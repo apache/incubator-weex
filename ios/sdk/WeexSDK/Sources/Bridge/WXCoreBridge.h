@@ -22,43 +22,13 @@
 
 #include <core/bridge/bridge.h>
 
-enum WeexCoreEventBlockType {
-    WeexCoreEventBlockTypeSetJSVersion,
-    WeexCoreEventBlockTypeReportException,
-    WeexCoreEventBlockTypeCallNative,
-    WeexCoreEventBlockTypeCallNativeModule,
-    WeexCoreEventBlockTypeCallNativeComponent,
-    WeexCoreEventBlockTypeSetTimeout,
-    WeexCoreEventBlockTypeCallNativeLog,
-    WeexCoreEventBlockTypeCallUpdateFinish,
-    WeexCoreEventBlockTypeCallRefreshFinish,
-    WeexCoreEventBlockTypeCallAddEvent,
-    WeexCoreEventBlockTypeCallRemoveEvent,
-    WeexCoreEventBlockTypeCallCreateBody,
-    WeexCoreEventBlockTypeCallAddElement,
-    WeexCoreEventBlockTypeCallLayout,
-    WeexCoreEventBlockTypeCallUpdateStyle,
-    WeexCoreEventBlockTypeCallUpdateAttr,
-    WeexCoreEventBlockTypeCallCreateFinish,
-    WeexCoreEventBlockTypeCallRemoveElement,
-    WeexCoreEventBlockTypeCallMoveElement,
-    WeexCoreEventBlockTypeCallAppendTreeCreateFinish,
-};
-
 namespace WeexCore {
-    struct WXCoreBridgeImpl;
-    
+
     class WXCoreBridge : public Bridge {
-        
-    private:
-        WXCoreBridgeImpl *impl;
-        
     public:
         
         WXCoreBridge();
         ~WXCoreBridge();
-        
-        void registerEventWithType(WeexCoreEventBlockType type,void* block);
         
         void setJSVersion(const char* version);
         

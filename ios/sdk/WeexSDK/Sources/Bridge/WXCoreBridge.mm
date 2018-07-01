@@ -17,6 +17,8 @@
  * under the License.
  */
 
+#ifdef WX_IMPORT_WEEXCORE
+
 #import "WXCoreBridge.h"
 #import "JSValue+Weex.h"
 #import "WXSDKManager.h"
@@ -31,6 +33,11 @@
 #include <core/render/page/render_page.h>
 #include <base/TimeUtils.h>
 #import "WXLayoutConstraint.h"
+
+#define NSSTRING(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCString(NULL, (const char *)(cstr), kCFStringEncodingUTF8)))
+#define NSSTRING_NO_COPY(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCStringNoCopy(NULL, (const char *)(cstr), kCFStringEncodingUTF8, kCFAllocatorNull)))
+
+#if 0
 
 #pragma mark - OC related
 @interface WXCoreBridgeOCImpl:NSObject
@@ -109,25 +116,41 @@
     }
 }
 
+@end
+
+#endif
+
 #pragma mark - C++ related
 namespace WeexCore {
     
-    struct WXCoreBridgeImpl{
-        WXCoreBridgeOCImpl *ocImpl;
-        std::map<WeexCoreEventBlockType,void *> blockMap;
-    };
-    
-    WXCoreBridge::WXCoreBridge(){
-        impl = new WXCoreBridgeImpl();
-        impl->ocImpl = [[WXCoreBridgeOCImpl alloc] init];
+    WXCoreBridge::WXCoreBridge() {
     }
     
-    WXCoreBridge::~WXCoreBridge(){
-        if(impl){
-            impl->ocImpl = nil;
-            impl->blockMap.clear();
+    WXCoreBridge::~WXCoreBridge() {
+    }
+    
+    static NSDictionary* NSDICTIONARY(std::map<std::string, std::string>* map)
+    {
+        if (map == nullptr)
+            return @{};
+        
+        NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:map->size()];
+        for (auto it = map->begin(); it != map->end(); it ++) {
+            [result setObject:NSSTRING(it->second.c_str()) forKey:NSSTRING(it->first.c_str())];
         }
-        delete impl;
+        return result;
+    }
+    
+    static NSArray* NSARRAY(std::set<std::string>* set)
+    {
+        if (set == nullptr)
+            return @[];
+        
+        NSMutableArray* result = [[NSMutableArray alloc] initWithCapacity:set->size()];
+        for (auto& s : *set) {
+            [result addObject:NSSTRING(s.c_str())];
+        }
+        return result;
     }
     
     void static cpyCMap2OCMap(std::map<std::string, std::string> *cMap, NSMutableDictionary *targetDic) {
@@ -148,10 +171,6 @@ namespace WeexCore {
                                                  encoding:NSUTF8StringEncoding];
             [targetDic setValue:value forKey:key];
         }
-    }
-    
-    void WXCoreBridge::registerEventWithType(WeexCoreEventBlockType type,void* block){
-        impl->blockMap[type] = block;
     }
     
     void WXCoreBridge::setJSVersion(const char* version){
@@ -293,33 +312,40 @@ namespace WeexCore {
                                      std::set<std::string> *events,
                                      const WXCoreMargin &margins,
                                      const WXCorePadding &paddings,
-                                     const WXCoreBorderWidth &borders){
+                                     const WXCoreBorderWidth &borders)
+    {
         RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        if (page == nullptr) {
+            return -1;
+        }
+        
         long long startTime = getCurrentTime();
         
-        NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
-        NSMutableDictionary *bodyData = [[NSMutableDictionary alloc] init];
-        // attr\style\type\ref
+        NSString* ns_instanceId = NSSTRING(pageId);
+        NSString* ns_ref = NSSTRING(ref);
+        NSString* ns_type = NSSTRING(componentType);
+        NSDictionary* ns_styles = NSDICTIONARY(styles);
+        NSDictionary* ns_attributes = NSDICTIONARY(attributes);
+        NSArray* ns_events = NSARRAY(events);
         
-        NSMutableDictionary *attrDic = [[NSMutableDictionary alloc] init];
-        cpyCMap2OCMap(attributes,attrDic);
-        [bodyData setValue:attrDic forKey:@"attr"];
-        
-        NSMutableDictionary *styleDic = [[NSMutableDictionary alloc] init];
-        cpyCMap2OCMap(styles,styleDic);
-        [bodyData setValue:styleDic forKey:@"style"];
-        
-        NSString *type = [NSString stringWithCString:componentType encoding:NSUTF8StringEncoding];
-        [bodyData setValue:type forKey:@"type"];
-        
-        NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
-        [bodyData setValue:refString forKey:@"type"];
-        
-#warning todo logic
-        
-        
-        if (page != nullptr)
-            page->CallBridgeTime(getCurrentTime() - startTime);
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
+        WXPerformBlockOnComponentThread(^{
+#ifdef DEBUG
+            WXLogDebug(@"flexLayout -> action: createBody %@ ref:%@", ns_type, ns_ref);
+#endif
+
+            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
+            [manager startComponentTasks];
+            [manager wxcore_CreateBody:@{@"ref": ns_ref, @"type": ns_type,
+                                         @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}];
+            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
+        });
+
+        page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
     }
         
@@ -331,38 +357,48 @@ namespace WeexCore {
                            const WXCoreMargin &margins,
                            const WXCorePadding &paddings,
                            const WXCoreBorderWidth &borders,
-                           bool willLayout){
+                           bool willLayout)
+    {
         
         RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        if (page == nullptr) {
+            return -1;
+        }
+        
         long long startTime = getCurrentTime();
         
-        NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
-        NSString *parentRefString = [NSString stringWithCString:parentRef encoding:NSUTF8StringEncoding];
+        NSString* ns_instanceId = NSSTRING(pageId);
+        NSString* ns_componentType = NSSTRING(componentType);
+        NSString* ns_ref = NSSTRING(ref);
+        NSString* ns_parentRef = NSSTRING(parentRef);
+        NSDictionary* ns_styles = NSDICTIONARY(styles);
+        NSDictionary* ns_attributes = NSDICTIONARY(attributes);
+        NSArray* ns_events = NSARRAY(events);
+        NSInteger ns_index = index;
         
-        NSMutableDictionary *elementData = [[NSMutableDictionary alloc] init];
-        // attr\style\type\ref
-        
-        NSMutableDictionary *attrDic = [[NSMutableDictionary alloc] init];
-        cpyCMap2OCMap(attributes,attrDic);
-        [elementData setValue:attrDic forKey:@"attr"];
-        
-        NSMutableDictionary *styleDic = [[NSMutableDictionary alloc] init];
-        cpyCMap2OCMap(styles,styleDic);
-        [elementData setValue:styleDic forKey:@"style"];
-        
-        NSString *type = [NSString stringWithCString:componentType encoding:NSUTF8StringEncoding];
-        [elementData setValue:type forKey:@"type"];
-        
-        NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
-        [elementData setValue:refString forKey:@"type"];
-        
-#warning todo logic
-        
-        if (page != nullptr)
-            page->CallBridgeTime(getCurrentTime() - startTime);
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addElement" options:nil];
+        WXPerformBlockOnComponentThread(^{
+#ifdef DEBUG
+            WXLogDebug(@"flexLayout -> action: addElement : %@", ns_componentType);
+#endif
+            
+            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            
+            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
+            [manager startComponentTasks];
+            [manager wxcore_AddElement:@{@"ref": ns_ref, @"type": ns_componentType,
+                                         @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}
+                      toSupercomponent:ns_parentRef atIndex:ns_index];
+            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
+        });
+
+        page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
     }
-        
+    
     int WXCoreBridge::callLayout(const char* pageId, const char* ref,
                        int top, int bottom, int left, int right,
                        int height, int width, int index){
@@ -485,9 +521,4 @@ namespace WeexCore {
     }
 }
 
-@end
-
-
-
-
-
+#endif

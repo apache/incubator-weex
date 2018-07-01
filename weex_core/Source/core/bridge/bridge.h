@@ -126,8 +126,7 @@ namespace WeexCore {
     /**Notice that this method is invoked from JS thread.**/
     bool notifyLayout(const char *instanceId);
 
-
-    void onInstanceClose(const char *instanceId) ;
+    void onInstanceClose(const char *instanceId);
   };
 } //end WeexCore
 #endif //Bridge_h

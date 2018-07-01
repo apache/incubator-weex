@@ -192,6 +192,7 @@ bool RenderManager::CallNativeModule(const char *pageId, const char *module, con
   if (strcmp(module, "meta") == 0) {
     CallMetaModule(method, arguments);
   }
+  return false;
 }
 
 bool RenderManager::CallMetaModule(const char *method, const char *arguments) {
@@ -215,6 +216,7 @@ bool RenderManager::CallMetaModule(const char *method, const char *arguments) {
       }
     }
   }
+  return false;
 }
 
 RenderPage *RenderManager::GetPage(const std::string &page_id) {
@@ -238,6 +240,7 @@ bool RenderManager::ClosePage(const std::string &page_id) {
   this->pages_.erase(page_id);
   delete page;
   page = nullptr;
+  return false;
 }
 
 void RenderManager::Batch(const std::string &page_id) {

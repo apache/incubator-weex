@@ -181,7 +181,9 @@ namespace WeexCore {
             if (ret) {
                 page->has_fore_layout_action_.store(true);
             }
+            return ret;
         }
+        return false;
     }
 
     void Bridge::onInstanceClose(const char *instanceId) {

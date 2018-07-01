@@ -40,7 +40,9 @@
 #import "WXRootView.h"
 #import "WXComponent+Layout.h"
 
-
+#ifdef WX_IMPORT_WEEXCORE
+#import <core/manager/weex_core_manager.h>
+#endif
 
 static NSThread *WXComponentThread;
 
@@ -1005,6 +1007,40 @@ static NSThread *WXComponentThread;
     }
 }
 
+#ifdef WX_IMPORT_WEEXCORE
+
+- (void)wxcore_CreateBody:(NSDictionary*)data
+{
+    WXAssertComponentThread();
+    WXAssertParam(data);
+    
+#warning todo logic 检查isWidthWrapContent和isHeightWrapContent参数
+    _rootComponent = [self _buildComponentForData:data supercomponent:nil];
+    
+    CGSize size = _weexInstance.frame.size;
+    WeexCore::WeexCoreManager::getInstance()->getPlatformBridge()->setDefaultHeightAndWidthIntoRootDom([_weexInstance.instanceId UTF8String], size.width, size.height, false, false);
+    
+    __weak typeof(self) weakSelf = self;
+    WX_MONITOR_INSTANCE_PERF_END(WXFirstScreenJSFExecuteTime, self.weexInstance);
+    [self _addUITask:^{
+        __strong typeof(self) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        
+        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:data[@"ref"] className:nil name:data[@"type"] phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTUIThread}];
+        strongSelf.weexInstance.rootView.wx_component = strongSelf->_rootComponent;
+        [strongSelf.weexInstance.rootView addSubview:strongSelf->_rootComponent.view];
+        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:data[@"ref"] className:nil name:data[@"type"] phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTUIThread}];
+    }];
+}
+
+- (void)wxcore_AddElement:(NSDictionary*)data toSupercomponent:(NSString*)superRef atIndex:(NSInteger)index
+{
+    
+}
+
+#endif
 
 @end
 
