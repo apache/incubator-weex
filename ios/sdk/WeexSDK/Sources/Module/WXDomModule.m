@@ -71,6 +71,7 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
         block(manager);
     });
 }
+
 - (void)performSelectorOnRuleManager:(void(^)(void))block{
     if (!block) {
         return;
