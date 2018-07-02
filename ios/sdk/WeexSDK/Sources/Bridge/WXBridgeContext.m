@@ -528,6 +528,9 @@ _Pragma("clang diagnostic pop") \
         sdkInstance.bundleType = bundleType;
         if ([bundleType.lowercaseString isEqualToString:@"rax"]) {
              raxAPIScriptPath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-rax-api" ofType:@"js"];
+			if (raxAPIScriptPath == nil) {
+				raxAPIScriptPath = [[NSBundle mainBundle] pathForResource:@"weex-rax-api" ofType:@"js"];
+			}
             raxAPIScript = [NSString stringWithContentsOfFile:raxAPIScriptPath encoding:NSUTF8StringEncoding error:nil];
             if (!raxAPIScript) {
                 WXLogError(@"weex-rax-api can not found");
@@ -565,6 +568,9 @@ _Pragma("clang diagnostic pop") \
                 
                 if (WX_SYS_VERSION_LESS_THAN(@"10.2")) {
                     NSString *filePath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-polyfill" ofType:@"js"];
+					if (filePath == nil) {
+						filePath = [[NSBundle mainBundle] pathForResource:@"weex-polyfill" ofType:@"js"];
+					}
                     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
                     if (script) {
                         [sdkInstance.instanceJavaScriptContext executeJavascript:script withSourceURL:[NSURL URLWithString:filePath]];
