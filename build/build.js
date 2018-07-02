@@ -20,7 +20,6 @@
 const fs = require('fs')
 const path = require('path')
 const rollup = require('rollup')
-const watch = require('rollup-watch')
 const getConfig = require('./config')
 
 let isWatch = false
@@ -37,17 +36,19 @@ else {
 }
 
 function runRollupOnWatch (config) {
-  const watcher = watch(rollup, config)
+  const watcher = rollup.watch(config)
   watcher.on('event', event => {
     switch (event.code) {
-      case 'STARTING': console.log('checking rollup-watch version...'); break
-      case 'BUILD_START': console.log('bundling...'); break
-      case 'BUILD_END': {
-        console.log('bundled in ' + path.relative(process.cwd(), config.dest)
+      case 'START': break
+      case 'BUNDLE_START': console.log('bundling...'); break
+      case 'BUNDLE_END': {
+        console.log('bundled in ' + config.output.file
           + ' (' + event.duration + 'ms)')
         console.log('Watching for changes...')
       } break
+      case 'END': break
       case 'ERROR': console.error('ERROR: ', event.error); break
+      case 'FATAL': console.error('FATAL: ', event.error); break
       default: console.error('unknown event', event)
     }
   })
