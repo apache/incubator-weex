@@ -487,4 +487,6 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
 
 + (BOOL)threadSafeCollectionUsingLock;
 
++ (void)setUnregisterFontWhenCollision:(BOOL)value;
+
 @end
