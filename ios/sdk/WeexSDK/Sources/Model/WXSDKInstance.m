@@ -322,6 +322,9 @@ typedef enum : NSUInteger {
         [WXTextComponent setRenderUsingCoreText:useCoreText];
         BOOL useThreadSafeLock = [[configCenter configForKey:@"iOS_weex_ext_config.useThreadSafeLock" defaultValue:@YES isDefault:NULL] boolValue];
         [WXUtility setThreadSafeCollectionUsingLock:useThreadSafeLock];
+        
+        BOOL unregisterFontWhenCollision = [[configCenter configForKey:@"iOS_weex_ext_config.unregisterFontWhenCollision" defaultValue:@NO isDefault:NULL] boolValue];
+        [WXUtility setUnregisterFontWhenCollision:unregisterFontWhenCollision];
 
         //Reading config from orange for Release instance in Main Thread or not
         _bReleaseInstanceInMainThread = [[configCenter configForKey:@"iOS_weex_ext_config.releaseInstanceInMainThread" defaultValue:@(YES) isDefault:nil] boolValue];
