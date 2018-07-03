@@ -34,11 +34,12 @@
 #include <unistd.h>
 #include <android/base/log_utils.h>
 #include <errno.h>
+#include <android/utils/so_utils.h>
 
-extern const char *s_cacheDir;
-extern const char *g_jssSoPath;
-extern const char *g_jssSoName;
-extern bool s_start_pie;
+//extern const char *s_cacheDir;
+//extern const char *g_jssSoPath;
+//extern const char *g_jssSoName;
+//extern bool s_start_pie;
 
 static void doExec(int fd, bool traceEnable, bool startupPie = true);
 
@@ -98,7 +99,8 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
   }
 #endif
 
-  static bool startupPie = s_start_pie;
+//  static bool startupPie = s_start_pie;
+  static bool startupPie = SoUtils::pie_support();
   LOGE("startupPie :%d", startupPie);
 
   pid_t child;
@@ -159,6 +161,10 @@ void WeexJSConnection::end() {
         break;
     }
   }
+}
+
+IPCSender* WeexJSConnection::sender() {
+  return m_impl->serverSender.get();
 }
 
 void printLogOnFile(const char *log) {
@@ -237,11 +243,13 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
   std::string executablePath;
   std::string icuDataPath;
   findIcuDataPath(icuDataPath);
-  if(g_jssSoPath != nullptr) {
-    executablePath = g_jssSoPath;
+//  if(g_jssSoPath != nullptr) {
+//    executablePath = g_jssSoPath;
+  if(SoUtils::jss_so_path() != nullptr) {
+    executablePath = SoUtils::jss_so_path();
   }
   if (executablePath.empty()) {
-    executablePath = WeexCore::WeexProxy::findLibJssSoPath();
+    executablePath = SoUtils::FindLibJssSoPath();
   }
 #if PRINT_LOG_CACHEFILE
   std::ofstream mcfile;
@@ -250,7 +258,7 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
   mcfile << "jsengine WeexJSConnection::doExec icuDataPath:" << icuDataPath << std::endl;
 #endif
   std::string::size_type pos = std::string::npos;
-  std::string libName = g_jssSoName;
+  std::string libName = SoUtils::jss_so_name();
   pos = executablePath.find(libName);
   if (pos != std::string::npos) {
     executablePath.replace(pos, libName.length(), "");
@@ -284,10 +292,11 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
   mcfile << "jsengine ldLibraryPathEnv:" << ldLibraryPathEnv << " icuDataPathEnv:" << icuDataPathEnv
          << std::endl;
 #endif
-  if (!s_cacheDir) {
+//  if (!s_cacheDir) {
+  if (!SoUtils::cache_dir()) {
     crashFilePathEnv.append("/data/data/com.taobao.taobao/cache");
   } else {
-    crashFilePathEnv.append(s_cacheDir);
+    crashFilePathEnv.append(SoUtils::cache_dir());
   }
   crashFilePathEnv.append("/jsserver_crash");
   char fdStr[16];
@@ -323,7 +332,7 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
            << result << " startupPie:" << startupPie << std::endl;
 #endif
     if (result == -1) {
-      executableName = std::string(s_cacheDir) + '/' + start_so;
+      executableName = std::string(SoUtils::cache_dir()) + '/' + start_so;
       int result_cache = access(executableName.c_str(), 00);
       if (result_cache == -1) {
         std::string sourceSo = executablePath + '/' + start_so;

@@ -21,6 +21,8 @@
 #include <android/bridge/impl/content_box_measurement_impl_android.h>
 #include <android/bridge/impl/measure_mode_impl_android.h>
 #include <android/base/jni/scoped_java_ref.h>
+#include <core/manager/weex_core_manager.h>
+#include <android/bridge/impl/android_side.h>
 
 namespace WeexCore {
 
@@ -32,64 +34,121 @@ namespace WeexCore {
 
     ~MeasureFunctionAdapterImplAndroid() {}
 
-    inline WXCoreSize Measure(WXCoreLayoutNode *node, float width,
-                       MeasureMode widthMeasureMode, float height,
-                       MeasureMode heightMeasureMode) {
+//    WXCoreSize Measure(WXCoreLayoutNode *node, float width,
+//                       MeasureMode widthMeasureMode, float height,
+//                       MeasureMode heightMeasureMode) {
+//      WXCoreSize size;
+//      size.height = 0;
+//      size.width = 0;
+//
+//      jobject measureFunc = static_cast<jobject>(GetMeasureFuncFromComponent(node));
+//
+//      if (node == nullptr || measureFunc == nullptr) {
+//        return size;
+//      }
+//
+//      JNIEnv *env = base::android::AttachCurrentThread();
+//
+//      int widthMode = Unspecified(env);
+//      int heightMode = Unspecified(env);
+//      if (widthMeasureMode == kExactly)
+//        widthMode = Exactly(env);
+//      if (heightMeasureMode == kExactly)
+//        heightMode = Exactly(env);
+//      cumsmeasure_Imple_Android(env, measureFunc,
+//                                width, height,
+//                                widthMode, heightMode);
+//      size.width = GetLayoutWidth(env, measureFunc);
+//      size.height = GetLayoutHeight(env, measureFunc);
+//
+//      env->DeleteLocalRef(measureFunc);
+//
+//      return size;
+//    }
+//
+//    void LayoutBefore(WXCoreLayoutNode *node) {
+//      jobject measureFunc = static_cast<jobject>(GetMeasureFuncFromComponent(node));
+//      if(nullptr == measureFunc) {
+//        return;
+//      }
+//
+//        JNIEnv *env = base::android::AttachCurrentThread();
+//      LayoutBeforeImplAndroid(env, measureFunc);
+//      env->DeleteLocalRef(measureFunc);
+//    }
+//
+//    void LayoutAfter(WXCoreLayoutNode *node, float width, float height) {
+//      jobject measureFunc = static_cast<jobject>(GetMeasureFuncFromComponent(node));
+//      if(nullptr == measureFunc) {
+//        return;
+//      }
+//        JNIEnv *env = base::android::AttachCurrentThread();
+//      LayoutAfterImplAndroid(env, measureFunc, width, height);
+//      env->DeleteLocalRef(measureFunc);
+//    }
+//
+//    inline void* GetMeasureFuncFromComponent(WXCoreLayoutNode *node) {
+//        if (!node->haveMeasureFunc()) {
+//            return nullptr;
+//        }
+//        return Bridge_Impl_Android::getInstance()->getMeasureFunc(((RenderObject *) node)->page_id().c_str(), convert_render_object_to_long(node));
+//    }
+
+    WXCoreSize Measure(const char* page_id, long render_ptr, float width,
+                   MeasureMode widthMeasureMode, float height,
+                   MeasureMode heightMeasureMode) {
       WXCoreSize size;
       size.height = 0;
       size.width = 0;
 
-      jobject measureFunc = static_cast<jobject>(GetMeasureFuncFromComponent(node));
+      jobject measureFunc = GetMeasureFuncFromComponent(page_id, render_ptr);
 
-      if (node == nullptr || measureFunc == nullptr) {
+      if (render_ptr == 0 || measureFunc == nullptr) {
         return size;
       }
 
-      JNIEnv *env = getJNIEnv();
+    JNIEnv *env = base::android::AttachCurrentThread();
 
-      int widthMode = Unspecified(env);
-      int heightMode = Unspecified(env);
-      if (widthMeasureMode == kExactly)
+    int widthMode = Unspecified(env);
+    int heightMode = Unspecified(env);
+    if (widthMeasureMode == kExactly)
         widthMode = Exactly(env);
-      if (heightMeasureMode == kExactly)
+    if (heightMeasureMode == kExactly)
         heightMode = Exactly(env);
-      cumsmeasure_Imple_Android(env, measureFunc,
-                                width, height,
-                                widthMode, heightMode);
-      size.width = GetLayoutWidth(env, measureFunc);
-      size.height = GetLayoutHeight(env, measureFunc);
+    cumsmeasure_Imple_Android(env, measureFunc,
+                              width, height,
+                              widthMode, heightMode);
+    size.width = GetLayoutWidth(env, measureFunc);
+    size.height = GetLayoutHeight(env, measureFunc);
 
-      env->DeleteLocalRef(measureFunc);
+    env->DeleteLocalRef(measureFunc);
 
       return size;
     }
 
-    inline void LayoutBefore(WXCoreLayoutNode *node) {
-      jobject measureFunc = static_cast<jobject>(GetMeasureFuncFromComponent(node));
+    void LayoutBefore(const char* page_id, long render_ptr) {
+      jobject measureFunc = GetMeasureFuncFromComponent(page_id, render_ptr);
       if(nullptr == measureFunc) {
         return;
       }
 
-      JNIEnv *env = getJNIEnv();
+        JNIEnv *env = base::android::AttachCurrentThread();
       LayoutBeforeImplAndroid(env, measureFunc);
       env->DeleteLocalRef(measureFunc);
     }
 
-    inline void LayoutAfter(WXCoreLayoutNode *node, float width, float height) {
-      jobject measureFunc = static_cast<jobject>(GetMeasureFuncFromComponent(node));
+    void LayoutAfter(const char* page_id, long render_ptr, float width, float height) {
+      jobject measureFunc = GetMeasureFuncFromComponent(page_id, render_ptr);
       if(nullptr == measureFunc) {
         return;
       }
-      JNIEnv *env = getJNIEnv();
+        JNIEnv *env = base::android::AttachCurrentThread();
       LayoutAfterImplAndroid(env, measureFunc, width, height);
       env->DeleteLocalRef(measureFunc);
     }
 
-    inline void* GetMeasureFuncFromComponent(WXCoreLayoutNode *node) {
-      if (!node->haveMeasureFunc()) {
-        return nullptr;
-      }
-      return Bridge_Impl_Android::getInstance()->getMeasureFunc(((RenderObject *) node)->page_id().c_str(), convert_render_object_to_long(node));
+   jobject GetMeasureFuncFromComponent(const char* page_id, long render_ptr) {
+      return static_cast<AndroidSide*>(WeexCoreManager::getInstance()->getPlatformBridge()->platform_side())->getMeasureFunc(page_id, render_ptr);
     }
   };
 }

@@ -23,20 +23,20 @@ namespace WeexCore {
 
     WeexCoreManager *WeexCoreManager::m_pInstance = nullptr;
 
-    void WeexCoreManager::setPlatformBridge(Bridge *pBridge) {
+    void WeexCoreManager::setPlatformBridge(PlatformBridge *pBridge) {
         this->platformBridge = pBridge;
     }
 
-    Bridge* WeexCoreManager::getPlatformBridge() {
+    PlatformBridge* WeexCoreManager::getPlatformBridge() {
         return this->platformBridge;
     }
 
-    void WeexCoreManager::setJSBridge(JSBridge *jsBridge) {
-        this->jsBridge = jsBridge;
+    void WeexCoreManager::set_script_bridge(ScriptBridge *script_bridge) {
+        script_bridge_ = script_bridge;
     }
 
-    JSBridge* WeexCoreManager::getJSBridge() {
-        return this->jsBridge;
+    ScriptBridge* WeexCoreManager::script_bridge() {
+        return script_bridge_;
     }
 
     void WeexCoreManager::SetMeasureFunctionAdapter(MeasureFunctionAdapter *measureFunctionAdapter) {

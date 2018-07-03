@@ -34,6 +34,8 @@ public:
 
     void end();
 
+    IPCSender* sender();
+
 private:
     struct WeexJSConnectionImpl;
 

@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// Copyright [2017-12-07] <WeexCore>
 #include "WeexProxy.h"
 
 #include <android/base/log_utils.h>
@@ -25,21 +24,32 @@
 #include <android/jsengine/multiprocess/ExtendJSApi.h>
 #include <android/jsengine/api/WeexJSCoreApi.h>
 
+#include <jni.h>
 #include <dlfcn.h>
 #include <errno.h>
 #include <core/layout/measure_func_adapter_impl_android.h>
 #include <core/manager/weex_core_manager.h>
+#include <android/bridge/impl/android_bridge_in_multi_process.h>
+#include <android/bridge/impl/android_bridge_in_multi_so.h>
+#include <android/bridge/impl/android_side.h>
+#include <android/bridge/impl/core_side_in_multi_so.h>
+#include <android/bridge/impl/core_side_in_multi_process.h>
+#include <android/wrap/wx_js_object.h>
+#include <android/base/jni_type.h>
+#include <android/utils/so_utils.h>
 
-const char *s_cacheDir;
-const char *g_jssSoPath = nullptr;
-const char *g_jssSoName = "libweexjss.so";
-bool s_start_pie = true;
+//const char *s_cacheDir;
+//const char *g_jssSoPath = nullptr;
+//const char *g_jssSoName = "libweexjss.so";
+//bool s_start_pie = true;
 
 static IPCSender *sSender;
 static std::unique_ptr<IPCHandler> sHandler;
 static std::unique_ptr<WeexJSConnection> sConnection;
-static WEEX_CORE_JS_SERVER_API_FUNCTIONS *js_server_api_functions = nullptr;
+static FunctionsExposedByJS *js_server_api_functions = nullptr;
 bool g_use_single_process = false;
+
+#define  USE_MULTI_SO_BRIDGE 1
 
 namespace WeexCore {
     void WeexProxy::reset() {
@@ -116,19 +126,13 @@ namespace WeexCore {
 
     inline void addParamsFromJArgs(std::vector<VALUE_WITH_TYPE *> &params, VALUE_WITH_TYPE *param,
                                    std::unique_ptr<IPCSerializer> &serializer, JNIEnv *env,
-                                   jobject jArg) {
-        jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
-        jint jTypeInt = env->GetIntField(jArg, jTypeId);
+                                   std::unique_ptr<WXJSObject>& wx_js_object) {
 
-        jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
-        jobject jDataObj = env->GetObjectField(jArg, jDataId);
+        jint jTypeInt = wx_js_object->GetType(env);
+        auto jDataObj = wx_js_object->GetData(env);
+
         if (jTypeInt == 1) {
-            if (jDoubleValueMethodId == NULL) {
-                jclass jDoubleClazz = env->FindClass("java/lang/Double");
-                jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
-                env->DeleteLocalRef(jDoubleClazz);
-            }
-            jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
+            jdouble jDoubleObj = base::android::JNIType::DoubleValue(env, jDataObj.Get());
             if (js_server_api_functions != nullptr) {
                 param->type = ParamsType::DOUBLE;
                 param->value.doubleValue = jDoubleObj;
@@ -137,7 +141,7 @@ namespace WeexCore {
             }
 
         } else if (jTypeInt == 2) {
-            jstring jDataStr = (jstring) jDataObj;
+            jstring jDataStr = (jstring) jDataObj.Get();
             if (js_server_api_functions != nullptr) {
                 param->type = ParamsType::STRING;
                 param->value.string = jstring2WeexString(env, jDataStr);
@@ -145,7 +149,7 @@ namespace WeexCore {
                 addString(env, serializer.get(), jDataStr);
             }
         } else if (jTypeInt == 3) {
-            jstring jDataStr = (jstring) jDataObj;
+            jstring jDataStr = (jstring) jDataObj.Get();
             if (js_server_api_functions != nullptr) {
                 param->type = ParamsType::JSONSTRING;
                 param->value.string = jstring2WeexString(env, jDataStr);
@@ -153,7 +157,7 @@ namespace WeexCore {
                 addJSONString(env, serializer.get(), jDataStr);
             }
         } else if (jTypeInt == 4) {
-            jbyteArray dataArray = (jbyteArray) jDataObj;
+            jbyteArray dataArray = (jbyteArray) jDataObj.Get();
             if (js_server_api_functions != nullptr) {
                 param->type = ParamsType::BYTEARRAY;
                 jbyte *data = env->GetByteArrayElements(dataArray, 0);
@@ -174,7 +178,6 @@ namespace WeexCore {
             params.push_back(param);
         }
 
-        env->DeleteLocalRef(jDataObj);
     }
 
     inline void freeParams(std::vector<VALUE_WITH_TYPE *> &params) {
@@ -193,13 +196,14 @@ namespace WeexCore {
     jint WeexProxy::doInitFramework(JNIEnv *env, jobject object,
                                     jstring script, jobject params,
                                     jstring cacheDir, jboolean pieSupport) {
-        const char *cache = env->GetStringUTFChars(
-                reinterpret_cast<jstring>(cacheDir), nullptr);
+        const char *cache = env->GetStringUTFChars(cacheDir, nullptr);
         if (strlen(cache) > 0) {
-            s_cacheDir = cache;
+//            s_cacheDir = cache;
+            SoUtils::set_cache_dir(const_cast<char*>(cache));
         }
-        s_start_pie = pieSupport;
-        return doInitFramework(env, jThis, script, params);
+//        s_start_pie = pieSupport;
+        SoUtils::set_pie_support(pieSupport);
+        return doInitFramework(env, object, script, params);
     }
 
     jint
@@ -232,11 +236,25 @@ namespace WeexCore {
                     realSerializer = serializer;
                 }
 
-                // initHandler(sHandler.get());
+//                 initHandler(sHandler.get());
 
-                ExtendJSApi *pExtensionJSApi = new ExtendJSApi();
+//                ExtendJSApi *pExtensionJSApi = new ExtendJSApi();
 
-                pExtensionJSApi->initFunction(sHandler.get());
+                AndroidBridgeInMultiProcess* bridge = static_cast<AndroidBridgeInMultiProcess*>(Bridge_Impl_Android::getInstance());
+                static_cast<CoreSideInMultiProcess*>(bridge->core_side())->set_sender(sSender);
+//                pExtensionJSApi->initFunction(sHandler.get());
+                bridge->RegisterIPCCallback(sHandler.get());
+
+                // for enviroment
+                bridge->core_side()->SetPlatform(
+                        WXCoreEnvironment::getInstance()->platform());
+                bridge->core_side()->SetDeviceWidthAndHeight(
+                        WXCoreEnvironment::getInstance()->DeviceWidth(), WXCoreEnvironment::getInstance()->DeviceHeight());
+                auto options = WXCoreEnvironment::getInstance()->options();
+                auto it = options.begin();
+                for (; it != options.end(); it++) {
+                    bridge->core_side()->AddOption(it->first, it->second);
+                }
 
                 // using base::debug::TraceEvent;
                 // TraceEvent::StartATrace(env);
@@ -269,11 +287,10 @@ namespace WeexCore {
                                     jstring script,
                                     jobject params) {
 
-        Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
-        WeexCoreManager::getInstance()->setPlatformBridge(Bridge_Impl_Android::getInstance());
-        WeexCoreManager::getInstance()->setJSBridge(new JSBridge());
-        WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(
-                new MeasureFunctionAdapterImplAndroid());
+//        WeexCoreManager::getInstance()->setPlatformBridge(Bridge_Impl_Android::getInstance());
+//        WeexCoreManager::getInstance()->setJSBridge(new JSBridge());
+//        WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(
+//                new MeasureFunctionAdapterImplAndroid());
         std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
         const std::vector<INIT_FRAMEWORK_PARAMS *> &initFrameworkParams = initFromParam(env,
                                                                                         script,
@@ -281,8 +298,15 @@ namespace WeexCore {
                                                                                         serializer.get());
         LOGE("Single process ? %s", g_use_single_process ? "true" : "false");
         if (g_use_single_process) {
+#if USE_MULTI_SO_BRIDGE
+            Bridge_Impl_Android::InitInstance(new AndroidBridgeInMultiSo);
+#endif
+            WeexCoreManager::getInstance()->setPlatformBridge(Bridge_Impl_Android::getInstance());
             if (initFrameworkInSingleProcess(env, script, initFrameworkParams)) {
                 //reportNativeInitStatus("-1011", "init Single Process Success");
+                // TODO
+                WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new MeasureFunctionAdapterImplAndroid());
+                WeexCoreManager::getInstance()->getPlatformBridge()->core_side()->SetMeasureFunctionAdapter();
                 return true;
             }
 
@@ -290,10 +314,13 @@ namespace WeexCore {
                 return true;
             }
         } else {
+            Bridge_Impl_Android::InitInstance(new AndroidBridgeInMultiProcess);
+            WeexCoreManager::getInstance()->setPlatformBridge(Bridge_Impl_Android::getInstance());
             if (initFrameworkInMultiProcess(env, script, params, serializer.get())) {
+                WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new MeasureFunctionAdapterImplAndroid());
+                WeexCoreManager::getInstance()->getPlatformBridge()->core_side()->SetMeasureFunctionAdapter();
                 return true;
             }
-
             if (initFrameworkInSingleProcess(env, script, initFrameworkParams)) {
                 reportNativeInitStatus("-1011", "init Single Process Success");
                 return true;
@@ -378,9 +405,11 @@ namespace WeexCore {
                         return false;
                 }
 
-                jobject jArg = env->GetObjectArrayElement(jargs, i);
-                addParamsFromJArgs(params, param, serializer, env, jArg);
-                env->DeleteLocalRef(jArg);
+//                jobject jArg = env->GetObjectArrayElement(jargs, i);
+                auto wx_js_object = std::unique_ptr<WXJSObject>(new WXJSObject(env, env->GetObjectArrayElement(jargs, i)));
+//                addParamsFromJArgs(params, param, serializer, env, jArg);
+                addParamsFromJArgs(params, param, serializer, env, wx_js_object);
+//                env->DeleteLocalRef(jArg);
             }
 
             if (js_server_api_functions != nullptr) {
@@ -423,126 +452,127 @@ namespace WeexCore {
         return true;
     }
 
-    std::string WeexProxy::findLibJssSoPath() {
-        std::string executablePath = "";
-        unsigned long target = reinterpret_cast<unsigned long>(__builtin_return_address(0));
-        FILE *f = fopen("/proc/self/maps", "r");
-        if (!f) {
-            return "";
-        }
-        char buffer[256];
-        char *line;
-        while ((line = fgets(buffer, 256, f))) {
-            char *end;
-            unsigned long val;
-            errno = 0;
-            val = strtoul(line, &end, 16);
-            if (errno)
-                continue;
-            if (val > target)
-                continue;
-            end += 1;
-            errno = 0;
-            val = strtoul(end, &end, 16);
-            if (errno)
-                continue;
-            if (val > target) {
-                char *s = strstr(end, "/");
-                if (s != nullptr)
-                    executablePath.assign(s);
-                std::size_t found = executablePath.rfind('/');
-                if (found != std::string::npos) {
-                    executablePath = executablePath.substr(0, found);
-                }
-            }
-            if (!executablePath.empty()) {
-                break;
-            }
-        }
-        fclose(f);
-        LOGE("find so path: %s", executablePath.c_str());
-        std::string::size_type pos = std::string::npos;
-        // dynamic deploy
-        if (!executablePath.empty() && executablePath.find(".maindex") != std::string::npos) {
-            std::string libs[] = {"/opt", "/oat/arm"};
-            auto libsCount = sizeof(libs) / sizeof(std::string);
-            for (int i = 0; i < libsCount; ++i) {
-                auto lib = libs[i];
-                pos = executablePath.find(lib);
-                if (pos != std::string::npos) {
-                    executablePath.replace(pos, lib.length(), "/lib");
-                    break;
-                }
-            }
-        }
-        std::string soPath = executablePath + "/" + g_jssSoName;
-        // -------------------------------------------------
-        // -------------------------------------------------
-        if (access(soPath.c_str(), 00) == 0) {
-            return soPath;
-        } else {
-            const char *error = soPath.c_str();
-            LOGE("so path: %s is not exsist, use full package lib", error);
-            executablePath = s_cacheDir;
-            std::string lib = "/cache";
-            if ((pos = soPath.find(lib)) != std::string::npos) {
-                executablePath.replace(pos, lib.length(), "/lib");
-            }
-            soPath = executablePath + "/" + g_jssSoName;
-            if (access(soPath.c_str(), 00) != 0) {
-                LOGE("so path: %s is not exsist", soPath.c_str());
-                reportNativeInitStatus("-1004", error);
-                //return false;
-                //use libweexjss.so directly
-                soPath = g_jssSoName;
-            }
-            return soPath;
-        }
-    }
+//    std::string WeexProxy::findLibJssSoPath() {
+//        std::string executablePath = "";
+//        unsigned long target = reinterpret_cast<unsigned long>(__builtin_return_address(0));
+//        FILE *f = fopen("/proc/self/maps", "r");
+//        if (!f) {
+//            return "";
+//        }
+//        char buffer[256];
+//        char *line;
+//        while ((line = fgets(buffer, 256, f))) {
+//            char *end;
+//            unsigned long val;
+//            errno = 0;
+//            val = strtoul(line, &end, 16);
+//            if (errno)
+//                continue;
+//            if (val > target)
+//                continue;
+//            end += 1;
+//            errno = 0;
+//            val = strtoul(end, &end, 16);
+//            if (errno)
+//                continue;
+//            if (val > target) {
+//                char *s = strstr(end, "/");
+//                if (s != nullptr)
+//                    executablePath.assign(s);
+//                std::size_t found = executablePath.rfind('/');
+//                if (found != std::string::npos) {
+//                    executablePath = executablePath.substr(0, found);
+//                }
+//            }
+//            if (!executablePath.empty()) {
+//                break;
+//            }
+//        }
+//        fclose(f);
+//        LOGE("find so path: %s", executablePath.c_str());
+//        std::string::size_type pos = std::string::npos;
+//        // dynamic deploy
+//        if (!executablePath.empty() && executablePath.find(".maindex") != std::string::npos) {
+//            std::string libs[] = {"/opt", "/oat/arm"};
+//            auto libsCount = sizeof(libs) / sizeof(std::string);
+//            for (int i = 0; i < libsCount; ++i) {
+//                auto lib = libs[i];
+//                pos = executablePath.find(lib);
+//                if (pos != std::string::npos) {
+//                    executablePath.replace(pos, lib.length(), "/lib");
+//                    break;
+//                }
+//            }
+//        }
+////        std::string soPath = executablePath + "/" + g_jssSoName;
+//        std::string soPath = executablePath + "/" + SoUtils::jss_so_name();
+//        // -------------------------------------------------
+//        // -------------------------------------------------
+//        if (access(soPath.c_str(), 00) == 0) {
+//            return soPath;
+//        } else {
+//            const char *error = soPath.c_str();
+//            LOGE("so path: %s is not exsist, use full package lib", error);
+////            executablePath = s_cacheDir;
+//            executablePath = SoUtils::cache_dir();
+//            std::string lib = "/cache";
+//            if ((pos = soPath.find(lib)) != std::string::npos) {
+//                executablePath.replace(pos, lib.length(), "/lib");
+//            }
+//            soPath = executablePath + "/" + SoUtils::jss_so_name();
+////            soPath = executablePath + "/" + g_jssSoName;
+//            if (access(soPath.c_str(), 00) != 0) {
+//                LOGE("so path: %s is not exsist", soPath.c_str());
+//                reportNativeInitStatus("-1004", error);
+//                //return false;
+//                //use libweexjss.so directly
+////                soPath = g_jssSoName;
+//                soPath = SoUtils::jss_so_name();
+//            }
+//            return soPath;
+//        }
+//    }
 
-    static WEEX_CORE_JS_API_FUNCTIONS *getWeexCoreApiFunctions() {
-        WEEX_CORE_JS_API_FUNCTIONS tempFunctions = {
-                _setJSVersion,
-                _reportException,
-                _callNative,
-                _callNativeModule,
-                _callNativeComponent,
-                _callAddElement,
-                _setTimeout,
-                _callNativeLog,
-                _callCreateBody,
-                _callUpdateFinish,
-                _callCreateFinish,
-                _callRefreshFinish,
-                _callUpdateAttrs,
-                _callUpdateStyle,
-                _callRemoveElement,
-                _callMoveElement,
-                _callAddEvent,
-                _callRemoveEvent,
-                _setInterval,
-                _clearInterval,
-                _callGCanvasLinkNative,
-                _t3dLinkNative,
-                callHandlePostMessage,
-                callDIspatchMessage
-        };
-
-        auto *functions = (WEEX_CORE_JS_API_FUNCTIONS *) malloc(
-                sizeof(WEEX_CORE_JS_API_FUNCTIONS));
-
-        if (!functions) {
-            return nullptr;
-        }
-
-        memset(functions, 0, sizeof(WEEX_CORE_JS_API_FUNCTIONS));
-        memcpy(functions, &tempFunctions, sizeof(WEEX_CORE_JS_API_FUNCTIONS));
+    static FunctionsExposedByCore *getWeexCoreApiFunctions() {
+//        FunctionsExposedByCore tempFunctions = {
+//                _setJSVersion,
+//                _reportException,
+//                _callNative,
+//                _callNativeModule,
+//                _callNativeComponent,
+//                _callAddElement,
+//                _setTimeout,
+//                _callNativeLog,
+//                _callCreateBody,
+//                _callUpdateFinish,
+//                _callCreateFinish,
+//                _callRefreshFinish,
+//                _callUpdateAttrs,
+//                _callUpdateStyle,
+//                _callRemoveElement,
+//                _callMoveElement,
+//                _callAddEvent,
+//                _callRemoveEvent,
+//                _setInterval,
+//                _clearInterval,
+//                _callGCanvasLinkNative,
+//                _t3dLinkNative,
+//                callHandlePostMessage,
+//                callDispatchMessage
+//        };
+//
+        auto *functions = (FunctionsExposedByCore *) malloc(
+                sizeof(FunctionsExposedByCore));
+//
+//        if (!functions) {
+//            return nullptr;
+//        }
+//
+//        memset(functions, 0, sizeof(FunctionsExposedByCore));
+//        memcpy(functions, &tempFunctions, sizeof(FunctionsExposedByCore));
 
         return functions;
     }
-
-    typedef WEEX_CORE_JS_SERVER_API_FUNCTIONS *(*InitMethodFunc)(
-            WEEX_CORE_JS_API_FUNCTIONS *functions);
 
     jint
     WeexProxy::initFrameworkInSingleProcess(JNIEnv *env, jstring script,
@@ -552,12 +582,15 @@ namespace WeexCore {
         // -----------------------------------------------
         // use find path to get lib path
         // use set path is better idea, should change in future
-        if (g_jssSoPath != nullptr) {
-            soPath = g_jssSoPath;
+//        if (g_jssSoPath != nullptr) {
+//            soPath = g_jssSoPath;
+//        }
+        if (SoUtils::jss_so_path() != nullptr) {
+            soPath = SoUtils::jss_so_path();
         }
 
         if (soPath.empty()) {
-            soPath = findLibJssSoPath();
+            soPath = SoUtils::FindLibJssSoPath();
         }
 
         LOGE("final executablePath:%s", soPath.c_str());
@@ -565,7 +598,8 @@ namespace WeexCore {
         void *handle = dlopen(soPath.c_str(), RTLD_NOW);
         if (!handle) {
             const char *error = dlerror();
-            LOGE("load %s failed,error=%s\n", g_jssSoName, error);
+//            LOGE("load %s failed,error=%s\n", g_jssSoName, error);
+            LOGE("load %s failed,error=%s\n", SoUtils::jss_so_name(), error);
             reportNativeInitStatus("-1005", error);
             // try again use current path
             dlclose(handle);
@@ -575,8 +609,13 @@ namespace WeexCore {
         //clear dlopen error message
         dlerror();
 
+        typedef FunctionsExposedByJS *(*ExchangeJSBridgeFunctions)(FunctionsExposedByCore *);
         LOGE("dlopen so and call function");
-        auto initMethod = (InitMethodFunc) dlsym(handle, "exchangeMethod");
+        auto initMethod = (ExchangeJSBridgeFunctions) dlsym(handle, "ExchangeJSBridgeFunctions");
+
+        typedef CoreSideFunctionsOfPlatformBridge *(*ExchangePlatformBridgeFunctions)(
+                PlatformExposeFunctions *);
+        auto exchange_platform_bridge_functions = (ExchangePlatformBridgeFunctions) dlsym(handle, "ExchangePlatformBridgeFunctions");
         if (!initMethod) {
             const char *error = dlerror();
             LOGE("load External_InitFrameWork failed,error=%s\n", error);
@@ -588,9 +627,26 @@ namespace WeexCore {
         //clear dlopen error message
         dlerror();
 
-        WEEX_CORE_JS_API_FUNCTIONS *pFunctions = getWeexCoreApiFunctions();
-
+        FunctionsExposedByCore *pFunctions = getWeexCoreApiFunctions();
         js_server_api_functions = initMethod(pFunctions);
+
+#if USE_MULTI_SO_BRIDGE
+        AndroidBridgeInMultiSo *bridge = static_cast<AndroidBridgeInMultiSo *>(Bridge_Impl_Android::getInstance());
+        PlatformExposeFunctions *platform_expose_functions = bridge->GetExposedFunctions();
+        auto core_side_functions = exchange_platform_bridge_functions(platform_expose_functions);
+
+        static_cast<CoreSideInMultiSo*>(bridge->core_side())->set_core_side_functions(core_side_functions);
+        // for enviroment
+        bridge->core_side()->SetPlatform(
+                WXCoreEnvironment::getInstance()->platform());
+        bridge->core_side()->SetDeviceWidthAndHeight(
+                WXCoreEnvironment::getInstance()->DeviceWidth(), WXCoreEnvironment::getInstance()->DeviceHeight());
+        auto options = WXCoreEnvironment::getInstance()->options();
+        auto it = options.begin();
+        for (; it != options.end(); it++) {
+            bridge->core_side()->AddOption(it->first, it->second);
+        }
+#endif
 
         if (js_server_api_functions != nullptr) {
             js_server_api_functions->funcInitFramework(env->GetStringUTFChars(script, nullptr),
@@ -660,10 +716,13 @@ namespace WeexCore {
         if (m_get_jss_so_path != nullptr) {
             jobject j_get_jss_so_path = env->CallObjectMethod(params, m_get_jss_so_path);
             if (j_get_jss_so_path != nullptr) {
-                g_jssSoPath = env->GetStringUTFChars(
-                        (jstring) (j_get_jss_so_path),
-                        nullptr);
-                LOGE("g_jssSoPath is %s ", g_jssSoPath);
+//                g_jssSoPath = env->GetStringUTFChars(
+//                        (jstring) (j_get_jss_so_path),
+//                        nullptr);
+                SoUtils::set_jss_so_path(const_cast<char *>(env->GetStringUTFChars(
+                                        (jstring) (j_get_jss_so_path),
+                                        nullptr)));
+                LOGE("g_jssSoPath is %s ", SoUtils::jss_so_path());
             }
         }
 
@@ -781,7 +840,8 @@ namespace WeexCore {
     WeexProxy::reportException(const char *instanceID,
                                const char *func,
                                const char *exception_string) {
-        _reportException(instanceID, func, exception_string);
+//        _reportException(instanceID, func, exception_string);
+
 //        JNIEnv *env = getJNIEnv();
 //        jstring jExceptionString = env->NewStringUTF(exception_string);
 //        jstring jInstanceId = env->NewStringUTF(instanceID);
@@ -801,137 +861,142 @@ namespace WeexCore {
     }
 
     void WeexProxy::reportServerCrash(jstring jinstanceid) {
-        JNIEnv *env = getJNIEnv();
-        jmethodID reportMethodId;
+//        JNIEnv *env = getJNIEnv();
+        JNIEnv *env = base::android::AttachCurrentThread();
+//        jmethodID reportMethodId;
         jstring crashFile;
         std::string crashFileStr;
-        reportMethodId = env->GetMethodID(jBridgeClazz,
-                                          "reportServerCrash",
-                                          "(Ljava/lang/String;Ljava/lang/String;)V");
-        if (!reportMethodId)
-            goto no_method;
+//        reportMethodId = env->GetMethodID(jBridgeClazz,
+//                                          "reportServerCrash",
+//                                          "(Ljava/lang/String;Ljava/lang/String;)V");
+//        if (!reportMethodId) {
+//            env->ExceptionClear();
+//        } else {
+            crashFileStr.assign("/jsserver_crash/jsserver_crash_info.log");
 
-        crashFileStr.assign("/jsserver_crash/jsserver_crash_info.log");
+//            crashFile = env->NewStringUTF(crashFileStr.c_str());
+//            env->CallVoidMethod(jThis, reportMethodId, jinstanceid, crashFile);
+//            env->DeleteLocalRef(crashFile);
+//        }
+        const char* instance_id = env->GetStringUTFChars(jinstanceid, JNI_FALSE);
+        WXBridge::Instance()->ReportServerCrash(env, instance_id, crashFileStr.c_str());
+        env->ReleaseStringUTFChars(jinstanceid, instance_id);
 
-        crashFile = env->NewStringUTF(crashFileStr.c_str());
-        env->CallVoidMethod(jThis, reportMethodId, jinstanceid, crashFile);
-        env->DeleteLocalRef(crashFile);
-        no_method:
-        env->ExceptionClear();
     }
 
     void WeexProxy::reportNativeInitStatus(const char *statusCode, const char *errorMsg) {
-        JNIEnv *env = getJNIEnv();
-        jmethodID reportMethodId;
-        jstring errorCodeString = env->NewStringUTF(statusCode);
+//        JNIEnv *env = getJNIEnv();
+        JNIEnv *env = base::android::AttachCurrentThread();
+//        jmethodID reportMethodId;
+//        jstring errorCodeString = env->NewStringUTF(statusCode);
 
         std::string m_errorMsgString = "useSingleProcess is ";
         m_errorMsgString.append(g_use_single_process ? "true" : "false");
         m_errorMsgString.append(" And Error Msg is ");
         m_errorMsgString.append(errorMsg);
 
-
-        LOGE("reportNativeInitStatus error msg is %s ", m_errorMsgString.c_str());
-
-        jstring errorMsgString = env->NewStringUTF(m_errorMsgString.c_str());
-        reportMethodId = env->GetMethodID(jBridgeClazz,
-                                          "reportNativeInitStatus",
-                                          "(Ljava/lang/String;Ljava/lang/String;)V");
-
-
-        if (!reportMethodId)
-            goto no_method;
-
-
-        env->CallVoidMethod(jThis, reportMethodId, errorCodeString, errorMsgString);
-
-        no_method:
-        env->DeleteLocalRef(errorCodeString);
-        env->DeleteLocalRef(errorMsgString);
-        env->ExceptionClear();
+        WXBridge::Instance()->ReportNativeInitStatus(env, statusCode, m_errorMsgString.c_str());
+//        LOGE("reportNativeInitStatus error msg is %s ", m_errorMsgString.c_str());
+//
+//        jstring errorMsgString = env->NewStringUTF(m_errorMsgString.c_str());
+//        reportMethodId = env->GetMethodID(jBridgeClazz,
+//                                          "reportNativeInitStatus",
+//                                          "(Ljava/lang/String;Ljava/lang/String;)V");
+//
+//
+//        if (!reportMethodId)
+//            goto no_method;
+//
+//
+//        env->CallVoidMethod(jThis, reportMethodId, errorCodeString, errorMsgString);
+//
+//        no_method:
+//        env->DeleteLocalRef(errorCodeString);
+//        env->DeleteLocalRef(errorMsgString);
+//        env->ExceptionClear();
     }
 
-    const char *WeexProxy::getCacheDir(JNIEnv *env) {
-        jclass activityThreadCls, applicationCls, fileCls;
-        jobject applicationObj, fileObj, pathStringObj;
-        jmethodID currentApplicationMethodId,
-                getCacheDirMethodId,
-                getAbsolutePathMethodId;
-        static std::string storage;
-        const char *tmp;
-        const char *ret = nullptr;
-        if (!storage.empty()) {
-            ret = storage.c_str();
-            goto no_empty;
-        }
-        activityThreadCls = env->FindClass("android/app/ActivityThread");
-        if (!activityThreadCls || env->ExceptionOccurred()) {
-            goto no_class;
-        }
-        currentApplicationMethodId = env->GetStaticMethodID(
-                activityThreadCls,
-                "currentApplication",
-                "()Landroid/app/Application;");
-        if (!currentApplicationMethodId || env->ExceptionOccurred()) {
-            goto no_currentapplication_method;
-        }
-        applicationObj = env->CallStaticObjectMethod(activityThreadCls,
-                                                     currentApplicationMethodId,
-                                                     nullptr);
-        if (!applicationObj || env->ExceptionOccurred()) {
-            goto no_application;
-        }
-        applicationCls = env->GetObjectClass(applicationObj);
-        getCacheDirMethodId = env->GetMethodID(applicationCls,
-                                               "getCacheDir",
-                                               "()Ljava/io/File;");
-        if (!getCacheDirMethodId || env->ExceptionOccurred()) {
-            goto no_getcachedir_method;
-        }
-        fileObj = env->CallObjectMethod(applicationObj, getCacheDirMethodId, nullptr);
-        if (!fileObj || env->ExceptionOccurred()) {
-            goto no_file_obj;
-        }
-        fileCls = env->GetObjectClass(fileObj);
-        getAbsolutePathMethodId = env->GetMethodID(fileCls,
-                                                   "getAbsolutePath",
-                                                   "()Ljava/lang/String;");
-        if (!getAbsolutePathMethodId || env->ExceptionOccurred()) {
-            goto no_getabsolutepath_method;
-        }
-        pathStringObj = env->CallObjectMethod(fileObj,
-                                              getAbsolutePathMethodId,
-                                              nullptr);
-        if (!pathStringObj || env->ExceptionOccurred()) {
-            goto no_path_string;
-        }
-        tmp = env->GetStringUTFChars(reinterpret_cast<jstring>(pathStringObj),
-                                     nullptr);
-        storage.assign(tmp);
-        env->ReleaseStringUTFChars(reinterpret_cast<jstring>(pathStringObj),
-                                   tmp);
-        ret = storage.c_str();
-        no_path_string:
-        no_getabsolutepath_method:
-        env->DeleteLocalRef(fileCls);
-        env->DeleteLocalRef(fileObj);
-        no_file_obj:
-        no_getcachedir_method:
-        env->DeleteLocalRef(applicationCls);
-        env->DeleteLocalRef(applicationObj);
-        no_application:
-        no_currentapplication_method:
-        env->DeleteLocalRef(activityThreadCls);
-        no_class:
-        env->ExceptionDescribe();
-        env->ExceptionClear();
-        no_empty:
-        return ret;
-    }
+//    const char *WeexProxy::getCacheDir(JNIEnv *env) {
+//        jclass activityThreadCls, applicationCls, fileCls;
+//        jobject applicationObj, fileObj, pathStringObj;
+//        jmethodID currentApplicationMethodId,
+//                getCacheDirMethodId,
+//                getAbsolutePathMethodId;
+//        static std::string storage;
+//        const char *tmp;
+//        const char *ret = nullptr;
+//        if (!storage.empty()) {
+//            ret = storage.c_str();
+//            goto no_empty;
+//        }
+//        activityThreadCls = env->FindClass("android/app/ActivityThread");
+//        if (!activityThreadCls || env->ExceptionOccurred()) {
+//            goto no_class;
+//        }
+//        currentApplicationMethodId = env->GetStaticMethodID(
+//                activityThreadCls,
+//                "currentApplication",
+//                "()Landroid/app/Application;");
+//        if (!currentApplicationMethodId || env->ExceptionOccurred()) {
+//            goto no_currentapplication_method;
+//        }
+//        applicationObj = env->CallStaticObjectMethod(activityThreadCls,
+//                                                     currentApplicationMethodId,
+//                                                     nullptr);
+//        if (!applicationObj || env->ExceptionOccurred()) {
+//            goto no_application;
+//        }
+//        applicationCls = env->GetObjectClass(applicationObj);
+//        getCacheDirMethodId = env->GetMethodID(applicationCls,
+//                                               "getCacheDir",
+//                                               "()Ljava/io/File;");
+//        if (!getCacheDirMethodId || env->ExceptionOccurred()) {
+//            goto no_getcachedir_method;
+//        }
+//        fileObj = env->CallObjectMethod(applicationObj, getCacheDirMethodId, nullptr);
+//        if (!fileObj || env->ExceptionOccurred()) {
+//            goto no_file_obj;
+//        }
+//        fileCls = env->GetObjectClass(fileObj);
+//        getAbsolutePathMethodId = env->GetMethodID(fileCls,
+//                                                   "getAbsolutePath",
+//                                                   "()Ljava/lang/String;");
+//        if (!getAbsolutePathMethodId || env->ExceptionOccurred()) {
+//            goto no_getabsolutepath_method;
+//        }
+//        pathStringObj = env->CallObjectMethod(fileObj,
+//                                              getAbsolutePathMethodId,
+//                                              nullptr);
+//        if (!pathStringObj || env->ExceptionOccurred()) {
+//            goto no_path_string;
+//        }
+//        tmp = env->GetStringUTFChars(reinterpret_cast<jstring>(pathStringObj),
+//                                     nullptr);
+//        storage.assign(tmp);
+//        env->ReleaseStringUTFChars(reinterpret_cast<jstring>(pathStringObj),
+//                                   tmp);
+//        ret = storage.c_str();
+//        no_path_string:
+//        no_getabsolutepath_method:
+//        env->DeleteLocalRef(fileCls);
+//        env->DeleteLocalRef(fileObj);
+//        no_file_obj:
+//        no_getcachedir_method:
+//        env->DeleteLocalRef(applicationCls);
+//        env->DeleteLocalRef(applicationObj);
+//        no_application:
+//        no_currentapplication_method:
+//        env->DeleteLocalRef(activityThreadCls);
+//        no_class:
+//        env->ExceptionDescribe();
+//        env->ExceptionClear();
+//        no_empty:
+//        return ret;
+//    }
 
-    void WeexProxy::setCacheDir(JNIEnv *env) {
-        s_cacheDir = getCacheDir(env);
-    }
+//    void WeexProxy::setCacheDir(JNIEnv *env) {
+//        s_cacheDir = getCacheDir(env);
+//    }
 
     jbyteArray WeexProxy::execJSWithResult(JNIEnv *env, jobject jthis,
                                            jstring jinstanceid,
@@ -975,9 +1040,11 @@ namespace WeexCore {
                         return nullptr;
                 }
 
-                jobject jArg = env->GetObjectArrayElement(jargs, i);
-                addParamsFromJArgs(params, param, serializer, env, jArg);
-                env->DeleteLocalRef(jArg);
+//                jobject jArg = env->GetObjectArrayElement(jargs, i);
+                auto wx_js_object = std::unique_ptr<WXJSObject>(new WXJSObject(env, env->GetObjectArrayElement(jargs, i)));
+                addParamsFromJArgs(params, param, serializer, env, wx_js_object);
+//                addParamsFromJArgs(params, param, serializer, env, jArg);
+//                env->DeleteLocalRef(jArg);
             }
 
             if (js_server_api_functions != nullptr) {
@@ -1056,17 +1123,22 @@ namespace WeexCore {
         if (length < (index + 1)) {
             return ret;
         }
-        jobject jArg = env->GetObjectArrayElement(jargs, index);
+//        jobject jArg = env->GetObjectArrayElement(jargs, index);
+//
+//        jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
+//        jint jTypeInt = env->GetIntField(jArg, jTypeId);
+//        jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+//        jobject jDataObj = env->GetObjectField(jArg, jDataId);
 
-        jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
-        jint jTypeInt = env->GetIntField(jArg, jTypeId);
-        jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
-        jobject jDataObj = env->GetObjectField(jArg, jDataId);
+        auto jArg = std::unique_ptr<WXJSObject>(new WXJSObject(env, env->GetObjectArrayElement(jargs, index)));
+        jint jTypeInt = jArg->GetType(env);
+        auto jDataObj = jArg->GetData(env);
+
         if (jTypeInt == 3) {
-            ret = (jstring) jDataObj;
+            ret = (jstring) jDataObj.Release();
         }
         // env->DeleteLocalRef(jDataObj);
-        env->DeleteLocalRef(jArg);
+//        env->DeleteLocalRef(jArg);
         return ret;
     }
 
@@ -1092,24 +1164,27 @@ namespace WeexCore {
             return false;
         }
 // get temp data, such as js bundle
-        jobject jArg = env->GetObjectArrayElement(jargs, 1);
-        jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
-        jobject jDataObj = env->GetObjectField(jArg, jDataId);
-        jstring jscript = (jstring) jDataObj;
+//        jobject jArg = env->GetObjectArrayElement(jargs, 1);
+//        jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+//        jobject jDataObj = env->GetObjectField(jArg, jDataId);
+        auto arg1 = std::unique_ptr<WXJSObject>(new WXJSObject(env, env->GetObjectArrayElement(jargs, 1)));
+        auto jscript = arg1->GetData(env);
         jstring opts = getJsonData(env, jargs, 2);
         // init jsonData
         jstring initData = getJsonData(env, jargs, 3);
         // get extend api data, such as rax-api
-        jArg = env->GetObjectArrayElement(jargs, 4);
-        jDataObj = env->GetObjectField(jArg, jDataId);
-        jstring japi = (jstring) jDataObj;
+//        jArg = env->GetObjectArrayElement(jargs, 4);
+//        jDataObj = env->GetObjectField(jArg, jDataId);
+//        jstring japi = (jstring) jDataObj;
+        auto arg4 = std::unique_ptr<WXJSObject>(new WXJSObject(env, env->GetObjectArrayElement(jargs, 4)));
+        auto japi = arg4->GetData(env);
         if (js_server_api_functions != nullptr) {
             ScopedJStringUTF8 idChar(env, jinstanceid);
             ScopedJStringUTF8 funcChar(env, jfunction);
-            ScopedJStringUTF8 scriptChar(env, jscript);
+            ScopedJStringUTF8 scriptChar(env, static_cast<jstring>(jscript.Get()));
             ScopedJStringUTF8 optsChar(env, opts);
             ScopedJStringUTF8 initDataChar(env, initData);
-            ScopedJStringUTF8 apiChar(env, japi);
+            ScopedJStringUTF8 apiChar(env, static_cast<jstring>(japi.Get()));
 
             return js_server_api_functions->funcCreateInstance(
                     idChar.getChars(),
@@ -1124,15 +1199,15 @@ namespace WeexCore {
                 serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::CREATEINSTANCE));
                 addString(env, serializer.get(), jinstanceid);
                 addString(env, serializer.get(), jfunction);
-                addString(env, serializer.get(), jscript);
+                addString(env, serializer.get(), static_cast<jstring>(jscript.Get()));
                 addJSONString(env, serializer.get(), opts);
                 addJSONString(env, serializer.get(), initData);
-                addString(env, serializer.get(), japi);
+                addString(env, serializer.get(), static_cast<jstring>(japi.Get()));
 
                 std::unique_ptr<IPCBuffer> buffer = serializer->finish();
                 std::unique_ptr<IPCResult> result = sSender->send(buffer.get());
-                env->DeleteLocalRef(jArg);
-                env->DeleteLocalRef(jDataObj);
+//                env->DeleteLocalRef(jArg);
+//                env->DeleteLocalRef(jDataObj);
                 env->DeleteLocalRef(opts);
                 if (result->getType() != IPCType::INT32) {
                     LOGE("createInstanceContext Unexpected result type");
@@ -1253,52 +1328,61 @@ namespace WeexCore {
 
 
             for (int i = 0; i < length; i++) {
-                jobject jArg = env->GetObjectArrayElement(jargs, i);
+//                jobject jArg = env->GetObjectArrayElement(jargs, i);
+//
+//                jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
+//                jint jTypeInt = env->GetIntField(jArg, jTypeId);
+//
+//                jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+//                jobject jDataObj = env->GetObjectField(jArg, jDataId);
+//
+//                jfieldID jKeyId = env->GetFieldID(jWXJSObject, "key", "Ljava/lang/String;");
+//                jobject jKeyObj = env->GetObjectField(jArg, jKeyId);
+//                jstring jKeyStr = (jstring) jKeyObj;
 
-                jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
-                jint jTypeInt = env->GetIntField(jArg, jTypeId);
+                auto jArg = std::unique_ptr<WXJSObject>(
+                        new WXJSObject(env, env->GetObjectArrayElement(jargs, i)));
+                jint jTypeInt = jArg->GetType(env);
+                auto jDataObj = jArg->GetData(env);
+                auto jKeyStr = jArg->GetKey(env);
 
-                jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
-                jobject jDataObj = env->GetObjectField(jArg, jDataId);
 
-                jfieldID jKeyId = env->GetFieldID(jWXJSObject, "key", "Ljava/lang/String;");
-                jobject jKeyObj = env->GetObjectField(jArg, jKeyId);
-                jstring jKeyStr = (jstring) jKeyObj;
                 if (js_server_api_functions == nullptr) {
 
-                    addByteArrayString(env, serializer.get(), jKeyStr);
+                    addByteArrayString(env, serializer.get(), jKeyStr.Get());
                 }
 
                 if (jTypeInt == 1) {
-                    if (jDoubleValueMethodId == NULL) {
-                        jclass jDoubleClazz = env->FindClass("java/lang/Double");
-                        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue",
-                                                                "()D");
-                        env->DeleteLocalRef(jDoubleClazz);
-                    }
-                    jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
+//                    if (jDoubleValueMethodId == NULL) {
+//                        jclass jDoubleClazz = env->FindClass("java/lang/Double");
+//                        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue",
+//                                                                "()D");
+//                        env->DeleteLocalRef(jDoubleClazz);
+//                    }
+//                    jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
+                    jdouble jDoubleObj = base::android::JNIType::DoubleValue(env, jDataObj.Get());
 
                     serializer->add(jDoubleObj);
 
                 } else if (jTypeInt == 2) {
-                    jstring jDataStr = (jstring) jDataObj;
+                    jstring jDataStr = (jstring) jDataObj.Get();
                     if (js_server_api_functions == nullptr) {
                         addByteArrayString(env, serializer.get(), jDataStr);
                     } else {
-                        params.push_back(genInitFrameworkParams(env->GetStringUTFChars(jKeyStr,
-                                                                                       nullptr),
-                                                                env->GetStringUTFChars(jDataStr,
-                                                                                       nullptr)));
+                        ScopedJStringUTF8 jni_key(env, jKeyStr.Get());
+                        ScopedJStringUTF8 jni_data(env, jDataStr);
+                        params.push_back(genInitFrameworkParams(jni_key.getChars(),
+                                                                jni_data.getChars()));
                     }
                 } else if (jTypeInt == 3) {
-                    jstring jDataStr = (jstring) jDataObj;
+                    jstring jDataStr = (jstring) jDataObj.Get();
                     if (js_server_api_functions == nullptr) {
                         addByteArrayString(env, serializer.get(), jDataStr);
                     } else {
-                        params.push_back(genInitFrameworkParams(env->GetStringUTFChars(jKeyStr,
-                                                                                       nullptr),
-                                                                env->GetStringUTFChars(jDataStr,
-                                                                                       nullptr)));
+                        ScopedJStringUTF8 jni_key(env, jKeyStr.Get());
+                        ScopedJStringUTF8 jni_data(env, jDataStr);
+                        params.push_back(genInitFrameworkParams(jni_key.getChars(),
+                                                                jni_data.getChars()));
                     }
                 }
 //            else if (jTypeInt == 4) {
@@ -1309,9 +1393,9 @@ namespace WeexCore {
                     serializer->addJSUndefined();
                 }
 
-                env->DeleteLocalRef(jKeyObj);
-                env->DeleteLocalRef(jDataObj);
-                env->DeleteLocalRef(jArg);
+//                env->DeleteLocalRef(jKeyObj);
+//                env->DeleteLocalRef(jDataObj);
+//                env->DeleteLocalRef(jArg);
             }
 
             if (js_server_api_functions != nullptr) {
@@ -1484,13 +1568,19 @@ namespace WeexCore {
 
 
             for (int i = 0; i < length; i++) {
-                jobject jArg = env->GetObjectArrayElement(jargs, i);
+//                jobject jArg = env->GetObjectArrayElement(jargs, i);
+//
+//                jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
+//                jint jTypeInt = env->GetIntField(jArg, jTypeId);
+//
+//                jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+//                jobject jDataObj = env->GetObjectField(jArg, jDataId);
 
-                jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
-                jint jTypeInt = env->GetIntField(jArg, jTypeId);
+                auto jArg = std::unique_ptr<WXJSObject>(
+                        new WXJSObject(env, env->GetObjectArrayElement(jargs, i)));
+                jint jTypeInt = jArg->GetType(env);
+                auto jDataObj = jArg->GetData(env);
 
-                jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
-                jobject jDataObj = env->GetObjectField(jArg, jDataId);
 
                 VALUE_WITH_TYPE *param = nullptr;
 
@@ -1502,13 +1592,14 @@ namespace WeexCore {
 
 
                 if (jTypeInt == 1) {
-                    if (jDoubleValueMethodId == NULL) {
-                        jclass jDoubleClazz = env->FindClass("java/lang/Double");
-                        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue",
-                                                                "()D");
-                        env->DeleteLocalRef(jDoubleClazz);
-                    }
-                    jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
+//                    if (jDoubleValueMethodId == NULL) {
+//                        jclass jDoubleClazz = env->FindClass("java/lang/Double");
+//                        jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue",
+//                                                                "()D");
+//                        env->DeleteLocalRef(jDoubleClazz);
+//                    }
+//                    jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
+                    jdouble jDoubleObj = base::android::JNIType::DoubleValue(env, jDataObj.Get());
 
                     if (js_server_api_functions != nullptr) {
                         param->type = ParamsType::DOUBLE;
@@ -1519,7 +1610,7 @@ namespace WeexCore {
                     }
 
                 } else if (jTypeInt == 2) {
-                    jstring jDataStr = (jstring) jDataObj;
+                    jstring jDataStr = (jstring) jDataObj.Get();
                     if (js_server_api_functions != nullptr) {
                         param->type = ParamsType::STRING;
                         param->value.string = jstring2WeexString(env, jDataStr);
@@ -1528,7 +1619,7 @@ namespace WeexCore {
                     }
 
                 } else if (jTypeInt == 3) {
-                    jstring jDataStr = (jstring) jDataObj;
+                    jstring jDataStr = (jstring) jDataObj.Get();
                     if (js_server_api_functions != nullptr) {
                         param->type = ParamsType::JSONSTRING;
                         param->value.string = jstring2WeexString(env, jDataStr);
@@ -1549,8 +1640,8 @@ namespace WeexCore {
                 }
                 if (param != nullptr)
                     params.push_back(param);
-                env->DeleteLocalRef(jDataObj);
-                env->DeleteLocalRef(jArg);
+//                env->DeleteLocalRef(jDataObj);
+//                env->DeleteLocalRef(jArg);
             }
             if (js_server_api_functions != nullptr) {
                 ScopedJStringUTF8 instanceId(env, jinstanceid);

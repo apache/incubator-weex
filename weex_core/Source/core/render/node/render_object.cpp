@@ -25,6 +25,7 @@
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/page/render_page.h"
+#include "android/base/log_utils.h"
 
 namespace WeexCore {
 
@@ -98,27 +99,42 @@ WXCoreSize measureFunc_Impl(WXCoreLayoutNode *node, float width,
   size.height = 0;
   size.width = 0;
 
-  if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
+//  if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
+//    return size;
+//
+//  return WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->Measure(
+//      node, width, widthMeasureMode, height, heightMeasureMode);
+  if (!node->haveMeasureFunc())
     return size;
-
-  return WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->Measure(
-      node, width, widthMeasureMode, height, heightMeasureMode);
+  return WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->InvokeMeasureFunction(
+          static_cast<RenderObject *>(node)->page_id().c_str(),
+          reinterpret_cast<intptr_t>(node), width, widthMeasureMode, height, heightMeasureMode);
 }
 
 void RenderObject::BindMeasureFunc() { setMeasureFunc(measureFunc_Impl); }
 
 void RenderObject::OnLayoutBefore() {
-  if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
+//  if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
+//    return;
+//  WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutBefore(
+//      this);
+  if (!haveMeasureFunc())
     return;
-  WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutBefore(
-      this);
+  WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->InvokeLayoutBefore(page_id().c_str(),
+                                                                          reinterpret_cast<intptr_t>(this));
 }
 
 void RenderObject::OnLayoutAfter(float width, float height) {
-  if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
+//  if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
+//    return;
+//  WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutAfter(
+//      this, width, height);
+
+  if (!haveMeasureFunc())
     return;
-  WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutAfter(
-      this, width, height);
+  WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->InvokeLayoutAfter(page_id().c_str(),
+                                                                         reinterpret_cast<intptr_t>(this),
+                                                                         width, height);
 }
 
 StyleType RenderObject::ApplyStyle(const std::string &key,

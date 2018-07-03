@@ -30,24 +30,24 @@
 #include <map>
 #include <string>
 
-extern jclass jBridgeClazz;
-extern jclass jWXJSObject;
-extern jclass jWXLogUtils;
-extern jmethodID jDoubleValueMethodId;
-extern jobject jThis;
-extern jobject jWMThis;
-extern jclass jMapClazz;
-extern jclass jSetClazz;
-extern jmethodID jMapConstructorMethodId;
-extern jmethodID jMapPutMethodId;
-extern jmethodID jSetConstructorMethodId;
-extern jmethodID jSetAddMethodId;
-extern jclass jWMBridgeClazz;
-extern JNIEnv *getJNIEnv();
-extern jstring getComponentTypeFromCache(const std::string type);
-extern jstring putComponentTypeToCache(const std::string type);
-extern jstring getKeyFromCache(JNIEnv *env, const char *key);
-extern jfloatArray c2jFloatArray(JNIEnv *env, const float c_array[]);
+//extern jclass jBridgeClazz;
+//extern jclass jWXJSObject;
+//extern jclass jWXLogUtils;
+//extern jmethodID jDoubleValueMethodId;
+//extern jobject jThis;
+//extern jobject jWMThis;
+//extern jclass jMapClazz;
+//extern jclass jSetClazz;
+//extern jmethodID jMapConstructorMethodId;
+//extern jmethodID jMapPutMethodId;
+//extern jmethodID jSetConstructorMethodId;
+//extern jmethodID jSetAddMethodId;
+//extern jclass jWMBridgeClazz;
+//extern JNIEnv *getJNIEnv();
+//extern jstring getComponentTypeFromCache(const std::string type);
+//extern jstring putComponentTypeToCache(const std::string type);
+//extern jstring getKeyFromCache(JNIEnv *env, const char *key);
+//extern jfloatArray c2jFloatArray(JNIEnv *env, const float c_array[]);
 
 namespace WeexCore {
 

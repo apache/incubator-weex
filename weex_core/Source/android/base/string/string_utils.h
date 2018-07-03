@@ -178,6 +178,33 @@ static inline int getArgumentAsInt32(JNIEnv* env, IPCArguments* arguments, int a
   return ret;
 }
 
+static inline int getArgumentAsInt32(IPCArguments* arguments, int argument) {
+  int ret = 0;
+  if (arguments->getType(argument) == IPCType::INT32) {
+    const int32_t type = arguments->get<int32_t>(argument);
+    ret = type;
+  }
+  return ret;
+}
+
+static inline int64_t getArgumentAsInt64(IPCArguments* arguments, int argument) {
+  int ret = 0;
+  if (arguments->getType(argument) == IPCType::INT64) {
+    const int64_t type = arguments->get<int64_t>(argument);
+    ret = type;
+  }
+  return ret;
+}
+
+static inline float getArgumentAsFloat(IPCArguments* arguments, int argument) {
+  float ret = 0;
+  if (arguments->getType(argument) == IPCType::FLOAT) {
+    const float type = arguments->get<float>(argument);
+    ret = type;
+  }
+  return ret;
+}
+
 static inline void addString(JNIEnv *env, IPCSerializer *serializer, jstring str) {
   ScopedJString scopedString(env, str);
   const uint16_t *chars = scopedString.getChars();

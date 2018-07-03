@@ -49,9 +49,26 @@ set(COMMON_SRCS
 
   ./core/moniter/render_performance.cpp
   ./core/manager/weex_core_manager.cpp
-  ./core/bridge/js_bridge.cpp
+  ./android/bridge/impl/android_side.cpp
+  ./core/bridge/platform/core_side_in_simple.cpp
+  ./core/bridge/script/core_side_in_simple.cpp
+  ./android/bridge/impl/android_bridge.cpp
+  ./android/bridge/impl/core_side_in_multi_process.cpp
+  ./android/bridge/impl/core_side_in_multi_so.cpp
+  ./android/bridge/impl/multi_process_and_so_initializer.cpp
+  ./android/bridge/impl/multi_so_initializer.cpp
+  ./android/wrap/wml_bridge.cpp
+  ./android/utils/cache_utils.cpp
+  ./android/utils/params_utils.cpp
+  ./android/utils/so_utils.cpp
+  ./android/wrap/log_utils.cpp
+  ./android/wrap/hash_set.cpp
+  ./android/wrap/wx_map.cpp
+  ./android/wrap/wx_js_object.cpp
+  ./android/wrap/wx_bridge.cpp
+  ./android/wrap/wx_params.cpp
+  ./android/base/jni_type.cpp
   ./core/parser/dom_wson.cpp
-   ./core/bridge/bridge.cpp
         )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
@@ -83,6 +100,9 @@ if (ANDROID)
     ./android/bridge/impl/content_box_measurement_impl_android.cpp
     ./android/bridge/impl/jsfunction_impl_android.cpp
     ./android/bridge/impl/native_render_object_utils_impl_android.cpp
+    ./android/bridge/impl/android_bridge_in_multi_process.cc
+    ./android/bridge/impl/android_bridge_in_multi_so.cc
+
 
     ./android/jsengine/multiprocess/WeexJSConnection.cpp
     ./android/jsengine/multiprocess/WeexProxy.cpp

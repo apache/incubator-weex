@@ -27,6 +27,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <android/base/log_utils.h>
 
 namespace WeexCore {
 

@@ -74,7 +74,7 @@ class RenderPage {
 
  public:
 
-  explicit RenderPage(std::string page_id);
+  explicit RenderPage(const std::string& page_id);
 
   ~RenderPage();
 

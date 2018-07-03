@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.bridge;
 
+import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.Map;
@@ -41,6 +42,7 @@ public class WXParams {
 
   private Map<String, String> options;
 
+  @CalledByNative
   public Object getOptions() {
     return options;
   }
@@ -57,6 +59,7 @@ public class WXParams {
     this.shouldInfoCollect = shouldInfoCollect;
   }
 
+  @CalledByNative
   public String getPlatform() {
     return platform;
   }
@@ -69,10 +72,12 @@ public class WXParams {
     this.cacheDir = cache;
   }
 
+  @CalledByNative
   public String getCacheDir() {
     return this.cacheDir;
   }
 
+  @CalledByNative
   public String getOsVersion() {
     return osVersion;
   }
@@ -81,6 +86,7 @@ public class WXParams {
     this.osVersion = osVersion;
   }
 
+  @CalledByNative
   public String getAppVersion() {
     return appVersion;
   }
@@ -89,6 +95,7 @@ public class WXParams {
     this.appVersion = appVersion;
   }
 
+  @CalledByNative
   public String getWeexVersion() {
     return weexVersion;
   }
@@ -97,6 +104,7 @@ public class WXParams {
     this.weexVersion = weexVersion;
   }
 
+  @CalledByNative
   public String getDeviceModel() {
     return deviceModel;
   }
@@ -105,6 +113,7 @@ public class WXParams {
     this.deviceModel = deviceModel;
   }
 
+  @CalledByNative
   public String getAppName() {
     return appName;
   }
@@ -113,6 +122,7 @@ public class WXParams {
     this.appName = appName;
   }
 
+  @CalledByNative
   public String getDeviceWidth() {
     return deviceWidth;
   }
@@ -128,6 +138,7 @@ public class WXParams {
     this.deviceWidth = deviceWidth;
   }
 
+  @CalledByNative
   public String getDeviceHeight() {
     return deviceHeight;
   }
@@ -143,6 +154,7 @@ public class WXParams {
     return logLevel;
   }
 
+  @CalledByNative
   public String getUseSingleProcess() {
     WXLogUtils.e("getUseSingleProcess is running " + useSingleProcess);
     return useSingleProcess;
@@ -171,6 +183,7 @@ public class WXParams {
     }
   }
 
+  @CalledByNative
   public String getLibJssPath() {
     WXLogUtils.e("getLibJssPath is running " + libJssPath);
     return libJssPath;

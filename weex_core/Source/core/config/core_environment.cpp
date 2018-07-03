@@ -20,6 +20,7 @@
 #include "base/CoreConstants.h"
 #include <stdlib.h>
 #include <base/ViewUtils.h>
+#include "android/base/log_utils.h"
 
 namespace WeexCore {
 
@@ -68,7 +69,9 @@ namespace WeexCore {
 
   const std::string &WXCoreEnvironment::GetOption(const std::string &key) {
     std::map<std::string, std::string>::iterator iter = mOptions.find(key);
+      LOGE("KEY = %s", key.c_str());
     if (iter != mOptions.end()) {
+        LOGE("KEY = %s, VALUE = %s", key.c_str(), iter->second.c_str());
       return iter->second;
     } else {
       return "";

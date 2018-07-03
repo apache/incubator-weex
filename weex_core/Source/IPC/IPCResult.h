@@ -23,7 +23,6 @@
 #ifndef IPCRESULT_H
 #define IPCRESULT_H
 #include "IPCType.h"
-#include <jni.h>
 #include <memory>
 #include "IPCByteArray.h"
 
@@ -47,9 +46,8 @@ public:
 
 std::unique_ptr<IPCResult> createVoidResult();
 std::unique_ptr<IPCResult> createInt32Result(int32_t val);
+std::unique_ptr<IPCResult> createInt64Result(int64_t val);
 std::unique_ptr<IPCResult> createDoubleResult(double val);
-std::unique_ptr<IPCResult> createStringResult(JNIEnv* env, jstring str);
-std::unique_ptr<IPCResult> createJSONStringResult(JNIEnv* env, jstring str);
 std::unique_ptr<IPCResult> createCharArrayResult(char* bytes);
 std::unique_ptr<IPCResult> createByteArrayResult(const char* data, size_t length);
 

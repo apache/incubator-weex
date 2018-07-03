@@ -150,6 +150,15 @@ inline void wson_push_type_string(wson_buffer *buffer, const void *src, int32_t 
     wson_push_bytes(buffer, src, length);
 }
 
+inline void wson_push_type_uint8_string(wson_buffer *buffer, const uint8_t *src, int32_t length){
+    WSON_BUFFER_ENSURE_SIZE(sizeof(uint8_t));
+    uint8_t* data = ((uint8_t*)buffer->data + buffer->position);
+    *data = WSON_UINT8_STRING_TYPE;
+    buffer->position += (sizeof(uint8_t));
+    wson_push_uint(buffer, length);
+    wson_push_bytes(buffer, src, length);
+}
+
 inline void wson_push_property(wson_buffer *buffer, const void *src, int32_t length){
     wson_push_uint(buffer, length);
     wson_push_bytes(buffer, src, length);

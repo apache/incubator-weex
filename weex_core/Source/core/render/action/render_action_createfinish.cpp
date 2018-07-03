@@ -27,7 +27,7 @@ RenderActionCreateFinish::RenderActionCreateFinish(const std::string &page_id) {
 }
 
 void RenderActionCreateFinish::ExecuteAction() {
-  WeexCoreManager::getInstance()->getPlatformBridge()->callCreateFinish(
+  WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->CreateFinish(
       this->page_id_.c_str());
 }
 }  // namespace WeexCore

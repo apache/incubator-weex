@@ -33,7 +33,7 @@ RenderActionMoveElement::RenderActionMoveElement(const std::string &page_id,
 }
 
 void RenderActionMoveElement::ExecuteAction() {
-  WeexCoreManager::getInstance()->getPlatformBridge()->callMoveElement(
+  WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->MoveElement(
       this->page_id_.c_str(), this->ref_.c_str(), this->parent_ref_.c_str(),
       this->index_);
 }

@@ -31,12 +31,17 @@ namespace WeexCore {
 
     ~MeasureFunctionAdapter() {}
 
-    virtual WXCoreSize Measure(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
-                                      float height, MeasureMode heightMeasureMode) = 0;
+//    virtual WXCoreSize Measure(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
+//                                      float height, MeasureMode heightMeasureMode) = 0;
+//
+//    virtual void LayoutBefore(WXCoreLayoutNode *node) = 0;
+//
+//    virtual void LayoutAfter(WXCoreLayoutNode *node, float width, float height) = 0;
+    virtual WXCoreSize Measure(const char* page_id, long render_ptr, float width, MeasureMode widthMeasureMode,
+                               float height, MeasureMode heightMeasureMode) = 0;
+    virtual void LayoutBefore(const char* page_id, long render_ptr) = 0;
 
-    virtual void LayoutBefore(WXCoreLayoutNode *node) = 0;
-
-    virtual void LayoutAfter(WXCoreLayoutNode *node, float width, float height) = 0;
+    virtual void LayoutAfter(const char* page_id, long render_ptr, float width, float height) = 0;
 
   private:
   };

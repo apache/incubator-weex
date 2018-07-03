@@ -27,7 +27,7 @@
 
 jint JNI_OnLoad (JavaVM *vm, void *reserved)
 {
-    //base::android::InitVM(vm);
+    base::android::InitVM(vm);
     // JNIEnv* env = base::android::AttachCurrentThread();
     JNIEnv *env;
     /* Get environment */

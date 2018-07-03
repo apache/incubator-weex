@@ -85,6 +85,7 @@ public class IndexActivity extends AbstractWeexActivity {
 
     if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
       renderPage(WXFileUtils.loadAsset("landing.weex.js", this), getIndexUrl());
+//      renderPageByURL("http://dotwe.org/raw/dist/2bbe1860da4669a68595c1aed01d7fd2.bundle.wx");
     } else {
       renderPageByURL(getIndexUrl());
     }

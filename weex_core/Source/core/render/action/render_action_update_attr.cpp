@@ -31,7 +31,7 @@ RenderActionUpdateAttr::RenderActionUpdateAttr(
 }
 
 void RenderActionUpdateAttr::ExecuteAction() {
-  WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateAttr(
+  WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->UpdateAttr(
       this->page_id_.c_str(), this->ref_.c_str(), this->attrs_);
 }
 }  // namespace WeexCore

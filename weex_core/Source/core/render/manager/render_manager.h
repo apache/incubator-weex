@@ -30,7 +30,7 @@ class RenderPage;
 
 class RenderManager {
  private:
-  RenderManager() {}
+  RenderManager() : pages_() {}
 
   ~RenderManager() {}
 
@@ -92,7 +92,7 @@ class RenderManager {
   void set_viewport_width(const std::string &page_id, float viewport_width);
 
   static RenderManager *GetInstance() {
-    if (!g_pInstance) {
+    if (NULL == g_pInstance) {
       g_pInstance = new RenderManager();
     }
     return g_pInstance;

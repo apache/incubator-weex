@@ -29,7 +29,7 @@
 #define JSON_OBJECT_MARK_CHAR '{'
 #define JSON_ARRAY_MARK_CHAR '['
 
-#define convert_render_object_to_long(render) ((jlong)((intptr_t)render))
+#define convert_render_object_to_long(render) ((long)((intptr_t)render))
 
 #define convert_long_to_render_object(ptr) ((RenderObject *)((intptr_t)ptr))
 
@@ -77,7 +77,7 @@ class RenderObject : public IRenderObject {
  public:
   RenderObject();
 
-  ~RenderObject();
+  virtual ~RenderObject();
 
   void BindMeasureFunc();
 

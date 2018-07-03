@@ -57,13 +57,13 @@ public:
                                     const std::vector<INIT_FRAMEWORK_PARAMS *> initFrameworkParams);
     static jint initFrameworkInMultiProcess(JNIEnv *env, jstring script, jobject params, IPCSerializer *serializer);
 
-    static const char *getCacheDir(JNIEnv *env);
+//    static const char *getCacheDir(JNIEnv *env);
 
-    static void setCacheDir(JNIEnv *env);
+//    static void setCacheDir(JNIEnv *env);
 
     static bool execJSService(JNIEnv *env, jobject object, jstring script);
 
-    static std::string findLibJssSoPath();
+//    static std::string findLibJssSoPath();
     static bool
     execJS(JNIEnv *env, jobject jthis, jstring jinstanceid, jstring jnamespace, jstring jfunction,
            jobjectArray jargs);

@@ -32,7 +32,7 @@ RenderActionLayout::RenderActionLayout(const std::string &page_id,
 }
 
 void RenderActionLayout::ExecuteAction() {
-  WeexCoreManager::getInstance()->getPlatformBridge()->callLayout(
+  WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->Layout(
       this->page_id_.c_str(), this->ref_.c_str(), this->top_, this->bottom_,
       this->left_, this->right_, this->height_, this->width_, this->index_);
 }

@@ -31,6 +31,6 @@ RenderActionAppendTreeCreateFinish::RenderActionAppendTreeCreateFinish(
 void RenderActionAppendTreeCreateFinish::ExecuteAction() {
   WeexCoreManager::getInstance()
       ->getPlatformBridge()
-      ->callAppendTreeCreateFinish(this->page_id_.c_str(), this->ref_.c_str());
+      ->platform_side()->AppendTreeCreateFinish(this->page_id_.c_str(), this->ref_.c_str());
 }
 }  // namespace WeexCore

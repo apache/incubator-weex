@@ -18,11 +18,15 @@
  */
 
 #include <android/base/jni/jbytearray_ref.h>
+#include <android/wrap/wx_bridge.h>
+#include <core/manager/weex_core_manager.h>
 #include "jsfunction_impl_android.h"
 #include "../../base/string/string_utils.h"
 #include "../../jniprebuild/jniheader/WXJsFunctions_jni.h"
 #include "bridge_impl_android.h"
 #include "../../../core/render/manager/render_manager.h"
+#include "IPC/IPCResult.h"
+#include "core/bridge/platform_bridge.h"
 
 using namespace WeexCore;
 
@@ -59,20 +63,21 @@ static const char *getCharFromJString(JNIEnv *env, jstring string) {
 }
 
 void initWxBridge(JNIEnv *env, jobject object, jobject bridge, jstring className) {
-    jThis = env->NewGlobalRef(bridge);
-    const char *classNameChar = env->GetStringUTFChars(className, 0);
-    jclass tempClass = env->FindClass(classNameChar);
-    jBridgeClazz = (jclass) env->NewGlobalRef(tempClass);
-    Bridge_Impl_Android::getInstance()->setGlobalRef(jThis);
+//    jThis = env->NewGlobalRef(bridge);
+//    const char *classNameChar = env->GetStringUTFChars(className, 0);
+//    jclass tempClass = env->FindClass(classNameChar);
+//    jBridgeClazz = (jclass) env->NewGlobalRef(tempClass);
+//    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->setGlobalRef(jThis);
+    WXBridge::Instance()->Reset(env, object);
 }
 
 void jsHandleSetJSVersion(JNIEnv *env, jobject object, jstring jsVersion) {
-    Bridge_Impl_Android::getInstance()->setJSVersion(getCharFromJString(env, jsVersion));
+    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->SetJSVersion(getCharFromJString(env, jsVersion));
 }
 
 void jsHandleReportException(JNIEnv *env, jobject object, jstring instanceId, jstring func,
                              jstring exceptionjstring) {
-    Bridge_Impl_Android::getInstance()->reportException(getCharFromJString(env, instanceId),
+    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->ReportException(getCharFromJString(env, instanceId),
                                                         getCharFromJString(env, func),
                                                         getCharFromJString(env,
                                                                            exceptionjstring));
@@ -93,7 +98,7 @@ void jsHandleCallNative(JNIEnv *env, jobject object, jstring instanceId, jbyteAr
         env->DeleteLocalRef(tasks);
         env->DeleteLocalRef(callback);
     } else {
-        Bridge_Impl_Android::getInstance()->callNative(getCharFromJString(env, instanceId),
+        WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->CallNative(getCharFromJString(env, instanceId),
                                                        task.c_str(),
                                                        getCharFromJString(env, callback));
     }
@@ -113,48 +118,56 @@ jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstrin
     JByteArrayRef argumentsRef(env, arguments);
     JByteArrayRef optionsRef(env, options);
 
+    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->CallNativeModule(
+            getCharFromJString(env, instanceId),
+            getCharFromJString(env, module),
+            getCharFromJString(env, method),
+            argumentsRef.getBytes(),
+            argumentsRef.length(),
+            optionsRef.getBytes(),
+            optionsRef.length());
 
     // add for android support
-    jobject result;
-    result = static_cast<jobject>(Bridge_Impl_Android::getInstance()->callNativeModule(
-                getCharFromJString(env, instanceId),
-                getCharFromJString(env, module),
-                getCharFromJString(env, method),
-                argumentsRef.getBytes(),
-                argumentsRef.length(),
-                optionsRef.getBytes(),
-                optionsRef.length()));
+//    jobject result;
+//    result = static_cast<jobject>(WeexCoreManager::getInstance()->getPlatformBridge()->callNativeModule(
+//                getCharFromJString(env, instanceId),
+//                getCharFromJString(env, module),
+//                getCharFromJString(env, method),
+//                argumentsRef.getBytes(),
+//                argumentsRef.length(),
+//                optionsRef.getBytes(),
+//                optionsRef.length()));
 
-    jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
-    jint jTypeInt = env->GetIntField(result, jTypeId);
-    jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
-    jobject jDataObj = env->GetObjectField(result, jDataId);
-    if (jTypeInt == 1) {
-        if (jDoubleValueMethodId == NULL) {
-            jclass jDoubleClazz = env->FindClass("java/lang/Double");
-            jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
-            env->DeleteLocalRef(jDoubleClazz);
-        }
-        jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
-    } else if (jTypeInt == 2) {
-        jstring jDataStr = (jstring) jDataObj;
-        //ret = std::move(createStringResult(env, jDataStr));
-    } else if (jTypeInt == 3) {
-        jstring jDataStr = (jstring) jDataObj;
-        //ret = std::move(createJSONStringResult(env, jDataStr));
-    } else if (jTypeInt == 4) {
-        jbyteArray array = (jbyteArray)jDataObj;
-        if(array != nullptr){
-            int length = env->GetArrayLength(array);
-            void* data = env->GetByteArrayElements(array, 0);
-            //ret = std::move(createByteArrayResult((const char*)data, length));
-            env->ReleaseByteArrayElements(array, (jbyte*)data, 0);
-        }
-    }
-    env->DeleteLocalRef(jDataObj);
-    if(result != nullptr){
-        env->DeleteLocalRef(result);
-    }
+//    jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
+//    jint jTypeInt = env->GetIntField(result, jTypeId);
+//    jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+//    jobject jDataObj = env->GetObjectField(result, jDataId);
+//    if (jTypeInt == 1) {
+//        if (jDoubleValueMethodId == NULL) {
+//            jclass jDoubleClazz = env->FindClass("java/lang/Double");
+//            jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
+//            env->DeleteLocalRef(jDoubleClazz);
+//        }
+//        jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
+//    } else if (jTypeInt == 2) {
+//        jstring jDataStr = (jstring) jDataObj;
+//        //ret = std::move(createStringResult(env, jDataStr));
+//    } else if (jTypeInt == 3) {
+//        jstring jDataStr = (jstring) jDataObj;
+//        //ret = std::move(createJSONStringResult(env, jDataStr));
+//    } else if (jTypeInt == 4) {
+//        jbyteArray array = (jbyteArray)jDataObj;
+//        if(array != nullptr){
+//            int length = env->GetArrayLength(array);
+//            void* data = env->GetByteArrayElements(array, 0);
+//            //ret = std::move(createByteArrayResult((const char*)data, length));
+//            env->ReleaseByteArrayElements(array, (jbyte*)data, 0);
+//        }
+//    }
+//    env->DeleteLocalRef(jDataObj);
+//    if(result != nullptr){
+//        env->DeleteLocalRef(result);
+//    }
     //return ret;
 }
 
@@ -165,7 +178,7 @@ jsHandleCallNativeComponent(JNIEnv *env, jobject object, jstring instanceId, jst
 
     JByteArrayRef argumentsRef(env, arguments);
     JByteArrayRef optionsRef(env, options);
-    Bridge_Impl_Android::getInstance()->callNativeComponent(getCharFromJString(env, instanceId),
+    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->CallNativeComponent(getCharFromJString(env, instanceId),
                                                             getCharFromJString(env, componentRef),
                                                             getCharFromJString(env, method),
                                                             argumentsRef.getBytes(),
@@ -195,13 +208,13 @@ jsHandleCallAddElement(JNIEnv *env, jobject object, jstring instanceId, jstring 
 
 void jsHandleSetTimeout(JNIEnv *env, jobject object, jstring callbackId, jstring time) {
 
-    Bridge_Impl_Android::getInstance()->setTimeout(getCharFromJString(env, callbackId),
+    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->SetTimeout(getCharFromJString(env, callbackId),
                                                    getCharFromJString(env, time));
 
 }
 
 void jsHandleCallNativeLog(JNIEnv *env, jobject object, jbyteArray str_array) {
-    Bridge_Impl_Android::getInstance()->callNativeLog(getCharFromJByte(env, str_array));
+    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->NativeLog(getCharFromJByte(env, str_array));
 }
 
 void jsFunctionCallCreateBody(JNIEnv *env, jobject object, jstring pageId, jbyteArray domStr, jboolean from) {
@@ -219,7 +232,7 @@ void
 jsFunctionCallUpdateFinish(JNIEnv *env, jobject object, jstring instanceId, jbyteArray tasks,
                            jstring callback) {
 
-    Bridge_Impl_Android::getInstance()->callUpdateFinish(getCharFromJString(env, instanceId),
+    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->UpdateFinish(getCharFromJString(env, instanceId),
                                                          getCharFromJByte(env, tasks),
                                                          getCharFromJString(env, callback));
 
@@ -232,7 +245,7 @@ void jsFunctionCallCreateFinish(JNIEnv *env, jobject object, jstring pageId) {
 void
 jsFunctionCallRefreshFinish(JNIEnv *env, jobject object, jstring instanceId, jbyteArray tasks,
                             jstring callback) {
-    Bridge_Impl_Android::getInstance()->callRefreshFinish(getCharFromJString(env, instanceId),
+    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->RefreshFinish(getCharFromJString(env, instanceId),
                                                           getCharFromJByte(env, tasks),
                                                           getCharFromJString(env, callback));
 }

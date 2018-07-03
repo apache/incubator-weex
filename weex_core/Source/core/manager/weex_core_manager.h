@@ -20,39 +20,21 @@
 #ifndef WEEXCORE_WEEX_CORE_MANAGER_H
 #define WEEXCORE_WEEX_CORE_MANAGER_H
 
-#include <core/bridge/bridge.h>
-#include <core/bridge/js_bridge.h>
-#include <core/layout/measure_func_adapter.h>
+#include "core/bridge/platform_bridge.h"
+#include "core/bridge/script_bridge.h"
 
 namespace WeexCore {
     class WeexCoreManager {
     private:
         static WeexCoreManager *m_pInstance;
-        Bridge *platformBridge = nullptr;
+        PlatformBridge *platformBridge = nullptr;
         MeasureFunctionAdapter *measureFunctionAdapter = nullptr;
-        JSBridge* jsBridge = nullptr;
+        ScriptBridge* script_bridge_ = nullptr;
 
     private:
         WeexCoreManager() {};
 
-        ~WeexCoreManager() {
-            delete platformBridge;
-            platformBridge = nullptr;
-            delete jsBridge;
-            jsBridge = nullptr;
-        };
-
-        //just to release singleton object
-        class Garbo {
-        public:
-            ~Garbo() {
-                if (WeexCoreManager::m_pInstance) {
-                    delete WeexCoreManager::m_pInstance;
-                }
-            }
-        };
-
-        static Garbo garbo;
+        ~WeexCoreManager() {};
 
     public:
         static WeexCoreManager *getInstance() {
@@ -62,13 +44,12 @@ namespace WeexCore {
             return m_pInstance;
         };
 
-        Bridge *getPlatformBridge();
+        PlatformBridge *getPlatformBridge();
 
-        void setPlatformBridge(Bridge *pBridge);
+        void setPlatformBridge(PlatformBridge *pBridge);
 
-        JSBridge* getJSBridge();
-
-        void setJSBridge(JSBridge *jsBridge);
+        ScriptBridge* script_bridge();
+        void set_script_bridge(ScriptBridge *script_bridge);
 
         void SetMeasureFunctionAdapter(MeasureFunctionAdapter *measureFunctionAdapter);
 

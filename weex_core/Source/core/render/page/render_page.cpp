@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include "core/render/page/render_page.h"
 #include "base/TimeUtils.h"
 #include "base/ViewUtils.h"
-#include "core/render/page/render_page.h"
 #include "core/config/core_environment.h"
 #include "core/css/constants_value.h"
 #include "core/layout/layout.h"
@@ -42,7 +42,12 @@
 
 namespace WeexCore {
 
-RenderPage::RenderPage(std::string page_id) {
+RenderPage::RenderPage(const std::string& page_id) : viewport_width_(0),
+                                                     render_root_(nullptr),
+                                                     page_id_(),
+                                                     render_page_size_(),
+                                                     render_object_registers_(),
+                                                     render_performance_(nullptr) {
 #if RENDER_LOG
   LOGD("[RenderPage] new RenderPage >>>> pageId: %s", pageId.c_str());
 #endif
@@ -56,9 +61,9 @@ RenderPage::RenderPage(std::string page_id) {
 }
 
 RenderPage::~RenderPage() {
-#if RENDER_LOG
-  LOGD("[RenderPage] Delete RenderPage >>>> pageId: %s", mPageId.c_str());
-#endif
+//#if RENDER_LOG
+  LOGE("[RenderPage] Delete RenderPage >>>> pageId: %s", page_id().c_str());
+//#endif
 
   this->render_object_registers_.clear();
 
@@ -210,7 +215,7 @@ bool RenderPage::UpdateStyle(
   int result =
       WeexCoreManager::getInstance()
           ->getPlatformBridge()
-          ->callHasTransitionPros(this->page_id_.c_str(), ref.c_str(), src);
+          ->platform_side()->HasTransitionPros(this->page_id_.c_str(), ref.c_str(), src);
   // int result =
   // Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId.c_str(),
   // ref.c_str(), src);

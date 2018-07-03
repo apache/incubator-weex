@@ -22,7 +22,7 @@
 
 namespace WeexCore {
   bool RegisterJNIMeasureMode(JNIEnv *env) {
-    RegisterNativesImpl(env);
+    return RegisterNativesImpl(env);
   }
 
   jint Exactly(JNIEnv *env) {
