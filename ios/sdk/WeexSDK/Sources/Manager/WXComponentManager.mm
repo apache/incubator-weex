@@ -41,7 +41,7 @@
 #import "WXComponent+Layout.h"
 
 #ifdef WX_IMPORT_WEEXCORE
-#import <core/manager/weex_core_manager.h>
+#import "WXCoreBridge.h"
 #endif
 
 static NSThread *WXComponentThread;
@@ -1044,8 +1044,8 @@ static NSThread *WXComponentThread;
     _rootComponent = [self _buildComponentForData:data supercomponent:nil];
     
     CGSize size = _weexInstance.frame.size;
-    WeexCore::WeexCoreManager::getInstance()->getPlatformBridge()->setDefaultHeightAndWidthIntoRootDom([_weexInstance.instanceId UTF8String], size.width, size.height, false, false);
-    
+    [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId width:size.width height:size.height isWidthWrapContent:NO isHeightWrapContent:NO];
+
     __weak typeof(self) weakSelf = self;
     WX_MONITOR_INSTANCE_PERF_END(WXFirstScreenJSFExecuteTime, self.weexInstance);
     [self _addUITask:^{

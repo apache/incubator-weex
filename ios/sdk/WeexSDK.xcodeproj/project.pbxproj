@@ -291,6 +291,14 @@
 		841CD1071F974E000081196D /* WXExceptionUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 841CD1021F9739890081196D /* WXExceptionUtils.m */; };
 		847E1DE41F9A1BCF00A48124 /* WXCoreStyle.h in Headers */ = {isa = PBXBuildFile; fileRef = 847E1DE01F9A1BCF00A48124 /* WXCoreStyle.h */; };
 		9B9E74791FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B9E74781FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m */; };
+		B85CA71520EBAA8100D98412 /* WsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = B85CA71120EBAA8100D98412 /* WsonParser.m */; };
+		B85CA71620EBAA8100D98412 /* WsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = B85CA71120EBAA8100D98412 /* WsonParser.m */; };
+		B85CA71720EBAA8100D98412 /* WsonObject.h in Headers */ = {isa = PBXBuildFile; fileRef = B85CA71220EBAA8100D98412 /* WsonObject.h */; };
+		B85CA71820EBAA8100D98412 /* WsonObject.h in Headers */ = {isa = PBXBuildFile; fileRef = B85CA71220EBAA8100D98412 /* WsonObject.h */; };
+		B85CA71920EBAA8100D98412 /* WsonParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B85CA71320EBAA8100D98412 /* WsonParser.h */; };
+		B85CA71A20EBAA8100D98412 /* WsonParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B85CA71320EBAA8100D98412 /* WsonParser.h */; };
+		B85CA71B20EBAA8100D98412 /* WsonObject.m in Sources */ = {isa = PBXBuildFile; fileRef = B85CA71420EBAA8100D98412 /* WsonObject.m */; };
+		B85CA71C20EBAA8100D98412 /* WsonObject.m in Sources */ = {isa = PBXBuildFile; fileRef = B85CA71420EBAA8100D98412 /* WsonObject.m */; };
 		B89543F320EB18B5006EAD63 /* WXCoreBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543ED20EB18B4006EAD63 /* WXCoreBridge.mm */; };
 		B89543F420EB18B5006EAD63 /* WXCoreBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543ED20EB18B4006EAD63 /* WXCoreBridge.mm */; };
 		B89543F520EB18B5006EAD63 /* WXJSCoreBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543EE20EB18B4006EAD63 /* WXJSCoreBridge.mm */; };
@@ -915,6 +923,10 @@
 		847E1DE01F9A1BCF00A48124 /* WXCoreStyle.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = WXCoreStyle.h; path = Layout/WXCoreStyle.h; sourceTree = "<group>"; };
 		9B9E74771FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTestBridgeMethodDummy.h; sourceTree = "<group>"; };
 		9B9E74781FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTestBridgeMethodDummy.m; sourceTree = "<group>"; };
+		B85CA71120EBAA8100D98412 /* WsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WsonParser.m; sourceTree = "<group>"; };
+		B85CA71220EBAA8100D98412 /* WsonObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WsonObject.h; sourceTree = "<group>"; };
+		B85CA71320EBAA8100D98412 /* WsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WsonParser.h; sourceTree = "<group>"; };
+		B85CA71420EBAA8100D98412 /* WsonObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WsonObject.m; sourceTree = "<group>"; };
 		B89543ED20EB18B4006EAD63 /* WXCoreBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXCoreBridge.mm; sourceTree = "<group>"; };
 		B89543EE20EB18B4006EAD63 /* WXJSCoreBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXJSCoreBridge.mm; sourceTree = "<group>"; };
 		B89543EF20EB18B4006EAD63 /* WXCoreBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCoreBridge.h; sourceTree = "<group>"; };
@@ -1362,6 +1374,7 @@
 		77D161191C02DD3C0010B15B /* Bridge */ = {
 			isa = PBXGroup;
 			children = (
+				B85CA71020EBAA8100D98412 /* wson */,
 				2A919DA41E321F1F006EB6B5 /* WXBridgeMethod.h */,
 				2A919DA51E321F1F006EB6B5 /* WXBridgeMethod.m */,
 				74862F7B1E03A0F300B7A041 /* WXModuleMethod.h */,
@@ -1634,6 +1647,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		B85CA71020EBAA8100D98412 /* wson */ = {
+			isa = PBXGroup;
+			children = (
+				B85CA71120EBAA8100D98412 /* WsonParser.m */,
+				B85CA71220EBAA8100D98412 /* WsonObject.h */,
+				B85CA71320EBAA8100D98412 /* WsonParser.h */,
+				B85CA71420EBAA8100D98412 /* WsonObject.m */,
+			);
+			path = wson;
+			sourceTree = "<group>";
+		};
 		C4F012711E1502A6003378D0 /* WebSocket */ = {
 			isa = PBXGroup;
 			children = (
@@ -1678,6 +1702,7 @@
 				74CFDD3D1F459400007A1A66 /* WXRecycleListDataManager.h in Headers */,
 				77D161201C02DDB40010B15B /* WXSDKEngine.h in Headers */,
 				745ED2DA1C5F2C7E002DB5A8 /* WXView.h in Headers */,
+				B85CA71920EBAA8100D98412 /* WsonParser.h in Headers */,
 				17B122252090AAB000387E33 /* WXSDKError.h in Headers */,
 				2AE5B7521CAB7DBD0082FDDB /* WXAComponent.h in Headers */,
 				77D1614F1C02E3880010B15B /* WXUtility.h in Headers */,
@@ -1800,6 +1825,7 @@
 				59A596241CB6311F0012CD52 /* WXStorageModule.h in Headers */,
 				74A4BA851CAD453400195969 /* WXNetworkProtocol.h in Headers */,
 				7461F8A81CFC33A800F62D44 /* WXThreadSafeMutableArray.h in Headers */,
+				B85CA71720EBAA8100D98412 /* WsonObject.h in Headers */,
 				D33451081D3E19480083598A /* WXCanvasComponent.h in Headers */,
 				74B8BEFE1DC47B72004A6027 /* WXRootView.h in Headers */,
 				77E65A111C155EA8008B8775 /* WXImageComponent.h in Headers */,
@@ -1891,6 +1917,7 @@
 				170B4664208733AF00562666 /* WXAnalyzerCenter.h in Headers */,
 				74B81AE71F73C3E900D3A61D /* WXRecycleListTemplateManager.h in Headers */,
 				DCA445ED1EFA5A1200D0CFA8 /* WXTransform.h in Headers */,
+				B85CA71A20EBAA8100D98412 /* WsonParser.h in Headers */,
 				DCA445DB1EFA59AA00D0CFA8 /* WXRecyclerComponent.h in Headers */,
 				DCA445CD1EFA592E00D0CFA8 /* WXComponent+Events.h in Headers */,
 				DCA445EC1EFA5A0E00D0CFA8 /* WXTextAreaComponent.h in Headers */,
@@ -1946,6 +1973,7 @@
 				DCA4460D1EFA5A7900D0CFA8 /* WXThreadSafeMutableArray.h in Headers */,
 				74B81AE31F73C3E300D3A61D /* WXRecycleListComponent.h in Headers */,
 				DCA445DA1EFA59A600D0CFA8 /* WXMultiColumnLayout.h in Headers */,
+				B85CA71820EBAA8100D98412 /* WsonObject.h in Headers */,
 				DCA445E01EFA59CD00D0CFA8 /* WXLoadingIndicator.h in Headers */,
 				DCA445E61EFA59E500D0CFA8 /* WXImageComponent.h in Headers */,
 				DCA4461B1EFA5AA200D0CFA8 /* WXDatePickerManager.h in Headers */,
@@ -2353,6 +2381,7 @@
 				59A596231CB6311F0012CD52 /* WXNavigatorModule.m in Sources */,
 				37B51EE51E97804D0040A743 /* WXCycleSliderComponent.mm in Sources */,
 				77D161211C02DDB40010B15B /* WXSDKEngine.m in Sources */,
+				B85CA71B20EBAA8100D98412 /* WsonObject.m in Sources */,
 				D33451091D3E19480083598A /* WXCanvasComponent.m in Sources */,
 				74A4BA971CB365D100195969 /* WXAppConfiguration.m in Sources */,
 				17B122212090AA9300387E33 /* WXSDKInstance_performance.m in Sources */,
@@ -2361,6 +2390,7 @@
 				7463192A1C71B92600EFEBD4 /* WXModalUIModule.m in Sources */,
 				77D161501C02E3880010B15B /* WXUtility.m in Sources */,
 				74A4BA9F1CB3C0A100195969 /* WXHandlerFactory.m in Sources */,
+				B85CA71520EBAA8100D98412 /* WsonParser.m in Sources */,
 				841CD1031F9739890081196D /* WXExceptionUtils.m in Sources */,
 				C4E97D341F1EF46D00ABC314 /* WXTracingManager.m in Sources */,
 				742AD72F1DF98C45007DC46C /* WXResourceRequest.m in Sources */,
@@ -2399,6 +2429,7 @@
 				74B81AE41F73C3E500D3A61D /* WXRecycleListComponent.mm in Sources */,
 				DC7764951F3C685200B5727E /* WXRecyclerDragController.m in Sources */,
 				B89543F420EB18B5006EAD63 /* WXCoreBridge.mm in Sources */,
+				B85CA71C20EBAA8100D98412 /* WsonObject.m in Sources */,
 				DCA4453D1EFA55B300D0CFA8 /* WXRootView.m in Sources */,
 				DCA4453E1EFA55B300D0CFA8 /* WXBaseViewController.m in Sources */,
 				B89543FE20EB18B5006EAD63 /* WXCoreJSHandler.mm in Sources */,
@@ -2469,6 +2500,7 @@
 				74B81AEA1F73C3E900D3A61D /* WXRecycleListUpdateManager.m in Sources */,
 				74B81AF01F73C3E900D3A61D /* WXComponent+DataBinding.mm in Sources */,
 				DCA445761EFA55B300D0CFA8 /* WXLog.m in Sources */,
+				B85CA71620EBAA8100D98412 /* WsonParser.m in Sources */,
 				17E5ACDC2091F05E00EE81F1 /* WXCoreLayout.cpp in Sources */,
 				DCA445771EFA55B300D0CFA8 /* WXWeakObjectWrapper.m in Sources */,
 				DCA445781EFA55B300D0CFA8 /* NSArray+Weex.m in Sources */,

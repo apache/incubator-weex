@@ -47,7 +47,7 @@ bool RenderManager::CreatePage(std::string page_id, const char *data) {
   std::map<std::string, float>::iterator iter =
       this->viewports_.find(page_id);
   if (iter != this->viewports_.end()) {
-    RenderManager::GetInstance()->set_viewport_width(page_id, iter->second);
+    this->set_viewport_width(page_id, iter->second);
     this->viewports_.erase(page_id);
   }
 

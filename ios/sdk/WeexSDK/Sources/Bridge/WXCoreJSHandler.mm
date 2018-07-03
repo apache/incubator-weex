@@ -44,12 +44,10 @@
 #import <dlfcn.h>
 #import <mach/mach.h>
 
-#import <base/CoreConstants.h>
-#import <core/config/core_environment.h>
 #import <core/manager/weex_core_manager.h>
-#import <core/bridge/js_bridge.h>
 
 #import "WXCoreBridge.h"
+#import "WsonObject.h"
 
 @interface WXCoreJSHandler ()
 {
@@ -357,49 +355,38 @@
 
 - (void)registerForWeexCore
 {
-    WeexCore::WXCoreEnvironment::getInstance()->SetPlatform(OS_iOS);
+    [WXCoreBridge install];
     
-    CGSize screenSize = [UIScreen mainScreen].bounds.size;
-    WeexCore::WXCoreEnvironment::getInstance()->SetDeviceWidth(std::to_string(screenSize.width));
-    WeexCore::WXCoreEnvironment::getInstance()->SetDeviceHeight(std::to_string(screenSize.height));
-    
-    WeexCore::WeexCoreManager::getInstance()->setPlatformBridge(new WeexCore::WXCoreBridge());
-    WeexCore::WeexCoreManager::getInstance()->setJSBridge(new WeexCore::JSBridge());
-//    WeexCore::WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new WeexCore::MeasureFunctionAdapterImplIOS());
-
-    _jsContext[@"callNative"] = ^JSValue*(JSValue *instance, JSValue *tasks, JSValue *callback) {
-        const char* cPageId = [[instance toString] UTF8String];
-#warning todo tasks is array?
-        const char* cTask = [[tasks toString] UTF8String];
-        const char* cCallBack = [[callback toString] UTF8String];
-        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallNative(cPageId, cTask, cCallBack);
+    _jsContext[@"callNative"] = ^JSValue* (JSValue *instance, JSValue *tasks, JSValue *callback) {
+        NSString *instanceId = [instance toString];
+        NSArray *tasksArray = [tasks toArray];
+        NSString *callbackId = [callback toString];
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallNative([instanceId UTF8String], [[WsonObject fromObject:tasksArray] data], [callbackId UTF8String]);
         return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
     _jsContext[@"callAddElement"] = ^(JSValue *instance, JSValue *ref, JSValue *element,
                                       JSValue *index, JSValue *ifCallback) {
         NSString *instanceId = [instance toString];
-#warning todo componentData
         NSDictionary *componentData = [element toDictionary];
         NSString *parentRef = [ref toString];
         int insertIndex = [[index toNumber] intValue];
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:componentData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTJSBridgeThread,@"componentData":componentData}];
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:componentData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTJSBridgeThread, @"componentData":componentData}];
         WXLogDebug(@"callAddElement...%@, %@, %@, %ld", instanceId, parentRef, componentData, (long)insertIndex);
         
         char indexBuffer[25];
         sprintf(indexBuffer, "%d", insertIndex);
-        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallAddElement([instanceId UTF8String], [parentRef UTF8String], [[element toString] UTF8String], indexBuffer);
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallAddElement([instanceId UTF8String], [parentRef UTF8String], [[WsonObject fromObject:componentData] data], indexBuffer);
         return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
     _jsContext[@"callCreateBody"] = ^(JSValue *instance, JSValue *body, JSValue *ifCallback) {
         NSString *instanceId = [instance toString];
-#warning todo bodyData
         NSDictionary *bodyData = [body toDictionary];
         
         WXLogDebug(@"callCreateBody...%@, %@,", instanceId, bodyData);
         [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
-        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallCreateBody([instanceId UTF8String], [[body toString] UTF8String]);
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallCreateBody([instanceId UTF8String], [[WsonObject fromObject:bodyData] data]);
         return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
@@ -433,8 +420,7 @@
         
         WXLogDebug(@"callUpdateAttrs...%@, %@, %@", instanceId, refString, attrsData);
         [WXTracingManager startTracingWithInstanceId:instanceId ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTJSBridgeThread}];
-#warning todo attrs
-        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallUpdateAttrs([instanceId UTF8String], [refString UTF8String], [[attrs toString] UTF8String]);
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallUpdateAttrs([instanceId UTF8String], [refString UTF8String], [[WsonObject fromObject:attrsData] data]);
         return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
@@ -445,8 +431,7 @@
         
         WXLogDebug(@"callUpdateStyle...%@, %@, %@", instanceId, refString, stylesData);
         [WXTracingManager startTracingWithInstanceId:instanceId ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateStyle" options:@{@"threadName":WXTJSBridgeThread}];
-#warning todo styles
-        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallUpdateStyle([instanceId UTF8String], [refString UTF8String], [[styles toString] UTF8String]);
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallUpdateStyle([instanceId UTF8String], [refString UTF8String], [[WsonObject fromObject:stylesData] data]);
         return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     

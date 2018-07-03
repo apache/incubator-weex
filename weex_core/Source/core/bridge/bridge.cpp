@@ -189,4 +189,8 @@ namespace WeexCore {
     void Bridge::onInstanceClose(const char *instanceId) {
         RenderManager::GetInstance()->ClosePage(std::string(instanceId));
     }
+
+    void Bridge::setViewportWidth(const char* pageId, float value) {
+        RenderManager::GetInstance()->set_viewport_width(pageId, value);
+    }
 }

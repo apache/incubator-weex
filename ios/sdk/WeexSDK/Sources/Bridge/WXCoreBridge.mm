@@ -31,25 +31,20 @@
 #import "WXBridgeProtocol.h"
 #import "WXUtility.h"
 #import "WXAppConfiguration.h"
+#import "WXLayoutConstraint.h"
+
+#include <base/CoreConstants.h>
+#include <core/manager/weex_core_manager.h>
 #include <core/render/manager/render_manager.h>
 #include <core/render/page/render_page.h>
+#include <core/config/core_environment.h>
 #include <base/TimeUtils.h>
-#import "WXLayoutConstraint.h"
 
 #define NSSTRING(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCString(NULL, (const char *)(cstr), kCFStringEncodingUTF8)))
 #define NSSTRING_NO_COPY(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCStringNoCopy(NULL, (const char *)(cstr), kCFStringEncodingUTF8, kCFAllocatorNull)))
 
-#pragma mark - C++ related
 namespace WeexCore
 {
-    WXCoreBridge::WXCoreBridge()
-    {
-    }
-    
-    WXCoreBridge::~WXCoreBridge()
-    {
-    }
-    
     static NSDictionary* NSDICTIONARY(std::map<std::string, std::string>* map)
     {
         if (map == nullptr)
@@ -515,7 +510,8 @@ namespace WeexCore
         return 0;
     }
         
-    int WXCoreBridge::callRemoveElement(const char* pageId, const char* ref){
+    int WXCoreBridge::callRemoveElement(const char* pageId, const char* ref)
+    {
         RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
         if (page == nullptr) {
             return -1;
@@ -606,13 +602,53 @@ namespace WeexCore
     }
     
     int WXCoreBridge::callHasTransitionPros(const char* pageId, const char* ref,
-                              std::vector<std::pair<std::string, std::string>> *style){
-        
+                              std::vector<std::pair<std::string, std::string>> *style)
+    {
         NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
         NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
 #warning todo apply for dom operation
         return 0;
     }
 }
+
+@implementation WXCoreBridge
+
+static WeexCore::WXCoreBridge* platformBridge = nullptr;
+static WeexCore::JSBridge* jsBridge = nullptr;
+
++ (void)install
+{
+    WeexCore::WXCoreEnvironment::getInstance()->SetPlatform(OS_iOS);
+    
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    WeexCore::WXCoreEnvironment::getInstance()->SetDeviceWidth(std::to_string(screenSize.width));
+    WeexCore::WXCoreEnvironment::getInstance()->SetDeviceHeight(std::to_string(screenSize.height));
+    
+    platformBridge = new WeexCore::WXCoreBridge();
+    WeexCore::WeexCoreManager::getInstance()->setPlatformBridge(platformBridge);
+    
+    jsBridge = new WeexCore::JSBridge();
+    WeexCore::WeexCoreManager::getInstance()->setJSBridge(jsBridge);
+    
+    //    WeexCore::WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new WeexCore::MeasureFunctionAdapterImplIOS());
+}
+
++ (void)setDefaultDimensionIntoRoot:(NSString*)instanceId width:(CGFloat)width height:(CGFloat)height
+                 isWidthWrapContent:(BOOL)isWidthWrapContent
+                isHeightWrapContent:(BOOL)isHeightWrapContent
+{
+    if (platformBridge) {
+        platformBridge->setDefaultHeightAndWidthIntoRootDom([instanceId UTF8String], (float)width, (float)height, (bool)isWidthWrapContent, (bool)isHeightWrapContent);
+    }
+}
+
++ (void)setViewportWidth:(NSString*)instanceId width:(CGFloat)width
+{
+    if (platformBridge) {
+        platformBridge->setViewportWidth([instanceId UTF8String], (float)width);
+    }
+}
+
+@end
 
 #endif

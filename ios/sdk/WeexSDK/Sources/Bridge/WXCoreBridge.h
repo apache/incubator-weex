@@ -20,15 +20,15 @@
 #ifndef WXCORE_BRIDGE_PLATFORM_H
 #define WXCORE_BRIDGE_PLATFORM_H
 
+#if defined __cplusplus
+
 #include <core/bridge/bridge.h>
 
-namespace WeexCore {
-
-    class WXCoreBridge : public Bridge {
+namespace WeexCore
+{
+    class WXCoreBridge : public Bridge
+    {
     public:
-        
-        WXCoreBridge();
-        ~WXCoreBridge();
         
         void setJSVersion(const char* version);
         
@@ -97,5 +97,23 @@ namespace WeexCore {
                                           std::vector<std::pair<std::string, std::string>> *style);
     };
 }
+
+#endif
+
+#import <Foundation/Foundation.h>
+
+// For Objective-C use
+
+@interface WXCoreBridge : NSObject
+
++ (void)install;
+
++ (void)setDefaultDimensionIntoRoot:(NSString*)instanceId width:(CGFloat)width height:(CGFloat)height
+                 isWidthWrapContent:(BOOL)isWidthWrapContent
+                isHeightWrapContent:(BOOL)isHeightWrapContent;
+
++ (void)setViewportWidth:(NSString*)instanceId width:(CGFloat)width;
+
+@end
 
 #endif

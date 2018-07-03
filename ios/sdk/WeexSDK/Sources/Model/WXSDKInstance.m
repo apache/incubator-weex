@@ -54,6 +54,7 @@
 
 #ifdef WX_IMPORT_WEEXCORE
 #import "WXCoreJSHandler.h"
+#import "WXCoreBridge.h"
 #endif
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
@@ -212,6 +213,16 @@ typedef enum : NSUInteger {
             }
         });
     }
+}
+
+- (void)setViewportWidth:(CGFloat)viewportWidth
+{
+    _viewportWidth = viewportWidth;
+    
+#ifdef WX_IMPORT_WEEXCORE
+    // notify weex core
+    [WXCoreBridge setViewportWidth:_instanceId width:viewportWidth];
+#endif
 }
 
 - (void)renderWithURL:(NSURL *)url

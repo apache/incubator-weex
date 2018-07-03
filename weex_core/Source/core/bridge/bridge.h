@@ -127,6 +127,8 @@ namespace WeexCore {
     bool notifyLayout(const char *instanceId);
 
     void onInstanceClose(const char *instanceId);
+
+    void setViewportWidth(const char* pageId, float value);
   };
 } //end WeexCore
 #endif //Bridge_h

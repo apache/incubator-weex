@@ -37,7 +37,7 @@ namespace WeexCore {
         LOGD("[ExtendJSApi] handleCallNative >>>> pageId: %s, task: %s", pageId, task);
 #endif
         if (strcmp(task, "[{\"module\":\"dom\",\"method\":\"createFinish\",\"args\":[]}]") == 0) {
-            RenderManager::GetInstance()->CreateFinish(pageId) ? 0 : -1;
+            RenderManager::GetInstance()->CreateFinish(pageId);
         } else {
             WeexCoreManager::getInstance()->getPlatformBridge()->callNative(pageId, task, callback);
         }
@@ -124,7 +124,7 @@ namespace WeexCore {
         LOGD("[ExtendJSApi] functionCallCreateBody >>>> pageId: %s, domStr: %s", pageId, domStr);
 #endif
 
-        RenderManager::GetInstance()->CreatePage(pageId, domStr) ? 0 : -1;
+        RenderManager::GetInstance()->CreatePage(pageId, domStr);
     }
 
     int JSBridge::onCallUpdateFinish(const char *pageId, const char *task, const char *callback) {
