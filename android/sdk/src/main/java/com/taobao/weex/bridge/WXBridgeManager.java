@@ -32,7 +32,6 @@ import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -41,64 +40,22 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.common.IWXBridge;
-import com.taobao.weex.common.IWXDebugProxy;
-import com.taobao.weex.common.WXConfig;
-import com.taobao.weex.common.WXErrorCode;
-import com.taobao.weex.common.WXException;
-import com.taobao.weex.common.WXJSBridgeMsgType;
-import com.taobao.weex.common.WXJSExceptionInfo;
-import com.taobao.weex.common.WXRefreshData;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.common.WXThread;
+import com.taobao.weex.common.*;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.ui.WXComponentRegistry;
+import com.taobao.weex.ui.action.*;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.action.ActionReloadPage;
-import com.taobao.weex.ui.action.BasicGraphicAction;
-import com.taobao.weex.ui.action.GraphicActionAddElement;
-import com.taobao.weex.ui.action.GraphicActionAddEvent;
-import com.taobao.weex.ui.action.GraphicActionAppendTreeCreateFinish;
-import com.taobao.weex.ui.action.GraphicActionCreateBody;
-import com.taobao.weex.ui.action.GraphicActionCreateFinish;
-import com.taobao.weex.ui.action.GraphicActionLayout;
-import com.taobao.weex.ui.action.GraphicActionMoveElement;
-import com.taobao.weex.ui.action.GraphicActionRefreshFinish;
-import com.taobao.weex.ui.action.GraphicActionRemoveElement;
-import com.taobao.weex.ui.action.GraphicActionRemoveEvent;
-import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
-import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
-import com.taobao.weex.ui.action.GraphicPosition;
-import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.module.WXDomModule;
-import com.taobao.weex.utils.WXExceptionUtils;
-import com.taobao.weex.utils.WXFileUtils;
-import com.taobao.weex.utils.WXJsonUtils;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXWsonJSONSwitch;
-import com.taobao.weex.utils.WXUtils;
-import com.taobao.weex.utils.WXViewUtils;
+import com.taobao.weex.utils.*;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -179,7 +136,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   // weexcore use single process or not
   private static boolean isUseSingleProcess = false;
 
-  private enum BundType {
+  public enum BundType {
     Vue,
     Rax,
     Others
@@ -1290,7 +1247,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         } catch (Throwable e) {
           e.printStackTrace();
         }
-
+        instance.bundleType = type;
         if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
           WXLogUtils.d("createInstance >>>> instanceId:" + instance.getInstanceId()
                   + ", options:"
@@ -1535,7 +1492,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public void invokeExecJS(String instanceId, String namespace, String function,
                            WXJSObject[] args, boolean logTaskDetail) {
-    if (WXEnvironment.isOpenDebugLog()) {
+    if (WXEnvironment.isOpenDebugLog() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
               .append("function:").append(function);
       if (logTaskDetail) {
@@ -1616,7 +1573,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     StringBuilder builder = new StringBuilder();
     builder.append("[");
     for(WXJSObject object : args){
-      builder.append(WXJsonUtils.fromObjectToJSONString(object));
+      builder.append(WXWsonJSONSwitch.fromObjectToJSONString(object));
       builder.append(",");
     }
     builder.append("]");

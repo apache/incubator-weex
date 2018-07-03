@@ -42,6 +42,7 @@
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
 
 static BOOL threadSafeCollectionUsingLock = YES;
+static BOOL unregisterFontWhenCollision = NO;
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
@@ -145,6 +146,11 @@ CGFloat WXFloorPixelValue(CGFloat value)
 + (BOOL)threadSafeCollectionUsingLock
 {
     return threadSafeCollectionUsingLock;
+}
+
++ (void)setUnregisterFontWhenCollision:(BOOL)value
+{
+    unregisterFontWhenCollision = value;
 }
 
 + (void)performBlock:(void (^)(void))block onThread:(NSThread *)thread
@@ -486,14 +492,18 @@ CGFloat WXFloorPixelValue(CGFloat value)
                     CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL(fontURL);
                     if (fontDataProvider) {
                         CGFontRef newFont = CGFontCreateWithDataProvider(fontDataProvider);
-                        CFErrorRef error = nil;
-                        CTFontManagerRegisterGraphicsFont(newFont, &error);
-                        // the same font family, remove it and register new one.
-                        if (error) {
-                            CTFontManagerUnregisterGraphicsFont(newFont, NULL);
+                        if (unregisterFontWhenCollision) {
+                            CFErrorRef error = nil;
+                            CTFontManagerRegisterGraphicsFont(newFont, &error);
+                            // the same font family, remove it and register new one.
+                            if (error) {
+                                CTFontManagerUnregisterGraphicsFont(newFont, NULL);
+                                CTFontManagerRegisterGraphicsFont(newFont, NULL);
+                                CFRelease(error);
+                            }
+                        }
+                        else {
                             CTFontManagerRegisterGraphicsFont(newFont, NULL);
-                            CFRelease(error);
-                            error = nil;
                         }
                         fontFamily = (__bridge_transfer  NSString*)CGFontCopyPostScriptName(newFont);
                         CGFontRelease(newFont);
@@ -501,12 +511,16 @@ CGFloat WXFloorPixelValue(CGFloat value)
                         CFRelease(fontDataProvider);
                     }
                 } else {
-                    CFErrorRef error = nil;
-                    CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
-                    if (error) {
-                        CFRelease(error);
-                        error = nil;
-                        CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                    if (unregisterFontWhenCollision) {
+                        CFErrorRef error = nil;
+                        CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
+                        if (error) {
+                            CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                            CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                            CFRelease(error);
+                        }
+                    }
+                    else {
                         CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
                     }
                     NSArray *descriptors = (__bridge_transfer NSArray *)CTFontManagerCreateFontDescriptorsFromURL(fontURL);

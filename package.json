@@ -2,7 +2,7 @@
   "name": "weex",
   "version": "0.12.2",
   "subversion": {
-    "framework": "0.26.14",
+    "framework": "0.26.18",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -79,17 +79,13 @@
   },
   "dependencies": {
     "@weex-project/downgrade": "^1.0.3",
-    "autoprefixer": "^6.7.7",
     "blink-diff": "~1.0.12",
     "core-js": "^2.4.0",
-    "query-string": "^4.2.3",
     "semver": "^5.1.0",
-    "weex-picker": "^0.1.0",
     "weex-rax-framework": "0.4.20",
     "weex-vue-framework": "2.5.13-weex.5"
   },
   "devDependencies": {
-    "@weex-project/weex-picker": "^0.2.4",
     "babel-core": "^6.17.0",
     "babel-eslint": "^7.2.1",
     "babel-istanbul": "^0.11.0",
@@ -123,7 +119,6 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "^2.0.1",
-    "rollup-watch": "^4.3.1",
     "selenium-server": "2.53.1",
     "serve": "^1.4.0",
     "shelljs": "^0.7.8",
@@ -139,6 +134,7 @@
     "weex-gcanvas": "^0.4.2",
     "weex-loader": "^0.5.3",
     "weex-vdom-tester": "^0.2.0",
+    "weex-vue-render": "^1.0.24",
     "weex-wd": "^1.0.23",
     "xmldom": "^0.1.27"
   }

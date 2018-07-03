@@ -326,7 +326,7 @@ public class WXSDKEngine implements Serializable {
       registerComponent(WXBasicComponentType.HEADER, WXHeader.class);
 
       registerModule("modal", WXModalUIModule.class, false);
-      registerModule("instanceWrap", WXInstanceWrap.class, true);
+      registerModule("instanceWrap", WXInstanceWrap.class, false);
       registerModule("animation", WXAnimationModule.class, true);
       registerModule("webview", WXWebViewModule.class, true);
       registerModule("navigator", WXNavigatorModule.class);

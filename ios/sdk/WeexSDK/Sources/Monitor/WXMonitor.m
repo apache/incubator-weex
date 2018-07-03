@@ -216,9 +216,9 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     commitDict[@"instanceId"] = [instance instanceId]?:@"";
     
     //new performance point
-    if (!commitDict[SCREENRENDERTIME] && commitDict[TOTALTIME]) {
-        commitDict[SCREENRENDERTIME] = commitDict[TOTALTIME];
-    }
+//    if (!commitDict[SCREENRENDERTIME] && commitDict[TOTALTIME]) {
+//        commitDict[SCREENRENDERTIME] = commitDict[TOTALTIME];
+//    }
     
     commitDict[CALLCREATEINSTANCETIME] = commitDict[COMMUNICATETIME];
     commitDict[COMMUNICATETOTALTIME] = commitDict[TOTALTIME];

@@ -10,22 +10,13 @@ by Tom Preston-Werner , licensed under the Creative Commons - CC BY 3.0 License.
 This product contains software core-js(https://github.com/zloirock/core-js) developed
 by Denis Pushkarev , licensed under the MIT License.
 
-This product contains software autoprefixer(https://github.com/postcss/autoprefixer) developed
-by postcss , licensed under the MIT License.
-
-This product contains software query-string(https://github.com/sindresorhus/query-string) developed
-by sindresorhus  , licensed under the MIT License.
-
-This product contains software weex-picker(https://github.com/weexteam/weex-picker) developed
-by abigtree  , licensed under the Apache 2.0 License.
-
 This product contains software weex-rax-framework(https://github.com/alibaba/rax) developed
 by yuanyan  , licensed under the BSD-3-Clause License.
 
 This product contains software weex-vue-framework(https://github.com/vuejs/vue) developed
 by fkysly  , licensed under the MIT License.
 
-This product contains software weex-vue-render(https://github.com/vuejs/vue) developed
+This product contains software weex-vue-render(https://github.com/weexteam/weex-vue-render) developed
 by MrRaindrop  , licensed under the Apache 2.0 License.
 
 This product contains software weex-styler(https://github.com/weexteam/weex-styler) developed
