@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#import "WXBridgeManager.h"
+#import "WXBridgeManager_private.h"
 #import "WXLog.h"
 #import "WXAssert.h"
 #import "WXBridgeMethod.h"
@@ -28,17 +28,8 @@
 #import "WXResourceLoader.h"
 #import "WXDebugTool.h"
 #import "WXTracingManager.h"
-#import "WXBridgeContext.h"
 #import "WXMonitor.h"
 #import "WXSDKInstance_performance.h"
-
-@interface WXBridgeManager ()
-
-@property (nonatomic, strong) WXBridgeContext   *bridgeCtx;
-@property (nonatomic, assign) BOOL  stopRunning;
-@property (nonatomic, strong) NSMutableArray *instanceIdStack;
-
-@end
 
 static NSThread *WXBridgeThread;
 
@@ -53,7 +44,6 @@ static NSThread *WXBridgeThread;
     });
     return _sharedInstance;
 }
-
 
 - (instancetype)init
 {

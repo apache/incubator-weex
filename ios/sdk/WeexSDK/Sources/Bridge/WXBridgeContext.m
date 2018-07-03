@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#import "WXBridgeContext.h"
+#import "WXBridgeContext_private.h"
 #import "WXJSCoreBridge.h"
 #import "WXLog.h"
 #import "WXUtility.h"
@@ -139,6 +139,7 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallNative:^NSInteger(NSString *instance, NSArray *tasks, NSString *callback) {
         return [weakSelf invokeNative:instance tasks:tasks callback:callback];
     }];
+    
     [_jsBridge registerCallAddElement:^NSInteger(NSString *instanceId, NSString *parentRef, NSDictionary *elementData, NSInteger index) {
         
         // Temporary here , in order to improve performance, will be refactored next version.
@@ -373,6 +374,7 @@ _Pragma("clang diagnostic pop") \
         
         return 0;
     }];
+#endif
     
     [_jsBridge registerCallNativeModule:^NSInvocation*(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *arguments, NSDictionary *options) {
         
@@ -422,7 +424,6 @@ _Pragma("clang diagnostic pop") \
         WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:componentRef methodName:methodName arguments:args instance:instance];
         [method invoke];
     }];
-#endif
 }
 
 - (NSMutableArray *)insStack
@@ -784,7 +785,7 @@ _Pragma("clang diagnostic pop") \
             [newArg removeObject:complection];
         }
         WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
-        if ([bridge isKindOfClass:[WXJSCoreBridge class]]) {
+        if ([bridge isKindOfClass:[WXJSCoreBridge class]] || [bridge isKindOfClass:[WXCoreJSHandler class]]) {
             JSValue *value = [bridge callJSMethod:method args:args];
             if (complection) {
                 complection(value);

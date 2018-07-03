@@ -367,16 +367,6 @@
     WeexCore::WeexCoreManager::getInstance()->setJSBridge(new WeexCore::JSBridge());
 //    WeexCore::WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new WeexCore::MeasureFunctionAdapterImplIOS());
 
-    _jsContext[@"callCreateBody"] = ^(JSValue *instance, JSValue *body, JSValue *ifCallback) {
-        NSString *instanceId = [instance toString];
-        NSDictionary *bodyData = [body toDictionary];
-        
-        WXLogDebug(@"callCreateBody...%@, %@,", instanceId, bodyData);
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
-        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallCreateBody([instanceId UTF8String], [[body toString] UTF8String]);
-        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
-    };
-    
     _jsContext[@"callNative"] = ^JSValue*(JSValue *instance, JSValue *tasks, JSValue *callback) {
         const char* cPageId = [[instance toString] UTF8String];
 #warning todo tasks is array?
@@ -386,162 +376,110 @@
         return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
-    // ...
-}
-
-#if 0
-
-- (void)registerCallNative:(WXJSCallNative)callNative
-{
-    JSValue* (^callNativeBlock)(JSValue *, JSValue *, JSValue *) = ^JSValue*(JSValue *instance, JSValue *tasks, JSValue *callback){
+    _jsContext[@"callAddElement"] = ^(JSValue *instance, JSValue *ref, JSValue *element,
+                                      JSValue *index, JSValue *ifCallback) {
         NSString *instanceId = [instance toString];
-        NSArray *tasksArray = [tasks toArray];
-        NSString *callbackId = [callback toString];
-        WXLogDebug(@"Calling native... instance:%@, tasks:%@, callback:%@", instanceId, tasksArray, callbackId);
-        return [JSValue valueWithInt32:(int32_t)callNative(instanceId, tasksArray, callbackId) inContext:[JSContext currentContext]];
-    };
-    
-    _jsContext[@"callNative"] = callNativeBlock;
-}
-
-- (void)registerCallAddElement:(WXJSCallAddElement)callAddElement
-{
-    id callAddElementBlock = ^(JSValue *instanceId, JSValue *ref, JSValue *element, JSValue *index, JSValue *ifCallback) {
-        
-        NSString *instanceIdString = [instanceId toString];
+#warning todo componentData
         NSDictionary *componentData = [element toDictionary];
         NSString *parentRef = [ref toString];
-        NSInteger insertIndex = [[index toNumber] integerValue];
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:componentData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTJSBridgeThread,@"componentData":componentData}];
-        WXLogDebug(@"callAddElement...%@, %@, %@, %ld", instanceIdString, parentRef, componentData, (long)insertIndex);
+        int insertIndex = [[index toNumber] intValue];
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:componentData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTJSBridgeThread,@"componentData":componentData}];
+        WXLogDebug(@"callAddElement...%@, %@, %@, %ld", instanceId, parentRef, componentData, (long)insertIndex);
         
-        return [JSValue valueWithInt32:(int32_t)callAddElement(instanceIdString, parentRef, componentData, insertIndex) inContext:[JSContext currentContext]];
+        char indexBuffer[25];
+        sprintf(indexBuffer, "%d", insertIndex);
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallAddElement([instanceId UTF8String], [parentRef UTF8String], [[element toString] UTF8String], indexBuffer);
+        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
-    _jsContext[@"callAddElement"] = callAddElementBlock;
-}
-
-- (void)registerCallCreateBody:(WXJSCallCreateBody)callCreateBody
-{
-    id WXJSCallCreateBodyBlock = ^(JSValue *instanceId, JSValue *body,JSValue *ifCallback) {
-        
-        NSString *instanceIdString = [instanceId toString];
+    _jsContext[@"callCreateBody"] = ^(JSValue *instance, JSValue *body, JSValue *ifCallback) {
+        NSString *instanceId = [instance toString];
+#warning todo bodyData
         NSDictionary *bodyData = [body toDictionary];
         
-        WXLogDebug(@"callCreateBody...%@, %@,", instanceIdString, bodyData);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
-        return [JSValue valueWithInt32:(int32_t)callCreateBody(instanceIdString, bodyData) inContext:[JSContext currentContext]];
+        WXLogDebug(@"callCreateBody...%@, %@,", instanceId, bodyData);
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallCreateBody([instanceId UTF8String], [[body toString] UTF8String]);
+        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
-    _jsContext[@"callCreateBody"] = WXJSCallCreateBodyBlock;
-}
-
-- (void)registerCallRemoveElement:(WXJSCallRemoveElement)callRemoveElement
-{
-    id WXJSCallCreateBodyBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *ifCallback) {
-        
-        NSString *instanceIdString = [instanceId toString];
+    _jsContext[@"callRemoveElement"] = ^(JSValue *instance, JSValue *ref,JSValue *ifCallback) {
+        NSString *instanceId = [instance toString];
         NSString *refString = [ref toString];
         
-        WXLogDebug(@"callRemoveElement...%@, %@,", instanceIdString, refString);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:nil className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"removeElement" options:nil];
-        return [JSValue valueWithInt32:(int32_t)callRemoveElement(instanceIdString, refString) inContext:[JSContext currentContext]];
+        WXLogDebug(@"callRemoveElement...%@, %@,", instanceId, refString);
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"removeElement" options:nil];
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallRemoveElement([instanceId UTF8String], [refString UTF8String]);
+        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
-    _jsContext[@"callRemoveElement"] = WXJSCallCreateBodyBlock;
-}
-
-- (void)registerCallMoveElement:(WXJSCallMoveElement)callMoveElement
-{
-    id WXJSCallMoveElementBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *parentRef,JSValue *index, JSValue *ifCallback) {
-        
-        NSString *instanceIdString = [instanceId toString];
+    _jsContext[@"callMoveElement"] = ^(JSValue *instance, JSValue *ref, JSValue *parentRef,
+                                       JSValue *index, JSValue *ifCallback) {
+        NSString *instanceId = [instance toString];
         NSString *refString = [ref toString];
         NSString *parentRefString = [parentRef toString];
-        NSInteger moveIndex = [[index toNumber] integerValue];
+        int moveIndex = [[index toNumber] intValue];
         
-        WXLogDebug(@"callAddElement...%@, %@,", instanceIdString, refString);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"moveElement" options:nil];
-        return [JSValue valueWithInt32:(int32_t)callMoveElement(instanceIdString, refString,parentRefString,moveIndex) inContext:[JSContext currentContext]];
+        WXLogDebug(@"callAddElement...%@, %@,", instanceId, refString);
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"moveElement" options:nil];
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallMoveElement([instanceId UTF8String], [refString UTF8String], [parentRefString UTF8String], moveIndex);
+        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
-    _jsContext[@"callMoveElement"] = WXJSCallMoveElementBlock;
-}
-
-- (void)registerCallUpdateAttrs:(WXJSCallUpdateAttrs)callUpdateAttrs
-{
-    id WXJSCallUpdateAttrsBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *attrs, JSValue *ifCallback) {
-        
-        NSString *instanceIdString = [instanceId toString];
+    _jsContext[@"callUpdateAttrs"] = ^(JSValue *instance, JSValue *ref, JSValue *attrs, JSValue *ifCallback) {
+        NSString *instanceId = [instance toString];
         NSString *refString = [ref toString];
         NSDictionary *attrsData = [attrs toDictionary];
         
-        WXLogDebug(@"callUpdateAttrs...%@, %@, %@", instanceIdString, refString,attrsData);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTJSBridgeThread}];
-        return [JSValue valueWithInt32:(int32_t)callUpdateAttrs(instanceIdString, refString,attrsData) inContext:[JSContext currentContext]];
+        WXLogDebug(@"callUpdateAttrs...%@, %@, %@", instanceId, refString, attrsData);
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTJSBridgeThread}];
+#warning todo attrs
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallUpdateAttrs([instanceId UTF8String], [refString UTF8String], [[attrs toString] UTF8String]);
+        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
-    _jsContext[@"callUpdateAttrs"] = WXJSCallUpdateAttrsBlock;
-}
-
-- (void)registerCallUpdateStyle:(WXJSCallUpdateStyle)callUpdateStyle
-{
-    id WXJSCallUpdateStyleBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *styles, JSValue *ifCallback) {
-        
-        NSString *instanceIdString = [instanceId toString];
+    _jsContext[@"callUpdateStyle"] = ^(JSValue *instance, JSValue *ref, JSValue *styles, JSValue *ifCallback) {
+        NSString *instanceId = [instance toString];
         NSString *refString = [ref toString];
-        NSDictionary *stylessData = [styles toDictionary];
+        NSDictionary *stylesData = [styles toDictionary];
         
-        WXLogDebug(@"callUpdateStyle...%@, %@, %@", instanceIdString, refString,stylessData);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateStyle" options:@{@"threadName":WXTJSBridgeThread}];
-        return [JSValue valueWithInt32:(int32_t)callUpdateStyle(instanceIdString, refString,stylessData) inContext:[JSContext currentContext]];
+        WXLogDebug(@"callUpdateStyle...%@, %@, %@", instanceId, refString, stylesData);
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateStyle" options:@{@"threadName":WXTJSBridgeThread}];
+#warning todo styles
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallUpdateStyle([instanceId UTF8String], [refString UTF8String], [[styles toString] UTF8String]);
+        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
-    _jsContext[@"callUpdateStyle"] = WXJSCallUpdateStyleBlock;
-}
-
-- (void)registerCallAddEvent:(WXJSCallAddEvent)callAddEvent
-{
-    id WXJSCallAddEventBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *event, JSValue *ifCallback) {
-        
-        NSString *instanceIdString = [instanceId toString];
+    _jsContext[@"callAddEvent"] = ^(JSValue *instance, JSValue *ref, JSValue *event, JSValue *ifCallback) {
+        NSString *instanceId = [instance toString];
         NSString *refString = [ref toString];
         NSString *eventString = [event toString];
         
-        WXLogDebug(@"callAddEvent...%@, %@, %@", instanceIdString, refString,eventString);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addEvent" options:nil];
-        return [JSValue valueWithInt32:(int32_t)callAddEvent(instanceIdString, refString,eventString) inContext:[JSContext currentContext]];
+        WXLogDebug(@"callAddEvent...%@, %@, %@", instanceId, refString, eventString);
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addEvent" options:nil];
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallAddEvent([instanceId UTF8String], [refString UTF8String], [eventString UTF8String]);
+        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
-    _jsContext[@"callAddEvent"] = WXJSCallAddEventBlock;
-}
-
-- (void)registerCallRemoveEvent:(WXJSCallRemoveEvent)callRemoveEvent
-{
-    id WXJSCallRemoveEventBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *event, JSValue *ifCallback) {
-        
-        NSString *instanceIdString = [instanceId toString];
+    _jsContext[@"callRemoveEvent"] = ^(JSValue *instance, JSValue *ref, JSValue *event, JSValue *ifCallback) {
+        NSString *instanceId = [instance toString];
         NSString *refString = [ref toString];
         NSString *eventString = [event toString];
         
-        WXLogDebug(@"callRemoveEvent...%@, %@, %@", instanceIdString, refString,eventString);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"removeEvent" options:nil];
-        return [JSValue valueWithInt32:(int32_t)callRemoveEvent(instanceIdString, refString,eventString) inContext:[JSContext currentContext]];
-    };
-}
-
-- (void)registerCallCreateFinish:(WXJSCallCreateFinish)callCreateFinish
-{
-    id WXJSCallCreateFinishBlock = ^(JSValue *instanceId, JSValue *ifCallback) {
-        
-        NSString *instanceIdString = [instanceId toString];
-        
-        WXLogDebug(@"callRCreateFinish...%@", instanceIdString);
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:nil className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTJSBridgeThread}];
-        return [JSValue valueWithInt32:(int32_t)callCreateFinish(instanceIdString) inContext:[JSContext currentContext]];
+        WXLogDebug(@"callRemoveEvent...%@, %@, %@", instanceId, refString, eventString);
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"removeEvent" options:nil];
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallRemoveEvent([instanceId UTF8String], [refString UTF8String], [eventString UTF8String]);
+        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     
-    _jsContext[@"callCreateFinish"] = WXJSCallCreateFinishBlock;
+    _jsContext[@"callCreateFinish"] = ^(JSValue *instance, JSValue *ifCallback) {
+        NSString *instanceId = [instance toString];
+        
+        WXLogDebug(@"callRCreateFinish...%@", instanceId);
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTJSBridgeThread}];
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallCreateFinish([instanceId UTF8String]);
+        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
+    };
 }
 
 - (void)registerCallNativeModule:(WXJSCallNativeModule)callNativeModuleBlock
@@ -576,7 +514,6 @@
         callNativeComponentBlock(instanceIdString, componentNameString, methodNameString, argsArray, optionsDic);
     };
 }
-#endif
 
 @end
 

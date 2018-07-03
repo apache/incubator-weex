@@ -52,6 +52,10 @@
 #import "WXSDKInstance_performance.h"
 #import "WXPageEventNotifyEvent.h"
 
+#ifdef WX_IMPORT_WEEXCORE
+#import "WXCoreJSHandler.h"
+#endif
+
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
 NSTimeInterval JSLibInitTime = 0;
@@ -137,7 +141,12 @@ typedef enum : NSUInteger {
 {
     _debugJS = [WXDebugTool isDevToolDebug];
     
+    
+#ifdef WX_IMPORT_WEEXCORE
+    Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXCoreJSHandler class];
+#else
     Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXJSCoreBridge class];
+#endif
     
     if (_instanceJavaScriptContext && [_instanceJavaScriptContext isKindOfClass:bridgeClass]) {
         return _instanceJavaScriptContext;
@@ -148,7 +157,7 @@ typedef enum : NSUInteger {
         _instanceJavaScriptContext = nil;
     }
     
-    _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
+    _instanceJavaScriptContext = [[bridgeClass alloc] init];
     if(!_debugJS) {
         id<WXBridgeProtocol> jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"bridgeCtx.jsBridge"];
         JSContext* globalContex = jsBridge.javaScriptContext;

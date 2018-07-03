@@ -24,6 +24,8 @@
 #import "WXSDKManager.h"
 #import "WXComponentManager.h"
 #import "WXSDKInstance_private.h"
+#import "WXBridgeManager_private.h"
+#import "WXBridgeContext_private.h"
 #import "WXLog.h"
 #import "WXTracingManager.h"
 #import "WXBridgeProtocol.h"
@@ -100,8 +102,22 @@ namespace WeexCore
     
     int WXCoreBridge::callNative(const char* pageId, const char *task, const char *callback)
     {
-        // should not enter this function
-        assert(false);
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        if (page == nullptr) {
+            return -1;
+        }
+        
+        long long startTime = getCurrentTime();
+        
+        NSString* ns_instanceId = NSSTRING(pageId);
+#warning todo task type
+        //NSString* ns_task = NSSTRING(task);
+        NSString* ns_callback = NSSTRING(callback);
+        
+        [[WXBridgeManager sharedManager].bridgeCtx invokeNative:ns_instanceId tasks:@[] callback:ns_callback];
+        
+        page->CallBridgeTime(getCurrentTime() - startTime);
+        return 0;
     }
     
     void* WXCoreBridge::callNativeModule(const char* pageId, const char *module, const char *method,

@@ -315,6 +315,8 @@
         [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"removeEvent" options:nil];
         return [JSValue valueWithInt32:(int32_t)callRemoveEvent(instanceIdString, refString,eventString) inContext:[JSContext currentContext]];
     };
+    
+    _jsContext[@"callRemoveEvent"] = WXJSCallRemoveEventBlock;
 }
     
 - (void)registerCallCreateFinish:(WXJSCallCreateFinish)callCreateFinish
