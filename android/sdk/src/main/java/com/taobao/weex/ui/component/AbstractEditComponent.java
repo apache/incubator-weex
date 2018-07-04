@@ -27,6 +27,7 @@ import android.text.InputType;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.method.DigitsKeyListener;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.util.TypedValue;
@@ -655,6 +656,8 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   private int getInputType(String type) {
+    String digits = "1234567890";
+    String digitsWithDot = "12234567890.";
     int inputType;
     switch (type) {
       case Constants.Value.TEXT:
@@ -676,6 +679,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         break;
       case Constants.Value.TEL:
         inputType = InputType.TYPE_CLASS_PHONE;
+        getHostView().setKeyListener(DigitsKeyListener.getInstance(digits));
         break;
       case Constants.Value.TIME:
         inputType = InputType.TYPE_NULL;
@@ -686,6 +690,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         break;
       case Constants.Value.NUMBER:
         inputType = InputType.TYPE_CLASS_NUMBER;
+        getHostView().setKeyListener(DigitsKeyListener.getInstance(digitsWithDot));
         break;
       default:
         inputType = InputType.TYPE_CLASS_TEXT;
