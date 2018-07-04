@@ -42,6 +42,11 @@ bool flexIsUndefined(float value) {
 
 - (void)setNeedsLayout
 {
+#ifdef WX_IMPORT_WEEXCORE
+    if (_flexCssNode != nullptr) {
+        _flexCssNode->markDirty();
+    }
+#else
     _isLayoutDirty = YES;
     WXComponent *supercomponent = [self supercomponent];
     
@@ -55,11 +60,21 @@ bool flexIsUndefined(float value) {
     if(supercomponent){
         [supercomponent setNeedsLayout];
     }
+#endif
 }
 
 - (BOOL)needsLayout
 {
+#ifdef WX_IMPORT_WEEXCORE
+    if (_flexCssNode != nullptr) {
+        return _flexCssNode->isDirty();
+    }
+    else {
+        return false;
+    }
+#else
     return _isLayoutDirty;
+#endif
 }
 
 - (CGSize (^)(CGSize))measureBlock
@@ -74,43 +89,69 @@ bool flexIsUndefined(float value) {
 
 #pragma mark Private
 
+- (void)_setRenderObject:(void *)object
+{
+    _flexCssNode = static_cast<WeexCore::WXCoreLayoutNode*>(object);
+    _flexCssNode->setContext((__bridge void *)self); // bind
+    if ([self measureBlock]) {
+        _flexCssNode->setMeasureFunc(flexCssNodeMeasure);
+    }
+}
+
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles
 {
-        _flexCssNode = new WeexCore::WXCoreLayoutNode();
-        if ([self measureBlock]) {
-            _flexCssNode->setMeasureFunc(flexCssNodeMeasure);
+    if (_flexCssNode != nullptr) {
+        // using weex core
+        return;
+    }
+    
+    _flexCssNode = new WeexCore::WXCoreLayoutNode();
+    if ([self measureBlock]) {
+        _flexCssNode->setMeasureFunc(flexCssNodeMeasure);
+    }
+    _flexCssNode->setContext((__bridge void *)self);
+    [self _recomputeCSSNodeChildren];
+    [self _fillCSSNode:styles isUpdate:NO];
+    
+    if ([self.ref isEqualToString:WX_SDK_ROOT_REF]) {
+        if (flexIsUndefined(_flexCssNode->getStyleHeight()) && self.weexInstance.frame.size.height) {
+            _flexCssNode->setStyleHeight(self.weexInstance.frame.size.height);
         }
-        _flexCssNode->setContext((__bridge void *)self);
-        [self _recomputeCSSNodeChildren];
-        [self _fillCSSNode:styles isUpdate:NO];
         
-        if ([self.ref isEqualToString:WX_SDK_ROOT_REF]) {
-            if (flexIsUndefined(_flexCssNode->getStyleHeight()) && self.weexInstance.frame.size.height) {
-                _flexCssNode->setStyleHeight(self.weexInstance.frame.size.height);
-            }
-            
-            if (flexIsUndefined(_flexCssNode->getStyleWidth()) && self.weexInstance.frame.size.width) {
-                _flexCssNode->setStyleWidth(self.weexInstance.frame.size.width,NO);
-            }
+        if (flexIsUndefined(_flexCssNode->getStyleWidth()) && self.weexInstance.frame.size.width) {
+            _flexCssNode->setStyleWidth(self.weexInstance.frame.size.width,NO);
         }
+    }
 }
 
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
     [self _fillCSSNode:styles isUpdate:YES];
 }
 
 -(void)_resetCSSNodeStyles:(NSArray *)styles
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
     [self _resetCSSNode:styles];
 }
 
 - (void)_recomputeCSSNodeChildren
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
 }
 
 - (NSUInteger)_childrenCountForLayout
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
     NSArray *subcomponents = _subcomponents;
     NSUInteger count = subcomponents.count;
     for (WXComponent *component in subcomponents) {
@@ -124,6 +165,9 @@ bool flexIsUndefined(float value) {
 
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
     WXAssertComponentThread();
     if (isChanged && [self isKindOfClass:[WXCellComponent class]]) {
         CGFloat mainScreenWidth = [[UIScreen mainScreen] bounds].size.width;
@@ -183,6 +227,9 @@ bool flexIsUndefined(float value) {
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition
                            gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
     WXAssertComponentThread();
 
         if (self.flexCssNode->hasNewLayout()) {
@@ -234,6 +281,9 @@ bool flexIsUndefined(float value) {
 
 - (void)_fillCSSNode:(NSDictionary *)styles isUpdate:(BOOL)isUpdate
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
         // flex
         if (styles[@"flex"]) {
             _flexCssNode->set_flex([WXConvert CGFloat:styles[@"flex"]]);
@@ -413,6 +463,9 @@ do {\
 
 - (void)_resetCSSNode:(NSArray *)styles
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
         if (styles.count<=0) {
             return;
         }
@@ -621,6 +674,9 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
 
 - (NSInteger) getActualNodeIndex:(WXComponent*)subcomponent atIndex:(NSInteger) index
 {
+#ifdef WX_IMPORT_WEEXCORE
+    return 0;
+#else
     NSInteger actualIndex = 0; //实际除去不需要布局的subComponent，此时所在的正确位置
     for (WXComponent *child in _subcomponents) {
         if ([child.ref isEqualToString:subcomponent.ref]) {
@@ -631,23 +687,32 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
         }
     }
     return actualIndex;
+#endif
 }
 
 - (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index
 {
+#ifdef WX_IMPORT_WEEXCORE
+#else
     self.flexCssNode->addChildAt(subcomponent.flexCssNode, (uint32_t)index);
+#endif
 }
 
 - (void)_rmChildCssNode:(WXComponent *)subcomponent
 {
+#ifdef WX_IMPORT_WEEXCORE
+#else
     self.flexCssNode->removeChild(subcomponent->_flexCssNode);
 #ifdef DEBUG
     WXLogDebug(@"flexLayout -> ref:%@ ,flexCssNode->removeChild ,childRef:%@",self.ref,subcomponent.ref);
 #endif
+#endif
 }
 
-
-+ (void) recycleNodeOnComponentThread:(WeexCore::WXCoreLayoutNode * ) garbageNode gabRef:(NSString *)ref {
++ (void) recycleNodeOnComponentThread:(WeexCore::WXCoreLayoutNode * ) garbageNode gabRef:(NSString *)ref
+{
+#ifdef WX_IMPORT_WEEXCORE
+#else
     if (nullptr == garbageNode) {
 #ifdef DEBUG
         WXLogDebug(@"flexlayout->recycle garbageNode ref:%@ is null ",ref);
@@ -663,6 +728,7 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
         }
     });
     //domthread
+#endif
 }
 
 @end

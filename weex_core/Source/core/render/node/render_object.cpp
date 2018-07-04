@@ -91,34 +91,32 @@ void RenderObject::ApplyDefaultAttr() {
   }
 }
 
-WXCoreSize measureFunc_Impl(WXCoreLayoutNode *node, float width,
+static WXCoreSize measureFunc_Impl(WXCoreLayoutNode *node, float width,
                             MeasureMode widthMeasureMode, float height,
                             MeasureMode heightMeasureMode) {
   WXCoreSize size;
   size.height = 0;
   size.width = 0;
 
-  if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
-    return size;
-
-  return WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->Measure(
+  auto adapter = WeexCoreManager::getInstance()->GetMeasureFunctionAdapter();
+  return adapter == nullptr ? size : adapter->Measure(
       node, width, widthMeasureMode, height, heightMeasureMode);
 }
 
 void RenderObject::BindMeasureFunc() { setMeasureFunc(measureFunc_Impl); }
 
 void RenderObject::OnLayoutBefore() {
-  if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
-    return;
-  WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutBefore(
-      this);
+  auto adapter = WeexCoreManager::getInstance()->GetMeasureFunctionAdapter();
+  if (adapter != nullptr) {
+    adapter->LayoutBefore(this);
+  }
 }
 
 void RenderObject::OnLayoutAfter(float width, float height) {
-  if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
-    return;
-  WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutAfter(
-      this, width, height);
+  auto adapter = WeexCoreManager::getInstance()->GetMeasureFunctionAdapter();
+  if (adapter != nullptr) {
+    adapter->LayoutAfter(this, width, height);
+  }
 }
 
 StyleType RenderObject::ApplyStyle(const std::string &key,

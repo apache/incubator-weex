@@ -16,4 +16,6 @@
 
 + (instancetype)sharedManager;
 
++ (NSThread*)jsThread;
+
 @end

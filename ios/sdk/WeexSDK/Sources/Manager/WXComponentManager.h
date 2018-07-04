@@ -201,8 +201,9 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 
 #ifdef WX_IMPORT_WEEXCORE
 
-- (void)wxcore_CreateBody:(NSDictionary*)data;
-- (void)wxcore_AddElement:(NSDictionary*)data toSupercomponent:(NSString*)superRef atIndex:(NSInteger)index;
+- (void)wxcore_CreateBody:(NSDictionary*)data renderObject:(void*)renderObject;
+- (void)wxcore_AddElement:(NSDictionary*)data toSupercomponent:(NSString*)superRef atIndex:(NSInteger)index
+             renderObject:(void*)renderObject;
 - (void)wxcore_RemoveElement:(NSString*)ref;
 - (void)wxcore_MoveComponent:(NSString*)ref toSuper:(NSString*)superRef atIndex:(NSInteger)index;
 - (void)wxcore_AppendTreeCreateFinish:(NSString*)ref;

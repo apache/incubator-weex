@@ -37,6 +37,7 @@
 #include <core/manager/weex_core_manager.h>
 #include <core/render/manager/render_manager.h>
 #include <core/render/page/render_page.h>
+#include <core/render/node/render_object.h>
 #include <core/config/core_environment.h>
 #include <base/TimeUtils.h>
 
@@ -302,6 +303,9 @@ namespace WeexCore
         
         long long startTime = getCurrentTime();
         
+        // get render object (layout node) in current thread
+        RenderObject* renderObject = page->GetRenderObject(ref);
+        
         NSString* ns_instanceId = NSSTRING(pageId);
         NSString* ns_ref = NSSTRING(ref);
         NSString* ns_type = NSSTRING(componentType);
@@ -322,7 +326,8 @@ namespace WeexCore
             [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
             [manager startComponentTasks];
             [manager wxcore_CreateBody:@{@"ref": ns_ref, @"type": ns_type,
-                                         @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}];
+                                         @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}
+                          renderObject:renderObject];
             [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
         });
 
@@ -346,6 +351,9 @@ namespace WeexCore
         }
         
         long long startTime = getCurrentTime();
+        
+        // get render object (layout node) in current thread
+        RenderObject* renderObject = page->GetRenderObject(ref);
         
         NSString* ns_instanceId = NSSTRING(pageId);
         NSString* ns_componentType = NSSTRING(componentType);
@@ -371,7 +379,8 @@ namespace WeexCore
             [manager startComponentTasks];
             [manager wxcore_AddElement:@{@"ref": ns_ref, @"type": ns_componentType,
                                          @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}
-                      toSupercomponent:ns_parentRef atIndex:ns_index];
+                      toSupercomponent:ns_parentRef atIndex:ns_index
+                          renderObject:renderObject];
             [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
         });
 
@@ -380,8 +389,8 @@ namespace WeexCore
     }
     
     int WXCoreBridge::callLayout(const char* pageId, const char* ref,
-                       int top, int bottom, int left, int right,
-                       int height, int width, int index)
+                       float top, float bottom, float left, float right,
+                       float height, float width, int index)
     {
         RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
         if (page == nullptr) {
@@ -398,7 +407,11 @@ namespace WeexCore
             if (!manager.isValid) {
                 return;
             }
-            [manager wxcore_Layout:ns_ref frame:CGRectMake(left, top, width, height)];
+            CGRect frame = CGRectMake(isnan(WXRoundPixelValue(left))?0:WXRoundPixelValue(left),
+                                      isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
+                                      isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
+                                      isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
+            [manager wxcore_Layout:ns_ref frame:frame];
         });
 
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -609,6 +622,25 @@ namespace WeexCore
 #warning todo apply for dom operation
         return 0;
     }
+    
+#pragma mark - Layout Impl
+    
+    WXCoreSize WXCoreMeasureFunctionBridge::Measure(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
+                                                    float height, MeasureMode heightMeasureMode)
+    {
+        // should not enter this function
+        assert(false);
+    }
+    
+    void WXCoreMeasureFunctionBridge::LayoutBefore(WXCoreLayoutNode *node)
+    {
+        
+    }
+    
+    void WXCoreMeasureFunctionBridge::LayoutAfter(WXCoreLayoutNode *node, float width, float height)
+    {
+        
+    }
 }
 
 @implementation WXCoreBridge
@@ -630,7 +662,7 @@ static WeexCore::JSBridge* jsBridge = nullptr;
     jsBridge = new WeexCore::JSBridge();
     WeexCore::WeexCoreManager::getInstance()->setJSBridge(jsBridge);
     
-    //    WeexCore::WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new WeexCore::MeasureFunctionAdapterImplIOS());
+    WeexCore::WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new WeexCore::WXCoreMeasureFunctionBridge());
 }
 
 + (void)setDefaultDimensionIntoRoot:(NSString*)instanceId width:(CGFloat)width height:(CGFloat)height
@@ -646,6 +678,15 @@ static WeexCore::JSBridge* jsBridge = nullptr;
 {
     if (platformBridge) {
         platformBridge->setViewportWidth([instanceId UTF8String], (float)width);
+    }
+}
+
++ (void)triggerLayout:(NSString*)instanceId size:(CGSize)size
+{
+    const char* page = [instanceId UTF8String];
+    if (platformBridge->notifyLayout(page)) {
+        platformBridge->setDefaultHeightAndWidthIntoRootDom(page, size.width, size.height, false, false);
+        platformBridge->forceLayout(page);
     }
 }
 

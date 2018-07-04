@@ -202,6 +202,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 /// @name Private Methods
 ///--------------------------------------
 
+- (void)_setRenderObject:(void *)object;
+
 - (void)_modifyStyles:(NSDictionary *)styles;
 
 - (void)_transitionUpdateViewProperty:(NSDictionary *)styles;

@@ -23,13 +23,13 @@
 #if defined __cplusplus
 
 #include <core/bridge/bridge.h>
+#include <core/layout/measure_func_adapter.h>
 
 namespace WeexCore
 {
     class WXCoreBridge : public Bridge
     {
     public:
-        
         void setJSVersion(const char* version);
         
         void reportException(const char* pageId, const char *func, const char *exception_string);
@@ -73,8 +73,8 @@ namespace WeexCore
                            bool willLayout= true);
         
         int callLayout(const char* pageId, const char* ref,
-                       int top, int bottom, int left, int right,
-                       int height, int width, int index);
+                       float top, float bottom, float left, float right,
+                       float height, float width, int index);
         
         int callUpdateStyle(const char* pageId, const char* ref,
                             std::vector<std::pair<std::string, std::string>> *style,
@@ -96,6 +96,17 @@ namespace WeexCore
         int callHasTransitionPros(const char* pageId, const char* ref,
                                           std::vector<std::pair<std::string, std::string>> *style);
     };
+    
+    class WXCoreMeasureFunctionBridge : public MeasureFunctionAdapter
+    {
+    public:
+        WXCoreSize Measure(WXCoreLayoutNode *node, float width, MeasureMode widthMeasureMode,
+                           float height, MeasureMode heightMeasureMode);
+        
+        void LayoutBefore(WXCoreLayoutNode *node);
+        
+        void LayoutAfter(WXCoreLayoutNode *node, float width, float height);
+    };
 }
 
 #endif
@@ -113,6 +124,8 @@ namespace WeexCore
                 isHeightWrapContent:(BOOL)isHeightWrapContent;
 
 + (void)setViewportWidth:(NSString*)instanceId width:(CGFloat)width;
+
++ (void)triggerLayout:(NSString*)instanceId size:(CGSize)size;
 
 @end
 

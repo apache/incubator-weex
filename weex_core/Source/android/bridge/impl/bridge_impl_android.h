@@ -109,8 +109,8 @@ namespace WeexCore {
     int callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index);
 
     int callLayout(const char* pageId, const char* ref,
-                   int top, int bottom, int left, int right,
-                   int height, int width, int index);
+                   float top, float bottom, float left, float right,
+                   float height, float width, int index);
 
     int callUpdateStyle(const char* pageId, const char* ref,
                         std::vector<std::pair<std::string, std::string>> *style,

@@ -42,6 +42,7 @@
 
 #ifdef WX_IMPORT_WEEXCORE
 #import "WXCoreBridge.h"
+#import "WXBridgeManager_private.h"
 #endif
 
 static NSThread *WXComponentThread;
@@ -117,6 +118,13 @@ static NSThread *WXComponentThread;
 
 + (NSThread *)componentThread
 {
+#ifdef WX_IMPORT_WEEXCORE
+    // Combine dom thread and js thread
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        WXComponentThread = [WXBridgeManager jsThread];
+    });
+#else
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         WXComponentThread = [[NSThread alloc] initWithTarget:[self sharedManager] selector:@selector(_runLoopThread) object:nil];
@@ -129,6 +137,7 @@ static NSThread *WXComponentThread;
         
         [WXComponentThread start];
     });
+#endif
     
     return WXComponentThread;
 }
@@ -230,7 +239,7 @@ static NSThread *WXComponentThread;
     WXAssertComponentThread();
     WXAssertParam(data);
     
-    _rootComponent = [self _buildComponentForData:data supercomponent:nil];
+    _rootComponent = [self _buildComponentForData:data supercomponent:nil renderObject:nullptr];
         [self _initRootFlexCssNode];
         _rootFlexCSSNode->addChildAt(_rootComponent.flexCssNode, (uint32_t)[_fixedComponents count]);
     
@@ -275,7 +284,7 @@ static NSThread *WXComponentThread;
 
 - (void)_recursivelyAddComponent:(NSDictionary *)componentData toSupercomponent:(WXComponent *)supercomponent atIndex:(NSInteger)index appendingInTree:(BOOL)appendingInTree
 {
-    WXComponent *component = [self _buildComponentForData:componentData supercomponent:supercomponent];
+    WXComponent *component = [self _buildComponentForData:componentData supercomponent:supercomponent renderObject:nullptr];
     if (!supercomponent.subcomponents) {
         index = 0;
     } else {
@@ -476,6 +485,7 @@ static NSThread *WXComponentThread;
 }
 
 - (WXComponent *)_buildComponentForData:(NSDictionary *)data supercomponent:(WXComponent *)supercomponent
+                           renderObject:(void*)renderObject
 {
     double buildSartTime = CACurrentMediaTime()*1000;
     NSString *ref = data[@"ref"];
@@ -511,11 +521,17 @@ static NSThread *WXComponentThread;
         bindingEvents = [self _extractBindingEvents:&events];
     }
     
-    Class clazz = NSClassFromString(config.clazz);;
-    WXComponent *component = [[clazz alloc] initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:self.weexInstance];
-    if (isTemplate) {
-        component->_isTemplate = YES;
-        [component _storeBindingsWithProps:bindingProps styles:bindingStyles attributes:bindingAttibutes events:bindingEvents];
+    Class clazz = NSClassFromString(config.clazz);
+    WXComponent *component = [clazz alloc];
+    if (component) {
+        if (renderObject) {
+            [component _setRenderObject:renderObject];
+        }
+        component = [component initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:self.weexInstance];
+        if (isTemplate) {
+            component->_isTemplate = YES;
+            [component _storeBindingsWithProps:bindingProps styles:bindingStyles attributes:bindingAttibutes events:bindingEvents];
+        }
     }
 
     WXAssert(component, @"Component build failed for data:%@", data);
@@ -899,6 +915,9 @@ static NSThread *WXComponentThread;
 
 - (void)_layout
 {
+#ifdef WX_IMPORT_WEEXCORE
+    [WXCoreBridge triggerLayout:_weexInstance.instanceId size:_weexInstance.frame.size];
+#else
     BOOL needsLayout = NO;
 
 //    NSEnumerator *enumerator = [_indexDict objectEnumerator];
@@ -932,6 +951,7 @@ static NSThread *WXComponentThread;
             [dirtyComponent _layoutDidFinish];
         }];
     }
+#endif
 }
 
 - (void) _printFlexComonentFrame:(WXComponent *)component
@@ -965,6 +985,9 @@ static NSThread *WXComponentThread;
 }
 - (void)_initRootFlexCssNode
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
     _rootFlexCSSNode = new WeexCore::WXCoreLayoutNode();
     [self _applyRootFrame:self.weexInstance.frame];
     _rootFlexCSSNode->setFlexWrap(WeexCore::kNoWrap);
@@ -973,6 +996,9 @@ static NSThread *WXComponentThread;
 
 - (void)_calculateRootFrame
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
         if(!_rootFlexCSSNode->hasNewLayout()){
             return;
         }
@@ -1005,7 +1031,10 @@ static NSThread *WXComponentThread;
 {
     pthread_mutex_lock(&_propertyMutex);
     [_fixedComponents addObject:fixComponent];
+#ifdef WX_IMPORT_WEEXCORE
+#else
     _rootFlexCSSNode->addChildAt(fixComponent.flexCssNode, (uint32_t)([_fixedComponents count]-1));
+#endif
     pthread_mutex_unlock(&_propertyMutex);
 }
 
@@ -1014,10 +1043,17 @@ static NSThread *WXComponentThread;
     pthread_mutex_lock(&_propertyMutex);
     [_fixedComponents removeObject:fixComponent];
     pthread_mutex_unlock(&_propertyMutex);
+#ifdef WX_IMPORT_WEEXCORE
+#else
     [self removeFixFlexNode:fixComponent->_flexCssNode];
+#endif
 }
 
-- (void)removeFixFlexNode:(WeexCore::WXCoreLayoutNode* )fixNode{
+- (void)removeFixFlexNode:(WeexCore::WXCoreLayoutNode* )fixNode
+{
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
     if (nullptr == fixNode) {
         return;
     }
@@ -1035,13 +1071,14 @@ static NSThread *WXComponentThread;
 
 #ifdef WX_IMPORT_WEEXCORE
 
-- (void)wxcore_CreateBody:(NSDictionary*)data
+- (void)wxcore_CreateBody:(NSDictionary*)data renderObject:(void*)renderObject
 {
     WXAssertComponentThread();
     WXAssertParam(data);
+    WXAssertParam(renderObject);
     
 #warning todo logic 检查isWidthWrapContent和isHeightWrapContent参数
-    _rootComponent = [self _buildComponentForData:data supercomponent:nil];
+    _rootComponent = [self _buildComponentForData:data supercomponent:nil renderObject:renderObject];
     
     CGSize size = _weexInstance.frame.size;
     [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId width:size.width height:size.height isWidthWrapContent:NO isHeightWrapContent:NO];
@@ -1062,10 +1099,12 @@ static NSThread *WXComponentThread;
 }
 
 - (void)wxcore_AddElement:(NSDictionary*)data toSupercomponent:(NSString*)superRef atIndex:(NSInteger)index
+             renderObject:(void*)renderObject
 {
     WXAssertComponentThread();
     WXAssertParam(data);
     WXAssertParam(superRef);
+    WXAssertParam(renderObject);
     
     WXComponent *supercomponent = [_indexDict objectForKey:superRef];
     WXAssertComponentExist(supercomponent);
@@ -1075,7 +1114,7 @@ static NSThread *WXComponentThread;
         return;
     }
     
-    WXComponent *component = [self _buildComponentForData:data supercomponent:supercomponent];
+    WXComponent *component = [self _buildComponentForData:data supercomponent:supercomponent renderObject:renderObject];
     if (!supercomponent.subcomponents) {
         index = 0;
     } else {
@@ -1160,6 +1199,7 @@ static NSThread *WXComponentThread;
     WXAssertComponentThread();
     
 #warning todo logic
+    
 }
 
 - (void)wxcore_AddEvent:(NSString*)eventName toComponent:(NSString*)ref
