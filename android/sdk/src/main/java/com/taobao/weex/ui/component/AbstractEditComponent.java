@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -93,6 +93,8 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private TextWatcher mTextChangedEventDispatcher;
   private int mFormatRepeatCount = 0;
   private static final int MAX_TEXT_FORMAT_REPEAT = 3;
+  private static final String INPUT_DIGITS = "1234567890";
+  private static final String INPUT_DIGITS_WITH_DOT = "1234567890.";
 
   private TextPaint mPaint = new TextPaint();
   private int mLineHeight = UNSET;
@@ -656,8 +658,6 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   private int getInputType(String type) {
-    String digits = "1234567890";
-    String digitsWithDot = "12234567890.";
     int inputType;
     switch (type) {
       case Constants.Value.TEXT:
@@ -675,22 +675,30 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         break;
       case Constants.Value.PASSWORD:
         inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
-        getHostView().setTransformationMethod(PasswordTransformationMethod.getInstance());
+        if(getHostView() != null){
+            getHostView().setTransformationMethod(PasswordTransformationMethod.getInstance());
+        }
         break;
       case Constants.Value.TEL:
         inputType = InputType.TYPE_CLASS_PHONE;
-        getHostView().setKeyListener(DigitsKeyListener.getInstance(digits));
+        if(getHostView() != null){
+          getHostView().setKeyListener(DigitsKeyListener.getInstance(INPUT_DIGITS));
+        }
         break;
       case Constants.Value.TIME:
         inputType = InputType.TYPE_NULL;
-        getHostView().setFocusable(false);
+        if(getHostView() != null){
+            getHostView().setFocusable(false);
+        }
         break;
       case Constants.Value.URL:
         inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
         break;
       case Constants.Value.NUMBER:
         inputType = InputType.TYPE_CLASS_NUMBER;
-        getHostView().setKeyListener(DigitsKeyListener.getInstance(digitsWithDot));
+        if(getHostView() != null){
+            getHostView().setKeyListener(DigitsKeyListener.getInstance(INPUT_DIGITS_WITH_DOT));
+        }
         break;
       default:
         inputType = InputType.TYPE_CLASS_TEXT;
