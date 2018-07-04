@@ -180,14 +180,23 @@
 
 #pragma mark Add & Remove Event
 
-
 #define WX_ADD_EVENT(eventName, addSelector) \
 if ([addEventName isEqualToString:@#eventName]) {\
     [self addSelector];\
 }
 
+#define WX_ADD_EVENTS(eventName1,eventName2, addSelector) \
+if ([addEventName isEqualToString:@#eventName1]||[addEventName isEqualToString:@#eventName2]) {\
+    [self addSelector:addEventName];\
+}
+
 #define WX_REMOVE_EVENT(eventName, removeSelector) \
 if ([removeEventName isEqualToString:@#eventName]) {\
+    [self removeSelector];\
+}
+
+#define WX_REMOVE_EVENTS(eventName1,eventName2, removeSelector) \
+if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToString:@#eventName2]) {\
     [self removeSelector];\
 }
 
@@ -232,7 +241,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_ADD_EVENT(touchcancel, addTouchCancelEvent)
     WX_ADD_EVENT(accessibilityMagicTap, addAccessibilityMagicTapEvent)
     
-    WX_ADD_EVENT(stopPropagation, addStopPropagationEvent)
+    WX_ADD_EVENTS(stopPropagation, stoppropagation, addStopPropagationEvent)
     
     if(_isListenPseudoTouch) {
         self.touchGesture.listenPseudoTouch = YES;
@@ -263,8 +272,8 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_REMOVE_EVENT(touchcancel, removeTouchCancelEvent)
     WX_REMOVE_EVENT(accessibilityMagicTap, removeAccessibilityMagicTapEvent)
     
-    WX_REMOVE_EVENT(stopPropagation, removeStopPropagationEvent)
-    
+    WX_REMOVE_EVENTS(stoppropagation,stopPropagation, removeStopPropagationEvent)
+
     if(_isListenPseudoTouch) {
         self.touchGesture.listenPseudoTouch = NO;
     }
@@ -337,9 +346,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 #pragma mark - StopPropagation
 
-- (void)addStopPropagationEvent
+- (void)addStopPropagationEvent:(NSString *)stopPropagationName
 {
     _listenStopPropagation = YES;
+    _stopPropagationName = stopPropagationName;
     self.touchGesture.listenTouchMove = YES;
 }
 
@@ -778,7 +788,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
             else{
                 touchState = @"end";
             }
-            BOOL stopPropagation = [[WXEventManager sharedManager]stopPropagation:self.weexInstance.instanceId ref:ref type:@"stopPropagation" params:@{@"changedTouches":resultTouch ? @[resultTouch] : @[],@"action":touchState}];
+            BOOL stopPropagation = [[WXEventManager sharedManager]stopPropagation:self.weexInstance.instanceId ref:ref type:_stopPropagationName params:@{@"changedTouches":resultTouch ? @[resultTouch] : @[],@"action":touchState}];
             touch.wx_stopPropagation = stopPropagation ? @1 : @0;
         }
     }
