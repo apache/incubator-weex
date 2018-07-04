@@ -52,6 +52,12 @@ set(COMMON_SRCS
   ./core/bridge/js_bridge.cpp
   ./core/parser/dom_wson.cpp
    ./core/bridge/bridge.cpp
+
+   ./core/data_render/ast.cc
+   ./core/data_render/parser.cc
+   ./core/data_render/op_code.cc
+   ./core/data_render/token.cc
+   ./core/data_render/vnode/vnode.cc
         )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
