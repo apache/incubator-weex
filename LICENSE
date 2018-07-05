@@ -219,24 +219,8 @@ This product bundles vuejs v1.0.12, which is available under a
   runtime/frameworks/legacy/core/state.js
   runtime/frameworks/legacy/core/watcher.js
 
-This product bundles Guava v20.0, which is available under a "Apache" license. For details, see
-For https://github.com/google/guava/blob/v20.0/COPYING and following files:
+This product bundles Guava v20.0, which is available under a "Apache" license. For details, see https://github.com/google/guava/blob/v20.0/COPYING and following files: 
 android_sdk/src/main/java/org/apache/taobao/weex/utils/WXDataStructureUtil.java
-/*
- * Copyright (C) 2007 The Guava Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
  For fpconv
  weex_core/Source/core/parser/dom_parser.cpp
