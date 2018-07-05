@@ -77,11 +77,11 @@ class RenderManager {
 
   bool CreateFinish(const std::string &page_id);
 
-  bool CallNativeModule(const char *page_id, const char *module, const char *method,
+  void CallNativeModule(const char *page_id, const char *module, const char *method,
                         const char *arguments, int arguments_length, const char *options,
                         int options_length);
 
-  bool CallMetaModule(const char *page_id, const char *method, const char *arguments);
+  void CallMetaModule(const char *page_id, const char *method, const char *arguments);
 
   RenderPage *GetPage(const std::string &page_id);
 

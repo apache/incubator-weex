@@ -224,9 +224,9 @@ namespace WeexCore {
                 }
             } else {
                 if (reinit) {
-                    initFromParam(env, script,
-                                  params,
-                                  serializerTemp.get());
+                    const std::vector<INIT_FRAMEWORK_PARAMS *> &initFrameworkParams = initFromParam(env, script, params, serializerTemp.get());
+                    if (initFrameworkParams.empty())
+                      return false;
                     realSerializer = serializerTemp.get();
                 } else {
                     realSerializer = serializer;
@@ -279,6 +279,9 @@ namespace WeexCore {
                                                                                         script,
                                                                                         params,
                                                                                         serializer.get());
+        if (initFrameworkParams.empty())
+          return false;
+
         LOGE("Single process ? %s", g_use_single_process ? "true" : "false");
         if (g_use_single_process) {
             if (initFrameworkInSingleProcess(env, script, initFrameworkParams)) {
@@ -302,7 +305,6 @@ namespace WeexCore {
 
         reportNativeInitStatus("-1010", "init Failed");
         return false;
-
     }
 
     bool WeexProxy::execJSService(JNIEnv *env, jobject object, jstring script) {
@@ -619,44 +621,67 @@ namespace WeexCore {
         LOGE("initFromParam is running ");
         std::vector<INIT_FRAMEWORK_PARAMS *> initFrameworkParams;
 
-#define ADDSTRING(name)                                     \
-    {                                                       \
-        const char* myname = #name;                         \
-        serializer->add(myname, strlen(myname));            \
-        ScopedJStringUTF8 scopedString(env, (jstring)name); \
-        const char* chars = scopedString.getChars();        \
-        int charLength = strlen(chars);                     \
-        serializer->add(chars, charLength);                 \
-        initFrameworkParams.push_back(genInitFrameworkParams(myname,chars));\
-    }
-        jclass c_params = env->GetObjectClass(params);
+#define ADDSTRING(name)                                       \
+        {                                                         \
+          if (name == nullptr) {                                \
+            initFrameworkParams.clear();                        \
+          } else {                                              \
+            const char* myname = #name;                         \
+            serializer->add(myname, strlen(myname));            \
+            ScopedJStringUTF8 scopedString(env, (jstring)name); \
+            const char* chars = scopedString.getChars();        \
+            int charLength = strlen(chars);                     \
+            serializer->add(chars, charLength);                 \
+            initFrameworkParams.push_back(genInitFrameworkParams(myname,chars));\
+          }                                                     \
+        }
 
-        jmethodID m_platform = env->GetMethodID(c_params,
-                                                "getPlatform",
-                                                "()Ljava/lang/String;");
+
+        jclass c_params = env->GetObjectClass(params);
+        if (c_params == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get c_params failed");
+          return initFrameworkParams;
+        }
+
+
+        jmethodID m_platform = env->GetMethodID(c_params, "getPlatform", "()Ljava/lang/String;");
+        if (m_platform == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get m_platform failed");
+          return initFrameworkParams;
+        }
         jobject platform = env->CallObjectMethod(params, m_platform);
+        if (platform == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get platform failed");
+          return initFrameworkParams;
+        }
         if (!WXCoreEnvironment::getInstance()->SetPlatform(
                 jString2StrFast(env, reinterpret_cast<jstring &>(platform)))) {
             LOGD("setPlatform");
         }
         ADDSTRING(platform);
+        env->DeleteLocalRef(platform);
 
 
-        jmethodID m_use_single_process = env->GetMethodID(c_params, "getUseSingleProcess",
-                                                          "()Ljava/lang/String;");
+        jmethodID m_use_single_process = env->GetMethodID(c_params, "getUseSingleProcess", "()Ljava/lang/String;");
         if (m_use_single_process == nullptr) {
             LOGE("getUseSingleProcess method is missing");
         } else {
             jobject j_use_single_process = env->CallObjectMethod(params, m_use_single_process);
-            const char *use_single_process = env->GetStringUTFChars(
-                    (jstring) (j_use_single_process),
-                    nullptr);
+            const char *use_single_process = env->GetStringUTFChars((jstring) (j_use_single_process), nullptr);
             LOGE("g_use_single_process is %s ", use_single_process);
-            g_use_single_process = strstr(use_single_process, "true") != nullptr;
+            if (use_single_process == nullptr) {
+              g_use_single_process = false;
+            } else {
+              g_use_single_process = strstr(use_single_process, "true") != nullptr;
+              env->DeleteLocalRef(j_use_single_process);
+            }
         }
 
-        jmethodID m_get_jss_so_path = env->GetMethodID(c_params, "getLibJssPath",
-                                                       "()Ljava/lang/String;");
+
+        jmethodID m_get_jss_so_path = env->GetMethodID(c_params, "getLibJssPath", "()Ljava/lang/String;");
         if (m_get_jss_so_path != nullptr) {
             jobject j_get_jss_so_path = env->CallObjectMethod(params, m_get_jss_so_path);
             if (j_get_jss_so_path != nullptr) {
@@ -664,80 +689,161 @@ namespace WeexCore {
                         (jstring) (j_get_jss_so_path),
                         nullptr);
                 LOGE("g_jssSoPath is %s ", g_jssSoPath);
+                env->DeleteLocalRef(j_get_jss_so_path);
             }
         }
 
-        jmethodID m_osVersion = env->GetMethodID(
-                c_params, "getOsVersion", "()Ljava/lang/String;");
+
+        jmethodID m_osVersion = env->GetMethodID(c_params, "getOsVersion", "()Ljava/lang/String;");
+        if (m_osVersion == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get m_osVersion failed");
+          return initFrameworkParams;
+        }
         jobject osVersion = env->CallObjectMethod(params, m_osVersion);
+        if (osVersion == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get osVersion failed");
+          return initFrameworkParams;
+        }
         ADDSTRING(osVersion);
+        env->DeleteLocalRef(osVersion);
 
-        // use param ti get cacheDir
-        jmethodID m_cacheMethod = env->GetMethodID(
-                c_params, "getCacheDir", "()Ljava/lang/String;");
-        if (m_cacheMethod != NULL) {
+
+        jmethodID m_cacheMethod = env->GetMethodID(c_params, "getCacheDir", "()Ljava/lang/String;");
+        if (m_cacheMethod != nullptr) {
             jobject cacheDir = env->CallObjectMethod(params, m_cacheMethod);
-            if (cacheDir != NULL) {
+            if (cacheDir != nullptr) {
                 ADDSTRING(cacheDir);
+                env->DeleteLocalRef(cacheDir);
             }
         }
 
-        jmethodID m_appVersion = env->GetMethodID(
-                c_params, "getAppVersion", "()Ljava/lang/String;");
+
+        jmethodID m_appVersion = env->GetMethodID(c_params, "getAppVersion", "()Ljava/lang/String;");
+        if (m_appVersion == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get m_appVersion failed");
+          return initFrameworkParams;
+        }
         jobject appVersion = env->CallObjectMethod(params, m_appVersion);
+        if (appVersion == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get appVersion failed");
+          return initFrameworkParams;
+        }
         ADDSTRING(appVersion);
+        env->DeleteLocalRef(appVersion);
 
-        jmethodID m_weexVersion = env->GetMethodID(
-                c_params, "getWeexVersion", "()Ljava/lang/String;");
+
+        jmethodID m_weexVersion = env->GetMethodID(c_params, "getWeexVersion", "()Ljava/lang/String;");
+        if (m_weexVersion == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get m_weexVersion failed");
+          return initFrameworkParams;
+        }
         jobject weexVersion = env->CallObjectMethod(params, m_weexVersion);
+        if (weexVersion == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get weexVersion failed");
+          return initFrameworkParams;
+        }
         ADDSTRING(weexVersion);
+        env->DeleteLocalRef(weexVersion);
 
-        jmethodID m_deviceModel = env->GetMethodID(
-                c_params, "getDeviceModel", "()Ljava/lang/String;");
+
+        jmethodID m_deviceModel = env->GetMethodID(c_params, "getDeviceModel", "()Ljava/lang/String;");
+        if (m_deviceModel == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get m_deviceModel failed");
+          return initFrameworkParams;
+        }
         jobject deviceModel = env->CallObjectMethod(params, m_deviceModel);
+        if (deviceModel == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get deviceModel failed");
+          return initFrameworkParams;
+        }
         ADDSTRING(deviceModel);
+        env->DeleteLocalRef(deviceModel);
 
-        jmethodID m_appName = env->GetMethodID(
-                c_params, "getAppName", "()Ljava/lang/String;");
+
+        jmethodID m_appName = env->GetMethodID(c_params, "getAppName", "()Ljava/lang/String;");
+        if (m_appName == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get m_appName failed");
+          return initFrameworkParams;
+        }
         jobject appName = env->CallObjectMethod(params, m_appName);
+        if (appName == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get appName failed");
+          return initFrameworkParams;
+        }
         ADDSTRING(appName);
+        env->DeleteLocalRef(appName);
 
-        jmethodID m_deviceWidth = env->GetMethodID(
-                c_params, "getDeviceWidth", "()Ljava/lang/String;");
+
+        jmethodID m_deviceWidth = env->GetMethodID(c_params, "getDeviceWidth", "()Ljava/lang/String;");
+        if (m_deviceWidth == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get m_deviceWidth failed");
+          return initFrameworkParams;
+        }
         jobject deviceWidth = env->CallObjectMethod(params, m_deviceWidth);
+        if (deviceWidth == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get deviceWidth failed");
+          return initFrameworkParams;
+        }
         if (!WXCoreEnvironment::getInstance()->SetDeviceWidth(
                 jString2StrFast(env, reinterpret_cast<jstring &>(deviceWidth)))) {
             LOGD("setDeviceWidth");
         }
         ADDSTRING(deviceWidth);
+        env->DeleteLocalRef(deviceWidth);
 
-        jmethodID m_deviceHeight = env->GetMethodID(
-                c_params, "getDeviceHeight", "()Ljava/lang/String;");
+
+        jmethodID m_deviceHeight = env->GetMethodID(c_params, "getDeviceHeight", "()Ljava/lang/String;");
+        if (m_deviceHeight == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get m_deviceHeight failed");
+          return initFrameworkParams;
+        }
         jobject deviceHeight = env->CallObjectMethod(params, m_deviceHeight);
+        if (deviceHeight == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get deviceHeight failed");
+          return initFrameworkParams;
+        }
         if (!WXCoreEnvironment::getInstance()->SetDeviceHeight(
                 jString2StrFast(env, reinterpret_cast<jstring &>(deviceHeight)))) {
             LOGD("setDeviceHeight");
         }
         ADDSTRING(deviceHeight);
+        env->DeleteLocalRef(deviceHeight);
 
-        jmethodID m_options = env->GetMethodID(
-                c_params, "getOptions", "()Ljava/lang/Object;");
+
+        jmethodID m_options = env->GetMethodID(c_params, "getOptions", "()Ljava/lang/Object;");
+        if (m_options == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get m_options failed");
+          return initFrameworkParams;
+        }
         jobject options = env->CallObjectMethod(params, m_options);
+        if (options == nullptr) {
+          ADDSTRING(nullptr);
+          reportNativeInitStatus("-1012", "get options failed");
+          return initFrameworkParams;
+        }
+
         jclass jmapclass = env->FindClass("java/util/HashMap");
-        jmethodID jkeysetmid = env->GetMethodID(jmapclass,
-                                                "keySet",
-                                                "()Ljava/util/Set;");
-        jmethodID jgetmid = env->GetMethodID(
-                jmapclass,
-                "get",
-                "(Ljava/lang/Object;)Ljava/lang/Object;");
+        jmethodID jkeysetmid = env->GetMethodID(jmapclass, "keySet", "()Ljava/util/Set;");
+        jmethodID jgetmid = env->GetMethodID(jmapclass, "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
         jobject jsetkey = env->CallObjectMethod(options, jkeysetmid);
         jclass jsetclass = env->FindClass("java/util/Set");
-        jmethodID jtoArraymid = env->GetMethodID(jsetclass,
-                                                 "toArray",
-                                                 "()[Ljava/lang/Object;");
-        jobjectArray jobjArray =
-                (jobjectArray) env->CallObjectMethod(jsetkey, jtoArraymid);
+        jmethodID jtoArraymid = env->GetMethodID(jsetclass, "toArray", "()[Ljava/lang/Object;");
+        jobjectArray jobjArray = (jobjectArray) env->CallObjectMethod(jsetkey, jtoArraymid);
         env->DeleteLocalRef(jsetkey);
         if (jobjArray != NULL) {
             jsize arraysize = env->GetArrayLength(jobjArray);
@@ -746,13 +852,6 @@ namespace WeexCore {
                 jstring jvalue = (jstring) env->CallObjectMethod(options, jgetmid, jkey);
 
                 if (jkey != NULL) {
-                    // const char* c_key = env->GetStringUTFChars(jkey, NULL);
-                    // addString(vm, WXEnvironment, c_key, jString2String(env, jvalue));
-                    // serializer->add(c_key, strlen(c_key));
-                    // env->DeleteLocalRef(jkey);
-                    // if (jvalue != NULL) {
-                    //     env->DeleteLocalRef(jvalue);
-                    // }
                     ScopedJStringUTF8 c_key(env, jkey);
                     ScopedJStringUTF8 c_value(env, jvalue);
                     const char *c_key_chars = c_key.getChars();
@@ -765,8 +864,7 @@ namespace WeexCore {
                             genInitFrameworkParams(c_key_chars, c_value_chars));
                     const std::string &key = jString2Str(env, jkey);
                     if (key != "") {
-                        WXCoreEnvironment::getInstance()->AddOption(key,
-                                                                    jString2Str(env, jvalue));
+                        WXCoreEnvironment::getInstance()->AddOption(key, jString2Str(env, jvalue));
                     }
 
                 }
@@ -774,6 +872,7 @@ namespace WeexCore {
             env->DeleteLocalRef(jobjArray);
         }
         env->DeleteLocalRef(options);
+
         return initFrameworkParams;
     }
 

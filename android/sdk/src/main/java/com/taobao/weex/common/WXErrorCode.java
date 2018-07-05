@@ -174,6 +174,8 @@ public enum WXErrorCode {
 
   WX_JS_FRAMEWORK_INIT_SINGLE_PROCESS_SUCCESS("-1011", "js framework init success in single process",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
+  WX_JS_FRAMEWORK_INIT_FAILED_PARAMS_NULL("-1012", "js framework init failed due to params null",ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
+
 
   /**
    * WX Key Exception Commit RT SDK Init
