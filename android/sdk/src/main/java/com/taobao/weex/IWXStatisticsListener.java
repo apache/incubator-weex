@@ -55,6 +55,12 @@ public interface IWXStatisticsListener {
   void onHeadersReceived();
 
   /**
+   * Called when to progress a http request.
+   * @param progress 0-100
+   */
+  void onHttpResponseProgress(int progress);
+
+  /**
    * Called when to finish a http request.
    */
   void onHttpFinish();

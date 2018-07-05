@@ -1695,6 +1695,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     private WXRenderStrategy flag;
     private WXSDKInstance instance;
     private long startRequestTime;
+    private long totalSize = 0;
     private int traceId;
 
     private WXHttpListener(String pageName, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag, long startRequestTime) {
@@ -1729,6 +1730,16 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     @Override
     public void onHeadersReceived(int statusCode, Map<String,List<String>> headers) {
+      if(headers != null){
+        List<String> contentLength = headers.containsKey("Content-Length")?headers.get("Content-Length"):headers.get("content-length");
+        if(contentLength != null && !contentLength.isEmpty()){
+          for(String value : contentLength){
+            if(TextUtils.isDigitsOnly(value)){
+              totalSize+=Long.parseLong(value);
+            }
+          }
+        }
+      }
       if (this.instance != null
               && this.instance.getWXStatisticsListener() != null) {
         this.instance.getWXStatisticsListener().onHeadersReceived();
@@ -1748,7 +1759,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     @Override
     public void onHttpResponseProgress(int loadedLength) {
-
+      if (this.instance != null
+              && this.instance.getWXStatisticsListener() != null) {
+        int progress = 100;
+        if(totalSize > 0){
+          progress = (int) (loadedLength * 100 / totalSize);
+        }
+        this.instance.getWXStatisticsListener().onHttpResponseProgress(progress);
+      }
     }
 
     @Override
