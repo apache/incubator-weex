@@ -1824,7 +1824,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           }
 
           if (mUserTrackAdapter != null) {
-            mUserTrackAdapter.commit(getContext(), null, IWXUserTrackAdapter.JS_DOWNLOAD, performance, null);
+            mUserTrackAdapter.commit(getContext(), null, IWXUserTrackAdapter.JS_DOWNLOAD, performance, getUserTrackParams());
           }
         }
       }
