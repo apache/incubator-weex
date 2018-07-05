@@ -93,7 +93,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private TextWatcher mTextChangedEventDispatcher;
   private int mFormatRepeatCount = 0;
   private static final int MAX_TEXT_FORMAT_REPEAT = 3;
-  private static final String INPUT_DIGITS = "1234567890";
+  private static final String INPUT_DIGITS = "1234567890-*#+";
   private static final String INPUT_DIGITS_WITH_DOT = "1234567890.";
 
   private TextPaint mPaint = new TextPaint();
