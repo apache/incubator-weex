@@ -140,7 +140,14 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
 
   @Override
   public boolean onInterceptTouchEvent(MotionEvent ev) {
-    return scrollable && super.onInterceptTouchEvent(ev);
+    try {
+      return scrollable && super.onInterceptTouchEvent(ev);
+    } catch (IllegalArgumentException e) {
+      e.printStackTrace();
+    } catch (ArrayIndexOutOfBoundsException e) {
+      e.printStackTrace();
+    }
+    return false;
   }
 
   @Override
