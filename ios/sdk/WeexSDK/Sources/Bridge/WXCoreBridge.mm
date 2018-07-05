@@ -248,9 +248,9 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager wxcore_AddEvent:ns_event toComponent:ns_ref];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addEvent" options:nil];
-        
+        [manager wxcore_AddEvent:ns_event toElement:ns_ref];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addEvent" options:@{@"threadName":WXTDOMThread}];
+
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
     }
@@ -277,8 +277,8 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager wxcore_RemoveEvent:ns_event fromComponent:ns_ref];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeEvent" options:nil];
+        [manager wxcore_RemoveEvent:ns_event fromElement:ns_ref];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeEvent" options:@{@"threadName":WXTDOMThread}];
     
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -320,8 +320,8 @@ namespace WeexCore
         [manager wxcore_CreateBody:@{@"ref": ns_ref, @"type": ns_type,
                                      @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}
                       renderObject:renderObject];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createBody" options:nil];
-
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
+        
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
     }
@@ -366,9 +366,10 @@ namespace WeexCore
         [manager startComponentTasks];
         [manager wxcore_AddElement:@{@"ref": ns_ref, @"type": ns_componentType,
                                      @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}
-                  toSupercomponent:ns_parentRef atIndex:ns_index
+                           toSuper:ns_parentRef
+                           atIndex:ns_index
                       renderObject:renderObject];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addElement" options:nil];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -433,8 +434,8 @@ namespace WeexCore
         }
         
         [manager startComponentTasks];
-        [manager wxcore_UpdateStyles:ns_style forComponent:ns_ref];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateStyles" options:nil];
+        [manager wxcore_UpdateStyles:ns_style forElement:ns_ref];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateStyles" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -463,9 +464,9 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager wxcore_UpdateAttributes:ns_attributes forComponent:ns_ref];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateAttrs" options:nil];
-        
+        [manager wxcore_UpdateAttributes:ns_attributes forElement:ns_ref];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
+
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
     }
@@ -491,7 +492,7 @@ namespace WeexCore
         }
         [manager startComponentTasks];
         [manager wxcore_CreateFinish];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createFinish" options:nil];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -520,7 +521,7 @@ namespace WeexCore
         
         [manager startComponentTasks];
         [manager wxcore_RemoveElement:ns_ref];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeElement" options:nil];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -550,8 +551,8 @@ namespace WeexCore
         }
         
         [manager startComponentTasks];
-        [manager wxcore_MoveComponent:ns_ref toSuper:ns_parentRef atIndex:ns_index];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"moveElement" options:nil];
+        [manager wxcore_MoveElement:ns_ref toSuper:ns_parentRef atIndex:ns_index];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"moveElement" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -583,10 +584,30 @@ namespace WeexCore
     int WXCoreBridge::callHasTransitionPros(const char* pageId, const char* ref,
                               std::vector<std::pair<std::string, std::string>> *style)
     {
-        NSString *pageIdString = [NSString stringWithCString:pageId encoding:NSUTF8StringEncoding];
-        NSString *refString = [NSString stringWithCString:ref encoding:NSUTF8StringEncoding];
-#warning todo apply for dom operation
-        return 0;
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        if (page == nullptr) {
+            return -1;
+        }
+        
+        long long startTime = getCurrentTime();
+        
+        NSString* ns_instanceId = NSSTRING(pageId);
+        NSString* ns_ref = NSSTRING(ref);
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        
+        // if transition is none, return directly, avoiding convert style
+        if ([manager wxcore_IsTransitionNoneOfElement:ns_ref]) {
+            return 0;
+        }
+        
+        int result = [manager wxcore_HasTransitionPropertyInStyles:NSDICTIONARY(style) forElement:ns_ref] ? 1 : 0;
+        
+        page->CallBridgeTime(getCurrentTime() - startTime);
+        return result;
     }
     
 #pragma mark - Layout Impl

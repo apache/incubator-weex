@@ -118,13 +118,6 @@ static NSThread *WXComponentThread;
 
 + (NSThread *)componentThread
 {
-#ifdef WX_IMPORT_WEEXCORE
-    // Combine dom thread and js thread
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        WXComponentThread = [WXBridgeManager jsThread];
-    });
-#else
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         WXComponentThread = [[NSThread alloc] initWithTarget:[self sharedManager] selector:@selector(_runLoopThread) object:nil];
@@ -137,7 +130,6 @@ static NSThread *WXComponentThread;
         
         [WXComponentThread start];
     });
-#endif
     
     return WXComponentThread;
 }
@@ -185,6 +177,12 @@ static NSThread *WXComponentThread;
 - (void)rootViewFrameDidChange:(CGRect)frame
 {
     WXAssertComponentThread();
+#ifdef WX_IMPORT_WEEXCORE
+    CGSize size = _weexInstance.frame.size;
+    [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId
+                                        width:size.width height:size.height
+                           isWidthWrapContent:NO isHeightWrapContent:NO];
+#else
         if (_rootFlexCSSNode) {
             [self _applyRootFrame:frame];
             if (!_rootComponent.styles[@"width"]) {
@@ -195,6 +193,7 @@ static NSThread *WXComponentThread;
             }
         }
     [_rootComponent setNeedsLayout];
+#endif
     [self startComponentTasks];
 }
 
@@ -1100,7 +1099,7 @@ static NSThread *WXComponentThread;
     }];
 }
 
-- (void)wxcore_AddElement:(NSDictionary*)data toSupercomponent:(NSString*)superRef atIndex:(NSInteger)index
+- (void)wxcore_AddElement:(NSDictionary*)data toSuper:(NSString*)superRef atIndex:(NSInteger)index
              renderObject:(void*)renderObject
 {
     WXAssertComponentThread();
@@ -1170,7 +1169,7 @@ static NSThread *WXComponentThread;
     [self removeComponent:ref];
 }
 
-- (void)wxcore_MoveComponent:(NSString*)ref toSuper:(NSString*)superRef atIndex:(NSInteger)index
+- (void)wxcore_MoveElement:(NSString*)ref toSuper:(NSString*)superRef atIndex:(NSInteger)index
 {
     [self moveComponent:ref toSuper:superRef atIndex:index];
 }
@@ -1185,12 +1184,12 @@ static NSThread *WXComponentThread;
     [self createFinish];
 }
 
-- (void)wxcore_UpdateAttributes:(NSDictionary*)attributes forComponent:(NSString*)ref
+- (void)wxcore_UpdateAttributes:(NSDictionary*)attributes forElement:(NSString*)ref
 {
     [self updateAttributes:attributes forComponent:ref];
 }
 
-- (void)wxcore_UpdateStyles:(NSDictionary*)styles forComponent:(NSString *)ref
+- (void)wxcore_UpdateStyles:(NSDictionary*)styles forElement:(NSString *)ref
 {
     [self updateStyles:styles forComponent:ref];
 }
@@ -1214,14 +1213,34 @@ static NSThread *WXComponentThread;
     }
 }
 
-- (void)wxcore_AddEvent:(NSString*)eventName toComponent:(NSString*)ref
+- (void)wxcore_AddEvent:(NSString*)eventName toElement:(NSString*)ref
 {
     [self addEvent:eventName toComponent:ref];
 }
 
-- (void)wxcore_removeEvent:(NSString*)eventName fromComponent:(NSString*)ref
+- (void)wxcore_removeEvent:(NSString*)eventName fromElement:(NSString*)ref
 {
     [self removeEvent:eventName fromComponent:ref];
+}
+
+- (BOOL)wxcore_IsTransitionNoneOfElement:(NSString*)ref
+{
+    WXAssertComponentThread();
+    
+    WXComponent *component = [_indexDict objectForKey:ref];
+    WXAssertComponentExist(component);
+    
+    return [component _isTransitionNone];
+}
+
+- (BOOL)wxcore_HasTransitionPropertyInStyles:(NSDictionary*)styles forElement:(NSString*)ref
+{
+    WXAssertComponentThread();
+    
+    WXComponent *component = [_indexDict objectForKey:ref];
+    WXAssertComponentExist(component);
+    
+    return [component _hasTransitionPropertyInStyles:styles];
 }
 
 #endif

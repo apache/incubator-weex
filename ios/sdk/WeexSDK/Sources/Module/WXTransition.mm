@@ -75,17 +75,17 @@
 #pragma mark - HandleStyle
 - (WXTransitionOptions)transitionOptionsFromString:(NSString *)string
 {
-    NSDictionary<NSString*,NSNumber*> *options = @{
-                                                  @"width": @(WXTransitionOptionsWidth),
-                                                  @"height": @(WXTransitionOptionsHeight),
-                                                  @"right": @(WXTransitionOptionsRight),
-                                                  @"left": @(WXTransitionOptionsLeft),
-                                                  @"bottom": @(WXTransitionOptionsBottom),
-                                                  @"top": @(WXTransitionOptionsTop),
-                                                  @"backgroundColor": @(WXTransitionOptionsBackgroundColor),
-                                                  @"transform": @(WXTransitionOptionsTransform),
-                                                  @"opacity": @(WXTransitionOptionsOpacity),
-                                                  };
+    static NSDictionary<NSString*, NSNumber*> *options = @{
+                                                           @"width": @(WXTransitionOptionsWidth),
+                                                           @"height": @(WXTransitionOptionsHeight),
+                                                           @"right": @(WXTransitionOptionsRight),
+                                                           @"left": @(WXTransitionOptionsLeft),
+                                                           @"bottom": @(WXTransitionOptionsBottom),
+                                                           @"top": @(WXTransitionOptionsTop),
+                                                           @"backgroundColor": @(WXTransitionOptionsBackgroundColor),
+                                                           @"transform": @(WXTransitionOptionsTransform),
+                                                           @"opacity": @(WXTransitionOptionsOpacity)
+                                                           };
     return options[string].integerValue;
 }
 
@@ -142,6 +142,16 @@
     
     [self _resloveTransitionProperty];
     [self performSelector:@selector(_startTransitionDisplayLink) withObject:self afterDelay:_transitionDelay/1000];
+}
+
+- (BOOL)_hasTransitionOptionInStyles:(NSDictionary *)styles
+{
+    for (NSString *key in styles) {
+        if (self.transitionOptions & [self transitionOptionsFromString:key]) {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 - (void)updateFutileStyles:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles target:(WXComponent *)targetComponent

@@ -127,17 +127,17 @@ bool flexIsUndefined(float value) {
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles
 {
 #ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#endif
+#else
     [self _fillCSSNode:styles isUpdate:YES];
+#endif
 }
 
 -(void)_resetCSSNodeStyles:(NSArray *)styles
 {
 #ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#endif
+#else
     [self _resetCSSNode:styles];
+#endif
 }
 
 - (void)_recomputeCSSNodeChildren
@@ -288,7 +288,7 @@ bool flexIsUndefined(float value) {
         }
         
         if (styles[@"flexDirection"]) {
-            _flexCssNode->setFlexDirection([self fxFlexDirection:styles[@"flexDirection"]],isUpdate);
+            _flexCssNode->setFlexDirection([self fxFlexDirection:styles[@"flexDirection"]], isUpdate);
         }
         if (styles[@"alignItems"]) {
             _flexCssNode->setAlignItems([self fxAlign:styles[@"alignItems"]]);

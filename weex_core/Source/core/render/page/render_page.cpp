@@ -257,6 +257,7 @@ bool RenderPage::UpdateStyle(
                 border->insert(border->end(), (*iter)), flag = true;
               });
           break;
+        default: break;
       }
     }
   }

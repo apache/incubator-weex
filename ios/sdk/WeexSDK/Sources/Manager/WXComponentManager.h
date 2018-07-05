@@ -202,17 +202,19 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 #ifdef WX_IMPORT_WEEXCORE
 
 - (void)wxcore_CreateBody:(NSDictionary*)data renderObject:(void*)renderObject;
-- (void)wxcore_AddElement:(NSDictionary*)data toSupercomponent:(NSString*)superRef atIndex:(NSInteger)index
+- (void)wxcore_AddElement:(NSDictionary*)data toSuper:(NSString*)superRef atIndex:(NSInteger)index
              renderObject:(void*)renderObject;
 - (void)wxcore_RemoveElement:(NSString*)ref;
-- (void)wxcore_MoveComponent:(NSString*)ref toSuper:(NSString*)superRef atIndex:(NSInteger)index;
+- (void)wxcore_MoveElement:(NSString*)ref toSuper:(NSString*)superRef atIndex:(NSInteger)index;
 - (void)wxcore_AppendTreeCreateFinish:(NSString*)ref;
 - (void)wxcore_CreateFinish;
-- (void)wxcore_UpdateAttributes:(NSDictionary*)attributes forComponent:(NSString*)ref;
-- (void)wxcore_UpdateStyles:(NSDictionary*)styles forComponent:(NSString*)ref;
+- (void)wxcore_UpdateAttributes:(NSDictionary*)attributes forElement:(NSString*)ref;
+- (void)wxcore_UpdateStyles:(NSDictionary*)styles forElement:(NSString*)ref;
 - (void)wxcore_Layout:(WXComponent*)component frame:(CGRect)frame;
-- (void)wxcore_AddEvent:(NSString*)eventName toComponent:(NSString*)ref;
-- (void)wxcore_RemoveEvent:(NSString*)eventName fromComponent:(NSString*)ref;
+- (void)wxcore_AddEvent:(NSString*)eventName toElement:(NSString*)ref;
+- (void)wxcore_RemoveEvent:(NSString*)eventName fromElement:(NSString*)ref;
+- (BOOL)wxcore_IsTransitionNoneOfElement:(NSString*)ref; // for quick access
+- (BOOL)wxcore_HasTransitionPropertyInStyles:(NSDictionary*)styles forElement:(NSString*)ref;
 
 #endif
 

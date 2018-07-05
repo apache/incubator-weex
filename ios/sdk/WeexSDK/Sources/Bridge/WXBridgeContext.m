@@ -791,7 +791,11 @@ _Pragma("clang diagnostic pop") \
             [newArg removeObject:complection];
         }
         WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
+#ifdef WX_IMPORT_WEEXCORE
         if ([bridge isKindOfClass:[WXJSCoreBridge class]] || [bridge isKindOfClass:[WXCoreJSHandler class]]) {
+#else
+        if ([bridge isKindOfClass:[WXJSCoreBridge class]]) {
+#endif
             JSValue *value = [bridge callJSMethod:method args:args];
             if (complection) {
                 complection(value);

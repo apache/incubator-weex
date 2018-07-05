@@ -632,9 +632,19 @@ static BOOL bNeedRemoveEvents = YES;
 }
 
 #pragma mark Updating
+
+- (BOOL)_isTransitionNone
+{
+    return _transition == nil || _transition.transitionOptions == WXTransitionOptionsNone;
+}
+
+- (BOOL)_hasTransitionPropertyInStyles:(NSDictionary *)styles
+{
+    return [_transition _hasTransitionOptionInStyles:styles];
+}
+
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    
     BOOL isTransitionTag = _transition ? [self _isTransitionTag:styles] : NO;
     if (isTransitionTag) {
         [_transition _handleTransitionWithStyles:styles resetStyles:resetStyles target:self];

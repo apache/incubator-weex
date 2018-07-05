@@ -73,12 +73,6 @@ WXAssert([[NSThread currentThread].name isEqualToString:WX_COMPONENT_THREAD_NAME
 WXAssert([[NSThread currentThread].name isEqualToString:WX_BRIDGE_THREAD_NAME], \
 @"must be called on the bridge thread")
 
-#ifdef WX_IMPORT_WEEXCORE
-// Combine dom thread and js thread
-#undef WXAssertComponentThread
-#define WXAssertComponentThread WXAssertBridgeThread
-#endif
-
 #define WXAssertNotReached() \
 WXAssert(NO, @"should never be reached")
 

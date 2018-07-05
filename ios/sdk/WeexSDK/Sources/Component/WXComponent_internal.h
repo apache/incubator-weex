@@ -176,6 +176,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 - (void)_removeFromSupercomponent;
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index;
 
+- (BOOL)_isTransitionNone;
+- (BOOL)_hasTransitionPropertyInStyles:(NSDictionary *)styles;
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles;
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes;
 - (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles;
