@@ -93,8 +93,6 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private TextWatcher mTextChangedEventDispatcher;
   private int mFormatRepeatCount = 0;
   private static final int MAX_TEXT_FORMAT_REPEAT = 3;
-  private static final String INPUT_DIGITS = "1234567890-*#+";
-  private static final String INPUT_DIGITS_WITH_DOT = "1234567890.";
 
   private TextPaint mPaint = new TextPaint();
   private int mLineHeight = UNSET;
@@ -552,7 +550,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       return;
     }
     mType = type;
-    ((EditText) getHostView()).setRawInputType(getInputType(mType));
+    ((EditText) getHostView()).setInputType(getInputType(mType));
     switch (mType) {
       case Constants.Value.DATE:
       case Constants.Value.TIME:
@@ -681,9 +679,6 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         break;
       case Constants.Value.TEL:
         inputType = InputType.TYPE_CLASS_PHONE;
-        if(getHostView() != null){
-          getHostView().setKeyListener(DigitsKeyListener.getInstance(INPUT_DIGITS));
-        }
         break;
       case Constants.Value.TIME:
         inputType = InputType.TYPE_NULL;
@@ -696,9 +691,6 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         break;
       case Constants.Value.NUMBER:
         inputType = InputType.TYPE_CLASS_NUMBER;
-        if(getHostView() != null){
-            getHostView().setKeyListener(DigitsKeyListener.getInstance(INPUT_DIGITS_WITH_DOT));
-        }
         break;
       default:
         inputType = InputType.TYPE_CLASS_TEXT;
