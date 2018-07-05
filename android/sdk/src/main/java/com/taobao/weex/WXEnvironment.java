@@ -99,7 +99,7 @@ public class WXEnvironment {
   public static long sComponentsAndModulesReadyTime = 0;
 
   public static LogLevel sLogLevel = LogLevel.DEBUG;
-  private static boolean isApkDebug = true;
+  private static Boolean isApkDebug;
   public static boolean isPerf = false;
 
   private static boolean openDebugLog = false;
@@ -242,8 +242,8 @@ public class WXEnvironment {
       return false;
     }
 
-    if (!isApkDebug) {
-      return false;
+    if (isApkDebug != null) {
+      return isApkDebug;
     }
     try {
       ApplicationInfo info = sApplication.getApplicationInfo();
