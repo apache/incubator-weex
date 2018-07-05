@@ -142,9 +142,6 @@ bool flexIsUndefined(float value) {
 
 - (void)_recomputeCSSNodeChildren
 {
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#endif
 }
 
 - (NSUInteger)_childrenCountForLayout
@@ -165,9 +162,6 @@ bool flexIsUndefined(float value) {
 
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#endif
     WXAssertComponentThread();
     if (isChanged && [self isKindOfClass:[WXCellComponent class]]) {
         CGFloat mainScreenWidth = [[UIScreen mainScreen] bounds].size.width;
@@ -203,10 +197,10 @@ bool flexIsUndefined(float value) {
             if (!CGRectEqualToRect(strongSelf.view.frame,strongSelf.calculatedFrame)) {
                 strongSelf.view.frame = strongSelf.calculatedFrame;
                 strongSelf->_absolutePosition = CGPointMake(NAN, NAN);
-                [strongSelf configBoxShadow:_boxShadow];
+                [strongSelf configBoxShadow:strongSelf->_boxShadow];
             } else {
-                if (![strongSelf equalBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
-                    [strongSelf configBoxShadow:_boxShadow];
+                if (![strongSelf equalBoxShadow:strongSelf->_boxShadow withBoxShadow:strongSelf->_lastBoxShadow]) {
+                    [strongSelf configBoxShadow:strongSelf->_boxShadow];
                 }
             }
             

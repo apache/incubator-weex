@@ -1081,7 +1081,9 @@ static NSThread *WXComponentThread;
     _rootComponent = [self _buildComponentForData:data supercomponent:nil renderObject:renderObject];
     
     CGSize size = _weexInstance.frame.size;
-    [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId width:size.width height:size.height isWidthWrapContent:NO isHeightWrapContent:NO];
+    [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId
+                                        width:size.width height:size.height
+                           isWidthWrapContent:NO isHeightWrapContent:NO];
 
     __weak typeof(self) weakSelf = self;
     WX_MONITOR_INSTANCE_PERF_END(WXFirstScreenJSFExecuteTime, self.weexInstance);
@@ -1176,7 +1178,6 @@ static NSThread *WXComponentThread;
 - (void)wxcore_AppendTreeCreateFinish:(NSString*)ref
 {
     WXAssertComponentThread();
-#warning todo logic 目前空实现
 }
 
 - (void)wxcore_CreateFinish
@@ -1194,12 +1195,23 @@ static NSThread *WXComponentThread;
     [self updateStyles:styles forComponent:ref];
 }
 
-- (void)wxcore_Layout:(NSString*)ref frame:(CGRect)frame
+- (void)wxcore_Layout:(WXComponent*)component frame:(CGRect)frame
 {
     WXAssertComponentThread();
+    WXAssertParam(component);
     
-#warning todo logic
-    
+    if (!CGRectEqualToRect(frame, component->_calculatedFrame))
+    {
+        component->_calculatedFrame = frame;
+        [component _frameDidCalculated:YES];
+        
+        [self _addUITask:^{
+            [component _layoutDidFinish];
+        }];
+    }
+    else {
+        [component _frameDidCalculated:NO];
+    }
 }
 
 - (void)wxcore_AddEvent:(NSString*)eventName toComponent:(NSString*)ref

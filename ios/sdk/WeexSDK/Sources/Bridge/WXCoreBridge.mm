@@ -239,19 +239,17 @@ namespace WeexCore
         NSString* ns_ref = NSSTRING(ref);
         NSString* ns_event = NSSTRING(event);
         
-        WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            WXLogDebug(@"flexLayout -> action: addEvent ref:%@", ns_ref);
+        WXLogDebug(@"flexLayout -> action: addEvent ref:%@", ns_ref);
 #endif
-            
-            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            [manager startComponentTasks];
-            [manager wxcore_AddEvent:ns_event toComponent:ns_ref];
-            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addEvent" options:nil];
-        });
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        [manager startComponentTasks];
+        [manager wxcore_AddEvent:ns_event toComponent:ns_ref];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addEvent" options:nil];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -270,19 +268,17 @@ namespace WeexCore
         NSString* ns_ref = NSSTRING(ref);
         NSString* ns_event = NSSTRING(event);
         
-        WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            WXLogDebug(@"flexLayout -> action :removeEvent ref:%@", ns_ref);
+        WXLogDebug(@"flexLayout -> action :removeEvent ref:%@", ns_ref);
 #endif
-            
-            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            [manager startComponentTasks];
-            [manager wxcore_RemoveEvent:ns_event fromComponent:ns_ref];
-            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeEvent" options:nil];
-        });
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        [manager startComponentTasks];
+        [manager wxcore_RemoveEvent:ns_event fromComponent:ns_ref];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeEvent" options:nil];
     
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -303,7 +299,6 @@ namespace WeexCore
         
         long long startTime = getCurrentTime();
         
-        // get render object (layout node) in current thread
         RenderObject* renderObject = page->GetRenderObject(ref);
         
         NSString* ns_instanceId = NSSTRING(pageId);
@@ -313,23 +308,19 @@ namespace WeexCore
         NSDictionary* ns_attributes = NSDICTIONARY(attributes);
         NSArray* ns_events = NSARRAY(events);
         
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
-        WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            WXLogDebug(@"flexLayout -> action: createBody %@ ref:%@", ns_type, ns_ref);
+        WXLogDebug(@"flexLayout -> action: createBody %@ ref:%@", ns_type, ns_ref);
 #endif
-
-            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
-            [manager startComponentTasks];
-            [manager wxcore_CreateBody:@{@"ref": ns_ref, @"type": ns_type,
-                                         @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}
-                          renderObject:renderObject];
-            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
-        });
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        [manager startComponentTasks];
+        [manager wxcore_CreateBody:@{@"ref": ns_ref, @"type": ns_type,
+                                     @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}
+                      renderObject:renderObject];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createBody" options:nil];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -352,7 +343,6 @@ namespace WeexCore
         
         long long startTime = getCurrentTime();
         
-        // get render object (layout node) in current thread
         RenderObject* renderObject = page->GetRenderObject(ref);
         
         NSString* ns_instanceId = NSSTRING(pageId);
@@ -364,25 +354,21 @@ namespace WeexCore
         NSArray* ns_events = NSARRAY(events);
         NSInteger ns_index = index;
         
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addElement" options:nil];
-        WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            WXLogDebug(@"flexLayout -> action: addElement : %@", ns_componentType);
+        WXLogDebug(@"flexLayout -> action: addElement : %@", ns_componentType);
 #endif
-            
-            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            
-            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
-            [manager startComponentTasks];
-            [manager wxcore_AddElement:@{@"ref": ns_ref, @"type": ns_componentType,
-                                         @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}
-                      toSupercomponent:ns_parentRef atIndex:ns_index
-                          renderObject:renderObject];
-            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
-        });
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        
+        [manager startComponentTasks];
+        [manager wxcore_AddElement:@{@"ref": ns_ref, @"type": ns_componentType,
+                                     @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}
+                  toSupercomponent:ns_parentRef atIndex:ns_index
+                      renderObject:renderObject];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addElement" options:nil];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -399,20 +385,19 @@ namespace WeexCore
         
         long long startTime = getCurrentTime();
         
+        RenderObject* renderObject = page->GetRenderObject(ref);
+        WXComponent* component = (__bridge WXComponent *)(renderObject->getContext());
         NSString* ns_instanceId = NSSTRING(pageId);
-        NSString* ns_ref = NSSTRING(ref);
         
-        WXPerformBlockOnComponentThread(^{
-            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            CGRect frame = CGRectMake(isnan(WXRoundPixelValue(left))?0:WXRoundPixelValue(left),
-                                      isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
-                                      isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
-                                      isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
-            [manager wxcore_Layout:ns_ref frame:frame];
-        });
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        CGRect frame = CGRectMake(isnan(WXRoundPixelValue(left))?0:WXRoundPixelValue(left),
+                                  isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
+                                  isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
+                                  isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
+        [manager wxcore_Layout:component frame:frame];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -438,20 +423,18 @@ namespace WeexCore
 //        NSDictionary* ns_padding = NSDICTIONARY(padding);
 //        NSDictionary* ns_border = NSDICTIONARY(border);
         
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateStyles" options:@{@"threadName":WXTJSBridgeThread}];
-        WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            WXLogDebug(@"flexLayout -> action: updateStyles ref:%@, styles:%@", ns_ref, ns_style);
+        WXLogDebug(@"flexLayout -> action: updateStyles ref:%@, styles:%@", ns_ref, ns_style);
 #endif
-
-            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            
-            [manager startComponentTasks];
-            [manager wxcore_UpdateStyles:ns_style forComponent:ns_ref];
-        });
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        
+        [manager startComponentTasks];
+        [manager wxcore_UpdateStyles:ns_style forComponent:ns_ref];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateStyles" options:nil];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -471,22 +454,17 @@ namespace WeexCore
         NSString* ns_ref = NSSTRING(ref);
         NSDictionary* ns_attributes = NSDICTIONARY(attrs);
         
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTJSBridgeThread}];
-        WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            WXLogDebug(@"flexLayout -> action: updateAttrs ref:%@, attr:%@", ns_ref, ns_attributes);
+        WXLogDebug(@"flexLayout -> action: updateAttrs ref:%@, attr:%@", ns_ref, ns_attributes);
 #endif
-            
-            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            
-            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
-            [manager startComponentTasks];
-            [manager wxcore_UpdateAttributes:ns_attributes forComponent:ns_ref];
-            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
-        });
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        [manager startComponentTasks];
+        [manager wxcore_UpdateAttributes:ns_attributes forComponent:ns_ref];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateAttrs" options:nil];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -502,22 +480,18 @@ namespace WeexCore
         long long startTime = getCurrentTime();
         
         NSString* ns_instanceId = NSSTRING(pageId);
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTJSBridgeThread}];
-        WXPerformBlockOnComponentThread(^{
+
 #ifdef DEBUG
-            WXLogDebug(@"flexLayout -> action: createFinish :%@", ns_instanceId);
+        WXLogDebug(@"flexLayout -> action: createFinish :%@", ns_instanceId);
 #endif
-            
-            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            
-            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
-            [manager startComponentTasks];
-            [manager wxcore_CreateFinish];
-            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
-        });
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        [manager startComponentTasks];
+        [manager wxcore_CreateFinish];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createFinish" options:nil];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -535,22 +509,18 @@ namespace WeexCore
         NSString* ns_instanceId = NSSTRING(pageId);
         NSString* ns_ref = NSSTRING(ref);
         
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeElement" options:nil];
-        WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            WXLogDebug(@"flexLayout -> action: removeElement ref:%@", ns_ref);
+        WXLogDebug(@"flexLayout -> action: removeElement ref:%@", ns_ref);
 #endif
-            
-            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            
-            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
-            [manager startComponentTasks];
-            [manager wxcore_RemoveElement:ns_ref];
-            [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
-        });
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        
+        [manager startComponentTasks];
+        [manager wxcore_RemoveElement:ns_ref];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeElement" options:nil];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -570,20 +540,18 @@ namespace WeexCore
         NSString* ns_parentRef = NSSTRING(parentRef);
         NSInteger ns_index = index;
         
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"moveElement" options:nil];
-        WXPerformBlockOnComponentThread(^{
 #ifdef DEBUG
-            WXLogDebug(@"flexLayout -> action: moveElement, ref:%@ to ref:%@", ns_ref, ns_parentRef);
+        WXLogDebug(@"flexLayout -> action: moveElement, ref:%@ to ref:%@", ns_ref, ns_parentRef);
 #endif
-            
-            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            
-            [manager startComponentTasks];
-            [manager wxcore_MoveComponent:ns_ref toSuper:ns_parentRef atIndex:ns_index];
-        });
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        
+        [manager startComponentTasks];
+        [manager wxcore_MoveComponent:ns_ref toSuper:ns_parentRef atIndex:ns_index];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"moveElement" options:nil];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -600,15 +568,13 @@ namespace WeexCore
         
         NSString* ns_instanceId = NSSTRING(pageId);
         NSString* ns_ref = NSSTRING(ref);
-        WXPerformBlockOnComponentThread(^{
-            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            if (!manager.isValid) {
-                return;
-            }
 
-            [manager startComponentTasks];
-            [manager wxcore_AppendTreeCreateFinish:ns_ref];
-        });
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        [manager startComponentTasks];
+        [manager wxcore_AppendTreeCreateFinish:ns_ref];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
