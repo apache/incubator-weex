@@ -46,10 +46,10 @@
 
 namespace WeexCore
 {
-    static NSDictionary* NSDICTIONARY(std::map<std::string, std::string>* map)
+    static NSMutableDictionary* NSDICTIONARY(std::map<std::string, std::string>* map)
     {
         if (map == nullptr)
-            return @{};
+            return @{}.mutableCopy;
         
         NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:map->size()];
         for (auto it = map->begin(); it != map->end(); it ++) {
@@ -58,10 +58,10 @@ namespace WeexCore
         return result;
     }
     
-    static NSDictionary* NSDICTIONARY(std::vector<std::pair<std::string, std::string>>* vec)
+    static NSMutableDictionary* NSDICTIONARY(std::vector<std::pair<std::string, std::string>>* vec)
     {
         if (vec == nullptr)
-            return @{};
+            return @{}.mutableCopy;
         
         NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:vec->size()];
         for (auto& p : *vec) {
@@ -70,16 +70,35 @@ namespace WeexCore
         return result;
     }
     
-    static NSArray* NSARRAY(std::set<std::string>* set)
+    static NSMutableArray* NSARRAY(std::set<std::string>* set)
     {
         if (set == nullptr)
-            return @[];
+            return @[].mutableCopy;
         
         NSMutableArray* result = [[NSMutableArray alloc] initWithCapacity:set->size()];
         for (auto& s : *set) {
             [result addObject:NSSTRING(s.c_str())];
         }
         return result;
+    }
+    
+    static void MergeBorderWidthValues(NSMutableDictionary* dict, const WXCoreBorderWidth & borders)
+    {
+        dict[@"borderTopWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthTop)];
+        dict[@"borderLeftWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthLeft)];
+        dict[@"borderBottomWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthBottom)];
+        dict[@"borderRightWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthRight)];
+    }
+    
+    static void MergeBorderWidthValues(NSMutableDictionary* dict, std::vector<std::pair<std::string, std::string>>* borders)
+    {
+        if (borders == nullptr) {
+            return;
+        }
+        
+        for (auto& p : *borders) {
+            dict[NSSTRING(p.first.c_str())] = NSSTRING(p.second.c_str());
+        }
     }
     
     void WXCoreBridge::setJSVersion(const char* version)
@@ -304,9 +323,10 @@ namespace WeexCore
         NSString* ns_instanceId = NSSTRING(pageId);
         NSString* ns_ref = NSSTRING(ref);
         NSString* ns_type = NSSTRING(componentType);
-        NSDictionary* ns_styles = NSDICTIONARY(styles);
+        NSMutableDictionary* ns_styles = NSDICTIONARY(styles);
         NSDictionary* ns_attributes = NSDICTIONARY(attributes);
         NSArray* ns_events = NSARRAY(events);
+        MergeBorderWidthValues(ns_styles, borders);
         
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> action: createBody %@ ref:%@", ns_type, ns_ref);
@@ -349,10 +369,11 @@ namespace WeexCore
         NSString* ns_componentType = NSSTRING(componentType);
         NSString* ns_ref = NSSTRING(ref);
         NSString* ns_parentRef = NSSTRING(parentRef);
-        NSDictionary* ns_styles = NSDICTIONARY(styles);
+        NSMutableDictionary* ns_styles = NSDICTIONARY(styles);
         NSDictionary* ns_attributes = NSDICTIONARY(attributes);
         NSArray* ns_events = NSARRAY(events);
         NSInteger ns_index = index;
+        MergeBorderWidthValues(ns_styles, borders);
         
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> action: addElement : %@", ns_componentType);
@@ -419,10 +440,8 @@ namespace WeexCore
         
         NSString* ns_instanceId = NSSTRING(pageId);
         NSString* ns_ref = NSSTRING(ref);
-        NSDictionary* ns_style = NSDICTIONARY(style);
-//        NSDictionary* ns_margin = NSDICTIONARY(margin);
-//        NSDictionary* ns_padding = NSDICTIONARY(padding);
-//        NSDictionary* ns_border = NSDICTIONARY(border);
+        NSMutableDictionary* ns_style = NSDICTIONARY(style);
+        MergeBorderWidthValues(ns_style, border);
         
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> action: updateStyles ref:%@, styles:%@", ns_ref, ns_style);

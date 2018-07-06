@@ -1218,7 +1218,7 @@ static NSThread *WXComponentThread;
     [self addEvent:eventName toComponent:ref];
 }
 
-- (void)wxcore_removeEvent:(NSString*)eventName fromElement:(NSString*)ref
+- (void)wxcore_RemoveEvent:(NSString*)eventName fromElement:(NSString*)ref
 {
     [self removeEvent:eventName fromComponent:ref];
 }
