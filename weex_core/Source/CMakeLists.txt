@@ -60,6 +60,7 @@ set(COMMON_SRCS
    ./core/data_render/exec_state.cc
    ./core/data_render/vm.cc
    ./core/data_render/vnode/vnode.cc
+   ./core/data_render/vnode/vnode_render_manager.cc
         )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)

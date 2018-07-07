@@ -16,22 +16,70 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include "core/render/node/factory/render_creator.h"
 #include "core/data_render/vnode/vnode.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
 
-VNode::VNode(const std::string& id, const std::string& tag_name) {}
+VNode::VNode(const std::string &id, const std::string &tag_name) {
+  ref_ = id;
+  tag_name_ = tag_name;
 
-VNode::~VNode() {}
+  styles_ = new std::map<std::string, std::string>();
+  attributes_ = new std::map<std::string, std::string>();
+}
 
-void VNode::SetStyles(const std::string& key, const std::string& value) {}
+VNode::~VNode() {
+  parent_ = nullptr;
 
-void VNode::SetAttributes(const std::string& key, const std::string& value) {}
+  if (styles_ != nullptr) {
+    delete styles_;
+    styles_ = nullptr;
+  }
 
-void VNode::AddEvent(const std::string& event, const std::string& function,
-                     const std::vector<std::string>& params) {}
+  if (attributes_ != nullptr) {
+    delete attributes_;
+    attributes_ = nullptr;
+  }
+
+  for (auto it = child_list_.begin(); it != child_list_.end(); it++) {
+    VNode *&reference = *it;
+    if (reference != nullptr) {
+      delete reference;
+      *it = nullptr;
+    }
+  }
+}
+
+void VNode::SetStyle(const std::string &key, const std::string &value) {
+  MapInsertOrAssign(styles_, key, value);
+}
+
+void VNode::SetAttribute(const std::string &key, const std::string &value) {
+  MapInsertOrAssign(attributes_, key, value);
+}
+
+void VNode::AddEvent(const std::string &event, const std::string &function,
+                     const std::vector<std::string> &params) {
+  //todo
+}
+
+void VNode::AddChild(VNode *child) {
+  child->parent_ = this;
+  child_list_.push_back(child);
+}
+
+void VNode::MapInsertOrAssign(std::map<std::string, std::string> *target_map, const std::string &key,
+                              const std::string &value) {
+  std::map<std::string, std::string>::iterator it = target_map->find(key);
+  if (it != target_map->end()) {
+    it->second = value;
+  } else {
+    target_map->insert({key, value});
+  }
+}
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

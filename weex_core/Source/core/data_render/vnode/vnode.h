@@ -16,28 +16,66 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef CORE_DATA_RENDER_VNODE_VNODE_H_
-#define CORE_DATA_RENDER_VNODE_VNODE_H_
+#pragma once
 
 #include <map>
 #include <string>
 #include <vector>
+#include "core/render/node/render_object.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
+class VNode;
+
+
 class VNode {
- public:
-  VNode(const std::string& id, const std::string& tag_name);
+public:
+  VNode(const std::string &id, const std::string &tag_name);
+
   ~VNode();
 
-  void SetStyles(const std::string& key, const std::string& value);
-  void SetAttributes(const std::string& key, const std::string& value);
-  void AddEvent(const std::string& event, const std::string& function,
-                const std::vector<std::string>& params);
+  void SetStyle(const std::string &key, const std::string &value);
+
+  void SetAttribute(const std::string &key, const std::string &value);
+
+  void AddEvent(const std::string &event, const std::string &function,
+                const std::vector<std::string> &params);
+
+  void AddChild(VNode *child);
+
+public:
+  inline const std::string &tag_name() const { return tag_name_; }
+
+  inline const std::string &ref() const { return ref_; }
+
+  inline const VNode *parent() const { return parent_; }
+
+  inline std::vector<VNode *> *child_list() { return &child_list_; }
+
+  inline std::map<std::string, std::string> *styles() const { return styles_; }
+
+  inline std::map<std::string, std::string> *attributes() const { return attributes_; }
+
+  inline bool HasChildren() { return !child_list_.empty(); }
+
+private:
+  std::string tag_name_;
+  std::string ref_;
+
+
+  VNode *parent_ = nullptr;
+  std::vector<VNode *> child_list_;
+
+  std::map<std::string, std::string> *styles_;
+  std::map<std::string, std::string> *attributes_;
+
+  void MapInsertOrAssign(std::map<std::string, std::string> *target_map,
+                         const std::string &key,
+                         const std::string &value);
+
 };
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
-
-#endif  // CORE_DATA_RENDER_VNODE_VNODE_H_
