@@ -499,10 +499,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         
         
         UIEdgeInsets border_flex = UIEdgeInsetsMake(self.flexCssNode->getBorderWidthTop(), self.flexCssNode->getBorderWidthLeft(), self.flexCssNode->getBorderWidthBottom(), self.flexCssNode->getBorderWidthRight());
-        
-        
-        
-        
+
         if (!UIEdgeInsetsEqualToEdgeInsets(border_flex, _border)) {
             [self setBorder:border_flex];
         }

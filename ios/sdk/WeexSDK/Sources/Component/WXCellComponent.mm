@@ -141,9 +141,6 @@
             renderPageSize.first = self.weexInstance.frame.size.width;
             renderPageSize.second = self.weexInstance.frame.size.height;
             self.flexCssNode->calculateLayout(renderPageSize);
-            if ([WXLog logLevel] >= WXLogLevelDebug) {
-                
-            }
         }
     [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
 }

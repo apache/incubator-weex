@@ -22,24 +22,34 @@
 
 @implementation WXScrollerComponent (FlexLayout)
 
-- (WeexCore::WXCoreLayoutNode *)flexScrollerCSSNode{
+- (WeexCore::WXCoreLayoutNode *)flexScrollerCSSNode
+{
+#ifdef WX_IMPORT_WEEXCORE
+    return nullptr;
+#else
     return _flexScrollerCSSNode;
+#endif
 }
 
 - (void)_insertChildCssNode:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
+#ifdef WX_IMPORT_WEEXCORE
+#else
     self.flexScrollerCSSNode->addChildAt(subcomponent.flexCssNode, (uint32_t) index);
 #ifdef DEBUG
     WXLogDebug(@"flexLayout -> ref:%@,subNodeIndex:%ld,childCount:%ld",self.ref,(long)index,_flexScrollerCSSNode->getChildCount());
 #endif
-   
-//    WXLogInfo(@"FlexLayout -- P:%@ -> C:%@",self,subcomponent);
+#endif
 }
+
 - (void)_rmChildCssNode:(WXComponent *)subcomponent
 {
+#ifdef WX_IMPORT_WEEXCORE
+#else
     self.flexScrollerCSSNode->removeChild(subcomponent->_flexCssNode);
 #ifdef DEBUG
     WXLogDebug(@"flexLayout -> ref:%@ ,scrollerCSSNode->removeChild ,childRef:%@",self.ref,subcomponent.ref);
+#endif
 #endif
 }
 

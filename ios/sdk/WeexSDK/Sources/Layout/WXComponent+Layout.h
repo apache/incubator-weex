@@ -39,7 +39,10 @@ extern "C" {
 #ifdef __cplusplus
     WeexCore::WXCoreLayoutNode *_flexCssNode;
 #endif // __cplusplus
+#ifdef WX_IMPORT_WEEXCORE
+#else
     BOOL _isLayoutDirty;
+#endif
     CGRect _calculatedFrame;
     CGPoint _absolutePosition;
     WXPositionType _positionType;

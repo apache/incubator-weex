@@ -157,7 +157,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         _offsetAccuracy = attributes[@"offsetAccuracy"] ? [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
         
-
+#ifdef WX_IMPORT_WEEXCORE
+#else
             _flexScrollerCSSNode = new WeexCore::WXCoreLayoutNode();
             // let scroller fill the rest space if it is a child component and has no fixed height & width
             if (((_scrollDirection == WXScrollDirectionVertical &&
@@ -167,6 +168,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
                 self.flexCssNode->getFlex() <= 0.0) {
                 self.flexCssNode->set_flex(1.0);
             }
+#endif
+        
         id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
             BOOL shouldNotifiAppearDescendantView = [[configCenter configForKey:@"iOS_weex_ext_config.shouldNotifiAppearDescendantView" defaultValue:@(YES) isDefault:NULL] boolValue];
@@ -227,8 +230,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)layoutDidFinish
 {
-
-    
     if ([self isViewLoaded]) {
         [self setContentSize:_contentSize];
         [self adjustSticky];

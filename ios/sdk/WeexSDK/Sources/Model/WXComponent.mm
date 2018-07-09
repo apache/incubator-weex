@@ -97,7 +97,10 @@ static BOOL bNeedRemoveEvents = YES;
         
         _displayType = WXDisplayTypeBlock;
         _isNeedJoinLayoutSystem = YES;
+#ifdef WX_IMPORT_WEEXCORE
+#else
         _isLayoutDirty = YES;
+#endif
         _isViewFrameSyncWithCalculated = YES;
         _ariaHidden = nil;
         _accessible = nil;
@@ -650,8 +653,12 @@ static BOOL bNeedRemoveEvents = YES;
         [_transition _handleTransitionWithStyles:styles resetStyles:resetStyles target:self];
     } else {
         styles = [self parseStyles:styles];
+#ifdef WX_IMPORT_WEEXCORE
+        // no animation, no need to update css styles here
+#else
         [self _updateCSSNodeStyles:styles];
         [self _resetCSSNodeStyles:resetStyles];
+#endif
     }
     if (isUpdateStyles) {
         [self _modifyStyles:styles];

@@ -82,12 +82,20 @@ namespace WeexCore
         return result;
     }
     
-    static void MergeBorderWidthValues(NSMutableDictionary* dict, const WXCoreBorderWidth & borders)
+    static void MergeBorderWidthValues(NSMutableDictionary* dict, const WXCoreBorderWidth & borders, bool isUpdate)
     {
-        dict[@"borderTopWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthTop)];
-        dict[@"borderLeftWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthLeft)];
-        dict[@"borderBottomWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthBottom)];
-        dict[@"borderRightWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthRight)];
+        if (borders.getBorderWidth(kBorderWidthTop) != (float)0.0f || isUpdate) {
+            dict[@"borderTopWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthTop)];
+        }
+        if (borders.getBorderWidth(kBorderWidthLeft) != (float)0.0f || isUpdate) {
+            dict[@"borderLeftWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthLeft)];
+        }
+        if (borders.getBorderWidth(kBorderWidthBottom) != (float)0.0f || isUpdate) {
+            dict[@"borderBottomWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthBottom)];
+        }
+        if (borders.getBorderWidth(kBorderWidthRight) != (float)0.0f || isUpdate) {
+            dict[@"borderRightWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthRight)];
+        }
     }
     
     static void MergeBorderWidthValues(NSMutableDictionary* dict, std::vector<std::pair<std::string, std::string>>* borders)
@@ -326,7 +334,7 @@ namespace WeexCore
         NSMutableDictionary* ns_styles = NSDICTIONARY(styles);
         NSDictionary* ns_attributes = NSDICTIONARY(attributes);
         NSArray* ns_events = NSARRAY(events);
-        MergeBorderWidthValues(ns_styles, borders);
+        MergeBorderWidthValues(ns_styles, borders, false);
         
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> action: createBody %@ ref:%@", ns_type, ns_ref);
@@ -373,7 +381,7 @@ namespace WeexCore
         NSDictionary* ns_attributes = NSDICTIONARY(attributes);
         NSArray* ns_events = NSARRAY(events);
         NSInteger ns_index = index;
-        MergeBorderWidthValues(ns_styles, borders);
+        MergeBorderWidthValues(ns_styles, borders, false);
         
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> action: addElement : %@", ns_componentType);
@@ -463,6 +471,13 @@ namespace WeexCore
     int WXCoreBridge::callUpdateAttr(const char* pageId, const char* ref,
                            std::vector<std::pair<std::string, std::string>> *attrs)
     {
+        if (attrs == nullptr) {
+            return 0;
+        }
+        if (attrs->size() == 0) {
+            return 0;
+        }
+        
         RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
         if (page == nullptr) {
             return -1;

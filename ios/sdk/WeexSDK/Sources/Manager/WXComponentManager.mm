@@ -698,8 +698,6 @@ static NSThread *WXComponentThread;
     WXAssertParam(ref);
     
     WXComponent *component = [_indexDict objectForKey:ref];
-    WXAssertComponentExist(component);
-    
     [component _updateAttributesOnComponentThread:attributes];
     __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
@@ -986,18 +984,19 @@ static NSThread *WXComponentThread;
 {
 #ifdef WX_IMPORT_WEEXCORE
     assert(0);
-#endif
+#else
     _rootFlexCSSNode = new WeexCore::WXCoreLayoutNode();
     [self _applyRootFrame:self.weexInstance.frame];
     _rootFlexCSSNode->setFlexWrap(WeexCore::kNoWrap);
     _rootFlexCSSNode->setContext((__bridge void *)(self));
+#endif
 }
 
 - (void)_calculateRootFrame
 {
 #ifdef WX_IMPORT_WEEXCORE
     assert(0);
-#endif
+#else
         if(!_rootFlexCSSNode->hasNewLayout()){
             return;
         }
@@ -1019,8 +1018,7 @@ static NSThread *WXComponentThread;
         //   _rootFlexCSSNode->reset();
         
         //    resetNodeLayout(_rootFlexCSSNode);
-    
-   
+#endif
 }
 
 
@@ -1052,7 +1050,7 @@ static NSThread *WXComponentThread;
 {
 #ifdef WX_IMPORT_WEEXCORE
     assert(0);
-#endif
+#else
     if (nullptr == fixNode) {
         return;
     }
@@ -1066,6 +1064,7 @@ static NSThread *WXComponentThread;
             _rootFlexCSSNode->removeChild(fixNode);
         });
     }
+#endif
 }
 
 #ifdef WX_IMPORT_WEEXCORE

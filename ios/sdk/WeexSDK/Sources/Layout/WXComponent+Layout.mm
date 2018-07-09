@@ -100,6 +100,8 @@ bool flexIsUndefined(float value) {
 
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles
 {
+#ifdef WX_IMPORT_WEEXCORE
+#else
     if (_flexCssNode != nullptr) {
         // using weex core
         return;
@@ -122,22 +124,17 @@ bool flexIsUndefined(float value) {
             _flexCssNode->setStyleWidth(self.weexInstance.frame.size.width,NO);
         }
     }
+#endif
 }
 
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles
 {
-#ifdef WX_IMPORT_WEEXCORE
-#else
     [self _fillCSSNode:styles isUpdate:YES];
-#endif
 }
 
 -(void)_resetCSSNodeStyles:(NSArray *)styles
 {
-#ifdef WX_IMPORT_WEEXCORE
-#else
     [self _resetCSSNode:styles];
-#endif
 }
 
 - (void)_recomputeCSSNodeChildren
@@ -223,7 +220,7 @@ bool flexIsUndefined(float value) {
 {
 #ifdef WX_IMPORT_WEEXCORE
     assert(0);
-#endif
+#else
     WXAssertComponentThread();
 
         if (self.flexCssNode->hasNewLayout()) {
@@ -254,6 +251,7 @@ bool flexIsUndefined(float value) {
         for (WXComponent *subcomponent in subcomponents) {
             [subcomponent _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
         }
+#endif
 }
 
 - (void)_layoutDidFinish
@@ -275,9 +273,6 @@ bool flexIsUndefined(float value) {
 
 - (void)_fillCSSNode:(NSDictionary *)styles isUpdate:(BOOL)isUpdate
 {
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#endif
         // flex
         if (styles[@"flex"]) {
             _flexCssNode->set_flex([WXConvert CGFloat:styles[@"flex"]]);
@@ -457,9 +452,6 @@ do {\
 
 - (void)_resetCSSNode:(NSArray *)styles
 {
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#endif
         if (styles.count<=0) {
             return;
         }
