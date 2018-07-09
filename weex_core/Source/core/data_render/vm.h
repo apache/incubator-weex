@@ -16,28 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef CORE_DATA_RENDER_VNODE_VNODE_H_
-#define CORE_DATA_RENDER_VNODE_VNODE_H_
 
-#include <map>
-#include <string>
-#include <vector>
+#ifndef WEEX_PROJECT_VM_H
+#define WEEX_PROJECT_VM_H
 
 namespace weex {
 namespace core {
 namespace data_render {
-class VNode {
+class ExecState;
+class VM {
  public:
-  VNode(const std::string& id, const std::string& tag_name);
-  ~VNode();
+  void CallFrame(ExecState* exec_state);
 
-  void SetStyles(const std::string& key, const std::string& value);
-  void SetAttributes(const std::string& key, const std::string& value);
-  void AddEvent(const std::string& event, const std::string& function,
-                const std::vector<std::string>& params);
 };
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
 
-#endif  // CORE_DATA_RENDER_VNODE_VNODE_H_
+#endif  // WEEX_PROJECT_VM_H

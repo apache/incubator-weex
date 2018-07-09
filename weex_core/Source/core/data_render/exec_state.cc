@@ -17,4 +17,21 @@
  * under the License.
  */
 
-#include "op_code.h"
+#include "core/data_render/exec_state.h"
+#include "core/data_render/vm.h"
+
+namespace weex {
+namespace core {
+namespace data_render {
+
+void ExecState::Compile(const std::string& source) {
+
+}
+
+void ExecState::Execute() {
+    vm_->CallFrame(this);
+}
+
+}  // namespace data_render
+}  // namespace core
+}  // namespace weex

@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#ifndef CORE_DATA_RENDER_TOKEN_H_
+#define CORE_DATA_RENDER_TOKEN_H_
 
 #include <assert.h>
 #include <cstdint>
@@ -159,6 +161,8 @@ class Token {
 
   inline int column() { return column_; }
 
+  inline Type type() { return type_; }
+
  private:
   int line_;
   int column_;
@@ -175,3 +179,5 @@ class Token {
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
+
+#endif  // CORE_DATA_RENDER_TOKEN_H_

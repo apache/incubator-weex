@@ -17,6 +17,9 @@
  * under the License.
  */
 
+#ifndef CORE_DATA_RENDER_AST_H_
+#define CORE_DATA_RENDER_AST_H_
+
 #include <memory>
 #include <vector>
 #include "core/data_render/token.h"
@@ -32,6 +35,7 @@ class ASTNode {
   ASTNode(const Token& token) : token_(token) {}
   virtual ~ASTNode() {}
   virtual void Accept(Visitor* visitor, void* data) = 0;
+  inline Token& token() { return token_; }
 
  protected:
   Token token_;
@@ -154,18 +158,40 @@ class BinaryExpressionNode : public ExpressionNode {
 
 class VariableNode : public ExpressionNode {
  public:
-  VariableNode(const Token& token, const std::string identifier)
+  VariableNode(const Token& token, const std::string& identifier)
       : ExpressionNode(token), identifier_(identifier) {}
   virtual void Accept(Visitor* visitor, void* data);
   bool IsVariable() const { return true; }
+  inline std::string& identifier() { return identifier_; }
+
+ private:
+  std::string identifier_;
+};
+
+class AssignmentNode : public ExpressionNode {
+ public:
+  AssignmentNode(const Token& token, const std::string& identifier)
+      : ExpressionNode(token), identifier_(identifier) {}
+  virtual void Accept(Visitor* visitor, void* data);
   inline void set_expression(ASTNode* expression) {
     expression_.reset(expression);
   }
+  inline Token::Type assginment() { return token().type(); }
   inline ASTNode* expression() { return expression_.get(); }
+  inline std::string& identifier() { return identifier_; }
 
  private:
   std::unique_ptr<ASTNode> expression_;
   std::string identifier_;
+};
+
+// TODO
+class VarDeclareNode : public ExpressionNode {
+ public:
+  VarDeclareNode(const Token& token, const std::string& identifier)
+      : ExpressionNode(token) {}
+private:
+    std::string identifier_;
 };
 
 class DotAccessorNode : public ExpressionNode {
@@ -312,6 +338,7 @@ class Visitor {
   virtual void Visit(UnaryExpressionNode* node, void* data) = 0;
   virtual void Visit(BinaryExpressionNode* node, void* data) = 0;
   virtual void Visit(VariableNode* node, void* data) = 0;
+  virtual void Visit(AssignmentNode* node, void* data) = 0;
   virtual void Visit(DotAccessorNode* node, void* data) = 0;
   virtual void Visit(ExpressionListNode* node, void* data) = 0;
   virtual void Visit(FunctionCallNode* node, void* data) = 0;
@@ -323,3 +350,5 @@ class Visitor {
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
+
+#endif  // CORE_DATA_RENDER_AST_H_

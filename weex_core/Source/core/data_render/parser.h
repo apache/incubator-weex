@@ -17,13 +17,17 @@
  * under the License.
  */
 
+#ifndef CORE_DATA_RENDER_PARSER_H_
+#define CORE_DATA_RENDER_PARSER_H_
+
 #include <string>
 
 namespace weex {
 namespace core {
 namespace data_render {
-class Parser {
-};
+class Parser {};
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
+
+#endif  // CORE_DATA_RENDER_PARSER_H_

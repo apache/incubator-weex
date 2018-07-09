@@ -33,6 +33,9 @@ void BinaryExpressionNode::Accept(Visitor* node, void* data) {
 void VariableNode::Accept(Visitor* node, void* data) {
   node->Visit(this, data);
 }
+void AssignmentNode::Accept(Visitor* node, void* data) {
+  node->Visit(this, data);
+}
 void DotAccessorNode::Accept(Visitor* node, void* data) {
   node->Visit(this, data);
 }
