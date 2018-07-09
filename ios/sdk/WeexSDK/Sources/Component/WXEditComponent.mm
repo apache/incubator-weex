@@ -578,7 +578,17 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         ((WXTextInputView*)textField).deleteWords = FALSE;
         ((WXTextInputView*)textField).editWords = string;
     }
-    
+  
+    if ([_inputType isEqualToString:@"tel"] || [_inputType isEqualToString:@"number"] ) {
+        if (![self isPureInt:string]) {
+            if ([string isEqualToString:@"+"]||[string isEqualToString:@"."]||[string isEqualToString:@"*"]||[string isEqualToString:@"#"]||(string.length == 0 && range.length == 1))
+            {
+                return YES;
+            }
+            return NO;
+        }
+    }
+
     if (_maxLength) {
         NSUInteger oldLength = [textField.text length];
         NSUInteger replacementLength = [string length];
@@ -760,6 +770,13 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
         return YES;
     return NO;
+}
+
+- (BOOL)isPureInt:(NSString*)textString
+{
+    int val;
+    NSScanner* scan = [NSScanner scannerWithString:textString];
+    return[scan scanInt:&val] && [scan isAtEnd];
 }
 
 - (void)setPlaceholderAttributedString
