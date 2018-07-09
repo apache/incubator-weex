@@ -391,6 +391,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
 
     mUserTrackAdapter=WXSDKManager.getInstance().getIWXUserTrackAdapter();
+
+    WXSDKManager.getInstance().getAllInstanceMap().put(mInstanceId,this);
   }
 
   /**
@@ -1340,6 +1342,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public synchronized void destroy() {
     if(!isDestroy()) {
+      WXSDKManager.getInstance().getAllInstanceMap().remove(mInstanceId);
       if(mRendered) {
         WXSDKManager.getInstance().destroyInstance(mInstanceId);
       }
@@ -1839,7 +1842,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         WXLogUtils.e("user intercept: WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR");
         onRenderError(WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorCode(),
                 "|response.errorMsg==" + response.errorMsg +
-                        "|instance.getTemplateInfo == \n" + instance.getTemplateInfo() +
                         "|instance bundleUrl = \n" + instance.getBundleUrl() +
                         "|instance requestUrl = \n" + Uri.decode(WXSDKInstance.requestUrl)
         );
@@ -1850,8 +1852,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         onRenderError(
                 WXErrorCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getErrorCode(),
                 WXErrorCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getErrorCode() +
-                        "|response.errorMsg==" + response.errorMsg +
-                        "|instance.getTemplateInfo == \n" + instance.getTemplateInfo());
+                        "|response.errorMsg==" + response.errorMsg
+        );
       }
       else {
         onRenderError(WXErrorCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode(),
