@@ -961,13 +961,9 @@ static NSThread *WXComponentThread;
           );
 #endif
     
-  
-    
     for (WXComponent *childComponent in component.subcomponents) {
         [self _printFlexComonentFrame:childComponent];
     }
-
-    
 }
 
 - (void)_syncUITasks
@@ -1193,14 +1189,15 @@ static NSThread *WXComponentThread;
     [self updateStyles:styles forComponent:ref];
 }
 
-- (void)wxcore_Layout:(WXComponent*)component frame:(CGRect)frame
+- (void)wxcore_Layout:(WXComponent*)component frame:(CGRect)frame innerMainSize:(CGFloat)innerMainSize
 {
     WXAssertComponentThread();
     WXAssertParam(component);
     
     if (!CGRectEqualToRect(frame, component->_calculatedFrame))
     {
-        component->_calculatedFrame = frame;
+        [component _assignCalculatedFrame:frame];
+        [component _assignInnerContentMainSize:innerMainSize];
         [component _frameDidCalculated:YES];
         
         [self _addUITask:^{
@@ -1208,7 +1205,19 @@ static NSThread *WXComponentThread;
         }];
     }
     else {
-        [component _frameDidCalculated:NO];
+        CGFloat oldValue = [component _getInnerContentMainSize];
+        if (oldValue >= 0 && oldValue != innerMainSize) {
+            [component _assignCalculatedFrame:frame];
+            [component _assignInnerContentMainSize:innerMainSize];
+            [component _frameDidCalculated:YES];
+            
+            [self _addUITask:^{
+                [component _layoutDidFinish];
+            }];
+        }
+        else {
+            [component _frameDidCalculated:NO];
+        }
     }
 }
 

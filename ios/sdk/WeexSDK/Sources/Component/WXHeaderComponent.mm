@@ -67,6 +67,12 @@
     [self.delegate headerDidRemove:self];
 }
 
+- (void)_assignCalculatedFrame:(CGRect)frame
+{
+    frame.origin = CGPointZero;
+    _calculatedFrame = frame;
+}
+
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
         if (self.delegate && ( isnan(self.flexCssNode->getStyleWidth()) || _isUseContainerWidth)) {

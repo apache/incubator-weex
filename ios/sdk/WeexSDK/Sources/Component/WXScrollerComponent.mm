@@ -249,11 +249,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     ((UIScrollView *)_view).delegate = nil;
     [self.stickyArray removeAllObjects];
     [self.listenerArray removeAllObjects];
-        if(_flexScrollerCSSNode){
-            [WXComponent recycleNodeOnComponentThread:_flexScrollerCSSNode gabRef:self.ref];
-            
-            _flexScrollerCSSNode=nullptr;
-        }
+    
+#ifdef WX_IMPORT_WEEXCORE
+#else
+    if(_flexScrollerCSSNode){
+        [WXComponent recycleNodeOnComponentThread:_flexScrollerCSSNode gabRef:self.ref];
+        _flexScrollerCSSNode=nullptr;
+    }
+#endif
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
@@ -881,6 +884,31 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (NSUInteger)childrenCountForScrollerLayout
 {
     return [super _childrenCountForLayout];
+}
+
+- (CGFloat)_getInnerContentMainSize
+{
+    if (_scrollDirection == WXScrollDirectionVertical) {
+        return _contentSize.height;
+    }
+    else if (_scrollDirection == WXScrollDirectionHorizontal) {
+        return _contentSize.width;
+    }
+    else {
+        return -1.0f;
+    }
+}
+
+- (void)_assignInnerContentMainSize:(CGFloat)value
+{
+    if ([self isMemberOfClass:[WXScrollerComponent class]]) {
+        if (_scrollDirection == WXScrollDirectionVertical) {
+            _contentSize.height = value;
+        }
+        else if (_scrollDirection == WXScrollDirectionHorizontal) {
+            _contentSize.width = value;
+        }
+    }
 }
 
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition

@@ -129,6 +129,12 @@
     // do nothing
 }
 
+- (void)_assignCalculatedFrame:(CGRect)frame
+{
+    frame.origin = CGPointZero;
+    _calculatedFrame = frame;
+}
+
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
         if (self.delegate && (flexIsUndefined(self.flexCssNode->getStyleWidth()) || _isUseContainerWidth)) {

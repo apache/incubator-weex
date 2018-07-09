@@ -427,7 +427,7 @@ namespace WeexCore
                                   isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
                                   isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
                                   isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
-        [manager wxcore_Layout:component frame:frame];
+        [manager wxcore_Layout:component frame:frame innerMainSize:renderObject->getLargestMainSize()];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;

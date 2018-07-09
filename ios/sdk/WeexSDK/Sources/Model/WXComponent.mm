@@ -504,6 +504,20 @@ static BOOL bNeedRemoveEvents = YES;
     return _calculatedFrame;
 }
 
+- (CGFloat)_getInnerContentMainSize
+{
+    return -1.0f;
+}
+
+- (void)_assignInnerContentMainSize:(CGFloat)value
+{
+}
+
+- (void)_assignCalculatedFrame:(CGRect)frame
+{
+    _calculatedFrame = frame;
+}
+
 - (CGPoint)absolutePosition
 {
     return _absolutePosition;

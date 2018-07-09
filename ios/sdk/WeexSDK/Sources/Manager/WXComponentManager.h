@@ -210,7 +210,7 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 - (void)wxcore_CreateFinish;
 - (void)wxcore_UpdateAttributes:(NSDictionary*)attributes forElement:(NSString*)ref;
 - (void)wxcore_UpdateStyles:(NSDictionary*)styles forElement:(NSString*)ref;
-- (void)wxcore_Layout:(WXComponent*)component frame:(CGRect)frame;
+- (void)wxcore_Layout:(WXComponent*)component frame:(CGRect)frame innerMainSize:(CGFloat)innerMainSize;
 - (void)wxcore_AddEvent:(NSString*)eventName toElement:(NSString*)ref;
 - (void)wxcore_RemoveEvent:(NSString*)eventName fromElement:(NSString*)ref;
 - (BOOL)wxcore_IsTransitionNoneOfElement:(NSString*)ref; // for quick access
