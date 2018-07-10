@@ -214,7 +214,7 @@ namespace WeexCore {
         if (isnan(height)) {
           height = actualHeight;
         } else if (!stretch) {
-          height = std::min(height, actualHeight);
+          height = std::max(height, actualHeight);
         }
       }
     } else {

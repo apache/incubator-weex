@@ -150,6 +150,8 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
 
       if (Float.isNaN(height)) {
         measureHeight = layout.getHeight();
+      }else{
+        measureHeight = Math.max(layout.getHeight(), measureHeight);
       }
     } else {
       if (widthMeasureMode == MeasureMode.UNSPECIFIED) {
