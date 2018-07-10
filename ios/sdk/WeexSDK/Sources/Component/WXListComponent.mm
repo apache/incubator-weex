@@ -439,7 +439,11 @@
 
 - (float)containerWidthForLayout:(WXCellComponent *)cell
 {
-        return self.flexScrollerCSSNode->getStyleWidth();
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
+    return self.flexScrollerCSSNode->getStyleWidth();
+#endif
 }
 
 - (void)cellDidRemove:(WXCellComponent *)cell

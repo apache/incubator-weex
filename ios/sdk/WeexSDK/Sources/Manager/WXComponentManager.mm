@@ -198,10 +198,14 @@ static NSThread *WXComponentThread;
 }
 
 - (void)_applyRootFrame:(CGRect)rootFrame{
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
     _rootFlexCSSNode->setStylePosition(WeexCore::kPositionEdgeLeft, self.weexInstance.frame.origin.x);
     _rootFlexCSSNode->setStylePosition(WeexCore::kPositionEdgeTop, self.weexInstance.frame.origin.y);
     _rootFlexCSSNode->setStyleWidth(self.weexInstance.frame.size.width ?: FlexUndefined,NO);
     _rootFlexCSSNode->setStyleHeight(self.weexInstance.frame.size.height ?: FlexUndefined);
+#endif
 }
 
 - (void)_addUITask:(void (^)(void))block
@@ -913,7 +917,7 @@ static NSThread *WXComponentThread;
 - (void)_layout
 {
 #ifdef WX_IMPORT_WEEXCORE
-    [WXCoreBridge triggerLayout:_weexInstance.instanceId size:_weexInstance.frame.size];
+    [WXCoreBridge triggerLayout:_weexInstance.instanceId size:_weexInstance.frame.size forced:[_rootComponent needsLayout]];
 #else
     BOOL needsLayout = NO;
 

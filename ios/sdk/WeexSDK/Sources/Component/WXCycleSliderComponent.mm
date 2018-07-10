@@ -660,7 +660,6 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)recycleSliderView:(WXRecycleSliderView *)recycleSliderView didScrollToItemAtIndex:(NSInteger)index
 {
-    
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
     }

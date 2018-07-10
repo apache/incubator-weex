@@ -125,7 +125,7 @@ namespace WeexCore
 
 + (void)setViewportWidth:(NSString*)instanceId width:(CGFloat)width;
 
-+ (void)triggerLayout:(NSString*)instanceId size:(CGSize)size;
++ (void)triggerLayout:(NSString*)instanceId size:(CGSize)size forced:(BOOL)forced;
 
 @end
 

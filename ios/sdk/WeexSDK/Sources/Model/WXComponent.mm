@@ -153,7 +153,10 @@ static BOOL bNeedRemoveEvents = YES;
 #endif
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
 
+#ifdef WX_IMPORT_WEEXCORE
+#else
         [self _initCSSNodeWithStyles:_styles];
+#endif
         [self _initViewPropertyWithStyles:_styles];
         [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];

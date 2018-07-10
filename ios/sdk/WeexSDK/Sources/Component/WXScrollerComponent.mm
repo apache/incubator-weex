@@ -914,6 +914,9 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition
                           gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
     /**
      *  Pretty hacky way
      *  layout from root to scroller to get scroller's frame,
@@ -950,6 +953,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     
     [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
+#endif
 }
 
 @end

@@ -101,6 +101,7 @@ bool flexIsUndefined(float value) {
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles
 {
 #ifdef WX_IMPORT_WEEXCORE
+    assert(0);
 #else
     if (_flexCssNode != nullptr) {
         // using weex core

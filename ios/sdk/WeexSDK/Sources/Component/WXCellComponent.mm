@@ -137,6 +137,9 @@
 
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
         if (self.delegate && (flexIsUndefined(self.flexCssNode->getStyleWidth()) || _isUseContainerWidth)) {
             self.flexCssNode->setStyleWidth([self.delegate containerWidthForLayout:self],NO);
             _isUseContainerWidth = YES;
@@ -149,6 +152,7 @@
             self.flexCssNode->calculateLayout(renderPageSize);
         }
     [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
+#endif
 }
 @end
 

@@ -702,12 +702,18 @@ static WeexCore::JSBridge* jsBridge = nullptr;
     }
 }
 
-+ (void)triggerLayout:(NSString*)instanceId size:(CGSize)size
++ (void)triggerLayout:(NSString*)instanceId size:(CGSize)size forced:(BOOL)forced
 {
-    const char* page = [instanceId UTF8String];
-    if (platformBridge->notifyLayout(page)) {
-        platformBridge->setDefaultHeightAndWidthIntoRootDom(page, size.width, size.height, false, false);
-        platformBridge->forceLayout(page);
+    if (platformBridge) {
+        const char* page = [instanceId UTF8String];
+        if (forced) {
+            platformBridge->setPageDirty(page);
+        }
+        
+        if (platformBridge->notifyLayout(page)) {
+            platformBridge->setDefaultHeightAndWidthIntoRootDom(page, size.width, size.height, false, false);
+            platformBridge->forceLayout(page);
+        }
     }
 }
 
