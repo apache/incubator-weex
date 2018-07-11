@@ -40,7 +40,7 @@
         if (attributes[@"default"]) {
             _templateCaseType = @"default";
         }
-        _templateCaseType = attributes[@"case"] ? [WXConvert NSString:attributes[@"case"]] :const_cast<NSString *>(WXDefaultRecycleTemplateType) ;
+        _templateCaseType = attributes[@"case"] ? [WXConvert NSString:attributes[@"case"]] :const_cast<NSString *>(WXDefaultRecycleTemplateType);
         _lazyCreateView = YES;
         _isNeedJoinLayoutSystem = NO;
     }
