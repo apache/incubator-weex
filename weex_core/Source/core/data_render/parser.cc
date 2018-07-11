@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <sstream>
 #include "core/data_render/parser.h"
 #include "core/data_render/json/json11.hpp"
 #include "core/data_render/ast_factory.h"
@@ -30,6 +31,14 @@ namespace weex {
         namespace data_render {
 
 namespace {
+
+template <typename T>
+std::string to_string(T value)
+{
+    std::ostringstream os;
+    os << value ;
+    return os.str() ;
+}
 
 struct ASTParser final {
     /* State */

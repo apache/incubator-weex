@@ -54,14 +54,17 @@ set(COMMON_SRCS
    ./core/bridge/bridge.cpp
 
    ./core/data_render/ast.cc
+   ./core/data_render/ast_factory.cc
    ./core/data_render/parser.cc
    ./core/data_render/token.cc
    ./core/data_render/code_generator.cc
    ./core/data_render/exec_state.cc
    ./core/data_render/vm.cc
+   ./core/data_render/statement.cc
    ./core/data_render/string_table.cc
    ./core/data_render/vnode/vnode.cc
    ./core/data_render/vnode/vnode_render_manager.cc
+   ./core/data_render/json/json11.cc
         )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)

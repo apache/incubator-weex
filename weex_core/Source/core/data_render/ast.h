@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <vector>
+#include <assert.h>
 #include "core/data_render/json/json11.hpp"
 #include "core/data_render/handle.h"
 
@@ -165,7 +166,7 @@ virtual bool Is##Type() const { return false; }
         { }
         
         Handle<ExpressionList> args() { return args_; }
-        auto length() { return args()->Size(); }
+        size_t length() { return args()->Size(); }
         
         DEFINE_NODE_TYPE(ArgumentList);
     private:

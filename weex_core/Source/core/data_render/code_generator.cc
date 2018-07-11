@@ -49,6 +49,8 @@ void CodeGenerator::EnterBlock() {
 void CodeGenerator::LeaveBlock() { cur_block_.reset(cur_block_->parent()); }
 
 void CodeGenerator::Visit(StringLiteral *node) {
+
+}
 //  long reg = data == nullptr ? -1 : *static_cast<long*>(data);
 //  if (reg >= 0) {
 //    FuncState* func_state = cur_func_->func_state();
