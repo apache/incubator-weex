@@ -33,6 +33,7 @@
 #import "WXSDKManager.h"
 #import "WXComponent+DataBinding.h"
 #import "WXComponent+Layout.h"
+#import "WXModuleProtocol.h"
 
 @interface WXRecycleListComponentView:UICollectionView
 @end
@@ -73,9 +74,11 @@ WX_EXPORT_METHOD(@selector(insertData:data:))
 WX_EXPORT_METHOD(@selector(updateData:data:))
 WX_EXPORT_METHOD(@selector(removeData:count:))
 WX_EXPORT_METHOD(@selector(moveData:toIndex:))
-WX_EXPORT_METHOD(@selector(scrollTo:options:))
 WX_EXPORT_METHOD(@selector(insertRange:range:))
 WX_EXPORT_METHOD(@selector(setListData:))
+WX_EXPORT_METHOD(@selector(queryElement:ref:callback:))
+WX_EXPORT_METHOD(@selector(scrollTo:options:))
+WX_EXPORT_METHOD(@selector(scrollToElement:options:))
 
 - (instancetype)initWithRef:(NSString *)ref
                        type:(NSString *)type
@@ -373,8 +376,64 @@ WX_EXPORT_METHOD(@selector(setListData:))
 - (void)scrollTo:(NSUInteger)index options:(NSDictionary *)options
 {
     NSIndexPath *toIndexPath = [NSIndexPath indexPathForItem:index inSection:0];
-    BOOL animated = options[@"animated"] ? [WXConvert BOOL:options[@"animated"]] : NO;
+    BOOL animated = options[@"animated"] ? [WXConvert BOOL:options[@"animated"]] : YES;
     [_collectionView scrollToItemAtIndexPath:toIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:animated];
+}
+
+- (void)scrollToElement:(NSUInteger)index options:(NSDictionary *)options
+{
+    [self scrollTo:index options:options];
+}
+
+- (void)queryElement:(NSUInteger)index ref:(NSString *)ref callback:(WXModuleCallback)callback
+{
+    if(callback)
+    {
+        callback([self infoArrayFromComponentArray:[self _componentArray:index ref:ref] index:index ref:ref]);
+    }
+}
+
+- (NSMutableArray *)_componentArray:(NSUInteger)index ref:(NSString *)ref
+{
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index?:0 inSection:0];
+    UICollectionViewCell *cellView = [_collectionView cellForItemAtIndexPath:indexPath];
+    WXCellSlotComponent *cellComponent = (WXCellSlotComponent *)cellView.wx_component;
+    NSArray *subComponents = cellComponent.subcomponents;
+    NSMutableArray *componentArray = [NSMutableArray new];
+    if (subComponents.count != 0) {
+        [self _querySubComponent:subComponents index:index queryComponentRef:ref array:componentArray];
+    }
+    return componentArray;
+}
+
+- (void)_querySubComponent:(NSArray *)subComponents index:(NSUInteger)index queryComponentRef:(NSString *)subComponentRef array:(NSMutableArray *)componentArray
+{
+    for (WXComponent *subComponent in subComponents) {
+        NSString *ref = subComponent.attributes[@"ref"];
+        if ([ref isEqualToString:subComponentRef] ) {
+            [componentArray addObject:subComponent];
+            continue;
+        }
+        else if(![ref isEqualToString:subComponentRef] && subComponent.subcomponents.count!=0)
+        {
+            [self _querySubComponent:subComponent.subcomponents index:index queryComponentRef:subComponentRef array:componentArray];
+        }
+    }
+}
+
+- (NSArray *)infoArrayFromComponentArray:(NSMutableArray *)componentArray index:(NSUInteger)index ref:(NSString *)ref
+{
+    NSMutableArray *infoArray = [NSMutableArray new];
+    if (componentArray.count != 0) {
+        for (WXComponent *subComponent in componentArray) {
+            NSDictionary *attributes = subComponent.attributes;
+            NSString *type = subComponent->_type;
+            NSString *virtualDomRefKey = [NSString stringWithFormat:@"%@@%lu@%@@%lu",self.ref,index,ref,[componentArray indexOfObject:subComponent]];
+            NSDictionary *info = @{@"attributes":attributes,@"type":type,@"virtualDomRef":virtualDomRefKey};
+            [infoArray addObject:info];
+        }
+    }
+    return infoArray;
 }
 
 #pragma mark - WXComponent Internal Methods

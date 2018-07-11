@@ -258,6 +258,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_didInserted;
 
+- (NSMutableArray *)_componentArray:(NSUInteger)index ref:(NSString *)ref;
 @end
 
 
