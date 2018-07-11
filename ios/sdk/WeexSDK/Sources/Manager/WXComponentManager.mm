@@ -569,6 +569,16 @@ static NSThread *WXComponentThread;
     NSMutableDictionary *bindingAttributesOrStyles = [NSMutableDictionary dictionary];
     
     [attributesOrStyles enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull attributeOrStyleName, id  _Nonnull attributeOrStyle, BOOL * _Nonnull stop) {
+#ifdef WX_IMPORT_WEEXCORE
+        if ([WXUtility isStringPossiblelyJSONContainer:attributeOrStyle]) {
+            // try parse json object
+            id jsonAttrOrStyle = [WXUtility objectFromJSON:attributeOrStyle];
+            if (jsonAttrOrStyle != nil) {
+                attributeOrStyle = jsonAttrOrStyle;
+            }
+        }
+#endif
+        
         if ([WXBindingMatchIdentify isEqualToString:attributeOrStyleName] // match
             ||  [WXBindingRepeatIdentify isEqualToString:attributeOrStyleName] // repeat
             ||  [WXBindingOnceIdentify isEqualToString:attributeOrStyleName] // once
@@ -579,6 +589,16 @@ static NSThread *WXComponentThread;
             // {"attributeOrStyleName":[..., "string", {"@binding":"bindingExpression"}, "string", {"@binding":"bindingExpression"}, ...]
             __block BOOL isBinding = NO;
             [attributeOrStyle enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+#ifdef WX_IMPORT_WEEXCORE
+                if ([WXUtility isStringPossiblelyJSONContainer:obj]) {
+                    // try parse json object
+                    id jsonObj = [WXUtility objectFromJSON:obj];
+                    if (jsonObj != nil) {
+                        obj = jsonObj;
+                    }
+                }
+#endif
+                
                 if ([obj isKindOfClass:[NSDictionary class]] && obj[WXBindingIdentify]) {
                     isBinding = YES;
                     *stop = YES;
@@ -917,7 +937,7 @@ static NSThread *WXComponentThread;
 - (void)_layout
 {
 #ifdef WX_IMPORT_WEEXCORE
-    [WXCoreBridge triggerLayout:_weexInstance.instanceId size:_weexInstance.frame.size forced:[_rootComponent needsLayout]];
+    [WXCoreBridge layoutPage:_weexInstance.instanceId size:_weexInstance.frame.size forced:[_rootComponent needsLayout]];
 #else
     BOOL needsLayout = NO;
 
@@ -1137,7 +1157,7 @@ static NSThread *WXComponentThread;
     
     [supercomponent _insertSubcomponent:component atIndex:index];
     // use _lazyCreateView to forbid component like cell's view creating
-    if(supercomponent && component && supercomponent->_lazyCreateView) {
+    if (supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
     }
     
@@ -1158,9 +1178,6 @@ static NSThread *WXComponentThread;
             [weakSelf onElementChange:isFSCreateFinish];
         }];
     }
-    
-#warning todo logic 检查recyclelist，_didInserted方法可以删除？
-    //[component _didInserted];
 }
 
 - (void)wxcore_RemoveElement:(NSString*)ref

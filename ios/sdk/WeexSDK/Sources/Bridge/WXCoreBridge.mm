@@ -33,13 +33,16 @@
 #import "WXAppConfiguration.h"
 #import "WXLayoutConstraint.h"
 
-#include <base/CoreConstants.h>
-#include <core/manager/weex_core_manager.h>
-#include <core/render/manager/render_manager.h>
-#include <core/render/page/render_page.h>
-#include <core/render/node/render_object.h>
-#include <core/config/core_environment.h>
-#include <base/TimeUtils.h>
+#include "base/CoreConstants.h"
+#include "core/manager/weex_core_manager.h"
+#include "core/render/manager/render_manager.h"
+#include "core/render/page/render_page.h"
+#include "core/render/node/render_object.h"
+#include "core/render/node/render_list.h"
+#include "core/render/node/factory/render_type.h"
+#include "core/render/node/factory/render_creator.h"
+#include "core/config/core_environment.h"
+#include "base/TimeUtils.h"
 
 #define NSSTRING(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCString(NULL, (const char *)(cstr), kCFStringEncodingUTF8)))
 #define NSSTRING_NO_COPY(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCStringNoCopy(NULL, (const char *)(cstr), kCFStringEncodingUTF8, kCFAllocatorNull)))
@@ -686,26 +689,26 @@ static WeexCore::JSBridge* jsBridge = nullptr;
     WeexCore::WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new WeexCore::WXCoreMeasureFunctionBridge());
 }
 
-+ (void)setDefaultDimensionIntoRoot:(NSString*)instanceId width:(CGFloat)width height:(CGFloat)height
++ (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
                  isWidthWrapContent:(BOOL)isWidthWrapContent
                 isHeightWrapContent:(BOOL)isHeightWrapContent
 {
     if (platformBridge) {
-        platformBridge->setDefaultHeightAndWidthIntoRootDom([instanceId UTF8String], (float)width, (float)height, (bool)isWidthWrapContent, (bool)isHeightWrapContent);
+        platformBridge->setDefaultHeightAndWidthIntoRootDom([pageId UTF8String], (float)width, (float)height, (bool)isWidthWrapContent, (bool)isHeightWrapContent);
     }
 }
 
-+ (void)setViewportWidth:(NSString*)instanceId width:(CGFloat)width
++ (void)setViewportWidth:(NSString*)pageId width:(CGFloat)width
 {
     if (platformBridge) {
-        platformBridge->setViewportWidth([instanceId UTF8String], (float)width);
+        platformBridge->setViewportWidth([pageId UTF8String], (float)width);
     }
 }
 
-+ (void)triggerLayout:(NSString*)instanceId size:(CGSize)size forced:(BOOL)forced
++ (void)layoutPage:(NSString*)pageId size:(CGSize)size forced:(BOOL)forced
 {
     if (platformBridge) {
-        const char* page = [instanceId UTF8String];
+        const char* page = [pageId UTF8String];
         if (forced) {
             platformBridge->setPageDirty(page);
         }
@@ -715,6 +718,61 @@ static WeexCore::JSBridge* jsBridge = nullptr;
             platformBridge->forceLayout(page);
         }
     }
+}
+
+static void _traverseTree(WeexCore::RenderObject *render, int index, const char* pageId)
+{
+    if (render == nullptr) return;
+
+    if (render->hasNewLayout()) {
+        platformBridge->callLayout(pageId, render->ref().c_str(),
+                                   render->getLayoutPositionTop(),
+                                   render->getLayoutPositionBottom(),
+                                   render->getLayoutPositionLeft(),
+                                   render->getLayoutPositionRight(),
+                                   render->getLayoutHeight(),
+                                   render->getLayoutWidth(), index);
+        render->setHasNewLayout(false);
+    }
+
+    for (auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it ++) {
+        WeexCore::RenderObject *child = static_cast<WeexCore::RenderObject *>(*it);
+        if (child != nullptr) {
+            _traverseTree(child, (int)(it - render->ChildListIterBegin()), pageId);
+        }
+    }
+}
+
++ (void)layoutRenderObject:(void*)object size:(CGSize)size page:(NSString*)pageId
+{
+    using namespace WeexCore;
+    RenderObject* render = static_cast<RenderObject*>(object);
+    std::pair<float, float> renderPageSize(size.width, size.height);
+    
+    render->LayoutBeforeImpl();
+    render->calculateLayout(renderPageSize);
+    render->LayoutAfterImpl();
+    _traverseTree(render, 0, [pageId UTF8String]);
+}
+
++ (void*)copyRenderObject:(void*)source replacedRef:(NSString*)ref
+{
+    using namespace WeexCore;
+    RenderObject* sourceObject = static_cast<RenderObject*>(source);
+    RenderObject* copyObject = static_cast<RenderObject*>(RenderCreator::GetInstance()->CreateRender(sourceObject->type(), ref == nil ? sourceObject->ref() : [ref UTF8String]));
+    copyObject->CopyFrom(sourceObject);
+    if (sourceObject->type() == kRenderCellSlot || sourceObject->type() == kRenderCell) {
+        RenderList* renderList = static_cast<RenderList*>(sourceObject->getParent());
+        if (renderList != nullptr) {
+            renderList->AddCellSlotCopyTrack(copyObject);
+        }
+    }
+    return copyObject;
+}
+
++ (void)addChildRenderObject:(void*)child toParent:(void*)parent
+{
+    (static_cast<WeexCore::RenderObject*>(parent))->AddRenderObject(-1, (static_cast<WeexCore::RenderObject*>(child)));
 }
 
 @end

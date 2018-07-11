@@ -245,21 +245,17 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return [NSString stringWithFormat:@"%@ %@ %@%@ %@", deviceUA, appUA, weexUA, externalUA, screenUA];
 }
 
++ (BOOL)isStringPossiblelyJSONContainer:(id _Nonnull)string
+{
+    if (string == nil) return NO;
+    if (![string isKindOfClass:[NSString class]]) return NO;
+    if ([(NSString*)string length] < 3) return NO; // {"A":A}, [1]
+    return [(NSString*)string characterAtIndex:0] == '{' || [(NSString*)string characterAtIndex:0] == '[';
+}
+
 + (id)objectFromJSON:(NSString *)json
 {
-    if (!json) return nil;
-    
-    NSData *data = [json dataUsingEncoding:NSUTF8StringEncoding];
-    NSError *error = nil;
-    id obj = [NSJSONSerialization JSONObjectWithData:data
-                                             options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
-                                               error:&error];
-    if(error){
-        WXLogError(@"%@", [error description]);
-        return nil;
-    }
-    
-    return obj;
+    return [self JSONObject:[json dataUsingEncoding:NSUTF8StringEncoding] error:nil];
 }
 
 + (id)JSONObject:(NSData*)data error:(NSError **)error
@@ -271,7 +267,9 @@ CGFloat WXFloorPixelValue(CGFloat value)
                                                   options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
                                                     error:error];
     } @catch (NSException *exception) {
-        *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{NSLocalizedDescriptionKey: [exception description]}];
+        if (error) {
+            *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{NSLocalizedDescriptionKey: [exception description]}];
+        }
     }
     return jsonObj;
 }

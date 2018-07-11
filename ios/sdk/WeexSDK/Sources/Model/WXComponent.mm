@@ -43,6 +43,10 @@
 #import "WXConfigCenterProtocol.h"
 #import "WXSDKEngine.h"
 
+#ifdef WX_IMPORT_WEEXCORE
+#import "WXCoreBridge.h"
+#endif
+
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 static BOOL bInited = NO;
@@ -175,12 +179,52 @@ static BOOL bNeedRemoveEvents = YES;
 
 - (id)copyWithZone:(NSZone *)zone
 {
+#ifdef WX_IMPORT_WEEXCORE
+    static std::atomic<long> __copy(0);
+    long copyId = __copy ++;
+    copyId %= (1024 * 1024);
+    NSString *copyRef = [NSString stringWithFormat:@"%ldcopy_of%@", copyId, _isTemplate ? self.ref : self->_templateComponent.ref];
+    
+    // first, copy weex core render object
+    void* copiedRenderObject = [WXCoreBridge copyRenderObject:_flexCssNode replacedRef:copyRef];
+    WXAssert(copiedRenderObject != nullptr, @"cannot copy render object.");
+    
+    // second, alloc new WXComponent
+    WXComponent *component = [[self class] allocWithZone:zone];
+    [component _setRenderObject:copiedRenderObject];
+    component = [component initWithRef:copyRef type:self.type styles:self.styles attributes:self.attributes events:self.events weexInstance:self.weexInstance];
+    if (_isTemplate) {
+        component->_templateComponent = self;
+    }
+    else {
+        component->_templateComponent = self->_templateComponent;
+    }
+    component->_calculatedFrame = self.calculatedFrame;
+    
+    // third, copy children
+    NSMutableArray* subcomponentsCopy = [NSMutableArray array];
+    component->_subcomponents = subcomponentsCopy;
+    NSUInteger count = [self.subcomponents count];
+    for (NSInteger i = 0; i < count; i ++) {
+        WXComponent *subcomponentCopy = [[self.subcomponents objectAtIndex:i] copy];
+        [component _insertSubcomponent:subcomponentCopy atIndex:i];
+        // add to layout tree
+        [WXCoreBridge addChildRenderObject:subcomponentCopy->_flexCssNode toParent:component->_flexCssNode];
+    }
+    
+    WXPerformBlockOnComponentThread(^{
+        [self.weexInstance.componentManager addComponent:component toIndexDictForRef:copyRef];
+    });
+    
+    return component;
+#else
     NSInteger copyId = 0;
     @synchronized(self){
         static NSInteger __copy = 0;
         copyId = __copy % (1024*1024);
         __copy++;
     }
+
     NSString *copyRef = [NSString stringWithFormat:@"%ldcopy_of%@", (long)copyId, _isTemplate ? self.ref : self->_templateComponent.ref];
     WXComponent *component = [[[self class] allocWithZone:zone] initWithRef:copyRef type:self.type styles:self.styles attributes:self.attributes events:self.events weexInstance:self.weexInstance];
     if (_isTemplate) {
@@ -202,20 +246,13 @@ static BOOL bNeedRemoveEvents = YES;
             WXComponent *subcomponentCopy = [[self.subcomponents objectAtIndex:i] copy];
             [component _insertSubcomponent:subcomponentCopy atIndex:i];
         }
-//    else{
-//        for (WXComponent *subcomponent in self.subcomponents) {
-//            WXComponent *subcomponentCopy = [subcomponent copy];
-//            subcomponentCopy->_supercomponent = component;
-//            [subcomponentsCopy addObject:subcomponentCopy];
-//        }
-//        component->_subcomponents = subcomponentsCopy;
-//    }
-    
+
     WXPerformBlockOnComponentThread(^{
         [self.weexInstance.componentManager addComponent:component toIndexDictForRef:copyRef];
     });
     
     return component;
+#endif
 }
 
 - (UIAccessibilityTraits)_parseAccessibilityTraitsWithTraits:(UIAccessibilityTraits)trait roles:(NSString*)roleStr
@@ -585,10 +622,14 @@ static BOOL bNeedRemoveEvents = YES;
     if (_useCompositing || _isCompositingChild) {
         subcomponent->_isCompositingChild = YES;
     }
+    
+#ifdef WX_IMPORT_WEEXCORE
+#else
         if (subcomponent->_isNeedJoinLayoutSystem) {
             NSInteger actualIndex = [self getActualNodeIndex:subcomponent atIndex:index];
             [self _insertChildCssNode:subcomponent atIndex:actualIndex];
-        }else{
+        }
+        else {
 #ifdef DEBUG
             WXLogDebug(@"flexLayout -> no need JoinLayoutSystem parent ref:%@ type:%@, self ref:%@ type:%@ ",
                   self.ref,
@@ -598,6 +639,7 @@ static BOOL bNeedRemoveEvents = YES;
                   );
 #endif
         }
+#endif
     
     [self _recomputeCSSNodeChildren];
     [self setNeedsLayout];
@@ -607,8 +649,10 @@ static BOOL bNeedRemoveEvents = YES;
 {
     pthread_mutex_lock(&_propertyMutex);
     [_subcomponents removeObject:subcomponent];
-        //subcomponent->_isNeedJoinLayoutSystem = NO;
-        [self _rmChildCssNode:subcomponent];
+#ifdef WX_IMPORT_WEEXCORE
+#else
+    [self _rmChildCssNode:subcomponent];
+#endif
     pthread_mutex_unlock(&_propertyMutex);
 }
 
@@ -632,7 +676,9 @@ static BOOL bNeedRemoveEvents = YES;
 
 - (void)_didInserted
 {
-    
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
 }
 
 - (id<WXScrollerProtocol>)ancestorScroller

@@ -34,6 +34,7 @@
 - (void)_insertChildCssNode:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
 #ifdef WX_IMPORT_WEEXCORE
+    assert(0);
 #else
     self.flexScrollerCSSNode->addChildAt(subcomponent.flexCssNode, (uint32_t) index);
 #ifdef DEBUG
@@ -45,6 +46,7 @@
 - (void)_rmChildCssNode:(WXComponent *)subcomponent
 {
 #ifdef WX_IMPORT_WEEXCORE
+    assert(0);
 #else
     self.flexScrollerCSSNode->removeChild(subcomponent->_flexCssNode);
 #ifdef DEBUG

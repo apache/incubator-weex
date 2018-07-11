@@ -466,7 +466,7 @@ void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent,
       new RenderActionAddElement(page_id(), child, parent, index, will_layout);
   PostRenderAction(action);
 
-  Index i = 0;
+  int i = 0;
   for (auto it = child->ChildListIterBegin(); it != child->ChildListIterEnd();
        it++) {
     RenderObject *grandson = static_cast<RenderObject *>(*it);

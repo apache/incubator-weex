@@ -680,6 +680,7 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
 - (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index
 {
 #ifdef WX_IMPORT_WEEXCORE
+    assert(0);
 #else
     self.flexCssNode->addChildAt(subcomponent.flexCssNode, (uint32_t)index);
 #endif
@@ -688,6 +689,7 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
 - (void)_rmChildCssNode:(WXComponent *)subcomponent
 {
 #ifdef WX_IMPORT_WEEXCORE
+    assert(0);
 #else
     self.flexCssNode->removeChild(subcomponent->_flexCssNode);
 #ifdef DEBUG

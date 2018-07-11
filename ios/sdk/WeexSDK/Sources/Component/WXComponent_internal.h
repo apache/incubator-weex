@@ -269,5 +269,3 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 - (void)_didInserted;
 
 @end
-
-

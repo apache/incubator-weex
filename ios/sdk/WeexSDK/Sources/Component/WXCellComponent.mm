@@ -59,11 +59,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    
-}
-
 - (BOOL)weex_isEqualTo:(id<WXDiffable>)object
 {
     return self == object;
@@ -154,5 +149,6 @@
     [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
 #endif
 }
+
 @end
 

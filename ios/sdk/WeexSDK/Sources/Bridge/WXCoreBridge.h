@@ -22,8 +22,8 @@
 
 #if defined __cplusplus
 
-#include <core/bridge/bridge.h>
-#include <core/layout/measure_func_adapter.h>
+#include "core/bridge/bridge.h"
+#include "core/layout/measure_func_adapter.h"
 
 namespace WeexCore
 {
@@ -119,13 +119,19 @@ namespace WeexCore
 
 + (void)install;
 
-+ (void)setDefaultDimensionIntoRoot:(NSString*)instanceId width:(CGFloat)width height:(CGFloat)height
++ (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
                  isWidthWrapContent:(BOOL)isWidthWrapContent
                 isHeightWrapContent:(BOOL)isHeightWrapContent;
 
-+ (void)setViewportWidth:(NSString*)instanceId width:(CGFloat)width;
++ (void)setViewportWidth:(NSString*)pageId width:(CGFloat)width;
 
-+ (void)triggerLayout:(NSString*)instanceId size:(CGSize)size forced:(BOOL)forced;
++ (void)layoutPage:(NSString*)pageId size:(CGSize)size forced:(BOOL)forced;
+
++ (void)layoutRenderObject:(void*)object size:(CGSize)size page:(NSString*)pageId;
+
++ (void*)copyRenderObject:(void*)source replacedRef:(NSString*)ref;
+
++ (void)addChildRenderObject:(void*)child toParent:(void*)parent;
 
 @end
 

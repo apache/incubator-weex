@@ -25,6 +25,10 @@
 #import "WXAssert.h"
 #import "WXScrollerComponent+Layout.h"
 
+#ifdef WX_IMPORT_WEEXCORE
+#import "WXCoreBridge.h"
+#endif
+
 @implementation WXCellSlotComponent
 
 - (instancetype)initWithRef:(NSString *)ref
@@ -63,11 +67,26 @@
 
 - (void)_didInserted
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
     [self triggerLayout];
+#endif
 }
 
 - (void)triggerLayout
 {
+#ifdef WX_IMPORT_WEEXCORE
+    WXAssertComponentThread();
+    
+    if (flexIsUndefined(self.flexCssNode->getStyleWidth())) {
+        self.flexCssNode->setStyleWidth(self.supercomponent.flexCssNode->getLayoutWidth(), NO);
+    }
+    
+    if ([self needsLayout]) {
+        [WXCoreBridge layoutRenderObject:self.flexCssNode size:self.weexInstance.frame.size page:self.weexInstance.instanceId];
+    }
+#else
     WXAssertComponentThread();
 
         if (flexIsUndefined(self.flexCssNode->getStyleWidth())) {
@@ -91,6 +110,7 @@
             [dirtyComponent _layoutDidFinish];
         }];
     }
+#endif
 }
 
 @end
