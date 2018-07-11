@@ -602,6 +602,9 @@ static BOOL bNeedRemoveEvents = YES;
         [self.weexInstance.componentManager removeFixedComponent:self];
         self->_isNeedJoinLayoutSystem = YES;
     }
+	if (_positionType == WXPositionTypeSticky) {
+		[self.ancestorScroller removeStickyComponent:self];
+	}
 }
 
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index
