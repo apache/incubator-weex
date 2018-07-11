@@ -19,6 +19,7 @@
 
 #include "core/data_render/exec_state.h"
 #include "core/data_render/code_generator.h"
+#include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
 
 namespace weex {
@@ -56,6 +57,7 @@ ExecState::ExecState(VM* vm)
       stack_(new ExecStack),
       func_state_(nullptr),
       global_(new Global),
+      string_table_(new StringTable),
       vm_(vm) {}
 
 ExecState::~ExecState() {}
@@ -79,6 +81,52 @@ void ExecState::Compile(const std::string& source) {
 //  chunk->statements().push_back(std::unique_ptr<StatementNode>(declareNode));
 //  chunk->statements().push_back(std::unique_ptr<StatementNode>(functionNode));
 //  generator.Visit(chunk, nullptr);
+  // This is a test
+//  Token token(0, 0);
+//  ChunkNode* chunk = new ChunkNode(token);
+//  // define num
+//  {
+//    ConstantNode* node = new NumberNode(token, 101);
+//    AssignmentNode* assignment =
+//        new AssignmentNode(token, Token::Type::ASSIGN, node);
+//    VarDeclareNode* declareNode = new VarDeclareNode(token, "num", assignment);
+//    chunk->statements().push_back(std::unique_ptr<StatementNode>(declareNode));
+//  }
+//  // define str
+//  {
+//    ConstantNode* node = new StringNode(token, "This is a demo");
+//    AssignmentNode* assignment =
+//        new AssignmentNode(token, Token::Type::ASSIGN, node);
+//    VarDeclareNode* declareNode = new VarDeclareNode(token, "str", assignment);
+//    chunk->statements().push_back(std::unique_ptr<StatementNode>(declareNode));
+//  }
+//
+//  // log(num)
+//  {
+//    VariableNode* funcName = new VariableNode(token, "log");
+//    VariableNode* aaNode = new VariableNode(token, "num");
+//    ExpressionListNode* argsList = new ExpressionListNode(token);
+//    argsList->expressions().push_back(std::unique_ptr<ExpressionNode>(aaNode));
+//    FunctionCallNode* functionCallNode =
+//        new FunctionCallNode(token, funcName, argsList);
+//    FunctionNode* functionNode = new FunctionNode(token, functionCallNode);
+//    chunk->statements().push_back(std::unique_ptr<StatementNode>(functionNode));
+//  }
+//
+//  // log(str)
+//  {
+//    VariableNode* funcName = new VariableNode(token, "log");
+//    VariableNode* aaNode = new VariableNode(token, "str");
+//    ExpressionListNode* argsList = new ExpressionListNode(token);
+//    argsList->expressions().push_back(std::unique_ptr<ExpressionNode>(aaNode));
+//    FunctionCallNode* functionCallNode =
+//        new FunctionCallNode(token, funcName, argsList);
+//    FunctionNode* functionNode = new FunctionNode(token, functionCallNode);
+//    chunk->statements().push_back(std::unique_ptr<StatementNode>(functionNode));
+//  }
+//
+//  generator.Visit(chunk, nullptr);
+//>>>>>>> a8dd181b3153519002e0024fc0854f933862b850
 }
 
 void ExecState::Execute() {
