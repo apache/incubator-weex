@@ -62,23 +62,23 @@ ExecState::~ExecState() {}
 
 void ExecState::Compile(const std::string& source) {
   CodeGenerator generator(this);
-  Token token(0, 0);
-  ChunkNode* chunk = new ChunkNode(token);
-  ConstantNode* node = new NumberNode(token, 101);
-  AssignmentNode* assignment =
-      new AssignmentNode(token, Token::Type::ASSIGN, node);
-  VarDeclareNode* declareNode = new VarDeclareNode(token, "aa", assignment);
-
-  VariableNode* funcName = new VariableNode(token, "log");
-  VariableNode* aaNode = new VariableNode(token, "aa");
-  ExpressionListNode* argsList = new ExpressionListNode(token);
-  argsList->expressions().push_back(std::unique_ptr<ExpressionNode>(aaNode));
-  FunctionCallNode* functionCallNode =
-      new FunctionCallNode(token, funcName, argsList);
-  FunctionNode* functionNode = new FunctionNode(token, functionCallNode);
-  chunk->statements().push_back(std::unique_ptr<StatementNode>(declareNode));
-  chunk->statements().push_back(std::unique_ptr<StatementNode>(functionNode));
-  generator.Visit(chunk, nullptr);
+//  Token token(0, 0);
+//  ChunkNode* chunk = new ChunkNode(token);
+//  ConstantNode* node = new NumberNode(token, 101);
+//  AssignmentNode* assignment =
+//      new AssignmentNode(token, Token::Type::ASSIGN, node);
+//  VarDeclareNode* declareNode = new VarDeclareNode(token, "aa", assignment);
+//
+//  VariableNode* funcName = new VariableNode(token, "log");
+//  VariableNode* aaNode = new VariableNode(token, "aa");
+//  ExpressionListNode* argsList = new ExpressionListNode(token);
+//  argsList->expressions().push_back(std::unique_ptr<ExpressionNode>(aaNode));
+//  FunctionCallNode* functionCallNode =
+//      new FunctionCallNode(token, funcName, argsList);
+//  FunctionNode* functionNode = new FunctionNode(token, functionCallNode);
+//  chunk->statements().push_back(std::unique_ptr<StatementNode>(declareNode));
+//  chunk->statements().push_back(std::unique_ptr<StatementNode>(functionNode));
+//  generator.Visit(chunk, nullptr);
 }
 
 void ExecState::Execute() {

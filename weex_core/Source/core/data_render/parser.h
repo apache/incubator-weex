@@ -17,17 +17,41 @@
  * under the License.
  */
 
-#ifndef CORE_DATA_RENDER_PARSER_H_
-#define CORE_DATA_RENDER_PARSER_H_
-
 #include <string>
+#include "core/data_render/statement.h"
+#include "core/data_render/ast.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-class Parser {};
+            
+class ParseResult {
+public:
+    friend class Parser;
+    ParseResult() { };
+    ParseResult(Handle<Expression> expr) :expr_(expr) {
+    };
+private:
+    Handle<ChunkStatement> expr_;
+};
+            
+enum ASTParseError {
+    UNKOWN_ERROR,
+    BODY_NONE_ERROR,
+    FILE_FORMAT_ERROR,
+    SYSTEM_MEMORY_ERROR,
+};
+    
+class Parser final {
+public:
+    // Parse. If parse fails, return Json() and assign an error message to err.
+    static ParseResult parse(const std::string &in,
+                      std::string &err);
+    static Handle<Expression> parseExpression(Json &json, std::string &err);
+private:
+    Parser() {};
+};
+            
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
-
-#endif  // CORE_DATA_RENDER_PARSER_H_

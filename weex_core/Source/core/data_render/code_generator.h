@@ -22,6 +22,7 @@
 
 #include <unordered_map>
 #include "base/common.h"
+#include "core/data_render/ast_visitor.h"
 #include "core/data_render/ast.h"
 #include "core/data_render/op_code.h"
 
@@ -30,25 +31,25 @@ namespace core {
 namespace data_render {
 class FuncState;
 class ExecState;
-class CodeGenerator : public Visitor {
+class CodeGenerator : public ASTVisitor {
  public:
-  CodeGenerator(ExecState* exec_state)
+  CodeGenerator(ExecState *exec_state)
       : exec_state_(exec_state), cur_block_(nullptr) {}
   ~CodeGenerator() {}
-  void Visit(ConstantNode* node, void* data) override;
-  void Visit(UnaryExpressionNode* node, void* data) override;
-  void Visit(BinaryExpressionNode* node, void* data) override;
-  void Visit(VariableNode* node, void* data) override;
-  void Visit(AssignmentNode* node, void* data) override;
-  void Visit(VarDeclareNode* node, void* data) override;
-  void Visit(DotAccessorNode* node, void* data) override;
-  void Visit(ExpressionListNode* node, void* data) override;
-  void Visit(FunctionCallNode* node, void* data) override;
-  void Visit(ForNode* node, void* data) override;
-  void Visit(IfElseNode* node, void* data) override;
-  void Visit(FunctionNode* node, void* data) override;
-  void Visit(BlockNode* node, void* data) override;
-  void Visit(ChunkNode* node, void* data) override;
+  void Visit(ChunkStatement *node) override;
+  void Visit(StringLiteral *node) override;
+//  void Visit(UnaryExpressionNode* node, void* data) override;
+//  void Visit(BinaryExpressionNode* node, void* data) override;
+//  void Visit(VariableNode* node, void* data) override;
+//  void Visit(AssignmentNode* node, void* data) override;
+//  void Visit(VarDeclareNode* node, void* data) override;
+//  void Visit(DotAccessorNode* node, void* data) override;
+//  void Visit(ExpressionListNode* node, void* data) override;
+//  void Visit(FunctionCallNode* node, void* data) override;
+//  void Visit(ForNode* node, void* data) override;
+//  void Visit(IfElseNode* node, void* data) override;
+//  void Visit(FunctionNode* node, void* data) override;
+//  void Visit(BlockNode* node, void* data) override;
 
  private:
   template <class T>
