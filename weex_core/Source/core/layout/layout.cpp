@@ -467,6 +467,11 @@ namespace WeexCore {
       if (isMainAxisHorizontal(this)) {
         child->setWidthMeasureMode(kExactly);
         child->setLayoutWidth(childMainSize);
+        //TODO Fix https://jsplayground.taobao.org/raxplayground/97efee70-775f-45a6-b07d-d84c8d1b4387
+        //TODO This is just a temporary fix, we need to make things beauty and clean.
+        if(child->heightMeasureMode == kUnspecified && child->measureFunc != nullptr && child->getChildCount() == 0){
+          child->setLayoutHeight(NAN);
+        }
       } else {
         child->setHeightMeasureMode(kExactly);
         child->setLayoutHeight(childMainSize);
