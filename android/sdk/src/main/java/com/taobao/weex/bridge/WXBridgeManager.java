@@ -293,12 +293,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         } catch (Throwable e) {
           //Ignore, It will throw Exception on Release environment
         }
-        WXServiceManager.execAllCacheJsService();
       } else {
         WXLogUtils.e("WXBridgeManager", "WXEnvironment.sApplication is null, skip init Inspector");
         WXLogUtils.w("WXBridgeManager", new Throwable("WXEnvironment.sApplication is null when init Inspector"));
       }
     }
+    WXServiceManager.execAllCacheJsService();
     if (remoteDebug && mWxDebugProxy != null) {
       mWXBridge = mWxDebugProxy.getWXBridge();
     } else {
