@@ -36,6 +36,9 @@ void VariableNode::Accept(Visitor* node, void* data) {
 void AssignmentNode::Accept(Visitor* node, void* data) {
   node->Visit(this, data);
 }
+void VarDeclareNode::Accept(Visitor* node, void* data) {
+  node->Visit(this, data);
+}
 void DotAccessorNode::Accept(Visitor* node, void* data) {
   node->Visit(this, data);
 }
@@ -47,6 +50,7 @@ void FunctionCallNode::Accept(Visitor* node, void* data) {
 }
 void ForNode::Accept(Visitor* node, void* data) { node->Visit(this, data); }
 void IfElseNode::Accept(Visitor* node, void* data) { node->Visit(this, data); }
+void FunctionNode::Accept(Visitor* node, void* data) { node->Visit(this, data); }
 void BlockNode::Accept(Visitor* node, void* data) { node->Visit(this, data); }
 void ChunkNode::Accept(Visitor* node, void* data) { node->Visit(this, data); }
 }  // namespace data_render

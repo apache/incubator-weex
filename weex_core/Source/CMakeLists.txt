@@ -59,6 +59,7 @@ set(COMMON_SRCS
    ./core/data_render/code_generator.cc
    ./core/data_render/exec_state.cc
    ./core/data_render/vm.cc
+   ./core/data_render/string_table.cc
    ./core/data_render/vnode/vnode.cc
    ./core/data_render/vnode/vnode_render_manager.cc
         )

@@ -21,6 +21,7 @@
 #define WEEX_PROJECT_CONTEXT_H
 
 #include <cmath>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -31,33 +32,65 @@ namespace core {
 namespace data_render {
 
 class VM;
+class Frame;
+class Value;
+class ExecState;
+class FuncState;
+
+typedef Value (*CFunction)(ExecState*);
 
 struct Value {
   union {
     int i;
     double n;
     bool b;
+    FuncState* f;
+    void* cf;
   };
 
-  enum Type { Nil, Integer, Number, Boolean };
+  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC };
 
   Type type;
 
-  Value(int value) : i(value), type(Integer) {}
-  Value(double value) : n(value), type(Number) {}
-  Value(bool value) : b(value), type(Boolean) {}
+  Value() : type(NIL) {}
+  Value(int value) : i(value), type(INT) {}
+  Value(double value) : n(value), type(NUMBER) {}
+  Value(bool value) : b(value), type(BOOL) {}
+  Value(const Value& value) {
+    type = value.type;
+    switch (type) {
+      case NUMBER:
+        n = value.n;
+        break;
+      case BOOL:
+        b = value.b;
+        break;
+      case FUNC:
+        f = value.f;
+        break;
+      case CFUNC:
+        cf = value.cf;
+        break;
+      default:
+        break;
+    }
+  }
 
   friend bool operator==(const Value& left, const Value& right) {
     if (left.type != right.type) return false;
     switch (left.type) {
-      case Nil:
+      case NIL:
         return true;
-      case Integer:
+      case INT:
         return left.i == right.i;
-      case Number:
+      case NUMBER:
         return fabs(left.n - right.n) < 0.000001;
-      case Boolean:
+      case BOOL:
         return left.b == right.b;
+      case FUNC:
+        return left.f == right.f;
+      case CFUNC:
+        return left.cf == right.cf;
       default:
         break;
     }
@@ -65,23 +98,9 @@ struct Value {
   }
 };
 
-struct UpvalDesc {
-  std::string name_;
-  long register_id_;
-  bool in_parent_stack_;
-
-  UpvalDesc(const std::string& name, long register_id, bool in_parent_stack)
-      : name_(name),
-        register_id_(register_id),
-        in_parent_stack_(in_parent_stack) {}
-};
-
-class BlockState {
+class FuncState {
  public:
-  BlockState() : instructions_(), constants_(), next_(nullptr), pre_(nullptr) {}
-  ~BlockState() {}
-
-  void AddInstruction(Instruction i) { instructions_.push_back(i); }
+  FuncState() : instructions_(), constants_(), children_() {}
 
   int AddConstant(Value value) {
     for (auto i = 0; i != constants_.size(); ++i) {
@@ -93,53 +112,66 @@ class BlockState {
     return constants_.size() - 1;
   }
 
-  void set_next(BlockState* block) { next_ = block; }
-
-  BlockState* next() { return next_.get(); }
+  inline Value* GetConstant(int index) { return &constants_[index]; }
+  inline size_t AddInstruction(Instruction i) {
+    instructions_.push_back(i);
+    return instructions_.size() - 1;
+  }
+  inline std::vector<Instruction>& instructions() { return instructions_; }
+  inline void AddChild(FuncState* func) {
+    children_.push_back(std::unique_ptr<FuncState>(func));
+  }
+  inline std::vector<std::unique_ptr<FuncState>>& children() {
+    return children_;
+  }
 
  private:
   std::vector<Instruction> instructions_;
   std::vector<Value> constants_;
-  std::unique_ptr<BlockState> next_;
-  BlockState* pre_;
-};
-
-// TODO
-class FuncState {
- public:
-  FuncState() : upvalues_() {}
-
- private:
-  std::vector<UpvalDesc> upvalues_;
+  std::vector<std::unique_ptr<FuncState>> children_;
 };
 
 class ExecStack {
  public:
-  ExecStack() : stack_() {}
-  Value& top() { return stack_[0]; }
-  Value& base() { return stack_[0]; }
+  ExecStack() : stack_(512) {}
+  Value** top() { return &top_; }
+  Value* base() { return &stack_[0]; }
 
  private:
   std::vector<Value> stack_;
+  Value* top_;
 };
 
 class Global {
  public:
-  int IndexOf(const std::string&) { return 0; }
+  Value* Find(int index);
+  int IndexOf(const std::string& name);
+  int Add(const std::string& name, Value value);
+
+ private:
+  std::map<std::string, int> map_;
+  std::vector<Value> values_;
 };
 
 class ExecState {
  public:
+  ExecState(VM* vm);
+  ~ExecState();
   void Compile(const std::string& source);
   void Execute();
+  void CallFunction(Value* func, size_t argc, Value* ret);
 
-  Global* global() { return global_.get(); }
-  ExecStack* stack() { return stack_.get(); }
+  size_t GetArgumentCount();
+  Value* GetArgument(int index);
+
+  inline Global* global() { return global_.get(); }
+  inline ExecStack* stack() { return stack_.get(); }
 
  private:
+  std::vector<Frame> frames_;
   std::unique_ptr<ExecStack> stack_;
   friend class CodeGenerator;
-  std::unique_ptr<BlockState> block_state_;
+  std::unique_ptr<FuncState> func_state_;
   std::unique_ptr<Global> global_;
   VM* vm_;
 };

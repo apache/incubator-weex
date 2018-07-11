@@ -24,14 +24,12 @@ namespace core {
 namespace data_render {
 
 enum OpCode {
-  OP_MOVE,      //	A B	    R(A) = R(B)
+  OP_MOVE,       //	A B	    R(A) = R(B)
   OP_LOADK,      //	A sBx	R(A) = sBx
-  OP_LOADNULL,  //	A       R(A) = null
+  OP_LOADNULL,   //	A       R(A) = null
   OP_GETGLOBAL,  //	A B	    R(A) = Global[B]
-  OP_GETUPVAL,  //	A B	    R(A) = UpValue[B]
-  OP_SETUPVAL,  //	A B	    UpValue[B] = R(A)
-  OP_GETTABLE,  //	A B C	R(A) = R(B)[R(C)]
-  OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)
+  OP_GETTABLE,   //	A B C	R(A) = R(B)[R(C)]
+  OP_SETTABLE,   //	A B C	R(A)[R(B)] = RK(C)
 
   OP_ADD,   //	A B C	R(A) = R(B) + R(C)
   OP_SUB,   //	A B C	R(A) = R(B) - R(C)
@@ -48,12 +46,16 @@ enum OpCode {
   OP_UNM,   //	A B	    R(A) = -R(B)
   OP_BNOT,  //	A B	    R(A) = ~R(B)
 
-  OP_JMP,   //	A B C	if (R(A)) pc += R(B) else pc += R(C)
-  OP_EQ,    //	A B C	R(A) = R(B) == R(C)
-  OP_LT,    //	A B C	R(A) = R(A) <  R(B)
-  OP_LE,    //	A B C	R(A) = R(A) <= R(B)
+  OP_JMP,  //	A B C	if (R(A)) pc += R(B) else pc += R(C)
+  OP_EQ,   //	A B C	R(A) = R(B) == R(C)
+  OP_LT,   //	A B C	R(A) = R(A) <  R(B)
+  OP_LE,   //	A B C	R(A) = R(A) <= R(B)
 
-  OP_CALL,  //	A B C	R(C) = R(A)(R(A+1), ... ,R(A+B-1))
+  OP_CALL,     //	A B C	R(A) = R(B)(R(B+1), ... ,R(B+C-1))
+  OP_RETURN0,  //	Return
+  OP_RETURN1,  //	Return R(A)
+
+  OP_INVALID
 
 };
 
@@ -69,14 +71,16 @@ typedef unsigned long Instruction;
 #define POS_B (POS_A + SIZE_A)
 #define POS_C (POS_B + SIZE_B)
 
-#define CREATE_ABC(op_code, a, b, c)                             \
-  ((Instruction)op_code << POS_OP) | ((Instruction)a << POS_A) | \
-   ((Instruction)b << POS_B) | ((Instruction)c << POS_C)
+#define CREATE_ABC(op_code, a, b, c)                                   \
+  a < 0 || b < 0 || c < 0                                              \
+      ? ((Instruction)OP_INVALID << POS_OP)                               \
+      : ((Instruction)op_code << POS_OP) | ((Instruction)a << POS_A) | \
+            ((Instruction)b << POS_B) | ((Instruction)c << POS_C)
 
-#define GET_OP_CODE(i) (OpCode)(((i) >> POS_OP) & SIZE_OP)
-#define GET_ARG_A(i) (OpCode)(((i) >> POS_A) & SIZE_A)
-#define GET_ARG_B(i) (OpCode)(((i) >> POS_B) & SIZE_B)
-#define GET_ARG_C(i) (OpCode)(((i) >> POS_C) & SIZE_C)
+#define GET_OP_CODE(i) (OpCode)(((i) >> POS_OP) & 0xFF)
+#define GET_ARG_A(i) (long)(((i) >> POS_A) & 0xFF)
+#define GET_ARG_B(i) (long)(((i) >> POS_B) & 0xFF)
+#define GET_ARG_C(i) (long)(((i) >> POS_C) & 0xFF)
 
 }  // namespace data_render
 }  // namespace core

@@ -21,91 +21,132 @@
 #define CORE_DATA_RENDER_CODE_GENERATOR_H_
 
 #include <unordered_map>
+#include "base/common.h"
 #include "core/data_render/ast.h"
 #include "core/data_render/op_code.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-class BlockState;
+class FuncState;
 class ExecState;
 class CodeGenerator : public Visitor {
  public:
-  CodeGenerator() : exec_state_(nullptr), current_block_(nullptr) {}
+  CodeGenerator(ExecState* exec_state)
+      : exec_state_(exec_state), cur_block_(nullptr) {}
   ~CodeGenerator() {}
   void Visit(ConstantNode* node, void* data) override;
   void Visit(UnaryExpressionNode* node, void* data) override;
   void Visit(BinaryExpressionNode* node, void* data) override;
   void Visit(VariableNode* node, void* data) override;
   void Visit(AssignmentNode* node, void* data) override;
+  void Visit(VarDeclareNode* node, void* data) override;
   void Visit(DotAccessorNode* node, void* data) override;
   void Visit(ExpressionListNode* node, void* data) override;
   void Visit(FunctionCallNode* node, void* data) override;
   void Visit(ForNode* node, void* data) override;
   void Visit(IfElseNode* node, void* data) override;
+  void Visit(FunctionNode* node, void* data) override;
   void Visit(BlockNode* node, void* data) override;
   void Visit(ChunkNode* node, void* data) override;
 
  private:
-  class BlockCnt {
+  template <class T>
+  class Node {
    public:
-    BlockCnt()
-        : block_state_(nullptr), upvalue_(), pre_(), idx_(0), is_loop_(false) {}
+    Node() : parent_(nullptr) {}
+    virtual ~Node() {}
+    inline T* parent() { return parent_; }
+    inline void set_parent(T* t) { parent_ = t; }
+
+   private:
+    T* parent_;
+  };
+
+  class FuncCnt : public Node<FuncCnt> {
+   public:
+    FuncCnt() {}
+    ~FuncCnt() {}
+    inline std::unordered_map<std::string, long>& upvalue() { return upvalue_; }
+    inline void set_func_state(FuncState* func_state) {
+      func_state_ = func_state;
+    }
+    inline FuncState* func_state() { return func_state_; }
+
+   private:
+    FuncState* func_state_;
+    std::unordered_map<std::string, long> upvalue_;
+  };
+
+  class BlockCnt : public Node<BlockCnt> {
+   public:
+    BlockCnt() : variables_(), idx_(0), is_loop_(false) {}
+    ~BlockCnt() {}
 
     inline long NextRegisterId() { return idx_++; }
 
     inline long FindRegisterId(const std::string& name) {
-      auto iter = upvalue_.find(name);
-      if (iter != upvalue_.end()) {
+      auto iter = variables_.find(name);
+      if (iter != variables_.end()) {
         return iter->second;
       }
-      if (pre_ != nullptr) {
-        return pre_->FindRegisterId(name);
+      if (parent() != nullptr) {
+        return parent()->FindRegisterId(name);
       }
       return -1;
     }
 
-    inline void set_block_state(BlockState* block_state) {
-      block_state_ = block_state;
+    inline std::unordered_map<std::string, long>& variables() {
+      return variables_;
     }
-    inline BlockState* block_state() { return block_state_; }
-    inline std::unordered_map<std::string, long>& upvalue() { return upvalue_; }
-    inline BlockCnt* pre() { return pre_; }
-    inline void set_pre(BlockCnt* pre) { pre_ = pre; }
     inline void set_idx(int idx) { idx_ = idx; }
     inline int idx() { return idx_; }
     inline bool is_loop() { return is_loop_; }
 
    private:
-    BlockState* block_state_;
-    std::unordered_map<std::string, long> upvalue_;
-    BlockCnt* pre_;
+    std::unordered_map<std::string, long> variables_;
     int idx_;
     bool is_loop_;
   };
-  class RegisterIdScope {
-   public:
-    RegisterIdScope(BlockCnt* block) : block_(block), save_(block->idx()) {}
 
-    ~RegisterIdScope() { block_->set_idx(save_); }
+  class RegisterScope {
+   public:
+    RegisterScope(BlockCnt* block) : stored_idx_(block->idx()), block_(block) {}
+    ~RegisterScope() { block_->set_idx(stored_idx_); }
 
    private:
+    long stored_idx_;
     BlockCnt* block_;
-    int save_;
+    DISALLOW_COPY_AND_ASSIGN(RegisterScope);
   };
+
   class BlockScope {
    public:
     BlockScope(CodeGenerator* cg) : cg_(cg) { cg_->EnterBlock(); }
-
     ~BlockScope() { cg_->LeaveBlock(); }
 
    private:
     CodeGenerator* cg_;
+    DISALLOW_COPY_AND_ASSIGN(BlockScope);
   };
+
+  class FuncScope {
+   public:
+    FuncScope(CodeGenerator* cg) : cg_(cg) { cg_->EnterFunction(); }
+    ~FuncScope() { cg_->LeaveFunction(); }
+
+   private:
+    CodeGenerator* cg_;
+    DISALLOW_COPY_AND_ASSIGN(FuncScope);
+  };
+
+  void EnterFunction();
+  void LeaveFunction();
   void EnterBlock();
   void LeaveBlock();
   ExecState* exec_state_;
-  std::unique_ptr<BlockCnt> current_block_;
+  std::unique_ptr<FuncCnt> cur_func_;
+  std::unique_ptr<BlockCnt> cur_block_;
 };
 }  // namespace data_render
 }  // namespace core

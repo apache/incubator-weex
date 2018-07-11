@@ -18,18 +18,106 @@
  */
 
 #include "core/data_render/exec_state.h"
+#include "core/data_render/code_generator.h"
 #include "core/data_render/vm.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
 
-void ExecState::Compile(const std::string& source) {
+Value* Global::Find(int index) {
+  if (index >= values_.size() || index < 0) {
+    return nullptr;
+  }
+  return &values_[index];
+}
 
+int Global::IndexOf(const std::string& name) {
+  auto iter = map_.find(name);
+  if (iter != map_.end()) {
+    return iter->second;
+  }
+  return -1;
+}
+
+int Global::Add(const std::string& name, Value value) {
+  auto iter = map_.find(name);
+  if (iter != map_.end()) {
+    return iter->second;
+  }
+  values_.push_back(value);
+  int index = values_.size() - 1;
+  map_.insert(std::make_pair(name, index));
+  return index;
+}
+
+ExecState::ExecState(VM* vm)
+    : frames_(),
+      stack_(new ExecStack),
+      func_state_(nullptr),
+      global_(new Global),
+      vm_(vm) {}
+
+ExecState::~ExecState() {}
+
+void ExecState::Compile(const std::string& source) {
+  CodeGenerator generator(this);
+  Token token(0, 0);
+  ChunkNode* chunk = new ChunkNode(token);
+  ConstantNode* node = new NumberNode(token, 101);
+  AssignmentNode* assignment =
+      new AssignmentNode(token, Token::Type::ASSIGN, node);
+  VarDeclareNode* declareNode = new VarDeclareNode(token, "aa", assignment);
+
+  VariableNode* funcName = new VariableNode(token, "log");
+  VariableNode* aaNode = new VariableNode(token, "aa");
+  ExpressionListNode* argsList = new ExpressionListNode(token);
+  argsList->expressions().push_back(std::unique_ptr<ExpressionNode>(aaNode));
+  FunctionCallNode* functionCallNode =
+      new FunctionCallNode(token, funcName, argsList);
+  FunctionNode* functionNode = new FunctionNode(token, functionCallNode);
+  chunk->statements().push_back(std::unique_ptr<StatementNode>(declareNode));
+  chunk->statements().push_back(std::unique_ptr<StatementNode>(functionNode));
+  generator.Visit(chunk, nullptr);
 }
 
 void ExecState::Execute() {
-    vm_->CallFrame(this);
+  Value chunk;
+  chunk.type = Value::Type::FUNC;
+  chunk.f = func_state_.get();
+  *stack_->base() = chunk;
+  CallFunction(stack_->base(), 0, nullptr);
+}
+
+void ExecState::CallFunction(Value* func, size_t argc, Value* ret) {
+  if (func->type == Value::Type::CFUNC) {
+    Frame frame;
+    *stack_->top() = func + argc;
+    frame.reg = func;
+    frames_.push_back(frame);
+    auto result = reinterpret_cast<CFunction>(func->cf)(this);
+    if (ret != nullptr) {
+      *ret = result;
+    }
+    frames_.pop_back();
+  } else {
+    Frame frame;
+    frame.func = func;
+    frame.reg = func;
+    frame.pc = &(*func->f->instructions().begin());
+    frame.end = &(*func->f->instructions().end());
+    frames_.push_back(frame);
+    vm_->RunFrame(this, frame);
+    frames_.pop_back();
+  }
+}
+
+size_t ExecState::GetArgumentCount() {
+  return *stack_->top() - frames_.back().reg;
+}
+
+Value* ExecState::GetArgument(int index) {
+  return frames_.back().reg + index + 1;
 }
 
 }  // namespace data_render

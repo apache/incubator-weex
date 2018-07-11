@@ -170,28 +170,37 @@ class VariableNode : public ExpressionNode {
 
 class AssignmentNode : public ExpressionNode {
  public:
-  AssignmentNode(const Token& token, const std::string& identifier)
-      : ExpressionNode(token), identifier_(identifier) {}
+  AssignmentNode(const Token& token, Token::Type assignment,
+                 ExpressionNode* expression)
+      : ExpressionNode(token),
+        assignment_(assignment),
+        expression_(expression) {}
   virtual void Accept(Visitor* visitor, void* data);
-  inline void set_expression(ASTNode* expression) {
+  inline void set_expression(ExpressionNode* expression) {
     expression_.reset(expression);
   }
-  inline Token::Type assginment() { return token().type(); }
-  inline ASTNode* expression() { return expression_.get(); }
-  inline std::string& identifier() { return identifier_; }
+  inline Token::Type assignment() { return assignment_; }
+  inline ExpressionNode* expression() { return expression_.get(); }
 
  private:
-  std::unique_ptr<ASTNode> expression_;
-  std::string identifier_;
+  std::unique_ptr<ExpressionNode> expression_;
+  Token::Type assignment_;
 };
 
-// TODO
-class VarDeclareNode : public ExpressionNode {
+class VarDeclareNode : public StatementNode {
  public:
-  VarDeclareNode(const Token& token, const std::string& identifier)
-      : ExpressionNode(token) {}
-private:
-    std::string identifier_;
+  VarDeclareNode(const Token& token, const std::string& identifier,
+                 ExpressionNode* expression)
+      : StatementNode(token),
+        identifier_(identifier),
+        expression_(expression) {}
+  virtual void Accept(Visitor* visitor, void* data);
+  inline std::string& identifier() { return identifier_; }
+  inline ASTNode* expression() { return expression_.get(); }
+
+ private:
+  std::unique_ptr<ExpressionNode> expression_;
+  std::string identifier_;
 };
 
 class DotAccessorNode : public ExpressionNode {
@@ -221,7 +230,8 @@ class PropertyNode : public ExpressionNode {
 
 class ExpressionListNode : public ExpressionNode {
  public:
-  ExpressionListNode(const Token& token) : ExpressionNode(token) {}
+  ExpressionListNode(const Token& token)
+      : ExpressionNode(token), expressions_() {}
   virtual void Accept(Visitor* visitor, void* data);
   inline std::vector<std::unique_ptr<ExpressionNode>>& expressions() {
     return expressions_;
@@ -309,9 +319,20 @@ class IfElseNode : public StatementNode {
   std::unique_ptr<StatementNode> else_block_;
 };
 
+class FunctionNode : public StatementNode {
+ public:
+  FunctionNode(const Token& token, FunctionCallNode* func)
+      : StatementNode(token), func_(func) {}
+  virtual void Accept(Visitor* visitor, void* data);
+  inline FunctionCallNode* func() { return func_.get(); }
+
+ private:
+  std::unique_ptr<FunctionCallNode> func_;
+};
+
 class BlockNode : public StatementNode {
  public:
-  BlockNode(const Token& token) : StatementNode(token) {}
+  BlockNode(const Token& token) : StatementNode(token), statements_() {}
   virtual void Accept(Visitor* visitor, void* data);
   bool IsBlock() const { return true; }
   std::vector<std::unique_ptr<StatementNode>>& statements() {
@@ -322,14 +343,10 @@ class BlockNode : public StatementNode {
   std::vector<std::unique_ptr<StatementNode>> statements_;
 };
 
-class ChunkNode : public StatementNode {
+class ChunkNode : public BlockNode {
  public:
-  ChunkNode(const Token& token) : StatementNode(token) {}
-  std::unique_ptr<BlockNode>& block() { return block_; }
+  ChunkNode(const Token& token) : BlockNode(token) {}
   virtual void Accept(Visitor* visitor, void* data);
-
- private:
-  std::unique_ptr<BlockNode> block_;
 };
 
 class Visitor {
@@ -339,11 +356,13 @@ class Visitor {
   virtual void Visit(BinaryExpressionNode* node, void* data) = 0;
   virtual void Visit(VariableNode* node, void* data) = 0;
   virtual void Visit(AssignmentNode* node, void* data) = 0;
+  virtual void Visit(VarDeclareNode* node, void* data) = 0;
   virtual void Visit(DotAccessorNode* node, void* data) = 0;
   virtual void Visit(ExpressionListNode* node, void* data) = 0;
   virtual void Visit(FunctionCallNode* node, void* data) = 0;
   virtual void Visit(ForNode* node, void* data) = 0;
   virtual void Visit(IfElseNode* node, void* data) = 0;
+  virtual void Visit(FunctionNode* node, void* data) = 0;
   virtual void Visit(BlockNode* node, void* data) = 0;
   virtual void Visit(ChunkNode* node, void* data) = 0;
 };

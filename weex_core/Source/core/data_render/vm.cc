@@ -17,13 +17,59 @@
  * under the License.
  */
 #include "core/data_render/vm.h"
+#include "core/data_render/exec_state.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
 
-void VM::CallFrame(ExecState* exec_state) {
-
+void VM::RunFrame(ExecState* exec_state, Frame frame) {
+  Value* a = nullptr;
+  Value* b = nullptr;
+  Value* c = nullptr;
+  auto pc = frame.pc;
+  while (pc != frame.end) {
+    Instruction instruction = *pc++;
+    switch (GET_OP_CODE(instruction)) {
+      case OP_MOVE:
+        a = frame.reg + GET_ARG_A(instruction);
+        b = frame.reg + GET_ARG_B(instruction);
+        *a = *b;
+        break;
+      case OP_LOADNULL:
+        a = frame.reg + GET_ARG_A(instruction);
+        a->type = Value::Type::NIL;
+        break;
+      case OP_LOADK:
+        a = frame.reg + GET_ARG_A(instruction);
+        b = frame.func->f->GetConstant(GET_ARG_B(instruction));
+        *a = *b;
+        break;
+      case OP_GETGLOBAL:
+        a = frame.reg + GET_ARG_A(instruction);
+        b = exec_state->global()->Find(GET_ARG_B(instruction));
+        *a = *b;
+        break;
+      case OP_ADD:
+        break;
+      case OP_SUB:
+        break;
+      case OP_MUL:
+        break;
+      case OP_MOD:
+        break;
+      case OP_POW:
+        break;
+      case OP_CALL: {
+        a = frame.reg + GET_ARG_A(instruction);
+        size_t argc = GET_ARG_B(instruction);
+        c = frame.reg + GET_ARG_C(instruction);
+        exec_state->CallFunction(c, argc, a);
+      } break;
+      default:
+        break;
+    }
+  }
 }
 
 }  // namespace data_render

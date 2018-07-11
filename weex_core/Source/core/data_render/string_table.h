@@ -17,34 +17,16 @@
  * under the License.
  */
 
-#ifndef CORE_DATA_RENDER_VM_H
-#define CORE_DATA_RENDER_VM_H
-
-#include "core/data_render/op_code.h"
+#ifndef CORE_DATA_RENDER_STRING_TABLE_H
+#define CORE_DATA_RENDER_STRING_TABLE_H
 
 namespace weex {
 namespace core {
 namespace data_render {
-class ExecState;
-class FuncState;
-class Value;
-
-struct Frame {
-  Value* reg;
-  Value* ret;
-  Value* func;
-  const Instruction* pc;
-  const Instruction* end;
-};
-
-class VM {
- public:
-  VM() {}
-  ~VM() {}
-  void RunFrame(ExecState* exec_state, Frame frame);
-};
+class String {};
+class StringTable {};
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
 
-#endif  // CORE_DATA_RENDER_VM_H
+#endif  // CORE_DATA_RENDER_STRING_TABLE_H
