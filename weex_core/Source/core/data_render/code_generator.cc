@@ -19,6 +19,7 @@
 
 #include "core/data_render/code_generator.h"
 #include "core/data_render/exec_state.h"
+#include "core/data_render/string_table.h"
 
 namespace weex {
 namespace core {
@@ -68,6 +69,12 @@ void CodeGenerator::Visit(ConstantNode* node, void* data) {
       func_state->AddInstruction(i);
     } else if (node->IsUndefined() || node->IsNull()) {
       Instruction i = CREATE_ABC(OpCode::OP_LOADNULL, reg, 0, 0);
+      func_state->AddInstruction(i);
+    } else if (node->IsString()) {
+      auto value = exec_state_->string_table_->StringFromUTF8(
+          static_cast<StringNode*>(node)->value());
+      int index = func_state->AddConstant(std::move(value));
+      Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
       func_state->AddInstruction(i);
     }
   }

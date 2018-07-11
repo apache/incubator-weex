@@ -36,6 +36,8 @@ class Frame;
 class Value;
 class ExecState;
 class FuncState;
+class String;
+class StringTable;
 
 typedef Value (*CFunction)(ExecState*);
 
@@ -46,9 +48,10 @@ struct Value {
     bool b;
     FuncState* f;
     void* cf;
+    String* str;
   };
 
-  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC };
+  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING };
 
   Type type;
 
@@ -56,6 +59,7 @@ struct Value {
   Value(int value) : i(value), type(INT) {}
   Value(double value) : n(value), type(NUMBER) {}
   Value(bool value) : b(value), type(BOOL) {}
+  Value(String* value) : str(value), type(STRING) {}
   Value(const Value& value) {
     type = value.type;
     switch (type) {
@@ -64,6 +68,9 @@ struct Value {
         break;
       case BOOL:
         b = value.b;
+        break;
+      case STRING:
+        str = value.str;
         break;
       case FUNC:
         f = value.f;
@@ -87,6 +94,8 @@ struct Value {
         return fabs(left.n - right.n) < 0.000001;
       case BOOL:
         return left.b == right.b;
+      case STRING:
+        return left.str == right.str;
       case FUNC:
         return left.f == right.f;
       case CFUNC:
@@ -166,6 +175,7 @@ class ExecState {
 
   inline Global* global() { return global_.get(); }
   inline ExecStack* stack() { return stack_.get(); }
+  inline StringTable* string_table() { return string_table_.get(); }
 
  private:
   std::vector<Frame> frames_;
@@ -173,6 +183,7 @@ class ExecState {
   friend class CodeGenerator;
   std::unique_ptr<FuncState> func_state_;
   std::unique_ptr<Global> global_;
+  std::unique_ptr<StringTable> string_table_;
   VM* vm_;
 };
 }  // namespace data_render

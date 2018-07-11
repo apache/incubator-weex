@@ -103,7 +103,7 @@ class StringNode : public ConstantNode {
  public:
   StringNode(const Token& token, const std::string& value)
       : ConstantNode(token), value_(value) {}
-  inline std::string value() { return value_; }
+  inline std::string& value() { return value_; }
   bool IsString() const { return true; }
 
  private:
