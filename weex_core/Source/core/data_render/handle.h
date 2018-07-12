@@ -140,7 +140,7 @@ public:
   template <class B>
   inline operator Ref<B>() {
       // typename std::enable_if<std::is_base_of<B, T>::value>::type;
-      return Ref<B>(dynamic_cast<B*>(ptr_));
+      return Ref<B>(reinterpret_cast<B*>(ptr_));
     }
 
 private:

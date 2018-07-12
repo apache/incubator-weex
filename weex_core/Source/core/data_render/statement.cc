@@ -125,25 +125,26 @@ void ChunkStatement::Pasing(Json &json) {
         }
         Json childs = json["childNodes"];
         if (childs.is_array() && childs.array_items().size() > 0) {
-            Handle<ExpressionList> list = factory->NewExpressionList();
+//            Handle<ExpressionList> list = factory->NewExpressionList();
             for (int i = 0;i < childs.array_items().size(); i++) {
                 Json child = childs[i];
                 if (child.is_null() || !child.is_object()) {
                     continue;
                 }
                 Handle<Expression> block = factory->NewChildBlockStatement(child, factory->NewExpressionList(), nodeId.string_value());
-                list->Insert(block);
+//                list->Insert(block);
+                PushExpression(block);
             }
-            if (controlExpr) {
-                if (controlExpr->IsForStatement()) {
-                    Handle<ForStatement> forExpr = controlExpr;
-                    Handle<BlockStatement> forBlock = forExpr->body();
-                    forBlock->PushExpression(list);
-                }
-            }
-            else {
-                PushExpression(list);
-            }
+//            if (controlExpr) {
+//                if (controlExpr->IsForStatement()) {
+//                    Handle<ForStatement> forExpr = controlExpr;
+//                    Handle<BlockStatement> forBlock = forExpr->body();
+//                    forBlock->PushExpression(list);
+//                }
+//            }
+//            else {
+//                PushExpression(list);
+//            }
         }
         
     } while (0);
@@ -205,6 +206,20 @@ void ChildBlockStatement::Pasing(Json &json) {
         }
         Json attributes = json["attributes"];
         if (attributes.is_object()) {
+            auto items = attributes.object_items();
+            for (auto it = items.begin(); it != items.end(); ++it) {
+                const auto& key = it->first;
+                const auto& value = it->second.string_value();//todo support expression
+                std::vector<Handle<Expression>> args;
+                args.push_back(factory->NewStringLiteral(json,nodeId.string_value()));
+                args.push_back(factory->NewStringLiteral(json,key));
+                args.push_back(factory->NewStringLiteral(json,value));
+
+                Handle<Expression> setAttrFunc = factory->NewIdentifier(json, "setAttr");
+                Handle<CallExpression> callFunc = factory->NewCallExpression(
+                    json,setAttrFunc,args);
+                PushExpression(callFunc);
+            }
             std::string error;
             Handle<Expression> attr = Parser::parseExpression(attributes, error);
             if (controlExpr) {

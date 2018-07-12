@@ -87,7 +87,8 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
   argc = stms->args().size();
   for (auto it = stms->args().begin(); it != stms->args().end(); ++it) {
     auto temp = (*it).get();
-    temp->Accept(this, nullptr);
+    long arg = cur_block_->NextRegisterId();
+    temp->Accept(this, &arg);
   }
 
   FuncState *state = cur_func_->func_state();

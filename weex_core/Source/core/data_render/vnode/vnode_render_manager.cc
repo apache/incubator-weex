@@ -177,6 +177,19 @@ static Value AppendChild(ExecState* exec_state) {//appendChild("parent_id","id")
   return Value();
 }
 
+static Value SetAttr(ExecState* exec_state) {//setAttr("id","key","value");
+  VNode* node = exec_state->find_node(exec_state->GetArgument(0)->str->c_str());
+  char* key = exec_state->GetArgument(1)->str->c_str();
+  char* value = exec_state->GetArgument(2)->str->c_str();
+
+  if (node == nullptr) {
+    return Value();
+  }
+
+  node->SetAttribute(key,value);
+  return Value();
+}
+
 void RegisterCFunc(ExecState* state, const std::string& name, CFunction function) {
   Value func;
   func.type = Value::Type::CFUNC;
@@ -186,7 +199,7 @@ void RegisterCFunc(ExecState* state, const std::string& name, CFunction function
 
 void VNodeRenderManager::InitVM() {
   if (g_vm_ == nullptr) {
-    VM* vm = new VM();
+    g_vm_ = new VM();
   }
 }
 void VNodeRenderManager::TestProcess(const std::string& input, const std::string& page_id) {
@@ -196,6 +209,7 @@ void VNodeRenderManager::TestProcess(const std::string& input, const std::string
   RegisterCFunc(execState, "log", Log);
   RegisterCFunc(execState, "createElement", CreateElement);
   RegisterCFunc(execState, "appendChild", AppendChild);
+  RegisterCFunc(execState, "setAttr", SetAttr);
 
   execState->page_id(page_id);
   execState->Compile(input);
