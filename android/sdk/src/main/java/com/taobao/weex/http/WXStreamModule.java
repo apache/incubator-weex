@@ -330,7 +330,6 @@ public class WXStreamModule extends WXModule {
             simpleHeaders.put(entry.getKey() == null ? "_" : entry.getKey(), entry.getValue().get(0));
           else {
             simpleHeaders.put(entry.getKey() == null ? "_" : entry.getKey(), entry.getValue().toString());
-
           }
         }
       }
