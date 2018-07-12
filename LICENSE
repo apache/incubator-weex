@@ -222,17 +222,8 @@ This product bundles vuejs v1.0.12, which is available under a
 This product bundles Guava v20.0, which is available under a "Apache" license. For details, see https://github.com/google/guava/blob/v20.0/COPYING and following files: 
 android_sdk/src/main/java/org/apache/taobao/weex/utils/WXDataStructureUtil.java
 
-This product bundles flexbox-layout v0.3.0, which is available under a "Apache" license. For details, see https://github.com/google/flexbox-layout/blob/0.3.0/LICENSE and following files:
-weex_core/Source/core/layout.h
-weex_core/Source/core/layout.cpp
-
-This product bundles linux, which is available under a "Apache" license. For details, see https://github.com/torvalds/linux/blob/master/LICENSES/other/Apache-2.0 and following files:
-weex_core/Source/IPC
-
-This product bundles jni_generator, which is available under a "BSD-style" license. For details, see https://github.com/chromium/chromium/blob/master/LICENSE and following files:
+This product bundles chromium, which is available under a "BSD-style" license. For details, see https://github.com/chromium/chromium/blob/master/LICENSE and following files:
 weex_core/Source/android/jniprebuild/jniheader
-weex_core/Source/android/jniprebuild/jni_generator.py
-
-This product bundles modp, which is available under a "BSD-style" license. For details, see http://modp.com/release/base64 and following files:
 weex_core/Source/android/base/base64
+weex_core/Source/android/jniprebuild/jni_generator.py
 
