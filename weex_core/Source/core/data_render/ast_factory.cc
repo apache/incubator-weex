@@ -42,9 +42,9 @@ namespace data_render {
     Handle<Expression> ASTFactory::NewIdentifier(Json &json, std::string name) {
         return MakeHandle<Identifier>(json, name);
     }
-    Handle<Expression> ASTFactory::NewStringLiteral(Json &json, std::string str)
+    Handle<Expression> ASTFactory::NewStringConstant(Json &json, std::string str)
     {
-        return MakeHandle<StringLiteral>(json, str);
+        return MakeHandle<StringConstant>(json, str);
     }
     Handle<Expression> ASTFactory::NewArgumentList(Json &json, Handle<ExpressionList> args)
     {
@@ -82,7 +82,7 @@ namespace data_render {
                         break;
                     }
                     Handle<DeclarationList> forInit = NewDeclarationList(repeat);
-                    forInit->Append(NewDeclaration(repeat, index.string_value(), NewIntegralLiteral(json, 0)));
+                    forInit->Append(NewDeclaration(repeat, index.string_value(), NewIntegralConstant(json, 0)));
                     Json expression = repeat["expression"];
                     if (!expression.is_string()) {
                         break;
@@ -124,8 +124,8 @@ namespace data_render {
     {
         return MakeHandle<BinaryExpression>(json, op, lhs, rhs);
     }
-    Handle<Expression> ASTFactory::NewIntegralLiteral(Json &json, int value) {
-        return MakeHandle<IntegralLiteral>(json, value);
+    Handle<Expression> ASTFactory::NewIntegralConstant(Json &json, int value) {
+        return MakeHandle<IntegralConstant>(json, value);
     }
     Handle<Expression> ASTFactory::NewCallExpression(Json &json, MemberAccessKind kind, Handle<Expression> func, Handle<Expression> args) {
         return MakeHandle<CallExpression>(json, kind, func, args);
@@ -144,9 +144,13 @@ namespace data_render {
     {
         return MakeHandle<ForStatement>(json, kind, init, condition, update, body);
     }
-    Handle<Expression> ASTFactory::NewObjectLiteral(Json &json, ProxyObject obj)
+    Handle<Expression> ASTFactory::NewObjectConstant(Json &json, ProxyObject obj)
     {
-        return MakeHandle<ObjectLiteral>(json, std::move(obj));
+        return MakeHandle<ObjectConstant>(json, std::move(obj));
+    }
+    Handle<Expression> ASTFactory::NewAssignExpression(Json &json, Handle<Expression> lhs, Handle<Expression> rhs)
+    {
+        return MakeHandle<AssignExpression>(json, lhs, rhs);
     }
     
 }  // namespace data_render

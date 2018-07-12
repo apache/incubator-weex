@@ -27,15 +27,15 @@ void BlockStatement::Pasing(Json &json) {
             Handle<Expression> callExpr = nullptr;
             std::vector<Handle<Expression>> args;
             Handle<Expression> func = factory->NewIdentifier(json, "createElement");
-            args.push_back(factory->NewStringLiteral(tagName, tagName.string_value()));
+            args.push_back(factory->NewStringConstant(tagName, tagName.string_value()));
             if (controlExpr && controlExpr->IsForStatement()) {
                 Json repeat = control["repeat"];
                 Json index = repeat["index"];
-                nodeIdExpr = factory->NewBinaryExpression(nodeId, BinaryOperation::kAnd, factory->NewStringLiteral(nodeId, nodeId.string_value() + "_REPEAT_"), factory->NewIdentifier(nodeId, index.string_value()));
+                nodeIdExpr = factory->NewBinaryExpression(nodeId, BinaryOperation::kAnd, factory->NewStringConstant(nodeId, nodeId.string_value() + "_REPEAT_"), factory->NewIdentifier(nodeId, index.string_value()));
                 args.push_back(nodeIdExpr);
             }
             else {
-                nodeIdExpr = factory->NewStringLiteral(nodeId, nodeId.string_value());
+                nodeIdExpr = factory->NewStringConstant(nodeId, nodeId.string_value());
                 args.push_back(nodeIdExpr);
             }
             callExpr = factory->NewCallExpression(json, func, args);
@@ -100,15 +100,15 @@ void ChunkStatement::Pasing(Json &json) {
             Handle<Expression> callExpr = nullptr;
             std::vector<Handle<Expression>> args;
             Handle<Expression> func = factory->NewIdentifier(json, "createElement");
-            args.push_back(factory->NewStringLiteral(tagName, tagName.string_value()));
+            args.push_back(factory->NewStringConstant(tagName, tagName.string_value()));
             if (controlExpr && controlExpr->IsForStatement()) {
                 Json repeat = control["repeat"];
                 Json index = repeat["index"];
-                nodeIdExpr = factory->NewBinaryExpression(nodeId, BinaryOperation::kAnd, factory->NewStringLiteral(nodeId, nodeId.string_value() + "_REPEAT_"), factory->NewIdentifier(nodeId, index.string_value()));
+                nodeIdExpr = factory->NewBinaryExpression(nodeId, BinaryOperation::kAnd, factory->NewStringConstant(nodeId, nodeId.string_value() + "_REPEAT_"), factory->NewIdentifier(nodeId, index.string_value()));
                 args.push_back(nodeIdExpr);
             }
             else {
-                nodeIdExpr = factory->NewStringLiteral(nodeId, nodeId.string_value());
+                nodeIdExpr = factory->NewStringConstant(nodeId, nodeId.string_value());
                 args.push_back(nodeIdExpr);
             }
             callExpr = factory->NewCallExpression(json, func, args);
@@ -175,17 +175,17 @@ void ChildBlockStatement::Pasing(Json &json) {
             std::vector<Handle<Expression>> args,appendArgs;
             Handle<Expression> func = factory->NewIdentifier(json, "createElement");
             Handle<Expression> appendFunc = factory->NewIdentifier(json, "appendChild");
-            args.push_back(factory->NewStringLiteral(tagName, tagName.string_value()));
-            appendArgs.push_back(factory->NewStringLiteral(json, parent_));
+            args.push_back(factory->NewStringConstant(tagName, tagName.string_value()));
+            appendArgs.push_back(factory->NewStringConstant(json, parent_));
             if (controlExpr && controlExpr->IsForStatement()) {
                 Json repeat = control["repeat"];
                 Json index = repeat["index"];
-                nodeIdExpr = factory->NewBinaryExpression(nodeId, BinaryOperation::kAnd, factory->NewStringLiteral(nodeId, nodeId.string_value() + "_REPEAT_"), factory->NewIdentifier(nodeId, index.string_value()));
+                nodeIdExpr = factory->NewBinaryExpression(nodeId, BinaryOperation::kAnd, factory->NewStringConstant(nodeId, nodeId.string_value() + "_REPEAT_"), factory->NewIdentifier(nodeId, index.string_value()));
                 args.push_back(nodeIdExpr);
                 appendArgs.push_back(nodeIdExpr);
             }
             else {
-                nodeIdExpr = factory->NewStringLiteral(nodeId, nodeId.string_value());
+                nodeIdExpr = factory->NewStringConstant(nodeId, nodeId.string_value());
                 args.push_back(nodeIdExpr);
                 appendArgs.push_back(nodeIdExpr);
             }
@@ -211,9 +211,9 @@ void ChildBlockStatement::Pasing(Json &json) {
                 const auto& key = it->first;
                 const auto& value = it->second.string_value();//todo support expression
                 std::vector<Handle<Expression>> args;
-                args.push_back(factory->NewStringLiteral(json,nodeId.string_value()));
-                args.push_back(factory->NewStringLiteral(json,key));
-                args.push_back(factory->NewStringLiteral(json,value));
+                args.push_back(factory->NewStringConstant(json,nodeId.string_value()));
+                args.push_back(factory->NewStringConstant(json,key));
+                args.push_back(factory->NewStringConstant(json,value));
 
                 Handle<Expression> setAttrFunc = factory->NewIdentifier(json, "setAttr");
                 Handle<CallExpression> callFunc = factory->NewCallExpression(

@@ -48,7 +48,7 @@ void CodeGenerator::EnterBlock() {
 
 void CodeGenerator::LeaveBlock() { cur_block_.reset(cur_block_->parent()); }
 
-void CodeGenerator::Visit(StringLiteral *node, void *data) {
+void CodeGenerator::Visit(StringConstant *node, void *data) {
   long reg = data == nullptr ? -1 : *static_cast<long *>(data);
   if (reg >= 0) {
     FuncState *func_state = cur_func_->func_state();
@@ -153,7 +153,7 @@ void CodeGenerator::Visit(Declaration *node, void *data) {
 
 void CodeGenerator::Visit(DeclarationList *node, void *data) {}
 
-void CodeGenerator::Visit(IntegralLiteral *node, void *data) {
+void CodeGenerator::Visit(IntegralConstant *node, void *data) {
   long reg = data == nullptr ? -1 : *static_cast<long *>(data);
   if (reg >= 0) {
     FuncState *func_state = cur_func_->func_state();
@@ -162,6 +162,14 @@ void CodeGenerator::Visit(IntegralLiteral *node, void *data) {
     Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
     func_state->AddInstruction(i);
   }
+}
+
+void CodeGenerator::Visit(ObjectConstant *node, void *data) {
+    
+}
+
+void CodeGenerator::Visit(ArrayConstant *node, void *data) {
+    
 }
 
 void CodeGenerator::Visit(MemberExpression *node, void *data) {}

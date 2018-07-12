@@ -42,19 +42,20 @@ namespace data_render {
         virtual Handle<Expression> NewChildBlockStatement(Json &json, Handle<ExpressionList> list, std::string parent);
         virtual Handle<Expression> NewFunctionPrototype(Json &json, std::string name, std::vector<std::string> args);
         virtual Handle<Expression> NewArgumentList(Json &json, Handle<ExpressionList>);
-        virtual Handle<Expression> NewStringLiteral(Json &json, std::string str);
+        virtual Handle<Expression> NewStringConstant(Json &json, std::string str);
         virtual Handle<Expression> NewControlStatement(Json &json);
         virtual Handle<Expression> NewBinaryExpression(Json &json, BinaryOperation op, Handle<Expression> lhs, Handle<Expression> rhs);
         virtual Handle<Expression> NewDeclaration(Json &json, std::string name, Handle<Expression> init = nullptr);
         virtual Handle<Expression> NewDeclarationList(Json &json, std::vector<Handle<Declaration>> decls);
         virtual Handle<Expression> NewDeclarationList(Json &json);
-        virtual Handle<Expression> NewIntegralLiteral(Json &json, int value);
+        virtual Handle<Expression> NewIntegralConstant(Json &json, int value);
         virtual Handle<Expression> NewCallExpression(Json &json, MemberAccessKind kind, Handle<Expression> func, Handle<Expression> args);
         virtual Handle<Expression> NewCallExpression(Json &json, Handle<Expression>func, std::vector<Handle<Expression>> args);
         virtual Handle<Expression> NewMemberExpression(Json &json, MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> mem);
         virtual Handle<Expression> NewPrefixExpression(Json &json, PrefixOperation op, Handle<Expression> expr);
         virtual Handle<Expression> NewForStatement(Json &json, ForKind kind, Handle<Expression> init, Handle<Expression> condition, Handle<Expression> update, Handle<Expression> body);
-        virtual Handle<Expression> NewObjectLiteral(Json &json, ProxyObject obj);
+        virtual Handle<Expression> NewObjectConstant(Json &json, ProxyObject obj);
+        virtual Handle<Expression> NewAssignExpression(Json &json, Handle<Expression> lhs, Handle<Expression> rhs);
     };
 
 }  // namespace data_render

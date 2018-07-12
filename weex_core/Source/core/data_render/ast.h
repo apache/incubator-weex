@@ -63,18 +63,19 @@ namespace data_render {
   M(BlockStatement)      \
   M(FunctionPrototype)   \
   M(FunctionStatement)   \
-  M(StringLiteral)       \
+  M(StringConstant)      \
   M(BinaryExpression)    \
+  M(AssignExpression)     \
   M(ChildBlockStatement) \
   M(Declaration)         \
   M(DeclarationList)     \
-  M(IntegralLiteral)     \
+  M(IntegralConstant)    \
   M(CallExpression)      \
   M(MemberExpression)    \
   M(Identifier)          \
   M(PrefixExpression)    \
-  M(ObjectLiteral)       \
-  M(ArrayLiteral)        \
+  M(ObjectConstant)      \
+  M(ArrayConstant)       \
   M(ChunkStatement)      \
   M(ReturnStatement)
 
@@ -171,15 +172,15 @@ class Identifier : public Expression {
   bool ProduceRValue() override { return false; }
   DEFINE_NODE_TYPE(Identifier);
 };
-class StringLiteral : public Expression {
+class StringConstant : public Expression {
  private:
   std::string str_;
 
  public:
-  StringLiteral(Json &json, const std::string &str)
+  StringConstant(Json &json, const std::string &str)
       : Expression(json), str_(str) {}
   std::string &string() { return str_; }
-  DEFINE_NODE_TYPE(StringLiteral);
+  DEFINE_NODE_TYPE(StringConstant);
 };
 enum class BinaryOperation {
   kAddition,
@@ -253,15 +254,13 @@ class DeclarationList : public Expression {
  private:
   std::vector<Handle<Declaration>> exprs_;
 };
-class IntegralLiteral : public Expression {
+class IntegralConstant : public Expression {
+ public:
+  IntegralConstant(Json &json, int value) : Expression(json), value_(value) {}
+  int value() { return value_; }
+  DEFINE_NODE_TYPE(IntegralConstant);
  private:
   int value_;
-
- public:
-  IntegralLiteral(Json &json, int value) : Expression(json), value_(value) {}
-
-  int value() { return value_; }
-  DEFINE_NODE_TYPE(IntegralLiteral);
 };
 enum class MemberAccessKind {
   kCall,
@@ -331,33 +330,46 @@ class PrefixExpression : public Expression {
   PrefixOperation op_;
   Handle<Expression> expr_;
 };
-class ObjectLiteral : public Expression {
+class ObjectConstant : public Expression {
  public:
-  ObjectLiteral(Json &json, ProxyObject props)
+  ObjectConstant(Json &json, ProxyObject props)
       : Expression(json), Props{std::move(props)} {}
 
   ProxyObject &proxy() { return Props; }
   bool IsEmpty() { return Props.empty(); }
   ProxyObject::size_type GetPropertyCount() { return Props.size(); }
 
-  DEFINE_NODE_TYPE(ObjectLiteral);
+  DEFINE_NODE_TYPE(ObjectConstant);
 
  private:
   ProxyObject Props;
 };
-class ArrayLiteral : public Expression {
+class ArrayConstant : public Expression {
  public:
-  ArrayLiteral(Json &json, ProxyArray exprs)
+  ArrayConstant(Json &json, ProxyArray exprs)
       : Expression(json), exprs_{std::move(exprs)} {}
 
   ProxyArray &exprs() { return exprs_; }
 
   typename ProxyArray::size_type length() { return exprs_.size(); }
 
-  DEFINE_NODE_TYPE(ArrayLiteral);
+  DEFINE_NODE_TYPE(ArrayConstant);
 
  private:
   ProxyArray exprs_;
+};
+    
+class AssignExpression : public Expression {
+public:
+    AssignExpression(Json &json, Handle<Expression> lhs, Handle<Expression> rhs)
+    : Expression(json), lhs_(lhs), rhs_(rhs) { }
+    
+    Handle<Expression> lhs() { return lhs_; }
+    Handle<Expression> rhs() { return rhs_; }
+    DEFINE_NODE_TYPE(AssignExpression);
+private:
+    Handle<Expression> lhs_;
+    Handle<Expression> rhs_;
 };
 
 }  // namespace data_render

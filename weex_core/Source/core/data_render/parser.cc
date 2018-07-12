@@ -23,12 +23,9 @@
 #include "core/data_render/ast_factory.h"
 #include "core/data_render/statement.h"
 
-using namespace std;
-using namespace json11;
-
 namespace weex {
-    namespace core {
-        namespace data_render {
+namespace core {
+namespace data_render {
 
 namespace {
 
@@ -42,15 +39,15 @@ std::string to_string(T value)
 
 struct ASTParser final {
     /* State */
-    const string &str_;
-    string &err_;
+    const std::string &str_;
+    std::string &err_;
     bool failed_;
     ASTFactory *factory_;
-    ParseResult fail(string &&msg) {
+    ParseResult fail(std::string &&msg) {
         return fail(move(msg), ParseResult());
     }
     template <typename T>
-    T fail(string &&msg, const T err_ret) {
+    T fail(std::string &&msg, const T err_ret) {
         if (!failed_)
             err_ = std::move(msg);
         failed_ = true;
@@ -78,7 +75,7 @@ struct ASTParser final {
     ParseResult parse() {
         ASTParseError error  = UNKOWN_ERROR;
         do {
-            string err_comment;
+            std::string err_comment;
             auto json = Json::parse(str_, err_comment);
             if (!json.is_object()) {
                 error = FILE_FORMAT_ERROR;
@@ -118,13 +115,13 @@ struct ASTParser final {
     }
     Handle<Expression> parseObjExpression(Json &json) {
         Handle<Expression> expr = nullptr;
-        map<string, Json>obj = json.object_items();
+        std::map<std::string, Json>obj = json.object_items();
         do {
             if (!obj.size()) {
                 break;
             }
             ProxyObject proxyObj;
-            for (map<string, Json>::iterator iter = obj.begin();iter != obj.end(); iter++) {
+            for (std::map<std::string, Json>::iterator iter = obj.begin();iter != obj.end(); iter++) {
                 if (iter->second.is_object()) {
                     Handle<Expression> objExpr = parseObjExpression(iter->second);
                     if (objExpr) {
@@ -154,14 +151,14 @@ struct ASTParser final {
                         }
                     }
                     else {
-                        proxyObj.insert(std::make_pair(iter->first, factory_->NewStringLiteral(json, iter->second.string_value())));
+                        proxyObj.insert(std::make_pair(iter->first, factory_->NewStringConstant(json, iter->second.string_value())));
                     }
                 }
                 else {
                     assert(0);
                 }
             }
-            expr = factory_->NewObjectLiteral(json, proxyObj);
+            expr = factory_->NewObjectConstant(json, proxyObj);
             
         } while (0);
         
@@ -196,6 +193,6 @@ ParseResult Parser::parse(const std::string &in, std::string &err) {
     return result;
 }
 
-        }  // namespace data_render
-    }  // namespace core
+}  // namespace data_render
+}  // namespace core
 }  // namespace weex

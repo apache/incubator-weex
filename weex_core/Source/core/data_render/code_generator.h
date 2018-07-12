@@ -37,7 +37,7 @@ class CodeGenerator : public ASTVisitor {
       : exec_state_(exec_state), cur_block_(nullptr) {}
   ~CodeGenerator() {}
   void Visit(ChunkStatement *node, void *data) override;
-  void Visit(StringLiteral *node, void *data) override;
+  void Visit(StringConstant *node, void *data) override;
   void Visit(CallExpression *node, void *data) override;
   void Visit(ArgumentList *node, void *data) override;
   void Visit(IfStatement *node, void *data) override;
@@ -50,12 +50,12 @@ class CodeGenerator : public ASTVisitor {
   void Visit(ChildBlockStatement *node, void *data) override;
   void Visit(Declaration *node, void *data) override;
   void Visit(DeclarationList *node, void *data) override;
-  void Visit(IntegralLiteral *node, void *data) override;
+  void Visit(IntegralConstant *node, void *data) override;
   void Visit(MemberExpression *node, void *data) override;
   void Visit(Identifier *node, void *data) override;
   void Visit(PrefixExpression *node, void *data) override;
-  //    void Visit(ObjectLiteral *node, void *data) override;
-  //    void Visit(ArrayLiteral *node, void *data) override;
+  void Visit(ObjectConstant *node, void *data) override;
+  void Visit(ArrayConstant *node, void *data) override;
   void Visit(ReturnStatement *node, void *data) override;
 
  private:
