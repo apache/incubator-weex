@@ -219,20 +219,20 @@ This product bundles vuejs v1.0.12, which is available under a
   runtime/frameworks/legacy/core/state.js
   runtime/frameworks/legacy/core/watcher.js
 
-This product bundles Guava v20.0, which is available under a "Apache" license. For details, see https://github.com/google/guava/blob/v20.0/COPYING and following files: 
-android_sdk/src/main/java/org/apache/taobao/weex/utils/WXDataStructureUtil.java
+This product bundles Guava v20.0, which is available under a "Apache" license. For details, see https://github.com/google/guava/blob/v20.0/COPYING and following files:
+  android_sdk/src/main/java/org/apache/taobao/weex/utils/WXDataStructureUtil.java
 
 This product bundles chromium, which is available under a "BSD-style" license. For details, see https://github.com/chromium/chromium/blob/master/LICENSE and following files:
-weex_core/Source/android/base/base64/base64.cpp
-weex_core/Source/android/base/base64/base64.h
-weex_core/Source/android/base/base64/modp_base64/modp_b64_data.h
-weex_core/Source/android/base/base64/modp_base64/modp_b64.cc
-weex_core/Source/android/base/base64/modp_base64/modp_b64.h
-weex_core/Source/android/jniprebuild/jniheader/ContentBoxMeasurement_jni.h
-weex_core/Source/android/jniprebuild/jniheader/MeasureMode_jni.h
-weex_core/Source/android/jniprebuild/jniheader/NativeRenderObjectUtils_jni.h
-weex_core/Source/android/jniprebuild/jniheader/SystemMessageHandler_jni.h
-weex_core/Source/android/jniprebuild/jniheader/WXBridge_jni.h
-weex_core/Source/android/jniprebuild/jniheader/WXJsFunctions_jni.h
-weex_core/Source/android/jniprebuild/jni_generator.py
+  weex_core/Source/android/base/base64/base64.cpp
+  weex_core/Source/android/base/base64/base64.h
+  weex_core/Source/android/base/base64/modp_base64/modp_b64_data.h
+  weex_core/Source/android/base/base64/modp_base64/modp_b64.cc
+  weex_core/Source/android/base/base64/modp_base64/modp_b64.h
+  weex_core/Source/android/jniprebuild/jniheader/ContentBoxMeasurement_jni.h
+  weex_core/Source/android/jniprebuild/jniheader/MeasureMode_jni.h
+  weex_core/Source/android/jniprebuild/jniheader/NativeRenderObjectUtils_jni.h
+  weex_core/Source/android/jniprebuild/jniheader/SystemMessageHandler_jni.h
+  weex_core/Source/android/jniprebuild/jniheader/WXBridge_jni.h
+  weex_core/Source/android/jniprebuild/jniheader/WXJsFunctions_jni.h
+  weex_core/Source/android/jniprebuild/jni_generator.py
 
