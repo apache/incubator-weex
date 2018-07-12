@@ -25,6 +25,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <core/data_render/vnode/vnode.h>
 #include "core/data_render/op_code.h"
 
 namespace weex {
@@ -32,14 +33,20 @@ namespace core {
 namespace data_render {
 
 class VM;
+
 class Frame;
+
 class Value;
+
 class ExecState;
+
 class FuncState;
+
 class String;
+
 class StringTable;
 
-typedef Value (*CFunction)(ExecState*);
+typedef Value (* CFunction)(ExecState*);
 
 struct Value {
   union {
@@ -51,7 +58,9 @@ struct Value {
     String* str;
   };
 
-  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING };
+  enum Type {
+    NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING
+  };
 
   Type type;
 
@@ -173,17 +182,31 @@ class ExecState {
   size_t GetArgumentCount();
   Value* GetArgument(int index);
 
+  void setVNodeRoot(VNode* v_node);
+  VNode* find_node(const std::string& ref);
+
   inline Global* global() { return global_.get(); }
   inline ExecStack* stack() { return stack_.get(); }
   inline StringTable* string_table() { return string_table_.get(); }
 
+  inline void page_id(const std::string& page_id) { page_id_ = page_id; }
+  inline const std::string& page_id() const { return page_id_; }
+  inline VNode* root() const { return root_.get(); }
+  inline void insert_node(VNode* node) { node_map_.insert({node->ref(), node}); }
+
  private:
   std::vector<Frame> frames_;
   std::unique_ptr<ExecStack> stack_;
+
   friend class CodeGenerator;
+
   std::unique_ptr<FuncState> func_state_;
   std::unique_ptr<Global> global_;
   std::unique_ptr<StringTable> string_table_;
+
+  std::string page_id_;
+  std::unique_ptr<VNode> root_;
+  std::map<std::string, VNode*> node_map_;
   VM* vm_;
 };
 }  // namespace data_render

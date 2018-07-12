@@ -52,6 +52,8 @@ private:
 public:
   void InitVM();
 
+  void TestProcess(const std::string& input,const std::string& page_id);
+
   bool CreatePage(const std::string &page_id, VNode *vNode);
 
   bool RefreshPage(const std::string &page_id, VNode *new_node);

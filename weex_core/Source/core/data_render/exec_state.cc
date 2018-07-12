@@ -149,6 +149,16 @@ size_t ExecState::GetArgumentCount() {
 Value* ExecState::GetArgument(int index) {
   return frames_.back().reg + index + 1;
 }
+void ExecState::setVNodeRoot(VNode* v_node) {
+  root_.reset(v_node);
+}
+VNode* ExecState::find_node(const std::string& ref) {
+  auto it = node_map_.find(ref);
+  if (it == node_map_.end()){
+    return nullptr;
+  }
+  return it->second;
+}
 
 }  // namespace data_render
 }  // namespace core

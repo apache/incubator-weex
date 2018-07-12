@@ -42,21 +42,21 @@ using std::string;
 using std::pair;
 using WeexCore::RenderManager;
 
-VNodeRenderManager *VNodeRenderManager::g_pInstance = nullptr;
-VNodeRenderManager *VNodeRenderManager::g_vm_ = nullptr;
+VNodeRenderManager* VNodeRenderManager::g_pInstance = nullptr;
+VNodeRenderManager* VNodeRenderManager::g_vm_ = nullptr;
 
-WeexCore::RenderObject *parseVNode2RenderObject(const VNode *vnode, WeexCore::RenderObject *parent,
-                                                int index, const string &pageId) {
-  WeexCore::RenderObject *render_object = static_cast<WeexCore::RenderObject *>(WeexCore::RenderCreator::GetInstance()->CreateRender(
+WeexCore::RenderObject* parseVNode2RenderObject(const VNode* vnode, WeexCore::RenderObject* parent,
+                                                int index, const string& pageId) {
+  WeexCore::RenderObject* render_object = static_cast<WeexCore::RenderObject*>(WeexCore::RenderCreator::GetInstance()->CreateRender(
       vnode->tag_name(), vnode->ref()));
   //style
-  map<string, string> *style = vnode->styles();
+  map<string, string>* style = vnode->styles();
   for (auto it = style->begin(); it != style->end(); it++) {
     render_object->AddStyle(it->first, it->second);
   }
 
   //attr
-  map<string, string> *attr = vnode->attributes();
+  map<string, string>* attr = vnode->attributes();
   for (auto it = attr->begin(); it != attr->end(); it++) {
     render_object->AddAttr(it->first, it->second);
   }
@@ -66,7 +66,7 @@ WeexCore::RenderObject *parseVNode2RenderObject(const VNode *vnode, WeexCore::Re
 //  renderObject->events()->insert(event->begin(), event->end());
 
   //child
-  vector<VNode *> *children = (const_cast<VNode *>(vnode))->child_list();
+  vector<VNode*>* children = (const_cast<VNode*>(vnode))->child_list();
   for (int i = 0; i < children->size(); i++) {
     parseVNode2RenderObject((*children)[i], render_object, i, pageId);
   }
@@ -85,14 +85,14 @@ WeexCore::RenderObject *parseVNode2RenderObject(const VNode *vnode, WeexCore::Re
 }
 
 
-WeexCore::RenderObject *VNode2RenderObject(const VNode *root, const string &page_id) {
+WeexCore::RenderObject* VNode2RenderObject(const VNode* root, const string& page_id) {
   return parseVNode2RenderObject(root, nullptr, 0, page_id);
 }
 
 
-void patch(const string &page_id, VNode *old_root, VNode *new_root);
+void patch(const string& page_id, VNode* old_root, VNode* new_root);
 
-bool VNodeRenderManager::CreatePage(const string &page_id, VNode *vNode) {
+bool VNodeRenderManager::CreatePage(const string& page_id, VNode* vNode) {
   auto node = vnode_trees_.find(page_id);
   if (node != vnode_trees_.end()) {
     delete node->second;
@@ -107,7 +107,7 @@ bool VNodeRenderManager::CreatePage(const string &page_id, VNode *vNode) {
   return true;
 }
 
-bool VNodeRenderManager::RefreshPage(const string &page_id, VNode *new_node) {
+bool VNodeRenderManager::RefreshPage(const string& page_id, VNode* new_node) {
   auto node = vnode_trees_.find(page_id);
   if (node == vnode_trees_.end()) {
     return false;
@@ -120,7 +120,7 @@ bool VNodeRenderManager::RefreshPage(const string &page_id, VNode *new_node) {
   return true;
 }
 
-bool VNodeRenderManager::ClosePage(const string &page_id) {
+bool VNodeRenderManager::ClosePage(const string& page_id) {
   auto node = vnode_trees_.find(page_id);
   if (node == vnode_trees_.end()) {
     return false;
@@ -131,19 +131,19 @@ bool VNodeRenderManager::ClosePage(const string &page_id) {
   return true;
 }
 
-static Value Log(ExecState *exec_state) {
+static Value Log(ExecState* exec_state) {
   size_t length = exec_state->GetArgumentCount();
   for (int i = 0; i < length; ++i) {
     Value* a = exec_state->GetArgument(i);
     switch (a->type) {
       case Value::Type::NUMBER:
-        std::cout<< a->n << "\n";
+        std::cout << a->n << "\n";
         break;
       case Value::Type::INT:
-        std::cout<< a->i << "\n";
+        std::cout << a->i << "\n";
         break;
       case Value::Type::STRING:
-        std::cout<< a->str->c_str() << "\n";
+        std::cout << a->str->c_str() << "\n";
         break;
       default:
         break;
@@ -152,67 +152,105 @@ static Value Log(ExecState *exec_state) {
   return Value();
 }
 
-void VNodeRenderManager::InitVM() {
-  if (g_vm_ == nullptr){
-    VM* vm = new VM();
-    ExecState *execState = new ExecState(vm);
-    Value log_func;
-    log_func.type = Value::Type::CFUNC;
-    log_func.cf = reinterpret_cast<void *>(Log);
-    execState->global()->Add("log", log_func);
-    execState->Compile("");
-    execState->Execute();
+static Value CreateElement(ExecState* exec_state) {//createElement("tagName","id");
+//  const std::string& page_name = exec_state->page_id();
+  VNode* node = new VNode(
+      exec_state->GetArgument(0)->str->c_str(),
+      exec_state->GetArgument(1)->str->c_str()
+  );
+  if (exec_state->root() == nullptr) {
+    //set root
+    exec_state->setVNodeRoot(node);
   }
+  exec_state->insert_node(node);
+  return Value();
 }
 
-void PatchVNode(const string &page_id, VNode *old_node, VNode *new_node);
+static Value AppendChild(ExecState* exec_state) {//appendChild("parent_id","id");
+  VNode* parent = exec_state->find_node(exec_state->GetArgument(0)->str->c_str());
+  VNode* child = exec_state->find_node(exec_state->GetArgument(1)->str->c_str());
+  if (parent == nullptr || child == nullptr) {
+    return Value();
+  }
+  parent->AddChild(child);
 
-bool SameNode(VNode *a, VNode *b) {
+  return Value();
+}
+
+void RegisterCFunc(ExecState* state, const std::string& name, CFunction function) {
+  Value func;
+  func.type = Value::Type::CFUNC;
+  func.cf = reinterpret_cast<void*>(function);
+  state->global()->Add(name, func);
+}
+
+void VNodeRenderManager::InitVM() {
+  if (g_vm_ == nullptr) {
+    VM* vm = new VM();
+  }
+}
+void VNodeRenderManager::TestProcess(const std::string& input, const std::string& page_id) {
+  ExecState* execState = new ExecState(g_vm_);
+
+  //log
+  RegisterCFunc(execState, "log", Log);
+  RegisterCFunc(execState, "createElement", CreateElement);
+  RegisterCFunc(execState, "appendChild", AppendChild);
+
+  execState->page_id(page_id);
+  execState->Compile(input);
+  execState->Execute();
+  CreatePage(page_id, execState->root());
+}
+
+void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node);
+
+bool SameNode(VNode* a, VNode* b) {
   return a->tag_name() == b->tag_name()
          && a->ref() == b->ref();//todo to be more accurate
 
 }
 
-inline VNode *GetOrNull(vector<VNode *> &vec, unsigned int index) {
+inline VNode* GetOrNull(vector<VNode*>& vec, unsigned int index) {
   if (index < 0 || index >= vec.size()) {
     return nullptr;
   }
   return vec[index];
 }
 
-void RemoveNodes(const string &pageId, vector<VNode *> &vec,
-                 vector<VNode *> &ref_list, unsigned int start, unsigned int end);
+void RemoveNodes(const string& pageId, vector<VNode*>& vec,
+                 vector<VNode*>& ref_list, unsigned int start, unsigned int end);
 
-void AddNodes(const string &pageId, vector<VNode *> &vec,
-              vector<VNode *> &ref_list, unsigned int start, unsigned int end);
+void AddNodes(const string& pageId, vector<VNode*>& vec,
+              vector<VNode*>& ref_list, unsigned int start, unsigned int end);
 
-inline vector<VNode *>::iterator IndexOf(
-    vector<VNode *> &vec, const VNode *value) {
+inline vector<VNode*>::iterator IndexOf(
+    vector<VNode*>& vec, const VNode* value) {
   return std::find(vec.begin(), vec.end(), value);
 }
 
-int MoveToBackOfRef(vector<VNode *> &ref_list, const VNode *move_ref,
-                    const VNode *anchor_ref);
+int MoveToBackOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
+                    const VNode* anchor_ref);
 
-int MoveToFrontOfRef(vector<VNode *> &ref_list, const VNode *move_ref,
-                     const VNode *anchor_ref);
+int MoveToFrontOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
+                     const VNode* anchor_ref);
 
-int MoveElmToFrontOfNode(const string &page_id, vector<VNode *> &ref_list,
-                         VNode *move_node,
-                         VNode *anchor_node);
+int MoveElmToFrontOfNode(const string& page_id, vector<VNode*>& ref_list,
+                         VNode* move_node,
+                         VNode* anchor_node);
 
-int MoveElmToBackOfNode(const string &page_id, vector<VNode *> &ref_list,
-                        VNode *move_node,
-                        VNode *anchor_node);
+int MoveElmToBackOfNode(const string& page_id, vector<VNode*>& ref_list,
+                        VNode* move_node,
+                        VNode* anchor_node);
 
-void CreateAndInsertElm(const string &page_id, VNode *node, vector<VNode *> &ref_list,
-                        const VNode *ref);
+void CreateAndInsertElm(const string& page_id, VNode* node, vector<VNode*>& ref_list,
+                        const VNode* ref);
 
-void UpdateChildren(const string &page_id, VNode *old_node, VNode *new_node) {
-  vector<VNode *> &old_children = *old_node->child_list();
-  vector<VNode *> &new_children = *new_node->child_list();
-  vector<VNode *> ref_list;
-  map<string, unsigned int> *refToIndex = nullptr;
+void UpdateChildren(const string& page_id, VNode* old_node, VNode* new_node) {
+  vector<VNode*>& old_children = *old_node->child_list();
+  vector<VNode*>& new_children = *new_node->child_list();
+  vector<VNode*> ref_list;
+  map<string, unsigned int>* refToIndex = nullptr;
 
   //ref
   for (auto begin = old_children.begin(); begin < old_children.end(); begin++) {
@@ -223,10 +261,10 @@ void UpdateChildren(const string &page_id, VNode *old_node, VNode *new_node) {
   unsigned int old_end = old_children.size() - 1;
   unsigned int new_start = 0;
   unsigned int new_end = new_children.size() - 1;
-  VNode *old_start_node = GetOrNull(old_children, old_start);
-  VNode *old_end_node = GetOrNull(old_children, old_end);
-  VNode *new_start_node = GetOrNull(new_children, new_start);
-  VNode *new_end_node = GetOrNull(new_children, new_end);
+  VNode* old_start_node = GetOrNull(old_children, old_start);
+  VNode* old_end_node = GetOrNull(old_children, old_end);
+  VNode* new_start_node = GetOrNull(new_children, new_start);
+  VNode* new_end_node = GetOrNull(new_children, new_end);
 
   while (old_start <= old_end && new_start <= new_end) {
     if (old_start_node == nullptr) {
@@ -324,20 +362,20 @@ void UpdateChildren(const string &page_id, VNode *old_node, VNode *new_node) {
   }
 }
 
-void CreateAndInsertElm(const string &page_id, VNode *node, vector<VNode *> &ref_list,
-                        const VNode *ref) {
+void CreateAndInsertElm(const string& page_id, VNode* node, vector<VNode*>& ref_list,
+                        const VNode* ref) {
   auto insert_pos = IndexOf(ref_list, ref);
   int index = std::distance(ref_list.begin(), insert_pos);
   ref_list.insert(insert_pos, node);
 
-  WeexCore::RenderObject *root = VNode2RenderObject(node, page_id);
+  WeexCore::RenderObject* root = VNode2RenderObject(node, page_id);
   RenderManager::GetInstance()->AddRenderObject(
       page_id, node->parent()->ref(), index, root
   );
 }
 
-int MoveToBackOfRef(vector<VNode *> &ref_list, const VNode *move_ref,
-                    const VNode *anchor_ref) {
+int MoveToBackOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
+                    const VNode* anchor_ref) {
   auto move_pos = IndexOf(ref_list, move_ref);
   int index = std::distance(ref_list.begin(), move_pos);
   if (move_pos == ref_list.end()) {
@@ -347,7 +385,7 @@ int MoveToBackOfRef(vector<VNode *> &ref_list, const VNode *move_ref,
 #endif
     return -1;//wtf!
   }
-  VNode *value = *move_pos;
+  VNode* value = *move_pos;
   ref_list.erase(move_pos);
   auto anchor_pos = IndexOf(ref_list, anchor_ref);
   if (anchor_pos == ref_list.end()) {
@@ -361,8 +399,8 @@ int MoveToBackOfRef(vector<VNode *> &ref_list, const VNode *move_ref,
   return index;
 }
 
-int MoveToFrontOfRef(vector<VNode *> &ref_list, const VNode *move_ref,
-                     const VNode *anchor_ref) {
+int MoveToFrontOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
+                     const VNode* anchor_ref) {
   auto move_pos = IndexOf(ref_list, move_ref);
   int index = std::distance(ref_list.begin(), move_pos);
   if (move_pos == ref_list.end()) {
@@ -372,7 +410,7 @@ int MoveToFrontOfRef(vector<VNode *> &ref_list, const VNode *move_ref,
 #endif
     return -1;//wtf!
   }
-  VNode *value = *move_pos;
+  VNode* value = *move_pos;
   ref_list.erase(move_pos);
   auto anchor_pos = IndexOf(ref_list, anchor_ref);
   if (anchor_pos == ref_list.end()) {
@@ -386,8 +424,8 @@ int MoveToFrontOfRef(vector<VNode *> &ref_list, const VNode *move_ref,
   return index;
 }
 
-int MoveElmToFrontOfNode(const string &page_id, vector<VNode *> &ref_list,
-                         VNode *move_node, VNode *anchor_node) {
+int MoveElmToFrontOfNode(const string& page_id, vector<VNode*>& ref_list,
+                         VNode* move_node, VNode* anchor_node) {
   int move_to_index = MoveToFrontOfRef(ref_list, move_node, anchor_node);
   RenderManager::GetInstance()->MoveRenderObject(
       page_id, move_node->ref(), move_node->parent()->ref(), move_to_index
@@ -395,8 +433,8 @@ int MoveElmToFrontOfNode(const string &page_id, vector<VNode *> &ref_list,
   return move_to_index;
 }
 
-int MoveElmToBackOfNode(const string &page_id, vector<VNode *> &ref_list,
-                        VNode *move_node, VNode *anchor_node) {
+int MoveElmToBackOfNode(const string& page_id, vector<VNode*>& ref_list,
+                        VNode* move_node, VNode* anchor_node) {
   int move_to_index = MoveToBackOfRef(ref_list, move_node, anchor_node);
   RenderManager::GetInstance()->MoveRenderObject(
       page_id, move_node->ref(), move_node->parent()->ref(), move_to_index
@@ -404,21 +442,21 @@ int MoveElmToBackOfNode(const string &page_id, vector<VNode *> &ref_list,
   return move_to_index;
 }
 
-void AddNodes(const string &pageId, vector<VNode *> &vec,
-              vector<VNode *> &ref_list, unsigned int start, unsigned int end) {
+void AddNodes(const string& pageId, vector<VNode*>& vec,
+              vector<VNode*>& ref_list, unsigned int start, unsigned int end) {
   for (int i = start; i <= end; ++i) {
     auto p_node = vec[i];
     ref_list.insert(ref_list.begin() + i, p_node);
 
-    WeexCore::RenderObject *root = VNode2RenderObject(p_node, pageId);
+    WeexCore::RenderObject* root = VNode2RenderObject(p_node, pageId);
     RenderManager::GetInstance()->AddRenderObject(
         pageId, p_node->parent()->ref(), i, root
     );
   }
 }
 
-void RemoveNodes(const string &pageId, vector<VNode *> &vec,
-                 vector<VNode *> &ref_list, unsigned int start, unsigned int end) {
+void RemoveNodes(const string& pageId, vector<VNode*>& vec,
+                 vector<VNode*>& ref_list, unsigned int start, unsigned int end) {
   for (int i = start; i <= end; ++i) {
     auto p_node = vec[start];
     //some might already been used for patch, which is null.
@@ -438,8 +476,8 @@ void RemoveNodes(const string &pageId, vector<VNode *> &vec,
   }
 }
 
-vector<pair<string, string>> *compareMap(const map<string, string> &oldMap,
-                                         const map<string, string> &newMap) {
+vector<pair<string, string>>* compareMap(const map<string, string>& oldMap,
+                                         const map<string, string>& newMap) {
   auto p_vec = new vector<pair<string, string>>();
   for (auto it = newMap.cbegin(); it != newMap.cend(); it++) {
     auto pos = oldMap.find(it->first);
@@ -461,7 +499,7 @@ vector<pair<string, string>> *compareMap(const map<string, string> &oldMap,
   return p_vec;
 };
 
-void PatchVNode(const string &page_id, VNode *old_node, VNode *new_node) {
+void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
   //compare attr
   auto p_vec = compareMap(*(old_node->attributes()), *(new_node->attributes()));
   RenderManager::GetInstance()->UpdateAttr(
@@ -487,7 +525,7 @@ void PatchVNode(const string &page_id, VNode *old_node, VNode *new_node) {
   } else if (!old_node->HasChildren() && new_node->HasChildren()) {
     int index = 0;
     for (auto it = new_node->child_list()->cbegin(); it != new_node->child_list()->cend(); it++) {
-      WeexCore::RenderObject *root = VNode2RenderObject(*it, page_id);
+      WeexCore::RenderObject* root = VNode2RenderObject(*it, page_id);
       RenderManager::GetInstance()->AddRenderObject(
           page_id, (*it)->parent()->ref(), index, root
       );
@@ -496,7 +534,7 @@ void PatchVNode(const string &page_id, VNode *old_node, VNode *new_node) {
   }
 }
 
-void patch(const string &page_id, VNode *old_root, VNode *new_root) {
+void patch(const string& page_id, VNode* old_root, VNode* new_root) {
   //root must be the same;
   PatchVNode(page_id, old_root, new_root);
 }
