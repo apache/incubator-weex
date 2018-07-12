@@ -43,6 +43,7 @@
 
 static BOOL threadSafeCollectionUsingLock = YES;
 static BOOL unregisterFontWhenCollision = NO;
+static BOOL listSectionRowThreadSafe = YES;
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
@@ -151,6 +152,16 @@ CGFloat WXFloorPixelValue(CGFloat value)
 + (void)setUnregisterFontWhenCollision:(BOOL)value
 {
     unregisterFontWhenCollision = value;
+}
+
++ (void)setListSectionRowThreadSafe:(BOOL)value
+{
+	listSectionRowThreadSafe = value;
+}
+
++ (BOOL)listSectionRowThreadSafe
+{
+	return listSectionRowThreadSafe;
 }
 
 + (void)performBlock:(void (^)(void))block onThread:(NSThread *)thread

@@ -31,6 +31,7 @@
 #import "WXRefreshComponent.h"
 #import "WXLoadingComponent.h"
 #import "WXScrollerComponent+Layout.h"
+#import "WXThreadSafeMutableArray.h"
 
 @interface WXTableView : UITableView
 
@@ -94,8 +95,11 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        _rows = [NSMutableArray array];
-    }
+		if ([WXUtility listSectionRowThreadSafe]) {
+			_rows = [WXThreadSafeMutableArray array];
+		} else {
+			_rows = [NSMutableArray array];
+		}    }
     
     return self;
 }
