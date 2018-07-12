@@ -18,20 +18,10 @@
  */
 #include "core/data_render/vm.h"
 #include "core/data_render/exec_state.h"
+#include "android/base/log_utils.h"
 
-#define IS_INT(o) (Value::Type::INT == o->type)
-#define IS_NUMBER(o) (Value::Type::NUMBER == o->type)
-#define INT_VALUE(o) (o->i)
-#define NUM_VALUE(o) (o->n)
-#define TO_NUM(o, n) (IS_NUMBER(o) ? (*(n) = NUM_VALUE(o), 1) : ToNumber(o, n))
-#define SET_I_VALUE(o, iv) {o->type=Value::Type::INT;o->i=iv;}
-#define SET_D_VALUE(o, d) {o->type=Value::Type::NUMBER;o->n=d;}
 #define INT_OP(op, v1, v2) CAST_U2S((CAST_S2U(v1)) op CAST_S2U(v2))
 #define NUM_OP(op, d1, d2) ((d1) op (d2))
-#define NUM_POW(d1, d2) (MATH_OP(pow)(d1, d2))
-#define NUM_I_DIV(d1, d2) (MATH_OP(floor)(NUM_OP(/, d1, d2)))
-#define NUM_MOD(d1, d2, ret) \
-    {(ret) = MATH_OP(fmod)(d1, d2); if ((ret) * (d2) < 0) (ret) += (d2);}
 #define MATH_OP(op) op
 #define CAST_S2U(o) ((unsigned)(o))
 #define CAST_U2S(o) ((signed)(o))
@@ -40,165 +30,201 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-int ToNumber(Value*, double*);
-int ValueMod(int, int);
+    inline bool IsInt(Value *o) { return Value::Type::INT == o->type; }
 
-void VM::RunFrame(ExecState* exec_state, Frame frame) {
-  Value* a = nullptr;
-  Value* b = nullptr;
-  Value* c = nullptr;
-  auto pc = frame.pc;
-  while (pc != frame.end) {
-    Instruction instruction = *pc++;
-    double d1, d2;
-    switch (GET_OP_CODE(instruction)) {
-      case OP_MOVE:
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
-        *a = *b;
-        break;
-      case OP_LOADNULL:
-        a = frame.reg + GET_ARG_A(instruction);
-        a->type = Value::Type::NIL;
-        break;
-      case OP_LOADK:
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.func->f->GetConstant(GET_ARG_B(instruction));
-        *a = *b;
-        break;
-      case OP_GETGLOBAL:
-        a = frame.reg + GET_ARG_A(instruction);
-        b = exec_state->global()->Find(GET_ARG_B(instruction));
-        *a = *b;
-        break;
-
-      case OP_ADD:
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
-        c = frame.reg + GET_ARG_C(instruction);
-        if (IS_INT(b) && IS_INT(c)) {
-          SET_I_VALUE(a, INT_OP(+, INT_VALUE(b), INT_VALUE(c)));
-        } else if (TO_NUM(b, &d1) && TO_NUM(c, &d2)) {
-          SET_D_VALUE(a, NUM_OP(+, d1, d2));
+    inline int IntMod(int a, int b) {
+        if (CAST_S2U(b) + 1u <= 1u) {
+            if (b == 0) {
+                LOGE("Error ValueMod Values[", a, b);
+            }
+            return 0;
         } else {
-          //TODO error
+            int ret = a % b;
+            if (ret != 0 && (a ^ b) < 0) {
+                ret += b;
+            }
+            return ret;
         }
-        break;
-
-      case OP_SUB:
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
-        c = frame.reg + GET_ARG_C(instruction);
-        if (IS_INT(b) && IS_INT(c)) {
-          SET_I_VALUE(a, INT_OP(-, INT_VALUE(b), INT_VALUE(c)));
-        } else if (TO_NUM(b, &d1) && TO_NUM(c, &d2)) {
-          SET_D_VALUE(a, NUM_OP(-, d1, d2));
-        } else {
-          //TODO error
-        }
-        break;
-
-      case OP_MUL:
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
-        c = frame.reg + GET_ARG_C(instruction);
-        if (IS_INT(b) && IS_INT(c)) {
-          SET_I_VALUE(a, INT_OP(*, INT_VALUE(b), INT_VALUE(c)));
-        } else if (TO_NUM(b, &d1) && TO_NUM(c, &d2)) {
-          SET_D_VALUE(a, NUM_OP(*, d1, d2));
-        } else {
-          //TODO error
-        }
-        break;
-
-        case OP_DIV:
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
-        c = frame.reg + GET_ARG_C(instruction);
-        if (TO_NUM(b, &d1) && TO_NUM(c, &d2)) {
-          SET_D_VALUE(a, NUM_OP(/, INT_VALUE(b), INT_VALUE(c)));
-        } else {
-          //TODO error
-        }
-        break;
-
-        case OP_IDIV:
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
-        c = frame.reg + GET_ARG_C(instruction);
-        if (IS_INT(b) && IS_INT(c)) {
-            SET_I_VALUE(a, INT_OP(/, INT_VALUE(b), INT_VALUE(c)));
-        } else if (TO_NUM(b, &d1) && TO_NUM(c, &d2)) {
-            SET_D_VALUE(a, NUM_I_DIV(d1, d2));
-        } else {
-            //TODO error
-        }
-        break;
-
-      case OP_MOD:
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
-        c = frame.reg + GET_ARG_C(instruction);
-        if (IS_INT(b) && IS_INT(c)) {
-            SET_I_VALUE(a, ValueMod(INT_VALUE(b), INT_VALUE(c)));
-        } else if (TO_NUM(b, &d1) && TO_NUM(c, &d2)) {
-            double d3 = 0;
-            NUM_MOD(d1, d2, d3);
-            SET_D_VALUE(a, d3);
-        } else {
-            //TODO error
-        }
-        break;
-
-      case OP_POW:
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
-        c = frame.reg + GET_ARG_C(instruction);
-        if (TO_NUM(b, &d1) && TO_NUM(c, &d2)) {
-          SET_D_VALUE(a, NUM_POW(d1, d2));
-        } else {
-            //TODO
-        }
-        break;
-
-      case OP_CALL: {
-        a = frame.reg + GET_ARG_A(instruction);
-        size_t argc = GET_ARG_B(instruction);
-        c = frame.reg + GET_ARG_C(instruction);
-        exec_state->CallFunction(c, argc, a);
-      } break;
-      default:
-        break;
     }
-  }
-}
 
-int ToNumber(Value* value, double* ret) {
-  if (IS_INT(value)) {
-    *ret = INT_VALUE(value);
-    return 1;
-  } else if (IS_NUMBER(value)) {
-    *ret = NUM_VALUE(value);
-    return 1;
-  } else {
-    return -1;
-  }
-}
+    inline bool IsNumber(Value *o) { return Value::Type::NUMBER == o->type; }
 
-int ValueMod(int a, int b) {
-    if (CAST_S2U(b) + 1u <= 1u) {
-        if (b == 0) {
-            //TODO error
+    inline int64_t IntValue(Value *o) { return o->i; }
+
+    inline double NumValue(Value *o) { return o->n; }
+
+    inline int ToNumber_(Value *value, double *ret) {
+        if (IsInt(value)) {
+            *ret = IntValue(value);
+            return 1;
+        } else if (IsNumber(value)) {
+            *ret = NumValue(value);
+            return 1;
+        } else {
+            return -1;
         }
-        return 0;
-    } else {
-        int ret = a % b;
-        if (ret != 0 && (a ^ b) < 0) {
-            ret += b;
-        }
+    }
+
+    inline int ToNum(Value *o, double *n) {
+        return IsNumber(o) ? (*n = NumValue(o), 1) : ToNumber_(o, n);
+    }
+
+    inline void SetIValue(Value *o, int iv) {
+        o->type = Value::Type::INT;
+        o->i = iv;
+    }
+
+    inline void SetDValue(Value *o, double d) {
+        o->type = Value::Type::NUMBER;
+        o->n = d;
+    }
+
+    inline double NumPow(double d1, double d2) {
+        return MATH_OP(pow)(d1, d2);
+    }
+
+    inline double NumIDiv(double d1, double d2) {
+        return MATH_OP(floor)(NUM_OP(/, d1, d2));
+    }
+
+    inline double NumMod(double d1, double d2) {
+        double ret = MATH_OP(fmod)(d1, d2);
+        if (ret * d2 < 0) ret += d2;
         return ret;
     }
-}
+
+    void VM::RunFrame(ExecState *exec_state, Frame frame) {
+        Value *a = nullptr;
+        Value *b = nullptr;
+        Value *c = nullptr;
+        auto pc = frame.pc;
+        while (pc != frame.end) {
+            Instruction instruction = *pc++;
+            double d1, d2;
+            switch (GET_OP_CODE(instruction)) {
+                case OP_MOVE:
+                    a = frame.reg + GET_ARG_A(instruction);
+                    b = frame.reg + GET_ARG_B(instruction);
+                    *a = *b;
+                    break;
+                case OP_LOADNULL:
+                    a = frame.reg + GET_ARG_A(instruction);
+                    a->type = Value::Type::NIL;
+                    break;
+                case OP_LOADK:
+                    a = frame.reg + GET_ARG_A(instruction);
+                    b = frame.func->f->GetConstant(GET_ARG_B(instruction));
+                    *a = *b;
+                    break;
+                case OP_GETGLOBAL:
+                    a = frame.reg + GET_ARG_A(instruction);
+                    b = exec_state->global()->Find(GET_ARG_B(instruction));
+                    *a = *b;
+                    break;
+
+                case OP_ADD:
+                    a = frame.reg + GET_ARG_A(instruction);
+                    b = frame.reg + GET_ARG_B(instruction);
+                    c = frame.reg + GET_ARG_C(instruction);
+                    if (IsInt(b) && IsInt(c)) {
+                        SetIValue(a, INT_OP(+, IntValue(b), IntValue(c)));
+                    } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                        SetDValue(a, NUM_OP(+, d1, d2));
+                    } else {
+                        LOGE("Unspport Type[%s,%s] with OP_CODE[OP_ADD]", b->type, c->type);
+                    }
+                    break;
+
+                case OP_SUB:
+                    a = frame.reg + GET_ARG_A(instruction);
+                    b = frame.reg + GET_ARG_B(instruction);
+                    c = frame.reg + GET_ARG_C(instruction);
+                    if (IsInt(b) && IsInt(c)) {
+                        SetIValue(a, INT_OP(-, IntValue(b), IntValue(c)));
+                    } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                        SetDValue(a, NUM_OP(-, d1, d2));
+                    } else {
+                        LOGE("Unspport Type[%s,%s] with OP_CODE[OP_SUB]", b->type, c->type);
+                    }
+                    break;
+
+                case OP_MUL:
+                    a = frame.reg + GET_ARG_A(instruction);
+                    b = frame.reg + GET_ARG_B(instruction);
+                    c = frame.reg + GET_ARG_C(instruction);
+                    if (IsInt(b) && IsInt(c)) {
+                        SetIValue(a, INT_OP(*, IntValue(b), IntValue(c)));
+                    } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                        SetDValue(a, NUM_OP(*, d1, d2));
+                    } else {
+                        LOGE("Unspport Type[%s,%s] with OP_CODE[OP_MUL]", b->type, c->type);
+                    }
+                    break;
+
+                case OP_DIV:
+                    a = frame.reg + GET_ARG_A(instruction);
+                    b = frame.reg + GET_ARG_B(instruction);
+                    c = frame.reg + GET_ARG_C(instruction);
+                    if (IsInt(b) && IsInt(c)) {
+                        SetIValue(a, NUM_OP(/, IntValue(b), IntValue(c)));
+                    } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                        SetDValue(a, NUM_OP(/, IntValue(b), IntValue(c)));
+                    } else {
+                        LOGE("Unspport Type[%s,%s] with OP_CODE[OP_DIV]", b->type, c->type);
+                    }
+                    break;
+
+                case OP_IDIV:
+                    a = frame.reg + GET_ARG_A(instruction);
+                    b = frame.reg + GET_ARG_B(instruction);
+                    c = frame.reg + GET_ARG_C(instruction);
+                    if (IsInt(b) && IsInt(c)) {
+                        SetIValue(a, INT_OP(/, IntValue(b), IntValue(c)));
+                    } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                        SetDValue(a, NumIDiv(d1, d2));
+                    } else {
+                        LOGE("Unspport Type[%s,%s] with OP_CODE[OP_IDIV]", b->type, c->type);
+                    }
+                    break;
+
+                case OP_MOD:
+                    a = frame.reg + GET_ARG_A(instruction);
+                    b = frame.reg + GET_ARG_B(instruction);
+                    c = frame.reg + GET_ARG_C(instruction);
+                    if (IsInt(b) && IsInt(c)) {
+                        SetIValue(a, IntMod(IntValue(b), IntValue(c)));
+                    } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                        SetDValue(a, NumMod(d1, d2));
+                    } else {
+                        LOGE("Unspport Type[%s,%s] with OP_CODE[OP_MOD]", b->type, c->type);
+                    }
+                    break;
+
+                case OP_POW:
+                    a = frame.reg + GET_ARG_A(instruction);
+                    b = frame.reg + GET_ARG_B(instruction);
+                    c = frame.reg + GET_ARG_C(instruction);
+                    if (IsInt(b) && IsInt(c)) {
+                        SetIValue(a, NumPow(IntValue(b), IntValue(c)));
+                    } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                        SetDValue(a, NumPow(d1, d2));
+                    } else {
+                        LOGE("Unspport Type[%s,%s] with OP_CODE[OP_POW]", b->type, c->type);
+                    }
+                    break;
+
+                case OP_CALL: {
+                    a = frame.reg + GET_ARG_A(instruction);
+                    size_t argc = GET_ARG_B(instruction);
+                    c = frame.reg + GET_ARG_C(instruction);
+                    exec_state->CallFunction(c, argc, a);
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
 }  // namespace data_render
 }  // namespace core

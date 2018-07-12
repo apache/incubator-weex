@@ -43,7 +43,7 @@ typedef Value (*CFunction)(ExecState*);
 
 struct Value {
   union {
-    int i;
+    int64_t i;
     double n;
     bool b;
     FuncState* f;
@@ -56,7 +56,7 @@ struct Value {
   Type type;
 
   Value() : type(NIL) {}
-  Value(int value) : i(value), type(INT) {}
+  Value(int64_t value) : i(value), type(INT) {}
   Value(double value) : n(value), type(NUMBER) {}
   Value(bool value) : b(value), type(BOOL) {}
   Value(String* value) : str(value), type(STRING) {}
