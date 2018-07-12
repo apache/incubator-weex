@@ -625,8 +625,14 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
     return true;
   }
 
+  public boolean isRequestDisallowInterceptTouchEvent() {
+    return requestDisallowInterceptTouchEvent;
+  }
+
   public void setRequestDisallowInterceptTouchEvent(boolean requestDisallowInterceptTouchEvent) {
     this.requestDisallowInterceptTouchEvent = requestDisallowInterceptTouchEvent;
   }
+
+
 
 }

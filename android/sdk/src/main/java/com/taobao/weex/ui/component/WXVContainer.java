@@ -49,7 +49,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   private static final String TAG = "WXVContainer";
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
   private BoxShadowHost mBoxShadowHost;
-  private  boolean requestDisallowInterceptTouchEvent = false;
 
   @Deprecated
   public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
@@ -544,14 +543,14 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
 
   public void requestDisallowInterceptTouchEvent(boolean requestDisallowInterceptTouchEvent) {
-    if(this.requestDisallowInterceptTouchEvent != requestDisallowInterceptTouchEvent){
-      this.requestDisallowInterceptTouchEvent = requestDisallowInterceptTouchEvent;
-      if(mGesture != null){
-        mGesture.setRequestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
+    if(mGesture != null){
+      if(mGesture.isRequestDisallowInterceptTouchEvent()){
+        return;
       }
-      if(getParent() != null){
-        getParent().requestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
-      }
+      mGesture.setRequestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
+    }
+    if(getParent() != null){
+      getParent().requestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
     }
   }
 
