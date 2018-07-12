@@ -24,6 +24,7 @@
 #include "core/render/node/render_object.h"
 #include "core/render/manager/render_manager.h"
 #include "vnode.h"
+#include "core/data_render/vm.h"
 
 namespace weex {
 namespace core {
@@ -49,6 +50,8 @@ private:
   static Garbo g_garbo;
 
 public:
+  void InitVM();
+
   bool CreatePage(const std::string &page_id, VNode *vNode);
 
   bool RefreshPage(const std::string &page_id, VNode *new_node);
@@ -63,6 +66,7 @@ public:
   }
 
 private:
+  static VM* g_vm_;
   static VNodeRenderManager *g_pInstance;
   std::map<std::string, VNode *> vnode_trees_;
 };

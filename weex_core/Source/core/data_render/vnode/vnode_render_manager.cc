@@ -19,6 +19,8 @@
 
 #include <core/render/manager/render_manager.h>
 #include "core/render/node/factory/render_creator.h"
+#include "core/data_render/exec_state.h"
+#include "core/data_render/string_table.h"
 #include "vnode_render_manager.h"
 #include "vnode.h"
 
@@ -39,7 +41,9 @@ using std::vector;
 using std::string;
 using std::pair;
 using WeexCore::RenderManager;
+
 VNodeRenderManager *VNodeRenderManager::g_pInstance = nullptr;
+VNodeRenderManager *VNodeRenderManager::g_vm_ = nullptr;
 
 WeexCore::RenderObject *parseVNode2RenderObject(const VNode *vnode, WeexCore::RenderObject *parent,
                                                 int index, const string &pageId) {
@@ -125,6 +129,40 @@ bool VNodeRenderManager::ClosePage(const string &page_id) {
   delete node->second;
   vnode_trees_.erase(node);
   return true;
+}
+
+static Value Log(ExecState *exec_state) {
+  size_t length = exec_state->GetArgumentCount();
+  for (int i = 0; i < length; ++i) {
+    Value* a = exec_state->GetArgument(i);
+    switch (a->type) {
+      case Value::Type::NUMBER:
+        std::cout<< a->n << "\n";
+        break;
+      case Value::Type::INT:
+        std::cout<< a->i << "\n";
+        break;
+      case Value::Type::STRING:
+        std::cout<< a->str->c_str() << "\n";
+        break;
+      default:
+        break;
+    }
+  }
+  return Value();
+}
+
+void VNodeRenderManager::InitVM() {
+  if (g_vm_ == nullptr){
+    VM* vm = new VM();
+    ExecState *execState = new ExecState(vm);
+    Value log_func;
+    log_func.type = Value::Type::CFUNC;
+    log_func.cf = reinterpret_cast<void *>(Log);
+    execState->global()->Add("log", log_func);
+    execState->Compile("");
+    execState->Execute();
+  }
 }
 
 void PatchVNode(const string &page_id, VNode *old_node, VNode *new_node);
