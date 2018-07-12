@@ -155,8 +155,8 @@ static Value Log(ExecState* exec_state) {
 static Value CreateElement(ExecState* exec_state) {//createElement("tagName","id");
 //  const std::string& page_name = exec_state->page_id();
   VNode* node = new VNode(
-      exec_state->GetArgument(0)->str->c_str(),
-      exec_state->GetArgument(1)->str->c_str()
+      exec_state->GetArgument(1)->str->c_str(),
+      exec_state->GetArgument(0)->str->c_str()
   );
   if (exec_state->root() == nullptr) {
     //set root
@@ -186,7 +186,7 @@ static Value SetAttr(ExecState* exec_state) {//setAttr("id","key","value");
     return Value();
   }
 
-  node->SetAttribute(key,value);
+  node->SetAttribute(key, value);
   return Value();
 }
 
