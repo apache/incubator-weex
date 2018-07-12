@@ -64,69 +64,51 @@ ExecState::~ExecState() {}
 
 void ExecState::Compile(const std::string& source) {
   CodeGenerator generator(this);
-//  Token token(0, 0);
-//  ChunkNode* chunk = new ChunkNode(token);
-//  ConstantNode* node = new NumberNode(token, 101);
-//  AssignmentNode* assignment =
-//      new AssignmentNode(token, Token::Type::ASSIGN, node);
-//  VarDeclareNode* declareNode = new VarDeclareNode(token, "aa", assignment);
-//
-//  VariableNode* funcName = new VariableNode(token, "log");
-//  VariableNode* aaNode = new VariableNode(token, "aa");
-//  ExpressionListNode* argsList = new ExpressionListNode(token);
-//  argsList->expressions().push_back(std::unique_ptr<ExpressionNode>(aaNode));
-//  FunctionCallNode* functionCallNode =
-//      new FunctionCallNode(token, funcName, argsList);
-//  FunctionNode* functionNode = new FunctionNode(token, functionCallNode);
-//  chunk->statements().push_back(std::unique_ptr<StatementNode>(declareNode));
-//  chunk->statements().push_back(std::unique_ptr<StatementNode>(functionNode));
-//  generator.Visit(chunk, nullptr);
-  // This is a test
-//  Token token(0, 0);
-//  ChunkNode* chunk = new ChunkNode(token);
-//  // define num
-//  {
-//    ConstantNode* node = new NumberNode(token, 101);
-//    AssignmentNode* assignment =
-//        new AssignmentNode(token, Token::Type::ASSIGN, node);
-//    VarDeclareNode* declareNode = new VarDeclareNode(token, "num", assignment);
-//    chunk->statements().push_back(std::unique_ptr<StatementNode>(declareNode));
-//  }
-//  // define str
-//  {
-//    ConstantNode* node = new StringNode(token, "This is a demo");
-//    AssignmentNode* assignment =
-//        new AssignmentNode(token, Token::Type::ASSIGN, node);
-//    VarDeclareNode* declareNode = new VarDeclareNode(token, "str", assignment);
-//    chunk->statements().push_back(std::unique_ptr<StatementNode>(declareNode));
-//  }
-//
-//  // log(num)
-//  {
-//    VariableNode* funcName = new VariableNode(token, "log");
-//    VariableNode* aaNode = new VariableNode(token, "num");
-//    ExpressionListNode* argsList = new ExpressionListNode(token);
-//    argsList->expressions().push_back(std::unique_ptr<ExpressionNode>(aaNode));
-//    FunctionCallNode* functionCallNode =
-//        new FunctionCallNode(token, funcName, argsList);
-//    FunctionNode* functionNode = new FunctionNode(token, functionCallNode);
-//    chunk->statements().push_back(std::unique_ptr<StatementNode>(functionNode));
-//  }
-//
-//  // log(str)
-//  {
-//    VariableNode* funcName = new VariableNode(token, "log");
-//    VariableNode* aaNode = new VariableNode(token, "str");
-//    ExpressionListNode* argsList = new ExpressionListNode(token);
-//    argsList->expressions().push_back(std::unique_ptr<ExpressionNode>(aaNode));
-//    FunctionCallNode* functionCallNode =
-//        new FunctionCallNode(token, funcName, argsList);
-//    FunctionNode* functionNode = new FunctionNode(token, functionCallNode);
-//    chunk->statements().push_back(std::unique_ptr<StatementNode>(functionNode));
-//  }
-//
-//  generator.Visit(chunk, nullptr);
-//>>>>>>> a8dd181b3153519002e0024fc0854f933862b850
+
+  Json* json = new Json();
+  Handle<ExpressionList> stmts = new ExpressionList();
+
+  ChunkStatement* chunk =
+      new ChunkStatement(*json, stmts);  // new ChunkStatement(NULL, stmts);
+
+  Handle<IntegralLiteral> intLiteral1 = new IntegralLiteral(*json, 1);
+  Handle<IntegralLiteral> intLiteral2 = new IntegralLiteral(*json, 2);
+
+  Declaration* declaration = new Declaration(*json, "aa", intLiteral1);
+  Declaration* declaration1 = new Declaration(*json, "bb", intLiteral2);
+
+  std::vector<Handle<Expression>> args;
+
+  Handle<Expression> lhs = nullptr;
+  Handle<Expression> rhs = nullptr;
+
+  BinaryExpression* addOperation = new BinaryExpression(
+      *json, BinaryOperation::kAddition, declaration, declaration1);
+
+  chunk->PushExpression(addOperation);
+
+  generator.Visit(chunk, nullptr);
+
+  //    Handle<StringLiteral> stringLiteral = new StringLiteral(*json, "string
+  //    1");
+  //
+  //    Declaration *declaration = new Declaration(*json, "aa", stringLiteral);
+  //
+  //    Handle<Expression> callee = new Identifier(*json, "log");
+  //
+  //    std::vector<Handle<Expression>> args;
+  //
+  //    Handle<Expression> arg1 = new Identifier(*json, "aa");
+  //
+  //    args.push_back(Handle<Expression>(arg1));
+  //
+  //    CallExpression *callExpression = new CallExpression(*json, callee,
+  //    args);
+  //
+  //    chunk->PushExpression(declaration);
+  //    chunk->PushExpression(callExpression);
+  //
+  //    generator.Visit(chunk, nullptr);
 }
 
 void ExecState::Execute() {

@@ -22,8 +22,8 @@
 
 #include <unordered_map>
 #include "base/common.h"
-#include "core/data_render/ast_visitor.h"
 #include "core/data_render/ast.h"
+#include "core/data_render/ast_visitor.h"
 #include "core/data_render/op_code.h"
 
 namespace weex {
@@ -36,20 +36,27 @@ class CodeGenerator : public ASTVisitor {
   CodeGenerator(ExecState *exec_state)
       : exec_state_(exec_state), cur_block_(nullptr) {}
   ~CodeGenerator() {}
-  void Visit(ChunkStatement *node) override;
-  void Visit(StringLiteral *node) override;
-//  void Visit(UnaryExpressionNode* node, void* data) override;
-//  void Visit(BinaryExpressionNode* node, void* data) override;
-//  void Visit(VariableNode* node, void* data) override;
-//  void Visit(AssignmentNode* node, void* data) override;
-//  void Visit(VarDeclareNode* node, void* data) override;
-//  void Visit(DotAccessorNode* node, void* data) override;
-//  void Visit(ExpressionListNode* node, void* data) override;
-//  void Visit(FunctionCallNode* node, void* data) override;
-//  void Visit(ForNode* node, void* data) override;
-//  void Visit(IfElseNode* node, void* data) override;
-//  void Visit(FunctionNode* node, void* data) override;
-//  void Visit(BlockNode* node, void* data) override;
+  void Visit(ChunkStatement *node, void *data) override;
+  void Visit(StringLiteral *node, void *data) override;
+  void Visit(CallExpression *node, void *data) override;
+  void Visit(ArgumentList *node, void *data) override;
+  void Visit(IfStatement *node, void *data) override;
+  void Visit(IfElseStatement *node, void *data) override;
+  void Visit(ForStatement *node, void *data) override;
+  void Visit(BlockStatement *node, void *data) override;
+  void Visit(FunctionPrototype *node, void *data) override;
+  void Visit(FunctionStatement *node, void *data) override;
+  void Visit(BinaryExpression *node, void *data) override;
+  void Visit(ChildBlockStatement *node, void *data) override;
+  void Visit(Declaration *node, void *data) override;
+  void Visit(DeclarationList *node, void *data) override;
+  void Visit(IntegralLiteral *node, void *data) override;
+  void Visit(MemberExpression *node, void *data) override;
+  void Visit(Identifier *node, void *data) override;
+  void Visit(PrefixExpression *node, void *data) override;
+  //    void Visit(ObjectLiteral *node, void *data) override;
+  //    void Visit(ArrayLiteral *node, void *data) override;
+  void Visit(ReturnStatement *node, void *data) override;
 
  private:
   template <class T>
@@ -57,25 +64,25 @@ class CodeGenerator : public ASTVisitor {
    public:
     Node() : parent_(nullptr) {}
     virtual ~Node() {}
-    inline T* parent() { return parent_; }
-    inline void set_parent(T* t) { parent_ = t; }
+    inline T *parent() { return parent_; }
+    inline void set_parent(T *t) { parent_ = t; }
 
    private:
-    T* parent_;
+    T *parent_;
   };
 
   class FuncCnt : public Node<FuncCnt> {
    public:
     FuncCnt() {}
     ~FuncCnt() {}
-    inline std::unordered_map<std::string, long>& upvalue() { return upvalue_; }
-    inline void set_func_state(FuncState* func_state) {
+    inline std::unordered_map<std::string, long> &upvalue() { return upvalue_; }
+    inline void set_func_state(FuncState *func_state) {
       func_state_ = func_state;
     }
-    inline FuncState* func_state() { return func_state_; }
+    inline FuncState *func_state() { return func_state_; }
 
    private:
-    FuncState* func_state_;
+    FuncState *func_state_;
     std::unordered_map<std::string, long> upvalue_;
   };
 
@@ -86,7 +93,7 @@ class CodeGenerator : public ASTVisitor {
 
     inline long NextRegisterId() { return idx_++; }
 
-    inline long FindRegisterId(const std::string& name) {
+    inline long FindRegisterId(const std::string &name) {
       auto iter = variables_.find(name);
       if (iter != variables_.end()) {
         return iter->second;
@@ -97,7 +104,7 @@ class CodeGenerator : public ASTVisitor {
       return -1;
     }
 
-    inline std::unordered_map<std::string, long>& variables() {
+    inline std::unordered_map<std::string, long> &variables() {
       return variables_;
     }
     inline void set_idx(int idx) { idx_ = idx; }
@@ -112,32 +119,32 @@ class CodeGenerator : public ASTVisitor {
 
   class RegisterScope {
    public:
-    RegisterScope(BlockCnt* block) : stored_idx_(block->idx()), block_(block) {}
+    RegisterScope(BlockCnt *block) : stored_idx_(block->idx()), block_(block) {}
     ~RegisterScope() { block_->set_idx(stored_idx_); }
 
    private:
     long stored_idx_;
-    BlockCnt* block_;
+    BlockCnt *block_;
     DISALLOW_COPY_AND_ASSIGN(RegisterScope);
   };
 
   class BlockScope {
    public:
-    BlockScope(CodeGenerator* cg) : cg_(cg) { cg_->EnterBlock(); }
+    BlockScope(CodeGenerator *cg) : cg_(cg) { cg_->EnterBlock(); }
     ~BlockScope() { cg_->LeaveBlock(); }
 
    private:
-    CodeGenerator* cg_;
+    CodeGenerator *cg_;
     DISALLOW_COPY_AND_ASSIGN(BlockScope);
   };
 
   class FuncScope {
    public:
-    FuncScope(CodeGenerator* cg) : cg_(cg) { cg_->EnterFunction(); }
+    FuncScope(CodeGenerator *cg) : cg_(cg) { cg_->EnterFunction(); }
     ~FuncScope() { cg_->LeaveFunction(); }
 
    private:
-    CodeGenerator* cg_;
+    CodeGenerator *cg_;
     DISALLOW_COPY_AND_ASSIGN(FuncScope);
   };
 
@@ -145,7 +152,7 @@ class CodeGenerator : public ASTVisitor {
   void LeaveFunction();
   void EnterBlock();
   void LeaveBlock();
-  ExecState* exec_state_;
+  ExecState *exec_state_;
   std::unique_ptr<FuncCnt> cur_func_;
   std::unique_ptr<BlockCnt> cur_block_;
 };

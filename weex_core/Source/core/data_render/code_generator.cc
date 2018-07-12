@@ -26,7 +26,7 @@ namespace core {
 namespace data_render {
 
 void CodeGenerator::EnterFunction() {
-  FuncCnt* parent_func = cur_func_.release();
+  FuncCnt *parent_func = cur_func_.release();
   cur_func_.reset(new FuncCnt);
   cur_func_->set_parent(parent_func);
   cur_func_->set_func_state(new FuncState);
@@ -38,7 +38,7 @@ void CodeGenerator::EnterFunction() {
 void CodeGenerator::LeaveFunction() { cur_func_.reset(cur_func_->parent()); }
 
 void CodeGenerator::EnterBlock() {
-  BlockCnt* parent_block = cur_block_.release();
+  BlockCnt *parent_block = cur_block_.release();
   cur_block_.reset(new BlockCnt);
   cur_block_->set_parent(parent_block);
   if (parent_block != nullptr) {
@@ -48,258 +48,140 @@ void CodeGenerator::EnterBlock() {
 
 void CodeGenerator::LeaveBlock() { cur_block_.reset(cur_block_->parent()); }
 
-void CodeGenerator::Visit(StringLiteral *node) {
-
+void CodeGenerator::Visit(StringLiteral *node, void *data) {
+  long reg = data == nullptr ? -1 : *static_cast<long *>(data);
+  if (reg >= 0) {
+    FuncState *func_state = cur_func_->func_state();
+    auto value = exec_state_->string_table_->StringFromUTF8(node->string());
+    int index = func_state->AddConstant(std::move(value));
+    Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
+    func_state->AddInstruction(i);
+  }
 }
-//  long reg = data == nullptr ? -1 : *static_cast<long*>(data);
-//  if (reg >= 0) {
-//    FuncState* func_state = cur_func_->func_state();
-//    if (node->IsBool()) {
-//      int index =
-//          func_state->AddConstant(static_cast<BoolNode*>(node)->value());
-//      Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
-//      func_state->AddInstruction(i);
-//    } else if (node->IsInteger()) {
-//      int index =
-//          func_state->AddConstant(static_cast<IntegerNode*>(node)->value());
-//      Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
-//      func_state->AddInstruction(i);
-//    } else if (node->IsNumber()) {
-//      int index =
-//          func_state->AddConstant(static_cast<NumberNode*>(node)->value());
-//      Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
-//      func_state->AddInstruction(i);
-//    } else if (node->IsUndefined() || node->IsNull()) {
-//      Instruction i = CREATE_ABC(OpCode::OP_LOADNULL, reg, 0, 0);
-//      func_state->AddInstruction(i);
-//    }
-//  }
-    
-//void CodeGenerator::Visit(ConstantNode* node, void* data) {
-//  long reg = data == nullptr ? -1 : *static_cast<long*>(data);
-//  if (reg >= 0) {
-//    FuncState* func_state = cur_func_->func_state();
-//    if (node->IsBool()) {
-//      int index =
-//          func_state->AddConstant(static_cast<BoolNode*>(node)->value());
-//      Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
-//      func_state->AddInstruction(i);
-//    } else if (node->IsInteger()) {
-//      int index =
-//          func_state->AddConstant(static_cast<IntegerNode*>(node)->value());
-//      Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
-//      func_state->AddInstruction(i);
-//    } else if (node->IsNumber()) {
-//      int index =
-//          func_state->AddConstant(static_cast<NumberNode*>(node)->value());
-//      Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
-//      func_state->AddInstruction(i);
-//    } else if (node->IsUndefined() || node->IsNull()) {
-//      Instruction i = CREATE_ABC(OpCode::OP_LOADNULL, reg, 0, 0);
-//      func_state->AddInstruction(i);
-//    } else if (node->IsString()) {
-//      auto value = exec_state_->string_table_->StringFromUTF8(
-//          static_cast<StringNode*>(node)->value());
-//      int index = func_state->AddConstant(std::move(value));
-//      Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
-//      func_state->AddInstruction(i);
-//    }
-//  }
-//}
-//
-//void CodeGenerator::Visit(UnaryExpressionNode* node, void* data) {}
-//void CodeGenerator::Visit(BinaryExpressionNode* node, void* data) {}
-//
-//void CodeGenerator::Visit(VariableNode* node, void* data) {
-//  long reg_a = data == nullptr ? -1 : *static_cast<long*>(data);
-//  if (reg_a >= 0) {
-//    FuncState* state = cur_func_->func_state();
-//
-//    int reg_b = cur_block_->FindRegisterId(node->identifier());
-//    if (reg_b >= 0) {
-//      state->AddInstruction(CREATE_ABC(OP_MOVE, reg_a, reg_b, 0));
-//      return;
-//    }
-//
-//    int index = exec_state_->global()->IndexOf(node->identifier());
-//    if (index >= 0) {
-//      state->AddInstruction(CREATE_ABC(OP_GETGLOBAL, reg_a, index, 0));
-//      return;
-//    }
-//  }
-//}
-//
-//void CodeGenerator::Visit(AssignmentNode* node, void* data) {
-//  long reg_a = data == nullptr ? -1 : *static_cast<long*>(data);
-//  if (reg_a >= 0) {
-//    if (node->expression() != nullptr) {
-//      node->expression()->Accept(this, &reg_a);
-//    } else {
-//      FuncState* state = cur_func_->func_state();
-//      state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg_a, 0, 0));
-//    }
-//  }
-//}
-//
-//void CodeGenerator::Visit(VarDeclareNode* node, void* data) {
-//  long reg = cur_block_->NextRegisterId();
-//  cur_block_->variables().insert(std::make_pair(node->identifier(), reg));
-//  if (node->expression() != nullptr) {
-//    node->expression()->Accept(this, &reg);
-//  } else {
-//    FuncState* state = cur_func_->func_state();
-//    state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
-//  }
-//}
-//
-//void CodeGenerator::Visit(DotAccessorNode* node, void* data) {}
-//
-//void CodeGenerator::Visit(ExpressionListNode* node, void* data) {
-//  RegisterScope scope(cur_block_.get());
-//  for (auto it = node->expressions().begin(); it != node->expressions().end();
-//       ++it) {
-//    long reg = cur_block_->NextRegisterId();
-//    (*it).get()->Accept(this, &reg);
-//  }
-//}
-//
-//void CodeGenerator::Visit(FunctionCallNode* node, void* data) {
-//  RegisterScope scope(cur_block_.get());
-//  long ret = data == nullptr ? cur_block_->NextRegisterId()
-//                             : *static_cast<long*>(data);
-//  long caller = cur_block_->NextRegisterId();
-//  size_t argc = 0;
-//  if (node->caller() != nullptr) {
-//    node->caller()->Accept(this, &caller);
-//  }
-//  if (node->arguments() != nullptr) {
-//    argc = node->arguments()->expressions().size();
-//    node->arguments()->Accept(this, nullptr);
-//  }
-//  FuncState* state = cur_func_->func_state();
-//  state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
-//}
-//
-//void CodeGenerator::Visit(ForNode* node, void* data) {}
-//void CodeGenerator::Visit(IfElseNode* node, void* data) {}
-//
-//void CodeGenerator::Visit(FunctionNode* node, void* data) {
-//  if (node->func() != nullptr) {
-//    node->func()->Accept(this, data);
-//  }
-//}
-//
-//void CodeGenerator::Visit(BlockNode* node, void* data) {
-//  BlockScope block_scoped(this);
-//  for (auto it = node->statements().begin(); it != node->statements().end();
-//       ++it) {
-//    (*it)->Accept(this, nullptr);
-//  }
-//>>>>>>> a8dd181b3153519002e0024fc0854f933862b850
-//}
 
-//void CodeGenerator::Visit(UnaryExpressionNode* node, void* data) {}
-//void CodeGenerator::Visit(BinaryExpressionNode* node, void* data) {}
-//
-//void CodeGenerator::Visit(VariableNode* node, void* data) {
-//  long reg_a = data == nullptr ? -1 : *static_cast<long*>(data);
-//  if (reg_a >= 0) {
-//    FuncState* state = cur_func_->func_state();
-//
-//    int reg_b = cur_block_->FindRegisterId(node->identifier());
-//    if (reg_b >= 0) {
-//      state->AddInstruction(CREATE_ABC(OP_MOVE, reg_a, reg_b, 0));
-//      return;
-//    }
-//
-//    int index = exec_state_->global()->IndexOf(node->identifier());
-//    if (index >= 0) {
-//      state->AddInstruction(CREATE_ABC(OP_GETGLOBAL, reg_a, index, 0));
-//      return;
-//    }
-//  }
-//}
-//
-//void CodeGenerator::Visit(AssignmentNode* node, void* data) {
-//  long reg_a = data == nullptr ? -1 : *static_cast<long*>(data);
-//  if (reg_a >= 0) {
-//    if (node->expression() != nullptr) {
-//      node->expression()->Accept(this, &reg_a);
-//    } else {
-//      FuncState* state = cur_func_->func_state();
-//      state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg_a, 0, 0));
-//    }
-//  }
-//}
-//
-//void CodeGenerator::Visit(VarDeclareNode* node, void* data) {
-//  long reg = cur_block_->NextRegisterId();
-//  cur_block_->variables().insert(std::make_pair(node->identifier(), reg));
-//  if (node->expression() != nullptr) {
-//    node->expression()->Accept(this, &reg);
-//  } else {
-//    FuncState* state = cur_func_->func_state();
-//    state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
-//  }
-//}
-//
-//void CodeGenerator::Visit(DotAccessorNode* node, void* data) {}
-//
-//void CodeGenerator::Visit(ExpressionListNode* node, void* data) {
-//  RegisterScope scope(cur_block_.get());
-//  for (auto it = node->expressions().begin(); it != node->expressions().end();
-//       ++it) {
-//    long reg = cur_block_->NextRegisterId();
-//    (*it).get()->Accept(this, &reg);
-//  }
-//}
-//
-//void CodeGenerator::Visit(FunctionCallNode* node, void* data) {
-//  RegisterScope scope(cur_block_.get());
-//  long ret = data == nullptr ? cur_block_->NextRegisterId()
-//                             : *static_cast<long*>(data);
-//  long caller = cur_block_->NextRegisterId();
-//  size_t argc = 0;
-//  if (node->caller() != nullptr) {
-//    node->caller()->Accept(this, &caller);
-//  }
-//  if (node->arguments() != nullptr) {
-//    argc = node->arguments()->expressions().size();
-//    node->arguments()->Accept(this, nullptr);
-//  }
-//  FuncState* state = cur_func_->func_state();
-//  state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
-//}
-//
-//void CodeGenerator::Visit(ForNode* node, void* data) {}
-//void CodeGenerator::Visit(IfElseNode* node, void* data) {}
-//
-//void CodeGenerator::Visit(FunctionNode* node, void* data) {
-//  if (node->func() != nullptr) {
-//    node->func()->Accept(this, data);
-//  }
-//}
-//
-//void CodeGenerator::Visit(BlockNode* node, void* data) {
-//  BlockScope block_scoped(this);
-//  for (auto it = node->statements().begin(); it != node->statements().end();
-//       ++it) {
-//    (*it)->Accept(this, nullptr);
-//  }
-//}
-
-void CodeGenerator::Visit(ChunkStatement *stms) {
+void CodeGenerator::Visit(ChunkStatement *stms, void *data) {
   FuncScope scope(this);
   BlockScope block_scoped(this);
   // For root func
   long reg = cur_block_->NextRegisterId();
-  for (auto it = stms->statements()->raw_list().begin(); it != stms->statements()->raw_list().end();
-       ++it) {
-    (*it)->Accept(this);
+  for (auto it = stms->statements()->raw_list().begin();
+       it != stms->statements()->raw_list().end(); ++it) {
+    if (it->GetPtr() != NULL) {
+      (*it)->Accept(this, data);
+    }
   }
   exec_state_->func_state_.reset(cur_func_->func_state());
   // global value
 }
+
+void CodeGenerator::Visit(CallExpression *stms, void *data) {
+  RegisterScope scope(cur_block_.get());
+  long ret = data == nullptr ? cur_block_->NextRegisterId()
+                             : *static_cast<long *>(data);
+  long caller = cur_block_->NextRegisterId();
+  size_t argc = 0;
+  if (stms->callee().get() != NULL) {
+    stms->callee()->Accept(this, &caller);
+  }
+
+  argc = stms->args().size();
+  for (auto it = stms->args().begin(); it != stms->args().end(); ++it) {
+    auto temp = (*it).get();
+    temp->Accept(this, nullptr);
+  }
+
+  FuncState *state = cur_func_->func_state();
+  state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
+}
+
+void CodeGenerator::Visit(ArgumentList *node, void *data) {}
+
+void CodeGenerator::Visit(IfStatement *node, void *data) {}
+
+void CodeGenerator::Visit(IfElseStatement *node, void *data) {}
+
+void CodeGenerator::Visit(ForStatement *node, void *data) {}
+
+void CodeGenerator::Visit(BlockStatement *node, void *data) {}
+
+void CodeGenerator::Visit(FunctionPrototype *node, void *data) {}
+
+void CodeGenerator::Visit(FunctionStatement *node, void *data) {}
+
+void CodeGenerator::Visit(BinaryExpression *node, void *data) {
+  RegisterScope scope(cur_block_.get());
+  long ret = data == nullptr ? cur_block_->NextRegisterId()
+                             : *static_cast<long *>(data);
+
+  long left = cur_block_->NextRegisterId();
+  if (node->lhs().get() != NULL) {
+    node->lhs()->Accept(this, &left);
+  }
+
+  long right = cur_block_->NextRegisterId();
+  if (node->rhs().get() != NULL) {
+    node->rhs()->Accept(this, &right);
+  }
+
+  BinaryOperation opeartion = node->op();
+
+  FuncState *state = cur_func_->func_state();
+  if (opeartion == BinaryOperation::kAddition) {
+    state->AddInstruction(CREATE_ABC(OP_ADD, ret, 0, 0));
+  }
+}
+
+void CodeGenerator::Visit(ChildBlockStatement *node, void *data) {}
+
+void CodeGenerator::Visit(Declaration *node, void *data) {
+  long reg = cur_block_->NextRegisterId();
+  cur_block_->variables().insert(std::make_pair(node->name(), reg));
+  if (node->expr().get() != nullptr) {
+    node->expr()->Accept(this, &reg);
+  } else {
+    FuncState *state = cur_func_->func_state();
+    state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
+  }
+}
+
+void CodeGenerator::Visit(DeclarationList *node, void *data) {}
+
+void CodeGenerator::Visit(IntegralLiteral *node, void *data) {
+  long reg = data == nullptr ? -1 : *static_cast<long *>(data);
+  if (reg >= 0) {
+    FuncState *func_state = cur_func_->func_state();
+    int value = node->value();
+    int index = func_state->AddConstant(std::move(value));
+    Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
+    func_state->AddInstruction(i);
+  }
+}
+
+void CodeGenerator::Visit(MemberExpression *node, void *data) {}
+
+void CodeGenerator::Visit(Identifier *node, void *data) {
+  long reg_a = data == nullptr ? cur_block_->NextRegisterId()
+                               : *static_cast<long *>(data);
+  if (reg_a >= 0) {
+    FuncState *state = cur_func_->func_state();
+
+    int reg_b = cur_block_->FindRegisterId(node->GetName());
+    if (reg_b >= 0) {
+      state->AddInstruction(CREATE_ABC(OP_MOVE, reg_a, reg_b, 0));
+      return;
+    }
+
+    int index = exec_state_->global()->IndexOf(node->GetName());
+    if (index >= 0) {
+      state->AddInstruction(CREATE_ABC(OP_GETGLOBAL, reg_a, index, 0));
+      return;
+    }
+  }
+}
+
+void CodeGenerator::Visit(PrefixExpression *node, void *data) {}
+
+void CodeGenerator::Visit(ReturnStatement *node, void *data) {}
 
 }  // namespace data_render
 }  // namespace core
