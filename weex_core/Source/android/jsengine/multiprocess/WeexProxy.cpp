@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <core/layout/measure_func_adapter_impl_android.h>
 #include <core/manager/weex_core_manager.h>
+#include "core/data_render/vnode/vnode_render_manager.h"
 
 const char *s_cacheDir;
 const char *g_jssSoPath = nullptr;
@@ -1074,6 +1075,13 @@ namespace WeexCore {
     WeexProxy::createInstanceContext(JNIEnv *env, jobject jcaller, jstring jinstanceid,
                                      jstring name,
                                      jstring jfunction, jobjectArray jargs) {
+        ScopedJStringUTF8 idChar(env, jinstanceid);
+        std::string sourceStr = "{\"body\":{\"tagName\":\"div\",\"nodeId\":\"1\",\"classList\":[\"wrap\"],\"childNodes\":[{\"tagName\":\"text\",\"nodeId\":\"2\",\"attributes\":{\"value\":\"hello world\"}}]},\"styles\":[{\"wrap\":{\"width\":\"100px\",\"height\":\"100px\"}}]}";
+        auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+        node_manager->InitVM();
+        node_manager->TestProcess(sourceStr,idChar.getChars());
+
+        return true;
         if (!sSender && js_server_api_functions == nullptr) {
             LOGE("have not connected to a js server");
             return false;

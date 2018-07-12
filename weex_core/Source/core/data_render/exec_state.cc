@@ -21,6 +21,7 @@
 #include "core/data_render/code_generator.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
+#include "parser.h"
 
 namespace weex {
 namespace core {
@@ -64,51 +65,9 @@ ExecState::~ExecState() {}
 
 void ExecState::Compile(const std::string& source) {
   CodeGenerator generator(this);
-
-  Json* json = new Json();
-  Handle<ExpressionList> stmts = new ExpressionList();
-
-  ChunkStatement* chunk =
-      new ChunkStatement(*json, stmts);  // new ChunkStatement(NULL, stmts);
-
-  Handle<IntegralLiteral> intLiteral1 = new IntegralLiteral(*json, 1);
-  Handle<IntegralLiteral> intLiteral2 = new IntegralLiteral(*json, 2);
-
-  Declaration* declaration = new Declaration(*json, "aa", intLiteral1);
-  Declaration* declaration1 = new Declaration(*json, "bb", intLiteral2);
-
-  std::vector<Handle<Expression>> args;
-
-  Handle<Expression> lhs = nullptr;
-  Handle<Expression> rhs = nullptr;
-
-  BinaryExpression* addOperation = new BinaryExpression(
-      *json, BinaryOperation::kAddition, declaration, declaration1);
-
-  chunk->PushExpression(addOperation);
-
-  generator.Visit(chunk, nullptr);
-
-  //    Handle<StringLiteral> stringLiteral = new StringLiteral(*json, "string
-  //    1");
-  //
-  //    Declaration *declaration = new Declaration(*json, "aa", stringLiteral);
-  //
-  //    Handle<Expression> callee = new Identifier(*json, "log");
-  //
-  //    std::vector<Handle<Expression>> args;
-  //
-  //    Handle<Expression> arg1 = new Identifier(*json, "aa");
-  //
-  //    args.push_back(Handle<Expression>(arg1));
-  //
-  //    CallExpression *callExpression = new CallExpression(*json, callee,
-  //    args);
-  //
-  //    chunk->PushExpression(declaration);
-  //    chunk->PushExpression(callExpression);
-  //
-  //    generator.Visit(chunk, nullptr);
+  std::string err;
+  const ParseResult& result = Parser::parse(source, err);
+  generator.Visit(result.expr().get(), nullptr);
 }
 
 void ExecState::Execute() {
@@ -154,7 +113,7 @@ void ExecState::setVNodeRoot(VNode* v_node) {
 }
 VNode* ExecState::find_node(const std::string& ref) {
   auto it = node_map_.find(ref);
-  if (it == node_map_.end()){
+  if (it == node_map_.end()) {
     return nullptr;
   }
   return it->second;

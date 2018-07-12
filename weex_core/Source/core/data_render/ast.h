@@ -298,6 +298,8 @@ class CallExpression : public Expression {
         callee_(callee),
         args_{std::move(args)} {}
   Handle<Expression> member() { return member_; }
+  Handle<Expression> callee() { return callee_; }
+  std::vector<Handle<Expression>>& args() { return args_; }
   MemberAccessKind kind() { return kind_; }
 
   Handle<Expression> expr() { return expr_; }

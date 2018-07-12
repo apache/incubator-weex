@@ -151,7 +151,7 @@ void CodeGenerator::Visit(IntegralLiteral *node, void *data) {
   if (reg >= 0) {
     FuncState *func_state = cur_func_->func_state();
     int value = node->value();
-    int index = func_state->AddConstant(std::move(value));
+    int index = func_state->AddConstant(static_cast<int64_t>(value));
     Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
     func_state->AddInstruction(i);
   }

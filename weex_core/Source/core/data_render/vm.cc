@@ -19,7 +19,7 @@
 #include "core/data_render/vm.h"
 #include "core/data_render/exec_state.h"
 
-#define LOGE(...) ()
+#define LOGE(...)
 
 #define INT_OP(op, v1, v2) CAST_U2S((CAST_S2U(v1)) op CAST_S2U(v2))
 #define NUM_OP(op, d1, d2) ((d1) op (d2))
