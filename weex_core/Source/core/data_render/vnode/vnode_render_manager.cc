@@ -43,7 +43,7 @@ using std::pair;
 using WeexCore::RenderManager;
 
 VNodeRenderManager* VNodeRenderManager::g_pInstance = nullptr;
-VNodeRenderManager* VNodeRenderManager::g_vm_ = nullptr;
+VM* VNodeRenderManager::g_vm_ = nullptr;
 
 WeexCore::RenderObject* parseVNode2RenderObject(const VNode* vnode, WeexCore::RenderObject* parent,
                                                 int index, const string& pageId) {
