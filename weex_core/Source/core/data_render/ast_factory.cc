@@ -53,61 +53,19 @@ namespace data_render {
     Handle<Expression> ASTFactory::NewBlockStatement(Json &json, Handle<ExpressionList> list)
     {
         Handle<Expression> expr = MakeHandle<BlockStatement>(json, list);
-        expr->Pasing(json);
         return expr;
     }
     Handle<ChunkStatement> ASTFactory::NewChunkStatement(Json &json, Handle<ExpressionList> list) {
         Handle<ChunkStatement> expr = MakeHandle<ChunkStatement>(json, list);
-        expr->Pasing(json);
         return expr;
     }
     Handle<Expression> ASTFactory::NewFunctionPrototype(Json &json, std::string name, std::vector<std::string> args)
     {
         return MakeHandle<FunctionPrototype>(json, name, std::move(args));
     }
-    Handle<Expression> ASTFactory::NewChildBlockStatement(Json &json, Handle<ExpressionList> list, std::string parent) {
-        Handle<Expression> expr = MakeHandle<ChildBlockStatement>(json, list, parent);
-        expr->Pasing(json);
+    Handle<Expression> ASTFactory::NewChildStatement(Json &json, Handle<ExpressionList> list, std::string parent) {
+        Handle<Expression> expr = MakeHandle<ChildStatement>(json, list, parent);
         return expr;
-    }
-    Handle<Expression> ASTFactory::NewControlStatement(Json &json) {
-        Handle<Expression> controlExpr = nullptr;
-        Json control = json["control"];
-        do {
-            Json repeat = control["repeat"];
-            if (!repeat.is_null() && repeat.is_object()) {
-                Json index = repeat["index"];
-                do {
-                    if (!index.is_string()) {
-                        break;
-                    }
-                    Handle<DeclarationList> forInit = NewDeclarationList(repeat);
-                    forInit->Append(NewDeclaration(repeat, index.string_value(), NewIntegralConstant(json, 0)));
-                    Json expression = repeat["expression"];
-                    if (!expression.is_string()) {
-                        break;
-                    }
-                    Json alias = repeat["alias"];
-                    if (!alias.is_string()) {
-                        break;
-                    }
-                    Handle<Identifier> expressionIdentifier = NewIdentifier(expression, expression.string_value());
-                    Handle<Identifier> indexIdentifier = NewIdentifier(index, index.string_value());
-                    Handle<MemberExpression> indexMember = NewMemberExpression(repeat, MemberAccessKind::kIndex, expressionIdentifier, indexIdentifier);
-                    forInit->Append(NewDeclaration(repeat, alias.string_value(), indexMember));
-                    Handle<Identifier> lengthIdentifier = NewIdentifier(index, "length");
-                    Handle<MemberExpression> lengthMember = NewMemberExpression(repeat, MemberAccessKind::kDot, expressionIdentifier, lengthIdentifier);
-                    Handle<Expression> forCondition = NewBinaryExpression(repeat, BinaryOperation::kLessThan, indexIdentifier, lengthMember);
-                    Handle<Expression> forUpdate = NewPrefixExpression(repeat, PrefixOperation::kIncrement, indexIdentifier);
-                    Handle<Expression> forBlock = MakeHandle<BlockStatement>(json, NewExpressionList());
-                    controlExpr = NewForStatement(repeat, ForKind::kForOf, forInit, forCondition, forUpdate, forBlock);
-                    
-                } while (0);
-            }
-            
-        } while (0);
-        
-        return controlExpr;
     }
     Handle<Expression> ASTFactory::NewDeclaration(Json &json, std::string name, Handle<Expression> init) {
         return MakeHandle<Declaration>(json, name, init);

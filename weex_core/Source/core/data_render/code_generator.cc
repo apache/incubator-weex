@@ -132,7 +132,7 @@ void CodeGenerator::Visit(BinaryExpression *node, void *data) {
   }
 }
 
-void CodeGenerator::Visit(ChildBlockStatement *node, void *data) {
+void CodeGenerator::Visit(ChildStatement *node, void *data) {
   Handle<ExpressionList> stms = node->statements();
   for (auto it = stms->raw_list().begin(); it != stms->raw_list().end(); ++it) {
     auto temp = (*it).get();

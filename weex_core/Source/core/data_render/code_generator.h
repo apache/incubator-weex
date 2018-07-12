@@ -47,7 +47,7 @@ class CodeGenerator : public ASTVisitor {
   void Visit(FunctionPrototype *node, void *data) override;
   void Visit(FunctionStatement *node, void *data) override;
   void Visit(BinaryExpression *node, void *data) override;
-  void Visit(ChildBlockStatement *node, void *data) override;
+  void Visit(ChildStatement *node, void *data) override;
   void Visit(Declaration *node, void *data) override;
   void Visit(DeclarationList *node, void *data) override;
   void Visit(IntegralConstant *node, void *data) override;

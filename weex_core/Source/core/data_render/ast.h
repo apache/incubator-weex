@@ -38,12 +38,12 @@ namespace data_render {
 #define EMIT_FUNCTION
 #endif
 
-#define DEFINE_NODE_TYPE(Type)                                       \
+#define DEFINE_NODE_TYPE(Type, Inheritor)                                       \
  public:                                                             \
   friend class ASTVisitor;                                           \
   friend class Expression;                                           \
   friend class ASTFactory;                                           \
-  Type(Json &json) : Expression(json) {}                             \
+  Type(Json &json) : Inheritor(json) {}                             \
   virtual ~Type() = default;                                         \
   bool Is##Type() const override { return true; }                    \
   Handle<Type> As##Type() override {                                 \
@@ -65,8 +65,8 @@ namespace data_render {
   M(FunctionStatement)   \
   M(StringConstant)      \
   M(BinaryExpression)    \
-  M(AssignExpression)     \
-  M(ChildBlockStatement) \
+  M(AssignExpression)    \
+  M(ChildStatement)      \
   M(Declaration)         \
   M(DeclarationList)     \
   M(IntegralConstant)    \
@@ -155,7 +155,7 @@ class ArgumentList : public Expression {
   Handle<ExpressionList> args() { return args_; }
   size_t length() { return args()->Size(); }
 
-  DEFINE_NODE_TYPE(ArgumentList);
+  DEFINE_NODE_TYPE(ArgumentList, Expression);
 
  private:
   Handle<ExpressionList> args_;
@@ -170,7 +170,7 @@ class Identifier : public Expression {
 
   const std::string &GetName() const { return name_; }
   bool ProduceRValue() override { return false; }
-  DEFINE_NODE_TYPE(Identifier);
+  DEFINE_NODE_TYPE(Identifier, Expression);
 };
 class StringConstant : public Expression {
  private:
@@ -180,7 +180,7 @@ class StringConstant : public Expression {
   StringConstant(Json &json, const std::string &str)
       : Expression(json), str_(str) {}
   std::string &string() { return str_; }
-  DEFINE_NODE_TYPE(StringConstant);
+  DEFINE_NODE_TYPE(StringConstant, Expression);
 };
 enum class BinaryOperation {
   kAddition,
@@ -209,7 +209,7 @@ enum class BinaryOperation {
 };
 
 class BinaryExpression : public Expression {
-  DEFINE_NODE_TYPE(BinaryExpression);
+  DEFINE_NODE_TYPE(BinaryExpression, Expression);
 
  public:
   BinaryOperation op() { return op_; }
@@ -233,7 +233,7 @@ class Declaration : public Expression {
   std::string &name() { return name_; }
 
   Handle<Expression> expr() { return init_; }
-  DEFINE_NODE_TYPE(Declaration);
+  DEFINE_NODE_TYPE(Declaration, Expression);
 
  private:
   std::string name_;
@@ -249,7 +249,7 @@ class DeclarationList : public Expression {
   void Append(Handle<Declaration> decl) {
     exprs_.push_back(Handle<Declaration>(decl));
   }
-  DEFINE_NODE_TYPE(DeclarationList);
+  DEFINE_NODE_TYPE(DeclarationList, Expression);
 
  private:
   std::vector<Handle<Declaration>> exprs_;
@@ -258,7 +258,7 @@ class IntegralConstant : public Expression {
  public:
   IntegralConstant(Json &json, int value) : Expression(json), value_(value) {}
   int value() { return value_; }
-  DEFINE_NODE_TYPE(IntegralConstant);
+  DEFINE_NODE_TYPE(IntegralConstant, Expression);
  private:
   int value_;
 };
@@ -278,7 +278,7 @@ class MemberExpression : public Expression {
 
   Handle<Expression> expr() { return expr_; }
   bool ProduceRValue() override { return false; }
-  DEFINE_NODE_TYPE(MemberExpression);
+  DEFINE_NODE_TYPE(MemberExpression, Expression);
 
  private:
   MemberAccessKind kind_;
@@ -304,7 +304,7 @@ class CallExpression : public Expression {
   Handle<Expression> expr() { return expr_; }
   bool ProduceRValue() override { return false; }
   void InsertArgument(Handle<Expression> arg) { args_.push_back(arg); }
-  DEFINE_NODE_TYPE(CallExpression);
+  DEFINE_NODE_TYPE(CallExpression, Expression);
 
  private:
   MemberAccessKind kind_;
@@ -324,7 +324,7 @@ class PrefixExpression : public Expression {
       : Expression(json), op_{op}, expr_{expr} {}
   PrefixOperation op() { return op_; }
   Handle<Expression> expr() { return expr_; }
-  DEFINE_NODE_TYPE(PrefixExpression);
+  DEFINE_NODE_TYPE(PrefixExpression, Expression);
 
  private:
   PrefixOperation op_;
@@ -339,7 +339,7 @@ class ObjectConstant : public Expression {
   bool IsEmpty() { return Props.empty(); }
   ProxyObject::size_type GetPropertyCount() { return Props.size(); }
 
-  DEFINE_NODE_TYPE(ObjectConstant);
+  DEFINE_NODE_TYPE(ObjectConstant, Expression);
 
  private:
   ProxyObject Props;
@@ -353,7 +353,7 @@ class ArrayConstant : public Expression {
 
   typename ProxyArray::size_type length() { return exprs_.size(); }
 
-  DEFINE_NODE_TYPE(ArrayConstant);
+  DEFINE_NODE_TYPE(ArrayConstant, Expression);
 
  private:
   ProxyArray exprs_;
@@ -366,7 +366,7 @@ public:
     
     Handle<Expression> lhs() { return lhs_; }
     Handle<Expression> rhs() { return rhs_; }
-    DEFINE_NODE_TYPE(AssignExpression);
+    DEFINE_NODE_TYPE(AssignExpression, Expression);
 private:
     Handle<Expression> lhs_;
     Handle<Expression> rhs_;

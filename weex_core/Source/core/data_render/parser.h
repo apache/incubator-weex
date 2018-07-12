@@ -50,7 +50,6 @@ class Parser final {
   // Parse. If parse fails, return Json() and assign an error message to err.
   static ParseResult parse(const std::string& in,
                            std::string& err);
-  static Handle<Expression> parseExpression(Json& json, std::string& err);
  private:
   Parser() {};
 };

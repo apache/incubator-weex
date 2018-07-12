@@ -30,34 +30,26 @@ namespace data_render {
 class BlockStatement : public Expression {
 public:
     BlockStatement(Json &json, Handle<ExpressionList> stmts) : Expression(json), stmts_{ stmts } { }
-    void Pasing(Json &json) override;
     Handle<ExpressionList> statements() { return stmts_; }
     void PushExpression(Handle<Expression> expr);
-    DEFINE_NODE_TYPE(BlockStatement);
+    DEFINE_NODE_TYPE(BlockStatement, Expression);
 private:
     Handle<ExpressionList> stmts_;
 };
 
-class ChunkStatement : public Expression {
+class ChunkStatement : public BlockStatement {
 public:
-    ChunkStatement(Json &json, Handle<ExpressionList> stmts) : Expression(json), stmts_{ stmts } { }
-    void Pasing(Json &json) override;
-    Handle<ExpressionList> statements() { return stmts_; }
-    void PushExpression(Handle<Expression> expr);
-    DEFINE_NODE_TYPE(ChunkStatement);
+    ChunkStatement(Json &json, Handle<ExpressionList> stmts) : BlockStatement(json, stmts) { }
+    DEFINE_NODE_TYPE(ChunkStatement, BlockStatement);
 private:
-    Handle<ExpressionList> stmts_;
 };
 
-class ChildBlockStatement : public Expression {
+class ChildStatement : public BlockStatement {
 public:
-    ChildBlockStatement(Json &json, Handle<ExpressionList> stmts, std::string parent) : Expression(json), stmts_{ stmts }, parent_{ parent } { };
-    void Pasing(Json &json) override;
-    Handle<ExpressionList> statements() { return stmts_; }
-    void PushExpression(Handle<Expression> expr);
-    DEFINE_NODE_TYPE(ChildBlockStatement);
+    ChildStatement(Json &json, Handle<ExpressionList> stmts, std::string parent) : BlockStatement(json, stmts), parent_{ parent } { };
+    std::string &parent() { return parent_; };
+    DEFINE_NODE_TYPE(ChildStatement, BlockStatement);
 private:
-    Handle<ExpressionList> stmts_;
     std::string parent_;
 };
 
@@ -80,7 +72,7 @@ public:
 
     ForKind kind() { return kind_; }
 
-    DEFINE_NODE_TYPE(ForStatement);
+    DEFINE_NODE_TYPE(ForStatement, Expression);
 private:
     ForKind kind_;
     Handle<Expression> init_;
@@ -119,7 +111,7 @@ private:
 // FunctionPrototype - captures the prototype of the function
 // which includes the name of the function and
 class FunctionPrototype : public Expression {
-    DEFINE_NODE_TYPE(FunctionPrototype);
+    DEFINE_NODE_TYPE(FunctionPrototype, Expression);
 public:
     FunctionPrototype(Json &json, std::string name,
         std::vector<std::string> args)
@@ -134,7 +126,7 @@ private:
 
 // FunctionStatement - captures the function statement
 class FunctionStatement : public Expression {
-    DEFINE_NODE_TYPE(FunctionStatement);
+    DEFINE_NODE_TYPE(FunctionStatement, Expression);
 public:
     FunctionStatement(Json &json,
         Handle<FunctionPrototype> proto, Handle<Expression> body)
@@ -150,7 +142,7 @@ private:
 };
 
 class IfStatement : public Expression {
-    DEFINE_NODE_TYPE(IfStatement);
+    DEFINE_NODE_TYPE(IfStatement, Expression);
     using ExprPtr = Handle<Expression>;
 public:
     IfStatement(Json &json, ExprPtr cond, ExprPtr body)
@@ -166,7 +158,7 @@ private:
 };
 
 class IfElseStatement : public Expression {
-    DEFINE_NODE_TYPE(IfElseStatement);
+    DEFINE_NODE_TYPE(IfElseStatement, Expression);
     using ExprPtr = Handle<Expression>;
 public:
     IfElseStatement(Json &json, ExprPtr cond, ExprPtr body, ExprPtr el)
@@ -193,7 +185,7 @@ public:
 
     Handle<Expression> expr() { return expr_; }
 
-    DEFINE_NODE_TYPE(ReturnStatement);
+    DEFINE_NODE_TYPE(ReturnStatement, Expression);
 private:
     Handle<Expression> expr_;
 };

@@ -39,11 +39,10 @@ namespace data_render {
         virtual Handle<Expression> NewIdentifier(Json &json, std::string name);
         virtual Handle<ChunkStatement> NewChunkStatement(Json &json, Handle<ExpressionList> list);
         virtual Handle<Expression> NewBlockStatement(Json &json, Handle<ExpressionList> list);
-        virtual Handle<Expression> NewChildBlockStatement(Json &json, Handle<ExpressionList> list, std::string parent);
+        virtual Handle<Expression> NewChildStatement(Json &json, Handle<ExpressionList> list, std::string parent);
         virtual Handle<Expression> NewFunctionPrototype(Json &json, std::string name, std::vector<std::string> args);
         virtual Handle<Expression> NewArgumentList(Json &json, Handle<ExpressionList>);
         virtual Handle<Expression> NewStringConstant(Json &json, std::string str);
-        virtual Handle<Expression> NewControlStatement(Json &json);
         virtual Handle<Expression> NewBinaryExpression(Json &json, BinaryOperation op, Handle<Expression> lhs, Handle<Expression> rhs);
         virtual Handle<Expression> NewDeclaration(Json &json, std::string name, Handle<Expression> init = nullptr);
         virtual Handle<Expression> NewDeclarationList(Json &json, std::vector<Handle<Declaration>> decls);
