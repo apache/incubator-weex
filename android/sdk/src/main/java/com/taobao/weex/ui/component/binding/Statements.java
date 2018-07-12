@@ -47,6 +47,7 @@ import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.template.CellDataManager;
 import com.taobao.weex.ui.component.list.template.CellRenderContext;
+import com.taobao.weex.ui.component.list.template.TemplateDom;
 import com.taobao.weex.ui.component.list.template.VirtualComponentLifecycle;
 import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
@@ -356,7 +357,8 @@ public class Statements {
         ArrayStack stack = context.stack;
 
 
-
+        String virtualComponentId = null;
+        boolean callVirtualComponentAttach = false;
         if(attr.get(ELUtils.IS_COMPONENT_ROOT) != null
                 && WXUtils.getBoolean(attr.get(ELUtils.IS_COMPONENT_ROOT), false)){
             if(attr.get(ELUtils.COMPONENT_PROPS) != null
@@ -364,7 +366,7 @@ public class Statements {
                  String compoentId = (String) attr.get(CellDataManager.SUB_COMPONENT_TEMPLATE_ID);
                 Object compoentData = null;
                 if(!TextUtils.isEmpty(compoentId)){
-                    String virtualComponentId =  context.getRenderState().getVirtualComponentIds().get(component.getViewTreeKey());
+                   virtualComponentId =  context.getRenderState().getVirtualComponentIds().get(component.getViewTreeKey());
                    if(virtualComponentId == null){ //none virtualComponentId, create and do attach
                         virtualComponentId =  CellDataManager.createVirtualComponentId(context.templateList.getRef(),
                                 component.getViewTreeKey(), context.templateList.getItemId(context.position));
@@ -381,8 +383,7 @@ public class Statements {
                         compoentData  =  props;
                         context.getRenderState().getVirtualComponentIds().put(component.getViewTreeKey(), virtualComponentId);
                         context.templateList.getCellDataManager().createVirtualComponentData(context.position, virtualComponentId, compoentData);
-                        //create virtual componentId
-                        WXBridgeManager.getInstance().asyncCallJSEventVoidResult(WXBridgeManager.METHD_COMPONENT_HOOK_SYNC, component.getInstanceId(), null, virtualComponentId, VirtualComponentLifecycle.LIFECYCLE, VirtualComponentLifecycle.ATTACH, null);
+                         callVirtualComponentAttach = true; // when first create virtual compoent, call create
                      }else{ // get virtual component data check has dirty's update
                        compoentData = context.getRenderState().getVirtualComponentDatas().get(virtualComponentId);
                        if(context.getRenderState().isHasDataUpdate()){
@@ -446,7 +447,13 @@ public class Statements {
         if(stack != context.stack){
             context.stack = stack;
         }
-    }
+        //create virtual componentId
+        if(callVirtualComponentAttach && virtualComponentId != null){
+            WXBridgeManager.getInstance().asyncCallJSEventVoidResult(WXBridgeManager.METHD_COMPONENT_HOOK_SYNC, component.getInstanceId(), null, virtualComponentId, VirtualComponentLifecycle.LIFECYCLE, VirtualComponentLifecycle.ATTACH, new Object[]{
+                    TemplateDom.findAllComponentRefs(context.templateList.getRef(),context.position, component)
+            });
+        }
+     }
 
 
     /**

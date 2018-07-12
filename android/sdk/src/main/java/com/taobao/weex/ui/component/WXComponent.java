@@ -517,7 +517,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     };
     try{
       fireEvent(type, params, null, callback);
-      waitLatch.await(10, TimeUnit.MILLISECONDS);
+      waitLatch.await(50, TimeUnit.MILLISECONDS);
       return  callback;
     }catch (Exception e){
       if(WXEnvironment.isApkDebugable()){

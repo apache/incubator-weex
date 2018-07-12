@@ -28,10 +28,12 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.list.WXCell;
+import com.taobao.weex.ui.component.list.template.TemplateDom;
 import com.taobao.weex.ui.component.list.template.TemplateViewHolder;
 import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
 
 /**
  * Created by furture on 2017/8/21.
@@ -55,6 +57,9 @@ public class Layouts {
         }else{
             doLayoutOnly(component, templateViewHolder);
             setLayout(component, false);
+            if(templateViewHolder.getHolderPosition() >= 0){
+                templateViewHolder.getTemplateList().fireEvent("_attach_slot", TemplateDom.findAllComponentRefs(templateViewHolder.getTemplateList().getRef(), position, component));
+            }
         }
 
     }
@@ -105,6 +110,11 @@ public class Layouts {
     public static final void setLayout(WXComponent component, boolean force){
         if(component.isWaste()){
             return;
+        }
+        if(component.getAttrs().containsKey(TemplateDom.KEY_RESET_ANIMATION)){
+            if(WXUtils.getBoolean(component.getAttrs().get(TemplateDom.KEY_RESET_ANIMATION), true).booleanValue()){
+                TemplateDom.resetAnimaiton(component.getHostView());
+            }
         }
         long ptr = component.getRenderObjectPtr();
         if(NativeRenderObjectUtils.nativeRenderObjectHasNewLayout(ptr)){
