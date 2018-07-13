@@ -57,6 +57,13 @@ extern "C" {
 @property(nonatomic, readonly, assign) WeexCore::WXCoreLayoutNode *flexCssNode;
 #endif
 
+#ifdef WX_IMPORT_WEEXCORE
+/**
+ * @abstract Convert layout dimension value like 'left', 'width' to style value in js considering viewport and scale.
+ */
+- (NSString*)convertLayoutValueToStyleValue:(NSString*)valueName;
+#endif
+
 @end
 
 @interface WXComponent (Layout)

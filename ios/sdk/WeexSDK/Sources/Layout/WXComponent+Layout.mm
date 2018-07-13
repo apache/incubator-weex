@@ -422,6 +422,28 @@ bool flexIsUndefined(float value) {
     return defaultValue;
 }
 
+- (NSString*)convertLayoutValueToStyleValue:(NSString*)valueName
+{
+    float layoutValue = 0;
+    if ([valueName isEqualToString:@"left"])
+        layoutValue = _flexCssNode->getLayoutPositionLeft();
+    else if ([valueName isEqualToString:@"right"])
+        layoutValue = _flexCssNode->getLayoutPositionRight();
+    else if ([valueName isEqualToString:@"top"])
+        layoutValue = _flexCssNode->getLayoutPositionTop();
+    else if ([valueName isEqualToString:@"bottom"])
+        layoutValue = _flexCssNode->getLayoutPositionBottom();
+    else if ([valueName isEqualToString:@"width"])
+        layoutValue = _flexCssNode->getLayoutWidth();
+    else if ([valueName isEqualToString:@"height"])
+        layoutValue = _flexCssNode->getLayoutHeight();
+    else
+        return @"0";
+    
+    layoutValue /= self.weexInstance.pixelScaleFactor;
+    return [NSString stringWithFormat:@"%f", layoutValue];
+}
+
 #define WX_FLEX_STYLE_RESET_CSS_NODE(key, defaultValue)\
 do {\
     WX_FLEX_STYLE_RESET_CSS_NODE_GIVEN_KEY(key,key,defaultValue)\
