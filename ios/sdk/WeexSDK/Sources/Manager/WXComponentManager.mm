@@ -1117,7 +1117,6 @@ static NSThread *WXComponentThread;
     WXAssertParam(data);
     WXAssertParam(renderObject);
     
-#warning todo logic 检查isWidthWrapContent和isHeightWrapContent参数
     _rootComponent = [self _buildComponentForData:data supercomponent:nil renderObject:renderObject];
     
     CGSize size = _weexInstance.frame.size;

@@ -31,7 +31,6 @@
 #import "WXBridgeProtocol.h"
 #import "WXUtility.h"
 #import "WXAppConfiguration.h"
-#import "WXLayoutConstraint.h"
 
 #include "base/CoreConstants.h"
 #include "core/manager/weex_core_manager.h"
@@ -136,7 +135,7 @@ namespace WeexCore
         long long startTime = getCurrentTime();
         
         NSString* ns_instanceId = NSSTRING(pageId);
-#warning todo task type
+
         //NSString* ns_task = NSSTRING(task);
         NSString* ns_callback = NSSTRING(callback);
         

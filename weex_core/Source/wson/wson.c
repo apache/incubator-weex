@@ -19,8 +19,8 @@ union float_number{
 
 #define WSON_BUFFER_SIZE  1024
 
-#define WSON_BUFFER_ENSURE_SIZE(size)  {if((buffer->length) < (buffer->position + size)){\
-                                           msg_buffer_resize(buffer, size);\
+#define WSON_BUFFER_ENSURE_SIZE(size)  {if((buffer->length) < (buffer->position + (size))){\
+                                           msg_buffer_resize(buffer, (uint32_t)(size));\
                                       }}
 
 static inline void msg_buffer_resize(wson_buffer* buffer, uint32_t size){

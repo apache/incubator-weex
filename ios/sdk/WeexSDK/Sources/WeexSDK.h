@@ -75,8 +75,4 @@
 #import "NSObject+WXSwizzle.h"
 #import "JSContext+Weex.h"
 
-#include "core/layout/style.h"
-#include "core/layout/flex_enum.h"
-#include <core/layout/layout.h>
-
 #endif /* __OBJC__ */

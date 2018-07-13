@@ -63,9 +63,10 @@ StyleType RenderAppBar::ApplyStyle(const std::string &key,
                                    const bool updating) {
   if (key == PADDING) {
     UpdateStyleInternal(key, value, 0, [=](float foo) {
-      setPadding(kPaddingLeft, foo + this->default_nav_width_),
-          setPadding(kPaddingRight, foo + this->default_overflow_width_),
-          setPadding(kPaddingTop, foo), setPadding(kPaddingBottom, foo);
+        setPadding(kPaddingLeft, foo + this->default_nav_width_);
+        setPadding(kPaddingRight, foo + this->default_overflow_width_);
+        setPadding(kPaddingTop, foo);
+        setPadding(kPaddingBottom, foo);
     });
     return kTypePadding;
   } else if (key == PADDING_LEFT) {
