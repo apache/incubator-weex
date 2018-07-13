@@ -360,7 +360,9 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 {
     if([self.stickyArray containsObject:sticky]) {
         [self.stickyArray removeObject:sticky];
-        [self adjustSticky];
+		WXPerformBlockOnMainThread(^{
+			[self adjustSticky];
+		});
     }
 }
 

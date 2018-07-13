@@ -94,6 +94,9 @@ public class WXSDKManager {
   // Tell weexv8 to initialize v8, default is true.
   private boolean mNeedInitV8 = true;
 
+  //add when instance create,rm when instance destroy, not like WXRenderManager
+  private Map<String,WXSDKInstance> mAllInstanceMap;
+
   private List<InstanceLifeCycleCallbacks> mLifeCycleCallbacks;
 
   private static final int DEFAULT_VIEWPORT_WIDTH = 750;
@@ -107,6 +110,7 @@ public class WXSDKManager {
     mBridgeManager = WXBridgeManager.getInstance();
     mWXWorkThreadManager = new WXWorkThreadManager();
     mWXAnalyzerList = new ArrayList<>();
+    mAllInstanceMap = new HashMap<>();
   }
 
   /**
@@ -213,10 +217,15 @@ public class WXSDKManager {
     mWXRenderManager.postOnUiThread(WXThread.secure(runnable), delayMillis);
   }
 
+  public Map<String, WXSDKInstance> getAllInstanceMap() {
+    return mAllInstanceMap;
+  }
+
   public void destroy() {
     if (mWXWorkThreadManager != null) {
       mWXWorkThreadManager.destroy();
     }
+    mAllInstanceMap.clear();
   }
 
   @Deprecated
