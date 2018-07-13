@@ -28,6 +28,7 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.RenderContext;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXExceptionUtils;
@@ -153,12 +154,24 @@ public class WXRenderManager {
     RenderContextImpl statement = mRenderContext.get(instanceId);
     if (statement != null) {
       statement.registerComponent(ref, comp);
+      if (null != statement.getInstance()){
+        statement.getInstance().getApmForInstance().updateMaxStats(
+            WXInstanceApm.KEY_PAGE_STATS_MAX_COMPONENT_NUM,
+            statement.getComponentCount()
+        );
+      }
     }
   }
 
   public WXComponent unregisterComponent(String instanceId, String ref) {
     RenderContextImpl statement = mRenderContext.get(instanceId);
     if (statement != null) {
+      if (null != statement.getInstance()){
+        statement.getInstance().getApmForInstance().updateMaxStats(
+            WXInstanceApm.KEY_PAGE_STATS_MAX_COMPONENT_NUM,
+            statement.getComponentCount()
+        );
+      }
       return statement.unregisterComponent(ref);
     } else {
       return null;

@@ -66,6 +66,7 @@ import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
@@ -132,6 +133,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private boolean mNeedValidate = false;
   private boolean mNeedReLoad = false;
   private int mInstanceViewPortWidth = 750;
+  private WXInstanceApm mApmForInstance;
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
 
@@ -143,6 +145,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public WXBridgeManager.BundType bundleType;
   public long mRenderStartNanos;
   public int mExecJSTraceId = WXTracing.nextId();
+
+  private boolean isViewDisAppear = false;
 
   /**
    *for network tracker
@@ -392,6 +396,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mNativeInvokeHelper = new NativeInvokeHelper(mInstanceId);
 
     mWXPerformance = new WXPerformance(mInstanceId);
+    mApmForInstance = new WXInstanceApm(mInstanceId);
     mWXPerformance.WXSDKVersion = WXEnvironment.WXSDK_VERSION;
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
 
@@ -399,11 +404,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     WXSDKManager.getInstance().getAllInstanceMap().put(mInstanceId,this);
 
-    mContainerInfo.put(Dimension.activity.toString(), context instanceof Activity
+    mContainerInfo.put(WXInstanceApm.KEY_PAGE_PROPERTIES_CONTAINER_NAME, context instanceof Activity
             ? context.getClass().getSimpleName()
             :"unKnowContainer"
     );
-    mContainerInfo.put(Dimension.instanceType.toString(),"page");
+    mContainerInfo.put(WXInstanceApm.KEY_PAGE_PROPERTIES_INSTANCE_TYPE,"page");
   }
 
   /**
@@ -566,6 +571,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (mRendered || TextUtils.isEmpty(template)) {
       return;
     }
+    
+    mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_RENDER_ORGIGIN,System.currentTimeMillis());
 
     mWXPerformance.pageName = (TextUtils.isEmpty(pageName) ? "defaultBundleUrl":pageName);
     if (TextUtils.isEmpty(mBundleUrl)) {
@@ -598,6 +605,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
 
     mWXPerformance.JSTemplateSize = template.length() / 1024f;
+    mApmForInstance.addStats(WXInstanceApm.KEY_PAGE_STATS_BUNDLE_SIZE,mWXPerformance.JSTemplateSize);
 
     mRenderStartTime = System.currentTimeMillis();
     mRenderStrategy = flag;
@@ -629,9 +637,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       renderOptions.put(BUNDLE_URL, url);
     }
 
+    mApmForInstance.onStart();
+
     Uri uri = Uri.parse(url);
     if (uri != null && TextUtils.equals(uri.getScheme(), "file")) {
-      render(pageName, WXFileUtils.loadFileOrAsset(assembleFilePath(uri), mContext), renderOptions, jsonInitData, flag);
+      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START,System.currentTimeMillis());
+      String template = WXFileUtils.loadFileOrAsset(assembleFilePath(uri), mContext);
+      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END,System.currentTimeMillis());
+      render(pageName,template , renderOptions, jsonInitData, flag);
       return;
     }
 
@@ -1098,6 +1111,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    ********************************************************/
 
   public void onViewDisappear(){
+    isViewDisAppear = false;
+    mApmForInstance.onDisAppear();
     WXComponent comp = getRootComponent();
     if(comp != null) {
       fireEvent(comp.getRef(), Constants.Event.VIEWDISAPPEAR, null, null);
@@ -1108,7 +1123,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
+  public boolean isViewDisAppear(){
+    return isViewDisAppear;
+  }
+
   public void onViewAppear(){
+    isViewDisAppear = true;
+    mApmForInstance.onAppear();
     WXComponent comp = getRootComponent();
     if(comp != null) {
       fireEvent( comp.getRef(), Constants.Event.VIEWAPPEAR,null, null);
@@ -1247,6 +1268,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 //      WXLogUtils.renderPerformanceLog("   interactionViewAddCount", getWXPerformance().interactionViewAddCount);
 //      WXLogUtils.renderPerformanceLog("   interactionViewAddLimitCount", getWXPerformance().interactionViewAddLimitCount);
 //      WXLogUtils.renderPerformanceLog("   interactionTime", getWXPerformance().interactionTime);
+      mApmForInstance.arriveInteraction(getWXPerformance().interactionViewAddLimitCount,getWXPerformance().interactionViewAddCount);
     }
   }
 
@@ -1332,6 +1354,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if (mEnd)
           return;
 
+      mEnd = true;
+
+      mApmForInstance.arriveFSRenderTime();
+
       if (mStatisticsListener != null && mContext != null) {
           runOnUiThread(new Runnable() {
               @Override
@@ -1384,6 +1410,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public synchronized void destroy() {
     if(!isDestroy()) {
+      mApmForInstance.onEnd();
       if(mRendered) {
         WXSDKManager.getInstance().destroyInstance(mInstanceId);
       }
@@ -1594,6 +1621,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (null != mWXPerformance && mWXPerformance.fsCallEventTotalNum<Integer.MAX_VALUE){
       mWXPerformance.fsCallEventTotalNum++;
     }
+    mApmForInstance.updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_CALL_EVENT_NUM,1);
     WXBridgeManager.getInstance().fireEventOnNode(getInstanceId(),elementRef,type,data,domChanges, eventArgs, callback);
   }
   /**
@@ -1692,6 +1720,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     return mWXPerformance;
   }
 
+  public WXInstanceApm getApmForInstance() {
+    return mApmForInstance;
+  }
+
   public Map<String, Serializable> getUserTrackParams() {
     return mUserTrackParams;
   }
@@ -1721,9 +1753,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void setMaxDeepLayer(int maxDeepLayer) {
     mMaxDeepLayer = maxDeepLayer;
+    mApmForInstance.updateMaxStats(WXInstanceApm.KEY_PAGE_STATS_MAX_DEEP_VIEW,maxDeepLayer);
   }
 
   public void setMaxDomDeep(int maxDomDeep){
+    mApmForInstance.updateMaxStats(WXInstanceApm.KEY_PAGE_STATS_MAX_DEEP_DOM,maxDomDeep);
     if (null == mWXPerformance){
       return;
     }
@@ -1779,6 +1813,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
               && this.instance.getWXStatisticsListener() != null) {
         this.instance.getWXStatisticsListener().onHttpStart();
       }
+      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START,System.currentTimeMillis());
     }
 
     @Override
@@ -1807,6 +1842,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     @Override
     public void onHttpFinish(WXResponse response) {
+      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END,System.currentTimeMillis());
+
       if (this.instance != null
               && this.instance.getWXStatisticsListener() != null) {
         this.instance.getWXStatisticsListener().onHttpFinish();
@@ -1825,7 +1862,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       }
 
       mWXPerformance.networkTime = System.currentTimeMillis() - startRequestTime;
-      if(response.extendParams!=null){
+      if(null!= response && response.extendParams!=null){
+        mApmForInstance.updateExtInfo(response.extendParams);
         Object actualNetworkTime=response.extendParams.get("actualNetworkTime");
         mWXPerformance.actualNetworkTime=actualNetworkTime instanceof Long?(long)actualNetworkTime:0;
         WXLogUtils.renderPerformanceLog("actualNetworkTime", mWXPerformance.actualNetworkTime);
@@ -1883,6 +1921,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         }
       }
       WXLogUtils.renderPerformanceLog("networkTime", mWXPerformance.networkTime);
+      String wxErrorCode = WXInstanceApm.VALUE_ERROR_CODE_DEFAULT;
       if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
         String template = new String(response.originalData);
         render(pageName, template, options, jsonInitData, flag);
@@ -1891,7 +1930,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       } else if (TextUtils.equals(WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorCode(),
               response.statusCode)) {
         WXLogUtils.e("user intercept: WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR");
-        onRenderError(WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorCode(),
+        wxErrorCode = WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorCode();
+        onRenderError(wxErrorCode,
                 "|response.errorMsg==" + response.errorMsg +
                         "|instance bundleUrl = \n" + instance.getBundleUrl() +
                         "|instance requestUrl = \n" + Uri.decode(WXSDKInstance.requestUrl)
@@ -1900,15 +1940,19 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         // check content-length
       } else if (response!=null && response.originalData!=null && TextUtils.equals("-206", response.statusCode)) {
         WXLogUtils.e("user intercept: WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED");
-        onRenderError(
-                WXErrorCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getErrorCode(),
+        wxErrorCode =  WXErrorCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getErrorCode();
+        onRenderError(wxErrorCode ,
                 WXErrorCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getErrorCode() +
                         "|response.errorMsg==" + response.errorMsg
         );
       }
       else {
-        onRenderError(WXErrorCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode(),
+        wxErrorCode = WXErrorCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode();
+        onRenderError(wxErrorCode,
                 response.errorMsg);
+      }
+      if (!WXInstanceApm.VALUE_ERROR_CODE_DEFAULT.equals(wxErrorCode)){
+        mApmForInstance.addProperty(WXInstanceApm.KEY_PROPERTIES_ERROR_CODE,wxErrorCode);
       }
     }
   }

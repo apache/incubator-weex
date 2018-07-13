@@ -77,4 +77,8 @@ class RenderContextImpl implements RenderContext {
   public WXComponent unregisterComponent(String ref) {
     return mRegistry.remove(ref);
   }
+
+  public int getComponentCount(){
+    return mRegistry.size();
+  }
 }

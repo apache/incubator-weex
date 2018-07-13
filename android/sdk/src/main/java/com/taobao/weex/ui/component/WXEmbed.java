@@ -37,6 +37,8 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXPerformance.Dimension;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -289,8 +291,10 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
    */
   protected void loadContent(){
     mNestedInstance = createInstance();
-    mNestedInstance.setContainerInfo(Dimension.instanceType.toString(),"embed");
-    mNestedInstance.setContainerInfo("parentPage",getInstance().getBundleUrl());
+    if (null != mNestedInstance){
+      mNestedInstance.setContainerInfo(WXInstanceApm.KEY_PAGE_PROPERTIES_INSTANCE_TYPE,"embed");
+      mNestedInstance.setContainerInfo(WXInstanceApm.KEY_PAGE_PROPERTIES_PARENT_PAGE,getInstance().getBundleUrl());
+    }
     if(mListener != null && mListener.mEventListener != null){
       if(!mListener.mEventListener.onPreCreate(this,src)){
         //cancel render

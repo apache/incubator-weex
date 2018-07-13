@@ -22,6 +22,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 
@@ -60,6 +62,13 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
     execute(new Runnable() {
       @Override
       public void run() {
+        WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(request.instanceId);
+        if (null != instance && !instance.isDestroy()){
+          instance.getApmForInstance().actionNetRequest();
+        }
+
+        boolean isNetRequestSucceed = true;
+
         WXResponse response = new WXResponse();
         IEventReporterDelegate reporter = getEventReporterDelegate();
         try {
@@ -79,11 +88,13 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
             response.originalData = readInputStreamAsBytes(rawStream, listener);
           } else {
             response.errorMsg = readInputStream(connection.getErrorStream(), listener);
+            isNetRequestSucceed = false;
           }
           if (listener != null) {
             listener.onHttpFinish(response);
           }
         } catch (IOException|IllegalArgumentException e) {
+          isNetRequestSucceed = false;
           e.printStackTrace();
           response.statusCode = "-1";
           response.errorCode="-1";
@@ -98,6 +109,9 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
               t.printStackTrace();
             }
           }
+        }
+        if (null != instance && !instance.isDestroy()){
+          instance.getApmForInstance().actionNetResult(isNetRequestSucceed,null);
         }
       }
     });

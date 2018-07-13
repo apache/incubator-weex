@@ -48,6 +48,7 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.common.WXWorkThreadManager;
+import com.taobao.weex.performance.IApmGenerator;
 import com.taobao.weex.performance.IWXAnalyzer;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.WXLogUtils;
@@ -79,6 +80,7 @@ public class WXSDKManager {
   private IActivityNavBarSetter mActivityNavBarSetter;
   private IWXAccessibilityRoleAdapter mRoleAdapter;
   private List<IWXAnalyzer> mWXAnalyzerList;
+  private IApmGenerator mApmGenerater;
 
   private ICrashInfoReporter mCrashInfo;
 
@@ -341,6 +343,10 @@ public class WXSDKManager {
     return mIWXHttpAdapter;
   }
 
+  public IApmGenerator getApmGenerater() {
+    return mApmGenerater;
+  }
+
   public @NonNull URIAdapter getURIAdapter() {
     if(mURIAdapter == null){
       mURIAdapter = new DefaultUriAdapter();
@@ -384,6 +390,7 @@ public class WXSDKManager {
     this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
     this.mClassLoaderAdapter = config.getClassLoaderAdapter();
+    this.mApmGenerater = config.getApmGenerater();
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){

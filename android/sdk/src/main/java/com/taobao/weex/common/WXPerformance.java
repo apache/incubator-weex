@@ -23,6 +23,7 @@ import android.support.annotation.RestrictTo;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class WXPerformance {
 
   @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -44,8 +46,9 @@ public class WXPerformance {
     networkType,
     connectionType,
     zcacheInfo,
-    activity,
-    instanceType,
+    wxContainerName,
+    wxInstanceType,
+    wxParentPage,
     wxdim1,
     wxdim2,
     wxdim3,
@@ -460,10 +463,12 @@ public class WXPerformance {
     quotas.put(Dimension.useScroller.toString(), String.valueOf(useScroller));
 
     WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    String keyActivity = Dimension.activity.toString();
+    String keyActivity = WXInstanceApm.KEY_PAGE_PROPERTIES_CONTAINER_NAME;
     quotas.put(keyActivity, null == sdkInstance? "unKnow" : sdkInstance.getContainerInfo().get(keyActivity));
-    String keyType = Dimension.instanceType.toString();
+    String keyType = WXInstanceApm.KEY_PAGE_PROPERTIES_INSTANCE_TYPE;
     quotas.put(keyType,sdkInstance == null ?"unKnow": sdkInstance.getContainerInfo().get(keyType));
+    String keyParentPae = WXInstanceApm.KEY_PAGE_PROPERTIES_PARENT_PAGE;
+    quotas.put(keyParentPae,null == sdkInstance ?"unKnow":sdkInstance.getContainerInfo().get(keyParentPae));
 
     // TODO These attribute will be moved to elsewhere
     // Extra Dimension for 3rd developers.

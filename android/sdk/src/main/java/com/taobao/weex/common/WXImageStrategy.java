@@ -54,7 +54,18 @@ public class WXImageStrategy {
    * running weex instanceId
    * @see WXSDKInstance#mInstanceId
    */
-  public String instanceId;;
+  public String instanceId;
+
+  public WXImageStrategy()
+  {
+
+  }
+
+  public WXImageStrategy(String instanceId)
+  {
+    this.instanceId = instanceId;
+  }
+
 
   public ImageListener getImageListener() {
     return imageListener;
