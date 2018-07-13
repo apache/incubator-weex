@@ -172,88 +172,18 @@ namespace WeexCore
     {
         // should not enter this function
         assert(false);
-        
-//        if (str_array != nullptr) {
-//            WXLogDebug(@"jsLog: %s", str_array);
-//        }
     }
         
     int WXCoreBridge::callUpdateFinish(const char* pageId, const char *task, const char *callback)
     {
         // should not enter this function
         assert(false);
-        
-//        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-//        if (page == nullptr) {
-//            return -1;
-//        }
-//
-//        long long startTime = getCurrentTime();
-//
-//        NSString* ns_instanceId = NSSTRING(pageId);
-//        WXSDKInstance* instance = [WXSDKManager instanceForID:ns_instanceId];
-//
-//        if (instance) {
-//            WXPerformBlockOnComponentThread(^{
-//                WXComponentManager* manager = instance.componentManager;
-//                if (!manager.isValid) {
-//                    return;
-//                }
-//                [manager startComponentTasks];
-//                [manager updateFinish];
-//            });
-//
-//            NSString* ns_callback = NSSTRING(callback);
-//            if (ns_callback.length > 0) {
-//                JSContext* context = instance.instanceJavaScriptContext.javaScriptContext;
-//                JSValue* callbackFunction = context[ns_callback];
-//                if (callbackFunction) {
-//                    [callbackFunction callWithArguments:@[]];
-//                }
-//            }
-//        }
-//
-//        page->CallBridgeTime(getCurrentTime() - startTime);
-//        return 0;
     }
         
     int WXCoreBridge::callRefreshFinish(const char* pageId, const char *task, const char *callback)
     {
         // should not enter this function
         assert(false);
-        
-//        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-//        if (page == nullptr) {
-//            return -1;
-//        }
-//
-//        long long startTime = getCurrentTime();
-//
-//        NSString* ns_instanceId = NSSTRING(pageId);
-//        WXSDKInstance* instance = [WXSDKManager instanceForID:ns_instanceId];
-//
-//        if (instance) {
-//            WXPerformBlockOnComponentThread(^{
-//                WXComponentManager* manager = instance.componentManager;
-//                if (!manager.isValid) {
-//                    return;
-//                }
-//                [manager startComponentTasks];
-//                [manager refreshFinish];
-//            });
-//
-//            NSString* ns_callback = NSSTRING(callback);
-//            if (ns_callback.length > 0) {
-//                JSContext* context = instance.instanceJavaScriptContext.javaScriptContext;
-//                JSValue* callbackFunction = context[ns_callback];
-//                if (callbackFunction) {
-//                    [callbackFunction callWithArguments:@[]];
-//                }
-//            }
-//        }
-//
-//        page->CallBridgeTime(getCurrentTime() - startTime);
-//        return 0;
     }
         
     int WXCoreBridge::callAddEvent(const char* pageId, const char* ref, const char *event)
@@ -722,16 +652,29 @@ static WeexCore::JSBridge* jsBridge = nullptr;
 
 static void _traverseTree(WeexCore::RenderObject *render, int index, const char* pageId)
 {
+    using namespace WeexCore;
     if (render == nullptr) return;
 
     if (render->hasNewLayout()) {
-        platformBridge->callLayout(pageId, render->ref().c_str(),
-                                   render->getLayoutPositionTop(),
-                                   render->getLayoutPositionBottom(),
-                                   render->getLayoutPositionLeft(),
-                                   render->getLayoutPositionRight(),
-                                   render->getLayoutHeight(),
-                                   render->getLayoutWidth(), index);
+        /* do not call bridge->callLayout because render is not registered to page, so that
+         page->GetRenderObject will not give the correct object. */
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        if (page != nullptr) {
+            WXComponent* component = (__bridge WXComponent *)(render->getContext());
+            NSString* ns_instanceId = NSSTRING(pageId);
+            
+            float top = render->getLayoutPositionTop();
+            float left = render->getLayoutPositionLeft();
+            float height = render->getLayoutHeight();
+            float width = render->getLayoutWidth();
+            
+            WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+            CGRect frame = CGRectMake(isnan(WXRoundPixelValue(left))?0:WXRoundPixelValue(left),
+                                      isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
+                                      isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
+                                      isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
+            [manager wxcore_Layout:component frame:frame innerMainSize:render->getLargestMainSize()];
+        }
         render->setHasNewLayout(false);
     }
 
@@ -759,8 +702,13 @@ static void _traverseTree(WeexCore::RenderObject *render, int index, const char*
 {
     using namespace WeexCore;
     RenderObject* sourceObject = static_cast<RenderObject*>(source);
-    RenderObject* copyObject = static_cast<RenderObject*>(RenderCreator::GetInstance()->CreateRender(sourceObject->type(), ref == nil ? sourceObject->ref() : [ref UTF8String]));
+    RenderObject* copyObject = static_cast<RenderObject*>(RenderCreator::GetInstance()->CreateRender(sourceObject->type(), sourceObject->ref()));
+                                                          
     copyObject->CopyFrom(sourceObject);
+    if (ref != nil) {
+        copyObject->set_ref([ref UTF8String]);
+    }
+
     if (sourceObject->type() == kRenderCellSlot || sourceObject->type() == kRenderCell) {
         RenderList* renderList = static_cast<RenderList*>(sourceObject->getParent());
         if (renderList != nullptr) {

@@ -202,8 +202,6 @@ static BOOL bNeedRemoveEvents = YES;
     component->_calculatedFrame = self.calculatedFrame;
     
     // third, copy children
-    NSMutableArray* subcomponentsCopy = [NSMutableArray array];
-    component->_subcomponents = subcomponentsCopy;
     NSUInteger count = [self.subcomponents count];
     for (NSInteger i = 0; i < count; i ++) {
         WXComponent *subcomponentCopy = [[self.subcomponents objectAtIndex:i] copy];
@@ -716,12 +714,8 @@ static BOOL bNeedRemoveEvents = YES;
         [_transition _handleTransitionWithStyles:styles resetStyles:resetStyles target:self];
     } else {
         styles = [self parseStyles:styles];
-#ifdef WX_IMPORT_WEEXCORE
-        // no animation, no need to update css styles here
-#else
         [self _updateCSSNodeStyles:styles];
         [self _resetCSSNodeStyles:resetStyles];
-#endif
     }
     if (isUpdateStyles) {
         [self _modifyStyles:styles];

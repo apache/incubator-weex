@@ -249,12 +249,15 @@ CGFloat WXFloorPixelValue(CGFloat value)
 {
     if (string == nil) return NO;
     if (![string isKindOfClass:[NSString class]]) return NO;
-    if ([(NSString*)string length] < 3) return NO; // {"A":A}, [1]
+    if ([(NSString*)string length] < 2) return NO; // {"A":A}, [1], {}
     return [(NSString*)string characterAtIndex:0] == '{' || [(NSString*)string characterAtIndex:0] == '[';
 }
 
 + (id)objectFromJSON:(NSString *)json
 {
+    // in weex there are cases that json is empty container
+    if ([json isEqualToString:@"{}"]) return @{}.mutableCopy;
+    if ([json isEqualToString:@"[]"]) return @[].mutableCopy;
     return [self JSONObject:[json dataUsingEncoding:NSUTF8StringEncoding] error:nil];
 }
 

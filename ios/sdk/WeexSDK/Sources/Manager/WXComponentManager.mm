@@ -623,6 +623,16 @@ static NSThread *WXComponentThread;
     NSMutableArray *newEvents = [events mutableCopy];
     NSMutableDictionary *bindingEvents = [NSMutableDictionary dictionary];
     [events enumerateObjectsUsingBlock:^(id  _Nonnull event, NSUInteger idx, BOOL * _Nonnull stop) {
+#ifdef WX_IMPORT_WEEXCORE
+        if ([WXUtility isStringPossiblelyJSONContainer:event]) {
+            // try parse json object
+            id jsonObj = [WXUtility objectFromJSON:event];
+            if (jsonObj != nil) {
+                event = jsonObj;
+            }
+        }
+#endif
+        
         if ([event isKindOfClass:[NSDictionary class]] && event[@"type"] && event[@"params"]) {
             NSString *eventName = event[@"type"];
             NSString *bindingParams = event[@"params"];
@@ -642,7 +652,19 @@ static NSThread *WXComponentThread;
         NSMutableDictionary *newAttributes = [attributes mutableCopy];
         [newAttributes removeObjectForKey:@"@componentProps"];
         *attributesPoint = newAttributes;
+#ifdef WX_IMPORT_WEEXCORE
+        id compProps = attributes[@"@componentProps"];
+        if ([WXUtility isStringPossiblelyJSONContainer:compProps]) {
+            // try parse json object
+            id jsonObj = [WXUtility objectFromJSON:compProps];
+            if (jsonObj != nil) {
+                compProps = jsonObj;
+            }
+        }
+        return compProps;
+#else
         return attributes[@"@componentProps"];
+#endif
     }
     
     return nil;
