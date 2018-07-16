@@ -122,7 +122,6 @@ void CodeGenerator::Visit(IfElseStatement *node, void *data) {}
 
 void CodeGenerator::Visit(ForStatement *node, void *data) {
   RegisterScope scope(cur_block_.get());
-  cur_block_->set_is_loop(true);
 
   long init = cur_block_->NextRegisterId();
   if (node->init().get() != NULL) {
@@ -226,6 +225,23 @@ void CodeGenerator::Visit(BinaryExpression *node, void *data) {
   if (opeartion == BinaryOperation::kGreaterThanEqual) {
     state->AddInstruction(CREATE_ABC(OP_LE, ret, right, left));
   }
+}
+
+void CodeGenerator::Visit(AssignExpression *node, void *data) {
+  RegisterScope scope(cur_block_.get());
+
+  long left = cur_block_->NextRegisterId();
+  if (node->lhs().get() != NULL) {
+    node->lhs()->Accept(this, &left);
+  }
+
+  long right = cur_block_->NextRegisterId();
+  if (node->rhs().get() != NULL) {
+    node->rhs()->Accept(this, &right);
+  }
+
+  // a = b
+  cur_func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, left, right, 0));
 }
 
 void CodeGenerator::Visit(ChildStatement *node, void *data) {
