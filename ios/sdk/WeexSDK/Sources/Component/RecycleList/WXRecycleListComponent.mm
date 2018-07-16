@@ -76,9 +76,11 @@ WX_EXPORT_METHOD(@selector(removeData:count:))
 WX_EXPORT_METHOD(@selector(moveData:toIndex:))
 WX_EXPORT_METHOD(@selector(insertRange:range:))
 WX_EXPORT_METHOD(@selector(setListData:))
-WX_EXPORT_METHOD(@selector(queryElement:ref:callback:))
 WX_EXPORT_METHOD(@selector(scrollTo:options:))
 WX_EXPORT_METHOD(@selector(scrollToElement:options:))
+WX_EXPORT_METHOD(@selector(queryElement:cssSelector:callback:))
+WX_EXPORT_METHOD(@selector(queryElementAll:cssSelector:callback:))
+WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 
 - (instancetype)initWithRef:(NSString *)ref
                        type:(NSString *)type
@@ -373,67 +375,131 @@ WX_EXPORT_METHOD(@selector(scrollToElement:options:))
     }];
 }
 
-- (void)scrollTo:(NSUInteger)index options:(NSDictionary *)options
+- (void)scrollTo:(NSString *)virtalElementInfo options:(NSDictionary *)options
 {
-    NSIndexPath *toIndexPath = [NSIndexPath indexPathForItem:index inSection:0];
+    NSUInteger position = 0;
+    if ([virtalElementInfo isKindOfClass:[NSNumber class]]) {
+        position = [virtalElementInfo integerValue];
+    }
+    else
+    {
+        position = [self _positionForVirtalElementInfo:virtalElementInfo];
+    }
+    NSIndexPath *toIndexPath = [NSIndexPath indexPathForItem:position inSection:0];
     BOOL animated = options[@"animated"] ? [WXConvert BOOL:options[@"animated"]] : YES;
     [_collectionView scrollToItemAtIndexPath:toIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:animated];
 }
 
-- (void)scrollToElement:(NSUInteger)index options:(NSDictionary *)options
+- (void)scrollToElement:(NSString *)virtalElementInfo options:(NSDictionary *)options
 {
-    [self scrollTo:index options:options];
+    [self scrollTo:virtalElementInfo options:options];
 }
 
-- (void)queryElement:(NSUInteger)index ref:(NSString *)ref callback:(WXModuleCallback)callback
+- (void)queryElement:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
+{
+    [self _queryElement:virtalElementInfo cssSelector:cssSelector callback:callback isAll:NO];
+}
+
+- (void)queryElementAll:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
+{
+    [self _queryElement:virtalElementInfo cssSelector:cssSelector callback:callback isAll:YES];
+}
+
+
+- (NSString *)_refForVirtalElementInfo:(NSString *)virtalElementInfo
+{
+    NSArray *stringArray = [virtalElementInfo componentsSeparatedByString:@"@"];
+    return stringArray[0];
+}
+
+- (NSUInteger )_positionForVirtalElementInfo:(NSString *)virtalElementInfo
+{
+    NSArray *stringArray = [virtalElementInfo componentsSeparatedByString:@"@"];
+    return [stringArray[1] integerValue];
+}
+
+- (void)closest:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
 {
     if(callback)
     {
-        callback([self infoArrayFromComponentArray:[self _componentArray:index ref:ref] index:index ref:ref]);
+        WXPerformBlockSyncOnComponentThread(^{
+            WXComponent *component = [self.weexInstance.componentManager componentForRef:[self _refForVirtalElementInfo:virtalElementInfo]];
+            if (component) {
+                callback([self _closestComponentForCSSSelector:cssSelector component:component]);
+            }
+        });
     }
 }
 
-- (NSMutableArray *)_componentArray:(NSUInteger)index ref:(NSString *)ref
+- (NSDictionary *)_closestComponentForCSSSelector:(NSString *)cssSelector component:(WXComponent *)component
 {
-    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index?:0 inSection:0];
-    UICollectionViewCell *cellView = [_collectionView cellForItemAtIndexPath:indexPath];
-    WXCellSlotComponent *cellComponent = (WXCellSlotComponent *)cellView.wx_component;
-    NSArray *subComponents = cellComponent.subcomponents;
-    NSMutableArray *componentArray = [NSMutableArray new];
-    if (subComponents.count != 0) {
-        [self _querySubComponent:subComponents index:index queryComponentRef:ref array:componentArray];
+    WXComponent *supercomponent = component.supercomponent;
+    if ([self _parseCssSelector:cssSelector component:supercomponent]) {
+        NSDictionary *info = @{@"attrs":supercomponent.attributes,@"type":supercomponent->_type,@"vRef":supercomponent.ref};
+        return info;
     }
-    return componentArray;
-}
-
-- (void)_querySubComponent:(NSArray *)subComponents index:(NSUInteger)index queryComponentRef:(NSString *)subComponentRef array:(NSMutableArray *)componentArray
-{
-    for (WXComponent *subComponent in subComponents) {
-        NSString *ref = subComponent.attributes[@"ref"];
-        if ([ref isEqualToString:subComponentRef] ) {
-            [componentArray addObject:subComponent];
-            continue;
+    else
+    {
+        if ([supercomponent isKindOfClass:[WXRecycleListComponent class]] ) {
+            return nil;
         }
-        else if(![ref isEqualToString:subComponentRef] && subComponent.subcomponents.count!=0)
-        {
-            [self _querySubComponent:subComponent.subcomponents index:index queryComponentRef:subComponentRef array:componentArray];
-        }
+        return [self _closestComponentForCSSSelector:cssSelector component:supercomponent];
     }
 }
 
-- (NSArray *)infoArrayFromComponentArray:(NSMutableArray *)componentArray index:(NSUInteger)index ref:(NSString *)ref
+- (void)_queryElement:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback isAll:(BOOL)isAll
 {
-    NSMutableArray *infoArray = [NSMutableArray new];
-    if (componentArray.count != 0) {
-        for (WXComponent *subComponent in componentArray) {
-            NSDictionary *attributes = subComponent.attributes;
-            NSString *type = subComponent->_type;
-            NSString *virtualDomRefKey = [NSString stringWithFormat:@"%@@%lu@%@@%lu",self.ref,index,ref,[componentArray indexOfObject:subComponent]];
-            NSDictionary *info = @{@"attributes":attributes,@"type":type,@"virtualDomRef":virtualDomRefKey};
+    if(callback)
+    {
+        WXPerformBlockSyncOnComponentThread(^{
+            WXComponent *component = [self.weexInstance.componentManager componentForRef:[self _refForVirtalElementInfo:virtalElementInfo]];
+            if (component) {
+                NSMutableArray *infoArray = [NSMutableArray new];
+                [self _matchComponentForCSSSelector:cssSelector component:component infoArray:infoArray];
+                if (isAll) {
+                    callback(infoArray);
+                }
+                else
+                {
+                    if (infoArray.count != 0) {
+                        callback(infoArray[0]);
+                    }
+                }
+            }
+        });
+    }
+}
+
+- (void)_matchComponentForCSSSelector:(NSString *)cssSelector component:(WXComponent *)component infoArray:(NSMutableArray *)infoArray
+{
+    for (WXComponent *subcomponent in component.subcomponents) {
+        if ([self _parseCssSelector:cssSelector component:subcomponent]) {
+            NSDictionary *info = @{@"attrs":subcomponent.attributes,@"type":subcomponent->_type,@"ref":subcomponent.ref};
             [infoArray addObject:info];
         }
+        if (subcomponent.subcomponents.count != 0) {
+            [self _matchComponentForCSSSelector:cssSelector component:subcomponent infoArray:infoArray];
+        }
     }
-    return infoArray;
+}
+
+- (BOOL)_parseCssSelector:(NSString *)cssSelector component:(WXComponent *)component
+{
+    if ([cssSelector hasPrefix:@"["]&&[cssSelector hasSuffix:@"]"]) {
+        NSArray *selectorArray = [cssSelector componentsSeparatedByString:@"="];
+        if (selectorArray.count == 2) {
+            NSString *prefixString = selectorArray[0];
+            NSString *suffixString = selectorArray[1];
+            NSString *attribute = [prefixString substringWithRange:NSMakeRange(1,prefixString.length-1)];
+            NSString *value = [suffixString substringWithRange:NSMakeRange(0, suffixString.length-1)];
+            NSDictionary *componentAttrs = component.attributes;
+            NSString *valueString = [NSString stringWithFormat:@"%@",componentAttrs[attribute]];
+            if ([valueString isEqualToString:value]) {
+                return YES;
+            }
+        }
+    }
+    return NO;
 }
 
 #pragma mark - WXComponent Internal Methods
@@ -441,13 +507,11 @@ WX_EXPORT_METHOD(@selector(scrollToElement:options:))
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
    [super _insertSubcomponent:subcomponent atIndex:index];
-    
     if ([subcomponent isKindOfClass:[WXCellSlotComponent class]]) {
         WXCellSlotComponent *cell = (WXCellSlotComponent*)subcomponent;
         [self.weexInstance.componentManager _addUITask:^{
             [_templateManager addTemplate:cell];
         }];
-        
         //TODO: update collection view if adding template
     }
 }
