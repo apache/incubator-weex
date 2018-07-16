@@ -379,10 +379,15 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                     return;
                 }
                 if (con) {
-                    pc += true_pc_jump;
+                    pc += true_pc_jump - 1;
                 } else {
-                    pc += false_pc_jump;
+                    pc += false_pc_jump - 1;
                 }
+            }
+                break;
+
+            case OP_GOTO: {
+                pc = frame.pc + GET_ARG_A(instruction);
             }
                 break;
 
