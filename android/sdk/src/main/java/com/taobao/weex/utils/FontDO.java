@@ -22,11 +22,11 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Base64;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.common.Constants;
+import java.io.File;
 
 public class FontDO {
   private final String mFontFamilyName;
@@ -100,9 +100,9 @@ public class FontDO {
               String base64Data = data[1];
               if (!TextUtils.isEmpty(base64Data)) {
                 String md5 = WXFileUtils.md5(base64Data);
-                String filePath = WXEnvironment.getApplication().getCacheDir() + "/font-family/" + md5;
-                WXFileUtils.saveFile(filePath, Base64.decode(base64Data, Base64.DEFAULT), WXEnvironment.getApplication());
-                mUrl = filePath;
+                File tmpFile = File.createTempFile("md5", null, new File(WXEnvironment.getApplication().getCacheDir(), "font-family"));
+                WXFileUtils.saveFile(tmpFile.getPath(), Base64.decode(base64Data, Base64.DEFAULT), WXEnvironment.getApplication());
+                mUrl = tmpFile.getPath();
                 mType = TYPE_BASE64;
                 WXLogUtils.d("TypefaceUtil", "Parse base64 font cost " + (System.currentTimeMillis() - start) + " ms");
               }
