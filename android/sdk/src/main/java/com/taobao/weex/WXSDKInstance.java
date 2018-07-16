@@ -1342,7 +1342,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public synchronized void destroy() {
     if(!isDestroy()) {
-      WXSDKManager.getInstance().getAllInstanceMap().remove(mInstanceId);
       if(mRendered) {
         WXSDKManager.getInstance().destroyInstance(mInstanceId);
       }
@@ -1400,6 +1399,16 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           inactiveAddElementAction.clear();
         }
       });
+
+      //when report error in @WXExceptionUtils
+      // instance may had destroy and remove,
+      // so we delay remove from allInstanceMap
+      WXBridgeManager.getInstance().postDelay(new Runnable() {
+        @Override
+        public void run() {
+          WXSDKManager.getInstance().getAllInstanceMap().remove(mInstanceId);
+        }
+      },5000);
     }
   }
 
