@@ -67,6 +67,7 @@ ExecState::~ExecState() {}
 void ExecState::Compile(const std::string& source) {
   CodeGenerator generator(this);
   std::string err;
+  raw_json_.parse(source,err);
   const ParseResult& result = Parser::parse(source, err);
   generator.Visit(result.expr().get(), nullptr);
 }

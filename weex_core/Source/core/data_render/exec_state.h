@@ -28,6 +28,7 @@
 #include <vector>
 #include <core/data_render/vnode/vnode.h>
 #include "core/data_render/op_code.h"
+#include "core/data_render/json/json11.hpp"
 
 namespace weex {
 namespace core {
@@ -202,6 +203,7 @@ class ExecState {
   inline const std::string& page_id() const { return page_id_; }
   inline VNode* root() const { return root_.get(); }
   inline void insert_node(VNode* node) { node_map_.insert({node->ref(), node}); }
+  inline json11::Json& raw_json() { return raw_json_; }
 
  private:
   friend class VM;
@@ -216,9 +218,12 @@ class ExecState {
   std::unique_ptr<Global> global_;
   std::unique_ptr<StringTable> string_table_;
 
+  //node context
   std::string page_id_;
   std::unique_ptr<VNode> root_;
   std::map<std::string, VNode*> node_map_;
+  json11::Json raw_json_;
+
   VM* vm_;
   std::unordered_map<std::string, long> global_variables_;
 };

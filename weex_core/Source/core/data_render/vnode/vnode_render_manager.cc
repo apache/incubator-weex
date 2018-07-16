@@ -23,6 +23,7 @@
 #include "core/data_render/string_table.h"
 #include "vnode_render_manager.h"
 #include "vnode.h"
+#include <chrono>
 
 #define VRENDER_LOG true
 
@@ -100,9 +101,19 @@ bool VNodeRenderManager::CreatePage(const string& page_id, VNode* vNode) {
   }
   vnode_trees_[page_id] = vNode;
 
+  auto v_2_ro = std::chrono::steady_clock::now();
   //update tree
   auto render_root = VNode2RenderObject(vNode, page_id);
+  auto duration_v_2_ro = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - v_2_ro);
+  LOGE("DATA_RENDER, v_2_ro time %lld",duration_v_2_ro.count());
+
+  auto create_page_start = std::chrono::steady_clock::now();
   RenderManager::GetInstance()->CreatePage(page_id, render_root);
+  auto duration_create_page = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - create_page_start);
+  LOGE("DATA_RENDER, create_page time %lld",duration_create_page.count());
+
   RenderManager::GetInstance()->CreateFinish(page_id);
   return true;
 }
@@ -166,8 +177,8 @@ static Value CreateElement(ExecState* exec_state) {//createElement("tagName","id
   return Value();
 }
 
-static Value AppendChild(ExecState* exec_state) {//appendChild("parent_id","id");
-  VNode* parent = exec_state->find_node(exec_state->GetArgument(0)->str->c_str());
+static Value AppendChild(ExecState* exec_state) {//appendChild("tag","id",""parent_id");todo
+  VNode* parent = exec_state->find_node(exec_state->GetArgument(2)->str->c_str());
   VNode* child = exec_state->find_node(exec_state->GetArgument(1)->str->c_str());
   if (parent == nullptr || child == nullptr) {
     return Value();
@@ -190,6 +201,27 @@ static Value SetAttr(ExecState* exec_state) {//setAttr("id","key","value");
   return Value();
 }
 
+static Value SetClassList(ExecState* exec_state) {
+  VNode* node = exec_state->find_node(exec_state->GetArgument(0)->str->c_str());
+  char* key = exec_state->GetArgument(1)->str->c_str();
+
+  if (node == nullptr) {
+    return Value();
+  }
+
+  json11::Json& json = exec_state->raw_json();
+  const json11::Json& styles = json["styles"];
+  const json11::Json& style = styles[key];
+  if (style.is_null()) {
+    return Value();
+  }
+  const json11::Json::object& items = style.object_items();
+  for (auto it = items.begin(); it != items.end(); it++) {
+    node->SetStyle(it->first, it->second.string_value());
+  }
+  return Value();
+}
+
 void RegisterCFunc(ExecState* state, const std::string& name, CFunction function) {
   Value func;
   func.type = Value::Type::CFUNC;
@@ -203,6 +235,8 @@ void VNodeRenderManager::InitVM() {
   }
 }
 void VNodeRenderManager::TestProcess(const std::string& input, const std::string& page_id) {
+  auto start = std::chrono::steady_clock::now();
+
   ExecState* execState = new ExecState(g_vm_);
 
   //log
@@ -210,11 +244,29 @@ void VNodeRenderManager::TestProcess(const std::string& input, const std::string
   RegisterCFunc(execState, "createElement", CreateElement);
   RegisterCFunc(execState, "appendChild", AppendChild);
   RegisterCFunc(execState, "setAttr", SetAttr);
+  RegisterCFunc(execState, "setClassList", SetClassList);
 
   execState->page_id(page_id);
+  auto compile_start = std::chrono::steady_clock::now();
   execState->Compile(input);
+  auto duration_compile = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - compile_start);
+
+
+  auto exec_start = std::chrono::steady_clock::now();
   execState->Execute();
+  auto duration_exec = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - exec_start);
+
+
   CreatePage(page_id, execState->root());
+
+  auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - start);
+
+  LOGE("DATA_RENDER, All time %lld",duration_post.count());
+  LOGE("DATA_RENDER, Compile time %lld",duration_compile.count());
+  LOGE("DATA_RENDER, Exec time %lld",duration_exec.count());
 }
 
 void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node);
