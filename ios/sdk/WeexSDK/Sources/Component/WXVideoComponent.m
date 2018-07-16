@@ -199,7 +199,10 @@
     
     [self cancelImage];
     __weak typeof(self) weakSelf = self;
-    weakSelf.imageOperation = [[self imageLoader] downloadImageWithURL:posterURL.absoluteString imageFrame:self.posterImageView.frame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {
+    weakSelf.imageOperation = [[self imageLoader] downloadImageWithURL:posterURL.absoluteString imageFrame:self.posterImageView.frame
+                                                              userInfo:@{@"instanceId":self.weexSDKInstance.instanceId}
+                                                             completed:^(UIImage *image, NSError *error, BOOL finished)
+    {
         dispatch_async(dispatch_get_main_queue(), ^{
             __strong typeof(self) strongSelf = weakSelf;
             if (!error) {

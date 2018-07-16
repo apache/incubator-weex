@@ -484,6 +484,11 @@ _Pragma("clang diagnostic pop") \
         instance.performance.fsCallNativeNum++;
         instance.performance.fsCallNativeTime =  instance.performance.fsCallNativeTime + diff;
     }
+    if (instance && !instance.apmInstance.isFSEnd) {
+        NSTimeInterval diff = CACurrentMediaTime()*1000 - startTime;
+        [instance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_NATIVE_NUM withDiffValue:1];
+        [instance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_NATIVE_TIME withDiffValue:diff];
+    }
     return 1;
 }
 
@@ -504,6 +509,8 @@ _Pragma("clang diagnostic pop") \
 			}
 		}
 	}
+    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
+    [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_START];
     
     //create a sendQueue bind to the current instance
     NSMutableArray *sendQueue = [NSMutableArray array];
@@ -519,6 +526,8 @@ _Pragma("clang diagnostic pop") \
         bundleType = [self _pareJSBundleType:instanceIdString jsBundleString:jsBundleString]; // bundleType can be Vue, Rax and the new framework.
     }
     if (bundleType&&shoudMultiContext) {
+        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_USE_MULTI_CONTEXT withValue:[NSNumber numberWithBool:true]];
+        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:bundleType];
         NSMutableDictionary *newOptions = [options mutableCopy];
         if (!options) {
             newOptions = [NSMutableDictionary new];
@@ -527,7 +536,6 @@ _Pragma("clang diagnostic pop") \
         newOptions[@"bundleType"] = bundleType;
         NSString *raxAPIScript = nil;
         NSString *raxAPIScriptPath = nil;
-        WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
         sdkInstance.bundleType = bundleType;
         if ([bundleType.lowercaseString isEqualToString:@"rax"]) {
              raxAPIScriptPath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-rax-api" ofType:@"js"];
@@ -597,6 +605,8 @@ _Pragma("clang diagnostic pop") \
         }
         
     } else {
+        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_USE_MULTI_CONTEXT withValue:[NSNumber numberWithBool:false]];
+        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:@"singleContextUnkonwType"];
         if (data){
             args = @[instanceIdString, jsBundleString, options ?: @{}, data];
         } else {
@@ -605,6 +615,7 @@ _Pragma("clang diagnostic pop") \
         [self callJSMethod:@"createInstance" args:args];
     }
     WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+    [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
 }
 
 - (NSString *)_pareJSBundleType:(NSString*)instanceIdString jsBundleString:(NSString*)jsBundleString
@@ -950,10 +961,8 @@ _Pragma("clang diagnostic pop") \
     
     if ([tasks count] > 0 && execIns) {
         WXSDKInstance * execInstance = [WXSDKManager instanceForID:execIns];
-        NSTimeInterval start = -1;
-        if (execInstance && !(execInstance.isJSCreateFinish)) {
-            start = CACurrentMediaTime()*1000;
-        }
+        NSTimeInterval start = CACurrentMediaTime()*1000;
+        
         if (execInstance.instanceJavaScriptContext && execInstance.bundleType) {
             [self callJSMethod:@"__WEEX_CALL_JAVASCRIPT__" args:@[execIns, tasks] onContext:execInstance.instanceJavaScriptContext completion:nil];
         } else {
@@ -964,6 +973,11 @@ _Pragma("clang diagnostic pop") \
             execInstance.performance.fsCallJsNum++;
             execInstance.performance.fsCallJsTime =  execInstance.performance.fsCallJsTime+ diff;
          }
+        if (execInstance && !execInstance.apmInstance.isFSEnd) {
+             NSTimeInterval diff = CACurrentMediaTime()*1000 - start;
+            [execInstance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_JS_NUM withDiffValue:1];
+            [execInstance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_JS_TIME withDiffValue:diff];
+        }
     }
     
     if (hasTask) {

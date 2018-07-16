@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		17036A5720FDF9AA0029AE3D /* WXApmGeneratorImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 17036A5620FDF9AA0029AE3D /* WXApmGeneratorImpl.m */; };
+		17036A5A20FDF9DF0029AE3D /* WXApmImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 17036A5920FDF9DF0029AE3D /* WXApmImpl.m */; };
 		17C1DB57206B675D000E0CEB /* DebugAnzlyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = 17C1DB56206B675D000E0CEB /* DebugAnzlyzer.m */; };
 		2AE88A2C1C8544E6003329DE /* WXScannerVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AE88A2B1C8544E6003329DE /* WXScannerVC.m */; };
 		564B94671DD9C65000441C8D /* WeexUITestDemo-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 564B94661DD9C65000441C8D /* WeexUITestDemo-Info.plist */; };
@@ -67,6 +69,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		17036A5520FDF9AA0029AE3D /* WXApmGeneratorImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WXApmGeneratorImpl.h; path = extend/handler/WXApmGeneratorImpl.h; sourceTree = "<group>"; };
+		17036A5620FDF9AA0029AE3D /* WXApmGeneratorImpl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WXApmGeneratorImpl.m; path = extend/handler/WXApmGeneratorImpl.m; sourceTree = "<group>"; };
+		17036A5820FDF9DF0029AE3D /* WXApmImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WXApmImpl.h; path = extend/handler/WXApmImpl.h; sourceTree = "<group>"; };
+		17036A5920FDF9DF0029AE3D /* WXApmImpl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WXApmImpl.m; path = extend/handler/WXApmImpl.m; sourceTree = "<group>"; };
 		17C1DB55206B6729000E0CEB /* DebugAnalyzer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DebugAnalyzer.h; path = debug/DebugAnalyzer.h; sourceTree = "<group>"; };
 		17C1DB56206B675D000E0CEB /* DebugAnzlyzer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DebugAnzlyzer.m; path = debug/DebugAnzlyzer.m; sourceTree = "<group>"; };
 		1888E2C5769382461DEDC97D /* Pods-WeexUITestDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeexUITestDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-WeexUITestDemo/Pods-WeexUITestDemo.release.xcconfig"; sourceTree = "<group>"; };
@@ -336,6 +342,10 @@
 				DC20B8E51ECADA2500845F39 /* WXConfigCenterDefaultImpl.m */,
 				DCABAFFC1D029753001C8592 /* WXImgLoaderDefaultImpl.h */,
 				DCABAFFD1D029753001C8592 /* WXImgLoaderDefaultImpl.m */,
+				17036A5520FDF9AA0029AE3D /* WXApmGeneratorImpl.h */,
+				17036A5620FDF9AA0029AE3D /* WXApmGeneratorImpl.m */,
+				17036A5820FDF9DF0029AE3D /* WXApmImpl.h */,
+				17036A5920FDF9DF0029AE3D /* WXApmImpl.m */,
 			);
 			name = handler;
 			sourceTree = "<group>";
@@ -625,6 +635,7 @@
 				DCABAFF31D029685001C8592 /* WXATLoggerPlugin.m in Sources */,
 				DC15A3D0200E30FC009C8977 /* WXNavigationHandlerImpl.m in Sources */,
 				2AE88A2C1C8544E6003329DE /* WXScannerVC.m in Sources */,
+				17036A5720FDF9AA0029AE3D /* WXApmGeneratorImpl.m in Sources */,
 				775BEE861C1E8ECC008D1629 /* WXDemoViewController.m in Sources */,
 				DC5B53691E8CED9400E02125 /* WXScannerHistoryVC.m in Sources */,
 				74CC79EB1C2B9E4700829368 /* UIViewController+WXDemoNaviBar.m in Sources */,
@@ -633,6 +644,7 @@
 				775BEE831C1E8ECC008D1629 /* AppDelegate.m in Sources */,
 				847CAF311F39E3F100551725 /* WXExtModule.m in Sources */,
 				DC15A3C7200C505C009C8977 /* WXTitleBarModule.m in Sources */,
+				17036A5A20FDF9DF0029AE3D /* WXApmImpl.m in Sources */,
 				DC20B8E61ECADA2500845F39 /* WXConfigCenterDefaultImpl.m in Sources */,
 				DCABAFF41D029685001C8592 /* WXATViewHierarchyPlugin.m in Sources */,
 				775BEE801C1E8ECC008D1629 /* main.m in Sources */,

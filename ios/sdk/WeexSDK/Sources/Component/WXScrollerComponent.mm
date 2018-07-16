@@ -173,6 +173,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             _shouldRemoveScrollerListener = shouldRemoveScrollerListener;
             
         }
+        //may be list
+        if ([@"scroller" isEqualToString:type]) {
+            [weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_SCROLLER_NUM withDiffValue:1];
+        }
     }
     
     return self;
