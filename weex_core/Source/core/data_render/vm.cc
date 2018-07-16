@@ -19,7 +19,7 @@
 #include "core/data_render/vm.h"
 #include "core/data_render/exec_state.h"
 
-#define LOGE(...)
+#define LOGE(...) ((void)0)
 
 #define INT_OP(op, v1, v2) CAST_U2S((CAST_S2U(v1)) op CAST_S2U(v2))
 #define NUM_OP(op, d1, d2) ((d1) op (d2))
@@ -31,7 +31,7 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-inline bool IsInt(Value *o) { return Value::Type::INT == o->type; }
+inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
 
 inline int IntMod(int a, int b) {
     if (CAST_S2U(b) + 1u <= 1u) {
@@ -48,13 +48,17 @@ inline int IntMod(int a, int b) {
     }
 }
 
-inline bool IsNumber(Value *o) { return Value::Type::NUMBER == o->type; }
+inline bool IsNumber(const Value *o) { return Value::Type::NUMBER == o->type; }
 
-inline int64_t IntValue(Value *o) { return o->i; }
+inline bool IsBool(const Value *o) { return Value::Type ::BOOL == o->b;}
 
-inline double NumValue(Value *o) { return o->n; }
+inline int64_t IntValue(const Value *o) { return o->i; }
 
-inline int ToNumber_(Value *value, double *ret) {
+inline double NumValue(const Value *o) { return o->n; }
+
+inline bool BoolValue(const Value *o) { return (Value::Type::BOOL == o->type) ? o->b : false;}
+
+inline int ToNumber_(const Value *value, double *ret) {
     if (IsInt(value)) {
         *ret = IntValue(value);
         return 1;
@@ -66,7 +70,7 @@ inline int ToNumber_(Value *value, double *ret) {
     }
 }
 
-inline int ToNum(Value *o, double *n) {
+inline int ToNum(const Value *o, double *n) {
     return IsNumber(o) ? (*n = NumValue(o), 1) : ToNumber_(o, n);
 }
 
@@ -78,6 +82,11 @@ inline void SetIValue(Value *o, int iv) {
 inline void SetDValue(Value *o, double d) {
     o->type = Value::Type::NUMBER;
     o->n = d;
+}
+
+inline void SetBValue(Value *o, bool b) {
+    o->type = bool;
+    o->b = b;
 }
 
 inline double NumPow(double d1, double d2) {
@@ -92,6 +101,100 @@ inline double NumMod(double d1, double d2) {
     double ret = MATH_OP(fmod)(d1, d2);
     if (ret * d2 < 0) ret += d2;
     return ret;
+}
+
+inline bool NumEq(double d1, double d2) {
+    return d1 == d2;
+}
+
+inline bool NumLT(double d1, double d2) {
+    return d1 < d2;
+}
+
+inline int Number2Int(double v, int *p) {
+    if (v >= MININTEGER && v <= MAXINTEGER) {
+        //XXX
+    }
+}
+
+/*
+** try to convert a value to an integer, rounding according to 'mode':
+** mode == 0: accepts only integral values
+** mode == 1: takes the floor of the number
+** mode == 2: takes the ceil of the number
+*/
+int ToInteger(const Value *o, int mode, int64_t *v) {
+
+    Value tmp;
+    if (IsNumber(o)) {
+        double n = NumValue(o);
+        double f = MATH_OP(floor)(n);
+        if (n != f) {
+            if (mode == 0) {
+                return 0;
+            } else if (mode > 1) {
+                f += 1;
+            }
+        }
+    }
+    if (IsInt(o)) {
+        *v = IntValue(o);
+        return 1;
+    } else if ()
+}
+
+bool ValueEqulas(const Value *a, const Value *b) {
+    if (a->type != b->type) {
+        return false;
+    }
+    double d1, d2;
+    if (IsNumber(a)) {
+        return NumEq(NumValue(a), NumValue(b));
+    } else if (IsInt(a)) {
+        return IntValue(a) == IntValue(b);
+    } else if (IsBool(a)) {
+        return BoolValue(a) == BoolValue(b);
+    }
+    else if (ToNum(a, &d1) && ToNum(b, &d2)){
+        return NumEq(d1, d2);
+    } else {
+        return false;
+    }
+}
+
+bool ValueLE(const Value *a, const Value *b) {
+    if (a->type != b->type) {
+        return false;
+    }
+    double d1, d2;
+    d1 = NumValue(a);
+    d2 = NumValue(b);
+    label:
+    if (IsNumber(a)) {
+        return NumLT(d1, d2) || NumEq(d1, d2);
+    } else if (IsInt(a)) {
+        return IntValue(a) <= IntValue(b);
+    } else if (ToNum(a, &d1) && ToNum(b, &d2)){
+        goto label;
+    } else {
+        return false;
+    }
+}
+
+bool ValueLT(const Value *a, const Value *b) {
+    if (a->type != b->type) {
+        return false;
+    }
+    double d1, d2;
+    if (IsNumber(a)) {
+        return NumLT(NumValue(a), NumValue(b));
+    } else if (IsInt(a)) {
+        return IntValue(a) < IntValue(b);
+    } else if (ToNum(a, &d1) && ToNum(b, &d2)){
+        return NumLT(d1, d2);
+    } else {
+        return false;
+    }
 }
 
 void VM::RunFrame(ExecState *exec_state, Frame frame) {
@@ -214,6 +317,14 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 }
                 break;
 
+            case OP_BAND: {
+                a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
+                c = frame.reg + GET_ARG_C(instruction);
+                if ()
+            }
+                break;
+
             case OP_CALL: {
                 a = frame.reg + GET_ARG_A(instruction);
                 size_t argc = GET_ARG_B(instruction);
@@ -221,6 +332,49 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 exec_state->CallFunction(c, argc, a);
             }
                 break;
+
+            case OP_JMP: {
+                a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
+                c = frame.reg + GET_ARG_C(instruction);
+                if (!IsBool(a)) {
+                    //TODO error
+                    return;
+                }
+                if (BoolValue(a) && IsInt(b)) {
+                    frame.pc += IntValue(b);
+                } else if (!BoolValue(a) && IsInt(c)) {
+                    frame.pc += IntValue(c);
+                } else {
+                    //TODO error
+                }
+            }
+                break;
+
+            case OP_EQ: {
+                a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
+                c = frame.reg + GET_ARG_C(instruction);
+                SetBValue(a, ValueEqulas(b, c));
+            }
+                break;
+
+            case OP_LT: {
+                a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
+                c = frame.reg + GET_ARG_C(instruction);
+                SetBValue(a, ValueLT(b, c));
+            }
+                break;
+
+            case OP_LE: {
+                a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
+                c = frame.reg + GET_ARG_C(instruction);
+                SetBValue(a, ValueLE(b, c));
+            }
+                break;
+
             default:
                 break;
         }
