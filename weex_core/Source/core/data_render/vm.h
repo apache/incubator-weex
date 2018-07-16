@@ -20,6 +20,9 @@
 #ifndef CORE_DATA_RENDER_VM_H
 #define CORE_DATA_RENDER_VM_H
 
+#define MAXINTEGER INT_MAX
+#define MININTEGER INT_MIN
+
 #include "core/data_render/op_code.h"
 
 namespace weex {
