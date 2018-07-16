@@ -78,6 +78,30 @@ static void Java_SystemMessageHandler_scheduleWork(JNIEnv* env, jobject obj) {
 
 }
 
+static intptr_t g_SystemMessageHandler_scheduleDelayedWork = 0;
+static void Java_SystemMessageHandler_scheduleDelayedWork(JNIEnv* env, jobject
+    obj, jlong delayMillis) {
+  /* Must call RegisterNativesImpl()  */
+  //CHECK_CLAZZ(env, obj,
+  //    SystemMessageHandler_clazz(env));
+  jmethodID method_id =
+      base::android::GetMethod(
+      env, SystemMessageHandler_clazz(env),
+      base::android::INSTANCE_METHOD,
+      "scheduleDelayedWork",
+
+"("
+"J"
+")"
+"V",
+      &g_SystemMessageHandler_scheduleDelayedWork);
+
+     env->CallVoidMethod(obj,
+          method_id, delayMillis);
+  base::android::CheckException(env);
+
+}
+
 static intptr_t g_SystemMessageHandler_stop = 0;
 static void Java_SystemMessageHandler_stop(JNIEnv* env, jobject obj) {
   /* Must call RegisterNativesImpl()  */

@@ -8,6 +8,7 @@ add_compile_options(-fexceptions)
 add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
 add_definitions(-DDEBUG=1)
+add_definitions(-DOS_ANDROID=1)
 
 add_definitions(-DRENDER_LOG=0)
 add_definitions(-DPERFORMANCE_LOG=0)
@@ -16,7 +17,12 @@ add_definitions(-DJSAPI_LOG=0)
 add_definitions(-DDOM_PARSER_LOG=0)
 
 set(COMMON_SRCS
-
+  ./base/time_point.cc
+  ./base/thread/thread_impl_posix.cc
+  ./base/thread/thread_impl_android.cc
+  ./base/message_loop/message_loop.cc
+  ./base/message_loop/message_pump_posix.cc
+  ./base/message_loop/message_pump_android.cc
   ./core/render/manager/render_manager.cpp
   ./core/render/page/render_page.cpp
 
