@@ -218,8 +218,6 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles;
 
-- (void)_initFlexCssNodeWithStyles:(NSDictionary *)styles;
-
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles;
 
 - (void)_resetCSSNodeStyles:(NSArray *)styles;
