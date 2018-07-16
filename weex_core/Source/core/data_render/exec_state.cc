@@ -59,7 +59,8 @@ ExecState::ExecState(VM* vm)
       func_state_(nullptr),
       global_(new Global),
       string_table_(new StringTable),
-      vm_(vm) {}
+      vm_(vm),
+      global_variables_() {}
 
 ExecState::~ExecState() {}
 
@@ -78,10 +79,25 @@ void ExecState::Execute() {
   CallFunction(stack_->base(), 0, nullptr);
 }
 
+const Value& ExecState::Call(const std::string& func_name, const std::vector<Value>& params) {
+  Value ret;
+  auto it = global_variables_.find(func_name);
+  if (it != global_variables_.end()) {
+    long reg = it->second;
+    Value* function = *stack_->top() + 1;
+    *function = *(stack_->base() + reg);
+    for (int i = 0; i < params.size(); ++i) {
+      *(function + i) = params[i];
+    }
+    CallFunction(function, params.size(), &ret);
+  }
+  return ret;
+}
+
 void ExecState::CallFunction(Value* func, size_t argc, Value* ret) {
+  *stack_->top() = func + argc;
   if (func->type == Value::Type::CFUNC) {
     Frame frame;
-    *stack_->top() = func + argc;
     frame.reg = func;
     frames_.push_back(frame);
     auto result = reinterpret_cast<CFunction>(func->cf)(this);

@@ -22,6 +22,7 @@
 
 #include <cmath>
 #include <map>
+#include <unordered_map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -119,6 +120,7 @@ struct Value {
 class FuncState {
  public:
   FuncState() : instructions_(), constants_(), children_() {}
+  virtual ~FuncState() {}
 
   int AddConstant(Value value) {
     for (auto i = 0; i != constants_.size(); ++i) {
@@ -135,12 +137,19 @@ class FuncState {
     instructions_.push_back(i);
     return instructions_.size() - 1;
   }
+  inline size_t ReplaceInstruction(size_t pos, Instruction i) {
+    instructions_[pos] = i;
+    return pos;
+  }
   inline std::vector<Instruction>& instructions() { return instructions_; }
   inline void AddChild(FuncState* func) {
     children_.push_back(std::unique_ptr<FuncState>(func));
   }
   inline std::vector<std::unique_ptr<FuncState>>& children() {
     return children_;
+  }
+  inline FuncState* GetChild(size_t pos) {
+    return children_[pos].get();
   }
 
  private:
@@ -174,10 +183,10 @@ class Global {
 class ExecState {
  public:
   ExecState(VM* vm);
-  ~ExecState();
+  virtual ~ExecState();
   void Compile(const std::string& source);
   void Execute();
-  void CallFunction(Value* func, size_t argc, Value* ret);
+  const Value& Call(const std::string& func_name, const std::vector<Value>& params);
 
   size_t GetArgumentCount();
   Value* GetArgument(int index);
@@ -195,6 +204,9 @@ class ExecState {
   inline void insert_node(VNode* node) { node_map_.insert({node->ref(), node}); }
 
  private:
+  friend class VM;
+  void CallFunction(Value* func, size_t argc, Value* ret);
+
   std::vector<Frame> frames_;
   std::unique_ptr<ExecStack> stack_;
 
@@ -208,6 +220,7 @@ class ExecState {
   std::unique_ptr<VNode> root_;
   std::map<std::string, VNode*> node_map_;
   VM* vm_;
+  std::unordered_map<std::string, long> global_variables_;
 };
 }  // namespace data_render
 }  // namespace core

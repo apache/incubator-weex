@@ -75,7 +75,6 @@ class CodeGenerator : public ASTVisitor {
    public:
     FuncCnt() {}
     ~FuncCnt() {}
-    inline std::unordered_map<std::string, long> &upvalue() { return upvalue_; }
     inline void set_func_state(FuncState *func_state) {
       func_state_ = func_state;
     }
@@ -83,7 +82,6 @@ class CodeGenerator : public ASTVisitor {
 
    private:
     FuncState *func_state_;
-    std::unordered_map<std::string, long> upvalue_;
   };
 
   class BlockCnt : public Node<BlockCnt> {

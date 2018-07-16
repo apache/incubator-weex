@@ -250,6 +250,12 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 b = exec_state->global()->Find(GET_ARG_B(instruction));
                 *a = *b;
                 break;
+            case OP_GETFUNC: {
+                a = frame.reg + GET_ARG_A(instruction);
+                a->type = Value::Type::FUNC;
+                a->f = frame.func->f->GetChild(GET_ARG_B(instruction));
+                break;
+            }
 
             case OP_ADD:
                 a = frame.reg + GET_ARG_A(instruction);

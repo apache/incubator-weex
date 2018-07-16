@@ -28,6 +28,7 @@ enum OpCode {
   OP_LOADK,      //	A sBx	R(A) = sBx
   OP_LOADNULL,   //	A       R(A) = null
   OP_GETGLOBAL,  //	A B	    R(A) = Global[B]
+  OP_GETFUNC,    //	A B  	R(A) = Function[B]
   OP_GETTABLE,   //	A B C	R(A) = R(B)[R(C)]
   OP_SETTABLE,   //	A B C	R(A)[R(B)] = RK(C)
 
