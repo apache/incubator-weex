@@ -107,6 +107,8 @@ dependencies {
     compile 'com.facebook.fresco:fresco:0.12.0+'
     compile 'com.facebook.fresco:animated-gif:0.12.0'
 
+    compile 'com.google.zxing:core:3.3.3'
+
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
     compile 'com.squareup.okio:okio:1.0.1'
