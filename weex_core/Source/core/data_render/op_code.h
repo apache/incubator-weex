@@ -48,6 +48,7 @@ enum OpCode {
   OP_BNOT,  //	A B	    R(A) = ~R(B)
 
   OP_JMP,  //	A B C	if (R(A)) pc += R(B) else pc += R(C)
+  OP_GOTO, //   A       pc = A
   OP_EQ,   //	A B C	R(A) = R(B) == R(C)
   OP_LT,   //	A B C	R(A) = R(A) <  R(B)
   OP_LE,   //	A B C	R(A) = R(A) <= R(B)
