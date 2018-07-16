@@ -156,6 +156,8 @@ class Token {
     return s_precedence_[token];
   }
 
+  Token(std::size_t index) :  index_{index} {}
+
   Token(int line, int column) : line_(line), column_(column) {}
 
   inline int line() { return line_; }
@@ -168,6 +170,7 @@ class Token {
   std::string str_;
   double num_;
   Type type_;
+  std::size_t index_;
 
   static const char* const s_name_[NUM_TOKENS];
   static const char* const s_string_[NUM_TOKENS];

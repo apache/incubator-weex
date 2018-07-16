@@ -205,7 +205,8 @@ enum class BinaryOperation {
   kBitOr,
   kBitXor,
   kInstanceOf,
-  kIn
+  kIn,
+  kUndefine
 };
 
 class BinaryExpression : public Expression {

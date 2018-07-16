@@ -110,6 +110,9 @@ namespace data_render {
     {
         return MakeHandle<AssignExpression>(json, lhs, rhs);
     }
+    Handle<Expression> ASTFactory::NewIfStatement(Json &json, Handle<Expression> condition, Handle<Expression> then) {
+        return MakeHandle<IfStatement>(json, condition, then);
+    }
     
 }  // namespace data_render
 }  // namespace core

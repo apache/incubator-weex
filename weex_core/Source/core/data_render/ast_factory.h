@@ -55,6 +55,7 @@ namespace data_render {
         virtual Handle<Expression> NewForStatement(Json &json, ForKind kind, Handle<Expression> init, Handle<Expression> condition, Handle<Expression> update, Handle<Expression> body);
         virtual Handle<Expression> NewObjectConstant(Json &json, ProxyObject obj);
         virtual Handle<Expression> NewAssignExpression(Json &json, Handle<Expression> lhs, Handle<Expression> rhs);
+        virtual Handle<Expression> NewIfStatement(Json &json, Handle<Expression> condition, Handle<Expression> then);
     };
 
 }  // namespace data_render
