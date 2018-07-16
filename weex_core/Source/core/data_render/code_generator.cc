@@ -98,11 +98,64 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
 
 void CodeGenerator::Visit(ArgumentList *node, void *data) {}
 
-void CodeGenerator::Visit(IfStatement *node, void *data) {}
+void CodeGenerator::Visit(IfStatement *node, void *data) {
+  RegisterScope scope(cur_block_.get());
+
+  long condition = cur_block_->NextRegisterId();
+  if (node->condition().get() != NULL) {
+    node->condition()->Accept(this, &condition);
+  }
+  auto save = cur_func_->func_state()->AddInstruction(0);
+  int tb_start_index = cur_func_->func_state()->instructions().size() - 1;
+  if (node->body().get() != NULL) {
+    node->body()->Accept(this, nullptr);
+  }
+  int tb_end_index = cur_func_->func_state()->instructions().size() - 1;
+
+  FuncState *state = cur_func_->func_state();
+  state->ReplaceInstruction(
+      save,
+      CREATE_ABC(OP_JMP, condition, 1, tb_end_index - tb_start_index + 1));
+}
 
 void CodeGenerator::Visit(IfElseStatement *node, void *data) {}
 
-void CodeGenerator::Visit(ForStatement *node, void *data) {}
+void CodeGenerator::Visit(ForStatement *node, void *data) {
+  RegisterScope scope(cur_block_.get());
+  cur_block_->set_is_loop(true);
+
+  long init = cur_block_->NextRegisterId();
+  if (node->init().get() != NULL) {
+    node->init()->Accept(this, &init);
+  }
+
+  int condition_start_index =
+      cur_func_->func_state()->instructions().size() - 1;
+
+  long condition = cur_block_->NextRegisterId();
+  if (node->condition().get() != NULL) {
+    node->condition()->Accept(this, &condition);
+  }
+
+  auto slot = cur_func_->func_state()->AddInstruction(0);
+
+  if (node->body().get() != NULL) {
+    node->body()->Accept(this, nullptr);
+  }
+
+  long update = cur_block_->NextRegisterId();
+  if (node->update().get() != NULL) {
+    node->update()->Accept(this, &update);
+  }
+
+  FuncState *state = cur_func_->func_state();
+  state->AddInstruction(CREATE_ABC(OP_GOTO, condition_start_index, 0, 0));
+
+  int for_end_index = cur_func_->func_state()->instructions().size() - 1;
+
+  state->ReplaceInstruction(
+      slot, (CREATE_ABC(OP_JMP, condition, 1, for_end_index - slot + 1)));
+}
 
 void CodeGenerator::Visit(BlockStatement *node, void *data) {
   for (int i = 0; i < node->statements()->raw_list().size(); ++i) {
@@ -148,8 +201,30 @@ void CodeGenerator::Visit(BinaryExpression *node, void *data) {
   BinaryOperation opeartion = node->op();
 
   FuncState *state = cur_func_->func_state();
+
+  // a + b
   if (opeartion == BinaryOperation::kAddition) {
-    state->AddInstruction(CREATE_ABC(OP_ADD, ret, 0, 0));
+    state->AddInstruction(CREATE_ABC(OP_ADD, ret, left, right));
+  }
+
+  // a < b
+  if (opeartion == BinaryOperation::kLessThan) {
+    state->AddInstruction(CREATE_ABC(OP_LT, ret, left, right));
+  }
+
+  // a > b
+  if (opeartion == BinaryOperation::kGreaterThan) {
+    state->AddInstruction(CREATE_ABC(OP_LT, ret, right, left));
+  }
+
+  // a <= b
+  if (opeartion == BinaryOperation::kLessThanEqual) {
+    state->AddInstruction(CREATE_ABC(OP_LE, ret, left, right));
+  }
+
+  // a >= b
+  if (opeartion == BinaryOperation::kGreaterThanEqual) {
+    state->AddInstruction(CREATE_ABC(OP_LE, ret, right, left));
   }
 }
 
