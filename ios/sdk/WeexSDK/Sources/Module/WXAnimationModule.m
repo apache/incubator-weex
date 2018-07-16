@@ -146,14 +146,14 @@
 @synthesize weexInstance;
 
 WX_EXPORT_METHOD(@selector(transition:args:callback:))
-WX_EXPORT_METHOD(@selector(transitionPosition:index:ref:args:callback:))
 
 - (void)transition:(NSString *)nodeRef args:(NSDictionary *)args callback:(WXModuleKeepAliveCallback)callback
 {
     _needLayout = NO;
     _isAnimationedSuccess = YES;
     WXPerformBlockOnComponentThread(^{
-        WXComponent *targetComponent = [self.weexInstance componentForRef:nodeRef];
+        NSArray *stringArray = [nodeRef componentsSeparatedByString:@"@"];
+        WXComponent *targetComponent = [self.weexInstance componentForRef:stringArray[0]];
         if (!targetComponent) {
             if (callback) {
                 NSDictionary *message = @{@"result":@"Fail",
@@ -164,28 +164,6 @@ WX_EXPORT_METHOD(@selector(transitionPosition:index:ref:args:callback:))
         }
         WXPerformBlockOnMainThread(^{
             [self animation:targetComponent args:args callback:callback];
-        });
-    });
-}
-- (void)transitionPosition:(NSString *)el index:(NSUInteger)index ref:(NSString *)ref args:(NSDictionary *)args callback:(WXModuleKeepAliveCallback)callback
-{
-    _needLayout = NO;
-    _isAnimationedSuccess = YES;
-    WXPerformBlockOnComponentThread(^{
-        WXComponent *refList = [self.weexInstance componentForRef:el];
-        NSArray *componentArray = [refList _componentArray:index ref:ref];
-        if (componentArray.count == 0) {
-            if (callback) {
-                NSDictionary *message = @{@"result":@"Fail",
-                                          @"message":[NSString stringWithFormat:@"No recycle list component find for ref:%@ ", ref]};
-                callback(message, NO);
-            }
-            return;
-        }
-        WXPerformBlockOnMainThread(^{
-            for (WXComponent *component in componentArray) {
-                [self animation:component args:args callback:callback];
-            }
         });
     });
 }
@@ -200,10 +178,12 @@ WX_EXPORT_METHOD(@selector(transitionPosition:index:ref:args:callback:))
     double delay = [args[@"delay"] doubleValue] / 1000;
     if (args[@"needLayout"]) {
         _needLayout = [WXConvert BOOL:args[@"needLayout"]];
-        _transition = [WXTransition new];
-        _transitionDic = [NSMutableDictionary new];
-        _transition.filterStyles = [NSMutableDictionary new];
-        _transition.oldFilterStyles = [NSMutableDictionary new];
+        if (_needLayout) {
+            _transition = [WXTransition new];
+            _transitionDic = [NSMutableDictionary new];
+            _transition.filterStyles = [NSMutableDictionary new];
+            _transition.oldFilterStyles = [NSMutableDictionary new];
+        }
     }
     CAMediaTimingFunction *timingFunction = [WXConvert CAMediaTimingFunction:args[@"timingFunction"]];
     NSDictionary *styles = args[@"styles"];
