@@ -66,12 +66,28 @@ inline int ToNumber_(const Value *value, double *ret) {
         *ret = NumValue(value);
         return 1;
     } else {
-        return -1;
+        return 0;
     }
 }
 
 inline int ToNum(const Value *o, double *n) {
     return IsNumber(o) ? (*n = NumValue(o), 1) : ToNumber_(o, n);
+}
+
+int ToBool(const Value *o, bool *b) {
+    double d1;
+    if (Value::Type::BOOL == o->type) {
+        *b = BoolValue(o);
+    } else if (Value::Type::INT == o->type) {
+        *b = IntValue(o);
+    } else if (Value::Type::NUMBER == o->type) {
+        *b = NumValue(o);
+    } else if (ToNum(o, &d1)) {
+        *b = d1;
+    } else {
+        *b = false;
+    }
+
 }
 
 inline void SetIValue(Value *o, int iv) {
@@ -85,7 +101,7 @@ inline void SetDValue(Value *o, double d) {
 }
 
 inline void SetBValue(Value *o, bool b) {
-    o->type = bool;
+    o->type = Value::Type::BOOL;
     o->b = b;
 }
 
@@ -111,10 +127,12 @@ inline bool NumLT(double d1, double d2) {
     return d1 < d2;
 }
 
-inline int Number2Int(double v, int *p) {
-    if (v >= MININTEGER && v <= MAXINTEGER) {
-        //XXX
+inline int Number2Int(double n, int64_t *p) {
+    if (n >= MININTEGER && n < -MININTEGER) {
+        *p = n;
+        return 1;
     }
+    return 0;
 }
 
 /*
@@ -126,6 +144,8 @@ inline int Number2Int(double v, int *p) {
 int ToInteger(const Value *o, int mode, int64_t *v) {
 
     Value tmp;
+    double d;
+    label:
     if (IsNumber(o)) {
         double n = NumValue(o);
         double f = MATH_OP(floor)(n);
@@ -136,11 +156,16 @@ int ToInteger(const Value *o, int mode, int64_t *v) {
                 f += 1;
             }
         }
+        return Number2Int(f, v);
     }
     if (IsInt(o)) {
         *v = IntValue(o);
         return 1;
-    } else if ()
+    } else if (ToNum(o, &d)) {
+        SetDValue(&tmp, d);
+        o = &tmp;
+        goto label;
+    }
 }
 
 bool ValueEqulas(const Value *a, const Value *b) {
@@ -321,7 +346,12 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 a = frame.reg + GET_ARG_A(instruction);
                 b = frame.reg + GET_ARG_B(instruction);
                 c = frame.reg + GET_ARG_C(instruction);
-                if ()
+                int64_t i1, i2;
+                if (ToInteger(b, 0, &i1) && ToInteger(c, 0, &i2)) {
+                    SetIValue(a, INT_OP(&, i1, i2));
+                } else {
+                    LOGE("Unspport Type[%s,%s] with OP_CODE[OP_BAND]", b->type, c->type);
+                }
             }
                 break;
 
@@ -335,18 +365,17 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
 
             case OP_JMP: {
                 a = frame.reg + GET_ARG_A(instruction);
-                b = frame.reg + GET_ARG_B(instruction);
-                c = frame.reg + GET_ARG_C(instruction);
-                if (!IsBool(a)) {
-                    //TODO error
+                int true_pc_jump = GET_ARG_B(instruction);
+                int false_pc_jump = GET_ARG_C(instruction);
+                bool con = false;
+                if (!ToBool(a, &con)) {
+                    LOGE("Unspport Type[%s] with OP_CODE[OP_JMP]", a->type);
                     return;
                 }
-                if (BoolValue(a) && IsInt(b)) {
-                    frame.pc += IntValue(b);
-                } else if (!BoolValue(a) && IsInt(c)) {
-                    frame.pc += IntValue(c);
+                if (con) {
+                    pc += true_pc_jump;
                 } else {
-                    //TODO error
+                    pc += false_pc_jump;
                 }
             }
                 break;
