@@ -28,8 +28,8 @@ matrix:
           components:
             - platform-tools
             - tools
-            - build-tools-25.0.3
-            - android-25
+            - build-tools-26.0.3
+            - android-26
             - extra-google-m2repository
             - extra-android-m2repository
             - sys-img-armeabi-v7a-android-22
