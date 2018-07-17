@@ -70,6 +70,8 @@ namespace data_render {
   M(Declaration)         \
   M(DeclarationList)     \
   M(IntegralConstant)    \
+  M(DoubleConstant)      \
+  M(BooleanConstant)     \
   M(CallExpression)      \
   M(MemberExpression)    \
   M(Identifier)          \
@@ -263,6 +265,24 @@ class IntegralConstant : public Expression {
  private:
   int value_;
 };
+class DoubleConstant : public Expression {
+ public:
+  DoubleConstant(Json &json, double value) : Expression(json), value_(value) {}
+  double value() { return value_; }
+ DEFINE_NODE_TYPE(DoubleConstant, Expression);
+ private:
+  double value_;
+};
+class BooleanConstant : public Expression {
+  bool pred_;
+ public:
+  BooleanConstant(Json& json, bool val)
+      : Expression(json), pred_(val) { }
+
+  bool pred() { return pred_; }
+ DEFINE_NODE_TYPE(BooleanConstant,Expression);
+};
+
 enum class MemberAccessKind {
   kCall,
   kDot,
