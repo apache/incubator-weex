@@ -45,10 +45,15 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.CSSConstants;
 import com.taobao.weex.dom.TextDecorationSpan;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXCustomStyleSpan;
@@ -247,11 +252,53 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
             WXLogUtils.w("WXText", "Layout not created");
           }
           hostView.invalidate();
+          resize();
         }
         WXLogUtils.d("WXText", "Font family " + fontFamily + " is available");
       }
     };
 
     LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).registerReceiver(mTypefaceObserver, new IntentFilter(TypefaceUtil.ACTION_TYPE_FACE_AVAILABLE));
+  }
+
+  public void resize() {
+
+    TextPaint textPaint = getHostView().getTextLayout().getPaint();
+    float newWidth = getTextWidth(getHostView().getText().toString(), getHostView().getText(), textPaint, Float.NaN, false);
+
+    View RealView = getHostView();
+    if (RealView == null) {
+      return;
+    }
+
+    ViewGroup.LayoutParams params = RealView.getLayoutParams();
+
+    if (params instanceof FrameLayout.LayoutParams && ((FrameLayout.LayoutParams) params).leftMargin != 0) {
+      ((FrameLayout.LayoutParams) params).leftMargin += (params.width - newWidth) / 2;
+    }
+    params.width = (int) newWidth;
+    RealView.setLayoutParams(params);
+
+  }
+
+  public float getTextWidth(String mText, CharSequence spanned, TextPaint textPaint, float outerWidth, boolean forceToDesired) {
+    if (mText == null) {
+      if (forceToDesired) {
+        return outerWidth;
+      }
+      return 0;
+    }
+    float textWidth;
+    if (forceToDesired) {
+      textWidth = outerWidth;
+    } else {
+      float desiredWidth = Layout.getDesiredWidth(spanned, textPaint);
+      if (CSSConstants.isUndefined(outerWidth) || desiredWidth < outerWidth) {
+        textWidth = desiredWidth;
+      } else {
+        textWidth = outerWidth;
+      }
+    }
+    return textWidth;
   }
 }
