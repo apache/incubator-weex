@@ -20,13 +20,14 @@
 #ifndef WEEX_PROJECT_CONTEXT_H
 #define WEEX_PROJECT_CONTEXT_H
 
-#include <core/data_render/vnode/vnode.h>
 #include <cmath>
 #include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "core/data_render/vnode/vnode.h"
+#include "core/data_render/vnode/vnode_render_context.h"
 #include "core/data_render/json/json11.hpp"
 #include "core/data_render/op_code.h"
 
@@ -48,7 +49,7 @@ class String;
 
 class StringTable;
 
-typedef Value (*CFunction)(ExecState*);
+typedef Value (* CFunction)(ExecState*);
 
 struct Value {
   union {
@@ -60,7 +61,9 @@ struct Value {
     String* str;
   };
 
-  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING };
+  enum Type {
+    NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING
+  };
 
   Type type;
 
@@ -192,24 +195,16 @@ class ExecState {
   size_t GetArgumentCount();
   Value* GetArgument(int index);
 
-  void setVNodeRoot(VNode* v_node);
-  VNode* find_node(const std::string& ref);
-
   inline Global* global() { return global_.get(); }
   inline ExecStack* stack() { return stack_.get(); }
   inline StringTable* string_table() { return string_table_.get(); }
-
-  inline void page_id(const std::string& page_id) { page_id_ = page_id; }
-  inline const std::string& page_id() const { return page_id_; }
-  inline VNode* root() const { return root_.get(); }
-  inline void insert_node(VNode* node) {
-    node_map_.insert({node->ref(), node});
-  }
-  inline json11::Json& raw_json() { return raw_json_; }
+  inline VNodeRenderContext* context() { return render_context_.get(); }
 
  private:
   friend class VM;
+
   void CallFunction(Value* func, size_t argc, Value* ret);
+  std::unique_ptr<VNodeRenderContext> render_context_;
 
   std::vector<Frame> frames_;
   std::unique_ptr<ExecStack> stack_;
@@ -219,12 +214,6 @@ class ExecState {
   std::unique_ptr<FuncState> func_state_;
   std::unique_ptr<Global> global_;
   std::unique_ptr<StringTable> string_table_;
-
-  // node context
-  std::string page_id_;
-  std::unique_ptr<VNode> root_;
-  std::map<std::string, VNode*> node_map_;
-  json11::Json raw_json_;
 
   VM* vm_;
   std::unordered_map<std::string, long> global_variables_;

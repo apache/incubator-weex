@@ -59,6 +59,7 @@ ExecState::ExecState(VM* vm)
       func_state_(nullptr),
       global_(new Global),
       string_table_(new StringTable),
+      render_context_(new VNodeRenderContext),
       vm_(vm),
       global_variables_() {}
 
@@ -67,7 +68,7 @@ ExecState::~ExecState() {}
 void ExecState::Compile(const std::string& source) {
   CodeGenerator generator(this);
   std::string err;
-  raw_json_ = Json::parse(source, err);
+  context()->raw_json() = Json::parse(source, err);
   const ParseResult& result = Parser::parse(source, err);
   generator.Visit(result.expr().get(), nullptr);
 }
@@ -125,14 +126,6 @@ size_t ExecState::GetArgumentCount() {
 
 Value* ExecState::GetArgument(int index) {
   return frames_.back().reg + index + 1;
-}
-void ExecState::setVNodeRoot(VNode* v_node) { root_.reset(v_node); }
-VNode* ExecState::find_node(const std::string& ref) {
-  auto it = node_map_.find(ref);
-  if (it == node_map_.end()) {
-    return nullptr;
-  }
-  return it->second;
 }
 
 }  // namespace data_render
