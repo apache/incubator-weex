@@ -20,15 +20,15 @@
 #ifndef WEEX_PROJECT_CONTEXT_H
 #define WEEX_PROJECT_CONTEXT_H
 
+#include <core/data_render/vnode/vnode.h>
 #include <cmath>
 #include <map>
-#include <unordered_map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
-#include <core/data_render/vnode/vnode.h>
-#include "core/data_render/op_code.h"
 #include "core/data_render/json/json11.hpp"
+#include "core/data_render/op_code.h"
 
 namespace weex {
 namespace core {
@@ -48,7 +48,7 @@ class String;
 
 class StringTable;
 
-typedef Value (* CFunction)(ExecState*);
+typedef Value (*CFunction)(ExecState*);
 
 struct Value {
   union {
@@ -60,9 +60,7 @@ struct Value {
     String* str;
   };
 
-  enum Type {
-    NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING
-  };
+  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING };
 
   Type type;
 
@@ -74,6 +72,9 @@ struct Value {
   Value(const Value& value) {
     type = value.type;
     switch (type) {
+      case INT:
+        i = value.i;
+        break;
       case NUMBER:
         n = value.n;
         break;
@@ -149,9 +150,7 @@ class FuncState {
   inline std::vector<std::unique_ptr<FuncState>>& children() {
     return children_;
   }
-  inline FuncState* GetChild(size_t pos) {
-    return children_[pos].get();
-  }
+  inline FuncState* GetChild(size_t pos) { return children_[pos].get(); }
 
  private:
   std::vector<Instruction> instructions_;
@@ -187,7 +186,8 @@ class ExecState {
   virtual ~ExecState();
   void Compile(const std::string& source);
   void Execute();
-  const Value& Call(const std::string& func_name, const std::vector<Value>& params);
+  const Value& Call(const std::string& func_name,
+                    const std::vector<Value>& params);
 
   size_t GetArgumentCount();
   Value* GetArgument(int index);
@@ -202,7 +202,9 @@ class ExecState {
   inline void page_id(const std::string& page_id) { page_id_ = page_id; }
   inline const std::string& page_id() const { return page_id_; }
   inline VNode* root() const { return root_.get(); }
-  inline void insert_node(VNode* node) { node_map_.insert({node->ref(), node}); }
+  inline void insert_node(VNode* node) {
+    node_map_.insert({node->ref(), node});
+  }
   inline json11::Json& raw_json() { return raw_json_; }
 
  private:
@@ -218,7 +220,7 @@ class ExecState {
   std::unique_ptr<Global> global_;
   std::unique_ptr<StringTable> string_table_;
 
-  //node context
+  // node context
   std::string page_id_;
   std::unique_ptr<VNode> root_;
   std::map<std::string, VNode*> node_map_;

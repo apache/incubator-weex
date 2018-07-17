@@ -302,7 +302,26 @@ void CodeGenerator::Visit(Identifier *node, void *data) {
   }
 }
 
-void CodeGenerator::Visit(PrefixExpression *node, void *data) {}
+void CodeGenerator::Visit(PrefixExpression *node, void *data) {
+  RegisterScope scope(cur_block_.get());
+
+  long ret = data == nullptr ? cur_block_->NextRegisterId()
+                             : *static_cast<long *>(data);
+
+  Handle<Identifier> iden = node->expr();
+  long reg = cur_block_->FindRegisterId(iden->GetName());
+
+  PrefixOperation operation = node->op();
+  // ++i
+  if (operation == PrefixOperation::kIncrement) {
+    cur_func_->func_state()->AddInstruction(
+        CREATE_ABC(OP_PRE_INCR, reg, ret, 0));
+    // --i
+  } else if (operation == PrefixOperation::kDecrement) {
+    cur_func_->func_state()->AddInstruction(
+        CREATE_ABC(OP_PRE_DECR, reg, ret, 0));
+  }
+}
 
 void CodeGenerator::Visit(ReturnStatement *node, void *data) {}
 

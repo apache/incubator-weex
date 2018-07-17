@@ -67,7 +67,7 @@ ExecState::~ExecState() {}
 void ExecState::Compile(const std::string& source) {
   CodeGenerator generator(this);
   std::string err;
-  raw_json_ = Json::parse(source,err);
+  raw_json_ = Json::parse(source, err);
   const ParseResult& result = Parser::parse(source, err);
   generator.Visit(result.expr().get(), nullptr);
 }
@@ -80,7 +80,8 @@ void ExecState::Execute() {
   CallFunction(stack_->base(), 0, nullptr);
 }
 
-const Value& ExecState::Call(const std::string& func_name, const std::vector<Value>& params) {
+const Value& ExecState::Call(const std::string& func_name,
+                             const std::vector<Value>& params) {
   Value ret;
   auto it = global_variables_.find(func_name);
   if (it != global_variables_.end()) {
@@ -125,9 +126,7 @@ size_t ExecState::GetArgumentCount() {
 Value* ExecState::GetArgument(int index) {
   return frames_.back().reg + index + 1;
 }
-void ExecState::setVNodeRoot(VNode* v_node) {
-  root_.reset(v_node);
-}
+void ExecState::setVNodeRoot(VNode* v_node) { root_.reset(v_node); }
 VNode* ExecState::find_node(const std::string& ref) {
   auto it = node_map_.find(ref);
   if (it == node_map_.end()) {
