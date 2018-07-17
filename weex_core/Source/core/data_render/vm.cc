@@ -34,9 +34,9 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-inline bool IsInt(const Value &o) { return Value::Type::INT == o.type; }
+inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
 
-inline int IntMod(int a, int b) {
+inline int IntMod(const int &a, const int &b) {
     if (CAST_S2U(b) + 1u <= 1u) {
         if (b == 0) {
             LOGE("Error ValueMod Values[%d, %d]", a, b);
@@ -51,17 +51,17 @@ inline int IntMod(int a, int b) {
     }
 }
 
-inline bool IsNumber(const Value &o) { return Value::Type::NUMBER == o.type; }
+inline bool IsNumber(const Value *o) { return Value::Type::NUMBER == o->type; }
 
-inline bool IsBool(const Value &o) { return Value::Type::BOOL == o.type;}
+inline bool IsBool(const Value *o) { return Value::Type::BOOL == o->type;}
 
-inline int64_t IntValue(const Value &o) { return o.i; }
+inline int64_t IntValue(const Value *o) { return o->i; }
 
-inline double NumValue(const Value &o) { return o.n; }
+inline double NumValue(const Value *o) { return o->n; }
 
-inline bool BoolValue(const Value &o) { return (Value::Type::BOOL == o.type) ? o.b : false;}
+inline bool BoolValue(const Value *o) { return (Value::Type::BOOL == o->type) ? o->b : false;}
 
-inline int ToNumber_(const Value &value, double &ret) {
+inline int ToNumber_(const Value *value, double &ret) {
     if (IsInt(value)) {
         ret = IntValue(value);
         return 1;
@@ -73,17 +73,17 @@ inline int ToNumber_(const Value &value, double &ret) {
     }
 }
 
-inline int ToNum(const Value &o, double &n) {
+inline int ToNum(const Value *o, double &n) {
     return IsNumber(o) ? (n = NumValue(o), 1) : ToNumber_(o, n);
 }
 
-int ToBool(const Value &o, bool &b) {
+int ToBool(const Value *o, bool &b) {
     double d1;
-    if (Value::Type::BOOL == o.type) {
+    if (Value::Type::BOOL == o->type) {
         b = BoolValue(o);
-    } else if (Value::Type::INT == o.type) {
+    } else if (Value::Type::INT == o->type) {
         b = IntValue(o);
-    } else if (Value::Type::NUMBER == o.type) {
+    } else if (Value::Type::NUMBER == o->type) {
         b = NumValue(o);
     } else if (ToNum(o, d1)) {
         b = d1;
@@ -109,29 +109,29 @@ inline void SetBValue(Value *o, bool b) {
     o->b = b;
 }
 
-inline double NumPow(double d1, double d2) {
+inline double NumPow(const double &d1, const double &d2) {
     return MATH_OP(pow)(d1, d2);
 }
 
-inline double NumIDiv(double d1, double d2) {
+inline double NumIDiv(const double &d1, const double &d2) {
     return MATH_OP(floor)(NUM_OP(/, d1, d2));
 }
 
-inline double NumMod(double d1, double d2) {
+inline double NumMod(const double &d1, const double &d2) {
     double ret = MATH_OP(fmod)(d1, d2);
     if (ret * d2 < 0) ret += d2;
     return ret;
 }
 
-inline bool NumEq(double d1, double d2) {
+inline bool NumEq(const double &d1, const double &d2) {
     return d1 == d2;
 }
 
-inline bool NumLT(double d1, double d2) {
+inline bool NumLT(const double &d1, const double &d2) {
     return d1 < d2;
 }
 
-inline int Number2Int(double n, int64_t &p) {
+inline int Number2Int(const double &n, int64_t &p) {
     if (n >= MININTEGER && n < -MININTEGER) {
         p = n;
         return 1;
@@ -145,7 +145,7 @@ inline int Number2Int(double n, int64_t &p) {
 ** mode == 1: takes the floor of the number
 ** mode == 2: takes the ceil of the number
 */
-int ToInteger(const Value *o, int mode, int64_t &v) {
+int ToInteger(const Value *o, const int &mode, int64_t &v) {
 
     Value tmp;
     double d;
@@ -173,8 +173,8 @@ int ToInteger(const Value *o, int mode, int64_t &v) {
     }
 }
 
-bool ValueEqulas(const Value &a, const Value &b) {
-    if (a.type != b.type) {
+bool ValueEqulas(const Value *a, const Value *b) {
+    if (a->type != b->type) {
         return false;
     }
     double d1, d2;
@@ -192,8 +192,8 @@ bool ValueEqulas(const Value &a, const Value &b) {
     }
 }
 
-bool ValueLE(const Value &a, const Value &b) {
-    if (a.type != b.type) {
+bool ValueLE(const Value *a, const Value *b) {
+    if (a->type != b->type) {
         return false;
     }
     double d1, d2;
@@ -211,8 +211,8 @@ bool ValueLE(const Value &a, const Value &b) {
     }
 }
 
-bool ValueLT(const Value &a, const Value &b) {
-    if (a.type != b.type) {
+bool ValueLT(const Value *a, const Value *b) {
+    if (a->type != b->type) {
         return false;
     }
     double d1, d2;
@@ -227,11 +227,11 @@ bool ValueLT(const Value &a, const Value &b) {
     }
 }
 
-inline double NumUnm(double d) {
+inline double NumUnm(const double &d) {
     return -d;
 }
 
-inline int64_t ShiftLeft(int64_t a, int64_t b) {
+inline int64_t ShiftLeft(const int64_t &a, const int64_t &b) {
     if (b < 0) {
         if (b <= -NUM_BITS) {
             return 0;
@@ -520,10 +520,17 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
 
             case OP_PRE_INCR: {
                 a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
                 if (IsInt(a)) {
                     SetIValue(a, IntValue(a) + 1);
+                    if (NULL != b) {
+                        SetIValue(b, IntValue(a));
+                    }
                 } else if (IsNumber(a)) {
                     SetDValue(a, NumValue(a) + 1);
+                    if (NULL != b) {
+                        SetDValue(b, NumValue(a));
+                    }
                 } else {
                     LOGE("Unspport Type[%s] with OP_CODE[OP_PRE_INCR]", a->type);
                 }
@@ -532,10 +539,17 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
 
             case OP_PRE_DECR: {
                 a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
                 if (IsInt(a)) {
                     SetIValue(a, IntValue(a) - 1);
+                    if (NULL != b) {
+                        SetIValue(b, IntValue(a));
+                    }
                 } else if (IsNumber(a)) {
                     SetDValue(a, NumValue(a) - 1);
+                    if (NULL != b) {
+                        SetDValue(b, NumValue(a));
+                    }
                 } else {
                     LOGE("Unspport Type[%s] with OP_CODE[OP_PRE_DECR]", a->type);
                 }

@@ -59,8 +59,8 @@ enum OpCode {
 
   OP_INVALID,
 
-  OP_PRE_INCR, //A      R(A) = R(A) + 1
-  OP_PRE_DECR, //A      R(A) = R(A) - 1
+  OP_PRE_INCR, //A      if (B >= 0) R(B) = ++R(A) else ++R(A)
+  OP_PRE_DECR, //A      if (B >= 0) R(B) = --R(A) else --R(A)
 
 };
 
