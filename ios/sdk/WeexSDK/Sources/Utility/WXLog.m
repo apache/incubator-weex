@@ -54,6 +54,13 @@ static const WXLogLevel defaultLogLevel = WXLogLevelWarning;
 
 static id<WXLogProtocol> _externalLog;
 
+@interface WXSafeLog : NSObject
+/**
+ * @abstract This is a safer but slower log to resolve DEBUG log crash when there is a retain cycle in the object
+ */
++ (NSString *)getLogMessage:(NSString *)format arguments:(va_list)args;
+@end
+
 @implementation WXLog
 {
     WXLogLevel _logLevel;
@@ -185,7 +192,12 @@ static id<WXLogProtocol> _externalLog;
         
         va_list args;
         va_start(args, format);
-        NSString *message = [[NSString alloc] initWithFormat:format arguments:args];
+		NSString *message = @"";
+		if (flag == WXLogFlagDebug) {
+			message = [WXSafeLog getLogMessage:format arguments:args];
+		} else {
+			message = [[NSString alloc] initWithFormat:format arguments:args];
+		}
         va_end(args);
         
         NSArray *messageAry = [NSArray arrayWithObjects:message, nil];
@@ -216,4 +228,148 @@ static id<WXLogProtocol> _externalLog;
     _externalLog = externalLog;
 }
 
+@end
+
+#pragma mark - WXSafeLog
+static NSString *dealWithArray(NSArray *array, NSMutableSet *outSet);
+
+static NSUInteger getParamCount(NSString *format, NSMutableDictionary *outDict)
+{
+	NSUInteger paramCount = 0;
+	NSUInteger formatLength = [format length];
+
+	NSRange searchRange = NSMakeRange(0, formatLength);
+	NSRange paramRange = [format rangeOfString:@"%" options:0 range:searchRange];
+
+	NSMutableArray *paramLocations = [NSMutableArray array];
+	NSArray *possibleTwo = @[@"l", @"h", @"z"];
+	NSArray *two = @[@"hh", @"ld", @"lu", @"lx", @"zx"];
+	while (paramRange.location != NSNotFound)
+	{
+		NSString *subString = [format substringWithRange:NSMakeRange(paramRange.location+1, 1)];
+		if ([possibleTwo containsObject:subString]) {
+			NSString *subString2 = [format substringWithRange:NSMakeRange(paramRange.location+1, 2)];
+			if ([two containsObject:subString2]) {
+				subString = subString2;
+			}
+		}
+		[outDict setObject:subString forKey:@(paramCount)];
+		paramCount++;
+
+		[paramLocations addObject:@(paramRange.location)];
+
+		searchRange.location = paramRange.location + 1;
+		searchRange.length = formatLength - searchRange.location;
+
+		paramRange = [format rangeOfString:@"%" options:0 range:searchRange];
+	}
+	return paramCount;
+}
+
+static NSString *dealWithDictionary(NSDictionary *dict, NSMutableSet *outSet)
+{
+	NSMutableString *result = [NSMutableString new];
+	[result appendString:@" { "];
+	int i = 0;
+	for (id key in dict.allKeys) {
+		if ([key isKindOfClass:[NSDictionary class]] || [key isKindOfClass:[NSArray class]]) {
+			[result appendString:@"(invalid Dictionary key) : ( )"];
+		} else {
+			[result appendString:[NSString stringWithFormat:@"%@ : ", key]];
+			id value = [dict objectForKey:key];
+			if ([outSet containsObject:value]) {
+				[result appendString:@"(found Retain Recycle!!!)"];
+			} else {
+				[outSet addObject:value];
+				if ([value isKindOfClass:[NSArray class]]) {
+					NSString *tempString = dealWithArray((NSArray *)value, outSet);
+					[result appendString:tempString];
+				} else if ([value isKindOfClass:[NSDictionary class]]) {
+					[result appendString:dealWithDictionary((NSDictionary *)value, outSet)];
+				} else {
+					[result appendString:[NSString stringWithFormat:@"%@", value]];
+				}
+			}
+		}
+		i++;
+		if (i < dict.allKeys.count) {
+			[result appendString:@" , "];
+		}
+	}
+	[result appendString:@" } "];
+	return result;
+}
+
+static NSString *dealWithArray(NSArray *array, NSMutableSet *outSet)
+{
+	NSMutableString *result = [NSMutableString new];
+	[result appendString:@" [ "];
+	int i = 0;
+	for (id value in array) {
+		if ([outSet containsObject:value]) {
+			[result appendString:@"(found Retain Recycle!!!)"];
+		} else {
+			[outSet addObject:value];
+			if ([value isKindOfClass:[NSArray class]]) {
+				NSString *tempString = dealWithArray((NSArray *)value, outSet);
+				[result appendString:tempString];
+			} else if ([value isKindOfClass:[NSDictionary class]]) {
+				[result appendString:dealWithDictionary((NSDictionary *)value, outSet)];
+			} else {
+				[result appendString:[NSString stringWithFormat:@"%@", value]];
+			}
+		}
+		i++;
+		if (i < array.count) {
+			[result appendString:@" , "];
+		}
+	}
+	[result appendString:@" ] "];
+	return result;
+}
+
+@implementation WXSafeLog
++ (NSString *)getLogMessage:(NSString *)format arguments:(va_list)args
+{
+	NSMutableString *mutableFormat = [NSMutableString stringWithString:format];
+	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+	NSUInteger count = getParamCount(format, dict);
+	NSMutableArray<NSString *> *replacedDict = [NSMutableArray array];
+	for (NSUInteger i = 0; i < count; i++) {
+		if ([dict[@(i)] isEqualToString:@"@"]) {
+			NSMutableSet *outSet = [NSMutableSet set];
+			id obj = va_arg(args, id);
+			NSString *output = @"";
+			if (obj) {
+				if ([obj isKindOfClass:[NSDictionary class]]) {
+					output = dealWithDictionary((NSDictionary *)obj, outSet);
+				} else if ([obj isKindOfClass:[NSArray class]]) {
+					output = dealWithArray((NSArray *)obj, outSet);
+				} else {
+					output = [NSString stringWithFormat:@"%@", obj];
+				}
+			}
+			[replacedDict addObject:output];
+		} else {
+			va_arg(args, void *);
+		}
+	}
+	NSString *prefix = @"#$~";
+	NSString *suffix = @"~$#";
+	NSString *replace = [NSString stringWithFormat:@"%@%%p%@", prefix, suffix];
+	[mutableFormat replaceOccurrencesOfString:@"%@" withString:replace options:NSLiteralSearch range:NSMakeRange(0, mutableFormat.length)];
+	NSMutableString *result = [[NSMutableString alloc] initWithFormat:mutableFormat arguments:args];
+	int j = 0;
+	NSRange range, range1, range2;
+	range1 = [result rangeOfString:prefix options:NSLiteralSearch];
+	range2 = [result rangeOfString:suffix options:NSLiteralSearch];
+	range = NSMakeRange(range1.location, range2.location+range2.length - range1.location);
+	while(range1.length>0 && range2.length>0) {
+		[result replaceCharactersInRange:range withString:replacedDict[j++]];
+		range1 = [result rangeOfString:prefix options:NSLiteralSearch];
+		range2 = [result rangeOfString:suffix options:NSLiteralSearch];
+		range = NSMakeRange(range1.location, range2.location+range2.length - range1.location);
+	}
+	return result;
+}
 @end
