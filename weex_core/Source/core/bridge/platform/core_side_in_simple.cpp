@@ -16,11 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by yxp on 2018/6/20.
-//
 
 #include "core_side_in_simple.h"
+#include "core/bridge/script_bridge_in_multi_process.h"
+#include "core/bridge/script_bridge_in_multi_so.h"
 #include "android/base/log_utils.h"
 #include "core/config/core_environment.h"
 #include "core/manager/weex_core_manager.h"
@@ -104,6 +103,7 @@ void CoreSideInSimple::SetMargin(const std::string &instance_id,
   }
   page->set_is_dirty(true);
 }
+
 void CoreSideInSimple::SetPadding(const std::string &instance_id,
                                   const std::string &render_ref, int edge,
                                   float value) {
@@ -195,6 +195,7 @@ bool CoreSideInSimple::NotifyLayout(const std::string &instance_id) {
   }
   return false;
 }
+
 std::vector<int64_t> CoreSideInSimple::GetFirstScreenRenderTime(
     const std::string &instance_id) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instance_id);
@@ -204,6 +205,7 @@ std::vector<int64_t> CoreSideInSimple::GetFirstScreenRenderTime(
     return page->PrintFirstScreenLog();
   }
 }
+
 std::vector<int64_t> CoreSideInSimple::GetRenderFinishTime(
     const std::string &instance_id) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instance_id);
@@ -213,6 +215,7 @@ std::vector<int64_t> CoreSideInSimple::GetRenderFinishTime(
     return page->PrintRenderSuccessLog();
   }
 }
+
 void CoreSideInSimple::SetRenderContainerWrapContent(
     const std::string &instance_id, bool wrap) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instance_id);
@@ -297,87 +300,122 @@ void CoreSideInSimple::AddOption(const std::string &key,
   WXCoreEnvironment::getInstance()->AddOption(key, value);
 }
 
-    ////
-    int CoreSideInSimple::InitFramework(const char *script,
-                                         std::vector<INIT_FRAMEWORK_PARAMS *> params) {
-//      return WeexCoreManager::getJSBridge()->InitFrameWork(script, params);
-      return 0;
-    }
+int CoreSideInSimple::InitFramework(
+    const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> params) {
+  if (WeexCoreManager::getInstance()->project_mode() ==
+      WeexCoreManager::ProjectMode::MULTI_PROCESS) {
+    WeexCoreManager::getInstance()->set_script_bridge(
+        new ScriptBridgeInMultiProcess);
+  } else {
+    WeexCoreManager::getInstance()->set_script_bridge(
+        new ScriptBridgeInMultiSo);
+  }
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->InitFramework(script, params);
+}
 
-    int CoreSideInSimple::InitAppFramework(
-            const char *instanceId, const char *appFramework,
-            std::vector<INIT_FRAMEWORK_PARAMS *> params) {
-//      return core_side_functions_->init_app_framework(instanceId, appFramework, params);
-      return 0;
-    }
+int CoreSideInSimple::InitAppFramework(
+    const char *instanceId, const char *appFramework,
+    std::vector<INIT_FRAMEWORK_PARAMS *> params) {
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->InitAppFramework(instanceId, appFramework, params);
+}
 
-    int CoreSideInSimple::CreateAppContext(const char *instanceId,
-                                            const char *jsBundle) {
-//      return core_side_functions_->create_app_context(instanceId, jsBundle);
-      return 0;
-    }
+int CoreSideInSimple::CreateAppContext(const char *instanceId,
+                                       const char *jsBundle) {
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->CreateAppContext(instanceId, jsBundle);
+}
 
-    const char *CoreSideInSimple::ExecJSOnAppWithResult(const char *instanceId,
-                                                         const char *jsBundle) {
-//      return core_side_functions_->exec_js__on_app_with_result(instanceId, jsBundle);
-      return 0;
-    }
+const char *CoreSideInSimple::ExecJSOnAppWithResult(const char *instanceId,
+                                                    const char *jsBundle) {
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->ExecJSOnAppWithResult(instanceId, jsBundle);
+}
 
-    int CoreSideInSimple::CallJSOnAppContext(const char *instanceId, const char *func,
-                                              std::vector<VALUE_WITH_TYPE *> params) {
-//      return core_side_functions_->call_js_on_app_context(instanceId, func, params);
-      return 0;
-    }
+int CoreSideInSimple::CallJSOnAppContext(
+    const char *instanceId, const char *func,
+    std::vector<VALUE_WITH_TYPE *> params) {
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->CallJSOnAppContext(instanceId, func, params);
+}
 
-    int CoreSideInSimple::DestroyAppContext(const char *instanceId) {
-//      return core_side_functions_->destroy_app_context(instanceId);
-      return 0;
-    }
+int CoreSideInSimple::DestroyAppContext(const char *instanceId) {
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->DestroyAppContext(instanceId);
+}
 
-    int CoreSideInSimple::ExecJsService(const char *source) {
-//      return core_side_functions_->exec_js_service(source);
-      return 0;
-    }
+int CoreSideInSimple::ExecJsService(const char *source) {
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->ExecJsService(source);
+}
 
-    int CoreSideInSimple::ExecTimeCallback(const char *source) {
-      return 0;
-    }
+int CoreSideInSimple::ExecTimeCallback(const char *source) {
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->ExecTimeCallback(source);
+}
 
-    int CoreSideInSimple::ExecJS(const char *instanceId, const char *nameSpace,
-                                  const char *func,
-                                  std::vector<VALUE_WITH_TYPE *> params) {
-//      return core_side_functions_->exec_js(instanceId, nameSpace, func, params);
-      return 0;
-    }
+int CoreSideInSimple::ExecJS(const char *instanceId, const char *nameSpace,
+                             const char *func,
+                             std::vector<VALUE_WITH_TYPE *> params) {
+  return WeexCoreManager::getInstance()->script_bridge()->script_side()->ExecJS(
+      instanceId, nameSpace, func, params);
+}
 
-    WeexJSResult CoreSideInSimple::ExecJSWithResult(
-            const char *instanceId, const char *nameSpace, const char *func,
-            std::vector<VALUE_WITH_TYPE *> params) {
-//      return core_side_functions_->exec_js_with_result(instanceId, nameSpace, func, params);
-      return WeexJSResult();
-    }
+WeexJSResult CoreSideInSimple::ExecJSWithResult(
+    const char *instanceId, const char *nameSpace, const char *func,
+    std::vector<VALUE_WITH_TYPE *> params) {
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->ExecJSWithResult(instanceId, nameSpace, func, params);
+}
 
-    int CoreSideInSimple::CreateInstance(const char *instanceId, const char *func,
-                                          const char *script, const char *opts,
-                                          const char *initData, const char *extendsApi) {
-//      return core_side_functions_->create_instance(instanceId, func, script, opts, initData,
-//                                                   extendsApi);
-      return 0;
-    }
+int CoreSideInSimple::CreateInstance(const char *instanceId, const char *func,
+                                     const char *script, const char *opts,
+                                     const char *initData,
+                                     const char *extendsApi) {
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->CreateInstance(instanceId, func, script, opts, initData, extendsApi);
+}
 
-    const char *CoreSideInSimple::ExecJSOnInstance(const char *instanceId,
-                                                    const char *script) {
-//      return core_side_functions_->exec_js_on_instance(instanceId, script);
-      return nullptr;
-    }
+const char *CoreSideInSimple::ExecJSOnInstance(const char *instanceId,
+                                               const char *script) {
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->ExecJSOnInstance(instanceId, script);
+}
 
-    int CoreSideInSimple::DestroyInstance(const char *instanceId) {
-//      return core_side_functions_->destroy_instance(instanceId);
-      return 0;
-    }
+int CoreSideInSimple::DestroyInstance(const char *instanceId) {
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->DestroyInstance(instanceId);
+}
 
-    int CoreSideInSimple::UpdateGlobalConfig(const char *config) {
-//      return core_side_functions_->update_global_config(config);
-      return 0;
-    }
+int CoreSideInSimple::UpdateGlobalConfig(const char *config) {
+  return WeexCoreManager::getInstance()
+      ->script_bridge()
+      ->script_side()
+      ->UpdateGlobalConfig(config);
+}
 }  // namespace WeexCore

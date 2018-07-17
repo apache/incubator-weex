@@ -157,12 +157,18 @@ class ScriptBridge {
     script_side_->set_bridge(this);
   }
 
-  ScriptBridge() {}
-  ~ScriptBridge() {}
+  ScriptBridge() : is_passable_(true) {}
+  virtual ~ScriptBridge() {}
+
+  inline bool is_passable() { return is_passable_; }
+
+ protected:
+  inline void set_is_passable(bool passable) { is_passable_ = passable; }
 
  private:
   std::unique_ptr<CoreSide> core_side_;
   std::unique_ptr<ScriptSide> script_side_;
+  bool is_passable_;
   DISALLOW_COPY_AND_ASSIGN(ScriptBridge);
 };
 }  // namespace WeexCore

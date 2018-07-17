@@ -28,7 +28,6 @@ namespace WeexCore {
     }
 
     AndroidBridgeInSimple::~AndroidBridgeInSimple() {
-
     }
 
 }

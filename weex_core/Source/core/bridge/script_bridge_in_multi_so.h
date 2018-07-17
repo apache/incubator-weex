@@ -17,19 +17,22 @@
  * under the License.
  */
 
-#ifndef WEEX_PROJECT_PLATFORM_BRIDGE_IN_SIMPLE_H
-#define WEEX_PROJECT_PLATFORM_BRIDGE_IN_SIMPLE_H
+#ifndef WEEX_PROJECT_SCRIPT_BRIDGE_IN_MULTI_SO_H
+#define WEEX_PROJECT_SCRIPT_BRIDGE_IN_MULTI_SO_H
 
-#include <jni.h>
-#include "core/bridge/platform_bridge.h"
-#include "android/bridge/impl/bridge_impl_android.h"
+#include "core/bridge/script_bridge.h"
 
 namespace WeexCore {
-    class AndroidBridgeInSimple : public Bridge_Impl_Android {
-    public:
-        AndroidBridgeInSimple();
-        ~AndroidBridgeInSimple();
-    };
-}
+class ScriptBridgeInMultiSo : public ScriptBridge {
+ public:
+  ScriptBridgeInMultiSo();
+  ~ScriptBridgeInMultiSo();
 
-#endif //WEEX_PROJECT_PLATFORM_BRIDGE_IN_SIMPLE_H
+  FunctionsExposedByCore* GetExposedFunctions();
+
+ private:
+  DISALLOW_COPY_AND_ASSIGN(ScriptBridgeInMultiSo);
+};
+}  // namespace WeexCore
+
+#endif  // WEEX_PROJECT_SCRIPT_BRIDGE_IN_MULTI_SO_H

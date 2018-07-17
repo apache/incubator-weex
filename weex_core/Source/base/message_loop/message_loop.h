@@ -71,8 +71,7 @@ class MessageLoop : public MessagePump::Delegate {
   };
   struct DelayedTaskCompare {
     bool operator()(const DelayedTask& a, const DelayedTask& b) {
-      return a.time_point.ToTimeUnit().ToMilliseconds() ==
-                     b.time_point.ToTimeUnit().ToMilliseconds()
+      return a.time_point == b.time_point
                  ? a.priority < b.priority
                  : a.time_point > b.time_point;
     };

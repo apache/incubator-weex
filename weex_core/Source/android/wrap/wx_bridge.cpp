@@ -19,6 +19,7 @@
 
 #include "android/wrap/wx_bridge.h"
 #include <fstream>
+#include <android/bridge/impl/android_bridge.h>
 #include "android/base/jni_type.h"
 #include "android/base/string/string_utils.h"
 #include "android/bridge/impl/android_bridge_in_multi_process.h"
@@ -233,11 +234,11 @@ static void SetViewPortWidth(JNIEnv* env, jobject jcaller, jstring instanceId,
       ->SetViewPortWidth(jString2StrFast(env, instanceId), value);
 }
 
-/////
-
 static jint InitFramework(JNIEnv* env, jobject object, jstring script,
                           jobject params) {
   WXBridge::Instance()->Reset(env, object);
+  // Init platform thread --- ScriptThread
+  WeexCoreManager::getInstance()->InitScriptThread();
   // Exception handler for so
   SoUtils::RegisterExceptionHanler(
       [](const char* status_code, const char* error_msg) {
@@ -249,20 +250,15 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   std::vector<INIT_FRAMEWORK_PARAMS*> params_vector =
       initFromParam(env, params);
   // Init platform bridge
-  Bridge_Impl_Android* bridge = nullptr;
-  if (isSingleProcess()) {
-    bridge = new AndroidBridgeInMultiSo;
-    if (!bridge->is_passable()) {
-      bridge = new AndroidBridgeInMultiProcess;
-    }
-  } else {
-    bridge = new AndroidBridgeInMultiProcess;
-    if (!bridge->is_passable()) {
-      bridge = new AndroidBridgeInMultiSo;
-    }
-  }
+  Bridge_Impl_Android* bridge = new AndroidBridgeInSimple;
   Bridge_Impl_Android::InitInstance(bridge);
   WeexCoreManager::getInstance()->setPlatformBridge(bridge);
+  // Set project mode
+  if (isSingleProcess()) {
+    WeexCoreManager::getInstance()->set_project_mode(WeexCoreManager::ProjectMode::MULTI_SO);
+  } else {
+    WeexCoreManager::getInstance()->set_project_mode(WeexCoreManager::ProjectMode::MULTI_PROCESS);
+  }
   // for environment
   bridge->core_side()->SetPlatform(
       WXCoreEnvironment::getInstance()->platform());

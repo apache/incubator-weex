@@ -17,19 +17,28 @@
  * under the License.
  */
 
-#ifndef WEEX_PROJECT_PLATFORM_BRIDGE_IN_SIMPLE_H
-#define WEEX_PROJECT_PLATFORM_BRIDGE_IN_SIMPLE_H
+#ifndef WEEX_PROJECT_SCRIPT_BRIDGE_IN_MULTI_PROCESS_H
+#define WEEX_PROJECT_SCRIPT_BRIDGE_IN_MULTI_PROCESS_H
 
-#include <jni.h>
-#include "core/bridge/platform_bridge.h"
-#include "android/bridge/impl/bridge_impl_android.h"
+#include "core/bridge/script_bridge.h"
 
+class IPCHandler;
+class WeexJSConnection;
+class IPCHandler;
 namespace WeexCore {
-    class AndroidBridgeInSimple : public Bridge_Impl_Android {
-    public:
-        AndroidBridgeInSimple();
-        ~AndroidBridgeInSimple();
-    };
-}
 
-#endif //WEEX_PROJECT_PLATFORM_BRIDGE_IN_SIMPLE_H
+class ScriptBridgeInMultiProcess : public ScriptBridge {
+ public:
+  ScriptBridgeInMultiProcess();
+  ~ScriptBridgeInMultiProcess();
+
+  void RegisterIPCCallback(IPCHandler *handler);
+
+ private:
+  std::unique_ptr<WeexJSConnection> connection_;
+  std::unique_ptr<IPCHandler> handler_;
+  DISALLOW_COPY_AND_ASSIGN(ScriptBridgeInMultiProcess);
+};
+}  // namespace WeexCore
+
+#endif  // WEEX_PROJECT_SCRIPT_BRIDGE_IN_MULTI_PROCESS_H

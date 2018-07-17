@@ -57,7 +57,11 @@ set(COMMON_SRCS
   ./core/manager/weex_core_manager.cpp
   ./android/bridge/impl/android_side.cpp
   ./core/bridge/platform/core_side_in_simple.cpp
+  ./core/bridge/script_bridge_in_multi_so.cpp
+  ./core/bridge/script_bridge_in_multi_process.cpp
   ./core/bridge/script/core_side_in_simple.cpp
+  ./core/bridge/script/script_side_in_multi_so.cpp
+  ./core/bridge/script/script_side_in_multi_process.cpp
   ./android/bridge/impl/android_bridge.cpp
   ./android/bridge/impl/core_side_in_multi_process.cpp
   ./android/bridge/impl/core_side_in_multi_so.cpp
