@@ -26,17 +26,20 @@
 #define MATH_OP(op) op
 #define CAST_S2U(o) ((unsigned)(o))
 #define CAST_U2S(o) ((signed)(o))
+#define CAST(t, exp) ((t)(exp))
+#define CAST_INT(i) CAST(int64_t, (i))
+#define NUM_BITS CAST_INT(sizeof(int64_t) * CHAR_BIT)
 
 namespace weex {
 namespace core {
 namespace data_render {
 
-inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
+inline bool IsInt(const Value &o) { return Value::Type::INT == o.type; }
 
 inline int IntMod(int a, int b) {
     if (CAST_S2U(b) + 1u <= 1u) {
         if (b == 0) {
-            LOGE("Error ValueMod Values[", a, b);
+            LOGE("Error ValueMod Values[%d, %d]", a, b);
         }
         return 0;
     } else {
@@ -48,46 +51,47 @@ inline int IntMod(int a, int b) {
     }
 }
 
-inline bool IsNumber(const Value *o) { return Value::Type::NUMBER == o->type; }
+inline bool IsNumber(const Value &o) { return Value::Type::NUMBER == o.type; }
 
-inline bool IsBool(const Value *o) { return Value::Type ::BOOL == o->b;}
+inline bool IsBool(const Value &o) { return Value::Type::BOOL == o.type;}
 
-inline int64_t IntValue(const Value *o) { return o->i; }
+inline int64_t IntValue(const Value &o) { return o.i; }
 
-inline double NumValue(const Value *o) { return o->n; }
+inline double NumValue(const Value &o) { return o.n; }
 
-inline bool BoolValue(const Value *o) { return (Value::Type::BOOL == o->type) ? o->b : false;}
+inline bool BoolValue(const Value &o) { return (Value::Type::BOOL == o.type) ? o.b : false;}
 
-inline int ToNumber_(const Value *value, double *ret) {
+inline int ToNumber_(const Value &value, double &ret) {
     if (IsInt(value)) {
-        *ret = IntValue(value);
+        ret = IntValue(value);
         return 1;
     } else if (IsNumber(value)) {
-        *ret = NumValue(value);
+        ret = NumValue(value);
         return 1;
     } else {
         return 0;
     }
 }
 
-inline int ToNum(const Value *o, double *n) {
-    return IsNumber(o) ? (*n = NumValue(o), 1) : ToNumber_(o, n);
+inline int ToNum(const Value &o, double &n) {
+    return IsNumber(o) ? (n = NumValue(o), 1) : ToNumber_(o, n);
 }
 
-int ToBool(const Value *o, bool *b) {
+int ToBool(const Value &o, bool &b) {
     double d1;
-    if (Value::Type::BOOL == o->type) {
-        *b = BoolValue(o);
-    } else if (Value::Type::INT == o->type) {
-        *b = IntValue(o);
-    } else if (Value::Type::NUMBER == o->type) {
-        *b = NumValue(o);
-    } else if (ToNum(o, &d1)) {
-        *b = d1;
+    if (Value::Type::BOOL == o.type) {
+        b = BoolValue(o);
+    } else if (Value::Type::INT == o.type) {
+        b = IntValue(o);
+    } else if (Value::Type::NUMBER == o.type) {
+        b = NumValue(o);
+    } else if (ToNum(o, d1)) {
+        b = d1;
     } else {
-        *b = false;
+        b = false;
+        return 0;
     }
-
+    return 1;
 }
 
 inline void SetIValue(Value *o, int iv) {
@@ -127,9 +131,9 @@ inline bool NumLT(double d1, double d2) {
     return d1 < d2;
 }
 
-inline int Number2Int(double n, int64_t *p) {
+inline int Number2Int(double n, int64_t &p) {
     if (n >= MININTEGER && n < -MININTEGER) {
-        *p = n;
+        p = n;
         return 1;
     }
     return 0;
@@ -141,7 +145,7 @@ inline int Number2Int(double n, int64_t *p) {
 ** mode == 1: takes the floor of the number
 ** mode == 2: takes the ceil of the number
 */
-int ToInteger(const Value *o, int mode, int64_t *v) {
+int ToInteger(const Value *o, int mode, int64_t &v) {
 
     Value tmp;
     double d;
@@ -157,19 +161,20 @@ int ToInteger(const Value *o, int mode, int64_t *v) {
             }
         }
         return Number2Int(f, v);
-    }
-    if (IsInt(o)) {
-        *v = IntValue(o);
+    } else if (IsInt(o)) {
+        v = IntValue(o);
         return 1;
-    } else if (ToNum(o, &d)) {
+    } else if (ToNum(o, d)) {
         SetDValue(&tmp, d);
         o = &tmp;
         goto label;
+    } else {
+        return 0;
     }
 }
 
-bool ValueEqulas(const Value *a, const Value *b) {
-    if (a->type != b->type) {
+bool ValueEqulas(const Value &a, const Value &b) {
+    if (a.type != b.type) {
         return false;
     }
     double d1, d2;
@@ -180,15 +185,15 @@ bool ValueEqulas(const Value *a, const Value *b) {
     } else if (IsBool(a)) {
         return BoolValue(a) == BoolValue(b);
     }
-    else if (ToNum(a, &d1) && ToNum(b, &d2)){
+    else if (ToNum(a, d1) && ToNum(b, d2)){
         return NumEq(d1, d2);
     } else {
         return false;
     }
 }
 
-bool ValueLE(const Value *a, const Value *b) {
-    if (a->type != b->type) {
+bool ValueLE(const Value &a, const Value &b) {
+    if (a.type != b.type) {
         return false;
     }
     double d1, d2;
@@ -199,15 +204,15 @@ bool ValueLE(const Value *a, const Value *b) {
         return NumLT(d1, d2) || NumEq(d1, d2);
     } else if (IsInt(a)) {
         return IntValue(a) <= IntValue(b);
-    } else if (ToNum(a, &d1) && ToNum(b, &d2)){
+    } else if (ToNum(a, d1) && ToNum(b, d2)){
         goto label;
     } else {
         return false;
     }
 }
 
-bool ValueLT(const Value *a, const Value *b) {
-    if (a->type != b->type) {
+bool ValueLT(const Value &a, const Value &b) {
+    if (a.type != b.type) {
         return false;
     }
     double d1, d2;
@@ -215,10 +220,30 @@ bool ValueLT(const Value *a, const Value *b) {
         return NumLT(NumValue(a), NumValue(b));
     } else if (IsInt(a)) {
         return IntValue(a) < IntValue(b);
-    } else if (ToNum(a, &d1) && ToNum(b, &d2)){
+    } else if (ToNum(a, d1) && ToNum(b, d2)){
         return NumLT(d1, d2);
     } else {
         return false;
+    }
+}
+
+inline double NumUnm(double d) {
+    return -d;
+}
+
+inline int64_t ShiftLeft(int64_t a, int64_t b) {
+    if (b < 0) {
+        if (b <= -NUM_BITS) {
+            return 0;
+        } else {
+            return INT_OP(>>, a, b);
+        }
+    } else {
+        if (b >= NUM_BITS) {
+            return 0;
+        } else {
+            return INT_OP(<<, a, b);
+        }
     }
 }
 
@@ -263,7 +288,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 c = frame.reg + GET_ARG_C(instruction);
                 if (IsInt(b) && IsInt(c)) {
                     SetIValue(a, INT_OP(+, IntValue(b), IntValue(c)));
-                } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                } else if (ToNum(b, d1) && ToNum(c, d2)) {
                     SetDValue(a, NUM_OP(+, d1, d2));
                 } else {
                     LOGE("Unspport Type[%s,%s] with OP_CODE[OP_ADD]", b->type, c->type);
@@ -276,7 +301,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 c = frame.reg + GET_ARG_C(instruction);
                 if (IsInt(b) && IsInt(c)) {
                     SetIValue(a, INT_OP(-, IntValue(b), IntValue(c)));
-                } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                } else if (ToNum(b, d1) && ToNum(c, d2)) {
                     SetDValue(a, NUM_OP(-, d1, d2));
                 } else {
                     LOGE("Unspport Type[%s,%s] with OP_CODE[OP_SUB]", b->type, c->type);
@@ -289,7 +314,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 c = frame.reg + GET_ARG_C(instruction);
                 if (IsInt(b) && IsInt(c)) {
                     SetIValue(a, INT_OP(*, IntValue(b), IntValue(c)));
-                } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                } else if (ToNum(b, d1) && ToNum(c, d2)) {
                     SetDValue(a, NUM_OP(*, d1, d2));
                 } else {
                     LOGE("Unspport Type[%s,%s] with OP_CODE[OP_MUL]", b->type, c->type);
@@ -302,7 +327,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 c = frame.reg + GET_ARG_C(instruction);
                 if (IsInt(b) && IsInt(c)) {
                     SetIValue(a, NUM_OP(/, IntValue(b), IntValue(c)));
-                } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                } else if (ToNum(b, d1) && ToNum(c, d2)) {
                     SetDValue(a, NUM_OP(/, IntValue(b), IntValue(c)));
                 } else {
                     LOGE("Unspport Type[%s,%s] with OP_CODE[OP_DIV]", b->type, c->type);
@@ -315,7 +340,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 c = frame.reg + GET_ARG_C(instruction);
                 if (IsInt(b) && IsInt(c)) {
                     SetIValue(a, INT_OP(/, IntValue(b), IntValue(c)));
-                } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                } else if (ToNum(b, d1) && ToNum(c, d2)) {
                     SetDValue(a, NumIDiv(d1, d2));
                 } else {
                     LOGE("Unspport Type[%s,%s] with OP_CODE[OP_IDIV]", b->type, c->type);
@@ -328,7 +353,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 c = frame.reg + GET_ARG_C(instruction);
                 if (IsInt(b) && IsInt(c)) {
                     SetIValue(a, IntMod(IntValue(b), IntValue(c)));
-                } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                } else if (ToNum(b, d1) && ToNum(c, d2)) {
                     SetDValue(a, NumMod(d1, d2));
                 } else {
                     LOGE("Unspport Type[%s,%s] with OP_CODE[OP_MOD]", b->type, c->type);
@@ -341,7 +366,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 c = frame.reg + GET_ARG_C(instruction);
                 if (IsInt(b) && IsInt(c)) {
                     SetIValue(a, NumPow(IntValue(b), IntValue(c)));
-                } else if (ToNum(b, &d1) && ToNum(c, &d2)) {
+                } else if (ToNum(b, d1) && ToNum(c, d2)) {
                     SetDValue(a, NumPow(d1, d2));
                 } else {
                     LOGE("Unspport Type[%s,%s] with OP_CODE[OP_POW]", b->type, c->type);
@@ -353,7 +378,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 b = frame.reg + GET_ARG_B(instruction);
                 c = frame.reg + GET_ARG_C(instruction);
                 int64_t i1, i2;
-                if (ToInteger(b, 0, &i1) && ToInteger(c, 0, &i2)) {
+                if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
                     SetIValue(a, INT_OP(&, i1, i2));
                 } else {
                     LOGE("Unspport Type[%s,%s] with OP_CODE[OP_BAND]", b->type, c->type);
@@ -374,7 +399,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 int true_pc_jump = GET_ARG_B(instruction);
                 int false_pc_jump = GET_ARG_C(instruction);
                 bool con = false;
-                if (!ToBool(a, &con)) {
+                if (!ToBool(a, con)) {
                     LOGE("Unspport Type[%s] with OP_CODE[OP_JMP]", a->type);
                     return;
                 }
@@ -412,6 +437,108 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
                 b = frame.reg + GET_ARG_B(instruction);
                 c = frame.reg + GET_ARG_C(instruction);
                 SetBValue(a, ValueLE(b, c));
+            }
+                break;
+
+            case OP_UNM: {
+                a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
+                if (IsInt(b)) {
+                    SetIValue(a, INT_OP(-, 0, IntValue(b)));
+                } else if (IsNumber(b)) {
+                    SetDValue(a, NUM_OP(-, 0, NumValue(b)));
+                } else {
+                    LOGE("Unspport Type[%s] with OP_CODE[OP_UNM]", b->type);
+                }
+            }
+                break;
+
+            case OP_BNOT: {
+                a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
+                int64_t i;
+                if (ToInteger(b, 0, i)) {
+                    SetIValue(a, INT_OP(^, ~CAST_S2U(0), i));
+                } else {
+                    LOGE("Unspport Type[%s] with OP_CODE[OP_BNOT]", b->type);
+                }
+            }
+                break;
+
+            case OP_BOR: {
+                a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
+                c = frame.reg + GET_ARG_C(instruction);
+                int64_t i1, i2;
+                if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
+                    SetIValue(a, INT_OP(|, i1, i2));
+                } else {
+                    LOGE("Unspport Type[%s,%s] with OP_CODE[OP_BOR]", b->type, c->type);
+                }
+            }
+                break;
+
+            case OP_BXOR: {
+                a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
+                c = frame.reg + GET_ARG_C(instruction);
+                int64_t i1, i2;
+                if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
+                    SetIValue(a, INT_OP(^, i1, i2));
+                } else {
+                    LOGE("Unspport Type[%s,%s] with OP_CODE[OP_BXOR]", b->type, c->type);
+                }
+
+            }
+                break;
+
+            case OP_SHL: {
+                a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
+                c = frame.reg + GET_ARG_C(instruction);
+                int64_t i1, i2;
+                if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
+                    SetIValue(a, ShiftLeft(i1, i2));
+                } else {
+                    LOGE("Unspport Type[%s,%s] with OP_CODE[OP_SHL]", b->type, c->type);
+                }
+            }
+                break;
+
+            case OP_SHR: {
+                a = frame.reg + GET_ARG_A(instruction);
+                b = frame.reg + GET_ARG_B(instruction);
+                c = frame.reg + GET_ARG_C(instruction);
+                int64_t i1, i2;
+                if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
+                    SetIValue(a, ShiftLeft(i1, -i2));
+                } else {
+                    LOGE("Unspport Type[%s,%s] with OP_CODE[OP_SHR]", b->type, c->type);
+                }
+            }
+                break;
+
+            case OP_PRE_INCR: {
+                a = frame.reg + GET_ARG_A(instruction);
+                if (IsInt(a)) {
+                    SetIValue(a, IntValue(a) + 1);
+                } else if (IsNumber(a)) {
+                    SetDValue(a, NumValue(a) + 1);
+                } else {
+                    LOGE("Unspport Type[%s] with OP_CODE[OP_PRE_INCR]", a->type);
+                }
+            }
+                break;
+
+            case OP_PRE_DECR: {
+                a = frame.reg + GET_ARG_A(instruction);
+                if (IsInt(a)) {
+                    SetIValue(a, IntValue(a) - 1);
+                } else if (IsNumber(a)) {
+                    SetDValue(a, NumValue(a) - 1);
+                } else {
+                    LOGE("Unspport Type[%s] with OP_CODE[OP_PRE_DECR]", a->type);
+                }
             }
                 break;
 
