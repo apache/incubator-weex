@@ -68,12 +68,15 @@ class RenderPage {
 
   void SendCreateFinishAction();
 
+  void SendRenderSuccessAction();
+
   void SendAppendTreeCreateFinish(const std::string &ref);
 
   void PostRenderAction(RenderAction *action);
 
- public:
+  void LayoutInner();
 
+ public:
   explicit RenderPage(std::string page_id);
 
   ~RenderPage();
@@ -139,8 +142,7 @@ class RenderPage {
 
   void OnRenderPageClose();
 
-public:
-
+ public:
   inline std::string page_id() { return this->page_id_; }
 
   inline bool is_dirty() { return this->is_dirty_.load(); }

@@ -2569,6 +2569,33 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
+  public int callRenderSuccess(String instanceId) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+      mLodBuilder.append("[WXBridgeManager] callRenderSuccess >>>> instanceId:").append(instanceId);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if (instance != null) {
+        GraphicActionRenderSuccess action = new GraphicActionRenderSuccess(instanceId);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callRenderSuccess exception: ", e);
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE, "callCreateFinish",
+              WXLogUtils.getStackTrace(e), null);
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
   public ContentBoxMeasurement getMeasurementFunc(String instanceId, long renderObjectPtr) {
     ContentBoxMeasurement contentBoxMeasurement = null;
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
