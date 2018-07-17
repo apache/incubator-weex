@@ -75,7 +75,7 @@ public class WXExceptionUtils {
 
 		if (!TextUtils.isEmpty(instanceId)) {
 			instanceIdCommit = instanceId;
-			instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+			instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
 
 			if (null != instance && instance.getContainerView() != null){
 				Context c = instance.getContainerView().getContext();

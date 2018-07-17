@@ -133,6 +133,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
 
+  /**
+   * bundle type
+   */
+  public WXBridgeManager.BundType bundleType;
   public long mRenderStartNanos;
   public int mExecJSTraceId = WXTracing.nextId();
 
@@ -268,6 +272,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
+  private int mMaxDeepLayer;
+
   public boolean isTrackComponent() {
     return trackComponent;
   }
@@ -385,6 +391,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
 
     mUserTrackAdapter=WXSDKManager.getInstance().getIWXUserTrackAdapter();
+
+    WXSDKManager.getInstance().getAllInstanceMap().put(mInstanceId,this);
   }
 
   /**
@@ -916,6 +924,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if(componentTypes!=null && componentTypes.contains(WXBasicComponentType.SCROLLER)){
         mWXPerformance.useScroller=1;
       }
+      mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
       mWXPerformance.wxDims = mwxDims;
       mWXPerformance.measureTimes = measureTimes;
       if (mUserTrackAdapter != null) {
@@ -1390,6 +1399,16 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           inactiveAddElementAction.clear();
         }
       });
+
+      //when report error in @WXExceptionUtils
+      // instance may had destroy and remove,
+      // so we delay remove from allInstanceMap
+      WXBridgeManager.getInstance().postDelay(new Runnable() {
+        @Override
+        public void run() {
+          WXSDKManager.getInstance().getAllInstanceMap().remove(mInstanceId);
+        }
+      },5000);
     }
   }
 
@@ -1654,6 +1673,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
+  public int getMaxDeepLayer() {
+    return mMaxDeepLayer;
+  }
+
+  public void setMaxDeepLayer(int maxDeepLayer) {
+    mMaxDeepLayer = maxDeepLayer;
+  }
+
   public void setMaxDomDeep(int maxDomDeep){
     if (null == mWXPerformance){
       return;
@@ -1824,7 +1851,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         WXLogUtils.e("user intercept: WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR");
         onRenderError(WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorCode(),
                 "|response.errorMsg==" + response.errorMsg +
-                        "|instance.getTemplateInfo == \n" + instance.getTemplateInfo() +
                         "|instance bundleUrl = \n" + instance.getBundleUrl() +
                         "|instance requestUrl = \n" + Uri.decode(WXSDKInstance.requestUrl)
         );
@@ -1835,8 +1861,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         onRenderError(
                 WXErrorCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getErrorCode(),
                 WXErrorCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getErrorCode() +
-                        "|response.errorMsg==" + response.errorMsg +
-                        "|instance.getTemplateInfo == \n" + instance.getTemplateInfo());
+                        "|response.errorMsg==" + response.errorMsg
+        );
       }
       else {
         onRenderError(WXErrorCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode(),
