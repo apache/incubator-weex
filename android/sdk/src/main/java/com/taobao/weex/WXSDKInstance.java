@@ -947,7 +947,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
       intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.PAUSE_EVENT);
       intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
-      mContext.sendBroadcast(intent);
+      /**
+       *  Fix NPE just like {@link #onActivityResume()}
+       */
+      if (null != mContext){
+        mContext.sendBroadcast(intent);
+      }else {
+        WXEnvironment.getApplication().sendBroadcast(intent);
+      }
       this.mCurrentGround = true;
     }
   }
