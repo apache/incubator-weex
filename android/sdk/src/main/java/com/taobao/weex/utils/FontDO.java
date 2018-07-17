@@ -100,7 +100,7 @@ public class FontDO {
               String base64Data = data[1];
               if (!TextUtils.isEmpty(base64Data)) {
                 String md5 = WXFileUtils.md5(base64Data);
-                File tmpFile = File.createTempFile("md5", null, new File(WXEnvironment.getApplication().getCacheDir(), "font-family"));
+                File tmpFile = File.createTempFile(md5, null, new File(WXEnvironment.getApplication().getCacheDir(), "font-family"));
                 WXFileUtils.saveFile(tmpFile.getPath(), Base64.decode(base64Data, Base64.DEFAULT), WXEnvironment.getApplication());
                 mUrl = tmpFile.getPath();
                 mType = TYPE_BASE64;
