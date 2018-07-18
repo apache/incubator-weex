@@ -283,7 +283,7 @@ struct ASTParser final {
                 args.push_back(factory_->NewStringConstant(tagName, tagName.string_value()));
                 if (controlExprs.size() > 0 && controlExprs[controlExprs.size() - 1]->IsForStatement()) {
                     Json repeat = control["repeat"];
-                    Json index = repeat["index"];
+                    Json index = repeat["iterator1"];
                     nodeIdExpr = factory_->NewBinaryExpression(nodeId, BinaryOperation::kAddition, factory_->NewStringConstant(nodeId, nodeId.string_value() + "_REPEAT_"), factory_->NewIdentifier(nodeId, index.string_value()));
                     args.push_back(nodeIdExpr);
                 }
@@ -294,7 +294,7 @@ struct ASTParser final {
                 callExpr = factory_->NewCallExpression(json, func, args);
                 Handle<BlockStatement>statement = stacks_[stacks_.size() - 1];
                 statement->PushExpression(callExpr);
-                Handle<BlockStatement> parentStatement = controlExprs.size() == 0 ? stacks_[stacks_.size() - controlExprs.size()] : (stacks_[stacks_.size() - controlExprs.size() - 1]);
+                Handle<BlockStatement> parentStatement = controlExprs.size() == 0 ? stacks_[stacks_.size() - 1] : (stacks_[stacks_.size() - controlExprs.size() - 1]);
                 if (parentStatement->IsChildStatement()) {
                     Handle<Expression> appendFunc = factory_->NewIdentifier(json, "appendChild");
                     Handle<Expression> callAppendExpr = nullptr;
