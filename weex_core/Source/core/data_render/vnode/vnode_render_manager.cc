@@ -23,6 +23,7 @@
 #include "core/data_render/string_table.h"
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/data_render/vnode/vnode.h"
+#include <sstream>
 #include <chrono>
 
 #define VRENDER_LOG true
@@ -190,14 +191,22 @@ static Value AppendChild(ExecState* exec_state) {//appendChild("tag","id",""pare
 
 static Value SetAttr(ExecState* exec_state) {//setAttr("id","key","value");
   VNode* node = exec_state->context()->find_node(exec_state->GetArgument(0)->str->c_str());
-  char* key = exec_state->GetArgument(1)->str->c_str();
-  char* value = exec_state->GetArgument(2)->str->c_str();
-
   if (node == nullptr) {
     return Value();
   }
 
-  node->SetAttribute(key, value);
+  char* key = exec_state->GetArgument(1)->str->c_str();
+  Value* p_value = exec_state->GetArgument(2);
+  if (p_value->type == Value::STRING) {
+    node->SetAttribute(key, p_value->str->c_str());
+  } else if (p_value->type == Value::INT) {//todo use uniform type conversion.
+    std::stringstream ss;
+    ss << p_value->i;
+    string str = ss.str();
+    node->SetAttribute(key, str);
+  }
+
+
   return Value();
 }
 

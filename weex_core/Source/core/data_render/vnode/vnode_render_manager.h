@@ -16,7 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#pragma once
+
+#ifndef DATA_RENDER_VNODE_VNODE_RENDER_MANAGER_
+#define DATA_RENDER_VNODE_VNODE_RENDER_MANAGER_
 
 #include <map>
 #include <string>
@@ -30,16 +32,16 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-WeexCore::RenderObject *VNode2RenderObject(const VNode *root, const std::string &page_id);
+WeexCore::RenderObject* VNode2RenderObject(const VNode* root, const std::string& page_id);
 
 class VNodeRenderManager {
-private:
+ private:
   VNodeRenderManager() {}
 
   ~VNodeRenderManager() {}
 
   class Garbo {
-  public:
+   public:
     ~Garbo() {
       if (VNodeRenderManager::g_pInstance) {
         delete VNodeRenderManager::g_pInstance;
@@ -49,29 +51,30 @@ private:
 
   static Garbo g_garbo;
 
-public:
+ public:
   void InitVM();
 
-  void TestProcess(const std::string& input,const std::string& page_id);
+  void TestProcess(const std::string& input, const std::string& page_id);
 
-  bool CreatePage(const std::string &page_id, VNode *vNode);
+  bool CreatePage(const std::string& page_id, VNode* vNode);
 
-  bool RefreshPage(const std::string &page_id, VNode *new_node);
+  bool RefreshPage(const std::string& page_id, VNode* new_node);
 
-  bool ClosePage(const std::string &page_id);
+  bool ClosePage(const std::string& page_id);
 
-  static VNodeRenderManager *GetInstance() {
+  static VNodeRenderManager* GetInstance() {
     if (!g_pInstance) {
       g_pInstance = new VNodeRenderManager();
     }
     return g_pInstance;
   }
 
-private:
+ private:
   static VM* g_vm_;
-  static VNodeRenderManager *g_pInstance;
-  std::map<std::string, VNode *> vnode_trees_;
+  static VNodeRenderManager* g_pInstance;
+  std::map<std::string, VNode*> vnode_trees_;
 };
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
+#endif

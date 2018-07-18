@@ -22,6 +22,7 @@
 #include "core/data_render/json/json11.hpp"
 #include "core/data_render/ast_factory.h"
 #include "core/data_render/statement.h"
+#include "core/data_render/expression_parser.h"
 #include "token.h"
 
 namespace weex {
@@ -66,13 +67,13 @@ struct ASTParser final {
             if (!control.is_null()) {
                 parseControl(list, control);
             }
-            
+
         } while (0);
     };
     void parseObject(Handle<ExpressionList> &list, Json object) {
     }
     void parseControl(Handle<ExpressionList> &list, Json object) {
-        
+
     }
     ParseResult parse() {
         ASTParseError error  = UNKOWN_ERROR;
@@ -95,9 +96,9 @@ struct ASTParser final {
                 break;
             }
             return ParseResult(chunk);
-            
+
         } while (0);
-        
+
         return fail("parse error:" + to_string(error));
     }
     Handle<Expression> parseBinaryExpression(Json &json) {
@@ -155,9 +156,9 @@ struct ASTParser final {
                     binaryExpr = factory_->NewBinaryExpression(json, opera, lhs, rhs);
                 }
             }
-            
+
         } while (0);
-        
+
         return binaryExpr;
     }
     Handle<Expression> parseRHSExpression(Json &json) {
@@ -182,15 +183,15 @@ struct ASTParser final {
                 }
                 pos = found + 1;
                 found = next_found;
-                
+
             } while (true);
-            
+
             if (!pos) {
                 rhsExpr = factory_->NewIdentifier(json, content);
             }
-            
+
         } while (0);
-        
+
         return rhsExpr;
     }
     Handle<Expression> parseIfControl(Json &json) {
@@ -209,9 +210,9 @@ struct ASTParser final {
             Handle<BlockStatement>statement = stacks_[stacks_.size() - 1];
             statement->PushExpression(ifExpr);
             stacks_.push_back(ifBlock);
-            
+
         } while (0);
-        
+
         return ifExpr;
     }
     Handle<Expression> parseForControl(Json &json) {
@@ -248,9 +249,9 @@ struct ASTParser final {
             Handle<BlockStatement>statement = stacks_[stacks_.size() - 1];
             statement->PushExpression(forExpr);
             stacks_.push_back(forBlock);
-            
+
         } while (0);
-        
+
         return forExpr;
     }
     std::vector<Handle<Expression>> parseControl(Json &json) {
@@ -265,7 +266,15 @@ struct ASTParser final {
 
         return exprs;
     }
-    bool parseStatement(Json &json) {
+  Handle<Expression> parseBindingExpression(const Json& json) {
+    const Json& exp_str = json["@binding"];
+    if(exp_str.is_string()){
+      return ExpressionParser::ParseExpressionByString(exp_str.string_value());
+    } else{
+      return factory_->NewNullConstant();
+    }
+  }
+  bool parseStatement(Json &json) {
         bool succ = true;
         do {
             Json control = json["control"];
@@ -323,21 +332,25 @@ struct ASTParser final {
             Json attributes = json["attributes"];
             if (attributes.is_object()) {
                 if(true) { //todo test only
-                  auto items = attributes.object_items();
-                  for (auto it = items.begin(); it != items.end(); ++it) {
-                    const auto& key = it->first;
-                    const auto& value = it->second.string_value();//todo support expression
-                    std::vector<Handle<Expression>> args;
-                    args.push_back(factory_->NewStringConstant(json, nodeId.string_value()));
-                    args.push_back(factory_->NewStringConstant(json, key));
-                    args.push_back(factory_->NewStringConstant(json, value));
+                    auto items = attributes.object_items();
+                    for (auto it = items.begin(); it != items.end(); ++it) {
+                        const auto& key = it->first;
+                        const auto& value = it->second;
+                        std::vector<Handle<Expression>> args;
+                        args.push_back(factory_->NewStringConstant(json, nodeId.string_value()));
+                        args.push_back(factory_->NewStringConstant(json, key));
+                        if (value.is_string()){
+                            args.push_back(factory_->NewStringConstant(json, value.string_value()));
+                        } else{
+                            args.push_back(parseBindingExpression(value));
+                        }
 
-                    Handle<Expression> setAttrFunc = factory_->NewIdentifier(json, "setAttr");
-                    Handle<CallExpression> callFunc = factory_->NewCallExpression(
-                        json, setAttrFunc, args);
-                    Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
-                    statement->PushExpression(callFunc);
-                  }
+                        Handle<Expression> setAttrFunc = factory_->NewIdentifier(json, "setAttr");
+                        Handle<CallExpression> callFunc = factory_->NewCallExpression(
+                           json, setAttrFunc, args);
+                        Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
+                        statement->PushExpression(callFunc);
+                    }
                 } else {
                   Handle<Expression> attrExpr = parseExpression(attributes);
                   if (attrExpr) {
@@ -378,7 +391,7 @@ struct ASTParser final {
             succ = true;
 
         } while (0);
-        
+
         stacks_.pop_back();
         return succ;
     }
@@ -396,9 +409,9 @@ struct ASTParser final {
                     proxyArray.push_back(itemExpr);
                 }
             }
-            
+
         } while (0);
-        
+
         return expr;
     }
     Handle<Expression> parseObjExpression(Json &json) {
@@ -447,9 +460,9 @@ struct ASTParser final {
                 }
             }
             expr = factory_->NewObjectConstant(json, proxyObj);
-            
+
         } while (0);
-        
+
         return expr;
     }
     Handle<Expression> parseExpression(Json &json) {
@@ -463,13 +476,13 @@ struct ASTParser final {
                 expr = parseArrayExpression(json);
                 break;
             }
-            
+
         } while (0);
         return expr;
     };
 };
 }
-    
+
 ParseResult Parser::parse(const std::string &in, std::string &err) {
     ASTParser parser { in, err, false, ASTFactory::GetFactoryInstance() };
     ParseResult result = parser.parse();

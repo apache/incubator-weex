@@ -39,6 +39,7 @@ namespace data_render {
   T(RBRACK, "]", 0)                                                \
   T(LBRACE, "{", 0)                                                \
   T(RBRACE, "}", 0)                                                \
+  T(COLON, ":", 0)                                                 \
   T(SEMICOLON, ";", 0)                                             \
   T(PERIOD, ".", 0)                                                \
   T(CONDITIONAL, "?", 3)                                           \
@@ -118,18 +119,46 @@ namespace data_render {
   K(UNDEFINED, "undefined", 0)                                     \
                                                                    \
   T(EOS, "EOS", 0)                                                 \
-  T(INTEGER, nullptr, 0)                                           \
-  T(NUMBER, nullptr, 0)                                            \
-  T(STRING, nullptr, 0)                                            \
-  T(IDENTIFIER, nullptr, 0)                                        \
-  T(WHITESPACE, nullptr, 0)                                        \
-  T(UNINITIALIZED, nullptr, 0)                                     \
-  T(REGEXP_LITERAL, nullptr, 0)
+  T(INTEGER, "INTEGER", 0)                                         \
+  T(NUMBER, "NUMBER", 0)                                           \
+  T(STRING, "STRING", 0)                                           \
+  T(TEMPLATE, "TEMPLATE", 0)                                       \
+  T(IDENTIFIER, "IDENTIFIER", 0)                                   \
+  T(WHITESPACE, "WHITESPACE", 0)                                   \
+  T(UNINITIALIZED, "UNINITIALIZED", 0)                             \
+  T(REGEXP_LITERAL, "REGEXP_LITERAL", 0)                           \
+  T(ERROR, "ERROR", 0)                                             \
+  T(INVALID, "INVALID", 0)
+
+
+class Position {
+ public:
+  using size_type = std::string::size_type;
+
+  Position()
+      : col_ { 0 }, row_{ 0 }
+  { }
+
+  Position(size_type col, size_type row)
+      : col_{ col }, row_ { row }
+  { }
+
+  size_type &col() { return col_; }
+  size_type &row() { return row_; }
+
+  const size_type &col() const { return col_; }
+  const size_type &row() const { return row_; }
+ private:
+  size_type col_;
+  size_type row_;
+};
 
 class Token {
  public:
 #define T(name, string, precedence) name,
-  enum Type { TOKEN_TYPE_LIST(T, T) NUM_TOKENS };
+  enum Type {
+    TOKEN_TYPE_LIST(T, T) NUM_TOKENS
+  };
 #undef T
   static const char* Name(Type token) {
     assert(token < NUM_TOKENS);
@@ -156,13 +185,27 @@ class Token {
     return s_precedence_[token];
   }
 
-  Token(std::size_t index) :  index_{index} {}
+  Token(std::string str, Type type, Position pos, size_t index)
+      : str_{ str }, type_{ type }, pos_{pos}, index_{ index }
+  { }
 
-  Token(int line, int column) : line_(line), column_(column) {}
+  Token(int64_t num, Type type, Position pos, size_t index)
+      : num_{ num }, type_{ type }, pos_{pos}, index_{ index }
+  { }
+
+  Token(){ };
 
   inline int line() { return line_; }
 
   inline int column() { return column_; }
+
+  inline Type type() const { return type_; }
+
+  inline const std::string& view() const { return str_; }
+
+  static std::string str(Type type);
+
+  static int precedence(Type type);
 
  private:
   int line_;
@@ -171,6 +214,7 @@ class Token {
   double num_;
   Type type_;
   std::size_t index_;
+  Position pos_;
 
   static const char* const s_name_[NUM_TOKENS];
   static const char* const s_string_[NUM_TOKENS];

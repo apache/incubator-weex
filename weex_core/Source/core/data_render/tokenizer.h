@@ -16,36 +16,45 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef DATA_RENDER_VNODE_VNODE_RENDER_CONTEXT_
-#define DATA_RENDER_VNODE_VNODE_RENDER_CONTEXT_
+#ifndef DATA_RENDER_TOKENIZER_
+#define DATA_RENDER_TOKENIZER_
 
-#include <string>
-#include <memory>
-#include "core/data_render/json/json11.hpp"
-#include "core/data_render/vnode/vnode.h"
+
+#include "core/data_render/token.h"
+#include "core/data_render/scanner.h"
+#include "core/data_render/parse_context.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-class VNodeRenderContext {
- public:
-  void setVNodeRoot(VNode* v_node);
-  VNode* find_node(const std::string& ref);
 
-  inline void page_id(const std::string& page_id) { page_id_ = page_id; }
-  inline const std::string& page_id() const { return page_id_; }
-  inline VNode* root() const { return root_.get(); }
-  inline void set_root(VNode* root) { return root_.reset(root); }
-  inline void insert_node(VNode* node) {
-    node_map_.insert({node->ref(), node});
-  }
-  inline json11::Json& raw_json() { return raw_json_; }
+class TokenizerState;
+
+/*
+ * implementation of complete Tokenizer to be independant of flex
+ */
+class Tokenizer {
+ public:
+  Tokenizer(CharacterStream* stream, ParserContext* context);
+  ~Tokenizer();
+  Token::Type peek();
+
+  void advance(bool divide_expected = false);
+
+  void reset(CharacterStream* stream);
+
+  Token& currentToken();
+
+  ParserContext* context() { return context_; }
+
  private:
-  // node context
-  std::string page_id_;
-  std::unique_ptr<VNode> root_;
-  std::map<std::string, VNode*> node_map_;
-  json11::Json raw_json_;
+  Token advance_internal(bool not_regex);
+  Token parseString(char delim);
+  Token parseNumber(char start);
+  Token parseRegex(bool* ok);
+
+  TokenizerState* state_;
+  ParserContext* context_;
 };
 }
 }

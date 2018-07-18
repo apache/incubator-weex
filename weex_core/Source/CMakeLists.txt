@@ -62,6 +62,9 @@ set(COMMON_SRCS
    ./core/data_render/vm.cc
    ./core/data_render/statement.cc
    ./core/data_render/string_table.cc
+   ./core/data_render/tokenizer.cc
+   ./core/data_render/expression_parser.cc
+   ./core/data_render/parse_context.cc
    ./core/data_render/vnode/vnode.cc
    ./core/data_render/vnode/vnode_render_manager.cc
    ./core/data_render/vnode/vnode_render_context.cc

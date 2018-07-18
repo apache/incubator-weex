@@ -16,39 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "core/data_render/token.h"
+#ifndef DATA_RENDER_PARSE_CONTEXT_
+#define DATA_RENDER_PARSE_CONTEXT_
+
+#include "core/data_render/statistics.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
 
-#define T(name, string, precedence) #name,
-const char* const Token::s_name_[NUM_TOKENS] = {TOKEN_TYPE_LIST(T, T)};
-#undef T
+class ParserContextImpl;
 
-#define T(name, string, precedence) string,
-const char* const Token::s_string_[NUM_TOKENS] = {TOKEN_TYPE_LIST(T, T)};
-#undef T
+// class to store complete context of parser independant of
+// actual interpreter.
+class ParserContext {
+public:
+    ParserContext();
+    ~ParserContext();
 
-#define T(name, string, precedence) precedence,
-const int8_t Token::s_precedence_[NUM_TOKENS] = {TOKEN_TYPE_LIST(T, T)};
-#undef T
+    Statistics &Counters();
+private:
+    ParserContextImpl *impl_;
+    Statistics statistics_;
+};
 
-#define KT(a, b, c) 'T',
-#define KK(a, b, c) 'K',
-const char Token::s_token_type_[] = {TOKEN_TYPE_LIST(KT, KK)};
-#undef KT
-#undef KK
-#undef KC
-
-std::string Token::str(Type type) {
-  return s_string_[static_cast<int>(type)];
+}
+}
 }
 
-
-int Token::precedence(Type type) {
-  return s_precedence_[static_cast<int>(type)];
-}
-}  // namespace data_render
-}  // namespace core
-}  // namespace weex
+#endif

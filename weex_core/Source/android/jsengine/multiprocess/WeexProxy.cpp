@@ -31,6 +31,7 @@
 #include <core/manager/weex_core_manager.h>
 #include <chrono>
 #include "core/data_render/vnode/vnode_render_manager.h"
+#include "core/data_render/expression_parser.h"
 
 const char *s_cacheDir;
 const char *g_jssSoPath = nullptr;
@@ -1122,7 +1123,9 @@ namespace WeexCore {
                         "title"
                         ],
                         "attributes": {
-                            "value": "这是一个直播标题"
+                            "value": {
+                                "@binding":"1+2"
+                            }
                         }
                     },
                     {
