@@ -64,6 +64,7 @@ set(COMMON_SRCS
    ./core/data_render/string_table.cc
    ./core/data_render/vnode/vnode.cc
    ./core/data_render/vnode/vnode_render_manager.cc
+   ./core/data_render/vnode/vnode_render_context.cc
    ./core/data_render/json/json11.cc
         )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)

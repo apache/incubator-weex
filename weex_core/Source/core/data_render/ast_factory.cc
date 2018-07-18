@@ -85,6 +85,12 @@ namespace data_render {
     Handle<Expression> ASTFactory::NewIntegralConstant(Json &json, int value) {
         return MakeHandle<IntegralConstant>(json, value);
     }
+    Handle<Expression> ASTFactory::NewDoubleConstant(Json& json, double value) {
+        return MakeHandle<DoubleConstant>(json, value);
+    }
+    Handle<Expression> ASTFactory::NewBooleanConstant(Json& json, bool value) {
+        return MakeHandle<BooleanConstant>(json, value);
+    }
     Handle<Expression> ASTFactory::NewCallExpression(Json &json, MemberAccessKind kind, Handle<Expression> func, Handle<Expression> args) {
         return MakeHandle<CallExpression>(json, kind, func, args);
     }

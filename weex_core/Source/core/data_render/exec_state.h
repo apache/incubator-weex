@@ -24,9 +24,12 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
-#include <core/data_render/vnode/vnode.h>
+#include "core/data_render/json/json11.hpp"
 #include "core/data_render/op_code.h"
+#include "core/data_render/vnode/vnode.h"
+#include "core/data_render/vnode/vnode_render_context.h"
 
 namespace weex {
 namespace core {
@@ -46,7 +49,7 @@ class String;
 
 class StringTable;
 
-typedef Value (* CFunction)(ExecState*);
+typedef Value (*CFunction)(ExecState*);
 
 struct Value {
   union {
@@ -56,11 +59,10 @@ struct Value {
     FuncState* f;
     void* cf;
     String* str;
+    void* cptr;  // Lifecycle is managed outside vm
   };
 
-  enum Type {
-    NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING
-  };
+  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR };
 
   Type type;
 
@@ -72,6 +74,9 @@ struct Value {
   Value(const Value& value) {
     type = value.type;
     switch (type) {
+      case INT:
+        i = value.i;
+        break;
       case NUMBER:
         n = value.n;
         break;
@@ -86,6 +91,9 @@ struct Value {
         break;
       case CFUNC:
         cf = value.cf;
+        break;
+      case CPTR:
+        cptr = value.cptr;
         break;
       default:
         break;
@@ -109,6 +117,8 @@ struct Value {
         return left.f == right.f;
       case CFUNC:
         return left.cf == right.cf;
+      case CPTR:
+        return left.cptr == right.cptr;
       default:
         break;
     }
@@ -119,6 +129,7 @@ struct Value {
 class FuncState {
  public:
   FuncState() : instructions_(), constants_(), children_() {}
+  virtual ~FuncState() {}
 
   int AddConstant(Value value) {
     for (auto i = 0; i != constants_.size(); ++i) {
@@ -135,6 +146,10 @@ class FuncState {
     instructions_.push_back(i);
     return instructions_.size() - 1;
   }
+  inline size_t ReplaceInstruction(size_t pos, Instruction i) {
+    instructions_[pos] = i;
+    return pos;
+  }
   inline std::vector<Instruction>& instructions() { return instructions_; }
   inline void AddChild(FuncState* func) {
     children_.push_back(std::unique_ptr<FuncState>(func));
@@ -142,6 +157,7 @@ class FuncState {
   inline std::vector<std::unique_ptr<FuncState>>& children() {
     return children_;
   }
+  inline FuncState* GetChild(size_t pos) { return children_[pos].get(); }
 
  private:
   std::vector<Instruction> instructions_;
@@ -174,40 +190,34 @@ class Global {
 class ExecState {
  public:
   ExecState(VM* vm);
-  ~ExecState();
+  virtual ~ExecState();
   void Compile(const std::string& source);
   void Execute();
-  void CallFunction(Value* func, size_t argc, Value* ret);
+  const Value& Call(const std::string& func_name,
+                    const std::vector<Value>& params);
 
   size_t GetArgumentCount();
   Value* GetArgument(int index);
 
-  void setVNodeRoot(VNode* v_node);
-  VNode* find_node(const std::string& ref);
-
   inline Global* global() { return global_.get(); }
   inline ExecStack* stack() { return stack_.get(); }
   inline StringTable* string_table() { return string_table_.get(); }
-
-  inline void page_id(const std::string& page_id) { page_id_ = page_id; }
-  inline const std::string& page_id() const { return page_id_; }
-  inline VNode* root() const { return root_.get(); }
-  inline void insert_node(VNode* node) { node_map_.insert({node->ref(), node}); }
+  inline VNodeRenderContext* context() { return render_context_.get(); }
 
  private:
-  std::vector<Frame> frames_;
-  std::unique_ptr<ExecStack> stack_;
-
+  friend class VM;
   friend class CodeGenerator;
 
-  std::unique_ptr<FuncState> func_state_;
-  std::unique_ptr<Global> global_;
-  std::unique_ptr<StringTable> string_table_;
+  void CallFunction(Value* func, size_t argc, Value* ret);
 
-  std::string page_id_;
-  std::unique_ptr<VNode> root_;
-  std::map<std::string, VNode*> node_map_;
   VM* vm_;
+  std::vector<Frame> frames_;
+  std::unique_ptr<Global> global_;
+  std::unique_ptr<ExecStack> stack_;
+  std::unique_ptr<FuncState> func_state_;
+  std::unique_ptr<StringTable> string_table_;
+  std::unique_ptr<VNodeRenderContext> render_context_;
+  std::unordered_map<std::string, long> global_variables_;
 };
 }  // namespace data_render
 }  // namespace core

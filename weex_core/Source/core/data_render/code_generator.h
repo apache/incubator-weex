@@ -47,6 +47,7 @@ class CodeGenerator : public ASTVisitor {
   void Visit(FunctionPrototype *node, void *data) override;
   void Visit(FunctionStatement *node, void *data) override;
   void Visit(BinaryExpression *node, void *data) override;
+  void Visit(AssignExpression *node, void *data) override;
   void Visit(ChildStatement *node, void *data) override;
   void Visit(Declaration *node, void *data) override;
   void Visit(DeclarationList *node, void *data) override;
@@ -75,7 +76,6 @@ class CodeGenerator : public ASTVisitor {
    public:
     FuncCnt() {}
     ~FuncCnt() {}
-    inline std::unordered_map<std::string, long> &upvalue() { return upvalue_; }
     inline void set_func_state(FuncState *func_state) {
       func_state_ = func_state;
     }
@@ -83,7 +83,6 @@ class CodeGenerator : public ASTVisitor {
 
    private:
     FuncState *func_state_;
-    std::unordered_map<std::string, long> upvalue_;
   };
 
   class BlockCnt : public Node<BlockCnt> {

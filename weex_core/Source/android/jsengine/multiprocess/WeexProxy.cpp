@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <core/layout/measure_func_adapter_impl_android.h>
 #include <core/manager/weex_core_manager.h>
+#include <chrono>
 #include "core/data_render/vnode/vnode_render_manager.h"
 
 const char *s_cacheDir;
@@ -1075,13 +1076,109 @@ namespace WeexCore {
     WeexProxy::createInstanceContext(JNIEnv *env, jobject jcaller, jstring jinstanceid,
                                      jstring name,
                                      jstring jfunction, jobjectArray jargs) {
-        ScopedJStringUTF8 idChar(env, jinstanceid);
-        std::string sourceStr = "{\"body\":{\"tagName\":\"div\",\"nodeId\":\"1\",\"classList\":[\"wrap\"],\"childNodes\":[{\"tagName\":\"text\",\"nodeId\":\"2\",\"attributes\":{\"value\":\"hello world\"}}]},\"styles\":[{\"wrap\":{\"width\":\"100px\",\"height\":\"100px\"}}]}";
-        auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-        node_manager->InitVM();
-        node_manager->TestProcess(sourceStr,idChar.getChars());
+        if(true) {
+            ScopedJStringUTF8 idChar(env, jinstanceid);
+            std::string sourceStr =
+                R"({
+        "body": {
+            "tagName": "list",
+                "nodeId": "2",
+                "classList": [
+            "wrap",
+                "wrap-test"
+            ],
+            "childNodes": [
+            {
+                "tagName": "cell",
+                "nodeId": "3",
+                "classList": [
+                "main"
+                ],
+                "childNodes": [
+                {
+                    "tagName": "image",
+                        "nodeId": "4",
+                        "attributes": {
+                        "src": "https://gw.alicdn.com/tfs/TB1mMcNzhGYBuNjy0FnXXX5lpXa-85-85.png"
+                    },
+                    "classList": [
+                    "img"
+                    ]
+                },
+                {
+                    "tagName": "div",
+                        "nodeId": "5",
+                        "classList": [
+                    "info-wrap"
+                    ],
+                    "attributes": {
+                        "info": "hello"
+                    },
+                    "childNodes": [
+                    {
+                        "tagName": "text",
+                            "nodeId": "6",
+                            "classList": [
+                        "title"
+                        ],
+                        "attributes": {
+                            "value": "这是一个直播标题"
+                        }
+                    },
+                    {
+                        "tagName": "text",
+                            "nodeId": "7",
+                            "classList": [
+                        "title"
+                        ],
+                        "attributes": {
+                            "value": "这是一个直播副标题"
+                        }
+                    }
+                    ]
+                }
+                ]
+            }
+            ]
+        },
+        "data": {
+            "showInfo": true,
+                "list": [
+            {},
+            {},
+            {}
+            ]
+        },
+        "styles": {
+            "wrap": {
+                "flexDirection": "column"
+            },
+            "main": {
+                "width": "750px",
+                    "height": "300px",
+                    "flexDirection": "row"
+            },
+            "img": {
+                "width": "80px",
+                    "height": "80px",
+                    "marginRight": "10px"
+            },
+            "infoWrap": {
+                "flexDirection": "column",
+                    "justifyContent": "center"
+            },
+            "title": {
+                "fontSize": "24px",
+                    "color": "#000000"
+            }
+        }
+    })";
+            auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+            node_manager->InitVM();
+            node_manager->TestProcess(sourceStr, idChar.getChars());
 
-        return true;
+            return true;
+        }
         if (!sSender && js_server_api_functions == nullptr) {
             LOGE("have not connected to a js server");
             return false;
@@ -1111,7 +1208,11 @@ namespace WeexCore {
         jArg = env->GetObjectArrayElement(jargs, 4);
         jDataObj = env->GetObjectField(jArg, jDataId);
         jstring japi = (jstring) jDataObj;
-        if (js_server_api_functions != nullptr) {
+
+      auto start_time = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
+      LOGE("DATA_RENDER, Wx start %lld",start_time);
+
+      if (js_server_api_functions != nullptr) {
             ScopedJStringUTF8 idChar(env, jinstanceid);
             ScopedJStringUTF8 funcChar(env, jfunction);
             ScopedJStringUTF8 scriptChar(env, jscript);

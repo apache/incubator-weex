@@ -48,6 +48,8 @@ namespace data_render {
         virtual Handle<Expression> NewDeclarationList(Json &json, std::vector<Handle<Declaration>> decls);
         virtual Handle<Expression> NewDeclarationList(Json &json);
         virtual Handle<Expression> NewIntegralConstant(Json &json, int value);
+        virtual Handle<Expression> NewDoubleConstant(Json &json, double value);
+        virtual Handle<Expression> NewBooleanConstant(Json &json, bool value);
         virtual Handle<Expression> NewCallExpression(Json &json, MemberAccessKind kind, Handle<Expression> func, Handle<Expression> args);
         virtual Handle<Expression> NewCallExpression(Json &json, Handle<Expression>func, std::vector<Handle<Expression>> args);
         virtual Handle<Expression> NewMemberExpression(Json &json, MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> mem);

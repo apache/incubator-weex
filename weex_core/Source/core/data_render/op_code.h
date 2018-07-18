@@ -28,6 +28,7 @@ enum OpCode {
   OP_LOADK,      //	A sBx	R(A) = sBx
   OP_LOADNULL,   //	A       R(A) = null
   OP_GETGLOBAL,  //	A B	    R(A) = Global[B]
+  OP_GETFUNC,    //	A B  	R(A) = Function[B]
   OP_GETTABLE,   //	A B C	R(A) = R(B)[R(C)]
   OP_SETTABLE,   //	A B C	R(A)[R(B)] = RK(C)
 
@@ -47,6 +48,7 @@ enum OpCode {
   OP_BNOT,  //	A B	    R(A) = ~R(B)
 
   OP_JMP,  //	A B C	if (R(A)) pc += R(B) else pc += R(C)
+  OP_GOTO, //   A       pc = A
   OP_EQ,   //	A B C	R(A) = R(B) == R(C)
   OP_LT,   //	A B C	R(A) = R(A) <  R(B)
   OP_LE,   //	A B C	R(A) = R(A) <= R(B)
@@ -55,7 +57,10 @@ enum OpCode {
   OP_RETURN0,  //	Return
   OP_RETURN1,  //	Return R(A)
 
-  OP_INVALID
+  OP_INVALID,
+
+  OP_PRE_INCR, //A      if (B >= 0) R(B) = ++R(A) else ++R(A)
+  OP_PRE_DECR, //A      if (B >= 0) R(B) = --R(A) else --R(A)
 
 };
 
@@ -74,8 +79,8 @@ typedef unsigned long Instruction;
 #define CREATE_ABC(op_code, a, b, c)                                   \
   a < 0 || b < 0 || c < 0                                              \
       ? ((Instruction)OP_INVALID << POS_OP)                               \
-      : ((Instruction)op_code << POS_OP) | ((Instruction)a << POS_A) | \
-            ((Instruction)b << POS_B) | ((Instruction)c << POS_C)
+      : ((Instruction)op_code << POS_OP) | ((Instruction)(a) << POS_A) | \
+            ((Instruction)(b) << POS_B) | ((Instruction)(c) << POS_C)
 
 #define GET_OP_CODE(i) (OpCode)(((i) >> POS_OP) & 0xFF)
 #define GET_ARG_A(i) (long)(((i) >> POS_A) & 0xFF)

@@ -54,18 +54,21 @@ int Global::Add(const std::string& name, Value value) {
 }
 
 ExecState::ExecState(VM* vm)
-    : frames_(),
+    : vm_(vm),
+      frames_(),
+      global_(new Global),
       stack_(new ExecStack),
       func_state_(nullptr),
-      global_(new Global),
       string_table_(new StringTable),
-      vm_(vm) {}
+      render_context_(new VNodeRenderContext),
+      global_variables_() {}
 
 ExecState::~ExecState() {}
 
 void ExecState::Compile(const std::string& source) {
   CodeGenerator generator(this);
   std::string err;
+  context()->raw_json() = Json::parse(source, err);
   const ParseResult& result = Parser::parse(source, err);
   generator.Visit(result.expr().get(), nullptr);
 }
@@ -78,10 +81,26 @@ void ExecState::Execute() {
   CallFunction(stack_->base(), 0, nullptr);
 }
 
+const Value& ExecState::Call(const std::string& func_name,
+                             const std::vector<Value>& params) {
+  Value ret;
+  auto it = global_variables_.find(func_name);
+  if (it != global_variables_.end()) {
+    long reg = it->second;
+    Value* function = *stack_->top() + 1;
+    *function = *(stack_->base() + reg);
+    for (int i = 0; i < params.size(); ++i) {
+      *(function + i) = params[i];
+    }
+    CallFunction(function, params.size(), &ret);
+  }
+  return ret;
+}
+
 void ExecState::CallFunction(Value* func, size_t argc, Value* ret) {
+  *stack_->top() = func + argc;
   if (func->type == Value::Type::CFUNC) {
     Frame frame;
-    *stack_->top() = func + argc;
     frame.reg = func;
     frames_.push_back(frame);
     auto result = reinterpret_cast<CFunction>(func->cf)(this);
@@ -107,16 +126,6 @@ size_t ExecState::GetArgumentCount() {
 
 Value* ExecState::GetArgument(int index) {
   return frames_.back().reg + index + 1;
-}
-void ExecState::setVNodeRoot(VNode* v_node) {
-  root_.reset(v_node);
-}
-VNode* ExecState::find_node(const std::string& ref) {
-  auto it = node_map_.find(ref);
-  if (it == node_map_.end()) {
-    return nullptr;
-  }
-  return it->second;
 }
 
 }  // namespace data_render

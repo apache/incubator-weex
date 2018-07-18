@@ -266,7 +266,7 @@ struct ASTParser final {
         return exprs;
     }
     bool parseStatement(Json &json) {
-        bool error = true;
+        bool succ = true;
         do {
             Json control = json["control"];
             std::vector<Handle<Expression>> controlExprs;
@@ -294,7 +294,7 @@ struct ASTParser final {
                 callExpr = factory_->NewCallExpression(json, func, args);
                 Handle<BlockStatement>statement = stacks_[stacks_.size() - 1];
                 statement->PushExpression(callExpr);
-                Handle<BlockStatement> parentStatement = controlExprs.size() == 0 ? stacks_[stacks_.size() - 1] : (stacks_[stacks_.size() - controlExprs.size() - 1]);
+                Handle<BlockStatement> parentStatement = controlExprs.size() == 0 ? stacks_[stacks_.size() - 1] : (stacks_[stacks_.size() - controlExprs.size()]);
                 if (parentStatement->IsChildStatement()) {
                     Handle<Expression> appendFunc = factory_->NewIdentifier(json, "appendChild");
                     Handle<Expression> callAppendExpr = nullptr;
@@ -322,14 +322,33 @@ struct ASTParser final {
             }
             Json attributes = json["attributes"];
             if (attributes.is_object()) {
-                Handle<Expression> attrExpr = parseExpression(attributes);
-                if (attrExpr) {
+                if(true) { //todo test only
+                  auto items = attributes.object_items();
+                  for (auto it = items.begin(); it != items.end(); ++it) {
+                    const auto& key = it->first;
+                    const auto& value = it->second.string_value();//todo support expression
+                    std::vector<Handle<Expression>> args;
+                    args.push_back(factory_->NewStringConstant(json, nodeId.string_value()));
+                    args.push_back(factory_->NewStringConstant(json, key));
+                    args.push_back(factory_->NewStringConstant(json, value));
+
+                    Handle<Expression> setAttrFunc = factory_->NewIdentifier(json, "setAttr");
+                    Handle<CallExpression> callFunc = factory_->NewCallExpression(
+                        json, setAttrFunc, args);
+                    Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
+                    statement->PushExpression(callFunc);
+                  }
+                } else {
+                  Handle<Expression> attrExpr = parseExpression(attributes);
+                  if (attrExpr) {
                     Handle<Expression> func = factory_->NewIdentifier(json, "setAttr");
                     std::vector<Handle<Expression>> args;
                     args.push_back(attrExpr);
-                    Handle<CallExpression> callExpr = factory_->NewCallExpression(attributes, func, args);
-                    Handle<BlockStatement>statement = stacks_[stacks_.size() - 1];
+                    Handle<CallExpression> callExpr = factory_->NewCallExpression(attributes, func,
+                                                                                  args);
+                    Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
                     statement->PushExpression(callExpr);
+                  }
                 }
             }
             Json childs = json["childNodes"];
@@ -340,12 +359,14 @@ struct ASTParser final {
                         continue;
                     }
                     Handle<Expression> childStatement = factory_->NewChildStatement(child, factory_->NewExpressionList(), nodeId.string_value());
+                    Handle<BlockStatement>statement = stacks_[stacks_.size() - 1];
                     stacks_.push_back(childStatement);
                     if (!parseStatement(child)) {
                         break;
                     }
+                    statement->PushExpression(childStatement);
                 }
-                if (error) {
+                if (!succ) {
                     break;
                 }
             }
@@ -354,12 +375,12 @@ struct ASTParser final {
                     stacks_.pop_back();
                 }
             }
-            error = false;
+            succ = true;
 
         } while (0);
         
         stacks_.pop_back();
-        return error;
+        return succ;
     }
     Handle<Expression> parseArrayExpression(Json &json) {
         Handle<Expression> expr = nullptr;
