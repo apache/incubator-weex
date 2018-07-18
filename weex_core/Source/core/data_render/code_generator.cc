@@ -59,17 +59,14 @@ void CodeGenerator::Visit(StringConstant *node, void *data) {
   }
 }
 
-
 void CodeGenerator::Visit(ExpressionList *node, void *data) {
-
-   for (auto it = node->raw_list().begin(); it != node->raw_list().end(); ++it) {
-       auto temp = (*it).get();
-        temp->Accept(this, nullptr);
-   }
+  for (auto it = node->raw_list().begin(); it != node->raw_list().end(); ++it) {
+    auto temp = (*it).get();
+    temp->Accept(this, nullptr);
+  }
 }
 
-
- void CodeGenerator::Visit(ChunkStatement *stms, void *data) {
+void CodeGenerator::Visit(ChunkStatement *stms, void *data) {
   FuncScope scope(this);
   BlockScope block_scoped(this);
   // For root func
@@ -273,7 +270,12 @@ void CodeGenerator::Visit(Declaration *node, void *data) {
   }
 }
 
-void CodeGenerator::Visit(DeclarationList *node, void *data) {}
+void CodeGenerator::Visit(DeclarationList *node, void *data) {
+  for (auto it = node->exprs().begin(); it != node->exprs().end(); ++it) {
+    auto temp = (*it).get();
+    temp->Accept(this, nullptr);
+  }
+}
 
 void CodeGenerator::Visit(IntegralConstant *node, void *data) {
   long reg = data == nullptr ? -1 : *static_cast<long *>(data);
@@ -286,32 +288,27 @@ void CodeGenerator::Visit(IntegralConstant *node, void *data) {
   }
 }
 
-
-void CodeGenerator::Visit(BooleanConstant *node, void *data)
-{
-    long reg = data == nullptr ? -1 : *static_cast<long *>(data);
-    if (reg >= 0) {
-        FuncState *func_state = cur_func_->func_state();
-        bool value = node->pred();
-        int index = func_state->AddConstant(static_cast<bool>(value));
-        Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
-        func_state->AddInstruction(i);
-    }
+void CodeGenerator::Visit(BooleanConstant *node, void *data) {
+  long reg = data == nullptr ? -1 : *static_cast<long *>(data);
+  if (reg >= 0) {
+    FuncState *func_state = cur_func_->func_state();
+    bool value = node->pred();
+    int index = func_state->AddConstant(static_cast<bool>(value));
+    Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
+    func_state->AddInstruction(i);
+  }
 }
 
-
-void CodeGenerator::Visit(DoubleConstant *node, void *data)
-{
-    long reg = data == nullptr ? -1 : *static_cast<long *>(data);
-    if (reg >= 0) {
-         FuncState *func_state = cur_func_->func_state();
-         double value = node->value();
-         int index = func_state->AddConstant(static_cast<double>(value));
-         Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
-         func_state->AddInstruction(i);
-    }
+void CodeGenerator::Visit(DoubleConstant *node, void *data) {
+  long reg = data == nullptr ? -1 : *static_cast<long *>(data);
+  if (reg >= 0) {
+    FuncState *func_state = cur_func_->func_state();
+    double value = node->value();
+    int index = func_state->AddConstant(static_cast<double>(value));
+    Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
+    func_state->AddInstruction(i);
+  }
 }
-
 
 void CodeGenerator::Visit(ObjectConstant *node, void *data) {}
 
