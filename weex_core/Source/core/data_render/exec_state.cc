@@ -54,13 +54,13 @@ int Global::Add(const std::string& name, Value value) {
 }
 
 ExecState::ExecState(VM* vm)
-    : frames_(),
+    : vm_(vm),
+      frames_(),
+      global_(new Global),
       stack_(new ExecStack),
       func_state_(nullptr),
-      global_(new Global),
       string_table_(new StringTable),
       render_context_(new VNodeRenderContext),
-      vm_(vm),
       global_variables_() {}
 
 ExecState::~ExecState() {}
