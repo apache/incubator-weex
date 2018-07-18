@@ -24,15 +24,21 @@ fi
 
 echo "Build Weex SDK From Source...."
 
-npm install --production
-npm run install:buildtools
-npm run build:source
+npm install
+npm run build:jsfm
+npm run build:polyfill
+npm run build:rax
 
-echo "Javascript Framework and HTML5 SDK build completed."
+echo "Weex JS Framework build completed."
 sleep 2
 
-cp pre-build/weex-js-framework.min.js ios_sdk/WeexSDK/Resources/main.js
-cp pre-build/weex-js-framework.min.js android_sdk/assets/main.js
+cp dist/weex-js-framework.min.js pre-build/native-bundle-main.js
+cp dist/weex-js-framework.min.js android/sdk/assets/native-bundle-main.js
+cp dist/weex-js-framework.min.js pre-build/weex-main-jsfm.js
+cp dist/weex-js-framework.min.js android/sdk/assets/weex-main-jsfm.js
+cp dist/weex-polyfill.min.js pre-build/weex-polyfill.js
+cp dist/weex-rax.min.js pre-build/weex-rax-api.js
+cp dist/weex-rax.min.js android/sdk/assets/weex-rax-api.js
 
 gradle wrapper --gradle-version 3.3
 echo 'include ":android_sdk"'>settings.gradle
