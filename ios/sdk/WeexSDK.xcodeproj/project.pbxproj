@@ -316,18 +316,18 @@
 		B82A150A20F849930098A509 /* js_bridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B82A149820F849920098A509 /* js_bridge.cpp */; };
 		B82A150B20F849930098A509 /* measure_func_adapter.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A149A20F849920098A509 /* measure_func_adapter.h */; };
 		B82A150C20F849930098A509 /* measure_func_adapter.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A149A20F849920098A509 /* measure_func_adapter.h */; };
-		B82A150D20F849930098A509 /* style.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A149B20F849920098A509 /* style.h */; };
-		B82A150E20F849930098A509 /* style.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A149B20F849920098A509 /* style.h */; };
+		B82A150D20F849930098A509 /* style.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A149B20F849920098A509 /* style.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B82A150E20F849930098A509 /* style.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A149B20F849920098A509 /* style.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B82A150F20F849930098A509 /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B82A149C20F849920098A509 /* style.cpp */; };
 		B82A151020F849930098A509 /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B82A149C20F849920098A509 /* style.cpp */; };
 		B82A151120F849930098A509 /* layout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B82A149D20F849920098A509 /* layout.cpp */; };
 		B82A151220F849930098A509 /* layout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B82A149D20F849920098A509 /* layout.cpp */; };
 		B82A151320F849930098A509 /* measure_func_adapter_impl_android.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A149E20F849920098A509 /* measure_func_adapter_impl_android.h */; };
 		B82A151420F849930098A509 /* measure_func_adapter_impl_android.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A149E20F849920098A509 /* measure_func_adapter_impl_android.h */; };
-		B82A151520F849930098A509 /* layout.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A149F20F849920098A509 /* layout.h */; };
-		B82A151620F849930098A509 /* layout.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A149F20F849920098A509 /* layout.h */; };
-		B82A151720F849930098A509 /* flex_enum.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A14A020F849920098A509 /* flex_enum.h */; };
-		B82A151820F849930098A509 /* flex_enum.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A14A020F849920098A509 /* flex_enum.h */; };
+		B82A151520F849930098A509 /* layout.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A149F20F849920098A509 /* layout.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B82A151620F849930098A509 /* layout.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A149F20F849920098A509 /* layout.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B82A151720F849930098A509 /* flex_enum.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A14A020F849920098A509 /* flex_enum.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B82A151820F849930098A509 /* flex_enum.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A14A020F849920098A509 /* flex_enum.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B82A151920F849930098A509 /* render_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B82A14A320F849920098A509 /* render_page.cpp */; };
 		B82A151A20F849930098A509 /* render_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B82A14A320F849920098A509 /* render_page.cpp */; };
 		B82A151B20F849930098A509 /* render_page.h in Headers */ = {isa = PBXBuildFile; fileRef = B82A14A420F849920098A509 /* render_page.h */; };
@@ -516,6 +516,7 @@
 		C4F012831E1502E9003378D0 /* WXWebSocketModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C4F012811E1502E9003378D0 /* WXWebSocketModule.m */; };
 		C4F012861E150307003378D0 /* WXWebSocketLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = C4F012841E150307003378D0 /* WXWebSocketLoader.h */; };
 		C4F012871E150307003378D0 /* WXWebSocketLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = C4F012851E150307003378D0 /* WXWebSocketLoader.m */; };
+		D0E6624F20FDD1BC00AF8914 /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; };
 		D312CE3B1C730DEB00046D68 /* WXWebComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = D312CE391C730DEB00046D68 /* WXWebComponent.h */; };
 		D312CE3C1C730DEB00046D68 /* WXWebComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = D312CE3A1C730DEB00046D68 /* WXWebComponent.m */; };
 		D317338C1C57257000BB7539 /* WXTransform.h in Headers */ = {isa = PBXBuildFile; fileRef = D317338A1C57257000BB7539 /* WXTransform.h */; };
@@ -1295,13 +1296,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		17B12228209170CF00387E33 /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 		2A42AF861C23B33E00818EA6 /* WeexSDK_MTL */ = {
 			isa = PBXGroup;
 			children = (
@@ -1511,8 +1505,7 @@
 				745B2D661E5A8E1E0092D38A /* WXSectionDataController.h */,
 				745B2D671E5A8E1E0092D38A /* WXSectionDataController.m */,
 			);
-			name = Recycler;
-			path = Grid;
+			path = Recycler;
 			sourceTree = "<group>";
 		};
 		74EF31C11DE6932900667A07 /* handler */ = {
@@ -1542,7 +1535,6 @@
 				DCA445261EFA555400D0CFA8 /* WeexSDK-Dynamic */,
 				77D160FE1C02DBE70010B15B /* Products */,
 				A5818E244F9E235722E3B938 /* Frameworks */,
-				17B12228209170CF00387E33 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2154,7 +2146,10 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B82A151720F849930098A509 /* flex_enum.h in Headers */,
+				B82A150D20F849930098A509 /* style.h in Headers */,
 				B82A157F20F849930098A509 /* render_factory_interface.h in Headers */,
+				B82A151520F849930098A509 /* layout.h in Headers */,
 				7408C48E1CFB345D000BCCD0 /* WXComponent+Events.h in Headers */,
 				B82A157D20F849930098A509 /* render_cell_factory.h in Headers */,
 				775BEE711C1BD977008D1629 /* WXModuleProtocol.h in Headers */,
@@ -2261,13 +2256,10 @@
 				59A5962F1CB632050012CD52 /* WXBaseViewController.h in Headers */,
 				74AD99841D5B0E59008F0336 /* WXPolyfillSet.h in Headers */,
 				74A4BA961CB365D100195969 /* WXAppConfiguration.h in Headers */,
-				B82A150D20F849930098A509 /* style.h in Headers */,
-				B82A151520F849930098A509 /* layout.h in Headers */,
 				7461F8921CFB373100F62D44 /* WXLayer.h in Headers */,
 				594C28931CF9E61A009793A4 /* WXAnimationModule.h in Headers */,
 				B82A156320F849930098A509 /* render_object.h in Headers */,
 				745B2D701E5A8E1E0092D38A /* WXSectionDataController.h in Headers */,
-				B82A151720F849930098A509 /* flex_enum.h in Headers */,
 				B82A152D20F849930098A509 /* render_action_createfinish.h in Headers */,
 				B82A14E920F849930098A509 /* TimeUtils.h in Headers */,
 				B82A156B20F849930098A509 /* render_text_factory.h in Headers */,
@@ -2375,7 +2367,10 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B82A151820F849930098A509 /* flex_enum.h in Headers */,
+				B82A150E20F849930098A509 /* style.h in Headers */,
 				DCA445D21EFA594600D0CFA8 /* WXComponent+Display.h in Headers */,
+				B82A151620F849930098A509 /* layout.h in Headers */,
 				DCA445A81EFA572B00D0CFA8 /* WXResourceResponse.h in Headers */,
 				B82A150420F849930098A509 /* js_bridge.h in Headers */,
 				DCA445BC1EFA57B000D0CFA8 /* WXConvert.h in Headers */,
@@ -2453,6 +2448,7 @@
 				B85CA71A20EBAA8100D98412 /* WsonParser.h in Headers */,
 				B82A159720F84AF60098A509 /* WXRecyclerComponent.h in Headers */,
 				B82A150620F849930098A509 /* wx_type_define.h in Headers */,
+				D0E6624F20FDD1BC00AF8914 /* WXRecyclerComponent.h in Headers */,
 				DCA445CD1EFA592E00D0CFA8 /* WXComponent+Events.h in Headers */,
 				B82A14F020F849930098A509 /* CoreConstants.h in Headers */,
 				B82A152C20F849930098A509 /* render_action_update_style.h in Headers */,
@@ -2508,7 +2504,6 @@
 				74B81AE51F73C3E900D3A61D /* WXRecycleListDataManager.h in Headers */,
 				DCA445F21EFA5A2300D0CFA8 /* WXHeaderComponent.h in Headers */,
 				DCA445DD1EFA59B300D0CFA8 /* WXRecyclerUpdateController.h in Headers */,
-				B82A150E20F849930098A509 /* style.h in Headers */,
 				DCA4461E1EFA5AAF00D0CFA8 /* WXComponentFactory.h in Headers */,
 				DCA445F41EFA5A2800D0CFA8 /* WXNavigationDefaultImpl.h in Headers */,
 				DCA445E51EFA59E100D0CFA8 /* WXDivComponent.h in Headers */,
@@ -2517,11 +2512,9 @@
 				DCA4461D1EFA5AAA00D0CFA8 /* WXHandlerFactory.h in Headers */,
 				DCA445EE1EFA5A1500D0CFA8 /* WXWebComponent.h in Headers */,
 				DCA4460D1EFA5A7900D0CFA8 /* WXThreadSafeMutableArray.h in Headers */,
-				B82A151620F849930098A509 /* layout.h in Headers */,
 				B82A157020F849930098A509 /* render_type.h in Headers */,
 				B82A150220F849930098A509 /* bridge.h in Headers */,
 				74B81AE31F73C3E300D3A61D /* WXRecycleListComponent.h in Headers */,
-				B82A151820F849930098A509 /* flex_enum.h in Headers */,
 				DCA445DA1EFA59A600D0CFA8 /* WXMultiColumnLayout.h in Headers */,
 				B85CA71820EBAA8100D98412 /* WsonObject.h in Headers */,
 				DCA445E01EFA59CD00D0CFA8 /* WXLoadingIndicator.h in Headers */,
@@ -2671,7 +2664,7 @@
 		77D160F41C02DBE70010B15B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = taobao;
 				TargetAttributes = {
 					2A42AF841C23B33E00818EA6 = {
@@ -2775,7 +2768,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = ". \"${PROJECT_DIR}/buildScripts.sh\"\n\ngenerateSDKHeader 'WeexSDK'";
+			shellScript = ". \"${PROJECT_DIR}/buildScripts.sh\"\n\ngenerateSDKHeader 'WeexSDK'\n";
 		};
 		DCA445C81EFA584000D0CFA8 /* Generate WeexSDK.h */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3268,14 +3261,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = NO;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -3328,14 +3321,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = NO;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -3396,6 +3389,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/WeexSDK/Dependency",
 					"$(PROJECT_DIR)/../../weex_core/Source",
+					"$(PROJECT_DIR)/../../weex_core/Source/core/layout",
 				);
 				INFOPLIST_FILE = WeexSDK/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -3445,6 +3439,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/WeexSDK/Dependency",
 					"$(PROJECT_DIR)/../../weex_core/Source",
+					"$(PROJECT_DIR)/../../weex_core/Source/core/layout",
 				);
 				INFOPLIST_FILE = WeexSDK/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -3491,7 +3486,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "WeexSDK/Sources/Supporting Files/WeexSDK-Prefix.pch";
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../weex_core/Source";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../weex_core/Source",
+					"$(PROJECT_DIR)/../../weex_core/Source/core/layout",
+				);
 				INFOPLIST_FILE = "WeexSDK-Dynamic/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -3529,7 +3527,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "WeexSDK/Sources/Supporting Files/WeexSDK-Prefix.pch";
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../weex_core/Source";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../weex_core/Source",
+					"$(PROJECT_DIR)/../../weex_core/Source/core/layout",
+				);
 				INFOPLIST_FILE = "WeexSDK-Dynamic/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;

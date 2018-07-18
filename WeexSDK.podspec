@@ -50,10 +50,7 @@ Pod::Spec.new do |s|
                     'weex_core/Source/core/**/*.{h,m,mm,c,cpp}',
                     'weex_core/Source/wson/**/*.{h,m,mm,c,cpp}'
 
-    w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '"weex_core/Source/base/.."/**' }
-    w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '"weex_core/Source/core/.."/**' }   
-    w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '"weex_core/Source/wson/.."/**' }
-    w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '"weex_core/Source/iOS/.."/**' }
+    w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => ['${PODS_ROOT}/Headers/Public/WeexSDK/core/**'] }
     w.header_mappings_dir = 'weex_core/Source'
 
     w.libraries = "stdc++"

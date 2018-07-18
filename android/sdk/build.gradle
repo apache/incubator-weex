@@ -109,7 +109,7 @@ android {
         buildConfigField "long", "X86_Size", "${X86_Size}"
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
-        minSdkVersion 14
+        minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
 
         multiDexEnabled true

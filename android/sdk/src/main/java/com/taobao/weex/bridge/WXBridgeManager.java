@@ -396,6 +396,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     m.sendToTarget();
   }
 
+  public void postDelay(Runnable r,long delayMillis){
+    if (mJSHandler == null) {
+      return;
+    }
+    mJSHandler.postDelayed(WXThread.secure(r),delayMillis);
+  }
+
   void setTimeout(String callbackId, String time) {
     Message message = Message.obtain();
     message.what = WXJSBridgeMsgType.SET_TIMEOUT;

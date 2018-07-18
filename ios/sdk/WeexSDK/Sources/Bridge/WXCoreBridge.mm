@@ -55,7 +55,11 @@ namespace WeexCore
         
         NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:map->size()];
         for (auto it = map->begin(); it != map->end(); it ++) {
-            [result setObject:NSSTRING(it->second.c_str()) forKey:NSSTRING(it->first.c_str())];
+            NSString* object = NSSTRING(it->second.c_str());
+            if ([WXUtility isStringPossiblelyJSONContainer:object]) {
+                object = [WXUtility objectFromJSON:object];
+            }
+            [result setObject:object forKey:NSSTRING(it->first.c_str())];
         }
         return result;
     }
@@ -67,7 +71,11 @@ namespace WeexCore
         
         NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:vec->size()];
         for (auto& p : *vec) {
-            [result setObject:NSSTRING(p.second.c_str()) forKey:NSSTRING(p.first.c_str())];
+            NSString* object = NSSTRING(p.second.c_str());
+            if ([WXUtility isStringPossiblelyJSONContainer:object]) {
+                object = [WXUtility objectFromJSON:object];
+            }
+            [result setObject:object forKey:NSSTRING(p.first.c_str())];
         }
         return result;
     }
@@ -79,7 +87,11 @@ namespace WeexCore
         
         NSMutableArray* result = [[NSMutableArray alloc] initWithCapacity:set->size()];
         for (auto& s : *set) {
-            [result addObject:NSSTRING(s.c_str())];
+            NSString* object = NSSTRING(s.c_str());
+            if ([WXUtility isStringPossiblelyJSONContainer:object]) {
+                object = [WXUtility objectFromJSON:object];
+            }
+            [result addObject:object];
         }
         return result;
     }

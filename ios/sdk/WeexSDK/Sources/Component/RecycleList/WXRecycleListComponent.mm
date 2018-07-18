@@ -454,19 +454,11 @@ WX_EXPORT_METHOD(@selector(setListData:))
              animation:(BOOL)animation
 {
     if (![newData isKindOfClass:[NSArray class]]) {
-#ifdef WX_IMPORT_WEEXCORE
-        if ([WXUtility isStringPossiblelyJSONContainer:newData]) {
-            // try convert json data to array
-            newData = [WXUtility objectFromJSON:(NSString *)newData];
+        WXLogError(@"wrong format of list data:%@", newData);
+        if (completion) {
+            completion(NO);
         }
-#endif
-        if (![newData isKindOfClass:[NSArray class]]) {
-            WXLogError(@"wrong format of list data:%@", newData);
-            if (completion) {
-                completion(NO);
-            }
-            return;
-        }
+        return;
     }
     
     NSArray *oldData = [_dataManager data];

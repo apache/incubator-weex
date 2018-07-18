@@ -361,8 +361,13 @@
     _jsContext[@"callNative"] = ^JSValue* (JSValue *instance, JSValue *tasks, JSValue *callback) {
         NSString *instanceId = [instance toString];
         NSArray *tasksArray = [tasks toArray];
+        NSString* tasksJson = [WXUtility JSONString:tasksArray];
+        if (tasksJson == nil) {
+            return [JSValue valueWithInt32:-1 inContext:[JSContext currentContext]];
+        }
+        
         NSString *callbackId = [callback toString];
-        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallNative([instanceId UTF8String], [[WsonObject fromObject:tasksArray] data], [callbackId UTF8String]);
+        WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallNative([instanceId UTF8String], [tasksJson UTF8String], [callbackId UTF8String]);
         return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
     

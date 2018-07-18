@@ -21,11 +21,11 @@
 #import "WXSDKInstance.h"
 #import "WXUtility.h"
 
-#include <core/layout/layout.h>
-
 #define FlexUndefined NAN
 
 #ifdef __cplusplus
+#include "layout.h"
+
 extern "C" {
 #endif
     bool flexIsUndefined(float value);

@@ -569,16 +569,6 @@ static NSThread *WXComponentThread;
     NSMutableDictionary *bindingAttributesOrStyles = [NSMutableDictionary dictionary];
     
     [attributesOrStyles enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull attributeOrStyleName, id  _Nonnull attributeOrStyle, BOOL * _Nonnull stop) {
-#ifdef WX_IMPORT_WEEXCORE
-        if ([WXUtility isStringPossiblelyJSONContainer:attributeOrStyle]) {
-            // try parse json object
-            id jsonAttrOrStyle = [WXUtility objectFromJSON:attributeOrStyle];
-            if (jsonAttrOrStyle != nil) {
-                attributeOrStyle = jsonAttrOrStyle;
-            }
-        }
-#endif
-        
         if ([WXBindingMatchIdentify isEqualToString:attributeOrStyleName] // match
             ||  [WXBindingRepeatIdentify isEqualToString:attributeOrStyleName] // repeat
             ||  [WXBindingOnceIdentify isEqualToString:attributeOrStyleName] // once
@@ -589,16 +579,6 @@ static NSThread *WXComponentThread;
             // {"attributeOrStyleName":[..., "string", {"@binding":"bindingExpression"}, "string", {"@binding":"bindingExpression"}, ...]
             __block BOOL isBinding = NO;
             [attributeOrStyle enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-#ifdef WX_IMPORT_WEEXCORE
-                if ([WXUtility isStringPossiblelyJSONContainer:obj]) {
-                    // try parse json object
-                    id jsonObj = [WXUtility objectFromJSON:obj];
-                    if (jsonObj != nil) {
-                        obj = jsonObj;
-                    }
-                }
-#endif
-                
                 if ([obj isKindOfClass:[NSDictionary class]] && obj[WXBindingIdentify]) {
                     isBinding = YES;
                     *stop = YES;
@@ -623,16 +603,6 @@ static NSThread *WXComponentThread;
     NSMutableArray *newEvents = [events mutableCopy];
     NSMutableDictionary *bindingEvents = [NSMutableDictionary dictionary];
     [events enumerateObjectsUsingBlock:^(id  _Nonnull event, NSUInteger idx, BOOL * _Nonnull stop) {
-#ifdef WX_IMPORT_WEEXCORE
-        if ([WXUtility isStringPossiblelyJSONContainer:event]) {
-            // try parse json object
-            id jsonObj = [WXUtility objectFromJSON:event];
-            if (jsonObj != nil) {
-                event = jsonObj;
-            }
-        }
-#endif
-        
         if ([event isKindOfClass:[NSDictionary class]] && event[@"type"] && event[@"params"]) {
             NSString *eventName = event[@"type"];
             NSString *bindingParams = event[@"params"];
@@ -652,19 +622,7 @@ static NSThread *WXComponentThread;
         NSMutableDictionary *newAttributes = [attributes mutableCopy];
         [newAttributes removeObjectForKey:@"@componentProps"];
         *attributesPoint = newAttributes;
-#ifdef WX_IMPORT_WEEXCORE
-        id compProps = attributes[@"@componentProps"];
-        if ([WXUtility isStringPossiblelyJSONContainer:compProps]) {
-            // try parse json object
-            id jsonObj = [WXUtility objectFromJSON:compProps];
-            if (jsonObj != nil) {
-                compProps = jsonObj;
-            }
-        }
-        return compProps;
-#else
         return attributes[@"@componentProps"];
-#endif
     }
     
     return nil;

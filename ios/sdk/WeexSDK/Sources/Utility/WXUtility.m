@@ -292,37 +292,43 @@ CGFloat WXFloorPixelValue(CGFloat value)
 {
     if(!object) return nil;
     
-    NSError *error = nil;
-    if([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]){
-        NSData *data = [NSJSONSerialization dataWithJSONObject:object
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
-        if (error) {
-            WXLogError(@"%@", [error description]);
-            return nil;
-        }
-        
-        return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    @try {
     
-    } else if ([object isKindOfClass:[NSString class]]) {
-        NSArray *array = @[object];
-        NSData *data = [NSJSONSerialization dataWithJSONObject:array
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
-        if (error) {
-            WXLogError(@"%@", [error description]);
+        NSError *error = nil;
+        if ([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]) {
+            NSData *data = [NSJSONSerialization dataWithJSONObject:object
+                                                           options:NSJSONWritingPrettyPrinted
+                                                             error:&error];
+            if (error) {
+                WXLogError(@"%@", [error description]);
+                return nil;
+            }
+            
+            return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        
+        } else if ([object isKindOfClass:[NSString class]]) {
+            NSArray *array = @[object];
+            NSData *data = [NSJSONSerialization dataWithJSONObject:array
+                                                           options:NSJSONWritingPrettyPrinted
+                                                             error:&error];
+            if (error) {
+                WXLogError(@"%@", [error description]);
+                return nil;
+            }
+            
+            NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            if (string.length <= 4) {
+                WXLogError(@"json convert length less than 4 chars.");
+                return nil;
+            }
+            
+            return [string substringWithRange:NSMakeRange(2, string.length - 4)];
+        } else {
+            WXLogError(@"object isn't avaliable class");
             return nil;
         }
         
-        NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if (string.length <= 4) {
-            WXLogError(@"json convert length less than 4 chars.");
-            return nil;
-        }
-        
-        return [string substringWithRange:NSMakeRange(2, string.length - 4)];
-    } else {
-        WXLogError(@"object isn't avaliable class");
+    } @catch (NSException *exception) {
         return nil;
     }
 }
