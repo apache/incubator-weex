@@ -1362,6 +1362,7 @@
 				742AD7391DF98C8B007DC46C /* WXResourceLoader.m */,
 			);
 			name = Loader;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		745ED2D31C5F2C7E002DB5A8 /* View */ = {
@@ -1559,6 +1560,7 @@
 		77D160FF1C02DBE70010B15B /* WeexSDK */ = {
 			isa = PBXGroup;
 			children = (
+				B82A148120F849800098A509 /* WeexCore */,
 				77D161171C02DCB90010B15B /* Resources */,
 				77D161181C02DCB90010B15B /* Sources */,
 			);
@@ -1581,10 +1583,8 @@
 			isa = PBXGroup;
 			children = (
 				DCA446261EFA5DAF00D0CFA8 /* WeexSDK.h */,
-				B82A148120F849800098A509 /* WeexCore */,
-				C4F012711E1502A6003378D0 /* WebSocket */,
 				2AF626C61C191E2200E71A38 /* Layout */,
-				742AD7371DF98C72007DC46C /* Loader */,
+				C4F012711E1502A6003378D0 /* WebSocket */,
 				7408C48B1CFB345D000BCCD0 /* Events */,
 				7461F88B1CFB373100F62D44 /* Display */,
 				74A4BA581CABBBA300195969 /* Debug */,
@@ -1891,6 +1891,7 @@
 				B82A14E120F849920098A509 /* wson */,
 			);
 			name = WeexCore;
+			path = Sources;
 			sourceTree = "<group>";
 		};
 		B82A148220F849920098A509 /* base */ = {
@@ -2121,6 +2122,7 @@
 		C4F012711E1502A6003378D0 /* WebSocket */ = {
 			isa = PBXGroup;
 			children = (
+				742AD7371DF98C72007DC46C /* Loader */,
 				C4F012761E1502A6003378D0 /* WXWebSocketHandler.h */,
 			);
 			path = WebSocket;

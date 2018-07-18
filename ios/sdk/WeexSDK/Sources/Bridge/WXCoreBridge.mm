@@ -127,8 +127,22 @@ namespace WeexCore
     
     int WXCoreBridge::callNative(const char* pageId, const char *task, const char *callback)
     {
-        // should not enter this function
-        assert(false);
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        if (page == nullptr) {
+            return -1;
+        }
+        
+        long long startTime = getCurrentTime();
+        
+        NSString* ns_instanceId = NSSTRING(pageId);
+        NSString* ns_task = NSSTRING(task);
+        NSString* ns_callback = NSSTRING(callback);
+        NSArray* ns_taskArray = [WXUtility objectFromJSON:ns_task];
+        
+        [[WXBridgeManager sharedManager].bridgeCtx invokeNative:ns_instanceId tasks:ns_taskArray callback:ns_callback];
+        
+        page->CallBridgeTime(getCurrentTime() - startTime);
+        return 0;
     }
     
     void* WXCoreBridge::callNativeModule(const char* pageId, const char *module, const char *method,
