@@ -101,99 +101,6 @@ struct ASTParser final {
 
         return fail("parse error:" + to_string(error));
     }
-    Handle<Expression> parseBinaryExpression(Json &json) {
-        Handle<Expression> binaryExpr = nullptr;
-        do {
-            static Token::Type type[] = { Token::EQ, Token::NE, Token::EQ_STRICT, Token::NE_STRICT, Token::LT, Token::GT, Token::LTE, Token::GTE };
-            if (!json.is_string()) {
-                break;
-            }
-            std::string content = json.string_value();
-            std::size_t found = std::string::npos;
-            Token::Type token = Token::UNDEFINED;
-            for (int i = 0; i < sizeof(type) / sizeof(type[0]); i++) {
-                found = content.find(Token::String(type[i]));
-                if (found != std::string::npos) {
-                    token = type[i];
-                    break;
-                }
-            }
-            if (found != std::string::npos) {
-                std::string content_lhs = content.substr(0, found);
-                std::string content_rhs = content.substr(found + 1);
-                Handle<Identifier> lhs = factory_->NewIdentifier(json, content_lhs);
-                Handle<Identifier> rhs = factory_->NewIdentifier(json, content_rhs);
-                BinaryOperation opera = BinaryOperation::kUndefine;
-                switch (token) {
-                    case Token::EQ:
-                        opera = BinaryOperation::kEqual;
-                        break;
-                    case Token::NE:
-                        opera = BinaryOperation::kNotEqual;
-                        break;
-                    case Token::EQ_STRICT:
-                        opera = BinaryOperation::kStrictEqual;
-                        break;
-                    case Token::NE_STRICT:
-                        opera = BinaryOperation::kStrictNotEqual;
-                        break;
-                    case Token::LT:
-                        opera = BinaryOperation::kLessThan;
-                        break;
-                    case Token::GT:
-                        opera = BinaryOperation::kGreaterThan;
-                        break;
-                    case Token::LTE:
-                        opera = BinaryOperation::kLessThanEqual;
-                        break;
-                    case Token::GTE:
-                        opera = BinaryOperation::kGreaterThanEqual;
-                        break;
-                    default:
-                        break;
-                }
-                if (opera != BinaryOperation::kUndefine) {
-                    binaryExpr = factory_->NewBinaryExpression(json, opera, lhs, rhs);
-                }
-            }
-
-        } while (0);
-
-        return binaryExpr;
-    }
-    Handle<Expression> parseRHSExpression(Json &json) {
-        Handle<Expression> rhsExpr = nullptr;
-        do {
-            std::string content = json.string_value();
-            std::size_t found = content.find(Token::String(Token::PERIOD));
-            std::size_t pos = 0;
-            do {
-                if (found == std::string::npos) {
-                    break;
-                }
-                std::size_t next_found = content.find(Token::String(Token::PERIOD), found + 1);
-                if (rhsExpr) {
-                    Handle<Identifier> rhs_idt = factory_->NewIdentifier(json, content.substr(found + 1, next_found == std::string::npos ? content.length() - found : next_found - found));
-                    rhsExpr = factory_->NewMemberExpression(json, MemberAccessKind::kDot, rhsExpr, rhs_idt);
-                }
-                else {
-                    Handle<Identifier> lhs_idt = factory_->NewIdentifier(json, content.substr(pos, found));
-                    Handle<Identifier> rhs_idt = factory_->NewIdentifier(json, content.substr(found + 1, next_found == std::string::npos ? content.length() - found : next_found - found));
-                    rhsExpr = factory_->NewMemberExpression(json, MemberAccessKind::kDot, lhs_idt, rhs_idt);
-                }
-                pos = found + 1;
-                found = next_found;
-
-            } while (true);
-
-            if (!pos) {
-                rhsExpr = factory_->NewIdentifier(json, content);
-            }
-
-        } while (0);
-
-        return rhsExpr;
-    }
     Handle<Expression> parseIfControl(Json &json) {
         Handle<Expression> ifExpr = nullptr;
         do {
@@ -201,10 +108,7 @@ struct ASTParser final {
             if (!match.is_string()) {
                 break;
             }
-            Handle<Expression> expr = parseBinaryExpression(match);
-            if (!expr) {
-                expr = parseRHSExpression(match);
-            }
+            Handle<Expression> expr = ExpressionParser::ParseExpressionByString(match.string_value());
             Handle<Expression> ifBlock = MakeHandle<BlockStatement>(json, factory_->NewExpressionList());
             ifExpr = factory_->NewIfStatement(match, expr, ifBlock);
             Handle<BlockStatement>statement = stacks_[stacks_.size() - 1];
@@ -331,37 +235,24 @@ struct ASTParser final {
             }
             Json attributes = json["attributes"];
             if (attributes.is_object()) {
-                if(true) { //todo test only
-                    auto items = attributes.object_items();
-                    for (auto it = items.begin(); it != items.end(); ++it) {
-                        const auto& key = it->first;
-                        const auto& value = it->second;
-                        std::vector<Handle<Expression>> args;
-                        args.push_back(factory_->NewStringConstant(json, nodeId.string_value()));
-                        args.push_back(factory_->NewStringConstant(json, key));
-                        if (value.is_string()){
-                            args.push_back(factory_->NewStringConstant(json, value.string_value()));
-                        } else{
-                            args.push_back(parseBindingExpression(value));
-                        }
-
-                        Handle<Expression> setAttrFunc = factory_->NewIdentifier(json, "setAttr");
-                        Handle<CallExpression> callFunc = factory_->NewCallExpression(
-                           json, setAttrFunc, args);
-                        Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
-                        statement->PushExpression(callFunc);
-                    }
-                } else {
-                  Handle<Expression> attrExpr = parseExpression(attributes);
-                  if (attrExpr) {
-                    Handle<Expression> func = factory_->NewIdentifier(json, "setAttr");
+                auto items = attributes.object_items();
+                for (auto it = items.begin(); it != items.end(); ++it) {
+                    const auto& key = it->first;
+                    const auto& value = it->second;
                     std::vector<Handle<Expression>> args;
-                    args.push_back(attrExpr);
-                    Handle<CallExpression> callExpr = factory_->NewCallExpression(attributes, func,
-                                                                                  args);
+                    args.push_back(factory_->NewStringConstant(json, nodeId.string_value()));
+                    args.push_back(factory_->NewStringConstant(json, key));
+                    if (value.is_string()){
+                        args.push_back(factory_->NewStringConstant(json, value.string_value()));
+                    } else{
+                        args.push_back(parseBindingExpression(value));
+                    }
+
+                    Handle<Expression> setAttrFunc = factory_->NewIdentifier(json, "setAttr");
+                    Handle<CallExpression> callFunc = factory_->NewCallExpression(
+                       json, setAttrFunc, args);
                     Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
-                    statement->PushExpression(callExpr);
-                  }
+                    statement->PushExpression(callFunc);
                 }
             }
             Json childs = json["childNodes"];
@@ -395,91 +286,6 @@ struct ASTParser final {
         stacks_.pop_back();
         return succ;
     }
-    Handle<Expression> parseArrayExpression(Json &json) {
-        Handle<Expression> expr = nullptr;
-        do {
-            if (!json.array_items().size()) {
-                break;
-            }
-            ProxyArray proxyArray;
-            for (int i = 0; i < json.array_items().size(); i++) {
-                Json item = json[i];
-                Handle<Expression> itemExpr = parseExpression(item);
-                if (itemExpr) {
-                    proxyArray.push_back(itemExpr);
-                }
-            }
-
-        } while (0);
-
-        return expr;
-    }
-    Handle<Expression> parseObjExpression(Json &json) {
-        Handle<Expression> expr = nullptr;
-        std::map<std::string, Json>obj = json.object_items();
-        do {
-            if (!obj.size()) {
-                break;
-            }
-            ProxyObject proxyObj;
-            for (std::map<std::string, Json>::iterator iter = obj.begin();iter != obj.end(); iter++) {
-                if (iter->second.is_object()) {
-                    Handle<Expression> objExpr = parseObjExpression(iter->second);
-                    if (objExpr) {
-                        proxyObj.insert(std::make_pair(iter->first, objExpr));
-                    }
-                }
-                else if (iter->second.is_array()) {
-                    Handle<Expression> arrayExpr = parseArrayExpression(iter->second);
-                    if (arrayExpr) {
-                        proxyObj.insert(std::make_pair(iter->first, arrayExpr));
-                    }
-                }
-                else if (iter->second.is_string()) {
-                    if (iter->first == "@binding") {
-                        std::string strval = iter->second.string_value();
-                        std::size_t found = strval.find('.');
-                        if (found != std::string::npos) {
-                            std::string strlhs = strval.substr(0, found);
-                            std::string strrhs = strval.substr(found + 1);
-                            Handle<Identifier> lhs = factory_->NewIdentifier(json, strlhs);
-                            Handle<Identifier> rhs = factory_->NewIdentifier(json, strrhs);
-                            Handle<Expression> bindingExpr = factory_->NewMemberExpression(json, MemberAccessKind::kDot, lhs, rhs);
-                            return bindingExpr;
-                        }
-                        else {
-                            return factory_->NewIdentifier(json, strval);
-                        }
-                    }
-                    else {
-                        proxyObj.insert(std::make_pair(iter->first, factory_->NewStringConstant(json, iter->second.string_value())));
-                    }
-                }
-                else {
-                    assert(0);
-                }
-            }
-            expr = factory_->NewObjectConstant(json, proxyObj);
-
-        } while (0);
-
-        return expr;
-    }
-    Handle<Expression> parseExpression(Json &json) {
-        Handle<Expression> expr = nullptr;
-        do {
-            if (json.is_object()) {
-                expr = parseObjExpression(json);
-                break;
-            }
-            else if (json.is_array()) {
-                expr = parseArrayExpression(json);
-                break;
-            }
-
-        } while (0);
-        return expr;
-    };
 };
 }
 
