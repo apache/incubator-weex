@@ -195,22 +195,22 @@ public class WXWebView implements IWebView {
         mOnMessageListener = listener;
     }
 
-    private void showProgressBar(boolean shown) {
+    protected void showProgressBar(boolean shown) {
         if (mShowLoading) {
             mProgressBar.setVisibility(shown ? View.VISIBLE : View.GONE);
         }
     }
 
-    private void showWebView(boolean shown) {
+    protected void showWebView(boolean shown) {
         mWebView.setVisibility(shown ? View.VISIBLE : View.INVISIBLE);
     }
 
-    private @Nullable WebView getWebView() {
+    protected @Nullable WebView getWebView() {
         //TODO: remove this, duplicate with getView semantically.
         return mWebView;
     }
 
-    private void initWebView(WebView wv) {
+    protected void initWebView(WebView wv) {
         WebSettings settings = wv.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setAppCacheEnabled(true);
@@ -219,101 +219,8 @@ public class WXWebView implements IWebView {
         settings.setSupportZoom(false);
         settings.setBuiltInZoomControls(false);
         settings.setAllowFileAccess(false);
-        wv.setWebViewClient(new WebViewClient() {
-
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                WXLogUtils.v("tag", "onPageOverride " + url);
-                return true;
-            }
-
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
-                WXLogUtils.v("tag", "onPageStarted " + url);
-                if (mOnPageListener != null) {
-                    mOnPageListener.onPageStart(url);
-                }
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                WXLogUtils.v("tag", "onPageFinished " + url);
-                if (mOnPageListener != null) {
-                    mOnPageListener.onPageFinish(url, view.canGoBack(), view.canGoForward());
-                }
-                if (mOnMessageListener != null) {
-                    evaluateJS("javascript:(window.postMessage = function(message, targetOrigin) {"
-                        + "if (message == null || !targetOrigin) return;"
-                        + (DOWNGRADE_JS_INTERFACE
-                        ? "prompt('" + BRIDGE_NAME + "://postMessage?message=' + JSON.stringify(message) + '&targetOrigin=' + targetOrigin)"
-                        : BRIDGE_NAME + ".postMessage(JSON.stringify(message), targetOrigin);")
-                        + "})");
-                }
-            }
-
-            @Override
-            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                super.onReceivedError(view, request, error);
-                if (mOnErrorListener != null) {
-                    //mOnErrorListener.onError("error", "page error code:" + error.getErrorCode() + ", desc:" + error.getDescription() + ", url:" + request.getUrl());
-                    mOnErrorListener.onError("error", "page error");
-                }
-            }
-
-            @Override
-            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
-                super.onReceivedHttpError(view, request, errorResponse);
-                if (mOnErrorListener != null) {
-                    mOnErrorListener.onError("error", "http error");
-                }
-            }
-
-            @Override
-            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                super.onReceivedSslError(view, handler, error);
-                if (mOnErrorListener != null) {
-                    mOnErrorListener.onError("error", "ssl error");
-                }
-            }
-        });
-        wv.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                super.onProgressChanged(view, newProgress);
-                showWebView(newProgress == 100);
-                showProgressBar(newProgress != 100);
-                WXLogUtils.v("tag", "onPageProgressChanged " + newProgress);
-            }
-
-            @Override
-            public void onReceivedTitle(WebView view, String title) {
-                super.onReceivedTitle(view, title);
-                if (mOnPageListener != null) {
-                    mOnPageListener.onReceivedTitle(view.getTitle());
-                }
-            }
-
-            @Override
-            public boolean onJsPrompt(WebView view, String url, String text, String defaultValue, JsPromptResult result) {
-                Uri uri = Uri.parse(text);
-                String scheme = uri.getScheme();
-                if (TextUtils.equals(scheme, BRIDGE_NAME)) {
-                    if (TextUtils.equals(uri.getAuthority(), "postMessage")) {
-                        String message = uri.getQueryParameter("message");
-                        String targetOrigin = uri.getQueryParameter("targetOrigin");
-                        onMessage(message, targetOrigin);
-                        result.confirm("success");
-                    } else {
-                        result.confirm("fail");
-                    }
-                    return true;
-                }
-                return super.onJsPrompt(view, url, text, defaultValue, result);
-            }
-        });
+        wv.setWebViewClient(new WXWebViewClient());
+        wv.setWebChromeClient(new WXWebChromeClient());
         if (!DOWNGRADE_JS_INTERFACE) {
             wv.addJavascriptInterface(new Object() {
                 @JavascriptInterface
@@ -324,7 +231,104 @@ public class WXWebView implements IWebView {
         }
     }
 
-    private void onMessage(String message, String targetOrigin) {
+    protected class WXWebViewClient extends WebViewClient {
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            WXLogUtils.v("tag", "onPageOverride " + url);
+            return true;
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+            WXLogUtils.v("tag", "onPageStarted " + url);
+            if (mOnPageListener != null) {
+                mOnPageListener.onPageStart(url);
+            }
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            WXLogUtils.v("tag", "onPageFinished " + url);
+            if (mOnPageListener != null) {
+                mOnPageListener.onPageFinish(url, view.canGoBack(), view.canGoForward());
+            }
+            if (mOnMessageListener != null) {
+                evaluateJS("javascript:(window.postMessage = function(message, targetOrigin) {"
+                        + "if (message == null || !targetOrigin) return;"
+                        + (DOWNGRADE_JS_INTERFACE
+                        ? "prompt('" + BRIDGE_NAME + "://postMessage?message=' + JSON.stringify(message) + '&targetOrigin=' + targetOrigin)"
+                        : BRIDGE_NAME + ".postMessage(JSON.stringify(message), targetOrigin);")
+                        + "})");
+            }
+        }
+
+        @Override
+        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+            super.onReceivedError(view, request, error);
+            if (mOnErrorListener != null) {
+                //mOnErrorListener.onError("error", "page error code:" + error.getErrorCode() + ", desc:" + error.getDescription() + ", url:" + request.getUrl());
+                mOnErrorListener.onError("error", "page error");
+            }
+        }
+
+        @Override
+        public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+            super.onReceivedHttpError(view, request, errorResponse);
+            if (mOnErrorListener != null) {
+                mOnErrorListener.onError("error", "http error");
+            }
+        }
+
+        @Override
+        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+            super.onReceivedSslError(view, handler, error);
+            if (mOnErrorListener != null) {
+                mOnErrorListener.onError("error", "ssl error");
+            }
+        }
+    }
+
+    protected class WXWebChromeClient extends WebChromeClient {
+        @Override
+        public void onProgressChanged(WebView view, int newProgress) {
+            super.onProgressChanged(view, newProgress);
+            showWebView(newProgress == 100);
+            showProgressBar(newProgress != 100);
+            WXLogUtils.v("tag", "onPageProgressChanged " + newProgress);
+        }
+
+        @Override
+        public void onReceivedTitle(WebView view, String title) {
+            super.onReceivedTitle(view, title);
+            if (mOnPageListener != null) {
+                mOnPageListener.onReceivedTitle(view.getTitle());
+            }
+        }
+
+        @Override
+        public boolean onJsPrompt(WebView view, String url, String text, String defaultValue, JsPromptResult result) {
+            Uri uri = Uri.parse(text);
+            String scheme = uri.getScheme();
+            if (TextUtils.equals(scheme, BRIDGE_NAME)) {
+                if (TextUtils.equals(uri.getAuthority(), "postMessage")) {
+                    String message = uri.getQueryParameter("message");
+                    String targetOrigin = uri.getQueryParameter("targetOrigin");
+                    onMessage(message, targetOrigin);
+                    result.confirm("success");
+                } else {
+                    result.confirm("fail");
+                }
+                return true;
+            }
+            return super.onJsPrompt(view, url, text, defaultValue, result);
+        }
+    }
+
+    protected void onMessage(String message, String targetOrigin) {
         if (message != null && targetOrigin != null && mOnMessageListener != null) {
             try {
                 Map<String, Object> initData = new HashMap<>();
@@ -341,7 +345,7 @@ public class WXWebView implements IWebView {
         }
     }
 
-    private void evaluateJS(String jsStr) {
+    protected void evaluateJS(String jsStr) {
         if (SDK_VERSION < 19) {
             mWebView.loadUrl(jsStr);
         } else {
