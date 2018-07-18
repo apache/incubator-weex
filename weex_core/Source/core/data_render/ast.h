@@ -79,7 +79,8 @@ namespace data_render {
   M(ObjectConstant)      \
   M(ArrayConstant)       \
   M(ChunkStatement)      \
-  M(ReturnStatement)
+  M(ReturnStatement)     \
+  M(ExpressionList)
 
 class ASTVisitor;
 
@@ -100,6 +101,7 @@ extern const char *type_as_string[(int)ASTNodeType::kNrType];
 class Expression : public RefCountObject {
  protected:
   Expression(Json &json) : json_(json){};
+  Expression() {};
 
  public:
   virtual ~Expression() {}
@@ -129,7 +131,7 @@ using ProxyArray = std::vector<Handle<Expression>>;
 using ProxyObject = std::map<std::string, Handle<Expression>>;
 
 // ExpressionList ::= helper class representing a list of expressions
-class ExpressionList : public RefCountObject {
+class ExpressionList : public Expression {
  public:
   using iterator = std::vector<Handle<Expression>>::iterator;
 
@@ -141,10 +143,10 @@ class ExpressionList : public RefCountObject {
 
   std::vector<Handle<Expression>> &raw_list() { return exprs_; }
 
-  ~ExpressionList() { exprs_.clear(); }
-
   iterator begin() { return exprs_.begin(); }
   iterator end() { return exprs_.end(); }
+
+  DEFINE_NODE_TYPE(ExpressionList, Expression);
 
  private:
   std::vector<Handle<Expression>> exprs_;

@@ -51,6 +51,8 @@ class CodeGenerator : public ASTVisitor {
   void Visit(ChildStatement *node, void *data) override;
   void Visit(Declaration *node, void *data) override;
   void Visit(DeclarationList *node, void *data) override;
+  void Visit(BooleanConstant *node, void *data) override;
+  void Visit(DoubleConstant *node, void *data) override;
   void Visit(IntegralConstant *node, void *data) override;
   void Visit(MemberExpression *node, void *data) override;
   void Visit(Identifier *node, void *data) override;
@@ -58,6 +60,7 @@ class CodeGenerator : public ASTVisitor {
   void Visit(ObjectConstant *node, void *data) override;
   void Visit(ArrayConstant *node, void *data) override;
   void Visit(ReturnStatement *node, void *data) override;
+  void Visit(ExpressionList *node, void *data) override;
 
  private:
   template <class T>
