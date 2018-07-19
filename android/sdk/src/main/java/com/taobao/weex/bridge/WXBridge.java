@@ -606,6 +606,14 @@ public class WXBridge implements IWXBridge {
       return;
     }
 
+    if (WXErrorCode.WX_JS_FRAMEWORK_INIT_FAILED_PARAMS_NULL.getErrorCode().equals(statusCode)) {
+      WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_JS_FRAMEWORK_INIT_FAILED_PARAMS_NULL,
+              "WeexProxy::initFromParam()",
+              WXErrorCode.WX_JS_FRAMEWORK_INIT_FAILED_PARAMS_NULL.getErrorMsg() + ": " + errorMsg,
+              null);
+      return;
+    }
+
     for (WXErrorCode e : WXErrorCode.values()) {
       if (e.getErrorType().equals(WXErrorCode.ErrorType.NATIVE_ERROR)
               && e.getErrorCode().equals(statusCode)) {
