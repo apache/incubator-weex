@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef DATA_RENDER_VNODE_VNODE_RENDER_CONTEXT_
-#define DATA_RENDER_VNODE_VNODE_RENDER_CONTEXT_
+#ifndef CORE_DATA_RENDER_VNODE_VNODE_RENDER_CONTEXT_
+#define CORE_DATA_RENDER_VNODE_VNODE_RENDER_CONTEXT_
 
-#include <string>
 #include <memory>
+#include <string>
 #include "core/data_render/json/json11.hpp"
 #include "core/data_render/vnode/vnode.h"
 
@@ -40,6 +40,7 @@ class VNodeRenderContext {
     node_map_.insert({node->ref(), node});
   }
   inline json11::Json& raw_json() { return raw_json_; }
+
  private:
   // node context
   std::string page_id_;
@@ -47,7 +48,7 @@ class VNodeRenderContext {
   std::map<std::string, VNode*> node_map_;
   json11::Json raw_json_;
 };
-}
-}
-}
-#endif
+}  // namespace data_render
+}  // namespace core
+}  // namespace weex
+#endif  // CORE_DATA_RENDER_VNODE_VNODE_RENDER_CONTEXT_

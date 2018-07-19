@@ -23,7 +23,6 @@
 #include "core/data_render/ast_factory.h"
 #include "core/data_render/statement.h"
 #include "core/data_render/expression_parser.h"
-#include "token.h"
 
 namespace weex {
 namespace core {

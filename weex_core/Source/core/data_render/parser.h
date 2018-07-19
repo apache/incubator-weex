@@ -17,9 +17,12 @@
  * under the License.
  */
 
+#ifndef CORE_DATA_RENDER_PARSER_
+#define CORE_DATA_RENDER_PARSER_
+
 #include <string>
-#include "core/data_render/statement.h"
 #include "core/data_render/ast.h"
+#include "core/data_render/statement.h"
 
 namespace weex {
 namespace core {
@@ -29,11 +32,11 @@ class ParseResult {
  public:
   friend class Parser;
 
-  ParseResult() {};
-  ParseResult(Handle<Expression> expr) : expr_(expr) {
-  };
+  ParseResult(){};
+  ParseResult(Handle<Expression> expr) : expr_(expr){};
 
   inline Handle<ChunkStatement> expr() const { return expr_; }
+
  private:
   Handle<ChunkStatement> expr_;
 };
@@ -48,12 +51,14 @@ enum ASTParseError {
 class Parser final {
  public:
   // Parse. If parse fails, return Json() and assign an error message to err.
-  static ParseResult parse(const std::string& in,
-                           std::string& err);
+  static ParseResult parse(const std::string& in, std::string& err);
+
  private:
-  Parser() {};
+  Parser(){};
 };
 
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
+
+#endif // CORE_DATA_RENDER_PARSER_

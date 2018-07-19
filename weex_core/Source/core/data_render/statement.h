@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_STATEMENT_H_
-#define WEEX_STATEMENT_H_
+#ifndef CORE_DATA_RENDER_STATEMENT_H_
+#define CORE_DATA_RENDER_STATEMENT_H_
 
 #include "ast.h"
 #include <iostream>
@@ -194,4 +194,4 @@ private:
 }  // namespace core
 }  // namespace weex
 
-#endif
+#endif // CORE_DATA_RENDER_STATEMENT_H_

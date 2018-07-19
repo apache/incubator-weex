@@ -17,22 +17,23 @@
  * under the License.
  */
 
-#ifndef DATA_RENDER_VNODE_VNODE_RENDER_MANAGER_
-#define DATA_RENDER_VNODE_VNODE_RENDER_MANAGER_
+#ifndef CORE_DATA_RENDER_VNODE_VNODE_RENDER_MANAGER_
+#define CORE_DATA_RENDER_VNODE_VNODE_RENDER_MANAGER_
 
 #include <map>
 #include <string>
 
-#include "core/render/node/render_object.h"
-#include "core/render/manager/render_manager.h"
-#include "vnode.h"
 #include "core/data_render/vm.h"
+#include "core/render/manager/render_manager.h"
+#include "core/render/node/render_object.h"
+#include "vnode.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
 
-WeexCore::RenderObject* VNode2RenderObject(const VNode* root, const std::string& page_id);
+WeexCore::RenderObject* VNode2RenderObject(const VNode* root,
+                                           const std::string& page_id);
 
 class VNodeRenderManager {
  private:
@@ -77,4 +78,4 @@ class VNodeRenderManager {
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
-#endif
+#endif  // CORE_DATA_RENDER_VNODE_VNODE_RENDER_MANAGER_

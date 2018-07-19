@@ -16,13 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef DATA_RENDER_TOKENIZER_
-#define DATA_RENDER_TOKENIZER_
+#ifndef CORE_DATA_RENDER_TOKENIZER_
+#define CORE_DATA_RENDER_TOKENIZER_
 
-
-#include "core/data_render/token.h"
-#include "core/data_render/scanner.h"
 #include "core/data_render/parse_context.h"
+#include "core/data_render/scanner.h"
+#include "core/data_render/token.h"
 
 namespace weex {
 namespace core {
@@ -56,7 +55,7 @@ class Tokenizer {
   TokenizerState* state_;
   ParserContext* context_;
 };
-}
-}
-}
-#endif
+}  // namespace data_render
+}  // namespace core
+}  // namespace weex
+#endif  // CORE_DATA_RENDER_TOKENIZER_

@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef DATA_RENDER_PARSE_CONTEXT_
-#define DATA_RENDER_PARSE_CONTEXT_
+#ifndef CORE_DATA_RENDER_PARSE_CONTEXT_
+#define CORE_DATA_RENDER_PARSE_CONTEXT_
 
 #include "core/data_render/statistics.h"
 
@@ -30,18 +30,19 @@ class ParserContextImpl;
 // class to store complete context of parser independant of
 // actual interpreter.
 class ParserContext {
-public:
-    ParserContext();
-    ~ParserContext();
+ public:
+  ParserContext();
+  ~ParserContext();
 
-    Statistics &Counters();
-private:
-    ParserContextImpl *impl_;
-    Statistics statistics_;
+  Statistics &Counters();
+
+ private:
+  ParserContextImpl *impl_;
+  Statistics statistics_;
 };
 
-}
-}
-}
+}  // namespace data_render
+}  // namespace core
+}  // namespace weex
 
-#endif
+#endif  // CORE_DATA_RENDER_PARSE_CONTEXT_

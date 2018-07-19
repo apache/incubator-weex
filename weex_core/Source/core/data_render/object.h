@@ -1,21 +1,35 @@
-//
-// Created by chad on 2018/7/18.
-//
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
-#ifndef DATA_RENDER_OBJECT_H
-#define DATA_RENDER_OBJECT_H
+#ifndef CORE_DATA_RENDER_OBJECT_H
+#define CORE_DATA_RENDER_OBJECT_H
 
-//#include <math.h>
-#include "vm.h"
-#include "string_table.h"
+#include <math.h>
+#include "core/data_render/string_table.h"
+#include "core/data_render/vm.h"
 
-#define CommonHeader GCObject* gc
-
+#define CommonHeader GCObject *gc
 
 #define LOGE(...) ((void)0)
 
-#define INT_OP(op, v1, v2) CAST_U2S((CAST_S2U(v1)) op CAST_S2U(v2))
-#define NUM_OP(op, d1, d2) ((d1) op (d2))
+#define INT_OP(op, v1, v2) CAST_U2S((CAST_S2U(v1))op CAST_S2U(v2))
+#define NUM_OP(op, d1, d2) ((d1)op(d2))
 #define MATH_OP(op) op
 #define CAST_S2U(o) ((unsigned)(o))
 #define CAST_U2S(o) ((signed)(o))
@@ -43,244 +57,170 @@ class Value;
 typedef unsigned char byte;
 
 typedef struct GCObject {
-    CommonHeader;
+  CommonHeader;
 } GCObject;
 
 typedef struct Key {
-    int next;
-    Value *val;
+  int next;
+  Value *val;
 } Key;
 
 typedef struct Node {
-    Key *key;
-    Value *val;
-    Node *next;
+  Key *key;
+  Value *val;
+  Node *next;
 } Node;
 
 typedef struct Table {
-    CommonHeader;
+  CommonHeader;
 
-    size_t sizearray;  /* size of 'array' array */
-    size_t sizenode;
-    Value *array;  /* array part */
-    int *hash;
-    Node *node;
-    std::unordered_map<std::string, Value> *map;
+  size_t sizearray; /* size of 'array' array */
+  size_t sizenode;
+  Value *array; /* array part */
+  int *hash;
+  Node *node;
+  std::unordered_map<std::string, Value> *map;
 
 } Table;
 
 typedef Value (*CFunction)(ExecState *);
 
 struct Value {
-    union {
-        GCObject *gc;
-        int64_t i;
-        double n;
-        bool b;
-        FuncState *f;
-        void *cf;
-        String *str;
-        void *cptr;  // Lifecycle is managed outside vm
-    };
+  union {
+    GCObject *gc;
+    int64_t i;
+    double n;
+    bool b;
+    FuncState *f;
+    void *cf;
+    String *str;
+    void *cptr;  // Lifecycle is managed outside vm
+  };
 
-    enum Type {
-        NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, TABLE
-    };
+  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, TABLE };
 
-    Type type;
+  Type type;
 
-    Value() : type(NIL) {}
+  Value() : type(NIL) {}
 
-    Value(int64_t value) : i(value), type(INT) {}
+  Value(int64_t value) : i(value), type(INT) {}
 
-    Value(double value) : n(value), type(NUMBER) {}
+  Value(double value) : n(value), type(NUMBER) {}
 
-    Value(bool value) : b(value), type(BOOL) {}
+  Value(bool value) : b(value), type(BOOL) {}
 
-    Value(String *value) : str(value), type(STRING) {}
+  Value(String *value) : str(value), type(STRING) {}
 
-    Value(const Value &value) {
-        type = value.type;
-        switch (type) {
-            case INT:
-                i = value.i;
-                break;
-            case NUMBER:
-                n = value.n;
-                break;
-            case BOOL:
-                b = value.b;
-                break;
-            case STRING:
-                str = value.str;
-                break;
-            case FUNC:
-                f = value.f;
-                break;
-            case CFUNC:
-                cf = value.cf;
-                break;
-            case CPTR:
-                cptr = value.cptr;
-                break;
-            default:
-                break;
-        }
+  Value(const Value &value) {
+    type = value.type;
+    switch (type) {
+      case INT:
+        i = value.i;
+        break;
+      case NUMBER:
+        n = value.n;
+        break;
+      case BOOL:
+        b = value.b;
+        break;
+      case STRING:
+        str = value.str;
+        break;
+      case FUNC:
+        f = value.f;
+        break;
+      case CFUNC:
+        cf = value.cf;
+        break;
+      case CPTR:
+        cptr = value.cptr;
+        break;
+      default:
+        break;
     }
+  }
 
-    friend bool operator==(const Value &left, const Value &right) {
-        if (left.type != right.type) return false;
-        switch (left.type) {
-            case NIL:
-                return true;
-            case INT:
-                return left.i == right.i;
-            case NUMBER:
-                return fabs(left.n - right.n) < 0.000001;
-            case BOOL:
-                return left.b == right.b;
-            case STRING:
-                return left.str == right.str;
-            case FUNC:
-                return left.f == right.f;
-            case CFUNC:
-                return left.cf == right.cf;
-            case CPTR:
-                return left.cptr == right.cptr;
-            default:
-                break;
-        }
-        return false;
+  friend bool operator==(const Value &left, const Value &right) {
+    if (left.type != right.type) return false;
+    switch (left.type) {
+      case NIL:
+        return true;
+      case INT:
+        return left.i == right.i;
+      case NUMBER:
+        return fabs(left.n - right.n) < 0.000001;
+      case BOOL:
+        return left.b == right.b;
+      case STRING:
+        return left.str == right.str;
+      case FUNC:
+        return left.f == right.f;
+      case CFUNC:
+        return left.cf == right.cf;
+      case CPTR:
+        return left.cptr == right.cptr;
+      default:
+        break;
     }
+    return false;
+  }
 };
 
-inline double NumPow(const double &d1, const double &d2) {
-    return MATH_OP(pow)(d1, d2);
-}
+double NumPow(const double &d1, const double &d2);
 
-inline double NumIDiv(const double &d1, const double &d2) {
-    return MATH_OP(floor)(NUM_OP(/, d1, d2));
-}
+double NumIDiv(const double &d1, const double &d2);
 
-inline double NumMod(const double &d1, const double &d2) {
-    double ret = MATH_OP(fmod)(d1, d2);
-    if (ret * d2 < 0) ret += d2;
-    return ret;
-}
+double NumMod(const double &d1, const double &d2);
 
-inline bool NumEq(const double &d1, const double &d2) {
-    return d1 == d2;
-}
+bool NumEq(const double &d1, const double &d2);
 
-inline bool NumLT(const double &d1, const double &d2) {
-    return d1 < d2;
-}
+bool NumLT(const double &d1, const double &d2);
 
-inline int Number2Int(const double &n, int64_t &p) {
-    if (n >= MININTEGER && n < -MININTEGER) {
-        p = n;
-        return 1;
-    }
-    return 0;
-}
+int Number2Int(const double &n, int64_t &p);
 
+double NumUnm(const double &d);
 
-inline double NumUnm(const double &d) {
-    return -d;
-}
+int64_t ShiftLeft(const int64_t &a, const int64_t &b);
 
-inline int64_t ShiftLeft(const int64_t &a, const int64_t &b) {
-    if (b < 0) {
-        if (b <= -NUM_BITS) {
-            return 0;
-        } else {
-            return INT_OP(>>, a, b);
-        }
-    } else {
-        if (b >= NUM_BITS) {
-            return 0;
-        } else {
-            return INT_OP(<<, a, b);
-        }
-    }
-}
+bool IsInt(const Value *o);
 
-inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
+bool IsNil(const Value *o);
 
-inline bool IsNil(const Value *o) { return nullptr == o || Value::Type::NIL == o->type; }
+void SetNil(Value *o);
 
-inline void SetNil(Value *o) { if (!o) { o->type = Value::Type::NIL;} }
+int IntMod(const int &a, const int &b);
 
-inline int IntMod(const int &a, const int &b) {
-    if (CAST_S2U(b) + 1u <= 1u) {
-        if (b == 0) {
-            LOGE("Error ValueMod Values[%d, %d]", a, b);
-        }
-        return 0;
-    } else {
-        int ret = a % b;
-        if (ret != 0 && (a ^ b) < 0) {
-            ret += b;
-        }
-        return ret;
-    }
-}
+bool IsNumber(const Value *o);
 
-inline bool IsNumber(const Value *o) { return Value::Type::NUMBER == o->type; }
+bool IsBool(const Value *o);
 
-inline bool IsBool(const Value *o) { return Value::Type::BOOL == o->type; }
+bool IsTable(const Value *o);
 
-inline bool IsTable(const Value *o) { return Value::Type::TABLE == o->type; }
+bool IsString(const Value *o);
 
-inline bool IsString(const Value *o) { return Value::Type::STRING == o->type; }
+int64_t IntValue(const Value *o);
 
-inline int64_t IntValue(const Value *o) { return o->i; }
+double NumValue(const Value *o);
 
-inline double NumValue(const Value *o) { return o->n; }
+bool BoolValue(const Value *o);
 
-inline bool BoolValue(const Value *o) { return (Value::Type::BOOL == o->type) ? o->b : false; }
+String *StringValue(const Value *o);
 
-inline String* StringValue(const Value *o) { return IsString(o) ? o->str : NULL; }
+char *CStringValue(const Value *o);
 
-inline char* CStringValue(const Value *o) { return (IsString(o) && NULL != o->str) ? o->str->c_str() : NULL; }
+int ToNumber_(const Value *value, double &ret);
 
-inline int ToNumber_(const Value *value, double &ret) {
-    if (IsInt(value)) {
-        ret = IntValue(value);
-        return 1;
-    } else if (IsNumber(value)) {
-        ret = NumValue(value);
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-inline int ToNum(const Value *o, double &n) {
-    return IsNumber(o) ? (n = NumValue(o), 1) : ToNumber_(o, n);
-}
+int ToNum(const Value *o, double &n);
 
 int ToBool(const Value *o, bool &b);
 
-inline void SetIValue(Value *o, int iv) {
-    o->type = Value::Type::INT;
-    o->i = iv;
-}
+void SetIValue(Value *o, int iv);
 
-inline void SetDValue(Value *o, double d) {
-    o->type = Value::Type::NUMBER;
-    o->n = d;
-}
+void SetDValue(Value *o, double d);
 
-inline void SetBValue(Value *o, bool b) {
-    o->type = Value::Type::BOOL;
-    o->b = b;
-}
+void SetBValue(Value *o, bool b);
 
-inline void SetTabValue(Value *v, GCObject *o) {
-    v->type = Value::Type::TABLE;
-    v->gc = o;
-}
+void SetTabValue(Value *v, GCObject *o);
 
 /*
 ** try to convert a value to an integer, rounding according to 'mode':
@@ -295,8 +235,7 @@ bool ValueEqulas(const Value *a, const Value *b);
 bool ValueLE(const Value *a, const Value *b);
 
 bool ValueLT(const Value *a, const Value *b);
-
-}
-}
-}
-#endif //DATA_RENDER_OBJECT_H
+}  // namespace data_render
+}  // namespace core
+}  // namespace weex
+#endif  // CORE_DATA_RENDER_OBJECT_H

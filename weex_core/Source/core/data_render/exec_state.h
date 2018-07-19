@@ -36,8 +36,6 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-
-
 class FuncState {
  public:
   FuncState() : instructions_(), constants_(), children_() {}

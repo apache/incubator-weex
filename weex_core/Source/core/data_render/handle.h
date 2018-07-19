@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_HANDLE_H_
-#define WEEX_HANDLE_H_
+#ifndef CORE_DATA_RENDER_HANDLE_H
+#define CORE_DATA_RENDER_HANDLE_H
 
 #include <memory>
 #include <type_traits>
@@ -28,53 +28,41 @@ namespace core {
 namespace data_render {
 
 class RefCountObject {
-public:
-  explicit RefCountObject ()
-  : reference_count_(0)
-  { }
+ public:
+  explicit RefCountObject() : reference_count_(0) {}
 
   DISABLE_COPY(RefCountObject);
 
   virtual ~RefCountObject() = default;
 
-  inline int decrement() {
-    return --reference_count_;
-  }
+  inline int decrement() { return --reference_count_; }
 
-  inline int increment() {
-    return ++reference_count_;
-  }
+  inline int increment() { return ++reference_count_; }
 
-  inline int GetNumReferences() const {
-    return reference_count_;
-  }
+  inline int GetNumReferences() const { return reference_count_; }
 
-private:
+ private:
   int reference_count_;
 };
 
 // class T should be a subtype of ReferenceCount class.
-template<class T>
+template <class T>
 class Ref {
-  // using Enable = typename std::enable_if<std::is_base_of<RefCountObject, T>::value>::type;
-public:
+  // using Enable = typename std::enable_if<std::is_base_of<RefCountObject,
+  // T>::value>::type;
+ public:
   Ref(T *ptr = nullptr) : ptr_(ptr) {
-    if (ptr_ == nullptr)
-      return;
-    ptr_->increment(); // defined in ReferenceCount
+    if (ptr_ == nullptr) return;
+    ptr_->increment();  // defined in ReferenceCount
   }
 
   // Copy Constructor
-  Ref(const Ref &ref)
-  : ptr_{ ref.ptr_ } {
-    if (ptr_ != nullptr)
-      ptr_->increment(); // defined in ReferenceCount
+  Ref(const Ref &ref) : ptr_{ref.ptr_} {
+    if (ptr_ != nullptr) ptr_->increment();  // defined in ReferenceCount
   }
 
   // Destructor
-  ~Ref() {
-    clear();
-  }
+  ~Ref() { clear(); }
 
   Ref<T> &operator=(const Ref<T> &ref) {
     clear();
@@ -106,14 +94,12 @@ public:
     }
   }
 
-  inline T& operator*() const noexcept { return *ptr_; }
+  inline T &operator*() const noexcept { return *ptr_; }
 
-  inline T* operator->() const noexcept { return ptr_; }
+  inline T *operator->() const noexcept { return ptr_; }
 
   // Check whether it holds an object.
-  inline explicit operator bool() const noexcept {
-    return ptr_ != nullptr;
-  }
+  inline explicit operator bool() const noexcept { return ptr_ != nullptr; }
 
   inline bool operator<(const Ref<T> &ref) const noexcept {
     return GetPtr() < ref.GetPtr();
@@ -128,36 +114,31 @@ public:
   }
 
   // preferably use this function over T *get()
-  inline T *GetPtr() const {
-    return ptr_;
-  }
+  inline T *GetPtr() const { return ptr_; }
 
   // redundant func: mimics the library function for std::unique_ptr
-  inline T *get() {
-    return ptr_;
-  }
+  inline T *get() { return ptr_; }
 
   template <class B>
   inline operator Ref<B>() {
-      // typename std::enable_if<std::is_base_of<B, T>::value>::type;
-      return Ref<B>(reinterpret_cast<B*>(ptr_));
-    }
+    // typename std::enable_if<std::is_base_of<B, T>::value>::type;
+    return Ref<B>(reinterpret_cast<B *>(ptr_));
+  }
 
-private:
+ private:
   T *ptr_;
 };
-
 
 template <typename T>
 using Handle = Ref<T>;
 
 template <typename T, typename... Args>
-inline Handle<T> MakeHandle(Args&&... args) {
-    return Handle<T>(new T(std::forward<Args>(args)...));
+inline Handle<T> MakeHandle(Args &&... args) {
+  return Handle<T>(new T(std::forward<Args>(args)...));
 }
 
-        }  // namespace data_render
-    }  // namespace core
+}  // namespace data_render
+}  // namespace core
 }  // namespace weex
 
-#endif
+#endif // CORE_DATA_RENDER_HANDLE_H

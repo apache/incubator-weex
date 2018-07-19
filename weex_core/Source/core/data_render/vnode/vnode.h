@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef DATA_RENDER_VNODE_VNODE_
-#define DATA_RENDER_VNODE_VNODE_
+#ifndef CORE_DATA_RENDER_VNODE_VNODE_
+#define CORE_DATA_RENDER_VNODE_VNODE_
 
 #include <map>
 #include <string>
@@ -81,4 +81,4 @@ private:
 }  // namespace core
 }  // namespace weex
 
-#endif
+#endif // CORE_DATA_RENDER_VNODE_VNODE_

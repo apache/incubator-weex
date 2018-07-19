@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef DATA_RENDER_STATISTICS_
-#define DATA_RENDER_STATISTICS_
+#ifndef CORE_DATA_RENDER_STATISTICS_
+#define CORE_DATA_RENDER_STATISTICS_
 
 #include <cctype>
 
@@ -55,4 +55,4 @@ class Statistics {
 }
 }
 }
-#endif
+#endif // CORE_DATA_RENDER_STATISTICS_
