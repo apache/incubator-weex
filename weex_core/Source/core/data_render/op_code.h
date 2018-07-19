@@ -29,8 +29,10 @@ enum OpCode {
   OP_LOADNULL,   //	A       R(A) = null
   OP_GETGLOBAL,  //	A B	    R(A) = Global[B]
   OP_GETFUNC,    //	A B  	R(A) = Function[B]
-  OP_GETTABLE,   //	A B C	R(A) = R(B)[R(C)]
+
+  OP_NEWTABLE,   // A B C   R(A) := {} (size = B,C)
   OP_SETTABLE,   //	A B C	R(A)[R(B)] = RK(C)
+  OP_GETTABLE,   //	A B C	R(A) = R(B)[R(C)]
 
   OP_ADD,   //	A B C	R(A) = R(B) + R(C)
   OP_SUB,   //	A B C	R(A) = R(B) - R(C)
