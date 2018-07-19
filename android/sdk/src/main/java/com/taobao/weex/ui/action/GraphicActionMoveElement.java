@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.text.TextUtils;
+
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -43,8 +45,22 @@ public class GraphicActionMoveElement extends BasicGraphicAction {
       return;
     }
 
+    if (component.getHostView() != null && !TextUtils.equals("mComponentType", "video") && !TextUtils.equals("mComponentType", "videoplus")) {
+      int[] location = new  int[2] ;
+      component.getHostView().getLocationInWindow(location);
+      component.getInstance().onChangeElement(oldParent, location[1] > component.getInstance().getWeexHeight() + 1);
+    }
+
     oldParent.remove(component, false);
+
     ((WXVContainer) newParent).addChild(component, mIndex);
+
+    if (component.getHostView() != null && !TextUtils.equals("mComponentType", "video") && !TextUtils.equals("mComponentType", "videoplus")) {
+      int[] location = new  int[2] ;
+      component.getHostView().getLocationInWindow(location);
+      component.getInstance().onChangeElement(newParent, location[1] > component.getInstance().getWeexHeight() + 1);
+    }
+
     if (!component.isVirtualComponent()) {
       ((WXVContainer) newParent).addSubView(component.getHostView(), mIndex);
     }
