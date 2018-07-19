@@ -634,25 +634,58 @@ _Pragma("clang diagnostic pop") \
     if (!jsBundleString ) {
         return bundleType;
     }
-    if ([jsBundleString hasPrefix:@"// { \"framework\": \"Vue\""] || [jsBundleString hasPrefix:@"// { \"framework\": \"vue\""]) {
-        bundleType = @"Vue";
-    } else if ([jsBundleString hasPrefix:@"// { \"framework\": \"Rax\""] || [jsBundleString hasPrefix:@"// { \"framework\": \"rax\""] || [jsBundleString hasPrefix:@"// {\"framework\" : \"Rax\"}"] || [jsBundleString hasPrefix:@"// {\"framework\" : \"rax\"}"]) {
-        bundleType = @"Rax";
-    }else {
-        NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:vue)" options:NSRegularExpressionCaseInsensitive error:NULL];
+    if ( [self _isParserByRegEx]) {
+        NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\/\\/ *(\\{[^}]*\\}) *\\r?\\n" options:NSRegularExpressionCaseInsensitive error:NULL];
         NSTextCheckingResult *match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
         if (match) {
-            bundleType = [jsBundleString substringWithRange:match.range];
-            return bundleType;
+            NSString* bundleTypeStr = [jsBundleString substringWithRange:match.range];
+            bundleTypeStr = [bundleTypeStr stringByReplacingOccurrencesOfString:@"//" withString:@""];
+            id vale = [WXUtility objectFromJSON:bundleTypeStr];
+            bundleType = [vale objectForKey:@"framework"];
+        }else{
+            NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:vue)" options:NSRegularExpressionCaseInsensitive error:NULL];
+            NSTextCheckingResult *match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            if (match) {
+                bundleType = [jsBundleString substringWithRange:match.range];
+                return bundleType;
+            }
+            regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:rax)" options:NSRegularExpressionCaseInsensitive error:NULL];
+            match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            if (match) {
+                bundleType = [jsBundleString substringWithRange:match.range];
+            }
         }
-        regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:rax)" options:NSRegularExpressionCaseInsensitive error:NULL];
-         match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
-        if (match) {
-            bundleType = [jsBundleString substringWithRange:match.range];
+    }else{
+        if ([jsBundleString hasPrefix:@"// { \"framework\": \"Vue\""] || [jsBundleString hasPrefix:@"// { \"framework\": \"vue\""]) {
+            bundleType = @"Vue";
+        } else if ([jsBundleString hasPrefix:@"// { \"framework\": \"Rax\""] || [jsBundleString hasPrefix:@"// { \"framework\": \"rax\""] || [jsBundleString hasPrefix:@"// {\"framework\" : \"Rax\"}"] || [jsBundleString hasPrefix:@"// {\"framework\" : \"rax\"}"]) {
+            bundleType = @"Rax";
+        }else {
+            NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:vue)" options:NSRegularExpressionCaseInsensitive error:NULL];
+            NSTextCheckingResult *match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            if (match) {
+                bundleType = [jsBundleString substringWithRange:match.range];
+                return bundleType;
+            }
+            regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:rax)" options:NSRegularExpressionCaseInsensitive error:NULL];
+            match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            if (match) {
+                bundleType = [jsBundleString substringWithRange:match.range];
+            }
         }
     }
-    
     return bundleType;
+}
+
+- (bool)_isParserByRegEx
+{
+    bool useRegEx = true;
+    id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        useRegEx = [[configCenter configForKey:@"iOS_weex_ext_config.parserTypeByRegEx" defaultValue:@(YES) isDefault:NULL] boolValue];
+    }
+    return false;
 }
 
 - (void)destroyInstance:(NSString *)instance
