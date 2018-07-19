@@ -67,7 +67,6 @@ public class GraphicActionCreateFinish extends BasicGraphicAction {
     if (instance.getRenderStrategy() == WXRenderStrategy.APPEND_ONCE) {
       instance.onCreateFinish();
     }
-    instance.onRenderSuccess(mLayoutWidth, mLayoutHeight);
 
     if (null != instance.getWXPerformance()){
       instance.getWXPerformance().callCreateFinishTime = System.currentTimeMillis()-instance.getWXPerformance().renderTimeOrigin;

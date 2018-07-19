@@ -468,6 +468,17 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  public int callRenderSuccess(String instanceId) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callRenderSuccess(instanceId);
+    } catch (Throwable e) {
+      WXLogUtils.e(TAG, "callCreateFinish throw exception:" + e.getMessage());
+    }
+    return errorCode;
+  }
+
+  @Override
   public int callAppendTreeCreateFinish(String instanceId, String ref) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
