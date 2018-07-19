@@ -1216,11 +1216,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       }
     }
 
-    if (component.isAddElementToTree) {
+    if (component.mIsAddElementToTree) {
       getWXPerformance().localInteractionViewAddCount++;
       if (!isOutOfScreen)
         getWXPerformance().interactionViewAddLimitCount++;
-      component.isAddElementToTree = false;
+      component.mIsAddElementToTree = false;
     }
 
     if (!isOutOfScreen) {
@@ -1467,7 +1467,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void onRootCreated(WXComponent root) {
     this.mRootComp = root;
-    this.mRootComp.deepInComponentTree=1;
+    this.mRootComp.mDeepInComponentTree =1;
     mRenderContainer.addView(root.getHostView());
     setSize(mRenderContainer.getWidth(),mRenderContainer.getHeight());
   }

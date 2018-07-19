@@ -167,9 +167,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private int mType = TYPE_COMMON;
   private boolean mNeedLayoutOnAnimation = false;
   private String mLastBoxShadowId;
-  public int deepInComponentTree = 0;
-
-  public boolean isAddElementToTree = false;
+  public int mDeepInComponentTree = 0;
+  public boolean mIsAddElementToTree = false;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
@@ -939,7 +938,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getCSSLayoutTop());
     mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + getCSSLayoutLeft());
 
-    if (isAddElementToTree)
+    if (mIsAddElementToTree)
       mInstance.onChangeElement(this, mAbsoluteY > mInstance.getWeexHeight() + 1);
 
     if (mHost == null) {
