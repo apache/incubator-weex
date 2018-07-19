@@ -62,8 +62,14 @@ public class GraphicActionCreateFinish extends BasicGraphicAction {
       return;
     }
 
+    instance.mHasCreateFinish = true;
+
     if (instance.getRenderStrategy() == WXRenderStrategy.APPEND_ONCE) {
       instance.onCreateFinish();
+    }
+
+    if (null != instance.getWXPerformance()){
+      instance.getWXPerformance().callCreateFinishTime = System.currentTimeMillis()-instance.getWXPerformance().renderTimeOrigin;
     }
   }
 }
