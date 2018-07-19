@@ -99,8 +99,8 @@ public class WXEnvironment {
   public static long sComponentsAndModulesReadyTime = 0;
 
   public static LogLevel sLogLevel = LogLevel.DEBUG;
-  private static boolean isApkDebug = false;
-  public static boolean isPerf = true;
+  private static boolean isApkDebug = true;
+  public static boolean isPerf = false;
 
   private static boolean openDebugLog = false;
 

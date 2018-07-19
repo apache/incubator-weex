@@ -1226,9 +1226,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (!isOutOfScreen) {
       getWXPerformance().interactionViewAddCount = getWXPerformance().localInteractionViewAddCount;
       getWXPerformance().interactionTime = lastElementChangeTime - mWXPerformance.renderTimeOrigin;
-      WXLogUtils.renderPerformanceLog("   interactionViewAddCount", getWXPerformance().interactionViewAddCount);
-      WXLogUtils.renderPerformanceLog("   interactionViewAddLimitCount", getWXPerformance().interactionViewAddLimitCount);
-      WXLogUtils.renderPerformanceLog("   interactionTime", getWXPerformance().interactionTime);
+//      WXLogUtils.renderPerformanceLog("   interactionViewAddCount", getWXPerformance().interactionViewAddCount);
+//      WXLogUtils.renderPerformanceLog("   interactionViewAddLimitCount", getWXPerformance().interactionViewAddLimitCount);
+//      WXLogUtils.renderPerformanceLog("   interactionTime", getWXPerformance().interactionTime);
     }
   }
 
