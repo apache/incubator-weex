@@ -116,7 +116,14 @@ char *CStringValue(const Value *o) {
   return (IsString(o) && NULL != o->str) ? o->str->c_str() : NULL;
 }
 
-int ToNumber_(const Value *value, double &ret) {
+inline Table* TableValue(const Value *o) {
+  if (IsTable(o)) {
+    return reinterpret_cast<Table *>(o->gc);
+  }
+  return NULL;
+}
+
+inline int ToNumber_(const Value *value, double &ret) {
   if (IsInt(value)) {
     ret = IntValue(value);
     return 1;
@@ -131,8 +138,6 @@ int ToNumber_(const Value *value, double &ret) {
 int ToNum(const Value *o, double &n) {
   return IsNumber(o) ? (n = NumValue(o), 1) : ToNumber_(o, n);
 }
-
-int ToBool(const Value *o, bool &b);
 
 void SetIValue(Value *o, int iv) {
   o->type = Value::Type::INT;
@@ -149,7 +154,7 @@ void SetBValue(Value *o, bool b) {
   o->b = b;
 }
 
-void SetTabValue(Value *v, GCObject *o) {
+void SetTValue(Value *v, GCObject *o) {
   v->type = Value::Type::TABLE;
   v->gc = o;
 }
@@ -254,6 +259,12 @@ bool ValueLT(const Value *a, const Value *b) {
     return NumLT(d1, d2);
   } else {
     return false;
+  }
+}
+
+void FreeValue(Value *o) {
+  if (!o) {
+    return;
   }
 }
 

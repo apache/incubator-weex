@@ -20,6 +20,8 @@
 #ifndef CORE_DATA_RENDER_OBJECT_H
 #define CORE_DATA_RENDER_OBJECT_H
 
+#include <vector>
+#include <unordered_map>
 #include <math.h>
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
@@ -76,10 +78,10 @@ typedef struct Table {
 
   size_t sizearray; /* size of 'array' array */
   size_t sizenode;
-  Value *array; /* array part */
+  std::vector<Value*> *array; /* array part */
   int *hash;
   Node *node;
-  std::unordered_map<std::string, Value> *map;
+  std::unordered_map<std::string, Value*> *map;
 
 } Table;
 
@@ -208,6 +210,8 @@ String *StringValue(const Value *o);
 
 char *CStringValue(const Value *o);
 
+Table* TableValue(const Value *o);
+
 int ToNumber_(const Value *value, double &ret);
 
 int ToNum(const Value *o, double &n);
@@ -220,7 +224,7 @@ void SetDValue(Value *o, double d);
 
 void SetBValue(Value *o, bool b);
 
-void SetTabValue(Value *v, GCObject *o);
+void SetTValue(Value *v, GCObject *o);
 
 /*
 ** try to convert a value to an integer, rounding according to 'mode':
@@ -235,6 +239,9 @@ bool ValueEqulas(const Value *a, const Value *b);
 bool ValueLE(const Value *a, const Value *b);
 
 bool ValueLT(const Value *a, const Value *b);
+
+void FreeValue(Value *o);
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

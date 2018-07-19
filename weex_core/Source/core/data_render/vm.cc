@@ -319,16 +319,16 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
       } break;
 
-      case OP_NEWTABLE: {
-        a = frame.reg + GET_ARG_A(instruction);
-        size_t b = GET_ARG_B(instruction);
-        size_t c = GET_ARG_C(instruction);
-        Table *t = NewTable();
-        SetTabValue(a, reinterpret_cast<GCObject *>(t));
-        if (b != 0 || c != 0) {
-          ResizeTab(t, b, c);
-        }
-      } break;
+//      case OP_NEWTABLE: {
+//        a = frame.reg + GET_ARG_A(instruction);
+//        size_t b = GET_ARG_B(instruction);
+//        size_t c = GET_ARG_C(instruction);
+//        Table *t = NewTable();
+//        SetTabValue(a, reinterpret_cast<GCObject *>(t));
+//        if (b != 0 || c != 0) {
+//          ResizeTab(t, b, c);
+//        }
+//      } break;
 
       case OP_GETTABLE: {
         a = frame.reg + GET_ARG_A(instruction);
