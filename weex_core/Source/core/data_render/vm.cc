@@ -19,6 +19,7 @@
 #include "core/data_render/vm.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/table.h"
+#include "core/data_render/object.h"
 
 namespace weex {
 namespace core {

@@ -30,6 +30,7 @@
 #include "core/data_render/op_code.h"
 #include "core/data_render/vnode/vnode.h"
 #include "core/data_render/vnode/vnode_render_context.h"
+#include "core/data_render/object.h"
 
 namespace weex {
 namespace core {
