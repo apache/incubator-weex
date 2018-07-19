@@ -222,8 +222,8 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     if([value isKindOfClass:[NSString class]]){
         // 2. check if is color keyword or transparent
         static NSDictionary *knownColors;
-        static dispatch_once_t onceToken2;
-        dispatch_once(&onceToken2, ^{
+        static dispatch_once_t onceTokenKnownColors;
+        dispatch_once(&onceTokenKnownColors, ^{
             knownColors = @{
                             // https://www.w3.org/TR/css3-color/#svg-color
                             @"aliceblue": @"#f0f8ff",
