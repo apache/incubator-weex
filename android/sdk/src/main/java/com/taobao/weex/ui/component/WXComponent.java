@@ -169,6 +169,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private String mLastBoxShadowId;
   public int deepInComponentTree = 0;
 
+  public boolean isAddElementToTree = false;
+
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
   public static final int TYPE_COMMON = 0;
@@ -937,13 +939,17 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getCSSLayoutTop());
     mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + getCSSLayoutLeft());
 
+    if (isAddElementToTree)
+      mInstance.onChangeElement(this, mAbsoluteY > mInstance.getWeexHeight() + 1);
+
     if (mHost == null) {
       return;
     }
 
     //calculate first screen time
-    if (!mInstance.mEnd && !(mHost instanceof ViewGroup) && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
+    if (!(mHost instanceof ViewGroup) && !mInstance.mEnd && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
       mInstance.firstScreenRenderFinished();
+      mInstance.mEnd = true;
     }
 
     MeasureOutput measureOutput = measure(realWidth, realHeight);

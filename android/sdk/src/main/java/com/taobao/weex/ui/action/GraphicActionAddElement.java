@@ -21,6 +21,8 @@ package com.taobao.weex.ui.action;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.WorkerThread;
+import android.text.TextUtils;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
@@ -39,7 +41,6 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
   private WXComponent child;
   private GraphicPosition layoutPosition;
   private GraphicSize layoutSize;
-  private boolean isJSCreateFinish = false;
 
   public GraphicActionAddElement(String pageId, String ref,
                                  String componentType, String parentRef,
@@ -73,7 +74,6 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
           mParentRef);
       child = createComponent(instance, parent, basicComponentData);
       child.setTransition(WXTransition.fromMap(child.getStyles(), child));
-      isJSCreateFinish = instance.isJSCreateFinish;
 
       if (child == null || parent == null) {
         return;
@@ -113,6 +113,9 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
   public void executeAction() {
     super.executeAction();
     try {
+      if (!TextUtils.equals("mComponentType", "video") && !TextUtils.equals("mComponentType", "videoplus"))
+        child.isAddElementToTree = true;
+
       parent.addChild(child, mIndex);
       parent.createChildViewAt(mIndex);
 
@@ -120,13 +123,8 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
         child.setDemission(layoutSize, layoutPosition);
       }
       child.applyLayoutAndEvent(child);
-
       child.bindData(child);
-      WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
-      if (null!=instance){
-        instance.onElementChange(isJSCreateFinish);
-       // instance.setma
-      }
+
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);
     }

@@ -18,32 +18,32 @@
  */
 package com.taobao.weex.ui.action;
 
-import com.taobao.weex.WXSDKInstance;
+import android.text.TextUtils;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 
 public class GraphicActionRemoveElement extends BasicGraphicAction {
 
-  private boolean isJSCreateFinish = false;
-
   public GraphicActionRemoveElement(String pageId, String ref) {
     super(pageId, ref);
-    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
-    if (null != instance){
-      isJSCreateFinish = instance.isJSCreateFinish;
-    }
-
   }
 
   @Override
   public void executeAction() {
     WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
-    if (component == null || component.getParent() == null) {
+    if (component == null || component.getParent() == null || component.getInstance() == null) {
       return;
     }
     clearRegistryForComponent(component);
     WXVContainer parent = component.getParent();
+
+    if (component.getHostView() != null && !TextUtils.equals("mComponentType", "video") && !TextUtils.equals("mComponentType", "videoplus")) {
+      int[] location = new  int[2];
+      component.getHostView().getLocationInWindow(location);
+      component.getInstance().onChangeElement(parent, location[1] > component.getInstance().getWeexHeight() + 1);
+    }
+
     parent.remove(component, true);
   }
 
@@ -59,10 +59,6 @@ public class GraphicActionRemoveElement extends BasicGraphicAction {
       for (int i = count - 1; i >= 0; --i) {
         clearRegistryForComponent(container.getChild(i));
       }
-    }
-    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
-    if (null!=instance){
-      instance.onElementChange(isJSCreateFinish);
     }
   }
 }

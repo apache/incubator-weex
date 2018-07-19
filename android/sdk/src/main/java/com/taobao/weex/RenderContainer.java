@@ -38,7 +38,7 @@ import java.lang.ref.WeakReference;
 public class RenderContainer extends FrameLayout implements WeexFrameRateControl.VSyncListener{
   private WeakReference<WXSDKInstance> mSDKInstance;
   private WeexFrameRateControl mFrameRateControl;
-  private boolean mPageHasEvent = false;
+  private boolean hasConsumeEvent = false;
 
   public RenderContainer(Context context) {
     super(context);
@@ -113,11 +113,11 @@ public class RenderContainer extends FrameLayout implements WeexFrameRateControl
 
   @Override
   public boolean dispatchTouchEvent(MotionEvent ev) {
-    mPageHasEvent = true;
+    hasConsumeEvent = true;
     return super.dispatchTouchEvent(ev);
   }
 
-  public boolean isPageHasEvent(){
-    return mPageHasEvent;
+  public boolean hasConsumeEvent(){
+    return hasConsumeEvent;
   }
 }

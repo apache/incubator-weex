@@ -64,13 +64,13 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
       return;
     }
     component.setTransition(WXTransition.fromMap(component.getStyles(), component));
-
   }
 
   @Override
   public void executeAction() {
     super.executeAction();
     try {
+      component.isAddElementToTree = true;
       component.createView();
       component.applyLayoutAndEvent(component);
       component.bindData(component);

@@ -111,8 +111,10 @@ public class WXPerformance {
 
     fluency(0D, 101D),
     imgSizeCount(0D, 2000D),
-    interactionTime(0D,10000D);
-
+    interactionTime(0D,10000D),
+    interactionViewAddCount(0D, Double.MAX_VALUE),
+    interactionViewAddLimitCount(0D, Double.MAX_VALUE),
+    newFsRenderTime(0D, 10000D);
 
     private double mMinRange, mMaxRange;
 
@@ -162,6 +164,14 @@ public class WXPerformance {
   public long callCreateFinishTime;
 
   public long interactionTime;
+
+  public int interactionViewAddCount;
+
+  public int interactionViewAddLimitCount;
+
+  public long newFsRenderTime;
+
+  public int localInteractionViewAddCount;
 
   /**
    * Time used for
@@ -406,6 +416,9 @@ public class WXPerformance {
     quotas.put(Measure.callCreateFinishTime.toString(), (double) callCreateFinishTime);
     quotas.put(Measure.imgSizeCount.toString(), wrongImgSizeCount);
     quotas.put(Measure.interactionTime.toString(), (double) interactionTime);
+    quotas.put(Measure.interactionViewAddCount.toString(), (double) interactionViewAddCount);
+    quotas.put(Measure.interactionViewAddLimitCount.toString(), (double) interactionViewAddLimitCount);
+    quotas.put(Measure.newFsRenderTime.toString(), (double) newFsRenderTime);
 
     quotas.put(Measure.callBridgeTime.toString(), (double) callBridgeTime);
     quotas.put(Measure.cssLayoutTime.toString(), (double) cssLayoutTime);
