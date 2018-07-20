@@ -63,6 +63,7 @@ namespace data_render {
         virtual Handle<Expression> NewCallExpression(Json &json, MemberAccessKind kind, Handle<Expression> func, Handle<Expression> args);
         virtual Handle<Expression> NewCallExpression(Json &json, Handle<Expression>func, std::vector<Handle<Expression>> args);
         virtual Handle<Expression> NewCallExpression(Handle<Expression>func, std::vector<Handle<Expression>> args);
+        virtual Handle<Expression> NewCallExpression(Handle<Expression> func, Handle<Expression> arg);
         virtual Handle<Expression> NewMemberExpression(Json &json, MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> mem);
         virtual Handle<Expression> NewMemberExpression(MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> mem);
         virtual Handle<Expression> NewPrefixExpression(Json &json, PrefixOperation op, Handle<Expression> expr);

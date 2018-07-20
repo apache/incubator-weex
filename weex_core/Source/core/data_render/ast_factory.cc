@@ -133,6 +133,12 @@ Handle<Expression> ASTFactory::NewCallExpression(Handle<Expression> func,
                                                  std::vector<Handle<Expression>> args) {
   return MakeHandle<CallExpression>(func, args);
 }
+Handle<Expression> ASTFactory::NewCallExpression(Handle<Expression> func,
+                                                 Handle<Expression> arg) {
+  std::vector<Handle<Expression>> args;
+  args.push_back(arg);
+  return MakeHandle<CallExpression>(func, args);
+}
 Handle<Expression> ASTFactory::NewMemberExpression(
     Json& json, MemberAccessKind kind, Handle<Expression> expr,
     Handle<Expression> mem) {

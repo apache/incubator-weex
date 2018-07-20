@@ -51,7 +51,7 @@ enum ASTParseError {
 class Parser final {
  public:
   // Parse. If parse fails, return Json() and assign an error message to err.
-  static ParseResult parse(const std::string& in, std::string& err);
+  static ParseResult Parse(const std::string& in, std::string& err);
 
  private:
   Parser(){};
