@@ -305,12 +305,28 @@ public class WXSDKEngine implements Serializable {
               true,
               WXBasicComponentType.SLIDER_NEIGHBOR
       );
+      registerComponent(
+              new SimpleComponentHolder(
+                      WXCell.class,
+                      new WXCell.Creator()
+              ),
+              true,
+              WXBasicComponentType.CELL);
+      registerComponent(
+              new SimpleComponentHolder(
+                      WXListComponent.class,
+                      new WXListComponent.Creator()
+              ),
+              true,
+              WXBasicComponentType.LIST,
+              WXBasicComponentType.VLIST,
+              WXBasicComponentType.RECYCLER,
+              WXBasicComponentType.WATERFALL);
+
       String simpleList = "simplelist";
       registerComponent(SimpleListComponent.class,false,simpleList);
-      registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST,WXBasicComponentType.RECYCLER,WXBasicComponentType.WATERFALL);
       registerComponent(WXRecyclerTemplateList.class, false,WXBasicComponentType.RECYCLE_LIST);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
-      registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
       registerComponent(WXBasicComponentType.CELL_SLOT, WXCell.class, true);
       registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
       registerComponent(WXBasicComponentType.VIDEO, WXVideo.class, false);

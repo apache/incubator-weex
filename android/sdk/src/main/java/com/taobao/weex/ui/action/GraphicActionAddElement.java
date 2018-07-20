@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.WorkerThread;
@@ -41,7 +42,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
   private GraphicSize layoutSize;
   private boolean isJSCreateFinish = false;
 
-  public GraphicActionAddElement(String pageId, String ref,
+  public GraphicActionAddElement(@NonNull WXSDKInstance instance, String ref,
                                  String componentType, String parentRef,
                                  int index,
                                  Map<String, String> style,
@@ -50,7 +51,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
                                  float[] margins,
                                  float[] paddings,
                                  float[] borders) {
-    super(pageId, ref);
+    super(instance, ref);
     this.mComponentType = componentType;
     this.mParentRef = parentRef;
     this.mIndex = index;
@@ -61,8 +62,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
     this.mMargins = margins;
     this.mBorders = borders;
 
-    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
-    if (instance == null || instance.getContext() == null) {
+    if (instance.getContext() == null) {
       return;
     }
 

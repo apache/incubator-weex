@@ -37,26 +37,11 @@ import java.util.Set;
  * Component factory
  */
 public class WXComponentFactory {
-  private static Map<String, Set<String>> sComponentTypes = new HashMap<>();
-
-  public static Set<String> getComponentTypesByInstanceId(String instanceId) {
-    return sComponentTypes.get(instanceId);
-  }
-
-  public static void removeComponentTypesByInstanceId(String instanceId) {
-    sComponentTypes.remove(instanceId);
-  }
 
   public static WXComponent newInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     if (instance == null || TextUtils.isEmpty(basicComponentData.mComponentType)) {
       return null;
     }
-
-    if (sComponentTypes.get(instance.getInstanceId()) == null) {
-      Set<String> types = new HashSet<>();
-      sComponentTypes.put(instance.getInstanceId(), types);
-    }
-    sComponentTypes.get(instance.getInstanceId()).add(basicComponentData.mComponentType);
 
     IFComponentHolder holder = WXComponentRegistry.getComponent(basicComponentData.mComponentType);
     if (holder == null) {

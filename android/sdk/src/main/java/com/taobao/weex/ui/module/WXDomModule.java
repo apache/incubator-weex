@@ -83,7 +83,7 @@ public final class WXDomModule extends WXModule {
           }
           String ref = args.size() >= 1 ? args.getString(0) : null;
           JSONObject options = args.size() >= 2 ? args.getJSONObject(1) : null;
-          new GraphicActionScrollToElement(mWXSDKInstance.getInstanceId(), ref, options)
+          new GraphicActionScrollToElement(mWXSDKInstance, ref, options)
                   .executeActionOnRender();
           break;
         }
@@ -99,7 +99,7 @@ public final class WXDomModule extends WXModule {
             if(args == null){
                 return null;
             }
-            new ActionGetComponentRect(mWXSDKInstance.getInstanceId(), args.getString(0), args.getString(1))
+            new ActionGetComponentRect(mWXSDKInstance, args.getString(0), args.getString(1))
                     .executeActionOnRender();
             break;
         }
@@ -116,7 +116,7 @@ public final class WXDomModule extends WXModule {
           if(args == null || args.size() < 3){
             return null;
           }
-          new UpdateComponentDataAction(mWXSDKInstance.getInstanceId(), args.getString(0), JSONUtils.toJSON(args.get(1)), args.getString(2)).executeAction();
+          new UpdateComponentDataAction(mWXSDKInstance, args.getString(0), JSONUtils.toJSON(args.get(1)), args.getString(2)).executeAction();
           break;
         default:
           WXLogUtils.e("Unknown dom action.");

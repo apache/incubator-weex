@@ -129,6 +129,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private boolean enableLayerType = true;
   private boolean mNeedValidate = false;
   private boolean mNeedReLoad = false;
+  private boolean mUseScroller = false;
   private int mInstanceViewPortWidth = 750;
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
@@ -321,6 +322,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void setNeedLoad(boolean load) {
     mNeedReLoad = load;
+  }
+
+  public boolean isUseScroller() {
+    return mUseScroller;
+  }
+
+  public void setUseScroller(boolean use) {
+    mUseScroller = use;
   }
 
   public void setInstanceViewPortWidth(int instanceViewPortWidth) {
@@ -918,8 +927,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void onActivityPause() {
     onViewDisappear();
     if(!isCommit){
-      Set<String> componentTypes= WXComponentFactory.getComponentTypesByInstanceId(getInstanceId());
-      if(componentTypes!=null && componentTypes.contains(WXBasicComponentType.SCROLLER)){
+      if(mUseScroller){
         mWXPerformance.useScroller=1;
       }
       mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
@@ -1343,7 +1351,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if(mRendered) {
         WXSDKManager.getInstance().destroyInstance(mInstanceId);
       }
-      WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
 
       if (mGlobalEventReceiver != null) {
         getContext().unregisterReceiver(mGlobalEventReceiver);

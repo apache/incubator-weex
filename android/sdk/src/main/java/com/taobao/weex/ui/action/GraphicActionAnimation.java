@@ -71,25 +71,25 @@ public class GraphicActionAnimation extends BasicGraphicAction {
   private
   WXAnimationBean mAnimationBean;
 
-  public GraphicActionAnimation(@NonNull String pageId, @NonNull String ref, @NonNull WXAnimationBean animationBean) {
-    super(pageId, ref);
+  public GraphicActionAnimation(@NonNull WXSDKInstance instance, @NonNull String ref, @NonNull WXAnimationBean animationBean) {
+    super(instance, ref);
     this.styleNeedInit = false;
     this.callback = null;
     this.mAnimationBean = animationBean;
   }
 
-  public GraphicActionAnimation(@NonNull String pageId, @NonNull String ref, @Nullable String animation,
+  public GraphicActionAnimation(@NonNull WXSDKInstance instance, @NonNull String ref, @Nullable String animation,
                                 @Nullable final String callBack) {
-    super(pageId, ref);
+    super(instance, ref);
     this.styleNeedInit = true;
     this.callback = callBack;
     if (!TextUtils.isEmpty(animation)) {
       this.mAnimationBean = JSONObject.parseObject(animation, WXAnimationBean.class);
     }
   }
-  public GraphicActionAnimation(@NonNull String pageId, @NonNull String ref, @NonNull WXAnimationBean animationBean,
+  public GraphicActionAnimation(@NonNull WXSDKInstance instance, @NonNull String ref, @NonNull WXAnimationBean animationBean,
                                 @Nullable final String callBack) {
-    super(pageId, ref);
+    super(instance, ref);
     this.styleNeedInit = false;
     this.mAnimationBean = animationBean;
     this.callback = callBack;

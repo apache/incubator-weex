@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.component.list;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -62,6 +64,15 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   private String mSpanOffsetsStr;
   private Float[] mSpanOffsets;
   private boolean hasSetGapItemDecoration = false;
+
+  public static class Creator implements ComponentCreator {
+    public WXComponent createInstance(WXSDKInstance instance,
+                                      WXVContainer parent,
+                                      BasicComponentData basicComponentData)
+            throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXListComponent(instance, parent, true, basicComponentData);
+    }
+  }
 
   @Deprecated
   public WXListComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
