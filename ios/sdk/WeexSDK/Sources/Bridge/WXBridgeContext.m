@@ -48,6 +48,7 @@
 #import "WXConfigCenterProtocol.h"
 #import "WXSDKInstance_performance.h"
 #import "JSContext+Weex.h"
+#import <pthread/pthread.h>
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -58,6 +59,10 @@ _Pragma("clang diagnostic pop") \
 } while (0)
 
 @interface WXBridgeContext ()
+{
+	pthread_mutex_t _propertyMutex;
+	pthread_mutexattr_t _propertyMutexAttr;
+}
 
 @property (nonatomic, strong) id<WXBridgeProtocol>  jsBridge;
 @property (nonatomic, strong) id<WXBridgeProtocol> devToolSocketBridge;
@@ -77,10 +82,19 @@ _Pragma("clang diagnostic pop") \
 
 @implementation WXBridgeContext
 
+- (void)dealloc {
+	pthread_mutex_destroy(&_propertyMutex);
+	pthread_mutexattr_destroy(&_propertyMutexAttr);
+}
+
 - (instancetype) init
 {
     self = [super init];
     if (self) {
+		pthread_mutexattr_init(&_propertyMutexAttr);
+		pthread_mutexattr_settype(&_propertyMutexAttr, PTHREAD_MUTEX_RECURSIVE);
+		pthread_mutex_init(&_propertyMutex, &_propertyMutexAttr);
+		
         _methodQueue = [NSMutableArray new];
         _frameworkLoadFinished = NO;
         _jsServiceQueue = [NSMutableArray new];
@@ -422,10 +436,13 @@ _Pragma("clang diagnostic pop") \
 
 - (WXSDKInstance *)topInstance
 {
+	pthread_mutex_lock(&_propertyMutex);
     if (self.insStack.count > 0) {
         WXSDKInstance *topInstance = [WXSDKManager instanceForID:[self.insStack firstObject]];
+		pthread_mutex_unlock(&_propertyMutex);
         return topInstance;
     }
+	pthread_mutex_unlock(&_propertyMutex);
     
     return nil;
 }
@@ -493,7 +510,8 @@ _Pragma("clang diagnostic pop") \
 {
     WXAssertBridgeThread();
     WXAssertParam(instanceIdString);
-    
+	
+	pthread_mutex_lock(&_propertyMutex);
     if (![self.insStack containsObject:instanceIdString]) {
         if ([options[@"RENDER_IN_ORDER"] boolValue]) {
             [self.insStack addObject:instanceIdString];
@@ -501,6 +519,7 @@ _Pragma("clang diagnostic pop") \
             [self.insStack insertObject:instanceIdString atIndex:0];
         }
     }
+	pthread_mutex_unlock(&_propertyMutex);
     
     //create a sendQueue bind to the current instance
     NSMutableArray *sendQueue = [NSMutableArray array];
@@ -658,9 +677,11 @@ _Pragma("clang diagnostic pop") \
     WXAssertParam(instance);
     
     //remove instance from stack
+	pthread_mutex_lock(&_propertyMutex);
     if([self.insStack containsObject:instance]){
         [self.insStack removeObject:instance];
     }
+	pthread_mutex_unlock(&_propertyMutex);
     
     if(_jsBridge && [_jsBridge respondsToSelector:@selector(removeTimers:)]){
         [_jsBridge removeTimers:instance];
@@ -896,7 +917,8 @@ _Pragma("clang diagnostic pop") \
     BOOL hasTask = NO;
     NSMutableArray *tasks = [NSMutableArray array];
     NSString *execIns = nil;
-    
+	
+	pthread_mutex_lock(&_propertyMutex);
     for (NSString *instance in self.insStack) {
         NSMutableArray *sendQueue = self.sendQueue[instance];
         if(sendQueue.count > 0){
@@ -909,6 +931,7 @@ _Pragma("clang diagnostic pop") \
             break;
         }
     }
+	pthread_mutex_unlock(&_propertyMutex);
     
     if ([tasks count] > 0 && execIns) {
         WXSDKInstance * execInstance = [WXSDKManager instanceForID:execIns];
