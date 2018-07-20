@@ -99,16 +99,16 @@ namespace WeexCore
     static void MergeBorderWidthValues(NSMutableDictionary* dict, const WXCoreBorderWidth & borders, bool isUpdate)
     {
         if (borders.getBorderWidth(kBorderWidthTop) != (float)0.0f || isUpdate) {
-            dict[@"borderTopWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthTop)];
+            dict[@"borderTopWidth"] = @(borders.getBorderWidth(kBorderWidthTop));
         }
         if (borders.getBorderWidth(kBorderWidthLeft) != (float)0.0f || isUpdate) {
-            dict[@"borderLeftWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthLeft)];
+            dict[@"borderLeftWidth"] = @(borders.getBorderWidth(kBorderWidthLeft));
         }
         if (borders.getBorderWidth(kBorderWidthBottom) != (float)0.0f || isUpdate) {
-            dict[@"borderBottomWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthBottom)];
+            dict[@"borderBottomWidth"] = @(borders.getBorderWidth(kBorderWidthBottom));
         }
         if (borders.getBorderWidth(kBorderWidthRight) != (float)0.0f || isUpdate) {
-            dict[@"borderRightWidth"] = [NSString stringWithFormat:@"%f", borders.getBorderWidth(kBorderWidthRight)];
+            dict[@"borderRightWidth"] = @(borders.getBorderWidth(kBorderWidthRight));
         }
     }
     

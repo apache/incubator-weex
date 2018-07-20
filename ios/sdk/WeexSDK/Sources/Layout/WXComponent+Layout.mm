@@ -414,7 +414,8 @@ bool flexIsUndefined(float value) {
         [self setNeedsLayout];
 }
 
--(CGFloat)judgePropValuePropValue:(NSString *)propValue defaultValue:(CGFloat)defaultValue{
+-(CGFloat)judgePropValuePropValue:(id)propValue defaultValue:(CGFloat)defaultValue
+{
     CGFloat convertValue = (CGFloat)[WXConvert WXFlexPixelType:propValue scaleFactor:self.weexInstance.pixelScaleFactor];
     if (!isnan(convertValue)) {
         return convertValue;
