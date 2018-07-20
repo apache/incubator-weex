@@ -211,11 +211,11 @@ namespace WeexCore {
       }
       if (heightMeasureMode == kUnspecified) {
         float actualHeight = dimension.height + sumPaddingBorderAlongAxis(this, false);
-        if (isnan(height)) {
+//       if (isnan(height)) {
           height = actualHeight;
-        } else if (!stretch) {
-          height = std::min(height, actualHeight);
-        }
+//        } else if (!stretch) {
+//          height = std::max(height, actualHeight);
+//        }
       }
     } else {
       width = widthMeasureMode == kUnspecified ? sumPaddingBorderAlongAxis(this, true)

@@ -148,9 +148,11 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
         measureWidth = Math.min(layout.getWidth(), measureWidth);
       }
 
-      if (Float.isNaN(height)) {
+//      if (Float.isNaN(height)) {
         measureHeight = layout.getHeight();
-      }
+//      }else{
+//        measureHeight = Math.max(layout.getHeight(), measureHeight);
+//      }
     } else {
       if (widthMeasureMode == MeasureMode.UNSPECIFIED) {
         measureWidth = 0;
