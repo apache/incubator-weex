@@ -42,6 +42,8 @@
 #import "WXComponent+Layout.h"
 #import "WXConfigCenterProtocol.h"
 #import "WXSDKEngine.h"
+#import "WXSDKInstance_performance.h"
+#import "WXComponent_performance.h"
 
 #ifdef WX_IMPORT_WEEXCORE
 #import "WXCoreBridge.h"
@@ -483,6 +485,7 @@ static BOOL bNeedRemoveEvents = YES;
 
         [self _handleFirstScreenTime];
         
+        [self.weexInstance.performance onViewLoad:self];
         return _view;
     }
 }

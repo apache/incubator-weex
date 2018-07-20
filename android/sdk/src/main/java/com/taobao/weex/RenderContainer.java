@@ -27,8 +27,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 
-import com.taobao.weex.bridge.WXBridgeManager;
-
 import java.lang.ref.WeakReference;
 
 /**
@@ -38,7 +36,7 @@ import java.lang.ref.WeakReference;
 public class RenderContainer extends FrameLayout implements WeexFrameRateControl.VSyncListener{
   private WeakReference<WXSDKInstance> mSDKInstance;
   private WeexFrameRateControl mFrameRateControl;
-  private boolean mPageHasEvent = false;
+  private boolean mHasConsumeEvent = false;
 
   public RenderContainer(Context context) {
     super(context);
@@ -113,11 +111,11 @@ public class RenderContainer extends FrameLayout implements WeexFrameRateControl
 
   @Override
   public boolean dispatchTouchEvent(MotionEvent ev) {
-    mPageHasEvent = true;
+    mHasConsumeEvent = true;
     return super.dispatchTouchEvent(ev);
   }
 
-  public boolean isPageHasEvent(){
-    return mPageHasEvent;
+  public boolean hasConsumeEvent(){
+    return mHasConsumeEvent;
   }
 }

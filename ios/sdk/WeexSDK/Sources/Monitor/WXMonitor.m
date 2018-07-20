@@ -181,10 +181,11 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
                           @(WXPTWrongImgSize):M_IMG_WRONG_SIZE_NUM,
                           @(WXPTInteractionTime):M_INTERACTION_TIME,
                           @(WXPTFsReqNetNum):M_FS_REQUEST_NET_NUM,
-                          @(WXPTFsComponentCreateTime):M_COMPONENT_FS_TIME,
-                          @(WXPTFsComponentCount):M_COMPONENT_FS_COUNT,
                           @(WXPTComponentCreateTime):M_COMPONENT_TIME,
-                          @(WXPTComponentCount):COMPONENTCOUNT
+                          @(WXPTComponentCount):COMPONENTCOUNT,
+                          @(WXPTInteractionAddCount):M_INTERACTION_ADD_COUNT,
+                          @(WXPTInteractionLimitAddCount):M_INTERACTION_LIMIT_ADD_COUNT,
+                          @(WXPNewFSRenderTime):M_NEW_FS_RENDER_TIME
                           };
     });
     

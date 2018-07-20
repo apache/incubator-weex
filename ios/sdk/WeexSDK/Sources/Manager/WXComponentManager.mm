@@ -319,12 +319,10 @@ static NSThread *WXComponentThread;
     
     if (!component->_isTemplate) {
         __weak typeof(self) weakSelf = self;
-        BOOL isFSCreateFinish = [self weexInstance].isJSCreateFinish;
         [self _addUITask:^{
             [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:componentData[@"ref"] className:nil name:componentData[@"type"] phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
             [supercomponent insertSubview:component atIndex:index];
             [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:componentData[@"ref"] className:nil name:componentData[@"type"] phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
-            [weakSelf onElementChange:isFSCreateFinish];
         }];
     }
     
@@ -393,7 +391,6 @@ static NSThread *WXComponentThread;
     [_indexDict removeObjectForKey:ref];
     
     __weak typeof(self) weakSelf = self;
-    BOOL isFSCreateFinish = [self weexInstance].isJSCreateFinish;
     [self _addUITask:^{
         __strong typeof(self) strongSelf = weakSelf;
         if (strongSelf == nil) {
@@ -405,36 +402,11 @@ static NSThread *WXComponentThread;
             [component.supercomponent willRemoveSubview:component];
         }
         [component removeFromSuperview];
-        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTUIThread}];
-        [strongSelf onElementChange:isFSCreateFinish];
+        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTUIThread}];
     }];
     
     [self _checkFixedSubcomponentToRemove:component];
     
-}
-
-- (void)onElementChange:(BOOL)isFSCreateFinish
-{
-    if (!isFSCreateFinish) {
-        return;
-    }
-    
-    UIView *root = [self weexInstance].rootView;
-    BOOL hasEvent = TRUE;
-    if (root && [root isKindOfClass:[WXRootView class]]) {
-        WXRootView* wxRootView = (WXRootView *)root;
-        hasEvent = [wxRootView isHasEvent];
-    }
-    if (hasEvent) {
-        return;
-    }
-    double current = CACurrentMediaTime()*1000;
-    
-    double diff =  current - [self weexInstance].performance.jsCreateFinishTime;
-    if (diff > 8000) {
-        return;
-    }
-    [self weexInstance].performance.interactionTime = current - self.weexInstance.performance.renderTimeOrigin;
 }
 
 - (void)recordMaximumVirtualDom:(WXComponent*) component
@@ -543,12 +515,7 @@ static NSThread *WXComponentThread;
     [component readyToRender];// notify redyToRender event when init
     
     double diffTime = CACurrentMediaTime()*1000 - buildSartTime;
-    if (!(self.weexInstance.isJSCreateFinish)) {
-        self.weexInstance.performance.fsComponentCount++;
-        self.weexInstance.performance.fsComponentCreateTime+=diffTime;
-    }
-    self.weexInstance.performance.componentCount++;
-    self.weexInstance.performance.componentCreateTime+=diffTime;
+    [self.weexInstance.performance recordComponentCreatePerformance:diffTime forComponent:component];
     
     return component;
 }
@@ -782,6 +749,7 @@ static NSThread *WXComponentThread;
     WXSDKInstance *instance  = self.weexInstance;
     [self _addUITask:^{
         UIView *rootView = instance.rootView;
+        [instance.performance onInstanceCreateFinish];
         
         WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, instance);
         WX_MONITOR_INSTANCE_PERF_END(WXPTAllRender, instance);

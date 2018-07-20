@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include "core/render/page/render_page.h"
 #include "base/TimeUtils.h"
 #include "base/ViewUtils.h"
-#include "core/render/page/render_page.h"
 #include "core/config/core_environment.h"
 #include "core/css/constants_value.h"
 #include "core/layout/layout.h"
@@ -33,6 +33,7 @@
 #include "core/render/action/render_action_move_element.h"
 #include "core/render/action/render_action_remove_element.h"
 #include "core/render/action/render_action_remove_event.h"
+#include "core/render/action/render_action_render_success.h"
 #include "core/render/action/render_action_update_attr.h"
 #include "core/render/action/render_action_update_style.h"
 #include "core/render/manager/render_manager.h"
@@ -374,7 +375,8 @@ bool RenderPage::RemoveEvent(const std::string &ref, const std::string &event) {
 
   render->RemoveEvent(event);
 
-  RenderAction *action = new RenderActionRemoveEvent(this->page_id_, ref, event);
+  RenderAction *action =
+      new RenderActionRemoveEvent(this->page_id_, ref, event);
   PostRenderAction(action);
   return true;
 }
@@ -385,14 +387,22 @@ bool RenderPage::CreateFinish() {
   }
   Batch();
   SendCreateFinishAction();
+  // RenderSuccess means the Dom created after executing script finishes layout
+  // and render, it will be trigger even though body not yet attaches to parent.
+  LayoutInner();
+  SendRenderSuccessAction();
   return true;
+}
+
+void RenderPage::LayoutInner() {
+  CalculateLayout();
+  this->need_layout_.store(false);
+  set_is_dirty(false);
 }
 
 void RenderPage::LayoutImmediately() {
   if (is_dirty() && kUseVSync) {
-    CalculateLayout();
-    this->need_layout_.store(false);
-    set_is_dirty(false);
+    LayoutInner();
   }
 }
 
@@ -558,6 +568,11 @@ void RenderPage::SendCreateFinishAction() {
   PostRenderAction(action);
 }
 
+void RenderPage::SendRenderSuccessAction() {
+  RenderAction *action = new RenderActionRenderSuccess(page_id());
+  PostRenderAction(action);
+}
+
 void RenderPage::SendAppendTreeCreateFinish(const std::string &ref) {
   RenderAction *action = new RenderActionAppendTreeCreateFinish(page_id(), ref);
   PostRenderAction(action);
@@ -594,9 +609,7 @@ std::vector<int64_t> RenderPage::PrintRenderSuccessLog() {
 
 void RenderPage::Batch() {
   if ((kUseVSync && this->need_layout_.load()) || !kUseVSync) {
-    CalculateLayout();
-    this->need_layout_.store(false);
-    set_is_dirty(false);
+    LayoutInner();
   }
 }
 
