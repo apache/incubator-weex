@@ -224,7 +224,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         setJSFrameworkInit(false);
         WXModuleManager.resetAllModuleState();
         String jsf = "";
-        if (!isSandBoxContext || WXEnvironment.sDebugServerConnectable) {
+        if (!isSandBoxContext) {
           jsf = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
         } else {
           jsf = WXFileUtils.loadAsset("weex-main-jsfm.js", WXEnvironment.getApplication());
@@ -240,7 +240,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             setJSFrameworkInit(false);
             WXModuleManager.resetAllModuleState();
             String jsf = "";
-            if (!isSandBoxContext || WXEnvironment.sDebugServerConnectable) {
+            if (!isSandBoxContext) {
               jsf = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
             } else {
               jsf = WXFileUtils.loadAsset("weex-main-jsfm.js", WXEnvironment.getApplication());
@@ -1291,12 +1291,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
         // if { "framework": "Vue" } or  { "framework": "Rax" } will use invokeCreateInstanceContext
         // others will use invokeExecJS
-        if (!isSandBoxContext || WXEnvironment.sDebugServerConnectable) {
+        if (!isSandBoxContext) {
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           return;
         }
         if (type == BundType.Vue || type == BundType.Rax) {
-          invokeCreateInstanceContext(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
+          invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
           return;
         } else {
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
@@ -1315,7 +1315,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public WXJSObject optionObjConvert(boolean useSandBox, BundType type, WXJSObject opt) {
-    if (!useSandBox || type == BundType.Others || WXEnvironment.sDebugServerConnectable) {
+    if (!useSandBox || type == BundType.Others) {
       return opt;
     }
     try {
@@ -1604,7 +1604,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         // if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("weex JS framework from assets");
         // }
-        if (!isSandBoxContext || WXEnvironment.sDebugServerConnectable) {
+        if (!isSandBoxContext) {
           framework = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
         } else {
           framework = WXFileUtils.loadAsset("weex-main-jsfm.js", WXEnvironment.getApplication());
