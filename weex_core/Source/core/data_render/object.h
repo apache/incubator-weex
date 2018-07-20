@@ -136,6 +136,8 @@ struct Value {
         break;
       case CPTR:
         cptr = value.cptr;
+      case TABLE:
+        gc = value.gc;
         break;
       default:
         break;
@@ -161,6 +163,8 @@ struct Value {
         return left.cf == right.cf;
       case CPTR:
         return left.cptr == right.cptr;
+      case TABLE:
+        return left.gc == right.gc;
       default:
         break;
     }
@@ -210,9 +214,24 @@ String *StringValue(const Value *o);
 
 char *CStringValue(const Value *o);
 
-Table* TableValue(const Value *o);
+inline Table* TableValue(const Value *o) {
+  if (IsTable(o)) {
+    return reinterpret_cast<Table *>(o->gc);
+  }
+  return NULL;
+}
 
-int ToNumber_(const Value *value, double &ret);
+inline int ToNumber_(const Value *value, double &ret) {
+  if (IsInt(value)) {
+    ret = IntValue(value);
+    return 1;
+  } else if (IsNumber(value)) {
+    ret = NumValue(value);
+    return 1;
+  } else {
+    return 0;
+  }
+}
 
 int ToNum(const Value *o, double &n);
 

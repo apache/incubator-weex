@@ -22,6 +22,7 @@
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vnode/vnode_render_manager.h"
+#include "core/data_render/vnode/vnode_exec_env.h"
 #include "core/data_render/vnode/vnode.h"
 #include <sstream>
 #include <chrono>
@@ -143,100 +144,6 @@ bool VNodeRenderManager::ClosePage(const string& page_id) {
   return true;
 }
 
-static Value Log(ExecState* exec_state) {
-  size_t length = exec_state->GetArgumentCount();
-  for (int i = 0; i < length; ++i) {
-    Value* a = exec_state->GetArgument(i);
-    switch (a->type) {
-      case Value::Type::NUMBER:
-        std::cout << a->n << "\n";
-        break;
-      case Value::Type::INT:
-        std::cout << a->i << "\n";
-        break;
-      case Value::Type::STRING:
-        std::cout << a->str->c_str() << "\n";
-        break;
-      default:
-        break;
-    }
-  }
-  return Value();
-}
-
-static Value CreateElement(ExecState* exec_state) {//createElement("tagName","id");
-//  const std::string& page_name = exec_state->page_id();
-  VNode* node = new VNode(
-      exec_state->GetArgument(1)->str->c_str(),
-      exec_state->GetArgument(0)->str->c_str()
-  );
-  if (exec_state->context()->root() == nullptr) {
-    //set root
-    exec_state->context()->setVNodeRoot(node);
-  }
-  exec_state->context()->insert_node(node);
-  return Value();
-}
-
-static Value AppendChild(ExecState* exec_state) {//appendChild("tag","id",""parent_id");todo
-  VNode* parent = exec_state->context()->find_node(exec_state->GetArgument(2)->str->c_str());
-  VNode* child = exec_state->context()->find_node(exec_state->GetArgument(1)->str->c_str());
-  if (parent == nullptr || child == nullptr) {
-    return Value();
-  }
-  parent->AddChild(child);
-
-  return Value();
-}
-
-static Value SetAttr(ExecState* exec_state) {//setAttr("id","key","value");
-  VNode* node = exec_state->context()->find_node(exec_state->GetArgument(0)->str->c_str());
-  if (node == nullptr) {
-    return Value();
-  }
-
-  char* key = exec_state->GetArgument(1)->str->c_str();
-  Value* p_value = exec_state->GetArgument(2);
-  if (p_value->type == Value::STRING) {
-    node->SetAttribute(key, p_value->str->c_str());
-  } else if (p_value->type == Value::INT) {//todo use uniform type conversion.
-    std::stringstream ss;
-    ss << p_value->i;
-    string str = ss.str();
-    node->SetAttribute(key, str);
-  }
-
-
-  return Value();
-}
-
-static Value SetClassList(ExecState* exec_state) {
-  VNode* node = exec_state->context()->find_node(exec_state->GetArgument(0)->str->c_str());
-  char* key = exec_state->GetArgument(1)->str->c_str();
-
-  if (node == nullptr) {
-    return Value();
-  }
-
-  json11::Json& json = exec_state->context()->raw_json();
-  const json11::Json& styles = json["styles"];
-  const json11::Json& style = styles[key];
-  if (style.is_null()) {
-    return Value();
-  }
-  const json11::Json::object& items = style.object_items();
-  for (auto it = items.begin(); it != items.end(); it++) {
-    node->SetStyle(it->first, it->second.string_value());
-  }
-  return Value();
-}
-
-void RegisterCFunc(ExecState* state, const std::string& name, CFunction function) {
-  Value func;
-  func.type = Value::Type::CFUNC;
-  func.cf = reinterpret_cast<void*>(function);
-  state->global()->Add(name, func);
-}
 
 void VNodeRenderManager::InitVM() {
   if (g_vm_ == nullptr) {
@@ -248,16 +155,14 @@ void VNodeRenderManager::TestProcess(const std::string& input, const std::string
 
   ExecState* execState = new ExecState(g_vm_);
 
-  //log
-  RegisterCFunc(execState, "log", Log);
-  RegisterCFunc(execState, "createElement", CreateElement);
-  RegisterCFunc(execState, "appendChild", AppendChild);
-  RegisterCFunc(execState, "setAttr", SetAttr);
-  RegisterCFunc(execState, "setClassList", SetClassList);
+  VNodeExecEnv::InitCFuncEnv(execState);
 
   execState->context()->page_id(page_id);
   auto compile_start = std::chrono::steady_clock::now();
   execState->Compile(input);
+
+  VNodeExecEnv::InitGlobalValue(execState);
+
   auto duration_compile = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::steady_clock::now() - compile_start);
 

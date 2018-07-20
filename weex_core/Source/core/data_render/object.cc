@@ -116,25 +116,6 @@ char *CStringValue(const Value *o) {
   return (IsString(o) && NULL != o->str) ? o->str->c_str() : NULL;
 }
 
-inline Table* TableValue(const Value *o) {
-  if (IsTable(o)) {
-    return reinterpret_cast<Table *>(o->gc);
-  }
-  return NULL;
-}
-
-inline int ToNumber_(const Value *value, double &ret) {
-  if (IsInt(value)) {
-    ret = IntValue(value);
-    return 1;
-  } else if (IsNumber(value)) {
-    ret = NumValue(value);
-    return 1;
-  } else {
-    return 0;
-  }
-}
-
 int ToNum(const Value *o, double &n) {
   return IsNumber(o) ? (n = NumValue(o), 1) : ToNumber_(o, n);
 }

@@ -34,7 +34,7 @@ int IndexOf(const std::vector<Value*> *arr, const Value * val) {
 }
 
 int SetTabIntValue(Table *t, Value *key, Value *val) {
-  if (IsNil(val)) {
+  if (IsNil(key)) {
     return 0;
   }
   int index = IndexOf(t->array, val);
@@ -47,7 +47,7 @@ int SetTabIntValue(Table *t, Value *key, Value *val) {
 }
 
 int SetTabStringValue(Table *t, const Value *key, Value *val) {
-  if (IsNil(val)) {
+  if (IsNil(key)) {
     return 0;
   }
   std::string keyStr = CStringValue(key);

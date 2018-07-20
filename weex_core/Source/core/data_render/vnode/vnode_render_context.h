@@ -29,14 +29,15 @@ namespace core {
 namespace data_render {
 class VNodeRenderContext {
  public:
-  void setVNodeRoot(VNode* v_node);
-  VNode* find_node(const std::string& ref);
+  void SetVNodeRoot(VNode* v_node);
+  VNode* FindNode(const std::string& ref);
 
   inline void page_id(const std::string& page_id) { page_id_ = page_id; }
   inline const std::string& page_id() const { return page_id_; }
   inline VNode* root() const { return root_.get(); }
   inline void set_root(VNode* root) { return root_.reset(root); }
-  inline void insert_node(VNode* node) {
+
+  inline void InsertNode(VNode* node) {
     node_map_.insert({node->ref(), node});
   }
   inline json11::Json& raw_json() { return raw_json_; }

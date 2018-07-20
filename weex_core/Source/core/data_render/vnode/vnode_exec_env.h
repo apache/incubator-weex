@@ -16,23 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+//
+// Created by Xu Jiacheng on 2018/7/20.
+//
 
-#include "core/data_render/vnode/vnode_render_context.h"
+#ifndef WEEX_PROJECT_VNODE_EXEC_ENV_H
+#define WEEX_PROJECT_VNODE_EXEC_ENV_H
+
+#include "core/data_render/exec_state.h"
+#include "core/data_render/json/json11.hpp"
 
 namespace weex {
 namespace core {
 namespace data_render {
-void VNodeRenderContext::SetVNodeRoot(VNode* v_node) {
-  root_.reset(v_node);
-}
-
-VNode* VNodeRenderContext::FindNode(const std::string& ref) {
-  auto it = node_map_.find(ref);
-  if (it == node_map_.end()) {
-    return nullptr;
-  }
-  return it->second;
+class VNodeExecEnv {
+ public:
+  static void InitCFuncEnv(ExecState* state);
+  static void InitGlobalValue(ExecState* state);
+};
 }
 }
 }
-}
+#endif //WEEX_PROJECT_VNODE_EXEC_ENV_H

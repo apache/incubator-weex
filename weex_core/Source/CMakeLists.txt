@@ -67,7 +67,9 @@ set(COMMON_SRCS
    ./core/data_render/vm_mem.cc
    ./core/data_render/object.cc
    ./core/data_render/table.cc
+   ./core/data_render/table_factory.cc
    ./core/data_render/vnode/vnode.cc
+   ./core/data_render/vnode/vnode_exec_env.cc
    ./core/data_render/vnode/vnode_render_manager.cc
    ./core/data_render/vnode/vnode_render_context.cc
    ./core/data_render/json/json11.cc

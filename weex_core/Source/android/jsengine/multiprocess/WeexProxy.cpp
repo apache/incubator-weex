@@ -1146,10 +1146,22 @@ namespace WeexCore {
         },
         "data": {
             "showInfo": true,
-                "list": [
-            {},
-            {},
-            {}
+            "string_value":"string_value",
+            "number_value":13,
+            "number_value2":13.2,
+            "list": [
+                {
+                    "number_value":13,
+                    "object_key":"object_value_c1"
+                },
+                {
+                    "number_value":13,
+                    "object_key":"object_value_c2"
+                },
+                {
+                    "number_value":13,
+                    "object_key":null
+                }
             ]
         },
         "styles": {
