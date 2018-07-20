@@ -87,6 +87,8 @@ namespace WeexCore
         
         int callCreateFinish(const char* pageId);
         
+        int callRenderSuccess(const char* pageId);
+        
         int callRemoveElement(const char* pageId, const char* ref);
         
         int callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index);

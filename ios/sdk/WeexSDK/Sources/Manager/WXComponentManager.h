@@ -159,6 +159,13 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
  **/
 - (void)updateFinish;
 
+#ifdef WX_IMPORT_WEEXCORE
+/**
+ * @abstract called when all doms are created and layout finished
+ **/
+- (void)renderFinish;
+#endif
+
 /**
  * @abstract unload
  **/
@@ -207,7 +214,6 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 - (void)wxcore_RemoveElement:(NSString*)ref;
 - (void)wxcore_MoveElement:(NSString*)ref toSuper:(NSString*)superRef atIndex:(NSInteger)index;
 - (void)wxcore_AppendTreeCreateFinish:(NSString*)ref;
-- (void)wxcore_CreateFinish;
 - (void)wxcore_UpdateAttributes:(NSDictionary*)attributes forElement:(NSString*)ref;
 - (void)wxcore_UpdateStyles:(NSDictionary*)styles forElement:(NSString*)ref;
 - (void)wxcore_Layout:(WXComponent*)component frame:(CGRect)frame innerMainSize:(CGFloat)innerMainSize;

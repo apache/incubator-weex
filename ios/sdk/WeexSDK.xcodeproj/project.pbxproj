@@ -460,6 +460,10 @@
 		B82A159920F857200098A509 /* WXSDKError.m in Sources */ = {isa = PBXBuildFile; fileRef = 17B122242090AAB000387E33 /* WXSDKError.m */; };
 		B82A159A20F857450098A509 /* WXWebSocketLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = C4F012851E150307003378D0 /* WXWebSocketLoader.m */; };
 		B82A159B20F857470098A509 /* WXWebSocketModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C4F012811E1502E9003378D0 /* WXWebSocketModule.m */; };
+		B843AE9C2101C094007C76D0 /* render_action_render_success.h in Headers */ = {isa = PBXBuildFile; fileRef = B843AE9A2101C093007C76D0 /* render_action_render_success.h */; };
+		B843AE9D2101C094007C76D0 /* render_action_render_success.h in Headers */ = {isa = PBXBuildFile; fileRef = B843AE9A2101C093007C76D0 /* render_action_render_success.h */; };
+		B843AE9E2101C094007C76D0 /* render_action_render_success.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B843AE9B2101C094007C76D0 /* render_action_render_success.cpp */; };
+		B843AE9F2101C094007C76D0 /* render_action_render_success.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B843AE9B2101C094007C76D0 /* render_action_render_success.cpp */; };
 		B85CA71520EBAA8100D98412 /* WsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = B85CA71120EBAA8100D98412 /* WsonParser.m */; };
 		B85CA71620EBAA8100D98412 /* WsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = B85CA71120EBAA8100D98412 /* WsonParser.m */; };
 		B85CA71720EBAA8100D98412 /* WsonObject.h in Headers */ = {isa = PBXBuildFile; fileRef = B85CA71220EBAA8100D98412 /* WsonObject.h */; };
@@ -1171,6 +1175,8 @@
 		B82A14E620F849930098A509 /* wson_util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wson_util.cpp; sourceTree = "<group>"; };
 		B82A14E720F849930098A509 /* wson_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wson_parser.cpp; sourceTree = "<group>"; };
 		B82A14E820F849930098A509 /* wson_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wson_parser.h; sourceTree = "<group>"; };
+		B843AE9A2101C093007C76D0 /* render_action_render_success.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_action_render_success.h; sourceTree = "<group>"; };
+		B843AE9B2101C094007C76D0 /* render_action_render_success.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_action_render_success.cpp; sourceTree = "<group>"; };
 		B85CA71120EBAA8100D98412 /* WsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WsonParser.m; sourceTree = "<group>"; };
 		B85CA71220EBAA8100D98412 /* WsonObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WsonObject.h; sourceTree = "<group>"; };
 		B85CA71320EBAA8100D98412 /* WsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WsonParser.h; sourceTree = "<group>"; };
@@ -2006,6 +2012,8 @@
 		B82A14A820F849920098A509 /* action */ = {
 			isa = PBXGroup;
 			children = (
+				B843AE9B2101C094007C76D0 /* render_action_render_success.cpp */,
+				B843AE9A2101C093007C76D0 /* render_action_render_success.h */,
 				B82A14A920F849920098A509 /* render_action_appendtree_createfinish.h */,
 				B82A14AA20F849920098A509 /* render_action_update_attr.h */,
 				B82A14AB20F849920098A509 /* render_action_move_element.h */,
@@ -2159,6 +2167,7 @@
 				B82A157D20F849930098A509 /* render_cell_factory.h in Headers */,
 				775BEE711C1BD977008D1629 /* WXModuleProtocol.h in Headers */,
 				B895440020EB18E6006EAD63 /* WXBridgeManager_private.h in Headers */,
+				B843AE9C2101C094007C76D0 /* render_action_render_success.h in Headers */,
 				7469869F1C4E2C000054A57E /* NSArray+Weex.h in Headers */,
 				74CC7A201C2BF9DC00829368 /* WXListComponent.h in Headers */,
 				B82A152120F849930098A509 /* render_action_appendtree_createfinish.h in Headers */,
@@ -2475,6 +2484,7 @@
 				B82A14F620F849930098A509 /* constants_name.h in Headers */,
 				DCA445E81EFA59EF00D0CFA8 /* WXCycleSliderComponent.h in Headers */,
 				DCA4461F1EFA5AB100D0CFA8 /* WXRuleManager.h in Headers */,
+				B843AE9D2101C094007C76D0 /* render_action_render_success.h in Headers */,
 				DCA445E31EFA59DA00D0CFA8 /* WXEmbedComponent.h in Headers */,
 				DCA445DF1EFA59BC00D0CFA8 /* WXLoadingComponent.h in Headers */,
 				B82A157C20F849930098A509 /* render_creator.h in Headers */,
@@ -2855,6 +2865,7 @@
 				74A4BA9B1CB3BAA100195969 /* WXThreadSafeMutableDictionary.m in Sources */,
 				77E65A1A1C155F25008B8775 /* WXScrollerComponent.mm in Sources */,
 				747A787D1D1BAAC900DED9D0 /* WXComponent+ViewManagement.mm in Sources */,
+				B843AE9E2101C094007C76D0 /* render_action_render_success.cpp in Sources */,
 				C4E375371E5FCBD3009B2D9C /* WXComponent+BoxShadow.m in Sources */,
 				C43C03E91EC8ACA40044C7FF /* WXPrerenderManager.m in Sources */,
 				2A837AB51CD9DE9200AEDF03 /* WXLoadingIndicator.m in Sources */,
@@ -3027,6 +3038,7 @@
 				DC7764951F3C685200B5727E /* WXRecyclerDragController.m in Sources */,
 				B89543F420EB18B5006EAD63 /* WXCoreBridge.mm in Sources */,
 				B85CA71C20EBAA8100D98412 /* WsonObject.m in Sources */,
+				B843AE9F2101C094007C76D0 /* render_action_render_success.cpp in Sources */,
 				DCA4453D1EFA55B300D0CFA8 /* WXRootView.m in Sources */,
 				B82A154E20F849930098A509 /* render_action_appendtree_createfinish.cpp in Sources */,
 				B82A157220F849930098A509 /* render_creator.cpp in Sources */,

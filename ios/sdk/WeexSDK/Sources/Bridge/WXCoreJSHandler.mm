@@ -492,11 +492,27 @@
         NSString *instanceId = [instance toString];
         
         WXPerformBlockOnComponentThread(^{
-            WXLogDebug(@"callRCreateFinish...%@", instanceId);
+            WXLogDebug(@"callCreateFinish...%@", instanceId);
             [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
             WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallCreateFinish([instanceId UTF8String]);
         });
         
+        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
+    };
+    
+    _jsContext[@"callRefreshFinish"] = ^JSValue* (JSValue *instance) {
+        NSString *instanceId = [instance toString];
+        WXPerformBlockOnComponentThread(^{
+            WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallRefreshFinish([instanceId UTF8String], nullptr, nullptr);
+        });
+        return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
+    };
+    
+    _jsContext[@"callUpdateFinish"] = ^JSValue* (JSValue *instance) {
+        NSString *instanceId = [instance toString];
+        WXPerformBlockOnComponentThread(^{
+            WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallUpdateFinish([instanceId UTF8String], nullptr, nullptr);
+        });
         return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];
     };
 }

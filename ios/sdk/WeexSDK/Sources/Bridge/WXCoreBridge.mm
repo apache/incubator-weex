@@ -187,14 +187,36 @@ namespace WeexCore
         
     int WXCoreBridge::callUpdateFinish(const char* pageId, const char *task, const char *callback)
     {
-        // should not enter this function
-        assert(false);
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        if (page == nullptr) {
+            return -1;
+        }
+        
+        NSString* ns_instanceId = NSSTRING(pageId);
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        [manager startComponentTasks];
+        [manager updateFinish];
+        return 0;
     }
         
     int WXCoreBridge::callRefreshFinish(const char* pageId, const char *task, const char *callback)
     {
-        // should not enter this function
-        assert(false);
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        if (page == nullptr) {
+            return -1;
+        }
+        
+        NSString* ns_instanceId = NSSTRING(pageId);
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        [manager startComponentTasks];
+        [manager refreshFinish];
+        return 0;
     }
         
     int WXCoreBridge::callAddEvent(const char* pageId, const char* ref, const char *event)
@@ -469,9 +491,36 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager wxcore_CreateFinish];
+        [manager createFinish];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
 
+        page->CallBridgeTime(getCurrentTime() - startTime);
+        return 0;
+    }
+    
+    int WXCoreBridge::callRenderSuccess(const char* pageId)
+    {
+        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+        if (page == nullptr) {
+            return -1;
+        }
+        
+        long long startTime = getCurrentTime();
+        
+        NSString* ns_instanceId = NSSTRING(pageId);
+        
+#ifdef DEBUG
+        WXLogDebug(@"flexLayout -> action: renderFinish :%@", ns_instanceId);
+#endif
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+        [manager startComponentTasks];
+        [manager renderFinish];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"renderFinish" options:@{@"threadName":WXTDOMThread}];
+        
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
     }

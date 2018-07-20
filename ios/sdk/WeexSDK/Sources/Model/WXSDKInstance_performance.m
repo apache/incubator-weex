@@ -29,13 +29,11 @@
 #import "WXUtility.h"
 
 @interface WXPerformance()
-@property (nonatomic ,assign) bool hasRecordFsRenderTimeByPosition;
-@property (nonatomic ,assign) double interactionAddCountRecord;
+@property (nonatomic, assign) bool hasRecordFsRenderTimeByPosition;
+@property (nonatomic, assign) double interactionAddCountRecord;
 @end
 
 @implementation WXPerformance
-
-
 
 - (void) recordComponentCreatePerformance:(double) diffTime forComponent:(WXComponent *)targetComponent
 {
@@ -44,7 +42,8 @@
 }
 
 /** on UI thread **/
-- (void)onViewLoad:(WXComponent *)targetComponent{
+- (void)onViewLoad:(WXComponent *)targetComponent
+{
     if (targetComponent.hasAdd) {
         return;
     }

@@ -28,9 +28,7 @@
 #define WX_EXTERN extern __attribute__((visibility("default")))
 #endif
 
-#ifdef DEBUG
 #define WX_IMPORT_WEEXCORE
-#endif
 
 /*
  * Concatenate preprocessor tokens a and b without expanding macro definitions

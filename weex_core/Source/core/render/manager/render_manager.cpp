@@ -199,7 +199,6 @@ void RenderManager::CallNativeModule(const char *page_id, const char *module, co
   if (strcmp(module, "meta") == 0) {
     CallMetaModule(page_id, method, arguments);
   }
-  return false;
 }
 
 void RenderManager::CallMetaModule(const char *page_id, const char *method, const char *arguments) {
@@ -222,7 +221,6 @@ void RenderManager::CallMetaModule(const char *page_id, const char *method, cons
       }
     }
   }
-  return false;
 }
 
 RenderPage *RenderManager::GetPage(const std::string &page_id) {

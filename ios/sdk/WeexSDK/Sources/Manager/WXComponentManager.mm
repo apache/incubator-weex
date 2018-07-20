@@ -756,10 +756,13 @@ static NSThread *WXComponentThread;
         WX_MONITOR_SUCCESS(WXMTJSBridge);
         WX_MONITOR_SUCCESS(WXMTNativeRender);
         
+#ifdef WX_IMPORT_WEEXCORE
+#else
         if(instance.renderFinish){
             [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:@{@"threadName":WXTUIThread}];
             instance.renderFinish(rootView);
         }
+#endif
     }];
     [instance updatePerDicAfterCreateFinish];
 }
@@ -791,6 +794,22 @@ static NSThread *WXComponentThread;
         }
     }];
 }
+
+#ifdef WX_IMPORT_WEEXCORE
+- (void)renderFinish
+{
+    WXAssertComponentThread();
+    
+    WXSDKInstance *instance  = self.weexInstance;
+    [self _addUITask:^{
+        UIView *rootView = instance.rootView;
+        if(instance.renderFinish){
+            [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:@{@"threadName":WXTUIThread}];
+            instance.renderFinish(rootView);
+        }
+    }];
+}
+#endif
 
 - (void)unload
 {
@@ -1112,7 +1131,6 @@ static NSThread *WXComponentThread;
     
     if (!component->_isTemplate) {
         __weak typeof(self) weakSelf = self;
-        BOOL isFSCreateFinish = [self weexInstance].isJSCreateFinish;
         [self _addUITask:^{
             __strong typeof(self) strongSelf = weakSelf;
             if (strongSelf == nil) {
@@ -1122,7 +1140,6 @@ static NSThread *WXComponentThread;
             [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:data[@"ref"] className:nil name:data[@"type"] phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
             [supercomponent insertSubview:component atIndex:index];
             [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:data[@"ref"] className:nil name:data[@"type"] phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
-            [weakSelf onElementChange:isFSCreateFinish];
         }];
     }
 }
@@ -1140,11 +1157,6 @@ static NSThread *WXComponentThread;
 - (void)wxcore_AppendTreeCreateFinish:(NSString*)ref
 {
     WXAssertComponentThread();
-}
-
-- (void)wxcore_CreateFinish
-{
-    [self createFinish];
 }
 
 - (void)wxcore_UpdateAttributes:(NSDictionary*)attributes forElement:(NSString*)ref

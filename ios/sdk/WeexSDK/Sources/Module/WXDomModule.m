@@ -45,9 +45,12 @@ WX_EXPORT_METHOD(@selector(removeElement:))
 WX_EXPORT_METHOD(@selector(moveElement:parentRef:index:))
 WX_EXPORT_METHOD(@selector(addEvent:event:))
 WX_EXPORT_METHOD(@selector(removeEvent:event:))
+#ifdef WX_IMPORT_WEEXCORE
+#else
 WX_EXPORT_METHOD(@selector(createFinish))
 WX_EXPORT_METHOD(@selector(updateFinish))
 WX_EXPORT_METHOD(@selector(refreshFinish))
+#endif
 WX_EXPORT_METHOD(@selector(scrollToElement:options:))
 WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
@@ -129,6 +132,8 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     }];
 }
 
+#ifdef WX_IMPORT_WEEXCORE
+#else
 - (void)createFinish
 {
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
@@ -150,6 +155,7 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
         [manager refreshFinish];
     }];
 }
+#endif
 
 - (void)scrollToElement:(NSString *)elemRef options:(NSDictionary *)dict
 {
