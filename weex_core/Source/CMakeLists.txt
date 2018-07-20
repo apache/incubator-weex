@@ -64,7 +64,6 @@ set(COMMON_SRCS
    ./core/data_render/string_table.cc
    ./core/data_render/tokenizer.cc
    ./core/data_render/expression_parser.cc
-   ./core/data_render/parse_context.cc
    ./core/data_render/vm_mem.cc
    ./core/data_render/object.cc
    ./core/data_render/table.cc

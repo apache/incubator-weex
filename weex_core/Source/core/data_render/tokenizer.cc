@@ -26,14 +26,11 @@ class TokenizerState {
   using seek_type = size_t;
   using char_type = char;
 
-  TokenizerState(CharacterStream* scanner, ParserContext* context)
-      : seek_{0}, scanner_{scanner}, context_{context} {}
+  TokenizerState(CharacterStream* scanner)
+      : seek_{0}, scanner_{scanner} {}
 
-  TokenizerState(const TokenizerState& state) = default;
-  TokenizerState(TokenizerState&& state) = default;
 
-  inline ParserContext* context() { return context_; }
-  inline void reset(CharacterStream* scanner) {
+  inline void Reset(CharacterStream* scanner) {
     scanner_ = scanner;
     seek_ = 0;
     last_col_length_ = 0;
@@ -56,12 +53,12 @@ class TokenizerState {
     return last_token_;
   }
 
-  inline void setToken(Token token) {
+  inline void set_token(Token token) {
     last_token_ = token_;
     token_ = token;
   }
 
-  inline void setPosition(int col, int row) {
+  inline void set_position(int col, int row) {
     position_.col() = col;
     position_.row() = row;
   }
@@ -70,13 +67,11 @@ class TokenizerState {
     return position_;
   }
 
-  inline char_type readchar() {
-    char ch = scanner_->readchar();
-    context()->Counters().InputCharacter()++;
+  inline char_type ReadChar() {
+    char ch = scanner_->ReadChar();
     if (ch == '\n') {
       position_.row()++;
 
-      context()->Counters().Line()++;
       // save the last column position
       last_col_length_ = position_.col();
       position_.col() = 0;
@@ -92,22 +87,19 @@ class TokenizerState {
     return ch;
   }
 
-  inline void putback(char_type ch) {
+  inline void PutBack(char_type ch) {
     seek_--;
     if (ch == EOF)
       return;
     if (ch == '\n') {
       assert(position_.row() != 0);
-      // FIXME: we can only go back to last line correctly
       position_.col() = last_col_length_;
       position_.row()--;
-      context()->Counters().Line()--;
     } else {
       assert(position_.col() != 0);
       position_.col()--;
     }
-    scanner_->putback(ch);
-    context()->Counters().InputCharacter()++;
+    scanner_->PutBack(ch);
   }
 
  private:
@@ -119,34 +111,33 @@ class TokenizerState {
   Position position_;
   size_t last_col_length_;
   CharacterStream* scanner_;
-  ParserContext* context_;
 };
 
 std::unordered_map<std::string, Token::Type> TokenizerState::keywords = {
 #define K(t, k, p) { k, Token::t },
 #define T(t, k, p)
-    TOKEN_TYPE_LIST(T,K)
+    TOKEN_TYPE_LIST(T, K)
 #undef K
 #undef T
 };
 
 // small utility functions
-bool isValidIdentifierStart(char ch) {
+bool IsValidIdentifierStart(char ch) {
   return std::isalpha(ch) || ch == '_' || ch == '$';
 }
 
-bool isValidIdentifierChar(char ch) {
+bool IsValidIdentifierChar(char ch) {
   return std::isalnum(ch) || ch == '_' || ch == '$';
 }
 
-Token::Type isKeyword(const std::string& str) {
+Token::Type IsKeyword(const std::string& str) {
   auto it = TokenizerState::keywords.find(str);
   if (it == TokenizerState::keywords.end())
     return Token::IDENTIFIER;
   return it->second;
 }
 
-Token::Type isOneCharacterSymbol(char ch) {
+Token::Type IsOneCharacterSymbol(char ch) {
   // returns the type of token from the given symbol
   switch (ch) {
     case '(':
@@ -202,7 +193,7 @@ Token::Type isOneCharacterSymbol(char ch) {
   }
 }
 
-Token::Type isTwoCharacterSymbol(char ch1, char ch2) {
+Token::Type IsTwoCharacterSymbol(char ch1, char ch2) {
 // returns the type of symbol of two characters
   switch (ch2) {
     case '=':
@@ -261,7 +252,7 @@ Token::Type isTwoCharacterSymbol(char ch1, char ch2) {
   }
 }
 
-Token::Type isThreeCharacterSymbol(char ch1, char ch2, char ch3) {
+Token::Type IsThreeCharacterSymbol(char ch1, char ch2, char ch3) {
   if (ch1 == '=' && ch2 == '=' && ch3 == '=')
     return Token::EQ_STRICT;
   else if (ch1 == '!' && ch2 == '=' && ch3 == '=')
@@ -283,8 +274,8 @@ bool IsSpace(char ch) {
 // Tokenizer implementation
 // --------------------------
 
-Tokenizer::Tokenizer(CharacterStream* stream, ParserContext* context)
-    : state_{new TokenizerState(stream, context)}, context_{context} {}
+Tokenizer::Tokenizer(CharacterStream* stream)
+    : state_{new TokenizerState(stream)} {}
 
 Tokenizer::~Tokenizer() {
   delete state_;
@@ -292,38 +283,37 @@ Tokenizer::~Tokenizer() {
 
 #define _ state_->
 
-void Tokenizer::reset(CharacterStream* stream) {
-  state_->reset(stream);
+void Tokenizer::Reset(CharacterStream* stream) {
+  state_->Reset(stream);
 }
 
-void Tokenizer::advance(bool divide_expected) {
-  _ setToken(advance_internal(divide_expected));
-  context()->Counters().Token()++;
+void Tokenizer::Advance(bool divide_expected) {
+  _ set_token(AdvanceInternal(divide_expected));
 }
 
-Token::Type Tokenizer::peek() {
+Token::Type Tokenizer::Peek() {
   if (_ seek() == 0)
-    advance();
+    Advance();
   return _ token().type();
 }
 
-Token& Tokenizer::currentToken() {
+Token& Tokenizer::CurrentToken() {
   return _ token();
 }
 
 // The heart of the lexer
 // -----------------------
-Token Tokenizer::advance_internal(bool not_regex) {
-  char ch = _ readchar();
+Token Tokenizer::AdvanceInternal(bool not_regex) {
+  char ch = _ ReadChar();
 
   do {
     // skip all non printable characters
     while (ch != EOF && IsSpace(ch))
-      ch = _ readchar();
+      ch = _ ReadChar();
 
 
     if (ch == '/') {
-      char next = _ readchar();
+      char next = _ ReadChar();
 
       if (next == EOF) {
         return Token(std::string(1, ch), Token::DIV, _ position(),
@@ -331,32 +321,32 @@ Token Tokenizer::advance_internal(bool not_regex) {
       } else if (next == '/') {
         // single line comment skip whole line
         while (ch != '\n') {
-          ch = _ readchar();
+          ch = _ ReadChar();
         }
       } else if (next == '*') {
         // block comment
-        ch = _ readchar();
+        ch = _ ReadChar();
         char last = ch;
 
         while (ch != '/' || last != '*') {
           if (ch == EOF)
             break;
           last = ch;
-          ch = _ readchar();
+          ch = _ ReadChar();
         }
 
-        ch = _ readchar();
+        ch = _ ReadChar();
         if (ch == EOF) {
           return Token(std::string("ERROR"), Token::ERROR,
                        _ position(), _ seek());
         }
       } else {
         bool ok = true;
-        _ putback(next);
+        _ PutBack(next);
 
         // do not parse this as regular expression
         if (not_regex) break;
-        Token t = parseRegex(&ok);
+        Token t = ParseRegex(&ok);
         if (!ok) {
           break;
         } else {
@@ -377,44 +367,44 @@ Token Tokenizer::advance_internal(bool not_regex) {
   // Possibility 1:
   //  token is a valid identifier, or keyword
 
-  if (isValidIdentifierStart(ch)) {
+  if (IsValidIdentifierStart(ch)) {
     std::string identifier;
     identifier += ch;
 
-    ch = _ readchar();
-    while (isValidIdentifierChar(ch)) {
+    ch = _ ReadChar();
+    while (IsValidIdentifierChar(ch)) {
       identifier += ch;
-      ch = _ readchar();
+      ch = _ ReadChar();
     }
 
-    _ putback(ch);
+    _ PutBack(ch);
 
-    return Token(identifier, isKeyword(identifier), position, seek);
+    return Token(identifier, IsKeyword(identifier), position, seek);
   }
 
-  if (ch == EOF|| ch == '\0') {
+  if (ch == EOF || ch == '\0') {
     return Token(std::string("EOF"), Token::EOS,
                  position, seek);
   }
 
   char first = ch;
-  char second = _ readchar();
-  char third = _ readchar();
+  char second = _ ReadChar();
+  char third = _ ReadChar();
 
   Token::Type type;
   std::string view;
 
   if (first != EOF && second != EOF) {
-    type = isThreeCharacterSymbol(first, second, third);
+    type = IsThreeCharacterSymbol(first, second, third);
     if (type == Token::SHR) {
-      char fourth = _ readchar();
+      char fourth = _ ReadChar();
 
       if (fourth == '=') {
         // >>>=
         view = view + first + second + third + fourth;
         return Token(view, Token::ASSIGN_SHR, _ position(), _ seek());
       } else {
-        _ putback(fourth);
+        _ PutBack(fourth);
         view = view + first + second + third;
         return Token(view, type, position, seek);
       }
@@ -422,26 +412,26 @@ Token Tokenizer::advance_internal(bool not_regex) {
       view = view + first + second + third;
       return Token(view, type, position, seek);
     }
-    _ putback(third);
+    _ PutBack(third);
   }
 
 
   if (second != EOF) {
-    type = isTwoCharacterSymbol(first, second);
+    type = IsTwoCharacterSymbol(first, second);
 
     if (type != Token::INVALID) {
       view = view + first + second;
       return Token(view, type, position, seek);
     }
-    _ putback(second);
+    _ PutBack(second);
   }
 
 
-  type = isOneCharacterSymbol(first);
+  type = IsOneCharacterSymbol(first);
 
   if (type == Token::PERIOD) {
     if (isdigit(second)) {
-      return parseNumber(first);
+      return ParseNumber(first);
     }
   }
   if (type != Token::INVALID) {
@@ -450,11 +440,11 @@ Token Tokenizer::advance_internal(bool not_regex) {
   }
 
   if (ch == '"' || ch == '\'' || ch == '`') {
-    return parseString(ch);
+    return ParseString(ch);
   }
 
   if (isdigit(ch)) {
-    return parseNumber(ch);
+    return ParseNumber(ch);
   } else if (ch == EOF || ch == '\0') {
     return Token(std::string("EOF"), Token::EOS, position, seek);
   }
@@ -462,33 +452,33 @@ Token Tokenizer::advance_internal(bool not_regex) {
   return Token(std::string("ILLEGAL"), Token::INVALID, position, seek);
 }
 
-Token Tokenizer::parseRegex(bool* ok) {
+Token Tokenizer::ParseRegex(bool* ok) {
   std::string buffer;
   auto seek = _ seek();
   auto position = _ position();
 
-  char ch = _ readchar();
+  char ch = _ ReadChar();
 
   while (ch != '/') {
     if (ch == EOF || ch == '\n') {
       *ok = false;
       if (ch == '\n') {
-        _ putback('\n');
+        _ PutBack('\n');
       }
       for (int i = buffer.length() - 1; i >= 0; i--) {
-        _ putback(buffer[i]);
+        _ PutBack(buffer[i]);
       }
       return Token(std::string("ERROR"), Token::ERROR, position, seek);
     }
 
     if (ch == '[') {
       buffer.push_back(ch);
-      ch = _ readchar();
+      ch = _ ReadChar();
       while (ch != ']') {
 
         if (ch == '\\') {
           buffer.push_back(ch);
-          ch = _ readchar();
+          ch = _ ReadChar();
         }
 
         if (ch == EOF) {
@@ -496,7 +486,7 @@ Token Tokenizer::parseRegex(bool* ok) {
         }
 
         buffer.push_back(ch);
-        ch = _ readchar();
+        ch = _ ReadChar();
       }
 
       if (ch == ']')
@@ -505,11 +495,11 @@ Token Tokenizer::parseRegex(bool* ok) {
 
     if (ch == '\\') {
       buffer.push_back(ch);
-      ch = _ readchar();
+      ch = _ ReadChar();
     }
 
     buffer.push_back(ch);
-    ch = _ readchar();
+    ch = _ ReadChar();
 
   }
 
@@ -518,15 +508,15 @@ Token Tokenizer::parseRegex(bool* ok) {
 
   // parse regex flags g, i, m, u, y
   // Including special case n when there is no flag present
-  ch = _ readchar();
+  ch = _ ReadChar();
   bool flag_present = false;
   while (ch == 'g' || ch == 'i' || ch == 'm' || ch == 'u' || ch == 'y') {
     flag_present = true;
     buffer.push_back(ch);
-    ch = _ readchar();
+    ch = _ ReadChar();
   }
 
-  _ putback(ch);
+  _ PutBack(ch);
 
   if (!flag_present) {
     buffer.push_back('n');
@@ -535,23 +525,23 @@ Token Tokenizer::parseRegex(bool* ok) {
   return Token(buffer, Token::REGEXP_LITERAL, position, seek);
 }
 
-Token Tokenizer::parseString(char delim) {
+Token Tokenizer::ParseString(char delim) {
   std::string buffer;
 
   auto seek = _ seek();
   auto position = _ position();
-  char ch = _ readchar();
+  char ch = _ ReadChar();
   while (ch != EOF && ch != delim) {
     // escape characters
     if (ch == '\\') {
       buffer.push_back(ch);
-      ch = _ readchar();
+      ch = _ ReadChar();
       if (ch == EOF) {
         break;
       }
     }
     buffer.push_back(ch);
-    ch = _ readchar();
+    ch = _ ReadChar();
   }
 
   if (ch == EOF) {
@@ -563,43 +553,43 @@ Token Tokenizer::parseString(char delim) {
   return Token(buffer, type, position, seek);
 }
 
-Token Tokenizer::parseNumber(char start) {
+Token Tokenizer::ParseNumber(char start) {
   std::string buffer;
   auto seek = _ seek();
   bool had_exp = false;
   bool seen_dot = false;
   bool isdouble = false;
   auto position = _ position();
-  char ch = _ readchar();
+  char ch = _ ReadChar();
 
   buffer.push_back(start);
 
   if (tolower(ch) == 'x') {
     // parsing hex number
     buffer.push_back(ch);
-    ch = _ readchar();
+    ch = _ ReadChar();
     while (ch != EOF && (tolower(ch) == 'a' || tolower(ch) == 'b'
                          || tolower(ch) == 'c' || tolower(ch) == 'd'
                          || tolower(ch) == 'e' || tolower(ch) == 'f'
                          || isdigit(ch))) {
       buffer.push_back(ch);
-      ch = _ readchar();
+      ch = _ ReadChar();
     }
 
   } else if (tolower(ch) == 'b') {
     // parsing a bin number
     buffer.push_back(ch);
-    ch = _ readchar();
+    ch = _ ReadChar();
     while (ch != EOF && (ch == '0' || ch == '1')) {
       buffer.push_back(ch);
-      ch = _ readchar();
+      ch = _ ReadChar();
     }
 
   } else if (tolower(ch) == 'o') {
     // parsing oct number
     while (ch != EOF && ch < '8' && ch >= '0') {
       buffer.push_back(ch);
-      ch = _ readchar();
+      ch = _ ReadChar();
     }
 
   } else {
@@ -613,7 +603,7 @@ Token Tokenizer::parseNumber(char start) {
       buffer.push_back(ch);
 
     while (isdigit(ch) || (tolower(ch) == 'e') || ch == '.') {
-      ch = _ readchar();
+      ch = _ ReadChar();
 
       if (ch == '.') {
         if (!seen_dot) {
@@ -647,7 +637,7 @@ Token Tokenizer::parseNumber(char start) {
   }
 
 
-  _ putback(ch);
+  _ PutBack(ch);
 
   if (!isdouble) {
     return Token(buffer, Token::INTEGER, position, seek);

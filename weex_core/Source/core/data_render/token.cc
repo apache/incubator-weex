@@ -41,14 +41,11 @@ const char Token::s_token_type_[] = {TOKEN_TYPE_LIST(KT, KK)};
 #undef KK
 #undef KC
 
-std::string Token::str(Type type) {
+std::string Token::Str(Type type) {
   return s_string_[static_cast<int>(type)];
 }
 
 
-int Token::precedence(Type type) {
-  return s_precedence_[static_cast<int>(type)];
-}
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

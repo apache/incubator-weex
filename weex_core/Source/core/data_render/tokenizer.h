@@ -19,7 +19,6 @@
 #ifndef CORE_DATA_RENDER_TOKENIZER_
 #define CORE_DATA_RENDER_TOKENIZER_
 
-#include "core/data_render/parse_context.h"
 #include "core/data_render/scanner.h"
 #include "core/data_render/token.h"
 
@@ -34,26 +33,23 @@ class TokenizerState;
  */
 class Tokenizer {
  public:
-  Tokenizer(CharacterStream* stream, ParserContext* context);
+  Tokenizer(CharacterStream* stream);
   ~Tokenizer();
-  Token::Type peek();
+  Token::Type Peek();
 
-  void advance(bool divide_expected = false);
+  void Advance(bool divide_expected = false);
 
-  void reset(CharacterStream* stream);
+  void Reset(CharacterStream* stream);
 
-  Token& currentToken();
-
-  ParserContext* context() { return context_; }
+  Token& CurrentToken();
 
  private:
-  Token advance_internal(bool not_regex);
-  Token parseString(char delim);
-  Token parseNumber(char start);
-  Token parseRegex(bool* ok);
+  Token AdvanceInternal(bool not_regex);
+  Token ParseString(char delim);
+  Token ParseNumber(char start);
+  Token ParseRegex(bool* ok);
 
   TokenizerState* state_;
-  ParserContext* context_;
 };
 }  // namespace data_render
 }  // namespace core

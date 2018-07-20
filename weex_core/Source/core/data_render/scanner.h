@@ -31,11 +31,9 @@ class CharacterStream {
  public:
   virtual ~CharacterStream() = default;
 
-  virtual void putback(char ch) = 0;
+  virtual void PutBack(char ch) = 0;
 
-  virtual int read(std::string& str, int num) = 0;
-
-  virtual char readchar() = 0;
+  virtual char ReadChar() = 0;
 };
 
 // simple scanner class
@@ -45,22 +43,11 @@ class BufferedCharacterStream : public CharacterStream {
   BufferedCharacterStream(StreamType& is) : is_(is), buffer_(0) {}
   ~BufferedCharacterStream() = default;
 
-  // read a character from stream
-  int read(std::string& str, int num) override {
-    str.resize(num, '\0');
-
-    if (is_.eof())
-      return -1;
-    // FIXME: make it working
-    // auto size = is_.readsome(str.data(), num);
-    return -1;
-  }
-
-  void putback(char ch) override {
+  void PutBack(char ch) override {
     buffer_.push_back(ch);
   }
 
-  char readchar() override {
+  char ReadChar() override {
     if (!buffer_.empty()) {
       char ch = buffer_.back();
       buffer_.pop_back();

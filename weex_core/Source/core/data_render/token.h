@@ -180,6 +180,8 @@ class Token {
     return s_string_[token];
   }
 
+  static std::string Str(Type type);
+
   static int Precedence(Type token) {
     assert(token < NUM_TOKENS);  // token is unsigned.
     return s_precedence_[token];
@@ -202,10 +204,6 @@ class Token {
   inline Type type() const { return type_; }
 
   inline const std::string& view() const { return str_; }
-
-  static std::string str(Type type);
-
-  static int precedence(Type type);
 
  private:
   int line_;

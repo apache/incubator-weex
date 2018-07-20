@@ -23,7 +23,6 @@
 #ifndef DATA_RENDER_EXPRESSION_PARSER_
 #define DATA_RENDER_EXPRESSION_PARSER_
 
-#include "core/data_render/parse_context.h"
 #include "core/data_render/token.h"
 #include "core/data_render/ast_factory.h"
 #include "core/data_render/tokenizer.h"
@@ -33,7 +32,7 @@ namespace core {
 namespace data_render {
 class ExpressionParser {
  public:
-  ExpressionParser(ParserContext* ctx, ASTFactory* builder, Tokenizer* lex);
+  ExpressionParser(ASTFactory* builder, Tokenizer* lex);
 
   ~ExpressionParser();
 
@@ -64,16 +63,14 @@ class ExpressionParser {
   double ParseNumber(const Token& token);
   int ParseInteger(const Token& token);
 
-  Token::Type peek();
-  void advance(bool not_regex = false);
+  Token::Type Peek();
+  void Advance(bool not_regex = false);
 
   ASTFactory* builder() { return builder_; }
   Tokenizer* lex() { return lex_; }
-  ParserContext* context() { return ctx_; }
 //  ScopeManager *scope_manager() { return manager_; }
 
  private:
-  ParserContext* ctx_;
   ASTFactory* builder_;
   Tokenizer* lex_;
 //  ScopeManager *manager_;

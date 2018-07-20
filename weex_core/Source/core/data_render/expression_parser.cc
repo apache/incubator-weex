@@ -31,20 +31,20 @@ namespace core {
 namespace data_render {
 #define EXPECT(tok)     \
     do {    \
-        if (peek() != tok)  \
-            LOGE("exprect %s, got %s",Token::str(tok).c_str(),lex()->currentToken().view().c_str());\
-        advance();  \
+        if (Peek() != tok)  \
+            LOGE("exprect %s, got %s",Token::Str(tok).c_str(),lex()->CurrentToken().view().c_str());\
+        Advance();  \
     } while (0)
 
-ExpressionParser::ExpressionParser(ParserContext* context, ASTFactory* builder, Tokenizer* lex)
-    : ctx_{context}, builder_{builder}, lex_{lex} {
+ExpressionParser::ExpressionParser(ASTFactory* builder, Tokenizer* lex)
+    : builder_{builder}, lex_{lex} {
 }
 
 ExpressionParser::~ExpressionParser() {
 }
 
 const std::string& ExpressionParser::GetStringLiteral() {
-  return lex()->currentToken().view();
+  return lex()->CurrentToken().view();
 }
 
 double ExpressionParser::ParseNumber(const Token& token) {
@@ -69,90 +69,90 @@ int ExpressionParser::ParseInteger(const Token& token) {
 }
 
 const std::string& ExpressionParser::GetIdentifierName() {
-  return lex()->currentToken().view();
+  return lex()->CurrentToken().view();
 }
 
-Token::Type ExpressionParser::peek() {
-  return lex()->peek();
+Token::Type ExpressionParser::Peek() {
+  return lex()->Peek();
 }
 
-void ExpressionParser::advance(bool not_regex) {
-  lex()->advance(not_regex);
+void ExpressionParser::Advance(bool not_regex) {
+  lex()->Advance(not_regex);
 }
 
 
 Handle<Expression> ExpressionParser::ParsePrimary() {
-  auto tok = peek();
+  auto tok = Peek();
   Handle<Expression> result;
 
   if (tok == Token::NULL_LITERAL) {
     result = builder()->NewNullConstant();
   } else if (tok == Token::NUMBER) {
     result = builder()->NewDoubleConstant(
-        ParseNumber(lex()->currentToken()));
+        ParseNumber(lex()->CurrentToken()));
   } else if (tok == Token::INTEGER) {
     result = builder()->NewIntegralConstant(
-        ParseInteger(lex()->currentToken()));
+        ParseInteger(lex()->CurrentToken()));
   } else if (tok == Token::TEMPLATE) {//not support
-    result = builder()->NewStringConstant(lex()->currentToken().view());
+    result = builder()->NewStringConstant(lex()->CurrentToken().view());
   } else if (tok == Token::Token::REGEXP_LITERAL) {//not support
-    result = builder()->NewStringConstant(lex()->currentToken().view());
+    result = builder()->NewStringConstant(lex()->CurrentToken().view());
   } else if (tok == Token::STRING) {
-    result = builder()->NewStringConstant(lex()->currentToken().view());
+    result = builder()->NewStringConstant(lex()->CurrentToken().view());
   } else if (tok == Token::IDENTIFIER) {
-    result = builder()->NewIdentifier(lex()->currentToken().view());
+    result = builder()->NewIdentifier(lex()->CurrentToken().view());
   } else if (tok == Token::TRUE_LITERAL) {
     result = builder()->NewBooleanConstant(true);
   } else if (tok == Token::FALSE_LITERAL) {
     result = builder()->NewBooleanConstant(false);
   } else if (tok == Token::LPAREN) {
-    advance();    // eat '('
+    Advance();    // eat '('
     result = ParseCommaExpression();
-    tok = peek();
+    tok = Peek();
 
     if (tok != Token::RPAREN)
 //      throw SyntaxError(lex()->currentToken(), "expected a ')'");
-      LOGE("expected a ')', got: %s", lex()->currentToken().view().c_str());
+      LOGE("expected a ')', got: %s", lex()->CurrentToken().view().c_str());
   } /*else if (tok == Token::LBRACK) {
     result = ParseArrayLiteral();
   } else if (tok == Token::LBRACE) {
     result = ParseObjectLiteral();
   } */else {
 //    throw SyntaxError(lex()->currentToken(), "expected a primary expression");
-    LOGE("expected a primary expression %s", lex()->currentToken().view().c_str());
+    LOGE("expected a primary expression %s", lex()->CurrentToken().view().c_str());
   }
 
-  advance(true);
+  Advance(true);
   return result;
 }
 
 
 Handle<Expression> ExpressionParser::ParseDotExpression() {
   // eat the '.'
-  advance();
+  Advance();
 
-  auto tok = peek();
+  auto tok = Peek();
 
   // this token should be a valid identifier
   if (tok != Token::IDENTIFIER && !Token::IsKeyword(tok))
 //    throw SyntaxError(lex()->currentToken(), "expected a valid identifier");
-    LOGE("expected a valid identifier %s", lex()->currentToken().view().c_str());
+    LOGE("expected a valid identifier %s", lex()->CurrentToken().view().c_str());
   auto name = GetIdentifierName();
 
   auto ident = builder()->NewIdentifier(name);
-  advance(true);
+  Advance(true);
   return ident;
 }
 
 Handle<Expression> ExpressionParser::ParseIndexExpression() {
   // eat the '['
-  advance();
+  Advance();
   auto expr = ParseAssignExpression();
-  if (lex()->peek() != Token::RBRACK)
+  if (lex()->Peek() != Token::RBRACK)
 //    throw SyntaxError(lex()->currentToken(), "expected a ']'");
-    LOGE("expected a ']' got:%s", lex()->currentToken().view().c_str());
+    LOGE("expected a ']' got:%s", lex()->CurrentToken().view().c_str());
 
-  advance(true); // consumex ']'
+  Advance(true); // consumex ']'
   return expr;
 }
 // MemberExpression :
@@ -166,7 +166,7 @@ Handle<Expression> ExpressionParser::ParseMemberAndCallExpression() {
 
 
   // if next token is neither '[' or '.' or '('
-  Token::Type tok = peek();
+  Token::Type tok = Peek();
 
   if (tok != Token::LBRACK && tok != Token::PERIOD && tok != Token::LPAREN)
     return primary;
@@ -175,7 +175,7 @@ Handle<Expression> ExpressionParser::ParseMemberAndCallExpression() {
   Handle<Expression> member = primary;
   MemberAccessKind kind;
   while (true) {
-    tok = peek();
+    tok = Peek();
     if (tok == Token::PERIOD) {
       temp = ParseDotExpression();
       kind = MemberAccessKind::kDot;
@@ -199,12 +199,12 @@ Handle<Expression> ExpressionParser::ParseMemberAndCallExpression() {
 Handle<ExpressionList> ExpressionParser::ParseArgumentList() {
   Handle<ExpressionList> exprs = builder()->NewExpressionList();
 
-  auto tok = peek();
+  auto tok = Peek();
   EXPECT(Token::LPAREN);
 
-  tok = peek();
+  tok = Peek();
   if (tok == Token::RPAREN) {
-    advance(true);
+    Advance(true);
     return {};
   }
 
@@ -212,16 +212,16 @@ Handle<ExpressionList> ExpressionParser::ParseArgumentList() {
     auto one = ParseAssignExpression();
     exprs->Insert(one);
 
-    tok = peek();
+    tok = Peek();
     if (tok == Token::RPAREN)
       break;
     if (tok != Token::COMMA)
 //      throw SyntaxError(lex()->currentToken(), "expected a ',' or ')'");
       LOGE("expect a ',' or ')'");
-    advance();
+    Advance();
   }
 
-  advance(true); // eat the last ')'
+  Advance(true); // eat the last ')'
   return exprs;
 }
 
@@ -251,24 +251,24 @@ Handle<Expression> ExpressionParser::ParseUnaryExpression() {
   //     - UnaryExpression
   //     ~ UnaryExpression
   //     ! UnaryExpression
-  auto tok = peek();
+  auto tok = Peek();
 
   if (tok == Token::ADD) {
-    advance();
+    Advance();
     // convert + (Expr) to Expr * 1
     return builder()->NewBinaryExpression(BinaryOperation::kMultiplication,
                                           ParseUnaryExpression(),
                                           builder()->NewIntegralConstant(1));
   } else if (tok == Token::SUB) {
-    advance();
+    Advance();
 
     // similarly for `-Expr` to `Expr * -1`
     return builder()->NewBinaryExpression(BinaryOperation::kMultiplication,
                                           ParseUnaryExpression(),
                                           builder()->NewIntegralConstant(1));
   } else if (tok == Token::INC || tok == Token::DEC || tok == Token::NOT) {
-    auto token = lex()->currentToken();
-    lex()->advance();
+    auto token = lex()->CurrentToken();
+    lex()->Advance();
 
     return builder()->NewPrefixExpression(MapTokenWithPrefixOperator(token),
                                           ParseUnaryExpression());
@@ -280,13 +280,13 @@ Handle<Expression> ExpressionParser::ParseUnaryExpression() {
   //      LeftHandSideExpression [no LineTerminator here] --
   auto left = ParseMemberAndCallExpression();
 
-  tok = peek();
+  tok = Peek();
   if (tok == Token::INC) {
-    advance();
+    Advance();
     return builder()->NewPostfixExpression(PostfixOperation::kIncrement,
                                            left);
   } else if (tok == Token::DEC) {
-    advance();
+    Advance();
     return builder()->NewPostfixExpression(PostfixOperation::kDecrement,
                                            left);
   } else {
@@ -346,19 +346,19 @@ BinaryOperation MapBinaryOperator(Token& tok) {
 
 Handle<Expression> ExpressionParser::ParseBinaryExpressionRhs(int prec, Handle<Expression> lhs) {
   while (true) {
-    int tokprec = Token::precedence(peek());
+    int tokprec = Token::Precedence(Peek());
 
     if (tokprec < prec) {
       return lhs;
     }
 
     // now we definitely have a binary operator
-    auto op = MapBinaryOperator(lex()->currentToken());
-    advance();
+    auto op = MapBinaryOperator(lex()->CurrentToken());
+    Advance();
 
     auto rhs = ParseUnaryExpression();
 
-    auto nextprec = Token::precedence(peek());
+    auto nextprec = Token::Precedence(Peek());
     if (tokprec < nextprec) {
       rhs = ParseBinaryExpressionRhs(tokprec + 1, rhs);
     }
@@ -381,14 +381,14 @@ bool IsAssign(Token::Type tok) {
 
 Handle<Expression> ExpressionParser::ParseAssignExpression() {
   auto lhs = ParseTernaryExpression();
-  auto tok = peek();
+  auto tok = Peek();
 
   if (!IsAssign(tok))
     return lhs;
 
   // TODO: information about what kind of assignment is done here should
   //  be stored here. (in the AST?)
-  advance();
+  Advance();
   auto rhs = ParseAssignExpression();
   return builder()->NewAssignExpression((lhs), (rhs));
 }
@@ -396,23 +396,23 @@ Handle<Expression> ExpressionParser::ParseAssignExpression() {
 Handle<Expression> ExpressionParser::ParseTernaryExpression() {
   auto first = ParseBinaryExpression();
 
-  auto tok = peek();
+  auto tok = Peek();
   if (tok != Token::CONDITIONAL) {
     return first;
   }
 
   // now we're parsing conditional expression
   // eat '?'
-  advance();
+  Advance();
   auto second = ParseAssignExpression();
 
-  tok = peek();
+  tok = Peek();
   if (tok != Token::COLON) {
-    LOGE("expected a ':', got: %s", lex()->currentToken().view().c_str());
+    LOGE("expected a ':', got: %s", lex()->CurrentToken().view().c_str());
   }
 
   // eat ':'
-  advance();
+  Advance();
   auto third = ParseAssignExpression();
 
   return builder()->NewTernaryExpression(first, second, third);
@@ -420,7 +420,7 @@ Handle<Expression> ExpressionParser::ParseTernaryExpression() {
 
 Handle<Expression> ExpressionParser::ParseCommaExpression() {
   auto one = ParseAssignExpression();
-  auto tok = lex()->peek();
+  auto tok = lex()->Peek();
   return one;
 }
 
@@ -431,11 +431,9 @@ Handle<Expression> ExpressionParser::ParseExpressionByString(const std::string& 
   auto factory = weex::core::data_render::ASTFactory::GetFactoryInstance();
   std::istringstream ss(str);
   StandardCharacterStream input(ss);
-  ParserContext* context = new weex::core::data_render::ParserContext();
-  Tokenizer tokenizer(&input, context);
-  ExpressionParser parser(context, factory, &tokenizer);
+  Tokenizer tokenizer(&input);
+  ExpressionParser parser(factory, &tokenizer);
   Handle<Expression> result = parser.ParseExpression();
-  delete context;
   return result;
 }
 
