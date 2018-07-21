@@ -26,6 +26,7 @@
 #include "core/data_render/vm.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/render_object.h"
+#include "core/data_render/vnode/vnode_exec_env.h"
 #include "vnode.h"
 
 namespace weex {
@@ -55,7 +56,12 @@ class VNodeRenderManager {
  public:
   void InitVM();
 
-  void TestProcess(const std::string& input, const std::string& page_id);
+  void TestCreateProcess(const std::string& input, const std::string& page_id,
+                         const std::string& init_data);
+
+  void TestRefreshProcess(const std::string& page_id, const std::string& init_data);
+
+  void TestCloseProcess(const std::string& page_id);
 
   bool CreatePage(const std::string& page_id, VNode* vNode);
 
@@ -74,6 +80,8 @@ class VNodeRenderManager {
   static VM* g_vm_;
   static VNodeRenderManager* g_pInstance;
   std::map<std::string, VNode*> vnode_trees_;
+
+  std::map<std::string, ExecState*> exec_states_;
 };
 }  // namespace data_render
 }  // namespace core

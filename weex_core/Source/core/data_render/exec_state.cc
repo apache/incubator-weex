@@ -53,6 +53,20 @@ int Global::Add(const std::string& name, Value value) {
   return index;
 }
 
+int Global::Set(const std::string& name, Value value) {
+  auto iter = map_.find(name);
+  if (iter != map_.end()) {
+    int index = iter->second;
+    values_[static_cast<size_t>(index)] = value;
+    return index;
+  } else {
+    values_.push_back(value);
+    int index = values_.size() - 1;
+    map_.insert(std::make_pair(name, index));
+    return index;
+  }
+}
+
 ExecState::ExecState(VM* vm)
     : vm_(vm),
       frames_(),

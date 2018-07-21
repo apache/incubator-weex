@@ -40,7 +40,7 @@ static Value CreateElement(ExecState* exec_state) {//createElement("tagName","id
   );
   if (exec_state->context()->root() == nullptr) {
     //set root
-    exec_state->context()->SetVNodeRoot(node);
+    exec_state->context()->set_root(node);
   }
   exec_state->context()->InsertNode(node);
   return Value();
@@ -168,6 +168,18 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
     global->Add(it->first, value);
   }
 
+}
+
+void VNodeExecEnv::InitInitDataValue(ExecState* state, const std::string& init_data_str) {
+  std::string err;
+  const json11::Json& json = json11::Json::parse(init_data_str, err);
+  if (!err.empty()) {
+    LOGE("error parsing init data");
+    return;
+  }
+
+  const Value& value = ParseJson2Value(state, json);
+  state->global()->Set("_init_data_", value);
 }
 }
 }

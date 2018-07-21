@@ -91,6 +91,7 @@ class Global {
   Value* Find(int index);
   int IndexOf(const std::string& name);
   int Add(const std::string& name, Value value);
+  int Set(const std::string& name, Value value);
 
  private:
   std::map<std::string, int> map_;

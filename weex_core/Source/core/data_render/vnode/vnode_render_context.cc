@@ -22,16 +22,16 @@
 namespace weex {
 namespace core {
 namespace data_render {
-void VNodeRenderContext::SetVNodeRoot(VNode* v_node) {
-  root_.reset(v_node);
-}
-
 VNode* VNodeRenderContext::FindNode(const std::string& ref) {
   auto it = node_map_.find(ref);
   if (it == node_map_.end()) {
     return nullptr;
   }
   return it->second;
+}
+void VNodeRenderContext::Reset() {
+  root_ = nullptr;
+  node_map_.clear();
 }
 }
 }

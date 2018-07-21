@@ -150,30 +150,34 @@ void VNodeRenderManager::InitVM() {
     g_vm_ = new VM();
   }
 }
-void VNodeRenderManager::TestProcess(const std::string& input, const std::string& page_id) {
+void VNodeRenderManager::TestCreateProcess(const std::string& input, const std::string& page_id,
+                                           const std::string& init_data) {
   auto start = std::chrono::steady_clock::now();
 
-  ExecState* execState = new ExecState(g_vm_);
+  ExecState* exec_state = new ExecState(g_vm_);
+  exec_states_.insert({page_id, exec_state});
 
-  VNodeExecEnv::InitCFuncEnv(execState);
+  VNodeExecEnv::InitCFuncEnv(exec_state);
 
-  execState->context()->page_id(page_id);
+  exec_state->context()->page_id(page_id);
   auto compile_start = std::chrono::steady_clock::now();
-  execState->Compile(input);
+  exec_state->Compile(input);
 
-  VNodeExecEnv::InitGlobalValue(execState);
+  VNodeExecEnv::InitGlobalValue(exec_state);
+  VNodeExecEnv::InitInitDataValue(exec_state, init_data);
 
   auto duration_compile = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::steady_clock::now() - compile_start);
 
 
   auto exec_start = std::chrono::steady_clock::now();
-  execState->Execute();
+  exec_state->Execute();
   auto duration_exec = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::steady_clock::now() - exec_start);
 
 
-  CreatePage(page_id, execState->context()->root());
+  CreatePage(page_id, exec_state->context()->root());
+  exec_state->context()->Reset();
 
   auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::steady_clock::now() - start);
@@ -181,6 +185,31 @@ void VNodeRenderManager::TestProcess(const std::string& input, const std::string
   LOGE("DATA_RENDER, All time %lld", duration_post.count());
   LOGE("DATA_RENDER, Compile time %lld", duration_compile.count());
   LOGE("DATA_RENDER, Exec time %lld", duration_exec.count());
+}
+void VNodeRenderManager::TestRefreshProcess(const std::string& page_id,
+                                            const std::string& init_data) {
+  auto it = exec_states_.find(page_id);
+  if (it == exec_states_.end()) {
+    return;
+  }
+  ExecState* exec_state = it->second;
+
+  VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+
+  exec_state->Execute();//refresh root
+  RefreshPage(page_id,exec_state->context()->root());
+  exec_state->context()->Reset();
+}
+
+void VNodeRenderManager::TestCloseProcess(const std::string& page_id) {
+  auto it = exec_states_.find(page_id);
+  if (it == exec_states_.end()) {
+    return;
+  }
+  ExecState* exec_state = it->second;
+
+  ClosePage(page_id);
+  delete exec_state;
 }
 
 void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node);

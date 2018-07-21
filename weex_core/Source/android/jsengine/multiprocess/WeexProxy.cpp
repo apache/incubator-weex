@@ -33,6 +33,9 @@
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/data_render/expression_parser.h"
 
+#define _TEST_ true
+
+
 const char *s_cacheDir;
 const char *g_jssSoPath = nullptr;
 const char *g_jssSoName = "libweexjss.so";
@@ -45,6 +48,7 @@ static WEEX_CORE_JS_SERVER_API_FUNCTIONS *js_server_api_functions = nullptr;
 bool g_use_single_process = false;
 
 namespace WeexCore {
+    static jstring getJsonData(JNIEnv *env, jobjectArray jargs, int index);
     void WeexProxy::reset() {
         sConnection.reset();
         sHandler.reset();
@@ -344,6 +348,18 @@ namespace WeexCore {
                            jstring jnamespace,
                            jstring jfunction,
                            jobjectArray jargs) {
+        if(_TEST_) {
+            ScopedJStringUTF8 idChar(env, jinstanceid);
+            ScopedJStringUTF8 funcName(env, jfunction);
+            std::string funNameStr(funcName.getChars());
+            if (funNameStr == "refreshInstance"){
+                jstring initData = getJsonData(env, jargs, 1);
+                ScopedJStringUTF8 initDataChar(env, initData);
+                auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+                node_manager->TestRefreshProcess(idChar.getChars(),initDataChar.getChars());
+                return true;
+            }
+        }
         std::string mMessage = "";
         if (!sSender && !js_server_api_functions) {
             LOGE("have not connected to a js server");
@@ -1077,7 +1093,7 @@ namespace WeexCore {
     WeexProxy::createInstanceContext(JNIEnv *env, jobject jcaller, jstring jinstanceid,
                                      jstring name,
                                      jstring jfunction, jobjectArray jargs) {
-        if(true) {
+        if(_TEST_) {
             ScopedJStringUTF8 idChar(env, jinstanceid);
             std::string sourceStr =
                 R"({
@@ -1188,9 +1204,11 @@ namespace WeexCore {
             }
         }
     })";
+            jstring initData = getJsonData(env, jargs, 3);
+            ScopedJStringUTF8 initDataChar(env, initData);
             auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
             node_manager->InitVM();
-            node_manager->TestProcess(sourceStr, idChar.getChars());
+            node_manager->TestCreateProcess(sourceStr, idChar.getChars(), initDataChar.getChars());
 
             return true;
         }
@@ -1276,6 +1294,12 @@ namespace WeexCore {
     jint WeexProxy::destoryInstance(JNIEnv *env, jobject jcaller, jstring jinstanceid,
                                     jstring jnamespace,
                                     jstring jfunction, jobjectArray jargs) {
+        if(_TEST_) {
+            ScopedJStringUTF8 idChar(env, jinstanceid);
+            auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+            node_manager->TestCloseProcess(idChar.getChars());
+            return true;
+        }
         int ret = execJS(env, nullptr, jinstanceid, jnamespace, jfunction, jargs);
         if (jfunction == NULL || jinstanceid == NULL) {
             LOGE("native_destoryInstance function is NULL");
