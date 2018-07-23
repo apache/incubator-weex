@@ -158,6 +158,11 @@ public class WXBaseCircleIndicator extends FrameLayout implements WXGestureObser
   }
 
   @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
+  }
+
+  @Override
   public boolean dispatchTouchEvent(MotionEvent event) {
     boolean result = super.dispatchTouchEvent(event);
     if (wxGesture != null) {
