@@ -103,7 +103,10 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
   state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
 }
 
-void CodeGenerator::Visit(ArgumentList *node, void *data) {}
+void CodeGenerator::Visit(ArgumentList *node, void *data) {
+  Handle<ExpressionList> exprList = node->args();
+  exprList->Accept(this, data);
+}
 
 void CodeGenerator::Visit(IfStatement *node, void *data) {
   RegisterScope scope(cur_block_.get());
@@ -112,7 +115,7 @@ void CodeGenerator::Visit(IfStatement *node, void *data) {
   if (node->condition().get() != NULL) {
     node->condition()->Accept(this, &condition);
   }
-  auto save = cur_func_->func_state()->AddInstruction(0);
+  auto slot = cur_func_->func_state()->AddInstruction(0);
   int tb_start_index = cur_func_->func_state()->instructions().size() - 1;
   if (node->body().get() != NULL) {
     node->body()->Accept(this, nullptr);
@@ -121,11 +124,33 @@ void CodeGenerator::Visit(IfStatement *node, void *data) {
 
   FuncState *state = cur_func_->func_state();
   state->ReplaceInstruction(
-      save,
+      slot,
       CREATE_ABC(OP_JMP, condition, 1, tb_end_index - tb_start_index + 1));
 }
 
-void CodeGenerator::Visit(IfElseStatement *node, void *data) {}
+void CodeGenerator::Visit(IfElseStatement *node, void *data) {
+  long ifcondition = cur_block_->NextRegisterId();
+  if (node->condition().get() != NULL) {
+    node->condition()->Accept(this, &ifcondition);
+  }
+  auto slot = cur_func_->func_state()->AddInstruction(0);
+  int tb_start_index = cur_func_->func_state()->instructions().size() - 1;
+  if (node->body().get() != NULL) {
+    node->body()->Accept(this, nullptr);
+  }
+  int tb_end_index = cur_func_->func_state()->instructions().size() - 1;
+  auto else_slot = cur_func_->func_state()->AddInstruction(0);
+
+  long else_condition = cur_block_->NextRegisterId();
+  if (node->els().get() != NULL) {
+    node->els()->Accept(this, &else_condition);
+  }
+
+  FuncState *state = cur_func_->func_state();
+  state->ReplaceInstruction(
+      slot,
+      CREATE_ABC(OP_JMP, ifcondition, 1, tb_end_index - tb_start_index + 1));
+}
 
 void CodeGenerator::Visit(ForStatement *node, void *data) {
   RegisterScope scope(cur_block_.get());
@@ -310,11 +335,76 @@ void CodeGenerator::Visit(DoubleConstant *node, void *data) {
   }
 }
 
-void CodeGenerator::Visit(ObjectConstant *node, void *data) {}
+void CodeGenerator::Visit(ObjectConstant *node, void *data) {
+  long ret = data == nullptr ? -1 : *static_cast<long *>(data);
 
-void CodeGenerator::Visit(ArrayConstant *node, void *data) {}
+  FuncState *func_state = cur_func_->func_state();
 
-void CodeGenerator::Visit(MemberExpression *node, void *data) {}
+  // new table
+  Value *table = TableFactory::Instance()->CreateTable();
+  if (ret >= 0) {
+    int tableIndex = func_state->AddConstant(*table);
+    Instruction i = CREATE_ABC(OpCode::OP_LOADK, ret, tableIndex, 0);
+    func_state->AddInstruction(i);
+
+    // expr
+    for (auto it = node->proxy().begin(); it != node->proxy().end(); it++) {
+      long item = cur_block_->NextRegisterId();
+
+      auto ktemp = (*it).second;
+      ktemp->Accept(this, &item);
+
+      Instruction i = CREATE_ABC(OpCode::OP_SETTABLE, ret, 0, item);
+      func_state->AddInstruction(i);
+    }
+  }
+}
+
+void CodeGenerator::Visit(ArrayConstant *node, void *data) {
+  long reg = data == nullptr ? -1 : *static_cast<long *>(data);
+
+  FuncState *func_state = cur_func_->func_state();
+
+  // new table
+  Value *table = TableFactory::Instance()->CreateTable();
+  if (reg >= 0) {
+    int tableIndex = func_state->AddConstant(*table);
+    Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, tableIndex, 0);
+    func_state->AddInstruction(i);
+
+    // expr
+    for (auto it = node->exprs().begin(); it != node->exprs().end(); it++) {
+      long item = cur_block_->NextRegisterId();
+
+      auto temp = (*it).get();
+      temp->Accept(this, &item);
+
+      Instruction i = CREATE_ABC(OpCode::OP_SETTABLE, reg, 0, item);
+      func_state->AddInstruction(i);
+    }
+  }
+}
+
+void CodeGenerator::Visit(MemberExpression *node, void *data) {
+  long ret = data == nullptr ? cur_block_->NextRegisterId()
+                             : *static_cast<long *>(data);
+
+  Handle<Identifier> table = node->expr();
+  long tindex = exec_state_->global()->IndexOf(table->GetName());
+
+  if (node->kind() == MemberAccessKind::kIndex) {
+    long mindex = cur_block_->NextRegisterId();
+    if (node->member().get() != NULL) {
+      node->member()->Accept(this, &mindex);
+    }
+
+    FuncState *funcState = cur_func_->func_state();
+    funcState->AddInstruction(CREATE_ABC(OP_GETTABLE, ret, tindex, mindex));
+
+  } else if (node->kind() == MemberAccessKind::kDot) {
+  } else if (node->kind() == MemberAccessKind::kCall) {
+  }
+}
 
 void CodeGenerator::Visit(Identifier *node, void *data) {
   long reg_a = data == nullptr ? cur_block_->NextRegisterId()
