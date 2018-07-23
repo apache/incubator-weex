@@ -64,6 +64,8 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 /// @name Component Tree Building
 ///--------------------------------------
 
+#ifdef WX_IMPORT_WEEXCORE
+#else
 /**
  * @abstract create root of component tree
  **/
@@ -73,6 +75,7 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
  * @abstract add component
  **/
 - (void)addComponent:(NSDictionary *)componentData toSupercomponent:(NSString *)superRef atIndex:(NSInteger)index appendingInTree:(BOOL)appendingInTree;
+#endif
 
 /**
  * @abstract remove component

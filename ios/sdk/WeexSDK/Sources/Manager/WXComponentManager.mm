@@ -65,7 +65,10 @@ static NSThread *WXComponentThread;
 
     WXComponent *_rootComponent;
     NSMutableArray *_fixedComponents;
+#ifdef WX_IMPORT_WEEXCORE
+#else
     WeexCore::WXCoreLayoutNode* _rootFlexCSSNode;
+#endif
     CADisplayLink *_displayLink;
     pthread_mutex_t _propertyMutex;
     pthread_mutexattr_t _propertMutexAttr;
@@ -101,6 +104,8 @@ static NSThread *WXComponentThread;
 
 - (void)dealloc
 {
+#ifdef WX_IMPORT_WEEXCORE
+#else
     if(_rootFlexCSSNode){
         if ([[NSThread currentThread].name isEqualToString:WX_COMPONENT_THREAD_NAME]) {
             delete _rootFlexCSSNode;
@@ -109,6 +114,7 @@ static NSThread *WXComponentThread;
         }
         _rootFlexCSSNode=nullptr;
     }
+#endif
     [NSMutableArray wx_releaseArray:_fixedComponents];
     pthread_mutex_destroy(&_propertyMutex);
     pthread_mutexattr_destroy(&_propertMutexAttr);
@@ -237,6 +243,9 @@ static NSThread *WXComponentThread;
 
 #pragma mark Component Tree Building
 
+#ifdef WX_IMPORT_WEEXCORE
+#else
+
 - (void)createRoot:(NSDictionary *)data
 {
     WXAssertComponentThread();
@@ -341,6 +350,8 @@ static NSThread *WXComponentThread;
         [self _layoutAndSyncUI];
     }
 }
+
+#endif
 
 - (void)moveComponent:(NSString *)ref toSuper:(NSString *)superRef atIndex:(NSInteger)index
 {
@@ -942,7 +953,7 @@ static NSThread *WXComponentThread;
 #endif
 }
 
-- (void) _printFlexComonentFrame:(WXComponent *)component
+- (void) _printFlexComponentFrame:(WXComponent *)component
 {
 #ifdef DEBUG
     WXLogDebug(@"node ref:%@, type:%@ , frame:%@",
@@ -953,7 +964,7 @@ static NSThread *WXComponentThread;
 #endif
     
     for (WXComponent *childComponent in component.subcomponents) {
-        [self _printFlexComonentFrame:childComponent];
+        [self _printFlexComponentFrame:childComponent];
     }
 }
 
@@ -967,23 +978,19 @@ static NSThread *WXComponentThread;
         }
     });
 }
+
+#ifdef WX_IMPORT_WEEXCORE
+#else
 - (void)_initRootFlexCssNode
 {
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#else
     _rootFlexCSSNode = new WeexCore::WXCoreLayoutNode();
     [self _applyRootFrame:self.weexInstance.frame];
     _rootFlexCSSNode->setFlexWrap(WeexCore::kNoWrap);
     _rootFlexCSSNode->setContext((__bridge void *)(self));
-#endif
 }
 
 - (void)_calculateRootFrame
 {
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#else
         if(!_rootFlexCSSNode->hasNewLayout()){
             return;
         }
@@ -1005,9 +1012,8 @@ static NSThread *WXComponentThread;
         //   _rootFlexCSSNode->reset();
         
         //    resetNodeLayout(_rootFlexCSSNode);
-#endif
 }
-
+#endif
 
 #pragma mark Fixed 
 
