@@ -319,16 +319,11 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
       } break;
 
-        //      case OP_NEWTABLE: {
-        //        a = frame.reg + GET_ARG_A(instruction);
-        //        size_t b = GET_ARG_B(instruction);
-        //        size_t c = GET_ARG_C(instruction);
-        //        Table *t = NewTable();
-        //        SetTabValue(a, reinterpret_cast<GCObject *>(t));
-        //        if (b != 0 || c != 0) {
-        //          ResizeTab(t, b, c);
-        //        }
-        //      } break;
+      case OP_NEWTABLE: {
+        a = frame.reg + GET_ARG_A(instruction);
+        Value *t = exec_state->getTableFactory()->Instance()->CreateTable();
+        *a = *t;
+      } break;
 
       case OP_GETTABLE: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -338,9 +333,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
           // TODO error
           return;
         }
-        Value ret = GetTabValue(reinterpret_cast<const Table *>(b->gc), c);
-        if (!IsNil(&ret)) {
-          *a = ret;
+        Value *ret = GetTabValue(reinterpret_cast<const Table *>(b->gc), c);
+        if (!IsNil(ret)) {
+          *a = *ret;
         } else {
           SetNil(a);
         }
@@ -350,11 +345,11 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
-        if (IsTable(a)) {
+        if (!IsTable(a)) {
           // TODO error
           return;
         }
-        int ret = SetTabValue(reinterpret_cast<Table *>(a->gc), b, c);
+        int ret = SetTabValue(reinterpret_cast<Table *>(a->gc), b, *c);
         if (!ret) {
           // TODO set faile
         }

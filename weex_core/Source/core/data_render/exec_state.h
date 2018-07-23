@@ -31,6 +31,7 @@
 #include "core/data_render/vnode/vnode.h"
 #include "core/data_render/vnode/vnode_render_context.h"
 #include "core/data_render/object.h"
+#include "core/data_render/table_factory.h"
 
 namespace weex {
 namespace core {
@@ -114,6 +115,7 @@ class ExecState {
   inline ExecStack* stack() { return stack_.get(); }
   inline StringTable* string_table() { return string_table_.get(); }
   inline VNodeRenderContext* context() { return render_context_.get(); }
+  inline TableFactory* getTableFactory() { return factory_; }
 
  private:
   friend class VM;
@@ -122,6 +124,9 @@ class ExecState {
   void CallFunction(Value* func, size_t argc, Value* ret);
 
   VM* vm_;
+
+  TableFactory *factory_;
+
   std::vector<Frame> frames_;
   std::unique_ptr<Global> global_;
   std::unique_ptr<ExecStack> stack_;

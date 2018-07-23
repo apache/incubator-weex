@@ -24,8 +24,8 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-int IndexOf(const std::vector<Value*> *arr, const Value * val) {
-  std::vector<Value*>::const_iterator it = std::find(arr->begin(), arr->end(), val);
+int IndexOf(const std::vector<Value> *arr, const Value *val) {
+  auto it = std::find(arr->begin(), arr->end(), val);
   if (it != arr->end()) {
     return std::distance(arr->begin(), it);
   } else {
@@ -33,20 +33,22 @@ int IndexOf(const std::vector<Value*> *arr, const Value * val) {
   }
 }
 
-int SetTabIntValue(Table *t, Value *key, Value *val) {
-  if (IsNil(key)) {
+int SetTabIntValue(Table *t, Value *key, const Value *val) {
+  if (IsNil(val)) {
     return 0;
   }
   int index = IndexOf(t->array, val);
   if (index < 0) {
-    t->array->push_back(val);
+    t->array->emplace_back(val);
     index = t->array->size() - 1;
   }
-  SetIValue(key, index);
+  if (nullptr != key) {
+    SetIValue(key, index);
+  }
   return 1;
 }
 
-int SetTabStringValue(Table *t, const Value *key, Value *val) {
+int SetTabStringValue(Table *t, const Value *key, const Value *val) {
   if (IsNil(key)) {
     return 0;
   }
@@ -56,7 +58,7 @@ int SetTabStringValue(Table *t, const Value *key, Value *val) {
   }
   auto it = t->map->find(keyStr);
   if (it != t->map->end()) {
-    //TODO
+    t->map->erase(it);
   }
   t->map->insert(std::make_pair(keyStr, val));
   return 1;
@@ -65,7 +67,7 @@ int SetTabStringValue(Table *t, const Value *key, Value *val) {
 Value *GetTabIntValue(const Table *t, const Value *key) {
   int index = IntValue(key);
   if (index < t->array->size()) {
-    return t->array->at(index);
+    return &(t->array->at(index));
   }
   return nullptr;
 }
@@ -76,19 +78,19 @@ Value *GetTabStringValue(const Table *t, const Value *key) {
 
     auto it = t->map->find(str);
     if (it != t->map->end()) {
-      return it->second;
+      return &(it->second);
     }
   }
   return nullptr;
 }
 
 Table *NewTable() {
-  Table *t = reinterpret_cast<Table *>(reallocMem(NULL, sizeof(Table)));
-  if (NULL == t) {
-    return NULL;
+  Table *t = reinterpret_cast<Table *>(reallocMem(nullptr, sizeof(Table)));
+  if (nullptr == t) {
+    return nullptr;
   }
-  t->array = new std::vector<Value*>();
-  t->map = new std::unordered_map<std::string, Value*>();
+  t->array = new std::vector<Value>();
+  t->map = new std::unordered_map<std::string, Value>();
   t->sizearray = 0;
   t->sizenode = 0;
   return t;
@@ -154,25 +156,34 @@ int ResizeTab(Table *t, size_t nasize, size_t nhsize) {
   return 1;
 }
 
-Value *GetTabValue(const Table *t, const Value *key) {
-  if (IsInt(key)) {
-    return GetTabIntValue(t, key);
-  } else if (IsString(key)) {
-    return GetTabStringValue(t, key);
+Value *GetTabValue(const Table *t, const Value &key) {
+  if (IsInt(&key)) {
+    return GetTabIntValue(t, &key);
+  } else if (IsString(&key)) {
+    return GetTabStringValue(t, &key);
   }
   return nullptr;
 }
 
-int SetTabValue(Table *t, Value *key, Value *val) {
-  if (NULL == key) {
-    return 0;
-  }
-  if (IsString(key)) {
-    return SetTabStringValue(t, key, val);
-  } else if (IsInt(key)) {
-    return SetTabIntValue(t, key, val);
+int SetTabValue(Table *t, Value *key, const Value &val) {
+  if (IsInt(key)){
+      return SetTabIntValue(t, key, &val);
+  } else if (IsString(key)) {
+    return SetTabStringValue(t, key, &val);
   }
   return 0;
+}
+
+int GetTableSize(Table *t) {
+    if (!t) {
+        return -1;
+    }
+    int size = t->array->size();
+    if (size > 0) {
+        return size;
+    } else {
+        return t->map->size();
+    }
 }
 
 }  // namespace data_render

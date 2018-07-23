@@ -74,7 +74,7 @@ bool IsNil(const Value *o) {
 }
 
 void SetNil(Value *o) {
-  if (!o) {
+  if (nullptr != o) {
     o->type = Value::Type::NIL;
   }
 }
@@ -110,10 +110,10 @@ bool BoolValue(const Value *o) {
   return (Value::Type::BOOL == o->type) ? o->b : false;
 }
 
-String *StringValue(const Value *o) { return IsString(o) ? o->str : NULL; }
+String *StringValue(const Value *o) { return IsString(o) ? o->str : nullptr; }
 
 char *CStringValue(const Value *o) {
-  return (IsString(o) && NULL != o->str) ? o->str->c_str() : NULL;
+  return (IsString(o) && nullptr != o->str) ? o->str->c_str() : nullptr;
 }
 
 int ToNum(const Value *o, double &n) {
@@ -246,6 +246,10 @@ bool ValueLT(const Value *a, const Value *b) {
 void FreeValue(Value *o) {
   if (!o) {
     return;
+  }
+  if (Value::Type::TABLE == o->type) {
+    delete o->gc;
+    delete o;
   }
 }
 

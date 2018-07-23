@@ -22,7 +22,7 @@
 
 #include <vector>
 #include <unordered_map>
-#include <math.h>
+#include <cmath>
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
 
@@ -78,10 +78,10 @@ typedef struct Table {
 
   size_t sizearray; /* size of 'array' array */
   size_t sizenode;
-  std::vector<Value*> *array; /* array part */
+  std::vector<Value> *array; /* array part */
   int *hash;
   Node *node;
-  std::unordered_map<std::string, Value*> *map;
+  std::unordered_map<std::string, Value> *map;
 
 } Table;
 
@@ -218,7 +218,7 @@ inline Table* TableValue(const Value *o) {
   if (IsTable(o)) {
     return reinterpret_cast<Table *>(o->gc);
   }
-  return NULL;
+  return nullptr;
 }
 
 inline int ToNumber_(const Value *value, double &ret) {

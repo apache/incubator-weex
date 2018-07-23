@@ -75,9 +75,12 @@ ExecState::ExecState(VM* vm)
       func_state_(nullptr),
       string_table_(new StringTable),
       render_context_(new VNodeRenderContext),
+      factory_(TableFactory::Instance()),
       global_variables_() {}
 
-ExecState::~ExecState() {}
+ExecState::~ExecState() {
+  TableFactory::Release();
+}
 
 void ExecState::Compile(const std::string& source) {
   CodeGenerator generator(this);

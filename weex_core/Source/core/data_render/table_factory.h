@@ -36,13 +36,19 @@ public:
 
     static TableFactory* Instance();
 
-    Value* CreateTable();
+    static void Release();
+
+    virtual Value* CreateTable();
 
     ~TableFactory();
 
 private:
-    TableFactory() {};
+
+    static std::unique_ptr<TableFactory> _instance;
+
     std::vector<Value*> tablePool;
+
+    TableFactory() {};
 };
 
 }

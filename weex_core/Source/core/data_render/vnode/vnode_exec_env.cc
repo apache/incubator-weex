@@ -36,13 +36,14 @@ static Value GetTableSize(ExecState* exec_state) {
   size_t length = exec_state->GetArgumentCount();
   if (length > 0) {
     Value* value = exec_state->GetArgument(0);
-    if (value->type == Value::Type::TABLE) {
-      Table* table = TableValue(value);
-      if (table->sizearray > 0) {
-        return Value(static_cast<int64_t>(table->sizearray));
-      } else if (table->map->size() > 0) {
-        return Value(static_cast<int64_t>(table->map->size()));
-      };
+    if (IsTable(value)) {
+//      Table* table = TableValue(value);
+//      if (table->sizearray > 0) {
+//        return Value(static_cast<int64_t>(table->sizearray));
+//      } else if (table->map->size() > 0) {
+//        return Value(static_cast<int64_t>(table->map->size()));
+//      };
+      return Value(static_cast<int64_t>(GetTableSize(TableValue(value))));
     }
   }
   return Value(static_cast<int64_t>(-1));
@@ -155,8 +156,9 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     for (auto it = data_objects.begin(); it != data_objects.end();
          it++, index++) {
       // will be free by table
-      SetTabValue(TableValue(value), new Value(index),
-                  new Value(ParseJson2Value(state, *it)));
+      Value key(index);
+      Value val(ParseJson2Value(state, *it));
+      SetTabValue(TableValue(value), &key, val);
     }
     return Value(*value);
   } else if (json.is_object()) {
@@ -164,9 +166,9 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     const json11::Json::object& data_objects = json.object_items();
     for (auto it = data_objects.begin(); it != data_objects.end(); it++) {
       // will be free by table
-      SetTabValue(TableValue(value),
-                  new Value(state->string_table()->StringFromUTF8(it->first)),
-                  new Value(ParseJson2Value(state, it->second)));
+      Value key(state->string_table()->StringFromUTF8(it->first));
+      Value val(ParseJson2Value(state, it->second));
+      SetTabValue(TableValue(value), &key, val);
     }
     return Value(*value);
   } else {

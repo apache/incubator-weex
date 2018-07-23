@@ -9,14 +9,22 @@ namespace weex {
 namespace core {
 namespace data_render {
 
+std::unique_ptr<TableFactory> TableFactory::_instance = nullptr;
+
 TableFactory* TableFactory::Instance() {
-    static std::unique_ptr<TableFactory> _instance;
 
     if (!_instance) {
         _instance.reset(new TableFactory());
     }
 
     return _instance.get();
+}
+
+void TableFactory::Release() {
+    if (_instance) {
+        delete _instance.get();
+        _instance = nullptr;
+    }
 }
 
 Value* TableFactory::CreateTable() {
