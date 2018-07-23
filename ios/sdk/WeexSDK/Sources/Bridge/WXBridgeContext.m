@@ -65,7 +65,7 @@ _Pragma("clang diagnostic pop") \
 //store the methods which will be executed from native to js
 @property (nonatomic, strong) NSMutableDictionary   *sendQueue;
 //the instance stack
-@property (nonatomic, strong) WXThreadSafeMutableArray    *insStack;
+@property (nonatomic, strong) NSMutableArray    *insStack;
 //identify if the JSFramework has been loaded
 @property (nonatomic) BOOL frameworkLoadFinished;
 //store some methods temporarily before JSFramework is loaded
@@ -415,7 +415,7 @@ _Pragma("clang diagnostic pop") \
 {
     if (_insStack) return _insStack;
 
-    _insStack = [WXThreadSafeMutableArray array];
+    _insStack = [NSMutableArray array];
     
     return _insStack;
 }
@@ -662,9 +662,7 @@ _Pragma("clang diagnostic pop") \
     
     //remove instance from stack
 	@synchronized(self) {
-		if([self.insStack containsObject:instance]){
-			[self.insStack removeObject:instance];
-		}
+		[self.insStack removeObject:instance];
 	}
     
     if(_jsBridge && [_jsBridge respondsToSelector:@selector(removeTimers:)]){
