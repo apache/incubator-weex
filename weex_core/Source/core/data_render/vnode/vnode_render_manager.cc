@@ -26,7 +26,7 @@
 #include "core/data_render/vnode/vnode_exec_env.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_creator.h"
-#include "json/json11.hpp"
+#include "core/data_render/json/json11.hpp"
 
 #define VRENDER_LOG true
 

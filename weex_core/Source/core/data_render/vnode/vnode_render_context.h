@@ -29,6 +29,8 @@ namespace core {
 namespace data_render {
 class VNodeRenderContext {
  public:
+  VNodeRenderContext();
+  ~VNodeRenderContext();
   VNode* FindNode(const std::string& ref);
   void Reset();
 
@@ -37,9 +39,7 @@ class VNodeRenderContext {
   inline VNode* root() const { return root_; }
   inline void set_root(VNode* root) { root_ = root; }
 
-  inline void InsertNode(VNode* node) {
-    node_map_.insert({node->ref(), node});
-  }
+  inline void InsertNode(VNode* node) { node_map_.insert({node->ref(), node}); }
   inline json11::Json& raw_json() { return raw_json_; }
 
  private:
