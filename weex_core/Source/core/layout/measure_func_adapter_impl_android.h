@@ -19,7 +19,6 @@
 #include "measure_func_adapter.h"
 #include <core/render/node/render_object.h>
 #include <android/bridge/impl/content_box_measurement_impl_android.h>
-#include <android/bridge/impl/measure_mode_impl_android.h>
 #include <android/base/jni/scoped_java_ref.h>
 
 namespace WeexCore {
@@ -47,15 +46,9 @@ namespace WeexCore {
 
       JNIEnv *env = getJNIEnv();
 
-      int widthMode = Unspecified(env);
-      int heightMode = Unspecified(env);
-      if (widthMeasureMode == kExactly)
-        widthMode = Exactly(env);
-      if (heightMeasureMode == kExactly)
-        heightMode = Exactly(env);
       cumsmeasure_Imple_Android(env, measureFunc,
                                 width, height,
-                                widthMode, heightMode);
+                                widthMeasureMode, heightMeasureMode);
       size.width = GetLayoutWidth(env, measureFunc);
       size.height = GetLayoutHeight(env, measureFunc);
 

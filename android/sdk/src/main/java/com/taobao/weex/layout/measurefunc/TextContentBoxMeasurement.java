@@ -261,10 +261,10 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
   protected void updateSpannable(Spannable spannable, int spanFlag) {
     int end = spannable.length();
     if (mFontSize == UNSET) {
-      setSpan(spannable, new AbsoluteSizeSpan(WXText.sDEFAULT_SIZE), 0, end, spanFlag);
+      mTextPaint.setTextSize(WXText.sDEFAULT_SIZE);
     }
     else{
-      setSpan(spannable,  new AbsoluteSizeSpan(mFontSize), 0, end, spanFlag);
+      mTextPaint.setTextSize(mFontSize);
     }
 
     if (mLineHeight != UNSET) {
@@ -278,7 +278,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
     }
 
     if (mIsColorSet) {
-      setSpan(spannable, new ForegroundColorSpan(mColor), 0, end, spanFlag);
+      mTextPaint.setColor(mColor);
     }
 
     if (mTextDecoration == WXTextDecoration.UNDERLINE || mTextDecoration == WXTextDecoration.LINETHROUGH) {

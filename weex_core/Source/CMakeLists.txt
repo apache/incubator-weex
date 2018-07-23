@@ -100,7 +100,6 @@ if (ANDROID)
     ./android/base/string/jstring_cache.cpp
     ./android/bridge/impl/bridge_impl_android.cpp
     ./android/bridge/impl/weexcore_impl_android.cpp
-    ./android/bridge/impl/measure_mode_impl_android.cpp
     ./android/bridge/impl/content_box_measurement_impl_android.cpp
     ./android/bridge/impl/jsfunction_impl_android.cpp
     ./android/bridge/impl/native_render_object_utils_impl_android.cpp
