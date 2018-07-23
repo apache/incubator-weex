@@ -100,7 +100,12 @@ public class FontDO {
               String base64Data = data[1];
               if (!TextUtils.isEmpty(base64Data)) {
                 String md5 = WXFileUtils.md5(base64Data);
-                File tmpFile = new File(new File(WXEnvironment.getApplication().getCacheDir(), "font-family"), md5);
+                File cacheDir = new File(WXEnvironment.getApplication().getCacheDir(),
+                    "font-family");
+                if (!cacheDir.exists()) {
+                  cacheDir.mkdirs();
+                }
+                File tmpFile = new File(cacheDir, md5);
                 if(!tmpFile.exists()){
                   tmpFile.createNewFile();
                   WXFileUtils.saveFile(tmpFile.getPath(), Base64.decode(base64Data, Base64.DEFAULT), WXEnvironment.getApplication());
@@ -118,7 +123,7 @@ public class FontDO {
         mState = STATE_INIT;
       } catch (Exception e) {
         mType = STATE_INVALID;
-        WXLogUtils.e("TypefaceUtil", "URI.create(mUrl) failed mUrl: " + mUrl);
+        WXLogUtils.e("TypefaceUtil", "URI.create(mUrl) failed mUrl: " + mUrl+ "\n"+ WXLogUtils.getStackTrace(e));
       }
     } else {
       mUrl = src;
