@@ -33,12 +33,14 @@ bool MultiProcessAndSoInitializer::Init(const std::function<void(IPCHandler*)>& 
                                         const std::function<bool(std::unique_ptr<WeexJSConnection>, std::unique_ptr<IPCHandler>)>& OnInitFinished,
                                         const std::function<void(const char*, const char*, const char*)>& ReportException){
   bool reinit = false;
+  LOGE("MultiProcessAndSoInitializer IS IN init");
 startInitFrameWork:
   try {
     auto handler = std::move(createIPCHandler());
-    OnHandlerCreated(handler.get());
+    auto handlerServer = std::move(createIPCHandler());
+    OnHandlerCreated(handlerServer.get());
     std::unique_ptr<WeexJSConnection> connection(new WeexJSConnection());
-    auto sender = connection->start(handler.get(), reinit);
+    auto sender = connection->start(handler.get(), handlerServer.get(), reinit);
     if (sender == nullptr) {
       LOGE("JSFramwork init start sender is null");
       if (!reinit) {

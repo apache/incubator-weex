@@ -20,6 +20,7 @@
 
 #include "ashmem.h"
 #include "WeexProxy.h"
+#include "ExtendJSApi.h"
 #include <dirent.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -35,17 +36,21 @@
 #include <android/base/log_utils.h>
 #include <errno.h>
 #include <android/utils/so_utils.h>
+#include <IPCListener.h>
+#include <android/bridge/impl/android_bridge_in_multi_process.h>
+#include <core/manager/weex_core_manager.h>
+#include <core/bridge/script_bridge_in_multi_process.h>
 
 //extern const char *s_cacheDir;
 //extern const char *g_jssSoPath;
 //extern const char *g_jssSoName;
 //extern bool s_start_pie;
 
-static void doExec(int fd, bool traceEnable, bool startupPie = true);
+static void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie);
 
 static int copyFile(const char *SourceFile, const char *NewFile);
 
-static void closeAllButThis(int fd);
+static void closeAllButThis(int fd, int fd2);
 
 static void printLogOnFile(const char *log);
 
@@ -67,8 +72,40 @@ WeexJSConnection::~WeexJSConnection() {
   end();
 }
 
-IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
-  int fd = ashmem_create_region("WEEX_IPC", IPCFutexPageQueue::ipc_size);
+struct ThreadData {
+    int ipcServerFd;
+    IPCHandler *ipcServerHandler;
+};
+pthread_t ipcServerThread = 0;
+static volatile bool finish = false;
+static void *newIPCServer(void *_td) {
+    ThreadData *td = static_cast<ThreadData *>(_td);
+    void *base = mmap(nullptr, IPCFutexPageQueue::ipc_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+                      td->ipcServerFd, 0);
+    LOGE("mmap222 result base is %x",base);
+    if (base == MAP_FAILED) {
+        int _errno = errno;
+        close(td->ipcServerFd);
+        throw IPCException("failed to map ashmem region: %s", strerror(_errno));
+    }
+    std::unique_ptr<IPCFutexPageQueue> futexPageQueue(
+            new IPCFutexPageQueue(base, IPCFutexPageQueue::ipc_size, 0));
+    LOGE("HANDLER is %x",td->ipcServerHandler);
+    std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), td->ipcServerHandler));
+    std::unique_ptr<IPCListener> listener =std::move(createIPCListener(futexPageQueue.get(), td->ipcServerHandler)) ;
+    LOGE("newIPCServer is running %d",gettid());
+    ScriptBridgeInMultiProcess* bridge = static_cast<ScriptBridgeInMultiProcess*>(WeexCoreManager::getInstance()->script_bridge());
+    bridge->RegisterIPCCallback(td->ipcServerHandler);
+
+    finish = true;
+    futexPageQueue->spinWaitPeer();
+    listener->listen();
+}
+
+
+IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandler, bool reinit) {
+  LOGE("start is running %d",gettid());
+  int fd = ashmem_create_region("WEEX_IPC_CLIENT", IPCFutexPageQueue::ipc_size);
   if (-1 == fd) {
     throw IPCException("failed to create ashmem region: %s", strerror(errno));
   }
@@ -84,6 +121,23 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
   std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), handler));
   m_impl->serverSender = std::move(sender);
   m_impl->futexPageQueue = std::move(futexPageQueue);
+
+  int fd2 = ashmem_create_region("WEEX_IPC_SERVER", IPCFutexPageQueue::ipc_size);
+  LOGE("FD2 = %d",fd2);
+  if (-1 == fd2) {
+    throw IPCException("failed to create ashmem region: %s", strerror(errno));
+  }
+  ThreadData td = { static_cast<int>(fd2), static_cast<IPCHandler *>(serverHandler) };
+
+  pthread_attr_t threadAttr;
+  finish = false;
+  pthread_attr_init(&threadAttr);
+  int i = pthread_create(&ipcServerThread, &threadAttr, newIPCServer, &td);
+  while (!finish) {
+    continue;
+  }
+
+
 #if PRINT_LOG_CACHEFILE
   if (s_cacheDir) {
     logFilePath = s_cacheDir;
@@ -124,10 +178,10 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
     throw IPCException("failed to fork: %s", strerror(myerrno));
   } else if (child == 0) {
     // the child
-    closeAllButThis(fd);
+    closeAllButThis(fd, fd2);
     // implements close all but handles[1]
     // do exec
-    doExec(fd, true, startupPie);
+    doExec(fd, fd2, true, startupPie);
     LOGE("exec Failed completely.");
     // failed to exec
     _exit(1);
@@ -239,7 +293,7 @@ std::unique_ptr<const char *[]> EnvPBuilder::build() {
   return ptr;
 }
 
-void doExec(int fd, bool traceEnable, bool startupPie) {
+void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
   std::string executablePath;
   std::string icuDataPath;
   findIcuDataPath(icuDataPath);
@@ -300,7 +354,9 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
   }
   crashFilePathEnv.append("/jsserver_crash");
   char fdStr[16];
-  snprintf(fdStr, 16, "%d", fd);
+  char fdServerStr[16];
+  snprintf(fdStr, 16, "%d", fdClient);
+  snprintf(fdServerStr, 16, "%d", fdServer);
   EnvPBuilder envpBuilder;
   envpBuilder.addNew(ldLibraryPathEnv.c_str());
   envpBuilder.addNew(icuDataPathEnv.c_str());
@@ -309,7 +365,7 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
   {
     std::string executableName = executablePath + '/' + "libweexjsb64.so";
     chmod(executableName.c_str(), 0755);
-    const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", nullptr};
+    const char *argv[] = {executableName.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0", nullptr};
     if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                      const_cast<char *const *>(envp.get()))) {
     }
@@ -347,7 +403,7 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
       mcfile << "jsengine WeexJSConnection::doExec start path on sdcard, start execve so name:"
              << executableName << std::endl;
 #endif
-      const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", nullptr};
+      const char *argv[] = {executableName.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0", nullptr};
       if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                        const_cast<char *const *>(envp.get()))) {
 #if PRINT_LOG_CACHEFILE
@@ -361,7 +417,7 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
       mcfile << "jsengine WeexJSConnection::doExec start execve so name:" << executableName
              << std::endl;
 #endif
-      const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", nullptr};
+      const char *argv[] = {executableName.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0", nullptr};
       if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                        const_cast<char *const *>(envp.get()))) {
 #if PRINT_LOG_CACHEFILE
@@ -376,7 +432,7 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
 #endif
 }
 
-static void closeAllButThis(int exceptfd) {
+static void closeAllButThis(int exceptfd, int fd2) {
   DIR *dir = opendir("/proc/self/fd");
   if (!dir) {
     return;
@@ -401,7 +457,7 @@ static void closeAllButThis(int exceptfd) {
       continue;
     if (curFd <= 2)
       continue;
-    if ((curFd != dirFd) && (curFd != exceptfd)) {
+    if ((curFd != dirFd) && (curFd != exceptfd) && (curFd != fd2)) {
       close(curFd);
     }
   }

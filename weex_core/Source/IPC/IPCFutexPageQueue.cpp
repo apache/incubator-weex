@@ -26,6 +26,7 @@
 #include "IPCLog.h"
 #include "IPCType.h"
 #include "futex.h"
+#include "../android/base/log_utils.h"
 #include <errno.h>
 #include <sched.h>
 #include <string.h>
@@ -42,11 +43,13 @@ IPCFutexPageQueue::IPCFutexPageQueue(void* sharedMemory, size_t s, size_t id)
 {
     IPC_DCHECK(s == ipc_size);
     IPC_LOGD("id: %zu", id);
+    LOGE("init m_tid = %d",m_tid);
     for (int i = m_currentWrite; i < m_pagesCount; i += 2) {
         uint32_t* data = static_cast<uint32_t*>(getPage(i));
         data[1] |= m_finishTag;
     }
     lock(m_currentWrite, true);
+    LOGE("init ok m_tid = %d",m_tid);
 }
 
 IPCFutexPageQueue::~IPCFutexPageQueue()
@@ -140,7 +143,8 @@ void IPCFutexPageQueue::lock(size_t id, bool checkFinish)
             volatile uint32_t* pageStart1 = static_cast<volatile uint32_t*>(getPage(1));
             volatile uint32_t* pageStart2 = static_cast<volatile uint32_t*>(getPage(2));
             volatile uint32_t* pageStart3 = static_cast<volatile uint32_t*>(getPage(3));
-            throw IPCException("futex lock pi failed: %s, %x %x (%x %x %x %x)", strerror(errno), *pageStart, m_tid, *pageStart0, *pageStart1, *pageStart2, *pageStart3);
+            LOGE("futex lock pi failed: %s, %x %d (%x %x %x %x)", strerror(errno), *pageStart, m_tid, *pageStart0, *pageStart1, *pageStart2, *pageStart3);
+            throw IPCException("futex lock pi failed: %s, %x %d (%x %x %x %x)", strerror(errno), *pageStart, m_tid, *pageStart0, *pageStart1, *pageStart2, *pageStart3);
         }
         if (futexReturn == -1)
             continue;
@@ -149,6 +153,7 @@ void IPCFutexPageQueue::lock(size_t id, bool checkFinish)
     l = *pageStart;
     if ((l & FUTEX_OWNER_DIED)) {
         unlock(id);
+        LOGE("died m_tid = %d", m_tid);
         throw IPCException("original owner has die");
     }
 }

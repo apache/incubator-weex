@@ -217,7 +217,7 @@ namespace WeexCore {
         try {
             sHandler = std::move(createIPCHandler());
             sConnection.reset(new WeexJSConnection());
-            sSender = sConnection->start(sHandler.get(), reinit);
+            sSender = sConnection->start(sHandler.get(), nullptr, reinit);
             if (sSender == nullptr) {
                 LOGE("JSFreamwork init start sender is null");
                 if (!reinit) {
