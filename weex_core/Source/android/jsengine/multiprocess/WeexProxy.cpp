@@ -1097,113 +1097,113 @@ namespace WeexCore {
             ScopedJStringUTF8 idChar(env, jinstanceid);
             std::string sourceStr =
                 R"({
-        "body": {
-            "tagName": "list",
-                "nodeId": "2",
-                "classList": [
+    "body": {
+        "tagName": "list",
+        "nodeId": "2",
+        "classList": [
             "wrap",
-                "wrap-test"
-            ],
-            "childNodes": [
+            "wrap-test"
+        ],
+        "childNodes": [
             {
                 "tagName": "cell",
                 "nodeId": "3",
+                "control": {
+                    "repeat": {
+                        "for": "list",
+                        "alias": "item",
+                        "iterator1": "index"
+                    },
+                    "match": "showInfo"
+                },
                 "classList": [
-                "main"
+                    "main"
                 ],
                 "childNodes": [
-                {
-                    "tagName": "image",
+                    {
+                        "tagName": "image",
                         "nodeId": "4",
                         "attributes": {
-                        "src": "https://gw.alicdn.com/tfs/TB1mMcNzhGYBuNjy0FnXXX5lpXa-85-85.png"
+                            "src": "https://gw.alicdn.com/tfs/TB1mMcNzhGYBuNjy0FnXXX5lpXa-85-85.png"
+                        },
+                        "classList": [
+                            "img"
+                        ]
                     },
-                    "classList": [
-                    "img"
-                    ]
-                },
-                {
-                    "tagName": "div",
+                    {
+                        "tagName": "div",
                         "nodeId": "5",
                         "classList": [
-                    "info-wrap"
-                    ],
-                    "attributes": {
-                        "info": "hello"
-                    },
-                    "childNodes": [
-                    {
-                        "tagName": "text",
-                            "nodeId": "6",
-                            "classList": [
-                        "title"
+                            "info-wrap"
                         ],
                         "attributes": {
-                            "value": {
-                                "@binding":"1+2"
+                            "name": {
+                                "@binding": "item.name"
+                            },
+                            "title": {
+                                "@binding": "item.title"
+                            },
+                            "info": "hello"
+                        },
+                        "childNodes": [
+                            {
+                                "tagName": "text",
+                                "nodeId": "6",
+                                "classList": [
+                                    "title"
+                                ],
+                                "attributes": {
+                                    "value": "这是一个直播标题"
+                                }
+                            },
+                            {
+                                "tagName": "text",
+                                "nodeId": "7",
+                                "classList": [
+                                    "title"
+                                ],
+                                "attributes": {
+                                    "value": "这是一个直播副标题"
+                                }
                             }
-                        }
-                    },
-                    {
-                        "tagName": "text",
-                            "nodeId": "7",
-                            "classList": [
-                        "title"
-                        ],
-                        "attributes": {
-                            "value": "这是一个直播副标题"
-                        }
+                        ]
                     }
-                    ]
-                }
                 ]
             }
-            ]
+        ]
+    },
+    "data": {
+        "showInfo": true,
+        "list": [
+            {},
+            {},
+            {}
+        ]
+    },
+    "styles": {
+        "wrap": {
+            "flexDirection": "column"
         },
-        "data": {
-            "showInfo": true,
-            "string_value":"string_value",
-            "number_value":13,
-            "number_value2":13.2,
-            "list": [
-                {
-                    "number_value":13,
-                    "object_key":"object_value_c1"
-                },
-                {
-                    "number_value":13,
-                    "object_key":"object_value_c2"
-                },
-                {
-                    "number_value":13,
-                    "object_key":null
-                }
-            ]
+        "main": {
+            "width": "750px",
+            "height": "300px",
+            "flexDirection": "row"
         },
-        "styles": {
-            "wrap": {
-                "flexDirection": "column"
-            },
-            "main": {
-                "width": "750px",
-                    "height": "300px",
-                    "flexDirection": "row"
-            },
-            "img": {
-                "width": "80px",
-                    "height": "80px",
-                    "marginRight": "10px"
-            },
-            "infoWrap": {
-                "flexDirection": "column",
-                    "justifyContent": "center"
-            },
-            "title": {
-                "fontSize": "24px",
-                    "color": "#000000"
-            }
+        "img": {
+            "width": "80px",
+            "height": "80px",
+            "marginRight": "10px"
+        },
+        "infoWrap": {
+            "flexDirection": "column",
+            "justifyContent": "center"
+        },
+        "title": {
+            "fontSize": "24px",
+            "color": "#000000"
         }
-    })";
+    }
+})";
             jstring initData = getJsonData(env, jargs, 3);
             ScopedJStringUTF8 initDataChar(env, initData);
             auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();

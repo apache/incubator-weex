@@ -170,7 +170,7 @@ void VNodeRenderManager::TestCreateProcess(const std::string& input,
 
   exec_state->context()->page_id(page_id);
   auto compile_start = std::chrono::steady_clock::now();
-  exec_state->Compile(input);
+  exec_state->Compile();
 
   auto duration_compile = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::steady_clock::now() - compile_start);

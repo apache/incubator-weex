@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <sstream>
 #include "core/data_render/object.h"
 
 namespace weex {
@@ -160,15 +161,21 @@ std::string ToCString(const Value *o) {
     switch (o->type) {
 
         case Value::Type::INT: {
-            return std::to_string(IntValue(o));
+            std::stringstream ss;
+            ss<<IntValue(0);
+            return ss.str();
         }
 
         case Value::Type::NUMBER: {
-            return std::to_string(NumValue(o));
+            std::stringstream ss;
+            ss<<NumValue(o);
+            return ss.str();
         }
 
         case Value::Type::BOOL: {
-            return std::to_string(BoolValue(o));
+            std::stringstream ss;
+            ss<<BoolValue(o);
+            return ss.str();
         }
 
         case Value::Type::STRING: {

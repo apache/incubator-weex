@@ -82,10 +82,10 @@ ExecState::~ExecState() {
   delete factory_;
 }
 
-void ExecState::Compile(const std::string& source) {
+void ExecState::Compile() {
   CodeGenerator generator(this);
   std::string err;
-  const ParseResult& result = Parser::Parse(source, err);
+  const ParseResult& result = Parser::Parse(context()->raw_json(),err);
   generator.Visit(result.expr().get(), nullptr);
 }
 

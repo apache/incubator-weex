@@ -39,7 +39,7 @@ std::string to_string(T value) {
 
 struct ASTParser final {
   /* State */
-  const std::string& str_;
+  const json11::Json& json_;
   std::string& err_;
   bool failed_;
   ASTFactory* factory_;
@@ -77,7 +77,7 @@ struct ASTParser final {
     ASTParseError error = UNKOWN_ERROR;
     do {
       std::string err_comment;
-      auto json = Json::parse(str_, err_comment);
+      auto& json = json_;
       if (!json.is_object()) {
         error = FILE_FORMAT_ERROR;
         break;
@@ -209,7 +209,7 @@ struct ASTParser final {
         std::vector<Handle<Expression>> args;
         Handle<Expression> func = factory_->NewIdentifier(json, "createElement");
         args.push_back(factory_->NewStringConstant(tag_name, tag_name.string_value()));
-        if (control_exprs.size() > 0 && control_exprs[control_exprs.size() - 1]->IsForStatement()) {
+        if (control_exprs.size() > 0 && control_exprs[0]->IsForStatement()) {
           Json repeat = control["repeat"];
           Json index = repeat["iterator1"];
           node_id_expr = factory_->NewBinaryExpression(node_id, BinaryOperation::kAddition,
@@ -228,7 +228,7 @@ struct ASTParser final {
         statement->PushExpression(call_expr);
         Handle<BlockStatement> parent_statement =
             control_exprs.size() == 0 ? stacks_[stacks_.size() - 1] : (stacks_[stacks_.size() -
-                                                                              control_exprs.size()]);
+                                                                              control_exprs.size()-1]);
         if (parent_statement->IsChildStatement()) {
           Handle<Expression> append_func = factory_->NewIdentifier(json, "appendChild");
           Handle<Expression> call_append_expr = nullptr;
@@ -313,7 +313,7 @@ struct ASTParser final {
 };
 }
 
-ParseResult Parser::Parse(const std::string& in, std::string& err) {
+ParseResult Parser::Parse(const json11::Json& in, std::string& err) {
   ASTParser parser{in, err, false, ASTFactory::GetFactoryInstance()};
   ParseResult result = parser.Parse();
   return result;
