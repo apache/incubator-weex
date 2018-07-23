@@ -237,6 +237,8 @@ int ToNum(const Value *o, double &n);
 
 int ToBool(const Value *o, bool &b);
 
+std::string ToCString(const Value *o);
+
 void SetIValue(Value *o, int iv);
 
 void SetDValue(Value *o, double d);
@@ -244,6 +246,10 @@ void SetDValue(Value *o, double d);
 void SetBValue(Value *o, bool b);
 
 void SetTValue(Value *v, GCObject *o);
+
+void SetSValue(Value *v, String *s);
+
+String *StringAdd(StringTable *t, Value *a, Value *b);
 
 /*
 ** try to convert a value to an integer, rounding according to 'mode':

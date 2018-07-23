@@ -34,21 +34,16 @@ class TableFactory {
 
 public:
 
-    static TableFactory* Instance();
-
-    static void Release();
-
     virtual Value* CreateTable();
 
     ~TableFactory();
 
-private:
+    TableFactory() {};
 
-    static std::unique_ptr<TableFactory> _instance;
+private:
 
     std::vector<Value*> tablePool;
 
-    TableFactory() {};
 };
 
 }

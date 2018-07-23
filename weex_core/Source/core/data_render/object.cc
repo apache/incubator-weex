@@ -100,7 +100,7 @@ bool IsBool(const Value *o) { return Value::Type::BOOL == o->type; }
 
 bool IsTable(const Value *o) { return Value::Type::TABLE == o->type; }
 
-bool IsString(const Value *o) { return Value::Type::STRING == o->type; }
+bool IsString(const Value *o) { return nullptr != o && Value::Type::STRING == o->type; }
 
 int64_t IntValue(const Value *o) { return o->i; }
 
@@ -138,6 +138,46 @@ void SetBValue(Value *o, bool b) {
 void SetTValue(Value *v, GCObject *o) {
   v->type = Value::Type::TABLE;
   v->gc = o;
+}
+
+void SetSValue(Value *v, String *s) {
+  v->type = Value::Type::STRING;
+  v->str = s;
+}
+
+String *StringAdd(StringTable *t, Value *a, Value *b) {
+    std::string str;
+    if (IsString(a)) {
+        str = a->str->c_str();
+        return t->StringFromUTF8(str += ToCString(b));
+    } else {
+        str = b->str->c_str();
+        return t->StringFromUTF8(str += ToCString(a));
+    }
+}
+
+std::string ToCString(const Value *o) {
+    switch (o->type) {
+
+        case Value::Type::INT: {
+            return std::to_string(IntValue(o));
+        }
+
+        case Value::Type::NUMBER: {
+            return std::to_string(NumValue(o));
+        }
+
+        case Value::Type::BOOL: {
+            return std::to_string(BoolValue(o));
+        }
+
+        case Value::Type::STRING: {
+            return CStringValue(o);
+        }
+
+        default:
+            return "";
+    }
 }
 
 int ToBool(const Value *o, bool &b) {

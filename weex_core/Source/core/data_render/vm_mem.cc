@@ -17,8 +17,8 @@
  * under the License.
  */
 
-#include "core/data_render/vm_mem.h"
 #include <stdlib.h>
+#include "core/data_render/vm_mem.h"
 
 namespace weex {
 namespace core {

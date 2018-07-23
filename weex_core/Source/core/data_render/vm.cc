@@ -64,7 +64,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
-        if (IsInt(b) && IsInt(c)) {
+        if (IsString(b) || IsString(c)) {
+          SetSValue(a, StringAdd(exec_state->string_table(), b, c));
+        }else if (IsInt(b) && IsInt(c)) {
           SetIValue(a, INT_OP(+, IntValue(b), IntValue(c)));
         } else if (ToNum(b, d1) && ToNum(c, d2)) {
           SetDValue(a, NUM_OP(+, d1, d2));
@@ -321,7 +323,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
 
       case OP_NEWTABLE: {
         a = frame.reg + GET_ARG_A(instruction);
-        Value *t = exec_state->getTableFactory()->Instance()->CreateTable();
+        Value *t = exec_state->getTableFactory()->CreateTable();
         *a = *t;
       } break;
 

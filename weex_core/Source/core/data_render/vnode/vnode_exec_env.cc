@@ -144,7 +144,7 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     String* p_str = state->string_table()->StringFromUTF8(json.string_value());
     return Value(p_str);
   } else if (json.is_array()) {
-    Value* value = TableFactory::Instance()->CreateTable();
+    Value* value = state->getTableFactory()->CreateTable();
     const json11::Json::array& data_objects = json.array_items();
     int64_t array_size = data_objects.size();
     for (int64_t index = 0; index < array_size; index++) {
@@ -155,7 +155,7 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     }
     return Value(*value);
   } else if (json.is_object()) {
-    Value* value = TableFactory::Instance()->CreateTable();
+    Value* value = state->getTableFactory()->CreateTable();
     const json11::Json::object& data_objects = json.object_items();
     for (auto it = data_objects.begin(); it != data_objects.end(); it++) {
       // will be free by table
