@@ -185,6 +185,11 @@ typedef UITextView WXTextAreaView;
 
 -(void)setAttributedPlaceholder:(NSMutableAttributedString *)attributedString font:(UIFont *)font
 {
+    if ([_textView.text length] > 0) {
+        self.placeHolderLabel.text = @"";
+        return;
+    }
+    
     if (self.placeholderColor) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:self.placeholderColor range:NSMakeRange(0, self.placeholderString.length)];
         [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, self.placeholderString.length)];
