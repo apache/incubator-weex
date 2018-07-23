@@ -55,6 +55,11 @@ public class WXEditText extends EditText implements WXGestureObservable {
   }
 
   @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
+  }
+
+  @Override
   public void setLines(int lines) {
     super.setLines(lines);
     mLines = lines;
