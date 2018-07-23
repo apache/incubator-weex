@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.dom;
 
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
@@ -580,5 +582,11 @@ public class WXAttr implements Map<String, Object>,Cloneable {
       wxAttr.mStatement = new WXStatement(mStatement);
     }
     return wxAttr;
+  }
+
+  @RestrictTo(Scope.LIBRARY)
+  @Override
+  public String toString() {
+    return attr.toString();
   }
 }
