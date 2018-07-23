@@ -3,10 +3,10 @@
 //
 
 #include "core/data_render/vnode/vnode_exec_env.h"
-#include "core/data_render/object.h"
-#include "core/data_render/table_factory.h"
-#include "core/data_render/table.h"
 #include <sstream>
+#include "core/data_render/object.h"
+#include "core/data_render/table.h"
+#include "core/data_render/table_factory.h"
 
 namespace weex {
 namespace core {
@@ -32,23 +32,41 @@ static Value Log(ExecState* exec_state) {
   return Value();
 }
 
-static Value CreateElement(ExecState* exec_state) {//createElement("tagName","id");
-//  const std::string& page_name = exec_state->page_id();
-  VNode* node = new VNode(
-      exec_state->GetArgument(1)->str->c_str(),
-      exec_state->GetArgument(0)->str->c_str()
-  );
+static Value GetTableSize(ExecState* exec_state) {
+  size_t length = exec_state->GetArgumentCount();
+  if (length > 0) {
+    Value* value = exec_state->GetArgument(0);
+    if (value->type == Value::Type::TABLE) {
+      Table* table = TableValue(value);
+      if (table->sizearray > 0) {
+        return Value(static_cast<int64_t>(table->sizearray));
+      } else if (table->map->size() > 0) {
+        return Value(static_cast<int64_t>(table->map->size()));
+      };
+    }
+  }
+  return Value(static_cast<int64_t>(-1));
+}
+
+static Value CreateElement(
+    ExecState* exec_state) {  // createElement("tagName","id");
+  //  const std::string& page_name = exec_state->page_id();
+  VNode* node = new VNode(exec_state->GetArgument(1)->str->c_str(),
+                          exec_state->GetArgument(0)->str->c_str());
   if (exec_state->context()->root() == nullptr) {
-    //set root
+    // set root
     exec_state->context()->set_root(node);
   }
   exec_state->context()->InsertNode(node);
   return Value();
 }
 
-static Value AppendChild(ExecState* exec_state) {//appendChild("tag","id",""parent_id");todo
-  VNode* parent = exec_state->context()->FindNode(exec_state->GetArgument(2)->str->c_str());
-  VNode* child = exec_state->context()->FindNode(exec_state->GetArgument(1)->str->c_str());
+static Value AppendChild(
+    ExecState* exec_state) {  // appendChild("tag","id",""parent_id");todo
+  VNode* parent =
+      exec_state->context()->FindNode(exec_state->GetArgument(2)->str->c_str());
+  VNode* child =
+      exec_state->context()->FindNode(exec_state->GetArgument(1)->str->c_str());
   if (parent == nullptr || child == nullptr) {
     return Value();
   }
@@ -57,8 +75,9 @@ static Value AppendChild(ExecState* exec_state) {//appendChild("tag","id",""pare
   return Value();
 }
 
-static Value SetAttr(ExecState* exec_state) {//setAttr("id","key","value");
-  VNode* node = exec_state->context()->FindNode(exec_state->GetArgument(0)->str->c_str());
+static Value SetAttr(ExecState* exec_state) {  // setAttr("id","key","value");
+  VNode* node =
+      exec_state->context()->FindNode(exec_state->GetArgument(0)->str->c_str());
   if (node == nullptr) {
     return Value();
   }
@@ -67,19 +86,20 @@ static Value SetAttr(ExecState* exec_state) {//setAttr("id","key","value");
   Value* p_value = exec_state->GetArgument(2);
   if (p_value->type == Value::STRING) {
     node->SetAttribute(key, p_value->str->c_str());
-  } else if (p_value->type == Value::INT) {//todo use uniform type conversion.
+  } else if (p_value->type == Value::INT) {  // todo use uniform type
+                                             // conversion.
     std::stringstream ss;
     ss << p_value->i;
     std::string str = ss.str();
     node->SetAttribute(key, str);
   }
 
-
   return Value();
 }
 
 static Value SetClassList(ExecState* exec_state) {
-  VNode* node = exec_state->context()->FindNode(exec_state->GetArgument(0)->str->c_str());
+  VNode* node =
+      exec_state->context()->FindNode(exec_state->GetArgument(0)->str->c_str());
   char* key = exec_state->GetArgument(1)->str->c_str();
 
   if (node == nullptr) {
@@ -99,17 +119,18 @@ static Value SetClassList(ExecState* exec_state) {
   return Value();
 }
 
-void RegisterCFunc(ExecState* state, const std::string& name, CFunction function) {
+void RegisterCFunc(ExecState* state, const std::string& name,
+                   CFunction function) {
   Value func;
   func.type = Value::Type::CFUNC;
   func.cf = reinterpret_cast<void*>(function);
   state->global()->Add(name, func);
 }
 
-
 void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
-  //log
+  // log
   RegisterCFunc(state, "log", Log);
+  RegisterCFunc(state, "sizeof", GetTableSize);
   RegisterCFunc(state, "createElement", CreateElement);
   RegisterCFunc(state, "appendChild", AppendChild);
   RegisterCFunc(state, "setAttr", SetAttr);
@@ -122,7 +143,7 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
   } else if (json.is_bool()) {
     return Value(json.bool_value());
   } else if (json.is_number()) {
-    //todo check which is int or double.
+    // todo check which is int or double.
     return Value(json.number_value());
   } else if (json.is_string()) {
     String* p_str = state->string_table()->StringFromUTF8(json.string_value());
@@ -131,23 +152,21 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     Value* value = TableFactory::Instance()->CreateTable();
     const json11::Json::array& data_objects = json.array_items();
     int64_t index = 0;
-    for (auto it = data_objects.begin(); it != data_objects.end(); it++, index++) {
-      //will be free by table
-      SetTabValue(TableValue(value),
-                  new Value(index),
-                  new Value(ParseJson2Value(state, *it))
-      );
+    for (auto it = data_objects.begin(); it != data_objects.end();
+         it++, index++) {
+      // will be free by table
+      SetTabValue(TableValue(value), new Value(index),
+                  new Value(ParseJson2Value(state, *it)));
     }
     return Value(*value);
   } else if (json.is_object()) {
     Value* value = TableFactory::Instance()->CreateTable();
     const json11::Json::object& data_objects = json.object_items();
     for (auto it = data_objects.begin(); it != data_objects.end(); it++) {
-      //will be free by table
+      // will be free by table
       SetTabValue(TableValue(value),
                   new Value(state->string_table()->StringFromUTF8(it->first)),
-                  new Value(ParseJson2Value(state, it->second))
-      );
+                  new Value(ParseJson2Value(state, it->second)));
     }
     return Value(*value);
   } else {
@@ -167,10 +186,10 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
     const Value& value = ParseJson2Value(state, it->second);
     global->Add(it->first, value);
   }
-
 }
 
-void VNodeExecEnv::InitInitDataValue(ExecState* state, const std::string& init_data_str) {
+void VNodeExecEnv::InitInitDataValue(ExecState* state,
+                                     const std::string& init_data_str) {
   std::string err;
   const json11::Json& json = json11::Json::parse(init_data_str, err);
   if (!err.empty()) {
@@ -181,6 +200,6 @@ void VNodeExecEnv::InitInitDataValue(ExecState* state, const std::string& init_d
   const Value& value = ParseJson2Value(state, json);
   state->global()->Set("_init_data_", value);
 }
-}
-}
-}
+}  // namespace data_render
+}  // namespace core
+}  // namespace weex
