@@ -407,6 +407,8 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
 }
 
 void CodeGenerator::Visit(Identifier *node, void *data) {
+  RegisterScope(cur_block_.get());
+
   long reg_a = data == nullptr ? cur_block_->NextRegisterId()
                                : *static_cast<long *>(data);
   if (reg_a >= 0) {

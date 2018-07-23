@@ -191,7 +191,7 @@ class Token {
       : str_{ str }, type_{ type }, pos_{pos}, index_{ index }
   { }
 
-  Token(int64_t num, Type type, Position pos, size_t index)
+  Token(double num, Type type, Position pos, size_t index)
       : num_{ num }, type_{ type }, pos_{pos}, index_{ index }
   { }
 

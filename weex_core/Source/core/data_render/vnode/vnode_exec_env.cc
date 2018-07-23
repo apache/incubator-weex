@@ -37,12 +37,6 @@ static Value GetTableSize(ExecState* exec_state) {
   if (length > 0) {
     Value* value = exec_state->GetArgument(0);
     if (IsTable(value)) {
-//      Table* table = TableValue(value);
-//      if (table->sizearray > 0) {
-//        return Value(static_cast<int64_t>(table->sizearray));
-//      } else if (table->map->size() > 0) {
-//        return Value(static_cast<int64_t>(table->map->size()));
-//      };
       return Value(static_cast<int64_t>(GetTableSize(TableValue(value))));
     }
   }
@@ -152,12 +146,11 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
   } else if (json.is_array()) {
     Value* value = TableFactory::Instance()->CreateTable();
     const json11::Json::array& data_objects = json.array_items();
-    int64_t index = 0;
-    for (auto it = data_objects.begin(); it != data_objects.end();
-         it++, index++) {
+    int64_t array_size = data_objects.size();
+    for (int64_t index = 0; index < array_size; index++) {
       // will be free by table
       Value key(index);
-      Value val(ParseJson2Value(state, *it));
+      Value val(ParseJson2Value(state, json[index]));
       SetTabValue(TableValue(value), &key, val);
     }
     return Value(*value);
