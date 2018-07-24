@@ -23,13 +23,11 @@
 #include "IPCHandler.h"
 #include "IPCLog.h"
 #include "IPCResult.h"
-#include "../android/base/log_utils.h"
 #include <unordered_map>
 
 namespace {
 class IPCHandlerImpl : public IPCHandler {
 public:
-    ~IPCHandlerImpl() {LOGE("IPCHandlerImpl dele");}
     std::unique_ptr<IPCResult> handle(uint32_t msg, IPCArguments*) override;
     void registerHandler(int msg, const std::function<std::unique_ptr<IPCResult>(IPCArguments*)>& handler) override;
 
@@ -40,7 +38,6 @@ private:
 
 std::unique_ptr<IPCResult> IPCHandlerImpl::handle(uint32_t msg, IPCArguments* arguments)
 {
-    LOGE("in handle %x and msg is %d", this, msg);
     auto it = m_map.find(msg);
     if (it == m_map.end()) {
         IPC_LOGE("unable to find msg: %d", msg);

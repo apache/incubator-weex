@@ -100,6 +100,7 @@ std::unique_ptr<IPCResult> AndroidSide::CallNativeModule(
     const char *arguments, int arguments_length, const char *options,
     int options_length) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  LOGE("CallNativeModule is running and page_id is %s method = %s module is %s" , page_id, method, module);
   auto result =
       wx_bridge_->CallNativeModule(env, page_id, module, method, arguments,
                                    arguments_length, options, options_length);

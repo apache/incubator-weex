@@ -25,9 +25,9 @@ IPCStringResult::IPCStringResult(JNIEnv* env, jstring val)
 
 IPCStringResult::~IPCStringResult()
 {
-    if (m_cvalue)
-        m_env->ReleaseStringChars(m_value, m_cvalue);
-    m_env->DeleteLocalRef(m_value);
+//    if (m_cvalue)
+//        m_env->ReleaseStringChars(m_value, m_cvalue);
+//    m_env->DeleteLocalRef(m_value);
 }
 
 const void* IPCStringResult::getData()
