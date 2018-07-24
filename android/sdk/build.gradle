@@ -223,3 +223,48 @@ if(file('../license/LICENSE').exists()){
     }
     preBuild.dependsOn licenseFormat
 }
+
+task checkNdkVersion() {
+    def rootDir = project.rootDir
+    def localProperties = new File(rootDir, "local.properties")
+    def ndkDir = ''
+    if (localProperties.exists()) {
+        Properties properties = new Properties()
+        localProperties.withInputStream { instr ->
+            properties.load(instr)
+        }
+        ndkDir = properties.getProperty('ndk.dir')
+    }
+
+    if(!ndkDir.isEmpty()) {
+        def sourcePropertiesFile = new File(ndkDir,"source.properties")
+        def ndkVersion = ''
+        println("sourcePropertiesFile" + sourcePropertiesFile.absolutePath)
+        if(sourcePropertiesFile.exists()) {
+            Properties properties = new Properties()
+            sourcePropertiesFile.withInputStream { instr ->
+                properties.load(instr)
+            }
+
+            ndkVersion = properties.getProperty('Pkg.Revision')
+        }
+
+        if(ndkVersion.length() > 2) {
+            def substring = ndkVersion.substring(0, 2)
+            try {
+                if(substring.toInteger() != 16) {
+                    throw new StopActionException("Ndk Version 16 supported only")
+                }
+            } catch (Exception ignored) {
+                println("Ndk Version 16 supported only")
+            }
+
+        } else {
+            println("Ndk Version 16 supported only")
+        }
+    } else {
+        println("Ndk Version 16 supported only")
+    }
+}
+
+preBuild.dependsOn checkNdkVersion
