@@ -265,6 +265,11 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     this.wxGesture = wxGesture;
   }
 
+  @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
+  }
+
   public int getRealCurrentItem() {
     int i = super.getCurrentItem();
     return ((WXCirclePageAdapter) getAdapter()).getRealPosition(i);
