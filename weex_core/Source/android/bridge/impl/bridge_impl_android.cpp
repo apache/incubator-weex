@@ -89,7 +89,7 @@ namespace WeexCore {
     jCallLayoutMethodId = NULL;
     jCallAppendTreeCreateFinishMethodId = NULL;
     jCallCreateFinishMethodId = NULL;
-
+    jCallRenderSuccessMethodId = NULL;
     jCallGetMeasurementMethodId = NULL;
   }
 
