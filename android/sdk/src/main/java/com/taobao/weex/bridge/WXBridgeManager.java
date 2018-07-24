@@ -273,9 +273,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXEnvironment.sDebugServerConnectable = true;
     }
 
-    if (mWxDebugProxy != null) {
-      mWxDebugProxy.stop(false);
-    }
+//    if (mWxDebugProxy != null) {
+//      mWxDebugProxy.stop(false);
+//    }
     if (WXEnvironment.sDebugServerConnectable && (WXEnvironment.isApkDebugable() || WXEnvironment.sForceEnableDevTool)) {
       if (WXEnvironment.getApplication() != null) {
         try {
