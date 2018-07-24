@@ -43,25 +43,28 @@ static Value GetTableSize(ExecState* exec_state) {
   return Value(static_cast<int64_t>(-1));
 }
 
-static Value CreateElement(
-    ExecState* exec_state) {  // createElement("tagName","id");
-  //  const std::string& page_name = exec_state->page_id();
+// createElement("tag_name", "id");
+static Value CreateElement(ExecState* exec_state) {
   VNode* node = new VNode(exec_state->GetArgument(1)->str->c_str(),
                           exec_state->GetArgument(0)->str->c_str());
-  if (exec_state->context()->root() == nullptr) {
-    // set root
-    exec_state->context()->set_root(node);
-  }
   exec_state->context()->InsertNode(node);
-  return Value();
+  Value result;
+  result.type = Value::Type::CPTR;
+  result.cptr = node;
+  return result;
 }
 
-static Value AppendChild(
-    ExecState* exec_state) {  // appendChild("tag","id",""parent_id");todo
+// appendChild(parent, node);
+static Value AppendChild(ExecState* exec_state) {
   VNode* parent =
-      exec_state->context()->FindNode(exec_state->GetArgument(2)->str->c_str());
-  VNode* child =
-      exec_state->context()->FindNode(exec_state->GetArgument(1)->str->c_str());
+      exec_state->GetArgument(0)->type == Value::Type::NIL
+          ? nullptr
+          : reinterpret_cast<VNode*>(exec_state->GetArgument(0)->cptr);
+  VNode* child = reinterpret_cast<VNode*>(exec_state->GetArgument(1)->cptr);
+
+  if (parent == nullptr && exec_state->context()->root() == nullptr) {
+    exec_state->context()->set_root(child);
+  }
   if (parent == nullptr || child == nullptr) {
     return Value();
   }
@@ -70,9 +73,9 @@ static Value AppendChild(
   return Value();
 }
 
-static Value SetAttr(ExecState* exec_state) {  // setAttr("id","key","value");
-  VNode* node =
-      exec_state->context()->FindNode(exec_state->GetArgument(0)->str->c_str());
+// setAttr(node, "value");
+static Value SetAttr(ExecState* exec_state) {
+  VNode* node = reinterpret_cast<VNode*>(exec_state->GetArgument(0)->cptr);
   if (node == nullptr) {
     return Value();
   }
@@ -92,9 +95,9 @@ static Value SetAttr(ExecState* exec_state) {  // setAttr("id","key","value");
   return Value();
 }
 
+// setClassList(node, "class-name");
 static Value SetClassList(ExecState* exec_state) {
-  VNode* node =
-      exec_state->context()->FindNode(exec_state->GetArgument(0)->str->c_str());
+  VNode* node = reinterpret_cast<VNode*>(exec_state->GetArgument(0)->cptr);
   char* key = exec_state->GetArgument(1)->str->c_str();
 
   if (node == nullptr) {

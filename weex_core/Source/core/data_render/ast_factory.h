@@ -40,7 +40,6 @@ namespace data_render {
         virtual Handle<Expression> NewIdentifier(std::string name);
         virtual Handle<ChunkStatement> NewChunkStatement(Json &json, Handle<ExpressionList> list);
         virtual Handle<Expression> NewBlockStatement(Json &json, Handle<ExpressionList> list);
-        virtual Handle<Expression> NewChildStatement(Json &json, Handle<ExpressionList> list, std::string parent);
         virtual Handle<Expression> NewFunctionPrototype(Json &json, std::string name, std::vector<std::string> args);
         virtual Handle<Expression> NewArgumentList(Json &json, Handle<ExpressionList>);
         virtual Handle<Expression> NewArgumentList(Handle<ExpressionList>);

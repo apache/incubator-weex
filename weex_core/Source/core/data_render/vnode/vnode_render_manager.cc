@@ -21,12 +21,12 @@
 #include <chrono>
 #include <sstream>
 #include "core/data_render/exec_state.h"
+#include "core/data_render/json/json11.hpp"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vnode/vnode.h"
 #include "core/data_render/vnode/vnode_exec_env.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_creator.h"
-#include "core/data_render/json/json11.hpp"
 
 #define VRENDER_LOG true
 
@@ -48,14 +48,19 @@ using WeexCore::RenderManager;
 
 VNodeRenderManager* VNodeRenderManager::g_pInstance = nullptr;
 VM* VNodeRenderManager::g_vm_ = nullptr;
+// TODO establish linkages between page ref_id
+int ref_id = 0;
 
 WeexCore::RenderObject* parseVNode2RenderObject(const VNode* vnode,
                                                 WeexCore::RenderObject* parent,
                                                 int index,
                                                 const string& pageId) {
+  std::stringstream ss;
+  ss << ref_id++;
+  std::string ref_str = parent == nullptr ? "_root" : ss.str();
   WeexCore::RenderObject* render_object = static_cast<WeexCore::RenderObject*>(
       WeexCore::RenderCreator::GetInstance()->CreateRender(vnode->tag_name(),
-                                                           vnode->ref()));
+                                                           ref_str));
   // style
   map<string, string>* style = vnode->styles();
   for (auto it = style->begin(); it != style->end(); it++) {

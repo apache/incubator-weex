@@ -189,6 +189,7 @@ void CodeGenerator::Visit(ForStatement *node, void *data) {
 }
 
 void CodeGenerator::Visit(BlockStatement *node, void *data) {
+  BlockScope block_scoped(this);
   for (int i = 0; i < node->statements()->raw_list().size(); ++i) {
     auto temp = node->statements()->raw_list()[i].get();
     if (temp != NULL) {
@@ -274,14 +275,6 @@ void CodeGenerator::Visit(AssignExpression *node, void *data) {
 
   // a = b
   cur_func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, left, right, 0));
-}
-
-void CodeGenerator::Visit(ChildStatement *node, void *data) {
-  Handle<ExpressionList> stms = node->statements();
-  for (auto it = stms->raw_list().begin(); it != stms->raw_list().end(); ++it) {
-    auto temp = (*it).get();
-    temp->Accept(this, nullptr);
-  }
 }
 
 void CodeGenerator::Visit(Declaration *node, void *data) {

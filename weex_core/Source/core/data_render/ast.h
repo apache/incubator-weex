@@ -67,7 +67,6 @@ namespace data_render {
   M(BinaryExpression)    \
   M(TernaryExpression)   \
   M(AssignExpression)    \
-  M(ChildStatement)      \
   M(Declaration)         \
   M(DeclarationList)     \
   M(IntegralConstant)    \

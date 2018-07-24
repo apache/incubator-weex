@@ -44,15 +44,6 @@ public:
 private:
 };
 
-class ChildStatement : public BlockStatement {
-public:
-    ChildStatement(Json &json, Handle<ExpressionList> stmts, std::string parent) : BlockStatement(json, stmts), parent_{ parent } { };
-    std::string &parent() { return parent_; };
-    DEFINE_NODE_TYPE(ChildStatement, BlockStatement);
-private:
-    std::string parent_;
-};
-
 enum class ForKind {
     kForOf,
     kForIn

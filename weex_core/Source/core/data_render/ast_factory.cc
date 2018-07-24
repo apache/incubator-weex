@@ -67,11 +67,6 @@ Handle<Expression> ASTFactory::NewFunctionPrototype(
     Json& json, std::string name, std::vector<std::string> args) {
   return MakeHandle<FunctionPrototype>(json, name, std::move(args));
 }
-Handle<Expression> ASTFactory::NewChildStatement(
-    Json& json, Handle<ExpressionList> list, std::string parent) {
-  Handle<Expression> expr = MakeHandle<ChildStatement>(json, list, parent);
-  return expr;
-}
 Handle<Expression> ASTFactory::NewDeclaration(
     Json& json, std::string name, Handle<Expression> init) {
   return MakeHandle<Declaration>(json, name, init);
