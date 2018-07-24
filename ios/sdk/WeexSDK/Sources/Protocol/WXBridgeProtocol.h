@@ -72,6 +72,8 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
  */
 - (void)garbageCollect;
 
+@required
+
 /**
  * Register callback when call native tasks occur
  */
@@ -123,16 +125,6 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
 - (void)registerCallCreateFinish:(WXJSCallCreateFinish)callCreateFinish;
 
 /**
- * Register callback when refreshFinish tasks occur
- */
-- (void)registerCallRefreshFinish:(WXJSCallRefreshFinish)callRefreshFinish;
-
-/**
- * Register callback when updateFinish tasks occur
- */
-- (void)registerCallUpdateFinish:(WXJSCallUpdateFinish)callUpdateFinish;
-
-/**
  * Register callback for global js function `callNativeModule`
  */
 - (void)registerCallNativeModule:(WXJSCallNativeModule)callNativeModuleBlock;
@@ -143,6 +135,16 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
 - (void)registerCallNativeComponent:(WXJSCallNativeComponent)callNativeComponentBlock;
 
 @optional
+
+/**
+ * Register callback when refreshFinish tasks occur
+ */
+- (void)registerCallRefreshFinish:(WXJSCallRefreshFinish)callRefreshFinish;
+
+/**
+ * Register callback when updateFinish tasks occur
+ */
+- (void)registerCallUpdateFinish:(WXJSCallUpdateFinish)callUpdateFinish;
 
 /*
  * Executes the specified JavaScript code, treating the specified URL as its source location.

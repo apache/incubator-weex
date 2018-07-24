@@ -215,7 +215,7 @@ _Pragma("clang diagnostic pop") \
     }];
     
     [_jsBridge registerCallCreateFinish:^NSInteger(NSString *instanceId) {
-        
+
         WXPerformBlockOnComponentThread(^{
             [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callCreateFinish:instanceId];
@@ -224,25 +224,29 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
-    [_jsBridge registerCallRefreshFinish:^NSInteger(NSString *instanceId) {
-        
-        WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"refreshFinish" options:@{@"threadName":WXTDOMThread}];
-            [WXCoreBridge callRefreshFinish:instanceId];
-        });
-        
-        return 0;
-    }];
+    if ([_jsBridge respondsToSelector:@selector(registerCallRefreshFinish:)]) {
+        [_jsBridge registerCallRefreshFinish:^NSInteger(NSString *instanceId) {
+            
+            WXPerformBlockOnComponentThread(^{
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"refreshFinish" options:@{@"threadName":WXTDOMThread}];
+                [WXCoreBridge callRefreshFinish:instanceId];
+            });
+            
+            return 0;
+        }];
+    }
     
-    [_jsBridge registerCallUpdateFinish:^NSInteger(NSString *instanceId) {
-        
-        WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateFinish" options:@{@"threadName":WXTDOMThread}];
-            [WXCoreBridge callUpdateFinish:instanceId];
-        });
-        
-        return 0;
-    }];
+    if ([_jsBridge respondsToSelector:@selector(registerCallUpdateFinish:)]) {
+        [_jsBridge registerCallUpdateFinish:^NSInteger(NSString *instanceId) {
+            
+            WXPerformBlockOnComponentThread(^{
+                [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateFinish" options:@{@"threadName":WXTDOMThread}];
+                [WXCoreBridge callUpdateFinish:instanceId];
+            });
+            
+            return 0;
+        }];
+    }
 #else
     [_jsBridge registerCallAddElement:^NSInteger(NSString *instanceId, NSString *parentRef, NSDictionary *elementData, NSInteger index) {
         
