@@ -40,6 +40,11 @@
         WXSDKInstance * instance = [WXSDKManager instanceForID:instanceId];
         if(instance){
             bundleUrlCommit = instance.pageName?:([instance.scriptURL absoluteString]?:bundleUrlCommit);
+            if (instance.containerInfo && instance.containerInfo.count >0) {
+                NSMutableDictionary* extInfo = [[NSMutableDictionary alloc] initWithDictionary:extParams];
+                [extInfo addEntriesFromDictionary:instance.containerInfo];
+                extParams = extInfo;
+            }
         }else if([instanceIdCommit hasPrefix:@"WX_KEY_EXCEPTION"]){
             bundleUrlCommit = instanceId;
         }
