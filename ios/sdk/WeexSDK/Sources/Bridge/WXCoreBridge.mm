@@ -43,6 +43,8 @@
 #include "core/config/core_environment.h"
 #include "base/TimeUtils.h"
 
+#import <objc/runtime.h>
+
 #define NSSTRING(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCString(NULL, (const char *)(cstr), kCFStringEncodingUTF8)))
 #define NSSTRING_NO_COPY(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCStringNoCopy(NULL, (const char *)(cstr), kCFStringEncodingUTF8, kCFAllocatorNull)))
 
@@ -50,8 +52,8 @@ namespace WeexCore
 {
     static NSMutableDictionary* NSDICTIONARY(std::map<std::string, std::string>* map)
     {
-        if (map == nullptr)
-            return @{}.mutableCopy;
+        if (map == nullptr || map->size() == 0)
+            return [[NSMutableDictionary alloc] init];
         
         NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:map->size()];
         for (auto it = map->begin(); it != map->end(); it ++) {
@@ -66,8 +68,8 @@ namespace WeexCore
     
     static NSMutableDictionary* NSDICTIONARY(std::vector<std::pair<std::string, std::string>>* vec)
     {
-        if (vec == nullptr)
-            return @{}.mutableCopy;
+        if (vec == nullptr || vec->size() == 0)
+            return [[NSMutableDictionary alloc] init];
         
         NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:vec->size()];
         for (auto& p : *vec) {
@@ -82,8 +84,8 @@ namespace WeexCore
     
     static NSMutableArray* NSARRAY(std::set<std::string>* set)
     {
-        if (set == nullptr)
-            return @[].mutableCopy;
+        if (set == nullptr || set->size() == 0)
+            return [[NSMutableArray alloc] init];
         
         NSMutableArray* result = [[NSMutableArray alloc] initWithCapacity:set->size()];
         for (auto& s : *set) {
@@ -311,9 +313,7 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager wxcore_CreateBody:@{@"ref": ns_ref, @"type": ns_type,
-                                     @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}
-                      renderObject:renderObject];
+        [manager wxcore_CreateBody:ns_ref type:ns_type styles:ns_styles attributes:ns_attributes events:ns_events renderObject:renderObject];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -359,11 +359,7 @@ namespace WeexCore
         }
         
         [manager startComponentTasks];
-        [manager wxcore_AddElement:@{@"ref": ns_ref, @"type": ns_componentType,
-                                     @"style": ns_styles, @"attr": ns_attributes, @"event": ns_events}
-                           toSuper:ns_parentRef
-                           atIndex:ns_index
-                      renderObject:renderObject];
+        [manager wxcore_AddElement:ns_ref type:ns_componentType parentRef:ns_parentRef styles:ns_styles attributes:ns_attributes events:ns_events index:ns_index renderObject:renderObject];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -781,6 +777,156 @@ static void _traverseTree(WeexCore::RenderObject *render, int index, const char*
 + (void)addChildRenderObject:(void*)child toParent:(void*)parent
 {
     (static_cast<WeexCore::RenderObject*>(parent))->AddRenderObject(-1, (static_cast<WeexCore::RenderObject*>(child)));
+}
+
+static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::RenderObject* parent,
+                                                  int index, const std::string& pageId)
+{
+    using namespace WeexCore;
+    
+    const char* type = [data[@"type"] UTF8String];
+    const char* ref = [data[@"ref"] UTF8String];
+    if (type != nullptr && ref != nullptr) {
+        RenderObject* render = (RenderObject *)RenderCreator::GetInstance()->CreateRender(type, ref);
+        render->set_page_id(pageId);
+        if (parent != nullptr){
+            parent->AddRenderObject(index, render);
+        }
+        
+        [data[@"attr"] enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            if ([obj isKindOfClass:[NSString class]]) {
+                render->AddAttr([key UTF8String], [obj UTF8String]);
+            }
+            else if ([obj isKindOfClass:[NSNumber class]]) {
+                NSNumber* num = (NSNumber*)obj;
+                char objcType = [num objCType][0];
+                char buffer[128];
+                switch (objcType) {
+                    case _C_DBL:
+                    case _C_FLT:
+                        snprintf(buffer, sizeof(buffer), "%f", [num doubleValue]);
+                        render->AddAttr([key UTF8String], buffer);
+                        break;
+                    case _C_INT:
+                    case _C_CHR:
+                    case _C_SHT:
+                        snprintf(buffer, sizeof(buffer), "%d", [num intValue]);
+                        render->AddAttr([key UTF8String], buffer);
+                        break;
+                    case _C_USHT:
+                    case _C_UINT:
+                    case _C_UCHR:
+                        snprintf(buffer, sizeof(buffer), "%u", [num unsignedIntValue]);
+                        render->AddAttr([key UTF8String], buffer);
+                        break;
+                    case _C_LNG:
+                    case _C_LNG_LNG:
+                        snprintf(buffer, sizeof(buffer), "%lld", [num longLongValue]);
+                        render->AddAttr([key UTF8String], buffer);
+                        break;
+                    case _C_ULNG:
+                    case _C_ULNG_LNG:
+                        snprintf(buffer, sizeof(buffer), "%llu", [num unsignedLongLongValue]);
+                        render->AddAttr([key UTF8String], buffer);
+                        break;
+                    case _C_BFLD:
+                    case _C_BOOL:
+                        render->AddAttr([key UTF8String], [num boolValue] ? "true" : "false");
+                        break;
+                    default:
+                        render->AddAttr([key UTF8String], [[num stringValue] UTF8String]);
+                        break;
+                }
+            }
+            else {
+                render->AddAttr([key UTF8String], [[WXUtility JSONString:obj] UTF8String]);
+            }
+        }];
+        
+        [data[@"style"] enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            if ([obj isKindOfClass:[NSString class]]) {
+                render->AddStyle([key UTF8String], [obj UTF8String]);
+            }
+            else if ([obj isKindOfClass:[NSNumber class]]) {
+                NSNumber* num = (NSNumber*)obj;
+                char objcType = [num objCType][0];
+                char buffer[128];
+                switch (objcType) {
+                    case _C_DBL:
+                    case _C_FLT:
+                        snprintf(buffer, sizeof(buffer), "%f", [num doubleValue]);
+                        render->AddStyle([key UTF8String], buffer);
+                        break;
+                    case _C_INT:
+                    case _C_CHR:
+                    case _C_SHT:
+                        snprintf(buffer, sizeof(buffer), "%d", [num intValue]);
+                        render->AddStyle([key UTF8String], buffer);
+                        break;
+                    case _C_USHT:
+                    case _C_UINT:
+                    case _C_UCHR:
+                        snprintf(buffer, sizeof(buffer), "%u", [num unsignedIntValue]);
+                        render->AddStyle([key UTF8String], buffer);
+                        break;
+                    case _C_LNG:
+                    case _C_LNG_LNG:
+                        snprintf(buffer, sizeof(buffer), "%lld", [num longLongValue]);
+                        render->AddStyle([key UTF8String], buffer);
+                        break;
+                    case _C_ULNG:
+                    case _C_ULNG_LNG:
+                        snprintf(buffer, sizeof(buffer), "%llu", [num unsignedLongLongValue]);
+                        render->AddStyle([key UTF8String], buffer);
+                        break;
+                    case _C_BFLD:
+                    case _C_BOOL:
+                        render->AddStyle([key UTF8String], [num boolValue] ? "true" : "false");
+                        break;
+                    default:
+                        render->AddStyle([key UTF8String], [[num stringValue] UTF8String]);
+                        break;
+                }
+            }
+            else {
+                render->AddStyle([key UTF8String], [[WXUtility JSONString:obj] UTF8String]);
+            }
+        }];
+        
+        for (id obj in data[@"event"]) {
+            if ([obj isKindOfClass:[NSString class]]) {
+                render->AddEvent([obj UTF8String]);
+            }
+            else {
+                render->AddEvent([[WXUtility JSONString:obj] UTF8String]);
+            }
+        }
+        
+        int childIndex = 0;
+        for (NSDictionary* obj in data[@"children"]) {
+            _parseRenderObject(obj, render, childIndex ++, pageId);
+        }
+        
+        render->ApplyDefaultStyle();
+        render->ApplyDefaultAttr();
+        
+        return render;
+    }
+    return nullptr;
+}
+
++ (void)addRenderObjectFromData:(NSDictionary*)data pageId:(NSString*)pageId parentRef:(NSString*)parentRef index:(int)index
+{
+#if 0
+    char indexBuffer[25];
+    sprintf(indexBuffer, "%d", index);
+    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallAddElement([pageId UTF8String], [parentRef UTF8String], [[WsonObject fromObject:data] data], indexBuffer);
+#else
+    using namespace WeexCore;
+    const std::string page([pageId UTF8String]);
+    RenderObject* child = _parseRenderObject(data, nullptr, 0, page);
+    RenderManager::GetInstance()->AddRenderObject(page, [parentRef UTF8String], index, child);
+#endif
 }
 
 @end

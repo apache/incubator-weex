@@ -82,6 +82,16 @@ bool RenderManager::AddRenderObject(const std::string &page_id,
   page->set_is_dirty(true);
   return page->AddRenderObject(parent_ref, index, child);
 }
+    
+bool RenderManager::AddRenderObject(const std::string &page_id,
+                                    const std::string &parent_ref, int index,
+                                    RenderObject *child) {
+  RenderPage *page = GetPage(page_id);
+  if (page == nullptr) return false;
+  if (child == nullptr) return false;
+  page->set_is_dirty(true);
+  return page->AddRenderObject(parent_ref, index, child);
+}
 
 bool RenderManager::RemoveRenderObject(const std::string &page_id,
                                        const std::string &ref) {

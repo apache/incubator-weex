@@ -27,6 +27,7 @@
 namespace WeexCore {
 
 class RenderPage;
+class RenderObject;
 
 class RenderManager {
  private:
@@ -56,7 +57,10 @@ class RenderManager {
    * better */
   bool AddRenderObject(const std::string &page_id,
                        const std::string &parent_ref, int index,
-                       const char *data);
+                       const char *data); // from dom str
+  bool AddRenderObject(const std::string &page_id,
+                       const std::string &parent_ref, int index,
+                       RenderObject *child); // from RenderObject
 
   bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
 

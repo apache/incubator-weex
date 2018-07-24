@@ -381,10 +381,7 @@
         WXPerformBlockOnComponentThread(^{
             WXLogDebug(@"callAddElement...%@, %@, %@, %ld", instanceId, parentRef, componentData, (long)insertIndex);
             [WXTracingManager startTracingWithInstanceId:instanceId ref:componentData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
-            
-            char indexBuffer[25];
-            sprintf(indexBuffer, "%d", insertIndex);
-            WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallAddElement([instanceId UTF8String], [parentRef UTF8String], [[WsonObject fromObject:componentData] data], indexBuffer);
+            [WXCoreBridge addRenderObjectFromData:componentData pageId:instanceId parentRef:parentRef index:insertIndex];
         });
 
         return [JSValue valueWithInt32:1 inContext:[JSContext currentContext]];

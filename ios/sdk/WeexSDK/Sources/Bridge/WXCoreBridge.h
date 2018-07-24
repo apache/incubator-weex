@@ -135,6 +135,8 @@ namespace WeexCore
 
 + (void)addChildRenderObject:(void*)child toParent:(void*)parent;
 
++ (void)addRenderObjectFromData:(NSDictionary*)data pageId:(NSString*)pageId parentRef:(NSString*)parentRef index:(int)index;
+
 @end
 
 #endif
