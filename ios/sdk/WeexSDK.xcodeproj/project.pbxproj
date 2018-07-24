@@ -77,7 +77,6 @@
 		5996BD751D4D8A0E00C0FEA6 /* WXSDKEngineTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5996BD741D4D8A0E00C0FEA6 /* WXSDKEngineTests.m */; };
 		59A582D41CF481110081FD3E /* WXAppMonitorProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 59A582D31CF481110081FD3E /* WXAppMonitorProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		59A582FC1CF5B17B0081FD3E /* WXBridgeContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 59A582FA1CF5B17B0081FD3E /* WXBridgeContext.h */; };
-		59A582FD1CF5B17B0081FD3E /* WXBridgeContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 59A582FB1CF5B17B0081FD3E /* WXBridgeContext.m */; };
 		59A583081CF5B2FD0081FD3E /* WXNavigationDefaultImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 59A583041CF5B2FD0081FD3E /* WXNavigationDefaultImpl.h */; };
 		59A583091CF5B2FD0081FD3E /* WXNavigationDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 59A583051CF5B2FD0081FD3E /* WXNavigationDefaultImpl.m */; };
 		59A596191CB630E50012CD52 /* WXNavigationProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 59A596171CB630E50012CD52 /* WXNavigationProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -472,20 +471,14 @@
 		B85CA71A20EBAA8100D98412 /* WsonParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B85CA71320EBAA8100D98412 /* WsonParser.h */; };
 		B85CA71B20EBAA8100D98412 /* WsonObject.m in Sources */ = {isa = PBXBuildFile; fileRef = B85CA71420EBAA8100D98412 /* WsonObject.m */; };
 		B85CA71C20EBAA8100D98412 /* WsonObject.m in Sources */ = {isa = PBXBuildFile; fileRef = B85CA71420EBAA8100D98412 /* WsonObject.m */; };
+		B863DF322107308000EA887D /* WXBridgeContext.m in Sources */ = {isa = PBXBuildFile; fileRef = B863DF312107307F00EA887D /* WXBridgeContext.m */; };
+		B863DF332107313400EA887D /* WXBridgeContext.m in Sources */ = {isa = PBXBuildFile; fileRef = B863DF312107307F00EA887D /* WXBridgeContext.m */; };
 		B89543F320EB18B5006EAD63 /* WXCoreBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543ED20EB18B4006EAD63 /* WXCoreBridge.mm */; };
 		B89543F420EB18B5006EAD63 /* WXCoreBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543ED20EB18B4006EAD63 /* WXCoreBridge.mm */; };
 		B89543F520EB18B5006EAD63 /* WXJSCoreBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543EE20EB18B4006EAD63 /* WXJSCoreBridge.mm */; };
 		B89543F620EB18B5006EAD63 /* WXJSCoreBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543EE20EB18B4006EAD63 /* WXJSCoreBridge.mm */; };
 		B89543F720EB18B5006EAD63 /* WXCoreBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = B89543EF20EB18B4006EAD63 /* WXCoreBridge.h */; };
 		B89543F820EB18B5006EAD63 /* WXCoreBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = B89543EF20EB18B4006EAD63 /* WXCoreBridge.h */; };
-		B89543F920EB18B5006EAD63 /* WXBridgeContext_private.h in Headers */ = {isa = PBXBuildFile; fileRef = B89543F020EB18B4006EAD63 /* WXBridgeContext_private.h */; };
-		B89543FA20EB18B5006EAD63 /* WXBridgeContext_private.h in Headers */ = {isa = PBXBuildFile; fileRef = B89543F020EB18B4006EAD63 /* WXBridgeContext_private.h */; };
-		B89543FB20EB18B5006EAD63 /* WXCoreJSHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = B89543F120EB18B4006EAD63 /* WXCoreJSHandler.h */; };
-		B89543FC20EB18B5006EAD63 /* WXCoreJSHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = B89543F120EB18B4006EAD63 /* WXCoreJSHandler.h */; };
-		B89543FD20EB18B5006EAD63 /* WXCoreJSHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543F220EB18B4006EAD63 /* WXCoreJSHandler.mm */; };
-		B89543FE20EB18B5006EAD63 /* WXCoreJSHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543F220EB18B4006EAD63 /* WXCoreJSHandler.mm */; };
-		B895440020EB18E6006EAD63 /* WXBridgeManager_private.h in Headers */ = {isa = PBXBuildFile; fileRef = B89543FF20EB18E6006EAD63 /* WXBridgeManager_private.h */; };
-		B895440120EB18E6006EAD63 /* WXBridgeManager_private.h in Headers */ = {isa = PBXBuildFile; fileRef = B89543FF20EB18E6006EAD63 /* WXBridgeManager_private.h */; };
 		BA5F00F11FC5AFFE00F76B5C /* WXLocaleModule.h in Headers */ = {isa = PBXBuildFile; fileRef = BA5F00EF1FC5AFFE00F76B5C /* WXLocaleModule.h */; };
 		BA5F00F21FC5AFFE00F76B5C /* WXLocaleModule.m in Sources */ = {isa = PBXBuildFile; fileRef = BA5F00F01FC5AFFE00F76B5C /* WXLocaleModule.m */; };
 		BA5F00F31FC6834900F76B5C /* WXLocaleModule.h in Headers */ = {isa = PBXBuildFile; fileRef = BA5F00EF1FC5AFFE00F76B5C /* WXLocaleModule.h */; };
@@ -635,7 +628,6 @@
 		DCA445841EFA55B300D0CFA8 /* WXModuleMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = 74862F7C1E03A0F300B7A041 /* WXModuleMethod.m */; };
 		DCA445851EFA55B300D0CFA8 /* WXComponentMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = 74862F801E03A24500B7A041 /* WXComponentMethod.m */; };
 		DCA445861EFA55B300D0CFA8 /* WXCallJSMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = 74D2051F1E091B8000128F44 /* WXCallJSMethod.m */; };
-		DCA445881EFA55B300D0CFA8 /* WXBridgeContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 59A582FB1CF5B17B0081FD3E /* WXBridgeContext.m */; };
 		DCA4458A1EFA55B300D0CFA8 /* WXPolyfillSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 74AD99831D5B0E59008F0336 /* WXPolyfillSet.m */; };
 		DCA4458B1EFA55B300D0CFA8 /* JSValue+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = 74862F781E02B88D00B7A041 /* JSValue+Weex.m */; };
 		DCA4458C1EFA55B300D0CFA8 /* WXServiceFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 740451E91E14BB26004157CB /* WXServiceFactory.m */; };
@@ -896,7 +888,6 @@
 		5996BD741D4D8A0E00C0FEA6 /* WXSDKEngineTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXSDKEngineTests.m; sourceTree = "<group>"; };
 		59A582D31CF481110081FD3E /* WXAppMonitorProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAppMonitorProtocol.h; sourceTree = "<group>"; };
 		59A582FA1CF5B17B0081FD3E /* WXBridgeContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXBridgeContext.h; sourceTree = "<group>"; };
-		59A582FB1CF5B17B0081FD3E /* WXBridgeContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXBridgeContext.m; sourceTree = "<group>"; };
 		59A583041CF5B2FD0081FD3E /* WXNavigationDefaultImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXNavigationDefaultImpl.h; sourceTree = "<group>"; };
 		59A583051CF5B2FD0081FD3E /* WXNavigationDefaultImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXNavigationDefaultImpl.m; sourceTree = "<group>"; };
 		59A596171CB630E50012CD52 /* WXNavigationProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXNavigationProtocol.h; sourceTree = "<group>"; };
@@ -1181,13 +1172,10 @@
 		B85CA71220EBAA8100D98412 /* WsonObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WsonObject.h; sourceTree = "<group>"; };
 		B85CA71320EBAA8100D98412 /* WsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WsonParser.h; sourceTree = "<group>"; };
 		B85CA71420EBAA8100D98412 /* WsonObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WsonObject.m; sourceTree = "<group>"; };
+		B863DF312107307F00EA887D /* WXBridgeContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXBridgeContext.m; sourceTree = "<group>"; };
 		B89543ED20EB18B4006EAD63 /* WXCoreBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXCoreBridge.mm; sourceTree = "<group>"; };
 		B89543EE20EB18B4006EAD63 /* WXJSCoreBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXJSCoreBridge.mm; sourceTree = "<group>"; };
 		B89543EF20EB18B4006EAD63 /* WXCoreBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCoreBridge.h; sourceTree = "<group>"; };
-		B89543F020EB18B4006EAD63 /* WXBridgeContext_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXBridgeContext_private.h; sourceTree = "<group>"; };
-		B89543F120EB18B4006EAD63 /* WXCoreJSHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCoreJSHandler.h; sourceTree = "<group>"; };
-		B89543F220EB18B4006EAD63 /* WXCoreJSHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXCoreJSHandler.mm; sourceTree = "<group>"; };
-		B89543FF20EB18E6006EAD63 /* WXBridgeManager_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXBridgeManager_private.h; sourceTree = "<group>"; };
 		BA5F00EF1FC5AFFE00F76B5C /* WXLocaleModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXLocaleModule.h; sourceTree = "<group>"; };
 		BA5F00F01FC5AFFE00F76B5C /* WXLocaleModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXLocaleModule.m; sourceTree = "<group>"; };
 		C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXFloatCompareTests.m; sourceTree = "<group>"; };
@@ -1623,13 +1611,10 @@
 				74D2051F1E091B8000128F44 /* WXCallJSMethod.m */,
 				B89543EF20EB18B4006EAD63 /* WXCoreBridge.h */,
 				B89543ED20EB18B4006EAD63 /* WXCoreBridge.mm */,
-				B89543F020EB18B4006EAD63 /* WXBridgeContext_private.h */,
+				B863DF312107307F00EA887D /* WXBridgeContext.m */,
 				59A582FA1CF5B17B0081FD3E /* WXBridgeContext.h */,
-				59A582FB1CF5B17B0081FD3E /* WXBridgeContext.m */,
 				77D1613A1C02DEA60010B15B /* WXJSCoreBridge.h */,
 				B89543EE20EB18B4006EAD63 /* WXJSCoreBridge.mm */,
-				B89543F120EB18B4006EAD63 /* WXCoreJSHandler.h */,
-				B89543F220EB18B4006EAD63 /* WXCoreJSHandler.mm */,
 				74AD99821D5B0E59008F0336 /* WXPolyfillSet.h */,
 				74AD99831D5B0E59008F0336 /* WXPolyfillSet.m */,
 				74862F771E02B88D00B7A041 /* JSValue+Weex.h */,
@@ -1653,7 +1638,6 @@
 				C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */,
 				77D161261C02DE1A0010B15B /* WXSDKManager.h */,
 				77D161271C02DE1A0010B15B /* WXSDKManager.m */,
-				B89543FF20EB18E6006EAD63 /* WXBridgeManager_private.h */,
 				77D161361C02DE940010B15B /* WXBridgeManager.h */,
 				77D161371C02DE940010B15B /* WXBridgeManager.m */,
 				77E659EF1C0C3612008B8775 /* WXModuleFactory.h */,
@@ -2166,7 +2150,6 @@
 				7408C48E1CFB345D000BCCD0 /* WXComponent+Events.h in Headers */,
 				B82A157D20F849930098A509 /* render_cell_factory.h in Headers */,
 				775BEE711C1BD977008D1629 /* WXModuleProtocol.h in Headers */,
-				B895440020EB18E6006EAD63 /* WXBridgeManager_private.h in Headers */,
 				B843AE9C2101C094007C76D0 /* render_action_render_success.h in Headers */,
 				7469869F1C4E2C000054A57E /* NSArray+Weex.h in Headers */,
 				74CC7A201C2BF9DC00829368 /* WXListComponent.h in Headers */,
@@ -2267,7 +2250,6 @@
 				B82A150320F849930098A509 /* js_bridge.h in Headers */,
 				74BF19F81F5139BB00AEE3D7 /* WXJSASTParser.h in Headers */,
 				59A596191CB630E50012CD52 /* WXNavigationProtocol.h in Headers */,
-				B89543FB20EB18B5006EAD63 /* WXCoreJSHandler.h in Headers */,
 				59A5962F1CB632050012CD52 /* WXBaseViewController.h in Headers */,
 				74AD99841D5B0E59008F0336 /* WXPolyfillSet.h in Headers */,
 				74A4BA961CB365D100195969 /* WXAppConfiguration.h in Headers */,
@@ -2342,7 +2324,6 @@
 				B89543F720EB18B5006EAD63 /* WXCoreBridge.h in Headers */,
 				2A60CE9C1C91733E00857B9F /* WXSwitchComponent.h in Headers */,
 				DCDFED011E68238F00C228D7 /* WXJSExceptionProtocol.h in Headers */,
-				B89543F920EB18B5006EAD63 /* WXBridgeContext_private.h in Headers */,
 				2A4445BF1CA8FD56009E7C6D /* WXTextComponentProtocol.h in Headers */,
 				746319021C60AFC100EFEBD4 /* WXThreadSafeCounter.h in Headers */,
 				B82A153120F849930098A509 /* render_action_add_event.h in Headers */,
@@ -2453,11 +2434,9 @@
 				DCA445BD1EFA57B500D0CFA8 /* WXConfigCenterProtocol.h in Headers */,
 				B82A156420F849930098A509 /* render_object.h in Headers */,
 				DCA445A11EFA56FA00D0CFA8 /* WXScrollerProtocol.h in Headers */,
-				B89543FC20EB18B5006EAD63 /* WXCoreJSHandler.h in Headers */,
 				DCA445DE1EFA59B800D0CFA8 /* WXSectionDataController.h in Headers */,
 				DCA445F01EFA5A1D00D0CFA8 /* WXComponent_internal.h in Headers */,
 				B82A158020F849930098A509 /* render_factory_interface.h in Headers */,
-				B895440120EB18E6006EAD63 /* WXBridgeManager_private.h in Headers */,
 				170B4664208733AF00562666 /* WXAnalyzerCenter.h in Headers */,
 				B82A150020F849930098A509 /* core_environment.h in Headers */,
 				74B81AE71F73C3E900D3A61D /* WXRecycleListTemplateManager.h in Headers */,
@@ -2577,7 +2556,6 @@
 				DCA445EF1EFA5A1800D0CFA8 /* WXSwitchComponent.h in Headers */,
 				C49642EC1F73E6DF0092CC5A /* WXWebSocketHandler.h in Headers */,
 				DCA445EB1EFA5A0B00D0CFA8 /* WXTextInputComponent.h in Headers */,
-				B89543FA20EB18B5006EAD63 /* WXBridgeContext_private.h in Headers */,
 				DCA4460C1EFA5A7600D0CFA8 /* WXThreadSafeMutableDictionary.h in Headers */,
 				B82A156E20F849930098A509 /* render_scroller_factory.h in Headers */,
 				DCA445CE1EFA593500D0CFA8 /* WXComponent+BoxShadow.h in Headers */,
@@ -2844,7 +2822,6 @@
 				B82A14F920F849930098A509 /* css_value_getter.cpp in Sources */,
 				176BE43E209172E20086B6AF /* WXScrollerComponent+Layout.mm in Sources */,
 				77D161291C02DE1A0010B15B /* WXSDKManager.m in Sources */,
-				B89543FD20EB18B5006EAD63 /* WXCoreJSHandler.mm in Sources */,
 				7461F8911CFB373100F62D44 /* WXDisplayQueue.m in Sources */,
 				74896F311D1AC79400D1D593 /* NSObject+WXSwizzle.m in Sources */,
 				746986A01C4E2C010054A57E /* NSArray+Weex.m in Sources */,
@@ -2885,7 +2862,6 @@
 				59A5961D1CB630F10012CD52 /* WXComponent+Navigation.m in Sources */,
 				77D161631C02ED790010B15B /* WXLog.m in Sources */,
 				17C74F0D2072145100AB4CAB /* WXAnalyzerCenter.m in Sources */,
-				59A582FD1CF5B17B0081FD3E /* WXBridgeContext.m in Sources */,
 				B82A155F20F849930098A509 /* render_appbar.cpp in Sources */,
 				743933B51C7ED9AA00773BB7 /* WXSimulatorShortcutManager.m in Sources */,
 				BA5F00F21FC5AFFE00F76B5C /* WXLocaleModule.m in Sources */,
@@ -2917,6 +2893,7 @@
 				77E659F21C0C3612008B8775 /* WXModuleFactory.m in Sources */,
 				DCF343681E49CAEE00A2FB34 /* WXJSExceptionInfo.m in Sources */,
 				B82A153D20F849930098A509 /* render_action_move_element.cpp in Sources */,
+				B863DF322107308000EA887D /* WXBridgeContext.m in Sources */,
 				59CE27E91CC387DB000BE37A /* WXEmbedComponent.m in Sources */,
 				DCA0EF651D6EED6F00CB18B9 /* WXGlobalEventModule.m in Sources */,
 				2A919DA71E321F1F006EB6B5 /* WXBridgeMethod.m in Sources */,
@@ -3014,6 +2991,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B863DF332107313400EA887D /* WXBridgeContext.m in Sources */,
 				B82A159A20F857450098A509 /* WXWebSocketLoader.m in Sources */,
 				B82A159920F857200098A509 /* WXSDKError.m in Sources */,
 				B82A159820F8556F0098A509 /* WXSDKInstance_performance.m in Sources */,
@@ -3043,7 +3021,6 @@
 				B82A154E20F849930098A509 /* render_action_appendtree_createfinish.cpp in Sources */,
 				B82A157220F849930098A509 /* render_creator.cpp in Sources */,
 				DCA4453E1EFA55B300D0CFA8 /* WXBaseViewController.m in Sources */,
-				B89543FE20EB18B5006EAD63 /* WXCoreJSHandler.mm in Sources */,
 				DCA4453F1EFA55B300D0CFA8 /* WXRootViewController.m in Sources */,
 				DCA445401EFA55B300D0CFA8 /* WXEditComponent.mm in Sources */,
 				176BE43D209172A30086B6AF /* WXScrollerComponent+Layout.mm in Sources */,
@@ -3156,7 +3133,6 @@
 				B82A156220F849930098A509 /* render_list.cpp in Sources */,
 				DCA445851EFA55B300D0CFA8 /* WXComponentMethod.m in Sources */,
 				DCA445861EFA55B300D0CFA8 /* WXCallJSMethod.m in Sources */,
-				DCA445881EFA55B300D0CFA8 /* WXBridgeContext.m in Sources */,
 				DCA4458A1EFA55B300D0CFA8 /* WXPolyfillSet.m in Sources */,
 				333D9A2A1F41507A007CED39 /* WXTransition.mm in Sources */,
 				DCA4458B1EFA55B300D0CFA8 /* JSValue+Weex.m in Sources */,

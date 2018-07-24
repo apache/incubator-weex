@@ -48,9 +48,9 @@ WX_EXPORT_METHOD(@selector(moveElement:parentRef:index:))
 WX_EXPORT_METHOD(@selector(addEvent:event:))
 WX_EXPORT_METHOD(@selector(removeEvent:event:))
 WX_EXPORT_METHOD(@selector(createFinish))
+#endif
 WX_EXPORT_METHOD(@selector(updateFinish))
 WX_EXPORT_METHOD(@selector(refreshFinish))
-#endif
 WX_EXPORT_METHOD(@selector(scrollToElement:options:))
 #ifdef WX_IMPORT_WEEXCORE
 #else
@@ -145,6 +145,8 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:nil className:nil name:@"dom" phase:WXTracingEnd functionName:@"createFinish" options:nil];
 }
 
+#endif
+
 - (void)updateFinish
 {
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
@@ -158,7 +160,6 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
         [manager refreshFinish];
     }];
 }
-#endif
 
 - (void)scrollToElement:(NSString *)elemRef options:(NSDictionary *)dict
 {

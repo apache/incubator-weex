@@ -42,7 +42,6 @@
 
 #ifdef WX_IMPORT_WEEXCORE
 #import "WXCoreBridge.h"
-#import "WXBridgeManager_private.h"
 #endif
 
 static NSThread *WXComponentThread;
@@ -828,7 +827,10 @@ static NSThread *WXComponentThread;
     
     WXSDKInstance *instance  = self.weexInstance;
     [self _addUITask:^{
+#ifdef WX_IMPORT_WEEXCORE
+#else
         UIView *rootView = instance.rootView;
+#endif
         [instance.performance onInstanceCreateFinish];
         
         WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, instance);

@@ -135,7 +135,27 @@ namespace WeexCore
 
 + (void)addChildRenderObject:(void*)child toParent:(void*)parent;
 
-+ (void)addRenderObjectFromData:(NSDictionary*)data pageId:(NSString*)pageId parentRef:(NSString*)parentRef index:(int)index;
++ (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index;
+
++ (void)callCreateBody:(NSString*)pageId data:(NSDictionary*)data;
+
++ (void)callRemoveElement:(NSString*)pageId ref:(NSString*)ref;
+
++ (void)callMoveElement:(NSString*)pageId ref:(NSString*)ref parentRef:(NSString*)parentRef index:(int)index;
+
++ (void)callUpdateAttrs:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data;
+
++ (void)callUpdateStyle:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data;
+
++ (void)callAddEvent:(NSString*)pageId ref:(NSString*)ref event:(NSString*)event;
+
++ (void)callRemoveEvent:(NSString*)pageId ref:(NSString*)ref event:(NSString*)event;
+
++ (void)callCreateFinish:(NSString*)pageId;
+
++ (void)callRefreshFinish:(NSString*)pageId;
+
++ (void)callUpdateFinish:(NSString*)pageId;
 
 @end
 

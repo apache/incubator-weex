@@ -24,13 +24,12 @@
 #import "WXSDKManager.h"
 #import "WXComponentManager.h"
 #import "WXSDKInstance_private.h"
-#import "WXBridgeManager_private.h"
-#import "WXBridgeContext_private.h"
 #import "WXLog.h"
 #import "WXTracingManager.h"
 #import "WXBridgeProtocol.h"
 #import "WXUtility.h"
 #import "WXAppConfiguration.h"
+#import "WsonObject.h"
 
 #include "base/CoreConstants.h"
 #include "core/manager/weex_core_manager.h"
@@ -141,22 +140,8 @@ namespace WeexCore
     
     int WXCoreBridge::callNative(const char* pageId, const char *task, const char *callback)
     {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
-        if (page == nullptr) {
-            return -1;
-        }
-        
-        long long startTime = getCurrentTime();
-        
-        NSString* ns_instanceId = NSSTRING(pageId);
-        NSString* ns_task = NSSTRING(task);
-        NSString* ns_callback = NSSTRING(callback);
-        NSArray* ns_taskArray = [WXUtility objectFromJSON:ns_task];
-        
-        [[WXBridgeManager sharedManager].bridgeCtx invokeNative:ns_instanceId tasks:ns_taskArray callback:ns_callback];
-        
-        page->CallBridgeTime(getCurrentTime() - startTime);
-        return 0;
+        // should not enter this function
+        assert(false);
     }
     
     void* WXCoreBridge::callNativeModule(const char* pageId, const char *module, const char *method,
@@ -201,6 +186,8 @@ namespace WeexCore
         }
         [manager startComponentTasks];
         [manager updateFinish];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateFinish" options:@{@"threadName":WXTDOMThread}];
+        
         return 0;
     }
         
@@ -218,6 +205,8 @@ namespace WeexCore
         }
         [manager startComponentTasks];
         [manager refreshFinish];
+        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"refreshFinish" options:@{@"threadName":WXTDOMThread}];
+        
         return 0;
     }
         
@@ -660,19 +649,22 @@ static WeexCore::JSBridge* jsBridge = nullptr;
 
 + (void)install
 {
-    WeexCore::WXCoreEnvironment::getInstance()->SetPlatform(OS_iOS);
-    
-    CGSize screenSize = [UIScreen mainScreen].bounds.size;
-    WeexCore::WXCoreEnvironment::getInstance()->SetDeviceWidth(std::to_string(screenSize.width));
-    WeexCore::WXCoreEnvironment::getInstance()->SetDeviceHeight(std::to_string(screenSize.height));
-    
-    platformBridge = new WeexCore::WXCoreBridge();
-    WeexCore::WeexCoreManager::getInstance()->setPlatformBridge(platformBridge);
-    
-    jsBridge = new WeexCore::JSBridge();
-    WeexCore::WeexCoreManager::getInstance()->setJSBridge(jsBridge);
-    
-    WeexCore::WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new WeexCore::WXCoreMeasureFunctionBridge());
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        WeexCore::WXCoreEnvironment::getInstance()->SetPlatform(OS_iOS);
+        
+        CGSize screenSize = [UIScreen mainScreen].bounds.size;
+        WeexCore::WXCoreEnvironment::getInstance()->SetDeviceWidth(std::to_string(screenSize.width));
+        WeexCore::WXCoreEnvironment::getInstance()->SetDeviceHeight(std::to_string(screenSize.height));
+        
+        platformBridge = new WeexCore::WXCoreBridge();
+        WeexCore::WeexCoreManager::getInstance()->setPlatformBridge(platformBridge);
+        
+        jsBridge = new WeexCore::JSBridge();
+        WeexCore::WeexCoreManager::getInstance()->setJSBridge(jsBridge);
+        
+        WeexCore::WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new WeexCore::WXCoreMeasureFunctionBridge());
+    });
 }
 
 + (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
@@ -915,7 +907,7 @@ static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::
     return nullptr;
 }
 
-+ (void)addRenderObjectFromData:(NSDictionary*)data pageId:(NSString*)pageId parentRef:(NSString*)parentRef index:(int)index
++ (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index
 {
 #if 0
     char indexBuffer[25];
@@ -927,6 +919,56 @@ static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::
     RenderObject* child = _parseRenderObject(data, nullptr, 0, page);
     RenderManager::GetInstance()->AddRenderObject(page, [parentRef UTF8String], index, child);
 #endif
+}
+
++ (void)callCreateBody:(NSString*)pageId data:(NSDictionary*)data
+{
+    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallCreateBody([pageId UTF8String], [[WsonObject fromObject:data] data]);
+}
+
++ (void)callRemoveElement:(NSString*)pageId ref:(NSString*)ref
+{
+    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallRemoveElement([pageId UTF8String], [ref UTF8String]);
+}
+
++ (void)callMoveElement:(NSString*)pageId ref:(NSString*)ref parentRef:(NSString*)parentRef index:(int)index
+{
+    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallMoveElement([pageId UTF8String], [ref UTF8String], [parentRef UTF8String], index);
+}
+
++ (void)callUpdateAttrs:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
+{
+    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallUpdateAttrs([pageId UTF8String], [ref UTF8String], [[WsonObject fromObject:data] data]);
+}
+
++ (void)callUpdateStyle:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
+{
+    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallUpdateStyle([pageId UTF8String], [ref UTF8String], [[WsonObject fromObject:data] data]);
+}
+
++ (void)callAddEvent:(NSString*)pageId ref:(NSString*)ref event:(NSString*)event
+{
+    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallAddEvent([pageId UTF8String], [ref UTF8String], [event UTF8String]);
+}
+
++ (void)callRemoveEvent:(NSString*)pageId ref:(NSString*)ref event:(NSString*)event
+{
+    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallRemoveEvent([pageId UTF8String], [ref UTF8String], [event UTF8String]);
+}
+
++ (void)callCreateFinish:(NSString*)pageId
+{
+    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallCreateFinish([pageId UTF8String]);
+}
+
++ (void)callRefreshFinish:(NSString*)pageId
+{
+    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallRefreshFinish([pageId UTF8String], nullptr, nullptr);
+}
+
++ (void)callUpdateFinish:(NSString*)pageId
+{
+    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallUpdateFinish([pageId UTF8String], nullptr, nullptr);
 }
 
 @end

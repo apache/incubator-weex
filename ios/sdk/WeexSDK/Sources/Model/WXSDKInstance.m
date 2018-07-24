@@ -53,7 +53,6 @@
 #import "WXPageEventNotifyEvent.h"
 
 #ifdef WX_IMPORT_WEEXCORE
-#import "WXCoreJSHandler.h"
 #import "WXCoreBridge.h"
 #endif
 
@@ -142,12 +141,7 @@ typedef enum : NSUInteger {
 {
     _debugJS = [WXDebugTool isDevToolDebug];
     
-    
-#ifdef WX_IMPORT_WEEXCORE
-    Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXCoreJSHandler class];
-#else
     Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXJSCoreBridge class];
-#endif
     
     if (_instanceJavaScriptContext && [_instanceJavaScriptContext isKindOfClass:bridgeClass]) {
         return _instanceJavaScriptContext;

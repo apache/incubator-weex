@@ -29,6 +29,8 @@ typedef NSInteger(^WXJSCallUpdateStyle)(NSString *instanceId,NSString *ref,NSDic
 typedef NSInteger(^WXJSCallAddEvent)(NSString *instanceId,NSString *ref,NSString *event);
 typedef NSInteger(^WXJSCallRemoveEvent)(NSString *instanceId,NSString *ref,NSString *event);
 typedef NSInteger(^WXJSCallCreateFinish)(NSString *instanceId);
+typedef NSInteger(^WXJSCallRefreshFinish)(NSString *instanceId);
+typedef NSInteger(^WXJSCallUpdateFinish)(NSString *instanceId);
 typedef NSInvocation *(^WXJSCallNativeModule)(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options);
 typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options);
 
@@ -59,11 +61,6 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
 - (void)resetEnvironment;
 
 @optional
-
-/**
- * Register weex core functions.
- */
-- (void)registerForWeexCore;
 
 /**
  * Remove instance's timer.
@@ -104,22 +101,37 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
  * Register callback when updateAttrs tasks occur
  */
 - (void)registerCallUpdateAttrs:(WXJSCallUpdateAttrs)callUpdateAttrs;
+
 /**
  * Register callback when updateStyle tasks occur
  */
 - (void)registerCallUpdateStyle:(WXJSCallUpdateStyle)callUpdateStyle;
+
 /**
  * Register callback when addEvent tasks occur
  */
 - (void)registerCallAddEvent:(WXJSCallAddEvent)callAddEvent;
+
 /**
  * Register callback when removeEvent tasks occur
  */
 - (void)registerCallRemoveEvent:(WXJSCallRemoveEvent)callRemoveEvent;
+
 /**
  * Register callback when createFinish tasks occur
 */
 - (void)registerCallCreateFinish:(WXJSCallCreateFinish)callCreateFinish;
+
+/**
+ * Register callback when refreshFinish tasks occur
+ */
+- (void)registerCallRefreshFinish:(WXJSCallRefreshFinish)callRefreshFinish;
+
+/**
+ * Register callback when updateFinish tasks occur
+ */
+- (void)registerCallUpdateFinish:(WXJSCallUpdateFinish)callUpdateFinish;
+
 /**
  * Register callback for global js function `callNativeModule`
  */
@@ -154,4 +166,5 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
  * javaScript runtime context
  */
 - (JSContext*)javaScriptContext;
+
 @end
