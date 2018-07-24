@@ -70,6 +70,7 @@ class AndroidBridgeInMultiProcess : public Bridge_Impl_Android {
  private:
   std::unique_ptr<WeexJSConnection> connection_;
   std::unique_ptr<IPCHandler> handler_;
+  std::unique_ptr<IPCHandler> server_handler_;
   DISALLOW_COPY_AND_ASSIGN(AndroidBridgeInMultiProcess);
 };
 }  // namespace WeexCore

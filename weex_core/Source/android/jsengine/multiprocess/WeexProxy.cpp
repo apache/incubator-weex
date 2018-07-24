@@ -48,7 +48,6 @@ static std::unique_ptr<IPCHandler> sHandler;
 static std::unique_ptr<WeexJSConnection> sConnection;
 static FunctionsExposedByJS *js_server_api_functions = nullptr;
 bool g_use_single_process = false;
-
 #define  USE_MULTI_SO_BRIDGE 1
 
 namespace WeexCore {

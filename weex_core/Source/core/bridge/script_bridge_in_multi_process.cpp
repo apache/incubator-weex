@@ -71,6 +71,8 @@ static std::unique_ptr<IPCResult> HandleReportException(
 
 static std::unique_ptr<IPCResult> HandleCallNativeLog(IPCArguments *arguments) {
     LOGE("IN HandleCallNativeLog");
+    if(arguments == nullptr)
+      return createInt32Result(static_cast<int32_t>(true));
   const char *str_array = getArumentAsCStr(arguments, 0);
   WeexCoreManager::getInstance()->script_bridge()->core_side()->NativeLog(
       str_array);
@@ -672,14 +674,17 @@ ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
     LOGE("ScriptBridgeInMultiProcess");
   bool passable = initializer->Init(
       [this](IPCHandler *handler) {
-//          RegisterIPCCallback(handler);
+          RegisterIPCCallback(handler);
           },
       [this](std::unique_ptr<WeexJSConnection> connection,
-             std::unique_ptr<IPCHandler> handler) {
+             std::unique_ptr<IPCHandler> handler,
+             std::unique_ptr<IPCHandler> server_handler) {
         static_cast<bridge::script::ScriptSideInMultiProcess *>(script_side())
             ->set_sender(connection->sender());
         connection_ = std::move(connection);
         handler_ = std::move(handler);
+        server_handler_ = std::move(server_handler);
+        LOGE("ScriptBridgeInMultiProcess finish %x %x",server_handler_.get(),server_handler.get());
         return true;
       },
       [this](const char *page_id, const char *func,
@@ -698,6 +703,7 @@ void ScriptBridgeInMultiProcess::RegisterIPCCallback(IPCHandler *handler) {
     LOGE("RegisterIPCCallback is running");
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETJSFVERSION),
                            HandleSetJSVersion);
+    LOGE("RegisterIPCCallback is running2");
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::REPORTEXCEPTION),
                            HandleReportException);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVE),

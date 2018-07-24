@@ -49,15 +49,16 @@ AndroidBridgeInMultiProcess::AndroidBridgeInMultiProcess() {
       new MultiProcessAndSoInitializer);
   LOGE("AndroidBridgeInMultiProcess");
   bool passable = initializer->Init(
-      [this](IPCHandler* handler) {
-//        RegisterIPCCallback(handler);
-        },
+      [this](IPCHandler* handler) { RegisterIPCCallback(handler); },
       [this](std::unique_ptr<WeexJSConnection> connection,
-             std::unique_ptr<IPCHandler> handler) {
+             std::unique_ptr<IPCHandler> handler,
+             std::unique_ptr<IPCHandler> server_handler) {
         static_cast<CoreSideInMultiProcess*>(core_side())
             ->set_sender(connection->sender());
         connection_ = std::move(connection);
         handler_ = std::move(handler);
+        server_handler_ = std::move(server_handler);
+        LOGE("FINISH %x",server_handler_.get());
         return true;
       },
       [this](const char* page_id, const char* func,

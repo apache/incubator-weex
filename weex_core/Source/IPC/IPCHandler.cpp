@@ -29,6 +29,7 @@
 namespace {
 class IPCHandlerImpl : public IPCHandler {
 public:
+    ~IPCHandlerImpl() {LOGE("IPCHandlerImpl dele");}
     std::unique_ptr<IPCResult> handle(uint32_t msg, IPCArguments*) override;
     void registerHandler(int msg, const std::function<std::unique_ptr<IPCResult>(IPCArguments*)>& handler) override;
 

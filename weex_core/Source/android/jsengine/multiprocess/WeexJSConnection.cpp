@@ -45,7 +45,6 @@
 //extern const char *g_jssSoPath;
 //extern const char *g_jssSoName;
 //extern bool s_start_pie;
-
 static void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie);
 
 static int copyFile(const char *SourceFile, const char *NewFile);
@@ -76,8 +75,11 @@ struct ThreadData {
     int ipcServerFd;
     IPCHandler *ipcServerHandler;
 };
-pthread_t ipcServerThread = 0;
+pthread_t ipcServerThread;
 static volatile bool finish = false;
+static std::unique_ptr<IPCResult> test(IPCArguments *arguments) {
+  return createVoidResult();
+}
 static void *newIPCServer(void *_td) {
     ThreadData *td = static_cast<ThreadData *>(_td);
     void *base = mmap(nullptr, IPCFutexPageQueue::ipc_size, PROT_READ | PROT_WRITE, MAP_SHARED,
@@ -90,15 +92,25 @@ static void *newIPCServer(void *_td) {
     }
     std::unique_ptr<IPCFutexPageQueue> futexPageQueue(
             new IPCFutexPageQueue(base, IPCFutexPageQueue::ipc_size, 0));
-    LOGE("HANDLER is %x",td->ipcServerHandler);
+
     std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), td->ipcServerHandler));
     std::unique_ptr<IPCListener> listener =std::move(createIPCListener(futexPageQueue.get(), td->ipcServerHandler)) ;
     LOGE("newIPCServer is running %d",gettid());
-    ScriptBridgeInMultiProcess* bridge = static_cast<ScriptBridgeInMultiProcess*>(WeexCoreManager::getInstance()->script_bridge());
-    bridge->RegisterIPCCallback(td->ipcServerHandler);
 
+    LOGE("TEST1 %x",td->ipcServerHandler);
+    td->ipcServerHandler->registerHandler(10000,test);
+    LOGE("TEST2");
+    td->ipcServerHandler->handle(7, nullptr);
+    LOGE("TEST3");
     finish = true;
+    td->ipcServerHandler->handle(7, nullptr);
+    LOGE("TEST7%x",td->ipcServerHandler);
     futexPageQueue->spinWaitPeer();
+    LOGE("TEST4 %x",td->ipcServerHandler);
+    td->ipcServerHandler->registerHandler(10000,test);
+    LOGE("TEST5");
+    td->ipcServerHandler->handle(7, nullptr);
+    LOGE("TEST6");
     listener->listen();
 }
 
@@ -178,7 +190,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
     throw IPCException("failed to fork: %s", strerror(myerrno));
   } else if (child == 0) {
     // the child
-    closeAllButThis(fd, fd2);
+    //closeAllButThis(fd, fd2);
     // implements close all but handles[1]
     // do exec
     doExec(fd, fd2, true, startupPie);

@@ -37,6 +37,7 @@ class ScriptBridgeInMultiProcess : public ScriptBridge {
  private:
   std::unique_ptr<WeexJSConnection> connection_;
   std::unique_ptr<IPCHandler> handler_;
+  std::unique_ptr<IPCHandler> server_handler_;
   DISALLOW_COPY_AND_ASSIGN(ScriptBridgeInMultiProcess);
 };
 }  // namespace WeexCore
