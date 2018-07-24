@@ -78,6 +78,7 @@ struct ThreadData {
 pthread_t ipcServerThread;
 static volatile bool finish = false;
 static std::unique_ptr<IPCResult> test(IPCArguments *arguments) {
+    LOGE("test is running");
   return createVoidResult();
 }
 static void *newIPCServer(void *_td) {
@@ -90,27 +91,16 @@ static void *newIPCServer(void *_td) {
         close(td->ipcServerFd);
         throw IPCException("failed to map ashmem region: %s", strerror(_errno));
     }
+
+    IPCHandler *handler = td->ipcServerHandler;
     std::unique_ptr<IPCFutexPageQueue> futexPageQueue(
             new IPCFutexPageQueue(base, IPCFutexPageQueue::ipc_size, 0));
-
-    std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), td->ipcServerHandler));
-    std::unique_ptr<IPCListener> listener =std::move(createIPCListener(futexPageQueue.get(), td->ipcServerHandler)) ;
+    const std::unique_ptr<IPCHandler> &testHandler = createIPCHandler();
+    std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), handler));
+    std::unique_ptr<IPCListener> listener =std::move(createIPCListener(futexPageQueue.get(), handler)) ;
     LOGE("newIPCServer is running %d",gettid());
-
-    LOGE("TEST1 %x",td->ipcServerHandler);
-    td->ipcServerHandler->registerHandler(10000,test);
-    LOGE("TEST2");
-    td->ipcServerHandler->handle(7, nullptr);
-    LOGE("TEST3");
     finish = true;
-    td->ipcServerHandler->handle(7, nullptr);
-    LOGE("TEST7%x",td->ipcServerHandler);
     futexPageQueue->spinWaitPeer();
-    LOGE("TEST4 %x",td->ipcServerHandler);
-    td->ipcServerHandler->registerHandler(10000,test);
-    LOGE("TEST5");
-    td->ipcServerHandler->handle(7, nullptr);
-    LOGE("TEST6");
     listener->listen();
 }
 
@@ -135,7 +125,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
   m_impl->futexPageQueue = std::move(futexPageQueue);
 
   int fd2 = ashmem_create_region("WEEX_IPC_SERVER", IPCFutexPageQueue::ipc_size);
-  LOGE("FD2 = %d",fd2);
+  LOGE("FD1 = %D FD2 = %d",fd,  fd2);
   if (-1 == fd2) {
     throw IPCException("failed to create ashmem region: %s", strerror(errno));
   }
@@ -190,7 +180,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
     throw IPCException("failed to fork: %s", strerror(myerrno));
   } else if (child == 0) {
     // the child
-    //closeAllButThis(fd, fd2);
+    closeAllButThis(fd, fd2);
     // implements close all but handles[1]
     // do exec
     doExec(fd, fd2, true, startupPie);
@@ -200,6 +190,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
   } else {
     printLogOnFile("fork success on main process and start m_impl->futexPageQueue->spinWaitPeer()");
     close(fd);
+    close(fd2);
     m_impl->child = child;
     try {
       m_impl->futexPageQueue->spinWaitPeer();
@@ -208,6 +199,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
       // TODO throw exception
       return nullptr;
     }
+    LOGE("serverHandler %x",serverHandler);
   }
   return m_impl->serverSender.get();
 }
