@@ -69,7 +69,7 @@ _Pragma("clang diagnostic pop") \
 //store the methods which will be executed from native to js
 @property (nonatomic, strong) NSMutableDictionary   *sendQueue;
 //the instance stack
-@property (nonatomic, strong) WXThreadSafeMutableArray    *insStack;
+@property (nonatomic, strong) NSMutableArray    *insStack;
 //identify if the JSFramework has been loaded
 @property (nonatomic) BOOL frameworkLoadFinished;
 //store some methods temporarily before JSFramework is loaded
@@ -430,19 +430,20 @@ _Pragma("clang diagnostic pop") \
 {
     if (_insStack) return _insStack;
 
-    _insStack = [WXThreadSafeMutableArray array];
+    _insStack = [NSMutableArray array];
     
     return _insStack;
 }
 
 - (WXSDKInstance *)topInstance
 {
-    if (self.insStack.count > 0) {
-        WXSDKInstance *topInstance = [WXSDKManager instanceForID:[self.insStack firstObject]];
-        return topInstance;
-    }
-    
-    return nil;
+	WXSDKInstance *topInstance = nil;
+	@synchronized(self) {
+		if (self.insStack.count > 0) {
+			topInstance = [WXSDKManager instanceForID:[self.insStack firstObject]];
+		}
+	}
+    return topInstance;
 }
 
 - (NSMutableDictionary *)sendQueue
@@ -508,14 +509,16 @@ _Pragma("clang diagnostic pop") \
 {
     WXAssertBridgeThread();
     WXAssertParam(instanceIdString);
-    
-    if (![self.insStack containsObject:instanceIdString]) {
-        if ([options[@"RENDER_IN_ORDER"] boolValue]) {
-            [self.insStack addObject:instanceIdString];
-        } else {
-            [self.insStack insertObject:instanceIdString atIndex:0];
-        }
-    }
+	
+	@synchronized(self) {
+		if (![self.insStack containsObject:instanceIdString]) {
+			if ([options[@"RENDER_IN_ORDER"] boolValue]) {
+				[self.insStack addObject:instanceIdString];
+			} else {
+				[self.insStack insertObject:instanceIdString atIndex:0];
+			}
+		}
+	}
     
     //create a sendQueue bind to the current instance
     NSMutableArray *sendQueue = [NSMutableArray array];
@@ -676,9 +679,9 @@ _Pragma("clang diagnostic pop") \
     WXAssertParam(instance);
     
     //remove instance from stack
-    if([self.insStack containsObject:instance]){
-        [self.insStack removeObject:instance];
-    }
+	@synchronized(self) {
+		[self.insStack removeObject:instance];
+	}
     
     if(_jsBridge && [_jsBridge respondsToSelector:@selector(removeTimers:)]){
         [_jsBridge removeTimers:instance];
@@ -918,19 +921,21 @@ _Pragma("clang diagnostic pop") \
     BOOL hasTask = NO;
     NSMutableArray *tasks = [NSMutableArray array];
     NSString *execIns = nil;
-    
-    for (NSString *instance in self.insStack) {
-        NSMutableArray *sendQueue = self.sendQueue[instance];
-        if(sendQueue.count > 0){
-            hasTask = YES;
-            for(WXCallJSMethod *method in sendQueue){
-                [tasks addObject:[method callJSTask]];
-            }
-            [sendQueue removeAllObjects];
-            execIns = instance;
-            break;
-        }
-    }
+	
+	@synchronized(self) {
+		for (NSString *instance in self.insStack) {
+			NSMutableArray *sendQueue = self.sendQueue[instance];
+			if(sendQueue.count > 0){
+				hasTask = YES;
+				for(WXCallJSMethod *method in sendQueue){
+					[tasks addObject:[method callJSTask]];
+				}
+				[sendQueue removeAllObjects];
+				execIns = instance;
+				break;
+			}
+		}
+	}
     
     if ([tasks count] > 0 && execIns) {
         WXSDKInstance * execInstance = [WXSDKManager instanceForID:execIns];

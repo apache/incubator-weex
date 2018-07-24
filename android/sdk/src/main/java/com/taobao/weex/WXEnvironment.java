@@ -79,7 +79,7 @@ public class WXEnvironment {
    * Debug model
    */
   public static boolean sDebugMode = false;
-  public static final boolean sForceEnableDevTool = false;
+  public static final boolean sForceEnableDevTool = true;
   public static String sDebugWsUrl = "";
   public static boolean sDebugServerConnectable = false;
   public static boolean sRemoteDebugMode = false;
@@ -255,7 +255,7 @@ public class WXEnvironment {
        */
       e.printStackTrace();
     }
-    return false;
+    return true;
   }
 
   public static boolean isPerf() {
