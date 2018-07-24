@@ -94,6 +94,11 @@ public class WXHorizontalScrollView extends HorizontalScrollView implements IWXS
   }
 
   @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
+  }
+
+  @Override
   public boolean dispatchTouchEvent(MotionEvent event) {
     boolean result = super.dispatchTouchEvent(event);
     if (wxGesture != null) {

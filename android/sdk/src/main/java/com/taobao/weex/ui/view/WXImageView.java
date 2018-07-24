@@ -102,6 +102,11 @@ public class WXImageView extends ImageView implements WXGestureObservable,
   }
 
   @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
+  }
+
+  @Override
   public boolean onTouchEvent(MotionEvent event) {
     boolean result = super.onTouchEvent(event);
     if (wxGesture != null) {
