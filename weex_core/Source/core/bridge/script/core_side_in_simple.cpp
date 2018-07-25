@@ -34,11 +34,11 @@ CoreSideInSimple::CoreSideInSimple() {}
 
 CoreSideInSimple::~CoreSideInSimple() {}
 
-inline char* copyStr(const char *str) {
+inline char* copyStr(const char *str, size_t length = 0) {
   char* ret = nullptr;
   if(str == nullptr)
     return ret;
-  size_t strLen = strlen(str);
+  size_t strLen = length == 0 ? strlen(str) : length;
   ret = new char[strLen+1];
   memcpy(ret, str, strLen);
   ret[strLen] = '\0';
@@ -92,9 +92,9 @@ std::unique_ptr<IPCResult> CoreSideInSimple::CallNativeModule(
             weex::base::MakeCopyable([pageId = std::unique_ptr<char[]>(copyStr(page_id)),
                                              moduleS = std::unique_ptr<char[]>(copyStr(module)),
                                              methodS = std::unique_ptr<char[]>(copyStr(method)),
-                                             argumentsS = std::unique_ptr<char[]>(copyStr(arguments)),
+                                             argumentsS = std::unique_ptr<char[]>(copyStr(arguments, arguments_length)),
                                                      argLen = arguments_length,
-                                             optionsS = std::unique_ptr<char[]>(copyStr(options)),
+                                             optionsS = std::unique_ptr<char[]>(copyStr(options, options_length)),
                                                      optLen = options_length,
                                              result = &ret,
                                                      e =&event] {
@@ -143,9 +143,9 @@ void CoreSideInSimple::CallNativeComponent(const char *page_id, const char *ref,
                                              refS = std::unique_ptr<char[]>(copyStr(ref)),
                                              methodS = std::unique_ptr<char[]>(copyStr(method)),
                                              argumentsS = std::unique_ptr<char[]>(
-                                                     copyStr(arguments)),
+                                                     copyStr(arguments, arguments_length)),
                                              argLen = arguments_length,
-                                             optionsS = std::unique_ptr<char[]>(copyStr(options)),
+                                             optionsS = std::unique_ptr<char[]>(copyStr(options, options_length)),
                                                      optLen = options_length] {
                 WeexCoreManager::getInstance()
                         ->getPlatformBridge()
@@ -176,7 +176,8 @@ void CoreSideInSimple::AddElement(const char *page_id, const char *parent_ref,
   WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
           weex::base::MakeCopyable([pageId = std::unique_ptr<char[]>(copyStr(page_id)),
                                            parentRef = std::unique_ptr<char[]>(copyStr(parent_ref)),
-                                           domStr = std::unique_ptr<char[]>(copyStr(dom_str)),
+                                           domStr = std::unique_ptr<char[]>(
+                                                   copyStr(dom_str, dom_str_length)),
                                            i = index] {
               RenderManager::GetInstance()->AddRenderObject(pageId.get(), parentRef.get(), i,
                                                             domStr.get());
@@ -221,12 +222,12 @@ void CoreSideInSimple::CreateBody(const char *page_id, const char *dom_str,
                                   int dom_str_length) {
   LOGE("Script Bridge Core Side Simple::CreateBody");
 
-  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-          weex::base::MakeCopyable([pageId = std::unique_ptr<char[]>(copyStr(page_id)),
-                                           domStr = std::unique_ptr<char[]>(copyStr(dom_str)),
-                                           domLength = dom_str_length] {
-              RenderManager::GetInstance()->CreatePage(pageId.get(), domStr.get()) ? 0 : -1;
-          }));
+    WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+            weex::base::MakeCopyable([pageId = std::unique_ptr<char[]>(copyStr(page_id)),
+                                             domStr = std::unique_ptr<char[]>(
+                                                     copyStr(dom_str, dom_str_length))] {
+                RenderManager::GetInstance()->CreatePage(pageId.get(), domStr.get()) ? 0 : -1;
+            }));
 
 //  RenderManager::GetInstance()->CreatePage(page_id, dom_str) ? 0 : -1;
 }
@@ -239,8 +240,8 @@ int CoreSideInSimple::UpdateFinish(const char *page_id, const char *task,
   int result = 0;
   WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
           weex::base::MakeCopyable([pageId = std::unique_ptr<char[]>(copyStr(page_id)),
-                                           taskS = std::unique_ptr<char[]>(copyStr(task)),
-                                           callbackS = std::unique_ptr<char[]>(copyStr(callback)),
+                                           taskS = std::unique_ptr<char[]>(copyStr(task, task_length)),
+                                           callbackS = std::unique_ptr<char[]>(copyStr(callback, callback_length)),
                                            ret = &result,
                                                    e = &event] {
               *ret = WeexCoreManager::getInstance()
@@ -298,7 +299,7 @@ void CoreSideInSimple::UpdateAttrs(const char *page_id, const char *ref,
   WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
           weex::base::MakeCopyable([pageId = std::unique_ptr<char[]>(copyStr(page_id)),
                                            refS = std::unique_ptr<char[]>(copyStr(ref)),
-                                           dataS = std::unique_ptr<char[]>(copyStr(data))] {
+                                           dataS = std::unique_ptr<char[]>(copyStr(data, data_length))] {
               RenderManager::GetInstance()->UpdateAttr(pageId.get(), refS.get(), dataS.get());
           }));
 //  RenderManager::GetInstance()->UpdateAttr(page_id, ref, data);
@@ -308,12 +309,13 @@ void CoreSideInSimple::UpdateStyle(const char *page_id, const char *ref,
                                    const char *data, int data_length) {
   LOGE("Script Bridge Core Side Simple::UpdateStyle");
 
-  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-          weex::base::MakeCopyable([pageId = std::unique_ptr<char[]>(copyStr(page_id)),
-                                           refS = std::unique_ptr<char[]>(copyStr(ref)),
-                                           dataS = std::unique_ptr<char[]>(copyStr(data))] {
-              RenderManager::GetInstance()->UpdateStyle(pageId.get(), refS.get(), dataS.get());
-          }));
+    WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+            weex::base::MakeCopyable([pageId = std::unique_ptr<char[]>(copyStr(page_id)),
+                                             refS = std::unique_ptr<char[]>(copyStr(ref)),
+                                             dataS = std::unique_ptr<char[]>(
+                                                     copyStr(data, data_length))] {
+                RenderManager::GetInstance()->UpdateStyle(pageId.get(), refS.get(), dataS.get());
+            }));
 
 //  RenderManager::GetInstance()->UpdateStyle(page_id, ref, data);
 }

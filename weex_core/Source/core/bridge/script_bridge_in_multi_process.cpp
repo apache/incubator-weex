@@ -422,12 +422,13 @@ static std::unique_ptr<IPCResult> FunctionCallCreateBody(
 
       auto page_id = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
       auto dom_str = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+      int dom_str_len = getArumentAsCStrLen(arguments, 1);
 
       if (page_id.get() == nullptr || dom_str == nullptr)
           return createInt32Result(0);
 
     WeexCoreManager::getInstance()->script_bridge()->core_side()->CreateBody(
-            page_id.get(), dom_str.get(), strlen(dom_str.get()));
+            page_id.get(), dom_str.get(), dom_str_len);
 
   return createInt32Result(0);
 }
@@ -488,7 +489,7 @@ static std::unique_ptr<IPCResult> HandleCallAddElement(
     }
   #endif
       WeexCoreManager::getInstance()->script_bridge()->core_side()->AddElement(
-          pageId, parentRef, dom_str, strlen(dom_str), indexChar);
+          pageId, parentRef, dom_str, getArumentAsCStrLen(arguments, 2), indexChar);
     }
 
     delete[] pageId;
@@ -644,12 +645,12 @@ static std::unique_ptr<IPCResult> FunctionCallUpdateStyle(
     char *pageId = getArumentAsCStr(arguments, 0);
     char *ref = getArumentAsCStr(arguments, 1);
     char *data = getArumentAsCStr(arguments, 2);
-
+    int data_length = getArumentAsCStrLen(arguments,2);
     if (pageId == nullptr || ref == nullptr || data == nullptr)
       return createInt32Result(0);
 
     WeexCoreManager::getInstance()->script_bridge()->core_side()->UpdateStyle(
-        pageId, ref, data, strlen(data));
+        pageId, ref, data, data_length);
 
     delete[] pageId;
     delete[] ref;
@@ -678,12 +679,12 @@ static std::unique_ptr<IPCResult> FunctionCallUpdateAttrs(
     char *pageId = getArumentAsCStr(arguments, 0);
     char *ref = getArumentAsCStr(arguments, 1);
     char *data = getArumentAsCStr(arguments, 2);
-
+    int data_length = getArumentAsCStrLen(arguments,2);
     if (pageId == nullptr || ref == nullptr || data == nullptr)
       return createInt32Result(0);
 
     WeexCoreManager::getInstance()->script_bridge()->core_side()->UpdateAttrs(
-        pageId, ref, data, strlen(data));
+        pageId, ref, data, data_length);
 
     delete[] pageId;
     delete[] ref;
@@ -731,7 +732,9 @@ static std::unique_ptr<IPCResult> FunctionCallUpdateFinish(
 
   char *pageId = getArumentAsCStr(arguments, 0);
   char *task = getArumentAsCStr(arguments, 1);
+  int task_length = getArumentAsCStrLen(arguments,1);
   char *callback = getArumentAsCStr(arguments, 2);
+  int callback_length = getArumentAsCStrLen(arguments,2);
 
   int flag = 0;
 
@@ -740,8 +743,8 @@ static std::unique_ptr<IPCResult> FunctionCallUpdateFinish(
   flag = WeexCoreManager::getInstance()
              ->script_bridge()
              ->core_side()
-             ->UpdateFinish(pageId, task, strlen(task), callback,
-                            strlen(callback));
+             ->UpdateFinish(pageId, task, task_length, callback,
+                            callback_length);
 
   if (pageId != nullptr) {
     delete[] pageId;
