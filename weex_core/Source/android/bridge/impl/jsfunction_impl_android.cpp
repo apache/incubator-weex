@@ -18,6 +18,7 @@
  */
 
 #include <android/base/jni/jbytearray_ref.h>
+#include <android/jsengine/api/WeexJSCoreApi.h>
 #include "jsfunction_impl_android.h"
 #include "../../base/string/string_utils.h"
 #include "../../jniprebuild/jniheader/WXJsFunctions_jni.h"
@@ -103,59 +104,12 @@ void
 jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstring module,
                          jstring method, jbyteArray
                          arguments, jbyteArray options, jboolean from) {
-
-
-#if JSAPI_LOG
-    LOGD("[ExtendJSApi] handleCallNativeModule >>>> pageId: %s, module: %s, method: %s, arg: %s",
-         jString2StrFast(env, instanceId).c_str(), jString2StrFast(env, module).c_str(),
-         jString2StrFast(env, method).c_str(), jByteArray2Str(env, arguments).c_str());
-#endif
     JByteArrayRef argumentsRef(env, arguments);
     JByteArrayRef optionsRef(env, options);
 
 
-    // add for android support
-    jobject result;
-    result = static_cast<jobject>(Bridge_Impl_Android::getInstance()->callNativeModule(
-                getCharFromJString(env, instanceId),
-                getCharFromJString(env, module),
-                getCharFromJString(env, method),
-                argumentsRef.getBytes(),
-                argumentsRef.length(),
-                optionsRef.getBytes(),
-                optionsRef.length()));
-
-    jfieldID jTypeId = env->GetFieldID(jWXJSObject, "type", "I");
-    jint jTypeInt = env->GetIntField(result, jTypeId);
-    jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
-    jobject jDataObj = env->GetObjectField(result, jDataId);
-    if (jTypeInt == 1) {
-        if (jDoubleValueMethodId == NULL) {
-            jclass jDoubleClazz = env->FindClass("java/lang/Double");
-            jDoubleValueMethodId = env->GetMethodID(jDoubleClazz, "doubleValue", "()D");
-            env->DeleteLocalRef(jDoubleClazz);
-        }
-        jdouble jDoubleObj = env->CallDoubleMethod(jDataObj, jDoubleValueMethodId);
-    } else if (jTypeInt == 2) {
-        jstring jDataStr = (jstring) jDataObj;
-        //ret = std::move(createStringResult(env, jDataStr));
-    } else if (jTypeInt == 3) {
-        jstring jDataStr = (jstring) jDataObj;
-        //ret = std::move(createJSONStringResult(env, jDataStr));
-    } else if (jTypeInt == 4) {
-        jbyteArray array = (jbyteArray)jDataObj;
-        if(array != nullptr){
-            int length = env->GetArrayLength(array);
-            void* data = env->GetByteArrayElements(array, 0);
-            //ret = std::move(createByteArrayResult((const char*)data, length));
-            env->ReleaseByteArrayElements(array, (jbyte*)data, 0);
-        }
-    }
-    env->DeleteLocalRef(jDataObj);
-    if(result != nullptr){
-        env->DeleteLocalRef(result);
-    }
-    //return ret;
+    _callNativeModule(getCharFromJString(env, instanceId), getCharFromJString(env, module), getCharFromJString(env, method),
+                    argumentsRef.getBytes(), argumentsRef.length(), optionsRef.getBytes(), optionsRef.length());
 }
 
 void
