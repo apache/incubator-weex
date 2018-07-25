@@ -131,7 +131,7 @@ void ExecState::CallFunction(Value* func, size_t argc, Value* ret) {
     frame.pc = &(*func->f->instructions().begin());
     frame.end = &(*func->f->instructions().end());
     frames_.push_back(frame);
-    vm_->RunFrame(this, frame);
+    vm_->RunFrame(this, frame, ret);
     frames_.pop_back();
   }
 }

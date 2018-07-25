@@ -45,7 +45,7 @@ class VM {
  public:
   VM() {}
   ~VM() {}
-  void RunFrame(ExecState *exec_state, Frame frame);
+  void RunFrame(ExecState *exec_state, Frame frame, Value* ret);
 };
 }  // namespace data_render
 }  // namespace core

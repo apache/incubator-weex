@@ -67,9 +67,20 @@ Handle<Expression> ASTFactory::NewFunctionPrototype(
     Json& json, std::string name, std::vector<std::string> args) {
   return MakeHandle<FunctionPrototype>(json, name, std::move(args));
 }
+Handle<Expression> ASTFactory::NewFunctionStatement(
+    Json& json, Handle<FunctionPrototype> proto, Handle<Expression> body) {
+  return MakeHandle<FunctionStatement>(json, proto, body);
+}
+Handle<Expression> ASTFactory::NewReturnStatement(Handle<Expression> expr) {
+  return MakeHandle<ReturnStatement>(expr);
+}
 Handle<Expression> ASTFactory::NewDeclaration(
     Json& json, std::string name, Handle<Expression> init) {
   return MakeHandle<Declaration>(json, name, init);
+}
+Handle<Expression> ASTFactory::NewDeclaration(
+    std::string name, Handle<Expression> init) {
+  return MakeHandle<Declaration>(name, init);
 }
 Handle<Expression> ASTFactory::NewDeclarationList(Json& json) {
   return MakeHandle<DeclarationList>(json);
@@ -81,6 +92,10 @@ Handle<Expression> ASTFactory::NewDeclarationList(
 Handle<Expression> ASTFactory::NewTernaryExpression(
     Handle<Expression> first, Handle<Expression> second, Handle<Expression> third) {
   return MakeHandle<TernaryExpression>(first, second, third);
+}
+Handle<Expression>
+ASTFactory::NewCommaExpression(const std::vector<Handle<Expression>>& list) {
+  return MakeHandle<CommaExpression>(list);
 }
 Handle<Expression> ASTFactory::NewBinaryExpression(
     Json& json, BinaryOperation op, Handle<Expression> lhs,

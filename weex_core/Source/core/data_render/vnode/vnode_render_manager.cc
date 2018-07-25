@@ -172,6 +172,7 @@ void VNodeRenderManager::TestCreateProcess(const std::string& input,
 
   VNodeExecEnv::InitGlobalValue(exec_state);
   VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+  VNodeExecEnv::InitStyleList(exec_state);
 
   exec_state->context()->page_id(page_id);
   auto compile_start = std::chrono::steady_clock::now();

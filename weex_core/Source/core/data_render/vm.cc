@@ -25,27 +25,31 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-void VM::RunFrame(ExecState *exec_state, Frame frame) {
-  Value *a = nullptr;
-  Value *b = nullptr;
-  Value *c = nullptr;
+void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
+  Value* a = nullptr;
+  Value* b = nullptr;
+  Value* c = nullptr;
   auto pc = frame.pc;
   while (pc != frame.end) {
     Instruction instruction = *pc++;
     double d1, d2;
     switch (GET_OP_CODE(instruction)) {
-      case OP_MOVE:a = frame.reg + GET_ARG_A(instruction);
+      case OP_MOVE:
+        a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         *a = *b;
         break;
-      case OP_LOADNULL:a = frame.reg + GET_ARG_A(instruction);
+      case OP_LOADNULL:
+        a = frame.reg + GET_ARG_A(instruction);
         a->type = Value::Type::NIL;
         break;
-      case OP_LOADK:a = frame.reg + GET_ARG_A(instruction);
+      case OP_LOADK:
+        a = frame.reg + GET_ARG_A(instruction);
         b = frame.func->f->GetConstant(GET_ARG_B(instruction));
         *a = *b;
         break;
-      case OP_GETGLOBAL:a = frame.reg + GET_ARG_A(instruction);
+      case OP_GETGLOBAL:
+        a = frame.reg + GET_ARG_A(instruction);
         b = exec_state->global()->Find(GET_ARG_B(instruction));
         *a = *b;
         break;
@@ -56,7 +60,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         break;
       }
 
-      case OP_ADD:a = frame.reg + GET_ARG_A(instruction);
+      case OP_ADD:
+        a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsString(b) || IsString(c)) {
@@ -70,7 +75,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
         break;
 
-      case OP_SUB:a = frame.reg + GET_ARG_A(instruction);
+      case OP_SUB:
+        a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
@@ -82,7 +88,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
         break;
 
-      case OP_MUL:a = frame.reg + GET_ARG_A(instruction);
+      case OP_MUL:
+        a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
@@ -94,7 +101,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
         break;
 
-      case OP_DIV:a = frame.reg + GET_ARG_A(instruction);
+      case OP_DIV:
+        a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
@@ -106,7 +114,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
         break;
 
-      case OP_IDIV:a = frame.reg + GET_ARG_A(instruction);
+      case OP_IDIV:
+        a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
@@ -118,7 +127,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
         break;
 
-      case OP_MOD:a = frame.reg + GET_ARG_A(instruction);
+      case OP_MOD:
+        a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
@@ -130,7 +140,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
         break;
 
-      case OP_POW:a = frame.reg + GET_ARG_A(instruction);
+      case OP_POW:
+        a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
@@ -327,20 +338,20 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
 
       case OP_NEWTABLE: {
         a = frame.reg + GET_ARG_A(instruction);
-        Value *t = exec_state->getTableFactory()->CreateTable();
+        Value* t = exec_state->getTableFactory()->CreateTable();
         *a = *t;
       }
         break;
 
       case OP_GETTABLE: {
         a = frame.reg + GET_ARG_A(instruction);
-        b = exec_state->global()->Find(GET_ARG_B(instruction));
+        b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (!IsTable(b)) {
           // TODO error
           return;
         }
-        Value *ret = GetTabValue(reinterpret_cast<const Table *>(b->gc), c);
+        Value* ret = GetTabValue(reinterpret_cast<const Table*>(b->gc), *c);
         if (!IsNil(ret)) {
           *a = *ret;
         } else {
@@ -357,14 +368,35 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
           // TODO error
           return;
         }
-        int ret = SetTabValue(reinterpret_cast<Table *>(a->gc), b, *c);
+        int ret = SetTabValue(reinterpret_cast<Table*>(a->gc), b, *c);
         if (!ret) {
           // TODO set faile
         }
       }
         break;
+      case OP_RETURN0: {
+        return;
+      }
+        break;
+      case OP_RETURN1: {
+        if (ret == nullptr) {
+          return;
+        } else {
+          a = frame.reg + GET_ARG_A(instruction);
+          *ret = *a;
+          return;
+        }
+      }
 
-      default:break;
+      case OP_INVALID: {
+        //todo make an error;
+        int a = 0/0;
+        return;
+      }
+        break;
+
+      default:
+        break;
     }
   }
 }

@@ -41,6 +41,8 @@ namespace data_render {
         virtual Handle<ChunkStatement> NewChunkStatement(Json &json, Handle<ExpressionList> list);
         virtual Handle<Expression> NewBlockStatement(Json &json, Handle<ExpressionList> list);
         virtual Handle<Expression> NewFunctionPrototype(Json &json, std::string name, std::vector<std::string> args);
+        virtual Handle<Expression> NewFunctionStatement(Json& json, Handle<FunctionPrototype> proto, Handle<Expression> body);
+        virtual Handle<Expression> NewReturnStatement(Handle<Expression> expr);
         virtual Handle<Expression> NewArgumentList(Json &json, Handle<ExpressionList>);
         virtual Handle<Expression> NewArgumentList(Handle<ExpressionList>);
         virtual Handle<Expression> NewStringConstant(Json &json, std::string str);
@@ -48,7 +50,9 @@ namespace data_render {
         virtual Handle<Expression> NewBinaryExpression(Json &json, BinaryOperation op, Handle<Expression> lhs, Handle<Expression> rhs);
         virtual Handle<Expression> NewBinaryExpression(BinaryOperation op, Handle<Expression> lhs, Handle<Expression> rhs);
         virtual Handle<Expression> NewTernaryExpression(Handle<Expression> first, Handle<Expression> second, Handle<Expression> third);
+        virtual Handle<Expression> NewCommaExpression(const std::vector<Handle<Expression>>& list);
         virtual Handle<Expression> NewDeclaration(Json &json, std::string name, Handle<Expression> init = nullptr);
+        virtual Handle<Expression> NewDeclaration(std::string name, Handle<Expression> init = nullptr);
         virtual Handle<Expression> NewDeclarationList(Json &json, std::vector<Handle<Declaration>> decls);
         virtual Handle<Expression> NewDeclarationList(Json &json);
         virtual Handle<Expression> NewIntegralConstant(Json &json, int value);

@@ -34,6 +34,7 @@ class VNodeExecEnv {
   static void InitCFuncEnv(ExecState* state);
   static void InitGlobalValue(ExecState* state);
   static void InitInitDataValue(ExecState* state, const std::string& init_data_str);
+  static void InitStyleList(ExecState* state);
 };
 }
 }

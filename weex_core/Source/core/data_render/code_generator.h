@@ -47,6 +47,8 @@ class CodeGenerator : public ASTVisitor {
   void Visit(FunctionPrototype *node, void *data) override;
   void Visit(FunctionStatement *node, void *data) override;
   void Visit(BinaryExpression *node, void *data) override;
+  void Visit(TernaryExpression *node, void *data) override;
+  void Visit(CommaExpression *node, void *data) override;
   void Visit(AssignExpression *node, void *data) override;
   void Visit(Declaration *node, void *data) override;
   void Visit(DeclarationList *node, void *data) override;
@@ -72,19 +74,6 @@ class CodeGenerator : public ASTVisitor {
 
    private:
     T *parent_;
-  };
-
-  class FuncCnt : public Node<FuncCnt> {
-   public:
-    FuncCnt() {}
-    ~FuncCnt() {}
-    inline void set_func_state(FuncState *func_state) {
-      func_state_ = func_state;
-    }
-    inline FuncState *func_state() { return func_state_; }
-
-   private:
-    FuncState *func_state_;
   };
 
   class BlockCnt : public Node<BlockCnt> {
@@ -116,6 +105,29 @@ class CodeGenerator : public ASTVisitor {
     std::unordered_map<std::string, long> variables_;
     int idx_;
     bool is_loop_;
+  };
+
+  class FuncCnt : public Node<FuncCnt> {
+   public:
+    FuncCnt() {}
+    ~FuncCnt() {}
+    inline void set_func_state(FuncState *func_state) {
+      func_state_ = func_state;
+    }
+    inline void set_root_block(BlockCnt *root_block) {
+      root_block_ = root_block;
+    }
+    inline void set_current_block(BlockCnt *current_block) {
+      current_block_ = current_block;
+    }
+    inline FuncState *func_state() { return func_state_; }
+    inline BlockCnt *root_block() { return root_block_; }
+    inline BlockCnt *current_block() { return current_block_; }
+
+   private:
+    FuncState *func_state_;
+    BlockCnt *root_block_;
+    BlockCnt *current_block_;
   };
 
   class RegisterScope {

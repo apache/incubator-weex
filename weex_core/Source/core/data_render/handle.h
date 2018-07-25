@@ -113,6 +113,10 @@ class Ref {
     return ptr_ == ref.GetPtr();
   }
 
+  inline bool operator!=(const Ref<T> &ref) const {
+    return ptr_ != ref.GetPtr();
+  }
+
   // preferably use this function over T *get()
   inline T *GetPtr() const { return ptr_; }
 

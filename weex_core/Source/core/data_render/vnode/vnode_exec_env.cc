@@ -43,11 +43,29 @@ static Value GetTableSize(ExecState* exec_state) {
   return Value(static_cast<int64_t>(-1));
 }
 
+static Value Merge(ExecState* exec_state) {
+  size_t length = exec_state->GetArgumentCount();
+  if (length != 2) {
+    return Value();
+  }
+  Value* lvalue = exec_state->GetArgument(0);
+  Value* rvalue = exec_state->GetArgument(1);
+  if (!IsTable(lvalue) || !IsTable(rvalue)) {
+    return Value();
+  }
+  Table* l_table = TableValue(lvalue);
+  Table* r_table = TableValue(rvalue);
+  Value* new_value = exec_state->getTableFactory()->CreateTable();
+  Table* new_table = TableValue(new_value);
+  new_table->map->insert(l_table->map->begin(), l_table->map->end());
+  new_table->map->insert(r_table->map->begin(), r_table->map->end());
+  return Value(*new_value);
+}
+
 // createElement("tag_name", "id");
 static Value CreateElement(ExecState* exec_state) {
   VNode* node = new VNode(exec_state->GetArgument(1)->str->c_str(),
                           exec_state->GetArgument(0)->str->c_str());
-  exec_state->context()->InsertNode(node);
   Value result;
   result.type = Value::Type::CPTR;
   result.cptr = node;
@@ -58,8 +76,8 @@ static Value CreateElement(ExecState* exec_state) {
 static Value AppendChild(ExecState* exec_state) {
   VNode* parent =
       exec_state->GetArgument(0)->type == Value::Type::NIL
-          ? nullptr
-          : reinterpret_cast<VNode*>(exec_state->GetArgument(0)->cptr);
+      ? nullptr
+      : reinterpret_cast<VNode*>(exec_state->GetArgument(0)->cptr);
   VNode* child = reinterpret_cast<VNode*>(exec_state->GetArgument(1)->cptr);
 
   if (parent == nullptr && exec_state->context()->root() == nullptr) {
@@ -85,7 +103,7 @@ static Value SetAttr(ExecState* exec_state) {
   if (p_value->type == Value::STRING) {
     node->SetAttribute(key, p_value->str->c_str());
   } else if (p_value->type == Value::INT) {  // todo use uniform type
-                                             // conversion.
+    // conversion.
     std::stringstream ss;
     ss << p_value->i;
     std::string str = ss.str();
@@ -104,8 +122,7 @@ static Value SetClassList(ExecState* exec_state) {
     return Value();
   }
 
-  json11::Json& json = exec_state->context()->raw_json();
-  const json11::Json& styles = json["styles"];
+  auto styles = exec_state->context()->style_json();
   const json11::Json& style = styles[key];
   if (style.is_null()) {
     return Value();
@@ -129,6 +146,7 @@ void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   // log
   RegisterCFunc(state, "log", Log);
   RegisterCFunc(state, "sizeof", GetTableSize);
+  RegisterCFunc(state, "merge", Merge);
   RegisterCFunc(state, "createElement", CreateElement);
   RegisterCFunc(state, "appendChild", AppendChild);
   RegisterCFunc(state, "setAttr", SetAttr);
@@ -176,14 +194,8 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   const json11::Json& json = state->context()->raw_json();
   Global* global = state->global();
   const json11::Json& data = json["data"];
-  if (data.is_null()) {
-    return;
-  }
-  const json11::Json::object& data_objects = data.object_items();
-  for (auto it = data_objects.begin(); it != data_objects.end(); it++) {
-    const Value& value = ParseJson2Value(state, it->second);
-    global->Add(it->first, value);
-  }
+  const Value& value = ParseJson2Value(state, data);
+  global->Add("_data_main", value);
 }
 
 void VNodeExecEnv::InitInitDataValue(ExecState* state,
@@ -192,12 +204,47 @@ void VNodeExecEnv::InitInitDataValue(ExecState* state,
   const json11::Json& json = json11::Json::parse(init_data_str, err);
   if (!err.empty()) {
     LOGE("error parsing init data");
+    Value value = *(state->getTableFactory()->CreateTable());
+    state->global()->Set("_init_data", value);
     return;
   }
 
-  const Value& value = ParseJson2Value(state, json);
-  state->global()->Set("_init_data_", value);
+  Value value = ParseJson2Value(state, json);
+  if (value.type != Value::Type::TABLE) {
+    value = *(state->getTableFactory()->CreateTable());
+  }
+  state->global()->Set("_init_data", value);
 }
+
+void AddStyles(ExecState* state, const std::string& prefix, const json11::Json& style_obj) {
+  if (style_obj.is_object()) {
+    for (auto it = style_obj.object_items().begin(); it != style_obj.object_items().end(); it++) {
+      state->context()->style_json()[prefix + it->first] = const_cast<json11::Json&>(it->second);
+    }
+  }
+}
+
+void VNodeExecEnv::InitStyleList(ExecState* state) {
+  json11::Json& json = state->context()->raw_json();
+  //body styles
+
+  const json11::Json& style_obj = json["styles"];
+  AddStyles(state, "", style_obj);
+
+  const json11::Json& components_obj = json["components"];
+  if (components_obj.is_array()) {
+    for (auto it = components_obj.array_items().begin();
+         it != components_obj.array_items().end(); it++) {
+      const json11::Json name = (*it)["name"];
+      if (!name.is_string()) {
+        continue;
+      }
+      AddStyles(state, "_" + name.string_value() + "_", (*it)["styles"]);
+    }
+  }
+
+}
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

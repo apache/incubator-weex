@@ -174,6 +174,10 @@ public:
         : Expression(json), expr_{ (expr) }
     { }
 
+    ReturnStatement(Handle<Expression> expr)
+        : Expression(), expr_{ (expr) }
+    { }
+
     Handle<Expression> expr() { return expr_; }
 
     DEFINE_NODE_TYPE(ReturnStatement, Expression);

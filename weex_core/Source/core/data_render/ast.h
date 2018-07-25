@@ -67,6 +67,7 @@ namespace data_render {
   M(BinaryExpression)    \
   M(TernaryExpression)   \
   M(AssignExpression)    \
+  M(CommaExpression)     \
   M(Declaration)         \
   M(DeclarationList)     \
   M(IntegralConstant)    \
@@ -305,6 +306,24 @@ class DeclarationList : public Expression {
   std::vector<Handle<Declaration>> exprs_;
 };
 
+class CommaExpression : public Expression {
+ public:
+  CommaExpression(Json& json, std::vector<Handle<Expression>> exprs)
+      : Expression(json), exprs_{std::move(exprs)} {}
+  explicit CommaExpression(std::vector<Handle<Expression>> exprs)
+      : Expression(), exprs_{std::move(exprs)} {}
+
+  std::vector<Handle<Expression>>& exprs() { return exprs_; }
+
+  void Append(Handle<Expression> decl) {
+    exprs_.push_back(Handle<Expression>(decl));
+  }
+ DEFINE_NODE_TYPE(CommaExpression, Expression);
+
+ private:
+  std::vector<Handle<Expression>> exprs_;
+};
+
 class IntegralConstant : public Expression {
  public:
   IntegralConstant(Json& json, int value) : Expression(json), value_(value) {}
@@ -345,7 +364,6 @@ class NullConstant : public Expression {
 };
 
 enum class MemberAccessKind {
-  kCall,
   kDot,
   kIndex,
 };
@@ -376,23 +394,20 @@ class CallExpression : public Expression {
  public:
   CallExpression(Json& json, MemberAccessKind kind, Handle<Expression> expr,
                  Handle<Expression> member)
-      : Expression(json), kind_{kind}, expr_(expr), member_(member) {}
+      : Expression(json), expr_(expr), member_(member) {}
   CallExpression(Json& json, Handle<Expression> callee,
                  std::vector<Handle<Expression>> args)
       : Expression(json),
-        kind_{MemberAccessKind::kCall},
         callee_(callee),
         args_{std::move(args)} {}
   CallExpression(Handle<Expression> callee,
                  std::vector<Handle<Expression>> args)
       : Expression(),
-        kind_{MemberAccessKind::kCall},
         callee_(callee),
         args_{std::move(args)} {}
   Handle<Expression> member() { return member_; }
   Handle<Expression> callee() { return callee_; }
   std::vector<Handle<Expression>>& args() { return args_; }
-  MemberAccessKind kind() { return kind_; }
 
   Handle<Expression> expr() { return expr_; }
   bool ProduceRValue() override { return false; }
@@ -400,7 +415,6 @@ class CallExpression : public Expression {
  DEFINE_NODE_TYPE(CallExpression, Expression);
 
  private:
-  MemberAccessKind kind_;
   Handle<Expression> expr_;
   Handle<Expression> member_;
   Handle<Expression> callee_;

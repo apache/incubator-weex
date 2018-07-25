@@ -187,7 +187,9 @@ inline double NumMod(const double &d1, const double &d2) {
 
 inline bool NumEq(const double &d1, const double &d2) { return d1 == d2; }
 
-inline bool NumLT(const double &d1, const double &d2) { return d1 < d2; }
+inline bool NumLT(const double &d1, const double &d2) {
+  return d1 < d2;
+}
 
 inline int Number2Int(const double &n, int64_t &p) {
   if (n >= MININTEGER && n < -MININTEGER) {

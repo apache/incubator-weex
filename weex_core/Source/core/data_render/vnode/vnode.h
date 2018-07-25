@@ -32,7 +32,7 @@ class VNode;
 
 class VNode {
 public:
-  VNode(const std::string &id, const std::string &tag_name);
+  VNode(const std::string &ref, const std::string &tag_name);
 
   ~VNode();
 

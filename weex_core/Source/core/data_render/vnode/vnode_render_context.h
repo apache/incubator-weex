@@ -31,7 +31,6 @@ class VNodeRenderContext {
  public:
   VNodeRenderContext();
   ~VNodeRenderContext();
-  VNode* FindNode(const std::string& ref);
   void Reset();
 
   inline void page_id(const std::string& page_id) { page_id_ = page_id; }
@@ -39,15 +38,15 @@ class VNodeRenderContext {
   inline VNode* root() const { return root_; }
   inline void set_root(VNode* root) { root_ = root; }
 
-  inline void InsertNode(VNode* node) { node_map_.insert({node->ref(), node}); }
   inline json11::Json& raw_json() { return raw_json_; }
+  inline std::map<std::string,json11::Json>& style_json() { return style_json_; }
 
  private:
   // node context
   std::string page_id_;
   VNode* root_;
-  std::map<std::string, VNode*> node_map_;
   json11::Json raw_json_;
+  std::map<std::string,json11::Json> style_json_;
 };
 }  // namespace data_render
 }  // namespace core

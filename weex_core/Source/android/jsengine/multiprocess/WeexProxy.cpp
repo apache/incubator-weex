@@ -1097,112 +1097,86 @@ namespace WeexCore {
             ScopedJStringUTF8 idChar(env, jinstanceid);
             std::string sourceStr =
                 R"({
-    "body": {
-        "tagName": "list",
-        "nodeId": "2",
+  "body": {
+    "tagName": "list",
+    "nodeId": "2",
+    "childNodes": [
+      {
+        "tagName": "cell",
+        "nodeId": "3",
+        "control": {
+          "repeat": {
+            "for": "this.list",
+            "alias": "item",
+            "iterator1": "index"
+          }
+        },
         "classList": [
-            "wrap",
-            "wrap-test"
+          "main"
         ],
         "childNodes": [
-            {
-                "tagName": "cell",
-                "nodeId": "3",
-                "control": {
-                    "repeat": {
-                        "for": "list",
-                        "alias": "item",
-                        "iterator1": "index"
-                    },
-                    "match": "showInfo"
-                },
-                "classList": [
-                    "main"
-                ],
-                "childNodes": [
-                    {
-                        "tagName": "image",
-                        "nodeId": "4",
-                        "attributes": {
-                            "src": "https://gw.alicdn.com/tfs/TB1mMcNzhGYBuNjy0FnXXX5lpXa-85-85.png"
-                        },
-                        "classList": [
-                            "img"
-                        ]
-                    },
-                    {
-                        "tagName": "div",
-                        "nodeId": "5",
-                        "classList": [
-                            "info-wrap"
-                        ],
-                        "attributes": {
-                            "name": {
-                                "@binding": "item.name"
-                            },
-                            "title": {
-                                "@binding": "item.title"
-                            },
-                            "info": "hello"
-                        },
-                        "childNodes": [
-                            {
-                                "tagName": "text",
-                                "nodeId": "6",
-                                "classList": [
-                                    "title"
-                                ],
-                                "attributes": {
-                                    "value": "这是一个直播标题"
-                                }
-                            },
-                            {
-                                "tagName": "text",
-                                "nodeId": "7",
-                                "classList": [
-                                    "title"
-                                ],
-                                "attributes": {
-                                    "value": "这是一个直播副标题"
-                                }
-                            }
-                        ]
-                    }
-                ]
+          {
+            "tagName": "image",
+            "nodeId": "4",
+            "attributes": {
+              "src": "https://gw.alicdn.com/tfs/TB1mMcNzhGYBuNjy0FnXXX5lpXa-85-85.png"
+            },
+            "classList": [
+              "img"
+            ]
+          },
+          {
+            "tagName": "text",
+            "nodeId": "7",
+            "classList": [
+              "title"
+            ],
+            "attributes": {
+              "value": {"@binding":"item.title"}
             }
+          }
         ]
+      }
+    ]
+  },
+  "data": {
+    "showInfo": true,
+    "title": "hellotitle",
+    "title2": {
+      "title": "abc"
     },
-    "data": {
-        "showInfo": true,
-        "list": [
-            {},
-            {},
-            {}
-        ]
+    "list": [
+      {
+        "title": "dev"
+      },
+      {
+        "title": "dev2",
+        "title2": "dev2"
+      },
+      {
+        "title": "dev3",
+        "title2": "dev3",
+        "title3": "dev3"
+      }
+    ]
+  },
+  "styles": {
+    "main": {
+      "backgroundColor": "#ff5000",
+      "flexDirection": "row",
+      "width": "700px",
+      "height": "100px"
     },
-    "styles": {
-        "wrap": {
-            "flexDirection": "column"
-        },
-        "main": {
-            "width": "750px",
-            "height": "300px",
-            "flexDirection": "row"
-        },
-        "img": {
-            "width": "80px",
-            "height": "80px",
-            "marginRight": "10px"
-        },
-        "infoWrap": {
-            "flexDirection": "column",
-            "justifyContent": "center"
-        },
-        "title": {
-            "fontSize": "24px",
-            "color": "#000000"
-        }
+    "img": {
+      "width": "80px",
+      "height": "80px",
+      "marginRight": "10px"
+    },
+    "title": {
+      "fontSize": "24px",
+      "color": "#000000"
     }
+  }
 })";
             jstring initData = getJsonData(env, jargs, 3);
             ScopedJStringUTF8 initDataChar(env, initData);
