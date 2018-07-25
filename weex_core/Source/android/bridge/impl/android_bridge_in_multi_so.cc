@@ -184,13 +184,13 @@ void AndroidBridgeInMultiSo::CallNativeLog(const char *str_array) {
 }
 
 int AndroidBridgeInMultiSo::CallUpdateFinish(const char *pageId,
-                                             const char *task,
-                                             const char *callback) {
+                                             const char *task,int taskLen,
+                                             const char *callback, int callbackLen) {
   LOGE("Android Bridge: CallUpdateFinish");
   return WeexCoreManager::getInstance()
       ->getPlatformBridge()
       ->platform_side()
-      ->UpdateFinish(pageId, task, callback);
+      ->UpdateFinish(pageId, task,taskLen, callback,callbackLen);
 }
 
 int AndroidBridgeInMultiSo::CallRefreshFinish(const char *pageId,

@@ -92,9 +92,9 @@ static void CallNativeComponent(const char *page_id, const char *ref,
 }
 
 static void AddElement(const char *page_id, const char *parent_ref,
-                       const char *dom_str, const char *index_str) {
+                       const char *dom_str, int domLen, const char *index_str) {
   WeexCoreManager::getInstance()->script_bridge()->core_side()->AddElement(
-      page_id, parent_ref, dom_str, strlen(dom_str), index_str);
+      page_id, parent_ref, dom_str, domLen, index_str);
 }
 
 static void SetTimeout(const char *callback_id, const char *time) {
@@ -107,17 +107,17 @@ static void NativeLog(const char *str_array) {
       str_array);
 }
 
-static void CreateBody(const char *page_id, const char *dom_str) {
+static void CreateBody(const char *page_id, const char *dom_str, int domLen) {
   WeexCoreManager::getInstance()->script_bridge()->core_side()->CreateBody(
-      page_id, dom_str, strlen(dom_str));
+      page_id, dom_str, domLen);
 }
 
-static int UpdateFinish(const char *page_id, const char *task,
-                        const char *callback) {
+static int UpdateFinish(const char *page_id, const char *task, int taskLen,
+                        const char *callback, int callbackLen) {
   return WeexCoreManager::getInstance()
       ->script_bridge()
       ->core_side()
-      ->UpdateFinish(page_id, task, strlen(task), callback, strlen(callback));
+      ->UpdateFinish(page_id, task, taskLen, callback, callbackLen);
 }
 
 static void CreateFinish(const char *page_id) {
@@ -134,15 +134,15 @@ static int RefreshFinish(const char *page_id, const char *task,
 }
 
 static void UpdateAttrs(const char *page_id, const char *ref,
-                        const char *data) {
+                        const char *data, int dataLen) {
   WeexCoreManager::getInstance()->script_bridge()->core_side()->UpdateAttrs(
-      page_id, ref, data, strlen(data));
+      page_id, ref, data, dataLen);
 }
 
 static void UpdateStyle(const char *page_id, const char *ref,
-                        const char *data) {
+                        const char *data, int dataLen) {
   WeexCoreManager::getInstance()->script_bridge()->core_side()->UpdateStyle(
-      page_id, ref, data, strlen(data));
+      page_id, ref, data, dataLen);
 }
 
 static void RemoveElement(const char *page_id, const char *ref) {

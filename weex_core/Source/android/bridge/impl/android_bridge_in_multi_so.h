@@ -59,8 +59,8 @@ class AndroidBridgeInMultiSo : public Bridge_Impl_Android {
 
   static void CallNativeLog(const char* str_array);
 
-  static int CallUpdateFinish(const char* pageId, const char* task,
-                              const char* callback);
+  static int CallUpdateFinish(const char* pageId, const char* task,int taskLen,
+                              const char *callback, int callbackLen);
 
   static int CallRefreshFinish(const char* pageId, const char* task,
                                const char* callback);

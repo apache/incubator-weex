@@ -82,24 +82,24 @@ typedef std::unique_ptr<IPCResult> (*FuncCallNativeModule)(const char *pageId, c
 typedef void (*FuncCallNativeComponent)(const char *pageId, const char *ref,
                                         const char *method, const char *arguments, int argumentsLen, const char *options, int optionsLen);
 
-typedef void (*FuncCallAddElement)(const char *pageId, const char *parentRef, const char *domStr,
+typedef void (*FuncCallAddElement)(const char *pageId, const char *parentRef, const char *domStr, int domLen,
                                    const char *index_cstr);
 
 typedef void (*FuncSetTimeout)(const char *callbackId, const char *time);
 
 typedef void (*FuncCallNativeLog)(const char *str_array);
 
-typedef void (*FuncCallCreateBody)(const char *pageId, const char *domStr);
+typedef void (*FuncCallCreateBody)(const char *pageId, const char *domStr, int domStrLen);
 
-typedef int (*FuncCallUpdateFinish)(const char *pageId, const char *task, const char *callback);
+typedef int (*FuncCallUpdateFinish)(const char *pageId, const char *task,int taskLen, const char *callback, int callbackLen);
 
 typedef void (*FuncCallCreateFinish)(const char *pageId);
 
 typedef int (*FuncCallRefreshFinish)(const char *pageId, const char *task, const char *callback);
 
-typedef void (*FuncCallUpdateAttrs)(const char *pageId, const char *ref, const char *data);
+typedef void (*FuncCallUpdateAttrs)(const char *pageId, const char *ref, const char *data, int dataLen);
 
-typedef void (*FuncCallUpdateStyle)(const char *pageId, const char *ref, const char *data);
+typedef void (*FuncCallUpdateStyle)(const char *pageId, const char *ref, const char *data, int dataLen);
 
 typedef void (*FuncCallRemoveElement)(const char *pageId, const char *ref);
 

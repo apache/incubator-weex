@@ -158,8 +158,8 @@ void AndroidSide::NativeLog(const char *str_array) {
   LogUtils::NativeLog(env, str_array);
 }
 
-int AndroidSide::UpdateFinish(const char *page_id, const char *task,
-                              const char *callback) {
+int AndroidSide::UpdateFinish(const char *page_id, const char *task,int taskLen,
+                              const char *callback, int callbackLen) {
   JNIEnv *env = base::android::AttachCurrentThread();
   int flag = wx_bridge_->UpdateFinish(env, page_id, task, callback);
   if (flag == -1) {

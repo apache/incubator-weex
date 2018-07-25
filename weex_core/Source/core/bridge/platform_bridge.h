@@ -162,8 +162,8 @@ class PlatformBridge {
                                      int options_length) = 0;
     virtual void SetTimeout(const char* callback_id, const char* time) = 0;
     virtual void NativeLog(const char* str_array) = 0;
-    virtual int UpdateFinish(const char* page_id, const char* task,
-                             const char* callback) = 0;
+    virtual int UpdateFinish(const char* page_id, const char* task, int taskLen,
+                             const char* callback, int callbackLen) = 0;
     virtual int RefreshFinish(const char* page_id, const char* task,
                               const char* callback) = 0;
     virtual int AddEvent(const char* page_id, const char* ref,

@@ -321,12 +321,14 @@ std::unique_ptr<IPCResult> AndroidBridgeInMultiProcess::UpdateFinish(
     IPCArguments* arguments) {
   const char* page_id = getArumentAsCStr(arguments, 0);
   const char* task = getArumentAsCStr(arguments, 1);
+  int taskLen = getArumentAsCStrLen(arguments,1);
   const char* callback = getArumentAsCStr(arguments, 2);
+  int callbackLen = getArumentAsCStrLen(arguments,2);
 
   int result = WeexCoreManager::getInstance()
                    ->getPlatformBridge()
                    ->platform_side()
-                   ->UpdateFinish(page_id, task, callback);
+                   ->UpdateFinish(page_id, task,taskLen, callback,callbackLen);
 
   delete[] page_id;
   delete[] task;

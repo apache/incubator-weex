@@ -232,9 +232,11 @@ void
 jsFunctionCallUpdateFinish(JNIEnv *env, jobject object, jstring instanceId, jbyteArray tasks,
                            jstring callback) {
 
+    auto task = getCharFromJByte(env, tasks);
+    auto callbackS = getCharFromJString(env, callback);
     WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->UpdateFinish(getCharFromJString(env, instanceId),
-                                                         getCharFromJByte(env, tasks),
-                                                         getCharFromJString(env, callback));
+                                                                                       task,strlen(task),
+                                                                                       callbackS,strlen(callbackS));
 
 }
 

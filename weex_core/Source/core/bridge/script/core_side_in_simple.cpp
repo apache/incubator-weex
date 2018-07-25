@@ -34,13 +34,13 @@ CoreSideInSimple::CoreSideInSimple() {}
 
 CoreSideInSimple::~CoreSideInSimple() {}
 
-inline char* copyStr(const char *str, size_t length = 0) {
+inline char* copyStr(const char *str, int length = 0) {
   char* ret = nullptr;
   if(str == nullptr)
     return ret;
-  size_t strLen = length == 0 ? strlen(str) : length;
+  int strLen = length == 0 ? strlen(str) : length;
   ret = new char[strLen+1];
-  memcpy(ret, str, strLen);
+  memcpy(ret, str, static_cast<size_t>(strLen));
   ret[strLen] = '\0';
   return ret;
 }
@@ -237,19 +237,23 @@ int CoreSideInSimple::UpdateFinish(const char *page_id, const char *task,
                                    int callback_length) {
   LOGE("Script Bridge Core Side Simple::UpdateFinish");
   weex::base::WaitableEvent event;
-  int result = 0;
-  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-          weex::base::MakeCopyable([pageId = std::unique_ptr<char[]>(copyStr(page_id)),
-                                           taskS = std::unique_ptr<char[]>(copyStr(task, task_length)),
-                                           callbackS = std::unique_ptr<char[]>(copyStr(callback, callback_length)),
-                                           ret = &result,
-                                                   e = &event] {
-              *ret = WeexCoreManager::getInstance()
-                      ->getPlatformBridge()
-                      ->platform_side()
-                      ->UpdateFinish(pageId.get(), taskS.get(), callbackS.get());
-              e->Signal();
-          }));
+    int result = 0;
+    WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+            weex::base::MakeCopyable([pageId = std::unique_ptr<char[]>(copyStr(page_id)),
+                                             taskS = std::unique_ptr<char[]>(
+                                                     copyStr(task, task_length)),
+                                             callbackS = std::unique_ptr<char[]>(
+                                                     copyStr(callback, callback_length)),
+                                             ret = &result,
+                                             e = &event,
+                                             tl = task_length,
+                                             cl = callback_length] {
+                *ret = WeexCoreManager::getInstance()
+                        ->getPlatformBridge()
+                        ->platform_side()
+                        ->UpdateFinish(pageId.get(), taskS.get(), tl, callbackS.get(), cl);
+                e->Signal();
+            }));
   event.Wait();
   return result;
 //  return WeexCoreManager::getInstance()

@@ -55,8 +55,8 @@ class AndroidSide : public PlatformBridge::PlatformSide {
                            int options_length) override;
   void SetTimeout(const char* callback_id, const char* time) override;
   void NativeLog(const char* str_array) override;
-  int UpdateFinish(const char* page_id, const char* task,
-                   const char* callback) override;
+  int UpdateFinish(const char* page_id, const char* task, int taskLen,
+                   const char* callback, int callbackLen) override;
   int RefreshFinish(const char* page_id, const char* task,
                     const char* callback) override;
   int AddEvent(const char* page_id, const char* ref,
