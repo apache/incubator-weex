@@ -22,18 +22,18 @@
 namespace weex {
 namespace core {
 namespace data_render {
-String::String(const char* str, std::size_t len) {
+String::String(const char *str, std::size_t len) {
   length_ = len;
   str_ = std::unique_ptr<char[]>(new char[len + 1]);
   memcpy(str_.get(), str, len);
   str_[len] = 0;
 }
 
-String::String(const std::string& str) : String(str.c_str(), str.length()) {}
+String::String(const std::string &str) : String(str.c_str(), str.length()) {}
 
 String::~String() {}
 
-String* StringTable::StringFromUTF8(const std::string& str) {
+String *StringTable::StringFromUTF8(const std::string &str) {
   auto it = store_.find(str);
   if (it != store_.end()) {
     return it->second;

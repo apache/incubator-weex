@@ -32,17 +32,17 @@ namespace data_render {
 
 class TableFactory {
 
-public:
+ public:
 
-    virtual Value* CreateTable();
+  virtual Value *CreateTable();
 
-    ~TableFactory();
+  ~TableFactory();
 
-    TableFactory() {};
+  TableFactory() {};
 
-private:
+ private:
 
-    std::vector<Value*> tablePool;
+  std::vector<Value *> tablePool;
 
 };
 

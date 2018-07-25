@@ -90,67 +90,10 @@ Table *NewTable() {
   }
   t->array = new std::vector<Value>();
   t->map = new std::unordered_map<std::string, Value>();
-  t->sizearray = 0;
-  t->sizenode = 0;
   return t;
 }
 
 int ResizeTab(Table *t, size_t nasize, size_t nhsize) {
-//  size_t i;
-//
-//  size_t oldArrSize = t->sizearray;
-//  size_t oldHashSize = t->sizenode;
-//
-//  //    Value *arr = t->array;
-//  //    Node *oldNode = t->node;
-//
-//  if (nasize != 0) {
-//    Value *ptr =
-//        static_cast<Value *>(reallocMem(t->array, nasize * sizeof(Value)));
-//    if (NULL == ptr) {
-//      // TODO OOM
-//      return 0;
-//    }
-//    if (nasize > oldArrSize) {
-//      for (i = oldArrSize; i < nasize; i++) {
-//        SetNil(&ptr[i]);
-//      }
-//    }
-//    t->array = ptr;
-//    t->sizearray = nasize;
-//  } else {
-//    return 0;
-//  }
-//
-//  if (nhsize != 0) {
-//    //        t->map = new std::unordered_map<std::string, Value>(nhsize);
-//
-//    //        Node *ptr = static_cast<Node *>(reallocMem(t->node, nhsize *
-//    //        sizeof(Node))); if (NULL == ptr) {
-//    //            //TODO OOM
-//    //            return 0;
-//    //        }
-//    //        int *hptr = static_cast<int *>(reallocMem(t->hash, nhsize *
-//    //        sizeof(int))); if (NULL == hptr) {
-//    //            //TODO OOM
-//    //            return 0;
-//    //        }
-//    //        if (nhsize > oldHashSize) {
-//    //            for (i = oldHashSize; i < nhsize; i++) {
-//    //                Node *n = &ptr[i];
-//    //                n->next = NULL;
-//    //                SetNil(n->key->val);
-//    //                SetNil(n->val);
-//    //
-//    //                hptr[i] = -1;
-//    //            }
-//    //        }
-//    //        t->hash = hptr;
-//    //        t->node = ptr;
-//    //        t->sizenode = nhsize;
-//  } else {
-//    return 0;
-//  }
 
   return 1;
 }

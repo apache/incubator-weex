@@ -9,21 +9,20 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-Value* TableFactory::CreateTable() {
-    Table *t = NewTable();
-//    ResizeTable(t, arrSize, mapSize);
-    Value *v = new Value();
-    SetTValue(v, reinterpret_cast<GCObject *>(t));
-    tablePool.emplace_back(v);
-    return v;
+Value *TableFactory::CreateTable() {
+  Table *t = NewTable();
+  Value *v = new Value();
+  SetTValue(v, reinterpret_cast<GCObject *>(t));
+  tablePool.emplace_back(v);
+  return v;
 }
 
 TableFactory::~TableFactory() {
 
-    for (auto it = tablePool.begin(); it != tablePool.end(); it++) {
-        FreeValue(*it);
-    }
-    tablePool.clear();
+  for (auto it = tablePool.begin(); it != tablePool.end(); it++) {
+    FreeValue(*it);
+  }
+  tablePool.clear();
 }
 
 }

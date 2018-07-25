@@ -34,22 +34,18 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
     Instruction instruction = *pc++;
     double d1, d2;
     switch (GET_OP_CODE(instruction)) {
-      case OP_MOVE:
-        a = frame.reg + GET_ARG_A(instruction);
+      case OP_MOVE:a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         *a = *b;
         break;
-      case OP_LOADNULL:
-        a = frame.reg + GET_ARG_A(instruction);
+      case OP_LOADNULL:a = frame.reg + GET_ARG_A(instruction);
         a->type = Value::Type::NIL;
         break;
-      case OP_LOADK:
-        a = frame.reg + GET_ARG_A(instruction);
+      case OP_LOADK:a = frame.reg + GET_ARG_A(instruction);
         b = frame.func->f->GetConstant(GET_ARG_B(instruction));
         *a = *b;
         break;
-      case OP_GETGLOBAL:
-        a = frame.reg + GET_ARG_A(instruction);
+      case OP_GETGLOBAL:a = frame.reg + GET_ARG_A(instruction);
         b = exec_state->global()->Find(GET_ARG_B(instruction));
         *a = *b;
         break;
@@ -60,13 +56,12 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         break;
       }
 
-      case OP_ADD:
-        a = frame.reg + GET_ARG_A(instruction);
+      case OP_ADD:a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsString(b) || IsString(c)) {
           SetSValue(a, StringAdd(exec_state->string_table(), b, c));
-        }else if (IsInt(b) && IsInt(c)) {
+        } else if (IsInt(b) && IsInt(c)) {
           SetIValue(a, INT_OP(+, IntValue(b), IntValue(c)));
         } else if (ToNum(b, d1) && ToNum(c, d2)) {
           SetDValue(a, NUM_OP(+, d1, d2));
@@ -75,8 +70,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
         break;
 
-      case OP_SUB:
-        a = frame.reg + GET_ARG_A(instruction);
+      case OP_SUB:a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
@@ -88,8 +82,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
         break;
 
-      case OP_MUL:
-        a = frame.reg + GET_ARG_A(instruction);
+      case OP_MUL:a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
@@ -101,8 +94,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
         break;
 
-      case OP_DIV:
-        a = frame.reg + GET_ARG_A(instruction);
+      case OP_DIV:a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
@@ -114,8 +106,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
         break;
 
-      case OP_IDIV:
-        a = frame.reg + GET_ARG_A(instruction);
+      case OP_IDIV:a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
@@ -127,8 +118,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
         break;
 
-      case OP_MOD:
-        a = frame.reg + GET_ARG_A(instruction);
+      case OP_MOD:a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
@@ -140,8 +130,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         }
         break;
 
-      case OP_POW:
-        a = frame.reg + GET_ARG_A(instruction);
+      case OP_POW:a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
@@ -163,14 +152,16 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         } else {
           LOGE("Unspport Type[%s,%s] with OP_CODE[OP_BAND]", b->type, c->type);
         }
-      } break;
+      }
+        break;
 
       case OP_CALL: {
         a = frame.reg + GET_ARG_A(instruction);
         size_t argc = GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         exec_state->CallFunction(c, argc, a);
-      } break;
+      }
+        break;
 
       case OP_JMP: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -186,32 +177,37 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         } else {
           pc += false_pc_jump - 1;
         }
-      } break;
+      }
+        break;
 
       case OP_GOTO: {
         pc = frame.pc + GET_ARG_A(instruction);
-      } break;
+      }
+        break;
 
       case OP_EQ: {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         SetBValue(a, ValueEqulas(b, c));
-      } break;
+      }
+        break;
 
       case OP_LT: {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         SetBValue(a, ValueLT(b, c));
-      } break;
+      }
+        break;
 
       case OP_LE: {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         SetBValue(a, ValueLE(b, c));
-      } break;
+      }
+        break;
 
       case OP_UNM: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -223,7 +219,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         } else {
           LOGE("Unspport Type[%s] with OP_CODE[OP_UNM]", b->type);
         }
-      } break;
+      }
+        break;
 
       case OP_BNOT: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -234,7 +231,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         } else {
           LOGE("Unspport Type[%s] with OP_CODE[OP_BNOT]", b->type);
         }
-      } break;
+      }
+        break;
 
       case OP_BOR: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -246,7 +244,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         } else {
           LOGE("Unspport Type[%s,%s] with OP_CODE[OP_BOR]", b->type, c->type);
         }
-      } break;
+      }
+        break;
 
       case OP_BXOR: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -259,7 +258,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
           LOGE("Unspport Type[%s,%s] with OP_CODE[OP_BXOR]", b->type, c->type);
         }
 
-      } break;
+      }
+        break;
 
       case OP_SHL: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -271,7 +271,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         } else {
           LOGE("Unspport Type[%s,%s] with OP_CODE[OP_SHL]", b->type, c->type);
         }
-      } break;
+      }
+        break;
 
       case OP_SHR: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -283,7 +284,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         } else {
           LOGE("Unspport Type[%s,%s] with OP_CODE[OP_SHR]", b->type, c->type);
         }
-      } break;
+      }
+        break;
 
       case OP_PRE_INCR: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -301,7 +303,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         } else {
           LOGE("Unspport Type[%s] with OP_CODE[OP_PRE_INCR]", a->type);
         }
-      } break;
+      }
+        break;
 
       case OP_PRE_DECR: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -319,13 +322,15 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         } else {
           LOGE("Unspport Type[%s] with OP_CODE[OP_PRE_DECR]", a->type);
         }
-      } break;
+      }
+        break;
 
       case OP_NEWTABLE: {
         a = frame.reg + GET_ARG_A(instruction);
         Value *t = exec_state->getTableFactory()->CreateTable();
         *a = *t;
-      } break;
+      }
+        break;
 
       case OP_GETTABLE: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -341,7 +346,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         } else {
           SetNil(a);
         }
-      } break;
+      }
+        break;
 
       case OP_SETTABLE: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -355,10 +361,10 @@ void VM::RunFrame(ExecState *exec_state, Frame frame) {
         if (!ret) {
           // TODO set faile
         }
-      } break;
-
-      default:
+      }
         break;
+
+      default:break;
     }
   }
 }

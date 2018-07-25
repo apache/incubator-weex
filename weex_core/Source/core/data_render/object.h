@@ -23,6 +23,7 @@
 #include <vector>
 #include <unordered_map>
 #include <cmath>
+#include <sstream>
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
 
@@ -56,31 +57,14 @@ class StringTable;
 
 class Value;
 
-typedef unsigned char byte;
-
 typedef struct GCObject {
   CommonHeader;
 } GCObject;
 
-typedef struct Key {
-  int next;
-  Value *val;
-} Key;
-
-typedef struct Node {
-  Key *key;
-  Value *val;
-  Node *next;
-} Node;
-
 typedef struct Table {
   CommonHeader;
 
-  size_t sizearray; /* size of 'array' array */
-  size_t sizenode;
   std::vector<Value> *array; /* array part */
-  int *hash;
-  Node *node;
   std::unordered_map<std::string, Value> *map;
 
 } Table;
@@ -116,122 +100,42 @@ struct Value {
   Value(const Value &value) {
     type = value.type;
     switch (type) {
-      case INT:
-        i = value.i;
+      case INT:i = value.i;
         break;
-      case NUMBER:
-        n = value.n;
+      case NUMBER:n = value.n;
         break;
-      case BOOL:
-        b = value.b;
+      case BOOL:b = value.b;
         break;
-      case STRING:
-        str = value.str;
+      case STRING:str = value.str;
         break;
-      case FUNC:
-        f = value.f;
+      case FUNC:f = value.f;
         break;
-      case CFUNC:
-        cf = value.cf;
+      case CFUNC:cf = value.cf;
         break;
-      case CPTR:
-        cptr = value.cptr;
-      case TABLE:
-        gc = value.gc;
+      case CPTR:cptr = value.cptr;
+      case TABLE:gc = value.gc;
         break;
-      default:
-        break;
+      default:break;
     }
   }
 
   friend bool operator==(const Value &left, const Value &right) {
     if (left.type != right.type) return false;
     switch (left.type) {
-      case NIL:
-        return true;
-      case INT:
-        return left.i == right.i;
-      case NUMBER:
-        return fabs(left.n - right.n) < 0.000001;
-      case BOOL:
-        return left.b == right.b;
-      case STRING:
-        return left.str == right.str;
-      case FUNC:
-        return left.f == right.f;
-      case CFUNC:
-        return left.cf == right.cf;
-      case CPTR:
-        return left.cptr == right.cptr;
-      case TABLE:
-        return left.gc == right.gc;
-      default:
-        break;
+      case NIL:return true;
+      case INT:return left.i == right.i;
+      case NUMBER:return fabs(left.n - right.n) < 0.000001;
+      case BOOL:return left.b == right.b;
+      case STRING:return left.str == right.str;
+      case FUNC:return left.f == right.f;
+      case CFUNC:return left.cf == right.cf;
+      case CPTR:return left.cptr == right.cptr;
+      case TABLE:return left.gc == right.gc;
+      default:break;
     }
     return false;
   }
 };
-
-double NumPow(const double &d1, const double &d2);
-
-double NumIDiv(const double &d1, const double &d2);
-
-double NumMod(const double &d1, const double &d2);
-
-bool NumEq(const double &d1, const double &d2);
-
-bool NumLT(const double &d1, const double &d2);
-
-int Number2Int(const double &n, int64_t &p);
-
-double NumUnm(const double &d);
-
-int64_t ShiftLeft(const int64_t &a, const int64_t &b);
-
-bool IsInt(const Value *o);
-
-bool IsNil(const Value *o);
-
-void SetNil(Value *o);
-
-int IntMod(const int &a, const int &b);
-
-bool IsNumber(const Value *o);
-
-bool IsBool(const Value *o);
-
-bool IsTable(const Value *o);
-
-bool IsString(const Value *o);
-
-int64_t IntValue(const Value *o);
-
-double NumValue(const Value *o);
-
-bool BoolValue(const Value *o);
-
-String *StringValue(const Value *o);
-
-char *CStringValue(const Value *o);
-
-inline Table* TableValue(const Value *o) {
-  if (IsTable(o)) {
-    return reinterpret_cast<Table *>(o->gc);
-  }
-  return nullptr;
-}
-
-inline int ToNumber_(const Value *value, double &ret) {
-  if (IsInt(value)) {
-    ret = IntValue(value);
-    return 1;
-  } else if (IsNumber(value)) {
-    ret = NumValue(value);
-    return 1;
-  } else {
-    return 0;
-  }
-}
 
 int ToNum(const Value *o, double &n);
 
@@ -266,6 +170,204 @@ bool ValueLE(const Value *a, const Value *b);
 bool ValueLT(const Value *a, const Value *b);
 
 void FreeValue(Value *o);
+
+inline double NumPow(const double &d1, const double &d2) {
+  return MATH_OP(pow)(d1, d2);
+}
+
+inline double NumIDiv(const double &d1, const double &d2) {
+  return MATH_OP(floor)(NUM_OP(/, d1, d2));
+}
+
+inline double NumMod(const double &d1, const double &d2) {
+  double ret = MATH_OP(fmod)(d1, d2);
+  if (ret * d2 < 0) ret += d2;
+  return ret;
+}
+
+inline bool NumEq(const double &d1, const double &d2) { return d1 == d2; }
+
+inline bool NumLT(const double &d1, const double &d2) { return d1 < d2; }
+
+inline int Number2Int(const double &n, int64_t &p) {
+  if (n >= MININTEGER && n < -MININTEGER) {
+    p = n;
+    return 1;
+  }
+  return 0;
+}
+
+inline double NumUnm(const double &d) { return -d; }
+
+inline int64_t ShiftLeft(const int64_t &a, const int64_t &b) {
+  if (b < 0) {
+    if (b <= -NUM_BITS) {
+      return 0;
+    } else {
+      return INT_OP(>>, a, b);
+    }
+  } else {
+    if (b >= NUM_BITS) {
+      return 0;
+    } else {
+      return INT_OP(<<, a, b);
+    }
+  }
+}
+
+inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
+
+inline bool IsNil(const Value *o) {
+  return nullptr == o || Value::Type::NIL == o->type;
+}
+
+inline void SetNil(Value *o) {
+  if (nullptr != o) {
+    o->type = Value::Type::NIL;
+  }
+}
+
+inline int IntMod(const int &a, const int &b) {
+  if (CAST_S2U(b) + 1u <= 1u) {
+    if (b == 0) {
+      LOGE("Error ValueMod Values[%d, %d]", a, b);
+    }
+    return 0;
+  } else {
+    int ret = a % b;
+    if (ret != 0 && (a ^ b) < 0) {
+      ret += b;
+    }
+    return ret;
+  }
+}
+
+inline bool IsNumber(const Value *o) { return Value::Type::NUMBER == o->type; }
+
+inline bool IsBool(const Value *o) { return Value::Type::BOOL == o->type; }
+
+inline bool IsTable(const Value *o) { return Value::Type::TABLE == o->type; }
+
+inline bool IsString(const Value *o) { return nullptr != o && Value::Type::STRING == o->type; }
+
+inline int64_t IntValue(const Value *o) { return o->i; }
+
+inline double NumValue(const Value *o) { return o->n; }
+
+inline bool BoolValue(const Value *o) {
+  return (Value::Type::BOOL == o->type) ? o->b : false;
+}
+
+inline String *StringValue(const Value *o) { return IsString(o) ? o->str : nullptr; }
+
+inline char *CStringValue(const Value *o) {
+  return (IsString(o) && nullptr != o->str) ? o->str->c_str() : nullptr;
+}
+
+inline Table *TableValue(const Value *o) {
+  if (IsTable(o)) {
+    return reinterpret_cast<Table *>(o->gc);
+  }
+  return nullptr;
+}
+
+inline int ToNumber_(const Value *value, double &ret) {
+  if (IsInt(value)) {
+    ret = IntValue(value);
+    return 1;
+  } else if (IsNumber(value)) {
+    ret = NumValue(value);
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+inline int ToNum(const Value *o, double &n) {
+  return IsNumber(o) ? (n = NumValue(o), 1) : ToNumber_(o, n);
+}
+
+inline void SetIValue(Value *o, int iv) {
+  o->type = Value::Type::INT;
+  o->i = iv;
+}
+
+inline void SetDValue(Value *o, double d) {
+  o->type = Value::Type::NUMBER;
+  o->n = d;
+}
+
+inline void SetBValue(Value *o, bool b) {
+  o->type = Value::Type::BOOL;
+  o->b = b;
+}
+
+inline void SetTValue(Value *v, GCObject *o) {
+  v->type = Value::Type::TABLE;
+  v->gc = o;
+}
+
+inline void SetSValue(Value *v, String *s) {
+  v->type = Value::Type::STRING;
+  v->str = s;
+}
+
+inline String *StringAdd(StringTable *t, Value *a, Value *b) {
+  std::string str;
+  if (IsString(a)) {
+    str = a->str->c_str();
+    return t->StringFromUTF8(str += ToCString(b));
+  } else {
+    str = b->str->c_str();
+    return t->StringFromUTF8(str += ToCString(a));
+  }
+}
+
+inline std::string ToCString(const Value *o) {
+  switch (o->type) {
+
+    case Value::Type::INT: {
+      std::stringstream ss;
+      ss << IntValue(o);
+      return ss.str();
+    }
+
+    case Value::Type::NUMBER: {
+      std::stringstream ss;
+      ss << NumValue(o);
+      return ss.str();
+    }
+
+    case Value::Type::BOOL: {
+      std::stringstream ss;
+      ss << BoolValue(o);
+      return ss.str();
+    }
+
+    case Value::Type::STRING: {
+      return CStringValue(o);
+    }
+
+    default:return "";
+  }
+}
+
+inline int ToBool(const Value *o, bool &b) {
+  double d1;
+  if (Value::Type::BOOL == o->type) {
+    b = BoolValue(o);
+  } else if (Value::Type::INT == o->type) {
+    b = IntValue(o);
+  } else if (Value::Type::NUMBER == o->type) {
+    b = NumValue(o);
+  } else if (ToNum(o, d1)) {
+    b = d1;
+  } else {
+    b = false;
+    return 0;
+  }
+  return 1;
+}
 
 }  // namespace data_render
 }  // namespace core

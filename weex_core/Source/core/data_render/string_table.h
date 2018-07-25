@@ -29,11 +29,11 @@ namespace core {
 namespace data_render {
 class String {
  public:
-  explicit String(const char* str, std::size_t len);
-  explicit String(const std::string& str);
+  explicit String(const char *str, std::size_t len);
+  explicit String(const std::string &str);
   ~String();
 
-  char* c_str() { return str_.get(); }
+  char *c_str() { return str_.get(); }
 
   std::size_t length() { return length_; }
 
@@ -47,10 +47,10 @@ class StringTable {
   StringTable() : store_() {}
   ~StringTable() {}
 
-  String* StringFromUTF8(const std::string& str);
+  String *StringFromUTF8(const std::string &str);
 
  private:
-  std::unordered_map<std::string, String*> store_;
+  std::unordered_map<std::string, String *> store_;
 };
 }  // namespace data_render
 }  // namespace core

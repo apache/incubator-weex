@@ -24,13 +24,17 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-void* reallocMem(void* block, size_t newSize) {
+void *reallocMem(void *block, size_t newSize) {
   if (newSize == 0) {
     free(block);
     return NULL;
   } else {
     return realloc(block, newSize);
   }
+}
+
+void freeMem(void *block) {
+  free(block);
 }
 
 }  // namespace data_render
