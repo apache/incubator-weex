@@ -204,6 +204,8 @@ void CodeGenerator::Visit(FunctionStatement *node, void *data) {
   RegisterScope register_scope(cur_block_.get());
   long reg = data == nullptr ? cur_block_->NextRegisterId()
                              : *static_cast<long *>(data);
+
+  // body
   // Slot
   auto slot = cur_func_->func_state()->AddInstruction(0);
   {
@@ -213,6 +215,31 @@ void CodeGenerator::Visit(FunctionStatement *node, void *data) {
   int index = cur_func_->func_state()->children().size() - 1;
   Instruction i = CREATE_ABC(OP_GETFUNC, reg, index, 0);
   cur_func_->func_state()->ReplaceInstruction(slot, i);
+
+  // function prototype
+  Handle<FunctionPrototype> proto = node->proto();
+
+  // associate function_name and function_state
+  cur_block_->variables().insert(std::make_pair(proto->GetName(), reg));
+
+  // arguments
+  for (int i = 0; i < proto->GetArgs().size(); i++) {
+    std::string arg = proto->GetArgs().at(i);
+    cur_block_->variables().insert(std::make_pair(arg, ++reg));
+  }
+
+  // associate function_name and function_state
+  //  Value funcVal = new Value();
+  //  funcVal.type  = Value::Type::FUNC;
+  //  funcVal.f     = cur_func_->func_state()->GetChild(index);
+  //
+  //  long funcIndex = cur_block_->NextRegisterId();
+  //  cur_block_->variables().insert(std::make_pair(node->proto()->GetName(),
+  //  reg));
+
+  //  int constantIndex = cur_func_->func_state()->AddConstant(funcVal);
+  //  Instruction i1    = CREATE_ABC(OpCode::OP_LOADK, funcIndex, constantIndex,
+  //  0); cur_func_->func_state()->AddInstruction(i1);
 }
 
 void CodeGenerator::Visit(BinaryExpression *node, void *data) {
