@@ -632,7 +632,7 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
         [self fireEvent:@"horizontalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
     }
         
-    if (_listenVerticalPan && (gesture.state != UIGestureRecognizerStateBegan || fabs(translation.y) > fabs(translation.x))) {
+    if (_listenVerticalPan && (gesture.state != UIGestureRecognizerStateBegan || fabs(translation.y) >= fabs(translation.x))) {
         [self fireEvent:@"verticalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
     }
         
