@@ -252,14 +252,14 @@ struct ASTParser final {
     }
   }
 
-  //function createComponent_xxx(node_id, this){
+  //function createComponent_xxx(nodeId, this){
   //  //initialState
   //  this = {
   //    count: this.start
   //  }
   //
   //  //ParseNode
-  //  var child = createElement(tag_name, node_id);
+  //  var child = createElement(tag_name, nodeId);
   //  appendChild(parent, child);
   //  setClassList(child, class_name);
   //  setAttr(child, key, value);
@@ -280,9 +280,9 @@ struct ASTParser final {
 
     std::string function_name("createComponent_" + name.string_value());
 
-    //function createComponent_xxx(node_id, this)
+    //function createComponent_xxx(nodeId, this)
     std::vector<std::string> proto_args;
-    proto_args.push_back("node_id");
+    proto_args.push_back("nodeId");
     proto_args.push_back("this");
     Handle<FunctionPrototype> func_proto =
         factory_->NewFunctionPrototype(json, function_name, proto_args);
@@ -420,16 +420,16 @@ struct ASTParser final {
       Handle<Declaration> attr_decl = factory_->NewDeclaration(json, "attr", attr_init);
       statement->PushExpression(attr_decl);
 
-      // var child = createComponent_xxx(node_id, attr);
+      // var child = createComponent_xxx("node_id", attr);
       {
-        //createComponent_xxx(node_id, attr))
+        //createComponent_xxx("node_id", attr))
         Handle<Expression> func = factory_->NewIdentifier(json,
                                                           "createComponent_" + component_real_name);
 
         args.push_back(ParseNodeId(control, control_exprs, node_id.string_value()));
         args.push_back(attr_identifier);
 
-        // var child = createComponent_xxx(node_id, attr);
+        // var child = createComponent_xxx("node_id", attr);
         call_expr = factory_->NewCallExpression(json, func, args);
         Handle<Declaration> child_declaration =
             factory_->NewDeclaration(json, "child", call_expr);

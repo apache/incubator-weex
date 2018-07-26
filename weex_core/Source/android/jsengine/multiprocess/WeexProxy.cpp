@@ -1132,7 +1132,22 @@ namespace WeexCore {
               "title"
             ],
             "attributes": {
-              "value": {"@binding":"item.title"}
+              "value": {
+                "@binding": "item.title"
+              }
+            }
+          },
+          {
+            "tagName": "B",
+            "isComponent": true,
+            "nodeId": "8",
+            "componentAlias": {
+              "B": "module/a.vue"
+            },
+            "attributes": {
+              "inputattr": {
+                "@binding": "item.title"
+              }
             }
           }
         ]
@@ -1176,7 +1191,43 @@ namespace WeexCore {
       "fontSize": "24px",
       "color": "#000000"
     }
-  }
+  },
+  "components": [
+    {
+      "initialState": {
+        "titlein": {
+          "@binding": "this.inputattr"
+        }
+      },
+      "template": {
+        "tagName": "div",
+        "nodeId": "12",
+        "childNodes": [
+          {
+            "tagName": "text",
+            "nodeId": "13",
+            "attributes": {
+              "value": {
+                "@binding": "\"comp:\"+this.titlein"
+              }
+            }
+          }
+        ]
+      },
+      "name": "module/a.vue"
+    },
+    {
+      "template": {
+        "tagName": "text",
+        "nodeId": "17",
+        "attributes": {
+          "value": "b.vue"
+        }
+      },
+      "styles": {},
+      "name": "module/b.vue"
+    }
+  ]
 })";
             jstring initData = getJsonData(env, jargs, 3);
             ScopedJStringUTF8 initDataChar(env, initData);

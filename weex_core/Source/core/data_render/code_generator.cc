@@ -239,15 +239,25 @@ void CodeGenerator::Visit(FunctionStatement* node, void* data) {
 
     node->body()->Accept(this, nullptr);
   }
-  int index = cur_func_->func_state()->children().size() - 1;
-  Instruction i = CREATE_ABC(OP_GETFUNC, reg, index, 0);
-  cur_func_->func_state()->ReplaceInstruction(slot, i);
+
 
   // function prototype
-
-
+  
   // associate function_name and function_state
-  cur_block_->variables().insert(std::make_pair(proto->GetName(), reg));
+  if (cur_func_->parent() == nullptr){
+    //in chunk
+    Value value;
+    value.f = cur_func_->func_state()->GetChild(cur_func_->func_state()->children().size() - 1);
+    value.type = Value::FUNC;
+    exec_state_->global()->Add(proto->GetName(), value);
+    
+  } else{
+    //inside function
+    int index = cur_func_->func_state()->children().size() - 1;
+    Instruction i = CREATE_ABC(OP_GETFUNC, reg, index, 0);
+    cur_func_->func_state()->ReplaceInstruction(slot, i);
+    cur_block_->variables().insert(std::make_pair(proto->GetName(), reg));
+  }
 
   // associate function_name and function_state
   //  Value funcVal = new Value();
@@ -404,17 +414,24 @@ void CodeGenerator::Visit(ObjectConstant* node, void* data) {
 
     // expr
     for (auto it = node->proxy().begin(); it != node->proxy().end(); it++) {
+      RegisterScope scope(cur_block_.get());
       long item = cur_block_->NextRegisterId();
+      long key = cur_block_->NextRegisterId();
 
       auto ktemp = (*it).second;
       ktemp->Accept(this, &item);
 
-      Instruction i = CREATE_ABC(OpCode::OP_SETTABLE, ret, 0, item);
+      auto value = exec_state_->string_table_
+          ->StringFromUTF8(it->first);
+      int keyIndex = func_state->AddConstant(std::move(value));
+      func_state->AddInstruction(CREATE_ABC(OpCode::OP_LOADK, key, keyIndex, 0));
+
+      Instruction i = CREATE_ABC(OpCode::OP_SETTABLE, ret, key, item);
       func_state->AddInstruction(i);
     }
   }
 }
-
+//TODO: this is not correct.
 void CodeGenerator::Visit(ArrayConstant* node, void* data) {
   long reg = data == nullptr ? -1 : *static_cast<long*>(data);
 
@@ -488,6 +505,8 @@ void CodeGenerator::Visit(Identifier* node, void* data) {
       state->AddInstruction(CREATE_ABC(OP_GETGLOBAL, reg_a, index, 0));
       return;
     }
+    //make data undefined.
+    state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg_a, 0, 0));
   }
 }
 
