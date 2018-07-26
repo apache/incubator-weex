@@ -21,6 +21,8 @@ package com.taobao.weex.common;
 import android.support.annotation.RestrictTo;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.HashMap;
@@ -42,6 +44,8 @@ public class WXPerformance {
     networkType,
     connectionType,
     zcacheInfo,
+    activity,
+    instanceType,
     wxdim1,
     wxdim2,
     wxdim3,
@@ -363,11 +367,11 @@ public class WXPerformance {
   public int mActionAddElementCount = 0;
   public int mActionAddElementSumTime = 0;
 
-  public WXPerformance(){
-    mErrMsgBuilder=new StringBuilder();
-  }
+  private String mInstanceId;
 
-  public static void init() {
+  public WXPerformance(String instanceId){
+    mErrMsgBuilder=new StringBuilder();
+    mInstanceId = instanceId;
   }
 
   public Map<String, Double> getMeasureMap() {
@@ -454,6 +458,12 @@ public class WXPerformance {
     quotas.put(Dimension.zcacheInfo.toString(), zCacheInfo);
     quotas.put(Dimension.cacheType.toString(), cacheType);
     quotas.put(Dimension.useScroller.toString(), String.valueOf(useScroller));
+
+    WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+    String keyActivity = Dimension.activity.toString();
+    quotas.put(keyActivity, null == sdkInstance? "unKnow" : sdkInstance.getContainerInfo().get(keyActivity));
+    String keyType = Dimension.instanceType.toString();
+    quotas.put(keyType,sdkInstance == null ?"unKnow": sdkInstance.getContainerInfo().get(keyType));
 
     // TODO These attribute will be moved to elsewhere
     // Extra Dimension for 3rd developers.
