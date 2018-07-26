@@ -87,7 +87,7 @@ namespace WeexCore {
 
     bool g_is_single_process = false;
     bool isSingleProcess() {
-        return true;
+        return g_is_single_process;
     }
 
     std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(JNIEnv* env,
