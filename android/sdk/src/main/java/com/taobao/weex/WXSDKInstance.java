@@ -946,7 +946,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
       mWXPerformance.wxDims = mwxDims;
       mWXPerformance.measureTimes = measureTimes;
-      WXExceptionUtils.commitCriticalExceptionRT(mInstanceId,WXErrorCode.WX_ERR_BAD_SO,"TEST","ss",null);
       if (mUserTrackAdapter != null) {
         mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
       }
