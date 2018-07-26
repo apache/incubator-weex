@@ -77,10 +77,6 @@ struct ThreadData {
 };
 pthread_t ipcServerThread;
 static volatile bool finish = false;
-static std::unique_ptr<IPCResult> test(IPCArguments *arguments) {
-    LOGE("test is running");
-  return createVoidResult();
-}
 static void *newIPCServer(void *_td) {
     ThreadData *td = static_cast<ThreadData *>(_td);
     void *base = mmap(nullptr, IPCFutexPageQueue::ipc_size, PROT_READ | PROT_WRITE, MAP_SHARED,
@@ -98,7 +94,6 @@ static void *newIPCServer(void *_td) {
     const std::unique_ptr<IPCHandler> &testHandler = createIPCHandler();
     std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), handler));
     std::unique_ptr<IPCListener> listener =std::move(createIPCListener(futexPageQueue.get(), handler)) ;
-    LOGE("newIPCServer is running %d",gettid());
     finish = true;
     futexPageQueue->spinWaitPeer();
     listener->listen();
@@ -106,7 +101,6 @@ static void *newIPCServer(void *_td) {
 
 
 IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandler, bool reinit) {
-  LOGE("start is running %d",gettid());
   int fd = ashmem_create_region("WEEX_IPC_CLIENT", IPCFutexPageQueue::ipc_size);
   if (-1 == fd) {
     throw IPCException("failed to create ashmem region: %s", strerror(errno));
@@ -125,7 +119,6 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
   m_impl->futexPageQueue = std::move(futexPageQueue);
 
   int fd2 = ashmem_create_region("WEEX_IPC_SERVER", IPCFutexPageQueue::ipc_size);
-  LOGE("FD1 = %D FD2 = %d",fd,  fd2);
   if (-1 == fd2) {
     throw IPCException("failed to create ashmem region: %s", strerror(errno));
   }
@@ -199,7 +192,6 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
       // TODO throw exception
       return nullptr;
     }
-    LOGE("serverHandler %x",serverHandler);
   }
   return m_impl->serverSender.get();
 }
