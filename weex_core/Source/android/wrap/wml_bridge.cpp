@@ -120,7 +120,8 @@ static void Java_WMLBridge_postMessage(JNIEnv* env, jobject obj, jstring vmID,
 }
 
 bool WMLBridge::RegisterJNIUtils(JNIEnv* env) {
-  g_WMLBridge_clazz = env->FindClass(kWMLBridgeClassPath);
+  jclass temp_class = env->FindClass(kWMLBridgeClassPath);
+
 
   // use to check WMLBridge has already on env
   if (env->ExceptionOccurred()) {
@@ -128,9 +129,9 @@ bool WMLBridge::RegisterJNIUtils(JNIEnv* env) {
     env->ExceptionDescribe();
     env->ExceptionClear();
     return false;
-  } else if (g_WMLBridge_clazz != nullptr) {
-    g_WMLBridge_clazz = (jclass)env->NewGlobalRef(g_WMLBridge_clazz);
-    env->DeleteLocalRef(g_WMLBridge_clazz);
+  } else if (temp_class != nullptr) {
+    g_WMLBridge_clazz = (jclass)env->NewGlobalRef(temp_class);
+    env->DeleteLocalRef(temp_class);
     LOGE("success find class WMBridge");
     registerWMLBridgeNativeMethods(env, gWMMethods,
                                    sizeof(gWMMethods) / sizeof(gWMMethods[0]));
