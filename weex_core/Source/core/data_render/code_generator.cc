@@ -242,16 +242,16 @@ void CodeGenerator::Visit(FunctionStatement* node, void* data) {
 
 
   // function prototype
-  
+
   // associate function_name and function_state
-  if (cur_func_->parent() == nullptr){
+  if (cur_func_->parent() == nullptr) {
     //in chunk
     Value value;
     value.f = cur_func_->func_state()->GetChild(cur_func_->func_state()->children().size() - 1);
     value.type = Value::FUNC;
     exec_state_->global()->Add(proto->GetName(), value);
-    
-  } else{
+
+  } else {
     //inside function
     int index = cur_func_->func_state()->children().size() - 1;
     Instruction i = CREATE_ABC(OP_GETFUNC, reg, index, 0);
@@ -505,8 +505,23 @@ void CodeGenerator::Visit(Identifier* node, void* data) {
       state->AddInstruction(CREATE_ABC(OP_GETGLOBAL, reg_a, index, 0));
       return;
     }
-    //make data undefined.
-    state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg_a, 0, 0));
+
+    long thisIdx = cur_block_->FindRegisterId("this");
+    if (thisIdx >= 0) {
+      //using this
+      long right = cur_block_->NextRegisterId();
+
+      FuncState* func_state = cur_func_->func_state();
+      auto value = exec_state_->string_table_->StringFromUTF8(node->GetName());
+      int tableIndex = func_state->AddConstant(std::move(value));
+
+      func_state->AddInstruction(CREATE_ABC(OpCode::OP_LOADK, right, tableIndex, 0));
+      func_state->AddInstruction(CREATE_ABC(OP_GETTABLE, reg_a, thisIdx, right));
+    } else {
+      //make data undefined.
+      state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg_a, 0, 0));
+    }
+
   }
 }
 
