@@ -76,9 +76,10 @@ class FuncState {
   std::vector<std::unique_ptr<FuncState>> children_;
 };
 
+// TODO Each Func should contain a stack whose size is 256
 class ExecStack {
  public:
-  ExecStack() : stack_(512) {}
+  ExecStack() : stack_(256) {}
   Value** top() { return &top_; }
   Value* base() { return &stack_[0]; }
 

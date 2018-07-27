@@ -73,7 +73,7 @@ void CodeGenerator::Visit(StringConstant* node, void* data) {
     FuncState* func_state = cur_func_->func_state();
     auto value = exec_state_->string_table_->StringFromUTF8(node->string());
     int index = func_state->AddConstant(std::move(value));
-    Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
+    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
 }
@@ -142,8 +142,7 @@ void CodeGenerator::Visit(IfStatement* node, void* data) {
 
   FuncState* state = cur_func_->func_state();
   state->ReplaceInstruction(
-      slot,
-      CREATE_ABC(OP_JMP, condition, 1, tb_end_index - tb_start_index + 1));
+      slot, CREATE_ABx(OP_JMP, condition, tb_end_index - tb_start_index));
 }
 
 void CodeGenerator::Visit(IfElseStatement* node, void* data) {
@@ -166,20 +165,18 @@ void CodeGenerator::Visit(IfElseStatement* node, void* data) {
 
   FuncState* state = cur_func_->func_state();
   state->ReplaceInstruction(
-      slot,
-      CREATE_ABC(OP_JMP, ifcondition, 1, tb_end_index - tb_start_index + 1));
+      slot, CREATE_ABx(OP_JMP, ifcondition, tb_end_index - tb_start_index));
 }
 
 void CodeGenerator::Visit(ForStatement* node, void* data) {
-  BlockScope forScope(this);//for var index = 0;
+  BlockScope for_scope(this);  // for var index = 0;
 
-  long init = cur_block_->NextRegisterId();
   if (node->init().get() != NULL) {
-    node->init()->Accept(this, &init);
+    node->init()->Accept(this, nullptr);
   }
 
   int condition_start_index =
-      cur_func_->func_state()->instructions().size();//aka next one.
+      cur_func_->func_state()->instructions().size();  // aka next one.
 
   long condition = cur_block_->NextRegisterId();
   if (node->condition().get() != NULL) {
@@ -198,12 +195,12 @@ void CodeGenerator::Visit(ForStatement* node, void* data) {
   }
 
   FuncState* state = cur_func_->func_state();
-  state->AddInstruction(CREATE_ABC(OP_GOTO, condition_start_index, 0, 0));
+  state->AddInstruction(CREATE_Ax(OP_GOTO, condition_start_index));
 
   int for_end_index = cur_func_->func_state()->instructions().size() - 1;
 
   state->ReplaceInstruction(
-      slot, (CREATE_ABC(OP_JMP, condition, 1, for_end_index - slot + 1)));
+      slot, (CREATE_ABx(OP_JMP, condition, for_end_index - slot)));
 }
 
 void CodeGenerator::Visit(BlockStatement* node, void* data) {
@@ -228,49 +225,38 @@ void CodeGenerator::Visit(FunctionStatement* node, void* data) {
   auto slot = cur_func_->func_state()->AddInstruction(0);
   {
     FuncScope scope(this);
-    //skip func value in the fornt of stack;
+    // skip func value in the fornt of stack;
     cur_block_->NextRegisterId();
 
-    //make arguments var in thie front of stack;
+    // make arguments var in thie front of stack;
     for (int i = 0; i < proto->GetArgs().size(); i++) {
       std::string arg = proto->GetArgs().at(i);
-      cur_block_->variables().insert(std::make_pair(arg, cur_block_->NextRegisterId()));
+      cur_block_->variables().insert(
+          std::make_pair(arg, cur_block_->NextRegisterId()));
     }
 
     node->body()->Accept(this, nullptr);
   }
 
-
   // function prototype
 
   // associate function_name and function_state
   if (cur_func_->parent() == nullptr) {
-    //in chunk
+    // in chunk
     Value value;
-    value.f = cur_func_->func_state()->GetChild(cur_func_->func_state()->children().size() - 1);
+    value.f = cur_func_->func_state()->GetChild(
+        cur_func_->func_state()->children().size() - 1);
     value.type = Value::FUNC;
     exec_state_->global()->Add(proto->GetName(), value);
 
   } else {
-    //inside function
+    // inside function
     int index = cur_func_->func_state()->children().size() - 1;
-    Instruction i = CREATE_ABC(OP_GETFUNC, reg, index, 0);
+    Instruction i = CREATE_ABx(OP_GETFUNC, reg, index);
     cur_func_->func_state()->ReplaceInstruction(slot, i);
     cur_block_->variables().insert(std::make_pair(proto->GetName(), reg));
   }
 
-  // associate function_name and function_state
-  //  Value funcVal = new Value();
-  //  funcVal.type  = Value::Type::FUNC;
-  //  funcVal.f     = cur_func_->func_state()->GetChild(index);
-  //
-  //  long funcIndex = cur_block_->NextRegisterId();
-  //  cur_block_->variables().insert(std::make_pair(node->proto()->GetName(),
-  //  reg));
-
-  //  int constantIndex = cur_func_->func_state()->AddConstant(funcVal);
-  //  Instruction i1    = CREATE_ABC(OpCode::OP_LOADK, funcIndex, constantIndex,
-  //  0); cur_func_->func_state()->AddInstruction(i1);
 }
 
 void CodeGenerator::Visit(BinaryExpression* node, void* data) {
@@ -321,9 +307,9 @@ void CodeGenerator::Visit(BinaryExpression* node, void* data) {
 void CodeGenerator::Visit(AssignExpression* node, void* data) {
   RegisterScope scope(cur_block_.get());
 
-  //needs to be left value, for now only identifer is supported.
-  //this = a;
-  //this.b = a; TBD
+  // needs to be left value, for now only identifer is supported.
+  // this = a;
+  // this.b = a; TBD
   long left = -1;
   if (node->lhs().get() != NULL && node->lhs()->IsIdentifier()) {
     auto& name = node->lhs()->AsIdentifier()->GetName();
@@ -351,12 +337,13 @@ void CodeGenerator::Visit(Declaration* node, void* data) {
 }
 
 void CodeGenerator::Visit(DeclarationList* node, void* data) {
-  for (auto it = node->exprs().begin(); it != node->exprs().end(); ++it) {
-    auto temp = (*it).get();
-    temp->Accept(this, nullptr);
+  for (int i = 0; i < node->exprs().size(); ++i) {
+    auto temp = node->exprs()[i].get();
+    if (temp != NULL) {
+      temp->Accept(this, data);
+    }
   }
 }
-
 
 void CodeGenerator::Visit(CommaExpression* node, void* data) {
   bool first = true;
@@ -373,7 +360,7 @@ void CodeGenerator::Visit(IntegralConstant* node, void* data) {
     FuncState* func_state = cur_func_->func_state();
     int value = node->value();
     int index = func_state->AddConstant(static_cast<int64_t>(value));
-    Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
+    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
 }
@@ -384,7 +371,7 @@ void CodeGenerator::Visit(BooleanConstant* node, void* data) {
     FuncState* func_state = cur_func_->func_state();
     bool value = node->pred();
     int index = func_state->AddConstant(static_cast<bool>(value));
-    Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
+    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
 }
@@ -395,7 +382,7 @@ void CodeGenerator::Visit(DoubleConstant* node, void* data) {
     FuncState* func_state = cur_func_->func_state();
     double value = node->value();
     int index = func_state->AddConstant(static_cast<double>(value));
-    Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, index, 0);
+    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
 }
@@ -409,7 +396,7 @@ void CodeGenerator::Visit(ObjectConstant* node, void* data) {
   Value* table = exec_state_->getTableFactory()->CreateTable();
   if (ret >= 0) {
     int tableIndex = func_state->AddConstant(*table);
-    Instruction i = CREATE_ABC(OpCode::OP_LOADK, ret, tableIndex, 0);
+    Instruction i = CREATE_ABx(OpCode::OP_LOADK, ret, tableIndex);
     func_state->AddInstruction(i);
 
     // expr
@@ -421,17 +408,17 @@ void CodeGenerator::Visit(ObjectConstant* node, void* data) {
       auto ktemp = (*it).second;
       ktemp->Accept(this, &item);
 
-      auto value = exec_state_->string_table_
-          ->StringFromUTF8(it->first);
+      auto value = exec_state_->string_table_->StringFromUTF8(it->first);
       int keyIndex = func_state->AddConstant(std::move(value));
-      func_state->AddInstruction(CREATE_ABC(OpCode::OP_LOADK, key, keyIndex, 0));
+      func_state->AddInstruction(
+          CREATE_ABx(OpCode::OP_LOADK, key, keyIndex));
 
       Instruction i = CREATE_ABC(OpCode::OP_SETTABLE, ret, key, item);
       func_state->AddInstruction(i);
     }
   }
 }
-//TODO: this is not correct.
+// TODO: this is not correct.
 void CodeGenerator::Visit(ArrayConstant* node, void* data) {
   long reg = data == nullptr ? -1 : *static_cast<long*>(data);
 
@@ -441,7 +428,7 @@ void CodeGenerator::Visit(ArrayConstant* node, void* data) {
   Value* table = exec_state_->getTableFactory()->CreateTable();
   if (reg >= 0) {
     int tableIndex = func_state->AddConstant(*table);
-    Instruction i = CREATE_ABC(OpCode::OP_LOADK, reg, tableIndex, 0);
+    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, tableIndex);
     func_state->AddInstruction(i);
 
     // expr
@@ -477,11 +464,12 @@ void CodeGenerator::Visit(MemberExpression* node, void* data) {
     long right = cur_block_->NextRegisterId();
 
     FuncState* func_state = cur_func_->func_state();
-    auto value = exec_state_->string_table_
-        ->StringFromUTF8(node->member()->AsIdentifier()->GetName());
+    auto value = exec_state_->string_table_->StringFromUTF8(
+        node->member()->AsIdentifier()->GetName());
     int tableIndex = func_state->AddConstant(std::move(value));
 
-    func_state->AddInstruction(CREATE_ABC(OpCode::OP_LOADK, right, tableIndex, 0));
+    func_state->AddInstruction(
+        CREATE_ABx(OpCode::OP_LOADK, right, tableIndex));
     func_state->AddInstruction(CREATE_ABC(OP_GETTABLE, ret, ret, right));
   }
 }
@@ -502,26 +490,29 @@ void CodeGenerator::Visit(Identifier* node, void* data) {
 
     int index = exec_state_->global()->IndexOf(node->GetName());
     if (index >= 0) {
-      state->AddInstruction(CREATE_ABC(OP_GETGLOBAL, reg_a, index, 0));
+      state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, reg_a, index));
       return;
     }
 
-    long thisIdx = cur_block_->FindRegisterId("this");
-    if (thisIdx >= 0) {
-      //using this
+    // TODO Fix me: Identifer searching in this scope should be ahead of
+    // searching in global
+    long this_idx = cur_block_->FindRegisterId("this");
+    if (this_idx >= 0) {
+      // using this
       long right = cur_block_->NextRegisterId();
 
       FuncState* func_state = cur_func_->func_state();
       auto value = exec_state_->string_table_->StringFromUTF8(node->GetName());
       int tableIndex = func_state->AddConstant(std::move(value));
 
-      func_state->AddInstruction(CREATE_ABC(OpCode::OP_LOADK, right, tableIndex, 0));
-      func_state->AddInstruction(CREATE_ABC(OP_GETTABLE, reg_a, thisIdx, right));
+      func_state->AddInstruction(
+          CREATE_ABx(OpCode::OP_LOADK, right, tableIndex));
+      func_state->AddInstruction(
+          CREATE_ABC(OP_GETTABLE, reg_a, this_idx, right));
     } else {
-      //make data undefined.
+      // make data undefined.
       state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg_a, 0, 0));
     }
-
   }
 }
 

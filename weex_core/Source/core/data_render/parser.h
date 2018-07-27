@@ -33,7 +33,7 @@ class ParseResult {
   friend class Parser;
 
   ParseResult(){};
-  ParseResult(Handle<Expression> expr) : expr_(expr){};
+  ParseResult(Handle<ChunkStatement> expr) : expr_(expr){};
 
   inline Handle<ChunkStatement> expr() const { return expr_; }
 

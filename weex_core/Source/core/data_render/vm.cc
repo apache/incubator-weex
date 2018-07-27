@@ -45,18 +45,18 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         break;
       case OP_LOADK:
         a = frame.reg + GET_ARG_A(instruction);
-        b = frame.func->f->GetConstant(GET_ARG_B(instruction));
+        b = frame.func->f->GetConstant(GET_ARG_Bx(instruction));
         *a = *b;
         break;
       case OP_GETGLOBAL:
         a = frame.reg + GET_ARG_A(instruction);
-        b = exec_state->global()->Find(GET_ARG_B(instruction));
+        b = exec_state->global()->Find(GET_ARG_Bx(instruction));
         *a = *b;
         break;
       case OP_GETFUNC: {
         a = frame.reg + GET_ARG_A(instruction);
         a->type = Value::Type::FUNC;
-        a->f = frame.func->f->GetChild(GET_ARG_B(instruction));
+        a->f = frame.func->f->GetChild(GET_ARG_Bx(instruction));
         break;
       }
 
@@ -71,7 +71,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         } else if (ToNum(b, d1) && ToNum(c, d2)) {
           SetDValue(a, NUM_OP(+, d1, d2));
         } else {
-          LOGE("Unspport Type[%s,%s] with OP_CODE[OP_ADD]", b->type, c->type);
+          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_ADD]", b->type, c->type);
         }
         break;
 
@@ -84,7 +84,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         } else if (ToNum(b, d1) && ToNum(c, d2)) {
           SetDValue(a, NUM_OP(-, d1, d2));
         } else {
-          LOGE("Unspport Type[%s,%s] with OP_CODE[OP_SUB]", b->type, c->type);
+          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_SUB]", b->type, c->type);
         }
         break;
 
@@ -97,7 +97,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         } else if (ToNum(b, d1) && ToNum(c, d2)) {
           SetDValue(a, NUM_OP(*, d1, d2));
         } else {
-          LOGE("Unspport Type[%s,%s] with OP_CODE[OP_MUL]", b->type, c->type);
+          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_MUL]", b->type, c->type);
         }
         break;
 
@@ -110,7 +110,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         } else if (ToNum(b, d1) && ToNum(c, d2)) {
           SetDValue(a, NUM_OP(/, IntValue(b), IntValue(c)));
         } else {
-          LOGE("Unspport Type[%s,%s] with OP_CODE[OP_DIV]", b->type, c->type);
+          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_DIV]", b->type, c->type);
         }
         break;
 
@@ -123,7 +123,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         } else if (ToNum(b, d1) && ToNum(c, d2)) {
           SetDValue(a, NumIDiv(d1, d2));
         } else {
-          LOGE("Unspport Type[%s,%s] with OP_CODE[OP_IDIV]", b->type, c->type);
+          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_IDIV]", b->type, c->type);
         }
         break;
 
@@ -136,7 +136,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         } else if (ToNum(b, d1) && ToNum(c, d2)) {
           SetDValue(a, NumMod(d1, d2));
         } else {
-          LOGE("Unspport Type[%s,%s] with OP_CODE[OP_MOD]", b->type, c->type);
+          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_MOD]", b->type, c->type);
         }
         break;
 
@@ -149,7 +149,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         } else if (ToNum(b, d1) && ToNum(c, d2)) {
           SetDValue(a, NumPow(d1, d2));
         } else {
-          LOGE("Unspport Type[%s,%s] with OP_CODE[OP_POW]", b->type, c->type);
+          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_POW]", b->type, c->type);
         }
         break;
 
@@ -161,7 +161,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
           SetIValue(a, INT_OP(&, i1, i2));
         } else {
-          LOGE("Unspport Type[%s,%s] with OP_CODE[OP_BAND]", b->type, c->type);
+          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_BAND]", b->type, c->type);
         }
       }
         break;
@@ -175,24 +175,20 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         break;
 
       case OP_JMP: {
-        a = frame.reg + GET_ARG_A(instruction);
-        int true_pc_jump = GET_ARG_B(instruction);
-        int false_pc_jump = GET_ARG_C(instruction);
-        bool con = false;
-        if (!ToBool(a, con)) {
-          LOGE("Unspport Type[%s] with OP_CODE[OP_JMP]", a->type);
-          return;
-        }
-        if (con) {
-          pc += true_pc_jump - 1;
-        } else {
-          pc += false_pc_jump - 1;
-        }
+          a = frame.reg + GET_ARG_A(instruction);
+          bool con = false;
+          if (!ToBool(a, con)) {
+              LOGE("Unspport Type[%d] with OP_CODE[OP_JMP]", a->type);
+              return;
+          }
+          if (!con) {
+              pc += GET_ARG_Bx(instruction);
+          }
       }
         break;
 
       case OP_GOTO: {
-        pc = frame.pc + GET_ARG_A(instruction);
+        pc = frame.pc + GET_ARG_Ax(instruction);
       }
         break;
 
@@ -228,7 +224,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         } else if (IsNumber(b)) {
           SetDValue(a, NUM_OP(-, 0, NumValue(b)));
         } else {
-          LOGE("Unspport Type[%s] with OP_CODE[OP_UNM]", b->type);
+          LOGE("Unspport Type[%d] with OP_CODE[OP_UNM]", b->type);
         }
       }
         break;
@@ -240,7 +236,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         if (ToInteger(b, 0, i)) {
           SetIValue(a, INT_OP(^, ~CAST_S2U(0), i));
         } else {
-          LOGE("Unspport Type[%s] with OP_CODE[OP_BNOT]", b->type);
+          LOGE("Unspport Type[%d] with OP_CODE[OP_BNOT]", b->type);
         }
       }
         break;
@@ -253,7 +249,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
           SetIValue(a, INT_OP(|, i1, i2));
         } else {
-          LOGE("Unspport Type[%s,%s] with OP_CODE[OP_BOR]", b->type, c->type);
+          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_BOR]", b->type, c->type);
         }
       }
         break;
@@ -266,7 +262,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
           SetIValue(a, INT_OP(^, i1, i2));
         } else {
-          LOGE("Unspport Type[%s,%s] with OP_CODE[OP_BXOR]", b->type, c->type);
+          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_BXOR]", b->type, c->type);
         }
 
       }
@@ -280,7 +276,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
           SetIValue(a, ShiftLeft(i1, i2));
         } else {
-          LOGE("Unspport Type[%s,%s] with OP_CODE[OP_SHL]", b->type, c->type);
+          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_SHL]", b->type, c->type);
         }
       }
         break;
@@ -293,7 +289,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
           SetIValue(a, ShiftLeft(i1, -i2));
         } else {
-          LOGE("Unspport Type[%s,%s] with OP_CODE[OP_SHR]", b->type, c->type);
+          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_SHR]", b->type, c->type);
         }
       }
         break;
@@ -312,7 +308,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             SetDValue(b, NumValue(a));
           }
         } else {
-          LOGE("Unspport Type[%s] with OP_CODE[OP_PRE_INCR]", a->type);
+          LOGE("Unspport Type[%d] with OP_CODE[OP_PRE_INCR]", a->type);
         }
       }
         break;
@@ -322,16 +318,16 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         b = frame.reg + GET_ARG_B(instruction);
         if (IsInt(a)) {
           SetIValue(a, IntValue(a) - 1);
-          if (NULL != b) {
+          if (GET_ARG_B(instruction) != 0) {
             SetIValue(b, IntValue(a));
           }
         } else if (IsNumber(a)) {
           SetDValue(a, NumValue(a) - 1);
-          if (NULL != b) {
+          if (GET_ARG_B(instruction) != 0) {
             SetDValue(b, NumValue(a));
           }
         } else {
-          LOGE("Unspport Type[%s] with OP_CODE[OP_PRE_DECR]", a->type);
+          LOGE("Unspport Type[%d] with OP_CODE[OP_PRE_DECR]", a->type);
         }
       }
         break;
@@ -377,7 +373,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
       case OP_RETURN0: {
         return;
       }
-        break;
+
       case OP_RETURN1: {
         if (ret == nullptr) {
           return;

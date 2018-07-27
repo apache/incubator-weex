@@ -41,7 +41,7 @@ struct ASTParser final {
   std::string& err_;
   bool failed_;
   ASTFactory* factory_;
-  std::vector<Handle<Expression>> stacks_;
+  std::vector<Handle<BlockStatement>> stacks_;
 
   ParseResult Fail(std::string&& msg) { return Fail(move(msg), ParseResult()); }
 
@@ -157,14 +157,11 @@ struct ASTParser final {
     do {
       Json repeat = json["repeat"];
       Json index = repeat["iterator1"];
-      if (!index.is_string()) {
-        break;
-      }
       Handle<DeclarationList> for_init = factory_->NewDeclarationList(repeat);
       // var index=0
-      for_init->Append(
-          factory_->NewDeclaration(repeat, index.string_value(),
-                                   factory_->NewIntegralConstant(json, 0)));
+      for_init->Append(factory_->NewDeclaration(
+          repeat, index.is_null() ? "index" : index.string_value(),
+          factory_->NewIntegralConstant(json, 0)));
       Json expression = repeat["for"];
       if (!expression.is_string()) {
         break;
@@ -175,8 +172,8 @@ struct ASTParser final {
       }
       Handle<Expression> list_expr =
           ExpressionParser::ParseExpressionByString(expression.string_value());
-      Handle<Identifier> index_var =
-          factory_->NewIdentifier(index, index.string_value());
+      Handle<Identifier> index_var = factory_->NewIdentifier(
+          index, index.is_null() ? "index" : index.string_value());
       // expr[index]
       Handle<MemberExpression> indexMember = factory_->NewMemberExpression(
           repeat, MemberAccessKind::kIndex, list_expr, index_var);
@@ -448,17 +445,7 @@ struct ASTParser final {
                                  const std::vector<Handle<Expression>>& control_exprs,
                                  const std::string& node_id) {
     Handle<Expression> node_id_expr = nullptr;
-    if (control_exprs.size() > 0 && control_exprs[0]->IsForStatement()) {
-      Json repeat = body["repeat"];
-      Json index = repeat["iterator1"];
-      node_id_expr = this->factory_->NewBinaryExpression(BinaryOperation::kAddition,
-                                                         this->factory_->NewStringConstant(
-                                                             node_id + "_REPEAT_"),
-                                                         this->factory_->NewIdentifier(
-                                                             index.string_value()));
-    } else {
-      node_id_expr = this->factory_->NewStringConstant(node_id);
-    }
+    node_id_expr = this->factory_->NewStringConstant(node_id);
     return node_id_expr;
   }
 
@@ -612,10 +599,8 @@ struct ASTParser final {
           cur_block->PushExpression(child_block);
         }
       }
-      if (control_exprs.size()) {
-        for (int i = 0; i < control_exprs.size(); i++) {
-          stacks_.pop_back();
-        }
+      for (int i = 0; i < control_exprs.size(); i++) {
+        stacks_.pop_back();
       }
       succ = true;
 
@@ -626,8 +611,7 @@ struct ASTParser final {
 
 ParseResult Parser::Parse(const json11::Json& in, std::string& err) {
   ASTParser parser{in, err, false, ASTFactory::GetFactoryInstance()};
-  ParseResult result = parser.Parse();
-  return result;
+  return parser.Parse();
 }
 
 }  // namespace data_render

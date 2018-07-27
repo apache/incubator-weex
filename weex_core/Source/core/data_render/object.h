@@ -364,6 +364,8 @@ inline int ToBool(const Value *o, bool &b) {
     b = NumValue(o);
   } else if (ToNum(o, d1)) {
     b = d1;
+  } else if (Value::Type::NIL == o->type) {
+    b = false;
   } else {
     b = false;
     return 0;

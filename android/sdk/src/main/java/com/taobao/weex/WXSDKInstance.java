@@ -1159,23 +1159,15 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, "mComponentNum:" + mWXPerformance.componentCount);
 
     if (mRenderListener != null && mContext != null) {
-      runOnUiThread(new Runnable() {
+      mRenderListener.onRenderSuccess(WXSDKInstance.this, width, height);
+      if (mUserTrackAdapter != null) {
+        WXPerformance performance=new WXPerformance();
+        performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
+        performance.args=getBundleUrl();
+        mUserTrackAdapter.commit(mContext,null,IWXUserTrackAdapter.JS_BRIDGE,performance,getUserTrackParams());
+      }
 
-        @Override
-        public void run() {
-          if (mRenderListener != null && mContext != null) {
-            mRenderListener.onRenderSuccess(WXSDKInstance.this, width, height);
-            if (mUserTrackAdapter != null) {
-              WXPerformance performance=new WXPerformance();
-              performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
-              performance.args=getBundleUrl();
-              mUserTrackAdapter.commit(mContext,null,IWXUserTrackAdapter.JS_BRIDGE,performance,getUserTrackParams());
-            }
-
-            WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
-          }
-        }
-      });
+      WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
     }
     if(!WXEnvironment.isApkDebugable()){
       WXLogUtils.e("weex_perf",mWXPerformance.getPerfData());

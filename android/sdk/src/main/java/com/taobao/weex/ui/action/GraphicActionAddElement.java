@@ -122,7 +122,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
       child.applyLayoutAndEvent(child);
 
       child.bindData(child);
-      WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
+      WXSDKInstance instance = getWXSDKIntance();
       if (null!=instance){
         instance.onElementChange(isJSCreateFinish);
        // instance.setma
