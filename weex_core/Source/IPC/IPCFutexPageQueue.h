@@ -47,7 +47,7 @@ public:
     inline void* getCurrentWritePage() { return sizeof(uint32_t) * 2 + static_cast<char*>(getPage(m_currentWrite)); }
     inline size_t getPageSize() const { return m_pageSize - sizeof(uint32_t) * 2; }
 
-    static const size_t ipc_size = 4 * 1024 * 1024;
+    static const size_t ipc_size = 2 * 1024 * 1024;
 
 private:
     void unlock(size_t id);
