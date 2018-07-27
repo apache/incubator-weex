@@ -18,6 +18,7 @@
  */
 package com.taobao.weex;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -133,6 +134,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private int mInstanceViewPortWidth = 750;
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
+
+  private Map<String,String> mContainerInfo;
 
   /**
    * bundle type
@@ -385,15 +388,22 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void init(Context context) {
     mContext = context;
+    mContainerInfo = new HashMap<>(4);
     mNativeInvokeHelper = new NativeInvokeHelper(mInstanceId);
 
-    mWXPerformance = new WXPerformance();
+    mWXPerformance = new WXPerformance(mInstanceId);
     mWXPerformance.WXSDKVersion = WXEnvironment.WXSDK_VERSION;
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
 
     mUserTrackAdapter=WXSDKManager.getInstance().getIWXUserTrackAdapter();
 
     WXSDKManager.getInstance().getAllInstanceMap().put(mInstanceId,this);
+
+    mContainerInfo.put(Dimension.activity.toString(), context instanceof Activity
+            ? context.getClass().getSimpleName()
+            :"unKnowContainer"
+    );
+    mContainerInfo.put(Dimension.instanceType.toString(),"page");
   }
 
   /**
@@ -445,6 +455,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   @Deprecated
   public void setIWXUserTrackAdapter(IWXUserTrackAdapter adapter) {
+  }
+
+  public void setContainerInfo(String key,String val){
+    mContainerInfo.put(key,val);
+  }
+
+  public Map<String, String> getContainerInfo() {
+    return mContainerInfo;
   }
 
   /**
@@ -1163,7 +1181,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           if (mRenderListener != null && mContext != null) {
             mRenderListener.onRenderSuccess(WXSDKInstance.this, width, height);
             if (mUserTrackAdapter != null) {
-              WXPerformance performance=new WXPerformance();
+              WXPerformance performance=new WXPerformance(mInstanceId);
               performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
               performance.args=getBundleUrl();
               mUserTrackAdapter.commit(mContext,null,IWXUserTrackAdapter.JS_BRIDGE,performance,getUserTrackParams());
@@ -1837,7 +1855,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         mWXPerformance.zCacheInfo = zCacheInfo instanceof String?(String)zCacheInfo:"";
 
         if(isNet(mWXPerformance.requestType) && mUserTrackAdapter!=null){
-          WXPerformance performance=new WXPerformance();
+          WXPerformance performance=new WXPerformance(mInstanceId);
           if(!TextUtils.isEmpty(mBundleUrl)){
             try {
               performance.args= Uri.parse(mBundleUrl).buildUpon().clearQuery().toString();

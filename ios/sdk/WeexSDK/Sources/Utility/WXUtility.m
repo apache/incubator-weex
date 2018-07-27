@@ -83,7 +83,7 @@ void WXSwizzleInstanceMethod(Class className, SEL original, SEL replaced)
     
     BOOL didAddMethod = class_addMethod(className, original, method_getImplementation(newMethod), method_getTypeEncoding(newMethod));
     if (didAddMethod) {
-        class_replaceMethod(className, replaced, method_getImplementation(newMethod), method_getTypeEncoding(newMethod));
+        class_replaceMethod(className, replaced, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
     } else {
         method_exchangeImplementations(originalMethod, newMethod);
     }

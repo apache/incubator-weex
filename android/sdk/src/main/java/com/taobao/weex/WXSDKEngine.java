@@ -168,7 +168,6 @@ public class WXSDKEngine implements Serializable {
       registerApplicationOptions(application);
       WXEnvironment.sSDKInitInvokeTime = System.currentTimeMillis()-start;
       WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
-      WXPerformance.init();
       mIsInit = true;
     }
   }

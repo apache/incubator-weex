@@ -78,6 +78,8 @@ extern NSString *const bundleUrlOptionKey;
  **/
 @property (nonatomic, assign) BOOL needPrerender;
 
+@property (nonatomic , strong) NSDictionary* containerInfo;
+
 /**
  * The state of current instance.
  **/

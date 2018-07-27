@@ -273,9 +273,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXEnvironment.sDebugServerConnectable = true;
     }
 
-    if (mWxDebugProxy != null) {
-      mWxDebugProxy.stop(false);
-    }
+//    if (mWxDebugProxy != null) {
+//      mWxDebugProxy.stop(false);
+//    }
     if (WXEnvironment.sDebugServerConnectable && (WXEnvironment.isApkDebugable() || WXEnvironment.sForceEnableDevTool)) {
       if (WXEnvironment.getApplication() != null) {
         try {
@@ -341,7 +341,19 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         return validateInfo;
       }
     }
-    return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);
+    try {
+      return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);
+    }catch(NumberFormatException e){
+      ArrayMap<String, String> ext = new ArrayMap<>();
+      ext.put("moduleName", moduleStr);
+      ext.put("methodName", methodStr);
+      ext.put("args", args.toJSONString());
+      WXLogUtils.e("[WXBridgeManager] callNative : numberFormatException when parsing string to numbers in args", ext.toString());
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+          WXErrorCode.WX_KEY_EXCEPTION_INVOKE, "callNative",
+          "[WXBridgeManager] callNative : numberFormatException when parsing string to numbers in args" , ext);
+      return null;
+    }
   }
 
   /**

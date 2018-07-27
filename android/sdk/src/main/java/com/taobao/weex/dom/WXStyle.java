@@ -21,6 +21,8 @@ package com.taobao.weex.dom;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import android.support.v4.util.ArrayMap;
 import android.text.Layout;
 import android.text.TextUtils;
@@ -545,4 +547,9 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return style;
   }
 
+  @Override
+  @RestrictTo(Scope.LIBRARY)
+  public String toString() {
+    return mStyles.toString();
+  }
 }
