@@ -355,7 +355,11 @@
 
 - (float)headerWidthForLayout:(WXHeaderComponent *)cell
 {
+#ifdef WX_IMPORT_WEEXCORE
+    return self.flexCssNode->getStyleWidth();
+#else
         return self.flexScrollerCSSNode->getStyleWidth();
+#endif
 }
 
 - (void)headerDidLayout:(WXHeaderComponent *)header
