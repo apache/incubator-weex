@@ -45,7 +45,7 @@ class String {
 class StringTable {
  public:
   StringTable() : store_() {}
-  ~StringTable() {}
+  ~StringTable();
 
   String *StringFromUTF8(const std::string &str);
 

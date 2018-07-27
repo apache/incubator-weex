@@ -80,6 +80,7 @@ ExecState::ExecState(VM* vm)
 
 ExecState::~ExecState() {
   delete factory_;
+  delete string_table_.get();
 }
 
 void ExecState::Compile() {

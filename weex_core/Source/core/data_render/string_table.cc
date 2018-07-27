@@ -31,7 +31,11 @@ String::String(const char *str, std::size_t len) {
 
 String::String(const std::string &str) : String(str.c_str(), str.length()) {}
 
-String::~String() {}
+String::~String() {
+  if (nullptr != str_ && nullptr != str_.get()) {
+    delete str_.get();
+  }
+}
 
 String *StringTable::StringFromUTF8(const std::string &str) {
   auto it = store_.find(str);
@@ -42,6 +46,13 @@ String *StringTable::StringFromUTF8(const std::string &str) {
   auto result = new String(key);
   store_.insert(std::make_pair(std::move(key), result));
   return result;
+}
+
+StringTable::~StringTable() {
+  for (auto it = store_.begin(); it != store_.end(); it++) {
+//    delete it->first;
+    delete it->second;
+  }
 }
 
 }  // namespace data_render
