@@ -102,7 +102,7 @@ class Global {
 class ExecState {
  public:
   ExecState(VM* vm);
-  virtual ~ExecState();
+  virtual ~ExecState() {}
   void Compile();
   void Execute();
   const Value& Call(const std::string& func_name,
@@ -115,7 +115,7 @@ class ExecState {
   inline ExecStack* stack() { return stack_.get(); }
   inline StringTable* string_table() { return string_table_.get(); }
   inline VNodeRenderContext* context() { return render_context_.get(); }
-  inline TableFactory* getTableFactory() { return factory_; }
+  inline TableFactory* getTableFactory() { return factory_.get(); }
 
  private:
   friend class VM;
@@ -125,7 +125,7 @@ class ExecState {
 
   VM* vm_;
 
-  TableFactory *factory_;
+  std::unique_ptr<TableFactory> factory_;
 
   std::vector<Frame> frames_;
   std::unique_ptr<Global> global_;

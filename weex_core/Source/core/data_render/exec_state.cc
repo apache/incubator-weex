@@ -78,11 +78,6 @@ ExecState::ExecState(VM* vm)
       factory_(new TableFactory()),
       global_variables_() {}
 
-ExecState::~ExecState() {
-  delete factory_;
-  delete string_table_.get();
-}
-
 void ExecState::Compile() {
   CodeGenerator generator(this);
   std::string err;
