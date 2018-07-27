@@ -289,8 +289,14 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         super.onScrollStateChanged(recyclerView, newState);
 
         List<OnWXScrollListener> listeners = getInstance().getWXScrollListeners();
-        if (listeners != null && listeners.size() > 0) {
-          for (OnWXScrollListener listener : listeners) {
+        int size;
+        OnWXScrollListener listener;
+        if (listeners != null && (size = listeners.size()) > 0) {
+          for (int i=0; i<size; ++i) {
+            if(i >= listeners.size()){
+              break;
+            }
+            listener = listeners.get(i);
             if (listener != null) {
               View topView = recyclerView.getChildAt(0);
               if (topView != null) {
