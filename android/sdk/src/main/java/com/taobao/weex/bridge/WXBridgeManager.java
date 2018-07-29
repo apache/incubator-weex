@@ -134,7 +134,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   // add for cloud setting, default value is false.
   // weexcore use single process or not
-  private static boolean isUseSingleProcess = false;
+  private static boolean isUseSingleProcess = true;
 
   public enum BundType {
     Vue,

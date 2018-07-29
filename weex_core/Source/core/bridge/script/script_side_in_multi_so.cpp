@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <android/base/log_utils.h>
 #include "core/bridge/script/script_side_in_multi_so.h"
 
 namespace WeexCore {
@@ -29,54 +30,64 @@ ScriptSideInMultiSo::~ScriptSideInMultiSo() {}
 
 int ScriptSideInMultiSo::InitFramework(
     const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> params) {
+  LOGE("ScriptSideInMultiSo::InitFramework");
   return script_side_functions_->funcInitFramework(script, params);
 }
 
 int ScriptSideInMultiSo::InitAppFramework(
     const char *instanceId, const char *appFramework,
     std::vector<INIT_FRAMEWORK_PARAMS *> params) {
+  LOGE("ScriptSideInMultiSo::InitAppFramework");
   return script_side_functions_->funcInitAppFramework(instanceId, appFramework,
                                                       params);
 }
 
 int ScriptSideInMultiSo::CreateAppContext(const char *instanceId,
                                           const char *jsBundle) {
+  LOGE("ScriptSideInMultiSo::CreateAppContext");
   return script_side_functions_->funcCreateAppContext(instanceId, jsBundle);
 }
 
 char *ScriptSideInMultiSo::ExecJSOnAppWithResult(const char *instanceId,
                                                  const char *jsBundle) {
+  LOGE("ScriptSideInMultiSo::ExecJSOnAppWithResult");
   return script_side_functions_->funcExeJSOnAppWithResult(instanceId, jsBundle);
 }
 
 int ScriptSideInMultiSo::CallJSOnAppContext(
     const char *instanceId, const char *func,
     std::vector<VALUE_WITH_TYPE *> params) {
+  LOGE("ScriptSideInMultiSo::CallJSOnAppContext");
   return script_side_functions_->funcCallJSOnAppContext(instanceId, func,
                                                         params);
 }
 
 int ScriptSideInMultiSo::DestroyAppContext(const char *instanceId) {
+  LOGE("ScriptSideInMultiSo::DestroyAppContext");
   return script_side_functions_->funcDestroyAppContext(instanceId);
 }
 
 int ScriptSideInMultiSo::ExecJsService(const char *source) {
+  LOGE("ScriptSideInMultiSo::ExecJsService");
   return script_side_functions_->funcExeJsService(source);
 }
 
 int ScriptSideInMultiSo::ExecTimeCallback(const char *source) {
+  LOGE("ScriptSideInMultiSo::ExecTimeCallback");
   return script_side_functions_->funcExeCTimeCallback(source);
 }
 
 int ScriptSideInMultiSo::ExecJS(const char *instanceId, const char *nameSpace,
                                 const char *func,
                                 std::vector<VALUE_WITH_TYPE *> params) {
+  LOGE("ScriptSideInMultiSo::ExecJS");
   return script_side_functions_->funcExeJS(instanceId, nameSpace, func, params);
 }
 
 WeexJSResult ScriptSideInMultiSo::ExecJSWithResult(
     const char *instanceId, const char *nameSpace, const char *func,
     std::vector<VALUE_WITH_TYPE *> params) {
+  LOGE("ScriptSideInMultiSo::ExecJSWithResult");
   return script_side_functions_->funcExeJSWithResult(instanceId, nameSpace,
                                                      func, params);
 }
@@ -85,20 +96,24 @@ int ScriptSideInMultiSo::CreateInstance(const char *instanceId,
                                         const char *func, const char *script,
                                         const char *opts, const char *initData,
                                         const char *extendsApi) {
+  LOGE("ScriptSideInMultiSo::CreateInstance");
   return script_side_functions_->funcCreateInstance(instanceId, func, script,
                                                     opts, initData, extendsApi);
 }
 
 char *ScriptSideInMultiSo::ExecJSOnInstance(const char *instanceId,
                                             const char *script) {
+  LOGE("ScriptSideInMultiSo::ExecJSOnInstance");
   return script_side_functions_->funcExeJSOnInstance(instanceId, script);
 }
 
 int ScriptSideInMultiSo::DestroyInstance(const char *instanceId) {
+  LOGE("ScriptSideInMultiSo::DestroyInstance");
   return script_side_functions_->funcDestroyInstance(instanceId);
 }
 
 int ScriptSideInMultiSo::UpdateGlobalConfig(const char *config) {
+  LOGE("ScriptSideInMultiSo::UpdateGlobalConfig");
   return script_side_functions_->funcUpdateGlobalConfig(config);
 }
 }  // namespace script

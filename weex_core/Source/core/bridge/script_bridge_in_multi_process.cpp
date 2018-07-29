@@ -38,9 +38,9 @@
 namespace WeexCore {
 
 static std::unique_ptr<IPCResult> HandleSetJSVersion(IPCArguments *arguments) {
-  const char *version = getArumentAsCStr(arguments, 0);
+  auto version = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
   WeexCoreManager::getInstance()->script_bridge()->core_side()->SetJSVersion(
-      version);
+      version.get());
   return createVoidResult();
 }
 
