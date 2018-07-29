@@ -31,7 +31,7 @@
 #include <core/render/node/render_list.h>
 #include <core/config/core_environment.h>
 #include <android/base/jni/android_jni.h>
-#include "IPC/Android/IPCStringResult.h"
+#include "android/utils/IPCStringResult.h"
 #include "IPC/IPCResult.h"
 #include "core/layout/measure_func_adapter.h"
 

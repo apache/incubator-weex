@@ -71,6 +71,7 @@ set(COMMON_SRCS
   ./android/utils/cache_utils.cpp
   ./android/utils/params_utils.cpp
   ./android/utils/so_utils.cpp
+        ./android/utils/IPCStringResult.cpp
   ./android/wrap/log_utils.cpp
   ./android/wrap/hash_set.cpp
   ./android/wrap/wx_map.cpp

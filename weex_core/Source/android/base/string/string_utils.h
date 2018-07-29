@@ -89,7 +89,6 @@ static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
 
 }
 
-
 static inline jbyteArray newJByteArray(JNIEnv *env, const char* data, int length) {
   jbyteArray jarray = nullptr;
   if (data == nullptr || length <= 0)

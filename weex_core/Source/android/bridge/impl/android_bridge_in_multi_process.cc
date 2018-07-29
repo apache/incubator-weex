@@ -24,7 +24,7 @@
 #include "core/render/manager/render_manager.h"
 #include "wson/wson_parser.h"
 
-#include "IPC/Android/IPCStringResult.h"
+#include "android/utils/IPCStringResult.h"
 #include "IPC/Buffering/IPCBuffer.h"
 #include "IPC/IPCArguments.h"
 #include "IPC/IPCByteArray.h"

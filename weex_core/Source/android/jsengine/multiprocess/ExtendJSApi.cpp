@@ -19,7 +19,7 @@
 #include <android/base/string/string_utils.h>
 #include <base/ViewUtils.h>
 #include <android/jsengine/api/WeexJSCoreApi.h>
-#include "IPC/Android/IPCStringResult.h"
+#include "android/utils/IPCStringResult.h"
 #include "ExtendJSApi.h"
 
 using namespace WeexCore;

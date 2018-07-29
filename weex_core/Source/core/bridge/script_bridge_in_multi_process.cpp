@@ -20,7 +20,8 @@
 #include <base/make_copyable.h>
 #include <base/message_loop/message_loop.h>
 #include <base/thread/waitable_event.h>
-#include "IPC/Android/IPCStringResult.h"
+#include <android/utils/params_utils.h>
+#include "android/utils/IPCStringResult.h"
 #include "IPC/IPCArguments.h"
 #include "IPC/IPCHandler.h"
 #include "IPC/IPCMessageJS.h"
@@ -243,7 +244,7 @@ static std::unique_ptr<IPCResult> HandleCallGCanvasLinkNative(
       std::unique_ptr<IPCResult> ret = createVoidResult();
       if (retVal) {
     jstring jDataStr = env->NewStringUTF(retVal);
-    ret = std::unique_ptr<IPCResult>(new IPCStringResult(env, jDataStr));
+    ret = std::unique_ptr<IPCResult>(new IPCStringResult(jstring2WeexString(env,jDataStr)));
     env->DeleteLocalRef(jDataStr);
     retVal = NULL;
       }
@@ -272,7 +273,7 @@ static std::unique_ptr<IPCResult> HandleT3DLinkNative(IPCArguments *arguments) {
   std::unique_ptr<IPCResult> ret = createVoidResult();
   if (retVal) {
     jstring jDataStr = env->NewStringUTF(retVal);
-    ret = std::unique_ptr<IPCResult>(new IPCStringResult(env, jDataStr));
+    ret = std::unique_ptr<IPCResult>(new IPCStringResult(jstring2WeexString(env,jDataStr)));
     env->DeleteLocalRef(jDataStr);
     retVal = NULL;
   }

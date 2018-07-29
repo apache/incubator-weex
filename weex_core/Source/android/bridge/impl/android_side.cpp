@@ -17,8 +17,9 @@
  * under the License.
  */
 
+#include <android/utils/params_utils.h>
 #include "android/bridge/impl/android_side.h"
-#include "IPC/Android/IPCStringResult.h"
+#include "android/utils/IPCStringResult.h"
 #include "IPC/IPCResult.h"
 #include "android/base/jni/android_jni.h"
 #include "android/base/jni_type.h"
@@ -121,11 +122,11 @@ std::unique_ptr<IPCResult> AndroidSide::CallNativeModule(
 
   } else if (jTypeInt == 2) {
     jstring jDataStr = (jstring)jDataObj.Get();
-    ipc_result = std::unique_ptr<IPCResult>(new IPCStringResult(env, jDataStr));
+    ipc_result = std::unique_ptr<IPCResult>(new IPCStringResult(jstring2WeexString(env,jDataStr)));
   } else if (jTypeInt == 3) {
     jstring jDataStr = (jstring)jDataObj.Get();
     ipc_result =
-        std::unique_ptr<IPCResult>(new IPCJSONStringResult(env, jDataStr));
+        std::unique_ptr<IPCResult>(new IPCJSONStringResult(jstring2WeexString(env,jDataStr)));
   } else if (jTypeInt == 4) {
     jbyteArray array = (jbyteArray)jDataObj.Get();
     if (array != nullptr) {

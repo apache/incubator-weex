@@ -4,7 +4,6 @@ set(IPC_LIBRARY_NAME weexipc)
 
 add_library(${IPC_LIBRARY_NAME} STATIC
   ./Serializing/IPCSerializer.cpp
-  ./Android/IPCStringResult.cpp
   ./IPCResult.cpp
   ./IPCSender.cpp
   ./IPCException.cpp
