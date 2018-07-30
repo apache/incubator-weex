@@ -57,8 +57,8 @@ static Value Merge(ExecState* exec_state) {
   Table* r_table = TableValue(rvalue);
   Value* new_value = exec_state->getTableFactory()->CreateTable();
   Table* new_table = TableValue(new_value);
-  new_table->map->insert(l_table->map->begin(), l_table->map->end());
   new_table->map->insert(r_table->map->begin(), r_table->map->end());
+  new_table->map->insert(l_table->map->begin(), l_table->map->end());
   return Value(*new_value);
 }
 

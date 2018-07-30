@@ -33,8 +33,6 @@
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/data_render/expression_parser.h"
 
-#define _TEST_ true
-
 
 const char *s_cacheDir;
 const char *g_jssSoPath = nullptr;
@@ -342,24 +340,28 @@ namespace WeexCore {
         }
     }
 
+    void WeexProxy::RefreshInstance(JNIEnv* env, jobject jcaller,
+                                    jstring jinstanceid,
+                                    jstring jnamespace,
+                                    jstring jfunction,
+                                    jobjectArray jargs) {
+        auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+        ScopedJStringUTF8 id(env, jinstanceid);
+        jstring jni_init_data = getJsonData(env, jargs, 1);
+        ScopedJStringUTF8 init_data(env, jni_init_data);
+        // First check if page is rendered with data render strategy.
+        if (node_manager->RefreshPage(id.getChars(), init_data.getChars())) {
+            return;
+        }
+        execJS(env, nullptr, jinstanceid, jnamespace, jfunction, jargs);
+    }
+
     bool WeexProxy::execJS(JNIEnv *env,
                            jobject jthis,
                            jstring jinstanceid,
                            jstring jnamespace,
                            jstring jfunction,
                            jobjectArray jargs) {
-        if(_TEST_) {
-            ScopedJStringUTF8 idChar(env, jinstanceid);
-            ScopedJStringUTF8 funcName(env, jfunction);
-            std::string funNameStr(funcName.getChars());
-            if (funNameStr == "refreshInstance"){
-                jstring initData = getJsonData(env, jargs, 1);
-                ScopedJStringUTF8 initDataChar(env, initData);
-                auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-                node_manager->TestRefreshProcess(idChar.getChars(),initDataChar.getChars());
-                return true;
-            }
-        }
         std::string mMessage = "";
         if (!sSender && !js_server_api_functions) {
             LOGE("have not connected to a js server");
@@ -1093,147 +1095,38 @@ namespace WeexCore {
     WeexProxy::createInstanceContext(JNIEnv *env, jobject jcaller, jstring jinstanceid,
                                      jstring name,
                                      jstring jfunction, jobjectArray jargs) {
-        if(_TEST_) {
+
+        // get temp data, such as js bundle
+        jobject jArg = env->GetObjectArrayElement(jargs, 1);
+        jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+        jobject jDataObj = env->GetObjectField(jArg, jDataId);
+        jstring jscript = (jstring) jDataObj;
+        jstring opts = getJsonData(env, jargs, 2);
+        // init jsonData
+        jstring initData = getJsonData(env, jargs, 3);
+        // get extend api data, such as rax-api
+        jArg = env->GetObjectArrayElement(jargs, 4);
+        jDataObj = env->GetObjectField(jArg, jDataId);
+        jstring japi = (jstring) jDataObj;
+        // get render strategy
+        jobject jni_render_strategy = env->GetObjectArrayElement(jargs, 5);
+        auto jstr_render_stategy = jni_render_strategy == nullptr ?
+                                      nullptr : env->GetObjectField(jni_render_strategy, jDataId);
+        ScopedJStringUTF8 render_strategy(env, static_cast<jstring>(jstr_render_stategy));
+        // if render strategy is data render, render page with data render mode.
+        if(render_strategy.getChars() != nullptr
+            && strcmp(render_strategy.getChars(), "DATA_RENDER") == 0) {
+
             ScopedJStringUTF8 idChar(env, jinstanceid);
-            std::string sourceStr =
-                R"({
-  "body": {
-    "tagName": "list",
-    "nodeId": "2",
-    "childNodes": [
-      {
-        "tagName": "cell",
-        "nodeId": "3",
-        "control": {
-          "repeat": {
-            "for": "this.list",
-            "alias": "item",
-            "iterator1": "index"
-          }
-        },
-        "classList": [
-          "main"
-        ],
-        "childNodes": [
-          {
-            "tagName": "image",
-            "nodeId": "4",
-            "attributes": {
-              "src": "https://gw.alicdn.com/tfs/TB1mMcNzhGYBuNjy0FnXXX5lpXa-85-85.png"
-            },
-            "classList": [
-              "img"
-            ]
-          },
-          {
-            "tagName": "text",
-            "nodeId": "7",
-            "classList": [
-              "title"
-            ],
-            "attributes": {
-              "value": {
-                "@binding": "item.title"
-              }
-            }
-          },
-          {
-            "tagName": "B",
-            "isComponent": true,
-            "nodeId": "8",
-            "componentAlias": {
-              "B": "module/a.vue"
-            },
-            "attributes": {
-              "inputattr": {
-                "@binding": "item.title"
-              }
-            }
-          }
-        ]
-      }
-    ]
-  },
-  "data": {
-    "showInfo": true,
-    "title": "hellotitle",
-    "title2": {
-      "title": "abc"
-    },
-    "list": [
-      {
-        "title": "dev"
-      },
-      {
-        "title": "dev2",
-        "title2": "dev2"
-      },
-      {
-        "title": "dev3",
-        "title2": "dev3",
-        "title3": "dev3"
-      }
-    ]
-  },
-  "styles": {
-    "main": {
-      "backgroundColor": "#ff5000",
-      "flexDirection": "row",
-      "width": "700px",
-      "height": "100px"
-    },
-    "img": {
-      "width": "80px",
-      "height": "80px",
-      "marginRight": "10px"
-    },
-    "title": {
-      "fontSize": "24px",
-      "color": "#000000"
-    }
-  },
-  "components": [
-    {
-      "initialState": {
-        "titlein": {
-          "@binding": "this.inputattr"
-        }
-      },
-      "template": {
-        "tagName": "div",
-        "nodeId": "12",
-        "childNodes": [
-          {
-            "tagName": "text",
-            "nodeId": "13",
-            "attributes": {
-              "value": {
-                "@binding": "\"comp:\"+this.titlein"
-              }
-            }
-          }
-        ]
-      },
-      "name": "module/a.vue"
-    },
-    {
-      "template": {
-        "tagName": "text",
-        "nodeId": "17",
-        "attributes": {
-          "value": "b.vue"
-        }
-      },
-      "styles": {},
-      "name": "module/b.vue"
-    }
-  ]
-})";
-            jstring initData = getJsonData(env, jargs, 3);
+            ScopedJStringUTF8 scriptChar(env, jscript);
+            std::string sourceStr = scriptChar.getChars();
             ScopedJStringUTF8 initDataChar(env, initData);
+
+            auto start_time = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
+            LOGE("DATA_RENDER, Wx start %lld",start_time);
+
             auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-            node_manager->InitVM();
-            node_manager->TestCreateProcess(sourceStr, idChar.getChars(), initDataChar.getChars());
+            node_manager->CreatePage(sourceStr, idChar.getChars(), initDataChar.getChars());
 
             return true;
         }
@@ -1254,18 +1147,6 @@ namespace WeexCore {
             LOGE("native_createInstanceContext jargs format error");
             return false;
         }
-// get temp data, such as js bundle
-        jobject jArg = env->GetObjectArrayElement(jargs, 1);
-        jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
-        jobject jDataObj = env->GetObjectField(jArg, jDataId);
-        jstring jscript = (jstring) jDataObj;
-        jstring opts = getJsonData(env, jargs, 2);
-        // init jsonData
-        jstring initData = getJsonData(env, jargs, 3);
-        // get extend api data, such as rax-api
-        jArg = env->GetObjectArrayElement(jargs, 4);
-        jDataObj = env->GetObjectField(jArg, jDataId);
-        jstring japi = (jstring) jDataObj;
 
       auto start_time = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
       LOGE("DATA_RENDER, Wx start %lld",start_time);
@@ -1319,12 +1200,13 @@ namespace WeexCore {
     jint WeexProxy::destoryInstance(JNIEnv *env, jobject jcaller, jstring jinstanceid,
                                     jstring jnamespace,
                                     jstring jfunction, jobjectArray jargs) {
-        if(_TEST_) {
-            ScopedJStringUTF8 idChar(env, jinstanceid);
-            auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-            node_manager->TestCloseProcess(idChar.getChars());
+        // First check if page is rendered with data render strategy.
+        ScopedJStringUTF8 idChar(env, jinstanceid);
+        auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+        if(node_manager->ClosePage(idChar.getChars())) {
             return true;
         }
+
         int ret = execJS(env, nullptr, jinstanceid, jnamespace, jfunction, jargs);
         if (jfunction == NULL || jinstanceid == NULL) {
             LOGE("native_destoryInstance function is NULL");
@@ -1332,7 +1214,6 @@ namespace WeexCore {
         }
 
         if (js_server_api_functions != nullptr) {
-            ScopedJStringUTF8 idChar(env, jinstanceid);
             return js_server_api_functions->funcDestroyInstance(idChar.getChars());
         } else {
             try {

@@ -20,9 +20,9 @@
 #ifndef CORE_DATA_RENDER_STRING_TABLE_H
 #define CORE_DATA_RENDER_STRING_TABLE_H
 
+#include <memory>
 #include <string>
 #include <unordered_map>
-#include <memory>
 
 namespace weex {
 namespace core {
@@ -50,7 +50,7 @@ class StringTable {
   String *StringFromUTF8(const std::string &str);
 
  private:
-  std::unordered_map<std::string, String *> store_;
+  std::unordered_map<std::string, std::unique_ptr<String>> store_;
 };
 }  // namespace data_render
 }  // namespace core

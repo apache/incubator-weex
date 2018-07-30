@@ -52,6 +52,8 @@ public interface IWXBridge extends IWXObject {
    */
   int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
 
+  void refreshInstance(String instanceId, String namespace, String function, WXJSObject[] args);
+
   /**
    * execute javascript function
    */

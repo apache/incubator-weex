@@ -116,6 +116,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private static final String NON_CALLBACK = "-1";
   private static final String UNDEFINED = "undefined";
   private static final String BUNDLE_TYPE = "bundleType";
+  private static final String RENDER_STRATEGY = "renderStrategy";
   private static final int INIT_FRAMEWORK_OK = 1;
   private static final int CRASHREINIT = 50;
   static volatile WXBridgeManager mBridgeManager;
@@ -1086,8 +1087,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   private void invokeRefreshInstance(String instanceId, WXRefreshData refreshData) {
     try {
+      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (!isJSFrameworkInit()) {
-        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
         if (instance != null) {
           instance.onRenderError(
                   WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
@@ -1113,7 +1114,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXJSObject dataObj = new WXJSObject(WXJSObject.JSON,
               refreshData.data == null ? "{}" : refreshData.data);
       WXJSObject[] args = {instanceIdObj, dataObj};
-      invokeExecJS(instanceId, null, METHOD_REFRESH_INSTANCE, args);
+      mWXBridge.refreshInstance(instanceId, null, METHOD_REFRESH_INSTANCE, args);
       WXLogUtils.renderPerformanceLog("invokeRefreshInstance", System.currentTimeMillis() - start);
     } catch (Throwable e) {
       String err = "[WXBridgeManager] invokeRefreshInstance " + WXLogUtils.getStackTrace(e);
@@ -1258,10 +1259,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 instance.getInstanceId());
         WXJSObject instanceObj = new WXJSObject(WXJSObject.String,
                 template);
+
         WXJSObject optionsObj = new WXJSObject(WXJSObject.JSON,
                 options == null ? "{}"
                         : WXJsonUtils.fromObjectToJSONString(options));
-        optionsObj = optionObjConvert(isSandBoxContext, type, optionsObj);WXJSObject dataObj = new WXJSObject(WXJSObject.JSON,
+        optionsObj = optionObjConvert(isSandBoxContext, type, optionsObj);
+        WXJSObject dataObj = new WXJSObject(WXJSObject.JSON,
                 data == null ? "{}" : data);
 
         WXJSObject apiObj;
@@ -1276,8 +1279,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                   "");
         }
 
+        // When render strategy is data_render, put it into options. Others keep null.
+        WXJSObject renderStrategy = null;
+        if (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER) {
+          renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.DATA_RENDER.getFlag());
+        }
+
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
-                dataObj, apiObj};
+                dataObj, apiObj, renderStrategy};
 
         instance.setTemplate(template);
 
@@ -1287,7 +1296,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           return;
         }
-        if (type == BundType.Vue || type == BundType.Rax) {
+        if (type == BundType.Vue || type == BundType.Rax
+                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER) {
           invokeCreateInstanceContext(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           return;
         } else {

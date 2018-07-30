@@ -62,8 +62,18 @@ public class SliceTestActivity extends AppCompatActivity {
     mRecyclerView.setAdapter(mAdapter);
   }
 
+  static int i = 0;
   public void addCellClick(View view) {
-    mData.add("{}");
+    if (i++ % 2 == 0) {
+      mData.add("{" +
+              "\"items\": [\"修身\", \"潮流\", \"休闲\", \"弹力\", \"薄款\", \"中年\", \"超薄\", \"韩版\"]" +
+              "}");
+    } else {
+      mData.add("{" +
+              "\"items\": [\"测试\", \"测试\", \"测试\", \"测试\", \"测试\", \"测试\", \"测试\", \"测试\"]" +
+              "}");
+    }
+
     mAdapter.notifyItemInserted(mData.size() - 1);
 //    mAdapter.notifyDataSetChanged();
   }
@@ -73,7 +83,7 @@ public class SliceTestActivity extends AppCompatActivity {
     public WXViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
       Log.d(LOG_TAG, "onCreateViewHolder");
       FrameLayout itemView = new FrameLayout(SliceTestActivity.this);
-      itemView.setLayoutParams(new RecyclerView.LayoutParams(800,120));
+      itemView.setLayoutParams(new RecyclerView.LayoutParams(1200,320));
       return new WXViewHolder(itemView);
     }
 
@@ -133,10 +143,122 @@ public class SliceTestActivity extends AppCompatActivity {
     public void render(String initData, int position) {
       mInstance.render(
           "testPage",
-          "// { \"framework\": \"Rax\" }",
+          "{\n" +
+                  "  \"styles\": {\n" +
+                  "    \"container\": {\n" +
+                  "      \"backgroundColor\": \"#eee\",\n" +
+                  "      \"flexDirection\": \"row\",\n" +
+                  "      \"flexWrap\": \"wrap\",\n" +
+                  "      \"alignItems\": \"flex-start\"\n" +
+                  "    },\n" +
+                  "    \"text\": {\n" +
+                  "      \"fontSize\": \"70px\",\n" +
+                  "      \"color\": \"#ff0000\"\n" +
+                  "    },\n" +
+                  "    \"top\": {\n" +
+                  "      \"width\": \"750px\",\n" +
+                  "      \"flexDirection\": \"row\",\n" +
+                  "      \"justifyContent\": \"center\",\n" +
+                  "      \"alignItems\": \"center\",\n" +
+                  "      \"height\": \"60px\",\n" +
+                  "      \"margin-top\": \"10px\"\n" +
+                  "    },\n" +
+                  "    \"lpixel\": {\n" +
+                  "      \"height\": \"1px\",\n" +
+                  "      \"width\": \"150px\",\n" +
+                  "      \"backgroundColor\": \"black\",\n" +
+                  "      \"marginRight\": \"20px\"\n" +
+                  "    },\n" +
+                  "    \"rpixel\": {\n" +
+                  "      \"height\": \"1px\",\n" +
+                  "      \"width\": \"150px\",\n" +
+                  "      \"backgroundColor\": \"black\",\n" +
+                  "      \"marginLeft\": \"20px\"\n" +
+                  "    },\n" +
+                  "    \"item\": {\n" +
+                  "      \"marginTop\": \"10px\",\n" +
+                  "      \"backgroundColor\": \"white\",\n" +
+                  "      \"borderRadius\": \"30px\",\n" +
+                  "      \"width\": \"150px\",\n" +
+                  "      \"height\": \"60px\",\n" +
+                  "      \"justifyContent\": \"center\",\n" +
+                  "      \"alignItems\": \"center\",\n" +
+                  "      \"marginLeft\": \"15px\",\n" +
+                  "      \"marginRight\": \"15px\"\n" +
+                  "    }\n" +
+                  "  },\n" +
+                  "  \"body\": {\n" +
+                  "    \"tagName\": \"div\",\n" +
+                  "    \"nodeId\": \"1\",\n" +
+                  "    \"classList\": [\n" +
+                  "      \"container\"\n" +
+                  "    ],\n" +
+                  "    \"childNodes\": [\n" +
+                  "      {\n" +
+                  "        \"tagName\": \"div\",\n" +
+                  "        \"nodeId\": \"2\",\n" +
+                  "        \"classList\": [\n" +
+                  "          \"top\"\n" +
+                  "        ],\n" +
+                  "        \"childNodes\": [\n" +
+                  "          {\n" +
+                  "            \"tagName\": \"div\",\n" +
+                  "            \"nodeId\": \"3\",\n" +
+                  "            \"classList\": [\n" +
+                  "              \"lpixel\"\n" +
+                  "            ]\n" +
+                  "          },\n" +
+                  "          {\n" +
+                  "            \"tagName\": \"text\",\n" +
+                  "            \"nodeId\": \"4\",\n" +
+                  "            \"attributes\": {\n" +
+                  "              \"value\": \"细选\"\n" +
+                  "            }\n" +
+                  "          },\n" +
+                  "          {\n" +
+                  "            \"tagName\": \"div\",\n" +
+                  "            \"nodeId\": \"5\",\n" +
+                  "            \"classList\": [\n" +
+                  "              \"rpixel\"\n" +
+                  "            ]\n" +
+                  "          }\n" +
+                  "        ]\n" +
+                  "      },\n" +
+                  "      {\n" +
+                  "        \"tagName\": \"div\",\n" +
+                  "        \"nodeId\": \"6\",\n" +
+                  "        \"control\": {\n" +
+                  "          \"repeat\": {\n" +
+                  "            \"for\": \"items\",\n" +
+                  "            \"alias\": \"item\"\n" +
+                  "          }\n" +
+                  "        },\n" +
+                  "        \"classList\": [\n" +
+                  "          \"item\"\n" +
+                  "        ],\n" +
+                  "        \"childNodes\": [\n" +
+                  "          {\n" +
+                  "            \"tagName\": \"text\",\n" +
+                  "            \"nodeId\": \"7\",\n" +
+                  "            \"classList\": [\n" +
+                  "              \"item-text\"\n" +
+                  "            ],\n" +
+                  "            \"attributes\": {\n" +
+                  "              \"value\": {\"@binding\": \"item\"}\n" +
+                  "            }\n" +
+                  "          }\n" +
+                  "        ]\n" +
+                  "      }\n" +
+                  "    ]\n" +
+                  "  },\n" +
+                  "  \"components\": [],\n" +
+                  "  \"data\": {\n" +
+                  "    \"items\": [\"修身\", \"潮流\", \"休闲\", \"弹力\", \"薄款\", \"中年\", \"超薄\", \"韩版\"]\n" +
+                  "  }\n" +
+                  "}",
           null,
           initData,
-          WXRenderStrategy.APPEND_ONCE
+          WXRenderStrategy.DATA_RENDER
       );
       mRendered = true;
       mTextView.setText(String.valueOf(position));
