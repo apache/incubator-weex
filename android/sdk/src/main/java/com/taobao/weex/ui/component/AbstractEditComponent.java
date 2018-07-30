@@ -690,7 +690,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
         break;
       case Constants.Value.NUMBER:
-        inputType = InputType.TYPE_CLASS_NUMBER;
+        inputType = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
         break;
       default:
         inputType = InputType.TYPE_CLASS_TEXT;

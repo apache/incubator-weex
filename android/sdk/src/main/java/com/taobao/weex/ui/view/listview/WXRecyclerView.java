@@ -84,6 +84,11 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
   }
 
   @Override
+  public WXGesture getGestureListener() {
+    return mGesture;
+  }
+
+  @Override
   public boolean onTouchEvent(MotionEvent event) {
     if(!scrollable) {
       return true;

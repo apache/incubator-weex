@@ -90,6 +90,9 @@ export class TaskCenter {
         return v.map(item => this.normalize(item, true))
       }
     }
+    if (v && v.ref && v['[[VirtualElement]]']) {
+      return v.ref
+    }
     return normalizePrimitive(v)
   }
 

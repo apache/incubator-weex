@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,20 +17,22 @@
  * under the License.
  */
 
-export function error (...messages) {
-  if (typeof console.error === 'function') {
-    console.error(`[JS Framework] `, ...messages)
-  }
-}
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_RENDER_SUCCESS_H
+#define CORE_RENDER_ACTION_RENDER_ACTION_RENDER_SUCCESS_H
 
-export function handleException (err) {
-  if (typeof console.error === 'function') {
-    try {
-      console.error(err.toString())
-    }
-    catch (e) {}
-  }
-  if (process.env.NODE_ENV !== 'production') {
-    throw err
-  }
-}
+#include <string>
+#include "core/render/action/render_action_interface.h"
+
+namespace WeexCore {
+class RenderActionRenderSuccess : public RenderAction {
+ public:
+  explicit RenderActionRenderSuccess(const std::string &page_id);
+
+  void ExecuteAction();
+
+ public:
+  std::string page_id_;
+};
+}  // namespace WeexCore
+
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_RENDER_SUCCESS_H

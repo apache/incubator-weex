@@ -93,6 +93,8 @@ namespace WeexCore {
 
     virtual int callCreateFinish(const char* pageId) = 0;
 
+    virtual int callRenderSuccess(const char* pageId) = 0;
+
     virtual int callRemoveElement(const char* pageId, const char* ref) = 0;
 
     virtual int callMoveElement(const char* pageId, const char* ref, const char* parentRef, int index) = 0;

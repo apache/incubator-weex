@@ -468,6 +468,17 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  public int callRenderSuccess(String instanceId) {
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callRenderSuccess(instanceId);
+    } catch (Throwable e) {
+      WXLogUtils.e(TAG, "callCreateFinish throw exception:" + e.getMessage());
+    }
+    return errorCode;
+  }
+
+  @Override
   public int callAppendTreeCreateFinish(String instanceId, String ref) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -592,6 +603,14 @@ public class WXBridge implements IWXBridge {
         userTrackAdapter.commit(null, null, IWXUserTrackAdapter.INIT_FRAMEWORK, null, params);
       }
 
+      return;
+    }
+
+    if (WXErrorCode.WX_JS_FRAMEWORK_INIT_FAILED_PARAMS_NULL.getErrorCode().equals(statusCode)) {
+      WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_JS_FRAMEWORK_INIT_FAILED_PARAMS_NULL,
+              "WeexProxy::initFromParam()",
+              WXErrorCode.WX_JS_FRAMEWORK_INIT_FAILED_PARAMS_NULL.getErrorMsg() + ": " + errorMsg,
+              null);
       return;
     }
 
