@@ -207,6 +207,9 @@
         }
     }
     NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:fileName ofType:@"js"];
+	if (filePath == nil) {
+		filePath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"js"];
+	}
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [WXSDKEngine initSDKEnvironment:script];
     
@@ -309,6 +312,9 @@ static NSDictionary *_customEnvironment;
         }
     }
     NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:fileName ofType:@"js"];
+	if (filePath == nil) {
+		filePath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"js"];
+	}
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [self restartWithScript:script];
 }

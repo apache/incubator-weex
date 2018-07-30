@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,20 +17,15 @@
  * under the License.
  */
 
-export function error (...messages) {
-  if (typeof console.error === 'function') {
-    console.error(`[JS Framework] `, ...messages)
-  }
-}
+#include "core/render/action/render_action_render_success.h"
+#include "core/manager/weex_core_manager.h"
 
-export function handleException (err) {
-  if (typeof console.error === 'function') {
-    try {
-      console.error(err.toString())
-    }
-    catch (e) {}
-  }
-  if (process.env.NODE_ENV !== 'production') {
-    throw err
-  }
+namespace WeexCore {
+RenderActionRenderSuccess::RenderActionRenderSuccess(const std::string& page_id)
+    : page_id_(page_id) {}
+
+void RenderActionRenderSuccess::ExecuteAction() {
+  WeexCoreManager::getInstance()->getPlatformBridge()->callRenderSuccess(
+      page_id_.c_str());
 }
+}  // namespace WeexCore

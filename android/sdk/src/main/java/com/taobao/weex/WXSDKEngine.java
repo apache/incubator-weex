@@ -168,7 +168,6 @@ public class WXSDKEngine implements Serializable {
       registerApplicationOptions(application);
       WXEnvironment.sSDKInitInvokeTime = System.currentTimeMillis()-start;
       WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
-      WXPerformance.init();
       mIsInit = true;
     }
   }
@@ -343,7 +342,7 @@ public class WXSDKEngine implements Serializable {
 
       registerModule("modal", WXModalUIModule.class, false);
       registerModule("instanceWrap", WXInstanceWrap.class, false);
-      registerModule("animation", WXAnimationModule.class, true);
+      registerModule("animation", WXAnimationModule.class, false);
       registerModule("webview", WXWebViewModule.class, true);
       registerModule("navigator", WXNavigatorModule.class);
       registerModule("stream", WXStreamModule.class);

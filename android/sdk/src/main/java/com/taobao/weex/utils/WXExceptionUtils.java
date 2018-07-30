@@ -75,14 +75,7 @@ public class WXExceptionUtils {
 
 		if (!TextUtils.isEmpty(instanceId)) {
 			instanceIdCommit = instanceId;
-			instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-
-			if (null != instance && instance.getContainerView() != null){
-				Context c = instance.getContainerView().getContext();
-				if (c instanceof Activity){
-					commitMap.put("activity",c.getClass().getSimpleName());
-				}
-			}
+			instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
 
 			if (null != instance) {
 				bundleUrlCommit = instance.getBundleUrl();
@@ -92,6 +85,9 @@ public class WXExceptionUtils {
 						bundleUrlCommit = degradeUrl;
 					} else
 						bundleUrlCommit = WXSDKInstance.requestUrl;
+				}
+				for (Map.Entry<String,String> entry: instance.getContainerInfo().entrySet()){
+					commitMap.put(entry.getKey(),entry.getValue());
 				}
 			}
 		} else {//instance is null for instance id is null

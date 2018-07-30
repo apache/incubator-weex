@@ -76,7 +76,11 @@ export default class CallbackManager {
       delete this.callbacks[callbackId]
     }
     if (typeof callback === 'function') {
-      return callback(data)
+      try {
+        return callback.call(null, data)
+      } catch (error) {
+        console.error(`[JS Framework] Failed to execute the callback function:\n + ${error.toString()}`)
+      }
     }
     return new Error(`invalid callback id "${callbackId}"`)
   }

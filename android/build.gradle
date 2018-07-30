@@ -14,21 +14,15 @@ plugins {
 //    id "com.github.dcendents.android-maven" version "1.5"
 }
 
-repositories {
-    mavenLocal()
-    jcenter()
-}
-
 subprojects {
     repositories {
         mavenLocal()
         jcenter()
+        maven {
+            url 'https://maven.google.com'
+        }
     }
     buildscript {
-        repositories {
-            mavenLocal()
-            jcenter()
-        }
         dependencies {
             classpath 'com.android.tools.build:gradle:2.3.3'
             classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
@@ -36,12 +30,11 @@ subprojects {
         }
     }
     ext {
-        compileSdkVersion=25
-        buildToolsVersion="25.0.3"
+        compileSdkVersion=26
+        buildToolsVersion="26.0.3"
         minSdkVersion=14
-        appMinSdkVersion=15
-        targetSdkVersion=25
-        supportLibVersion="25.3.1"
+        targetSdkVersion=26
+        supportLibVersion="26.0.2"
         fastjsonLibVersion="1.1.46.android"
     }
 }

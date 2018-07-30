@@ -125,4 +125,9 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
     mGesture = wxGesture;
     getInnerView().registerGestureListener(wxGesture);
   }
+
+  @Override
+  public WXGesture getGestureListener() {
+    return mGesture;
+  }
 }

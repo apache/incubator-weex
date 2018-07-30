@@ -25,6 +25,7 @@
 #include "core/data_render/string_table.h"
 #include "core/data_render/vnode/vnode.h"
 #include "core/data_render/vnode/vnode_exec_env.h"
+#include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_creator.h"
 
@@ -32,7 +33,7 @@
 
 #if VRENDER_LOG
 
-#include <android/base/log_utils.h>
+#include "android/base/log_utils.h"
 
 #endif
 
@@ -198,6 +199,9 @@ bool VNodeRenderManager::RefreshPage(const std::string& page_id,
   exec_state->Execute();  // refresh root
   RefreshPageInternal(page_id, exec_state->context()->root());
   exec_state->context()->Reset();
+  WeexCore::WeexCoreManager::getInstance()
+      ->getPlatformBridge()
+      ->callRefreshFinish(page_id.c_str(), nullptr, "");
   return true;
 }
 

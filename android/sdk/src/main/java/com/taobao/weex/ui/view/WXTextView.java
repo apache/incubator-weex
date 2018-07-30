@@ -78,6 +78,11 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
   }
 
   @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
+  }
+
+  @Override
   public CharSequence getText() {
     return textLayout.getText();
   }

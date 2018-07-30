@@ -83,7 +83,7 @@ public class SliceTestActivity extends AppCompatActivity {
     public WXViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
       Log.d(LOG_TAG, "onCreateViewHolder");
       FrameLayout itemView = new FrameLayout(SliceTestActivity.this);
-      itemView.setLayoutParams(new RecyclerView.LayoutParams(1200,320));
+      itemView.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.WRAP_CONTENT,RecyclerView.LayoutParams.WRAP_CONTENT));
       return new WXViewHolder(itemView);
     }
 
@@ -284,12 +284,10 @@ public class SliceTestActivity extends AppCompatActivity {
 
     @Override
     public void onRefreshSuccess(WXSDKInstance instance, int width, int height) {
-
     }
 
     @Override
     public void onException(WXSDKInstance instance, String errCode, String msg) {
-
     }
   }
 }

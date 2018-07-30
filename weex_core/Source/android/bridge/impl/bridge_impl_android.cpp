@@ -48,6 +48,7 @@ static jmethodID jCallHasTransitionProsMethodId;
 static jmethodID jCallUpdateAttrsMethodId;
 static jmethodID jCallLayoutMethodId;
 static jmethodID jCallCreateFinishMethodId;
+static jmethodID jCallRenderSuccessMethodId;
 static jmethodID jCallAppendTreeCreateFinishMethodId;
 static jmethodID jCallGetMeasurementMethodId;
 
@@ -88,7 +89,7 @@ namespace WeexCore {
     jCallLayoutMethodId = NULL;
     jCallAppendTreeCreateFinishMethodId = NULL;
     jCallCreateFinishMethodId = NULL;
-
+    jCallRenderSuccessMethodId = NULL;
     jCallGetMeasurementMethodId = NULL;
   }
 
@@ -803,6 +804,31 @@ namespace WeexCore {
 
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callCreateFinish");
+    }
+
+    if (page != nullptr)
+      page->CallBridgeTime(getCurrentTime() - startTime);
+    return flag;
+  }
+
+  int Bridge_Impl_Android::callRenderSuccess(const char* pageId) {
+
+    RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
+    int64_t startTime = getCurrentTime();
+
+    JNIEnv *env = getJNIEnv();
+
+    jstring jPageId = getKeyFromCache(env, pageId);
+
+    if (jCallRenderSuccessMethodId == NULL)
+      jCallRenderSuccessMethodId = env->GetMethodID(jBridgeClazz,
+                                                             "callRenderSuccess",
+                                                             "(Ljava/lang/String;)I");
+
+    int flag = env->CallIntMethod(jThis, jCallRenderSuccessMethodId, jPageId);
+
+    if (flag == -1) {
+      LOGE("instance destroy JFM must stop callRenderSuccess");
     }
 
     if (page != nullptr)

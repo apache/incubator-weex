@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.dom;
 
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -579,5 +581,11 @@ public class WXAttr implements Map<String, Object>,Cloneable {
       wxAttr.mStatement = new WXStatement(mStatement);
     }
     return wxAttr;
+  }
+
+  @RestrictTo(Scope.LIBRARY)
+  @Override
+  public String toString() {
+    return attr.toString();
   }
 }
