@@ -147,13 +147,13 @@ void CoreSideInMultiSo::AddOption(const std::string &key,
 
     ////
     int CoreSideInMultiSo::InitFramework(const char *script,
-                                              std::vector<INIT_FRAMEWORK_PARAMS *> params) {
+                                              std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
       return core_side_functions_->init_framework(script, params);
     }
 
     int CoreSideInMultiSo::InitAppFramework(
             const char *instanceId, const char *appFramework,
-            std::vector<INIT_FRAMEWORK_PARAMS *> params) {
+            std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
       return core_side_functions_->init_app_framework(instanceId, appFramework, params);
     }
 
@@ -168,7 +168,7 @@ void CoreSideInMultiSo::AddOption(const std::string &key,
     }
 
     int CoreSideInMultiSo::CallJSOnAppContext(const char *instanceId, const char *func,
-                                                   std::vector<VALUE_WITH_TYPE *> params) {
+                                                   std::vector<VALUE_WITH_TYPE *> &params) {
       return core_side_functions_->call_js_on_app_context(instanceId, func, params);
     }
 
@@ -186,13 +186,13 @@ void CoreSideInMultiSo::AddOption(const std::string &key,
 
     int CoreSideInMultiSo::ExecJS(const char *instanceId, const char *nameSpace,
                                        const char *func,
-                                       std::vector<VALUE_WITH_TYPE *> params) {
+                                       std::vector<VALUE_WITH_TYPE *> &params) {
       return core_side_functions_->exec_js(instanceId, nameSpace, func, params);
     }
 
     WeexJSResult CoreSideInMultiSo::ExecJSWithResult(
             const char *instanceId, const char *nameSpace, const char *func,
-            std::vector<VALUE_WITH_TYPE *> params) {
+            std::vector<VALUE_WITH_TYPE *> &params) {
       return core_side_functions_->exec_js_with_result(instanceId, nameSpace, func, params);
     }
 

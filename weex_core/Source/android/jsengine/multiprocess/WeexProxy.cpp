@@ -180,6 +180,7 @@ namespace WeexCore {
     }
 
     inline void freeParams(std::vector<VALUE_WITH_TYPE *> &params) {
+        LOGE("freeParams is running and params.size = %d",params.size());
         for (auto &param : params) {
             if (param->type == ParamsType::STRING ||
                 param->type == ParamsType::JSONSTRING) {
@@ -649,7 +650,7 @@ namespace WeexCore {
 
         if (js_server_api_functions != nullptr) {
             js_server_api_functions->funcInitFramework(env->GetStringUTFChars(script, nullptr),
-                                                       std::move(initFrameworkParams));
+                                                       const_cast<std::vector<INIT_FRAMEWORK_PARAMS *> &>(initFrameworkParams));
             return true;
         } else {
             dlclose(handle);

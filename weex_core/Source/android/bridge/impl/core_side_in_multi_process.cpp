@@ -316,7 +316,7 @@ namespace WeexCore {
 
     ////
     int CoreSideInMultiProcess::InitFramework(const char *script,
-                                          std::vector<INIT_FRAMEWORK_PARAMS *> params) {
+                                          std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
         try {
             std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
             serializer->setMsg(static_cast<uint32_t>(IPCMsgFromPlatformToCore::INIT_FRAMEWORK));
@@ -342,7 +342,7 @@ namespace WeexCore {
 
     int CoreSideInMultiProcess::InitAppFramework(
             const char *instanceId, const char *appFramework,
-            std::vector<INIT_FRAMEWORK_PARAMS *> params) {
+            std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
         try {
             std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
             serializer->setMsg(static_cast<uint32_t>(IPCMsgFromPlatformToCore::INIT_APP_FRAMEWORK));
@@ -408,7 +408,7 @@ namespace WeexCore {
     }
 
     int CoreSideInMultiProcess::CallJSOnAppContext(const char *instanceId, const char *func,
-                                               std::vector<VALUE_WITH_TYPE *> params) {
+                                               std::vector<VALUE_WITH_TYPE *> &params) {
         try {
             std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
             serializer->setMsg(static_cast<uint32_t>(IPCMsgFromPlatformToCore::CALL_JS_ON_APP_CONTEXT));
@@ -485,7 +485,7 @@ namespace WeexCore {
 
     int CoreSideInMultiProcess::ExecJS(const char *instanceId, const char *nameSpace,
                                    const char *func,
-                                   std::vector<VALUE_WITH_TYPE *> params) {
+                                   std::vector<VALUE_WITH_TYPE *> &params) {
         try {
             std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
             serializer->setMsg(static_cast<uint32_t>(IPCMsgFromPlatformToCore::EXEC_JS));
@@ -534,10 +534,10 @@ namespace WeexCore {
 
     WeexJSResult CoreSideInMultiProcess::ExecJSWithResult(
             const char *instanceId, const char *nameSpace, const char *func,
-            std::vector<VALUE_WITH_TYPE *> params) {
+            std::vector<VALUE_WITH_TYPE *> &params) {
         try {
             std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-            std::vector<VALUE_WITH_TYPE *> params;
+//            std::vector<VALUE_WITH_TYPE *> params;
             serializer->setMsg(static_cast<uint32_t>(IPCMsgFromPlatformToCore::EXEC_JS_WITH_RESULT));
             serializer->add(instanceId, strlen(instanceId));
             if (nameSpace)

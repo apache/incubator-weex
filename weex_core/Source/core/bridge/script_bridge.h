@@ -95,11 +95,11 @@ class ScriptBridge {
     virtual ~ScriptSide() {}
 
     virtual int InitFramework(const char *script,
-                              std::vector<INIT_FRAMEWORK_PARAMS *> params) = 0;
+                              std::vector<INIT_FRAMEWORK_PARAMS *> &params) = 0;
 
     virtual int InitAppFramework(
         const char *instanceId, const char *appFramework,
-        std::vector<INIT_FRAMEWORK_PARAMS *> params) = 0;
+        std::vector<INIT_FRAMEWORK_PARAMS *> &params) = 0;
 
     virtual int CreateAppContext(const char *instanceId,
                                  const char *jsBundle) = 0;
@@ -108,7 +108,7 @@ class ScriptBridge {
                                         const char *jsBundle) = 0;
 
     virtual int CallJSOnAppContext(const char *instanceId, const char *func,
-                                   std::vector<VALUE_WITH_TYPE *> params) = 0;
+                                   std::vector<VALUE_WITH_TYPE *> &params) = 0;
 
     virtual int DestroyAppContext(const char *instanceId) = 0;
 
@@ -118,11 +118,11 @@ class ScriptBridge {
 
     virtual int ExecJS(const char *instanceId, const char *nameSpace,
                        const char *func,
-                       std::vector<VALUE_WITH_TYPE *> params) = 0;
+                       std::vector<VALUE_WITH_TYPE *> &params) = 0;
 
     virtual WeexJSResult ExecJSWithResult(
         const char *instanceId, const char *nameSpace, const char *func,
-        std::vector<VALUE_WITH_TYPE *> params) = 0;
+        std::vector<VALUE_WITH_TYPE *> &params) = 0;
 
     virtual int CreateInstance(const char *instanceId, const char *func,
                                const char *script, const char *opts,

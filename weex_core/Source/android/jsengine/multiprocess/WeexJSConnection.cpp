@@ -81,7 +81,6 @@ static void *newIPCServer(void *_td) {
     ThreadData *td = static_cast<ThreadData *>(_td);
     void *base = mmap(nullptr, IPCFutexPageQueue::ipc_size, PROT_READ | PROT_WRITE, MAP_SHARED,
                       td->ipcServerFd, 0);
-    LOGE("mmap222 result base is %x",base);
     if (base == MAP_FAILED) {
         int _errno = errno;
         close(td->ipcServerFd);

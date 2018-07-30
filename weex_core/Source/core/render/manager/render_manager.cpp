@@ -74,7 +74,6 @@ bool RenderManager::AddRenderObject(const std::string &page_id,
 #endif
 
   int64_t start_time = getCurrentTime();
-  LOGE("AddRenderObject %s",data);
   RenderObject *child = Wson2RenderObject(data, page_id);
   page->ParseJsonTime(getCurrentTime() - start_time);
 

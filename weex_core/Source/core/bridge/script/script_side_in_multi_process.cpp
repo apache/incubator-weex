@@ -35,7 +35,7 @@ ScriptSideInMultiProcess::ScriptSideInMultiProcess() {}
 ScriptSideInMultiProcess::~ScriptSideInMultiProcess() {}
 
 int ScriptSideInMultiProcess::InitFramework(
-    const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> params) {
+    const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
   try {
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
     serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::INITFRAMEWORK));
@@ -61,7 +61,7 @@ int ScriptSideInMultiProcess::InitFramework(
 
 int ScriptSideInMultiProcess::InitAppFramework(
     const char *instanceId, const char *appFramework,
-    std::vector<INIT_FRAMEWORK_PARAMS *> params) {
+    std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
   try {
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
     serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::INITAPPFRAMEWORK));
@@ -137,7 +137,7 @@ char *ScriptSideInMultiProcess::ExecJSOnAppWithResult(const char *instanceId,
 
 int ScriptSideInMultiProcess::CallJSOnAppContext(
     const char *instanceId, const char *func,
-    std::vector<VALUE_WITH_TYPE *> params) {
+    std::vector<VALUE_WITH_TYPE *> &params) {
   try {
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
     serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::CALLJSONAPPCONTEXT));
@@ -219,7 +219,7 @@ int ScriptSideInMultiProcess::ExecTimeCallback(const char *source) { return 0; }
 
 int ScriptSideInMultiProcess::ExecJS(const char *instanceId,
                                      const char *nameSpace, const char *func,
-                                     std::vector<VALUE_WITH_TYPE *> params) {
+                                     std::vector<VALUE_WITH_TYPE *> &params) {
   try {
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
     serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::EXECJS));
@@ -272,10 +272,10 @@ int ScriptSideInMultiProcess::ExecJS(const char *instanceId,
 
 WeexJSResult ScriptSideInMultiProcess::ExecJSWithResult(
     const char *instanceId, const char *nameSpace, const char *func,
-    std::vector<VALUE_WITH_TYPE *> params) {
+    std::vector<VALUE_WITH_TYPE *> &params) {
   try {
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-    std::vector<VALUE_WITH_TYPE *> params;
+//    std::vector<VALUE_WITH_TYPE *> params;
     serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::EXECJSWITHRESULT));
     serializer->add(instanceId, strlen(instanceId));
     if (nameSpace)

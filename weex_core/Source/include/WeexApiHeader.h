@@ -259,17 +259,17 @@ typedef struct ValueWithType {
 } VALUE_WITH_TYPE;
 
 
-typedef int (*FuncInitFramework)(const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> params);
+typedef int (*FuncInitFramework)(const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> &params);
 
 
 typedef int (*FuncInitAppFramework)(const char *instanceId, const char *appFramework,
-                                    std::vector<INIT_FRAMEWORK_PARAMS *> params);
+                                    std::vector<INIT_FRAMEWORK_PARAMS *> &params);
 
 typedef int (*FuncCreateAppContext)(const char *instanceId, const char *jsBundle);
 
 typedef char *(*FuncExeJSOnAppWithResult)(const char *instanceId, const char *jsBundle);
 
-typedef int (*FuncCallJSOnAppContext)(const char *instanceId, const char *func, std::vector<VALUE_WITH_TYPE *> params);
+typedef int (*FuncCallJSOnAppContext)(const char *instanceId, const char *func, std::vector<VALUE_WITH_TYPE *> &params);
 
 typedef int (*FuncDestroyAppContext)(const char *instanceId);
 
@@ -278,10 +278,10 @@ typedef int (*FuncExeJsService)(const char *source);
 typedef int (*FuncExeCTimeCallback)(const char *source);
 
 typedef int (*FuncExeJS)(const char *instanceId, const char *nameSpace, const char *func,
-                         std::vector<VALUE_WITH_TYPE *> params);
+                         std::vector<VALUE_WITH_TYPE *> &params);
 
 typedef WeexJSResult(*FuncExeJSWithResult)(const char *instanceId, const char *nameSpace, const char *func,
-                                           std::vector<VALUE_WITH_TYPE *> params);
+                                           std::vector<VALUE_WITH_TYPE *> &params);
 
 typedef int (*FuncCreateInstance)(const char *instanceId, const char *func, const char *script, const char *opts,
                                   const char *initData, const char *extendsApi);

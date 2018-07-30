@@ -301,7 +301,7 @@ void CoreSideInSimple::AddOption(const std::string &key,
 }
 
 int CoreSideInSimple::InitFramework(
-    const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> params) {
+    const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
   if (WeexCoreManager::getInstance()->project_mode() ==
       WeexCoreManager::ProjectMode::MULTI_PROCESS) {
     WeexCoreManager::getInstance()->set_script_bridge(
@@ -318,7 +318,7 @@ int CoreSideInSimple::InitFramework(
 
 int CoreSideInSimple::InitAppFramework(
     const char *instanceId, const char *appFramework,
-    std::vector<INIT_FRAMEWORK_PARAMS *> params) {
+    std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
   return WeexCoreManager::getInstance()
       ->script_bridge()
       ->script_side()
@@ -343,7 +343,7 @@ const char *CoreSideInSimple::ExecJSOnAppWithResult(const char *instanceId,
 
 int CoreSideInSimple::CallJSOnAppContext(
     const char *instanceId, const char *func,
-    std::vector<VALUE_WITH_TYPE *> params) {
+    std::vector<VALUE_WITH_TYPE *> &params) {
   return WeexCoreManager::getInstance()
       ->script_bridge()
       ->script_side()
@@ -373,14 +373,14 @@ int CoreSideInSimple::ExecTimeCallback(const char *source) {
 
 int CoreSideInSimple::ExecJS(const char *instanceId, const char *nameSpace,
                              const char *func,
-                             std::vector<VALUE_WITH_TYPE *> params) {
+                             std::vector<VALUE_WITH_TYPE *> &params) {
   return WeexCoreManager::getInstance()->script_bridge()->script_side()->ExecJS(
       instanceId, nameSpace, func, params);
 }
 
 WeexJSResult CoreSideInSimple::ExecJSWithResult(
     const char *instanceId, const char *nameSpace, const char *func,
-    std::vector<VALUE_WITH_TYPE *> params) {
+    std::vector<VALUE_WITH_TYPE *> &params) {
   return WeexCoreManager::getInstance()
       ->script_bridge()
       ->script_side()
