@@ -70,13 +70,10 @@ static Value Merge(ExecState* exec_state) {
   if (!IsTable(lvalue) || !IsTable(rvalue)) {
     return Value();
   }
-  Table* l_table = TableValue(lvalue);
-  Table* r_table = TableValue(rvalue);
-  Value* new_value = exec_state->getTableFactory()->CreateTable();
-  Table* new_table = TableValue(new_value);
-  new_table->map->insert(r_table->map->begin(), r_table->map->end());
-  new_table->map->insert(l_table->map->begin(), l_table->map->end());
-  return Value(*new_value);
+  Value new_value = exec_state->getTableFactory()->CreateTable();
+  TableMapAddAll(*lvalue, new_value);
+  TableMapAddAll(*rvalue, new_value);
+  return new_value;
 }
 
 static Value ToString(ExecState* exec_state) {
@@ -107,20 +104,18 @@ static Value Slice(ExecState* exec_state) {
   if (!IsTable(table) || !IsInt(start) || !IsInt(end)) {
     return Value();
   }
-  Table* p_table = TableValue(table);
   unsigned int v_start = static_cast<unsigned int>(IntValue(start));
   unsigned int v_end = static_cast<unsigned int>(IntValue(end));
-  if (v_end > p_table->array->size()) {
-    v_end = p_table->array->size();
+  size_t size = GetValueArraySize(*table);
+  if (v_end > size) {
+    v_end = size;
   }
   if (v_start > v_end) {
     v_start = v_end;
   }
-  Value* new_value = exec_state->getTableFactory()->CreateTable();
-  Table* new_table = TableValue(new_value);
-  new_table->array->insert(new_table->array->end(),
-                           p_table->array->begin() + v_start, p_table->array->begin() + v_end);
-  return Value(*new_value);
+  Value new_value = exec_state->getTableFactory()->CreateTable();
+  TableArrayAddAll(*table, new_value, v_start, v_end);
+  return new_value;
 }
 
 static Value AppendUrlParam(ExecState* exec_state) {
@@ -268,26 +263,26 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     String* p_str = state->string_table()->StringFromUTF8(json.string_value());
     return Value(p_str);
   } else if (json.is_array()) {
-    Value* value = state->getTableFactory()->CreateTable();
+    Value value = state->getTableFactory()->CreateTable();
     const json11::Json::array& data_objects = json.array_items();
     int64_t array_size = data_objects.size();
     for (int64_t index = 0; index < array_size; index++) {
       // will be free by table
       Value key(index);
       Value val(ParseJson2Value(state, json[index]));
-      SetTabValue(TableValue(value), &key, val);
+      SetTabValue(TableValue(&value), &key, val);
     }
-    return Value(*value);
+    return value;
   } else if (json.is_object()) {
-    Value* value = state->getTableFactory()->CreateTable();
+    Value value = state->getTableFactory()->CreateTable();
     const json11::Json::object& data_objects = json.object_items();
     for (auto it = data_objects.begin(); it != data_objects.end(); it++) {
       // will be free by table
       Value key(state->string_table()->StringFromUTF8(it->first));
       Value val(ParseJson2Value(state, it->second));
-      SetTabValue(TableValue(value), &key, val);
+      SetTabValue(TableValue(&value), &key, val);
     }
-    return Value(*value);
+    return value;
   } else {
     return Value();
   }
@@ -339,7 +334,7 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   const json11::Json& data = json["data"];
   Value value = ParseJson2Value(state, data);
   if (value.type != Value::Type::TABLE) {
-    value = *(state->getTableFactory()->CreateTable());
+    value = state->getTableFactory()->CreateTable();
   }
   global->Add("_data_main", value);
 }
@@ -350,14 +345,14 @@ void VNodeExecEnv::InitInitDataValue(ExecState* state,
   const json11::Json& json = json11::Json::parse(init_data_str, err);
   if (!err.empty()) {
     LOGE("error parsing init data");
-    Value value = *(state->getTableFactory()->CreateTable());
+    Value value = state->getTableFactory()->CreateTable();
     state->global()->Set("_init_data", value);
     return;
   }
 
   Value value = ParseJson2Value(state, json);
   if (value.type != Value::Type::TABLE) {
-    value = *(state->getTableFactory()->CreateTable());
+    value = state->getTableFactory()->CreateTable();
   }
   state->global()->Set("_init_data", value);
 }

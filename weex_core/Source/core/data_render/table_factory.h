@@ -34,7 +34,7 @@ class TableFactory {
 
  public:
 
-  virtual Value *CreateTable();
+  virtual Value CreateTable();
 
   ~TableFactory();
 
@@ -42,7 +42,7 @@ class TableFactory {
 
  private:
 
-  std::vector<Value *> tablePool;
+  std::vector<Table *> tablePool;
 
 };
 

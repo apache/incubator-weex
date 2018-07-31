@@ -373,6 +373,22 @@ inline int ToBool(const Value *o, bool &b) {
   return 1;
 }
 
+inline void TableArrayAddAll(Value &src, Value &dest, int start, int end) {
+  Table *st = TableValue(&src);
+  Table *dt = TableValue(&dest);
+  st->array->insert(st->array->end(), dt->array->begin() + start, end > 0 ? dt->array->begin() + end : dt->array->end());
+}
+
+inline void TableArrayAddAll(Value &src, Value &dest) {
+  TableArrayAddAll(src, dest, 0, 0);
+}
+
+inline void TableMapAddAll(Value &src, Value &dest) {
+  Table *st = TableValue(&src);
+  Table *dt = TableValue(&dest);
+  st->map->insert(dt->map->begin(), dt->map->end());
+}
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

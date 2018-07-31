@@ -334,8 +334,8 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
 
       case OP_NEWTABLE: {
         a = frame.reg + GET_ARG_A(instruction);
-        Value* t = exec_state->getTableFactory()->CreateTable();
-        *a = *t;
+        Value t = exec_state->getTableFactory()->CreateTable();
+        *a = t;
       }
         break;
 

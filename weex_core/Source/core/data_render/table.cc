@@ -88,8 +88,8 @@ Table *NewTable() {
   if (nullptr == t) {
     return nullptr;
   }
-  t->array = new std::vector<Value>();
-  t->map = new std::unordered_map<std::string, Value>();
+//  t->array = new std::vector<Value>();
+//  t->map = new std::unordered_map<std::string, Value>();
   return t;
 }
 
@@ -116,16 +116,32 @@ int SetTabValue(Table *t, Value *key, const Value &val) {
   return 0;
 }
 
-int GetTableSize(Table *t) {
-  if (!t) {
+size_t GetTableSize(Table *t) {
+  size_t a_size = GetArraySize(t);
+  size_t m_size = GetMapSize(t);
+  return a_size > m_size ? a_size : m_size;
+}
+
+size_t GetArraySize(Table *t) {
+  if (nullptr == t) {
+    return 0;
+  }
+  return t->array->size();
+}
+
+size_t GetMapSize(Table *t) {
+  if (nullptr == t) {
     return -1;
   }
-  int size = t->array->size();
-  if (size > 0) {
-    return size;
-  } else {
-    return t->map->size();
-  }
+  return t->map->size();
+}
+
+size_t GetValueArraySize(Value &o) {
+  return GetArraySize(TableValue(&o));
+}
+
+size_t GetValueMapSize(Value &o) {
+  return GetMapSize(TableValue(&o));
 }
 
 }  // namespace data_render

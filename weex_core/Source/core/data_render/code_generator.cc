@@ -393,9 +393,9 @@ void CodeGenerator::Visit(ObjectConstant* node, void* data) {
   FuncState* func_state = cur_func_->func_state();
 
   // new table
-  Value* table = exec_state_->getTableFactory()->CreateTable();
+  Value table = exec_state_->getTableFactory()->CreateTable();
   if (ret >= 0) {
-    int tableIndex = func_state->AddConstant(*table);
+    int tableIndex = func_state->AddConstant(table);
     Instruction i = CREATE_ABx(OpCode::OP_LOADK, ret, tableIndex);
     func_state->AddInstruction(i);
 
@@ -425,9 +425,9 @@ void CodeGenerator::Visit(ArrayConstant* node, void* data) {
   FuncState* func_state = cur_func_->func_state();
 
   // new table
-  Value* table = exec_state_->getTableFactory()->CreateTable();
+  Value table = exec_state_->getTableFactory()->CreateTable();
   if (reg >= 0) {
-    int tableIndex = func_state->AddConstant(*table);
+    int tableIndex = func_state->AddConstant(table);
     Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, tableIndex);
     func_state->AddInstruction(i);
 

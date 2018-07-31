@@ -34,7 +34,15 @@ Value *GetTabValue(const Table *, const Value &);
 
 int SetTabValue(Table *, Value *, const Value &);
 
-int GetTableSize(Table *);
+size_t GetTableSize(Table *);
+
+size_t GetArraySize(Table *);
+
+size_t GetMapSize(Table *);
+
+size_t GetValueArraySize(Value &);
+
+size_t GetValueMapSize(Value &);
 
 }  // namespace data_render
 }  // namespace core
