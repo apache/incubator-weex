@@ -438,7 +438,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void setRootScrollView(ScrollView scrollView) {
     mScrollView = scrollView;
-    if (mWXScrollViewListener != null) {
+    if (mWXScrollViewListener != null && mScrollView instanceof WXScrollView) {
       ((WXScrollView) mScrollView).addScrollViewListener(mWXScrollViewListener);
     }
   }
