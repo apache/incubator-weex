@@ -58,6 +58,13 @@ public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends Recyc
   }
 
   @Override
+  public void onViewDetachedFromWindow(T holder) {
+    super.onViewDetachedFromWindow(holder);
+    if (holder != null)
+      holder.setComponentUsing(false);
+  }
+
+  @Override
   public void onBindViewHolder(T viewHolder, int i) {
     if (iRecyclerAdapterListener != null) {
       iRecyclerAdapterListener.onBindViewHolder(viewHolder, i);
