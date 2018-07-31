@@ -40,6 +40,7 @@
 #include "core/render/node/factory/render_type.h"
 #include "core/render/node/factory/render_creator.h"
 #include "core/config/core_environment.h"
+#include "core/data_render/vnode/vnode_render_manager.h"
 #include "base/TimeUtils.h"
 
 #import <objc/runtime.h>
@@ -666,6 +667,18 @@ static WeexCore::JSBridge* jsBridge = nullptr;
         WeexCore::WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(new WeexCore::WXCoreMeasureFunctionBridge());
     });
 }
+
++ (void)createInstance:(NSString *)pageId
+              template:(NSString *)jsBundleString
+               options:(NSDictionary *)options
+                  data:(id)data
+{
+    auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+    NSString *optionsString = [WXUtility JSONString:options];
+    
+    node_manager->CreatePage([jsBundleString UTF8String], [pageId UTF8String], [optionsString UTF8String]);
+}
+
 
 + (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
                  isWidthWrapContent:(BOOL)isWidthWrapContent
