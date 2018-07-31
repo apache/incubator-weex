@@ -66,11 +66,11 @@ namespace WeexCore {
 
     bool SetDeviceHeight(const std::string &height);
 
-    const float &DeviceWidth();
+    const float DeviceWidth();
 
-    const float &DeviceHeight();
+    const float DeviceHeight();
 
-    const std::string &GetOption(const std::string &key);
+    const std::string GetOption(const std::string &key);
 
     void AddOption(std::string key, std::string value);
 

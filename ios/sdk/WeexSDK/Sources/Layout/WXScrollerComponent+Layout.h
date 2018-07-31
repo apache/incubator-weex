@@ -23,16 +23,22 @@
 
 @interface WXScrollerComponent ()
 {
+#ifdef WX_IMPORT_WEEXCORE
+#else
 #ifdef __cplusplus
     WeexCore::WXCoreLayoutNode *_flexScrollerCSSNode;
+#endif
 #endif
 }
 @end
 
 @interface WXScrollerComponent (FlexLayout)
 
+#ifdef WX_IMPORT_WEEXCORE
+#else
 #ifdef __cplusplus
 @property (nonatomic, readonly, assign) WeexCore::WXCoreLayoutNode *flexScrollerCSSNode;
+#endif
 #endif
 
 @end

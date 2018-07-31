@@ -39,6 +39,8 @@
 
 @synthesize weexInstance;
 
+#ifdef WX_IMPORT_WEEXCORE
+#else
 WX_EXPORT_METHOD(@selector(createBody:))
 WX_EXPORT_METHOD(@selector(addElement:element:atIndex:))
 WX_EXPORT_METHOD(@selector(removeElement:))
@@ -46,11 +48,15 @@ WX_EXPORT_METHOD(@selector(moveElement:parentRef:index:))
 WX_EXPORT_METHOD(@selector(addEvent:event:))
 WX_EXPORT_METHOD(@selector(removeEvent:event:))
 WX_EXPORT_METHOD(@selector(createFinish))
+#endif
 WX_EXPORT_METHOD(@selector(updateFinish))
 WX_EXPORT_METHOD(@selector(refreshFinish))
 WX_EXPORT_METHOD(@selector(scrollToElement:options:))
+#ifdef WX_IMPORT_WEEXCORE
+#else
 WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
+#endif
 WX_EXPORT_METHOD(@selector(addRule:rule:))
 WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
@@ -71,6 +77,7 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
         block(manager);
     });
 }
+
 - (void)performSelectorOnRuleManager:(void(^)(void))block{
     if (!block) {
         return;
@@ -85,6 +92,8 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     return [WXComponentManager componentThread];
 }
 
+#ifdef WX_IMPORT_WEEXCORE
+#else
 - (void)createBody:(NSDictionary *)body
 {
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
@@ -136,6 +145,8 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:nil className:nil name:@"dom" phase:WXTracingEnd functionName:@"createFinish" options:nil];
 }
 
+#endif
+
 - (void)updateFinish
 {
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
@@ -157,6 +168,8 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     }];
 }
 
+#ifdef WX_IMPORT_WEEXCORE
+#else
 -(void)updateStyle:(NSString *)elemRef styles:(NSDictionary *)styles
 {
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
@@ -170,6 +183,7 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
         [manager updateAttributes:attrs forComponent:elemRef];
     }];
 }
+#endif
 
 - (void)addRule:(NSString*)type rule:(NSDictionary *)rule {
     if ([WXUtility isBlankString:type] || ![rule count]) {

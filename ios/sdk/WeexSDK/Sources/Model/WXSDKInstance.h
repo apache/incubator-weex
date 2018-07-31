@@ -39,11 +39,14 @@ extern NSString *const bundleUrlOptionKey;
  **/
 @property (nonatomic, strong) UIView *rootView;
 
+#ifdef WX_IMPORT_WEEXCORE
+#else
 /**
  * Component can freeze the rootview frame through the variable isRootViewFrozen
  * If Component want to freeze the rootview frame, set isRootViewFrozen YES, weex will not change the rootview frame when layout,or set NO.
  **/
 @property (nonatomic, assign) BOOL isRootViewFrozen;
+#endif
 
 /**
  * Which indicates current instance needs to be validated or not to load,default value is false.

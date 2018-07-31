@@ -5,6 +5,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 #add_compile_options(-std=c++11)
 add_compile_options(-fexceptions)
 
+
 add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
 add_definitions(-DDEBUG=1)
@@ -111,7 +112,7 @@ if (ANDROID)
 
 
     ./android/jsengine/api/WeexJSCoreApi.cpp
-     
+
 
   )
   SET(FINAL_ADD_LIBRARY
@@ -129,6 +130,12 @@ if (ANDROID)
           )
 
 endif (ANDROID)
+
+##if(iOS)
+  add_definitions(-DTARGET_OS_IPHONE=1)
+
+##endif(iOS)
+
 
 add_library(${WEEXCORE_LIBRARY_NAME} SHARED ${FINAL_ADD_LIBRARY})
 target_include_directories(${WEEXCORE_LIBRARY_NAME} PUBLIC .)

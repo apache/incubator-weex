@@ -52,6 +52,10 @@
 #import "WXSDKInstance_performance.h"
 #import "WXPageEventNotifyEvent.h"
 
+#ifdef WX_IMPORT_WEEXCORE
+#import "WXCoreBridge.h"
+#endif
+
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
 NSTimeInterval JSLibInitTime = 0;
@@ -148,7 +152,7 @@ typedef enum : NSUInteger {
         _instanceJavaScriptContext = nil;
     }
     
-    _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
+    _instanceJavaScriptContext = [[bridgeClass alloc] init];
     if(!_debugJS) {
         id<WXBridgeProtocol> jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"bridgeCtx.jsBridge"];
         JSContext* globalContex = jsBridge.javaScriptContext;
@@ -203,6 +207,16 @@ typedef enum : NSUInteger {
             }
         });
     }
+}
+
+- (void)setViewportWidth:(CGFloat)viewportWidth
+{
+    _viewportWidth = viewportWidth;
+    
+#ifdef WX_IMPORT_WEEXCORE
+    // notify weex core
+    [WXCoreBridge setViewportWidth:_instanceId width:viewportWidth];
+#endif
 }
 
 - (void)renderWithURL:(NSURL *)url

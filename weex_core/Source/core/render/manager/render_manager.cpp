@@ -49,7 +49,7 @@ bool RenderManager::CreatePage(std::string page_id, const char *data) {
   std::map<std::string, float>::iterator iter =
       this->viewports_.find(page_id);
   if (iter != this->viewports_.end()) {
-    RenderManager::GetInstance()->set_viewport_width(page_id, iter->second);
+    this->set_viewport_width(page_id, iter->second);
     this->viewports_.erase(page_id);
   }
 
@@ -103,6 +103,16 @@ bool RenderManager::AddRenderObject(const std::string &page_id,
 
   if (child == nullptr) return false;
 
+  page->set_is_dirty(true);
+  return page->AddRenderObject(parent_ref, index, child);
+}
+    
+bool RenderManager::AddRenderObject(const std::string &page_id,
+                                    const std::string &parent_ref, int index,
+                                    RenderObject *child) {
+  RenderPage *page = GetPage(page_id);
+  if (page == nullptr) return false;
+  if (child == nullptr) return false;
   page->set_is_dirty(true);
   return page->AddRenderObject(parent_ref, index, child);
 }
@@ -324,6 +334,7 @@ bool RenderManager::ClosePage(const std::string &page_id) {
   this->pages_.erase(page_id);
   delete page;
   page = nullptr;
+  return false;
 }
 
 float RenderManager::viewport_width(const std::string &page_id) {

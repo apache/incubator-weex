@@ -23,8 +23,8 @@
 #include <core/render/node/render_object.h>
 
 namespace WeexCore {
-    void Bridge::setStyleWidth(const char *instanceId, const char *ref, float value) {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
+    void Bridge::setStyleWidth(const char *pageId, const char *ref, float value) {
+        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(pageId));
         if (page == nullptr)
             return;
 
@@ -37,8 +37,8 @@ namespace WeexCore {
         page->set_is_dirty(true);
     }
 
-    void Bridge::setStyleHeight(const char *instanceId, const char *ref, float value) {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
+    void Bridge::setStyleHeight(const char *pageId, const char *ref, float value) {
+        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(pageId));
         if (page == nullptr)
             return;
 
@@ -52,8 +52,8 @@ namespace WeexCore {
     }
 
 
-    void Bridge::setMargin(const char *instanceId, const char *ref, int32_t edge, float value) {
-         RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
+    void Bridge::setMargin(const char *pageId, const char *ref, int32_t edge, float value) {
+         RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(pageId));
          if (page == nullptr)
            return;
 
@@ -75,8 +75,8 @@ namespace WeexCore {
          page->set_is_dirty(true);
     }
 
-    void Bridge::setPadding(const char *instanceId, const char *ref, int32_t edge, float value) {
-         RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
+    void Bridge::setPadding(const char *pageId, const char *ref, int32_t edge, float value) {
+         RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(pageId));
          if (page == nullptr)
            return;
 
@@ -98,8 +98,8 @@ namespace WeexCore {
          page->set_is_dirty(true);
     }
 
-    void Bridge::setPosition(const char *instanceId, const char *ref, int32_t edge, float value) {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
+    void Bridge::setPosition(const char *pageId, const char *ref, int32_t edge, float value) {
+        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(pageId));
         if (page == nullptr)
             return;
 
@@ -119,8 +119,8 @@ namespace WeexCore {
         page->set_is_dirty(true);
     }
 
-    void Bridge::markDirty(const char *instanceId, const char *ref, bool dirty) {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
+    void Bridge::markDirty(const char *pageId, const char *ref, bool dirty) {
+        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(pageId));
         if (page == nullptr)
             return;
 
@@ -132,10 +132,10 @@ namespace WeexCore {
         }
     }
 
-    void Bridge::setDefaultHeightAndWidthIntoRootDom(const char *instanceId, const float defaultWidth,
+    void Bridge::setDefaultHeightAndWidthIntoRootDom(const char *pageId, const float defaultWidth,
                                                      const float defaultHeight,
                                                      const bool isWidthWrapContent, const bool isHeightWrapContent) {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
+        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(pageId));
         if (page == nullptr) {
             return;
         }
@@ -148,8 +148,8 @@ namespace WeexCore {
                                                      isHeightWrapContent);
     }
 
-    void Bridge::setRenderContainerWrapContent(const char *instanceId, bool wrap) {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
+    void Bridge::setRenderContainerWrapContent(const char *pageId, bool wrap) {
+        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(pageId));
         if (page == nullptr)
             return;
 
@@ -157,20 +157,20 @@ namespace WeexCore {
 
     }
 
-    void Bridge::forceLayout(const char *instanceId) {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
+    void Bridge::forceLayout(const char *pageId) {
+        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(pageId));
         if (page != nullptr) {
 
 #if RENDER_LOG
-            LOGD("[JNI] ForceLayout >>>> pageId: %s, needForceLayout: %s", jString2StrFast(env, instanceId).c_str(), page->hasForeLayoutAction.load()?"true":"false");
+            LOGD("[JNI] ForceLayout >>>> pageId: %s, needForceLayout: %s", jString2StrFast(env, pageId).c_str(), page->hasForeLayoutAction.load()?"true":"false");
 #endif
             page->LayoutImmediately();
             page->has_fore_layout_action_.store(false);
         }
     }
 
-    bool Bridge::notifyLayout(const char *instanceId) {
-        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(instanceId));
+    bool Bridge::notifyLayout(const char *pageId) {
+        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(pageId));
         if (page != nullptr) {
 
             if (!page->need_layout_.load()) {
@@ -181,10 +181,23 @@ namespace WeexCore {
             if (ret) {
                 page->has_fore_layout_action_.store(true);
             }
+            return ret;
         }
+        return false;
     }
 
-    void Bridge::onInstanceClose(const char *instanceId) {
-        RenderManager::GetInstance()->ClosePage(std::string(instanceId));
+    void Bridge::onInstanceClose(const char *pageId) {
+        RenderManager::GetInstance()->ClosePage(std::string(pageId));
+    }
+
+    void Bridge::setViewportWidth(const char* pageId, float value) {
+        RenderManager::GetInstance()->set_viewport_width(pageId, value);
+    }
+    
+    void Bridge::setPageDirty(const char* pageId) {
+        RenderPage *page = RenderManager::GetInstance()->GetPage(std::string(pageId));
+        if (page != nullptr) {
+            page->set_is_dirty(true);
+        }
     }
 }

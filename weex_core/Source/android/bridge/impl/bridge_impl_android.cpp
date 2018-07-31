@@ -754,8 +754,8 @@ namespace WeexCore {
   }
 
   int Bridge_Impl_Android::callLayout(const char* pageId, const char* ref,
-                                      int top, int bottom, int left, int right,
-                                      int height, int width, int index) {
+                                      float top, float bottom, float left, float right,
+                                      float height, float width, int index) {
 
     RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
     int64_t startTime = getCurrentTime();
@@ -772,7 +772,7 @@ namespace WeexCore {
 
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallLayoutMethodId, jPageId,
-                              jRef, top, bottom, left, right, height, width, index);
+                              jRef, (int)top, (int)bottom, (int)left, (int)right, (int)height, (int)width, index);
 
     env->DeleteLocalRef(jPageId);
     env->DeleteLocalRef(jRef);

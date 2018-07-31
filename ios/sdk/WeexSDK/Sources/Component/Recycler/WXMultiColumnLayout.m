@@ -22,7 +22,9 @@
 #import "WXUtility.h"
 #import "WXAssert.h"
 
-void computeColumnWidthAndCount(float availableWidth, WXLength *columnCount, WXLength *columnWidth, float columnGap, int *N, float *W)
+#ifdef WX_IMPORT_WEEXCORE
+#else
+static void computeColumnWidthAndCount(float availableWidth, WXLength *columnCount, WXLength *columnWidth, float columnGap, int *N, float *W)
 {
     /* Pseudo-algorithm according to
      * https://www.w3.org/TR/css3-multicol/
@@ -49,6 +51,7 @@ void computeColumnWidthAndCount(float availableWidth, WXLength *columnCount, WXL
         *W = ((availableWidth + columnGap) / *N) - columnGap;
     }
 }
+#endif
 
 NSString * const kCollectionSupplementaryViewKindHeader = @"WXCollectionSupplementaryViewKindHeader";
 NSString * const kMultiColumnLayoutHeader = @"WXMultiColumnLayoutHeader";
@@ -138,20 +141,30 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 
 - (CGFloat)computedColumnWidth
 {
+#ifdef WX_IMPORT_WEEXCORE
+    WXAssert([_columnWidth isFixed], @"column width must be calculated by core.");
+    return _columnWidth.floatValue;
+#else
     if (!_computedColumnWidth && !_computedColumnCount) {
         [self _computeColumnWidthAndCount];
     }
     
     return _computedColumnWidth;
+#endif
 }
 
 - (int)computedColumnCount
 {
+#ifdef WX_IMPORT_WEEXCORE
+    WXAssert([_columnCount isFixed], @"column count must be calculated by core.");
+    return _columnCount.intValue;
+#else
     if (!_computedColumnWidth && !_computedColumnCount) {
         [self _computeColumnWidthAndCount];
     }
     
     return _computedColumnCount;
+#endif
 }
 
 - (CGFloat)computedHeaderWidth
@@ -359,10 +372,13 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 
 - (void)_computeColumnWidthAndCount
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
     UIEdgeInsets insets = [self.delegate collectionView:self.collectionView insetForLayout:self];
     
     int columnCount;
-    float columnWidth ;
+    float columnWidth;
     float availableWidth = self.contentWidth - (insets.left + insets.right+_leftGap + _rightGap);
     
     computeColumnWidthAndCount(availableWidth, self.columnCount, self.columnWidth, self.columnGap, &columnCount, &columnWidth);
@@ -374,6 +390,7 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     
     _computedColumnWidth = columnWidth;
     _computedColumnCount = columnCount;
+#endif
 }
 
 - (CGFloat)_maxHeightForAllColumns
@@ -430,6 +447,5 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     
     [self _cleanComputed];
 }
-
 
 @end

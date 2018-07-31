@@ -569,16 +569,4 @@ do {\
     return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha(_backgroundColor.CGColor) == 1.0 && [self _needsDrawBorder];
 }
 
-#pragma mark - Deprecated
-
-- (WXDisplayBlock)displayBlock
-{
-    return [self _displayBlock];
-}
-
-- (WXDisplayCompletionBlock)displayCompletionBlock
-{
-    return [self _displayCompletionBlock];
-}
-
 @end

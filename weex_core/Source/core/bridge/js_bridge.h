@@ -20,12 +20,20 @@
 #ifndef WEEXCORE_JS_BRIDGE_H
 #define WEEXCORE_JS_BRIDGE_H
 
+#include <cstdint>
+#include <string>
+#include <map>
+#include "wx_type_define.h"
+#include <wson/wson.h>
+
 namespace WeexCore {
+  
+    
     class JSBridge {
     public:
         JSBridge(){};
 
-        ~JSBridge(){};
+        virtual ~JSBridge(){};
 
     public:
 
@@ -73,6 +81,9 @@ namespace WeexCore {
         int onSetInterval(const char *pageId, const char *callbackId, const char *_time);
 
         void onClearInterval(const char *pageId, const char *callbackId);
+
+
+
     };
 }
 

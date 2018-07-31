@@ -40,7 +40,9 @@
 #import "WXRootView.h"
 #import "WXComponent+Layout.h"
 
-
+#ifdef WX_IMPORT_WEEXCORE
+#import "WXCoreBridge.h"
+#endif
 
 static NSThread *WXComponentThread;
 
@@ -62,7 +64,10 @@ static NSThread *WXComponentThread;
 
     WXComponent *_rootComponent;
     NSMutableArray *_fixedComponents;
+#ifdef WX_IMPORT_WEEXCORE
+#else
     WeexCore::WXCoreLayoutNode* _rootFlexCSSNode;
+#endif
     CADisplayLink *_displayLink;
     pthread_mutex_t _propertyMutex;
     pthread_mutexattr_t _propertMutexAttr;
@@ -98,6 +103,8 @@ static NSThread *WXComponentThread;
 
 - (void)dealloc
 {
+#ifdef WX_IMPORT_WEEXCORE
+#else
     if(_rootFlexCSSNode){
         if ([[NSThread currentThread].name isEqualToString:WX_COMPONENT_THREAD_NAME]) {
             delete _rootFlexCSSNode;
@@ -106,6 +113,7 @@ static NSThread *WXComponentThread;
         }
         _rootFlexCSSNode=nullptr;
     }
+#endif
     [NSMutableArray wx_releaseArray:_fixedComponents];
     pthread_mutex_destroy(&_propertyMutex);
     pthread_mutexattr_destroy(&_propertMutexAttr);
@@ -174,6 +182,12 @@ static NSThread *WXComponentThread;
 - (void)rootViewFrameDidChange:(CGRect)frame
 {
     WXAssertComponentThread();
+#ifdef WX_IMPORT_WEEXCORE
+    CGSize size = _weexInstance.frame.size;
+    [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId
+                                        width:size.width height:size.height
+                           isWidthWrapContent:NO isHeightWrapContent:NO];
+#else
         if (_rootFlexCSSNode) {
             [self _applyRootFrame:frame];
             if (!_rootComponent.styles[@"width"]) {
@@ -184,14 +198,19 @@ static NSThread *WXComponentThread;
             }
         }
     [_rootComponent setNeedsLayout];
+#endif
     [self startComponentTasks];
 }
 
 - (void)_applyRootFrame:(CGRect)rootFrame{
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
     _rootFlexCSSNode->setStylePosition(WeexCore::kPositionEdgeLeft, self.weexInstance.frame.origin.x);
     _rootFlexCSSNode->setStylePosition(WeexCore::kPositionEdgeTop, self.weexInstance.frame.origin.y);
     _rootFlexCSSNode->setStyleWidth(self.weexInstance.frame.size.width ?: FlexUndefined,NO);
     _rootFlexCSSNode->setStyleHeight(self.weexInstance.frame.size.height ?: FlexUndefined);
+#endif
 }
 
 - (void)_addUITask:(void (^)(void))block
@@ -223,12 +242,15 @@ static NSThread *WXComponentThread;
 
 #pragma mark Component Tree Building
 
+#ifdef WX_IMPORT_WEEXCORE
+#else
+
 - (void)createRoot:(NSDictionary *)data
 {
     WXAssertComponentThread();
     WXAssertParam(data);
     
-    _rootComponent = [self _buildComponentForData:data supercomponent:nil];
+    _rootComponent = [self _buildComponentForData:data supercomponent:nil renderObject:nullptr];
         [self _initRootFlexCssNode];
         _rootFlexCSSNode->addChildAt(_rootComponent.flexCssNode, (uint32_t)[_fixedComponents count]);
     
@@ -273,7 +295,7 @@ static NSThread *WXComponentThread;
 
 - (void)_recursivelyAddComponent:(NSDictionary *)componentData toSupercomponent:(WXComponent *)supercomponent atIndex:(NSInteger)index appendingInTree:(BOOL)appendingInTree
 {
-    WXComponent *component = [self _buildComponentForData:componentData supercomponent:supercomponent];
+    WXComponent *component = [self _buildComponentForData:componentData supercomponent:supercomponent renderObject:nullptr];
     if (!supercomponent.subcomponents) {
         index = 0;
     } else {
@@ -328,6 +350,8 @@ static NSThread *WXComponentThread;
     }
 }
 
+#endif
+
 - (void)moveComponent:(NSString *)ref toSuper:(NSString *)superRef atIndex:(NSInteger)index
 {
     WXAssertComponentThread();
@@ -348,9 +372,14 @@ static NSThread *WXComponentThread;
     [component _moveToSupercomponent:newSupercomponent atIndex:index];
     __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
-        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
+        __strong typeof(self) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        
+        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
         [component moveToSuperview:newSupercomponent atIndex:index];
-        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
+        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
     }];
 }
 
@@ -373,7 +402,12 @@ static NSThread *WXComponentThread;
     
     __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
-        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTUIThread}];
+        __strong typeof(self) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        
+        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTUIThread}];
         if (component.supercomponent) {
             [component.supercomponent willRemoveSubview:component];
         }
@@ -435,7 +469,70 @@ static NSThread *WXComponentThread;
     return _indexDict.count;
 }
 
+#ifdef WX_IMPORT_WEEXCORE
+- (WXComponent *)_buildComponent:(NSString *)ref
+                            type:(NSString*)type
+                  supercomponent:(WXComponent *)supercomponent
+                          styles:(NSDictionary*)styles
+                      attributes:(NSDictionary*)attributes
+                          events:(NSArray*)events
+                    renderObject:(void*)renderObject
+{
+    double buildStartTime = CACurrentMediaTime()*1000;
+    
+    if (self.weexInstance.needValidate) {
+        id<WXValidateProtocol> validateHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)];
+        if (validateHandler) {
+            WXComponentValidateResult* validateResult;
+            if ([validateHandler respondsToSelector:@selector(validateWithWXSDKInstance:component:supercomponent:)]) {
+                validateResult = [validateHandler validateWithWXSDKInstance:self.weexInstance component:type supercomponent:supercomponent];
+            }
+            if (validateResult==nil || !validateResult.isSuccess) {
+                type = validateResult.replacedComponent? validateResult.replacedComponent : @"div";
+                WXLogError(@"%@",[validateResult.error.userInfo objectForKey:@"errorMsg"]);
+            }
+        }
+    }
+    
+    WXComponentConfig *config = [WXComponentFactory configWithComponentName:type];
+    BOOL isTemplate = [config.properties[@"isTemplate"] boolValue] || (supercomponent && supercomponent->_isTemplate);
+    NSDictionary *bindingStyles = nil;
+    NSDictionary *bindingAttibutes = nil;
+    NSDictionary *bindingEvents = nil;
+    NSDictionary *bindingProps = nil;
+    if (isTemplate) {
+        bindingProps = [self _extractBindingProps:&attributes];
+        bindingStyles = [self _extractBindings:&styles];
+        bindingAttibutes = [self _extractBindings:&attributes];
+        bindingEvents = [self _extractBindingEvents:&events];
+    }
+    
+    Class clazz = NSClassFromString(config.clazz);
+    WXComponent *component = [clazz alloc];
+    if (component) {
+        if (renderObject) {
+            [component _setRenderObject:renderObject];
+        }
+        component = [component initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:self.weexInstance];
+        if (isTemplate) {
+            component->_isTemplate = YES;
+            [component _storeBindingsWithProps:bindingProps styles:bindingStyles attributes:bindingAttibutes events:bindingEvents];
+        }
+    }
+    
+    WXAssert(component, @"Component build failed for ref:%@, type:%@", ref, type);
+    
+    [_indexDict setObject:component forKey:component.ref];
+    [component readyToRender];// notify redyToRender event when init
+    
+    double diffTime = CACurrentMediaTime()*1000 - buildStartTime;
+    [self.weexInstance.performance recordComponentCreatePerformance:diffTime forComponent:component];
+    
+    return component;
+}
+#else
 - (WXComponent *)_buildComponentForData:(NSDictionary *)data supercomponent:(WXComponent *)supercomponent
+                           renderObject:(void*)renderObject
 {
     double buildSartTime = CACurrentMediaTime()*1000;
     NSString *ref = data[@"ref"];
@@ -471,11 +568,17 @@ static NSThread *WXComponentThread;
         bindingEvents = [self _extractBindingEvents:&events];
     }
     
-    Class clazz = NSClassFromString(config.clazz);;
-    WXComponent *component = [[clazz alloc] initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:self.weexInstance];
-    if (isTemplate) {
-        component->_isTemplate = YES;
-        [component _storeBindingsWithProps:bindingProps styles:bindingStyles attributes:bindingAttibutes events:bindingEvents];
+    Class clazz = NSClassFromString(config.clazz);
+    WXComponent *component = [clazz alloc];
+    if (component) {
+        if (renderObject) {
+            [component _setRenderObject:renderObject];
+        }
+        component = [component initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:self.weexInstance];
+        if (isTemplate) {
+            component->_isTemplate = YES;
+            [component _storeBindingsWithProps:bindingProps styles:bindingStyles attributes:bindingAttibutes events:bindingEvents];
+        }
     }
 
     WXAssert(component, @"Component build failed for data:%@", data);
@@ -488,6 +591,7 @@ static NSThread *WXComponentThread;
     
     return component;
 }
+#endif
 
 - (void)addComponent:(WXComponent *)component toIndexDictForRef:(NSString *)ref
 {
@@ -536,6 +640,9 @@ static NSThread *WXComponentThread;
 - (NSDictionary *)_extractBindingEvents:(NSArray **)eventsPoint
 {
     NSArray *events = *eventsPoint;
+    if (events == nil) {
+        return nil;
+    }
     NSMutableArray *newEvents = [events mutableCopy];
     NSMutableDictionary *bindingEvents = [NSMutableDictionary dictionary];
     [events enumerateObjectsUsingBlock:^(id  _Nonnull event, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -554,6 +661,9 @@ static NSThread *WXComponentThread;
 - (NSDictionary *)_extractBindingProps:(NSDictionary **)attributesPoint
 {
     NSDictionary *attributes = *attributesPoint;
+    if (attributes == nil) {
+        return nil;
+    }
     if (attributes[@"@componentProps"]) {
         NSMutableDictionary *newAttributes = [attributes mutableCopy];
         [newAttributes removeObjectForKey:@"@componentProps"];
@@ -638,15 +748,18 @@ static NSThread *WXComponentThread;
     WXAssertParam(ref);
     
     WXComponent *component = [_indexDict objectForKey:ref];
-    WXAssertComponentExist(component);
-    
     [component _updateAttributesOnComponentThread:attributes];
     __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
-        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTUIThread}];
+        __strong typeof(self) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        
+        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTUIThread}];
         [component _updateAttributesOnMainThread:attributes];
         [component readyToRender];
-        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTUIThread}];
+        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTUIThread}];
     }];
 }
 
@@ -714,7 +827,10 @@ static NSThread *WXComponentThread;
     
     WXSDKInstance *instance  = self.weexInstance;
     [self _addUITask:^{
+#ifdef WX_IMPORT_WEEXCORE
+#else
         UIView *rootView = instance.rootView;
+#endif
         [instance.performance onInstanceCreateFinish];
         
         WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, instance);
@@ -722,10 +838,13 @@ static NSThread *WXComponentThread;
         WX_MONITOR_SUCCESS(WXMTJSBridge);
         WX_MONITOR_SUCCESS(WXMTNativeRender);
         
+#ifdef WX_IMPORT_WEEXCORE
+#else
         if(instance.renderFinish){
             [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:@{@"threadName":WXTUIThread}];
             instance.renderFinish(rootView);
         }
+#endif
     }];
     [instance updatePerDicAfterCreateFinish];
 }
@@ -757,6 +876,22 @@ static NSThread *WXComponentThread;
         }
     }];
 }
+
+#ifdef WX_IMPORT_WEEXCORE
+- (void)renderFinish
+{
+    WXAssertComponentThread();
+    
+    WXSDKInstance *instance  = self.weexInstance;
+    [self _addUITask:^{
+        UIView *rootView = instance.rootView;
+        if(instance.renderFinish){
+            [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:@{@"threadName":WXTUIThread}];
+            instance.renderFinish(rootView);
+        }
+    }];
+}
+#endif
 
 - (void)unload
 {
@@ -850,6 +985,9 @@ static NSThread *WXComponentThread;
 
 - (void)_layout
 {
+#ifdef WX_IMPORT_WEEXCORE
+    [WXCoreBridge layoutPage:_weexInstance.instanceId size:_weexInstance.frame.size forced:[_rootComponent needsLayout]];
+#else
     BOOL needsLayout = NO;
 
 //    NSEnumerator *enumerator = [_indexDict objectEnumerator];
@@ -883,9 +1021,10 @@ static NSThread *WXComponentThread;
             [dirtyComponent _layoutDidFinish];
         }];
     }
+#endif
 }
 
-- (void) _printFlexComonentFrame:(WXComponent *)component
+- (void) _printFlexComponentFrame:(WXComponent *)component
 {
 #ifdef DEBUG
     WXLogDebug(@"node ref:%@, type:%@ , frame:%@",
@@ -895,13 +1034,9 @@ static NSThread *WXComponentThread;
           );
 #endif
     
-  
-    
     for (WXComponent *childComponent in component.subcomponents) {
-        [self _printFlexComonentFrame:childComponent];
+        [self _printFlexComponentFrame:childComponent];
     }
-
-    
 }
 
 - (void)_syncUITasks
@@ -914,6 +1049,9 @@ static NSThread *WXComponentThread;
         }
     });
 }
+
+#ifdef WX_IMPORT_WEEXCORE
+#else
 - (void)_initRootFlexCssNode
 {
     _rootFlexCSSNode = new WeexCore::WXCoreLayoutNode();
@@ -945,10 +1083,8 @@ static NSThread *WXComponentThread;
         //   _rootFlexCSSNode->reset();
         
         //    resetNodeLayout(_rootFlexCSSNode);
-    
-   
 }
-
+#endif
 
 #pragma mark Fixed 
 
@@ -956,7 +1092,10 @@ static NSThread *WXComponentThread;
 {
     pthread_mutex_lock(&_propertyMutex);
     [_fixedComponents addObject:fixComponent];
+#ifdef WX_IMPORT_WEEXCORE
+#else
     _rootFlexCSSNode->addChildAt(fixComponent.flexCssNode, (uint32_t)([_fixedComponents count]-1));
+#endif
     pthread_mutex_unlock(&_propertyMutex);
 }
 
@@ -965,10 +1104,17 @@ static NSThread *WXComponentThread;
     pthread_mutex_lock(&_propertyMutex);
     [_fixedComponents removeObject:fixComponent];
     pthread_mutex_unlock(&_propertyMutex);
+#ifdef WX_IMPORT_WEEXCORE
+#else
     [self removeFixFlexNode:fixComponent->_flexCssNode];
+#endif
 }
 
-- (void)removeFixFlexNode:(WeexCore::WXCoreLayoutNode* )fixNode{
+- (void)removeFixFlexNode:(WeexCore::WXCoreLayoutNode* )fixNode
+{
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
     if (nullptr == fixNode) {
         return;
     }
@@ -982,8 +1128,203 @@ static NSThread *WXComponentThread;
             _rootFlexCSSNode->removeChild(fixNode);
         });
     }
+#endif
 }
 
+#ifdef WX_IMPORT_WEEXCORE
+
+- (void)wxcore_CreateBody:(NSString*)ref
+                     type:(NSString*)type
+                   styles:(NSDictionary*)styles
+               attributes:(NSDictionary*)attributes
+                   events:(NSArray*)events
+             renderObject:(void*)renderObject
+{
+    WXAssertComponentThread();
+    WXAssertParam(ref);
+    WXAssertParam(type);
+    WXAssertParam(renderObject);
+    
+    _rootComponent = [self _buildComponent:ref type:type supercomponent:nil styles:styles attributes:attributes events:events renderObject:renderObject];
+    
+    CGSize size = _weexInstance.frame.size;
+    [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId
+                                        width:size.width height:size.height
+                           isWidthWrapContent:NO isHeightWrapContent:NO];
+
+    __weak typeof(self) weakSelf = self;
+    WX_MONITOR_INSTANCE_PERF_END(WXFirstScreenJSFExecuteTime, self.weexInstance);
+    [self _addUITask:^{
+        __strong typeof(self) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        
+        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:type phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTUIThread}];
+        strongSelf.weexInstance.rootView.wx_component = strongSelf->_rootComponent;
+        [strongSelf.weexInstance.rootView addSubview:strongSelf->_rootComponent.view];
+        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:type phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTUIThread}];
+    }];
+}
+
+- (void)wxcore_AddElement:(NSString*)ref
+                     type:(NSString*)type
+                parentRef:(NSString*)parentRef
+                   styles:(NSDictionary*)styles
+               attributes:(NSDictionary*)attributes
+                   events:(NSArray*)events
+                    index:(NSInteger)index
+             renderObject:(void*)renderObject
+{
+    WXAssertComponentThread();
+    WXAssertParam(ref);
+    WXAssertParam(type);
+    WXAssertParam(parentRef);
+    WXAssertParam(renderObject);
+    
+    WXComponent *supercomponent = [_indexDict objectForKey:parentRef];
+    WXAssertComponentExist(supercomponent);
+    
+    if (!supercomponent) {
+        WXLogWarning(@"addComponent,superRef from js never exit ! check JS action, supRef:%@", parentRef);
+        return;
+    }
+    
+    WXComponent *component = [self _buildComponent:ref type:type supercomponent:supercomponent styles:styles attributes:attributes events:events renderObject:renderObject];
+    if (!supercomponent.subcomponents) {
+        index = 0;
+    } else {
+        index = (index == -1 ? supercomponent->_subcomponents.count : index);
+    }
+    
+#ifdef DEBUG
+    WXLogDebug(@"flexLayout -> _recursivelyAddComponent : super:(%@,%@):[%f,%f] ,child:(%@,%@):[%f,%f],childClass:%@",
+               supercomponent.type,
+               supercomponent.ref,
+               supercomponent.flexCssNode->getStyleWidth(),
+               supercomponent.flexCssNode->getStyleHeight(),
+               component.type,
+               component.ref,
+               component.flexCssNode->getStyleWidth(),
+               component.flexCssNode->getStyleHeight(),
+               NSStringFromClass([component class])
+               );
+#endif //DEBUG
+    
+    [supercomponent _insertSubcomponent:component atIndex:index];
+    // use _lazyCreateView to forbid component like cell's view creating
+    if (supercomponent && component && supercomponent->_lazyCreateView) {
+        component->_lazyCreateView = YES;
+    }
+    
+    [self recordMaximumVirtualDom:component];
+    
+    if (!component->_isTemplate) {
+        __weak typeof(self) weakSelf = self;
+        [self _addUITask:^{
+            __strong typeof(self) strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
+            
+            [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:type phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
+            [supercomponent insertSubview:component atIndex:index];
+            [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:type phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
+        }];
+    }
+}
+
+- (void)wxcore_RemoveElement:(NSString*)ref
+{
+    [self removeComponent:ref];
+}
+
+- (void)wxcore_MoveElement:(NSString*)ref toSuper:(NSString*)superRef atIndex:(NSInteger)index
+{
+    [self moveComponent:ref toSuper:superRef atIndex:index];
+}
+
+- (void)wxcore_AppendTreeCreateFinish:(NSString*)ref
+{
+    WXAssertComponentThread();
+    
+    // If appending tree，force layout in case of too much tasks piling up in syncQueue
+    [self _layoutAndSyncUI];
+}
+
+- (void)wxcore_UpdateAttributes:(NSDictionary*)attributes forElement:(NSString*)ref
+{
+    [self updateAttributes:attributes forComponent:ref];
+}
+
+- (void)wxcore_UpdateStyles:(NSDictionary*)styles forElement:(NSString *)ref
+{
+    [self updateStyles:styles forComponent:ref];
+}
+
+- (void)wxcore_Layout:(WXComponent*)component frame:(CGRect)frame innerMainSize:(CGFloat)innerMainSize
+{
+    WXAssertComponentThread();
+    WXAssertParam(component);
+    
+    if (!CGRectEqualToRect(frame, component->_calculatedFrame))
+    {
+        [component _assignCalculatedFrame:frame];
+        [component _assignInnerContentMainSize:innerMainSize];
+        [component _frameDidCalculated:YES];
+        
+        [self _addUITask:^{
+            [component _layoutDidFinish];
+        }];
+    }
+    else {
+        CGFloat oldValue = [component _getInnerContentMainSize];
+        if (oldValue >= 0 && oldValue != innerMainSize) {
+            [component _assignCalculatedFrame:frame];
+            [component _assignInnerContentMainSize:innerMainSize];
+            [component _frameDidCalculated:YES];
+            
+            [self _addUITask:^{
+                [component _layoutDidFinish];
+            }];
+        }
+        else {
+            [component _frameDidCalculated:NO];
+        }
+    }
+}
+
+- (void)wxcore_AddEvent:(NSString*)eventName toElement:(NSString*)ref
+{
+    [self addEvent:eventName toComponent:ref];
+}
+
+- (void)wxcore_RemoveEvent:(NSString*)eventName fromElement:(NSString*)ref
+{
+    [self removeEvent:eventName fromComponent:ref];
+}
+
+- (BOOL)wxcore_IsTransitionNoneOfElement:(NSString*)ref
+{
+    WXAssertComponentThread();
+    
+    WXComponent *component = [_indexDict objectForKey:ref];
+    WXAssertComponentExist(component);
+    
+    return [component _isTransitionNone];
+}
+
+- (BOOL)wxcore_HasTransitionPropertyInStyles:(NSDictionary*)styles forElement:(NSString*)ref
+{
+    WXAssertComponentThread();
+    
+    WXComponent *component = [_indexDict objectForKey:ref];
+    WXAssertComponentExist(component);
+    
+    return [component _hasTransitionPropertyInStyles:styles];
+}
+
+#endif
 
 @end
 

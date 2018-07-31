@@ -46,6 +46,9 @@ typedef void (^WXCallback)(_Nonnull id result);
  */
 typedef void (^WXKeepAliveCallback)(_Nonnull id result, BOOL keepAlive);
 
+typedef UIImage * _Nonnull(^WXDisplayBlock)(CGRect bounds, BOOL(^ _Nonnull isCancelled)(void));
+typedef void(^WXDisplayCompletionBlock)(CALayer * _Nonnull layer, BOOL finished);
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface WXComponent : NSObject <NSCopying>
@@ -414,30 +417,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @parameter binding data to update
  */
 - (void)updateBindingData:(NSDictionary *)data;
-
-@end
-
-@interface WXComponent (Deprecated)
-
-typedef UIImage * _Nonnull(^WXDisplayBlock)(CGRect bounds, BOOL(^isCancelled)(void));
-typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
-
-/**
- * @abstract Return a block to be called to draw layer.
- *
- * @discussion The block returned will be called on any thread.
- *
- */
-- (WXDisplayBlock)displayBlock DEPRECATED_MSG_ATTRIBUTE("use drawRect: method instead.");
-
-/**
- * @abstract Return a block to be called while drawing is finished.
- *
- * @discussion The block returned will be called on main thread.
- *
- */
-- (WXDisplayCompletionBlock)displayCompletionBlock DEPRECATED_MSG_ATTRIBUTE("use didFinishDrawingLayer: method instead.");
-
 
 @end
 

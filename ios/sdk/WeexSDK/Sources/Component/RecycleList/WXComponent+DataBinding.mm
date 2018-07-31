@@ -19,6 +19,7 @@
 
 #import "WXComponent+DataBinding.h"
 #import "WXComponent_internal.h"
+#import "WXComponent+Layout.h"
 #import "WXSDKInstance_private.h"
 #import "WXComponentManager.h"
 #import "WXSDKManager.h"
@@ -30,6 +31,10 @@
 #import "WXRecycleListDataManager.h"
 
 #import <JavaScriptCore/JavaScriptCore.h>
+
+#ifdef WX_IMPORT_WEEXCORE
+#import "WXCoreBridge.h"
+#endif
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
@@ -237,6 +242,11 @@ static JSContext *jsContext;
         if (!exsitingComponent) {
             [self.weexInstance.componentManager startComponentTasks];
             [self.supercomponent _insertSubcomponent:component atIndex:startIndex + idx];
+#ifdef WX_IMPORT_WEEXCORE
+            // add to layout tree
+            [WXCoreBridge addChildRenderObject:component->_flexCssNode toParent:self.supercomponent->_flexCssNode];
+#endif
+            
             [self.weexInstance.componentManager _addUITask:^{
                 [self.supercomponent insertSubview:component atIndex:startIndex + idx];
             }];
@@ -377,7 +387,15 @@ static JSContext *jsContext;
     if (!expression) {
         return nil;
     }
+    
+    __weak typeof(self) weakSelf = self;
     WXDataBindingBlock block = ^id(NSDictionary *data, BOOL *needUpdate) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            *needUpdate = NO;
+            return nil;
+        }
+        
         if (expression->is<WXJSStringLiteral>()) {
             *needUpdate = NO;
             return [NSString stringWithCString:(((WXJSStringLiteral *)expression)->value).c_str() encoding:[NSString defaultCStringEncoding]];
@@ -402,9 +420,9 @@ static JSContext *jsContext;
         } else if (expression->is<WXJSMemberExpression>()) {
             WXJSMemberExpression *member = (WXJSMemberExpression *)expression;
             BOOL objectNeedUpdate = NO, propertyNeedUpdate = NO;
-            id object = [self bindingBlockWithExpression:member->object](data, &objectNeedUpdate);
+            id object = [strongSelf bindingBlockWithExpression:member->object](data, &objectNeedUpdate);
             if (member->computed) {
-                id propertyName = [self bindingBlockWithExpression:member->property](data, &propertyNeedUpdate);
+                id propertyName = [strongSelf bindingBlockWithExpression:member->property](data, &propertyNeedUpdate);
                 *needUpdate = objectNeedUpdate || propertyNeedUpdate;
                 if ([object isKindOfClass:[NSDictionary class]] && [propertyName isKindOfClass:[NSString class]]) {
                     return object[propertyName];
@@ -418,7 +436,7 @@ static JSContext *jsContext;
                     *needUpdate = objectNeedUpdate;
                     return object[propertyName];
                 } else {
-                    id retvalue = [self bindingBlockWithExpression:member->property](object, &objectNeedUpdate);
+                    id retvalue = [strongSelf bindingBlockWithExpression:member->property](object, &objectNeedUpdate);
                     *needUpdate = objectNeedUpdate || propertyNeedUpdate;
                     return retvalue;
                 }
@@ -433,7 +451,7 @@ static JSContext *jsContext;
                 if (expr == NULL) {
                     continue;
                 }
-                WXDataBindingBlock block = [self bindingBlockWithExpression:expr];
+                WXDataBindingBlock block = [strongSelf bindingBlockWithExpression:expr];
                 *needUpdate = NO;
                 if (block) {
                     BOOL elementNeedUpdate;
@@ -449,7 +467,7 @@ static JSContext *jsContext;
         } else if (expression->is<WXJSUnaryExpression>()) {
             WXJSUnaryExpression *expr = (WXJSUnaryExpression *)expression;
             std::string operator_ = expr->operator_;
-            id argument = [self bindingBlockWithExpression:expr->argument](data, needUpdate);
+            id argument = [strongSelf bindingBlockWithExpression:expr->argument](data, needUpdate);
             if (operator_ == "+") {
                 return @([argument doubleValue]);
             } else if (operator_ == "-") {
@@ -464,8 +482,8 @@ static JSContext *jsContext;
             WXJSBinaryExpression *expr = (WXJSBinaryExpression *)expression;
             std::string operator_ = expr->operator_;
             BOOL leftNeedUpdate = NO, rightNeedUpdate = NO;
-            id left = [self bindingBlockWithExpression:expr->left](data, &leftNeedUpdate);
-            id right = [self bindingBlockWithExpression:expr->right](data, &rightNeedUpdate);
+            id left = [strongSelf bindingBlockWithExpression:expr->left](data, &leftNeedUpdate);
+            id right = [strongSelf bindingBlockWithExpression:expr->right](data, &rightNeedUpdate);
             *needUpdate = leftNeedUpdate || rightNeedUpdate;
             if (operator_ == "+") {
                 return @([left doubleValue] + [right doubleValue]);
@@ -514,12 +532,12 @@ static JSContext *jsContext;
         } else if (expression->is<WXJSConditionalExpression>()) {
             WXJSConditionalExpression *conditional = (WXJSConditionalExpression *)expression;
             BOOL testNeedUpdate = NO, conditionalNeedUpdate = NO, alternateNeedUpdate = NO;
-            id testResult = [self bindingBlockWithExpression:conditional->test](data, &testNeedUpdate);
+            id testResult = [strongSelf bindingBlockWithExpression:conditional->test](data, &testNeedUpdate);
             id result;
             if ([testResult boolValue]) {
-                result = [self bindingBlockWithExpression:conditional->consequent](data, &conditionalNeedUpdate);
+                result = [strongSelf bindingBlockWithExpression:conditional->consequent](data, &conditionalNeedUpdate);
             } else {
-                result = [self bindingBlockWithExpression:conditional->alternate](data, &alternateNeedUpdate);
+                result = [strongSelf bindingBlockWithExpression:conditional->alternate](data, &alternateNeedUpdate);
             }
             *needUpdate = testNeedUpdate || conditionalNeedUpdate || alternateNeedUpdate;
             return result;

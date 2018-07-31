@@ -42,6 +42,11 @@ bool flexIsUndefined(float value) {
 
 - (void)setNeedsLayout
 {
+#ifdef WX_IMPORT_WEEXCORE
+    if (_flexCssNode != nullptr) {
+        _flexCssNode->markDirty();
+    }
+#else
     _isLayoutDirty = YES;
     WXComponent *supercomponent = [self supercomponent];
     
@@ -55,11 +60,21 @@ bool flexIsUndefined(float value) {
     if(supercomponent){
         [supercomponent setNeedsLayout];
     }
+#endif
 }
 
 - (BOOL)needsLayout
 {
+#ifdef WX_IMPORT_WEEXCORE
+    if (_flexCssNode != nullptr) {
+        return _flexCssNode->isDirty();
+    }
+    else {
+        return false;
+    }
+#else
     return _isLayoutDirty;
+#endif
 }
 
 - (CGSize (^)(CGSize))measureBlock
@@ -74,25 +89,43 @@ bool flexIsUndefined(float value) {
 
 #pragma mark Private
 
+- (void)_setRenderObject:(void *)object
+{
+    _flexCssNode = static_cast<WeexCore::WXCoreLayoutNode*>(object);
+    _flexCssNode->setContext((__bridge void *)self); // bind
+    if ([self measureBlock]) {
+        _flexCssNode->setMeasureFunc(flexCssNodeMeasure);
+    }
+}
+
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles
 {
-        _flexCssNode = new WeexCore::WXCoreLayoutNode();
-        if ([self measureBlock]) {
-            _flexCssNode->setMeasureFunc(flexCssNodeMeasure);
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
+    if (_flexCssNode != nullptr) {
+        // using weex core
+        return;
+    }
+    
+    _flexCssNode = new WeexCore::WXCoreLayoutNode();
+    if ([self measureBlock]) {
+        _flexCssNode->setMeasureFunc(flexCssNodeMeasure);
+    }
+    _flexCssNode->setContext((__bridge void *)self);
+    [self _recomputeCSSNodeChildren];
+    [self _fillCSSNode:styles isUpdate:NO];
+    
+    if ([self.ref isEqualToString:WX_SDK_ROOT_REF]) {
+        if (flexIsUndefined(_flexCssNode->getStyleHeight()) && self.weexInstance.frame.size.height) {
+            _flexCssNode->setStyleHeight(self.weexInstance.frame.size.height);
         }
-        _flexCssNode->setContext((__bridge void *)self);
-        [self _recomputeCSSNodeChildren];
-        [self _fillCSSNode:styles isUpdate:NO];
         
-        if ([self.ref isEqualToString:WX_SDK_ROOT_REF]) {
-            if (flexIsUndefined(_flexCssNode->getStyleHeight()) && self.weexInstance.frame.size.height) {
-                _flexCssNode->setStyleHeight(self.weexInstance.frame.size.height);
-            }
-            
-            if (flexIsUndefined(_flexCssNode->getStyleWidth()) && self.weexInstance.frame.size.width) {
-                _flexCssNode->setStyleWidth(self.weexInstance.frame.size.width,NO);
-            }
+        if (flexIsUndefined(_flexCssNode->getStyleWidth()) && self.weexInstance.frame.size.width) {
+            _flexCssNode->setStyleWidth(self.weexInstance.frame.size.width,NO);
         }
+    }
+#endif
 }
 
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles
@@ -111,6 +144,9 @@ bool flexIsUndefined(float value) {
 
 - (NSUInteger)_childrenCountForLayout
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#endif
     NSArray *subcomponents = _subcomponents;
     NSUInteger count = subcomponents.count;
     for (WXComponent *component in subcomponents) {
@@ -159,10 +195,10 @@ bool flexIsUndefined(float value) {
             if (!CGRectEqualToRect(strongSelf.view.frame,strongSelf.calculatedFrame)) {
                 strongSelf.view.frame = strongSelf.calculatedFrame;
                 strongSelf->_absolutePosition = CGPointMake(NAN, NAN);
-                [strongSelf configBoxShadow:_boxShadow];
+                [strongSelf configBoxShadow:strongSelf->_boxShadow];
             } else {
-                if (![strongSelf equalBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
-                    [strongSelf configBoxShadow:_boxShadow];
+                if (![strongSelf equalBoxShadow:strongSelf->_boxShadow withBoxShadow:strongSelf->_lastBoxShadow]) {
+                    [strongSelf configBoxShadow:strongSelf->_boxShadow];
                 }
             }
             
@@ -183,6 +219,9 @@ bool flexIsUndefined(float value) {
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition
                            gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
     WXAssertComponentThread();
 
         if (self.flexCssNode->hasNewLayout()) {
@@ -213,6 +252,7 @@ bool flexIsUndefined(float value) {
         for (WXComponent *subcomponent in subcomponents) {
             [subcomponent _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
         }
+#endif
 }
 
 - (void)_layoutDidFinish
@@ -236,15 +276,15 @@ bool flexIsUndefined(float value) {
 {
         // flex
         if (styles[@"flex"]) {
-            _flexCssNode->setFlex([WXConvert CGFloat:styles[@"flex"]]);
+            _flexCssNode->set_flex([WXConvert CGFloat:styles[@"flex"]]);
         }
         if (isnan(_flexCssNode->getFlex())) {
             // to make the default flex value is zero, yoga is nan, maybe this can configured by yoga config
-            _flexCssNode->setFlex(0);
+            _flexCssNode->set_flex(0);
         }
         
         if (styles[@"flexDirection"]) {
-            _flexCssNode->setFlexDirection([self fxFlexDirection:styles[@"flexDirection"]],isUpdate);
+            _flexCssNode->setFlexDirection([self fxFlexDirection:styles[@"flexDirection"]], isUpdate);
         }
         if (styles[@"alignItems"]) {
             _flexCssNode->setAlignItems([self fxAlign:styles[@"alignItems"]]);
@@ -374,12 +414,35 @@ bool flexIsUndefined(float value) {
         [self setNeedsLayout];
 }
 
--(CGFloat)judgePropValuePropValue:(NSString *)propValue defaultValue:(CGFloat)defaultValue{
+-(CGFloat)judgePropValuePropValue:(id)propValue defaultValue:(CGFloat)defaultValue
+{
     CGFloat convertValue = (CGFloat)[WXConvert WXFlexPixelType:propValue scaleFactor:self.weexInstance.pixelScaleFactor];
     if (!isnan(convertValue)) {
         return convertValue;
     }
     return defaultValue;
+}
+
+- (NSString*)convertLayoutValueToStyleValue:(NSString*)valueName
+{
+    float layoutValue = 0;
+    if ([valueName isEqualToString:@"left"])
+        layoutValue = _flexCssNode->getLayoutPositionLeft();
+    else if ([valueName isEqualToString:@"right"])
+        layoutValue = _flexCssNode->getLayoutPositionRight();
+    else if ([valueName isEqualToString:@"top"])
+        layoutValue = _flexCssNode->getLayoutPositionTop();
+    else if ([valueName isEqualToString:@"bottom"])
+        layoutValue = _flexCssNode->getLayoutPositionBottom();
+    else if ([valueName isEqualToString:@"width"])
+        layoutValue = _flexCssNode->getLayoutWidth();
+    else if ([valueName isEqualToString:@"height"])
+        layoutValue = _flexCssNode->getLayoutHeight();
+    else
+        return @"0";
+    
+    layoutValue /= self.weexInstance.pixelScaleFactor;
+    return [NSString stringWithFormat:@"%f", layoutValue];
 }
 
 #define WX_FLEX_STYLE_RESET_CSS_NODE(key, defaultValue)\
@@ -621,6 +684,9 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
 
 - (NSInteger) getActualNodeIndex:(WXComponent*)subcomponent atIndex:(NSInteger) index
 {
+#ifdef WX_IMPORT_WEEXCORE
+    return 0;
+#else
     NSInteger actualIndex = 0; //实际除去不需要布局的subComponent，此时所在的正确位置
     for (WXComponent *child in _subcomponents) {
         if ([child.ref isEqualToString:subcomponent.ref]) {
@@ -631,23 +697,34 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
         }
     }
     return actualIndex;
+#endif
 }
 
 - (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
     self.flexCssNode->addChildAt(subcomponent.flexCssNode, (uint32_t)index);
+#endif
 }
 
 - (void)_rmChildCssNode:(WXComponent *)subcomponent
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
     self.flexCssNode->removeChild(subcomponent->_flexCssNode);
 #ifdef DEBUG
     WXLogDebug(@"flexLayout -> ref:%@ ,flexCssNode->removeChild ,childRef:%@",self.ref,subcomponent.ref);
 #endif
+#endif
 }
 
-
-+ (void) recycleNodeOnComponentThread:(WeexCore::WXCoreLayoutNode * ) garbageNode gabRef:(NSString *)ref {
++ (void) recycleNodeOnComponentThread:(WeexCore::WXCoreLayoutNode * ) garbageNode gabRef:(NSString *)ref
+{
+#ifdef WX_IMPORT_WEEXCORE
+#else
     if (nullptr == garbageNode) {
 #ifdef DEBUG
         WXLogDebug(@"flexlayout->recycle garbageNode ref:%@ is null ",ref);
@@ -663,6 +740,7 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
         }
     });
     //domthread
+#endif
 }
 
 @end

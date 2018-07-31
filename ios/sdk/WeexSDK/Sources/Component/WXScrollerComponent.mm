@@ -30,8 +30,9 @@
 #import "WXSDKEngine.h"
 #import "WXComponent+Events.h"
 #import "WXScrollerComponent+Layout.h"
-#import "WXCoreLayout.h"
 #import "WXPageEventNotifyEvent.h"
+
+#include <core/layout/layout.h>
 
 @interface WXScrollerComponentView:UIScrollView
 @end
@@ -156,6 +157,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         _offsetAccuracy = attributes[@"offsetAccuracy"] ? [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
         
+#ifdef WX_IMPORT_WEEXCORE
+#else
             _flexScrollerCSSNode = new WeexCore::WXCoreLayoutNode();
             // let scroller fill the rest space if it is a child component and has no fixed height & width
             if (((_scrollDirection == WXScrollDirectionVertical &&
@@ -163,8 +166,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
                  (_scrollDirection == WXScrollDirectionHorizontal &&
                   flexIsUndefined(self.flexCssNode->getStyleWidth()))) &&
                 self.flexCssNode->getFlex() <= 0.0) {
-                self.flexCssNode->setFlex(1.0);
+                self.flexCssNode->set_flex(1.0);
             }
+#endif
+        
         id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
             BOOL shouldNotifiAppearDescendantView = [[configCenter configForKey:@"iOS_weex_ext_config.shouldNotifiAppearDescendantView" defaultValue:@(YES) isDefault:NULL] boolValue];
@@ -225,8 +230,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)layoutDidFinish
 {
-
-    
     if ([self isViewLoaded]) {
         [self setContentSize:_contentSize];
         [self adjustSticky];
@@ -246,11 +249,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     ((UIScrollView *)_view).delegate = nil;
     [self.stickyArray removeAllObjects];
     [self.listenerArray removeAllObjects];
-        if(_flexScrollerCSSNode){
-            [WXComponent recycleNodeOnComponentThread:_flexScrollerCSSNode gabRef:self.ref];
-            
-            _flexScrollerCSSNode=nullptr;
-        }
+    
+#ifdef WX_IMPORT_WEEXCORE
+#else
+    if(_flexScrollerCSSNode){
+        [WXComponent recycleNodeOnComponentThread:_flexScrollerCSSNode gabRef:self.ref];
+        _flexScrollerCSSNode=nullptr;
+    }
+#endif
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
@@ -882,9 +888,37 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     return [super _childrenCountForLayout];
 }
 
+- (CGFloat)_getInnerContentMainSize
+{
+    if (_scrollDirection == WXScrollDirectionVertical) {
+        return _contentSize.height;
+    }
+    else if (_scrollDirection == WXScrollDirectionHorizontal) {
+        return _contentSize.width;
+    }
+    else {
+        return -1.0f;
+    }
+}
+
+- (void)_assignInnerContentMainSize:(CGFloat)value
+{
+    if ([self isMemberOfClass:[WXScrollerComponent class]]) {
+        if (_scrollDirection == WXScrollDirectionVertical) {
+            _contentSize.height = value;
+        }
+        else if (_scrollDirection == WXScrollDirectionHorizontal) {
+            _contentSize.width = value;
+        }
+    }
+}
+
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition
                           gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
+#ifdef WX_IMPORT_WEEXCORE
+    assert(0);
+#else
     /**
      *  Pretty hacky way
      *  layout from root to scroller to get scroller's frame,
@@ -921,6 +955,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     
     [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
+#endif
 }
 
 @end

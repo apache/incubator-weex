@@ -1,3 +1,4 @@
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,21 +17,47 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef BASE_COMMON_H_
-#define BASE_COMMON_H_
 
-// Should be used in the private: declarations to define a class to be
-// uncopyable.
-#define DISALLOW_COPY(TypeName) TypeName(const TypeName&)
+#ifndef WEEXV8_WXTYPEDEFINE_H
+#define WEEXV8_WXTYPEDEFINE_H
 
-// Should be used in the private: declarations to define a class to be
-// unssignable.
-#define DISALLOW_ASSIGN(TypeName) void operator=(const TypeName&)
 
-// Should be used in the private: declarations to define a class to be
-// uncopyable and unssignable.
-#define DISALLOW_COPY_AND_ASSIGN(TypeName) \
-  TypeName(const TypeName&);               \
-  void operator=(const TypeName&)
+#include <cstdint>
 
-#endif  // BASE_COMMON_H_
+namespace WeexCore {
+
+    enum wx_type_define {
+        VOID = 1,
+        INTEGER,
+        DOUBLE,
+        STRING,
+        JSON,
+        WSON
+    };
+
+    union WXValeDefine {
+        int64_t intValue;
+        double doubleValue;
+        char* string;
+    };
+
+
+    struct WXValue {
+        wx_type_define type;
+        WXValeDefine value;
+    };
+
+    struct WXFuncSignature {
+        char*            methodName;
+        wx_type_define    returnType;
+        wx_type_define   *argsType;
+        uint8_t         argsLength;
+        void*           fucnAddr;
+    };
+}
+
+
+
+
+
+#endif //WEEXV8_WXTYPEDEFINE_H

@@ -136,7 +136,7 @@ namespace WeexCore {
    */
   class WXCoreLayoutNode {
 
-  protected:
+  public:
       WXCoreLayoutNode() :
               mParent(nullptr),
               dirty(true),

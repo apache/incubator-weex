@@ -499,10 +499,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         
         
         UIEdgeInsets border_flex = UIEdgeInsetsMake(self.flexCssNode->getBorderWidthTop(), self.flexCssNode->getBorderWidthLeft(), self.flexCssNode->getBorderWidthBottom(), self.flexCssNode->getBorderWidthRight());
-        
-        
-        
-        
+
         if (!UIEdgeInsetsEqualToEdgeInsets(border_flex, _border)) {
             [self setBorder:border_flex];
         }
@@ -904,7 +901,10 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         CGRect inputFrame = [self.view.superview convertRect:self.view.frame toView:rootView];
         if (keyboardRect.origin.y - inputFrame.size.height <= inputFrame.origin.y) {
             [self setViewMovedUp:YES];
+#ifdef WX_IMPORT_WEEXCORE
+#else
             self.weexInstance.isRootViewFrozen = YES;
+#endif
         }
     }
     
@@ -924,8 +924,11 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         UIView * rootView = self.weexInstance.rootView;
         if (!CGRectEqualToRect(self.weexInstance.frame, rootView.frame)) {
             [self setViewMovedUp:NO];
-            self.weexInstance.isRootViewFrozen = NO;
         }
+#ifdef WX_IMPORT_WEEXCORE
+#else
+        self.weexInstance.isRootViewFrozen = NO;
+#endif
     }
     if (_keyboardEvent) {
         [self fireEvent:@"keyboard" params:@{ @"isShow": @NO }];

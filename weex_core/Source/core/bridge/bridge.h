@@ -35,6 +35,8 @@ namespace WeexCore {
 
   class Bridge {
   public:
+    virtual ~Bridge() {}
+      
     /**  platform  impl **/
     virtual void setJSVersion(const char* version) = 0;
 
@@ -79,8 +81,8 @@ namespace WeexCore {
                                bool willLayout= true) = 0;
 
     virtual int callLayout(const char* pageId, const char* ref,
-                           int top, int bottom, int left, int right,
-                           int height, int width, int index) = 0;
+                           float top, float bottom, float left, float right,
+                           float height, float width, int index) = 0;
 
     virtual int callUpdateStyle(const char* pageId, const char* ref,
                                 std::vector<std::pair<std::string, std::string>> *style,
@@ -105,29 +107,32 @@ namespace WeexCore {
                                         std::vector<std::pair<std::string, std::string>> *style)=0;
 
     /**  core api **/
-    void setStyleWidth(const char *instanceId, const char *ref, float value);
-    void setStyleHeight(const char *instanceId, const char *ref, float value);
+    void setStyleWidth(const char *pageId, const char *ref, float value);
+    void setStyleHeight(const char *pageId, const char *ref, float value);
 
-    void setMargin(const char *instanceId,const char *ref, int32_t edge, float value);
+    void setMargin(const char *pageId,const char *ref, int32_t edge, float value);
 
-    void setPadding(const char *instanceId, const char *ref, int32_t edge, float value);
+    void setPadding(const char *pageId, const char *ref, int32_t edge, float value);
 
-    void setPosition(const char *instanceId, const char *ref, int32_t edge, float value);
+    void setPosition(const char *pageId, const char *ref, int32_t edge, float value);
 
-    void markDirty(const char *instanceId,const  char *ref, bool dirty);
+    void markDirty(const char *pageId,const  char *ref, bool dirty);
 
-    void setDefaultHeightAndWidthIntoRootDom(const char *instanceId, const float defaultWidth, const float defaultHeight,
+    void setDefaultHeightAndWidthIntoRootDom(const char *pageId, const float defaultWidth, const float defaultHeight,
                                              const bool isWidthWrapContent, const bool isHeightWrapContent);
-    void setRenderContainerWrapContent(const char* instanceId,bool wrap);
+    void setRenderContainerWrapContent(const char* pageId, bool wrap);
 
     /**Notice that this method is invoked from JS thread.**/
-    void forceLayout(const char *instanceId);
+    void forceLayout(const char *pageId);
 
     /**Notice that this method is invoked from JS thread.**/
-    bool notifyLayout(const char *instanceId);
+    bool notifyLayout(const char *pageId);
 
+    void onInstanceClose(const char *pageId);
 
-    void onInstanceClose(const char *instanceId) ;
+    void setViewportWidth(const char* pageId, float value);
+      
+    void setPageDirty(const char* pageId);
   };
 } //end WeexCore
 #endif //Bridge_h

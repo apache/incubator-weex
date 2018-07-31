@@ -17,6 +17,8 @@
  * under the License.
  */
 
+#ifdef __cplusplus
+
 #ifndef WEEXCORE_WEEX_CORE_MANAGER_H
 #define WEEXCORE_WEEX_CORE_MANAGER_H
 
@@ -24,22 +26,30 @@
 #include <core/bridge/js_bridge.h>
 #include <core/layout/measure_func_adapter.h>
 
+
 namespace WeexCore {
+
+
     class WeexCoreManager {
     private:
         static WeexCoreManager *m_pInstance;
         Bridge *platformBridge = nullptr;
+        JSBridge *jsBridge = nullptr;
         MeasureFunctionAdapter *measureFunctionAdapter = nullptr;
-        JSBridge* jsBridge = nullptr;
 
     private:
         WeexCoreManager() {};
 
         ~WeexCoreManager() {
-            delete platformBridge;
-            platformBridge = nullptr;
-            delete jsBridge;
-            jsBridge = nullptr;
+            if (platformBridge != nullptr) {
+                delete platformBridge;
+                platformBridge = nullptr;
+            }
+            
+            if (jsBridge != nullptr) {
+                delete jsBridge;
+                jsBridge = nullptr;
+            }
         };
 
         //just to release singleton object
@@ -48,6 +58,7 @@ namespace WeexCore {
             ~Garbo() {
                 if (WeexCoreManager::m_pInstance) {
                     delete WeexCoreManager::m_pInstance;
+                    WeexCoreManager::m_pInstance = nullptr;
                 }
             }
         };
@@ -78,3 +89,4 @@ namespace WeexCore {
 }
 
 #endif //WEEXCORE_WEEX_CORE_MANAGER_H
+#endif //#ifdef __cplusplus
