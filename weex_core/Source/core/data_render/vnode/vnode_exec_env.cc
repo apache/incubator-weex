@@ -77,6 +77,67 @@ static Value Merge(ExecState* exec_state) {
   return Value(*new_value);
 }
 
+
+static Value Slice(ExecState* exec_state) {
+  size_t length = exec_state->GetArgumentCount();
+  if (length != 3) {
+    return Value();
+  }
+  Value* table = exec_state->GetArgument(0);
+  Value* start = exec_state->GetArgument(1);
+  Value* end = exec_state->GetArgument(2);
+  if (!IsTable(table) || !IsInt(start) || !IsInt(end)) {
+    return Value();
+  }
+  Table* p_table = TableValue(table);
+  unsigned int v_start = static_cast<unsigned int>(IntValue(start));
+  unsigned int v_end = static_cast<unsigned int>(IntValue(end));
+  if (v_end > p_table->array->size()) {
+    v_end = p_table->array->size();
+  }
+  if (v_start > v_end) {
+    v_start = v_end;
+  }
+  Value* new_value = exec_state->getTableFactory()->CreateTable();
+  Table* new_table = TableValue(new_value);
+  new_table->array->insert(new_table->array->end(),
+                           p_table->array->begin() + v_start, p_table->array->begin() + v_end);
+  return Value(*new_value);
+}
+
+static Value AppendUrlParam(ExecState* exec_state) {
+  size_t length = exec_state->GetArgumentCount();
+  if (length != 2) {
+    return Value();
+  }
+  Value* url = exec_state->GetArgument(0);
+  Value* array = exec_state->GetArgument(1);
+  if (!IsString(url) || !IsTable(array)) {
+    return Value();
+  }
+  String* p_string = StringValue(url);
+  Table* p_array = TableValue(array);
+  std::stringstream ss;
+  ss << p_string->c_str();
+
+  std::vector<Value>* kv_array = p_array->array;
+  for (auto it = kv_array->begin(); it != kv_array->end(); it++) {
+    Value& kv_map = *it;
+    Table* p_table = TableValue(&kv_map);
+    if (p_table != nullptr && p_table->map->find("key") != p_table->map->end() &&
+        p_table->map->find("value") != p_table->map->end()) {
+      Value& key = p_table->map->find("key")->second;
+      Value& value = p_table->map->find("value")->second;
+      if (IsString(&key) && IsString(&value)) {
+        ss << "&" << key.str->c_str() << "=" << value.str->c_str();
+      }
+    }
+  }
+
+  String* new_value = exec_state->string_table()->StringFromUTF8(ss.str());
+  return Value(new_value);
+}
+
 // createElement("tag_name", "id");
 static Value CreateElement(ExecState* exec_state) {
   VNode* node = new VNode(exec_state->GetArgument(1)->str->c_str(),
@@ -161,6 +222,8 @@ void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   // log
   RegisterCFunc(state, "log", Log);
   RegisterCFunc(state, "sizeof", GetTableSize);
+  RegisterCFunc(state, "slice", Slice);
+  RegisterCFunc(state, "appendUrlParam", AppendUrlParam);
   RegisterCFunc(state, "merge", Merge);
   RegisterCFunc(state, "createElement", CreateElement);
   RegisterCFunc(state, "appendChild", AppendChild);
@@ -174,8 +237,14 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
   } else if (json.is_bool()) {
     return Value(json.bool_value());
   } else if (json.is_number()) {
-    // todo check which is int or double.
-    return Value(json.number_value());
+    std::string value;
+    json.dump(value);
+    if (value.find('.') == std::string::npos) {
+      //int
+      return Value(static_cast<int64_t>(json.number_value()));
+    } else {
+      return Value(json.number_value());
+    }
   } else if (json.is_string()) {
     String* p_str = state->string_table()->StringFromUTF8(json.string_value());
     return Value(p_str);
@@ -209,7 +278,10 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   const json11::Json& json = state->context()->raw_json();
   Global* global = state->global();
   const json11::Json& data = json["data"];
-  const Value& value = ParseJson2Value(state, data);
+  Value value = ParseJson2Value(state, data);
+  if (value.type != Value::Type::TABLE) {
+    value = *(state->getTableFactory()->CreateTable());
+  }
   global->Add("_data_main", value);
 }
 
