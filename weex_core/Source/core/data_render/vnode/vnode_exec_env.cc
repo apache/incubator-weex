@@ -26,6 +26,8 @@
 namespace weex {
 namespace core {
 namespace data_render {
+json11::Json ParseValue2Json(const Value& value);
+
 static Value Log(ExecState* exec_state) {
   size_t length = exec_state->GetArgumentCount();
   for (int i = 0; i < length; ++i) {
@@ -77,6 +79,22 @@ static Value Merge(ExecState* exec_state) {
   return Value(*new_value);
 }
 
+static Value ToString(ExecState* exec_state) {
+  size_t length = exec_state->GetArgumentCount();
+  if (length != 1) {
+    return Value();
+  }
+  Value* table = exec_state->GetArgument(0);
+  if (!IsTable(table)) {
+    return Value();
+  }
+
+  const json11::Json& json = ParseValue2Json(*table);
+  std::string s;
+  json.dump(s);
+  String* new_value = exec_state->string_table()->StringFromUTF8(s);
+  return Value(new_value);
+}
 
 static Value Slice(ExecState* exec_state) {
   size_t length = exec_state->GetArgumentCount();
@@ -225,6 +243,7 @@ void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   RegisterCFunc(state, "slice", Slice);
   RegisterCFunc(state, "appendUrlParam", AppendUrlParam);
   RegisterCFunc(state, "merge", Merge);
+  RegisterCFunc(state, "tostring", ToString);
   RegisterCFunc(state, "createElement", CreateElement);
   RegisterCFunc(state, "appendChild", AppendChild);
   RegisterCFunc(state, "setAttr", SetAttr);
@@ -273,6 +292,46 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     return Value();
   }
 };
+
+json11::Json ParseValue2Json(const Value& value) {
+  if (value.type != Value::TABLE) {
+    return json11::Json();
+  }
+
+  Table* p_table = TableValue(&value);
+  if (p_table->array->size() > 0) {
+    json11::Json::array array;
+
+    for (auto it = p_table->array->begin(); it != p_table->array->end(); it++) {
+      if ((*it).type == Value::STRING) {
+        array.push_back(json11::Json((*it).str->c_str()));
+        continue;
+      }
+
+      if ((*it).type == Value::TABLE) {
+        array.push_back(ParseValue2Json((*it)));
+        continue;
+      }
+    }
+
+    return json11::Json(array);
+  }
+
+  json11::Json::object object;
+  for (auto it = p_table->map->begin(); it != p_table->map->end(); it++) {
+    if (it->second.type == Value::STRING) {
+      object.insert({it->first, json11::Json(it->second.str->c_str())});
+      continue;
+    }
+
+    if (it->second.type == Value::TABLE) {
+      object.insert({it->first, ParseValue2Json(it->second)});
+      continue;
+    }
+  }
+  
+  return json11::Json(object);
+}
 
 void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   const json11::Json& json = state->context()->raw_json();
