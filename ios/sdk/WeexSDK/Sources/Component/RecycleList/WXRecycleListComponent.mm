@@ -405,7 +405,6 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
     [self _queryElement:virtalElementInfo cssSelector:cssSelector callback:callback isAll:YES];
 }
 
-
 - (NSString *)_refForVirtalElementInfo:(NSString *)virtalElementInfo
 {
     NSArray *stringArray = [virtalElementInfo componentsSeparatedByString:@"@"];
@@ -485,13 +484,16 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 
 - (BOOL)_parseCssSelector:(NSString *)cssSelector component:(WXComponent *)component
 {
+    if (!cssSelector) {
+        return NO;
+    }
     if ([cssSelector hasPrefix:@"["]&&[cssSelector hasSuffix:@"]"]) {
-        NSArray *selectorArray = [cssSelector componentsSeparatedByString:@"="];
+        NSCharacterSet *unwantedChars = [NSCharacterSet characterSetWithCharactersInString:@"\"[]"];
+        NSString *requiredString = [[cssSelector componentsSeparatedByCharactersInSet:unwantedChars] componentsJoinedByString:@""];
+        NSArray *selectorArray = [requiredString componentsSeparatedByString:@"="];
         if (selectorArray.count == 2) {
-            NSString *prefixString = selectorArray[0];
-            NSString *suffixString = selectorArray[1];
-            NSString *attribute = [prefixString substringWithRange:NSMakeRange(1,prefixString.length-1)];
-            NSString *value = [suffixString substringWithRange:NSMakeRange(0, suffixString.length-1)];
+            NSString *attribute = selectorArray[0];
+            NSString *value = selectorArray[1];
             NSDictionary *componentAttrs = component.attributes;
             NSString *valueString = [NSString stringWithFormat:@"%@",componentAttrs[attribute]];
             if ([valueString isEqualToString:value]) {
