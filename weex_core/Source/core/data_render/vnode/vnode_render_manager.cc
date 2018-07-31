@@ -21,7 +21,6 @@
 #include <chrono>
 #include <sstream>
 #include "core/data_render/exec_state.h"
-#include "core/data_render/json/json11.hpp"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vnode/vnode.h"
 #include "core/data_render/vnode/vnode_exec_env.h"

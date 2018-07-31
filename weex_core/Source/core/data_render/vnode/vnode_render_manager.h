@@ -24,10 +24,10 @@
 #include <string>
 
 #include "core/data_render/vm.h"
+#include "core/data_render/vnode/vnode.h"
 #include "core/data_render/vnode/vnode_exec_env.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/render_object.h"
-#include "vnode.h"
 
 namespace weex {
 namespace core {

@@ -17,14 +17,14 @@
  * under the License.
  */
 
-#ifndef WEEX_AST_H_
-#define WEEX_AST_H_
+#ifndef CORE_DATA_RENDER_AST_H_
+#define CORE_DATA_RENDER_AST_H_
 
 #include <assert.h>
 #include <memory>
 #include <vector>
 #include "core/data_render/handle.h"
-#include "core/data_render/json/json11.hpp"
+#include "third_party/json11/json11.hpp"
 
 using namespace json11;
 
@@ -38,19 +38,19 @@ namespace data_render {
 #define EMIT_FUNCTION
 #endif
 
-#define DEFINE_NODE_TYPE(Type, Inheritor)                                       \
+#define DEFINE_NODE_TYPE(Type, Inheritor)                            \
  public:                                                             \
   friend class ASTVisitor;                                           \
   friend class Expression;                                           \
   friend class ASTFactory;                                           \
-  Type(Json &json) : Inheritor(json) {}                              \
+  Type(Json& json) : Inheritor(json) {}                              \
   virtual ~Type() = default;                                         \
   bool Is##Type() const override { return true; }                    \
   Handle<Type> As##Type() override {                                 \
-    return Handle<Type>(dynamic_cast<Type *>(this));                 \
+    return Handle<Type>(dynamic_cast<Type*>(this));                  \
   }                                                                  \
   ASTNodeType type() const override { return ASTNodeType::k##Type; } \
-  void Accept(ASTVisitor *visitor, void *data) override;             \
+  void Accept(ASTVisitor* visitor, void* data) override;             \
                                                                      \
  protected:                                                          \
   static Handle<Type> Create(Json json) { return MakeHandle<Type>(json); }
@@ -98,19 +98,19 @@ enum class ASTNodeType {
 #define AST_NODE_TYPE(type) k##type,
   AST_NODE_LIST(AST_NODE_TYPE)
 #undef AST_NODE_TYPE
-  kNrType
+      kNrType
 };
 
-extern const char* type_as_string[(int) ASTNodeType::kNrType];
+extern const char* type_as_string[(int)ASTNodeType::kNrType];
 
 class Expression : public RefCountObject {
  protected:
-  Expression(Json& json) : json_(json) {};
-  Expression() {};
+  Expression(Json& json) : json_(json){};
+  Expression(){};
 
  public:
   virtual ~Expression() {}
-  virtual void Pasing(Json& json) {};
+  virtual void Pasing(Json& json){};
   virtual void Accept(ASTVisitor* visitor, void* data) = 0;
   virtual bool ProduceRValue() { return true; }
   virtual ASTNodeType type() const = 0;
@@ -151,7 +151,7 @@ class ExpressionList : public Expression {
   iterator begin() { return exprs_.begin(); }
   iterator end() { return exprs_.end(); }
 
- DEFINE_NODE_TYPE(ExpressionList, Expression);
+  DEFINE_NODE_TYPE(ExpressionList, Expression);
 
  private:
   std::vector<Handle<Expression>> exprs_;
@@ -168,7 +168,7 @@ class ArgumentList : public Expression {
   Handle<ExpressionList> args() { return args_; }
   size_t length() { return args()->Size(); }
 
- DEFINE_NODE_TYPE(ArgumentList, Expression);
+  DEFINE_NODE_TYPE(ArgumentList, Expression);
 
  private:
   Handle<ExpressionList> args_;
@@ -182,12 +182,11 @@ class Identifier : public Expression {
   Identifier(Json& json, const std::string& name)
       : Expression(json), name_(name) {}
 
-  explicit Identifier(const std::string& name)
-      : Expression(), name_(name) {}
+  explicit Identifier(const std::string& name) : Expression(), name_(name) {}
 
   const std::string& GetName() const { return name_; }
   bool ProduceRValue() override { return false; }
- DEFINE_NODE_TYPE(Identifier, Expression);
+  DEFINE_NODE_TYPE(Identifier, Expression);
 };
 
 class StringConstant : public Expression {
@@ -197,28 +196,26 @@ class StringConstant : public Expression {
  public:
   StringConstant(Json& json, const std::string& str)
       : Expression(json), str_(str) {}
-  explicit StringConstant(const std::string& str)
-      : Expression(), str_(str) {}
+  explicit StringConstant(const std::string& str) : Expression(), str_(str) {}
   std::string& string() { return str_; }
- DEFINE_NODE_TYPE(StringConstant, Expression);
+  DEFINE_NODE_TYPE(StringConstant, Expression);
 };
 
 class TernaryExpression : public Expression {
  public:
   TernaryExpression(Json& json, Handle<Expression> first,
                     Handle<Expression> second, Handle<Expression> third)
-      : Expression(json), first_(first), second_(second),
-        third_(third) {}
+      : Expression(json), first_(first), second_(second), third_(third) {}
 
-  TernaryExpression(Handle<Expression> first,
-                    Handle<Expression> second, Handle<Expression> third)
-      : Expression(), first_(first), second_(second),
-        third_(third) {}
+  TernaryExpression(Handle<Expression> first, Handle<Expression> second,
+                    Handle<Expression> third)
+      : Expression(), first_(first), second_(second), third_(third) {}
 
   Handle<Expression> first() { return first_; }
   Handle<Expression> second() { return second_; }
   Handle<Expression> third() { return third_; }
- DEFINE_NODE_TYPE(TernaryExpression, Expression);
+  DEFINE_NODE_TYPE(TernaryExpression, Expression);
+
  private:
   Handle<Expression> first_;
   Handle<Expression> second_;
@@ -251,7 +248,7 @@ enum class BinaryOperation {
 };
 
 class BinaryExpression : public Expression {
- DEFINE_NODE_TYPE(BinaryExpression, Expression);
+  DEFINE_NODE_TYPE(BinaryExpression, Expression);
 
  public:
   BinaryExpression(Json& json, BinaryOperation op, Handle<Expression> lhs,
@@ -281,7 +278,7 @@ class Declaration : public Expression {
   std::string& name() { return name_; }
 
   Handle<Expression> expr() { return init_; }
- DEFINE_NODE_TYPE(Declaration, Expression);
+  DEFINE_NODE_TYPE(Declaration, Expression);
 
  private:
   std::string name_;
@@ -300,7 +297,7 @@ class DeclarationList : public Expression {
   void Append(Handle<Declaration> decl) {
     exprs_.push_back(Handle<Declaration>(decl));
   }
- DEFINE_NODE_TYPE(DeclarationList, Expression);
+  DEFINE_NODE_TYPE(DeclarationList, Expression);
 
  private:
   std::vector<Handle<Declaration>> exprs_;
@@ -318,7 +315,7 @@ class CommaExpression : public Expression {
   void Append(Handle<Expression> decl) {
     exprs_.push_back(Handle<Expression>(decl));
   }
- DEFINE_NODE_TYPE(CommaExpression, Expression);
+  DEFINE_NODE_TYPE(CommaExpression, Expression);
 
  private:
   std::vector<Handle<Expression>> exprs_;
@@ -330,7 +327,8 @@ class IntegralConstant : public Expression {
   explicit IntegralConstant(int value) : Expression(), value_(value) {}
 
   int value() { return value_; }
- DEFINE_NODE_TYPE(IntegralConstant, Expression);
+  DEFINE_NODE_TYPE(IntegralConstant, Expression);
+
  private:
   int value_;
 };
@@ -340,27 +338,27 @@ class DoubleConstant : public Expression {
   DoubleConstant(Json& json, double value) : Expression(json), value_(value) {}
   explicit DoubleConstant(double value) : Expression(), value_(value) {}
   double value() { return value_; }
- DEFINE_NODE_TYPE(DoubleConstant, Expression);
+  DEFINE_NODE_TYPE(DoubleConstant, Expression);
+
  private:
   double value_;
 };
 
 class BooleanConstant : public Expression {
   bool pred_;
+
  public:
-  BooleanConstant(Json& json, bool val)
-      : Expression(json), pred_(val) {}
-  explicit BooleanConstant(bool val)
-      : Expression(), pred_(val) {}
+  BooleanConstant(Json& json, bool val) : Expression(json), pred_(val) {}
+  explicit BooleanConstant(bool val) : Expression(), pred_(val) {}
 
   bool pred() { return pred_; }
- DEFINE_NODE_TYPE(BooleanConstant, Expression);
+  DEFINE_NODE_TYPE(BooleanConstant, Expression);
 };
 
 class NullConstant : public Expression {
  public:
   NullConstant() : Expression() {}
- DEFINE_NODE_TYPE(NullConstant, Expression);
+  DEFINE_NODE_TYPE(NullConstant, Expression);
 };
 
 enum class MemberAccessKind {
@@ -382,7 +380,7 @@ class MemberExpression : public Expression {
 
   Handle<Expression> expr() { return expr_; }
   bool ProduceRValue() override { return false; }
- DEFINE_NODE_TYPE(MemberExpression, Expression);
+  DEFINE_NODE_TYPE(MemberExpression, Expression);
 
  private:
   MemberAccessKind kind_;
@@ -397,14 +395,10 @@ class CallExpression : public Expression {
       : Expression(json), expr_(expr), member_(member) {}
   CallExpression(Json& json, Handle<Expression> callee,
                  std::vector<Handle<Expression>> args)
-      : Expression(json),
-        callee_(callee),
-        args_{std::move(args)} {}
+      : Expression(json), callee_(callee), args_{std::move(args)} {}
   CallExpression(Handle<Expression> callee,
                  std::vector<Handle<Expression>> args)
-      : Expression(),
-        callee_(callee),
-        args_{std::move(args)} {}
+      : Expression(), callee_(callee), args_{std::move(args)} {}
   Handle<Expression> member() { return member_; }
   Handle<Expression> callee() { return callee_; }
   std::vector<Handle<Expression>>& args() { return args_; }
@@ -412,7 +406,7 @@ class CallExpression : public Expression {
   Handle<Expression> expr() { return expr_; }
   bool ProduceRValue() override { return false; }
   void InsertArgument(Handle<Expression> arg) { args_.push_back(arg); }
- DEFINE_NODE_TYPE(CallExpression, Expression);
+  DEFINE_NODE_TYPE(CallExpression, Expression);
 
  private:
   Handle<Expression> expr_;
@@ -435,17 +429,14 @@ class PrefixExpression : public Expression {
       : Expression(), op_{op}, expr_{expr} {}
   PrefixOperation op() { return op_; }
   Handle<Expression> expr() { return expr_; }
- DEFINE_NODE_TYPE(PrefixExpression, Expression);
+  DEFINE_NODE_TYPE(PrefixExpression, Expression);
 
  private:
   PrefixOperation op_;
   Handle<Expression> expr_;
 };
 
-enum class PostfixOperation {
-  kIncrement,
-  kDecrement
-};
+enum class PostfixOperation { kIncrement, kDecrement };
 
 class PostfixExpression : public Expression {
  public:
@@ -455,10 +446,10 @@ class PostfixExpression : public Expression {
   PostfixExpression(PostfixOperation op, Handle<Expression> expr)
       : Expression(), op_{op}, expr_{expr} {}
 
-
   PostfixOperation op() { return op_; }
   Handle<Expression> expr() { return expr_; }
- DEFINE_NODE_TYPE(PostfixExpression, Expression);
+  DEFINE_NODE_TYPE(PostfixExpression, Expression);
+
  private:
   PostfixOperation op_;
   Handle<Expression> expr_;
@@ -473,7 +464,7 @@ class ObjectConstant : public Expression {
   bool IsEmpty() { return Props.empty(); }
   ProxyObject::size_type GetPropertyCount() { return Props.size(); }
 
- DEFINE_NODE_TYPE(ObjectConstant, Expression);
+  DEFINE_NODE_TYPE(ObjectConstant, Expression);
 
  private:
   ProxyObject Props;
@@ -488,7 +479,7 @@ class ArrayConstant : public Expression {
 
   typename ProxyArray::size_type length() { return exprs_.size(); }
 
- DEFINE_NODE_TYPE(ArrayConstant, Expression);
+  DEFINE_NODE_TYPE(ArrayConstant, Expression);
 
  private:
   ProxyArray exprs_;
@@ -503,7 +494,8 @@ class AssignExpression : public Expression {
 
   Handle<Expression> lhs() { return lhs_; }
   Handle<Expression> rhs() { return rhs_; }
- DEFINE_NODE_TYPE(AssignExpression, Expression);
+  DEFINE_NODE_TYPE(AssignExpression, Expression);
+
  private:
   Handle<Expression> lhs_;
   Handle<Expression> rhs_;
@@ -513,4 +505,4 @@ class AssignExpression : public Expression {
 }  // namespace core
 }  // namespace weex
 
-#endif
+#endif  // CORE_DATA_RENDER_AST_H_
