@@ -27,7 +27,7 @@ Pod::Spec.new do |s|
   s.platform     = :ios
   s.ios.deployment_target = '8.0'
   s.source =  { :path => '.' }
-  s.source_files = 'ios/sdk/WeexSDK/Sources/**/*.{h,m,mm,c,cpp}'
+  s.source_files = 'ios/sdk/WeexSDK/Sources/**/*.{h,m,mm,c,cpp,cc}'
   s.resources = 'pre-build/*.js','ios/sdk/WeexSDK/Resources/wx_load_error@3x.png'
 
   s.user_target_xcconfig  = { 'FRAMEWORK_SEARCH_PATHS' => "'$(PODS_ROOT)/WeexSDK'" }
@@ -46,9 +46,9 @@ Pod::Spec.new do |s|
   s.default_subspec='WeexCore'
 
   s.subspec 'WeexCore' do |w|
-    w.source_files = 'weex_core/Source/base/**/*.{h,m,mm,c,cpp}',
-                    'weex_core/Source/core/**/*.{h,m,mm,c,cpp}',
-                    'weex_core/Source/wson/**/*.{h,m,mm,c,cpp}'
+    w.source_files = 'weex_core/Source/base/**/*.{h,m,mm,c,cpp,cc}',
+                    'weex_core/Source/core/**/*.{h,m,mm,c,cpp,cc}',
+                    'weex_core/Source/wson/**/*.{h,m,mm,c,cpp,cc}'
 
     w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => ['${PODS_ROOT}/Headers/Public/WeexSDK/core/**'] }
     w.header_mappings_dir = 'weex_core/Source'
