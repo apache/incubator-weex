@@ -435,7 +435,7 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 {
     WXComponent *supercomponent = component.supercomponent;
     if ([self _parseCssSelector:cssSelector component:supercomponent]) {
-        NSDictionary *info = @{@"attrs":supercomponent.attributes,@"type":supercomponent->_type,@"vRef":supercomponent.ref};
+        NSDictionary *info = @{@"attrs":supercomponent.attributes,@"type":supercomponent->_type,@"ref":supercomponent.ref};
         return info;
     }
     else
