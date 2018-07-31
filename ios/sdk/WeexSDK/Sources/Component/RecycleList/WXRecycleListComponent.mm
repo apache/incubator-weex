@@ -383,6 +383,9 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
     }
     else
     {
+        if (virtalElementInfo.length == 0) {
+            return;
+        }
         position = [self _positionForVirtalElementInfo:virtalElementInfo];
     }
     NSIndexPath *toIndexPath = [NSIndexPath indexPathForItem:position inSection:0];
@@ -408,13 +411,19 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 - (NSString *)_refForVirtalElementInfo:(NSString *)virtalElementInfo
 {
     NSArray *stringArray = [virtalElementInfo componentsSeparatedByString:@"@"];
-    return stringArray[0];
+    if (stringArray.count == 2) {
+        return stringArray[0];
+    }
+    return nil;
 }
 
 - (NSUInteger )_positionForVirtalElementInfo:(NSString *)virtalElementInfo
 {
     NSArray *stringArray = [virtalElementInfo componentsSeparatedByString:@"@"];
-    return [stringArray[1] integerValue];
+    if (stringArray.count == 2) {
+        return [stringArray[1] integerValue];
+    }
+    return 0;
 }
 
 - (void)closest:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
