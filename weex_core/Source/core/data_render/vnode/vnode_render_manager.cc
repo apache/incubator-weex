@@ -33,7 +33,7 @@
 
 #if VRENDER_LOG
 
-#include "android/base/log_utils.h"
+#include "base/LogDefines.h"
 
 #endif
 

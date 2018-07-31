@@ -24,7 +24,7 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
-#include <android/base/log_utils.h>
+#include <base/LogDefines.h>
 
 namespace weex {
 namespace core {
@@ -235,6 +235,7 @@ PrefixOperation MapTokenWithPrefixOperator(Token& tok) {
       return PrefixOperation::kNot;
     default:
       LOGE("error prefix opration: %s", tok.view().c_str());
+      return PrefixOperation::kNot;
   }
 }
 
@@ -341,6 +342,7 @@ BinaryOperation MapBinaryOperator(Token& tok) {
     default:
 //      throw SyntaxError(tok, "unexpected token as binary operator");
       LOGE("unexpected token as binary operator %s", tok.view().c_str());
+      return BinaryOperation::kUndefine;
   }
 }
 

@@ -20,7 +20,7 @@
 #include <utility>
 #include <vector>
 #include <wson_parser.h>
-#include <android/base/log_utils.h>
+#include <base/LogDefines.h>
 #include <chrono>
 
 #include "base/ViewUtils.h"
@@ -115,26 +115,6 @@ bool RenderManager::AddRenderObject(const std::string &page_id,
   if (child == nullptr) return false;
   page->set_is_dirty(true);
   return page->AddRenderObject(parent_ref, index, child);
-}
-
-
-bool RenderManager::AddRenderObject(const std::string &page_id, const std::string &parent_ref,
-                                    int index,  RenderObject *root) {
-  RenderPage *page = GetPage(page_id);
-  if (page == nullptr) return false;
-
-#if RENDER_LOG
-  wson_parser parser(data);
-  LOGD(
-      "[RenderManager] AddRenderObject >>>> pageId: %s, parentRef: %s, index: "
-      "%d, dom data: %s",
-      pageId.c_str(), parentRef.c_str(), index, parser.toStringUTF8().c_str());
-#endif
-
-  if (root == nullptr) return false;
-
-  page->set_is_dirty(true);
-  return page->AddRenderObject(parent_ref, index, root);
 }
 
 bool RenderManager::RemoveRenderObject(const std::string &page_id,

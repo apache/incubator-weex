@@ -46,9 +46,9 @@ Pod::Spec.new do |s|
   s.default_subspec='WeexCore'
 
   s.subspec 'WeexCore' do |w|
-    w.source_files = 'weex_core/Source/base/**/*.{h,m,mm,c,cpp,cc}',
-                    'weex_core/Source/core/**/*.{h,m,mm,c,cpp,cc}',
-                    'weex_core/Source/wson/**/*.{h,m,mm,c,cpp,cc}'
+    w.source_files = 'weex_core/Source/base/**/*.{h,hpp,m,mm,c,cpp,cc}',
+                    'weex_core/Source/core/**/*.{h,hpp,m,mm,c,cpp,cc}',
+                    'weex_core/Source/wson/**/*.{h,hpp,m,mm,c,cpp,cc}'
 
     w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => ['${PODS_ROOT}/Headers/Public/WeexSDK/core/**'] }
     w.header_mappings_dir = 'weex_core/Source'

@@ -49,16 +49,16 @@
 
 #elif __APPLE__
 
-#define LOGE(...)    print(__VA_ARGS__)
-#define LOGA(...)    print(__VA_ARGS__)
-#define LOGD(...)    print(__VA_ARGS__)
+#define LOGE(...)    printf(__VA_ARGS__)
+#define LOGA(...)    printf(__VA_ARGS__)
+#define LOGD(...)    printf(__VA_ARGS__)
 
 #ifdef DEBUG
 
-#define LOGV(...)     print(__VA_ARGS__)
-#define LOGD(...)     print(__VA_ARGS__)
-#define LOGI(...)     print(__VA_ARGS__)
-#define LOGW(...)     print(__VA_ARGS__)
+#define LOGV(...)     printf(__VA_ARGS__)
+#define LOGD(...)     printf(__VA_ARGS__)
+#define LOGI(...)     printf(__VA_ARGS__)
+#define LOGW(...)     printf(__VA_ARGS__)
 #define LOG_LINE LOGV("%s, %d", __func__, __LINE__)
 
 #else

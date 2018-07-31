@@ -53,8 +53,8 @@ class local_cfunction {
       Value* value = exec_state->GetArgument(0);
       if (value->type == Value::Type::TABLE) {
         Table* table = TableValue(value);
-        if (table->sizearray > 0) {
-          return Value(static_cast<int64_t>(table->sizearray));
+        if (table->array->size() > 0) {
+          return Value(static_cast<int64_t>(table->array->size()));
         } else if (table->map->size() > 0) {
           return Value(static_cast<int64_t>(table->map->size()));
         };
