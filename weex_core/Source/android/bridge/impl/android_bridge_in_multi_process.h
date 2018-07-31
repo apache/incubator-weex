@@ -20,7 +20,9 @@
 #ifndef WEEX_PROJECT_IPC_BRIDGE_IMPL_H
 #define WEEX_PROJECT_IPC_BRIDGE_IMPL_H
 
-#include "bridge_impl_android.h"
+#include "IPC/IPCHandler.h"
+#include "android/jsengine/multiprocess/WeexJSConnection.h"
+#include "android/bridge/impl/bridge_impl_android.h"
 
 class IPCArguments;
 class IPCResult;
