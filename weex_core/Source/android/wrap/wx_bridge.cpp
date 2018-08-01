@@ -47,7 +47,9 @@ static jint InitFrameworkEnv(JNIEnv* env, jobject jcaller, jstring framework,
     SoUtils::set_cache_dir(const_cast<char*>(cache));
   }
   SoUtils::set_pie_support(pieSupport);
-  return InitFramework(env, jcaller, framework, params);
+  jint ret = InitFramework(env, jcaller, framework, params);
+  env->ReleaseStringUTFChars(cacheDir, cache);
+  return ret;
 }
 
 static void BindMeasurementToRenderObject(JNIEnv* env, jobject jcaller,
@@ -278,6 +280,7 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   // Call InitFramework
   auto result = bridge->core_side()->InitFramework(c_script, params_vector);
   env->ReleaseStringUTFChars(script, c_script);
+  freeInitFrameworkParams(params_vector);
   return result;
 }
 

@@ -300,6 +300,14 @@ namespace WeexCore {
     }
 
 
+    void freeInitFrameworkParams(std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
+        for (auto &param : params) {
+            free(param->type);
+            free(param->value);
+            free(param);
+        }
+    }
+
     void freeParams(std::vector<VALUE_WITH_TYPE *> &params) {
         for (auto &param : params) {
             if (param->type == ParamsType::STRING ||
