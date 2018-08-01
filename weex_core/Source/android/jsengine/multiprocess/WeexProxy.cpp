@@ -402,6 +402,7 @@ namespace WeexCore {
                 }
 
                 jobject jArg = env->GetObjectArrayElement(jargs, i);
+                if (jArg == nullptr) continue;
                 addParamsFromJArgs(params, param, serializer, env, jArg);
                 env->DeleteLocalRef(jArg);
             }
