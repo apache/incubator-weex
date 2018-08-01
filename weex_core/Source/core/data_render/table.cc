@@ -37,10 +37,10 @@ int SetTabIntValue(Table *t, Value *key, const Value &val) {
   if (IsNil(&val)) {
     return 0;
   }
-  int index = IndexOf(t->array, &val);
+  int index = IndexOf(&t->array, &val);
   if (index < 0) {
-    t->array->emplace_back(val);
-    index = t->array->size() - 1;
+    t->array.emplace_back(val);
+    index = t->array.size() - 1;
   }
   if (nullptr != key) {
     SetIValue(key, index);
@@ -56,27 +56,27 @@ int SetTabStringValue(Table *t, const Value *key, const Value &val) {
   if (keyStr.empty()) {
     return 0;
   }
-  auto it = t->map->find(keyStr);
-  if (it != t->map->end()) {
-    t->map->erase(it);
+  auto it = t->map.find(keyStr);
+  if (it != t->map.end()) {
+    t->map.erase(it);
   }
-  t->map->insert(std::make_pair(keyStr, val));
+  t->map.insert(std::make_pair(keyStr, val));
   return 1;
 }
 
-Value *GetTabIntValue(const Table *t, const Value *key) {
+Value *GetTabIntValue(Table *t, const Value *key) {
   int index = IntValue(key);
-  if (index < t->array->size()) {
-    return &(t->array->at(index));
+  if (index < t->array.size()) {
+    return &(t->array.at(index));
   }
   return nullptr;
 }
 
-Value *GetTabStringValue(const Table *t, const Value *key) {
+Value *GetTabStringValue(Table *t, const Value *key) {
   std::string str = CStringValue(key);
   if (!str.empty()) {
-    auto it = t->map->find(str);
-    if (it != t->map->end()) {
+    auto it = t->map.find(str);
+    if (it != t->map.end()) {
       return &(it->second);
     }
   }
@@ -84,12 +84,13 @@ Value *GetTabStringValue(const Table *t, const Value *key) {
 }
 
 Table *NewTable() {
-  Table *t = reinterpret_cast<Table *>(reallocMem(nullptr, sizeof(Table)));
-  if (nullptr == t) {
-    return nullptr;
-  }
+//  Table *t = reinterpret_cast<Table *>(reallocMem(nullptr, sizeof(Table)));
+//  if (nullptr == t) {
+//    return nullptr;
+//  }
 //  t->array = new std::vector<Value>();
 //  t->map = new std::unordered_map<std::string, Value>();
+  Table *t = new Table();
   return t;
 }
 
@@ -98,7 +99,7 @@ int ResizeTab(Table *t, size_t nasize, size_t nhsize) {
   return 1;
 }
 
-Value *GetTabValue(const Table *t, const Value &key) {
+Value *GetTabValue(Table *t, const Value &key) {
   if (IsInt(&key)) {
     return GetTabIntValue(t, &key);
   } else if (IsString(&key)) {
@@ -126,14 +127,14 @@ size_t GetArraySize(Table *t) {
   if (nullptr == t) {
     return 0;
   }
-  return t->array->size();
+  return t->array.size();
 }
 
 size_t GetMapSize(Table *t) {
   if (nullptr == t) {
     return -1;
   }
-  return t->map->size();
+  return t->map.size();
 }
 
 size_t GetValueArraySize(Value &o) {

@@ -133,14 +133,14 @@ static Value AppendUrlParam(ExecState* exec_state) {
   std::stringstream ss;
   ss << p_string->c_str();
 
-  std::vector<Value>* kv_array = p_array->array;
-  for (auto it = kv_array->begin(); it != kv_array->end(); it++) {
+  std::vector<Value> kv_array = p_array->array;
+  for (auto it = kv_array.begin(); it != kv_array.end(); it++) {
     Value& kv_map = *it;
     Table* p_table = TableValue(&kv_map);
-    if (p_table != nullptr && p_table->map->find("key") != p_table->map->end() &&
-        p_table->map->find("value") != p_table->map->end()) {
-      Value& key = p_table->map->find("key")->second;
-      Value& value = p_table->map->find("value")->second;
+    if (p_table != nullptr && p_table->map.find("key") != p_table->map.end() &&
+        p_table->map.find("value") != p_table->map.end()) {
+      Value& key = p_table->map.find("key")->second;
+      Value& value = p_table->map.find("value")->second;
       if (IsString(&key) && IsString(&value)) {
         ss << "&" << key.str->c_str() << "=" << value.str->c_str();
       }
@@ -294,10 +294,10 @@ json11::Json ParseValue2Json(const Value& value) {
   }
 
   Table* p_table = TableValue(&value);
-  if (p_table->array->size() > 0) {
+  if (p_table->array.size() > 0) {
     json11::Json::array array;
 
-    for (auto it = p_table->array->begin(); it != p_table->array->end(); it++) {
+    for (auto it = p_table->array.begin(); it != p_table->array.end(); it++) {
       if ((*it).type == Value::STRING) {
         array.push_back(json11::Json((*it).str->c_str()));
         continue;
@@ -313,7 +313,7 @@ json11::Json ParseValue2Json(const Value& value) {
   }
 
   json11::Json::object object;
-  for (auto it = p_table->map->begin(); it != p_table->map->end(); it++) {
+  for (auto it = p_table->map.begin(); it != p_table->map.end(); it++) {
     if (it->second.type == Value::STRING) {
       object.insert({it->first, json11::Json(it->second.str->c_str())});
       continue;

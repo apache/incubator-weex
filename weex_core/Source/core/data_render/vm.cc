@@ -347,7 +347,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
           // TODO error
           return;
         }
-        Value* ret = GetTabValue(reinterpret_cast<const Table*>(b->gc), *c);
+        Value* ret = GetTabValue(reinterpret_cast<Table *>(b->gc), *c);
         if (!IsNil(ret)) {
           *a = *ret;
         } else {

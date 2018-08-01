@@ -26,6 +26,7 @@
 #include <sstream>
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
+#include "core/data_render/object.h"
 
 #define CommonHeader GCObject *gc
 
@@ -60,14 +61,6 @@ class Value;
 typedef struct GCObject {
   CommonHeader;
 } GCObject;
-
-typedef struct Table {
-  CommonHeader;
-
-  std::vector<Value> *array; /* array part */
-  std::unordered_map<std::string, Value> *map;
-
-} Table;
 
 typedef Value (*CFunction)(ExecState *);
 
@@ -137,6 +130,15 @@ struct Value {
   }
 };
 
+typedef struct Table {
+    CommonHeader;
+
+    std::vector<Value> array; /* array part */
+    std::unordered_map<std::string, Value> map;
+
+    Table() : array(), map() {}
+
+} Table;
 /*
 ** try to convert a value to an integer, rounding according to 'mode':
 ** mode == 0: accepts only integral values
@@ -358,7 +360,7 @@ inline int ToBool(const Value *o, bool &b) {
 inline void TableArrayAddAll(Value &src, Value &dest, int start, int end) {
   Table *st = TableValue(&src);
   Table *dt = TableValue(&dest);
-  st->array->insert(st->array->end(), dt->array->begin() + start, end > 0 ? dt->array->begin() + end : dt->array->end());
+  st->array.insert(st->array.end(), dt->array.begin() + start, end > 0 ? dt->array.begin() + end : dt->array.end());
 }
 
 inline void TableArrayAddAll(Value &src, Value &dest) {
@@ -368,7 +370,7 @@ inline void TableArrayAddAll(Value &src, Value &dest) {
 inline void TableMapAddAll(Value &src, Value &dest) {
   Table *st = TableValue(&src);
   Table *dt = TableValue(&dest);
-  st->map->insert(dt->map->begin(), dt->map->end());
+  st->map.insert(dt->map.begin(), dt->map.end());
 }
 
 }  // namespace data_render

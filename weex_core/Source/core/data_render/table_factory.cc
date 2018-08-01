@@ -22,7 +22,7 @@ TableFactory::~TableFactory() {
 
   for (auto it = tablePool.begin(); it != tablePool.end(); it++) {
 //    FreeValue(*it);
-    freeMem(*it);
+    delete *it;
   }
   tablePool.clear();
 }

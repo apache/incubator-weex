@@ -30,7 +30,7 @@ Table *NewTable();
 
 int ResizeTab(Table *, size_t, size_t);
 
-Value *GetTabValue(const Table *, const Value &);
+Value *GetTabValue(Table *, const Value &);
 
 int SetTabValue(Table *, Value *, const Value &);
 
