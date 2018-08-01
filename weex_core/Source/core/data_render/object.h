@@ -370,7 +370,7 @@ inline void TableArrayAddAll(Value &src, Value &dest) {
 inline void TableMapAddAll(Value &src, Value &dest) {
   Table *st = TableValue(&src);
   Table *dt = TableValue(&dest);
-  st->map.insert(dt->map.begin(), dt->map.end());
+  dt->map.insert(st->map.begin(), st->map.end());
 }
 
 }  // namespace data_render
