@@ -52,12 +52,12 @@ VM* VNodeRenderManager::g_vm = nullptr;
 int ref_id = 0;
 
 WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
-                                                WeexCore::RenderObject* parent,
+                                                WeexCore::RenderObject* parent, bool isRoot,
                                                 int index,
                                                 const string& pageId) {
   std::stringstream ss;
   ss << ref_id++;
-  std::string ref_str = parent == nullptr ? "_root" : ss.str();
+  std::string ref_str = isRoot ? "_root" : ss.str();
   WeexCore::RenderObject* render_object = static_cast<WeexCore::RenderObject*>(
       WeexCore::RenderCreator::GetInstance()->CreateRender(vnode->tag_name(),
                                                            ref_str));
@@ -83,7 +83,7 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
   // child
   vector<VNode*>* children = (const_cast<VNode*>(vnode))->child_list();
   for (int i = 0; i < children->size(); i++) {
-    ParseVNode2RenderObject((*children)[i], render_object, i, pageId);
+    ParseVNode2RenderObject((*children)[i], render_object, false, i, pageId);
   }
 
   render_object->set_page_id(pageId);
@@ -100,7 +100,7 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
 }
 
 WeexCore::RenderObject* VNode2RenderObject(VNode* root, const string& page_id) {
-  return ParseVNode2RenderObject(root, nullptr, 0, page_id);
+  return ParseVNode2RenderObject(root, nullptr, true, 0, page_id);
 }
 
 void Patch(const string& page_id, VNode* old_root, VNode* new_root);
@@ -381,7 +381,7 @@ void CreateAndInsertElm(const string& page_id, VNode* node,
   int index = std::distance(ref_list.begin(), insert_pos);
   ref_list.insert(insert_pos, node);
 
-  WeexCore::RenderObject* root = VNode2RenderObject(node, page_id);
+  WeexCore::RenderObject* root = ParseVNode2RenderObject(node, nullptr, false, 0, page_id);
   RenderManager::GetInstance()->AddRenderObject(
       page_id, node->parent()->render_object_ref(), index, root);
 }
