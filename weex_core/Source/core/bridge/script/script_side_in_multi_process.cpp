@@ -149,12 +149,12 @@ int ScriptSideInMultiProcess::CallJSOnAppContext(
 
       if (param->type == ParamsType::DOUBLE) {
         serializer->add(param->value.doubleValue);
-      } else if (param->type == ParamsType::STRING ||
-                 param->type == ParamsType::JSONSTRING) {
+      } else if (param->type == ParamsType::STRING) {
         serializer->add(param->value.string->content,
                         param->value.string->length);
-        serializer->add(param->value.string->content,
-                        param->value.string->length);
+      } else if(param->type == ParamsType::JSONSTRING) {
+        serializer->addJSON(param->value.string->content,
+                            param->value.string->length);
       } else {
         serializer->addJSUndefined();
       }
@@ -237,9 +237,11 @@ int ScriptSideInMultiProcess::ExecJS(const char *instanceId,
 
       if (param->type == ParamsType::DOUBLE) {
         serializer->add(param->value.doubleValue);
-      } else if (param->type == ParamsType::STRING ||
-                 param->type == ParamsType::JSONSTRING) {
+      } else if (param->type == ParamsType::STRING) {
         serializer->add(param->value.string->content,
+                        param->value.string->length);
+      } else if(param->type == ParamsType::JSONSTRING) {
+        serializer->addJSON(param->value.string->content,
                         param->value.string->length);
       } else if (param->type == ParamsType::BYTEARRAY) {
         serializer->add(param->value.byteArray->content,
@@ -291,11 +293,13 @@ WeexJSResult ScriptSideInMultiProcess::ExecJSWithResult(
 
       if (param->type == ParamsType::DOUBLE) {
         serializer->add(param->value.doubleValue);
-      } else if (param->type == ParamsType::STRING ||
-                 param->type == ParamsType::JSONSTRING) {
+      } else if (param->type == ParamsType::STRING) {
         serializer->add(param->value.string->content,
                         param->value.string->length);
-      } else if (param->type == ParamsType::BYTEARRAY) {
+      } else if(param->type == ParamsType::JSONSTRING) {
+        serializer->addJSON(param->value.string->content,
+                            param->value.string->length);
+      }else if (param->type == ParamsType::BYTEARRAY) {
         serializer->add(param->value.byteArray->content,
                         param->value.byteArray->length);
       } else {

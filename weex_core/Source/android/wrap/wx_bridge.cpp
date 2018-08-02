@@ -276,10 +276,9 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(
       new MeasureFunctionAdapterImplAndroid());
   bridge->core_side()->SetMeasureFunctionAdapter();
-  char* c_script = const_cast<char*>(env->GetStringUTFChars(script, JNI_FALSE));
+  ScopedJStringUTF8 c_script(env,script);
   // Call InitFramework
-  auto result = bridge->core_side()->InitFramework(c_script, params_vector);
-  env->ReleaseStringUTFChars(script, c_script);
+  auto result = bridge->core_side()->InitFramework(c_script.getChars(), params_vector);
   freeInitFrameworkParams(params_vector);
   return result;
 }
