@@ -19,30 +19,21 @@
 #ifndef _EXTEND_JSAPI_H_
 #define _EXTEND_JSAPI_H_
 
-#include <android/base/log_utils.h>
-#include <core/render/manager/render_manager.h>
 #include <jni.h>
-#include <sys/types.h>
 
 namespace WeexCore {
 
   typedef const char *(*FunType)(const char *, int, const char *);
 
-  const char *callGCanvasFun(FunType fp, const char *conextId, int x, const char *args);
+  const char *CallGCanvasFun(const char *conextId, int x, const char *args);
 
   extern "C" void Inject_GCanvasFunc(FunType fp);
 
   typedef const char* (*FunTypeT3d)(int, const char*);
 
-  const char* weexCallT3dFunc(FunTypeT3d fp, int x, const char* args);
+  const char* CallT3dFunc(int x, const char* args);
 
   extern "C" void Inject_T3dFunc(FunTypeT3d fp);
-
-  class ExtendJSApi {
-  public:
-    ExtendJSApi();
-
-  };
 
 } //WeexCore
 

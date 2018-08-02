@@ -46,8 +46,8 @@ jstring getJsonData(JNIEnv* env, jobjectArray jargs, int index);
 void addParamsFromJArgs(std::vector<VALUE_WITH_TYPE*>& params,
                         VALUE_WITH_TYPE* param, JNIEnv* env,
                         std::unique_ptr<WXJSObject>& wx_js_object);
-void freeInitFrameworkParams(std::vector<INIT_FRAMEWORK_PARAMS *> &params);
 void freeParams(std::vector<VALUE_WITH_TYPE *> &params);
+void freeParams(std::vector<InitFrameworkParams *> &params);
 }  // namespace WeexCore
 
 #endif  // WEEX_PROJECT_PARAMS_UTILS_H

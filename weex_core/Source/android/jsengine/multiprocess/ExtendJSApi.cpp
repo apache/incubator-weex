@@ -19,6 +19,7 @@
 #include <android/base/string/string_utils.h>
 #include <base/ViewUtils.h>
 #include <android/jsengine/api/WeexJSCoreApi.h>
+#include <android/base/log_utils.h>
 #include "android/utils/IPCStringResult.h"
 #include "ExtendJSApi.h"
 
@@ -28,22 +29,15 @@ WeexCore::FunType gCanvasFunc = nullptr;
 
 WeexCore::FunTypeT3d t3dFunc = nullptr;
 
-/**
-* This class aim to extend JS Api
-**/
-ExtendJSApi::ExtendJSApi() {
-}
-
 namespace WeexCore {
 
   extern "C" void Inject_GCanvasFunc(FunType fp) {
-      // TODO
     gCanvasFunc = fp;
     LOGE("weexjsc injectGCanvasFunc gCanvasFunc");
   }
 
-  const char *callGCanvasFun(FunType fp, const char *conextId, int x, const char *args) {
-    return fp(conextId, x, args);
+  const char *CallGCanvasFun(const char *conextId, int x, const char *args) {
+    return gCanvasFunc(conextId, x, args);
   }
 
   extern "C" void Inject_T3dFunc(FunTypeT3d fp) {
@@ -51,8 +45,8 @@ namespace WeexCore {
     LOGE("weexjsc Inject_T3dFunc t3d Func");
   }
 
-const char* weexCallT3dFunc(FunTypeT3d fp, int x, const char* args) {
-  return fp(x, args);
+const char* CallT3dFunc(int x, const char* args) {
+  return t3dFunc(x, args);
 }
 
 }

@@ -115,7 +115,6 @@ if (ANDROID)
 
 
     ./android/jsengine/multiprocess/WeexJSConnection.cpp
-    ./android/jsengine/multiprocess/WeexProxy.cpp
     ./android/jsengine/multiprocess/ExtendJSApi.cpp
 
 

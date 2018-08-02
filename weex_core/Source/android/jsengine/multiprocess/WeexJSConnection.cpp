@@ -19,7 +19,6 @@
 #include "WeexJSConnection.h"
 
 #include "ashmem.h"
-#include "WeexProxy.h"
 #include "ExtendJSApi.h"
 #include <dirent.h>
 #include <stdlib.h>

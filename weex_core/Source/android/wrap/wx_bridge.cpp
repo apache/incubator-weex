@@ -279,7 +279,7 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   ScopedJStringUTF8 c_script(env,script);
   // Call InitFramework
   auto result = bridge->core_side()->InitFramework(c_script.getChars(), params_vector);
-  freeInitFrameworkParams(params_vector);
+  freeParams(params_vector);
   return result;
 }
 

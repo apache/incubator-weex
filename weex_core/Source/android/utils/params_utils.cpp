@@ -299,15 +299,6 @@ namespace WeexCore {
 
     }
 
-
-    void freeInitFrameworkParams(std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
-        for (auto &param : params) {
-            free(param->type);
-            free(param->value);
-            free(param);
-        }
-    }
-
     void freeParams(std::vector<VALUE_WITH_TYPE *> &params) {
         for (auto &param : params) {
             if (param->type == ParamsType::STRING ||
@@ -316,6 +307,18 @@ namespace WeexCore {
             }
             if (param->type == ParamsType::BYTEARRAY) {
                 free(param->value.byteArray);
+            }
+            free(param);
+        }
+    }
+
+    void freeParams(std::vector<InitFrameworkParams *> &params) {
+        for (auto &param : params) {
+            if (param->type != nullptr) {
+                free(param->type);
+            }
+            if (param->value != nullptr) {
+                free(param->value);
             }
             free(param);
         }

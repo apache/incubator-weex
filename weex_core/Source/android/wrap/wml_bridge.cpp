@@ -18,38 +18,138 @@
  */
 
 #include "android/wrap/wml_bridge.h"
+#include "android/base/jni_type.h"
+#include "android/utils/params_utils.h"
+#include "core/manager/weex_core_manager.h"
 #include "android/base/jni/android_jni.h"
 #include "android/base/log_utils.h"
 #include "android/base/string/string_utils.h"
-#include "android/jsengine/multiprocess/WeexProxy.h"
 
 static jint InitAppFramework(JNIEnv* env, jobject jcaller, jstring jinstanceid,
                              jstring jframwork, jobjectArray jargs) {
   WeexCore::WMLBridge::Instance()->Reset(env, jcaller);
-  return WeexProxy::initAppFramework(env, jcaller, jinstanceid, jframwork,
-                                     jargs);
+  ScopedJStringUTF8 id(env, jinstanceid);
+  ScopedJStringUTF8 framework(env, jframwork);
+  int length = jargs == NULL ? 0 : env->GetArrayLength(jargs);
+  std::vector<INIT_FRAMEWORK_PARAMS*> params;
+
+  for (int i = 0; i < length; i++) {
+    auto jArg = std::unique_ptr<WXJSObject>(
+        new WXJSObject(env, env->GetObjectArrayElement(jargs, i)));
+    jint jTypeInt = jArg->GetType(env);
+    auto jDataObj = jArg->GetData(env);
+    auto jKeyStr = jArg->GetKey(env);
+
+    if (jTypeInt == 2) {
+      jstring jDataStr = (jstring)jDataObj.Get();
+      ScopedJStringUTF8 jni_key(env, jKeyStr.Get());
+      ScopedJStringUTF8 jni_data(env, jDataStr);
+      params.push_back(
+          genInitFrameworkParams(jni_key.getChars(), jni_data.getChars()));
+    } else if (jTypeInt == 3) {
+      jstring jDataStr = (jstring)jDataObj.Get();
+      ScopedJStringUTF8 jni_key(env, jKeyStr.Get());
+      ScopedJStringUTF8 jni_data(env, jDataStr);
+      params.push_back(
+          genInitFrameworkParams(jni_key.getChars(), jni_data.getChars()));
+    }
+  }
+
+  auto result =
+      WeexCoreManager::getInstance()
+          ->getPlatformBridge()
+          ->core_side()
+          ->InitAppFramework(id.getChars(), framework.getChars(), params);
+  freeParams(params);
+  return result;
 }
 
 static jint DestoryAppContext(JNIEnv* env, jobject jcaller,
                               jstring jinstanceid) {
-  return WeexProxy::destoryAppContext(env, jcaller, jinstanceid);
+  ScopedJStringUTF8 id(env, jinstanceid);
+  return WeexCoreManager::getInstance()
+      ->getPlatformBridge()
+      ->core_side()
+      ->DestroyAppContext(id.getChars());
 }
 
 static jint CreateAppContext(JNIEnv* env, jobject jcaller, jstring jinstanceid,
                              jstring jbundle, jobject jargs) {
-  return WeexProxy::createAppContext(env, jcaller, jinstanceid, jbundle, jargs);
+  ScopedJStringUTF8 id(env, jinstanceid);
+  ScopedJStringUTF8 bundle(env, jbundle);
+  return WeexCoreManager::getInstance()
+      ->getPlatformBridge()
+      ->core_side()
+      ->CreateAppContext(id.getChars(), bundle.getChars());
 }
 
 static jbyteArray ExecJsOnAppWithResult(JNIEnv* env, jobject jcaller,
                                         jstring jinstanceid, jstring jbundle,
                                         jobject jargs) {
-  return WeexProxy::execJsOnAppWithResult(env, jcaller, jinstanceid, jbundle,
-                                          jargs);
+  ScopedJStringUTF8 id(env, jinstanceid);
+  ScopedJStringUTF8 bundle(env, jbundle);
+  auto ret = WeexCoreManager::getInstance()
+                 ->getPlatformBridge()
+                 ->core_side()
+                 ->ExecJSOnAppWithResult(id.getChars(), bundle.getChars());
+  if (ret != nullptr) {
+    jbyteArray array = env->NewByteArray(strlen(ret));
+    env->SetByteArrayRegion(array, 0, strlen(ret),
+                            reinterpret_cast<const jbyte*>(ret));
+    return array;
+  }
+
+  return nullptr;
 }
 
 static jint ExecJsOnApp(JNIEnv* env, jobject jcaller, jstring jinstanceid,
                         jstring jfunction, jobjectArray jargs) {
-  return WeexProxy::execJsOnApp(env, jcaller, jinstanceid, jfunction, jargs);
+  //  return WeexProxy::execJsOnApp(env, jcaller, jinstanceid, jfunction,
+  //  jargs);
+
+  ScopedJStringUTF8 id(env, jinstanceid);
+  ScopedJStringUTF8 function(env, jfunction);
+
+  int length = 0;
+  if (jargs != NULL) {
+    length = env->GetArrayLength(jargs);
+  }
+  std::vector<VALUE_WITH_TYPE*> params;
+
+  for (int i = 0; i < length; i++) {
+    auto jArg = std::unique_ptr<WXJSObject>(
+        new WXJSObject(env, env->GetObjectArrayElement(jargs, i)));
+    jint jTypeInt = jArg->GetType(env);
+    auto jDataObj = jArg->GetData(env);
+
+    VALUE_WITH_TYPE* param = nullptr;
+
+    param = getValueWithTypePtr();
+
+    if (jTypeInt == 1) {
+      jdouble jDoubleObj =
+          base::android::JNIType::DoubleValue(env, jDataObj.Get());
+      param->type = ParamsType::DOUBLE;
+      param->value.doubleValue = jDoubleObj;
+
+    } else if (jTypeInt == 2) {
+      jstring jDataStr = (jstring)jDataObj.Get();
+      param->type = ParamsType::STRING;
+      param->value.string = jstring2WeexString(env, jDataStr);
+    } else if (jTypeInt == 3) {
+      jstring jDataStr = (jstring)jDataObj.Get();
+      param->type = ParamsType::JSONSTRING;
+      param->value.string = jstring2WeexString(env, jDataStr);
+    } else {
+      param->type = ParamsType::JSUNDEFINED;
+    }
+    params.push_back(param);
+  }
+
+  return WeexCoreManager::getInstance()
+      ->getPlatformBridge()
+      ->core_side()
+      ->CallJSOnAppContext(id.getChars(), function.getChars(), params);
 }
 
 namespace WeexCore {
@@ -121,7 +221,6 @@ static void Java_WMLBridge_postMessage(JNIEnv* env, jobject obj, jstring vmID,
 
 bool WMLBridge::RegisterJNIUtils(JNIEnv* env) {
   jclass temp_class = env->FindClass(kWMLBridgeClassPath);
-
 
   // use to check WMLBridge has already on env
   if (env->ExceptionOccurred()) {
