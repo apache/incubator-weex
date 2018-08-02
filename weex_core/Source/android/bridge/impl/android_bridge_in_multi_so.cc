@@ -99,7 +99,7 @@ PlatformExposeFunctions *AndroidBridgeInMultiSo::GetExposedFunctions() {
 }
 
 void AndroidBridgeInMultiSo::SetJSVersion(const char *version) {
-  LOGE("Android Bridge: SetJSVersion");
+//  LOGE("Android Bridge: SetJSVersion");
   WeexCoreManager::getInstance()
       ->getPlatformBridge()
       ->platform_side()

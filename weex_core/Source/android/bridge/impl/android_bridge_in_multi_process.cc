@@ -47,7 +47,6 @@ AndroidBridgeInMultiProcess::AndroidBridgeInMultiProcess() {
 
   std::unique_ptr<MultiProcessAndSoInitializer> initializer(
       new MultiProcessAndSoInitializer);
-  LOGE("AndroidBridgeInMultiProcess");
   bool passable = initializer->Init(
       [this](IPCHandler* handler) { RegisterIPCCallback(handler); },
       [this](std::unique_ptr<WeexJSConnection> connection,
@@ -58,7 +57,6 @@ AndroidBridgeInMultiProcess::AndroidBridgeInMultiProcess() {
         connection_ = std::move(connection);
         handler_ = std::move(handler);
         server_handler_ = std::move(server_handler);
-        LOGE("FINISH %x",server_handler_.get());
         return true;
       },
       [this](const char* page_id, const char* func,
@@ -71,7 +69,6 @@ AndroidBridgeInMultiProcess::AndroidBridgeInMultiProcess() {
 AndroidBridgeInMultiProcess::~AndroidBridgeInMultiProcess() {}
 
 void AndroidBridgeInMultiProcess::RegisterIPCCallback(IPCHandler* handler) {
-  LOGE("RegisterIPCCallback AND handler is %x",handler);
   handler->registerHandler(
       static_cast<uint32_t>(IPCMsgFromCoreToPlatform::INVOKE_MEASURE_FUNCTION),
       InvokeMeasureFunction);
