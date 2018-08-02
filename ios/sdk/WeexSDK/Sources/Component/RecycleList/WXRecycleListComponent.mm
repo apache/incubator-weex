@@ -430,7 +430,7 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 {
     if(callback)
     {
-        WXPerformBlockSyncOnComponentThread(^{
+        WXPerformBlockOnComponentThread(^{
             WXComponent *component = [self.weexInstance.componentManager componentForRef:[self _refForVirtalElementInfo:virtalElementInfo]];
             if (component) {
                 callback([self _closestComponentForCSSSelector:cssSelector component:component]);
