@@ -26,6 +26,7 @@ import java.util.Map;
 import com.alibaba.fastjson.JSON;
 
 import android.content.Context;
+import android.support.v7.widget.PagerSnapHelper;
 import android.text.TextUtils;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
@@ -81,6 +82,15 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
         bounceRecyclerView.getSwipeLayout().setNestedScrollingEnabled(true);
       }
     }
+
+    /**
+     *  enable pagingEnabled attr
+     */
+    if(WXUtils.getBoolean(getAttrs().get(Constants.Name.PAGE_ENABLED),false)){
+      PagerSnapHelper snapHelper = new PagerSnapHelper();
+      snapHelper.attachToRecyclerView(bounceRecyclerView.getInnerView());
+    }
+
     return bounceRecyclerView;
   }
 
