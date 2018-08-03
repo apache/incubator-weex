@@ -23,6 +23,10 @@
 #include "core/data_render/vm.h"
 #include "core/data_render/parser.h"
 
+#if DEBUG
+#include "core/data_render/monitor/vm_monitor.h"
+#endif
+
 namespace weex {
 namespace core {
 namespace data_render {
@@ -79,6 +83,10 @@ ExecState::ExecState(VM* vm)
       global_variables_() {}
 
 void ExecState::Compile() {
+
+#if DEBUG
+  TimeCost tc("Compile");
+#endif
   CodeGenerator generator(this);
   std::string err;
   ParseResult result = Parser::Parse(context()->raw_json(),err);
@@ -86,6 +94,9 @@ void ExecState::Compile() {
 }
 
 void ExecState::Execute() {
+#if DEBUG
+  TimeCost tc("ExecuteMain");
+#endif
   Value chunk;
   chunk.type = Value::Type::FUNC;
   chunk.f = func_state_.get();

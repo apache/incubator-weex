@@ -21,11 +21,20 @@
 #include "core/data_render/object.h"
 #include "core/data_render/table.h"
 
+#if DEBUG
+#include "core/data_render/monitor/vm_monitor.h"
+#endif
+
 namespace weex {
 namespace core {
 namespace data_render {
 
 void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
+
+#if DEBUG
+  TimeCost tc;
+#endif
+
   Value* a = nullptr;
   Value* b = nullptr;
   Value* c = nullptr;
@@ -33,7 +42,13 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
   while (pc != frame.end) {
     Instruction instruction = *pc++;
     double d1, d2;
-    switch (GET_OP_CODE(instruction)) {
+    OpCode op(GET_OP_CODE(instruction));
+
+#if DEBUG
+    tc.op_start(op);
+#endif
+
+    switch (op) {
       case OP_MOVE:
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
@@ -394,6 +409,11 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
       default:
         break;
     }
+
+#if DEBUG
+    tc.op_end();
+#endif
+
   }
 }
 

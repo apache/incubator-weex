@@ -27,10 +27,9 @@
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
 #include "core/data_render/object.h"
+#include "android/base/log_utils.h"
 
 #define CommonHeader GCObject *gc
-
-#define LOGE(...) ((void)0)
 
 #define INT_OP(op, v1, v2) CAST_U2S((CAST_S2U(v1))op CAST_S2U(v2))
 #define NUM_OP(op, d1, d2) ((d1)op(d2))
@@ -106,6 +105,7 @@ struct Value {
       case CFUNC:cf = value.cf;
         break;
       case CPTR:cptr = value.cptr;
+        break;
       case TABLE:gc = value.gc;
         break;
       default:break;
