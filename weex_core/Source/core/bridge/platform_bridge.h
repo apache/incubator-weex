@@ -204,6 +204,8 @@ class PlatformBridge {
 
     virtual int CreateFinish(const char* pageId) = 0;
 
+    virtual int RenderSuccess(const char* pageId) = 0;
+
     virtual int RemoveElement(const char* pageId, const char* ref) = 0;
 
     virtual int MoveElement(const char* pageId, const char* ref,

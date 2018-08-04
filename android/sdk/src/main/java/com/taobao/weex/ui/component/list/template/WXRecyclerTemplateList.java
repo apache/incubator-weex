@@ -42,8 +42,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
@@ -97,7 +99,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     /**
      * trace log for template list
      * */
-    public static final boolean ENABLE_TRACE_LOG = true;
+    public static final boolean ENABLE_TRACE_LOG = false;
 
     public static final String TAG = "WXRecyclerTemplateList";
 
@@ -522,21 +524,129 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     }
 
 
-    @JSMethod
-    public void scrollTo(int position, Map<String, Object> options){
-        if (position >= 0) {
-            boolean smooth = true;
-            if(options != null) {
-                smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
-            }
-
-            final int pos = position;
-            BounceRecyclerView bounceRecyclerView = getHostView();
-            if (bounceRecyclerView == null) {
+    @JSMethod(uiThread = true)
+    public void queryElement(String virtualRef, String selector, JSCallback callback){
+        try{
+            String[]  segments = virtualRef.split(TemplateDom.SEPARATOR + "");
+            String listRef = segments[0];
+            int position = Integer.parseInt(segments[1]); // position
+            WXComponent component = TemplateDom.findVirtualComponentByVRef(getInstanceId(), virtualRef);
+            if(component == null){
                 return;
             }
-            final WXRecyclerView view = bounceRecyclerView.getInnerView();
-            view.scrollTo(smooth, pos, 0, getOrientation());
+            if(getHostView() == null || getHostView().getInnerView() == null){
+                return;
+            }
+            List<WXComponent>  componentList  = new ArrayList<>(4);
+            Selector.queryElementAll(component, selector, componentList);
+            if(componentList.size() > 0){
+                callback.invoke(TemplateDom.toMap(listRef, position, componentList.get(0)));
+            }else{
+                callback.invoke(new HashMap<>(4));
+            }
+        }catch (Exception e){
+            callback.invoke(new HashMap<>(4));
+            WXLogUtils.e(TAG, e);
+        }
+    }
+
+    @JSMethod(uiThread = true)
+    public void queryElementAll(String virtualRef,  String selector, JSCallback callback){
+        List datas = new ArrayList();
+        try{
+            String[]  segments = virtualRef.split(TemplateDom.SEPARATOR + "");
+            String listRef = segments[0];
+            int position = Integer.parseInt(segments[1]); // position
+            WXComponent component = TemplateDom.findVirtualComponentByVRef(getInstanceId(), virtualRef);
+            if(component == null){
+                return;
+            }
+            if(getHostView() == null || getHostView().getInnerView() == null){
+                return;
+            }
+            List<WXComponent>  componentList  = new ArrayList<>(4);
+            Selector.queryElementAll(component, selector, componentList);
+            for(WXComponent child : componentList){
+                datas.add(TemplateDom.toMap(listRef, position, child));
+            }
+            callback.invoke(datas);
+        }catch (Exception e){
+            callback.invoke(datas);
+            WXLogUtils.e(TAG, e);
+        }
+    }
+
+    @JSMethod(uiThread = true)
+    public void closest(String virtualRef,  String selector, JSCallback callback){
+        try{
+            String[]  segments = virtualRef.split(TemplateDom.SEPARATOR + "");
+            String listRef = segments[0];
+            int position = Integer.parseInt(segments[1]); // position
+            WXComponent component = TemplateDom.findVirtualComponentByVRef(getInstanceId(), virtualRef);
+            if(component == null){
+                return;
+            }
+            if(getHostView() == null || getHostView().getInnerView() == null){
+                return;
+            }
+            List<WXComponent>  componentList  = new ArrayList<>(4);
+            Selector.closest(component, selector, componentList);
+            if(componentList.size() > 0){
+                callback.invoke(TemplateDom.toMap(listRef, position, componentList.get(0)));
+            }else{
+                callback.invoke(new HashMap<>(4));
+            }
+        }catch (Exception e){
+            callback.invoke(new HashMap<>(4));
+            WXLogUtils.e(TAG, e);
+        }
+    }
+
+
+
+    @JSMethod(uiThread = true)
+    public void scrollToElement(String virtualRef, Map<String, Object> options){
+        scrollTo(virtualRef, options);
+    }
+
+
+    @JSMethod(uiThread = true)
+    public void scrollTo(String virtualRef, Map<String, Object> options){
+        int position = -1;
+        try{
+            if(virtualRef.indexOf(TemplateDom.SEPARATOR) > 0){
+                String[]  segments = virtualRef.split(TemplateDom.SEPARATOR + "");
+                position = Integer.parseInt(segments[0]);
+            }else{
+                position = (int) Float.parseFloat(virtualRef);
+            }
+            if (position >= 0) {
+                boolean smooth = true;
+                float offsetFloat = 0;
+                if(options != null) {
+                    smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
+                    String offsetStr = options.get(Constants.Name.OFFSET) == null ? "0" : options.get(Constants.Name.OFFSET).toString();
+                    smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
+                    if (offsetStr != null) {
+                        try {
+                            offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offsetStr), getInstance().getInstanceViewPortWidth());
+                        }catch (Exception e ){
+                            WXLogUtils.e("Float parseFloat error :"+e.getMessage());
+                        }
+                    }
+                }
+                final int offset = (int) offsetFloat;
+
+                final int pos = position;
+                BounceRecyclerView bounceRecyclerView = getHostView();
+                if (bounceRecyclerView == null) {
+                    return;
+                }
+                final WXRecyclerView view = bounceRecyclerView.getInnerView();
+                view.scrollTo(smooth, pos, offset, getOrientation());
+            }
+        }catch (Exception e){
+            WXLogUtils.e(TAG, e);
         }
     }
 
@@ -1218,6 +1328,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if(component == null){
             return;
         }
+        if(templateViewHolder.getHolderPosition() >= 0){
+            fireEvent(TemplateDom.DETACH_CELL_SLOT, TemplateDom.findAllComponentRefs(getRef(), position, component));
+        }
         long start = System.currentTimeMillis();
         templateViewHolder.setHolderPosition(position);
         Object data = cellDataManager.listData.get(position);
@@ -1227,6 +1340,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 WXLogUtils.d(TAG,  position + " position "+ getTemplateKey(position) + " onBindViewHolder none data update "
                         + " component " + component.hashCode());
             }
+            fireEvent(TemplateDom.ATTACH_CELL_SLOT, TemplateDom.findAllComponentRefs(getRef(), position, component));
             return;  //none update just return
         }else{
             List<WXComponent> updates = doRenderTemplate(component, position);
@@ -1739,6 +1853,27 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             componentList.add(child);
         }
         return  componentList;
+    }
+
+
+
+    /**
+     * find child by ref
+     * */
+    public WXComponent findChildByAttrsRef(WXComponent component, String ref){
+        if(component.getAttrs() != null && ref.equals(component.getAttrs().get(TemplateDom.ATTRS_KEY_REF))){
+            return component;
+        }
+        if(component instanceof WXVContainer){
+            WXVContainer container = (WXVContainer) component;
+            for(int i=0; i<container.getChildCount(); i++){
+                WXComponent child = findChildByAttrsRef(container.getChild(i), ref);
+                if(child != null){
+                    return  child;
+                }
+            }
+        }
+        return  null;
     }
 
 

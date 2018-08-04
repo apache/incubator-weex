@@ -65,7 +65,7 @@ _Pragma("clang diagnostic pop") \
 //store the methods which will be executed from native to js
 @property (nonatomic, strong) NSMutableDictionary   *sendQueue;
 //the instance stack
-@property (nonatomic, strong) WXThreadSafeMutableArray    *insStack;
+@property (nonatomic, strong) NSMutableArray    *insStack;
 //identify if the JSFramework has been loaded
 @property (nonatomic) BOOL frameworkLoadFinished;
 //store some methods temporarily before JSFramework is loaded
@@ -415,19 +415,20 @@ _Pragma("clang diagnostic pop") \
 {
     if (_insStack) return _insStack;
 
-    _insStack = [WXThreadSafeMutableArray array];
+    _insStack = [NSMutableArray array];
     
     return _insStack;
 }
 
 - (WXSDKInstance *)topInstance
 {
-    if (self.insStack.count > 0) {
-        WXSDKInstance *topInstance = [WXSDKManager instanceForID:[self.insStack firstObject]];
-        return topInstance;
-    }
-    
-    return nil;
+	WXSDKInstance *topInstance = nil;
+	@synchronized(self) {
+		if (self.insStack.count > 0) {
+			topInstance = [WXSDKManager instanceForID:[self.insStack firstObject]];
+		}
+	}
+    return topInstance;
 }
 
 - (NSMutableDictionary *)sendQueue
@@ -493,14 +494,16 @@ _Pragma("clang diagnostic pop") \
 {
     WXAssertBridgeThread();
     WXAssertParam(instanceIdString);
-    
-    if (![self.insStack containsObject:instanceIdString]) {
-        if ([options[@"RENDER_IN_ORDER"] boolValue]) {
-            [self.insStack addObject:instanceIdString];
-        } else {
-            [self.insStack insertObject:instanceIdString atIndex:0];
-        }
-    }
+	
+	@synchronized(self) {
+		if (![self.insStack containsObject:instanceIdString]) {
+			if ([options[@"RENDER_IN_ORDER"] boolValue]) {
+				[self.insStack addObject:instanceIdString];
+			} else {
+				[self.insStack insertObject:instanceIdString atIndex:0];
+			}
+		}
+	}
     
     //create a sendQueue bind to the current instance
     NSMutableArray *sendQueue = [NSMutableArray array];
@@ -528,6 +531,9 @@ _Pragma("clang diagnostic pop") \
         sdkInstance.bundleType = bundleType;
         if ([bundleType.lowercaseString isEqualToString:@"rax"]) {
              raxAPIScriptPath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-rax-api" ofType:@"js"];
+			if (raxAPIScriptPath == nil) {
+				raxAPIScriptPath = [[NSBundle mainBundle] pathForResource:@"weex-rax-api" ofType:@"js"];
+			}
             raxAPIScript = [NSString stringWithContentsOfFile:raxAPIScriptPath encoding:NSUTF8StringEncoding error:nil];
             if (!raxAPIScript) {
                 WXLogError(@"weex-rax-api can not found");
@@ -565,6 +571,9 @@ _Pragma("clang diagnostic pop") \
                 
                 if (WX_SYS_VERSION_LESS_THAN(@"10.2")) {
                     NSString *filePath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-polyfill" ofType:@"js"];
+					if (filePath == nil) {
+						filePath = [[NSBundle mainBundle] pathForResource:@"weex-polyfill" ofType:@"js"];
+					}
                     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
                     if (script) {
                         [sdkInstance.instanceJavaScriptContext executeJavascript:script withSourceURL:[NSURL URLWithString:filePath]];
@@ -625,25 +634,58 @@ _Pragma("clang diagnostic pop") \
     if (!jsBundleString ) {
         return bundleType;
     }
-    if ([jsBundleString hasPrefix:@"// { \"framework\": \"Vue\""] || [jsBundleString hasPrefix:@"// { \"framework\": \"vue\""]) {
-        bundleType = @"Vue";
-    } else if ([jsBundleString hasPrefix:@"// { \"framework\": \"Rax\""] || [jsBundleString hasPrefix:@"// { \"framework\": \"rax\""] || [jsBundleString hasPrefix:@"// {\"framework\" : \"Rax\"}"] || [jsBundleString hasPrefix:@"// {\"framework\" : \"rax\"}"]) {
-        bundleType = @"Rax";
-    }else {
-        NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:vue)" options:NSRegularExpressionCaseInsensitive error:NULL];
+    if ( [self _isParserByRegEx]) {
+        NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\/\\/ *(\\{[^}]*\\}) *\\r?\\n" options:NSRegularExpressionCaseInsensitive error:NULL];
         NSTextCheckingResult *match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
         if (match) {
-            bundleType = [jsBundleString substringWithRange:match.range];
-            return bundleType;
+            NSString* bundleTypeStr = [jsBundleString substringWithRange:match.range];
+            bundleTypeStr = [bundleTypeStr stringByReplacingOccurrencesOfString:@"//" withString:@""];
+            id vale = [WXUtility objectFromJSON:bundleTypeStr];
+            bundleType = [vale objectForKey:@"framework"];
+        }else{
+            NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:vue)" options:NSRegularExpressionCaseInsensitive error:NULL];
+            NSTextCheckingResult *match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            if (match) {
+                bundleType = [jsBundleString substringWithRange:match.range];
+                return bundleType;
+            }
+            regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:rax)" options:NSRegularExpressionCaseInsensitive error:NULL];
+            match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            if (match) {
+                bundleType = [jsBundleString substringWithRange:match.range];
+            }
         }
-        regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:rax)" options:NSRegularExpressionCaseInsensitive error:NULL];
-         match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
-        if (match) {
-            bundleType = [jsBundleString substringWithRange:match.range];
+    }else{
+        if ([jsBundleString hasPrefix:@"// { \"framework\": \"Vue\""] || [jsBundleString hasPrefix:@"// { \"framework\": \"vue\""]) {
+            bundleType = @"Vue";
+        } else if ([jsBundleString hasPrefix:@"// { \"framework\": \"Rax\""] || [jsBundleString hasPrefix:@"// { \"framework\": \"rax\""] || [jsBundleString hasPrefix:@"// {\"framework\" : \"Rax\"}"] || [jsBundleString hasPrefix:@"// {\"framework\" : \"rax\"}"]) {
+            bundleType = @"Rax";
+        }else {
+            NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:vue)" options:NSRegularExpressionCaseInsensitive error:NULL];
+            NSTextCheckingResult *match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            if (match) {
+                bundleType = [jsBundleString substringWithRange:match.range];
+                return bundleType;
+            }
+            regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:rax)" options:NSRegularExpressionCaseInsensitive error:NULL];
+            match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            if (match) {
+                bundleType = [jsBundleString substringWithRange:match.range];
+            }
         }
     }
-    
     return bundleType;
+}
+
+- (bool)_isParserByRegEx
+{
+    bool useRegEx = true;
+    id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        useRegEx = [[configCenter configForKey:@"iOS_weex_ext_config.parserTypeByRegEx" defaultValue:@(YES) isDefault:NULL] boolValue];
+    }
+    return false;
 }
 
 - (void)destroyInstance:(NSString *)instance
@@ -652,9 +694,9 @@ _Pragma("clang diagnostic pop") \
     WXAssertParam(instance);
     
     //remove instance from stack
-    if([self.insStack containsObject:instance]){
-        [self.insStack removeObject:instance];
-    }
+	@synchronized(self) {
+		[self.insStack removeObject:instance];
+	}
     
     if(_jsBridge && [_jsBridge respondsToSelector:@selector(removeTimers:)]){
         [_jsBridge removeTimers:instance];
@@ -890,19 +932,21 @@ _Pragma("clang diagnostic pop") \
     BOOL hasTask = NO;
     NSMutableArray *tasks = [NSMutableArray array];
     NSString *execIns = nil;
-    
-    for (NSString *instance in self.insStack) {
-        NSMutableArray *sendQueue = self.sendQueue[instance];
-        if(sendQueue.count > 0){
-            hasTask = YES;
-            for(WXCallJSMethod *method in sendQueue){
-                [tasks addObject:[method callJSTask]];
-            }
-            [sendQueue removeAllObjects];
-            execIns = instance;
-            break;
-        }
-    }
+	
+	@synchronized(self) {
+		for (NSString *instance in self.insStack) {
+			NSMutableArray *sendQueue = self.sendQueue[instance];
+			if(sendQueue.count > 0){
+				hasTask = YES;
+				for(WXCallJSMethod *method in sendQueue){
+					[tasks addObject:[method callJSTask]];
+				}
+				[sendQueue removeAllObjects];
+				execIns = instance;
+				break;
+			}
+		}
+	}
     
     if ([tasks count] > 0 && execIns) {
         WXSDKInstance * execInstance = [WXSDKManager instanceForID:execIns];

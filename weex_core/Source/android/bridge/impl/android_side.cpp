@@ -288,6 +288,16 @@ int AndroidSide::CreateFinish(const char *page_id) {
   return flag;
 }
 
+int AndroidSide::RenderSuccess(const char *page_id) {
+  JNIEnv *env = base::android::AttachCurrentThread();
+  int flag = wx_bridge_->RenderSuccess(env, page_id);
+
+  if (flag == -1) {
+    LOGE("instance destroy JFM must stop callRenderFinish");
+  }
+  return flag;
+}
+
 int AndroidSide::RemoveElement(const char *page_id, const char *ref) {
   JNIEnv *env = base::android::AttachCurrentThread();
   int flag = wx_bridge_->RemoveElement(env, page_id, ref);

@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
@@ -38,8 +37,6 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * All container components must implement this class
@@ -49,7 +46,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   private static final String TAG = "WXVContainer";
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
   private BoxShadowHost mBoxShadowHost;
-  private  boolean requestDisallowInterceptTouchEvent = false;
 
   @Deprecated
   public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
@@ -264,8 +260,8 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     if (child == null || index < -1) {
       return;
     }
-    child.deepInComponentTree = this.deepInComponentTree+1;
-    getInstance().setMaxDomDeep(child.deepInComponentTree);
+    child.mDeepInComponentTree = this.mDeepInComponentTree +1;
+    getInstance().setMaxDomDeep(child.mDeepInComponentTree);
     int count = mChildren.size();
     index = index >= count ? -1 : index;
     if (index == -1) {
@@ -544,14 +540,14 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
 
   public void requestDisallowInterceptTouchEvent(boolean requestDisallowInterceptTouchEvent) {
-    if(this.requestDisallowInterceptTouchEvent != requestDisallowInterceptTouchEvent){
-      this.requestDisallowInterceptTouchEvent = requestDisallowInterceptTouchEvent;
-      if(mGesture != null){
-        mGesture.setRequestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
+    if(mGesture != null){
+      if(mGesture.isRequestDisallowInterceptTouchEvent()){
+        return;
       }
-      if(getParent() != null){
-        getParent().requestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
-      }
+      mGesture.setRequestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
+    }
+    if(getParent() != null){
+      getParent().requestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
     }
   }
 

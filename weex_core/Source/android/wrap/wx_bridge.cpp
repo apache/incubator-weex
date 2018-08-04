@@ -18,8 +18,8 @@
  */
 
 #include "android/wrap/wx_bridge.h"
-#include <fstream>
 #include <android/bridge/impl/android_bridge.h>
+#include <fstream>
 #include "android/base/jni_type.h"
 #include "android/base/string/string_utils.h"
 #include "android/bridge/impl/android_bridge_in_multi_process.h"
@@ -249,17 +249,26 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
             ->platform_side()
             ->ReportNativeInitStatus(status_code, error_msg);
       });
-  std::vector<INIT_FRAMEWORK_PARAMS*> params_vector =
-      initFromParam(env, params);
+  std::vector<INIT_FRAMEWORK_PARAMS*> params_vector = initFromParam(
+      env, params, [](const char* status_code, const char* error_msg) {
+        WeexCoreManager::getInstance()
+            ->getPlatformBridge()
+            ->platform_side()
+            ->ReportNativeInitStatus(status_code, error_msg);
+      });
+  // If parse init params error, return false
+  if (params_vector.empty()) return false;
   // Init platform bridge
   Bridge_Impl_Android* bridge = new AndroidBridgeInSimple;
   Bridge_Impl_Android::InitInstance(bridge);
   WeexCoreManager::getInstance()->setPlatformBridge(bridge);
   // Set project mode
   if (isSingleProcess()) {
-    WeexCoreManager::getInstance()->set_project_mode(WeexCoreManager::ProjectMode::MULTI_SO);
+    WeexCoreManager::getInstance()->set_project_mode(
+        WeexCoreManager::ProjectMode::MULTI_SO);
   } else {
-    WeexCoreManager::getInstance()->set_project_mode(WeexCoreManager::ProjectMode::MULTI_PROCESS);
+    WeexCoreManager::getInstance()->set_project_mode(
+        WeexCoreManager::ProjectMode::MULTI_PROCESS);
   }
   // for environment
   bridge->core_side()->SetPlatform(
@@ -276,9 +285,10 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(
       new MeasureFunctionAdapterImplAndroid());
   bridge->core_side()->SetMeasureFunctionAdapter();
-  ScopedJStringUTF8 c_script(env,script);
+  ScopedJStringUTF8 c_script(env, script);
   // Call InitFramework
-  auto result = bridge->core_side()->InitFramework(c_script.getChars(), params_vector);
+  auto result =
+      bridge->core_side()->InitFramework(c_script.getChars(), params_vector);
   freeParams(params_vector);
   return result;
 }
@@ -760,6 +770,11 @@ int WXBridge::RefreshFinish(JNIEnv* env, const char* page_id, const char* task,
   jstring jPageId = getKeyFromCache(env, page_id);
   return Java_WXBridge_callRefreshFinish(env, jni_object(), jPageId,
                                          jTask.Get(), jCallback.Get());
+}
+
+int WXBridge::RenderSuccess(JNIEnv* env, const char* page_id) {
+  jstring jPageId = getKeyFromCache(env, page_id);
+  return Java_WXBridge_callRenderSuccess(env, jni_object(), jPageId);
 }
 
 int WXBridge::UpdateFinish(JNIEnv* env, const char* page_id, const char* task,

@@ -150,6 +150,8 @@ public interface IWXBridge extends IWXObject {
 
   int callCreateFinish(String instanceId);
 
+  int callRenderSuccess(String instanceId);
+
   int callAppendTreeCreateFinish(String instanceId, String ref);
 
   int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles);

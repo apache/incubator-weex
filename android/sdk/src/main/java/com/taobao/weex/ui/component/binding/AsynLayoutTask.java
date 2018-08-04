@@ -21,6 +21,7 @@ package com.taobao.weex.ui.component.binding;
 import android.os.AsyncTask;
 
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.list.template.TemplateDom;
 import com.taobao.weex.ui.component.list.template.TemplateViewHolder;
 
 /**
@@ -54,6 +55,9 @@ class AsynLayoutTask extends AsyncTask<Void, Void, Void> {
         if(position == templateViewHolder.getHolderPosition()) {
             if(component.getInstance() != null && !component.getInstance().isDestroy()) {
                 Layouts.setLayout(component, false);
+                if(templateViewHolder.getHolderPosition() >= 0){
+                    templateViewHolder.getTemplateList().fireEvent("_attach_slot", TemplateDom.findAllComponentRefs(templateViewHolder.getTemplateList().getRef(), position, component));
+                }
             }
         }
     }

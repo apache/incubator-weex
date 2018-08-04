@@ -18,6 +18,7 @@
  */
 package com.taobao.weex;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -106,7 +107,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   //Performance
   public boolean mEnd = false;
-  public boolean isJSCreateFinish =false;
+  public boolean mHasCreateFinish = false;
+  public boolean mHasSetCreateFinishFsTime = false;
   public static final String BUNDLE_URL = "bundleUrl";
   private IWXUserTrackAdapter mUserTrackAdapter;
   private IWXRenderListener mRenderListener;
@@ -132,6 +134,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private int mInstanceViewPortWidth = 750;
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
+
+  private Map<String,String> mContainerInfo;
 
   /**
    * bundle type
@@ -384,13 +388,22 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void init(Context context) {
     mContext = context;
+    mContainerInfo = new HashMap<>(4);
     mNativeInvokeHelper = new NativeInvokeHelper(mInstanceId);
 
-    mWXPerformance = new WXPerformance();
+    mWXPerformance = new WXPerformance(mInstanceId);
     mWXPerformance.WXSDKVersion = WXEnvironment.WXSDK_VERSION;
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
 
     mUserTrackAdapter=WXSDKManager.getInstance().getIWXUserTrackAdapter();
+
+    WXSDKManager.getInstance().getAllInstanceMap().put(mInstanceId,this);
+
+    mContainerInfo.put(Dimension.activity.toString(), context instanceof Activity
+            ? context.getClass().getSimpleName()
+            :"unKnowContainer"
+    );
+    mContainerInfo.put(Dimension.instanceType.toString(),"page");
   }
 
   /**
@@ -425,7 +438,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void setRootScrollView(ScrollView scrollView) {
     mScrollView = scrollView;
-    if (mWXScrollViewListener != null) {
+    if (mWXScrollViewListener != null && mScrollView instanceof WXScrollView) {
       ((WXScrollView) mScrollView).addScrollViewListener(mWXScrollViewListener);
     }
   }
@@ -442,6 +455,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   @Deprecated
   public void setIWXUserTrackAdapter(IWXUserTrackAdapter adapter) {
+  }
+
+  public void setContainerInfo(String key,String val){
+    mContainerInfo.put(key,val);
+  }
+
+  public Map<String, String> getContainerInfo() {
+    return mContainerInfo;
   }
 
   /**
@@ -945,7 +966,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
       intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.PAUSE_EVENT);
       intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
-      mContext.sendBroadcast(intent);
+      /**
+       *  Fix NPE just like {@link #onActivityResume()}
+       */
+      if (null != mContext){
+        mContext.sendBroadcast(intent);
+      }else {
+        WXEnvironment.getApplication().sendBroadcast(intent);
+      }
       this.mCurrentGround = true;
     }
   }
@@ -1092,10 +1120,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
 
   public void onCreateFinish() {
-    if (null != mWXPerformance){
-      mWXPerformance.callCreateFinishTime=System.currentTimeMillis()-mWXPerformance
-              .renderTimeOrigin;
-    }
     if (mContext != null) {
       runOnUiThread(new Runnable() {
 
@@ -1129,7 +1153,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void onRenderSuccess(final int width, final int height) {
-    isJSCreateFinish = true;
     firstScreenRenderFinished();
 
     long time = System.currentTimeMillis() - mRenderStartTime;
@@ -1158,7 +1181,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           if (mRenderListener != null && mContext != null) {
             mRenderListener.onRenderSuccess(WXSDKInstance.this, width, height);
             if (mUserTrackAdapter != null) {
-              WXPerformance performance=new WXPerformance();
+              WXPerformance performance=new WXPerformance(mInstanceId);
               performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
               performance.args=getBundleUrl();
               mUserTrackAdapter.commit(mContext,null,IWXUserTrackAdapter.JS_BRIDGE,performance,getUserTrackParams());
@@ -1189,21 +1212,42 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
-  /**
-   * when add/rm element
-   */
-  public void onElementChange(boolean afterJSCreateFinish){
-    if (isDestroy() || !afterJSCreateFinish ||null == mRenderContainer || mRenderContainer.isPageHasEvent() ||
-            mWXPerformance == null){
+  public void onChangeElement(WXComponent component, boolean isOutOfScreen) {
+
+    if (isDestroy()  || null == mRenderContainer || mWXPerformance == null){
       return;
     }
-    long lazyLoadTime = System.currentTimeMillis()- mWXPerformance.renderTimeOrigin - mWXPerformance
-            .callCreateFinishTime;
-    if (lazyLoadTime > 8000){
-      //bad case
+
+    if (mRenderContainer.hasConsumeEvent()) {
       return;
     }
-    getWXPerformance().interactionTime = mWXPerformance.callCreateFinishTime + lazyLoadTime;
+
+    long lastElementChangeTime = System.currentTimeMillis();
+
+    long lazyLoadTime;
+
+    if (mHasCreateFinish){
+      lazyLoadTime = lastElementChangeTime - mWXPerformance.renderTimeOrigin - mWXPerformance.callCreateFinishTime;
+      if (lazyLoadTime > 8000) {
+        //bad case
+        return;
+      }
+    }
+
+    if (component.mIsAddElementToTree) {
+      getWXPerformance().localInteractionViewAddCount++;
+      if (!isOutOfScreen)
+        getWXPerformance().interactionViewAddLimitCount++;
+      component.mIsAddElementToTree = false;
+    }
+
+    if (!isOutOfScreen) {
+      getWXPerformance().interactionViewAddCount = getWXPerformance().localInteractionViewAddCount;
+      getWXPerformance().interactionTime = lastElementChangeTime - mWXPerformance.renderTimeOrigin;
+//      WXLogUtils.renderPerformanceLog("   interactionViewAddCount", getWXPerformance().interactionViewAddCount);
+//      WXLogUtils.renderPerformanceLog("   interactionViewAddLimitCount", getWXPerformance().interactionViewAddLimitCount);
+//      WXLogUtils.renderPerformanceLog("   interactionTime", getWXPerformance().interactionTime);
+    }
   }
 
   public void onRenderError(final String errCode, final String msg) {
@@ -1288,8 +1332,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if (mEnd)
           return;
 
-      mEnd = true;
-
       if (mStatisticsListener != null && mContext != null) {
           runOnUiThread(new Runnable() {
               @Override
@@ -1304,17 +1346,19 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       }
 
       mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
-      mWXPerformance.fsRenderTime = System.currentTimeMillis();
+      if (!mHasSetCreateFinishFsTime) {
+        mWXPerformance.fsRenderTime = System.currentTimeMillis();
+        if (mHasCreateFinish)
+          mHasSetCreateFinishFsTime = true;
+      }
+      mWXPerformance.newFsRenderTime = System.currentTimeMillis() - mRenderStartTime;
       long[] fitstScreenPerformance = WXBridgeManager.getInstance().getFirstScreenRenderTime(getInstanceId());
       WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
+      WXLogUtils.renderPerformanceLog("newFsRenderTime", mWXPerformance.newFsRenderTime);
       WXLogUtils.renderPerformanceLog("    firstScreenJSFExecuteTime", mWXPerformance.firstScreenJSFExecuteTime);
       WXLogUtils.renderPerformanceLog("    firstScreenCallBridgeTime", fitstScreenPerformance[0]);
       WXLogUtils.renderPerformanceLog("    firstScreenCssLayoutTime", fitstScreenPerformance[1]);
       WXLogUtils.renderPerformanceLog("    firstScreenParseJsonTime", fitstScreenPerformance[2]);
-  }
-
-  public void createInstanceFinished(long time) {
-
   }
 
   private void destroyView(View rootView) {
@@ -1397,6 +1441,16 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           inactiveAddElementAction.clear();
         }
       });
+
+      //when report error in @WXExceptionUtils
+      // instance may had destroy and remove,
+      // so we delay remove from allInstanceMap
+      WXBridgeManager.getInstance().postDelay(new Runnable() {
+        @Override
+        public void run() {
+          WXSDKManager.getInstance().getAllInstanceMap().remove(mInstanceId);
+        }
+      },5000);
     }
   }
 
@@ -1431,7 +1485,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void onRootCreated(WXComponent root) {
     this.mRootComp = root;
-    this.mRootComp.deepInComponentTree=1;
+    this.mRootComp.mDeepInComponentTree =1;
     mRenderContainer.addView(root.getHostView());
     setSize(mRenderContainer.getWidth(),mRenderContainer.getHeight());
   }
@@ -1801,7 +1855,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         mWXPerformance.zCacheInfo = zCacheInfo instanceof String?(String)zCacheInfo:"";
 
         if(isNet(mWXPerformance.requestType) && mUserTrackAdapter!=null){
-          WXPerformance performance=new WXPerformance();
+          WXPerformance performance=new WXPerformance(mInstanceId);
           if(!TextUtils.isEmpty(mBundleUrl)){
             try {
               performance.args= Uri.parse(mBundleUrl).buildUpon().clearQuery().toString();
@@ -1839,7 +1893,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         WXLogUtils.e("user intercept: WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR");
         onRenderError(WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorCode(),
                 "|response.errorMsg==" + response.errorMsg +
-                        "|instance.getTemplateInfo == \n" + instance.getTemplateInfo() +
                         "|instance bundleUrl = \n" + instance.getBundleUrl() +
                         "|instance requestUrl = \n" + Uri.decode(WXSDKInstance.requestUrl)
         );
@@ -1850,8 +1903,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         onRenderError(
                 WXErrorCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getErrorCode(),
                 WXErrorCode.WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED.getErrorCode() +
-                        "|response.errorMsg==" + response.errorMsg +
-                        "|instance.getTemplateInfo == \n" + instance.getTemplateInfo());
+                        "|response.errorMsg==" + response.errorMsg
+        );
       }
       else {
         onRenderError(WXErrorCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode(),

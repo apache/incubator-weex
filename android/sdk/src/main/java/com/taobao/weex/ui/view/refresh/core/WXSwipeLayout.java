@@ -767,8 +767,17 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   }
 
   private void notifyOnRefreshOffsetChangedListener(int verticalOffset) {
-    for(OnRefreshOffsetChangedListener listener : mRefreshOffsetChangedListeners) {
-      listener.onOffsetChanged(verticalOffset);
+    int size = mRefreshOffsetChangedListeners.size();
+    OnRefreshOffsetChangedListener listener;
+    for (int i=0; i<size; i++) {
+      if(i >= mRefreshOffsetChangedListeners.size()){
+        break;
+      }
+      listener = mRefreshOffsetChangedListeners.get(i);
+
+      if (listener != null) {
+        listener.onOffsetChanged(verticalOffset);
+      }
     }
   }
 

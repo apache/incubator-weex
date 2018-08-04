@@ -144,6 +144,8 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     NSString *_textOverflow;
     CGFloat _lineHeight;
     CGFloat _letterSpacing;
+    CGFloat _fontDescender;
+    CGFloat _fontAscender;
     BOOL _truncationLine; // support trunk tail
     
     NSAttributedString * _ctAttributedString;
@@ -289,7 +291,6 @@ do {\
             _padding = flex_padding;
             [self setNeedsRepaint];
         }
-    
 }
 
 - (void)fillAttributes:(NSDictionary *)attributes
@@ -312,7 +313,6 @@ do {\
     pthread_mutex_lock(&(_ctAttributedStringMutex));
     _ctAttributedString = nil;
     pthread_mutex_unlock(&(_ctAttributedStringMutex));
-    
 }
 
 #pragma mark - Subclass
@@ -484,6 +484,10 @@ do {\
     CTFontRef ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName,
                                            font.pointSize,
                                            NULL);
+    
+    _fontAscender = font.ascender;
+    _fontDescender = font.descender;
+    
     if (ctFont) {
         [attributedString addAttribute:(id)kCTFontAttributeName value:(__bridge id)(ctFont) range:NSMakeRange(0, string.length)];
         CFRelease(ctFont);
@@ -776,6 +780,15 @@ do {\
         BOOL needTruncation = NO;
         CTLineRef ctTruncatedLine = NULL;
         CTFrameGetLineOrigins(_coreTextFrameRef, CFRangeMake(0, 0), lineOrigins);
+        
+        CGFloat fixDescent = 0;
+        if (lineCount > 0 && _lineHeight && WX_SYS_VERSION_LESS_THAN(@"10.0")) {
+            CGFloat ascent, descent, leading;
+            CTLineRef line1 = (CTLineRef)CFArrayGetValueAtIndex(ctLines, 0);
+            CTLineGetTypographicBounds(line1, &ascent, &descent, &leading);
+            fixDescent = (descent + _fontDescender) + (ascent - _fontAscender);
+        }
+        
         for (CFIndex lineIndex = 0;(!_lines || _lines > lineIndex) && lineIndex < lineCount; lineIndex ++) {
             CTLineRef lineRef = NULL;
             lineRef = (CTLineRef)CFArrayGetValueAtIndex(ctLines, lineIndex);
@@ -784,7 +797,7 @@ do {\
             }
             CGPoint lineOrigin = lineOrigins[lineIndex];
             lineOrigin.x += padding.left;
-            lineOrigin.y -= padding.top;
+            lineOrigin.y -= padding.top + fixDescent;
             CFArrayRef runs = CTLineGetGlyphRuns(lineRef);
             [mutableLines addObject:(__bridge id _Nonnull)(lineRef)];
             // lineIndex base 0

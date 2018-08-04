@@ -224,7 +224,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         setJSFrameworkInit(false);
         WXModuleManager.resetAllModuleState();
         String jsf = "";
-        if (!isSandBoxContext || WXEnvironment.sDebugServerConnectable) {
+        if (!isSandBoxContext) {
           jsf = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
         } else {
           jsf = WXFileUtils.loadAsset("weex-main-jsfm.js", WXEnvironment.getApplication());
@@ -240,7 +240,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             setJSFrameworkInit(false);
             WXModuleManager.resetAllModuleState();
             String jsf = "";
-            if (!isSandBoxContext || WXEnvironment.sDebugServerConnectable) {
+            if (!isSandBoxContext) {
               jsf = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
             } else {
               jsf = WXFileUtils.loadAsset("weex-main-jsfm.js", WXEnvironment.getApplication());
@@ -273,9 +273,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXEnvironment.sDebugServerConnectable = true;
     }
 
-    if (mWxDebugProxy != null) {
-      mWxDebugProxy.stop(false);
-    }
+//    if (mWxDebugProxy != null) {
+//      mWxDebugProxy.stop(false);
+//    }
     if (WXEnvironment.sDebugServerConnectable && (WXEnvironment.isApkDebugable() || WXEnvironment.sForceEnableDevTool)) {
       if (WXEnvironment.getApplication() != null) {
         try {
@@ -341,7 +341,19 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         return validateInfo;
       }
     }
-    return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);
+    try {
+      return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);
+    }catch(NumberFormatException e){
+      ArrayMap<String, String> ext = new ArrayMap<>();
+      ext.put("moduleName", moduleStr);
+      ext.put("methodName", methodStr);
+      ext.put("args", args.toJSONString());
+      WXLogUtils.e("[WXBridgeManager] callNative : numberFormatException when parsing string to numbers in args", ext.toString());
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+          WXErrorCode.WX_KEY_EXCEPTION_INVOKE, "callNative",
+          "[WXBridgeManager] callNative : numberFormatException when parsing string to numbers in args" , ext);
+      return null;
+    }
   }
 
   /**
@@ -394,6 +406,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     Message m = Message.obtain(mJSHandler, WXThread.secure(r));
     m.obj = token;
     m.sendToTarget();
+  }
+
+  public void postDelay(Runnable r,long delayMillis){
+    if (mJSHandler == null) {
+      return;
+    }
+    mJSHandler.postDelayed(WXThread.secure(r),delayMillis);
   }
 
   void setTimeout(String callbackId, String time) {
@@ -1284,12 +1303,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
         // if { "framework": "Vue" } or  { "framework": "Rax" } will use invokeCreateInstanceContext
         // others will use invokeExecJS
-        if (!isSandBoxContext || WXEnvironment.sDebugServerConnectable) {
+        if (!isSandBoxContext) {
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           return;
         }
         if (type == BundType.Vue || type == BundType.Rax) {
-          invokeCreateInstanceContext(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
+          invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
           return;
         } else {
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
@@ -1308,7 +1327,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public WXJSObject optionObjConvert(boolean useSandBox, BundType type, WXJSObject opt) {
-    if (!useSandBox || type == BundType.Others || WXEnvironment.sDebugServerConnectable) {
+    if (!useSandBox || type == BundType.Others) {
       return opt;
     }
     try {
@@ -1597,7 +1616,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         // if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("weex JS framework from assets");
         // }
-        if (!isSandBoxContext || WXEnvironment.sDebugServerConnectable) {
+        if (!isSandBoxContext) {
           framework = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
         } else {
           framework = WXFileUtils.loadAsset("weex-main-jsfm.js", WXEnvironment.getApplication());
@@ -2554,6 +2573,33 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callCreateFinish exception: ", e);
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE, "callCreateFinish",
+              WXLogUtils.getStackTrace(e), null);
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callRenderSuccess(String instanceId) {
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+      mLodBuilder.append("[WXBridgeManager] callRenderSuccess >>>> instanceId:").append(instanceId);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if (instance != null) {
+        GraphicActionRenderSuccess action = new GraphicActionRenderSuccess(instanceId);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callRenderSuccess exception: ", e);
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
               WXErrorCode.WX_KEY_EXCEPTION_INVOKE, "callCreateFinish",
               WXLogUtils.getStackTrace(e), null);

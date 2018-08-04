@@ -54,6 +54,11 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
     this.wxGesture = wxGesture;
   }
 
+  @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
+  }
+
   public void setOnVideoPauseListener(VideoPlayListener listener) {
     mVideoPauseListener = listener;
   }

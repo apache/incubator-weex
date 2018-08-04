@@ -108,13 +108,6 @@ void
 jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstring module,
                          jstring method, jbyteArray
                          arguments, jbyteArray options, jboolean from) {
-
-
-#if JSAPI_LOG
-    LOGD("[ExtendJSApi] handleCallNativeModule >>>> pageId: %s, module: %s, method: %s, arg: %s",
-         jString2StrFast(env, instanceId).c_str(), jString2StrFast(env, module).c_str(),
-         jString2StrFast(env, method).c_str(), jByteArray2Str(env, arguments).c_str());
-#endif
     JByteArrayRef argumentsRef(env, arguments);
     JByteArrayRef optionsRef(env, options);
 

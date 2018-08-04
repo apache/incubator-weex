@@ -27,6 +27,7 @@ import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.ui.action.GraphicActionAnimation;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.list.template.TemplateDom;
 
 public class WXAnimationModule extends WXModule {
 
@@ -39,6 +40,9 @@ public class WXAnimationModule extends WXModule {
       WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
     }
   }
+
+
+ 
 
   //add by moxun on 12/26/2016
   public static class AnimationHolder {

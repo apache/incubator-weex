@@ -55,13 +55,12 @@ class WXBridge : public JNIObjectWrap {
   int RemoveElement(JNIEnv *env, const char *page_id, const char *ref);
   int CreateFinish(JNIEnv *env, const char *page_id);
   int UpdateAttr(JNIEnv *env, const char *page_id, const char *ref,
-                 std::vector<std::pair<std::string, std::string>>* attrs);
-  int UpdateStyle(
-      JNIEnv *env, const char *page_id, const char *ref,
-      std::vector<std::pair<std::string, std::string>>* style,
-      std::vector<std::pair<std::string, std::string>>* margin,
-      std::vector<std::pair<std::string, std::string>>* padding,
-      std::vector<std::pair<std::string, std::string>>* border);
+                 std::vector<std::pair<std::string, std::string>> *attrs);
+  int UpdateStyle(JNIEnv *env, const char *page_id, const char *ref,
+                  std::vector<std::pair<std::string, std::string>> *style,
+                  std::vector<std::pair<std::string, std::string>> *margin,
+                  std::vector<std::pair<std::string, std::string>> *padding,
+                  std::vector<std::pair<std::string, std::string>> *border);
   int Layout(JNIEnv *env, const char *page_id, const char *ref, int top,
              int bottom, int left, int right, int height, int width, int index);
   int AddElement(JNIEnv *env, const char *page_id, const char *component_type,
@@ -83,6 +82,7 @@ class WXBridge : public JNIObjectWrap {
                const char *event);
   int RefreshFinish(JNIEnv *env, const char *page_id, const char *task,
                     const char *callback);
+  int RenderSuccess(JNIEnv *env, const char *page_id);
   int UpdateFinish(JNIEnv *env, const char *page_id, const char *task,
                    const char *callback);
   void SetTimeout(JNIEnv *env, const char *callback_id, const char *time);
@@ -99,9 +99,10 @@ class WXBridge : public JNIObjectWrap {
   void ReportException(JNIEnv *env, const char *page_id, const char *func,
                        const char *exception_string);
   void SetJSFrmVersion(JNIEnv *env, const char *version);
-  void ReportServerCrash(JNIEnv *env, const char* instance_id, const char* info);
-  void ReportNativeInitStatus(JNIEnv *env, const char *statusCode, const char *errorMsg);
-
+  void ReportServerCrash(JNIEnv *env, const char *instance_id,
+                         const char *info);
+  void ReportNativeInitStatus(JNIEnv *env, const char *statusCode,
+                              const char *errorMsg);
 
  private:
   WXBridge() {}

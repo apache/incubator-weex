@@ -174,6 +174,8 @@ public enum WXErrorCode {
 
   WX_JS_FRAMEWORK_INIT_SINGLE_PROCESS_SUCCESS("-1011", "js framework init success in single process",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
+  WX_JS_FRAMEWORK_INIT_FAILED_PARAMS_NULL("-1012", "js framework init failed due to params null",ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
+
 
   /**
    * WX Key Exception Commit RT SDK Init
@@ -234,7 +236,7 @@ public enum WXErrorCode {
   WX_RENDER_ERR_NULL_KEY("-9603", "WX_RENDER_ERR_NULL_KEY", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
   WX_RENDER_ERR_CONTAINER_TYPE("-9611", "WX_RENDER_ERR_CONTAINER_TYPE", ErrorType.JS_ERROR,ErrorGroup.JS),
   WX_RENDER_ERR_TRANSITION("-9616", "WX_RENDER_ERR_TRANSITION", ErrorType.JS_ERROR, ErrorGroup.JS),
-
+  WX_RENDER_ERR_INSTANCE_ID_NULL("-9618", "WX_RENDER_ERR_INSTANCE_ID_NULL", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
 
 
   /**

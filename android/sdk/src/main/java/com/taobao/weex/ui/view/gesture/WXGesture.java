@@ -47,6 +47,7 @@ import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -84,6 +85,8 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
   private boolean shouldBubbleResult = true;
   private int     shouldBubbleInterval = 0; //every times try
   private int     shouldBubbleCallRemainTimes = 0;
+
+  private final List<OnTouchListener> mTouchListeners = new LinkedList<>();
 
   public WXGesture(WXComponent wxComponent, Context context) {
     this.component = wxComponent;
@@ -189,6 +192,21 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
     return  true;
   }
 
+  @SuppressWarnings("unused")
+  public void addOnTouchListener(OnTouchListener listener) {
+    if(listener != null) {
+      mTouchListeners.add(listener);
+    }
+  }
+
+  @SuppressWarnings("unused")
+  public boolean removeTouchListener(OnTouchListener listener) {
+    if(listener != null) {
+      return mTouchListeners.remove(listener);
+    }
+    return false;
+  }
+
   @Override
   public boolean onTouch(View v, MotionEvent event) {
     if(requestDisallowInterceptTouchEvent){
@@ -197,6 +215,13 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
     }
     try {
       boolean result = mGestureDetector.onTouchEvent(event);
+
+      if(mTouchListeners != null && !mTouchListeners.isEmpty()) {
+        for(OnTouchListener listener : mTouchListeners) {
+          result |= listener.onTouch(v, event);
+        }
+      }
+
       switch (event.getActionMasked()) {
         case MotionEvent.ACTION_POINTER_DOWN:
         case MotionEvent.ACTION_DOWN:
@@ -625,8 +650,14 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
     return true;
   }
 
+  public boolean isRequestDisallowInterceptTouchEvent() {
+    return requestDisallowInterceptTouchEvent;
+  }
+
   public void setRequestDisallowInterceptTouchEvent(boolean requestDisallowInterceptTouchEvent) {
     this.requestDisallowInterceptTouchEvent = requestDisallowInterceptTouchEvent;
   }
+
+
 
 }
