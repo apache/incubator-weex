@@ -17,17 +17,17 @@
  * under the License.
  */
 
-#include "android_bridge.h"
+#include "android/bridge/impl/android_bridge.h"
+#include "android/bridge/impl/android_side.h"
 #include "core/bridge/platform/core_side_in_simple.h"
-#include "android_side.h"
 
 namespace WeexCore {
-    AndroidBridgeInSimple::AndroidBridgeInSimple() {
-        set_core_side(new CoreSideInSimple);
-        set_platform_side(new AndroidSide);
-    }
 
-    AndroidBridgeInSimple::~AndroidBridgeInSimple() {
-    }
-
+AndroidBridgeInSimple::AndroidBridgeInSimple() {
+  set_core_side(new CoreSideInSimple);
+  set_platform_side(new AndroidSide);
 }
+
+AndroidBridgeInSimple::~AndroidBridgeInSimple() {}
+
+}  // namespace WeexCore

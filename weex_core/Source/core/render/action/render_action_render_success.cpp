@@ -25,7 +25,7 @@ RenderActionRenderSuccess::RenderActionRenderSuccess(const std::string& page_id)
     : page_id_(page_id) {}
 
 void RenderActionRenderSuccess::ExecuteAction() {
-  WeexCoreManager::getInstance()
+  WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
       ->RenderSuccess(page_id_.c_str());

@@ -54,14 +54,14 @@ static jint InitFrameworkEnv(JNIEnv* env, jobject jcaller, jstring framework,
 
 static void BindMeasurementToRenderObject(JNIEnv* env, jobject jcaller,
                                           jlong ptr) {
-  WeexCoreManager::getInstance()
+  WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->BindMeasurementToRenderObject(ptr);
 }
 
 static void OnInstanceClose(JNIEnv* env, jobject jcaller, jstring instanceId) {
-  WeexCoreManager::getInstance()
+  WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->OnInstanceClose(jString2StrFast(env, instanceId));
@@ -73,7 +73,7 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv* env, jobject jcaller,
                                                 jfloat defaultHeight,
                                                 jboolean isWidthWrapContent,
                                                 jboolean isHeightWrapContent) {
-  WeexCoreManager::getInstance()
+  WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->SetDefaultHeightAndWidthIntoRootDom(
@@ -83,7 +83,7 @@ static void SetDefaultHeightAndWidthIntoRootDom(JNIEnv* env, jobject jcaller,
 
 static void SetRenderContainerWrapContent(JNIEnv* env, jobject jcaller,
                                           jboolean wrap, jstring instanceId) {
-  WeexCoreManager::getInstance()
+  WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->SetRenderContainerWrapContent(jString2StrFast(env, instanceId), wrap);
@@ -95,7 +95,7 @@ static jlongArray GetFirstScreenRenderTime(JNIEnv* env, jobject jcaller,
   jlongArray jTemp = env->NewLongArray(3);
 
   std::vector<int64_t> temp =
-      WeexCoreManager::getInstance()
+      WeexCoreManager::Instance()
           ->getPlatformBridge()
           ->core_side()
           ->GetFirstScreenRenderTime(jString2StrFast(env, instanceId));
@@ -132,7 +132,7 @@ static jlongArray GetRenderFinishTime(JNIEnv* env, jobject jcaller,
   jlongArray jTemp = env->NewLongArray(3);
 
   std::vector<int64_t> temp =
-      WeexCoreManager::getInstance()
+      WeexCoreManager::Instance()
           ->getPlatformBridge()
           ->core_side()
           ->GetRenderFinishTime(jString2StrFast(env, instanceId));
@@ -164,7 +164,7 @@ static jlongArray GetRenderFinishTime(JNIEnv* env, jobject jcaller,
 
 // Notice that this method is invoked from main thread.
 static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
-  return WeexCoreManager::getInstance()
+  return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->NotifyLayout(jString2StrFast(env, instanceId));
@@ -172,57 +172,51 @@ static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
 
 // Notice that this method is invoked from JS thread.
 static void ForceLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
-  WeexCoreManager::getInstance()->getPlatformBridge()->core_side()->ForceLayout(
+  WeexCoreManager::Instance()->getPlatformBridge()->core_side()->ForceLayout(
       jString2StrFast(env, instanceId));
 }
 
 // call on main thread
 static void SetStyleWidth(JNIEnv* env, jobject jcaller, jstring instanceId,
                           jstring ref, jfloat value) {
-  WeexCoreManager::getInstance()
-      ->getPlatformBridge()
-      ->core_side()
-      ->SetStyleWidth(jString2StrFast(env, instanceId),
-                      jString2StrFast(env, ref), value);
+  WeexCoreManager::Instance()->getPlatformBridge()->core_side()->SetStyleWidth(
+      jString2StrFast(env, instanceId), jString2StrFast(env, ref), value);
 }
 
 // call on main thread
 static void SetStyleHeight(JNIEnv* env, jobject jcaller, jstring instanceId,
                            jstring ref, jfloat value) {
-  WeexCoreManager::getInstance()
-      ->getPlatformBridge()
-      ->core_side()
-      ->SetStyleHeight(jString2StrFast(env, instanceId),
-                       jString2StrFast(env, ref), value);
+  WeexCoreManager::Instance()->getPlatformBridge()->core_side()->SetStyleHeight(
+      jString2StrFast(env, instanceId), jString2StrFast(env, ref), value);
 }
 
 static void SetMargin(JNIEnv* env, jobject jcaller, jstring instanceId,
                       jstring ref, jint edge, jfloat value) {
-  WeexCoreManager::getInstance()->getPlatformBridge()->core_side()->SetMargin(
+  WeexCoreManager::Instance()->getPlatformBridge()->core_side()->SetMargin(
       jString2StrFast(env, instanceId), jString2StrFast(env, ref), edge, value);
 }
 
 static void SetPadding(JNIEnv* env, jobject jcaller, jstring instanceId,
                        jstring ref, jint edge, jfloat value) {
-  WeexCoreManager::getInstance()->getPlatformBridge()->core_side()->SetPadding(
+  WeexCoreManager::Instance()->getPlatformBridge()->core_side()->SetPadding(
       jString2StrFast(env, instanceId), jString2StrFast(env, ref), edge, value);
 }
 
 static void SetPosition(JNIEnv* env, jobject jcaller, jstring instanceId,
                         jstring ref, jint edge, jfloat value) {
-  WeexCoreManager::getInstance()->getPlatformBridge()->core_side()->SetPosition(
+  WeexCoreManager::Instance()->getPlatformBridge()->core_side()->SetPosition(
       jString2StrFast(env, instanceId), jString2StrFast(env, ref), edge, value);
 }
 
 static void MarkDirty(JNIEnv* env, jobject jcaller, jstring instanceId,
                       jstring ref, jboolean dirty) {
-  WeexCoreManager::getInstance()->getPlatformBridge()->core_side()->MarkDirty(
+  WeexCoreManager::Instance()->getPlatformBridge()->core_side()->MarkDirty(
       jString2StrFast(env, instanceId), jString2StrFast(env, ref));
 }
 
 static void RegisterCoreEnv(JNIEnv* env, jobject jcaller, jstring key,
                             jstring value) {
-  WeexCoreManager::getInstance()
+  WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->RegisterCoreEnv(jString2StrFast(env, key), jString2StrFast(env, value));
@@ -230,7 +224,7 @@ static void RegisterCoreEnv(JNIEnv* env, jobject jcaller, jstring key,
 
 static void SetViewPortWidth(JNIEnv* env, jobject jcaller, jstring instanceId,
                              jfloat value) {
-  WeexCoreManager::getInstance()
+  WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->SetViewPortWidth(jString2StrFast(env, instanceId), value);
@@ -240,18 +234,18 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
                           jobject params) {
   WXBridge::Instance()->Reset(env, object);
   // Init platform thread --- ScriptThread
-  WeexCoreManager::getInstance()->InitScriptThread();
+  WeexCoreManager::Instance()->InitScriptThread();
   // Exception handler for so
   SoUtils::RegisterExceptionHanler(
       [](const char* status_code, const char* error_msg) {
-        WeexCoreManager::getInstance()
+        WeexCoreManager::Instance()
             ->getPlatformBridge()
             ->platform_side()
             ->ReportNativeInitStatus(status_code, error_msg);
       });
   std::vector<INIT_FRAMEWORK_PARAMS*> params_vector = initFromParam(
       env, params, [](const char* status_code, const char* error_msg) {
-        WeexCoreManager::getInstance()
+        WeexCoreManager::Instance()
             ->getPlatformBridge()
             ->platform_side()
             ->ReportNativeInitStatus(status_code, error_msg);
@@ -259,15 +253,14 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   // If parse init params error, return false
   if (params_vector.empty()) return false;
   // Init platform bridge
-  Bridge_Impl_Android* bridge = new AndroidBridgeInSimple;
-  Bridge_Impl_Android::InitInstance(bridge);
-  WeexCoreManager::getInstance()->setPlatformBridge(bridge);
+  PlatformBridge* bridge = new AndroidBridgeInSimple;
+  WeexCoreManager::Instance()->set_platform_bridge(bridge);
   // Set project mode
   if (isSingleProcess()) {
-    WeexCoreManager::getInstance()->set_project_mode(
+    WeexCoreManager::Instance()->set_project_mode(
         WeexCoreManager::ProjectMode::MULTI_SO);
   } else {
-    WeexCoreManager::getInstance()->set_project_mode(
+    WeexCoreManager::Instance()->set_project_mode(
         WeexCoreManager::ProjectMode::MULTI_PROCESS);
   }
   // for environment
@@ -282,7 +275,7 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
     bridge->core_side()->AddOption(it->first, it->second);
   }
   // Set measure function
-  WeexCoreManager::getInstance()->SetMeasureFunctionAdapter(
+  WeexCoreManager::Instance()->set_measure_function_adapter(
       new MeasureFunctionAdapterImplAndroid());
   bridge->core_side()->SetMeasureFunctionAdapter();
   ScopedJStringUTF8 c_script(env, script);
@@ -296,7 +289,7 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
 static jint ExecJSService(JNIEnv* env, jobject object, jstring script) {
   if (script == nullptr) return false;
   ScopedJStringUTF8 source(env, script);
-  return WeexCoreManager::getInstance()
+  return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->ExecJsService(source.getChars());
@@ -335,7 +328,7 @@ static jint ExecJS(JNIEnv* env, jobject jthis, jstring jinstanceid,
     addParamsFromJArgs(params, param, env, wx_js_object);
   }
   auto result =
-      WeexCoreManager::getInstance()->getPlatformBridge()->core_side()->ExecJS(
+      WeexCoreManager::Instance()->getPlatformBridge()->core_side()->ExecJS(
           instance_id.getChars(), name_space.getChars(), function.getChars(),
           params);
 
@@ -372,7 +365,7 @@ static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
   }
 
   auto result =
-      WeexCoreManager::getInstance()
+      WeexCoreManager::Instance()
           ->getPlatformBridge()
           ->core_side()
           ->ExecJSWithResult(instance_id.getChars(), name_space.getChars(),
@@ -390,7 +383,7 @@ static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller, jstring config) {
     return;
   }
   ScopedJStringUTF8 scoped_config(env, config);
-  WeexCoreManager::getInstance()
+  WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->UpdateGlobalConfig(scoped_config.getChars());
@@ -433,7 +426,7 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
   ScopedJStringUTF8 scoped_init_data(env, initData.Get());
   ScopedJStringUTF8 scoped_api(env, static_cast<jstring>(japi.Get()));
 
-  return WeexCoreManager::getInstance()
+  return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
@@ -450,7 +443,7 @@ static jint DestoryInstance(JNIEnv* env, jobject jcaller, jstring instanceId,
   }
 
   ScopedJStringUTF8 idChar(env, instanceId);
-  return WeexCoreManager::getInstance()
+  return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->DestroyInstance(idChar.getChars());
@@ -465,7 +458,7 @@ static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
   ScopedJStringUTF8 idChar(env, instanceId);
   ScopedJStringUTF8 scriptChar(env, script);
   auto result =
-      WeexCoreManager::getInstance()
+      WeexCoreManager::Instance()
           ->getPlatformBridge()
           ->core_side()
           ->ExecJSOnInstance(idChar.getChars(), scriptChar.getChars());

@@ -23,15 +23,11 @@
 #include "jsfunction_impl_android.h"
 #include "../../base/string/string_utils.h"
 #include "../../jniprebuild/jniheader/WXJsFunctions_jni.h"
-#include "bridge_impl_android.h"
 #include "../../../core/render/manager/render_manager.h"
 #include "IPC/IPCResult.h"
 #include "core/bridge/platform_bridge.h"
 
 using namespace WeexCore;
-
-extern jobject jThis;
-extern jclass jBridgeClazz;
 
 namespace WeexCore {
     bool RegisterWXJsFunction(JNIEnv *env) {
@@ -72,12 +68,12 @@ void initWxBridge(JNIEnv *env, jobject object, jobject bridge, jstring className
 }
 
 void jsHandleSetJSVersion(JNIEnv *env, jobject object, jstring jsVersion) {
-    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->SetJSVersion(getCharFromJString(env, jsVersion));
+    WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->SetJSVersion(getCharFromJString(env, jsVersion));
 }
 
 void jsHandleReportException(JNIEnv *env, jobject object, jstring instanceId, jstring func,
                              jstring exceptionjstring) {
-    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->ReportException(getCharFromJString(env, instanceId),
+    WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(getCharFromJString(env, instanceId),
                                                         getCharFromJString(env, func),
                                                         getCharFromJString(env,
                                                                            exceptionjstring));
@@ -98,7 +94,7 @@ void jsHandleCallNative(JNIEnv *env, jobject object, jstring instanceId, jbyteAr
         env->DeleteLocalRef(tasks);
         env->DeleteLocalRef(callback);
     } else {
-        WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->CallNative(getCharFromJString(env, instanceId),
+        WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->CallNative(getCharFromJString(env, instanceId),
                                                        task.c_str(),
                                                        getCharFromJString(env, callback));
     }
@@ -111,7 +107,7 @@ jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstrin
     JByteArrayRef argumentsRef(env, arguments);
     JByteArrayRef optionsRef(env, options);
 
-    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->CallNativeModule(
+    WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->CallNativeModule(
             getCharFromJString(env, instanceId),
             getCharFromJString(env, module),
             getCharFromJString(env, method),
@@ -171,7 +167,7 @@ jsHandleCallNativeComponent(JNIEnv *env, jobject object, jstring instanceId, jst
 
     JByteArrayRef argumentsRef(env, arguments);
     JByteArrayRef optionsRef(env, options);
-    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->CallNativeComponent(getCharFromJString(env, instanceId),
+    WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->CallNativeComponent(getCharFromJString(env, instanceId),
                                                             getCharFromJString(env, componentRef),
                                                             getCharFromJString(env, method),
                                                             argumentsRef.getBytes(),
@@ -201,13 +197,13 @@ jsHandleCallAddElement(JNIEnv *env, jobject object, jstring instanceId, jstring 
 
 void jsHandleSetTimeout(JNIEnv *env, jobject object, jstring callbackId, jstring time) {
 
-    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->SetTimeout(getCharFromJString(env, callbackId),
+    WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->SetTimeout(getCharFromJString(env, callbackId),
                                                    getCharFromJString(env, time));
 
 }
 
 void jsHandleCallNativeLog(JNIEnv *env, jobject object, jbyteArray str_array) {
-    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->NativeLog(getCharFromJByte(env, str_array));
+    WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->NativeLog(getCharFromJByte(env, str_array));
 }
 
 void jsFunctionCallCreateBody(JNIEnv *env, jobject object, jstring pageId, jbyteArray domStr, jboolean from) {
@@ -227,7 +223,7 @@ jsFunctionCallUpdateFinish(JNIEnv *env, jobject object, jstring instanceId, jbyt
 
     auto task = getCharFromJByte(env, tasks);
     auto callbackS = getCharFromJString(env, callback);
-    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->UpdateFinish(getCharFromJString(env, instanceId),
+    WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->UpdateFinish(getCharFromJString(env, instanceId),
                                                                                        task,strlen(task),
                                                                                        callbackS,strlen(callbackS));
 
@@ -240,7 +236,7 @@ void jsFunctionCallCreateFinish(JNIEnv *env, jobject object, jstring pageId) {
 void
 jsFunctionCallRefreshFinish(JNIEnv *env, jobject object, jstring instanceId, jbyteArray tasks,
                             jstring callback) {
-    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->RefreshFinish(getCharFromJString(env, instanceId),
+    WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->RefreshFinish(getCharFromJString(env, instanceId),
                                                           getCharFromJByte(env, tasks),
                                                           getCharFromJString(env, callback));
 }

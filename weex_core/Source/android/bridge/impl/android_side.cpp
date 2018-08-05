@@ -17,14 +17,14 @@
  * under the License.
  */
 
-#include <android/utils/params_utils.h>
 #include "android/bridge/impl/android_side.h"
-#include "android/utils/IPCStringResult.h"
 #include "IPC/IPCResult.h"
 #include "android/base/jni/android_jni.h"
 #include "android/base/jni_type.h"
 #include "android/base/string/string_utils.h"
+#include "android/utils/IPCStringResult.h"
 #include "android/utils/cache_utils.h"
+#include "android/utils/params_utils.h"
 #include "android/wrap/hash_set.h"
 #include "android/wrap/log_utils.h"
 #include "android/wrap/wml_bridge.h"
@@ -46,18 +46,18 @@ WXCoreSize AndroidSide::InvokeMeasureFunction(const char *page_id,
                                               int width_measure_mode,
                                               float height,
                                               int height_measure_mode) {
-  return WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->Measure(
+  return WeexCoreManager::Instance()->measure_function_adapter()->Measure(
       page_id, render_ptr, width, static_cast<MeasureMode>(width_measure_mode),
       height, static_cast<MeasureMode>(height_measure_mode));
 }
 void AndroidSide::InvokeLayoutBefore(const char *page_id, long render_ptr) {
-  WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutBefore(
+  WeexCoreManager::Instance()->measure_function_adapter()->LayoutBefore(
       page_id, render_ptr);
 }
 
 void AndroidSide::InvokeLayoutAfter(const char *page_id, long render_ptr,
                                     float width, float height) {
-  WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutAfter(
+  WeexCoreManager::Instance()->measure_function_adapter()->LayoutAfter(
       page_id, render_ptr, width, height);
 }
 
@@ -101,7 +101,8 @@ std::unique_ptr<IPCResult> AndroidSide::CallNativeModule(
     const char *arguments, int arguments_length, const char *options,
     int options_length) {
   JNIEnv *env = base::android::AttachCurrentThread();
-  LOGE("CallNativeModule is running and page_id is %s method = %s module is %s" , page_id, method, module);
+  LOGE("CallNativeModule is running and page_id is %s method = %s module is %s",
+       page_id, method, module);
   auto result =
       wx_bridge_->CallNativeModule(env, page_id, module, method, arguments,
                                    arguments_length, options, options_length);
@@ -117,16 +118,17 @@ std::unique_ptr<IPCResult> AndroidSide::CallNativeModule(
   auto jDataObj = wx_js_object_result->GetData(env);
 
   if (jTypeInt == 1) {
-    ipc_result = std::move(
-        createDoubleResult(base::android::JNIType::DoubleValue(env, jDataObj.Get())));
+    ipc_result = std::move(createDoubleResult(
+        base::android::JNIType::DoubleValue(env, jDataObj.Get())));
 
   } else if (jTypeInt == 2) {
     jstring jDataStr = (jstring)jDataObj.Get();
-    ipc_result = std::unique_ptr<IPCResult>(new IPCStringResult(jstring2WeexString(env,jDataStr)));
+    ipc_result = std::unique_ptr<IPCResult>(
+        new IPCStringResult(jstring2WeexString(env, jDataStr)));
   } else if (jTypeInt == 3) {
     jstring jDataStr = (jstring)jDataObj.Get();
-    ipc_result =
-        std::unique_ptr<IPCResult>(new IPCJSONStringResult(jstring2WeexString(env,jDataStr)));
+    ipc_result = std::unique_ptr<IPCResult>(
+        new IPCJSONStringResult(jstring2WeexString(env, jDataStr)));
   } else if (jTypeInt == 4) {
     jbyteArray array = (jbyteArray)jDataObj.Get();
     if (array != nullptr) {
@@ -159,8 +161,9 @@ void AndroidSide::NativeLog(const char *str_array) {
   LogUtils::NativeLog(env, str_array);
 }
 
-int AndroidSide::UpdateFinish(const char *page_id, const char *task,int taskLen,
-                              const char *callback, int callbackLen) {
+int AndroidSide::UpdateFinish(const char *page_id, const char *task,
+                              int taskLen, const char *callback,
+                              int callbackLen) {
   JNIEnv *env = base::android::AttachCurrentThread();
   int flag = wx_bridge_->UpdateFinish(env, page_id, task, callback);
   if (flag == -1) {

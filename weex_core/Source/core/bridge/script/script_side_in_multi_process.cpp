@@ -79,7 +79,7 @@ int ScriptSideInMultiProcess::InitAppFramework(
   } catch (IPCException &e) {
     LOGE("initAppFramework error %s", e.msg());
     // report crash here
-    WeexCoreManager::getInstance()
+    WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);
@@ -100,7 +100,7 @@ int ScriptSideInMultiProcess::CreateAppContext(const char *instanceId,
   } catch (IPCException &e) {
     LOGE("%s", e.msg());
     // report crash here
-    WeexCoreManager::getInstance()
+    WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);
@@ -127,7 +127,7 @@ char *ScriptSideInMultiProcess::ExecJSOnAppWithResult(const char *instanceId,
   } catch (IPCException &e) {
     LOGE("%s", e.msg());
     // report crash here
-    WeexCoreManager::getInstance()
+    WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);
@@ -152,7 +152,7 @@ int ScriptSideInMultiProcess::CallJSOnAppContext(
       } else if (param->type == ParamsType::STRING) {
         serializer->add(param->value.string->content,
                         param->value.string->length);
-      } else if(param->type == ParamsType::JSONSTRING) {
+      } else if (param->type == ParamsType::JSONSTRING) {
         serializer->addJSON(param->value.string->content,
                             param->value.string->length);
       } else {
@@ -169,7 +169,7 @@ int ScriptSideInMultiProcess::CallJSOnAppContext(
   } catch (IPCException &e) {
     LOGE("%s", e.msg());
     // report crash here
-    WeexCoreManager::getInstance()
+    WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);
@@ -189,7 +189,7 @@ int ScriptSideInMultiProcess::DestroyAppContext(const char *instanceId) {
   } catch (IPCException &e) {
     LOGE("%s", e.msg());
     // report crash here
-    WeexCoreManager::getInstance()
+    WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);
@@ -240,9 +240,9 @@ int ScriptSideInMultiProcess::ExecJS(const char *instanceId,
       } else if (param->type == ParamsType::STRING) {
         serializer->add(param->value.string->content,
                         param->value.string->length);
-      } else if(param->type == ParamsType::JSONSTRING) {
+      } else if (param->type == ParamsType::JSONSTRING) {
         serializer->addJSON(param->value.string->content,
-                        param->value.string->length);
+                            param->value.string->length);
       } else if (param->type == ParamsType::BYTEARRAY) {
         serializer->add(param->value.byteArray->content,
                         param->value.byteArray->length);
@@ -264,7 +264,7 @@ int ScriptSideInMultiProcess::ExecJS(const char *instanceId,
   } catch (IPCException &e) {
     LOGE("%s", e.msg());
     // report crash here
-    WeexCoreManager::getInstance()
+    WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);
@@ -277,7 +277,7 @@ WeexJSResult ScriptSideInMultiProcess::ExecJSWithResult(
     std::vector<VALUE_WITH_TYPE *> &params) {
   try {
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-//    std::vector<VALUE_WITH_TYPE *> params;
+    //    std::vector<VALUE_WITH_TYPE *> params;
     serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::EXECJSWITHRESULT));
     serializer->add(instanceId, strlen(instanceId));
     if (nameSpace)
@@ -296,10 +296,10 @@ WeexJSResult ScriptSideInMultiProcess::ExecJSWithResult(
       } else if (param->type == ParamsType::STRING) {
         serializer->add(param->value.string->content,
                         param->value.string->length);
-      } else if(param->type == ParamsType::JSONSTRING) {
+      } else if (param->type == ParamsType::JSONSTRING) {
         serializer->addJSON(param->value.string->content,
                             param->value.string->length);
-      }else if (param->type == ParamsType::BYTEARRAY) {
+      } else if (param->type == ParamsType::BYTEARRAY) {
         serializer->add(param->value.byteArray->content,
                         param->value.byteArray->length);
       } else {
@@ -322,7 +322,7 @@ WeexJSResult ScriptSideInMultiProcess::ExecJSWithResult(
   } catch (IPCException &e) {
     LOGE("%s", e.msg());
     // report crash here
-    WeexCoreManager::getInstance()
+    WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);
@@ -353,7 +353,7 @@ int ScriptSideInMultiProcess::CreateInstance(
   } catch (IPCException &e) {
     LOGE("%s", e.msg());
     // report crash here
-    WeexCoreManager::getInstance()
+    WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);
@@ -381,7 +381,7 @@ char *ScriptSideInMultiProcess::ExecJSOnInstance(const char *instanceId,
   } catch (IPCException &e) {
     LOGE("%s", e.msg());
     // report crash here
-    WeexCoreManager::getInstance()
+    WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);
@@ -405,7 +405,7 @@ int ScriptSideInMultiProcess::DestroyInstance(const char *instanceId) {
   } catch (IPCException &e) {
     LOGE("%s", e.msg());
     // report crash here
-    WeexCoreManager::getInstance()
+    WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);

@@ -17,11 +17,10 @@
  * under the License.
  */
 #include "core/bridge/script_bridge_in_multi_process.h"
+#include <android/utils/params_utils.h>
 #include <base/make_copyable.h>
 #include <base/message_loop/message_loop.h>
 #include <base/thread/waitable_event.h>
-#include <android/utils/params_utils.h>
-#include "android/utils/IPCStringResult.h"
 #include "IPC/IPCArguments.h"
 #include "IPC/IPCHandler.h"
 #include "IPC/IPCMessageJS.h"
@@ -31,6 +30,7 @@
 #include "android/base/string/string_utils.h"
 #include "android/bridge/impl/multi_process_and_so_initializer.h"
 #include "android/jsengine/multiprocess/WeexJSConnection.h"
+#include "android/utils/IPCStringResult.h"
 #include "core/bridge/script/core_side_in_simple.h"
 #include "core/bridge/script/script_side_in_multi_process.h"
 #include "core/manager/weex_core_manager.h"
@@ -39,7 +39,7 @@ namespace WeexCore {
 
 static std::unique_ptr<IPCResult> HandleSetJSVersion(IPCArguments *arguments) {
   auto version = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-  WeexCoreManager::getInstance()->script_bridge()->core_side()->SetJSVersion(
+  WeexCoreManager::Instance()->script_bridge()->core_side()->SetJSVersion(
       version.get());
   return createVoidResult();
 }
@@ -66,34 +66,34 @@ static std::unique_ptr<IPCResult> HandleReportException(
   }
 
   LOGE(" ReportException : %s", exceptionInfo);
-  WeexCoreManager::getInstance()->script_bridge()->core_side()->ReportException(
+  WeexCoreManager::Instance()->script_bridge()->core_side()->ReportException(
       pageId, func, exceptionInfo);
   return createVoidResult();
 }
 
 static std::unique_ptr<IPCResult> HandleCallNativeLog(IPCArguments *arguments) {
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable([str_array = std::move(arg1)] {
-//              WeexCoreManager::getInstance()->script_bridge()->core_side()->NativeLog(
-//                      str_array.get());
-//          }));
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //          weex::base::MakeCopyable([str_array = std::move(arg1)] {
+  //              WeexCoreManager::getInstance()->script_bridge()->core_side()->NativeLog(
+  //                      str_array.get());
+  //          }));
 
   const char *str_array = getArumentAsCStr(arguments, 0);
-  WeexCoreManager::getInstance()->script_bridge()->core_side()->NativeLog(
+  WeexCoreManager::Instance()->script_bridge()->core_side()->NativeLog(
       str_array);
   return createInt32Result(static_cast<int32_t>(true));
 }
 
 static std::unique_ptr<IPCResult> HandleSetTimeout(IPCArguments *arguments) {
-
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable([callbackID = std::move(arg1), time = std::move(arg2)] {
-//              WeexCoreManager::getInstance()->script_bridge()->core_side()->SetTimeout(
-//                      callbackID.get(), time.get());
-//          }));
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //          weex::base::MakeCopyable([callbackID = std::move(arg1), time =
+  //          std::move(arg2)] {
+  //              WeexCoreManager::getInstance()->script_bridge()->core_side()->SetTimeout(
+  //                      callbackID.get(), time.get());
+  //          }));
 
   char *callbackID = getArumentAsCStr(arguments, 0);
   char *time = getArumentAsCStr(arguments, 1);
@@ -101,7 +101,7 @@ static std::unique_ptr<IPCResult> HandleSetTimeout(IPCArguments *arguments) {
   if (callbackID == nullptr || time == nullptr)
     return createInt32Result(static_cast<int32_t>(false));
 
-  WeexCoreManager::getInstance()->script_bridge()->core_side()->SetTimeout(
+  WeexCoreManager::Instance()->script_bridge()->core_side()->SetTimeout(
       callbackID, time);
 
   if (callbackID != nullptr) {
@@ -116,16 +116,16 @@ static std::unique_ptr<IPCResult> HandleSetTimeout(IPCArguments *arguments) {
 }
 
 static std::unique_ptr<IPCResult> HandleSetInterval(IPCArguments *arguments) {
-
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable(
-//                  [pageId = std::move(arg1), callbackID = std::move(arg2), time = std::move(arg3)] {
-//                      WeexCoreManager::getInstance()->script_bridge()->core_side()->SetInterval(
-//                              pageId.get(), callbackID.get(), time.get());
-//                  }));
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //          weex::base::MakeCopyable(
+  //                  [pageId = std::move(arg1), callbackID = std::move(arg2),
+  //                  time = std::move(arg3)] {
+  //                      WeexCoreManager::getInstance()->script_bridge()->core_side()->SetInterval(
+  //                              pageId.get(), callbackID.get(), time.get());
+  //                  }));
 
   const char *pageId = getArumentAsCStr(arguments, 0);
   const char *callbackID = getArumentAsCStr(arguments, 1);
@@ -135,7 +135,7 @@ static std::unique_ptr<IPCResult> HandleSetInterval(IPCArguments *arguments) {
 
   long time_ = atoi(_time);
   int _timerId =
-      WeexCoreManager::getInstance()->script_bridge()->core_side()->SetInterval(
+      WeexCoreManager::Instance()->script_bridge()->core_side()->SetInterval(
           pageId, callbackID, _time);
 
   if (pageId != nullptr) {
@@ -151,19 +151,11 @@ static std::unique_ptr<IPCResult> HandleSetInterval(IPCArguments *arguments) {
     _time = nullptr;
   }
 
-        //TODO timerId
+  // TODO timerId
   return createInt32Result(1);
 }
 
 static std::unique_ptr<IPCResult> HandleClearInterval(IPCArguments *arguments) {
-
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable([pageId = std::move(arg1), callbackID = std::move(arg2)] {
-//              long id = atoi(callbackID.get());
-//          }));
-
   const char *pageId = getArumentAsCStr(arguments, 0);
   const char *callbackID = getArumentAsCStr(arguments, 1);
   long id = atoi(callbackID);
@@ -180,17 +172,16 @@ static std::unique_ptr<IPCResult> HandleClearInterval(IPCArguments *arguments) {
 }
 
 static std::unique_ptr<IPCResult> HandleCallNative(IPCArguments *arguments) {
-
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable(
-//                  [pageId = std::move(arg1), task = std::move(arg2), callback = std::move(arg3)] {
-//                      WeexCoreManager::getInstance()->script_bridge()->core_side()->CallNative(
-//                              pageId.get(), task.get(), callback.get());
-//                  }));
-
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //          weex::base::MakeCopyable(
+  //                  [pageId = std::move(arg1), task = std::move(arg2),
+  //                  callback = std::move(arg3)] {
+  //                      WeexCoreManager::getInstance()->script_bridge()->core_side()->CallNative(
+  //                              pageId.get(), task.get(), callback.get());
+  //                  }));
 
   char *pageId = getArumentAsCStr(arguments, 0);
   char *task = getArumentAsCStr(arguments, 1);
@@ -201,7 +192,7 @@ static std::unique_ptr<IPCResult> HandleCallNative(IPCArguments *arguments) {
     LOGD("[ExtendJSApi] handleCallNative >>>> pageId: %s, task: %s", pageId,
          task);
 #endif
-    WeexCoreManager::getInstance()->script_bridge()->core_side()->CallNative(
+    WeexCoreManager::Instance()->script_bridge()->core_side()->CallNative(
         pageId, task, callback);
   }
 
@@ -244,7 +235,8 @@ static std::unique_ptr<IPCResult> HandleCallGCanvasLinkNative(
       std::unique_ptr<IPCResult> ret = createVoidResult();
       if (retVal) {
     jstring jDataStr = env->NewStringUTF(retVal);
-    ret = std::unique_ptr<IPCResult>(new IPCStringResult(jstring2WeexString(env,jDataStr)));
+    ret = std::unique_ptr<IPCResult>(
+        new IPCStringResult(jstring2WeexString(env, jDataStr)));
     env->DeleteLocalRef(jDataStr);
     retVal = NULL;
       }
@@ -273,7 +265,8 @@ static std::unique_ptr<IPCResult> HandleT3DLinkNative(IPCArguments *arguments) {
   std::unique_ptr<IPCResult> ret = createVoidResult();
   if (retVal) {
     jstring jDataStr = env->NewStringUTF(retVal);
-    ret = std::unique_ptr<IPCResult>(new IPCStringResult(jstring2WeexString(env,jDataStr)));
+    ret = std::unique_ptr<IPCResult>(
+        new IPCStringResult(jstring2WeexString(env, jDataStr)));
     env->DeleteLocalRef(jDataStr);
     retVal = NULL;
   }
@@ -291,28 +284,35 @@ static std::unique_ptr<IPCResult> HandleCallNativeModule(
   char *optionsData = getArumentAsCStr(arguments, 4);
   int optionsDataLength = getArumentAsCStrLen(arguments, 4);
 
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-//  auto arg4 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3));
-//  auto arg5 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 4));
-//
-//  weex::base::WaitableEvent event;
-//  std::unique_ptr<IPCResult> ret = createInt32Result(static_cast<int32_t>(true));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable(
-//                  [pageId = std::move(arg1), module = std::move(arg2), method = std::move(
-//                          arg3), argumentsData = std::move(arg4), optionsData = std::move(arg5), length1= argumentsDataLength, length2 = optionsDataLength, result = &ret, e = &event] {
-//                      *result = WeexCoreManager::getInstance()->script_bridge()->core_side()->CallNativeModule(
-//                              pageId.get(), module.get(), method.get(), argumentsData.get(),
-//                              length1, optionsData.get(), length2);
-//                      e->Signal();
-//                  }));
-//
-//    event.Wait();
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  //  auto arg4 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3));
+  //  auto arg5 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 4));
+  //
+  //  weex::base::WaitableEvent event;
+  //  std::unique_ptr<IPCResult> ret =
+  //  createInt32Result(static_cast<int32_t>(true));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //          weex::base::MakeCopyable(
+  //                  [pageId = std::move(arg1), module = std::move(arg2),
+  //                  method = std::move(
+  //                          arg3), argumentsData = std::move(arg4),
+  //                          optionsData = std::move(arg5), length1=
+  //                          argumentsDataLength, length2 = optionsDataLength,
+  //                          result = &ret, e = &event] {
+  //                      *result =
+  //                      WeexCoreManager::getInstance()->script_bridge()->core_side()->CallNativeModule(
+  //                              pageId.get(), module.get(), method.get(),
+  //                              argumentsData.get(), length1,
+  //                              optionsData.get(), length2);
+  //                      e->Signal();
+  //                  }));
+  //
+  //    event.Wait();
 
   std::unique_ptr<IPCResult> ret =
-      WeexCoreManager::getInstance()
+      WeexCoreManager::Instance()
           ->script_bridge()
           ->core_side()
           ->CallNativeModule(pageId, module, method, argumentsData,
@@ -352,19 +352,23 @@ static std::unique_ptr<IPCResult> HandleCallNativeComponent(
   char *optionsData = getArumentAsCStr(arguments, 4);
   int optionsDataLength = getArumentAsCStrLen(arguments, 4);
 
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-//  auto arg4 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3));
-//  auto arg5 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 4));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable(
-//                  [pageId = std::move(arg1), ref = std::move(arg2), method = std::move(
-//                          arg3), argumentsData = std::move(arg4), optionsData = std::move(arg5), l1 = argumentsDataLength, l2=optionsDataLength] {
-//                      WeexCoreManager::getInstance()->script_bridge()->core_side()->CallNativeComponent(
-//                              pageId.get(), ref.get(), method.get(), argumentsData.get(),
-//                              l1, optionsData.get(), l2);
-//                  }));
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  //  auto arg4 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3));
+  //  auto arg5 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 4));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //          weex::base::MakeCopyable(
+  //                  [pageId = std::move(arg1), ref = std::move(arg2), method =
+  //                  std::move(
+  //                          arg3), argumentsData = std::move(arg4),
+  //                          optionsData = std::move(arg5), l1 =
+  //                          argumentsDataLength, l2=optionsDataLength] {
+  //                      WeexCoreManager::getInstance()->script_bridge()->core_side()->CallNativeComponent(
+  //                              pageId.get(), ref.get(), method.get(),
+  //                              argumentsData.get(), l1, optionsData.get(),
+  //                              l2);
+  //                  }));
 
   if (pageId != nullptr && ref != nullptr && method != nullptr) {
 #if JSAPI_LOG
@@ -377,7 +381,7 @@ static std::unique_ptr<IPCResult> HandleCallNativeComponent(
                pageId,
            ref, method, argString, optString);
 #endif
-    WeexCoreManager::getInstance()
+    WeexCoreManager::Instance()
         ->script_bridge()
         ->core_side()
         ->CallNativeComponent(pageId, ref, method, argumentsData,
@@ -410,107 +414,108 @@ static std::unique_ptr<IPCResult> HandleCallNativeComponent(
 
 static std::unique_ptr<IPCResult> FunctionCallCreateBody(
     IPCArguments *arguments) {
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//      weex::base::MakeCopyable(
-//          [page_id = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0)),
-//           dom_str = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1))] {
-//            WeexCoreManager::getInstance()
-//                ->script_bridge()
-//                ->core_side()
-//                ->CreateBody(page_id.get(), dom_str.get(),
-//                             strlen(dom_str.get()));
-//          }));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //      weex::base::MakeCopyable(
+  //          [page_id = std::unique_ptr<char[]>(getArumentAsCStr(arguments,
+  //          0)),
+  //           dom_str = std::unique_ptr<char[]>(getArumentAsCStr(arguments,
+  //           1))] {
+  //            WeexCoreManager::getInstance()
+  //                ->script_bridge()
+  //                ->core_side()
+  //                ->CreateBody(page_id.get(), dom_str.get(),
+  //                             strlen(dom_str.get()));
+  //          }));
 
-      auto page_id = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-      auto dom_str = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-      int dom_str_len = getArumentAsCStrLen(arguments, 1);
+  auto page_id = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  auto dom_str = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  int dom_str_len = getArumentAsCStrLen(arguments, 1);
 
-      if (page_id.get() == nullptr || dom_str == nullptr)
-          return createInt32Result(0);
+  if (page_id.get() == nullptr || dom_str == nullptr)
+    return createInt32Result(0);
 
-    WeexCoreManager::getInstance()->script_bridge()->core_side()->CreateBody(
-            page_id.get(), dom_str.get(), dom_str_len);
+  WeexCoreManager::Instance()->script_bridge()->core_side()->CreateBody(
+      page_id.get(), dom_str.get(), dom_str_len);
 
   return createInt32Result(0);
 }
 
 static std::unique_ptr<IPCResult> HandleCallAddElement(
     IPCArguments *arguments) {
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-//  auto arg4 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//      weex::base::MakeCopyable(
-//          [page_id = std::move(arg1), parent_ref = std::move(arg2),
-//           dom_str = std::move(arg3), index_cstr = std::move(arg4)] {
-//            const char *index_char =
-//                index_cstr.get() == nullptr ? "\0" : index_cstr.get();
-//            int index = atoi(index_char);
-//            if (page_id.get() != nullptr && parent_ref.get() != nullptr &&
-//                dom_str.get() != nullptr && index >= -1) {
-//              WeexCoreManager::getInstance()
-//                  ->script_bridge()
-//                  ->core_side()
-//                  ->AddElement(page_id.get(), parent_ref.get(), dom_str.get(),
-//                               strlen(dom_str.get()), index_char);
-//            }
-//          }));
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  //  auto arg4 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //      weex::base::MakeCopyable(
+  //          [page_id = std::move(arg1), parent_ref = std::move(arg2),
+  //           dom_str = std::move(arg3), index_cstr = std::move(arg4)] {
+  //            const char *index_char =
+  //                index_cstr.get() == nullptr ? "\0" : index_cstr.get();
+  //            int index = atoi(index_char);
+  //            if (page_id.get() != nullptr && parent_ref.get() != nullptr &&
+  //                dom_str.get() != nullptr && index >= -1) {
+  //              WeexCoreManager::getInstance()
+  //                  ->script_bridge()
+  //                  ->core_side()
+  //                  ->AddElement(page_id.get(), parent_ref.get(),
+  //                  dom_str.get(),
+  //                               strlen(dom_str.get()), index_char);
+  //            }
+  //          }));
 
-    char *pageId = getArumentAsCStr(arguments, 0);
-    char *parentRef = getArumentAsCStr(arguments, 1);
-    char *dom_str = getArumentAsCStr(arguments, 2);
-    char *index_cstr = getArumentAsCStr(arguments, 3);
-    LOGE("AddRenderObject in Handle %s",dom_str);
-    const char *indexChar = index_cstr == nullptr ? "\0" : index_cstr;
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *parentRef = getArumentAsCStr(arguments, 1);
+  char *dom_str = getArumentAsCStr(arguments, 2);
+  char *index_cstr = getArumentAsCStr(arguments, 3);
+  LOGE("AddRenderObject in Handle %s", dom_str);
+  const char *indexChar = index_cstr == nullptr ? "\0" : index_cstr;
 
-    int index = atoi(indexChar);
-    if (pageId != nullptr && parentRef != nullptr && dom_str != nullptr &&
-        index >= -1) {
-  #if JSAPI_LOG
+  int index = atoi(indexChar);
+  if (pageId != nullptr && parentRef != nullptr && dom_str != nullptr &&
+      index >= -1) {
+#if JSAPI_LOG
 
-      std::string log = "";
+    std::string log = "";
     log.append("pageId: ").append(pageId).append(", parentRef:
     ").append(parentRef).append(", dom_str: ").append(dom_str); int
     log_index = 0; int maxLength = 800; std::string sub; while (log_index <
     log.length()) {
-        if (log.length() <= log_index + maxLength) {
-          sub = log.substr(log_index);
-        } else {
-          sub = log.substr(log_index, maxLength);
-        }
+      if (log.length() <= log_index + maxLength) {
+        sub = log.substr(log_index);
+      } else {
+        sub = log.substr(log_index, maxLength);
+      }
 
-        if (log_index == 0)
-          LOGD("[ExtendJSApi] functionCallAddElement >>>> %s", sub.c_str());
-        else
-          LOGD("      [ExtendJSApi] functionCallAddElement >>>> %s",
-          sub.c_str());
+      if (log_index == 0)
+        LOGD("[ExtendJSApi] functionCallAddElement >>>> %s", sub.c_str());
+      else
+        LOGD("      [ExtendJSApi] functionCallAddElement >>>> %s", sub.c_str());
 
-        log_index += maxLength;
+      log_index += maxLength;
     }
-  #endif
-      WeexCoreManager::getInstance()->script_bridge()->core_side()->AddElement(
+#endif
+        WeexCoreManager::Instance()->script_bridge()->core_side()->AddElement(
           pageId, parentRef, dom_str, getArumentAsCStrLen(arguments, 2), indexChar);
-    }
+  }
 
-    delete[] pageId;
-    delete[] parentRef;
-    delete[] dom_str;
-    delete[] index_cstr;
+  delete[] pageId;
+  delete[] parentRef;
+  delete[] dom_str;
+  delete[] index_cstr;
   return createInt32Result(0);
 }
 
 static std::unique_ptr<IPCResult> FunctionCallRemoveElement(
     IPCArguments *arguments) {
-
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable(
-//                  [pageId = std::move(arg1), ref = std::move(arg2)] {
-//                      WeexCoreManager::getInstance()->script_bridge()->core_side()->RemoveElement(
-//                              pageId.get(), ref.get());
-//                  }));
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //          weex::base::MakeCopyable(
+  //                  [pageId = std::move(arg1), ref = std::move(arg2)] {
+  //                      WeexCoreManager::getInstance()->script_bridge()->core_side()->RemoveElement(
+  //                              pageId.get(), ref.get());
+  //                  }));
 
   char *pageId = getArumentAsCStr(arguments, 0);
   char *ref = getArumentAsCStr(arguments, 1);
@@ -521,7 +526,7 @@ static std::unique_ptr<IPCResult> FunctionCallRemoveElement(
   LOGD("[ExtendJSApi] functionCallRemoveElement >>>> pageId: %s, ref: %s",
        pageId, ref);
 #endif
-  WeexCoreManager::getInstance()->script_bridge()->core_side()->RemoveElement(
+  WeexCoreManager::Instance()->script_bridge()->core_side()->RemoveElement(
       pageId, ref);
 
   delete[] pageId;
@@ -531,19 +536,20 @@ static std::unique_ptr<IPCResult> FunctionCallRemoveElement(
 
 static std::unique_ptr<IPCResult> FunctionCallMoveElement(
     IPCArguments *arguments) {
-
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-//  auto arg4 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable(
-//                  [pageId = std::move(arg1), ref = std::move(arg2), parentRef = std::move(
-//                          arg3), index_str = std::move(arg4)] {
-//                      int index = atoi(index_str.get());
-//                      WeexCoreManager::getInstance()->script_bridge()->core_side()->MoveElement(
-//                              pageId.get(), ref.get(), parentRef.get(), index);
-//                  }));
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  //  auto arg4 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //          weex::base::MakeCopyable(
+  //                  [pageId = std::move(arg1), ref = std::move(arg2),
+  //                  parentRef = std::move(
+  //                          arg3), index_str = std::move(arg4)] {
+  //                      int index = atoi(index_str.get());
+  //                      WeexCoreManager::getInstance()->script_bridge()->core_side()->MoveElement(
+  //                              pageId.get(), ref.get(), parentRef.get(),
+  //                              index);
+  //                  }));
 
   char *pageId = getArumentAsCStr(arguments, 0);
   char *ref = getArumentAsCStr(arguments, 1);
@@ -555,7 +561,7 @@ static std::unique_ptr<IPCResult> FunctionCallMoveElement(
       index_str == nullptr || index < -1)
     return createInt32Result(0);
 
-  WeexCoreManager::getInstance()->script_bridge()->core_side()->MoveElement(
+  WeexCoreManager::Instance()->script_bridge()->core_side()->MoveElement(
       pageId, ref, parentRef, index);
 
   delete[] pageId;
@@ -567,17 +573,17 @@ static std::unique_ptr<IPCResult> FunctionCallMoveElement(
 
 static std::unique_ptr<IPCResult> FunctionCallAddEvent(
     IPCArguments *arguments) {
-
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable(
-//                  [pageId = std::move(arg1), ref = std::move(arg2), event = std::move(
-//                          arg3)] {
-//                      WeexCoreManager::getInstance()->script_bridge()->core_side()->AddEvent(
-//                              pageId.get(), ref.get(), event.get());
-//                  }));
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //          weex::base::MakeCopyable(
+  //                  [pageId = std::move(arg1), ref = std::move(arg2), event =
+  //                  std::move(
+  //                          arg3)] {
+  //                      WeexCoreManager::getInstance()->script_bridge()->core_side()->AddEvent(
+  //                              pageId.get(), ref.get(), event.get());
+  //                  }));
 
   char *pageId = getArumentAsCStr(arguments, 0);
   char *ref = getArumentAsCStr(arguments, 1);
@@ -586,7 +592,7 @@ static std::unique_ptr<IPCResult> FunctionCallAddEvent(
   if (pageId == nullptr || ref == nullptr || event == nullptr)
     return createInt32Result(0);
 
-  WeexCoreManager::getInstance()->script_bridge()->core_side()->AddEvent(
+  WeexCoreManager::Instance()->script_bridge()->core_side()->AddEvent(
       pageId, ref, event);
 
   delete[] pageId;
@@ -597,17 +603,17 @@ static std::unique_ptr<IPCResult> FunctionCallAddEvent(
 
 static std::unique_ptr<IPCResult> FunctionCallRemoveEvent(
     IPCArguments *arguments) {
-
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable(
-//                  [pageId = std::move(arg1), ref = std::move(arg2), event = std::move(
-//                          arg3)] {
-//                      WeexCoreManager::getInstance()->script_bridge()->core_side()->RemoveEvent(
-//                              pageId.get(), ref.get(), event.get());
-//                  }));
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //          weex::base::MakeCopyable(
+  //                  [pageId = std::move(arg1), ref = std::move(arg2), event =
+  //                  std::move(
+  //                          arg3)] {
+  //                      WeexCoreManager::getInstance()->script_bridge()->core_side()->RemoveEvent(
+  //                              pageId.get(), ref.get(), event.get());
+  //                  }));
 
   char *pageId = getArumentAsCStr(arguments, 0);
   char *ref = getArumentAsCStr(arguments, 1);
@@ -616,7 +622,7 @@ static std::unique_ptr<IPCResult> FunctionCallRemoveEvent(
   if (pageId == nullptr || ref == nullptr || event == nullptr)
     return createInt32Result(0);
 
-  WeexCoreManager::getInstance()->script_bridge()->core_side()->RemoveEvent(
+  WeexCoreManager::Instance()->script_bridge()->core_side()->RemoveEvent(
       pageId, ref, event);
 
   delete[] pageId;
@@ -627,125 +633,125 @@ static std::unique_ptr<IPCResult> FunctionCallRemoveEvent(
 
 static std::unique_ptr<IPCResult> FunctionCallUpdateStyle(
     IPCArguments *arguments) {
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//      weex::base::MakeCopyable([page_id = std::move(arg1),
-//                                ref = std::move(arg2), data = std::move(arg3)] {
-//          if (page_id.get() == nullptr || ref.get() == nullptr ||
-//            data.get() == nullptr)
-//          return;
-//
-//        WeexCoreManager::getInstance()
-//            ->script_bridge()
-//            ->core_side()
-//            ->UpdateStyle(page_id.get(), ref.get(), data.get(),
-//                          strlen(data.get()));
-//      }));
-    char *pageId = getArumentAsCStr(arguments, 0);
-    char *ref = getArumentAsCStr(arguments, 1);
-    char *data = getArumentAsCStr(arguments, 2);
-    int data_length = getArumentAsCStrLen(arguments,2);
-    if (pageId == nullptr || ref == nullptr || data == nullptr)
-      return createInt32Result(0);
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //      weex::base::MakeCopyable([page_id = std::move(arg1),
+  //                                ref = std::move(arg2), data =
+  //                                std::move(arg3)] {
+  //          if (page_id.get() == nullptr || ref.get() == nullptr ||
+  //            data.get() == nullptr)
+  //          return;
+  //
+  //        WeexCoreManager::getInstance()
+  //            ->script_bridge()
+  //            ->core_side()
+  //            ->UpdateStyle(page_id.get(), ref.get(), data.get(),
+  //                          strlen(data.get()));
+  //      }));
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *ref = getArumentAsCStr(arguments, 1);
+  char *data = getArumentAsCStr(arguments, 2);
+  int data_length = getArumentAsCStrLen(arguments, 2);
+  if (pageId == nullptr || ref == nullptr || data == nullptr)
+    return createInt32Result(0);
 
-    WeexCoreManager::getInstance()->script_bridge()->core_side()->UpdateStyle(
-        pageId, ref, data, data_length);
+  WeexCoreManager::Instance()->script_bridge()->core_side()->UpdateStyle(
+      pageId, ref, data, data_length);
 
-    delete[] pageId;
-    delete[] ref;
-    delete[] data;
+  delete[] pageId;
+  delete[] ref;
+  delete[] data;
   return createInt32Result(0);
 }
 
 static std::unique_ptr<IPCResult> FunctionCallUpdateAttrs(
     IPCArguments *arguments) {
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//      weex::base::MakeCopyable([page_id = std::move(arg1),
-//                                ref = std::move(arg2), data = std::move(arg3)] {
-//        if (page_id.get() == nullptr || ref.get() == nullptr ||
-//            data.get() == nullptr)
-//          return;
-//
-//        WeexCoreManager::getInstance()
-//            ->script_bridge()
-//            ->core_side()
-//            ->UpdateAttrs(page_id.get(), ref.get(), data.get(),
-//                          strlen(data.get()));
-//      }));
-    char *pageId = getArumentAsCStr(arguments, 0);
-    char *ref = getArumentAsCStr(arguments, 1);
-    char *data = getArumentAsCStr(arguments, 2);
-    int data_length = getArumentAsCStrLen(arguments,2);
-    if (pageId == nullptr || ref == nullptr || data == nullptr)
-      return createInt32Result(0);
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //      weex::base::MakeCopyable([page_id = std::move(arg1),
+  //                                ref = std::move(arg2), data =
+  //                                std::move(arg3)] {
+  //        if (page_id.get() == nullptr || ref.get() == nullptr ||
+  //            data.get() == nullptr)
+  //          return;
+  //
+  //        WeexCoreManager::getInstance()
+  //            ->script_bridge()
+  //            ->core_side()
+  //            ->UpdateAttrs(page_id.get(), ref.get(), data.get(),
+  //                          strlen(data.get()));
+  //      }));
+  char *pageId = getArumentAsCStr(arguments, 0);
+  char *ref = getArumentAsCStr(arguments, 1);
+  char *data = getArumentAsCStr(arguments, 2);
+  int data_length = getArumentAsCStrLen(arguments, 2);
+  if (pageId == nullptr || ref == nullptr || data == nullptr)
+    return createInt32Result(0);
 
-    WeexCoreManager::getInstance()->script_bridge()->core_side()->UpdateAttrs(
-        pageId, ref, data, data_length);
+  WeexCoreManager::Instance()->script_bridge()->core_side()->UpdateAttrs(
+      pageId, ref, data, data_length);
 
-    delete[] pageId;
-    delete[] ref;
-    delete[] data;
+  delete[] pageId;
+  delete[] ref;
+  delete[] data;
   return createInt32Result(0);
 }
 
 static std::unique_ptr<IPCResult> FunctionCallCreateFinish(
     IPCArguments *arguments) {
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//      weex::base::MakeCopyable([page_id = std::move(arg1)] {
-//        if (page_id.get() == nullptr) return;
-//
-//        WeexCoreManager::getInstance()
-//            ->script_bridge()
-//            ->core_side()
-//            ->CreateFinish(page_id.get());
-//      }));
-    char *pageId = getArumentAsCStr(arguments, 0);
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //      weex::base::MakeCopyable([page_id = std::move(arg1)] {
+  //        if (page_id.get() == nullptr) return;
+  //
+  //        WeexCoreManager::getInstance()
+  //            ->script_bridge()
+  //            ->core_side()
+  //            ->CreateFinish(page_id.get());
+  //      }));
+  char *pageId = getArumentAsCStr(arguments, 0);
 
-    if (pageId == nullptr) return createInt32Result(0);
+  if (pageId == nullptr) return createInt32Result(0);
 
-    WeexCoreManager::getInstance()->script_bridge()->core_side()->CreateFinish(
-        pageId);
+  WeexCoreManager::Instance()->script_bridge()->core_side()->CreateFinish(
+      pageId);
 
-    delete[] pageId;
+  delete[] pageId;
   return createInt32Result(0);
 }
 
 static std::unique_ptr<IPCResult> FunctionCallUpdateFinish(
     IPCArguments *arguments) {
-
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable(
-//                  [pageId = std::move(arg1), task = std::move(arg2), callback = std::move(
-//                          arg3)] {
-//                      WeexCoreManager::getInstance()->script_bridge()->core_side()->UpdateFinish(
-//                              pageId.get(), task.get(), strlen(task.get()), callback.get(),
-//                              strlen(callback.get()));
-//                  }));
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //          weex::base::MakeCopyable(
+  //                  [pageId = std::move(arg1), task = std::move(arg2),
+  //                  callback = std::move(
+  //                          arg3)] {
+  //                      WeexCoreManager::getInstance()->script_bridge()->core_side()->UpdateFinish(
+  //                              pageId.get(), task.get(), strlen(task.get()),
+  //                              callback.get(), strlen(callback.get()));
+  //                  }));
 
   char *pageId = getArumentAsCStr(arguments, 0);
   char *task = getArumentAsCStr(arguments, 1);
-  int task_length = getArumentAsCStrLen(arguments,1);
+  int task_length = getArumentAsCStrLen(arguments, 1);
   char *callback = getArumentAsCStr(arguments, 2);
-  int callback_length = getArumentAsCStrLen(arguments,2);
+  int callback_length = getArumentAsCStrLen(arguments, 2);
 
   int flag = 0;
 
   if (pageId == nullptr || task == nullptr) return createInt32Result(flag);
 
-  flag = WeexCoreManager::getInstance()
-             ->script_bridge()
-             ->core_side()
-             ->UpdateFinish(pageId, task, task_length, callback,
-                            callback_length);
+  flag =
+      WeexCoreManager::Instance()->script_bridge()->core_side()->UpdateFinish(
+          pageId, task, task_length, callback, callback_length);
 
   if (pageId != nullptr) {
     delete[] pageId;
@@ -759,22 +765,23 @@ static std::unique_ptr<IPCResult> FunctionCallUpdateFinish(
     delete[] callback;
     callback = nullptr;
   }
-  //todo result
+  // todo result
   return createInt32Result(1);
 }
 
 static std::unique_ptr<IPCResult> FunctionCallRefreshFinish(
     IPCArguments *arguments) {
-//  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-//  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-//  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-//  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
-//          weex::base::MakeCopyable(
-//                  [pageId = std::move(arg1), task = std::move(arg2), callback = std::move(
-//                          arg3)] {
-//                      WeexCoreManager::getInstance()->script_bridge()->core_side()->RefreshFinish(
-//                              pageId.get(), task.get(), callback.get());
-//                  }));
+  //  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  //  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  //  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  //  WeexCoreManager::getInstance()->script_thread()->message_loop()->PostTask(
+  //          weex::base::MakeCopyable(
+  //                  [pageId = std::move(arg1), task = std::move(arg2),
+  //                  callback = std::move(
+  //                          arg3)] {
+  //                      WeexCoreManager::getInstance()->script_bridge()->core_side()->RefreshFinish(
+  //                              pageId.get(), task.get(), callback.get());
+  //                  }));
 
   char *pageId = getArumentAsCStr(arguments, 0);
   char *task = getArumentAsCStr(arguments, 1);
@@ -784,10 +791,9 @@ static std::unique_ptr<IPCResult> FunctionCallRefreshFinish(
 
   if (pageId == nullptr) return createInt32Result(flag);
 
-  flag = WeexCoreManager::getInstance()
-             ->script_bridge()
-             ->core_side()
-             ->RefreshFinish(pageId, task, callback);
+  flag =
+      WeexCoreManager::Instance()->script_bridge()->core_side()->RefreshFinish(
+          pageId, task, callback);
 
   if (pageId != nullptr) {
     delete[] pageId;
@@ -801,15 +807,15 @@ static std::unique_ptr<IPCResult> FunctionCallRefreshFinish(
     delete[] callback;
     callback = nullptr;
   }
-        //todo result
+  // todo result
   return createInt32Result(1);
 }
 
 static std::unique_ptr<IPCResult> HandlePostMessage(IPCArguments *arguments) {
   char *jData = getArumentAsCStr(arguments, 0);
   char *jVmId = getArumentAsCStr(arguments, 1);
-  WeexCoreManager::getInstance()->script_bridge()->core_side()->PostMessage(
-      jVmId, jData);
+  WeexCoreManager::Instance()->script_bridge()->core_side()->PostMessage(jVmId,
+                                                                         jData);
   return createInt32Result(static_cast<int32_t>(true));
 }
 
@@ -818,7 +824,7 @@ std::unique_ptr<IPCResult> HandleDispatchMessage(IPCArguments *arguments) {
   char *jData = getArumentAsCStr(arguments, 1);
   char *jCallback = getArumentAsCStr(arguments, 2);
   char *jVmId = getArumentAsCStr(arguments, 3);
-  WeexCoreManager::getInstance()->script_bridge()->core_side()->DispatchMessage(
+  WeexCoreManager::Instance()->script_bridge()->core_side()->DispatchMessage(
       jClientId, jVmId, jData, jCallback);
 
   return createInt32Result(static_cast<int32_t>(true));
@@ -830,11 +836,9 @@ ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   std::unique_ptr<MultiProcessAndSoInitializer> initializer(
       new MultiProcessAndSoInitializer);
 
-    LOGE("ScriptBridgeInMultiProcess");
+  LOGE("ScriptBridgeInMultiProcess");
   bool passable = initializer->Init(
-      [this](IPCHandler *handler) {
-          RegisterIPCCallback(handler);
-          },
+      [this](IPCHandler *handler) { RegisterIPCCallback(handler); },
       [this](std::unique_ptr<WeexJSConnection> connection,
              std::unique_ptr<IPCHandler> handler,
              std::unique_ptr<IPCHandler> server_handler) {
@@ -843,12 +847,13 @@ ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
         connection_ = std::move(connection);
         handler_ = std::move(handler);
         server_handler_ = std::move(server_handler);
-        LOGE("ScriptBridgeInMultiProcess finish %x %x",server_handler_.get(),server_handler.get());
+        LOGE("ScriptBridgeInMultiProcess finish %x %x", server_handler_.get(),
+             server_handler.get());
         return true;
       },
       [this](const char *page_id, const char *func,
              const char *exception_string) {
-        WeexCoreManager::getInstance()
+        WeexCoreManager::Instance()
             ->getPlatformBridge()
             ->platform_side()
             ->ReportException(page_id, func, exception_string);
@@ -856,13 +861,15 @@ ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   set_is_passable(passable);
 }
 
-ScriptBridgeInMultiProcess::~ScriptBridgeInMultiProcess() { LOGE("ScriptBridgeInMultiProcess DELETE");}
+ScriptBridgeInMultiProcess::~ScriptBridgeInMultiProcess() {
+  LOGE("ScriptBridgeInMultiProcess DELETE");
+}
 
 void ScriptBridgeInMultiProcess::RegisterIPCCallback(IPCHandler *handler) {
-    LOGE("RegisterIPCCallback is running");
+  LOGE("RegisterIPCCallback is running");
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::SETJSFVERSION),
                            HandleSetJSVersion);
-    LOGE("RegisterIPCCallback is running2");
+  LOGE("RegisterIPCCallback is running2");
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::REPORTEXCEPTION),
                            HandleReportException);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVE),

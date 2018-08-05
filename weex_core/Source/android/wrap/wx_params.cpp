@@ -17,68 +17,69 @@
  * under the License.
  */
 
-#include <android/base/string/scoped_jstring_utf8.h>
 #include "android/wrap/wx_params.h"
+#include "android/base/string/scoped_jstring_utf8.h"
 #include "android/jniprebuild/jniheader/WXParams_jni.h"
 
 namespace WeexCore {
 
-    bool WXParams::RegisterJNIUtils(JNIEnv* env) {
-        RegisterNativesImpl(env);
-    }
+bool WXParams::RegisterJNIUtils(JNIEnv* env) { RegisterNativesImpl(env); }
 
-    WXParams::WXParams(JNIEnv* env, jobject jni_object) {
-        Reset(env, jni_object);
-    }
-    WXParams::~WXParams() {
+WXParams::WXParams(JNIEnv* env, jobject jni_object) { Reset(env, jni_object); }
+WXParams::~WXParams() {}
 
-    }
-
-    base::android::ScopedLocalJavaRef<jstring> WXParams::GetOsVersion(JNIEnv* env) {
-        return Java_WXParams_getOsVersion(env, jni_object());
-    }
-
-    base::android::ScopedLocalJavaRef<jstring> WXParams::GetPlatform(JNIEnv* env) {
-        return Java_WXParams_getPlatform(env, jni_object());
-    }
-
-    base::android::ScopedLocalJavaRef<jstring> WXParams::GetUseSingleProcess(JNIEnv* env) {
-        return Java_WXParams_getUseSingleProcess(env, jni_object());
-    }
-
-    base::android::ScopedLocalJavaRef<jstring> WXParams::GetLibJssPath(JNIEnv* env) {
-        return Java_WXParams_getLibJssPath(env, jni_object());
-    }
-
-    base::android::ScopedLocalJavaRef<jstring> WXParams::GetCacheDir(JNIEnv* env) {
-        return Java_WXParams_getCacheDir(env, jni_object());
-    }
-
-    base::android::ScopedLocalJavaRef<jstring> WXParams::GetWeexVersion(JNIEnv* env) {
-        return Java_WXParams_getWeexVersion(env, jni_object());
-    }
-
-    base::android::ScopedLocalJavaRef<jstring> WXParams::GetDeviceModel(JNIEnv* env) {
-        return Java_WXParams_getDeviceModel(env, jni_object());
-    }
-
-    base::android::ScopedLocalJavaRef<jstring> WXParams::GetAppVersion(JNIEnv* env) {
-        return Java_WXParams_getAppVersion(env, jni_object());
-    }
-
-    base::android::ScopedLocalJavaRef<jstring> WXParams::GetAppName(JNIEnv* env) {
-        return Java_WXParams_getAppName(env, jni_object());
-    }
-
-    base::android::ScopedLocalJavaRef<jstring> WXParams::GetDeviceWidth(JNIEnv* env) {
-        return Java_WXParams_getDeviceWidth(env, jni_object());
-    }
-
-    base::android::ScopedLocalJavaRef<jstring> WXParams::GetDeviceHeight(JNIEnv* env) {
-        return Java_WXParams_getDeviceHeight(env, jni_object());
-    }
-
-    base::android::ScopedLocalJavaRef<jobject > WXParams::GetOptions(JNIEnv* env) {
-        return Java_WXParams_getOptions(env, jni_object());
-    }
+base::android::ScopedLocalJavaRef<jstring> WXParams::GetOsVersion(JNIEnv* env) {
+  return Java_WXParams_getOsVersion(env, jni_object());
 }
+
+base::android::ScopedLocalJavaRef<jstring> WXParams::GetPlatform(JNIEnv* env) {
+  return Java_WXParams_getPlatform(env, jni_object());
+}
+
+base::android::ScopedLocalJavaRef<jstring> WXParams::GetUseSingleProcess(
+    JNIEnv* env) {
+  return Java_WXParams_getUseSingleProcess(env, jni_object());
+}
+
+base::android::ScopedLocalJavaRef<jstring> WXParams::GetLibJssPath(
+    JNIEnv* env) {
+  return Java_WXParams_getLibJssPath(env, jni_object());
+}
+
+base::android::ScopedLocalJavaRef<jstring> WXParams::GetCacheDir(JNIEnv* env) {
+  return Java_WXParams_getCacheDir(env, jni_object());
+}
+
+base::android::ScopedLocalJavaRef<jstring> WXParams::GetWeexVersion(
+    JNIEnv* env) {
+  return Java_WXParams_getWeexVersion(env, jni_object());
+}
+
+base::android::ScopedLocalJavaRef<jstring> WXParams::GetDeviceModel(
+    JNIEnv* env) {
+  return Java_WXParams_getDeviceModel(env, jni_object());
+}
+
+base::android::ScopedLocalJavaRef<jstring> WXParams::GetAppVersion(
+    JNIEnv* env) {
+  return Java_WXParams_getAppVersion(env, jni_object());
+}
+
+base::android::ScopedLocalJavaRef<jstring> WXParams::GetAppName(JNIEnv* env) {
+  return Java_WXParams_getAppName(env, jni_object());
+}
+
+base::android::ScopedLocalJavaRef<jstring> WXParams::GetDeviceWidth(
+    JNIEnv* env) {
+  return Java_WXParams_getDeviceWidth(env, jni_object());
+}
+
+base::android::ScopedLocalJavaRef<jstring> WXParams::GetDeviceHeight(
+    JNIEnv* env) {
+  return Java_WXParams_getDeviceHeight(env, jni_object());
+}
+
+base::android::ScopedLocalJavaRef<jobject> WXParams::GetOptions(JNIEnv* env) {
+  return Java_WXParams_getOptions(env, jni_object());
+}
+}  // namespace WeexCore

@@ -20,7 +20,6 @@
 #include <jni.h>
 #include "android/base/jni/android_jni.h"
 #include "android/base/jni_type.h"
-#include "android/bridge/impl/bridge_impl_android.h"
 #include "android/bridge/impl/content_box_measurement_impl_android.h"
 #include "android/bridge/impl/jsfunction_impl_android.h"
 #include "android/bridge/impl/measure_mode_impl_android.h"
@@ -36,25 +35,20 @@
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
   base::android::InitVM(vm);
-  // JNIEnv* env = base::android::AttachCurrentThread();
-  JNIEnv *env;
-  /* Get environment */
-  if ((vm)->GetEnv((void **)&env, JNI_VERSION_1_4) != JNI_OK) {
-    return JNI_FALSE;
-  }
+  JNIEnv *env = base::android::AttachCurrentThread();
   WeexCore::RegisterJNIMeasureMode(env);
   WeexCore::RegisterJNIContentBoxMeasurement(env);
   WeexCore::RegisterWXJsFunction(env);
   WeexCore::RegisterJNINativeRenderObjectUtils(env);
   weex::base::MessagePumpAndroid::RegisterJNIUtils(env);
-  WXBridge::RegisterJNIUtils(env);
+  WeexCore::WXBridge::RegisterJNIUtils(env);
   base::android::JNIType::RegisterJNIUtils(env);
-  WXJSObject::RegisterJNIUtils(env);
-  LogUtils::RegisterJNIUtils(env);
-  WXMap::RegisterJNIUtils(env);
-  HashSet::RegisterJNIUtils(env);
-  WMLBridge::RegisterJNIUtils(env);
-  SoUtils::Init(env);
+  WeexCore::WXJSObject::RegisterJNIUtils(env);
+  WeexCore::LogUtils::RegisterJNIUtils(env);
+  WeexCore::WXMap::RegisterJNIUtils(env);
+  WeexCore::HashSet::RegisterJNIUtils(env);
+  WeexCore::WMLBridge::RegisterJNIUtils(env);
+  WeexCore::SoUtils::Init(env);
   return JNI_VERSION_1_4;
 }
 

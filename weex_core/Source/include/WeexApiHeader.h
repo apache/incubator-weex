@@ -203,6 +203,7 @@ typedef struct PlatformExposeFunctions {
     FuncCreateBody create_body;
     FuncCallUpdateFinish update_finish;
     FuncCreateFinish create_finish;
+    FuncCreateFinish render_success;
     FuncCallRefreshFinish refresh_finish;
     FuncUpdateAttr update_attrs;
     FuncUpdateStyle update_style;
@@ -210,10 +211,6 @@ typedef struct PlatformExposeFunctions {
     FuncMoveElement move_element;
     FuncAddEvent add_event;
     FuncRemoveEvent remove_event;
-//    FuncSetInterval set_interval;
-//    FuncClearInterval clear_interval;
-//    FuncCallGCanvasLinkNative call_gcanvas_link_native;
-//    FuncT3dLinkNative t3d_link_native;
     FuncCallHandlePostMessage post_message;
     FuncCallDIspatchMessage dispatch_message;
     FuncLayout layout;

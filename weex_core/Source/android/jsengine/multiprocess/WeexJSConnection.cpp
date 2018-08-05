@@ -40,10 +40,6 @@
 #include <core/manager/weex_core_manager.h>
 #include <core/bridge/script_bridge_in_multi_process.h>
 
-//extern const char *s_cacheDir;
-//extern const char *g_jssSoPath;
-//extern const char *g_jssSoName;
-//extern bool s_start_pie;
 static void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie);
 
 static int copyFile(const char *SourceFile, const char *NewFile);

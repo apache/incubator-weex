@@ -20,8 +20,8 @@
 #ifndef WEEX_PROJECT_CORE_SIDE_IN_MULTI_SO_H
 #define WEEX_PROJECT_CORE_SIDE_IN_MULTI_SO_H
 
-#include <core/bridge/platform_bridge.h>
-#include <include/WeexApiHeader.h>
+#include "core/bridge/platform_bridge.h"
+#include "include/WeexApiHeader.h"
 
 namespace WeexCore {
 class CoreSideInMultiSo : public PlatformBridge::CoreSide {

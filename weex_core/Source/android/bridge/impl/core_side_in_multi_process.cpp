@@ -17,14 +17,14 @@
  * under the License.
  */
 
-#include <Serializing/IPCSerializer.h>
-#include <IPCMessageJS.h>
-#include <IPCSender.h>
-#include <IPCResult.h>
-#include <Buffering/IPCBuffer.h>
-#include <IPCException.h>
-#include <android/base/log_utils.h>
-#include "core_side_in_multi_process.h"
+#include "IPC/Serializing/IPCSerializer.H"
+#include "IPC/IPCMessageJS.H"
+#include "IPC/IPCSender.H"
+#include "IPC/IPCResult.H"
+#include "IPC/Buffering/IPCBuffer.H"
+#include "IPC/IPCException.H"
+#include "android/base/log_utils.H"
+#include "android/bridge/impl/core_side_in_multi_process.h"
 
 namespace WeexCore {
 
@@ -56,28 +56,12 @@ namespace WeexCore {
                                          const std::string &render_ref,
                                          float width) {
         // TODO 无法 call on main thread
-//  std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-//  serializer->setMsg(
-//      static_cast<uint32_t>(IPCMsgFromPlatformToCore::SET_STYLE_WIDTH));
-//  serializer->add(instance_id.c_str(), instance_id.size());
-//  serializer->add(render_ref.c_str(), render_ref.size());
-//  serializer->add(width);
-//  std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-//  std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
     }
 
     void CoreSideInMultiProcess::SetStyleHeight(const std::string &instance_id,
                                           const std::string &render_ref,
                                           float height) {
         // TODO 无法 call on main thread
-//  std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-//  serializer->setMsg(
-//      static_cast<uint32_t>(IPCMsgFromPlatformToCore::SET_STYLE_HEIGHT));
-//  serializer->add(instance_id.c_str(), instance_id.size());
-//  serializer->add(render_ref.c_str(), render_ref.size());
-//  serializer->add(height);
-//  std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-//  std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
     }
 
     void CoreSideInMultiProcess::SetMargin(const std::string &instance_id,
@@ -154,49 +138,18 @@ namespace WeexCore {
     }
 
     bool CoreSideInMultiProcess::NotifyLayout(const std::string &instance_id) {
-//  std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-//  serializer->setMsg(
-//      static_cast<uint32_t>(IPCMsgFromPlatformToCore::NOTIFY_LAYOUT));
-//  serializer->add(instance_id.c_str(), instance_id.size());
-//  std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-//  std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
-//  return result->get<bool>();
         // TODO 为什么需要 notfiylayout，直接一次 layout 就可以，layout 可以给 async 标签，不需要等待写入
         return true;
     }
     std::vector<int64_t> CoreSideInMultiProcess::GetFirstScreenRenderTime(
             const std::string &instance_id) {
         // TODO 无法 call on main thread
-//  std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-//  serializer->setMsg(static_cast<uint32_t>(
-//      IPCMsgFromPlatformToCore::GET_FIRST_SCREEN_RENDER_TIME));
-//  serializer->add(instance_id.c_str(), instance_id.size());
-//  std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-//  std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
-//  if (result->getType() == IPCType::VOID) {
         return std::vector<int64_t>();
-//  } else {
-//    const int64_t* temp =
-//        reinterpret_cast<const int64_t*>(result->getByteArrayContent());
-//    return std::vector<int64_t>(temp, temp + 3);
-//  }
     }
     std::vector<int64_t> CoreSideInMultiProcess::GetRenderFinishTime(
             const std::string &instance_id) {
         // TODO 无法 call on main thread
-//  std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-//  serializer->setMsg(
-//      static_cast<uint32_t>(IPCMsgFromPlatformToCore::GET_RENDER_FINISH_TIME));
-//  serializer->add(instance_id.c_str(), instance_id.size());
-//  std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-//  std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
-//  if (result->getType() == IPCType::VOID) {
         return std::vector<int64_t>();
-//  } else {
-//    const int64_t* temp =
-//        reinterpret_cast<const int64_t*>(result->getByteArrayContent());
-//    return std::vector<int64_t>(temp, temp + 3);
-//  }
     }
     void CoreSideInMultiProcess::SetRenderContainerWrapContent(
             const std::string &instance_id, bool wrap) {
@@ -314,7 +267,6 @@ namespace WeexCore {
         std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
     }
 
-    ////
     int CoreSideInMultiProcess::InitFramework(const char *script,
                                           std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
         try {
@@ -543,7 +495,6 @@ namespace WeexCore {
             std::vector<VALUE_WITH_TYPE *> &params) {
         try {
             std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-//            std::vector<VALUE_WITH_TYPE *> params;
             serializer->setMsg(static_cast<uint32_t>(IPCMsgFromPlatformToCore::EXEC_JS_WITH_RESULT));
             serializer->add(instanceId, strlen(instanceId));
             if (nameSpace)

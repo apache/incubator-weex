@@ -24,28 +24,28 @@
 #include "android/wrap/jni_object_wrap.h"
 
 namespace WeexCore {
-    class WXParams : public JNIObjectWrap {
-    public:
-        static bool RegisterJNIUtils(JNIEnv* env);
-        WXParams(JNIEnv* env, jobject jni_object);
-        virtual ~WXParams();
+class WXParams : public JNIObjectWrap {
+ public:
+  static bool RegisterJNIUtils(JNIEnv* env);
+  WXParams(JNIEnv* env, jobject jni_object);
+  virtual ~WXParams();
 
-        base::android::ScopedLocalJavaRef<jstring> GetOsVersion(JNIEnv* env);
-        base::android::ScopedLocalJavaRef<jstring> GetPlatform(JNIEnv* env);
-        base::android::ScopedLocalJavaRef<jstring> GetUseSingleProcess(JNIEnv* env);
-        base::android::ScopedLocalJavaRef<jstring> GetLibJssPath(JNIEnv* env);
-        base::android::ScopedLocalJavaRef<jstring> GetCacheDir(JNIEnv* env);
-        base::android::ScopedLocalJavaRef<jstring> GetWeexVersion(JNIEnv* env);
-        base::android::ScopedLocalJavaRef<jstring> GetDeviceModel(JNIEnv* env);
-        base::android::ScopedLocalJavaRef<jstring> GetAppVersion(JNIEnv* env);
-        base::android::ScopedLocalJavaRef<jstring> GetAppName(JNIEnv* env);
-        base::android::ScopedLocalJavaRef<jstring> GetDeviceWidth(JNIEnv* env);
-        base::android::ScopedLocalJavaRef<jstring> GetDeviceHeight(JNIEnv* env);
-        base::android::ScopedLocalJavaRef<jobject > GetOptions(JNIEnv* env);
+  base::android::ScopedLocalJavaRef<jstring> GetOsVersion(JNIEnv* env);
+  base::android::ScopedLocalJavaRef<jstring> GetPlatform(JNIEnv* env);
+  base::android::ScopedLocalJavaRef<jstring> GetUseSingleProcess(JNIEnv* env);
+  base::android::ScopedLocalJavaRef<jstring> GetLibJssPath(JNIEnv* env);
+  base::android::ScopedLocalJavaRef<jstring> GetCacheDir(JNIEnv* env);
+  base::android::ScopedLocalJavaRef<jstring> GetWeexVersion(JNIEnv* env);
+  base::android::ScopedLocalJavaRef<jstring> GetDeviceModel(JNIEnv* env);
+  base::android::ScopedLocalJavaRef<jstring> GetAppVersion(JNIEnv* env);
+  base::android::ScopedLocalJavaRef<jstring> GetAppName(JNIEnv* env);
+  base::android::ScopedLocalJavaRef<jstring> GetDeviceWidth(JNIEnv* env);
+  base::android::ScopedLocalJavaRef<jstring> GetDeviceHeight(JNIEnv* env);
+  base::android::ScopedLocalJavaRef<jobject> GetOptions(JNIEnv* env);
 
-    private:
-        DISALLOW_COPY_AND_ASSIGN(WXParams);
-    };
-}
+ private:
+  DISALLOW_COPY_AND_ASSIGN(WXParams);
+};
+}  // namespace WeexCore
 
-#endif //WEEX_PROJECT_WX_PARAMS_H
+#endif  // WEEX_PROJECT_WX_PARAMS_H

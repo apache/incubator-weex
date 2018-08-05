@@ -57,7 +57,7 @@ static jlong GetRenderObject(JNIEnv* env, jclass jcaller,
 //        return 0;
 //    }
 //    return convert_render_object_to_long(render);
-    return WeexCoreManager::getInstance()->getPlatformBridge()->core_side()->GetRenderObject(
+    return WeexCoreManager::Instance()->getPlatformBridge()->core_side()->GetRenderObject(
             jString2StrFast(env, instanceId), jString2StrFast(env, ref));
 }
 
@@ -70,7 +70,7 @@ static void UpdateRenderObjectStyle(JNIEnv* env, jclass jcaller,
 //
 //    RenderObject *render  = convert_long_to_render_object(ptr);
 //    render->UpdateStyle(jString2StrFast(env, key), jString2StrFast(env, value));
-    WeexCoreManager::getInstance()->getPlatformBridge()->core_side()->UpdateRenderObjectStyle(ptr, jString2StrFast(env, key), jString2StrFast(env, value));
+    WeexCoreManager::Instance()->getPlatformBridge()->core_side()->UpdateRenderObjectStyle(ptr, jString2StrFast(env, key), jString2StrFast(env, value));
 }
 
 static void UpdateRenderObjectAttr(JNIEnv* env, jclass jcaller,
@@ -80,7 +80,7 @@ static void UpdateRenderObjectAttr(JNIEnv* env, jclass jcaller,
 //    RenderObject *render  = convert_long_to_render_object(ptr);
 //    render->UpdateAttr(jString2StrFast(env, key), jString2StrFast(env, value));
 //    render->markDirty(true);
-    WeexCoreManager::getInstance()->getPlatformBridge()->core_side()->UpdateRenderObjectAttr(ptr, jString2StrFast(env, key), jString2StrFast(env, value));
+    WeexCoreManager::Instance()->getPlatformBridge()->core_side()->UpdateRenderObjectAttr(ptr, jString2StrFast(env, key), jString2StrFast(env, value));
 
 }
 
@@ -98,7 +98,7 @@ static jlong CopyRenderObject(JNIEnv* env, jclass jcaller, jlong ptr){
     //    }
     //}
     //return  convert_render_object_to_long(copy);
-    return WeexCoreManager::getInstance()->getPlatformBridge()->core_side()->CopyRenderObject(ptr);
+    return WeexCoreManager::Instance()->getPlatformBridge()->core_side()->CopyRenderObject(ptr);
 }
 
 static  void showRenderObjectLayout(RenderObject *renderObject, int level){

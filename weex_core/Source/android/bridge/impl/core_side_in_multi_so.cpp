@@ -16,11 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by yxp on 2018/6/20.
-//
 
-#include "core_side_in_multi_so.h"
+#include "android/bridge/impl/core_side_in_multi_so.h"
 
 namespace WeexCore {
 void CoreSideInMultiSo::SetDefaultHeightAndWidthIntoRootDom(
@@ -145,74 +142,77 @@ void CoreSideInMultiSo::AddOption(const std::string &key,
   core_side_functions_->add_option(key, value);
 }
 
-    ////
-    int CoreSideInMultiSo::InitFramework(const char *script,
-                                              std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
-      return core_side_functions_->init_framework(script, params);
-    }
+////
+int CoreSideInMultiSo::InitFramework(
+    const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
+  return core_side_functions_->init_framework(script, params);
+}
 
-    int CoreSideInMultiSo::InitAppFramework(
-            const char *instanceId, const char *appFramework,
-            std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
-      return core_side_functions_->init_app_framework(instanceId, appFramework, params);
-    }
+int CoreSideInMultiSo::InitAppFramework(
+    const char *instanceId, const char *appFramework,
+    std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
+  return core_side_functions_->init_app_framework(instanceId, appFramework,
+                                                  params);
+}
 
-    int CoreSideInMultiSo::CreateAppContext(const char *instanceId,
-                                                 const char *jsBundle) {
-      return core_side_functions_->create_app_context(instanceId, jsBundle);
-    }
+int CoreSideInMultiSo::CreateAppContext(const char *instanceId,
+                                        const char *jsBundle) {
+  return core_side_functions_->create_app_context(instanceId, jsBundle);
+}
 
-    const char *CoreSideInMultiSo::ExecJSOnAppWithResult(const char *instanceId,
-                                                              const char *jsBundle) {
-      return core_side_functions_->exec_js__on_app_with_result(instanceId, jsBundle);
-    }
+const char *CoreSideInMultiSo::ExecJSOnAppWithResult(const char *instanceId,
+                                                     const char *jsBundle) {
+  return core_side_functions_->exec_js__on_app_with_result(instanceId,
+                                                           jsBundle);
+}
 
-    int CoreSideInMultiSo::CallJSOnAppContext(const char *instanceId, const char *func,
-                                                   std::vector<VALUE_WITH_TYPE *> &params) {
-      return core_side_functions_->call_js_on_app_context(instanceId, func, params);
-    }
+int CoreSideInMultiSo::CallJSOnAppContext(
+    const char *instanceId, const char *func,
+    std::vector<VALUE_WITH_TYPE *> &params) {
+  return core_side_functions_->call_js_on_app_context(instanceId, func, params);
+}
 
-    int CoreSideInMultiSo::DestroyAppContext(const char *instanceId) {
-      return core_side_functions_->destroy_app_context(instanceId);
-    }
+int CoreSideInMultiSo::DestroyAppContext(const char *instanceId) {
+  return core_side_functions_->destroy_app_context(instanceId);
+}
 
-    int CoreSideInMultiSo::ExecJsService(const char *source) {
-      return core_side_functions_->exec_js_service(source);
-    }
+int CoreSideInMultiSo::ExecJsService(const char *source) {
+  return core_side_functions_->exec_js_service(source);
+}
 
-    int CoreSideInMultiSo::ExecTimeCallback(const char *source) {
-      return 0;
-    }
+int CoreSideInMultiSo::ExecTimeCallback(const char *source) { return 0; }
 
-    int CoreSideInMultiSo::ExecJS(const char *instanceId, const char *nameSpace,
-                                       const char *func,
-                                       std::vector<VALUE_WITH_TYPE *> &params) {
-      return core_side_functions_->exec_js(instanceId, nameSpace, func, params);
-    }
+int CoreSideInMultiSo::ExecJS(const char *instanceId, const char *nameSpace,
+                              const char *func,
+                              std::vector<VALUE_WITH_TYPE *> &params) {
+  return core_side_functions_->exec_js(instanceId, nameSpace, func, params);
+}
 
-    WeexJSResult CoreSideInMultiSo::ExecJSWithResult(
-            const char *instanceId, const char *nameSpace, const char *func,
-            std::vector<VALUE_WITH_TYPE *> &params) {
-      return core_side_functions_->exec_js_with_result(instanceId, nameSpace, func, params);
-    }
+WeexJSResult CoreSideInMultiSo::ExecJSWithResult(
+    const char *instanceId, const char *nameSpace, const char *func,
+    std::vector<VALUE_WITH_TYPE *> &params) {
+  return core_side_functions_->exec_js_with_result(instanceId, nameSpace, func,
+                                                   params);
+}
 
-    int CoreSideInMultiSo::CreateInstance(const char *instanceId, const char *func,
-                                               const char *script, const char *opts,
-                                               const char *initData, const char *extendsApi) {
-      return core_side_functions_->create_instance(instanceId, func, script, opts, initData,
-                                                   extendsApi);
-    }
+int CoreSideInMultiSo::CreateInstance(const char *instanceId, const char *func,
+                                      const char *script, const char *opts,
+                                      const char *initData,
+                                      const char *extendsApi) {
+  return core_side_functions_->create_instance(instanceId, func, script, opts,
+                                               initData, extendsApi);
+}
 
-    const char *CoreSideInMultiSo::ExecJSOnInstance(const char *instanceId,
-                                                         const char *script) {
-      return core_side_functions_->exec_js_on_instance(instanceId, script);
-    }
+const char *CoreSideInMultiSo::ExecJSOnInstance(const char *instanceId,
+                                                const char *script) {
+  return core_side_functions_->exec_js_on_instance(instanceId, script);
+}
 
-    int CoreSideInMultiSo::DestroyInstance(const char *instanceId) {
-      return core_side_functions_->destroy_instance(instanceId);
-    }
+int CoreSideInMultiSo::DestroyInstance(const char *instanceId) {
+  return core_side_functions_->destroy_instance(instanceId);
+}
 
-    int CoreSideInMultiSo::UpdateGlobalConfig(const char *config) {
-      return core_side_functions_->update_global_config(config);
-    }
+int CoreSideInMultiSo::UpdateGlobalConfig(const char *config) {
+  return core_side_functions_->update_global_config(config);
+}
 }  // namespace WeexCore

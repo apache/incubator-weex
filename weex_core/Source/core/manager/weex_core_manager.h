@@ -25,64 +25,66 @@
 #include "core/bridge/script_bridge.h"
 
 namespace WeexCore {
-    class WeexCoreManager {
+class WeexCoreManager {
+ public:
+  enum ProjectMode { MULTI_SO, MULTI_PROCESS, COMMON };
 
-    public:
-        enum ProjectMode {
-            MULTI_SO,
-            MULTI_PROCESS,
-            COMMON
-        };
+  static WeexCoreManager *Instance() {
+    if (nullptr == g_instance_) {
+      g_instance_ = new WeexCoreManager();
+    }
+    return g_instance_;
+  };
 
-        static WeexCoreManager *getInstance() {
-            if (nullptr == m_pInstance) {
-                m_pInstance = new WeexCoreManager();
-            }
-            return m_pInstance;
-        };
+  PlatformBridge *getPlatformBridge() { return platform_bridge_; }
 
-        PlatformBridge *getPlatformBridge();
+  inline void set_platform_bridge(PlatformBridge *bridge) {
+    platform_bridge_ = bridge;
+  }
 
-        void setPlatformBridge(PlatformBridge *pBridge);
+  inline ScriptBridge *script_bridge() { return script_bridge_; }
 
-        ScriptBridge* script_bridge();
-        void set_script_bridge(ScriptBridge *script_bridge);
+  inline void set_script_bridge(ScriptBridge *script_bridge) {
+    script_bridge_ = script_bridge;
+  }
 
-        void SetMeasureFunctionAdapter(MeasureFunctionAdapter *measureFunctionAdapter);
+  inline void set_measure_function_adapter(MeasureFunctionAdapter *adapter) {
+    measure_function_adapter_ = adapter;
+  }
 
-        MeasureFunctionAdapter *GetMeasureFunctionAdapter();
+  inline MeasureFunctionAdapter *measure_function_adapter() {
+    return measure_function_adapter_;
+  }
 
-        inline ProjectMode project_mode() {
-            return project_mode_;
-        }
+  inline ProjectMode project_mode() { return project_mode_; }
 
-        inline void set_project_mode(ProjectMode mode) {
-            project_mode_ = mode;
-        }
+  inline void set_project_mode(ProjectMode mode) { project_mode_ = mode; }
 
-        // Should be called on ScriptThread
-        inline void InitScriptThread() {
-            script_thread_ = new weex::base::Thread(weex::base::MessageLoop::Type::PLATFORM);
-            script_thread_->Start();
-        }
+  // Should be called on ScriptThread
+  inline void InitScriptThread() {
+    script_thread_ =
+        new weex::base::Thread(weex::base::MessageLoop::Type::PLATFORM);
+    script_thread_->Start();
+  }
 
-        inline weex::base::Thread* script_thread() {
-            return script_thread_;
-        }
+  inline weex::base::Thread *script_thread() { return script_thread_; }
 
-    private:
-        static WeexCoreManager *m_pInstance;
-        PlatformBridge *platformBridge;
-        MeasureFunctionAdapter *measureFunctionAdapter;
-        ScriptBridge* script_bridge_;
-        ProjectMode project_mode_;
-        weex::base::Thread* script_thread_;
+ private:
+  static WeexCoreManager *g_instance_;
+  PlatformBridge *platform_bridge_;
+  MeasureFunctionAdapter *measure_function_adapter_;
+  ScriptBridge *script_bridge_;
+  ProjectMode project_mode_;
+  weex::base::Thread *script_thread_;
 
+  WeexCoreManager()
+      : platform_bridge_(nullptr),
+        measure_function_adapter_(nullptr),
+        script_bridge_(nullptr),
+        project_mode_(COMMON),
+        script_thread_(nullptr){};
+  ~WeexCoreManager(){};
+};
+}  // namespace WeexCore
 
-        WeexCoreManager() : platformBridge(nullptr), measureFunctionAdapter(nullptr), script_bridge_(
-                nullptr), project_mode_(COMMON), script_thread_(nullptr){};
-        ~WeexCoreManager() {};
-    };
-}
-
-#endif //WEEXCORE_WEEX_CORE_MANAGER_H
+#endif  // WEEXCORE_WEEX_CORE_MANAGER_H

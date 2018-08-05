@@ -17,33 +17,10 @@
  * under the License.
  */
 
-#include "weex_core_manager.h"
+#include "core/manager/weex_core_manager.h"
 
 namespace WeexCore {
 
-    WeexCoreManager *WeexCoreManager::m_pInstance = nullptr;
+WeexCoreManager *WeexCoreManager::g_instance_ = nullptr;
 
-    void WeexCoreManager::setPlatformBridge(PlatformBridge *pBridge) {
-        this->platformBridge = pBridge;
-    }
-
-    PlatformBridge* WeexCoreManager::getPlatformBridge() {
-        return this->platformBridge;
-    }
-
-    void WeexCoreManager::set_script_bridge(ScriptBridge *script_bridge) {
-        script_bridge_ = script_bridge;
-    }
-
-    ScriptBridge* WeexCoreManager::script_bridge() {
-        return script_bridge_;
-    }
-
-    void WeexCoreManager::SetMeasureFunctionAdapter(MeasureFunctionAdapter *measureFunctionAdapter) {
-      this->measureFunctionAdapter = measureFunctionAdapter;
-    }
-
-    MeasureFunctionAdapter * WeexCoreManager::GetMeasureFunctionAdapter() {
-      return this->measureFunctionAdapter;
-    }
-}
+}  // namespace WeexCore

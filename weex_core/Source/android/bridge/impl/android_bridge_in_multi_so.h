@@ -20,12 +20,12 @@
 #ifndef WEEX_PROJECT_MULTI_SO_BRIDGE_H
 #define WEEX_PROJECT_MULTI_SO_BRIDGE_H
 
-#include "bridge_impl_android.h"
+#include "core/bridge/platform_bridge.h"
 #include "include/WeexApiHeader.h"
 
 namespace WeexCore {
 // For situation in single process and multi so
-class AndroidBridgeInMultiSo : public Bridge_Impl_Android {
+class AndroidBridgeInMultiSo : public PlatformBridge {
  public:
   AndroidBridgeInMultiSo();
   ~AndroidBridgeInMultiSo();
@@ -59,8 +59,8 @@ class AndroidBridgeInMultiSo : public Bridge_Impl_Android {
 
   static void CallNativeLog(const char* str_array);
 
-  static int CallUpdateFinish(const char* pageId, const char* task,int taskLen,
-                              const char *callback, int callbackLen);
+  static int CallUpdateFinish(const char* pageId, const char* task, int taskLen,
+                              const char* callback, int callbackLen);
 
   static int CallRefreshFinish(const char* pageId, const char* task,
                                const char* callback);
@@ -106,6 +106,8 @@ class AndroidBridgeInMultiSo : public Bridge_Impl_Android {
       std::vector<std::pair<std::string, std::string>>* attrs);
 
   static int CallCreateFinish(const char* pageId);
+
+  static int CallRenderSuccess(const char* pageId);
 
   static int CallRemoveElement(const char* pageId, const char* ref);
 

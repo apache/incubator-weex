@@ -18,12 +18,12 @@
  */
 
 #include "android/wrap/wml_bridge.h"
-#include "android/base/jni_type.h"
-#include "android/utils/params_utils.h"
-#include "core/manager/weex_core_manager.h"
 #include "android/base/jni/android_jni.h"
+#include "android/base/jni_type.h"
 #include "android/base/log_utils.h"
 #include "android/base/string/string_utils.h"
+#include "android/utils/params_utils.h"
+#include "core/manager/weex_core_manager.h"
 
 static jint InitAppFramework(JNIEnv* env, jobject jcaller, jstring jinstanceid,
                              jstring jframwork, jobjectArray jargs) {
@@ -56,7 +56,7 @@ static jint InitAppFramework(JNIEnv* env, jobject jcaller, jstring jinstanceid,
   }
 
   auto result =
-      WeexCoreManager::getInstance()
+      WeexCoreManager::Instance()
           ->getPlatformBridge()
           ->core_side()
           ->InitAppFramework(id.getChars(), framework.getChars(), params);
@@ -67,7 +67,7 @@ static jint InitAppFramework(JNIEnv* env, jobject jcaller, jstring jinstanceid,
 static jint DestoryAppContext(JNIEnv* env, jobject jcaller,
                               jstring jinstanceid) {
   ScopedJStringUTF8 id(env, jinstanceid);
-  return WeexCoreManager::getInstance()
+  return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->DestroyAppContext(id.getChars());
@@ -77,7 +77,7 @@ static jint CreateAppContext(JNIEnv* env, jobject jcaller, jstring jinstanceid,
                              jstring jbundle, jobject jargs) {
   ScopedJStringUTF8 id(env, jinstanceid);
   ScopedJStringUTF8 bundle(env, jbundle);
-  return WeexCoreManager::getInstance()
+  return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->CreateAppContext(id.getChars(), bundle.getChars());
@@ -88,7 +88,7 @@ static jbyteArray ExecJsOnAppWithResult(JNIEnv* env, jobject jcaller,
                                         jobject jargs) {
   ScopedJStringUTF8 id(env, jinstanceid);
   ScopedJStringUTF8 bundle(env, jbundle);
-  auto ret = WeexCoreManager::getInstance()
+  auto ret = WeexCoreManager::Instance()
                  ->getPlatformBridge()
                  ->core_side()
                  ->ExecJSOnAppWithResult(id.getChars(), bundle.getChars());
@@ -146,7 +146,7 @@ static jint ExecJsOnApp(JNIEnv* env, jobject jcaller, jstring jinstanceid,
     params.push_back(param);
   }
 
-  return WeexCoreManager::getInstance()
+  return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->CallJSOnAppContext(id.getChars(), function.getChars(), params);

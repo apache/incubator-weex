@@ -22,10 +22,9 @@
 
 #include <jni.h>
 #include "core/bridge/platform_bridge.h"
-#include "android/bridge/impl/bridge_impl_android.h"
 
 namespace WeexCore {
-    class AndroidBridgeInSimple : public Bridge_Impl_Android {
+    class AndroidBridgeInSimple : public PlatformBridge {
     public:
         AndroidBridgeInSimple();
         ~AndroidBridgeInSimple();

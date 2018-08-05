@@ -22,7 +22,7 @@
 
 #include "IPC/IPCHandler.h"
 #include "android/jsengine/multiprocess/WeexJSConnection.h"
-#include "android/bridge/impl/bridge_impl_android.h"
+#include "core/bridge/platform_bridge.h"
 
 class IPCArguments;
 class IPCResult;
@@ -31,7 +31,7 @@ class IPCSender;
 namespace WeexCore {
 
 // For multi-process and multi so
-class AndroidBridgeInMultiProcess : public Bridge_Impl_Android {
+class AndroidBridgeInMultiProcess : public PlatformBridge {
  public:
   AndroidBridgeInMultiProcess();
   virtual ~AndroidBridgeInMultiProcess();
@@ -61,6 +61,7 @@ class AndroidBridgeInMultiProcess : public Bridge_Impl_Android {
   IPC_METHOD(UpdateStyle)
   IPC_METHOD(UpdateAttr)
   IPC_METHOD(CreateFinish)
+  IPC_METHOD(RenderSuccess)
   IPC_METHOD(RemoveElement)
   IPC_METHOD(MoveElement)
 
