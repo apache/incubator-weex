@@ -16,49 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+//
+// Created by pentao.pt on 2018/7/25.
+//
 
-#ifndef CORE_DATA_RENDER_PARSER_
-#define CORE_DATA_RENDER_PARSER_
+#ifndef DATA_RENDER_RAX_PARSER_BUILDER_
+#define DATA_RENDER_RAX_PARSER_BUILDER_
 
+#include <sstream>
 #include <string>
-#include "core/data_render/ast.h"
-#include "core/data_render/statement.h"
+#include "core/data_render/ast_builder.h"
+#include "core/data_render/rax_parser.h"
+#include "core/data_render/rax_source_locator.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-
-class ParseResult {
- public:
-  friend class Parser;
-
-  ParseResult(){};
-  ParseResult(Handle<Expression> expr) : expr_(expr){};
-
-  inline Handle<ChunkStatement> expr() const { return expr_; }
-
- private:
-  Handle<ChunkStatement> expr_;
+    
+class RAXParserBuilder {
+public:
+    RAXParserBuilder(const std::string &content);
+    RAXParser *parser() { return parser_.get(); }
+    ParserContext *context() { return context_.get(); }
+private:
+    std::unique_ptr<ParserContext> context_;
+    std::unique_ptr<CharacterStream> stream_;
+    std::unique_ptr<Tokenizer> lex_;
+    std::unique_ptr<SourceLocator> locator_;
+    ASTFactory *factory_;
+    std::unique_ptr<ScopeManager> manager_;
+    std::unique_ptr<RAXParser> parser_;
+    std::unique_ptr<ASTBuilder> builder_;
+    std::stringstream content_;
 };
 
-enum ASTParseError {
-  UNKOWN_ERROR,
-  BODY_NONE_ERROR,
-  FILE_FORMAT_ERROR,
-  SYSTEM_MEMORY_ERROR,
-};
+}
+}
+}
 
-class Parser final {
- public:
-  // Parse. If parse fails, return Json() and assign an error message to err.
-  static ParseResult Parse(const json11::Json& in, std::string& err);
-
- private:
-  Parser(){};
-};
-
-}  // namespace data_render
-}  // namespace core
-}  // namespace weex
-
-#endif // CORE_DATA_RENDER_PARSER_
+#endif

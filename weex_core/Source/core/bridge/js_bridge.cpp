@@ -129,6 +129,7 @@ namespace WeexCore {
 
     int JSBridge::onCallUpdateFinish(const char *pageId, const char *task, const char *callback) {
         WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateFinish(pageId, task, callback);
+        return true;
     }
 
     void JSBridge::onCallCreateFinish(const char *pageId) {

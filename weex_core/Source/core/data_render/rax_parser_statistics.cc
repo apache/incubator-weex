@@ -16,49 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+//
+// Created by pengtao.pt on 2018/7/25.
+//
 
-#ifndef CORE_DATA_RENDER_PARSER_
-#define CORE_DATA_RENDER_PARSER_
-
-#include <string>
-#include "core/data_render/ast.h"
-#include "core/data_render/statement.h"
+#include "core/data_render/rax_parser_statistics.h"
+#include <iostream>
 
 namespace weex {
 namespace core {
 namespace data_render {
 
-class ParseResult {
- public:
-  friend class Parser;
-
-  ParseResult(){};
-  ParseResult(Handle<Expression> expr) : expr_(expr){};
-
-  inline Handle<ChunkStatement> expr() const { return expr_; }
-
- private:
-  Handle<ChunkStatement> expr_;
-};
-
-enum ASTParseError {
-  UNKOWN_ERROR,
-  BODY_NONE_ERROR,
-  FILE_FORMAT_ERROR,
-  SYSTEM_MEMORY_ERROR,
-};
-
-class Parser final {
- public:
-  // Parse. If parse fails, return Json() and assign an error message to err.
-  static ParseResult Parse(const json11::Json& in, std::string& err);
-
- private:
-  Parser(){};
-};
-
-}  // namespace data_render
-}  // namespace core
-}  // namespace weex
-
-#endif // CORE_DATA_RENDER_PARSER_
+void Statistics::dump() {
+        std::cout << "-- Statistics\n";
+#define PRINT_COUNTER(C) std::cout << #C << " = " << counters_[CountType::k##C] << "\n";
+    COUNTER_TYPE(PRINT_COUNTER)
+#undef PRINT_COUNTER
+}
+    
+}
+}
+}

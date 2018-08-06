@@ -16,49 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+//
+// Created by pentao.pt on 2018/7/25.
+//
 
-#ifndef CORE_DATA_RENDER_PARSER_
-#define CORE_DATA_RENDER_PARSER_
+#ifndef DATA_RENDER_RAX_PARSER_CONTEXT_
+#define DATA_RENDER_RAX_PARSER_CONTEXT_
 
-#include <string>
-#include "core/data_render/ast.h"
-#include "core/data_render/statement.h"
+#include "core/data_render/rax_parser_statistics.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
+  
+class Scope;
 
-class ParseResult {
- public:
-  friend class Parser;
-
-  ParseResult(){};
-  ParseResult(Handle<Expression> expr) : expr_(expr){};
-
-  inline Handle<ChunkStatement> expr() const { return expr_; }
-
- private:
-  Handle<ChunkStatement> expr_;
+class ParserContext {
+public:
+    ParserContext();
+    ~ParserContext() { };
+    Scope *globalScope() { return global_scope_.get(); }
+    Statistics &Counters();
+private:
+    std::unique_ptr<Scope> global_scope_;
+    Statistics statistics_;
 };
+    
+}
+}
+}
 
-enum ASTParseError {
-  UNKOWN_ERROR,
-  BODY_NONE_ERROR,
-  FILE_FORMAT_ERROR,
-  SYSTEM_MEMORY_ERROR,
-};
-
-class Parser final {
- public:
-  // Parse. If parse fails, return Json() and assign an error message to err.
-  static ParseResult Parse(const json11::Json& in, std::string& err);
-
- private:
-  Parser(){};
-};
-
-}  // namespace data_render
-}  // namespace core
-}  // namespace weex
-
-#endif // CORE_DATA_RENDER_PARSER_
+#endif

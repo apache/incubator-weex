@@ -19,7 +19,7 @@
 
 #include <utility>
 #include <vector>
-#include <wson_parser.h>
+#include "wson_parser.h"
 #include <android/base/log_utils.h>
 #include <chrono>
 
@@ -279,6 +279,7 @@ bool RenderManager::CallNativeModule(const char *page_id, const char *module, co
   if (strcmp(module, "meta") == 0) {
     CallMetaModule(page_id, method, arguments);
   }
+    return true;
 }
 
 bool RenderManager::CallMetaModule(const char *page_id, const char *method, const char *arguments) {
@@ -302,6 +303,7 @@ bool RenderManager::CallMetaModule(const char *page_id, const char *method, cons
       }
     }
   }
+    return true;
 }
 
 RenderPage *RenderManager::GetPage(const std::string &page_id) {
@@ -325,6 +327,7 @@ bool RenderManager::ClosePage(const std::string &page_id) {
   this->pages_.erase(page_id);
   delete page;
   page = nullptr;
+    return true;
 }
 
 float RenderManager::viewport_width(const std::string &page_id) {

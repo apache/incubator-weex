@@ -25,6 +25,8 @@
 #include <vector>
 #include "core/data_render/handle.h"
 #include "core/data_render/json/json11.hpp"
+#include "core/data_render/rax_parser_scope.h"
+#include "core/data_render/token.h"
 
 using namespace json11;
 
@@ -38,12 +40,13 @@ namespace data_render {
 #define EMIT_FUNCTION
 #endif
 
-#define DEFINE_NODE_TYPE(Type, Inheritor)                                       \
+#define DEFINE_NODE_TYPE(Type, Inheritor)                            \
  public:                                                             \
   friend class ASTVisitor;                                           \
   friend class Expression;                                           \
   friend class ASTFactory;                                           \
-  Type(Json &json) : Inheritor(json) {}                              \
+  Type(const Position &pos, Scope *scope) : Inheritor(pos, scope) {} \
+  Type() : Inheritor() {}                                            \
   virtual ~Type() = default;                                         \
   bool Is##Type() const override { return true; }                    \
   Handle<Type> As##Type() override {                                 \
@@ -53,7 +56,9 @@ namespace data_render {
   void Accept(ASTVisitor *visitor, void *data) override;             \
                                                                      \
  protected:                                                          \
-  static Handle<Type> Create(Json json) { return MakeHandle<Type>(json); }
+  static Handle<Type> Create() { return MakeHandle<Type>(); }        \
+  static Handle<Type> Create(const Position &pos, Scope *scope)      \
+    { return MakeHandle<Type>(pos, scope); }
 
 #define AST_NODE_LIST(M) \
   M(ArgumentList)        \
@@ -80,8 +85,15 @@ namespace data_render {
   M(PostfixExpression)   \
   M(ObjectConstant)      \
   M(ArrayConstant)       \
+  M(UndefinedConstant)   \
   M(ChunkStatement)      \
   M(ReturnStatement)     \
+  M(LabelledStatement)   \
+  M(NewExpression)       \
+  M(ThisExpression)      \
+  M(CommaExpression)     \
+  M(JSXNodeExpression)       \
+  M(ArrowFunctionStatement) \
   M(ExpressionList)
 
 class ASTVisitor;
@@ -104,17 +116,18 @@ extern const char* type_as_string[(int) ASTNodeType::kNrType];
 
 class Expression : public RefCountObject {
  protected:
-  Expression(Json& json) : json_(json) {};
+  Expression(const Position &loc, Scope *scope) : locator_{ loc }, scope_{ scope }
+    { }
   Expression() {};
 
  public:
   virtual ~Expression() {}
-  virtual void Pasing(Json& json) {};
   virtual void Accept(ASTVisitor* visitor, void* data) = 0;
   virtual bool ProduceRValue() { return true; }
   virtual ASTNodeType type() const = 0;
-  virtual void SetContent(Json& json) { json_ = json; }
-
+  virtual void SetScope(Scope *scope) { scope_ = scope; }
+  virtual Scope *GetScope() { return scope_; }
+    
   // helper conversion functions
 #define AS_EXPRESSION_FUNCTION(Type) \
   virtual Handle<Type> As##Type() { assert(0 && "Expression is not " #Type); }
@@ -128,7 +141,8 @@ class Expression : public RefCountObject {
 #undef IS_EXPRESSION_FUNCTION
 
  private:
-  Json json_;
+  Scope *scope_;
+  Position locator_;
 };
 
 using ProxyArray = std::vector<Handle<Expression>>;
@@ -138,8 +152,6 @@ using ProxyObject = std::map<std::string, Handle<Expression>>;
 class ExpressionList : public Expression {
  public:
   using iterator = std::vector<Handle<Expression>>::iterator;
-
-  ExpressionList() : exprs_{} {}
 
   void Insert(Handle<Expression> expr) { exprs_.push_back(expr); }
 
@@ -158,12 +170,10 @@ class ExpressionList : public Expression {
 
 class ArgumentList : public Expression {
  public:
-  ArgumentList(Json& json, Handle<ExpressionList> args)
-      : Expression(json), args_{std::move(args)} {}
-
-  explicit ArgumentList(Handle<ExpressionList> args)
+  ArgumentList(Handle<ExpressionList> args)
       : Expression(), args_{std::move(args)} {}
-
+  ArgumentList(Position &loc, Scope *scope, Handle<ExpressionList> args)
+    : Expression(loc, scope), args_{ std::move(args) } { }
   Handle<ExpressionList> args() { return args_; }
   size_t length() { return args()->Size(); }
 
@@ -178,12 +188,10 @@ class Identifier : public Expression {
   std::string name_;
 
  public:
-  Identifier(Json& json, const std::string& name)
-      : Expression(json), name_(name) {}
-
-  explicit Identifier(const std::string& name)
+  Identifier(const std::string& name)
       : Expression(), name_(name) {}
-
+  Identifier(Position &loc, Scope *scope, const std::string &name)
+    : Expression(loc, scope), name_(name) { }
   const std::string& GetName() const { return name_; }
   bool ProduceRValue() override { return false; }
  DEFINE_NODE_TYPE(Identifier, Expression);
@@ -194,9 +202,10 @@ class StringConstant : public Expression {
   std::string str_;
 
  public:
-  StringConstant(Json& json, const std::string& str)
-      : Expression(json), str_(str) {}
-  explicit StringConstant(const std::string& str)
+  StringConstant(Position &loc, Scope *scope, const std::string &str)
+    : Expression(loc, scope), str_(str)
+    { }
+  StringConstant(const std::string& str)
       : Expression(), str_(str) {}
   std::string& string() { return str_; }
  DEFINE_NODE_TYPE(StringConstant, Expression);
@@ -204,15 +213,15 @@ class StringConstant : public Expression {
 
 class TernaryExpression : public Expression {
  public:
-  TernaryExpression(Json& json, Handle<Expression> first,
-                    Handle<Expression> second, Handle<Expression> third)
-      : Expression(json), first_(first), second_(second),
-        third_(third) {}
-
+  TernaryExpression(Position &loc, Scope *scope, Handle<Expression> first,
+                      Handle<Expression> second, Handle<Expression> third)
+    : Expression(loc, scope), first_(first), second_(second),
+    third_(third) { }
   TernaryExpression(Handle<Expression> first,
                     Handle<Expression> second, Handle<Expression> third)
       : Expression(), first_(first), second_(second),
         third_(third) {}
+
 
   Handle<Expression> first() { return first_; }
   Handle<Expression> second() { return second_; }
@@ -225,6 +234,7 @@ class TernaryExpression : public Expression {
 };
 
 enum class BinaryOperation {
+  kUnknown,
   kAddition,
   kSubtraction,
   kMultiplication,
@@ -246,20 +256,21 @@ enum class BinaryOperation {
   kBitAnd,
   kBitOr,
   kBitXor,
-  kUndefine
+  kInstanceOf,
+  kIn
 };
 
 class BinaryExpression : public Expression {
  DEFINE_NODE_TYPE(BinaryExpression, Expression);
 
  public:
-  BinaryExpression(Json& json, BinaryOperation op, Handle<Expression> lhs,
-                   Handle<Expression> rhs)
-      : Expression(json), op_(op), lhs_(lhs), rhs_(rhs) {}
-
+  BinaryExpression(Position &loc, Scope *scope, BinaryOperation op,
+                     Handle<Expression> lhs, Handle<Expression> rhs)
+    : Expression(loc, scope), op_(op), lhs_(lhs), rhs_(rhs) { }
   BinaryExpression(BinaryOperation op, Handle<Expression> lhs,
                    Handle<Expression> rhs)
       : Expression(), op_(op), lhs_(lhs), rhs_(rhs) {}
+
 
   BinaryOperation op() { return op_; }
   Handle<Expression> lhs() { return lhs_; }
@@ -270,28 +281,34 @@ class BinaryExpression : public Expression {
   Handle<Expression> lhs_;
   Handle<Expression> rhs_;
 };
+    
+enum class DeclarationKind {
+    kConst,
+};
 
 class Declaration : public Expression {
  public:
-  Declaration(Json& json, std::string name, Handle<Expression> init)
-      : Expression(json), name_{name}, init_{init} {}
+  Declaration(Position &loc, Scope *scope, std::string name, Handle<Expression> init)
+    : Expression(loc, scope), name_{ name }, init_{ init } { }
   Declaration(std::string name, Handle<Expression> init)
       : Expression(), name_{name}, init_{init} {}
   std::string& name() { return name_; }
-
+  void SetKind(DeclarationKind kind) { kind_ = kind; }
   Handle<Expression> expr() { return init_; }
  DEFINE_NODE_TYPE(Declaration, Expression);
 
  private:
   std::string name_;
   Handle<Expression> init_;
+  DeclarationKind kind_;
 };
 
 class DeclarationList : public Expression {
  public:
-  DeclarationList(Json& json, std::vector<Handle<Declaration>> exprs)
-      : Expression(json), exprs_{std::move(exprs)} {}
-  explicit DeclarationList(std::vector<Handle<Declaration>> exprs)
+  DeclarationList(Position &loc, Scope *scope,
+                    std::vector<Handle<Declaration>> exprs)
+    : Expression(loc, scope), exprs_{ std::move(exprs) } { }
+  DeclarationList(std::vector<Handle<Declaration>> exprs)
       : Expression(), exprs_{std::move(exprs)} {}
 
   std::vector<Handle<Declaration>>& exprs() { return exprs_; }
@@ -307,8 +324,10 @@ class DeclarationList : public Expression {
 
 class IntegralConstant : public Expression {
  public:
-  IntegralConstant(Json& json, int value) : Expression(json), value_(value) {}
-  explicit IntegralConstant(int value) : Expression(), value_(value) {}
+  IntegralConstant(Position &loc, Scope *scope, int value)
+    : Expression(loc, scope), value_(value)
+    { }
+  IntegralConstant(int value) : Expression(), value_(value) {}
 
   int value() { return value_; }
  DEFINE_NODE_TYPE(IntegralConstant, Expression);
@@ -318,8 +337,7 @@ class IntegralConstant : public Expression {
 
 class DoubleConstant : public Expression {
  public:
-  DoubleConstant(Json& json, double value) : Expression(json), value_(value) {}
-  explicit DoubleConstant(double value) : Expression(), value_(value) {}
+  DoubleConstant(double value) : Expression(), value_(value) {}
   double value() { return value_; }
  DEFINE_NODE_TYPE(DoubleConstant, Expression);
  private:
@@ -329,9 +347,9 @@ class DoubleConstant : public Expression {
 class BooleanConstant : public Expression {
   bool pred_;
  public:
-  BooleanConstant(Json& json, bool val)
-      : Expression(json), pred_(val) {}
-  explicit BooleanConstant(bool val)
+  BooleanConstant(Position &loc, Scope *scope, bool val)
+    : Expression(loc, scope), pred_(val) { }
+  BooleanConstant(bool val)
       : Expression(), pred_(val) {}
 
   bool pred() { return pred_; }
@@ -340,7 +358,6 @@ class BooleanConstant : public Expression {
 
 class NullConstant : public Expression {
  public:
-  NullConstant() : Expression() {}
  DEFINE_NODE_TYPE(NullConstant, Expression);
 };
 
@@ -352,9 +369,9 @@ enum class MemberAccessKind {
 
 class MemberExpression : public Expression {
  public:
-  MemberExpression(Json& json, MemberAccessKind kind, Handle<Expression> expr,
-                   Handle<Expression> member)
-      : Expression(json), kind_{kind}, expr_(expr), member_(member) {}
+  MemberExpression(Position &loc, Scope *scope, MemberAccessKind kind,
+                     Handle<Expression> expr, Handle<Expression> member)
+    : Expression(loc, scope), kind_{ kind }, expr_(expr), member_(member) { }
   MemberExpression(MemberAccessKind kind, Handle<Expression> expr,
                    Handle<Expression> member)
       : Expression(), kind_{kind}, expr_(expr), member_(member) {}
@@ -374,15 +391,13 @@ class MemberExpression : public Expression {
 
 class CallExpression : public Expression {
  public:
-  CallExpression(Json& json, MemberAccessKind kind, Handle<Expression> expr,
+  CallExpression(Position &loc, Scope *scope, MemberAccessKind kind,
+                   Handle<Expression> expr, Handle<Expression> member)
+    : Expression(loc, scope), kind_{ kind }, expr_(expr), member_(member)
+    { }
+  CallExpression(MemberAccessKind kind, Handle<Expression> expr,
                  Handle<Expression> member)
-      : Expression(json), kind_{kind}, expr_(expr), member_(member) {}
-  CallExpression(Json& json, Handle<Expression> callee,
-                 std::vector<Handle<Expression>> args)
-      : Expression(json),
-        kind_{MemberAccessKind::kCall},
-        callee_(callee),
-        args_{std::move(args)} {}
+      : Expression(), kind_{kind}, expr_(expr), member_(member) {}
   CallExpression(Handle<Expression> callee,
                  std::vector<Handle<Expression>> args)
       : Expression(),
@@ -408,15 +423,17 @@ class CallExpression : public Expression {
 };
 
 enum class PrefixOperation {
+  kUnknown,
   kIncrement,
   kDecrement,
   kNot,
+  kUnfold
 };
 
 class PrefixExpression : public Expression {
  public:
-  PrefixExpression(Json& json, PrefixOperation op, Handle<Expression> expr)
-      : Expression(json), op_{op}, expr_{expr} {}
+  PrefixExpression(Position &loc, Scope *scope, PrefixOperation op, Handle<Expression> expr)
+    : Expression(loc, scope), op_{ op }, expr_{ expr } { }
   PrefixExpression(PrefixOperation op, Handle<Expression> expr)
       : Expression(), op_{op}, expr_{expr} {}
   PrefixOperation op() { return op_; }
@@ -435,12 +452,10 @@ enum class PostfixOperation {
 
 class PostfixExpression : public Expression {
  public:
-  PostfixExpression(Json& json, PostfixOperation op, Handle<Expression> expr)
-      : Expression(json), op_{op}, expr_{expr} {}
-
+  PostfixExpression(Position &loc, Scope *scope, PostfixOperation op, Handle<Expression> expr)
+    : Expression(loc, scope), op_{ op }, expr_{ expr } { }
   PostfixExpression(PostfixOperation op, Handle<Expression> expr)
       : Expression(), op_{op}, expr_{expr} {}
-
 
   PostfixOperation op() { return op_; }
   Handle<Expression> expr() { return expr_; }
@@ -452,8 +467,11 @@ class PostfixExpression : public Expression {
 
 class ObjectConstant : public Expression {
  public:
-  ObjectConstant(Json& json, ProxyObject props)
-      : Expression(json), Props{std::move(props)} {}
+  ObjectConstant(Position &loc, Scope *scope, ProxyObject props)
+    : Expression(loc, scope), Props{ std::move(props) }
+    { }
+  ObjectConstant(ProxyObject props)
+      : Expression(), Props{std::move(props)} {}
 
   ProxyObject& proxy() { return Props; }
   bool IsEmpty() { return Props.empty(); }
@@ -467,8 +485,10 @@ class ObjectConstant : public Expression {
 
 class ArrayConstant : public Expression {
  public:
-  ArrayConstant(Json& json, ProxyArray exprs)
-      : Expression(json), exprs_{std::move(exprs)} {}
+  ArrayConstant(Position &loc, Scope *scope, ProxyArray exprs)
+    : Expression(loc, scope), exprs_{ std::move(exprs) } { }
+  ArrayConstant(ProxyArray exprs)
+      : Expression(), exprs_{std::move(exprs)} {}
 
   ProxyArray& exprs() { return exprs_; }
 
@@ -482,17 +502,78 @@ class ArrayConstant : public Expression {
 
 class AssignExpression : public Expression {
  public:
-  AssignExpression(Json& json, Handle<Expression> lhs, Handle<Expression> rhs)
-      : Expression(json), lhs_(lhs), rhs_(rhs) {}
+  AssignExpression(Position &loc, Scope *scope, Handle<Expression> lhs, Handle<Expression> rhs)
+    : Expression(loc, scope), lhs_(lhs), rhs_(rhs) { }
   AssignExpression(Handle<Expression> lhs, Handle<Expression> rhs)
       : Expression(), lhs_(lhs), rhs_(rhs) {}
-
   Handle<Expression> lhs() { return lhs_; }
   Handle<Expression> rhs() { return rhs_; }
  DEFINE_NODE_TYPE(AssignExpression, Expression);
  private:
   Handle<Expression> lhs_;
   Handle<Expression> rhs_;
+};
+
+class UndefinedConstant : public Expression {
+public:
+    UndefinedConstant(Position &loc, Scope *scope)
+    : Expression(loc, scope)
+    { }
+    
+    DEFINE_NODE_TYPE(UndefinedConstant, Expression);
+};
+    
+class NewExpression : public Expression {
+public:
+    NewExpression(Position &loc, Scope *scope, Handle<Expression> member)
+    : Expression(loc, scope), member_{ member }
+    { }
+    
+    Handle<Expression> member() { return member_; }
+    bool ProduceRValue() override { return false; }
+    DEFINE_NODE_TYPE(NewExpression, Expression);
+private:
+    Handle<Expression> member_;
+};
+    
+class ThisExpression : public Expression {
+public:
+    ThisExpression(Position &loc, Scope *scope)
+    : Expression(loc, scope)
+    { }
+    
+    bool ProduceRValue() override { return false; }
+    DEFINE_NODE_TYPE(ThisExpression, Expression);
+};
+    
+class CommaExpression : public Expression {
+public:
+    CommaExpression(Position &loc, Scope *scope, Handle<ExpressionList> exprs)
+    : Expression(loc, scope), exprs_{ exprs }
+    { }
+    
+    Handle<ExpressionList> exprs() { return exprs_; }
+    DEFINE_NODE_TYPE(CommaExpression, Expression);
+private:
+    Handle<ExpressionList> exprs_;
+};
+
+#define JSXNODE_IDENTIFIER                        "jsxnid"
+
+class JSXNodeExpression : public Expression {
+public:
+    JSXNodeExpression(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> nid, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens)
+    : Expression(loc, scope), identifier_(identifier), nid_(nid), parent_(parent),
+    props_(props), childrens_{std::move(childrens)} { }
+    void SetParent(Handle<Expression> parent) { parent_ = parent; }
+    std::vector<Handle<Expression>>& childrens() { return childrens_; }
+    DEFINE_NODE_TYPE(JSXNodeExpression, Expression);
+private:
+    Handle<Expression> identifier_;
+    Handle<Expression> nid_;
+    Handle<Expression> parent_{nullptr};
+    Handle<Expression> props_;
+    std::vector<Handle<Expression>> childrens_;
 };
 
 }  // namespace data_render

@@ -45,6 +45,7 @@ namespace data_render {
   T(CONDITIONAL, "?", 3)                                           \
   T(INC, "++", 0)                                                  \
   T(DEC, "--", 0)                                                  \
+  T(UNFOLD, "...", 0)                                              \
                                                                    \
   /* Assignment operators. */                                      \
   /* IsAssignmentOp() relies on this block of enum values being */ \
@@ -93,6 +94,7 @@ namespace data_render {
   T(GT, ">", 10)                                                   \
   T(LTE, "<=", 10)                                                 \
   T(GTE, ">=", 10)                                                 \
+  T(ARROW_FUNCTION, "=>", 10)                                               \
                                                                    \
   /* Unary operators. */                                           \
   /* IsUnaryOp() relies on this block of enum values */            \
@@ -117,6 +119,16 @@ namespace data_render {
   K(TRUE_LITERAL, "true", 0)                                       \
   K(FALSE_LITERAL, "false", 0)                                     \
   K(UNDEFINED, "undefined", 0)                                     \
+  K(IN, "in", 10)                                                  \
+  K(THIS, "this", 0)                                               \
+  K(TYPEOF, "typeof", 0)                                           \
+  K(DELETE, "delete", 0)                                           \
+  K(NEW, "new", 0)                                                 \
+  K(CLASS, "class", 0)                                             \
+  K(CONST, "const", 0)                                             \
+  K(EXTENDS, "extends", 0)                                         \
+  K(SUPER, "super", 0)                                             \
+  K(LET, "let", 0)                                                 \
                                                                    \
   T(EOS, "EOS", 0)                                                 \
   T(INTEGER, "INTEGER", 0)                                         \
@@ -128,6 +140,7 @@ namespace data_render {
   T(UNINITIALIZED, "UNINITIALIZED", 0)                             \
   T(REGEXP_LITERAL, "REGEXP_LITERAL", 0)                           \
   T(ERROR, "ERROR", 0)                                             \
+  T(END_OF_FILE, "EOF", 0)                                         \
   T(INVALID, "INVALID", 0)
 
 
@@ -203,6 +216,8 @@ class Token {
 
   inline Type type() const { return type_; }
 
+  Position &position() { return pos_; }
+    
   inline const std::string& view() const { return str_; }
 
  private:
