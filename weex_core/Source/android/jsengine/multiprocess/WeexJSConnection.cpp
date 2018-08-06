@@ -171,6 +171,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
     int myerrno = errno;
     munmap(base, IPCFutexPageQueue::ipc_size);
     close(fd);
+    close(fd2);
     throw IPCException("failed to fork: %s", strerror(myerrno));
   } else if (child == 0) {
     // the child
