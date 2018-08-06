@@ -72,6 +72,8 @@ struct ThreadData {
 };
 pthread_t ipcServerThread;
 static volatile bool finish = false;
+
+
 static void *newIPCServer(void *_td) {
     ThreadData *td = static_cast<ThreadData *>(_td);
     void *base = mmap(nullptr, IPCFutexPageQueue::ipc_size, PROT_READ | PROT_WRITE, MAP_SHARED,
@@ -94,9 +96,9 @@ static void *newIPCServer(void *_td) {
       futexPageQueue->spinWaitPeer();
       listener->listen();
     } catch (IPCException &e) {
-      LOGE("server died");
-      if (ipcServerThread != 0)
-        pthread_kill(ipcServerThread, 0);
+        LOGE("server died");
+//        killIpcServer();
+        close(td->ipcServerFd);
     }
 }
 
@@ -127,6 +129,9 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
 
   pthread_attr_t threadAttr;
   finish = false;
+  if (ipcServerThread != 0)
+    pthread_kill(ipcServerThread, 0);
+
   pthread_attr_init(&threadAttr);
   int i = pthread_create(&ipcServerThread, &threadAttr, newIPCServer, &td);
   while (!finish) {
