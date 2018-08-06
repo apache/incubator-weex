@@ -18,33 +18,25 @@
  */
 package com.taobao.weex.ui.action;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
+import android.support.annotation.NonNull;
+
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
-import java.util.Map;
+/**
+ * Description
+ * Created by luciolong on 02/08/2018.
+ */
+public class GraphicActionTransformNode extends BasicGraphicAction {
+    @NonNull
+    private final WXComponentNode mNode;
 
-public class GraphicActionUpdateAttr extends BasicGraphicAction {
-
-  private Map<String, String> mAttrs;
-  private WXComponentNode mNode;
-
-  public GraphicActionUpdateAttr(WXSDKInstance instance, String ref,
-                                 Map<String, String> attrs) {
-    super(instance, ref);
-    this.mAttrs = attrs;
-
-    mNode = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
-    if (mNode != null) {
-      mNode.addAttrs(mAttrs);
+    public GraphicActionTransformNode(@NonNull WXComponentNode node, String pageId, String ref) {
+        super(pageId, ref);
+        this.mNode = node;
     }
-  }
 
-  @Override
-  public void executeAction() {
-    if (mNode == null) {
-      return;
+    @Override
+    public void executeAction() {
+        mNode.transformNode();
     }
-    mNode.updateAttrs(mAttrs);
-  }
 }

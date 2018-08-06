@@ -67,11 +67,14 @@ import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.performance.WXAnalyzerDataTransfer;
+import com.taobao.weex.prerender.PreRenderContext;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXEmbed;
+import com.taobao.weex.ui.component.node.WXComponentNode;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.utils.Trace;
@@ -138,10 +141,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private WXInstanceApm mApmForInstance;
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
-
-  private Map<String,String> mContainerInfo;
-
-  public boolean isNewFsEnd = false;
 
   /**
    * bundle type
@@ -262,6 +261,37 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    */
   public void setUseSingleProcess(boolean flag) {
     WXBridgeManager.getInstance().setUseSingleProcess(flag);
+  }
+
+  public void preRender(String pageName, final String url, Map<String, Object> options, final String jsonInitData, final int width, final int height, final WXRenderStrategy flag) {
+    if (mPrerenderContext.interceptRenderState.compareAndSet(PreRenderContext.INTERCEPT_RENDER_CLOSE, PreRenderContext.INTERCEPT_RENDER_OPEN)) {
+      mPrerenderContext.width = width;
+      mPrerenderContext.height = height;
+      renderByUrl(pageName, url, options, jsonInitData, flag);
+    }
+  }
+
+  public void realRender(@NonNull Context context) {
+    if (mPrerenderContext.interceptRenderState.compareAndSet(PreRenderContext.INTERCEPT_RENDER_OPEN, PreRenderContext.INTERCEPT_RENDER_CLOSE)) {
+      mContext = context;
+      WXComponentNode rootNode = mPrerenderContext.rootNode;
+      if (rootNode != null) {
+        mPrerenderContext.rootNode.startTransform();
+      }
+    }
+  }
+
+  @NonNull
+  public PreRenderContext getPrerenderContext() {
+    return mPrerenderContext;
+  }
+
+  public Map<String, WXComponentNode> getNodeMap() {
+    return mPrerenderContext.nodeMap;
+  }
+
+  public boolean getNeedInterceptRender() {
+    return mPrerenderContext.interceptRenderState.get() == PreRenderContext.INTERCEPT_RENDER_OPEN;
   }
 
   /**

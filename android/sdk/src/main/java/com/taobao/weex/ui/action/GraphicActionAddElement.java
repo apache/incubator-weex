@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.WorkerThread;
+
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
@@ -29,11 +30,13 @@ import com.taobao.weex.BuildConfig;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.ui.component.node.WXComponentNode;
 import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXExceptionUtils;
+
 import com.taobao.weex.utils.WXLogUtils;
 import java.util.Arrays;
 import java.util.Locale;
@@ -42,11 +45,10 @@ import java.util.Set;
 
 public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
-  private WXVContainer parent;
-  private WXComponent child;
   private GraphicPosition layoutPosition;
   private GraphicSize layoutSize;
   private boolean isLayoutRTL;
+  private WXComponentNode childNode;
 
   public GraphicActionAddElement(@NonNull WXSDKInstance instance, String ref,
                                  String componentType, String parentRef,
@@ -75,10 +77,15 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
         Log.d(WXAnalyzerDataTransfer.INTERACTION_TAG, "[client][addelementStart]"+instance.getInstanceId()+","+componentType+","+ref);
       }
     try {
-      parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager()
-          .getWXComponent(getPageId(), mParentRef);
       BasicComponentData basicComponentData = new BasicComponentData(ref, mComponentType,
           mParentRef);
+      childNode = createNode(instance, basicComponentData)
+              .setIndex(mIndex)
+              .setIsJSCreateFinish(instance.isJSCreateFinish)
+              .setLayoutPosition(layoutPosition)
+              .setLayoutSize(layoutSize).build();
+      childNode.createComponent();
+
       child = createComponent(instance, parent, basicComponentData);
       child.setTransition(WXTransition.fromMap(child.getStyles(), child));
       if (null != parent && parent.isIgnoreInteraction){
@@ -162,23 +169,26 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
   @WorkerThread
   public void setSize(GraphicSize graphicSize){
     this.layoutSize = graphicSize;
+    childNode.setLayoutSize(graphicSize);
   }
 
   @RestrictTo(Scope.LIBRARY)
   @WorkerThread
   public void setPosition(GraphicPosition position){
     this.layoutPosition = position;
+    childNode.setLayoutPosition(position);
   }
 
   @RestrictTo(Scope.LIBRARY)
   @WorkerThread
   public void setIndex(int index){
-    mIndex = index;
+    childNode.setIndex(index);
   }
 
   @Override
   public void executeAction() {
     super.executeAction();
+    childNode.addElement();
     try {
       if (!TextUtils.equals(mComponentType, "video") && !TextUtils.equals(mComponentType, "videoplus"))
         child.mIsAddElementToTree = true;

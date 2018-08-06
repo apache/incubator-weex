@@ -35,6 +35,7 @@ import java.util.Set;
 public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
 
   private WXComponent component;
+  private WXComponentNode node;
 
   public GraphicActionCreateBody(@NonNull WXSDKInstance instance, String ref,
                                  String componentType,
@@ -58,6 +59,9 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
     }
 
     BasicComponentData basicComponentData = new BasicComponentData(getRef(), mComponentType, null);
+    node = createNode(instance, basicComponentData).build();
+    node.createComponent();
+    // need merge
     component = createComponent(instance, null, basicComponentData);
     if (component == null) {
       return;
@@ -68,6 +72,8 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
   @Override
   public void executeAction() {
     super.executeAction();
+    node.createBody();
+    // needMerge
     try {
       component.createView();
       component.applyLayoutAndEvent(component);

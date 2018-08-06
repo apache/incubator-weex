@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.action;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.View;
 
 import com.taobao.weex.common.Constants;
@@ -87,6 +88,34 @@ public class BasicComponentData<T extends View> {
       mEvents = new WXEvent();
     }
     mEvents.addAll(events);
+  }
+
+  public final void addEvent(String event) {
+    if (TextUtils.isEmpty(event)) {
+      return;
+    }
+
+    if (mEvents == null) {
+      mEvents = new WXEvent();
+    }
+
+    if (!mEvents.contains(event)) {
+      mEvents.add(event);
+    }
+  }
+
+  public final void removeEvent(String event) {
+    if (TextUtils.isEmpty(event)) {
+      return;
+    }
+
+    if (mEvents == null) {
+      mEvents = new WXEvent();
+    }
+
+    if (mEvents.contains(event)) {
+      mEvents.remove(event);
+    }
   }
 
   public final void addShorthand(float[] shorthand, CSSShorthand.TYPE type) {

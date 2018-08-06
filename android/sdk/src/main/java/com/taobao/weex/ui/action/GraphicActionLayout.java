@@ -21,6 +21,8 @@ package com.taobao.weex.ui.action;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.node.WXComponentNode;
+import com.taobao.weex.utils.WXLogUtils;
 
 public class GraphicActionLayout extends BasicGraphicAction {
 
@@ -37,14 +39,19 @@ public class GraphicActionLayout extends BasicGraphicAction {
 
   @Override
   public void executeAction() {
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
-    if (component == null) {
+    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
+    if (instance == null || instance.getContext() == null) {
+      WXLogUtils.w(WXLogUtils.WEEX_TAG);
       return;
     }
-
+// need merge
     component.setIsLayoutRTL(mIsLayoutRTL);
     component.setDemission(mLayoutSize, mLayoutPosition);
     component.setSafeLayout(component);
     component.setPadding(component.getPadding(), component.getBorder());
+    WXComponentNode node = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
+    if (node != null) {
+      node.updateLayout(mLayoutPosition, mLayoutSize);
+    }
   }
 }

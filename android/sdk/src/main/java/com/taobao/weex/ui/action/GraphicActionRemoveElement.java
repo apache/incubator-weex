@@ -24,6 +24,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.component.node.WXComponentNode;
 
 public class GraphicActionRemoveElement extends BasicGraphicAction {
 
@@ -33,6 +34,11 @@ public class GraphicActionRemoveElement extends BasicGraphicAction {
 
   @Override
   public void executeAction() {
+    WXComponentNode node = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
+    if (node != null) {
+      node.removeElement(isJSCreateFinish);
+
+      // need merge
     WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
     if (component == null || component.getParent() == null || component.getInstance() == null) {
       return;

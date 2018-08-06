@@ -28,10 +28,12 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.RenderContext;
+import com.taobao.weex.prerender.PreRenderContext;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.GraphicActionBatchAction;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.node.WXComponentNode;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXUtils;
 
@@ -48,6 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WXRenderManager {
 
   private volatile ConcurrentHashMap<String, RenderContextImpl> mRenderContext;
+  private volatile ConcurrentHashMap<String, PreRenderContext> mPreRenderContextMap;
   private WXRenderHandler mWXRenderHandler;
   private ArrayList<Map<String,Object>> mBatchActions = new ArrayList<>();
   private final int MAX_DROP_FRAME_NATIVE_BATCH = 2000;
@@ -63,6 +66,10 @@ public class WXRenderManager {
     return mRenderContext.get(instanceId);
   }
 
+  public PreRenderContext getPreRenderContext(String instanceId) {
+    return mPreRenderContextMap.get(instanceId);
+  }
+
   public @Nullable
   WXComponent getWXComponent(String instanceId, String ref) {
     if (instanceId == null || TextUtils.isEmpty(ref)) {
@@ -70,6 +77,16 @@ public class WXRenderManager {
     }
     RenderContext stmt = getRenderContext(instanceId);
     return stmt == null ? null : stmt.getComponent(ref);
+  }
+
+  public @Nullable
+  WXComponentNode getWXComponentNode(String instanceId, String ref) {
+    if (instanceId == null || TextUtils.isEmpty(ref)) {
+      return null;
+    }
+
+    PreRenderContext preRenderContext = getPreRenderContext(instanceId);
+    return preRenderContext == null ? null : preRenderContext.nodeMap.get(ref);
   }
 
   public WXSDKInstance getWXSDKInstance(String instanceId) {
@@ -171,6 +188,7 @@ public class WXRenderManager {
               null);
     } else {
       mRenderContext.put(instance.getInstanceId(), new RenderContextImpl(instance));
+      mPreRenderContextMap.put(instance.getInstanceId(), instance.getPrerenderContext());
     }
   }
 

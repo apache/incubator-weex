@@ -16,35 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.prerender;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class GraphicActionUpdateAttr extends BasicGraphicAction {
+/**
+ * Created by luciolong on 18/07/2018.
+ */
+public class PreRenderContext {
+    public static final int INTERCEPT_RENDER_CLOSE = 0;
+    public static final int INTERCEPT_RENDER_OPEN = 1;
 
-  private Map<String, String> mAttrs;
-  private WXComponentNode mNode;
+    // need intercept real render
+    public AtomicInteger interceptRenderState = new AtomicInteger(INTERCEPT_RENDER_CLOSE);
 
-  public GraphicActionUpdateAttr(WXSDKInstance instance, String ref,
-                                 Map<String, String> attrs) {
-    super(instance, ref);
-    this.mAttrs = attrs;
+    @Nullable
+    public WXComponentNode rootNode;
 
-    mNode = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
-    if (mNode != null) {
-      mNode.addAttrs(mAttrs);
-    }
-  }
+    @NonNull
+    public Map<String, WXComponentNode> nodeMap = new HashMap<>();
 
-  @Override
-  public void executeAction() {
-    if (mNode == null) {
-      return;
-    }
-    mNode.updateAttrs(mAttrs);
-  }
+    public int width = 0;
+    public int height = 0;
 }
