@@ -89,16 +89,15 @@ static void *newIPCServer(void *_td) {
     std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), handler));
     std::unique_ptr<IPCListener> listener =std::move(createIPCListener(futexPageQueue.get(), handler)) ;
     finish = true;
-    futexPageQueue->spinWaitPeer();
+
     try {
+      futexPageQueue->spinWaitPeer();
       listener->listen();
     } catch (IPCException &e) {
       LOGE("server died");
       if (ipcServerThread != 0)
         pthread_kill(ipcServerThread, 0);
     }
-
-
 }
 
 

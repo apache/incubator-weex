@@ -17,13 +17,13 @@
  * under the License.
  */
 
-#include "IPC/Serializing/IPCSerializer.H"
-#include "IPC/IPCMessageJS.H"
-#include "IPC/IPCSender.H"
-#include "IPC/IPCResult.H"
-#include "IPC/Buffering/IPCBuffer.H"
-#include "IPC/IPCException.H"
-#include "android/base/log_utils.H"
+#include "IPC/Serializing/IPCSerializer.h"
+#include "IPC/IPCMessageJS.h"
+#include "IPC/IPCSender.h"
+#include "IPC/IPCResult.h"
+#include "IPC/Buffering/IPCBuffer.h"
+#include "IPC/IPCException.h"
+#include "android/base/log_utils.h"
 #include "android/bridge/impl/core_side_in_multi_process.h"
 
 namespace WeexCore {
