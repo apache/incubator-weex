@@ -290,6 +290,8 @@ class Declaration : public Expression {
  public:
   Declaration(Position &loc, Scope *scope, std::string name, Handle<Expression> init)
     : Expression(loc, scope), name_{ name }, init_{ init } { }
+  Declaration(Position &loc, Scope *scope, Handle<Expression> expr, Handle<Expression> init)
+    : Expression(loc, scope), expr_{ expr }, init_{ init } { }
   Declaration(std::string name, Handle<Expression> init)
       : Expression(), name_{name}, init_{init} {}
   std::string& name() { return name_; }
@@ -298,6 +300,7 @@ class Declaration : public Expression {
  DEFINE_NODE_TYPE(Declaration, Expression);
 
  private:
+  Handle<Expression> expr_;
   std::string name_;
   Handle<Expression> init_;
   DeclarationKind kind_;

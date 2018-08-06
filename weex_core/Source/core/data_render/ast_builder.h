@@ -55,6 +55,7 @@ public:
     // create a new node representing JavaScript assign expression
     Handle<Expression> NewAssignExpression(Handle<Expression> lhs, Handle<Expression> rhs);
     Handle<Expression> NewDeclaration(std::string name, Handle<Expression> init = nullptr);
+    Handle<Expression> NewDeclaration(Handle<Expression> expr, Handle<Expression> init = nullptr);
     Handle<Expression> NewIntegralConstant(int value);
     // create a new node representing JavaScript prefix operation
     Handle<Expression> NewPrefixExpression(PrefixOperation op, Handle<Expression> expr);

@@ -42,7 +42,7 @@ namespace data_render {
   T(COLON, ":", 0)                                                 \
   T(SEMICOLON, ";", 0)                                             \
   T(PERIOD, ".", 0)                                                \
-  T(CONDITIONAL, "?", 3)                                           \
+  T(CONDITIONAL, "?", 2)                                           \
   T(INC, "++", 0)                                                  \
   T(DEC, "--", 0)                                                  \
   T(UNFOLD, "...", 0)                                              \
@@ -140,7 +140,6 @@ namespace data_render {
   T(UNINITIALIZED, "UNINITIALIZED", 0)                             \
   T(REGEXP_LITERAL, "REGEXP_LITERAL", 0)                           \
   T(ERROR, "ERROR", 0)                                             \
-  T(END_OF_FILE, "EOF", 0)                                         \
   T(INVALID, "INVALID", 0)
 
 

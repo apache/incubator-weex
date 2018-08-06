@@ -226,8 +226,10 @@ Handle<Expression> RAXParser::ParseBinaryExpressionRhs(int prec, Handle<Expressi
         
         // now we definitely have a binary operator
         auto op =  MapBinaryOperator(lex()->CurrentToken());
+        if (op == BinaryOperation::kLessThan && lhs->IsStringConstant()) {
+            return lhs;
+        }
         Advance();
-        
         auto rhs = ParseUnaryExpression();
         
         auto nextprec = Token::Precedence(Peek());
@@ -261,18 +263,23 @@ Handle<Expression> RAXParser::ParseUnaryExpression()
         // convert + (Expr) to Expr * 1
         return builder()->NewBinaryExpression(BinaryOperation::kMultiplication,
                                               ParseUnaryExpression(), builder()->NewIntegralConstant(1));
-    } else if (tok == Token::SUB) {
+    }
+    else if (tok == Token::SUB) {
         Advance();
         
         // similarly for `-Expr` to `Expr * -1`
         return builder()->NewBinaryExpression(BinaryOperation::kMultiplication,
                                               ParseUnaryExpression(), builder()->NewIntegralConstant(-1));
-    } else if (tok == Token::INC || tok == Token::DEC || tok == Token::NOT || tok == Token::BIT_NOT
+    }
+    else if (tok == Token::INC || tok == Token::DEC || tok == Token::NOT || tok == Token::BIT_NOT
                || tok == Token::TYPEOF || tok == Token::DELETE || tok == Token::VOID || tok == Token::UNFOLD) {
         auto token = lex()->CurrentToken();
         lex()->Advance();
         return builder()->NewPrefixExpression(MapTokenWithPrefixOperator(token),
                                               ParseUnaryExpression());
+    }
+    else if (tok == Token::LT) {
+        return ParseJSXNodeStatement();
     }
     
     // PostfixExpression :
@@ -284,19 +291,15 @@ Handle<Expression> RAXParser::ParseUnaryExpression()
     tok = Peek();
     if (tok == Token::INC) {
         Advance();
-        return builder()->NewPostfixExpression(PostfixOperation::kIncrement,
-                                               left);
+        return builder()->NewPostfixExpression(PostfixOperation::kIncrement, left);
     }
     else if (tok == Token::DEC) {
         Advance();
-        return builder()->NewPostfixExpression(PostfixOperation::kDecrement,
-                                               left);
+        return builder()->NewPostfixExpression(PostfixOperation::kDecrement, left);
     }
     else if (tok == Token::ARROW_FUNCTION) {
         Advance();
-        EXPECT(Token::LBRACE);
         auto body = ParseStatement();
-        EXPECT(Token::RBRACE);
         return builder()->NewArrowFunctionStatement(body, {left});
     }
     else {
@@ -417,6 +420,9 @@ Handle<Expression> RAXParser::ParsePrimary()
     }
     else if (tok == Token::STRING) {
         result = builder()->NewStringConstant(lex()->CurrentToken().view());
+    }
+    else if (tok == Token::INTEGER) {
+        result = builder()->NewIntegralConstant(atoi((lex()->CurrentToken().view()).c_str()));
     }
     else if (tok == Token::IDENTIFIER) {
         result = builder()->NewIdentifier(lex()->CurrentToken().view());
@@ -754,7 +760,9 @@ Handle<Expression> RAXParser::ParseCommaExpression()
 }
     
 Handle<Expression> RAXParser::ParseJSXNodeStatement() {
-    Advance(); // eat '('
+    if (Peek() == Token::LPAREN) {
+        Advance(); // eat '('
+    }
     EXPECT(Token::LT); // eat '<'
     auto tok = Peek();
     if (tok != Token::IDENTIFIER) {
@@ -762,11 +770,13 @@ Handle<Expression> RAXParser::ParseJSXNodeStatement() {
     }
     Handle<Expression>expr = ParseJSXNodeExpression();
     EXPECT(Token::GT); // eat '>'
-    EXPECT(Token::RPAREN); // eat ')'
+    if (Peek() == Token::RPAREN) {
+        Advance(); // eat ')'
+    }
     return expr;
 }
     
-Handle<Expression> RAXParser::ParseJSXNodeExpression() {
+Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) {
     Handle<Expression> expr = nullptr;
     Handle<Expression> props = nullptr;
     std::string name = GetIdentifierName();
@@ -778,23 +788,48 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression() {
         EXPECT(Token::RBRACE);
     }
     tok = Peek();
+    expr = builder()->NewJSXNodeExpression(builder()->NewIdentifier(name), props, parent, {});
     if (tok == Token::DIV) {
         // no childrens
-        expr = builder()->NewJSXNodeExpression(builder()->NewIdentifier(name), props, nullptr, {});
         Advance(); // eat '/'
     }
     else if (tok == Token::GT) {
-        std::vector<Handle<Expression>> childrens = {};
         Advance();
         while (true) {
             tok = Peek();
-            if (tok != Token::LBRACE && tok != Token::LT) {
+            if (tok != Token::LBRACE && tok != Token::LT && tok != Token::STRING) {
+                throw SyntaxError(lex()->CurrentToken(), "expected a string name");
                 break;
             }
-            if (tok == Token::LBRACE) {
+            if (tok == Token::STRING) {
+                expr->AsJSXNodeExpression()->childrens().push_back(ParseExpression());
+            }
+            else if (tok == Token::LBRACE) {
                 Advance(); // eat '{'
-                
+                Handle<Expression> children = ParseExpression();
+                expr->AsJSXNodeExpression()->childrens().push_back(children);
                 EXPECT(Token::RBRACE);
+            }
+            else if (tok == Token::LT) {
+                Advance(); // eat '<'
+                tok = Peek();
+                if (tok == Token::IDENTIFIER) {
+                    Handle<Expression> children = ParseJSXNodeExpression(expr);
+                    expr->AsJSXNodeExpression()->childrens().push_back(children);
+                    EXPECT(Token::GT); // eat '>'
+                }
+                else if (tok == Token::DIV) {
+                    Advance();
+                    auto tok = Peek();
+                    if (tok != Token::IDENTIFIER) {
+                        throw SyntaxError(lex()->CurrentToken(), "expected a identifier name");
+                    }
+                    if (name != GetIdentifierName()) {
+                        throw SyntaxError(lex()->CurrentToken(), "expected identifier name not equal");
+                    }
+                    Advance(); // eat 'Identifier'
+                    break;
+                }
             }
         }
     }
@@ -991,7 +1026,7 @@ Handle<Expression> RAXParser::ParseProgram()
     // 引入node_id初始化变量
     builder()->NewDeclaration(JSXNODE_IDENTIFIER, builder()->NewIntegralConstant(0));
     try {
-        while (Peek() != Token::END_OF_FILE) {
+        while (Peek() != Token::EOS) {
             exprs->Insert(ParseStatement());
         }
     } catch (std::exception &e) {
@@ -1011,21 +1046,53 @@ Handle<Expression> RAXParser::ParseProgram()
 Handle<Declaration> RAXParser::ParseDeclaration()
 {
     auto tok = Peek();
-    if (tok != Token::IDENTIFIER) {
-        throw SyntaxError(lex()->CurrentToken(), "expected an identifier");
+    if (tok == Token::IDENTIFIER) {
+        std::string name = GetIdentifierName();
+        Advance();
+        tok = Peek();
+        if (tok == Token::SEMICOLON || tok == Token::COMMA || (flags_.IsForInLoopParsing() && tok == Token::IN)) {
+            return builder()->NewDeclaration(name);
+        }
+        else if (tok != Token::ASSIGN) {
+            throw SyntaxError(lex()->CurrentToken(), "expected a '='");
+        }
+        Advance();
+        return builder()->NewDeclaration(name, ParseAssignExpression());
     }
-    std::string name = GetIdentifierName();
-    Advance();
-    
-    tok = Peek();
-    if (tok == Token::SEMICOLON || tok == Token::COMMA || (flags_.IsForInLoopParsing() && tok == Token::IN)) {
-        return builder()->factory()->NewDeclaration(builder()->locator()->location(), scope_manager()->current(), name);
+    else if (tok == Token::LBRACE) {
+        Advance();
+        tok = Peek();
+        if (tok != Token::IDENTIFIER) {
+            throw SyntaxError(lex()->CurrentToken(), "expected an identifier");
+        }
+        std::string key_name = GetIdentifierName();
+        Advance();
+        std::string value_name = key_name;
+        if (Peek() == Token::COLON) {
+            Advance();
+            if (Peek() != Token::IDENTIFIER) {
+                throw SyntaxError(lex()->CurrentToken(), "expected an identifier");
+            }
+            value_name = GetIdentifierName();
+            Advance();
+        }
+        ProxyObject proxyObj;
+        proxyObj.insert(std::make_pair(key_name, builder()->NewIdentifier(value_name)));
+        Handle<Expression> expr = builder()->NewObjectConstant(proxyObj);
+        EXPECT(Token::RBRACE);
+        tok = Peek();
+        if (tok == Token::SEMICOLON || tok == Token::COMMA || (flags_.IsForInLoopParsing() && tok == Token::IN)) {
+            return builder()->NewDeclaration(expr);
+        }
+        else if (tok != Token::ASSIGN) {
+            throw SyntaxError(lex()->CurrentToken(), "expected a '='");
+        }
+        Advance();
+        return builder()->NewDeclaration(expr, ParseAssignExpression());
     }
-    else if (tok != Token::ASSIGN) {
-        throw SyntaxError(lex()->CurrentToken(), "expected a '='");
+    else {
+        throw SyntaxError(lex()->CurrentToken(), "expected an identifier or {");
     }
-    Advance();
-    return builder()->factory()->NewDeclaration(builder()->locator()->location(), scope_manager()->current(), name, ParseAssignExpression());
 }
     
 Handle<Expression> RAXParser::ParseVariableStatement()

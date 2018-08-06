@@ -283,6 +283,11 @@ Handle<Declaration> ASTFactory::NewDeclaration(Position &loc, Scope *scope, std:
     return MakeHandle<Declaration>(loc, scope, name, init);
 }
     
+Handle<Declaration> ASTFactory::NewDeclaration(Position &loc, Scope *scope, Handle<Expression> expr, Handle<Expression> init)
+{
+    return MakeHandle<Declaration>(loc, scope, expr, init);
+}
+    
 Handle<Expression> ASTFactory::NewDeclarationList(Position &loc, Scope *scope, std::vector<Handle<Declaration>> decls)
 {
     return MakeHandle<DeclarationList>(loc, scope, std::move(decls));

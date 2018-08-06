@@ -95,7 +95,7 @@ public:
     Handle<Expression> ParseReturnStatement();
     Handle<Expression> ParseForStatement();
     Handle<Expression> ParseJSXNodeStatement();
-    Handle<Expression> ParseJSXNodeExpression();
+    Handle<Expression> ParseJSXNodeExpression(Handle<Expression> parent = nullptr);
     Handle<Expression> ParseVariableOrExpressionOptional();
     Handle<Expression> ParseForInStatement(Handle<Expression> inexpr);
     Handle<Declaration> ParseDeclaration();

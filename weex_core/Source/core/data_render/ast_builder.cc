@@ -66,6 +66,11 @@ Handle<Expression> ASTBuilder::NewDeclaration(std::string name, Handle<Expressio
     return save(factory()->NewDeclaration(locator()->location(), manager()->current(), name, init));
 }
     
+Handle<Expression> ASTBuilder::NewDeclaration(Handle<Expression> expr, Handle<Expression> init) {
+    COUNT();
+    return save(factory()->NewDeclaration(locator()->location(), manager()->current(), expr, init));
+}
+    
 Handle<Expression> ASTBuilder::NewBinaryExpression(BinaryOperation op,
                                                    Handle<Expression> lhs, Handle<Expression> rhs)
 {
@@ -224,7 +229,7 @@ Handle<Expression> ASTBuilder::NewJSXNodeExpression(Handle<Expression> identifie
     COUNT();
     return save(factory()->NewJSXNodeExpression(locator()->location(), manager()->current(), identifier, props, parent, childrens));
 }
-
+    
 }
 }
 }

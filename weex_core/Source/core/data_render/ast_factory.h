@@ -91,10 +91,10 @@ namespace data_render {
         virtual Handle<Expression> NewReturnStatement(Position &loc, Scope *scope, Handle<Expression> expr);
         virtual Handle<Expression> NewCommaExpression(Position &loc, Scope *scope, Handle<ExpressionList> l);
         virtual Handle<Declaration> NewDeclaration(Position &loc, Scope *scope, std::string name, Handle<Expression> init = nullptr);
+        virtual Handle<Declaration> NewDeclaration(Position &loc, Scope *scope, Handle<Expression> expr, Handle<Expression> init = nullptr);
         virtual Handle<Expression> NewDeclarationList(Position &loc, Scope *scope, std::vector<Handle<Declaration>> decls);
         virtual Handle<Expression> NewArrowFunctionStatement(Position &loc, Scope *scope, Handle<Expression> body, std::vector<Handle<Expression>> args);
         virtual Handle<Expression> NewJSXNodeExpression(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens);
-
     };
 
 }  // namespace data_render

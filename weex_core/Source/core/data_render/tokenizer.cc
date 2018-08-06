@@ -375,7 +375,7 @@ Token Tokenizer::AdvanceInternal(bool not_regex) {
     } else if (!IsSpace(ch)) {
       break;
     } else if (ch == EOF || ch == '\0') {
-      return Token(std::string("EOF"), Token::END_OF_FILE,
+      return Token(std::string("EOF"), Token::EOS,
                    _ position(), _ seek());
     }
   } while (true);
