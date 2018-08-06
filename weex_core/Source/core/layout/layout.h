@@ -151,8 +151,8 @@ namespace WeexCore {
       }
 
 
-      ~WXCoreLayoutNode() {
-          mIsDestroy = true;
+      virtual ~WXCoreLayoutNode() {
+        mIsDestroy = true;
         mHasNewLayout = true;
         dirty = true;
         measureFunc = nullptr;

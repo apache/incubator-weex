@@ -29,7 +29,7 @@
 
 namespace WeexCore {
 
-RenderObject::RenderObject() {
+RenderObject::RenderObject() : parent_render_(nullptr) {
   this->styles_ = new std::map<std::string, std::string>();
   this->attributes_ = new std::map<std::string, std::string>();
   this->events_ = new std::set<std::string>();

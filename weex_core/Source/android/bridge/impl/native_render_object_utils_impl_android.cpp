@@ -47,18 +47,10 @@ namespace WeexCore {
 static jlong GetRenderObject(JNIEnv* env, jclass jcaller,
                              jstring instanceId,
                              jstring ref){
-//    RenderPage *page = RenderManager::GetInstance()->GetPage(jString2StrFast(env, instanceId));
-//    if (page == nullptr){
-//        return 0;
-//    }
-//
-//    RenderObject *render = page->GetRenderObject(jString2StrFast(env, ref));
-//    if (render == nullptr){
-//        return 0;
-//    }
-//    return convert_render_object_to_long(render);
+    ScopedJStringUTF8 scoped_id(env, instanceId);
+    ScopedJStringUTF8 scoped_ref(env, ref);
     return WeexCoreManager::Instance()->getPlatformBridge()->core_side()->GetRenderObject(
-            jString2StrFast(env, instanceId), jString2StrFast(env, ref));
+            scoped_id.getChars(), scoped_ref.getChars());
 }
 
 
@@ -67,37 +59,22 @@ static void UpdateRenderObjectStyle(JNIEnv* env, jclass jcaller,
                                     jlong ptr,
                                     jstring key,
                                     jstring value){
-//
-//    RenderObject *render  = convert_long_to_render_object(ptr);
-//    render->UpdateStyle(jString2StrFast(env, key), jString2StrFast(env, value));
-    WeexCoreManager::Instance()->getPlatformBridge()->core_side()->UpdateRenderObjectStyle(ptr, jString2StrFast(env, key), jString2StrFast(env, value));
+    ScopedJStringUTF8 scoped_key(env, key);
+    ScopedJStringUTF8 scoped_value(env, value);
+    WeexCoreManager::Instance()->getPlatformBridge()->core_side()->UpdateRenderObjectStyle(ptr, scoped_key.getChars(), scoped_value.getChars());
 }
 
 static void UpdateRenderObjectAttr(JNIEnv* env, jclass jcaller,
                                    jlong ptr,
                                    jstring key,
                                    jstring value){
-//    RenderObject *render  = convert_long_to_render_object(ptr);
-//    render->UpdateAttr(jString2StrFast(env, key), jString2StrFast(env, value));
-//    render->markDirty(true);
-    WeexCoreManager::Instance()->getPlatformBridge()->core_side()->UpdateRenderObjectAttr(ptr, jString2StrFast(env, key), jString2StrFast(env, value));
+    ScopedJStringUTF8 scoped_key(env, key);
+    ScopedJStringUTF8 scoped_value(env, value);
+    WeexCoreManager::Instance()->getPlatformBridge()->core_side()->UpdateRenderObjectAttr(ptr, scoped_key.getChars(), scoped_value.getChars());
 
 }
 
 static jlong CopyRenderObject(JNIEnv* env, jclass jcaller, jlong ptr){
-    //RenderObject *render = convert_long_to_render_object(ptr);
-    //RenderObject *copy = (RenderObject*)RenderCreator::GetInstance()->CreateRender(render->type(),
-    //                                                                               render->ref());
-    //copy->CopyFrom(render);
-    //if(render->type() == WeexCore::kRenderCellSlot || render->type() == WeexCore::kRenderCell){
-    //    RenderList* renderList = static_cast<RenderList*>(render->getParent());
-    //    if(renderList != nullptr){
-    //        renderList->AddCellSlotCopyTrack(copy);
-    //    }else{
-    //        __android_log_print(ANDROID_LOG_ERROR, " LayoutRenderObject","copy error parent null");
-    //    }
-    //}
-    //return  convert_render_object_to_long(copy);
     return WeexCoreManager::Instance()->getPlatformBridge()->core_side()->CopyRenderObject(ptr);
 }
 
