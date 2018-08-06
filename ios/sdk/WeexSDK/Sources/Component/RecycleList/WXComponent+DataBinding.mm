@@ -105,7 +105,14 @@ static JSContext *jsContext;
             __componentId++;
             dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
             [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self.attributes[@"@templateId"] type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(JSValue *value) {
-                [newData addEntriesFromDictionary:[value toDictionary][@"0"]];
+                if ([value isKindOfClass:[NSDictionary class]]) {
+                    NSDictionary *valueDict = (NSDictionary *) value;
+                    [newData addEntriesFromDictionary:valueDict[@"0"]];
+                }
+                else
+                {
+                    [newData addEntriesFromDictionary:[value toDictionary][@"0"]];
+                }
                 [newData setObject:indexPath forKey:@"indexPath"];
                 [newData setObject:listRef forKey:@"recycleListComponentRef"];
                 [[recycleListComponent dataManager] updateVirtualComponentData:self->_virtualComponentId data:newData];
