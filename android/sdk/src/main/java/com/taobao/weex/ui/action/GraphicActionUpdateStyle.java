@@ -119,7 +119,7 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
 
   @Override
   public void executeAction() {
-    if (component == null) {
+    if (component == null || mStyle == null) {
       return;
     }
     if(component.getTransition() != null){
