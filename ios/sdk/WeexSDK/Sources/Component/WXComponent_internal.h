@@ -140,6 +140,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     NSString *_repeatIndexIdentify;
     NSString *_repeatLabelIdentify;
     NSString *_virtualComponentId;// for recycleList subcomponent
+    NSMutableDictionary *_virtalElementInfo;
+
     BOOL _isRepeating;
     BOOL _isSkipUpdate;
     BOOL _dataBindOnce;
@@ -257,6 +259,10 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 - (void)_storeBindingsWithProps:(NSDictionary *)props styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSDictionary *)events;
 
 - (void)_didInserted;
+
+- (void)_attachSlotEvent:(NSDictionary *)data;
+
+- (void)_detachSlotEvent:(NSDictionary *)data;
 
 @end
 

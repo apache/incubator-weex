@@ -40,7 +40,7 @@
         if (attributes[@"default"]) {
             _templateCaseType = @"default";
         }
-        _templateCaseType = attributes[@"case"] ? [WXConvert NSString:attributes[@"case"]] :const_cast<NSString *>(WXDefaultRecycleTemplateType) ;
+        _templateCaseType = attributes[@"case"] ? [WXConvert NSString:attributes[@"case"]] :const_cast<NSString *>(WXDefaultRecycleTemplateType);
         _lazyCreateView = YES;
         _isNeedJoinLayoutSystem = NO;
     }
@@ -55,9 +55,9 @@
 
 - (void)updateCellData:(NSDictionary *)data
 {
-    WXAssertComponentThread();    
-    
+    WXAssertComponentThread();
     [self updateBindingData:data];
+    [self _attachSlotEvent:data];
     [self triggerLayout];
 }
 
@@ -69,21 +69,16 @@
 - (void)triggerLayout
 {
     WXAssertComponentThread();
-
-        if (flexIsUndefined(self.flexCssNode->getStyleWidth())) {
-            self.flexCssNode->setStyleWidth(((WXScrollerComponent *)(self.supercomponent)).flexScrollerCSSNode->getStyleWidth(),NO);
-        }
-        
-        if ([self needsLayout]) {
-            std::pair<float, float> renderPageSize;
-            renderPageSize.first = self.weexInstance.frame.size.width;
-            renderPageSize.second = self.weexInstance.frame.size.height;
-            self.flexCssNode->calculateLayout(renderPageSize);
-            if ([WXLog logLevel] >= WXLogLevelDebug) {
-                
-            }
-        }
+    if (flexIsUndefined(self.flexCssNode->getStyleWidth())) {
+        self.flexCssNode->setStyleWidth(((WXScrollerComponent *)(self.supercomponent)).flexScrollerCSSNode->getStyleWidth(),NO);
+    }
     
+    if ([self needsLayout]) {
+        std::pair<float, float> renderPageSize;
+        renderPageSize.first = self.weexInstance.frame.size.width;
+        renderPageSize.second = self.weexInstance.frame.size.height;
+        self.flexCssNode->calculateLayout(renderPageSize);
+    }
     NSMutableSet<WXComponent *> *dirtyComponents = [NSMutableSet set];
     [self _calculateFrameWithSuperAbsolutePosition:CGPointZero gatherDirtyComponents:dirtyComponents];
     for (WXComponent *dirtyComponent in dirtyComponents) {
@@ -92,5 +87,4 @@
         }];
     }
 }
-
 @end

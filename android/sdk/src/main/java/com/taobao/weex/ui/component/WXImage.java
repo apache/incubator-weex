@@ -18,6 +18,9 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
+import com.taobao.weex.dom.WXImageQuality;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -159,7 +162,8 @@ public class WXImage extends WXComponent<ImageView> {
     (getHostView()).setScaleType(getResizeMode(resizeMode));
   }
 
-  private ScaleType getResizeMode(String resizeMode) {
+  @RestrictTo(Scope.LIBRARY_GROUP)
+  protected ScaleType getResizeMode(String resizeMode) {
     ScaleType scaleType = ScaleType.FIT_XY;
     if (TextUtils.isEmpty(resizeMode)) {
       return scaleType;
@@ -337,8 +341,13 @@ public class WXImage extends WXComponent<ImageView> {
     IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
     if (imgLoaderAdapter != null) {
       imgLoaderAdapter.setImage(rewrited.toString(), getHostView(),
-          getAttrs().getImageQuality(), imageStrategy);
+          getImageQuality(), imageStrategy);
     }
+  }
+
+  @RestrictTo(Scope.LIBRARY_GROUP)
+  protected WXImageQuality getImageQuality(){
+    return getAttrs().getImageQuality();
   }
 
   @Override

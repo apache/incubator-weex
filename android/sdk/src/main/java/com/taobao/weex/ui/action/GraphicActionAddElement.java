@@ -159,7 +159,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
   public void executeAction() {
     super.executeAction();
     try {
-      if (!TextUtils.equals("mComponentType", "video") && !TextUtils.equals("mComponentType", "videoplus"))
+      if (!TextUtils.equals(mComponentType, "video") && !TextUtils.equals(mComponentType, "videoplus"))
         child.mIsAddElementToTree = true;
 
       parent.addChild(child, mIndex);
