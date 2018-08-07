@@ -36,6 +36,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
@@ -1620,7 +1621,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   private void initFramework(String framework) {
-    if (!isJSFrameworkInit()) {
+    if (WXSDKEngine.isSoInitialized() && !isJSFrameworkInit()) {
       if (TextUtils.isEmpty(framework)) {
         // if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("weex JS framework from assets");

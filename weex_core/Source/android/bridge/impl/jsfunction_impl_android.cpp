@@ -32,7 +32,7 @@ extern jclass jBridgeClazz;
 
 namespace WeexCore {
     bool RegisterWXJsFunction(JNIEnv *env) {
-        RegisterNativesImpl(env);
+        return RegisterNativesImpl(env);
     }
 }
 
