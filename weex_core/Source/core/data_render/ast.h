@@ -89,11 +89,14 @@ namespace data_render {
   M(ChunkStatement)      \
   M(ReturnStatement)     \
   M(LabelledStatement)   \
+  M(ClassStatement)      \
+  M(MethodStatement)     \
   M(NewExpression)       \
   M(ThisExpression)      \
   M(CommaExpression)     \
   M(JSXNodeExpression)       \
   M(ArrowFunctionStatement) \
+  M(ClassBody)              \
   M(ExpressionList)
 
 class ASTVisitor;
@@ -166,6 +169,23 @@ class ExpressionList : public Expression {
 
  private:
   std::vector<Handle<Expression>> exprs_;
+};
+    
+class ClassBody : public Expression {
+public:
+    using iterator = std::vector<Handle<Expression>>::iterator;
+    
+    void Insert(Handle<Expression> expr) { body_.push_back(expr); }
+    
+    size_t Size() { return body_.size(); }
+    
+    std::vector<Handle<Expression>>& raw_list() { return body_; }
+    
+    iterator begin() { return body_.begin(); }
+    iterator end() { return body_.end(); }
+    DEFINE_NODE_TYPE(ClassBody, Expression);
+private:
+    std::vector<Handle<Expression>> body_;
 };
 
 class ArgumentList : public Expression {

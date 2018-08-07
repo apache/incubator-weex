@@ -36,6 +36,7 @@ namespace data_render {
         // GetFactoryInstance ::= returns singleton instance of ASTFactory
         static ASTFactory *GetFactoryInstance();
         virtual Handle<ExpressionList> NewExpressionList();
+        virtual Handle<ClassBody> NewClassBody();
         virtual Handle<Expression> NewIdentifier(std::string name);
         virtual Handle<ChunkStatement> NewChunkStatement(Handle<ExpressionList> list);
         virtual Handle<Expression> NewBlockStatement(Handle<ExpressionList> list);
@@ -95,6 +96,8 @@ namespace data_render {
         virtual Handle<Expression> NewDeclarationList(Position &loc, Scope *scope, std::vector<Handle<Declaration>> decls);
         virtual Handle<Expression> NewArrowFunctionStatement(Position &loc, Scope *scope, Handle<Expression> body, std::vector<Handle<Expression>> args);
         virtual Handle<Expression> NewJSXNodeExpression(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens);
+        virtual Handle<Expression> NewClassStatement(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body);
+
     };
 
 }  // namespace data_render

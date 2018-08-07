@@ -38,6 +38,10 @@ Handle<ExpressionList> ASTFactory::NewExpressionList() {
   return MakeHandle<ExpressionList>();
 }
     
+Handle<ClassBody> ASTFactory::NewClassBody() {
+  return MakeHandle<ClassBody>();
+}
+    
 Handle<Expression> ASTFactory::NewIdentifier(std::string name) {
   return MakeHandle<Identifier>(name);
 }
@@ -301,6 +305,10 @@ Handle<Expression> ASTFactory::NewArrowFunctionStatement(Position &loc, Scope *s
 Handle<Expression> ASTFactory::NewJSXNodeExpression(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens) {
     Handle<Expression> nidExpr = NewPrefixExpression(PrefixOperation::kIncrement, NewIdentifier(JSXNODE_IDENTIFIER));
     return MakeHandle<JSXNodeExpression>(loc, scope, identifier, nidExpr, props, parent, std::move(childrens));
+}
+    
+Handle<Expression> ASTFactory::NewClassStatement(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body) {
+    return MakeHandle<ClassStatement>(loc, scope, identifier, superClass, body);
 }
     
 }  // namespace data_render

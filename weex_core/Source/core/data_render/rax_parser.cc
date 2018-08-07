@@ -454,6 +454,9 @@ Handle<Expression> RAXParser::ParsePrimary()
         result = ParseFunctionStatement();
         return result;
     }
+    else if (tok == Token::SUPER) {
+        result = builder()->NewIdentifier(lex()->CurrentToken().view());
+    }
     else {
         throw SyntaxError(lex()->CurrentToken(), "expected a primary expression");
     }
@@ -487,7 +490,6 @@ Handle<Expression> RAXParser::ParseArrayConstant()
     return builder()->NewArrayConstant(exprs);
 }
    
-    
 const std::string& RAXParser::GetStringConstant()
 {
     return lex()->CurrentToken().view();
@@ -515,6 +517,9 @@ Handle<Expression> RAXParser::ParseObjectConstant()
         }
         else if (tok == Token::IDENTIFIER || Token::IsKeyword(tok) || tok == Token::NUMBER) {
             name = lex()->CurrentToken().view();
+        }
+        else if (tok == Token::UNFOLD) {
+            return ParseExpression();
         }
         else {
             throw SyntaxError(lex()->CurrentToken(), "expected an Identifier or a string");
@@ -760,17 +765,17 @@ Handle<Expression> RAXParser::ParseCommaExpression()
 }
     
 Handle<Expression> RAXParser::ParseJSXNodeStatement() {
-    if (Peek() == Token::LPAREN) {
+    auto tok = Peek();
+    if (tok == Token::LPAREN) {
         Advance(); // eat '('
     }
     EXPECT(Token::LT); // eat '<'
-    auto tok = Peek();
-    if (tok != Token::IDENTIFIER) {
+    if (Peek() != Token::IDENTIFIER) {
         throw SyntaxError(lex()->CurrentToken(), "expected a identifier name");
     }
     Handle<Expression>expr = ParseJSXNodeExpression();
     EXPECT(Token::GT); // eat '>'
-    if (Peek() == Token::RPAREN) {
+    if (tok == Token::LPAREN && Peek() == Token::RPAREN) {
         Advance(); // eat ')'
     }
     return expr;
@@ -782,10 +787,28 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
     std::string name = GetIdentifierName();
     Advance(); // eat 'name'
     auto tok = Peek();
+    // props process
     if (tok == Token::LBRACE) {
         Advance();
         props = ParseExpression();
         EXPECT(Token::RBRACE);
+    }
+    else if (tok == Token::IDENTIFIER) {
+        // props process
+        ProxyObject proxyObj;
+        while (true) {
+            auto token = Peek();
+            if (token == Token::DIV || token == Token::GT) {
+                break;
+            }
+            std::string key = GetIdentifierName();
+            Advance();
+            EXPECT(Token::ASSIGN);
+            EXPECT(Token::LBRACE);
+            proxyObj.insert(std::make_pair(key, ParseExpression()));
+            EXPECT(Token::RBRACE);
+        }
+        props = builder()->NewObjectConstant(proxyObj);
     }
     tok = Peek();
     expr = builder()->NewJSXNodeExpression(builder()->NewIdentifier(name), props, parent, {});
@@ -864,10 +887,8 @@ Handle<Expression> RAXParser::ParseStatement()
             return ParseBlockStatement();
         case Token::RETURN:
             return ParseReturnStatement();
-//        case WHILE:
-//            return ParseWhileStatement();
-//        case DO:
-//            return ParseDoWhileStatement();
+        case Token::CLASS:
+            return ParseClassStatement();
         case Token::CONST:
         {
             Handle<DeclarationList> decl_list = ParseVariableStatement();
@@ -893,6 +914,56 @@ Handle<Expression> RAXParser::ParseStatement()
 //        case THROW:
 //            return ParseThrowStatement();
     }
+}
+    
+Handle<Expression> RAXParser::ParseClassStatement() {
+    EXPECT(Token::CLASS);
+    auto tok = Peek();
+    if (tok != Token::IDENTIFIER) {
+        throw SyntaxError(lex()->CurrentToken(), "expected a class identifier name");
+    }
+    Handle<Expression> clssuper_expr = nullptr;
+    std::string clsname = GetIdentifierName();
+    Advance();
+    tok = Peek();
+    if (tok == Token::EXTENDS) {
+        Advance();
+        tok = Peek();
+        if (tok != Token::IDENTIFIER) {
+            throw SyntaxError(lex()->CurrentToken(), "expected a super class identifier name");
+        }
+        clssuper_expr = builder()->NewIdentifier(GetIdentifierName());
+        Advance();
+    }
+    return builder()->NewClassStatement(builder()->NewIdentifier(clsname), clssuper_expr, ParseClassBody());
+}
+    
+Handle<Expression> RAXParser::ParseClassBody() {
+    Handle<ClassBody> clsbody = builder()->NewClassBody();
+    EXPECT(Token::LBRACE);
+    while (true) {
+        auto one = ParseMethodStatement();
+        clsbody->Insert(one);
+        auto tok = Peek();
+        if (tok == Token::RBRACE) {
+            break;
+        }
+    }
+    EXPECT(Token::RBRACE);
+    return clsbody;
+}
+    
+Handle<Expression> RAXParser::ParseMethodStatement() {
+    auto tok = Peek();
+    if (tok != Token::IDENTIFIER) {
+        throw SyntaxError(lex()->CurrentToken(), "expected a method identifier name");
+    }
+    std::string identifier = GetIdentifierName();
+    Advance();
+    auto args = ParseParameterList();
+    auto body = ParseBlockStatement();
+    auto proto = builder()->NewFunctionPrototype(identifier, args);
+    return builder()->NewFunctionStatement(proto->AsFunctionPrototype(), body);
 }
     
 Handle<Expression> RAXParser::ParseIfStatement()
@@ -1061,26 +1132,56 @@ Handle<Declaration> RAXParser::ParseDeclaration()
     }
     else if (tok == Token::LBRACE) {
         Advance();
-        tok = Peek();
-        if (tok != Token::IDENTIFIER) {
-            throw SyntaxError(lex()->CurrentToken(), "expected an identifier");
-        }
-        std::string key_name = GetIdentifierName();
-        Advance();
-        std::string value_name = key_name;
-        if (Peek() == Token::COLON) {
-            Advance();
-            if (Peek() != Token::IDENTIFIER) {
+        ProxyObject proxyObj;
+        while (true) {
+            tok = Peek();
+            if (tok == Token::RBRACE) {
+                break;
+            }
+            if (tok != Token::IDENTIFIER) {
                 throw SyntaxError(lex()->CurrentToken(), "expected an identifier");
             }
-            value_name = GetIdentifierName();
+            Handle<Expression> expr = ParseExpression();
+            tok = Peek();
+            if (tok == Token::COLON) {
+                if (!expr->IsIdentifier()) {
+                    throw SyntaxError(lex()->CurrentToken(), ": before expected an identifier");
+                }
+                std::string key_name = expr->AsIdentifier()->GetName();
+                Advance();
+                if (Peek() != Token::IDENTIFIER) {
+                    throw SyntaxError(lex()->CurrentToken(), "expected an identifier");
+                }
+                std::string value_name = GetIdentifierName();
+                Advance();
+                proxyObj.insert(std::make_pair(key_name, builder()->NewIdentifier(value_name)));
+            }
+            else if (expr->IsIdentifier()) {
+                std::string name = expr->AsIdentifier()->GetName();
+                proxyObj.insert(std::make_pair(name, builder()->NewIdentifier(name)));
+            }
+            else if (expr->IsCommaExpression()) {
+                Handle<ExpressionList> exprs = expr->AsCommaExpression()->exprs();
+                for (int i = 0; i < exprs->Size(); i++) {
+                    if (exprs->raw_list()[i]->IsIdentifier()) {
+                        std::string name = exprs->raw_list()[i]->AsIdentifier()->GetName();
+                        proxyObj.insert(std::make_pair(name, builder()->NewIdentifier(name)));
+                    }
+                    else if (exprs->raw_list()[i]->IsAssignExpression()) {
+                        std::string name = exprs->raw_list()[i]->AsAssignExpression()->lhs()->AsIdentifier()->GetName();
+                        proxyObj.insert(std::make_pair(name, exprs->raw_list()[i]));
+                    }
+                }
+            }
+            tok = Peek();
+            if (tok != Token::COMMA) {
+                break;
+            }
             Advance();
         }
-        ProxyObject proxyObj;
-        proxyObj.insert(std::make_pair(key_name, builder()->NewIdentifier(value_name)));
-        Handle<Expression> expr = builder()->NewObjectConstant(proxyObj);
         EXPECT(Token::RBRACE);
         tok = Peek();
+        Handle<Expression> expr = builder()->NewObjectConstant(proxyObj);
         if (tok == Token::SEMICOLON || tok == Token::COMMA || (flags_.IsForInLoopParsing() && tok == Token::IN)) {
             return builder()->NewDeclaration(expr);
         }

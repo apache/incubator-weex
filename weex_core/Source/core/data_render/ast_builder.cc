@@ -37,6 +37,10 @@ Handle<ExpressionList> ASTBuilder::NewExpressionList()
     return (factory()->NewExpressionList());
 }
     
+Handle<ClassBody> ASTBuilder::NewClassBody() {
+    return (factory()->NewClassBody());
+}
+    
 Handle<ExpressionList> ASTBuilder::NewChunkStatement(Handle<ExpressionList> list) {
     COUNT();
     return save(factory()->NewChunkStatement(locator()->location(), manager()->current(), list));
@@ -228,6 +232,11 @@ Handle<Expression> ASTBuilder::NewArrowFunctionStatement(Handle<Expression> body
 Handle<Expression> ASTBuilder::NewJSXNodeExpression(Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens) {
     COUNT();
     return save(factory()->NewJSXNodeExpression(locator()->location(), manager()->current(), identifier, props, parent, childrens));
+}
+
+Handle<Expression> ASTBuilder::NewClassStatement(Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body) {
+    COUNT();
+    return save(factory()->NewClassStatement(locator()->location(), manager()->current(), identifier, superClass, body));
 }
     
 }

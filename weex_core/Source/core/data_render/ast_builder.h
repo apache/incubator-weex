@@ -103,6 +103,9 @@ public:
     Handle<Expression> NewForStatement(ForKind kind, Handle<Expression> init, Handle<Expression> cond, Handle<Expression> update, Handle<Expression> body);
     Handle<Expression> NewArrowFunctionStatement(Handle<Expression> body, std::vector<Handle<Expression>> args);
     Handle<Expression> NewJSXNodeExpression(Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens);
+    Handle<Expression> NewClassStatement(Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body);
+    Handle<ClassBody> NewClassBody();
+
     ASTFactory *factory() { return factory_; }
     SourceLocator *locator() { return locator_; }
     ScopeManager *manager() { return manager_; }

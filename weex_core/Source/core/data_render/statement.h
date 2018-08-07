@@ -122,21 +122,39 @@ private:
     std::string name_;
     std::vector<std::string> args_;
 };
-
+    
+class MethodStatement : public Expression {
+    DEFINE_NODE_TYPE(MethodStatement, Expression);
+public:
+    MethodStatement(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> function)
+    : Expression(loc, scope), identifier_{ identifier }, function_{ function } { }
+    Handle<Expression> identifier() { return identifier_; }
+    Handle<Expression> function() { return function_; }
+    void SetStatic(bool is_static) { static_ = is_static; }
+    bool Static() { return static_; }
+private:
+    Handle<Expression> identifier_;
+    Handle<Expression> function_;
+    bool static_;
+};
+    
 // FunctionStatement - captures the function statement
 class FunctionStatement : public Expression {
     DEFINE_NODE_TYPE(FunctionStatement, Expression);
 public:
-    FunctionStatement(Position &loc, Scope *scope,
-                      Handle<FunctionPrototype> proto, Handle<Expression> body)
+    FunctionStatement(Position &loc, Scope *scope, Handle<Expression> args, Handle<Expression> body)
+    : Expression(loc, scope), args_{ (args) }, body_{ body } { }
+    FunctionStatement(Position &loc, Scope *scope, Handle<FunctionPrototype> proto, Handle<Expression> body)
     : Expression(loc, scope), proto_{ (proto) }, body_{ body } { }
     FunctionStatement(Handle<FunctionPrototype> proto, Handle<Expression> body)
         : Expression(), proto_{ (proto) }, body_{ body } { }
 
     Handle<FunctionPrototype> proto() { return proto_; }
     Handle<Expression> body() { return body_; }
+    Handle<Expression> args() { return args_; };
 private:
-    Handle<FunctionPrototype> proto_;
+    Handle<Expression> args_{nullptr};
+    Handle<FunctionPrototype> proto_{nullptr};
     Handle<Expression> body_;
 };
     
@@ -196,7 +214,6 @@ public:
     : Expression(loc, scope), label_{ label }, expr_{ expr }
     { }
     
-    
     Handle<Expression> expr() { return expr_; }
     std::string &label() { return label_; }
     
@@ -218,6 +235,22 @@ public:
     DEFINE_NODE_TYPE(ReturnStatement, Expression);
 private:
     Handle<Expression> expr_;
+};
+    
+class ClassStatement : public Expression {
+public:
+    ClassStatement(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body)
+    : Expression(loc, scope), identifier_{ identifier }, superClass_{superClass}, body_{body}  { }
+    
+    Handle<Expression> identifier() { return identifier_; }
+    Handle<Expression> &body () { return body_; }
+    Handle<Expression> superClass() { return superClass_; }
+
+    DEFINE_NODE_TYPE(ClassStatement, Expression);
+private:
+    Handle<Expression> identifier_;
+    Handle<Expression> superClass_;
+    Handle<Expression> body_;
 };
 
 }  // namespace data_render
