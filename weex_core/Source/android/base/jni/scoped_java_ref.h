@@ -76,6 +76,8 @@ public:
       ResetNewLocalRef(env, obj);
     }
 
+    T Get() const { return (T)obj_; }
+
 private:
     JNIEnv *env_;
 };

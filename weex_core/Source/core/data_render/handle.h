@@ -21,17 +21,18 @@
 
 #include <memory>
 #include <type_traits>
-#include "core/data_render/macros.h"
+#include "base/common.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
 
+// Thread unsafe
 class RefCountObject {
  public:
   explicit RefCountObject() : reference_count_(0) {}
 
-  DISABLE_COPY(RefCountObject);
+  DISALLOW_COPY_AND_ASSIGN(RefCountObject);
 
   virtual ~RefCountObject() = default;
 
@@ -111,6 +112,10 @@ class Ref {
 
   inline bool operator==(const Ref<T> &ref) const {
     return ptr_ == ref.GetPtr();
+  }
+
+  inline bool operator!=(const Ref<T> &ref) const {
+    return ptr_ != ref.GetPtr();
   }
 
   // preferably use this function over T *get()

@@ -407,12 +407,12 @@
 
 - (void)parseScalex:(NSArray *)value
 {
-    [self parseScale:@[value[0], @1]];
+	_scaleX = [value[0] doubleValue];
 }
 
 - (void)parseScaley:(NSArray *)value
 {
-    [self parseScale:@[@1, value[0]]];
+	_scaleY = [value[0] doubleValue];
 }
 
 // Angle in radians

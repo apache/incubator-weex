@@ -63,6 +63,11 @@ public:
 
     static bool execJSService(JNIEnv *env, jobject object, jstring script);
 
+    static void RefreshInstance(JNIEnv* env, jobject jcaller,
+                                jstring instanceId,
+                                jstring name,
+                                jstring function,
+                                jobjectArray args);
     static std::string findLibJssSoPath();
     static bool
     execJS(JNIEnv *env, jobject jthis, jstring jinstanceid, jstring jnamespace, jstring jfunction,

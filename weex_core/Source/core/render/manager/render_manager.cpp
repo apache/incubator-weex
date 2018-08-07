@@ -268,22 +268,20 @@ bool RenderManager::CreateFinish(const std::string &page_id) {
 
   page->set_is_dirty(true);
   bool b = page->CreateFinish();
-  auto start_time = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
-  LOGE("DATA_RENDER, Wx End %lld",start_time);
+  auto end_time = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
+  LOGE("DATA_RENDER, Wx End %lld",end_time);
   return b;
 }
 
-bool RenderManager::CallNativeModule(const char *page_id, const char *module, const char *method,
+void RenderManager::CallNativeModule(const char *page_id, const char *module, const char *method,
                                      const char *arguments, int arguments_length,
                                      const char *options, int options_length) {
   if (strcmp(module, "meta") == 0) {
     CallMetaModule(page_id, method, arguments);
   }
-    return true;
 }
 
-bool RenderManager::CallMetaModule(const char *page_id, const char *method, const char *arguments) {
-
+void RenderManager::CallMetaModule(const char *page_id, const char *method, const char *arguments) {
   if (strcmp(method, "setViewport") == 0) {
     wson_parser parser(arguments);
     if (parser.isArray(parser.nextType())) {
@@ -303,7 +301,6 @@ bool RenderManager::CallMetaModule(const char *page_id, const char *method, cons
       }
     }
   }
-    return true;
 }
 
 RenderPage *RenderManager::GetPage(const std::string &page_id) {

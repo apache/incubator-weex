@@ -123,6 +123,8 @@ namespace WeexCore {
 
     int callCreateFinish(const char* pageId);
 
+    int callRenderSuccess(const char* pageId);
+
     int callAppendTreeCreateFinish(const char* pageId, const char* ref);
 
     int callHasTransitionPros(const char* pageId, const char* ref,

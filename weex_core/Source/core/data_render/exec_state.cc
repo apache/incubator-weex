@@ -21,7 +21,11 @@
 #include "core/data_render/code_generator.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
-#include "parser.h"
+#include "core/data_render/parser.h"
+
+#if DEBUG
+#include "core/data_render/monitor/vm_monitor.h"
+#endif
 
 namespace weex {
 namespace core {
@@ -78,18 +82,21 @@ ExecState::ExecState(VM* vm)
       factory_(new TableFactory()),
       global_variables_() {}
 
-ExecState::~ExecState() {
-  delete factory_;
-}
-
 void ExecState::Compile() {
+
+#if DEBUG
+  TimeCost tc("Compile");
+#endif
   CodeGenerator generator(this);
   std::string err;
-  const ParseResult& result = Parser::Parse(context()->raw_json(),err);
+  ParseResult result = Parser::Parse(context()->raw_json(),err);
   generator.Visit(result.expr().get(), nullptr);
 }
 
 void ExecState::Execute() {
+#if DEBUG
+  TimeCost tc("ExecuteMain");
+#endif
   Value chunk;
   chunk.type = Value::Type::FUNC;
   chunk.f = func_state_.get();
@@ -131,7 +138,7 @@ void ExecState::CallFunction(Value* func, size_t argc, Value* ret) {
     frame.pc = &(*func->f->instructions().begin());
     frame.end = &(*func->f->instructions().end());
     frames_.push_back(frame);
-    vm_->RunFrame(this, frame);
+    vm_->RunFrame(this, frame, ret);
     frames_.pop_back();
   }
 }

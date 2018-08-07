@@ -65,9 +65,9 @@
 #define M_TIMER_NUM             @"timerCount"
 #define M_WRONG_IMG_NUM         @"imgSizeCount"
 #define M_INTERACTION_TIME      @"interactionTime"
-#define M_COMPONENT_FS_COUNT    @"fsComponentCount"
-#define M_COMPONENT_FS_TIME     @"fsComponentCreateTime"
-
+#define M_INTERACTION_ADD_COUNT    @"interactionViewAddCount"
+#define M_INTERACTION_LIMIT_ADD_COUNT    @"interactionViewAddLimitCount"
+#define M_NEW_FS_RENDER_TIME             @"newFsRenderTime"
 
 
 @protocol WXAppMonitorProtocol <WXModuleProtocol>

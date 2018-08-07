@@ -20,20 +20,20 @@
 #ifndef CORE_DATA_RENDER_STRING_TABLE_H
 #define CORE_DATA_RENDER_STRING_TABLE_H
 
+#include <memory>
 #include <string>
 #include <unordered_map>
-#include <memory>
 
 namespace weex {
 namespace core {
 namespace data_render {
 class String {
  public:
-  explicit String(const char* str, std::size_t len);
-  explicit String(const std::string& str);
+  explicit String(const char *str, std::size_t len);
+  explicit String(const std::string &str);
   ~String();
 
-  char* c_str() { return str_.get(); }
+  char *c_str() { return str_.get(); }
 
   std::size_t length() { return length_; }
 
@@ -45,12 +45,12 @@ class String {
 class StringTable {
  public:
   StringTable() : store_() {}
-  ~StringTable() {}
+  ~StringTable();
 
-  String* StringFromUTF8(const std::string& str);
+  String *StringFromUTF8(const std::string &str);
 
  private:
-  std::unordered_map<std::string, String*> store_;
+  std::unordered_map<std::string, std::unique_ptr<String>> store_;
 };
 }  // namespace data_render
 }  // namespace core

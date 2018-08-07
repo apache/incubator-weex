@@ -34,18 +34,18 @@ class FuncState;
 class Value;
 
 struct Frame {
-  Value* reg;
-  Value* ret;
-  Value* func;
-  const Instruction* pc;
-  const Instruction* end;
+  Value *reg;
+  Value *ret;
+  Value *func;
+  const Instruction *pc;
+  const Instruction *end;
 };
 
 class VM {
  public:
   VM() {}
   ~VM() {}
-  void RunFrame(ExecState* exec_state, Frame frame);
+  void RunFrame(ExecState *exec_state, Frame frame, Value* ret);
 };
 }  // namespace data_render
 }  // namespace core

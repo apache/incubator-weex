@@ -24,17 +24,14 @@
 #include <string>
 
 #include "core/data_render/vm.h"
+#include "core/data_render/vnode/vnode.h"
+#include "core/data_render/vnode/vnode_exec_env.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/render_object.h"
-#include "core/data_render/vnode/vnode_exec_env.h"
-#include "vnode.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-
-WeexCore::RenderObject* VNode2RenderObject(const VNode* root,
-                                           const std::string& page_id);
 
 class VNodeRenderManager {
  private:
@@ -42,46 +39,30 @@ class VNodeRenderManager {
 
   ~VNodeRenderManager() {}
 
-  class Garbo {
-   public:
-    ~Garbo() {
-      if (VNodeRenderManager::g_pInstance) {
-        delete VNodeRenderManager::g_pInstance;
-      }
-    }
-  };
-
-  static Garbo g_garbo;
-
  public:
-  void InitVM();
+  void CreatePage(const std::string &input, const std::string &page_id,
+                  const std::string &init_data);
+  bool RefreshPage(const std::string &page_id, const std::string &init_data);
+  bool ClosePage(const std::string &page_id);
 
-  void TestCreateProcess(const std::string& input, const std::string& page_id,
-                         const std::string& init_data);
-
-  void TestRefreshProcess(const std::string& page_id, const std::string& init_data);
-
-  void TestCloseProcess(const std::string& page_id);
-
-  bool CreatePage(const std::string& page_id, VNode* vNode);
-
-  bool RefreshPage(const std::string& page_id, VNode* new_node);
-
-  bool ClosePage(const std::string& page_id);
-
-  static VNodeRenderManager* GetInstance() {
-    if (!g_pInstance) {
-      g_pInstance = new VNodeRenderManager();
+  static VNodeRenderManager *GetInstance() {
+    if (!g_instance) {
+      g_instance = new VNodeRenderManager();
     }
-    return g_pInstance;
+    return g_instance;
   }
 
  private:
-  static VM* g_vm_;
-  static VNodeRenderManager* g_pInstance;
-  std::map<std::string, VNode*> vnode_trees_;
+  void InitVM();
+  bool CreatePageInternal(const std::string &page_id, VNode *v_node);
+  bool RefreshPageInternal(const std::string &page_id, VNode *new_node);
+  bool ClosePageInternal(const std::string &page_id);
 
-  std::map<std::string, ExecState*> exec_states_;
+  static VM *g_vm;
+  static VNodeRenderManager *g_instance;
+
+  std::map<std::string, VNode *> vnode_trees_;
+  std::map<std::string, ExecState *> exec_states_;
 };
 }  // namespace data_render
 }  // namespace core

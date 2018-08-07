@@ -17,8 +17,8 @@
  * under the License.
  */
 
-#ifndef WEEX_PROJECT_CONTEXT_H
-#define WEEX_PROJECT_CONTEXT_H
+#ifndef CORE_DATA_RENDER_CONTEXT_H_
+#define CORE_DATA_RENDER_CONTEXT_H_
 
 #include <cmath>
 #include <map>
@@ -26,12 +26,11 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "core/data_render/json/json11.hpp"
+#include "core/data_render/object.h"
 #include "core/data_render/op_code.h"
+#include "core/data_render/table_factory.h"
 #include "core/data_render/vnode/vnode.h"
 #include "core/data_render/vnode/vnode_render_context.h"
-#include "core/data_render/object.h"
-#include "core/data_render/table_factory.h"
 
 namespace weex {
 namespace core {
@@ -76,9 +75,10 @@ class FuncState {
   std::vector<std::unique_ptr<FuncState>> children_;
 };
 
+// TODO Each Func should contain a stack whose size is 256
 class ExecStack {
  public:
-  ExecStack() : stack_(512) {}
+  ExecStack() : stack_(256) {}
   Value** top() { return &top_; }
   Value* base() { return &stack_[0]; }
 
@@ -102,7 +102,7 @@ class Global {
 class ExecState {
  public:
   ExecState(VM* vm);
-  virtual ~ExecState();
+  virtual ~ExecState() {}
   void Compile();
   void Execute();
   const Value& Call(const std::string& func_name,
@@ -115,7 +115,7 @@ class ExecState {
   inline ExecStack* stack() { return stack_.get(); }
   inline StringTable* string_table() { return string_table_.get(); }
   inline VNodeRenderContext* context() { return render_context_.get(); }
-  inline TableFactory* getTableFactory() { return factory_; }
+  inline TableFactory* getTableFactory() { return factory_.get(); }
 
  private:
   friend class VM;
@@ -125,7 +125,7 @@ class ExecState {
 
   VM* vm_;
 
-  TableFactory *factory_;
+  std::unique_ptr<TableFactory> factory_;
 
   std::vector<Frame> frames_;
   std::unique_ptr<Global> global_;
@@ -139,4 +139,4 @@ class ExecState {
 }  // namespace core
 }  // namespace weex
 
-#endif  // WEEX_PROJECT_CONTEXT_H
+#endif  // CORE_DATA_RENDER_CONTEXT_H_

@@ -17,4 +17,22 @@
  * under the License.
  */
 
-#include "local_cfunction.h"
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_RENDER_SUCCESS_H
+#define CORE_RENDER_ACTION_RENDER_ACTION_RENDER_SUCCESS_H
+
+#include <string>
+#include "core/render/action/render_action_interface.h"
+
+namespace WeexCore {
+class RenderActionRenderSuccess : public RenderAction {
+ public:
+  explicit RenderActionRenderSuccess(const std::string &page_id);
+
+  void ExecuteAction();
+
+ public:
+  std::string page_id_;
+};
+}  // namespace WeexCore
+
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_RENDER_SUCCESS_H

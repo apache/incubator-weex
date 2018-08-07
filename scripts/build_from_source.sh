@@ -24,11 +24,11 @@ fi
 
 echo "Build Weex SDK From Source...."
 
-npm install --production
-npm run install:buildtools
-npm run build:source
+npm install
+npm run build:jsfm
+npm run build:polyfill
 
-echo "Javascript Framework and HTML5 SDK build completed."
+echo "Weex JS Framework build completed."
 sleep 2
 
 cp pre-build/weex-js-framework.min.js ios_sdk/WeexSDK/Resources/main.js

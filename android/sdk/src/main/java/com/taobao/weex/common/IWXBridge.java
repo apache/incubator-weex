@@ -52,6 +52,8 @@ public interface IWXBridge extends IWXObject {
    */
   int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
 
+  void refreshInstance(String instanceId, String namespace, String function, WXJSObject[] args);
+
   /**
    * execute javascript function
    */
@@ -149,6 +151,8 @@ public interface IWXBridge extends IWXObject {
   int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, int index);
 
   int callCreateFinish(String instanceId);
+
+  int callRenderSuccess(String instanceId);
 
   int callAppendTreeCreateFinish(String instanceId, String ref);
 

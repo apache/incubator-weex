@@ -24,20 +24,12 @@ namespace core {
 namespace data_render {
 
 VNodeRenderContext::VNodeRenderContext()
-    : page_id_(), root_(nullptr), node_map_(), raw_json_() {}
+    : page_id_(), root_(nullptr), raw_json_() {}
 
 VNodeRenderContext::~VNodeRenderContext() {}
 
-VNode* VNodeRenderContext::FindNode(const std::string& ref) {
-  auto it = node_map_.find(ref);
-  if (it == node_map_.end()) {
-    return nullptr;
-  }
-  return it->second;
-}
 void VNodeRenderContext::Reset() {
   root_ = nullptr;
-  node_map_.clear();
 }
 }  // namespace data_render
 }  // namespace core

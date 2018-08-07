@@ -38,6 +38,10 @@ Handle<ExpressionList> ASTFactory::NewExpressionList() {
   return MakeHandle<ExpressionList>();
 }
     
+Handle<ExpressionList> ASTFactory::NewExpressionList(const std::vector<Handle<Expression>>& list) {
+    return MakeHandle<ExpressionList>(list);
+}
+    
 Handle<ClassBody> ASTFactory::NewClassBody() {
   return MakeHandle<ClassBody>();
 }
@@ -71,7 +75,15 @@ Handle<ChunkStatement> ASTFactory::NewChunkStatement(Position &loc, Scope *scope
 Handle<Expression> ASTFactory::NewFunctionPrototype(std::string name, std::vector<std::string> args) {
   return MakeHandle<FunctionPrototype>(name, std::move(args));
 }
+
+Handle<Expression> ASTFactory::NewFunctionStatement(Handle<FunctionPrototype> proto, Handle<Expression> body) {
+  return MakeHandle<FunctionStatement>(proto, body);
+}
     
+Handle<Expression> ASTFactory::NewReturnStatement(Handle<Expression> expr) {
+  return MakeHandle<ReturnStatement>(expr);
+}
+
 Handle<Expression> ASTFactory::NewDeclaration(std::string name, Handle<Expression> init) {
   return MakeHandle<Declaration>(name, init);
 }
@@ -79,10 +91,15 @@ Handle<Expression> ASTFactory::NewDeclaration(std::string name, Handle<Expressio
 Handle<Expression> ASTFactory::NewDeclarationList() {
     return MakeHandle<DeclarationList>();
 }
+
 Handle<Expression> ASTFactory::NewDeclarationList(std::vector<Handle<Declaration>> decls) {
   return MakeHandle<DeclarationList>(std::move(decls));
 }
 
+Handle<Expression> ASTFactory::NewCommaExpression(const std::vector<Handle<Expression>>& list) {
+    return MakeHandle<CommaExpression>(NewExpressionList(list));
+}
+    
 Handle<Expression> ASTFactory::NewBinaryExpression(BinaryOperation op, Handle<Expression> lhs, Handle<Expression> rhs) {
   return MakeHandle<BinaryExpression>(op, lhs, rhs);
 }

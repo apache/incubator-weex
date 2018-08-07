@@ -29,6 +29,9 @@
         UIImageView *imageView = [[UIImageView alloc]initWithFrame:self.bounds];
         NSBundle *bundle = [NSBundle bundleForClass:self.class];
         NSString *file = [bundle pathForResource:@"wx_load_error@3x" ofType:@"png"];
+		if (file == nil) {
+			file = [[NSBundle mainBundle] pathForResource:@"wx_load_error@3x" ofType:@"png"];
+		}
         imageView.image = [UIImage imageWithContentsOfFile:file];
         [self addSubview:imageView];
         

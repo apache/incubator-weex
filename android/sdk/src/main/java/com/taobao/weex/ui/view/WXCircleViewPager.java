@@ -139,6 +139,18 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   }
 
   @Override
+  public boolean onInterceptTouchEvent(MotionEvent ev) {
+    try {
+      return scrollable && super.onInterceptTouchEvent(ev);
+    } catch (IllegalArgumentException e) {
+      e.printStackTrace();
+    } catch (ArrayIndexOutOfBoundsException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  @Override
   public boolean onTouchEvent(MotionEvent ev) {
     if(!scrollable) {
       return true;
@@ -251,6 +263,11 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   @Override
   public void registerGestureListener(WXGesture wxGesture) {
     this.wxGesture = wxGesture;
+  }
+
+  @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
   }
 
   public int getRealCurrentItem() {

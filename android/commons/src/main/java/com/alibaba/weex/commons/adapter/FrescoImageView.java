@@ -60,6 +60,11 @@ public class FrescoImageView extends SimpleDraweeView implements WXGestureObserv
   }
 
   @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
+  }
+
+  @Override
   public boolean onTouchEvent(MotionEvent event) {
     boolean result = super.onTouchEvent(event);
     if (wxGesture != null) {

@@ -16,15 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by Xu Jiacheng on 2018/7/20.
-//
 
-#ifndef WEEX_PROJECT_VNODE_EXEC_ENV_H
-#define WEEX_PROJECT_VNODE_EXEC_ENV_H
+#ifndef CORE_DATA_RENDER_VNODE_VNODE_EXEC_ENV_H
+#define CORE_DATA_RENDER_VNODE_VNODE_EXEC_ENV_H
 
 #include "core/data_render/exec_state.h"
-#include "core/data_render/json/json11.hpp"
 
 namespace weex {
 namespace core {
@@ -33,9 +29,11 @@ class VNodeExecEnv {
  public:
   static void InitCFuncEnv(ExecState* state);
   static void InitGlobalValue(ExecState* state);
-  static void InitInitDataValue(ExecState* state, const std::string& init_data_str);
+  static void InitInitDataValue(ExecState* state,
+                                const std::string& init_data_str);
+  static void InitStyleList(ExecState* state);
 };
-}
-}
-}
-#endif //WEEX_PROJECT_VNODE_EXEC_ENV_H
+}  // namespace data_render
+}  // namespace core
+}  // namespace weex
+#endif  // CORE_DATA_RENDER_VNODE_VNODE_EXEC_ENV_H

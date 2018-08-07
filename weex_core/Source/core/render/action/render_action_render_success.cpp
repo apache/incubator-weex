@@ -16,13 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_MACROS_H_
-#define WEEX_MACROS_H_
 
-#ifndef DISABLE_COPY
-#define DISABLE_COPY(className) \
-  className(const className &c) = delete; \
-  className &operator=(const className &c) = delete
-#endif
+#include "core/render/action/render_action_render_success.h"
+#include "core/manager/weex_core_manager.h"
 
-#endif
+namespace WeexCore {
+RenderActionRenderSuccess::RenderActionRenderSuccess(const std::string& page_id)
+    : page_id_(page_id) {}
+
+void RenderActionRenderSuccess::ExecuteAction() {
+  WeexCoreManager::getInstance()->getPlatformBridge()->callRenderSuccess(
+      page_id_.c_str());
+}
+}  // namespace WeexCore

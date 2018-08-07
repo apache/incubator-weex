@@ -307,6 +307,14 @@ static jint ExecJSService(JNIEnv *env, jobject object, jstring script) {
 static void TakeHeapSnapshot(JNIEnv *env, jobject object, jstring name) {
 }
 
+static void RefreshInstance(JNIEnv* env, jobject jcaller,
+                            jstring instanceId,
+                            jstring _namespace,
+                            jstring _function,
+                            jobjectArray args) {
+  WeexProxy::RefreshInstance(env, jcaller, instanceId, _namespace, _function, args);
+}
+
 /**
  * Called to execute JavaScript such as . createInstance(),destroyInstance ext.
  *

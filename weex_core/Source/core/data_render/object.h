@@ -23,12 +23,13 @@
 #include <vector>
 #include <unordered_map>
 #include <cmath>
+#include <sstream>
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
+#include "core/data_render/object.h"
+#include "android/base/log_utils.h"
 
 #define CommonHeader GCObject *gc
-
-#define LOGE(...) ((void)0)
 
 #define INT_OP(op, v1, v2) CAST_U2S((CAST_S2U(v1))op CAST_S2U(v2))
 #define NUM_OP(op, d1, d2) ((d1)op(d2))
@@ -56,34 +57,9 @@ class StringTable;
 
 class Value;
 
-typedef unsigned char byte;
-
 typedef struct GCObject {
   CommonHeader;
 } GCObject;
-
-typedef struct Key {
-  int next;
-  Value *val;
-} Key;
-
-typedef struct Node {
-  Key *key;
-  Value *val;
-  Node *next;
-} Node;
-
-typedef struct Table {
-  CommonHeader;
-
-  size_t sizearray; /* size of 'array' array */
-  size_t sizenode;
-  std::vector<Value> *array; /* array part */
-  int *hash;
-  Node *node;
-  std::unordered_map<std::string, Value> *map;
-
-} Table;
 
 typedef Value (*CFunction)(ExecState *);
 
@@ -116,105 +92,165 @@ struct Value {
   Value(const Value &value) {
     type = value.type;
     switch (type) {
-      case INT:
-        i = value.i;
+      case INT:i = value.i;
         break;
-      case NUMBER:
-        n = value.n;
+      case NUMBER:n = value.n;
         break;
-      case BOOL:
-        b = value.b;
+      case BOOL:b = value.b;
         break;
-      case STRING:
-        str = value.str;
+      case STRING:str = value.str;
         break;
-      case FUNC:
-        f = value.f;
+      case FUNC:f = value.f;
         break;
-      case CFUNC:
-        cf = value.cf;
+      case CFUNC:cf = value.cf;
         break;
-      case CPTR:
-        cptr = value.cptr;
-      case TABLE:
-        gc = value.gc;
+      case CPTR:cptr = value.cptr;
         break;
-      default:
+      case TABLE:gc = value.gc;
         break;
+      default:break;
     }
   }
 
   friend bool operator==(const Value &left, const Value &right) {
     if (left.type != right.type) return false;
     switch (left.type) {
-      case NIL:
-        return true;
-      case INT:
-        return left.i == right.i;
-      case NUMBER:
-        return fabs(left.n - right.n) < 0.000001;
-      case BOOL:
-        return left.b == right.b;
-      case STRING:
-        return left.str == right.str;
-      case FUNC:
-        return left.f == right.f;
-      case CFUNC:
-        return left.cf == right.cf;
-      case CPTR:
-        return left.cptr == right.cptr;
-      case TABLE:
-        return left.gc == right.gc;
-      default:
-        break;
+      case NIL:return true;
+      case INT:return left.i == right.i;
+      case NUMBER:return fabs(left.n - right.n) < 0.000001;
+      case BOOL:return left.b == right.b;
+      case STRING:return left.str == right.str;
+      case FUNC:return left.f == right.f;
+      case CFUNC:return left.cf == right.cf;
+      case CPTR:return left.cptr == right.cptr;
+      case TABLE:return left.gc == right.gc;
+      default:break;
     }
     return false;
   }
 };
 
-double NumPow(const double &d1, const double &d2);
+typedef struct Table {
+    CommonHeader;
 
-double NumIDiv(const double &d1, const double &d2);
+    std::vector<Value> array; /* array part */
+    std::unordered_map<std::string, Value> map;
 
-double NumMod(const double &d1, const double &d2);
+    Table() : array(), map() {}
 
-bool NumEq(const double &d1, const double &d2);
+} Table;
+/*
+** try to convert a value to an integer, rounding according to 'mode':
+** mode == 0: accepts only integral values
+** mode == 1: takes the floor of the number
+** mode == 2: takes the ceil of the number
+*/
+int ToInteger(const Value *o, const int &mode, int64_t &v);
 
-bool NumLT(const double &d1, const double &d2);
+bool ValueEqulas(const Value *a, const Value *b);
 
-int Number2Int(const double &n, int64_t &p);
+bool ValueLE(const Value *a, const Value *b);
 
-double NumUnm(const double &d);
+bool ValueLT(const Value *a, const Value *b);
 
-int64_t ShiftLeft(const int64_t &a, const int64_t &b);
+void FreeValue(Value *o);
 
-bool IsInt(const Value *o);
+inline double NumPow(const double &d1, const double &d2) {
+  return MATH_OP(pow)(d1, d2);
+}
 
-bool IsNil(const Value *o);
+inline double NumIDiv(const double &d1, const double &d2) {
+  return MATH_OP(floor)(NUM_OP(/, d1, d2));
+}
 
-void SetNil(Value *o);
+inline double NumMod(const double &d1, const double &d2) {
+  double ret = MATH_OP(fmod)(d1, d2);
+  if (ret * d2 < 0) ret += d2;
+  return ret;
+}
 
-int IntMod(const int &a, const int &b);
+inline bool NumEq(const double &d1, const double &d2) { return d1 == d2; }
 
-bool IsNumber(const Value *o);
+inline bool NumLT(const double &d1, const double &d2) {
+  return d1 < d2;
+}
 
-bool IsBool(const Value *o);
+inline int Number2Int(const double &n, int64_t &p) {
+  if (n >= MININTEGER && n < -MININTEGER) {
+    p = n;
+    return 1;
+  }
+  return 0;
+}
 
-bool IsTable(const Value *o);
+inline double NumUnm(const double &d) { return -d; }
 
-bool IsString(const Value *o);
+inline int64_t ShiftLeft(const int64_t &a, const int64_t &b) {
+  if (b < 0) {
+    if (b <= -NUM_BITS) {
+      return 0;
+    } else {
+      return INT_OP(>>, a, b);
+    }
+  } else {
+    if (b >= NUM_BITS) {
+      return 0;
+    } else {
+      return INT_OP(<<, a, b);
+    }
+  }
+}
 
-int64_t IntValue(const Value *o);
+inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
 
-double NumValue(const Value *o);
+inline bool IsNil(const Value *o) {
+  return nullptr == o || Value::Type::NIL == o->type;
+}
 
-bool BoolValue(const Value *o);
+inline void SetNil(Value *o) {
+  if (nullptr != o) {
+    o->type = Value::Type::NIL;
+  }
+}
 
-String *StringValue(const Value *o);
+inline int IntMod(const int &a, const int &b) {
+  if (CAST_S2U(b) + 1u <= 1u) {
+    if (b == 0) {
+      LOGE("Error ValueMod Values[%d, %d]", a, b);
+    }
+    return 0;
+  } else {
+    int ret = a % b;
+    if (ret != 0 && (a ^ b) < 0) {
+      ret += b;
+    }
+    return ret;
+  }
+}
 
-char *CStringValue(const Value *o);
+inline bool IsNumber(const Value *o) { return Value::Type::NUMBER == o->type; }
 
-inline Table* TableValue(const Value *o) {
+inline bool IsBool(const Value *o) { return Value::Type::BOOL == o->type; }
+
+inline bool IsTable(const Value *o) { return Value::Type::TABLE == o->type; }
+
+inline bool IsString(const Value *o) { return nullptr != o && Value::Type::STRING == o->type; }
+
+inline int64_t IntValue(const Value *o) { return o->i; }
+
+inline double NumValue(const Value *o) { return o->n; }
+
+inline bool BoolValue(const Value *o) {
+  return (Value::Type::BOOL == o->type) ? o->b : false;
+}
+
+inline String *StringValue(const Value *o) { return IsString(o) ? o->str : nullptr; }
+
+inline char *CStringValue(const Value *o) {
+  return (IsString(o) && nullptr != o->str) ? o->str->c_str() : nullptr;
+}
+
+inline Table *TableValue(const Value *o) {
   if (IsTable(o)) {
     return reinterpret_cast<Table *>(o->gc);
   }
@@ -233,39 +269,109 @@ inline int ToNumber_(const Value *value, double &ret) {
   }
 }
 
-int ToNum(const Value *o, double &n);
+inline int ToNum(const Value *o, double &n) {
+  return IsNumber(o) ? (n = NumValue(o), 1) : ToNumber_(o, n);
+}
 
-int ToBool(const Value *o, bool &b);
+inline void SetIValue(Value *o, int iv) {
+  o->type = Value::Type::INT;
+  o->i = iv;
+}
 
-std::string ToCString(const Value *o);
+inline void SetDValue(Value *o, double d) {
+  o->type = Value::Type::NUMBER;
+  o->n = d;
+}
 
-void SetIValue(Value *o, int iv);
+inline void SetBValue(Value *o, bool b) {
+  o->type = Value::Type::BOOL;
+  o->b = b;
+}
 
-void SetDValue(Value *o, double d);
+inline void SetTValue(Value *v, GCObject *o) {
+  v->type = Value::Type::TABLE;
+  v->gc = o;
+}
 
-void SetBValue(Value *o, bool b);
+inline void SetSValue(Value *v, String *s) {
+  v->type = Value::Type::STRING;
+  v->str = s;
+}
 
-void SetTValue(Value *v, GCObject *o);
+inline std::string ToCString(const Value *o) {
+  switch (o->type) {
 
-void SetSValue(Value *v, String *s);
+    case Value::Type::INT: {
+      std::stringstream ss;
+      ss << IntValue(o);
+      return ss.str();
+    }
 
-String *StringAdd(StringTable *t, Value *a, Value *b);
+    case Value::Type::NUMBER: {
+      std::stringstream ss;
+      ss << NumValue(o);
+      return ss.str();
+    }
 
-/*
-** try to convert a value to an integer, rounding according to 'mode':
-** mode == 0: accepts only integral values
-** mode == 1: takes the floor of the number
-** mode == 2: takes the ceil of the number
-*/
-int ToInteger(const Value *o, const int &mode, int64_t &v);
+    case Value::Type::BOOL: {
+      std::stringstream ss;
+      ss << BoolValue(o);
+      return ss.str();
+    }
 
-bool ValueEqulas(const Value *a, const Value *b);
+    case Value::Type::STRING: {
+      return CStringValue(o);
+    }
 
-bool ValueLE(const Value *a, const Value *b);
+    default:return "";
+  }
+}
 
-bool ValueLT(const Value *a, const Value *b);
+inline String *StringAdd(StringTable *t, Value *a, Value *b) {
+  std::string str;
+  if (IsString(a)) {
+    str = a->str->c_str();
+    return t->StringFromUTF8(str += ToCString(b));
+  } else {
+    str = b->str->c_str();
+    return t->StringFromUTF8(str += ToCString(a));
+  }
+}
 
-void FreeValue(Value *o);
+inline int ToBool(const Value *o, bool &b) {
+  double d1;
+  if (Value::Type::BOOL == o->type) {
+    b = BoolValue(o);
+  } else if (Value::Type::INT == o->type) {
+    b = IntValue(o);
+  } else if (Value::Type::NUMBER == o->type) {
+    b = NumValue(o);
+  } else if (ToNum(o, d1)) {
+    b = d1;
+  } else if (Value::Type::NIL == o->type) {
+    b = false;
+  } else {
+    b = false;
+    return 0;
+  }
+  return 1;
+}
+
+inline void TableArrayAddAll(Value &src, Value &dest, int start, int end) {
+  Table *st = TableValue(&src);
+  Table *dt = TableValue(&dest);
+  st->array.insert(st->array.end(), dt->array.begin() + start, end > 0 ? dt->array.begin() + end : dt->array.end());
+}
+
+inline void TableArrayAddAll(Value &src, Value &dest) {
+  TableArrayAddAll(src, dest, 0, 0);
+}
+
+inline void TableMapAddAll(Value &src, Value &dest) {
+  Table *st = TableValue(&src);
+  Table *dt = TableValue(&dest);
+  dt->map.insert(st->map.begin(), st->map.end());
+}
 
 }  // namespace data_render
 }  // namespace core

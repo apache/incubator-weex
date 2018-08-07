@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.alibaba.weex"
-        minSdkVersion project.appMinSdkVersion
+        minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
         versionCode 17
         versionName "0.18.0-beta-3"
@@ -101,7 +101,6 @@ dependencies {
     debugCompile 'com.taobao.android:weex_analyzer:0.1.0.5'
 
 
-    compile 'com.taobao.android:dexposed:0.1.8'
     compile 'com.loopj.android:android-async-http:1.4.9@aar'
     compile 'com.facebook.fresco:fresco:0.12.0+'
     compile 'com.facebook.fresco:animated-gif:0.12.0'

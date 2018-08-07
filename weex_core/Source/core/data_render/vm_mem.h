@@ -26,7 +26,9 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-void* reallocMem(void* block, size_t newSize);
+void *reallocMem(void *block, size_t newSize);
+
+void freeMem(void *block);
 
 }  // namespace data_render
 }  // namespace core

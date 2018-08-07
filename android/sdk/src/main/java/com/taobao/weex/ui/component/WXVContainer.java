@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
@@ -38,8 +37,6 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * All container components must implement this class
@@ -264,8 +261,8 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     if (child == null || index < -1) {
       return;
     }
-    child.deepInComponentTree = this.deepInComponentTree+1;
-    getInstance().setMaxDomDeep(child.deepInComponentTree);
+    child.mDeepInComponentTree = this.mDeepInComponentTree +1;
+    getInstance().setMaxDomDeep(child.mDeepInComponentTree);
     int count = mChildren.size();
     index = index >= count ? -1 : index;
     if (index == -1) {

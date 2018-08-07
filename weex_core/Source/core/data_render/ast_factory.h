@@ -17,29 +17,32 @@
  * under the License.
  */
 
-#ifndef WEEX_AST_FACTORY_H_
-#define WEEX_AST_FACTORY_H_
+#ifndef CORE_DATA_RENDER_AST_FACTORY_H_
+#define CORE_DATA_RENDER_AST_FACTORY_H_
 
 #include <memory>
 #include <vector>
-#include "core/data_render/handle.h"
 #include "core/data_render/ast.h"
+#include "core/data_render/handle.h"
 #include "core/data_render/statement.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
 
-    class ASTFactory {
+class ASTFactory {
         ASTFactory() { }
     public:
         // GetFactoryInstance ::= returns singleton instance of ASTFactory
         static ASTFactory *GetFactoryInstance();
         virtual Handle<ExpressionList> NewExpressionList();
+        virtual Handle<ExpressionList> NewExpressionList(const std::vector<Handle<Expression>>& list);
         virtual Handle<ClassBody> NewClassBody();
         virtual Handle<Expression> NewIdentifier(std::string name);
         virtual Handle<ChunkStatement> NewChunkStatement(Handle<ExpressionList> list);
         virtual Handle<Expression> NewBlockStatement(Handle<ExpressionList> list);
+        virtual Handle<Expression> NewReturnStatement(Handle<Expression> expr);
+        virtual Handle<Expression> NewFunctionStatement(Handle<FunctionPrototype> proto, Handle<Expression> body);
         virtual Handle<Expression> NewFunctionPrototype(std::string name, std::vector<std::string> args);
         virtual Handle<Expression> NewArgumentList(Handle<ExpressionList>);
         virtual Handle<Expression> NewStringConstant(std::string str);
@@ -52,6 +55,8 @@ namespace data_render {
         virtual Handle<Expression> NewBooleanConstant(bool value);
         virtual Handle<Expression> NewNullConstant();
         virtual Handle<Expression> NewCallExpression(MemberAccessKind kind, Handle<Expression> func, Handle<Expression> args);
+        virtual Handle<Expression> NewCommaExpression(const std::vector<Handle<Expression>>& list);
+
         virtual Handle<Expression> NewCallExpression(Handle<Expression>func, std::vector<Handle<Expression>> args);
         virtual Handle<Expression> NewMemberExpression(MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> mem);
         virtual Handle<Expression> NewPrefixExpression(PrefixOperation op, Handle<Expression> expr);
@@ -104,4 +109,4 @@ namespace data_render {
 }  // namespace core
 }  // namespace weex
 
-#endif
+#endif  // CORE_DATA_RENDER_AST_FACTORY_H_

@@ -37,10 +37,10 @@ int SetTabIntValue(Table *t, Value *key, const Value &val) {
   if (IsNil(&val)) {
     return 0;
   }
-  int index = IndexOf(t->array, &val);
+  int index = IndexOf(&t->array, &val);
   if (index < 0) {
-    t->array->emplace_back(val);
-    index = t->array->size() - 1;
+    t->array.emplace_back(val);
+    index = t->array.size() - 1;
   }
   if (nullptr != key) {
     SetIValue(key, index);
@@ -56,27 +56,27 @@ int SetTabStringValue(Table *t, const Value *key, const Value &val) {
   if (keyStr.empty()) {
     return 0;
   }
-  auto it = t->map->find(keyStr);
-  if (it != t->map->end()) {
-    t->map->erase(it);
+  auto it = t->map.find(keyStr);
+  if (it != t->map.end()) {
+    t->map.erase(it);
   }
-  t->map->insert(std::make_pair(keyStr, val));
+  t->map.insert(std::make_pair(keyStr, val));
   return 1;
 }
 
-Value *GetTabIntValue(const Table *t, const Value *key) {
+Value *GetTabIntValue(Table *t, const Value *key) {
   int index = IntValue(key);
-  if (index < t->array->size()) {
-    return &(t->array->at(index));
+  if (index < t->array.size()) {
+    return &(t->array.at(index));
   }
   return nullptr;
 }
 
-Value *GetTabStringValue(const Table *t, const Value *key) {
+Value *GetTabStringValue(Table *t, const Value *key) {
   std::string str = CStringValue(key);
   if (!str.empty()) {
-    auto it = t->map->find(str);
-    if (it != t->map->end()) {
+    auto it = t->map.find(str);
+    if (it != t->map.end()) {
       return &(it->second);
     }
   }
@@ -84,78 +84,22 @@ Value *GetTabStringValue(const Table *t, const Value *key) {
 }
 
 Table *NewTable() {
-  Table *t = reinterpret_cast<Table *>(reallocMem(nullptr, sizeof(Table)));
-  if (nullptr == t) {
-    return nullptr;
-  }
-  t->array = new std::vector<Value>();
-  t->map = new std::unordered_map<std::string, Value>();
-  t->sizearray = 0;
-  t->sizenode = 0;
+//  Table *t = reinterpret_cast<Table *>(reallocMem(nullptr, sizeof(Table)));
+//  if (nullptr == t) {
+//    return nullptr;
+//  }
+//  t->array = new std::vector<Value>();
+//  t->map = new std::unordered_map<std::string, Value>();
+  Table *t = new Table();
   return t;
 }
 
 int ResizeTab(Table *t, size_t nasize, size_t nhsize) {
-//  size_t i;
-//
-//  size_t oldArrSize = t->sizearray;
-//  size_t oldHashSize = t->sizenode;
-//
-//  //    Value *arr = t->array;
-//  //    Node *oldNode = t->node;
-//
-//  if (nasize != 0) {
-//    Value *ptr =
-//        static_cast<Value *>(reallocMem(t->array, nasize * sizeof(Value)));
-//    if (NULL == ptr) {
-//      // TODO OOM
-//      return 0;
-//    }
-//    if (nasize > oldArrSize) {
-//      for (i = oldArrSize; i < nasize; i++) {
-//        SetNil(&ptr[i]);
-//      }
-//    }
-//    t->array = ptr;
-//    t->sizearray = nasize;
-//  } else {
-//    return 0;
-//  }
-//
-//  if (nhsize != 0) {
-//    //        t->map = new std::unordered_map<std::string, Value>(nhsize);
-//
-//    //        Node *ptr = static_cast<Node *>(reallocMem(t->node, nhsize *
-//    //        sizeof(Node))); if (NULL == ptr) {
-//    //            //TODO OOM
-//    //            return 0;
-//    //        }
-//    //        int *hptr = static_cast<int *>(reallocMem(t->hash, nhsize *
-//    //        sizeof(int))); if (NULL == hptr) {
-//    //            //TODO OOM
-//    //            return 0;
-//    //        }
-//    //        if (nhsize > oldHashSize) {
-//    //            for (i = oldHashSize; i < nhsize; i++) {
-//    //                Node *n = &ptr[i];
-//    //                n->next = NULL;
-//    //                SetNil(n->key->val);
-//    //                SetNil(n->val);
-//    //
-//    //                hptr[i] = -1;
-//    //            }
-//    //        }
-//    //        t->hash = hptr;
-//    //        t->node = ptr;
-//    //        t->sizenode = nhsize;
-//  } else {
-//    return 0;
-//  }
 
   return 1;
 }
 
-Value *GetTabValue(const Table *t, const Value &key) {
+Value *GetTabValue(Table *t, const Value &key) {
   if (IsInt(&key)) {
     return GetTabIntValue(t, &key);
   } else if (IsString(&key)) {
@@ -173,16 +117,32 @@ int SetTabValue(Table *t, Value *key, const Value &val) {
   return 0;
 }
 
-int GetTableSize(Table *t) {
-  if (!t) {
+size_t GetTableSize(Table *t) {
+  size_t a_size = GetArraySize(t);
+  size_t m_size = GetMapSize(t);
+  return a_size > m_size ? a_size : m_size;
+}
+
+size_t GetArraySize(Table *t) {
+  if (nullptr == t) {
+    return 0;
+  }
+  return t->array.size();
+}
+
+size_t GetMapSize(Table *t) {
+  if (nullptr == t) {
     return -1;
   }
-  int size = t->array->size();
-  if (size > 0) {
-    return size;
-  } else {
-    return t->map->size();
-  }
+  return t->map.size();
+}
+
+size_t GetValueArraySize(Value &o) {
+  return GetArraySize(TableValue(&o));
+}
+
+size_t GetValueMapSize(Value &o) {
+  return GetMapSize(TableValue(&o));
 }
 
 }  // namespace data_render

@@ -29,10 +29,9 @@ namespace core {
 namespace data_render {
 class VNode;
 
-
 class VNode {
-public:
-  VNode(const std::string &id, const std::string &tag_name);
+ public:
+  VNode(const std::string &ref, const std::string &tag_name);
 
   ~VNode();
 
@@ -45,10 +44,18 @@ public:
 
   void AddChild(VNode *child);
 
-public:
+ public:
   inline const std::string &tag_name() const { return tag_name_; }
 
   inline const std::string &ref() const { return ref_; }
+
+  inline const std::string &render_object_ref() const {
+    return render_object_ref_;
+  }
+
+  inline void set_render_object_ref(std::string ref) {
+    render_object_ref_ = std::move(ref);
+  }
 
   inline const VNode *parent() const { return parent_; }
 
@@ -56,14 +63,17 @@ public:
 
   inline std::map<std::string, std::string> *styles() const { return styles_; }
 
-  inline std::map<std::string, std::string> *attributes() const { return attributes_; }
+  inline std::map<std::string, std::string> *attributes() const {
+    return attributes_;
+  }
 
   inline bool HasChildren() { return !child_list_.empty(); }
 
-private:
+ private:
   std::string tag_name_;
   std::string ref_;
-
+  // Ref point to RenderObject is set when PatchVNode or ParseVNode2RenderObject
+  std::string render_object_ref_;
 
   VNode *parent_ = nullptr;
   std::vector<VNode *> child_list_;
@@ -72,13 +82,11 @@ private:
   std::map<std::string, std::string> *attributes_;
 
   void MapInsertOrAssign(std::map<std::string, std::string> *target_map,
-                         const std::string &key,
-                         const std::string &value);
-
+                         const std::string &key, const std::string &value);
 };
 
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
 
-#endif // CORE_DATA_RENDER_VNODE_VNODE_
+#endif  // CORE_DATA_RENDER_VNODE_VNODE_
