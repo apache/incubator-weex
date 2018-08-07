@@ -67,6 +67,14 @@ public class WXEventModule extends WXModule {
       return;
     }
 
+
+    if(TextUtils.equals("tel", scheme)){
+      Intent intent = new Intent(Intent.ACTION_DIAL,Uri.parse(url));
+      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      mWXSDKInstance.getContext().startActivity(intent);
+      return;
+    }
+
     if (TextUtils.equals("http", scheme) || TextUtils.equals("https", scheme) || TextUtils.equals("file", scheme)) {
       builder.append(url);
     } else {
