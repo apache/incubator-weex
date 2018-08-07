@@ -180,7 +180,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
     throw IPCException("failed to fork: %s", strerror(myerrno));
   } else if (child == 0) {
     // the child
-    closeAllButThis(fd, fd2);
+//    closeAllButThis(fd, fd2);
     // implements close all but handles[1]
     // do exec
     doExec(fd, fd2, true, startupPie);
@@ -238,6 +238,14 @@ static void findIcuDataPath(std::string &icuDataPath) {
   if (!f) {
     return;
   }
+  fseek(f,0L,SEEK_END);
+  int size=ftell(f);
+
+    LOGE("file size is %d",size);
+    struct stat statbuf;
+    stat("/proc/self/maps",&statbuf);
+    int size1=statbuf.st_size;
+    LOGE("file size1 is %d",size1);
   char buffer[256];
   char *line;
   while ((line = fgets(buffer, 256, f))) {

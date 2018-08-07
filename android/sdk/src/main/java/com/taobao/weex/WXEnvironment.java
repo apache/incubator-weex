@@ -40,7 +40,11 @@ import com.taobao.weex.utils.WXUtils;
 
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -398,6 +402,33 @@ public class WXEnvironment {
   }
 
   public static String getLibJssRealPath() {
+    File file = new File("/proc/self/maps");
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new FileReader(file));
+      String tempString = null;
+      int line = 1;
+      // 一次读入一行，直到读入null为文件结束
+      while ((tempString = reader.readLine()) != null) {
+        // 显示行号
+        if (tempString.contains("icudt")) {
+          Log.e("dyy","line " + line + ": " + tempString);
+        }
+        line++;
+      }
+      reader.close();
+    } catch (IOException e) {
+      Log.e("dyy",e.toString());
+      e.printStackTrace();
+    } finally {
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException e1) {
+        }
+      }
+    }
+
     if(TextUtils.isEmpty(CORE_JSS_SO_PATH)) {
       CORE_JSS_SO_PATH = findLibJssRealPath();
       WXLogUtils.e("findLibJssRealPath " + CORE_JSS_SO_PATH);
