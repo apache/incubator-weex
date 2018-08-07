@@ -195,7 +195,7 @@ public class WXParams {
   }
   @CalledByNative
   public String getLibIcuPath() {
-    WXLogUtils.e("getLibIcuPath is running " + libJssPath);
+    WXLogUtils.e("getLibIcuPath is running " + libIcuPath);
     return libIcuPath;
   }
 
