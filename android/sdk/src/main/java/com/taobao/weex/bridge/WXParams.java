@@ -39,6 +39,7 @@ public class WXParams {
   private String cacheDir;
   private String useSingleProcess;
   private String libJssPath;
+  private String libIcuPath;
 
   private Map<String, String> options;
 
@@ -191,5 +192,13 @@ public class WXParams {
 
   public void setLibJssPath(String libJssPath) {
     this.libJssPath = libJssPath;
+  }
+  @CalledByNative
+  public String getLibIcuPath() {
+    return libIcuPath;
+  }
+
+  public void setLibIcuPath(String libIcuPath) {
+    this.libIcuPath = libIcuPath;
   }
 }

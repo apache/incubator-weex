@@ -307,13 +307,17 @@ std::unique_ptr<const char *[]> EnvPBuilder::build() {
 void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
   std::string executablePath;
   std::string icuDataPath;
-  findIcuDataPath(icuDataPath);
+  if(SoUtils::jss_icu_path() != nullptr) {
+    LOGE("jss_icu_path not null %s",SoUtils::jss_icu_path());
+    icuDataPath = SoUtils::jss_icu_path();
+  } else {
+    findIcuDataPath(icuDataPath);
+  }
 //  if(g_jssSoPath != nullptr) {
 //    executablePath = g_jssSoPath;
   if(SoUtils::jss_so_path() != nullptr) {
     executablePath = SoUtils::jss_so_path();
-  }
-  if (executablePath.empty()) {
+  } else {
     executablePath = SoUtils::FindLibJssSoPath();
   }
 #if PRINT_LOG_CACHEFILE

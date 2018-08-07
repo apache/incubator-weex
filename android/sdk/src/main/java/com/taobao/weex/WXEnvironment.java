@@ -115,6 +115,8 @@ public class WXEnvironment {
 
   private static  String CORE_JSS_SO_PATH = null;
 
+  private static String CORE_JSS_ICU_PATH = null;
+
   private static Map<String, String> options = new HashMap<>();
   static {
     options.put(WXConfig.os, OS);
@@ -377,6 +379,36 @@ public class WXEnvironment {
     return false;
   }
 
+  private static String findIcuPath() {
+    File file = new File("/proc/self/maps");
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new FileReader(file));
+      String tempString = null;
+      while ((tempString = reader.readLine()) != null) {
+        if (tempString.contains("icudt")) {
+
+          int i = tempString.indexOf('/');
+
+          String substring = tempString.substring(i);
+          return substring.trim();
+        }
+      }
+      reader.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException e1) {
+        }
+      }
+    }
+
+    return null;
+  }
+
   private static String findLibJssRealPath() {
     String soPath = findSoPath(CORE_JSS_SO_NAME);
     String realName = "lib" + CORE_JSS_SO_NAME + ".so";
@@ -402,38 +434,19 @@ public class WXEnvironment {
   }
 
   public static String getLibJssRealPath() {
-    File file = new File("/proc/self/maps");
-    BufferedReader reader = null;
-    try {
-      reader = new BufferedReader(new FileReader(file));
-      String tempString = null;
-      int line = 1;
-      // 一次读入一行，直到读入null为文件结束
-      while ((tempString = reader.readLine()) != null) {
-        // 显示行号
-        if (tempString.contains("icudt")) {
-          Log.e("dyy","line " + line + ": " + tempString);
-        }
-        line++;
-      }
-      reader.close();
-    } catch (IOException e) {
-      Log.e("dyy",e.toString());
-      e.printStackTrace();
-    } finally {
-      if (reader != null) {
-        try {
-          reader.close();
-        } catch (IOException e1) {
-        }
-      }
-    }
-
     if(TextUtils.isEmpty(CORE_JSS_SO_PATH)) {
       CORE_JSS_SO_PATH = findLibJssRealPath();
       WXLogUtils.e("findLibJssRealPath " + CORE_JSS_SO_PATH);
     }
 
     return CORE_JSS_SO_PATH;
+  }
+
+  public static String getLibJssIcuPath() {
+    if(TextUtils.isEmpty(CORE_JSS_ICU_PATH)){
+      CORE_JSS_ICU_PATH = findIcuPath();
+    }
+
+    return CORE_JSS_ICU_PATH;
   }
 }

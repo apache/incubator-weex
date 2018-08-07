@@ -1771,6 +1771,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     wxParams.setLogLevel(config.get(WXConfig.logLevel));
     wxParams.setUseSingleProcess(isUseSingleProcess ? "true" : "false");
     wxParams.setLibJssPath(WXEnvironment.getLibJssRealPath());
+    wxParams.setLibIcuPath(WXEnvironment.getLibJssIcuPath());
     String appName = config.get(WXConfig.appName);
     if (!TextUtils.isEmpty(appName)) {
       wxParams.setAppName(appName);

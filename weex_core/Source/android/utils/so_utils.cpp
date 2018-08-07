@@ -27,6 +27,7 @@
 namespace WeexCore {
     char * SoUtils::g_cache_dir = nullptr;
     char * SoUtils::g_jss_so_path = nullptr;
+    char * SoUtils::g_jss_icu_path = nullptr;
     char * SoUtils::g_jss_so_name = const_cast<char *>("libweexjss.so");
     bool SoUtils::g_pie_support = false;
     std::function<void(const char*, const char*)> SoUtils::g_exception_handler = nullptr;

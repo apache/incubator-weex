@@ -165,6 +165,19 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     }
   }
 
+  jmethodID m_get_jss_icu_path =
+          env->GetMethodID(c_params, "getLibIcuPath", "()Ljava/lang/String;");
+  if (m_get_jss_icu_path != nullptr) {
+    jobject j_get_jss_icu_path =
+            env->CallObjectMethod(params, m_get_jss_icu_path);
+    if (j_get_jss_icu_path != nullptr) {
+      SoUtils::set_jss_icu_path(const_cast<char*>(
+                                       env->GetStringUTFChars((jstring)(j_get_jss_icu_path), nullptr)));
+      LOGE("g_jssIcuPath is %s ", SoUtils::jss_icu_path());
+      env->DeleteLocalRef(j_get_jss_icu_path);
+    }
+  }
+
   jmethodID m_osVersion =
       env->GetMethodID(c_params, "getOsVersion", "()Ljava/lang/String;");
   if (m_osVersion == nullptr) {
