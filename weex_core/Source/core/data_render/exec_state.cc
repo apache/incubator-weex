@@ -21,7 +21,7 @@
 #include "core/data_render/code_generator.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
-#include "parser.h"
+#include "core/data_render/parser.h"
 
 namespace weex {
 namespace core {

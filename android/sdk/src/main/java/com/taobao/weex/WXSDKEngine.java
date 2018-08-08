@@ -104,6 +104,7 @@ public class WXSDKEngine implements Serializable {
   public static final String JS_FRAMEWORK_RELOAD="js_framework_reload";
   private static final String V8_SO_NAME = CORE_SO_NAME;
   private volatile static boolean mIsInit = false;
+  private volatile static boolean mIsSoInit = false;
   private static final Object mLock = new Object();
   private static final String TAG = "WXSDKEngine";
 
@@ -140,6 +141,12 @@ public class WXSDKEngine implements Serializable {
     synchronized(mLock) {
 
       return mIsInit && WXEnvironment.JsFrameworkInit;
+    }
+  }
+
+  public static boolean isSoInitialized(){
+    synchronized(mLock) {
+      return mIsSoInit;
     }
   }
 
@@ -214,14 +221,13 @@ public class WXSDKEngine implements Serializable {
         WXSoInstallMgrSdk.init(application,
                 sm.getIWXSoLoaderAdapter(),
                 sm.getWXStatisticsListener());
-        boolean isSoInitSuccess = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
-        if (!isSoInitSuccess) {
+        mIsSoInit = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
+        if (!mIsSoInit) {
           WXExceptionUtils.commitCriticalExceptionRT(null,
                   WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
                   "doInitInternal",
                   WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorMsg() + "isSoInit false",
                   null);
-
           return;
         }
         sm.initScriptsFramework(config!=null?config.getFramework():null);

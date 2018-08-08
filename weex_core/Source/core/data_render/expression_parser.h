@@ -16,15 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by Xu Jiacheng on 2018/7/17.
-//
 
-#ifndef DATA_RENDER_EXPRESSION_PARSER_
-#define DATA_RENDER_EXPRESSION_PARSER_
+#ifndef CORE_DATA_RENDER_EXPRESSION_PARSER_
+#define CORE_DATA_RENDER_EXPRESSION_PARSER_
 
-#include "core/data_render/token.h"
 #include "core/data_render/ast_factory.h"
+#include "core/data_render/token.h"
 #include "core/data_render/tokenizer.h"
 
 namespace weex {
@@ -38,8 +35,8 @@ class ExpressionParser {
 
   Handle<Expression> ParsePrimary();
 
-//  Handle<Expression> ParseArrayLiteral();
-//  Handle<Expression> ParseObjectLiteral();
+  //  Handle<Expression> ParseArrayLiteral();
+  //  Handle<Expression> ParseObjectLiteral();
 
   Handle<Expression> ParseDotExpression();
   Handle<Expression> ParseIndexExpression();
@@ -49,7 +46,8 @@ class ExpressionParser {
   Handle<Expression> ParseUnaryExpression();
 
   Handle<Expression> ParseBinaryExpression();
-  Handle<Expression> ParseBinaryExpressionRhs(int precedance, Handle<Expression> lhs);
+  Handle<Expression> ParseBinaryExpressionRhs(int precedance,
+                                              Handle<Expression> lhs);
   Handle<Expression> ParseTernaryExpression();
   Handle<Expression> ParseAssignExpression();
   Handle<Expression> ParseCommaExpression();
@@ -57,6 +55,7 @@ class ExpressionParser {
   Handle<Expression> ParseExpression();
 
   static Handle<Expression> ParseExpressionByString(const std::string& str);
+
  private:
   const std::string& GetStringLiteral();
   const std::string& GetIdentifierName();
@@ -68,17 +67,17 @@ class ExpressionParser {
 
   ASTFactory* builder() { return builder_; }
   Tokenizer* lex() { return lex_; }
-//  ScopeManager *scope_manager() { return manager_; }
+  //  ScopeManager *scope_manager() { return manager_; }
 
  private:
   ASTFactory* builder_;
   Tokenizer* lex_;
-//  ScopeManager *manager_;
-//  ParserFlags flags_;
+  //  ScopeManager *manager_;
+  //  ParserFlags flags_;
 };
 
-}
-}
-}
+}  // namespace data_render
+}  // namespace core
+}  // namespace weex
 
-#endif
+#endif  // CORE_DATA_RENDER_EXPRESSION_PARSER_

@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_AST_VISITOR_H_
-#define WEEX_AST_VISITOR_H_
+#ifndef CORE_DATA_RENDER_AST_VISITOR_H_
+#define CORE_DATA_RENDER_AST_VISITOR_H_
 
 #include "ast.h"
 #include "core/data_render/statement.h"
@@ -60,4 +60,4 @@ class SingleNodeVisitor {
 }  // namespace core
 }  // namespace weex
 
-#endif
+#endif  // CORE_DATA_RENDER_AST_VISITOR_H_

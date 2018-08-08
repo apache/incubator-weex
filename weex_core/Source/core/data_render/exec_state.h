@@ -17,8 +17,8 @@
  * under the License.
  */
 
-#ifndef WEEX_PROJECT_CONTEXT_H
-#define WEEX_PROJECT_CONTEXT_H
+#ifndef CORE_DATA_RENDER_CONTEXT_H_
+#define CORE_DATA_RENDER_CONTEXT_H_
 
 #include <cmath>
 #include <map>
@@ -26,12 +26,11 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "core/data_render/json/json11.hpp"
+#include "core/data_render/object.h"
 #include "core/data_render/op_code.h"
+#include "core/data_render/table_factory.h"
 #include "core/data_render/vnode/vnode.h"
 #include "core/data_render/vnode/vnode_render_context.h"
-#include "core/data_render/object.h"
-#include "core/data_render/table_factory.h"
 
 namespace weex {
 namespace core {
@@ -140,4 +139,4 @@ class ExecState {
 }  // namespace core
 }  // namespace weex
 
-#endif  // WEEX_PROJECT_CONTEXT_H
+#endif  // CORE_DATA_RENDER_CONTEXT_H_

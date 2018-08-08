@@ -21,7 +21,6 @@
 #include <sstream>
 #include "core/data_render/ast_factory.h"
 #include "core/data_render/expression_parser.h"
-#include "core/data_render/json/json11.hpp"
 #include "core/data_render/statement.h"
 
 namespace weex {

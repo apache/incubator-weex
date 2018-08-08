@@ -74,15 +74,15 @@ set(COMMON_SRCS
    ./core/data_render/vnode/vnode_exec_env.cc
    ./core/data_render/vnode/vnode_render_manager.cc
    ./core/data_render/vnode/vnode_render_context.cc
-   ./core/data_render/json/json11.cc
         )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/json11)
 
 SET(FINAL_ADD_LIBRARY
         ${COMMON_SRCS}
 )
-SET(FINAL_TARGET_LINK_LIBRARIES wson)
+SET(FINAL_TARGET_LINK_LIBRARIES wson json11)
 
 if (ANDROID)
   ## add_subdirectory for subdirectory has a CMakeLists.txt

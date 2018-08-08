@@ -59,9 +59,6 @@ int ToInteger(const Value *o, const int &mode, int64_t &v) {
 }
 
 bool ValueEqulas(const Value *a, const Value *b) {
-  if (a->type != b->type) {
-    return false;
-  }
   double d1, d2;
   if (IsNumber(a)) {
     return NumEq(NumValue(a), NumValue(b));
@@ -77,32 +74,25 @@ bool ValueEqulas(const Value *a, const Value *b) {
 }
 
 bool ValueLE(const Value *a, const Value *b) {
-  if (a->type != b->type) {
-    return false;
-  }
   double d1, d2;
   d1 = NumValue(a);
   d2 = NumValue(b);
-  label:
-  if (IsNumber(a)) {
+  if (IsNumber(a) && IsNumber(b)) {
     return NumLT(d1, d2) || NumEq(d1, d2);
-  } else if (IsInt(a)) {
+  } else if (IsInt(a) && IsInt(b)) {
     return IntValue(a) <= IntValue(b);
   } else if (ToNum(a, d1) && ToNum(b, d2)) {
-    goto label;
+    return NumLT(d1, d2) || NumEq(d1, d2);
   } else {
     return false;
   }
 }
 
 bool ValueLT(const Value *a, const Value *b) {
-  if (a->type != b->type) {
-    return false;
-  }
   double d1, d2;
-  if (IsNumber(a)) {
+  if (IsNumber(a) && IsNumber(b)) {
     return NumLT(NumValue(a), NumValue(b));
-  } else if (IsInt(a)) {
+  } else if (IsInt(a) && IsInt(b)) {
     return IntValue(a) < IntValue(b);
   } else if (ToNum(a, d1) && ToNum(b, d2)) {
     return NumLT(d1, d2);

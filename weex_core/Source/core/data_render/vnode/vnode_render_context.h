@@ -21,8 +21,8 @@
 
 #include <memory>
 #include <string>
-#include "core/data_render/json/json11.hpp"
 #include "core/data_render/vnode/vnode.h"
+#include "third_party/json11/json11.hpp"
 
 namespace weex {
 namespace core {
@@ -39,14 +39,16 @@ class VNodeRenderContext {
   inline void set_root(VNode* root) { root_ = root; }
 
   inline json11::Json& raw_json() { return raw_json_; }
-  inline std::map<std::string,json11::Json>& style_json() { return style_json_; }
+  inline std::map<std::string, json11::Json>& style_json() {
+    return style_json_;
+  }
 
  private:
   // node context
   std::string page_id_;
   VNode* root_;
   json11::Json raw_json_;
-  std::map<std::string,json11::Json> style_json_;
+  std::map<std::string, json11::Json> style_json_;
 };
 }  // namespace data_render
 }  // namespace core
