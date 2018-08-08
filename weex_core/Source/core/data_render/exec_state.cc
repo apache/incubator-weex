@@ -48,7 +48,7 @@ int Global::Add(const std::string& name, Value value) {
     return iter->second;
   }
   values_.push_back(value);
-  int index = values_.size() - 1;
+  int index = static_cast<int>(values_.size()) - 1;
   map_.insert(std::make_pair(name, index));
   return index;
 }
@@ -61,7 +61,7 @@ int Global::Set(const std::string& name, Value value) {
     return index;
   } else {
     values_.push_back(value);
-    int index = values_.size() - 1;
+    int index = static_cast<int>(values_.size()) - 1;
     map_.insert(std::make_pair(name, index));
     return index;
   }
@@ -93,7 +93,7 @@ void ExecState::Execute() {
   CallFunction(stack_->base(), 0, nullptr);
 }
 
-const Value& ExecState::Call(const std::string& func_name,
+const Value ExecState::Call(const std::string& func_name,
                              const std::vector<Value>& params) {
   Value ret;
   auto it = global_variables_.find(func_name);

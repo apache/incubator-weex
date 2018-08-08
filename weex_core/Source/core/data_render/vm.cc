@@ -45,12 +45,12 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         break;
       case OP_LOADK:
         a = frame.reg + GET_ARG_A(instruction);
-        b = frame.func->f->GetConstant(GET_ARG_Bx(instruction));
+        b = frame.func->f->GetConstant(static_cast<int>(GET_ARG_Bx(instruction)));
         *a = *b;
         break;
       case OP_GETGLOBAL:
         a = frame.reg + GET_ARG_A(instruction);
-        b = exec_state->global()->Find(GET_ARG_Bx(instruction));
+        b = exec_state->global()->Find(static_cast<int>(GET_ARG_Bx(instruction)));
         *a = *b;
         break;
       case OP_GETFUNC: {
@@ -106,7 +106,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
-          SetIValue(a, NUM_OP(/, IntValue(b), IntValue(c)));
+          SetIValue(a, static_cast<int>(NUM_OP(/, IntValue(b), IntValue(c))));
         } else if (ToNum(b, d1) && ToNum(c, d2)) {
           SetDValue(a, NUM_OP(/, IntValue(b), IntValue(c)));
         } else {
@@ -132,7 +132,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (IsInt(b) && IsInt(c)) {
-          SetIValue(a, IntMod(IntValue(b), IntValue(c)));
+          SetIValue(a, IntMod(static_cast<int>(IntValue(b)), static_cast<int>(IntValue(c))));
         } else if (ToNum(b, d1) && ToNum(c, d2)) {
           SetDValue(a, NumMod(d1, d2));
         } else {
@@ -157,7 +157,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
-        int64_t i1, i2;
+        int64_t i1=0, i2=0;
         if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
           SetIValue(a, INT_OP(&, i1, i2));
         } else {
@@ -245,7 +245,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
-        int64_t i1, i2;
+        int64_t i1=0, i2=0;
         if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
           SetIValue(a, INT_OP(|, i1, i2));
         } else {
@@ -258,7 +258,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
-        int64_t i1, i2;
+        int64_t i1=0, i2=0;
         if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
           SetIValue(a, INT_OP(^, i1, i2));
         } else {
@@ -274,7 +274,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         c = frame.reg + GET_ARG_C(instruction);
         int64_t i1, i2;
         if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
-          SetIValue(a, ShiftLeft(i1, i2));
+          SetIValue(a, static_cast<int>(ShiftLeft(i1, i2)));
         } else {
           LOGE("Unspport Type[%d,%d] with OP_CODE[OP_SHL]", b->type, c->type);
         }
@@ -285,9 +285,9 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
-        int64_t i1, i2;
+        int64_t i1=0, i2=0;
         if (ToInteger(b, 0, i1) && ToInteger(c, 0, i2)) {
-          SetIValue(a, ShiftLeft(i1, -i2));
+          SetIValue(a, static_cast<int>(ShiftLeft(i1, -i2)));
         } else {
           LOGE("Unspport Type[%d,%d] with OP_CODE[OP_SHR]", b->type, c->type);
         }
@@ -298,9 +298,9 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         if (IsInt(a)) {
-          SetIValue(a, IntValue(a) + 1);
+          SetIValue(a, static_cast<int>(IntValue(a)) + 1);
           if (NULL != b) {
-            SetIValue(b, IntValue(a));
+            SetIValue(b, static_cast<int>(IntValue(a)));
           }
         } else if (IsNumber(a)) {
           SetDValue(a, NumValue(a) + 1);
@@ -317,9 +317,9 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         if (IsInt(a)) {
-          SetIValue(a, IntValue(a) - 1);
+          SetIValue(a, static_cast<int>(IntValue(a)) - 1);
           if (GET_ARG_B(instruction) != 0) {
-            SetIValue(b, IntValue(a));
+            SetIValue(b, static_cast<int>(IntValue(a)));
           }
         } else if (IsNumber(a)) {
           SetDValue(a, NumValue(a) - 1);
@@ -386,7 +386,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
 
       case OP_INVALID: {
         //todo make an error;
-        int a = 0/0;
+        //int a = 0/0;
         return;
       }
         break;

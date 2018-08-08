@@ -265,7 +265,7 @@ struct ASTParser final {
   void ParseComponentFunction(Json& json) {
     auto& name = json["name"];
     auto& initial_state = json["initialState"];
-    auto& styles = json["styles"];
+    //auto& styles = json["styles"];
     Json template_obj = json["template"];
 
     Handle<BlockStatement> chunk = stacks_.back();

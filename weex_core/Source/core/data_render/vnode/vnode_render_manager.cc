@@ -171,10 +171,10 @@ void VNodeRenderManager::CreatePage(const std::string& input,
   VNodeExecEnv::InitStyleList(exec_state);
 
   exec_state->context()->page_id(page_id);
-  auto compile_start = std::chrono::steady_clock::now();
+  //auto compile_start = std::chrono::steady_clock::now();
   exec_state->Compile();
 
-  auto exec_start = std::chrono::steady_clock::now();
+  //auto exec_start = std::chrono::steady_clock::now();
   exec_state->Execute();
 
   CreatePageInternal(page_id, exec_state->context()->root());
@@ -223,7 +223,7 @@ bool SameNode(VNode* a, VNode* b) {
          a->ref() == b->ref();  // todo to be more accurate
 }
 
-inline VNode* GetOrNull(vector<VNode*>& vec, unsigned int index) {
+inline VNode* GetOrNull(vector<VNode*>& vec, int index) {
   if (index < 0 || index >= vec.size()) {
     return nullptr;
   }
@@ -269,9 +269,9 @@ void UpdateChildren(const string& page_id, VNode* old_node, VNode* new_node) {
   }
 
   unsigned int old_start = 0;
-  unsigned int old_end = old_children.size() - 1;
+  unsigned int old_end = static_cast<unsigned int >(old_children.size()) - 1;
   unsigned int new_start = 0;
-  unsigned int new_end = new_children.size() - 1;
+  unsigned int new_end = static_cast<unsigned int >(new_children.size()) - 1;
   VNode* old_start_node = GetOrNull(old_children, old_start);
   VNode* old_end_node = GetOrNull(old_children, old_end);
   VNode* new_start_node = GetOrNull(new_children, new_start);
@@ -378,7 +378,7 @@ void UpdateChildren(const string& page_id, VNode* old_node, VNode* new_node) {
 void CreateAndInsertElm(const string& page_id, VNode* node,
                         vector<VNode*>& ref_list, const VNode* ref) {
   auto insert_pos = IndexOf(ref_list, ref);
-  int index = std::distance(ref_list.begin(), insert_pos);
+  int index = static_cast<int>(std::distance(ref_list.begin(), insert_pos));
   ref_list.insert(insert_pos, node);
 
   WeexCore::RenderObject* root = ParseVNode2RenderObject(node, nullptr, false, 0, page_id);
@@ -389,7 +389,7 @@ void CreateAndInsertElm(const string& page_id, VNode* node,
 int MoveToBackOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
                     const VNode* anchor_ref) {
   auto move_pos = IndexOf(ref_list, move_ref);
-  int index = std::distance(ref_list.begin(), move_pos);
+  int index = static_cast<int>(std::distance(ref_list.begin(), move_pos));
   if (move_pos == ref_list.end()) {
 #if VRENDER_LOG
     LOGE("[VRenderManager] moveToBackOfRef movePos == refList.end() ref: %s",
@@ -414,7 +414,7 @@ int MoveToBackOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
 int MoveToFrontOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
                      const VNode* anchor_ref) {
   auto move_pos = IndexOf(ref_list, move_ref);
-  int index = std::distance(ref_list.begin(), move_pos);
+  int index = static_cast<int>(std::distance(ref_list.begin(), move_pos));
   if (move_pos == ref_list.end()) {
 #if VRENDER_LOG
     LOGE("[VRenderManager] moveToFrontOfRef movePos == refList.end() ref: %s",

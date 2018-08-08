@@ -422,7 +422,7 @@ Handle<Expression> ExpressionParser::ParseTernaryExpression() {
 
 Handle<Expression> ExpressionParser::ParseCommaExpression() {
   auto one = ParseAssignExpression();//todo not support yet.
-  auto tok = lex()->Peek();
+  lex()->Peek();
   return one;
 }
 

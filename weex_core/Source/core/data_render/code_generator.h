@@ -136,7 +136,7 @@ class CodeGenerator : public ASTVisitor {
     ~RegisterScope() { block_->set_idx(stored_idx_); }
 
    private:
-    long stored_idx_;
+    int stored_idx_;
     BlockCnt *block_;
     DISALLOW_COPY_AND_ASSIGN(RegisterScope);
   };

@@ -27,7 +27,7 @@ namespace data_render {
 int IndexOf(const std::vector<Value> *arr, const Value *val) {
   auto it = std::find(arr->begin(), arr->end(), val);
   if (it != arr->end()) {
-    return std::distance(arr->begin(), it);
+    return static_cast<int>(std::distance(arr->begin(), it));
   } else {
     return -1;
   }
@@ -40,7 +40,7 @@ int SetTabIntValue(Table *t, Value *key, const Value &val) {
   int index = IndexOf(t->array, &val);
   if (index < 0) {
     t->array->emplace_back(val);
-    index = t->array->size() - 1;
+    index = static_cast<int>(t->array->size()) - 1;
   }
   if (nullptr != key) {
     SetIValue(key, index);
@@ -65,7 +65,7 @@ int SetTabStringValue(Table *t, const Value *key, const Value &val) {
 }
 
 Value *GetTabIntValue(const Table *t, const Value *key) {
-  int index = IntValue(key);
+  int64_t index = IntValue(key);
   if (index < t->array->size()) {
     return &(t->array->at(index));
   }
@@ -120,11 +120,11 @@ int GetTableSize(Table *t) {
   if (!t) {
     return -1;
   }
-  int size = t->array->size();
+  int size = static_cast<int>(t->array->size());
   if (size > 0) {
     return size;
   } else {
-    return t->map->size();
+    return static_cast<int>(t->map->size());
   }
 }
 

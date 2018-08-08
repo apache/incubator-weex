@@ -48,7 +48,7 @@ class FuncState {
       }
     }
     constants_.push_back(std::move(value));
-    return constants_.size() - 1;
+    return static_cast<int>(constants_.size()) - 1;
   }
 
   inline Value* GetConstant(int index) { return &constants_[index]; }
@@ -105,7 +105,7 @@ class ExecState {
   virtual ~ExecState() {}
   void Compile();
   void Execute();
-  const Value& Call(const std::string& func_name,
+  const Value Call(const std::string& func_name,
                     const std::vector<Value>& params);
 
   size_t GetArgumentCount();

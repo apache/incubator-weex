@@ -63,6 +63,10 @@
 		333D9A2A1F41507A007CED39 /* WXTransition.mm in Sources */ = {isa = PBXBuildFile; fileRef = 333D9A261F41507A007CED39 /* WXTransition.mm */; };
 		37B51EE41E97804D0040A743 /* WXCycleSliderComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 37B51EE21E97804D0040A743 /* WXCycleSliderComponent.h */; };
 		37B51EE51E97804D0040A743 /* WXCycleSliderComponent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 37B51EE31E97804D0040A743 /* WXCycleSliderComponent.mm */; };
+		45FA8EAB211B0FF000280226 /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = 45FA8EAA211B0FF000280226 /* common.h */; };
+		45FA8EB4211B150B00280226 /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 45FA8EB1211B150B00280226 /* CMakeLists.txt */; };
+		45FA8EB5211B150B00280226 /* json11.cc in Sources */ = {isa = PBXBuildFile; fileRef = 45FA8EB2211B150B00280226 /* json11.cc */; };
+		45FA8EB6211B150B00280226 /* json11.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 45FA8EB3211B150B00280226 /* json11.hpp */; };
 		591324A31D49B7F1004E89ED /* WXTimerModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */; };
 		591DD3311D23AD5800BE8709 /* WXErrorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 591DD32F1D23AD5800BE8709 /* WXErrorView.m */; };
 		591DD3321D23AD5800BE8709 /* WXErrorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 591DD3301D23AD5800BE8709 /* WXErrorView.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -523,24 +527,16 @@
 		B894EED521104234009187C9 /* string_table.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE8D21104234009187C9 /* string_table.h */; };
 		B894EED621104234009187C9 /* ast.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE8E21104234009187C9 /* ast.h */; };
 		B894EED721104234009187C9 /* ast.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE8E21104234009187C9 /* ast.h */; };
-		B894EED821104234009187C9 /* json11.hpp in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9021104234009187C9 /* json11.hpp */; };
-		B894EED921104234009187C9 /* json11.hpp in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9021104234009187C9 /* json11.hpp */; };
-		B894EEDA21104234009187C9 /* json11.cc in Sources */ = {isa = PBXBuildFile; fileRef = B894EE9121104234009187C9 /* json11.cc */; };
-		B894EEDB21104234009187C9 /* json11.cc in Sources */ = {isa = PBXBuildFile; fileRef = B894EE9121104234009187C9 /* json11.cc */; };
 		B894EEDC21104234009187C9 /* vm_mem.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9221104234009187C9 /* vm_mem.h */; };
 		B894EEDD21104234009187C9 /* vm_mem.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9221104234009187C9 /* vm_mem.h */; };
 		B894EEDE21104234009187C9 /* table_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9321104234009187C9 /* table_factory.h */; };
 		B894EEDF21104234009187C9 /* table_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9321104234009187C9 /* table_factory.h */; };
 		B894EEE021104234009187C9 /* scanner.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9421104234009187C9 /* scanner.h */; };
 		B894EEE121104234009187C9 /* scanner.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9421104234009187C9 /* scanner.h */; };
-		B894EEE221104234009187C9 /* macros.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9521104234009187C9 /* macros.h */; };
-		B894EEE321104234009187C9 /* macros.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9521104234009187C9 /* macros.h */; };
 		B894EEE421104234009187C9 /* expression_parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = B894EE9621104234009187C9 /* expression_parser.cc */; };
 		B894EEE521104234009187C9 /* expression_parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = B894EE9621104234009187C9 /* expression_parser.cc */; };
 		B894EEE621104234009187C9 /* handle.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9721104234009187C9 /* handle.h */; };
 		B894EEE721104234009187C9 /* handle.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9721104234009187C9 /* handle.h */; };
-		B894EEE821104234009187C9 /* local_cfunction.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9821104234009187C9 /* local_cfunction.h */; };
-		B894EEE921104234009187C9 /* local_cfunction.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9821104234009187C9 /* local_cfunction.h */; };
 		B894EEEA21104234009187C9 /* exec_state.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9921104234009187C9 /* exec_state.h */; };
 		B894EEEB21104234009187C9 /* exec_state.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9921104234009187C9 /* exec_state.h */; };
 		B894EEEC21104234009187C9 /* object.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9A21104234009187C9 /* object.h */; };
@@ -551,8 +547,6 @@
 		B894EEF121104234009187C9 /* vm_mem.cc in Sources */ = {isa = PBXBuildFile; fileRef = B894EE9C21104234009187C9 /* vm_mem.cc */; };
 		B894EEF221104234009187C9 /* token.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9D21104234009187C9 /* token.h */; };
 		B894EEF321104234009187C9 /* token.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9D21104234009187C9 /* token.h */; };
-		B894EEF421104234009187C9 /* local_cfunction.cc in Sources */ = {isa = PBXBuildFile; fileRef = B894EE9E21104234009187C9 /* local_cfunction.cc */; };
-		B894EEF521104235009187C9 /* local_cfunction.cc in Sources */ = {isa = PBXBuildFile; fileRef = B894EE9E21104234009187C9 /* local_cfunction.cc */; };
 		B894EEF621104235009187C9 /* vm.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9F21104234009187C9 /* vm.h */; };
 		B894EEF721104235009187C9 /* vm.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EE9F21104234009187C9 /* vm.h */; };
 		B894EEF821104235009187C9 /* op_code.h in Headers */ = {isa = PBXBuildFile; fileRef = B894EEA021104234009187C9 /* op_code.h */; };
@@ -967,6 +961,10 @@
 		333D9A261F41507A007CED39 /* WXTransition.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXTransition.mm; sourceTree = "<group>"; };
 		37B51EE21E97804D0040A743 /* WXCycleSliderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCycleSliderComponent.h; sourceTree = "<group>"; };
 		37B51EE31E97804D0040A743 /* WXCycleSliderComponent.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXCycleSliderComponent.mm; sourceTree = "<group>"; };
+		45FA8EAA211B0FF000280226 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		45FA8EB1211B150B00280226 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		45FA8EB2211B150B00280226 /* json11.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json11.cc; sourceTree = "<group>"; };
+		45FA8EB3211B150B00280226 /* json11.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = json11.hpp; sourceTree = "<group>"; };
 		591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTimerModuleTests.m; sourceTree = "<group>"; };
 		591DD32F1D23AD5800BE8709 /* WXErrorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXErrorView.m; sourceTree = "<group>"; };
 		591DD3301D23AD5800BE8709 /* WXErrorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXErrorView.h; sourceTree = "<group>"; };
@@ -1292,21 +1290,16 @@
 		B894EE8C21104234009187C9 /* vm.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vm.cc; sourceTree = "<group>"; };
 		B894EE8D21104234009187C9 /* string_table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = string_table.h; sourceTree = "<group>"; };
 		B894EE8E21104234009187C9 /* ast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ast.h; sourceTree = "<group>"; };
-		B894EE9021104234009187C9 /* json11.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = json11.hpp; sourceTree = "<group>"; };
-		B894EE9121104234009187C9 /* json11.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json11.cc; sourceTree = "<group>"; };
 		B894EE9221104234009187C9 /* vm_mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vm_mem.h; sourceTree = "<group>"; };
 		B894EE9321104234009187C9 /* table_factory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = table_factory.h; sourceTree = "<group>"; };
 		B894EE9421104234009187C9 /* scanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scanner.h; sourceTree = "<group>"; };
-		B894EE9521104234009187C9 /* macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = macros.h; sourceTree = "<group>"; };
 		B894EE9621104234009187C9 /* expression_parser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = expression_parser.cc; sourceTree = "<group>"; };
 		B894EE9721104234009187C9 /* handle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handle.h; sourceTree = "<group>"; };
-		B894EE9821104234009187C9 /* local_cfunction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = local_cfunction.h; sourceTree = "<group>"; };
 		B894EE9921104234009187C9 /* exec_state.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exec_state.h; sourceTree = "<group>"; };
 		B894EE9A21104234009187C9 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
 		B894EE9B21104234009187C9 /* table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = table.h; sourceTree = "<group>"; };
 		B894EE9C21104234009187C9 /* vm_mem.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vm_mem.cc; sourceTree = "<group>"; };
 		B894EE9D21104234009187C9 /* token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = token.h; sourceTree = "<group>"; };
-		B894EE9E21104234009187C9 /* local_cfunction.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = local_cfunction.cc; sourceTree = "<group>"; };
 		B894EE9F21104234009187C9 /* vm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vm.h; sourceTree = "<group>"; };
 		B894EEA021104234009187C9 /* op_code.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = op_code.h; sourceTree = "<group>"; };
 		B894EEA121104234009187C9 /* ast_visitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ast_visitor.h; sourceTree = "<group>"; };
@@ -1453,6 +1446,17 @@
 				744BEA571D0520F300452B5D /* WXComponent+Layout.h */,
 			);
 			name = Layout;
+			sourceTree = "<group>";
+		};
+		45FA8EB0211B150B00280226 /* json11 */ = {
+			isa = PBXGroup;
+			children = (
+				45FA8EB1211B150B00280226 /* CMakeLists.txt */,
+				45FA8EB2211B150B00280226 /* json11.cc */,
+				45FA8EB3211B150B00280226 /* json11.hpp */,
+			);
+			name = json11;
+			path = ../../../../weex_core/Source/third_party/json11;
 			sourceTree = "<group>";
 		};
 		59A583031CF5B2FD0081FD3E /* Handler */ = {
@@ -2014,6 +2018,7 @@
 		B82A148120F849800098A509 /* WeexCore */ = {
 			isa = PBXGroup;
 			children = (
+				45FA8EB0211B150B00280226 /* json11 */,
 				B82A148220F849920098A509 /* base */,
 				B82A148720F849920098A509 /* core */,
 				B82A14E120F849920098A509 /* wson */,
@@ -2025,6 +2030,7 @@
 		B82A148220F849920098A509 /* base */ = {
 			isa = PBXGroup;
 			children = (
+				45FA8EAA211B0FF000280226 /* common.h */,
 				B82A148320F849920098A509 /* TimeUtils.h */,
 				B82A148420F849920098A509 /* ViewUtils.h */,
 				B82A148520F849920098A509 /* LogDefines.h */,
@@ -2271,20 +2277,16 @@
 				B894EE8C21104234009187C9 /* vm.cc */,
 				B894EE8D21104234009187C9 /* string_table.h */,
 				B894EE8E21104234009187C9 /* ast.h */,
-				B894EE8F21104234009187C9 /* json */,
 				B894EE9221104234009187C9 /* vm_mem.h */,
 				B894EE9321104234009187C9 /* table_factory.h */,
 				B894EE9421104234009187C9 /* scanner.h */,
-				B894EE9521104234009187C9 /* macros.h */,
 				B894EE9621104234009187C9 /* expression_parser.cc */,
 				B894EE9721104234009187C9 /* handle.h */,
-				B894EE9821104234009187C9 /* local_cfunction.h */,
 				B894EE9921104234009187C9 /* exec_state.h */,
 				B894EE9A21104234009187C9 /* object.h */,
 				B894EE9B21104234009187C9 /* table.h */,
 				B894EE9C21104234009187C9 /* vm_mem.cc */,
 				B894EE9D21104234009187C9 /* token.h */,
-				B894EE9E21104234009187C9 /* local_cfunction.cc */,
 				B894EE9F21104234009187C9 /* vm.h */,
 				B894EEA021104234009187C9 /* op_code.h */,
 				B894EEA121104234009187C9 /* ast_visitor.h */,
@@ -2309,15 +2311,6 @@
 				B894EE8421104234009187C9 /* vnode_render_context.h */,
 			);
 			path = vnode;
-			sourceTree = "<group>";
-		};
-		B894EE8F21104234009187C9 /* json */ = {
-			isa = PBXGroup;
-			children = (
-				B894EE9021104234009187C9 /* json11.hpp */,
-				B894EE9121104234009187C9 /* json11.cc */,
-			);
-			path = json;
 			sourceTree = "<group>";
 		};
 		C4F012711E1502A6003378D0 /* WebSocket */ = {
@@ -2388,7 +2381,6 @@
 				B894EED421104234009187C9 /* string_table.h in Headers */,
 				7410811F1CED585A001BC6E5 /* WXComponentManager.h in Headers */,
 				74CFDD411F45941E007A1A66 /* WXRecycleListTemplateManager.h in Headers */,
-				B894EEE221104234009187C9 /* macros.h in Headers */,
 				1D3000F11D40B9AC004F3B4F /* WXClipboardModule.h in Headers */,
 				59A583081CF5B2FD0081FD3E /* WXNavigationDefaultImpl.h in Headers */,
 				17B122222090AA9300387E33 /* WXSDKInstance_performance.h in Headers */,
@@ -2426,6 +2418,7 @@
 				042013AD1E66CD6A001FC79C /* WXValidateProtocol.h in Headers */,
 				B82A152320F849930098A509 /* render_action_update_attr.h in Headers */,
 				C4D872221E5DDEDA00E39BC1 /* WXInnerLayer.h in Headers */,
+				45FA8EB6211B150B00280226 /* json11.hpp in Headers */,
 				2A919DA61E321F1F006EB6B5 /* WXBridgeMethod.h in Headers */,
 				B82A14ED20F849930098A509 /* LogDefines.h in Headers */,
 				37B51EE41E97804D0040A743 /* WXCycleSliderComponent.h in Headers */,
@@ -2472,7 +2465,6 @@
 				B82A150320F849930098A509 /* js_bridge.h in Headers */,
 				74BF19F81F5139BB00AEE3D7 /* WXJSASTParser.h in Headers */,
 				59A596191CB630E50012CD52 /* WXNavigationProtocol.h in Headers */,
-				B894EEE821104234009187C9 /* local_cfunction.h in Headers */,
 				59A5962F1CB632050012CD52 /* WXBaseViewController.h in Headers */,
 				74AD99841D5B0E59008F0336 /* WXPolyfillSet.h in Headers */,
 				74A4BA961CB365D100195969 /* WXAppConfiguration.h in Headers */,
@@ -2530,6 +2522,7 @@
 				C4B3D6D41E6954300013F38D /* WXEditComponent.h in Headers */,
 				B82A158720F849930098A509 /* weex_core_manager.h in Headers */,
 				74CC7A1C1C2BC5F800829368 /* WXCellComponent.h in Headers */,
+				45FA8EAB211B0FF000280226 /* common.h in Headers */,
 				74896F301D1AC79400D1D593 /* NSObject+WXSwizzle.h in Headers */,
 				B894EEF821104235009187C9 /* op_code.h in Headers */,
 				B82A156F20F849930098A509 /* render_type.h in Headers */,
@@ -2568,7 +2561,6 @@
 				B894EEC221104234009187C9 /* vnode_render_context.h in Headers */,
 				D317338C1C57257000BB7539 /* WXTransform.h in Headers */,
 				77D161301C02DE4E0010B15B /* WXComponent.h in Headers */,
-				B894EED821104234009187C9 /* json11.hpp in Headers */,
 				B894EEC621104234009187C9 /* ast_factory.h in Headers */,
 				B82A153920F849930098A509 /* render_action_interface.h in Headers */,
 				2AFEB17B1C747139000507FA /* WXInstanceWrap.h in Headers */,
@@ -2660,7 +2652,6 @@
 				DCA445AB1EFA574100D0CFA8 /* WXPrerenderManager.h in Headers */,
 				B82A14EE20F849930098A509 /* LogDefines.h in Headers */,
 				DCA445BB1EFA57AA00D0CFA8 /* WXDebugTool.h in Headers */,
-				B894EED921104234009187C9 /* json11.hpp in Headers */,
 				B894EED521104234009187C9 /* string_table.h in Headers */,
 				DCA445A91EFA573200D0CFA8 /* WXResourceRequestHandler.h in Headers */,
 				DCA445C41EFA57E300D0CFA8 /* WXAppConfiguration.h in Headers */,
@@ -2793,7 +2784,6 @@
 				B894EEB521104234009187C9 /* vnode.h in Headers */,
 				C42E8FAA1F3C7AA1001EBE9D /* WXTracingProtocol.h in Headers */,
 				DCA446181EFA5A9B00D0CFA8 /* JSValue+Weex.h in Headers */,
-				B894EEE921104234009187C9 /* local_cfunction.h in Headers */,
 				DCA446061EFA5A5B00D0CFA8 /* NSTimer+Weex.h in Headers */,
 				B894EEF721104235009187C9 /* vm.h in Headers */,
 				DCA445D61EFA598600D0CFA8 /* WXView.h in Headers */,
@@ -2821,7 +2811,6 @@
 				DCA445EB1EFA5A0B00D0CFA8 /* WXTextInputComponent.h in Headers */,
 				DCA4460C1EFA5A7600D0CFA8 /* WXThreadSafeMutableDictionary.h in Headers */,
 				B82A156E20F849930098A509 /* render_scroller_factory.h in Headers */,
-				B894EEE321104234009187C9 /* macros.h in Headers */,
 				DCA445CE1EFA593500D0CFA8 /* WXComponent+BoxShadow.h in Headers */,
 				B82A153A20F849930098A509 /* render_action_interface.h in Headers */,
 				74B81AF11F73C3E900D3A61D /* WXJSASTParser.h in Headers */,
@@ -2982,6 +2971,7 @@
 			files = (
 				DC15A3DC2010BC93009C8977 /* weex-rax-api.js in Resources */,
 				DCF0CD9E1EAF3A6B0062CA8F /* native-bundle-main.js in Resources */,
+				45FA8EB4211B150B00280226 /* CMakeLists.txt in Resources */,
 				DCD8D0F32073392A0002C420 /* weex-polyfill.js in Resources */,
 				DC15A3DB2010BC93009C8977 /* weex-main-jsfm.js in Resources */,
 				59AC02511D2A7E6E00355112 /* wx_load_error@3x.png in Resources */,
@@ -3166,7 +3156,6 @@
 				DCF343681E49CAEE00A2FB34 /* WXJSExceptionInfo.m in Sources */,
 				B82A153D20F849930098A509 /* render_action_move_element.cpp in Sources */,
 				B863DF322107308000EA887D /* WXBridgeContext.m in Sources */,
-				B894EEF421104234009187C9 /* local_cfunction.cc in Sources */,
 				59CE27E91CC387DB000BE37A /* WXEmbedComponent.m in Sources */,
 				B894EEC421104234009187C9 /* tokenizer.cc in Sources */,
 				B894EF0221104235009187C9 /* exec_state.cc in Sources */,
@@ -3226,6 +3215,7 @@
 				7408C48F1CFB345D000BCCD0 /* WXComponent+Events.m in Sources */,
 				B89543F320EB18B5006EAD63 /* WXCoreBridge.mm in Sources */,
 				C4F012871E150307003378D0 /* WXWebSocketLoader.m in Sources */,
+				45FA8EB5211B150B00280226 /* json11.cc in Sources */,
 				B82A153320F849930098A509 /* render_action_remove_element.cpp in Sources */,
 				B82A155120F849930098A509 /* render_text.cpp in Sources */,
 				C4D872211E5DDEDA00E39BC1 /* WXInnerLayer.m in Sources */,
@@ -3266,7 +3256,6 @@
 				B82A14F120F849930098A509 /* render_performance.cpp in Sources */,
 				745B2D691E5A8E1E0092D38A /* WXMultiColumnLayout.m in Sources */,
 				77D161391C02DE940010B15B /* WXBridgeManager.m in Sources */,
-				B894EEDA21104234009187C9 /* json11.cc in Sources */,
 				74BF19F91F5139BB00AEE3D7 /* WXJSASTParser.mm in Sources */,
 				B82A159320F849930098A509 /* wson_parser.cpp in Sources */,
 			);
@@ -3359,7 +3348,6 @@
 				DCA4455A1EFA55B300D0CFA8 /* WXSwitchComponent.mm in Sources */,
 				DCA4455B1EFA55B300D0CFA8 /* WXAComponent.m in Sources */,
 				DCA4455C1EFA55B300D0CFA8 /* WXCanvasComponent.m in Sources */,
-				B894EEF521104235009187C9 /* local_cfunction.cc in Sources */,
 				DCA4455D1EFA55B300D0CFA8 /* WXHeaderComponent.mm in Sources */,
 				B894EEC521104234009187C9 /* tokenizer.cc in Sources */,
 				B894EF0321104235009187C9 /* exec_state.cc in Sources */,
@@ -3459,7 +3447,6 @@
 				B82A152A20F849930098A509 /* render_action_layout.cpp in Sources */,
 				DCA4459A1EFA55B300D0CFA8 /* WXResourceRequest.m in Sources */,
 				B82A150A20F849930098A509 /* js_bridge.cpp in Sources */,
-				B894EEDB21104234009187C9 /* json11.cc in Sources */,
 				DCA4459B1EFA55B300D0CFA8 /* WXResourceRequestHandlerDefaultImpl.m in Sources */,
 				DCA4459C1EFA55B300D0CFA8 /* WXResourceResponse.m in Sources */,
 			);

@@ -88,7 +88,7 @@ void CodeGenerator::Visit(ExpressionList* node, void* data) {
 void CodeGenerator::Visit(ChunkStatement* stms, void* data) {
   FuncScope scope(this);
   // For root func
-  long reg = cur_block_->NextRegisterId();
+  cur_block_->NextRegisterId();
   for (int i = 0; i < stms->statements()->raw_list().size(); ++i) {
     auto temp = stms->statements()->raw_list()[i].get();
     if (temp != NULL) {
@@ -134,11 +134,11 @@ void CodeGenerator::Visit(IfStatement* node, void* data) {
     node->condition()->Accept(this, &condition);
   }
   auto slot = cur_func_->func_state()->AddInstruction(0);
-  int tb_start_index = cur_func_->func_state()->instructions().size() - 1;
+  unsigned long tb_start_index = cur_func_->func_state()->instructions().size() - 1;
   if (node->body().get() != NULL) {
     node->body()->Accept(this, nullptr);
   }
-  int tb_end_index = cur_func_->func_state()->instructions().size() - 1;
+  unsigned long tb_end_index = cur_func_->func_state()->instructions().size() - 1;
 
   FuncState* state = cur_func_->func_state();
   state->ReplaceInstruction(
@@ -151,12 +151,12 @@ void CodeGenerator::Visit(IfElseStatement* node, void* data) {
     node->condition()->Accept(this, &ifcondition);
   }
   auto slot = cur_func_->func_state()->AddInstruction(0);
-  int tb_start_index = cur_func_->func_state()->instructions().size() - 1;
+  unsigned long tb_start_index = cur_func_->func_state()->instructions().size() - 1;
   if (node->body().get() != NULL) {
     node->body()->Accept(this, nullptr);
   }
-  int tb_end_index = cur_func_->func_state()->instructions().size() - 1;
-  auto else_slot = cur_func_->func_state()->AddInstruction(0);
+  unsigned long tb_end_index = cur_func_->func_state()->instructions().size() - 1;
+  cur_func_->func_state()->AddInstruction(0);
 
   long else_condition = cur_block_->NextRegisterId();
   if (node->els().get() != NULL) {
@@ -175,7 +175,7 @@ void CodeGenerator::Visit(ForStatement* node, void* data) {
     node->init()->Accept(this, nullptr);
   }
 
-  int condition_start_index =
+  unsigned long condition_start_index =
       cur_func_->func_state()->instructions().size();  // aka next one.
 
   long condition = cur_block_->NextRegisterId();
@@ -197,7 +197,7 @@ void CodeGenerator::Visit(ForStatement* node, void* data) {
   FuncState* state = cur_func_->func_state();
   state->AddInstruction(CREATE_Ax(OP_GOTO, condition_start_index));
 
-  int for_end_index = cur_func_->func_state()->instructions().size() - 1;
+  unsigned long for_end_index = cur_func_->func_state()->instructions().size() - 1;
 
   state->ReplaceInstruction(
       slot, (CREATE_ABx(OP_JMP, condition, for_end_index - slot)));
@@ -251,7 +251,7 @@ void CodeGenerator::Visit(FunctionStatement* node, void* data) {
 
   } else {
     // inside function
-    int index = cur_func_->func_state()->children().size() - 1;
+    unsigned long index = cur_func_->func_state()->children().size() - 1;
     Instruction i = CREATE_ABx(OP_GETFUNC, reg, index);
     cur_func_->func_state()->ReplaceInstruction(slot, i);
     cur_block_->variables().insert(std::make_pair(proto->GetName(), reg));
@@ -482,7 +482,7 @@ void CodeGenerator::Visit(Identifier* node, void* data) {
   if (reg_a >= 0) {
     FuncState* state = cur_func_->func_state();
 
-    int reg_b = cur_block_->FindRegisterId(node->GetName());
+    long reg_b = cur_block_->FindRegisterId(node->GetName());
     if (reg_b >= 0) {
       state->AddInstruction(CREATE_ABC(OP_MOVE, reg_a, reg_b, 0));
       return;

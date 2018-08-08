@@ -108,8 +108,8 @@ static Value Slice(ExecState* exec_state) {
     return Value();
   }
   Table* p_table = TableValue(table);
-  unsigned int v_start = static_cast<unsigned int>(IntValue(start));
-  unsigned int v_end = static_cast<unsigned int>(IntValue(end));
+  unsigned long v_start = IntValue(start);
+  unsigned long v_end = IntValue(end);
   if (v_end > p_table->array->size()) {
     v_end = p_table->array->size();
   }

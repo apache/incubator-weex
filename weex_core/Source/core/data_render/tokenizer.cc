@@ -465,7 +465,7 @@ Token Tokenizer::ParseRegex(bool* ok) {
       if (ch == '\n') {
         _ PutBack('\n');
       }
-      for (int i = buffer.length() - 1; i >= 0; i--) {
+      for (long i = buffer.length() - 1; i >= 0; i--) {
         _ PutBack(buffer[i]);
       }
       return Token(std::string("ERROR"), Token::ERROR, position, seek);
