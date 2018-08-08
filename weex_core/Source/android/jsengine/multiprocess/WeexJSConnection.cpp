@@ -180,7 +180,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
     throw IPCException("failed to fork: %s", strerror(myerrno));
   } else if (child == 0) {
     // the child
-//    closeAllButThis(fd, fd2);
+    closeAllButThis(fd, fd2);
     // implements close all but handles[1]
     // do exec
     doExec(fd, fd2, true, startupPie);
