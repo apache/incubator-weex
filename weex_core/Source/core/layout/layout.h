@@ -217,7 +217,7 @@ namespace WeexCore {
 
     WXCoreMeasureFunc measureFunc = nullptr;
 
-    void *context;
+    void *context = nullptr;
 
     /** ================================ Cache：Last calculate result =================================== **/
 
