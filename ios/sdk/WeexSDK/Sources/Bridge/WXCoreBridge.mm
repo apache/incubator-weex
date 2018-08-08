@@ -671,12 +671,23 @@ static WeexCore::JSBridge* jsBridge = nullptr;
 + (void)createInstance:(NSString *)pageId
               template:(NSString *)jsBundleString
                options:(NSDictionary *)options
-                  data:(id)data
 {
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
     NSString *optionsString = [WXUtility JSONString:options];
     
     node_manager->CreatePage([jsBundleString UTF8String], [pageId UTF8String], [optionsString UTF8String]);
+}
+
++ (void)destroyInstance:(NSString *)pageId
+{
+    auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+    node_manager->ClosePage([pageId UTF8String]);
+}
+
++ (void)refreshInstance:(NSString *)pageId data:(id)data;
+{
+    auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+    node_manager->RefreshPage([pageId UTF8String], [data UTF8String]);
 }
 
 

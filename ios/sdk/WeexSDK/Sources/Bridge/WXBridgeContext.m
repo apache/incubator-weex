@@ -617,6 +617,14 @@ _Pragma("clang diagnostic pop") \
 {
     WXAssertBridgeThread();
     WXAssertParam(instanceIdString);
+
+    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
+    if (sdkInstance.dataRender) {
+        WXPerformBlockOnComponentThread(^{
+            [WXCoreBridge createInstance:instanceIdString template:jsBundleString options:options];
+        });
+        return;
+    }
 	
 	@synchronized(self) {
 		if (![self.insStack containsObject:instanceIdString]) {
@@ -631,116 +639,105 @@ _Pragma("clang diagnostic pop") \
     //create a sendQueue bind to the current instance
     NSMutableArray *sendQueue = [NSMutableArray array];
     [self.sendQueue setValue:sendQueue forKey:instanceIdString];
+    NSArray *args = nil;
     WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instanceIdString]);
     WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
     BOOL shoudMultiContext = [WXSDKManager sharedInstance].multiContext;
+    __weak typeof(self) weakSelf = self;
+    NSString * bundleType = nil;
     
-#ifdef WX_IMPORT_WEEXCORE
-    if ([options[@"DATA_RENDER"] boolValue]) {
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge createInstance:instanceIdString template:jsBundleString options:options data:data];
-        });
-    } else {
-#endif
-        NSArray *args = nil;
-        __weak typeof(self) weakSelf = self;
-        NSString * bundleType = nil;
-        
-        if (shoudMultiContext) {
-            bundleType = [self _pareJSBundleType:instanceIdString jsBundleString:jsBundleString]; // bundleType can be Vue, Rax and the new framework.
+    if (shoudMultiContext) {
+        bundleType = [self _pareJSBundleType:instanceIdString jsBundleString:jsBundleString]; // bundleType can be Vue, Rax and the new framework.
+    }
+    if (bundleType&&shoudMultiContext) {
+        NSMutableDictionary *newOptions = [options mutableCopy];
+        if (!options) {
+            newOptions = [NSMutableDictionary new];
         }
-        if (bundleType&&shoudMultiContext) {
-            NSMutableDictionary *newOptions = [options mutableCopy];
-            if (!options) {
-                newOptions = [NSMutableDictionary new];
+        [newOptions addEntriesFromDictionary:@{@"env":[WXUtility getEnvironment]}];
+        newOptions[@"bundleType"] = bundleType;
+        NSString *raxAPIScript = nil;
+        NSString *raxAPIScriptPath = nil;
+        WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
+        sdkInstance.bundleType = bundleType;
+        if ([bundleType.lowercaseString isEqualToString:@"rax"]) {
+            raxAPIScriptPath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-rax-api" ofType:@"js"];
+            if (raxAPIScriptPath == nil) {
+                raxAPIScriptPath = [[NSBundle mainBundle] pathForResource:@"weex-rax-api" ofType:@"js"];
             }
-            [newOptions addEntriesFromDictionary:@{@"env":[WXUtility getEnvironment]}];
-            newOptions[@"bundleType"] = bundleType;
-            NSString *raxAPIScript = nil;
-            NSString *raxAPIScriptPath = nil;
-            WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
-            sdkInstance.bundleType = bundleType;
-            if ([bundleType.lowercaseString isEqualToString:@"rax"]) {
-                raxAPIScriptPath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-rax-api" ofType:@"js"];
-                if (raxAPIScriptPath == nil) {
-                    raxAPIScriptPath = [[NSBundle mainBundle] pathForResource:@"weex-rax-api" ofType:@"js"];
-                }
-                raxAPIScript = [NSString stringWithContentsOfFile:raxAPIScriptPath encoding:NSUTF8StringEncoding error:nil];
-                if (!raxAPIScript) {
-                    WXLogError(@"weex-rax-api can not found");
-                }
+            raxAPIScript = [NSString stringWithContentsOfFile:raxAPIScriptPath encoding:NSUTF8StringEncoding error:nil];
+            if (!raxAPIScript) {
+                WXLogError(@"weex-rax-api can not found");
             }
+        }
+        
+        if ([WXDebugTool isDevToolDebug]) {
+            [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[],raxAPIScript?:@""]];
             
-            if ([WXDebugTool isDevToolDebug]) {
-                [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[],raxAPIScript?:@""]];
+            if ([NSURL URLWithString:sdkInstance.pageName]) {
+                [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]];
+            } else {
+                [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
+            }
+        } else {
+            sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@",instanceIdString, newOptions,data];
+            [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
+                if (sdkInstance.pageName) {
+                    if (@available(iOS 8.0, *)) {
+                        [sdkInstance.instanceJavaScriptContext.javaScriptContext setName:sdkInstance.pageName];
+                    } else {
+                        // Fallback
+                    }
+                }
                 
-                if ([NSURL URLWithString:sdkInstance.pageName]) {
-                    [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]];
+                NSDictionary* envDic = [instanceContextEnvironment toDictionary];
+                sdkInstance.createInstanceContextResult = [NSString stringWithFormat:@"%@", [envDic allKeys]];
+                JSGlobalContextRef instanceContextRef = sdkInstance.instanceJavaScriptContext.javaScriptContext.JSGlobalContextRef;
+                JSObjectRef instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
+                
+                for (NSString * key in [envDic allKeys]) {
+                    JSStringRef propertyName = JSStringCreateWithUTF8CString([key cStringUsingEncoding:NSUTF8StringEncoding]);
+                    if ([key isEqualToString:@"Vue"]) {
+                        JSObjectSetPrototype(instanceContextRef, JSValueToObject(instanceContextRef, [instanceContextEnvironment valueForProperty:key].JSValueRef, NULL), JSObjectGetPrototype(instanceContextRef, instanceGlobalObject));
+                    }
+                    JSObjectSetProperty(instanceContextRef, instanceGlobalObject, propertyName, [instanceContextEnvironment valueForProperty:key].JSValueRef, 0, NULL);
+                }
+                
+                if (WX_SYS_VERSION_LESS_THAN(@"10.2")) {
+                    NSString *filePath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-polyfill" ofType:@"js"];
+                    if (filePath == nil) {
+                        filePath = [[NSBundle mainBundle] pathForResource:@"weex-polyfill" ofType:@"js"];
+                    }
+                    NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
+                    if (script) {
+                        [sdkInstance.instanceJavaScriptContext executeJavascript:script withSourceURL:[NSURL URLWithString:filePath]];
+                    } else {
+                        WXLogError(@"weex-pollyfill can not found");
+                    }
+                }
+                
+                if (raxAPIScript) {
+                    [sdkInstance.instanceJavaScriptContext executeJavascript:raxAPIScript withSourceURL:[NSURL URLWithString:raxAPIScriptPath]];
+                    sdkInstance.executeRaxApiResult = [NSString stringWithFormat:@"%@", [[sdkInstance.instanceJavaScriptContext.javaScriptContext.globalObject toDictionary] allKeys]];
+                }
+                
+                if ([NSURL URLWithString:sdkInstance.pageName] || sdkInstance.scriptURL) {
+                    [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]?:sdkInstance.scriptURL];
                 } else {
                     [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
                 }
-            } else {
-                sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@",instanceIdString, newOptions,data];
-                [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
-                    if (sdkInstance.pageName) {
-                        if (@available(iOS 8.0, *)) {
-                            [sdkInstance.instanceJavaScriptContext.javaScriptContext setName:sdkInstance.pageName];
-                        } else {
-                            // Fallback
-                        }
-                    }
-                    
-                    NSDictionary* envDic = [instanceContextEnvironment toDictionary];
-                    sdkInstance.createInstanceContextResult = [NSString stringWithFormat:@"%@", [envDic allKeys]];
-                    JSGlobalContextRef instanceContextRef = sdkInstance.instanceJavaScriptContext.javaScriptContext.JSGlobalContextRef;
-                    JSObjectRef instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
-                    
-                    for (NSString * key in [envDic allKeys]) {
-                        JSStringRef propertyName = JSStringCreateWithUTF8CString([key cStringUsingEncoding:NSUTF8StringEncoding]);
-                        if ([key isEqualToString:@"Vue"]) {
-                            JSObjectSetPrototype(instanceContextRef, JSValueToObject(instanceContextRef, [instanceContextEnvironment valueForProperty:key].JSValueRef, NULL), JSObjectGetPrototype(instanceContextRef, instanceGlobalObject));
-                        }
-                        JSObjectSetProperty(instanceContextRef, instanceGlobalObject, propertyName, [instanceContextEnvironment valueForProperty:key].JSValueRef, 0, NULL);
-                    }
-                    
-                    if (WX_SYS_VERSION_LESS_THAN(@"10.2")) {
-                        NSString *filePath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-polyfill" ofType:@"js"];
-                        if (filePath == nil) {
-                            filePath = [[NSBundle mainBundle] pathForResource:@"weex-polyfill" ofType:@"js"];
-                        }
-                        NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
-                        if (script) {
-                            [sdkInstance.instanceJavaScriptContext executeJavascript:script withSourceURL:[NSURL URLWithString:filePath]];
-                        } else {
-                            WXLogError(@"weex-pollyfill can not found");
-                        }
-                    }
-                    
-                    if (raxAPIScript) {
-                        [sdkInstance.instanceJavaScriptContext executeJavascript:raxAPIScript withSourceURL:[NSURL URLWithString:raxAPIScriptPath]];
-                        sdkInstance.executeRaxApiResult = [NSString stringWithFormat:@"%@", [[sdkInstance.instanceJavaScriptContext.javaScriptContext.globalObject toDictionary] allKeys]];
-                    }
-                    
-                    if ([NSURL URLWithString:sdkInstance.pageName] || sdkInstance.scriptURL) {
-                        [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]?:sdkInstance.scriptURL];
-                    } else {
-                        [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
-                    }
-                    
-                }];
-            }
-            
-        } else {
-            if (data){
-                args = @[instanceIdString, jsBundleString, options ?: @{}, data];
-            } else {
-                args = @[instanceIdString, jsBundleString, options ?: @{}];
-            }
-            [self callJSMethod:@"createInstance" args:args];
+                
+            }];
         }
-#ifdef WX_IMPORT_WEEXCORE
+        
+    } else {
+        if (data){
+            args = @[instanceIdString, jsBundleString, options ?: @{}, data];
+        } else {
+            args = @[instanceIdString, jsBundleString, options ?: @{}];
+        }
+        [self callJSMethod:@"createInstance" args:args];
     }
-#endif
     
     WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
 }
@@ -831,6 +828,13 @@ _Pragma("clang diagnostic pop") \
     WXAssertBridgeThread();
     WXAssertParam(instance);
     
+    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
+    if (sdkInstance.dataRender) {
+        WXPerformBlockOnComponentThread(^{
+            [WXCoreBridge destroyInstance:instance];
+        });
+        return;
+    }
     //remove instance from stack
 	@synchronized(self) {
 		[self.insStack removeObject:instance];
@@ -862,6 +866,14 @@ _Pragma("clang diagnostic pop") \
     
     if (!data) return;
     
+    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
+    if (sdkInstance.dataRender) {
+        WXPerformBlockOnComponentThread(^{
+            [WXCoreBridge refreshInstance:instance data:data];
+        });
+        return;
+    }
+
     [self callJSMethod:@"refreshInstance" args:@[instance, data]];
 }
 

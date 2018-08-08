@@ -84,6 +84,7 @@ typedef enum : NSUInteger {
     id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context    
     CGFloat _defaultPixelScaleFactor;
     BOOL _bReleaseInstanceInMainThread;
+    BOOL _defaultDataRender;
 }
 
 - (void)dealloc
@@ -131,6 +132,7 @@ typedef enum : NSUInteger {
         }
         _defaultPixelScaleFactor = CGFLOAT_MIN;
         _bReleaseInstanceInMainThread = YES;
+        _defaultDataRender = NO;
         
         [self addObservers];
     }
@@ -635,6 +637,14 @@ typedef enum : NSUInteger {
         _defaultPixelScaleFactor = [WXUtility defaultPixelScaleFactor];
         return _defaultPixelScaleFactor;
     }
+}
+
+- (BOOL)dataRender
+{
+    if ([_options[@"DATA_RENDER"] boolValue]) {
+        return YES;
+    }
+    return _defaultDataRender;
 }
 
 - (NSURL *)completeURL:(NSString *)url

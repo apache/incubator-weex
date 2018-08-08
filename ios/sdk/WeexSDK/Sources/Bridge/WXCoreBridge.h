@@ -123,8 +123,11 @@ namespace WeexCore
 
 + (void)createInstance:(NSString *)pageId
               template:(NSString *)temp
-               options:(NSDictionary *)options
-                  data:(id)data;
+               options:(NSDictionary *)options;
+
++ (void)destroyInstance:(NSString *)pageId;
+
++ (void)refreshInstance:(NSString *)pageId data:(id)data;
 
 + (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
                  isWidthWrapContent:(BOOL)isWidthWrapContent
