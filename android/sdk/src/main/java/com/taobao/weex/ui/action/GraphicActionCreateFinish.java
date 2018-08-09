@@ -69,5 +69,6 @@ public class GraphicActionCreateFinish extends BasicGraphicAction {
     if (null != instance.getWXPerformance()){
       instance.getWXPerformance().callCreateFinishTime = System.currentTimeMillis()-instance.getWXPerformance().renderTimeOrigin;
     }
+    instance.onOldFsRenderTimeLogic();
   }
 }

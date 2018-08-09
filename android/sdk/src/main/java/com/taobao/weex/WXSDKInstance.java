@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -580,7 +580,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (mRendered || TextUtils.isEmpty(template)) {
       return;
     }
-    
+
     mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_RENDER_ORGIGIN,System.currentTimeMillis());
 
     mWXPerformance.pageName = (TextUtils.isEmpty(pageName) ? "defaultBundleUrl":pageName);
@@ -1334,27 +1334,37 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       mWXPerformance.mActionAddElementSumTime += time;
   }
 
-  public void firstScreenRenderFinished() {
-      if (mEnd)
-          return;
-
+  public void onOldFsRenderTimeLogic(){
+      if (mEnd){
+        return;
+      }
       mEnd = true;
+      if (mStatisticsListener != null && mContext != null) {
+        runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+            if (mStatisticsListener != null && mContext != null) {
+              Trace.beginSection("onFirstScreen");
+              mStatisticsListener.onFirstScreen();
+              Trace.endSection();
+            }
+          }
+        });
+      }
+      mApmForInstance.arriveFSRenderTime();
+      mWXPerformance.fsRenderTime = System.currentTimeMillis();
+      mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
+      long[] fitstScreenPerformance = WXBridgeManager.getInstance().getFirstScreenRenderTime(getInstanceId());
+      WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
+      WXLogUtils.renderPerformanceLog("    firstScreenJSFExecuteTime", mWXPerformance.firstScreenJSFExecuteTime);
+      WXLogUtils.renderPerformanceLog("    firstScreenCallBridgeTime", fitstScreenPerformance[0]);
+      WXLogUtils.renderPerformanceLog("    firstScreenCssLayoutTime", fitstScreenPerformance[1]);
+      WXLogUtils.renderPerformanceLog("    firstScreenParseJsonTime", fitstScreenPerformance[2]);
+  }
+
+  public void firstScreenRenderFinished() {
 
       mApmForInstance.arriveFSRenderTime();
-
-      if (mStatisticsListener != null && mContext != null) {
-          runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                  if (mStatisticsListener != null && mContext != null) {
-                      Trace.beginSection("onFirstScreen");
-                      mStatisticsListener.onFirstScreen();
-                      Trace.endSection();
-                  }
-              }
-          });
-      }
-
       mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
       if (!mHasSetCreateFinishFsTime) {
         mWXPerformance.fsRenderTime = System.currentTimeMillis();
@@ -1362,13 +1372,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           mHasSetCreateFinishFsTime = true;
       }
       mWXPerformance.newFsRenderTime = System.currentTimeMillis() - mRenderStartTime;
-      long[] fitstScreenPerformance = WXBridgeManager.getInstance().getFirstScreenRenderTime(getInstanceId());
-      WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
-      WXLogUtils.renderPerformanceLog("newFsRenderTime", mWXPerformance.newFsRenderTime);
-      WXLogUtils.renderPerformanceLog("    firstScreenJSFExecuteTime", mWXPerformance.firstScreenJSFExecuteTime);
-      WXLogUtils.renderPerformanceLog("    firstScreenCallBridgeTime", fitstScreenPerformance[0]);
-      WXLogUtils.renderPerformanceLog("    firstScreenCssLayoutTime", fitstScreenPerformance[1]);
-      WXLogUtils.renderPerformanceLog("    firstScreenParseJsonTime", fitstScreenPerformance[2]);
   }
 
   private void destroyView(View rootView) {

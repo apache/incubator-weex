@@ -50,6 +50,7 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STAGES_LOAD_BUNDLE_START = "wxStartLoadBundle";
     public static final String KEY_PAGE_STAGES_LOAD_BUNDLE_END = "wxEndLoadBundle";
     public static final String KEY_PAGE_STAGES_FSRENDER = "wxFsRender";
+    public static final String KEY_PAGE_STAGES_NEW_FSRENDER = "wxNewFsRender";
     public static final String KEY_PAGE_STAGES_INTERACTION = "wxInteraction";
     public static final String KEY_PAGE_STAGES_DESTROY = "wxDestroy";
 
@@ -192,7 +193,11 @@ public class WXInstanceApm {
     }
 
     public void arriveFSRenderTime() {
-        if (null == apmInstance || isFSEnd) {
+        if (null == apmInstance){
+            return;
+        }
+        onStage(WXInstanceApm.KEY_PAGE_STAGES_NEW_FSRENDER, System.currentTimeMillis());
+        if (isFSEnd) {
             return;
         }
         isFSEnd = true;
