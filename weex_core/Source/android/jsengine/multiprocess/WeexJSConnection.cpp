@@ -39,7 +39,7 @@ extern const char *s_cacheDir;
 extern const char *g_jssSoPath;
 extern const char *g_jssSoName;
 extern bool s_start_pie;
-
+static bool s_in_find_icu = false;
 static void doExec(int fd, bool traceEnable, bool startupPie = true);
 
 static int copyFile(const char *SourceFile, const char *NewFile);
@@ -138,6 +138,9 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
     } catch (IPCException &e) {
       LOGE("WeexJSConnection catch: %s", e.msg());
       // TODO throw exception
+      if(s_in_find_icu) {
+        WeexCore::WeexProxy::reportNativeInitStatus("-1013", "find icu timeout");
+      }
       return nullptr;
     }
   }
@@ -236,7 +239,9 @@ std::unique_ptr<const char *[]> EnvPBuilder::build() {
 void doExec(int fd, bool traceEnable, bool startupPie) {
   std::string executablePath;
   std::string icuDataPath;
+  s_in_find_icu = true;
   findIcuDataPath(icuDataPath);
+  s_in_find_icu = false;
   if(g_jssSoPath != nullptr) {
     executablePath = g_jssSoPath;
   }
