@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -28,6 +28,7 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
+import com.taobao.weex.performance.IApmGenerator;
 
 /**
  * Created by sospartan on 5/31/16.
@@ -44,6 +45,7 @@ public class InitConfig {
   private IWXJSExceptionAdapter mJSExceptionAdapter;
   private String framework;
   private ClassLoaderAdapter classLoaderAdapter;
+  private IApmGenerator apmGenerater;
 
   public IWXHttpAdapter getHttpAdapter() {
     return httpAdapter;
@@ -85,6 +87,10 @@ public class InitConfig {
     return classLoaderAdapter;
   }
 
+  public IApmGenerator getApmGenerater() {
+    return apmGenerater;
+  }
+
   public InitConfig setClassLoaderAdapter(ClassLoaderAdapter classLoaderAdapter) {
     this.classLoaderAdapter = classLoaderAdapter;
     return this;
@@ -109,6 +115,7 @@ public class InitConfig {
     String framework;
     IWebSocketAdapterFactory webSocketAdapterFactory;
     ClassLoaderAdapter classLoaderAdapter;
+    IApmGenerator apmGenerater;
 
     public Builder(){
 
@@ -169,6 +176,11 @@ public class InitConfig {
       return this;
     }
 
+    public Builder setApmGenerater(IApmGenerator apmGenerater){
+      this.apmGenerater =apmGenerater;
+      return this;
+    }
+
     public InitConfig build(){
       InitConfig config =  new InitConfig();
       config.httpAdapter = this.httpAdapter;
@@ -182,6 +194,7 @@ public class InitConfig {
       config.webSocketAdapterFactory = this.webSocketAdapterFactory;
       config.mJSExceptionAdapter=this.mJSExceptionAdapter;
       config.classLoaderAdapter = this.classLoaderAdapter;
+      config.apmGenerater = this.apmGenerater;
       return config;
     }
   }

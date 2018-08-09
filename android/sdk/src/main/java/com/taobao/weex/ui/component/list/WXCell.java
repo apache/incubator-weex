@@ -22,6 +22,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -30,6 +31,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXAttr;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.flat.WidgetContainer;
@@ -37,6 +39,7 @@ import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
+import org.w3c.dom.Text;
 
 import java.util.LinkedList;
 
@@ -85,6 +88,12 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
             } catch (NullPointerException e) {
                 WXLogUtils.e("Cell", WXLogUtils.getStackTrace(e));
             }
+        }
+        if (!canRecycled()){
+            instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_CELL_DATA_UN_RECYCLE_NUM,1);
+        }
+        if (TextUtils.isEmpty(getAttrs().getScope())){
+            instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_CELL_UN_RE_USE_NUM,1);
         }
     }
 

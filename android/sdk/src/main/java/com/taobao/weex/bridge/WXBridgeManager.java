@@ -43,6 +43,7 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.*;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.action.*;
 import com.taobao.weex.ui.component.WXComponent;
@@ -1201,8 +1202,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       @Override
       public void run() {
         long start = System.currentTimeMillis();
+        instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_START,start);
         invokeCreateInstance(instance, template, options, data);
-        instance.getWXPerformance().callCreateInstanceTime = System.currentTimeMillis();
+        long end = System.currentTimeMillis();
+        instance.getWXPerformance().callCreateInstanceTime = end;
+        instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END,end);
+
         long totalTime =  instance.getWXPerformance().callCreateInstanceTime - start;
         if (totalTime > 0) {
           instance.getWXPerformance().communicateTime = totalTime;
@@ -1524,7 +1529,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     mWXBridge.execJS(instanceId, namespace, function, args);
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (null != instance){
-      instance.callJsTime(System.currentTimeMillis()-start);
+      long diff = System.currentTimeMillis()-start;
+      instance.getApmForInstance().updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_CALL_JS_NUM,1);
+      instance.getApmForInstance().updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_CALL_JS_TIME,diff);
+      instance.callJsTime(diff);
     }
   }
 

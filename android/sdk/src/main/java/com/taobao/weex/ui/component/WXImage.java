@@ -54,6 +54,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXImageView;
@@ -134,6 +135,9 @@ public class WXImage extends WXComponent<ImageView> {
         return true;
       case Constants.Name.AUTO_RECYCLE:
         mAutoRecycle = WXUtils.getBoolean(param, mAutoRecycle);
+        if (!mAutoRecycle && null != getInstance()){
+          getInstance().getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_IMG_UN_RECYCLE_NUM,1);
+        }
         return true;
       case Constants.Name.FILTER:
         int blurRadius = 0;
@@ -294,7 +298,7 @@ public class WXImage extends WXComponent<ImageView> {
 
   private void setRemoteSrc(Uri rewrited,int blurRadius) {
 
-    WXImageStrategy imageStrategy = new WXImageStrategy();
+    WXImageStrategy imageStrategy = new WXImageStrategy(getInstanceId());
     imageStrategy.isClipping = true;
 
     WXImageSharpen imageSharpen = getAttrs().getImageSharpen();
@@ -467,6 +471,7 @@ public class WXImage extends WXComponent<ImageView> {
     if (img.getIntrinsicHeight() * img.getIntrinsicWidth() > imageView.getMeasuredHeight() *
             imageView.getMeasuredWidth()){
       instance.getWXPerformance().wrongImgSizeCount++;
+      instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,1);
     }
   }
 
