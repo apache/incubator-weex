@@ -70,7 +70,6 @@ struct ThreadData {
     int ipcServerFd;
     IPCHandler *ipcServerHandler;
 };
-pthread_t ipcServerThread;
 static volatile bool finish = false;
 
 
@@ -97,7 +96,6 @@ static void *newIPCServer(void *_td) {
       listener->listen();
     } catch (IPCException &e) {
         LOGE("server died");
-//        killIpcServer();
         close(td->ipcServerFd);
     }
 }
@@ -129,10 +127,9 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
 
   pthread_attr_t threadAttr;
   finish = false;
-  if (ipcServerThread != 0)
-    pthread_kill(ipcServerThread, 0);
 
   pthread_attr_init(&threadAttr);
+  pthread_t ipcServerThread;
   int i = pthread_create(&ipcServerThread, &threadAttr, newIPCServer, &td);
   while (!finish) {
     continue;
