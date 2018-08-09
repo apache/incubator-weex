@@ -296,6 +296,7 @@ static NSThread *WXComponentThread;
 
     
     [supercomponent _insertSubcomponent:component atIndex:index];
+    [supercomponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_MAX_COMPONENT_NUM curMaxValue:[supercomponent.weexInstance numberOfComponents]];
     // use _lazyCreateView to forbid component like cell's view creating
     if(supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
@@ -396,6 +397,7 @@ static NSThread *WXComponentThread;
         maxDeep++;
         component = component.supercomponent;
     }
+    [self.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_MAX_DEEP_DOM curMaxValue:maxDeep];
     if(maxDeep > [self weexInstance].performance.maxVdomDeep)
     {
         [self weexInstance].performance.maxVdomDeep = maxDeep;

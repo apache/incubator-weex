@@ -351,6 +351,10 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     {
         instance.performance.fsCallEventNum++;
     }
+    if (instance && !instance.apmInstance.isFSEnd) {
+        [instance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_EVENT_NUM withDiffValue:1];
+    }
+    
     WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"fireEvent" arguments:args instance:instance];
     [self callJsMethod:method];
 }

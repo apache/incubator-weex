@@ -969,6 +969,12 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
     }
     return nil;
 }
+
++ (long) getUnixCurrentTimeMillis
+{
+    return [[NSDate date] timeIntervalSince1970] * 1000;
+}
+
 @end
 
 

@@ -130,6 +130,7 @@ bool flexIsUndefined(float value) {
         CGFloat mainScreenHeight = [[UIScreen mainScreen] bounds].size.height;
         if (mainScreenHeight/2 < _calculatedFrame.size.height && mainScreenWidth/2 < _calculatedFrame.size.width) {
             [self weexInstance].performance.cellExceedNum++;
+            [self.weexInstance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_CELL_EXCEED_NUM withDiffValue:1];
         }
     }
     

@@ -54,6 +54,13 @@
         if (attributes[@"zIndex"]) {
             _zIndex = [WXConvert NSString:attributes[@"zIndex"]];
         }
+        if (!_isRecycle) {
+            [weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_CELL_UN_RE_USE_NUM withDiffValue:1];
+            //for protocol
+            //in iOS impl,cellReuse equal cellDataRecycle
+            //in Android, cellReuse is not equal cellDataRecycle
+            [weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_CELL_DATA_UN_RECYCLE_NUM withDiffValue:1];
+        }
     }
     
     return self;

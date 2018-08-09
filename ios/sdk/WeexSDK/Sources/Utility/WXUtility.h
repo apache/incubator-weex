@@ -493,4 +493,6 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
 
 + (BOOL)listSectionRowThreadSafe;
 
++ (long) getUnixCurrentTimeMillis;
+
 @end

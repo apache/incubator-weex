@@ -37,6 +37,7 @@
 #import "WXConfigCenterDefaultImpl.h"
 #import "WXNavigationHandlerImpl.h"
 //#import "WXAnalyzerCenter.h"
+#import "WXApmGeneratorImpl.h"
 
 
 #ifdef DEBUG
@@ -123,6 +124,7 @@
     [WXSDKEngine registerHandler:[WXEventModule new] withProtocol:@protocol(WXEventModuleProtocol)];
     [WXSDKEngine registerHandler:[WXConfigCenterDefaultImpl new] withProtocol:@protocol(WXConfigCenterProtocol)];
     [WXSDKEngine registerHandler:[WXNavigationHandlerImpl new] withProtocol:@protocol(WXNavigationProtocol)];
+    [WXSDKEngine registerHandler:[WXApmGeneratorImpl new] withProtocol:@protocol(WXApmGeneratorProtocol)];
     
     [WXSDKEngine registerComponent:@"select" withClass:NSClassFromString(@"WXSelectComponent")];
     [WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];
