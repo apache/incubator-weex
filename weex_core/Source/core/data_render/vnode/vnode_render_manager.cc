@@ -213,6 +213,7 @@ bool VNodeRenderManager::ClosePage(const std::string& page_id) {
 
   ClosePageInternal(page_id);
   delete exec_state;
+  exec_states_.erase(it);
   return true;
 }
 
