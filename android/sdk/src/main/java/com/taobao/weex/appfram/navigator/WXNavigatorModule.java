@@ -116,6 +116,15 @@ public class WXNavigatorModule extends WXModule {
                 }
             }
 
+            if (WXSDKEngine.getNavigator()!= null) {
+                if (WXSDKEngine.getNavigator().push(param)) {
+                    if (callback != null) {
+                        callback.invoke(MSG_SUCCESS);
+                    }
+                    return;
+                }
+            }
+
             try {
                 JSONObject jsonObject = JSON.parseObject(param);
                 String url = jsonObject.getString(URL);
@@ -150,6 +159,16 @@ public class WXNavigatorModule extends WXModule {
 
         if (WXSDKEngine.getActivityNavBarSetter() != null) {
             if (WXSDKEngine.getActivityNavBarSetter().pop(param)) {
+                if (callback != null) {
+                    callback.invoke(MSG_SUCCESS);
+                }
+                return;
+            }
+        }
+
+
+        if (WXSDKEngine.getNavigator()!= null) {
+            if (WXSDKEngine.getNavigator().pop(param)) {
                 if (callback != null) {
                     callback.invoke(MSG_SUCCESS);
                 }
