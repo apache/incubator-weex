@@ -18,6 +18,7 @@
  */
 
 #include "WXCoreLayout.h"
+#include <tuple>
 
 using namespace WeexCore;
 
@@ -192,7 +193,14 @@ namespace WeexCore {
         (widthMeasureMode == kUnspecified
             || heightMeasureMode == kUnspecified)) {
       float constrainsWidth = width;
-      if(widthMeasureMode == kExactly && !isnan(width)){
+      if(isnan(width)){
+        if(!isnan(mCssStyle->mMaxWidth)){
+          constrainsWidth = mCssStyle->mMaxWidth;
+        }
+      }
+
+      if((!isnan(width)&&widthMeasureMode == kExactly) ||
+          (isnan(width) && !isnan(mCssStyle->mMaxWidth))) {
         constrainsWidth -= sumPaddingBorderAlongAxis(this, true);
       }
       WXCoreSize dimension = measureFunc(this, constrainsWidth,
@@ -239,7 +247,6 @@ namespace WeexCore {
         }
       }
     }
-
 
   /**
    * @param flexDirection         the flex direction attribute
@@ -335,9 +342,11 @@ namespace WeexCore {
           child->hypotheticalMeasure(childWidth, childHeight, stretch);
         } else {
           if(isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)
-              && !isMainAxisHorizontal(this) && child->widthMeasureMode == kUnspecified){
-            child->setLayoutWidth(parentWidth - sumPaddingBorderAlongAxis(this, true)
-                                      -child->mCssStyle->sumMarginOfDirection(true));
+              && !isMainAxisHorizontal(this)){
+            if(child->widthMeasureMode == kUnspecified) {
+              child->setLayoutWidth(parentWidth - sumPaddingBorderAlongAxis(this, true)
+                                        - child->mCssStyle->sumMarginOfDirection(true));
+            }
             if(child->heightMeasureMode == kUnspecified && child->widthDirty) {
               child->mLayoutResult->mLayoutSize.height = NAN;
             }
@@ -464,6 +473,11 @@ namespace WeexCore {
       if (isMainAxisHorizontal(this)) {
         child->setWidthMeasureMode(kExactly);
         child->setLayoutWidth(childMainSize);
+        //TODO Fix https://jsplayground.taobao.org/raxplayground/97efee70-775f-45a6-b07d-d84c8d1b4387
+        //TODO This is just a temporary fix, we need to make things beauty and clean.
+        if(child->heightMeasureMode == kUnspecified && child->measureFunc != nullptr && child->getChildCount() == 0){
+          child->setLayoutHeight(NAN);
+        }
       } else {
         child->setHeightMeasureMode(kExactly);
         child->setLayoutHeight(childMainSize);
@@ -494,10 +508,11 @@ namespace WeexCore {
 
     void WXCoreLayoutNode::stretchViewCrossSize(WXCoreLayoutNode* const child, float crossSize){
       if (isMainAxisHorizontal(this)) {
-        if (child->heightMeasureMode != kExactly) {
-            crossSize -=
-                child->mCssStyle->mMargin.getMargin(kMarginTop) +
-                    child->mCssStyle->mMargin.getMargin(kMarginBottom);
+        if (child->heightMeasureMode != kExactly &&
+            !(child->measureFunc != nullptr && child->getChildCount() == 0)) {
+          crossSize -=
+              child->mCssStyle->mMargin.getMargin(kMarginTop) +
+                  child->mCssStyle->mMargin.getMargin(kMarginBottom);
           child->setHeightMeasureMode(kExactly);
           child->setLayoutHeight(std::max(0.f, crossSize));
         }
