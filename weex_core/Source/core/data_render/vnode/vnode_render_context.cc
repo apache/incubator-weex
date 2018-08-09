@@ -16,21 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <android/base/jni/android_jni.h>
-#include "measure_mode_impl_android.h"
-#include <android/jniprebuild/jniheader/MeasureMode_jni.h>
 
-namespace WeexCore {
-  bool RegisterJNIMeasureMode(JNIEnv *env) {
-    RegisterNativesImpl(env);
-  }
+#include "core/data_render/vnode/vnode_render_context.h"
 
-  jint Exactly(JNIEnv *env) {
-    return Java_MeasureMode_getEXACTLY(env);
-  }
+namespace weex {
+namespace core {
+namespace data_render {
 
-  jint Unspecified(JNIEnv *env) {
-    return Java_MeasureMode_getUNSPECIFIED(env);
-  }
+VNodeRenderContext::VNodeRenderContext()
+    : page_id_(), root_(nullptr), raw_json_() {}
+
+VNodeRenderContext::~VNodeRenderContext() {}
+
+void VNodeRenderContext::Reset() {
+  root_ = nullptr;
 }
-
+}  // namespace data_render
+}  // namespace core
+}  // namespace weex

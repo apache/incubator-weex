@@ -18,23 +18,12 @@
  */
 package com.taobao.weex.layout;
 
-import com.taobao.weex.base.CalledByNative;
-
 import java.io.Serializable;
 
 public class MeasureMode implements Serializable {
 
-  public static int EXACTLY = 0;
+  public static int EXACTLY = 1;
 
-  public static int UNSPECIFIED = 1;
+  public static int UNSPECIFIED = 0;
 
-  @CalledByNative
-  public static int getEXACTLY() {
-    return EXACTLY;
-  }
-
-  @CalledByNative
-  public static int getUNSPECIFIED() {
-    return UNSPECIFIED;
-  }
 }

@@ -394,17 +394,26 @@ namespace WeexCore {
     int64_t startTime = getCurrentTime();
 
     JNIEnv *env = getJNIEnv();
+    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jRef = env->NewStringUTF(ref);
 
-    jstring jPageId = getKeyFromCache(env, pageId);
-    jstring jRef = getKeyFromCache(env, ref);
+    jobject jStyles = nullptr;
+    if (styles != nullptr && styles->size() > 0) {
+      jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
+      cpyCMap2JMap(styles, jStyles, env);
+    }
+    jobject jAttributes = nullptr;
+    if (attributes != nullptr && attributes->size() > 0) {
+      jAttributes = env->NewObject(jMapClazz, jMapConstructorMethodId);
+      cpyCMap2JMap(attributes, jAttributes, env);
+    }
 
-    jobject jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
-    jobject jAttributes = env->NewObject(jMapClazz, jMapConstructorMethodId);
-    jobject jEvents = env->NewObject(jSetClazz, jSetConstructorMethodId);
 
-    cpyCMap2JMap(styles, jStyles, env);
-    cpyCMap2JMap(attributes, jAttributes, env);
-    cpyCSet2JSet(events, jEvents, env);
+    jobject jEvents = nullptr;
+    if (events != nullptr && events->size() > 0) {
+      jEvents = env->NewObject(jSetClazz, jSetConstructorMethodId);
+      cpyCSet2JSet(events, jEvents, env);
+    }
 
     float c_margins[4];
     float c_paddings[4];
@@ -435,10 +444,7 @@ namespace WeexCore {
                                                  "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;[F[F[F)I");
 
 
-    jstring jComponentType = getComponentTypeFromCache(componentType);
-    if (jComponentType == nullptr) {
-      jComponentType = putComponentTypeToCache(componentType);
-    }
+    jstring jComponentType = env->NewStringUTF(componentType);
 
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallCreateBodyMethodId, jPageId,
@@ -455,6 +461,9 @@ namespace WeexCore {
     env->DeleteLocalRef(jMargins);
     env->DeleteLocalRef(jPaddings);
     env->DeleteLocalRef(jBorders);
+    env->DeleteLocalRef(jPageId);
+    env->DeleteLocalRef(jComponentType);
+    env->DeleteLocalRef(jRef);
 
     if (page != nullptr)
       page->CallBridgeTime(getCurrentTime() - startTime);
@@ -471,17 +480,26 @@ namespace WeexCore {
                                           const WXCoreBorderWidth &borders,
                                           bool willLayout) {
     JNIEnv *env = getJNIEnv();
-    jstring jPageId = getKeyFromCache(env, pageId);
-    jstring jRef = getKeyFromCache(env, ref);
-    jstring jParentRef = getKeyFromCache(env, parentRef);
+    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jRef = env->NewStringUTF(ref);
+    jstring jParentRef = env->NewStringUTF(parentRef);
 
-    jobject jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
-    jobject jAttributes = env->NewObject(jMapClazz, jMapConstructorMethodId);
-    jobject jEvents = env->NewObject(jSetClazz, jSetConstructorMethodId);
+    jobject jStyles = nullptr;
+    if (styles != nullptr && styles->size() > 0) {
+      jStyles = env->NewObject(jMapClazz, jMapConstructorMethodId);
+      cpyCMap2JMap(styles, jStyles, env);
+    }
+    jobject jAttributes = nullptr;
+    if (attributes != nullptr && attributes->size() > 0) {
+      jAttributes = env->NewObject(jMapClazz, jMapConstructorMethodId);
+      cpyCMap2JMap(attributes, jAttributes, env);
+    }
 
-    cpyCMap2JMap(styles, jStyles, env);
-    cpyCMap2JMap(attributes, jAttributes, env);
-    cpyCSet2JSet(events, jEvents, env);
+    jobject jEvents = nullptr;
+    if (events != nullptr && events->size() > 0) {
+      jEvents = env->NewObject(jSetClazz, jSetConstructorMethodId);
+      cpyCSet2JSet(events, jEvents, env);
+    }
 
     float c_margins[4];
     float c_paddings[4];
@@ -511,10 +529,7 @@ namespace WeexCore {
                                                            "callAddElement",
                                                            "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;Ljava/util/HashSet;[F[F[FZ)I");
 
-    jstring jComponentType = getComponentTypeFromCache(componentType);
-    if (jComponentType == nullptr) {
-      jComponentType = putComponentTypeToCache(componentType);
-    }
+    jstring jComponentType = env->NewStringUTF(componentType);
 
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallAddElementMethodId, jPageId, jComponentType, jRef, index,
@@ -530,6 +545,10 @@ namespace WeexCore {
     env->DeleteLocalRef(jMargins);
     env->DeleteLocalRef(jPaddings);
     env->DeleteLocalRef(jBorders);
+    env->DeleteLocalRef(jPageId);
+    env->DeleteLocalRef(jParentRef);
+    env->DeleteLocalRef(jRef);
+    env->DeleteLocalRef(jComponentType);
 
     return flag;
   }
@@ -743,8 +762,8 @@ namespace WeexCore {
 
     JNIEnv *env = getJNIEnv();
 
-    jstring jPageId = getKeyFromCache(env, pageId);
-    jstring jRef = getKeyFromCache(env, ref);
+    jstring jPageId = env->NewStringUTF(pageId);
+    jstring jRef = env->NewStringUTF(ref);
 
     if (jCallLayoutMethodId == NULL)
       jCallLayoutMethodId = env->GetMethodID(jBridgeClazz,
@@ -754,6 +773,9 @@ namespace WeexCore {
     int flag = 0;
     flag = env->CallIntMethod(jThis, jCallLayoutMethodId, jPageId,
                               jRef, top, bottom, left, right, height, width, index);
+
+    env->DeleteLocalRef(jPageId);
+    env->DeleteLocalRef(jRef);
 
     if (flag == -1) {
       LOGE("instance destroy JFM must stop callLayout");

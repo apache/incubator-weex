@@ -89,6 +89,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   public static class Creator implements ComponentCreator {
     @Override
     public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      // For performance message collection
+      instance.setUseScroller(true);
       return new WXScroller(instance, parent, basicComponentData);
     }
   }

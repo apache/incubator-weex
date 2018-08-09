@@ -16,18 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef WEEX_PROJECT_MEASUREMODE_H
-#define WEEX_PROJECT_MEASUREMODE_H
+#ifndef CORE_DATA_RENDER_TOKENIZER_
+#define CORE_DATA_RENDER_TOKENIZER_
 
-#include <jni.h>
+#include "core/data_render/scanner.h"
+#include "core/data_render/token.h"
 
-namespace WeexCore {
-  bool RegisterJNIMeasureMode(JNIEnv *env);
+namespace weex {
+namespace core {
+namespace data_render {
 
-  jint Exactly(JNIEnv *env);
+class TokenizerState;
 
-  jint Unspecified(JNIEnv *env);
-}
+/*
+ * implementation of complete Tokenizer to be independant of flex
+ */
+class Tokenizer {
+ public:
+  Tokenizer(CharacterStream* stream);
+  ~Tokenizer();
+  Token::Type Peek();
 
+  void Advance(bool divide_expected = false);
 
-#endif //WEEX_PROJECT_MEASUREMODE_H
+  void Reset(CharacterStream* stream);
+
+  Token& CurrentToken();
+
+ private:
+  Token AdvanceInternal(bool not_regex);
+  Token ParseString(char delim);
+  Token ParseNumber(char start);
+  Token ParseRegex(bool* ok);
+
+  TokenizerState* state_;
+};
+}  // namespace data_render
+}  // namespace core
+}  // namespace weex
+#endif  // CORE_DATA_RENDER_TOKENIZER_

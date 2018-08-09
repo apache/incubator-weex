@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.action;
 
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 
@@ -28,9 +29,9 @@ public class GraphicActionUpdateAttr extends BasicGraphicAction {
   private Map<String, String> mAttrs;
   private WXComponent component;
 
-  public GraphicActionUpdateAttr(String pageId, String ref,
+  public GraphicActionUpdateAttr(WXSDKInstance instance, String ref,
                                  Map<String, String> attrs) {
-    super(pageId, ref);
+    super(instance, ref);
     this.mAttrs = attrs;
 
     component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());

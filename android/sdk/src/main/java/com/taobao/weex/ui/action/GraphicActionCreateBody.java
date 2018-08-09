@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.support.annotation.NonNull;
 import android.widget.ScrollView;
 
 import com.taobao.weex.WXSDKInstance;
@@ -33,10 +34,9 @@ import java.util.Set;
 
 public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
 
-  private WXSDKInstance instance;
   private WXComponent component;
 
-  public GraphicActionCreateBody(String pageId, String ref,
+  public GraphicActionCreateBody(@NonNull WXSDKInstance instance, String ref,
                                  String componentType,
                                  Map<String, String> style,
                                  Map<String, String> attributes,
@@ -44,7 +44,7 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
                                  float[] margins,
                                  float[] paddings,
                                  float[] borders) {
-    super(pageId, ref);
+    super(instance, ref);
     this.mComponentType = componentType;
     this.mStyle = style;
     this.mAttributes = attributes;
@@ -53,8 +53,7 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
     this.mPaddings = paddings;
     this.mBorders = borders;
 
-    instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
-    if (instance == null || instance.getContext() == null) {
+    if (instance.getContext() == null) {
       return;
     }
 
@@ -74,6 +73,7 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
       component.createView();
       component.applyLayoutAndEvent(component);
       component.bindData(component);
+      WXSDKInstance instance = getWXSDKIntance();
 
       if (component instanceof WXScroller) {
         WXScroller scroller = (WXScroller) component;

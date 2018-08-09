@@ -21,6 +21,7 @@ package com.taobao.weex.ui.action;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.ui.component.WXComponent;
@@ -40,9 +41,9 @@ public class UpdateComponentDataAction extends BasicGraphicAction{
     private String callback;
 
 
-    public UpdateComponentDataAction(String pageId, String virtualComponentId,
+    public UpdateComponentDataAction(WXSDKInstance instance, String virtualComponentId,
                                      JSONObject data, String callback) {
-        super(pageId, CellDataManager.getListRef(virtualComponentId));
+        super(instance, CellDataManager.getListRef(virtualComponentId));
         this.virtualComponentId = virtualComponentId;
         this.data = data;
         this.callback = callback;

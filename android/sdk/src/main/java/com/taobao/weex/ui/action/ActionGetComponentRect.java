@@ -40,14 +40,14 @@ public class ActionGetComponentRect extends BasicGraphicAction {
 
   private final String mCallback;
 
-  public ActionGetComponentRect(String pageId, String ref, String callback) {
-    super(pageId, ref);
+  public ActionGetComponentRect(WXSDKInstance instance, String ref, String callback) {
+    super(instance, ref);
     this.mCallback = callback;
   }
 
   @Override
   public void executeAction() {
-    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
+    WXSDKInstance instance = getWXSDKIntance();
     if (instance == null || instance.isDestroy()) {
       return;
     }

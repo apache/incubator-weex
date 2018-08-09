@@ -36,7 +36,7 @@ public class WXAnimationModule extends WXModule {
     if (!TextUtils.isEmpty(ref) && !TextUtils.isEmpty(animation) && mWXSDKInstance != null) {
       //Due to animation module rely on the result of the css-layout and the batch mechanism of
       //css-layout, the animation.transition must be delayed the batch time.
-      GraphicActionAnimation action = new GraphicActionAnimation(mWXSDKInstance.getInstanceId(), ref, animation, callBack);
+      GraphicActionAnimation action = new GraphicActionAnimation(mWXSDKInstance, ref, animation, callBack);
       WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
     }
   }
@@ -52,7 +52,7 @@ public class WXAnimationModule extends WXModule {
 
     public void execute(WXSDKInstance instance, WXComponent component) {
       if (null != instance && null != component) {
-        GraphicActionAnimation action = new GraphicActionAnimation(instance.getInstanceId(), component.getRef(), wxAnimationBean, callback);
+        GraphicActionAnimation action = new GraphicActionAnimation(instance, component.getRef(), wxAnimationBean, callback);
         WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
     }
