@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.support.annotation.NonNull;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRenderStrategy;
@@ -31,12 +33,8 @@ public class GraphicActionCreateFinish extends BasicGraphicAction {
   private int mLayoutWidth;
   private int mLayoutHeight;
 
-  public GraphicActionCreateFinish(String pageId) {
-    super(pageId, "");
-    final WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(pageId);
-    if (instance == null) {
-      return;
-    }
+  public GraphicActionCreateFinish(@NonNull WXSDKInstance instance) {
+    super(instance, "");
     WXComponent component = instance.getRootComponent();
     if (null != component) {
         this.mLayoutWidth = (int) component.getLayoutWidth();
@@ -57,7 +55,7 @@ public class GraphicActionCreateFinish extends BasicGraphicAction {
 
   @Override
   public void executeAction() {
-    final WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
+    final WXSDKInstance instance = getWXSDKIntance();
     if (instance == null || instance.getContext() == null) {
       return;
     }

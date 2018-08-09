@@ -53,14 +53,35 @@ set(COMMON_SRCS
   ./core/bridge/js_bridge.cpp
   ./core/parser/dom_wson.cpp
    ./core/bridge/bridge.cpp
+
+   ./core/data_render/ast.cc
+   ./core/data_render/ast_factory.cc
+   ./core/data_render/parser.cc
+   ./core/data_render/token.cc
+   ./core/data_render/code_generator.cc
+   ./core/data_render/exec_state.cc
+   ./core/data_render/vm.cc
+   ./core/data_render/statement.cc
+   ./core/data_render/string_table.cc
+   ./core/data_render/tokenizer.cc
+   ./core/data_render/expression_parser.cc
+   ./core/data_render/vm_mem.cc
+   ./core/data_render/object.cc
+   ./core/data_render/table.cc
+   ./core/data_render/table_factory.cc
+   ./core/data_render/vnode/vnode.cc
+   ./core/data_render/vnode/vnode_exec_env.cc
+   ./core/data_render/vnode/vnode_render_manager.cc
+   ./core/data_render/vnode/vnode_render_context.cc
         )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/json11)
 
 SET(FINAL_ADD_LIBRARY
         ${COMMON_SRCS}
 )
-SET(FINAL_TARGET_LINK_LIBRARIES wson)
+SET(FINAL_TARGET_LINK_LIBRARIES wson json11)
 
 if (ANDROID)
   ## add_subdirectory for subdirectory has a CMakeLists.txt
@@ -80,7 +101,6 @@ if (ANDROID)
     ./android/base/string/jstring_cache.cpp
     ./android/bridge/impl/bridge_impl_android.cpp
     ./android/bridge/impl/weexcore_impl_android.cpp
-    ./android/bridge/impl/measure_mode_impl_android.cpp
     ./android/bridge/impl/content_box_measurement_impl_android.cpp
     ./android/bridge/impl/jsfunction_impl_android.cpp
     ./android/bridge/impl/native_render_object_utils_impl_android.cpp

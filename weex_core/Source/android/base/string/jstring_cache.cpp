@@ -46,6 +46,7 @@ void JStringCache::put(JNIEnv *env, std::string key, jobject value) {
     posMap[key] = cacheList.begin();
 }
 
+// TODO Should set max size to control performance
 jstring JStringCache::GetString(JNIEnv *env, std::string key) {
 //    LOGW("JStringCache map size: %d, list size: %d", posMap.size(), cacheList.size());
     if (posMap.find(key) != posMap.end()) {

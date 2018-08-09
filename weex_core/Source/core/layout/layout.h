@@ -40,7 +40,7 @@ namespace WeexCore {
   } ;
 
   enum MeasureMode {
-    kUnspecified,
+    kUnspecified = 0,
     kExactly,
   } ;
 

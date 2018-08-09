@@ -29,6 +29,10 @@
 #include <errno.h>
 #include <core/layout/measure_func_adapter_impl_android.h>
 #include <core/manager/weex_core_manager.h>
+#include <chrono>
+#include "core/data_render/vnode/vnode_render_manager.h"
+#include "core/data_render/expression_parser.h"
+
 
 const char *s_cacheDir;
 const char *g_jssSoPath = nullptr;
@@ -42,6 +46,7 @@ static WEEX_CORE_JS_SERVER_API_FUNCTIONS *js_server_api_functions = nullptr;
 bool g_use_single_process = false;
 
 namespace WeexCore {
+    static jstring getJsonData(JNIEnv *env, jobjectArray jargs, int index);
     void WeexProxy::reset() {
         sConnection.reset();
         sHandler.reset();
@@ -337,6 +342,22 @@ namespace WeexCore {
         }
     }
 
+    void WeexProxy::RefreshInstance(JNIEnv* env, jobject jcaller,
+                                    jstring jinstanceid,
+                                    jstring jnamespace,
+                                    jstring jfunction,
+                                    jobjectArray jargs) {
+        auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+        ScopedJStringUTF8 id(env, jinstanceid);
+        jstring jni_init_data = getJsonData(env, jargs, 1);
+        ScopedJStringUTF8 init_data(env, jni_init_data);
+        // First check if page is rendered with data render strategy.
+        if (node_manager->RefreshPage(id.getChars(), init_data.getChars())) {
+            return;
+        }
+        execJS(env, nullptr, jinstanceid, jnamespace, jfunction, jargs);
+    }
+
     bool WeexProxy::execJS(JNIEnv *env,
                            jobject jthis,
                            jstring jinstanceid,
@@ -381,6 +402,7 @@ namespace WeexCore {
                 }
 
                 jobject jArg = env->GetObjectArrayElement(jargs, i);
+                if (jArg == nullptr) continue;
                 addParamsFromJArgs(params, param, serializer, env, jArg);
                 env->DeleteLocalRef(jArg);
             }
@@ -1075,6 +1097,7 @@ namespace WeexCore {
                 }
 
                 jobject jArg = env->GetObjectArrayElement(jargs, i);
+                if (jArg == nullptr) continue;
                 addParamsFromJArgs(params, param, serializer, env, jArg);
                 env->DeleteLocalRef(jArg);
             }
@@ -1173,6 +1196,37 @@ namespace WeexCore {
     WeexProxy::createInstanceContext(JNIEnv *env, jobject jcaller, jstring jinstanceid,
                                      jstring name,
                                      jstring jfunction, jobjectArray jargs) {
+        // get temp data, such as js bundle
+        jobject jArg = env->GetObjectArrayElement(jargs, 1);
+        jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
+        jobject jDataObj = env->GetObjectField(jArg, jDataId);
+        jstring jscript = (jstring) jDataObj;
+        jstring opts = getJsonData(env, jargs, 2);
+        // init jsonData
+        jstring initData = getJsonData(env, jargs, 3);
+        // get extend api data, such as rax-api
+        jArg = env->GetObjectArrayElement(jargs, 4);
+        jDataObj = env->GetObjectField(jArg, jDataId);
+        jstring japi = (jstring) jDataObj;
+        // get render strategy
+        jobject jni_render_strategy = env->GetObjectArrayElement(jargs, 5);
+        auto jstr_render_stategy = jni_render_strategy == nullptr ?
+                                      nullptr : env->GetObjectField(jni_render_strategy, jDataId);
+        ScopedJStringUTF8 render_strategy(env, static_cast<jstring>(jstr_render_stategy));
+        // if render strategy is data render, render page with data render mode.
+        if(render_strategy.getChars() != nullptr
+            && strcmp(render_strategy.getChars(), "DATA_RENDER") == 0) {
+
+            ScopedJStringUTF8 idChar(env, jinstanceid);
+            ScopedJStringUTF8 scriptChar(env, jscript);
+            std::string sourceStr = scriptChar.getChars();
+            ScopedJStringUTF8 initDataChar(env, initData);
+
+            auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+            node_manager->CreatePage(sourceStr, idChar.getChars(), initDataChar.getChars());
+
+            return true;
+        }
         if (!sSender && js_server_api_functions == nullptr) {
             LOGE("have not connected to a js server");
             return false;
@@ -1190,19 +1244,8 @@ namespace WeexCore {
             LOGE("native_createInstanceContext jargs format error");
             return false;
         }
-// get temp data, such as js bundle
-        jobject jArg = env->GetObjectArrayElement(jargs, 1);
-        jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
-        jobject jDataObj = env->GetObjectField(jArg, jDataId);
-        jstring jscript = (jstring) jDataObj;
-        jstring opts = getJsonData(env, jargs, 2);
-        // init jsonData
-        jstring initData = getJsonData(env, jargs, 3);
-        // get extend api data, such as rax-api
-        jArg = env->GetObjectArrayElement(jargs, 4);
-        jDataObj = env->GetObjectField(jArg, jDataId);
-        jstring japi = (jstring) jDataObj;
-        if (js_server_api_functions != nullptr) {
+
+      if (js_server_api_functions != nullptr) {
             ScopedJStringUTF8 idChar(env, jinstanceid);
             ScopedJStringUTF8 funcChar(env, jfunction);
             ScopedJStringUTF8 scriptChar(env, jscript);
@@ -1251,6 +1294,13 @@ namespace WeexCore {
     jint WeexProxy::destoryInstance(JNIEnv *env, jobject jcaller, jstring jinstanceid,
                                     jstring jnamespace,
                                     jstring jfunction, jobjectArray jargs) {
+        // First check if page is rendered with data render strategy.
+        ScopedJStringUTF8 idChar(env, jinstanceid);
+        auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+        if(node_manager->ClosePage(idChar.getChars())) {
+            return true;
+        }
+
         int ret = execJS(env, nullptr, jinstanceid, jnamespace, jfunction, jargs);
         if (jfunction == NULL || jinstanceid == NULL) {
             LOGE("native_destoryInstance function is NULL");
@@ -1258,7 +1308,6 @@ namespace WeexCore {
         }
 
         if (js_server_api_functions != nullptr) {
-            ScopedJStringUTF8 idChar(env, jinstanceid);
             return js_server_api_functions->funcDestroyInstance(idChar.getChars());
         } else {
             try {

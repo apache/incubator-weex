@@ -29,7 +29,7 @@ std::map<std::string, std::string> *RenderScroller::GetDefaultStyle() {
       new std::map<std::string, std::string>();
 
   bool is_vertical = true;
-  RenderObject *parent = dynamic_cast<RenderObject *>(getParent());
+  RenderObject *parent = static_cast<RenderObject *>(getParent());
 
   if (parent != nullptr) {
     if (parent->GetAttr(SCROLL_DIRECTION) == HORIZONTAL) {

@@ -36,8 +36,7 @@ using namespace WeexCore;
 
 namespace WeexCore {
     bool RegisterJNINativeRenderObjectUtils(JNIEnv *env){
-        RegisterNativesImpl(env);
-        return true;
+        return RegisterNativesImpl(env);
     }
 }
 
