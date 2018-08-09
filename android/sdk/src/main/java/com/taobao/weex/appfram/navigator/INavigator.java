@@ -1,4 +1,5 @@
 package com.taobao.weex.appfram.navigator;
+import android.app.Activity;
 
 /**
  * Created by zhengshihan on 2018/8/9.
@@ -6,7 +7,7 @@ package com.taobao.weex.appfram.navigator;
 
 public interface INavigator {
 
-  boolean push(String param);
+  boolean push(Activity activity,String param);
 
-  boolean pop(String param);
+  boolean pop(Activity activity,String param);
 }

@@ -116,8 +116,11 @@ public class WXNavigatorModule extends WXModule {
                 }
             }
 
-            if (WXSDKEngine.getNavigator()!= null) {
-                if (WXSDKEngine.getNavigator().push(param)) {
+            if (mWXSDKInstance.getContext() instanceof Activity){
+                Activity activity = (Activity)mWXSDKInstance.getContext();
+
+                if (WXSDKEngine.getNavigator()!= null
+                    && WXSDKEngine.getNavigator().push(activity,param)) {
                     if (callback != null) {
                         callback.invoke(MSG_SUCCESS);
                     }
@@ -166,17 +169,17 @@ public class WXNavigatorModule extends WXModule {
             }
         }
 
-
-        if (WXSDKEngine.getNavigator()!= null) {
-            if (WXSDKEngine.getNavigator().pop(param)) {
-                if (callback != null) {
-                    callback.invoke(MSG_SUCCESS);
-                }
-                return;
-            }
-        }
-
         if (mWXSDKInstance.getContext() instanceof Activity) {
+            Activity activity = (Activity) mWXSDKInstance.getContext();
+            if (WXSDKEngine.getNavigator() != null) {
+                if (WXSDKEngine.getNavigator().pop(activity, param)) {
+                    if (callback != null) {
+                        callback.invoke(MSG_SUCCESS);
+                    }
+                    return;
+                }
+            }
+
             if (callback != null) {
                 callback.invoke(MSG_SUCCESS);
             }
