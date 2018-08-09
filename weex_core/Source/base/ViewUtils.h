@@ -64,7 +64,7 @@ namespace WeexCore {
 
     float realPx = (src * WXCoreEnvironment::getInstance()->DeviceWidth() /
                     viewport);
-    float result = realPx > 0.005 && realPx < 1 ? 1.0f : rint(realPx);
+    float result = realPx > 0.005 && realPx < 1 ? 1.0f : realPx;
     return result;
   }
 
