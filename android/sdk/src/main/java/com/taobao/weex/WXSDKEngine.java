@@ -32,6 +32,7 @@ import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.appfram.clipboard.WXClipboardModule;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
+import com.taobao.weex.appfram.navigator.INavigator;
 import com.taobao.weex.appfram.navigator.WXNavigatorModule;
 import com.taobao.weex.appfram.pickers.WXPickersModule;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
@@ -510,6 +511,14 @@ public class WXSDKEngine implements Serializable {
 
   public static IActivityNavBarSetter getActivityNavBarSetter() {
     return WXSDKManager.getInstance().getActivityNavBarSetter();
+  }
+
+  public static INavigator getNavigator() {
+    return WXSDKManager.getInstance().getNavigator();
+  }
+
+  public static  void setNavigator(INavigator navigator) {
+    WXSDKManager.getInstance().setNavigator(navigator);
   }
 
   public static void setActivityNavBarSetter(IActivityNavBarSetter activityNavBarSetter) {

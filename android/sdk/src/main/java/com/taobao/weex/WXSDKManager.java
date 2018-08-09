@@ -37,6 +37,7 @@ import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
+import com.taobao.weex.appfram.navigator.INavigator;
 import com.taobao.weex.appfram.storage.DefaultWXStorage;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
@@ -488,5 +489,15 @@ public class WXSDKManager {
   public interface InstanceLifeCycleCallbacks {
     void onInstanceDestroyed(String instanceId);
     void onInstanceCreated(String instanceId);
+  }
+
+  private INavigator mNavigator;
+
+  public INavigator getNavigator() {
+    return mNavigator;
+  }
+
+  public void setNavigator(INavigator mNavigator) {
+    this.mNavigator = mNavigator;
   }
 }
