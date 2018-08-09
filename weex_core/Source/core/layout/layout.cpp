@@ -502,10 +502,11 @@ namespace WeexCore {
 
     void WXCoreLayoutNode::stretchViewCrossSize(WXCoreLayoutNode* const child, float crossSize){
       if (isMainAxisHorizontal(this)) {
-        if (child->heightMeasureMode != kExactly) {
-            crossSize -=
-                child->mCssStyle->mMargin.getMargin(kMarginTop) +
-                    child->mCssStyle->mMargin.getMargin(kMarginBottom);
+        if (child->heightMeasureMode != kExactly &&
+            !(child->measureFunc != nullptr && child->getChildCount() == 0)) {
+          crossSize -=
+              child->mCssStyle->mMargin.getMargin(kMarginTop) +
+                  child->mCssStyle->mMargin.getMargin(kMarginBottom);
           child->setHeightMeasureMode(kExactly);
           child->setLayoutHeight(std::max(0.f, crossSize));
         }
