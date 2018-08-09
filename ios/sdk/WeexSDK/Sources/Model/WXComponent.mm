@@ -44,10 +44,7 @@
 #import "WXSDKEngine.h"
 #import "WXSDKInstance_performance.h"
 #import "WXComponent_performance.h"
-
-#ifdef WX_IMPORT_WEEXCORE
 #import "WXCoreBridge.h"
-#endif
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -103,10 +100,6 @@ static BOOL bNeedRemoveEvents = YES;
         
         _displayType = WXDisplayTypeBlock;
         _isNeedJoinLayoutSystem = YES;
-#ifdef WX_IMPORT_WEEXCORE
-#else
-        _isLayoutDirty = YES;
-#endif
         _isViewFrameSyncWithCalculated = YES;
         _ariaHidden = nil;
         _accessible = nil;
@@ -159,10 +152,6 @@ static BOOL bNeedRemoveEvents = YES;
 #endif
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
 
-#ifdef WX_IMPORT_WEEXCORE
-#else
-        [self _initCSSNodeWithStyles:_styles];
-#endif
         [self _initViewPropertyWithStyles:_styles];
         [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];
@@ -181,7 +170,6 @@ static BOOL bNeedRemoveEvents = YES;
 
 - (id)copyWithZone:(NSZone *)zone
 {
-#ifdef WX_IMPORT_WEEXCORE
     static std::atomic<long> __copy(0);
     long copyId = __copy ++;
     copyId %= (1024 * 1024);
@@ -217,42 +205,6 @@ static BOOL bNeedRemoveEvents = YES;
     });
     
     return component;
-#else
-    NSInteger copyId = 0;
-    @synchronized(self){
-        static NSInteger __copy = 0;
-        copyId = __copy % (1024*1024);
-        __copy++;
-    }
-
-    NSString *copyRef = [NSString stringWithFormat:@"%ldcopy_of%@", (long)copyId, _isTemplate ? self.ref : self->_templateComponent.ref];
-    WXComponent *component = [[[self class] allocWithZone:zone] initWithRef:copyRef type:self.type styles:self.styles attributes:self.attributes events:self.events weexInstance:self.weexInstance];
-    if (_isTemplate) {
-        component->_templateComponent = self;
-    } else {
-        component->_templateComponent = self->_templateComponent;
-    }
-    //memcpy((void*)component->_flexCssNode,self.flexCssNode,sizeof(WeexCore::WXCoreLayoutNode));
-    component->_flexCssNode->copyStyle(self.flexCssNode);
-    component->_flexCssNode->copyMeasureFunc(self.flexCssNode);
-    component->_flexCssNode->setContext((__bridge void *)component);
-    component->_calculatedFrame = self.calculatedFrame;
-    
-    NSMutableArray *subcomponentsCopy = [NSMutableArray array];
-    
-        component->_subcomponents = subcomponentsCopy;
-        NSUInteger count = [self.subcomponents count];
-        for (NSInteger i = 0 ; i < count;i++){
-            WXComponent *subcomponentCopy = [[self.subcomponents objectAtIndex:i] copy];
-            [component _insertSubcomponent:subcomponentCopy atIndex:i];
-        }
-
-    WXPerformBlockOnComponentThread(^{
-        [self.weexInstance.componentManager addComponent:component toIndexDictForRef:copyRef];
-    });
-    
-    return component;
-#endif
 }
 
 - (UIAccessibilityTraits)_parseAccessibilityTraitsWithTraits:(UIAccessibilityTraits)trait roles:(NSString*)roleStr
@@ -269,13 +221,6 @@ static BOOL bNeedRemoveEvents = YES;
 {
     if (_positionType == WXPositionTypeFixed) {
         [self.weexInstance.componentManager removeFixedComponent:self];
-    }
-    if(_flexCssNode){
-#ifdef DEBUG
-        WXLogDebug(@"flexLayout -> dealloc %@",self.ref);
-#endif
-        [WXComponent recycleNodeOnComponentThread:_flexCssNode gabRef:_ref];
-        _flexCssNode=nullptr;
     }
     
     // remove all gesture and all
@@ -360,13 +305,11 @@ static BOOL bNeedRemoveEvents = YES;
         _displayType = displayType;
         if (displayType == WXDisplayTypeNone) {
             _isNeedJoinLayoutSystem = NO;
-            [self.supercomponent _recomputeCSSNodeChildren];
             WXPerformBlockOnMainThread(^{
                 [self removeFromSuperview];
             });
         } else {
             _isNeedJoinLayoutSystem = YES;
-            [self.supercomponent _recomputeCSSNodeChildren];
             WXPerformBlockOnMainThread(^{
                 [self _buildViewHierarchyLazily];
                 // TODO: insert into the correct index
@@ -624,25 +567,6 @@ static BOOL bNeedRemoveEvents = YES;
         subcomponent->_isCompositingChild = YES;
     }
     
-#ifdef WX_IMPORT_WEEXCORE
-#else
-        if (subcomponent->_isNeedJoinLayoutSystem) {
-            NSInteger actualIndex = [self getActualNodeIndex:subcomponent atIndex:index];
-            [self _insertChildCssNode:subcomponent atIndex:actualIndex];
-        }
-        else {
-#ifdef DEBUG
-            WXLogDebug(@"flexLayout -> no need JoinLayoutSystem parent ref:%@ type:%@, self ref:%@ type:%@ ",
-                  self.ref,
-                  self.type,
-                  subcomponent.ref,
-                  subcomponent.type
-                  );
-#endif
-        }
-#endif
-    
-    [self _recomputeCSSNodeChildren];
     [self setNeedsLayout];
 }
 
@@ -650,17 +574,12 @@ static BOOL bNeedRemoveEvents = YES;
 {
     pthread_mutex_lock(&_propertyMutex);
     [_subcomponents removeObject:subcomponent];
-#ifdef WX_IMPORT_WEEXCORE
-#else
-    [self _rmChildCssNode:subcomponent];
-#endif
     pthread_mutex_unlock(&_propertyMutex);
 }
 
 - (void)_removeFromSupercomponent
 {
     [self.supercomponent _removeSubcomponent:self];
-    [self.supercomponent _recomputeCSSNodeChildren];
     [self.supercomponent setNeedsLayout];
     
     if (_positionType == WXPositionTypeFixed) {
@@ -680,9 +599,6 @@ static BOOL bNeedRemoveEvents = YES;
 
 - (void)_didInserted
 {
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#endif
 }
 
 - (id<WXScrollerProtocol>)ancestorScroller

@@ -73,25 +73,4 @@
     _calculatedFrame = frame;
 }
 
-- (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
-{
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#else
-        if (self.delegate && ( isnan(self.flexCssNode->getStyleWidth()) || _isUseContainerWidth)) {
-            self.flexCssNode->setStyleWidth([self.delegate headerWidthForLayout:self],NO);
-            //TODO: set _isUseContainerWidth to NO if updateStyles have width
-            _isUseContainerWidth = YES;
-        }
-        
-        if ([self needsLayout]) {
-            std::pair<float, float> renderPageSize;
-            renderPageSize.first = self.weexInstance.frame.size.width;
-            renderPageSize.second = self.weexInstance.frame.size.height;
-            self.flexCssNode->calculateLayout(renderPageSize);
-        }
-    [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
-#endif
-}
-
 @end

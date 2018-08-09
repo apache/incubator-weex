@@ -109,7 +109,6 @@
             [_filterStyles setObject:styles[key] forKey:key];
             if (![key isEqualToString:@"transform"]) {
                 if (!isRunning) {
-#ifdef WX_IMPORT_WEEXCORE
                     /* style value may not be in component.styles, so we must get
                      value from layout and convert it to style value. */
                     id styleValue = targetComponent.styles[key];
@@ -117,9 +116,6 @@
                         styleValue = [targetComponent convertLayoutValueToStyleValue:key];
                     }
                     [_oldFilterStyles setObject:styleValue forKey:key];
-#else
-                    [_oldFilterStyles setObject:targetComponent.styles[key] forKey:key];
-#endif
                 }
             }
         }

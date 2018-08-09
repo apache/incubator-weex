@@ -17,8 +17,6 @@
  * under the License.
  */
 
-#ifdef WX_IMPORT_WEEXCORE
-
 #import "WXCoreBridge.h"
 #import "JSValue+Weex.h"
 #import "WXSDKManager.h"
@@ -996,5 +994,3 @@ static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::
 }
 
 @end
-
-#endif

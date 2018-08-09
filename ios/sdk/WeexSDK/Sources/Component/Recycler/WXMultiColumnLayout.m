@@ -22,37 +22,6 @@
 #import "WXUtility.h"
 #import "WXAssert.h"
 
-#ifdef WX_IMPORT_WEEXCORE
-#else
-static void computeColumnWidthAndCount(float availableWidth, WXLength *columnCount, WXLength *columnWidth, float columnGap, int *N, float *W)
-{
-    /* Pseudo-algorithm according to
-     * https://www.w3.org/TR/css3-multicol/
-     * Note that, in most cases, only one of ‘column-width’ and ‘column-count’ affect the layout. 
-     * If ‘column-width’ has a value other than ‘auto’, ‘column-count’ indicates the maximum number of columns.
-     **/
-    if (columnWidth.isAuto && columnCount.isAuto) {
-        WXAssert(NO, @"Unsupport both of column-width and column-count being auto.");
-        return;
-    }
-    
-    if (columnWidth.isAuto && !columnCount.isAuto) {
-        *N = columnCount.intValue;
-        *W = MAX(0, (availableWidth - ((*N -1) * columnGap)) / *N);
-    }
-    
-    if (!columnWidth.isAuto && columnCount.isAuto) {
-        *N = MAX(1, WXFloorPixelValue((availableWidth + columnGap) / (columnWidth.floatValue + columnGap)));
-        *W = ((availableWidth + columnGap) / *N) - columnGap;
-    }
-    
-    if (!columnWidth.isAuto && !columnCount.isAuto) {
-        *N = MIN(columnCount.intValue, WXFloorPixelValue((availableWidth + columnGap) / (columnWidth.floatValue + columnGap)));
-        *W = ((availableWidth + columnGap) / *N) - columnGap;
-    }
-}
-#endif
-
 NSString * const kCollectionSupplementaryViewKindHeader = @"WXCollectionSupplementaryViewKindHeader";
 NSString * const kMultiColumnLayoutHeader = @"WXMultiColumnLayoutHeader";
 NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
@@ -141,30 +110,14 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 
 - (CGFloat)computedColumnWidth
 {
-#ifdef WX_IMPORT_WEEXCORE
     WXAssert([_columnWidth isFixed], @"column width must be calculated by core.");
     return _columnWidth.floatValue;
-#else
-    if (!_computedColumnWidth && !_computedColumnCount) {
-        [self _computeColumnWidthAndCount];
-    }
-    
-    return _computedColumnWidth;
-#endif
 }
 
 - (int)computedColumnCount
 {
-#ifdef WX_IMPORT_WEEXCORE
     WXAssert([_columnCount isFixed], @"column count must be calculated by core.");
     return _columnCount.intValue;
-#else
-    if (!_computedColumnWidth && !_computedColumnCount) {
-        [self _computeColumnWidthAndCount];
-    }
-    
-    return _computedColumnCount;
-#endif
 }
 
 - (CGFloat)computedHeaderWidth
@@ -368,29 +321,6 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 - (CGFloat)contentHeight
 {
     return [self _maxHeightForAllColumns];
-}
-
-- (void)_computeColumnWidthAndCount
-{
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#else
-    UIEdgeInsets insets = [self.delegate collectionView:self.collectionView insetForLayout:self];
-    
-    int columnCount;
-    float columnWidth;
-    float availableWidth = self.contentWidth - (insets.left + insets.right+_leftGap + _rightGap);
-    
-    computeColumnWidthAndCount(availableWidth, self.columnCount, self.columnWidth, self.columnGap, &columnCount, &columnWidth);
-    if (availableWidth <= 0) {
-        return;
-    }
-    WXAssert(columnCount > 0, @"invalid column count");
-    WXAssert(columnWidth > 0, @"invalid column width");
-    
-    _computedColumnWidth = columnWidth;
-    _computedColumnCount = columnCount;
-#endif
 }
 
 - (CGFloat)_maxHeightForAllColumns

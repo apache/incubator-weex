@@ -51,10 +51,7 @@
 #import "WXJSCoreBridge.h"
 #import "WXSDKInstance_performance.h"
 #import "WXPageEventNotifyEvent.h"
-
-#ifdef WX_IMPORT_WEEXCORE
 #import "WXCoreBridge.h"
-#endif
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -215,10 +212,8 @@ typedef enum : NSUInteger {
 {
     _viewportWidth = viewportWidth;
     
-#ifdef WX_IMPORT_WEEXCORE
     // notify weex core
     [WXCoreBridge setViewportWidth:_instanceId width:viewportWidth];
-#endif
 }
 
 - (void)renderWithURL:(NSURL *)url

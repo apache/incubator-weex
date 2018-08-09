@@ -29,12 +29,9 @@
 #import "WXUtility.h"
 #import "WXRecycleListComponent.h"
 #import "WXRecycleListDataManager.h"
+#import "WXCoreBridge.h"
 
 #import <JavaScriptCore/JavaScriptCore.h>
-
-#ifdef WX_IMPORT_WEEXCORE
-#import "WXCoreBridge.h"
-#endif
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
@@ -242,10 +239,8 @@ static JSContext *jsContext;
         if (!exsitingComponent) {
             [self.weexInstance.componentManager startComponentTasks];
             [self.supercomponent _insertSubcomponent:component atIndex:startIndex + idx];
-#ifdef WX_IMPORT_WEEXCORE
             // add to layout tree
             [WXCoreBridge addChildRenderObject:component->_flexCssNode toParent:self.supercomponent->_flexCssNode];
-#endif
             
             [self.weexInstance.componentManager _addUITask:^{
                 [self.supercomponent insertSubview:component atIndex:startIndex + idx];

@@ -29,12 +29,10 @@
 #import "WXConfigCenterProtocol.h"
 #import "WXSDKEngine.h"
 #import "WXComponent+Events.h"
-#import "WXScrollerComponent+Layout.h"
 #import "WXPageEventNotifyEvent.h"
+#import "WXComponent+Layout.h"
 
-#include <core/layout/layout.h>
-
-@interface WXScrollerComponentView:UIScrollView
+@interface WXScrollerComponentView : UIScrollView
 @end
 
 @implementation WXScrollerComponentView
@@ -157,19 +155,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         _offsetAccuracy = attributes[@"offsetAccuracy"] ? [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
         
-#ifdef WX_IMPORT_WEEXCORE
-#else
-            _flexScrollerCSSNode = new WeexCore::WXCoreLayoutNode();
-            // let scroller fill the rest space if it is a child component and has no fixed height & width
-            if (((_scrollDirection == WXScrollDirectionVertical &&
-                  flexIsUndefined(self.flexCssNode->getStyleHeight())) ||
-                 (_scrollDirection == WXScrollDirectionHorizontal &&
-                  flexIsUndefined(self.flexCssNode->getStyleWidth()))) &&
-                self.flexCssNode->getFlex() <= 0.0) {
-                self.flexCssNode->set_flex(1.0);
-            }
-#endif
-        
         id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
             BOOL shouldNotifiAppearDescendantView = [[configCenter configForKey:@"iOS_weex_ext_config.shouldNotifiAppearDescendantView" defaultValue:@(YES) isDefault:NULL] boolValue];
@@ -249,14 +234,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     ((UIScrollView *)_view).delegate = nil;
     [self.stickyArray removeAllObjects];
     [self.listenerArray removeAllObjects];
-    
-#ifdef WX_IMPORT_WEEXCORE
-#else
-    if(_flexScrollerCSSNode){
-        [WXComponent recycleNodeOnComponentThread:_flexScrollerCSSNode gabRef:self.ref];
-        _flexScrollerCSSNode=nullptr;
-    }
-#endif
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
@@ -878,16 +855,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 #pragma mark Layout
 
-- (NSUInteger)_childrenCountForLayout;
-{
-    return 0;
-}
-
-- (NSUInteger)childrenCountForScrollerLayout
-{
-    return [super _childrenCountForLayout];
-}
-
 - (CGFloat)_getInnerContentMainSize
 {
     if (_scrollDirection == WXScrollDirectionVertical) {
@@ -911,51 +878,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             _contentSize.width = value;
         }
     }
-}
-
-- (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition
-                          gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
-{
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#else
-    /**
-     *  Pretty hacky way
-     *  layout from root to scroller to get scroller's frame,
-     *  layout from children to scroller to get scroller's contentSize
-     */
-    if ([self needsLayout]) {
-            _flexScrollerCSSNode->copyStyle(_flexCssNode);
-            _flexScrollerCSSNode->copyMeasureFunc(_flexCssNode);
-            
-            if (_scrollDirection == WXScrollDirectionVertical) {
-                _flexScrollerCSSNode->setFlexDirection(WeexCore::kFlexDirectionColumn,NO);
-                _flexScrollerCSSNode->setStyleWidth(self.flexCssNode->getLayoutWidth(),NO);
-                _flexScrollerCSSNode->setStyleHeight(FlexUndefined);
-            } else {
-                _flexScrollerCSSNode->setFlexDirection(WeexCore::kFlexDirectionRow,NO);
-                _flexScrollerCSSNode->setStyleHeight(self.flexCssNode->getLayoutHeight());
-                _flexScrollerCSSNode->setStyleWidth(FlexUndefined,NO);
-            }
-            _flexScrollerCSSNode->markDirty();
-            std::pair<float, float> renderPageSize;
-            renderPageSize.first = self.weexInstance.frame.size.width;
-            renderPageSize.second = self.weexInstance.frame.size.height;
-            _flexScrollerCSSNode->calculateLayout(renderPageSize);
-            CGSize size = {
-                WXRoundPixelValue(_flexScrollerCSSNode->getLayoutWidth()),
-                WXRoundPixelValue(_flexScrollerCSSNode->getLayoutHeight())
-            };
-            
-            if (!CGSizeEqualToSize(size, _contentSize)) {
-                // content size
-                _contentSize = size;
-                [dirtyComponents addObject:self];
-            }
-    }
-    
-    [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
-#endif
 }
 
 @end

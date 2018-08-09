@@ -162,9 +162,6 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 ///--------------------------------------
 
 - (void)_layoutDidFinish;
-- (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition
-                           gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents;
-
 
 - (void)_willDisplayLayer:(CALayer *)layer;
 
@@ -198,8 +195,6 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_frameDidCalculated:(BOOL)isChanged;
 
-- (NSUInteger)_childrenCountForLayout;
-
 ///--------------------------------------
 /// @name Private Methods
 ///--------------------------------------
@@ -216,13 +211,9 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_transitionUpdateViewProperty:(NSDictionary *)styles;
 
-- (void)_initCSSNodeWithStyles:(NSDictionary *)styles;
-
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles;
 
 - (void)_resetCSSNodeStyles:(NSArray *)styles;
-
-- (void)_recomputeCSSNodeChildren;
 
 - (void)_handleBorders:(NSDictionary *)styles isUpdating:(BOOL)updating;
 

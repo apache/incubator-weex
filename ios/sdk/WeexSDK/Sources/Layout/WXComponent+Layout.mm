@@ -42,39 +42,19 @@ bool flexIsUndefined(float value) {
 
 - (void)setNeedsLayout
 {
-#ifdef WX_IMPORT_WEEXCORE
     if (_flexCssNode != nullptr) {
         _flexCssNode->markDirty();
     }
-#else
-    _isLayoutDirty = YES;
-    WXComponent *supercomponent = [self supercomponent];
-    
-    //protet nil ptr
-    if (self.flexCssNode) {
-        self.flexCssNode->markDirty();
-    }else{
-        WXLogError(@"flexCssNode is nil");
-    }
-    
-    if(supercomponent){
-        [supercomponent setNeedsLayout];
-    }
-#endif
 }
 
 - (BOOL)needsLayout
 {
-#ifdef WX_IMPORT_WEEXCORE
     if (_flexCssNode != nullptr) {
         return _flexCssNode->isDirty();
     }
     else {
         return false;
     }
-#else
-    return _isLayoutDirty;
-#endif
 }
 
 - (CGSize (^)(CGSize))measureBlock
@@ -98,36 +78,6 @@ bool flexIsUndefined(float value) {
     }
 }
 
-- (void)_initCSSNodeWithStyles:(NSDictionary *)styles
-{
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#else
-    if (_flexCssNode != nullptr) {
-        // using weex core
-        return;
-    }
-    
-    _flexCssNode = new WeexCore::WXCoreLayoutNode();
-    if ([self measureBlock]) {
-        _flexCssNode->setMeasureFunc(flexCssNodeMeasure);
-    }
-    _flexCssNode->setContext((__bridge void *)self);
-    [self _recomputeCSSNodeChildren];
-    [self _fillCSSNode:styles isUpdate:NO];
-    
-    if ([self.ref isEqualToString:WX_SDK_ROOT_REF]) {
-        if (flexIsUndefined(_flexCssNode->getStyleHeight()) && self.weexInstance.frame.size.height) {
-            _flexCssNode->setStyleHeight(self.weexInstance.frame.size.height);
-        }
-        
-        if (flexIsUndefined(_flexCssNode->getStyleWidth()) && self.weexInstance.frame.size.width) {
-            _flexCssNode->setStyleWidth(self.weexInstance.frame.size.width,NO);
-        }
-    }
-#endif
-}
-
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles
 {
     [self _fillCSSNode:styles isUpdate:YES];
@@ -137,26 +87,6 @@ bool flexIsUndefined(float value) {
 {
     [self _resetCSSNode:styles];
 }
-
-- (void)_recomputeCSSNodeChildren
-{
-}
-
-- (NSUInteger)_childrenCountForLayout
-{
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#endif
-    NSArray *subcomponents = _subcomponents;
-    NSUInteger count = subcomponents.count;
-    for (WXComponent *component in subcomponents) {
-        if (!component->_isNeedJoinLayoutSystem) {
-            count--;
-        }
-    }
-    return (int)(count);
-}
-
 
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
@@ -214,45 +144,6 @@ bool flexIsUndefined(float value) {
             [strongSelf setNeedsDisplay];
         }];
     }
-}
-
-- (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition
-                           gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
-{
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#else
-    WXAssertComponentThread();
-
-        if (self.flexCssNode->hasNewLayout()) {
-            self.flexCssNode->setHasNewLayout(false);
-            _isLayoutDirty = NO;
-            CGRect newFrame = CGRectMake(
-                                         isnan(WXRoundPixelValue(_flexCssNode->getLayoutPositionLeft()))?0:WXRoundPixelValue(_flexCssNode->getLayoutPositionLeft())
-                                         ,isnan(WXRoundPixelValue(_flexCssNode->getLayoutPositionTop()))?0:WXRoundPixelValue(_flexCssNode->getLayoutPositionTop())
-                                         ,isnan(WXRoundPixelValue(_flexCssNode->getLayoutWidth()))?0:WXRoundPixelValue(_flexCssNode->getLayoutWidth())
-                                         ,isnan(WXRoundPixelValue(_flexCssNode->getLayoutHeight()))?0:WXRoundPixelValue(_flexCssNode->getLayoutHeight())
-                                         );
-            BOOL isFrameChanged = NO;
-            
-            if (!CGRectEqualToRect(newFrame, _calculatedFrame)) {
-                
-                isFrameChanged = YES;
-                _calculatedFrame = newFrame;
-                [dirtyComponents addObject:self];
-            }
-            
-            [self _frameDidCalculated:isFrameChanged];
-#ifdef DEBUG
-            WXLogDebug(@"flexLayout -> newFrame ,type:%@,ref:%@, parentRef:%@,size :%@ ,instance:%@",self.type,self.ref,self.supercomponent.ref,NSStringFromCGRect(newFrame),self.weexInstance.instanceId);
-#endif
-        }
-    
-        NSArray * subcomponents = [_subcomponents copy];
-        for (WXComponent *subcomponent in subcomponents) {
-            [subcomponent _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
-        }
-#endif
 }
 
 - (void)_layoutDidFinish
@@ -679,68 +570,6 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
         }
     }
     return WeexCore::kJustifyFlexStart;
-}
-
-
-- (NSInteger) getActualNodeIndex:(WXComponent*)subcomponent atIndex:(NSInteger) index
-{
-#ifdef WX_IMPORT_WEEXCORE
-    return 0;
-#else
-    NSInteger actualIndex = 0; //实际除去不需要布局的subComponent，此时所在的正确位置
-    for (WXComponent *child in _subcomponents) {
-        if ([child.ref isEqualToString:subcomponent.ref]) {
-            break;
-        }
-        if (child->_isNeedJoinLayoutSystem) {
-            actualIndex ++;
-        }
-    }
-    return actualIndex;
-#endif
-}
-
-- (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index
-{
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#else
-    self.flexCssNode->addChildAt(subcomponent.flexCssNode, (uint32_t)index);
-#endif
-}
-
-- (void)_rmChildCssNode:(WXComponent *)subcomponent
-{
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#else
-    self.flexCssNode->removeChild(subcomponent->_flexCssNode);
-#ifdef DEBUG
-    WXLogDebug(@"flexLayout -> ref:%@ ,flexCssNode->removeChild ,childRef:%@",self.ref,subcomponent.ref);
-#endif
-#endif
-}
-
-+ (void) recycleNodeOnComponentThread:(WeexCore::WXCoreLayoutNode * ) garbageNode gabRef:(NSString *)ref
-{
-#ifdef WX_IMPORT_WEEXCORE
-#else
-    if (nullptr == garbageNode) {
-#ifdef DEBUG
-        WXLogDebug(@"flexlayout->recycle garbageNode ref:%@ is null ",ref);
-#endif
-        return;
-    }
-    WXPerformBlockOnComponentThread(^{
-#ifdef DEBUG
-        WXLogDebug(@"flexlayout->recycle  ref:%@ ,node:%p",ref,garbageNode );
-#endif
-        if(nullptr != garbageNode){
-            delete garbageNode;
-        }
-    });
-    //domthread
-#endif
 }
 
 @end

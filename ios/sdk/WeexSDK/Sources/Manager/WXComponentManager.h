@@ -64,19 +64,6 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 /// @name Component Tree Building
 ///--------------------------------------
 
-#ifdef WX_IMPORT_WEEXCORE
-#else
-/**
- * @abstract create root of component tree
- **/
-- (void)createRoot:(NSDictionary *)data;
-
-/**
- * @abstract add component
- **/
-- (void)addComponent:(NSDictionary *)componentData toSupercomponent:(NSString *)superRef atIndex:(NSInteger)index appendingInTree:(BOOL)appendingInTree;
-#endif
-
 /**
  * @abstract remove component
  **/
@@ -162,12 +149,10 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
  **/
 - (void)updateFinish;
 
-#ifdef WX_IMPORT_WEEXCORE
 /**
  * @abstract called when all doms are created and layout finished
  **/
 - (void)renderFinish;
-#endif
 
 /**
  * @abstract unload
@@ -209,8 +194,6 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
  */
 - (void)handleStyleOnMainThread:(NSDictionary*)styles forComponent:(WXComponent *)component isUpdateStyles:(BOOL)isUpdateStyles;
 
-#ifdef WX_IMPORT_WEEXCORE
-
 - (void)wxcore_CreateBody:(NSString*)ref
                      type:(NSString*)type
                    styles:(NSDictionary*)styles
@@ -235,7 +218,5 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 - (void)wxcore_RemoveEvent:(NSString*)eventName fromElement:(NSString*)ref;
 - (BOOL)wxcore_IsTransitionNoneOfElement:(NSString*)ref; // for quick access
 - (BOOL)wxcore_HasTransitionPropertyInStyles:(NSDictionary*)styles forElement:(NSString*)ref;
-
-#endif
 
 @end

@@ -22,6 +22,7 @@
 #import "WXHeaderComponent.h"
 #import "WXComponent.h"
 #import "WXComponent_internal.h"
+#import "WXComponent+Layout.h"
 #import "NSArray+Weex.h"
 #import "WXAssert.h"
 #import "WXMonitor.h"
@@ -30,7 +31,6 @@
 #import "WXSDKInstance_private.h"
 #import "WXRefreshComponent.h"
 #import "WXLoadingComponent.h"
-#import "WXScrollerComponent+Layout.h"
 #import "WXThreadSafeMutableArray.h"
 
 @interface WXTableView : UITableView
@@ -355,11 +355,7 @@
 
 - (float)headerWidthForLayout:(WXHeaderComponent *)cell
 {
-#ifdef WX_IMPORT_WEEXCORE
     return self.flexCssNode->getStyleWidth();
-#else
-        return self.flexScrollerCSSNode->getStyleWidth();
-#endif
 }
 
 - (void)headerDidLayout:(WXHeaderComponent *)header
@@ -447,11 +443,7 @@
 
 - (float)containerWidthForLayout:(WXCellComponent *)cell
 {
-#ifdef WX_IMPORT_WEEXCORE
-    assert(0);
-#else
-    return self.flexScrollerCSSNode->getStyleWidth();
-#endif
+    return self.flexCssNode->getStyleWidth();
 }
 
 - (void)cellDidRemove:(WXCellComponent *)cell

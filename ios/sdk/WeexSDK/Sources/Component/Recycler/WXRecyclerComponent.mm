@@ -35,7 +35,6 @@
 #import "WXComponent+Events.h"
 #import "WXRecyclerDragController.h"
 #import "WXComponent+Layout.h"
-#import "WXScrollerComponent+Layout.h"
 
 static NSString * const kCollectionCellReuseIdentifier = @"WXRecyclerCell";
 static NSString * const kCollectionHeaderReuseIdentifier = @"WXRecyclerHeader";
@@ -468,11 +467,7 @@ typedef enum : NSUInteger {
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView contentWidthForLayout:(UICollectionViewLayout *)collectionViewLayout
 {
-#ifdef WX_IMPORT_WEEXCORE
     return self.flexCssNode->getLayoutWidth();
-#else
-    return self.flexScrollerCSSNode->getStyleWidth();
-#endif
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout heightForItemAtIndexPath:(NSIndexPath *)indexPath
