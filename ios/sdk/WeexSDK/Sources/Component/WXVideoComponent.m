@@ -333,14 +333,6 @@
     _videoView = (WXVideoView *)self.view;
     [_videoView setURL:_videoURL];
     [_videoView setPosterURL:_posterURL];
-    if (_playStatus) {
-        [_videoView play];
-    } else {
-        [_videoView pause];
-    }
-    if (_autoPlay) {
-        [_videoView play];
-    }
     __weak __typeof__(self) weakSelf = self;
     _videoView.posterClickHandle = ^{
         [weakSelf.videoView play];
@@ -367,6 +359,14 @@
         }
         [weakSelf fireEvent:eventType params:nil];
     };
+    if (_playStatus) {
+        [_videoView play];
+    } else {
+        [_videoView pause];
+    }
+    if (_autoPlay) {
+        [_videoView play];
+    }
 }
 
 -(void)updateAttributes:(NSDictionary *)attributes
