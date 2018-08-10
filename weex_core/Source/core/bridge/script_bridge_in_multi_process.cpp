@@ -28,11 +28,11 @@
 #include "android/base/jni/android_jni.h"
 #include "android/base/log_utils.h"
 #include "android/base/string/string_utils.h"
-#include "android/bridge/impl/multi_process_and_so_initializer.h"
+#include "android/bridge/multi_process_and_so_initializer.h"
 #include "android/jsengine/multiprocess/WeexJSConnection.h"
 #include "android/utils/IPCStringResult.h"
 #include "core/bridge/script/core_side_in_simple.h"
-#include "core/bridge/script/script_side_in_multi_process.h"
+#include "android/bridge/script/script_side_in_multi_process.h"
 #include "core/manager/weex_core_manager.h"
 
 namespace WeexCore {

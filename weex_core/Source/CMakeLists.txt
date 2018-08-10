@@ -60,8 +60,6 @@ set(COMMON_SRCS
   ./core/bridge/script_bridge_in_multi_so.cpp
   ./core/bridge/script_bridge_in_multi_process.cpp
   ./core/bridge/script/core_side_in_simple.cpp
-  ./core/bridge/script/script_side_in_multi_so.cpp
-  ./core/bridge/script/script_side_in_multi_process.cpp
   ./core/parser/dom_wson.cpp
         )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
@@ -88,19 +86,21 @@ if (ANDROID)
     ./android/base/string/scoped_jstring.cpp
     ./android/base/string/scoped_jstring_utf8.cpp
     ./android/base/string/jstring_cache.cpp
-    ./android/bridge/impl/measure_mode_impl_android.cpp
-    ./android/bridge/impl/content_box_measurement_impl_android.cpp
-    ./android/bridge/impl/jsfunction_impl_android.cpp
-    ./android/bridge/impl/native_render_object_utils_impl_android.cpp
-    ./android/bridge/impl/android_bridge_in_multi_process.cc
-    ./android/bridge/impl/android_bridge_in_multi_so.cc
+    ./android/wrap/measure_mode_impl_android.cpp
+    ./android/wrap/content_box_measurement_impl_android.cpp
+    ./android/wrap/jsfunction_impl_android.cpp
+    ./android/wrap/native_render_object_utils_impl_android.cpp
+    ./android/bridge/platform/android_bridge_in_multi_process.cc
+    ./android/bridge/platform/android_bridge_in_multi_so.cc
+    ./android/bridge/platform/android_side.cpp
+    ./android/bridge/platform/android_bridge.cpp
+    ./android/bridge/platform/core_side_in_multi_process.cpp
+    ./android/bridge/platform/core_side_in_multi_so.cpp
+    ./android/bridge/script/script_side_in_multi_so.cpp
+    ./android/bridge/script/script_side_in_multi_process.cpp
 
-    ./android/bridge/impl/android_side.cpp
-    ./android/bridge/impl/android_bridge.cpp
-    ./android/bridge/impl/core_side_in_multi_process.cpp
-    ./android/bridge/impl/core_side_in_multi_so.cpp
-    ./android/bridge/impl/multi_process_and_so_initializer.cpp
-    ./android/bridge/impl/multi_so_initializer.cpp
+    ./android/bridge/multi_process_and_so_initializer.cpp
+    ./android/bridge/multi_so_initializer.cpp
     ./android/wrap/wml_bridge.cpp
     ./android/utils/cache_utils.cpp
     ./android/utils/params_utils.cpp

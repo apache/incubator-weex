@@ -36,7 +36,7 @@
 #include <errno.h>
 #include <android/utils/so_utils.h>
 #include <IPCListener.h>
-#include <android/bridge/impl/android_bridge_in_multi_process.h>
+#include <android/bridge/platform/android_bridge_in_multi_process.h>
 #include <core/manager/weex_core_manager.h>
 #include <core/bridge/script_bridge_in_multi_process.h>
 #include <android/base/jni/android_jni.h>

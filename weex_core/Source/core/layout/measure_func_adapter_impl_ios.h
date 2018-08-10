@@ -18,8 +18,8 @@
  */
 #include "measure_func_adapter.h"
 #include <core/render/node/render_object.h>
-#include <android/bridge/impl/content_box_measurement_impl_android.h>
-#include <android/bridge/impl/measure_mode_impl_android.h>
+#include <android/wrap/content_box_measurement_impl_android.h>
+#include <android/wrap/measure_mode_impl_android.h>
 #include <android/base/jni/scoped_java_ref.h>
 
 namespace WeexCore {

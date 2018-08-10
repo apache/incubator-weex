@@ -20,9 +20,9 @@
 #include "core/bridge/script_bridge_in_multi_so.h"
 #include <dlfcn.h>
 #include "android/base/log_utils.h"
-#include "android/bridge/impl/multi_so_initializer.h"
+#include "android/bridge/multi_so_initializer.h"
 #include "core/bridge/script/core_side_in_simple.h"
-#include "core/bridge/script/script_side_in_multi_so.h"
+#include "android/bridge/script/script_side_in_multi_so.h"
 #include "core/manager/weex_core_manager.h"
 
 namespace WeexCore {

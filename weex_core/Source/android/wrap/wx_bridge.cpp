@@ -18,12 +18,12 @@
  */
 
 #include "android/wrap/wx_bridge.h"
-#include <android/bridge/impl/android_bridge.h>
 #include <fstream>
 #include "android/base/jni_type.h"
 #include "android/base/string/string_utils.h"
-#include "android/bridge/impl/android_bridge_in_multi_process.h"
-#include "android/bridge/impl/android_bridge_in_multi_so.h"
+#include "android/bridge/platform/android_bridge.h"
+#include "android/bridge/platform/android_bridge_in_multi_process.h"
+#include "android/bridge/platform/android_bridge_in_multi_so.h"
 #include "android/jniprebuild/jniheader/WXBridge_jni.h"
 #include "android/utils/cache_utils.h"
 #include "android/utils/params_utils.h"
