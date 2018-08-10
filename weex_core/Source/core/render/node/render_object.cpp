@@ -57,7 +57,6 @@ RenderObject::~RenderObject() {
     RenderObject *child = static_cast<RenderObject *>(*it);
     if (child != nullptr) {
       delete child;
-      child = nullptr;
     }
   }
 }
@@ -72,7 +71,6 @@ void RenderObject::ApplyDefaultStyle() {
 
   if (style != nullptr) {
     delete style;
-    style = nullptr;
   }
 }
 
@@ -87,7 +85,6 @@ void RenderObject::ApplyDefaultAttr() {
 
   if (attrs != nullptr) {
     delete attrs;
-    attrs = nullptr;
   }
 }
 

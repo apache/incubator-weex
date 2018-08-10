@@ -137,6 +137,8 @@ namespace WeexCore
 
 + (void)layoutPage:(NSString*)pageId size:(CGSize)size forced:(BOOL)forced;
 
++ (void)closePage:(NSString*)pageId;
+
 + (void)layoutRenderObject:(void*)object size:(CGSize)size page:(NSString*)pageId;
 
 + (void*)copyRenderObject:(void*)source replacedRef:(NSString*)ref;

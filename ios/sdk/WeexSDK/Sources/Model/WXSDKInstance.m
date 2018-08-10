@@ -516,7 +516,7 @@ typedef enum : NSUInteger {
         [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
         _needDestroy = NO;
     }
-
+    
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
     
     if (_componentManager) {
@@ -525,8 +525,17 @@ typedef enum : NSUInteger {
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnComponentThread(^{
         __strong typeof(self) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        
+        // Destroy weexcore c++ page and objects.
+        [WXCoreBridge closePage:strongSelf.instanceId];
+        
+        // Destroy components and views in main thread.
         [strongSelf.componentManager unload];
-        //Reading config from orange for Release instance in Main Thread or not, for Bug #15172691 +{
+        
+        // Reading config from orange for Release instance in Main Thread or not, for Bug #15172691 +{
         if (!_bReleaseInstanceInMainThread) {
             [WXSDKManager removeInstanceforID:strongSelf.instanceId];
         } else {

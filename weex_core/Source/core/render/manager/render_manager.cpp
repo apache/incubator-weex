@@ -315,7 +315,6 @@ bool RenderManager::ClosePage(const std::string &page_id) {
   page->OnRenderPageClose();
   this->pages_.erase(page_id);
   delete page;
-  page = nullptr;
   return false;
 }
 
