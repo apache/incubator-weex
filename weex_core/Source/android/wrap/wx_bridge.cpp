@@ -243,6 +243,10 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
             ->platform_side()
             ->ReportNativeInitStatus(status_code, error_msg);
       });
+  // Init platform bridge
+  PlatformBridge* bridge = new AndroidBridgeInSimple;
+  WeexCoreManager::Instance()->set_platform_bridge(bridge);
+  // Init params
   std::vector<INIT_FRAMEWORK_PARAMS*> params_vector = initFromParam(
       env, params, [](const char* status_code, const char* error_msg) {
         WeexCoreManager::Instance()
@@ -252,9 +256,6 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
       });
   // If parse init params error, return false
   if (params_vector.empty()) return false;
-  // Init platform bridge
-  PlatformBridge* bridge = new AndroidBridgeInSimple;
-  WeexCoreManager::Instance()->set_platform_bridge(bridge);
   // Set project mode
   if (isSingleProcess()) {
     WeexCoreManager::Instance()->set_project_mode(
