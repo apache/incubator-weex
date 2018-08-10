@@ -13,12 +13,12 @@ Thanks for using Weex. Please follow the [Bug Report Guidelines](http://weex-pro
 ## Environment
 
 <!-- The environment to reproduce this bug, such as **Weex Version** and **Device Mode**. -->
-<!-- You can get those information throw [this example](http://dotwe.org/vue/1dea64f527db3fd109c0fb682d41c14f). -->
+<!-- You can get the environment of your device by [this example](http://dotwe.org/vue/1dea64f527db3fd109c0fb682d41c14f). -->
 
 ## Broken Example
 
-<!-- Please offer an example on the [online editor of Weex](http://dotwe.org/) to reproduce the bug. -->
+<!-- Please offer an example on the [online editor of Weex](http://dotwe.org/) to reproduce this bug. -->
 
 ## Steps to Reproduce
 
-<!-- Clear and concise steps to reproduce the bug. -->
+<!-- Clear and concise steps to reproduce this bug. -->
