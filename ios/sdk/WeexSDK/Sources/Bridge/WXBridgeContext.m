@@ -377,14 +377,6 @@ _Pragma("clang diagnostic pop") \
 {
     WXAssertBridgeThread();
     WXAssertParam(instanceIdString);
-
-    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
-    if (sdkInstance.dataRender) {
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge createDataRenderInstance:instanceIdString template:jsBundleString options:options];
-        });
-        return;
-    }
 	
 	@synchronized(self) {
 		if (![self.insStack containsObject:instanceIdString]) {
@@ -399,6 +391,19 @@ _Pragma("clang diagnostic pop") \
     //create a sendQueue bind to the current instance
     NSMutableArray *sendQueue = [NSMutableArray array];
     [self.sendQueue setValue:sendQueue forKey:instanceIdString];
+
+    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
+    if (sdkInstance.dataRender) {
+        WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instanceIdString]);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+
+        WXPerformBlockOnComponentThread(^{
+            [WXCoreBridge createDataRenderInstance:instanceIdString template:jsBundleString options:options];
+            WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+        });
+        return;
+    }
+
     NSArray *args = nil;
     WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instanceIdString]);
     WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
@@ -418,7 +423,6 @@ _Pragma("clang diagnostic pop") \
         newOptions[@"bundleType"] = bundleType;
         NSString *raxAPIScript = nil;
         NSString *raxAPIScriptPath = nil;
-        WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
         sdkInstance.bundleType = bundleType;
         if ([bundleType.lowercaseString isEqualToString:@"rax"]) {
             raxAPIScriptPath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-rax-api" ofType:@"js"];
@@ -588,14 +592,6 @@ _Pragma("clang diagnostic pop") \
     WXAssertBridgeThread();
     WXAssertParam(instance);
     
-    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
-    if (sdkInstance.dataRender) {
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge destroyDataRenderInstance:instance];
-        });
-        return;
-    }
-    
     //remove instance from stack
 	@synchronized(self) {
 		[self.insStack removeObject:instance];
@@ -609,7 +605,14 @@ _Pragma("clang diagnostic pop") \
         [self.sendQueue removeObjectForKey:instance];
     }
     
-    [self callJSMethod:@"destroyInstance" args:@[instance]];
+    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
+    if (sdkInstance.dataRender) {
+        WXPerformBlockOnComponentThread(^{
+            [WXCoreBridge destroyDataRenderInstance:instance];
+        });
+    } else {
+        [self callJSMethod:@"destroyInstance" args:@[instance]];
+    }
 }
 
 - (void)forceGarbageCollection
@@ -632,10 +635,9 @@ _Pragma("clang diagnostic pop") \
         WXPerformBlockOnComponentThread(^{
             [WXCoreBridge refreshDataRenderInstance:instance data:data];
         });
-        return;
+    } else {
+        [self callJSMethod:@"refreshInstance" args:@[instance, data]];
     }
-
-    [self callJSMethod:@"refreshInstance" args:@[instance, data]];
 }
 
 - (void)updateState:(NSString *)instance data:(id)data
