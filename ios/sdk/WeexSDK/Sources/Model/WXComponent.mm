@@ -252,7 +252,6 @@ static BOOL bNeedRemoveEvents = YES;
 
     pthread_mutex_destroy(&_propertyMutex);
     pthread_mutexattr_destroy(&_propertMutexAttr);
-
 }
 
 - (NSDictionary *)styles

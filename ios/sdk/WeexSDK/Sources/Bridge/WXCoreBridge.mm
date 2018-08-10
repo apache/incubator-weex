@@ -721,6 +721,11 @@ static WeexCore::JSBridge* jsBridge = nullptr;
     }
 }
 
++ (void)closePage:(NSString*)pageId
+{
+    platformBridge->onInstanceClose([pageId UTF8String]);
+}
+
 static void _traverseTree(WeexCore::RenderObject *render, int index, const char* pageId)
 {
     using namespace WeexCore;

@@ -670,15 +670,18 @@ static NSThread *WXComponentThread;
     WXAssertComponentThread();
     [self invalidate];
     [self _stopDisplayLink];
+    
+    __block WXComponent* rootComponent = _rootComponent;
     NSEnumerator *enumerator = [[_indexDict copy] objectEnumerator];
     dispatch_async(dispatch_get_main_queue(), ^{
         WXComponent *component;
         while ((component = [enumerator nextObject])) {
             [component _unloadViewWithReusing:NO];
         }
-        _rootComponent = nil;
+        rootComponent = nil; // finally release all components
     });
     
+    _rootComponent = nil;
     [_indexDict removeAllObjects];
     [_uiTaskQueue removeAllObjects];
 }
