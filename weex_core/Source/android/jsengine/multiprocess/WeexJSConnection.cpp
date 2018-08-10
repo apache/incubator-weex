@@ -39,6 +39,7 @@
 #include <android/bridge/impl/android_bridge_in_multi_process.h>
 #include <core/manager/weex_core_manager.h>
 #include <core/bridge/script_bridge_in_multi_process.h>
+#include <android/base/jni/android_jni.h>
 
 static void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie);
 
@@ -97,6 +98,8 @@ static void *newIPCServer(void *_td) {
     } catch (IPCException &e) {
         LOGE("server died");
         close(td->ipcServerFd);
+        base::android::DetachFromVM();
+        pthread_exit(NULL);
     }
 }
 
