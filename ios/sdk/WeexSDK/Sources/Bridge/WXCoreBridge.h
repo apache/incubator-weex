@@ -121,13 +121,13 @@ namespace WeexCore
 
 + (void)install;
 
-+ (void)createInstance:(NSString *)pageId
-              template:(NSString *)temp
-               options:(NSDictionary *)options;
++ (void)createDataRenderInstance:(NSString *)pageId
+                        template:(NSString *)temp
+                         options:(NSDictionary *)options;
 
-+ (void)destroyInstance:(NSString *)pageId;
++ (void)destroyDataRenderInstance:(NSString *)pageId;
 
-+ (void)refreshInstance:(NSString *)pageId data:(id)data;
++ (void)refreshDataRenderInstance:(NSString *)pageId data:(id)data;
 
 + (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
                  isWidthWrapContent:(BOOL)isWidthWrapContent

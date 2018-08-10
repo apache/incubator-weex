@@ -381,7 +381,7 @@ _Pragma("clang diagnostic pop") \
     WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
     if (sdkInstance.dataRender) {
         WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge createInstance:instanceIdString template:jsBundleString options:options];
+            [WXCoreBridge createDataRenderInstance:instanceIdString template:jsBundleString options:options];
         });
         return;
     }
@@ -440,7 +440,7 @@ _Pragma("clang diagnostic pop") \
                 [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
             }
         } else {
-            sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@",instanceIdString, newOptions,data];
+            sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@", instanceIdString, newOptions, data];
             [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
                 if (sdkInstance.pageName) {
                     if (@available(iOS 8.0, *)) {
@@ -591,10 +591,11 @@ _Pragma("clang diagnostic pop") \
     WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
     if (sdkInstance.dataRender) {
         WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge destroyInstance:instance];
+            [WXCoreBridge destroyDataRenderInstance:instance];
         });
         return;
     }
+    
     //remove instance from stack
 	@synchronized(self) {
 		[self.insStack removeObject:instance];
@@ -629,7 +630,7 @@ _Pragma("clang diagnostic pop") \
     WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
     if (sdkInstance.dataRender) {
         WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge refreshInstance:instance data:data];
+            [WXCoreBridge refreshDataRenderInstance:instance data:data];
         });
         return;
     }

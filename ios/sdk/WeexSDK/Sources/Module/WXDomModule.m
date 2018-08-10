@@ -39,6 +39,7 @@
 
 @synthesize weexInstance;
 
+WX_EXPORT_METHOD(@selector(createFinish))
 WX_EXPORT_METHOD(@selector(updateFinish))
 WX_EXPORT_METHOD(@selector(refreshFinish))
 WX_EXPORT_METHOD(@selector(scrollToElement:options:))
@@ -77,6 +78,13 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     return [WXComponentManager componentThread];
 }
 
+- (void)createFinish
+{
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
+        [manager createFinish];
+    }];
+}
+
 - (void)updateFinish
 {
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
@@ -106,7 +114,6 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     [self performSelectorOnRuleManager:^{
         [WXRuleManager sharedInstance].instance = weexInstance;
         [[WXRuleManager sharedInstance] addRule:type rule:rule];
-        
     }];
 }
 
