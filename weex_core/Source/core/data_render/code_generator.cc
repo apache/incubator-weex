@@ -20,10 +20,23 @@
 #include "core/data_render/code_generator.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
+#include "core/data_render/common_error.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
+    
+void CodeGenerator::EnterClass(Value *class_value) {
+    ClassCnt *parent = cur_class_.release();
+    cur_class_.reset(new ClassCnt);
+    cur_class_->set_parent(parent);
+    cur_class_->set_class_value(class_value);
+}
+    
+void CodeGenerator::LeaveClass() {
+    ClassCnt *parent = cur_class_->parent();
+    cur_class_.reset(parent);
+}
 
 void CodeGenerator::EnterFunction() {
   FuncCnt* parent_func = cur_func_.release();
@@ -37,8 +50,12 @@ void CodeGenerator::EnterFunction() {
   BlockCnt* block = new BlockCnt();
   cur_func_->set_root_block(block);
   cur_func_->set_current_block(block);
-  cur_block_.release();
+  BlockCnt *parent_block = cur_block_.release();
   cur_block_.reset(block);
+  cur_block_->set_parent(parent_block);
+  if (parent_block != nullptr) {
+      cur_block_->set_idx(parent_block->idx());
+  }
 }
 
 void CodeGenerator::LeaveFunction() {
@@ -220,6 +237,7 @@ void CodeGenerator::Visit(FunctionStatement* node, void* data) {
   long reg = data == nullptr ? cur_block_->NextRegisterId()
                              : *static_cast<long*>(data);
   Handle<FunctionPrototype> proto = node->proto();
+  bool is_class_func = cur_func_->parent() == nullptr && cur_class_ ? true : false;
   // body
   // Slot
   auto slot = cur_func_->func_state()->AddInstruction(0);
@@ -229,17 +247,18 @@ void CodeGenerator::Visit(FunctionStatement* node, void* data) {
     cur_block_->NextRegisterId();
 
     // make arguments var in thie front of stack;
+    if (is_class_func) {
+        cur_block_->variables().insert(std::make_pair("this", cur_block_->NextRegisterId()));
+    }
     for (int i = 0; i < proto->GetArgs().size(); i++) {
       std::string arg = proto->GetArgs().at(i);
-      cur_block_->variables().insert(
-          std::make_pair(arg, cur_block_->NextRegisterId()));
+      cur_block_->variables().insert(std::make_pair(arg, cur_block_->NextRegisterId()));
     }
 
     node->body()->Accept(this, nullptr);
   }
-
+    
   // function prototype
-
   // associate function_name and function_state
   if (cur_func_->parent() == nullptr) {
     // in chunk
@@ -247,7 +266,13 @@ void CodeGenerator::Visit(FunctionStatement* node, void* data) {
     value.f = cur_func_->func_state()->GetChild(
         cur_func_->func_state()->children().size() - 1);
     value.type = Value::FUNC;
-    exec_state_->global()->Add(proto->GetName(), value);
+    if (cur_class_) {
+        ClassDescriptor *class_desc = ObjectValue<ClassDescriptor>(cur_class_->class_value());
+        class_desc->funcs_->Add(proto->GetName(), value);
+    }
+    else {
+        exec_state_->global()->Add(proto->GetName(), value);
+    }
 
   } else {
     // inside function
@@ -257,6 +282,150 @@ void CodeGenerator::Visit(FunctionStatement* node, void* data) {
     cur_block_->variables().insert(std::make_pair(proto->GetName(), reg));
   }
 
+}
+    
+void CodeGenerator::Visit(ThisExpression *node, void *data) {    
+    long ret = data == nullptr ? -1 : *static_cast<long *>(data);
+    if (ret >= 0) {
+        // searching in global
+        long rhs = cur_block_->FindRegisterId("this");
+        if (rhs != ret) {
+            // a = b
+            cur_func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, ret, rhs, 0));
+        }
+    }
+}
+    
+void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
+    RegisterScope register_scope(cur_block_.get());
+    long ret = data == nullptr ? cur_block_->NextRegisterId()
+    : *static_cast<long *>(data);
+    
+    // body
+    // Slot
+    auto slot = cur_func_->func_state()->AddInstruction(0);
+    {
+        FuncScope scope(this);
+        // skip func value in the fornt of stack;
+        cur_block_->NextRegisterId();
+
+        // make arguments var in thie front of stack;
+        for (int i = 0; i < node->args().size(); i++) {
+            assert(node->args()[i]->IsIdentifier());
+            std::string arg = node->args()[i]->AsIdentifier()->GetName();
+            cur_block_->variables().insert(std::make_pair(arg, cur_block_->NextRegisterId()));
+        }
+        node->body()->Accept(this, nullptr);
+    }
+    // associate function_name and function_state
+    if (cur_func_->parent() == nullptr) {
+        // in chunk
+        Value value;
+        assert(data);
+        value.f = cur_func_->func_state()->GetChild(cur_func_->func_state()->children().size() - 1);
+        value.type = Value::FUNC;
+        int index = exec_state_->global()->Add(value);
+        if (index >= 0) {
+            cur_func_->func_state()->AddInstruction(CREATE_ABx(OP_GETGLOBAL, ret, index));
+        }
+    }
+    else {
+        // inside function
+        int index = (int)cur_func_->func_state()->children().size() - 1;
+        Instruction i = CREATE_ABx(OP_GETFUNC, ret, index);
+        cur_func_->func_state()->ReplaceInstruction(slot, i);
+    }
+}
+    
+void CodeGenerator::Visit(ClassStatement *node, void *data) {
+    do {
+        Handle<Expression> super_expr = node->Super();
+        Value *super_value = nullptr,class_value = nullptr;
+        if (super_expr) {
+            if (!super_expr->IsIdentifier()) {
+                throw GeneratorError("super isn't a Identifier");
+                break;
+            }
+            int index = exec_state_->global()->IndexOf(super_expr->AsIdentifier()->GetName());
+            if (index == -1) {
+                throw GeneratorError("can't find super class" + super_expr->AsIdentifier()->GetName());
+                break;
+            }
+            super_value = exec_state_->global()->Find(index);
+            if (super_value->type != Value::CLASS_DESC) {
+                throw GeneratorError("can't find super class" + super_expr->AsIdentifier()->GetName());
+                break;
+            }
+        }
+        std::string class_name = node->Identifier()->AsIdentifier()->GetName();
+        int index = exec_state_->global()->IndexOf(class_name);
+        if (index != -1) {
+            throw GeneratorError(class_name + "redefine");
+            break;
+        }
+        class_value = exec_state_->class_factory()->CreateClassDescriptor(super_value ? ObjectValue<ClassDescriptor>(super_value) : nullptr);
+        exec_state_->global()->Add(class_name, class_value);
+        ClassScope scope(this, &class_value);
+        node->Body()->Accept(this, nullptr);
+        
+    } while (0);
+}
+    
+void CodeGenerator::Visit(ClassBody *node, void *data) {
+    for (int i = 0; i < node->raw_list().size(); i++) {
+        node->raw_list()[i]->Accept(this, data);
+    }
+}
+    
+void CodeGenerator::Visit(NewExpression *node, void *data) {
+    do {
+        RegisterScope(cur_block_.get());
+        long lhs = data == nullptr ? cur_block_->NextRegisterId() : *static_cast<long *>(data);
+        if (lhs >= 0) {
+            FuncState *state = cur_func_->func_state();
+            long rhs = cur_block_->FindRegisterId(node->member()->AsIdentifier()->GetName());
+            if (rhs >= 0) {
+                state->AddInstruction(CREATE_ABC(OP_MOVE, lhs, rhs, 0));
+                break;
+            }
+            int index = exec_state_->global()->IndexOf(node->member()->AsIdentifier()->GetName());
+            if (index >= 0) {
+                Value *value = exec_state_->global()->Find(index);
+                if (IsClassDescriptor(value)) {
+                    state->AddInstruction(CREATE_ABx(OP_NEWCLASS, lhs, index));
+                }
+                else {
+                    state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, lhs, index));
+                }
+            }
+        }
+            
+    } while (0);
+
+}
+    
+void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
+    do {
+        if (!node->LowerIdentifier()) {
+            std::string name = node->Identifier()->AsIdentifier()->GetName();
+            int index = exec_state_->global()->IndexOf(name);
+            if (index < 0) {
+                long registerId = cur_block_->FindRegisterId(name);
+                if (registerId < 0) {
+                    throw GeneratorError("can't find identifier:" + name);
+                    break;
+                }
+            }
+            else {
+                node->SetClass(true);
+            }
+        }
+        std::vector<Handle<Expression>> exprs = node->funcexprs();
+        for (int i = 0; i < exprs.size(); i++) {
+            exprs[i]->Accept(this, data);
+        }
+        
+    } while (0);
 }
 
 void CodeGenerator::Visit(BinaryExpression* node, void* data) {
@@ -311,9 +480,15 @@ void CodeGenerator::Visit(AssignExpression* node, void* data) {
   // this = a;
   // this.b = a; TBD
   long left = -1;
-  if (node->lhs().get() != NULL && node->lhs()->IsIdentifier()) {
-    auto& name = node->lhs()->AsIdentifier()->GetName();
-    left = cur_block_->FindRegisterId(name);
+  if (node->lhs().get() != NULL) {
+      if (node->lhs()->IsIdentifier()) {
+          auto& name = node->lhs()->AsIdentifier()->GetName();
+          left = cur_block_->FindRegisterId(name);
+      }
+      else {
+          left = cur_block_->NextRegisterId();
+          node->lhs()->Accept(this, &left);
+      }
   }
 
   long right = cur_block_->NextRegisterId();
@@ -325,7 +500,7 @@ void CodeGenerator::Visit(AssignExpression* node, void* data) {
   cur_func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, left, right, 0));
 }
 
-void CodeGenerator::Visit(Declaration* node, void* data) {
+void CodeGenerator::Visit(Declaration *node, void *data) {
   long reg = cur_block_->NextRegisterId();
   cur_block_->variables().insert(std::make_pair(node->name(), reg));
   if (node->expr().get() != nullptr) {
@@ -336,7 +511,7 @@ void CodeGenerator::Visit(Declaration* node, void* data) {
   }
 }
 
-void CodeGenerator::Visit(DeclarationList* node, void* data) {
+void CodeGenerator::Visit(DeclarationList *node, void *data) {
   for (int i = 0; i < node->exprs().size(); ++i) {
     auto temp = node->exprs()[i].get();
     if (temp != NULL) {
@@ -393,7 +568,7 @@ void CodeGenerator::Visit(ObjectConstant* node, void* data) {
   FuncState* func_state = cur_func_->func_state();
 
   // new table
-  Value table = exec_state_->getTableFactory()->CreateTable();
+  Value table = exec_state_->table_factory()->CreateTable();
   if (ret >= 0) {
     int tableIndex = func_state->AddConstant(table);
     Instruction i = CREATE_ABx(OpCode::OP_LOADK, ret, tableIndex);
@@ -425,7 +600,7 @@ void CodeGenerator::Visit(ArrayConstant* node, void* data) {
   FuncState* func_state = cur_func_->func_state();
 
   // new table
-  Value table = exec_state_->getTableFactory()->CreateTable();
+  Value table = exec_state_->table_factory()->CreateTable();
   if (reg >= 0) {
     int tableIndex = func_state->AddConstant(table);
     Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, tableIndex);
@@ -460,16 +635,14 @@ void CodeGenerator::Visit(MemberExpression* node, void* data) {
 
     FuncState* funcState = cur_func_->func_state();
     funcState->AddInstruction(CREATE_ABC(OP_GETTABLE, ret, ret, mindex));
-  } else if (node->kind() == MemberAccessKind::kDot) {
+  }
+  else if (node->kind() == MemberAccessKind::kDot) {
     long right = cur_block_->NextRegisterId();
-
-    FuncState* func_state = cur_func_->func_state();
+    FuncState *func_state = cur_func_->func_state();
     auto value = exec_state_->string_table_->StringFromUTF8(
         node->member()->AsIdentifier()->GetName());
     int tableIndex = func_state->AddConstant(std::move(value));
-
-    func_state->AddInstruction(
-        CREATE_ABx(OpCode::OP_LOADK, right, tableIndex));
+    func_state->AddInstruction(CREATE_ABx(OP_LOADK, right, tableIndex));
     func_state->AddInstruction(CREATE_ABC(OP_GETTABLE, ret, ret, right));
   }
 }
@@ -516,25 +689,31 @@ void CodeGenerator::Visit(Identifier* node, void* data) {
   }
 }
 
-void CodeGenerator::Visit(PrefixExpression* node, void* data) {
-  RegisterScope scope(cur_block_.get());
-
-  long ret = data == nullptr ? cur_block_->NextRegisterId()
-                             : *static_cast<long*>(data);
-
-  Handle<Identifier> iden = node->expr();
-  long reg = cur_block_->FindRegisterId(iden->GetName());
-
-  PrefixOperation operation = node->op();
-  // ++i
-  if (operation == PrefixOperation::kIncrement) {
-    cur_func_->func_state()->AddInstruction(
-        CREATE_ABC(OP_PRE_INCR, reg, ret, 0));
+void CodeGenerator::Visit(PrefixExpression *node, void *data) {
+    RegisterScope scope(cur_block_.get());
+    long ret = data == nullptr ? cur_block_->NextRegisterId()
+                             : *static_cast<long *>(data);
+    Handle<Expression> expr = node->expr();
+    long reg = -1;
+    if (expr->IsIdentifier()) {
+        reg = cur_block_->FindRegisterId(expr->AsIdentifier()->GetName());
+    }
+    else {
+        reg = cur_block_->NextRegisterId();
+        expr->Accept(this, &reg);
+    }
+    PrefixOperation operation = node->op();
+    // ++i
+    if (operation == PrefixOperation::kIncrement) {
+        cur_func_->func_state()->AddInstruction(CREATE_ABC(OP_PRE_INCR, reg, ret, 0));
+    }
     // --i
-  } else if (operation == PrefixOperation::kDecrement) {
-    cur_func_->func_state()->AddInstruction(
-        CREATE_ABC(OP_PRE_DECR, reg, ret, 0));
-  }
+    else if (operation == PrefixOperation::kDecrement) {
+        cur_func_->func_state()->AddInstruction(CREATE_ABC(OP_PRE_DECR, reg, ret, 0));
+    }
+    else if (operation == PrefixOperation::kUnfold) {
+        cur_func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, ret, reg, 0));
+    }
 }
 
 void CodeGenerator::Visit(ReturnStatement* node, void* data) {

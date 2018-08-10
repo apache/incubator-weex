@@ -116,9 +116,12 @@ public:
         std::vector<std::string> args)
         : Expression(), name_{ name }, args_{ std::move(args) }
     { }
+    void SetClassName(std::string &class_name) { class_name_ = class_name; };
     const std::string &GetName() const;
+    const std::string &GetClassName() const;
     const std::vector<std::string> &GetArgs() const;
 private:
+    std::string class_name_;
     std::string name_;
     std::vector<std::string> args_;
 };
@@ -239,17 +242,17 @@ private:
     
 class ClassStatement : public Expression {
 public:
-    ClassStatement(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body)
-    : Expression(loc, scope), identifier_{ identifier }, superClass_{superClass}, body_{body}  { }
+    ClassStatement(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> super_class, Handle<Expression> body)
+    : Expression(loc, scope), identifier_{ identifier }, super_class_{super_class}, body_{body}  { }
     
-    Handle<Expression> identifier() { return identifier_; }
-    Handle<Expression> &body () { return body_; }
-    Handle<Expression> superClass() { return superClass_; }
+    Handle<Expression> &Identifier() { return identifier_; }
+    Handle<Expression> &Body () { return body_; }
+    Handle<Expression> &Super() { return super_class_; }
 
     DEFINE_NODE_TYPE(ClassStatement, Expression);
 private:
     Handle<Expression> identifier_;
-    Handle<Expression> superClass_;
+    Handle<Expression> super_class_;
     Handle<Expression> body_;
 };
 

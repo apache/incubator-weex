@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <cmath>
 #include <sstream>
+#include <map>
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
 #include "core/data_render/object.h"
@@ -56,6 +57,8 @@ class String;
 class StringTable;
 
 class Value;
+    
+class Variables;
 
 typedef struct GCObject {
   CommonHeader;
@@ -75,7 +78,7 @@ struct Value {
     void *cptr;  // Lifecycle is managed outside vm
   };
 
-  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, TABLE };
+  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, TABLE, CLASS_DESC, CLASS_INST };
 
   Type type;
 
@@ -106,7 +109,9 @@ struct Value {
         break;
       case CPTR:cptr = value.cptr;
         break;
-      case TABLE:gc = value.gc;
+      case TABLE:
+      case CLASS_DESC:
+        gc = value.gc;
         break;
       default:break;
     }
@@ -139,6 +144,38 @@ typedef struct Table {
     Table() : array(), map() {}
 
 } Table;
+    
+class Variables {
+public:
+    Value *Find(int index);
+    int IndexOf(const std::string& name);
+    int Add(Value value);
+    int Add(const std::string& name, Value value);
+    int Set(const std::string& name, Value value);
+    
+private:
+    std::map<std::string, int> map_;
+    std::vector<Value> values_;
+};
+
+struct ClassDescriptor;
+    
+typedef struct ClassDescriptor {
+    CommonHeader;
+    ClassDescriptor *p_super_;
+    std::unique_ptr<Variables> funcs_;
+    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables) {}
+    
+} ClassDescriptor;
+
+typedef struct ClassInstance {
+    CommonHeader;
+    ClassDescriptor *p_desc_;
+    std::unique_ptr<Variables> vars_;
+    ClassInstance(ClassDescriptor *p_desc) : p_desc_(p_desc), vars_(new Variables) {}
+    
+} ClassInstance;
+
 /*
 ** try to convert a value to an integer, rounding according to 'mode':
 ** mode == 0: accepts only integral values
@@ -235,7 +272,9 @@ inline bool IsBool(const Value *o) { return Value::Type::BOOL == o->type; }
 inline bool IsTable(const Value *o) { return Value::Type::TABLE == o->type; }
 
 inline bool IsString(const Value *o) { return nullptr != o && Value::Type::STRING == o->type; }
-
+    
+inline bool IsClassDescriptor(const Value *o) { return nullptr != o && Value::Type::CLASS_DESC == o->type; }
+    
 inline int64_t IntValue(const Value *o) { return o->i; }
 
 inline double NumValue(const Value *o) { return o->n; }
@@ -249,12 +288,10 @@ inline String *StringValue(const Value *o) { return IsString(o) ? o->str : nullp
 inline char *CStringValue(const Value *o) {
   return (IsString(o) && nullptr != o->str) ? o->str->c_str() : nullptr;
 }
-
-inline Table *TableValue(const Value *o) {
-  if (IsTable(o)) {
-    return reinterpret_cast<Table *>(o->gc);
-  }
-  return nullptr;
+    
+template <typename T>
+inline T* ObjectValue(const Value *o) {
+    return reinterpret_cast<T*>(o->gc);
 }
 
 inline int ToNumber_(const Value *value, double &ret) {
@@ -291,6 +328,16 @@ inline void SetBValue(Value *o, bool b) {
 inline void SetTValue(Value *v, GCObject *o) {
   v->type = Value::Type::TABLE;
   v->gc = o;
+}
+    
+inline void SetCDValue(Value *v, GCObject *o) {
+    v->type = Value::Type::CLASS_DESC;
+    v->gc = o;
+}
+
+inline void SetCIValue(Value *v, GCObject *o) {
+    v->type = Value::Type::CLASS_INST;
+    v->gc = o;
 }
 
 inline void SetSValue(Value *v, String *s) {
@@ -358,8 +405,8 @@ inline int ToBool(const Value *o, bool &b) {
 }
 
 inline void TableArrayAddAll(Value &src, Value &dest, int start, int end) {
-  Table *st = TableValue(&src);
-  Table *dt = TableValue(&dest);
+  Table *st = ObjectValue<Table>(&src);
+  Table *dt = ObjectValue<Table>(&dest);
   st->array.insert(st->array.end(), dt->array.begin() + start, end > 0 ? dt->array.begin() + end : dt->array.end());
 }
 
@@ -368,8 +415,8 @@ inline void TableArrayAddAll(Value &src, Value &dest) {
 }
 
 inline void TableMapAddAll(Value &src, Value &dest) {
-  Table *st = TableValue(&src);
-  Table *dt = TableValue(&dest);
+  Table *st = ObjectValue<Table>(&src);
+  Table *dt = ObjectValue<Table>(&dest);
   dt->map.insert(st->map.begin(), st->map.end());
 }
 

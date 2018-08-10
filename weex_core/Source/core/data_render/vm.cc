@@ -20,6 +20,7 @@
 #include "core/data_render/exec_state.h"
 #include "core/data_render/object.h"
 #include "core/data_render/table.h"
+#include "common_error.h"
 
 #if DEBUG
 #include "core/data_render/monitor/vm_monitor.h"
@@ -50,6 +51,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
 
     switch (op) {
       case OP_MOVE:
+        LOGD("OP_MOVE A:%i BX:%i\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         *a = *b;
@@ -59,6 +61,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         a->type = Value::Type::NIL;
         break;
       case OP_LOADK:
+        LOGD("OP_LOADK A:%i BX:%i\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.func->f->GetConstant(GET_ARG_Bx(instruction));
         *a = *b;
@@ -87,6 +90,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
           SetDValue(a, NUM_OP(+, d1, d2));
         } else {
           LOGE("Unspport Type[%d,%d] with OP_CODE[OP_ADD]", b->type, c->type);
+            throw VMExecError("Unspport Type with OP_CODE[OP_ADD]");
         }
         break;
 
@@ -100,6 +104,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
           SetDValue(a, NUM_OP(-, d1, d2));
         } else {
           LOGE("Unspport Type[%d,%d] with OP_CODE[OP_SUB]", b->type, c->type);
+          throw VMExecError("Unspport Type with OP_CODE[OP_SUB]");
         }
         break;
 
@@ -182,6 +187,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         break;
 
       case OP_CALL: {
+        LOGD("OP_CALL A:%i B:%i C::%i\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         size_t argc = GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
@@ -193,8 +199,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
           a = frame.reg + GET_ARG_A(instruction);
           bool con = false;
           if (!ToBool(a, con)) {
-              LOGE("Unspport Type[%d] with OP_CODE[OP_JMP]", a->type);
-              return;
+              throw VMExecError("Unspport Type With OP_CODE [OP_JMP]");
           }
           if (!con) {
               pc += GET_ARG_Bx(instruction);
@@ -342,25 +347,34 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             SetDValue(b, NumValue(a));
           }
         } else {
-          LOGE("Unspport Type[%d] with OP_CODE[OP_PRE_DECR]", a->type);
+          throw VMExecError("Unspport Type with OP_CODE [OP_PRE_DECR]");
         }
       }
         break;
-
+      case OP_NEWCLASS: {
+          a = frame.reg + GET_ARG_A(instruction);
+          b = exec_state->global()->Find((int)(GET_ARG_Bx(instruction)));
+          if (!IsClassDescriptor(b)) {
+              throw VMExecError("Unspport Find Desc with OP_CODE [OP_NEWCLASS]");
+          }
+          *a = exec_state->class_factory()->CreateClassInstance(ObjectValue<ClassDescriptor>(b));
+          break;
+      }
       case OP_NEWTABLE: {
         a = frame.reg + GET_ARG_A(instruction);
-        Value t = exec_state->getTableFactory()->CreateTable();
+        Value t = exec_state->table_factory()->CreateTable();
         *a = t;
       }
         break;
 
       case OP_GETTABLE: {
+          LOGD("OP_GETTABLE A:%i B:%i C:%i\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (!IsTable(b)) {
           // TODO error
-          return;
+            throw VMExecError("Unspport Type with OP_CODE [OP_GETTABLE]");
         }
         Value* ret = GetTabValue(reinterpret_cast<Table *>(b->gc), *c);
         if (!IsNil(ret)) {
@@ -372,16 +386,18 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         break;
 
       case OP_SETTABLE: {
+          LOGD("OP_SETTABLE A:%i B:%i C:%i\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         if (!IsTable(a)) {
           // TODO error
-          return;
+            throw VMExecError("Table Type Error With OP_CODE [OP_SETTABLE]");
         }
         int ret = SetTabValue(reinterpret_cast<Table*>(a->gc), b, *c);
         if (!ret) {
           // TODO set faile
+            throw VMExecError("Set Table Error With OP_CODE [OP_SETTABLE]");
         }
       }
         break;
@@ -398,11 +414,8 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
           return;
         }
       }
-
       case OP_INVALID: {
-        //todo make an error;
-        int a = 0/0;
-        return;
+          throw VMExecError("Error With OP_CODE [OP_INVALID]");
       }
         break;
 

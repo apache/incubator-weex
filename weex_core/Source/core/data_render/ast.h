@@ -91,10 +91,10 @@ namespace data_render {
   M(LabelledStatement)   \
   M(ClassStatement)      \
   M(MethodStatement)     \
-  M(NewExpression)       \
   M(ThisExpression)      \
   M(CommaExpression)     \
-  M(JSXNodeExpression)       \
+  M(JSXNodeExpression)    \
+  M(NewExpression)        \
   M(ArrowFunctionStatement) \
   M(ClassBody)              \
   M(ExpressionList)
@@ -549,9 +549,10 @@ public:
 class NewExpression : public Expression {
 public:
     NewExpression(Position &loc, Scope *scope, Handle<Expression> member)
-    : Expression(loc, scope), member_{ member }
-    { }
-    
+    : Expression(loc, scope), member_{ member } { }
+    NewExpression(Handle<Expression> member)
+    : Expression(), member_{ member } { }
+
     Handle<Expression> member() { return member_; }
     bool ProduceRValue() override { return false; }
     DEFINE_NODE_TYPE(NewExpression, Expression);
@@ -582,25 +583,7 @@ public:
 private:
     Handle<ExpressionList> exprs_;
 };
-
-#define JSXNODE_IDENTIFIER                        "jsxnid"
-
-class JSXNodeExpression : public Expression {
-public:
-    JSXNodeExpression(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> nid, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens)
-    : Expression(loc, scope), identifier_(identifier), nid_(nid), parent_(parent),
-    props_(props), childrens_{std::move(childrens)} { }
-    void SetParent(Handle<Expression> parent) { parent_ = parent; }
-    std::vector<Handle<Expression>>& childrens() { return childrens_; }
-    DEFINE_NODE_TYPE(JSXNodeExpression, Expression);
-private:
-    Handle<Expression> identifier_;
-    Handle<Expression> nid_;
-    Handle<Expression> parent_{nullptr};
-    Handle<Expression> props_;
-    std::vector<Handle<Expression>> childrens_;
-};
-
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

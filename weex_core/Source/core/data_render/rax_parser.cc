@@ -21,7 +21,7 @@
 //
 
 #include "core/data_render/rax_parser.h"
-#include "core/data_render/rax_error.h"
+#include "core/data_render/common_error.h"
 #include "core/data_render/rax_parser_context.h"
 #include "core/data_render/rax_parser_statistics.h"
 #include "core/data_render/ast_builder.h"
@@ -935,14 +935,14 @@ Handle<Expression> RAXParser::ParseClassStatement() {
         clssuper_expr = builder()->NewIdentifier(GetIdentifierName());
         Advance();
     }
-    return builder()->NewClassStatement(builder()->NewIdentifier(clsname), clssuper_expr, ParseClassBody());
+    return builder()->NewClassStatement(builder()->NewIdentifier(clsname), clssuper_expr, ParseClassBody(clsname));
 }
     
-Handle<Expression> RAXParser::ParseClassBody() {
+Handle<Expression> RAXParser::ParseClassBody(std::string &clsname) {
     Handle<ClassBody> clsbody = builder()->NewClassBody();
     EXPECT(Token::LBRACE);
     while (true) {
-        auto one = ParseMethodStatement();
+        auto one = ParseClassMethodStatement(clsname);
         clsbody->Insert(one);
         auto tok = Peek();
         if (tok == Token::RBRACE) {
@@ -953,7 +953,7 @@ Handle<Expression> RAXParser::ParseClassBody() {
     return clsbody;
 }
     
-Handle<Expression> RAXParser::ParseMethodStatement() {
+Handle<Expression> RAXParser::ParseClassMethodStatement(std::string &clsname) {
     auto tok = Peek();
     if (tok != Token::IDENTIFIER) {
         throw SyntaxError(lex()->CurrentToken(), "expected a method identifier name");
@@ -963,6 +963,7 @@ Handle<Expression> RAXParser::ParseMethodStatement() {
     auto args = ParseParameterList();
     auto body = ParseBlockStatement();
     auto proto = builder()->NewFunctionPrototype(identifier, args);
+    proto->AsFunctionPrototype()->SetClassName(clsname);
     return builder()->NewFunctionStatement(proto->AsFunctionPrototype(), body);
 }
     
@@ -1094,8 +1095,6 @@ Handle<Expression> RAXParser::ParseProgram()
 {
     Handle<ExpressionList> exprs = builder()->NewExpressionList();
     Handle<ChunkStatement> chunk = builder()->NewChunkStatement(exprs);
-    // 引入node_id初始化变量
-    builder()->NewDeclaration(JSXNODE_IDENTIFIER, builder()->NewIntegralConstant(0));
     try {
         while (Peek() != Token::EOS) {
             exprs->Insert(ParseStatement());

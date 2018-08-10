@@ -33,7 +33,7 @@ int ResizeTab(Table *, size_t, size_t);
 Value *GetTabValue(Table *, const Value &);
 
 int SetTabValue(Table *, Value *, const Value &);
-
+    
 size_t GetTableSize(Table *);
 
 size_t GetArraySize(Table *);

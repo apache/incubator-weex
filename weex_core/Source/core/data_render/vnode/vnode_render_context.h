@@ -39,6 +39,7 @@ class VNodeRenderContext {
   inline void set_root(VNode* root) { root_ = root; }
 
   inline json11::Json& raw_json() { return raw_json_; }
+  inline std::string& raw_source() { return raw_source_; }
   inline std::map<std::string, json11::Json>& style_json() {
     return style_json_;
   }
@@ -48,6 +49,7 @@ class VNodeRenderContext {
   std::string page_id_;
   VNode* root_;
   json11::Json raw_json_;
+  std::string raw_source_;
   std::map<std::string, json11::Json> style_json_;
 };
 }  // namespace data_render

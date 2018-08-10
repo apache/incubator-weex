@@ -22,6 +22,10 @@
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
 #include "core/data_render/parser.h"
+#include "core/data_render/rax_parser_builder.h"
+#include "core/data_render/rax_parser.h"
+#include "core/data_render/rax_parser_context.h"
+#include "core/data_render/common_error.h"
 
 #if DEBUG
 #include "core/data_render/monitor/vm_monitor.h"
@@ -31,55 +35,16 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-Value* Global::Find(int index) {
-  if (index >= values_.size() || index < 0) {
-    return nullptr;
-  }
-  return &values_[index];
-}
-
-int Global::IndexOf(const std::string& name) {
-  auto iter = map_.find(name);
-  if (iter != map_.end()) {
-    return iter->second;
-  }
-  return -1;
-}
-
-int Global::Add(const std::string& name, Value value) {
-  auto iter = map_.find(name);
-  if (iter != map_.end()) {
-    return iter->second;
-  }
-  values_.push_back(value);
-  int index = values_.size() - 1;
-  map_.insert(std::make_pair(name, index));
-  return index;
-}
-
-int Global::Set(const std::string& name, Value value) {
-  auto iter = map_.find(name);
-  if (iter != map_.end()) {
-    int index = iter->second;
-    values_[static_cast<size_t>(index)] = value;
-    return index;
-  } else {
-    values_.push_back(value);
-    int index = values_.size() - 1;
-    map_.insert(std::make_pair(name, index));
-    return index;
-  }
-}
-
 ExecState::ExecState(VM* vm)
     : vm_(vm),
       frames_(),
-      global_(new Global),
+      global_(new Variables),
       stack_(new ExecStack),
       func_state_(nullptr),
       string_table_(new StringTable),
       render_context_(new VNodeRenderContext),
       factory_(new TableFactory()),
+      class_factory_(new ClassFactory()),
       global_variables_() {}
 
 void ExecState::Compile() {
@@ -89,8 +54,25 @@ void ExecState::Compile() {
 #endif
   CodeGenerator generator(this);
   std::string err;
-  ParseResult result = Parser::Parse(context()->raw_json(),err);
-  generator.Visit(result.expr().get(), nullptr);
+  if (!context()->raw_json().is_null()) {
+      ParseResult result = Parser::Parse(context()->raw_json(),err);
+      generator.Visit(result.expr().get(), nullptr);
+  }
+  else if (context()->raw_source().length() > 0) {
+      weex::core::data_render::RAXParserBuilder builder(context()->raw_source());
+      weex::core::data_render::RAXParser *parser = builder.parser();
+      Handle<Expression> expr = nullptr;
+      try {
+          expr = ParseProgram(parser);
+      }
+      catch (std::exception &) {
+          std::cout << "Parsed Error" << std::endl;
+      }
+      std::cout << "Parsed correctly" << std::endl;
+      if (expr->IsChunkStatement()) {
+          generator.Visit(expr->AsChunkStatement().get(), nullptr);
+      }
+  }
 }
 
 void ExecState::Execute() {
@@ -101,7 +83,15 @@ void ExecState::Execute() {
   chunk.type = Value::Type::FUNC;
   chunk.f = func_state_.get();
   *stack_->base() = chunk;
-  CallFunction(stack_->base(), 0, nullptr);
+  try {
+      CallFunction(stack_->base(), 0, nullptr);
+  } catch (std::exception &e) {
+      auto error = dynamic_cast<VMExecError *>(&e);
+      if (error) {
+          std::cerr << error->what() << std::endl;
+      }
+      return;
+  }
 }
 
 const Value& ExecState::Call(const std::string& func_name,

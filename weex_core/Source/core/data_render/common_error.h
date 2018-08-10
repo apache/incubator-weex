@@ -20,8 +20,8 @@
 // Created by pentao.pt on 2018/7/25.
 //
 
-#ifndef DATA_RENDER_RAX_ERROR_
-#define DATA_RENDER_RAX_ERROR_
+#ifndef DATA_RENDER_COMMON_ERROR_
+#define DATA_RENDER_COMMON_ERROR_
 
 #include "core/data_render/token.h"
 
@@ -29,9 +29,9 @@ namespace weex {
 namespace core {
 namespace data_render {
     
-class JSError : public std::runtime_error {
+class Error : public std::runtime_error {
 public:
-    JSError(std::string prefix, std::string msg)
+    Error(std::string prefix, std::string msg)
     : std::runtime_error(std::move(msg)), prefix_{ std::move(prefix) }
     { }
     
@@ -44,7 +44,25 @@ public:
 private:
     std::string prefix_;
 };
+    
+class GeneratorError : public Error {
+public:
+    GeneratorError(std::string str)
+    : Error("[GeneratorError]", std::move(str)) { }
+};
 
+class JSError : public Error {
+public:
+    JSError(std::string prefix, std::string str)
+    : Error("[JSError]" + prefix, std::move(str)) { }
+};
+
+class VMExecError : public Error {
+public:
+    VMExecError(std::string str)
+    : Error("[VMExecError]", std::move(str)) { }
+};
+    
 class SyntaxError : public JSError {
 public:
     SyntaxError(Token token, std::string str = "")
@@ -99,4 +117,4 @@ public:
 }
 }
 
-#endif
+#endif // DATA_RENDER_COMMON_ERROR_

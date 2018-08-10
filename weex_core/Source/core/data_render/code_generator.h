@@ -25,6 +25,7 @@
 #include "core/data_render/ast.h"
 #include "core/data_render/ast_visitor.h"
 #include "core/data_render/op_code.h"
+#include "core/data_render/object.h"
 
 namespace weex {
 namespace core {
@@ -62,6 +63,12 @@ class CodeGenerator : public ASTVisitor {
   void Visit(ArrayConstant *node, void *data) override;
   void Visit(ReturnStatement *node, void *data) override;
   void Visit(ExpressionList *node, void *data) override;
+  void Visit(JSXNodeExpression *node, void *data) override;
+  void Visit(ClassStatement *node, void *data) override;
+  void Visit(ClassBody *node, void *data) override;
+  void Visit(ArrowFunctionStatement *node, void *data) override;
+  void Visit(ThisExpression *node, void *data) override;
+  void Visit(NewExpression *node, void *data) override;
 
  private:
   template <class T>
@@ -130,6 +137,17 @@ class CodeGenerator : public ASTVisitor {
     BlockCnt *current_block_;
   };
 
+  class ClassCnt : public Node<ClassCnt> {
+    public:
+        ClassCnt() {}
+        ~ClassCnt() {}
+        inline void set_class_value(Value *class_value) {
+            class_value_ = class_value;
+        }
+        inline Value *class_value() { return class_value_; }
+    private:
+      Value *class_value_;
+  };
   class RegisterScope {
    public:
     RegisterScope(BlockCnt *block) : stored_idx_(block->idx()), block_(block) {}
@@ -160,7 +178,16 @@ class CodeGenerator : public ASTVisitor {
     CodeGenerator *cg_;
     DISALLOW_COPY_AND_ASSIGN(FuncScope);
   };
-
+  class ClassScope {
+    public:
+        ClassScope(CodeGenerator *cg, Value *class_value) : cg_(cg) { cg_->EnterClass(class_value); }
+        ~ClassScope() { cg_->LeaveClass(); }
+    private:
+        CodeGenerator *cg_;
+        DISALLOW_COPY_AND_ASSIGN(ClassScope);
+  };
+  void EnterClass(Value *class_value);
+  void LeaveClass();
   void EnterFunction();
   void LeaveFunction();
   void EnterBlock();
@@ -168,6 +195,7 @@ class CodeGenerator : public ASTVisitor {
   ExecState *exec_state_;
   std::unique_ptr<FuncCnt> cur_func_;
   std::unique_ptr<BlockCnt> cur_block_;
+  std::unique_ptr<ClassCnt> cur_class_;
 };
 }  // namespace data_render
 }  // namespace core

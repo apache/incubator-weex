@@ -16,27 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "core/data_render/statement.h"
-#include "core/data_render/ast.h"
-#include "core/data_render/ast_factory.h"
-#include "core/data_render/parser.h"
+//
+// Created by pentao.pt on 2018/7/25.
+//
+
+#ifndef DATA_RENDER_CLASSFACTORY_H
+#define DATA_RENDER_CLASSFACTORY_H
+
+#include <vector>
+#include "core/data_render/object.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
+        
+class ClassFactory {
+public:
+    ClassFactory() {};
+    virtual Value CreateClassDescriptor(ClassDescriptor *p_super);
+    virtual Value CreateClassInstance(ClassDescriptor *p_desc);
+    ~ClassFactory();
 
-void BlockStatement::PushExpression(Handle<Expression> expr) {
-  stmts_->Insert(expr);
+private:
+    std::vector<ClassDescriptor *> descs_;
+    std::vector<ClassInstance *> insts_;
+};
+
+}
+}
 }
 
-const std::string &FunctionPrototype::GetName() const { return name_; }
-
-const std::string &FunctionPrototype::GetClassName() const { return class_name_; }
-    
-const std::vector<std::string> &FunctionPrototype::GetArgs() const {
-  return args_;
-}
-
-}  // namespace data_render
-}  // namespace core
-}  // namespace weex
+#endif //DATA_RENDER_CLASSFACTORY_H

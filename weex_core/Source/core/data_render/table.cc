@@ -61,6 +61,12 @@ int SetTabStringValue(Table *t, const Value *key, const Value &val) {
     t->map.erase(it);
   }
   t->map.insert(std::make_pair(keyStr, val));
+    if (Value::Type::STRING == val.type) {
+        printf("SetTabStringValue: key:%s => value:%s\n", CStringValue(key), val.str->c_str());
+    }
+    else {
+        printf("SetTabStringValue: key:%s =>\n", CStringValue(key));
+    }
   return 1;
 }
 
@@ -138,11 +144,11 @@ size_t GetMapSize(Table *t) {
 }
 
 size_t GetValueArraySize(Value &o) {
-  return GetArraySize(TableValue(&o));
+  return GetArraySize(ObjectValue<Table>(&o));
 }
 
 size_t GetValueMapSize(Value &o) {
-  return GetMapSize(TableValue(&o));
+  return GetMapSize(ObjectValue<Table>(&o));
 }
 
 }  // namespace data_render

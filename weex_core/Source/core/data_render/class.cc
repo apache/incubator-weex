@@ -16,25 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "core/data_render/statement.h"
-#include "core/data_render/ast.h"
-#include "core/data_render/ast_factory.h"
-#include "core/data_render/parser.h"
+#include <algorithm>
+#include "core/data_render/class.h"
+#include "core/data_render/vm_mem.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
 
-void BlockStatement::PushExpression(Handle<Expression> expr) {
-  stmts_->Insert(expr);
+ClassDescriptor *NewClassDescriptor(ClassDescriptor *p_super) {
+    return new ClassDescriptor(p_super);
 }
-
-const std::string &FunctionPrototype::GetName() const { return name_; }
-
-const std::string &FunctionPrototype::GetClassName() const { return class_name_; }
     
-const std::vector<std::string> &FunctionPrototype::GetArgs() const {
-  return args_;
+ClassInstance *NewClassInstance(ClassDescriptor *p_desc) {
+    return new ClassInstance(p_desc);
 }
 
 }  // namespace data_render

@@ -20,6 +20,7 @@
 #include "core/data_render/ast.h"
 #include "core/data_render/ast_factory.h"
 #include "core/data_render/statement.h"
+#include "core/data_render/rax_jsx_ast.h"
 
 namespace weex {
 namespace core {
@@ -44,6 +45,10 @@ Handle<ExpressionList> ASTFactory::NewExpressionList(const std::vector<Handle<Ex
     
 Handle<ClassBody> ASTFactory::NewClassBody() {
   return MakeHandle<ClassBody>();
+}
+    
+Handle<Expression> ASTFactory::NewNewExpression(Handle<Expression> expr) {
+    return MakeHandle<NewExpression>(expr);
 }
     
 Handle<Expression> ASTFactory::NewIdentifier(std::string name) {
@@ -320,8 +325,7 @@ Handle<Expression> ASTFactory::NewArrowFunctionStatement(Position &loc, Scope *s
 }
     
 Handle<Expression> ASTFactory::NewJSXNodeExpression(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens) {
-    Handle<Expression> nidExpr = NewPrefixExpression(PrefixOperation::kIncrement, NewIdentifier(JSXNODE_IDENTIFIER));
-    return MakeHandle<JSXNodeExpression>(loc, scope, identifier, nidExpr, props, parent, std::move(childrens));
+    return MakeHandle<JSXNodeExpression>(loc, scope, identifier, props, parent, std::move(childrens));
 }
     
 Handle<Expression> ASTFactory::NewClassStatement(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body) {

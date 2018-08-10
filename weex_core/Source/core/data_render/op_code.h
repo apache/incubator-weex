@@ -29,6 +29,8 @@ enum OpCode {
   OP_LOADNULL,   //	A       R(A) = null
   OP_GETGLOBAL,  //	A Bx	R(A) = Global[B]
   OP_GETFUNC,    //	A Bx  	R(A) = Function[B]
+  
+  OP_NEWCLASS,   // A Bx R(A) = New Class[B]
 
   OP_NEWTABLE,  // A B C   R(A) = {} (size = B,C)
   OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)

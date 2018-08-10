@@ -25,6 +25,7 @@
 #include "core/data_render/ast.h"
 #include "core/data_render/handle.h"
 #include "core/data_render/statement.h"
+#include "core/data_render/rax_jsx_ast.h"
 
 namespace weex {
 namespace core {
@@ -38,6 +39,7 @@ class ASTFactory {
         virtual Handle<ExpressionList> NewExpressionList();
         virtual Handle<ExpressionList> NewExpressionList(const std::vector<Handle<Expression>>& list);
         virtual Handle<ClassBody> NewClassBody();
+        virtual Handle<Expression> NewNewExpression(Handle<Expression> expr);
         virtual Handle<Expression> NewIdentifier(std::string name);
         virtual Handle<ChunkStatement> NewChunkStatement(Handle<ExpressionList> list);
         virtual Handle<Expression> NewBlockStatement(Handle<ExpressionList> list);

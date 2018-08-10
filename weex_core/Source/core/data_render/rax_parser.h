@@ -99,9 +99,9 @@ public:
     Handle<Expression> ParseVariableOrExpressionOptional();
     Handle<Expression> ParseForInStatement(Handle<Expression> inexpr);
     Handle<Declaration> ParseDeclaration();
-    Handle<Expression> ParseClassBody();
     Handle<Expression> ParseClassStatement();
-    Handle<Expression> ParseMethodStatement();
+    Handle<Expression> ParseClassBody(std::string &clsname);
+    Handle<Expression> ParseClassMethodStatement(std::string &clsname);
 private:
     const std::string& GetIdentifierName();
     const std::string& GetStringConstant();

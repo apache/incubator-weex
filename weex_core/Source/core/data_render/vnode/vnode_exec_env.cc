@@ -54,7 +54,7 @@ static Value GetTableSize(ExecState* exec_state) {
   if (length > 0) {
     Value* value = exec_state->GetArgument(0);
     if (IsTable(value)) {
-      return Value(static_cast<int64_t>(GetTableSize(TableValue(value))));
+      return Value(static_cast<int64_t>(GetTableSize(ObjectValue<Table>(value))));
     }
   }
   return Value(static_cast<int64_t>(-1));
@@ -70,7 +70,7 @@ static Value Merge(ExecState* exec_state) {
   if (!IsTable(lvalue) || !IsTable(rvalue)) {
     return Value();
   }
-  Value new_value = exec_state->getTableFactory()->CreateTable();
+  Value new_value = exec_state->table_factory()->CreateTable();
   TableMapAddAll(*lvalue, new_value);
   TableMapAddAll(*rvalue, new_value);
   return new_value;
@@ -113,7 +113,7 @@ static Value Slice(ExecState* exec_state) {
   if (v_start > v_end) {
     v_start = v_end;
   }
-  Value new_value = exec_state->getTableFactory()->CreateTable();
+  Value new_value = exec_state->table_factory()->CreateTable();
   TableArrayAddAll(*table, new_value, v_start, v_end);
   return new_value;
 }
@@ -129,14 +129,14 @@ static Value AppendUrlParam(ExecState* exec_state) {
     return Value();
   }
   String* p_string = StringValue(url);
-  Table* p_array = TableValue(array);
+  Table* p_array = ObjectValue<Table>(array);
   std::stringstream ss;
   ss << p_string->c_str();
 
   std::vector<Value> kv_array = p_array->array;
   for (auto it = kv_array.begin(); it != kv_array.end(); it++) {
     Value& kv_map = *it;
-    Table* p_table = TableValue(&kv_map);
+    Table* p_table = ObjectValue<Table>(&kv_map);
     if (p_table != nullptr && p_table->map.find("key") != p_table->map.end() &&
         p_table->map.find("value") != p_table->map.end()) {
       Value& key = p_table->map.find("key")->second;
@@ -202,6 +202,63 @@ static Value SetAttr(ExecState* exec_state) {
   return Value();
 }
 
+
+// setProps(node, "value");
+static Value SetProps(ExecState *exec_state) {
+    VNode *node = reinterpret_cast<VNode *>(exec_state->GetArgument(0)->cptr);
+    if (node == nullptr) {
+        return Value();
+    }
+    Value *p_value = exec_state->GetArgument(1);
+    if (p_value->type == Value::TABLE) {
+        Table *table = ObjectValue<Table>(p_value);
+        for (auto iter = table->map.begin(); iter != table->map.end(); iter++) {
+            if (iter->first == "style") {
+                Value style = iter->second;
+                if (style.type == Value::TABLE) {
+                    Table *style_table = ObjectValue<Table>(&style);
+                    for (auto iter_style = style_table->map.begin(); iter_style != style_table->map.end(); iter_style++) {
+                        switch (iter_style->second.type) {
+                            case Value::STRING:
+                            {
+                                node->SetStyle(iter_style->first, iter_style->second.str->c_str());
+                                break;
+                            }
+                            case Value::INT:
+                            {
+                                node->SetStyle(iter_style->first, std::to_string(iter_style->second.i));
+                                break;
+                            }
+                            default:
+                                LOGE("can't support type:%i", iter_style->second.type);
+                                break;
+                        }
+                    }
+                }
+            }
+            else {
+                switch (iter->second.type) {
+                    case Value::STRING:
+                    {
+                        node->SetAttribute(iter->first, iter->second.str->c_str());
+                        break;
+                    }
+                    case Value::INT:
+                    {
+                        node->SetAttribute(iter->first, std::to_string(iter->second.i));
+                        break;
+                    }
+                    default:
+                        LOGE("can't support type:%i", iter->second.type);
+                        break;
+                }
+
+            }
+        }
+    }
+    return Value();
+}
+
 // setClassList(node, "class-name");
 static Value SetClassList(ExecState* exec_state) {
   VNode* node = reinterpret_cast<VNode*>(exec_state->GetArgument(0)->cptr);
@@ -242,6 +299,7 @@ void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   RegisterCFunc(state, "createElement", CreateElement);
   RegisterCFunc(state, "appendChild", AppendChild);
   RegisterCFunc(state, "setAttr", SetAttr);
+  RegisterCFunc(state, "setProps", SetProps);
   RegisterCFunc(state, "setClassList", SetClassList);
 }
 
@@ -263,24 +321,24 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     String* p_str = state->string_table()->StringFromUTF8(json.string_value());
     return Value(p_str);
   } else if (json.is_array()) {
-    Value value = state->getTableFactory()->CreateTable();
+    Value value = state->table_factory()->CreateTable();
     const json11::Json::array& data_objects = json.array_items();
     int64_t array_size = data_objects.size();
     for (int64_t index = 0; index < array_size; index++) {
       // will be free by table
       Value key(index);
       Value val(ParseJson2Value(state, json[index]));
-      SetTabValue(TableValue(&value), &key, val);
+      SetTabValue(ObjectValue<Table>(&value), &key, val);
     }
     return value;
   } else if (json.is_object()) {
-    Value value = state->getTableFactory()->CreateTable();
+    Value value = state->table_factory()->CreateTable();
     const json11::Json::object& data_objects = json.object_items();
     for (auto it = data_objects.begin(); it != data_objects.end(); it++) {
       // will be free by table
       Value key(state->string_table()->StringFromUTF8(it->first));
       Value val(ParseJson2Value(state, it->second));
-      SetTabValue(TableValue(&value), &key, val);
+      SetTabValue(ObjectValue<Table>(&value), &key, val);
     }
     return value;
   } else {
@@ -293,7 +351,7 @@ json11::Json ParseValue2Json(const Value& value) {
     return json11::Json();
   }
 
-  Table* p_table = TableValue(&value);
+  Table* p_table = ObjectValue<Table>(&value);
   if (p_table->array.size() > 0) {
     json11::Json::array array;
 
@@ -330,11 +388,11 @@ json11::Json ParseValue2Json(const Value& value) {
 
 void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   const json11::Json& json = state->context()->raw_json();
-  Global* global = state->global();
+  Variables* global = state->global();
   const json11::Json& data = json["data"];
   Value value = ParseJson2Value(state, data);
   if (value.type != Value::Type::TABLE) {
-    value = state->getTableFactory()->CreateTable();
+    value = state->table_factory()->CreateTable();
   }
   global->Add("_data_main", value);
 }
@@ -345,14 +403,14 @@ void VNodeExecEnv::InitInitDataValue(ExecState* state,
   const json11::Json& json = json11::Json::parse(init_data_str, err);
   if (!err.empty()) {
     LOGE("error parsing init data");
-    Value value = state->getTableFactory()->CreateTable();
+    Value value = state->table_factory()->CreateTable();
     state->global()->Set("_init_data", value);
     return;
   }
 
   Value value = ParseJson2Value(state, json);
   if (value.type != Value::Type::TABLE) {
-    value = state->getTableFactory()->CreateTable();
+    value = state->table_factory()->CreateTable();
   }
   state->global()->Set("_init_data", value);
 }
