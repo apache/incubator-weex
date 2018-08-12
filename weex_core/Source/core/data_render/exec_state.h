@@ -40,17 +40,18 @@ namespace data_render {
 class ValueRef {
     friend class ExecState;
 public:
-    ValueRef(FuncState *func_state, long register_id) : func_state_(func_state), register_id_(register_id), ref_id_(s_ref_id++) {};
+    ValueRef(FuncState *func_state, long register_id) : func_state_(func_state), register_id_(register_id), ref_id_(s_ref_id++) { SetNil(&value_); };
     inline int ref_id() { return ref_id_; }
     inline FuncState *func_state() { return func_state_; }
     inline long register_id() { return register_id_; }
+    inline Value &value() { return value_; }
     ~ValueRef() {}
 private:
     static int s_ref_id;
     FuncState *func_state_;
     int ref_id_;
     long register_id_;
-    Value *value_;
+    Value value_;
 };
 
 class FuncState {
@@ -115,7 +116,8 @@ class ExecState {
 
   size_t GetArgumentCount();
   Value* GetArgument(int index);
-  ValueRef* AddRef(FuncState *func_state, long register_id);
+  ValueRef *AddRef(FuncState *func_state, long register_id);
+  ValueRef *FindRef(int index);
   std::vector<ValueRef *> &refs() { return refs_; };
   inline Variables* global() { return global_.get(); }
   inline ExecStack* stack() { return stack_.get(); }

@@ -39,6 +39,7 @@ class ASTFactory {
         virtual Handle<ExpressionList> NewExpressionList();
         virtual Handle<ExpressionList> NewExpressionList(const std::vector<Handle<Expression>>& list);
         virtual Handle<ClassBody> NewClassBody();
+        virtual Handle<Expression> NewThisExpression();
         virtual Handle<Expression> NewNewExpression(Handle<Expression> expr);
         virtual Handle<Expression> NewIdentifier(std::string name);
         virtual Handle<ChunkStatement> NewChunkStatement(Handle<ExpressionList> list);

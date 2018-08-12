@@ -63,7 +63,8 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
                 args.push_back(props_);
             }
             else {
-                args.push_back(factory->NewNullConstant());
+                ProxyObject proxy;
+                args.push_back(factory->NewObjectConstant(proxy));
             }
             funcexprs_.push_back(factory->NewCallExpression(call_func_expr, args));
         }
@@ -78,7 +79,12 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
                 ProxyObject proxy;
                 args.push_back(factory->NewObjectConstant(proxy));
             }
-            funcexprs_.push_back(factory->NewCallExpression(MemberAccessKind::kCall, factory->NewIdentifier("vnode_ptr"), factory->NewIdentifier("constructor"), args));
+            Handle<Expression> vnode_ptr_expr = factory->NewIdentifier("vnode_ptr");
+            funcexprs_.push_back(factory->NewCallExpression(MemberAccessKind::kCall, vnode_ptr_expr, factory->NewIdentifier("constructor"), args));
+            // if (vnode_ptr.xxxx) then vnode_ptr.xxxx()
+            Handle<Expression> render_expr = factory->NewIdentifier("render");
+            Handle<MemberExpression> member_func_expr = factory->NewMemberExpression(MemberAccessKind::kClass, vnode_ptr_expr, render_expr);
+            funcexprs_.push_back(factory->NewIfStatement(member_func_expr, factory->NewCallExpression(MemberAccessKind::kCall, vnode_ptr_expr, render_expr, {})));
         }
     }
     return funcexprs_;

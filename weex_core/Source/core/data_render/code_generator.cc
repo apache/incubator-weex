@@ -50,6 +50,8 @@ void CodeGenerator::EnterFunction() {
         parent_func->func_state()->AddChild(func_->func_state());
     }
     BlockCnt *block = new BlockCnt();
+    block->set_func_state(func_->func_state());
+    block->set_exec_state(exec_state_);
     func_->set_root_block(block);
     func_->set_current_block(block);
     BlockCnt *parent_block = block_;
@@ -427,8 +429,8 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
             std::string name = node->Identifier()->AsIdentifier()->GetName();
             int index = exec_state_->global()->IndexOf(name);
             if (index < 0) {
-                long registerId = block_->FindRegisterId(name);
-                if (registerId < 0) {
+                bool exist = block_->FindVariable(name);
+                if (!exist) {
                     throw GeneratorError("can't find identifier:" + name);
                     break;
                 }
@@ -510,7 +512,13 @@ void CodeGenerator::Visit(AssignExpression *node, void *data) {
         node->rhs()->Accept(this, &right);
     }
     // a = b
-    func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, left, right, 0));
+    FuncState *func_state = func_->func_state();
+    if (class_ && node->lhs()->IsMemberExpression() && node->lhs()->AsMemberExpression()->expr()->IsThisExpression()) {
+        func_state->AddInstruction(CREATE_ABC(OP_SETCLASSVAR, left, right, 0));
+    }
+    else {
+        func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, right, 0));
+    }
 }
 
 void CodeGenerator::Visit(Declaration *node, void *data) {
@@ -660,6 +668,16 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
             func_state->AddInstruction(CREATE_ABC(OP_GETTABLE, ret, ret, right));
         }
     }
+    else if (node->kind() == MemberAccessKind::kClass) {
+        Handle<Expression> left = node->expr();
+        left->Accept(this, &ret);
+        long right = block_->NextRegisterId();
+        FuncState *func_state = func_->func_state();
+        auto value = exec_state_->string_table_->StringFromUTF8(node->member()->AsIdentifier()->GetName());
+        int tableIndex = func_state->AddConstant(std::move(value));
+        func_state->AddInstruction(CREATE_ABx(OP_LOADK, right, tableIndex));
+        func_state->AddInstruction(CREATE_ABC(OP_GETCLASSVAR, ret, ret, right));
+    }
     else if (node->kind() == MemberAccessKind::kCall) {
         FuncState *func_state = func_->func_state();
         Handle<Expression> expr = node->expr();
@@ -700,8 +718,7 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
     }
 }
 
-void CodeGenerator::Visit(Identifier* node, void* data) {
-  RegisterScope scope(block_);
+void CodeGenerator::Visit(Identifier *node, void* data) {
 
   long reg_a = data == nullptr ? block_->NextRegisterId()
                                : *static_cast<long*>(data);
@@ -784,20 +801,35 @@ void CodeGenerator::Visit(TernaryExpression* node, void* data) {
   ASTVisitor::Visit(node, data);
 }
     
+bool CodeGenerator::BlockCnt::FindVariable(const std::string &name) {
+    auto iter = variables_.find(name);
+    if (iter != variables_.end()) {
+        return true;
+    }
+    if (parent() != nullptr) {
+        return parent()->FindRegisterId(name) >= 0 ? true : false;
+    }
+    return false;
+}
+    
 long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
     auto iter = variables_.find(name);
     if (iter != variables_.end()) {
         return iter->second;
     }
     if (parent() != nullptr) {
-        long reg_ref = -1;
-        ValueRef *ref = parent()->FindValueRef(name, reg_ref);
-        if (ref) {
-            reg_ref = NextRegisterId();
-            func_state_->AddInstruction(CREATE_ABx(OP_GETVALUE, reg_ref, ref->ref_id()));
-            variables_.insert(std::make_pair(name, reg_ref));
+        if (parent()->func_state() == func_state_) {
+            return parent()->FindRegisterId(name);
         }
-        return reg_ref;
+        else {
+            long reg_ref = -1;
+            ValueRef *ref = parent()->FindValueRef(name, reg_ref);
+            if (ref) {
+                reg_ref = NextRegisterId();
+                func_state_->AddInstruction(CREATE_ABx(OP_GETVALUE, reg_ref, ref->ref_id()));
+            }
+            return reg_ref;
+        }
     }
     return -1;
 }
@@ -812,7 +844,7 @@ ValueRef *CodeGenerator::BlockCnt::FindValueRef(const std::string &name, long &r
             if (instruction && (op == OP_RETURN0 || op == OP_RETURN1)) {
                 func_state_->instructions().pop_back();
             }
-            func_state_->AddInstruction(CREATE_ABx(OP_SETVALUE, iter->second, ref->register_id()));
+            func_state_->AddInstruction(CREATE_ABx(OP_SETVALUE, iter->second, ref->ref_id()));
             if (instruction && (op == OP_RETURN0 || op == OP_RETURN1)) {
                 func_state_->AddInstruction(instruction);
             }

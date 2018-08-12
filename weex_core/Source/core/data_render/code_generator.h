@@ -92,6 +92,8 @@ class CodeGenerator : public ASTVisitor {
     inline long NextRegisterId() { return idx_++; }
 
     long FindRegisterId(const std::string &name);
+      
+    bool FindVariable(const std::string &name);
 
     inline void set_func_state(FuncState *func_state) {
       func_state_ = func_state;

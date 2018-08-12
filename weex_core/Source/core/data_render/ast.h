@@ -391,6 +391,7 @@ class NullConstant : public Expression {
 
 enum class MemberAccessKind {
   kCall,
+  kClass,
   kDot,
   kIndex,
 };

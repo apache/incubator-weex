@@ -162,6 +162,18 @@ ValueRef* ExecState::AddRef(FuncState *func_state, long register_id) {
     }
     return ref;
 }
+    
+ValueRef *ExecState::FindRef(int index) {
+    ValueRef *ref = nullptr;
+    for (int i = 0; i < refs_.size(); i++) {
+        ValueRef *ref_cur = refs_[i];
+        if (ref_cur->ref_id_ == index) {
+            ref = ref_cur;
+            break;
+        }
+    }
+    return ref;
+}
 
 size_t ExecState::GetArgumentCount() {
   return *stack_->top() - frames_.back().reg;

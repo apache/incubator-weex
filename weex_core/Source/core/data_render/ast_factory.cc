@@ -47,6 +47,10 @@ Handle<ClassBody> ASTFactory::NewClassBody() {
   return MakeHandle<ClassBody>();
 }
     
+Handle<Expression> ASTFactory::NewThisExpression() {
+  return MakeHandle<ThisExpression>();
+}
+    
 Handle<Expression> ASTFactory::NewNewExpression(Handle<Expression> expr) {
     return MakeHandle<NewExpression>(expr);
 }

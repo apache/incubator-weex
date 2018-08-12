@@ -54,12 +54,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         LOGD("OP_MOVE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
-        if (IsValueRef(a)) {
-            *a->var = *b;
-        }
-        else {
-            *a = *b;
-        }
+        *a = *b;
         break;
       case OP_LOADNULL:
         a = frame.reg + GET_ARG_A(instruction);
@@ -71,6 +66,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         *a = *b;
         break;
       case OP_GETGLOBAL:
+        LOGD("OP_GETGLOBAL A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = exec_state->global()->Find((int)GET_ARG_Bx(instruction));
         *a = *b;
@@ -195,6 +191,9 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         a = frame.reg + GET_ARG_A(instruction);
         size_t argc = GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
+        if (!IsFunc(c)) {
+            throw VMExecError("Unspport Type With OP_CODE [OP_CALL]");
+        }
         exec_state->CallFunction(c, argc, a);
           
       }
@@ -388,6 +387,17 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             *c = *inst_super->p_desc_->funcs_->Find(index);
             break;
         }
+        case OP_SETCLASSVAR:
+        {
+            LOGD("OP_SETCLASSVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            if (!IsValueRef(a)) {
+                throw VMExecError("Only ValueRef Support With OP_CODE [OP_SETCLASSVAR]");
+            }
+            *a->var = *b;
+            break;
+        }
         case OP_GETCLASS:
         {
             LOGD("OP_GETCLASS A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
@@ -419,16 +429,25 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             if (!IsString(c)) {
                 throw VMExecError("Type Error For Member with OP_CODE [OP_GETCLASSVAR]");
             }
-            Variables *vars = ObjectValue<ClassInstance>(b)->vars_.get();
+            // first find member func
             std::string var_name = StringValue(c)->c_str();
-            int index = vars->IndexOf(var_name);
+            Variables *funcs = ObjectValue<ClassInstance>(b)->p_desc_->funcs_.get();
+            int index = funcs->IndexOf(var_name);
             if (index < 0) {
-                Value var;
-                SetNil(&var);
-                index = vars->Add(var_name, var);
+                Variables *vars = ObjectValue<ClassInstance>(b)->vars_.get();
+                index = vars->IndexOf(var_name);
+                if (index < 0) {
+                    Value var;
+                    SetNil(&var);
+                    index = vars->Add(var_name, var);
+                }
+                Value *ref = vars->Find(index);
+                SetValueRef(a, ref);
             }
-            Value *ref = vars->Find(index);
-            SetValueRef(a, ref);
+            else {
+                Value *ref = funcs->Find(index);
+                SetValueRef(a, ref);
+            }
             break;
         }
         case OP_SETVALUE:
@@ -436,6 +455,11 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             LOGD("OP_SETVALUE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             int index = (int)GET_ARG_Bx(instruction);
+            ValueRef *ref = exec_state->FindRef(index);
+            if (!ref) {
+                throw VMExecError("Can't Find ValueRef " + std::to_string(index) + " [OP_SETVALUE]");
+            }
+            ref->value() = *a;
             break;
         }
         case OP_GETVALUE:
@@ -443,6 +467,11 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             LOGD("OP_GETVALUE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             int index = (int)GET_ARG_Bx(instruction);
+            ValueRef *ref = exec_state->FindRef(index);
+            if (!ref) {
+                throw VMExecError("Can't Find ValueRef " + std::to_string(index) + " [OP_GETVALUE]");
+            }
+            *a = ref->value();
             break;
         }
       case OP_NEWTABLE: {

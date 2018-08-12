@@ -243,6 +243,8 @@ inline int64_t ShiftLeft(const int64_t &a, const int64_t &b) {
 }
 
 inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
+    
+inline bool IsFunc(const Value *o) { return Value::Type::FUNC == o->type || Value::Type::CFUNC == o->type; }
 
 inline bool IsValueRef(const Value *o) { return Value::Type::VALUE_REF == o->type; }
     
@@ -401,22 +403,33 @@ inline String *StringAdd(StringTable *t, Value *a, Value *b) {
 }
 
 inline int ToBool(const Value *o, bool &b) {
-  double d1;
-  if (Value::Type::BOOL == o->type) {
-    b = BoolValue(o);
-  } else if (Value::Type::INT == o->type) {
-    b = IntValue(o);
-  } else if (Value::Type::NUMBER == o->type) {
-    b = NumValue(o);
-  } else if (ToNum(o, d1)) {
-    b = d1;
-  } else if (Value::Type::NIL == o->type) {
-    b = false;
-  } else {
-    b = false;
-    return 0;
-  }
-  return 1;
+    double d1;
+    if (Value::Type::BOOL == o->type) {
+        b = BoolValue(o);
+    }
+    else if (Value::Type::INT == o->type) {
+        b = IntValue(o);
+    }
+    else if (Value::Type::NUMBER == o->type) {
+        b = NumValue(o);
+    }
+    else if (Value::Type::VALUE_REF == o->type) {
+        return ToBool(o->var, b);
+    }
+    else if (ToNum(o, d1)) {
+        b = d1;
+    }
+    else if (Value::Type::NIL == o->type) {
+        b = false;
+    }
+    else if (Value::Type::FUNC == o->type) {
+        b = o->f ? true : false;
+    }
+    else {
+        b = false;
+        return 0;
+    }
+    return 1;
 }
 
 inline void TableArrayAddAll(Value &src, Value &dest, int start, int end) {
