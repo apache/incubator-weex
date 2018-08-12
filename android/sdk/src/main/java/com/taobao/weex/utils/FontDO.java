@@ -73,7 +73,7 @@ public class FontDO {
       return;
     }
 
-    if (src.matches("^url\\('.*'\\)$")) {
+    if (src.matches("^url\\((('[^']*')|(\"[^\"]*\"))\\)$")) {
       String url = src.substring(5, src.length() - 2);
       Uri uri = Uri.parse(url);
       if( instance != null){
