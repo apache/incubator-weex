@@ -69,6 +69,16 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
         }
         else {
             funcexprs_.push_back(factory->NewDeclaration("vnode_ptr", factory->NewNewExpression(identifier_)));
+            // call constructor
+            std::vector<Handle<Expression>> args;
+            if (props_) {
+                args.push_back(props_);
+            }
+            else {
+                ProxyObject proxy;
+                args.push_back(factory->NewObjectConstant(proxy));
+            }
+            funcexprs_.push_back(factory->NewCallExpression(MemberAccessKind::kCall, factory->NewIdentifier("vnode_ptr"), factory->NewIdentifier("constructor"), args));
         }
     }
     return funcexprs_;

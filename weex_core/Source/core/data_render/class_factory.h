@@ -38,6 +38,7 @@ public:
     ~ClassFactory();
 
 private:
+    ClassInstance *CreateClassInstanceFromSuper(ClassDescriptor *p_desc);
     std::vector<ClassDescriptor *> descs_;
     std::vector<ClassInstance *> insts_;
 };

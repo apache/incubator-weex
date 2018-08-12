@@ -56,9 +56,8 @@ class ASTFactory {
         virtual Handle<Expression> NewDoubleConstant(double value);
         virtual Handle<Expression> NewBooleanConstant(bool value);
         virtual Handle<Expression> NewNullConstant();
-        virtual Handle<Expression> NewCallExpression(MemberAccessKind kind, Handle<Expression> func, Handle<Expression> args);
+        virtual Handle<Expression> NewCallExpression(MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> member, std::vector<Handle<Expression>> args);
         virtual Handle<Expression> NewCommaExpression(const std::vector<Handle<Expression>>& list);
-
         virtual Handle<Expression> NewCallExpression(Handle<Expression>func, std::vector<Handle<Expression>> args);
         virtual Handle<Expression> NewMemberExpression(MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> mem);
         virtual Handle<Expression> NewPrefixExpression(PrefixOperation op, Handle<Expression> expr);

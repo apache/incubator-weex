@@ -30,12 +30,13 @@
 namespace weex {
 namespace core {
 namespace data_render {
+class ValueRef;
 class FuncState;
 class ExecState;
 class CodeGenerator : public ASTVisitor {
  public:
   CodeGenerator(ExecState *exec_state)
-      : exec_state_(exec_state), cur_block_(nullptr) {}
+      : exec_state_(exec_state), block_(nullptr) {}
   ~CodeGenerator() {}
   void Visit(ChunkStatement *node, void *data) override;
   void Visit(StringConstant *node, void *data) override;
@@ -90,16 +91,17 @@ class CodeGenerator : public ASTVisitor {
 
     inline long NextRegisterId() { return idx_++; }
 
-    inline long FindRegisterId(const std::string &name) {
-      auto iter = variables_.find(name);
-      if (iter != variables_.end()) {
-        return iter->second;
-      }
-      if (parent() != nullptr) {
-        return parent()->FindRegisterId(name);
-      }
-      return -1;
+    long FindRegisterId(const std::string &name);
+
+    inline void set_func_state(FuncState *func_state) {
+      func_state_ = func_state;
     }
+    inline FuncState *func_state() { return func_state_; }
+    inline void set_exec_state(ExecState *exec_state) {
+      exec_state_ = exec_state;
+    }
+    
+    inline ExecState *exec_state() { return exec_state_; }
 
     inline std::unordered_map<std::string, long> &variables() {
       return variables_;
@@ -109,9 +111,12 @@ class CodeGenerator : public ASTVisitor {
     inline bool is_loop() { return is_loop_; }
 
    private:
+    ValueRef *FindValueRef(const std::string &name, long &reg_ref);
     std::unordered_map<std::string, long> variables_;
     int idx_;
     bool is_loop_;
+    FuncState *func_state_{nullptr};
+    ExecState *exec_state_{nullptr};
   };
 
   class FuncCnt : public Node<FuncCnt> {
@@ -193,9 +198,9 @@ class CodeGenerator : public ASTVisitor {
   void EnterBlock();
   void LeaveBlock();
   ExecState *exec_state_;
-  std::unique_ptr<FuncCnt> cur_func_;
-  std::unique_ptr<BlockCnt> cur_block_;
-  std::unique_ptr<ClassCnt> cur_class_;
+  FuncCnt *func_;
+  BlockCnt *block_;
+  ClassCnt *class_;
 };
 }  // namespace data_render
 }  // namespace core

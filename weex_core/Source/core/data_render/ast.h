@@ -423,11 +423,9 @@ class CallExpression : public Expression {
                    Handle<Expression> expr, Handle<Expression> member)
     : Expression(loc, scope), kind_{ kind }, expr_(expr), member_(member)
     { }
-  CallExpression(MemberAccessKind kind, Handle<Expression> expr,
-                 Handle<Expression> member)
-      : Expression(), kind_{kind}, expr_(expr), member_(member) {}
-  CallExpression(Handle<Expression> callee,
-                 std::vector<Handle<Expression>> args)
+  CallExpression(MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> member, std::vector<Handle<Expression>> args)
+      : Expression(), kind_{kind}, expr_(expr), member_(member), args_{std::move(args)} {}
+  CallExpression(Handle<Expression> callee, std::vector<Handle<Expression>> args)
       : Expression(), kind_{MemberAccessKind::kCall}, callee_(callee), args_{std::move(args)} {}
   Handle<Expression> member() { return member_; }
   Handle<Expression> callee() { return callee_; }

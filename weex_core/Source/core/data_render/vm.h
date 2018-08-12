@@ -44,7 +44,7 @@ struct Frame {
 class VM {
  public:
   VM() {}
-  ~VM() {}
+  ~VM() {}    
   void RunFrame(ExecState *exec_state, Frame frame, Value* ret);
 };
 }  // namespace data_render

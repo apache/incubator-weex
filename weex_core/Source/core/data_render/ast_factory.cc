@@ -125,9 +125,8 @@ Handle<Expression> ASTFactory::NewNullConstant() {
   return MakeHandle<NullConstant>();
 }
 
-Handle<Expression> ASTFactory::NewCallExpression(MemberAccessKind kind, Handle<Expression> func,
-    Handle<Expression> args) {
-  return MakeHandle<CallExpression>(kind, func, args);
+Handle<Expression> ASTFactory::NewCallExpression(MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> member, std::vector<Handle<Expression>> args) {
+    return MakeHandle<CallExpression>(kind, expr, member, args);
 }
     
 Handle<Expression> ASTFactory::NewCallExpression(Handle<Expression> func, std::vector<Handle<Expression>> args) {

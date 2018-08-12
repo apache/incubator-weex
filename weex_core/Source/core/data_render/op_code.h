@@ -31,7 +31,14 @@ enum OpCode {
   OP_GETFUNC,    //	A Bx  	R(A) = Function[B]
   
   OP_NEWCLASS,   // A Bx R(A) = New Class[B]
+  OP_GETCLASS,   // A B C R(A) = B->C
+  OP_GETCLASSVAR
+  OP_GETSUPER,   // A B C     R(A) = super[B] C = super func
+  
+  OP_SETVALUE,     // A B C R(A) = B->C
+  OP_GETVALUE,     // A B C R(A) = B->C
 
+    
   OP_NEWTABLE,  // A B C   R(A) = {} (size = B,C)
   OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)
   OP_GETTABLE,  //	A B C	R(A) = R(B)[R(C)]

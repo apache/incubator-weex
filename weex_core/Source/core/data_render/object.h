@@ -170,6 +170,7 @@ typedef struct ClassDescriptor {
 
 typedef struct ClassInstance {
     CommonHeader;
+    ClassInstance *p_super_;
     ClassDescriptor *p_desc_;
     std::unique_ptr<Variables> vars_;
     ClassInstance(ClassDescriptor *p_desc) : p_desc_(p_desc), vars_(new Variables) {}
@@ -273,7 +274,9 @@ inline bool IsTable(const Value *o) { return Value::Type::TABLE == o->type; }
 
 inline bool IsString(const Value *o) { return nullptr != o && Value::Type::STRING == o->type; }
     
-inline bool IsClassDescriptor(const Value *o) { return nullptr != o && Value::Type::CLASS_DESC == o->type; }
+inline bool IsClass(const Value *o) { return nullptr != o && Value::Type::CLASS_DESC == o->type; }
+    
+inline bool IsClassInstance(const Value *o) { return nullptr != o && Value::Type::CLASS_INST == o->type; }
     
 inline int64_t IntValue(const Value *o) { return o->i; }
 

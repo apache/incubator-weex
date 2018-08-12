@@ -37,6 +37,22 @@ namespace weex {
 namespace core {
 namespace data_render {
 
+class ValueRef {
+    friend class ExecState;
+public:
+    ValueRef(FuncState *func_state, long register_id) : func_state_(func_state), register_id_(register_id), ref_id_(s_ref_id++) {};
+    inline int ref_id() { return ref_id_; }
+    inline FuncState *func_state() { return func_state_; }
+    inline long register_id() { return register_id_; }
+    ~ValueRef() {}
+private:
+    static int s_ref_id;
+    FuncState *func_state_;
+    int ref_id_;
+    long register_id_;
+    Value *value_;
+};
+
 class FuncState {
  public:
   FuncState() : instructions_(), constants_(), children_() {}
@@ -49,7 +65,7 @@ class FuncState {
       }
     }
     constants_.push_back(std::move(value));
-    return constants_.size() - 1;
+    return (int)constants_.size() - 1;
   }
 
   inline Value* GetConstant(int index) { return &constants_[index]; }
@@ -99,7 +115,8 @@ class ExecState {
 
   size_t GetArgumentCount();
   Value* GetArgument(int index);
-
+  ValueRef* AddRef(FuncState *func_state, long register_id);
+  std::vector<ValueRef *> &refs() { return refs_; };
   inline Variables* global() { return global_.get(); }
   inline ExecStack* stack() { return stack_.get(); }
   inline StringTable* string_table() { return string_table_.get(); }
@@ -120,6 +137,7 @@ class ExecState {
 
 
   std::vector<Frame> frames_;
+  std::vector<ValueRef *> refs_;
   std::unique_ptr<Variables> global_;
   std::unique_ptr<ExecStack> stack_;
   std::unique_ptr<FuncState> func_state_;
@@ -127,6 +145,7 @@ class ExecState {
   std::unique_ptr<VNodeRenderContext> render_context_;
   std::unordered_map<std::string, long> global_variables_;
 };
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

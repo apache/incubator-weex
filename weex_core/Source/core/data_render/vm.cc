@@ -51,7 +51,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
 
     switch (op) {
       case OP_MOVE:
-        LOGD("OP_MOVE A:%i BX:%i\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+        LOGD("OP_MOVE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         *a = *b;
@@ -61,14 +61,13 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         a->type = Value::Type::NIL;
         break;
       case OP_LOADK:
-        LOGD("OP_LOADK A:%i BX:%i\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
         a = frame.reg + GET_ARG_A(instruction);
-        b = frame.func->f->GetConstant(GET_ARG_Bx(instruction));
+        b = frame.func->f->GetConstant((int)GET_ARG_Bx(instruction));
         *a = *b;
         break;
       case OP_GETGLOBAL:
         a = frame.reg + GET_ARG_A(instruction);
-        b = exec_state->global()->Find(GET_ARG_Bx(instruction));
+        b = exec_state->global()->Find((int)GET_ARG_Bx(instruction));
         *a = *b;
         break;
       case OP_GETFUNC: {
@@ -187,11 +186,12 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         break;
 
       case OP_CALL: {
-        LOGD("OP_CALL A:%i B:%i C::%i\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+        LOGD("OP_CALL A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         size_t argc = GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         exec_state->CallFunction(c, argc, a);
+          
       }
         break;
 
@@ -318,9 +318,9 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         if (IsInt(a)) {
-          SetIValue(a, IntValue(a) + 1);
+          SetIValue(a, (int)IntValue(a) + 1);
           if (NULL != b) {
-            SetIValue(b, IntValue(a));
+            SetIValue(b, (int)IntValue(a));
           }
         } else if (IsNumber(a)) {
           SetDValue(a, NumValue(a) + 1);
@@ -352,14 +352,70 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
       }
         break;
       case OP_NEWCLASS: {
+          LOGD("OP_NEWCLASS A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
           a = frame.reg + GET_ARG_A(instruction);
           b = exec_state->global()->Find((int)(GET_ARG_Bx(instruction)));
-          if (!IsClassDescriptor(b)) {
+          if (!IsClass(b)) {
               throw VMExecError("Unspport Find Desc with OP_CODE [OP_NEWCLASS]");
           }
           *a = exec_state->class_factory()->CreateClassInstance(ObjectValue<ClassDescriptor>(b));
           break;
       }
+        case OP_GETCLASS:
+        {
+            LOGD("OP_GETCLASS A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            c = frame.reg + GET_ARG_C(instruction);
+            if (!IsClassInstance(b)) {
+                throw VMExecError("Type Error For Class Instance with OP_CODE [OP_GETCLASS]");
+            }
+            if (!IsString(c)) {
+                throw VMExecError("Type Error For Member with OP_CODE [OP_GETCLASS]");
+            }
+            int index = ObjectValue<ClassInstance>(b)->p_desc_->funcs_->IndexOf(StringValue(c)->c_str());
+            if (index < 0) {
+                throw VMExecError("Can't Find " + std::string(StringValue(c)->c_str()) + " With OP_CODE [OP_GETCLASS]");
+            }
+            *a = *ObjectValue<ClassInstance>(b)->p_desc_->funcs_->Find(index);
+            break;
+        }
+        case OP_GETSUPER:
+        {
+            LOGD("OP_GETSUPER A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            c = frame.reg + GET_ARG_C(instruction);
+            if (!IsClassInstance(b)) {
+                throw VMExecError("Type Error For Class Instance with OP_CODE [OP_GETSUPER]");
+            }
+            ClassInstance *inst = ObjectValue<ClassInstance>(b);
+            ClassInstance *inst_super = inst->p_super_;
+            if (!inst_super) {
+                throw VMExecError("Instance Can't Find Super With OP_CODE [OP_GETSUPER]");
+            }
+            int index = inst_super->p_desc_->funcs_->IndexOf("constructor");
+            if (index < 0) {
+                throw VMExecError("Can't Find Super Constructor With OP_CODE [OP_GETSUPER]");
+            }
+            SetCIValue(a, reinterpret_cast<GCObject *>(inst->p_super_));
+            *c = *inst_super->p_desc_->funcs_->Find(index);
+            break;
+        }
+        case OP_SETVALUE:
+        {
+            LOGD("OP_SETVALUE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            int index = (int)GET_ARG_Bx(instruction);
+            break;
+        }
+        case OP_GETVALUE:
+        {
+            LOGD("OP_GETVALUE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            int index = (int)GET_ARG_Bx(instruction);
+            break;
+        }
       case OP_NEWTABLE: {
         a = frame.reg + GET_ARG_A(instruction);
         Value t = exec_state->table_factory()->CreateTable();
@@ -368,7 +424,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         break;
 
       case OP_GETTABLE: {
-          LOGD("OP_GETTABLE A:%i B:%i C:%i\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+        LOGD("OP_GETTABLE A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
@@ -386,7 +442,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         break;
 
       case OP_SETTABLE: {
-          LOGD("OP_SETTABLE A:%i B:%i C:%i\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+        LOGD("OP_SETTABLE A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);

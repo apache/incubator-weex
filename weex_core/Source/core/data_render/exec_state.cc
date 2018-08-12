@@ -38,6 +38,7 @@ namespace data_render {
 ExecState::ExecState(VM* vm)
     : vm_(vm),
       frames_(),
+      refs_(),
       global_(new Variables),
       stack_(new ExecStack),
       func_state_(nullptr),
@@ -65,19 +66,32 @@ void ExecState::Compile() {
       try {
           expr = ParseProgram(parser);
       }
-      catch (std::exception &) {
-          std::cout << "Parsed Error" << std::endl;
+      catch (std::exception &e) {
+          auto error = dynamic_cast<Error *>(&e);
+          if (error) {
+              std::cerr << error->what() << std::endl;
+          }
+          return;
       }
       std::cout << "Parsed correctly" << std::endl;
       if (expr->IsChunkStatement()) {
-          generator.Visit(expr->AsChunkStatement().get(), nullptr);
+          try {
+              generator.Visit(expr->AsChunkStatement().get(), nullptr);
+          }
+          catch (std::exception &e) {
+              auto error = dynamic_cast<Error *>(&e);
+              if (error) {
+                  std::cerr << error->what() << std::endl;
+              }
+              return;
+          }
       }
   }
 }
 
 void ExecState::Execute() {
 #if DEBUG
-  TimeCost tc("ExecuteMain");
+  TimeCost tc("Execute");
 #endif
   Value chunk;
   chunk.type = Value::Type::FUNC;
@@ -86,7 +100,7 @@ void ExecState::Execute() {
   try {
       CallFunction(stack_->base(), 0, nullptr);
   } catch (std::exception &e) {
-      auto error = dynamic_cast<VMExecError *>(&e);
+      auto error = dynamic_cast<Error *>(&e);
       if (error) {
           std::cerr << error->what() << std::endl;
       }
@@ -127,10 +141,26 @@ void ExecState::CallFunction(Value* func, size_t argc, Value* ret) {
     frame.reg = func;
     frame.pc = &(*func->f->instructions().begin());
     frame.end = &(*func->f->instructions().end());
-    frames_.push_back(frame);
+      frames_.push_back(frame);
     vm_->RunFrame(this, frame, ret);
     frames_.pop_back();
   }
+}
+    
+ValueRef* ExecState::AddRef(FuncState *func_state, long register_id) {
+    ValueRef *ref = nullptr;
+    for (int i = 0; i < refs_.size(); i++) {
+        ValueRef *ref_cur = refs_[i];
+        if (ref_cur->func_state_ == func_state && ref_cur->register_id_ == register_id) {
+            ref = ref_cur;
+            break;
+        }
+    }
+    if (!ref) {
+        ref = new ValueRef(func_state, register_id);
+        refs_.push_back(ref);
+    }
+    return ref;
 }
 
 size_t ExecState::GetArgumentCount() {
@@ -140,6 +170,8 @@ size_t ExecState::GetArgumentCount() {
 Value* ExecState::GetArgument(int index) {
   return frames_.back().reg + index + 1;
 }
+    
+int ValueRef::s_ref_id = 0;
 
 }  // namespace data_render
 }  // namespace core
