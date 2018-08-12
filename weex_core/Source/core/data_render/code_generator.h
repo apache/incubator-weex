@@ -75,13 +75,16 @@ class CodeGenerator : public ASTVisitor {
   template <class T>
   class Node {
    public:
-    Node() : parent_(nullptr) {}
+      Node() : parent_(nullptr), children_{nullptr} {}
     virtual ~Node() {}
     inline T *parent() { return parent_; }
     inline void set_parent(T *t) { parent_ = t; }
+    inline T *children() { return children_; }
+    inline void set_children(T *t) { children_ = t; }
 
    private:
     T *parent_;
+    T *children_;
   };
 
   class BlockCnt : public Node<BlockCnt> {
@@ -113,6 +116,7 @@ class CodeGenerator : public ASTVisitor {
     inline bool is_loop() { return is_loop_; }
 
    private:
+    bool FindRegisterId(const std::string &name, long &ret);
     ValueRef *FindValueRef(const std::string &name, long &reg_ref);
     std::unordered_map<std::string, long> variables_;
     int idx_;

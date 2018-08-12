@@ -43,6 +43,12 @@ size_t GetMapSize(Table *);
 size_t GetValueArraySize(Value &);
 
 size_t GetValueMapSize(Value &);
+    
+#ifdef DEBUG
+    
+std::string TableToString(Table *table);
+    
+#endif
 
 }  // namespace data_render
 }  // namespace core

@@ -61,6 +61,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         a->type = Value::Type::NIL;
         break;
       case OP_LOADK:
+        LOGD("OP_LOADK A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.func->f->GetConstant((int)GET_ARG_Bx(instruction));
         *a = *b;
@@ -492,8 +493,11 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         }
         Value* ret = GetTabValue(reinterpret_cast<Table *>(b->gc), *c);
         if (!IsNil(ret)) {
-          *a = *ret;
-        } else {
+            Table *table = ObjectValue<Table>(ret);
+            LOGD("[OP_GETTABLE]:%s\n", TableToString(table).c_str());
+            *a = *ret;
+        }
+        else {
           SetNil(a);
         }
       }
@@ -508,7 +512,8 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
           // TODO error
             throw VMExecError("Table Type Error With OP_CODE [OP_SETTABLE]");
         }
-        int ret = SetTabValue(reinterpret_cast<Table*>(a->gc), b, *c);
+        int ret = SetTabValue(reinterpret_cast<Table *>(a->gc), b, *c);
+        LOGD("[OP_SETTABLE]:%s\n", TableToString(ObjectValue<Table>(a)).c_str());
         if (!ret) {
           // TODO set faile
             throw VMExecError("Set Table Error With OP_CODE [OP_SETTABLE]");

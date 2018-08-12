@@ -57,6 +57,9 @@ void CodeGenerator::EnterFunction() {
     BlockCnt *parent_block = block_;
     block_ = block;
     block_->set_parent(parent_block);
+    if (parent_block) {
+        parent_block->set_children(block_);
+    }
 }
 
 void CodeGenerator::LeaveFunction() {
@@ -79,6 +82,7 @@ void CodeGenerator::EnterBlock() {
     block_->set_func_state(func_->func_state());
     block_->set_exec_state(exec_state_);
     if (parent_block != nullptr) {
+        parent_block->set_children(block_);
         block_->set_idx(parent_block->idx());
     }
     func_->set_current_block(block_);
@@ -135,6 +139,11 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
         caller = block_->NextRegisterId();
         stms->callee()->Accept(this, &caller);
         argc = stms->args().size();
+        if (block_->idx() > caller + 1) {
+            long reg_old_caller = caller;
+            caller = block_->NextRegisterId();
+            func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, reg_old_caller, 0));
+        }
     }
     else if (stms->expr().get() && stms->member().get()) {
         long reg_member = block_->NextRegisterId();
@@ -825,7 +834,11 @@ long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
             long reg_ref = -1;
             ValueRef *ref = parent()->FindValueRef(name, reg_ref);
             if (ref) {
-                reg_ref = NextRegisterId();
+                BlockCnt *root_block = this;
+                while (root_block->children() && root_block->children()->func_state() == func_state_) {
+                    root_block = root_block->children();
+                }
+                reg_ref = root_block->NextRegisterId();
                 func_state_->AddInstruction(CREATE_ABx(OP_GETVALUE, reg_ref, ref->ref_id()));
             }
             return reg_ref;
@@ -844,6 +857,7 @@ ValueRef *CodeGenerator::BlockCnt::FindValueRef(const std::string &name, long &r
             if (instruction && (op == OP_RETURN0 || op == OP_RETURN1)) {
                 func_state_->instructions().pop_back();
             }
+            printf("%i\n", (int)iter->second);
             func_state_->AddInstruction(CREATE_ABx(OP_SETVALUE, iter->second, ref->ref_id()));
             if (instruction && (op == OP_RETURN0 || op == OP_RETURN1)) {
                 func_state_->AddInstruction(instruction);

@@ -19,6 +19,7 @@
 #include <algorithm>
 #include "core/data_render/table.h"
 #include "core/data_render/vm_mem.h"
+#include "third_party/json11/json11.hpp"
 
 namespace weex {
 namespace core {
@@ -150,6 +151,32 @@ size_t GetValueArraySize(Value &o) {
 size_t GetValueMapSize(Value &o) {
   return GetMapSize(ObjectValue<Table>(&o));
 }
+    
+#ifdef DEBUG
+json11::Json TableToJson(Table *table) {
+    json11::Json::object obj;
+    for (auto iter = table->map.begin(); iter != table->map.end(); iter++) {
+        if (iter->second.type == Value::Type::TABLE) {
+            obj.insert(std::make_pair(iter->first, TableToJson(ObjectValue<Table>(&iter->second))));
+        }
+        else if (iter->second.type == Value::Type::STRING) {
+            obj.insert(std::make_pair(iter->first, CStringValue(&iter->second)));
+        }
+        else if (iter->second.type == Value::Type::INT) {
+            obj.insert(std::make_pair(iter->first, std::to_string(IntValue(&iter->second))));
+        }
+    }
+    return json11::Json(obj);
+}
+    
+std::string TableToString(Table *table) {
+    json11::Json json = TableToJson(table);
+    std::string json_string;
+    json.dump(json_string);
+    return json_string;
+}
+    
+#endif
 
 }  // namespace data_render
 }  // namespace core
