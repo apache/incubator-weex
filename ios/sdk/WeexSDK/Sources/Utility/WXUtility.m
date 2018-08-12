@@ -256,14 +256,6 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return [NSString stringWithFormat:@"%@ %@ %@%@ %@", deviceUA, appUA, weexUA, externalUA, screenUA];
 }
 
-+ (BOOL)isStringPossiblelyJSONContainer:(id _Nonnull)string
-{
-    if (string == nil) return NO;
-    if (![string isKindOfClass:[NSString class]]) return NO;
-    if ([(NSString*)string length] < 2) return NO; // {"A":A}, [1], {}
-    return [(NSString*)string characterAtIndex:0] == '{' || [(NSString*)string characterAtIndex:0] == '[';
-}
-
 + (id)objectFromJSON:(NSString *)json
 {
     // in weex there are cases that json is empty container

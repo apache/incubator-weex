@@ -75,7 +75,6 @@ typedef enum : NSUInteger {
     WXRootView *_rootView;
     WXThreadSafeMutableDictionary *_moduleEventObservers;
     BOOL _performanceCommit;
-    BOOL _needDestroy;
     BOOL _syncDestroyComponentManager;
     BOOL _debugJS;
     id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context    
@@ -306,8 +305,7 @@ typedef enum : NSUInteger {
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
      [[NSNotificationCenter defaultCenter] postNotificationName:WX_SDKINSTANCE_WILL_RENDER object:self];
-     
-    _needDestroy = YES;
+    
     _mainBundleString = mainBundleString;
     if ([self _handleConfigCenter]) {
         NSError * error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:9999 userInfo:nil];
@@ -317,7 +315,6 @@ typedef enum : NSUInteger {
         return;
     }
     
-    _needDestroy = YES;
     [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"renderWithMainBundleString" options:@{@"threadName":WXTMainThread}];
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
     [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"renderWithMainBundleString" options:@{@"threadName":WXTMainThread}];
@@ -511,12 +508,6 @@ typedef enum : NSUInteger {
 
     [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];
-    
-    if (_needDestroy) {
-        [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
-        _needDestroy = NO;
-    }
-    
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
     
     if (_componentManager) {

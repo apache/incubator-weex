@@ -162,7 +162,6 @@ namespace WeexCore {
         RenderManager::GetInstance()->UpdateStyle(pageId, ref, data);
     }
 
-
     void JSBridge::onCallRemoveElement(const char *pageId, const char *ref) {
 #if JSAPI_LOG
         LOGD("[ExtendJSApi] functionCallRemoveElement >>>> pageId: %s, ref: %s", pageId,

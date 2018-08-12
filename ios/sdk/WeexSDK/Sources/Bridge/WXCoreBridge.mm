@@ -26,8 +26,8 @@
 #import "WXTracingManager.h"
 #import "WXBridgeProtocol.h"
 #import "WXUtility.h"
+#import "WXAssert.h"
 #import "WXAppConfiguration.h"
-#import "WsonObject.h"
 
 #include "base/CoreConstants.h"
 #include "core/manager/weex_core_manager.h"
@@ -48,6 +48,63 @@
 
 namespace WeexCore
 {
+    static NSString* const JSONSTRING_SUFFIX = @"\t\n\t\r";
+    
+    static NSString* TO_JSON(id object)
+    {
+        if (object == nil) {
+            return nil;
+        }
+        
+        @try {
+            if ([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]) {
+                NSError *error = nil;
+                NSData *data = [NSJSONSerialization dataWithJSONObject:object
+                                                               options:0
+                                                                 error:&error];
+                
+                if (error) {
+                    WXLogError(@"%@", error);
+                    WXAssert(NO, @"Fail to convert object to json. %@", error);
+                    return nil;
+                }
+                
+                return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] stringByAppendingString:JSONSTRING_SUFFIX]; // add suffix so that we know this is a json string
+            }
+        } @catch (NSException *exception) {
+            WXLogError(@"%@", exception);
+            WXAssert(NO, @"Fail to convert object to json. %@", exception);
+            return nil;
+        }
+        
+        return nil;
+    }
+    
+    static id TO_OBJECT(NSString* s)
+    {
+        if ([s hasSuffix:JSONSTRING_SUFFIX]) {
+            // s is a json string
+            @try {
+                NSError* error = nil;
+                id jsonObj = [NSJSONSerialization JSONObjectWithData:[s dataUsingEncoding:NSUTF8StringEncoding]
+                                                             options:NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
+                                                               error:&error];
+                
+                if (jsonObj == nil) {
+                    WXLogError(@"%@", error);
+                    WXAssert(NO, @"Fail to convert json to object. %@", error);
+                }
+                else {
+                    return jsonObj;
+                }
+            } @catch (NSException *exception) {
+                WXLogError(@"%@", exception);
+                WXAssert(NO, @"Fail to convert json to object. %@", exception);
+            }
+        }
+        return s; // return s instead
+    }
+    
     static NSMutableDictionary* NSDICTIONARY(std::map<std::string, std::string>* map)
     {
         if (map == nullptr || map->size() == 0)
@@ -55,11 +112,10 @@ namespace WeexCore
         
         NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:map->size()];
         for (auto it = map->begin(); it != map->end(); it ++) {
-            NSString* object = NSSTRING(it->second.c_str());
-            if ([WXUtility isStringPossiblelyJSONContainer:object]) {
-                object = [WXUtility objectFromJSON:object];
+            id object = TO_OBJECT(NSSTRING(it->second.c_str()));
+            if (object) {
+                [result setObject:object forKey:NSSTRING(it->first.c_str())];
             }
-            [result setObject:object forKey:NSSTRING(it->first.c_str())];
         }
         return result;
     }
@@ -71,11 +127,10 @@ namespace WeexCore
         
         NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:vec->size()];
         for (auto& p : *vec) {
-            NSString* object = NSSTRING(p.second.c_str());
-            if ([WXUtility isStringPossiblelyJSONContainer:object]) {
-                object = [WXUtility objectFromJSON:object];
+            id object = TO_OBJECT(NSSTRING(p.second.c_str()));
+            if (object) {
+                [result setObject:object forKey:NSSTRING(p.first.c_str())];
             }
-            [result setObject:object forKey:NSSTRING(p.first.c_str())];
         }
         return result;
     }
@@ -87,11 +142,10 @@ namespace WeexCore
         
         NSMutableArray* result = [[NSMutableArray alloc] initWithCapacity:set->size()];
         for (auto& s : *set) {
-            NSString* object = NSSTRING(s.c_str());
-            if ([WXUtility isStringPossiblelyJSONContainer:object]) {
-                object = [WXUtility objectFromJSON:object];
+            id object = TO_OBJECT(NSSTRING(s.c_str()));
+            if (object) {
+                [result addObject:object];
             }
-            [result addObject:object];
         }
         return result;
     }
@@ -799,6 +853,60 @@ static void _traverseTree(WeexCore::RenderObject *render, int index, const char*
     (static_cast<WeexCore::RenderObject*>(parent))->AddRenderObject(-1, (static_cast<WeexCore::RenderObject*>(child)));
 }
 
+static void _convertToCString(id _Nonnull obj, void (^callback)(const char*))
+{
+    if ([obj isKindOfClass:[NSString class]]) {
+        callback([obj UTF8String]);
+    }
+    else if ([obj isKindOfClass:[NSNumber class]]) {
+        NSNumber* num = (NSNumber*)obj;
+        char objcType = [num objCType][0];
+        char buffer[128];
+        switch (objcType) {
+            case _C_DBL:
+            case _C_FLT:
+                snprintf(buffer, sizeof(buffer), "%f", [num doubleValue]);
+                callback(buffer);
+                break;
+            case _C_INT:
+            case _C_CHR:
+            case _C_SHT:
+                snprintf(buffer, sizeof(buffer), "%d", [num intValue]);
+                callback(buffer);
+                break;
+            case _C_USHT:
+            case _C_UINT:
+            case _C_UCHR:
+                snprintf(buffer, sizeof(buffer), "%u", [num unsignedIntValue]);
+                callback(buffer);
+                break;
+            case _C_LNG:
+            case _C_LNG_LNG:
+                snprintf(buffer, sizeof(buffer), "%lld", [num longLongValue]);
+                callback(buffer);
+                break;
+            case _C_ULNG:
+            case _C_ULNG_LNG:
+                snprintf(buffer, sizeof(buffer), "%llu", [num unsignedLongLongValue]);
+                callback(buffer);
+                break;
+            case _C_BFLD:
+            case _C_BOOL:
+                callback([num boolValue] ? "true" : "false");
+                break;
+            default:
+                callback([[num stringValue] UTF8String]);
+                break;
+        }
+    }
+    else {
+        NSString* jsonstring = WeexCore::TO_JSON(obj);
+        if (jsonstring != nil) {
+            callback([jsonstring UTF8String]);
+        }
+    }
+}
+
 static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::RenderObject* parent,
                                                   int index, const std::string& pageId)
 {
@@ -814,112 +922,27 @@ static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::
         }
         
         [data[@"attr"] enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-            if ([obj isKindOfClass:[NSString class]]) {
-                render->AddAttr([key UTF8String], [obj UTF8String]);
-            }
-            else if ([obj isKindOfClass:[NSNumber class]]) {
-                NSNumber* num = (NSNumber*)obj;
-                char objcType = [num objCType][0];
-                char buffer[128];
-                switch (objcType) {
-                    case _C_DBL:
-                    case _C_FLT:
-                        snprintf(buffer, sizeof(buffer), "%f", [num doubleValue]);
-                        render->AddAttr([key UTF8String], buffer);
-                        break;
-                    case _C_INT:
-                    case _C_CHR:
-                    case _C_SHT:
-                        snprintf(buffer, sizeof(buffer), "%d", [num intValue]);
-                        render->AddAttr([key UTF8String], buffer);
-                        break;
-                    case _C_USHT:
-                    case _C_UINT:
-                    case _C_UCHR:
-                        snprintf(buffer, sizeof(buffer), "%u", [num unsignedIntValue]);
-                        render->AddAttr([key UTF8String], buffer);
-                        break;
-                    case _C_LNG:
-                    case _C_LNG_LNG:
-                        snprintf(buffer, sizeof(buffer), "%lld", [num longLongValue]);
-                        render->AddAttr([key UTF8String], buffer);
-                        break;
-                    case _C_ULNG:
-                    case _C_ULNG_LNG:
-                        snprintf(buffer, sizeof(buffer), "%llu", [num unsignedLongLongValue]);
-                        render->AddAttr([key UTF8String], buffer);
-                        break;
-                    case _C_BFLD:
-                    case _C_BOOL:
-                        render->AddAttr([key UTF8String], [num boolValue] ? "true" : "false");
-                        break;
-                    default:
-                        render->AddAttr([key UTF8String], [[num stringValue] UTF8String]);
-                        break;
+            _convertToCString(obj, ^(const char * value) {
+                if (value != nullptr) {
+                    render->AddAttr([key UTF8String], value);
                 }
-            }
-            else {
-                render->AddAttr([key UTF8String], [[WXUtility JSONString:obj] UTF8String]);
-            }
+            });
         }];
         
         [data[@"style"] enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-            if ([obj isKindOfClass:[NSString class]]) {
-                render->AddStyle([key UTF8String], [obj UTF8String]);
-            }
-            else if ([obj isKindOfClass:[NSNumber class]]) {
-                NSNumber* num = (NSNumber*)obj;
-                char objcType = [num objCType][0];
-                char buffer[128];
-                switch (objcType) {
-                    case _C_DBL:
-                    case _C_FLT:
-                        snprintf(buffer, sizeof(buffer), "%f", [num doubleValue]);
-                        render->AddStyle([key UTF8String], buffer);
-                        break;
-                    case _C_INT:
-                    case _C_CHR:
-                    case _C_SHT:
-                        snprintf(buffer, sizeof(buffer), "%d", [num intValue]);
-                        render->AddStyle([key UTF8String], buffer);
-                        break;
-                    case _C_USHT:
-                    case _C_UINT:
-                    case _C_UCHR:
-                        snprintf(buffer, sizeof(buffer), "%u", [num unsignedIntValue]);
-                        render->AddStyle([key UTF8String], buffer);
-                        break;
-                    case _C_LNG:
-                    case _C_LNG_LNG:
-                        snprintf(buffer, sizeof(buffer), "%lld", [num longLongValue]);
-                        render->AddStyle([key UTF8String], buffer);
-                        break;
-                    case _C_ULNG:
-                    case _C_ULNG_LNG:
-                        snprintf(buffer, sizeof(buffer), "%llu", [num unsignedLongLongValue]);
-                        render->AddStyle([key UTF8String], buffer);
-                        break;
-                    case _C_BFLD:
-                    case _C_BOOL:
-                        render->AddStyle([key UTF8String], [num boolValue] ? "true" : "false");
-                        break;
-                    default:
-                        render->AddStyle([key UTF8String], [[num stringValue] UTF8String]);
-                        break;
+            _convertToCString(obj, ^(const char * value) {
+                if (value != nullptr) {
+                    render->AddStyle([key UTF8String], value);
                 }
-            }
-            else {
-                render->AddStyle([key UTF8String], [[WXUtility JSONString:obj] UTF8String]);
-            }
+            });
         }];
         
         for (id obj in data[@"event"]) {
-            if ([obj isKindOfClass:[NSString class]]) {
-                render->AddEvent([obj UTF8String]);
-            }
-            else {
-                render->AddEvent([[WXUtility JSONString:obj] UTF8String]);
-            }
+            _convertToCString(obj, ^(const char * value) {
+                if (value != nullptr) {
+                    render->AddEvent(value);
+                }
+            });
         }
         
         int childIndex = 0;
@@ -935,23 +958,33 @@ static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::
     return nullptr;
 }
 
+static std::vector<std::pair<std::string, std::string>>* _parseMapValuePairs(NSDictionary* data)
+{
+    std::vector<std::pair<std::string, std::string>>* result = new std::vector<std::pair<std::string, std::string>>();
+    [data enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+        _convertToCString(obj, ^(const char * value) {
+            if (value != nullptr) {
+                result->emplace_back([key UTF8String], value);
+            }
+        });
+    }];
+    return result;
+}
+
 + (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index
 {
-#if 0
-    char indexBuffer[25];
-    sprintf(indexBuffer, "%d", index);
-    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallAddElement([pageId UTF8String], [parentRef UTF8String], [[WsonObject fromObject:data] data], indexBuffer);
-#else
     using namespace WeexCore;
     const std::string page([pageId UTF8String]);
     RenderObject* child = _parseRenderObject(data, nullptr, 0, page);
     RenderManager::GetInstance()->AddRenderObject(page, [parentRef UTF8String], index, child);
-#endif
 }
 
 + (void)callCreateBody:(NSString*)pageId data:(NSDictionary*)data
 {
-    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallCreateBody([pageId UTF8String], [[WsonObject fromObject:data] data]);
+    using namespace WeexCore;
+    const std::string page([pageId UTF8String]);
+    RenderObject* root = _parseRenderObject(data, nullptr, 0, page);
+    RenderManager::GetInstance()->CreatePage(page, root);
 }
 
 + (void)callRemoveElement:(NSString*)pageId ref:(NSString*)ref
@@ -966,12 +999,12 @@ static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::
 
 + (void)callUpdateAttrs:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
 {
-    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallUpdateAttrs([pageId UTF8String], [ref UTF8String], [[WsonObject fromObject:data] data]);
+    WeexCore::RenderManager::GetInstance()->UpdateAttr([pageId UTF8String], [ref UTF8String], _parseMapValuePairs(data));
 }
 
 + (void)callUpdateStyle:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
 {
-    WeexCore::WeexCoreManager::getInstance()->getJSBridge()->onCallUpdateStyle([pageId UTF8String], [ref UTF8String], [[WsonObject fromObject:data] data]);
+    WeexCore::RenderManager::GetInstance()->UpdateStyle([pageId UTF8String], [ref UTF8String], _parseMapValuePairs(data));
 }
 
 + (void)callAddEvent:(NSString*)pageId ref:(NSString*)ref event:(NSString*)event

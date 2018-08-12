@@ -140,16 +140,6 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 + (NSString *_Nonnull)userAgent;
 
 /**
- * @abstract Whether string is a NSString starting with '{' or '['
- *
- * @param string A NSString.
- *
- * @return Result
- *
- */
-+ (BOOL)isStringPossiblelyJSONContainer:(id _Nonnull)string;
-
-/**
  * @abstract JSON Decode Method
  *
  * @param json String.
