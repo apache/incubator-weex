@@ -54,7 +54,12 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         LOGD("OP_MOVE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
-        *a = *b;
+        if (IsValueRef(a)) {
+            *a->var = *b;
+        }
+        else {
+            *a = *b;
+        }
         break;
       case OP_LOADNULL:
         a = frame.reg + GET_ARG_A(instruction);
@@ -361,25 +366,6 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
           *a = exec_state->class_factory()->CreateClassInstance(ObjectValue<ClassDescriptor>(b));
           break;
       }
-        case OP_GETCLASS:
-        {
-            LOGD("OP_GETCLASS A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
-            a = frame.reg + GET_ARG_A(instruction);
-            b = frame.reg + GET_ARG_B(instruction);
-            c = frame.reg + GET_ARG_C(instruction);
-            if (!IsClassInstance(b)) {
-                throw VMExecError("Type Error For Class Instance with OP_CODE [OP_GETCLASS]");
-            }
-            if (!IsString(c)) {
-                throw VMExecError("Type Error For Member with OP_CODE [OP_GETCLASS]");
-            }
-            int index = ObjectValue<ClassInstance>(b)->p_desc_->funcs_->IndexOf(StringValue(c)->c_str());
-            if (index < 0) {
-                throw VMExecError("Can't Find " + std::string(StringValue(c)->c_str()) + " With OP_CODE [OP_GETCLASS]");
-            }
-            *a = *ObjectValue<ClassInstance>(b)->p_desc_->funcs_->Find(index);
-            break;
-        }
         case OP_GETSUPER:
         {
             LOGD("OP_GETSUPER A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
@@ -400,6 +386,49 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             }
             SetCIValue(a, reinterpret_cast<GCObject *>(inst->p_super_));
             *c = *inst_super->p_desc_->funcs_->Find(index);
+            break;
+        }
+        case OP_GETCLASS:
+        {
+            LOGD("OP_GETCLASS A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            c = frame.reg + GET_ARG_C(instruction);
+            if (!IsClassInstance(b)) {
+                throw VMExecError("Type Error For Class Instance with OP_CODE [OP_GETCLASS]");
+            }
+            if (!IsString(c)) {
+                throw VMExecError("Type Error For Member with OP_CODE [OP_GETCLASS]");
+            }
+            int index = ObjectValue<ClassInstance>(b)->p_desc_->funcs_->IndexOf(StringValue(c)->c_str());
+            if (index < 0) {
+                throw VMExecError("Can't Find " + std::string(StringValue(c)->c_str()) + " With OP_CODE [OP_GETCLASS]");
+            }
+            *a = *ObjectValue<ClassInstance>(b)->p_desc_->funcs_->Find(index);
+            break;
+        }
+        case OP_GETCLASSVAR:
+        {
+            LOGD("OP_GETCLASSVAR A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            c = frame.reg + GET_ARG_C(instruction);
+            if (!IsClassInstance(b)) {
+                throw VMExecError("Type Error For Class Instance with OP_CODE [OP_GETCLASSVAR]");
+            }
+            if (!IsString(c)) {
+                throw VMExecError("Type Error For Member with OP_CODE [OP_GETCLASSVAR]");
+            }
+            Variables *vars = ObjectValue<ClassInstance>(b)->vars_.get();
+            std::string var_name = StringValue(c)->c_str();
+            int index = vars->IndexOf(var_name);
+            if (index < 0) {
+                Value var;
+                SetNil(&var);
+                index = vars->Add(var_name, var);
+            }
+            Value *ref = vars->Find(index);
+            SetValueRef(a, ref);
             break;
         }
         case OP_SETVALUE:

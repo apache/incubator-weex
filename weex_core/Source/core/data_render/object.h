@@ -76,9 +76,10 @@ struct Value {
     void *cf;
     String *str;
     void *cptr;  // Lifecycle is managed outside vm
+    struct Value *var;
   };
 
-  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, TABLE, CLASS_DESC, CLASS_INST };
+  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, TABLE, CLASS_DESC, CLASS_INST, VALUE_REF };
 
   Type type;
 
@@ -108,6 +109,8 @@ struct Value {
       case CFUNC:cf = value.cf;
         break;
       case CPTR:cptr = value.cptr;
+        break;
+      case VALUE_REF:var = value.var;
         break;
       case TABLE:
       case CLASS_DESC:
@@ -241,6 +244,8 @@ inline int64_t ShiftLeft(const int64_t &a, const int64_t &b) {
 
 inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
 
+inline bool IsValueRef(const Value *o) { return Value::Type::VALUE_REF == o->type; }
+    
 inline bool IsNil(const Value *o) {
   return nullptr == o || Value::Type::NIL == o->type;
 }
@@ -249,6 +254,13 @@ inline void SetNil(Value *o) {
   if (nullptr != o) {
     o->type = Value::Type::NIL;
   }
+}
+    
+inline void SetValueRef(Value *o, Value *src) {
+    if (nullptr != o) {
+        o->type = Value::Type::VALUE_REF;
+        o->var = src;
+    }
 }
 
 inline int IntMod(const int &a, const int &b) {

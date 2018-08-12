@@ -489,31 +489,28 @@ void CodeGenerator::Visit(BinaryExpression* node, void* data) {
   }
 }
 
-void CodeGenerator::Visit(AssignExpression* node, void* data) {
-  RegisterScope scope(block_);
-
-  // needs to be left value, for now only identifer is supported.
-  // this = a;
-  // this.b = a; TBD
-  long left = -1;
-  if (node->lhs().get() != NULL) {
-      if (node->lhs()->IsIdentifier()) {
-          auto& name = node->lhs()->AsIdentifier()->GetName();
-          left = block_->FindRegisterId(name);
-      }
-      else {
-          left = block_->NextRegisterId();
-          node->lhs()->Accept(this, &left);
-      }
-  }
-
-  long right = block_->NextRegisterId();
-  if (node->rhs().get() != NULL) {
-    node->rhs()->Accept(this, &right);
-  }
-
-  // a = b
-  func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, left, right, 0));
+void CodeGenerator::Visit(AssignExpression *node, void *data) {
+    RegisterScope scope(block_);
+    // needs to be left value, for now only identifer is supported.
+    // this = a;
+    // this.b = a; TBD
+    long left = -1;
+    if (node->lhs().get() != NULL) {
+        if (node->lhs()->IsIdentifier()) {
+            auto& name = node->lhs()->AsIdentifier()->GetName();
+            left = block_->FindRegisterId(name);
+        }
+        else {
+            left = block_->NextRegisterId();
+            node->lhs()->Accept(this, &left);
+        }
+    }
+    long right = block_->NextRegisterId();
+    if (node->rhs().get() != NULL) {
+        node->rhs()->Accept(this, &right);
+    }
+    // a = b
+    func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, left, right, 0));
 }
 
 void CodeGenerator::Visit(Declaration *node, void *data) {
