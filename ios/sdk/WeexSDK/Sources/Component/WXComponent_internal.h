@@ -264,6 +264,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_detachSlotEvent:(NSDictionary *)data;
 
+- (void)_buildViewHierarchyLazily;
+
 @end
 
 

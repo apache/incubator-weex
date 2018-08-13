@@ -229,8 +229,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)layoutDidFinish
 {
-
-    
     if ([self isViewLoaded]) {
         [self setContentSize:_contentSize];
         [self adjustSticky];
@@ -238,6 +236,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     
     [_loadingComponent resizeFrame];
+}
+
+- (void)_buildViewHierarchyLazily
+{
+    [super _buildViewHierarchyLazily];
+    [self handleAppear];
 }
 
 - (void)viewWillUnload
