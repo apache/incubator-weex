@@ -1744,14 +1744,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           break;
         }
       }
-      task = ((ArrayList) task).toArray();
+      if (null != task){
+        task = ((ArrayList) task).toArray();
 
-      WXJSObject[] args = {
-              new WXJSObject(WXJSObject.String, instanceId),
-              WXWsonJSONSwitch.toWsonOrJsonWXJSObject(task)};
+        WXJSObject[] args = {
+            new WXJSObject(WXJSObject.String, instanceId),
+            WXWsonJSONSwitch.toWsonOrJsonWXJSObject(task)};
 
-      invokeExecJS(String.valueOf(instanceId), null, METHOD_CALL_JS, args);
-
+        invokeExecJS(String.valueOf(instanceId), null, METHOD_CALL_JS, args);
+      }
     } catch (Throwable e) {
       WXLogUtils.e("WXBridgeManager", e);
       String err = "invokeCallJSBatch#" + WXLogUtils.getStackTrace(e);
