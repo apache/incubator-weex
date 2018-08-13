@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.ui.component.list.template;
 
+import static com.taobao.weex.common.Constants.Name.LOADMOREOFFSET;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Point;
@@ -37,18 +39,17 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.WXAttr;
@@ -74,18 +75,17 @@ import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 import com.taobao.weex.ui.view.listview.adapter.WXRecyclerViewOnScrollListener;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.taobao.weex.common.Constants.Name.LOADMOREOFFSET;
 
 /**
  * weex template list supported, high performance recycler-list
@@ -929,6 +929,15 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private void updateRecyclerAttr(){
         mLayoutType = getAttrs().getLayoutType();
         mColumnCount = getAttrs().getColumnCount();
+        if (mColumnCount <= 0) {
+            WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
+                WXErrorCode.WX_RENDER_ERR_LIST_INVALID_COLUMN_COUNT, "columnCount",
+                String.format(Locale.ENGLISH,
+                    "You are trying to set the list/recycler/vlist/waterfall's column to %d, which is illeal. The column count should be a positive integer",
+                    mColumnCount),
+                new ArrayMap<String, String>());
+            mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
+        }
         mColumnGap = getAttrs().getColumnGap();
         mColumnWidth = getAttrs().getColumnWidth();
         mPaddingLeft = getPadding().get(CSSShorthand.EDGE.LEFT);
