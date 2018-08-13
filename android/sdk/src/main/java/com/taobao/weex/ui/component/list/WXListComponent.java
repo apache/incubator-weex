@@ -166,7 +166,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
       WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
           WXErrorCode.WX_RENDER_ERR_LIST_INVALID_COLUMN_COUNT, "columnCount",
           String.format(Locale.ENGLISH,
-              "You are trying to set the list/waterfull/vlist/waterfall's column to %d, which is illeal. The column count should be a positive integer",
+              "You are trying to set the list/recycler/vlist/waterfall's column to %d, which is illeal. The column count should be a positive integer",
               mColumnCount),
           new ArrayMap<String, String>());
       mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
