@@ -18,12 +18,14 @@
  */
 package com.taobao.weex.performance;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.utils.WXExceptionUtils;
 
 public class WXInstanceApm {
 
@@ -102,7 +104,7 @@ public class WXInstanceApm {
         IApmGenerator generator = WXSDKManager.getInstance().getApmGenerater();
         if (null != generator) {
             apmInstance = generator.generateApmInstance(WEEX_PAGE_TOPIC);
-            recordStatsMap = new HashMap<>();
+            recordStatsMap = new ConcurrentHashMap<>();
         }
     }
 
@@ -228,7 +230,19 @@ public class WXInstanceApm {
         if (null == apmInstance) {
             return;
         }
-        double preVal = recordStatsMap.containsKey(name) ? recordStatsMap.get(name) : 0;
+        Double preVal = recordStatsMap.containsKey(name) ? recordStatsMap.get(name) : 0;
+        //fix by use ConcurrentHashMap,but not sure,so report if error still happen
+        if (null == preVal){
+            WXExceptionUtils.commitCriticalExceptionRT(
+                "",
+                WXErrorCode.WX_ERR_HASH_MAP_TMP,
+                "updateDiffStats",
+                "key : "+name,
+                null
+            );
+            return;
+        }
+
         double currentValue = preVal + diffValue;
         recordStatsMap.put(name, currentValue);
         addStats(name, currentValue);
@@ -238,7 +252,18 @@ public class WXInstanceApm {
         if (null == apmInstance) {
             return;
         }
-        double maxValue = recordStatsMap.containsKey(name) ? recordStatsMap.get(name) : 0;
+        Double maxValue = recordStatsMap.containsKey(name) ? recordStatsMap.get(name) : 0;
+        //fix by use ConcurrentHashMap,but not sure,so report if error still happen
+        if (null == maxValue){
+            WXExceptionUtils.commitCriticalExceptionRT(
+                "",
+                WXErrorCode.WX_ERR_HASH_MAP_TMP,
+                "updateMaxStats",
+                "key : "+name,
+                null
+            );
+            return;
+        }
         if (maxValue < currentVal) {
             maxValue = currentVal;
             recordStatsMap.put(name, currentVal);

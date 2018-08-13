@@ -102,6 +102,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public static final String METHOD_NOTIFY_TRIM_MEMORY = "notifyTrimMemory";
   public static final String METHOD_NOTIFY_SERIALIZE_CODE_CACHE =
           "notifySerializeCodeCache";
+  public static final String METHOD_CREATE_INSTANCE_CONTEXT = "createInstanceContext";
 
   public static final String KEY_METHOD = "method";
   public static final String KEY_ARGS = "args";
@@ -1628,8 +1629,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
   }
 
+  public static long sInitFrameWorkTimeOrigin;
+  public static StringBuilder sInitFrameWorkMsg = new StringBuilder();
+
   private void initFramework(String framework) {
     if (WXSDKEngine.isSoInitialized() && !isJSFrameworkInit()) {
+      sInitFrameWorkTimeOrigin = System.currentTimeMillis();
       if (TextUtils.isEmpty(framework)) {
         // if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("weex JS framework from assets");
@@ -1639,9 +1644,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         } else {
           framework = WXFileUtils.loadAsset("weex-main-jsfm.js", WXEnvironment.getApplication());
         }
+        sInitFrameWorkMsg.append("| weex JS framework from assets, isSandBoxContext: ").append(isSandBoxContext);
       }
       if (TextUtils.isEmpty(framework)) {
         setJSFrameworkInit(false);
+        sInitFrameWorkMsg.append("| framework isEmpty ");
         WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_FRAMEWORK,
                 "initFramework", "framework is empty!! ", null);
         return;
@@ -1666,6 +1673,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         } catch (Exception e) {
           e.printStackTrace();
         }
+        sInitFrameWorkMsg.append(" | pieSupport:").append(pieSupport);
         WXLogUtils.d("[WXBridgeManager] initFrameworkEnv crashFile:" + crashFile + " pieSupport:" + pieSupport);
         // extends initFramework
         if (mWXBridge.initFrameworkEnv(framework, assembleDefaultOptions(), crashFile, pieSupport) == INIT_FRAMEWORK_OK) {
@@ -1683,39 +1691,20 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
           trackComponentAndModulesTime();
-          String reinitInfo = "";
-          if (reInitCount > 1) {
-            reinitInfo = "reinit Framework:";
-//            WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_JS_FRAMEWORK_REINIT_SUCCESS,
-//                    "initFramework", reinitInfo + "success", null);
-          } else {
-//            WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_JS_FRAMEWORK_INIT_SUCCESS,
-//                    "initFramework", reinitInfo + "success", null);
-          }
         } else {
+          sInitFrameWorkMsg.append(" | ExecuteJavaScript fail, reInitCount").append(reInitCount);
           if (reInitCount > 1) {
             WXLogUtils.e("[WXBridgeManager] invokeReInitFramework  ExecuteJavaScript fail");
-            String err = "[WXBridgeManager] invokeReInitFramework  ExecuteJavaScript fail reinit FrameWork";
-//            WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_FRAMEWORK,
-//                    "initFramework", "reInitCount = " + reInitCount + err, null);
           } else {
             WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
-            String err = "[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail";
-//            WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_FRAMEWORK,
-//                    "initFramework", err, null);
           }
         }
       } catch (Throwable e) {
+        sInitFrameWorkMsg.append(" | invokeInitFramework exception ").append(e.toString());
         if (reInitCount > 1) {
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
-          String err = "[WXBridgeManager] invokeInitFramework reinit FrameWork exception!#" + e.toString();
-//          WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_FRAMEWORK,
-//                  "initFramework", "reInitCount ==" + reInitCount + err, null);
         } else {
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
-          String err = "[WXBridgeManager] invokeInitFramework exception!#" + e.toString();
-//          WXExceptionUtils.commitCriticalExceptionRT(null, WXErrorCode.WX_ERR_JS_FRAMEWORK,
-//                  "initFramework", err, null);
         }
       }
 
@@ -2015,12 +2004,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             instance.setNeedLoad(true);
             return;
           } else {
+            String errorMsg = new StringBuilder()
+                .append(WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg())
+                .append(", reportJSException >>>> instanceId:").append(instanceId)
+                .append(", exception function:").append(function)
+                .append(", exception:").append(exception)
+                .append(", extInitTime:").append(System.currentTimeMillis()-WXBridgeManager.sInitFrameWorkTimeOrigin).append("ms")
+                .append(", extInitErrorMsg:").append(WXBridgeManager.sInitFrameWorkMsg.toString())
+                .toString();
             instance.onRenderError(//DegradPassivity to H5
                     WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
-                    WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg() +
-                            "reportJSException >>>> instanceId:" + instanceId
-                            + ", exception function:" + function + ", exception:"
-                            + exception
+                     errorMsg
             );
             //doReportJSException(instanceId,function,exception);
             WXExceptionUtils.commitCriticalExceptionRT(instanceId,WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE,function,exception,null);
@@ -2083,6 +2077,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
         }
       }
+      Map<String,String> extInfo = null;
+      if (METHOD_CREATE_INSTANCE.equals(function) || METHOD_CREATE_INSTANCE_CONTEXT.equals(function)){
+        extInfo = new HashMap<>();
+        extInfo.put("extInitTime",(System.currentTimeMillis() - WXBridgeManager.sInitFrameWorkTimeOrigin)+"ms");
+        extInfo.put("extInitErrorMsg",WXBridgeManager.sInitFrameWorkMsg.toString());
+      }
 
       if (checkEmptyScreen(instance)){
         if (WXEnvironment.isApkDebugable()){
@@ -2091,12 +2091,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_RENDER_ERR_JS_RUNTIME,
                 function,
                 WXErrorCode.WX_RENDER_ERR_JS_RUNTIME.getErrorMsg() + exception,
-                null);
+            extInfo);
       } else {
         WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE,
                 function,
                 WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE.getErrorMsg() + exception,
-                null);
+            extInfo);
       }
     }
   }

@@ -224,7 +224,7 @@ public enum WXErrorCode {
   /**
    * WX Key Exception Commit RT JsBridge eg. js excute runtime error
    */
-  WX_KEY_EXCEPTION_WXBRIDGE("-9400", "[js excute runtime error] detail js stack \n",ErrorType.JS_ERROR,ErrorGroup.JS),
+  WX_KEY_EXCEPTION_WXBRIDGE("-9400", "[js excute runtime error] detail js stack -> ",ErrorType.JS_ERROR,ErrorGroup.JS),
   WX_KEY_EXCEPTION_WXBRIDGE_EXCEPTION("-9401", "[js excute runtime error] detail js stack \n",ErrorType.JS_ERROR,ErrorGroup.JS),
 
   /**
@@ -278,7 +278,7 @@ public enum WXErrorCode {
 
   WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED_JS("-1006", "degradeToH5|createInstance fail|wx_create_instance_error",ErrorType.DEGRAD_ERROR,ErrorGroup.JS),
 
-
+  WX_ERR_HASH_MAP_TMP("-10010", "WX_ERR_HASH_MAP_TMP",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
   /**
    * TEST
