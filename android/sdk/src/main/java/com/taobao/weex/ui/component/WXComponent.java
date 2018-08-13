@@ -865,13 +865,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (mBackgroundDrawable == null) {
       mBackgroundDrawable = new BorderDrawable();
       if (mHost != null) {
-        WXViewUtils.setBackGround(mHost, null);
+        WXViewUtils.setBackGround(mHost, null, this);
         if (mRippleBackground == null) {
-          WXViewUtils.setBackGround(mHost, mBackgroundDrawable);
+          WXViewUtils.setBackGround(mHost, mBackgroundDrawable, this);
         } else {
           //TODO Not strictly clip according to background-clip:border-box
           WXViewUtils.setBackGround(mHost, new LayerDrawable(new Drawable[]{
-                  mRippleBackground, mBackgroundDrawable}));
+                  mRippleBackground, mBackgroundDrawable}), this);
         }
       }
     }
@@ -1538,10 +1538,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         mRippleBackground = prepareBackgroundRipple();
         if (mRippleBackground != null) {
           if (mBackgroundDrawable == null) {
-            WXViewUtils.setBackGround(mHost, mRippleBackground);
+            WXViewUtils.setBackGround(mHost, mRippleBackground, this);
           } else {
             LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{mRippleBackground, mBackgroundDrawable});
-            WXViewUtils.setBackGround(mHost, layerDrawable);
+            WXViewUtils.setBackGround(mHost, layerDrawable, this);
           }
           return;
         }

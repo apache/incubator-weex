@@ -573,7 +573,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
         WXLogUtils.d("BoxShadow", "Draw box-shadow with BoxShadowHost on div: " + toString());
         if (mBoxShadowHost == null) {
           mBoxShadowHost = new BoxShadowHost(getContext());
-          WXViewUtils.setBackGround(mBoxShadowHost, null);
+          WXViewUtils.setBackGround(mBoxShadowHost, null, this);
 
           CSSShorthand padding = this.getPadding();
           CSSShorthand border = this.getBorder();
