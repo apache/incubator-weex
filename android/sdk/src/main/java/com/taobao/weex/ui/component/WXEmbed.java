@@ -118,7 +118,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
               WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode()) && container instanceof WXEmbed) {
         final WXEmbed comp = ((WXEmbed)container);
         final ImageView imageView = new ImageView(comp.getContext());
-        imageView.setImageResource(R.drawable.error);
+        imageView.setImageResource(R.drawable.weex_error);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ERROR_IMG_WIDTH, ERROR_IMG_HEIGHT);
         layoutParams.gravity = Gravity.CENTER;
         imageView.setLayoutParams(layoutParams);
