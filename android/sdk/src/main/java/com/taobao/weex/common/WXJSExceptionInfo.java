@@ -56,6 +56,8 @@ public class WXJSExceptionInfo {
    */
   private String mWeexVersion = WXEnvironment.WXSDK_VERSION;
 
+  public long time;
+
   /**
    * js framework verison
    */
@@ -68,6 +70,7 @@ public class WXJSExceptionInfo {
     this.mFunction = function;
     this.mException = exception;
     this.mExtParams = extParams;
+    this.time = System.currentTimeMillis();
   }
 
   public String getInstanceId() {
