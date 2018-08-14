@@ -50,6 +50,8 @@ public class WXBridge implements IWXBridge {
 
   private native int nativeInitFramework(String framework, WXParams params);
 
+  private native void nativeRefreshInstance(String instanceId, String namespace, String function, WXJSObject[] args);
+
   private native int nativeExecJS(String instanceId, String name, String function, WXJSObject[] args);
 
   private native int nativeExecJSService(String javascript);
@@ -114,6 +116,11 @@ public class WXBridge implements IWXBridge {
     } else {
       return nativeInitFramework(framework, params);
     }
+  }
+
+  @Override
+  public void refreshInstance(String instanceId, String namespace, String function, WXJSObject[] args) {
+    nativeRefreshInstance(instanceId, namespace, function, args);
   }
 
   @Override

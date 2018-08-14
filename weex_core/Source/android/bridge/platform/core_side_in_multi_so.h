@@ -74,6 +74,9 @@ class CoreSideInMultiSo : public PlatformBridge::CoreSide {
   void SetDeviceWidthAndHeight(float width, float height) override;
   void AddOption(const std::string& key, const std::string& value) override;
 
+    int RefreshInstance(const char* instanceId, const char* nameSpace,
+                                const char* func,
+                                std::vector<VALUE_WITH_TYPE *> &params) override ;
     int InitFramework(const char *script,
                       std::vector<INIT_FRAMEWORK_PARAMS *> &params) override;
     int InitAppFramework(const char *instanceId, const char *appFramework,
@@ -93,7 +96,7 @@ class CoreSideInMultiSo : public PlatformBridge::CoreSide {
                                   std::vector<VALUE_WITH_TYPE *> &params) override;
     int CreateInstance(const char *instanceId, const char *func,
                        const char *script, const char *opts, const char *initData,
-                       const char *extendsApi) override;
+                       const char *extendsApi, const char* render_strategy) override;
     const char *ExecJSOnInstance(const char *instanceId, const char *script) override;
     int DestroyInstance(const char *instanceId) override;
     int UpdateGlobalConfig(const char *config) override;

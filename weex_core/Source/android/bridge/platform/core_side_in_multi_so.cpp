@@ -143,6 +143,13 @@ void CoreSideInMultiSo::AddOption(const std::string &key,
 }
 
 ////
+
+int CoreSideInMultiSo::RefreshInstance(const char* instanceId, const char* nameSpace,
+                    const char* func,
+                    std::vector<VALUE_WITH_TYPE *> &params) {
+  return 1;
+}
+
 int CoreSideInMultiSo::InitFramework(
     const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
   return core_side_functions_->init_framework(script, params);
@@ -198,7 +205,7 @@ WeexJSResult CoreSideInMultiSo::ExecJSWithResult(
 int CoreSideInMultiSo::CreateInstance(const char *instanceId, const char *func,
                                       const char *script, const char *opts,
                                       const char *initData,
-                                      const char *extendsApi) {
+                                      const char *extendsApi, const char* render_strategy) {
   return core_side_functions_->create_instance(instanceId, func, script, opts,
                                                initData, extendsApi);
 }

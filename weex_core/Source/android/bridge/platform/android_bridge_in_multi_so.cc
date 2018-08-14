@@ -143,7 +143,7 @@ int AndroidBridgeInMultiSo::CallNative(const char *pageId, const char *task,
       ->CallNative(pageId, task, callback);
 }
 
-std::unique_ptr<IPCResult> AndroidBridgeInMultiSo::CallNativeModule(
+std::unique_ptr<ValueWithType> AndroidBridgeInMultiSo::CallNativeModule(
     const char *pageId, const char *module, const char *method,
     const char *arguments, int argumentsLength, const char *options,
     int optionsLength) {

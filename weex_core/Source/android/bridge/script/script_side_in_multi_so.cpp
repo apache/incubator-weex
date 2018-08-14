@@ -17,8 +17,8 @@
  * under the License.
  */
 
-#include <android/base/log_utils.h>
 #include "script_side_in_multi_so.h"
+#include <android/base/log_utils.h>
 
 namespace WeexCore {
 namespace bridge {
@@ -30,14 +30,14 @@ ScriptSideInMultiSo::~ScriptSideInMultiSo() {}
 
 int ScriptSideInMultiSo::InitFramework(
     const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
-    LOGE("ScriptSideInMultiSo::InitFramework");
+  LOGE("ScriptSideInMultiSo::InitFramework");
   return script_side_functions_->funcInitFramework(script, params);
 }
 
 int ScriptSideInMultiSo::InitAppFramework(
     const char *instanceId, const char *appFramework,
     std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
-    LOGE("ScriptSideInMultiSo::InitAppFramework");
+  LOGE("ScriptSideInMultiSo::InitAppFramework");
   return script_side_functions_->funcInitAppFramework(instanceId, appFramework,
                                                       params);
 }
@@ -57,7 +57,7 @@ char *ScriptSideInMultiSo::ExecJSOnAppWithResult(const char *instanceId,
 int ScriptSideInMultiSo::CallJSOnAppContext(
     const char *instanceId, const char *func,
     std::vector<VALUE_WITH_TYPE *> &params) {
-    LOGE("ScriptSideInMultiSo::CallJSOnAppContext");
+  LOGE("ScriptSideInMultiSo::CallJSOnAppContext");
   return script_side_functions_->funcCallJSOnAppContext(instanceId, func,
                                                         params);
 }
@@ -80,14 +80,14 @@ int ScriptSideInMultiSo::ExecTimeCallback(const char *source) {
 int ScriptSideInMultiSo::ExecJS(const char *instanceId, const char *nameSpace,
                                 const char *func,
                                 std::vector<VALUE_WITH_TYPE *> &params) {
-    LOGE("ScriptSideInMultiSo::ExecJS");
+  LOGE("ScriptSideInMultiSo::ExecJS");
   return script_side_functions_->funcExeJS(instanceId, nameSpace, func, params);
 }
 
 WeexJSResult ScriptSideInMultiSo::ExecJSWithResult(
     const char *instanceId, const char *nameSpace, const char *func,
     std::vector<VALUE_WITH_TYPE *> &params) {
-    LOGE("ScriptSideInMultiSo::ExecJSWithResult");
+  LOGE("ScriptSideInMultiSo::ExecJSWithResult");
   return script_side_functions_->funcExeJSWithResult(instanceId, nameSpace,
                                                      func, params);
 }

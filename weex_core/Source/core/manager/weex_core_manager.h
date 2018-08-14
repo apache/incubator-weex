@@ -17,12 +17,15 @@
  * under the License.
  */
 
+#ifdef __cplusplus
+
 #ifndef WEEXCORE_WEEX_CORE_MANAGER_H
 #define WEEXCORE_WEEX_CORE_MANAGER_H
 
 #include "base/thread/thread.h"
 #include "core/bridge/platform_bridge.h"
 #include "core/bridge/script_bridge.h"
+
 
 namespace WeexCore {
 class WeexCoreManager {
@@ -88,3 +91,4 @@ class WeexCoreManager {
 }  // namespace WeexCore
 
 #endif  // WEEXCORE_WEEX_CORE_MANAGER_H
+#endif //#ifdef __cplusplus

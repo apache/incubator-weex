@@ -65,16 +65,6 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 ///--------------------------------------
 
 /**
- * @abstract create root of component tree
- **/
-- (void)createRoot:(NSDictionary *)data;
-
-/**
- * @abstract add component
- **/
-- (void)addComponent:(NSDictionary *)componentData toSupercomponent:(NSString *)superRef atIndex:(NSInteger)index appendingInTree:(BOOL)appendingInTree;
-
-/**
  * @abstract remove component
  **/
 - (void)removeComponent:(NSString *)ref;
@@ -160,6 +150,11 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 - (void)updateFinish;
 
 /**
+ * @abstract called when all doms are created and layout finished
+ **/
+- (void)renderFinish;
+
+/**
  * @abstract unload
  **/
 - (void)unload;
@@ -198,4 +193,30 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
  * @abstract handleStyle will be add to a queue to be executed every frame, but handleStyleOnMainThread will switch to main thread and execute imediately, you can call this for your execution time sequence.
  */
 - (void)handleStyleOnMainThread:(NSDictionary*)styles forComponent:(WXComponent *)component isUpdateStyles:(BOOL)isUpdateStyles;
+
+- (void)wxcore_CreateBody:(NSString*)ref
+                     type:(NSString*)type
+                   styles:(NSDictionary*)styles
+               attributes:(NSDictionary*)attributes
+                   events:(NSArray*)events
+             renderObject:(void*)renderObject;
+- (void)wxcore_AddElement:(NSString*)ref
+                     type:(NSString*)type
+                parentRef:(NSString*)parentRef
+                   styles:(NSDictionary*)styles
+               attributes:(NSDictionary*)attributes
+                   events:(NSArray*)events
+                    index:(NSInteger)index
+             renderObject:(void*)renderObject;
+- (void)wxcore_RemoveElement:(NSString*)ref;
+- (void)wxcore_MoveElement:(NSString*)ref toSuper:(NSString*)superRef atIndex:(NSInteger)index;
+- (void)wxcore_AppendTreeCreateFinish:(NSString*)ref;
+- (void)wxcore_UpdateAttributes:(NSDictionary*)attributes forElement:(NSString*)ref;
+- (void)wxcore_UpdateStyles:(NSDictionary*)styles forElement:(NSString*)ref;
+- (void)wxcore_Layout:(WXComponent*)component frame:(CGRect)frame innerMainSize:(CGFloat)innerMainSize;
+- (void)wxcore_AddEvent:(NSString*)eventName toElement:(NSString*)ref;
+- (void)wxcore_RemoveEvent:(NSString*)eventName fromElement:(NSString*)ref;
+- (BOOL)wxcore_IsTransitionNoneOfElement:(NSString*)ref; // for quick access
+- (BOOL)wxcore_HasTransitionPropertyInStyles:(NSDictionary*)styles forElement:(NSString*)ref;
+
 @end

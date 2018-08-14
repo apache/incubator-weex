@@ -19,6 +19,7 @@
 #ifndef BASE_MESSAGE_LOOP_MESSAGE_PUMP_H
 #define BASE_MESSAGE_LOOP_MESSAGE_PUMP_H
 #include "base/time_unit.h"
+#include "base/common.h"
 
 namespace weex {
 namespace base {
@@ -29,12 +30,16 @@ class MessagePump {
     virtual ~Delegate() {}
     virtual void DoWork() = 0;
   };
+  MessagePump() {}
   virtual ~MessagePump() {}
 
   virtual void Run(Delegate* delegate) = 0;
   virtual void Stop() = 0;
   virtual void ScheduleWork() = 0;
   virtual void ScheduleDelayedWork(TimeUnit delayed_time) = 0;
+    
+ private:
+  DISALLOW_COPY_AND_ASSIGN(MessagePump);
 };
 }  // namespace base
 }  // namespace weex

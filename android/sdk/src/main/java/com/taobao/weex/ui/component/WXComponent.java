@@ -2014,7 +2014,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   private void updateStyleByPesudo(Map<String, Object> styles) {
-    new GraphicActionUpdateStyle(getInstanceId(), getRef(), styles, getPadding(), getMargin(), getBorder(), true)
+    new GraphicActionUpdateStyle(getInstance(), getRef(), styles, getPadding(), getMargin(), getBorder(), true)
             .executeActionOnRender();
     if (getLayoutWidth() == 0 && getLayoutWidth() == 0) {
     } else {
@@ -2212,7 +2212,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       if (!TextUtils.isEmpty(pair.first)) {
         final WXAnimationBean animationBean = createAnimationBean(pair.first, pair.second);
         if (animationBean != null) {
-          GraphicActionAnimation action = new GraphicActionAnimation(getInstanceId(), getRef(), animationBean);
+          GraphicActionAnimation action = new GraphicActionAnimation(getInstance(), getRef(), animationBean);
           action.executeAction();
         }
       }

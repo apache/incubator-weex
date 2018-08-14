@@ -20,11 +20,12 @@
 #import "WXComponent.h"
 #import "WXSDKInstance.h"
 #import "WXUtility.h"
-#import "WXCoreLayout.h"
 
 #define FlexUndefined NAN
 
 #ifdef __cplusplus
+#include "layout.h"
+
 extern "C" {
 #endif
     bool flexIsUndefined(float value);
@@ -38,7 +39,7 @@ extern "C" {
 #ifdef __cplusplus
     WeexCore::WXCoreLayoutNode *_flexCssNode;
 #endif // __cplusplus
-    BOOL _isLayoutDirty;
+
     CGRect _calculatedFrame;
     CGPoint _absolutePosition;
     WXPositionType _positionType;
@@ -53,13 +54,9 @@ extern "C" {
 @property(nonatomic, readonly, assign) WeexCore::WXCoreLayoutNode *flexCssNode;
 #endif
 
-@end
+/**
+ * @abstract Convert layout dimension value like 'left', 'width' to style value in js considering viewport and scale.
+ */
+- (NSString*)convertLayoutValueToStyleValue:(NSString*)valueName;
 
-@interface WXComponent (Layout)
-- (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index;
-- (void)_rmChildCssNode:(WXComponent*)subcomponent;
-- (NSInteger) getActualNodeIndex:(WXComponent*)subcomponent atIndex:(NSInteger) index;
-#ifdef __cplusplus
-+ (void) recycleNodeOnComponentThread:(WeexCore::WXCoreLayoutNode * ) garbageNode gabRef:(NSString *)ref;
-#endif
 @end

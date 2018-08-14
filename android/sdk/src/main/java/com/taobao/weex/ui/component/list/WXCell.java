@@ -30,7 +30,9 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXAttr;
+import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.view.WXFrameLayout;
@@ -38,6 +40,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
 import static com.taobao.weex.common.Constants.Name.STICKY_OFFSET;
@@ -66,6 +69,15 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     private boolean isAppendTreeDone;
 
     private CellAppendTreeListener cellAppendTreeListener;
+
+    public static class Creator implements ComponentCreator {
+        public WXComponent createInstance(WXSDKInstance instance,
+                                          WXVContainer parent,
+                                          BasicComponentData basicComponentData)
+                throws IllegalAccessException, InvocationTargetException, InstantiationException {
+            return new WXCell(instance, parent, true, basicComponentData);
+        }
+    }
 
     @Deprecated
     public WXCell(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {

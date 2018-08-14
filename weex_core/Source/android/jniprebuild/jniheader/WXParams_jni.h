@@ -314,6 +314,30 @@ static base::android::ScopedLocalJavaRef<jstring>
   return base::android::ScopedLocalJavaRef<jstring>(env, ret);
 }
 
+static intptr_t g_WXParams_getLibIcuPath = 0;
+static base::android::ScopedLocalJavaRef<jstring>
+    Java_WXParams_getLibIcuPath(JNIEnv* env, jobject obj) {
+  /* Must call RegisterNativesImpl()  */
+  //CHECK_CLAZZ(env, obj,
+  //    WXParams_clazz(env), NULL);
+  jmethodID method_id =
+      base::android::GetMethod(
+      env, WXParams_clazz(env),
+      base::android::INSTANCE_METHOD,
+      "getLibIcuPath",
+
+"("
+")"
+"Ljava/lang/String;",
+      &g_WXParams_getLibIcuPath);
+
+  jstring ret =
+      static_cast<jstring>(env->CallObjectMethod(obj,
+          method_id));
+  base::android::CheckException(env);
+  return base::android::ScopedLocalJavaRef<jstring>(env, ret);
+}
+
 // Step 3: RegisterNatives.
 
 static bool RegisterNativesImpl(JNIEnv* env) {

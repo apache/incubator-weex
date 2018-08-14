@@ -24,6 +24,8 @@
 #include "android/bridge/platform/android_bridge.h"
 #include "android/bridge/platform/android_bridge_in_multi_process.h"
 #include "android/bridge/platform/android_bridge_in_multi_so.h"
+#include "android/bridge/script_bridge_in_multi_process.h"
+#include "android/bridge/script_bridge_in_multi_so.h"
 #include "android/jniprebuild/jniheader/WXBridge_jni.h"
 #include "android/utils/cache_utils.h"
 #include "android/utils/params_utils.h"
@@ -31,6 +33,7 @@
 #include "android/wrap/hash_set.h"
 #include "android/wrap/wx_js_object.h"
 #include "android/wrap/wx_map.h"
+#include "base/LogDefines.h"
 #include "core/config/core_environment.h"
 #include "core/layout/layout.h"
 #include "core/layout/measure_func_adapter_impl_android.h"
@@ -264,6 +267,14 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
     WeexCoreManager::Instance()->set_project_mode(
         WeexCoreManager::ProjectMode::MULTI_PROCESS);
   }
+  // Init script bridge
+  if (WeexCoreManager::Instance()->project_mode() ==
+      WeexCoreManager::ProjectMode::MULTI_PROCESS) {
+    WeexCoreManager::Instance()->set_script_bridge(
+        new ScriptBridgeInMultiProcess);
+  } else {
+    WeexCoreManager::Instance()->set_script_bridge(new ScriptBridgeInMultiSo);
+  }
   // for environment
   bridge->core_side()->SetPlatform(
       WXCoreEnvironment::getInstance()->platform());
@@ -285,6 +296,37 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
       bridge->core_side()->InitFramework(c_script.getChars(), params_vector);
   freeParams(params_vector);
   return result;
+}
+
+static void RefreshInstance(JNIEnv* env, jobject jcaller, jstring instanceId,
+                            jstring _namespace, jstring _function,
+                            jobjectArray args) {
+  ScopedJStringUTF8 instance_id(env, instanceId);
+  ScopedJStringUTF8 name_space(env, _namespace);
+  ScopedJStringUTF8 function(env, _function);
+  int length = 0;
+  if (args != nullptr) {
+    length = env->GetArrayLength(args);
+  }
+  std::vector<VALUE_WITH_TYPE*> params;
+
+  for (int i = 0; i < length; i++) {
+    VALUE_WITH_TYPE* param = nullptr;
+
+    param = WeexCore::getValueWithTypePtr();
+    auto jni_object = base::android::ScopedLocalJavaRef<jobject>(
+        env, env->GetObjectArrayElement(args, i));
+    auto wx_js_object =
+        std::unique_ptr<WXJSObject>(new WXJSObject(env, jni_object.Get()));
+    addParamsFromJArgs(params, param, env, wx_js_object);
+  }
+  WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->core_side()
+      ->RefreshInstance(instance_id.getChars(), name_space.getChars(),
+                        function.getChars(), params);
+
+  freeParams(params);
 }
 
 static jint ExecJSService(JNIEnv* env, jobject object, jstring script) {
@@ -419,6 +461,11 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
       new WXJSObject(env, base::android::ScopedLocalJavaRef<jobject>(
                               env, env->GetObjectArrayElement(args, 4))
                               .Get()));
+  // get render strategy
+  auto render_strategy = std::unique_ptr<WXJSObject>(
+      new WXJSObject(env, base::android::ScopedLocalJavaRef<jobject>(
+                              env, env->GetObjectArrayElement(args, 5))
+                              .Get()));
   auto japi = arg4->GetData(env);
   ScopedJStringUTF8 scoped_id(env, instanceId);
   ScopedJStringUTF8 scoped_func(env, function);
@@ -426,13 +473,16 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
   ScopedJStringUTF8 scoped_opts(env, opts.Get());
   ScopedJStringUTF8 scoped_init_data(env, initData.Get());
   ScopedJStringUTF8 scoped_api(env, static_cast<jstring>(japi.Get()));
+  ScopedJStringUTF8 scoped_render_strategy(
+      env, static_cast<jstring>(render_strategy->GetData(env).Release()));
 
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
       ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
                        scoped_script.getChars(), scoped_opts.getChars(),
-                       scoped_init_data.getChars(), scoped_api.getChars());
+                       scoped_init_data.getChars(), scoped_api.getChars(),
+                       scoped_render_strategy.getChars());
 }
 
 static jint DestoryInstance(JNIEnv* env, jobject jcaller, jstring instanceId,

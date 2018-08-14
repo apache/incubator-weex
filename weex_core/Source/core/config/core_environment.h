@@ -78,11 +78,11 @@ namespace WeexCore {
         mDeviceWidth = width;
     }
 
-    const float &DeviceWidth();
+    const float DeviceWidth();
 
-    const float &DeviceHeight();
+    const float DeviceHeight();
 
-    const std::string &GetOption(const std::string &key);
+    const std::string GetOption(const std::string &key);
 
     inline const std::map<std::string, std::string> &options() {
         return mOptions;

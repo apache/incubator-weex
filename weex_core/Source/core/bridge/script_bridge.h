@@ -17,14 +17,13 @@
  * under the License.
  */
 
-#ifndef WEEX_PROJECT_SCRIPT_BRIDGE_H
-#define WEEX_PROJECT_SCRIPT_BRIDGE_H
+#ifndef CORE_BRIDGE_SCRIPT_BRIDGE_H
+#define CORE_BRIDGE_SCRIPT_BRIDGE_H
 
 #include <memory>
 #include "base/common.h"
 #include "include/WeexApiHeader.h"
 
-class IPCResult;
 namespace WeexCore {
 class ScriptBridge {
  public:
@@ -34,7 +33,7 @@ class ScriptBridge {
     virtual ~CoreSide() {}
     virtual void CallNative(const char *page_id, const char *task,
                             const char *callback) = 0;
-    virtual std::unique_ptr<IPCResult> CallNativeModule(
+    virtual std::unique_ptr<ValueWithType> CallNativeModule(
         const char *page_id, const char *module, const char *method,
         const char *arguments, int arguments_length, const char *options,
         int options_length) = 0;
@@ -173,4 +172,4 @@ class ScriptBridge {
 };
 }  // namespace WeexCore
 
-#endif  // WEEX_PROJECT_SCRIPT_BRIDGE_H
+#endif  // CORE_BRIDGE_SCRIPT_BRIDGE_H

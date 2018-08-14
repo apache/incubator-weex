@@ -19,12 +19,12 @@
 
 #include "android_bridge.h"
 #include "android/bridge/platform/android_side.h"
-#include "core/bridge/platform/core_side_in_simple.h"
+#include "core/bridge/platform/core_side_in_platform.h"
 
 namespace WeexCore {
 
 AndroidBridgeInSimple::AndroidBridgeInSimple() {
-  set_core_side(new CoreSideInSimple);
+  set_core_side(new CoreSideInPlatform);
   set_platform_side(new AndroidSide);
 }
 

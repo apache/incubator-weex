@@ -39,18 +39,10 @@
 
 @synthesize weexInstance;
 
-WX_EXPORT_METHOD(@selector(createBody:))
-WX_EXPORT_METHOD(@selector(addElement:element:atIndex:))
-WX_EXPORT_METHOD(@selector(removeElement:))
-WX_EXPORT_METHOD(@selector(moveElement:parentRef:index:))
-WX_EXPORT_METHOD(@selector(addEvent:event:))
-WX_EXPORT_METHOD(@selector(removeEvent:event:))
 WX_EXPORT_METHOD(@selector(createFinish))
 WX_EXPORT_METHOD(@selector(updateFinish))
 WX_EXPORT_METHOD(@selector(refreshFinish))
 WX_EXPORT_METHOD(@selector(scrollToElement:options:))
-WX_EXPORT_METHOD(@selector(updateStyle:styles:))
-WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 WX_EXPORT_METHOD(@selector(addRule:rule:))
 WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
@@ -71,6 +63,7 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
         block(manager);
     });
 }
+
 - (void)performSelectorOnRuleManager:(void(^)(void))block{
     if (!block) {
         return;
@@ -85,55 +78,11 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     return [WXComponentManager componentThread];
 }
 
-- (void)createBody:(NSDictionary *)body
-{
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager createRoot:body];
-    }];
-}
-
-- (void)addElement:(NSString *)parentRef element:(NSDictionary *)element atIndex:(NSInteger)index
-{
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager addComponent:element toSupercomponent:parentRef atIndex:index appendingInTree:NO];
-    }];
-    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:nil className:nil name:@"dom" phase:WXTracingEnd functionName:@"addElement" options:nil];
-}
-
-- (void)removeElement:(NSString *)ref
-{
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager removeComponent:ref];
-    }];
-}
-
-- (void)moveElement:(NSString *)elemRef parentRef:(NSString *)parentRef index:(NSInteger)index
-{
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager moveComponent:elemRef toSuper:parentRef atIndex:index];
-    }];
-}
-
-- (void)addEvent:(NSString *)elemRef event:(NSString *)event
-{
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager addEvent:event toComponent:elemRef];
-    }];
-}
-
-- (void)removeEvent:(NSString *)elemRef event:(NSString *)event
-{
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager removeEvent:event fromComponent:elemRef];
-    }];
-}
-
 - (void)createFinish
 {
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager createFinish];
     }];
-    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:nil className:nil name:@"dom" phase:WXTracingEnd functionName:@"createFinish" options:nil];
 }
 
 - (void)updateFinish
@@ -157,20 +106,6 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     }];
 }
 
--(void)updateStyle:(NSString *)elemRef styles:(NSDictionary *)styles
-{
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager updateStyles:styles forComponent:elemRef];
-    }];
-}
-
-- (void)updateAttrs:(NSString *)elemRef attrs:(NSDictionary *)attrs
-{
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager updateAttributes:attrs forComponent:elemRef];
-    }];
-}
-
 - (void)addRule:(NSString*)type rule:(NSDictionary *)rule {
     if ([WXUtility isBlankString:type] || ![rule count]) {
         return;
@@ -179,7 +114,6 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     [self performSelectorOnRuleManager:^{
         [WXRuleManager sharedInstance].instance = weexInstance;
         [[WXRuleManager sharedInstance] addRule:type rule:rule];
-        
     }];
 }
 

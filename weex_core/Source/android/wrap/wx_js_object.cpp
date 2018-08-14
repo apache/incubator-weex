@@ -72,14 +72,23 @@ WXJSObject::WXJSObject(JNIEnv* env, jobject jni_object) {
 WXJSObject::~WXJSObject() {}
 
 base::android::ScopedLocalJavaRef<jobject> WXJSObject::GetData(JNIEnv* env) {
+  if (jni_object() == nullptr) {
+    return base::android::ScopedLocalJavaRef<jobject>();
+  }
   return Java_WXJSObject_get_filedID_data(env, jni_object());
 }
 
 jint WXJSObject::GetType(JNIEnv* env) {
+  if (jni_object() == nullptr) {
+    return -1;
+  }
   return Java_WXJSObject_get_filedID_type(env, jni_object());
 }
 
 base::android::ScopedLocalJavaRef<jstring> WXJSObject::GetKey(JNIEnv* env) {
+  if (jni_object() == nullptr) {
+    return base::android::ScopedLocalJavaRef<jstring>();
+  }
   return Java_WXJSObject_get_filedID_key(env, jni_object());
 }
 }  // namespace WeexCore

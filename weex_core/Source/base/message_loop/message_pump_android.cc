@@ -36,8 +36,8 @@ MessagePumpAndroid::MessagePumpAndroid() {}
 
 MessagePumpAndroid::~MessagePumpAndroid() {}
 
-void MessagePumpAndroid::RegisterJNIUtils(JNIEnv* env) {
-  RegisterNativesImpl(env);
+bool MessagePumpAndroid::RegisterJNIUtils(JNIEnv* env) {
+  return RegisterNativesImpl(env);
 }
 
 void MessagePumpAndroid::Run(Delegate* delegate) {

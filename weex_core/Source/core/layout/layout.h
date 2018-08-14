@@ -27,7 +27,6 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
-#include <android/base/log_utils.h>
 
 namespace WeexCore {
 
@@ -41,7 +40,7 @@ namespace WeexCore {
   } ;
 
   enum MeasureMode {
-    kUnspecified,
+    kUnspecified = 0,
     kExactly,
   } ;
 
@@ -137,7 +136,7 @@ namespace WeexCore {
    */
   class WXCoreLayoutNode {
 
-  protected:
+  public:
       WXCoreLayoutNode() :
               mParent(nullptr),
               dirty(true),
@@ -218,7 +217,7 @@ namespace WeexCore {
 
     WXCoreMeasureFunc measureFunc = nullptr;
 
-    void *context;
+    void *context = nullptr;
 
     /** ================================ Cache：Last calculate result =================================== **/
 

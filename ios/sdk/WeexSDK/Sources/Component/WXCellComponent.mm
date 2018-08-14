@@ -59,11 +59,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    
-}
-
 - (BOOL)weex_isEqualTo:(id<WXDiffable>)object
 {
     return self == object;
@@ -129,23 +124,11 @@
     // do nothing
 }
 
-- (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
+- (void)_assignCalculatedFrame:(CGRect)frame
 {
-        if (self.delegate && (flexIsUndefined(self.flexCssNode->getStyleWidth()) || _isUseContainerWidth)) {
-            self.flexCssNode->setStyleWidth([self.delegate containerWidthForLayout:self],NO);
-            _isUseContainerWidth = YES;
-        }
-        
-        if ([self needsLayout]) {
-            std::pair<float, float> renderPageSize;
-            renderPageSize.first = self.weexInstance.frame.size.width;
-            renderPageSize.second = self.weexInstance.frame.size.height;
-            self.flexCssNode->calculateLayout(renderPageSize);
-            if ([WXLog logLevel] >= WXLogLevelDebug) {
-                
-            }
-        }
-    [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
+    frame.origin = CGPointZero;
+    _calculatedFrame = frame;
 }
+
 @end
 

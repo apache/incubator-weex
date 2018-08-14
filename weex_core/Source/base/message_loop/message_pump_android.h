@@ -19,6 +19,7 @@
 
 #ifndef CORE_BASE_MESSAGE_LOOP_MESSAGE_PUMP_ANDROID_H
 #define CORE_BASE_MESSAGE_LOOP_MESSAGE_PUMP_ANDROID_H
+#ifdef OS_ANDROID
 
 #include <jni.h>
 #include "android/base/jni/scoped_java_ref.h"
@@ -36,7 +37,7 @@ class MessagePumpAndroid : public MessagePump, public WeexCore::JNIObjectWrap {
   void ScheduleWork() override;
   void ScheduleDelayedWork(TimeUnit delayed_time) override;
 
-  static void RegisterJNIUtils(JNIEnv* env);
+  static bool RegisterJNIUtils(JNIEnv* env);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(MessagePumpAndroid);
@@ -44,4 +45,5 @@ class MessagePumpAndroid : public MessagePump, public WeexCore::JNIObjectWrap {
 }  // namespace base
 }  // namespace weex
 
+#endif
 #endif  // CORE_BASE_MESSAGE_LOOP_MESSAGE_PUMP_ANDROID_H

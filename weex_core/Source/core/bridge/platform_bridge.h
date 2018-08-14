@@ -19,15 +19,13 @@
 #ifndef Bridge_h
 #define Bridge_h
 
-#include <include/WeexApiHeader.h>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
 #include "base/common.h"
-
-class IPCResult;
+#include "include/WeexApiHeader.h"
 
 namespace WeexCore {
 class MeasureFunctionAdapter;
@@ -40,7 +38,7 @@ class PlatformBridge {
  public:
   class CoreSide {
    public:
-    CoreSide() : measure_function_adapter_exist_(false) {}
+    explicit CoreSide() : measure_function_adapter_exist_(false) {}
     virtual ~CoreSide() {}
     virtual void SetDefaultHeightAndWidthIntoRootDom(
         const std::string& instance_id, float default_width,
@@ -65,6 +63,7 @@ class PlatformBridge {
                            const std::string& render_ref) = 0;
     virtual void SetViewPortWidth(const std::string& instance_id,
                                   float width) = 0;
+    virtual void SetPageDirty(const std::string& instance_id) = 0;
     virtual void ForceLayout(const std::string& instance_id) = 0;
     virtual bool NotifyLayout(const std::string& instance_id) = 0;
     virtual std::vector<int64_t> GetFirstScreenRenderTime(
@@ -91,30 +90,33 @@ class PlatformBridge {
     virtual void AddOption(const std::string& key,
                            const std::string& value) = 0;
 
+    virtual int RefreshInstance(const char* instanceId, const char* nameSpace,
+                                const char* func,
+                                std::vector<VALUE_WITH_TYPE*>& params) = 0;
     virtual int InitFramework(const char* script,
-                              std::vector<INIT_FRAMEWORK_PARAMS *> &params) = 0;
+                              std::vector<INIT_FRAMEWORK_PARAMS*>& params) = 0;
     virtual int InitAppFramework(
         const char* instanceId, const char* appFramework,
-        std::vector<INIT_FRAMEWORK_PARAMS *> &params) = 0;
+        std::vector<INIT_FRAMEWORK_PARAMS*>& params) = 0;
     virtual int CreateAppContext(const char* instanceId,
                                  const char* jsBundle) = 0;
     virtual const char* ExecJSOnAppWithResult(const char* instanceId,
                                               const char* jsBundle) = 0;
     virtual int CallJSOnAppContext(const char* instanceId, const char* func,
-                                   std::vector<VALUE_WITH_TYPE *> &params) = 0;
+                                   std::vector<VALUE_WITH_TYPE*>& params) = 0;
     virtual int DestroyAppContext(const char* instanceId) = 0;
     virtual int ExecJsService(const char* source) = 0;
     virtual int ExecTimeCallback(const char* source) = 0;
     virtual int ExecJS(const char* instanceId, const char* nameSpace,
                        const char* func,
-                       std::vector<VALUE_WITH_TYPE *> &params) = 0;
+                       std::vector<VALUE_WITH_TYPE*>& params) = 0;
     virtual WeexJSResult ExecJSWithResult(
         const char* instanceId, const char* nameSpace, const char* func,
-        std::vector<VALUE_WITH_TYPE *> &params) = 0;
+        std::vector<VALUE_WITH_TYPE*>& params) = 0;
     virtual int CreateInstance(const char* instanceId, const char* func,
                                const char* script, const char* opts,
-                               const char* initData,
-                               const char* extendsApi) = 0;
+                               const char* initData, const char* extendsApi,
+                               const char* render_strategy) = 0;
     virtual const char* ExecJSOnInstance(const char* instanceId,
                                          const char* script) = 0;
     virtual int DestroyInstance(const char* instanceId) = 0;
@@ -152,7 +154,7 @@ class PlatformBridge {
                                         const char* error_msg) = 0;
     virtual int CallNative(const char* page_id, const char* task,
                            const char* callback) = 0;
-    virtual std::unique_ptr<IPCResult> CallNativeModule(
+    virtual std::unique_ptr<ValueWithType> CallNativeModule(
         const char* page_id, const char* module, const char* method,
         const char* arguments, int arguments_length, const char* options,
         int options_length) = 0;
@@ -188,9 +190,9 @@ class PlatformBridge {
                            const WXCorePadding& paddings,
                            const WXCoreBorderWidth& borders,
                            bool willLayout = true) = 0;
-    virtual int Layout(const char* page_id, const char* ref, int top,
-                       int bottom, int left, int right, int height, int width,
-                       int index) = 0;
+    virtual int Layout(const char* page_id, const char* ref, float top,
+                       float bottom, float left, float right, float height,
+                       float width, int index) = 0;
 
     virtual int UpdateStyle(
         const char* pageId, const char* ref,

@@ -45,7 +45,7 @@ class AndroidSide : public PlatformBridge::PlatformSide {
                               const char* error_msg) override;
   int CallNative(const char* page_id, const char* task,
                  const char* callback) override;
-  std::unique_ptr<IPCResult> CallNativeModule(
+  std::unique_ptr<ValueWithType> CallNativeModule(
       const char* page_ld, const char* module, const char* method,
       const char* arguments, int arguments_length, const char* options,
       int options_length) override;
@@ -77,8 +77,8 @@ class AndroidSide : public PlatformBridge::PlatformSide {
                  std::set<std::string>* events, const WXCoreMargin& margins,
                  const WXCorePadding& paddings,
                  const WXCoreBorderWidth& borders, bool willLayout) override;
-  int Layout(const char* page_id, const char* ref, int top, int bottom,
-             int left, int right, int height, int width, int index) override;
+  int Layout(const char* page_id, const char* ref, float top, float bottom,
+             float left, float right, float height, float width, int index) override;
 
   int UpdateStyle(
       const char* pageId, const char* ref,

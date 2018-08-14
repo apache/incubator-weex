@@ -19,7 +19,6 @@
 #include <android/base/jni/android_jni.h>
 #include <android/jniprebuild/jniheader/ContentBoxMeasurement_jni.h>
 #include "content_box_measurement_impl_android.h"
-#include "android/wrap/measure_mode_impl_android.h"
 
 namespace WeexCore {
   bool RegisterJNIContentBoxMeasurement(JNIEnv *env) {

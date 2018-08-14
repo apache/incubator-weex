@@ -45,7 +45,7 @@ class AndroidBridgeInMultiSo : public PlatformBridge {
   static int CallNative(const char* pageId, const char* task,
                         const char* callback);
 
-  static std::unique_ptr<IPCResult> CallNativeModule(
+  static std::unique_ptr<ValueWithType> CallNativeModule(
       const char* pageId, const char* module, const char* method,
       const char* arguments, int argumentsLength, const char* options,
       int optionsLength);

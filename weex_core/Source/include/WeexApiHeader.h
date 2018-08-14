@@ -23,11 +23,13 @@
 #ifndef WEEXV8_WEEXAPIHEADER_H
 #define WEEXV8_WEEXAPIHEADER_H
 
-#include <jni.h>
 #include <vector>
 #include <set>
 #include <map>
+#ifdef OS_ANDROID
+#include <jni.h>
 #include "IPC/IPCResult.h"
+#endif
 
 namespace WeexCore {
     class WXCoreMargin;
@@ -66,7 +68,42 @@ inline void WeexJSResultDataFree(WeexJSResult& result){
     }
 }
 
+typedef struct InitFrameworkParams {
+    WeexByteArray *type;
+    WeexByteArray *value;
+} INIT_FRAMEWORK_PARAMS;
 
+
+enum class ParamsType {
+    INT32 = 1,
+    INT64,
+    FLOAT,
+    DOUBLE,
+    JSONSTRING,
+    STRING,
+    BYTEARRAY, /* terminated with zero. */
+    VOID,
+    JSUNDEFINED,
+    END,
+};
+
+
+typedef union ExecJsParamValue {
+    int32_t int32Value;
+    int64_t int64Value;
+    float floatValue;
+    double doubleValue;
+    WeexString *string;
+    WeexByteArray *byteArray;
+} EXEC_JS_PARAM_VALUE;
+
+typedef struct ValueWithType {
+    ParamsType type;
+    EXEC_JS_PARAM_VALUE value;
+} VALUE_WITH_TYPE;
+
+
+#ifdef OS_ANDROID
 
 typedef void (*FuncSetJSVersion)(const char *jsVersion);
 
@@ -221,40 +258,6 @@ typedef struct PlatformExposeFunctions {
     InvokeLayoutAfter invoke_layout_after;
 } PlatformExposeFunctions;
 
-typedef struct InitFrameworkParams {
-    WeexByteArray *type;
-    WeexByteArray *value;
-} INIT_FRAMEWORK_PARAMS;
-
-
-enum class ParamsType {
-    INT32 = 1,
-    INT64,
-    FLOAT,
-    DOUBLE,
-    JSONSTRING,
-    STRING,
-    BYTEARRAY, /* terminated with zero. */
-    VOID,
-    JSUNDEFINED,
-    END,
-};
-
-
-typedef union ExecJsParamValue {
-    int32_t int32Value;
-    int64_t int64Value;
-    float floatValue;
-    double doubleValue;
-    WeexString *string;
-    WeexByteArray *byteArray;
-} EXEC_JS_PARAM_VALUE;
-
-typedef struct ValueWithType {
-    ParamsType type;
-    EXEC_JS_PARAM_VALUE value;
-} VALUE_WITH_TYPE;
-
 
 typedef int (*FuncInitFramework)(const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> &params);
 
@@ -377,5 +380,6 @@ typedef struct CoreSideFunctionsOfPlatformBridge {
     FuncDestroyInstance destroy_instance;
     FuncUpdateGlobalConfig update_global_config;
 } CoreSideFunctionsOfPlatformBridge;
+#endif
 
 #endif //WEEXV8_WEEXAPIHEADER_H

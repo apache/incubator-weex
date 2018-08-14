@@ -19,14 +19,16 @@
 package com.taobao.weex.ui.action;
 
 import android.text.TextUtils;
+
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 
 public class GraphicActionRemoveElement extends BasicGraphicAction {
 
-  public GraphicActionRemoveElement(String pageId, String ref) {
-    super(pageId, ref);
+  public GraphicActionRemoveElement(WXSDKInstance instance, String ref) {
+    super(instance, ref);
   }
 
   @Override

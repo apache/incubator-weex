@@ -24,6 +24,8 @@
 #include <memory>
 #if OS_ANDROID
 #include "base/thread/thread_impl_android.h"
+#elif OS_IOS
+#include "base/thread/thread_impl_darwin.h"
 #endif
 
 namespace weex {
@@ -44,6 +46,8 @@ class Thread {
   inline static ThreadImpl* CreateImpl(const ThreadParams& params) {
 #if OS_ANDROID
     return new ThreadImplAndroid(params);
+#elif OS_IOS
+    return new ThreadImplDarwin(params);
 #endif
   }
   std::unique_ptr<ThreadImpl> impl_;

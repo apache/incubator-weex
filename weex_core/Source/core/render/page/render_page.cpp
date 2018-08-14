@@ -19,6 +19,7 @@
 #include "core/render/page/render_page.h"
 #include "base/TimeUtils.h"
 #include "base/ViewUtils.h"
+#include "base/LogDefines.h"
 #include "core/config/core_environment.h"
 #include "core/css/constants_value.h"
 #include "core/layout/layout.h"
@@ -95,11 +96,11 @@ void RenderPage::CalculateLayout() {
   TraverseTree(this->render_root_, 0);
 }
 
-void RenderPage::TraverseTree(RenderObject *render, int index) {
+void RenderPage::TraverseTree(RenderObject *render, long index) {
   if (render == nullptr) return;
 
   if (render->hasNewLayout()) {
-    SendLayoutAction(render, index);
+    SendLayoutAction(render, (int)index);
     render->setHasNewLayout(false);
   }
 
@@ -186,9 +187,7 @@ bool RenderPage::MoveRenderObject(const std::string &ref,
   if (old_parent == nullptr || new_parent == nullptr) return false;
 
   if (old_parent->ref() == new_parent->ref()) {
-    if (old_parent->IndexOf(child) < 0) {
-      return false;
-    } else if (old_parent->IndexOf(child) == index) {
+    if (old_parent->IndexOf(child) == index) {
       return false;
     } else if (old_parent->IndexOf(child) < index) {
       index = index - 1;
@@ -241,8 +240,9 @@ bool RenderPage::UpdateStyle(
           }
           render->UpdateStyleInternal(
               (*iter).first, (*iter).second, 0, [=, &flag](float foo) {
-                (*iter).second = to_string(foo),
-                margin->insert(margin->end(), (*iter)), flag = true;
+                  (*iter).second = to_string(foo);
+                  margin->insert(margin->end(), (*iter));
+                  flag = true;
               });
           break;
         case kTypePadding:
@@ -251,8 +251,9 @@ bool RenderPage::UpdateStyle(
           }
           render->UpdateStyleInternal(
               (*iter).first, (*iter).second, 0, [=, &flag](float foo) {
-                (*iter).second = to_string(foo),
-                padding->insert(padding->end(), (*iter)), flag = true;
+                  (*iter).second = to_string(foo);
+                  padding->insert(padding->end(), (*iter));
+                  flag = true;
               });
           break;
         case kTypeBorder:
@@ -261,10 +262,12 @@ bool RenderPage::UpdateStyle(
           }
           render->UpdateStyleInternal(
               (*iter).first, (*iter).second, 0, [=, &flag](float foo) {
-                (*iter).second = to_string(foo),
-                border->insert(border->end(), (*iter)), flag = true;
+                  (*iter).second = to_string(foo);
+                  border->insert(border->end(), (*iter));
+                  flag = true;
               });
           break;
+        default: break;
       }
     }
   }
@@ -455,7 +458,7 @@ void RenderPage::SendCreateBodyAction(RenderObject *render) {
   RenderAction *action = new RenderActionCreateBody(page_id(), render);
   PostRenderAction(action);
 
-  Index i = 0;
+  int i = 0;
   for (auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd();
        it++) {
     RenderObject *child = static_cast<RenderObject *>(*it);
@@ -482,7 +485,7 @@ void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent,
       new RenderActionAddElement(page_id(), child, parent, index, will_layout);
   PostRenderAction(action);
 
-  Index i = 0;
+  int i = 0;
   for (auto it = child->ChildListIterBegin(); it != child->ChildListIterEnd();
        it++) {
     RenderObject *grandson = static_cast<RenderObject *>(*it);

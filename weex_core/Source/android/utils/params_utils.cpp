@@ -419,15 +419,21 @@ void addParamsFromJArgs(std::vector<VALUE_WITH_TYPE*>& params,
   }
 }
 
+
+
+void freeValueWithType(VALUE_WITH_TYPE* param) {
+  if (param->type == ParamsType::STRING ||
+      param->type == ParamsType::JSONSTRING) {
+    free(param->value.string);
+  }
+  if (param->type == ParamsType::BYTEARRAY) {
+    free(param->value.byteArray);
+  }
+}
+
 void freeParams(std::vector<VALUE_WITH_TYPE*>& params) {
   for (auto& param : params) {
-    if (param->type == ParamsType::STRING ||
-        param->type == ParamsType::JSONSTRING) {
-      free(param->value.string);
-    }
-    if (param->type == ParamsType::BYTEARRAY) {
-      free(param->value.byteArray);
-    }
+    freeValueWithType(param);
     free(param);
   }
 }

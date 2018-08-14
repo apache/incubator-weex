@@ -68,7 +68,7 @@
         if(attributes[@"tintColor"]){
             _tintColor = [WXConvert UIColor:attributes[@"tintColor"]];
         }
-        self.flexCssNode->setStyleWidth(51,NO);
+        self.flexCssNode->setStyleWidth(51, NO);
         self.flexCssNode->setStyleHeight(31);
     }
     return self;

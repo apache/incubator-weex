@@ -30,6 +30,7 @@
 #include "android/wrap/wml_bridge.h"
 #include "android/wrap/wx_js_object.h"
 #include "android/wrap/wx_map.h"
+#include "base/LogDefines.h"
 #include "core/layout/layout.h"
 #include "core/layout/measure_func_adapter.h"
 #include "core/manager/weex_core_manager.h"
@@ -96,7 +97,7 @@ int AndroidSide::CallNative(const char *page_id, const char *task,
   return flag;
 }
 
-std::unique_ptr<IPCResult> AndroidSide::CallNativeModule(
+std::unique_ptr<ValueWithType> AndroidSide::CallNativeModule(
     const char *page_id, const char *module, const char *method,
     const char *arguments, int arguments_length, const char *options,
     int options_length) {
@@ -105,7 +106,9 @@ std::unique_ptr<IPCResult> AndroidSide::CallNativeModule(
       wx_bridge_->CallNativeModule(env, page_id, module, method, arguments,
                                    arguments_length, options, options_length);
 
-  std::unique_ptr<IPCResult> ipc_result = createInt32Result(-1);
+  std::unique_ptr<ValueWithType> ipc_result(new ValueWithType());
+  ipc_result->type = ParamsType::INT32;
+  ipc_result->value.int32Value = -1;
   if (result.IsNull()) {
     return ipc_result;
   }
@@ -116,23 +119,25 @@ std::unique_ptr<IPCResult> AndroidSide::CallNativeModule(
   auto jDataObj = wx_js_object_result->GetData(env);
 
   if (jTypeInt == 1) {
-    ipc_result = std::move(createDoubleResult(
-        base::android::JNIType::DoubleValue(env, jDataObj.Get())));
-
+    ipc_result->type = ParamsType::DOUBLE;
+    ipc_result->value.doubleValue =
+        base::android::JNIType::DoubleValue(env, jDataObj.Get());
   } else if (jTypeInt == 2) {
     jstring jDataStr = (jstring)jDataObj.Get();
-    ipc_result = std::unique_ptr<IPCResult>(
-        new IPCStringResult(jstring2WeexString(env, jDataStr)));
+    ipc_result->type = ParamsType::STRING;
+    ipc_result->value.string = jstring2WeexString(env, jDataStr);
   } else if (jTypeInt == 3) {
     jstring jDataStr = (jstring)jDataObj.Get();
-    ipc_result = std::unique_ptr<IPCResult>(
-        new IPCJSONStringResult(jstring2WeexString(env, jDataStr)));
+    ipc_result->type = ParamsType::JSONSTRING;
+    ipc_result->value.string = jstring2WeexString(env, jDataStr);
   } else if (jTypeInt == 4) {
     jbyteArray array = (jbyteArray)jDataObj.Get();
     if (array != nullptr) {
       int length = env->GetArrayLength(array);
       void *data = env->GetByteArrayElements(array, 0);
-      ipc_result = std::move(createByteArrayResult((const char *)data, length));
+      ipc_result->type = ParamsType::BYTEARRAY;
+      ipc_result->value.byteArray =
+          genWeexByteArray((const char *)data, length);
       env->ReleaseByteArrayElements(array, (jbyte *)data, 0);
     }
   }
@@ -238,9 +243,9 @@ int AndroidSide::AddElement(const char *page_id, const char *component_type,
   return flag;
 }
 
-int AndroidSide::Layout(const char *page_id, const char *ref, int top,
-                        int bottom, int left, int right, int height, int width,
-                        int index) {
+int AndroidSide::Layout(const char *page_id, const char *ref, float top,
+                        float bottom, float left, float right, float height,
+                        float width, int index) {
   JNIEnv *env = base::android::AttachCurrentThread();
   int flag = 0;
   wx_bridge_->Layout(env, page_id, ref, top, bottom, left, right, height, width,

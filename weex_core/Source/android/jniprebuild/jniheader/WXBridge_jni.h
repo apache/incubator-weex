@@ -34,6 +34,12 @@ static jint InitFramework(JNIEnv* env, jobject jcaller,
     jstring framework,
     jobject params);
 
+static void RefreshInstance(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring _namespace,
+    jstring function,
+    jobjectArray args);
+
 static jint ExecJS(JNIEnv* env, jobject jcaller,
     jstring instanceId,
     jstring name,
@@ -886,6 +892,14 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Lcom/taobao/weex/bridge/WXParams;"
 ")"
 "I", reinterpret_cast<void*>(InitFramework) },
+    { "nativeRefreshInstance",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"[Lcom/taobao/weex/bridge/WXJSObject;"
+")"
+"V", reinterpret_cast<void*>(RefreshInstance) },
     { "nativeExecJS",
 "("
 "Ljava/lang/String;"

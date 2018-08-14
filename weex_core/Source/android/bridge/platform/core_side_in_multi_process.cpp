@@ -267,6 +267,13 @@ namespace WeexCore {
         std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
     }
 
+
+    int CoreSideInMultiProcess::RefreshInstance(const char* instanceId, const char* nameSpace,
+                        const char* func,
+                        std::vector<VALUE_WITH_TYPE *> &params) {
+        return 1;
+    }
+
     int CoreSideInMultiProcess::InitFramework(const char *script,
                                           std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
         try {
@@ -546,7 +553,8 @@ namespace WeexCore {
 
     int CoreSideInMultiProcess::CreateInstance(const char *instanceId, const char *func,
                                            const char *script, const char *opts,
-                                           const char *initData, const char *extendsApi) {
+                                           const char *initData, const char *extendsApi,
+                                           const char* render_strategy) {
         try {
             std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
             serializer->setMsg(static_cast<uint32_t>(IPCMsgFromPlatformToCore::CREATE_INSTANCE));

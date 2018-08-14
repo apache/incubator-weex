@@ -18,9 +18,11 @@
  */
 
 #include "base/message_loop/message_loop.h"
-#include <base/thread/thread_local.h>
-#if ANDROID
+#include "base/thread/thread_local.h"
+#ifdef OS_ANDROID
 #include "base/message_loop/message_pump_android.h"
+#elif OS_IOS
+#include "base/message_loop/message_pump_darwin.h"
 #endif
 #include "base/message_loop/message_pump_posix.h"
 
@@ -33,8 +35,10 @@ MessageLoop::MessageLoop(Type type)
     : delayed_tasks_(), type_(type), delayed_tasks_mutex_() {
   switch (type) {
     case PLATFORM:
-#if ANDROID
+#ifdef OS_ANDROID
       message_pump_ = std::unique_ptr<MessagePump>(new MessagePumpAndroid());
+#elif OS_IOS
+      message_pump_ = std::unique_ptr<MessagePump>(new MessagePumpDarwin());
 #endif
       break;
     case DEFAULT:

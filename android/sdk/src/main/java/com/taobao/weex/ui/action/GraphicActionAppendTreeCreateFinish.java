@@ -31,10 +31,10 @@ public class GraphicActionAppendTreeCreateFinish extends BasicGraphicAction {
 
   WXComponent component;
 
-  public GraphicActionAppendTreeCreateFinish(String instanceId, String ref) {
-    super(instanceId, ref);
+  public GraphicActionAppendTreeCreateFinish(WXSDKInstance instance, String ref) {
+    super(instance, ref);
 
-    component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(instanceId, ref);
+    component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), ref);
     if (null != component && component instanceof WXVContainer) {
       ((WXVContainer)component).appendTreeCreateFinish();
     }

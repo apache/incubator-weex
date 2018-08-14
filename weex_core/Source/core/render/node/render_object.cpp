@@ -17,7 +17,6 @@
  * under the License.
  */
 #include "core/render/node/render_object.h"
-#include "android/base/log_utils.h"
 #include "base/ViewUtils.h"
 #include "core/css/constants_name.h"
 #include "core/css/constants_value.h"
@@ -58,7 +57,6 @@ RenderObject::~RenderObject() {
     RenderObject *child = static_cast<RenderObject *>(*it);
     if (child != nullptr) {
       delete child;
-      child = nullptr;
     }
   }
 }
@@ -73,7 +71,6 @@ void RenderObject::ApplyDefaultStyle() {
 
   if (style != nullptr) {
     delete style;
-    style = nullptr;
   }
 }
 
@@ -88,11 +85,10 @@ void RenderObject::ApplyDefaultAttr() {
 
   if (attrs != nullptr) {
     delete attrs;
-    attrs = nullptr;
   }
 }
 
-WXCoreSize measureFunc_Impl(WXCoreLayoutNode *node, float width,
+static WXCoreSize measureFunc_Impl(WXCoreLayoutNode *node, float width,
                             MeasureMode widthMeasureMode, float height,
                             MeasureMode heightMeasureMode) {
   WXCoreSize size;

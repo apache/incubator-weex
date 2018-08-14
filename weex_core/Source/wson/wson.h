@@ -74,6 +74,7 @@ void wson_push_type_boolean(wson_buffer *buffer, uint8_t value);
 void wson_push_type_int(wson_buffer *buffer, int32_t num);
 void wson_push_type_long(wson_buffer *buffer, int64_t num);
 void wson_push_type_double(wson_buffer *buffer, double num);
+void wson_push_type_float(wson_buffer *buffer, float num);
 void wson_push_type_string(wson_buffer *buffer, const void *src, int32_t length);
 void wson_push_type_uint8_string(wson_buffer *buffer, const uint8_t *src, int32_t length);
 void wson_push_type_null(wson_buffer *buffer);

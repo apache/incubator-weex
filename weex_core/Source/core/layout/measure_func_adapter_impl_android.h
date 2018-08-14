@@ -19,7 +19,6 @@
 #include "measure_func_adapter.h"
 #include <core/render/node/render_object.h>
 #include <android/wrap/content_box_measurement_impl_android.h>
-#include <android/wrap/measure_mode_impl_android.h>
 #include <android/base/jni/scoped_java_ref.h>
 #include <core/manager/weex_core_manager.h>
 #include <android/bridge/platform/android_side.h>
@@ -46,21 +45,14 @@ namespace WeexCore {
         return size;
       }
 
-    JNIEnv *env = base::android::AttachCurrentThread();
+      JNIEnv* env = base::android::AttachCurrentThread();
 
-    int widthMode = Unspecified(env);
-    int heightMode = Unspecified(env);
-    if (widthMeasureMode == kExactly)
-        widthMode = Exactly(env);
-    if (heightMeasureMode == kExactly)
-        heightMode = Exactly(env);
-    cumsmeasure_Imple_Android(env, measureFunc,
-                              width, height,
-                              widthMode, heightMode);
-    size.width = GetLayoutWidth(env, measureFunc);
-    size.height = GetLayoutHeight(env, measureFunc);
+      cumsmeasure_Imple_Android(env, measureFunc, width, height,
+                                widthMeasureMode, heightMeasureMode);
+      size.width = GetLayoutWidth(env, measureFunc);
+      size.height = GetLayoutHeight(env, measureFunc);
 
-    env->DeleteLocalRef(measureFunc);
+      env->DeleteLocalRef(measureFunc);
 
       return size;
     }

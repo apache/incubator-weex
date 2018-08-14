@@ -31,7 +31,7 @@ using namespace WeexCore;
 
 namespace WeexCore {
     bool RegisterWXJsFunction(JNIEnv *env) {
-        RegisterNativesImpl(env);
+        return RegisterNativesImpl(env);
     }
 }
 

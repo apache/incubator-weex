@@ -455,7 +455,9 @@ WX_EXPORT_METHOD(@selector(setListData:))
 {
     if (![newData isKindOfClass:[NSArray class]]) {
         WXLogError(@"wrong format of list data:%@", newData);
-        completion(NO);
+        if (completion) {
+            completion(NO);
+        }
         return;
     }
     

@@ -36,7 +36,7 @@ class RenderPerformance;
 
 class RenderPage {
  private:
-  void TraverseTree(RenderObject *render, int index);
+  void TraverseTree(RenderObject *render, long index);
 
   void PushRenderToRegisterMap(RenderObject *render);
 

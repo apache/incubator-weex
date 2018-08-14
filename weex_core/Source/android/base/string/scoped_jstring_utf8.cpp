@@ -32,7 +32,7 @@ const char *ScopedJStringUTF8::getChars() {
   if (m_chars)
     return m_chars;
   if (m_jstring == nullptr)
-    return "";
+    return nullptr;
   m_chars = m_env->GetStringUTFChars(m_jstring, nullptr);
   return m_chars;
 }

@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.action;
 
+import com.taobao.weex.WXSDKInstance;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKManager;
@@ -29,8 +30,8 @@ public class GraphicActionMoveElement extends BasicGraphicAction {
   private String mParentref;
   private int mIndex;
 
-  public GraphicActionMoveElement(String pageId, String ref, String parentRef, int index) {
-    super(pageId, ref);
+  public GraphicActionMoveElement(WXSDKInstance instance, String ref, String parentRef, int index) {
+    super(instance, ref);
     this.mParentref = parentRef;
     this.mIndex = index;
   }

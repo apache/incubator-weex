@@ -38,7 +38,7 @@
 #include <IPCListener.h>
 #include <android/bridge/platform/android_bridge_in_multi_process.h>
 #include <core/manager/weex_core_manager.h>
-#include <core/bridge/script_bridge_in_multi_process.h>
+#include <android/bridge/script_bridge_in_multi_process.h>
 #include <android/base/jni/android_jni.h>
 
 static void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie);

@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#ifdef OS_ANDROID
 #ifndef WEEX_PROJECT_THREAD_IMPL_ANDROID_H
 #define WEEX_PROJECT_THREAD_IMPL_ANDROID_H
 
@@ -37,3 +38,4 @@ class ThreadImplAndroid : public ThreadImplPosix {
 }  // namespace weex
 
 #endif  // WEEX_PROJECT_THREAD_IMPL_ANDROID_H
+#endif
