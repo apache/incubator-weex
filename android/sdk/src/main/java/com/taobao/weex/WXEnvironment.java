@@ -98,6 +98,8 @@ public class WXEnvironment {
    * */
   public static long sComponentsAndModulesReadyTime = 0;
 
+  public static boolean sInAliWeex = false;
+
   public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
   public static boolean isPerf = false;

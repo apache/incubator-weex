@@ -311,6 +311,10 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     } else {
       getRealView().addView(child, index);
     }
+    WXSDKInstance instance = getInstance();
+    if (null != instance && instance.getExceptionRecorder().hasAddView.compareAndSet(false,true)){
+      instance.getExceptionRecorder().errorList.clear();
+    }
   }
 
   public void remove(WXComponent child, boolean destroy) {

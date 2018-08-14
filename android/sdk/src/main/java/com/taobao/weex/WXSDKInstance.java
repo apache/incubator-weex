@@ -67,6 +67,7 @@ import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.performance.WXInstanceExceptionRecord;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
@@ -139,6 +140,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
 
   private Map<String,String> mContainerInfo;
+
+  private WXInstanceExceptionRecord mExceptionRecorder;
 
   /**
    * bundle type
@@ -406,6 +409,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     mWXPerformance = new WXPerformance(mInstanceId);
     mApmForInstance = new WXInstanceApm(mInstanceId);
+    mExceptionRecorder = new WXInstanceExceptionRecord(mInstanceId);
     mWXPerformance.WXSDKVersion = WXEnvironment.WXSDK_VERSION;
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
 
@@ -1398,6 +1402,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public synchronized void destroy() {
     if(!isDestroy()) {
       mApmForInstance.onEnd();
+      getExceptionRecorder().checkEmptyScreenAndReport();
       if(mRendered) {
         WXSDKManager.getInstance().destroyInstance(mInstanceId);
       }
@@ -1708,6 +1713,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public WXInstanceApm getApmForInstance() {
     return mApmForInstance;
+  }
+
+  public WXInstanceExceptionRecord getExceptionRecorder() {
+    return mExceptionRecorder;
   }
 
   public Map<String, Serializable> getUserTrackParams() {

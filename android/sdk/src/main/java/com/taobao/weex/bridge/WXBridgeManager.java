@@ -2016,8 +2016,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                     WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
                      errorMsg
             );
-            //doReportJSException(instanceId,function,exception);
-            WXExceptionUtils.commitCriticalExceptionRT(instanceId,WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE,function,exception,null);
+            if (!WXEnvironment.sInAliWeex){
+              WXExceptionUtils.commitCriticalExceptionRT(instanceId,WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE,function,exception,null);
+            }
             return;
           }
         } catch (Exception e) {
@@ -2035,7 +2036,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (adapter != null) {
       String exceptionId = instanceId;
 
-      if (instanceId == "" || instanceId == null) {
+      if (TextUtils.isEmpty(instanceId)) {
         exceptionId = "instanceIdisNull";
       }
 
@@ -2077,27 +2078,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
         }
       }
-      Map<String,String> extInfo = null;
-      if (METHOD_CREATE_INSTANCE.equals(function) || METHOD_CREATE_INSTANCE_CONTEXT.equals(function)){
-        extInfo = new HashMap<>();
-        extInfo.put("extInitTime",(System.currentTimeMillis() - WXBridgeManager.sInitFrameWorkTimeOrigin)+"ms");
-        extInfo.put("extInitErrorMsg",WXBridgeManager.sInitFrameWorkMsg.toString());
-      }
 
-      if (checkEmptyScreen(instance)){
-        if (WXEnvironment.isApkDebugable()){
-          WXLogUtils.e("render error 4 js error !");
-        }
-        WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_RENDER_ERR_JS_RUNTIME,
-                function,
-                WXErrorCode.WX_RENDER_ERR_JS_RUNTIME.getErrorMsg() + exception,
-            extInfo);
-      } else {
-        WXExceptionUtils.commitCriticalExceptionRT(exceptionId, WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE,
-                function,
-                WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE.getErrorMsg() + exception,
-            extInfo);
-      }
+      WXErrorCode errorCode = (METHOD_CREATE_INSTANCE.equals(function) || METHOD_CREATE_INSTANCE_CONTEXT.equals(function))
+          ?WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE
+          :WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE;
+      WXExceptionUtils.commitCriticalExceptionRT(exceptionId, errorCode,
+            function,
+          errorCode.getErrorMsg() + exception,
+            null);
+
     }
   }
 

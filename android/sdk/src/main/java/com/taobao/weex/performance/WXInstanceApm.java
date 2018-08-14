@@ -122,6 +122,10 @@ public class WXInstanceApm {
      * record stage
      */
     public void onStage(String name, long timestamp) {
+        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+        if (null != instance){
+            instance.getExceptionRecorder().recordStage(name,timestamp);
+        }
         if (null == apmInstance) {
             return;
         }
