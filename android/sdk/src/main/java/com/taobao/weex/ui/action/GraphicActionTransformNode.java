@@ -34,6 +34,7 @@ public class GraphicActionTransformNode extends BasicGraphicAction {
     public GraphicActionTransformNode(@NonNull WXComponentNode node, WXSDKInstance instance, String ref) {
         super(instance, ref);
         this.mNode = node;
+        this.mNode.createComponent();
     }
 
     @Override

@@ -59,6 +59,7 @@ public class WXRenderManager {
 
   public WXRenderManager() {
     mRenderContext = new ConcurrentHashMap<>();
+    mPreRenderContextMap = new ConcurrentHashMap<>();
     mWXRenderHandler = new WXRenderHandler();
   }
 

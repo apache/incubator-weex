@@ -44,10 +44,25 @@ public class WXPrerenderManager {
     private WXPrerenderManager() {
     }
 
-    public WXSDKInstance preload(String pageName, final String url, Map<String, Object> options, final String jsonInitData, final int width, final int height, final WXRenderStrategy flag) {
+    public WXSDKInstance preRenderByUrl(Context context, String pageName, final String url,
+                                        Map<String, Object> options, final String jsonInitData,
+                                        final int width, final int height, final WXRenderStrategy flag) {
         if (!mPreloadInstanceMap.containsKey(url)) {
-            WXSDKInstance instance = new WXSDKInstance(null);
-            instance.preRender(pageName, url, options, jsonInitData, width, height, flag);
+            WXSDKInstance instance = new WXSDKInstance(context);
+            instance.preRenderByUrl(pageName, url, options, jsonInitData, width, height, flag);
+            mPreloadInstanceMap.put(url, instance);
+            return instance;
+        } else {
+            return mPreloadInstanceMap.get(url);
+        }
+    }
+
+    public WXSDKInstance preRenderByTemplate(Context context, String pageName, final String url,
+                                             String template, Map<String, Object> options, final String jsonInitData,
+                                             final int width, final int height, final WXRenderStrategy flag) {
+        if (!mPreloadInstanceMap.containsKey(url)) {
+            WXSDKInstance instance = new WXSDKInstance(context);
+            instance.preRenderByTemplate(pageName, template, options, jsonInitData, width, height, flag);
             mPreloadInstanceMap.put(url, instance);
             return instance;
         } else {
@@ -56,9 +71,8 @@ public class WXPrerenderManager {
     }
 
     @Nullable
-    public WXSDKInstance fetchPreload(Context context, String url) {
-        WXSDKInstance instance = mPreloadInstanceMap.get(url);
-        return instance;
+    public WXSDKInstance fetchPreload(String url) {
+        return mPreloadInstanceMap.get(url);
     }
 
 }

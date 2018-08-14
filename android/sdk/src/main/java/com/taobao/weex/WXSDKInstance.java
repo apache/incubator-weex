@@ -269,11 +269,19 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXBridgeManager.getInstance().setUseSingleProcess(flag);
   }
 
-  public void preRender(String pageName, final String url, Map<String, Object> options, final String jsonInitData, final int width, final int height, final WXRenderStrategy flag) {
+  public void preRenderByUrl(String pageName, final String url, Map<String, Object> options, final String jsonInitData, final int width, final int height, final WXRenderStrategy flag) {
     if (mPrerenderContext.interceptRenderState.compareAndSet(PreRenderContext.INTERCEPT_RENDER_CLOSE, PreRenderContext.INTERCEPT_RENDER_OPEN)) {
       mPrerenderContext.width = width;
       mPrerenderContext.height = height;
       renderByUrl(pageName, url, options, jsonInitData, flag);
+    }
+  }
+
+  public void preRenderByTemplate(String pageName, final String template, Map<String, Object> options, final String jsonInitData, final int width, final int height, final WXRenderStrategy flag) {
+    if (mPrerenderContext.interceptRenderState.compareAndSet(PreRenderContext.INTERCEPT_RENDER_CLOSE, PreRenderContext.INTERCEPT_RENDER_OPEN)) {
+      mPrerenderContext.width = width;
+      mPrerenderContext.height = height;
+      render(pageName, template, options, jsonInitData, flag);
     }
   }
 
@@ -285,6 +293,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         mPrerenderContext.rootNode.startTransform();
       }
     }
+  }
+
+  public void specifiedRootNode(WXComponentNode rootNode) {
+      mPrerenderContext.rootNode = rootNode;
   }
 
   @NonNull

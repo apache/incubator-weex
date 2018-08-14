@@ -21,7 +21,6 @@ package com.taobao.weex.ui.action;
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
 import java.util.Map;
@@ -29,7 +28,6 @@ import java.util.Set;
 
 public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
 
-  private WXComponent component;
   private WXComponentNode node;
 
   public GraphicActionCreateBody(@NonNull WXSDKInstance instance, String ref,
@@ -62,6 +60,5 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
   public void executeAction() {
     super.executeAction();
     node.createBody();
-
   }
 }

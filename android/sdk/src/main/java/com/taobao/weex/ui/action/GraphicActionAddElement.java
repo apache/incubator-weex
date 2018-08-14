@@ -18,7 +18,6 @@
  */
 package com.taobao.weex.ui.action;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.WorkerThread;
@@ -85,55 +84,57 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
       WXComponent parent = WXSDKManager.getInstance().getWXRenderManager()
           .getWXComponent(getPageId(), mParentRef);
 
-      if (mStyle != null && !mStyle.isEmpty()) {
-        ext.put("child.style", mStyle.toString());
-      }
-      if (parent != null && parent.getStyles() != null && !parent.getStyles().isEmpty()) {
-        ext.put("parent.style", parent.getStyles().toString());
-      }
+      if (parent != null) {
+        if (mStyle != null && !mStyle.isEmpty()) {
+          ext.put("child.style", mStyle.toString());
+        }
+        if (parent != null && parent.getStyles() != null && !parent.getStyles().isEmpty()) {
+          ext.put("parent.style", parent.getStyles().toString());
+        }
 
-      if (mAttributes != null && !mAttributes.isEmpty()) {
-        ext.put("child.attr", mAttributes.toString());
-      }
-      if (parent != null && parent.getAttrs() != null && !parent.getAttrs().isEmpty()) {
-        ext.put("parent.attr", parent.getAttrs().toString());
-      }
+        if (mAttributes != null && !mAttributes.isEmpty()) {
+          ext.put("child.attr", mAttributes.toString());
+        }
+        if (parent != null && parent.getAttrs() != null && !parent.getAttrs().isEmpty()) {
+          ext.put("parent.attr", parent.getAttrs().toString());
+        }
 
-      if (mEvents != null && !mEvents.isEmpty()) {
-        ext.put("child.event", mEvents.toString());
-      }
-      if (parent != null && parent.getEvents() != null && !parent.getEvents().isEmpty()) {
-        ext.put("parent.event", parent.getEvents().toString());
-      }
+        if (mEvents != null && !mEvents.isEmpty()) {
+          ext.put("child.event", mEvents.toString());
+        }
+        if (parent != null && parent.getEvents() != null && !parent.getEvents().isEmpty()) {
+          ext.put("parent.event", parent.getEvents().toString());
+        }
 
-      if (mMargins != null && mMargins.length > 0) {
-        ext.put("child.margin", Arrays.toString(mMargins));
-      }
-      if (parent != null && parent.getMargin() != null) {
-        ext.put("parent.margin", parent.getMargin().toString());
-      }
+        if (mMargins != null && mMargins.length > 0) {
+          ext.put("child.margin", Arrays.toString(mMargins));
+        }
+        if (parent != null && parent.getMargin() != null) {
+          ext.put("parent.margin", parent.getMargin().toString());
+        }
 
-      if (mPaddings != null && mPaddings.length > 0) {
-        ext.put("child.padding", Arrays.toString(mPaddings));
-      }
-      if (parent != null && parent.getPadding() != null) {
-        ext.put("parent.padding", parent.getPadding().toString());
-      }
+        if (mPaddings != null && mPaddings.length > 0) {
+          ext.put("child.padding", Arrays.toString(mPaddings));
+        }
+        if (parent != null && parent.getPadding() != null) {
+          ext.put("parent.padding", parent.getPadding().toString());
+        }
 
-      if (mBorders != null && mBorders.length > 0) {
-        ext.put("child.border", Arrays.toString(mBorders));
-      }
-      if (parent != null && parent.getBorder() != null) {
-        ext.put("parent.border", parent.getBorder().toString());
-      }
+        if (mBorders != null && mBorders.length > 0) {
+          ext.put("child.border", Arrays.toString(mBorders));
+        }
+        if (parent != null && parent.getBorder() != null) {
+          ext.put("parent.border", parent.getBorder().toString());
+        }
 
-      WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
-          WXErrorCode.WX_RENDER_ERR_CONTAINER_TYPE,
-          "GraphicActionAddElement",
-          String.format(Locale.ENGLISH,"You are trying to add a %s to a %2$s, which is illegal as %2$s is not a container",
-              componentType,
-              WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentRef).getComponentType()),
-          ext);
+        WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
+                WXErrorCode.WX_RENDER_ERR_CONTAINER_TYPE,
+                "GraphicActionAddElement",
+                String.format(Locale.ENGLISH, "You are trying to add a %s to a %2$s, which is illegal as %2$s is not a container",
+                        componentType,
+                        WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentRef).getComponentType()),
+                ext);
+      }
     }
 
   }

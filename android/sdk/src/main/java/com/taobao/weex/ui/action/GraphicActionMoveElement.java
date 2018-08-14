@@ -19,7 +19,6 @@
 package com.taobao.weex.ui.action;
 
 import com.taobao.weex.WXSDKInstance;
-import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.node.WXComponentNode;

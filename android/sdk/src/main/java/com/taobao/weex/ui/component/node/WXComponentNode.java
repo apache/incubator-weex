@@ -29,6 +29,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.WXStyle;
@@ -51,7 +52,7 @@ import java.util.Map;
 /**
  * Created by luciolong on 14/07/2018.
  */
-public class WXComponentNode {
+public class WXComponentNode implements Runnable {
     private static final String TAG = "WXComponentNode";
 
     private static final int EXECUTE_STATE_CREATE_BODY = 1;
@@ -120,12 +121,10 @@ public class WXComponentNode {
     }
 
     private void postTransformAction() {
-        new GraphicActionTransformNode(this, mWxInstance, mComponentData.mRef).executeActionOnRender();
+        WXBridgeManager.getInstance().post(this);
     }
 
     public void transformNode() {
-        createComponent();
-
         switch (mExecuteState) {
             case EXECUTE_STATE_CREATE_BODY:
                 createBody();
@@ -140,11 +139,11 @@ public class WXComponentNode {
 
     public void createComponent() {
         if (mWxInstance.getNeedInterceptRender()) {
-            mExecuteState = EXECUTE_STATE_CREATE_BODY;
             return;
         }
 
         if (data == null) {
+            WXLogUtils.d(TAG, "node real create component");
             long createComponentStart = System.currentTimeMillis();
             String pageId = mWxInstance.getInstanceId();
             WXVContainer parent = null;
@@ -181,12 +180,15 @@ public class WXComponentNode {
 
     public void createBody() {
         if (mWxInstance.getNeedInterceptRender()) {
-            mExecuteState = EXECUTE_STATE_ADD_ELEMENT;
+            mExecuteState = EXECUTE_STATE_CREATE_BODY;
+            mWxInstance.specifiedRootNode(this);
             return;
         }
         try {
             ensureDataNotNull();
             if (data != null) {
+                WXLogUtils.d(TAG, "node real create body");
+                data.mIsAddElementToTree = true;
                 data.createView();
                 data.applyLayoutAndEvent(data);
                 data.bindData(data);
@@ -216,6 +218,7 @@ public class WXComponentNode {
         }
         mParentNode.addNode(this, mIndex);
         if (mWxInstance.getNeedInterceptRender()) {
+            mExecuteState = EXECUTE_STATE_ADD_ELEMENT;
             return;
         }
 
@@ -460,6 +463,11 @@ public class WXComponentNode {
     @NonNull
     public WXSDKInstance getWxInstance() {
         return mWxInstance;
+    }
+
+    @Override
+    public void run() {
+        new GraphicActionTransformNode(this, mWxInstance, mComponentData.mRef).executeActionOnRender();
     }
 
     public void onCreateFinish() {
