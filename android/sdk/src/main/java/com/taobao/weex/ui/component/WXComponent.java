@@ -1347,7 +1347,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         initView();
       }
       if (mHost != null) {
-        mHost.setId(WXViewUtils.generateViewId());
+        if(mHost.getId() == View.NO_ID)
+          mHost.setId(WXViewUtils.generateViewId());
         if(TextUtils.isEmpty(mHost.getContentDescription()) && WXEnvironment.isApkDebugable()){
           mHost.setContentDescription(getRef());
         }
