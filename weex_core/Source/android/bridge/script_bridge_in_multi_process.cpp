@@ -865,7 +865,7 @@ std::unique_ptr<IPCResult> HandleDispatchMessage(IPCArguments *arguments) {
 
 ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   set_script_side(new bridge::script::ScriptSideInMultiProcess);
-  set_core_side(new bridge::script::CoreSideInScript);
+  set_core_side(new CoreSideInScript);
   std::unique_ptr<MultiProcessAndSoInitializer> initializer(
       new MultiProcessAndSoInitializer);
 
