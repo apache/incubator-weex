@@ -643,7 +643,7 @@ static BOOL bNeedRemoveEvents = YES;
     
     BOOL isTransitionTag = _transition ? [self _isTransitionTag:styles] : NO;
     if (isTransitionTag) {
-        [_transition _handleTransitionWithStyles:styles resetStyles:resetStyles target:self];
+        [_transition _handleTransitionWithStyles:[styles mutableCopy] resetStyles:resetStyles target:self];
     } else {
         styles = [self parseStyles:styles];
         [self _updateCSSNodeStyles:styles];
