@@ -1923,8 +1923,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     WXJSObject[] args = {WXWsonJSONSwitch.toWsonOrJsonWXJSObject(modules)};
+    String errorMsg = null;
     try {
-      mWXBridge.execJS("", null, METHOD_REGISTER_MODULES, args);
+        if(0 == mWXBridge.execJS("", null, METHOD_REGISTER_MODULES, args)) {
+            errorMsg = "execJS error";
+        }
       try {
         Iterator<String> iter = modules.keySet().iterator();
         while (iter.hasNext()) {
@@ -1938,13 +1941,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXLogUtils.e("Weex [invokeRegisterModules]", e);
       }
     } catch (Throwable e) {
-      WXExceptionUtils.commitCriticalExceptionRT(null,
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_MODULES,
-              "invokeRegisterModules", WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_MODULES.getErrorMsg() +
-                      " \n " + e.getMessage() + modules.entrySet().toString(),
-              null );
+      errorMsg = WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_MODULES.getErrorMsg() +
+                " \n " + e.getMessage() + modules.entrySet().toString();
+    }
 
-      WXLogUtils.e("[WXBridgeManager] invokeRegisterModules:", e);
+    if(!TextUtils.isEmpty(errorMsg)) {
+        WXLogUtils.e("[WXBridgeManager] invokeRegisterModules:", errorMsg);
+        WXExceptionUtils.commitCriticalExceptionRT(null,
+                WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_MODULES,
+                "invokeRegisterModules", errorMsg,
+                null );
     }
   }
 
@@ -1965,17 +1971,23 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     WXJSObject[] args = {WXWsonJSONSwitch.toWsonOrJsonWXJSObject(components)};
+    String errorMsg = null;
     try {
-      mWXBridge.execJS("", null, METHOD_REGISTER_COMPONENTS, args);
+      if(0 == mWXBridge.execJS("", null, METHOD_REGISTER_COMPONENTS, args)) {
+          errorMsg = "execJS error";
+      }
     } catch (Throwable e) {
-      WXLogUtils.e("[WXBridgeManager] invokeRegisterComponents ", e);
-      WXExceptionUtils.commitCriticalExceptionRT(null,
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED,
-              METHOD_REGISTER_COMPONENTS,
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED
-                      + args.toString()
-                      + WXLogUtils.getStackTrace(e),
-              null);
+        errorMsg = WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_COMPONENT
+                + args.toString()
+                + WXLogUtils.getStackTrace(e);
+    }
+
+    if(!TextUtils.isEmpty(errorMsg)) {
+        WXLogUtils.e("[WXBridgeManager] invokeRegisterComponents ", errorMsg);
+        WXExceptionUtils.commitCriticalExceptionRT(null,
+                WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_COMPONENT,
+                METHOD_REGISTER_COMPONENTS, errorMsg,
+                null);
     }
   }
 
