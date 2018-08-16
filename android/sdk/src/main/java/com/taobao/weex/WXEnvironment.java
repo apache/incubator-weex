@@ -312,6 +312,20 @@ public class WXEnvironment {
     return path;
   }
 
+  public static String getCrashFilePath(Context context) {
+    if (context == null) {
+        return "";
+    }
+
+    File dir = context.getDir("crash", Context.MODE_PRIVATE);
+    if (dir == null)
+        return "";
+
+    String crashDir = dir.getAbsolutePath();
+
+    return crashDir;
+  }
+
   public static String getGlobalFontFamilyName() {
     return sGlobalFontFamily;
   }

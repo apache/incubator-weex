@@ -36,6 +36,7 @@
 
 const char *s_cacheDir;
 const char *g_jssSoPath = nullptr;
+const char *g_crashFilePath = nullptr;
 const char *g_jssSoName = "libweexjss.so";
 bool s_start_pie = true;
 
@@ -715,6 +716,17 @@ namespace WeexCore {
             }
         }
 
+        jmethodID m_get_crash_file_path = env->GetMethodID(c_params, "getCrashFilePath", "()Ljava/lang/String;");
+        if (m_get_jss_so_path != nullptr) {
+            jobject j_get_crash_file_path = env->CallObjectMethod(params, m_get_crash_file_path);
+            if (j_get_crash_file_path != nullptr) {
+                g_crashFilePath = env->GetStringUTFChars(
+                        (jstring) (j_get_crash_file_path),
+                        nullptr);
+                LOGE("g_crashFilePath is %s ", g_crashFilePath);
+                env->DeleteLocalRef(j_get_crash_file_path);
+            }
+        }
 
         jmethodID m_osVersion = env->GetMethodID(c_params, "getOsVersion", "()Ljava/lang/String;");
         if (m_osVersion == nullptr) {
@@ -932,7 +944,7 @@ namespace WeexCore {
         if (!reportMethodId)
             goto no_method;
 
-        crashFileStr.assign("/jsserver_crash/jsserver_crash_info.log");
+        crashFileStr.assign("/crash_dump.log");
 
         crashFile = env->NewStringUTF(crashFileStr.c_str());
         env->CallVoidMethod(jThis, reportMethodId, jinstanceid, crashFile);
