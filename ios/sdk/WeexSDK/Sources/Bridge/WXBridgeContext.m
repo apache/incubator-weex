@@ -808,7 +808,7 @@ _Pragma("clang diagnostic pop") \
     [self performSelector:@selector(_sendQueueLoop) withObject:nil];
 }
 
-- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(id<WXBridgeProtocol>)bridge completion:(void (^)(JSValue * value))complection
+- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(id<WXBridgeProtocol>)bridge completion:(void (^)(JSValue * value))completion
 {
     NSMutableArray *newArg = nil;
     if (!bridge) {
@@ -816,22 +816,23 @@ _Pragma("clang diagnostic pop") \
     }
     if (self.frameworkLoadFinished) {
         newArg = [args mutableCopy];
-        if ([newArg containsObject:complection]) {
-            [newArg removeObject:complection];
+        if ([newArg containsObject:completion]) {
+            [newArg removeObject:completion];
         }
         WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
-        if ([bridge isKindOfClass:[WXJSCoreBridge class]]) {
+        if (([bridge isKindOfClass:[WXJSCoreBridge class]]) ||
+            ([bridge isKindOfClass:NSClassFromString(@"WXDebugger") ]) ) {
             JSValue *value = [bridge callJSMethod:method args:args];
-            if (complection) {
-                complection(value);
+            if (completion) {
+                completion(value);
             }
         } else {
             [bridge callJSMethod:method args:args];
         }
     } else {
         newArg = [args mutableCopy];
-        if (complection) {
-            [newArg addObject:complection];
+        if (completion) {
+            [newArg addObject:completion];
         }
         [_methodQueue addObject:@{@"method":method, @"args":[newArg copy]}];
     }
