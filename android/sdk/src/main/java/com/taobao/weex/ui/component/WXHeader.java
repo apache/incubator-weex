@@ -50,12 +50,7 @@ public class WXHeader extends WXCell {
   }
 
   @Override
-  public boolean isSticky() {
-    return true;
-  }
-
-  @Override
   public boolean canRecycled() {
-    return false;
+    return !isSticky();
   }
 }

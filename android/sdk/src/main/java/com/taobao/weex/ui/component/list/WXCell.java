@@ -35,6 +35,7 @@ import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXHeader;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.view.WXFrameLayout;
@@ -125,7 +126,7 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
      */
     @Override
     protected WXFrameLayout initComponentHostView(@NonNull Context context) {
-        if (isSticky()) {
+        if (isSticky() || this instanceof WXHeader) {
             WXFrameLayout view = new WXFrameLayout(context);
             mRealView = new WXFrameLayout(context);
             view.addView(mRealView);
