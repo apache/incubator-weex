@@ -20,6 +20,16 @@
 #import <Foundation/Foundation.h>
 #import "WXSDKInstance.h"
 
+#define WX_ERROR_GROUP_NATIVE   @"NATIVE"
+#define WX_ERROR_GROUP_JS       @"JS"
+#define WX_ERROR_GROUP_NET      @"NET"
+
+#define WX_ERROR_TYPE_NATIVE    @"NATIVE_ERROR"
+#define WX_ERROR_TYPE_JS        @"JS_ERROR"
+#define WX_ERROR_TYPE_DEGRADE    @"DEGRADE_ERROR"
+#define WX_ERROR_TYPE_RENDER    @"RENDER_ERROR"
+
+
 typedef NS_ENUM(int, WXSDKErrCode)
 {
     WX_ERR_JSFRAMEWORK_START = -1001,
@@ -62,6 +72,7 @@ typedef NS_ENUM(int, WXSDKErrCode)
     WX_KEY_EXCEPTION_DEGRADE_CHECK_CONTENT_LENGTH_FAILED = -9501,
     WX_KEY_EXCEPTION_DEGRADE_BUNDLE_CONTENTTYPE_ERROR = -9502,
     WX_KEY_EXCEPTION_DEGRADE_OTHER_CAUSE = -9503,
+    WX_KEY_EXCEPTION_DEGRADE_NET_CODE_CAUSE = -9504,
     
     WX_KEY_EXCEPTION_ABILITY_DOWN = -9600,
     WX_KEY_EXCEPTION_ABILITY_DOWN_IMAGE = -9601,
@@ -71,23 +82,26 @@ typedef NS_ENUM(int, WXSDKErrCode)
     WX_KEY_EXCEPTION_EMPTY_SCREEN_JS = -9700
 };
 
-typedef NS_ENUM (int,WXSDKErrorType)
+typedef NS_ENUM (NSInteger,WXSDKErrorType)
 {
-    JS_ERROR,
-    NATIVE_ERROR,
-    RENDER_ERROR,
-    DEGRAD_ERROR
+    WX_JS_ERROR,
+    WX_NATIVE_ERROR,
+    WX_RENDER_ERROR,
+    WX_DEGRADE_ERROR
 };
 
-typedef NS_ENUM (int,WXSDKErrorGroup){
-    JS,
-    NATIVE
+typedef NS_ENUM (NSInteger,WXSDKErrorGroup){
+    WX_JS,
+    WX_NATIVE,
+    WX_NET
 };
 
 @interface WXSDKErrCodeUtil :NSObject
 
 + (WXSDKErrorType) getErrorTypeByCode:(WXSDKErrCode) code;
 + (WXSDKErrorGroup) getErrorGroupByCode:(WXSDKErrCode) code;
++ (NSString *) convertGroupToStringName:(WXSDKErrorGroup) group;
++ (NSString *) convertTypeToStringName:(WXSDKErrorType)type;
 
 @end
 

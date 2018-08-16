@@ -461,8 +461,15 @@ typedef enum : NSUInteger {
 
         WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, wxErrorCode, errorMessage, weakSelf.pageName);
         
+    
+        NSMutableDictionary *allUserInfo = [[NSMutableDictionary alloc] initWithDictionary:error.userInfo];
+        [allUserInfo addEntriesFromDictionary:loadError.userInfo];
+        NSError *errorWithReportMsg = [NSError errorWithDomain:error.domain
+                                             code:error.code
+                                         userInfo:allUserInfo];
+      
         if (weakSelf.onFailed) {
-            weakSelf.onFailed(error);
+            weakSelf.onFailed(errorWithReportMsg);
         }
         [weakSelf.apmInstance setProperty:KEY_PROPERTIES_ERROR_CODE withValue:[@(wxErrorCode) stringValue]];
     };
