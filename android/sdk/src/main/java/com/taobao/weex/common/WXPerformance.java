@@ -397,7 +397,7 @@ public class WXPerformance {
     quotas.put(Measure.JSTemplateSize.toString(), JSTemplateSize);
     quotas.put(Measure.pureNetworkTime.toString(), (double) pureNetworkTime);
     quotas.put(Measure.networkTime.toString(), (double) networkTime);
-    quotas.put(Measure.fsCreateInstanceTime.toString(), (double) (callCreateInstanceTime - renderTimeOrigin));
+    quotas.put(Measure.fsCreateInstanceTime.toString(), (double) callCreateInstanceTime);
     quotas.put(Measure.fsCallJsTotalTime.toString(), (double) fsCallJsTotalTime);
     quotas.put(Measure.fsCallJsTotalNum.toString(), (double) fsCallJsTotalNum);
     quotas.put(Measure.fsCallNativeTotalTime.toString(), (double) fsCallNativeTotalTime);

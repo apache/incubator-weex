@@ -22,6 +22,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
@@ -565,6 +566,12 @@ public class WXUtils {
         return  Integer.parseInt(number);
       }
     }catch (Exception e){return  defaultValue;}
+  }
+
+  private static final long sInterval = System.currentTimeMillis() - SystemClock.uptimeMillis();
+
+  public static long getFixUnixTime(){
+    return  sInterval + SystemClock.uptimeMillis();
   }
 
 }
