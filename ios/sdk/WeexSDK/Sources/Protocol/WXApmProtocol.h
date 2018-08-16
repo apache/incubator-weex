@@ -1,6 +1,5 @@
 
 #import <Foundation/Foundation.h>
-#import "WXAppMonitorProtocol.h"
 
 
 @protocol WXApmProtocol <NSObject>
