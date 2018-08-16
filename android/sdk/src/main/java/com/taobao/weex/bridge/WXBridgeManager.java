@@ -61,6 +61,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import android.util.Log;
 
 import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
 
@@ -678,8 +679,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
       try {
         if (WXEnvironment.getApplication() != null) {
-          crashFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath() + crashFile;
-          // Log.e("jsengine", "callReportCrashReloadPage crashFile:" + crashFile);
+          crashFile = mInitParams.getCrashFilePath() + crashFile;
+          Log.d("jsengine", "callReportCrashReloadPage crashFile:" + crashFile);
         }
       } catch (Throwable e) {
         e.printStackTrace();
@@ -1153,6 +1154,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return;
     }
 
+    Log.d("ReportCrash", " commitJscCrashAlarmMonitor errMsg " + errMsg);
     String method = "callReportCrash";
     String exception = "weex core process crash and restart exception";
     Map<String, String> extParams = new HashMap<String, String>();
@@ -1778,6 +1780,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     wxParams.setShouldInfoCollect(config.get("infoCollect"));
     wxParams.setLogLevel(config.get(WXConfig.logLevel));
     wxParams.setUseSingleProcess(isUseSingleProcess ? "true" : "false");
+    wxParams.setCrashFilePath(WXEnvironment.getCrashFilePath(WXEnvironment.getApplication().getApplicationContext()));
     wxParams.setLibJssPath(WXEnvironment.getLibJssRealPath());
     String appName = config.get(WXConfig.appName);
     if (!TextUtils.isEmpty(appName)) {

@@ -20,9 +20,10 @@ package com.taobao.weex.bridge;
 
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class WXParams {
+public class WXParams implements Serializable {
 
   private String platform;
   private String osVersion;
@@ -37,6 +38,7 @@ public class WXParams {
   private String needInitV8;
   private String cacheDir;
   private String useSingleProcess;
+  private String crashFilePath;
   private String libJssPath;
 
   private Map<String, String> options;
@@ -169,6 +171,16 @@ public class WXParams {
     } else {
       this.needInitV8 = "0";
     }
+  }
+
+  public void setCrashFilePath(String crashFilePath) {
+    WXLogUtils.e("WXParams","setCrashFilePath: " + crashFilePath);
+    this.crashFilePath = crashFilePath;
+  }
+
+  public String getCrashFilePath() {
+    WXLogUtils.e("WXParams", "getCrashFilePath:" + crashFilePath);
+    return this.crashFilePath;
   }
 
   public String getLibJssPath() {

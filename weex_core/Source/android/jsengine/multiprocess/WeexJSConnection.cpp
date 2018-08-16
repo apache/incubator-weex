@@ -20,8 +20,10 @@
 
 #include "ashmem.h"
 #include "WeexProxy.h"
+#include <fcntl.h>
 #include <dirent.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/mman.h>
@@ -38,8 +40,11 @@
 extern const char *s_cacheDir;
 extern const char *g_jssSoPath;
 extern const char *g_jssSoName;
+extern const char *g_crashFilePath;
 extern bool s_start_pie;
 static bool s_in_find_icu = false;
+static std::string g_crashFileName;
+
 static void doExec(int fd, bool traceEnable, bool startupPie = true);
 
 static int copyFile(const char *SourceFile, const char *NewFile);
@@ -47,6 +52,54 @@ static int copyFile(const char *SourceFile, const char *NewFile);
 static void closeAllButThis(int fd);
 
 static void printLogOnFile(const char *log);
+
+static bool checkOrCreateCrashFile(const char* file) {
+    if (file == nullptr) {
+        LOGE("checkOrCreateCrashFile Pass error file name!");
+        return false;
+    }
+
+    int flags = 0;
+    int mode = 0666;
+    int ret = ::access(file,F_OK);
+    if (ret < 0)
+        flags |= O_CREAT;
+    flags |= O_RDWR;
+    int fd = ::open(file, flags, mode);
+    if (fd < 0) {
+        LOGE(" checkOrCreateCrashFile failed, can not create or use crash file! ");
+        return false;
+    }
+    return true;
+}
+
+static bool checkDirOrFileIsLink(const char* path) {
+    if (path == nullptr)
+        return false;
+    struct stat fileStat;
+    int st = stat(path, &fileStat);
+    if (st < 0) {
+        LOGE(" checkDirOrFileIsLink file error: %d\n", errno);
+        return false;
+    }
+    if (!S_ISLNK(fileStat.st_mode))
+        return false;
+    return true;
+}
+
+static bool getDirOrFileLink(const char* path, char* buf, size_t length) {
+    if(path == nullptr || buf == nullptr) {
+        return false;
+    }
+
+    int ret = readlink(path, buf, length);
+    if (ret < 0 ) {
+        return false;
+        LOGE(" checkDirOrFileIsLink check link error: %d\n", errno);
+    }
+
+    return true;
+}
 
 #if PRINT_LOG_CACHEFILE
 static std::string logFilePath = "/data/data/com.taobao.taobao/cache";
@@ -60,7 +113,24 @@ struct WeexJSConnection::WeexJSConnectionImpl {
 
 WeexJSConnection::WeexJSConnection()
         : m_impl(new WeexJSConnectionImpl) {
+  if (checkDirOrFileIsLink(g_crashFilePath)) {
+    std::string tmp = g_crashFilePath;
+    size_t length = tmp.length();
+    char buf[length];
+    memset(buf, 0, length);
+    if (!getDirOrFileLink(g_crashFilePath, buf, length)) {
+        LOGE("getDirOrFileLink filePath(%s) error\n", g_crashFilePath);
+        g_crashFileName = g_crashFilePath;
+    } else {
+        g_crashFileName = buf;
+    }
+  } else {
+    g_crashFileName = g_crashFilePath;
+  }
+  g_crashFileName += "/crash_dump.log";
+  LOGE("WeexJSConnection g_crashFileName: %s\n", g_crashFileName.c_str());
 }
+
 
 WeexJSConnection::~WeexJSConnection() {
   end();
@@ -83,6 +153,12 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
   std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), handler));
   m_impl->serverSender = std::move(sender);
   m_impl->futexPageQueue = std::move(futexPageQueue);
+
+  //before process boot up, we prapare a crash file for child process
+  bool success = checkOrCreateCrashFile(g_crashFileName.c_str());
+  if (!success) {
+    LOGE("Create crash for child process failed, if child process crashed, we can not get a crash file now");
+  }
 #if PRINT_LOG_CACHEFILE
   if (s_cacheDir) {
     logFilePath = s_cacheDir;
@@ -121,6 +197,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
     close(fd);
     throw IPCException("failed to fork: %s", strerror(myerrno));
   } else if (child == 0) {
+    LOGE("weexcore fork child success\n");
     // the child
     closeAllButThis(fd);
     // implements close all but handles[1]
@@ -237,6 +314,7 @@ std::unique_ptr<const char *[]> EnvPBuilder::build() {
 }
 
 void doExec(int fd, bool traceEnable, bool startupPie) {
+  LOGE("weexcore doExec start");
   std::string executablePath;
   std::string icuDataPath;
   s_in_find_icu = true;
@@ -282,30 +360,22 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
   }
   std::string ldLibraryPathEnv("LD_LIBRARY_PATH=");
   std::string icuDataPathEnv("ICU_DATA_PATH=");
-  std::string crashFilePathEnv("CRASH_FILE_PATH=");
   ldLibraryPathEnv.append(executablePath);
   icuDataPathEnv.append(icuDataPath);
 #if PRINT_LOG_CACHEFILE
   mcfile << "jsengine ldLibraryPathEnv:" << ldLibraryPathEnv << " icuDataPathEnv:" << icuDataPathEnv
          << std::endl;
 #endif
-  if (!s_cacheDir) {
-    crashFilePathEnv.append("/data/data/com.taobao.taobao/cache");
-  } else {
-    crashFilePathEnv.append(s_cacheDir);
-  }
-  crashFilePathEnv.append("/jsserver_crash");
   char fdStr[16];
   snprintf(fdStr, 16, "%d", fd);
   EnvPBuilder envpBuilder;
   envpBuilder.addNew(ldLibraryPathEnv.c_str());
   envpBuilder.addNew(icuDataPathEnv.c_str());
-  envpBuilder.addNew(crashFilePathEnv.c_str());
   auto envp = envpBuilder.build();
   {
     std::string executableName = executablePath + '/' + "libweexjsb64.so";
     chmod(executableName.c_str(), 0755);
-    const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", nullptr};
+    const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", g_crashFileName.c_str(),  nullptr};
     if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                      const_cast<char *const *>(envp.get()))) {
     }
@@ -343,7 +413,7 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
       mcfile << "jsengine WeexJSConnection::doExec start path on sdcard, start execve so name:"
              << executableName << std::endl;
 #endif
-      const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", nullptr};
+      const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", g_crashFileName.c_str(), nullptr};
       if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                        const_cast<char *const *>(envp.get()))) {
 #if PRINT_LOG_CACHEFILE
@@ -357,7 +427,8 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
       mcfile << "jsengine WeexJSConnection::doExec start execve so name:" << executableName
              << std::endl;
 #endif
-      const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", nullptr};
+      const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", g_crashFileName.c_str()
+              , nullptr};
       if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                        const_cast<char *const *>(envp.get()))) {
 #if PRINT_LOG_CACHEFILE

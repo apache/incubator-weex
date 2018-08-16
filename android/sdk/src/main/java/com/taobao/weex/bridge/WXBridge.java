@@ -321,7 +321,7 @@ public class WXBridge implements IWXBridge {
 
   @Override
   public void reportServerCrash(String instanceId, String crashFile) {
-    WXLogUtils.e(TAG, "reportServerCrash instanceId:" + instanceId);
+    WXLogUtils.e(TAG, "reportServerCrash instanceId:" + instanceId + " crashFile: " + crashFile);
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
       errorCode = WXBridgeManager.getInstance().callReportCrashReloadPage(instanceId, crashFile);
