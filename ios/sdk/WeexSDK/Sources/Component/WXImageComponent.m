@@ -373,12 +373,12 @@ WX_EXPORT_METHOD(@selector(save:))
         if (self.placeholdSrc) {
             newURL = [self.placeholdSrc copy];
             WX_REWRITE_URL([self placeholdSrc], WXResourceTypeImage, self.weexInstance)
-            NSDictionary* extInfo = @{@"instanceId":self.weexInstance.instanceId};
+            NSDictionary* extInfo = @{@"instanceId":[self _safeInstanceId]};
             [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:extInfo progress:nil completed:nil];
         }
         newURL = [[self imageSrc] copy];
         WX_REWRITE_URL([self imageSrc], WXResourceTypeImage, self.weexInstance)
-        NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius),@"instanceId":self.weexInstance.instanceId};
+        NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius),@"instanceId":[self _safeInstanceId]};
         [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:userInfo progress:^(NSInteger receivedSize, NSInteger expectedSize) {
             // progress when loading image
         } completed:^(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL) {
@@ -396,7 +396,8 @@ WX_EXPORT_METHOD(@selector(save:))
                 if (strongSelf.placeholdSrc) {
                     NSString *newURL = [strongSelf.placeholdSrc copy];
                     WX_REWRITE_URL([strongSelf placeholdSrc], WXResourceTypeImage, strongSelf.weexInstance)
-                    [[strongSelf imageLoader] setImageViewWithURL:(UIImageView*)strongSelf.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:@{@"instanceId":strongSelf.weexInstance.instanceId} progress:nil completed:nil];
+                    [[strongSelf imageLoader] setImageViewWithURL:(UIImageView*)strongSelf.view url:[NSURL
+                                                                                                     URLWithString:newURL] placeholderImage:nil options:@{@"instanceId":[strongSelf _safeInstanceId]} progress:nil completed:nil];
                     return;
                 }
             }
@@ -468,7 +469,7 @@ WX_EXPORT_METHOD(@selector(save:))
     
     __weak typeof(self) weakSelf = self;
     self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL imageFrame:self.calculatedFrame
-                                        userInfo:@{@"instanceId":self.weexInstance.instanceId}
+                                        userInfo:@{@"instanceId":[self _safeInstanceId]}
                                         completed:^(UIImage *image, NSError *error, BOOL finished)
     {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -507,7 +508,7 @@ WX_EXPORT_METHOD(@selector(save:))
     }
     
     WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
-    NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius),@"instanceId":self.weexInstance.instanceId};
+    NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius),@"instanceId":[self _safeInstanceId]};
     NSString * newURL = [imageSrc copy];
     WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance)
     __weak typeof(self) weakSelf = self;
@@ -548,6 +549,11 @@ WX_EXPORT_METHOD(@selector(save:))
             }
         });
     }];
+}
+
+- (NSString*) _safeInstanceId
+{
+    return self.weexInstance.instanceId ? : @"unknown";
 }
 
 - (void)readyToRender
