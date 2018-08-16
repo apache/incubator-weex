@@ -19,10 +19,8 @@ Pod::Spec.new do |s|
     LICENSE
   }
   s.authors      = { "cxfeng1"      => "cxfeng1@gmail.com",
-                     "boboning"     => "ningli928@163.com",
                      "yangshengtao" => "yangshengtao1314@163.com",
-                     "kfeagle"      => "sunjjbobo@163.com",
-                     "acton393"     => "zhangxing610321@gmail.com"
+                     "kfeagle"      => "sunjjbobo@163.com"
                    }
   s.platform     = :ios
   s.ios.deployment_target = '8.0'
@@ -34,14 +32,13 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.prefix_header_file = 'ios/sdk/WeexSDK/Sources/Supporting Files/WeexSDK-Prefix.pch'
 
-#  s.xcconfig = { "GCC_PREPROCESSOR_DEFINITIONS" => '$(inherited) DEBUG=1' }
-
   s.private_header_files = 'ios/sdk/WeexSDK/Sources/Component/RecycleList/WXJSASTParser.h',
-                           'ios/sdk/WeexSDK/Sources/Layout/WXScrollerComponent+Layout.h'
+                           'ios/sdk/WeexSDK/Sources/Layout/WXScrollerComponent+Layout.h',
+                           'weex_core/Source/**/*.{h,hpp}'
 
   s.xcconfig = { "OTHER_LINK_FLAG" => '$(inherited) -ObjC', 'GCC_PREPROCESSOR_DEFINITIONS' => 'OS_IOS=1' }
 
-  s.frameworks = 'CoreMedia','MediaPlayer','AVFoundation','AVKit','JavaScriptCore', 'GLKit', 'OpenGLES', 'CoreText', 'QuartzCore', 'CoreGraphics'
+  s.frameworks = 'CoreMedia','MediaPlayer','AVFoundation','AVKit','JavaScriptCore','GLKit','OpenGLES','CoreText','QuartzCore','CoreGraphics'
   
   s.default_subspec='WeexCore'
 
