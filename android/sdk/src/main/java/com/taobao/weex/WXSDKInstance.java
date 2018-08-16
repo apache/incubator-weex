@@ -585,7 +585,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       return;
     }
 
-    mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_RENDER_ORGIGIN,System.currentTimeMillis());
+    mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_RENDER_ORGIGIN);
 
     mWXPerformance.pageName = (TextUtils.isEmpty(pageName) ? "defaultBundleUrl":pageName);
     if (TextUtils.isEmpty(mBundleUrl)) {
@@ -654,9 +654,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     Uri uri = Uri.parse(url);
     if (uri != null && TextUtils.equals(uri.getScheme(), "file")) {
-      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START,System.currentTimeMillis());
+      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
       String template = WXFileUtils.loadFileOrAsset(assembleFilePath(uri), mContext);
-      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END,System.currentTimeMillis());
+      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END);
       render(pageName,template , renderOptions, jsonInitData, flag);
       return;
     }
@@ -1808,7 +1808,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
               && this.instance.getWXStatisticsListener() != null) {
         this.instance.getWXStatisticsListener().onHttpStart();
       }
-      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START,System.currentTimeMillis());
+      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
     }
 
     @Override
@@ -1837,7 +1837,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     @Override
     public void onHttpFinish(WXResponse response) {
-      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END,System.currentTimeMillis());
+      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END);
 
       if (this.instance != null
               && this.instance.getWXStatisticsListener() != null) {

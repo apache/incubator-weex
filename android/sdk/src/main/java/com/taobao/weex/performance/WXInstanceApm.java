@@ -26,6 +26,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.WXExceptionUtils;
+import com.taobao.weex.utils.WXUtils;
 
 public class WXInstanceApm {
 
@@ -121,15 +122,16 @@ public class WXInstanceApm {
     /**
      * record stage
      */
-    public void onStage(String name, long timestamp) {
+    public void onStage(String name) {
         WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+        long time =  WXUtils.getFixUnixTime();
         if (null != instance){
-            instance.getExceptionRecorder().recordStage(name,timestamp);
+            instance.getExceptionRecorder().recordStage(name, time);
         }
         if (null == apmInstance) {
             return;
         }
-        apmInstance.onStage(name, timestamp);
+        apmInstance.onStage(name, time);
     }
 
     /**
@@ -202,19 +204,19 @@ public class WXInstanceApm {
         if (null == apmInstance){
             return;
         }
-        onStage(WXInstanceApm.KEY_PAGE_STAGES_NEW_FSRENDER, System.currentTimeMillis());
+        onStage(WXInstanceApm.KEY_PAGE_STAGES_NEW_FSRENDER);
         if (isFSEnd) {
             return;
         }
         isFSEnd = true;
-        onStage(WXInstanceApm.KEY_PAGE_STAGES_FSRENDER, System.currentTimeMillis());
+        onStage(WXInstanceApm.KEY_PAGE_STAGES_FSRENDER);
     }
 
     public void arriveInteraction(int screenViewCount, int allViewCount) {
         if (null == apmInstance) {
             return;
         }
-        onStage(WXInstanceApm.KEY_PAGE_STAGES_INTERACTION, System.currentTimeMillis());
+        onStage(WXInstanceApm.KEY_PAGE_STAGES_INTERACTION);
         updateMaxStats(KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT, screenViewCount);
         updateMaxStats(KEY_PAGE_STATS_I_ALL_VIEW_COUNT, allViewCount);
         WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);

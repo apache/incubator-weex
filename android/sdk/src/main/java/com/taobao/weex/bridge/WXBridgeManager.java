@@ -1207,16 +1207,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       @Override
       public void run() {
         long start = System.currentTimeMillis();
-        instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_START,start);
+        instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_START);
         invokeCreateInstance(instance, template, options, data);
         long end = System.currentTimeMillis();
-        instance.getWXPerformance().callCreateInstanceTime = end;
-        instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END,end);
+        instance.getWXPerformance().callCreateInstanceTime = end - start;
+        instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
 
-        long totalTime =  instance.getWXPerformance().callCreateInstanceTime - start;
-        if (totalTime > 0) {
-          instance.getWXPerformance().communicateTime = totalTime;
-        }
+        instance.getWXPerformance().communicateTime =  instance.getWXPerformance().callCreateInstanceTime;
       }
     }, instanceId);
   }
