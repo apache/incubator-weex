@@ -110,6 +110,10 @@ public class WXEnvironment {
 
   public static final String CORE_SO_NAME = "weexcore";
   public static final String CORE_JSS_SO_NAME = "weexjss";
+  /**
+   * this marked jsb.so's version, Change this if we want to update jsb.so
+   */
+  public static final int CORE_JSB_SO_VERSION = 1;
 
   private static  String CORE_JSS_SO_PATH = null;
 
