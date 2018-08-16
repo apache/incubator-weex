@@ -38,7 +38,7 @@ CoreSideInScript::~CoreSideInScript() {}
 inline char *copyStr(const char *str, int length = 0) {
   char *ret = nullptr;
   if (str == nullptr) return ret;
-  int strLen = length == 0 ? strlen(str) : length;
+  size_t strLen = length == 0 ? strlen(str) : length;
   ret = new char[strLen + 1];
   memcpy(ret, str, static_cast<size_t>(strLen));
   ret[strLen] = '\0';
@@ -70,7 +70,7 @@ void CoreSideInScript::CallNative(const char *page_id, const char *task,
   if (strcmp(task,
              "[{\"module\":\"dom\",\"method\":\"createFinish\","
              "\"args\":[]}]") == 0) {
-    RenderManager::GetInstance()->CreateFinish(page_id) ? 0 : -1;
+    RenderManager::GetInstance()->CreateFinish(page_id);
   } else {
     WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -201,7 +201,7 @@ void CoreSideInScript::CreateBody(const char *page_id, const char *dom_str,
   //                ? 0
   //                : -1;
   //          }));
-  RenderManager::GetInstance()->CreatePage(page_id, dom_str) ? 0 : -1;
+  RenderManager::GetInstance()->CreatePage(page_id, dom_str);
 }
 
 int CoreSideInScript::UpdateFinish(const char *page_id, const char *task,

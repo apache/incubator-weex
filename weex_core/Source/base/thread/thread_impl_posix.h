@@ -32,7 +32,6 @@ class ThreadImplPosix : public ThreadImpl {
   virtual ~ThreadImplPosix();
   virtual void Start() override;
   virtual void Stop() override;
-  virtual void SetName(const std::string& name) = 0;
 
   inline pthread_t handle() const { return handle_; }
 

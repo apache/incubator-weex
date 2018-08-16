@@ -44,6 +44,8 @@ MessageLoop::MessageLoop(Type type)
     case DEFAULT:
       message_pump_ = std::unique_ptr<MessagePump>(new MessagePumpPosix());
       break;
+    case IO:
+      break;
   }
 }
 MessageLoop::~MessageLoop() {}
@@ -78,8 +80,7 @@ void MessageLoop::DoWork() {
     }
 
     if (!delayed_tasks_.empty()) {
-      message_pump_->ScheduleDelayedWork(
-          std::move(delayed_tasks_.top().time_point - now));
+      message_pump_->ScheduleDelayedWork(delayed_tasks_.top().time_point - now);
     }
   }
 

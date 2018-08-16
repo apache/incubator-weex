@@ -286,7 +286,7 @@ long CoreSideInPlatform::CopyRenderObject(long render_ptr) {
     if (renderList != nullptr) {
       renderList->AddCellSlotCopyTrack(copy);
     } else {
-      LOGE("LayoutRenderObject", "copy error parent null");
+      LOGE("CopyRenderObject: %s", "copy error parent null");
     }
   }
   return convert_render_object_to_long(copy);
