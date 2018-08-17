@@ -405,6 +405,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (UIImage *)endDrawContext:(CGContextRef)context;
 
+/**
+ * @abstract Return a shapelayer when compoent need border radius.（Especially video components）
+ *
+ * @discussion You can add this shadelayer to your view.layer attached to component.
+ *
+ */
+- (CAShapeLayer *)drawBorderRadiusMaskLayer:(CGRect)rect;
+
 ///--------------------------------------
 /// @name Data Binding
 ///--------------------------------------
@@ -437,7 +445,6 @@ typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
  *
  */
 - (WXDisplayCompletionBlock)displayCompletionBlock DEPRECATED_MSG_ATTRIBUTE("use didFinishDrawingLayer: method instead.");
-
 
 @end
 
