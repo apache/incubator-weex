@@ -80,7 +80,6 @@ bool flexIsUndefined(float value) {
     }
     else if (_flexCssNode) {
         _flexCssNode->setContext(nullptr);
-        _flexCssNode->setMeasureFunc(nullptr);
         _flexCssNode = nullptr;
     }
 }
