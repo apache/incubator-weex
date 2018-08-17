@@ -67,7 +67,7 @@ int SetTabStringValue(Table *t, const Value *key, const Value &val) {
 Value *GetTabIntValue(const Table *t, const Value *key) {
   int64_t index = IntValue(key);
   if (index < t->array->size()) {
-    return &(t->array->at(index));
+    return &(t->array->at(static_cast<int>(index)));
   }
   return nullptr;
 }

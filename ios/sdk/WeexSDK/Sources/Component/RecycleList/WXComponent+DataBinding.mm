@@ -602,7 +602,7 @@ static JSContext *jsContext;
     if (component.attributes[@"ref"]) {
         NSIndexPath *indexPath = data[@"item"][@"indexPath"];
         NSUInteger position = [indexPath indexAtPosition:1];
-        NSString *virtalElementInfo = [NSString stringWithFormat:@"%@@%lu",component.ref,position];
+        NSString *virtalElementInfo = [NSString stringWithFormat:@"%@@%lu",component.ref,(unsigned long)position];
         NSDictionary *refInfo = @{@"attrs":component.attributes,@"type":component->_type,@"ref":virtalElementInfo,@"[[VirtualElement]]":@"true"};
         if (subInfo[component.attributes[@"ref"]]) {
             [subInfo[component.attributes[@"ref"]] addObject:refInfo];

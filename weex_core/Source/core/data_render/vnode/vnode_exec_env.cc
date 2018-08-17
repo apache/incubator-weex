@@ -108,8 +108,8 @@ static Value Slice(ExecState* exec_state) {
     return Value();
   }
   Table* p_table = TableValue(table);
-  unsigned long v_start = IntValue(start);
-  unsigned long v_end = IntValue(end);
+  int64_t v_start = IntValue(start);
+  int64_t v_end = IntValue(end);
   if (v_end > p_table->array->size()) {
     v_end = p_table->array->size();
   }
@@ -119,7 +119,7 @@ static Value Slice(ExecState* exec_state) {
   Value* new_value = exec_state->getTableFactory()->CreateTable();
   Table* new_table = TableValue(new_value);
   new_table->array->insert(new_table->array->end(),
-                           p_table->array->begin() + v_start, p_table->array->begin() + v_end);
+                           p_table->array->begin() + static_cast<int>(v_start), p_table->array->begin() + static_cast<int>(v_end));
   return Value(*new_value);
 }
 
@@ -274,7 +274,7 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     for (int64_t index = 0; index < array_size; index++) {
       // will be free by table
       Value key(index);
-      Value val(ParseJson2Value(state, json[index]));
+      Value val(ParseJson2Value(state, json[static_cast<int>(index)]));
       SetTabValue(TableValue(value), &key, val);
     }
     return Value(*value);
