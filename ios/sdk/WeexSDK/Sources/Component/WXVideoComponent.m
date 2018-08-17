@@ -320,19 +320,20 @@
     return self;
 }
 
--(UIView *)loadView
+- (UIView *)loadView
 {
     WXVideoView* videoView = [[WXVideoView alloc] init];
     videoView.weexSDKInstance = self.weexInstance;
-    
     return videoView;
 }
 
--(void)viewDidLoad
+- (void)viewDidLoad
 {
     _videoView = (WXVideoView *)self.view;
+    _videoView.layer.mask = [self drawBorderRadiusMaskLayer:_videoView.bounds];
     [_videoView setURL:_videoURL];
     [_videoView setPosterURL:_posterURL];
+    
     __weak __typeof__(self) weakSelf = self;
     _videoView.posterClickHandle = ^{
         [weakSelf.videoView play];
