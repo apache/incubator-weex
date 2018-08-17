@@ -30,8 +30,6 @@
 
 #define CommonHeader GCObject *gc
 
-//#define LOGE(...) ((void)0)
-
 #define INT_OP(op, v1, v2) CAST_U2S((CAST_S2U(v1))op CAST_S2U(v2))
 #define NUM_OP(op, d1, d2) ((d1)op(d2))
 #define MATH_OP(op) op
@@ -287,7 +285,7 @@ inline int ToNumber_(const Value *value, double &ret) {
 }
 
 inline int ToNum(const Value *o, double &n) {
-    return IsNumber(o) ? (static_cast<void>(n = NumValue(o)), 1) : ToNumber_(o, n);
+  return IsNumber(o) ? (static_cast<void>(n = NumValue(o)), 1) : ToNumber_(o, n);
 }
 
 inline void SetIValue(Value *o, int iv) {

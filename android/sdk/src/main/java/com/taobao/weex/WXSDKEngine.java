@@ -32,6 +32,7 @@ import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.appfram.clipboard.WXClipboardModule;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
+import com.taobao.weex.appfram.navigator.INavigator;
 import com.taobao.weex.appfram.navigator.WXNavigatorModule;
 import com.taobao.weex.appfram.pickers.WXPickersModule;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
@@ -346,18 +347,18 @@ public class WXSDKEngine implements Serializable {
       registerComponent(WXBasicComponentType.LOADING_INDICATOR, WXLoadingIndicator.class);
       registerComponent(WXBasicComponentType.HEADER, WXHeader.class);
 
-      registerModule("modal", WXModalUIModule.class, false);
-      registerModule("instanceWrap", WXInstanceWrap.class, false);
-      registerModule("animation", WXAnimationModule.class, false);
-      registerModule("webview", WXWebViewModule.class, true);
+      registerModule("modal", WXModalUIModule.class);
+      registerModule("instanceWrap", WXInstanceWrap.class);
+      registerModule("animation", WXAnimationModule.class);
+      registerModule("webview", WXWebViewModule.class);
       registerModule("navigator", WXNavigatorModule.class);
       registerModule("stream", WXStreamModule.class);
-      registerModule("timer", WXTimerModule.class, false);
-      registerModule("storage", WXStorageModule.class, true);
-      registerModule("clipboard", WXClipboardModule.class, true);
+      registerModule("timer", WXTimerModule.class);
+      registerModule("storage", WXStorageModule.class);
+      registerModule("clipboard", WXClipboardModule.class);
       registerModule("globalEvent",WXGlobalEventModule.class);
       registerModule("picker", WXPickersModule.class);
-      registerModule("meta", WXMetaModule.class,true);
+      registerModule("meta", WXMetaModule.class);
       registerModule("webSocket", WebSocketModule.class);
       registerModule("locale", WXLocaleModule.class);
     } catch (WXException e) {
@@ -532,6 +533,14 @@ public class WXSDKEngine implements Serializable {
 
   public static IActivityNavBarSetter getActivityNavBarSetter() {
     return WXSDKManager.getInstance().getActivityNavBarSetter();
+  }
+
+  public static INavigator getNavigator() {
+    return WXSDKManager.getInstance().getNavigator();
+  }
+
+  public static  void setNavigator(INavigator navigator) {
+    WXSDKManager.getInstance().setNavigator(navigator);
   }
 
   public static void setActivityNavBarSetter(IActivityNavBarSetter activityNavBarSetter) {

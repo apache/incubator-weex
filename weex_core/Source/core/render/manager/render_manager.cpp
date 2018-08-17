@@ -21,6 +21,7 @@
 #include <vector>
 #include <chrono>
 #include "wson/wson_parser.h"
+#include "base/LogDefines.h"
 
 #include "base/ViewUtils.h"
 #include "core/css/constants_name.h"

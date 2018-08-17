@@ -175,7 +175,7 @@ public enum WXErrorCode {
   WX_JS_FRAMEWORK_INIT_SINGLE_PROCESS_SUCCESS("-1011", "js framework init success in single process",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
   WX_JS_FRAMEWORK_INIT_FAILED_PARAMS_NULL("-1012", "js framework init failed due to params null",ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
-
+  WX_JS_FRAMEWORK_INIT_FAILED_FIND_ICU_TIMEOUT("-1013", "find icu failed",ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
 
   /**
    * WX Key Exception Commit RT SDK Init
@@ -224,20 +224,23 @@ public enum WXErrorCode {
   /**
    * WX Key Exception Commit RT JsBridge eg. js excute runtime error
    */
-  WX_KEY_EXCEPTION_WXBRIDGE("-9400", "[js excute runtime error] detail js stack \n",ErrorType.JS_ERROR,ErrorGroup.JS),
-  WX_KEY_EXCEPTION_WXBRIDGE_EXCEPTION("-9401", "[js excute runtime error] detail js stack \n",ErrorType.JS_ERROR,ErrorGroup.JS),
+  WX_KEY_EXCEPTION_WXBRIDGE("-9400", "[js excute runtime error] detail js stack -> ",ErrorType.JS_ERROR,ErrorGroup.JS),
+  WX_KEY_EXCEPTION_WXBRIDGE_EXCEPTION("-9401", "[js excute runtime error] detail js stack -> ",ErrorType.JS_ERROR,ErrorGroup.JS),
 
   /**
    * renderErrorCode
    */
   WX_RENDER_ERR_JS_CREATE_INSTANCE("-9600", "WX_RENDER_ERR_JS_CREATE_INSTANCE",ErrorType.RENDER_ERROR,ErrorGroup.JS),
   WX_RENDER_ERR_JS_RUNTIME("-9601", "WX_RENDER_ERR for js error",ErrorType.RENDER_ERROR, ErrorGroup.JS),
+  WX_RENDER_ERR_NATIVE_RUNTIME("-9604", "WX_RENDER_ERR for js error",ErrorType.RENDER_ERROR, ErrorGroup.NATIVE),
   WX_RENDER_ERR_LAYER_OVERFLOW("-9602", "WX_RENDER_ERR_LAYER_OVERFLOW", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
   WX_RENDER_ERR_NULL_KEY("-9603", "WX_RENDER_ERR_NULL_KEY", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
+
   WX_RENDER_ERR_CONTAINER_TYPE("-9611", "WX_RENDER_ERR_CONTAINER_TYPE", ErrorType.JS_ERROR,ErrorGroup.JS),
   WX_RENDER_ERR_TRANSITION("-9616", "WX_RENDER_ERR_TRANSITION", ErrorType.JS_ERROR, ErrorGroup.JS),
   WX_RENDER_ERR_INSTANCE_ID_NULL("-9618", "WX_RENDER_ERR_INSTANCE_ID_NULL", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
-
+  WX_RENDER_ERR_LIST_INVALID_COLUMN_COUNT("-9619", "WX_RENDER_ERR_LIST_INVALID_COLUMNJ_CONUNT", ErrorType.JS_ERROR, ErrorGroup.JS),
+  WX_RENDER_ERR_TEXTURE_SETBACKGROUND("-9620", "WX_RENDER_ERR_TEXTURE_SETBACKGROUND", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
 
   /**
    * degrade code.
@@ -278,7 +281,7 @@ public enum WXErrorCode {
 
   WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED_JS("-1006", "degradeToH5|createInstance fail|wx_create_instance_error",ErrorType.DEGRAD_ERROR,ErrorGroup.JS),
 
-
+  WX_ERR_HASH_MAP_TMP("-10010", "WX_ERR_HASH_MAP_TMP",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
   /**
    * TEST

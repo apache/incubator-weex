@@ -279,6 +279,7 @@ static NSThread *WXComponentThread;
         maxDeep++;
         component = component.supercomponent;
     }
+    [self.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_MAX_DEEP_DOM curMaxValue:maxDeep];
     if(maxDeep > [self weexInstance].performance.maxVdomDeep)
     {
         [self weexInstance].performance.maxVdomDeep = maxDeep;

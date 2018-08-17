@@ -18,9 +18,6 @@
  */
 package com.taobao.weex.ui;
 
-import android.support.v4.util.ArrayMap;
-import android.util.Log;
-
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.RenderContext;
 import com.taobao.weex.ui.component.WXComponent;
@@ -31,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Class for rendering view. Method in this class should be run in main thread.
@@ -43,7 +41,7 @@ class RenderContextImpl implements RenderContext {
 
   public RenderContextImpl(WXSDKInstance instance) {
     mWXSDKInstance = instance;
-    mRegistry = new ArrayMap<>();
+    mRegistry = new ConcurrentHashMap<>();
   }
 
   public void destroy() {
@@ -76,5 +74,9 @@ class RenderContextImpl implements RenderContext {
   @Override
   public WXComponent unregisterComponent(String ref) {
     return mRegistry.remove(ref);
+  }
+
+  public int getComponentCount(){
+    return mRegistry.size();
   }
 }

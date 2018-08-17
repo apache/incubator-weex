@@ -37,6 +37,12 @@ class SoUtils {
 
   inline static const char* cache_dir() { return g_cache_dir; }
 
+  inline static void set_crash_file_path(char* crash_file_path) {
+    g_crash_file_path = crash_file_path;
+  }
+
+  inline static const char* crash_file_path() { return g_crash_file_path; }
+
   inline static void set_jss_so_path(char* jss_so_path) {
     g_jss_so_path = jss_so_path;
   }
@@ -51,20 +57,21 @@ class SoUtils {
     g_pie_support = startup_pie;
   }
 
-    inline static void set_jss_icu_path(char* jss_icu_path) {
-        g_jss_icu_path = jss_icu_path;
-    }
+  inline static void set_jss_icu_path(char* jss_icu_path) {
+    g_jss_icu_path = jss_icu_path;
+  }
 
-    inline static const char* jss_icu_path() { return g_jss_icu_path; }
+  inline static const char* jss_icu_path() { return g_jss_icu_path; }
 
  private:
   static const char* GetDefaultCacheDir(JNIEnv* env);
   static char* g_cache_dir;
   static char* g_jss_so_path;
+  static char* g_crash_file_path;
   static char* g_jss_so_name;
   static char* g_jss_icu_path;
   static bool g_pie_support;
-    static std::function<void(const char*, const char*)> g_exception_handler;
+  static std::function<void(const char*, const char*)> g_exception_handler;
 };
 }  // namespace WeexCore
 

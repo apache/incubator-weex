@@ -17,6 +17,8 @@
  * under the License.
  */
 
+//Deprecated, use @WXApmForInstance
+
 #import "WXSDKInstance.h"
 #import "WXImageComponent.h"
 
@@ -71,6 +73,7 @@
 @interface WXSDKInstance ()
 
 @property (nonatomic, assign) BOOL isJSCreateFinish;
+//Deprecated, use @WXApmForInstance
 @property (nonatomic,strong) WXPerformance* performance;
 
 @end

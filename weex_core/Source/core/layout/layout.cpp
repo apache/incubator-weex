@@ -340,9 +340,11 @@ namespace WeexCore {
           child->hypotheticalMeasure(childWidth, childHeight, stretch);
         } else {
           if(isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)
-              && !isMainAxisHorizontal(this) && child->widthMeasureMode == kUnspecified){
-            child->setLayoutWidth(parentWidth - sumPaddingBorderAlongAxis(this, true)
-                                      -child->mCssStyle->sumMarginOfDirection(true));
+              && !isMainAxisHorizontal(this)){
+            if(child->widthMeasureMode == kUnspecified) {
+              child->setLayoutWidth(parentWidth - sumPaddingBorderAlongAxis(this, true)
+                                        - child->mCssStyle->sumMarginOfDirection(true));
+            }
             if(child->heightMeasureMode == kUnspecified && child->widthDirty) {
               child->mLayoutResult->mLayoutSize.height = NAN;
             }
@@ -504,10 +506,11 @@ namespace WeexCore {
 
     void WXCoreLayoutNode::stretchViewCrossSize(WXCoreLayoutNode* const child, float crossSize){
       if (isMainAxisHorizontal(this)) {
-        if (child->heightMeasureMode != kExactly) {
-            crossSize -=
-                child->mCssStyle->mMargin.getMargin(kMarginTop) +
-                    child->mCssStyle->mMargin.getMargin(kMarginBottom);
+        if (child->heightMeasureMode != kExactly &&
+            !(child->measureFunc != nullptr && child->getChildCount() == 0)) {
+          crossSize -=
+              child->mCssStyle->mMargin.getMargin(kMarginTop) +
+                  child->mCssStyle->mMargin.getMargin(kMarginBottom);
           child->setHeightMeasureMode(kExactly);
           child->setLayoutHeight(std::max(0.f, crossSize));
         }

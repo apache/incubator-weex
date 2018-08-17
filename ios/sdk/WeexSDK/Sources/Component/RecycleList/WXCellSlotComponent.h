@@ -26,8 +26,6 @@ static const NSString *WXDefaultRecycleTemplateType = @"default";
 @property (nonatomic, strong) NSString *templateCaseType;
 
 - (void)updateCellData:(NSDictionary *)data;
-
 - (void)triggerLayout;
-
 
 @end

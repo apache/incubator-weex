@@ -402,7 +402,11 @@ CGFloat WXFloorPixelValue(CGFloat value)
             if ([subStr hasPrefix:@"rgb"]) {
                 gradientType = [WXConvert gradientType:gradientTypeStr];
                 
-                range = [subStr rangeOfString:@")"];
+                if ([subStr containsString:@"%"]) {
+                    range = [subStr rangeOfString:@"%"];
+                } else {
+                    range = [subStr rangeOfString:@")"];
+                }
                 NSString *startColorStr = [subStr substringToIndex:range.location + 1];
                 NSString *endColorStr = [subStr substringFromIndex:range.location + 2];
                 startColor = [WXConvert UIColor:startColorStr];
@@ -968,6 +972,12 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
     }
     return nil;
 }
+
++ (long) getUnixCurrentTimeMillis
+{
+    return [[NSDate date] timeIntervalSince1970] * 1000;
+}
+
 @end
 
 

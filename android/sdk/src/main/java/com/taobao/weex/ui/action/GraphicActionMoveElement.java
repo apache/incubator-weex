@@ -46,7 +46,7 @@ public class GraphicActionMoveElement extends BasicGraphicAction {
       return;
     }
 
-    if (component.getHostView() != null && !TextUtils.equals("mComponentType", "video") && !TextUtils.equals("mComponentType", "videoplus")) {
+    if (component.getHostView() != null && !TextUtils.equals(component.getComponentType(), "video") && !TextUtils.equals(component.getComponentType(), "videoplus")) {
       int[] location = new  int[2] ;
       component.getHostView().getLocationInWindow(location);
       component.getInstance().onChangeElement(oldParent, location[1] > component.getInstance().getWeexHeight() + 1);
@@ -56,7 +56,7 @@ public class GraphicActionMoveElement extends BasicGraphicAction {
 
     ((WXVContainer) newParent).addChild(component, mIndex);
 
-    if (component.getHostView() != null && !TextUtils.equals("mComponentType", "video") && !TextUtils.equals("mComponentType", "videoplus")) {
+    if (component.getHostView() != null && !TextUtils.equals(component.getComponentType(), "video") && !TextUtils.equals(component.getComponentType(), "videoplus")) {
       int[] location = new  int[2] ;
       component.getHostView().getLocationInWindow(location);
       component.getInstance().onChangeElement(newParent, location[1] > component.getInstance().getWeexHeight() + 1);

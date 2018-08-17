@@ -3,94 +3,12 @@
 dir_name=$(dirname $0)
 source ${dir_name}/common.sh
 
-function isValidVersion () {
-  echo "$1" | awk '/^[0-9]+\.[0-9]+(\.[0-9]+){0,2}(-rc[0-9]+|-beta[0-9]+)?$/ {print $0}'
-}
+prepareWorkingDir
 
-function isBetaVersion () {
-  echo "$1" | awk '/^[0-9]+\.[0-9]+(\.[0-9]+){0,2}-beta[0-9]+$/ {print $0}'
-}
-
-function isRCVersion () {
-  echo "$1" | awk '/^[0-9]+\.[0-9]+(\.[0-9]+){0,2}-rc[0-9]+$/ {print $0}'
-}
-
-function latestVersion () {
-  git tag -l | awk '/^0\.[0-9]+(\.[0-9]+){0,2}(-rc[0-9]+|-beta[0-9]+)?$/ { print $0 }' | sort -rV | head -n 1
-}
-
-function latestNotRCVersion () {
-  git tag -l | awk '/^0\.[0-9]+(\.[0-9]+){0,2}(-beta[0-9]+)?$/ { print $0 }' | sort -rV | head -n 1
-}
-
-function betaNumber () {
-  echo "$1" | awk -F 'beta' '{print $2}'
-}
-
-function rcNumber () {
-  echo "$1" | awk -F 'rc' '{print $2}'
-}
-
-function gitRepoModified () {
-  git status --short | awk '/^[ M][ M] / { print $0 }'
-}
-
-function increaseBetaVersion () {
-  if [ $(isRCVersion "$1") ]; then
-    # Unable to increase beta version number on a RC version, exit.
-    return 1
-  fi
-  if [ $(isBetaVersion "$1") ]; then
-    echo "$1" | awk -F 'beta' '{printf("%sbeta%d\n", $1, $2+1)}'
-  else
-    echo "$1" | awk -F '.' '/^([0-9]+\.){1,3}([0-9]+)$/ {
-      for(i=1;i<=NF;i++) {
-        if (i==NF) {
-          printf("%d-beta1\n", $i+1)
-        } else {
-          printf("%d.", $i)
-        }
-      }
-    }'
-  fi
-}
-
-function increaseRCVersion () {
-  if [ $(isBetaVersion "$1") ]; then
-    # Unable to increase rc version number on a beta version, exit.
-    return 1
-  fi
-  if [ $(isRCVersion "$1") ]; then
-    echo "$1" | awk -F 'rc' '{printf("%src%d\n", $1, $2+1)}'
-  else
-    echo "$1" | awk -F '.' '/^([0-9]+\.){1,3}([0-9]+)$/ {
-      for(i=1;i<=NF;i++) {
-        if (i==NF) {
-          printf("%d-rc1\n", $i+1)
-        } else {
-          printf("%d.", $i)
-        }
-      }
-    }'
-  fi
-}
-
-read -e -p "Your upstream git remote is? [origin]"
-remote=${REPLY:="origin"}
-
-info "Fetching latest changes and prune ${LGREEN}$remote${RESTORE}..."
-git fetch -p -t "$remote"
-if [ $? ]; then
-  error "It is not able to fetch codes from your $remote, check if there is any issue."
-  exit 1
-fi
-git remote prune "$remote"
-info "${GREEN}Done.${RESTORE}"
-
-latest_ver=$(latestNotRCVersion)
+latest_ver=$(latestNonRCVersion)
 beta_ver="0.0.1-beta1"
 if [ -z "$latest_ver" ]; then
-  echo "Use ${YELLOW}$beta_ver${RESTORE} as the version number."
+  info "Use ${YELLOW}$beta_ver${RESTORE} as the version number."
 else
   beta_ver=$(increaseBetaVersion "$latest_ver")
 fi
@@ -120,20 +38,13 @@ if [ ${shouldContinue,,} = n ]; then
   exit 0
 fi
 
-if [ "$(gitRepoModified)" ]; then
-  read -e -p "Your working directory is modified, stash it? [Y/n]" -n 1
-  shouldStash=${REPLY:=y}
-  if [ ${shouldStash,,} = y ]; then
-    git stash
-  else
-    info "Change ignored."
-  fi
-fi
+stashLocalChanges
 
-echo -e "\nCreating local branch: ${YELLOW}$beta_branch${RESTORE}..."
+info "\nCreating local branch: ${YELLOW}$beta_branch${RESTORE}..."
 git checkout -B "$beta_branch" "$latest_sha"
 
-echo -e "\nPushing ${YELLOW}$beta_branch${RESTORE} onto $remote..."
+info "\nPushing ${YELLOW}$beta_branch${RESTORE} onto $remote...\n"
 git push "$remote" "$beta_branch":"$beta_branch"
 git branch --set-upstream-to="$remote/$beta_branch"
-echo "${GREEN}Done.${RESTORE}"
+info "\n${GREEN}Done.${RESTORE}"
+info "\nNOTICE: Now you've started the release process for $beta_ver, please work on the branch $beta_branch for bug fixes, no feature allowed submitting on it. Keep it sync with $remote/$beta_branch before your release."

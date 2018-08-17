@@ -60,11 +60,12 @@ class RenderManager {
    * better */
   bool AddRenderObject(const std::string &page_id,
                        const std::string &parent_ref, int index,
-                       const char *data); // from dom str
+                       const char *data);
+
   bool AddRenderObject(const std::string &page_id,
                        const std::string &parent_ref, int index,
-                       RenderObject *child); // from RenderObject
-    
+                       RenderObject *root);
+
   bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
 
   bool MoveRenderObject(const std::string &page_id, const std::string &ref,

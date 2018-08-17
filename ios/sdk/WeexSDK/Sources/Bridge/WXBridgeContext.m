@@ -367,6 +367,11 @@ _Pragma("clang diagnostic pop") \
         instance.performance.fsCallNativeNum++;
         instance.performance.fsCallNativeTime =  instance.performance.fsCallNativeTime + diff;
     }
+    if (instance && !instance.apmInstance.isFSEnd) {
+        NSTimeInterval diff = CACurrentMediaTime()*1000 - startTime;
+        [instance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_NATIVE_NUM withDiffValue:1];
+        [instance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_NATIVE_TIME withDiffValue:diff];
+    }
     return 1;
 }
 
@@ -387,12 +392,13 @@ _Pragma("clang diagnostic pop") \
 			}
 		}
 	}
+    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
+    [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_START];
     
     //create a sendQueue bind to the current instance
     NSMutableArray *sendQueue = [NSMutableArray array];
     [self.sendQueue setValue:sendQueue forKey:instanceIdString];
 
-    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
     if (sdkInstance.dataRender) {
         WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instanceIdString]);
         WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
@@ -415,6 +421,8 @@ _Pragma("clang diagnostic pop") \
         bundleType = [self _pareJSBundleType:instanceIdString jsBundleString:jsBundleString]; // bundleType can be Vue, Rax and the new framework.
     }
     if (bundleType&&shoudMultiContext) {
+        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_USE_MULTI_CONTEXT withValue:[NSNumber numberWithBool:true]];
+        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:bundleType];
         NSMutableDictionary *newOptions = [options mutableCopy];
         if (!options) {
             newOptions = [NSMutableDictionary new];
@@ -443,6 +451,8 @@ _Pragma("clang diagnostic pop") \
             } else {
                 [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
             }
+            WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+            [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
         } else {
             sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@", instanceIdString, newOptions, data];
             [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
@@ -490,20 +500,23 @@ _Pragma("clang diagnostic pop") \
                 } else {
                     [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
                 }
-                
+                WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+                [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
             }];
         }
         
     } else {
+        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_USE_MULTI_CONTEXT withValue:[NSNumber numberWithBool:false]];
+        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:@"singleContextUnkonwType"];
         if (data){
             args = @[instanceIdString, jsBundleString, options ?: @{}, data];
         } else {
             args = @[instanceIdString, jsBundleString, options ?: @{}];
         }
         [self callJSMethod:@"createInstance" args:args];
+        WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+        [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
     }
-    
-    WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
 }
 
 - (NSString *)_pareJSBundleType:(NSString*)instanceIdString jsBundleString:(NSString*)jsBundleString
@@ -710,7 +723,7 @@ _Pragma("clang diagnostic pop") \
     [self performSelector:@selector(_sendQueueLoop) withObject:nil];
 }
 
-- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(id<WXBridgeProtocol>)bridge completion:(void (^)(JSValue * value))complection
+- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(id<WXBridgeProtocol>)bridge completion:(void (^)(JSValue * value))completion
 {
     NSMutableArray *newArg = nil;
     if (!bridge) {
@@ -718,22 +731,23 @@ _Pragma("clang diagnostic pop") \
     }
     if (self.frameworkLoadFinished) {
         newArg = [args mutableCopy];
-        if ([newArg containsObject:complection]) {
-            [newArg removeObject:complection];
+        if ([newArg containsObject:completion]) {
+            [newArg removeObject:completion];
         }
         WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
-        if ([bridge isKindOfClass:[WXJSCoreBridge class]]) {
+        if (([bridge isKindOfClass:[WXJSCoreBridge class]]) ||
+            ([bridge isKindOfClass:NSClassFromString(@"WXDebugger") ]) ) {
             JSValue *value = [bridge callJSMethod:method args:args];
-            if (complection) {
-                complection(value);
+            if (completion) {
+                completion(value);
             }
         } else {
             [bridge callJSMethod:method args:args];
         }
     } else {
         newArg = [args mutableCopy];
-        if (complection) {
-            [newArg addObject:complection];
+        if (completion) {
+            [newArg addObject:completion];
         }
         [_methodQueue addObject:@{@"method":method, @"args":[newArg copy]}];
     }
@@ -863,10 +877,8 @@ _Pragma("clang diagnostic pop") \
     
     if ([tasks count] > 0 && execIns) {
         WXSDKInstance * execInstance = [WXSDKManager instanceForID:execIns];
-        NSTimeInterval start = -1;
-        if (execInstance && !(execInstance.isJSCreateFinish)) {
-            start = CACurrentMediaTime()*1000;
-        }
+        NSTimeInterval start = CACurrentMediaTime()*1000;
+        
         if (execInstance.instanceJavaScriptContext && execInstance.bundleType) {
             [self callJSMethod:@"__WEEX_CALL_JAVASCRIPT__" args:@[execIns, tasks] onContext:execInstance.instanceJavaScriptContext completion:nil];
         } else {
@@ -877,6 +889,11 @@ _Pragma("clang diagnostic pop") \
             execInstance.performance.fsCallJsNum++;
             execInstance.performance.fsCallJsTime =  execInstance.performance.fsCallJsTime+ diff;
          }
+        if (execInstance && !execInstance.apmInstance.isFSEnd) {
+             NSTimeInterval diff = CACurrentMediaTime()*1000 - start;
+            [execInstance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_JS_NUM withDiffValue:1];
+            [execInstance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_JS_TIME withDiffValue:diff];
+        }
     }
     
     if (hasTask) {

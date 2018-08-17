@@ -102,6 +102,8 @@ public class WXEnvironment {
    * */
   public static long sComponentsAndModulesReadyTime = 0;
 
+  public static boolean sInAliWeex = false;
+
   public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
   public static boolean isPerf = false;
@@ -320,6 +322,20 @@ public class WXEnvironment {
     }
 
     return path;
+  }
+
+  public static String getCrashFilePath(Context context) {
+    if (context == null) {
+        return "";
+    }
+
+    File dir = context.getDir("crash", Context.MODE_PRIVATE);
+    if (dir == null)
+        return "";
+
+    String crashDir = dir.getAbsolutePath();
+
+    return crashDir;
   }
 
   public static String getGlobalFontFamilyName() {

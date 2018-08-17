@@ -121,6 +121,7 @@ typedef enum : NSUInteger {
         _performanceCommit = NO;
         
         _performance = [[WXPerformance alloc] init];
+        _apmInstance = [[WXApmForInstance alloc] init];
         
         id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
@@ -226,9 +227,9 @@ typedef enum : NSUInteger {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
     }
+    [self.apmInstance startRecord:self.instanceId];
     
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:url];
-    
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
     [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTNetworkHanding phase:WXTracingBegin functionName:@"renderWithURL" options:@{@"bundleUrl":url?[url absoluteString]:@"",@"threadName":WXTMainThread}];
@@ -255,6 +256,7 @@ typedef enum : NSUInteger {
         return;
     }
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
+    [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
     
     if (![WXUtility isBlankString:self.pageName]) {
         WXLog(@"Start rendering page:%@", self.pageName);
@@ -308,10 +310,12 @@ typedef enum : NSUInteger {
     
     _mainBundleString = mainBundleString;
     if ([self _handleConfigCenter]) {
-        NSError * error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:9999 userInfo:nil];
+        int wxErrorCode = 9999;
+        NSError * error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:wxErrorCode userInfo:nil];
         if (self.onFailed) {
             self.onFailed(error);
         }
+        [self.apmInstance setProperty:KEY_PROPERTIES_ERROR_CODE withValue:[@(wxErrorCode) stringValue]];
         return;
     }
     
@@ -388,8 +392,10 @@ typedef enum : NSUInteger {
     WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, self);
     __weak typeof(self) weakSelf = self;
     _mainBundleLoader = [[WXResourceLoader alloc] initWithRequest:request];;
+     [self.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_START];
     _mainBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_END];
         NSError *error = nil;
         if ([response isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)response).statusCode != 200) {
             error = [NSError errorWithDomain:WX_ERROR_DOMAIN
@@ -407,6 +413,7 @@ typedef enum : NSUInteger {
         if (error) {
             WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:@"" bundleUrl:[request.URL absoluteString] errorCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_JS_DOWNLOAD] functionName:@"_renderWithRequest:options:data:" exception:[error localizedDescription]  userInfo:nil];
             [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo];
+            [strongSelf.apmInstance setProperty:KEY_PROPERTIES_ERROR_CODE withValue:[@(WX_KEY_EXCEPTION_JS_DOWNLOAD) stringValue]];
             return;
         }
 
@@ -420,18 +427,24 @@ typedef enum : NSUInteger {
             if (strongSelf.onFailed) {
                 strongSelf.onFailed(error);
             }
+            [strongSelf.apmInstance setProperty:KEY_PROPERTIES_ERROR_CODE withValue:[@(WX_KEY_EXCEPTION_JS_DOWNLOAD) stringValue]];
             return;
         }
         
         NSString *jsBundleString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if (!jsBundleString) {
             WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_STRING_CONVERT, @"data converting to string failed.", strongSelf.pageName)
+            [strongSelf.apmInstance setProperty:KEY_PROPERTIES_ERROR_CODE withValue:[@(WX_ERR_JSBUNDLE_STRING_CONVERT) stringValue]];
             return;
         }
         if (!strongSelf.userInfo) {
             strongSelf.userInfo = [NSMutableDictionary new];
         }
-        strongSelf.userInfo[@"jsMainBundleStringContentLength"] = @([jsBundleString length]);
+        
+        NSUInteger bundleSize = [jsBundleString length];
+        [strongSelf.apmInstance updateDiffStats:KEY_PAGE_STATS_BUNDLE_SIZE withDiffValue:bundleSize];
+        
+        strongSelf.userInfo[@"jsMainBundleStringContentLength"] = @(bundleSize);
         strongSelf.userInfo[@"jsMainBundleStringContentMd5"] = [WXUtility md5:jsBundleString];
 
         WX_MONITOR_SUCCESS_ON_PAGE(WXMTJSDownload, strongSelf.pageName);
@@ -450,13 +463,23 @@ typedef enum : NSUInteger {
     };
     
     _mainBundleLoader.onFailed = ^(NSError *loadError) {
+        [weakSelf.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_END];
         NSString *errorMessage = [NSString stringWithFormat:@"Request to %@ occurs an error:%@", request.URL, loadError.localizedDescription];
+        long wxErrorCode = [loadError.domain isEqualToString:NSURLErrorDomain] && loadError.code == NSURLErrorNotConnectedToInternet ? WX_ERR_NOT_CONNECTED_TO_INTERNET : WX_ERR_JSBUNDLE_DOWNLOAD;
+
+        WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, wxErrorCode, errorMessage, weakSelf.pageName);
         
-        WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, [loadError.domain isEqualToString:NSURLErrorDomain] && loadError.code == NSURLErrorNotConnectedToInternet ? WX_ERR_NOT_CONNECTED_TO_INTERNET : WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
-        
+    
+        NSMutableDictionary *allUserInfo = [[NSMutableDictionary alloc] initWithDictionary:error.userInfo];
+        [allUserInfo addEntriesFromDictionary:loadError.userInfo];
+        NSError *errorWithReportMsg = [NSError errorWithDomain:error.domain
+                                             code:error.code
+                                         userInfo:allUserInfo];
+      
         if (weakSelf.onFailed) {
-            weakSelf.onFailed(error);
+            weakSelf.onFailed(errorWithReportMsg);
         }
+        [weakSelf.apmInstance setProperty:KEY_PROPERTIES_ERROR_CODE withValue:[@(wxErrorCode) stringValue]];
     };
     
     [_mainBundleLoader start];
@@ -489,6 +512,7 @@ typedef enum : NSUInteger {
 
 - (void)destroyInstance
 {
+    [self.apmInstance endRecord];
     NSString *url = @"";
     if([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
         url = [self.scriptURL absoluteString];

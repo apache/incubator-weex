@@ -165,6 +165,18 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     }
   }
 
+    jmethodID m_get_crash_file_path = env->GetMethodID(c_params, "getCrashFilePath", "()Ljava/lang/String;");
+    if (m_get_jss_so_path != nullptr) {
+        jobject j_get_crash_file_path = env->CallObjectMethod(params, m_get_crash_file_path);
+        if (j_get_crash_file_path != nullptr) {
+            SoUtils::set_crash_file_path(const_cast<char *>(env->GetStringUTFChars(
+                                (jstring) (j_get_crash_file_path),
+                                nullptr)));
+            LOGE("g_crashFilePath is %s ", SoUtils::crash_file_path());
+            env->DeleteLocalRef(j_get_crash_file_path);
+        }
+    }
+
   jmethodID m_get_jss_icu_path =
           env->GetMethodID(c_params, "getLibIcuPath", "()Ljava/lang/String;");
   if (m_get_jss_icu_path != nullptr) {

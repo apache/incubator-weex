@@ -39,7 +39,9 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.flat.widget.Widget;
 import com.taobao.weex.ui.flat.widget.WidgetGroup;
 import com.taobao.weex.ui.view.border.BorderDrawable;
@@ -361,12 +363,22 @@ public class WXViewUtils {
   }
 
   @SuppressWarnings("deprecation")
-  public static void setBackGround(View view, Drawable drawable){
+  public static void setBackGround(View view, Drawable drawable, WXComponent component) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN){
       view.setBackgroundDrawable(drawable);
     }
     else{
-      view.setBackground(drawable);
+      try {
+        view.setBackground(drawable);
+      } catch (Exception e) {
+        if (component == null)
+          return;
+        WXExceptionUtils.commitCriticalExceptionRT(component.getInstanceId(),
+                WXErrorCode.WX_RENDER_ERR_TEXTURE_SETBACKGROUND,
+                component.getComponentType() + " setBackGround for android view",
+                WXErrorCode.WX_RENDER_ERR_TEXTURE_SETBACKGROUND.getErrorMsg() + ": TextureView doesn't support displaying a background drawable!",
+                null);
+      }
     }
   }
 

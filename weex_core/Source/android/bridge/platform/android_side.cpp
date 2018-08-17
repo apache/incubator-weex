@@ -77,7 +77,7 @@ void AndroidSide::ReportServerCrash(const char *instance_id) {
   JNIEnv *env = base::android::AttachCurrentThread();
 
   std::string crash_file;
-  crash_file.assign("/jsserver_crash/jsserver_crash_info.log");
+  crash_file.assign("/crash_dump.log");
   wx_bridge_->ReportServerCrash(env, instance_id, crash_file.c_str());
 }
 

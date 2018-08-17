@@ -373,11 +373,12 @@ WX_EXPORT_METHOD(@selector(save:))
         if (self.placeholdSrc) {
             newURL = [self.placeholdSrc copy];
             WX_REWRITE_URL([self placeholdSrc], WXResourceTypeImage, self.weexInstance)
-            [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:nil progress:nil completed:nil];
+            NSDictionary* extInfo = @{@"instanceId":[self _safeInstanceId]};
+            [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:extInfo progress:nil completed:nil];
         }
         newURL = [[self imageSrc] copy];
         WX_REWRITE_URL([self imageSrc], WXResourceTypeImage, self.weexInstance)
-        NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius)};
+        NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius),@"instanceId":[self _safeInstanceId]};
         [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:userInfo progress:^(NSInteger receivedSize, NSInteger expectedSize) {
             // progress when loading image
         } completed:^(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL) {
@@ -395,7 +396,8 @@ WX_EXPORT_METHOD(@selector(save:))
                 if (strongSelf.placeholdSrc) {
                     NSString *newURL = [strongSelf.placeholdSrc copy];
                     WX_REWRITE_URL([strongSelf placeholdSrc], WXResourceTypeImage, strongSelf.weexInstance)
-                    [[strongSelf imageLoader] setImageViewWithURL:(UIImageView*)strongSelf.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:nil progress:nil completed:nil];
+                    [[strongSelf imageLoader] setImageViewWithURL:(UIImageView*)strongSelf.view url:[NSURL
+                                                                                                     URLWithString:newURL] placeholderImage:nil options:@{@"instanceId":[strongSelf _safeInstanceId]} progress:nil completed:nil];
                     return;
                 }
             }
@@ -419,8 +421,9 @@ WX_EXPORT_METHOD(@selector(save:))
             if (!error && image && strongSelf.view) {
                 double imageSize = image.size.width * image.scale * image.size.height * image.scale;
                 double viewSize = strongSelf.view.frame.size.height *  strongSelf.view.frame.size.width;
-                if (imageSize > viewSize) {
+                if (imageSize > viewSize+1) {
                     self.weexInstance.performance.imgWrongSizeNum++;
+                    [self.weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT withDiffValue:1];
                 }
             }
         }];
@@ -465,7 +468,10 @@ WX_EXPORT_METHOD(@selector(save:))
     WX_REWRITE_URL(self.placeholdSrc, WXResourceTypeImage, self.weexInstance)
     
     __weak typeof(self) weakSelf = self;
-    self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL imageFrame:self.calculatedFrame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {
+    self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL imageFrame:self.calculatedFrame
+                                        userInfo:@{@"instanceId":[self _safeInstanceId]}
+                                        completed:^(UIImage *image, NSError *error, BOOL finished)
+    {
         dispatch_async(dispatch_get_main_queue(), ^{
             __strong typeof(self) strongSelf = weakSelf;
             UIImage *viewImage = ((UIImageView *)strongSelf.view).image;
@@ -502,7 +508,7 @@ WX_EXPORT_METHOD(@selector(save:))
     }
     
     WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
-    NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius)};
+    NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius),@"instanceId":[self _safeInstanceId]};
     NSString * newURL = [imageSrc copy];
     WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance)
     __weak typeof(self) weakSelf = self;
@@ -543,6 +549,11 @@ WX_EXPORT_METHOD(@selector(save:))
             }
         });
     }];
+}
+
+- (NSString*) _safeInstanceId
+{
+    return self.weexInstance.instanceId ? : @"unknown";
 }
 
 - (void)readyToRender

@@ -72,6 +72,8 @@
 #import "WXBaseViewController.h"
 #import "WXAppMonitorProtocol.h"
 #import "WXAppConfiguration.h"
+#import "WXApmProtocol.h"
+#import "WXApmForInstance.h"
 #import "WXAnalyzerProtocol.h"
 #import "WXAnalyzerCenter.h"
 #import "WXAComponent.h"

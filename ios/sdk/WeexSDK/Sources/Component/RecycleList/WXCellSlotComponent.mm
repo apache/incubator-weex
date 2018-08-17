@@ -41,7 +41,7 @@
         if (attributes[@"default"]) {
             _templateCaseType = @"default";
         }
-        _templateCaseType = attributes[@"case"] ? [WXConvert NSString:attributes[@"case"]] :const_cast<NSString *>(WXDefaultRecycleTemplateType) ;
+        _templateCaseType = attributes[@"case"] ? [WXConvert NSString:attributes[@"case"]] :const_cast<NSString *>(WXDefaultRecycleTemplateType);
         _lazyCreateView = YES;
         _isNeedJoinLayoutSystem = NO;
     }
@@ -56,9 +56,9 @@
 
 - (void)updateCellData:(NSDictionary *)data
 {
-    WXAssertComponentThread();    
-    
+    WXAssertComponentThread();
     [self updateBindingData:data];
+    [self _attachSlotEvent:data];
     [self triggerLayout];
 }
 
@@ -78,5 +78,4 @@
         [WXCoreBridge layoutRenderObject:self.flexCssNode size:self.weexInstance.frame.size page:self.weexInstance.instanceId];
     }
 }
-
 @end

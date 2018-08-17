@@ -356,17 +356,15 @@ static NSDictionary *_customEnvironment;
 + (void)_originalRegisterComponents:(NSDictionary *)components {
     NSMutableDictionary * mutableComponents = [components mutableCopy];
     void (^componentBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
-        
         NSString *name = mObj[@"name"];
         NSString *componentClass = mObj[@"clazz"];
         NSDictionary *pros = nil;
         if (mObj[@"pros"]) {
-            pros = mObj[@""];
+            pros = mObj[@"pros"];
         }
         [self registerComponent:name withClass:NSClassFromString(componentClass) withProperties:pros];
     };
     [mutableComponents enumerateKeysAndObjectsUsingBlock:componentBlock];
-    
 }
 
 + (void)_originalRegisterModules:(NSDictionary *)modules {

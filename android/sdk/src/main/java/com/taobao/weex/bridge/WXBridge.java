@@ -31,6 +31,7 @@ import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
@@ -196,6 +197,14 @@ public class WXBridge implements IWXBridge {
       WXLogUtils.e(TAG, "callNative throw exception:" + e.getMessage());
     }
 
+    if (null != instance){
+      instance.getApmForInstance().updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_CALL_NATIVE_NUM,1);
+      instance.getApmForInstance().updateFSDiffStats(
+          WXInstanceApm.KEY_PAGE_STATS_FS_CALL_NATIVE_TIME,
+          System.currentTimeMillis()-start
+      );
+    }
+
     if (WXEnvironment.isApkDebugable()) {
       if (errorCode == IWXBridge.DESTROY_INSTANCE) {
         WXLogUtils.w("destroyInstance :" + instanceId + " JSF must stop callNative");
@@ -322,7 +331,7 @@ public class WXBridge implements IWXBridge {
   @Override
   @CalledByNative
   public void reportServerCrash(String instanceId, String crashFile) {
-    WXLogUtils.e(TAG, "reportServerCrash instanceId:" + instanceId);
+    WXLogUtils.e(TAG, "reportServerCrash instanceId:" + instanceId + " crashFile: " + crashFile);
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
       errorCode = WXBridgeManager.getInstance().callReportCrashReloadPage(instanceId, crashFile);

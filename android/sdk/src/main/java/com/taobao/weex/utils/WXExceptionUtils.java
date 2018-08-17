@@ -18,23 +18,19 @@
  */
 package com.taobao.weex.utils;
 
-import android.app.Activity;
-import android.content.Context;
+import java.util.HashMap;
+import java.util.Map;
+
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
-import com.taobao.weex.performance.IWXAnalyzer;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.taobao.weex.performance.WXInstanceExceptionRecord;
 
 /**
  * Created on 2017/10/13.
@@ -62,7 +58,7 @@ public class WXExceptionUtils {
 												 @Nullable final String exception,
 												 @Nullable final Map<String,String> extParams ) {
 		IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
-		WXSDKInstance instance;
+		WXSDKInstance instance = null;
 		WXJSExceptionInfo exceptionCommit;
 		String bundleUrlCommit = "BundleUrlDefault";
 		String instanceIdCommit = "InstanceIdDefalut";
@@ -89,6 +85,7 @@ public class WXExceptionUtils {
 				for (Map.Entry<String,String> entry: instance.getContainerInfo().entrySet()){
 					commitMap.put(entry.getKey(),entry.getValue());
 				}
+				commitMap.put(WXInstanceExceptionRecord.KEY_EXP_STAGE_LIST,instance.getExceptionRecorder().convertStageToStr());
 			}
 		} else {//instance is null for instance id is null
 			if (!TextUtils.isEmpty(WXSDKInstance.requestUrl)) {
@@ -103,6 +100,10 @@ public class WXExceptionUtils {
 		exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exceptionMsgCommit, commitMap);
 		if (adapter != null) {
 			adapter.onJSException(exceptionCommit);
+		}
+
+		if (null != instance){
+			instance.getExceptionRecorder().recordErrorMsg(exceptionCommit);
 		}
 
 		WXAnalyzerDataTransfer.transferError(exceptionCommit, instanceId);

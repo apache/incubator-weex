@@ -119,12 +119,11 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
 
 - (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
     [self performBlockOnComponentManager:^(WXComponentManager * manager) {
-        UIView *rootView = manager.weexInstance.rootView;
         if ([ref isEqualToString:@"viewport"]) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSMutableDictionary * callbackRsp = nil;
+                UIView* rootView = manager.weexInstance.rootView;
                 CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView];
-                callbackRsp = [self _componentRectInfoWithViewFrame:rootRect];
+                NSMutableDictionary *callbackRsp = [self _componentRectInfoWithViewFrame:rootRect];
                 [callbackRsp setObject:@(true) forKey:@"result"];
                 if (callback) {
                     callback(callbackRsp, false);
@@ -132,9 +131,8 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
             });
         } else {
             WXComponent *component = [manager componentForRef:ref];
-            __weak typeof (self) weakSelf = self;
             dispatch_async(dispatch_get_main_queue(), ^{
-                __strong typeof (weakSelf) strongSelf = weakSelf;
+                UIView* rootView = manager.weexInstance.rootView;
                 NSMutableDictionary * callbackRsp = nil;
                 if (!component) {
                     callbackRsp = [NSMutableDictionary new];
@@ -148,7 +146,7 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
                     } else {
                         componentRect = component.calculatedFrame;
                     }
-                    callbackRsp = [strongSelf _componentRectInfoWithViewFrame:componentRect];
+                    callbackRsp = [self _componentRectInfoWithViewFrame:componentRect];
                     [callbackRsp setObject:@(true)forKey:@"result"];
                 }
                 if (callback) {

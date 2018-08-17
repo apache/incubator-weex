@@ -311,6 +311,10 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     } else {
       getRealView().addView(child, index);
     }
+    WXSDKInstance instance = getInstance();
+    if (null != instance && instance.getExceptionRecorder().hasAddView.compareAndSet(false,true)){
+      instance.getExceptionRecorder().errorList.clear();
+    }
   }
 
   public void remove(WXComponent child, boolean destroy) {
@@ -573,7 +577,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
         WXLogUtils.d("BoxShadow", "Draw box-shadow with BoxShadowHost on div: " + toString());
         if (mBoxShadowHost == null) {
           mBoxShadowHost = new BoxShadowHost(getContext());
-          WXViewUtils.setBackGround(mBoxShadowHost, null);
+          WXViewUtils.setBackGround(mBoxShadowHost, null, this);
 
           CSSShorthand padding = this.getPadding();
           CSSShorthand border = this.getBorder();

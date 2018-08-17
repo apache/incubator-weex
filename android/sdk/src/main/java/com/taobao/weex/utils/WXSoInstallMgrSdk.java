@@ -32,6 +32,7 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -221,9 +222,12 @@ public class WXSoInstallMgrSdk {
         String jsbVersionFile = "jsb.version";
 
         File versionFile = new File(cacheFile,jsbVersionFile);
+        Closeable r = null;
+
         if(newfile.exists() && versionFile.exists()) {
           try {
             FileReader fileReader = new FileReader(versionFile);
+            r = fileReader;
             BufferedReader br = new BufferedReader(fileReader);
             String s = br.readLine();
             if(!TextUtils.isEmpty(s)) {
@@ -233,6 +237,9 @@ public class WXSoInstallMgrSdk {
             }
           } catch (FileNotFoundException e) {
             //do nothing and copy so file
+          } finally {
+            if (r != null)
+              r.close();
           }
         }
 
@@ -261,12 +268,22 @@ public class WXSoInstallMgrSdk {
         } else {
           WXEnvironment.extractSo();
         }
-        if(!versionFile.exists())
-          versionFile.createNewFile();
-        FileWriter fileWriter = new FileWriter(versionFile);
-        fileWriter.write(String.valueOf(WXEnvironment.CORE_JSB_SO_VERSION));
-        fileWriter.flush();
-        fileWriter.close();
+
+        Closeable w = null;
+        try {
+          if(!versionFile.exists())
+            versionFile.createNewFile();
+          FileWriter fileWriter = new FileWriter(versionFile);
+          w = fileWriter;
+          fileWriter.write(String.valueOf(WXEnvironment.CORE_JSB_SO_VERSION));
+          fileWriter.flush();
+        } catch (Exception e ) {
+          // do nothing
+        } finally {
+          if(w != null)
+            w.close();
+        }
+
       }
     } catch (Throwable e) {
       e.printStackTrace();

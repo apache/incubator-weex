@@ -33,6 +33,7 @@
 #import "WXSDKManager.h"
 #import "WXComponent+DataBinding.h"
 #import "WXComponent+Layout.h"
+#import "WXModuleProtocol.h"
 
 @interface WXRecycleListComponentView:UICollectionView
 @end
@@ -73,9 +74,13 @@ WX_EXPORT_METHOD(@selector(insertData:data:))
 WX_EXPORT_METHOD(@selector(updateData:data:))
 WX_EXPORT_METHOD(@selector(removeData:count:))
 WX_EXPORT_METHOD(@selector(moveData:toIndex:))
-WX_EXPORT_METHOD(@selector(scrollTo:options:))
 WX_EXPORT_METHOD(@selector(insertRange:range:))
 WX_EXPORT_METHOD(@selector(setListData:))
+WX_EXPORT_METHOD(@selector(scrollTo:options:))
+WX_EXPORT_METHOD(@selector(scrollToElement:options:))
+WX_EXPORT_METHOD(@selector(queryElement:cssSelector:callback:))
+WX_EXPORT_METHOD(@selector(queryElementAll:cssSelector:callback:))
+WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 
 - (instancetype)initWithRef:(NSString *)ref
                        type:(NSString *)type
@@ -370,11 +375,142 @@ WX_EXPORT_METHOD(@selector(setListData:))
     }];
 }
 
-- (void)scrollTo:(NSUInteger)index options:(NSDictionary *)options
+- (void)scrollTo:(NSString *)virtalElementInfo options:(NSDictionary *)options
 {
-    NSIndexPath *toIndexPath = [NSIndexPath indexPathForItem:index inSection:0];
-    BOOL animated = options[@"animated"] ? [WXConvert BOOL:options[@"animated"]] : NO;
+    NSUInteger position = 0;
+    if ([virtalElementInfo isKindOfClass:[NSNumber class]]) {
+        position = [virtalElementInfo integerValue];
+    }
+    else
+    {
+        if (virtalElementInfo.length == 0) {
+            return;
+        }
+        position = [self _positionForVirtalElementInfo:virtalElementInfo];
+    }
+    NSIndexPath *toIndexPath = [NSIndexPath indexPathForItem:position inSection:0];
+    BOOL animated = options[@"animated"] ? [WXConvert BOOL:options[@"animated"]] : YES;
     [_collectionView scrollToItemAtIndexPath:toIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:animated];
+}
+
+- (void)scrollToElement:(NSString *)virtalElementInfo options:(NSDictionary *)options
+{
+    [self scrollTo:virtalElementInfo options:options];
+}
+
+- (void)queryElement:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
+{
+    [self _queryElement:virtalElementInfo cssSelector:cssSelector callback:callback isAll:NO];
+}
+
+- (void)queryElementAll:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
+{
+    [self _queryElement:virtalElementInfo cssSelector:cssSelector callback:callback isAll:YES];
+}
+
+- (NSString *)_refForVirtalElementInfo:(NSString *)virtalElementInfo
+{
+    NSArray *stringArray = [virtalElementInfo componentsSeparatedByString:@"@"];
+    if (stringArray.count == 2) {
+        return stringArray[0];
+    }
+    return nil;
+}
+
+- (NSUInteger )_positionForVirtalElementInfo:(NSString *)virtalElementInfo
+{
+    NSArray *stringArray = [virtalElementInfo componentsSeparatedByString:@"@"];
+    if (stringArray.count == 2) {
+        return [stringArray[1] integerValue];
+    }
+    return 0;
+}
+
+- (void)closest:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
+{
+    if(callback)
+    {
+        WXPerformBlockOnComponentThread(^{
+            WXComponent *component = [self.weexInstance.componentManager componentForRef:[self _refForVirtalElementInfo:virtalElementInfo]];
+            if (component) {
+                callback([self _closestComponentForCSSSelector:cssSelector component:component]);
+            }
+        });
+    }
+}
+
+- (NSDictionary *)_closestComponentForCSSSelector:(NSString *)cssSelector component:(WXComponent *)component
+{
+    WXComponent *supercomponent = component.supercomponent;
+    if ([self _parseCssSelector:cssSelector component:supercomponent]) {
+        NSDictionary *info = @{@"attrs":supercomponent.attributes,@"type":supercomponent->_type,@"ref":supercomponent.ref};
+        return info;
+    }
+    else
+    {
+        if ([supercomponent isKindOfClass:[WXRecycleListComponent class]] ) {
+            return nil;
+        }
+        return [self _closestComponentForCSSSelector:cssSelector component:supercomponent];
+    }
+}
+
+- (void)_queryElement:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback isAll:(BOOL)isAll
+{
+    if(callback)
+    {
+        WXPerformBlockSyncOnComponentThread(^{
+            WXComponent *component = [self.weexInstance.componentManager componentForRef:[self _refForVirtalElementInfo:virtalElementInfo]];
+            if (component) {
+                NSMutableArray *infoArray = [NSMutableArray new];
+                [self _matchComponentForCSSSelector:cssSelector component:component infoArray:infoArray];
+                if (isAll) {
+                    callback(infoArray);
+                }
+                else
+                {
+                    if (infoArray.count != 0) {
+                        callback(infoArray[0]);
+                    }
+                }
+            }
+        });
+    }
+}
+
+- (void)_matchComponentForCSSSelector:(NSString *)cssSelector component:(WXComponent *)component infoArray:(NSMutableArray *)infoArray
+{
+    for (WXComponent *subcomponent in component.subcomponents) {
+        if ([self _parseCssSelector:cssSelector component:subcomponent]) {
+            NSDictionary *info = @{@"attrs":subcomponent.attributes,@"type":subcomponent->_type,@"ref":subcomponent.ref};
+            [infoArray addObject:info];
+        }
+        if (subcomponent.subcomponents.count != 0) {
+            [self _matchComponentForCSSSelector:cssSelector component:subcomponent infoArray:infoArray];
+        }
+    }
+}
+
+- (BOOL)_parseCssSelector:(NSString *)cssSelector component:(WXComponent *)component
+{
+    if (!cssSelector) {
+        return NO;
+    }
+    if ([cssSelector hasPrefix:@"["]&&[cssSelector hasSuffix:@"]"]) {
+        NSCharacterSet *unwantedChars = [NSCharacterSet characterSetWithCharactersInString:@"\"[]"];
+        NSString *requiredString = [[cssSelector componentsSeparatedByCharactersInSet:unwantedChars] componentsJoinedByString:@""];
+        NSArray *selectorArray = [requiredString componentsSeparatedByString:@"="];
+        if (selectorArray.count == 2) {
+            NSString *attribute = selectorArray[0];
+            NSString *value = selectorArray[1];
+            NSDictionary *componentAttrs = component.attributes;
+            NSString *valueString = [NSString stringWithFormat:@"%@",componentAttrs[attribute]];
+            if ([valueString isEqualToString:value]) {
+                return YES;
+            }
+        }
+    }
+    return NO;
 }
 
 #pragma mark - WXComponent Internal Methods
@@ -382,13 +518,11 @@ WX_EXPORT_METHOD(@selector(setListData:))
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
    [super _insertSubcomponent:subcomponent atIndex:index];
-    
     if ([subcomponent isKindOfClass:[WXCellSlotComponent class]]) {
         WXCellSlotComponent *cell = (WXCellSlotComponent*)subcomponent;
         [self.weexInstance.componentManager _addUITask:^{
             [_templateManager addTemplate:cell];
         }];
-        
         //TODO: update collection view if adding template
     }
 }

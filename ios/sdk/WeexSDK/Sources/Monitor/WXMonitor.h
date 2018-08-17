@@ -17,6 +17,7 @@
  * under the License.
  */
 
+
 #import <Foundation/Foundation.h>
 #import "WXDefine.h"
 #import "WXSDKError.h"
@@ -95,6 +96,7 @@ NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN \
 #define WX_MONITOR_INSTANCE_PERF_IS_RECORDED(tag, instance) [WXMonitor performancePoint:tag isRecordedWithInstance:instance]
 #define WX_MONITOR_INSTANCE_PERF_COMMIT(instance) [WXMonitor performanceFinish:instance]
 
+//DEPRECATED_ATTRIBUTE
 @interface WXMonitor : NSObject
 
 + (void)performancePoint:(WXPerformanceTag)tag willStartWithInstance:(WXSDKInstance *)instance;

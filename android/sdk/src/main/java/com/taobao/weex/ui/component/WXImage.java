@@ -18,6 +18,9 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
+import com.taobao.weex.dom.WXImageQuality;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,6 +54,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXImageView;
@@ -131,6 +135,9 @@ public class WXImage extends WXComponent<ImageView> {
         return true;
       case Constants.Name.AUTO_RECYCLE:
         mAutoRecycle = WXUtils.getBoolean(param, mAutoRecycle);
+        if (!mAutoRecycle && null != getInstance()){
+          getInstance().getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_IMG_UN_RECYCLE_NUM,1);
+        }
         return true;
       case Constants.Name.FILTER:
         int blurRadius = 0;
@@ -159,7 +166,8 @@ public class WXImage extends WXComponent<ImageView> {
     (getHostView()).setScaleType(getResizeMode(resizeMode));
   }
 
-  private ScaleType getResizeMode(String resizeMode) {
+  @RestrictTo(Scope.LIBRARY_GROUP)
+  protected ScaleType getResizeMode(String resizeMode) {
     ScaleType scaleType = ScaleType.FIT_XY;
     if (TextUtils.isEmpty(resizeMode)) {
       return scaleType;
@@ -290,7 +298,7 @@ public class WXImage extends WXComponent<ImageView> {
 
   private void setRemoteSrc(Uri rewrited,int blurRadius) {
 
-    WXImageStrategy imageStrategy = new WXImageStrategy();
+    WXImageStrategy imageStrategy = new WXImageStrategy(getInstanceId());
     imageStrategy.isClipping = true;
 
     WXImageSharpen imageSharpen = getAttrs().getImageSharpen();
@@ -337,8 +345,13 @@ public class WXImage extends WXComponent<ImageView> {
     IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
     if (imgLoaderAdapter != null) {
       imgLoaderAdapter.setImage(rewrited.toString(), getHostView(),
-          getAttrs().getImageQuality(), imageStrategy);
+          getImageQuality(), imageStrategy);
     }
+  }
+
+  @RestrictTo(Scope.LIBRARY_GROUP)
+  protected WXImageQuality getImageQuality(){
+    return getAttrs().getImageQuality();
   }
 
   @Override
@@ -458,6 +471,7 @@ public class WXImage extends WXComponent<ImageView> {
     if (img.getIntrinsicHeight() * img.getIntrinsicWidth() > imageView.getMeasuredHeight() *
             imageView.getMeasuredWidth()){
       instance.getWXPerformance().wrongImgSizeCount++;
+      instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,1);
     }
   }
 

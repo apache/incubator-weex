@@ -152,7 +152,8 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     _needLayout = NO;
     _isAnimationedSuccess = YES;
     WXPerformBlockOnComponentThread(^{
-        WXComponent *targetComponent = [self.weexInstance componentForRef:nodeRef];
+        NSArray *stringArray = [nodeRef componentsSeparatedByString:@"@"];
+        WXComponent *targetComponent = [self.weexInstance componentForRef:stringArray[0]];
         if (!targetComponent) {
             if (callback) {
                 NSDictionary *message = @{@"result":@"Fail",
@@ -167,7 +168,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     });
 }
 
-
 - (NSArray<WXAnimationInfo *> *)animationInfoArrayFromArgs:(NSDictionary *)args target:(WXComponent *)target
 {
     UIView *view = target.view;
@@ -178,10 +178,12 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     double delay = [args[@"delay"] doubleValue] / 1000;
     if (args[@"needLayout"]) {
         _needLayout = [WXConvert BOOL:args[@"needLayout"]];
-        _transition = [WXTransition new];
-        _transitionDic = [NSMutableDictionary new];
-        _transition.filterStyles = [NSMutableDictionary new];
-        _transition.oldFilterStyles = [NSMutableDictionary new];
+        if (_needLayout) {
+            _transition = [WXTransition new];
+            _transitionDic = [NSMutableDictionary new];
+            _transition.filterStyles = [NSMutableDictionary new];
+            _transition.oldFilterStyles = [NSMutableDictionary new];
+        }
     }
     CAMediaTimingFunction *timingFunction = [WXConvert CAMediaTimingFunction:args[@"timingFunction"]];
     NSDictionary *styles = args[@"styles"];
