@@ -65,14 +65,42 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 ///--------------------------------------
 
 /**
- * @abstract remove component
+ * @abstract create root component
  **/
-- (void)removeComponent:(NSString *)ref;
+- (void)createBody:(NSString*)ref
+              type:(NSString*)type
+            styles:(NSDictionary*)styles
+        attributes:(NSDictionary*)attributes
+            events:(NSArray*)events
+      renderObject:(void*)renderObject;
+
+/**
+ * @abstract add a component to its parent
+ **/
+- (void)addElement:(NSString*)ref
+              type:(NSString*)type
+         parentRef:(NSString*)parentRef
+            styles:(NSDictionary*)styles
+        attributes:(NSDictionary*)attributes
+            events:(NSArray*)events
+             index:(NSInteger)index
+      renderObject:(void*)renderObject;
 
 /**
  * @abstract move component
  **/
-- (void)moveComponent:(NSString *)ref toSuper:(NSString *)superRef atIndex:(NSInteger)index;
+- (void)moveElement:(NSString*)ref toSuper:(NSString*)superRef atIndex:(NSInteger)index;
+
+/**
+ * @abstract remove component
+ **/
+- (void)removeElement:(NSString*)ref;
+
+/**
+ * @abstract notify that a component tree is built and trigger layout,
+    may be called several times rendering a page.
+ **/
+- (void)appendTreeCreateFinish:(NSString*)ref;
 
 /**
  * @abstract return component for specific ref, must be called on component thread by calling WXPerformBlockOnComponentThread
@@ -89,6 +117,9 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
  */
 - (NSUInteger)numberOfComponents;
 
+/**
+ * @abstract add an existing component to references look-up map
+ */
 - (void)addComponent:(WXComponent *)component toIndexDictForRef:(NSString *)ref;
 
 ///--------------------------------------
@@ -96,34 +127,44 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 ///--------------------------------------
 
 /**
- * @abstract update styles
- **/
-- (void)updateStyles:(NSDictionary *)styles forComponent:(NSString *)ref;
-
-///--------------------------------------
-/// @name Updating pseudo class
-///--------------------------------------
-
-/**
- * @abstract update  pseudo class styles
- **/
-
-- (void)updatePseudoClassStyles:(NSDictionary *)styles forComponent:(NSString *)ref;
-
-/**
  * @abstract update attributes
  **/
-- (void)updateAttributes:(NSDictionary *)attributes forComponent:(NSString *)ref;
+- (void)updateAttributes:(NSDictionary*)attributes forElement:(NSString*)ref;
+
+/**
+ * @abstract update styles
+ **/
+- (void)updateStyles:(NSDictionary*)styles forElement:(NSString*)ref;
+
+/**
+ * @abstract update pseudo class styles
+ **/
+- (void)updatePseudoClassStyles:(NSDictionary *)styles forElement:(NSString *)ref;
+
+/**
+ * @abstract quick check that if a component has non transition properties
+ **/
+- (BOOL)isTransitionNoneOfElement:(NSString*)ref; // for quick access
+
+/**
+ * @abstract check if component with @ref has any style in @styles which is animated
+ **/
+- (BOOL)hasTransitionPropertyInStyles:(NSDictionary*)styles forElement:(NSString*)ref;
+
+/**
+ * @abstract layout a component with frame output by weex core layout engine
+ **/
+- (void)layoutComponent:(WXComponent*)component frame:(CGRect)frame innerMainSize:(CGFloat)innerMainSize;
 
 /**
  * @abstract add event
  **/
-- (void)addEvent:(NSString *)event toComponent:(NSString *)ref;
+- (void)addEvent:(NSString*)eventName toElement:(NSString*)ref;
 
 /**
  * @abstract remove event
  **/
-- (void)removeEvent:(NSString *)event fromComponent:(NSString *)ref;
+- (void)removeEvent:(NSString*)eventName fromElement:(NSString*)ref;
 
 /**
  * @abstract scroll to specific component
@@ -193,30 +234,5 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
  * @abstract handleStyle will be add to a queue to be executed every frame, but handleStyleOnMainThread will switch to main thread and execute imediately, you can call this for your execution time sequence.
  */
 - (void)handleStyleOnMainThread:(NSDictionary*)styles forComponent:(WXComponent *)component isUpdateStyles:(BOOL)isUpdateStyles;
-
-- (void)wxcore_CreateBody:(NSString*)ref
-                     type:(NSString*)type
-                   styles:(NSDictionary*)styles
-               attributes:(NSDictionary*)attributes
-                   events:(NSArray*)events
-             renderObject:(void*)renderObject;
-- (void)wxcore_AddElement:(NSString*)ref
-                     type:(NSString*)type
-                parentRef:(NSString*)parentRef
-                   styles:(NSDictionary*)styles
-               attributes:(NSDictionary*)attributes
-                   events:(NSArray*)events
-                    index:(NSInteger)index
-             renderObject:(void*)renderObject;
-- (void)wxcore_RemoveElement:(NSString*)ref;
-- (void)wxcore_MoveElement:(NSString*)ref toSuper:(NSString*)superRef atIndex:(NSInteger)index;
-- (void)wxcore_AppendTreeCreateFinish:(NSString*)ref;
-- (void)wxcore_UpdateAttributes:(NSDictionary*)attributes forElement:(NSString*)ref;
-- (void)wxcore_UpdateStyles:(NSDictionary*)styles forElement:(NSString*)ref;
-- (void)wxcore_Layout:(WXComponent*)component frame:(CGRect)frame innerMainSize:(CGFloat)innerMainSize;
-- (void)wxcore_AddEvent:(NSString*)eventName toElement:(NSString*)ref;
-- (void)wxcore_RemoveEvent:(NSString*)eventName fromElement:(NSString*)ref;
-- (BOOL)wxcore_IsTransitionNoneOfElement:(NSString*)ref; // for quick access
-- (BOOL)wxcore_HasTransitionPropertyInStyles:(NSDictionary*)styles forElement:(NSString*)ref;
 
 @end

@@ -289,7 +289,7 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager wxcore_AddEvent:ns_event toElement:ns_ref];
+        [manager addEvent:ns_event toElement:ns_ref];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addEvent" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -318,7 +318,7 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager wxcore_RemoveEvent:ns_event fromElement:ns_ref];
+        [manager removeEvent:ns_event fromElement:ns_ref];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeEvent" options:@{@"threadName":WXTDOMThread}];
     
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -359,7 +359,7 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager wxcore_CreateBody:ns_ref type:ns_type styles:ns_styles attributes:ns_attributes events:ns_events renderObject:renderObject];
+        [manager createBody:ns_ref type:ns_type styles:ns_styles attributes:ns_attributes events:ns_events renderObject:renderObject];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -405,7 +405,7 @@ namespace WeexCore
         }
         
         [manager startComponentTasks];
-        [manager wxcore_AddElement:ns_ref type:ns_componentType parentRef:ns_parentRef styles:ns_styles attributes:ns_attributes events:ns_events index:ns_index renderObject:renderObject];
+        [manager addElement:ns_ref type:ns_componentType parentRef:ns_parentRef styles:ns_styles attributes:ns_attributes events:ns_events index:ns_index renderObject:renderObject];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -438,7 +438,7 @@ namespace WeexCore
                                   isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
                                   isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
                                   isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
-        [manager wxcore_Layout:component frame:frame innerMainSize:renderObject->getLargestMainSize()];
+        [manager layoutComponent:component frame:frame innerMainSize:renderObject->getLargestMainSize()];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -472,7 +472,7 @@ namespace WeexCore
         }
         
         [manager startComponentTasks];
-        [manager wxcore_UpdateStyles:ns_style forElement:ns_ref];
+        [manager updateStyles:ns_style forElement:ns_ref];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateStyles" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -509,7 +509,7 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager wxcore_UpdateAttributes:ns_attributes forElement:ns_ref];
+        [manager updateAttributes:ns_attributes forElement:ns_ref];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -592,7 +592,7 @@ namespace WeexCore
         }
         
         [manager startComponentTasks];
-        [manager wxcore_RemoveElement:ns_ref];
+        [manager removeElement:ns_ref];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -623,7 +623,7 @@ namespace WeexCore
         }
         
         [manager startComponentTasks];
-        [manager wxcore_MoveElement:ns_ref toSuper:ns_parentRef atIndex:ns_index];
+        [manager moveElement:ns_ref toSuper:ns_parentRef atIndex:ns_index];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"moveElement" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -647,7 +647,7 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager wxcore_AppendTreeCreateFinish:ns_ref];
+        [manager appendTreeCreateFinish:ns_ref];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -672,11 +672,11 @@ namespace WeexCore
         }
         
         // if transition is none, return directly, avoiding convert style
-        if ([manager wxcore_IsTransitionNoneOfElement:ns_ref]) {
+        if ([manager isTransitionNoneOfElement:ns_ref]) {
             return 0;
         }
         
-        int result = [manager wxcore_HasTransitionPropertyInStyles:NSDICTIONARY(style) forElement:ns_ref] ? 1 : 0;
+        int result = [manager hasTransitionPropertyInStyles:NSDICTIONARY(style) forElement:ns_ref] ? 1 : 0;
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return result;
@@ -809,7 +809,7 @@ static void _traverseTree(WeexCore::RenderObject *render, int index, const char*
                                       isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
                                       isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
                                       isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
-            [manager wxcore_Layout:component frame:frame innerMainSize:render->getLargestMainSize()];
+            [manager layoutComponent:component frame:frame innerMainSize:render->getLargestMainSize()];
         }
         render->setHasNewLayout(false);
     }
