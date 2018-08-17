@@ -113,7 +113,7 @@ typedef void (*FuncReportNativeInitStatus)(const char *status_code, const char *
 
 typedef void (*FuncCallNative)(const char *pageId, const char *task, const char *callback);
 
-typedef std::unique_ptr<IPCResult> (*FuncCallNativeModule)(const char *pageId, const char *module, const char *method,
+typedef std::unique_ptr<ValueWithType> (*FuncCallNativeModule)(const char *pageId, const char *module, const char *method,
                                                            const char *arguments, int argumentsLen, const char *options, int optionsLen);
 
 typedef void (*FuncCallNativeComponent)(const char *pageId, const char *ref,

@@ -92,7 +92,7 @@ static void CallNative(const char *page_id, const char *task,
       }));
 }
 
-static std::unique_ptr<IPCResult> CallNativeModule(
+static std::unique_ptr<ValueWithType> CallNativeModule(
     const char *page_id, const char *module, const char *method,
     const char *arguments, int arguments_length, const char *options,
     int options_length) {
@@ -123,41 +123,7 @@ static std::unique_ptr<IPCResult> CallNativeModule(
             event->Signal();
           }));
   event.Wait();
-
-  std::unique_ptr<IPCResult> result;
-  switch (ret->type) {
-    case ParamsType::INT32:
-      result = createInt32Result(ret->value.int32Value);
-      break;
-    case ParamsType::INT64:
-      result = createInt64Result(ret->value.int32Value);
-      break;
-    case ParamsType::FLOAT:
-    case ParamsType::DOUBLE:
-      result = createDoubleResult(ret->value.doubleValue);
-      break;
-    case ParamsType::VOID:
-      result = createVoidResult();
-      break;
-    case ParamsType::BYTEARRAY:
-      result = createByteArrayResult(ret->value.byteArray->content,
-                                     ret->value.byteArray->length);
-      break;
-    case ParamsType::JSONSTRING:
-      result = std::unique_ptr<IPCResult>(
-          new IPCJSONStringResult(ret->value.string));
-      break;
-    case ParamsType::STRING:
-      result =
-          std::unique_ptr<IPCResult>(new IPCStringResult(ret->value.string));
-      break;
-    default:
-      result = createVoidResult();
-      break;
-  }
-  // TODO fix it
-  //  freeValueWithType(ret.get());
-  return result;
+    return ret;
 }
 
 static void CallNativeComponent(const char *page_id, const char *ref,
