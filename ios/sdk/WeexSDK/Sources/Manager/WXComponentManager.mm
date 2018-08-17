@@ -189,7 +189,7 @@ static NSThread *WXComponentThread;
     }
 }
 
-- (void)excutePrerenderUITask:(NSString *)url
+- (void)executePrerenderUITask:(NSString *)url
 {
     NSMutableArray *tasks  = [_uiPrerenderTaskQueue objectForKey:[WXPrerenderManager getTaskKeyFromUrl:self.weexInstance.scriptURL.absoluteString]];
     for (id block in tasks) {
@@ -235,14 +235,14 @@ static NSThread *WXComponentThread;
     }];
 }
 
-- (void)addElement:(NSString*)ref
-              type:(NSString*)type
-         parentRef:(NSString*)parentRef
-            styles:(NSDictionary*)styles
-        attributes:(NSDictionary*)attributes
-            events:(NSArray*)events
-             index:(NSInteger)index
-      renderObject:(void*)renderObject
+- (void)addComponent:(NSString*)ref
+                type:(NSString*)type
+           parentRef:(NSString*)parentRef
+              styles:(NSDictionary*)styles
+          attributes:(NSDictionary*)attributes
+              events:(NSArray*)events
+               index:(NSInteger)index
+        renderObject:(void*)renderObject
 {
     WXAssertComponentThread();
     WXAssertParam(ref);
@@ -302,7 +302,7 @@ static NSThread *WXComponentThread;
     }
 }
 
-- (void)moveElement:(NSString*)ref toSuper:(NSString*)superRef atIndex:(NSInteger)index
+- (void)moveComponent:(NSString *)ref toSuper:(NSString *)superRef atIndex:(NSInteger)index
 {
     WXAssertComponentThread();
     WXAssertParam(ref);
@@ -327,13 +327,13 @@ static NSThread *WXComponentThread;
             return;
         }
         
-        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
+        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"moveElement" options:@{@"threadName":WXTUIThread}];
         [component moveToSuperview:newSupercomponent atIndex:index];
-        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
+        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"moveElement" options:@{@"threadName":WXTUIThread}];
     }];
 }
 
-- (void)removeElement:(NSString*)ref
+- (void)removeComponent:(NSString *)ref
 {
     WXAssertComponentThread();
     WXAssertParam(ref);
@@ -593,14 +593,14 @@ static NSThread *WXComponentThread;
     }
 }
 
-- (void)updateStyles:(NSDictionary*)styles forElement:(NSString *)ref
+- (void)updateStyles:(NSDictionary *)styles forComponent:(NSString *)ref
 {
-    [self handleStyles:styles forElement:ref isUpdateStyles:YES];
+    [self handleStyles:styles forComponent:ref isUpdateStyles:YES];
 }
 
-- (void)updatePseudoClassStyles:(NSDictionary *)styles forElement:(NSString *)ref
+- (void)updatePseudoClassStyles:(NSDictionary *)styles forComponent:(NSString *)ref
 {
-    [self handleStyles:styles forElement:ref isUpdateStyles:NO];
+    [self handleStyles:styles forComponent:ref isUpdateStyles:NO];
 }
 
 - (void)handleStyleOnMainThread:(NSDictionary*)styles forComponent:(WXComponent *)component isUpdateStyles:(BOOL)isUpdateStyles
@@ -620,7 +620,7 @@ static NSThread *WXComponentThread;
     });
 }
 
-- (void)handleStyles:(NSDictionary *)styles forElement:(NSString *)ref isUpdateStyles:(BOOL)isUpdateStyles
+- (void)handleStyles:(NSDictionary *)styles forComponent:(NSString *)ref isUpdateStyles:(BOOL)isUpdateStyles
 {
     WXAssertParam(styles);
     WXAssertParam(ref);
@@ -638,7 +638,7 @@ static NSThread *WXComponentThread;
     }];
 }
 
-- (void)updateAttributes:(NSDictionary*)attributes forElement:(NSString*)ref
+- (void)updateAttributes:(NSDictionary *)attributes forComponent:(NSString *)ref
 {
     WXAssertParam(attributes);
     WXAssertParam(ref);
@@ -659,7 +659,7 @@ static NSThread *WXComponentThread;
     }];
 }
 
-- (BOOL)isTransitionNoneOfElement:(NSString*)ref
+- (BOOL)isTransitionNoneOfComponent:(NSString*)ref
 {
     WXAssertComponentThread();
     
@@ -669,7 +669,7 @@ static NSThread *WXComponentThread;
     return [component _isTransitionNone];
 }
 
-- (BOOL)hasTransitionPropertyInStyles:(NSDictionary*)styles forElement:(NSString*)ref
+- (BOOL)hasTransitionPropertyInStyles:(NSDictionary*)styles forComponent:(NSString*)ref
 {
     WXAssertComponentThread();
     
@@ -711,35 +711,35 @@ static NSThread *WXComponentThread;
     }
 }
 
-- (void)addEvent:(NSString*)eventName toElement:(NSString*)ref
+- (void)addEvent:(NSString *)event toComponent:(NSString *)ref
 {
     WXAssertComponentThread();
-    WXAssertParam(eventName);
+    WXAssertParam(event);
     WXAssertParam(ref);
     
     WXComponent *component = [_indexDict objectForKey:ref];
     WXAssertComponentExist(component);
     
-    [component _addEventOnComponentThread:eventName];
+    [component _addEventOnComponentThread:event];
     
     [self _addUITask:^{
-        [component _addEventOnMainThread:eventName];
+        [component _addEventOnMainThread:event];
     }];
 }
 
-- (void)removeEvent:(NSString*)eventName fromElement:(NSString*)ref
+- (void)removeEvent:(NSString *)event fromComponent:(NSString *)ref
 {
     WXAssertComponentThread();
-    WXAssertParam(eventName);
+    WXAssertParam(event);
     WXAssertParam(ref);
     
     WXComponent *component = [_indexDict objectForKey:ref];
     WXAssertComponentExist(component);
     
-    [component _removeEventOnComponentThread:eventName];
+    [component _removeEventOnComponentThread:event];
     
     [self _addUITask:^{
-        [component _removeEventOnMainThread:eventName];
+        [component _removeEventOnMainThread:event];
     }];
 }
 

@@ -289,7 +289,7 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager addEvent:ns_event toElement:ns_ref];
+        [manager addEvent:ns_event toComponent:ns_ref];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addEvent" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -318,7 +318,7 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager removeEvent:ns_event fromElement:ns_ref];
+        [manager removeEvent:ns_event fromComponent:ns_ref];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeEvent" options:@{@"threadName":WXTDOMThread}];
     
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -405,7 +405,7 @@ namespace WeexCore
         }
         
         [manager startComponentTasks];
-        [manager addElement:ns_ref type:ns_componentType parentRef:ns_parentRef styles:ns_styles attributes:ns_attributes events:ns_events index:ns_index renderObject:renderObject];
+        [manager addComponent:ns_ref type:ns_componentType parentRef:ns_parentRef styles:ns_styles attributes:ns_attributes events:ns_events index:ns_index renderObject:renderObject];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -472,7 +472,7 @@ namespace WeexCore
         }
         
         [manager startComponentTasks];
-        [manager updateStyles:ns_style forElement:ns_ref];
+        [manager updateStyles:ns_style forComponent:ns_ref];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateStyles" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -509,7 +509,7 @@ namespace WeexCore
             return -1;
         }
         [manager startComponentTasks];
-        [manager updateAttributes:ns_attributes forElement:ns_ref];
+        [manager updateAttributes:ns_attributes forComponent:ns_ref];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -592,7 +592,7 @@ namespace WeexCore
         }
         
         [manager startComponentTasks];
-        [manager removeElement:ns_ref];
+        [manager removeComponent:ns_ref];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -623,7 +623,7 @@ namespace WeexCore
         }
         
         [manager startComponentTasks];
-        [manager moveElement:ns_ref toSuper:ns_parentRef atIndex:ns_index];
+        [manager moveComponent:ns_ref toSuper:ns_parentRef atIndex:ns_index];
         [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"moveElement" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -672,11 +672,11 @@ namespace WeexCore
         }
         
         // if transition is none, return directly, avoiding convert style
-        if ([manager isTransitionNoneOfElement:ns_ref]) {
+        if ([manager isTransitionNoneOfComponent:ns_ref]) {
             return 0;
         }
         
-        int result = [manager hasTransitionPropertyInStyles:NSDICTIONARY(style) forElement:ns_ref] ? 1 : 0;
+        int result = [manager hasTransitionPropertyInStyles:NSDICTIONARY(style) forComponent:ns_ref] ? 1 : 0;
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return result;

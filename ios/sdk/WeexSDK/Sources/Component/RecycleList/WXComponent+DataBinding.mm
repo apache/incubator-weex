@@ -187,9 +187,9 @@ static JSContext *jsContext;
         if (newAttributesOrStyles.count > 0) {
             [self.weexInstance.componentManager startComponentTasks];
             if (i == WXDataBindingTypeStyle) {
-                [self.weexInstance.componentManager updateStyles:newAttributesOrStyles forElement:self.ref];
+                [self.weexInstance.componentManager updateStyles:newAttributesOrStyles forComponent:self.ref];
             } else if (i == WXDataBindingTypeAttributes) {
-                [self.weexInstance.componentManager updateAttributes:newAttributesOrStyles forElement:self.ref];
+                [self.weexInstance.componentManager updateAttributes:newAttributesOrStyles forComponent:self.ref];
             } else if (i == WXDataBindingTypeEvents) {
                 [self _addEventParams:newAttributesOrStyles];
             } else if (i == WXDataBindingTypeProp) {

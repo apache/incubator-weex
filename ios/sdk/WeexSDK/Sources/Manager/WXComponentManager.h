@@ -77,24 +77,24 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 /**
  * @abstract add a component to its parent
  **/
-- (void)addElement:(NSString*)ref
-              type:(NSString*)type
-         parentRef:(NSString*)parentRef
-            styles:(NSDictionary*)styles
-        attributes:(NSDictionary*)attributes
-            events:(NSArray*)events
-             index:(NSInteger)index
-      renderObject:(void*)renderObject;
+- (void)addComponent:(NSString*)ref
+                type:(NSString*)type
+           parentRef:(NSString*)parentRef
+              styles:(NSDictionary*)styles
+          attributes:(NSDictionary*)attributes
+              events:(NSArray*)events
+               index:(NSInteger)index
+        renderObject:(void*)renderObject;
 
 /**
  * @abstract move component
  **/
-- (void)moveElement:(NSString*)ref toSuper:(NSString*)superRef atIndex:(NSInteger)index;
+- (void)moveComponent:(NSString *)ref toSuper:(NSString *)superRef atIndex:(NSInteger)index;
 
 /**
  * @abstract remove component
  **/
-- (void)removeElement:(NSString*)ref;
+- (void)removeComponent:(NSString *)ref;
 
 /**
  * @abstract notify that a component tree is built and trigger layout,
@@ -127,29 +127,29 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 ///--------------------------------------
 
 /**
- * @abstract update attributes
- **/
-- (void)updateAttributes:(NSDictionary*)attributes forElement:(NSString*)ref;
-
-/**
  * @abstract update styles
  **/
-- (void)updateStyles:(NSDictionary*)styles forElement:(NSString*)ref;
+- (void)updateStyles:(NSDictionary *)styles forComponent:(NSString *)ref;
 
 /**
  * @abstract update pseudo class styles
  **/
-- (void)updatePseudoClassStyles:(NSDictionary *)styles forElement:(NSString *)ref;
+- (void)updatePseudoClassStyles:(NSDictionary *)styles forComponent:(NSString *)ref;
+
+/**
+ * @abstract update attributes
+ **/
+- (void)updateAttributes:(NSDictionary *)attributes forComponent:(NSString *)ref;
 
 /**
  * @abstract quick check that if a component has non transition properties
  **/
-- (BOOL)isTransitionNoneOfElement:(NSString*)ref; // for quick access
+- (BOOL)isTransitionNoneOfComponent:(NSString*)ref; // for quick access
 
 /**
  * @abstract check if component with @ref has any style in @styles which is animated
  **/
-- (BOOL)hasTransitionPropertyInStyles:(NSDictionary*)styles forElement:(NSString*)ref;
+- (BOOL)hasTransitionPropertyInStyles:(NSDictionary*)styles forComponent:(NSString*)ref;
 
 /**
  * @abstract layout a component with frame output by weex core layout engine
@@ -159,12 +159,12 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 /**
  * @abstract add event
  **/
-- (void)addEvent:(NSString*)eventName toElement:(NSString*)ref;
+- (void)addEvent:(NSString *)event toComponent:(NSString *)ref;
 
 /**
  * @abstract remove event
  **/
-- (void)removeEvent:(NSString*)eventName fromElement:(NSString*)ref;
+- (void)removeEvent:(NSString *)event fromComponent:(NSString *)ref;
 
 /**
  * @abstract scroll to specific component
@@ -223,9 +223,15 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
  */
 - (void)removeFixedComponent:(WXComponent *)fixComponent;
 
+/**
+ * @abstract add a task to UI thread
+ **/
 - (void)_addUITask:(void (^)(void))block;
 
-- (void)excutePrerenderUITask:(NSString *)url;
+/**
+ * @abstract execute a task to UI thread
+ **/
+- (void)executePrerenderUITask:(NSString *)url;
 
 /**
  * @param styles a NSDictionary value, styles which will resolve

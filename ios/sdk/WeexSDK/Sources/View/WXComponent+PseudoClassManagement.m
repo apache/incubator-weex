@@ -61,7 +61,7 @@
             if (!manager.isValid) {
                 return;
             }
-            [manager updatePseudoClassStyles:styles forElement:self.ref];
+            [manager updatePseudoClassStyles:styles forComponent:self.ref];
             [manager startComponentTasks];
         });
     }
@@ -149,7 +149,7 @@
         if (!manager.isValid) {
             return;
         }
-        [manager updatePseudoClassStyles:resetStyles forElement:self.ref];
+        [manager updatePseudoClassStyles:resetStyles forComponent:self.ref];
         [manager startComponentTasks];
     });
 }
