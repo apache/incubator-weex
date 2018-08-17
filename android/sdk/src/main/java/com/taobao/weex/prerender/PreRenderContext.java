@@ -25,6 +25,7 @@ import com.taobao.weex.ui.component.node.WXComponentNode;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -45,4 +46,6 @@ public class PreRenderContext {
 
     public int width = 0;
     public int height = 0;
+
+    public AtomicBoolean isRenderSuccess = new AtomicBoolean(false);
 }

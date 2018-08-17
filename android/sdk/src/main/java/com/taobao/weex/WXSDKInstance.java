@@ -93,6 +93,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -297,6 +298,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void specifiedRootNode(WXComponentNode rootNode) {
       mPrerenderContext.rootNode = rootNode;
+  }
+
+  public AtomicBoolean isRenderSuccess() {
+    return mPrerenderContext.isRenderSuccess;
   }
 
   @NonNull

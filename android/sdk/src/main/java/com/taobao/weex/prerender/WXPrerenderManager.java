@@ -72,7 +72,11 @@ public class WXPrerenderManager {
 
     @Nullable
     public WXSDKInstance fetchPreload(String url) {
-        return mPreloadInstanceMap.get(url);
+        WXSDKInstance instance = mPreloadInstanceMap.get(url);
+        if (instance != null) {
+            mPreloadInstanceMap.remove(url);
+        }
+        return instance;
     }
 
 }

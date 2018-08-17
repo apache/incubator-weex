@@ -82,6 +82,8 @@ public class WXComponentNode implements Runnable {
     private boolean mIsLayoutRTL;
     private JSONObject mScrollOptions;
 
+    private boolean mIsRenderSuccuess = false;
+
     private int mExecuteState = EXECUTE_STATE_ADD_ELEMENT;
 
     WXComponentNode(@NonNull BasicComponentData data,
@@ -118,6 +120,7 @@ public class WXComponentNode implements Runnable {
                 node.startTransform();
             }
         }
+        mIsRenderSuccuess = true;
     }
 
     private void postTransformAction() {
@@ -128,9 +131,23 @@ public class WXComponentNode implements Runnable {
         switch (mExecuteState) {
             case EXECUTE_STATE_CREATE_BODY:
                 createBody();
+                WXBridgeManager.getInstance().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        WXBridgeManager.getInstance().callCreateFinish(mWxInstance.getInstanceId());
+                    }
+                });
                 break;
             case EXECUTE_STATE_ADD_ELEMENT:
                 addElement();
+                if (mIsRenderSuccuess && mWxInstance.isRenderSuccess().compareAndSet(false, true)) {
+                    WXBridgeManager.getInstance().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            WXBridgeManager.getInstance().callRenderSuccess(mWxInstance.getInstanceId());
+                        }
+                    });
+                }
                 break;
             default:
                 break;
