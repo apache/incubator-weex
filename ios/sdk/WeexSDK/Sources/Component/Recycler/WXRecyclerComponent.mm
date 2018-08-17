@@ -339,7 +339,7 @@ typedef enum : NSUInteger {
     [_updateController performUpdatesWithNewData:newData oldData:oldData view:_collectionView];
 }
 
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
+- (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
     if ([subcomponent isKindOfClass:[WXCellComponent class]]) {
         ((WXCellComponent *)subcomponent).delegate = self;
@@ -347,18 +347,20 @@ typedef enum : NSUInteger {
         ((WXHeaderComponent *)subcomponent).delegate = self;
     }
     
-    [super _insertSubcomponent:subcomponent atIndex:index];
+    BOOL inserted = [super _insertSubcomponent:subcomponent atIndex:index];
     
     if (![subcomponent isKindOfClass:[WXHeaderComponent class]]
         && ![subcomponent isKindOfClass:[WXCellComponent class]]) {
-        return;
+        return inserted;
     }
     
     WXPerformBlockOnMainThread(^{
         [self performUpdatesWithCompletion:^(BOOL finished) {
-            
+            // void
         }];
     });
+    
+    return inserted;
 }
 
 - (void)insertSubview:(WXComponent *)subcomponent atIndex:(NSInteger)index

@@ -114,9 +114,9 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     _previousLoadMoreContentHeight=0;
 }
 
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
+- (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
-    [super _insertSubcomponent:subcomponent atIndex:index];
+    BOOL inserted = [super _insertSubcomponent:subcomponent atIndex:index];
     
     if ([subcomponent isKindOfClass:[WXRefreshComponent class]]) {
         _refreshComponent = (WXRefreshComponent*)subcomponent;
@@ -124,6 +124,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     else if ([subcomponent isKindOfClass:[WXLoadingComponent class]]) {
         _loadingComponent = (WXLoadingComponent*)subcomponent;
     }
+    
+    return inserted;
 }
 
 -(instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance

@@ -240,13 +240,18 @@ static JSContext *jsContext;
         
         if (!exsitingComponent) {
             [self.weexInstance.componentManager startComponentTasks];
-            [self.supercomponent _insertSubcomponent:component atIndex:startIndex + idx];
-            // add to layout tree
-            [WXCoreBridge addChildRenderObject:component->_flexCssNode toParent:self.supercomponent->_flexCssNode];
-            
-            [self.weexInstance.componentManager _addUITask:^{
-                [self.supercomponent insertSubview:component atIndex:startIndex + idx];
-            }];
+            BOOL inserted = [self.supercomponent _insertSubcomponent:component atIndex:startIndex + idx];
+            if (inserted) {
+                // add to layout tree
+                [WXCoreBridge addChildRenderObject:component->_flexCssNode toParent:self.supercomponent->_flexCssNode];
+                
+                [self.weexInstance.componentManager _addUITask:^{
+                    [self.supercomponent insertSubview:component atIndex:startIndex + idx];
+                }];
+            }
+            else {
+                WXLogError(@"fail to insert copied component for data binding.");
+            }
         }
     }];
     

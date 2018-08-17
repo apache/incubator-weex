@@ -171,7 +171,9 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (id<WXScrollerProtocol>)ancestorScroller;
 
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index;
+// return if the component is actually inserted
+- (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index;
+
 - (void)_removeFromSupercomponent;
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index;
 

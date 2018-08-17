@@ -279,7 +279,13 @@ static NSThread *WXComponentThread;
                );
 #endif //DEBUG
     
-    [supercomponent _insertSubcomponent:component atIndex:index];
+    BOOL inserted = [supercomponent _insertSubcomponent:component atIndex:index];
+    if (!inserted) {
+        // component is not inserted, ignore
+        [component _setRenderObject:nullptr]; // unbind with RenderObject
+        return;
+    }
+    
     // use _lazyCreateView to forbid component like cell's view creating
     if (supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
@@ -346,6 +352,7 @@ static NSThread *WXComponentThread;
         return;
     }
     
+    [component _setRenderObject:nullptr]; // unbind with RenderObject
     [component _removeFromSupercomponent];
     
     [_indexDict removeObjectForKey:ref];
@@ -833,16 +840,29 @@ static NSThread *WXComponentThread;
     [self invalidate];
     [self _stopDisplayLink];
     
-    __block WXComponent* rootComponent = _rootComponent;
-    NSEnumerator *enumerator = [[_indexDict copy] objectEnumerator];
-    dispatch_async(dispatch_get_main_queue(), ^{
+    // first, unbind with underneath RenderObjects
+    {
+        NSEnumerator* enumerator = [_indexDict objectEnumerator];
         WXComponent *component;
         while ((component = [enumerator nextObject])) {
-            [component _unloadViewWithReusing:NO];
+            [component _setRenderObject:nullptr];
         }
-        rootComponent = nil; // finally release all components
-    });
+    }
     
+    // second, unload views and finally release components in UI thread
+    {
+        __block WXComponent* rootComponent = _rootComponent;
+        NSEnumerator *enumerator = [[_indexDict copy] objectEnumerator];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            WXComponent *component;
+            while ((component = [enumerator nextObject])) {
+                [component _unloadViewWithReusing:NO];
+            }
+            rootComponent = nil; // finally release all components
+        });
+    }
+    
+    // clear containers
     _rootComponent = nil;
     [_indexDict removeAllObjects];
     [_uiTaskQueue removeAllObjects];

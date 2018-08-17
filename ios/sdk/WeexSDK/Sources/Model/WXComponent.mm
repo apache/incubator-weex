@@ -195,9 +195,14 @@ static BOOL bNeedRemoveEvents = YES;
     NSUInteger count = [self.subcomponents count];
     for (NSInteger i = 0; i < count; i ++) {
         WXComponent *subcomponentCopy = [[self.subcomponents objectAtIndex:i] copy];
-        [component _insertSubcomponent:subcomponentCopy atIndex:i];
-        // add to layout tree
-        [WXCoreBridge addChildRenderObject:subcomponentCopy->_flexCssNode toParent:component->_flexCssNode];
+        BOOL inserted = [component _insertSubcomponent:subcomponentCopy atIndex:i];
+        if (inserted) {
+            // add to layout tree
+            [WXCoreBridge addChildRenderObject:subcomponentCopy->_flexCssNode toParent:component->_flexCssNode];
+        }
+        else {
+            WXLogError(@"fail to insert copied component.");
+        }
     }
     
     WXPerformBlockOnComponentThread(^{
@@ -543,12 +548,17 @@ static BOOL bNeedRemoveEvents = YES;
     return _supercomponent;
 }
 
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
+- (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
     WXAssert(subcomponent, @"The subcomponent to insert to %@ at index %d must not be nil", self, index);
+    
+    if (subcomponent == nil) {
+        return NO;
+    }
+    
     if (index > [_subcomponents count]) {
         WXLogError(@"the index of inserted %ld is out of range as the current is %lu", (long)index, (unsigned long)[_subcomponents count]);
-        return;
+        return NO;
     }
     
     subcomponent->_supercomponent = self;
@@ -567,6 +577,8 @@ static BOOL bNeedRemoveEvents = YES;
     }
     
     [self setNeedsLayout];
+    
+    return YES;
 }
 
 - (void)_removeSubcomponent:(WXComponent *)subcomponent

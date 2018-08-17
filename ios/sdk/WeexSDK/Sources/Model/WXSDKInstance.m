@@ -514,7 +514,7 @@ typedef enum : NSUInteger {
 {
     [self.apmInstance endRecord];
     NSString *url = @"";
-    if([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
+    if ([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
         url = [self.scriptURL absoluteString];
     }
     if (!self.instanceId) {
@@ -544,11 +544,11 @@ typedef enum : NSUInteger {
             return;
         }
         
+        // Destroy components and views in main thread. Unbind with underneath RenderObjects.
+        [strongSelf.componentManager unload];
+        
         // Destroy weexcore c++ page and objects.
         [WXCoreBridge closePage:strongSelf.instanceId];
-        
-        // Destroy components and views in main thread.
-        [strongSelf.componentManager unload];
         
         // Reading config from orange for Release instance in Main Thread or not, for Bug #15172691 +{
         if (!_bReleaseInstanceInMainThread) {
@@ -560,10 +560,10 @@ typedef enum : NSUInteger {
         }
         //+}
     });
-    if(url.length > 0){
+    
+    if (url.length > 0) {
         [WXPrerenderManager addGlobalTask:url callback:nil];
     }
-    
 }
 
 - (void)forceGarbageCollection

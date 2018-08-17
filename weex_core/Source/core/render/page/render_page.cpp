@@ -171,9 +171,9 @@ bool RenderPage::RemoveRenderObject(const std::string &ref) {
   parent->RemoveRenderObject(child);
 
   RemoveRenderFromRegisterMap(child);
-  delete child;
-
   SendRemoveElementAction(ref);
+    
+  delete child;
   return true;
 }
 

@@ -71,10 +71,17 @@ bool flexIsUndefined(float value) {
 
 - (void)_setRenderObject:(void *)object
 {
-    _flexCssNode = static_cast<WeexCore::WXCoreLayoutNode*>(object);
-    _flexCssNode->setContext((__bridge void *)self); // bind
-    if ([self measureBlock]) {
-        _flexCssNode->setMeasureFunc(flexCssNodeMeasure);
+    if (object) {
+        _flexCssNode = static_cast<WeexCore::WXCoreLayoutNode*>(object);
+        _flexCssNode->setContext((__bridge void *)self); // bind
+        if ([self measureBlock]) {
+            _flexCssNode->setMeasureFunc(flexCssNodeMeasure);
+        }
+    }
+    else if (_flexCssNode) {
+        _flexCssNode->setContext(nullptr);
+        _flexCssNode->setMeasureFunc(nullptr);
+        _flexCssNode = nullptr;
     }
 }
 
@@ -166,6 +173,10 @@ bool flexIsUndefined(float value) {
 
 - (void)_fillCSSNode:(NSDictionary *)styles isUpdate:(BOOL)isUpdate
 {
+    if (_flexCssNode == nullptr) {
+        return;
+    }
+    
         // flex
         if (styles[@"flex"]) {
             _flexCssNode->set_flex([WXConvert CGFloat:styles[@"flex"]]);
@@ -317,6 +328,10 @@ bool flexIsUndefined(float value) {
 
 - (NSString*)convertLayoutValueToStyleValue:(NSString*)valueName
 {
+    if (_flexCssNode == nullptr) {
+        return @"0";
+    }
+    
     float layoutValue = 0;
     if ([valueName isEqualToString:@"left"])
         layoutValue = _flexCssNode->getLayoutPositionLeft();

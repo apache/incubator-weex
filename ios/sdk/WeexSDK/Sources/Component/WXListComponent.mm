@@ -252,25 +252,20 @@
 
 #pragma mark - Inheritance
 
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
+- (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
     if ([subcomponent isKindOfClass:[WXCellComponent class]]) {
         ((WXCellComponent *)subcomponent).delegate = self;
     } else if ([subcomponent isKindOfClass:[WXHeaderComponent class]]) {
         ((WXHeaderComponent *)subcomponent).delegate = self;
-    } else if (![subcomponent isKindOfClass:[WXRefreshComponent class]]
-               && ![subcomponent isKindOfClass:[WXLoadingComponent class]]
-               && subcomponent->_positionType != WXPositionTypeFixed) {
-        WXLogError(@"list only support cell/header/refresh/loading/fixed-component as child.");
-        return;
     }
     
-    [super _insertSubcomponent:subcomponent atIndex:index];
+    BOOL inserted = [super _insertSubcomponent:subcomponent atIndex:index];
     
     if (![subcomponent isKindOfClass:[WXHeaderComponent class]]
         && ![subcomponent isKindOfClass:[WXCellComponent class]]) {
         // Don't insert section if subcomponent is not header or cell
-        return;
+        return inserted;
     }
     
     NSIndexPath *indexPath = [self indexPathForSubIndex:index];
@@ -340,6 +335,8 @@
         }];
         
     }
+    
+    return inserted;
 }
 
 - (void)insertSubview:(WXComponent *)subcomponent atIndex:(NSInteger)index
