@@ -57,7 +57,7 @@
 {
     WXAssertComponentThread();
     [self updateBindingData:data];
-    [self _attachSlotEvent:data];
+    [self attachSlotEvent:data];
     [self triggerLayout];
 }
 

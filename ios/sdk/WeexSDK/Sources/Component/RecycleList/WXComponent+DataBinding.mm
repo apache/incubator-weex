@@ -119,13 +119,14 @@ static JSContext *jsContext;
             [self _refsConventFromData:newData];
             NSIndexPath *indexPath = newData[@"indexPath"];
             NSUInteger position = [indexPath indexAtPosition:1];
-            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_virtualComponentId type:@"lifecycle" hook:@"attach" args:@[@{@"virtualComponentId":self->_virtualComponentId,@"position":@(position),@"refs":self->_virtalElementInfo[@"refs"]?:@{}}] competion:nil];
+            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_virtualComponentId type:@"lifecycle" hook:@"attach" args:@[@{@"virtualComponentId":self->_virtualComponentId,@"position":@(position),@"refs":self->_virtualElementInfo[@"refs"]?:@{}}] competion:nil];
             if ([newData count]) {
                 data = newData;
             }
         } else {
             NSDictionary *virtualComponentData = [recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath templateId:templateId];
             newData[@"virtualComponentId"] = self->_virtualComponentId;
+            [newData setObject:listRef forKey:@"recycleListComponentRef"];
             [newData addEntriesFromDictionary:virtualComponentData];
             data = newData;
         }
@@ -535,31 +536,37 @@ static JSContext *jsContext;
     return block;
 }
 
-- (void)_attachSlotEvent:(NSDictionary *)data
+- (void)attachSlotEvent:(NSDictionary *)data
 {
-    [self _refsConventFromData:data];
-    if (_virtalElementInfo.count != 0) {
-        NSIndexPath *indexPath = data[@"indexPath"];
-        NSUInteger position = [indexPath indexAtPosition:1];
-        [_virtalElementInfo addEntriesFromDictionary:@{@"position":@(position)}];
-        [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:data[@"recycleListComponentRef"] type:@"_attach_slot" params:_virtalElementInfo domChanges:nil handlerArguments:nil];
-    }
+    [self cellSlotEventHandle:data isAttach:YES];
 }
 
-- (void)_detachSlotEvent:(NSDictionary *)data
+- (void)detachSlotEvent:(NSDictionary *)data
+{
+    [self cellSlotEventHandle:data isAttach:NO];
+}
+
+- (void)cellSlotEventHandle:(NSDictionary *)data isAttach:(BOOL)isAttach
 {
     [self _refsConventFromData:data];
-    if (_virtalElementInfo.count != 0) {
+    if (_virtualElementInfo.count != 0) {
+        NSString *recycleListComponentRef = data[@"recycleListComponentRef"];
         NSIndexPath *indexPath = data[@"indexPath"];
-        NSUInteger position = [indexPath indexAtPosition:1];
-        [_virtalElementInfo addEntriesFromDictionary:@{@"position":@(position)}];
-        [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:data[@"recycleListComponentRef"] type:@"_detach_slot" params:_virtalElementInfo domChanges:nil handlerArguments:nil];
+        if (!recycleListComponentRef) {
+            if (data[@"aliasKey"]) {
+                id key = data[@"aliasKey"];
+                recycleListComponentRef = data[key][@"recycleListComponentRef"];
+                indexPath = data[key][@"indexPath"];
+            }
+        }
+        [_virtualElementInfo addEntriesFromDictionary:@{@"position":@(indexPath.row)}];
+        [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:recycleListComponentRef type:isAttach ?@"_attach_slot": @"_detach_slot" params:_virtualElementInfo domChanges:nil handlerArguments:nil];
     }
 }
 
 - (void )_refsConventFromData:(NSDictionary *)data
 {
-    _virtalElementInfo = [NSMutableDictionary new];
+    _virtualElementInfo = [NSMutableDictionary new];
     if (self.attributes[@"ref"]) {
         NSMutableDictionary *subInfo = [NSMutableDictionary new];
         [self _componentInfoOfRef:self subInfo:subInfo data:data];
@@ -581,7 +588,7 @@ static JSContext *jsContext;
         [self _componentInfoOfRef:subcomponent subInfo:subInfo data:data];
     }
     if (subInfo.count !=0) {
-        [_virtalElementInfo setObject:subInfo forKey:@"refs"];
+        [_virtualElementInfo setObject:subInfo forKey:@"refs"];
     }
 }
 
@@ -589,15 +596,20 @@ static JSContext *jsContext;
 {
     if (component.attributes[@"ref"]) {
         NSIndexPath *indexPath = data[@"indexPath"];
-        NSUInteger position = [indexPath indexAtPosition:1];
-        NSString *virtalElementInfo = [NSString stringWithFormat:@"%@@%lu",component.ref,position];
-        NSDictionary *refInfo = @{@"attrs":component.attributes,@"type":component->_type,@"ref":virtalElementInfo,@"[[VirtualElement]]":@"true"};
+        if (!indexPath) {
+            if (data[@"aliasKey"]) {
+                id key = data[@"aliasKey"];
+                indexPath = data[key][@"indexPath"];
+            }
+        }
+        NSString *virtualElementInfo = [NSString stringWithFormat:@"%@@%lu",component.ref,indexPath.row];
+        NSDictionary *refInfo = @{@"attrs":component.attributes,@"type":component->_type,@"ref":virtualElementInfo,@"[[VirtualElement]]":@"true"};
         if (subInfo[component.attributes[@"ref"]]) {
             [subInfo[component.attributes[@"ref"]] addObject:refInfo];
         }
         else
         {
-            [subInfo setValue:@[refInfo] forKey:component.attributes[@"ref"]];
+            [subInfo setValue:[NSMutableArray arrayWithArray:@[refInfo]] forKey:component.attributes[@"ref"]];
         }
     }
 }
