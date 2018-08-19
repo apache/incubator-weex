@@ -52,9 +52,11 @@ class RenderManager {
   void Batch(const std::string &page_id);
 
   // create root node
-  bool CreatePage(std::string page_id, const char *data);
+  bool CreatePage(const std::string& page_id, const char *data);
 
-  bool CreatePage(std::string page_id, RenderObject *root);
+  bool CreatePage(const std::string& page_id, RenderObject *root);
+    
+  bool CreatePage(const std::string& page_id, std::function<RenderObject* (void)> constructRoot);
 
   /** use auto constructor is bad idea, it cann't transfer binary, use char* is
    * better */

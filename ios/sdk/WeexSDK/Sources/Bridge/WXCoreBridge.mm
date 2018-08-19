@@ -710,11 +710,16 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        WeexCore::WXCoreEnvironment::getInstance()->SetPlatform(OS_iOS);
+        WeexCore::WXCoreEnvironment* env = WeexCore::WXCoreEnvironment::getInstance();
+        env->SetPlatform(OS_iOS);
+        env->AddOption("scale", "1");
         
         CGSize screenSize = [UIScreen mainScreen].bounds.size;
-        WeexCore::WXCoreEnvironment::getInstance()->SetDeviceWidth(std::to_string(screenSize.width));
-        WeexCore::WXCoreEnvironment::getInstance()->SetDeviceHeight(std::to_string(screenSize.height));
+        env->SetDeviceWidth(std::to_string(screenSize.width));
+        env->SetDeviceHeight(std::to_string(screenSize.height));
+        env->AddOption("screen_width_pixels", std::to_string(screenSize.width));
+        env->AddOption("screen_height_pixels", std::to_string(screenSize.height));
+        env->AddOption("status_bar_height", std::to_string([[UIApplication sharedApplication] statusBarFrame].size.height));
         
         platformBridge = new WeexCore::PlatformBridge();
         platformBridge->set_platform_side(new WeexCore::IOSSide());
@@ -989,8 +994,9 @@ static std::vector<std::pair<std::string, std::string>>* _parseMapValuePairs(NSD
 {
     using namespace WeexCore;
     const std::string page([pageId UTF8String]);
-    RenderObject* root = _parseRenderObject(data, nullptr, 0, page);
-    RenderManager::GetInstance()->CreatePage(page, root);
+    RenderManager::GetInstance()->CreatePage(page, [&] (void) -> RenderObject* {
+        return _parseRenderObject(data, nullptr, 0, page);
+    });
 }
 
 + (void)callRemoveElement:(NSString*)pageId ref:(NSString*)ref
