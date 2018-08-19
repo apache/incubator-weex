@@ -90,21 +90,24 @@ static JSContext *jsContext;
     }
     
     __block NSMutableDictionary *newData = [NSMutableDictionary dictionary];
-    [templateComponent->_bindingProps enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, WXDataBindingBlock  _Nonnull block, BOOL * _Nonnull stop) {
-        BOOL needUpdate;
-        id value = block(data, &needUpdate);
-        if (value) {
-            newData[key] = value;
-        }
-    }];
+    if (templateComponent->_bindingProps) {
+        [templateComponent->_bindingProps enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, WXDataBindingBlock  _Nonnull block, BOOL * _Nonnull stop) {
+            BOOL needUpdate;
+            id value = block(data, &needUpdate);
+            if (value) {
+                newData[key] = value;
+            }
+        }];
+    }
     
     if (self.attributes[@"@isComponentRoot"]) {
-        if (![recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath]) {
+        NSString *templateId = self.attributes[@"@templateId"];
+        if (![recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath templateId:templateId]) {
             static NSUInteger __componentId = 0;
-            self->_virtualComponentId = [NSString stringWithFormat:@"%@@%lu", listRef, (unsigned long)__componentId % (2048*1024)];
+            self->_virtualComponentId = [NSString stringWithFormat:@"%@@%lu*%@", listRef, (unsigned long)__componentId % (2048*1024),templateId];
             __componentId++;
             dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self.attributes[@"@templateId"] type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(JSValue *value) {
+            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:templateId type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(JSValue *value) {
                 [newData addEntriesFromDictionary:[value toArray][0]];
                 [newData setObject:indexPath forKey:@"indexPath"];
                 [newData setObject:listRef forKey:@"recycleListComponentRef"];
@@ -114,17 +117,16 @@ static JSContext *jsContext;
             dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
             
             [self _refsConventFromData:newData];
-            NSIndexPath *indexPath = newData[@"item"][@"indexPath"];
+            NSIndexPath *indexPath = newData[@"indexPath"];
             NSUInteger position = [indexPath indexAtPosition:1];
             [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_virtualComponentId type:@"lifecycle" hook:@"attach" args:@[@{@"virtualComponentId":self->_virtualComponentId,@"position":@(position),@"refs":self->_virtalElementInfo[@"refs"]?:@{}}] competion:nil];
             if ([newData count]) {
                 data = newData;
             }
         } else {
-            newData[@"componentDataId"] = self->_virtualComponentId;
-            NSDictionary * virtualComponentData = [recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath];
+            NSDictionary *virtualComponentData = [recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath templateId:templateId];
+            newData[@"virtualComponentId"] = self->_virtualComponentId;
             [newData addEntriesFromDictionary:virtualComponentData];
-            [newData addEntriesFromDictionary:data];
             data = newData;
         }
     }
@@ -312,7 +314,6 @@ static JSContext *jsContext;
             WXAssert(NO, @"error binding type:%z", type);
             break;
     }
-    
     [stylesOrAttributesOrEvents enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull name, id  _Nonnull binding, BOOL * _Nonnull stop) {
         if ([binding isKindOfClass:[NSDictionary class]] && binding[WXBindingIdentify]) {
             // {"attributeOrStyleName":{"@binding":"bindingExpression"}
@@ -351,7 +352,6 @@ static JSContext *jsContext;
                         }
                     }
                 }];
-                
                 return type == WXDataBindingTypeEvents ? newArray : [newArray componentsJoinedByString:@""];
             };
         }
@@ -399,7 +399,8 @@ static JSContext *jsContext;
                 return data[identiferName];
             } else {
                 WXLogError(@"identifer:%@ not found", identiferName);
-                return nil;
+                *needUpdate = YES;
+                return @"";
             }
         } else if (expression->is<WXJSMemberExpression>()) {
             WXJSMemberExpression *member = (WXJSMemberExpression *)expression;
@@ -538,10 +539,10 @@ static JSContext *jsContext;
 {
     [self _refsConventFromData:data];
     if (_virtalElementInfo.count != 0) {
-        NSIndexPath *indexPath = data[@"item"][@"indexPath"];
+        NSIndexPath *indexPath = data[@"indexPath"];
         NSUInteger position = [indexPath indexAtPosition:1];
         [_virtalElementInfo addEntriesFromDictionary:@{@"position":@(position)}];
-        [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:data[@"item"][@"recycleListComponentRef"] type:@"_attach_slot" params:_virtalElementInfo domChanges:nil handlerArguments:nil];
+        [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:data[@"recycleListComponentRef"] type:@"_attach_slot" params:_virtalElementInfo domChanges:nil handlerArguments:nil];
     }
 }
 
@@ -549,10 +550,10 @@ static JSContext *jsContext;
 {
     [self _refsConventFromData:data];
     if (_virtalElementInfo.count != 0) {
-        NSIndexPath *indexPath = data[@"item"][@"indexPath"];
+        NSIndexPath *indexPath = data[@"indexPath"];
         NSUInteger position = [indexPath indexAtPosition:1];
         [_virtalElementInfo addEntriesFromDictionary:@{@"position":@(position)}];
-        [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:data[@"item"][@"recycleListComponentRef"] type:@"_detach_slot" params:_virtalElementInfo domChanges:nil handlerArguments:nil];
+        [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:data[@"recycleListComponentRef"] type:@"_detach_slot" params:_virtalElementInfo domChanges:nil handlerArguments:nil];
     }
 }
 
@@ -587,7 +588,7 @@ static JSContext *jsContext;
 - (void)_componentInfoOfRef:(WXComponent *)component subInfo:(NSMutableDictionary *)subInfo data:(NSDictionary *)data
 {
     if (component.attributes[@"ref"]) {
-        NSIndexPath *indexPath = data[@"item"][@"indexPath"];
+        NSIndexPath *indexPath = data[@"indexPath"];
         NSUInteger position = [indexPath indexAtPosition:1];
         NSString *virtalElementInfo = [NSString stringWithFormat:@"%@@%lu",component.ref,position];
         NSDictionary *refInfo = @{@"attrs":component.attributes,@"type":component->_type,@"ref":virtalElementInfo,@"[[VirtualElement]]":@"true"};

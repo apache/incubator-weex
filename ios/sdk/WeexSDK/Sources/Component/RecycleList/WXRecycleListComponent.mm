@@ -293,30 +293,30 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 
 - (void)updateData:(NSUInteger)index data:(id)data
 {
-    NSMutableArray * newListData = [[_dataManager data] mutableCopy];
-    if (!data && index > [newListData count]) {
-        return;
-    }
-    NSIndexPath * indexPath = [NSIndexPath indexPathForRow:index inSection:0];
-    NSDictionary * virtualComponentData = [_dataManager virtualComponentDataWithIndexPath:indexPath];
-    if ([virtualComponentData[WXBindingOnceIdentify] boolValue]) {
-        return;
-    }
-    
-    // TODO: bring the update logic to UpdateManager
-    newListData[index] = data;
-    [_dataManager updateData:newListData];
-    NSString* virtualComponentId = [_dataManager virtualComponentIdWithIndexPath:indexPath];
-    [_dataManager updateVirtualComponentData:virtualComponentId data:data];
-    NSMutableDictionary * newData = nil;
-    if (![data isKindOfClass:[NSDictionary class]]) {
-         newData = [NSMutableDictionary new];
-        [newData setObject:@"data" forKey:data];
-        data = newData;
-    }
-    newData = [data mutableCopy];
-    newData[@"@phase"] = @"update";
-    [self _updateDataForCellSlotAtIndexPath:indexPath data:[newData copy]];
+//    NSMutableArray * newListData = [[_dataManager data] mutableCopy];
+//    if (!data && index > [newListData count]) {
+//        return;
+//    }
+//    NSIndexPath * indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+//    NSDictionary * virtualComponentData = [_dataManager virtualComponentDataWithIndexPath:indexPath];
+//    if ([virtualComponentData[WXBindingOnceIdentify] boolValue]) {
+//        return;
+//    }
+//    
+//    // TODO: bring the update logic to UpdateManager
+//    newListData[index] = data;
+//    [_dataManager updateData:newListData];
+//    NSString* virtualComponentId = [_dataManager virtualComponentIdWithIndexPath:indexPath];
+//    [_dataManager updateVirtualComponentData:virtualComponentId data:data];
+//    NSMutableDictionary * newData = nil;
+//    if (![data isKindOfClass:[NSDictionary class]]) {
+//         newData = [NSMutableDictionary new];
+//        [newData setObject:@"data" forKey:data];
+//        data = newData;
+//    }
+//    newData = [data mutableCopy];
+//    newData[@"@phase"] = @"update";
+//    [self _updateDataForCellSlotAtIndexPath:indexPath data:[newData copy]];
 }
 
 - (void)insertRange:(NSInteger)index range:(NSArray*)data
