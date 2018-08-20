@@ -294,6 +294,8 @@ inline bool IsBool(const Value *o) { return Value::Type::BOOL == o->type; }
 
 inline bool IsTable(const Value *o) { return Value::Type::TABLE == o->type; }
 
+inline bool IsArray(const Value *o) { return Value::Type::ARRAY == o->type; }
+    
 inline bool IsString(const Value *o) { return nullptr != o && Value::Type::STRING == o->type; }
     
 inline bool IsClass(const Value *o) { return nullptr != o && Value::Type::CLASS_DESC == o->type; }
@@ -353,6 +355,11 @@ inline void SetBValue(Value *o, bool b) {
 inline void SetTValue(Value *v, GCObject *o) {
   v->type = Value::Type::TABLE;
   v->gc = o;
+}
+    
+inline void SetAValue(Value *v, GCObject *o) {
+    v->type = Value::Type::ARRAY;
+    v->gc = o;
 }
     
 inline void SetCDValue(Value *v, GCObject *o) {

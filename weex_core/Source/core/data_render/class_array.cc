@@ -34,6 +34,51 @@ ClassDescriptor *NewClassArray() {
     AddClassStaticCFunc(array_desc, "isArray", isArray);
     return array_desc;
 }
+    
+int IndexOf(const std::vector<Value> &items, const Value *val) {
+    auto iterator = std::find(items.begin(), items.end(), val);
+    if (iterator != items.end()) {
+        return (int)std::distance(items.begin(), iterator);
+    }
+    else {
+        return -1;
+    }
+}
+
+int SetArray(Array *array, Value *index, const Value &val) {
+    int ret = 0;
+    do {
+        if (!IsInt(index)) {
+            break;
+        }
+        int index = IndexOf(array->items, &val);
+        if (index < 0) {
+            break;
+        }
+        array->items.emplace_back(val);
+        index = (int)array->items.size() - 1;
+        ret = true;
+        
+    } while (0);
+   
+    return ret;
+}
+    
+Value GetArray(Array *array, const Value &index) {
+    Value ret = Value();
+    do {
+        if (!IsInt(&index)) {
+            break;
+        }
+        int indexValue = (int)IntValue(&index);
+        if (indexValue < array->items.size()) {
+            ret = array->items.at(indexValue);
+        }
+        
+    } while (0);
+    
+    return ret;
+}
 
 static Value isArray(ExecState *exec_state) {
     size_t length = exec_state->GetArgumentCount();

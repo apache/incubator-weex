@@ -21,6 +21,7 @@
 #include "core/data_render/object.h"
 #include "core/data_render/table.h"
 #include "core/data_render/common_error.h"
+#include "core/data_render/class_array.h"
 
 #if DEBUG
 #include "core/data_render/monitor/vm_monitor.h"
@@ -502,7 +503,35 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         }
       }
         break;
-
+        case OP_GETARRAY: {
+            LOGD("OP_GETARRAY A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            c = frame.reg + GET_ARG_C(instruction);
+            if (!IsArray(b)) {
+                // TODO error
+                throw VMExecError("Unspport Type with OP_CODE [OP_GETARRAY]");
+            }
+            if (!IsInt(c)) {
+                throw VMExecError("Array Type Error With OP_CODE [OP_GETARRAY]");
+            }
+            *a = GetArray(ObjectValue<Array>(b), *c);
+            break;
+        }
+        case OP_SETARRAY: {
+            LOGD("OP_SETARRAY A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            c = frame.reg + GET_ARG_C(instruction);
+            if (!IsArray(a)) {
+                // TODO error
+                throw VMExecError("Array Type Error With OP_CODE [OP_SETARRAY]");
+            }
+            if (!SetArray(ObjectValue<Array>(a), b, *c)) {
+                throw VMExecError("Array Type Error With OP_CODE [OP_SETARRAY]");
+            }
+            break;
+        }
       case OP_SETTABLE: {
         LOGD("OP_SETTABLE A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
         a = frame.reg + GET_ARG_A(instruction);

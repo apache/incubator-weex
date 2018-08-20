@@ -627,12 +627,12 @@ void CodeGenerator::Visit(ObjectConstant* node, void* data) {
 void CodeGenerator::Visit(ArrayConstant* node, void* data) {
   long reg = data == nullptr ? -1 : *static_cast<long*>(data);
 
-  FuncState* func_state = func_->func_state();
+  FuncState *func_state = func_->func_state();
 
   // new table
-  Value table = exec_state_->table_factory()->CreateTable();
+  Value array = exec_state_->class_factory()->CreateArray();
   if (reg >= 0) {
-    int tableIndex = func_state->AddConstant(table);
+    int tableIndex = func_state->AddConstant(array);
     Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, tableIndex);
     func_state->AddInstruction(i);
 
@@ -660,7 +660,7 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
             node->member()->Accept(this, &mindex);
         }
         FuncState *funcState = func_->func_state();
-        funcState->AddInstruction(CREATE_ABC(OP_GETTABLE, ret, ret, mindex));
+        funcState->AddInstruction(CREATE_ABC(OP_GETARRAY, ret, ret, mindex));
     }
     else if (node->kind() == MemberAccessKind::kDot) {
         Handle<Expression> left = node->expr();

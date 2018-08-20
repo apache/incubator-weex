@@ -17,7 +17,15 @@ Value ClassFactory::CreateClassDescriptor(ClassDescriptor *p_super) {
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
     descs_.emplace_back(desc);
     return value;
-} 
+}
+    
+Value ClassFactory::CreateArray() {
+    Array *array = new Array();
+    Value value;
+    SetAValue(&value, reinterpret_cast<GCObject *>(array));
+    arrays_.emplace_back(array);
+    return value;
+}
     
 Value ClassFactory::ClassArray() {
     ClassDescriptor *desc = NewClassArray();

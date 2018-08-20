@@ -44,6 +44,10 @@ enum OpCode {
   OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)
   OP_GETTABLE,  //	A B C	R(A) = R(B)[R(C)]
 
+  OP_SETARRAY,  //    A B C    R(A)[R(B)] = RK(C)
+  OP_GETARRAY,  //    A B C    R(A) = R(B)[R(C)]
+
+    
   OP_ADD,   //	A B C	R(A) = R(B) + R(C)
   OP_SUB,   //	A B C	R(A) = R(B) - R(C)
   OP_MUL,   //	A B C	R(A) = R(B) * R(C)

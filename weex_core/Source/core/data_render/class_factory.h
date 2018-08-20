@@ -36,12 +36,14 @@ public:
     virtual Value CreateClassDescriptor(ClassDescriptor *p_super);
     virtual Value CreateClassInstance(ClassDescriptor *p_desc);
     virtual Value ClassArray();
+    virtual Value CreateArray();
     ~ClassFactory();
     
 private:
     ClassInstance *CreateClassInstanceFromSuper(ClassDescriptor *p_desc);
     std::vector<ClassDescriptor *> descs_;
     std::vector<ClassInstance *> insts_;
+    std::vector<Array *> arrays_;
 };
 
 }
