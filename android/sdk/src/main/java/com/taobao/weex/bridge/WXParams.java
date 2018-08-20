@@ -160,7 +160,7 @@ public class WXParams implements Serializable {
   @CalledByNative
   public String getUseSingleProcess() {
     WXLogUtils.e("getUseSingleProcess is running " + useSingleProcess);
-    return useSingleProcess;
+    return "true";
   }
 
   public void setUseSingleProcess(String useSingleProcess) {
