@@ -296,7 +296,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  * Enumerate components using breadth-first search algorithm,
     must be called on component thread by calling WXPerformBlockOnComponentThread
  */
-- (void)enumerateComponentsUsingBlock:(void (^)(WXComponent *, BOOL *stop))block;
+- (void)enumerateComponentsUsingBlock:(void (^)(WXComponent *component, BOOL *stop))block;
 
 /**
  * check whether the module eventName is registered
