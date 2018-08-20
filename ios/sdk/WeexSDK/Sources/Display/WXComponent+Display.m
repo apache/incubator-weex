@@ -569,4 +569,32 @@ do {\
     return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha(_backgroundColor.CGColor) == 1.0 && [self _needsDrawBorder];
 }
 
+- (CAShapeLayer *)drawBorderRadiusMaskLayer:(CGRect)rect
+{
+    if ([self hasBorderRadiusMaskLayer]) {
+        UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomLeftRadius];
+        CAShapeLayer *maskLayer = [CAShapeLayer layer];
+        maskLayer.path = bezierPath.CGPath;
+        return maskLayer;
+    }
+    return nil;
+}
+
+- (BOOL)hasBorderRadiusMaskLayer
+{
+    return _borderTopLeftRadius > 0.001 || _borderTopRightRadius > 0.001 || _borderBottomLeftRadius > 0.001 || _borderBottomLeftRadius > 0.001;
+}
+
+#pragma mark - Deprecated
+
+- (WXDisplayBlock)displayBlock
+{
+    return [self _displayBlock];
+}
+
+- (WXDisplayCompletionBlock)displayCompletionBlock
+{
+    return [self _displayCompletionBlock];
+}
+
 @end
