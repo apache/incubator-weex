@@ -586,11 +586,19 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     
     _scrollStartPoint = scrollView.contentOffset;
     
-    if (_scrollStartEvent) {
+    if (_scrollStartEvent || _scrollEventListener) {
         CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-        NSDictionary *contentSizeData = @{@"width":[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"height":[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor]};
-        NSDictionary *contentOffsetData = @{@"x":[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"y":[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor]};
-        [self fireEvent:@"scrollstart" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+        NSDictionary *contentSizeData = @{@"width":@(scrollView.contentSize.width / scaleFactor),
+                                          @"height":@(scrollView.contentSize.height / scaleFactor)};
+        NSDictionary *contentOffsetData = @{@"x":@(-scrollView.contentOffset.x / scaleFactor),
+                                            @"y":@(-scrollView.contentOffset.y / scaleFactor)};
+        
+        if (_scrollStartEvent) {
+            [self fireEvent:@"scrollstart" params:@{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData} domChanges:nil];
+        }
+        if (_scrollEventListener) {
+            _scrollEventListener(self, @"scrollstart", @{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData});
+        }
     }
     
     NSHashTable *delegates = [_delegates copy];
@@ -643,10 +651,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (self.onScroll) {
         self.onScroll(scrollView);
     }
-    if (_scrollEvent) {
-        NSDictionary *contentSizeData = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"width",[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor],@"height", nil];
-        //contentOffset values are replaced by (-contentOffset.x,-contentOffset.y) ,in order to be consistent with Android client.
-        NSDictionary *contentOffsetData = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"x",[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor],@"y", nil];
+    if (_scrollEvent || _scrollEventListener) {
         CGFloat distance = 0;
         if (_scrollDirection == WXScrollDirectionHorizontal) {
             distance = scrollView.contentOffset.x - _lastScrollEventFiredOffset.x;
@@ -654,7 +659,18 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             distance = scrollView.contentOffset.y - _lastScrollEventFiredOffset.y;
         }
         if (fabs(distance) >= _offsetAccuracy) {
-            [self fireEvent:@"scroll" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+            NSDictionary *contentSizeData = @{@"width": @(scrollView.contentSize.width / scaleFactor),
+                                              @"height": @(scrollView.contentSize.height / scaleFactor)};
+            //contentOffset values are replaced by (-contentOffset.x,-contentOffset.y), in order to be consistent with Android client.
+            NSDictionary *contentOffsetData = @{@"x": @(-scrollView.contentOffset.x / scaleFactor),
+                                                @"y": @(-scrollView.contentOffset.y / scaleFactor)};
+            
+            if (_scrollEvent) {
+                [self fireEvent:@"scroll" params:@{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData} domChanges:nil];
+            }
+            if (_scrollEventListener) {
+                _scrollEventListener(self, @"scroll", @{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData});
+            }
             _lastScrollEventFiredOffset = scrollView.contentOffset;
         }
     }
@@ -695,12 +711,20 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    if (_scrollEndEvent) {
+    if (_scrollEndEvent || _scrollEventListener) {
         if (!_isScrolling) {
             CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-            NSDictionary *contentSizeData = @{@"width":[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"height":[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor]};
-            NSDictionary *contentOffsetData = @{@"x":[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"y":[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor]};
-            [self fireEvent:@"scrollend" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+            NSDictionary *contentSizeData = @{@"width":@(scrollView.contentSize.width / scaleFactor),
+                                              @"height":@(scrollView.contentSize.height / scaleFactor)};
+            NSDictionary *contentOffsetData = @{@"x":@(-scrollView.contentOffset.x / scaleFactor),
+                                                @"y":@(-scrollView.contentOffset.y / scaleFactor)};
+            
+            if (_scrollEndEvent) {
+                [self fireEvent:@"scrollend" params:@{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData} domChanges:nil];
+            }
+            if (_scrollEventListener) {
+                _scrollEventListener(self, @"scrollend", @{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData});
+            }
         }
     }
     if (!_isScrolling) {
