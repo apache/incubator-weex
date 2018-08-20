@@ -1211,8 +1211,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         invokeCreateInstance(instance, template, options, data);
         long end = System.currentTimeMillis();
         instance.getWXPerformance().callCreateInstanceTime = end - start;
-        instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
-
         instance.getWXPerformance().communicateTime =  instance.getWXPerformance().callCreateInstanceTime;
       }
     }, instanceId);
@@ -1266,6 +1264,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             } else {
               options.put(BUNDLE_TYPE, "Others");
             }
+            instance.getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_BUNDLE_TYPE, options.get(BUNDLE_TYPE));
           }
           if (options.get("env") == null) {
             options.put("env", mInitParams);
@@ -1314,6 +1313,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 dataObj, apiObj, renderStrategy};
 
         instance.setTemplate(template);
+
+        instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
 
         // if { "framework": "Vue" } or  { "framework": "Rax" } will use invokeCreateInstanceContext
         // others will use invokeExecJS

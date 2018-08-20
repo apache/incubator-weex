@@ -86,6 +86,8 @@ public class WXExceptionUtils {
 					commitMap.put(entry.getKey(),entry.getValue());
 				}
 				commitMap.put(WXInstanceExceptionRecord.KEY_EXP_STAGE_LIST,instance.getExceptionRecorder().convertStageToStr());
+				String bundleTemplate = instance.getTemplate();
+				commitMap.put("wxTemplateOfBundle",null == bundleTemplate ?"has recycle by gc":bundleTemplate);
 			}
 		} else {//instance is null for instance id is null
 			if (!TextUtils.isEmpty(WXSDKInstance.requestUrl)) {

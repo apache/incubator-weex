@@ -208,6 +208,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     }
     this.priority = WXUtils.getString(getAttrs().get(Constants.Name.PRIORITY), PRIORITY_NORMAL);
     this.strategy = WXUtils.getString(getAttrs().get(Constants.Name.STRATEGY), STRATEGY_NONE);
+    instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_EMBED_COUNT,1);
   }
 
   @Override
@@ -291,10 +292,6 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
    */
   protected void loadContent(){
     mNestedInstance = createInstance();
-    if (null != mNestedInstance){
-      mNestedInstance.setContainerInfo(WXInstanceApm.KEY_PAGE_PROPERTIES_INSTANCE_TYPE,"embed");
-      mNestedInstance.setContainerInfo(WXInstanceApm.KEY_PAGE_PROPERTIES_PARENT_PAGE,getInstance().getBundleUrl());
-    }
     if(mListener != null && mListener.mEventListener != null){
       if(!mListener.mEventListener.onPreCreate(this,src)){
         //cancel render
@@ -338,8 +335,10 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
       );
       return sdkInstance;
     }
+    sdkInstance.setContainerInfo(WXInstanceApm.KEY_PAGE_PROPERTIES_INSTANCE_TYPE,"embed");
+    sdkInstance.setContainerInfo(WXInstanceApm.KEY_PAGE_PROPERTIES_PARENT_PAGE,getInstance().getWXPerformance().pageName);
 
-    sdkInstance.renderByUrl(WXPerformance.DEFAULT,
+    sdkInstance.renderByUrl(url,
             url,
             null, null,
             WXRenderStrategy.APPEND_ASYNC);

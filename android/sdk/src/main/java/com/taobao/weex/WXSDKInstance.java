@@ -585,6 +585,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       return;
     }
 
+    //some case ,from render(template),but not render (url)
+    if (!mApmForInstance.hasInit()){
+      mApmForInstance.doInit();
+    }
+    mApmForInstance.setPageName(pageName);
     mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_RENDER_ORGIGIN);
 
     mWXPerformance.pageName = (TextUtils.isEmpty(pageName) ? "defaultBundleUrl":pageName);
@@ -650,7 +655,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       renderOptions.put(BUNDLE_URL, url);
     }
 
-    mApmForInstance.onStart();
+    mApmForInstance.doInit();
 
     Uri uri = Uri.parse(url);
     if (uri != null && TextUtils.equals(uri.getScheme(), "file")) {
