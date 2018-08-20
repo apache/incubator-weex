@@ -1863,7 +1863,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
       mWXPerformance.networkTime = System.currentTimeMillis() - startRequestTime;
       if(null!= response && response.extendParams!=null){
-        mApmForInstance.updateExtInfo(response.extendParams);
+        mApmForInstance.updateRecordInfo(response.extendParams);
         Object actualNetworkTime=response.extendParams.get("actualNetworkTime");
         mWXPerformance.actualNetworkTime=actualNetworkTime instanceof Long?(long)actualNetworkTime:0;
         WXLogUtils.renderPerformanceLog("actualNetworkTime", mWXPerformance.actualNetworkTime);
