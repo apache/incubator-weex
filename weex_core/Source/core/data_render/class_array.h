@@ -29,15 +29,8 @@
 namespace weex {
 namespace core {
 namespace data_render {
-    
-typedef struct Array {
-    CommonHeader;
-    std::vector<Value> items;
-    Array() : items() {}
-    
-} Array;
-    
-ClassDescriptor *NewClassArrayDescriptor();
+        
+ClassDescriptor *NewClassArray();
     
 }  // namespace data_render
 }  // namespace core

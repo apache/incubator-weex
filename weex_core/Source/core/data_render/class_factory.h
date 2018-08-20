@@ -35,7 +35,7 @@ public:
     ClassFactory() {};
     virtual Value CreateClassDescriptor(ClassDescriptor *p_super);
     virtual Value CreateClassInstance(ClassDescriptor *p_desc);
-    virtual Value CreateClassArrayDescriptor();
+    virtual Value ClassArray();
     ~ClassFactory();
     
 private:

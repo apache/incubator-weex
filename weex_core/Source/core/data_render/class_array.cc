@@ -29,7 +29,7 @@ namespace data_render {
 
 static Value isArray(ExecState *exec_state);
     
-ClassDescriptor *NewClassArrayDescriptor() {
+ClassDescriptor *NewClassArray() {
     ClassDescriptor *array_desc = new ClassDescriptor(nullptr);
     AddClassStaticCFunc(array_desc, "isArray", isArray);
     return array_desc;
@@ -40,11 +40,14 @@ static Value isArray(ExecState *exec_state) {
     if (length != 1) {
         throw VMExecError("Argument Count Error For Array.isArray");
     }
-    Value *a = exec_state->GetArgument(0);
-    //if (a->type == Value::type::)
-    return Value();
+    Value *array = exec_state->GetArgument(0);
+    if (array->type == Value::Type::ARRAY) {
+        return Value(true);
+    }
+    else {
+        return Value(false);
+    }
 }
-
     
 }  // namespace data_render
 }  // namespace core

@@ -113,6 +113,7 @@ struct Value {
       case VALUE_REF:var = value.var;
         break;
       case TABLE:
+      case ARRAY:
       case CLASS_DESC:
         gc = value.gc;
         break;
@@ -131,12 +132,21 @@ struct Value {
       case FUNC:return left.f == right.f;
       case CFUNC:return left.cf == right.cf;
       case CPTR:return left.cptr == right.cptr;
-      case TABLE:return left.gc == right.gc;
+      case ARRAY:
+      case TABLE:
+            return left.gc == right.gc;
       default:break;
     }
     return false;
   }
 };
+
+typedef struct Array {
+    CommonHeader;
+    std::vector<Value> items;
+    Array() : items() {}
+    
+} Array;
 
 typedef struct Table {
     CommonHeader;

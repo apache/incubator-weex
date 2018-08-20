@@ -17,10 +17,10 @@ Value ClassFactory::CreateClassDescriptor(ClassDescriptor *p_super) {
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
     descs_.emplace_back(desc);
     return value;
-}
+} 
     
-Value ClassFactory::CreateClassArrayDescriptor() {
-    ClassDescriptor *desc = NewClassArrayDescriptor();
+Value ClassFactory::ClassArray() {
+    ClassDescriptor *desc = NewClassArray();
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
     descs_.emplace_back(desc);
