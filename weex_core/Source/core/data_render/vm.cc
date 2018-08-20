@@ -20,7 +20,7 @@
 #include "core/data_render/exec_state.h"
 #include "core/data_render/object.h"
 #include "core/data_render/table.h"
-#include "common_error.h"
+#include "core/data_render/common_error.h"
 
 #if DEBUG
 #include "core/data_render/monitor/vm_monitor.h"

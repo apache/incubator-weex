@@ -38,13 +38,13 @@ int SetTabIntValue(Table *t, Value *key, const Value &val) {
   if (IsNil(&val)) {
     return 0;
   }
-  int index = IndexOf(&t->array, &val);
-  if (index < 0) {
-    t->array.emplace_back(val);
-    index = t->array.size() - 1;
-  }
+//  int index = IndexOf(&t->array, &val);
+//  if (index < 0) {
+//    t->array.emplace_back(val);
+//    index = t->array.size() - 1;
+//  }
   if (nullptr != key) {
-    SetIValue(key, index);
+    //SetIValue(key, index);
   }
   return 1;
 }
@@ -72,10 +72,10 @@ int SetTabStringValue(Table *t, const Value *key, const Value &val) {
 }
 
 Value *GetTabIntValue(Table *t, const Value *key) {
-  int index = IntValue(key);
-  if (index < t->array.size()) {
-    return &(t->array.at(index));
-  }
+//  int index = IntValue(key);
+//  if (index < t->array.size()) {
+//    return &(t->array.at(index));
+//  }
   return nullptr;
 }
 
@@ -134,7 +134,8 @@ size_t GetArraySize(Table *t) {
   if (nullptr == t) {
     return 0;
   }
-  return t->array.size();
+    return 0;
+  //return t->array.size();
 }
 
 size_t GetMapSize(Table *t) {

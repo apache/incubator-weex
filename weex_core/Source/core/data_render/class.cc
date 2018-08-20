@@ -28,6 +28,20 @@ ClassDescriptor *NewClassDescriptor(ClassDescriptor *p_super) {
     return new ClassDescriptor(p_super);
 }
     
+void AddClassStaticCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function) {
+    Value func;
+    func.type = Value::Type::CFUNC;
+    func.cf = reinterpret_cast<void *>(function);
+    p_desc->static_funcs_->Add(name, func);
+}
+
+void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function) {
+    Value func;
+    func.type = Value::Type::CFUNC;
+    func.cf = reinterpret_cast<void *>(function);
+    p_desc->funcs_->Add(name, func);
+}
+
 ClassInstance *NewClassInstance(ClassDescriptor *p_desc) {
     return new ClassInstance(p_desc);
 }

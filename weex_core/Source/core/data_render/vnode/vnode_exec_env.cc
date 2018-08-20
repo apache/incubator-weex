@@ -22,6 +22,7 @@
 #include "core/data_render/object.h"
 #include "core/data_render/table.h"
 #include "core/data_render/table_factory.h"
+#include "core/data_render/class_factory.h"
 
 namespace weex {
 namespace core {
@@ -114,7 +115,7 @@ static Value Slice(ExecState* exec_state) {
     v_start = v_end;
   }
   Value new_value = exec_state->table_factory()->CreateTable();
-  TableArrayAddAll(*table, new_value, v_start, v_end);
+  //TableArrayAddAll(*table, new_value, v_start, v_end);
   return new_value;
 }
 
@@ -133,19 +134,19 @@ static Value AppendUrlParam(ExecState* exec_state) {
   std::stringstream ss;
   ss << p_string->c_str();
 
-  std::vector<Value> kv_array = p_array->array;
-  for (auto it = kv_array.begin(); it != kv_array.end(); it++) {
-    Value& kv_map = *it;
-    Table* p_table = ObjectValue<Table>(&kv_map);
-    if (p_table != nullptr && p_table->map.find("key") != p_table->map.end() &&
-        p_table->map.find("value") != p_table->map.end()) {
-      Value& key = p_table->map.find("key")->second;
-      Value& value = p_table->map.find("value")->second;
-      if (IsString(&key) && IsString(&value)) {
-        ss << "&" << key.str->c_str() << "=" << value.str->c_str();
-      }
-    }
-  }
+//  std::vector<Value> kv_array = p_array->array;
+//  for (auto it = kv_array.begin(); it != kv_array.end(); it++) {
+//    Value& kv_map = *it;
+//    Table* p_table = ObjectValue<Table>(&kv_map);
+//    if (p_table != nullptr && p_table->map.find("key") != p_table->map.end() &&
+//        p_table->map.find("value") != p_table->map.end()) {
+//      Value& key = p_table->map.find("key")->second;
+//      Value& value = p_table->map.find("value")->second;
+//      if (IsString(&key) && IsString(&value)) {
+//        ss << "&" << key.str->c_str() << "=" << value.str->c_str();
+//      }
+//    }
+//  }
 
   String* new_value = exec_state->string_table()->StringFromUTF8(ss.str());
   return Value(new_value);
@@ -287,7 +288,11 @@ void RegisterCFunc(ExecState* state, const std::string& name,
   func.cf = reinterpret_cast<void*>(function);
   state->global()->Add(name, func);
 }
-
+    
+void RegisterClass(ExecState *state, const std::string& name, Value value) {
+    state->global()->Add(name, value);
+}
+    
 void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   // log
   RegisterCFunc(state, "log", Log);
@@ -301,6 +306,7 @@ void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   RegisterCFunc(state, "setAttr", SetAttr);
   RegisterCFunc(state, "setProps", SetProps);
   RegisterCFunc(state, "setClassList", SetClassList);
+  RegisterClass(state, "Array", state->class_factory()->CreateClassArrayDescriptor());
 }
 
 Value ParseJson2Value(ExecState* state, const json11::Json& json) {
@@ -352,23 +358,23 @@ json11::Json ParseValue2Json(const Value& value) {
   }
 
   Table* p_table = ObjectValue<Table>(&value);
-  if (p_table->array.size() > 0) {
-    json11::Json::array array;
-
-    for (auto it = p_table->array.begin(); it != p_table->array.end(); it++) {
-      if ((*it).type == Value::STRING) {
-        array.push_back(json11::Json((*it).str->c_str()));
-        continue;
-      }
-
-      if ((*it).type == Value::TABLE) {
-        array.push_back(ParseValue2Json((*it)));
-        continue;
-      }
-    }
-
-    return json11::Json(array);
-  }
+//  if (p_table->array.size() > 0) {
+//    json11::Json::array array;
+//
+//    for (auto it = p_table->array.begin(); it != p_table->array.end(); it++) {
+//      if ((*it).type == Value::STRING) {
+//        array.push_back(json11::Json((*it).str->c_str()));
+//        continue;
+//      }
+//
+//      if ((*it).type == Value::TABLE) {
+//        array.push_back(ParseValue2Json((*it)));
+//        continue;
+//      }
+//    }
+//
+//    return json11::Json(array);
+//  }
 
   json11::Json::object object;
   for (auto it = p_table->map.begin(); it != p_table->map.end(); it++) {

@@ -79,7 +79,7 @@ struct Value {
     struct Value *var;
   };
 
-  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, TABLE, CLASS_DESC, CLASS_INST, VALUE_REF };
+  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, ARRAY, TABLE, CLASS_DESC, CLASS_INST, VALUE_REF };
 
   Type type;
 
@@ -140,11 +140,8 @@ struct Value {
 
 typedef struct Table {
     CommonHeader;
-
-    std::vector<Value> array; /* array part */
     std::unordered_map<std::string, Value> map;
-
-    Table() : array(), map() {}
+    Table() : map() {}
 
 } Table;
     
@@ -166,8 +163,9 @@ struct ClassDescriptor;
 typedef struct ClassDescriptor {
     CommonHeader;
     ClassDescriptor *p_super_;
+    std::unique_ptr<Variables> static_funcs_;
     std::unique_ptr<Variables> funcs_;
-    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables) {}
+    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), static_funcs_(new Variables) {}
     
 } ClassDescriptor;
 
@@ -432,15 +430,15 @@ inline int ToBool(const Value *o, bool &b) {
     return 1;
 }
 
-inline void TableArrayAddAll(Value &src, Value &dest, int start, int end) {
-  Table *st = ObjectValue<Table>(&src);
-  Table *dt = ObjectValue<Table>(&dest);
-  st->array.insert(st->array.end(), dt->array.begin() + start, end > 0 ? dt->array.begin() + end : dt->array.end());
-}
-
-inline void TableArrayAddAll(Value &src, Value &dest) {
-  TableArrayAddAll(src, dest, 0, 0);
-}
+//inline void TableArrayAddAll(Value &src, Value &dest, int start, int end) {
+//  Table *st = ObjectValue<Table>(&src);
+//  Table *dt = ObjectValue<Table>(&dest);
+//  st->array.insert(st->array.end(), dt->array.begin() + start, end > 0 ? dt->array.begin() + end : dt->array.end());
+//}
+//
+//inline void TableArrayAddAll(Value &src, Value &dest) {
+//  TableArrayAddAll(src, dest, 0, 0);
+//}
 
 inline void TableMapAddAll(Value &src, Value &dest) {
   Table *st = ObjectValue<Table>(&src);

@@ -21,25 +21,26 @@
 // Created by pentao.pt on 2018/7/25.
 //
 
-#ifndef DATA_RENDER_CLASS_H
-#define DATA_RENDER_CLASS_H
+#ifndef DATA_RENDER_ARRAY_CLASS_H
+#define DATA_RENDER_ARRAY_CLASS_H
 
 #include "core/data_render/object.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-
-ClassDescriptor *NewClassDescriptor(ClassDescriptor *p_super = nullptr);
-
-void AddClassStaticCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function);
-
-void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function);
-
-ClassInstance *NewClassInstance(ClassDescriptor *p_desc);
+    
+typedef struct Array {
+    CommonHeader;
+    std::vector<Value> items;
+    Array() : items() {}
+    
+} Array;
+    
+ClassDescriptor *NewClassArrayDescriptor();
     
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
 
-#endif  // DATA_RENDER_CLASS_H
+#endif  // DATA_RENDER_ARRAY_CLASS_H
