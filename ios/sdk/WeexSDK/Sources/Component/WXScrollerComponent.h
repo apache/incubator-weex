@@ -24,6 +24,8 @@
 
 @property (nonatomic, copy) void (^onScroll)(UIScrollView *);
 
+@property (nonatomic, copy) void (^scrollEventListener)(WXScrollerComponent*, NSString*, NSDictionary*);
+
 @property (nonatomic, assign) NSUInteger loadmoreretry;
 
 @property (nonatomic, assign) CGSize contentSize;

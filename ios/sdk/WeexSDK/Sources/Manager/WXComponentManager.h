@@ -241,4 +241,10 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
  */
 - (void)handleStyleOnMainThread:(NSDictionary*)styles forComponent:(WXComponent *)component isUpdateStyles:(BOOL)isUpdateStyles;
 
+///--------------------------------------
+/// @name Enumerating
+///--------------------------------------
+
+- (void)enumerateComponentsUsingBlock:(void (^)(WXComponent *, BOOL *stop))block;
+
 @end
