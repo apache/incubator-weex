@@ -27,6 +27,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXErrorCode.ErrorType;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
@@ -67,8 +68,6 @@ public class WXExceptionUtils {
 		if (null == commitMap){
 			commitMap = new HashMap<>();
 		}
-		commitMap.put("activity","empty");
-
 		if (!TextUtils.isEmpty(instanceId)) {
 			instanceIdCommit = instanceId;
 			instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
@@ -104,7 +103,7 @@ public class WXExceptionUtils {
 			adapter.onJSException(exceptionCommit);
 		}
 
-		if (null != instance){
+		if (null != instance && exceptionCommit.getErrCode().getErrorType() != ErrorType.RENDER_ERROR){
 			instance.getExceptionRecorder().recordErrorMsg(exceptionCommit);
 		}
 
