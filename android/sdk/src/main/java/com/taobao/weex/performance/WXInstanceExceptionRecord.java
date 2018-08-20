@@ -77,9 +77,13 @@ public class WXInstanceExceptionRecord {
             || WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START.equals(stage)
             || WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_START.equals(stage)
             ) {
-            mBeginRender = true;
+            setBeginRender(true);
         }
         stageList.add(stage + " :" + time);
+    }
+
+    public void setBeginRender(boolean isBegin){
+        mBeginRender = true;
     }
 
     public String convertStageToStr() {
