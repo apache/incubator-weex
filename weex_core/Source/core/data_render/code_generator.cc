@@ -165,14 +165,6 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
             long arg_super = block_->NextRegisterId();
             func_state->AddInstruction(CREATE_ABC(OP_GETSUPER, arg_super, reg_this, caller));
             argc++;
-            if (stms->args_expr()->IsArgumentList()) {
-                Handle<ArgumentList> arg_list = stms->args_expr()->AsArgumentList();
-                for (int i = 0; i < arg_list->length(); i++) {
-                    long arg = block_->NextRegisterId();
-                    arg_list->args()->raw_list()[i]->Accept(this, &arg);
-                }
-                argc += arg_list->length();
-            }
         }
         else {
             if (stms->expr()->IsIdentifier() && stms->member() && stms->member()->IsIdentifier()) {
@@ -210,14 +202,6 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
                         argc++;
                     }                    
                 }
-                if (stms->args_expr()->IsArgumentList()) {
-                    Handle<ArgumentList> arg_list = stms->args_expr()->AsArgumentList();
-                    for (int i = 0; i < arg_list->length(); i++) {
-                        long arg = block_->NextRegisterId();
-                        arg_list->args()->raw_list()[i]->Accept(this, &arg);
-                    }
-                    argc += arg_list->length();
-                }
             }
         }
     }
@@ -225,6 +209,14 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
         auto temp = (*it).get();
         long arg = block_->NextRegisterId();
         temp->Accept(this, &arg);
+    }
+    if (stms->args_expr()->IsArgumentList()) {
+        Handle<ArgumentList> arg_list = stms->args_expr()->AsArgumentList();
+        for (int i = 0; i < arg_list->length(); i++) {
+            long arg = block_->NextRegisterId();
+            arg_list->args()->raw_list()[i]->Accept(this, &arg);
+        }
+        argc += arg_list->length();
     }
     FuncState *state = func_->func_state();
     state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
