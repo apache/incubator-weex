@@ -450,7 +450,7 @@ inline int ToBool(const Value *o, bool &b) {
 inline void ArrayAddAll(Value &src, Value &dest, int start, int end) {
   Array *st = ObjectValue<Array>(&src);
   Array *dt = ObjectValue<Array>(&dest);
-  st->items.insert(st->items.end(), dt->items.begin() + start, end > 0 ? dt->items.begin() + end : dt->items.end());
+  dt->items.insert(dt->items.end(), st->items.begin() + start, end > 0 ? st->items.begin() + end : st->items.end());
 }
 
 inline void ArrayAddAll(Value &src, Value &dest) {

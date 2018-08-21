@@ -23,6 +23,7 @@
 #include "core/data_render/table.h"
 #include "core/data_render/table_factory.h"
 #include "core/data_render/class_factory.h"
+#include "core/data_render/class_array.h"
 
 namespace weex {
 namespace core {
@@ -113,7 +114,7 @@ static Value Slice(ExecState* exec_state) {
   Value* table = exec_state->GetArgument(0);
   Value* start = exec_state->GetArgument(1);
   Value* end = exec_state->GetArgument(2);
-  if (!IsTable(table) || !IsInt(start) || !IsInt(end)) {
+  if (!IsArray(table) || !IsInt(start) || !IsInt(end)) {
     return Value();
   }
   unsigned int v_start = static_cast<unsigned int>(IntValue(start));
@@ -125,7 +126,7 @@ static Value Slice(ExecState* exec_state) {
   if (v_start > v_end) {
     v_start = v_end;
   }
-  Value new_value = exec_state->table_factory()->CreateTable();
+  Value new_value = exec_state->class_factory()->CreateArray();
   ArrayAddAll(*table, new_value, v_start, v_end);
   return new_value;
 }
@@ -137,27 +138,27 @@ static Value AppendUrlParam(ExecState* exec_state) {
   }
   Value* url = exec_state->GetArgument(0);
   Value* array = exec_state->GetArgument(1);
-  if (!IsString(url) || !IsTable(array)) {
+  if (!IsString(url) || !IsArray(array)) {
     return Value();
   }
   String* p_string = StringValue(url);
-  Table* p_array = ObjectValue<Table>(array);
+  Array* p_array = ObjectValue<Array>(array);
   std::stringstream ss;
   ss << p_string->c_str();
 
-//  std::vector<Value> kv_array = p_array->array;
-//  for (auto it = kv_array.begin(); it != kv_array.end(); it++) {
-//    Value& kv_map = *it;
-//    Table* p_table = ObjectValue<Table>(&kv_map);
-//    if (p_table != nullptr && p_table->map.find("key") != p_table->map.end() &&
-//        p_table->map.find("value") != p_table->map.end()) {
-//      Value& key = p_table->map.find("key")->second;
-//      Value& value = p_table->map.find("value")->second;
-//      if (IsString(&key) && IsString(&value)) {
-//        ss << "&" << key.str->c_str() << "=" << value.str->c_str();
-//      }
-//    }
-//  }
+  std::vector<Value> kv_array = p_array->items;
+  for (auto it = kv_array.begin(); it != kv_array.end(); it++) {
+    Value& kv_map = *it;
+    Table* p_table = ObjectValue<Table>(&kv_map);
+    if (p_table != nullptr && p_table->map.find("key") != p_table->map.end() &&
+        p_table->map.find("value") != p_table->map.end()) {
+      Value& key = p_table->map.find("key")->second;
+      Value& value = p_table->map.find("value")->second;
+      if (IsString(&key) && IsString(&value)) {
+        ss << "&" << key.str->c_str() << "=" << value.str->c_str();
+      }
+    }
+  }
 
   String* new_value = exec_state->string_table()->StringFromUTF8(ss.str());
   return Value(new_value);
@@ -338,14 +339,14 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     String* p_str = state->string_table()->StringFromUTF8(json.string_value());
     return Value(p_str);
   } else if (json.is_array()) {
-    Value value = state->table_factory()->CreateTable();
+    Value value = state->class_factory()->CreateArray();
     const json11::Json::array& data_objects = json.array_items();
     int64_t array_size = data_objects.size();
     for (int64_t index = 0; index < array_size; index++) {
       // will be free by table
       Value key(index);
       Value val(ParseJson2Value(state, json[index]));
-      SetTabValue(ObjectValue<Table>(&value), &key, val);
+      SetArray(ObjectValue<Array>(&value), &key, val);
     }
     return value;
   } else if (json.is_object()) {

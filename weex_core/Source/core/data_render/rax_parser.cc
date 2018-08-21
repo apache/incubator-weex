@@ -355,7 +355,11 @@ Handle<Expression> RAXParser::ParseCallExpression()
         else {
             break;
         }
-        member = builder()->NewCallExpression(kind, member, temp);
+        if (member->IsIdentifier()){
+            member = builder()->NewCallExpression(member, temp);
+        } else{
+            member = builder()->NewCallExpression(kind, member, temp);
+        }
     }
     return member;
 }
@@ -706,7 +710,11 @@ Handle<Expression> RAXParser::ParseMemberExpression()
             if (member->IsMemberExpression()) {
                 member->AsMemberExpression()->setKind(kind);
             }
-            member = builder()->NewCallExpression(kind, member, temp);
+            if (member->IsIdentifier()){
+                member = builder()->NewCallExpression(member, temp);
+            } else{
+                member = builder()->NewCallExpression(kind, member, temp);
+            }
         }
         else {
             member = builder()->NewMemberExpression(kind, member, temp);

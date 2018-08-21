@@ -134,17 +134,15 @@ int SetTabValue(Table *t, Value *key, const Value &val) {
 }
 
 size_t GetTableSize(Table *t) {
-  size_t a_size = GetArraySize(t);
   size_t m_size = GetMapSize(t);
-  return a_size > m_size ? a_size : m_size;
+  return m_size;
 }
 
-size_t GetArraySize(Table *t) {
+size_t GetArraySize(Array *t) {
   if (nullptr == t) {
     return 0;
   }
-    return 0;
-  //return t->array.size();
+  return t->items.size();
 }
 
 size_t GetMapSize(Table *t) {
@@ -155,7 +153,7 @@ size_t GetMapSize(Table *t) {
 }
 
 size_t GetValueArraySize(Value &o) {
-  return GetArraySize(ObjectValue<Table>(&o));
+  return GetArraySize(ObjectValue<Array>(&o));
 }
 
 size_t GetValueMapSize(Value &o) {

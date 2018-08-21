@@ -55,12 +55,11 @@ int SetArray(Array *array, Value *index, const Value &val) {
         if (!IsInt(index)) {
             break;
         }
-        int index = IndexOf(array->items, &val);
-        if (index < 0) {
+        int64_t index_of = index->i;
+        if (index_of > (int)array->items.size()) {
             break;
         }
-        array->items.emplace_back(val);
-        index = (int)array->items.size() - 1;
+        array->items.insert(array->items.begin()+index_of,val);
         ret = true;
         
     } while (0);

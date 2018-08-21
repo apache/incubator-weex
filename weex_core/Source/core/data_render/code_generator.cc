@@ -136,7 +136,10 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
     long caller = -1;
     size_t argc = 0;
     if (stms->callee().get() != NULL) {
-        caller = block_->NextRegisterId();
+      if (stms->callee()->IsIdentifier() && stms->callee()->AsIdentifier()->GetName() == "sizeof") {
+        LOGD("abc");
+      }
+      caller = block_->NextRegisterId();
         stms->callee()->Accept(this, &caller);
         argc = stms->args().size();
         if (block_->idx() > caller + 1) {
@@ -210,7 +213,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
         long arg = block_->NextRegisterId();
         temp->Accept(this, &arg);
     }
-    if (stms->args_expr()->IsArgumentList()) {
+    if (stms->args_expr() != nullptr && stms->args_expr()->IsArgumentList()) {
         Handle<ArgumentList> arg_list = stms->args_expr()->AsArgumentList();
         for (int i = 0; i < arg_list->length(); i++) {
             long arg = block_->NextRegisterId();
