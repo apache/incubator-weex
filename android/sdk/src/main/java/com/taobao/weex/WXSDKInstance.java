@@ -1129,22 +1129,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void onCreateFinish() {
     if (mContext != null) {
-      runOnUiThread(new Runnable() {
-
-        @Override
-        public void run() {
-          if ( mContext != null) {
-            onViewAppear();
-            View wxView= mRenderContainer;
-            if(mRenderListener != null) {
-              mRenderListener.onViewCreated(WXSDKInstance.this, wxView);
-            }
-            if (mStatisticsListener != null) {
-              mStatisticsListener.onFirstView();
-            }
-          }
-        }
-      });
+      onViewAppear();
+      View wxView= mRenderContainer;
+      if(mRenderListener != null) {
+        mRenderListener.onViewCreated(WXSDKInstance.this, wxView);
+      }
+      if (mStatisticsListener != null) {
+        mStatisticsListener.onFirstView();
+      }
     }
   }
 
@@ -1200,15 +1192,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void onRefreshSuccess(final int width, final int height) {
     WXLogUtils.renderPerformanceLog("onRefreshSuccess", (System.currentTimeMillis() - mRefreshStartTime));
     if (mRenderListener != null && mContext != null) {
-      runOnUiThread(new Runnable() {
-
-        @Override
-        public void run() {
-          if (mRenderListener != null && mContext != null) {
-            mRenderListener.onRefreshSuccess(WXSDKInstance.this, width, height);
-          }
-        }
-      });
+      mRenderListener.onRefreshSuccess(WXSDKInstance.this, width, height);
     }
   }
 

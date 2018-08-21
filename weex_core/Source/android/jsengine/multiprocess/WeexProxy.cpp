@@ -401,6 +401,7 @@ namespace WeexCore {
                 }
 
                 jobject jArg = env->GetObjectArrayElement(jargs, i);
+                if (jArg == nullptr) continue;
                 addParamsFromJArgs(params, param, serializer, env, jArg);
                 env->DeleteLocalRef(jArg);
             }
@@ -1095,6 +1096,7 @@ namespace WeexCore {
                 }
 
                 jobject jArg = env->GetObjectArrayElement(jargs, i);
+                if (jArg == nullptr) continue;
                 addParamsFromJArgs(params, param, serializer, env, jArg);
                 env->DeleteLocalRef(jArg);
             }
@@ -1193,7 +1195,6 @@ namespace WeexCore {
     WeexProxy::createInstanceContext(JNIEnv *env, jobject jcaller, jstring jinstanceid,
                                      jstring name,
                                      jstring jfunction, jobjectArray jargs) {
-
         // get temp data, such as js bundle
         jobject jArg = env->GetObjectArrayElement(jargs, 1);
         jfieldID jDataId = env->GetFieldID(jWXJSObject, "data", "Ljava/lang/Object;");
@@ -1220,9 +1221,6 @@ namespace WeexCore {
             std::string sourceStr = scriptChar.getChars();
             ScopedJStringUTF8 initDataChar(env, initData);
 
-            auto start_time = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
-            LOGE("DATA_RENDER, Wx start %lld",start_time);
-
             auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
             node_manager->CreatePage(sourceStr, idChar.getChars(), initDataChar.getChars());
 
@@ -1245,9 +1243,6 @@ namespace WeexCore {
             LOGE("native_createInstanceContext jargs format error");
             return false;
         }
-
-      auto start_time = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
-      LOGE("DATA_RENDER, Wx start %lld",start_time);
 
       if (js_server_api_functions != nullptr) {
             ScopedJStringUTF8 idChar(env, jinstanceid);
