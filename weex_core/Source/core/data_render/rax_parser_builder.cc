@@ -39,9 +39,9 @@ RAXParserBuilder::RAXParserBuilder(const std::string &content) :
     content_(content),
     context_{ make_unique<ParserContext>() },
     factory_{ ASTFactory::GetFactoryInstance() },
-    manager_{ make_unique<ScopeManager>(context_.get()) }
+    manager_{ make_unique<ScopeManager>(context_.get()) },
+    stream_(new StandardCharacterStream(content_))
 {
-    stream_ = make_unique<StandardCharacterStream>(content_);
     lex_ = make_unique<Tokenizer>(stream_.get(), context_.get());
     locator_ = make_unique<SourceLocator>(lex_.get());
     builder_ = make_unique<ASTBuilder>(context_.get(), factory_, locator_.get(), manager_.get());

@@ -29,6 +29,7 @@ namespace data_render {
 
 static Value isArray(ExecState *exec_state);
 static Value push(ExecState *exec_state);
+static Value slice(ExecState *exec_state);
     
 ClassDescriptor *NewClassArray() {
     ClassDescriptor *array_desc = new ClassDescriptor(nullptr);
@@ -85,17 +86,24 @@ Value GetArray(Array *array, const Value &index) {
 static Value push(ExecState *exec_state) {
     size_t length = exec_state->GetArgumentCount();
     if (length != 2) {
-        throw VMExecError("Argument Count Error For Array.push");
+        throw VMExecError("argument count error for Array.push");
     }
     Value *array = exec_state->GetArgument(0);
     Value *item = exec_state->GetArgument(1);
+    if (!IsArray(array)) {
+        throw VMExecError("caller isn't a Array");
+    }
+    if (IsNil(item)) {
+        throw VMExecError("Array.push item can't be nil");
+    }
+    ObjectValue<Array>(array)->items.push_back(*item);
     return Value();
 }
 
 static Value isArray(ExecState *exec_state) {
     size_t length = exec_state->GetArgumentCount();
     if (length != 1) {
-        throw VMExecError("Argument Count Error For Array.isArray");
+        throw VMExecError("argument count error for Array.isArray");
     }
     Value *array = exec_state->GetArgument(0);
     if (array->type == Value::Type::ARRAY) {
@@ -104,6 +112,25 @@ static Value isArray(ExecState *exec_state) {
     else {
         return Value(false);
     }
+}
+    
+static Value slice(ExecState *exec_state) {
+    Value ret;
+    do {
+        size_t argc = exec_state->GetArgumentCount();
+        if (argc != 3) {
+            throw VMExecError("argument count error for Array.slice");
+            break;
+        }
+        Value *array = exec_state->GetArgument(0);
+        if (!IsArray(array)) {
+            throw VMExecError("Array.slice caller isn't a Array");
+        }
+
+
+    } while (0);
+    
+    return ret;
 }
     
 }  // namespace data_render
