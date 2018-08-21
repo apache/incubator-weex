@@ -57,6 +57,7 @@ public:
     Handle<Expression> NewDeclaration(std::string name, Handle<Expression> init = nullptr);
     Handle<Expression> NewDeclaration(Handle<Expression> expr, Handle<Expression> init = nullptr);
     Handle<Expression> NewIntegralConstant(int value);
+    Handle<Expression> NewDoubleConstant(double value);
     // create a new node representing JavaScript prefix operation
     Handle<Expression> NewPrefixExpression(PrefixOperation op, Handle<Expression> expr);
     // create a new node representing JavaScript postfix operation

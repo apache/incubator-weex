@@ -36,7 +36,7 @@ class ExecState;
 class CodeGenerator : public ASTVisitor {
  public:
   CodeGenerator(ExecState *exec_state)
-      : exec_state_(exec_state), block_(nullptr) {}
+      : exec_state_(exec_state), block_(nullptr),func_(nullptr),class_(nullptr) {}
   ~CodeGenerator() {}
   void Visit(ChunkStatement *node, void *data) override;
   void Visit(StringConstant *node, void *data) override;

@@ -67,7 +67,7 @@ void ExecState::Compile() {
           expr = ParseProgram(parser);
       }
       catch (std::exception &e) {
-          auto error = dynamic_cast<Error *>(&e);
+          auto error = static_cast<Error *>(&e);
           if (error) {
               std::cerr << error->what() << std::endl;
           }
@@ -79,7 +79,7 @@ void ExecState::Compile() {
               generator.Visit(expr->AsChunkStatement().get(), nullptr);
           }
           catch (std::exception &e) {
-              auto error = dynamic_cast<Error *>(&e);
+              auto error = static_cast<Error *>(&e);
               if (error) {
                   std::cerr << error->what() << std::endl;
               }
@@ -100,7 +100,7 @@ void ExecState::Execute() {
   try {
       CallFunction(stack_->base(), 0, nullptr);
   } catch (std::exception &e) {
-      auto error = dynamic_cast<Error *>(&e);
+      auto error = static_cast<Error *>(&e);
       if (error) {
           std::cerr << error->what() << std::endl;
       }

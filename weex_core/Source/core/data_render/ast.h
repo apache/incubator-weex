@@ -363,6 +363,9 @@ class IntegralConstant : public Expression {
 
 class DoubleConstant : public Expression {
  public:
+  DoubleConstant(Position &loc, Scope *scope, double value)
+  : Expression(loc, scope), value_(value)
+      { }
   DoubleConstant(double value) : Expression(), value_(value) {}
   double value() { return value_; }
   DEFINE_NODE_TYPE(DoubleConstant, Expression);

@@ -55,20 +55,30 @@ set(COMMON_SRCS
    ./core/bridge/bridge.cpp
 
    ./core/data_render/ast.cc
+   ./core/data_render/ast_builder.cc
    ./core/data_render/ast_factory.cc
-   ./core/data_render/parser.cc
-   ./core/data_render/token.cc
+   ./core/data_render/class.cc
+   ./core/data_render/class_array.cc
+   ./core/data_render/class_factory.cc
    ./core/data_render/code_generator.cc
    ./core/data_render/exec_state.cc
-   ./core/data_render/vm.cc
+   ./core/data_render/object.cc
+   ./core/data_render/parser.cc
+   ./core/data_render/rax_jsx_ast.cc
+   ./core/data_render/rax_parser.cc
+   ./core/data_render/rax_parser_builder.cc
+   ./core/data_render/rax_parser_context.cc
+   ./core/data_render/rax_parser_scope.cc
+   ./core/data_render/rax_parser_statistics.cc
+   ./core/data_render/rax_source_locator.cc
    ./core/data_render/statement.cc
    ./core/data_render/string_table.cc
-   ./core/data_render/tokenizer.cc
-   ./core/data_render/expression_parser.cc
-   ./core/data_render/vm_mem.cc
-   ./core/data_render/object.cc
    ./core/data_render/table.cc
    ./core/data_render/table_factory.cc
+   ./core/data_render/token.cc
+   ./core/data_render/tokenizer.cc
+   ./core/data_render/vm.cc
+   ./core/data_render/vm_mem.cc
    ./core/data_render/vnode/vnode.cc
    ./core/data_render/vnode/vnode_exec_env.cc
    ./core/data_render/vnode/vnode_render_manager.cc

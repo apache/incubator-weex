@@ -22,12 +22,17 @@
 
 #include "core/data_render/rax_parser_context.h"
 #include "core/data_render/rax_parser_scope.h"
+#include <memory>
 
 namespace weex {
 namespace core {
 namespace data_render {
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
 
-ParserContext::ParserContext() : global_scope_{ std::make_unique<Scope>(nullptr, nullptr) }
+ParserContext::ParserContext() : global_scope_{ make_unique<Scope>(nullptr, nullptr) }
 { }
 
 Statistics &ParserContext::Counters() {

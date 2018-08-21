@@ -33,15 +33,57 @@ using namespace std::chrono;
 
 typedef steady_clock::time_point tp;
 
-static std::string OP_NAME[] = {"OP_MOVE","OP_LOADK","OP_LOADNULL",
-                         "OP_GETGLOBAL","OP_GETFUNC","OP_NEWTABLE",
-                         "OP_SETTABLE", "OP_GETTABLE","OP_ADD","OP_SUB",
-                         "OP_MUL","OP_MOD","OP_POW","OP_DIV",
-                         "OP_IDIV","OP_BAND","OP_BOR","OP_BXOR",
-                         "OP_SHL","OP_SHR","OP_UNM","OP_BNOT","OP_JMP",
-                         "OP_GOTO","OP_EQ","OP_LT","OP_LE","OP_CALL",
-                         "OP_RETURN0","OP_RETURN1","OP_INVALID",
-                         "OP_PRE_INCR","OP_PRE_DECR"};
+static std::string OP_NAME[] = {"OP_MOVE",
+                                "OP_LOADK",
+                                "OP_LOADNULL",
+
+                                "OP_GETGLOBAL",
+                                "OP_GETFUNC",
+                                "OP_NEWCLASS",
+
+                                "OP_GETCLASS",
+                                "OP_GETCLASSVAR",
+                                "OP_SETCLASSVAR",
+                                "OP_GETSUPER",
+
+                                "OP_SETVALUE",
+                                "OP_GETVALUE",
+                                "OP_NEWTABLE",
+                                "OP_SETTABLE",
+
+                                "OP_GETTABLE",
+                                "OP_SETARRAY",
+                                "OP_GETARRAY",
+                                "OP_ADD",
+
+                                "OP_SUB",
+                                "OP_MUL",
+                                "OP_MOD",
+                                "OP_POW",
+                                "OP_DIV",
+
+                                "OP_IDIV",
+                                "OP_BAND",
+                                "OP_BOR",
+                                "OP_BXOR",
+                                "OP_SHL",
+
+                                "OP_SHR",
+                                "OP_UNM",
+                                "OP_BNOT",
+
+                                "OP_JMP",
+                                "OP_GOTO",
+                                "OP_EQ",
+                                "OP_LT",
+                                "OP_LE",
+                                "OP_CALL",
+                                "OP_RETURN0",
+                                "OP_RETURN1",
+                                "OP_INVALID",
+                                "OP_PRE_INCR",
+                                "OP_PRE_DECR"
+};
 
 inline tp now() {
   return steady_clock::now();
@@ -94,7 +136,7 @@ typedef struct TimeCost {
 
   std::string tag = "Execute";
 
-  TimeCost(const char *tag) : tag(tag) {
+  TimeCost(const char* tag) : tag(tag) {
     fc_s = now();
   }
 
@@ -128,16 +170,16 @@ typedef struct TimeCost {
   inline void process() {
 
     total = getTimeMs(fc_s, fc_e);
-    total_ms = total / (float)1000000;
+    total_ms = total / (float) 1000000;
 
     for (OpCost oc : op_cost) {
 
       oc.count = 1;
       oc.total = oc.getCost();
-      oc.total_ms = oc.total / (float)1000000;
+      oc.total_ms = oc.total / (float) 1000000;
       oc.max = oc.getCost();
       oc.min = oc.getCost();
-      oc.max_ms = oc.max / (float)1000000;
+      oc.max_ms = oc.max / (float) 1000000;
 
       if (oc.op_index >= 0) {
         oc.op = OP_NAME[oc.op_index];
@@ -148,11 +190,11 @@ typedef struct TimeCost {
 
         it->second.count++;
         it->second.total += oc.total;
-        it->second.total_ms = it->second.total / (float)1000000;
+        it->second.total_ms = it->second.total / (float) 1000000;
 
         if (it->second.max < oc.max) {
           it->second.max = oc.max;
-          it->second.max_ms = oc.max / (float)1000000;
+          it->second.max_ms = oc.max / (float) 1000000;
         }
         if (it->second.min > oc.min) {
           it->second.min = oc.min;
@@ -174,11 +216,12 @@ typedef struct TimeCost {
     LOGE("There are %d OP_CODEs. Each OP_CODE Info:\n", op_cost.size());
 
     int i = 0;
-    for (auto &it : ret) {
-      LOGE("0x%02d:OP[%2d:%-12s] total:%lldns(%.2fms), count:%d, max:%lldns(%.2fms), min:%lldns, avg:%.2fns \n",
-           ++i, it.second.op_index, it.second.op.c_str(),
-           it.second.total, it.second.total_ms, it.second.count, it.second.max,
-           it.second.max_ms, it.second.min, it.second.getAvg());
+    for (auto& it : ret) {
+      LOGE(
+          "0x%02d:OP[%2d:%-12s] total:%lldns(%.2fms), count:%d, max:%lldns(%.2fms), min:%lldns, avg:%.2fns \n",
+          ++i, it.second.op_index, it.second.op.c_str(),
+          it.second.total, it.second.total_ms, it.second.count, it.second.max,
+          it.second.max_ms, it.second.min, it.second.getAvg());
     }
   }
 

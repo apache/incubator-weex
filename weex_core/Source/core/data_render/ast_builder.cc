@@ -93,7 +93,13 @@ Handle<Expression> ASTBuilder::NewIntegralConstant(int value)
     COUNT();
     return save(factory()->NewIntegralConstant(locator()->location(), manager()->current(), value));
 }
-    
+
+Handle<Expression> ASTBuilder::NewDoubleConstant(double value)
+{
+    COUNT();
+    return save(factory()->NewDoubleConstant(locator()->location(), manager()->current(), value));
+}
+
 Handle<Expression> ASTBuilder::NewPrefixExpression(PrefixOperation op, Handle<Expression> expr)
 {
     COUNT();

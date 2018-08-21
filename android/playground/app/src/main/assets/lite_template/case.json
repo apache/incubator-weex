@@ -1,0 +1,419 @@
+{
+  "styles": {
+    "wrapper": {
+      "justifyContent": "center",
+      "alignItems": "center"
+    },
+    "logo": {
+      "width": "424px",
+      "height": "200px"
+    },
+    "greeting": {
+      "textAlign": "center",
+      "marginTop": "70px",
+      "fontSize": "50px",
+      "color": "#41b883"
+    },
+    "message": {
+      "margin": "30px",
+      "fontSize": "32px",
+      "color": "#727272"
+    },
+    "listContainer": {
+      "width": "750",
+      "backgroundColor": "#ffffff",
+      "flexDirection": "column",
+      "alignItems": "stretch",
+      "marginTop": "17",
+      "marginBottom": "17"
+    },
+    "wfContainer": {
+      "width": "345",
+      "backgroundColor": "#ffffff",
+      "flexDirection": "column",
+      "alignItems": "stretch",
+      "borderRadius": "12",
+      "overflow": "hidden"
+    },
+    "listContentContainer": {
+      "flexDirection": "row",
+      "marginTop": "13",
+      "marginLeft": "24",
+      "marginRight": "24",
+      "marginBottom": "24",
+      "justifyContent": "space-between"
+    },
+    "wfContentContainer": {
+      "paddingBottom": "17",
+      "flexDirection": "column"
+    },
+    "titleContainer": {
+      "flexDirection": "row",
+      "alignItems": "center",
+      "justifyContent": "center",
+      "marginLeft": "32",
+      "marginRight": "32",
+      "height": "78"
+    },
+    "titleText": {
+      "fontSize": "28",
+      "color": "#333333",
+      "marginLeft": "12",
+      "marginRight": "12",
+      "paddingTop": "27",
+      "paddingBottom": "27"
+    },
+    "titleLine": {
+      "height": "2",
+      "backgroundColor": "#9b9b9b",
+      "width": "28"
+    },
+    "tagItem": {
+      "flexDirection": "column",
+      "alignItems": "center"
+    },
+    "tagImage": {
+      "width": "142",
+      "height": "110",
+      "borderRadius": "55"
+    },
+    "tagImageMask": {
+      "width": "142",
+      "height": "110",
+      "borderRadius": "55",
+      "backgroundColor": "rgba(0, 0, 0, 0.04)",
+      "position": "absolute",
+      "left": "0",
+      "top": "0"
+    },
+    "tagText": {
+      "fontSize": "24",
+      "marginTop": "12",
+      "lineHeight": "37",
+      "maxWidth": "145",
+      "color": "#4b4b4b"
+    },
+    "tagLine": {
+      "flexDirection": "row",
+      "marginLeft": "18",
+      "marginRight": "18",
+      "marginTop": "20",
+      "justifyContent": "space-between"
+    }
+  },
+  "data": {},
+  "body": {
+    "tagName": "div",
+    "nodeId": "1",
+    "classList": [
+      "wrapper"
+    ],
+    "childNodes": [
+      {
+        "tagName": "div",
+        "nodeId": "2",
+        "control": {
+          "match": "status.layoutStyle < 0.5"
+        },
+        "classList": [
+          "listContainer"
+        ],
+        "childNodes": [
+          {
+            "tagName": "div",
+            "nodeId": "3",
+            "classList": [
+              "titleContainer"
+            ],
+            "childNodes": [
+              {
+                "tagName": "div",
+                "nodeId": "4",
+                "classList": [
+                  "titleLine"
+                ]
+              },
+              {
+                "tagName": "text",
+                "nodeId": "5",
+                "classList": [
+                  "titleText"
+                ],
+                "attributes": {
+                  "value": {
+                    "@binding": "model.topic"
+                  }
+                }
+              },
+              {
+                "tagName": "div",
+                "nodeId": "6",
+                "classList": [
+                  "titleLine"
+                ]
+              }
+            ]
+          },
+          {
+            "tagName": "div",
+            "nodeId": "7",
+            "control": {
+              "match": "sizeof(model.tips) >= 4"
+            },
+            "classList": [
+              "listContentContainer"
+            ],
+            "childNodes": [
+              {
+                "tagName": "a",
+                "nodeId": "8",
+                "control": {
+                  "repeat": {
+                    "for": "slice(model.tips,0,4)",
+                    "alias": "tag",
+                    "iterator1": "i"
+                  }
+                },
+                "attributes": {
+                  "key": {
+                    "@binding": "i"
+                  },
+                  "href": {
+                    "@binding": "appendUrlParam(\"http://market.m.taobao.com/app/nx3/tmall_discovery?apiInfo=%7B%22apiName%22%3A%22mtop.taobao.wsearch.appsearch%22%2C%22apiVersion%22%3A%221.0%22%7D\",tag.params)"
+                  }
+                },
+                "classList": [
+                  "tagItem"
+                ],
+                "childNodes": [
+                  {
+                    "tagName": "img",
+                    "nodeId": "9",
+                    "classList": [
+                      "tagImage"
+                    ],
+                    "attributes": {
+                      "src": {
+                        "@binding": "tag.picUrl"
+                      }
+                    }
+                  },
+                  {
+                    "tagName": "div",
+                    "nodeId": "10",
+                    "classList": [
+                      "tagImageMask"
+                    ]
+                  },
+                  {
+                    "tagName": "text",
+                    "nodeId": "11",
+                    "classList": [
+                      "tagText"
+                    ],
+                    "attributes": {
+                      "lines": "1",
+                      "value": {
+                        "@binding": "tag.show"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tagName": "div",
+        "nodeId": "12",
+        "control": {
+          "match": "status.layoutStyle > 0.5"
+        },
+        "classList": [
+          "wfContainer"
+        ],
+        "childNodes": [
+          {
+            "tagName": "div",
+            "nodeId": "13",
+            "classList": [
+              "titleContainer"
+            ],
+            "childNodes": [
+              {
+                "tagName": "div",
+                "nodeId": "14",
+                "classList": [
+                  "titleLine"
+                ]
+              },
+              {
+                "tagName": "text",
+                "nodeId": "15",
+                "classList": [
+                  "titleText"
+                ],
+                "attributes": {
+                  "value": {
+                    "@binding": "model.topic"
+                  }
+                }
+              },
+              {
+                "tagName": "div",
+                "nodeId": "16",
+                "classList": [
+                  "titleLine"
+                ]
+              }
+            ]
+          },
+          {
+            "tagName": "div",
+            "nodeId": "17",
+            "control": {
+              "match": "sizeof(model.tips) >= 4"
+            },
+            "classList": [
+              "wfContentContainer"
+            ],
+            "childNodes": [
+              {
+                "tagName": "div",
+                "nodeId": "18",
+                "classList": [
+                  "tagLine"
+                ],
+                "childNodes": [
+                  {
+                    "tagName": "a",
+                    "nodeId": "19",
+                    "control": {
+                      "repeat": {
+                        "for": "slice(model.tips,0,2)",
+                        "alias": "tag",
+                        "iterator1": "i"
+                      }
+                    },
+                    "attributes": {
+                      "key": {
+                        "@binding": "i"
+                      },
+                      "href": {
+                        "@binding": "appendUrlParam(\"http://market.m.taobao.com/app/nx3/tmall_discovery?apiInfo=%7B%22apiName%22%3A%22mtop.taobao.wsearch.appsearch%22%2C%22apiVersion%22%3A%221.0%22%7D\",tag.params)"
+                      }
+                    },
+                    "classList": [
+                      "tagItem"
+                    ],
+                    "childNodes": [
+                      {
+                        "tagName": "img",
+                        "nodeId": "20",
+                        "classList": [
+                          "tagImage"
+                        ],
+                        "attributes": {
+                          "src": {
+                            "@binding": "tag.picUrl"
+                          }
+                        }
+                      },
+                      {
+                        "tagName": "div",
+                        "nodeId": "21",
+                        "classList": [
+                          "tagImageMask"
+                        ]
+                      },
+                      {
+                        "tagName": "text",
+                        "nodeId": "22",
+                        "classList": [
+                          "tagText"
+                        ],
+                        "attributes": {
+                          "lines": "1",
+                          "value": {
+                            "@binding": "tag.show"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "tagName": "div",
+                "nodeId": "23",
+                "classList": [
+                  "tagLine"
+                ],
+                "childNodes": [
+                  {
+                    "tagName": "a",
+                    "nodeId": "24",
+                    "control": {
+                      "repeat": {
+                        "for": "slice(model.tips,2,4)",
+                        "alias": "tag",
+                        "iterator1": "i"
+                      }
+                    },
+                    "attributes": {
+                      "key": {
+                        "@binding": "i"
+                      },
+                      "href": {
+                        "@binding": "appendUrlParam(\"http://market.m.taobao.com/app/nx3/tmall_discovery?apiInfo=%7B%22apiName%22%3A%22mtop.taobao.wsearch.appsearch%22%2C%22apiVersion%22%3A%221.0%22%7D\",tag.params)"
+                      }
+                    },
+                    "classList": [
+                      "tagItem"
+                    ],
+                    "childNodes": [
+                      {
+                        "tagName": "img",
+                        "nodeId": "25",
+                        "classList": [
+                          "tagImage"
+                        ],
+                        "attributes": {
+                          "src": {
+                            "@binding": "tag.picUrl"
+                          }
+                        }
+                      },
+                      {
+                        "tagName": "div",
+                        "nodeId": "26",
+                        "classList": [
+                          "tagImageMask"
+                        ]
+                      },
+                      {
+                        "tagName": "text",
+                        "nodeId": "27",
+                        "classList": [
+                          "tagText"
+                        ],
+                        "attributes": {
+                          "lines": "1",
+                          "value": {
+                            "@binding": "tag.show"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "components": []
+}

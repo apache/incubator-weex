@@ -20,12 +20,22 @@
 // Created by pengtao.pt on 2018/7/25.
 //
 
+#include <sstream>
 #include "core/data_render/ast.h"
 #include "core/data_render/ast_factory.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
+
+
+template <typename T>
+std::string to_string(T value)
+{
+    std::ostringstream os ;
+    os << value ;
+    return os.str() ;
+}
 
 uint64_t JSXNodeExpression::s_node_id_ = 0;
 
@@ -42,7 +52,7 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
             std::vector<Handle<Expression>> args;
             Handle<Expression> create_element_func_expr = factory->NewIdentifier("createElement");
             args.push_back(factory->NewStringConstant(name));
-            node_id_ = factory->NewStringConstant("vn_" + std::to_string(s_node_id_++));
+            node_id_ = factory->NewStringConstant("vn_" + to_string(s_node_id_++));
             args.push_back(node_id_);
             funcexprs_.push_back(factory->NewDeclaration("vnode_ptr", factory->NewCallExpression(create_element_func_expr, args)));
             if (props_) {
