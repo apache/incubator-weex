@@ -205,7 +205,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
   ThreadData td = { static_cast<int>(fd2), static_cast<IPCHandler *>(serverHandler) };
 
   pthread_attr_t threadAttr;
-  newThreadStatus = -1;
+  newThreadStatus = UNFINISH;
 
   pthread_attr_init(&threadAttr);
   pthread_t ipcServerThread;
