@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.component.WXComponent;
 
 /**
@@ -40,6 +41,7 @@ public class GraphicActionCreateFinish extends BasicGraphicAction {
         this.mLayoutWidth = (int) component.getLayoutWidth();
         this.mLayoutHeight = (int) component.getLayoutHeight();
     }
+    instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH);
 
     // todo add LayoutFinishListener
 //    final LayoutFinishListener listener;
