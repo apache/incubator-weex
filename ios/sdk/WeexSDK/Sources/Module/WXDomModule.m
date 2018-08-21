@@ -29,6 +29,7 @@
 #import "WXSDKInstance.h"
 #import "WXTracingManager.h"
 #import "WXRecycleListComponent.h"
+#import "WXCoreBridge.h"
 #import <objc/message.h>
 
 @interface WXDomModule ()
@@ -80,23 +81,29 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
 
 - (void)createFinish
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager createFinish];
-    }];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callCreateFinish:instanceId];
+    });
 }
 
 - (void)updateFinish
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager updateFinish];
-    }];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateFinish" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callUpdateFinish:instanceId];
+    });
 }
 
 - (void)refreshFinish
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager refreshFinish];
-    }];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"refreshFinish" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callRefreshFinish:instanceId];
+    });
 }
 
 - (void)scrollToElement:(NSString *)elemRef options:(NSDictionary *)dict

@@ -800,7 +800,7 @@ static NSThread *WXComponentThread;
     WXComponent *root = [_indexDict objectForKey:WX_SDK_ROOT_REF];
     
     [self _addUITask:^{
-        if(instance.updateFinish){
+        if (instance.updateFinish) {
             instance.updateFinish(root.view);
         }
     }];
@@ -814,7 +814,7 @@ static NSThread *WXComponentThread;
     WXComponent *root = [_indexDict objectForKey:WX_SDK_ROOT_REF];
     
     [self _addUITask:^{
-        if(instance.refreshFinish){
+        if (instance.refreshFinish) {
             instance.refreshFinish(root.view);
         }
     }];
@@ -827,7 +827,7 @@ static NSThread *WXComponentThread;
     WXSDKInstance *instance  = self.weexInstance;
     [self _addUITask:^{
         UIView *rootView = instance.rootView;
-        if(instance.renderFinish){
+        if (instance.renderFinish) {
             [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:@{@"threadName":WXTUIThread}];
             instance.renderFinish(rootView);
         }
