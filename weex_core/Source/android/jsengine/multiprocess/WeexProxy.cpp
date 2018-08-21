@@ -31,7 +31,6 @@
 #include <core/manager/weex_core_manager.h>
 #include <chrono>
 #include "core/data_render/vnode/vnode_render_manager.h"
-#include "core/data_render/expression_parser.h"
 
 
 const char *s_cacheDir;

@@ -391,7 +391,7 @@ Handle<Expression> RAXParser::ParseIndexExpression()
 double RAXParser::ParseNumber(const Token &token)
 {
     try {
-        double num = std::stod(token.view());
+        double num = std::strtod(token.view().c_str(), nullptr);
         return num;
     }
     catch(std::exception &e) {
@@ -1100,7 +1100,7 @@ Handle<Expression> RAXParser::ParseProgram()
             exprs->Insert(ParseStatement());
         }
     } catch (std::exception &e) {
-        auto error = dynamic_cast<SyntaxError*>(&e);
+        auto error = static_cast<SyntaxError*>(&e);
         
         if (error) {
             std::cerr << error->what() << " (" << error->token().position().row()

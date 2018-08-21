@@ -24,6 +24,7 @@
 #define DATA_RENDER_RAX_PARSER_STATISTICS_
 
 #include <vector>
+#include <memory>
 
 namespace weex {
 namespace core {

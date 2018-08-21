@@ -25,6 +25,15 @@ namespace weex {
 namespace core {
 namespace data_render {
 
+
+template <typename T>
+std::string to_string(T value)
+{
+  std::ostringstream os ;
+  os << value ;
+  return os.str() ;
+}
+
 int IndexOf(const std::vector<Value> *arr, const Value *val) {
   auto it = std::find(arr->begin(), arr->end(), val);
   if (it != arr->end()) {
@@ -164,7 +173,7 @@ json11::Json TableToJson(Table *table) {
             obj.insert(std::make_pair(iter->first, CStringValue(&iter->second)));
         }
         else if (iter->second.type == Value::Type::INT) {
-            obj.insert(std::make_pair(iter->first, std::to_string(IntValue(&iter->second))));
+            obj.insert(std::make_pair(iter->first, to_string(IntValue(&iter->second))));
         }
     }
     return json11::Json(obj);

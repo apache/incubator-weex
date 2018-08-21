@@ -31,6 +31,15 @@ namespace weex {
 namespace core {
 namespace data_render {
 
+
+template <typename T>
+std::string to_string(T value)
+{
+  std::ostringstream os ;
+  os << value ;
+  return os.str() ;
+}
+
 void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
 
 #if DEBUG
@@ -459,7 +468,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             int index = (int)GET_ARG_Bx(instruction);
             ValueRef *ref = exec_state->FindRef(index);
             if (!ref) {
-                throw VMExecError("Can't Find ValueRef " + std::to_string(index) + " [OP_SETVALUE]");
+                throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_SETVALUE]");
             }
             ref->value() = *a;
             break;
@@ -471,7 +480,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             int index = (int)GET_ARG_Bx(instruction);
             ValueRef *ref = exec_state->FindRef(index);
             if (!ref) {
-                throw VMExecError("Can't Find ValueRef " + std::to_string(index) + " [OP_GETVALUE]");
+                throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_GETVALUE]");
             }
             *a = ref->value();
             break;

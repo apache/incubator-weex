@@ -27,6 +27,15 @@
 namespace weex {
 namespace core {
 namespace data_render {
+
+template <typename T>
+std::string to_string(T value)
+{
+  std::ostringstream os ;
+  os << value ;
+  return os.str() ;
+}
+
 json11::Json ParseValue2Json(const Value& value);
 
 static Value Log(ExecState* exec_state) {
@@ -227,7 +236,7 @@ static Value SetProps(ExecState *exec_state) {
                             }
                             case Value::INT:
                             {
-                                node->SetStyle(iter_style->first, std::to_string(iter_style->second.i));
+                                node->SetStyle(iter_style->first, to_string(iter_style->second.i));
                                 break;
                             }
                             default:
@@ -246,7 +255,7 @@ static Value SetProps(ExecState *exec_state) {
                     }
                     case Value::INT:
                     {
-                        node->SetAttribute(iter->first, std::to_string(iter->second.i));
+                        node->SetAttribute(iter->first, to_string(iter->second.i));
                         break;
                     }
                     default:
