@@ -664,7 +664,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (self.onScroll) {
         self.onScroll(scrollView);
     }
-    if (_scrollEvent) {
+    if (_scrollEvent || _scrollEventListener) {
         CGFloat distance = 0;
         if (_scrollDirection == WXScrollDirectionHorizontal) {
             distance = scrollView.contentOffset.x - _lastScrollEventFiredOffset.x;
@@ -724,7 +724,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    if (_scrollEndEvent) {
+    if (_scrollEndEvent || _scrollEventListener) {
         if (!_isScrolling) {
             CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
             NSDictionary *contentSizeData = @{@"width":@(scrollView.contentSize.width / scaleFactor),
