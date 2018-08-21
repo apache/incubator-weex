@@ -108,26 +108,29 @@ static JSContext *jsContext;
             __componentId++;
             dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
             [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:templateId type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(JSValue *value) {
-                [newData addEntriesFromDictionary:[value toArray][0]];
                 [newData setObject:indexPath forKey:@"indexPath"];
                 [newData setObject:listRef forKey:@"recycleListComponentRef"];
-                [[recycleListComponent dataManager] updateVirtualComponentData:self->_virtualComponentId data:newData];
+                if ([[value toArray][0] isKindOfClass:[NSDictionary class]]) {
+                    NSMutableDictionary *virtualComponentData = [value toArray][0];
+                    [virtualComponentData setObject:indexPath forKey:@"indexPath"];
+                    [[recycleListComponent dataManager] updateVirtualComponentData:self->_virtualComponentId data:virtualComponentData];
+                    [newData addEntriesFromDictionary:virtualComponentData];
+                }
                 dispatch_semaphore_signal(semaphore);
             }];
             dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
             
             [self _refsConventFromData:newData];
-            NSIndexPath *indexPath = newData[@"indexPath"];
-            NSUInteger position = [indexPath indexAtPosition:1];
-            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_virtualComponentId type:@"lifecycle" hook:@"attach" args:@[@{@"virtualComponentId":self->_virtualComponentId,@"position":@(position),@"refs":self->_virtualElementInfo[@"refs"]?:@{}}] competion:nil];
+            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_virtualComponentId type:@"lifecycle" hook:@"attach" args:@[@{@"virtualComponentId":self->_virtualComponentId,@"position":@(indexPath.row),@"refs":self->_virtualElementInfo[@"refs"]?:@{}}] competion:nil];
             if ([newData count]) {
                 data = newData;
             }
         } else {
             NSDictionary *virtualComponentData = [recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath templateId:templateId];
-            newData[@"virtualComponentId"] = self->_virtualComponentId;
-            [newData setObject:listRef forKey:@"recycleListComponentRef"];
             [newData addEntriesFromDictionary:virtualComponentData];
+            newData[@"virtualComponentId"] = self->_virtualComponentId;
+            [newData setObject:indexPath forKey:@"indexPath"];
+            [newData setObject:listRef forKey:@"recycleListComponentRef"];
             data = newData;
         }
     }
@@ -420,7 +423,9 @@ static JSContext *jsContext;
                 if (memberExpression->is<WXJSIdentifier>()) {
                     NSString *propertyName = [NSString stringWithCString:(((WXJSStringLiteral *)member->property)->value).c_str() encoding:[NSString defaultCStringEncoding]];
                     *needUpdate = objectNeedUpdate;
-                    return object[propertyName];
+                    if ([object isKindOfClass:[NSDictionary class]]) {
+                        return object[propertyName];
+                    }
                 } else {
                     id retvalue = [self bindingBlockWithExpression:member->property](object, &objectNeedUpdate);
                     *needUpdate = objectNeedUpdate || propertyNeedUpdate;
