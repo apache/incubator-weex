@@ -349,10 +349,10 @@ void AndroidSide::PostMessage(const char *vm_id, const char *data) {
   wml_bridge_->PostMessage(env, vm_id, data);
 }
 
-void AndroidSide::DispatchMessage(const char *client_id, const char *vm_id,
-                                  const char *data, const char *callback) {
+void AndroidSide::DispatchMessage(const char *client_id,
+                                  const char *data, const char *callback, const char *vm_id) {
   JNIEnv *env = base::android::AttachCurrentThread();
-  wml_bridge_->DispatchMessage(env, client_id, vm_id, data, callback);
+  wml_bridge_->DispatchMessage(env, client_id, data, callback, vm_id);
 }
 
 jobject AndroidSide::getMeasureFunc(const char *pageId, jlong renderObjectPtr) {

@@ -857,8 +857,8 @@ std::unique_ptr<IPCResult> HandleDispatchMessage(IPCArguments *arguments) {
             WeexCoreManager::Instance()
                 ->script_bridge()
                 ->core_side()
-                ->DispatchMessage(clientId.get(), vmId.get(), dataS.get(),
-                                  callbackS.get());
+                ->DispatchMessage(clientId.get(), dataS.get(),
+                                  callbackS.get(), vmId.get());
           }));
   return createInt32Result(static_cast<int32_t>(true));
 }

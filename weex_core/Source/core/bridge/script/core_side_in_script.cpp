@@ -430,7 +430,7 @@ void CoreSideInScript::DispatchMessage(const char *client_id, const char *data,
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
-      ->DispatchMessage(client_id, vm_id, data, callback);
+      ->DispatchMessage(client_id, data, callback, vm_id);
 }
 
 void CoreSideInScript::ReportException(const char *page_id, const char *func,

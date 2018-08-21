@@ -105,8 +105,8 @@ class AndroidSide : public PlatformBridge::PlatformSide {
       const char* pageId, const char* ref,
       std::vector<std::pair<std::string, std::string>>* style) override;
   void PostMessage(const char* vm_id, const char* data) override;
-  void DispatchMessage(const char* client_id, const char* vm_id,
-                       const char* data, const char* callback) override;
+  void DispatchMessage(const char* client_id,
+                       const char* data, const char* callback, const char* vm_id) override;
 
   jobject getMeasureFunc(const char* pageId, jlong renderObjectPtr);
 

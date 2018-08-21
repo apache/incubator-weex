@@ -250,9 +250,9 @@ void WMLBridge::PostMessage(JNIEnv* env, const char* vm_id, const char* data) {
   }
 }
 
-void WMLBridge::DispatchMessage(JNIEnv* env, const char* client_id,
-                                const char* vm_id, const char* data,
-                                const char* callback) {
+void WMLBridge::DispatchMessage(JNIEnv* env, const char* client_id, const char* data,
+                                const char* callback,
+                                const char* vm_id) {
   if (jni_object() != NULL) {
     auto jni_client_id = base::android::ScopedLocalJavaRef<jstring>(
         env, newJString(env, client_id));

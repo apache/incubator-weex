@@ -219,8 +219,8 @@ class PlatformBridge {
         const char* pageId, const char* ref,
         std::vector<std::pair<std::string, std::string>>* style) = 0;
     virtual void PostMessage(const char* vm_id, const char* data) = 0;
-    virtual void DispatchMessage(const char* client_id, const char* vm_id,
-                                 const char* data, const char* callback) = 0;
+    virtual void DispatchMessage(const char* client_id,
+                                 const char* data, const char* callback, const char* vm_id) = 0;
 
     inline PlatformBridge* bridge() { return bridge_; }
 
