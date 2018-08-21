@@ -198,4 +198,11 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
  * @abstract handleStyle will be add to a queue to be executed every frame, but handleStyleOnMainThread will switch to main thread and execute imediately, you can call this for your execution time sequence.
  */
 - (void)handleStyleOnMainThread:(NSDictionary*)styles forComponent:(WXComponent *)component isUpdateStyles:(BOOL)isUpdateStyles;
+
+///--------------------------------------
+/// @name Enumerating
+///--------------------------------------
+
+- (void)enumerateComponentsUsingBlock:(void (^)(WXComponent *, BOOL *stop))block;
+
 @end

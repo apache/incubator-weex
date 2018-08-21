@@ -986,6 +986,40 @@ static NSThread *WXComponentThread;
     }
 }
 
+#pragma mark Enumerating
+
+- (void)enumerateComponentsUsingBlock:(void (^)(WXComponent *, BOOL *stop))block
+{
+    if (block == nil || _rootComponent == nil) {
+        return;
+    }
+    
+    NSMutableArray* components = [[NSMutableArray alloc] init];
+    [components addObject:_rootComponent];
+    
+    while ([components count] > 0) {
+        BOOL stop = NO;
+        
+        NSArray* thisLevelComponents = [components copy];
+        [components removeAllObjects];
+        
+        // enumerate thisLevelComponents and add next level components to components
+        for (WXComponent* c in thisLevelComponents) {
+            block(c, &stop);
+            if (stop) {
+                break;
+            }
+            
+            for (WXComponent* nextLevelComponent in c->_subcomponents) {
+                [components addObject:nextLevelComponent];
+            }
+        }
+        
+        if (stop) {
+            break;
+        }
+    }
+}
 
 @end
 
