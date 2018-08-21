@@ -230,6 +230,10 @@ Handle<Expression> ASTFactory::NewCallExpression(Position &loc, Scope *scope, Me
     return MakeHandle<CallExpression>(loc, scope, kind, func, args);
 }
     
+Handle<Expression> ASTFactory::NewCallExpression(Position &loc, Scope *scope, Handle<Expression>func, Handle<Expression> args) {
+    return MakeHandle<CallExpression>(loc, scope, func, args);
+}
+    
 Handle<Expression> ASTFactory::NewNullConstant(Position &loc, Scope *scope)
 {
     return MakeHandle<NullConstant>(loc, scope);

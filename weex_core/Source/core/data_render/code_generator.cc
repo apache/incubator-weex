@@ -145,7 +145,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
             func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, reg_old_caller, 0));
         }
     }
-    else if (stms->expr().get() && stms->member().get()) {
+    else if (stms->expr().get()) {
         if (class_ && stms->expr()->IsIdentifier() && stms->expr()->AsIdentifier()->GetName() == "super")
         {
             ClassDescriptor *class_desc = ObjectValue<ClassDescriptor>(class_->class_value());
@@ -165,8 +165,8 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
             long arg_super = block_->NextRegisterId();
             func_state->AddInstruction(CREATE_ABC(OP_GETSUPER, arg_super, reg_this, caller));
             argc++;
-            if (stms->member()->IsArgumentList()) {
-                Handle<ArgumentList> arg_list = stms->member()->AsArgumentList();
+            if (stms->args_expr()->IsArgumentList()) {
+                Handle<ArgumentList> arg_list = stms->args_expr()->AsArgumentList();
                 for (int i = 0; i < arg_list->length(); i++) {
                     long arg = block_->NextRegisterId();
                     arg_list->args()->raw_list()[i]->Accept(this, &arg);
@@ -175,7 +175,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
             }
         }
         else {
-            if (stms->expr()->IsIdentifier()) {
+            if (stms->expr()->IsIdentifier() && stms->member() && stms->member()->IsIdentifier()) {
                 long reg_member = block_->NextRegisterId();
                 auto value = exec_state_->string_table_->StringFromUTF8(stms->member()->AsIdentifier()->GetName());
                 int tableIndex = func_state->AddConstant(std::move(value));
@@ -210,8 +210,8 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
                         argc++;
                     }                    
                 }
-                if (stms->member()->IsArgumentList()) {
-                    Handle<ArgumentList> arg_list = stms->member()->AsArgumentList();
+                if (stms->args_expr()->IsArgumentList()) {
+                    Handle<ArgumentList> arg_list = stms->args_expr()->AsArgumentList();
                     for (int i = 0; i < arg_list->length(); i++) {
                         long arg = block_->NextRegisterId();
                         arg_list->args()->raw_list()[i]->Accept(this, &arg);

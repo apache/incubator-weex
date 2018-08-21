@@ -84,6 +84,8 @@ class ASTFactory {
         virtual Handle<Expression> NewIdentifier(Position &loc, Scope *scope, std::string name);
         virtual Handle<Expression> NewArgumentList(Position &loc, Scope *scope, Handle<ExpressionList>);
         virtual Handle<Expression> NewCallExpression(Position &loc, Scope *scope, MemberAccessKind kind, Handle<Expression> func, Handle<Expression> args);
+        virtual Handle<Expression> NewCallExpression(Position &loc, Scope *scope, Handle<Expression>func, Handle<Expression> args);
+
         virtual Handle<Expression> NewMemberExpression(Position &loc, Scope *scope, MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> mem);
         virtual Handle<Expression> NewNullConstant(Position &loc, Scope *scope);
         virtual Handle<Expression> NewStringConstant(Position &loc, Scope *scope, std::string str);

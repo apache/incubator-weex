@@ -70,6 +70,8 @@ public:
     Handle<Expression> NewArgumentList(Handle<ExpressionList> arg);
     // create a new node representing JavaScript member call
     Handle<Expression> NewCallExpression(MemberAccessKind kind, Handle<Expression> func, Handle<Expression> args);
+    // create a new node representing JavaScript member call
+    Handle<Expression> NewCallExpression(Handle<Expression> callee, Handle<Expression> args_expr);
     // create a new node representing JavaScript member expression
     Handle<Expression> NewMemberExpression(MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> args);
     // create a new node representing JavaScript Comma Expression

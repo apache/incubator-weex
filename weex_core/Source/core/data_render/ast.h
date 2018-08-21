@@ -425,8 +425,11 @@ class MemberExpression : public Expression {
 class CallExpression : public Expression {
  public:
   CallExpression(Position &loc, Scope *scope, MemberAccessKind kind,
-                   Handle<Expression> expr, Handle<Expression> member)
-    : Expression(loc, scope), kind_{ kind }, expr_(expr), member_(member)
+                   Handle<Expression> expr, Handle<Expression> args_expr)
+    : Expression(loc, scope), kind_{ kind }, expr_(expr), args_expr_(args_expr)
+    { }
+  CallExpression(Position &loc, Scope *scope, Handle<Expression> callee, Handle<Expression> args_expr)
+    : Expression(loc, scope), kind_{MemberAccessKind::kCall}, callee_(callee), args_expr_(args_expr)
     { }
   CallExpression(MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> member, std::vector<Handle<Expression>> args)
       : Expression(), kind_{kind}, expr_(expr), member_(member), args_{std::move(args)} {}
@@ -434,6 +437,7 @@ class CallExpression : public Expression {
       : Expression(), kind_{MemberAccessKind::kCall}, callee_(callee), args_{std::move(args)} {}
   Handle<Expression> member() { return member_; }
   Handle<Expression> callee() { return callee_; }
+  Handle<Expression> args_expr() { return args_expr_; }
   std::vector<Handle<Expression>>& args() { return args_; }
   MemberAccessKind kind() { return kind_; }
   Handle<Expression> expr() { return expr_; }
@@ -446,6 +450,7 @@ class CallExpression : public Expression {
   Handle<Expression> expr_;
   Handle<Expression> member_;
   Handle<Expression> callee_;
+  Handle<Expression> args_expr_;
   std::vector<Handle<Expression>> args_;
 };
 

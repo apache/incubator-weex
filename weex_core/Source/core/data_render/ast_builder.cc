@@ -131,11 +131,15 @@ Handle<Expression> ASTBuilder::NewArgumentList(Handle<ExpressionList> args)
     return save(factory()->NewArgumentList(locator()->location(), manager()->current(), args));
 }
 
-Handle<Expression> ASTBuilder::NewCallExpression(MemberAccessKind kind,
-                                                 Handle<Expression> func, Handle<Expression> args)
+Handle<Expression> ASTBuilder::NewCallExpression(MemberAccessKind kind, Handle<Expression> func, Handle<Expression> args)
 {
     COUNT();
     return save(factory()->NewCallExpression(locator()->location(), manager()->current(), kind, func, args));
+}
+    
+Handle<Expression> ASTBuilder::NewCallExpression(Handle<Expression> callee, Handle<Expression> args_expr) {
+    COUNT();
+    return save(factory()->NewCallExpression(locator()->location(), manager()->current(), callee, args_expr));
 }
     
 Handle<Expression> ASTBuilder::NewMemberExpression(MemberAccessKind kind,
