@@ -408,7 +408,7 @@ Handle<Expression> RAXParser::ParsePrimary()
         result = builder()->NewNullConstant();
     }
     else if (tok == Token::NUMBER) {
-        result = builder()->NewIntegralConstant(ParseNumber(lex()->CurrentToken()));
+        result = builder()->NewDoubleConstant(ParseNumber(lex()->CurrentToken()));
     }
     else if (tok == Token::TEMPLATE) {
         // can't support

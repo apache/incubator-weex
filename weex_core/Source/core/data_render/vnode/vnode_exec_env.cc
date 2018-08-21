@@ -65,6 +65,8 @@ static Value GetTableSize(ExecState* exec_state) {
     Value* value = exec_state->GetArgument(0);
     if (IsTable(value)) {
       return Value(static_cast<int64_t>(GetTableSize(ObjectValue<Table>(value))));
+    } else if ((IsArray(value))){
+      return Value(static_cast<int64_t>(GetValueArraySize(*value)));
     }
   }
   return Value(static_cast<int64_t>(-1));
@@ -124,7 +126,7 @@ static Value Slice(ExecState* exec_state) {
     v_start = v_end;
   }
   Value new_value = exec_state->table_factory()->CreateTable();
-  //TableArrayAddAll(*table, new_value, v_start, v_end);
+  ArrayAddAll(*table, new_value, v_start, v_end);
   return new_value;
 }
 
@@ -297,11 +299,11 @@ void RegisterCFunc(ExecState* state, const std::string& name,
   func.cf = reinterpret_cast<void*>(function);
   state->global()->Add(name, func);
 }
-    
+
 void RegisterClass(ExecState *state, const std::string& name, Value value) {
     state->global()->Add(name, value);
 }
-    
+
 void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   // log
   RegisterCFunc(state, "log", Log);
@@ -397,7 +399,7 @@ json11::Json ParseValue2Json(const Value& value) {
       continue;
     }
   }
-  
+
   return json11::Json(object);
 }
 

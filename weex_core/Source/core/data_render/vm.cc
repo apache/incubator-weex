@@ -503,8 +503,8 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         }
         Value* ret = GetTabValue(reinterpret_cast<Table *>(b->gc), *c);
         if (!IsNil(ret)) {
-            Table *table = ObjectValue<Table>(ret);
-            LOGD("[OP_GETTABLE]:%s\n", TableToString(table).c_str());
+//            Table *table = ObjectValue<Table>(ret);
+//            LOGD("[OP_GETTABLE]:%s\n", TableToString(table).c_str());
             *a = *ret;
         }
         else {

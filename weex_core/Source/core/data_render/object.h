@@ -447,15 +447,15 @@ inline int ToBool(const Value *o, bool &b) {
     return 1;
 }
 
-//inline void TableArrayAddAll(Value &src, Value &dest, int start, int end) {
-//  Table *st = ObjectValue<Table>(&src);
-//  Table *dt = ObjectValue<Table>(&dest);
-//  st->array.insert(st->array.end(), dt->array.begin() + start, end > 0 ? dt->array.begin() + end : dt->array.end());
-//}
-//
-//inline void TableArrayAddAll(Value &src, Value &dest) {
-//  TableArrayAddAll(src, dest, 0, 0);
-//}
+inline void ArrayAddAll(Value &src, Value &dest, int start, int end) {
+  Array *st = ObjectValue<Array>(&src);
+  Array *dt = ObjectValue<Array>(&dest);
+  st->items.insert(st->items.end(), dt->items.begin() + start, end > 0 ? dt->items.begin() + end : dt->items.end());
+}
+
+inline void ArrayAddAll(Value &src, Value &dest) {
+  ArrayAddAll(src, dest, 0, 0);
+}
 
 inline void TableMapAddAll(Value &src, Value &dest) {
   Table *st = ObjectValue<Table>(&src);

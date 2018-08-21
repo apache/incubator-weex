@@ -205,6 +205,10 @@ Handle<Expression> ASTFactory::NewIntegralConstant(Position &loc, Scope *scope, 
 {
     return MakeHandle<IntegralConstant>(loc, scope, value);
 }
+Handle<Expression> ASTFactory::NewDoubleConstant(Position &loc, Scope *scope, double value)
+{
+    return MakeHandle<DoubleConstant>(loc, scope, value);
+}
     
 Handle<Expression> ASTFactory::NewNewExpression(Position &loc, Scope *scope, Handle<Expression> expr)
 {
