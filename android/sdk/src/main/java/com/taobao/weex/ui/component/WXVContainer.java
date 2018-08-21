@@ -312,8 +312,8 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       getRealView().addView(child, index);
     }
     WXSDKInstance instance = getInstance();
-    if (null != instance && instance.getExceptionRecorder().hasAddView.compareAndSet(false,true)){
-      instance.getExceptionRecorder().errorList.clear();
+    if (null != instance){
+      instance.getExceptionRecorder().hasAddView.set(true);
     }
   }
 

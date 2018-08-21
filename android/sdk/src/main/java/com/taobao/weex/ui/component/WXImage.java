@@ -296,7 +296,7 @@ public class WXImage extends WXComponent<ImageView> {
     }
   }
 
-  private void setRemoteSrc(Uri rewrited,int blurRadius) {
+  private void setRemoteSrc(Uri rewrited, int blurRadius) {
 
     WXImageStrategy imageStrategy = new WXImageStrategy(getInstanceId());
     imageStrategy.isClipping = true;
@@ -307,6 +307,7 @@ public class WXImage extends WXComponent<ImageView> {
     imageStrategy.blurRadius = Math.max(0, blurRadius);
     this.mBlurRadius = blurRadius;
 
+    final String rewritedStr = rewrited.toString();
     imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
       @Override
       public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
@@ -327,7 +328,7 @@ public class WXImage extends WXComponent<ImageView> {
             fireEvent(Constants.Event.ONLOAD, params);
           }
         }
-        monitorImgSize(imageView);
+        monitorImgSize(imageView,rewritedStr);
       }
     });
 
@@ -344,7 +345,7 @@ public class WXImage extends WXComponent<ImageView> {
     imageStrategy.instanceId = getInstanceId();
     IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
     if (imgLoaderAdapter != null) {
-      imgLoaderAdapter.setImage(rewrited.toString(), getHostView(),
+      imgLoaderAdapter.setImage(rewritedStr, getHostView(),
           getImageQuality(), imageStrategy);
     }
   }
@@ -454,7 +455,8 @@ public class WXImage extends WXComponent<ImageView> {
     });
   }
 
-  private void monitorImgSize(ImageView imageView){
+  private String preImgUrlStr = "";
+  private void monitorImgSize(ImageView imageView,String currentImgUrlStr){
     if (null == imageView){
       return;
     }
@@ -467,9 +469,16 @@ public class WXImage extends WXComponent<ImageView> {
     if (null == params || null ==img){
       return;
     }
+    int imgHeight = img.getIntrinsicHeight();
+    int imgWidth = img.getIntrinsicWidth();
+    if (!preImgUrlStr.equals(currentImgUrlStr) && imgHeight > 1920 && imgWidth > 1080){
+      preImgUrlStr = currentImgUrlStr;
+      instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_LARGE_IMG_COUNT,1);
+    }
 
-    if (img.getIntrinsicHeight() * img.getIntrinsicWidth() > imageView.getMeasuredHeight() *
-            imageView.getMeasuredWidth()){
+
+    if (imgHeight * imgHeight > imageView.getMeasuredHeight() *
+            imageView.getMeasuredWidth() +10){
       instance.getWXPerformance().wrongImgSizeCount++;
       instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,1);
     }

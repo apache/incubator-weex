@@ -2174,15 +2174,15 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
 
-  /** component key id in native,
-   *  differ with ref, ref + position
+  /** component uniquie key id in native for recycle-list,
+   *  should be unique for every native component differ with ref
    *  */
   public  String getViewTreeKey(){
     if(mViewTreeKey == null){
       if(getParent() == null){
-        mViewTreeKey = getRef();
+        mViewTreeKey = hashCode() + "_" + getRef();
       }else{
-        mViewTreeKey = getRef() + "_" + getParent().indexOf(this);
+        mViewTreeKey = hashCode() + "_" + getRef() + "_" + getParent().indexOf(this);
       }
     }
     return mViewTreeKey;

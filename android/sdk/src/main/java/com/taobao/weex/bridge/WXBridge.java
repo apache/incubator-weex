@@ -34,6 +34,7 @@ import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
 
 import java.io.Serializable;
@@ -197,14 +198,6 @@ public class WXBridge implements IWXBridge {
       WXLogUtils.e(TAG, "callNative throw exception:" + e.getMessage());
     }
 
-    if (null != instance){
-      instance.getApmForInstance().updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_CALL_NATIVE_NUM,1);
-      instance.getApmForInstance().updateFSDiffStats(
-          WXInstanceApm.KEY_PAGE_STATS_FS_CALL_NATIVE_TIME,
-          System.currentTimeMillis()-start
-      );
-    }
-
     if (WXEnvironment.isApkDebugable()) {
       if (errorCode == IWXBridge.DESTROY_INSTANCE) {
         WXLogUtils.w("destroyInstance :" + instanceId + " JSF must stop callNative");
@@ -234,6 +227,7 @@ public class WXBridge implements IWXBridge {
   @CalledByNative
   public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
     try {
+      long start = WXUtils.getFixUnixTime();
       JSONArray argArray = null;
       if (arguments != null)
         argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
@@ -257,7 +251,17 @@ public class WXBridge implements IWXBridge {
         }
 
       }
+
       Object object = WXBridgeManager.getInstance().callNativeModule(instanceId, module, method, argArray, optionsObj);
+
+      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if (null != instance){
+        instance.getApmForInstance().updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_CALL_NATIVE_NUM,1);
+        instance.getApmForInstance().updateFSDiffStats(
+            WXInstanceApm.KEY_PAGE_STATS_FS_CALL_NATIVE_TIME,
+            WXUtils.getFixUnixTime()-start
+        );
+      }
       return WXWsonJSONSwitch.toWsonOrJsonWXJSObject(object);
     }catch (Exception e){
       WXLogUtils.e(TAG,  e);
