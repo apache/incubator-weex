@@ -316,8 +316,19 @@ int CoreSideInPlatform::RefreshInstance(
   auto node_manager =
       weex::core::data_render::VNodeRenderManager::GetInstance();
   // First check if page is rendered with data render strategy.
+
+  if(params.size() < 2)
+    return false;
+
+  if(params[1]->value.string->length <= 0)
+    return false;
+
   char *init_data =
-      reinterpret_cast<char *>(params[1]->value.string->content[0]);
+      reinterpret_cast<char *>(params[1]->value.string->content);
+
+  if(init_data == nullptr)
+    return false;
+
   if (node_manager->RefreshPage(instanceId, init_data)) {
     return true;
   }
