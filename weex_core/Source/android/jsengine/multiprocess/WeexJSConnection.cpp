@@ -140,8 +140,13 @@ struct ThreadData {
     int ipcServerFd;
     IPCHandler *ipcServerHandler;
 };
-static volatile bool finish = false;
-
+// -1 unFinish, 0 error, 1 success
+enum NewThreadStatus {
+    UNFINISH,
+    ERROR,
+    SUCCESS
+};
+static volatile int newThreadStatus = UNFINISH;
 
 static void *newIPCServer(void *_td) {
     ThreadData *td = static_cast<ThreadData *>(_td);
@@ -150,7 +155,9 @@ static void *newIPCServer(void *_td) {
     if (base == MAP_FAILED) {
         int _errno = errno;
         close(td->ipcServerFd);
-        throw IPCException("failed to map ashmem region: %s", strerror(_errno));
+        //throw IPCException("failed to map ashmem region: %s", strerror(_errno));
+        newThreadStatus = ERROR;
+        return nullptr;
     }
 
     IPCHandler *handler = td->ipcServerHandler;
@@ -159,7 +166,7 @@ static void *newIPCServer(void *_td) {
     const std::unique_ptr<IPCHandler> &testHandler = createIPCHandler();
     std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), handler));
     std::unique_ptr<IPCListener> listener =std::move(createIPCListener(futexPageQueue.get(), handler)) ;
-    finish = true;
+    newThreadStatus = SUCCESS;
 
     try {
       futexPageQueue->spinWaitPeer();
@@ -198,13 +205,17 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
   ThreadData td = { static_cast<int>(fd2), static_cast<IPCHandler *>(serverHandler) };
 
   pthread_attr_t threadAttr;
-  finish = false;
+  newThreadStatus = -1;
 
   pthread_attr_init(&threadAttr);
   pthread_t ipcServerThread;
   int i = pthread_create(&ipcServerThread, &threadAttr, newIPCServer, &td);
-  while (!finish) {
+  while (newThreadStatus == UNFINISH) {
     continue;
+  }
+
+  if(newThreadStatus == ERROR) {
+    throw IPCException("failed to map ashmem region: %s");
   }
 
   //before process boot up, we prapare a crash file for child process
