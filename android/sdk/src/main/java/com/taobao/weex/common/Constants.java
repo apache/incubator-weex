@@ -26,6 +26,12 @@ public class Constants {
     int VERTICAL = 1;
   }
 
+  public interface Weex {
+    String REF = "ref";
+    String INSTANCEID = "instanceid";
+    String TYPE = "type";
+  }
+
   public interface Name {
 
     String DEFAULT_WIDTH = "defaultWidth";
@@ -84,6 +90,8 @@ public class Constants {
     String BORDER_BOTTOM_STYLE = "borderBottomStyle";
     String BORDER_LEFT_STYLE = "borderLeftStyle";
     String BORDER_TOP_STYLE = "borderTopStyle";
+    String BOX_SHADOW = "boxShadow";
+    String SHADOW_QUALITY = "shadowQuality";
 
     String POSITION = "position";
 
@@ -106,8 +114,10 @@ public class Constants {
     String FILTER = "filter";
     String QUALITY = "quality";
     String SRC = "src";
+    String SOURCE = "source";
     String PLACE_HOLDER = "placeHolder";
     String RESIZE_MODE = "resizeMode";
+    String AUTO_RECYCLE = "autoBitmapRecycle";
     String SHOW_INDICATORS = "showIndicators";
     String AUTO_PLAY = "autoPlay";
     String SCROLL_DIRECTION = "scrollDirection";
@@ -117,10 +127,13 @@ public class Constants {
     String LOADMOREOFFSET = "loadmoreoffset";
     String RECYCLE_IMAGE = "recycleImage";
     String LAYOUT = "layout";
-    String COLUMN_WIDTH= "columnWidth";
-    String COLUMN_COUNT= "columnCount";
-    String COLUMN_GAP= "columnGap";
-    String SHOW_SCROLLBAR= "showScrollbar";
+    String SPAN_OFFSETS = "spanOffsets";
+    String COLUMN_WIDTH = "columnWidth";
+    String COLUMN_COUNT = "columnCount";
+    String COLUMN_GAP = "columnGap";
+    String SHOW_SCROLLBAR = "showScrollbar";
+    String LEFT_GAP= "leftGap";
+    String RIGHT_GAP= "rightGap";
     String OVERFLOW = "overflow";
     String TYPE = "type";
     String PLACEHOLDER = "placeholder";
@@ -152,6 +165,7 @@ public class Constants {
     String OFFSET_X_ACCURACY = "offsetXAccuracy";
     String OFFSET_X_RATIO = "offsetXRatio";
     String ELEVATION = "elevation";
+    String PERSPECTIVE = "perspective";
     String SCROLLABLE = "scrollable";
     String DRAGGABLE = "draggable";
     String DISTANCE_Y = "dy";
@@ -169,6 +183,10 @@ public class Constants {
     String OFFSET = "offset";
     String ANIMATED = "animated";
     String STABLE = "stable";
+    String TRANSFORM = "transform";
+    String TRANSFORM_ORIGIN = "transformOrigin";
+    String KEEP_INDEX = "keepIndex";
+    String KEEP_SELECTION_INDEX = "keepSelectionIndex";
 
     String INSERT_CELL_ANIMATION = "insertAnimation";
     String DELETE_CELL_ANIMATION = "deleteAnimation";
@@ -176,6 +194,57 @@ public class Constants {
     String NORMAL = "normal";
     String ARIA_LABEL = "ariaLabel";
     String ARIA_HIDDEN = "ariaHidden";
+    String ROLE = "role";
+
+    String LAYERLIMIT = "layerLimit";
+    String LAYER_LIMIT = "layer-limit";
+
+    String DIRECTION = "direction";
+    String RTL = "rtl";
+
+    String STICKY_OFFSET = "stickyOffset";
+    String HAS_FIXED_SIZE = "hasFixedSize";
+    String KEEP_POSITION_LAYOUT_DELAY = "keepPositionLayoutDelay";
+
+    String OVERFLOW_HIDDEN_HEIGHT = "overflowHiddenHeight";
+    String OVERFLOW_HIDDEN_WIDTH = "overflowHiddenWidth";
+
+    String PRIORITY  = "priority";
+
+    String STRATEGY  = "strategy";
+
+    String ALLOW_COPY_PASTE = "allowCopyPaste";
+    String INCLUDE_FONT_PADDING = "includeFontPadding";
+    String ENABLE_COPY = "enableCopy";
+
+    String PAGE_ENABLED = "pagingEnabled";
+
+
+
+    interface  Recycler{
+      String LIST_DATA = "listData";
+      String LIST_DATA_ITEM  ="alias";
+      String LIST_DATA_ITEM_INDEX = "index";
+      String LIST_DATA_TEMPLATE_SWITCH_KEY = "switch";
+      String SLOT_TEMPLATE_CASE = "case";
+      String SLOT_TEMPLATE_DEFAULT = "default";
+      String CELL_INDEX = "cellIndex";
+      String TYPE_INDEX = "typeIndex";
+    }
+
+
+    String VIF_FALSE = "ifFalse";
+    String UNDEFINED = "undefined";
+    String FLAT = "flat";
+    String RIPPLE_ENABLED = "rippleEnabled";
+
+    String SHOULD_STOP_PROPAGATION_INIT_RESULT = "shouldStopPropagationInitResult";
+    String SHOULD_STOP_PROPAGATION_INTERVAL = "shouldStopPropagationInterval";
+
+
+    String NEST_SCROLLING_ENABLED = "nestedScrollingEnabled";
+
+    String ORIENTATION  = "orientation";
   }
 
   public interface Value {
@@ -186,8 +255,8 @@ public class Constants {
     int AUTO = -1;
     int COLUMN_GAP_NORMAL = 32;
     int COLUMN_COUNT_NORMAL = 1;
-    String MULTI_COLUMN= "multi-column";
-    String GRID= "grid";
+    String MULTI_COLUMN = "multi-column";
+    String GRID = "grid";
     String STICKY = "sticky";
     String FIXED = "fixed";
     String LEFT = "left";
@@ -220,6 +289,8 @@ public class Constants {
 
     String NONE = "none";
     String DEFAULT = "default";
+
+    String HORIZONTAL = "horizontal";
   }
 
   public interface Event {
@@ -248,11 +319,32 @@ public class Constants {
     String ONPULLING_DOWN = "pullingdown";
     String ONPULLING_UP = "pullingup";
     String SCROLL = "scroll";
+    String SCROLL_START = "scrollstart";
+    String SCROLL_END = "scrollend";
     String CLICKBACKITEM = "clickbackitem";
     String RESUME_EVENT = "WXApplicationDidBecomeActiveEvent";
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
     String RETURN = "return";
     String KEYBOARD = "keyboard";
+
+    String UNSTICKY = "unsticky";
+    String STICKY = "sticky";
+
+    String ON_TRANSITION_END = "transitionEnd";
+
+    String LAYEROVERFLOW = "layeroverflow";
+
+    interface SLOT_LIFECYCLE {
+      String CREATE = "create";
+      String ATTACH = "attach";
+      String DETACH = "detach";
+      String DESTORY = "destroy";
+    }
+
+    String STOP_PROPAGATION = "stopPropagation";
+    String STOP_PROPAGATION_RAX = "stoppropagation";
+    String ONMESSAGE = "message";
+    String NATIVE_BACK = "nativeback";
   }
 
   public interface PSEUDO {
@@ -268,6 +360,7 @@ public class Constants {
     String HTTPS = "https";
     String HTTP = "http";
     String LOCAL = "local";
+    String DATA = "data";
   }
 
   public interface CodeCache {
@@ -276,5 +369,14 @@ public class Constants {
     String PATH = "codeCachePath";
     String BANNER_DIGEST = "digest";
     String SAVE_PATH = "v8";
+  }
+
+  public interface TimeFunction {
+    String LINEAR = "linear";
+    String EASE_IN_OUT = "ease-in-out";
+    String EASE_IN = "ease-in";
+    String EASE_OUT = "ease-out";
+    String EASE = "ease";
+    String CUBIC_BEZIER = "cubic-bezier";
   }
 }

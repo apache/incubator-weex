@@ -113,6 +113,12 @@
     [self _renderWithURL:_sourceURL];
 }
 
+
+- (void)addEdgePop
+{
+    self.navigationController.interactivePopGestureRecognizer.delegate = self;
+}
+
 - (void)_renderWithURL:(NSURL *)sourceURL
 {
     if (!sourceURL) {
@@ -120,11 +126,10 @@
     }
     
     [_instance destroyInstance];
-    if([WXPrerenderManager isTaskExist:[self.sourceURL absoluteString]]){
+    _instance = [[WXSDKInstance alloc] init];
+    if([WXPrerenderManager isTaskReady:[self.sourceURL absoluteString]]){
         _instance = [WXPrerenderManager instanceFromUrl:self.sourceURL.absoluteString];
     }
-
-    _instance = [[WXSDKInstance alloc] init];
     _instance.frame = CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, self.view.bounds.size.height);
     _instance.pageObject = self;
     _instance.pageName = sourceURL.absoluteString;
@@ -154,7 +159,7 @@
         [weakSelf _updateInstanceState:WeexInstanceAppear];
     };
     
-    if([WXPrerenderManager isTaskExist:[self.sourceURL absoluteString]]){
+    if([WXPrerenderManager isTaskReady:[self.sourceURL absoluteString]]){
         WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, _instance);
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, _instance);
         WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, _instance);

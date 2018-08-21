@@ -25,7 +25,7 @@
 
 #define WXPickerHeight 266
 
-@interface WXDatePickerManager()
+@interface WXDatePickerManager() <UIGestureRecognizerDelegate>
 
 @property(nonatomic,strong)UIDatePicker *datePicker;
 @property(nonatomic,strong)UIView *backgroudView;
@@ -46,6 +46,9 @@
         {
             self.backgroudView = [self createBackgroundView];
             UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
+            if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0") && WX_SYS_VERSION_LESS_THAN(@"11.1")) {
+                tapGesture.delegate = self;
+            }
             [self.backgroudView addGestureRecognizer:tapGesture];
         }
         
@@ -150,6 +153,7 @@
 {
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     [window addSubview:self.backgroudView];
+    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, self.datePicker);
     if(self.isAnimating)
     {
         return;
@@ -178,6 +182,13 @@
         self.backgroudView.hidden = YES;
         self.isAnimating = NO;
         [self.backgroudView removeFromSuperview];
+        
+        // move focus to original view;
+        if ([self.delegate isKindOfClass:[WXComponent class]]) {
+            UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, ((WXComponent*)self.delegate).view);
+        }else if ([self.delegate isKindOfClass:[UIView class]]) {
+            UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, (UIView*)self.delegate);
+        }
     }];
 }
 
@@ -201,6 +212,14 @@
         [self.delegate fetchDatePickerValue:value];
     }
     
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if (self.datePickerView && [touch.view isDescendantOfView:self.datePickerView]) {
+        return NO;
+    }
+    return YES;
 }
 
 @end

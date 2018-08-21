@@ -29,13 +29,12 @@ describe('slider infinite scroll', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  before(function () {
+  beforeEach(function () {
     return util.init(driver)
-      .get(util.getPage('/slider-infinite.js'))
-      .waitForElementById('txt1',util.getGETActionWaitTimeMills(),1000)
+      .get(util.getPage('/components/slider-infinite.js'))
   });
 
-  after(function () {
+  afterEach(function () {
       return util.quit(driver);
   })
 
@@ -43,6 +42,7 @@ describe('slider infinite scroll', function () {
   it('#1 waiting for auto play', () => {
     return driver
     .sleep(5000)
+    .waitForElementById('txt1',util.getGETActionWaitTimeMills(),1000)
     .elementById('txt1')
     .text()
     .then((text)=>{

@@ -38,6 +38,7 @@ import android.widget.TextView;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -76,7 +77,6 @@ public class WXPickersModule extends WXModule {
     private static final String KEY_SELECTION_COLOR = "selectionColor";
 
     private int selected;
-    private View selectedView;
 
     @JSMethod
     public void pick(Map<String, Object> options, JSCallback callback) {
@@ -148,8 +148,8 @@ public class WXPickersModule extends WXModule {
                             callback.invoke(ret);
                         }
                     }
-                }
-        );
+                },
+                options);
     }
 
     private void performPickDate(Map<String, Object> options, final JSCallback callback) {
@@ -176,35 +176,44 @@ public class WXPickersModule extends WXModule {
                             callback.invoke(ret);
                         }
                     }
-                });
+                },
+                options);
 
     }
 
-    private void performSinglePick(List<String> items, final Map<String, Object> options, final JSCallback callback) {
+    private void performSinglePick(final List<String> items, final Map<String, Object> options, final JSCallback callback) {
         selected = getOption(options, KEY_INDEX, 0);
         final int textColor = getColor(options, KEY_TEXT_COLOR, Color.TRANSPARENT);
+        final int selectionColor = getColor(options, KEY_SELECTION_COLOR, Color.TRANSPARENT);
+        final ArrayAdapter adapter = new ArrayAdapter<String>(
+            mWXSDKInstance.getContext(),
+            android.R.layout.simple_list_item_single_choice,
+            items) {
+            @NonNull
+            @Override
+            public View getView(int position, View convertView, @Nullable ViewGroup parent) {
+                View itemView =  super.getView(position, convertView, parent);
 
+                if (itemView != null && itemView instanceof Checkable) {
+                    boolean needSelected = position == selected;
+                    ((Checkable) itemView).setChecked(needSelected);
+
+                    if (needSelected) {
+                        itemView.setBackgroundColor(selectionColor);
+                    } else {
+                        itemView.setBackgroundColor(Color.TRANSPARENT);
+                    }
+                }
+
+                if (itemView instanceof TextView && textColor != Color.TRANSPARENT) {
+                    ((TextView) itemView).setTextColor(textColor);
+                }
+
+                return itemView;
+            }
+        };
         final AlertDialog dialog =  new AlertDialog.Builder(mWXSDKInstance.getContext())
-                .setAdapter(
-                        new ArrayAdapter<String>(
-                                mWXSDKInstance.getContext(),
-                                android.R.layout.simple_list_item_single_choice,
-                                items) {
-                            @NonNull
-                            @Override
-                            public View getView(int position, View convertView, @Nullable ViewGroup parent) {
-                                View itemView =  super.getView(position, convertView, parent);
-                                if (position == selected) {
-                                    selectedView = itemView;
-                                }
-
-                                if (itemView instanceof TextView && textColor != Color.TRANSPARENT) {
-                                    ((TextView) itemView).setTextColor(textColor);
-                                }
-
-                                return itemView;
-                            }
-                        } , null)
+                .setAdapter(adapter, null)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -236,39 +245,14 @@ public class WXPickersModule extends WXModule {
 
         final ListView listView = dialog.getListView();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            private View previousView;
-            private int selectionColor = getColor(options, KEY_SELECTION_COLOR, Color.TRANSPARENT);
-
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selected = position;
-                if (previousView == view) {
-                    return;
-                }
-                if (previousView != null) {
-                    previousView.setBackgroundColor(Color.TRANSPARENT);
-                    if (previousView instanceof Checkable) {
-                        ((Checkable) previousView).toggle();
-                    }
-                }
-                if (view instanceof Checkable) {
-                    ((Checkable) view).toggle();
-                }
-                view.setBackgroundColor(selectionColor);
-                previousView = view;
+                adapter.notifyDataSetChanged();
             }
         });
 
-        listView.post(new Runnable() {
-            @Override
-            public void run() {
-                if (selectedView != null) {
-                    listView.performItemClick(selectedView, selected, selectedView.getId());
-                }
-            }
-        });
-
-        dialog.getWindow().getDecorView().post(new Runnable() {
+        dialog.getWindow().getDecorView().post(WXThread.secure(new Runnable() {
             @Override
             public void run() {
                 Button confirm = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
@@ -302,7 +286,7 @@ public class WXPickersModule extends WXModule {
                     }
                 }
             }
-        });
+        }));
 
         dialog.show();
     }

@@ -35,9 +35,9 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.WXCirclePageAdapter;
 import com.taobao.weex.ui.view.WXCircleViewPager;
@@ -63,10 +63,13 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   Map<String, Object> params = new HashMap<>();
   private float offsetXAccuracy = 0.1f;
   private int initIndex = -1;
+  private boolean keepIndex = false;
+  private Runnable initRunnable;
+
 
   public static class Creator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXSlider(instance, node, parent);
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXSlider(instance, parent, basicComponentData);
     }
   }
 
@@ -92,20 +95,20 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   protected OnPageChangeListener mPageChangeListener = new SliderPageChangeListener();
 
   @Deprecated
-  public WXSlider(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent);
+  public WXSlider(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
-  public WXSlider(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
-    super(instance, node, parent);
+  public WXSlider(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
 
   @Override
   protected FrameLayout initComponentHostView(@NonNull Context context) {
     FrameLayout view = new FrameLayout(context);
     // init view pager
-    if (getDomObject() != null && getDomObject().getAttrs() != null) {
-      Object obj = getDomObject().getAttrs().get(INFINITE);
+    if (getAttrs() != null) {
+      Object obj = getAttrs().get(INFINITE);
       isInfinite = WXUtils.getBoolean(obj, true);
     }
     FrameLayout.LayoutParams pagerParams = new FrameLayout.LayoutParams(
@@ -174,7 +177,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   }
 
   @Override
-  protected void addSubView(View view, int index) {
+  public void addSubView(View view, int index) {
     if (view == null || mAdapter == null) {
       return;
     }
@@ -185,10 +188,23 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     mAdapter.addPageView(view);
     hackTwoItemsInfiniteScroll();
     if (initIndex != -1 && mAdapter.getRealCount() > initIndex) {
-      mViewPager.setCurrentItem(initIndex);
-      initIndex = -1;
+      if(initRunnable == null){
+        initRunnable = new Runnable() {
+          @Override
+          public void run() {
+            initIndex = getInitIndex();
+            mViewPager.setCurrentItem(initIndex);
+            initIndex = -1;
+            initRunnable = null;
+          }
+        };
+      }
+      mViewPager.removeCallbacks(initRunnable);
+      mViewPager.postDelayed(initRunnable, 50);
     } else {
-      mViewPager.setCurrentItem(0);
+      if (!keepIndex) {
+        mViewPager.setCurrentItem(0);
+      }
     }
     if (mIndicator != null) {
       mIndicator.getHostView().forceLayout();
@@ -219,6 +235,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   @Override
   public void onActivityResume() {
+    super.onActivityResume();
     if (mViewPager != null && mViewPager.isAutoScroll()) {
       mViewPager.startAutoScroll();
     }
@@ -226,6 +243,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   @Override
   public void onActivityStop() {
+    super.onActivityStop();
     if (mViewPager != null) {
       mViewPager.pauseAutoScroll();
     }
@@ -245,6 +263,20 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     }
 
   }
+
+
+  private int getInitIndex(){
+    Object index = getAttrs().get(Constants.Name.INDEX);
+    int select = WXUtils.getInteger(index, initIndex);
+    if(mAdapter == null || mAdapter.getCount() == 0){
+      return  0;
+    }
+    if(select >= mAdapter.getRealCount()){
+      select = select%mAdapter.getRealCount();
+    }
+    return select;
+  }
+
 
   @Override
   protected boolean setProperty(String key, Object param) {
@@ -288,6 +320,9 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       case Constants.Name.SCROLLABLE:
         boolean scrollable = WXUtils.getBoolean(param, true);
         setScrollable(scrollable);
+        return true;
+      case Constants.Name.KEEP_INDEX:
+        this.keepIndex = WXUtils.getBoolean(param, false);
         return true;
     }
     return super.setProperty(key, param);
@@ -365,9 +400,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   @WXComponentProp(name = Constants.Name.SCROLLABLE)
   public void setScrollable(boolean scrollable) {
     if (mViewPager != null && mAdapter != null) {
-      if(mAdapter.getRealCount() > 0){
-        mViewPager.setScrollable(scrollable);
-      }
+      mViewPager.setScrollable(scrollable);
     }
   }
 
@@ -402,11 +435,11 @@ public class WXSlider extends WXVContainer<FrameLayout> {
         return;
       }
 
-      if (getDomObject().getEvents().size() == 0) {
+      if (getEvents().size() == 0) {
         return;
       }
-      WXEvent event = getDomObject().getEvents();
-      String ref = getDomObject().getRef();
+      WXEvent event = getEvents();
+      String ref = getRef();
       if (event.contains(Constants.Event.CHANGE) && WXViewUtils.onScreenArea(getHostView())) {
         params.put(INDEX, realPosition);
 

@@ -20,6 +20,9 @@ package com.taobao.weex.ui.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -31,7 +34,6 @@ import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.WXLogUtils;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 
 /**
@@ -39,6 +41,7 @@ import java.lang.reflect.Field;
 @SuppressLint("HandlerLeak")
 public class WXCircleViewPager extends ViewPager implements WXGestureObservable {
 
+  private final int SCROLL_TO_NEXT = 1;
   private WXGesture wxGesture;
   private boolean isAutoScroll;
   private long intervalTime = 3 * 1000;
@@ -46,8 +49,18 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   private boolean needLoop = true;
   private boolean scrollable = true;
   private int mState = ViewPager.SCROLL_STATE_IDLE;
-
-  private Runnable scrollAction = new ScrollAction(this);
+  private Handler mAutoScrollHandler = new Handler(Looper.getMainLooper()) {
+    @Override
+    public void handleMessage(Message msg) {
+      if (msg.what == SCROLL_TO_NEXT) {
+        WXLogUtils.d("[CircleViewPager] trigger auto play action");
+        showNextItem();
+        this.sendEmptyMessageDelayed(SCROLL_TO_NEXT, intervalTime);
+        return;
+      }
+      super.handleMessage(msg);
+    }
+  };
 
   @SuppressLint("NewApi")
   public WXCircleViewPager(Context context) {
@@ -99,11 +112,11 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
       Field scroller = ViewPager.class.getDeclaredField("mScroller");
       scroller.setAccessible(true);
       Field interpolator = ViewPager.class
-          .getDeclaredField("sInterpolator");
+              .getDeclaredField("sInterpolator");
       interpolator.setAccessible(true);
 
       mScroller = new WXSmoothScroller(getContext(),
-          (Interpolator) interpolator.get(null));
+              (Interpolator) interpolator.get(null));
       scroller.set(this, mScroller);
     } catch (Exception e) {
       WXLogUtils.e("[CircleViewPager] postInitViewPager: ", e);
@@ -126,15 +139,23 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   }
 
   @Override
+  public boolean onInterceptTouchEvent(MotionEvent ev) {
+    try {
+      return scrollable && super.onInterceptTouchEvent(ev);
+    } catch (IllegalArgumentException e) {
+      e.printStackTrace();
+    } catch (ArrayIndexOutOfBoundsException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  @Override
   public boolean onTouchEvent(MotionEvent ev) {
     if(!scrollable) {
       return true;
     }
-    boolean result = super.onTouchEvent(ev);
-    if (wxGesture != null) {
-      result |= wxGesture.onTouch(this, ev);
-    }
-    return result;
+    return super.onTouchEvent(ev);
   }
 
   @Override
@@ -149,12 +170,12 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
    */
   public void startAutoScroll() {
     isAutoScroll = true;
-    removeCallbacks(scrollAction);
-    postDelayed(scrollAction, intervalTime);
+    mAutoScrollHandler.removeCallbacksAndMessages(null);
+    mAutoScrollHandler.sendEmptyMessageDelayed(SCROLL_TO_NEXT, intervalTime);
   }
 
   public void pauseAutoScroll(){
-    removeCallbacks(scrollAction);
+    mAutoScrollHandler.removeCallbacksAndMessages(null);
   }
 
   /**
@@ -162,7 +183,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
    */
   public void stopAutoScroll() {
     isAutoScroll = false;
-    removeCallbacks(scrollAction);
+    mAutoScrollHandler.removeCallbacksAndMessages(null);
   }
 
   public boolean isAutoScroll() {
@@ -215,25 +236,38 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     switch (ev.getAction()) {
       case MotionEvent.ACTION_DOWN:
       case MotionEvent.ACTION_MOVE:
-        removeCallbacks(scrollAction);
+        mAutoScrollHandler.removeCallbacksAndMessages(null);
         break;
       case MotionEvent.ACTION_UP:
       case MotionEvent.ACTION_CANCEL:
         if (isAutoScroll()) {
-          postDelayed(scrollAction, intervalTime);
+          mAutoScrollHandler.sendEmptyMessageDelayed(SCROLL_TO_NEXT, intervalTime);
         }
         break;
     }
-    return super.dispatchTouchEvent(ev);
+    try{
+      boolean result = super.dispatchTouchEvent(ev);
+      if (wxGesture != null) {
+        result |= wxGesture.onTouch(this, ev);
+      }
+      return result;
+    }catch (Exception e){
+      return  false;
+    }
   }
 
   public void destory() {
-
+    mAutoScrollHandler.removeCallbacksAndMessages(null);
   }
 
   @Override
   public void registerGestureListener(WXGesture wxGesture) {
     this.wxGesture = wxGesture;
+  }
+
+  @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
   }
 
   public int getRealCurrentItem() {
@@ -290,30 +324,6 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
       superSetCurrentItem(0, true);
     } else {
       superSetCurrentItem(superGetCurrentItem() + 1, true);
-    }
-  }
-
-  @Override
-  protected void onDetachedFromWindow() {
-    super.onDetachedFromWindow();
-    removeCallbacks(scrollAction);
-  }
-
-  private static final class ScrollAction implements Runnable {
-    private WeakReference<WXCircleViewPager> targetRef;
-    private ScrollAction(WXCircleViewPager target) {
-      this.targetRef = new WeakReference<>(target);
-    }
-
-    @Override
-    public void run() {
-      WXLogUtils.d("[CircleViewPager] trigger auto play action");
-      WXCircleViewPager target;
-      if ((target = targetRef.get()) != null) {
-        target.showNextItem();
-        target.removeCallbacks(this);
-        target.postDelayed(this, target.getIntervalTime());
-      }
     }
   }
 }

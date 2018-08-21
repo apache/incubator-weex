@@ -19,6 +19,14 @@
 
 #import "WXRootView.h"
 #import "WXSDKInstance.h"
+#import "WXPageEventNotifyEvent.h"
+#import "WXSDKEngine.h"
+
+@interface WXRootView()
+
+@property (nonatomic, assign) BOOL mHasEvent;
+
+@end
 
 @implementation WXRootView
 
@@ -34,6 +42,21 @@
     if (shouldNotifyLayout && _instance.onLayoutChange) {
         _instance.onLayoutChange(self);
     }
+}
+
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
+{
+    _mHasEvent = TRUE;
+    id<WXPageEventNotifyEventProtocol> pageEventNotify = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
+    if ([pageEventNotify respondsToSelector:@selector(hitTest:withEvent:withView:)]){
+        [pageEventNotify hitTest:point withEvent:event withView:self];
+    }
+    return [super hitTest:point withEvent:event];
+}
+
+- (BOOL)isHasEvent
+{
+    return _mHasEvent;
 }
 
 @end

@@ -20,6 +20,7 @@
 #import "WXView.h"
 #import "WXComponent.h"
 #import "WXLayer.h"
+#import "WXComponent_internal.h"
 
 @implementation WXView
 
@@ -59,6 +60,14 @@
     }
     
     return nil;
+}
+
+- (BOOL)accessibilityPerformMagicTap
+{
+    if (self.wx_component->_accessibilityMagicTapEvent) {
+        [self.wx_component fireEvent:@"accessibilityMagicTap" params:nil];
+    }
+    return [super accessibilityPerformMagicTap];
 }
 
 @end

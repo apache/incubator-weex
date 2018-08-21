@@ -120,6 +120,22 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     }
 }
 
+- (void)setLeftGap:(float)leftGap
+{
+    if (_leftGap != leftGap) {
+        _leftGap = leftGap;
+        [self _cleanComputed];
+    }
+}
+
+- (void)setRightGap:(float)rightGap
+{
+    if (_rightGap != rightGap) {
+        _rightGap = rightGap;
+        [self _cleanComputed];
+    }
+}
+
 - (CGFloat)computedColumnWidth
 {
     if (!_computedColumnWidth && !_computedColumnCount) {
@@ -182,18 +198,28 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
         }
         
         // cells
-        for (NSInteger item = 0; item < [self.collectionView numberOfItemsInSection:section]; item++) {
-            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
-            CGFloat itemHeight = [self.delegate collectionView:self.collectionView layout:self heightForItemAtIndexPath:indexPath];
-            UICollectionViewLayoutAttributes *itemAttributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
-            NSUInteger column = [self _minHeightColumnForAllColumns];
-            CGFloat x = insets.left + (columnWidth + columnGap) * column;
-            CGFloat y = [self.columnsMaxHeights[column] floatValue];
-            itemAttributes.frame = CGRectMake(x, y, columnWidth, itemHeight);
-            cellAttributes[indexPath] = itemAttributes;
-            
-            self.columnsMaxHeights[column] = @(CGRectGetMaxY(itemAttributes.frame));
+        
+        @try {
+            for (NSInteger item = 0; item < [self.collectionView numberOfItemsInSection:section]; item++) {
+                NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
+                CGFloat itemHeight = [self.delegate collectionView:self.collectionView layout:self heightForItemAtIndexPath:indexPath];
+                UICollectionViewLayoutAttributes *itemAttributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
+                NSUInteger column = [self _minHeightColumnForAllColumns];
+                CGFloat x = insets.left + (columnWidth + columnGap) * column+_leftGap;
+                if (column >= [self.columnsMaxHeights count]) {
+                    return;
+                }
+                CGFloat y = [self.columnsMaxHeights[column] floatValue];
+                itemAttributes.frame = CGRectMake(x, y, columnWidth, itemHeight);
+                cellAttributes[indexPath] = itemAttributes;
+                
+                self.columnsMaxHeights[column] = @(CGRectGetMaxY(itemAttributes.frame));
+            }
+        } @catch (NSException *exception) {
+            WXLog(@"%@", exception);
+        } @finally {
         }
+        
         
         currentHeight = [self _maxHeightForAllColumns];
         [self _columnsReachToHeight:currentHeight];
@@ -271,6 +297,11 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 {
     if ([elementKind isEqualToString:kCollectionSupplementaryViewKindHeader]) {
         UICollectionViewLayoutAttributes *attributes = self.layoutAttributes[kMultiColumnLayoutHeader][@(indexPath.section)];
+        if (!attributes) {
+            attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:elementKind withIndexPath:indexPath];
+            attributes.frame = CGRectZero;
+            attributes.hidden = YES;
+        }
         WXLogDebug(@"return header attributes:%@ for index path:%@", attributes, indexPath);
         
         return attributes;
@@ -332,7 +363,8 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     
     int columnCount;
     float columnWidth ;
-    float availableWidth = self.contentWidth - (insets.left + insets.right);
+    float availableWidth = self.contentWidth - (insets.left + insets.right+_leftGap + _rightGap);
+    
     computeColumnWidthAndCount(availableWidth, self.columnCount, self.columnWidth, self.columnGap, &columnCount, &columnWidth);
     if (availableWidth <= 0) {
         return;

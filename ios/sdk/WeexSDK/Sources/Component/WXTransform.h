@@ -32,6 +32,7 @@
 @property (nonatomic, strong, readonly) WXLength *translateY;
 @property (nonatomic, assign, readonly) float scaleX;
 @property (nonatomic, assign, readonly) float scaleY;
+@property (nonatomic, assign) float perspective;
 
 - (instancetype)initWithCSSValue:(NSString *)cssValue origin:(NSString *)origin instance:(WXSDKInstance *)instance;
 

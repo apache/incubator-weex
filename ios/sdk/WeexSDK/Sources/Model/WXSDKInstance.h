@@ -22,6 +22,8 @@
 #import "WXJSExceptionInfo.h"
 #import "WXResourceResponse.h"
 #import "WXResourceRequest.h"
+#import "WXBridgeProtocol.h"
+#import "WXApmForInstance.h"
 
 extern NSString *const bundleUrlOptionKey;
 
@@ -73,6 +75,8 @@ extern NSString *const bundleUrlOptionKey;
  * Which indicates current instance needs to be prerender or not,default value is false.
  **/
 @property (nonatomic, assign) BOOL needPrerender;
+
+@property (nonatomic , strong) NSDictionary* containerInfo;
 
 /**
  * The state of current instance.
@@ -133,11 +137,30 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, copy) void (^refreshFinish)(UIView *);
 
 /**
+ * bundleType is the DSL type
+ */
+@property (nonatomic, strong) NSString * bundleType;
+
+/**
  *  The callback triggered when the instance fails to render.
  *
  *  @return A block that takes a NSError argument, which is the error occured
  **/
 @property (nonatomic, copy) void (^onFailed)(NSError *error);
+
+/**
+ *
+ *  @return instance runtime JavaScript.
+ *  you must call it in brige thread. Learn more at WXPerformBlockOnBridgeThread
+ **/
+- (id<WXBridgeProtocol>)instanceJavaScriptContext;
+
+/**
+ *  The callback triggered when js occurs runtime error while executing.
+ *
+ *  @return A block that takes a WXJSExceptionInfo argument, which is the exception info
+ **/
+@property (nonatomic, copy) void (^onJSRuntimeException)(WXJSExceptionInfo * jsException);
 
 /**
  *  The callback triggered when the instacne executes scrolling .
@@ -160,6 +183,14 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, copy) void(^onJSDownloadedFinish)(WXResourceResponse *response,WXResourceRequest *request,NSData *data, NSError* error);
 
 /**
+ * The callback triggered when the bundleJS request finished in the renderWithURL. If the callback returns YES, the render process will terminate.
+ * @return A block that takes response which the server response,request which send to server,data which the server returned and an error
+ */
+@property (nonatomic, copy) BOOL (^onRenderTerminateWhenJSDownloadedFinish)(WXResourceResponse *response,WXResourceRequest *request,NSData *data, NSError* error);
+
+@property(nonatomic,strong) NSDictionary* continerInfo;
+
+/**
  *  the frame of current instance.
  **/
 @property (nonatomic, assign) CGRect frame;
@@ -167,7 +198,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 /**
  *  the info stored by user.
  */
-@property (nonatomic, strong) NSMutableDictionary *userInfo;
+@property (atomic, strong) NSMutableDictionary *userInfo;
 
 /**
  *  scale factor from css unit to device pixel.
@@ -256,7 +287,6 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  */
 - (NSUInteger)numberOfComponents;
 
-
 /**
  * check whether the module eventName is registered
  */
@@ -286,12 +316,18 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSString *bizType;
 @property (nonatomic, strong) NSString *pageName;
 @property (nonatomic, weak) id pageObject;
+//Deprecated, use @WXApmForInstance
 @property (nonatomic, strong) NSMutableDictionary *performanceDict;
+
+@property (nonatomic ,strong) WXApmForInstance* apmInstance;
+
 
 
 /** 
  * Deprecated 
  */
+
+
 @property (nonatomic, strong) NSDictionary *properties DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, assign) NSTimeInterval networkTime DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, copy) void (^updateFinish)(UIView *);

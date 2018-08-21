@@ -28,11 +28,11 @@
 
 @property (nonatomic, assign) CGSize contentSize;
 
-@property (nonatomic, readonly, assign) css_node_t *scrollerCSSNode;
-
 - (NSUInteger)childrenCountForScrollerLayout;
 
 - (void)handleAppear;
+
+- (CGPoint)absolutePositionForComponent:(WXComponent *)component;
 
 @end
 

@@ -24,7 +24,7 @@
 
 #define WX_REWRITE_URL(url, resourceType, instance)\
 do {\
-    id<WXURLRewriteProtocol> rewriteHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXURLRewriteProtocol)];\
+    id<WXURLRewriteProtocol> rewriteHandler = [WXSDKEngine handlerForProtocol:@protocol(WXURLRewriteProtocol)];\
     if ([rewriteHandler respondsToSelector:@selector(rewriteURL:withResourceType:withInstance:)]) {\
         newURL = [[rewriteHandler rewriteURL:url withResourceType:resourceType withInstance:instance].absoluteString copy];\
     }\

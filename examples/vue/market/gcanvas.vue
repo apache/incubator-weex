@@ -1,15 +1,19 @@
 <template>
   <div ref="test">
-    <gcanvas ref="canvas_holder" style="width:750;height:750;"></gcanvas>
+    <component :is="tagName" width="750" height="750" ref="canvas_holder" style="width:750px;height:750px;"></component>
   </div>
 </template>
 <script>
-  //	var gcanvas = weex.requireModule('weex-gcanvas');
 
   var GCanvas=require('weex-gcanvas');
   var Image=require('weex-gcanvas/gcanvasimage');
 
   module.exports = {
+    data() {
+      return {
+        tagName: weex.config.env.platform === 'Web' ? 'canvas' : 'gcanvas'
+      }
+    },
     mounted: function () {
       var ref = this.$refs.canvas_holder;
       var gcanvas = GCanvas.start(ref)

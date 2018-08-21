@@ -28,6 +28,8 @@
 #import "WXRuleManager.h"
 #import "WXSDKInstance.h"
 #import "WXTracingManager.h"
+#import "WXRecycleListComponent.h"
+#import <objc/message.h>
 
 @interface WXDomModule ()
 
@@ -51,6 +53,7 @@ WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 WX_EXPORT_METHOD(@selector(addRule:rule:))
 WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
+WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
 
 - (void)performBlockOnComponentManager:(void(^)(WXComponentManager *))block
 {
@@ -182,12 +185,11 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 
 - (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
     [self performBlockOnComponentManager:^(WXComponentManager * manager) {
-        UIView *rootView = manager.weexInstance.rootView;
         if ([ref isEqualToString:@"viewport"]) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSMutableDictionary * callbackRsp = nil;
+                UIView* rootView = manager.weexInstance.rootView;
                 CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView];
-                callbackRsp = [self _componentRectInfoWithViewFrame:rootRect];
+                NSMutableDictionary *callbackRsp = [self _componentRectInfoWithViewFrame:rootRect];
                 [callbackRsp setObject:@(true) forKey:@"result"];
                 if (callback) {
                     callback(callbackRsp, false);
@@ -195,9 +197,8 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
             });
         } else {
             WXComponent *component = [manager componentForRef:ref];
-            __weak typeof (self) weakSelf = self;
             dispatch_async(dispatch_get_main_queue(), ^{
-                __strong typeof (weakSelf) strongSelf = weakSelf;
+                UIView* rootView = manager.weexInstance.rootView;
                 NSMutableDictionary * callbackRsp = nil;
                 if (!component) {
                     callbackRsp = [NSMutableDictionary new];
@@ -211,7 +212,7 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
                     } else {
                         componentRect = component.calculatedFrame;
                     }
-                    callbackRsp = [strongSelf _componentRectInfoWithViewFrame:componentRect];
+                    callbackRsp = [self _componentRectInfoWithViewFrame:componentRect];
                     [callbackRsp setObject:@(true)forKey:@"result"];
                 }
                 if (callback) {
@@ -220,6 +221,19 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
             });
 
         }
+    }];
+}
+
+- (void)updateComponentData:(NSString*)componentDataId componentData:(NSDictionary*)componentData callback:(NSString*)callbackId
+{
+    NSString *recycleListComponentRef = [[componentDataId componentsSeparatedByString:@"@"] objectAtIndex:0];
+    if (!recycleListComponentRef) {
+        return;
+    }
+    SEL selector = _cmd;
+    [self performBlockOnComponentManager:^(WXComponentManager * manager) {
+        WXRecycleListComponent * recycleListComponent = (WXRecycleListComponent*)[manager componentForRef:recycleListComponentRef];
+        ((void*(*)(id,SEL,NSString*,NSDictionary*,NSString*))objc_msgSend)(recycleListComponent, selector, componentDataId, componentData,callbackId);
     }];
 }
 

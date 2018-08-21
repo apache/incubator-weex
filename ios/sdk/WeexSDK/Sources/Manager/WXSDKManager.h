@@ -25,6 +25,12 @@
 
 @interface WXSDKManager : NSObject
 
+@property (nonatomic, assign) BOOL multiContext;
+
+/**
+ *@abstract Returns sdk manager
+ */
++ (WXSDKManager *)sharedInstance;
 /**
  * @abstract Returns bridge manager
  **/

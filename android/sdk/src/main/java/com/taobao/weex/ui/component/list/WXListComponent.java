@@ -19,13 +19,17 @@
 package com.taobao.weex.ui.component.list;
 
 import android.content.Context;
-
+import android.support.v4.util.ArrayMap;
+import android.support.v7.widget.PagerSnapHelper;
+import android.text.TextUtils;
+import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXRecyclerDomObject;
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXThread;
+import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
@@ -36,8 +40,12 @@ import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
-
+import com.taobao.weex.utils.WXUtils;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -51,36 +59,50 @@ import java.util.Map;
 
 public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   private String TAG = "WXListComponent";
-  private WXRecyclerDomObject mDomObject;
+  //  private WXRecyclerDomObject mDomObject;
   private float mPaddingLeft;
   private float mPaddingRight;
+  private String mSpanOffsetsStr;
+  private Float[] mSpanOffsets;
+  private boolean hasSetGapItemDecoration = false;
+
+  public static class Creator implements ComponentCreator {
+    public WXComponent createInstance(WXSDKInstance instance,
+                                      WXVContainer parent,
+                                      BasicComponentData basicComponentData)
+            throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXListComponent(instance, parent, true, basicComponentData);
+    }
+  }
 
   @Deprecated
-  public WXListComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent, isLazy);
+  public WXListComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, isLazy, basicComponentData);
   }
 
 
-  public WXListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent);
-    if (node != null && node instanceof WXRecyclerDomObject) {
-      mDomObject = (WXRecyclerDomObject) node;
-      mDomObject.preCalculateCellWidth();
-
-      if(WXBasicComponentType.WATERFALL.equals(node.getType())){
-        mLayoutType = WXRecyclerView.TYPE_STAGGERED_GRID_LAYOUT;
-      }else{
-        mLayoutType = mDomObject.getLayoutType();
-      }
-      updateRecyclerAttr();
-
-    }
+  public WXListComponent(WXSDKInstance instance, WXVContainer parent, boolean lazy, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
 
   @Override
   protected BounceRecyclerView generateListView(Context context, int orientation) {
+    BounceRecyclerView bounceRecyclerView = new BounceRecyclerView(context, mLayoutType, mColumnCount, mColumnGap, orientation);
+    if (bounceRecyclerView.getSwipeLayout() != null) {
+      if (WXUtils.getBoolean(getAttrs().get(Constants.Name.NEST_SCROLLING_ENABLED), false)) {
+        bounceRecyclerView.getSwipeLayout().setNestedScrollingEnabled(true);
+      }
+    }
 
-    return new BounceRecyclerView(context,mLayoutType,mColumnCount,mColumnGap,orientation);
+    /**
+     *  enable pagingEnabled attr
+     */
+    if(WXUtils.getBoolean(getAttrs().get(Constants.Name.PAGE_ENABLED),false)){
+      PagerSnapHelper snapHelper = new PagerSnapHelper();
+      snapHelper.attachToRecyclerView(bounceRecyclerView.getInnerView());
+    }
+
+    return bounceRecyclerView;
   }
 
   @Override
@@ -90,14 +112,17 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
       return;
     }
     setRefreshOrLoading(child);
-
     // Synchronize DomObject's attr to Component and Native View
-    if(mDomObject != null && getHostView() != null && (mColumnWidth != mDomObject.getColumnWidth() ||
-            mColumnCount != mDomObject.getColumnCount() ||
-            mColumnGap != mDomObject.getColumnGap())) {
+    if(getHostView() != null && hasColumnPros()) {
       updateRecyclerAttr();
       getHostView().getInnerView().initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
     }
+  }
+
+  private boolean hasColumnPros() {
+    return (getAttrs().containsKey(Constants.Name.COLUMN_WIDTH) && mColumnWidth != WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_WIDTH))) ||
+            (getAttrs().containsKey(Constants.Name.COLUMN_COUNT) &&  mColumnCount != WXUtils.parseInt(getAttrs().get(Constants.Name.COLUMN_COUNT))) ||
+            (getAttrs().containsKey(Constants.Name.COLUMN_GAP) && mColumnGap != WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_GAP)));
   }
 
   /**
@@ -113,39 +138,80 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     }
     if (child instanceof WXRefresh) {
       getHostView().setOnRefreshListener((WXRefresh) child);
-      getHostView().postDelayed(new Runnable() {
+      getHostView().postDelayed(WXThread.secure(new Runnable() {
         @Override
         public void run() {
           getHostView().setHeaderView(child);
         }
-      }, 100);
+      }), 100);
       return true;
     }
 
     if (child instanceof WXLoading) {
       getHostView().setOnLoadingListener((WXLoading) child);
-      getHostView().postDelayed(new Runnable() {
+      getHostView().postDelayed(WXThread.secure(new Runnable() {
         @Override
         public void run() {
           getHostView().setFooterView(child);
         }
-      }, 100);
+      }), 100);
       return true;
     }
     return false;
   }
 
-  private void updateRecyclerAttr(){
-    mColumnCount = mDomObject.getColumnCount();
-    mColumnGap = mDomObject.getColumnGap();
-    mColumnWidth = mDomObject.getColumnWidth();
-    mPaddingLeft =mDomObject.getPadding().get(Spacing.LEFT);
-    mPaddingRight =mDomObject.getPadding().get(Spacing.RIGHT);
+  private void updateRecyclerAttr() {
+    mColumnCount = WXUtils.parseInt(getAttrs().get(Constants.Name.COLUMN_COUNT));
+    if (mColumnCount <= 0) {
+      WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
+          WXErrorCode.WX_RENDER_ERR_LIST_INVALID_COLUMN_COUNT, "columnCount",
+          String.format(Locale.ENGLISH,
+              "You are trying to set the list/recycler/vlist/waterfall's column to %d, which is illegal. The column count should be a positive integer",
+              mColumnCount),
+          new ArrayMap<String, String>());
+      mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
+    }
+    mColumnGap = WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_GAP));
+    mColumnWidth = WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_WIDTH));
+    mPaddingLeft = WXUtils.parseFloat(getAttrs().get(Constants.Name.PADDING_LEFT));
+    mPaddingRight = WXUtils.parseFloat(getAttrs().get(Constants.Name.PADDING_RIGHT));
+    mSpanOffsetsStr = (String)getAttrs().get(Constants.Name.SPAN_OFFSETS);
+
+    try {
+      if (!TextUtils.isEmpty(mSpanOffsetsStr)) {
+        List<Float> list = JSON.parseArray(mSpanOffsetsStr, Float.class);
+        final int size = list.size();
+        if (null == mSpanOffsets || mSpanOffsets.length != size) {
+          mSpanOffsets = new Float[size];
+        }
+        list.toArray(mSpanOffsets);
+      } else {
+        mSpanOffsets = null;
+      }
+    } catch (Throwable e) {
+      WXLogUtils.w("Parser SpanOffsets error ", e);
+    }
+
+    if (!hasSetGapItemDecoration && null != getSpanOffsets() && null != getHostView()
+        && null != getHostView().getInnerView()) {
+      hasSetGapItemDecoration = true;
+      getHostView().getInnerView().addItemDecoration(new GapItemDecoration(this));
+    }
+  }
+
+  @WXComponentProp(name = Constants.Name.SPAN_OFFSETS)
+  public void setSpanOffsets(String spanOffsets)  {
+    if (!TextUtils.equals(spanOffsets, mSpanOffsetsStr)) {
+      markComponentUsable();
+      updateRecyclerAttr();
+      WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+      wxRecyclerView.initView(getContext(), mLayoutType, mColumnCount, mColumnGap, getOrientation());
+    }
   }
 
   @WXComponentProp(name = Constants.Name.COLUMN_WIDTH)
-  public void setColumnWidth(int columnCount)  {
-    if(mDomObject.getColumnWidth() != mColumnWidth){
+  public void setColumnWidth(float columnWidth)  {
+    if(columnWidth != mColumnWidth){
       markComponentUsable();
       updateRecyclerAttr();
       WXRecyclerView wxRecyclerView = getHostView().getInnerView();
@@ -155,7 +221,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @WXComponentProp(name = Constants.Name.COLUMN_COUNT)
   public void setColumnCount(int columnCount){
-    if(mDomObject.getColumnCount() != mColumnCount){
+    if(columnCount != mColumnCount) {
       markComponentUsable();
       updateRecyclerAttr();
       WXRecyclerView wxRecyclerView = getHostView().getInnerView();
@@ -165,7 +231,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @WXComponentProp(name = Constants.Name.COLUMN_GAP)
   public void setColumnGap(float columnGap) throws InterruptedException {
-    if(mDomObject.getColumnGap() != mColumnGap) {
+    if(columnGap != mColumnGap) {
       markComponentUsable();
       updateRecyclerAttr();
       WXRecyclerView wxRecyclerView = getHostView().getInnerView();
@@ -182,20 +248,24 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   @Override
   public void updateProperties(Map<String, Object> props) {
     super.updateProperties(props);
+    if (isRecycler(this)) {
+      if(WXBasicComponentType.WATERFALL.equals(getComponentType())){
+        mLayoutType = WXRecyclerView.TYPE_STAGGERED_GRID_LAYOUT;
+      }else{
+        mLayoutType = getAttrs().getLayoutType();
+      }
+    }
+
     if(props.containsKey(Constants.Name.PADDING)
             ||props.containsKey(Constants.Name.PADDING_LEFT)
             || props.containsKey(Constants.Name.PADDING_RIGHT)){
-
-      if(mPaddingLeft !=mDomObject.getPadding().get(Spacing.LEFT)
-              || mPaddingRight !=mDomObject.getPadding().get(Spacing.RIGHT)) {
-
+      if(mPaddingLeft != WXUtils.parseFloat(props.get(Constants.Name.PADDING_LEFT)) || mPaddingRight != WXUtils.parseFloat(props.get(Constants.Name.PADDING_RIGHT))) {
         markComponentUsable();
         updateRecyclerAttr();
         WXRecyclerView wxRecyclerView = getHostView().getInnerView();
         wxRecyclerView.initView(getContext(), mLayoutType, mColumnCount, mColumnGap, getOrientation());
       }
     }
-
   }
 
   @Override
@@ -243,5 +313,15 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     } else if (child instanceof WXRefresh) {
       getHostView().removeHeaderView(child);
     }
+  }
+
+  private boolean isRecycler(WXComponent component) {
+    return WXBasicComponentType.WATERFALL.equals(component.getComponentType())
+            || WXBasicComponentType.RECYCLE_LIST.equals(component.getComponentType())
+            || WXBasicComponentType.RECYCLER.equals(component.getComponentType());
+  }
+
+  public Float[] getSpanOffsets() {
+    return mSpanOffsets;
   }
 }

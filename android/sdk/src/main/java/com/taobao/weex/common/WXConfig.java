@@ -23,6 +23,7 @@ public interface WXConfig {
   String os = "os";
   String osName = "osName";
   String appVersion="appVersion";
+  String cacheDir = "cacheDir";
   String devId="devId";
   String sysVersion="sysVersion";
   String sysModel="sysModel";
@@ -32,4 +33,5 @@ public interface WXConfig {
   String externalUserAgent="externalUserAgent";
   String logLevel="logLevel";
   String scale = "scale";
+  String debugMode = "debugMode";
 }

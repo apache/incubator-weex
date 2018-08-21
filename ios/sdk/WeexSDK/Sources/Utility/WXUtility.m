@@ -33,7 +33,7 @@
 #import <UIKit/UIScreen.h>
 #import <Security/Security.h>
 #import <CommonCrypto/CommonCrypto.h>
-#import <coreText/CoreText.h>
+#import <CoreText/CoreText.h>
 #import "WXAppMonitorProtocol.h"
 
 #import "WXTextComponent.h"
@@ -41,7 +41,11 @@
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
 
-void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
+static BOOL threadSafeCollectionUsingLock = YES;
+static BOOL unregisterFontWhenCollision = NO;
+static BOOL listSectionRowThreadSafe = YES;
+
+void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
     if (!block) return;
     
@@ -54,7 +58,7 @@ void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
     }
 }
 
-void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)())
+void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)(void))
 {
     if (!block) return;
     
@@ -67,7 +71,7 @@ void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)())
     }
 }
 
-void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *thread)
+void WXPerformBlockOnThread(void (^ _Nonnull block)(void), NSThread *thread)
 {
     [WXUtility performBlock:block onThread:thread];
 }
@@ -79,7 +83,7 @@ void WXSwizzleInstanceMethod(Class className, SEL original, SEL replaced)
     
     BOOL didAddMethod = class_addMethod(className, original, method_getImplementation(newMethod), method_getTypeEncoding(newMethod));
     if (didAddMethod) {
-        class_replaceMethod(className, replaced, method_getImplementation(newMethod), method_getTypeEncoding(newMethod));
+        class_replaceMethod(className, replaced, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
     } else {
         method_exchangeImplementations(originalMethod, newMethod);
     }
@@ -135,7 +139,32 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 @implementation WXUtility
 
-+ (void)performBlock:(void (^)())block onThread:(NSThread *)thread
++ (void)setThreadSafeCollectionUsingLock:(BOOL)usingLock
+{
+    threadSafeCollectionUsingLock = usingLock;
+}
+
++ (BOOL)threadSafeCollectionUsingLock
+{
+    return threadSafeCollectionUsingLock;
+}
+
++ (void)setUnregisterFontWhenCollision:(BOOL)value
+{
+    unregisterFontWhenCollision = value;
+}
+
++ (void)setListSectionRowThreadSafe:(BOOL)value
+{
+	listSectionRowThreadSafe = value;
+}
+
++ (BOOL)listSectionRowThreadSafe
+{
+	return listSectionRowThreadSafe;
+}
+
++ (void)performBlock:(void (^)(void))block onThread:(NSThread *)thread
 {
     if (!thread || !block) return;
     
@@ -149,11 +178,10 @@ CGFloat WXFloorPixelValue(CGFloat value)
     }
 }
 
-+ (void)_performBlock:(void (^)())block
++ (void)_performBlock:(void (^)(void))block
 {
     block();
 }
-
 
 + (NSDictionary *)getEnvironment
 {
@@ -326,7 +354,12 @@ CGFloat WXFloorPixelValue(CGFloat value)
 }
 
 + (BOOL)isBlankString:(NSString *)string {
+    
     if (string == nil || string == NULL || [string isKindOfClass:[NSNull class]]) {
+        return true;
+    }
+    if (![string isKindOfClass:[NSString class]]) {
+        WXLogError(@"%@ is not a string", string);
         return true;
     }
     if ([[string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] == 0) {
@@ -334,6 +367,11 @@ CGFloat WXFloorPixelValue(CGFloat value)
     }
     
     return false;
+}
+
++ (BOOL)isValidPoint:(CGPoint)point
+{
+    return !(isnan(point.x)) && !(isnan(point.y));
 }
 
 + (NSError *)errorWithCode:(NSInteger)code message:(NSString *)message
@@ -365,7 +403,11 @@ CGFloat WXFloorPixelValue(CGFloat value)
             if ([subStr hasPrefix:@"rgb"]) {
                 gradientType = [WXConvert gradientType:gradientTypeStr];
                 
-                range = [subStr rangeOfString:@")"];
+                if ([subStr containsString:@"%"]) {
+                    range = [subStr rangeOfString:@"%"];
+                } else {
+                    range = [subStr rangeOfString:@")"];
+                }
                 NSString *startColorStr = [subStr substringToIndex:range.location + 1];
                 NSString *endColorStr = [subStr substringFromIndex:range.location + 2];
                 startColor = [WXConvert UIColor:startColorStr];
@@ -465,14 +507,18 @@ CGFloat WXFloorPixelValue(CGFloat value)
                     CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL(fontURL);
                     if (fontDataProvider) {
                         CGFontRef newFont = CGFontCreateWithDataProvider(fontDataProvider);
-                        CFErrorRef error = nil;
-                        CTFontManagerRegisterGraphicsFont(newFont, &error);
-                        // the same font family, remove it and register new one.
-                        if (error) {
-                            CTFontManagerUnregisterGraphicsFont(newFont, NULL);
+                        if (unregisterFontWhenCollision) {
+                            CFErrorRef error = nil;
+                            CTFontManagerRegisterGraphicsFont(newFont, &error);
+                            // the same font family, remove it and register new one.
+                            if (error) {
+                                CTFontManagerUnregisterGraphicsFont(newFont, NULL);
+                                CTFontManagerRegisterGraphicsFont(newFont, NULL);
+                                CFRelease(error);
+                            }
+                        }
+                        else {
                             CTFontManagerRegisterGraphicsFont(newFont, NULL);
-                            CFRelease(error);
-                            error = nil;
                         }
                         fontFamily = (__bridge_transfer  NSString*)CGFontCopyPostScriptName(newFont);
                         CGFontRelease(newFont);
@@ -480,12 +526,16 @@ CGFloat WXFloorPixelValue(CGFloat value)
                         CFRelease(fontDataProvider);
                     }
                 } else {
-                    CFErrorRef error = nil;
-                    CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
-                    if (error) {
-                        CFRelease(error);
-                        error = nil;
-                        CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                    if (unregisterFontWhenCollision) {
+                        CFErrorRef error = nil;
+                        CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
+                        if (error) {
+                            CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                            CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                            CFRelease(error);
+                        }
+                    }
+                    else {
                         CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
                     }
                     NSArray *descriptors = (__bridge_transfer NSArray *)CTFontManagerCreateFontDescriptorsFromURL(fontURL);
@@ -901,6 +951,34 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
     [custormMonitorDict setObject:value forKey:key];
     instance.userInfo[WXCUSTOMMONITORINFO] = custormMonitorDict;
 }
+
++ (NSDictionary *_Nonnull)dataToBase64Dict:(NSData *_Nullable)data
+{
+    NSMutableDictionary *dataDict = [NSMutableDictionary new];
+    if(data){
+        NSString *base64Encoded = [data base64EncodedStringWithOptions:0];
+        [dataDict setObject:@"binary" forKey:@"@type"];
+        [dataDict setObject:base64Encoded forKey:@"base64"];
+    }
+    
+    return dataDict;
+}
+
++ (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict
+{
+    if([@"binary" isEqualToString:base64Dict[@"@type"]]){
+        NSString *base64 = base64Dict[@"base64"];
+        NSData *sendData = [[NSData alloc] initWithBase64EncodedString:base64 options:0];
+        return sendData;
+    }
+    return nil;
+}
+
++ (long) getUnixCurrentTimeMillis
+{
+    return [[NSDate date] timeIntervalSince1970] * 1000;
+}
+
 @end
 
 

@@ -20,6 +20,7 @@
 #import "WXPickerModule.h"
 #import "WXConvert.h"
 #import "WXUtility.h"
+#import "WXComponentManager.h"
 #import <UIKit/UIPickerView.h>
 #import <UIKit/UIDatePicker.h>
 #import <UIKit/UIKit.h>
@@ -27,8 +28,11 @@
 #define WXPickerHeight 266
 #define WXPickerToolBarHeight 44
 
-@interface WXPickerModule()
+@interface WXPickerModule() <UIGestureRecognizerDelegate>
 
+@property (nonatomic, strong)NSString * pickerType;
+// when resign the picker ,then the focus will be.
+@property (nonatomic, strong)UIView * focusToView;
 //picker
 @property(nonatomic,strong)UIPickerView *picker;
 @property(nonatomic,strong)UIView *backgroundView;
@@ -49,7 +53,7 @@
 @property(nonatomic,copy)NSArray *items;
 @property(nonatomic)BOOL isAnimating;
 @property(nonatomic)NSInteger index;
-@property(nonatomic,copy)WXModuleCallback callback;
+@property(nonatomic,copy)WXModuleKeepAliveCallback callback;
 
 //date picker
 @property(nonatomic,strong)UIDatePicker *datePicker;
@@ -78,10 +82,16 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     }
 }
 
--(void)pick:(NSDictionary *)options callback:(WXModuleCallback)callback
+-(void)pick:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback
 {
+    if (UIAccessibilityIsVoiceOverRunning()) {
+        [self handleA11yFocusback:options];
+    }
+    
+    _pickerType = @"picker";
     NSArray *items = @[];
     NSInteger index = 0 ;
+  
     if (options[@"items"]) {
         items = options[@"items"];
     }
@@ -123,9 +133,22 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
         self.callback = callback;
     } else {
         if (callback) {
-            callback(@{ @"result": @"error" });
+            callback(@{ @"result": @"error" },NO);
         }
         self.callback = nil;
+    }
+}
+
+- (void)handleA11yFocusback:(NSDictionary*)options
+{
+    __weak typeof(self) weakSelf = self;
+    if (options[@"sourceRef"] && [options[@"sourceRef"] isKindOfClass:[NSString class]]) {
+        WXPerformBlockOnComponentThread(^{
+            WXComponent * focusBackComponent = [weakSelf.weexInstance componentForRef:options[@"sourceRef"]];
+            WXPerformBlockOnMainThread(^{
+                weakSelf.focusToView = focusBackComponent.view;
+            });
+        });
     }
 }
 
@@ -164,11 +187,20 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     }
     self.isAnimating = YES;
     self.backgroundView.hidden = NO;
+    UIView * focusView = self.picker;
+    if([_pickerType isEqualToString:@"picker"]) {
+        focusView = self.picker;
+    } else {
+        focusView = self.datePicker;
+    }
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, focusView);
     [UIView animateWithDuration:0.35f animations:^{
         self.pickerView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height - WXPickerHeight, [UIScreen mainScreen].bounds.size.width, WXPickerHeight);
         self.backgroundView.alpha = 1;
+        
     } completion:^(BOOL finished) {
         self.isAnimating = NO;
+        
     }];
 }
 
@@ -184,6 +216,10 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     } completion:^(BOOL finished) {
         self.backgroundView.hidden = YES;
         self.isAnimating = NO;
+        if (!_focusToView) {
+            _focusToView = self.backgroundView.superview;
+        }
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _focusToView);
         [self.backgroundView removeFromSuperview];
     }];
 }
@@ -192,7 +228,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     [self hide];
     if (self.callback) {
-        self.callback(@{ @"result": @"cancel"});
+        self.callback(@{ @"result": @"cancel"},NO);
         self.callback=nil;
     }
 }
@@ -201,7 +237,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     [self hide];
     if (self.callback) {
-        self.callback(@{ @"result": @"success",@"data":[NSNumber numberWithInteger:self.index]});
+        self.callback(@{ @"result": @"success",@"data":[NSNumber numberWithInteger:self.index]},NO);
         self.callback=nil;
     }
 }
@@ -233,6 +269,9 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     self.backgroundView = [self createbackgroundView];
     UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0") && WX_SYS_VERSION_LESS_THAN(@"11.1")) {
+        tapGesture.delegate = self;
+    }
     [self.backgroundView addGestureRecognizer:tapGesture];
     self.pickerView = [self createPickerView];
     UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, WXPickerToolBarHeight)];
@@ -355,31 +394,39 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 
 #pragma mark -
 #pragma Date & Time Picker
--(void)pickDate:(NSDictionary *)options callback:(WXModuleCallback)callback
+-(void)pickDate:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback
 {
+    if (UIAccessibilityIsVoiceOverRunning()) {
+        [self handleA11yFocusback:options];
+    }
+    _pickerType = @"pickDate";
     self.datePickerMode = UIDatePickerModeDate;
     [self datepick:options callback:callback];
 }
 
--(void)pickTime:(NSDictionary *)options callback:(WXModuleCallback)callback
+-(void)pickTime:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback
 {
+    if (UIAccessibilityIsVoiceOverRunning()) {
+        [self handleA11yFocusback:options];
+    }
+    _pickerType = @"pickTime";
     self.datePickerMode = UIDatePickerModeTime;
     [self datepick:options callback:callback];
 }
     
--(void)datepick:(NSDictionary *)options callback:(WXModuleCallback)callback
+-(void)datepick:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback
 {
     if ((UIDatePickerModeTime == self.datePickerMode) || (UIDatePickerModeDate == self.datePickerMode)) {
         [self createDatePicker:options callback:callback];
     } else {
         if (callback) {
-            callback(@{ @"result": @"error" });
+            callback(@{ @"result": @"error" },NO);
         }
         self.callback = nil;
     }
 }
 
-- (void)createDatePicker:(NSDictionary *)options callback:(WXModuleCallback)callback
+- (void)createDatePicker:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback
 {
     self.callback = callback;
     self.datePicker = [[UIDatePicker alloc]init];
@@ -424,6 +471,9 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     self.backgroundView = [self createbackgroundView];
     UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0") && WX_SYS_VERSION_LESS_THAN(@"11.1")) {
+        tapGesture.delegate = self;
+    }
     [self.backgroundView addGestureRecognizer:tapGesture];
     self.pickerView = [self createPickerView];
     UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, WXPickerToolBarHeight)];
@@ -446,7 +496,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     [self hide];
     if (self.callback) {
-        self.callback(@{ @"result": @"cancel"});
+        self.callback(@{ @"result": @"cancel"},NO);
         self.callback = nil;
     }
 }
@@ -462,9 +512,17 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
         value = [WXUtility dateToString:self.datePicker.date];
     }
     if (self.callback) {
-        self.callback(@{ @"result": @"success",@"data":value});
+        self.callback(@{ @"result": @"success",@"data":value},NO);
         self.callback=nil;
     }
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if (self.pickerView && [touch.view isDescendantOfView:self.pickerView]) {
+        return NO;
+    }
+    return YES;
 }
 
 @end

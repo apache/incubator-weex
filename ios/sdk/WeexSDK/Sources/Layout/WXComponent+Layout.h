@@ -20,7 +20,46 @@
 #import "WXComponent.h"
 #import "WXSDKInstance.h"
 #import "WXUtility.h"
+#import "WXCoreLayout.h"
+
+#define FlexUndefined NAN
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+    bool flexIsUndefined(float value);
+#ifdef __cplusplus
+}
+#endif
+
+@interface WXComponent ()
+{
+    @package
+#ifdef __cplusplus
+    WeexCore::WXCoreLayoutNode *_flexCssNode;
+#endif // __cplusplus
+    BOOL _isLayoutDirty;
+    CGRect _calculatedFrame;
+    CGPoint _absolutePosition;
+    WXPositionType _positionType;
+}
+
+/**
+ * @abstract Return the css node used to layout.
+ *
+ * @warning Subclasses must not override this.
+ */
+#ifdef __cplusplus
+@property(nonatomic, readonly, assign) WeexCore::WXCoreLayoutNode *flexCssNode;
+#endif
+
+@end
 
 @interface WXComponent (Layout)
-
+- (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index;
+- (void)_rmChildCssNode:(WXComponent*)subcomponent;
+- (NSInteger) getActualNodeIndex:(WXComponent*)subcomponent atIndex:(NSInteger) index;
+#ifdef __cplusplus
++ (void) recycleNodeOnComponentThread:(WeexCore::WXCoreLayoutNode * ) garbageNode gabRef:(NSString *)ref;
+#endif
 @end

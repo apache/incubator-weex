@@ -18,11 +18,12 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <JavaScriptCore/JavaScriptCore.h>
 
 @class WXBridgeMethod;
 @class WXSDKInstance;
 
-extern void WXPerformBlockOnBridgeThread(void (^block)());
+extern void WXPerformBlockOnBridgeThread(void (^block)(void));
 
 @interface WXBridgeManager : NSObject
 
@@ -125,11 +126,32 @@ extern void WXPerformBlockOnBridgeThread(void (^block)());
  *  @param instanceId   instance id
  *  @param ref       :   node reference
  *  @param type      :   event type
- *  @param params    :   parameters
+ *  @param params    :   parameters in event object
  *  @param domChanges   dom value changes, used for two-way data binding
  **/
 - (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges;
 
+/**
+ *  FireEvent
+ *  @param instanceId   instance id
+ *  @param ref       :   node reference
+ *  @param type      :   event type
+ *  @param params    :   parameters in event object
+ *  @param domChanges   dom value changes, used for two-way data binding
+ *  @param handlerArguments : arguments passed to event handler
+ **/
+- (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges handlerArguments:(NSArray *)handlerArguments;
+
+- (JSValue *)fireEventWithResult:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges;
+
+/**
+ * componentHook
+ * @param instanceId  : instance id
+ * @param componentId : compoent id
+ * @param type        : component hook Type, such as life-cycle
+ * @param hookPhase   : hook phase
+ */
+- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase args:(NSArray*)args competion:(void (^)(JSValue * value))complection;
 /**
  *  callBack
  *

@@ -1,5 +1,5 @@
 <template>
-  <scroller class="list" append="tree">
+  <scroller class="list" append="tree" ref="scroller">
     <refresh class="refresh-view" :display="refresh_display" @refresh="onrefresh" @pullingdown="pullingdown">
       <img id="roate" ref="roate" src="http://gw.alicdn.com/bao/uploaded/TB1xDrVNFXXXXbEXFXXXXXXXXXX-48-48.png" style="width: 50px;height: 50px;"></img>
     </refresh>
@@ -74,7 +74,14 @@
 </style>
 
 <script>
+  const dom = weex.requireModule('dom')
+  console.log(dom)
   module.exports = {
+    mounted () {
+      const result = dom.getComponentRect(this.$refs.scroller, option => {
+        console.log('getComponentRect:', option)
+      })
+    },
     methods: {
       onrefresh: function(e) {
         var self = this;

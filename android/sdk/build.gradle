@@ -1,5 +1,6 @@
 buildscript {
     dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
     }
 }
@@ -20,7 +21,7 @@ if(!disableCov.toBoolean()){
 }
 
 task checkstyle(type: Checkstyle) {
-    configFile file("${project.rootDir}/config/quality/checkstyle.xml") // Where my checkstyle config is...
+    configFile file("${project.rootDir}/sdk/config/quality/checkstyle.xml") // Where my checkstyle config is...
     // configProperties.checkstyleSuppressionsPath = file("${project.rootDir}/config/quality/checkstyle/suppressions.xml").absolutePath // Where is my suppressions file for checkstyle is...
     source 'src'
     include '**/*.java'
@@ -34,12 +35,19 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-version = "0.9.4"
+
+version = "0.18.13.25"
 
 android {
+
+    publishNonDefault true
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
+
+    delete 'libs/armeabi/libweexcore.so'
+    delete 'libs/armeabi-v7a/libweexcore.so'
+    delete 'libs/x86/libweexcore.so'
 
     useLibrary 'org.apache.http.legacy'
     copy {
@@ -51,52 +59,96 @@ android {
     def line
     new File(projectDir,"assets/main.js").withReader { line = it.readLine() }
     def m = line =~ /[A-Z\s]+\s+([0-9\.]+),\s+Build\s+[0-9]+/;
-    def jsfmVersion = m[0][1]
+    def jsfmVersion // = m[0][1]
     println jsfmVersion
+
+    copy {
+        from '../../pre-build'
+        into new File(projectDir,"assets")
+        include 'weex-main-jsfm.js'
+        rename('weex-main-jsfm.js','weex-main-jsfm.js')
+    }
+
+    copy {
+        from '../../pre-build'
+        into new File(projectDir,"assets")
+        include 'weex-rax-api.js'
+    }
+
+
+//    copy {
+//        from '../../pre-build'
+//        into new File(projectDir,"assets")
+//        include 'weex-rax-extra-api.js'
+//    }
 
     if(project.hasProperty('asfRelease')){
         //download so file if not exist, when compile in source release
         download{
-            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/armeabi/libweexjsc.so;hb=refs/heads/master'
-            dest "${projectDir}/libs/armeabi/libweexjsc.so"
+            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/armeabi/libweexcore.so;hb=refs/heads/master'
+            dest "${projectDir}/libs/armeabi/libweexcore.so"
             overwrite false
         }
         download{
-            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexjsc.so;hb=refs/heads/master'
-            dest "${projectDir}/libs/x86/libweexjsc.so"
+            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexcore.so;hb=refs/heads/master'
+            dest "${projectDir}/libs/x86/libweexcore.so"
             overwrite false
         }
     }
 
-    def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexjsc.so").length();
-    def X86_Size = new File(projectDir,"libs/x86/libweexjsc.so").length();
+    def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexcore.so").length();
+    def ARMEABIV7_Size = new File(projectDir,"libs/armeabi-v7/libweexcore.so").length();
+    def X86_Size = new File(projectDir,"libs/x86/libweexcore.so").length();
     println "ARMEABI_Size: "+ARMEABI_Size;
+    println "ARMEABIV7_Size:" + ARMEABIV7_Size;
     println "X86_Size:" + X86_Size;
-
 
     defaultConfig {
         buildConfigField "long", "ARMEABI_Size", "${ARMEABI_Size}"
+        buildConfigField "long", "ARMEABIV7_Size", "${ARMEABIV7_Size}"
         buildConfigField "long", "X86_Size", "${X86_Size}"
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
-        minSdkVersion 14
+        minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
+
+        multiDexEnabled true
+
         versionCode 1
         versionName "1.0"
         ndk {
-            abiFilters "armeabi","x86"
+            abiFilters "armeabi-v7a","armeabi","x86"
+        }
+
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_PLATFORM=android-19',
+                        '-DANDROID_TOOLCHAIN=gcc',
+                        '-DANDROID_STL=gnustl_static',
+                        '-DCMAKE_BUILD_TYPE=Release'
+            }
         }
     }
     buildTypes {
         release {
             minifyEnabled false
+            testCoverageEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "ENABLE_TRACE", "false"
+            consumerProguardFiles 'proguard-rules.pro'
         }
 
         debug {
-            testCoverageEnabled true
             buildConfigField "boolean", "ENABLE_TRACE", "true"
+            jniDebuggable true
+            debuggable true
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path '../../weex_core/CMakeLists.txt'
         }
     }
 
@@ -153,10 +205,66 @@ dependencies {
     testCompile "org.robolectric:shadows-httpclient:3.3.2"
     testCompile 'org.json:json:20160212'
 }
+
 if(file('../license/LICENSE').exists()){
     license {
         header = file('../license/LICENSE')
-        excludes(["com/taobao/weex/dom/flex/*.java"])
+        mapping('cpp','JAVADOC_STYLE')
+        mapping('h','JAVADOC_STYLE')
+    }
+
+    task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
+        source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc']).
+                exclude(['Source/rapidjson/**/*.h','Source/rapidjson/**/*.cpp',
+                         'Source/android/base/base64/**/*.h','Source/android/base/base64/**/*.cpp',
+                         'Source/android/jniprebuild/jniheader/*.h',
+                         'Source/base/Compatible.cpp',
+                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp'])
     }
     preBuild.dependsOn licenseFormat
 }
+
+task checkNdkVersion() {
+    def rootDir = project.rootDir
+    def localProperties = new File(rootDir, "local.properties")
+    def ndkDir = ''
+    if (localProperties.exists()) {
+        Properties properties = new Properties()
+        localProperties.withInputStream { instr ->
+            properties.load(instr)
+        }
+        ndkDir = properties.getProperty('ndk.dir')
+    }
+
+    if(!ndkDir.isEmpty()) {
+        def sourcePropertiesFile = new File(ndkDir,"source.properties")
+        def ndkVersion = ''
+        println("sourcePropertiesFile" + sourcePropertiesFile.absolutePath)
+        if(sourcePropertiesFile.exists()) {
+            Properties properties = new Properties()
+            sourcePropertiesFile.withInputStream { instr ->
+                properties.load(instr)
+            }
+
+            ndkVersion = properties.getProperty('Pkg.Revision')
+        }
+
+        if(ndkVersion.length() > 2) {
+            def substring = ndkVersion.substring(0, 2)
+            try {
+                if(substring.toInteger() != 16) {
+                    throw new StopActionException("Ndk Version 16 supported only")
+                }
+            } catch (Exception ignored) {
+                println("Ndk Version 16 supported only")
+            }
+
+        } else {
+            println("Ndk Version 16 supported only")
+        }
+    } else {
+        println("Ndk Version 16 supported only")
+    }
+}
+
+preBuild.dependsOn checkNdkVersion

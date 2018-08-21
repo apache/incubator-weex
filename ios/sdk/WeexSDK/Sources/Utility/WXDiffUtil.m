@@ -63,7 +63,7 @@ typedef enum : NSUInteger {
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p; %zi inserts; %zi deletes; %zi updates", NSStringFromClass([self class]), self, _inserts.count, _deletes.count, _updates.count];
+    return [NSString stringWithFormat:@"<%@: %p; %lu inserts; %lu deletes; %lu updates", NSStringFromClass([self class]), self, (unsigned long)_inserts.count, (unsigned long)_deletes.count, (unsigned long)_updates.count];
 }
 
 
@@ -96,7 +96,7 @@ typedef enum : NSUInteger {
     
     for (int oldIndex = 1; oldIndex < oldSize; oldIndex ++) {
         for (int newIndex = 1; newIndex < newSize; newIndex ++) {
-            if ([oldArray[oldIndex - 1] isEqualToWXObject:newArray[newIndex - 1]]) {
+            if ([oldArray[oldIndex - 1] weex_isEqualTo:newArray[newIndex - 1]]) {
                 matrix[oldIndex][newIndex] = matrix[oldIndex - 1][newIndex - 1];
             } else {
                 int updateCost = matrix[oldIndex - 1][newIndex - 1] + 1;
@@ -107,7 +107,9 @@ typedef enum : NSUInteger {
         }
     }
     
+#if DEBUG
     [self _printMatrix:matrix rowSize:oldSize columnSize:newSize];
+#endif
     
     NSMutableArray *updates = [NSMutableArray array];
     NSMutableIndexSet *inserts = [NSMutableIndexSet indexSet];
@@ -184,14 +186,96 @@ typedef enum : NSUInteger {
             int value = matrix[i][j];
             NSString *result;
             if (value < 10) {
-                result = [NSString stringWithFormat:@"0%zi", value];
+                result = [NSString stringWithFormat:@"0%i", value];
             } else {
-                result = [NSString stringWithFormat:@"%zi", value];
+                result = [NSString stringWithFormat:@"%i", value];
             }
             [array addObject:result];
         }
         WXLogDebug(@"%@", [array componentsJoinedByString:@" "]);
     }
+}
+
+@end
+
+@implementation NSNumber (WXDiffable)
+
+- (BOOL)weex_isEqualTo:(id<WXDiffable>)object
+{
+    return [self isEqual:object];
+}
+
+@end
+
+@implementation NSString (WXDiffable)
+
+- (BOOL)weex_isEqualTo:(id<WXDiffable>)object
+{
+    return [self isEqual:object];
+}
+
+@end
+
+@implementation NSArray (WXDiffable)
+
+- (BOOL)weex_isEqualTo:(id<WXDiffable>)object
+{
+    if (![object isKindOfClass:[NSArray class]]) {
+        return NO;
+    }
+    
+    NSArray *array = (NSArray *)object;
+    if (self.count != array.count) {
+        return NO;
+    }
+    
+    __block BOOL isEqual = YES;
+    [array enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        id obj2 = [self objectAtIndex:idx];
+        if ([obj conformsToProtocol:@protocol(WXDiffable)] && [obj2 conformsToProtocol:@protocol(WXDiffable)]) {
+            if (![obj weex_isEqualTo:obj2]) {
+                isEqual = NO;
+                *stop = YES;
+            }
+        } else {
+            isEqual = NO;
+            *stop = YES;
+        }
+    }];
+    
+    return isEqual;
+}
+
+@end
+
+@implementation NSDictionary (WXDiffable)
+
+- (BOOL)weex_isEqualTo:(id<WXDiffable>)object
+{
+    if (![object isKindOfClass:[NSDictionary class]]) {
+        return NO;
+    }
+    
+    NSDictionary *dictionary = (NSDictionary *)object;
+    if (self.count != dictionary.count) {
+        return NO;
+    }
+    
+    __block BOOL isEqual = YES;
+    [dictionary enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+        id obj2 = [self objectForKey:key];
+        if (obj2 && [obj2 conformsToProtocol:@protocol(WXDiffable)] && [obj conformsToProtocol:@protocol(WXDiffable)]) {
+            if (![obj weex_isEqualTo:obj2]) {
+                isEqual = NO;
+                *stop = YES;
+            }
+        } else {
+            isEqual = NO;
+            *stop = YES;
+        }
+    }];
+    
+    return isEqual;
 }
 
 @end

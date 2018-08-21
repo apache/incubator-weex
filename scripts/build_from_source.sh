@@ -6,9 +6,9 @@
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
-# 
+#
 #   http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -24,17 +24,17 @@ fi
 
 echo "Build Weex SDK From Source...."
 
-npm install --production
-npm run install:buildtools
-npm run build:source
+npm install
+npm run build:jsfm
+npm run build:polyfill
 
-echo "Javascript Framework and HTML5 SDK build completed."
+echo "Weex JS Framework build completed."
 sleep 2
 
-cp dist/native.min.js ios_sdk/WeexSDK/Resources/main.js
-cp dist/native.min.js android_sdk/assets/main.js
+cp pre-build/weex-js-framework.min.js ios_sdk/WeexSDK/Resources/main.js
+cp pre-build/weex-js-framework.min.js android_sdk/assets/main.js
 
-gradle wrapper --gradle-version 2.14.1
+gradle wrapper --gradle-version 3.3
 echo 'include ":android_sdk"'>settings.gradle
 ./gradlew :android_sdk:assemble -PasfRelease
 

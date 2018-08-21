@@ -36,6 +36,14 @@
     [super tearDown];
 }
 
+- (void)testDirection {
+    NSArray *testDirections = @[@"inherit", @"ltr", @"rtl"];
+    css_direction_t directions[3] = {CSS_DIRECTION_INHERIT, CSS_DIRECTION_LTR, CSS_DIRECTION_RTL};
+    for (int i = 0; i<testDirections.count; i++) {
+        XCTAssertTrue([WXConvert wx_css_direction_t:testDirections[i]] == directions[i]);
+    }
+}
+
 - (void)testBOOL {
     // This is an example of a functional test case.
     // Use XCTAssert and related functions to verify your tests produce the correct results.
@@ -53,7 +61,6 @@
     NSUInteger val= [WXConvert NSUInteger:@"x"];
     XCTAssertTrue(0==val);
     
-    
     val= [WXConvert NSUInteger:@"9"];
     XCTAssertTrue(9);
     
@@ -62,8 +69,6 @@
     val= [WXConvert NSUInteger:unsignedIntMax];
     XCTAssertTrue(val==NSUIntegerMax);
     
-    
-    
     //test overflow
     unsigned long long uio = NSUIntegerMax;
     uio++;
@@ -71,7 +76,25 @@
     NSString * ulval  = [NSString stringWithFormat:@"%llu", uio ];
     val = [WXConvert NSUInteger:ulval];
     XCTAssertTrue(0==val);//overflowed
+
+}
+
+- (void) testHex2Color{
     
+    UIColor *redColor = [UIColor redColor];
+    NSString *redString = @"#ff0000";
+    //hex2color
+    UIColor *redTestColor = [WXConvert UIColor:redString];
+    XCTAssertTrue(CGColorEqualToColor(redTestColor.CGColor, redColor.CGColor));
+}
+
+- (void) testColor2Hex{
+    
+    UIColor *redColor = [UIColor redColor];
+    NSString *redString = @"#ff0000";
+    //color2hex
+    NSString *hexString = [WXConvert HexWithColor:redColor];
+    XCTAssertTrue([redString isEqualToString:hexString]);
 }
 
 @end

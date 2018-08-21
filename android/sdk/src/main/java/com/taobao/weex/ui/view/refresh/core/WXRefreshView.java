@@ -52,8 +52,8 @@ public class WXRefreshView extends FrameLayout {
   private void setupViews() {
     linearLayout = new LinearLayout(getContext());
     FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams
-                                                                     .MATCH_PARENT,FrameLayout
-        .LayoutParams.MATCH_PARENT);
+            .MATCH_PARENT,FrameLayout
+            .LayoutParams.MATCH_PARENT);
     linearLayout.setOrientation(LinearLayout.VERTICAL);
     linearLayout.setGravity(Gravity.CENTER);
     addView(linearLayout,lp);
@@ -65,11 +65,6 @@ public class WXRefreshView extends FrameLayout {
     }
   }
 
-  @Override
-  public boolean post(Runnable action) {
-    return super.post(WXThread.secure(action));
-  }
-
   /**
    * Setting refresh view or loading view
    *
@@ -78,7 +73,7 @@ public class WXRefreshView extends FrameLayout {
   public void setRefreshView(final View view) {
     if (view == null)
       return;
-    post(new Runnable() {
+    post(WXThread.secure(new Runnable() {
       @Override
       public void run() {
         View child = null;
@@ -93,7 +88,7 @@ public class WXRefreshView extends FrameLayout {
         }
         linearLayout.addView(temp);
       }
-    });
+    }));
   }
 
   /**

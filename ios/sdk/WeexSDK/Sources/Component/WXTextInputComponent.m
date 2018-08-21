@@ -18,11 +18,7 @@
  */
 
 #import "WXTextInputComponent.h"
-
-@interface WXTextInputView : UITextField
-@property (nonatomic, assign) UIEdgeInsets border;
-@property (nonatomic, assign) UIEdgeInsets padding;
-@end
+#import "WXConvert.h"
 
 @implementation WXTextInputView
 
@@ -51,6 +47,18 @@
     return bounds;
 }
 
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender
+{
+    // this behavior will hide the action like copy, cut, paste, selectAll and so on.
+    // fixed textfield issue
+    // fixed menu item show by system default(like: if word not be selected ,menu item not show "cut")
+    BOOL allowCopyPaste = [[self.wx_component valueForKey:@"allowCopyPaste"] boolValue];
+    if (allowCopyPaste) {
+        return [super canPerformAction:action withSender:sender];
+    }
+    return NO;
+}
+
 - (CGRect)editingRectForBounds:(CGRect)bounds
 {
     return [self textRectForBounds:bounds];
@@ -60,15 +68,34 @@
 @interface WXTextInputComponent()
 
 @property (nonatomic, strong) WXTextInputView *inputView;
+@property (nonatomic, assign) BOOL allowCopyPaste;
 
 @end
 
 @implementation WXTextInputComponent
 
+- (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
+{
+    if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
+        _allowCopyPaste = YES;
+        if (attributes[@"allowCopyPaste"]) {
+            _allowCopyPaste = [WXConvert BOOL:attributes[@"allowCopyPaste"]];
+        }
+    }
+    return self;
+}
+
 - (UIView *)loadView
 {
     _inputView = [[WXTextInputView alloc] init];
     return _inputView;
+}
+
+- (void)updateAttributes:(NSDictionary *)attributes {
+    [super updateAttributes:attributes];
+    if (attributes[@"allowCopyPaste"]) {
+        _allowCopyPaste = [WXConvert BOOL:attributes[@"allowCopyPaste"]];
+    }
 }
 
 -(void)viewDidLoad

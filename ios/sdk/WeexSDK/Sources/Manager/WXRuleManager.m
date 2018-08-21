@@ -25,6 +25,7 @@
 #import "WXURLRewriteProtocol.h"
 #import "WXComponentManager.h"
 #import "WXDefine.h"
+#import "WXSDKEngine.h"
 
 @interface WXRuleManager()
 @property (nonatomic, strong) WXThreadSafeMutableDictionary *fontStorage;
@@ -82,13 +83,13 @@ static WXRuleManager *_sharedInstance = nil;
             }
             
             fontSrc = newURL;
-            NSMutableDictionary * fontFamily = [self.fontStorage objectForKey:rule[@"fontFamily"]];
-            if (fontFamily && [fontFamily[@"src"] isEqualToString:fontSrc]) {
+            WXThreadSafeMutableDictionary * fontFamily = [self.fontStorage objectForKey:rule[@"fontFamily"]];
+            if (fontFamily && [fontFamily[@"tempSrc"] isEqualToString:fontSrc]) {
                 // if the new src is same as src in dictionary , ignore it, or update it
                 return;
             }
             if (!fontFamily) {
-                fontFamily = [NSMutableDictionary dictionary];
+                fontFamily = [[WXThreadSafeMutableDictionary alloc] init];
             }
             NSURL *fontURL = [NSURL URLWithString:fontSrc];
             if (!fontURL) {
@@ -113,7 +114,7 @@ static WXRuleManager *_sharedInstance = nil;
             [WXUtility getIconfont:fontURL completion:^(NSURL * _Nonnull url, NSError * _Nullable error) {
                 if (!error && url) {
                     // load success
-                    NSMutableDictionary * dictForFontFamily = [weakSelf.fontStorage objectForKey:rule[@"fontFamily"]];
+                    WXThreadSafeMutableDictionary * dictForFontFamily = [weakSelf.fontStorage objectForKey:rule[@"fontFamily"]];
                     NSString *fontSrc = [dictForFontFamily objectForKey:@"tempSrc"];
                     if (fontSrc) {
                         // only remote font will be mark as tempSrc

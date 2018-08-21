@@ -48,4 +48,8 @@
 
 + (NSDictionary *) jsServiceCache;
 
++ (BOOL)isRemoteTracing;
+
++ (void)setRemoteTracing:(BOOL)isRemoteTracing;
+
 @end

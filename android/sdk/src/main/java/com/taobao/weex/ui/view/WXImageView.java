@@ -22,9 +22,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -38,13 +40,16 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 
 public class WXImageView extends ImageView implements WXGestureObservable,
-                                                      IRenderStatus<WXImage>,
-                                                      IRenderResult<WXImage>, WXImage.Measurable {
+        IRenderStatus<WXImage>,
+        IRenderResult<WXImage>, WXImage.Measurable {
 
   private WeakReference<WXImage> mWeakReference;
   private WXGesture wxGesture;
   private float[] borderRadius;
   private boolean gif;
+  private boolean isBitmapReleased = false;
+  private boolean enableBitmapAutoManage = true;
+
 
   public WXImageView(Context context) {
     super(context);
@@ -61,10 +66,10 @@ public class WXImageView extends ImageView implements WXGestureObservable,
     ViewGroup.LayoutParams layoutParams;
     if ((layoutParams = getLayoutParams()) != null) {
       Drawable wrapDrawable = ImageDrawable.createImageDrawable(drawable,
-                                                                getScaleType(), borderRadius,
-                                                                layoutParams.width - getPaddingLeft() - getPaddingRight(),
-                                                                layoutParams.height - getPaddingTop() - getPaddingBottom(),
-                                                                isGif);
+              getScaleType(), borderRadius,
+              layoutParams.width - getPaddingLeft() - getPaddingRight(),
+              layoutParams.height - getPaddingTop() - getPaddingBottom(),
+              isGif);
       if (wrapDrawable instanceof ImageDrawable) {
         ImageDrawable imageDrawable = (ImageDrawable) wrapDrawable;
         if (!Arrays.equals(imageDrawable.getCornerRadii(), borderRadius)) {
@@ -94,6 +99,11 @@ public class WXImageView extends ImageView implements WXGestureObservable,
   @Override
   public void registerGestureListener(WXGesture wxGesture) {
     this.wxGesture = wxGesture;
+  }
+
+  @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
   }
 
   @Override
@@ -167,4 +177,86 @@ public class WXImageView extends ImageView implements WXGestureObservable,
     }
     return -1;
   }
+
+  private boolean mOutWindowVisibilityChangedReally;
+  @Override
+  public void dispatchWindowVisibilityChanged(int visibility) {
+    mOutWindowVisibilityChangedReally = true;
+    super.dispatchWindowVisibilityChanged(visibility);
+    mOutWindowVisibilityChangedReally = false;
+  }
+
+  @Override
+  protected void onWindowVisibilityChanged(int visibility) {
+    super.onWindowVisibilityChanged(visibility);
+    if(mOutWindowVisibilityChangedReally){
+      if(visibility == View.VISIBLE){
+        autoRecoverImage();
+      }else{
+        autoReleaseImage();
+      }
+    }
+  }
+
+
+  @Override
+  protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    autoRecoverImage();
+  }
+
+  @Override
+  protected void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
+    autoReleaseImage();
+
+  }
+
+
+  @Override
+  public void onStartTemporaryDetach () {
+    super.onStartTemporaryDetach();
+    autoReleaseImage();
+
+  }
+
+
+  @Override
+  public void onFinishTemporaryDetach () {
+    super.onFinishTemporaryDetach();
+    autoRecoverImage();
+  }
+
+
+  public void setEnableBitmapAutoManage(boolean enableBitmapAutoManage) {
+    this.enableBitmapAutoManage = enableBitmapAutoManage;
+  }
+
+  public void autoReleaseImage(){
+    if(enableBitmapAutoManage) {
+      if (!isBitmapReleased) {
+        isBitmapReleased = true;
+        WXImage image = getComponent();
+        if (image != null) {
+          image.autoReleaseImage();
+        }
+      }
+    }
+  }
+
+  public void autoRecoverImage(){
+    if(enableBitmapAutoManage){
+      if(isBitmapReleased){
+        WXImage image = getComponent();
+        if(image != null){
+          image.autoRecoverImage();
+        }
+        isBitmapReleased = false;
+      }
+    }
+  }
+
+
+
+
 }

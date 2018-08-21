@@ -10,6 +10,8 @@ build/
 _demo/
 DerivedData
 
+sdk/Products
+
 ## Various settings
 *.pbxuser
 !default.pbxuser
@@ -64,4 +66,5 @@ fastlane/screenshots
 # Created by https://www.gitignore.io/api/node
 
 *.gcno
+.xcodecoverageignore
 

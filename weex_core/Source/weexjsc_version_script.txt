@@ -1,0 +1,4 @@
+{
+    global: *Inject_GCanvasFunc*; Java_com*; JNI_OnLoad; JNI_OnUnload;
+    local: *;
+};

@@ -26,6 +26,21 @@
 
 @end
 
+typedef NS_ENUM(NSInteger, WXImageLoaderCacheType) {
+    /**
+     * The image wasn't available the imageLoad caches, but was downloaded from the web.
+     */
+    WXImageLoaderCacheTypeNone,
+    /**
+     * The image was obtained from the disk cache.
+     */
+    WXImageLoaderCacheTypeDisk,
+    /**
+     * The image was obtained from the memory cache.
+     */
+    WXImageLoaderCacheTypeMemory
+};
+
 @protocol WXImgLoaderProtocol <WXModuleProtocol>
 
 /**
@@ -43,5 +58,32 @@
  *              finished : a Boolean value indicating whether download action has finished.
  */
 - (id<WXImageOperationProtocol>)downloadImageWithURL:(NSString *)url imageFrame:(CGRect)imageFrame userInfo:(NSDictionary *)options completed:(void(^)(UIImage *image,  NSError *error, BOOL finished))completedBlock;
+
+@optional
+
+/**
+ * @abstract Creates a image download handler with a given URL
+ *
+ * @param imageView UIImageView to display the image
+ *
+ * @param url The URL of the image to download
+ *
+ * @param placeholder The image to be set initially, until the image request finishes.
+ *
+ * @param options : The options to be used for download operation
+ *
+ * @param progressBlock : A block called while the download start
+ *
+ * @param completedBlock : A block called once the download is completed.
+ *                 image : the image which has been download to local.
+ *                 error : the error which has happened in download.
+ *              finished : a Boolean value indicating whether download action has finished.
+ */
+- (void)setImageViewWithURL:(UIImageView*)imageView
+                        url:(NSURL *)url
+           placeholderImage:(UIImage *)placeholder
+                    options:(NSDictionary*)options
+                   progress:(void(^)(NSInteger receivedSize, NSInteger expectedSize))progressBlock
+                  completed:(void(^)(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL))completedBlock;
 
 @end

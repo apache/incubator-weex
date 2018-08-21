@@ -19,6 +19,8 @@
 
 #import "WXJSExceptionInfo.h"
 
+typedef WXJSExceptionInfo WXRuntimeCheckException;
+
 @protocol WXJSExceptionProtocol <NSObject>
 
 /**
@@ -28,5 +30,13 @@
  */
 
 - (void)onJSException:(WXJSExceptionInfo*) exception;
+
+
+@optional
+
+/**
+ * report runtime check exception, this is optional for this protocol
+ */
+- (void)onRuntimeCheckException:(WXRuntimeCheckException*)exception;
 
 @end

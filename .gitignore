@@ -12,7 +12,7 @@ test/build
 weex_tmp
 coverage
 dist
-packages
+*.js.gz
 
 # Node
 logs
@@ -39,18 +39,14 @@ examples/vue/test/
 html5/browser/extend/packer.js
 html5/render/browser/extend/packer.js
 
+# Created by weex-vue-bundle-util
+weex-vue-plugins.js
+
 android/playground/app/gradlew
 android/playground/app/gradlew.bat
 android/playground/app/gradle/wrapper/gradle-wrapper.jar
 android/playground/app/gradle/wrapper/gradle-wrapper.properties
 android/sdk/.externalNativeBuild/ndkBuild/
-
-# doc
-doc/Thumbs.db
-doc/db.json
-doc/node_modules/
-doc/public/
-doc/.deploy*/
 
 # release
 apache_release_temp

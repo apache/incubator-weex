@@ -21,12 +21,16 @@ package com.taobao.weex.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
+import android.graphics.drawable.shapes.Shape;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
@@ -42,7 +46,7 @@ public class ImageDrawable extends PaintDrawable {
     Bitmap bm;
     if (!gif && vWidth > 0 && vHeight > 0) {
       if (original instanceof BitmapDrawable &&
-          (bm = ((BitmapDrawable) original).getBitmap()) != null) {
+              (bm = ((BitmapDrawable) original).getBitmap()) != null) {
         ImageDrawable imageDrawable;
         imageDrawable = new ImageDrawable();
         imageDrawable.bitmapWidth = bm.getWidth();
@@ -54,7 +58,7 @@ public class ImageDrawable extends PaintDrawable {
       } else if (original instanceof ImageDrawable) {
         ImageDrawable imageDrawable = (ImageDrawable) original;
         if (imageDrawable.getPaint() != null &&
-            imageDrawable.getPaint().getShader() instanceof BitmapShader) {
+                imageDrawable.getPaint().getShader() instanceof BitmapShader) {
           BitmapShader bitmapShader = (BitmapShader) imageDrawable.getPaint().getShader();
           updateShaderAndSize(scaleType, vWidth, vHeight, imageDrawable, bitmapShader);
           return imageDrawable;
@@ -66,8 +70,8 @@ public class ImageDrawable extends PaintDrawable {
 
   private static void updateShaderAndSize(@NonNull ImageView.ScaleType scaleType, int vWidth, int vHeight, ImageDrawable imageDrawable, BitmapShader bitmapShader) {
     Matrix matrix = createShaderMatrix(scaleType, vWidth, vHeight,
-                                       imageDrawable.bitmapWidth,
-                                       imageDrawable.bitmapHeight);
+            imageDrawable.bitmapWidth,
+            imageDrawable.bitmapHeight);
     int intrinsicWidth = vWidth, intrinsicHeight = vHeight;
     if (scaleType == ImageView.ScaleType.FIT_CENTER) {
       RectF bitmapRect = new RectF(0, 0, imageDrawable.bitmapWidth, imageDrawable.bitmapHeight), contentRect = new RectF();
@@ -75,7 +79,7 @@ public class ImageDrawable extends PaintDrawable {
       intrinsicWidth = (int) contentRect.width();
       intrinsicHeight = (int) contentRect.height();
       matrix = createShaderMatrix(scaleType, intrinsicWidth, intrinsicHeight, imageDrawable
-          .bitmapWidth, imageDrawable.bitmapHeight);
+              .bitmapWidth, imageDrawable.bitmapHeight);
     }
     imageDrawable.setIntrinsicWidth(intrinsicWidth);
     imageDrawable.setIntrinsicHeight(intrinsicHeight);
@@ -121,6 +125,15 @@ public class ImageDrawable extends PaintDrawable {
   public void setCornerRadii(float[] radii) {
     this.radii = radii;
     super.setCornerRadii(radii);
+  }
+
+  @Override
+  protected void onDraw(Shape shape, Canvas canvas, Paint paint) {
+    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP) {
+      // fix api 21 PaintDrawable crash
+      paint.setAntiAlias(false);
+    }
+    super.onDraw(shape, canvas, paint);
   }
 
   public
