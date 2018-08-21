@@ -702,7 +702,15 @@ Handle<Expression> RAXParser::ParseMemberExpression()
         else {
             break;
         }
-        member = builder()->NewMemberExpression(kind, member, temp);
+        if (kind == MemberAccessKind::kCall) {
+            if (member->IsMemberExpression()) {
+                member->AsMemberExpression()->setKind(kind);
+            }
+            member = builder()->NewCallExpression(kind, member, temp);
+        }
+        else {
+            member = builder()->NewMemberExpression(kind, member, temp);
+        }
     }
     
     return member;

@@ -28,10 +28,12 @@ namespace core {
 namespace data_render {
 
 static Value isArray(ExecState *exec_state);
+static Value push(ExecState *exec_state);
     
 ClassDescriptor *NewClassArray() {
     ClassDescriptor *array_desc = new ClassDescriptor(nullptr);
     AddClassStaticCFunc(array_desc, "isArray", isArray);
+    AddClassCFunc(array_desc, "push", push);
     return array_desc;
 }
     
@@ -78,6 +80,16 @@ Value GetArray(Array *array, const Value &index) {
     } while (0);
     
     return ret;
+}
+    
+static Value push(ExecState *exec_state) {
+    size_t length = exec_state->GetArgumentCount();
+    if (length != 2) {
+        throw VMExecError("Argument Count Error For Array.push");
+    }
+    Value *array = exec_state->GetArgument(0);
+    Value *item = exec_state->GetArgument(1);
+    return Value();
 }
 
 static Value isArray(ExecState *exec_state) {

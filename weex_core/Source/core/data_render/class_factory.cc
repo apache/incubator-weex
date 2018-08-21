@@ -62,6 +62,10 @@ ClassFactory::~ClassFactory() {
         delete *iter;
     }
     insts_.clear();
+    for (auto iter = arrays_.begin(); iter != arrays_.end(); iter++) {
+        delete *iter;
+    }
+    arrays_.clear();
 }
 
 }

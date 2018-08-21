@@ -407,6 +407,7 @@ class MemberExpression : public Expression {
 
   Handle<Expression> member() { return member_; }
   MemberAccessKind kind() { return kind_; }
+  void setKind(MemberAccessKind kind) { kind_ = kind; }
 
   Handle<Expression> expr() { return expr_; }
   bool ProduceRValue() override { return false; }

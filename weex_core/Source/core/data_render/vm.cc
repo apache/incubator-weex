@@ -197,7 +197,6 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             throw VMExecError("Unspport Type With OP_CODE [OP_CALL]");
         }
         exec_state->CallFunction(c, argc, a);
-          
       }
         break;
 
@@ -425,30 +424,56 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
-            if (!IsClassInstance(b)) {
-                throw VMExecError("Type Error For Class Instance with OP_CODE [OP_GETCLASSVAR]");
+            if (!IsClassInstance(b) && !IsClass(b) && !IsArray(b)) {
+                throw VMExecError("Type Error For Class Instance Or Class With OP_CODE [OP_GETCLASSVAR]");
             }
             if (!IsString(c)) {
                 throw VMExecError("Type Error For Member with OP_CODE [OP_GETCLASSVAR]");
             }
-            // first find member func
             std::string var_name = StringValue(c)->c_str();
-            Variables *funcs = ObjectValue<ClassInstance>(b)->p_desc_->funcs_.get();
-            int index = funcs->IndexOf(var_name);
-            if (index < 0) {
-                Variables *vars = ObjectValue<ClassInstance>(b)->vars_.get();
-                index = vars->IndexOf(var_name);
+            // first find member func
+            if (IsClassInstance(b)) {
+                Variables *funcs = ObjectValue<ClassInstance>(b)->p_desc_->funcs_.get();
+                int index = funcs->IndexOf(var_name);
                 if (index < 0) {
-                    Value var;
-                    SetNil(&var);
-                    index = vars->Add(var_name, var);
+                    Variables *vars = ObjectValue<ClassInstance>(b)->vars_.get();
+                    index = vars->IndexOf(var_name);
+                    if (index < 0) {
+                        Value var;
+                        SetNil(&var);
+                        index = vars->Add(var_name, var);
+                    }
+                    Value *ref = vars->Find(index);
+                    SetValueRef(a, ref);
                 }
-                Value *ref = vars->Find(index);
-                SetValueRef(a, ref);
+                else {
+                    Value *ref = funcs->Find(index);
+                    SetValueRef(a, ref);
+                }
+            }
+            else if (IsArray(b)) {
+                int index = exec_state->global()->IndexOf("Array");
+                if (index < 0) {
+                    throw VMExecError("Can't Find Array Class With OP_CODE [OP_GETCLASSVAR]");
+                }
+                Value *class_desc = exec_state->global()->Find(index);
+                Variables *funcs = ObjectValue<ClassDescriptor>(class_desc)->funcs_.get();
+                index = funcs->IndexOf(var_name);
+                if (index < 0) {
+                    throw VMExecError("Can't Find Array Func " + var_name + " With OP_CODE [OP_GETCLASSVAR]");
+                }
+                Value *func = funcs->Find(index);
+                *a = *func;
             }
             else {
-                Value *ref = funcs->Find(index);
-                SetValueRef(a, ref);
+                // only can find class static funcs;
+                Variables *funcs = ObjectValue<ClassDescriptor>(b)->static_funcs_.get();
+                int index = funcs->IndexOf(var_name);
+                if (index < 0) {
+                    throw VMExecError("Can't Find Static Func " + var_name + " With OP_CODE [OP_GETCLASSVAR]");
+                }
+                Value *func = funcs->Find(index);
+                *a = *func;
             }
             break;
         }
@@ -488,6 +513,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
+        std::string str = CStringValue(c);
         if (!IsTable(b)) {
           // TODO error
             throw VMExecError("Unspport Type with OP_CODE [OP_GETTABLE]");

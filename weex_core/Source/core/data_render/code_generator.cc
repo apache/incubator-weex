@@ -146,20 +146,80 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
         }
     }
     else if (stms->expr().get() && stms->member().get()) {
-        long reg_member = block_->NextRegisterId();
-        auto value = exec_state_->string_table_->StringFromUTF8(stms->member()->AsIdentifier()->GetName());
-        int tableIndex = func_state->AddConstant(std::move(value));
-        func_state->AddInstruction(CREATE_ABx(OP_LOADK, reg_member, tableIndex));
-        long reg_class = block_->FindRegisterId(stms->expr()->AsIdentifier()->GetName());
-        if (reg_class < 0) {
-            throw GeneratorError("can't find " + stms->expr()->AsIdentifier()->GetName());
+        if (class_ && stms->expr()->IsIdentifier() && stms->expr()->AsIdentifier()->GetName() == "super")
+        {
+            ClassDescriptor *class_desc = ObjectValue<ClassDescriptor>(class_->class_value());
+            if (!class_desc->p_super_) {
+                throw GeneratorError("can't call super without class desc");
+            }
+            ClassDescriptor *class_desc_super = class_desc->p_super_;
+            int index = class_desc_super->funcs_->IndexOf("constructor");
+            if (index < 0) {
+                throw GeneratorError("can't call super without class desc");
+            }
+            long reg_this = block_->FindRegisterId("this");
+            if (reg_this < 0) {
+                throw GeneratorError("can't call super this without class desc");
+            }
+            caller = block_->NextRegisterId();
+            long arg_super = block_->NextRegisterId();
+            func_state->AddInstruction(CREATE_ABC(OP_GETSUPER, arg_super, reg_this, caller));
+            argc++;
+            if (stms->member()->IsArgumentList()) {
+                Handle<ArgumentList> arg_list = stms->member()->AsArgumentList();
+                for (int i = 0; i < arg_list->length(); i++) {
+                    long arg = block_->NextRegisterId();
+                    arg_list->args()->raw_list()[i]->Accept(this, &arg);
+                }
+                argc += arg_list->length();
+            }
         }
-        // caller and args must be continuous;
-        caller = block_->NextRegisterId();
-        func_state->AddInstruction(CREATE_ABC(OP_GETCLASS, caller, reg_class, reg_member));
-        long arg = block_->NextRegisterId();
-        stms->expr()->Accept(this, &arg);
-        argc = stms->args().size() + 1;
+        else {
+            if (stms->expr()->IsIdentifier()) {
+                long reg_member = block_->NextRegisterId();
+                auto value = exec_state_->string_table_->StringFromUTF8(stms->member()->AsIdentifier()->GetName());
+                int tableIndex = func_state->AddConstant(std::move(value));
+                func_state->AddInstruction(CREATE_ABx(OP_LOADK, reg_member, tableIndex));
+                long reg_class = block_->FindRegisterId(stms->expr()->AsIdentifier()->GetName());
+                if (reg_class < 0) {
+                    throw GeneratorError("can't find " + stms->expr()->AsIdentifier()->GetName());
+                }
+                // caller and args must be continuous;
+                caller = block_->NextRegisterId();
+                func_state->AddInstruction(CREATE_ABC(OP_GETCLASS, caller, reg_class, reg_member));
+                long arg = block_->NextRegisterId();
+                stms->expr()->Accept(this, &arg);
+                argc = stms->args().size() + 1;
+            }
+            else {
+                caller = block_->NextRegisterId();
+                stms->expr()->Accept(this, &caller);
+                argc = stms->args().size();
+                if (block_->idx() > caller + 1) {
+                    long reg_old_caller = caller;
+                    caller = block_->NextRegisterId();
+                    func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, reg_old_caller, 0));
+                }
+                if (stms->expr()->IsMemberExpression()) {
+                    Handle<Expression> left = stms->expr()->AsMemberExpression()->expr();
+                    std::string class_name = left->AsIdentifier()->GetName();
+                    int index = exec_state_->global()->IndexOf(class_name);
+                    if (index <= 0) {
+                        long arg = block_->NextRegisterId();
+                        stms->expr()->AsMemberExpression()->expr()->AsIdentifier()->Accept(this, &arg);
+                        argc++;
+                    }                    
+                }
+                if (stms->member()->IsArgumentList()) {
+                    Handle<ArgumentList> arg_list = stms->member()->AsArgumentList();
+                    for (int i = 0; i < arg_list->length(); i++) {
+                        long arg = block_->NextRegisterId();
+                        arg_list->args()->raw_list()[i]->Accept(this, &arg);
+                    }
+                    argc += arg_list->length();
+                }
+            }
+        }
     }
     for (auto it = stms->args().begin(); it != stms->args().end(); ++it) {
         auto temp = (*it).get();
@@ -453,6 +513,7 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
             exprs[i]->Accept(this, data);
         }
         
+        
     } while (0);
 }
 
@@ -532,12 +593,17 @@ void CodeGenerator::Visit(AssignExpression *node, void *data) {
 
 void CodeGenerator::Visit(Declaration *node, void *data) {
   long reg = block_->NextRegisterId();
+  FuncState *func_state = func_->func_state();
   block_->variables().insert(std::make_pair(node->name(), reg));
   if (node->expr().get() != nullptr) {
-    node->expr()->Accept(this, &reg);
-  } else {
-    FuncState* state = func_->func_state();
-    state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
+      node->expr()->Accept(this, &reg);
+  }
+  else {
+      func_state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
+  }
+  if (data) {
+      long ret = *static_cast<long *>(data);
+      func_state->AddInstruction(CREATE_ABC(OP_MOVE, ret, reg, 0));
   }
 }
 
@@ -652,6 +718,7 @@ void CodeGenerator::Visit(ArrayConstant* node, void* data) {
 void CodeGenerator::Visit(MemberExpression *node, void *data) {
     RegisterScope registerScope(block_);
     long ret = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
+    FuncState *func_state = func_->func_state();
     if (node->kind() == MemberAccessKind::kIndex) {
         Handle<Expression> left = node->expr();
         left->Accept(this, &ret);
@@ -659,14 +726,12 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
         if (node->member().get() != NULL) {
             node->member()->Accept(this, &mindex);
         }
-        FuncState *funcState = func_->func_state();
-        funcState->AddInstruction(CREATE_ABC(OP_GETARRAY, ret, ret, mindex));
+        func_state->AddInstruction(CREATE_ABC(OP_GETARRAY, ret, ret, mindex));
     }
-    else if (node->kind() == MemberAccessKind::kDot) {
+    else if (node->kind() == MemberAccessKind::kDot || node->kind() == MemberAccessKind::kCall) {
         Handle<Expression> left = node->expr();
         left->Accept(this, &ret);
         long right = block_->NextRegisterId();
-        FuncState *func_state = func_->func_state();
         auto value = exec_state_->string_table_->StringFromUTF8(node->member()->AsIdentifier()->GetName());
         int tableIndex = func_state->AddConstant(std::move(value));
         func_state->AddInstruction(CREATE_ABx(OP_LOADK, right, tableIndex));
@@ -674,56 +739,36 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
             func_state->AddInstruction(CREATE_ABC(OP_GETCLASSVAR, ret, ret, right));
         }
         else {
-            func_state->AddInstruction(CREATE_ABC(OP_GETTABLE, ret, ret, right));
+            std::string class_name = left->AsIdentifier()->GetName();
+            int index = exec_state_->global()->IndexOf(class_name);
+            if (index < 0) {
+                if (node->kind() == MemberAccessKind::kDot) {
+                    func_state->AddInstruction(CREATE_ABC(OP_GETTABLE, ret, ret, right));
+                }
+                else {
+                    func_state->AddInstruction(CREATE_ABC(OP_GETCLASSVAR, ret, ret, right));
+                }
+            }
+            else {
+                // class call
+                Value *value = exec_state_->global()->Find(index);
+                if (IsClass(value)) {
+                    func_state->AddInstruction(CREATE_ABC(OP_GETCLASSVAR, ret, ret, right));
+                }
+                else {
+                    func_state->AddInstruction(CREATE_ABC(OP_GETTABLE, ret, ret, right));
+                }
+            }
         }
     }
     else if (node->kind() == MemberAccessKind::kClass) {
         Handle<Expression> left = node->expr();
         left->Accept(this, &ret);
         long right = block_->NextRegisterId();
-        FuncState *func_state = func_->func_state();
         auto value = exec_state_->string_table_->StringFromUTF8(node->member()->AsIdentifier()->GetName());
         int tableIndex = func_state->AddConstant(std::move(value));
         func_state->AddInstruction(CREATE_ABx(OP_LOADK, right, tableIndex));
         func_state->AddInstruction(CREATE_ABC(OP_GETCLASSVAR, ret, ret, right));
-    }
-    else if (node->kind() == MemberAccessKind::kCall) {
-        FuncState *func_state = func_->func_state();
-        Handle<Expression> expr = node->expr();
-        if (expr->IsIdentifier() && expr->AsIdentifier()->GetName() == "super" && !class_) {
-            throw GeneratorError("can't call super without class desc");
-        }
-        if (class_) {
-            // super must call constructor
-            if (expr->IsIdentifier() && expr->AsIdentifier()->GetName() == "super") {
-                ClassDescriptor *class_desc = ObjectValue<ClassDescriptor>(class_->class_value());
-                if (!class_desc->p_super_) {
-                    throw GeneratorError("can't call super without class desc");
-                }
-                ClassDescriptor *class_desc_super = class_desc->p_super_;
-                int index = class_desc_super->funcs_->IndexOf("constructor");
-                if (index < 0) {
-                    throw GeneratorError("can't call super without class desc");
-                }
-                long reg_this = block_->FindRegisterId("this");
-                if (reg_this < 0) {
-                    throw GeneratorError("can't call super this without class desc");
-                }
-                long caller = block_->NextRegisterId();
-                long arg_super = block_->NextRegisterId();
-                func_state->AddInstruction(CREATE_ABC(OP_GETSUPER, arg_super, reg_this, caller));
-                size_t argc = 1;
-                if (node->member()->IsArgumentList()) {
-                    Handle<ArgumentList> arg_list = node->member()->AsArgumentList();
-                    for (int i = 0; i < arg_list->length(); i++) {
-                        long arg = block_->NextRegisterId();
-                        arg_list->args()->raw_list()[i]->Accept(this, &arg);
-                    }
-                    argc += arg_list->length();
-                }
-                func_state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
-            }
-        }
     }
 }
 
