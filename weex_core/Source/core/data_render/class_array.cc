@@ -35,6 +35,7 @@ ClassDescriptor *NewClassArray() {
     ClassDescriptor *array_desc = new ClassDescriptor(nullptr);
     AddClassStaticCFunc(array_desc, "isArray", isArray);
     AddClassCFunc(array_desc, "push", push);
+    AddClassCFunc(array_desc, "slice", slice);
     return array_desc;
 }
     
@@ -118,7 +119,7 @@ static Value slice(ExecState *exec_state) {
     Value ret;
     do {
         size_t argc = exec_state->GetArgumentCount();
-        if (argc != 3) {
+        if (argc < 2) {
             throw VMExecError("argument count error for Array.slice");
             break;
         }
@@ -126,7 +127,33 @@ static Value slice(ExecState *exec_state) {
         if (!IsArray(array)) {
             throw VMExecError("Array.slice caller isn't a Array");
         }
-
+        Value *start = exec_state->GetArgument(1);
+        if (!IsInt(start)) {
+            throw VMExecError("Array.slice start isn't a int");
+        }
+        int start_index = (int)IntValue(start);
+        std::vector<Value> items = ObjectValue<Array>(array)->items;
+        int end_index = (int)items.size();
+        Value *end = nullptr;
+        if (argc > 2) {
+            end = exec_state->GetArgument(2);
+            if (!IsInt(end)) {
+                throw VMExecError("Array.slice end isn't a int");
+            }
+            end_index = (int)IntValue(end);
+            if (end_index < 0) {
+                end_index = (int)items.size() + end_index;
+            }
+            if (end_index > items.size()) {
+                end_index = (int)items.size();
+            }
+        }
+        ret = exec_state->class_factory()->CreateArray();
+        if (start_index >= 0 && start_index < items.size()) {
+            for (int i = start_index; i < end_index; i++) {
+                ObjectValue<Array>(&ret)->items.push_back(items[i]);
+            }
+        }
 
     } while (0);
     
