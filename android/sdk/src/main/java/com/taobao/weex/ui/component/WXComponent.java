@@ -170,6 +170,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private String mLastBoxShadowId;
   public int mDeepInComponentTree = 0;
   public boolean mIsAddElementToTree = false;
+  public boolean mHasAddFocusListener = false;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
@@ -331,7 +332,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
       addClickListener(mClickEventListener);
     } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR))) {
-      addFocusChangeListener(new OnFocusChangeListener() {
+      if (mHasAddFocusListener){
+        mHasAddFocusListener = true;
+        addFocusChangeListener(new OnFocusChangeListener() {
         @Override
         public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
@@ -339,6 +342,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           fireEvent(hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
         }
       });
+      }
     } else if (needGestureDetector(type)) {
       if (null == view) {
         // wait next time to add.
