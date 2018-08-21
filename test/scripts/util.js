@@ -114,7 +114,7 @@ module.exports = {
         return isIOS? iOSOpts : androidOpts;
     },
     getDeviceHost:function(){
-        return getIpAddress()+":12581";
+        return getIpAddress()+':'+ servePort;
     },
     getPage:function(name){
         let url
