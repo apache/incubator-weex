@@ -631,7 +631,7 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
     // 2. get the template type specified by data, and if template is not found, return an empty view of any template to avoid crash.
     NSString * templateType = [self templateType:indexPath];
     _templateManager.collectionView = collectionView;
-    if (!templateType || (templateType && ![_templateManager isTemplateRegistered:templateType])) {
+    if (!templateType) {
         WXLogError(@"Template %@ not registered for collection view.", templateType);
         UICollectionViewCell *cellView = [_collectionView dequeueReusableCellWithReuseIdentifier:[_templateManager anyRegisteredTemplate] forIndexPath:indexPath];
         for (UIView *view in cellView.contentView.subviews) {
@@ -640,6 +640,9 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
         cellView.wx_component = nil;
         [cellView setAccessibilityIdentifier:nil];
         return cellView;
+    }
+    if (![_templateManager isTemplateRegistered:templateType]) {
+        templateType = @"default";
     }
     
     // 3. dequeue a cell component by template type
