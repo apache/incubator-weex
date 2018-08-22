@@ -610,6 +610,13 @@ typedef enum : NSUInteger {
     return [_componentManager numberOfComponents];
 }
 
+- (void)enumerateComponentsUsingBlock:(void (^)(WXComponent *, BOOL *stop))block
+{
+    WXAssertComponentThread();
+    
+    [_componentManager enumerateComponentsUsingBlock:block];
+}
+
 - (void)fireGlobalEvent:(NSString *)eventName params:(NSDictionary *)params
 {
     if (!params){
