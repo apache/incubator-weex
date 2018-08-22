@@ -320,6 +320,7 @@ static BOOL bNeedRemoveEvents = YES;
         if (displayType == WXDisplayTypeNone) {
             _isNeedJoinLayoutSystem = NO;
             [self.supercomponent _recomputeCSSNodeChildren];
+            [self _removeFromSupercomponent];
             WXPerformBlockOnMainThread(^{
                 [self removeFromSuperview];
             });

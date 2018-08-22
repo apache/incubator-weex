@@ -572,7 +572,7 @@ do {\
 - (CAShapeLayer *)drawBorderRadiusMaskLayer:(CGRect)rect
 {
     if ([self hasBorderRadiusMaskLayer]) {
-        UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomLeftRadius];
+        UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
         CAShapeLayer *maskLayer = [CAShapeLayer layer];
         maskLayer.path = bezierPath.CGPath;
         return maskLayer;

@@ -198,7 +198,7 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
         } else {
             WXComponent *component = [manager componentForRef:ref];
             dispatch_async(dispatch_get_main_queue(), ^{
-                UIView* rootView = manager.weexInstance.rootView;
+                UIView *rootView = manager.weexInstance.rootView;
                 NSMutableDictionary * callbackRsp = nil;
                 if (!component) {
                     callbackRsp = [NSMutableDictionary new];
@@ -231,8 +231,8 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
         return;
     }
     SEL selector = _cmd;
-    [self performBlockOnComponentManager:^(WXComponentManager * manager) {
-        WXRecycleListComponent * recycleListComponent = (WXRecycleListComponent*)[manager componentForRef:recycleListComponentRef];
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
+        WXRecycleListComponent *recycleListComponent = (WXRecycleListComponent*)[manager componentForRef:recycleListComponentRef];
         ((void*(*)(id,SEL,NSString*,NSDictionary*,NSString*))objc_msgSend)(recycleListComponent, selector, componentDataId, componentData,callbackId);
     }];
 }
@@ -247,7 +247,7 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
 - (NSMutableDictionary*)_componentRectInfoWithViewFrame:(CGRect)componentRect
 {
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-    NSMutableDictionary * callbackRsp = [NSMutableDictionary new];
+    NSMutableDictionary *callbackRsp = [NSMutableDictionary new];
     [callbackRsp setObject:@{
                              @"width":@(componentRect.size.width /scaleFactor),
                              @"height":@(componentRect.size.height / scaleFactor),
