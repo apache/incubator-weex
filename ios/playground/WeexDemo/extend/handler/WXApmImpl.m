@@ -1,6 +1,7 @@
 
 #import "WXApmImpl.h"
 #import "WXUtility.h"
+#import "WXComponentManager.h"
 
 @interface WXApmImpl()
 @property(nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* stageMap;
@@ -32,27 +33,43 @@
 
 - (void) onEnd
 {
-    [self _printApmInfo];
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnComponentThread(^{
+        [weakSelf _printApmInfo];
+    });
+    
 }
 
 - (void) onEvent:(NSString *)name withValue:(id)value
 {
-    [self.eventMap setObject:value forKey:name];
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnComponentThread(^{
+        [weakSelf.eventMap setObject:value forKey:name];
+    });
 }
 
 - (void) onStage:(NSString *)name withValue:(long)timestamp
 {
-    [self.stageMap setObject:[NSNumber numberWithLong:timestamp] forKey:name];
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnComponentThread(^{
+         [weakSelf.stageMap setObject:[NSNumber numberWithLong:timestamp] forKey:name];
+    });
 }
 
 - (void) addProperty:(NSString *)name withValue:(id)value
 {
-    [self.propertyMap setObject:value forKey:name];
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnComponentThread(^{
+         [weakSelf.propertyMap setObject:value forKey:name];
+    });
 }
 
 - (void) addStatistic:(NSString *)name withValue:(double)value
 {
-     [self.statisticMap setObject:[NSNumber numberWithDouble:value] forKey:name];
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnComponentThread(^{
+        [weakSelf.statisticMap setObject:[NSNumber numberWithDouble:value] forKey:name];
+    });
 }
 
 - (void) addBiz:(NSString *)bizID withValue:(NSDictionary *)properties

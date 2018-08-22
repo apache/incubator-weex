@@ -6,16 +6,18 @@ extern NSString* const WEEX_PAGE_TOPIC;
 
 /************** properties *****************/
 extern NSString* const KEY_PROPERTIES_ERROR_CODE;
-extern NSString* const KEY_PAGE_PROPERTIES_LAUNCH_ID;
 extern NSString* const KEY_PAGE_PROPERTIES_BIZ_ID;
+extern NSString* const KEY_PAGE_PROPERTIES_BUBDLE_URL;
 extern NSString* const KEY_PAGE_PROPERTIES_JSLIB_VERSION;
 extern NSString* const KEY_PAGE_PROPERTIES_WEEX_VERSION;
 extern NSString* const KEY_PAGE_PROPERTIES_REQUEST_TYPE;
-extern NSString* const KEY_PAGE_PROPERTIES_REQUEST_TYPE;
-extern NSString* const KEY_PAGE_PROPERTIES_NET_TYPE;
-extern NSString* const KEY_PAGE_PROPERTIES_CACHE_TYPE;
-extern NSString* const KEY_PAGE_PROPERTIES_USE_MULTI_CONTEXT;
+extern NSString* const KEY_PAGE_PROPERTIES_Z_CACHE_INFO;
+extern NSString* const KEY_PAGE_PROPERTIES_JS_FM_INIT;
 extern NSString* const KEY_PAGE_PROPERTIES_BUNDLE_TYPE;
+extern NSString* const KEY_PAGE_PROPERTIES_CONTAINER_NAME;
+extern NSString* const KEY_PAGE_PROPERTIES_INSTANCE_TYPE;
+extern NSString* const KEY_PAGE_PROPERTIES_PARENT_PAGE;
+
 
 ///************** stages *****************/
 extern NSString* const KEY_PAGE_STAGES_START;
@@ -24,6 +26,7 @@ extern NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_END;
 extern NSString* const KEY_PAGE_STAGES_RENDER_ORGIGIN;
 extern NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_START;
 extern NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_END;
+extern NSString* const KEY_PAGE_STAGES_CREATE_FINISH;
 extern NSString* const KEY_PAGE_STAGES_FSRENDER;
 extern NSString* const KEY_PAGE_STAGES_INTERACTION;
 extern NSString* const KEY_PAGE_STAGES_DESTROY;
@@ -42,6 +45,8 @@ extern NSString* const KEY_PAGE_STATS_SCROLLER_NUM;
 extern NSString* const KEY_PAGE_STATS_CELL_EXCEED_NUM;
 extern NSString* const KEY_PAGE_STATS_CELL_UN_RE_USE_NUM;
 extern NSString* const KEY_PAGE_STATS_CELL_DATA_UN_RECYCLE_NUM;
+extern NSString* const KEY_PAGE_STATS_EMBED_COUNT;
+extern NSString* const KEY_PAGE_STATS_LARGE_IMG_COUNT;
 
 extern NSString* const KEY_PAGE_STATS_MAX_DEEP_VIEW;
 extern NSString* const KEY_PAGE_STATS_MAX_DEEP_DOM;
@@ -72,6 +77,7 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 @interface WXApmForInstance : NSObject
 
 @property (nonatomic, assign) bool isFSEnd;
+@property (nonatomic, assign) bool isStartRecord;
 
 #pragma mark - basic method
 

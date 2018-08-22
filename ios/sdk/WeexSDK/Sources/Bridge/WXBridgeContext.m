@@ -337,6 +337,7 @@ _Pragma("clang diagnostic pop") \
         
         // Temporary here , in order to improve performance, will be refactored next version.
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        [instance.apmInstance onStage:KEY_PAGE_STAGES_CREATE_FINISH];
         
         if(![weakSelf checkInstance:instance]) {
             return -1;
@@ -526,7 +527,6 @@ _Pragma("clang diagnostic pop") \
         bundleType = [self _pareJSBundleType:instanceIdString jsBundleString:jsBundleString]; // bundleType can be Vue, Rax and the new framework.
     }
     if (bundleType&&shoudMultiContext) {
-        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_USE_MULTI_CONTEXT withValue:[NSNumber numberWithBool:true]];
         [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:bundleType];
         NSMutableDictionary *newOptions = [options mutableCopy];
         if (!options) {
@@ -608,8 +608,7 @@ _Pragma("clang diagnostic pop") \
         }
         
     } else {
-        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_USE_MULTI_CONTEXT withValue:[NSNumber numberWithBool:false]];
-        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:@"singleContextUnkonwType"];
+        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:@"other"];
         if (data){
             args = @[instanceIdString, jsBundleString, options ?: @{}, data];
         } else {

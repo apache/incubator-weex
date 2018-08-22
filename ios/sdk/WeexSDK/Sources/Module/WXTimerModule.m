@@ -46,6 +46,7 @@
         
         if (weexInstance && !weexInstance.isJSCreateFinish) {
             weexInstance.performance.timerNum++;
+            [weexInstance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_TIMER_NUM withDiffValue:1];
         }
     }
     
