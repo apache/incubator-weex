@@ -21,10 +21,10 @@ package com.taobao.weex.utils;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
+import android.system.ErrnoException;
+import android.system.Os;
 import android.text.TextUtils;
-import android.util.Log;
 
-import com.taobao.weex.BuildConfig;
 import com.taobao.weex.IWXStatisticsListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
@@ -34,7 +34,6 @@ import com.taobao.weex.common.WXErrorCode;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -125,6 +124,7 @@ public class WXSoInstallMgrSdk {
 
     // copy startup so
     copyStartUpSo();
+    prepareJsc(libName);
 
     boolean InitSuc = false;
 //    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
@@ -187,6 +187,32 @@ public class WXSoInstallMgrSdk {
   //  }
     return InitSuc;
   }
+
+  private static void prepareJsc(String libName) {
+    String libPath = WXEnvironment.findSoPath(libName);
+    String libJScRealPath = WXEnvironment.getLibJScRealPath();
+
+    File jscFile = new File(libJScRealPath);
+    File libFile = new File(libPath);
+
+    if (!TextUtils.equals(jscFile.getParent(), libFile.getParent())) {
+      File newJsc = new File(libFile.getParentFile(), jscFile.getName());
+      if (Build.VERSION.SDK_INT >= 21) {
+        try {
+          Os.symlink(jscFile.getAbsolutePath(), newJsc.getAbsolutePath());
+        } catch (ErrnoException e) {
+//          e.printStackTrace();
+          WXFileUtils.copyFile(jscFile, newJsc);
+        }
+      } else {
+        WXFileUtils.copyFile(jscFile, newJsc);
+      }
+
+    }
+
+
+  }
+
 
   /**
    * copyStartUpSo
@@ -257,14 +283,7 @@ public class WXSoInstallMgrSdk {
 
         File oldfile = new File(soName);
         if (oldfile.exists()) {
-          FileInputStream inputStream = new FileInputStream(oldfile);
-          byte[] data = new byte[1024];
-          FileOutputStream outputStream =new FileOutputStream(newfile);
-          while (inputStream.read(data) != -1) {
-            outputStream.write(data);
-          }
-          inputStream.close();
-          outputStream.close();
+          WXFileUtils.copyFile(oldfile, newfile);
         } else {
           WXEnvironment.extractSo();
         }

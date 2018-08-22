@@ -208,5 +208,37 @@ public class WXFileUtils {
     zin.closeEntry();
   }
 
+  public static void copyFile(File oldFile, File newFile) {
+    FileInputStream inputStream = null;
+    FileOutputStream outputStream = null;
+    try {
+      inputStream = new FileInputStream(oldFile);
+      byte[] data = new byte[1024];
+      outputStream = new FileOutputStream(newFile);
+      while (inputStream.read(data) != -1) {
+        outputStream.write(data);
+      }
+      inputStream.close();
+      outputStream.close();
+    } catch (Exception e) {
+
+      if (inputStream != null) {
+        try {
+          inputStream.close();
+        } catch (IOException e1) {
+          e1.printStackTrace();
+        }
+      }
+
+      if (outputStream != null) {
+        try {
+          outputStream.close();
+        } catch (IOException e1) {
+          e1.printStackTrace();
+        }
+      }
+    }
+
+  }
 
 }
