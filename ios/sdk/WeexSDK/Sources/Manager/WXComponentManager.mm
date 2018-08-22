@@ -865,6 +865,7 @@ static NSThread *WXComponentThread;
     // clear containers
     _rootComponent = nil;
     [_indexDict removeAllObjects];
+    [_fixedComponents removeAllObjects];
     [_uiTaskQueue removeAllObjects];
 }
 

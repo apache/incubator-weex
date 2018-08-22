@@ -180,8 +180,13 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
 
 - (void)destroyInstance
 {
+    NSString* instanceId = self.weexInstance.instanceId;
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
+        [manager invalidate];
         [manager unload];
+        
+        // Destroy weexcore c++ page and objects.
+        [WXCoreBridge closePage:instanceId];
     }];
 }
 
