@@ -114,6 +114,7 @@ public class WXEnvironment {
 
   public static final String CORE_SO_NAME = "weexcore";
   public static final String CORE_JSS_SO_NAME = "weexjss";
+  public static final String CORE_JSC_SO_NAME = "JavaScriptCore";
   /**
    * this marked jsb.so's version, Change this if we want to update jsb.so
    */
@@ -122,6 +123,9 @@ public class WXEnvironment {
   private static  String CORE_JSS_SO_PATH = null;
 
   private static String CORE_JSS_ICU_PATH = null;
+
+  private static String CORE_JSC_SO_PATH = null;
+
 
   private static Map<String, String> options = new HashMap<>();
   static {
@@ -371,12 +375,6 @@ public class WXEnvironment {
     }
   }
 
-  public static String findSoPath(String libName) {
-    final String libPath = ((PathClassLoader) (WXEnvironment.class.getClassLoader())).findLibrary(libName);
-    WXLogUtils.e(libName + "'s Path is" + libPath);
-    return libPath;
-  }
-
   public static String getCacheDir() {
     final Application application = getApplication();
     if (application == null || application.getApplicationContext() == null)
@@ -429,9 +427,12 @@ public class WXEnvironment {
     return null;
   }
 
-  private static String findLibJssRealPath() {
-    String soPath = findSoPath(CORE_JSS_SO_NAME);
-    String realName = "lib" + CORE_JSS_SO_NAME + ".so";
+
+  public static String findSoPath(String libName) {
+    String soPath = ((PathClassLoader) (WXEnvironment.class.getClassLoader())).findLibrary(libName);
+    WXLogUtils.e(libName + "'s Path is" + soPath);
+
+    String realName = "lib" + libName + ".so";
     if (TextUtils.isEmpty(soPath)) {
       String cacheDir = getCacheDir();
       if (TextUtils.isEmpty(cacheDir)) {
@@ -450,12 +451,21 @@ public class WXEnvironment {
       if (success)
         return new File(getCacheDir(), realName).getAbsolutePath();
     }
-    return "";
+    return soPath;
+  }
+
+  public static String getLibJScRealPath() {
+    if(TextUtils.isEmpty(CORE_JSC_SO_PATH)) {
+      CORE_JSC_SO_PATH = findSoPath(CORE_JSC_SO_NAME);
+      WXLogUtils.e("findLibJscRealPath " + CORE_JSS_SO_PATH);
+    }
+
+    return CORE_JSC_SO_PATH;
   }
 
   public static String getLibJssRealPath() {
     if(TextUtils.isEmpty(CORE_JSS_SO_PATH)) {
-      CORE_JSS_SO_PATH = findLibJssRealPath();
+      CORE_JSS_SO_PATH = findSoPath(CORE_JSS_SO_NAME);
       WXLogUtils.e("findLibJssRealPath " + CORE_JSS_SO_PATH);
     }
 
