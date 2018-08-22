@@ -92,41 +92,47 @@ static JSContext *jsContext;
     }
     
     __block NSMutableDictionary *newData = [NSMutableDictionary dictionary];
-    [templateComponent->_bindingProps enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, WXDataBindingBlock  _Nonnull block, BOOL * _Nonnull stop) {
-        BOOL needUpdate;
-        id value = block(data, &needUpdate);
-        if (value) {
-            newData[key] = value;
-        }
-    }];
+    if (templateComponent->_bindingProps) {
+        [templateComponent->_bindingProps enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, WXDataBindingBlock  _Nonnull block, BOOL * _Nonnull stop) {
+            BOOL needUpdate;
+            id value = block(data, &needUpdate);
+            if (value) {
+                newData[key] = value;
+            }
+        }];
+    }
     
     if (self.attributes[@"@isComponentRoot"]) {
-        if (![recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath]) {
+        NSString *templateId = self.attributes[@"@templateId"];
+        if (![recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath templateId:templateId]) {
             static NSUInteger __componentId = 0;
-            self->_virtualComponentId = [NSString stringWithFormat:@"%@@%lu", listRef, (unsigned long)__componentId % (2048*1024)];
+            self->_virtualComponentId = [NSString stringWithFormat:@"%@@%lu*%@", listRef, (unsigned long)__componentId % (2048*1024),templateId];
             __componentId++;
             dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self.attributes[@"@templateId"] type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(JSValue *value) {
-                [newData addEntriesFromDictionary:[value toArray][0]];
+            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:templateId type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(JSValue *value) {
                 [newData setObject:indexPath forKey:@"indexPath"];
                 [newData setObject:listRef forKey:@"recycleListComponentRef"];
-                [[recycleListComponent dataManager] updateVirtualComponentData:self->_virtualComponentId data:newData];
+                if ([[value toArray][0] isKindOfClass:[NSDictionary class]]) {
+                    NSMutableDictionary *virtualComponentData = [value toArray][0];
+                    [virtualComponentData setObject:indexPath forKey:@"indexPath"];
+                    [[recycleListComponent dataManager] updateVirtualComponentData:self->_virtualComponentId data:virtualComponentData];
+                    [newData addEntriesFromDictionary:virtualComponentData];
+                }
                 dispatch_semaphore_signal(semaphore);
             }];
             dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
             
             [self _refsConventFromData:newData];
-            NSIndexPath *indexPath = newData[@"item"][@"indexPath"];
-            NSUInteger position = [indexPath indexAtPosition:1];
-            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_virtualComponentId type:@"lifecycle" hook:@"attach" args:@[@{@"virtualComponentId":self->_virtualComponentId,@"position":@(position),@"refs":self->_virtalElementInfo[@"refs"]?:@{}}] competion:nil];
+            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:self->_virtualComponentId type:@"lifecycle" hook:@"attach" args:@[@{@"virtualComponentId":self->_virtualComponentId,@"position":@(indexPath.row),@"refs":self->_virtualElementInfo[@"refs"]?:@{}}] competion:nil];
             if ([newData count]) {
                 data = newData;
             }
         } else {
-            newData[@"componentDataId"] = self->_virtualComponentId;
-            NSDictionary * virtualComponentData = [recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath];
+            NSDictionary *virtualComponentData = [recycleListComponent.dataManager virtualComponentDataWithIndexPath:indexPath templateId:templateId];
             [newData addEntriesFromDictionary:virtualComponentData];
-            [newData addEntriesFromDictionary:data];
+            newData[@"virtualComponentId"] = self->_virtualComponentId;
+            [newData setObject:indexPath forKey:@"indexPath"];
+            [newData setObject:listRef forKey:@"recycleListComponentRef"];
             data = newData;
         }
     }
@@ -322,7 +328,6 @@ static JSContext *jsContext;
             WXAssert(NO, @"error binding type:%z", type);
             break;
     }
-    
     [stylesOrAttributesOrEvents enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull name, id  _Nonnull binding, BOOL * _Nonnull stop) {
         if ([binding isKindOfClass:[NSDictionary class]] && binding[WXBindingIdentify]) {
             // {"attributeOrStyleName":{"@binding":"bindingExpression"}
@@ -361,7 +366,6 @@ static JSContext *jsContext;
                         }
                     }
                 }];
-                
                 return type == WXDataBindingTypeEvents ? newArray : [newArray componentsJoinedByString:@""];
             };
         }
@@ -417,7 +421,8 @@ static JSContext *jsContext;
                 return data[identiferName];
             } else {
                 WXLogError(@"identifer:%@ not found", identiferName);
-                return nil;
+                *needUpdate = YES;
+                return @"";
             }
         } else if (expression->is<WXJSMemberExpression>()) {
             WXJSMemberExpression *member = (WXJSMemberExpression *)expression;
@@ -436,7 +441,9 @@ static JSContext *jsContext;
                 if (memberExpression->is<WXJSIdentifier>()) {
                     NSString *propertyName = [NSString stringWithCString:(((WXJSStringLiteral *)member->property)->value).c_str() encoding:[NSString defaultCStringEncoding]];
                     *needUpdate = objectNeedUpdate;
-                    return object[propertyName];
+                    if ([object isKindOfClass:[NSDictionary class]]) {
+                        return object[propertyName];
+                    }
                 } else {
                     id retvalue = [strongSelf bindingBlockWithExpression:member->property](object, &objectNeedUpdate);
                     *needUpdate = objectNeedUpdate || propertyNeedUpdate;
@@ -552,31 +559,37 @@ static JSContext *jsContext;
     return block;
 }
 
-- (void)_attachSlotEvent:(NSDictionary *)data
+- (void)attachSlotEvent:(NSDictionary *)data
 {
-    [self _refsConventFromData:data];
-    if (_virtalElementInfo.count != 0) {
-        NSIndexPath *indexPath = data[@"item"][@"indexPath"];
-        NSUInteger position = [indexPath indexAtPosition:1];
-        [_virtalElementInfo addEntriesFromDictionary:@{@"position":@(position)}];
-        [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:data[@"item"][@"recycleListComponentRef"] type:@"_attach_slot" params:_virtalElementInfo domChanges:nil handlerArguments:nil];
-    }
+    [self cellSlotEventHandle:data isAttach:YES];
 }
 
-- (void)_detachSlotEvent:(NSDictionary *)data
+- (void)detachSlotEvent:(NSDictionary *)data
+{
+    [self cellSlotEventHandle:data isAttach:NO];
+}
+
+- (void)cellSlotEventHandle:(NSDictionary *)data isAttach:(BOOL)isAttach
 {
     [self _refsConventFromData:data];
-    if (_virtalElementInfo.count != 0) {
-        NSIndexPath *indexPath = data[@"item"][@"indexPath"];
-        NSUInteger position = [indexPath indexAtPosition:1];
-        [_virtalElementInfo addEntriesFromDictionary:@{@"position":@(position)}];
-        [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:data[@"item"][@"recycleListComponentRef"] type:@"_detach_slot" params:_virtalElementInfo domChanges:nil handlerArguments:nil];
+    if (_virtualElementInfo.count != 0) {
+        NSString *recycleListComponentRef = data[@"recycleListComponentRef"];
+        NSIndexPath *indexPath = data[@"indexPath"];
+        if (!recycleListComponentRef) {
+            if (data[@"aliasKey"]) {
+                id key = data[@"aliasKey"];
+                recycleListComponentRef = data[key][@"recycleListComponentRef"];
+                indexPath = data[key][@"indexPath"];
+            }
+        }
+        [_virtualElementInfo addEntriesFromDictionary:@{@"position":@(indexPath.row)}];
+        [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:recycleListComponentRef type:isAttach ?@"_attach_slot": @"_detach_slot" params:_virtualElementInfo domChanges:nil handlerArguments:nil];
     }
 }
 
 - (void )_refsConventFromData:(NSDictionary *)data
 {
-    _virtalElementInfo = [NSMutableDictionary new];
+    _virtualElementInfo = [NSMutableDictionary new];
     if (self.attributes[@"ref"]) {
         NSMutableDictionary *subInfo = [NSMutableDictionary new];
         [self _componentInfoOfRef:self subInfo:subInfo data:data];
@@ -598,23 +611,28 @@ static JSContext *jsContext;
         [self _componentInfoOfRef:subcomponent subInfo:subInfo data:data];
     }
     if (subInfo.count !=0) {
-        [_virtalElementInfo setObject:subInfo forKey:@"refs"];
+        [_virtualElementInfo setObject:subInfo forKey:@"refs"];
     }
 }
 
 - (void)_componentInfoOfRef:(WXComponent *)component subInfo:(NSMutableDictionary *)subInfo data:(NSDictionary *)data
 {
     if (component.attributes[@"ref"]) {
-        NSIndexPath *indexPath = data[@"item"][@"indexPath"];
-        NSUInteger position = [indexPath indexAtPosition:1];
-        NSString *virtalElementInfo = [NSString stringWithFormat:@"%@@%lu",component.ref,(unsigned long)position];
-        NSDictionary *refInfo = @{@"attrs":component.attributes,@"type":component->_type,@"ref":virtalElementInfo,@"[[VirtualElement]]":@"true"};
+        NSIndexPath *indexPath = data[@"indexPath"];
+        if (!indexPath) {
+            if (data[@"aliasKey"]) {
+                id key = data[@"aliasKey"];
+                indexPath = data[key][@"indexPath"];
+            }
+        }
+        NSString *virtualElementInfo = [NSString stringWithFormat:@"%@@%lu",component.ref,indexPath.row];
+        NSDictionary *refInfo = @{@"attrs":component.attributes,@"type":component->_type,@"ref":virtualElementInfo,@"[[VirtualElement]]":@"true"};
         if (subInfo[component.attributes[@"ref"]]) {
             [subInfo[component.attributes[@"ref"]] addObject:refInfo];
         }
         else
         {
-            [subInfo setValue:@[refInfo] forKey:component.attributes[@"ref"]];
+            [subInfo setValue:[NSMutableArray arrayWithArray:@[refInfo]] forKey:component.attributes[@"ref"]];
         }
     }
 }

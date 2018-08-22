@@ -26,7 +26,7 @@
 {
     NSArray *_data;
     NSMapTable<NSString*, NSDictionary*>* _virtualComponentData;
-    NSMapTable<NSIndexPath*, NSString*>*  _renderStatus;
+    NSMapTable<NSIndexPath*, NSMutableSet*>* _renderStatus;
 }
 
 - (instancetype)init
@@ -79,21 +79,20 @@
     return [_data count];
 }
 
-- (void)updateVirtualComponentData:(NSString*)componentId data:(NSDictionary*)data
+- (void)updateVirtualComponentData:(NSString *)componentId data:(NSDictionary *)data
 {
     if (!componentId) {
         return;
     }
-    NSIndexPath * indexPath = [data objectForKey:@"indexPath"];
     [_virtualComponentData setObject:data forKey:componentId];
-    [_renderStatus setObject:componentId forKey:indexPath];
-    
-//    NSMutableDictionary* newComponentData = [[_virtualComponentData objectForKey:componentId] mutableCopy];
-//    if (newComponentData) {
-//        [newComponentData addEntriesFromDictionary:data];
-//    } else {
-//        newComponentData = [data mutableCopy];
-//    }
+
+    NSIndexPath *indexPath = [data objectForKey:@"indexPath"];
+    NSMutableSet *ids = [_renderStatus objectForKey:indexPath];
+    if (!ids) {
+        ids = [NSMutableSet set];
+    }
+    [ids addObject:componentId];
+    [_renderStatus setObject:ids forKey:indexPath];
 }
 
 - (void)deleteVirtualComponentAtIndexPaths:(NSArray<NSIndexPath*>*)indexPaths
@@ -102,21 +101,32 @@
     [_renderStatus removeAllObjects];
 }
 
-- (NSDictionary*)virtualComponentDataWithId:(NSString*)componentId
+- (NSDictionary *)virtualComponentDataWithId:(NSString *)componentId
 {
     return [_virtualComponentData objectForKey:componentId];
 }
 
-- (NSString*)virtualComponentIdWithIndexPath:(NSIndexPath*)indexPath
+- (NSString *)virtualComponentIdWithIndexPath:(NSIndexPath *)indexPath templateId:(NSString *)templateId
 {
-    return [_renderStatus objectForKey:indexPath];
+    if (!templateId) {
+        return nil;
+    }
+    NSSet *ids = [_renderStatus objectForKey:indexPath];
+    if (!ids) {
+        return nil;
+    }
+    for (NSString *componentId in ids) {
+        if ([componentId containsString:templateId]) {
+            return componentId;
+        }
+    }
+    return nil;
 }
 
-- (NSDictionary*)virtualComponentDataWithIndexPath:(NSIndexPath*)indexPath
+- (NSDictionary *)virtualComponentDataWithIndexPath:(NSIndexPath*)indexPath templateId:(NSString *)templateId
 {
-    NSString * componentDataId = [self virtualComponentIdWithIndexPath:indexPath];
-    
-    return [self virtualComponentDataWithId:componentDataId];
+    NSString *componentId = [self virtualComponentIdWithIndexPath:indexPath templateId:templateId];
+    return [self virtualComponentDataWithId:componentId];
 }
 
 - (NSInteger)numberOfVirtualComponent
