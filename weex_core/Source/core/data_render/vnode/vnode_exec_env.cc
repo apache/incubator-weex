@@ -216,6 +216,7 @@ static Value AppendChild(ExecState *exec_state) {
   }
   else if (IsString(childrens)) {
       LOGD("[AppendChild]:string:%s\n", CStringValue(childrens));
+      // 平逸补充处理一下
   }
   else {
       VNode *children = reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);
