@@ -69,6 +69,7 @@ static dispatch_queue_t WXImageUpdateQueue;
 @property (nonatomic) BOOL imageLoadEvent;
 @property (nonatomic) BOOL imageDownloadFinish;
 @property (nonatomic) BOOL downloadImageWithURL;
+@property (nonatomic ,strong) NSString* preUrl;
 
 @end
 
@@ -424,6 +425,13 @@ WX_EXPORT_METHOD(@selector(save:))
                 if (imageSize > viewSize+1) {
                     self.weexInstance.performance.imgWrongSizeNum++;
                     [self.weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT withDiffValue:1];
+                }
+                NSString* curUrl = imageURL.absoluteString;
+                if (![curUrl isEqualToString:self.preUrl]) {
+                    self.preUrl = curUrl;
+                    if (image.size.width >1080 && image.size.height > 1920) {
+                        [self.weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_LARGE_IMG_COUNT withDiffValue:1];
+                    }
                 }
             }
         }];

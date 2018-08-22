@@ -12,15 +12,18 @@ NSString* const WEEX_PAGE_TOPIC = @"weex_page";
 
 /************** properties *****************/
 NSString* const KEY_PROPERTIES_ERROR_CODE = @"wxErrorCode";
-NSString* const KEY_PAGE_PROPERTIES_LAUNCH_ID = @"wxLaunchId";
 NSString* const KEY_PAGE_PROPERTIES_BIZ_ID = @"wxBizID";
+NSString* const KEY_PAGE_PROPERTIES_BUBDLE_URL = @"wxBundleUrl";
 NSString* const KEY_PAGE_PROPERTIES_JSLIB_VERSION  = @"wxJSLibVersion";
 NSString* const KEY_PAGE_PROPERTIES_WEEX_VERSION  = @"wxSDKVersion";
 NSString* const KEY_PAGE_PROPERTIES_REQUEST_TYPE  = @"wxRequestType";
-NSString* const KEY_PAGE_PROPERTIES_NET_TYPE  = @"wxNetType";
-NSString* const KEY_PAGE_PROPERTIES_CACHE_TYPE  = @"wxCacheType";
-NSString* const KEY_PAGE_PROPERTIES_USE_MULTI_CONTEXT  = @"wxUseMultiContext";
+NSString* const KEY_PAGE_PROPERTIES_Z_CACHE_INFO  = @"wxZCacheInfo";
+NSString* const KEY_PAGE_PROPERTIES_JS_FM_INIT  = @"wxJsFrameworkInit";
 NSString* const KEY_PAGE_PROPERTIES_BUNDLE_TYPE = @"wxBundleType";
+NSString* const KEY_PAGE_PROPERTIES_CONTAINER_NAME = @"wxContainerName";
+NSString* const KEY_PAGE_PROPERTIES_INSTANCE_TYPE = @"wxInstanceType";
+NSString* const KEY_PAGE_PROPERTIES_PARENT_PAGE = @"wxParentPage";
+
 
 ///************** stages *****************/
 NSString* const KEY_PAGE_STAGES_START = @"wxRecordStart";
@@ -29,6 +32,7 @@ NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_END  = @"wxEndDownLoadBundle";
 NSString* const KEY_PAGE_STAGES_RENDER_ORGIGIN  = @"wxRenderTimeOrigin";
 NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_START  = @"wxStartLoadBundle";
 NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_END  = @"wxEndLoadBundle";
+NSString* const KEY_PAGE_STAGES_CREATE_FINISH = @"wxJSBundleCreateFinish";
 NSString* const KEY_PAGE_STAGES_FSRENDER  = @"wxFsRender";
 NSString* const KEY_PAGE_STAGES_INTERACTION  = @"wxInteraction";
 NSString* const KEY_PAGE_STAGES_DESTROY  = @"wxDestroy";
@@ -47,6 +51,8 @@ NSString* const KEY_PAGE_STATS_SCROLLER_NUM = @"wxScrollerCount";
 NSString* const KEY_PAGE_STATS_CELL_EXCEED_NUM = @"wxCellExceedNum";
 NSString* const KEY_PAGE_STATS_CELL_UN_RE_USE_NUM = @"wxCellUnReUseCount";
 NSString* const KEY_PAGE_STATS_CELL_DATA_UN_RECYCLE_NUM = @"wxCellDataUnRecycleCount";
+NSString* const KEY_PAGE_STATS_EMBED_COUNT=@"wxEmbedCount";
+NSString* const KEY_PAGE_STATS_LARGE_IMG_COUNT=@"wxLargeImgMaxCount";
 
 NSString* const KEY_PAGE_STATS_MAX_DEEP_VIEW = @"wxMaxDeepViewLayer";
 NSString* const KEY_PAGE_STATS_MAX_DEEP_DOM = @"wxMaxDeepVDomLayer";
@@ -105,7 +111,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (nil == _apmProtocolInstance) {
         return;
     }
-    [self.apmProtocolInstance onStage:name withValue:[WXUtility getUnixCurrentTimeMillis]];
+    [self.apmProtocolInstance onStage:name withValue:[WXUtility getUnixFixTimeMillis]];
 }
 
 - (void) setProperty:(NSString *)name withValue:(id)value
@@ -128,9 +134,10 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) startRecord:(NSString*) instanceId
 {
-    if (nil == _apmProtocolInstance) {
+    if (nil == _apmProtocolInstance || self.isStartRecord) {
         return;
     }
+    self.isStartRecord = YES;
     _instanceId = instanceId;
     
     [self.apmProtocolInstance onStart:instanceId topic:WEEX_PAGE_TOPIC];
@@ -144,8 +151,15 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     }
     NSString* pageUrl = instance.scriptURL.absoluteString;
     pageUrl = nil == pageUrl || [@"" isEqualToString:pageUrl]?@"unKnowUrl":pageUrl;
-    
-    [self setProperty:KEY_PAGE_PROPERTIES_BIZ_ID withValue:pageUrl];
+    NSString* pageName = instance.pageName?:@"unKnowPageName";
+    NSString* vcName = @"unKnowVCName";
+    if (nil != instance.viewController) {
+        vcName = NSStringFromClass(instance.viewController.class);
+    }
+    [self setProperty:KEY_PAGE_PROPERTIES_CONTAINER_NAME withValue:vcName];
+    [self setProperty:KEY_PAGE_PROPERTIES_INSTANCE_TYPE withValue:@"page"];
+    [self setProperty:KEY_PAGE_PROPERTIES_BIZ_ID withValue:pageName];
+    [self setProperty:KEY_PAGE_PROPERTIES_BUBDLE_URL withValue:pageUrl];
     [self setProperty:KEY_PROPERTIES_ERROR_CODE withValue:VALUE_ERROR_CODE_DEFAULT];
     [self setProperty:KEY_PAGE_PROPERTIES_JSLIB_VERSION withValue:[WXAppConfiguration JSFrameworkVersion]];
     [self setProperty:KEY_PAGE_PROPERTIES_WEEX_VERSION withValue:WX_SDK_VERSION];
@@ -221,20 +235,15 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
         [self setProperty:KEY_PAGE_PROPERTIES_REQUEST_TYPE withValue:wxRequestType];
     }
     
-    id wxNetType = [extInfo objectForKey:KEY_PAGE_PROPERTIES_NET_TYPE];
-    if (nil != wxRequestType && [wxNetType isKindOfClass: NSString.class]) {
-        [self setProperty:KEY_PAGE_PROPERTIES_NET_TYPE withValue:wxRequestType];
-    }
-    
-    id wxCacheType = [extInfo objectForKey:KEY_PAGE_PROPERTIES_CACHE_TYPE];
-    if (nil != wxCacheType && [wxCacheType isKindOfClass: NSString.class]) {
-        [self setProperty:KEY_PAGE_PROPERTIES_CACHE_TYPE withValue:wxCacheType];
-    }
-
     id wxNetLibDownBundleTime = [extInfo objectForKey:KEY_PAGE_STATS_ACTUAL_DOWNLOAD_TIME];
     if (nil != wxNetLibDownBundleTime && [wxNetLibDownBundleTime isKindOfClass: NSNumber.class]) {
         double value = ((NSNumber *)wxNetLibDownBundleTime).doubleValue;
-        [self  setStatistic:KEY_PAGE_PROPERTIES_CACHE_TYPE withValue:value];
+        [self  setStatistic:KEY_PAGE_STATS_ACTUAL_DOWNLOAD_TIME withValue:value];
+    }
+    
+    id wxZcacheInfo = [extInfo objectForKey:KEY_PAGE_PROPERTIES_Z_CACHE_INFO];
+    if (nil !=wxZcacheInfo && [wxZcacheInfo isKindOfClass: NSString.class]) {
+        [self setProperty:KEY_PAGE_PROPERTIES_Z_CACHE_INFO withValue:wxZcacheInfo];
     }
 }
 

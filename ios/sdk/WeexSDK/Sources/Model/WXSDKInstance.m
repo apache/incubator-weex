@@ -255,6 +255,10 @@ typedef enum : NSUInteger {
         WXLogError(@"Fail to find instance！");
         return;
     }
+  
+    //some case , with out render (url)
+    [self.apmInstance startRecord:self.instanceId];
+    
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
     [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
     

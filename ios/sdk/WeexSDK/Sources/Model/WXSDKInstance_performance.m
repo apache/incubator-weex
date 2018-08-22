@@ -81,6 +81,7 @@
     if (!self.hasRecordFsRenderTimeByPosition && rightBottom.y > rootFrame.size.height +1 && ![self _isViewGroup:targetComponent] ) {
         self.newFsRenderTime = diff;
         self.hasRecordFsRenderTimeByPosition = true;
+        [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_FSRENDER];
     }
     
     UIView *root = targetComponent.weexInstance.rootView;
@@ -109,6 +110,7 @@
           NSStringFromCGRect(targetComponent.weexInstance.rootView.frame)
           );
 #endif
+    [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_INTERACTION];
     self.interactionLimitAddOpCount++;
     self.interactionAddCount = self.interactionAddCountRecord;
     self.interactionTime = self.interactionTime < diff ? diff :self.interactionTime;

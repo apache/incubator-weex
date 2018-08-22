@@ -973,9 +973,15 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
     return nil;
 }
 
-+ (long) getUnixCurrentTimeMillis
++ (long) getUnixFixTimeMillis
 {
-    return [[NSDate date] timeIntervalSince1970] * 1000;
+    static long sInterval;
+    static dispatch_once_t unixTimeToken;
+    
+    dispatch_once(&unixTimeToken, ^{
+        sInterval = [[NSDate date] timeIntervalSince1970] * 1000 - CACurrentMediaTime()*1000;
+    });
+    return sInterval+CACurrentMediaTime()*1000;
 }
 
 @end

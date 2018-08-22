@@ -211,7 +211,10 @@ _Pragma("clang diagnostic pop") \
     }];
     
     [_jsBridge registerCallCreateFinish:^NSInteger(NSString *instanceId) {
-
+        
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        [instance.apmInstance onStage:KEY_PAGE_STAGES_CREATE_FINISH];
+        
         WXPerformBlockOnComponentThread(^{
             [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callCreateFinish:instanceId];
@@ -421,7 +424,6 @@ _Pragma("clang diagnostic pop") \
         bundleType = [self _pareJSBundleType:instanceIdString jsBundleString:jsBundleString]; // bundleType can be Vue, Rax and the new framework.
     }
     if (bundleType&&shoudMultiContext) {
-        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_USE_MULTI_CONTEXT withValue:[NSNumber numberWithBool:true]];
         [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:bundleType];
         NSMutableDictionary *newOptions = [options mutableCopy];
         if (!options) {
@@ -506,8 +508,7 @@ _Pragma("clang diagnostic pop") \
         }
         
     } else {
-        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_USE_MULTI_CONTEXT withValue:[NSNumber numberWithBool:false]];
-        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:@"singleContextUnkonwType"];
+        [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:@"other"];
         if (data){
             args = @[instanceIdString, jsBundleString, options ?: @{}, data];
         } else {
