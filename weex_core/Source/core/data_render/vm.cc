@@ -599,6 +599,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         std::string str = CStringValue(c);
+        LOGD("[OP_GETTABLE]:key:%s\n", str.c_str());
         if (!IsTable(b)) {
           // TODO error
             throw VMExecError("Unspport Type with OP_CODE [OP_GETTABLE]");

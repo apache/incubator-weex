@@ -337,6 +337,8 @@ inline int IntMod(const int &a, const int &b) {
 
 inline bool IsNumber(const Value *o) { return Value::Type::NUMBER == o->type; }
 
+inline bool IsCptr(const Value *o) { return Value::Type::CPTR == o->type; }
+
 inline bool IsBool(const Value *o) { return Value::Type::BOOL == o->type; }
 
 inline bool IsTable(const Value *o) { return Value::Type::TABLE == o->type; }

@@ -307,7 +307,7 @@ void CodeGenerator::Visit(ForStatement* node, void* data) {
   FuncState* state = func_->func_state();
   state->AddInstruction(CREATE_Ax(OP_GOTO, condition_start_index));
 
-  int for_end_index = func_->func_state()->instructions().size() - 1;
+  int for_end_index = (int)func_->func_state()->instructions().size() - 1;
 
   state->ReplaceInstruction(
       slot, (CREATE_ABx(OP_JMP, condition, for_end_index - slot)));
@@ -971,7 +971,6 @@ long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
                 }
                 reg_ref = root_block->NextRegisterId();
                 func_state_->AddInstruction(CREATE_ABx(OP_GETVALUE, reg_ref, ref->ref_id()));
-                root_block->variables().insert(std::make_pair(name, reg_ref));
             }
             return reg_ref;
         }

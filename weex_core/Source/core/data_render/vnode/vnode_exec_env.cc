@@ -24,6 +24,7 @@
 #include "core/data_render/table_factory.h"
 #include "core/data_render/class_factory.h"
 #include "core/data_render/class_array.h"
+#include "core/data_render/common_error.h"
 
 namespace weex {
 namespace core {
@@ -182,23 +183,44 @@ static Value CreateElement(ExecState* exec_state) {
   result.cptr = node;
   return result;
 }
+    
+static void AppendChild(ExecState *exec_state, VNode *parent, VNode *children) {
+    if (parent == nullptr && exec_state->context()->root() == nullptr) {
+        exec_state->context()->set_root(children);
+    }
+    if (parent && children) {
+        parent->AddChild(children);
+    }
+}
 
 // appendChild(parent, node);
-static Value AppendChild(ExecState* exec_state) {
-  VNode* parent =
-      exec_state->GetArgument(0)->type == Value::Type::NIL
-      ? nullptr
-      : reinterpret_cast<VNode*>(exec_state->GetArgument(0)->cptr);
-  VNode* child = reinterpret_cast<VNode*>(exec_state->GetArgument(1)->cptr);
-
-  if (parent == nullptr && exec_state->context()->root() == nullptr) {
-    exec_state->context()->set_root(child);
+static Value AppendChild(ExecState *exec_state) {
+  VNode *parent = exec_state->GetArgument(0)->type == Value::Type::NIL ?
+    nullptr : reinterpret_cast<VNode *>(exec_state->GetArgument(0)->cptr);
+  Value *childrens = exec_state->GetArgument(1);
+  if (IsString(childrens) && parent->tag_name() != "span") {
+      throw VMExecError("AppendChild only support string for span");
   }
-  if (parent == nullptr || child == nullptr) {
-    return Value();
+  else if (!IsArray(childrens) && !IsCptr(childrens) && !IsString(childrens)) {
+      throw VMExecError("AppendChild unsupport array or cptr");
   }
-  parent->AddChild(child);
-
+  if (IsArray(childrens)) {
+      std::vector<Value> items = ObjectValue<Array>(childrens)->items;
+      for (int i = 0; i < items.size(); i++) {
+          if (!IsCptr(&items[i])) {
+              throw VMExecError("AppendChild unspport array or cptr");
+          }
+          VNode *children = reinterpret_cast<VNode *>(items[i].cptr);
+          AppendChild(exec_state, parent, children);
+      }
+  }
+  else if (IsString(childrens)) {
+      LOGD("[AppendChild]:string:%s\n", CStringValue(childrens));
+  }
+  else {
+      VNode *children = reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);
+      AppendChild(exec_state, parent, children);
+  }
   return Value();
 }
 
@@ -234,6 +256,7 @@ static Value SetProps(ExecState *exec_state) {
     Value *p_value = exec_state->GetArgument(1);
     if (p_value->type == Value::TABLE) {
         Table *table = ObjectValue<Table>(p_value);
+        LOGD("[SetProps]:table:%s\n", TableToString(table).c_str());
         for (auto iter = table->map.begin(); iter != table->map.end(); iter++) {
             if (iter->first == "style") {
                 Value style = iter->second;
