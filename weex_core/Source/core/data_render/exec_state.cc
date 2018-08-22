@@ -124,7 +124,7 @@ const Value& ExecState::Call(const std::string& func_name,
   return ret;
 }
 
-void ExecState::CallFunction(Value* func, size_t argc, Value* ret) {
+void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
   *stack_->top() = func + argc;
   if (func->type == Value::Type::CFUNC) {
     Frame frame;

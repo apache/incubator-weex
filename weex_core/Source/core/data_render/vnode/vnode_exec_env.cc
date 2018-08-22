@@ -167,7 +167,7 @@ static Value AppendUrlParam(ExecState* exec_state) {
 
 // createElement("tag_name", "id");
 static Value CreateElement(ExecState* exec_state) {
-  Value *arg_ref = exec_state->GetArgument(1);
+    Value *arg_ref = exec_state->GetArgument(1);
     std::string ref;
     if (IsString(arg_ref)) {
         ref = CStringValue(arg_ref);
@@ -177,11 +177,11 @@ static Value CreateElement(ExecState* exec_state) {
         os << IntValue(arg_ref) ;
         ref = "vn_" + os.str();
     }
-  VNode *node = new VNode(ref, exec_state->GetArgument(0)->str->c_str());
-  Value result;
-  result.type = Value::Type::CPTR;
-  result.cptr = node;
-  return result;
+    VNode *node = new VNode(ref, exec_state->GetArgument(0)->str->c_str());
+    Value result;
+    result.type = Value::Type::CPTR;
+    result.cptr = node;
+    return result;
 }
     
 static void AppendChild(ExecState *exec_state, VNode *parent, VNode *children) {
@@ -256,7 +256,7 @@ static Value SetProps(ExecState *exec_state) {
     Value *p_value = exec_state->GetArgument(1);
     if (p_value->type == Value::TABLE) {
         Table *table = ObjectValue<Table>(p_value);
-        LOGD("[SetProps]:table:%s\n", TableToString(table).c_str());
+        //LOGD("[SetProps]:table:%s\n", TableToString(table).c_str());
         for (auto iter = table->map.begin(); iter != table->map.end(); iter++) {
             if (iter->first == "style") {
                 Value style = iter->second;

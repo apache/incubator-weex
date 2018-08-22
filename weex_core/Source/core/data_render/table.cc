@@ -71,12 +71,6 @@ int SetTabStringValue(Table *t, const Value *key, const Value &val) {
     t->map.erase(it);
   }
   t->map.insert(std::make_pair(keyStr, val));
-    if (Value::Type::STRING == val.type) {
-        printf("SetTabStringValue: key:%s => value:%s\n", CStringValue(key), val.str->c_str());
-    }
-    else {
-        printf("SetTabStringValue: key:%s =>\n", CStringValue(key));
-    }
   return 1;
 }
 

@@ -526,11 +526,16 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
         std::vector<Handle<Expression>> exprs = node->funcexprs();
         for (int i = 0; i < exprs.size(); i++) {
             if (i == 0) {
-                exprs[i]->Accept(this, data);
+                exprs[i]->Accept(this, nullptr);
             }
             else {
                 exprs[i]->Accept(this, nullptr);
             }
+        }
+        std::string vnode_ptr = node->node_ptr()->AsStringConstant()->string();
+        long reg_parent = block_->FindRegisterId(vnode_ptr);
+        if (reg_parent < 0) {
+            throw GeneratorError("can't find identifier: " + node->node_ptr()->AsStringConstant()->string());
         }
         std::vector<Handle<Expression>> childrens = node->childrens();
         // 递归 childrens
@@ -546,11 +551,6 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
                     throw GeneratorError("can't find identifier appendChild");
                 }
                 func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, caller, index));
-                std::string vnode_ptr = node->node_ptr()->AsStringConstant()->string();
-                long reg_parent = block_->FindRegisterId(vnode_ptr);
-                if (reg_parent < 0) {
-                    throw GeneratorError("can't find identifier: " + node->node_ptr()->AsStringConstant()->string());
-                }
                 func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg_0, reg_parent, 0));
                 if (childrens[i]->IsJSXNodeExpression()) {
                     childrens[i]->Accept(this, nullptr);
@@ -566,6 +566,10 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
                 }
                 func_state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
             }
+        }
+        if (data) {
+            long ret = *static_cast<long *>(data);
+            func_state->AddInstruction(CREATE_ABC(OP_MOVE, ret, reg_parent, 0));
         }
         
     } while (0);
