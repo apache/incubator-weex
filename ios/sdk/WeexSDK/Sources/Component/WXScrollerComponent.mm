@@ -578,6 +578,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 }
 
 #pragma mark UIScrollViewDelegate
+
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
     if ([_refreshType isEqualToString:@"refreshForAppear"] && _refreshComponent) {
@@ -651,6 +652,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (self.onScroll) {
         self.onScroll(scrollView);
     }
+    
     if (_scrollEvent || _scrollEventListener) {
         CGFloat distance = 0;
         if (_scrollDirection == WXScrollDirectionHorizontal) {
@@ -674,6 +676,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             _lastScrollEventFiredOffset = scrollView.contentOffset;
         }
     }
+    
     NSHashTable *delegates = [_delegates copy];
     for (id<UIScrollViewDelegate> delegate in delegates) {
         if ([delegate respondsToSelector:@selector(scrollViewDidScroll:)]) {
@@ -727,6 +730,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             }
         }
     }
+    
     if (!_isScrolling) {
         _scrollEndPoint = scrollView.contentOffset;
         id<WXPageEventNotifyEventProtocol> eventNotify = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
