@@ -267,6 +267,7 @@ static NSThread *WXComponentThread;
         WXLogWarning(@"addComponent,superRef from js never exit ! check JS action, supRef:%@",superRef);
         return;
     }
+    supercomponent.weexInstance.apmInstance.hasAddView = YES;
     
     [self _recursivelyAddComponent:componentData toSupercomponent:supercomponent atIndex:index appendingInTree:appendingInTree];
 }

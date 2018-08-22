@@ -4,6 +4,11 @@
 #import "WXSDKManager.h"
 #import "WXAppConfiguration.h"
 #import "WXUtility.h"
+#import "WXComponentManager.h"
+#import "WXConfigCenterProtocol.h"
+#import "WXSDKEngine.h"
+#import "WXSDKError.h"
+#import "WXExceptionUtils.h"
 
 
 #pragma mark - const static string
@@ -82,6 +87,9 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 @property (nonatomic,strong) id<WXApmProtocol> apmProtocolInstance;
 @property (nonatomic,strong) NSString* instanceId;
 @property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStatsMap;
+@property (nonatomic,assign) BOOL isRecord;
+@property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStageMap;
+@property (nonatomic,strong) NSMutableArray<WXJSExceptionInfo*>* errorList;
 @end
 
 @implementation WXApmForInstance
@@ -91,9 +99,14 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 {
     self = [super init];
     if (self) {
-        id<WXApmGeneratorProtocol> generater = [WXHandlerFactory handlerForProtocol:@protocol(WXApmGeneratorProtocol)];
-        _apmProtocolInstance = [generater gengratorApmInstance:WEEX_PAGE_TOPIC];
         _recordStatsMap = [[NSMutableDictionary alloc] init];
+        _recordStageMap = [[NSMutableDictionary alloc] init];
+        _errorList = [[NSMutableArray alloc] init];
+        _isOpenApm = [self _loadApmSwitch];
+        if (_isOpenApm) {
+            id<WXApmGeneratorProtocol> generater = [WXHandlerFactory handlerForProtocol:@protocol(WXApmGeneratorProtocol)];
+            _apmProtocolInstance = [generater gengratorApmInstance:WEEX_PAGE_TOPIC];
+        }
     }
     return self;
 }
@@ -111,7 +124,12 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (nil == _apmProtocolInstance) {
         return;
     }
-    [self.apmProtocolInstance onStage:name withValue:[WXUtility getUnixFixTimeMillis]];
+    long time = [WXUtility getUnixFixTimeMillis];
+    [self.apmProtocolInstance onStage:name withValue:time];
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnComponentThread(^{
+        [weakSelf.recordStageMap setObject:@(time) forKey:name];
+    });
 }
 
 - (void) setProperty:(NSString *)name withValue:(id)value
@@ -134,10 +152,10 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) startRecord:(NSString*) instanceId
 {
-    if (nil == _apmProtocolInstance || self.isStartRecord) {
+    if (nil == _apmProtocolInstance || self.isRecord) {
         return;
     }
-    self.isStartRecord = YES;
+    self.isRecord = YES;
     _instanceId = instanceId;
     
     [self.apmProtocolInstance onStart:instanceId topic:WEEX_PAGE_TOPIC];
@@ -178,6 +196,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     
     [self onStage:KEY_PAGE_STAGES_DESTROY];
     [self.apmProtocolInstance onEnd];
+    [self _checkScreenEmptyAndReport];
 }
 
 - (void) arriveFSRenderTime
@@ -202,11 +221,14 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (nil == _apmProtocolInstance) {
         return;
     }
-    NSNumber* preNumber = [self.recordStatsMap objectForKey:name];
-    double preVal = nil == preNumber?0:preNumber.doubleValue;
-    double currentVal = preVal + diff;
-    [self.recordStatsMap setObject:@(currentVal) forKey:name];
-    [self setStatistic:name withValue:currentVal];
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnComponentThread(^{
+        NSNumber* preNumber = [self.recordStatsMap objectForKey:name];
+        double preVal = nil == preNumber?0:preNumber.doubleValue;
+        double currentVal = preVal + diff;
+        [weakSelf.recordStatsMap setObject:@(currentVal) forKey:name];
+        [weakSelf setStatistic:name withValue:currentVal];
+    });
 }
 
 - (void) updateMaxStats:(NSString *)name curMaxValue:(double)currentValue
@@ -214,14 +236,17 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (nil == _apmProtocolInstance) {
         return;
     }
-    NSNumber* maxNumber = [self.recordStatsMap objectForKey:name];
-    double maxVal = nil == maxNumber?0:maxNumber.doubleValue;
-    
-    if (maxVal < currentValue) {
-        maxVal = currentValue;
-        [self.recordStatsMap setObject:@(maxVal) forKey:name];
-        [self setStatistic:name withValue:maxVal];
-    }
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnComponentThread(^{
+        NSNumber* maxNumber = [weakSelf.recordStatsMap objectForKey:name];
+        double maxVal = nil == maxNumber?0:maxNumber.doubleValue;
+        
+        if (maxVal < currentValue) {
+            maxVal = currentValue;
+            [weakSelf.recordStatsMap setObject:@(maxVal) forKey:name];
+            [weakSelf setStatistic:name withValue:maxVal];
+        }
+    });
 }
 
 - (void) updateExtInfo:(NSDictionary*) extInfo
@@ -292,6 +317,88 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     } else {
         [self updateDiffStats:KEY_PAGE_STATS_IMG_LOAD_FAIL_NUM withDiffValue:1];
     }
+}
+
+- (void) recordErrorMsg:(WXJSExceptionInfo *)exception
+{
+    if (nil == exception || !self.isOpenApm) {
+        return;
+    }
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnComponentThread(^{
+        if (weakSelf.errorList.count > 5) {
+            [weakSelf.errorList removeObjectAtIndex:0];
+            [weakSelf.errorList addObject:exception];
+        }
+    });
+}
+
+- (NSArray<WXJSExceptionInfo*>*) topExceptionList
+{
+    return self.errorList;
+}
+
+- (void) _checkScreenEmptyAndReport
+{
+    if(self.hasAddView || !self.isStartRender || self.isDegrade){
+        return;
+    }
+    WXSDKErrCode code = WX_KEY_EXCEPTION_EMPTY_SCREEN_NATIVE;
+    
+    
+    NSNumberFormatter *formater = [[NSNumberFormatter alloc] init];
+    formater.numberStyle = NSNumberFormatterDecimalStyle;
+    
+    for (WXJSExceptionInfo* exception in self.errorList) {
+        NSNumber *codeNumber = [formater numberFromString:exception.errorCode];
+        if (nil == codeNumber) {
+            continue;
+        }
+        WXSDKErrorGroup group = [WXSDKErrCodeUtil getErrorGroupByCode:codeNumber.intValue];
+        if(group == WX_JS){
+            code = WX_KEY_EXCEPTION_EMPTY_SCREEN_JS;
+            break;
+        }
+    }
+    NSString *codeStr = [NSString stringWithFormat:@"%d",code];
+    [WXExceptionUtils commitCriticalExceptionRT:self.instanceId errCode:codeStr function:@"_checkScreenEmptyAndReport"
+                                      exception:[self _convertTopExceptionListToStr] extParams:nil];
+    
+}
+
+- (NSString *)_convertTopExceptionListToStr
+{
+    if (!self.isOpenApm) {
+        return @"";
+    }
+    if (!self.errorList || self.errorList.count <= 0) {
+        return @"emptyTopErrorlist";
+    }
+    NSString* errorStr = @"========== topErrorList start ============";
+    for (WXJSExceptionInfo* exception in self.errorList) {
+        errorStr = [errorStr stringByAppendingFormat:
+                    @"%@ -> code:%@,func:%@,exception:%@ \n",
+                    errorStr,exception.errorCode,exception.functionName,exception.exception
+                    ];
+    }
+    errorStr = [errorStr stringByAppendingFormat:@"%@ ========== topErrorList start end ============\n",errorStr];
+    return errorStr;
+}
+
+- (NSDictionary<NSString*,NSNumber*>*) stageDic
+{
+    return self.recordStageMap;
+}
+
+- (BOOL) _loadApmSwitch
+{
+    BOOL openApm = YES;
+    id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        openApm = [[configCenter configForKey:@"iOS_weex_ext_config.open_apm" defaultValue:@(YES) isDefault:NULL] boolValue];
+    }
+    return openApm;
 }
 
 @end
