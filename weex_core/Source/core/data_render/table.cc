@@ -161,6 +161,28 @@ size_t GetValueMapSize(Value &o) {
 }
     
 #ifdef DEBUG
+json11::Json TableToJson(Table *table);
+    
+json11::Json ArrayToJson(Array *array) {
+    json11::Json::array json;
+    for (int i = 0; i < array->items.size(); i++) {
+        Value item = array->items[i];
+        if (item.type == Value::Type::TABLE) {
+            json.push_back(TableToJson(ObjectValue<Table>(&item)));
+        }
+        else if (item.type == Value::Type::STRING) {
+            json.push_back(CStringValue(&item));
+        }
+        else if (item.type == Value::Type::INT) {
+            json.push_back(to_string(IntValue(&item)));
+        }
+        else if (item.type == Value::Type::ARRAY) {
+            json.push_back(ArrayToJson(ObjectValue<Array>(&item)));
+        }
+    }
+    return json;
+}
+    
 json11::Json TableToJson(Table *table) {
     json11::Json::object obj;
     for (auto iter = table->map.begin(); iter != table->map.end(); iter++) {
@@ -172,6 +194,9 @@ json11::Json TableToJson(Table *table) {
         }
         else if (iter->second.type == Value::Type::INT) {
             obj.insert(std::make_pair(iter->first, to_string(IntValue(&iter->second))));
+        }
+        else if (iter->second.type == Value::Type::ARRAY) {
+            obj.insert(std::make_pair(iter->first, ArrayToJson(ObjectValue<Array>(&iter->second))));
         }
     }
     return json11::Json(obj);

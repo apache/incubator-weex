@@ -235,13 +235,21 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         break;
 
       case OP_LT: {
+        LOGD("OP_LT A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
         c = frame.reg + GET_ARG_C(instruction);
         SetBValue(a, ValueLT(b, c));
       }
         break;
-
+        case OP_AND: {
+            LOGD("OP_AND A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            c = frame.reg + GET_ARG_C(instruction);
+            SetBValue(a, ValueAND(b, c));
+            break;
+        }
       case OP_LE: {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
@@ -327,6 +335,49 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         }
       }
         break;
+        case OP_POST_INCR: {
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            if (IsInt(a)) {
+                if (NULL != b) {
+                    SetIValue(b, (int)IntValue(a));
+                }
+                SetIValue(a, (int)IntValue(a) + 1);
+                SetRefValue(a);
+            }
+            else if (IsNumber(a)) {
+                if (NULL != b) {
+                    SetDValue(b, NumValue(a));
+                }
+                SetDValue(a, NumValue(a) + 1);
+                SetRefValue(a);
+            }
+            else {
+                LOGE("Unspport Type[%d] with OP_CODE[OP_POST_INCR]", a->type);
+            }
+        }
+            break;
+            
+        case OP_POST_DECR: {
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            if (IsInt(a)) {
+                if (GET_ARG_B(instruction) != 0) {
+                    SetIValue(b, (int)IntValue(a));
+                }
+                SetIValue(a, (int)IntValue(a) - 1);
+            }
+            else if (IsNumber(a)) {
+                if (GET_ARG_B(instruction) != 0) {
+                    SetDValue(b, NumValue(a));
+                }
+                SetDValue(a, NumValue(a) - 1);
+            }
+            else {
+                throw VMExecError("Unspport Type with OP_CODE [OP_POST_DECR]");
+            }
+        }
+            break;
 
       case OP_PRE_INCR: {
         a = frame.reg + GET_ARG_A(instruction);
@@ -435,7 +486,10 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
-            if (!IsClassInstance(b) && !IsClass(b) && !IsArray(b)) {
+            if (IsValueRef(b)) {
+                b = b->var;
+            }
+            if (!IsClassInstance(b) && !IsClass(b) && !IsArray(b) && !IsTable(b)) {
                 throw VMExecError("Type Error For Class Instance Or Class With OP_CODE [OP_GETCLASSVAR]");
             }
             if (!IsString(c)) {
@@ -463,18 +517,36 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
                 }
             }
             else if (IsArray(b)) {
-                int index = exec_state->global()->IndexOf("Array");
-                if (index < 0) {
-                    throw VMExecError("Can't Find Array Class With OP_CODE [OP_GETCLASSVAR]");
+                if (var_name == "length") {
+                    *a = GetArrayLength(ObjectValue<Array>(b));
                 }
-                Value *class_desc = exec_state->global()->Find(index);
-                Variables *funcs = ObjectValue<ClassDescriptor>(class_desc)->funcs_.get();
-                index = funcs->IndexOf(var_name);
-                if (index < 0) {
-                    throw VMExecError("Can't Find Array Func " + var_name + " With OP_CODE [OP_GETCLASSVAR]");
+                else {
+                    int index = exec_state->global()->IndexOf("Array");
+                    if (index < 0) {
+                        throw VMExecError("Can't Find Array Class With OP_CODE [OP_GETCLASSVAR]");
+                    }
+                    Value *class_desc = exec_state->global()->Find(index);
+                    Variables *funcs = ObjectValue<ClassDescriptor>(class_desc)->funcs_.get();
+                    index = funcs->IndexOf(var_name);
+                    if (index < 0) {
+                        throw VMExecError("Can't Find Array Func " + var_name + " With OP_CODE [OP_GETCLASSVAR]");
+                    }
+                    Value *func = funcs->Find(index);
+                    *a = *func;
                 }
-                Value *func = funcs->Find(index);
-                *a = *func;
+            }
+            else if (IsTable(b)) {
+                Value *ret = GetTabValue(reinterpret_cast<Table *>(b->gc), *c);
+                if (!IsNil(ret)) {
+                    if (IsTable(ret)) {
+                        Table *table = ObjectValue<Table>(ret);
+                        LOGD("[OP_GETTABLE]:%s\n", TableToString(table).c_str());
+                    }
+                    *a = *ret;
+                }
+                else {
+                    SetNil(a);
+                }
             }
             else {
                 // only can find class static funcs;
@@ -531,10 +603,13 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
           // TODO error
             throw VMExecError("Unspport Type with OP_CODE [OP_GETTABLE]");
         }
-        Value* ret = GetTabValue(reinterpret_cast<Table *>(b->gc), *c);
+        LOGD("[OP_GETTABLE]:b %s\n", TableToString(ObjectValue<Table>(b)).c_str());
+        Value *ret = GetTabValue(reinterpret_cast<Table *>(b->gc), *c);
         if (!IsNil(ret)) {
-//            Table *table = ObjectValue<Table>(ret);
-//            LOGD("[OP_GETTABLE]:%s\n", TableToString(table).c_str());
+            if (IsTable(ret)) {
+                Table *table = ObjectValue<Table>(ret);
+                LOGD("[OP_GETTABLE]:%s\n", TableToString(table).c_str());
+            }
             *a = *ret;
         }
         else {

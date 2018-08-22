@@ -440,6 +440,7 @@ void VNodeExecEnv::InitInitDataValue(ExecState* state,
     value = state->table_factory()->CreateTable();
   }
   state->global()->Set("_init_data", value);
+  state->global()->Set("__weex_data__", value);
 }
 
 void AddStyles(ExecState* state, const std::string& prefix, const json11::Json& style_obj) {

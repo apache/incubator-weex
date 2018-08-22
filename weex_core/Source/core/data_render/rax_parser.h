@@ -108,7 +108,7 @@ private:
 
     double ParseNumber(const Token &token);
     Token::Type Peek();
-    void Advance(bool not_regex = false);
+    void Advance(bool not_regex = true);
     Tokenizer *lex() { return lex_; }
     ParserContext *context() { return ctx_; }
     ScopeManager *scope_manager() { return manager_; }

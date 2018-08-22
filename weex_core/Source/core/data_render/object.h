@@ -86,6 +86,8 @@ struct Value {
   Type type;
 
   Value() : type(NIL) {}
+ 
+  Value(int value) : i(value), type(INT) {}
 
   Value(int64_t value) : i(value), type(INT) {}
 
@@ -244,6 +246,8 @@ bool ValueEqulas(const Value *a, const Value *b);
 bool ValueLE(const Value *a, const Value *b);
 
 bool ValueLT(const Value *a, const Value *b);
+    
+bool ValueAND(const Value *a, const Value *b);
 
 void FreeValue(Value *o);
 

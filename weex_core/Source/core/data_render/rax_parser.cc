@@ -502,6 +502,7 @@ const std::string& RAXParser::GetStringConstant()
 Handle<Expression> RAXParser::ParseObjectConstant()
 {
     ProxyObject proxy;
+    ProxyArray spread_property;
     
     // eat the left brace '{'
     Advance();
@@ -523,7 +524,13 @@ Handle<Expression> RAXParser::ParseObjectConstant()
             name = lex()->CurrentToken().view();
         }
         else if (tok == Token::UNFOLD) {
-            return ParseExpression();
+            Handle<Expression> unfold_expr = ParseAssignExpression();
+            if (Peek() == Token::COMMA) {
+                spread_property.push_back(unfold_expr);
+                Advance();
+                continue;
+            }
+            return unfold_expr;
         }
         else {
             throw SyntaxError(lex()->CurrentToken(), "expected an Identifier or a string");
@@ -556,7 +563,13 @@ Handle<Expression> RAXParser::ParseObjectConstant()
         Advance();
     }
     
-    return builder()->NewObjectConstant(proxy);
+    Handle<Expression> obj_expr = builder()->NewObjectConstant(proxy);
+    if (spread_property.size() > 0) {
+        for (int i = 0; i < spread_property.size(); i++) {
+            obj_expr->AsObjectConstant()->SpreadProperty().push_back(spread_property[i]);
+        }
+    }
+    return obj_expr;
 }
     
 Handle<Expression> RAXParser::ParseObjectMethod(const std::string &name)
@@ -821,9 +834,16 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
             std::string key = GetIdentifierName();
             Advance();
             EXPECT(Token::ASSIGN);
-            EXPECT(Token::LBRACE);
-            proxyObj.insert(std::make_pair(key, ParseExpression()));
-            EXPECT(Token::RBRACE);
+            if (Peek() == Token::LBRACE) {
+                EXPECT(Token::LBRACE);
+                proxyObj.insert(std::make_pair(key, ParseExpression()));
+                EXPECT(Token::RBRACE);
+            }
+            else {
+                std::string value = GetIdentifierName();
+                EXPECT(Token::STRING);
+                proxyObj.insert(std::make_pair(key, builder()->NewStringConstant(value)));
+            }
         }
         props = builder()->NewObjectConstant(proxyObj);
     }

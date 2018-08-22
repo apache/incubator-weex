@@ -39,6 +39,9 @@ void CodeGenerator::LeaveClass() {
         delete class_;
     }
     class_ = parent;
+    if (class_) {
+        class_->set_children(nullptr);
+    }
 }
 
 void CodeGenerator::EnterFunction() {
@@ -68,11 +71,17 @@ void CodeGenerator::LeaveFunction() {
         delete func_;
     }
     func_ = parent_func;
+    if (func_) {
+        func_->set_children(nullptr);
+    }
     BlockCnt *parent_block = block_->parent();
     if (block_) {
         delete block_;
     }
     block_ = parent_block;
+    if (block_) {
+        block_->set_children(nullptr);
+    }
 }
 
 void CodeGenerator::EnterBlock() {
@@ -94,6 +103,9 @@ void CodeGenerator::LeaveBlock() {
         delete block_;
     }
     block_ = parent;
+    if (block_) {
+        block_->set_children(nullptr);
+    }
     func_->set_current_block(block_);
 }
 
@@ -315,7 +327,7 @@ void CodeGenerator::Visit(FunctionPrototype* node, void* data) {}
 
 void CodeGenerator::Visit(FunctionStatement *node, void *data) {
     RegisterScope register_scope(block_);
-    long reg = data == nullptr ? block_->NextRegisterId() : *static_cast<long*>(data);
+    long ret = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
     Handle<FunctionPrototype> proto = node->proto();
     bool is_class_func = func_->parent() == nullptr && class_ ? true : false;
     // body
@@ -352,15 +364,25 @@ void CodeGenerator::Visit(FunctionStatement *node, void *data) {
             Value value;
             value.f = func_->func_state()->GetChild(func_->func_state()->children().size() - 1);
             value.type = Value::FUNC;
-            exec_state_->global()->Add(proto->GetName(), value);
+            if (proto->GetName().length() > 0) {
+                exec_state_->global()->Add(proto->GetName(), value);
+            }
+            else {
+                int index = exec_state_->global()->Add(value);
+                if (index >= 0) {
+                    func_->func_state()->AddInstruction(CREATE_ABx(OP_GETGLOBAL, ret, index));
+                }
+            }
         }
     }
     else {
         // inside function
         int index = (int)func_->func_state()->children().size() - 1;
-        Instruction i = CREATE_ABx(OP_GETFUNC, reg, index);
+        Instruction i = CREATE_ABx(OP_GETFUNC, ret, index);
         func_->func_state()->ReplaceInstruction(slot, i);
-        block_->variables().insert(std::make_pair(proto->GetName(), reg));
+        if (proto->GetName().length() > 0) {
+            block_->variables().insert(std::make_pair(proto->GetName(), ret));
+        }
     }
 }
     
@@ -514,30 +536,34 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
         // 递归 childrens
         if (childrens.size() > 0) {
             for (int i = 0; i < childrens.size(); i++) {
-                assert(childrens[i]->IsJSXNodeExpression());
-                childrens[i]->Accept(this, nullptr);
                 long ret = block_->NextRegisterId();
                 long caller = block_->NextRegisterId();
+                size_t argc = 2;
+                long arg_0 = block_->NextRegisterId();
+                long arg_1 = block_->NextRegisterId();
                 int index = exec_state_->global()->IndexOf("appendChild");
                 if (index < 0) {
                     throw GeneratorError("can't find identifier appendChild");
                 }
                 func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, caller, index));
-                size_t argc = 2;
-                long arg_0 = block_->NextRegisterId();
-                long arg_1 = block_->NextRegisterId();
                 std::string vnode_ptr = node->node_ptr()->AsStringConstant()->string();
                 long reg_parent = block_->FindRegisterId(vnode_ptr);
                 if (reg_parent < 0) {
                     throw GeneratorError("can't find identifier: " + node->node_ptr()->AsStringConstant()->string());
                 }
                 func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg_0, reg_parent, 0));
-                std::string vnode_child_ptr = childrens[i]->AsJSXNodeExpression()->node_ptr()->AsStringConstant()->string();
-                long reg_child = block_->FindRegisterId(vnode_child_ptr);
-                if (reg_child < 0) {
-                    throw GeneratorError("can't find identifier: " + childrens[i]->AsJSXNodeExpression()->node_ptr()->AsStringConstant()->string());
+                if (childrens[i]->IsJSXNodeExpression()) {
+                    childrens[i]->Accept(this, nullptr);
+                    std::string vnode_child_ptr = childrens[i]->AsJSXNodeExpression()->node_ptr()->AsStringConstant()->string();
+                    long reg_child = block_->FindRegisterId(vnode_child_ptr);
+                    if (reg_child < 0) {
+                        throw GeneratorError("can't find identifier: " + childrens[i]->AsJSXNodeExpression()->node_ptr()->AsStringConstant()->string());
+                    }
+                    func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg_1, reg_child, 0));
                 }
-                func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg_1, reg_child, 0));
+                else {
+                    childrens[i]->Accept(this, &arg_1);
+                }
                 func_state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
             }
         }
@@ -586,6 +612,10 @@ void CodeGenerator::Visit(BinaryExpression* node, void* data) {
   // a >= b
   if (opeartion == BinaryOperation::kGreaterThanEqual) {
     state->AddInstruction(CREATE_ABC(OP_LE, ret, right, left));
+  }
+    
+  if (opeartion == BinaryOperation::kAnd) {
+      state->AddInstruction(CREATE_ABC(OP_AND, ret, right, left));
   }
 }
 
@@ -766,6 +796,9 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
         if (class_ && left->IsThisExpression()) {
             func_state->AddInstruction(CREATE_ABC(OP_GETCLASSVAR, ret, ret, right));
         }
+        else if (!left->IsIdentifier()) {
+            func_state->AddInstruction(CREATE_ABC(OP_GETCLASSVAR, ret, ret, right));
+        }
         else {
             std::string class_name = left->AsIdentifier()->GetName();
             int index = exec_state_->global()->IndexOf(class_name);
@@ -867,6 +900,30 @@ void CodeGenerator::Visit(PrefixExpression *node, void *data) {
         func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, ret, reg, 0));
     }
 }
+    
+void CodeGenerator::Visit(PostfixExpression *node, void *data) {
+    RegisterScope scope(block_);
+    long ret = data == nullptr ? block_->NextRegisterId()
+    : *static_cast<long *>(data);
+    Handle<Expression> expr = node->expr();
+    long reg = -1;
+    if (expr->IsIdentifier()) {
+        reg = block_->FindRegisterId(expr->AsIdentifier()->GetName());
+    }
+    else {
+        reg = block_->NextRegisterId();
+        expr->Accept(this, &reg);
+    }
+    PostfixOperation operation = node->op();
+    // i++
+    if (operation == PostfixOperation::kIncrement) {
+        func_->func_state()->AddInstruction(CREATE_ABC(OP_POST_INCR, reg, ret, 0));
+    }
+    // i++
+    else if (operation == PostfixOperation::kDecrement) {
+        func_->func_state()->AddInstruction(CREATE_ABC(OP_POST_DECR, reg, ret, 0));
+    }
+}
 
 void CodeGenerator::Visit(ReturnStatement* node, void* data) {
     
@@ -908,11 +965,13 @@ long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
             ValueRef *ref = parent()->FindValueRef(name, reg_ref);
             if (ref) {
                 BlockCnt *root_block = this;
-                while (root_block->children() && root_block->children()->func_state() == func_state_) {
+                while (root_block->children() && root_block->children()->func_state() == func_state_)
+                {
                     root_block = root_block->children();
                 }
                 reg_ref = root_block->NextRegisterId();
                 func_state_->AddInstruction(CREATE_ABx(OP_GETVALUE, reg_ref, ref->ref_id()));
+                root_block->variables().insert(std::make_pair(name, reg_ref));
             }
             return reg_ref;
         }
@@ -930,7 +989,6 @@ ValueRef *CodeGenerator::BlockCnt::FindValueRef(const std::string &name, long &r
             if (instruction && (op == OP_RETURN0 || op == OP_RETURN1)) {
                 func_state_->instructions().pop_back();
             }
-            printf("%i\n", (int)iter->second);
             func_state_->AddInstruction(CREATE_ABx(OP_SETVALUE, iter->second, ref->ref_id()));
             if (instruction && (op == OP_RETURN0 || op == OP_RETURN1)) {
                 func_state_->AddInstruction(instruction);

@@ -83,6 +83,10 @@ Value GetArray(Array *array, const Value &index) {
     return ret;
 }
     
+Value GetArrayLength(Array *array) {
+    return Value((int)array->items.size());
+}
+    
 static Value push(ExecState *exec_state) {
     size_t length = exec_state->GetArgumentCount();
     if (length != 2) {

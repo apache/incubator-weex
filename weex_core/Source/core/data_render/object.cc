@@ -87,6 +87,13 @@ bool ValueLE(const Value *a, const Value *b) {
     return false;
   }
 }
+    
+bool ValueAND(const Value *a, const Value *b) {
+    if (IsBool(a) && IsBool(b)) {
+        return BoolValue(a) && BoolValue(b);
+    }
+    return false;
+}
 
 bool ValueLT(const Value *a, const Value *b) {
   double d1, d2;

@@ -505,12 +505,15 @@ class ObjectConstant : public Expression {
 
   ProxyObject& proxy() { return Props; }
   bool IsEmpty() { return Props.empty(); }
+  ProxyArray &SpreadProperty() { return spread_property_; };
   ProxyObject::size_type GetPropertyCount() { return Props.size(); }
 
   DEFINE_NODE_TYPE(ObjectConstant, Expression);
 
  private:
   ProxyObject Props;
+  ProxyArray spread_property_;
+
 };
 
 class ArrayConstant : public Expression {

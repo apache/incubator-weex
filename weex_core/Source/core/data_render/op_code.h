@@ -68,6 +68,7 @@ enum OpCode {
   OP_EQ,    //	A B C	R(A) = R(B) == R(C)
   OP_LT,    //	A B C	R(A) = R(A) <  R(B)
   OP_LE,    //	A B C	R(A) = R(A) <= R(B)
+  OP_AND,
 
   OP_CALL,     //	A B C	R(A) = R(B)(R(B+1), ... ,R(B+C-1))
   OP_RETURN0,  //	Return
@@ -77,6 +78,10 @@ enum OpCode {
 
   OP_PRE_INCR,  // A      if (B >= 0) R(B) = ++R(A) else ++R(A)
   OP_PRE_DECR,  // A      if (B >= 0) R(B) = --R(A) else --R(A)
+    
+  OP_POST_INCR,  // A      if (B >= 0) R(B) = R(A)++ else R(A)++
+  OP_POST_DECR,  // A      if (B >= 0) R(B) = R(A)++ else R(A)--
+
 
 };
 

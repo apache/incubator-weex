@@ -33,7 +33,7 @@ namespace data_render {
 ClassDescriptor *NewClassArray();
 int SetArray(Array *array, Value *index, const Value &val);
 Value GetArray(Array *array, const Value &index);
-
+Value GetArrayLength(Array *array);
     
 }  // namespace data_render
 }  // namespace core

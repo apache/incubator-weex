@@ -70,6 +70,7 @@ class CodeGenerator : public ASTVisitor {
   void Visit(ArrowFunctionStatement *node, void *data) override;
   void Visit(ThisExpression *node, void *data) override;
   void Visit(NewExpression *node, void *data) override;
+  void Visit(PostfixExpression *node, void *data) override;
 
  private:
   template <class T>
