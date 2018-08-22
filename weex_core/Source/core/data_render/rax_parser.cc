@@ -710,7 +710,8 @@ Handle<Expression> RAXParser::ParseMemberExpression()
             if (member->IsMemberExpression()) {
                 member->AsMemberExpression()->setKind(kind);
             }
-            if (member->IsIdentifier()){
+            if (member->IsIdentifier() && member->AsIdentifier()->GetName() != "super")
+            {
                 member = builder()->NewCallExpression(member, temp);
             } else{
                 member = builder()->NewCallExpression(kind, member, temp);
@@ -1111,6 +1112,7 @@ Handle<Expression> RAXParser::ParseProgram()
 {
     Handle<ExpressionList> exprs = builder()->NewExpressionList();
     Handle<ChunkStatement> chunk = builder()->NewChunkStatement(exprs);
+    exprs->Insert(builder()->NewDeclaration(JSX_GLOBAL_VNODE_INDEX, builder()->NewIntegralConstant(0)));
     try {
         while (Peek() != Token::EOS) {
             exprs->Insert(ParseStatement());

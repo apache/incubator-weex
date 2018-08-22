@@ -166,8 +166,17 @@ static Value AppendUrlParam(ExecState* exec_state) {
 
 // createElement("tag_name", "id");
 static Value CreateElement(ExecState* exec_state) {
-  VNode* node = new VNode(exec_state->GetArgument(1)->str->c_str(),
-                          exec_state->GetArgument(0)->str->c_str());
+  Value *arg_ref = exec_state->GetArgument(1);
+    std::string ref;
+    if (IsString(arg_ref)) {
+        ref = CStringValue(arg_ref);
+    }
+    else if (IsInt(arg_ref)) {
+        std::ostringstream os;
+        os << IntValue(arg_ref) ;
+        ref = "vn_" + os.str();
+    }
+  VNode *node = new VNode(ref, exec_state->GetArgument(0)->str->c_str());
   Value result;
   result.type = Value::Type::CPTR;
   result.cptr = node;

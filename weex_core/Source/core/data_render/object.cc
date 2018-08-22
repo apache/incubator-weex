@@ -155,6 +155,14 @@ int Variables::Set(const std::string& name, Value value) {
         return index;
     }
 }
+    
+void SetRefValue(Value *o) {
+    Value *value = o;
+    while (value->ref) {
+        *value->ref = *value;
+        value = value->ref;
+    }
+}
 
 }  // namespace data_render
 }  // namespace core

@@ -333,11 +333,13 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         b = frame.reg + GET_ARG_B(instruction);
         if (IsInt(a)) {
           SetIValue(a, (int)IntValue(a) + 1);
+          SetRefValue(a);
           if (NULL != b) {
             SetIValue(b, (int)IntValue(a));
           }
         } else if (IsNumber(a)) {
           SetDValue(a, NumValue(a) + 1);
+          SetRefValue(a);
           if (NULL != b) {
             SetDValue(b, NumValue(a));
           }
@@ -496,6 +498,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
                 throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_SETVALUE]");
             }
             ref->value() = *a;
+            ref->value().ref = a;
             break;
         }
         case OP_GETVALUE:
@@ -508,6 +511,7 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
                 throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_GETVALUE]");
             }
             *a = ref->value();
+            a->ref = &ref->value();
             break;
         }
       case OP_NEWTABLE: {

@@ -28,8 +28,8 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-
 template <typename T>
+    
 std::string to_string(T value)
 {
     std::ostringstream os ;
@@ -37,7 +37,7 @@ std::string to_string(T value)
     return os.str() ;
 }
 
-uint64_t JSXNodeExpression::s_node_id_ = 0;
+uint64_t JSXNodeExpression::s_node_ptr_ = 0;
 
 bool JSXNodeExpression::LowerIdentifier() {
     std::string name = Identifier()->AsIdentifier()->GetName();
@@ -48,22 +48,24 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
     if (!funcexprs_.size()) {
         ASTFactory *factory = ASTFactory::GetFactoryInstance();
         std::string name = Identifier()->AsIdentifier()->GetName();
+        std::string vnode_ptr = "vn_" + to_string(s_node_ptr_++) + "_ptr";
+        if (!node_ptr_) {
+            node_ptr_ = factory->NewStringConstant(vnode_ptr);
+        }
         if (LowerIdentifier()) {
+            Handle<Expression> vnode_index_expr = factory->NewIdentifier(JSX_GLOBAL_VNODE_INDEX);
             std::vector<Handle<Expression>> args;
             Handle<Expression> create_element_func_expr = factory->NewIdentifier("createElement");
             args.push_back(factory->NewStringConstant(name));
-            node_id_ = factory->NewStringConstant("vn_" + to_string(s_node_id_++));
-            args.push_back(node_id_);
-            funcexprs_.push_back(factory->NewDeclaration("vnode_ptr", factory->NewCallExpression(create_element_func_expr, args)));
+            args.push_back(vnode_index_expr);
+            funcexprs_.push_back(factory->NewDeclaration(vnode_ptr, factory->NewCallExpression(create_element_func_expr, args)));
+            funcexprs_.push_back(factory->NewPrefixExpression(PrefixOperation::kIncrement, vnode_index_expr));
             if (props_) {
                 std::vector<Handle<Expression>> args;
                 Handle<Expression> set_props_func_expr = factory->NewIdentifier("setProps");
-                args.push_back(factory->NewIdentifier("vnode_ptr"));
+                args.push_back(factory->NewIdentifier(vnode_ptr));
                 args.push_back(props_);
                 funcexprs_.push_back(factory->NewCallExpression(set_props_func_expr, args));
-            }
-            if (childrens_.size() > 0) {
-                
             }
         }
         else if (!is_class_) {
@@ -76,10 +78,10 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
                 ProxyObject proxy;
                 args.push_back(factory->NewObjectConstant(proxy));
             }
-            funcexprs_.push_back(factory->NewCallExpression(call_func_expr, args));
+            funcexprs_.push_back(factory->NewDeclaration(vnode_ptr,factory->NewCallExpression(call_func_expr, args)));
         }
         else {
-            funcexprs_.push_back(factory->NewDeclaration("vnode_ptr", factory->NewNewExpression(identifier_)));
+            funcexprs_.push_back(factory->NewDeclaration(vnode_ptr, factory->NewNewExpression(identifier_)));
             // call constructor
             std::vector<Handle<Expression>> args;
             if (props_) {
@@ -89,7 +91,7 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
                 ProxyObject proxy;
                 args.push_back(factory->NewObjectConstant(proxy));
             }
-            Handle<Expression> vnode_ptr_expr = factory->NewIdentifier("vnode_ptr");
+            Handle<Expression> vnode_ptr_expr = factory->NewIdentifier(vnode_ptr);
             funcexprs_.push_back(factory->NewCallExpression(MemberAccessKind::kCall, vnode_ptr_expr, factory->NewIdentifier("constructor"), args));
             // if (vnode_ptr.xxxx) then vnode_ptr.xxxx()
             Handle<Expression> render_expr = factory->NewIdentifier("render");

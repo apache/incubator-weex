@@ -29,6 +29,8 @@ namespace weex {
 namespace core {
 namespace data_render {
     
+#define JSX_GLOBAL_VNODE_INDEX               "global_vnode_index"
+    
 class JSXNodeExpression : public Expression {
 public:
     JSXNodeExpression(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens)
@@ -37,14 +39,15 @@ public:
     void SetParent(Handle<Expression> parent) { parent_ = parent; }
     Handle<Expression> &Identifier() { return identifier_; }
     void SetClass(bool is_class) { is_class_ = is_class; }
+    Handle<Expression> node_ptr() { return node_ptr_; }
     bool LowerIdentifier();
     std::vector<Handle<Expression>>& funcexprs();
     std::vector<Handle<Expression>>& childrens() { return childrens_; }
     DEFINE_NODE_TYPE(JSXNodeExpression, Expression);
-    static uint64_t s_node_id_;
+    static uint64_t s_node_ptr_;
 private:
     Handle<Expression> identifier_;
-    Handle<Expression> node_id_;
+    Handle<Expression> node_ptr_;
     Handle<Expression> parent_{nullptr};
     Handle<Expression> props_;
     std::vector<Handle<Expression>> childrens_;

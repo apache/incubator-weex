@@ -136,10 +136,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
     long caller = -1;
     size_t argc = 0;
     if (stms->callee().get() != NULL) {
-      if (stms->callee()->IsIdentifier() && stms->callee()->AsIdentifier()->GetName() == "sizeof") {
-        LOGD("abc");
-      }
-      caller = block_->NextRegisterId();
+        caller = block_->NextRegisterId();
         stms->callee()->Accept(this, &caller);
         argc = stms->args().size();
         if (block_->idx() > caller + 1) {
@@ -489,6 +486,7 @@ void CodeGenerator::Visit(NewExpression *node, void *data) {
     
 void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
     do {
+        FuncState *func_state = func_->func_state();
         if (!node->LowerIdentifier()) {
             std::string name = node->Identifier()->AsIdentifier()->GetName();
             int index = exec_state_->global()->IndexOf(name);
@@ -505,9 +503,44 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
         }
         std::vector<Handle<Expression>> exprs = node->funcexprs();
         for (int i = 0; i < exprs.size(); i++) {
-            exprs[i]->Accept(this, data);
+            if (i == 0) {
+                exprs[i]->Accept(this, data);
+            }
+            else {
+                exprs[i]->Accept(this, nullptr);
+            }
         }
-        
+        std::vector<Handle<Expression>> childrens = node->childrens();
+        // 递归 childrens
+        if (childrens.size() > 0) {
+            for (int i = 0; i < childrens.size(); i++) {
+                assert(childrens[i]->IsJSXNodeExpression());
+                childrens[i]->Accept(this, nullptr);
+                long ret = block_->NextRegisterId();
+                long caller = block_->NextRegisterId();
+                int index = exec_state_->global()->IndexOf("appendChild");
+                if (index < 0) {
+                    throw GeneratorError("can't find identifier appendChild");
+                }
+                func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, caller, index));
+                size_t argc = 2;
+                long arg_0 = block_->NextRegisterId();
+                long arg_1 = block_->NextRegisterId();
+                std::string vnode_ptr = node->node_ptr()->AsStringConstant()->string();
+                long reg_parent = block_->FindRegisterId(vnode_ptr);
+                if (reg_parent < 0) {
+                    throw GeneratorError("can't find identifier: " + node->node_ptr()->AsStringConstant()->string());
+                }
+                func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg_0, reg_parent, 0));
+                std::string vnode_child_ptr = childrens[i]->AsJSXNodeExpression()->node_ptr()->AsStringConstant()->string();
+                long reg_child = block_->FindRegisterId(vnode_child_ptr);
+                if (reg_child < 0) {
+                    throw GeneratorError("can't find identifier: " + childrens[i]->AsJSXNodeExpression()->node_ptr()->AsStringConstant()->string());
+                }
+                func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg_1, reg_child, 0));
+                func_state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
+            }
+        }
         
     } while (0);
 }

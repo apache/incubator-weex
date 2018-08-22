@@ -79,6 +79,8 @@ struct Value {
     struct Value *var;
   };
 
+  struct Value *ref {nullptr};
+
   enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, ARRAY, TABLE, CLASS_DESC, CLASS_INST, VALUE_REF };
 
   Type type;
@@ -115,10 +117,49 @@ struct Value {
       case TABLE:
       case ARRAY:
       case CLASS_DESC:
+      case CLASS_INST:
         gc = value.gc;
         break;
       default:break;
     }
+  }
+  
+  inline Value operator=(Value value) {
+      type = value.type;
+      switch (type) {
+          case INT:
+              i = value.i;
+              break;
+          case NUMBER:
+              n = value.n;
+              break;
+          case BOOL:
+              b = value.b;
+              break;
+          case STRING:
+              str = value.str;
+              break;
+          case FUNC:
+              f = value.f;
+              break;
+          case CFUNC:
+              cf = value.cf;
+              break;
+          case CPTR:
+              cptr = value.cptr;
+              break;
+          case VALUE_REF:
+              var = value.var;
+              break;
+          case TABLE:
+          case ARRAY:
+          case CLASS_DESC:
+          case CLASS_INST:
+              gc = value.gc;
+              break;
+          default:break;
+      }
+      return *this;
   }
 
   friend bool operator==(const Value &left, const Value &right) {
@@ -134,6 +175,8 @@ struct Value {
       case CPTR:return left.cptr == right.cptr;
       case ARRAY:
       case TABLE:
+      case CLASS_DESC:
+      case CLASS_INST:
             return left.gc == right.gc;
       default:break;
     }
@@ -341,6 +384,8 @@ inline void SetIValue(Value *o, int iv) {
   o->type = Value::Type::INT;
   o->i = iv;
 }
+    
+void SetRefValue(Value *o);
 
 inline void SetDValue(Value *o, double d) {
   o->type = Value::Type::NUMBER;
