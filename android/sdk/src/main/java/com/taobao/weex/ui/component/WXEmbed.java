@@ -33,19 +33,21 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
-import com.taobao.weex.common.WXPerformance;
-import com.taobao.weex.common.WXPerformance.Dimension;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
 import com.taobao.weex.performance.WXInstanceApm;
-import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
+import java.util.ArrayDeque;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 @Component(lazyload = false)
 public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
@@ -68,6 +70,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   private boolean mIsVisible = true;
   private EmbedRenderListener mListener;
+  private EmbedInstanceOnScrollFireEventInterceptor mInstanceOnScrollFireEventInterceptor;
 
 
   private String priority = PRIORITY_NORMAL;
@@ -75,6 +78,8 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   private String strategy = "normal";  //none, normal, high(ignore priority)
 
   private long hiddenTime;
+
+
 
   public interface EmbedManager {
     WXEmbed getEmbed(String itemId);
@@ -197,6 +202,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   public WXEmbed(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     super(instance, parent, basicComponentData);
     mListener = new EmbedRenderListener(this);
+    mInstanceOnScrollFireEventInterceptor = new EmbedInstanceOnScrollFireEventInterceptor(this);
 
     ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270, instance.getInstanceViewPortWidth());
     ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260, instance.getInstanceViewPortWidth());
@@ -262,6 +268,19 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   private String originUrl;
 
+
+  @Override
+  public void addEvent(String type) {
+    super.addEvent(type);
+    if(Constants.Event.SCROLL_START.equals(type)){
+      mInstanceOnScrollFireEventInterceptor.addInterceptEvent(type);
+    }else if(Constants.Event.SCROLL_END.equals(type)){
+      mInstanceOnScrollFireEventInterceptor.addInterceptEvent(type);
+    }else if(Constants.Event.SCROLL.equals(type)){
+      mInstanceOnScrollFireEventInterceptor.addInterceptEvent(type);
+    }
+  }
+
   @WXComponentProp(name = Constants.Name.SRC)
   public void setSrc(String src) {
     originUrl=src;
@@ -318,6 +337,9 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     WXSDKInstance sdkInstance = getInstance().createNestedInstance(this);
     getInstance().addOnInstanceVisibleListener(this);
     sdkInstance.registerRenderListener(mListener);
+    mInstanceOnScrollFireEventInterceptor.resetFirstLaterScroller();;
+    sdkInstance.addInstanceOnFireEventInterceptor(mInstanceOnScrollFireEventInterceptor);
+    sdkInstance.registerOnWXScrollListener(mInstanceOnScrollFireEventInterceptor);
 
     String url=src;
     if(mListener != null && mListener.mEventListener != null){
@@ -337,7 +359,6 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     }
     sdkInstance.setContainerInfo(WXInstanceApm.KEY_PAGE_PROPERTIES_INSTANCE_TYPE,"embed");
     sdkInstance.setContainerInfo(WXInstanceApm.KEY_PAGE_PROPERTIES_PARENT_PAGE,getInstance().getWXPerformance().pageName);
-
     sdkInstance.renderByUrl(url,
             url,
             null, null,
@@ -518,4 +539,99 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     if (mNestedInstance != null)
       mNestedInstance.removeLayerOverFlowListener(ref);
   }
+
+  static class EmbedInstanceOnScrollFireEventInterceptor extends InstanceOnFireEventInterceptor implements OnWXScrollListener{
+
+    private WXEmbed mEmbed;
+    private WXComponent firstLayerScroller;
+
+    public EmbedInstanceOnScrollFireEventInterceptor(WXEmbed embed) {
+      this.mEmbed = embed;
+    }
+
+    public void resetFirstLaterScroller(){
+      firstLayerScroller = null;
+    }
+
+    @Override
+    public void onFireEvent(String instanceId, String elementRef, String type, Map<String, Object> params, Map<String, Object> domChanges) {
+      if(mEmbed == null
+              || mEmbed.mNestedInstance == null
+              || !mEmbed.mNestedInstance.getInstanceId().equals(instanceId)){
+        return;
+      }
+      if(firstLayerScroller == null){
+          initFirstLayerScroller();
+      }
+      if(firstLayerScroller == null){
+        return;
+      }
+      if(firstLayerScroller.getRef().equals(elementRef)){
+         mEmbed.getInstance().fireEvent(mEmbed.getRef(), type, params, domChanges);
+      }
+    }
+
+
+    private void initFirstLayerScroller(){
+      if(firstLayerScroller == null){
+          firstLayerScroller = findFirstLayerScroller();
+          if(firstLayerScroller != null){
+            for(String event : getListenEvents()){
+              if(!firstLayerScroller.containsEvent(event)){
+                  firstLayerScroller.getEvents().add(event);
+                  firstLayerScroller.addEvent(event);
+              }
+            }
+          }
+      }
+    }
+
+    /**
+     * get first layer scroller ref
+     * */
+    private WXComponent findFirstLayerScroller(){
+         if(mEmbed.mNestedInstance == null){
+           return null;
+         }
+         WXComponent rootComponent = mEmbed.mNestedInstance.getRootComponent();
+        if(rootComponent instanceof  Scrollable){
+          return rootComponent;
+        }
+        Queue<WXComponent> queues = new ArrayDeque<>();
+        queues.offer(rootComponent);
+        while (!queues.isEmpty()){
+             WXComponent component = queues.poll();
+             if(component == null){
+               break;
+             }
+             if(component instanceof  Scrollable){
+                return  component;
+             }
+             if(component instanceof WXVContainer){
+               WXVContainer container = (WXVContainer) component;
+               for(int i=0; i<container.getChildCount(); i++){
+                  queues.offer(container.getChild(i));
+               }
+             }
+        }
+        return null;
+    }
+
+
+    @Override
+    public void onScrolled(View view, int x, int y) {
+      if(firstLayerScroller != null){
+        return;
+      }
+      if(getListenEvents().size() > 0){
+        initFirstLayerScroller();
+      }
+    }
+
+    @Override
+    public void onScrollStateChanged(View view, int x, int y, int newState) {
+
+    }
+  }
+
 }

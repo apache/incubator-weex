@@ -64,6 +64,7 @@ import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
+import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.performance.WXInstanceApm;
@@ -71,9 +72,7 @@ import com.taobao.weex.performance.WXInstanceExceptionRecord;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
-import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXEmbed;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
@@ -93,7 +92,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
@@ -207,6 +205,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private Map<String, GraphicActionAddElement> inactiveAddElementAction = new ArrayMap<>();
 
   private Map<Long, ContentBoxMeasurement> mContentBoxMeasurements = new ArrayMap<>();
+
+  private List<InstanceOnFireEventInterceptor> mInstanceOnFireEventInterceptorList;
+
 
   /**
    * set make weexCore run in single process mode
@@ -1436,7 +1437,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
       getFlatUIContext().destroy();
       mFlatGUIContext = null;
-
+      mInstanceOnFireEventInterceptorList = null;
       mWXScrollListeners = null;
       mRenderContainer = null;
       mNestedInstanceInterceptor = null;
@@ -1614,12 +1615,15 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void fireEvent(String elementRef,final String type, final Map<String, Object> data,final Map<String, Object> domChanges, List<Object> eventArgs, EventResult callback) {
+    onInterceptInstanceEvent(getInstanceId(), elementRef, type, data, domChanges);
     if (null != mWXPerformance && mWXPerformance.fsCallEventTotalNum<Integer.MAX_VALUE){
       mWXPerformance.fsCallEventTotalNum++;
     }
     mApmForInstance.updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_CALL_EVENT_NUM,1);
     WXBridgeManager.getInstance().fireEventOnNode(getInstanceId(),elementRef,type,data,domChanges, eventArgs, callback);
   }
+
+
   /**
    * Fire event callback on a element.
    * @param elementRef
@@ -2054,5 +2058,32 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public ContentBoxMeasurement getContentBoxMeasurement(long renderObjectPtr) {
     return mContentBoxMeasurements.get(renderObjectPtr);
+  }
+
+
+  private void onInterceptInstanceEvent(String instanceId, String elementRef, String type, Map<String, Object> data, Map<String, Object> domChanges) {
+    if(this.mInstanceOnFireEventInterceptorList == null){
+      return;
+    }
+    for(InstanceOnFireEventInterceptor instanceOnFireEventInterceptor : this.mInstanceOnFireEventInterceptorList){
+      instanceOnFireEventInterceptor.onInterceptFireEvent(instanceId, elementRef, type, data, domChanges);
+    }
+  }
+
+  public List<InstanceOnFireEventInterceptor> getInstanceOnFireEventInterceptorList(){
+    if(this.mInstanceOnFireEventInterceptorList == null){
+      this.mInstanceOnFireEventInterceptorList = new ArrayList<>();
+    }
+    return mInstanceOnFireEventInterceptorList;
+  }
+
+
+  public void addInstanceOnFireEventInterceptor(InstanceOnFireEventInterceptor instanceOnFireEventInterceptor) {
+    if(instanceOnFireEventInterceptor == null){
+      return;
+    }
+    if(!getInstanceOnFireEventInterceptorList().contains(instanceOnFireEventInterceptor)){
+      getInstanceOnFireEventInterceptorList().add(instanceOnFireEventInterceptor);
+    }
   }
 }
