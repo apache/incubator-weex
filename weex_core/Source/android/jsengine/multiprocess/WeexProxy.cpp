@@ -289,25 +289,25 @@ namespace WeexCore {
           return false;
 
         LOGE("Single process ? %s", g_use_single_process ? "true" : "false");
-        if (g_use_single_process) {
-            if (initFrameworkInSingleProcess(env, script, initFrameworkParams)) {
-                //reportNativeInitStatus("-1011", "init Single Process Success");
-                return true;
-            }
-
-            if (initFrameworkInMultiProcess(env, script, params, serializer.get())) {
-                return true;
-            }
-        } else {
-            if (initFrameworkInMultiProcess(env, script, params, serializer.get())) {
-                return true;
-            }
-
-            if (initFrameworkInSingleProcess(env, script, initFrameworkParams)) {
-                reportNativeInitStatus("-1011", "init Single Process Success");
-                return true;
-            }
+//        if (g_use_single_process) {
+//            if (initFrameworkInSingleProcess(env, script, initFrameworkParams)) {
+//                //reportNativeInitStatus("-1011", "init Single Process Success");
+//                return true;
+//            }
+//
+//            if (initFrameworkInMultiProcess(env, script, params, serializer.get())) {
+//                return true;
+//            }
+//        } else {
+        if (initFrameworkInMultiProcess(env, script, params, serializer.get())) {
+            return true;
         }
+
+//            if (initFrameworkInSingleProcess(env, script, initFrameworkParams)) {
+//                reportNativeInitStatus("-1011", "init Single Process Success");
+//                return true;
+//            }
+//        }
 
         reportNativeInitStatus("-1010", "init Failed");
         return false;
