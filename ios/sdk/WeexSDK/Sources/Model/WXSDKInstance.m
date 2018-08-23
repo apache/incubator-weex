@@ -218,6 +218,7 @@ typedef enum : NSUInteger {
         return;
     }
     [self.apmInstance startRecord:self.instanceId];
+    self.apmInstance.isStartRender = YES;
     
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:url];
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
@@ -239,6 +240,11 @@ typedef enum : NSUInteger {
     [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
 }
 
+- (NSString*) bundleTemplate
+{
+    return self.mainBundleString;
+}
+
 - (void)_renderWithMainBundleString:(NSString *)mainBundleString
 {
     if (!self.instanceId) {
@@ -248,6 +254,7 @@ typedef enum : NSUInteger {
   
     //some case , with out render (url)
     [self.apmInstance startRecord:self.instanceId];
+    self.apmInstance.isStartRender = YES;
     
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
     [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];

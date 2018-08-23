@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import "WXJSExceptionInfo.h"
 
 #pragma mark - const static string
 
@@ -76,8 +77,12 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 
 @interface WXApmForInstance : NSObject
 
-@property (nonatomic, assign) bool isFSEnd;
-@property (nonatomic, assign) bool isStartRecord;
+@property (nonatomic, assign) BOOL isFSEnd;
+@property (nonatomic,assign)  BOOL isOpenApm;
+@property (nonatomic, assign) BOOL isStartRecord;
+@property (nonatomic, assign) BOOL hasAddView;
+@property (nonatomic, assign) BOOL isDegrade;
+@property (nonatomic, assign) BOOL isStartRender;
 
 #pragma mark - basic method
 
@@ -106,4 +111,7 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 - (void) actionImgLoad;
 - (void) actionImgLoadResult:(bool)succeed withErrorCode:(NSString*)errorCode;
 
+#pragma mark record top5 errorMsg
+- (void) recordErrorMsg:(WXJSExceptionInfo *)exception;
+- (NSDictionary<NSString*,NSNumber*>*) stageDic;
 @end
