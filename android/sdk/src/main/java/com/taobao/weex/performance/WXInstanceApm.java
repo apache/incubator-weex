@@ -203,8 +203,14 @@ public class WXInstanceApm {
         }
     }
 
-    public void setPageName(String pageName){
-        String fixPageName = TextUtils.isEmpty(pageName)?"emptyPageName":pageName;
+    public void setPageName(String pageName) {
+        if (TextUtils.isEmpty(pageName)) {
+            WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(mInstanceId);
+            if (null != instance) {
+                pageName = instance.getContainerInfo().get(KEY_PAGE_PROPERTIES_CONTAINER_NAME);
+            }
+        }
+        String fixPageName = TextUtils.isEmpty(pageName) ? "emptyPageName" : pageName;
         addProperty(KEY_PAGE_PROPERTIES_BIZ_ID, fixPageName);
     }
 
