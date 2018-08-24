@@ -42,6 +42,7 @@ public class GraphicActionCreateFinish extends BasicGraphicAction {
         this.mLayoutHeight = (int) component.getLayoutHeight();
     }
     instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH);
+    instance.getApmForInstance().extInfo.put(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH,true);
 
     // todo add LayoutFinishListener
 //    final LayoutFinishListener listener;

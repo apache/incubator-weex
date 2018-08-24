@@ -322,6 +322,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 - (NSURL *)completeURL:(NSString *)url;
 
 /**
+ * jsbundle str ,may be nil (weak)
+ */
+- (NSString*) bundleTemplate;
+
+/**
  * application performance statistics
  */
 @property (nonatomic, strong) NSString *bizType;

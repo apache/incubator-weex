@@ -35,22 +35,38 @@
     NSString *bundleUrlCommit = @"BundleUrlDefault";
     NSString *instanceIdCommit = @"InstanceIdDefalut";
     
+    WXSDKInstance * instance ;
     if(![WXUtility isBlankString:instanceId]){
         instanceIdCommit = instanceId;
-        WXSDKInstance * instance = [WXSDKManager instanceForID:instanceId];
+        instance = [WXSDKManager instanceForID:instanceId];
         if(instance){
             bundleUrlCommit = instance.pageName?:([instance.scriptURL absoluteString]?:bundleUrlCommit);
+            NSMutableDictionary* extInfo = [[NSMutableDictionary alloc] initWithDictionary:extParams];
             if (instance.containerInfo && instance.containerInfo.count >0) {
-                NSMutableDictionary* extInfo = [[NSMutableDictionary alloc] initWithDictionary:extParams];
                 [extInfo addEntriesFromDictionary:instance.containerInfo];
-                extParams = extInfo;
             }
+            [extInfo setObject:[self _convertInstanceStageToStr:instance] forKey:@"wxStageList"];
+            [extInfo setObject:instance.pageName?:@"unKnowPageNameCaseUnSet" forKey:@"wxPageName"];
+            [extInfo setObject:instance.bundleTemplate?:@"has recycle" forKey:@"wxTemplateOfBundle"];
+            extParams = extInfo;
         }else if([instanceIdCommit hasPrefix:@"WX_KEY_EXCEPTION"]){
             bundleUrlCommit = instanceId;
         }
     }
-    
+  
     WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instanceIdCommit bundleUrl:bundleUrlCommit errorCode:errCode functionName:function exception:exception userInfo: [extParams mutableCopy]];
+    
+    //record top5 erromsg ,if errorType is not WX_RENDER_ERROR
+    NSNumberFormatter *formater = [[NSNumberFormatter alloc] init];
+    formater.numberStyle = NSNumberFormatterDecimalStyle;
+    NSNumber *codeNumber = [formater numberFromString:errCode];
+    if (codeNumber) {
+       WXSDKErrorType type = [WXSDKErrCodeUtil getErrorTypeByCode:codeNumber.intValue];
+        if (type != WX_RENDER_ERROR && nil != instance) {
+            [instance.apmInstance recordErrorMsg:jsExceptionInfo];
+        }
+    }
+  
     [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo];
 }
 
@@ -63,5 +79,24 @@
         [WXAnalyzerCenter transErrorInfo:jsExceptionInfo];
     }
 }
+
++ (NSString*) _convertInstanceStageToStr:(WXSDKInstance *)instance
+{
+    if (nil == instance || !instance.apmInstance.isOpenApm) {
+        return @"";
+    }
+    NSDictionary<NSString*,NSNumber*>* stageDic = instance.apmInstance.stageDic;
+    if (!stageDic || stageDic.count <=0 ) {
+        return @"emptyStageRecord";
+    }
+    NSString* stageStr = @"";
+    for (NSString* key in stageDic) {
+        NSNumber* time = [stageDic objectForKey:key];
+        stageStr = [stageStr stringByAppendingFormat:@"%@ -> %@:%@",stageStr,key,time];
+    }
+    return stageStr;
+}
+
+
 
 @end

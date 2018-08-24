@@ -113,21 +113,24 @@ struct WeexJSConnection::WeexJSConnectionImpl {
 
 WeexJSConnection::WeexJSConnection()
         : m_impl(new WeexJSConnectionImpl) {
-  if (checkDirOrFileIsLink(SoUtils::crash_file_path())) {
-    std::string tmp = SoUtils::crash_file_path();
-    size_t length = tmp.length();
-    char buf[length];
-    memset(buf, 0, length);
-    if (!getDirOrFileLink(SoUtils::crash_file_path(), buf, length)) {
-        LOGE("getDirOrFileLink filePath(%s) error\n", SoUtils::crash_file_path());
-        g_crashFileName = SoUtils::crash_file_path();
+  if (g_crashFilePath != nullptr) {
+    if (checkDirOrFileIsLink(g_crashFilePath)) {
+        std::string tmp = g_crashFilePath;
+        size_t length = tmp.length();
+        char buf[length];
+        memset(buf, 0, length);
+        if (!getDirOrFileLink(g_crashFilePath, buf, length)) {
+            LOGE("getDirOrFileLink filePath(%s) error\n", g_crashFilePath);
+            g_crashFileName = g_crashFilePath;
+        } else {
+            g_crashFileName = buf;
+        }
     } else {
-        g_crashFileName = buf;
+        g_crashFileName = g_crashFilePath;
     }
   } else {
-    g_crashFileName = SoUtils::crash_file_path();
+    g_crashFileName += "/crash_dump.log";
   }
-  g_crashFileName += "/crash_dump.log";
   LOGE("WeexJSConnection g_crashFileName: %s\n", g_crashFileName.c_str());
 }
 

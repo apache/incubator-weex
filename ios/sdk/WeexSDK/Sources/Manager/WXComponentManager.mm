@@ -257,6 +257,7 @@ static NSThread *WXComponentThread;
         WXLogWarning(@"addComponent,superRef from js never exit ! check JS action, supRef:%@", parentRef);
         return;
     }
+    supercomponent.weexInstance.apmInstance.hasAddView = YES;
     
     WXComponent *component = [self _buildComponent:ref type:type supercomponent:supercomponent styles:styles attributes:attributes events:events renderObject:renderObject];
     if (!supercomponent.subcomponents) {

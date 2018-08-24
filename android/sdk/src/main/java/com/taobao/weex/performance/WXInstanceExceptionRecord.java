@@ -18,7 +18,14 @@
  */
 package com.taobao.weex.performance;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,7 +40,7 @@ public class WXInstanceExceptionRecord {
     public static int sErrorMsgSizeLimit = 5;
     public static final String KEY_EXP_STAGE_LIST = "wxStageList";
 
-    public final List<String> stageList;
+    private final Map<String,Long> mStageMap;
     public final List<WXJSExceptionInfo> errorList;
     public final String instanceId;
     public final AtomicBoolean hasAddView;
@@ -43,7 +50,7 @@ public class WXInstanceExceptionRecord {
 
     public WXInstanceExceptionRecord(String instanceId) {
         this.instanceId = instanceId;
-        this.stageList = new CopyOnWriteArrayList<>();
+        this.mStageMap = new ConcurrentHashMap<>();
         this.errorList = new CopyOnWriteArrayList<>();
         this.hasAddView = new AtomicBoolean(false);
         this.hasDegrade = new AtomicBoolean(false);
@@ -79,7 +86,7 @@ public class WXInstanceExceptionRecord {
             ) {
             setBeginRender(true);
         }
-        stageList.add(stage + " :" + time);
+        mStageMap.put(stage,time);
     }
 
     public void setBeginRender(boolean isBegin){
@@ -87,12 +94,20 @@ public class WXInstanceExceptionRecord {
     }
 
     public String convertStageToStr() {
-        if (stageList.isEmpty()) {
-            return "empty";
+        if (mStageMap.isEmpty()) {
+            return "emptyStage";
         }
+        List<Map.Entry<String,Long>> list = new ArrayList<>(mStageMap.entrySet());
+        Collections.sort(list, new Comparator<Entry<String, Long>>() {
+            @Override
+            public int compare(Entry<String, Long> o1, Entry<String, Long> o2) {
+                return (int)(o1.getValue() - o2.getValue());
+            }
+        });
+
         StringBuilder builder = new StringBuilder();
-        for (String value : stageList) {
-            builder.append(value).append(" -> ");
+        for (Map.Entry<String,Long> entry : list) {
+            builder.append(entry.getKey()).append(':').append(entry.getValue()).append("->");
         }
         return builder.toString();
     }
@@ -131,12 +146,18 @@ public class WXInstanceExceptionRecord {
                 break;
             }
         }
+        Map<String,String> flagMap = new HashMap<>(4);
+        flagMap.put("wxBeginRender",String.valueOf(mBeginRender));
+        flagMap.put("wxHasAddView",String.valueOf(hasAddView.get()));
+        flagMap.put("wxHasDegrade",String.valueOf(hasDegrade.get()));
+        flagMap.put("wxHasReportScreenEmpty",String.valueOf(mHasReportScreenEmpty));
+
         WXExceptionUtils.commitCriticalExceptionRT(
             instanceId,
             hasJsException ? WXErrorCode.WX_RENDER_ERR_JS_RUNTIME : WXErrorCode.WX_RENDER_ERR_NATIVE_RUNTIME,
             "checkEmptyScreenAndReport",
             convertExceptionListToString(),
-            null
+            flagMap
         );
     }
 

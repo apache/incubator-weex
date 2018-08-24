@@ -106,9 +106,11 @@ public class WXInstanceApm {
     private Map<String, Double> recordStatsMap;
     private boolean isFSEnd;
     private boolean mHasInit = false;
+    public final Map<String,Object> extInfo;
 
     public WXInstanceApm(String instanceId) {
         mInstanceId = instanceId;
+        extInfo = new ConcurrentHashMap<>();
         IApmGenerator generator = WXSDKManager.getInstance().getApmGenerater();
         if (null != generator) {
             apmInstance = generator.generateApmInstance(WEEX_PAGE_TOPIC);
@@ -308,7 +310,7 @@ public class WXInstanceApm {
         }
     }
 
-    public void updateExtInfo(Map<String, Object> extParams) {
+    public void updateRecordInfo(Map<String, Object> extParams) {
         if (null == apmInstance || null == extParams) {
             return;
         }

@@ -276,7 +276,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     recyclerViewBaseAdapter.setHasStableIds(true);
     bounceRecyclerView.setRecyclerViewBaseAdapter(recyclerViewBaseAdapter);
     bounceRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-    bounceRecyclerView.getInnerView().clearOnScrollListeners();
     bounceRecyclerView.getInnerView().addOnScrollListener(mViewOnScrollListener);
     if(getAttrs().get(Constants.Name.HAS_FIXED_SIZE) != null){
       boolean hasFixedSize = WXUtils.getBoolean(getAttrs().get(Constants.Name.HAS_FIXED_SIZE), false);

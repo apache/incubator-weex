@@ -27,6 +27,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXErrorCode.ErrorType;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
@@ -67,8 +68,6 @@ public class WXExceptionUtils {
 		if (null == commitMap){
 			commitMap = new HashMap<>();
 		}
-		commitMap.put("activity","empty");
-
 		if (!TextUtils.isEmpty(instanceId)) {
 			instanceIdCommit = instanceId;
 			instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
@@ -88,6 +87,7 @@ public class WXExceptionUtils {
 				commitMap.put(WXInstanceExceptionRecord.KEY_EXP_STAGE_LIST,instance.getExceptionRecorder().convertStageToStr());
 				String bundleTemplate = instance.getTemplate();
 				commitMap.put("wxTemplateOfBundle",null == bundleTemplate ?"has recycle by gc":bundleTemplate);
+				commitMap.put("wxPageName",instance.getWXPerformance().pageName);
 			}
 		} else {//instance is null for instance id is null
 			if (!TextUtils.isEmpty(WXSDKInstance.requestUrl)) {
@@ -104,7 +104,7 @@ public class WXExceptionUtils {
 			adapter.onJSException(exceptionCommit);
 		}
 
-		if (null != instance){
+		if (null != instance && exceptionCommit.getErrCode().getErrorType() != ErrorType.RENDER_ERROR){
 			instance.getExceptionRecorder().recordErrorMsg(exceptionCommit);
 		}
 
