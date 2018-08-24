@@ -23,6 +23,7 @@ import java.util.Map;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
@@ -58,57 +59,74 @@ public class WXExceptionUtils {
 												 @Nullable final String function,
 												 @Nullable final String exception,
 												 @Nullable final Map<String,String> extParams ) {
-		IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
-		WXSDKInstance instance = null;
-		WXJSExceptionInfo exceptionCommit;
-		String bundleUrlCommit = "BundleUrlDefault";
-		String instanceIdCommit = "InstanceIdDefalut";
-		String exceptionMsgCommit = exception;
-		Map<String, String> commitMap = extParams;
-		if (null == commitMap){
-			commitMap = new HashMap<>();
-		}
-		if (!TextUtils.isEmpty(instanceId)) {
-			instanceIdCommit = instanceId;
-			instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
-
-			if (null != instance) {
-				bundleUrlCommit = instance.getBundleUrl();
-				commitMap.put("templateInfo",instance.getTemplateInfo());
-				if (TextUtils.isEmpty(bundleUrlCommit) || bundleUrlCommit.equals(WXPerformance.DEFAULT)) {
-					if (!TextUtils.equals(degradeUrl, "BundleUrlDefaultDegradeUrl")) {
-						bundleUrlCommit = degradeUrl;
-					} else
-						bundleUrlCommit = WXSDKInstance.requestUrl;
-				}
-				for (Map.Entry<String,String> entry: instance.getContainerInfo().entrySet()){
-					commitMap.put(entry.getKey(),entry.getValue());
-				}
-				commitMap.put(WXInstanceExceptionRecord.KEY_EXP_STAGE_LIST,instance.getExceptionRecorder().convertStageToStr());
-				String bundleTemplate = instance.getTemplate();
-				commitMap.put("wxTemplateOfBundle",null == bundleTemplate ?"has recycle by gc":bundleTemplate);
-				commitMap.put("wxPageName",instance.getWXPerformance().pageName);
-			}
-		} else {//instance is null for instance id is null
-			if (!TextUtils.isEmpty(WXSDKInstance.requestUrl)) {
-				bundleUrlCommit = WXSDKInstance.requestUrl;
-			}
-			if (commitMap.size() > 0) {
-				bundleUrlCommit = TextUtils.isEmpty(commitMap.get("weexUrl")) ? commitMap.get("weexUrl")
-								: commitMap.get("bundleUrl");
-			}
-		}
-
-		exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exceptionMsgCommit, commitMap);
-		if (adapter != null) {
-			adapter.onJSException(exceptionCommit);
-		}
-
-		if (null != instance && exceptionCommit.getErrCode().getErrorType() != ErrorType.RENDER_ERROR){
-			instance.getExceptionRecorder().recordErrorMsg(exceptionCommit);
-		}
-
-		WXAnalyzerDataTransfer.transferError(exceptionCommit, instanceId);
-
+		commitCriticalExceptionWithDefaultUrl(
+		    "BundleUrlDefault",
+            instanceId,
+            errCode,
+            function,
+            exception,
+            extParams
+        );
 	}
+
+    public static void commitCriticalExceptionWithDefaultUrl(
+        @Nullable final String defaultUrl,
+        @Nullable final String instanceId,
+        @Nullable final WXErrorCode errCode,
+        @Nullable final String function,
+        @Nullable final String exception,
+        @Nullable final Map<String,String> extParams
+    ){
+        IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
+        WXSDKInstance instance = null;
+        WXJSExceptionInfo exceptionCommit;
+        String bundleUrlCommit = TextUtils.isEmpty(defaultUrl)?"BundleUrlDefault":defaultUrl;
+        String instanceIdCommit = "InstanceIdDefalut";
+        String exceptionMsgCommit = exception;
+        Map<String, String> commitMap = extParams;
+        if (null == commitMap){
+            commitMap = new HashMap<>();
+            commitMap.put("wxSdkInitStartTime", String.valueOf(WXEnvironment.sSDKInitStart));
+            commitMap.put("wxSDKInitCostTime", String.valueOf(WXEnvironment.sSDKInitTime));
+            commitMap.put("wxSDKCurExceptionTime", String.valueOf(System.currentTimeMillis()));
+        }
+        if (!TextUtils.isEmpty(instanceId)) {
+            instanceIdCommit = instanceId;
+            instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
+
+            if (null != instance) {
+                bundleUrlCommit = instance.getBundleUrl();
+                commitMap.put("templateInfo",instance.getTemplateInfo());
+                if (TextUtils.isEmpty(bundleUrlCommit) || bundleUrlCommit.equals(WXPerformance.DEFAULT)) {
+                    if (!TextUtils.equals(degradeUrl, "BundleUrlDefaultDegradeUrl")) {
+                        bundleUrlCommit = degradeUrl;
+                    } else
+                        bundleUrlCommit = WXSDKInstance.requestUrl;
+                }
+                for (Map.Entry<String,String> entry: instance.getContainerInfo().entrySet()){
+                    commitMap.put(entry.getKey(),entry.getValue());
+                }
+                commitMap.put(WXInstanceExceptionRecord.KEY_EXP_STAGE_LIST,instance.getExceptionRecorder().convertStageToStr());
+                String bundleTemplate = instance.getTemplate();
+                commitMap.put("wxTemplateOfBundle",null == bundleTemplate ?"has recycle by gc":bundleTemplate);
+            }
+        } else {//instance is null for instance id is null
+            if (commitMap.size() > 0) {
+                bundleUrlCommit = TextUtils.isEmpty(commitMap.get("weexUrl")) ? commitMap.get("weexUrl")
+                    : commitMap.get("bundleUrl");
+            }
+        }
+
+        exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exceptionMsgCommit, commitMap);
+        if (adapter != null) {
+            adapter.onJSException(exceptionCommit);
+        }
+
+        if (null != instance && exceptionCommit.getErrCode().getErrorType() != ErrorType.RENDER_ERROR){
+            instance.getExceptionRecorder().recordErrorMsg(exceptionCommit);
+        }
+
+        WXAnalyzerDataTransfer.transferError(exceptionCommit, instanceId);
+    }
+
 }

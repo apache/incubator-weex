@@ -1229,7 +1229,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void onChangeElement(WXComponent component, boolean isOutOfScreen) {
 
-    if (isDestroy()  || null == mRenderContainer || mWXPerformance == null){
+    if (isDestroy()  || null == mRenderContainer || mWXPerformance == null || "videoplus".equals(component.getComponentType())){
       return;
     }
 

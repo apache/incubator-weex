@@ -43,7 +43,7 @@ public class GraphicActionRemoveElement extends BasicGraphicAction {
     if (component.getHostView() != null && !TextUtils.equals(component.getComponentType(), "video") && !TextUtils.equals(component.getComponentType(), "videoplus")) {
       int[] location = new  int[2];
       component.getHostView().getLocationInWindow(location);
-      component.getInstance().onChangeElement(parent, location[1] > component.getInstance().getWeexHeight() + 1);
+      //component.getInstance().onChangeElement(parent, location[1] > component.getInstance().getWeexHeight() + 1);
     }
 
     parent.remove(component, true);
