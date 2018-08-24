@@ -141,6 +141,11 @@ template <typename T, typename... Args>
 inline Handle<T> MakeHandle(Args &&... args) {
   return Handle<T>(new T(std::forward<Args>(args)...));
 }
+    
+template <typename T>
+inline Handle<T> MakeHandle() {
+    return Handle<T>(new T());
+}
 
 }  // namespace data_render
 }  // namespace core

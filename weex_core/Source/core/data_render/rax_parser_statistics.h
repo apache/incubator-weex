@@ -16,39 +16,46 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+//
+// Created by pentao.pt on 2018/7/25.
+//
 
-#ifndef CORE_DATA_RENDER_VM_H
-#define CORE_DATA_RENDER_VM_H
+#ifndef DATA_RENDER_RAX_PARSER_STATISTICS_
+#define DATA_RENDER_RAX_PARSER_STATISTICS_
 
-#include <limits.h>
-#include "core/data_render/op_code.h"
-
-#define MAXINTEGER INT_MAX
-#define MININTEGER INT_MIN
+#include <vector>
+#include <memory>
 
 namespace weex {
 namespace core {
 namespace data_render {
-class ExecState;
-class FuncState;
-class Value;
 
-struct Frame {
-  Value *reg;
-  Value *ret;
-  Value *func;
-  const Instruction *pc;
-  const Instruction *end;
+#define COUNTER_TYPE(F) \
+F(Token) \
+F(Expression) \
+F(InputCharacter) \
+F(Allocations) \
+F(Line)
+    
+class Statistics {
+    enum CountType {
+#define COUNT_TYPE(t) k##t,
+        COUNTER_TYPE(COUNT_TYPE)
+#undef COUNT_TYPE
+        kSize,
+    };
+public:
+    Statistics() : counters_{0} { }
+#define COUNTER_ACCESSOR(t) std::size_t &t() { return counters_[CountType::k##t]; }
+        COUNTER_TYPE(COUNTER_ACCESSOR)
+#undef COUNTER_ACCESSOR
+    void dump();
+private:
+    std::size_t counters_[CountType::kSize];    
 };
+    
+}
+}
+}
 
-class VM {
- public:
-  VM() {}
-  ~VM() {}    
-  void RunFrame(ExecState *exec_state, Frame frame, Value* ret);
-};
-}  // namespace data_render
-}  // namespace core
-}  // namespace weex
-
-#endif  // CORE_DATA_RENDER_VM_H
+#endif

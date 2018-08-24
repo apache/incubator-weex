@@ -16,39 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-#ifndef CORE_DATA_RENDER_VM_H
-#define CORE_DATA_RENDER_VM_H
-
-#include <limits.h>
-#include "core/data_render/op_code.h"
-
-#define MAXINTEGER INT_MAX
-#define MININTEGER INT_MIN
+#include <algorithm>
+#include "core/data_render/class.h"
+#include "core/data_render/vm_mem.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-class ExecState;
-class FuncState;
-class Value;
 
-struct Frame {
-  Value *reg;
-  Value *ret;
-  Value *func;
-  const Instruction *pc;
-  const Instruction *end;
-};
+ClassDescriptor *NewClassDescriptor(ClassDescriptor *p_super) {
+    return new ClassDescriptor(p_super);
+}
+    
+void AddClassStaticCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function) {
+    Value func;
+    func.type = Value::Type::CFUNC;
+    func.cf = reinterpret_cast<void *>(function);
+    p_desc->static_funcs_->Add(name, func);
+}
 
-class VM {
- public:
-  VM() {}
-  ~VM() {}    
-  void RunFrame(ExecState *exec_state, Frame frame, Value* ret);
-};
+void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function) {
+    Value func;
+    func.type = Value::Type::CFUNC;
+    func.cf = reinterpret_cast<void *>(function);
+    p_desc->funcs_->Add(name, func);
+}
+
+ClassInstance *NewClassInstance(ClassDescriptor *p_desc) {
+    return new ClassInstance(p_desc);
+}
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
-
-#endif  // CORE_DATA_RENDER_VM_H

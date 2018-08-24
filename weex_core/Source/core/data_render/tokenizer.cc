@@ -195,6 +195,19 @@ Token::Type IsOneCharacterSymbol(char ch) {
 
 Token::Type IsTwoCharacterSymbol(char ch1, char ch2) {
 // returns the type of symbol of two characters
+    switch (ch1) {
+        case '=':
+            switch (ch2) {
+                case '>':
+                    return Token::ARROW_FUNCTION;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
   switch (ch2) {
     case '=':
       switch (ch1) {
@@ -263,6 +276,9 @@ Token::Type IsThreeCharacterSymbol(char ch1, char ch2, char ch3) {
     return Token::ASSIGN_SAR;
   else if (ch1 == '<' && ch2 == '<' && ch3 == '=')
     return Token::ASSIGN_SHL;
+  else if (ch1 == '.' && ch2 == '.' && ch3 == '.')
+      return Token::UNFOLD;
+
   return Token::INVALID;
 }
 
@@ -274,8 +290,11 @@ bool IsSpace(char ch) {
 // Tokenizer implementation
 // --------------------------
 
-Tokenizer::Tokenizer(CharacterStream* stream)
-    : state_{new TokenizerState(stream)} {}
+Tokenizer::Tokenizer(CharacterStream *stream, ParserContext *context)
+    : state_{new TokenizerState(stream)}, context_{ context } {}
+
+Tokenizer::Tokenizer(CharacterStream *stream)
+: state_{new TokenizerState(stream)} {}
 
 Tokenizer::~Tokenizer() {
   delete state_;

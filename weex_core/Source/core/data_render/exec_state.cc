@@ -22,78 +22,93 @@
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
 #include "core/data_render/parser.h"
+#include "core/data_render/rax_parser_builder.h"
+#include "core/data_render/rax_parser.h"
+#include "core/data_render/rax_parser_context.h"
+#include "core/data_render/common_error.h"
+
+#if DEBUG
+#include "core/data_render/monitor/vm_monitor.h"
+#endif
 
 namespace weex {
 namespace core {
 namespace data_render {
 
-Value* Global::Find(int index) {
-  if (index >= values_.size() || index < 0) {
-    return nullptr;
-  }
-  return &values_[index];
-}
-
-int Global::IndexOf(const std::string& name) {
-  auto iter = map_.find(name);
-  if (iter != map_.end()) {
-    return iter->second;
-  }
-  return -1;
-}
-
-int Global::Add(const std::string& name, Value value) {
-  auto iter = map_.find(name);
-  if (iter != map_.end()) {
-    return iter->second;
-  }
-  values_.push_back(value);
-  int index = static_cast<int>(values_.size()) - 1;
-  map_.insert(std::make_pair(name, index));
-  return index;
-}
-
-int Global::Set(const std::string& name, Value value) {
-  auto iter = map_.find(name);
-  if (iter != map_.end()) {
-    int index = iter->second;
-    values_[static_cast<size_t>(index)] = value;
-    return index;
-  } else {
-    values_.push_back(value);
-    int index = static_cast<int>(values_.size()) - 1;
-    map_.insert(std::make_pair(name, index));
-    return index;
-  }
-}
-
 ExecState::ExecState(VM* vm)
     : vm_(vm),
       frames_(),
-      global_(new Global),
+      refs_(),
+      global_(new Variables),
       stack_(new ExecStack),
       func_state_(nullptr),
       string_table_(new StringTable),
       render_context_(new VNodeRenderContext),
       factory_(new TableFactory()),
+      class_factory_(new ClassFactory()),
       global_variables_() {}
 
 void ExecState::Compile() {
+
+#if DEBUG
+  TimeCost tc("Compile");
+#endif
   CodeGenerator generator(this);
   std::string err;
-  ParseResult result = Parser::Parse(context()->raw_json(),err);
-  generator.Visit(result.expr().get(), nullptr);
+  if (!context()->raw_json().is_null()) {
+      ParseResult result = Parser::Parse(context()->raw_json(),err);
+      generator.Visit(result.expr().get(), nullptr);
+  }
+  else if (context()->raw_source().length() > 0) {
+      weex::core::data_render::RAXParserBuilder builder(context()->raw_source());
+      weex::core::data_render::RAXParser *parser = builder.parser();
+      Handle<Expression> expr = nullptr;
+      try {
+          expr = ParseProgram(parser);
+      }
+      catch (std::exception &e) {
+          auto error = static_cast<Error *>(&e);
+          if (error) {
+              std::cerr << error->what() << std::endl;
+          }
+          return;
+      }
+      std::cout << "Parsed correctly" << std::endl;
+      if (expr->IsChunkStatement()) {
+          try {
+              generator.Visit(expr->AsChunkStatement().get(), nullptr);
+          }
+          catch (std::exception &e) {
+              auto error = static_cast<Error *>(&e);
+              if (error) {
+                  std::cerr << error->what() << std::endl;
+              }
+              return;
+          }
+      }
+  }
 }
 
 void ExecState::Execute() {
+#if DEBUG
+  TimeCost tc("Execute");
+#endif
   Value chunk;
   chunk.type = Value::Type::FUNC;
   chunk.f = func_state_.get();
   *stack_->base() = chunk;
-  CallFunction(stack_->base(), 0, nullptr);
+  try {
+      CallFunction(stack_->base(), 0, nullptr);
+  } catch (std::exception &e) {
+      auto error = static_cast<Error *>(&e);
+      if (error) {
+          std::cerr << error->what() << std::endl;
+      }
+      return;
+  }
 }
 
-const Value ExecState::Call(const std::string& func_name,
+const Value& ExecState::Call(const std::string& func_name,
                              const std::vector<Value>& params) {
   Value ret;
   auto it = global_variables_.find(func_name);
@@ -109,14 +124,14 @@ const Value ExecState::Call(const std::string& func_name,
   return ret;
 }
 
-void ExecState::CallFunction(Value* func, size_t argc, Value* ret) {
+void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
   *stack_->top() = func + argc;
   if (func->type == Value::Type::CFUNC) {
     Frame frame;
     frame.reg = func;
     frames_.push_back(frame);
     auto result = reinterpret_cast<CFunction>(func->cf)(this);
-    if (ret != nullptr) {
+    if (ret != nullptr && !IsNil(&result)) {
       *ret = result;
     }
     frames_.pop_back();
@@ -126,10 +141,38 @@ void ExecState::CallFunction(Value* func, size_t argc, Value* ret) {
     frame.reg = func;
     frame.pc = &(*func->f->instructions().begin());
     frame.end = &(*func->f->instructions().end());
-    frames_.push_back(frame);
+      frames_.push_back(frame);
     vm_->RunFrame(this, frame, ret);
     frames_.pop_back();
   }
+}
+    
+ValueRef* ExecState::AddRef(FuncState *func_state, long register_id) {
+    ValueRef *ref = nullptr;
+    for (int i = 0; i < refs_.size(); i++) {
+        ValueRef *ref_cur = refs_[i];
+        if (ref_cur->func_state_ == func_state && ref_cur->register_id_ == register_id) {
+            ref = ref_cur;
+            break;
+        }
+    }
+    if (!ref) {
+        ref = new ValueRef(func_state, register_id);
+        refs_.push_back(ref);
+    }
+    return ref;
+}
+    
+ValueRef *ExecState::FindRef(int index) {
+    ValueRef *ref = nullptr;
+    for (int i = 0; i < refs_.size(); i++) {
+        ValueRef *ref_cur = refs_[i];
+        if (ref_cur->ref_id_ == index) {
+            ref = ref_cur;
+            break;
+        }
+    }
+    return ref;
 }
 
 size_t ExecState::GetArgumentCount() {
@@ -139,6 +182,8 @@ size_t ExecState::GetArgumentCount() {
 Value* ExecState::GetArgument(int index) {
   return frames_.back().reg + index + 1;
 }
+    
+int ValueRef::s_ref_id = 0;
 
 }  // namespace data_render
 }  // namespace core

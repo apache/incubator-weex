@@ -16,39 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+//
+// Created by pentao.pt on 2018/7/25.
+//
 
-#ifndef CORE_DATA_RENDER_VM_H
-#define CORE_DATA_RENDER_VM_H
+#ifndef DATA_RENDER_RAX_PARSER_CONTEXT_
+#define DATA_RENDER_RAX_PARSER_CONTEXT_
 
-#include <limits.h>
-#include "core/data_render/op_code.h"
-
-#define MAXINTEGER INT_MAX
-#define MININTEGER INT_MIN
+#include "core/data_render/rax_parser_statistics.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-class ExecState;
-class FuncState;
-class Value;
+  
+class Scope;
 
-struct Frame {
-  Value *reg;
-  Value *ret;
-  Value *func;
-  const Instruction *pc;
-  const Instruction *end;
+class ParserContext {
+public:
+    ParserContext();
+    ~ParserContext() { };
+    Scope *globalScope() { return global_scope_.get(); }
+    Statistics &Counters();
+private:
+    std::unique_ptr<Scope> global_scope_;
+    Statistics statistics_;
 };
+    
+}
+}
+}
 
-class VM {
- public:
-  VM() {}
-  ~VM() {}    
-  void RunFrame(ExecState *exec_state, Frame frame, Value* ret);
-};
-}  // namespace data_render
-}  // namespace core
-}  // namespace weex
-
-#endif  // CORE_DATA_RENDER_VM_H
+#endif

@@ -29,11 +29,25 @@ enum OpCode {
   OP_LOADNULL,   //	A       R(A) = null
   OP_GETGLOBAL,  //	A Bx	R(A) = Global[B]
   OP_GETFUNC,    //	A Bx  	R(A) = Function[B]
+  
+  OP_NEWCLASS,   // A Bx R(A) = New Class[B]
+  OP_GETCLASS,   // A B C R(A) = B->C
+  OP_GETCLASSVAR,
+  OP_SETCLASSVAR,
+  OP_GETSUPER,   // A B C     R(A) = super[B] C = super func
+  
+  OP_SETVALUE,     // A B C R(A) = B->C
+  OP_GETVALUE,     // A B C R(A) = B->C
 
+    
   OP_NEWTABLE,  // A B C   R(A) = {} (size = B,C)
   OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)
   OP_GETTABLE,  //	A B C	R(A) = R(B)[R(C)]
 
+  OP_SETARRAY,  //    A B C    R(A)[R(B)] = RK(C)
+  OP_GETARRAY,  //    A B C    R(A) = R(B)[R(C)]
+
+    
   OP_ADD,   //	A B C	R(A) = R(B) + R(C)
   OP_SUB,   //	A B C	R(A) = R(B) - R(C)
   OP_MUL,   //	A B C	R(A) = R(B) * R(C)
@@ -54,6 +68,7 @@ enum OpCode {
   OP_EQ,    //	A B C	R(A) = R(B) == R(C)
   OP_LT,    //	A B C	R(A) = R(A) <  R(B)
   OP_LE,    //	A B C	R(A) = R(A) <= R(B)
+  OP_AND,
 
   OP_CALL,     //	A B C	R(A) = R(B)(R(B+1), ... ,R(B+C-1))
   OP_RETURN0,  //	Return
@@ -63,6 +78,10 @@ enum OpCode {
 
   OP_PRE_INCR,  // A      if (B >= 0) R(B) = ++R(A) else ++R(A)
   OP_PRE_DECR,  // A      if (B >= 0) R(B) = --R(A) else --R(A)
+    
+  OP_POST_INCR,  // A      if (B >= 0) R(B) = R(A)++ else R(A)++
+  OP_POST_DECR,  // A      if (B >= 0) R(B) = R(A)++ else R(A)--
+
 
 };
 

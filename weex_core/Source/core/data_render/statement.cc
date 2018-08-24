@@ -31,6 +31,8 @@ void BlockStatement::PushExpression(Handle<Expression> expr) {
 
 const std::string &FunctionPrototype::GetName() const { return name_; }
 
+const std::string &FunctionPrototype::GetClassName() const { return class_name_; }
+    
 const std::vector<std::string> &FunctionPrototype::GetArgs() const {
   return args_;
 }

@@ -16,39 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+//
+// Created by pengtao.pt on 2018/7/25.
+//
 
-#ifndef CORE_DATA_RENDER_VM_H
-#define CORE_DATA_RENDER_VM_H
-
-#include <limits.h>
-#include "core/data_render/op_code.h"
-
-#define MAXINTEGER INT_MAX
-#define MININTEGER INT_MIN
+#include "core/data_render/rax_source_locator.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-class ExecState;
-class FuncState;
-class Value;
 
-struct Frame {
-  Value *reg;
-  Value *ret;
-  Value *func;
-  const Instruction *pc;
-  const Instruction *end;
-};
-
-class VM {
- public:
-  VM() {}
-  ~VM() {}    
-  void RunFrame(ExecState *exec_state, Frame frame, Value* ret);
-};
-}  // namespace data_render
-}  // namespace core
-}  // namespace weex
-
-#endif  // CORE_DATA_RENDER_VM_H
+Position &SourceLocator::location()
+{
+    auto pos = parent_->CurrentToken().position();
+    cache_ = pos;
+    return cache_;
+}
+    
+}
+}
+}

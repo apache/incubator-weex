@@ -17,38 +17,29 @@
  * under the License.
  */
 
-#ifndef CORE_DATA_RENDER_VM_H
-#define CORE_DATA_RENDER_VM_H
+//
+// Created by pentao.pt on 2018/7/25.
+//
 
-#include <limits.h>
-#include "core/data_render/op_code.h"
+#ifndef DATA_RENDER_CLASS_H
+#define DATA_RENDER_CLASS_H
 
-#define MAXINTEGER INT_MAX
-#define MININTEGER INT_MIN
+#include "core/data_render/object.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-class ExecState;
-class FuncState;
-class Value;
 
-struct Frame {
-  Value *reg;
-  Value *ret;
-  Value *func;
-  const Instruction *pc;
-  const Instruction *end;
-};
+ClassDescriptor *NewClassDescriptor(ClassDescriptor *p_super = nullptr);
 
-class VM {
- public:
-  VM() {}
-  ~VM() {}    
-  void RunFrame(ExecState *exec_state, Frame frame, Value* ret);
-};
+void AddClassStaticCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function);
+
+void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function);
+
+ClassInstance *NewClassInstance(ClassDescriptor *p_desc);
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
 
-#endif  // CORE_DATA_RENDER_VM_H
+#endif  // DATA_RENDER_CLASS_H

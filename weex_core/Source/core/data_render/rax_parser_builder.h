@@ -16,39 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+//
+// Created by pentao.pt on 2018/7/25.
+//
 
-#ifndef CORE_DATA_RENDER_VM_H
-#define CORE_DATA_RENDER_VM_H
+#ifndef DATA_RENDER_RAX_PARSER_BUILDER_
+#define DATA_RENDER_RAX_PARSER_BUILDER_
 
-#include <limits.h>
-#include "core/data_render/op_code.h"
-
-#define MAXINTEGER INT_MAX
-#define MININTEGER INT_MIN
+#include <sstream>
+#include <string>
+#include "core/data_render/ast_builder.h"
+#include "core/data_render/rax_parser.h"
+#include "core/data_render/rax_source_locator.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-class ExecState;
-class FuncState;
-class Value;
-
-struct Frame {
-  Value *reg;
-  Value *ret;
-  Value *func;
-  const Instruction *pc;
-  const Instruction *end;
+    
+class RAXParserBuilder {
+public:
+    RAXParserBuilder(const std::string &content);
+    RAXParser *parser() { return parser_.get(); }
+    ParserContext *context() { return context_.get(); }
+private:
+    std::unique_ptr<ParserContext> context_;
+    std::unique_ptr<CharacterStream> stream_;
+    std::unique_ptr<Tokenizer> lex_;
+    std::unique_ptr<SourceLocator> locator_;
+    ASTFactory *factory_;
+    std::unique_ptr<ScopeManager> manager_;
+    std::unique_ptr<RAXParser> parser_;
+    std::unique_ptr<ASTBuilder> builder_;
+    std::stringstream content_;
 };
 
-class VM {
- public:
-  VM() {}
-  ~VM() {}    
-  void RunFrame(ExecState *exec_state, Frame frame, Value* ret);
-};
-}  // namespace data_render
-}  // namespace core
-}  // namespace weex
+}
+}
+}
 
-#endif  // CORE_DATA_RENDER_VM_H
+#endif

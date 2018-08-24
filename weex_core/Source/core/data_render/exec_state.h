@@ -29,12 +29,30 @@
 #include "core/data_render/object.h"
 #include "core/data_render/op_code.h"
 #include "core/data_render/table_factory.h"
+#include "core/data_render/class_factory.h"
 #include "core/data_render/vnode/vnode.h"
 #include "core/data_render/vnode/vnode_render_context.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
+
+class ValueRef {
+    friend class ExecState;
+public:
+    ValueRef(FuncState *func_state, long register_id) : func_state_(func_state), register_id_(register_id), ref_id_(s_ref_id++) { SetNil(&value_); };
+    inline int ref_id() { return ref_id_; }
+    inline FuncState *func_state() { return func_state_; }
+    inline long register_id() { return register_id_; }
+    inline Value &value() { return value_; }
+    ~ValueRef() {}
+private:
+    static int s_ref_id;
+    FuncState *func_state_;
+    int ref_id_;
+    long register_id_;
+    Value value_;
+};
 
 class FuncState {
  public:
@@ -48,7 +66,7 @@ class FuncState {
       }
     }
     constants_.push_back(std::move(value));
-    return static_cast<int>(constants_.size()) - 1;
+    return (int)constants_.size() - 1;
   }
 
   inline Value* GetConstant(int index) { return &constants_[index]; }
@@ -87,35 +105,26 @@ class ExecStack {
   Value* top_;
 };
 
-class Global {
- public:
-  Value* Find(int index);
-  int IndexOf(const std::string& name);
-  int Add(const std::string& name, Value value);
-  int Set(const std::string& name, Value value);
-
- private:
-  std::map<std::string, int> map_;
-  std::vector<Value> values_;
-};
-
 class ExecState {
  public:
   ExecState(VM* vm);
   virtual ~ExecState() {}
   void Compile();
   void Execute();
-  const Value Call(const std::string& func_name,
+  const Value& Call(const std::string& func_name,
                     const std::vector<Value>& params);
 
   size_t GetArgumentCount();
   Value* GetArgument(int index);
-
-  inline Global* global() { return global_.get(); }
+  ValueRef *AddRef(FuncState *func_state, long register_id);
+  ValueRef *FindRef(int index);
+  std::vector<ValueRef *> &refs() { return refs_; };
+  inline Variables* global() { return global_.get(); }
   inline ExecStack* stack() { return stack_.get(); }
   inline StringTable* string_table() { return string_table_.get(); }
   inline VNodeRenderContext* context() { return render_context_.get(); }
-  inline TableFactory* getTableFactory() { return factory_.get(); }
+  inline TableFactory *table_factory() { return factory_.get(); }
+  inline ClassFactory *class_factory() { return class_factory_.get(); }
 
  private:
   friend class VM;
@@ -126,15 +135,19 @@ class ExecState {
   VM* vm_;
 
   std::unique_ptr<TableFactory> factory_;
+  std::unique_ptr<ClassFactory> class_factory_;
+
 
   std::vector<Frame> frames_;
-  std::unique_ptr<Global> global_;
+  std::vector<ValueRef *> refs_;
+  std::unique_ptr<Variables> global_;
   std::unique_ptr<ExecStack> stack_;
   std::unique_ptr<FuncState> func_state_;
   std::unique_ptr<StringTable> string_table_;
   std::unique_ptr<VNodeRenderContext> render_context_;
   std::unordered_map<std::string, long> global_variables_;
 };
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

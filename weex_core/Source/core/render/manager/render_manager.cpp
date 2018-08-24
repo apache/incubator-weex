@@ -19,9 +19,9 @@
 
 #include <utility>
 #include <vector>
+#include "wson_parser.h"
+#include <android/base/log_utils.h>
 #include <chrono>
-#include "wson/wson_parser.h"
-#include "base/LogDefines.h"
 
 #include "base/ViewUtils.h"
 #include "core/css/constants_name.h"
@@ -36,7 +36,7 @@ namespace WeexCore {
 
 RenderManager *RenderManager::g_pInstance = nullptr;
 
-bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
+bool RenderManager::CreatePage(std::string page_id, const char *data) {
 #if RENDER_LOG
   wson_parser parser(data);
   LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s",
@@ -44,12 +44,12 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
 #endif
 
   RenderPage *page = new RenderPage(page_id);
-  pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
+  this->pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
 
   std::map<std::string, float>::iterator iter =
       this->viewports_.find(page_id);
   if (iter != this->viewports_.end()) {
-    this->set_viewport_width(page_id, iter->second);
+    RenderManager::GetInstance()->set_viewport_width(page_id, iter->second);
     this->viewports_.erase(page_id);
   }
 
@@ -61,9 +61,11 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
   return page->CreateRootRender(root);
 }
 
-bool RenderManager::CreatePage(const std::string& page_id, RenderObject *root) {
+bool RenderManager::CreatePage(std::string page_id, RenderObject *root) {
 #if RENDER_LOG
-  LOGD("[RenderManager] CreatePage >>>> pageId: %s", pageId.c_str());
+  wson_parser parser(data);
+  LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s",
+       pageId.c_str(), parser.toStringUTF8().c_str());
 #endif
 
   RenderPage *page = new RenderPage(page_id);
@@ -80,28 +82,6 @@ bool RenderManager::CreatePage(const std::string& page_id, RenderObject *root) {
   return page->CreateRootRender(root);
 }
 
-bool RenderManager::CreatePage(const std::string& page_id, std::function<RenderObject* (void)> constructRoot) {
-#if RENDER_LOG
-  LOGD("[RenderManager] CreatePage >>>> pageId: %s", pageId.c_str());
-#endif
-    
-  RenderPage *page = new RenderPage(page_id);
-  this->pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
-
-  std::map<std::string, float>::iterator iter =
-    this->viewports_.find(page_id);
-  if (iter != this->viewports_.end()) {
-    RenderManager::GetInstance()->set_viewport_width(page_id, iter->second);
-    this->viewports_.erase(page_id);
-  }
-
-  int64_t start_time = getCurrentTime();
-  RenderObject *root = constructRoot();
-  page->ParseJsonTime(getCurrentTime() - start_time);	
-
-  page->set_is_dirty(true);
-  return page->CreateRootRender(root);
-}
 
 bool RenderManager::AddRenderObject(const std::string &page_id,
                                     const std::string &parent_ref, int index,
@@ -126,15 +106,25 @@ bool RenderManager::AddRenderObject(const std::string &page_id,
   page->set_is_dirty(true);
   return page->AddRenderObject(parent_ref, index, child);
 }
-    
-bool RenderManager::AddRenderObject(const std::string &page_id,
-                                    const std::string &parent_ref, int index,
-                                    RenderObject *child) {
+
+
+bool RenderManager::AddRenderObject(const std::string &page_id, const std::string &parent_ref,
+                                    int index,  RenderObject *root) {
   RenderPage *page = GetPage(page_id);
   if (page == nullptr) return false;
-  if (child == nullptr) return false;
+
+#if RENDER_LOG
+  wson_parser parser(data);
+  LOGD(
+      "[RenderManager] AddRenderObject >>>> pageId: %s, parentRef: %s, index: "
+      "%d, dom data: %s",
+      pageId.c_str(), parentRef.c_str(), index, parser.toStringUTF8().c_str());
+#endif
+
+  if (root == nullptr) return false;
+
   page->set_is_dirty(true);
-  return page->AddRenderObject(parent_ref, index, child);
+  return page->AddRenderObject(parent_ref, index, root);
 }
 
 bool RenderManager::RemoveRenderObject(const std::string &page_id,
@@ -278,10 +268,8 @@ bool RenderManager::CreateFinish(const std::string &page_id) {
 
   page->set_is_dirty(true);
   bool b = page->CreateFinish();
-#if RENDER_LOG
   auto end_time = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
   LOGE("DATA_RENDER, Wx End %lld",end_time);
-#endif
   return b;
 }
 
@@ -335,7 +323,8 @@ bool RenderManager::ClosePage(const std::string &page_id) {
   page->OnRenderPageClose();
   this->pages_.erase(page_id);
   delete page;
-  return false;
+  page = nullptr;
+    return true;
 }
 
 float RenderManager::viewport_width(const std::string &page_id) {

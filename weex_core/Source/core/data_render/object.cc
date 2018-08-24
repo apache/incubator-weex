@@ -87,6 +87,13 @@ bool ValueLE(const Value *a, const Value *b) {
     return false;
   }
 }
+    
+bool ValueAND(const Value *a, const Value *b) {
+    if (IsBool(a) && IsBool(b)) {
+        return BoolValue(a) && BoolValue(b);
+    }
+    return false;
+}
 
 bool ValueLT(const Value *a, const Value *b) {
   double d1, d2;
@@ -109,6 +116,59 @@ void FreeValue(Value *o) {
     freeMem(o->gc);
     delete o;
   }
+}
+
+Value* Variables::Find(int index) {
+    if (index >= values_.size() || index < 0) {
+        return nullptr;
+    }
+    return &values_[index];
+}
+
+int Variables::IndexOf(const std::string& name) {
+    auto iter = map_.find(name);
+    if (iter != map_.end()) {
+        return iter->second;
+    }
+    return -1;
+}
+
+int Variables::Add(const std::string& name, Value value) {
+    auto iter = map_.find(name);
+    if (iter != map_.end()) {
+        return iter->second;
+    }
+    values_.push_back(value);
+    int index = (int)values_.size() - 1;
+    map_.insert(std::make_pair(name, index));
+    return index;
+}
+
+int Variables::Add(Value value) {
+    values_.push_back(value);
+    return (int)values_.size() - 1;
+}
+
+int Variables::Set(const std::string& name, Value value) {
+    auto iter = map_.find(name);
+    if (iter != map_.end()) {
+        int index = iter->second;
+        values_[static_cast<size_t>(index)] = value;
+        return index;
+    } else {
+        values_.push_back(value);
+        int index = (int)values_.size() - 1;
+        map_.insert(std::make_pair(name, index));
+        return index;
+    }
+}
+    
+void SetRefValue(Value *o) {
+    Value *value = o;
+    while (value->ref) {
+        *value->ref = *value;
+        value = value->ref;
+    }
 }
 
 }  // namespace data_render
