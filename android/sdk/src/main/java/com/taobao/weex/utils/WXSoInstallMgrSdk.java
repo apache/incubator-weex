@@ -124,7 +124,7 @@ public class WXSoInstallMgrSdk {
 
     // copy startup so
     copyStartUpSo();
-    prepareJsc(libName);
+//    prepareJsc(libName);
 
     boolean InitSuc = false;
 //    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
@@ -190,6 +190,9 @@ public class WXSoInstallMgrSdk {
 
   private static void prepareJsc(String libName) {
     String libPath = WXEnvironment.findSoPath(libName);
+    if(libPath == null || !libPath.contains("maindex"))
+      return;
+
     String libJScRealPath = WXEnvironment.getLibJScRealPath();
 
     File jscFile = new File(libJScRealPath);
@@ -201,7 +204,7 @@ public class WXSoInstallMgrSdk {
         try {
           Os.symlink(jscFile.getAbsolutePath(), newJsc.getAbsolutePath());
         } catch (ErrnoException e) {
-//          e.printStackTrace();
+          WXLogUtils.e("symlink error " + e.getMessage());
           WXFileUtils.copyFile(jscFile, newJsc);
         }
       } else {
@@ -209,8 +212,6 @@ public class WXSoInstallMgrSdk {
       }
 
     }
-
-
   }
 
 

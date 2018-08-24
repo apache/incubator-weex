@@ -42,7 +42,7 @@ bool MultiSoInitializer::Init(
   }
 
   LOGE("final executablePath:%s", soPath.c_str());
-
+  SoUtils::updateSoLinkPath(SoUtils::jsc_so_path());
   void *handle = dlopen(soPath.c_str(), RTLD_NOW);
   if (!handle) {
     const char *error = dlerror();

@@ -86,7 +86,7 @@ VALUE_WITH_TYPE* getValueWithTypePtr() {
 }
 
 bool g_is_single_process = false;
-bool isSingleProcess() { return g_is_single_process; }
+bool isSingleProcess() { return true; }
 
 std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     JNIEnv* env, jobject params,
@@ -149,6 +149,19 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     } else {
       g_is_single_process = strstr(use_single_process, "true") != nullptr;
       env->DeleteLocalRef(j_use_single_process);
+    }
+  }
+
+  jmethodID m_get_jsc_so_path =
+          env->GetMethodID(c_params, "getLibJscPath", "()Ljava/lang/String;");
+  if (m_get_jsc_so_path != nullptr) {
+    jobject j_get_jsc_so_path =
+            env->CallObjectMethod(params, m_get_jsc_so_path);
+    if (j_get_jsc_so_path != nullptr) {
+      SoUtils::set_jsc_so_path(const_cast<char*>(
+                                       env->GetStringUTFChars((jstring)(j_get_jsc_so_path), nullptr)));
+      LOGE("g_jscSoPath is %s ", SoUtils::jsc_so_path());
+      env->DeleteLocalRef(j_get_jsc_so_path);
     }
   }
 

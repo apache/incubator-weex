@@ -389,7 +389,8 @@ public class WXEnvironment {
       try {
         WXFileUtils.extractSo(sourceFile.getAbsolutePath(), cacheDir);
       } catch (IOException e) {
-        e.printStackTrace();
+        WXLogUtils.e("extractSo error " + e.getMessage());
+//        e.printStackTrace();
         return false;
       }
       return true;
@@ -430,26 +431,39 @@ public class WXEnvironment {
 
   public static String findSoPath(String libName) {
     String soPath = ((PathClassLoader) (WXEnvironment.class.getClassLoader())).findLibrary(libName);
-    WXLogUtils.e(libName + "'s Path is" + soPath);
-
-    String realName = "lib" + libName + ".so";
-    if (TextUtils.isEmpty(soPath)) {
-      String cacheDir = getCacheDir();
-      if (TextUtils.isEmpty(cacheDir)) {
-        return "";
-      }
-      if (cacheDir.indexOf("/cache") > 0) {
-        soPath = new File(cacheDir.replace("/cache", "/lib"), realName).getAbsolutePath();
+    if (!TextUtils.isEmpty(soPath)) {
+      File soFile = new File(soPath);
+      if (soFile.exists()) {
+        WXLogUtils.e(libName + "'s Path is" + soPath);
+        return soFile.getAbsolutePath();
+      } else {
+        WXLogUtils.e(libName + "'s Path is " + soPath + " but file is not exist");
       }
     }
+
+    String realName = "lib" + libName + ".so";
+    String cacheDir = getCacheDir();
+    if (TextUtils.isEmpty(cacheDir)) {
+      WXLogUtils.e("cache dir is null");
+      return "";
+    }
+
+
+    if (cacheDir.indexOf("/cache") > 0) {
+      soPath = new File(cacheDir.replace("/cache", "/lib"), realName).getAbsolutePath();
+    }
+
+
     final File soFile = new File(soPath);
-    if (soFile.exists())
+    if (soFile.exists()) {
+      WXLogUtils.e(libName + "use lib so");
       return soPath;
-    else {
+    } else {
       //unzip from apk file
       final boolean success = extractSo();
-      if (success)
+      if (success) {
         return new File(getCacheDir(), realName).getAbsolutePath();
+      }
     }
     return soPath;
   }
@@ -457,9 +471,8 @@ public class WXEnvironment {
   public static String getLibJScRealPath() {
     if(TextUtils.isEmpty(CORE_JSC_SO_PATH)) {
       CORE_JSC_SO_PATH = findSoPath(CORE_JSC_SO_NAME);
-      WXLogUtils.e("findLibJscRealPath " + CORE_JSS_SO_PATH);
+      WXLogUtils.e("findLibJscRealPath " + CORE_JSC_SO_PATH);
     }
-
     return CORE_JSC_SO_PATH;
   }
 
