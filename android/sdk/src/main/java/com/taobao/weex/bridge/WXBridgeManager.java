@@ -2104,27 +2104,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
   }
 
-  private boolean checkEmptyScreen(WXSDKInstance instance){
-    if (null == instance || instance.isDestroy()){
-      return false;
-    }
-    WXComponent rootComponent = instance.getRootComponent();
-    if (null == rootComponent) {
-      return true;
-    }
-
-    View rootView = rootComponent.getRealView();
-    if (null == rootView){
-      return true;
-    }
-
-    if (rootView instanceof ViewGroup) {
-      return ((ViewGroup) rootView).getChildCount() > 0;
-    }else {
-      return false;
-    }
-  }
-
   private void registerDomModule() throws WXException {
     /** Tell Javascript Framework what methods you have. This is Required.**/
     Map<String, Object> domMap = new HashMap<>();
