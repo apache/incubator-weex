@@ -47,7 +47,6 @@ inline char *copyStr(const char *str, int length = 0) {
 
 void CoreSideInScript::CallNative(const char *page_id, const char *task,
                                   const char *callback) {
-  LOGE("Script Bridge Core Side Simple::CallNative");
   if (page_id == nullptr || task == nullptr) return;
 
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
@@ -83,7 +82,6 @@ std::unique_ptr<ValueWithType> CoreSideInScript::CallNativeModule(
     const char *page_id, const char *module, const char *method,
     const char *arguments, int arguments_length, const char *options,
     int options_length) {
-  LOGE("Script Bridge Core Side Simple::CallNativeModule");
   std::unique_ptr<ValueWithType> ret(new ValueWithType);
   ret->type = ParamsType::INT32;
   ret->value.int32Value = -1;
@@ -104,7 +102,6 @@ void CoreSideInScript::CallNativeComponent(const char *page_id, const char *ref,
                                            int arguments_length,
                                            const char *options,
                                            int options_length) {
-  LOGE("Script Bridge Core Side Simple::CallNativeComponent");
   if (page_id != nullptr && ref != nullptr && method != nullptr) {
     //    WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
     //        weex::base::MakeCopyable(
@@ -138,9 +135,7 @@ void CoreSideInScript::CallNativeComponent(const char *page_id, const char *ref,
 void CoreSideInScript::AddElement(const char *page_id, const char *parent_ref,
                                   const char *dom_str, int dom_str_length,
                                   const char *index_str) {
-  LOGE("Script Bridge Core Side Simple::AddElement");
   const char *indexChar = index_str == nullptr ? "\0" : index_str;
-  LOGE("AddRenderObject in Addelement %s", dom_str);
   int index = atoi(indexChar);
   if (page_id == nullptr || parent_ref == nullptr || dom_str == nullptr ||
       index < -1)
@@ -159,7 +154,6 @@ void CoreSideInScript::AddElement(const char *page_id, const char *parent_ref,
 }
 
 void CoreSideInScript::SetTimeout(const char *callback_id, const char *time) {
-  LOGE("Script Bridge Core Side Simple::SetTimeout");
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
   //          [callbackId = std::unique_ptr<char[]>(copyStr(callback_id)),
@@ -174,7 +168,6 @@ void CoreSideInScript::SetTimeout(const char *callback_id, const char *time) {
 }
 
 void CoreSideInScript::NativeLog(const char *str_array) {
-  LOGE("Script Bridge Core Side Simple::NativeLog");
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
   //          [str = std::unique_ptr<char[]>(copyStr(str_array))] {
@@ -189,7 +182,6 @@ void CoreSideInScript::NativeLog(const char *str_array) {
 
 void CoreSideInScript::CreateBody(const char *page_id, const char *dom_str,
                                   int dom_str_length) {
-  LOGE("Script Bridge Core Side Simple::CreateBody");
 
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
@@ -207,7 +199,6 @@ void CoreSideInScript::CreateBody(const char *page_id, const char *dom_str,
 int CoreSideInScript::UpdateFinish(const char *page_id, const char *task,
                                    int task_length, const char *callback,
                                    int callback_length) {
-  LOGE("Script Bridge Core Side Simple::UpdateFinish");
   //  weex::base::WaitableEvent event;
   //  int result = 0;
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
@@ -234,7 +225,6 @@ int CoreSideInScript::UpdateFinish(const char *page_id, const char *task,
 }
 
 void CoreSideInScript::CreateFinish(const char *page_id) {
-  LOGE("Script Bridge Core Side Simple::CreateFinish");
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
   //          [pageId = std::unique_ptr<char[]>(copyStr(page_id))] {
@@ -245,7 +235,6 @@ void CoreSideInScript::CreateFinish(const char *page_id) {
 
 int CoreSideInScript::RefreshFinish(const char *page_id, const char *task,
                                     const char *callback) {
-  LOGE("Script Bridge Core Side Simple::RefreshFinish");
   if (page_id == nullptr) return -1;
   //  weex::base::WaitableEvent event;
   //  int result = 0;
@@ -273,7 +262,6 @@ int CoreSideInScript::RefreshFinish(const char *page_id, const char *task,
 
 void CoreSideInScript::UpdateAttrs(const char *page_id, const char *ref,
                                    const char *data, int data_length) {
-  LOGE("Script Bridge Core Side Simple::UpdateAttrs");
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
   //          [pageId = std::unique_ptr<char[]>(copyStr(page_id)),
@@ -288,7 +276,7 @@ void CoreSideInScript::UpdateAttrs(const char *page_id, const char *ref,
 
 void CoreSideInScript::UpdateStyle(const char *page_id, const char *ref,
                                    const char *data, int data_length) {
-  LOGE("Script Bridge Core Side Simple::UpdateStyle");
+ 
 
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
@@ -303,7 +291,6 @@ void CoreSideInScript::UpdateStyle(const char *page_id, const char *ref,
 }
 
 void CoreSideInScript::RemoveElement(const char *page_id, const char *ref) {
-  LOGE("Script Bridge Core Side Simple::RemoveElement");
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
   //          [pageId = std::unique_ptr<char[]>(copyStr(page_id)),
@@ -316,7 +303,6 @@ void CoreSideInScript::RemoveElement(const char *page_id, const char *ref) {
 
 void CoreSideInScript::MoveElement(const char *page_id, const char *ref,
                                    const char *parent_ref, int index) {
-  LOGE("Script Bridge Core Side Simple::MoveElement");
 
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
@@ -333,7 +319,6 @@ void CoreSideInScript::MoveElement(const char *page_id, const char *ref,
 
 void CoreSideInScript::AddEvent(const char *page_id, const char *ref,
                                 const char *event) {
-  LOGE("Script Bridge Core Side Simple::AddEvent");
 
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
@@ -348,7 +333,6 @@ void CoreSideInScript::AddEvent(const char *page_id, const char *ref,
 
 void CoreSideInScript::RemoveEvent(const char *page_id, const char *ref,
                                    const char *event) {
-  LOGE("Script Bridge Core Side Simple::RemoveEvent");
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
   //          [pageId = std::unique_ptr<char[]>(copyStr(page_id)),
@@ -363,7 +347,6 @@ void CoreSideInScript::RemoveEvent(const char *page_id, const char *ref,
 
 const char *CoreSideInScript::CallGCanvasLinkNative(const char *context_id,
                                                     int type, const char *arg) {
-  LOGE("Script Bridge Core Side Simple::CallGCanvasLinkNative");
 
 #ifdef OS_ANDROID
   return CallGCanvasFun(context_id, type, arg);
@@ -374,7 +357,6 @@ const char *CoreSideInScript::CallGCanvasLinkNative(const char *context_id,
 
 int CoreSideInScript::SetInterval(const char *page_id, const char *callback_id,
                                   const char *time) {
-  LOGE("Script Bridge Core Side Simple::SetInterval");
   return (atoi(page_id) << 16) | (atoi(callback_id));
 }
 
@@ -384,7 +366,6 @@ void CoreSideInScript::ClearInterval(const char *page_id,
 }
 
 const char *CoreSideInScript::CallT3DLinkNative(int type, const char *arg) {
-  LOGE("Script Bridge Core Side Simple::CallT3DLinkNative");
 #ifdef OS_ANDROID
   return CallT3dFunc(type, arg);
 #else
@@ -393,7 +374,6 @@ const char *CoreSideInScript::CallT3DLinkNative(int type, const char *arg) {
 }
 
 void CoreSideInScript::PostMessage(const char *vm_id, const char *data) {
-  LOGE("Script Bridge Core Side Simple::PostMessage");
 
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
@@ -413,7 +393,6 @@ void CoreSideInScript::PostMessage(const char *vm_id, const char *data) {
 void CoreSideInScript::DispatchMessage(const char *client_id, const char *data,
                                        const char *callback,
                                        const char *vm_id) {
-  LOGE("Script Bridge Core Side Simple::DispatchMessage");
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
   //          [clientId = std::unique_ptr<char[]>(copyStr(client_id)),
@@ -435,7 +414,6 @@ void CoreSideInScript::DispatchMessage(const char *client_id, const char *data,
 
 void CoreSideInScript::ReportException(const char *page_id, const char *func,
                                        const char *exception_string) {
-  LOGE("Script Bridge Core Side Simple::ReportException");
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
   //          [pageId = std::unique_ptr<char[]>(copyStr(page_id)),
@@ -455,7 +433,6 @@ void CoreSideInScript::ReportException(const char *page_id, const char *func,
 }
 
 void CoreSideInScript::SetJSVersion(const char *js_version) {
-  LOGE("Script Bridge Core Side Simple::SetJSVersion");
   LOGA("init JSFrm version %s", js_version);
 
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
