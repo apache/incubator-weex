@@ -43,6 +43,12 @@ class SoUtils {
 
   inline static const char* crash_file_path() { return g_crash_file_path; }
 
+  inline static void set_jsc_so_path(char* jss_so_path) {
+    g_jsc_so_path = jss_so_path;
+  }
+
+  inline static const char* jsc_so_path() { return g_jsc_so_path; }
+
   inline static void set_jss_so_path(char* jss_so_path) {
     g_jss_so_path = jss_so_path;
   }
@@ -63,6 +69,8 @@ class SoUtils {
 
   inline static const char* jss_icu_path() { return g_jss_icu_path; }
 
+  static void updateSoLinkPath(const char *jscPath);
+
  private:
   static const char* GetDefaultCacheDir(JNIEnv* env);
   static char* g_cache_dir;
@@ -70,6 +78,7 @@ class SoUtils {
   static char* g_crash_file_path;
   static char* g_jss_so_name;
   static char* g_jss_icu_path;
+  static char* g_jsc_so_path;
   static bool g_pie_support;
   static std::function<void(const char*, const char*)> g_exception_handler;
 };

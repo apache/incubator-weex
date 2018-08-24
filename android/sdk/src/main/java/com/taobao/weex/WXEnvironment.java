@@ -471,7 +471,7 @@ public class WXEnvironment {
   public static String getLibJScRealPath() {
     if(TextUtils.isEmpty(CORE_JSC_SO_PATH)) {
       CORE_JSC_SO_PATH = findSoPath(CORE_JSC_SO_NAME);
-      WXLogUtils.e("findLibJscRealPath " + CORE_JSS_SO_PATH);
+      WXLogUtils.e("findLibJscRealPath " + CORE_JSC_SO_PATH);
     }
 
     return CORE_JSC_SO_PATH;

@@ -41,6 +41,8 @@ public class WXParams implements Serializable {
   private String useSingleProcess;
   private String crashFilePath;
   private String libJssPath;
+
+  private String libJscPath;
   private String libIcuPath;
 
   private Map<String, String> options;
@@ -203,6 +205,14 @@ public class WXParams implements Serializable {
     return libJssPath;
   }
 
+  @CalledByNative
+  public String getLibJscPath() {
+    WXLogUtils.e("getLibJscPath is running " + libJscPath);
+    return libJscPath;
+  }
+  public void setLibJscPath(String libJscPath) {
+    this.libJscPath = libJscPath;
+  }
   public void setLibJssPath(String libJssPath) {
     this.libJssPath = libJssPath;
   }

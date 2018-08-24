@@ -22,11 +22,13 @@
 #include <errno.h>
 #include <cstdlib>
 #include <unistd.h>
+#include <dlfcn.h>
 #include "android/base/log_utils.h"
 
 namespace WeexCore {
     char * SoUtils::g_cache_dir = nullptr;
     char * SoUtils::g_jss_so_path = nullptr;
+    char * SoUtils::g_jsc_so_path = nullptr;
     char * SoUtils::g_crash_file_path = nullptr;
     char * SoUtils::g_jss_icu_path = nullptr;
     char * SoUtils::g_jss_so_name = const_cast<char *>("libweexjss.so");
@@ -202,4 +204,15 @@ namespace WeexCore {
         g_exception_handler = ReportNativeInitStatus;
     }
 
+    void SoUtils::updateSoLinkPath(const char *jscPath) {
+        LOGE("jscPath is %s",jscPath);
+        void* sym = dlsym(RTLD_DEFAULT, "android_update_LD_LIBRARY_PATH");
+        if (sym != NULL) {
+            typedef void (*Fn)(const char*);
+            Fn android_update_LD_LIBRARY_PATH = reinterpret_cast<Fn>(sym);
+            (*android_update_LD_LIBRARY_PATH)(jscPath);
+        } else {
+            LOGE("android_update_LD_LIBRARY_PATH not found; .so dependencies will not work!");
+        }
+    }
 }

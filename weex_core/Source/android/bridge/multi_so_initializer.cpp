@@ -42,7 +42,7 @@ bool MultiSoInitializer::Init(
   }
 
   LOGE("final executablePath:%s", soPath.c_str());
-// if libweexjss.so and libJavascript.so are not in the same dir....try in java?
+  SoUtils::updateSoLinkPath(SoUtils::jsc_so_path());
   void *handle = dlopen(soPath.c_str(), RTLD_NOW);
   if (!handle) {
     const char *error = dlerror();

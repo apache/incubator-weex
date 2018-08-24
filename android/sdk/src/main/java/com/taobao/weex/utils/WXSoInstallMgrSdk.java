@@ -124,7 +124,7 @@ public class WXSoInstallMgrSdk {
 
     // copy startup so
     copyStartUpSo();
-    prepareJsc(libName);
+//    prepareJsc(libName);
 
     boolean InitSuc = false;
 //    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
