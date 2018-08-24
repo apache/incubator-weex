@@ -21,6 +21,7 @@ package com.taobao.weex.performance;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -145,12 +146,18 @@ public class WXInstanceExceptionRecord {
                 break;
             }
         }
+        Map<String,String> flagMap = new HashMap<>(4);
+        flagMap.put("wxBeginRender",String.valueOf(mBeginRender));
+        flagMap.put("wxHasAddView",String.valueOf(hasAddView.get()));
+        flagMap.put("wxHasDegrade",String.valueOf(hasDegrade.get()));
+        flagMap.put("wxHasReportScreenEmpty",String.valueOf(mHasReportScreenEmpty));
+
         WXExceptionUtils.commitCriticalExceptionRT(
             instanceId,
             hasJsException ? WXErrorCode.WX_RENDER_ERR_JS_RUNTIME : WXErrorCode.WX_RENDER_ERR_NATIVE_RUNTIME,
             "checkEmptyScreenAndReport",
             convertExceptionListToString(),
-            null
+            flagMap
         );
     }
 
