@@ -25,6 +25,7 @@
 #include "core/data_render/class_factory.h"
 #include "core/data_render/class_array.h"
 #include "core/data_render/common_error.h"
+#include <base/LogDefines.h>
 
 namespace weex {
 namespace core {

@@ -28,7 +28,6 @@
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
 #include "core/data_render/object.h"
-#include "android/base/log_utils.h"
 
 #define CommonHeader GCObject *gc
 
@@ -323,7 +322,7 @@ inline void SetValueRef(Value *o, Value *src) {
 inline int IntMod(const int &a, const int &b) {
   if (CAST_S2U(b) + 1u <= 1u) {
     if (b == 0) {
-      LOGE("Error ValueMod Values[%d, %d]", a, b);
+      //LOGE("Error ValueMod Values[%d, %d]", a, b);
     }
     return 0;
   } else {

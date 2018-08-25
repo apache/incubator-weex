@@ -28,7 +28,7 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
-#include <android/base/log_utils.h>
+#include <base/LogDefines.h>
 
 namespace weex {
 namespace core {

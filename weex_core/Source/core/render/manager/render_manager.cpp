@@ -20,7 +20,7 @@
 #include <utility>
 #include <vector>
 #include "wson_parser.h"
-#include <android/base/log_utils.h>
+#include <base/LogDefines.h>
 #include <chrono>
 
 #include "base/ViewUtils.h"
@@ -36,7 +36,7 @@ namespace WeexCore {
 
 RenderManager *RenderManager::g_pInstance = nullptr;
 
-bool RenderManager::CreatePage(std::string page_id, const char *data) {
+bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
 #if RENDER_LOG
   wson_parser parser(data);
   LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s",
@@ -61,7 +61,7 @@ bool RenderManager::CreatePage(std::string page_id, const char *data) {
   return page->CreateRootRender(root);
 }
 
-bool RenderManager::CreatePage(std::string page_id, RenderObject *root) {
+bool RenderManager::CreatePage(const std::string& page_id, RenderObject *root) {
 #if RENDER_LOG
   wson_parser parser(data);
   LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s",

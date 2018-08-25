@@ -53,6 +53,7 @@ class RenderManager {
 
   // create root node
   bool CreatePage(const std::string& page_id, const char *data);
+    
 
   bool CreatePage(const std::string& page_id, RenderObject *root);
     
