@@ -86,7 +86,7 @@ VALUE_WITH_TYPE* getValueWithTypePtr() {
 }
 
 bool g_is_single_process = false;
-bool isSingleProcess() { return true; }
+bool isSingleProcess() { return g_is_single_process; }
 
 std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     JNIEnv* env, jobject params,
