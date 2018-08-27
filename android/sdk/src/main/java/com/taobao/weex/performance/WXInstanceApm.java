@@ -55,6 +55,7 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STAGES_RENDER_ORGIGIN = "wxRenderTimeOrigin";
     public static final String KEY_PAGE_STAGES_LOAD_BUNDLE_START = "wxStartLoadBundle";
     public static final String KEY_PAGE_STAGES_LOAD_BUNDLE_END = "wxEndLoadBundle";
+    public static final String KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW = "wxFirstInteractionView";
     public static final String KEY_PAGE_STAGES_CREATE_FINISH= "wxJSBundleCreateFinish";
     public static final String KEY_PAGE_STAGES_FSRENDER = "wxFsRender";
     public static final String KEY_PAGE_STAGES_NEW_FSRENDER = "wxNewFsRender";
@@ -106,6 +107,7 @@ public class WXInstanceApm {
     private Map<String, Double> recordStatsMap;
     private boolean isFSEnd;
     private boolean mHasInit = false;
+    private boolean hasRecordFistInteractionView =false;
     public final Map<String,Object> extInfo;
 
     public WXInstanceApm(String instanceId) {
@@ -235,7 +237,7 @@ public class WXInstanceApm {
         if (null == apmInstance) {
             return;
         }
-        apmInstance.onStage(KEY_PAGE_STAGES_DESTROY, System.currentTimeMillis());
+        onStage(KEY_PAGE_STAGES_DESTROY);
         apmInstance.onEnd();
     }
 
@@ -255,7 +257,11 @@ public class WXInstanceApm {
         if (null == apmInstance) {
             return;
         }
-        onStage(WXInstanceApm.KEY_PAGE_STAGES_INTERACTION);
+        if (!hasRecordFistInteractionView){
+            onStage(KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW);
+            hasRecordFistInteractionView = true;
+        }
+        onStage(KEY_PAGE_STAGES_INTERACTION);
         updateMaxStats(KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT, screenViewCount);
         updateMaxStats(KEY_PAGE_STATS_I_ALL_VIEW_COUNT, allViewCount);
         WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);

@@ -34,6 +34,7 @@ import com.taobao.weex.common.WXErrorCode.ErrorGroup;
 import com.taobao.weex.common.WXErrorCode.ErrorType;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.utils.WXExceptionUtils;
+import com.taobao.weex.utils.WXUtils;
 
 public class WXInstanceExceptionRecord {
 
@@ -139,6 +140,17 @@ public class WXInstanceExceptionRecord {
         if (!mBeginRender || mHasReportScreenEmpty || hasAddView.get() || hasDegrade.get()) {
             return;
         }
+        //2s limit of instance stayTime (case in\quit very fast case)
+        final long DIFF_LIMIT = 2000;
+        long useTime = 2001;
+        Long startRequestTime = mStageMap.get(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
+        if (null != startRequestTime) {
+            useTime = WXUtils.getFixUnixTime() - startRequestTime;
+        }
+        if (useTime < DIFF_LIMIT) {
+            return;
+        }
+
         boolean hasJsException = false;
         for (WXJSExceptionInfo info : errorList) {
             if (info.getErrCode().getErrorGroup() == ErrorGroup.JS) {
@@ -151,6 +163,7 @@ public class WXInstanceExceptionRecord {
         flagMap.put("wxHasAddView",String.valueOf(hasAddView.get()));
         flagMap.put("wxHasDegrade",String.valueOf(hasDegrade.get()));
         flagMap.put("wxHasReportScreenEmpty",String.valueOf(mHasReportScreenEmpty));
+        flagMap.put("wxUseTime", String.valueOf(useTime));
 
         WXExceptionUtils.commitCriticalExceptionRT(
             instanceId,
