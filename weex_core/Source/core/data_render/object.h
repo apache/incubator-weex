@@ -382,7 +382,7 @@ inline int ToNumber_(const Value *value, double &ret) {
 }
 
 inline int ToNum(const Value *o, double &n) {
-  return IsNumber(o) ? (n = NumValue(o), 1) : ToNumber_(o, n);
+  return IsNumber(o) ? (static_cast<void>(n = NumValue(o)), 1) : ToNumber_(o, n);
 }
 
 inline void SetIValue(Value *o, int iv) {
