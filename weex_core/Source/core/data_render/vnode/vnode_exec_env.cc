@@ -376,7 +376,7 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     Value value = state->class_factory()->CreateArray();
     const json11::Json::array& data_objects = json.array_items();
     int64_t array_size = data_objects.size();
-    for (int64_t index = 0; index < array_size; index++) {
+    for (int index = 0; index < array_size; index++) {
       // will be free by table
       Value key(index);
       Value val(ParseJson2Value(state, json[index]));

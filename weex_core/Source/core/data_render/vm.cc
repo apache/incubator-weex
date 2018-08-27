@@ -22,10 +22,7 @@
 #include "core/data_render/table.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/class_array.h"
-
-#if DEBUG
 #include "core/data_render/monitor/vm_monitor.h"
-#endif
 
 namespace weex {
 namespace core {

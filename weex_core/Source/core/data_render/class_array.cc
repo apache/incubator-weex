@@ -59,7 +59,7 @@ int SetArray(Array *array, Value *index, const Value &val) {
         if (index_of > (int)array->items.size()) {
             break;
         }
-        array->items.insert(array->items.begin()+index_of,val);
+        array->items.insert(array->items.begin()+ static_cast<int>(index_of),val);
         ret = true;
         
     } while (0);
