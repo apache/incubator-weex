@@ -105,7 +105,8 @@ _Pragma("clang diagnostic pop") \
         _frameworkLoadFinished = NO;
     }
     
-    _jsBridge = [[bridgeClass alloc] init];
+    // WXDebugger is a singleton actually and should not call its init twice.
+    _jsBridge = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
     
     [self registerGlobalFunctions];
     

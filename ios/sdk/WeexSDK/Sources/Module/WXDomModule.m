@@ -40,10 +40,18 @@
 
 @synthesize weexInstance;
 
+WX_EXPORT_METHOD(@selector(createBody:))
+WX_EXPORT_METHOD(@selector(addElement:element:atIndex:))
+WX_EXPORT_METHOD(@selector(removeElement:))
+WX_EXPORT_METHOD(@selector(moveElement:parentRef:index:))
+WX_EXPORT_METHOD(@selector(addEvent:event:))
+WX_EXPORT_METHOD(@selector(removeEvent:event:))
 WX_EXPORT_METHOD(@selector(createFinish))
 WX_EXPORT_METHOD(@selector(updateFinish))
 WX_EXPORT_METHOD(@selector(refreshFinish))
 WX_EXPORT_METHOD(@selector(scrollToElement:options:))
+WX_EXPORT_METHOD(@selector(updateStyle:styles:))
+WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 WX_EXPORT_METHOD(@selector(addRule:rule:))
 WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
@@ -79,6 +87,60 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     return [WXComponentManager componentThread];
 }
 
+- (void)createBody:(NSDictionary *)bodyData
+{
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callCreateBody:instanceId data:bodyData];
+    });
+}
+
+- (void)addElement:(NSString *)parentRef element:(NSDictionary *)elementData atIndex:(NSInteger)index
+{
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callAddElement:instanceId parentRef:parentRef data:elementData index:(int)index];
+    });
+}
+
+- (void)removeElement:(NSString *)ref
+{
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callRemoveElement:instanceId ref:ref];
+    });
+}
+
+- (void)moveElement:(NSString *)ref parentRef:(NSString *)parentRef index:(NSInteger)index
+{
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"moveElement" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callMoveElement:instanceId ref:ref parentRef:parentRef index:(int)index];
+    });
+}
+
+- (void)addEvent:(NSString *)ref event:(NSString *)event
+{
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addEvent" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callAddEvent:instanceId ref:ref event:event];
+    });
+}
+
+- (void)removeEvent:(NSString *)ref event:(NSString *)event
+{
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeEvent" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callRemoveEvent:instanceId ref:ref event:event];
+    });
+}
+
 - (void)createFinish
 {
     NSString* instanceId = self.weexInstance.instanceId;
@@ -111,6 +173,24 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager scrollToComponent:elemRef options:dict];
     }];
+}
+
+- (void)updateStyle:(NSString *)ref styles:(NSDictionary *)styles
+{
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateStyle" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callUpdateStyle:instanceId ref:ref data:styles];
+    });
+}
+
+- (void)updateAttrs:(NSString *)ref attrs:(NSDictionary *)attrs
+{
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callUpdateAttrs:instanceId ref:ref data:attrs];
+    });
 }
 
 - (void)addRule:(NSString*)type rule:(NSDictionary *)rule {

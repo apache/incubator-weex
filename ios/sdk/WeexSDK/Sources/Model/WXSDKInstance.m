@@ -151,8 +151,9 @@ typedef enum : NSUInteger {
         _instanceJavaScriptContext = nil;
     }
     
-    _instanceJavaScriptContext = [[bridgeClass alloc] init];
-    if(!_debugJS) {
+    // WXDebugger is a singleton actually and should not call its init twice.
+    _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
+    if (!_debugJS) {
         id<WXBridgeProtocol> jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"bridgeCtx.jsBridge"];
         JSContext* globalContex = jsBridge.javaScriptContext;
         JSContextGroupRef contextGroup = JSContextGetGroup([globalContex JSGlobalContextRef]);
@@ -167,7 +168,7 @@ typedef enum : NSUInteger {
         [_instanceJavaScriptContext setJSContext:instanceContext];
     }
     
-    if([_instanceJavaScriptContext respondsToSelector:@selector(setWeexInstanceId:)]) {
+    if ([_instanceJavaScriptContext respondsToSelector:@selector(setWeexInstanceId:)]) {
         [_instanceJavaScriptContext setWeexInstanceId:_instanceId];
     }
     if (!_debugJS) {
