@@ -296,6 +296,16 @@ WX_EXPORT_METHOD(@selector(save:))
     return NO;
 }
 
+- (void)_resetNativeBorderRadius
+{
+    if (_borderTopLeftRadius == _borderTopRightRadius && _borderTopRightRadius == _borderBottomLeftRadius && _borderBottomLeftRadius == _borderBottomRightRadius)
+    {
+        _layer.cornerRadius = _borderBottomLeftRadius;
+        return;
+    }
+    [self _clipsToBounds];
+}
+
 - (BOOL)needsDrawRect
 {
     if (_isCompositingChild) {
