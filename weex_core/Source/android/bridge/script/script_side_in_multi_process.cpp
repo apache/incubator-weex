@@ -30,7 +30,7 @@
 namespace WeexCore {
 namespace bridge {
 namespace script {
-ScriptSideInMultiProcess::ScriptSideInMultiProcess() {}
+ScriptSideInMultiProcess::ScriptSideInMultiProcess():sender_(nullptr){}
 
 ScriptSideInMultiProcess::~ScriptSideInMultiProcess() {}
 

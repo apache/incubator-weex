@@ -72,7 +72,7 @@ class ScriptSideInMultiProcess : public ScriptBridge::ScriptSide {
   inline void set_sender(IPCSender *sender) { sender_ = sender; }
 
  private:
-  IPCSender *sender_;
+  IPCSender *sender_ = nullptr;
   DISALLOW_COPY_AND_ASSIGN(ScriptSideInMultiProcess);
 };
 }  // namespace script

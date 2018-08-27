@@ -24,7 +24,7 @@ namespace WeexCore {
 namespace bridge {
 namespace script {
 
-ScriptSideInMultiSo::ScriptSideInMultiSo() {}
+ScriptSideInMultiSo::ScriptSideInMultiSo():script_side_functions_(nullptr) {}
 
 ScriptSideInMultiSo::~ScriptSideInMultiSo() {}
 

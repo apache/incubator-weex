@@ -73,7 +73,7 @@ class ScriptSideInMultiSo : public ScriptBridge::ScriptSide {
   }
 
  private:
-  FunctionsExposedByJS *script_side_functions_;
+  FunctionsExposedByJS *script_side_functions_ = nullptr;
   DISALLOW_COPY_AND_ASSIGN(ScriptSideInMultiSo);
 };
 }  // namespace script
