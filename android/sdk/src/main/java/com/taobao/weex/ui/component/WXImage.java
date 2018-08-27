@@ -471,17 +471,17 @@ public class WXImage extends WXComponent<ImageView> {
     }
     int imgHeight = img.getIntrinsicHeight();
     int imgWidth = img.getIntrinsicWidth();
-    if (!preImgUrlStr.equals(currentImgUrlStr) && imgHeight > 1920 && imgWidth > 1080){
+    if (!preImgUrlStr.equals(currentImgUrlStr)){
       preImgUrlStr = currentImgUrlStr;
-      instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_LARGE_IMG_COUNT,1);
+      if (imgHeight > 1921 && imgWidth > 1081){
+        instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_LARGE_IMG_COUNT,1);
+      }
+      if (imgHeight * imgWidth > imageView.getMeasuredHeight() * imageView.getMeasuredWidth() +10){
+        instance.getWXPerformance().wrongImgSizeCount++;
+        instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,1);
+      }
     }
 
-
-    if (imgHeight * imgHeight > imageView.getMeasuredHeight() *
-            imageView.getMeasuredWidth() +10){
-      instance.getWXPerformance().wrongImgSizeCount++;
-      instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,1);
-    }
   }
 
   @Override
