@@ -44,6 +44,7 @@ public class WXParams implements Serializable {
 
   private String libJscPath;
   private String libIcuPath;
+  private String libLdPath;
 
   private Map<String, String> options;
 
@@ -224,5 +225,15 @@ public class WXParams implements Serializable {
 
   public void setLibIcuPath(String libIcuPath) {
     this.libIcuPath = libIcuPath;
+  }
+
+  @CalledByNative
+  public String getLibLdPath() {
+    WXLogUtils.e("getLibLdPath is running " + libLdPath);
+    return libLdPath;
+  }
+
+  public void setLibLdPath(String libLdPath) {
+    this.libLdPath = libLdPath;
   }
 }

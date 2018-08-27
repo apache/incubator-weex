@@ -69,7 +69,13 @@ class SoUtils {
 
   inline static const char* jss_icu_path() { return g_jss_icu_path; }
 
-  static void updateSoLinkPath(const char *jscPath);
+  inline static void set_lib_ld_path(char* lib_ld_path) {
+    g_lib_ld_path = lib_ld_path;
+  }
+
+  inline static const char* lib_ld_path() { return g_lib_ld_path; }
+
+  static void updateSoLinkPath(const char *lib_ld_path);
 
  private:
   static const char* GetDefaultCacheDir(JNIEnv* env);
@@ -79,6 +85,7 @@ class SoUtils {
   static char* g_jss_so_name;
   static char* g_jss_icu_path;
   static char* g_jsc_so_path;
+  static char* g_lib_ld_path;
   static bool g_pie_support;
   static std::function<void(const char*, const char*)> g_exception_handler;
 };

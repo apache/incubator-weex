@@ -30,64 +30,95 @@ ScriptSideInMultiSo::~ScriptSideInMultiSo() {}
 
 int ScriptSideInMultiSo::InitFramework(
     const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
-  LOGE("ScriptSideInMultiSo::InitFramework");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::InitFramework script_side_functions_ is null");
+    return false;
+  }
+
   return script_side_functions_->funcInitFramework(script, params);
 }
 
 int ScriptSideInMultiSo::InitAppFramework(
     const char *instanceId, const char *appFramework,
     std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
-  LOGE("ScriptSideInMultiSo::InitAppFramework");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::InitAppFramework script_side_functions_ is null");
+    return false;
+  }
   return script_side_functions_->funcInitAppFramework(instanceId, appFramework,
                                                       params);
 }
 
 int ScriptSideInMultiSo::CreateAppContext(const char *instanceId,
                                           const char *jsBundle) {
-  LOGE("ScriptSideInMultiSo::CreateAppContext");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::CreateAppContext script_side_functions_ is null");
+    return false;
+  }
   return script_side_functions_->funcCreateAppContext(instanceId, jsBundle);
 }
 
 char *ScriptSideInMultiSo::ExecJSOnAppWithResult(const char *instanceId,
                                                  const char *jsBundle) {
-  LOGE("ScriptSideInMultiSo::ExecJSOnAppWithResult");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::ExecJSOnAppWithResult script_side_functions_ is null");
+    return false;
+  }
   return script_side_functions_->funcExeJSOnAppWithResult(instanceId, jsBundle);
 }
 
 int ScriptSideInMultiSo::CallJSOnAppContext(
     const char *instanceId, const char *func,
     std::vector<VALUE_WITH_TYPE *> &params) {
-  LOGE("ScriptSideInMultiSo::CallJSOnAppContext");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::CallJSOnAppContext script_side_functions_ is null");
+    return false;
+  }
   return script_side_functions_->funcCallJSOnAppContext(instanceId, func,
                                                         params);
 }
 
 int ScriptSideInMultiSo::DestroyAppContext(const char *instanceId) {
-  LOGE("ScriptSideInMultiSo::DestroyAppContext");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::DestroyAppContext script_side_functions_ is null");
+    return false;
+  }
   return script_side_functions_->funcDestroyAppContext(instanceId);
 }
 
 int ScriptSideInMultiSo::ExecJsService(const char *source) {
-  LOGE("ScriptSideInMultiSo::ExecJsService");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::ExecJsService script_side_functions_ is null");
+    return false;
+  }
   return script_side_functions_->funcExeJsService(source);
 }
 
 int ScriptSideInMultiSo::ExecTimeCallback(const char *source) {
-  LOGE("ScriptSideInMultiSo::ExecTimeCallback");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::ExecTimeCallback script_side_functions_ is null");
+    return false;
+  }
   return script_side_functions_->funcExeCTimeCallback(source);
 }
 
 int ScriptSideInMultiSo::ExecJS(const char *instanceId, const char *nameSpace,
                                 const char *func,
                                 std::vector<VALUE_WITH_TYPE *> &params) {
-  LOGE("ScriptSideInMultiSo::ExecJS");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::ExecJS script_side_functions_ is null");
+    return false;
+  }
   return script_side_functions_->funcExeJS(instanceId, nameSpace, func, params);
 }
 
 WeexJSResult ScriptSideInMultiSo::ExecJSWithResult(
     const char *instanceId, const char *nameSpace, const char *func,
     std::vector<VALUE_WITH_TYPE *> &params) {
-  LOGE("ScriptSideInMultiSo::ExecJSWithResult");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::ExecJSWithResult script_side_functions_ is null");
+    return  WeexJSResult();
+  }
   return script_side_functions_->funcExeJSWithResult(instanceId, nameSpace,
                                                      func, params);
 }
@@ -96,24 +127,36 @@ int ScriptSideInMultiSo::CreateInstance(const char *instanceId,
                                         const char *func, const char *script,
                                         const char *opts, const char *initData,
                                         const char *extendsApi) {
-  LOGE("ScriptSideInMultiSo::CreateInstance");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::CreateInstance script_side_functions_ is null");
+    return false;
+  }
   return script_side_functions_->funcCreateInstance(instanceId, func, script,
                                                     opts, initData, extendsApi);
 }
 
 char *ScriptSideInMultiSo::ExecJSOnInstance(const char *instanceId,
                                             const char *script) {
-  LOGE("ScriptSideInMultiSo::ExecJSOnInstance");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::ExecJSOnInstance script_side_functions_ is null");
+    return false;
+  }
   return script_side_functions_->funcExeJSOnInstance(instanceId, script);
 }
 
 int ScriptSideInMultiSo::DestroyInstance(const char *instanceId) {
-  LOGE("ScriptSideInMultiSo::DestroyInstance");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::DestroyInstance script_side_functions_ is null");
+    return false;
+  }
   return script_side_functions_->funcDestroyInstance(instanceId);
 }
 
 int ScriptSideInMultiSo::UpdateGlobalConfig(const char *config) {
-  LOGE("ScriptSideInMultiSo::UpdateGlobalConfig");
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::UpdateGlobalConfig script_side_functions_ is null");
+    return false;
+  }
   return script_side_functions_->funcUpdateGlobalConfig(config);
 }
 }  // namespace script
