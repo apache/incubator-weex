@@ -46,6 +46,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -125,6 +127,8 @@ public class WXEnvironment {
   private static String CORE_JSS_ICU_PATH = null;
 
   private static String CORE_JSC_SO_PATH = null;
+
+  private static String LIB_LD_PATH = null;
 
 
   private static Map<String, String> options = new HashMap<>();
@@ -491,5 +495,24 @@ public class WXEnvironment {
     }
 
     return CORE_JSS_ICU_PATH;
+  }
+
+  public static String getLibLdPath() {
+    if (TextUtils.isEmpty(LIB_LD_PATH)) {
+      ClassLoader classLoader = WXEnvironment.class.getClassLoader();
+      try {
+        Method getLdLibraryPath = classLoader.getClass().getMethod("getLdLibraryPath", new Class[0]);
+        LIB_LD_PATH = (String) getLdLibraryPath.invoke(classLoader, new Object[0]);
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
+      } catch (NoSuchMethodException e) {
+        e.printStackTrace();
+      }
+    }
+
+    WXLogUtils.e("getLibLdPath is " + LIB_LD_PATH);
+    return LIB_LD_PATH;
   }
 }

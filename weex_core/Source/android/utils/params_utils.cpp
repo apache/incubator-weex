@@ -203,6 +203,19 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     }
   }
 
+  jmethodID m_get_lib_ld_path =
+          env->GetMethodID(c_params, "getLibLdPath", "()Ljava/lang/String;");
+  if (m_get_lib_ld_path != nullptr) {
+    jobject j_get_lib_ld_path =
+            env->CallObjectMethod(params, m_get_lib_ld_path);
+    if (j_get_lib_ld_path != nullptr) {
+      SoUtils::set_lib_ld_path(const_cast<char*>(
+                                        env->GetStringUTFChars((jstring)(j_get_lib_ld_path), nullptr)));
+      LOGE("lib_ld_path is %s ", SoUtils::lib_ld_path());
+      env->DeleteLocalRef(j_get_lib_ld_path);
+    }
+  }
+
   jmethodID m_osVersion =
       env->GetMethodID(c_params, "getOsVersion", "()Ljava/lang/String;");
   if (m_osVersion == nullptr) {

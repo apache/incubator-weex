@@ -31,6 +31,7 @@ namespace WeexCore {
     char * SoUtils::g_jsc_so_path = nullptr;
     char * SoUtils::g_crash_file_path = nullptr;
     char * SoUtils::g_jss_icu_path = nullptr;
+    char * SoUtils::g_lib_ld_path = nullptr;
     char * SoUtils::g_jss_so_name = const_cast<char *>("libweexjss.so");
     bool SoUtils::g_pie_support = false;
     std::function<void(const char*, const char*)> SoUtils::g_exception_handler = nullptr;
@@ -204,13 +205,13 @@ namespace WeexCore {
         g_exception_handler = ReportNativeInitStatus;
     }
 
-    void SoUtils::updateSoLinkPath(const char *jscPath) {
-        LOGE("jscPath is %s",jscPath);
+    void SoUtils::updateSoLinkPath(const char *lib_ld_path) {
+        LOGE("updateSoLinkPath is %s",lib_ld_path);
         void* sym = dlsym(RTLD_DEFAULT, "android_update_LD_LIBRARY_PATH");
         if (sym != NULL) {
             typedef void (*Fn)(const char*);
             Fn android_update_LD_LIBRARY_PATH = reinterpret_cast<Fn>(sym);
-            (*android_update_LD_LIBRARY_PATH)(jscPath);
+            (*android_update_LD_LIBRARY_PATH)(lib_ld_path);
         } else {
             LOGE("android_update_LD_LIBRARY_PATH not found; .so dependencies will not work!");
         }
