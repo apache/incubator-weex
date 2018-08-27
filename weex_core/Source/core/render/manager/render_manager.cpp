@@ -290,8 +290,11 @@ bool RenderManager::CreateFinish(const std::string &page_id) {
 
   page->set_is_dirty(true);
   bool b = page->CreateFinish();
+
+#if RENDER_LOG
   auto end_time = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
   LOGE("DATA_RENDER, Wx End %lld",end_time);
+#endif
   return b;
 }
 

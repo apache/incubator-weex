@@ -108,7 +108,7 @@ void ExecState::Execute() {
   }
 }
 
-const Value& ExecState::Call(const std::string& func_name,
+const Value ExecState::Call(const std::string& func_name,
                              const std::vector<Value>& params) {
   Value ret;
   auto it = global_variables_.find(func_name);

@@ -122,7 +122,7 @@ typedef struct OpCost {
  private:
   int64_t cost = -1;
   float avg = -1;
-};
+}OpCost;
 
 typedef struct TimeCost {
   tp fc_s;
@@ -213,7 +213,7 @@ typedef struct TimeCost {
       return;
     }
 
-    LOGE("There are %d OP_CODEs. Each OP_CODE Info:\n", op_cost.size());
+    LOGE("There are %lu OP_CODEs. Each OP_CODE Info:\n", op_cost.size());
 
     int i = 0;
     for (auto& it : ret) {
@@ -227,6 +227,6 @@ typedef struct TimeCost {
 
  private:
   OpCost last;
-};
+}TimeCost;
 
 #endif //PROJECT_VM_MONITOR_H

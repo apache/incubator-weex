@@ -270,7 +270,7 @@ struct ASTParser final {
   void ParseComponentFunction(json11::Json& json) {
     auto& name = json["name"];
     auto& initial_state = json["initialState"];
-    auto& styles = json["styles"];
+    //auto& styles = json["styles"];
     json11::Json template_obj = json["template"];
 
     Handle<BlockStatement> chunk = stacks_.back();

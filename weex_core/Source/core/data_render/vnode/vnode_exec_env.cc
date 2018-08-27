@@ -123,7 +123,7 @@ static Value Slice(ExecState* exec_state) {
   unsigned int v_end = static_cast<unsigned int>(IntValue(end));
   size_t size = GetValueArraySize(*table);
   if (v_end > size) {
-    v_end = size;
+    v_end = static_cast<unsigned int>(size);
   }
   if (v_start > v_end) {
     v_start = v_end;

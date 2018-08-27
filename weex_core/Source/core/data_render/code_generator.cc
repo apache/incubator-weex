@@ -268,7 +268,7 @@ void CodeGenerator::Visit(IfElseStatement* node, void* data) {
     node->body()->Accept(this, nullptr);
   }
   int tb_end_index = (int)func_->func_state()->instructions().size() - 1;
-  auto else_slot = func_->func_state()->AddInstruction(0);
+  //auto else_slot = func_->func_state()->AddInstruction(0);
 
   long else_condition = block_->NextRegisterId();
   if (node->els().get() != NULL) {
