@@ -50,13 +50,18 @@
     targetComponent.hasAdd = true;
     double modifyTime =  CACurrentMediaTime()*1000;
     
+    __weak WXComponent* weakComponent = targetComponent;
     dispatch_async(dispatch_get_main_queue(), ^{
-        if(![self _verifyComponent:targetComponent]){
+        __strong WXComponent* strongComponent = weakComponent;
+        if (nil == strongComponent) {
+            return;
+        }
+        if(![self _verifyComponent:strongComponent]){
             return;
         }
         self.interactionAddCountRecord++;
         
-        [self _handleRenderTime:targetComponent withModifyTime:modifyTime];
+        [self _handleRenderTime:strongComponent withModifyTime:modifyTime];
     });
 }
 
