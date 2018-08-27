@@ -625,7 +625,7 @@ static JSContext *jsContext;
                 indexPath = data[key][@"indexPath"];
             }
         }
-        NSString *virtualElementInfo = [NSString stringWithFormat:@"%@@%lu",component.ref,indexPath.row];
+        NSString *virtualElementInfo = [NSString stringWithFormat:@"%@@%ld",component.ref,(long)indexPath.row];
         NSDictionary *refInfo = @{@"attrs":component.attributes,@"type":component->_type,@"ref":virtualElementInfo,@"[[VirtualElement]]":@"true"};
         if (subInfo[component.attributes[@"ref"]]) {
             [subInfo[component.attributes[@"ref"]] addObject:refInfo];

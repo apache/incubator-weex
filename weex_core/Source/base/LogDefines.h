@@ -51,7 +51,6 @@
 
 #define LOGE(...)    printf(__VA_ARGS__)
 #define LOGA(...)    printf(__VA_ARGS__)
-#define LOGD(...)    printf(__VA_ARGS__)
 
 #ifdef DEBUG
 

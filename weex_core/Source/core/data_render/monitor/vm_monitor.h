@@ -105,7 +105,7 @@ typedef struct OpCost {
   int64_t min = 0;
   int count = 0;
 
-  inline long getCost() {
+  inline int64_t getCost() {
     if (cost < 0) {
       cost = getTimeMs(s, e);
     }
