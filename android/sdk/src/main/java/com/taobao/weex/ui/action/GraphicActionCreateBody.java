@@ -70,7 +70,6 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
   public void executeAction() {
     super.executeAction();
     try {
-      component.mIsAddElementToTree = true;
       component.createView();
       component.applyLayoutAndEvent(component);
       component.bindData(component);
