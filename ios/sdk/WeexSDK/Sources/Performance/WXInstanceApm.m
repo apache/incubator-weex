@@ -343,27 +343,56 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if(self.hasAddView || !self.isStartRender || self.isDegrade){
         return;
     }
-    WXSDKErrCode code = WX_KEY_EXCEPTION_EMPTY_SCREEN_NATIVE;
-    
-    
-    NSNumberFormatter *formater = [[NSNumberFormatter alloc] init];
-    formater.numberStyle = NSNumberFormatterDecimalStyle;
-    
-    for (WXJSExceptionInfo* exception in self.errorList) {
-        NSNumber *codeNumber = [formater numberFromString:exception.errorCode];
-        if (nil == codeNumber) {
-            continue;
+    __weak WXApmForInstance* weakSelf = self;
+    WXPerformBlockOnComponentThread(^{
+        __strong WXApmForInstance* strongSelf = weakSelf;
+        if (nil == strongSelf) {
+            return;
         }
-        WXSDKErrorGroup group = [WXSDKErrCodeUtil getErrorGroupByCode:codeNumber.intValue];
-        if(group == WX_JS){
-            code = WX_KEY_EXCEPTION_EMPTY_SCREEN_JS;
-            break;
+        
+        NSInteger LIMIT_TIME_FROM_RENDER_URL = 2000;
+        NSInteger LIMIT_TIME_FROM_RENDER_TEMPLATE = 1000;
+        
+        long curTime = [WXUtility getUnixFixTimeMillis];
+        BOOL sholudReportByTime;
+        long useTime;
+        NSString* useTimeFrom;
+        
+        NSNumber* startTime = [strongSelf.stageDic objectForKey:KEY_PAGE_STAGES_DOWN_BUNDLE_START];
+        if (nil != startTime) {
+            useTime = curTime - startTime.longValue;
+            useTimeFrom = KEY_PAGE_STAGES_DOWN_BUNDLE_START;
+            sholudReportByTime = useTime > LIMIT_TIME_FROM_RENDER_URL;
+        }else{
+            startTime = [strongSelf.stageDic objectForKey:KEY_PAGE_STAGES_RENDER_ORGIGIN];
+            useTime = nil != startTime ? curTime -startTime.longValue : curTime;
+            useTimeFrom = KEY_PAGE_STAGES_RENDER_ORGIGIN;
+            sholudReportByTime = useTime > LIMIT_TIME_FROM_RENDER_TEMPLATE;
         }
-    }
-    NSString *codeStr = [NSString stringWithFormat:@"%d",code];
-    [WXExceptionUtils commitCriticalExceptionRT:self.instanceId errCode:codeStr function:@"_checkScreenEmptyAndReport"
-                                      exception:[self _convertTopExceptionListToStr] extParams:nil];
-    
+        
+        if (!sholudReportByTime) {
+            return;
+        }
+        
+        WXSDKErrCode code = WX_KEY_EXCEPTION_EMPTY_SCREEN_NATIVE;
+        for (WXJSExceptionInfo* exception in strongSelf.errorList) {
+            WXSDKErrorGroup group = [WXSDKErrCodeUtil getErrorGroupByCode:exception.errorCode.intValue];
+            if(group == WX_JS){
+                code = WX_KEY_EXCEPTION_EMPTY_SCREEN_JS;
+                break;
+            }
+        }
+        NSString *codeStr = [NSString stringWithFormat:@"%d",code];
+        NSDictionary* extInfo = @{
+            @"wxBeginRender":@(strongSelf.isStartRender),
+            @"wxHasAddView":@(strongSelf.hasAddView),
+            @"wxHasDegrade":@(strongSelf.isDegrade),
+            @"wxUseTime":@(useTime),
+            @"wxUseTimeFrom":useTimeFrom
+            };
+        [WXExceptionUtils commitCriticalExceptionRT:strongSelf.instanceId errCode:codeStr function:@"_checkScreenEmptyAndReport"
+                                          exception:[strongSelf _convertTopExceptionListToStr] extParams:extInfo];
+    });
 }
 
 - (NSString *)_convertTopExceptionListToStr
