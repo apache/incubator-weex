@@ -111,7 +111,7 @@ class ExecState {
   virtual ~ExecState() {}
   void Compile();
   void Execute();
-  const Value& Call(const std::string& func_name,
+  const Value Call(const std::string& func_name,
                     const std::vector<Value>& params);
 
   size_t GetArgumentCount();

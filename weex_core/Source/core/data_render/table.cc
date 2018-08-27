@@ -37,7 +37,7 @@ std::string to_string(T value)
 int IndexOf(const std::vector<Value> *arr, const Value *val) {
   auto it = std::find(arr->begin(), arr->end(), val);
   if (it != arr->end()) {
-    return std::distance(arr->begin(), it);
+    return static_cast<int>(std::distance(arr->begin(), it));
   } else {
     return -1;
   }
