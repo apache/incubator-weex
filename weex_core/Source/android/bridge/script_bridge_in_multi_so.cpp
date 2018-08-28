@@ -389,29 +389,29 @@ static const char *CallT3DLinkNative(int type, const char *arg) {
       ->CallT3DLinkNative(type, arg);
 }
 
-static void PostMessage(const char *vim_id, const char *data) {
+static void PostMessage(const char *vim_id, const char *data, int dataLength) {
   //  WeexCoreManager::Instance()->script_bridge()->core_side()->PostMessage(vim_id,
   //                                                                         data);
   WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
       weex::base::MakeCopyable([vim_id = std::string(vim_id),
-                                data = std::string(data)] {
+                                data = std::string(data), length = dataLength] {
         WeexCoreManager::Instance()->script_bridge()->core_side()->PostMessage(
-            vim_id.c_str(), data.c_str());
+            vim_id.c_str(), data.c_str(),length);
       }));
 }
 
-static void DispatchMessage(const char *client_id, const char *data,
+static void DispatchMessage(const char *client_id, const char *data, int dataLength,
                             const char *callback, const char *vm_id) {
   //  WeexCoreManager::Instance()->script_bridge()->core_side()->DispatchMessage(
   //      client_id, data, callback, vm_id);
   WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
       weex::base::MakeCopyable(
           [client_id = std::string(client_id), data = std::string(data),
-           callback = std::string(callback), vm_id = std::string(vm_id)] {
+           callback = std::string(callback), vm_id = std::string(vm_id), length = dataLength] {
             WeexCoreManager::Instance()
                 ->script_bridge()
                 ->core_side()
-                ->DispatchMessage(client_id.c_str(), data.c_str(),
+                ->DispatchMessage(client_id.c_str(), data.c_str(),length,
                                   callback.c_str(), vm_id.c_str());
           }));
 }

@@ -238,33 +238,33 @@ bool WMLBridge::RegisterJNIUtils(JNIEnv* env) {
   }
 }
 
-void WMLBridge::PostMessage(JNIEnv* env, const char* vm_id, const char* data) {
+void WMLBridge::PostMessage(JNIEnv* env, const char* vm_id, const char* data, int dataLength) {
   if (jni_object() != NULL) {
     auto jni_str = base::android::ScopedLocalJavaRef<jstring>(
         env, env->NewStringUTF(vm_id));
     auto jni_array = base::android::ScopedLocalJavaRef<jbyteArray>(
-        env, newJByteArray(env, data));
+        env, newJByteArray(env, data, dataLength));
 
     Java_WMLBridge_postMessage(env, jni_object(), jni_str.Get(),
                                jni_array.Get());
   }
 }
 
-void WMLBridge::DispatchMessage(JNIEnv* env, const char* client_id, const char* data,
-                                const char* callback,
-                                const char* vm_id) {
-  if (jni_object() != NULL) {
-    auto jni_client_id = base::android::ScopedLocalJavaRef<jstring>(
-        env, newJString(env, client_id));
-    auto jni_array = base::android::ScopedLocalJavaRef<jbyteArray>(
-        env, newJByteArray(env, data));
-    auto jni_callback = base::android::ScopedLocalJavaRef<jstring>(
-        env, newJString(env, callback));
-    auto jni_vm_id =
-        base::android::ScopedLocalJavaRef<jstring>(env, newJString(env, vm_id));
-    Java_WMLBridge_dispatchMessage(env, jni_object(), jni_client_id.Get(),
-                                   jni_vm_id.Get(), jni_array.Get(),
-                                   jni_callback.Get());
-  }
-}
+    void WMLBridge::DispatchMessage(JNIEnv *env, const char *client_id,
+                                    const char *data, int dataLength, const char *callback, const char* vm_id) {
+      if (jni_object() != NULL) {
+        auto jni_client_id = base::android::ScopedLocalJavaRef<jstring>(
+                env, newJString(env, client_id));
+        auto jni_array = base::android::ScopedLocalJavaRef<jbyteArray>(
+                env, newJByteArray(env, data, dataLength));
+        auto jni_callback = base::android::ScopedLocalJavaRef<jstring>(
+                env, newJString(env, callback));
+        auto jni_vm_id =
+                base::android::ScopedLocalJavaRef<jstring>(env, newJString(env, vm_id));
+        Java_WMLBridge_dispatchMessage(env, jni_object(), jni_client_id.Get(),
+                                       jni_vm_id.Get(), jni_array.Get(),
+                                       jni_callback.Get());
+      }
+    }
+
 }  // namespace WeexCore

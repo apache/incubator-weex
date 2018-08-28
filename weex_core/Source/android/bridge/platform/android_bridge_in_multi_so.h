@@ -114,10 +114,10 @@ class AndroidBridgeInMultiSo : public PlatformBridge {
   static int CallMoveElement(const char* pageId, const char* ref,
                              const char* parentRef, int index);
 
-  static void PostMessage(const char* vm_id, const char* data);
+  static void PostMessage(const char* vm_id, const char* data, int dataLength);
 
-  static void DispatchMessage(const char* client_id, const char* vm_id,
-                              const char* data, const char* callback);
+  static void DispatchMessage(const char* client_id,
+                              const char* data, int dataLength, const char* callback, const char* vm_id);
 
   static int CallAppendTreeCreateFinish(const char* pageId, const char* ref);
 

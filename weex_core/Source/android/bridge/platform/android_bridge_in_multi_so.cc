@@ -319,23 +319,25 @@ int AndroidBridgeInMultiSo::CallMoveElement(const char *pageId, const char *ref,
       ->MoveElement(pageId, ref, parentRef, index);
 }
 
-void AndroidBridgeInMultiSo::PostMessage(const char *vm_id, const char *data) {
+void AndroidBridgeInMultiSo::PostMessage(const char *vm_id, const char *data,
+                                         int dataLength) {
   LOGE("Android Bridge: PostMessage");
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
-      ->PostMessage(vm_id, data);
+      ->PostMessage(vm_id, data, dataLength);
 }
 
 void AndroidBridgeInMultiSo::DispatchMessage(const char *client_id,
-                                             const char *vm_id,
                                              const char *data,
-                                             const char *callback) {
+                                             int dataLength,
+                                             const char *callback,
+                                             const char *vm_id) {
   LOGE("Android Bridge: DispatchMessage");
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
-      ->DispatchMessage(client_id, vm_id, data, callback);
+      ->DispatchMessage(client_id, data, dataLength, callback, vm_id);
 }
 
 int AndroidBridgeInMultiSo::CallAppendTreeCreateFinish(const char *pageId,

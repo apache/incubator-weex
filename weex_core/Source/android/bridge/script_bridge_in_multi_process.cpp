@@ -828,14 +828,15 @@ static std::unique_ptr<IPCResult> HandlePostMessage(IPCArguments *arguments) {
   //  char *jVmId = getArumentAsCStr(arguments, 1);
   //  WeexCoreManager::Instance()->script_bridge()->core_side()->PostMessage(jVmId,
   //                                                                         jData);
-
+  int i = getArumentAsCStrLen(arguments, 0);
   WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
       weex::base::MakeCopyable([jData = std::unique_ptr<char[]>(
                                     getArumentAsCStr(arguments, 0)),
+              length = i,
                                 jVmId = std::unique_ptr<char[]>(
                                     getArumentAsCStr(arguments, 1))] {
         WeexCoreManager::Instance()->script_bridge()->core_side()->PostMessage(
-            jVmId.get(), jData.get());
+            jVmId.get(), jData.get(),length);
       }));
   return createInt32Result(static_cast<int32_t>(true));
 }
@@ -847,17 +848,18 @@ std::unique_ptr<IPCResult> HandleDispatchMessage(IPCArguments *arguments) {
   //  char *jVmId = getArumentAsCStr(arguments, 3);
   //  WeexCoreManager::Instance()->script_bridge()->core_side()->DispatchMessage(
   //      jClientId, jVmId, jData, jCallback);
-
+  int i = getArumentAsCStrLen(arguments, 1);
   WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
       weex::base::MakeCopyable(
           [clientId = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0)),
            dataS = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1)),
+                  length = i,
            callbackS = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2)),
            vmId = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3))] {
             WeexCoreManager::Instance()
                 ->script_bridge()
                 ->core_side()
-                ->DispatchMessage(clientId.get(), dataS.get(),
+                ->DispatchMessage(clientId.get(), dataS.get(),length,
                                   callbackS.get(), vmId.get());
           }));
   return createInt32Result(static_cast<int32_t>(true));

@@ -68,8 +68,8 @@ class CoreSideInScript : public ScriptBridge::CoreSide {
                   const char *time) override;
   void ClearInterval(const char *page_id, const char *callback_id) override;
   const char *CallT3DLinkNative(int type, const char *arg) override;
-  void PostMessage(const char *vim_id, const char *data) override;
-  void DispatchMessage(const char *client_id, const char *data,
+  void PostMessage(const char *vim_id, const char *data, int dataLength) override;
+  void DispatchMessage(const char *client_id, const char *data, int dataLength,
                        const char *callback, const char *vm_id) override;
   void ReportException(const char *page_id, const char *func,
                        const char *exception_string) override;
