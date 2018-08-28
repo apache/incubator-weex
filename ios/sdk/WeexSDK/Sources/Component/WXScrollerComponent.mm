@@ -183,7 +183,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 {
     [super viewDidLoad];
     [self setContentSize:_contentSize];
-    WXScrollerComponentView* scrollView = (WXScrollerComponentView *)self.view;
+    WXScrollerComponentView *scrollView = (WXScrollerComponentView *)self.view;
     scrollView.delegate = self;
     scrollView.exclusiveTouch = YES;
     scrollView.autoresizesSubviews = NO;

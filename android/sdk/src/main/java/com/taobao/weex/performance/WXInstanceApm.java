@@ -144,7 +144,7 @@ public class WXInstanceApm {
      * @param time unixTime ,plz use WXUtils.getFixUnixTime
      */
     public void onStageWithTime(String name,long time){
-        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+        WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(mInstanceId);
         if (null != instance){
             instance.getExceptionRecorder().recordStage(name, time);
         }
