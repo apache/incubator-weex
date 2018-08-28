@@ -110,7 +110,6 @@ void AndroidBridgeInMultiSo::SetJSVersion(const char *version) {
 void AndroidBridgeInMultiSo::ReportException(const char *pageId,
                                              const char *func,
                                              const char *exception_string) {
-  LOGE("Android Bridge: ReportException");
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -118,7 +117,6 @@ void AndroidBridgeInMultiSo::ReportException(const char *pageId,
 }
 
 void AndroidBridgeInMultiSo::ReportServerCrash(const char *instance_id) {
-  LOGE("Android Bridge: ReportServerCrash");
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -127,7 +125,6 @@ void AndroidBridgeInMultiSo::ReportServerCrash(const char *instance_id) {
 
 void AndroidBridgeInMultiSo::ReportNativeInitStatus(const char *status_code,
                                                     const char *error_msg) {
-  LOGE("Android Bridge: ReportNativeInitStatus");
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -136,7 +133,6 @@ void AndroidBridgeInMultiSo::ReportNativeInitStatus(const char *status_code,
 
 int AndroidBridgeInMultiSo::CallNative(const char *pageId, const char *task,
                                        const char *callback) {
-  LOGE("Android Bridge: CallNative");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -147,7 +143,6 @@ std::unique_ptr<ValueWithType> AndroidBridgeInMultiSo::CallNativeModule(
     const char *pageId, const char *module, const char *method,
     const char *arguments, int argumentsLength, const char *options,
     int optionsLength) {
-  LOGE("Android Bridge: CallNativeModule");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -159,7 +154,6 @@ void AndroidBridgeInMultiSo::CallNativeComponent(
     const char *pageId, const char *ref, const char *method,
     const char *arguments, int argumentsLength, const char *options,
     int optionsLength) {
-  LOGE("Android Bridge: CallNativeComponent");
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -169,7 +163,6 @@ void AndroidBridgeInMultiSo::CallNativeComponent(
 
 void AndroidBridgeInMultiSo::SetTimeout(const char *callbackID,
                                         const char *time) {
-  LOGE("Android Bridge: SetTimeout");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -177,7 +170,6 @@ void AndroidBridgeInMultiSo::SetTimeout(const char *callbackID,
 }
 
 void AndroidBridgeInMultiSo::CallNativeLog(const char *str_array) {
-  LOGE("Android Bridge: CallNativeLog");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -188,7 +180,6 @@ int AndroidBridgeInMultiSo::CallUpdateFinish(const char *pageId,
                                              const char *task, int taskLen,
                                              const char *callback,
                                              int callbackLen) {
-  LOGE("Android Bridge: CallUpdateFinish");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -198,7 +189,6 @@ int AndroidBridgeInMultiSo::CallUpdateFinish(const char *pageId,
 int AndroidBridgeInMultiSo::CallRefreshFinish(const char *pageId,
                                               const char *task,
                                               const char *callback) {
-  LOGE("Android Bridge: CallRefreshFinish");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -207,7 +197,6 @@ int AndroidBridgeInMultiSo::CallRefreshFinish(const char *pageId,
 
 int AndroidBridgeInMultiSo::CallAddEvent(const char *pageId, const char *ref,
                                          const char *event) {
-  LOGE("Android Bridge: CallAddEvent");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -216,7 +205,6 @@ int AndroidBridgeInMultiSo::CallAddEvent(const char *pageId, const char *ref,
 
 int AndroidBridgeInMultiSo::CallRemoveEvent(const char *pageId, const char *ref,
                                             const char *event) {
-  LOGE("Android Bridge: CallRemoveEvent");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -229,7 +217,6 @@ int AndroidBridgeInMultiSo::CallCreateBody(
     std::map<std::string, std::string> *attributes,
     std::set<std::string> *events, const WXCoreMargin &margins,
     const WXCorePadding &paddings, const WXCoreBorderWidth &borders) {
-  LOGE("Android Bridge: CallCreateBody");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -244,7 +231,6 @@ int AndroidBridgeInMultiSo::CallAddElement(
     std::set<std::string> *events, const WXCoreMargin &margins,
     const WXCorePadding &paddings, const WXCoreBorderWidth &borders,
     bool willLayout) {
-  LOGE("Android Bridge: CallAddElement");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -255,7 +241,6 @@ int AndroidBridgeInMultiSo::CallAddElement(
 int AndroidBridgeInMultiSo::CallLayout(const char *pageId, const char *ref,
                                        int top, int bottom, int left, int right,
                                        int height, int width, int index) {
-  LOGE("Android Bridge: CallLayout");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -268,7 +253,6 @@ int AndroidBridgeInMultiSo::CallUpdateStyle(
     std::vector<std::pair<std::string, std::string>> *margin,
     std::vector<std::pair<std::string, std::string>> *padding,
     std::vector<std::pair<std::string, std::string>> *border) {
-  LOGE("Android Bridge: CallUpdateStyle");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -278,7 +262,6 @@ int AndroidBridgeInMultiSo::CallUpdateStyle(
 int AndroidBridgeInMultiSo::CallUpdateAttr(
     const char *pageId, const char *ref,
     std::vector<std::pair<std::string, std::string>> *attrs) {
-  LOGE("Android Bridge: CallUpdateAttr");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -286,7 +269,6 @@ int AndroidBridgeInMultiSo::CallUpdateAttr(
 }
 
 int AndroidBridgeInMultiSo::CallCreateFinish(const char *pageId) {
-  LOGE("Android Bridge: CallCreateFinish");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -294,7 +276,6 @@ int AndroidBridgeInMultiSo::CallCreateFinish(const char *pageId) {
 }
 
 int AndroidBridgeInMultiSo::CallRenderSuccess(const char *pageId) {
-  LOGE("Android Bridge: CallRenderSuccess");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -303,7 +284,6 @@ int AndroidBridgeInMultiSo::CallRenderSuccess(const char *pageId) {
 
 int AndroidBridgeInMultiSo::CallRemoveElement(const char *pageId,
                                               const char *ref) {
-  LOGE("Android Bridge: CallRemoveElement");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -312,7 +292,6 @@ int AndroidBridgeInMultiSo::CallRemoveElement(const char *pageId,
 
 int AndroidBridgeInMultiSo::CallMoveElement(const char *pageId, const char *ref,
                                             const char *parentRef, int index) {
-  LOGE("Android Bridge: CallMoveElement");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -321,7 +300,6 @@ int AndroidBridgeInMultiSo::CallMoveElement(const char *pageId, const char *ref,
 
 void AndroidBridgeInMultiSo::PostMessage(const char *vm_id, const char *data,
                                          int dataLength) {
-  LOGE("Android Bridge: PostMessage");
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -333,7 +311,6 @@ void AndroidBridgeInMultiSo::DispatchMessage(const char *client_id,
                                              int dataLength,
                                              const char *callback,
                                              const char *vm_id) {
-  LOGE("Android Bridge: DispatchMessage");
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -342,7 +319,6 @@ void AndroidBridgeInMultiSo::DispatchMessage(const char *client_id,
 
 int AndroidBridgeInMultiSo::CallAppendTreeCreateFinish(const char *pageId,
                                                        const char *ref) {
-  LOGE("Android Bridge: CallAppendTreeCreateFinish");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -352,7 +328,6 @@ int AndroidBridgeInMultiSo::CallAppendTreeCreateFinish(const char *pageId,
 int AndroidBridgeInMultiSo::CallHasTransitionPros(
     const char *pageId, const char *ref,
     std::vector<std::pair<std::string, std::string>> *style) {
-  LOGE("Android Bridge: CallHasTransitionPros");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -362,7 +337,6 @@ int AndroidBridgeInMultiSo::CallHasTransitionPros(
 WXCoreSize AndroidBridgeInMultiSo::CallInvokeMeasureFunction(
     const char *page_id, long render_ptr, float width, int width_measure_mode,
     float height, int height_measure_mode) {
-  LOGE("Android Bridge: CallInvokeMeasureFunction");
   return WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -372,7 +346,6 @@ WXCoreSize AndroidBridgeInMultiSo::CallInvokeMeasureFunction(
 
 void AndroidBridgeInMultiSo::CallInvokeLayoutBefore(const char *page_id,
                                                     long render_ptr) {
-  LOGE("Android Bridge: CallInvokeLayoutBefore");
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
@@ -382,7 +355,6 @@ void AndroidBridgeInMultiSo::CallInvokeLayoutBefore(const char *page_id,
 void AndroidBridgeInMultiSo::CallInvokeLayoutAfter(const char *page_id,
                                                    long render_ptr, float width,
                                                    float height) {
-  LOGE("Android Bridge: CallInvokeLayoutAfter");
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
