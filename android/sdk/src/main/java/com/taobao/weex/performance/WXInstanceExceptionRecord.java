@@ -141,13 +141,26 @@ public class WXInstanceExceptionRecord {
             return;
         }
         //2s limit of instance stayTime (case in\quit very fast case)
-        final long DIFF_LIMIT = 2000;
-        long useTime = 2001;
+        final long DIFF_LIMIT_FROM_RENDER_URL = 2000;
+        final long DIFF_LIMIT_FROM_RENDER_TEMPLATE = 1000;
+
+        long curTime = WXUtils.getFixUnixTime();
         Long startRequestTime = mStageMap.get(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
+        long useTime;
+        String useTimeForm;
+        boolean shouldReportByUseTime;
         if (null != startRequestTime) {
-            useTime = WXUtils.getFixUnixTime() - startRequestTime;
+            useTime = curTime - startRequestTime;
+            shouldReportByUseTime = useTime >= DIFF_LIMIT_FROM_RENDER_URL;
+            useTimeForm = WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START;
+        }else {
+            Long startRenderTemplateTime = mStageMap.get(WXInstanceApm.KEY_PAGE_STAGES_RENDER_ORGIGIN);
+            useTime = null != startRenderTemplateTime?curTime - startRenderTemplateTime:curTime;
+            shouldReportByUseTime = useTime >= DIFF_LIMIT_FROM_RENDER_TEMPLATE;
+            useTimeForm = WXInstanceApm.KEY_PAGE_STAGES_RENDER_ORGIGIN;
         }
-        if (useTime < DIFF_LIMIT) {
+
+        if (!shouldReportByUseTime){
             return;
         }
 
@@ -164,6 +177,7 @@ public class WXInstanceExceptionRecord {
         flagMap.put("wxHasDegrade",String.valueOf(hasDegrade.get()));
         flagMap.put("wxHasReportScreenEmpty",String.valueOf(mHasReportScreenEmpty));
         flagMap.put("wxUseTime", String.valueOf(useTime));
+        flagMap.put("wxUseTimeForm", useTimeForm);
 
         WXExceptionUtils.commitCriticalExceptionRT(
             instanceId,
