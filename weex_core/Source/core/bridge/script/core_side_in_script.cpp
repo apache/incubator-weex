@@ -373,7 +373,7 @@ const char *CoreSideInScript::CallT3DLinkNative(int type, const char *arg) {
 #endif
 }
 
-void CoreSideInScript::PostMessage(const char *vm_id, const char *data) {
+void CoreSideInScript::PostMessage(const char *vm_id, const char *data, int dataLength) {
 
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
@@ -387,10 +387,10 @@ void CoreSideInScript::PostMessage(const char *vm_id, const char *data) {
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
-      ->PostMessage(vm_id, data);
+      ->PostMessage(vm_id, data,dataLength);
 }
 
-void CoreSideInScript::DispatchMessage(const char *client_id, const char *data,
+void CoreSideInScript::DispatchMessage(const char *client_id, const char *data, int dataLength,
                                        const char *callback,
                                        const char *vm_id) {
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
@@ -409,7 +409,7 @@ void CoreSideInScript::DispatchMessage(const char *client_id, const char *data,
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
-      ->DispatchMessage(client_id, data, callback, vm_id);
+      ->DispatchMessage(client_id, data, dataLength, callback, vm_id);
 }
 
 void CoreSideInScript::ReportException(const char *page_id, const char *func,

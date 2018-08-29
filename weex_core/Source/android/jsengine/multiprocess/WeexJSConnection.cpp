@@ -67,7 +67,7 @@ static bool checkOrCreateCrashFile(const char* file) {
     flags |= O_RDWR;
     int fd = ::open(file, flags, mode);
     if (fd < 0) {
-        LOGE(" checkOrCreateCrashFile failed, can not create or use crash file! ");
+        LOGE(" checkOrCreateCrashFile failed, can not create or use crash file errno: %s \n", strerror(errno));
         return false;
     }
     return true;
@@ -128,8 +128,9 @@ WeexJSConnection::WeexJSConnection()
     } else {
         g_crashFileName = SoUtils::crash_file_path();
     }
-  } else {
     g_crashFileName += "/crash_dump.log";
+  } else {
+    g_crashFileName += "nullfilename";
   }
   LOGE("WeexJSConnection g_crashFileName: %s\n", g_crashFileName.c_str());
 }

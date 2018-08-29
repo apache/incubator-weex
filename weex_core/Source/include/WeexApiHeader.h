@@ -154,10 +154,10 @@ typedef const char *(*FuncCallGCanvasLinkNative)(const char *pageId, int type, c
 
 typedef const char *(*FuncT3dLinkNative)(int type, const char *args);
 
-typedef void (*FuncCallHandlePostMessage)(const char *vimId, const char *data);
+typedef void (*FuncCallHandlePostMessage)(const char *vimId, const char *data, int dataLength);
 
 typedef void
-(*FuncCallDIspatchMessage)(const char *clientId, const char *data, const char *callback, const char *vmId);
+(*FuncCallDIspatchMessage)(const char *clientId, const char *data, int dataLength, const char *callback, const char *vmId);
 
 
 typedef struct FunctionsExposedByCore {

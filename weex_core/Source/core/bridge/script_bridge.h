@@ -73,8 +73,8 @@ class ScriptBridge {
     virtual void ClearInterval(const char *page_id,
                                const char *callback_id) = 0;
     virtual const char *CallT3DLinkNative(int type, const char *arg) = 0;
-    virtual void PostMessage(const char *vim_id, const char *data) = 0;
-    virtual void DispatchMessage(const char *client_id, const char *data,
+    virtual void PostMessage(const char *vim_id, const char *data, int dataLength) = 0;
+    virtual void DispatchMessage(const char *client_id, const char *data, int dataLength,
                                  const char *callback, const char *vm_id) = 0;
     virtual void ReportException(const char *page_id, const char *func,
                                  const char *exception_string) = 0;

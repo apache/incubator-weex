@@ -344,15 +344,15 @@ int AndroidSide::HasTransitionPros(
   }
 }
 
-void AndroidSide::PostMessage(const char *vm_id, const char *data) {
+void AndroidSide::PostMessage(const char *vm_id, const char *data, int dataLength) {
   JNIEnv *env = base::android::AttachCurrentThread();
-  wml_bridge_->PostMessage(env, vm_id, data);
+  wml_bridge_->PostMessage(env, vm_id, data, dataLength);
 }
 
 void AndroidSide::DispatchMessage(const char *client_id,
-                                  const char *data, const char *callback, const char *vm_id) {
+                                  const char *data, int dataLength, const char *callback, const char *vm_id) {
   JNIEnv *env = base::android::AttachCurrentThread();
-  wml_bridge_->DispatchMessage(env, client_id, data, callback, vm_id);
+  wml_bridge_->DispatchMessage(env, client_id,  data, dataLength, callback, vm_id);
 }
 
 jobject AndroidSide::getMeasureFunc(const char *pageId, jlong renderObjectPtr) {

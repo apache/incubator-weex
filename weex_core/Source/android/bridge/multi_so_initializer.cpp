@@ -49,7 +49,7 @@ bool MultiSoInitializer::Init(
     LOGE("load %s failed,error=%s\n", SoUtils::jss_so_name(), error);
     ReportNativeInitStatus("-1005", error);
     // try again use current path
-    dlclose(handle);
+    //dlclose(handle);
     return false;
   }
 

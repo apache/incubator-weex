@@ -110,9 +110,9 @@ namespace WeexCore
     
         int HasTransitionPros(const char* pageId, const char* ref,
                                           std::vector<std::pair<std::string, std::string>> *style) override;
-        void PostMessage(const char* vm_id, const char* data) override {};
-        void DispatchMessage(const char* client_id, const char* vm_id,
-                             const char* data, const char* callback) override {};
+        void PostMessage(const char* vm_id, const char* data, int dataLength) override {};
+        void DispatchMessage(const char* client_id,
+                             const char* data, int dataLength, const char* callback, const char* vm_id) override {};
     };
     
     class WXCoreMeasureFunctionBridge : public MeasureFunctionAdapter

@@ -801,11 +801,11 @@ std::unique_ptr<IPCResult> AndroidBridgeInMultiProcess::PostMessage(
     IPCArguments* arguments) {
   const char* vm_id = getArumentAsCStr(arguments, 0);
   const char* data = getArumentAsCStr(arguments, 1);
-
+  int dataLength = getArumentAsCStrLen(arguments, 1);
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
-      ->PostMessage(vm_id, data);
+      ->PostMessage(vm_id, data,dataLength);
   delete[] vm_id;
   delete[] data;
   return createVoidResult();
@@ -816,12 +816,15 @@ std::unique_ptr<IPCResult> AndroidBridgeInMultiProcess::DispatchMessage(
   const char* client_id = getArumentAsCStr(arguments, 0);
   const char* vm_id = getArumentAsCStr(arguments, 1);
   const char* data = getArumentAsCStr(arguments, 2);
+  int dataLength = getArumentAsCStrLen(arguments, 2);
   const char* callback = getArumentAsCStr(arguments, 3);
+
+  
 
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
-      ->DispatchMessage(client_id, vm_id, data, callback);
+      ->DispatchMessage(client_id, data, dataLength, callback, vm_id);
   delete[] client_id;
   delete[] vm_id;
   delete[] data;
