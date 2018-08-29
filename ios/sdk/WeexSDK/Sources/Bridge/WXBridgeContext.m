@@ -408,7 +408,7 @@ _Pragma("clang diagnostic pop") \
         WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
 
         WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge createDataRenderInstance:instanceIdString template:jsBundleString options:options];
+            [WXCoreBridge createDataRenderInstance:instanceIdString template:jsBundleString options:options data:data];
             WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
         });
         return;

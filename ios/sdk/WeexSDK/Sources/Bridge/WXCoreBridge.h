@@ -137,9 +137,7 @@ namespace WeexCore
 
 + (void)install;
 
-+ (void)createDataRenderInstance:(NSString *)pageId
-                        template:(NSString *)temp
-                         options:(NSDictionary *)options;
++ (void)createDataRenderInstance:(NSString *)pageId template:(NSString *)temp options:(NSDictionary *)options data:(id)data;
 
 + (void)destroyDataRenderInstance:(NSString *)pageId;
 

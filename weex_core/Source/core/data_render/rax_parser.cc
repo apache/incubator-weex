@@ -461,6 +461,9 @@ Handle<Expression> RAXParser::ParsePrimary()
     else if (tok == Token::SUPER) {
         result = builder()->NewIdentifier(lex()->CurrentToken().view());
     }
+    else if (tok == Token::UNDEFINED) {
+        result = builder()->NewUndefinedConstant();
+    }
     else {
         throw SyntaxError(lex()->CurrentToken(), "expected a primary expression");
     }
@@ -544,7 +547,8 @@ Handle<Expression> RAXParser::ParseObjectConstant()
         }
         else if (Peek() == Token::LPAREN) {
             prop = ParseObjectMethod(name);
-        } else
+        }
+        else
             // TODO: create a getter list in the ProxyObject class that will keep track of getters
             // and setters
             if (Peek() == Token::IDENTIFIER && (name == "get" || name == "set")) {
@@ -553,6 +557,9 @@ Handle<Expression> RAXParser::ParseObjectConstant()
                 prop = ParseObjectMethod(name);
             }
         
+        if (prop == NULL) {
+            prop = builder()->NewIdentifier(name);
+        }
         proxy[name] = Handle<Expression>(prop);
         // next token should be a ',' or '}'
         tok = Peek();

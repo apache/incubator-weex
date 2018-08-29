@@ -154,7 +154,6 @@ size_t GetValueMapSize(Value &o) {
   return GetMapSize(ObjectValue<Table>(&o));
 }
     
-#ifdef DEBUG
 json11::Json TableToJson(Table *table);
     
 json11::Json ArrayToJson(Array *array) {
@@ -203,7 +202,6 @@ std::string TableToString(Table *table) {
     return json_string;
 }
     
-#endif
 
 }  // namespace data_render
 }  // namespace core

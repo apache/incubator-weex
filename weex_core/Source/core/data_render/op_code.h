@@ -32,17 +32,16 @@ enum OpCode {
   
   OP_NEWCLASS,   // A Bx R(A) = New Class[B]
   OP_GETCLASS,   // A B C R(A) = B->C
-  OP_GETCLASSVAR,
-  OP_SETCLASSVAR,
+  OP_GETMEMBER,
+  OP_SETMEMBER,
   OP_GETSUPER,   // A B C     R(A) = super[B] C = super func
   
-  OP_SETVALUE,     // A B C R(A) = B->C
-  OP_GETVALUE,     // A B C R(A) = B->C
+  OP_SETOUTVAR,     // A B C R(A) = B->C
+  OP_GETOUTVAR,     // A B C R(A) = B->C
 
     
   OP_NEWTABLE,  // A B C   R(A) = {} (size = B,C)
   OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)
-  OP_GETTABLE,  //	A B C	R(A) = R(B)[R(C)]
 
   OP_SETARRAY,  //    A B C    R(A)[R(B)] = RK(C)
   OP_GETARRAY,  //    A B C    R(A) = R(B)[R(C)]
@@ -66,8 +65,11 @@ enum OpCode {
   OP_JMP,   //	A Bx	if (!R(A)) pc += Bx
   OP_GOTO,  //   Ax      pc = Ax
   OP_EQ,    //	A B C	R(A) = R(B) == R(C)
+  OP_SEQ,
   OP_LT,    //	A B C	R(A) = R(A) <  R(B)
-  OP_LE,    //	A B C	R(A) = R(A) <= R(B)
+  OP_LTE,
+  OP_GT,
+  OP_GTE,
   OP_AND,
 
   OP_CALL,     //	A B C	R(A) = R(B)(R(B+1), ... ,R(B+C-1))

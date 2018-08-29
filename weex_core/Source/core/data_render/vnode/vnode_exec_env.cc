@@ -44,7 +44,7 @@ json11::Json ParseValue2Json(const Value& value);
 static Value Log(ExecState* exec_state) {
   size_t length = exec_state->GetArgumentCount();
   for (int i = 0; i < length; ++i) {
-    Value* a = exec_state->GetArgument(i);
+    Value *a = exec_state->GetArgument(i);
     switch (a->type) {
       case Value::Type::NUMBER:
         std::cout << a->n << "\n";
@@ -54,6 +54,9 @@ static Value Log(ExecState* exec_state) {
         break;
       case Value::Type::STRING:
         std::cout << a->str->c_str() << "\n";
+        break;
+      case Value::Type::TABLE:
+        std::cout << TableToString(ObjectValue<Table>(a)) << "\n";
         break;
       default:
         break;
@@ -457,6 +460,7 @@ void VNodeExecEnv::InitInitDataValue(ExecState* state,
     LOGE("error parsing init data");
     Value value = state->table_factory()->CreateTable();
     state->global()->Set("_init_data", value);
+    state->global()->Set("__weex_data__", value);
     return;
   }
 

@@ -155,55 +155,74 @@ void VNodeRenderManager::InitVM() {
 
 void VNodeRenderManager::CreatePage(const std::string& input,
                                     const std::string& page_id,
+                                    const std::string& options,
                                     const std::string& init_data) {
-  InitVM();
-  auto start = std::chrono::steady_clock::now();
-
-  ExecState* exec_state = new ExecState(g_vm);
-  exec_states_.insert({page_id, exec_state});
-
-  VNodeExecEnv::InitCFuncEnv(exec_state);
-
-  std::string err;
-  exec_state->context()->raw_json() = json11::Json::parse(input, err);
-
-  VNodeExecEnv::InitGlobalValue(exec_state);
-  VNodeExecEnv::InitInitDataValue(exec_state, init_data);
-  VNodeExecEnv::InitStyleList(exec_state);
-
-  exec_state->context()->page_id(page_id);
-  //auto compile_start = std::chrono::steady_clock::now();
-  exec_state->Compile();
-
-  //auto exec_start = std::chrono::steady_clock::now();
-  exec_state->Execute();
-
-  CreatePageInternal(page_id, exec_state->context()->root());
-  exec_state->context()->Reset();
-
-  auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(
-      std::chrono::steady_clock::now() - start);
-
-  LOGE("DATA_RENDER, All time %lld", duration_post.count());
+    do {
+        InitVM();
+        auto start = std::chrono::steady_clock::now();
+        ExecState *exec_state = new ExecState(g_vm);
+        exec_states_.insert({page_id, exec_state});
+        VNodeExecEnv::InitCFuncEnv(exec_state);
+        std::string err;
+        json11::Json json = json11::Json::parse(input, err);
+        if (!err.empty() || json.is_null()) {
+            exec_state->context()->raw_source() = input;
+        }
+        else {
+            exec_state->context()->raw_json() = json;
+        }
+        VNodeExecEnv::InitGlobalValue(exec_state);
+        if (init_data.length() > 0) {
+            VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+        }
+        VNodeExecEnv::InitStyleList(exec_state);
+        exec_state->context()->page_id(page_id);
+        //auto compile_start = std::chrono::steady_clock::now();
+        exec_state->Compile(err);
+        if (!err.empty()) {
+            break;
+        }
+        //auto exec_start = std::chrono::steady_clock::now();
+        exec_state->Execute(err);
+        if (!err.empty()) {
+            break;
+        }
+        if (exec_state->context()->root() == NULL) {
+            break;
+        }
+        CreatePageInternal(page_id, exec_state->context()->root());
+        exec_state->context()->Reset();
+        auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+        
+        LOGE("DATA_RENDER, All time %lld", duration_post.count());
+        
+    } while (0);
 }
 bool VNodeRenderManager::RefreshPage(const std::string& page_id,
                                      const std::string& init_data) {
-  auto it = exec_states_.find(page_id);
-  if (it == exec_states_.end()) {
+    do {
+        auto it = exec_states_.find(page_id);
+        if (it == exec_states_.end()) {
+            break;
+        }
+        ExecState *exec_state = it->second;
+        VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+        std::string err;
+        exec_state->Execute(err);  // refresh root
+        if (!err.empty()) {
+            break;
+        }
+        RefreshPageInternal(page_id, exec_state->context()->root());
+        exec_state->context()->Reset();
+        WeexCore::WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->platform_side()
+        ->RefreshFinish(page_id.c_str(), nullptr, "");
+        return true;
+        
+    } while (0);
+    
     return false;
-  }
-  ExecState* exec_state = it->second;
-
-  VNodeExecEnv::InitInitDataValue(exec_state, init_data);
-
-  exec_state->Execute();  // refresh root
-  RefreshPageInternal(page_id, exec_state->context()->root());
-  exec_state->context()->Reset();
-  WeexCore::WeexCoreManager::Instance()
-      ->getPlatformBridge()
-      ->platform_side()
-      ->RefreshFinish(page_id.c_str(), nullptr, "");
-  return true;
 }
 
 bool VNodeRenderManager::ClosePage(const std::string& page_id) {

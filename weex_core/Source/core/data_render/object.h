@@ -240,11 +240,17 @@ typedef struct ClassInstance {
 */
 int ToInteger(const Value *o, const int &mode, int64_t &v);
 
-bool ValueEqulas(const Value *a, const Value *b);
+bool ValueEquals(const Value *a, const Value *b);
 
-bool ValueLE(const Value *a, const Value *b);
-
+bool ValueStrictEquals(const Value *a, const Value *b);
+    
 bool ValueLT(const Value *a, const Value *b);
+    
+bool ValueLTE(const Value *a, const Value *b);
+    
+bool ValueGT(const Value *a, const Value *b);
+
+bool ValueGTE(const Value *a, const Value *b);
     
 bool ValueAND(const Value *a, const Value *b);
 
@@ -270,6 +276,18 @@ inline bool NumLT(const double &d1, const double &d2) {
   return d1 < d2;
 }
 
+inline bool NumLTE(const double &d1, const double &d2) {
+    return d1 <= d2;
+}
+
+inline bool NumGT(const double &d1, const double &d2) {
+    return d1 > d2;
+}
+    
+inline bool NumGTE(const double &d1, const double &d2) {
+    return d1 >= d2;
+}
+    
 inline int Number2Int(const double &n, int64_t &p) {
   if (n >= MININTEGER && n < -MININTEGER) {
     p = n;

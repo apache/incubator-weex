@@ -48,13 +48,13 @@ ExecState::ExecState(VM* vm)
       class_factory_(new ClassFactory()),
       global_variables_() {}
 
-void ExecState::Compile() {
+void ExecState::Compile(std::string& err) {
 
 #if DEBUG
   TimeCost tc("Compile");
 #endif
+  err.clear();
   CodeGenerator generator(this);
-  std::string err;
   if (!context()->raw_json().is_null()) {
       ParseResult result = Parser::Parse(context()->raw_json(),err);
       generator.Visit(result.expr().get(), nullptr);
@@ -69,11 +69,11 @@ void ExecState::Compile() {
       catch (std::exception &e) {
           auto error = static_cast<Error *>(&e);
           if (error) {
+              err = error->what();
               std::cerr << error->what() << std::endl;
           }
           return;
       }
-      std::cout << "Parsed correctly" << std::endl;
       if (expr->IsChunkStatement()) {
           try {
               generator.Visit(expr->AsChunkStatement().get(), nullptr);
@@ -81,6 +81,7 @@ void ExecState::Compile() {
           catch (std::exception &e) {
               auto error = static_cast<Error *>(&e);
               if (error) {
+                  err = error->what();
                   std::cerr << error->what() << std::endl;
               }
               return;
@@ -89,10 +90,11 @@ void ExecState::Compile() {
   }
 }
 
-void ExecState::Execute() {
+void ExecState::Execute(std::string& err) {
 #if DEBUG
   TimeCost tc("Execute");
 #endif
+  err.clear();
   Value chunk;
   chunk.type = Value::Type::FUNC;
   chunk.f = func_state_.get();
@@ -102,6 +104,7 @@ void ExecState::Execute() {
   } catch (std::exception &e) {
       auto error = static_cast<Error *>(&e);
       if (error) {
+          err = error->what();
           std::cerr << error->what() << std::endl;
       }
       return;

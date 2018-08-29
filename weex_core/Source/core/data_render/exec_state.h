@@ -109,8 +109,8 @@ class ExecState {
  public:
   ExecState(VM* vm);
   virtual ~ExecState() {}
-  void Compile();
-  void Execute();
+  void Compile(std::string& error);
+  void Execute(std::string& error);
   const Value Call(const std::string& func_name,
                     const std::vector<Value>& params);
 

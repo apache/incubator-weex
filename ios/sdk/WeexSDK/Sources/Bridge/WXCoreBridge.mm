@@ -734,13 +734,12 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     });
 }
 
-+ (void)createDataRenderInstance:(NSString *)pageId
-                        template:(NSString *)jsBundleString
-                         options:(NSDictionary *)options
++ (void)createDataRenderInstance:(NSString *)pageId template:(NSString *)jsBundleString options:(NSDictionary *)options  data:(id)data
 {
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
     NSString *optionsString = [WXUtility JSONString:options];
-    node_manager->CreatePage([jsBundleString UTF8String], [pageId UTF8String], [optionsString UTF8String]);
+    NSString *dataString = [WXUtility JSONString:data];
+    node_manager->CreatePage([jsBundleString UTF8String], [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "");
 }
 
 + (void)destroyDataRenderInstance:(NSString *)pageId

@@ -193,11 +193,11 @@ private:
 class ArgumentList : public Expression {
  public:
   ArgumentList(Handle<ExpressionList> args)
-      : Expression(), args_{std::move(args)} {}
+    : Expression(), args_{std::move(args)} {}
   ArgumentList(Position &loc, Scope *scope, Handle<ExpressionList> args)
     : Expression(loc, scope), args_{ std::move(args) } { }
   Handle<ExpressionList> args() { return args_; }
-  size_t length() { return args()->Size(); }
+    size_t length() { return args() ? args()->Size() : 0; }
 
   DEFINE_NODE_TYPE(ArgumentList, Expression);
 
