@@ -300,7 +300,8 @@ WX_EXPORT_METHOD(@selector(save:))
 {
     if (_borderTopLeftRadius == _borderTopRightRadius && _borderTopRightRadius == _borderBottomLeftRadius && _borderBottomLeftRadius == _borderBottomRightRadius)
     {
-        _layer.cornerRadius = _borderBottomLeftRadius;
+        WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:self.calculatedFrame topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+        _layer.cornerRadius = borderRect.radii.topLeft;
         return;
     }
     [self _clipsToBounds];
