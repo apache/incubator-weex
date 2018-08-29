@@ -442,6 +442,9 @@ struct ASTParser final {
       //setClassList(child, class_name);
       AddSetClassListCall(json, child_identifier, component_name);
     }
+    for (int i = 0; i < control_exprs.size(); i++) {
+        stacks_.pop_back();
+    }
     return true;
   }
   Handle<Expression> ParseNodeId(const json11::Json& body,

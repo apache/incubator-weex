@@ -298,7 +298,7 @@ void CodeGenerator::Visit(IfElseStatement *node, void *data) {
     func_state->ReplaceInstruction(else_slot, CREATE_Ax(OP_GOTO, end_index));
 }
 
-void CodeGenerator::Visit(ForStatement* node, void* data) {
+void CodeGenerator::Visit(ForStatement *node, void *data) {
   BlockScope for_scope(this);  // for var index = 0;
 
   if (node->init().get() != NULL) {
@@ -849,13 +849,10 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
     }
 }
 
-void CodeGenerator::Visit(Identifier *node, void* data) {
-
-  long reg_a = data == nullptr ? block_->NextRegisterId()
-                               : *static_cast<long*>(data);
+void CodeGenerator::Visit(Identifier *node, void *data) {
+  long reg_a = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
   if (reg_a >= 0) {
     FuncState *state = func_->func_state();
-
     long reg_b = block_->FindRegisterId(node->GetName());
     if (reg_b >= 0) {
       state->AddInstruction(CREATE_ABC(OP_MOVE, reg_a, reg_b, 0));

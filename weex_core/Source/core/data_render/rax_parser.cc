@@ -864,11 +864,15 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
         Advance();
         while (true) {
             tok = Peek();
-            if (tok != Token::LBRACE && tok != Token::LT && tok != Token::STRING) {
+            if (tok != Token::LBRACE && tok != Token::LT && tok != Token::STRING && tok != Token::IDENTIFIER) {
                 throw SyntaxError(lex()->CurrentToken(), "expected a string name");
                 break;
             }
-            if (tok == Token::STRING) {
+            if (tok == Token::IDENTIFIER) {
+                expr->AsJSXNodeExpression()->childrens().push_back(builder()->NewStringConstant(GetIdentifierName()));
+                Advance();
+            }
+            else if (tok == Token::STRING) {
                 expr->AsJSXNodeExpression()->childrens().push_back(ParseExpression());
             }
             else if (tok == Token::LBRACE) {

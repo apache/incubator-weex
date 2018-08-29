@@ -78,20 +78,26 @@ static Value GetTableSize(ExecState* exec_state) {
   return Value(static_cast<int64_t>(-1));
 }
 
-static Value Merge(ExecState* exec_state) {
-  size_t length = exec_state->GetArgumentCount();
-  if (length != 2) {
-    return Value();
-  }
-  Value* lvalue = exec_state->GetArgument(0);
-  Value* rvalue = exec_state->GetArgument(1);
-  if (!IsTable(lvalue) || !IsTable(rvalue)) {
-    return Value();
-  }
-  Value new_value = exec_state->table_factory()->CreateTable();
-  TableMapAddAll(*lvalue, new_value);
-  TableMapAddAll(*rvalue, new_value);
-  return new_value;
+static Value Merge(ExecState *exec_state) {
+    size_t length = exec_state->GetArgumentCount();
+    if (length != 2) {
+        return Value();
+    }
+    Value *lhs = exec_state->GetArgument(0);
+    Value *rhs = exec_state->GetArgument(1);
+    if (!IsTable(lhs) && !IsTable(rhs)) {
+        return Value();
+    }
+    Value new_value = exec_state->table_factory()->CreateTable();
+    if (IsTable(lhs)) {
+        TableMapAddAll(*lhs, new_value);
+        LOGD("[Merge]:lhs:%s\n", TableToString(ObjectValue<Table>(lhs)).c_str());
+    }
+    if (IsTable(rhs)) {
+        TableMapAddAll(*rhs, new_value);
+        LOGD("[Merge]:rhs:%s\n", TableToString(ObjectValue<Table>(rhs)).c_str());
+    }
+    return new_value;
 }
 
 static Value ToString(ExecState* exec_state) {
@@ -170,7 +176,7 @@ static Value AppendUrlParam(ExecState* exec_state) {
 }
 
 // createElement("tag_name", "id");
-static Value CreateElement(ExecState* exec_state) {
+static Value CreateElement(ExecState *exec_state) {
     Value *arg_ref = exec_state->GetArgument(1);
     std::string ref;
     if (IsString(arg_ref)) {
@@ -452,8 +458,7 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   global->Add("_data_main", value);
 }
 
-void VNodeExecEnv::InitInitDataValue(ExecState* state,
-                                     const std::string& init_data_str) {
+void VNodeExecEnv::InitInitDataValue(ExecState *state, const std::string& init_data_str) {
   std::string err;
   const json11::Json& json = json11::Json::parse(init_data_str, err);
   if (!err.empty()) {
