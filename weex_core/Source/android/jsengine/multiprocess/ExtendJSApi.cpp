@@ -36,7 +36,11 @@ namespace WeexCore {
   }
 
   const char *CallGCanvasFun(const char *conextId, int x, const char *args) {
-    return gCanvasFunc(conextId, x, args);
+    if(gCanvasFunc != nullptr){
+      return gCanvasFunc(conextId, x, args);
+    } else {
+      return nullptr;
+    }
   }
 
   extern "C" void Inject_T3dFunc(FunTypeT3d fp) {
@@ -45,7 +49,11 @@ namespace WeexCore {
   }
 
 const char* CallT3dFunc(int x, const char* args) {
-  return t3dFunc(x, args);
+ if(t3dFunc != nullptr) {
+    return t3dFunc(x, args);
+ } else {
+    return nullptr;
+ }
 }
 
 }
