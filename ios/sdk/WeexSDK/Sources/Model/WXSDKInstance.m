@@ -180,7 +180,8 @@ typedef enum : NSUInteger {
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p; id = %@; rootView = %@; url= %@>", NSStringFromClass([self class]), self, _instanceId, _rootView, _scriptURL];
+    CGRect frame = _rootView.frame;
+    return [NSString stringWithFormat:@"<%@: %p; id = %@; rootView = %p; rootView frame = (%f, %f, %f, %f); url= %@>", NSStringFromClass([self class]), self, _instanceId, (__bridge void*)_rootView, frame.origin.x, frame.origin.y, frame.size.width, frame.size.height, _scriptURL];
 }
 
 #pragma mark Public Mehtods
