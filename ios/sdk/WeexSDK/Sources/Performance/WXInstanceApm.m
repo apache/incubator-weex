@@ -88,6 +88,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 @property (nonatomic,strong) NSString* instanceId;
 @property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStatsMap;
 @property (nonatomic,assign) BOOL isRecord;
+@property (nonatomic,assign) BOOL isEnd;
 @property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStageMap;
 @property (nonatomic,strong) NSMutableArray<WXJSExceptionInfo*>* errorList;
 @end
@@ -190,9 +191,10 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) endRecord;
 {
-    if (nil == _apmProtocolInstance) {
+    if (nil == _apmProtocolInstance || self.isEnd) {
         return;
     }
+    self.isEnd = YES;
     
     [self onStage:KEY_PAGE_STAGES_DESTROY];
     [self.apmProtocolInstance onEnd];
