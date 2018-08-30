@@ -70,6 +70,10 @@
 {
     WXAssertComponentThread();
     
+    if (self.flexCssNode == nullptr) {
+        return;
+    }
+    
     if (flexIsUndefined(self.flexCssNode->getStyleWidth())) {
         self.flexCssNode->setStyleWidth(self.supercomponent.flexCssNode->getLayoutWidth(), NO);
     }

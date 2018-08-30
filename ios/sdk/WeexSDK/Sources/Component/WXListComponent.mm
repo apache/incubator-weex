@@ -352,6 +352,9 @@
 
 - (float)headerWidthForLayout:(WXHeaderComponent *)cell
 {
+    if (self.flexCssNode == nullptr) {
+        return 0.0f;
+    }
     return self.flexCssNode->getStyleWidth();
 }
 
@@ -440,6 +443,9 @@
 
 - (float)containerWidthForLayout:(WXCellComponent *)cell
 {
+    if (self.flexCssNode == nullptr) {
+        return 0.0f;
+    }
     return self.flexCssNode->getStyleWidth();
 }
 

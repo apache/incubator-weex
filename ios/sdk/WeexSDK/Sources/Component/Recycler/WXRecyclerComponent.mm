@@ -469,6 +469,9 @@ typedef enum : NSUInteger {
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView contentWidthForLayout:(UICollectionViewLayout *)collectionViewLayout
 {
+    if (self.flexCssNode == nullptr) {
+        return 0.0f;
+    }
     return self.flexCssNode->getLayoutWidth();
 }
 
@@ -639,6 +642,10 @@ typedef enum : NSUInteger {
 
 - (void)_fillPadding
 {
+    if (self.flexCssNode == nullptr) {
+        return;
+    }
+    
     UIEdgeInsets padding = {
             WXFloorPixelValue(self.flexCssNode->getPaddingTop() + self.flexCssNode->getBorderWidthTop()),
             WXFloorPixelValue(self.flexCssNode->getPaddingLeft() + self.flexCssNode->getBorderWidthLeft()),

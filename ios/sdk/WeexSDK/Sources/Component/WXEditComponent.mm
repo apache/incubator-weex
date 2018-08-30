@@ -486,6 +486,10 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 
 -(void)updatePattern
 {
+    if (self.flexCssNode == nullptr) {
+        return;
+    }
+    
         UIEdgeInsets padding_flex = UIEdgeInsetsMake(
                                                      self.flexCssNode->getPaddingTop(),
                                                      self.flexCssNode->getPaddingLeft(),
@@ -509,22 +513,30 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 {
     __weak typeof(self) weakSelf = self;
     return ^CGSize (CGSize constrainedSize) {
+        __strong typeof(self) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return CGSizeZero;
+        }
+        
+        if (strongSelf.flexCssNode == nullptr) {
+            return CGSizeZero;
+        }
         
         CGSize computedSize = [[[NSString alloc] init]sizeWithAttributes:nil];
-            if (!isnan(weakSelf.flexCssNode->getMinWidth())) {
-                computedSize.width = MAX(computedSize.width, weakSelf.flexCssNode->getMinWidth());
+            if (!isnan(strongSelf.flexCssNode->getMinWidth())) {
+                computedSize.width = MAX(computedSize.width, strongSelf.flexCssNode->getMinWidth());
             }
             
-            if (!isnan(weakSelf.flexCssNode->getMaxWidth())) {
-                computedSize.width = MIN(computedSize.width, weakSelf.flexCssNode->getMaxWidth());
+            if (!isnan(strongSelf.flexCssNode->getMaxWidth())) {
+                computedSize.width = MIN(computedSize.width, strongSelf.flexCssNode->getMaxWidth());
             }
             
-            if (!isnan(weakSelf.flexCssNode->getMinHeight())) {
-                computedSize.height = MAX(computedSize.height, weakSelf.flexCssNode->getMinHeight());
+            if (!isnan(strongSelf.flexCssNode->getMinHeight())) {
+                computedSize.height = MAX(computedSize.height, strongSelf.flexCssNode->getMinHeight());
             }
             
-            if (!isnan(weakSelf.flexCssNode->getMaxHeight())) {
-                computedSize.height = MIN(computedSize.height, weakSelf.flexCssNode->getMaxHeight());
+            if (!isnan(strongSelf.flexCssNode->getMaxHeight())) {
+                computedSize.height = MIN(computedSize.height, strongSelf.flexCssNode->getMaxHeight());
             }
         return (CGSize) {
             WXCeilPixelValue(computedSize.width),
