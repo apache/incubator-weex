@@ -359,8 +359,9 @@ WeexJSResult ScriptSideInMultiProcess::ExecJSWithResult(
       return WeexJSResult();
     }
     WeexJSResult weex_js_result;
-    weex_js_result.data = const_cast<char *>(result->getByteArrayContent());
     weex_js_result.length = result->getByteArrayLength();
+    weex_js_result.data.reset(new char[weex_js_result.length]);
+    memcpy(weex_js_result.data.get(), result->getByteArrayContent(),result->getByteArrayLength());
     return weex_js_result;
   } catch (IPCException &e) {
     LOGE("%s", e.msg());

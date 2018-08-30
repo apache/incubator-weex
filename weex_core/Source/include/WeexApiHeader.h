@@ -49,24 +49,10 @@ struct WeexByteArray {
     char content[1];
 };
 
-
 struct WeexJSResult{
-    char* data = nullptr;
-    int  length = 0;
-    bool fromMalloc = false;
-    bool fromNew = false;
+    std::unique_ptr<char[]> data;
+    int length = 0;
 };
-
-inline void WeexJSResultDataFree(WeexJSResult& result){
-    if(result.fromMalloc){
-        free(result.data);
-        return;
-    }
-    if(result.fromNew){
-        delete[] result.data;
-        return;
-    }
-}
 
 typedef struct InitFrameworkParams {
     WeexByteArray *type;

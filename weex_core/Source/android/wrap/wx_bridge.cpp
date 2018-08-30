@@ -415,7 +415,7 @@ static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
                              function.getChars(), params);
   jbyteArray array = env->NewByteArray(result.length);
   env->SetByteArrayRegion(array, 0, result.length,
-                          reinterpret_cast<const jbyte*>(result.data));
+                          reinterpret_cast<const jbyte*>(result.data.get()));
   freeParams(params);
   return array;
 }
