@@ -518,7 +518,11 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         NSUInteger rangeLength = range.length;
         
         NSUInteger newLength = oldLength - rangeLength + replacementLength;
-        
+        if (newLength <= oldLength) {
+            // deleting, we should allow delete
+            return YES;
+        }
+
         return newLength <= [_maxLength integerValue] ;
     }
     return YES;
