@@ -187,7 +187,17 @@ static Value CreateElement(ExecState *exec_state) {
         os << IntValue(arg_ref) ;
         ref = "vn_" + os.str();
     }
-    VNode *node = new VNode(ref, exec_state->GetArgument(0)->str->c_str());
+    std::string tag_name = exec_state->GetArgument(0)->str->c_str();
+    VNode *node = NULL;
+    if (tag_name == "root") {
+        node = new VNode(ref, "div");
+        if (exec_state->context()->root() == nullptr) {
+            exec_state->context()->set_root(node);
+        }
+    }
+    else {
+        node = new VNode(ref, tag_name);
+    }
     Value result;
     result.type = Value::Type::CPTR;
     result.cptr = node;
@@ -208,7 +218,7 @@ static Value AppendChild(ExecState *exec_state) {
   VNode *parent = exec_state->GetArgument(0)->type == Value::Type::NIL ?
     nullptr : reinterpret_cast<VNode *>(exec_state->GetArgument(0)->cptr);
   Value *childrens = exec_state->GetArgument(1);
-  if (IsString(childrens) && parent->tag_name() != "span") {
+  if (IsString(childrens) && parent->tag_name() != "text") {
       throw VMExecError("AppendChild only support string for span");
   }
   else if (!IsArray(childrens) && !IsCptr(childrens) && !IsString(childrens)) {
@@ -224,9 +234,9 @@ static Value AppendChild(ExecState *exec_state) {
           AppendChild(exec_state, parent, children);
       }
   }
-  else if (IsString(childrens)) {
+  else if (IsString(childrens) && parent) {
       LOGD("[AppendChild]:string:%s\n", CStringValue(childrens));
-      // 平逸补充处理一下
+      parent->SetAttribute("value", CStringValue(childrens));
   }
   else {
       VNode *children = reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);
