@@ -1291,36 +1291,37 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @Override
     public void destroy() {
-
-        if(getHostView() != null){
-            if(mAppearChangeRunnable != null) {
-                getHostView().removeCallbacks(mAppearChangeRunnable);
-                mAppearChangeRunnable = null;
+        synchronized (this){
+            if(getHostView() != null){
+                if(mAppearChangeRunnable != null) {
+                    getHostView().removeCallbacks(mAppearChangeRunnable);
+                    mAppearChangeRunnable = null;
+                }
+                getHostView().removeCallbacks(listUpdateRunnable);
+                if(getHostView().getInnerView() != null){
+                    getHostView().getInnerView().setAdapter(null);
+                }
             }
-            getHostView().removeCallbacks(listUpdateRunnable);
-            if(getHostView().getInnerView() != null){
-                getHostView().getInnerView().setAdapter(null);
+            if(cellDataManager.listData != null){
+                cellDataManager.setListData(null);
             }
+            if(mStickyHelper != null){
+                mStickyHelper = null;
+            }
+            if(mTemplateViewTypes != null){
+                mTemplateViewTypes.clear();
+            }
+            if(mTemplateSources != null){
+                mTemplateSources.clear();
+            }
+            if(mAppearHelpers != null){
+                mAppearHelpers.clear();
+            }
+            if(mDisAppearWatchList != null){
+                mDisAppearWatchList.clear();
+            }
+            super.destroy();
         }
-        if(cellDataManager.listData != null){
-            cellDataManager.setListData(null);
-        }
-        if(mStickyHelper != null){
-            mStickyHelper = null;
-        }
-        if(mTemplateViewTypes != null){
-            mTemplateViewTypes.clear();
-        }
-        if(mTemplateSources != null){
-            mTemplateSources.clear();
-        }
-        if(mAppearHelpers != null){
-            mAppearHelpers.clear();
-        }
-        if(mDisAppearWatchList != null){
-            mDisAppearWatchList.clear();
-        }
-        super.destroy();
     }
 
 
