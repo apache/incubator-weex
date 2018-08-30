@@ -37,7 +37,7 @@ std::string to_string(T value)
   return os.str() ;
 }
 
-void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
+void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
 
 #if DEBUG
   TimeCost tc;
@@ -57,12 +57,17 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
 #endif
 
     switch (op) {
-      case OP_MOVE:
-        LOGD("OP_MOVE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
-        *a = *b;
-        break;
+        case OP_MOVE:
+        {
+            LOGD("OP_MOVE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            *a = *b;
+            if (a->ref) {
+                SetRefValue(a);
+            }
+            break;
+        }
       case OP_LOADNULL:
         a = frame.reg + GET_ARG_A(instruction);
         a->type = Value::Type::NIL;
@@ -86,22 +91,27 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
         break;
       }
 
-      case OP_ADD:
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
-        c = frame.reg + GET_ARG_C(instruction);
-        if (IsString(b) || IsString(c)) {
-          SetSValue(a, StringAdd(exec_state->string_table(), b, c));
-        } else if (IsInt(b) && IsInt(c)) {
-          SetIValue(a, INT_OP(+, IntValue(b), IntValue(c)));
-        } else if (ToNum(b, d1) && ToNum(c, d2)) {
-          SetDValue(a, NUM_OP(+, d1, d2));
-        } else {
-          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_ADD]", b->type, c->type);
-            throw VMExecError("Unspport Type with OP_CODE[OP_ADD]");
+        case OP_ADD:
+        {
+            LOGD("OP_ADD A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            c = frame.reg + GET_ARG_C(instruction);
+            if (IsString(b) || IsString(c)) {
+                SetSValue(a, StringAdd(exec_state->string_table(), b, c));
+            }
+            else if (IsInt(b) && IsInt(c)) {
+                SetIValue(a, INT_OP(+, IntValue(b), IntValue(c)));
+            }
+            else if (ToNum(b, d1) && ToNum(c, d2)) {
+                SetDValue(a, NUM_OP(+, d1, d2));
+            }
+            else {
+                LOGE("Unspport Type[%d,%d] with OP_CODE[OP_ADD]", b->type, c->type);
+                throw VMExecError("Unspport Type with OP_CODE[OP_ADD]");
+            }
+            break;            
         }
-        break;
-
       case OP_SUB:
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);
@@ -557,10 +567,10 @@ void VM::RunFrame(ExecState* exec_state, Frame frame, Value* ret) {
             else if (IsTable(b)) {
                 Value *ret = GetTabValue(reinterpret_cast<Table *>(b->gc), *c);
                 if (!IsNil(ret)) {
-//                    if (IsTable(ret)) {
-//                        Table *table = ObjectValue<Table>(ret);
-//                        LOGD("[OP_GETTABLE]:%s\n", TableToString(table).c_str());
-//                    }
+                    if (IsTable(ret)) {
+                        Table *table = ObjectValue<Table>(ret);
+                        LOGD("[OP_GETMEMBER]:%s\n", TableToString(table).c_str());
+                    }
                     *a = *ret;
                 }
                 else {

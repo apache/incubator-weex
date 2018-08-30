@@ -22,6 +22,8 @@
 #include "core/data_render/exec_state.h"
 #include "core/data_render/vm_mem.h"
 #include "core/data_render/common_error.h"
+#include "core/data_render/table.h"
+#include <base/LogDefines.h>
 
 namespace weex {
 namespace core {
@@ -30,12 +32,14 @@ namespace data_render {
 static Value isArray(ExecState *exec_state);
 static Value push(ExecState *exec_state);
 static Value slice(ExecState *exec_state);
-    
+static Value forEach(ExecState *exec_state);
+
 ClassDescriptor *NewClassArray() {
     ClassDescriptor *array_desc = new ClassDescriptor(nullptr);
     AddClassStaticCFunc(array_desc, "isArray", isArray);
     AddClassCFunc(array_desc, "push", push);
     AddClassCFunc(array_desc, "slice", slice);
+    AddClassCFunc(array_desc, "forEach", forEach);
     return array_desc;
 }
     
@@ -85,6 +89,33 @@ Value GetArray(Array *array, const Value &index) {
     
 Value GetArrayLength(Array *array) {
     return Value((int)array->items.size());
+}
+    
+static Value forEach(ExecState *exec_state) {
+    do {
+        size_t length = exec_state->GetArgumentCount();
+        if (length < 2) {
+            break;
+        }
+        Value *array = exec_state->GetArgument(0);
+        if (!IsArray(array)) {
+            throw VMExecError("forEach caller isn't a Array");
+        }
+        Value *func = exec_state->GetArgument(1);
+        if (!IsFunc(func)) {
+            throw VMExecError("forEach => isn't a function");
+        }
+        std::vector<Value> items = ObjectValue<Array>(array)->items;
+        for (int i = 0; i < items.size(); i++) {
+            Value item = items[i];
+            Value index = Value(i);
+            std::vector<Value> args = { item, index };
+            exec_state->Call(func, args);
+        }
+        
+    } while (0);
+    
+    return Value();
 }
     
 static Value push(ExecState *exec_state) {

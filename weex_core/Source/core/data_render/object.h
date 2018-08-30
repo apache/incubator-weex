@@ -162,7 +162,6 @@ struct Value {
       }
       return *this;
   }
-
   friend bool operator==(const Value &left, const Value &right) {
     if (left.type != right.type) return false;
     switch (left.type) {
@@ -183,6 +182,10 @@ struct Value {
     }
     return false;
   }
+    friend bool operator!=(const Value &left, const Value &right) {
+        return !(left == right);
+    }
+
 };
 
 typedef struct Array {

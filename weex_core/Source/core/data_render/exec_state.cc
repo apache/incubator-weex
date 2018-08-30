@@ -34,6 +34,13 @@
 namespace weex {
 namespace core {
 namespace data_render {
+    
+void ExecStack::reset() {
+    size_t size = VM_EXEC_STACK_SIZE - (top_ - base());
+    for (int i = 0; i < size; i++) {
+        top_[i].ref = NULL;
+    }
+}
 
 ExecState::ExecState(VM* vm)
     : vm_(vm),
@@ -120,34 +127,55 @@ const Value ExecState::Call(const std::string& func_name,
     Value* function = *stack_->top() + 1;
     *function = *(stack_->base() + reg);
     for (int i = 0; i < params.size(); ++i) {
-      *(function + i) = params[i];
+      *(function + i + 1) = params[i];
     }
     CallFunction(function, params.size(), &ret);
   }
   return ret;
 }
+    
+const Value ExecState::Call(Value *func, const std::vector<Value>& params) {
+    Value ret;
+    do {
+        // 首先检查函数是否属于堆栈函数
+        long reg = func - stack_->base();
+        if (reg >= VM_EXEC_STACK_SIZE) {
+            throw VMExecError("call function out of stack");
+            break;
+        }
+        for (int i = 0; i < params.size(); i++) {
+            *(func + i + 1) = params[i];
+        }
+        CallFunction(func, params.size(), &ret);
+        
+    } while (0);
+    
+    return ret;
+}
 
 void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
-  *stack_->top() = func + argc;
-  if (func->type == Value::Type::CFUNC) {
-    Frame frame;
-    frame.reg = func;
-    frames_.push_back(frame);
-    auto result = reinterpret_cast<CFunction>(func->cf)(this);
-    if (ret != nullptr && !IsNil(&result)) {
-      *ret = result;
+    *stack_->top() = func + argc;
+    stack_->reset();
+    if (func->type == Value::Type::CFUNC) {
+        Frame frame;
+        frame.reg = func;
+        frames_.push_back(frame);
+        auto result = reinterpret_cast<CFunction>(func->cf)(this);
+        if (ret != nullptr && !IsNil(&result)) {
+            *ret = result;
+        }
+        frames_.pop_back();
     }
-    frames_.pop_back();
-  } else {
-    Frame frame;
-    frame.func = func;
-    frame.reg = func;
-    frame.pc = &(*func->f->instructions().begin());
-    frame.end = &(*func->f->instructions().end());
-      frames_.push_back(frame);
-    vm_->RunFrame(this, frame, ret);
-    frames_.pop_back();
-  }
+    else {
+        Frame frame;
+        frame.func = func;
+        frame.reg = func;
+        frame.pc = &(*func->f->instructions().begin());
+        frame.end = &(*func->f->instructions().end());
+        frames_.push_back(frame);
+        vm_->RunFrame(this, frame, ret);
+        frames_.pop_back();
+    }
 }
     
 ValueRef* ExecState::AddRef(FuncState *func_state, long register_id) {

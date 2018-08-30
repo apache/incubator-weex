@@ -206,13 +206,20 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
                 }
                 if (stms->expr()->IsMemberExpression()) {
                     Handle<Expression> left = stms->expr()->AsMemberExpression()->expr();
-                    std::string class_name = left->AsIdentifier()->GetName();
-                    int index = exec_state_->global()->IndexOf(class_name);
-                    if (index <= 0) {
+                    if (left->IsIdentifier()) {
+                        std::string class_name = left->AsIdentifier()->GetName();
+                        int index = exec_state_->global()->IndexOf(class_name);
+                        if (index <= 0) {
+                            long arg = block_->NextRegisterId();
+                            stms->expr()->AsMemberExpression()->expr()->AsIdentifier()->Accept(this, &arg);
+                            argc++;
+                        }
+                    }
+                    else {
                         long arg = block_->NextRegisterId();
-                        stms->expr()->AsMemberExpression()->expr()->AsIdentifier()->Accept(this, &arg);
+                        left->Accept(this, &arg);
                         argc++;
-                    }                    
+                    }
                 }
             }
         }
@@ -968,7 +975,11 @@ long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
     }
     if (parent() != nullptr) {
         if (parent()->func_state() == func_state_) {
-            return parent()->FindRegisterId(name);
+            long reg_ref = parent()->FindRegisterId(name);
+            if (reg_ref >= 0) {
+                variables_.insert(std::make_pair(name, reg_ref));
+            }
+            return reg_ref;
         }
         else {
             long reg_ref = -1;

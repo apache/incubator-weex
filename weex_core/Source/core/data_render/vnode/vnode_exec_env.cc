@@ -41,7 +41,7 @@ std::string to_string(T value)
 
 json11::Json ParseValue2Json(const Value& value);
 
-static Value Log(ExecState* exec_state) {
+static Value Log(ExecState *exec_state) {
   size_t length = exec_state->GetArgumentCount();
   for (int i = 0; i < length; ++i) {
     Value *a = exec_state->GetArgument(i);

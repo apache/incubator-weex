@@ -36,6 +36,8 @@
 namespace weex {
 namespace core {
 namespace data_render {
+    
+#define VM_EXEC_STACK_SIZE               256
 
 class ValueRef {
     friend class ExecState;
@@ -92,13 +94,14 @@ class FuncState {
   std::vector<Value> constants_;
   std::vector<std::unique_ptr<FuncState>> children_;
 };
-
+    
 // TODO Each Func should contain a stack whose size is 256
 class ExecStack {
  public:
-  ExecStack() : stack_(256) {}
+  ExecStack() : stack_(VM_EXEC_STACK_SIZE) {}
   Value** top() { return &top_; }
   Value* base() { return &stack_[0]; }
+  void reset();
 
  private:
   std::vector<Value> stack_;
@@ -113,7 +116,7 @@ class ExecState {
   void Execute(std::string& error);
   const Value Call(const std::string& func_name,
                     const std::vector<Value>& params);
-
+  const Value Call(Value *func, const std::vector<Value>& params);
   size_t GetArgumentCount();
   Value* GetArgument(int index);
   ValueRef *AddRef(FuncState *func_state, long register_id);
@@ -130,7 +133,7 @@ class ExecState {
   friend class VM;
   friend class CodeGenerator;
 
-  void CallFunction(Value* func, size_t argc, Value* ret);
+  void CallFunction(Value *func, size_t argc, Value *ret);
 
   VM* vm_;
 
