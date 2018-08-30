@@ -50,7 +50,22 @@
                 }
                 [extInfo setObject:[self _convertInstanceStageToStr:instance] forKey:@"wxStageList"];
                 [extInfo setObject:instance.pageName?:@"unKnowPageNameCaseUnSet" forKey:@"wxPageName"];
-                [extInfo setObject:instance.bundleTemplate?:@"has recycle" forKey:@"wxTemplateOfBundle"];
+                NSString* bundleTemplateCommit = @"has recycle";
+                if (nil != instance.bundleTemplate) {
+                    NSUInteger strLength = instance.bundleTemplate.length;
+                    bundleTemplateCommit = [instance.bundleTemplate substringWithRange:NSMakeRange(0, strLength>300?300:strLength)];
+                }
+                [extInfo setObject:bundleTemplateCommit forKey:@"wxTemplateOfBundle"];
+                [extInfo setObject:[instance.apmInstance templateInfo] forKey:@"templateInfo"];
+                NSNumber* pageStartTime = [instance.apmInstance.stageDic objectForKey:KEY_PAGE_STAGES_DOWN_BUNDLE_START];
+                if (nil == pageStartTime) {
+                    pageStartTime = [instance.apmInstance.stageDic objectForKey:KEY_PAGE_STAGES_RENDER_ORGIGIN];
+                }
+                if (nil != pageStartTime) {
+                    long useTime = [WXUtility getUnixFixTimeMillis] - pageStartTime.longValue;
+                    [extInfo setObject:@(useTime) forKey:@"wxUseTime"];
+                }
+                
             }else if([instanceIdCommit hasPrefix:@"WX_KEY_EXCEPTION"]){
                 bundleUrlCommit = instanceId;
             }

@@ -200,9 +200,9 @@
         return;
     }
     NSDictionary *dic= @{
-                         @"errorCode":errorInfo.errorCode,
+                         @"errorCode":errorInfo.errorCode?:@"-1",
                          @"errorGroup":@"",
-                         @"errorMsg":errorInfo.exception
+                         @"errorMsg":errorInfo.exception?:@"unSetException"
                          };
     
     [self _transDataToAnaylzer:instance

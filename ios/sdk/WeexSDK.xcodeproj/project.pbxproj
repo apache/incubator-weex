@@ -10,8 +10,6 @@
 		042013AD1E66CD6A001FC79C /* WXValidateProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 042013AC1E66CD6A001FC79C /* WXValidateProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		17036A4E20FDE72F0029AE3D /* WXApmForInstance.h in Headers */ = {isa = PBXBuildFile; fileRef = 17036A4C20FDE72F0029AE3D /* WXApmForInstance.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		17036A4F20FDE72F0029AE3D /* WXApmForInstance.h in Headers */ = {isa = PBXBuildFile; fileRef = 17036A4C20FDE72F0029AE3D /* WXApmForInstance.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		17036A5020FDE72F0029AE3D /* WXInstanceApm.m in Sources */ = {isa = PBXBuildFile; fileRef = 17036A4D20FDE72F0029AE3D /* WXInstanceApm.m */; };
-		17036A5120FDE72F0029AE3D /* WXInstanceApm.m in Sources */ = {isa = PBXBuildFile; fileRef = 17036A4D20FDE72F0029AE3D /* WXInstanceApm.m */; };
 		17036A5320FDE7490029AE3D /* WXApmProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 17036A5220FDE7490029AE3D /* WXApmProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		17036A5420FDE7490029AE3D /* WXApmProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 17036A5220FDE7490029AE3D /* WXApmProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		170B4664208733AF00562666 /* WXAnalyzerCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 17C74F092072145000AB4CAB /* WXAnalyzerCenter.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -21,6 +19,8 @@
 		1746EA7420E9D253007E55BD /* WXComponent_performance.h in Headers */ = {isa = PBXBuildFile; fileRef = 1746EA7220E9D253007E55BD /* WXComponent_performance.h */; };
 		1746EA7520E9D25E007E55BD /* WXSDKInstance_performance.h in Headers */ = {isa = PBXBuildFile; fileRef = 17B122202090AA9300387E33 /* WXSDKInstance_performance.h */; };
 		176BE43C209172330086B6AF /* WXComponent+Layout.mm in Sources */ = {isa = PBXBuildFile; fileRef = 176BE43B209172330086B6AF /* WXComponent+Layout.mm */; };
+		1771795721416DF0006F39A9 /* WXApmForInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = 1771795421412A5D006F39A9 /* WXApmForInstance.m */; };
+		1771795821416DF1006F39A9 /* WXApmForInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = 1771795421412A5D006F39A9 /* WXApmForInstance.m */; };
 		17B122212090AA9300387E33 /* WXSDKInstance_performance.m in Sources */ = {isa = PBXBuildFile; fileRef = 17B1221F2090AA9300387E33 /* WXSDKInstance_performance.m */; };
 		17B122222090AA9300387E33 /* WXSDKInstance_performance.h in Headers */ = {isa = PBXBuildFile; fileRef = 17B122202090AA9300387E33 /* WXSDKInstance_performance.h */; };
 		17B122252090AAB000387E33 /* WXSDKError.h in Headers */ = {isa = PBXBuildFile; fileRef = 17B122232090AAB000387E33 /* WXSDKError.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1006,10 +1006,10 @@
 /* Begin PBXFileReference section */
 		042013AC1E66CD6A001FC79C /* WXValidateProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXValidateProtocol.h; sourceTree = "<group>"; };
 		17036A4C20FDE72F0029AE3D /* WXApmForInstance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXApmForInstance.h; sourceTree = "<group>"; };
-		17036A4D20FDE72F0029AE3D /* WXInstanceApm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXInstanceApm.m; sourceTree = "<group>"; };
 		17036A5220FDE7490029AE3D /* WXApmProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXApmProtocol.h; sourceTree = "<group>"; };
 		1746EA7220E9D253007E55BD /* WXComponent_performance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXComponent_performance.h; sourceTree = "<group>"; };
 		176BE43B209172330086B6AF /* WXComponent+Layout.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "WXComponent+Layout.mm"; path = "Layout/WXComponent+Layout.mm"; sourceTree = "<group>"; };
+		1771795421412A5D006F39A9 /* WXApmForInstance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXApmForInstance.m; sourceTree = "<group>"; };
 		17B1221F2090AA9300387E33 /* WXSDKInstance_performance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXSDKInstance_performance.m; sourceTree = "<group>"; };
 		17B122202090AA9300387E33 /* WXSDKInstance_performance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXSDKInstance_performance.h; sourceTree = "<group>"; };
 		17B122232090AAB000387E33 /* WXSDKError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXSDKError.h; sourceTree = "<group>"; };
@@ -1563,7 +1563,7 @@
 			isa = PBXGroup;
 			children = (
 				17036A4C20FDE72F0029AE3D /* WXApmForInstance.h */,
-				17036A4D20FDE72F0029AE3D /* WXInstanceApm.m */,
+				1771795421412A5D006F39A9 /* WXApmForInstance.m */,
 			);
 			path = Performance;
 			sourceTree = "<group>";
@@ -3510,7 +3510,6 @@
 				77E65A121C155EA8008B8775 /* WXImageComponent.m in Sources */,
 				74CFDD3E1F459400007A1A66 /* WXRecycleListDataManager.m in Sources */,
 				4532670B213FC84A00DAA620 /* WXDisplayLinkManager.m in Sources */,
-				17036A5020FDE72F0029AE3D /* WXInstanceApm.m in Sources */,
 				2A837AB31CD9DE9200AEDF03 /* WXLoadingComponent.mm in Sources */,
 				2AE5B7531CAB7DBD0082FDDB /* WXAComponent.m in Sources */,
 				B8D66C9521255730003960BD /* dom_wson.cpp in Sources */,
@@ -3546,6 +3545,7 @@
 				7463192A1C71B92600EFEBD4 /* WXModalUIModule.m in Sources */,
 				77D161501C02E3880010B15B /* WXUtility.m in Sources */,
 				B8F2C6F42133A83C00635B37 /* rax_parser_statistics.cc in Sources */,
+				1771795721416DF0006F39A9 /* WXApmForInstance.m in Sources */,
 				74A4BA9F1CB3C0A100195969 /* WXHandlerFactory.m in Sources */,
 				B8D66C3721255730003960BD /* render_action_update_attr.cpp in Sources */,
 				B8F2C6F02133A83C00635B37 /* rax_jsx_ast.cc in Sources */,
@@ -3656,7 +3656,6 @@
 				B8F2C6F72133A83C00635B37 /* rax_parser_context.cc in Sources */,
 				B8A72C9F213F8BAE0024E7BE /* class_json.cc in Sources */,
 				DCA445531EFA55B300D0CFA8 /* WXCellComponent.mm in Sources */,
-				17036A5120FDE72F0029AE3D /* WXInstanceApm.m in Sources */,
 				DCA445541EFA55B300D0CFA8 /* WXListComponent.mm in Sources */,
 				DCA445551EFA55B300D0CFA8 /* WXIndicatorComponent.m in Sources */,
 				17E5ACDB2091F05700EE81F1 /* WXComponent+Layout.mm in Sources */,
@@ -3673,6 +3672,7 @@
 				B8F2C7072133A83C00635B37 /* rax_parser_scope.cc in Sources */,
 				DCA4455C1EFA55B300D0CFA8 /* WXCanvasComponent.m in Sources */,
 				DCA4455D1EFA55B300D0CFA8 /* WXHeaderComponent.mm in Sources */,
+				1771795821416DF1006F39A9 /* WXApmForInstance.m in Sources */,
 				B8D66C6021255730003960BD /* render_action_render_success.cpp in Sources */,
 				DCA4455E1EFA55B300D0CFA8 /* WXFooterComponent.m in Sources */,
 				DCA4455F1EFA55B300D0CFA8 /* WXNavigationDefaultImpl.m in Sources */,
