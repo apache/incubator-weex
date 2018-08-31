@@ -67,6 +67,11 @@
     [self.delegate headerDidRemove:self];
 }
 
+- (BOOL)_isCaculatedFrameChanged:(CGRect)frame
+{
+    return !CGSizeEqualToSize(frame.size, _calculatedFrame.size); // only compares sizes
+}
+
 - (void)_assignCalculatedFrame:(CGRect)frame
 {
     frame.origin = CGPointZero;

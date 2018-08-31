@@ -692,7 +692,7 @@ static NSThread *WXComponentThread;
     WXAssertComponentThread();
     WXAssertParam(component);
     
-    if (!CGRectEqualToRect(frame, component->_calculatedFrame))
+    if ([component _isCaculatedFrameChanged:frame])
     {
         [component _assignCalculatedFrame:frame];
         [component _assignInnerContentMainSize:innerMainSize];
