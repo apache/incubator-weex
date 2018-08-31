@@ -160,7 +160,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
     else if (stms->expr().get()) {
         if (class_ && stms->expr()->IsIdentifier() && stms->expr()->AsIdentifier()->GetName() == "super")
         {
-            ClassDescriptor *class_desc = ObjectValue<ClassDescriptor>(class_->class_value());
+            ClassDescriptor *class_desc = ValueTo<ClassDescriptor>(class_->class_value());
             if (!class_desc->p_super_) {
                 throw GeneratorError("can't call super without class desc");
             }
@@ -304,39 +304,48 @@ void CodeGenerator::Visit(IfElseStatement *node, void *data) {
     int end_index = (int)func_state->instructions().size();
     func_state->ReplaceInstruction(else_slot, CREATE_Ax(OP_GOTO, end_index));
 }
+    
+void CodeGenerator::Visit(ContinueStatement *node, void *data) {
+    do {
+        int for_start_index = block_->for_start_index();
+        if (for_start_index < 0) {
+            throw GeneratorError("continue must in for statement");
+            break;
+        }
+        func_->func_state()->AddInstruction(CREATE_Ax(OP_GOTO, for_start_index));
+        
+    } while (0);
+}
 
 void CodeGenerator::Visit(ForStatement *node, void *data) {
-  BlockScope for_scope(this);  // for var index = 0;
-
-  if (node->init().get() != NULL) {
-    node->init()->Accept(this, nullptr);
-  }
-
-  int condition_start_index = (int)func_->func_state()->instructions().size();  // aka next one.
-
-  long condition = block_->NextRegisterId();
-  if (node->condition().get() != NULL) {
-    node->condition()->Accept(this, &condition);
-  }
-
-  auto slot = func_->func_state()->AddInstruction(0);
-
-  if (node->body().get() != NULL) {
-    node->body()->Accept(this, nullptr);
-  }
-
-  long update = block_->NextRegisterId();
-  if (node->update().get() != NULL) {
-    node->update()->Accept(this, &update);
-  }
-
-  FuncState* state = func_->func_state();
-  state->AddInstruction(CREATE_Ax(OP_GOTO, condition_start_index));
-
-  int for_end_index = (int)func_->func_state()->instructions().size() - 1;
-
-  state->ReplaceInstruction(
-      slot, (CREATE_ABx(OP_JMP, condition, for_end_index - slot)));
+    BlockScope for_scope(this);  // for var index = 0;
+    FuncState *func_state = func_->func_state();
+    long condition = block_->NextRegisterId();
+    if (node->init().get() != NULL) {
+        node->init()->Accept(this, node->kind() == ForKind::kForIn ? &condition : nullptr);
+    }
+    int condition_start_index = -1;
+    if (node->kind() == ForKind::kForIn) {
+        condition_start_index = block_->for_start_index();
+    }
+    else {
+        condition_start_index = (int)func_state->instructions().size();  // aka next one.
+        block_->set_for_start_index(condition_start_index);
+    }
+    if (node->condition().get() != NULL) {
+        node->condition()->Accept(this, &condition);
+    }
+    auto slot = func_->func_state()->AddInstruction(0);
+    if (node->body().get() != NULL) {
+        node->body()->Accept(this, nullptr);
+    }
+    if (node->update().get() != NULL) {
+        long update = block_->NextRegisterId();
+        node->update()->Accept(this, &update);
+    }
+    func_state->AddInstruction(CREATE_Ax(OP_GOTO, condition_start_index));
+    int for_end_index = (int)func_->func_state()->instructions().size() - 1;
+    func_state->ReplaceInstruction(slot, (CREATE_ABx(OP_JMP, condition, for_end_index - slot)));
 }
 
 void CodeGenerator::Visit(BlockStatement* node, void* data) {
@@ -365,7 +374,7 @@ void CodeGenerator::Visit(FunctionStatement *node, void *data) {
             Value value;
             value.f = func_->func_state();
             value.type = Value::FUNC;
-            ClassDescriptor *class_desc = ObjectValue<ClassDescriptor>(class_->class_value());
+            ClassDescriptor *class_desc = ValueTo<ClassDescriptor>(class_->class_value());
             class_desc->funcs_->Add(proto->GetName(), value);
         }
         // skip func value in the fornt of stack;
@@ -491,7 +500,7 @@ void CodeGenerator::Visit(ClassStatement *node, void *data) {
             throw GeneratorError(class_name + "redefine");
             break;
         }
-        class_value = exec_state_->class_factory()->CreateClassDescriptor(super_value ? ObjectValue<ClassDescriptor>(super_value) : nullptr);
+        class_value = exec_state_->class_factory()->CreateClassDescriptor(super_value ? ValueTo<ClassDescriptor>(super_value) : nullptr);
         exec_state_->global()->Add(class_name, class_value);
         ClassScope scope(this, &class_value);
         node->Body()->Accept(this, nullptr);
@@ -601,54 +610,70 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
     } while (0);
 }
 
-void CodeGenerator::Visit(BinaryExpression* node, void* data) {
-    RegisterScope scope(block_);
+void CodeGenerator::Visit(BinaryExpression *node, void *data) {
+    long left = -1;
     long ret = data == nullptr ? block_->NextRegisterId() : *static_cast<long*>(data);
-    long left = block_->NextRegisterId();
-    if (node->lhs().get() != NULL) {
+    if (node->lhs() && (node->lhs()->IsDeclaration() || node->lhs()->IsDeclarationList())) {
+        left = block_->NextRegisterId();
         node->lhs()->Accept(this, &left);
+    }
+    BinaryOperation opeartion = node->op();
+    FuncState *func_state = func_->func_state();
+    RegisterScope scope(block_);
+    if (left < 0) {
+        left = block_->NextRegisterId();
+        if (node->lhs().get() != NULL) {
+            node->lhs()->Accept(this, &left);
+        }
+    }
+    if (opeartion == BinaryOperation::kIn) {
+        int for_start_index = (int)func_state->instructions().size();  // aka next one.
+        block_->set_for_start_index(for_start_index);
     }
     long right = block_->NextRegisterId();
     if (node->rhs().get() != NULL) {
         node->rhs()->Accept(this, &right);
     }
-    BinaryOperation opeartion = node->op();
-    FuncState *state = func_->func_state();
     switch (opeartion) {
         case BinaryOperation::kAddition:
         {
             // a + b
-            state->AddInstruction(CREATE_ABC(OP_ADD, ret, left, right));
+            func_state->AddInstruction(CREATE_ABC(OP_ADD, ret, left, right));
             break;
         }
         case BinaryOperation::kLessThan:
         {
-            state->AddInstruction(CREATE_ABC(OP_LT, ret, left, right));
+            func_state->AddInstruction(CREATE_ABC(OP_LT, ret, left, right));
             break;
         }
         case BinaryOperation::kGreaterThan:
         {
-            state->AddInstruction(CREATE_ABC(OP_GT, ret, right, left));
+            func_state->AddInstruction(CREATE_ABC(OP_GT, ret, left, right));
             break;
         }
         case BinaryOperation::kLessThanEqual:
         {
-            state->AddInstruction(CREATE_ABC(OP_LTE, ret, left, right));
+            func_state->AddInstruction(CREATE_ABC(OP_LTE, ret, left, right));
             break;
         }
         case BinaryOperation::kGreaterThanEqual:
         {
-            state->AddInstruction(CREATE_ABC(OP_GTE, ret, right, left));
+            func_state->AddInstruction(CREATE_ABC(OP_GTE, ret, left, right));
             break;
         }
         case BinaryOperation::kAnd:
         {
-            state->AddInstruction(CREATE_ABC(OP_AND, ret, right, left));
+            func_state->AddInstruction(CREATE_ABC(OP_AND, ret, left, right));
             break;
         }
         case BinaryOperation::kStrictEqual:
         {
-            state->AddInstruction(CREATE_ABC(OP_SEQ, ret, right, left));
+            func_state->AddInstruction(CREATE_ABC(OP_SEQ, ret, left, right));
+            break;
+        }
+        case BinaryOperation::kIn:
+        {
+            func_state->AddInstruction(CREATE_ABC(OP_IN, ret, left, right));
             break;
         }
         default:
@@ -690,19 +715,15 @@ void CodeGenerator::Visit(AssignExpression *node, void *data) {
 }
 
 void CodeGenerator::Visit(Declaration *node, void *data) {
-  long reg = block_->NextRegisterId();
-  FuncState *func_state = func_->func_state();
-  block_->variables().insert(std::make_pair(node->name(), reg));
-  if (node->expr().get() != nullptr) {
-      node->expr()->Accept(this, &reg);
-  }
-  else {
-      func_state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
-  }
-  if (data) {
-      long ret = *static_cast<long *>(data);
-      func_state->AddInstruction(CREATE_ABC(OP_MOVE, ret, reg, 0));
-  }
+    long reg = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
+    FuncState *func_state = func_->func_state();
+    block_->variables().insert(std::make_pair(node->name(), reg));
+    if (node->expr().get() != nullptr) {
+        node->expr()->Accept(this, &reg);
+    }
+    else {
+        func_state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
+    }
 }
 
 void CodeGenerator::Visit(DeclarationList *node, void *data) {
@@ -798,29 +819,24 @@ void CodeGenerator::Visit(ObjectConstant* node, void* data) {
   }
 }
 // TODO: this is not correct.
-void CodeGenerator::Visit(ArrayConstant* node, void* data) {
-  long reg = data == nullptr ? -1 : *static_cast<long*>(data);
-
-  FuncState *func_state = func_->func_state();
-
-  // new table
-  Value array = exec_state_->class_factory()->CreateArray();
-  if (reg >= 0) {
-    int tableIndex = func_state->AddConstant(array);
-    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, tableIndex);
-    func_state->AddInstruction(i);
-
-    // expr
-    for (auto it = node->exprs().begin(); it != node->exprs().end(); it++) {
-      long item = block_->NextRegisterId();
-
-      auto temp = (*it).get();
-      temp->Accept(this, &item);
-
-      Instruction i = CREATE_ABC(OpCode::OP_SETTABLE, reg, 0, item);
-      func_state->AddInstruction(i);
+void CodeGenerator::Visit(ArrayConstant *node, void *data) {
+    long reg = data == nullptr ? -1 : *static_cast<long*>(data);
+    FuncState *func_state = func_->func_state();
+    // new table
+    Value array = exec_state_->class_factory()->CreateArray();
+    if (reg >= 0) {
+        int tableIndex = func_state->AddConstant(array);
+        Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, tableIndex);
+        func_state->AddInstruction(i);
+        // expr
+        for (auto it = node->exprs().begin(); it != node->exprs().end(); it++) {
+            long item = block_->NextRegisterId();
+            auto temp = (*it).get();
+            temp->Accept(this, &item);
+            Instruction i = CREATE_ABC(OP_SETARRAY, reg, 0, item);
+            func_state->AddInstruction(i);
+        }
     }
-  }
 }
 
 void CodeGenerator::Visit(MemberExpression *node, void *data) {
@@ -834,7 +850,12 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
         if (node->member().get() != NULL) {
             node->member()->Accept(this, &mindex);
         }
-        func_state->AddInstruction(CREATE_ABC(OP_GETARRAY, ret, ret, mindex));
+        if (node->lhs_value()) {
+            func_state->AddInstruction(CREATE_ABC(OP_GETINDEXVAR, ret, ret, mindex));
+        }
+        else {
+            func_state->AddInstruction(CREATE_ABC(OP_GETINDEX, ret, ret, mindex));
+        }
     }
     else if (node->kind() == MemberAccessKind::kDot || node->kind() == MemberAccessKind::kCall) {
         Handle<Expression> left = node->expr();
@@ -968,6 +989,18 @@ bool CodeGenerator::BlockCnt::FindVariable(const std::string &name) {
     return false;
 }
     
+int CodeGenerator::BlockCnt::for_start_index() {
+    if (for_start_index_ >= 0) {
+        return for_start_index_;
+    }
+    if (parent() != nullptr) {
+        if (parent()->func_state() == func_state_) {
+            return parent()->for_start_index();
+        }
+    }
+    return -1;
+}
+
 long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
     auto iter = variables_.find(name);
     if (iter != variables_.end()) {

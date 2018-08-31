@@ -33,6 +33,7 @@ static Value isArray(ExecState *exec_state);
 static Value push(ExecState *exec_state);
 static Value slice(ExecState *exec_state);
 static Value forEach(ExecState *exec_state);
+static Value indexOf(ExecState *exec_state);
 
 ClassDescriptor *NewClassArray() {
     ClassDescriptor *array_desc = new ClassDescriptor(nullptr);
@@ -40,6 +41,7 @@ ClassDescriptor *NewClassArray() {
     AddClassCFunc(array_desc, "push", push);
     AddClassCFunc(array_desc, "slice", slice);
     AddClassCFunc(array_desc, "forEach", forEach);
+    AddClassCFunc(array_desc, "indexOf", indexOf);
     return array_desc;
 }
     
@@ -71,8 +73,48 @@ int SetArray(Array *array, Value *index, const Value &val) {
     return ret;
 }
     
-Value GetArray(Array *array, const Value &index) {
-    Value ret = Value();
+int SetArray(Array *array, int index, const Value &val) {
+    int ret = 0;
+    do {
+        if (index >= (int)array->items.size()) {
+            array->items.push_back(val);
+        }
+        else {
+            array->items.insert(array->items.begin() + index,val);
+        }
+        ret = true;
+
+    } while (0);
+    
+    return ret;
+}
+    
+Value* GetArrayVar(Array *array, const Value &index) {
+    Value *ret = nullptr;
+    do {
+        if (!IsInt(&index)) {
+            break;
+        }
+        int indexValue = (int)IntValue(&index);
+        int size = (int)array->items.size();
+        if (indexValue < size) {
+            ret = &array->items.at(indexValue);
+        }
+        else {
+            int inserts = indexValue - size + 1;
+            for (int i = 0; i < inserts; i++) {
+                array->items.push_back(Value());
+            }
+            ret = &array->items.at(indexValue);
+        }
+        
+    } while (0);
+    
+    return ret;
+}
+    
+Value GetArrayValue(Array *array, const Value &index) {
+    Value ret;
     do {
         if (!IsInt(&index)) {
             break;
@@ -105,7 +147,7 @@ static Value forEach(ExecState *exec_state) {
         if (!IsFunc(func)) {
             throw VMExecError("forEach => isn't a function");
         }
-        std::vector<Value> items = ObjectValue<Array>(array)->items;
+        std::vector<Value> items = ValueTo<Array>(array)->items;
         for (int i = 0; i < items.size(); i++) {
             Value item = items[i];
             Value index = Value(i);
@@ -116,6 +158,31 @@ static Value forEach(ExecState *exec_state) {
     } while (0);
     
     return Value();
+}
+    
+static Value indexOf(ExecState *exec_state) {
+    int index = -1;
+    do {
+        size_t length = exec_state->GetArgumentCount();
+        if (length < 2) {
+            break;
+        }
+        Value *array = exec_state->GetArgument(0);
+        if (!IsArray(array)) {
+            throw VMExecError("indexOf caller isn't a Array");
+        }
+        Value *item = exec_state->GetArgument(1);
+        std::vector<Value> items = ValueTo<Array>(array)->items;
+        for (int i = 0; i < items.size(); i++) {
+            if (ObjectEquals(item, &items[i])) {
+                index = i;
+                break;
+            }
+        }
+        
+    } while (0);
+
+    return Value(index);
 }
     
 static Value push(ExecState *exec_state) {
@@ -131,7 +198,7 @@ static Value push(ExecState *exec_state) {
     if (IsNil(item)) {
         throw VMExecError("Array.push item can't be nil");
     }
-    ObjectValue<Array>(array)->items.push_back(*item);
+    ValueTo<Array>(array)->items.push_back(*item);
     return Value();
 }
 
@@ -166,7 +233,7 @@ static Value slice(ExecState *exec_state) {
             throw VMExecError("Array.slice start isn't a int");
         }
         int start_index = (int)IntValue(start);
-        std::vector<Value> items = ObjectValue<Array>(array)->items;
+        std::vector<Value> items = ValueTo<Array>(array)->items;
         int end_index = (int)items.size();
         Value *end = nullptr;
         if (argc > 2) {
@@ -185,7 +252,7 @@ static Value slice(ExecState *exec_state) {
         ret = exec_state->class_factory()->CreateArray();
         if (start_index >= 0 && start_index < items.size()) {
             for (int i = start_index; i < end_index; i++) {
-                ObjectValue<Array>(&ret)->items.push_back(items[i]);
+                ValueTo<Array>(&ret)->items.push_back(items[i]);
             }
         }
 

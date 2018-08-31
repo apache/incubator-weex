@@ -20,6 +20,7 @@
 #include "core/data_render/table.h"
 #include "core/data_render/vm_mem.h"
 #include "third_party/json11/json11.hpp"
+#include "core/data_render/common_error.h"
 
 namespace weex {
 namespace core {
@@ -43,21 +44,6 @@ int IndexOf(const std::vector<Value> *arr, const Value *val) {
   }
 }
 
-int SetTabIntValue(Table *t, Value *key, const Value &val) {
-  if (IsNil(&val)) {
-    return 0;
-  }
-//  int index = IndexOf(&t->array, &val);
-//  if (index < 0) {
-//    t->array.emplace_back(val);
-//    index = t->array.size() - 1;
-//  }
-  if (nullptr != key) {
-    //SetIValue(key, index);
-  }
-  return 1;
-}
-
 int SetTabStringValue(Table *t, const Value *key, const Value &val) {
   if (IsNil(key)) {
     return 0;
@@ -74,57 +60,52 @@ int SetTabStringValue(Table *t, const Value *key, const Value &val) {
   return 1;
 }
 
-Value *GetTabIntValue(Table *t, const Value *key) {
-//  int index = IntValue(key);
-//  if (index < t->array.size()) {
-//    return &(t->array.at(index));
-//  }
-  return nullptr;
-}
-
 Value *GetTabStringValue(Table *t, const Value *key) {
-  std::string str = CStringValue(key);
-  if (!str.empty()) {
-    auto it = t->map.find(str);
-    if (it != t->map.end()) {
-      return &(it->second);
+    std::string str = CStringValue(key);
+    if (!str.empty()) {
+        auto it = t->map.find(str);
+        if (it != t->map.end()) {
+            return &(it->second);
+        }
     }
-  }
-  return nullptr;
+    return nullptr;
 }
 
 Table *NewTable() {
-//  Table *t = reinterpret_cast<Table *>(reallocMem(nullptr, sizeof(Table)));
-//  if (nullptr == t) {
-//    return nullptr;
-//  }
-//  t->array = new std::vector<Value>();
-//  t->map = new std::unordered_map<std::string, Value>();
   Table *t = new Table();
   return t;
 }
 
-int ResizeTab(Table *t, size_t nasize, size_t nhsize) {
-
-  return 1;
+Value *GetTableValue(Table *t, const Value &key) {
+    if (IsString(&key)) {
+        return GetTabStringValue(t, &key);
+    }
+    return nullptr;
 }
-
-Value *GetTabValue(Table *t, const Value &key) {
-  if (IsInt(&key)) {
-    return GetTabIntValue(t, &key);
-  } else if (IsString(&key)) {
-    return GetTabStringValue(t, &key);
-  }
-  return nullptr;
+    
+Value *GetTableVar(Table *table, const Value &key) {
+    Value *ret = nullptr;
+    do {
+        if (!IsString(&key)) {
+            throw VMExecError("can't get table var when the key isn't string");
+        }
+        ret = GetTabStringValue(table, &key);
+        if (!ret) {
+            std::string keystr = CStringValue(&key);
+            table->map.insert(std::make_pair(keystr, Value()));
+            ret = &table->map.find(keystr)->second;
+        }
+        
+    } while (0);
+    
+    return ret;
 }
 
 int SetTabValue(Table *t, Value *key, const Value &val) {
-  if (IsInt(key)) {
-    return SetTabIntValue(t, key, val);
-  } else if (IsString(key)) {
-    return SetTabStringValue(t, key, val);
-  }
-  return 0;
+    if (IsString(key)) {
+        return SetTabStringValue(t, key, val);
+    }
+    return 0;
 }
 
 size_t GetTableSize(Table *t) {
@@ -147,11 +128,11 @@ size_t GetMapSize(Table *t) {
 }
 
 size_t GetValueArraySize(Value &o) {
-  return GetArraySize(ObjectValue<Array>(&o));
+  return GetArraySize(ValueTo<Array>(&o));
 }
 
 size_t GetValueMapSize(Value &o) {
-  return GetMapSize(ObjectValue<Table>(&o));
+  return GetMapSize(ValueTo<Table>(&o));
 }
     
 json11::Json TableToJson(Table *table);
@@ -161,7 +142,7 @@ json11::Json ArrayToJson(Array *array) {
     for (int i = 0; i < array->items.size(); i++) {
         Value item = array->items[i];
         if (item.type == Value::Type::TABLE) {
-            json.push_back(TableToJson(ObjectValue<Table>(&item)));
+            json.push_back(TableToJson(ValueTo<Table>(&item)));
         }
         else if (item.type == Value::Type::STRING) {
             json.push_back(CStringValue(&item));
@@ -170,7 +151,7 @@ json11::Json ArrayToJson(Array *array) {
             json.push_back(to_string(IntValue(&item)));
         }
         else if (item.type == Value::Type::ARRAY) {
-            json.push_back(ArrayToJson(ObjectValue<Array>(&item)));
+            json.push_back(ArrayToJson(ValueTo<Array>(&item)));
         }
     }
     return json;
@@ -180,7 +161,7 @@ json11::Json TableToJson(Table *table) {
     json11::Json::object obj;
     for (auto iter = table->map.begin(); iter != table->map.end(); iter++) {
         if (iter->second.type == Value::Type::TABLE) {
-            obj.insert(std::make_pair(iter->first, TableToJson(ObjectValue<Table>(&iter->second))));
+            obj.insert(std::make_pair(iter->first, TableToJson(ValueTo<Table>(&iter->second))));
         }
         else if (iter->second.type == Value::Type::STRING) {
             obj.insert(std::make_pair(iter->first, CStringValue(&iter->second)));
@@ -189,7 +170,7 @@ json11::Json TableToJson(Table *table) {
             obj.insert(std::make_pair(iter->first, to_string(IntValue(&iter->second))));
         }
         else if (iter->second.type == Value::Type::ARRAY) {
-            obj.insert(std::make_pair(iter->first, ArrayToJson(ObjectValue<Array>(&iter->second))));
+            obj.insert(std::make_pair(iter->first, ArrayToJson(ValueTo<Array>(&iter->second))));
         }
     }
     return json11::Json(obj);
@@ -202,6 +183,49 @@ std::string TableToString(Table *table) {
     return json_string;
 }
     
+int TableInKey(StringTable *string_table,Table *table, Value *condition, Value *var) {
+    int ret = 1;
+    do {
+        if (!table->map.size()) {
+            SetBValue(condition, false);
+            break;
+        }
+        if (!IsString(var)) {
+            String *key = string_table->StringFromUTF8(table->map.begin()->first);
+            SetBValue(condition, true);
+            SetSValue(var, key);
+            break;
+        }
+        bool exist = false;
+        auto iter = table->map.begin();
+        for (; iter != table->map.end(); iter++) {
+            if (strcmp(CStringValue(var), iter->first.c_str()) == 0) {
+                exist = true;
+                iter++;
+                break;
+            }
+        }
+        if (!exist) {
+            String *key = string_table->StringFromUTF8(table->map.begin()->first);
+            SetBValue(condition, true);
+            SetSValue(var, key);
+            break;
+        }
+        if (iter == table->map.end()) {
+            SetBValue(condition, false);
+            SetNil(var);
+            break;
+        }
+        else {
+            String *key = string_table->StringFromUTF8(iter->first);
+            SetBValue(condition, true);
+            SetSValue(var, key);
+        }
+        
+    } while (0);
+    
+    return ret;
+}
 
 }  // namespace data_render
 }  // namespace core

@@ -28,9 +28,9 @@ namespace data_render {
 
 Table *NewTable();
 
-int ResizeTab(Table *, size_t, size_t);
-
-Value *GetTabValue(Table *, const Value &);
+Value *GetTableValue(Table *, const Value &);
+    
+Value *GetTableVar(Table *table, const Value &key);
 
 int SetTabValue(Table *, Value *, const Value &);
     
@@ -45,6 +45,8 @@ size_t GetValueArraySize(Value &);
 size_t GetValueMapSize(Value &);
     
 std::string TableToString(Table *table);
+    
+int TableInKey(StringTable *string_table,Table *table, Value *condition, Value *var);
     
 }  // namespace data_render
 }  // namespace core

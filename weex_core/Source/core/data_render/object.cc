@@ -57,23 +57,63 @@ int ToInteger(const Value *o, const int &mode, int64_t &v) {
     return 0;
   }
 }
+    
+bool ObjectEquals(const Value *a, const Value *b) {
+    bool equal = false;
+    do {
+        if (a->type != b->type) {
+            break;
+        }
+        switch (a->type) {
+            case Value::STRING:
+            {
+                equal = std::string(CStringValue(a)) == std::string(CStringValue(b));
+                break;
+            }
+            case Value::BOOL:
+            {
+                equal = BoolValue(a) == BoolValue(b);
+                break;
+            }
+            case Value::INT:
+            {
+                equal = IntValue(a) == IntValue(b);
+                break;
+            }
+            case Value::NUMBER:
+            {
+                equal = NumValue(a) == NumValue(b);
+                break;
+            }
+            default:
+                break;
+        }
+        
+    } while (0);
+    
+    return equal;
+}
 
 bool ValueEquals(const Value *a, const Value *b) {
-  double d1, d2;
-  if (IsNumber(a)) {
-    return NumEq(NumValue(a), NumValue(b));
-  } else if (IsInt(a)) {
-    return IntValue(a) == IntValue(b);
-  } else if (IsBool(a)) {
-    return BoolValue(a) == BoolValue(b);
-  } else if (ToNum(a, d1) && ToNum(b, d2)) {
-    return NumEq(d1, d2);
-  } else {
-    return false;
-  }
+    double d1, d2;
+    if (IsNumber(a)) {
+        return NumEq(NumValue(a), NumValue(b));
+    }
+    else if (IsInt(a)) {
+        return IntValue(a) == IntValue(b);
+    }
+    else if (IsBool(a)) {
+        return BoolValue(a) == BoolValue(b);
+    }
+    else if (ToNum(a, d1) && ToNum(b, d2)) {
+        return NumEq(d1, d2);
+    }
+    else {
+        return false;
+    }
 }
     
-bool ValueStrictEquals(const Value *a, const Value *b) {\
+bool ValueStrictEquals(const Value *a, const Value *b) {
     double d1, d2;
     if (IsNumber(a)) {
         return NumEq(NumValue(a), NumValue(b));

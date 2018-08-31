@@ -214,6 +214,18 @@ Handle<Expression> ASTBuilder::NewForStatement(ForKind kind, Handle<Expression> 
     COUNT();
     return save(factory()->NewForStatement(locator()->location(), manager()->current(), kind, init, cond, update, body));
 }
+    
+Handle<Expression> ASTBuilder::NewBreakStatement(Handle<Expression> label)
+{
+    COUNT();
+    return save(factory()->NewBreakStatement(locator()->location(), manager()->current(), label));
+}
+    
+Handle<Expression> ASTBuilder::NewContinueStatement(Handle<Expression> label)
+{
+    COUNT();
+    return save(factory()->NewContinueStatement(locator()->location(), manager()->current(), label));
+}
 
 Handle<Expression> ASTBuilder::NewIfStatement(Handle<Expression> condition, Handle<Expression> then)
 {

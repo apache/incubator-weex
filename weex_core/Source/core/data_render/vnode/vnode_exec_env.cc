@@ -56,7 +56,7 @@ static Value Log(ExecState *exec_state) {
         std::cout << a->str->c_str() << "\n";
         break;
       case Value::Type::TABLE:
-        std::cout << TableToString(ObjectValue<Table>(a)) << "\n";
+        std::cout << TableToString(ValueTo<Table>(a)) << "\n";
         break;
       default:
         break;
@@ -70,7 +70,7 @@ static Value GetTableSize(ExecState* exec_state) {
   if (length > 0) {
     Value* value = exec_state->GetArgument(0);
     if (IsTable(value)) {
-      return Value(static_cast<int64_t>(GetTableSize(ObjectValue<Table>(value))));
+      return Value(static_cast<int64_t>(GetTableSize(ValueTo<Table>(value))));
     } else if ((IsArray(value))){
       return Value(static_cast<int64_t>(GetValueArraySize(*value)));
     }
@@ -91,11 +91,11 @@ static Value Merge(ExecState *exec_state) {
     Value new_value = exec_state->table_factory()->CreateTable();
     if (IsTable(lhs)) {
         TableMapAddAll(*lhs, new_value);
-        LOGD("[Merge]:lhs:%s\n", TableToString(ObjectValue<Table>(lhs)).c_str());
+        LOGD("[Merge]:lhs:%s\n", TableToString(ValueTo<Table>(lhs)).c_str());
     }
     if (IsTable(rhs)) {
         TableMapAddAll(*rhs, new_value);
-        LOGD("[Merge]:rhs:%s\n", TableToString(ObjectValue<Table>(rhs)).c_str());
+        LOGD("[Merge]:rhs:%s\n", TableToString(ValueTo<Table>(rhs)).c_str());
     }
     return new_value;
 }
@@ -153,14 +153,14 @@ static Value AppendUrlParam(ExecState* exec_state) {
     return Value();
   }
   String* p_string = StringValue(url);
-  Array* p_array = ObjectValue<Array>(array);
+  Array* p_array = ValueTo<Array>(array);
   std::stringstream ss;
   ss << p_string->c_str();
 
   std::vector<Value> kv_array = p_array->items;
   for (auto it = kv_array.begin(); it != kv_array.end(); it++) {
     Value& kv_map = *it;
-    Table* p_table = ObjectValue<Table>(&kv_map);
+    Table* p_table = ValueTo<Table>(&kv_map);
     if (p_table != nullptr && p_table->map.find("key") != p_table->map.end() &&
         p_table->map.find("value") != p_table->map.end()) {
       Value& key = p_table->map.find("key")->second;
@@ -225,7 +225,7 @@ static Value AppendChild(ExecState *exec_state) {
       throw VMExecError("AppendChild unsupport array or cptr");
   }
   if (IsArray(childrens)) {
-      std::vector<Value> items = ObjectValue<Array>(childrens)->items;
+      std::vector<Value> items = ValueTo<Array>(childrens)->items;
       for (int i = 0; i < items.size(); i++) {
           if (!IsCptr(&items[i])) {
               throw VMExecError("AppendChild unspport array or cptr");
@@ -276,13 +276,13 @@ static Value SetProps(ExecState *exec_state) {
     }
     Value *p_value = exec_state->GetArgument(1);
     if (p_value->type == Value::TABLE) {
-        Table *table = ObjectValue<Table>(p_value);
+        Table *table = ValueTo<Table>(p_value);
         //LOGD("[SetProps]:table:%s\n", TableToString(table).c_str());
         for (auto iter = table->map.begin(); iter != table->map.end(); iter++) {
             if (iter->first == "style") {
                 Value style = iter->second;
                 if (style.type == Value::TABLE) {
-                    Table *style_table = ObjectValue<Table>(&style);
+                    Table *style_table = ValueTo<Table>(&style);
                     for (auto iter_style = style_table->map.begin(); iter_style != style_table->map.end(); iter_style++) {
                         switch (iter_style->second.type) {
                             case Value::STRING:
@@ -399,7 +399,7 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
       // will be free by table
       Value key(index);
       Value val(ParseJson2Value(state, json[index]));
-      SetArray(ObjectValue<Array>(&value), &key, val);
+      SetArray(ValueTo<Array>(&value), &key, val);
     }
     return value;
   } else if (json.is_object()) {
@@ -409,7 +409,7 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
       // will be free by table
       Value key(state->string_table()->StringFromUTF8(it->first));
       Value val(ParseJson2Value(state, it->second));
-      SetTabValue(ObjectValue<Table>(&value), &key, val);
+      SetTabValue(ValueTo<Table>(&value), &key, val);
     }
     return value;
   } else {
@@ -418,11 +418,10 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
 };
 
 json11::Json ParseValue2Json(const Value& value) {
-  if (value.type != Value::TABLE) {
-    return json11::Json();
-  }
-
-  Table* p_table = ObjectValue<Table>(&value);
+    if (value.type != Value::TABLE) {
+        return json11::Json();
+    }
+    Table *p_table = ValueTo<Table>(&value);
 //  if (p_table->array.size() > 0) {
 //    json11::Json::array array;
 //

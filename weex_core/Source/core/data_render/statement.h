@@ -77,33 +77,26 @@ private:
     Handle<Expression> body_;
 };
 
-//class BreakStatement : public Expression {
-//public:
-//    BreakStatement(Json &json, Handle<Expression> label = nullptr)
-//        : Expression(json), label_{ label }
-//    { }
-//
-//
-//    Handle<Expression> label() { return label_; }
-//    DEFINE_NODE_TYPE(BreakStatement);
-//private:
-//    Handle<Expression> label_;
-//};
-//
-//class ContinueStatement : public Expression {
-//public:
-//    ContinueStatement(Json &json, Handle<Expression> label = nullptr)
-//        : Expression(json), label_{ label }
-//    { }
-//
-//
-//    Handle<Expression> label() { return label_; }
-//
-//    DEFINE_NODE_TYPE(ContinueStatement);
-//private:
-//    Handle<Expression> label_;
-//};
-            
+class BreakStatement : public Expression {
+public:
+    BreakStatement(Position &loc, Scope *scope, Handle<Expression> label = nullptr)
+        : Expression(loc, scope), label_{ label } { }
+    Handle<Expression> label() { return label_; }
+    DEFINE_NODE_TYPE(BreakStatement, Expression);
+private:
+    Handle<Expression> label_;
+};
+
+class ContinueStatement : public Expression {
+public:
+    ContinueStatement(Position &loc, Scope *scope, Handle<Expression> label = nullptr)
+        : Expression(loc, scope), label_{ label } { }
+    Handle<Expression> label() { return label_; }
+    DEFINE_NODE_TYPE(ContinueStatement, Expression);
+private:
+    Handle<Expression> label_;
+};
+    
 // FunctionPrototype - captures the prototype of the function
 // which includes the name of the function and
 class FunctionPrototype : public Expression {

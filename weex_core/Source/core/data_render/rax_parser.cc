@@ -110,6 +110,9 @@ Handle<Expression> RAXParser::ParseAssignExpression()
     // TODO: information about what kind of assignment is done here should
     //  be stored here. (in the AST?)
     Advance();
+    if (lhs->IsMemberExpression()) {
+        lhs->AsMemberExpression()->lhs_value() = true;
+    }
     auto rhs = ParseAssignExpression();
     return builder()->NewAssignExpression((lhs), (rhs));
 }
@@ -907,6 +910,26 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
     return expr;
 }
     
+Handle<Expression> RAXParser::ParseBreakStatement()
+{
+    Advance();
+    Handle<Expression> label = nullptr;
+    if (Peek() == Token::IDENTIFIER) {
+        label = builder()->NewIdentifier(GetIdentifierName());
+    }
+    return builder()->NewBreakStatement(label);
+}
+    
+Handle<Expression> RAXParser::ParseContinueStatement()
+{
+    Advance();
+    Handle<Expression> label = nullptr;
+    if (Peek() == Token::IDENTIFIER) {
+        label = builder()->NewIdentifier(GetIdentifierName());
+    }    
+    return builder()->NewContinueStatement(label);
+}
+
 Handle<Expression> RAXParser::ParseStatement()
 {
     auto tok = Peek();
@@ -951,12 +974,12 @@ Handle<Expression> RAXParser::ParseStatement()
         case Token::VAR:
         case Token::LET:
             return ParseVariableStatement();
+        case Token::BREAK:
+            return ParseBreakStatement();
+        case Token::CONTINUE:
+            return ParseContinueStatement();
 //        case SWITCH:
 //            return ParseSwitchStatement();
-//        case BREAK:
-//            return ParseBreakStatement();
-//        case CONTINUE:
-//            return ParseContinueStatement();
 //        case TRY:
 //            return ParseTryCatchStatement();
 //        case THROW:

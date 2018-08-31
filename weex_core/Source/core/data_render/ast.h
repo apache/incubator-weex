@@ -65,6 +65,8 @@ namespace data_render {
   M(IfStatement)         \
   M(IfElseStatement)     \
   M(ForStatement)        \
+  M(ContinueStatement)   \
+  M(BreakStatement)      \
   M(BlockStatement)      \
   M(FunctionPrototype)   \
   M(FunctionStatement)   \
@@ -411,6 +413,7 @@ class MemberExpression : public Expression {
   Handle<Expression> member() { return member_; }
   MemberAccessKind kind() { return kind_; }
   void setKind(MemberAccessKind kind) { kind_ = kind; }
+  bool &lhs_value() { return lhs_value_; }
 
   Handle<Expression> expr() { return expr_; }
   bool ProduceRValue() override { return false; }
@@ -420,6 +423,7 @@ class MemberExpression : public Expression {
   MemberAccessKind kind_;
   Handle<Expression> expr_;
   Handle<Expression> member_;
+  bool lhs_value_{false};
 };
 
 class CallExpression : public Expression {

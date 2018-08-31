@@ -104,6 +104,11 @@ public:
     Handle<Expression> NewIfElseStatement(Handle<Expression> cond, Handle<Expression> then, Handle<Expression> els);
     // create a new node representing JavaScript for loop
     Handle<Expression> NewForStatement(ForKind kind, Handle<Expression> init, Handle<Expression> cond, Handle<Expression> update, Handle<Expression> body);
+    // create a new node representing JavaScript break statement
+    Handle<Expression> NewBreakStatement(Handle<Expression> label = nullptr);
+    
+    // create a new node representing JavaScript continue statement
+    Handle<Expression> NewContinueStatement(Handle<Expression> label = nullptr);
     Handle<Expression> NewArrowFunctionStatement(Handle<Expression> body, std::vector<Handle<Expression>> args);
     Handle<Expression> NewJSXNodeExpression(Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens);
     Handle<Expression> NewClassStatement(Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body);

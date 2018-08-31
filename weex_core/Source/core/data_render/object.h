@@ -185,7 +185,6 @@ struct Value {
     friend bool operator!=(const Value &left, const Value &right) {
         return !(left == right);
     }
-
 };
 
 typedef struct Array {
@@ -245,6 +244,8 @@ int ToInteger(const Value *o, const int &mode, int64_t &v);
 
 bool ValueEquals(const Value *a, const Value *b);
 
+bool ObjectEquals(const Value *a, const Value *b);
+    
 bool ValueStrictEquals(const Value *a, const Value *b);
     
 bool ValueLT(const Value *a, const Value *b);
@@ -386,7 +387,7 @@ inline char *CStringValue(const Value *o) {
 }
     
 template <typename T>
-inline T* ObjectValue(const Value *o) {
+inline T* ValueTo(const Value *o) {
     return reinterpret_cast<T*>(o->gc);
 }
 
@@ -519,8 +520,8 @@ inline int ToBool(const Value *o, bool &b) {
 }
 
 inline void ArrayAddAll(Value &src, Value &dest, int start, int end) {
-  Array *st = ObjectValue<Array>(&src);
-  Array *dt = ObjectValue<Array>(&dest);
+  Array *st = ValueTo<Array>(&src);
+  Array *dt = ValueTo<Array>(&dest);
   dt->items.insert(dt->items.end(), st->items.begin() + start, end > 0 ? st->items.begin() + end : st->items.end());
 }
 
@@ -529,8 +530,8 @@ inline void ArrayAddAll(Value &src, Value &dest) {
 }
 
 inline void TableMapAddAll(Value &src, Value &dest) {
-  Table *st = ObjectValue<Table>(&src);
-  Table *dt = ObjectValue<Table>(&dest);
+  Table *st = ValueTo<Table>(&src);
+  Table *dt = ValueTo<Table>(&dest);
   dt->map.insert(st->map.begin(), st->map.end());
 }
 

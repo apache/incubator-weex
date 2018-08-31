@@ -72,6 +72,7 @@ class CodeGenerator : public ASTVisitor {
   void Visit(ThisExpression *node, void *data) override;
   void Visit(NewExpression *node, void *data) override;
   void Visit(PostfixExpression *node, void *data) override;
+  void Visit(ContinueStatement *node, void *data) override;
 
  private:
   template <class T>
@@ -109,7 +110,9 @@ class CodeGenerator : public ASTVisitor {
     }
     
     inline ExecState *exec_state() { return exec_state_; }
-
+    int for_start_index();
+    void set_for_start_index(int index) { for_start_index_ = index; }
+    inline std::vector<int>& for_break_slots() { return for_break_slots_; }
     inline std::unordered_map<std::string, long> &variables() {
       return variables_;
     }
@@ -125,6 +128,8 @@ class CodeGenerator : public ASTVisitor {
     bool is_loop_;
     FuncState *func_state_{nullptr};
     ExecState *exec_state_{nullptr};
+    int for_start_index_{-1};
+    std::vector<int> for_break_slots_;
   };
 
   class FuncCnt : public Node<FuncCnt> {

@@ -44,8 +44,8 @@ enum OpCode {
   OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)
 
   OP_SETARRAY,  //    A B C    R(A)[R(B)] = RK(C)
-  OP_GETARRAY,  //    A B C    R(A) = R(B)[R(C)]
-
+  OP_GETINDEX,  //    A B C    R(A) = R(B)[R(C)]
+  OP_GETINDEXVAR,
     
   OP_ADD,   //	A B C	R(A) = R(B) + R(C)
   OP_SUB,   //	A B C	R(A) = R(B) - R(C)
@@ -71,6 +71,7 @@ enum OpCode {
   OP_GT,
   OP_GTE,
   OP_AND,
+  OP_IN,
 
   OP_CALL,     //	A B C	R(A) = R(B)(R(B+1), ... ,R(B+C-1))
   OP_RETURN0,  //	Return

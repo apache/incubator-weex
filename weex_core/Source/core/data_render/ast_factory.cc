@@ -285,6 +285,16 @@ Handle<Expression> ASTFactory::NewForStatement(Position &loc, Scope *scope, ForK
     return MakeHandle<ForStatement>(loc, scope, kind, init, condition, update, body);
 }
     
+Handle<Expression> ASTFactory::NewBreakStatement(Position &loc, Scope *scope, Handle<Expression> label)
+{
+    return MakeHandle<BreakStatement>(loc, scope, label);
+}
+
+Handle<Expression> ASTFactory::NewContinueStatement(Position &loc, Scope *scope, Handle<Expression> label)
+{
+    return MakeHandle<ContinueStatement>(loc, scope, label);
+}
+    
 Handle<Expression> ASTFactory::NewIfStatement(Position &loc, Scope *scope, Handle<Expression> condition, Handle<Expression> then)
 {
     return MakeHandle<IfStatement>(loc, scope, condition, then);
