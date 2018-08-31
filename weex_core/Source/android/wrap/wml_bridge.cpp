@@ -92,10 +92,10 @@ static jbyteArray ExecJsOnAppWithResult(JNIEnv* env, jobject jcaller,
                  ->getPlatformBridge()
                  ->core_side()
                  ->ExecJSOnAppWithResult(id.getChars(), bundle.getChars());
-  if (ret != nullptr) {
-    jbyteArray array = env->NewByteArray(strlen(ret));
-    env->SetByteArrayRegion(array, 0, strlen(ret),
-                            reinterpret_cast<const jbyte*>(ret));
+  if (ret.get() != nullptr && ret->data.get() != nullptr) {
+    jbyteArray array = env->NewByteArray(ret->length);
+    env->SetByteArrayRegion(array, 0, ret->length,
+                            reinterpret_cast<const jbyte*>(ret->data.get()));
     return array;
   }
 

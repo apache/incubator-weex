@@ -49,24 +49,11 @@ struct WeexByteArray {
     char content[1];
 };
 
-
-struct WeexJSResult{
-    char* data = nullptr;
-    int  length = 0;
-    bool fromMalloc = false;
-    bool fromNew = false;
+class WeexJSResult{
+public:
+    std::unique_ptr<char[]> data;
+    int length = 0;
 };
-
-inline void WeexJSResultDataFree(WeexJSResult& result){
-    if(result.fromMalloc){
-        free(result.data);
-        return;
-    }
-    if(result.fromNew){
-        delete[] result.data;
-        return;
-    }
-}
 
 typedef struct InitFrameworkParams {
     WeexByteArray *type;
@@ -267,7 +254,7 @@ typedef int (*FuncInitAppFramework)(const char *instanceId, const char *appFrame
 
 typedef int (*FuncCreateAppContext)(const char *instanceId, const char *jsBundle);
 
-typedef char *(*FuncExeJSOnAppWithResult)(const char *instanceId, const char *jsBundle);
+typedef std::unique_ptr<WeexJSResult> (*FuncExeJSOnAppWithResult)(const char *instanceId, const char *jsBundle);
 
 typedef int (*FuncCallJSOnAppContext)(const char *instanceId, const char *func, std::vector<VALUE_WITH_TYPE *> &params);
 
@@ -280,13 +267,13 @@ typedef int (*FuncExeCTimeCallback)(const char *source);
 typedef int (*FuncExeJS)(const char *instanceId, const char *nameSpace, const char *func,
                          std::vector<VALUE_WITH_TYPE *> &params);
 
-typedef WeexJSResult(*FuncExeJSWithResult)(const char *instanceId, const char *nameSpace, const char *func,
+typedef std::unique_ptr<WeexJSResult>(*FuncExeJSWithResult)(const char *instanceId, const char *nameSpace, const char *func,
                                            std::vector<VALUE_WITH_TYPE *> &params);
 
 typedef int (*FuncCreateInstance)(const char *instanceId, const char *func, const char *script, const char *opts,
                                   const char *initData, const char *extendsApi);
 
-typedef char *(*FuncExeJSOnInstance)(const char *instanceId, const char *script);
+typedef std::unique_ptr<WeexJSResult> (*FuncExeJSOnInstance)(const char *instanceId, const char *script);
 
 typedef int (*FuncDestroyInstance)(const char *instanceId);
 

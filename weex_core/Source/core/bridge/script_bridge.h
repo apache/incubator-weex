@@ -104,7 +104,7 @@ class ScriptBridge {
     virtual int CreateAppContext(const char *instanceId,
                                  const char *jsBundle) = 0;
 
-    virtual char *ExecJSOnAppWithResult(const char *instanceId,
+    virtual std::unique_ptr<WeexJSResult>  ExecJSOnAppWithResult(const char *instanceId,
                                         const char *jsBundle) = 0;
 
     virtual int CallJSOnAppContext(const char *instanceId, const char *func,
@@ -120,7 +120,7 @@ class ScriptBridge {
                        const char *func,
                        std::vector<VALUE_WITH_TYPE *> &params) = 0;
 
-    virtual WeexJSResult ExecJSWithResult(
+    virtual std::unique_ptr<WeexJSResult>  ExecJSWithResult(
         const char *instanceId, const char *nameSpace, const char *func,
         std::vector<VALUE_WITH_TYPE *> &params) = 0;
 
@@ -129,7 +129,7 @@ class ScriptBridge {
                                const char *initData,
                                const char *extendsApi) = 0;
 
-    virtual char *ExecJSOnInstance(const char *instanceId,
+    virtual std::unique_ptr<WeexJSResult>  ExecJSOnInstance(const char *instanceId,
                                    const char *script) = 0;
 
     virtual int DestroyInstance(const char *instanceId) = 0;

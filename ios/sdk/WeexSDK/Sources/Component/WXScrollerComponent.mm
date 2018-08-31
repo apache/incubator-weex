@@ -910,13 +910,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)_assignInnerContentMainSize:(CGFloat)value
 {
-    if ([self isMemberOfClass:[WXScrollerComponent class]]) {
-        if (_scrollDirection == WXScrollDirectionVertical) {
-            _contentSize.height = value;
-        }
-        else if (_scrollDirection == WXScrollDirectionHorizontal) {
-            _contentSize.width = value;
-        }
+    if (_scrollDirection == WXScrollDirectionVertical) {
+        _contentSize.height = value;
+    }
+    else if (_scrollDirection == WXScrollDirectionHorizontal) {
+        _contentSize.width = value;
     }
 }
 

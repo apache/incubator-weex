@@ -44,7 +44,12 @@ class AsynLayoutTask extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... params) {
         if(templateViewHolder.getHolderPosition() == position){
             if(component.getInstance() != null && !component.getInstance().isDestroy()) {
-                Layouts.doLayoutOnly(component, templateViewHolder);
+                synchronized (templateViewHolder.getTemplateList()){
+                    if(templateViewHolder.getTemplateList().isDestoryed()){
+                        return null;
+                    }
+                    Layouts.doLayoutOnly(component, templateViewHolder);
+                }
             }
         }
         return null;
