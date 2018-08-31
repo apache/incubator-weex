@@ -223,7 +223,23 @@ bool flexIsUndefined(float value) {
     if (_positionType == WXPositionTypeSticky) {
         [self.ancestorScroller adjustSticky];
     }
+    [self _adjustForRTL];
     [self layoutDidFinish];
+}
+
+- (void)_adjustForRTL {
+    if (self.supercomponent && self.supercomponent->_flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL && [self.supercomponent shouldTranformSubviewsWhenRTL]) {
+        self.view.transform = CGAffineTransformScale(CGAffineTransformIdentity, -1, 1);
+    } else {
+        self.view.transform = CGAffineTransformIdentity;
+    }
+}
+
+// Now we scrollView RTL solution is tranform
+// so scrollView need tranform subviews when RTL by default
+// if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
+- (BOOL)shouldTranformSubviewsWhenRTL {
+    return [self.view isKindOfClass:[UIScrollView class]];
 }
 
 #define WX_STYLE_FLEX_NODE_JUDGE_LEGAL(key) styles[key]&&!isnan([WXConvert WXPixelType:styles[key] scaleFactor:self.weexInstance.pixelScaleFactor])

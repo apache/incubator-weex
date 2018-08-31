@@ -56,6 +56,12 @@ extern "C" {
 @end
 
 @interface WXComponent (Layout)
+
+// Now we scrollView RTL solution is tranform
+// so scrollView need tranform subviews when RTL by default
+// if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
+- (BOOL)shouldTranformSubviewsWhenRTL;
+
 - (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index;
 - (void)_rmChildCssNode:(WXComponent*)subcomponent;
 - (NSInteger) getActualNodeIndex:(WXComponent*)subcomponent atIndex:(NSInteger) index;

@@ -377,13 +377,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 {
     // this is scroll rtl solution.
     // scroll layout not use direction, use self tranform
-    if (_flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL
+    if (self.view && _flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL
         ) {
-        CGAffineTransform transform = CGAffineTransformScale(CGAffineTransformIdentity, -1, 1);
-            self.view.transform = transform;
-        [self.view.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            obj.transform = transform;
-        }];
+        self.view.transform = CGAffineTransformScale(CGAffineTransformIdentity, -1, 1);
+    } else {
+        self.view.transform = CGAffineTransformIdentity;
     }
 }
 

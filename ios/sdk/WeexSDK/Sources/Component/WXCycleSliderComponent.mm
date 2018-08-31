@@ -473,14 +473,21 @@ typedef NS_ENUM(NSInteger, Direction) {
         ) {
         WXRecycleSliderView *slider = (WXRecycleSliderView *)self.view;
         CGAffineTransform transform = CGAffineTransformScale(CGAffineTransformIdentity, -1, 1);
-        slider.scrollView.transform = transform;
-        [slider.scrollView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            obj.transform = transform;
-        }];
+        slider.scrollView.transform = transform ;
         if (slider.indicator) {
             slider.indicator.transform = transform;
         }
+    } else {
+        WXRecycleSliderView *slider = (WXRecycleSliderView *)self.view;
+        slider.scrollView.transform = CGAffineTransformIdentity ;
+        if (slider.indicator) {
+            slider.indicator.transform = CGAffineTransformIdentity;
+        }
     }
+}
+
+- (BOOL)shouldTranformSubviewsWhenRTL {
+    return YES;
 }
 
 - (void)viewDidUnload

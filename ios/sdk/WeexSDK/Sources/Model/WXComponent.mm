@@ -476,6 +476,7 @@ static BOOL bNeedRemoveEvents = YES;
         WXComponent *subcomponent = subcomponents[i];
         [self insertSubview:subcomponent atIndex:i];
     }
+    [self _adjustForRTL];
 }
 
 - (void)_resetNativeBorderRadius
