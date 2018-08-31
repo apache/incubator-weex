@@ -205,6 +205,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_setRenderObject:(void *)object;
 
+- (BOOL)_isCaculatedFrameChanged:(CGRect)frame;
+
 - (CGFloat)_getInnerContentMainSize;
 
 - (void)_assignInnerContentMainSize:(CGFloat)value;
