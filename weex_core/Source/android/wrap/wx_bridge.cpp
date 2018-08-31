@@ -34,6 +34,7 @@
 #include "android/wrap/hash_set.h"
 #include "android/wrap/wx_js_object.h"
 #include "android/wrap/wx_map.h"
+#include "core/render/node/factory/render_creator.h"
 #include "base/LogDefines.h"
 #include "core/config/core_environment.h"
 #include "core/layout/layout.h"
@@ -234,6 +235,11 @@ static void ResetWXBridge(JNIEnv* env, jobject jcaller,
   WXBridge::Instance()->Reset(env, bridge);
   WXBridge::Instance()->reset_clazz(env, classNameRef.getChars());
 }
+
+static void SetSegmentSwitch(JNIEnv* env, jobject jcaller,  jboolean segmentSwitch){
+    RenderCreator::GetInstance()->setSegmentSwitch(segmentSwitch);
+}
+
 
 static void SetViewPortWidth(JNIEnv* env, jobject jcaller, jstring instanceId,
                              jfloat value) {

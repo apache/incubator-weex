@@ -23,6 +23,7 @@
 #include <core/render/node/render_object.h>
 #include <core/render/page/render_page.h>
 #include <core/render/node/factory/render_creator.h>
+#include <core/render/node/factory/render_type.h>
 #include "dom_wson.h"
 #include "wson/wson.h"
 #include "wson/wson_parser.h"
@@ -67,7 +68,7 @@ namespace WeexCore {
             }else if (0 == strcmp(objectKey.c_str(), "type")) {
                 renderType = parser.nextStringUTF8(parser.nextType());
                 render = (RenderObject *) RenderCreator::GetInstance()->CreateRender(renderType, ref);
-              render->set_page_id(pageId);
+                render->set_page_id(pageId);
                 if (parent != nullptr){
                     parent->AddRenderObject(index, render);
                 }
@@ -80,6 +81,10 @@ namespace WeexCore {
                         std::string attrValueString = parser.nextStringUTF8(parser.nextType());
                         render->AddAttr(attrKeyString, attrValueString);
                     }
+                    /**
+                    if (parent != nullptr && parent->type() == kRenderCell){
+                        render->AddAttr("doctype", "weexrender");
+                    }*/
                 }else{
                     keyOrderRight = keys_order_as_expect(render, keyOrderRight);
                     parser.skipValue(attrType);
@@ -185,6 +190,38 @@ namespace WeexCore {
                     parser.skipValue(parser.nextType());
                 }
             }
+        }
+
+        if(render->type() == kRenderDiv
+           && render->attributes()->find("doctype") != render->attributes()->end()
+           && RenderCreator::GetInstance()->isSegmentSwitchOpen()){
+            RenderObject* segment = (RenderObject *) RenderCreator::GetInstance()->CreateRender(kRenderDocument, ref);
+            segment->set_page_id(pageId);
+            if (parent != nullptr){
+                parent->removeChild(render);
+                parent->AddRenderObject(index, segment);
+            }
+            for(int i=0; i<render->getChildCount(); i++){
+                RenderObject* child = (RenderObject *) render->getChildAt(i);
+                segment->AddRenderObject(i, child);
+            }
+            std::map<std::string, std::string>::iterator attrIt = render->attributes()->begin();
+            for(; attrIt != render->attributes()->end(); attrIt++){
+                segment->AddAttr(attrIt->first, attrIt->second);
+            }
+            std::map<std::string, std::string>::iterator styleIt = render->styles()->begin();
+            for(; styleIt != render->styles()->end(); styleIt++){
+                segment->AddStyle(styleIt->first, styleIt->second);
+            }
+            std::set<std::string>::iterator eventIt =  render->events()->begin();
+            for(;eventIt != render->events()->end(); eventIt++){
+                segment->AddEvent(*eventIt);
+            }
+
+
+            render->clearChilds();
+            delete  render;
+            render = segment;
         }
 
 

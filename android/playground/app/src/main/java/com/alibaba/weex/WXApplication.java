@@ -39,6 +39,7 @@ import com.alibaba.weex.extend.module.SyncTestModule;
 import com.alibaba.weex.extend.module.WXEventModule;
 import com.alibaba.weex.extend.module.WXTitleBar;
 import com.alibaba.weex.extend.module.WXWsonTestModule;
+import com.alibaba.weex.extend.render.PicassoImageAdapter;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXEnvironment;
@@ -46,6 +47,9 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
+import com.taobao.weex.render.RenderSDK;
+import com.taobao.weex.render.bridge.RenderBridge;
+import com.taobao.weex.render.log.RenderLog;
 
 public class WXApplication extends Application {
 
@@ -86,7 +90,7 @@ public class WXApplication extends Application {
       WXSDKEngine.registerComponent("synccomponent", WXComponentSyncTest.class);
       WXSDKEngine.registerComponent(WXParallax.PARALLAX, WXParallax.class);
 
-      WXSDKEngine.registerComponent("richtext", RichText.class);
+      //WXSDKEngine.registerComponent("richtext", RichText.class);
       WXSDKEngine.registerModule("render", RenderModule.class);
       WXSDKEngine.registerModule("event", WXEventModule.class);
       WXSDKEngine.registerModule("syncTest", SyncTestModule.class);
@@ -99,6 +103,7 @@ public class WXApplication extends Application {
 
       WXSDKEngine.registerModule("wsonTest", WXWsonTestModule.class);
 
+      RenderSDK.getInstance().setApplication(this).setImageAdapter(new PicassoImageAdapter()).init();
 
       /**
        * override default image tag
@@ -107,6 +112,8 @@ public class WXApplication extends Application {
 
       //Typeface nativeFont = Typeface.createFromAsset(getAssets(), "font/native_font.ttf");
       //WXEnvironment.setGlobalFontFamily("bolezhusun", nativeFont);
+
+      //RenderLog.openRenderLog(true);
 
     } catch (WXException e) {
       e.printStackTrace();

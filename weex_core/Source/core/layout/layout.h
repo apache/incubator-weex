@@ -707,6 +707,11 @@ namespace WeexCore {
       markDirty();
     }
 
+    inline void clearChilds(){
+      mChildList.clear();
+      markDirty();
+    }
+
     inline void addChildAt(WXCoreLayoutNode* const child, Index index) {
       mChildList.insert(mChildList.begin() + index, child);
       child->mParent = this;

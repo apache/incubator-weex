@@ -136,8 +136,7 @@ StyleType RenderObject::ApplyStyle(const std::string &key,
                                    const std::string &value,
                                    const bool updating) {
   bool insert = false;
-  if (value.length() > 0 && (value.at(0) == JSON_OBJECT_MARK_CHAR ||
-                             value.at(0) == JSON_ARRAY_MARK_CHAR)) {
+  if (value.length() > 0) {
     MapInsertOrAssign(this->styles_, key, value);
     insert = true;
   }

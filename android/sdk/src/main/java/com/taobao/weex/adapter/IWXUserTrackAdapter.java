@@ -51,5 +51,7 @@ public interface IWXUserTrackAdapter {
   String MONITOR_ARG = "arg";
   String MONITOR_ERROR_MSG = "errMsg";
 
+  String WEEX_RENDER = "weexrender";
+
   void commit(Context context, String eventId, String type, WXPerformance perf, Map<String, Serializable> params);
 }

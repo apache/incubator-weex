@@ -34,6 +34,8 @@ constexpr char kRenderHeader[] = "header";
 constexpr char kRenderFooter[] = "footer";
 constexpr char kRenderWaterfall[] = "waterfall";
 constexpr char kRenderAppBar[] = "appbar";
+constexpr char kRenderDocument[] = "segment";
+constexpr char kRenderDiv[] = "div";
 }  // namespace WeexCore
 
 #endif  // CORE_RENDER_NODE_FACTORY_RENDER_TYPE_H_
