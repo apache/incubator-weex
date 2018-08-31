@@ -69,6 +69,7 @@ typedef enum : NSUInteger {
     NSDictionary *_options;
     id _jsData;
     
+    UIUserInterfaceLayoutDirection _sysLayoutDirection;
     WXResourceLoader *_mainBundleLoader;
     WXComponentManager *_componentManager;
     WXRootView *_rootView;
@@ -105,6 +106,7 @@ typedef enum : NSUInteger {
             __instance++;
         }
         _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
+        _sysLayoutDirection = [UIApplication sharedApplication].userInterfaceLayoutDirection;
         
         [WXSDKManager storeInstance:self forID:_instanceId];
         
@@ -801,6 +803,10 @@ typedef enum : NSUInteger {
 - (void)applicationDidBecomeActive:(NSNotification*)notification
 {
     [self fireGlobalEvent:WX_APPLICATION_DID_BECOME_ACTIVE params:nil];
+}
+
+- (UIUserInterfaceLayoutDirection)sysLayoutDirection {
+    return _sysLayoutDirection;
 }
 
 - (WXComponentManager *)componentManager

@@ -38,6 +38,11 @@
 - (void)adjustSticky;
 
 /**
+ * @abstract adjust for RTL
+ */
+- (void)adjustForRTL;
+
+/**
  * @abstract add scroll listener
  */
 - (void)addScrollToListener:(WXComponent *)target;

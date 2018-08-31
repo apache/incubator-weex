@@ -123,6 +123,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 @interface WXTextComponent()
 @property (nonatomic, strong) NSString *useCoreTextAttr;
+@property (nonatomic, assign, readonly) BOOL isDirectionRTL;
 @end
 
 @implementation WXTextComponent
@@ -139,7 +140,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     WXTextStyle _fontStyle;
     NSUInteger _lines;
     NSTextAlignment _textAlign;
-    NSString *_direction;
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
     CGFloat _lineHeight;
@@ -273,7 +273,6 @@ do {\
     WX_STYLE_FILL_TEXT_PIXEL(lineHeight, lineHeight, YES)
     WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
     WX_STYLE_FILL_TEXT(wordWrap, wordWrap, NSString, YES);
-    WX_STYLE_FILL_TEXT(direction, direction, NSString, YES)
     if (_fontFamily && !_observerIconfont) {
         // notification received when custom icon font file download finish
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
@@ -373,6 +372,12 @@ do {\
     }
     
     return nil;
+}
+
+- (BOOL)isDirectionRTL {
+    WeexCore::WXCoreDirection direction = _flexCssNode->getLayoutDirectionFromPathNode();
+    if (direction != WeexCore::kDirectionInherit) return direction == WeexCore::kDirectionRTL;
+    return self.weexInstance.defaultLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
 }
 
 - (CGSize (^)(CGSize))measureBlock
@@ -502,7 +507,7 @@ do {\
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
     
     // handle text direction style, default ltr
-    BOOL isRtl = [_direction isEqualToString:@"rtl"];
+    BOOL isRtl = [self isDirectionRTL];
     if (isRtl) {
         if (0 == _textAlign) {
             //force text right-align if don't specified any align.
@@ -585,7 +590,7 @@ do {\
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
 
     // handle text direction style, default ltr
-    BOOL isRtl = [_direction isEqualToString:@"rtl"];
+    BOOL isRtl = [self isDirectionRTL];
     if (isRtl) {
         if (0 == _textAlign) {
             //force text right-align if don't specified any align.

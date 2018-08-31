@@ -19,6 +19,7 @@
 
 #import "WXScrollerComponent.h"
 #import "WXComponent_internal.h"
+#import "WXSDKInstance_private.h"
 #import "WXComponent.h"
 #import "WXDefine.h"
 #import "WXConvert.h"
@@ -37,6 +38,7 @@
 @end
 
 @implementation WXScrollerComponentView
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
     if ([(id <WXScrollerProtocol>) self.wx_component respondsToSelector:@selector(requestGestureShouldStopPropagation:shouldReceiveTouch:)]) {
@@ -46,6 +48,7 @@
         return YES;
     }
 }
+
 @end
 
 @interface WXScrollToTarget : NSObject
@@ -232,6 +235,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if ([self isViewLoaded]) {
         [self setContentSize:_contentSize];
         [self adjustSticky];
+        [self adjustForRTL];
         [self handleAppear];
     }
     
@@ -241,6 +245,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)_buildViewHierarchyLazily
 {
     [super _buildViewHierarchyLazily];
+    [self adjustForRTL];
     [self handleAppear];
 }
 
@@ -365,6 +370,20 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 		WXPerformBlockOnMainThread(^{
 			[self adjustSticky];
 		});
+    }
+}
+
+- (void)adjustForRTL
+{
+    // this is scroll rtl solution.
+    // scroll layout not use direction, use self tranform
+    if (_flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL
+        ) {
+        CGAffineTransform transform = CGAffineTransformScale(CGAffineTransformIdentity, -1, 1);
+            self.view.transform = transform;
+        [self.view.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            obj.transform = transform;
+        }];
     }
 }
 
@@ -923,33 +942,38 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
      *  layout from children to scroller to get scroller's contentSize
      */
     if ([self needsLayout]) {
-            _flexScrollerCSSNode->copyStyle(_flexCssNode);
-            _flexScrollerCSSNode->copyMeasureFunc(_flexCssNode);
-            
-            if (_scrollDirection == WXScrollDirectionVertical) {
-                _flexScrollerCSSNode->setFlexDirection(WeexCore::kFlexDirectionColumn,NO);
-                _flexScrollerCSSNode->setStyleWidth(self.flexCssNode->getLayoutWidth(),NO);
-                _flexScrollerCSSNode->setStyleHeight(FlexUndefined);
-            } else {
-                _flexScrollerCSSNode->setFlexDirection(WeexCore::kFlexDirectionRow,NO);
-                _flexScrollerCSSNode->setStyleHeight(self.flexCssNode->getLayoutHeight());
-                _flexScrollerCSSNode->setStyleWidth(FlexUndefined,NO);
-            }
-            _flexScrollerCSSNode->markDirty();
-            std::pair<float, float> renderPageSize;
-            renderPageSize.first = self.weexInstance.frame.size.width;
-            renderPageSize.second = self.weexInstance.frame.size.height;
-            _flexScrollerCSSNode->calculateLayout(renderPageSize);
-            CGSize size = {
-                WXRoundPixelValue(_flexScrollerCSSNode->getLayoutWidth()),
-                WXRoundPixelValue(_flexScrollerCSSNode->getLayoutHeight())
-            };
-            
-            if (!CGSizeEqualToSize(size, _contentSize)) {
-                // content size
-                _contentSize = size;
-                [dirtyComponents addObject:self];
-            }
+        _flexScrollerCSSNode->copyStyle(_flexCssNode);
+        _flexScrollerCSSNode->copyMeasureFunc(_flexCssNode);
+        
+        if (_scrollDirection == WXScrollDirectionVertical) {
+            _flexScrollerCSSNode->setFlexDirection(WeexCore::kFlexDirectionColumn,NO);
+            _flexScrollerCSSNode->setStyleWidth(self.flexCssNode->getLayoutWidth(),NO);
+            _flexScrollerCSSNode->setStyleHeight(FlexUndefined);
+        } else {
+            _flexScrollerCSSNode->setFlexDirection(WeexCore::kFlexDirectionRow,NO);
+            _flexScrollerCSSNode->setStyleHeight(self.flexCssNode->getLayoutHeight());
+            _flexScrollerCSSNode->setStyleWidth(FlexUndefined,NO);
+        }
+        _flexScrollerCSSNode->markDirty();
+        std::pair<float, float> renderPageSize;
+        renderPageSize.first = self.weexInstance.frame.size.width;
+        renderPageSize.second = self.weexInstance.frame.size.height;
+        
+        // this is scroll rtl solution.
+        // scroll layout not use direction, use self tranform
+        // but we need inherit direction in CSS, so we set children layout diretion manually
+        _flexScrollerCSSNode->determineChildLayoutDirection(_flexCssNode->getLayoutDirection());
+        
+        _flexScrollerCSSNode->calculateLayout(renderPageSize);
+        CGSize size = {
+            WXRoundPixelValue(_flexScrollerCSSNode->getLayoutWidth()),
+            WXRoundPixelValue(_flexScrollerCSSNode->getLayoutHeight())
+        };
+        if (!CGSizeEqualToSize(size, _contentSize)) {
+            // content size
+            _contentSize = size;
+            [dirtyComponents addObject:self];
+        }
     }
     
     [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];

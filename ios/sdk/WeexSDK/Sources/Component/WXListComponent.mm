@@ -264,7 +264,6 @@
         WXLogError(@"list only support cell/header/refresh/loading/fixed-component as child.");
         return;
     }
-    
     [super _insertSubcomponent:subcomponent atIndex:index];
     
     if (![subcomponent isKindOfClass:[WXHeaderComponent class]]

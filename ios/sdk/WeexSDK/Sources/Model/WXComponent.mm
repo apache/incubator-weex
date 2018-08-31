@@ -573,6 +573,8 @@ static BOOL bNeedRemoveEvents = YES;
             NSInteger actualIndex = [self getActualNodeIndex:subcomponent atIndex:index];
             [self _insertChildCssNode:subcomponent atIndex:actualIndex];
         }else{
+            // To inherit CSS, we need set parentNode even though the commponent no need join layout system
+            subcomponent->_flexCssNode->setParent(_flexCssNode);
 #ifdef DEBUG
             WXLogDebug(@"flexLayout -> no need JoinLayoutSystem parent ref:%@ type:%@, self ref:%@ type:%@ ",
                   self.ref,

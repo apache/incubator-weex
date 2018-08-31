@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#import "WXAssert.h"
 #import "WXCycleSliderComponent.h"
 #import "WXIndicatorComponent.h"
 #import "WXComponent_internal.h"
@@ -456,6 +457,30 @@ typedef NS_ENUM(NSInteger, Direction) {
 - (void)layoutDidFinish
 {
     _recycleSliderView.currentIndex = _index;
+    [self adjustForRTL];
+}
+
+- (void)_buildViewHierarchyLazily {
+    [super _buildViewHierarchyLazily];
+    [self adjustForRTL];
+}
+
+- (void)adjustForRTL
+{
+    // this is scroll rtl solution.
+    // scroll layout not use direction, use self tranform
+    if (_flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL
+        ) {
+        WXRecycleSliderView *slider = (WXRecycleSliderView *)self.view;
+        CGAffineTransform transform = CGAffineTransformScale(CGAffineTransformIdentity, -1, 1);
+        slider.scrollView.transform = transform;
+        [slider.scrollView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            obj.transform = transform;
+        }];
+        if (slider.indicator) {
+            slider.indicator.transform = transform;
+        }
+    }
 }
 
 - (void)viewDidUnload
