@@ -25,6 +25,7 @@
 #include "IPC/IPCException.h"
 #include "android/base/log_utils.h"
 #include "core_side_in_multi_process.h"
+#include "../../../include/WeexApiHeader.h"
 
 namespace WeexCore {
 
@@ -342,8 +343,9 @@ namespace WeexCore {
         }
     }
 
-    const char *CoreSideInMultiProcess::ExecJSOnAppWithResult(const char *instanceId,
+    std::unique_ptr<WeexJSResult> CoreSideInMultiProcess::ExecJSOnAppWithResult(const char *instanceId,
                                                     const char *jsBundle) {
+        std::unique_ptr<WeexJSResult> ret;
         try {
             std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
             serializer->setMsg(static_cast<uint32_t>(IPCMsgFromPlatformToCore::EXEC_JS_ON_APP_WITH_RESULT));
@@ -352,17 +354,25 @@ namespace WeexCore {
             std::unique_ptr<IPCBuffer> buffer = serializer->finish();
             std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
             if (result->getType() != IPCType::BYTEARRAY) {
-                return NULL;
+                return ret;
             }
             if (result->getByteArrayLength() == 0) {
-                return NULL;
+                return ret;
             }
-            return result->getByteArrayContent();
+
+            ret.reset(new WeexJSResult);
+            ret->length = result->getByteArrayLength();
+            char *string = new char[ret->length + 1];
+            ret->data.reset(string);
+            memset(string, 0, ret->length);
+            memcpy(string, result->getByteArrayContent(), result->getByteArrayLength());
+            string[ret->length] = '\0';
+            return ret;
         } catch (IPCException &e) {
             LOGE("%s", e.msg());
             // report crash here
             bridge()->platform_side()->ReportServerCrash(instanceId);
-            return nullptr;
+            return ret;
         }
     }
 
@@ -497,9 +507,10 @@ namespace WeexCore {
         }
     }
 
-    WeexJSResult CoreSideInMultiProcess::ExecJSWithResult(
+    std::unique_ptr<WeexJSResult> CoreSideInMultiProcess::ExecJSWithResult(
             const char *instanceId, const char *nameSpace, const char *func,
             std::vector<VALUE_WITH_TYPE *> &params) {
+        std::unique_ptr<WeexJSResult> ret;
         try {
             std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
             serializer->setMsg(static_cast<uint32_t>(IPCMsgFromPlatformToCore::EXEC_JS_WITH_RESULT));
@@ -534,20 +545,26 @@ namespace WeexCore {
             std::unique_ptr<IPCBuffer> buffer = serializer->finish();
             std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
             if (result->getType() != IPCType::BYTEARRAY) {
-                return WeexJSResult();
+                return ret;
             }
             if (result->getByteArrayLength() == 0) {
-                return WeexJSResult();
+                return ret;
             }
-            WeexJSResult weex_js_result;
-            weex_js_result.data = const_cast<char *>(result->getByteArrayContent());
-            weex_js_result.length = result->getByteArrayLength();
-            return weex_js_result;
+            ret.reset(new WeexJSResult);
+            ret->length = result->getByteArrayLength();
+            char *string = new char[ret->length + 1];
+            ret->data.reset(string);
+            memset(string, 0, ret->length);
+            memcpy(string, result->getByteArrayContent(), result->getByteArrayLength());
+            string[ret->length] = '\0';
+
+            return ret;
+
         } catch (IPCException &e) {
             LOGE("%s", e.msg());
             // report crash here
             bridge()->platform_side()->ReportServerCrash(instanceId);
-            return WeexJSResult();
+            return ret;
         }
     }
 
@@ -580,8 +597,9 @@ namespace WeexCore {
         }
     }
 
-    const char *CoreSideInMultiProcess::ExecJSOnInstance(const char *instanceId,
+    std::unique_ptr<WeexJSResult> CoreSideInMultiProcess::ExecJSOnInstance(const char *instanceId,
                                                const char *script) {
+        std::unique_ptr<WeexJSResult> ret;
         try {
             // base::debug::TraceScope traceScope("weex", "native_execJSOnInstance");
             std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
@@ -596,12 +614,19 @@ namespace WeexCore {
                 // LOGE("native_execJSOnInstance return type error");
                 return nullptr;
             }
-            return result->getByteArrayContent();
+            ret.reset(new WeexJSResult);
+            ret->length = result->getByteArrayLength();
+            ret->data.reset(new char[ret->length + 1]);
+            void *dst = ret->data.get();
+            memset(dst, 0, ret->length);
+            memcpy(dst, result->getByteArrayContent(), result->getByteArrayLength());
+            dst[ret->length] = '\0';
+            return ret;
         } catch (IPCException &e) {
             LOGE("%s", e.msg());
             // report crash here
             bridge()->platform_side()->ReportServerCrash(instanceId);
-            return nullptr;
+            return ret;
         }
     }
 

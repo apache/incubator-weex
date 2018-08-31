@@ -125,8 +125,9 @@ int ScriptSideInMultiProcess::CreateAppContext(const char *instanceId,
   }
 }
 
-char *ScriptSideInMultiProcess::ExecJSOnAppWithResult(const char *instanceId,
+std::unique_ptr<WeexJSResult> ScriptSideInMultiProcess::ExecJSOnAppWithResult(const char *instanceId,
                                                       const char *jsBundle) {
+    std::unique_ptr<WeexJSResult> ret;
   try {
     if(sender_ == nullptr) {
       LOGE("ExecJSOnAppWithResult sender is null");
@@ -139,12 +140,21 @@ char *ScriptSideInMultiProcess::ExecJSOnAppWithResult(const char *instanceId,
     std::unique_ptr<IPCBuffer> buffer = serializer->finish();
     std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
     if (result->getType() != IPCType::BYTEARRAY) {
-      return NULL;
+      return ret;
     }
     if (result->getByteArrayLength() == 0) {
-      return NULL;
+      return ret;
     }
-    return const_cast<char *>(result->getByteArrayContent());
+
+    ret.reset(new WeexJSResult);
+    ret->length = result->getByteArrayLength();
+    char *string = new char[ret->length + 1];
+    ret->data.reset(string);
+    memset(string, 0, ret->length);
+    memcpy(string, result->getByteArrayContent(), result->getByteArrayLength());
+    string[ret->length] = '\0';
+      return ret;
+
   } catch (IPCException &e) {
     LOGE("%s", e.msg());
     // report crash here
@@ -152,7 +162,7 @@ char *ScriptSideInMultiProcess::ExecJSOnAppWithResult(const char *instanceId,
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);
-    return nullptr;
+    return ret;
   }
 }
 
@@ -311,13 +321,14 @@ int ScriptSideInMultiProcess::ExecJS(const char *instanceId,
   }
 }
 
-WeexJSResult ScriptSideInMultiProcess::ExecJSWithResult(
+std::unique_ptr<WeexJSResult> ScriptSideInMultiProcess::ExecJSWithResult(
     const char *instanceId, const char *nameSpace, const char *func,
     std::vector<VALUE_WITH_TYPE *> &params) {
+    std::unique_ptr<WeexJSResult> ret;
   try {
     if(sender_ == nullptr) {
       LOGE("ExecJSWithResult sender is null");
-      return WeexJSResult();
+      return ret;
     }
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
     //    std::vector<VALUE_WITH_TYPE *> params;
@@ -353,16 +364,21 @@ WeexJSResult ScriptSideInMultiProcess::ExecJSWithResult(
     std::unique_ptr<IPCBuffer> buffer = serializer->finish();
     std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
     if (result->getType() != IPCType::BYTEARRAY) {
-      return WeexJSResult();
+      return ret;
     }
     if (result->getByteArrayLength() == 0) {
-      return WeexJSResult();
+      return ret;
     }
-    WeexJSResult weex_js_result;
-    weex_js_result.length = result->getByteArrayLength();
-    weex_js_result.data.reset(new char[weex_js_result.length]);
-    memcpy(weex_js_result.data.get(), result->getByteArrayContent(),result->getByteArrayLength());
-    return weex_js_result;
+
+    ret.reset(new WeexJSResult);
+    ret->length = result->getByteArrayLength();
+    char *string = new char[ret->length + 1];
+    ret->data.reset(string);
+    memset(string, 0, ret->length);
+    memcpy(string, result->getByteArrayContent(), result->getByteArrayLength());
+    string[ret->length] = '\0';
+
+      return ret;
   } catch (IPCException &e) {
     LOGE("%s", e.msg());
     // report crash here
@@ -370,7 +386,7 @@ WeexJSResult ScriptSideInMultiProcess::ExecJSWithResult(
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);
-    return WeexJSResult();
+    return ret;
   }
 }
 
@@ -411,8 +427,9 @@ int ScriptSideInMultiProcess::CreateInstance(
   }
 }
 
-char *ScriptSideInMultiProcess::ExecJSOnInstance(const char *instanceId,
+std::unique_ptr<WeexJSResult> ScriptSideInMultiProcess::ExecJSOnInstance(const char *instanceId,
                                                  const char *script) {
+ std::unique_ptr<WeexJSResult> ret;
   try {
     // base::debug::TraceScope traceScope("weex", "native_execJSOnInstance");
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
@@ -425,9 +442,16 @@ char *ScriptSideInMultiProcess::ExecJSOnInstance(const char *instanceId,
     std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
     if (result->getType() != IPCType::BYTEARRAY) {
       // LOGE("native_execJSOnInstance return type error");
-      return nullptr;
+      return ret;
     }
-    return const_cast<char *>(result->getByteArrayContent());
+    ret.reset(new WeexJSResult);
+    ret->length = result->getByteArrayLength();
+    char *string = new char[ret->length + 1];
+    ret->data.reset(string);
+    memset(string, 0, ret->length);
+    memcpy(string, result->getByteArrayContent(), result->getByteArrayLength());
+    string[ret->length] = '\0';
+      return ret;
   } catch (IPCException &e) {
     LOGE("%s", e.msg());
     // report crash here
@@ -435,7 +459,7 @@ char *ScriptSideInMultiProcess::ExecJSOnInstance(const char *instanceId,
         ->getPlatformBridge()
         ->platform_side()
         ->ReportServerCrash(instanceId);
-    return nullptr;
+    return ret;
   }
 }
 

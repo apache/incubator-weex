@@ -1111,12 +1111,17 @@ namespace WeexCore {
                     namespaceChar = nullptr;
                 }
                 ScopedJStringUTF8 functionChar(env, jfunction);
-                WeexJSResult jsResultData = js_server_api_functions->funcExeJSWithResult(
+                std::unique_ptr<WeexJSResult> jsResultData = js_server_api_functions->funcExeJSWithResult(
                         instanceidChar.getChars(), namespaceChar, functionChar.getChars(), params);
                 freeParams(params);
-                jbyteArray array = newJByteArray(env, jsResultData.data, jsResultData.length);
-                WeexJSResultDataFree(jsResultData);
-                return array;
+                if(jsResultData.get() != nullptr && jsResultData.data.get() != nullptr) {
+                    jbyteArray array = newJByteArray(env, jsResultData->data.get(), jsResultData.length);
+//                WeexJSResultDataFree(jsResultData);
+                    return array;
+                } else {
+                    return nullptr;
+                }
+
             } else {
 
                 std::unique_ptr<IPCBuffer> buffer = serializer->finish();

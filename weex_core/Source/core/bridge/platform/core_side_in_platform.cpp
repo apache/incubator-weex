@@ -360,7 +360,7 @@ int CoreSideInPlatform::CreateAppContext(const char *instanceId,
       ->CreateAppContext(instanceId, jsBundle);
 }
 
-const char *CoreSideInPlatform::ExecJSOnAppWithResult(const char *instanceId,
+std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSOnAppWithResult(const char *instanceId,
                                                       const char *jsBundle) {
   return WeexCoreManager::Instance()
       ->script_bridge()
@@ -405,7 +405,7 @@ int CoreSideInPlatform::ExecJS(const char *instanceId, const char *nameSpace,
       instanceId, nameSpace, func, params);
 }
 
-WeexJSResult CoreSideInPlatform::ExecJSWithResult(
+std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSWithResult(
     const char *instanceId, const char *nameSpace, const char *func,
     std::vector<VALUE_WITH_TYPE *> &params) {
   return WeexCoreManager::Instance()
@@ -433,7 +433,7 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
       ->CreateInstance(instanceId, func, script, opts, initData, extendsApi);
 }
 
-const char *CoreSideInPlatform::ExecJSOnInstance(const char *instanceId,
+std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSOnInstance(const char *instanceId,
                                                  const char *script) {
   return WeexCoreManager::Instance()
       ->script_bridge()

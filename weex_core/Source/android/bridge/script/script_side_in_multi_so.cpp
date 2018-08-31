@@ -58,11 +58,12 @@ int ScriptSideInMultiSo::CreateAppContext(const char *instanceId,
   return script_side_functions_->funcCreateAppContext(instanceId, jsBundle);
 }
 
-char *ScriptSideInMultiSo::ExecJSOnAppWithResult(const char *instanceId,
+std::unique_ptr<WeexJSResult> ScriptSideInMultiSo::ExecJSOnAppWithResult(const char *instanceId,
                                                  const char *jsBundle) {
   if(script_side_functions_ == nullptr) {
     LOGE("ScriptSideInMultiSo::ExecJSOnAppWithResult script_side_functions_ is null");
-    return false;
+    std::unique_ptr<WeexJSResult> result;
+    return result;
   }
   return script_side_functions_->funcExeJSOnAppWithResult(instanceId, jsBundle);
 }
@@ -112,12 +113,13 @@ int ScriptSideInMultiSo::ExecJS(const char *instanceId, const char *nameSpace,
   return script_side_functions_->funcExeJS(instanceId, nameSpace, func, params);
 }
 
-WeexJSResult ScriptSideInMultiSo::ExecJSWithResult(
+std::unique_ptr<WeexJSResult> ScriptSideInMultiSo::ExecJSWithResult(
     const char *instanceId, const char *nameSpace, const char *func,
     std::vector<VALUE_WITH_TYPE *> &params) {
   if(script_side_functions_ == nullptr) {
     LOGE("ScriptSideInMultiSo::ExecJSWithResult script_side_functions_ is null");
-    return  WeexJSResult();
+    std::unique_ptr<WeexJSResult> result;
+    return  result;
   }
   return script_side_functions_->funcExeJSWithResult(instanceId, nameSpace,
                                                      func, params);
@@ -135,11 +137,12 @@ int ScriptSideInMultiSo::CreateInstance(const char *instanceId,
                                                     opts, initData, extendsApi);
 }
 
-char *ScriptSideInMultiSo::ExecJSOnInstance(const char *instanceId,
+std::unique_ptr<WeexJSResult> ScriptSideInMultiSo::ExecJSOnInstance(const char *instanceId,
                                             const char *script) {
   if(script_side_functions_ == nullptr) {
     LOGE("ScriptSideInMultiSo::ExecJSOnInstance script_side_functions_ is null");
-    return false;
+    std::unique_ptr<WeexJSResult> result;
+    return  result;
   }
   return script_side_functions_->funcExeJSOnInstance(instanceId, script);
 }

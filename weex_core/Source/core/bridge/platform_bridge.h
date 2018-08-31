@@ -100,7 +100,7 @@ class PlatformBridge {
         std::vector<INIT_FRAMEWORK_PARAMS*>& params) = 0;
     virtual int CreateAppContext(const char* instanceId,
                                  const char* jsBundle) = 0;
-    virtual const char* ExecJSOnAppWithResult(const char* instanceId,
+    virtual std::unique_ptr<WeexJSResult> ExecJSOnAppWithResult(const char* instanceId,
                                               const char* jsBundle) = 0;
     virtual int CallJSOnAppContext(const char* instanceId, const char* func,
                                    std::vector<VALUE_WITH_TYPE*>& params) = 0;
@@ -110,14 +110,14 @@ class PlatformBridge {
     virtual int ExecJS(const char* instanceId, const char* nameSpace,
                        const char* func,
                        std::vector<VALUE_WITH_TYPE*>& params) = 0;
-    virtual WeexJSResult ExecJSWithResult(
+    virtual std::unique_ptr<WeexJSResult> ExecJSWithResult(
         const char* instanceId, const char* nameSpace, const char* func,
         std::vector<VALUE_WITH_TYPE*>& params) = 0;
     virtual int CreateInstance(const char* instanceId, const char* func,
                                const char* script, const char* opts,
                                const char* initData, const char* extendsApi,
                                const char* render_strategy) = 0;
-    virtual const char* ExecJSOnInstance(const char* instanceId,
+    virtual std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char* instanceId,
                                          const char* script) = 0;
     virtual int DestroyInstance(const char* instanceId) = 0;
     virtual int UpdateGlobalConfig(const char* config) = 0;

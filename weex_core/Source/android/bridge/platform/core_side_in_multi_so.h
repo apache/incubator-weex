@@ -82,7 +82,7 @@ class CoreSideInMultiSo : public PlatformBridge::CoreSide {
     int InitAppFramework(const char *instanceId, const char *appFramework,
                          std::vector<INIT_FRAMEWORK_PARAMS *> &params) override;
     int CreateAppContext(const char *instanceId, const char *jsBundle) override;
-    const char *ExecJSOnAppWithResult(const char *instanceId,
+    std::unique_ptr<WeexJSResult> ExecJSOnAppWithResult(const char *instanceId,
                                       const char *jsBundle) override;
     int CallJSOnAppContext(const char *instanceId, const char *func,
                            std::vector<VALUE_WITH_TYPE *> &params) override;
@@ -91,13 +91,13 @@ class CoreSideInMultiSo : public PlatformBridge::CoreSide {
     int ExecTimeCallback(const char *source) override;
     int ExecJS(const char *instanceId, const char *nameSpace, const char *func,
                std::vector<VALUE_WITH_TYPE *> &params) override;
-    WeexJSResult ExecJSWithResult(const char *instanceId, const char *nameSpace,
+    std::unique_ptr<WeexJSResult> ExecJSWithResult(const char *instanceId, const char *nameSpace,
                                   const char *func,
                                   std::vector<VALUE_WITH_TYPE *> &params) override;
     int CreateInstance(const char *instanceId, const char *func,
                        const char *script, const char *opts, const char *initData,
                        const char *extendsApi, const char* render_strategy) override;
-    const char *ExecJSOnInstance(const char *instanceId, const char *script) override;
+    std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char *instanceId, const char *script) override;
     int DestroyInstance(const char *instanceId) override;
     int UpdateGlobalConfig(const char *config) override;
  private:
