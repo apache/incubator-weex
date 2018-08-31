@@ -409,7 +409,7 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
       // will be free by table
       Value key(state->string_table()->StringFromUTF8(it->first));
       Value val(ParseJson2Value(state, it->second));
-      SetTabValue(ValueTo<Table>(&value), &key, val);
+      SetTableValue(ValueTo<Table>(&value), &key, val);
     }
     return value;
   } else {

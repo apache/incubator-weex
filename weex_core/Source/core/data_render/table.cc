@@ -101,7 +101,7 @@ Value *GetTableVar(Table *table, const Value &key) {
     return ret;
 }
 
-int SetTabValue(Table *t, Value *key, const Value &val) {
+int SetTableValue(Table *t, Value *key, const Value &val) {
     if (IsString(key)) {
         return SetTabStringValue(t, key, val);
     }

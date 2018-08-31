@@ -579,7 +579,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 }
             }
             else if (IsTable(b)) {
-                Value *ret = GetTableValue(ValueTo<Table>(b), c);
+                Value *ret = GetTableValue(ValueTo<Table>(b), *c);
                 if (!IsNil(ret)) {
                     *a = *ret;
                 }
@@ -727,7 +727,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
           // TODO error
             throw VMExecError("Table Type Error With OP_CODE [OP_SETTABLE]");
         }
-        int ret = SetTabValue(reinterpret_cast<Table *>(a->gc), b, *c);
+        int ret = SetTableValue(reinterpret_cast<Table *>(a->gc), b, *c);
         //LOGD("[OP_SETTABLE]:%s\n", TableToString(ValueTo<Table>(a)).c_str());
         if (!ret) {
           // TODO set faile

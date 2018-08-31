@@ -28,11 +28,11 @@ namespace data_render {
 
 Table *NewTable();
 
+int SetTableValue(Table *, Value *, const Value &);
+    
 Value *GetTableValue(Table *, const Value &);
     
 Value *GetTableVar(Table *table, const Value &key);
-
-int SetTabValue(Table *, Value *, const Value &);
     
 size_t GetTableSize(Table *);
 
