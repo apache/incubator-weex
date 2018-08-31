@@ -41,7 +41,7 @@ cp dist/weex-polyfill.min.js pre-build/weex-polyfill.js
 cp dist/weex-rax.min.js pre-build/weex-rax-api.js
 cp dist/weex-rax.min.js android_sdk/assets/weex-rax-api.js
 
-gradle wrapper --gradle-version 3.3
+gradle wrapper --gradle-version 4.4
 echo 'include ":android_sdk"'>settings.gradle
 ./gradlew :android_sdk:assemble -PasfRelease
 
