@@ -85,7 +85,7 @@ struct Value {
   Type type;
 
   Value() : type(NIL) {}
- 
+    
   Value(int value) : i(value), type(INT) {}
 
   Value(int64_t value) : i(value), type(INT) {}
@@ -257,6 +257,8 @@ bool ValueGT(const Value *a, const Value *b);
 bool ValueGTE(const Value *a, const Value *b);
     
 bool ValueAND(const Value *a, const Value *b);
+    
+bool ValueOR(const Value *a, const Value *b);
 
 void FreeValue(Value *o);
 

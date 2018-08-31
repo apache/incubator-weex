@@ -71,13 +71,12 @@ enum OpCode {
   OP_GT,
   OP_GTE,
   OP_AND,
+  OP_OR,
   OP_IN,
 
   OP_CALL,     //	A B C	R(A) = R(B)(R(B+1), ... ,R(B+C-1))
   OP_RETURN0,  //	Return
   OP_RETURN1,  //	Return R(A)
-
-  OP_INVALID,
 
   OP_PRE_INCR,  // A      if (B >= 0) R(B) = ++R(A) else ++R(A)
   OP_PRE_DECR,  // A      if (B >= 0) R(B) = --R(A) else --R(A)
@@ -85,6 +84,7 @@ enum OpCode {
   OP_POST_INCR,  // A      if (B >= 0) R(B) = R(A)++ else R(A)++
   OP_POST_DECR,  // A      if (B >= 0) R(B) = R(A)++ else R(A)--
 
+  OP_INVALID,
 
 };
 

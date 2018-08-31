@@ -1274,13 +1274,13 @@ Handle<Expression> RAXParser::ParseVariableStatement()
     std::vector<Handle<Declaration>> decl_list;
     while (true) {
         decl_list.push_back(Handle<Declaration>(ParseDeclaration()));
-        
+
         auto tok = Peek();
         if (tok == Token::SEMICOLON) {
             Advance();
             break;
         }
-        else if (tok == Token::IN) {
+        else if (tok == Token::IN || tok == Token::CONST) {
             break;
         }
         else if (tok != Token::COMMA) {

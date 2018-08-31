@@ -293,6 +293,14 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             SetBValue(a, ValueAND(b, c));
             break;
         }
+        case OP_OR: {
+            LOGD("OP_OR A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_B(instruction);
+            c = frame.reg + GET_ARG_C(instruction);
+            SetBValue(a, ValueOR(b, c));
+            break;
+        }
       case OP_UNM: {
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.reg + GET_ARG_B(instruction);

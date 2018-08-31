@@ -676,6 +676,11 @@ void CodeGenerator::Visit(BinaryExpression *node, void *data) {
             func_state->AddInstruction(CREATE_ABC(OP_IN, ret, left, right));
             break;
         }
+        case BinaryOperation::kOr:
+        {
+            func_state->AddInstruction(CREATE_ABC(OP_OR, ret, left, right));
+            break;
+        }
         default:
         {
             throw GeneratorError("unsupport binary operation");
@@ -777,13 +782,19 @@ void CodeGenerator::Visit(DoubleConstant* node, void* data) {
   }
 }
     
+void CodeGenerator::Visit(NullConstant *node, void *data) {
+    long reg = data == nullptr ? -1 : *static_cast<long *>(data);
+    if (reg >= 0) {
+        FuncState *func_state = func_->func_state();
+        func_state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
+    }
+}
+    
 void CodeGenerator::Visit(UndefinedConstant *node, void *data) {
     long reg = data == nullptr ? -1 : *static_cast<long*>(data);
     if (reg >= 0) {
         FuncState *func_state = func_->func_state();
-        int index = func_state->AddConstant(Value());
-        Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
-        func_state->AddInstruction(i);
+        func_state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
     }
 }
 
