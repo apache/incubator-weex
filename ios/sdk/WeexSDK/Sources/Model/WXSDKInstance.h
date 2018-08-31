@@ -29,6 +29,8 @@ extern NSString *const bundleUrlOptionKey;
 
 @interface WXSDKInstance : NSObject
 
+@property (nonatomic, assign) UIUserInterfaceLayoutDirection defaultLayoutDirection;
+
 /**
  * The viewControler which the weex bundle is rendered in.
  **/

@@ -39,7 +39,6 @@
 @property (nonatomic, strong) NSString *createInstanceContextResult;
 @property (nonatomic, strong) NSString *executeRaxApiResult;
 
-@property (nonatomic, assign) UIUserInterfaceLayoutDirection defaultLayoutDirection;
 @property (nonatomic, readonly, strong) WXComponentManager *componentManager;
 
 - (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary*)option moduleClassName:(NSString*)moduleClassName;
