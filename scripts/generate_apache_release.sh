@@ -37,3 +37,4 @@ $SED_CMD -i '' 's/\.\.\/\.\.\/pre-build/\.\.\/pre-build/g' $dest/android_sdk/bui
 mv $dest/android/build.gradle $dest/build.gradle
 rm -rf $dest/android $dest/ios
 
+rm -rf $dest/android_sdk/gradle
