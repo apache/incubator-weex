@@ -72,9 +72,10 @@ namespace WeexCore {
   };
 
   /**
-   * layout-result：layout-height、layout-width、position（left、right、top、bottom）
+   * layout-result：layout-height、layout-width、position（left、right、top、bottom）、direction
    */
   struct WXCorelayoutResult {
+    WXCoreDirection mLayoutDirection;
     WXCoreSize mLayoutSize;
     WXCorePosition mLayoutPosition;
 
@@ -83,8 +84,9 @@ namespace WeexCore {
     }
 
     inline void reset() {
-      mLayoutSize.reset();
-      mLayoutPosition.reset();
+        mLayoutSize.reset();
+        mLayoutPosition.reset();
+        mLayoutDirection = kDirectionInherit;
     }
   };
 
@@ -265,6 +267,23 @@ namespace WeexCore {
       this->context = context;
     }
 
+    inline void copyParentNode(WXCoreLayoutNode *srcNode) {
+        if (nullptr == srcNode->mParent) {
+            if (nullptr != mParent) {
+                mParent = nullptr;
+                markDirty();
+            }
+            return;
+        }
+        if (mParent == nullptr) {
+            mParent = new WXCoreLayoutNode();
+        }
+        if (memcmp(mParent, srcNode->mParent, sizeof(WXCoreLayoutNode)) != 0) {
+            memcpy(mParent, srcNode->mParent, sizeof(WXCoreLayoutNode));
+          markDirty();
+      }
+    }
+      
     inline void copyStyle(WXCoreLayoutNode *srcNode) {
       if (memcmp(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle)) != 0) {
         memcpy(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle));
@@ -739,6 +758,10 @@ namespace WeexCore {
       return mParent;
     }
 
+    inline void setParent(WXCoreLayoutNode *parentNode) {
+        mParent = parentNode;
+    }
+
     inline bool isBFC(WXCoreLayoutNode* const node) const {
       return node->mCssStyle->mPositionType == kAbsolute || node->mCssStyle->mPositionType == kFixed;
     }
@@ -970,7 +993,28 @@ namespace WeexCore {
       return mCssStyle->mMaxHeight;
     }
 
+      inline void setDirection(const WXCoreDirection direction, const bool updating) {
+          if (mCssStyle->mDirection != direction) {
+              mCssStyle->mDirection = direction;
+              markDirty();
+              if (updating) {
+                  for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+                      (*it)->markDirty(false);
+                  }
+              }
+          }
+      }
 
+    inline WXCoreDirection getDirection() const {
+        return mCssStyle->mDirection;
+    }
+    
+    /** ================================ CSS direction For RTL =================================== **/
+      
+    void determineChildLayoutDirection(const WXCoreDirection direction);
+      
+    WXCoreDirection getLayoutDirectionFromPathNode();
+      
     /** ================================ flex-style =================================== **/
 
     inline void setFlexDirection(const WXCoreFlexDirection flexDirection, const bool updating) {
@@ -988,7 +1032,7 @@ namespace WeexCore {
     inline WXCoreFlexDirection getFlexDirection() const {
       return mCssStyle->mFlexDirection;
     }
-
+      
     inline void setFlexWrap(const WXCoreFlexWrap flexWrap) {
       if (mCssStyle->mFlexWrap != flexWrap) {
         mCssStyle->mFlexWrap = flexWrap;
@@ -1068,7 +1112,11 @@ namespace WeexCore {
     inline float getLayoutPositionRight() const  {
       return mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeRight);
     }
-
+      
+    inline WXCoreDirection getLayoutDirection() const {
+      return mLayoutResult->mLayoutDirection;
+    }
+      
     inline bool hasNewLayout() const {
       return mHasNewLayout;
     }

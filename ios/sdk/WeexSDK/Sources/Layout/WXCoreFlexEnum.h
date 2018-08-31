@@ -23,7 +23,14 @@
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 
 namespace WeexCore {
-
+    /**
+     * MainAxis direction
+     */
+    enum WXCoreDirection {
+        kDirectionInherit,
+        kDirectionLTR,
+        kDirectionRTL
+    };
   /**
    * MainAxis direction
    */

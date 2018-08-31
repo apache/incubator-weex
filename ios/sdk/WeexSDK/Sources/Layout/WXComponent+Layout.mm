@@ -235,6 +235,15 @@ bool flexIsUndefined(float value) {
 
 - (void)_fillCSSNode:(NSDictionary *)styles isUpdate:(BOOL)isUpdate
 {
+        if (styles[@"direction"]) {
+            _flexCssNode->setDirection([self fxDirection:styles[@"direction"]], isUpdate);
+        }
+        if ([self.ref isEqualToString:WX_SDK_ROOT_REF] && _flexCssNode->getDirection() == WeexCore::kDirectionInherit) {
+            // if root element have not specify direction, then we use system layout direction
+            WeexCore::WXCoreDirection direction = self.weexInstance.defaultLayoutDirection ? WeexCore::kDirectionRTL : WeexCore::kDirectionRTL;
+            _flexCssNode->setDirection(direction, NO);
+        }
+    
         // flex
         if (styles[@"flex"]) {
             _flexCssNode->setFlex([WXConvert CGFloat:styles[@"flex"]]);
@@ -417,7 +426,9 @@ do {\
         if (styles.count<=0) {
             return;
         }
-        
+    
+        WX_FLEX_STYLE_RESET_CSS_NODE(direction, @(WeexCore::kDirectionInherit))
+    
         WX_FLEX_STYLE_RESET_CSS_NODE(flex, @0.0)
         WX_FLEX_STYLE_RESET_CSS_NODE(flexDirection, @(WeexCore::kFlexDirectionColumn))
         WX_FLEX_STYLE_RESET_CSS_NODE(alignItems, @(WeexCore::kAlignItemsStretch))
@@ -525,6 +536,18 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
         }
     }
     return WeexCore::kRelative;
+}
+
+- (WeexCore::WXCoreDirection)fxDirection:(id)value
+{
+    if([value isKindOfClass:[NSString class]]){
+        if ([value isEqualToString:@"rtl"]) {
+            return WeexCore::kDirectionRTL;
+        } else if ([value isEqualToString:@"ltr"]) {
+            return WeexCore::kDirectionLTR;
+        }
+    }
+    return WeexCore::kDirectionInherit;
 }
 
 - (WeexCore::WXCoreFlexDirection)fxFlexDirection:(id)value
