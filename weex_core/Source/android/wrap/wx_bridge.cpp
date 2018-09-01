@@ -413,6 +413,10 @@ static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
           ->core_side()
           ->ExecJSWithResult(instance_id.getChars(), name_space.getChars(),
                              function.getChars(), params);
+
+  if(result.get() == nullptr || result.get().data.get() == nullptr)
+    return nullptr;
+
   jbyteArray array = env->NewByteArray(result->length);
   env->SetByteArrayRegion(array, 0, result->length,
                           reinterpret_cast<const jbyte*>(result->data.get()));
@@ -513,6 +517,10 @@ static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
           ->getPlatformBridge()
           ->core_side()
           ->ExecJSOnInstance(idChar.getChars(), scriptChar.getChars());
+
+  if(result.get() == nullptr || result.get().data.get() == nullptr)
+    return nullptr;
+
   return env->NewStringUTF(result->data.get());
 }
 

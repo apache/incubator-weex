@@ -449,7 +449,7 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
   std::string ldLibraryPathEnv("LD_LIBRARY_PATH=");
   std::string icuDataPathEnv("ICU_DATA_PATH=");
   ldLibraryPathEnv.append(executablePath);
-  if(SoUtils::jsc_so_path() != nullptr && strlen(SoUtils::jsc_so_path()) != 0) {
+  if(SoUtils::lib_ld_path() != nullptr && strlen(SoUtils::lib_ld_path()) != 0) {
     ldLibraryPathEnv.append(":").append(SoUtils::lib_ld_path());
   }
 
