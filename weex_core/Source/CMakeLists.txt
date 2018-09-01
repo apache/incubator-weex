@@ -56,7 +56,6 @@ set(COMMON_SRCS
   ./core/config/core_environment.cpp
 
   ./core/moniter/render_performance.cpp
-  ./core/manager/weex_core_manager.cpp
   ./core/bridge/platform/core_side_in_platform.cpp
   ./core/bridge/script/core_side_in_script.cpp
   ./core/parser/dom_wson.cpp
