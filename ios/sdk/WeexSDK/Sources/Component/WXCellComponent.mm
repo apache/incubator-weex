@@ -133,12 +133,12 @@
 
 - (BOOL)_isCaculatedFrameChanged:(CGRect)frame
 {
-    return !CGSizeEqualToSize(frame.size, _calculatedFrame.size); // only compares sizes
+    return (!CGSizeEqualToSize(frame.size, _calculatedFrame.size)) || (frame.origin.x != _calculatedFrame.origin.x);
 }
 
 - (void)_assignCalculatedFrame:(CGRect)frame
 {
-    frame.origin = CGPointZero;
+    frame.origin.y = 0.0f;
     _calculatedFrame = frame;
 }
 
