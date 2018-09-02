@@ -531,8 +531,6 @@
 		B8D66C9421255730003960BD /* dom_wson.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B732125572F003960BD /* dom_wson.h */; };
 		B8D66C9521255730003960BD /* dom_wson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8D66B742125572F003960BD /* dom_wson.cpp */; };
 		B8D66C9621255730003960BD /* dom_wson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8D66B742125572F003960BD /* dom_wson.cpp */; };
-		B8D66C9721255730003960BD /* weex_core_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8D66B762125572F003960BD /* weex_core_manager.cpp */; };
-		B8D66C9821255730003960BD /* weex_core_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8D66B762125572F003960BD /* weex_core_manager.cpp */; };
 		B8D66C9921255730003960BD /* weex_core_manager.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B772125572F003960BD /* weex_core_manager.h */; };
 		B8D66C9A21255730003960BD /* weex_core_manager.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B772125572F003960BD /* weex_core_manager.h */; };
 		B8D66C9D21255730003960BD /* json11.hpp in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B7B2125572F003960BD /* json11.hpp */; };
@@ -1374,7 +1372,6 @@
 		B8D66B712125572F003960BD /* render_factory_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_factory_interface.h; sourceTree = "<group>"; };
 		B8D66B732125572F003960BD /* dom_wson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dom_wson.h; sourceTree = "<group>"; };
 		B8D66B742125572F003960BD /* dom_wson.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dom_wson.cpp; sourceTree = "<group>"; };
-		B8D66B762125572F003960BD /* weex_core_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = weex_core_manager.cpp; sourceTree = "<group>"; };
 		B8D66B772125572F003960BD /* weex_core_manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = weex_core_manager.h; sourceTree = "<group>"; };
 		B8D66B7B2125572F003960BD /* json11.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = json11.hpp; sourceTree = "<group>"; };
 		B8D66B7C2125572F003960BD /* json11.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json11.cc; sourceTree = "<group>"; };
@@ -2430,7 +2427,6 @@
 		B8D66B752125572F003960BD /* manager */ = {
 			isa = PBXGroup;
 			children = (
-				B8D66B762125572F003960BD /* weex_core_manager.cpp */,
 				B8D66B772125572F003960BD /* weex_core_manager.h */,
 			);
 			path = manager;
@@ -3529,7 +3525,6 @@
 				746B923C1F46BE36009AE86B /* WXCellSlotComponent.mm in Sources */,
 				7463192A1C71B92600EFEBD4 /* WXModalUIModule.m in Sources */,
 				77D161501C02E3880010B15B /* WXUtility.m in Sources */,
-				B8D66C9721255730003960BD /* weex_core_manager.cpp in Sources */,
 				B8F2C6F42133A83C00635B37 /* rax_parser_statistics.cc in Sources */,
 				74A4BA9F1CB3C0A100195969 /* WXHandlerFactory.m in Sources */,
 				B8D66C3721255730003960BD /* render_action_update_attr.cpp in Sources */,
@@ -3735,7 +3730,6 @@
 				DCA4458D1EFA55B300D0CFA8 /* WXInvocationConfig.m in Sources */,
 				DCA4458E1EFA55B300D0CFA8 /* WXDatePickerManager.m in Sources */,
 				DCA4458F1EFA55B300D0CFA8 /* WXSDKManager.m in Sources */,
-				B8D66C9821255730003960BD /* weex_core_manager.cpp in Sources */,
 				B8F2C6F52133A83C00635B37 /* rax_parser_statistics.cc in Sources */,
 				DCA445901EFA55B300D0CFA8 /* WXBridgeManager.m in Sources */,
 				B8D66C3821255730003960BD /* render_action_update_attr.cpp in Sources */,

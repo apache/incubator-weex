@@ -472,7 +472,7 @@ typedef enum : NSUInteger {
     if (self.flexCssNode == nullptr) {
         return 0.0f;
     }
-    return self.flexCssNode->getLayoutWidth();
+    return self.flexCssNode->getStyleWidth();
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout heightForItemAtIndexPath:(NSIndexPath *)indexPath
