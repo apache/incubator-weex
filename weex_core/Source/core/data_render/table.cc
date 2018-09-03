@@ -172,6 +172,13 @@ json11::Json ArrayToJson(Array *array) {
     return json;
 }
     
+std::string ArrayToString(Array *array) {
+    json11::Json json = ArrayToJson(array);
+    std::string json_string;
+    json.dump(json_string);
+    return json_string;
+}
+    
 json11::Json TableToJson(Table *table) {
     json11::Json::object obj;
     for (auto iter = table->map.begin(); iter != table->map.end(); iter++) {

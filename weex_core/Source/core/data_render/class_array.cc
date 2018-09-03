@@ -260,7 +260,7 @@ static Value slice(ExecState *exec_state) {
     
     return ret;
 }
-    
+        
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

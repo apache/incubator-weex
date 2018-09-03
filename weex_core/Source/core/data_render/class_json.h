@@ -17,41 +17,23 @@
  * under the License.
  */
 
-#ifndef DATA_RENDER_TABLE_H
-#define DATA_RENDER_TABLE_H
+//
+// Created by pentao.pt on 2018/7/25.
+//
+
+#ifndef DATA_RENDER_JSON_CLASS_H
+#define DATA_RENDER_JSON_CLASS_H
 
 #include "core/data_render/object.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-
-Table *NewTable();
-
-int SetTableValue(Table *, Value *, const Value &);
-    
-Value *GetTableValue(Table *, const Value &);
-    
-Value *GetTableVar(Table *table, const Value &key);
-    
-size_t GetTableSize(Table *);
-
-size_t GetArraySize(Table *);
-
-size_t GetMapSize(Table *);
-
-size_t GetValueArraySize(Value &);
-
-size_t GetValueMapSize(Value &);
-    
-std::string TableToString(Table *table);
-    
-std::string ArrayToString(Array *array);
-    
-int TableInKey(StringTable *string_table,Table *table, Value *condition, Value *var);
+        
+ClassDescriptor *NewClassJSON();
     
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
 
-#endif  // DATA_RENDER_TABLE_H
+#endif  // DATA_RENDER_JSON_CLASS_H

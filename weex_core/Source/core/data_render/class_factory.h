@@ -37,6 +37,7 @@ public:
     virtual Value CreateClassInstance(ClassDescriptor *p_desc);
     virtual Value ClassArray();
     virtual Value ClassString();
+    virtual Value ClassJSON();
     virtual Value CreateArray();
     ~ClassFactory();
     
