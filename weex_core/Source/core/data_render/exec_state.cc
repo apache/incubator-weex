@@ -39,10 +39,11 @@ void ExecStack::reset() {
     size_t size = VM_EXEC_STACK_SIZE - (top_ - base());
     for (int i = 0; i < size; i++) {
         top_[i].ref = NULL;
+        SetNil(&top_[i]);
     }
 }
 
-ExecState::ExecState(VM* vm)
+ExecState::ExecState(VM *vm)
     : vm_(vm),
       frames_(),
       refs_(),
@@ -155,7 +156,6 @@ const Value ExecState::Call(Value *func, const std::vector<Value>& params) {
 
 void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
     *stack_->top() = func + argc;
-    stack_->reset();
     if (func->type == Value::Type::CFUNC) {
         Frame frame;
         frame.reg = func;
@@ -174,6 +174,7 @@ void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
         frame.end = &(*func->f->instructions().end());
         frames_.push_back(frame);
         vm_->RunFrame(this, frame, ret);
+        stack_->reset();
         frames_.pop_back();
     }
 }
