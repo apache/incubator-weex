@@ -37,6 +37,7 @@ namespace WeexCore {
 
   const char *CallGCanvasFun(const char *conextId, int x, const char *args) {
     if(gCanvasFunc != nullptr){
+      LOGE("CallGCanvasFun");
       return gCanvasFunc(conextId, x, args);
     } else {
       return nullptr;

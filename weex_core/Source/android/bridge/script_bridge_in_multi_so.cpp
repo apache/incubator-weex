@@ -112,7 +112,7 @@ static std::unique_ptr<ValueWithType> CallNativeModule(
                std::unique_ptr<char[]>(copyStr(arguments, arguments_length)),
            arguments_length = arguments_length,
            options = std::unique_ptr<char[]>(copyStr(options, options_length)),
-           options_length = options_length, event = &event, ret = &ret] {
+           options_length = options_length, e = &event, ret = &ret] {
             *ret = WeexCoreManager::Instance()
                        ->script_bridge()
                        ->core_side()
@@ -120,7 +120,7 @@ static std::unique_ptr<ValueWithType> CallNativeModule(
                                           method.c_str(), arguments.get(),
                                           arguments_length, options.get(),
                                           options_length);
-            event->Signal();
+            e->Signal();
           }));
   event.Wait();
     return ret;
@@ -356,10 +356,23 @@ static void RemoveEvent(const char *page_id, const char *ref,
 }
 static const char *CallGCanvasLinkNative(const char *context_id, int type,
                                          const char *arg) {
-  return WeexCoreManager::Instance()
-      ->script_bridge()
-      ->core_side()
-      ->CallGCanvasLinkNative(context_id, type, arg);
+
+    weex::base::WaitableEvent event;
+    char *ret = nullptr;
+
+    WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+            weex::base::MakeCopyable([page_id = std::string(context_id),
+                                             t = type,
+                                             args = std::string(arg), e = &event, ret = &ret] {
+                *ret = const_cast<char *>(WeexCoreManager::Instance()
+                                        ->script_bridge()
+                                        ->core_side()
+                                        ->CallGCanvasLinkNative(page_id.c_str(), t, args.c_str()));
+                e->Signal();
+            }));
+    event.Wait();
+
+  return ret;
 }
 
 static int SetInterval(const char *page_id, const char *callback_id,
@@ -383,10 +396,23 @@ static void ClearInterval(const char *page_id, const char *callback_id) {
 }
 
 static const char *CallT3DLinkNative(int type, const char *arg) {
-  return WeexCoreManager::Instance()
-      ->script_bridge()
-      ->core_side()
-      ->CallT3DLinkNative(type, arg);
+
+    weex::base::WaitableEvent event;
+    char *ret = nullptr;
+
+    WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+            weex::base::MakeCopyable([
+                                             t = type,
+                                             args = std::string(arg), e = &event, ret = &ret] {
+                *ret = const_cast<char *>(WeexCoreManager::Instance()
+                        ->script_bridge()
+                        ->core_side()
+                        ->CallT3DLinkNative(t, args.c_str()));
+                e->Signal();
+            }));
+    event.Wait();
+
+  return ret;
 }
 
 static void PostMessage(const char *vim_id, const char *data, int dataLength) {

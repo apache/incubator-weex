@@ -85,6 +85,41 @@ VALUE_WITH_TYPE* getValueWithTypePtr() {
   return param;
 }
 
+void addParamsToIPCSerializer(IPCSerializer *serializer, VALUE_WITH_TYPE* param) {
+  if (param == nullptr) {
+    serializer->addJSUndefined();
+  } else if (param->type == ParamsType::DOUBLE) {
+    serializer->add(param->value.doubleValue);
+  } else if (param->type == ParamsType::STRING) {
+
+    if(param->value.string == nullptr) {
+      uint16_t tmp = 0;
+      serializer->add(&tmp, 0);
+    } else {
+      serializer->add(param->value.string->content,
+                      param->value.string->length);
+    }
+  } else if(param->type == ParamsType::JSONSTRING) {
+    if(param->value.string == nullptr) {
+      uint16_t tmp = 0;
+      serializer->addJSON(&tmp, 0);
+    } else {
+      serializer->addJSON(param->value.string->content,
+                      param->value.string->length);
+    }
+  }else if (param->type == ParamsType::BYTEARRAY) {
+    if (param->value.byteArray == nullptr) {
+      char tmp = '\0';
+      serializer->add(&tmp, 0);
+    } else {
+      serializer->add(param->value.byteArray->content,
+                      param->value.byteArray->length);
+    }
+  } else {
+    serializer->addJSUndefined();
+  }
+};
+
 bool g_is_single_process = false;
 bool isSingleProcess() { return g_is_single_process; }
 

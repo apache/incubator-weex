@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <android/utils/params_utils.h>
 #include "script_side_in_multi_process.h"
 #include "IPC/Buffering/IPCBuffer.h"
 #include "IPC/IPCException.h"
@@ -283,21 +284,21 @@ int ScriptSideInMultiProcess::ExecJS(const char *instanceId,
 
     for (int i = 0; i < params.size(); i++) {
       VALUE_WITH_TYPE *param = params[i];
-
-      if (param->type == ParamsType::DOUBLE) {
-        serializer->add(param->value.doubleValue);
-      } else if (param->type == ParamsType::STRING) {
-        serializer->add(param->value.string->content,
-                        param->value.string->length);
-      } else if (param->type == ParamsType::JSONSTRING) {
-        serializer->addJSON(param->value.string->content,
-                            param->value.string->length);
-      } else if (param->type == ParamsType::BYTEARRAY) {
-        serializer->add(param->value.byteArray->content,
-                        param->value.byteArray->length);
-      } else {
-        serializer->addJSUndefined();
-      }
+      addParamsToIPCSerializer(serializer.get(), param);
+//      if (param->type == ParamsType::DOUBLE) {
+//        serializer->add(param->value.doubleValue);
+//      } else if (param->type == ParamsType::STRING) {
+//        serializer->add(param->value.string->content,
+//                        param->value.string->length);
+//      } else if (param->type == ParamsType::JSONSTRING) {
+//        serializer->addJSON(param->value.string->content,
+//                            param->value.string->length);
+//      } else if (param->type == ParamsType::BYTEARRAY) {
+//        serializer->add(param->value.byteArray->content,
+//                        param->value.byteArray->length);
+//      } else {
+//        serializer->addJSUndefined();
+//      }
     }
 
     std::unique_ptr<IPCBuffer> buffer = serializer->finish();
@@ -344,21 +345,21 @@ std::unique_ptr<WeexJSResult> ScriptSideInMultiProcess::ExecJSWithResult(
 
     for (int i = 0; i < params.size(); i++) {
       VALUE_WITH_TYPE *param = params[i];
-
-      if (param->type == ParamsType::DOUBLE) {
-        serializer->add(param->value.doubleValue);
-      } else if (param->type == ParamsType::STRING) {
-        serializer->add(param->value.string->content,
-                        param->value.string->length);
-      } else if (param->type == ParamsType::JSONSTRING) {
-        serializer->addJSON(param->value.string->content,
-                            param->value.string->length);
-      } else if (param->type == ParamsType::BYTEARRAY) {
-        serializer->add(param->value.byteArray->content,
-                        param->value.byteArray->length);
-      } else {
-        serializer->addJSUndefined();
-      }
+      addParamsToIPCSerializer(serializer.get(), param);
+//      if (param->type == ParamsType::DOUBLE) {
+//        serializer->add(param->value.doubleValue);
+//      } else if (param->type == ParamsType::STRING) {
+//        serializer->add(param->value.string->content,
+//                        param->value.string->length);
+//      } else if (param->type == ParamsType::JSONSTRING) {
+//        serializer->addJSON(param->value.string->content,
+//                            param->value.string->length);
+//      } else if (param->type == ParamsType::BYTEARRAY) {
+//        serializer->add(param->value.byteArray->content,
+//                        param->value.byteArray->length);
+//      } else {
+//        serializer->addJSUndefined();
+//      }
     }
 
     std::unique_ptr<IPCBuffer> buffer = serializer->finish();
