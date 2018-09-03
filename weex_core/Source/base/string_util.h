@@ -16,36 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "scoped_jstring.h"
 
-namespace WeexCore {
+#ifndef CORE_BASE_STRING_UTIL_H
+#define CORE_BASE_STRING_UTIL_H
 
-ScopedJString::ScopedJString(JNIEnv *env, jstring _jstring)
-        : m_env(env), m_jstring(_jstring), m_chars(nullptr), m_len(0) {
+#include <sstream>
+#include <string>
+
+namespace weex {
+namespace base {
+
+template <typename T>
+std::string to_string(T value) {
+  std::ostringstream os;
+  os << value;
+  return os.str();
 }
-
-ScopedJString::~ScopedJString() {
-  if (m_chars)
-    m_env->ReleaseStringChars(m_jstring, m_chars);
-}
-
-const jchar *ScopedJString::getChars() {
-  if (m_chars)
-    return m_chars;
-  if (m_jstring == nullptr)
-    return nullptr;
-  m_chars = m_env->GetStringChars(m_jstring, nullptr);
-  m_len = m_env->GetStringLength(m_jstring);
-  return m_chars;
-}
-
-size_t ScopedJString::getCharsLength() {
-  if (m_chars)
-    return m_len;
-  if (m_jstring == nullptr)
-    return 0;
-  m_len = m_env->GetStringLength(m_jstring);
-  return m_len;
-}
-
-} //WeexCore
+}  // namespace base
+}  // namespace weex
+#endif  // CORE_BASE_STRING_UTIL_H

@@ -86,7 +86,9 @@ VALUE_WITH_TYPE* getValueWithTypePtr() {
 }
 
 void addParamsToIPCSerializer(IPCSerializer *serializer, VALUE_WITH_TYPE* param) {
-  if (param->type == ParamsType::DOUBLE) {
+  if (param == nullptr) {
+    serializer->addJSUndefined();
+  } else if (param->type == ParamsType::DOUBLE) {
     serializer->add(param->value.doubleValue);
   } else if (param->type == ParamsType::STRING) {
 

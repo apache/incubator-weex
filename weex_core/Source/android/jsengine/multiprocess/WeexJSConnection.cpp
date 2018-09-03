@@ -219,7 +219,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
   }
 
   if(newThreadStatus == ERROR) {
-    throw IPCException("failed to map ashmem region: %s");
+    throw IPCException("failed to map ashmem region");
   }
 
   //before process boot up, we prapare a crash file for child process
