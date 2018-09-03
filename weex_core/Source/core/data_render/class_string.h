@@ -16,39 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 //
 // Created by pentao.pt on 2018/7/25.
 //
 
-#ifndef DATA_RENDER_CLASSFACTORY_H
-#define DATA_RENDER_CLASSFACTORY_H
+#ifndef DATA_RENDER_STRING_CLASS_H
+#define DATA_RENDER_STRING_CLASS_H
 
-#include <vector>
 #include "core/data_render/object.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
         
-class ClassFactory {
-public:
-    ClassFactory() {};
-    virtual Value CreateClassDescriptor(ClassDescriptor *p_super);
-    virtual Value CreateClassInstance(ClassDescriptor *p_desc);
-    virtual Value ClassArray();
-    virtual Value ClassString();
-    virtual Value CreateArray();
-    ~ClassFactory();
+ClassDescriptor *NewClassString();
+
     
-private:
-    ClassInstance *CreateClassInstanceFromSuper(ClassDescriptor *p_desc);
-    std::vector<ClassDescriptor *> descs_;
-    std::vector<ClassInstance *> insts_;
-    std::vector<Array *> arrays_;
-};
+}  // namespace data_render
+}  // namespace core
+}  // namespace weex
 
-}
-}
-}
-
-#endif //DATA_RENDER_CLASSFACTORY_H
+#endif  // DATA_RENDER_STRING_CLASS_H

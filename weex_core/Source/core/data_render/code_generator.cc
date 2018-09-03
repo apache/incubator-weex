@@ -149,6 +149,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
     long ret = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
     long caller = -1;
     size_t argc = 0;
+    std::vector<long> caller_regs_order;
     if (stms->callee().get() != NULL) {
         caller = block_->NextRegisterId();
         stms->callee()->Accept(this, &caller);
@@ -176,7 +177,9 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
                 throw GeneratorError("can't call super this without class desc");
             }
             caller = block_->NextRegisterId();
+            caller_regs_order.push_back(caller);
             long arg_super = block_->NextRegisterId();
+            caller_regs_order.push_back(arg_super);
             func_state->AddInstruction(CREATE_ABC(OP_GETSUPER, arg_super, reg_this, caller));
             argc++;
         }
@@ -192,8 +195,10 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
                 }
                 // caller and args must be continuous;
                 caller = block_->NextRegisterId();
+                caller_regs_order.push_back(caller);
                 func_state->AddInstruction(CREATE_ABC(OP_GETCLASS, caller, reg_class, reg_member));
                 long arg = block_->NextRegisterId();
+                caller_regs_order.push_back(arg);
                 stms->expr()->Accept(this, &arg);
                 argc = stms->args().size() + 1;
             }
@@ -206,6 +211,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
                     caller = block_->NextRegisterId();
                     func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, reg_old_caller, 0));
                 }
+                caller_regs_order.push_back(caller);
                 if (stms->expr()->IsMemberExpression()) {
                     Handle<Expression> left = stms->expr()->AsMemberExpression()->expr();
                     if (left->IsIdentifier()) {
@@ -213,6 +219,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
                         int index = exec_state_->global()->IndexOf(class_name);
                         if (index <= 0) {
                             long arg = block_->NextRegisterId();
+                            caller_regs_order.push_back(arg);
                             stms->expr()->AsMemberExpression()->expr()->AsIdentifier()->Accept(this, &arg);
                             argc++;
                         }
@@ -220,6 +227,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
                     else {
                         long arg = block_->NextRegisterId();
                         left->Accept(this, &arg);
+                        caller_regs_order.push_back(arg);
                         argc++;
                     }
                 }
@@ -229,6 +237,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
     for (auto it = stms->args().begin(); it != stms->args().end(); ++it) {
         auto temp = (*it).get();
         long arg = block_->NextRegisterId();
+        caller_regs_order.push_back(arg);
         temp->Accept(this, &arg);
     }
     if (stms->args_expr() != nullptr && stms->args_expr()->IsArgumentList()) {
@@ -236,11 +245,30 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
         for (int i = 0; i < arg_list->length(); i++) {
             long arg = block_->NextRegisterId();
             arg_list->args()->raw_list()[i]->Accept(this, &arg);
+            caller_regs_order.push_back(arg);
         }
         argc += arg_list->length();
     }
     FuncState *state = func_->func_state();
-    state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
+    bool continued = true;
+    for (int i = 1; i < caller_regs_order.size(); i++) {
+        if (caller_regs_order[i] - caller_regs_order[i - 1] != 1) {
+            continued = false;
+            break;
+        }
+    }
+    if (!continued) {
+        caller = block_->NextRegisterId();
+        func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, caller_regs_order[0], 0));
+        for (int i = 1; i < caller_regs_order.size(); i++) {
+            long arg = block_->NextRegisterId();
+            func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg, caller_regs_order[i], 0));
+        }
+        state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
+    }
+    else {
+        state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
+    }
 }
 
 void CodeGenerator::Visit(ArgumentList* node, void* data) {
@@ -683,6 +711,11 @@ void CodeGenerator::Visit(BinaryExpression *node, void *data) {
         case BinaryOperation::kOr:
         {
             func_state->AddInstruction(CREATE_ABC(OP_OR, ret, left, right));
+            break;
+        }
+        case BinaryOperation::kEqual:
+        {
+            func_state->AddInstruction(CREATE_ABC(OP_EQ, ret, left, right));
             break;
         }
         default:

@@ -5,6 +5,7 @@
 #include "core/data_render/class_factory.h"
 #include "core/data_render/class.h"
 #include "core/data_render/class_array.h"
+#include "core/data_render/class_string.h"
 #include "core/data_render/vm_mem.h"
 
 namespace weex {
@@ -24,6 +25,14 @@ Value ClassFactory::CreateArray() {
     Value value;
     SetAValue(&value, reinterpret_cast<GCObject *>(array));
     arrays_.emplace_back(array);
+    return value;
+}
+    
+Value ClassFactory::ClassString() {
+    ClassDescriptor *desc = NewClassString();
+    Value value;
+    SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
+    descs_.emplace_back(desc);
     return value;
 }
     

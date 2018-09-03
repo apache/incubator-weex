@@ -108,6 +108,9 @@ bool ValueEquals(const Value *a, const Value *b) {
     else if (ToNum(a, d1) && ToNum(b, d2)) {
         return NumEq(d1, d2);
     }
+    else if (IsString(a) && IsString(b)) {
+        return strcmp(CStringValue(a), CStringValue(b)) == 0;
+    }
     else {
         return false;
     }

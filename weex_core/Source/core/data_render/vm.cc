@@ -524,20 +524,13 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             if (IsValueRef(b)) {
                 b = b->var;
             }
-            if (!IsClassInstance(b) && !IsClass(b) && !IsArray(b) && !IsTable(b)) {
+            if (!IsClassInstance(b) && !IsClass(b) && !IsArray(b) && !IsTable(b) && !IsString(b)) {
                 throw VMExecError("Type Error For Class Instance Or Class With OP_CODE [OP_GETMEMBER]");
             }
             if (!IsString(c)) {
                 throw VMExecError("Type Error For Member with OP_CODE [OP_GETMEMBER]");
             }
             std::string var_name = CStringValue(c);
-            if (var_name == "forEach") {
-                ValueRef *test = exec_state->FindRef(0);
-                printf("1223\n");
-            }
-            if (var_name == "tagItem") {
-                
-            }
             // first find member func
             if (IsClassInstance(b)) {
                 Variables *funcs = ValueTo<ClassInstance>(b)->p_desc_->funcs_.get();
@@ -585,6 +578,25 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                     index = funcs->IndexOf(var_name);
                     if (index < 0) {
                         throw VMExecError("Can't Find Array Func " + var_name + " With OP_CODE [OP_GETMEMBER]");
+                    }
+                    Value *func = funcs->Find(index);
+                    *a = *func;
+                }
+            }
+            else if (IsString(b)) {
+                if (var_name == "length") {
+                    //*a = GetStringLength(ValueTo<Array>(b));
+                }
+                else {
+                    int index = exec_state->global()->IndexOf("String");
+                    if (index < 0) {
+                        throw VMExecError("Can't Find String Class With OP_CODE OP_GETMEMBER");
+                    }
+                    Value *class_desc = exec_state->global()->Find(index);
+                    Variables *funcs = ValueTo<ClassDescriptor>(class_desc)->funcs_.get();
+                    index = funcs->IndexOf(var_name);
+                    if (index < 0) {
+                        throw VMExecError("Can't Find String Func " + var_name + " With OP_CODE [OP_GETMEMBER]");
                     }
                     Value *func = funcs->Find(index);
                     *a = *func;

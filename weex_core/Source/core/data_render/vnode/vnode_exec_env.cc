@@ -367,6 +367,7 @@ void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   RegisterCFunc(state, "setProps", SetProps);
   RegisterCFunc(state, "setClassList", SetClassList);
   RegisterClass(state, "Array", state->class_factory()->ClassArray());
+  RegisterClass(state, "String", state->class_factory()->ClassString());
 }
 
 Value ParseJson2Value(ExecState* state, const json11::Json& json) {
