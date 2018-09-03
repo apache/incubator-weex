@@ -2648,10 +2648,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   /**
    * native: OnInstanceClose
+   * should be called on JSThread
    * @param instanceId
    */
   public void onInstanceClose(String instanceId) {
-    mWXBridge.onInstanceClose(instanceId);
+    if (isJSFrameworkInit()) {
+      mWXBridge.onInstanceClose(instanceId);
+    }
   }
 
   /**
@@ -2665,7 +2668,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public void setRenderContentWrapContentToCore(boolean wrap, final String instanceId) {
-    mWXBridge.setRenderContainerWrapContent(wrap, instanceId);
+    if (isJSFrameworkInit()) {
+      mWXBridge.setRenderContainerWrapContent(wrap, instanceId);
+    }
   }
 
   public void setStyleWidth(String instanceId, String ref, float value) {

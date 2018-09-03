@@ -131,7 +131,7 @@ std::unique_ptr<WeexJSResult> ScriptSideInMultiProcess::ExecJSOnAppWithResult(co
   try {
     if(sender_ == nullptr) {
       LOGE("ExecJSOnAppWithResult sender is null");
-      return false;
+      return std::unique_ptr<WeexJSResult>();
     }
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
     serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::EXECJSONAPPWITHRESULT));

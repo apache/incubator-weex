@@ -33,13 +33,11 @@ class WeexCoreManager {
   enum ProjectMode { MULTI_SO, MULTI_PROCESS, COMMON };
 
   static WeexCoreManager *Instance() {
-    if (nullptr == g_instance_) {
-      g_instance_ = new WeexCoreManager();
-    }
-    return g_instance_;
+    static auto s_instance = new WeexCoreManager();
+    return s_instance;
   };
 
-  PlatformBridge *getPlatformBridge() { return platform_bridge_; }
+  inline PlatformBridge *getPlatformBridge() { return platform_bridge_; }
 
   inline void set_platform_bridge(PlatformBridge *bridge) {
     platform_bridge_ = bridge;
@@ -73,7 +71,6 @@ class WeexCoreManager {
   inline weex::base::Thread *script_thread() { return script_thread_; }
 
  private:
-  static WeexCoreManager *g_instance_;
   PlatformBridge *platform_bridge_;
   MeasureFunctionAdapter *measure_function_adapter_;
   ScriptBridge *script_bridge_;

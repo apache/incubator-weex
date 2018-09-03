@@ -49,9 +49,6 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSDictionary<id, UICollectionViewLayoutAttributes *> *> *layoutAttributes;
 @property (nonatomic, strong) NSMutableArray<NSNumber *> *columnsMaxHeights;
 
-@property (nonatomic, assign, readwrite) CGFloat computedColumnWidth;
-@property (nonatomic, assign, readwrite) int computedColumnCount;
-
 @end
 
 @implementation WXMultiColumnLayout
@@ -367,8 +364,6 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 
 - (void)_cleanComputed
 {
-    _computedColumnWidth = 0;
-    _computedColumnCount = 0;
 }
 
 - (void)invalidateLayout

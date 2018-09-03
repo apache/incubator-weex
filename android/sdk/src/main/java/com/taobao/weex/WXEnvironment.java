@@ -512,6 +512,18 @@ public class WXEnvironment {
       }
     }
 
+    if(TextUtils.isEmpty(LIB_LD_PATH)) {
+      try {
+        String property = System.getProperty("java.library.path");
+        String libJScRealPath = getLibJScRealPath();
+        if(!TextUtils.isEmpty(libJScRealPath)) {
+          LIB_LD_PATH = new File(libJScRealPath).getParent() + ":" + property;
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+
     WXLogUtils.e("getLibLdPath is " + LIB_LD_PATH);
     return LIB_LD_PATH;
   }

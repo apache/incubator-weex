@@ -206,6 +206,10 @@ namespace WeexCore {
     }
 
     void SoUtils::updateSoLinkPath(const char *lib_ld_path) {
+        if(lib_ld_path == nullptr || strlen(lib_ld_path) == 0) {
+          return;
+        }
+
         LOGE("updateSoLinkPath is %s",lib_ld_path);
         void* sym = dlsym(RTLD_DEFAULT, "android_update_LD_LIBRARY_PATH");
         if (sym != NULL) {
