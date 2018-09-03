@@ -230,20 +230,41 @@ static std::unique_ptr<IPCResult> HandleCallNative(IPCArguments *arguments) {
 
 static std::unique_ptr<IPCResult> HandleCallGCanvasLinkNative(
     IPCArguments *arguments) {
-  JNIEnv *env = base::android::AttachCurrentThread();
-  jstring jPageId = getArgumentAsJString(env, arguments, 0);
-  const char *pageId = env->GetStringUTFChars(jPageId, NULL);
-  int type = getArgumentAsInt32(env, arguments, 1);
-  jstring val = getArgumentAsJString(env, arguments, 2);
-  const char *args = env->GetStringUTFChars(val, NULL);
 
-#if JSAPI_LOG
-      LOGD("[ExtendJSApi] HandleCallGCanvasLinkNative >>>> pageId: %s, type:
-      %d, args: %s", pageId, type, args);
-#endif
-      const char *retVal = NULL;
-    retVal = WeexCoreManager::Instance()->script_bridge()->core_side()->CallGCanvasLinkNative(pageId, type,
-                                                                                     args);
+  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  int type = arguments->get<int32_t>(1);
+  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  weex::base::WaitableEvent event;
+  char *retVal = nullptr;
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+          weex::base::MakeCopyable(
+                  [pageId = std::move(arg1), t = type,
+                          args = std::move(arg3), returnResult = &retVal, e = &event] {
+                      *returnResult =
+                              const_cast<char *>(WeexCoreManager::Instance()
+                                      ->script_bridge()
+                                      ->core_side()
+                                      ->CallGCanvasLinkNative(pageId.get(),t,args.get()));
+                      e->Signal();
+                  }));
+
+  event.Wait();
+
+
+  JNIEnv *env = base::android::AttachCurrentThread();
+//  jstring jPageId = getArgumentAsJString(env, arguments, 0);
+//  const char *pageId = env->GetStringUTFChars(jPageId, NULL);
+//  int type = getArgumentAsInt32(env, arguments, 1);
+//  jstring val = getArgumentAsJString(env, arguments, 2);
+//  const char *args = env->GetStringUTFChars(val, NULL);
+//
+//#if JSAPI_LOG
+//      LOGD("[ExtendJSApi] HandleCallGCanvasLinkNative >>>> pageId: %s, type:
+//      %d, args: %s", pageId, type, args);
+//#endif
+//      const char *retVal = NULL;
+//    retVal = WeexCoreManager::Instance()->script_bridge()->core_side()->CallGCanvasLinkNative(pageId, type,
+//                                                                                     args);
 
       std::unique_ptr<IPCResult> ret = createVoidResult();
       if (retVal) {
@@ -253,25 +274,45 @@ static std::unique_ptr<IPCResult> HandleCallGCanvasLinkNative(
     env->DeleteLocalRef(jDataStr);
     retVal = NULL;
       }
-      env->DeleteLocalRef(jPageId);
-      env->DeleteLocalRef(val);
+//      env->DeleteLocalRef(jPageId);
+//      env->DeleteLocalRef(val);
       return ret;
 }
 
 static std::unique_ptr<IPCResult> HandleT3DLinkNative(IPCArguments *arguments) {
+
+
+  int type = arguments->get<int32_t>(0);
+  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  weex::base::WaitableEvent event;
+  char *retVal = nullptr;
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+          weex::base::MakeCopyable(
+                  [args = std::move(arg1), t = type,
+                          returnResult = &retVal, e = &event] {
+                      *returnResult =
+                              const_cast<char *>(WeexCoreManager::Instance()
+                                      ->script_bridge()
+                                      ->core_side()
+                                      ->CallT3DLinkNative(t, args.get()));
+                      e->Signal();
+                  }));
+
+  event.Wait();
+
   JNIEnv *env = base::android::AttachCurrentThread();
-  int type = getArgumentAsInt32(env, arguments, 0);
-  jstring val = getArgumentAsJString(env, arguments, 1);
-  const char *args = env->GetStringUTFChars(val, NULL);
+//  int type = getArgumentAsInt32(env, arguments, 0);
+//  jstring val = getArgumentAsJString(env, arguments, 1);
+//  const char *args = env->GetStringUTFChars(val, NULL);
 
 #if JSAPI_LOG
   LOGD("[ExtendJSApi] handleT3DLinkNative >>>> type: %d, args: %s", type, args);
 #endif
-  const char *retVal = NULL;
-  retVal = WeexCoreManager::Instance()
-               ->script_bridge()
-               ->core_side()
-               ->CallT3DLinkNative(type, args);
+//  const char *retVal = NULL;
+//  retVal = WeexCoreManager::Instance()
+//               ->script_bridge()
+//               ->core_side()
+//               ->CallT3DLinkNative(type, args);
 
   std::unique_ptr<IPCResult> ret = createVoidResult();
   if (retVal) {
@@ -281,7 +322,7 @@ static std::unique_ptr<IPCResult> HandleT3DLinkNative(IPCArguments *arguments) {
     env->DeleteLocalRef(jDataStr);
     retVal = NULL;
   }
-  env->DeleteLocalRef(val);
+//  env->DeleteLocalRef(val);
   return ret;
 }
 
