@@ -413,17 +413,16 @@ class MemberExpression : public Expression {
   Handle<Expression> member() { return member_; }
   MemberAccessKind kind() { return kind_; }
   void setKind(MemberAccessKind kind) { kind_ = kind; }
-  bool &lhs_value() { return lhs_value_; }
-
   Handle<Expression> expr() { return expr_; }
-  bool ProduceRValue() override { return false; }
+  inline bool& is_assignment() { return is_assignment_; }
+  bool ProduceRValue() override { return !is_assignment_; }
   DEFINE_NODE_TYPE(MemberExpression, Expression);
 
  private:
   MemberAccessKind kind_;
   Handle<Expression> expr_;
   Handle<Expression> member_;
-  bool lhs_value_{false};
+  bool is_assignment_{false};
 };
 
 class CallExpression : public Expression {

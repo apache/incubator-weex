@@ -111,7 +111,7 @@ Handle<Expression> RAXParser::ParseAssignExpression()
     //  be stored here. (in the AST?)
     Advance();
     if (lhs->IsMemberExpression()) {
-        lhs->AsMemberExpression()->lhs_value() = true;
+        lhs->AsMemberExpression()->is_assignment() = true;
     }
     auto rhs = ParseAssignExpression();
     return builder()->NewAssignExpression((lhs), (rhs));

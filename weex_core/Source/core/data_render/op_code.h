@@ -33,7 +33,8 @@ enum OpCode {
   OP_NEWCLASS,   // A Bx R(A) = New Class[B]
   OP_GETCLASS,   // A B C R(A) = B->C
   OP_GETMEMBER,
-  OP_SETMEMBER,
+  OP_GETMEMBERVAR,
+  OP_SETMEMBERVAR,
   OP_GETSUPER,   // A B C     R(A) = super[B] C = super func
   
   OP_SETOUTVAR,     // A B C R(A) = B->C

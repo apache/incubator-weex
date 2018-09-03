@@ -712,7 +712,7 @@ void CodeGenerator::Visit(AssignExpression *node, void *data) {
     // a = b
     FuncState *func_state = func_->func_state();
     if (class_ && node->lhs()->IsMemberExpression() && node->lhs()->AsMemberExpression()->expr()->IsThisExpression()) {
-        func_state->AddInstruction(CREATE_ABC(OP_SETMEMBER, left, right, 0));
+        func_state->AddInstruction(CREATE_ABC(OP_SETMEMBERVAR, left, right, 0));
     }
     else {
         func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, right, 0));
@@ -861,7 +861,7 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
         if (node->member().get() != NULL) {
             node->member()->Accept(this, &mindex);
         }
-        if (node->lhs_value()) {
+        if (!node->ProduceRValue()) {
             func_state->AddInstruction(CREATE_ABC(OP_GETINDEXVAR, ret, ret, mindex));
         }
         else {
@@ -875,7 +875,12 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
         auto value = exec_state_->string_table_->StringFromUTF8(node->member()->AsIdentifier()->GetName());
         int tableIndex = func_state->AddConstant(std::move(value));
         func_state->AddInstruction(CREATE_ABx(OP_LOADK, right, tableIndex));
-        func_state->AddInstruction(CREATE_ABC(OP_GETMEMBER, ret, ret, right));
+        if (!node->ProduceRValue()) {
+            func_state->AddInstruction(CREATE_ABC(OP_GETMEMBERVAR, ret, ret, right));
+        }
+        else {
+            func_state->AddInstruction(CREATE_ABC(OP_GETMEMBER, ret, ret, right));
+        }
     }
     else if (node->kind() == MemberAccessKind::kClass) {
         Handle<Expression> left = node->expr();
@@ -884,7 +889,12 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
         auto value = exec_state_->string_table_->StringFromUTF8(node->member()->AsIdentifier()->GetName());
         int tableIndex = func_state->AddConstant(std::move(value));
         func_state->AddInstruction(CREATE_ABx(OP_LOADK, right, tableIndex));
-        func_state->AddInstruction(CREATE_ABC(OP_GETMEMBER, ret, ret, right));
+        if (!node->ProduceRValue()) {
+            func_state->AddInstruction(CREATE_ABC(OP_GETMEMBERVAR, ret, ret, right));
+        }
+        else {
+            func_state->AddInstruction(CREATE_ABC(OP_GETMEMBER, ret, ret, right));
+        }
     }
 }
 

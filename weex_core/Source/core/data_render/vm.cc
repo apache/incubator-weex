@@ -492,7 +492,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             *c = *inst_super->p_desc_->funcs_->Find(index);
             break;
         }
-        case OP_SETMEMBER:
+        case OP_SETMEMBERVAR:
         {
             LOGD("OP_SETMEMBER A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
             a = frame.reg + GET_ARG_A(instruction);
@@ -522,6 +522,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             *a = *ValueTo<ClassInstance>(b)->p_desc_->funcs_->Find(index);
             break;
         }
+        case OP_GETMEMBERVAR:
         case OP_GETMEMBER:
         {
             LOGD("OP_GETMEMBER A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
@@ -545,17 +546,30 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 if (index < 0) {
                     Variables *vars = ValueTo<ClassInstance>(b)->vars_.get();
                     index = vars->IndexOf(var_name);
+                    if (index < 0 && op == OP_GETMEMBER) {
+                        throw VMExecError("can't find " + var_name + "[OP_GETMEMBER]");
+                    }
                     if (index < 0) {
                         Value var;
                         SetNil(&var);
                         index = vars->Add(var_name, var);
                     }
-                    Value *ref = vars->Find(index);
-                    SetValueRef(a, ref);
+                    Value *ret = vars->Find(index);
+                    if (op == OP_GETMEMBER) {
+                        *a = *ret;
+                    }
+                    else {
+                        SetValueRef(a, ret);
+                    }
                 }
                 else {
-                    Value *ref = funcs->Find(index);
-                    SetValueRef(a, ref);
+                    Value *ret = funcs->Find(index);
+                    if (op == OP_GETMEMBER) {
+                        *a = *ret;
+                    }
+                    else {
+                        SetValueRef(a, ret);
+                    }
                 }
             }
             else if (IsArray(b)) {
@@ -578,12 +592,20 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 }
             }
             else if (IsTable(b)) {
-                Value *ret = GetTableValue(ValueTo<Table>(b), *c);
-                if (!IsNil(ret)) {
-                    *a = *ret;
+                if (op == OP_GETMEMBER) {
+                    Value *ret = GetTableValue(ValueTo<Table>(b), *c);
+                    if (!IsNil(ret)) {
+                        *a = *ret;
+                    }
+                    else {
+                        SetNil(a);
+                    }
                 }
                 else {
-                    SetNil(a);
+                    Value *ret = GetTableVar(ValueTo<Table>(b), *c);
+                    if (ret) {
+                        SetValueRef(a, ret);
+                    }
                 }
             }
             else {
