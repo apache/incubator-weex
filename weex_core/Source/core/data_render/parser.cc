@@ -19,6 +19,7 @@
 
 #include "core/data_render/parser.h"
 #include <sstream>
+#include "base/string_util.h"
 #include "core/data_render/ast_factory.h"
 #include "core/data_render/rax_parser_builder.h"
 #include "core/data_render/rax_parser_context.h"
@@ -28,13 +29,6 @@
 namespace weex {
 namespace core {
 namespace data_render {
-
-template <typename T>
-std::string to_string(T value) {
-  std::ostringstream os;
-  os << value;
-  return os.str();
-}
 
 struct ASTParser final {
   /* State */
@@ -128,7 +122,7 @@ struct ASTParser final {
 
     } while (0);
 
-    return Fail("parse error:" + to_string(error));
+    return Fail("parse error:" + base::to_string(error));
   }
 
   Handle<Expression> ParseIfControl(json11::Json& json) {

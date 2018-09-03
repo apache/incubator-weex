@@ -20,6 +20,7 @@
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include <chrono>
 #include <sstream>
+#include "base/string_util.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vnode/vnode.h"
@@ -56,9 +57,13 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
                                                 WeexCore::RenderObject* parent, bool isRoot,
                                                 int index,
                                                 const string& pageId) {
-  std::stringstream ss;
-  ss << ref_id++;
-  std::string ref_str = isRoot ? "_root" : ss.str();
+  std::string ref_str;
+  if (isRoot) {
+    ref_str = base::to_string(ref_id++);
+  } else {
+    ref_str = "_root";
+  }
+
   WeexCore::RenderObject* render_object = static_cast<WeexCore::RenderObject*>(
       WeexCore::RenderCreator::GetInstance()->CreateRender(vnode->tag_name(),
                                                            ref_str));
