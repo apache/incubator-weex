@@ -26,6 +26,7 @@
 #include "android/base/log_utils.h"
 #include "core_side_in_multi_process.h"
 #include "../../../include/WeexApiHeader.h"
+#include "../../utils/params_utils.h"
 
 namespace WeexCore {
 
@@ -472,21 +473,21 @@ namespace WeexCore {
 
             for (int i = 0; i < params.size(); i++) {
                 VALUE_WITH_TYPE *param = params[i];
-
-                if (param->type == ParamsType::DOUBLE) {
-                    serializer->add(param->value.doubleValue);
-                } else if (param->type == ParamsType::STRING) {
-                    serializer->add(param->value.string->content,
-                                    param->value.string->length);
-                } else if(param->type == ParamsType::JSONSTRING) {
-                    serializer->addJSON(param->value.string->content,
-                                        param->value.string->length);
-                }else if (param->type == ParamsType::BYTEARRAY) {
-                    serializer->add(param->value.byteArray->content,
-                                    param->value.byteArray->length);
-                } else {
-                    serializer->addJSUndefined();
-                }
+                addParamsToIPCSerializer(serializer.get(), param);
+//                if (param->type == ParamsType::DOUBLE) {
+//                    serializer->add(param->value.doubleValue);
+//                } else if (param->type == ParamsType::STRING) {
+//                    serializer->add(param->value.string->content,
+//                                    param->value.string->length);
+//                } else if(param->type == ParamsType::JSONSTRING) {
+//                    serializer->addJSON(param->value.string->content,
+//                                        param->value.string->length);
+//                }else if (param->type == ParamsType::BYTEARRAY) {
+//                    serializer->add(param->value.byteArray->content,
+//                                    param->value.byteArray->length);
+//                } else {
+//                    serializer->addJSUndefined();
+//                }
             }
 
             std::unique_ptr<IPCBuffer> buffer = serializer->finish();
@@ -525,21 +526,21 @@ namespace WeexCore {
 
             for (int i = 0; i < params.size(); i++) {
                 VALUE_WITH_TYPE *param = params[i];
-
-                if (param->type == ParamsType::DOUBLE) {
-                    serializer->add(param->value.doubleValue);
-                }  else if (param->type == ParamsType::STRING) {
-                    serializer->add(param->value.string->content,
-                                    param->value.string->length);
-                } else if(param->type == ParamsType::JSONSTRING) {
-                    serializer->addJSON(param->value.string->content,
-                                        param->value.string->length);
-                } else if (param->type == ParamsType::BYTEARRAY) {
-                    serializer->add(param->value.byteArray->content,
-                                    param->value.byteArray->length);
-                } else {
-                    serializer->addJSUndefined();
-                }
+                addParamsToIPCSerializer(serializer.get(), param);
+//                if (param->type == ParamsType::DOUBLE) {
+//                    serializer->add(param->value.doubleValue);
+//                }  else if (param->type == ParamsType::STRING) {
+//                    serializer->add(param->value.string->content,
+//                                    param->value.string->length);
+//                } else if(param->type == ParamsType::JSONSTRING) {
+//                    serializer->addJSON(param->value.string->content,
+//                                        param->value.string->length);
+//                } else if (param->type == ParamsType::BYTEARRAY) {
+//                    serializer->add(param->value.byteArray->content,
+//                                    param->value.byteArray->length);
+//                } else {
+//                    serializer->addJSUndefined();
+//                }
             }
 
             std::unique_ptr<IPCBuffer> buffer = serializer->finish();

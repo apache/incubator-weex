@@ -21,6 +21,7 @@
 #define WEEX_PROJECT_PARAMS_UTILS_H
 
 #include <jni.h>
+#include <Serializing/IPCSerializer.h>
 #include "android/wrap/wx_js_object.h"
 #include "include/WeexApiHeader.h"
 
@@ -36,7 +37,7 @@ WeexString* genWeexString(const uint16_t* str, size_t length);
 WeexString* jstring2WeexString(JNIEnv* env, jstring fromJString);
 
 VALUE_WITH_TYPE* getValueWithTypePtr();
-
+void addParamsToIPCSerializer(IPCSerializer *serializer, VALUE_WITH_TYPE* param);
 std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     JNIEnv* env, jobject params,
     const std::function<void(const char*, const char*)>&
