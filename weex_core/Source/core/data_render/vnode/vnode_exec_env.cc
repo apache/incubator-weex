@@ -31,14 +31,6 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-template <typename T>
-std::string to_string(T value)
-{
-  std::ostringstream os ;
-  os << value ;
-  return os.str() ;
-}
-
 json11::Json ParseValue2Json(const Value& value);
 
 static Value Log(ExecState *exec_state) {
@@ -186,6 +178,9 @@ static Value CreateElement(ExecState *exec_state) {
         std::ostringstream os;
         os << IntValue(arg_ref) ;
         ref = "vn_" + os.str();
+    }
+    else {
+        throw VMExecError("CreateElement only support int for string");
     }
     std::string tag_name = exec_state->GetArgument(0)->str->c_str();
     VNode *node = NULL;

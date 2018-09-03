@@ -33,7 +33,7 @@
 namespace weex {
 namespace core {
 namespace data_render {
-        
+    
 #define EXPECT(tok)     \
 do {    \
 if (Peek() != tok)  \
@@ -509,7 +509,7 @@ Handle<Expression> RAXParser::ParseObjectConstant()
 {
     ProxyObject proxy;
     ProxyArray spread_property;
-    
+    std::vector<std::pair<ProxyOrder, std::string>> orders;
     // eat the left brace '{'
     Advance();
     auto tok = Peek();
@@ -533,8 +533,14 @@ Handle<Expression> RAXParser::ParseObjectConstant()
             Handle<Expression> unfold_expr = ParseAssignExpression();
             if (Peek() == Token::COMMA) {
                 spread_property.push_back(unfold_expr);
+                orders.push_back(std::make_pair(ProxyOrder::ProxyArray, to_string((int)spread_property.size() - 1)));
                 Advance();
                 continue;
+            }
+            else if (spread_property.size() > 0) {
+                spread_property.push_back(unfold_expr);
+                orders.push_back(std::make_pair(ProxyOrder::ProxyArray, to_string((int)spread_property.size() - 1)));
+                break;
             }
             return unfold_expr;
         }
@@ -564,6 +570,8 @@ Handle<Expression> RAXParser::ParseObjectConstant()
             prop = builder()->NewIdentifier(name);
         }
         proxy[name] = Handle<Expression>(prop);
+        orders.push_back(std::make_pair(ProxyOrder::ProxyObject, name));
+
         // next token should be a ',' or '}'
         tok = Peek();
         if (tok == Token::RBRACE)
@@ -578,6 +586,7 @@ Handle<Expression> RAXParser::ParseObjectConstant()
         for (int i = 0; i < spread_property.size(); i++) {
             obj_expr->AsObjectConstant()->SpreadProperty().push_back(spread_property[i]);
         }
+        obj_expr->AsObjectConstant()->Orders() = orders;
     }
     return obj_expr;
 }

@@ -28,19 +28,10 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-
-template <typename T>
-std::string to_string(T value)
-{
-  std::ostringstream os ;
-  os << value ;
-  return os.str() ;
-}
-
 void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
 
 #if DEBUG
-  TimeCost tc;
+  //TimeCost tc;
 #endif
 
   Value* a = nullptr;
@@ -52,7 +43,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
     double d1, d2;
     OpCode op(GET_OP_CODE(instruction));
 #if DEBUG
-    tc.op_start(op);
+    //tc.op_start(op);
 #endif
       switch (op) {
         case OP_MOVE:
@@ -89,6 +80,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         *a = *b;
         break;
       case OP_GETFUNC: {
+        LOGD("OP_GETFUNC A:%ld\n", GET_ARG_A(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         a->type = Value::Type::FUNC;
         a->f = frame.func->f->GetChild(GET_ARG_Bx(instruction));
@@ -539,6 +531,13 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 throw VMExecError("Type Error For Member with OP_CODE [OP_GETMEMBER]");
             }
             std::string var_name = CStringValue(c);
+            if (var_name == "forEach") {
+                ValueRef *test = exec_state->FindRef(0);
+                printf("1223\n");
+            }
+            if (var_name == "tagItem") {
+                
+            }
             // first find member func
             if (IsClassInstance(b)) {
                 Variables *funcs = ValueTo<ClassInstance>(b)->p_desc_->funcs_.get();
@@ -595,6 +594,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 if (op == OP_GETMEMBER) {
                     Value *ret = GetTableValue(ValueTo<Table>(b), *c);
                     if (!IsNil(ret)) {
+                        if (IsTable(ret)) {
+                            LOGD("[OP_GETMEMBER]:%s\n", TableToString(ValueTo<Table>(ret)).c_str());
+                        }
                         *a = *ret;
                     }
                     else {
@@ -631,6 +633,13 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             }
             ref->value() = *a;
             ref->value().ref = a;
+            break;
+        }
+        case OP_RESETOUTVAR:
+        {
+            LOGD("OP_RESETOUTVAR A:%ld\n", GET_ARG_A(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            a->ref = NULL;
             break;
         }
         case OP_GETOUTVAR:
@@ -740,22 +749,24 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             break;
         }
       case OP_SETTABLE: {
-        LOGD("OP_SETTABLE A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
-        c = frame.reg + GET_ARG_C(instruction);
-        if (!IsTable(a)) {
-          // TODO error
-            throw VMExecError("Table Type Error With OP_CODE [OP_SETTABLE]");
-        }
-        int ret = SetTableValue(reinterpret_cast<Table *>(a->gc), b, *c);
-        //LOGD("[OP_SETTABLE]:%s\n", TableToString(ValueTo<Table>(a)).c_str());
-        if (!ret) {
-          // TODO set faile
-            throw VMExecError("Set Table Error With OP_CODE [OP_SETTABLE]");
-        }
+          LOGD("OP_SETTABLE A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+          a = frame.reg + GET_ARG_A(instruction);
+          b = frame.reg + GET_ARG_B(instruction);
+          c = frame.reg + GET_ARG_C(instruction);
+          if (!IsTable(a)) {
+              // TODO error
+              throw VMExecError("Table Type Error With OP_CODE [OP_SETTABLE]");
+          }
+          if (IsString(b) || IsTable(b)) {
+              int ret = SetTableValue(reinterpret_cast<Table *>(a->gc), b, *c);
+              //LOGD("[OP_SETTABLE]:%s\n", TableToString(ValueTo<Table>(a)).c_str());
+              if (!ret) {
+                  // TODO set faile
+                  throw VMExecError("Set Table Error With OP_CODE [OP_SETTABLE]");
+              }
+          }
+          break;          
       }
-        break;
         case OP_RETURN0: {
             return;
         }
@@ -779,7 +790,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
     }
 
 #if DEBUG
-    tc.op_end();
+    //tc.op_end();
 #endif
 
   }

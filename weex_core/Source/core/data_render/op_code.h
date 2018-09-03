@@ -38,6 +38,7 @@ enum OpCode {
   OP_GETSUPER,   // A B C     R(A) = super[B] C = super func
   
   OP_SETOUTVAR,     // A B C R(A) = B->C
+  OP_RESETOUTVAR,
   OP_GETOUTVAR,     // A B C R(A) = B->C
 
     

@@ -37,7 +37,7 @@ namespace weex {
 namespace core {
 namespace data_render {
     
-#define VM_EXEC_STACK_SIZE               256
+#define VM_EXEC_STACK_SIZE               512
 
 class ValueRef {
     friend class ExecState;
@@ -102,7 +102,6 @@ class ExecStack {
   Value** top() { return &top_; }
   Value* base() { return &stack_[0]; }
   void reset();
-
  private:
   std::vector<Value> stack_;
   Value* top_;

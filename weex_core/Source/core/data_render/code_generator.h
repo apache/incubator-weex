@@ -93,7 +93,7 @@ class CodeGenerator : public ASTVisitor {
 
   class BlockCnt : public Node<BlockCnt> {
    public:
-    BlockCnt() : variables_(), idx_(0), is_loop_(false) {}
+    BlockCnt() : reg_refs_(), variables_(), idx_(0), is_loop_(false) {}
     ~BlockCnt() {}
 
     inline long NextRegisterId() { return idx_++; }
@@ -121,13 +121,17 @@ class CodeGenerator : public ASTVisitor {
     inline void set_idx(int idx) { idx_ = idx; }
     inline int idx() { return idx_; }
     inline bool is_loop() { return is_loop_; }
-
+    inline std::vector<long>& reg_refs() { return reg_refs_; }
+    inline bool& is_register_scope() { return is_register_scope_; }
+    void reset();
    private:
     bool FindRegisterId(const std::string &name, long &ret);
     ValueRef *FindValueRef(const std::string &name, long &reg_ref);
     std::unordered_map<std::string, long> variables_;
+    std::vector<long> reg_refs_;
     int idx_;
     bool is_loop_;
+    bool is_register_scope_;
     FuncState *func_state_{nullptr};
     ExecState *exec_state_{nullptr};
     int for_start_index_{-1};
@@ -170,8 +174,10 @@ class CodeGenerator : public ASTVisitor {
   };
   class RegisterScope {
    public:
-    RegisterScope(BlockCnt *block) : stored_idx_(block->idx()), block_(block) {}
-    ~RegisterScope() { block_->set_idx(stored_idx_); }
+    RegisterScope(BlockCnt *block) : stored_idx_(block->idx()), block_(block) {
+        block_->is_register_scope() = true;
+    }
+      ~RegisterScope();
 
    private:
     int stored_idx_;

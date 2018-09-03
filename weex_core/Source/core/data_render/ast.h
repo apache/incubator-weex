@@ -497,6 +497,8 @@ class PostfixExpression : public Expression {
   PostfixOperation op_;
   Handle<Expression> expr_;
 };
+    
+enum class ProxyOrder { ProxyArray, ProxyObject };
 
 class ObjectConstant : public Expression {
  public:
@@ -509,6 +511,7 @@ class ObjectConstant : public Expression {
   ProxyObject& proxy() { return Props; }
   bool IsEmpty() { return Props.empty(); }
   ProxyArray &SpreadProperty() { return spread_property_; };
+  std::vector<std::pair<ProxyOrder, std::string>> &Orders() { return orders_; } ;
   ProxyObject::size_type GetPropertyCount() { return Props.size(); }
 
   DEFINE_NODE_TYPE(ObjectConstant, Expression);
@@ -516,7 +519,7 @@ class ObjectConstant : public Expression {
  private:
   ProxyObject Props;
   ProxyArray spread_property_;
-
+  std::vector<std::pair<ProxyOrder, std::string>> orders_;
 };
 
 class ArrayConstant : public Expression {

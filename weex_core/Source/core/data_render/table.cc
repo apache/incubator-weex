@@ -26,15 +26,6 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-
-template <typename T>
-std::string to_string(T value)
-{
-  std::ostringstream os ;
-  os << value ;
-  return os.str() ;
-}
-
 int IndexOf(const std::vector<Value> *arr, const Value *val) {
   auto it = std::find(arr->begin(), arr->end(), val);
   if (it != arr->end()) {
@@ -42,6 +33,27 @@ int IndexOf(const std::vector<Value> *arr, const Value *val) {
   } else {
     return -1;
   }
+}
+
+int SetTabTableValue(Table *table, const Value *src, const Value &val) {
+    int ret = 0;
+    do {
+        if (!IsTable(src)) {
+            break;
+        }
+        Table *src_table = ValueTo<Table>(src);
+        for (auto iter = src_table->map.begin(); iter != src_table->map.end(); iter++) {
+            auto find = table->map.find(iter->first);
+            if (find != table->map.end()) {
+                table->map.erase(find);
+            }
+            table->map.insert(std::make_pair(iter->first, iter->second));
+        }
+        ret = 1;
+        
+    } while (0);
+    
+    return ret;
 }
 
 int SetTabStringValue(Table *t, const Value *key, const Value &val) {
@@ -104,6 +116,9 @@ Value *GetTableVar(Table *table, const Value &key) {
 int SetTableValue(Table *t, Value *key, const Value &val) {
     if (IsString(key)) {
         return SetTabStringValue(t, key, val);
+    }
+    else if (IsTable(key)) {
+        return SetTabTableValue(t, key, val);
     }
     return 0;
 }

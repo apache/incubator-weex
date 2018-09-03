@@ -36,11 +36,9 @@ namespace core {
 namespace data_render {
     
 void ExecStack::reset() {
-    size_t size = VM_EXEC_STACK_SIZE - (top_ - base());
-    for (int i = 0; i < size; i++) {
-        top_[i].ref = NULL;
-        SetNil(&top_[i]);
-    }
+    size_t size = (VM_EXEC_STACK_SIZE - (top_ - base()) - 1) * sizeof(Value);
+    LOGD("reset:%i=>\n", (int)(top_ - base()));
+    memset(top_, 0, size);
 }
 
 ExecState::ExecState(VM *vm)
@@ -156,6 +154,7 @@ const Value ExecState::Call(Value *func, const std::vector<Value>& params) {
 
 void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
     *stack_->top() = func + argc;
+    printf("ExecStack::CallFunction:%i\n", (int)(func - stack_->base()));
     if (func->type == Value::Type::CFUNC) {
         Frame frame;
         frame.reg = func;
@@ -164,6 +163,7 @@ void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
         if (ret != nullptr && !IsNil(&result)) {
             *ret = result;
         }
+        stack_->reset();
         frames_.pop_back();
     }
     else {

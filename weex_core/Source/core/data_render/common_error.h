@@ -23,6 +23,7 @@
 #ifndef DATA_RENDER_COMMON_ERROR_
 #define DATA_RENDER_COMMON_ERROR_
 
+#include <sstream>
 #include "core/data_render/token.h"
 
 namespace weex {
@@ -113,6 +114,15 @@ public:
     { }
 };
     
+template <typename T>
+
+std::string to_string(T value)
+{
+    std::ostringstream os ;
+    os << value ;
+    return os.str() ;
+}
+
 }
 }
 }

@@ -76,6 +76,7 @@ void CodeGenerator::LeaveFunction() {
     }
     BlockCnt *parent_block = block_->parent();
     if (block_) {
+        block_->reset();
         delete block_;
     }
     block_ = parent_block;
@@ -100,6 +101,7 @@ void CodeGenerator::EnterBlock() {
 void CodeGenerator::LeaveBlock() {
     BlockCnt *parent = block_->parent();
     if (block_) {
+        block_->reset();
         delete block_;
     }
     block_ = parent;
@@ -437,7 +439,6 @@ void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
     RegisterScope register_scope(block_);
     long ret = data == nullptr ? block_->NextRegisterId()
     : *static_cast<long *>(data);
-    
     // body
     // Slot
     auto slot = func_->func_state()->AddInstruction(0);
@@ -605,6 +606,9 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
         if (data) {
             long ret = *static_cast<long *>(data);
             func_state->AddInstruction(CREATE_ABC(OP_MOVE, ret, reg_parent, 0));
+        }
+        else {
+            func_state->AddInstruction(CREATE_ABC(OP_RETURN1, reg_parent, 0, 0));
         }
         
     } while (0);
@@ -798,36 +802,64 @@ void CodeGenerator::Visit(UndefinedConstant *node, void *data) {
     }
 }
 
-void CodeGenerator::Visit(ObjectConstant* node, void* data) {
-  long ret = data == nullptr ? -1 : *static_cast<long*>(data);
-
-  FuncState* func_state = func_->func_state();
-
-  // new table
-  Value table = exec_state_->table_factory()->CreateTable();
-  if (ret >= 0) {
-    int tableIndex = func_state->AddConstant(table);
-    Instruction i = CREATE_ABx(OpCode::OP_LOADK, ret, tableIndex);
-    func_state->AddInstruction(i);
-
-    // expr
-    for (auto it = node->proxy().begin(); it != node->proxy().end(); it++) {
-      RegisterScope scope(block_);
-      long item = block_->NextRegisterId();
-      long key = block_->NextRegisterId();
-
-      auto ktemp = (*it).second;
-      ktemp->Accept(this, &item);
-
-      auto value = exec_state_->string_table_->StringFromUTF8(it->first);
-      int keyIndex = func_state->AddConstant(std::move(value));
-      func_state->AddInstruction(
-          CREATE_ABx(OpCode::OP_LOADK, key, keyIndex));
-
-      Instruction i = CREATE_ABC(OpCode::OP_SETTABLE, ret, key, item);
-      func_state->AddInstruction(i);
+void CodeGenerator::Visit(ObjectConstant *node, void *data) {
+    long ret = data == nullptr ? -1 : *static_cast<long *>(data);
+    FuncState *func_state = func_->func_state();
+    // new table
+    Value table = exec_state_->table_factory()->CreateTable();
+    if (ret >= 0) {
+        int tableIndex = func_state->AddConstant(table);
+        Instruction i = CREATE_ABx(OP_LOADK, ret, tableIndex);
+        func_state->AddInstruction(i);
+        if (node->SpreadProperty().size() > 0) {
+            std::vector<std::pair<ProxyOrder, std::string>> &orders = node->Orders();
+            for (int i = 0; i < orders.size(); i++) {
+                switch (orders[i].first) {
+                    case ProxyOrder::ProxyArray:
+                    {
+                        int index = atoi(orders[i].second.c_str());
+                        if (index < node->SpreadProperty().size()) {
+                            long key = block_->NextRegisterId();
+                            node->SpreadProperty()[index]->Accept(this, &key);
+                            func_state->AddInstruction(CREATE_ABC(OP_SETTABLE, ret, key, key));
+                        }
+                        break;
+                    }
+                    case ProxyOrder::ProxyObject:
+                    {
+                        RegisterScope scope(block_);
+                        auto iter = node->proxy().find(orders[i].second);
+                        if (iter != node->proxy().end()) {
+                            long item = block_->NextRegisterId();
+                            long key = block_->NextRegisterId();
+                            iter->second->Accept(this, &item);
+                            auto value = exec_state_->string_table_->StringFromUTF8(iter->first);
+                            int keyIndex = func_state->AddConstant(std::move(value));
+                            func_state->AddInstruction(CREATE_ABx(OP_LOADK, key, keyIndex));
+                            func_state->AddInstruction(CREATE_ABC(OP_SETTABLE, ret, key, item));
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
+        else {
+            // expr
+            for (auto it = node->proxy().begin(); it != node->proxy().end(); it++) {
+                RegisterScope scope(block_);
+                long item = block_->NextRegisterId();
+                long key = block_->NextRegisterId();
+                auto ktemp = (*it).second;
+                ktemp->Accept(this, &item);
+                auto value = exec_state_->string_table_->StringFromUTF8(it->first);
+                int keyIndex = func_state->AddConstant(std::move(value));
+                func_state->AddInstruction(CREATE_ABx(OP_LOADK, key, keyIndex));
+                func_state->AddInstruction(CREATE_ABC(OP_SETTABLE, ret, key, item));
+            }
+        }
     }
-  }
 }
 // TODO: this is not correct.
 void CodeGenerator::Visit(ArrayConstant *node, void *data) {
@@ -998,6 +1030,51 @@ void CodeGenerator::Visit(ReturnStatement* node, void* data) {
     func_->func_state()->AddInstruction(CREATE_ABC(OP_RETURN1, ret, 0, 0));
   }
 }
+
+CodeGenerator::RegisterScope::~RegisterScope()
+{
+    int start_idx = stored_idx_;
+    BlockCnt *block = block_;
+    FuncState *func_state = block_->func_state();
+    if (func_state) {
+        while (block) {
+            if (block->func_state() == func_state) {
+                auto iter = block->variables().begin();
+                while (iter != block->variables().end()) {
+                    long reg_ref = iter->second;
+                    if (reg_ref >= start_idx) {
+                        iter = block->variables().erase(iter);
+                    }
+                    else {
+                        iter++;
+                    }
+                }
+            }
+            block = block->parent();
+        }
+    }
+    block = block_;
+    if (func_state) {
+        while (block && block->reg_refs().size() > 0) {
+            if (block->func_state() == func_state) {
+                auto iter = block->reg_refs().begin();
+                while (iter != block->reg_refs().end()) {
+                    long reg_ref = *iter;
+                    if (reg_ref >= start_idx) {
+                        func_state->AddInstruction(CREATE_ABC(OP_RESETOUTVAR, reg_ref, 0, 0));
+                        iter = block->reg_refs().erase(iter);
+                    }
+                    else {
+                        iter++;
+                    }
+                }
+            }
+            block = block->children();
+        }
+    }
+    block_->is_register_scope() = false;
+    block_->set_idx(stored_idx_);
+}
     
 void CodeGenerator::BlockCnt::AddVariable(const std::string &name, long reg) {
     auto iter = variables_.find(name);
@@ -1029,6 +1106,14 @@ int CodeGenerator::BlockCnt::for_start_index() {
     }
     return -1;
 }
+    
+void CodeGenerator::BlockCnt::reset() {
+    for (int i = 0; i < reg_refs_.size(); i++) {
+        if (func_state()) {
+            func_state()->AddInstruction(CREATE_ABC(OP_RESETOUTVAR, reg_refs_[i], 0, 0));
+        }
+    }
+}
 
 long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
     auto iter = variables_.find(name);
@@ -1053,6 +1138,7 @@ long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
                     root_block = root_block->children();
                 }
                 reg_ref = root_block->NextRegisterId();
+                root_block->reg_refs().push_back(reg_ref);
                 func_state_->AddInstruction(CREATE_ABx(OP_GETOUTVAR, reg_ref, ref->ref_id()));
             }
             return reg_ref;
