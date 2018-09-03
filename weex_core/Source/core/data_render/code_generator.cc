@@ -382,11 +382,11 @@ void CodeGenerator::Visit(FunctionStatement *node, void *data) {
 
         // make arguments var in thie front of stack;
         if (is_class_func) {
-            block_->variables().insert(std::make_pair("this", block_->NextRegisterId()));
+            block_->AddVariable("this", block_->NextRegisterId());
         }
         for (int i = 0; i < proto->GetArgs().size(); i++) {
             std::string arg = proto->GetArgs().at(i);
-            block_->variables().insert(std::make_pair(arg, block_->NextRegisterId()));
+            block_->AddVariable(arg, block_->NextRegisterId());
         }
         node->body()->Accept(this, nullptr);
     }
@@ -416,7 +416,7 @@ void CodeGenerator::Visit(FunctionStatement *node, void *data) {
         Instruction i = CREATE_ABx(OP_GETFUNC, ret, index);
         func_->func_state()->ReplaceInstruction(slot, i);
         if (proto->GetName().length() > 0) {
-            block_->variables().insert(std::make_pair(proto->GetName(), ret));
+            block_->AddVariable(proto->GetName(), ret);
         }
     }
 }
@@ -450,7 +450,7 @@ void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
         for (int i = 0; i < node->args().size(); i++) {
             assert(node->args()[i]->IsIdentifier());
             std::string arg = node->args()[i]->AsIdentifier()->GetName();
-            block_->variables().insert(std::make_pair(arg, block_->NextRegisterId()));
+            block_->AddVariable(arg, block_->NextRegisterId());
         }
         node->body()->Accept(this, nullptr);
     }
@@ -722,7 +722,7 @@ void CodeGenerator::Visit(AssignExpression *node, void *data) {
 void CodeGenerator::Visit(Declaration *node, void *data) {
     long reg = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
     FuncState *func_state = func_->func_state();
-    block_->variables().insert(std::make_pair(node->name(), reg));
+    block_->AddVariable(node->name(), reg);
     if (node->expr().get() != nullptr) {
         node->expr()->Accept(this, &reg);
     }
@@ -987,6 +987,14 @@ void CodeGenerator::Visit(ReturnStatement* node, void* data) {
     node->expr()->Accept(this, &ret);
     func_->func_state()->AddInstruction(CREATE_ABC(OP_RETURN1, ret, 0, 0));
   }
+}
+    
+void CodeGenerator::BlockCnt::AddVariable(const std::string &name, long reg) {
+    auto iter = variables_.find(name);
+    if (iter != variables_.end()) {
+        variables_.erase(iter);
+    }
+    variables_.insert(std::make_pair(name, reg));
 }
     
 bool CodeGenerator::BlockCnt::FindVariable(const std::string &name) {
