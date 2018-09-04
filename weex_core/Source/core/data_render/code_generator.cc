@@ -159,6 +159,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
             caller = block_->NextRegisterId();
             func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, reg_old_caller, 0));
         }
+        caller_regs_order.push_back(caller);
     }
     else if (stms->expr().get()) {
         if (class_ && stms->expr()->IsIdentifier() && stms->expr()->AsIdentifier()->GetName() == "super")
@@ -250,14 +251,18 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
         argc += arg_list->length();
     }
     FuncState *state = func_->func_state();
-    bool continued = true;
-    for (int i = 1; i < caller_regs_order.size(); i++) {
+    bool call_reorder = false;
+    int regs_count = (int)caller_regs_order.size();
+    for (int i = 1; i < regs_count; i++) {
         if (caller_regs_order[i] - caller_regs_order[i - 1] != 1) {
-            continued = false;
+            call_reorder = true;
             break;
         }
     }
-    if (!continued) {
+    if (!call_reorder && regs_count > 0) {
+        call_reorder = caller_regs_order[regs_count - 1] + 1 >= block_->idx() ? false : true;
+    }
+    if (call_reorder) {
         caller = block_->NextRegisterId();
         func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, caller_regs_order[0], 0));
         for (int i = 1; i < caller_regs_order.size(); i++) {
@@ -905,11 +910,12 @@ void CodeGenerator::Visit(ArrayConstant *node, void *data) {
         Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, tableIndex);
         func_state->AddInstruction(i);
         // expr
+        int index = 0;
         for (auto it = node->exprs().begin(); it != node->exprs().end(); it++) {
             long item = block_->NextRegisterId();
             auto temp = (*it).get();
             temp->Accept(this, &item);
-            Instruction i = CREATE_ABC(OP_SETARRAY, reg, 0, item);
+            Instruction i = CREATE_ABC(OP_SETARRAY, reg, index++, item);
             func_state->AddInstruction(i);
         }
     }

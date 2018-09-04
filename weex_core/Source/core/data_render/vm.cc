@@ -665,6 +665,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             }
             *a = ref->value();
             a->ref = &ref->value();
+//            int value_index = a - exec_state->stack()->base();
+//            Value *test = exec_state->stack()->base() + value_index;
             break;
         }
         case OP_NEWTABLE: {

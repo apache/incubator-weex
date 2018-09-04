@@ -39,16 +39,16 @@ static Value Log(ExecState *exec_state) {
     Value *a = exec_state->GetArgument(i);
     switch (a->type) {
       case Value::Type::NUMBER:
-        std::cout << a->n << "\n";
+        std::cout << "[log]:=>" << a->n << "\n";
         break;
       case Value::Type::INT:
-        std::cout << a->i << "\n";
+        std::cout << "[log]:=>" << a->i << "\n";
         break;
       case Value::Type::STRING:
-        std::cout << a->str->c_str() << "\n";
+        std::cout << "[log]:=>" << a->str->c_str() << "\n";
         break;
       case Value::Type::TABLE:
-        std::cout << TableToString(ValueTo<Table>(a)) << "\n";
+        std::cout << "[log]:=>" << TableToString(ValueTo<Table>(a)) << "\n";
         break;
       default:
         break;
