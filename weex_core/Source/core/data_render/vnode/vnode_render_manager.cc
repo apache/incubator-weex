@@ -58,7 +58,7 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
                                                 int index,
                                                 const string& pageId) {
   std::string ref_str;
-  if (isRoot) {
+  if (!isRoot) {
     ref_str = base::to_string(ref_id++);
   } else {
     ref_str = "_root";
