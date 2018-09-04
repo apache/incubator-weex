@@ -486,7 +486,14 @@ void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
             std::string arg = node->args()[i]->AsIdentifier()->GetName();
             block_->AddVariable(arg, block_->NextRegisterId());
         }
-        node->body()->Accept(this, nullptr);
+        if (node->body()->IsJSXNodeExpression()) {
+            long return1 = block_->NextRegisterId();
+            node->body()->Accept(this, &return1);
+            func_->func_state()->AddInstruction(CREATE_ABC(OP_RETURN1, return1, 0, 0));
+        }
+        else {
+            node->body()->Accept(this, nullptr);
+        }
     }
     // associate function_name and function_state
     if (func_->parent() == nullptr) {
@@ -594,12 +601,7 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
         }
         std::vector<Handle<Expression>> exprs = node->funcexprs();
         for (int i = 0; i < exprs.size(); i++) {
-            if (i == 0) {
-                exprs[i]->Accept(this, nullptr);
-            }
-            else {
-                exprs[i]->Accept(this, nullptr);
-            }
+            exprs[i]->Accept(this, nullptr);
         }
         std::string vnode_ptr = node->node_ptr()->AsStringConstant()->string();
         long reg_parent = block_->FindRegisterId(vnode_ptr);
@@ -621,18 +623,7 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
                 }
                 func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, caller, index));
                 func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg_0, reg_parent, 0));
-                if (childrens[i]->IsJSXNodeExpression()) {
-                    childrens[i]->Accept(this, nullptr);
-                    std::string vnode_child_ptr = childrens[i]->AsJSXNodeExpression()->node_ptr()->AsStringConstant()->string();
-                    long reg_child = block_->FindRegisterId(vnode_child_ptr);
-                    if (reg_child < 0) {
-                        throw GeneratorError("can't find identifier: " + childrens[i]->AsJSXNodeExpression()->node_ptr()->AsStringConstant()->string());
-                    }
-                    func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg_1, reg_child, 0));
-                }
-                else {
-                    childrens[i]->Accept(this, &arg_1);
-                }
+                childrens[i]->Accept(this, &arg_1);
                 func_state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
             }
         }
@@ -640,16 +631,13 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
             long ret = *static_cast<long *>(data);
             func_state->AddInstruction(CREATE_ABC(OP_MOVE, ret, reg_parent, 0));
         }
-        else {
-            func_state->AddInstruction(CREATE_ABC(OP_RETURN1, reg_parent, 0, 0));
-        }
         
     } while (0);
 }
 
 void CodeGenerator::Visit(BinaryExpression *node, void *data) {
     long left = -1;
-    long ret = data == nullptr ? block_->NextRegisterId() : *static_cast<long*>(data);
+    long ret = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
     if (node->lhs() && (node->lhs()->IsDeclaration() || node->lhs()->IsDeclarationList())) {
         left = block_->NextRegisterId();
         node->lhs()->Accept(this, &left);
@@ -1059,16 +1047,16 @@ void CodeGenerator::Visit(PostfixExpression *node, void *data) {
     }
 }
 
-void CodeGenerator::Visit(ReturnStatement* node, void* data) {
-    
-  if (node->expr() == nullptr) {
-    func_->func_state()->AddInstruction(CREATE_ABC(OP_RETURN0, 0, 0, 0));
-  }
-  else {
-    long ret = block_->NextRegisterId();
-    node->expr()->Accept(this, &ret);
-    func_->func_state()->AddInstruction(CREATE_ABC(OP_RETURN1, ret, 0, 0));
-  }
+void CodeGenerator::Visit(ReturnStatement *node, void *data) {
+    FuncState *func_state = func_->func_state();
+    if (node->expr() == nullptr) {
+        func_state->AddInstruction(CREATE_ABC(OP_RETURN0, 0, 0, 0));
+    }
+    else {
+        long ret = block_->NextRegisterId();
+        node->expr()->Accept(this, &ret);
+        func_state->AddInstruction(CREATE_ABC(OP_RETURN1, ret, 0, 0));
+    }
 }
 
 CodeGenerator::RegisterScope::~RegisterScope()

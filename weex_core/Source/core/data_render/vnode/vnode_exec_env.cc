@@ -183,6 +183,7 @@ static Value CreateElement(ExecState *exec_state) {
         throw VMExecError("CreateElement only support int for string");
     }
     std::string tag_name = exec_state->GetArgument(0)->str->c_str();
+    LOGD("[VM][VNode][CreateElement]: %s  %s\n", ref.c_str(), tag_name.c_str());
     VNode *node = NULL;
     if (tag_name == "root") {
         node = new VNode(ref, "div");
@@ -230,11 +231,12 @@ static Value AppendChild(ExecState *exec_state) {
       }
   }
   else if (IsString(childrens) && parent) {
-      LOGD("[AppendChild]:string:%s\n", CStringValue(childrens));
+      LOGD("[VM][VNode][AppendChild]:string:%s\n", CStringValue(childrens));
       parent->SetAttribute("value", CStringValue(childrens));
   }
   else {
       VNode *children = reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);
+      LOGD("[VM][VNode][AppendChild]: %s  %s\n", parent->ref().c_str(), children->ref().c_str());
       AppendChild(exec_state, parent, children);
   }
   return Value();
