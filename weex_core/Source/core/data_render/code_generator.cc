@@ -970,6 +970,7 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
 }
 
 void CodeGenerator::Visit(Identifier *node, void *data) {
+  RegisterScope register_scope(block_);
   long reg_a = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
   if (reg_a >= 0) {
     FuncState *state = func_->func_state();
