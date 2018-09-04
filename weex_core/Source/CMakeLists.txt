@@ -65,6 +65,8 @@ set(COMMON_SRCS
    ./core/data_render/ast_factory.cc
    ./core/data_render/class.cc
    ./core/data_render/class_array.cc
+   ./core/data_render/class_json.cc
+   ./core/data_render/class_string.cc
    ./core/data_render/class_factory.cc
    ./core/data_render/code_generator.cc
    ./core/data_render/exec_state.cc
