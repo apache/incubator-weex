@@ -486,8 +486,8 @@ inline String *StringAdd(StringTable *t, Value *a, Value *b) {
     str = a->str->c_str();
     return t->StringFromUTF8(str += ToCString(b));
   } else {
-    str = b->str->c_str();
-    return t->StringFromUTF8(str += ToCString(a));
+    str = ToCString(a);
+    return t->StringFromUTF8(str += b->str->c_str());
   }
 }
 
