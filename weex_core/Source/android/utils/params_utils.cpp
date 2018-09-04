@@ -483,6 +483,7 @@ void addParamsFromJArgs(std::vector<VALUE_WITH_TYPE*>& params,
     jbyte* data = env->GetByteArrayElements(dataArray, 0);
     size_t length = env->GetArrayLength(dataArray);
     param->value.byteArray = genWeexByteArray((const char*)data, length);
+    env->ReleaseByteArrayElements(dataArray, data, 0);
   } else {
     param->type = ParamsType::JSUNDEFINED;
   }
