@@ -77,6 +77,7 @@
     BOOL _scrollStartEvent;
     BOOL _scrollEndEvent;
     BOOL _isScrolling;
+    CGFloat _pageSize;
     CGFloat _loadMoreOffset;
     CGFloat _previousLoadMoreContentHeight;
     CGFloat _offsetAccuracy;
@@ -150,6 +151,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _bounces = attributes[@"bounce"]?[WXConvert BOOL:attributes[@"bounce"]]:YES;
         _refreshType = [WXConvert NSString:attributes[@"refreshType"]]?:@"refreshForWholeVisible";
         _pagingEnabled = attributes[@"pagingEnabled"] ? [WXConvert BOOL:attributes[@"pagingEnabled"]] : NO;
+        _pageSize = attributes[@"pageSize"] ? [WXConvert WXPixelType:attributes[@"pageSize"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
+        if (_pageSize < 0) {
+            _pageSize = 0;
+        }
         _loadMoreOffset = attributes[@"loadmoreoffset"] ? [WXConvert WXPixelType:attributes[@"loadmoreoffset"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
         _loadmoreretry = attributes[@"loadmoreretry"] ? [WXConvert NSUInteger:attributes[@"loadmoreretry"]] : 0;
         _listenLoadMore = [events containsObject:@"loadmore"];
@@ -225,6 +230,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     } else {
         scrollView.scrollsToTop = YES;
     }
+    
+    if (_pagingEnabled && _pageSize > 0) {
+        scrollView.pagingEnabled = NO; // turn off system default paging
+        scrollView.decelerationRate = UIScrollViewDecelerationRateFast;
+    }
+    else {
+        scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
+    }
 }
 
 - (void)layoutDidFinish
@@ -274,9 +287,26 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         ((UIScrollView *)self.view).pagingEnabled = _pagingEnabled;
     }
     
+    if (attributes[@"pageSize"]) {
+        _pageSize = [WXConvert WXPixelType:attributes[@"pageSize"]
+                               scaleFactor:self.weexInstance.pixelScaleFactor];
+        if (_pageSize < 0) {
+            _pageSize = 0;
+        }
+    }
+    
+    if (_pagingEnabled && _pageSize > 0) {
+        ((UIScrollView *)self.view).pagingEnabled = NO; // turn off system default paging
+        ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateFast;
+    }
+    else {
+        ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateNormal;
+    }
+    
     if (attributes[@"loadmoreoffset"]) {
         _loadMoreOffset = [WXConvert WXPixelType:attributes[@"loadmoreoffset"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
+    
     if (attributes[@"bounce"]) {
         _bounces = [WXConvert BOOL:attributes[@"bounce"]];
         ((UIScrollView *)self.view).bounces = _bounces;
@@ -289,6 +319,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         }
         self.loadmoreretry = loadmoreretry;
     }
+    
     if (attributes[@"scrollable"]) {
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         ((UIScrollView *)self.view).scrollEnabled = _scrollable;
@@ -758,6 +789,24 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
 {
+    // Page stop effect
+    if (_pagingEnabled && _pageSize > 0) {
+        if (_scrollDirection == WXScrollDirectionVertical) {
+            CGFloat targetY = scrollView.contentOffset.y + velocity.y * 60.0;
+            CGFloat targetIndex = round(targetY / _pageSize);
+            if (targetIndex < 0)
+                targetIndex = 0;
+            targetContentOffset->y = targetIndex * _pageSize;
+        }
+        else {
+            CGFloat targetX = scrollView.contentOffset.x + velocity.x * 60.0;
+            CGFloat targetIndex = round(targetX / _pageSize);
+            if (targetIndex < 0)
+                targetIndex = 0;
+            targetContentOffset->x = targetIndex * _pageSize;
+        }
+    }
+    
     if ([_refreshType isEqualToString:@"refreshForAppear"]) {
         if(targetContentOffset == nil)
             return;
