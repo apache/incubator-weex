@@ -154,7 +154,7 @@ const Value ExecState::Call(Value *func, const std::vector<Value>& params) {
 
 void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
     *stack_->top() = func + argc;
-    printf("ExecStack::CallFunction:%i\n", (int)(func - stack_->base()));
+    //LOGD("ExecStack::CallFunction:%i\n", (int)(func - stack_->base()));
     if (func->type == Value::Type::CFUNC) {
         Frame frame;
         frame.reg = func;

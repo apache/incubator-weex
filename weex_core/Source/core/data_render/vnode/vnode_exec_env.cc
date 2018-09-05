@@ -236,7 +236,7 @@ static Value AppendChild(ExecState *exec_state) {
   }
   else {
       VNode *children = reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);
-      LOGD("[VM][VNode][AppendChild]: %s  %s\n", parent->ref().c_str(), children->ref().c_str());
+      LOGD("[VM][VNode][AppendChild]: %s  %s\n", parent ? parent->ref().c_str() : "null", children->ref().c_str());
       AppendChild(exec_state, parent, children);
   }
   return Value();
