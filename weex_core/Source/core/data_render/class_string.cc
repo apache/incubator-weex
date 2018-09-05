@@ -21,7 +21,6 @@
 #include "core/data_render/class.h"
 #include "core/data_render/class_array.h"
 #include "core/data_render/exec_state.h"
-#include "core/data_render/vm_mem.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/table.h"
 #include "core/data_render/string_table.h"
@@ -83,7 +82,6 @@ static Value split(ExecState *exec_state) {
             Value string_value = exec_state->string_table()->StringFromUTF8(split_array[i]);
             array->items.push_back(string_value);
         }
-
         
     } while (0);
     

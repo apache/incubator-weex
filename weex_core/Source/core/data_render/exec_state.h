@@ -28,7 +28,6 @@
 #include <vector>
 #include "core/data_render/object.h"
 #include "core/data_render/op_code.h"
-#include "core/data_render/table_factory.h"
 #include "core/data_render/class_factory.h"
 #include "core/data_render/vnode/vnode.h"
 #include "core/data_render/vnode/vnode_render_context.h"
@@ -37,7 +36,7 @@ namespace weex {
 namespace core {
 namespace data_render {
     
-#define VM_EXEC_STACK_SIZE               512
+#define VM_EXEC_STACK_SIZE               2048
 
 class ValueRef {
     friend class ExecState;
@@ -124,7 +123,6 @@ class ExecState {
   inline ExecStack* stack() { return stack_.get(); }
   inline StringTable* string_table() { return string_table_.get(); }
   inline VNodeRenderContext* context() { return render_context_.get(); }
-  inline TableFactory *table_factory() { return factory_.get(); }
   inline ClassFactory *class_factory() { return class_factory_.get(); }
 
  private:
@@ -135,7 +133,6 @@ class ExecState {
 
   VM* vm_;
 
-  std::unique_ptr<TableFactory> factory_;
   std::unique_ptr<ClassFactory> class_factory_;
 
 

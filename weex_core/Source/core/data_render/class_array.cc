@@ -17,10 +17,10 @@
  * under the License.
  */
 #include <algorithm>
+#include "core/data_render/object.h"
 #include "core/data_render/class.h"
 #include "core/data_render/class_array.h"
 #include "core/data_render/exec_state.h"
-#include "core/data_render/vm_mem.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/table.h"
 #include <base/LogDefines.h>
@@ -65,7 +65,8 @@ int SetArray(Array *array, Value *index, const Value &val) {
         if (index_of > (int)array->items.size()) {
             break;
         }
-        array->items.insert(array->items.begin()+ static_cast<int>(index_of),val);
+        array->items.insert(array->items.begin()+ static_cast<int>(index_of), val);
+        GCRetain((Value *)&val);
         ret = true;
         
     } while (0);
@@ -80,8 +81,9 @@ int SetArray(Array *array, int index, const Value &val) {
             array->items.push_back(val);
         }
         else {
-            array->items.insert(array->items.begin() + index,val);
+            array->items.insert(array->items.begin() + index, val);
         }
+        GCRetain((Value *)&val);
         ret = true;
 
     } while (0);
@@ -129,8 +131,12 @@ Value GetArrayValue(Array *array, const Value &index) {
     return ret;
 }
     
-Value GetArrayLength(Array *array) {
+Value GetArraySizeValue(Array *array) {
     return Value((int)array->items.size());
+}
+    
+size_t GetArraySize(Array *array) {
+    return array->items.size();
 }
     
 static Value forEach(ExecState *exec_state) {
@@ -199,6 +205,7 @@ static Value push(ExecState *exec_state) {
         throw VMExecError("Array.push item can't be nil");
     }
     ValueTo<Array>(array)->items.push_back(*item);
+    GCRetain(item);
     return Value();
 }
 
@@ -252,6 +259,7 @@ static Value slice(ExecState *exec_state) {
         ret = exec_state->class_factory()->CreateArray();
         if (start_index >= 0 && start_index < items.size()) {
             for (int i = start_index; i < end_index; i++) {
+                GCRetain(&items[i]);
                 ValueTo<Array>(&ret)->items.push_back(items[i]);
             }
         }

@@ -579,7 +579,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             }
             else if (IsArray(b)) {
                 if (var_name == "length") {
-                    *a = GetArrayLength(ValueTo<Array>(b));
+                    *a = GetArraySizeValue(ValueTo<Array>(b));
                 }
                 else {
                     int index = exec_state->global()->IndexOf("Array");
@@ -684,7 +684,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_NEWTABLE: {
             a = frame.reg + GET_ARG_A(instruction);
-            Value t = exec_state->table_factory()->CreateTable();
+            Value t = exec_state->class_factory()->CreateTable();
             *a = t;
             break;
         }

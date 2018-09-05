@@ -35,14 +35,6 @@ Value *GetTableValue(Table *, const Value &);
 Value *GetTableVar(Table *table, const Value &key);
     
 size_t GetTableSize(Table *);
-
-size_t GetArraySize(Table *);
-
-size_t GetMapSize(Table *);
-
-size_t GetValueArraySize(Value &);
-
-size_t GetValueMapSize(Value &);
     
 std::string TableToString(Table *table);
     

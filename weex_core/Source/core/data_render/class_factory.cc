@@ -7,7 +7,7 @@
 #include "core/data_render/class_array.h"
 #include "core/data_render/class_string.h"
 #include "core/data_render/class_json.h"
-#include "core/data_render/vm_mem.h"
+#include "core/data_render/table.h"
 
 namespace weex {
 namespace core {
@@ -17,7 +17,7 @@ Value ClassFactory::CreateClassDescriptor(ClassDescriptor *p_super) {
     ClassDescriptor *desc = NewClassDescriptor(p_super);
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
-    descs_.emplace_back(desc);
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
     return value;
 }
     
@@ -25,7 +25,15 @@ Value ClassFactory::CreateArray() {
     Array *array = new Array();
     Value value;
     SetAValue(&value, reinterpret_cast<GCObject *>(array));
-    arrays_.emplace_back(array);
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(array), value.type));
+    return value;
+}
+    
+Value ClassFactory::CreateTable() {
+    Table *table = NewTable();
+    Value value;
+    SetTValue(&value, reinterpret_cast<GCObject *>(table));
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(table), value.type));
     return value;
 }
     
@@ -33,7 +41,7 @@ Value ClassFactory::ClassString() {
     ClassDescriptor *desc = NewClassString();
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
-    descs_.emplace_back(desc);
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
     return value;
 }
     
@@ -41,7 +49,7 @@ Value ClassFactory::ClassJSON() {
     ClassDescriptor *desc = NewClassJSON();
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
-    descs_.emplace_back(desc);
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
     return value;
 }
     
@@ -49,14 +57,14 @@ Value ClassFactory::ClassArray() {
     ClassDescriptor *desc = NewClassArray();
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
-    descs_.emplace_back(desc);
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
     return value;
 }
     
 ClassInstance *ClassFactory::CreateClassInstanceFromSuper(ClassDescriptor *p_desc) {
     ClassInstance *p_super = nullptr;
     ClassInstance *inst = NewClassInstance(p_desc);
-    insts_.emplace_back(inst);
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(inst), Value::Type::CLASS_INST));
     if (p_desc->p_super_) {
         p_super = CreateClassInstanceFromSuper(p_desc->p_super_);
         inst->p_super_ = p_super;
@@ -72,18 +80,33 @@ Value ClassFactory::CreateClassInstance(ClassDescriptor *p_desc) {
 }
 
 ClassFactory::~ClassFactory() {
-    for (auto iter = descs_.begin(); iter != descs_.end(); iter++) {
-        delete *iter;
+    for (auto iter = stores_.begin(); iter != stores_.end(); iter++) {
+        switch (iter->second) {
+            case Value::Type::ARRAY:
+            {
+                delete reinterpret_cast<Array *>(iter->first);
+                break;
+            }
+            case Value::Type::TABLE:
+            {
+                delete reinterpret_cast<Table *>(iter->first);
+                break;
+            }
+            case Value::Type::CLASS_DESC:
+            {
+                delete reinterpret_cast<ClassDescriptor *>(iter->first);
+                break;
+            }
+            case Value::Type::CLASS_INST:
+            {
+                delete reinterpret_cast<ClassInstance *>(iter->first);
+                break;
+            }
+            default:
+                break;
+        }
     }
-    descs_.clear();
-    for (auto iter = insts_.begin(); iter != insts_.end(); iter++) {
-        delete *iter;
-    }
-    insts_.clear();
-    for (auto iter = arrays_.begin(); iter != arrays_.end(); iter++) {
-        delete *iter;
-    }
-    arrays_.clear();
+    stores_.clear();
 }
 
 }

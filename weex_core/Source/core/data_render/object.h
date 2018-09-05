@@ -25,11 +25,11 @@
 #include <cmath>
 #include <sstream>
 #include <map>
+#include "core/data_render/object.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
-#include "core/data_render/object.h"
 
-#define CommonHeader GCObject *gc
+#define CommonHeader GCObject *next_; int ref_;
 
 #define INT_OP(op, v1, v2) CAST_U2S((CAST_S2U(v1))op CAST_S2U(v2))
 #define NUM_OP(op, d1, d2) ((d1)op(d2))
@@ -60,10 +60,19 @@ class Value;
 class Variables;
 
 typedef struct GCObject {
-  CommonHeader;
+    CommonHeader;
+    inline int decrement() { return --ref_; }
+    inline int increment() { return ++ref_; }
+
 } GCObject;
 
 typedef Value (*CFunction)(ExecState *);
+
+#define ttype(o)            ((o)->type)
+#define iscollectable(o)    (ttype(o) >= Value::Type::ARRAY)
+
+inline void GCRelease(Value *o);
+inline void GCRetain(Value *o);
 
 struct Value {
   union {
@@ -80,7 +89,7 @@ struct Value {
 
   struct Value *ref {nullptr};
 
-  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, ARRAY, TABLE, CLASS_DESC, CLASS_INST, VALUE_REF };
+  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, VALUE_REF, ARRAY, TABLE, CLASS_DESC, CLASS_INST };
 
   Type type;
 
@@ -120,12 +129,14 @@ struct Value {
       case CLASS_DESC:
       case CLASS_INST:
         gc = value.gc;
+        gc->increment();
         break;
       default:break;
     }
   }
-  
+
   inline Value operator=(Value value) {
+      GCRelease(this);
       type = value.type;
       switch (type) {
           case INT:
@@ -157,6 +168,7 @@ struct Value {
           case CLASS_DESC:
           case CLASS_INST:
               gc = value.gc;
+              gc->increment();
               break;
           default:break;
       }
@@ -186,7 +198,7 @@ struct Value {
         return !(left == right);
     }
 };
-
+    
 typedef struct Array {
     CommonHeader;
     std::vector<Value> items;
@@ -260,8 +272,6 @@ bool ValueAND(const Value *a, const Value *b);
     
 bool ValueOR(const Value *a, const Value *b);
 
-void FreeValue(Value *o);
-
 inline double NumPow(const double &d1, const double &d2) {
   return MATH_OP(pow)(d1, d2);
 }
@@ -329,15 +339,29 @@ inline bool IsValueRef(const Value *o) { return Value::Type::VALUE_REF == o->typ
 inline bool IsNil(const Value *o) {
   return nullptr == o || Value::Type::NIL == o->type;
 }
+    
+inline void GCRelease(Value *o) {
+    if (iscollectable(o)) {
+        o->gc->decrement();
+    }
+}
+    
+inline void GCRetain(Value *o) {
+    if (iscollectable(o)) {
+        o->gc->increment();
+    }
+}
 
 inline void SetNil(Value *o) {
-  if (nullptr != o) {
-    o->type = Value::Type::NIL;
-  }
+    if (nullptr != o) {
+        GCRelease(o);
+        o->type = Value::Type::NIL;
+    }
 }
     
 inline void SetValueRef(Value *o, Value *src) {
     if (nullptr != o) {
+        GCRelease(o);
         o->type = Value::Type::VALUE_REF;
         o->var = src;
     }
@@ -410,45 +434,57 @@ inline int ToNum(const Value *o, double &n) {
 }
 
 inline void SetIValue(Value *o, int iv) {
-  o->type = Value::Type::INT;
-  o->i = iv;
+    GCRelease(o);
+    o->type = Value::Type::INT;
+    o->i = iv;
 }
     
 void SetRefValue(Value *o);
 
 inline void SetDValue(Value *o, double d) {
-  o->type = Value::Type::NUMBER;
-  o->n = d;
+    GCRelease(o);
+    o->type = Value::Type::NUMBER;
+    o->n = d;
 }
 
 inline void SetBValue(Value *o, bool b) {
-  o->type = Value::Type::BOOL;
-  o->b = b;
+    GCRelease(o);
+    o->type = Value::Type::BOOL;
+    o->b = b;
 }
 
 inline void SetTValue(Value *v, GCObject *o) {
-  v->type = Value::Type::TABLE;
-  v->gc = o;
+    GCRelease(v);
+    v->type = Value::Type::TABLE;
+    v->gc = o;
+    GCRetain(v);
 }
     
 inline void SetAValue(Value *v, GCObject *o) {
+    GCRelease(v);
     v->type = Value::Type::ARRAY;
     v->gc = o;
+    GCRetain(v);
 }
     
 inline void SetCDValue(Value *v, GCObject *o) {
+    GCRelease(v);
     v->type = Value::Type::CLASS_DESC;
     v->gc = o;
+    GCRetain(v);
 }
 
 inline void SetCIValue(Value *v, GCObject *o) {
+    GCRelease(v);
     v->type = Value::Type::CLASS_INST;
     v->gc = o;
+    GCRetain(v);
 }
 
 inline void SetSValue(Value *v, String *s) {
-  v->type = Value::Type::STRING;
-  v->str = s;
+    GCRelease(v);
+    v->type = Value::Type::STRING;
+    v->str = s;
 }
 
 inline std::string ToCString(const Value *o) {
@@ -521,20 +557,28 @@ inline int ToBool(const Value *o, bool &b) {
     return 1;
 }
 
-inline void ArrayAddAll(Value &src, Value &dest, int start, int end) {
-  Array *st = ValueTo<Array>(&src);
-  Array *dt = ValueTo<Array>(&dest);
-  dt->items.insert(dt->items.end(), st->items.begin() + start, end > 0 ? st->items.begin() + end : st->items.end());
+inline void ArrayCopyFrom(Value &src, Value &dest, int start, int end) {
+    Array *st = ValueTo<Array>(&src);
+    Array *dt = ValueTo<Array>(&dest);
+    auto iter_start = st->items.begin() + start;
+    auto iter_end = end > 0 ? st->items.begin() + end : st->items.end();
+    for (auto iter = iter_start; iter != iter_end; iter++) {
+        GCRetain(&*iter);
+    }
+    dt->items.insert(dt->items.end(), iter_start, iter_end);
 }
 
-inline void ArrayAddAll(Value &src, Value &dest) {
-  ArrayAddAll(src, dest, 0, 0);
+inline void ArrayCopy(Value &src, Value &dest) {
+    ArrayCopyFrom(src, dest, 0, 0);
 }
 
-inline void TableMapAddAll(Value &src, Value &dest) {
-  Table *st = ValueTo<Table>(&src);
-  Table *dt = ValueTo<Table>(&dest);
-  dt->map.insert(st->map.begin(), st->map.end());
+inline void TableCopy(Value &src, Value &dest) {
+    Table *st = ValueTo<Table>(&src);
+    Table *dt = ValueTo<Table>(&dest);
+    dt->map.insert(st->map.begin(), st->map.end());
+    for (auto iter = st->map.begin(); iter != st->map.end(); iter++) {
+        GCRetain(&iter->second);
+    }
 }
 
 }  // namespace data_render

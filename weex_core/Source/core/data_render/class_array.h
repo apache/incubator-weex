@@ -35,8 +35,9 @@ int SetArray(Array *array, Value *index, const Value &val);
 int SetArray(Array *array, int index, const Value &val);
 Value GetArrayValue(Array *array, const Value &index);
 Value* GetArrayVar(Array *array, const Value &index);
-Value GetArrayLength(Array *array);
-    
+Value GetArraySizeValue(Array *array);
+size_t GetArraySize(Array *array);
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

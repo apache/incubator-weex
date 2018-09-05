@@ -17,8 +17,8 @@
  * under the License.
  */
 #include <algorithm>
+#include "core/data_render/object.h"
 #include "core/data_render/table.h"
-#include "core/data_render/vm_mem.h"
 #include "third_party/json11/json11.hpp"
 #include "core/data_render/common_error.h"
 
@@ -35,7 +35,7 @@ int IndexOf(const std::vector<Value> *arr, const Value *val) {
   }
 }
 
-int SetTabTableValue(Table *table, const Value *src, const Value &val) {
+int SetTableForTable(Table *table, const Value *src, const Value &val) {
     int ret = 0;
     do {
         if (!IsTable(src)) {
@@ -45,9 +45,11 @@ int SetTabTableValue(Table *table, const Value *src, const Value &val) {
         for (auto iter = src_table->map.begin(); iter != src_table->map.end(); iter++) {
             auto find = table->map.find(iter->first);
             if (find != table->map.end()) {
+                GCRelease(&find->second);
                 table->map.erase(find);
             }
             table->map.insert(std::make_pair(iter->first, iter->second));
+            GCRetain(&iter->second);
         }
         ret = 1;
         
@@ -56,23 +58,25 @@ int SetTabTableValue(Table *table, const Value *src, const Value &val) {
     return ret;
 }
 
-int SetTabStringValue(Table *t, const Value *key, const Value &val) {
-  if (IsNil(key)) {
-    return 0;
-  }
-  std::string keyStr = CStringValue(key);
-  if (keyStr.empty()) {
-    return 0;
-  }
-  auto it = t->map.find(keyStr);
-  if (it != t->map.end()) {
-    t->map.erase(it);
-  }
-  t->map.insert(std::make_pair(keyStr, val));
-  return 1;
+int SetTableForKey(Table *t, const Value *key, const Value &val) {
+    if (IsNil(key)) {
+        return 0;
+    }
+    std::string keyStr = CStringValue(key);
+    if (keyStr.empty()) {
+        return 0;
+    }
+    auto iter = t->map.find(keyStr);
+    if (iter != t->map.end()) {
+        GCRelease(&iter->second);
+        t->map.erase(iter);
+    }
+    t->map.insert(std::make_pair(keyStr, val));
+    GCRetain((Value *)&val);
+    return 1;
 }
 
-Value *GetTabStringValue(Table *t, const Value *key) {
+Value *GetTableForKey(Table *t, const Value *key) {
     std::string str = CStringValue(key);
     if (!str.empty()) {
         auto it = t->map.find(str);
@@ -90,7 +94,7 @@ Table *NewTable() {
 
 Value *GetTableValue(Table *t, const Value &key) {
     if (IsString(&key)) {
-        return GetTabStringValue(t, &key);
+        return GetTableForKey(t, &key);
     }
     return nullptr;
 }
@@ -101,7 +105,7 @@ Value *GetTableVar(Table *table, const Value &key) {
         if (!IsString(&key)) {
             throw VMExecError("can't get table var when the key isn't string");
         }
-        ret = GetTabStringValue(table, &key);
+        ret = GetTableForKey(table, &key);
         if (!ret) {
             std::string keystr = CStringValue(&key);
             table->map.insert(std::make_pair(keystr, Value()));
@@ -115,39 +119,20 @@ Value *GetTableVar(Table *table, const Value &key) {
 
 int SetTableValue(Table *t, Value *key, const Value &val) {
     if (IsString(key)) {
-        return SetTabStringValue(t, key, val);
+        return SetTableForKey(t, key, val);
     }
     else if (IsTable(key)) {
-        return SetTabTableValue(t, key, val);
+        return SetTableForTable(t, key, val);
     }
     return 0;
 }
 
-size_t GetTableSize(Table *t) {
-  size_t m_size = GetMapSize(t);
-  return m_size;
-}
-
-size_t GetArraySize(Array *t) {
-  if (nullptr == t) {
-    return 0;
-  }
-  return t->items.size();
-}
-
-size_t GetMapSize(Table *t) {
-  if (nullptr == t) {
-    return -1;
-  }
-  return t->map.size();
-}
-
-size_t GetValueArraySize(Value &o) {
-  return GetArraySize(ValueTo<Array>(&o));
-}
-
-size_t GetValueMapSize(Value &o) {
-  return GetMapSize(ValueTo<Table>(&o));
+size_t GetTableSize(Table *table) {
+    size_t size = 0;
+    if (table) {
+        size = table->map.size();
+    }
+    return size;
 }
     
 json11::Json TableToJson(Table *table);

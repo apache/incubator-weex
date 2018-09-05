@@ -21,7 +21,6 @@
 #include <sstream>
 #include "core/data_render/object.h"
 #include "core/data_render/table.h"
-#include "core/data_render/table_factory.h"
 #include "core/data_render/class_factory.h"
 #include "core/data_render/class_array.h"
 #include "core/data_render/common_error.h"
@@ -57,17 +56,18 @@ static Value Log(ExecState *exec_state) {
   return Value();
 }
 
-static Value GetTableSize(ExecState* exec_state) {
-  size_t length = exec_state->GetArgumentCount();
-  if (length > 0) {
-    Value* value = exec_state->GetArgument(0);
-    if (IsTable(value)) {
-      return Value(static_cast<int64_t>(GetTableSize(ValueTo<Table>(value))));
-    } else if ((IsArray(value))){
-      return Value(static_cast<int64_t>(GetValueArraySize(*value)));
+static Value SizeOf(ExecState *exec_state) {
+    size_t length = exec_state->GetArgumentCount();
+    if (length > 0) {
+        Value *value = exec_state->GetArgument(0);
+        if (IsTable(value)) {
+            return Value(static_cast<int64_t>(GetTableSize(ValueTo<Table>(value))));
+        }
+        else if (IsArray(value)) {
+            return GetArraySizeValue(ValueTo<Array>(value));
+        }
     }
-  }
-  return Value(static_cast<int64_t>(-1));
+    return Value(static_cast<int64_t>(-1));
 }
 
 static Value Merge(ExecState *exec_state) {
@@ -80,13 +80,13 @@ static Value Merge(ExecState *exec_state) {
     if (!IsTable(lhs) && !IsTable(rhs)) {
         return Value();
     }
-    Value new_value = exec_state->table_factory()->CreateTable();
+    Value new_value = exec_state->class_factory()->CreateTable();
     if (IsTable(lhs)) {
-        TableMapAddAll(*lhs, new_value);
+        TableCopy(*lhs, new_value);
         LOGD("[Merge]:lhs:%s\n", TableToString(ValueTo<Table>(lhs)).c_str());
     }
     if (IsTable(rhs)) {
-        TableMapAddAll(*rhs, new_value);
+        TableCopy(*rhs, new_value);
         LOGD("[Merge]:rhs:%s\n", TableToString(ValueTo<Table>(rhs)).c_str());
     }
     return new_value;
@@ -109,29 +109,29 @@ static Value ToString(ExecState* exec_state) {
   return Value(new_value);
 }
 
-static Value Slice(ExecState* exec_state) {
-  size_t length = exec_state->GetArgumentCount();
-  if (length != 3) {
-    return Value();
-  }
-  Value* table = exec_state->GetArgument(0);
-  Value* start = exec_state->GetArgument(1);
-  Value* end = exec_state->GetArgument(2);
-  if (!IsArray(table) || !IsInt(start) || !IsInt(end)) {
-    return Value();
-  }
-  unsigned int v_start = static_cast<unsigned int>(IntValue(start));
-  unsigned int v_end = static_cast<unsigned int>(IntValue(end));
-  size_t size = GetValueArraySize(*table);
-  if (v_end > size) {
-    v_end = static_cast<unsigned int>(size);
-  }
-  if (v_start > v_end) {
-    v_start = v_end;
-  }
-  Value new_value = exec_state->class_factory()->CreateArray();
-  ArrayAddAll(*table, new_value, v_start, v_end);
-  return new_value;
+static Value Slice(ExecState *exec_state) {
+    size_t length = exec_state->GetArgumentCount();
+    if (length != 3) {
+        return Value();
+    }
+    Value *array = exec_state->GetArgument(0);
+    Value *start = exec_state->GetArgument(1);
+    Value *end = exec_state->GetArgument(2);
+    if (!IsArray(array) || !IsInt(start) || !IsInt(end)) {
+        return Value();
+    }
+    unsigned int v_start = static_cast<unsigned int>(IntValue(start));
+    unsigned int v_end = static_cast<unsigned int>(IntValue(end));
+    size_t size = GetArraySize(ValueTo<Array>(array));
+    if (v_end > size) {
+        v_end = static_cast<unsigned int>(size);
+    }
+    if (v_start > v_end) {
+        v_start = v_end;
+    }
+    Value new_value = exec_state->class_factory()->CreateArray();
+    ArrayCopyFrom(*array, new_value, v_start, v_end);
+    return new_value;
 }
 
 static Value AppendUrlParam(ExecState* exec_state) {
@@ -358,7 +358,7 @@ void RegisterClass(ExecState *state, const std::string& name, Value value) {
 void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   // log
   RegisterCFunc(state, "log", Log);
-  RegisterCFunc(state, "sizeof", GetTableSize);
+  RegisterCFunc(state, "sizeof", SizeOf);
   RegisterCFunc(state, "slice", Slice);
   RegisterCFunc(state, "appendUrlParam", AppendUrlParam);
   RegisterCFunc(state, "merge", Merge);
@@ -402,7 +402,7 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     }
     return value;
   } else if (json.is_object()) {
-    Value value = state->table_factory()->CreateTable();
+    Value value = state->class_factory()->CreateTable();
     const json11::Json::object& data_objects = json.object_items();
     for (auto it = data_objects.begin(); it != data_objects.end(); it++) {
       // will be free by table
@@ -461,7 +461,7 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   const json11::Json& data = json["data"];
   Value value = ParseJson2Value(state, data);
   if (value.type != Value::Type::TABLE) {
-    value = state->table_factory()->CreateTable();
+    value = state->class_factory()->CreateTable();
   }
   global->Add("_data_main", value);
 }
@@ -471,7 +471,7 @@ void VNodeExecEnv::InitInitDataValue(ExecState *state, const std::string& init_d
   const json11::Json& json = json11::Json::parse(init_data_str, err);
   if (!err.empty()) {
     LOGE("error parsing init data");
-    Value value = state->table_factory()->CreateTable();
+    Value value = state->class_factory()->CreateTable();
     state->global()->Set("_init_data", value);
     state->global()->Set("__weex_data__", value);
     return;
@@ -479,7 +479,7 @@ void VNodeExecEnv::InitInitDataValue(ExecState *state, const std::string& init_d
 
   Value value = ParseJson2Value(state, json);
   if (value.type != Value::Type::TABLE) {
-    value = state->table_factory()->CreateTable();
+    value = state->class_factory()->CreateTable();
   }
   state->global()->Set("_init_data", value);
   state->global()->Set("__weex_data__", value);

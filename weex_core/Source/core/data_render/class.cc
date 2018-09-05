@@ -18,7 +18,6 @@
  */
 #include <algorithm>
 #include "core/data_render/class.h"
-#include "core/data_render/vm_mem.h"
 
 namespace weex {
 namespace core {

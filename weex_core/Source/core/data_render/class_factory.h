@@ -39,13 +39,12 @@ public:
     virtual Value ClassString();
     virtual Value ClassJSON();
     virtual Value CreateArray();
+    virtual Value CreateTable();
     ~ClassFactory();
     
 private:
     ClassInstance *CreateClassInstanceFromSuper(ClassDescriptor *p_desc);
-    std::vector<ClassDescriptor *> descs_;
-    std::vector<ClassInstance *> insts_;
-    std::vector<Array *> arrays_;
+    std::vector<std::pair<GCObject *, Value::Type>> stores_;
 };
 
 }

@@ -19,7 +19,6 @@
 
 #include <sstream>
 #include "core/data_render/object.h"
-#include "core/data_render/vm_mem.h"
 
 namespace weex {
 namespace core {
@@ -221,16 +220,6 @@ bool ValueGTE(const Value *a, const Value *b) {
         return false;
     }
 }
-    
-void FreeValue(Value *o) {
-  if (nullptr == o) {
-    return;
-  }
-  if (Value::Type::TABLE == o->type) {
-    freeMem(o->gc);
-    delete o;
-  }
-}
 
 Value* Variables::Find(int index) {
     if (index >= values_.size() || index < 0) {
@@ -253,6 +242,7 @@ int Variables::Add(const std::string& name, Value value) {
         return iter->second;
     }
     values_.push_back(value);
+    GCRetain(&value);
     int index = (int)values_.size() - 1;
     map_.insert(std::make_pair(name, index));
     return index;
@@ -260,6 +250,7 @@ int Variables::Add(const std::string& name, Value value) {
 
 int Variables::Add(Value value) {
     values_.push_back(value);
+    GCRetain(&value);
     return (int)values_.size() - 1;
 }
 
@@ -267,12 +258,16 @@ int Variables::Set(const std::string& name, Value value) {
     auto iter = map_.find(name);
     if (iter != map_.end()) {
         int index = iter->second;
+        GCRelease(&values_[static_cast<size_t>(index)]);
         values_[static_cast<size_t>(index)] = value;
+        GCRetain(&values_[static_cast<size_t>(index)]);
         return index;
-    } else {
+    }
+    else {
         values_.push_back(value);
         int index = (int)values_.size() - 1;
         map_.insert(std::make_pair(name, index));
+        GCRetain(&value);
         return index;
     }
 }

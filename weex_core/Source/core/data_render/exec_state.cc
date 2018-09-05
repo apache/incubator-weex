@@ -50,7 +50,6 @@ ExecState::ExecState(VM *vm)
       func_state_(nullptr),
       string_table_(new StringTable),
       render_context_(new VNodeRenderContext),
-      factory_(new TableFactory()),
       class_factory_(new ClassFactory()),
       global_variables_() {}
 

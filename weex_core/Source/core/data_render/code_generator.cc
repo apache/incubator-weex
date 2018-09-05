@@ -844,7 +844,7 @@ void CodeGenerator::Visit(ObjectConstant *node, void *data) {
     long ret = data == nullptr ? -1 : *static_cast<long *>(data);
     FuncState *func_state = func_->func_state();
     // new table
-    Value table = exec_state_->table_factory()->CreateTable();
+    Value table = exec_state_->class_factory()->CreateTable();
     if (ret >= 0) {
         int tableIndex = func_state->AddConstant(table);
         Instruction i = CREATE_ABx(OP_LOADK, ret, tableIndex);
