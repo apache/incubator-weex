@@ -711,6 +711,18 @@ void CodeGenerator::Visit(BinaryExpression *node, void *data) {
             func_state->AddInstruction(CREATE_ABC(OP_EQ, ret, left, right));
             break;
         }
+        case BinaryOperation::kNotEqual:
+        {
+            func_state->AddInstruction(CREATE_ABC(OP_EQ, ret, left, right));
+            func_state->AddInstruction(CREATE_ABx(OP_NOT, ret, ret));
+            break;
+        }
+        case BinaryOperation::kStrictNotEqual:
+        {
+            func_state->AddInstruction(CREATE_ABC(OP_SEQ, ret, left, right));
+            func_state->AddInstruction(CREATE_ABx(OP_NOT, ret, ret));
+            break;
+        }
         default:
         {
             throw GeneratorError("unsupport binary operation");

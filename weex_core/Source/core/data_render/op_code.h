@@ -75,6 +75,7 @@ enum OpCode {
   OP_AND,
   OP_OR,
   OP_IN,
+  OP_NOT,
 
   OP_CALL,     //	A B C	R(A) = R(B)(R(B+1), ... ,R(B+C-1))
   OP_RETURN0,  //	Return
