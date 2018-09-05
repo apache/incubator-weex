@@ -26,8 +26,6 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-Table *NewTable();
-
 int SetTableValue(Table *, Value *, const Value &);
     
 Value *GetTableValue(Table *, const Value &);

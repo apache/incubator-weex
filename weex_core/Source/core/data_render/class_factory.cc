@@ -30,7 +30,7 @@ Value ClassFactory::CreateArray() {
 }
     
 Value ClassFactory::CreateTable() {
-    Table *table = NewTable();
+    Table *table = new Table();
     Value value;
     SetTValue(&value, reinterpret_cast<GCObject *>(table));
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(table), value.type));

@@ -87,11 +87,6 @@ Value *GetTableForKey(Table *t, const Value *key) {
     return nullptr;
 }
 
-Table *NewTable() {
-  Table *t = new Table();
-  return t;
-}
-
 Value *GetTableValue(Table *t, const Value &key) {
     if (IsString(&key)) {
         return GetTableForKey(t, &key);

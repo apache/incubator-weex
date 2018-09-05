@@ -843,12 +843,8 @@ void CodeGenerator::Visit(UndefinedConstant *node, void *data) {
 void CodeGenerator::Visit(ObjectConstant *node, void *data) {
     long ret = data == nullptr ? -1 : *static_cast<long *>(data);
     FuncState *func_state = func_->func_state();
-    // new table
-    Value table = exec_state_->class_factory()->CreateTable();
     if (ret >= 0) {
-        int tableIndex = func_state->AddConstant(table);
-        Instruction i = CREATE_ABx(OP_LOADK, ret, tableIndex);
-        func_state->AddInstruction(i);
+        func_state->AddInstruction(CREATE_ABx(OP_NEW, ret, Value::TABLE));
         if (node->SpreadProperty().size() > 0) {
             std::vector<std::pair<ProxyOrder, std::string>> &orders = node->Orders();
             for (int i = 0; i < orders.size(); i++) {
@@ -904,12 +900,8 @@ void CodeGenerator::Visit(ArrayConstant *node, void *data) {
     long reg = data == nullptr ? -1 : *static_cast<long*>(data);
     FuncState *func_state = func_->func_state();
     // new table
-    Value array = exec_state_->class_factory()->CreateArray();
     if (reg >= 0) {
-        int tableIndex = func_state->AddConstant(array);
-        Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, tableIndex);
-        func_state->AddInstruction(i);
-        // expr
+        func_state->AddInstruction(CREATE_ABx(OP_NEW, reg, Value::ARRAY));
         int index = 0;
         for (auto it = node->exprs().begin(); it != node->exprs().end(); it++) {
             long item = block_->NextRegisterId();

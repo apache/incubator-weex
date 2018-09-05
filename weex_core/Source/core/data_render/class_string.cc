@@ -31,10 +31,12 @@ namespace core {
 namespace data_render {
 
 static Value split(ExecState *exec_state);
+static Value trim(ExecState* exec_state);
 
 ClassDescriptor *NewClassString() {
     ClassDescriptor *array_desc = new ClassDescriptor(nullptr);
     AddClassCFunc(array_desc, "split", split);
+    AddClassCFunc(array_desc, "trim", trim);
     return array_desc;
 }
     
@@ -86,6 +88,34 @@ static Value split(ExecState *exec_state) {
     } while (0);
     
     return ret;
+}
+    
+std::string& trim(std::string &s) {
+    if (s.empty()) {
+        return s;
+    }
+    
+    s.erase(0, s.find_first_not_of(" "));
+    s.erase(s.find_last_not_of(" ") + 1);
+    return s;
+}
+
+static Value trim(ExecState* exec_state) {
+    size_t length = exec_state->GetArgumentCount();
+    if (length != 1) {
+        throw VMExecError("trim caller args wrong");
+    }
+    
+    Value *string = exec_state->GetArgument(0);
+    if (!IsString(string)) {
+        throw VMExecError("trim caller isn't a string");
+    }
+    
+    std::string src = CStringValue(string);
+    trim(src);
+    
+    Value string_value = exec_state->string_table()->StringFromUTF8(src);
+    return string_value;
 }
     
 }  // namespace data_render

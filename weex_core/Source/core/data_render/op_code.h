@@ -29,7 +29,7 @@ enum OpCode {
   OP_LOADNULL,   //	A       R(A) = null
   OP_GETGLOBAL,  //	A Bx	R(A) = Global[B]
   OP_GETFUNC,    //	A Bx  	R(A) = Function[B]
-  
+  OP_NEW,
   OP_NEWCLASS,   // A Bx R(A) = New Class[B]
   OP_GETCLASS,   // A B C R(A) = B->C
   OP_GETMEMBER,

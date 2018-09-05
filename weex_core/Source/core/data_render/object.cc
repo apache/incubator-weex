@@ -56,7 +56,7 @@ int ToInteger(const Value *o, const int &mode, int64_t &v) {
     return 0;
   }
 }
-    
+        
 bool ObjectEquals(const Value *a, const Value *b) {
     bool equal = false;
     do {

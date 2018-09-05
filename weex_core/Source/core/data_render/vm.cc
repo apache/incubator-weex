@@ -465,6 +465,27 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
       }
         break;
+          case OP_NEW: {
+              LOGD("OP_NEW A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+              a = frame.reg + GET_ARG_A(instruction);
+              int index = (int)GET_ARG_Bx(instruction);
+              switch (index) {
+                  case Value::TABLE:
+                  {
+                      *a = exec_state->class_factory()->CreateTable();
+                      break;
+                  }
+                  case Value::ARRAY:
+                  {
+                      *a = exec_state->class_factory()->CreateArray();
+                      break;
+                  }
+                  default:
+                      throw VMExecError("Unspport Type with OP_CODE [OP_NEW]");
+                      break;
+              }
+              break;
+          }
       case OP_NEWCLASS: {
           LOGD("OP_NEWCLASS A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
           a = frame.reg + GET_ARG_A(instruction);
