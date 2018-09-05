@@ -62,7 +62,6 @@ static NSThread *WXComponentThread;
     WXComponent *_rootComponent;
     NSMutableArray *_fixedComponents;
 
-    CADisplayLink *_displayLink;
     pthread_mutex_t _propertyMutex;
     pthread_mutexattr_t _propertMutexAttr;
 }
@@ -92,6 +91,14 @@ static NSThread *WXComponentThread;
         [self _startDisplayLink];
     }
     
+    return self;
+}
+
+- (instancetype)init
+{
+    if (self == [super init]) {
+        _suspend = NO;
+    }
     return self;
 }
 
@@ -885,39 +892,25 @@ static NSThread *WXComponentThread;
 - (void)_startDisplayLink
 {
     WXAssertComponentThread();
-    
-    if(!_displayLink){
-        _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(_handleDisplayLink)];
-        [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    }
+    [[WXDisplayLinkManager sharedInstance] registerDisplayClient:self];
 }
 
 - (void)_stopDisplayLink
 {
     WXAssertComponentThread();
-    
-    if(_displayLink){
-        [_displayLink invalidate];
-        _displayLink = nil;
-    }
+    [[WXDisplayLinkManager sharedInstance] unregisterDisplayClient:self];
 }
 
 - (void)_suspendDisplayLink
 {
     WXAssertComponentThread();
-    
-    if(_displayLink && !_displayLink.paused) {
-        _displayLink.paused = YES;
-    }
+    _suspend = YES;
 }
 
 - (void)_awakeDisplayLink
 {
     WXAssertComponentThread();
-    
-    if(_displayLink && _displayLink.paused) {
-        _displayLink.paused = NO;
-    }
+    _suspend = NO;
 }
 
 - (void)_handleDisplayLink
@@ -1023,6 +1016,13 @@ static NSThread *WXComponentThread;
         }
     }
 }
+
+- (void)handleDisplayLink {
+    [self _handleDisplayLink];
+}
+
+@synthesize suspend=_suspend;
+
 
 @end
 

@@ -19,6 +19,7 @@
 
 #import <CoreGraphics/CoreGraphics.h>
 #import <Foundation/Foundation.h>
+#import "WXDisplayLinkManager.h"
 
 @class WXBridgeMethod;
 @class WXSDKInstance;
@@ -35,7 +36,7 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 }
 #endif
 
-@interface WXComponentManager : NSObject
+@interface WXComponentManager : NSObject <WXDisplayLinkClient>
 
 @property (nonatomic, readonly, weak) WXSDKInstance *weexInstance;
 @property (nonatomic, readonly, assign) BOOL isValid;
