@@ -21,9 +21,12 @@ package com.taobao.weex.http;
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 import android.net.Uri;
+import android.text.TextUtils;
+
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.URIAdapter;
@@ -143,6 +146,16 @@ public class WXStreamModule extends WXModule {
     String body = optionsObj.getString("body");
     String type = optionsObj.getString("type");
     int timeout = optionsObj.getIntValue("timeout");
+
+    WXSDKInstance wxsdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if (wxsdkInstance != null) {
+      if (wxsdkInstance.getStreamNetworkHandler() != null) {
+        String localUrl = wxsdkInstance.getStreamNetworkHandler().fetchLocal(url);
+        if (!TextUtils.isEmpty(localUrl)) {
+          url = localUrl;
+        }
+      }
+    }
 
     if (method != null) method = method.toUpperCase();
     Options.Builder builder = new Options.Builder()

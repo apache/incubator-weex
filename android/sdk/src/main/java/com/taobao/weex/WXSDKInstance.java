@@ -210,6 +210,51 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
 
   /**
+   * network handler
+   */
+  public interface ImageNetworkHandler {
+    public String fetchLocal(String url);
+  }
+
+  public interface StreamNetworkHandler {
+    public String fetchLocal(String url);
+  }
+
+  public interface CustomFontNetworkHandler {
+    public String fetchLocal(String url);
+  }
+
+  private ImageNetworkHandler mImageNetworkHandler;
+
+  private StreamNetworkHandler mStreamNetworkHandler;
+
+  private CustomFontNetworkHandler mCustomFontNetworkHandler;
+
+  public ImageNetworkHandler getImageNetworkHandler() {
+    return mImageNetworkHandler;
+  }
+
+  public void setImageNetworkHandler(ImageNetworkHandler imageNetworkHandler) {
+    this.mImageNetworkHandler = imageNetworkHandler;
+  }
+
+  public StreamNetworkHandler getStreamNetworkHandler() {
+    return mStreamNetworkHandler;
+  }
+
+  public void setStreamNetworkHandler(StreamNetworkHandler streamNetworkHandler) {
+    this.mStreamNetworkHandler = streamNetworkHandler;
+  }
+
+  public CustomFontNetworkHandler getCustomFontNetworkHandler() {
+    return mCustomFontNetworkHandler;
+  }
+
+  public void setCustomFontNetworkHandler(CustomFontNetworkHandler customFontNetworkHandler) {
+    this.mCustomFontNetworkHandler = customFontNetworkHandler;
+  }
+
+  /**
    * set make weexCore run in single process mode
    * @param flag true means weexCore run in single process mode or multi process mode
    */
