@@ -284,6 +284,19 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             SetBValue(a, ValueAND(b, c));
             break;
         }
+          case OP_NOT:
+          {
+              LOGD("OP_NOT A:%ld B:%ld \n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+              a = frame.reg + GET_ARG_A(instruction);
+              b = frame.reg + GET_ARG_B(instruction);
+              if (!IsBool(b)) {
+                  // TODO error
+                  throw VMExecError("Not Bool Type Error With OP_CODE [OP_NOT]");
+              }
+              a->type =Value::Type::BOOL;
+              a->b = !b->b;
+              break;
+          }
         case OP_OR: {
             LOGD("OP_OR A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);

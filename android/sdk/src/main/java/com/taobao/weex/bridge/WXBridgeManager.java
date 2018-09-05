@@ -1267,7 +1267,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             instance.getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_BUNDLE_TYPE, options.get(BUNDLE_TYPE));
           }
           if (options.get("env") == null) {
-            options.put("env", mInitParams);
+            options.put("env", mInitParams.toMap());
           }
         } catch (Throwable e) {
           e.printStackTrace();
