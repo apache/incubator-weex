@@ -466,9 +466,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
       }
         break;
           case OP_NEW: {
-              LOGD("OP_NEW A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+              LOGD("OP_NEW A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
               a = frame.reg + GET_ARG_A(instruction);
-              int index = (int)GET_ARG_Bx(instruction);
+              int index = (int)GET_ARG_B(instruction);
               switch (index) {
                   case Value::TABLE:
                   {
@@ -480,22 +480,21 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                       *a = exec_state->class_factory()->CreateArray();
                       break;
                   }
+                  case Value::CLASS_DESC:
+                  {
+                      b = exec_state->global()->Find((int)(GET_ARG_C(instruction)));
+                      if (!IsClass(b)) {
+                          throw VMExecError("Unspport Find Desc with OP_CODE [OP_NEWCLASS]");
+                      }
+                      *a = exec_state->class_factory()->CreateClassInstance(ValueTo<ClassDescriptor>(b));
+                      break;
+                  }
                   default:
                       throw VMExecError("Unspport Type with OP_CODE [OP_NEW]");
                       break;
               }
               break;
           }
-      case OP_NEWCLASS: {
-          LOGD("OP_NEWCLASS A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
-          a = frame.reg + GET_ARG_A(instruction);
-          b = exec_state->global()->Find((int)(GET_ARG_Bx(instruction)));
-          if (!IsClass(b)) {
-              throw VMExecError("Unspport Find Desc with OP_CODE [OP_NEWCLASS]");
-          }
-          *a = exec_state->class_factory()->CreateClassInstance(ValueTo<ClassDescriptor>(b));
-          break;
-      }
         case OP_GETSUPER:
         {
             LOGD("OP_GETSUPER A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
@@ -690,7 +689,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_GETOUTVAR:
         {
-            LOGD("OP_GETOUTVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            LOGD("OP_GETOUTVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             int index = (int)GET_ARG_Bx(instruction);
             ValueRef *ref = exec_state->FindRef(index);
@@ -701,12 +700,6 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             a->ref = &ref->value();
 //            int value_index = a - exec_state->stack()->base();
 //            Value *test = exec_state->stack()->base() + value_index;
-            break;
-        }
-        case OP_NEWTABLE: {
-            a = frame.reg + GET_ARG_A(instruction);
-            Value t = exec_state->class_factory()->CreateTable();
-            *a = t;
             break;
         }
         case OP_GETINDEXVAR:

@@ -30,7 +30,6 @@ enum OpCode {
   OP_GETGLOBAL,  //	A Bx	R(A) = Global[B]
   OP_GETFUNC,    //	A Bx  	R(A) = Function[B]
   OP_NEW,
-  OP_NEWCLASS,   // A Bx R(A) = New Class[B]
   OP_GETCLASS,   // A B C R(A) = B->C
   OP_GETMEMBER,
   OP_GETMEMBERVAR,
@@ -40,9 +39,7 @@ enum OpCode {
   OP_SETOUTVAR,     // A B C R(A) = B->C
   OP_RESETOUTVAR,
   OP_GETOUTVAR,     // A B C R(A) = B->C
-
     
-  OP_NEWTABLE,  // A B C   R(A) = {} (size = B,C)
   OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)
 
   OP_SETARRAY,  //    A B C    R(A)[R(B)] = RK(C)

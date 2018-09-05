@@ -39,7 +39,6 @@ static std::string OP_NAME[] = {"OP_MOVE",
 
                                 "OP_GETGLOBAL",
                                 "OP_GETFUNC",
-                                "OP_NEWCLASS",
 
                                 "OP_GETCLASS",
                                 "OP_GETCLASSVAR",
@@ -48,7 +47,6 @@ static std::string OP_NAME[] = {"OP_MOVE",
 
                                 "OP_SETVALUE",
                                 "OP_GETVALUE",
-                                "OP_NEWTABLE",
                                 "OP_SETTABLE",
 
                                 "OP_GETTABLE",
