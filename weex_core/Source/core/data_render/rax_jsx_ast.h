@@ -44,7 +44,7 @@ public:
     std::vector<Handle<Expression>>& funcexprs();
     std::vector<Handle<Expression>>& childrens() { return childrens_; }
     DEFINE_NODE_TYPE(JSXNodeExpression, Expression);
-    static uint64_t s_node_ptr_;
+    static uint64_t gs_node_ptr_;
 private:
     Handle<Expression> identifier_;
     Handle<Expression> node_ptr_;
@@ -52,7 +52,7 @@ private:
     Handle<Expression> props_;
     std::vector<Handle<Expression>> childrens_;
     std::vector<Handle<Expression>> funcexprs_;
-    bool is_class_;
+    bool is_class_{false};
 };
             
 }

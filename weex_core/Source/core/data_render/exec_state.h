@@ -36,20 +36,20 @@ namespace weex {
 namespace core {
 namespace data_render {
     
-#define VM_EXEC_STACK_SIZE               2048
+#define VM_EXEC_STACK_SIZE               512
 
 class ValueRef {
     friend class ExecState;
 public:
-    ValueRef(FuncState *func_state, long register_id) : func_state_(func_state), register_id_(register_id), ref_id_(s_ref_id++) { SetNil(&value_); };
+    ValueRef(FuncState *func_state, long register_id) : func_state_(func_state), register_id_(register_id), ref_id_(gs_ref_id++) { SetNil(&value_); };
     inline int ref_id() { return ref_id_; }
     inline FuncState *func_state() { return func_state_; }
     inline long register_id() { return register_id_; }
     inline Value &value() { return value_; }
     ~ValueRef() {}
 private:
-    static int s_ref_id;
-    FuncState *func_state_;
+    static int gs_ref_id;
+    FuncState *func_state_{nullptr};
     int ref_id_;
     long register_id_;
     Value value_;
@@ -128,7 +128,6 @@ class ExecState {
  private:
   friend class VM;
   friend class CodeGenerator;
-
   void CallFunction(Value *func, size_t argc, Value *ret);
 
   VM* vm_;

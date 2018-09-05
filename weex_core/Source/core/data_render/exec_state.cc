@@ -35,6 +35,8 @@ namespace weex {
 namespace core {
 namespace data_render {
     
+int ValueRef::gs_ref_id = 0;
+
 void ExecStack::reset() {
     size_t size = (VM_EXEC_STACK_SIZE - (top_ - base()) - 1) * sizeof(Value);
     //LOGD("reset:%i=>\n", (int)(top_ - base()));
@@ -58,6 +60,7 @@ void ExecState::Compile(std::string& err) {
 #if DEBUG
   TimeCost tc("Compile");
 #endif
+  ValueRef::gs_ref_id = 0;
   err.clear();
   CodeGenerator generator(this);
   if (!context()->raw_json().is_null()) {
@@ -94,7 +97,7 @@ void ExecState::Compile(std::string& err) {
       }
   }
 }
-
+    
 void ExecState::Execute(std::string& err) {
 #if DEBUG
   TimeCost tc("Execute");
@@ -214,8 +217,6 @@ Value* ExecState::GetArgument(int index) {
   return frames_.back().reg + index + 1;
 }
     
-int ValueRef::s_ref_id = 0;
-
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

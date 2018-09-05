@@ -37,7 +37,7 @@ std::string to_string(T value)
     return os.str() ;
 }
 
-uint64_t JSXNodeExpression::s_node_ptr_ = 0;
+uint64_t JSXNodeExpression::gs_node_ptr_ = 0;
 
 bool JSXNodeExpression::LowerIdentifier() {
     std::string name = Identifier()->AsIdentifier()->GetName();
@@ -48,7 +48,7 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
     if (!funcexprs_.size()) {
         ASTFactory *factory = ASTFactory::GetFactoryInstance();
         std::string name = Identifier()->AsIdentifier()->GetName();
-        std::string vnode_ptr = "vn_" + to_string(s_node_ptr_++) + "_ptr";
+        std::string vnode_ptr = "vn_" + to_string(gs_node_ptr_++) + "_ptr";
         if (!node_ptr_) {
             node_ptr_ = factory->NewStringConstant(vnode_ptr);
         }
