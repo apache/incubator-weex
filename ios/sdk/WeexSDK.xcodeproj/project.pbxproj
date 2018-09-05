@@ -297,6 +297,14 @@
 		B89543F620EB18B5006EAD63 /* WXJSCoreBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543EE20EB18B4006EAD63 /* WXJSCoreBridge.mm */; };
 		B89543F720EB18B5006EAD63 /* WXCoreBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = B89543EF20EB18B4006EAD63 /* WXCoreBridge.h */; };
 		B89543F820EB18B5006EAD63 /* WXCoreBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = B89543EF20EB18B4006EAD63 /* WXCoreBridge.h */; };
+		B8A72C9A213F8BAE0024E7BE /* class_json.h in Headers */ = {isa = PBXBuildFile; fileRef = B8A72C96213F8BAD0024E7BE /* class_json.h */; };
+		B8A72C9B213F8BAE0024E7BE /* class_json.h in Headers */ = {isa = PBXBuildFile; fileRef = B8A72C96213F8BAD0024E7BE /* class_json.h */; };
+		B8A72C9C213F8BAE0024E7BE /* class_string.h in Headers */ = {isa = PBXBuildFile; fileRef = B8A72C97213F8BAD0024E7BE /* class_string.h */; };
+		B8A72C9D213F8BAE0024E7BE /* class_string.h in Headers */ = {isa = PBXBuildFile; fileRef = B8A72C97213F8BAD0024E7BE /* class_string.h */; };
+		B8A72C9E213F8BAE0024E7BE /* class_json.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8A72C98213F8BAD0024E7BE /* class_json.cc */; };
+		B8A72C9F213F8BAE0024E7BE /* class_json.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8A72C98213F8BAD0024E7BE /* class_json.cc */; };
+		B8A72CA0213F8BAE0024E7BE /* class_string.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8A72C99213F8BAD0024E7BE /* class_string.cc */; };
+		B8A72CA1213F8BAE0024E7BE /* class_string.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8A72C99213F8BAD0024E7BE /* class_string.cc */; };
 		B8D66BA72125572F003960BD /* string_table.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8D66AEE2125572F003960BD /* string_table.cc */; };
 		B8D66BA82125572F003960BD /* string_table.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8D66AEE2125572F003960BD /* string_table.cc */; };
 		B8D66BA92125572F003960BD /* table.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8D66AEF2125572F003960BD /* table.cc */; };
@@ -1255,6 +1263,10 @@
 		B89543ED20EB18B4006EAD63 /* WXCoreBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXCoreBridge.mm; sourceTree = "<group>"; };
 		B89543EE20EB18B4006EAD63 /* WXJSCoreBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXJSCoreBridge.mm; sourceTree = "<group>"; };
 		B89543EF20EB18B4006EAD63 /* WXCoreBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCoreBridge.h; sourceTree = "<group>"; };
+		B8A72C96213F8BAD0024E7BE /* class_json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = class_json.h; sourceTree = "<group>"; };
+		B8A72C97213F8BAD0024E7BE /* class_string.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = class_string.h; sourceTree = "<group>"; };
+		B8A72C98213F8BAD0024E7BE /* class_json.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = class_json.cc; sourceTree = "<group>"; };
+		B8A72C99213F8BAD0024E7BE /* class_string.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = class_string.cc; sourceTree = "<group>"; };
 		B8D66AEE2125572F003960BD /* string_table.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_table.cc; sourceTree = "<group>"; };
 		B8D66AEF2125572F003960BD /* table.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = table.cc; sourceTree = "<group>"; };
 		B8D66AF02125572F003960BD /* code_generator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = code_generator.h; sourceTree = "<group>"; };
@@ -2169,6 +2181,10 @@
 				B8F2C7122133A8BC00635B37 /* monitor */,
 				B8F2C6E32133A83C00635B37 /* ast_builder.cc */,
 				B8F2C6DB2133A83B00635B37 /* ast_builder.h */,
+				B8A72C98213F8BAD0024E7BE /* class_json.cc */,
+				B8A72C96213F8BAD0024E7BE /* class_json.h */,
+				B8A72C99213F8BAD0024E7BE /* class_string.cc */,
+				B8A72C97213F8BAD0024E7BE /* class_string.h */,
 				B8F2C6DD2133A83B00635B37 /* class_array.cc */,
 				B8F2C6CF2133A83A00635B37 /* class_array.h */,
 				B8F2C6D42133A83A00635B37 /* class_factory.cc */,
@@ -2585,6 +2601,7 @@
 				74CFDD3D1F459400007A1A66 /* WXRecycleListDataManager.h in Headers */,
 				B8D66BE52125572F003960BD /* object.h in Headers */,
 				77D161201C02DDB40010B15B /* WXSDKEngine.h in Headers */,
+				B8A72C9C213F8BAE0024E7BE /* class_string.h in Headers */,
 				745ED2DA1C5F2C7E002DB5A8 /* WXView.h in Headers */,
 				17B122252090AAB000387E33 /* WXSDKError.h in Headers */,
 				2AE5B7521CAB7DBD0082FDDB /* WXAComponent.h in Headers */,
@@ -2646,6 +2663,7 @@
 				C4D872221E5DDEDA00E39BC1 /* WXInnerLayer.h in Headers */,
 				2A919DA61E321F1F006EB6B5 /* WXBridgeMethod.h in Headers */,
 				B8D66BB12125572F003960BD /* parser.h in Headers */,
+				B8A72C9A213F8BAE0024E7BE /* class_json.h in Headers */,
 				B8D66C5121255730003960BD /* render_action_remove_event.h in Headers */,
 				37B51EE41E97804D0040A743 /* WXCycleSliderComponent.h in Headers */,
 				77D161281C02DE1A0010B15B /* WXSDKManager.h in Headers */,
@@ -2862,6 +2880,7 @@
 				DCA445A01EFA56F400D0CFA8 /* WXType.h in Headers */,
 				DCA445B21EFA576D00D0CFA8 /* WXListComponent.h in Headers */,
 				DCA445AD1EFA575100D0CFA8 /* WXNavigationProtocol.h in Headers */,
+				B8A72C9B213F8BAE0024E7BE /* class_json.h in Headers */,
 				DCA445B01EFA576200D0CFA8 /* WXModalUIModule.h in Headers */,
 				DCA445A61EFA571E00D0CFA8 /* WXSDKEngine.h in Headers */,
 				B8F2C6FF2133A83C00635B37 /* rax_parser_builder.h in Headers */,
@@ -2909,6 +2928,7 @@
 				DCA445BB1EFA57AA00D0CFA8 /* WXDebugTool.h in Headers */,
 				B8D66C8621255730003960BD /* render_appbar_factory.h in Headers */,
 				B8D66BBE2125572F003960BD /* vnode_exec_env.h in Headers */,
+				B8A72C9D213F8BAE0024E7BE /* class_string.h in Headers */,
 				B8D66BB22125572F003960BD /* parser.h in Headers */,
 				DCA445A91EFA573200D0CFA8 /* WXResourceRequestHandler.h in Headers */,
 				DCA445C41EFA57E300D0CFA8 /* WXAppConfiguration.h in Headers */,
@@ -3429,6 +3449,7 @@
 				B8D66C1121255730003960BD /* core_side_in_script.cpp in Sources */,
 				B8D66C032125572F003960BD /* css_value_getter.cpp in Sources */,
 				B8F2C6F62133A83C00635B37 /* rax_parser_context.cc in Sources */,
+				B8A72C9E213F8BAE0024E7BE /* class_json.cc in Sources */,
 				59D3CA4B1CFC3CE1008835DC /* NSTimer+Weex.m in Sources */,
 				59A596321CB632050012CD52 /* WXRootViewController.m in Sources */,
 				DCC77C131D770AE300CE7288 /* WXSliderNeighborComponent.mm in Sources */,
@@ -3472,6 +3493,7 @@
 				2AFEB17C1C747139000507FA /* WXInstanceWrap.m in Sources */,
 				74A4BA5C1CABBBD000195969 /* WXDebugTool.m in Sources */,
 				742AD73B1DF98C8B007DC46C /* WXResourceLoader.m in Sources */,
+				B8A72CA0213F8BAE0024E7BE /* class_string.cc in Sources */,
 				B8D66C6721255730003960BD /* render_scroller.cpp in Sources */,
 				B8D66C5321255730003960BD /* render_action_createbody.cpp in Sources */,
 				B8D66BA92125572F003960BD /* table.cc in Sources */,
@@ -3634,6 +3656,7 @@
 				B8D66C1221255730003960BD /* core_side_in_script.cpp in Sources */,
 				B8D66C042125572F003960BD /* css_value_getter.cpp in Sources */,
 				B8F2C6F72133A83C00635B37 /* rax_parser_context.cc in Sources */,
+				B8A72C9F213F8BAE0024E7BE /* class_json.cc in Sources */,
 				DCA445531EFA55B300D0CFA8 /* WXCellComponent.mm in Sources */,
 				17036A5120FDE72F0029AE3D /* WXInstanceApm.m in Sources */,
 				DCA445541EFA55B300D0CFA8 /* WXListComponent.mm in Sources */,
@@ -3677,6 +3700,7 @@
 				DCA4456B1EFA55B300D0CFA8 /* WXInstanceWrap.m in Sources */,
 				DCA4456C1EFA55B300D0CFA8 /* WXDomModule.m in Sources */,
 				DCA4456D1EFA55B300D0CFA8 /* WXTimerModule.m in Sources */,
+				B8A72CA1213F8BAE0024E7BE /* class_string.cc in Sources */,
 				DCA4456E1EFA55B300D0CFA8 /* WXModalUIModule.m in Sources */,
 				B8D66C6821255730003960BD /* render_scroller.cpp in Sources */,
 				B8D66C5421255730003960BD /* render_action_createbody.cpp in Sources */,
