@@ -15,7 +15,12 @@ namespace data_render {
 
 // TokenizerState implementation
 // -------------------------------
-
+    
+#ifdef __ANDROID__
+#undef EOF
+    static const char EOF = -1;
+#endif
+    
 class TokenizerState {
  public:
   static std::unordered_map<std::string, Token::Type> keywords;
