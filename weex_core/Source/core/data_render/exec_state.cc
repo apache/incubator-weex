@@ -37,7 +37,7 @@ namespace data_render {
     
 void ExecStack::reset() {
     size_t size = (VM_EXEC_STACK_SIZE - (top_ - base()) - 1) * sizeof(Value);
-    LOGD("reset:%i=>\n", (int)(top_ - base()));
+    //LOGD("reset:%i=>\n", (int)(top_ - base()));
     memset(top_, 0, size);
 }
 
