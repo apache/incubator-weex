@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include <stdlib.h>
 #include <algorithm>
 #include "core/data_render/class_string.h"
 #include "core/data_render/class.h"
@@ -105,7 +107,6 @@ static Value trim(ExecState* exec_state) {
     if (length != 1) {
         throw VMExecError("trim caller args wrong");
     }
-    
     Value *string = exec_state->GetArgument(0);
     if (!IsString(string)) {
         throw VMExecError("trim caller isn't a string");
@@ -116,6 +117,74 @@ static Value trim(ExecState* exec_state) {
     
     Value string_value = exec_state->string_table()->StringFromUTF8(src);
     return string_value;
+}
+    
+/* Converts a hex character to its integer value */
+char from_hex(char ch) {
+    return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
+}
+
+/* Converts an integer value to its hex character*/
+char to_hex(char code) {
+    static char hex[] = "0123456789abcdef";
+    return hex[code & 15];
+}
+
+/* Returns a url-encoded version of str */
+/* IMPORTANT: be sure to free() the returned string after use */
+char *url_encode(char *str) {
+    char *pstr = str, *buf = (char *)malloc(strlen(str) * 3 + 1), *pbuf = buf;
+    while (*pstr) {
+        if (isalnum(*pstr) || *pstr == '-' || *pstr == '_' || *pstr == '.' || *pstr == '~')
+            *pbuf++ = *pstr;
+        else if (*pstr == ' ')
+            *pbuf++ = '+';
+        else
+            *pbuf++ = '%', *pbuf++ = to_hex(*pstr >> 4), *pbuf++ = to_hex(*pstr & 15);
+        pstr++;
+    }
+    *pbuf = '\0';
+    return buf;
+}
+    
+/* Returns a url-decoded version of str */
+/* IMPORTANT: be sure to free() the returned string after use */
+char *url_decode(char *str) {
+    char *pstr = str, *buf = (char *)malloc(strlen(str) + 1), *pbuf = buf;
+    while (*pstr) {
+        if (*pstr == '%') {
+            if (pstr[1] && pstr[2]) {
+                *pbuf++ = from_hex(pstr[1]) << 4 | from_hex(pstr[2]);
+                pstr += 2;
+            }
+        } else if (*pstr == '+') {
+            *pbuf++ = ' ';
+        } else {
+            *pbuf++ = *pstr;
+        }
+        pstr++;
+    }
+    *pbuf = '\0';
+    return buf;
+}
+    
+Value encodeURIComponent(ExecState *exec_state) {
+    size_t length = exec_state->GetArgumentCount();
+    if (length < 1) {
+        throw VMExecError("trim caller args wrong");
+    }
+    Value *string = exec_state->GetArgument(0);
+    if (!IsString(string)) {
+        throw VMExecError("trim caller isn't a string");
+    }
+    std::string src = CStringValue(string);
+    char *uri = url_encode((char *)src.c_str());
+    std::string dst = src;
+    if (uri) {
+        dst = uri;
+        free(uri);
+    }
+    return exec_state->string_table()->StringFromUTF8(dst);
 }
     
 }  // namespace data_render

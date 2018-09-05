@@ -23,6 +23,7 @@
 #include "core/data_render/table.h"
 #include "core/data_render/class_factory.h"
 #include "core/data_render/class_array.h"
+#include "core/data_render/class_string.h"
 #include "core/data_render/common_error.h"
 #include <base/LogDefines.h>
 
@@ -365,6 +366,7 @@ void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   RegisterCFunc(state, "tostring", ToString);
   RegisterCFunc(state, "createElement", CreateElement);
   RegisterCFunc(state, "appendChild", AppendChild);
+  RegisterCFunc(state, "encodeURIComponent", encodeURIComponent);
   RegisterCFunc(state, "setAttr", SetAttr);
   RegisterCFunc(state, "setProps", SetProps);
   RegisterCFunc(state, "setClassList", SetClassList);

@@ -78,6 +78,7 @@ class TokenizerState {
     } else if (ch == EOF) {
       // in case of EOF we don't want to go outside the limit
       // of our source code
+      seek_++;
       return EOF;
     } else {
       position_.col()++;

@@ -31,7 +31,7 @@ namespace core {
 namespace data_render {
         
 ClassDescriptor *NewClassString();
-
+Value encodeURIComponent(ExecState *exec_state);
     
 }  // namespace data_render
 }  // namespace core
