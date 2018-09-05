@@ -69,6 +69,10 @@ static inline std::string jString2StrFast(JNIEnv *env, const jstring &jstr){
 }
 
 static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
+  if(barr == nullptr) {
+    return "";
+  }
+
   char *rtn = NULL;
   jsize alen = env->GetArrayLength(barr);
   jbyte *ba = env->GetByteArrayElements(barr, JNI_FALSE);

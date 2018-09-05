@@ -952,4 +952,9 @@ void WXBridge::ReportNativeInitStatus(JNIEnv* env, const char* statusCode,
                                        jni_error_msg.Get());
 }
 
+void WXBridge::reset_clazz(JNIEnv* env, const char* className) {
+  LOGE("class Name is %s", className);
+  Java_WXBridge_reset_clazz(env,className);
+}
+
 }  // namespace WeexCore
