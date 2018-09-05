@@ -67,6 +67,16 @@ public class FontDO {
 
   private void parseSrc(String src, WXSDKInstance instance) {
     src = (src != null )? src.trim() : "";
+
+    if (instance != null) {
+      if (instance.getCustomFontNetworkHandler() != null) {
+        String localUrl = instance.getCustomFontNetworkHandler().fetchLocal(src);
+        if (!TextUtils.isEmpty(localUrl)) {
+          src = localUrl;
+        }
+      }
+    }
+
     if (src.isEmpty()) {
       mState = STATE_INVALID;
       WXLogUtils.e("TypefaceUtil", "font src is empty.");
