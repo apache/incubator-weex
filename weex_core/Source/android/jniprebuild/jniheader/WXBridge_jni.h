@@ -16,13 +16,10 @@
 //#include "base/android/jni_int_wrapper.h"
 
 // Step 1: forward declarations.
-namespace {
 const char kWXBridgeClassPath[] = "com/taobao/weex/bridge/WXBridge";
 // Leaking this jclass as we cannot use LazyInstance from some threads.
 jclass g_WXBridge_clazz = NULL;
 #define WXBridge_clazz(env) g_WXBridge_clazz
-
-}  // namespace
 
 static jint InitFrameworkEnv(JNIEnv* env, jobject jcaller,
     jstring framework,
@@ -1069,6 +1066,41 @@ static bool RegisterNativesImpl(JNIEnv* env) {
   }
 
   return true;
+}
+
+
+
+static void Java_WXBridge_reset_clazz(JNIEnv* env, const char* className) {
+    LOGE("Java_WXBridge_reset_clazz class Name is %s", className);
+    g_WXBridge_clazz = reinterpret_cast<jclass>(env->NewGlobalRef(
+            base::android::GetClass(env, className).Get()));
+
+
+
+    g_WXBridge_callNative = 0;
+    g_WXBridge_reportJSException = 0;
+    g_WXBridge_callNativeModule = 0;
+    g_WXBridge_callNativeComponent = 0;
+    g_WXBridge_setTimeoutNative = 0;
+    g_WXBridge_setJSFrmVersion = 0;
+    g_WXBridge_callUpdateFinish = 0;
+    g_WXBridge_callRefreshFinish = 0;
+    g_WXBridge_reportServerCrash = 0;
+    g_WXBridge_callCreateBody = 0;
+    g_WXBridge_callAddElement = 0;
+    g_WXBridge_callRemoveElement = 0;
+    g_WXBridge_callMoveElement = 0;
+    g_WXBridge_callAddEvent = 0;
+    g_WXBridge_callRemoveEvent = 0;
+    g_WXBridge_callUpdateStyle = 0;
+    g_WXBridge_callUpdateAttrs = 0;
+    g_WXBridge_callLayout = 0;
+    g_WXBridge_callCreateFinish = 0;
+    g_WXBridge_callRenderSuccess = 0;
+    g_WXBridge_callAppendTreeCreateFinish = 0;
+    g_WXBridge_callHasTransitionPros = 0;
+    g_WXBridge_getMeasurementFunc = 0;
+    g_WXBridge_reportNativeInitStatus = 0;
 }
 
 #endif  // com_taobao_weex_bridge_WXBridge_JNI

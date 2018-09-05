@@ -104,6 +104,7 @@ class WXBridge : public JNIObjectWrap {
   void ReportNativeInitStatus(JNIEnv *env, const char *statusCode,
                               const char *errorMsg);
 
+  void reset_clazz(JNIEnv* env, const char* className);
  private:
   WXBridge() {}
   virtual ~WXBridge() {}

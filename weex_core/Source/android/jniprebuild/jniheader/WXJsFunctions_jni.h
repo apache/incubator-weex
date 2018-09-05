@@ -132,7 +132,7 @@ static const JNINativeMethod kMethodsWXJsFunctions[] = {
         {"jsFunctionCallUpdateAttrs",
                 "(Ljava/lang/String;Ljava/lang/String;[BZ)V",
                 reinterpret_cast<void *>(jsFunctionCallUpdateAttrs)},
-        {"jsFunctionCallUpdateStyle",
+        {"jsFunctionCallUpdateStyleNative",
                 "(Ljava/lang/String;Ljava/lang/String;[BZ)V",
                 reinterpret_cast<void *>(jsFunctionCallUpdateStyle)},
         {"jsFunctionCallRemoveElement",
