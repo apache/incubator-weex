@@ -65,8 +65,10 @@
 		333D9A2A1F41507A007CED39 /* WXTransition.mm in Sources */ = {isa = PBXBuildFile; fileRef = 333D9A261F41507A007CED39 /* WXTransition.mm */; };
 		37B51EE41E97804D0040A743 /* WXCycleSliderComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 37B51EE21E97804D0040A743 /* WXCycleSliderComponent.h */; };
 		37B51EE51E97804D0040A743 /* WXCycleSliderComponent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 37B51EE31E97804D0040A743 /* WXCycleSliderComponent.mm */; };
-		4532670A213FC84A00DAA620 /* WXDisplayLinkManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 45326708213FC84900DAA620 /* WXDisplayLinkManager.h */; };
+		4532670A213FC84A00DAA620 /* WXDisplayLinkManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 45326708213FC84900DAA620 /* WXDisplayLinkManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4532670B213FC84A00DAA620 /* WXDisplayLinkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 45326709213FC84900DAA620 /* WXDisplayLinkManager.m */; };
+		4532670C213FCF2300DAA620 /* WXDisplayLinkManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 45326708213FC84900DAA620 /* WXDisplayLinkManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4532670D213FCFB400DAA620 /* WXDisplayLinkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 45326709213FC84900DAA620 /* WXDisplayLinkManager.m */; };
 		591324A31D49B7F1004E89ED /* WXTimerModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */; };
 		591DD3311D23AD5800BE8709 /* WXErrorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 591DD32F1D23AD5800BE8709 /* WXErrorView.m */; };
 		591DD3321D23AD5800BE8709 /* WXErrorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 591DD3301D23AD5800BE8709 /* WXErrorView.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2587,6 +2589,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4532670A213FC84A00DAA620 /* WXDisplayLinkManager.h in Headers */,
 				B8D66C1B21255730003960BD /* style.h in Headers */,
 				B8D66C2321255730003960BD /* layout.h in Headers */,
 				B8D66C2521255730003960BD /* flex_enum.h in Headers */,
@@ -2609,7 +2612,6 @@
 				77D161201C02DDB40010B15B /* WXSDKEngine.h in Headers */,
 				B8A72C9C213F8BAE0024E7BE /* class_string.h in Headers */,
 				745ED2DA1C5F2C7E002DB5A8 /* WXView.h in Headers */,
-				4532670A213FC84A00DAA620 /* WXDisplayLinkManager.h in Headers */,
 				17B122252090AAB000387E33 /* WXSDKError.h in Headers */,
 				2AE5B7521CAB7DBD0082FDDB /* WXAComponent.h in Headers */,
 				B8D66CC521255730003960BD /* thread_local.h in Headers */,
@@ -2862,6 +2864,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4532670C213FCF2300DAA620 /* WXDisplayLinkManager.h in Headers */,
 				B8D66C1C21255730003960BD /* style.h in Headers */,
 				B8D66C2421255730003960BD /* layout.h in Headers */,
 				B8D66C2621255730003960BD /* flex_enum.h in Headers */,
@@ -3581,6 +3584,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4532670D213FCFB400DAA620 /* WXDisplayLinkManager.m in Sources */,
 				B863DF332107313400EA887D /* WXBridgeContext.m in Sources */,
 				B82A159A20F857450098A509 /* WXWebSocketLoader.m in Sources */,
 				B82A159920F857200098A509 /* WXSDKError.m in Sources */,
