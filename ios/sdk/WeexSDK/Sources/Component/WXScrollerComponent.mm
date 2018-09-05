@@ -295,12 +295,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         }
     }
     
-    if (_pagingEnabled && _pageSize > 0) {
-        ((UIScrollView *)self.view).pagingEnabled = NO; // turn off system default paging
-        ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateFast;
-    }
-    else {
-        ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateNormal;
+    if ([self isViewLoaded]) {
+        if (_pagingEnabled && _pageSize > 0) {
+            ((UIScrollView *)self.view).pagingEnabled = NO; // turn off system default paging
+            ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateFast;
+        }
+        else {
+            ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateNormal;
+        }
     }
     
     if (attributes[@"loadmoreoffset"]) {
