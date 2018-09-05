@@ -22,6 +22,7 @@ import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 public class WXParams implements Serializable {
@@ -235,5 +236,29 @@ public class WXParams implements Serializable {
 
   public void setLibLdPath(String libLdPath) {
     this.libLdPath = libLdPath;
+  }
+
+  public Map<String, Object> toMap() {
+    HashMap<String, Object> map  = new HashMap<>();
+    map.put("appName", appName);
+    map.put("appVersion", appVersion);
+    map.put("cacheDir", cacheDir);
+    map.put("deviceHeight", deviceHeight);
+    map.put("deviceModel", deviceModel);
+    map.put("deviceWidth", deviceWidth);
+    map.put("libJssPath", libJssPath);
+    map.put("logLevel", logLevel);
+    map.put("needInitV8", needInitV8);
+    map.put("osVersion", osVersion);
+    map.put("platform", platform);
+    map.put("useSingleProcess", useSingleProcess);
+    map.put("shouldInfoCollect", shouldInfoCollect);
+    map.put("weexVersion", weexVersion);
+    map.put("crashFilePath", crashFilePath);
+    map.put("libJscPath", libJscPath);
+    map.put("libIcuPath", libIcuPath);
+    map.put("libLdPath", libLdPath);
+    map.put("options", options);
+    return map;
   }
 }
