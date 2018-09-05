@@ -18,6 +18,8 @@
  */
 
 #import "WXDomModule.h"
+#import "WXComponent+Layout.h"
+#import "WXCoreFlexEnum.h"
 #import "WXDefine.h"
 #import "WXSDKManager.h"
 #import "WXComponentManager.h"
@@ -53,6 +55,7 @@ WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 WX_EXPORT_METHOD(@selector(addRule:rule:))
 WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
+WX_EXPORT_METHOD(@selector(getLayoutDirection:callback:))
 WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
 
 - (void)performBlockOnComponentManager:(void(^)(WXComponentManager *))block
@@ -220,6 +223,31 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
                 }
             });
 
+        }
+    }];
+}
+
+- (void)getLayoutDirection:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
+    [self performBlockOnComponentManager:^(WXComponentManager * manager) {
+        if ([ref isEqualToString:@"viewport"]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *direction = manager.weexInstance.usedLayoutDirection == WXLayoutDirectionRTL ? @"rtl" : @"ltr";
+                if (callback) {
+                    callback(direction, false);
+                }
+            });
+        } else {
+            WXComponent *component = [manager componentForRef:ref];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *direction = @"unknow";
+                if (component) {
+                    WeexCore::WXCoreDirection layoutDirection = component->_flexCssNode->getLayoutDirectionFromPathNode();
+                    direction = layoutDirection == WeexCore::kDirectionInherit ? @"unknow" : layoutDirection == WeexCore::kDirectionRTL ? @"rtl" : @"ltr";
+                }
+                if (callback) {
+                    callback(direction, false);
+                }
+            });
         }
     }];
 }

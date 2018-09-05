@@ -377,7 +377,7 @@ do {\
 - (BOOL)isDirectionRTL {
     WeexCore::WXCoreDirection direction = _flexCssNode->getLayoutDirectionFromPathNode();
     if (direction != WeexCore::kDirectionInherit) return direction == WeexCore::kDirectionRTL;
-    return self.weexInstance.defaultLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
+    return self.weexInstance.usedLayoutDirection == WXLayoutDirectionRTL;
 }
 
 - (CGSize (^)(CGSize))measureBlock

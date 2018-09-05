@@ -24,12 +24,16 @@
 #import "WXResourceRequest.h"
 #import "WXBridgeProtocol.h"
 #import "WXApmForInstance.h"
+#import "WXType.h"
 
 extern NSString *const bundleUrlOptionKey;
 
 @interface WXSDKInstance : NSObject
 
-@property (nonatomic, assign) UIUserInterfaceLayoutDirection defaultLayoutDirection;
+/**
+ * layoutDirection default value is WXLayoutDirectionLTR
+ **/
+@property (nonatomic, assign) WXLayoutDirection layoutDirection;
 
 /**
  * The viewControler which the weex bundle is rendered in.
@@ -78,7 +82,7 @@ extern NSString *const bundleUrlOptionKey;
  **/
 @property (nonatomic, assign) BOOL needPrerender;
 
-@property (nonatomic , strong) NSDictionary* containerInfo;
+@property (nonatomic, strong) NSDictionary* containerInfo;
 
 /**
  * The state of current instance.
@@ -92,7 +96,6 @@ typedef NS_ENUM(NSInteger, WXState) {//state.code
     WeexInstanceBindChanged,
     WeexInstanceDestroy
 };
-
 
 typedef NS_ENUM(NSInteger, WXErrorType) {//error.domain
     TemplateErrorType = 1,

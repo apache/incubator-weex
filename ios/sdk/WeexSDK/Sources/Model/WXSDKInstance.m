@@ -105,7 +105,7 @@ typedef enum : NSUInteger {
             __instance++;
         }
         _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
-        _defaultLayoutDirection = [UIApplication sharedApplication].userInterfaceLayoutDirection;
+        _layoutDirection = WXLayoutDirectionLTR;
         
         [WXSDKManager storeInstance:self forID:_instanceId];
         
@@ -187,7 +187,6 @@ typedef enum : NSUInteger {
 {
     return _rootView;
 }
-
 
 - (void)setFrame:(CGRect)frame
 {
@@ -688,6 +687,13 @@ typedef enum : NSUInteger {
 }
 
 #pragma mark Private Methods
+
+- (WXLayoutDirection)usedLayoutDirection {
+    if (_layoutDirection != WXLayoutDirectionAuto) {
+        return _layoutDirection;
+    }
+    return [WXUtility getEnvLayoutDirection];
+}
 
 - (void)_addModuleEventObserversWithModuleMethod:(WXModuleMethod *)method
 {

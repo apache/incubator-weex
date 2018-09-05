@@ -131,6 +131,8 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 
 + (NSDictionary *_Nonnull)getDebugEnvironment;
 
++ (WXLayoutDirection)getEnvLayoutDirection;
+
 /**
  * @abstract UserAgent Generation
  *

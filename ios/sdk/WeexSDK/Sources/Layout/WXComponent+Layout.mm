@@ -256,7 +256,7 @@ bool flexIsUndefined(float value) {
         }
         if ([self.ref isEqualToString:WX_SDK_ROOT_REF] && _flexCssNode->getDirection() == WeexCore::kDirectionInherit) {
             // if root element have not specify direction, then we use system layout direction
-            WeexCore::WXCoreDirection direction = self.weexInstance.defaultLayoutDirection ? WeexCore::kDirectionRTL : WeexCore::kDirectionRTL;
+            WeexCore::WXCoreDirection direction = self.weexInstance.usedLayoutDirection == WXLayoutDirectionRTL ? WeexCore::kDirectionRTL : WeexCore::kDirectionLTR;
             _flexCssNode->setDirection(direction, NO);
         }
     

@@ -127,6 +127,7 @@
 //    }
     [_instance destroyInstance];
     _instance = [[WXSDKInstance alloc] init];
+    _instance.layoutDirection = WXLayoutDirectionAuto;
     if([WXPrerenderManager isTaskExist:[self.url absoluteString]]){
         _instance = [WXPrerenderManager instanceFromUrl:self.url.absoluteString];
     }
