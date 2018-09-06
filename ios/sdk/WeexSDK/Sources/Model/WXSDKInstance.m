@@ -535,7 +535,7 @@ typedef enum : NSUInteger {
         return;
     }
     
-    [[WXSDKManager bridgeMgr] refreshInstance:self.instanceId data:[WXUtility JSONString:data]];
+    [[WXSDKManager bridgeMgr] refreshInstance:self.instanceId data:data];
 }
 
 - (void)destroyInstance

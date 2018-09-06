@@ -794,7 +794,9 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 
 + (void)closePage:(NSString*)pageId
 {
-    platformBridge->core_side()->OnInstanceClose([pageId UTF8String]);
+    if (platformBridge) {
+        platformBridge->core_side()->OnInstanceClose([pageId UTF8String]);
+    }
 }
 
 static void _traverseTree(WeexCore::RenderObject *render, int index, const char* pageId)
