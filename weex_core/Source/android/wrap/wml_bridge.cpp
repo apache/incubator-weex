@@ -25,6 +25,7 @@
 #include "android/utils/params_utils.h"
 #include "core/manager/weex_core_manager.h"
 
+static intptr_t jDoubleValueMethodId = 0;
 static jint InitAppFramework(JNIEnv* env, jobject jcaller, jstring jinstanceid,
                              jstring jframwork, jobjectArray jargs) {
   WeexCore::WMLBridge::Instance()->Reset(env, jcaller);
@@ -40,7 +41,34 @@ static jint InitAppFramework(JNIEnv* env, jobject jcaller, jstring jinstanceid,
     auto jDataObj = jArg->GetData(env);
     auto jKeyStr = jArg->GetKey(env);
 
-    if (jTypeInt == 2) {
+    if (jTypeInt == 1) {
+      jclass jDoubleClazz = env->FindClass("java/lang/Double");
+      jmethodID method_id = nullptr;
+      if (jDoubleValueMethodId != 0) {
+        method_id = reinterpret_cast<jmethodID>(jDoubleValueMethodId);
+      } else {
+        method_id = base::android::GetMethod(
+                env, jDoubleClazz,
+                base::android::INSTANCE_METHOD,
+                "doubleValue",
+                "()D",
+                &jDoubleValueMethodId);
+      }
+
+      jdouble jDoubleObj = env->CallDoubleMethod(jDataObj.Get(), method_id);
+      const auto size = sizeof(jDoubleObj) + 1;
+      char * charData = (char *) malloc(size);
+      if(charData == nullptr){
+        continue;
+      }
+
+      memset(charData, 0, size);
+      snprintf(charData, size, "%f", jDoubleObj);
+
+      ScopedJStringUTF8 jni_key(env, jKeyStr.Get());
+      params.push_back(genInitFrameworkParams(jni_key.getChars(), charData));
+      free(charData);
+    } else if (jTypeInt == 2) {
       jstring jDataStr = (jstring)jDataObj.Get();
       ScopedJStringUTF8 jni_key(env, jKeyStr.Get());
       ScopedJStringUTF8 jni_data(env, jDataStr);
