@@ -22,6 +22,7 @@
 
 #include <sstream>
 #include <string>
+#include <codecvt>
 
 namespace weex {
 namespace base {
@@ -32,6 +33,14 @@ std::string to_string(T value) {
   os << value;
   return os.str();
 }
+
+static std::string to_utf8(uint16_t* utf16, size_t length) {
+  char16_t *WC = reinterpret_cast<char16_t *>(utf16);
+  std::u16string str(WC, length);
+  /* 转换宽字符字符串 */
+  return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(str);
+}
+
 }  // namespace base
 }  // namespace weex
 #endif  // CORE_BASE_STRING_UTIL_H

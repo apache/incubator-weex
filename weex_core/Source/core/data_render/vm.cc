@@ -30,6 +30,7 @@ namespace data_render {
 
 void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
 
+#define LOGD(...)
 #if DEBUG
   //TimeCost tc;
 #endif
