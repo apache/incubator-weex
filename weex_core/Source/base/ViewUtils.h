@@ -64,11 +64,12 @@ namespace WeexCore {
 
     float realPx = (src * WXCoreEnvironment::getInstance()->DeviceWidth() /
                     viewport);
-    if (WXCoreEnvironment::getInstance()->IsIOS()) {
-      return realPx; // iOS supports decimal points
-    }
+#if OS_IOS
+    return realPx;
+#else
     float result = realPx > 0.005 && realPx < 1 ? 1.0f : realPx;
     return result;
+#endif
   }
 
   inline float getFloat(const std::string &src, const float &viewport) {
@@ -123,11 +124,12 @@ namespace WeexCore {
       return NAN;
 
     float realPx = (pxValue * customViewport / WXCoreEnvironment::getInstance()->DeviceWidth());
-    if (WXCoreEnvironment::getInstance()->IsIOS()) {
-      return realPx; // iOS supports decimal points
-    }
+#if OS_IOS
+    return realPx;
+#else
     float result = realPx > 0.005 && realPx < 1 ? 1.0f : realPx;
     return result;
+#endif
   }
 }
 
