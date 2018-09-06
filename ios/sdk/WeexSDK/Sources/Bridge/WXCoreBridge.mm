@@ -759,9 +759,14 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
                 isHeightWrapContent:(BOOL)isHeightWrapContent
 {
     if (platformBridge) {
-        if (width == 0 || height == 0) {
+        if (width == 0 && !isWidthWrapContent) {
             return;
         }
+        
+        if (height == 0 && !isHeightWrapContent) {
+            return;
+        }
+        
         platformBridge->core_side()->SetDefaultHeightAndWidthIntoRootDom([pageId UTF8String], (float)width, (float)height, (bool)isWidthWrapContent, (bool)isHeightWrapContent);
     }
 }
@@ -773,7 +778,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     }
 }
 
-+ (void)layoutPage:(NSString*)pageId size:(CGSize)size forced:(BOOL)forced
++ (void)layoutPage:(NSString*)pageId forced:(BOOL)forced
 {
     if (platformBridge) {
         const char* page = [pageId UTF8String];
@@ -782,7 +787,6 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         }
         
         if (platformBridge->core_side()->NotifyLayout(page)) {
-            platformBridge->core_side()->SetDefaultHeightAndWidthIntoRootDom(page, size.width, size.height, false, false);
             platformBridge->core_side()->ForceLayout(page);
         }
     }
