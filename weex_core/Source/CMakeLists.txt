@@ -82,7 +82,6 @@ set(COMMON_SRCS
    ./core/data_render/statement.cc
    ./core/data_render/string_table.cc
    ./core/data_render/table.cc
-   ./core/data_render/table_factory.cc
    ./core/data_render/token.cc
    ./core/data_render/tokenizer.cc
    ./core/data_render/vm.cc
