@@ -116,6 +116,10 @@
           NSStringFromCGRect(targetComponent.weexInstance.rootView.frame)
           );
 #endif
+    if (!targetComponent.weexInstance.apmInstance.hasRecordFirstInterationView) {
+        targetComponent.weexInstance.apmInstance.hasRecordFirstInterationView = YES;
+        [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW];
+    }
     [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_INTERACTION];
     self.interactionLimitAddOpCount++;
     self.interactionAddCount = self.interactionAddCountRecord;

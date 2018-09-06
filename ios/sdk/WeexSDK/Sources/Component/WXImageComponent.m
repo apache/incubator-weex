@@ -429,20 +429,23 @@ WX_EXPORT_METHOD(@selector(save:))
                 }
                 [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
             }
+            NSString* curUrl = imageURL.absoluteString;
             //check view/img size
-            if (!error && image && strongSelf.view) {
-                double imageSize = image.size.width * image.scale * image.size.height * image.scale;
-                double viewSize = strongSelf.view.frame.size.height *  strongSelf.view.frame.size.width;
-                if (imageSize > viewSize+1) {
+            if (!error && image && imageView && ![curUrl isEqualToString:self.preUrl]) {
+                self.preUrl = curUrl;
+                CGFloat screenScale = [[UIScreen mainScreen] scale];
+                double imageSize = image.size.width*image.scale  * image.size.height*image.scale;
+                double viewSize = imageView.frame.size.height *screenScale*  imageView.frame.size.width * screenScale;
+                CGFloat sizeRatio = imageSize/viewSize;
+                
+                //minDiffSize limt 40*40
+                if (sizeRatio>1.2 && (imageSize-viewSize) > 1600) {
                     self.weexInstance.performance.imgWrongSizeNum++;
                     [self.weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT withDiffValue:1];
                 }
-                NSString* curUrl = imageURL.absoluteString;
-                if (![curUrl isEqualToString:self.preUrl]) {
-                    self.preUrl = curUrl;
-                    if (image.size.width >1080 && image.size.height > 1920) {
-                        [self.weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_LARGE_IMG_COUNT withDiffValue:1];
-                    }
+                    
+                if (image.size.width* image.scale > 720 && image.size.height * image.scale> 1080) {
+                    [self.weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_LARGE_IMG_COUNT withDiffValue:1];
                 }
             }
         }];

@@ -79,16 +79,22 @@ NSString* const KEY_PAGE_STATS_IMG_LOAD_FAIL_NUM = @"wxImgLoadFailCount";
 NSString* const KEY_PAGE_STATS_NET_NUM  = @"wxNetworkRequestCount";
 NSString* const KEY_PAGE_STATS_NET_SUCCESS_NUM = @"wxNetworkRequestSuccessCount";
 NSString* const KEY_PAGE_STATS_NET_FAIL_NUM = @"wxNetworkRequestFailCount";
+NSString* const KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW = @"wxFirstInteractionView";
+NSString* const KEY_PAGE_STATS_BODY_RATIO = @"wxBodyRatio";
 
 ///************** value *****************/
 NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 @interface WXApmForInstance ()
+{
+    BOOL _isRecord;
+    BOOL _isEnd;
+    NSDictionary* _responseHeader;
+}
+
 @property (nonatomic,strong) id<WXApmProtocol> apmProtocolInstance;
 @property (nonatomic,strong) NSString* instanceId;
 @property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStatsMap;
-@property (nonatomic,assign) BOOL isRecord;
-@property (nonatomic,assign) BOOL isEnd;
 @property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStageMap;
 @property (nonatomic,strong) NSMutableArray<WXJSExceptionInfo*>* errorList;
 @end
@@ -122,7 +128,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) onStage:(NSString *)name
 {
-    if (nil == _apmProtocolInstance) {
+    if (nil == _apmProtocolInstance || _isEnd) {
         return;
     }
     long time = [WXUtility getUnixFixTimeMillis];
@@ -135,7 +141,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) setProperty:(NSString *)name withValue:(id)value
 {
-    if (nil == _apmProtocolInstance) {
+    if (nil == _apmProtocolInstance || _isEnd) {
         return;
     }
     [self.apmProtocolInstance addProperty:name withValue:value];
@@ -143,7 +149,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) setStatistic:(NSString *)name withValue:(double)value
 {
-    if (nil == _apmProtocolInstance) {
+    if (nil == _apmProtocolInstance || _isEnd) {
         return;
     }
     [self.apmProtocolInstance addStatistic:name withValue:value];
@@ -153,10 +159,10 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) startRecord:(NSString*) instanceId
 {
-    if (nil == _apmProtocolInstance || self.isRecord) {
+    if (nil == _apmProtocolInstance || _isRecord) {
         return;
     }
-    self.isRecord = YES;
+    _isRecord = YES;
     _instanceId = instanceId;
     
     [self.apmProtocolInstance onStart:instanceId topic:WEEX_PAGE_TOPIC];
@@ -191,10 +197,10 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) endRecord;
 {
-    if (nil == _apmProtocolInstance || self.isEnd) {
+    if (nil == _apmProtocolInstance || _isEnd) {
         return;
     }
-    self.isEnd = YES;
+    _isEnd = YES;
     
     [self onStage:KEY_PAGE_STAGES_DESTROY];
     [self.apmProtocolInstance onEnd];
@@ -203,16 +209,17 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) arriveFSRenderTime
 {
-    if (nil == _apmProtocolInstance || self.isFSEnd) {
+    if (nil == _apmProtocolInstance || _isFSEnd) {
         return;
     }
     self.isFSEnd = true;
+    
     [self onStage:KEY_PAGE_STAGES_FSRENDER];
 }
 
 - (void) updateFSDiffStats:(NSString *)name withDiffValue:(double)diff
 {
-    if (nil == _apmProtocolInstance || self.isFSEnd) {
+    if (nil == _apmProtocolInstance || _isFSEnd) {
         return;
     }
     [self updateDiffStats:name withDiffValue:diff];
@@ -225,7 +232,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     }
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnComponentThread(^{
-        NSNumber* preNumber = [self.recordStatsMap objectForKey:name];
+        NSNumber* preNumber = [weakSelf.recordStatsMap objectForKey:name];
         double preVal = nil == preNumber?0:preNumber.doubleValue;
         double currentVal = preVal + diff;
         [weakSelf.recordStatsMap setObject:@(currentVal) forKey:name];
@@ -251,8 +258,9 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     });
 }
 
-- (void) updateExtInfo:(NSDictionary*) extInfo
+- (void) updateExtInfoFromResponseHeader:(NSDictionary*) extInfo
 {
+    _responseHeader = extInfo;
     if (nil == _apmProtocolInstance || nil == extInfo) {
         return;
     }
@@ -268,7 +276,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
         [self  setStatistic:KEY_PAGE_STATS_ACTUAL_DOWNLOAD_TIME withValue:value];
     }
     
-    id wxZcacheInfo = [extInfo objectForKey:KEY_PAGE_PROPERTIES_Z_CACHE_INFO];
+    id wxZcacheInfo = [extInfo objectForKey:@"X-ZCache-Info"];
     if (nil !=wxZcacheInfo && [wxZcacheInfo isKindOfClass: NSString.class]) {
         [self setProperty:KEY_PAGE_PROPERTIES_Z_CACHE_INFO withValue:wxZcacheInfo];
     }
@@ -342,7 +350,10 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) _checkScreenEmptyAndReport
 {
-    if(self.hasAddView || !self.isStartRender || self.isDegrade){
+    if(self.isDownLoadFailed || self.hasAddView || !self.isStartRender || self.isDegrade){
+        return;
+    }
+    if (![self _isReportEmptyScreenError]) {
         return;
     }
     __weak WXApmForInstance* weakSelf = self;
@@ -351,49 +362,34 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
         if (nil == strongSelf) {
             return;
         }
-        
-        NSInteger LIMIT_TIME_FROM_RENDER_URL = 2000;
-        NSInteger LIMIT_TIME_FROM_RENDER_TEMPLATE = 1000;
-        
         long curTime = [WXUtility getUnixFixTimeMillis];
-        BOOL sholudReportByTime;
-        long useTime;
-        NSString* useTimeFrom;
-        
-        NSNumber* startTime = [strongSelf.stageDic objectForKey:KEY_PAGE_STAGES_DOWN_BUNDLE_START];
-        if (nil != startTime) {
-            useTime = curTime - startTime.longValue;
-            useTimeFrom = KEY_PAGE_STAGES_DOWN_BUNDLE_START;
-            sholudReportByTime = useTime > LIMIT_TIME_FROM_RENDER_URL;
-        }else{
-            startTime = [strongSelf.stageDic objectForKey:KEY_PAGE_STAGES_RENDER_ORGIGIN];
-            useTime = nil != startTime ? curTime -startTime.longValue : curTime;
-            useTimeFrom = KEY_PAGE_STAGES_RENDER_ORGIGIN;
-            sholudReportByTime = useTime > LIMIT_TIME_FROM_RENDER_TEMPLATE;
+        NSNumber* startExecJsTime = [strongSelf.stageDic objectForKey:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
+        if (nil == startExecJsTime) {
+            return;
         }
-        
-        if (!sholudReportByTime) {
+        long jsExecTime = curTime - startExecJsTime.longValue;
+        if (jsExecTime < 3000) {
             return;
         }
         
-        WXSDKErrCode code = WX_KEY_EXCEPTION_EMPTY_SCREEN_NATIVE;
-        for (WXJSExceptionInfo* exception in strongSelf.errorList) {
-            WXSDKErrorGroup group = [WXSDKErrCodeUtil getErrorGroupByCode:exception.errorCode.intValue];
-            if(group == WX_JS){
-                code = WX_KEY_EXCEPTION_EMPTY_SCREEN_JS;
-                break;
-            }
-        }
-        NSString *codeStr = [NSString stringWithFormat:@"%d",code];
+        NSString *codeStr = [NSString stringWithFormat:@"%d",WX_KEY_EXCEPTION_EMPTY_SCREEN_JS];
         NSDictionary* extInfo = @{
             @"wxBeginRender":@(strongSelf.isStartRender),
             @"wxHasAddView":@(strongSelf.hasAddView),
             @"wxHasDegrade":@(strongSelf.isDegrade),
-            @"wxUseTime":@(useTime),
-            @"wxUseTimeFrom":useTimeFrom
+            @"wxJSExecTime":@(jsExecTime)
             };
+        NSString* errorMsg;
+        if(self.errorList.count<=0){
+            NSNumber* jsEndTime = [strongSelf.stageDic objectForKey:KEY_PAGE_STAGES_CREATE_FINISH];
+            errorMsg = nil != jsEndTime
+                ? @"writeScreen :never add view until page destroy(js has execute > 3s)"
+                : @"writeScreen :never add view even js executeTime > 3s";
+        }else {
+            errorMsg = [NSString stringWithFormat:@"writeScreen :history exception :%@",[strongSelf _convertTopExceptionListToStr]];
+        }
         [WXExceptionUtils commitCriticalExceptionRT:strongSelf.instanceId errCode:codeStr function:@"_checkScreenEmptyAndReport"
-                                          exception:[strongSelf _convertTopExceptionListToStr] extParams:extInfo];
+                                          exception:errorMsg extParams:extInfo];
     });
 }
 
@@ -402,17 +398,14 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (!self.isOpenApm) {
         return @"";
     }
-    if (!self.errorList || self.errorList.count <= 0) {
-        return @"emptyTopErrorlist";
-    }
-    NSString* errorStr = @"========== topErrorList start ============";
+   
+    NSString* errorStr = @"";
     for (WXJSExceptionInfo* exception in self.errorList) {
         errorStr = [errorStr stringByAppendingFormat:
-                    @"%@ -> code:%@,func:%@,exception:%@ \n",
+                    @"%@ -> code:%@,func:%@,exception:%@ ========>",
                     errorStr,exception.errorCode,exception.functionName,exception.exception
                     ];
     }
-    errorStr = [errorStr stringByAppendingFormat:@"%@ ========== topErrorList start end ============\n",errorStr];
     return errorStr;
 }
 
@@ -430,6 +423,30 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
         openApm = [[configCenter configForKey:@"iOS_weex_ext_config.open_apm" defaultValue:@(YES) isDefault:NULL] boolValue];
     }
     return openApm;
+}
+
+- (BOOL) _isReportEmptyScreenError
+{
+    BOOL report = YES;
+    id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        report = [[configCenter configForKey:@"iOS_weex_ext_config.report_write_screen" defaultValue:@(YES) isDefault:NULL] boolValue];
+    }
+    return report;
+}
+
+- (NSString*) templateInfo
+{
+    
+    NSString* headerStr = [WXUtility JSONString:_responseHeader];
+    NSString* bundleVerfiInfo = nil;
+    WXSDKInstance* instance = [WXSDKManager instanceForID:self.instanceId];
+    if (nil != instance) {
+        bundleVerfiInfo = [WXUtility JSONString:instance.userInfo];
+    }
+    NSString* info = [NSString stringWithFormat:@"bundleVerfiInfo :%@, httpHeaderInfo:%@",bundleVerfiInfo?:@"unSetVerfiInfo",headerStr?:@"unSetHeader"];
+    return info;
 }
 
 @end

@@ -69,6 +69,8 @@ extern NSString* const KEY_PAGE_STATS_IMG_LOAD_FAIL_NUM;
 extern NSString* const KEY_PAGE_STATS_NET_NUM;
 extern NSString* const KEY_PAGE_STATS_NET_SUCCESS_NUM;
 extern NSString* const KEY_PAGE_STATS_NET_FAIL_NUM;
+extern NSString* const KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW;
+extern NSString* const KEY_PAGE_STATS_BODY_RATIO;
 
 ///************** value *****************/
 extern NSString* const VALUE_ERROR_CODE_DEFAULT;
@@ -83,6 +85,8 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 @property (nonatomic, assign) BOOL hasAddView;
 @property (nonatomic, assign) BOOL isDegrade;
 @property (nonatomic, assign) BOOL isStartRender;
+@property (nonatomic,assign)  BOOL  hasRecordFirstInterationView;
+@property (nonatomic, assign) BOOL isDownLoadFailed;
 
 #pragma mark - basic method
 
@@ -99,7 +103,7 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 - (void) updateFSDiffStats:(NSString *)name withDiffValue:(double)diff;
 - (void) updateDiffStats:(NSString *)name withDiffValue:(double)diff;
 - (void) updateMaxStats:(NSString *)name curMaxValue:(double)maxValue;
-- (void) updateExtInfo:(NSDictionary*) extInfo;
+- (void) updateExtInfoFromResponseHeader:(NSDictionary*) extInfo;
 
 
 #pragma mark - called by IWXHttpAdapter implementer
@@ -114,4 +118,7 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 #pragma mark record top5 errorMsg
 - (void) recordErrorMsg:(WXJSExceptionInfo *)exception;
 - (NSDictionary<NSString*,NSNumber*>*) stageDic;
+
+#pragma templateinfo
+- (NSString*) templateInfo;
 @end
