@@ -25,6 +25,7 @@
 #include "core/data_render/class_array.h"
 #include "core/data_render/class_string.h"
 #include "core/data_render/common_error.h"
+#include "core/data_render/vnode/vcomponent.h"
 #include <base/LogDefines.h>
 
 namespace weex {
@@ -168,6 +169,70 @@ static Value AppendUrlParam(ExecState* exec_state) {
   return Value(new_value);
 }
 
+// saveComponentDataAndProps(component, data, props);
+static Value SaveComponentDataAndProps(ExecState* exec_state) {
+  VComponent *component = exec_state->GetArgument(0)->type == Value::Type::NIL ?
+                    nullptr : reinterpret_cast<VComponent *>(exec_state->GetArgument(0)->cptr);
+  Value *data = exec_state->GetArgument(1);
+  Value *props = exec_state->GetArgument(2);
+  if (component) {
+      component->set_data(ValueTo<Table>(data));
+      component->set_props(ValueTo<Table>(props));
+  }
+  return Value();
+}
+
+// appendChildComponent(parent, child);
+static Value AppendChildComponent(ExecState* exec_state) {
+  VNode *parent = exec_state->GetArgument(0)->type == Value::Type::NIL ?
+                    nullptr : reinterpret_cast<VNode *>(exec_state->GetArgument(0)->cptr);
+  VNode *child = reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);
+  if (parent && child) {
+      static_cast<VComponent *>(parent)->AppendChildComponent(static_cast<VComponent *>(child));
+  }
+  return Value();
+}
+
+// createComponent(template_id, "template_name", "tag_name", "id");
+static Value CreateComponent(ExecState* exec_state) {
+  int template_id = 0;
+  if (exec_state->GetArgument(0)->type == Value::Type::NUMBER) {
+    template_id = static_cast<int>(exec_state->GetArgument(0)->i);
+  }
+  auto template_name = exec_state->GetArgument(1)->str;
+  Value* arg_ref = exec_state->GetArgument(3);
+  std::string ref;
+  if (IsString(arg_ref)) {
+    ref = CStringValue(arg_ref);
+  } else if (IsInt(arg_ref)) {
+    std::ostringstream os;
+    os << IntValue(arg_ref);
+    ref = "vn_" + os.str();
+  } else {
+    throw VMExecError("CreateElement only support int for string");
+  }
+  std::string tag_name = exec_state->GetArgument(2)->str->c_str();
+  LOGD("[VM][VNode][CreateDocument]: %s  %s\n", ref.c_str(), tag_name.c_str());
+  VComponent* component = NULL;
+  if (tag_name == "root") {
+    component = new VComponent(exec_state, template_id, template_name->c_str(),
+                               ref, "div");
+    if (exec_state->context()->root() == nullptr) {
+      exec_state->context()->set_root(component);
+    }
+  } else {
+    component = new VComponent(exec_state, template_id, template_name->c_str(),
+                               ref, tag_name);
+  }
+  if (exec_state->context()->root() == nullptr) {
+    exec_state->context()->set_root(component);
+  }
+  Value result;
+  result.type = Value::Type::CPTR;
+  result.cptr = component;
+  return result;
+}
+
 // createElement("tag_name", "id");
 static Value CreateElement(ExecState *exec_state) {
     Value *arg_ref = exec_state->GetArgument(1);
@@ -188,12 +253,11 @@ static Value CreateElement(ExecState *exec_state) {
     VNode *node = NULL;
     if (tag_name == "root") {
         node = new VNode(ref, "div");
-        if (exec_state->context()->root() == nullptr) {
-            exec_state->context()->set_root(node);
-        }
-    }
-    else {
+    } else {
         node = new VNode(ref, tag_name);
+    }
+    if (exec_state->context()->root() == nullptr) {
+        exec_state->context()->set_root(node);
     }
     Value result;
     result.type = Value::Type::CPTR;
@@ -202,9 +266,6 @@ static Value CreateElement(ExecState *exec_state) {
 }
     
 static void AppendChild(ExecState *exec_state, VNode *parent, VNode *children) {
-    if (parent == nullptr && exec_state->context()->root() == nullptr) {
-        exec_state->context()->set_root(children);
-    }
     if (parent && children) {
         parent->AddChild(children);
     }
@@ -365,6 +426,9 @@ void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   RegisterCFunc(state, "merge", Merge);
   RegisterCFunc(state, "tostring", ToString);
   RegisterCFunc(state, "createElement", CreateElement);
+  RegisterCFunc(state, "createComponent", CreateComponent);
+  RegisterCFunc(state, "saveComponentDataAndProps", SaveComponentDataAndProps);
+  RegisterCFunc(state, "appendChildComponent", AppendChildComponent);
   RegisterCFunc(state, "appendChild", AppendChild);
   RegisterCFunc(state, "encodeURIComponent", encodeURIComponent);
   RegisterCFunc(state, "setAttr", SetAttr);
@@ -466,6 +530,27 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
     value = state->class_factory()->CreateTable();
   }
   global->Add("_data_main", value);
+
+  // Set component data and props
+  Value components_data = state->class_factory()->CreateTable();
+  Value components_props = state->class_factory()->CreateTable();
+  const json11::Json& components_obj = json["components"];
+  if (components_obj.is_array()) {
+    for (auto it = components_obj.array_items().begin();
+         it != components_obj.array_items().end(); it++) {
+      const json11::Json name = (*it)["name"];
+      if (!name.is_string()) {
+        continue;
+      }
+      auto temp_data = ParseJson2Value(state, (*it)["data"]);
+      Value key(state->string_table()->StringFromUTF8(name.string_value()));
+      SetTableValue(ValueTo<Table>(&components_data), &key, temp_data);
+      auto temp_props = ParseJson2Value(state, (*it)["props"]);
+      SetTableValue(ValueTo<Table>(&components_props), &key, temp_props);
+    }
+  }
+  global->Add("_components_data", components_data);
+  global->Add("_components_props", components_props);
 }
 
 void VNodeExecEnv::InitInitDataValue(ExecState *state, const std::string& init_data_str) {

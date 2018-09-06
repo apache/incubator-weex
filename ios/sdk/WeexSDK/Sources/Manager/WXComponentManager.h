@@ -246,6 +246,10 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 /// @name Enumerating
 ///--------------------------------------
 
+/**
+ * Enumerate components using breadth-first search algorithm,
+ must be called on component thread by calling WXPerformBlockOnComponentThread
+ */
 - (void)enumerateComponentsUsingBlock:(void (^)(WXComponent *, BOOL *stop))block;
 
 @end

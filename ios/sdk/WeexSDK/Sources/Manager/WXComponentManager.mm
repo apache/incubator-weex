@@ -365,6 +365,14 @@ static NSThread *WXComponentThread;
     
     [_indexDict removeObjectForKey:ref];
     
+    // remove subcomponents of component from _indexDict and unbind them
+    NSMutableArray* subcomponents = [[NSMutableArray alloc] init];
+    [component _collectSubcomponents:subcomponents];
+    for (WXComponent* c in subcomponents) {
+        [c _setRenderObject:nullptr];
+        [_indexDict removeObjectForKey:c.ref];
+    }
+    
     __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
         __strong typeof(self) strongSelf = weakSelf;

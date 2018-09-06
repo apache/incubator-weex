@@ -175,6 +175,9 @@ void VNodeRenderManager::CreatePage(const std::string& input,
         }
         else {
             exec_state->context()->raw_json() = json;
+            if (json["script"].is_string()) {
+                exec_state->context()->set_script(json["script"].string_value());
+            }
         }
         VNodeExecEnv::InitGlobalValue(exec_state);
         if (init_data.length() > 0) {

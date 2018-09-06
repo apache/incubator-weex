@@ -86,6 +86,7 @@ set(COMMON_SRCS
    ./core/data_render/tokenizer.cc
    ./core/data_render/vm.cc
    ./core/data_render/vnode/vnode.cc
+   ./core/data_render/vnode/vcomponent.cc
    ./core/data_render/vnode/vnode_exec_env.cc
    ./core/data_render/vnode/vnode_render_manager.cc
    ./core/data_render/vnode/vnode_render_context.cc

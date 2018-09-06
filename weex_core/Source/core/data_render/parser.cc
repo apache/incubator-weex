@@ -47,6 +47,15 @@ struct ASTParser final {
     return err_ret;
   }
 
+  int GetTemplateId(const json11::Json& component) {
+    json11::Json json_template_id =
+        component["template_id"].type() == Json::Type::NUMBER;
+    if (json_template_id.type() == Json::Type::NUMBER) {
+      return json_template_id.int_value();
+    } else {
+      return std::atoi(json_template_id.string_value().c_str());
+    }
+  }
 
     void AddAppendChildCall(json11::Json& json, Handle<Identifier>& parent_identifier,
                           Handle<Identifier>& child_identifier) {
@@ -252,7 +261,8 @@ struct ASTParser final {
   //  this = {
   //    count: this.start
   //  }
-  //
+  //  // template_id
+  //  var template_id = 1;
   //  //ParseNode
   //  var child = createElement(tag_name, nodeId);
   //  appendChild(parent, child);
@@ -264,8 +274,8 @@ struct ASTParser final {
   void ParseComponentFunction(json11::Json& json) {
     auto& name = json["name"];
     auto& initial_state = json["initialState"];
-    //auto& styles = json["styles"];
     json11::Json template_obj = json["template"];
+    int template_id = GetTemplateId(json);
 
     Handle<BlockStatement> chunk = stacks_.back();
 
@@ -309,6 +319,10 @@ struct ASTParser final {
           factory_->NewObjectConstant(initial_obj)
       ));
     }
+    func_body->statements()->Insert(factory_->NewDeclaration(
+        "template_id", factory_->NewIntegralConstant(template_id)));
+    func_body->statements()->Insert(factory_->NewDeclaration(
+        "template_name", factory_->NewStringConstant(name.string_value())));
 
     //ParseNode
     ParseNode(template_obj, true, name.string_value());
@@ -332,10 +346,14 @@ struct ASTParser final {
         factory_->NewBlockStatement(factory_->NewExpressionList());
     //{
     stacks_.push_back(main_func_body);
-    //var parent = null;
+    // var parent = null;
     main_func_body->PushExpression(factory_->NewDeclaration("parent"));
-    //  ...
-    ParseNode(body, false, "");
+    main_func_body->PushExpression(factory_->NewDeclaration(
+        "template_id", factory_->NewIntegralConstant(GetTemplateId(body))));
+    main_func_body->PushExpression(factory_->NewDeclaration(
+        "template_name", factory_->NewStringConstant("body")));
+    // body is considered as a component
+    ParseNode(body, true, "");
 
     stacks_.pop_back();
     //}
@@ -412,7 +430,24 @@ struct ASTParser final {
       }
 
       Handle<ObjectConstant> attr_init = factory_->NewObjectConstant(attr_obj);
-      Handle<Declaration> attr_decl = factory_->NewDeclaration("attr", attr_init);
+      // merge data props into attr_decl
+      // attr = merge(merge(data, props), attr)
+      Handle<Identifier> component_data = factory_->NewMemberExpression(
+          MemberAccessKind::kDot, factory_->NewIdentifier("_components_data"),
+          factory_->NewIdentifier("template_name"));
+      Handle<Identifier> component_props = factory_->NewMemberExpression(
+          MemberAccessKind::kDot, factory_->NewIdentifier("_components_props"),
+          factory_->NewIdentifier("template_name"));
+      std::vector<Handle<Expression>> merge_args1;
+      merge_args1.push_back(component_data);
+      merge_args1.push_back(component_props);
+      std::vector<Handle<Expression>> merge_args2;
+      merge_args2.push_back(factory_->NewCallExpression(
+          factory_->NewIdentifier("merge"), merge_args1));
+      merge_args2.push_back(attr_init);
+      Handle<Declaration> attr_decl = factory_->NewDeclaration(
+          "attr", factory_->NewCallExpression(factory_->NewIdentifier("merge"),
+                                              merge_args2));
       statement->PushExpression(attr_decl);
 
       // var child = createComponent_xxx("node_id", attr);
@@ -428,6 +463,23 @@ struct ASTParser final {
         Handle<Declaration> child_declaration =
             factory_->NewDeclaration("child", call_expr);
         statement->PushExpression(child_declaration);
+
+        // addChildComponent(component, child)
+        args.clear();
+        Handle<Identifier> component_identifier =
+            factory_->NewIdentifier("component");
+        args.push_back(component_identifier);
+        args.push_back(child_identifier);
+        statement->PushExpression(factory_->NewCallExpression(
+            factory_->NewIdentifier("appendChildComponent"), args));
+
+        // saveComponentDataAndProps(component, data, props)
+        args.clear();
+        args.push_back(child_identifier);
+        args.push_back(component_data);
+        args.push_back(component_props);
+        statement->PushExpression(factory_->NewCallExpression(
+                factory_->NewIdentifier("saveComponentDataAndProps"), args));
       }
 
       //appendChild(parent, child);
@@ -513,21 +565,41 @@ struct ASTParser final {
         std::vector<Handle<Expression>> args;
 
         // var child = createElement(tag_name, node_id);
+        // or
+        // var child = createComponent(template_id, tag_name, node_id);
         {
-          Handle<Expression> func =
-              factory_->NewIdentifier("createElement");
-          args.push_back(
-              factory_->NewStringConstant(tag_name.string_value()));
-          if (component_root) {
-            node_id_expr = factory_->NewIdentifier("nodeId");
-          } else {
+            Handle<Expression> func;
             node_id_expr = ParseNodeId(control, control_exprs, node_id.string_value());
-          }
-          args.push_back(node_id_expr);
-          call_expr = factory_->NewCallExpression(func, args);
-          Handle<Declaration> child_declaration =
-              factory_->NewDeclaration("child", call_expr);
-          statement->PushExpression(child_declaration);
+            if (!component_root) {
+                // Common Node call createElement function
+                func = factory_->NewIdentifier("createElement");
+                args.push_back(
+                        factory_->NewStringConstant(tag_name.string_value()));
+                args.push_back(node_id_expr);
+                call_expr = factory_->NewCallExpression(func, args);
+            } else {
+                // Component Node call createComponent
+                Handle<Expression> func =
+                        factory_->NewIdentifier("createComponent");
+                args.push_back(
+                        factory_->NewIdentifier("template_id"));
+                args.push_back(
+                        factory_->NewIdentifier("template_name"));
+                args.push_back(
+                        factory_->NewStringConstant(tag_name.string_value()));
+                args.push_back(node_id_expr);
+                call_expr = factory_->NewCallExpression(func, args);
+            }
+            Handle<Declaration> child_declaration =
+                    factory_->NewDeclaration("child", call_expr);
+            statement->PushExpression(child_declaration);
+            if (component_root) {
+                // One createComponent method has one component field for
+                // build component tree
+                Handle<Declaration> component_declaration =
+                        factory_->NewDeclaration("component", child_identifier);
+                statement->PushExpression(component_declaration);
+            }
         }
         if (!component_root) {
           // appendChild(parent, child);

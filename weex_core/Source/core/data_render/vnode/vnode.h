@@ -33,7 +33,7 @@ class VNode {
  public:
   VNode(const std::string &ref, const std::string &tag_name);
 
-  ~VNode();
+  virtual ~VNode();
 
   void SetStyle(const std::string &key, const std::string &value);
 
@@ -43,6 +43,8 @@ class VNode {
                 const std::vector<std::string> &params);
 
   void AddChild(VNode *child);
+
+  void RemoveChild(VNode *child);
 
  public:
   inline const std::string &tag_name() const { return tag_name_; }

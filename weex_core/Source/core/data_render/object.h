@@ -581,6 +581,10 @@ inline void TableCopy(Value &src, Value &dest) {
     }
 }
 
+inline void TableMapAddAll(Table* src, Table* dest) {
+  dest->map.insert(src->map.begin(), src->map.end());
+}
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
