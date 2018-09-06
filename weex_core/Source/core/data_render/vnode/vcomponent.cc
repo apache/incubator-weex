@@ -104,7 +104,7 @@ void VComponent::UpdateData(std::unordered_map<std::string, Value> datas) {
   Value new_value = exec_state_->class_factory()->CreateTable();
   TableMapAddAll(props_, ValueTo<Table>(&new_value));
   TableMapAddAll(data_, ValueTo<Table>(&new_value));
-  Value new_component = exec_state_->Call(func_name_, {new_value}).cptr;
+  //Value new_component = exec_state_->Call(func_name_, {new_value}).cptr;
 }
 
 void VComponent::DispatchCreated() {

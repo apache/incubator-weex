@@ -50,7 +50,6 @@ struct ASTParser final {
   int GetTemplateId(const json11::Json& component) {
     json11::Json json_template_id =
         component["template_id"].type() == Json::Type::NUMBER;
-    int template_id = 0;
     if (json_template_id.type() == Json::Type::NUMBER) {
       return json_template_id.int_value();
     } else {

@@ -69,6 +69,8 @@
 		4532670B213FC84A00DAA620 /* WXDisplayLinkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 45326709213FC84900DAA620 /* WXDisplayLinkManager.m */; };
 		4532670C213FCF2300DAA620 /* WXDisplayLinkManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 45326708213FC84900DAA620 /* WXDisplayLinkManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4532670D213FCFB400DAA620 /* WXDisplayLinkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 45326709213FC84900DAA620 /* WXDisplayLinkManager.m */; };
+		453267142140E38900DAA620 /* vcomponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 453267122140E38900DAA620 /* vcomponent.h */; };
+		453267152140E38900DAA620 /* vcomponent.cc in Sources */ = {isa = PBXBuildFile; fileRef = 453267132140E38900DAA620 /* vcomponent.cc */; };
 		591324A31D49B7F1004E89ED /* WXTimerModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */; };
 		591DD3311D23AD5800BE8709 /* WXErrorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 591DD32F1D23AD5800BE8709 /* WXErrorView.m */; };
 		591DD3321D23AD5800BE8709 /* WXErrorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 591DD3301D23AD5800BE8709 /* WXErrorView.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1050,6 +1052,8 @@
 		37B51EE31E97804D0040A743 /* WXCycleSliderComponent.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXCycleSliderComponent.mm; sourceTree = "<group>"; };
 		45326708213FC84900DAA620 /* WXDisplayLinkManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDisplayLinkManager.h; sourceTree = "<group>"; };
 		45326709213FC84900DAA620 /* WXDisplayLinkManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDisplayLinkManager.m; sourceTree = "<group>"; };
+		453267122140E38900DAA620 /* vcomponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vcomponent.h; sourceTree = "<group>"; };
+		453267132140E38900DAA620 /* vcomponent.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vcomponent.cc; sourceTree = "<group>"; };
 		591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTimerModuleTests.m; sourceTree = "<group>"; };
 		591DD32F1D23AD5800BE8709 /* WXErrorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXErrorView.m; sourceTree = "<group>"; };
 		591DD3301D23AD5800BE8709 /* WXErrorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXErrorView.h; sourceTree = "<group>"; };
@@ -2241,6 +2245,8 @@
 				B8D66AF62125572F003960BD /* vnode.h */,
 				B8D66AF72125572F003960BD /* vnode_exec_env.cc */,
 				B8D66AF82125572F003960BD /* vnode.cc */,
+				453267132140E38900DAA620 /* vcomponent.cc */,
+				453267122140E38900DAA620 /* vcomponent.h */,
 				B8D66AF92125572F003960BD /* vnode_render_context.cc */,
 				B8D66AFA2125572F003960BD /* vnode_exec_env.h */,
 				B8D66AFB2125572F003960BD /* vnode_render_manager.cc */,
@@ -2764,6 +2770,7 @@
 				B8F2C6E62133A83C00635B37 /* common_error.h in Headers */,
 				B8D66BFD2125572F003960BD /* render_performance.h in Headers */,
 				C43C03E81EC8ACA40044C7FF /* WXPrerenderManager.h in Headers */,
+				453267142140E38900DAA620 /* vcomponent.h in Headers */,
 				17C74F0C2072145100AB4CAB /* WXAnalyzerCenter.h in Headers */,
 				B8D66CD121255730003960BD /* thread_impl_darwin.h in Headers */,
 				B8D66CBD21255730003960BD /* closure.h in Headers */,
@@ -3462,6 +3469,7 @@
 				B863DF322107308000EA887D /* WXBridgeContext.m in Sources */,
 				59CE27E91CC387DB000BE37A /* WXEmbedComponent.m in Sources */,
 				DCA0EF651D6EED6F00CB18B9 /* WXGlobalEventModule.m in Sources */,
+				453267152140E38900DAA620 /* vcomponent.cc in Sources */,
 				2A919DA71E321F1F006EB6B5 /* WXBridgeMethod.m in Sources */,
 				7423EB521F4ADE30001662D1 /* WXComponent+DataBinding.mm in Sources */,
 				DCAB35FF1D658EB700C0EA70 /* WXRuleManager.m in Sources */,

@@ -197,7 +197,7 @@ static Value AppendChildComponent(ExecState* exec_state) {
 static Value CreateComponent(ExecState* exec_state) {
   int template_id = 0;
   if (exec_state->GetArgument(0)->type == Value::Type::NUMBER) {
-    template_id = exec_state->GetArgument(0)->i;
+    template_id = static_cast<int>(exec_state->GetArgument(0)->i);
   }
   auto template_name = exec_state->GetArgument(1)->str;
   Value* arg_ref = exec_state->GetArgument(3);
