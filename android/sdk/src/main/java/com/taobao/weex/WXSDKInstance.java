@@ -1312,6 +1312,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void onRenderError(final String errCode, final String msg) {
+    getExceptionRecorder().recordReportErrorMsg("["+errCode+",onRenderError,"+msg+"]");
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
 
@@ -1326,6 +1327,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void onJSException(final String errCode, final String function, final String exception) {
+    getExceptionRecorder().recordReportErrorMsg("["+errCode+","+function+","+exception+"]");
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
 
@@ -1891,7 +1893,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     @Override
     public void onHttpFinish(WXResponse response) {
-      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END);
 
       if (this.instance != null
               && this.instance.getWXStatisticsListener() != null) {
@@ -1972,6 +1973,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXLogUtils.renderPerformanceLog("networkTime", mWXPerformance.networkTime);
       String wxErrorCode = WXInstanceApm.VALUE_ERROR_CODE_DEFAULT;
       if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
+        mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END);
         String template = new String(response.originalData);
         render(pageName, template, options, jsonInitData, flag);
 
@@ -1996,6 +1998,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         );
       }
       else {
+        getExceptionRecorder().isDownLoadBundleFailed = true;
         wxErrorCode = WXErrorCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode();
         onRenderError(wxErrorCode,
                 response.errorMsg);
@@ -2019,10 +2022,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public String getTemplateInfo() {
     String template = getTemplate();
     if(template == null){
-      return " template md5 null " + JSONObject.toJSONString(responseHeaders);
+      return " template md5 null ,httpHeader:" + JSONObject.toJSONString(responseHeaders);
     }
     if(TextUtils.isEmpty(template)){
-      return " template md5  length 0 " + JSONObject.toJSONString(responseHeaders);
+      return " template md5  length 0 ,httpHeader" + JSONObject.toJSONString(responseHeaders);
     }
     try {
       byte[] bts = template.getBytes("UTF-8");
@@ -2037,7 +2040,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       return " template md5 " + sourceMD5 + " length " +   bts.length
               + " base64 md5 " + sourceBase64MD5
               + " response header " + JSONObject.toJSONString(responseHeaders);
-    } catch (UnsupportedEncodingException e) {
+    } catch (Exception e) {
       return "template md5 getBytes error";
     }
 

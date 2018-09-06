@@ -196,8 +196,8 @@ public enum WXErrorCode {
   /**
    * WX Key Exception Commit Bundle Js Download
    */
-  WX_KEY_EXCEPTION_JS_DOWNLOAD("-9200", "[WX_KEY_EXCEPTION_JS_DOWNLOAD]|",ErrorType.NATIVE_ERROR,ErrorGroup.NET),
-  WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED("-9201", "[WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED] | details",ErrorType.NATIVE_ERROR,ErrorGroup.NET),
+  WX_KEY_EXCEPTION_JS_DOWNLOAD("-9200", "[WX_KEY_EXCEPTION_JS_DOWNLOAD]|",ErrorType.DOWN_LOAD_ERROR,ErrorGroup.NATIVE),
+  WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED("-9201", "[WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED] | details",ErrorType.DOWN_LOAD_ERROR,ErrorGroup.NATIVE),
 
   /**
    * WX Key Exception Commit RT DomAction Excute
@@ -245,7 +245,7 @@ public enum WXErrorCode {
   /**
    * degrade code.
    */
-  WX_DEGRAD_ERR("-1000", "degradeToH5|Weex DegradPassivity \n",ErrorType.DEGRAD_ERROR,ErrorGroup.JS),
+  WX_DEGRAD_ERR("-1000", "degradeToH5|Weex DegradPassivity ->",ErrorType.DEGRAD_ERROR,ErrorGroup.JS),
 
   /**
    * degrade for instance create failed, once this case occured,detail js stack and other specific
@@ -257,20 +257,20 @@ public enum WXErrorCode {
    * degrade for network failed download js bundle.once this case occured,network requist response header
    * and statuscode need track into errmsg.
    */
-  WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED("-1002", "|wx_network_error|js bundle download failed",ErrorType.DEGRAD_ERROR,ErrorGroup.NET),
+  WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED("-1002", "|wx_network_error|js bundle download failed",ErrorType.DOWN_LOAD_ERROR,ErrorGroup.NATIVE),
 
   /**
    * degrade for network failed for bundlejs is unbroken , once this case occured,network requist response header
    * and statuscode need track into errmsg.
    */
-  WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED("-1003", "degradeToH5|wx_network_error|js bundle content-length check failed",ErrorType.DEGRAD_ERROR,ErrorGroup.NET),
+  WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED("-1003", "degradeToH5|wx_network_error|js bundle content-length check failed",ErrorType.DEGRAD_ERROR,ErrorGroup.NATIVE),
 
   /**
    * degrade for Response header Content-Type is null or not "application/javascript".
    * once this case occured,network requist response header and statuscode need track into errmsg.
    */
   WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR("-1004", "degradeToH5|wx_user_intercept_error |Content-Type is not application/javascript, " +
-          "Weex render template must be javascript, please check your request!",ErrorType.DEGRAD_ERROR,ErrorGroup.NET),
+          "Weex render template must be javascript, please check your request!",ErrorType.DEGRAD_ERROR,ErrorGroup.NATIVE),
 
   /**
    * degrade for other reason. such as white screen which block error for some unknown reason.
@@ -337,12 +337,12 @@ public enum WXErrorCode {
     JS_ERROR,
     NATIVE_ERROR,
     RENDER_ERROR,
-    DEGRAD_ERROR
+    DEGRAD_ERROR,
+    DOWN_LOAD_ERROR
   }
 
   public enum ErrorGroup{
     JS,
-    NATIVE,
-    NET
+    NATIVE
   }
 }

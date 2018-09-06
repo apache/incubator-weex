@@ -28,10 +28,10 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.common.WXErrorCode;
-import com.taobao.weex.common.WXErrorCode.ErrorType;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.performance.WXInstanceExceptionRecord;
 
 /**
@@ -108,7 +108,21 @@ public class WXExceptionUtils {
                 }
                 commitMap.put(WXInstanceExceptionRecord.KEY_EXP_STAGE_LIST,instance.getExceptionRecorder().convertStageToStr());
                 String bundleTemplate = instance.getTemplate();
-                commitMap.put("wxTemplateOfBundle",null == bundleTemplate ?"has recycle by gc":bundleTemplate);
+                if (null == bundleTemplate){
+                    bundleTemplate = "has recycle by gc";
+                }else {
+                    int length = bundleTemplate.length();
+                    bundleTemplate = bundleTemplate.substring(0,Math.min(length,300));
+                }
+                commitMap.put("wxTemplateOfBundle",bundleTemplate);
+
+                Long pageStartTime = instance.getExceptionRecorder().getStageTime(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
+                if (null == pageStartTime){
+                    pageStartTime = instance.getExceptionRecorder().getStageTime(WXInstanceApm.KEY_PAGE_STAGES_RENDER_ORGIGIN);
+                }
+                if (null != pageStartTime){
+                    commitMap.put("wxUseTime", String.valueOf(WXUtils.getFixUnixTime() - pageStartTime));
+                }
             }
         } else {//instance is null for instance id is null
             if (commitMap.size() > 0) {
@@ -117,12 +131,17 @@ public class WXExceptionUtils {
             }
         }
 
+        String illegalValue = commitMap.get("errorCode");
+        if (null != illegalValue && illegalValue.length()>200){
+            commitMap.remove("errorCode");
+        }
+
         exceptionCommit = new WXJSExceptionInfo(instanceIdCommit, bundleUrlCommit, errCode, function, exceptionMsgCommit, commitMap);
         if (adapter != null) {
             adapter.onJSException(exceptionCommit);
         }
 
-        if (null != instance && exceptionCommit.getErrCode().getErrorType() != ErrorType.RENDER_ERROR){
+        if (null != instance ){
             instance.getExceptionRecorder().recordErrorMsg(exceptionCommit);
         }
 

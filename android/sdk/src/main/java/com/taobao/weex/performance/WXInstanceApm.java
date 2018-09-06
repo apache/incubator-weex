@@ -107,6 +107,7 @@ public class WXInstanceApm {
     private Map<String, Double> recordStatsMap;
     private boolean isFSEnd;
     private boolean mHasInit = false;
+    private boolean mEnd = false;
     private boolean hasRecordFistInteractionView =false;
     public final Map<String,Object> extInfo;
 
@@ -148,7 +149,7 @@ public class WXInstanceApm {
         if (null != instance){
             instance.getExceptionRecorder().recordStage(name, time);
         }
-        if (null == apmInstance) {
+        if (null == apmInstance || mEnd) {
             return;
         }
         apmInstance.onStage(name, time);
@@ -159,7 +160,7 @@ public class WXInstanceApm {
      * record property
      */
     public void addProperty(String key, Object value) {
-        if (null == apmInstance) {
+        if (null == apmInstance || mEnd) {
             return;
         }
         apmInstance.addProperty(key, value);
@@ -169,7 +170,7 @@ public class WXInstanceApm {
      * record statistic
      */
     public void addStats(String key, double value) {
-        if (null == apmInstance) {
+        if (null == apmInstance || mEnd) {
             return;
         }
         apmInstance.addStats(key, value);
@@ -234,11 +235,12 @@ public class WXInstanceApm {
      * end record
      */
     public void onEnd() {
-        if (null == apmInstance) {
+        if (null == apmInstance || mEnd) {
             return;
         }
         onStage(KEY_PAGE_STAGES_DESTROY);
         apmInstance.onEnd();
+        mEnd = true;
     }
 
     public void arriveFSRenderTime() {
