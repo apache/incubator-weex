@@ -189,6 +189,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 - (void)_addEventOnMainThread:(NSString *)eventName;
 - (void)_removeEventOnMainThread:(NSString *)eventName;
 
+- (void)_collectSubcomponents:(NSMutableArray *)components;
+
 ///--------------------------------------
 /// @name Protected Methods
 ///--------------------------------------

@@ -312,7 +312,14 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
     [self removeTouchCancelEvent];
     [self removeSwipeEvent];
     [self removePseudoTouchEvent];
+}
 
+- (void)_collectSubcomponents:(NSMutableArray *)components
+{
+    for (WXComponent* c in _subcomponents) {
+        [components addObject:c];
+        [c _collectSubcomponents:components];
+    }
 }
 
 #pragma mark - Appear & Disappear
