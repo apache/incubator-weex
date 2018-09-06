@@ -438,9 +438,13 @@ WX_EXPORT_METHOD(@selector(save:))
             //check view/img size
             if (!error && image && imageView && ![curUrl isEqualToString:self.preUrl]) {
                 self.preUrl = curUrl;
-                double imageSize = image.size.width  * image.size.height;
-                double viewSize = imageView.frame.size.height *  imageView.frame.size.width;
-                if (imageSize > viewSize+10) {
+                CGFloat screenScale = [[UIScreen mainScreen] scale];
+                double imageSize = image.size.width*image.scale  * image.size.height*image.scale;
+                double viewSize = imageView.frame.size.height *screenScale*  imageView.frame.size.width * screenScale;
+                CGFloat sizeRatio = imageSize/viewSize;
+                
+                //minDiffSize limt 40*40
+                if (sizeRatio>1.2 && (imageSize-viewSize) > 1600) {
                     self.weexInstance.performance.imgWrongSizeNum++;
                     [self.weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT withDiffValue:1];
                 }
