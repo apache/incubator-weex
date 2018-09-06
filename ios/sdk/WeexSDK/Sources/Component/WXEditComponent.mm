@@ -917,6 +917,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         CGRect inputFrame = [self.view.superview convertRect:self.view.frame toView:rootView];
         if (keyboardRect.origin.y - inputFrame.size.height <= inputFrame.origin.y) {
             [self setViewMovedUp:YES];
+            self.weexInstance.isRootViewFrozen = YES;
         }
     }
     
@@ -937,6 +938,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         if (!CGRectEqualToRect(self.weexInstance.frame, rootView.frame)) {
             [self setViewMovedUp:NO];
         }
+        self.weexInstance.isRootViewFrozen = NO;
     }
     if (_keyboardEvent) {
         [self fireEvent:@"keyboard" params:@{ @"isShow": @NO }];

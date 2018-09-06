@@ -149,7 +149,7 @@ namespace WeexCore
 
 + (void)setViewportWidth:(NSString*)pageId width:(CGFloat)width;
 
-+ (void)layoutPage:(NSString*)pageId size:(CGSize)size forced:(BOOL)forced;
++ (void)layoutPage:(NSString*)pageId forced:(BOOL)forced;
 
 + (void)closePage:(NSString*)pageId;
 

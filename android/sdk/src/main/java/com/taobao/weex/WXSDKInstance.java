@@ -83,6 +83,7 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -1610,8 +1611,19 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mWXScrollListeners.add(wxScrollListener);
   }
 
+  static int sScreenHeight = -1;
   public void setSize(int width, int height) {
     if (width > 0 && height > 0 & !isDestroy && mRendered && mRenderContainer != null) {
+        if (sScreenHeight < 0){
+            sScreenHeight = WXViewUtils.getScreenHeight(getContext());
+        }
+        if (sScreenHeight>0){
+            double screenRatio = (double)height/(double)sScreenHeight *100;
+            if(screenRatio>100){
+              screenRatio =100;
+            }
+            getApmForInstance().addStats(WXInstanceApm.KEY_PAGE_STATS_BODY_RATIO,screenRatio);
+        }
       ViewGroup.LayoutParams layoutParams = mRenderContainer.getLayoutParams();
       if (layoutParams != null) {
         final float realWidth = width;

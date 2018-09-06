@@ -175,7 +175,8 @@ static NSThread *WXComponentThread;
     CGSize size = _weexInstance.frame.size;
     [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId
                                         width:size.width height:size.height
-                           isWidthWrapContent:NO isHeightWrapContent:NO];
+                           isWidthWrapContent:size.width == 0.0f isHeightWrapContent:size.height == 0.0f];
+    [_rootComponent setNeedsLayout];
     [self startComponentTasks];
 }
 
@@ -225,7 +226,7 @@ static NSThread *WXComponentThread;
     CGSize size = _weexInstance.frame.size;
     [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId
                                         width:size.width height:size.height
-                           isWidthWrapContent:NO isHeightWrapContent:NO];
+                           isWidthWrapContent:size.width == 0.0f isHeightWrapContent:size.height == 0.0f];
     
     __weak typeof(self) weakSelf = self;
     WX_MONITOR_INSTANCE_PERF_END(WXFirstScreenJSFExecuteTime, self.weexInstance);
@@ -707,8 +708,20 @@ static NSThread *WXComponentThread;
     WXAssertComponentThread();
     WXAssertParam(component);
     
-    if ([component _isCaculatedFrameChanged:frame])
-    {
+    if (component == _rootComponent) {
+        if (!CGSizeEqualToSize(frame.size, self.weexInstance.frame.size)) {
+            // Synchronize view frame with root component, especially for content wrap mode.
+            WXPerformBlockOnMainThread(^{
+                if (!self.weexInstance.isRootViewFrozen) {
+                    CGRect rect = self.weexInstance.rootView.frame; // no change of origin
+                    rect.size = frame.size;
+                    self.weexInstance.rootView.frame = rect;
+                }
+            });
+        }
+    }
+    
+    if ([component _isCaculatedFrameChanged:frame]) {
         [component _assignCalculatedFrame:frame];
         [component _assignInnerContentMainSize:innerMainSize];
         [component _frameDidCalculated:YES];
@@ -945,7 +958,7 @@ static NSThread *WXComponentThread;
 
 - (void)_layout
 {
-    [WXCoreBridge layoutPage:_weexInstance.instanceId size:_weexInstance.frame.size forced:[_rootComponent needsLayout]];
+    [WXCoreBridge layoutPage:_weexInstance.instanceId forced:[_rootComponent needsLayout]];
 }
 
 - (void) _printFlexComponentFrame:(WXComponent *)component
