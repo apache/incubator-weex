@@ -180,8 +180,8 @@ typedef enum : NSUInteger {
 
 - (NSString *)description
 {
-    CGRect frame = _rootView.frame;
-    return [NSString stringWithFormat:@"<%@: %p; id = %@; rootView = %p; rootView frame = (%f, %f, %f, %f); url= %@>", NSStringFromClass([self class]), self, _instanceId, (__bridge void*)_rootView, frame.origin.x, frame.origin.y, frame.size.width, frame.size.height, _scriptURL];
+    // get _rootView.frame in JS thread may cause deaklock.
+    return [NSString stringWithFormat:@"<%@: %p; id = %@; rootView = %p; url= %@>", NSStringFromClass([self class]), self, _instanceId, (__bridge void*)_rootView, _scriptURL];
 }
 
 #pragma mark Public Mehtods
@@ -190,7 +190,6 @@ typedef enum : NSUInteger {
 {
     return _rootView;
 }
-
 
 - (void)setFrame:(CGRect)frame
 {
