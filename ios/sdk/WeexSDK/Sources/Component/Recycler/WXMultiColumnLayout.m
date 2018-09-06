@@ -349,7 +349,9 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 
 - (CGFloat)contentWidth
 {
-    return [self.delegate collectionView:self.collectionView contentWidthForLayout:self];
+    WXAssertClass(self.delegate, WXComponent);
+    CGFloat availableContentWidth = [self.delegate collectionView:self.collectionView contentWidthForLayout:self];
+    return isnan(availableContentWidth)?((WXComponent*)(self.delegate)).view.frame.size.width:availableContentWidth;
 }
 
 - (CGFloat)contentHeight
