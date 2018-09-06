@@ -255,6 +255,7 @@ do {\
         WXTransform* transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:transformOrigin] instance:self.weexInstance];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [transform applyTransformForView:_view];
+            [self _adjustForRTL];
             [_layer setNeedsDisplay];
         }
         self.transform = transform;
@@ -262,6 +263,7 @@ do {\
         [_transform setTransformOrigin:[WXConvert NSString:styles[@"transformOrigin"]]];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [_transform applyTransformForView:_view];
+            [self _adjustForRTL];
             [_layer setNeedsDisplay];
         }
     }

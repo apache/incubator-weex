@@ -457,12 +457,10 @@ typedef NS_ENUM(NSInteger, Direction) {
 - (void)layoutDidFinish
 {
     _recycleSliderView.currentIndex = _index;
-    [self adjustForRTL];
 }
 
 - (void)_buildViewHierarchyLazily {
     [super _buildViewHierarchyLazily];
-    [self adjustForRTL];
 }
 
 - (void)adjustForRTL
@@ -472,18 +470,18 @@ typedef NS_ENUM(NSInteger, Direction) {
     if (_flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL
         ) {
         WXRecycleSliderView *slider = (WXRecycleSliderView *)self.view;
-        CGAffineTransform transform = CGAffineTransformScale(CGAffineTransformIdentity, -1, 1);
-        slider.scrollView.transform = transform ;
-        if (slider.indicator) {
-            slider.indicator.transform = transform;
-        }
+        CATransform3D transform = CATransform3DScale(CATransform3DIdentity, -1, 1, 1);
+        slider.scrollView.layer.transform = transform ;
     } else {
         WXRecycleSliderView *slider = (WXRecycleSliderView *)self.view;
-        slider.scrollView.transform = CGAffineTransformIdentity ;
-        if (slider.indicator) {
-            slider.indicator.transform = CGAffineTransformIdentity;
-        }
+        slider.scrollView.layer.transform = CATransform3DIdentity ;
     }
+
+}
+
+- (void)_adjustForRTL {
+    [super _adjustForRTL];
+    [self adjustForRTL];
 }
 
 - (BOOL)shouldTranformSubviewsWhenRTL {

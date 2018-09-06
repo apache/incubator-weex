@@ -235,7 +235,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if ([self isViewLoaded]) {
         [self setContentSize:_contentSize];
         [self adjustSticky];
-        [self adjustForRTL];
         [self handleAppear];
     }
     
@@ -245,7 +244,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)_buildViewHierarchyLazily
 {
     [super _buildViewHierarchyLazily];
-    [self adjustForRTL];
     [self handleAppear];
 }
 
@@ -379,10 +377,21 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     // scroll layout not use direction, use self tranform
     if (self.view && _flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL
         ) {
-        self.view.transform = CGAffineTransformScale(CGAffineTransformIdentity, -1, 1);
+        if (_transform) {
+            self.view.layer.transform = CATransform3DConcat(self.view.layer.transform, CATransform3DScale(CATransform3DIdentity, -1, 1, 1));
+        } else {
+            self.view.layer.transform = CATransform3DScale(CATransform3DIdentity, -1, 1, 1);
+        }
     } else {
-        self.view.transform = CGAffineTransformIdentity;
+        if (!_transform) {
+            self.view.layer.transform = CATransform3DIdentity;
+        }
     }
+}
+
+- (void)_adjustForRTL {
+    [super _adjustForRTL];
+    [self adjustForRTL];
 }
 
 - (void)adjustSticky

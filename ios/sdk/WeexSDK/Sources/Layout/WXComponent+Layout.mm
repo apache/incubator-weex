@@ -173,6 +173,8 @@ bool flexIsUndefined(float value) {
                 [strongSelf->_transform applyTransformForView:strongSelf.view];
             }
             
+            [self _adjustForRTL];
+            
             if (strongSelf->_backgroundImage) {
                 [strongSelf setGradientLayer];
             }
@@ -223,15 +225,21 @@ bool flexIsUndefined(float value) {
     if (_positionType == WXPositionTypeSticky) {
         [self.ancestorScroller adjustSticky];
     }
-    [self _adjustForRTL];
+
     [self layoutDidFinish];
 }
 
 - (void)_adjustForRTL {
     if (self.supercomponent && self.supercomponent->_flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL && [self.supercomponent shouldTranformSubviewsWhenRTL]) {
-        self.view.transform = CGAffineTransformScale(CGAffineTransformIdentity, -1, 1);
+        if (_transform) {
+            self.view.layer.transform = CATransform3DConcat(self.view.layer.transform, CATransform3DScale(CATransform3DIdentity, -1, 1, 1));
+        } else {
+            self.view.layer.transform = CATransform3DScale(CATransform3DIdentity, -1, 1, 1);
+        }
     } else {
-        self.view.transform = CGAffineTransformIdentity;
+        if (!_transform) {
+            self.view.layer.transform = CATransform3DIdentity;
+        }
     }
 }
 

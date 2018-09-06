@@ -385,10 +385,12 @@ static BOOL bNeedRemoveEvents = YES;
         if (_backgroundImage) {
             [self setGradientLayer];
         }
-        
+
         if (_transform) {
             [_transform applyTransformForView:_view];
         }
+        
+        [self _adjustForRTL];
         
         if (_boxShadow) {
             [self configBoxShadow:_boxShadow];
@@ -476,7 +478,6 @@ static BOOL bNeedRemoveEvents = YES;
         WXComponent *subcomponent = subcomponents[i];
         [self insertSubview:subcomponent atIndex:i];
     }
-    [self _adjustForRTL];
 }
 
 - (void)_resetNativeBorderRadius
@@ -773,6 +774,7 @@ static BOOL bNeedRemoveEvents = YES;
     self.transform = [[WXTransform alloc] initWithNativeTransform:CATransform3DMakeAffineTransform(transform) instance:self.weexInstance];
     if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
         [_transform applyTransformForView:_view];
+        [self _adjustForRTL];
         [_layer setNeedsDisplay];
     }
 }
