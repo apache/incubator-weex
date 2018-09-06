@@ -100,7 +100,8 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
         }
     };
     
-    [loader start];
+    id<WXResourceRequestHandler> resourceRequestHandler = [self.weexInstance.handlerFactory handlerForProtocol:@protocol(WXResourceRequestHandler)];
+    [loader startWithRequestHandler:resourceRequestHandler];
 }
 
 - (void)fetchWithArrayBuffer:(id)arrayBuffer options:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback progressCallback:(WXModuleKeepAliveCallback)progressCallback
@@ -449,7 +450,8 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
         }
     };
 
-    [loader start];
+    id<WXResourceRequestHandler> resourceRequestHandler = [self.weexInstance.handlerFactory handlerForProtocol:@protocol(WXResourceRequestHandler)];
+    [loader startWithRequestHandler:resourceRequestHandler];
 }
 
 @end

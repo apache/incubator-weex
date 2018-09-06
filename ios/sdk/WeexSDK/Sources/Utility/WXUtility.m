@@ -592,6 +592,11 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 + (void)getIconfont:(NSURL *)url completion:(void(^)(NSURL *url, NSError *error))completionBlock
 {
+    [self getIconfont:url weexInstance:nil completion:completionBlock];
+}
+
++ (void)getIconfont:(NSURL *)url weexInstance:(WXSDKInstance *)weexInstance completion:(void(^)(NSURL *url, NSError *error))completionBlock
+{
     if ([url isFileURL]) {
         // local file url
         NSError * error = nil;
@@ -637,7 +642,14 @@ CGFloat WXFloorPixelValue(CGFloat value)
         completionBlock(nil, error);
     };
     
-    [iconfontLoader start];
+    if (weexInstance) {
+        id<WXResourceRequestHandler> resourceRequestHandler = [weexInstance.handlerFactory handlerForProtocol:@protocol(WXResourceRequestHandler)];
+        [iconfontLoader startWithRequestHandler:resourceRequestHandler];
+    }
+    else
+    {
+        [iconfontLoader start];
+    }
 }
 
 + (BOOL)isFileExist:(NSString *)filePath

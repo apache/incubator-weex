@@ -596,7 +596,10 @@ WX_EXPORT_METHOD(@selector(save:))
     static id<WXImgLoaderProtocol> imageLoader;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        imageLoader = [WXHandlerFactory handlerForProtocol:@protocol(WXImgLoaderProtocol)];
+        imageLoader = [self.weexInstance.handlerFactory handlerForProtocol:@protocol(WXImgLoaderProtocol)];
+        if (!imageLoader) {
+            imageLoader = [WXHandlerFactory handlerForProtocol:@protocol(WXImgLoaderProtocol)];
+        }
     });
     return imageLoader;
 }

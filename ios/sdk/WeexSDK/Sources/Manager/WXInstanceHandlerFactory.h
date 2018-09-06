@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -18,27 +18,8 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXResourceRequest.h"
-#import "WXResourceResponse.h"
-#import "WXResourceRequestHandler.h"
 
-
-@interface WXResourceLoader : NSObject
-
-@property (nonatomic, strong) WXResourceRequest *request;
-
-@property (nonatomic, copy) void (^onDataSent)(unsigned long long /* bytesSent */, unsigned long long /* totalBytesToBeSent */);
-@property (nonatomic, copy) void (^onResponseReceived)(const WXResourceResponse *);
-@property (nonatomic, copy) void (^onDataReceived)(NSData *);
-@property (nonatomic, copy) void (^onFinished)(const WXResourceResponse *, NSData *);
-@property (nonatomic, copy) void (^onFailed)(NSError *);
-
-- (instancetype)initWithRequest:(WXResourceRequest *)request;
-
-- (void)startWithRequestHandler:(id<WXResourceRequestHandler>)networkHandler;
-
-- (void)start;
-
-- (void)cancel:(NSError **)error;
-
+@interface WXInstanceHandlerFactory : NSObject
+- (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol;
+- (id)handlerForProtocol:(Protocol *)protocol;
 @end

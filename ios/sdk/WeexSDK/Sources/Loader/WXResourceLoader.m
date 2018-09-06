@@ -17,7 +17,6 @@
  * under the License.
  */
 #import "WXResourceLoader.h"
-#import "WXResourceRequestHandler.h"
 #import "WXSDKInstance.h"
 #import "WXLog.h"
 #import "WXHandlerFactory.h"
@@ -58,19 +57,30 @@
 
 - (void)start
 {
+    [self startWithRequestHandler:nil];
+}
+
+- (void)startWithRequestHandler:(id<WXResourceRequestHandler>)networkHandler
+{
     if ([_request.URL isFileURL]) {
         [self _handleFileURL:_request.URL];
         return;
     }
     
-    id<WXResourceRequestHandler> requestHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXResourceRequestHandler)];
-    if (requestHandler) {
-        [requestHandler sendRequest:_request withDelegate:self];
-    } else if ([WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXNetworkProtocol")]){
-        // deprecated logic
-        [self _handleDEPRECATEDNetworkHandler];
-    } else {
-        WXLogError(@"No resource request handler found!");
+    if (networkHandler) {
+        [networkHandler sendRequest:_request withDelegate:self];
+    }
+    else
+    {
+        id<WXResourceRequestHandler> requestHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXResourceRequestHandler)];
+        if (requestHandler) {
+            [requestHandler sendRequest:_request withDelegate:self];
+        } else if ([WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXNetworkProtocol")]){
+            // deprecated logic
+            [self _handleDEPRECATEDNetworkHandler];
+        } else {
+            WXLogError(@"No resource request handler found!");
+        }
     }
 }
 

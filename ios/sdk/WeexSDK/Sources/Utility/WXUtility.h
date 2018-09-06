@@ -251,6 +251,8 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  */
 + (void)getIconfont:(NSURL * _Nonnull)fontURL completion:( void(^ _Nullable )(NSURL * _Nonnull url, NSError * _Nullable error)) completionBlock;
 
++ (void)getIconfont:(NSURL * _Nonnull)fontURL weexInstance:(WXSDKInstance *_Nullable)weexInstance completion:( void(^ _Nullable )(NSURL * _Nonnull url, NSError * _Nullable error)) completionBlock;
+
 /**
  * @abstract Returns the main screen's size when the device is in portrait mode,.
  */

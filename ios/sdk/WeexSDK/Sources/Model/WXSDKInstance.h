@@ -24,6 +24,8 @@
 #import "WXResourceRequest.h"
 #import "WXBridgeProtocol.h"
 #import "WXApmForInstance.h"
+#import "WXResourceRequestHandler.h"
+#import "WXInstanceHandlerFactory.h"
 
 extern NSString *const bundleUrlOptionKey;
 
@@ -76,7 +78,7 @@ extern NSString *const bundleUrlOptionKey;
  **/
 @property (nonatomic, assign) BOOL needPrerender;
 
-@property (nonatomic , strong) NSDictionary* containerInfo;
+@property (nonatomic, strong) NSDictionary* containerInfo;
 
 /**
  * The state of current instance.
@@ -209,6 +211,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  * track component render
  */
 @property (nonatomic, assign)BOOL trackComponent;
+
+@property (nonatomic, strong) WXInstanceHandlerFactory *handlerFactory;
+
+- (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol;
+
 /**
  * Renders weex view with bundle url.
  *

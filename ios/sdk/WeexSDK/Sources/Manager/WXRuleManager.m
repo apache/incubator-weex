@@ -111,7 +111,7 @@ static WXRuleManager *_sharedInstance = nil;
                 return;
             }
             __weak typeof(self) weakSelf = self;
-            [WXUtility getIconfont:fontURL completion:^(NSURL * _Nonnull url, NSError * _Nullable error) {
+            [WXUtility getIconfont:fontURL weexInstance:self.instance completion:^(NSURL * _Nonnull url, NSError * _Nullable error) {
                 if (!error && url) {
                     // load success
                     WXThreadSafeMutableDictionary * dictForFontFamily = [weakSelf.fontStorage objectForKey:rule[@"fontFamily"]];

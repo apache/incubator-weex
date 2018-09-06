@@ -485,7 +485,8 @@ typedef enum : NSUInteger {
         [weakSelf.apmInstance setProperty:KEY_PROPERTIES_ERROR_CODE withValue:[@(wxErrorCode) stringValue]];
     };
     
-    [_mainBundleLoader start];
+    id<WXResourceRequestHandler> resourceRequestHandler = [self.handlerFactory handlerForProtocol:@protocol(WXResourceRequestHandler)];
+    [_mainBundleLoader startWithRequestHandler:resourceRequestHandler];
 }
 
 - (void)reload:(BOOL)forcedReload
@@ -822,6 +823,19 @@ typedef enum : NSUInteger {
             [self destroyInstance];
         }
     }
+}
+
+- (WXInstanceHandlerFactory *)handlerFactory
+{
+    if (!_handlerFactory) {
+        _handlerFactory = [WXInstanceHandlerFactory new];
+    }
+    return _handlerFactory;
+}
+
+- (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol
+{
+    [self.handlerFactory registerHandler:handler withProtocol:protocol];
 }
 
 @end
