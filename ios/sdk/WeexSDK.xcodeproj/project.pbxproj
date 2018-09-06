@@ -656,6 +656,8 @@
 		B8F2C7112133A83C00635B37 /* ast_builder.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8F2C6E32133A83C00635B37 /* ast_builder.cc */; };
 		B8F2C7142133A8BC00635B37 /* vm_monitor.h in Headers */ = {isa = PBXBuildFile; fileRef = B8F2C7132133A8BC00635B37 /* vm_monitor.h */; };
 		B8F2C7152133A8BC00635B37 /* vm_monitor.h in Headers */ = {isa = PBXBuildFile; fileRef = B8F2C7132133A8BC00635B37 /* vm_monitor.h */; };
+		B8F3323C2141A4C600701BA0 /* string_util.h in Headers */ = {isa = PBXBuildFile; fileRef = B8F3323B2141A4C500701BA0 /* string_util.h */; };
+		B8F3323D2141A4C600701BA0 /* string_util.h in Headers */ = {isa = PBXBuildFile; fileRef = B8F3323B2141A4C500701BA0 /* string_util.h */; };
 		BA5F00F11FC5AFFE00F76B5C /* WXLocaleModule.h in Headers */ = {isa = PBXBuildFile; fileRef = BA5F00EF1FC5AFFE00F76B5C /* WXLocaleModule.h */; };
 		BA5F00F21FC5AFFE00F76B5C /* WXLocaleModule.m in Sources */ = {isa = PBXBuildFile; fileRef = BA5F00F01FC5AFFE00F76B5C /* WXLocaleModule.m */; };
 		BA5F00F31FC6834900F76B5C /* WXLocaleModule.h in Headers */ = {isa = PBXBuildFile; fileRef = BA5F00EF1FC5AFFE00F76B5C /* WXLocaleModule.h */; };
@@ -1441,6 +1443,7 @@
 		B8F2C6E22133A83C00635B37 /* rax_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rax_parser.h; sourceTree = "<group>"; };
 		B8F2C6E32133A83C00635B37 /* ast_builder.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ast_builder.cc; sourceTree = "<group>"; };
 		B8F2C7132133A8BC00635B37 /* vm_monitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vm_monitor.h; sourceTree = "<group>"; };
+		B8F3323B2141A4C500701BA0 /* string_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = string_util.h; sourceTree = "<group>"; };
 		BA5F00EF1FC5AFFE00F76B5C /* WXLocaleModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXLocaleModule.h; sourceTree = "<group>"; };
 		BA5F00F01FC5AFFE00F76B5C /* WXLocaleModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXLocaleModule.m; sourceTree = "<group>"; };
 		C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXFloatCompareTests.m; sourceTree = "<group>"; };
@@ -2490,6 +2493,7 @@
 		B8D66B872125572F003960BD /* base */ = {
 			isa = PBXGroup;
 			children = (
+				B8F3323B2141A4C500701BA0 /* string_util.h */,
 				B8D66B8F2125572F003960BD /* LogDefines.h */,
 				B8D66B882125572F003960BD /* TimeUtils.h */,
 				B8D66B9C2125572F003960BD /* CoreConstants.h */,
@@ -2602,6 +2606,7 @@
 				77D161201C02DDB40010B15B /* WXSDKEngine.h in Headers */,
 				B8A72C9C213F8BAE0024E7BE /* class_string.h in Headers */,
 				745ED2DA1C5F2C7E002DB5A8 /* WXView.h in Headers */,
+				B8F3323C2141A4C600701BA0 /* string_util.h in Headers */,
 				17B122252090AAB000387E33 /* WXSDKError.h in Headers */,
 				2AE5B7521CAB7DBD0082FDDB /* WXAComponent.h in Headers */,
 				B8D66CC521255730003960BD /* thread_local.h in Headers */,
@@ -3012,6 +3017,7 @@
 				B8D66C5A21255730003960BD /* render_action_remove_element.h in Headers */,
 				DCA445FC1EFA5A3E00D0CFA8 /* WXStreamModule.h in Headers */,
 				B8D66C5C21255730003960BD /* render_action_add_element.h in Headers */,
+				B8F3323D2141A4C600701BA0 /* string_util.h in Headers */,
 				DCA446091EFA5A6D00D0CFA8 /* WXThreadSafeCounter.h in Headers */,
 				B8D66C3421255730003960BD /* render_action_update_attr.h in Headers */,
 				DCA445F11EFA5A2000D0CFA8 /* WXCanvasComponent.h in Headers */,
@@ -3387,7 +3393,6 @@
 				74A4BA9B1CB3BAA100195969 /* WXThreadSafeMutableDictionary.m in Sources */,
 				77E65A1A1C155F25008B8775 /* WXScrollerComponent.mm in Sources */,
 				747A787D1D1BAAC900DED9D0 /* WXComponent+ViewManagement.mm in Sources */,
-				1771795521412A5D006F39A9 /* WXApmForInstance.m in Sources */,
 				C4E375371E5FCBD3009B2D9C /* WXComponent+BoxShadow.m in Sources */,
 				C43C03E91EC8ACA40044C7FF /* WXPrerenderManager.m in Sources */,
 				B8D66BD12125572F003960BD /* statement.cc in Sources */,
@@ -3751,7 +3756,6 @@
 				B8D66BF62125572F003960BD /* token.cc in Sources */,
 				DCA4458D1EFA55B300D0CFA8 /* WXInvocationConfig.m in Sources */,
 				DCA4458E1EFA55B300D0CFA8 /* WXDatePickerManager.m in Sources */,
-				1771795621412A5D006F39A9 /* WXApmForInstance.m in Sources */,
 				DCA4458F1EFA55B300D0CFA8 /* WXSDKManager.m in Sources */,
 				B8F2C6F52133A83C00635B37 /* rax_parser_statistics.cc in Sources */,
 				DCA445901EFA55B300D0CFA8 /* WXBridgeManager.m in Sources */,
