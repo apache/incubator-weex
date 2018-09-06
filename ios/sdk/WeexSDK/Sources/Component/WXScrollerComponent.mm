@@ -785,15 +785,50 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     // Page stop effect
     if (_pagingEnabled && _pageSize > 0) {
         if (_scrollDirection == WXScrollDirectionVertical) {
-            CGFloat targetY = scrollView.contentOffset.y + velocity.y * 60.0;
+            CGFloat targetY = scrollView.contentOffset.y + velocity.y * 120.0;
             CGFloat targetIndex = round(targetY / _pageSize);
+            
+            /*
+             When user's finger departs from screen with any velocity (like swipe gesture).
+             We make sure that target index is changed.
+             */
+            CGFloat sourceIndex = round(_scrollStartPoint.y / _pageSize);
+            if (velocity.y > 0.3) {
+                if (targetIndex <= sourceIndex) {
+                    targetIndex = sourceIndex + 1;
+                }
+            }
+            else if (velocity.y < -0.3) {
+                if (targetIndex >= sourceIndex) {
+                    targetIndex = sourceIndex - 1;
+                }
+            }
+            
             if (targetIndex < 0)
                 targetIndex = 0;
+            
             targetContentOffset->y = targetIndex * _pageSize;
         }
         else {
-            CGFloat targetX = scrollView.contentOffset.x + velocity.x * 60.0;
+            CGFloat targetX = scrollView.contentOffset.x + velocity.x * 120.0;
             CGFloat targetIndex = round(targetX / _pageSize);
+            
+            /*
+             When user's finger departs from screen with any velocity (like swipe gesture).
+             We make sure that target index is changed.
+             */
+            CGFloat sourceIndex = round(_scrollStartPoint.x / _pageSize);
+            if (velocity.x > 0.3) {
+                if (targetIndex <= sourceIndex) {
+                    targetIndex = sourceIndex + 1;
+                }
+            }
+            else if (velocity.x < -0.3) {
+                if (targetIndex >= sourceIndex) {
+                    targetIndex = sourceIndex - 1;
+                }
+            }
+            
             if (targetIndex < 0)
                 targetIndex = 0;
             targetContentOffset->x = targetIndex * _pageSize;
