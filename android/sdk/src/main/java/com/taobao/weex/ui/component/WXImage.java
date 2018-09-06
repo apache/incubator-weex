@@ -211,7 +211,7 @@ public class WXImage extends WXComponent<ImageView> {
 
     if (getInstance().getImageNetworkHandler() != null) {
       String localUrl = getInstance().getImageNetworkHandler().fetchLocal(src);
-      if (!TextUtils.isEmpty(src)) {
+      if (!TextUtils.isEmpty(localUrl)) {
         src = localUrl;
       }
     }
