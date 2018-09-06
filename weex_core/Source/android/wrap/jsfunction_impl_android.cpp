@@ -334,7 +334,6 @@ void jsFunctionCallCreateBody(JNIEnv *env, jobject object, jstring pageId, jbyte
 
     if (page == nullptr || string == nullptr)
         return;
-//    RenderManager::GetInstance()->CreatePage(page, dom.getBytes());
 
     WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
             weex::base::MakeCopyable([page_id = std::string(page),
