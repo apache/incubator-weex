@@ -39,6 +39,9 @@ class VNodeRenderContext {
   inline void set_root(VNode* root) { root_ = root; }
 
   inline json11::Json& raw_json() { return raw_json_; }
+  inline void set_script(const std::string& script) { script_ = script; }
+  inline const std::string& script() { return script_; }
+  inline bool HasScript() { return !script_.empty(); }
   inline std::string& raw_source() { return raw_source_; }
   inline std::map<std::string, json11::Json>& style_json() {
     return style_json_;
@@ -50,6 +53,8 @@ class VNodeRenderContext {
   VNode* root_;
   json11::Json raw_json_;
   std::string raw_source_;
+  // script to execute
+  std::string script_;
   std::map<std::string, json11::Json> style_json_;
 };
 }  // namespace data_render
