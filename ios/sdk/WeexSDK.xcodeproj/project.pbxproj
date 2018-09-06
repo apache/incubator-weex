@@ -345,8 +345,6 @@
 		B8D66BC82125572F003960BD /* ast_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66AFF2125572F003960BD /* ast_factory.h */; };
 		B8D66BC92125572F003960BD /* ast.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8D66B002125572F003960BD /* ast.cc */; };
 		B8D66BCA2125572F003960BD /* ast.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8D66B002125572F003960BD /* ast.cc */; };
-		B8D66BCB2125572F003960BD /* table_factory.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8D66B012125572F003960BD /* table_factory.cc */; };
-		B8D66BCC2125572F003960BD /* table_factory.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8D66B012125572F003960BD /* table_factory.cc */; };
 		B8D66BCD2125572F003960BD /* statement.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B022125572F003960BD /* statement.h */; };
 		B8D66BCE2125572F003960BD /* statement.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B022125572F003960BD /* statement.h */; };
 		B8D66BCF2125572F003960BD /* tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B032125572F003960BD /* tokenizer.h */; };
@@ -361,8 +359,6 @@
 		B8D66BD82125572F003960BD /* ast.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B072125572F003960BD /* ast.h */; };
 		B8D66BD92125572F003960BD /* vm_mem.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B082125572F003960BD /* vm_mem.h */; };
 		B8D66BDA2125572F003960BD /* vm_mem.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B082125572F003960BD /* vm_mem.h */; };
-		B8D66BDB2125572F003960BD /* table_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B092125572F003960BD /* table_factory.h */; };
-		B8D66BDC2125572F003960BD /* table_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B092125572F003960BD /* table_factory.h */; };
 		B8D66BDD2125572F003960BD /* scanner.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B0A2125572F003960BD /* scanner.h */; };
 		B8D66BDE2125572F003960BD /* scanner.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B0A2125572F003960BD /* scanner.h */; };
 		B8D66BE12125572F003960BD /* handle.h in Headers */ = {isa = PBXBuildFile; fileRef = B8D66B0C2125572F003960BD /* handle.h */; };
@@ -1291,7 +1287,6 @@
 		B8D66AFE2125572F003960BD /* tokenizer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tokenizer.cc; sourceTree = "<group>"; };
 		B8D66AFF2125572F003960BD /* ast_factory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ast_factory.h; sourceTree = "<group>"; };
 		B8D66B002125572F003960BD /* ast.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ast.cc; sourceTree = "<group>"; };
-		B8D66B012125572F003960BD /* table_factory.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = table_factory.cc; sourceTree = "<group>"; };
 		B8D66B022125572F003960BD /* statement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = statement.h; sourceTree = "<group>"; };
 		B8D66B032125572F003960BD /* tokenizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tokenizer.h; sourceTree = "<group>"; };
 		B8D66B042125572F003960BD /* statement.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = statement.cc; sourceTree = "<group>"; };
@@ -1299,7 +1294,6 @@
 		B8D66B062125572F003960BD /* string_table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = string_table.h; sourceTree = "<group>"; };
 		B8D66B072125572F003960BD /* ast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ast.h; sourceTree = "<group>"; };
 		B8D66B082125572F003960BD /* vm_mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vm_mem.h; sourceTree = "<group>"; };
-		B8D66B092125572F003960BD /* table_factory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = table_factory.h; sourceTree = "<group>"; };
 		B8D66B0A2125572F003960BD /* scanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scanner.h; sourceTree = "<group>"; };
 		B8D66B0C2125572F003960BD /* handle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handle.h; sourceTree = "<group>"; };
 		B8D66B0D2125572F003960BD /* exec_state.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exec_state.h; sourceTree = "<group>"; };
@@ -2225,7 +2219,6 @@
 				B8D66AFE2125572F003960BD /* tokenizer.cc */,
 				B8D66AFF2125572F003960BD /* ast_factory.h */,
 				B8D66B002125572F003960BD /* ast.cc */,
-				B8D66B012125572F003960BD /* table_factory.cc */,
 				B8D66B022125572F003960BD /* statement.h */,
 				B8D66B032125572F003960BD /* tokenizer.h */,
 				B8D66B042125572F003960BD /* statement.cc */,
@@ -2233,7 +2226,6 @@
 				B8D66B062125572F003960BD /* string_table.h */,
 				B8D66B072125572F003960BD /* ast.h */,
 				B8D66B082125572F003960BD /* vm_mem.h */,
-				B8D66B092125572F003960BD /* table_factory.h */,
 				B8D66B0A2125572F003960BD /* scanner.h */,
 				B8D66B0C2125572F003960BD /* handle.h */,
 				B8D66B0D2125572F003960BD /* exec_state.h */,
@@ -2698,7 +2690,6 @@
 				77D1614B1C02E3790010B15B /* WXConvert.h in Headers */,
 				1746EA7320E9D253007E55BD /* WXComponent_performance.h in Headers */,
 				59A596221CB6311F0012CD52 /* WXNavigatorModule.h in Headers */,
-				B8D66BDB2125572F003960BD /* table_factory.h in Headers */,
 				B8F2C7082133A83C00635B37 /* rax_parser_context.h in Headers */,
 				C47B78CE1F2998EE001D3B0C /* WXExtendCallNativeManager.h in Headers */,
 				B8D66CA321255730003960BD /* wson.h in Headers */,
@@ -2998,7 +2989,6 @@
 				C42E8FAD1F3C7C3F001EBE9D /* WXExtendCallNativeManager.h in Headers */,
 				DCA445CB1EFA590600D0CFA8 /* WXComponent+Layout.h in Headers */,
 				DCA4460F1EFA5A8100D0CFA8 /* WXDiffUtil.h in Headers */,
-				B8D66BDC2125572F003960BD /* table_factory.h in Headers */,
 				B8D66BEC2125572F003960BD /* token.h in Headers */,
 				DCE7F1F020AD358A00D471E7 /* WXPageEventNotifyEvent.h in Headers */,
 				DCA445F91EFA5A3700D0CFA8 /* WXClipboardModule.h in Headers */,
@@ -3565,7 +3555,6 @@
 				B8D66BBB2125572F003960BD /* vnode_render_context.cc in Sources */,
 				841CD1031F9739890081196D /* WXExceptionUtils.m in Sources */,
 				B8D66CD921255730003960BD /* message_pump_posix.cc in Sources */,
-				B8D66BCB2125572F003960BD /* table_factory.cc in Sources */,
 				C4E97D341F1EF46D00ABC314 /* WXTracingManager.m in Sources */,
 				742AD72F1DF98C45007DC46C /* WXResourceRequest.m in Sources */,
 				7461F8931CFB373100F62D44 /* WXLayer.m in Sources */,
@@ -3773,7 +3762,6 @@
 				B8D66BBC2125572F003960BD /* vnode_render_context.cc in Sources */,
 				DCA445911EFA55B300D0CFA8 /* WXModuleFactory.m in Sources */,
 				B8D66CDA21255730003960BD /* message_pump_posix.cc in Sources */,
-				B8D66BCC2125572F003960BD /* table_factory.cc in Sources */,
 				DCA445921EFA55B300D0CFA8 /* WXHandlerFactory.m in Sources */,
 				DCA445931EFA55B300D0CFA8 /* WXComponentManager.mm in Sources */,
 				DCA445941EFA55B300D0CFA8 /* WXComponentFactory.m in Sources */,
