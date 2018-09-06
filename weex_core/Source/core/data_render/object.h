@@ -575,14 +575,17 @@ inline void ArrayCopy(Value &src, Value &dest) {
 inline void TableCopy(Value &src, Value &dest) {
     Table *st = ValueTo<Table>(&src);
     Table *dt = ValueTo<Table>(&dest);
-    dt->map.insert(st->map.begin(), st->map.end());
     for (auto iter = st->map.begin(); iter != st->map.end(); iter++) {
         GCRetain(&iter->second);
+        dt->map[iter->first] = iter->second;
     }
 }
 
-inline void TableMapAddAll(Table* src, Table* dest) {
-  dest->map.insert(src->map.begin(), src->map.end());
+inline void TableMapAddAll(Table *src, Table *dest) {
+  for (auto iter = src->map.begin(); iter != src->map.end(); iter++) {
+    GCRetain(&iter->second);
+    dest->map[iter->first] = iter->second;
+  }
 }
 
 }  // namespace data_render
