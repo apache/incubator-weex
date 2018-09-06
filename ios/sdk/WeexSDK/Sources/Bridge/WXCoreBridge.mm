@@ -759,6 +759,9 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
                 isHeightWrapContent:(BOOL)isHeightWrapContent
 {
     if (platformBridge) {
+        if (width == 0 || height == 0) {
+            return;
+        }
         platformBridge->core_side()->SetDefaultHeightAndWidthIntoRootDom([pageId UTF8String], (float)width, (float)height, (bool)isWidthWrapContent, (bool)isHeightWrapContent);
     }
 }
