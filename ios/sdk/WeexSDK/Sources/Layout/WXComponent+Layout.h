@@ -59,4 +59,9 @@ extern "C" {
  */
 - (NSString*)convertLayoutValueToStyleValue:(NSString*)valueName;
 
+/**
+ * @abstract Get style width of a container(scroller like) with safe value. No NAN, No zero.
+ */
+- (CGFloat)safeContainerStyleWidth;
+
 @end
