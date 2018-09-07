@@ -870,7 +870,7 @@ void WXBridge::CallNativeComponent(JNIEnv* env, const char* page_id,
   jstring jPageId = getKeyFromCache(env, page_id);
   jstring jRef = getKeyFromCache(env, ref);
 
-  if (jMethod.IsNull()) {
+  if (!jMethod.IsNull()) {
     Java_WXBridge_callNativeComponent(env, jni_object(), jPageId, jRef,
                                       jMethod.Get(), jArgString.Get(),
                                       jOptString.Get());
