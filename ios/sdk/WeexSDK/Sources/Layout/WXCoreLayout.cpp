@@ -652,6 +652,13 @@ namespace WeexCore {
           }
       }
       
+      bool verticalRTL = false;
+      if (mLayoutResult->mLayoutDirection == kDirectionRTL) {
+          verticalRTL = mCssStyle->mFlexWrap != kWrapReverse;
+      } else {
+          verticalRTL = mCssStyle->mFlexWrap == kWrapReverse;
+      }
+      
       switch (mCssStyle->mFlexDirection) {
         case kFlexDirectionRow:
             layoutHorizontal(mLayoutResult->mLayoutDirection == kDirectionRTL ? true : false, left, top, right, bottom, absoulteItem, flexLine);
@@ -659,13 +666,13 @@ namespace WeexCore {
         case kFlexDirectionRowReverse:
             layoutHorizontal(mLayoutResult->mLayoutDirection == kDirectionRTL ? false : true, left, top, right, bottom, absoulteItem, flexLine);
             break;
-        case kFlexDirectionColumnReverse:
-            layoutVertical(mCssStyle->mFlexWrap == kWrapReverse, true, left, top, right, bottom, absoulteItem, flexLine);
-            break;
-        case kFlexDirectionColumn:
-        default:
-            layoutVertical(mCssStyle->mFlexWrap == kWrapReverse, false, left, top, right, bottom, absoulteItem, flexLine);
-            break;
+          case kFlexDirectionColumnReverse:
+              layoutVertical(verticalRTL, true, left, top, right, bottom, absoulteItem, flexLine);
+              break;
+          case kFlexDirectionColumn:
+          default:
+              layoutVertical(verticalRTL, false, left, top, right, bottom, absoulteItem, flexLine);
+              break;
       }
   }
 

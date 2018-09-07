@@ -230,6 +230,8 @@ bool flexIsUndefined(float value) {
 }
 
 - (void)_adjustForRTL {
+    if (self->_positionType == WXPositionTypeFixed) return;
+    
     if (self.supercomponent && self.supercomponent->_flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL && [self.supercomponent shouldTranformSubviewsWhenRTL]) {
         if (_transform) {
             self.view.layer.transform = CATransform3DConcat(self.view.layer.transform, CATransform3DScale(CATransform3DIdentity, -1, 1, 1));
