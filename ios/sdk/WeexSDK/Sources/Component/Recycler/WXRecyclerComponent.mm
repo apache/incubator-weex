@@ -51,7 +51,16 @@ typedef enum : NSUInteger {
 @end
 
 @implementation WXCollectionView
+- (void)dealloc{
+    NSLog(@"%s,%@,%@",__func__,self,self.collectionViewLayout);
+    self.delegate = nil;
+    self.dataSource = nil;
+    if ([self.collectionViewLayout isKindOfClass:[WXMultiColumnLayout class]]) {
+        WXMultiColumnLayout* wxLayout = (WXMultiColumnLayout *)self.collectionViewLayout;
+        wxLayout.weak_collectionView = nil;
+    }
 
+}
 - (void)insertSubview:(UIView *)view atIndex:(NSInteger)index
 {
     [super insertSubview:view atIndex:index];
@@ -170,6 +179,10 @@ typedef enum : NSUInteger {
 {
     _collectionView.delegate = nil;
     _collectionView.dataSource = nil;
+    if ([_collectionViewlayout isKindOfClass:[WXMultiColumnLayout class]]) {
+        WXMultiColumnLayout* wxLayout = (WXMultiColumnLayout *)_collectionViewlayout;
+        wxLayout.weak_collectionView = nil;
+    }
 }
 
 #pragma mark - Public Subclass Methods
@@ -188,7 +201,10 @@ typedef enum : NSUInteger {
     _collectionView.allowsMultipleSelection = NO;
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
-    
+    if ([_collectionViewlayout isKindOfClass:[WXMultiColumnLayout class]]) {
+        WXMultiColumnLayout* wxLayout = (WXMultiColumnLayout *)_collectionViewlayout;
+        wxLayout.weak_collectionView = _collectionView;
+    }
     [_collectionView registerClass:[WXCollectionViewCell class] forCellWithReuseIdentifier:kCollectionCellReuseIdentifier];
     [_collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:kCollectionSupplementaryViewKindHeader withReuseIdentifier:kCollectionHeaderReuseIdentifier];
     
@@ -206,6 +222,10 @@ typedef enum : NSUInteger {
     
     _collectionView.dataSource = nil;
     _collectionView.delegate = nil;
+    if ([_collectionViewlayout isKindOfClass:[WXMultiColumnLayout class]]) {
+        WXMultiColumnLayout* wxLayout = (WXMultiColumnLayout *)_collectionViewlayout;
+        wxLayout.weak_collectionView = nil;
+    }
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
