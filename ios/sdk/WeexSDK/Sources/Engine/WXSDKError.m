@@ -84,7 +84,7 @@
                 
                 @(WX_KEY_EXCEPTION_SDK_INIT):@{ERROR_TYPE:@(WX_NATIVE_ERROR),ERROR_GROUP:@(WX_NATIVE)},
                 @(WX_KEY_EXCEPTION_INVOKE):@{ERROR_TYPE:@(WX_NATIVE_ERROR),ERROR_GROUP:@(WX_NATIVE)},
-                @(WX_KEY_EXCEPTION_JS_DOWNLOAD):@{ERROR_TYPE:@(WX_NATIVE_ERROR),ERROR_GROUP:@(WX_NATIVE)},
+                @(WX_KEY_EXCEPTION_JS_DOWNLOAD):@{ERROR_TYPE:@(WX_DOWN_LOAD_ERROR),ERROR_GROUP:@(WX_NATIVE)},
                 @(WX_KEY_EXCEPTION_DOM):@{ERROR_TYPE:@(WX_NATIVE_ERROR),ERROR_GROUP:@(WX_NATIVE)},
                 @(WX_KEY_EXCEPTION_WXBRIDGE):@{ERROR_TYPE:@(WX_JS_ERROR),ERROR_GROUP:@(WX_JS)},
                 
@@ -115,6 +115,8 @@
             return WX_ERROR_TYPE_RENDER;
         case WX_DEGRADE_ERROR:
             return WX_ERROR_TYPE_DEGRADE;
+        case WX_DOWN_LOAD_ERROR:
+            return WX_ERROR_TYPE_DOWNLOAD;
         case WX_NATIVE_ERROR:
         default:
             return WX_ERROR_TYPE_NATIVE;

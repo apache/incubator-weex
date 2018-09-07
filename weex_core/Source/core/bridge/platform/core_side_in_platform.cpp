@@ -18,6 +18,7 @@
  */
 
 #include "core/bridge/platform/core_side_in_platform.h"
+#include "base/string_util.h"
 #include "base/LogDefines.h"
 #include "core/config/core_environment.h"
 #include "core/data_render/vnode/vnode_render_manager.h"
@@ -323,11 +324,8 @@ int CoreSideInPlatform::RefreshInstance(
   if(params[1]->value.string->length <= 0)
     return false;
 
-  char *init_data =
-      reinterpret_cast<char *>(params[1]->value.string->content);
-
-  if(init_data == nullptr)
-    return false;
+  std::string init_data = weex::base::to_utf8(params[1]->value.string->content,
+                                              params[1]->value.string->length);
 
   if (node_manager->RefreshPage(instanceId, init_data)) {
     return true;

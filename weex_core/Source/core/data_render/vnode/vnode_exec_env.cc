@@ -85,11 +85,11 @@ static Value Merge(ExecState *exec_state) {
     Value new_value = exec_state->class_factory()->CreateTable();
     if (IsTable(lhs)) {
         TableCopy(*lhs, new_value);
-        LOGD("[Merge]:lhs:%s\n", TableToString(ValueTo<Table>(lhs)).c_str());
+//        LOGD("[Merge]:lhs:%s\n", TableToString(ValueTo<Table>(lhs)).c_str());
     }
     if (IsTable(rhs)) {
         TableCopy(*rhs, new_value);
-        LOGD("[Merge]:rhs:%s\n", TableToString(ValueTo<Table>(rhs)).c_str());
+//        LOGD("[Merge]:rhs:%s\n", TableToString(ValueTo<Table>(rhs)).c_str());
     }
     return new_value;
 }

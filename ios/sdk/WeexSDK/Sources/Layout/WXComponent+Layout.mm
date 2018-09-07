@@ -351,6 +351,33 @@ bool flexIsUndefined(float value) {
     return [NSString stringWithFormat:@"%f", layoutValue];
 }
 
+- (CGFloat)safeContainerStyleWidth
+{
+    if (_flexCssNode == nullptr) {
+        return 0.0f;
+    }
+    
+    CGFloat thisValue = _flexCssNode->getStyleWidth();
+    if (isnan(thisValue)) {
+        if (_flexCssNode->getParent()) {
+            thisValue = _flexCssNode->getParent()->getLayoutWidth(); // parent may be layout done
+            if (isnan(thisValue)) {
+                thisValue = _flexCssNode->getParent()->getStyleWidth();
+            }
+        }
+    }
+    
+    if (isnan(thisValue)) {
+        thisValue = self.weexInstance.frame.size.width;
+    }
+    
+    if (isnan(thisValue) || thisValue == 0.0f) {
+        thisValue = [UIScreen mainScreen].bounds.size.width;
+    }
+    
+    return thisValue;
+}
+
 #define WX_FLEX_STYLE_RESET_CSS_NODE(key, defaultValue)\
 do {\
     WX_FLEX_STYLE_RESET_CSS_NODE_GIVEN_KEY(key,key,defaultValue)\

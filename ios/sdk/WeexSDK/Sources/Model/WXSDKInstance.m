@@ -198,6 +198,12 @@ typedef enum : NSUInteger {
 #endif
     if (!CGRectEqualToRect(frame, _frame)) {
         _frame = frame;
+        CGFloat screenHeight =  [[UIScreen mainScreen] bounds].size.height;
+        if (screenHeight>0) {
+            CGFloat pageRatio = frame.size.height/screenHeight *100;
+            pageRatio = pageRatio>100?100:pageRatio;
+            [self.apmInstance setStatistic:KEY_PAGE_STATS_BODY_RATIO withValue:pageRatio];
+        }
         WXPerformBlockOnMainThread(^{
             if (_rootView) {
                 _rootView.frame = frame;
@@ -407,7 +413,6 @@ typedef enum : NSUInteger {
      [self.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_START];
     _mainBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_END];
         NSError *error = nil;
         if ([response isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)response).statusCode != 200) {
             error = [NSError errorWithDomain:WX_ERROR_DOMAIN
@@ -423,8 +428,13 @@ typedef enum : NSUInteger {
         }
         
         if (error) {
-            WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:@"" bundleUrl:[request.URL absoluteString] errorCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_JS_DOWNLOAD] functionName:@"_renderWithRequest:options:data:" exception:[error localizedDescription]  userInfo:nil];
-            [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo];
+            [WXExceptionUtils commitCriticalExceptionRT:strongSelf.instanceId
+                                                errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_JS_DOWNLOAD]
+                                               function:@"_renderWithRequest:options:data:"
+                                              exception:[NSString stringWithFormat:@"download bundle error :%@",[error localizedDescription]]
+                                              extParams:nil];
+        
+            strongSelf.apmInstance.isDownLoadFailed = YES;
             [strongSelf.apmInstance setProperty:KEY_PROPERTIES_ERROR_CODE withValue:[@(WX_KEY_EXCEPTION_JS_DOWNLOAD) stringValue]];
             return;
         }
@@ -432,13 +442,16 @@ typedef enum : NSUInteger {
         if (!data) {
             NSString *errorMessage = [NSString stringWithFormat:@"Request to %@ With no data return", request.URL];
             WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, strongSelf.pageName);
-
-            WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:@"" bundleUrl:[request.URL absoluteString] errorCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_JS_DOWNLOAD] functionName:@"_renderWithRequest:options:data:" exception:@"no data return"  userInfo:nil];
-            [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo];
+            [WXExceptionUtils commitCriticalExceptionRT:strongSelf.instanceId
+                                                errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_JS_DOWNLOAD]
+                                               function:@"_renderWithRequest:options:data:"
+                                              exception:@"no data return"
+                                              extParams:nil];
             
             if (strongSelf.onFailed) {
                 strongSelf.onFailed(error);
             }
+            strongSelf.apmInstance.isDownLoadFailed = YES;
             [strongSelf.apmInstance setProperty:KEY_PROPERTIES_ERROR_CODE withValue:[@(WX_KEY_EXCEPTION_JS_DOWNLOAD) stringValue]];
             return;
         }
@@ -467,7 +480,10 @@ typedef enum : NSUInteger {
                 return;
             }
         }
+      
         
+        [strongSelf.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_END];
+        [strongSelf.apmInstance updateExtInfoFromResponseHeader:response.allHeaderFields];
         [strongSelf _renderWithMainBundleString:jsBundleString];
         [WXTracingManager setBundleJSType:jsBundleString instanceId:weakSelf.instanceId];
         [WXMonitor performanceFinishWithState:DebugAfterRequest instance:strongSelf];
@@ -519,7 +535,7 @@ typedef enum : NSUInteger {
         return;
     }
     
-    [[WXSDKManager bridgeMgr] refreshInstance:self.instanceId data:[WXUtility JSONString:data]];
+    [[WXSDKManager bridgeMgr] refreshInstance:self.instanceId data:data];
 }
 
 - (void)destroyInstance
