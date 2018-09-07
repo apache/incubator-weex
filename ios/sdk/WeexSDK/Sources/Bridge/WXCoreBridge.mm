@@ -85,6 +85,10 @@ namespace WeexCore
     static id TO_OBJECT(NSString* s)
     {
         if ([s hasSuffix:JSONSTRING_SUFFIX]) {
+            if ([s length] == [JSONSTRING_SUFFIX length]) {
+                return [NSNull null];
+            }
+            
             // s is a json string
             @try {
                 NSError* error = nil;
@@ -917,6 +921,9 @@ static void _convertToCString(id _Nonnull obj, void (^callback)(const char*))
                 callback([[num stringValue] UTF8String]);
                 break;
         }
+    }
+    else if ([obj isKindOfClass:[NSNull class]]) {
+        callback([JSONSTRING_SUFFIX UTF8String]);
     }
     else {
         NSString* jsonstring = WeexCore::TO_JSON(obj);
