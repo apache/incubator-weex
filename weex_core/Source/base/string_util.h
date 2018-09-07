@@ -34,7 +34,7 @@ std::string to_string(T value) {
   return os.str();
 }
 
-std::string to_utf8(uint16_t* utf16, size_t length) {
+inline static std::string to_utf8(uint16_t* utf16, size_t length) {
   char16_t *WC = reinterpret_cast<char16_t *>(utf16);
   std::u16string str(WC, length);
   /* 转换宽字符字符串 */

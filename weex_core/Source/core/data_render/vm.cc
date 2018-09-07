@@ -29,7 +29,7 @@ namespace core {
 namespace data_render {
 
 void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
-
+#define LOGTEMP(...)
 #if DEBUG
   //TimeCost tc;
 #endif
@@ -48,7 +48,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
       switch (op) {
         case OP_MOVE:
         {
-            LOGD("OP_MOVE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            LOGTEMP("OP_MOVE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             if (IsValueRef(a)) {
@@ -68,19 +68,19 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         a->type = Value::Type::NIL;
         break;
       case OP_LOADK:
-        LOGD("OP_LOADK A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+        LOGTEMP("OP_LOADK A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = frame.func->f->GetConstant((int)GET_ARG_Bx(instruction));
         *a = *b;
         break;
       case OP_GETGLOBAL:
-        LOGD("OP_GETGLOBAL A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+        LOGTEMP("OP_GETGLOBAL A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         b = exec_state->global()->Find((int)GET_ARG_Bx(instruction));
         *a = *b;
         break;
       case OP_GETFUNC: {
-        LOGD("OP_GETFUNC A:%ld\n", GET_ARG_A(instruction));
+        LOGTEMP("OP_GETFUNC A:%ld\n", GET_ARG_A(instruction));
         a = frame.reg + GET_ARG_A(instruction);
         a->type = Value::Type::FUNC;
         a->f = frame.func->f->GetChild(GET_ARG_Bx(instruction));
@@ -89,7 +89,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
 
         case OP_ADD:
         {
-            LOGD("OP_ADD A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_ADD A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -201,7 +201,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         break;
 
       case OP_CALL: {
-          LOGD("OP_CALL A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+          LOGTEMP("OP_CALL A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
           a = frame.reg + GET_ARG_A(instruction);
           size_t argc = GET_ARG_B(instruction);
           c = frame.reg + GET_ARG_C(instruction);
@@ -209,11 +209,11 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
               throw VMExecError("Unspport Type With OP_CODE [OP_CALL]");
           }
           exec_state->CallFunction(c, argc, a);
-          LOGD("OP_CALL ret:%ld argc:%ld call:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+          LOGTEMP("OP_CALL ret:%ld argc:%ld call:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
           break;
       }
       case OP_JMP: {
-          LOGD("OP_JMP A:%ld\n", GET_ARG_A(instruction));
+          LOGTEMP("OP_JMP A:%ld\n", GET_ARG_A(instruction));
           a = frame.reg + GET_ARG_A(instruction);
           bool con = false;
           if (!ToBool(a, con)) {
@@ -245,7 +245,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             break;
         }
         case OP_LT: {
-            LOGD("OP_LT A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_LT A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -253,7 +253,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             break;
         }
         case OP_LTE: {
-            LOGD("OP_LTE A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_LTE A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -261,7 +261,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             break;
         }
         case OP_GT: {
-            LOGD("OP_GT A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_GT A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -269,7 +269,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             break;
         }
         case OP_GTE: {
-            LOGD("OP_GTE A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_GTE A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -277,7 +277,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             break;
         }
         case OP_AND: {
-            LOGD("OP_AND A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_AND A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -286,7 +286,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
           case OP_NOT:
           {
-              LOGD("OP_NOT A:%ld B:%ld \n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+              LOGTEMP("OP_NOT A:%ld B:%ld \n", GET_ARG_A(instruction), GET_ARG_B(instruction));
               a = frame.reg + GET_ARG_A(instruction);
               b = frame.reg + GET_ARG_B(instruction);
               if (!IsBool(b)) {
@@ -298,7 +298,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
               break;
           }
         case OP_OR: {
-            LOGD("OP_OR A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_OR A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -466,7 +466,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
       }
         break;
           case OP_NEW: {
-              LOGD("OP_NEW A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+              LOGTEMP("OP_NEW A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
               a = frame.reg + GET_ARG_A(instruction);
               int index = (int)GET_ARG_B(instruction);
               switch (index) {
@@ -497,7 +497,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
           }
         case OP_GETSUPER:
         {
-            LOGD("OP_GETSUPER A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_GETSUPER A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -519,7 +519,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_SETMEMBERVAR:
         {
-            LOGD("OP_SETMEMBER A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            LOGTEMP("OP_SETMEMBER A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             if (!IsValueRef(a)) {
@@ -530,7 +530,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_GETCLASS:
         {
-            LOGD("OP_GETCLASS A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_GETCLASS A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -550,7 +550,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         case OP_GETMEMBERVAR:
         case OP_GETMEMBER:
         {
-            LOGD("OP_GETMEMBER A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_GETMEMBER A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -640,7 +640,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                     Value *ret = GetTableValue(ValueTo<Table>(b), *c);
                     if (!IsNil(ret)) {
                         if (IsTable(ret)) {
-                            LOGD("[OP_GETMEMBER]:%s\n", TableToString(ValueTo<Table>(ret)).c_str());
+                            LOGTEMP("[OP_GETMEMBER]:%s\n", TableToString(ValueTo<Table>(ret)).c_str());
                         }
                         *a = *ret;
                     }
@@ -669,7 +669,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_SETOUTVAR:
         {
-            LOGD("OP_SETOUTVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            LOGTEMP("OP_SETOUTVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             int index = (int)GET_ARG_Bx(instruction);
             ValueRef *ref = exec_state->FindRef(index);
@@ -682,14 +682,14 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_RESETOUTVAR:
         {
-            LOGD("OP_RESETOUTVAR A:%ld\n", GET_ARG_A(instruction));
+            LOGTEMP("OP_RESETOUTVAR A:%ld\n", GET_ARG_A(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             a->ref = NULL;
             break;
         }
         case OP_GETOUTVAR:
         {
-            LOGD("OP_GETOUTVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+            LOGTEMP("OP_GETOUTVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             int index = (int)GET_ARG_Bx(instruction);
             ValueRef *ref = exec_state->FindRef(index);
@@ -704,7 +704,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_GETINDEXVAR:
         {
-            LOGD("OP_GETINDEXVAR A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_GETINDEXVAR A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -732,7 +732,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             break;
         }
         case OP_GETINDEX: {
-            LOGD("OP_GETINDEX A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_GETINDEX A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -760,7 +760,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             break;
         }
         case OP_SETARRAY: {
-            LOGD("OP_SETARRAY A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_SETARRAY A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             int index = (int)GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -775,7 +775,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_IN:
         {
-            LOGD("OP_IN A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+            LOGTEMP("OP_IN A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
@@ -783,14 +783,14 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 // TODO error
                 throw VMExecError("Not Array or Table Type Error With OP_CODE [OP_IN]");
             }
-            //LOGD("[OP_IN]:%s\n", TableToString(ValueTo<Table>(c)).c_str());
+            //LOGTEMP("[OP_IN]:%s\n", TableToString(ValueTo<Table>(c)).c_str());
             if (IsTable(c) && !TableInKey(exec_state->string_table(), ValueTo<Table>(c), a, b)) {
                 throw VMExecError("Table For In Error With OP_CODE [OP_IN]");
             }
             break;
         }
       case OP_SETTABLE: {
-          LOGD("OP_SETTABLE A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
+          LOGTEMP("OP_SETTABLE A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
           a = frame.reg + GET_ARG_A(instruction);
           b = frame.reg + GET_ARG_B(instruction);
           c = frame.reg + GET_ARG_C(instruction);
@@ -800,7 +800,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
           }
           if (IsString(b) || IsTable(b)) {
               int ret = SetTableValue(reinterpret_cast<Table *>(a->gc), b, *c);
-              //LOGD("[OP_SETTABLE]:%s\n", TableToString(ValueTo<Table>(a)).c_str());
+              //LOGTEMP("[OP_SETTABLE]:%s\n", TableToString(ValueTo<Table>(a)).c_str());
               if (!ret) {
                   // TODO set faile
                   throw VMExecError("Set Table Error With OP_CODE [OP_SETTABLE]");
@@ -812,7 +812,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             return;
         }
         case OP_RETURN1: {
-            LOGD("OP_RETURN1 A:%ld\n", GET_ARG_A(instruction));
+            LOGTEMP("OP_RETURN1 A:%ld\n", GET_ARG_A(instruction));
             if (ret == nullptr) {
                 return;
             }
