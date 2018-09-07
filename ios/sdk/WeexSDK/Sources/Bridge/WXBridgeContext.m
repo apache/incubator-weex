@@ -648,7 +648,11 @@ _Pragma("clang diagnostic pop") \
     WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
     if (sdkInstance.dataRender) {
         WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge refreshDataRenderInstance:instance data:data];
+            if ([data isKindOfClass:[NSDictionary class]]) {
+                [WXCoreBridge refreshDataRenderInstance:instance data:[WXUtility JSONString:data]];
+            } else if ([data isKindOfClass:[NSString class]]) {
+                [WXCoreBridge refreshDataRenderInstance:instance data:data];
+            }
         });
     } else {
         [self callJSMethod:@"refreshInstance" args:@[instance, data]];
