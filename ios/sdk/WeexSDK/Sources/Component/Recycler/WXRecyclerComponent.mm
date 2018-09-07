@@ -51,16 +51,17 @@ typedef enum : NSUInteger {
 @end
 
 @implementation WXCollectionView
-- (void)dealloc{
-    NSLog(@"%s,%@,%@",__func__,self,self.collectionViewLayout);
+
+- (void)dealloc
+{
     self.delegate = nil;
     self.dataSource = nil;
     if ([self.collectionViewLayout isKindOfClass:[WXMultiColumnLayout class]]) {
         WXMultiColumnLayout* wxLayout = (WXMultiColumnLayout *)self.collectionViewLayout;
         wxLayout.weak_collectionView = nil;
     }
-
 }
+
 - (void)insertSubview:(UIView *)view atIndex:(NSInteger)index
 {
     [super insertSubview:view atIndex:index];

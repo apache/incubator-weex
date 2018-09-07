@@ -49,8 +49,6 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSDictionary<id, UICollectionViewLayoutAttributes *> *> *layoutAttributes;
 @property (nonatomic, strong) NSMutableArray<NSNumber *> *columnsMaxHeights;
 
-//@property (nonatomic, weak, readonly) UICollectionView *private_collectionView;
-
 @end
 
 @implementation WXMultiColumnLayout
@@ -65,15 +63,12 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     return self;
 }
 
-- (void)dealloc{
-    NSLog(@"%s,%@",__func__,self);
-}
-
-//On system version below 10.0, UICollectionViewLayout.collectionView seems be unsafe_unretain rather than weak. sometime when the collectionView is released, and the layout is not released, it may crash.
-- (UICollectionView*)weakCollectionView {
+//Under system version 10.0, UICollectionViewLayout.collectionView seems be unsafe_unretain rather than weak. sometime when the collectionView is released, and the layout is not released, it may crash.
+- (UICollectionView *)weakCollectionView
+{
     if ([[[UIDevice currentDevice] systemVersion] floatValue]<10.0f) {
         return self.weak_collectionView;
-    } else{
+    } else {
         return self.collectionView;
     }
 }
