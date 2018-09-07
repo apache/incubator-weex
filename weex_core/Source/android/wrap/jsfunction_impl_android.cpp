@@ -72,13 +72,9 @@ static const char *getCharFromJString(JNIEnv *env, jstring string) {
 }
 
 void initWxBridge(JNIEnv *env, jobject object, jobject bridge, jstring className) {
-//    jThis = env->NewGlobalRef(bridge);
-    const char *classNameChar = env->GetStringUTFChars(className, 0);
-//    jclass tempClass = env->FindClass(classNameChar);
-//    jBridgeClazz = (jclass) env->NewGlobalRef(tempClass);
-//    WeexCoreManager::getInstance()->getPlatformBridge()->platform_side()->setGlobalRef(jThis);
+    ScopedJStringUTF8 classNameRef = ScopedJStringUTF8(env, className);
     WXBridge::Instance()->Reset(env, bridge);
-    WXBridge::Instance()->reset_clazz(env, classNameChar);
+    WXBridge::Instance()->reset_clazz(env, classNameRef.getChars());
 }
 
 void jsHandleSetJSVersion(JNIEnv *env, jobject object, jstring jsVersion) {
@@ -136,14 +132,15 @@ jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstrin
                          jstring method, jbyteArray
                          arguments, jbyteArray options, jboolean from) {
 
+    auto arg = JByteArrayRef(env, arguments);
+    auto opt = JByteArrayRef(env, options);
 
-
-
-    const char *argumentsChar = (char *)env->GetByteArrayElements(arguments,NULL);
-    int argLength = env->GetArrayLength(arguments);
-
-    const char *optionsChar = (char *)env->GetByteArrayElements(arguments,NULL);
-    int optionsLength = env->GetArrayLength(arguments);
+//    const char *argumentsChar = (char *)env->GetByteArrayElements(arguments,NULL);
+//
+//    int argLength = env->GetArrayLength(arguments);
+//
+//    const char *optionsChar = (char *)env->GetByteArrayElements(options,NULL);
+//    int optionsLength = env->GetArrayLength(options);
 
     const char *id = getCharFromJString(env, instanceId);
     const char *string = getCharFromJString(env, module);
@@ -162,10 +159,10 @@ jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, jstrin
                     [page_id = std::string(id), module = std::string(string),
                             method = std::string(jString),
                             arguments = std::unique_ptr<char[]>(
-                                    copyStr(argumentsChar, argLength)),
-                            argLen = argLength,
+                                    copyStr(arg.getBytes(), arg.length())),
+                            argLen = arg.length(),
                             options = std::unique_ptr<char[]>(
-                                    copyStr(optionsChar, optionsLength)),optLen = optionsLength] {
+                                    copyStr(opt.getBytes(), opt.length())),optLen = opt.length()] {
                         WeexCoreManager::Instance()
                                 ->script_bridge()
                                 ->core_side()
@@ -223,12 +220,8 @@ jsHandleCallNativeComponent(JNIEnv *env, jobject object, jstring instanceId, jst
                             jstring method,
                             jbyteArray arguments, jbyteArray options, jboolean from) {
 
-
-    const char *argumentsChar = (char *)env->GetByteArrayElements(arguments,NULL);
-    int argLength = env->GetArrayLength(arguments);
-
-    const char *optionsChar = (char *)env->GetByteArrayElements(arguments,NULL);
-    int optionsLength = env->GetArrayLength(arguments);
+    auto arg = JByteArrayRef(env, arguments);
+    auto opt = JByteArrayRef(env, options);
 
     const char *id = getCharFromJString(env, instanceId);
     const char *ref = getCharFromJString(env, componentRef);
@@ -247,10 +240,10 @@ jsHandleCallNativeComponent(JNIEnv *env, jobject object, jstring instanceId, jst
                     [page_id = std::string(id), ref = std::string(ref),
                             method = std::string(string),
                             arguments =
-                            std::unique_ptr<char[]>(copyStr(argumentsChar, argLength)),
-                            arguments_length = argLength,
-                            options = std::unique_ptr<char[]>(copyStr(optionsChar, optionsLength)),
-                            options_length = optionsLength] {
+                            std::unique_ptr<char[]>(copyStr(arg.getBytes(), arg.length())),
+                            arguments_length = arg.length(),
+                            options = std::unique_ptr<char[]>(copyStr(opt.getBytes(), opt.length())),
+                            options_length = opt.length()] {
                         WeexCoreManager::Instance()
                                 ->script_bridge()
                                 ->core_side()
