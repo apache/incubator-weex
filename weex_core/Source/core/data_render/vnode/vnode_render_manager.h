@@ -42,6 +42,9 @@ class VNodeRenderManager {
 
  public:
   void CreatePage(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data);
+
+  void CreatePage(const char* contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data);
+
   bool RefreshPage(const std::string &page_id, const std::string &init_data);
   bool ClosePage(const std::string &page_id);
 

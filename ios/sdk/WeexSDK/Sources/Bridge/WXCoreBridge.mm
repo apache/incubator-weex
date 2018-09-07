@@ -44,6 +44,8 @@
 #include "base/TimeUtils.h"
 
 #import <objc/runtime.h>
+#include <fstream>
+
 
 #define NSSTRING(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCString(NULL, (const char *)(cstr), kCFStringEncodingUTF8)))
 #define NSSTRING_NO_COPY(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCStringNoCopy(NULL, (const char *)(cstr), kCFStringEncodingUTF8, kCFAllocatorNull)))
@@ -801,6 +803,26 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     NSString *optionsString = [WXUtility JSONString:options];
     NSString *dataString = [WXUtility JSONString:data];
     node_manager->CreatePage([jsBundleString UTF8String] ?: "", [pageId UTF8String] ?: "", [optionsString UTF8String] ?: "", [dataString UTF8String] ?: "");
+}
+
++ (void)createDataRenderInstance:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary *)options data:(id)data
+{
+    auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+    NSString *optionsString = [WXUtility JSONString:options];
+    NSString *dataString = [WXUtility JSONString:data];
+
+//    NSString *documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+//    NSString *txtPath = [documentsPath stringByAppendingPathComponent:@"test.wasm"];
+//    std::string path = [txtPath UTF8String];
+//    std::ifstream fin(path, std::ios::in|std::ios::binary|std::ios::ate);
+//    unsigned length = static_cast<unsigned>(fin.tellg());
+//
+//    char* buffer = new char[length];
+//    fin.seekg (0, std::ios::beg);
+//    fin.read(buffer, length);
+//    fin.close();
+
+    node_manager->CreatePage(static_cast<const char*>(contents.bytes), contents.length, [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "");
 }
 
 + (void)destroyDataRenderInstance:(NSString *)pageId

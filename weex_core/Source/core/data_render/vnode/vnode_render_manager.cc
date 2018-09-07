@@ -29,6 +29,7 @@
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_creator.h"
 #include "core/bridge/platform_bridge.h"
+#include "core/data_render/binary_file.h"
 
 #define VRENDER_LOG true
 
@@ -158,54 +159,77 @@ void VNodeRenderManager::InitVM() {
   }
 }
 
-void VNodeRenderManager::CreatePage(const std::string& input,
-                                    const std::string& page_id,
-                                    const std::string& options,
-                                    const std::string& init_data) {
-    do {
-        InitVM();
-        auto start = std::chrono::steady_clock::now();
-        ExecState *exec_state = new ExecState(g_vm);
-        exec_states_.insert({page_id, exec_state});
-        VNodeExecEnv::InitCFuncEnv(exec_state);
-        std::string err;
-        json11::Json json = json11::Json::parse(input, err);
-        if (!err.empty() || json.is_null()) {
-            exec_state->context()->raw_source() = input;
-        }
-        else {
-            exec_state->context()->raw_json() = json;
-            if (json["script"].is_string()) {
-                exec_state->context()->set_script(json["script"].string_value());
-            }
-        }
-        VNodeExecEnv::InitGlobalValue(exec_state);
-        if (init_data.length() > 0) {
-            VNodeExecEnv::InitInitDataValue(exec_state, init_data);
-        }
-        VNodeExecEnv::InitStyleList(exec_state);
-        exec_state->context()->page_id(page_id);
-        //auto compile_start = std::chrono::steady_clock::now();
-        exec_state->Compile(err);
-        if (!err.empty()) {
-            break;
-        }
-        //auto exec_start = std::chrono::steady_clock::now();
-        exec_state->Execute(err);
-        if (!err.empty()) {
-            break;
-        }
-        if (exec_state->context()->root() == NULL) {
-            break;
-        }
-        CreatePageInternal(page_id, exec_state->context()->root());
-        exec_state->context()->Reset();
-        auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
-        
-        LOGE("DATA_RENDER, All time %lld", duration_post.count());
-        
-    } while (0);
+void VNodeRenderManager::CreatePage(const std::string &input, const std::string &page_id, const  std::string &options, const std::string &init_data) {
+    InitVM();
+    auto start = std::chrono::steady_clock::now();
+    ExecState *exec_state = new ExecState(g_vm);
+    exec_states_.insert({page_id, exec_state});
+    VNodeExecEnv::InitCFuncEnv(exec_state);
+    std::string err;
+    json11::Json json = json11::Json::parse(input, err);
+    if (!err.empty() || json.is_null()) {
+        exec_state->context()->raw_source() = input;
+    }
+    else {
+        exec_state->context()->raw_json() = json;
+    }
+    VNodeExecEnv::InitGlobalValue(exec_state);
+    if (init_data.length() > 0) {
+        VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+    }
+    VNodeExecEnv::InitStyleList(exec_state);
+    exec_state->context()->page_id(page_id);
+    //auto compile_start = std::chrono::steady_clock::now();
+    exec_state->Compile(err);
+    if (!err.empty()) {
+        return;
+    }
+
+    //auto exec_start = std::chrono::steady_clock::now();
+    exec_state->Execute(err);
+    if (!err.empty()) {
+        return;
+    }
+    if (exec_state->context()->root() == NULL) {
+        return;
+    }
+    CreatePageInternal(page_id, exec_state->context()->root());
+    exec_state->context()->Reset();
+    auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+
+    LOGE("DATA_RENDER, All time %lld", duration_post.count());
 }
+
+void VNodeRenderManager::CreatePage(const char* contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data) {
+    BinaryFile *file =  BinaryFile::instance();
+    file->set_input(contents);
+    file->set_length(length);
+
+    InitVM();
+    auto start = std::chrono::steady_clock::now();
+    ExecState *exec_state = new ExecState(g_vm);
+    exec_states_.insert({page_id, exec_state});
+    VNodeExecEnv::InitCFuncEnv(exec_state);
+    std::string err;
+
+    exec_state->startDecode();
+    exec_state->endDecode();
+
+    //auto exec_start = std::chrono::steady_clock::now();
+    exec_state->Execute(err);
+    if (!err.empty()) {
+        return;
+    }
+    if (exec_state->context()->root() == NULL) {
+        return;
+    }
+    CreatePageInternal(page_id, exec_state->context()->root());
+    exec_state->context()->Reset();
+    auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+
+    LOGE("DATA_RENDER, All time %lld", duration_post.count());
+}
+
 bool VNodeRenderManager::RefreshPage(const std::string& page_id,
                                      const std::string& init_data) {
     do {

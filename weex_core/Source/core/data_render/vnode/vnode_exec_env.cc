@@ -411,10 +411,12 @@ void RegisterCFunc(ExecState* state, const std::string& name,
   func.type = Value::Type::CFUNC;
   func.cf = reinterpret_cast<void*>(function);
   state->global()->Add(name, func);
+  state->global()->incrementRegisterSize();
 }
 
 void RegisterClass(ExecState *state, const std::string& name, Value value) {
     state->global()->Add(name, value);
+    state->global()->incrementRegisterSize();
 }
 
 void VNodeExecEnv::InitCFuncEnv(ExecState* state) {

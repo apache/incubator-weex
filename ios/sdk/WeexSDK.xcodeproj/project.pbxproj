@@ -71,6 +71,8 @@
 		4532670D213FCFB400DAA620 /* WXDisplayLinkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 45326709213FC84900DAA620 /* WXDisplayLinkManager.m */; };
 		453267142140E38900DAA620 /* vcomponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 453267122140E38900DAA620 /* vcomponent.h */; };
 		453267152140E38900DAA620 /* vcomponent.cc in Sources */ = {isa = PBXBuildFile; fileRef = 453267132140E38900DAA620 /* vcomponent.cc */; };
+		453267202142731000DAA620 /* binary_file.h in Headers */ = {isa = PBXBuildFile; fileRef = 4532671E2142731000DAA620 /* binary_file.h */; };
+		453267212142731000DAA620 /* binary_file.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4532671F2142731000DAA620 /* binary_file.cc */; };
 		591324A31D49B7F1004E89ED /* WXTimerModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */; };
 		591DD3311D23AD5800BE8709 /* WXErrorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 591DD32F1D23AD5800BE8709 /* WXErrorView.m */; };
 		591DD3321D23AD5800BE8709 /* WXErrorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 591DD3301D23AD5800BE8709 /* WXErrorView.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1060,6 +1062,8 @@
 		45326709213FC84900DAA620 /* WXDisplayLinkManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDisplayLinkManager.m; sourceTree = "<group>"; };
 		453267122140E38900DAA620 /* vcomponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vcomponent.h; sourceTree = "<group>"; };
 		453267132140E38900DAA620 /* vcomponent.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vcomponent.cc; sourceTree = "<group>"; };
+		4532671E2142731000DAA620 /* binary_file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = binary_file.h; sourceTree = "<group>"; };
+		4532671F2142731000DAA620 /* binary_file.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = binary_file.cc; sourceTree = "<group>"; };
 		591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTimerModuleTests.m; sourceTree = "<group>"; };
 		591DD32F1D23AD5800BE8709 /* WXErrorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXErrorView.m; sourceTree = "<group>"; };
 		591DD3301D23AD5800BE8709 /* WXErrorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXErrorView.h; sourceTree = "<group>"; };
@@ -2201,6 +2205,8 @@
 				B8F2C6D72133A83B00635B37 /* class.cc */,
 				B8F2C6D22133A83A00635B37 /* class.h */,
 				B8F2C6CE2133A83A00635B37 /* common_error.h */,
+				4532671F2142731000DAA620 /* binary_file.cc */,
+				4532671E2142731000DAA620 /* binary_file.h */,
 				B8F2C6D32133A83A00635B37 /* rax_jsx_ast.cc */,
 				B8F2C6D12133A83A00635B37 /* rax_jsx_ast.h */,
 				B8F2C6D92133A83B00635B37 /* rax_parser_builder.cc */,
@@ -2641,6 +2647,7 @@
 				B8D66BE12125572F003960BD /* handle.h in Headers */,
 				B8D66BCD2125572F003960BD /* statement.h in Headers */,
 				77D161241C02DDD10010B15B /* WXSDKInstance.h in Headers */,
+				453267202142731000DAA620 /* binary_file.h in Headers */,
 				DC6836E61EBB12B200AD2D84 /* WXConfigCenterProtocol.h in Headers */,
 				DC7764941F3C2CA300B5727E /* WXRecyclerDragController.h in Headers */,
 				74A4BAA61CB4F98300195969 /* WXStreamModule.h in Headers */,
@@ -3402,6 +3409,7 @@
 				2A837AB71CD9DE9200AEDF03 /* WXRefreshComponent.mm in Sources */,
 				74A4BA9B1CB3BAA100195969 /* WXThreadSafeMutableDictionary.m in Sources */,
 				77E65A1A1C155F25008B8775 /* WXScrollerComponent.mm in Sources */,
+				453267212142731000DAA620 /* binary_file.cc in Sources */,
 				747A787D1D1BAAC900DED9D0 /* WXComponent+ViewManagement.mm in Sources */,
 				C4E375371E5FCBD3009B2D9C /* WXComponent+BoxShadow.m in Sources */,
 				C43C03E91EC8ACA40044C7FF /* WXPrerenderManager.m in Sources */,

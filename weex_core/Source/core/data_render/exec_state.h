@@ -41,7 +41,7 @@ namespace data_render {
 class ValueRef {
     friend class ExecState;
 public:
-    ValueRef(FuncState *func_state, long register_id) : func_state_(func_state), register_id_(register_id), ref_id_(gs_ref_id++) { SetNil(&value_); };
+    ValueRef(FuncState *func_state, long register_id) : func_state_(func_state), register_id_(register_id), ref_id_(gs_ref_id++), func_index_(-1) { SetNil(&value_); };
     inline int ref_id() { return ref_id_; }
     inline FuncState *func_state() { return func_state_; }
     inline long register_id() { return register_id_; }
@@ -52,12 +52,13 @@ private:
     FuncState *func_state_{nullptr};
     int ref_id_;
     long register_id_;
+    int func_index_;
     Value value_;
 };
 
 class FuncState {
  public:
-  FuncState() : instructions_(), constants_(), children_() {}
+  FuncState() : instructions_(), constants_(), children_(), super_func_(nullptr), super_index_(-1) {}
   virtual ~FuncState() {}
 
   int AddConstant(Value value) {
@@ -71,6 +72,7 @@ class FuncState {
   }
 
   inline Value* GetConstant(int index) { return &constants_[index]; }
+  inline size_t GetConstantSize() { return constants_.size();}
   inline size_t AddInstruction(Instruction i) {
     instructions_.push_back(i);
     return instructions_.size() - 1;
@@ -81,17 +83,35 @@ class FuncState {
   }
   inline std::vector<Instruction>& instructions() { return instructions_; }
   inline void AddChild(FuncState* func) {
+    func->super_func_ = this;
     children_.push_back(std::unique_ptr<FuncState>(func));
   }
-  inline std::vector<std::unique_ptr<FuncState>>& children() {
+  inline const std::vector<std::unique_ptr<FuncState>>& children() {
     return children_;
   }
   inline FuncState* GetChild(size_t pos) { return children_[pos].get(); }
+  inline std::vector<Value>& constants() {return constants_;}
+  inline FuncState* super_func() {return super_func_;}
+  inline void set_super_func(FuncState* func) {super_func_ = func;}
+  std::vector<FuncState*> getAllChildren() {
+      std::vector<FuncState*> all_children;
+      for (auto &child : children_) {
+          all_children.push_back(child.get());
+          std::vector<FuncState*> children = child->getAllChildren();
+          all_children.insert(all_children.end(), children.begin(), children.end());
+      }
+      return all_children;
+  }
+
+  inline int super_index() const {return super_index_;}
+  inline void set_super_index(int super_index) {super_index_ = super_index;}
 
  private:
   std::vector<Instruction> instructions_;
   std::vector<Value> constants_;
   std::vector<std::unique_ptr<FuncState>> children_;
+  FuncState* super_func_;
+  int super_index_;
 };
     
 // TODO Each Func should contain a stack whose size is 256
@@ -125,10 +145,41 @@ class ExecState {
   inline VNodeRenderContext* context() { return render_context_.get(); }
   inline ClassFactory *class_factory() { return class_factory_.get(); }
 
+  void startEncode();
+  void endEncode();
+
+  bool startDecode();
+  void endDecode();
+
  private:
   friend class VM;
   friend class CodeGenerator;
+
+  void encodeGlobalSection();
+  void encodeFunctionSection();
+  void encodeStartSection();
+  void encodeTableSection();
+  void encodeStringSection();
+  void encodeStyleSection();
+  void encodeArraySection();
+  void encodeRefSection();
+  void encodeClassSection();
+  void encodeValue(const Value &value);
+
+  void decodeValue(Value &value);
+  void decodeStringSection();
+  void decodeTableSection();
+  void decodeFunctionSection();
+  void decodeStartSection();
+  void decodeGlobalSection();
+  void decodeStyleSection();
+  void decodeArraySection();
+  void decodeRefSection();
+  void decodeClassSection();
+  void serializeValue(Value &value);
+
   void CallFunction(Value *func, size_t argc, Value *ret);
+  int findSuperIndex(const std::vector<FuncState*>& func_states);
 
   VM* vm_;
 
@@ -143,8 +194,9 @@ class ExecState {
   std::unique_ptr<StringTable> string_table_;
   std::unique_ptr<VNodeRenderContext> render_context_;
   std::unordered_map<std::string, long> global_variables_;
+  std::unordered_map<int, json11::Json> styles_;
 };
-    
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

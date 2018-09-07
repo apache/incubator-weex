@@ -547,6 +547,42 @@ _Pragma("clang diagnostic pop") \
     globalContext[@"wxInstanceExtInfo"] = extInfo;
 }
 
+- (void)createInstance:(NSString *)instanceIdString
+              contents:(NSData *)contents
+               options:(NSDictionary *)options
+                  data:(id)data
+{
+    WXAssertBridgeThread();
+    WXAssertParam(instanceIdString);
+
+    @synchronized(self) {
+        if (![self.insStack containsObject:instanceIdString]) {
+            if ([options[@"RENDER_IN_ORDER"] boolValue]) {
+                [self.insStack addObject:instanceIdString];
+            } else {
+                [self.insStack insertObject:instanceIdString atIndex:0];
+            }
+        }
+    }
+    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
+    [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_START];
+
+    //create a sendQueue bind to the current instance
+    NSMutableArray *sendQueue = [NSMutableArray array];
+    [self.sendQueue setValue:sendQueue forKey:instanceIdString];
+
+    if (sdkInstance.dataRender) {
+        WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instanceIdString]);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+
+        WXPerformBlockOnComponentThread(^{
+            [WXCoreBridge createDataRenderInstance:instanceIdString contents:contents options:options data:data];
+            WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+        });
+        return;
+    }
+}
+
 - (NSString *)_pareJSBundleType:(NSString*)instanceIdString jsBundleString:(NSString*)jsBundleString
 {
     NSString * bundleType = nil;

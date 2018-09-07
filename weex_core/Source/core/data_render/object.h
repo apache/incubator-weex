@@ -93,6 +93,8 @@ struct Value {
 
   Type type;
 
+  int index = -1;
+
   Value() : type(NIL) {}
     
   Value(int value) : i(value), type(INT) {}
@@ -107,6 +109,7 @@ struct Value {
 
   Value(const Value &value) {
     type = value.type;
+    index = value.index;
     switch (type) {
       case INT:i = value.i;
         break;
@@ -129,7 +132,8 @@ struct Value {
       case CLASS_DESC:
       case CLASS_INST:
         gc = value.gc;
-        gc->increment();
+        if(gc)
+          gc->increment();
         break;
       default:break;
     }
@@ -138,6 +142,7 @@ struct Value {
   inline Value operator=(Value value) {
       GCRelease(this);
       type = value.type;
+      index = value.index;
       switch (type) {
           case INT:
               i = value.i;
@@ -168,7 +173,8 @@ struct Value {
           case CLASS_DESC:
           case CLASS_INST:
               gc = value.gc;
-              gc->increment();
+              if(gc)
+                gc->increment();
               break;
           default:break;
       }
@@ -176,6 +182,7 @@ struct Value {
   }
   friend bool operator==(const Value &left, const Value &right) {
     if (left.type != right.type) return false;
+    if (left.index != right.index) return false;
     switch (left.type) {
       case NIL:return true;
       case INT:return left.i == right.i;
@@ -220,10 +227,15 @@ public:
     int Add(Value value);
     int Add(const std::string& name, Value value);
     int Set(const std::string& name, Value value);
+    inline size_t size() {return values_.size();}
+    inline const std::map<std::string, int>& map() {return map_;}
+    inline unsigned register_size() {return register_size_;}
+    void incrementRegisterSize() {register_size_++;}
     
 private:
     std::map<std::string, int> map_;
     std::vector<Value> values_;
+    unsigned register_size_ = 0;
 };
 
 struct ClassDescriptor;
@@ -233,8 +245,8 @@ typedef struct ClassDescriptor {
     ClassDescriptor *p_super_;
     std::unique_ptr<Variables> static_funcs_;
     std::unique_ptr<Variables> funcs_;
-    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), static_funcs_(new Variables) {}
-    
+    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), static_funcs_(new Variables), super_index_(-1) {}
+    int super_index_;
 } ClassDescriptor;
 
 typedef struct ClassInstance {
@@ -341,13 +353,13 @@ inline bool IsNil(const Value *o) {
 }
     
 inline void GCRelease(Value *o) {
-    if (iscollectable(o)) {
+    if (iscollectable(o) && o->gc) {
         o->gc->decrement();
     }
 }
     
 inline void GCRetain(Value *o) {
-    if (iscollectable(o)) {
+    if (iscollectable(o) && o->gc) {
         o->gc->increment();
     }
 }

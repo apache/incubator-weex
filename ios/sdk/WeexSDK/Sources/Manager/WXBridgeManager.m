@@ -172,6 +172,36 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     });
 }
 
+- (void)createInstance:(NSString *)instance
+              contents:(NSData *)contents
+               options:(NSDictionary *)options
+                  data:(id)data
+{
+    if (!instance || !contents) return;
+    if (![self.instanceIdStack containsObject:instance]) {
+        if ([options[@"RENDER_IN_ORDER"] boolValue]) {
+            [self.instanceIdStack addObject:instance];
+        } else {
+            [self.instanceIdStack insertObject:instance atIndex:0];
+        }
+    }
+    //third team impl...
+    WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:instance];
+    if (sdkInstance) {
+        sdkInstance.apmInstance.isStartRender = YES;
+    }
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnBridgeThread(^(){
+        [WXTracingManager startTracingWithInstanceId:instance ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"createInstance" options:@{@"threadName":WXTJSBridgeThread}];
+        [weakSelf.bridgeCtx createInstance:instance
+                                  contents:contents
+                                   options:options
+                                      data:data];
+        [WXTracingManager startTracingWithInstanceId:instance ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"createInstance" options:@{@"threadName":WXTJSBridgeThread}];
+    });
+}
+
+
 - (NSMutableArray *)instanceIdStack
 {
     if (_instanceIdStack) return _instanceIdStack;
