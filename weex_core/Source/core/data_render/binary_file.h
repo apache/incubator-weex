@@ -54,7 +54,7 @@ namespace data_render {
         static BinaryFile* g_instance_;
         std::unique_ptr<std::ofstream> fout_;
         const char* input_;
-        unsigned position_;
+        unsigned long position_;
         unsigned long length_;
     };
 }  // namespace data_render
