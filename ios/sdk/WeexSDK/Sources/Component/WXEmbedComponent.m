@@ -165,6 +165,7 @@
     };
     
     _embedInstance.onFailed = ^(NSError *error) {
+        weakSelf.weexInstance.apmInstance.isDegrade = YES;
         dispatch_async(dispatch_get_main_queue(), ^{
             if (weakSelf.errorView) {
                 return ;
