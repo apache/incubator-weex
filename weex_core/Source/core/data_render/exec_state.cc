@@ -247,6 +247,10 @@ void ExecState::encodeGlobalSection() {
 
     file->write((char*)&id, sizeof(unsigned));
     file->write((char*)&size, sizeof(unsigned));
+    int init_data_index = global_->IndexOf("_init_data");
+    int weex_data_index = global_->IndexOf("__weex_data__");
+    file->write((char*)&init_data_index, sizeof(int));
+    file->write((char*)&weex_data_index, sizeof(int));
 
     for (int i=global_->register_size(); i<global_->size(); i++) {
         Value* value = global_->Find(i);
@@ -609,11 +613,23 @@ void ExecState::decodeGlobalSection() {
     unsigned count = 0;
     file->read((char*)&count, sizeof(unsigned));
 
+    int init_data_index = -1;
+    int weex_data_index = -1;
+    file->read((char*)&init_data_index, sizeof(int));
+    file->read((char*)&weex_data_index, sizeof(int));
+
+    unsigned register_size = global_->register_size();
     for (int i=0; i<count; i++) {
         Value value;
         decodeValue(value);
         if (value.type != Value::Type::CFUNC) {
-            global_->Add(value);
+            if (register_size + i == init_data_index) {
+                global_->Add("_init_data", value);
+            } else if (register_size + i == weex_data_index) {
+                global_->Add("__weex_data__", value);
+            } else  {
+                global_->Add(value);
+            }
         }
     }
 }

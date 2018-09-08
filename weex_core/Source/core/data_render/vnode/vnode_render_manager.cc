@@ -210,10 +210,13 @@ void VNodeRenderManager::CreatePage(const char* contents, unsigned long length, 
     ExecState *exec_state = new ExecState(g_vm);
     exec_states_.insert({page_id, exec_state});
     VNodeExecEnv::InitCFuncEnv(exec_state);
-    std::string err;
 
+    std::string err;
     exec_state->startDecode();
     exec_state->endDecode();
+    if (init_data.length() > 0) {
+        VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+    }
 
     //auto exec_start = std::chrono::steady_clock::now();
     exec_state->Execute(err);
