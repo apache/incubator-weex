@@ -63,6 +63,16 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     return self;
 }
 
+//Under system version 10.0, UICollectionViewLayout.collectionView seems be unsafe_unretain rather than weak. sometime when the collectionView is released, and the layout is not released, it may crash.
+- (UICollectionView *)weakCollectionView
+{
+    if ([[[UIDevice currentDevice] systemVersion] floatValue]<10.0f) {
+        return self.weak_collectionView;
+    } else {
+        return self.collectionView;
+    }
+}
+
 #pragma mark - Public Accessors
 
 - (void)setColumnCount:(WXLength *)columnCount
@@ -119,7 +129,7 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 
 - (CGFloat)computedHeaderWidth
 {
-    UIEdgeInsets insets = [self.delegate collectionView:self.collectionView insetForLayout:self];
+    UIEdgeInsets insets = [self.delegate collectionView:[self weakCollectionView] insetForLayout:self];
     return self.contentWidth - (insets.left + insets.right);
 }
 
@@ -131,8 +141,8 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     
     [self _cleanup];
     
-    NSInteger numberOfSections = [self.collectionView numberOfSections];
-    UIEdgeInsets insets = [self.delegate collectionView:self.collectionView insetForLayout:self];
+    NSInteger numberOfSections = [[self weakCollectionView]  numberOfSections];
+    UIEdgeInsets insets = [self.delegate collectionView:[self weakCollectionView]  insetForLayout:self];
     
     float columnWidth = self.computedColumnWidth;
     int columnCount = self.computedColumnCount;
@@ -146,13 +156,13 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     }
     
     for (NSInteger section = 0; section < numberOfSections; section++) {
-        BOOL hasHeader = [self.delegate collectionView:self.collectionView layout:self hasHeaderInSection:section];
+        BOOL hasHeader = [self.delegate collectionView:[self weakCollectionView]  layout:self hasHeaderInSection:section];
         // header
         if (hasHeader) {
-            CGFloat headerHeight = [self.delegate collectionView:self.collectionView layout:self heightForHeaderInSection:section];
+            CGFloat headerHeight = [self.delegate collectionView:[self weakCollectionView]  layout:self heightForHeaderInSection:section];
             WXMultiColumnLayoutHeaderAttributes *headerAttributes = [WXMultiColumnLayoutHeaderAttributes layoutAttributesForSupplementaryViewOfKind:kCollectionSupplementaryViewKindHeader withIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]];
             headerAttributes.frame = CGRectMake(insets.left, currentHeight, self.contentWidth - (insets.left + insets.right), headerHeight);
-            headerAttributes.isSticky = [self.delegate collectionView:self.collectionView layout:self isNeedStickyForHeaderInSection:section];
+            headerAttributes.isSticky = [self.delegate collectionView:[self weakCollectionView] layout:self isNeedStickyForHeaderInSection:section];
             headerAttributes.zIndex = headerAttributes.isSticky ? 1 : 0;
             headersAttributes[@(section)] = headerAttributes;
             
@@ -163,9 +173,9 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
         // cells
         
         @try {
-            for (NSInteger item = 0; item < [self.collectionView numberOfItemsInSection:section]; item++) {
+            for (NSInteger item = 0; item < [[self weakCollectionView] numberOfItemsInSection:section]; item++) {
                 NSIndexPath *indexPath = [NSIndexPath indexPathForItem:item inSection:section];
-                CGFloat itemHeight = [self.delegate collectionView:self.collectionView layout:self heightForItemAtIndexPath:indexPath];
+                CGFloat itemHeight = [self.delegate collectionView:[self weakCollectionView] layout:self heightForItemAtIndexPath:indexPath];
                 UICollectionViewLayoutAttributes *itemAttributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
                 NSUInteger column = [self _minHeightColumnForAllColumns];
                 CGFloat x = insets.left + (columnWidth + columnGap) * column+_leftGap;
@@ -197,7 +207,7 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 
 - (CGSize)collectionViewContentSize
 {
-    NSInteger numberOfSections = [self.collectionView numberOfSections];
+    NSInteger numberOfSections = [[self weakCollectionView] numberOfSections];
     if (numberOfSections == 0) {
         return CGSizeZero;
     }
@@ -213,7 +223,7 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     [self.layoutAttributes enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull kind, NSDictionary<id,UICollectionViewLayoutAttributes *> * _Nonnull dictionary, BOOL * _Nonnull stop) {
         [dictionary enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, UICollectionViewLayoutAttributes * _Nonnull attributes, BOOL * _Nonnull stop) {
             if (attributes.representedElementKind == kCollectionSupplementaryViewKindHeader
-                && [self.delegate collectionView:self.collectionView layout:self isNeedStickyForHeaderInSection:attributes.indexPath.section]) {
+                && [self.delegate collectionView:[self weakCollectionView] layout:self isNeedStickyForHeaderInSection:attributes.indexPath.section]) {
                 [stickyHeaders addObject:(WXMultiColumnLayoutHeaderAttributes *)attributes];
             } else if (CGRectIntersectsRect(rect, attributes.frame)) {
                 [result addObject:attributes];
@@ -243,10 +253,10 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 - (void)_adjustStickyForHeaderAttributes:(WXMultiColumnLayoutHeaderAttributes *)header
                                    next:(WXMultiColumnLayoutHeaderAttributes *)nextHeader
 {
-    CGRect bounds = self.collectionView.bounds;
+    CGRect bounds = [self weakCollectionView].bounds;
     CGFloat originY = header.frame.origin.y;
     CGFloat maxY = nextHeader ? (nextHeader.frame.origin.y - header.frame.size.height) : (CGRectGetMaxY(bounds) - header.frame.size.height);
-    CGFloat currentY = CGRectGetMaxY(bounds) - bounds.size.height + self.collectionView.contentInset.top;
+    CGFloat currentY = CGRectGetMaxY(bounds) - bounds.size.height + [self weakCollectionView].contentInset.top;
     
     CGFloat resultY = MIN(MAX(currentY, originY), maxY);
     CGPoint origin = header.frame.origin;
@@ -299,7 +309,7 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
         // always return yes no trigger resetting sticky header's frame.
         return YES;
     } else {
-        CGRect oldBounds = self.collectionView.bounds;
+        CGRect oldBounds = [self weakCollectionView].bounds;
         if (CGRectGetWidth(newBounds) != CGRectGetWidth(oldBounds)) {
             return YES;
         }
@@ -312,7 +322,7 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
 
 - (CGFloat)contentWidth
 {
-    return [self.delegate collectionView:self.collectionView contentWidthForLayout:self];
+    return [self.delegate collectionView:[self weakCollectionView] contentWidthForLayout:self];
 }
 
 - (CGFloat)contentHeight
