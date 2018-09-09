@@ -165,6 +165,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_layoutDidFinish;
 
+- (void)_layoutPlatform;
+
 - (void)_willDisplayLayer:(CALayer *)layer;
 
 - (void)_unloadViewWithReusing:(BOOL)isReusing;

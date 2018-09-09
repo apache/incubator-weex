@@ -35,6 +35,7 @@ class AndroidSide : public PlatformBridge::PlatformSide {
                                    float height,
                                    int height_measure_mode) override;
   void InvokeLayoutBefore(const char* page_id, long render_ptr) override;
+  void InvokeLayoutPlatform(const char* page_id, long render_ptr) override;
   void InvokeLayoutAfter(const char* page_id, long render_ptr, float width,
                          float height) override;
   void SetJSVersion(const char* version) override;

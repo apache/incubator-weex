@@ -448,6 +448,32 @@ namespace WeexCore
         return 0;
     }
     
+    void IOSSide::InvokeLayoutPlatform(const char* page_id, long render_ptr)
+    {
+        RenderPage *page = RenderManager::GetInstance()->GetPage(page_id);
+        if (page == nullptr) {
+            return;
+        }
+        
+        long long startTime = getCurrentTime();
+        
+        RenderObject* renderObject = reinterpret_cast<RenderObject*>(render_ptr);
+        if (renderObject->getContext() == nullptr) {
+            return;
+        }
+        WXComponent* component = (__bridge WXComponent *)(renderObject->getContext());
+        NSString* ns_instanceId = NSSTRING(page_id);
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return;
+        }
+        
+        [manager layoutComponent:component];
+
+        page->CallBridgeTime(getCurrentTime() - startTime);
+    }
+    
     int IOSSide::UpdateStyle(const char* pageId, const char* ref,
                             std::vector<std::pair<std::string, std::string>> *style,
                             std::vector<std::pair<std::string, std::string>> *margin,
@@ -845,9 +871,7 @@ static void _traverseTree(WeexCore::RenderObject *render, int index, const char*
     RenderObject* render = static_cast<RenderObject*>(object);
     std::pair<float, float> renderPageSize(size.width, size.height);
     
-    render->LayoutBeforeImpl();
     render->calculateLayout(renderPageSize);
-    render->LayoutAfterImpl();
     _traverseTree(render, 0, [pageId UTF8String]);
 }
 
@@ -1009,7 +1033,10 @@ static std::vector<std::pair<std::string, std::string>>* _parseMapValuePairs(NSD
 {
     using namespace WeexCore;
     const std::string page([pageId UTF8String]);
-    RenderManager::GetInstance()->CreatePage(page, [&] (void) -> RenderObject* {
+    RenderManager::GetInstance()->CreatePage(page, [&] (RenderPage* pageInstance) -> RenderObject* {
+        pageInstance->set_before_layout_needed(false); // we do not need before and after layout
+        pageInstance->set_after_layout_needed(false);
+        pageInstance->set_platform_layout_needed(true);
         return _parseRenderObject(data, nullptr, 0, page);
     });
 }

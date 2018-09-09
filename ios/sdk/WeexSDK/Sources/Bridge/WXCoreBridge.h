@@ -36,6 +36,7 @@ namespace WeexCore
                                          float height,
                                          int height_measure_mode) override { return WXCoreSize(); };
         void InvokeLayoutBefore(const char* page_id, long render_ptr) override {};
+        void InvokeLayoutPlatform(const char* page_id, long render_ptr) override;
         void InvokeLayoutAfter(const char* page_id, long render_ptr,
                                float width, float height) override {};
         

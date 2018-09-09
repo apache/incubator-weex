@@ -507,6 +507,10 @@ static BOOL bNeedRemoveEvents = YES;
     return !CGRectEqualToRect(frame, _calculatedFrame);
 }
 
+- (void)_layoutPlatform
+{
+}
+
 - (void)_assignCalculatedFrame:(CGRect)frame
 {
     _calculatedFrame = frame;

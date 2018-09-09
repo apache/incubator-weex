@@ -83,7 +83,7 @@ bool RenderManager::CreatePage(const std::string& page_id, RenderObject *root) {
   return page->CreateRootRender(root);
 }
     
-bool RenderManager::CreatePage(const std::string& page_id, std::function<RenderObject* (void)> constructRoot) {
+bool RenderManager::CreatePage(const std::string& page_id, std::function<RenderObject* (RenderPage*)> constructRoot) {
 #if RENDER_LOG
     LOGD("[RenderManager] CreatePage >>>> pageId: %s", pageId.c_str());
 #endif
@@ -99,7 +99,7 @@ bool RenderManager::CreatePage(const std::string& page_id, std::function<RenderO
     }
     
     int64_t start_time = getCurrentTime();
-    RenderObject *root = constructRoot();
+    RenderObject *root = constructRoot(page);
     page->ParseJsonTime(getCurrentTime() - start_time);
     
     page->set_is_dirty(true);

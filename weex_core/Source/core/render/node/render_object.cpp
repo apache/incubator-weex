@@ -114,6 +114,14 @@ void RenderObject::OnLayoutBefore() {
       ->platform_side()
       ->InvokeLayoutBefore(page_id().c_str(), reinterpret_cast<intptr_t>(this));
 }
+    
+void RenderObject::OnLayoutPlatform() {
+  if (!getNeedsPlatformDependentLayout()) return;
+  WeexCoreManager::Instance()
+    ->getPlatformBridge()
+    ->platform_side()
+    ->InvokeLayoutPlatform(page_id().c_str(), reinterpret_cast<intptr_t>(this));
+}
 
 void RenderObject::OnLayoutAfter(float width, float height) {
   if (!haveMeasureFunc()) return;
@@ -369,6 +377,19 @@ void RenderObject::LayoutBeforeImpl() {
     RenderObject *child = static_cast<RenderObject *>(*it);
     if (child != nullptr) {
       child->LayoutBeforeImpl();
+    }
+  }
+}
+    
+void RenderObject::LayoutPlatformImpl() {
+  if (hasNewLayout()) {
+    OnLayoutPlatform();
+  }
+
+  for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+    RenderObject *child = static_cast<RenderObject *>(*it);
+    if (child != nullptr) {
+      child->LayoutPlatformImpl();
     }
   }
 }

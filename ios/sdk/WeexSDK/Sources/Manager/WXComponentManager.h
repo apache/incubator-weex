@@ -158,6 +158,11 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 - (void)layoutComponent:(WXComponent*)component frame:(CGRect)frame innerMainSize:(CGFloat)innerMainSize;
 
 /**
+ * @abstract layout a component on platform side
+ **/
+- (void)layoutComponent:(WXComponent*)component;
+
+/**
  * @abstract add event
  **/
 - (void)addEvent:(NSString *)event toComponent:(NSString *)ref;

@@ -747,6 +747,13 @@ static NSThread *WXComponentThread;
     }
 }
 
+- (void)layoutComponent:(WXComponent*)component
+{
+    WXAssertComponentThread();
+    WXAssertParam(component);
+    [component _layoutPlatform];
+}
+
 - (void)addEvent:(NSString *)event toComponent:(NSString *)ref
 {
     WXAssertComponentThread();
