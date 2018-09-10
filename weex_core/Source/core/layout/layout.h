@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 #ifdef __cplusplus
 
 #ifndef WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_H
@@ -27,6 +28,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <cfloat>
 
 namespace WeexCore {
 
@@ -40,7 +42,7 @@ namespace WeexCore {
   } ;
 
   enum MeasureMode {
-    kUnspecified = 0,
+    kUnspecified,
     kExactly,
   } ;
 
@@ -70,9 +72,10 @@ namespace WeexCore {
   };
 
   /**
-   * layout-result：layout-height、layout-width、position（left、right、top、bottom）
+   * layout-result：layout-height、layout-width、position（left、right、top、bottom）、direction
    */
   struct WXCorelayoutResult {
+    WXCoreDirection mLayoutDirection;
     WXCoreSize mLayoutSize;
     WXCorePosition mLayoutPosition;
 
@@ -81,8 +84,9 @@ namespace WeexCore {
     }
 
     inline void reset() {
-      mLayoutSize.reset();
-      mLayoutPosition.reset();
+        mLayoutSize.reset();
+        mLayoutPosition.reset();
+        mLayoutDirection = kDirectionInherit;
     }
   };
 
@@ -136,7 +140,7 @@ namespace WeexCore {
    */
   class WXCoreLayoutNode {
 
-  protected:
+  public:
       WXCoreLayoutNode() :
               mParent(nullptr),
               dirty(true),
@@ -155,7 +159,16 @@ namespace WeexCore {
         mHasNewLayout = true;
         dirty = true;
         measureFunc = nullptr;
+        if(nullptr != mParent){
+            mParent->removeChild(this);
+        }
         mParent = nullptr;
+        for(WXCoreLayoutNode* childNode : mChildList){
+            if(nullptr != childNode){
+                childNode->mParent = nullptr;
+            }
+        }
+        
         mChildList.clear();
         BFCs.clear();
         NonBFCs.clear();
@@ -235,15 +248,15 @@ namespace WeexCore {
       markDirty();
     }
 
-    inline bool haveMeasureFunc() const {
-      return nullptr != measureFunc;
-    }
-
     inline WXCoreMeasureFunc getMeasureFunc() const {
       return measureFunc;
     }
 
-      /** ================================ context =================================== **/
+    inline bool haveMeasureFunc() const {
+      return measureFunc != nullptr;
+    }
+
+    /** ================================ context =================================== **/
 
 
     inline void *getContext() const {
@@ -254,15 +267,28 @@ namespace WeexCore {
       this->context = context;
     }
 
+    inline void copyParentNode(WXCoreLayoutNode *srcNode) {
+        if (nullptr == srcNode->mParent) {
+            if (nullptr != mParent) {
+                mParent = nullptr;
+                markDirty();
+            }
+            return;
+        }
+        if (mParent == nullptr) {
+            mParent = new WXCoreLayoutNode();
+        }
+        if (memcmp(mParent, srcNode->mParent, sizeof(WXCoreLayoutNode)) != 0) {
+            memcpy(mParent, srcNode->mParent, sizeof(WXCoreLayoutNode));
+          markDirty();
+      }
+    }
+      
     inline void copyStyle(WXCoreLayoutNode *srcNode) {
       if (memcmp(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle)) != 0) {
         memcpy(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle));
         markDirty();
       }
-    }
-
-    void copyFrom(WXCoreLayoutNode* srcNode){
-      memcpy(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle));
     }
 
     inline void copyMeasureFunc(WXCoreLayoutNode *srcNode) {
@@ -278,6 +304,10 @@ namespace WeexCore {
 
     inline void reset() {
       if (isDirty()) {
+        //todo tmp solution if mLayoutResult is nil (mutil thread ?)
+        if (nullptr == mLayoutResult) {
+            mLayoutResult = new WXCorelayoutResult();
+        }
         mLayoutResult->reset();
         for (WXCoreFlexLine *flexLine : mFlexLines) {
           if (flexLine != nullptr) {
@@ -374,14 +404,28 @@ namespace WeexCore {
     }
 
     inline bool isWrapRequired(const float &width, const float &height,
-                               const float &currentLength, const float &childLength) const {
-      float freeMainSize = CalculateFreeSpaceAlongMainAxis(width, height, currentLength);
-      return !isSingleFlexLine(freeMainSize) && freeMainSize < childLength;
+                             const float &currentLength, const float &childLength) const {
+        float freeMainSize = calcFreeSpaceAlongMainAxis(width, height, currentLength);
+        return !isSingleFlexLine(freeMainSize)
+        && freeMainSize < childLength
+        && !almostEqualRelative(childLength,freeMainSize);          //childLength is bigger than freeMainSize but not almost equal (precision)
+    }
+      
+    inline bool almostEqualRelative(const float A, const float B) const{
+        float maxRelDiff = FLT_EPSILON;
+        // Calculate the difference.
+        float diff = std::fabs(A - B);
+        float absA = std::fabs(A);
+        float absB = std::fabs(B);
+        // Find the largest
+        float largest = (absB > absA) ? absB : absA;
+      
+        if (diff <= largest * maxRelDiff) return true;
+        return false;
     }
 
     //If width/height is NAN, ret is NAN, which property we use on purpose.
-    virtual float CalculateFreeSpaceAlongMainAxis(const float &width, const float &height,
-                                                  const float &currentLength) const{
+    virtual float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const{
       float ret;
       if(isMainAxisHorizontal(this)){
         ret = width - sumPaddingBorderAlongAxis(this, true) - currentLength;
@@ -642,11 +686,11 @@ namespace WeexCore {
 
     std::tuple<bool, float, float> calculateBFCDimension(const std::pair<float,float>&);
 
-    virtual void OnLayoutBefore() {
+    virtual void onLayoutBefore() {
 
     }
 
-    virtual void OnLayoutAfter(float width, float height) {
+    virtual void onLayoutAfter(float width, float height) {
 
     }
 
@@ -678,17 +722,10 @@ namespace WeexCore {
       return mChildList.cend();
     }
 
-    inline bool hasChild(const WXCoreLayoutNode* const child){
-       if(std::find(mChildList.begin(), mChildList.end(), child) != mChildList.end()){
-         return true;
-       }else{
-         return false;
-       }
-    }
-
-    inline void removeChild(const WXCoreLayoutNode* const child) {
+    inline void removeChild(WXCoreLayoutNode* const child) {
       for (int index = 0; index < mChildList.size(); index++) {
         if (child == mChildList[index]) {
+          child->mParent = nullptr;
           mChildList.erase(mChildList.begin() + index);
           break;
         }
@@ -721,8 +758,8 @@ namespace WeexCore {
       return mParent;
     }
 
-    inline void setParent(WXCoreLayoutNode * const parent, WXCoreLayoutNode * const child) const {
-       child->mParent = parent;
+    inline void setParent(WXCoreLayoutNode *parentNode) {
+        mParent = parentNode;
     }
 
     inline bool isBFC(WXCoreLayoutNode* const node) const {
@@ -956,7 +993,28 @@ namespace WeexCore {
       return mCssStyle->mMaxHeight;
     }
 
+      inline void setDirection(const WXCoreDirection direction, const bool updating) {
+          if (mCssStyle->mDirection != direction) {
+              mCssStyle->mDirection = direction;
+              markDirty();
+              if (updating) {
+                  for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+                      (*it)->markDirty(false);
+                  }
+              }
+          }
+      }
 
+    inline WXCoreDirection getDirection() const {
+        return mCssStyle->mDirection;
+    }
+    
+    /** ================================ CSS direction For RTL =================================== **/
+      
+    void determineChildLayoutDirection(const WXCoreDirection direction);
+      
+    WXCoreDirection getLayoutDirectionFromPathNode();
+      
     /** ================================ flex-style =================================== **/
 
     inline void setFlexDirection(const WXCoreFlexDirection flexDirection, const bool updating) {
@@ -974,7 +1032,7 @@ namespace WeexCore {
     inline WXCoreFlexDirection getFlexDirection() const {
       return mCssStyle->mFlexDirection;
     }
-
+      
     inline void setFlexWrap(const WXCoreFlexWrap flexWrap) {
       if (mCssStyle->mFlexWrap != flexWrap) {
         mCssStyle->mFlexWrap = flexWrap;
@@ -1018,7 +1076,7 @@ namespace WeexCore {
       return mCssStyle->mAlignSelf;
     }
 
-    virtual void set_flex(const float flex) {
+    virtual void setFlex(const float flex) {
       if (mCssStyle->mFlexGrow != flex) {
         mCssStyle->mFlexGrow = flex;
         markDirty();
@@ -1054,7 +1112,11 @@ namespace WeexCore {
     inline float getLayoutPositionRight() const  {
       return mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeRight);
     }
-
+      
+    inline WXCoreDirection getLayoutDirection() const {
+      return mLayoutResult->mLayoutDirection;
+    }
+      
     inline bool hasNewLayout() const {
       return mHasNewLayout;
     }

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -135,7 +135,7 @@ namespace WeexCore {
     }
 
     inline bool isNAN() {
-      return isnan(mTop) || isnan(mBottom) || isnan(mLeft) || isnan(mRight);
+        return std::isnan(mTop) || std::isnan(mBottom) || std::isnan(mLeft) || std::isnan(mRight);
     }
 
     inline void reset() {
@@ -200,6 +200,8 @@ namespace WeexCore {
     WXCoreAlignSelf mAlignSelf;
 
     WXCorePositionType mPositionType;
+      
+      WXCoreDirection mDirection;
 
     float mFlexGrow;
 
@@ -241,7 +243,8 @@ namespace WeexCore {
 
     constexpr static WXCorePositionType kWXCorePositionTypeDefault = kRelative;
 
-    WXCoreCSSStyle() : mFlexDirection(kFlexDirectionDefault),
+    WXCoreCSSStyle() : mDirection(kDirectionInherit),
+                       mFlexDirection(kFlexDirectionDefault),
                        mFlexWrap(kFlexWrapDefault),
                        mJustifyContent(kFlexJustifyContentDefault),
                        mAlignItems(kFlexAlignItemsDefault),
@@ -256,6 +259,7 @@ namespace WeexCore {
     }
 
     ~WXCoreCSSStyle() {
+      mDirection = kDirectionInherit;
       mFlexDirection = kFlexDirectionDefault;
       mFlexWrap = kFlexWrapDefault;
       mJustifyContent = kFlexJustifyContentDefault;

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,13 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 #ifdef __cplusplus
 
 #ifndef WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 
 namespace WeexCore {
-
+    /**
+     * MainAxis direction
+     */
+    enum WXCoreDirection {
+        kDirectionInherit,
+        kDirectionLTR,
+        kDirectionRTL
+    };
   /**
    * MainAxis direction
    */
