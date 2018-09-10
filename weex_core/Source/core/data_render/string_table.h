@@ -49,10 +49,10 @@ class StringTable {
   ~StringTable();
 
   String *StringFromUTF8(const std::string &str);
-  inline const std::map<std::string, std::unique_ptr<String>>& store() {return store_;}
+  inline const std::vector<std::pair<std::string, std::unique_ptr<String>>>& store() {return store_;}
 
  private:
-  std::map<std::string, std::unique_ptr<String>> store_;
+  std::vector<std::pair<std::string, std::unique_ptr<String>>> store_;
 };
 }  // namespace data_render
 }  // namespace core

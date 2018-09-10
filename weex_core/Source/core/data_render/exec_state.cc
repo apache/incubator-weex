@@ -142,7 +142,7 @@ void ExecState::startEncode() {
 void ExecState::encodeStringSection() {
     unsigned id = Section::STRING_SECTION; //string_section
 
-    const std::map<std::string, std::unique_ptr<String>>& store = string_table_->store();
+    const std::vector<std::pair<std::string, std::unique_ptr<String>>>& store = string_table_->store();
     unsigned size = static_cast<unsigned>(store.size());
     BinaryFile* file = BinaryFile::instance();
 
@@ -881,9 +881,12 @@ void ExecState::serializeValue(Value &value) {
     }
 
     if (value.type == Value::Type::STRING) {
-        auto it = string_table_->store().begin();
-        std::advance(it, value.index);
-        value.str = it->second.get();
+        const std::vector<std::pair<std::string, std::unique_ptr<String>>>& store = string_table_->store();
+        if (value.index >= store.size()) {
+            value.str = store[0].second.get();
+        } else {
+            value.str = store[value.index].second.get();
+        }
     }
 
     if (value.type == Value::Type::FUNC) {
