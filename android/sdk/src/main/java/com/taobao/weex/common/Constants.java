@@ -218,6 +218,7 @@ public class Constants {
     String ENABLE_COPY = "enableCopy";
 
     String PAGE_ENABLED = "pagingEnabled";
+    String PAGE_SIZE = "pageSize";
 
 
 

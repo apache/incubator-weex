@@ -100,7 +100,14 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
      *  enable pagingEnabled attr
      */
     if(WXUtils.getBoolean(getAttrs().get(Constants.Name.PAGE_ENABLED),false)){
-      PagerSnapHelper snapHelper = new PagerSnapHelper();
+      PagerSnapHelper snapHelper = null;
+      String pageSize = WXUtils.getString(getAttrs().get(Constants.Name.PAGE_SIZE), null);
+      if(TextUtils.isEmpty(pageSize)) {
+        snapHelper = new PagerSnapHelper();
+      } else  {
+        snapHelper = new WXPagerSnapHelper();
+      }
+
       snapHelper.attachToRecyclerView(bounceRecyclerView.getInnerView());
     }
 
