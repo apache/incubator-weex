@@ -290,11 +290,13 @@ public class WXBridge implements IWXBridge {
     }
   }
 
+  @Override
   @CalledByNative
   public void setTimeoutNative(String callbackId, String time) {
     WXBridgeManager.getInstance().setTimeout(callbackId, time);
   }
 
+  @Override
   @CalledByNative
   public void setJSFrmVersion(String version) {
     if (version != null) {
