@@ -72,11 +72,11 @@
         }
         WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instanceIdCommit bundleUrl:bundleUrlCommit errorCode:errCode functionName:function exception:exception userInfo: [extInfo mutableCopy]];
         
-        //record top5 erromsg ,if errorType is not WX_RENDER_ERROR
-        WXSDKErrorType type = [WXSDKErrCodeUtil getErrorTypeByCode:errCode.intValue];
-        if (type != WX_RENDER_ERROR && nil != instance) {
-            [instance.apmInstance recordErrorMsg:jsExceptionInfo];
-        }
+//        //record top5 erromsg ,if errorType is not WX_RENDER_ERROR
+//        WXSDKErrorType type = [WXSDKErrCodeUtil getErrorTypeByCode:errCode.intValue];
+//        if (type != WX_RENDER_ERROR && nil != instance) {
+//            [instance.apmInstance recordErrorMsg:jsExceptionInfo];
+//        }
         [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo];
     });
 }

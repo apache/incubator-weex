@@ -350,47 +350,47 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) _checkScreenEmptyAndReport
 {
-    if(self.isDownLoadFailed || self.hasAddView || !self.isStartRender || self.isDegrade){
-        return;
-    }
-    if (![self _isReportEmptyScreenError]) {
-        return;
-    }
-    __weak WXApmForInstance* weakSelf = self;
-    WXPerformBlockOnComponentThread(^{
-        __strong WXApmForInstance* strongSelf = weakSelf;
-        if (nil == strongSelf) {
-            return;
-        }
-        long curTime = [WXUtility getUnixFixTimeMillis];
-        NSNumber* startExecJsTime = [strongSelf.stageDic objectForKey:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
-        if (nil == startExecJsTime) {
-            return;
-        }
-        long jsExecTime = curTime - startExecJsTime.longValue;
-        if (jsExecTime < 3000) {
-            return;
-        }
-        
-        NSString *codeStr = [NSString stringWithFormat:@"%d",WX_KEY_EXCEPTION_EMPTY_SCREEN_JS];
-        NSDictionary* extInfo = @{
-            @"wxBeginRender":@(strongSelf.isStartRender),
-            @"wxHasAddView":@(strongSelf.hasAddView),
-            @"wxHasDegrade":@(strongSelf.isDegrade),
-            @"wxJSExecTime":@(jsExecTime)
-            };
-        NSString* errorMsg;
-        if(self.errorList.count<=0){
-            NSNumber* jsEndTime = [strongSelf.stageDic objectForKey:KEY_PAGE_STAGES_CREATE_FINISH];
-            errorMsg = nil != jsEndTime
-                ? @"writeScreen :never add view until page destroy(js has execute > 3s)"
-                : @"writeScreen :never add view even js executeTime > 3s";
-        }else {
-            errorMsg = [NSString stringWithFormat:@"writeScreen :history exception :%@",[strongSelf _convertTopExceptionListToStr]];
-        }
-        [WXExceptionUtils commitCriticalExceptionRT:strongSelf.instanceId errCode:codeStr function:@"_checkScreenEmptyAndReport"
-                                          exception:errorMsg extParams:extInfo];
-    });
+//    if(self.isDownLoadFailed || self.hasAddView || !self.isStartRender || self.isDegrade){
+//        return;
+//    }
+//    if (![self _isReportEmptyScreenError]) {
+//        return;
+//    }
+//    __weak WXApmForInstance* weakSelf = self;
+//    WXPerformBlockOnComponentThread(^{
+//        __strong WXApmForInstance* strongSelf = weakSelf;
+//        if (nil == strongSelf) {
+//            return;
+//        }
+//        if (nil == [strongSelf.stageDic objectForKey:KEY_PAGE_STAGES_CREATE_FINISH]) {
+//            return;
+//        }
+//        long curTime = [WXUtility getUnixFixTimeMillis];
+//        NSNumber* startExecJsTime = [strongSelf.stageDic objectForKey:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
+//        if (nil == startExecJsTime) {
+//            return;
+//        }
+//        long jsExecTime = curTime - startExecJsTime.longValue;
+//        if (jsExecTime < 4000) {
+//            return;
+//        }
+//
+//        NSString *codeStr = [NSString stringWithFormat:@"%d",WX_KEY_EXCEPTION_EMPTY_SCREEN_JS];
+//        NSDictionary* extInfo = @{
+//            @"wxBeginRender":@(strongSelf.isStartRender),
+//            @"wxHasAddView":@(strongSelf.hasAddView),
+//            @"wxHasDegrade":@(strongSelf.isDegrade),
+//            @"wxJSExecTime":@(jsExecTime)
+//            };
+//        NSString* errorMsg;
+//        if(self.errorList.count<=0){
+//            errorMsg = @"whiteScreen :never add view until page destroy(js has execute > 3s)";
+//        }else {
+//            errorMsg = [NSString stringWithFormat:@"writeScreen :history exception :%@",[strongSelf _convertTopExceptionListToStr]];
+//        }
+//        [WXExceptionUtils commitCriticalExceptionRT:strongSelf.instanceId errCode:codeStr function:@"_checkScreenEmptyAndReport"
+//                                          exception:errorMsg extParams:extInfo];
+//    });
 }
 
 - (NSString *)_convertTopExceptionListToStr

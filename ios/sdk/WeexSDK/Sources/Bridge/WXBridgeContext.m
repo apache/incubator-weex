@@ -597,27 +597,53 @@ _Pragma("clang diagnostic pop") \
                     sdkInstance.executeRaxApiResult = [NSString stringWithFormat:@"%@", [[sdkInstance.instanceJavaScriptContext.javaScriptContext.globalObject toDictionary] allKeys]];
                 }
                 
+                [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
                 if ([NSURL URLWithString:sdkInstance.pageName] || sdkInstance.scriptURL) {
                     [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]?:sdkInstance.scriptURL];
                 } else {
                     [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
                 }
                 WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
-                [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
             }];
         }
         
     } else {
         [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:@"other"];
+        [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
         if (data){
             args = @[instanceIdString, jsBundleString, options ?: @{}, data];
         } else {
             args = @[instanceIdString, jsBundleString, options ?: @{}];
         }
+        [self _mountInstanceInfoToGlobalContext:sdkInstance];
         [self callJSMethod:@"createInstance" args:args];
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
-        [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
     }
+}
+
+- (BOOL) _shouldMountExtInfoToInstanceContxt
+{
+    id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    BOOL shouldMountInstanceContextExtInfo = YES;
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        shouldMountInstanceContextExtInfo = [[configCenter configForKey:@"iOS_weex_ext_config.shouldMountInstanceContextExtInfo" defaultValue:@YES isDefault:NULL] boolValue];
+    }
+    return shouldMountInstanceContextExtInfo;
+}
+
+- (void) _mountInstanceInfoToGlobalContext:(WXSDKInstance*) instance
+{
+    if (![self _shouldMountExtInfoToInstanceContxt]) {
+        return;
+    }
+    JSContext* globalContext = self.jsBridge.javaScriptContext;
+    if (!globalContext && [globalContext.name isEqualToString:@"Weex Context"]) {
+        return;
+    }
+    NSMutableDictionary *extInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+                @"wxInstanceId":instance.instanceId?:@"unSetInstanceId"
+    }];
+    globalContext[@"wxInstanceExtInfo"] = extInfo;
 }
 
 - (NSString *)_pareJSBundleType:(NSString*)instanceIdString jsBundleString:(NSString*)jsBundleString
@@ -1018,6 +1044,7 @@ _Pragma("clang diagnostic pop") \
         gInExceptionHandler = YES;
         
         @try {
+            BOOL tryFindInstanceInfoInGlobalContext = NO;
             context.exception = exception;
             NSString *errorCode = [NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_WXBRIDGE];;
             NSString *bundleUrl = nil;
@@ -1038,19 +1065,30 @@ _Pragma("clang diagnostic pop") \
                     }
                 } else {
                     // weex-main-jsfm.js runtime exception throws
-                    message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject]];
+                    message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@ js stack: %@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject]];
                     if (!JSValueIsUndefined(context.JSGlobalContextRef, exception[@"sourceURL"].JSValueRef)) {
                         bundleUrl = exception[@"sourceURL"].toString;
                     } else {
                         bundleUrl = @"weex-main-jsfm";
                     }
                     userInfo = [NSDictionary dictionary];
+                    tryFindInstanceInfoInGlobalContext = YES;
+                    JSValue* instanceExtInfoValue = [context objectForKeyedSubscript:@"wxInstanceExtInfo"];
+                    if (nil != instanceExtInfoValue) {
+                        NSDictionary* instanceInfo = [instanceExtInfoValue toDictionary];
+                        NSString* exceptionInstanceId = [instanceInfo objectForKey:@"wxInstanceId"];
+                        if (nil != exceptionInstanceId) {
+                            instance = [WXSDKManager instanceForID:exceptionInstanceId];
+                        }
+                    }
+                    errorCode = [NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_EMPTY_SCREEN_JS];
                 }
             } else {
                 instance = [WXSDKEngine topInstance];
             }
             
-            if (instance) {
+
+            if (instance && !tryFindInstanceInfoInGlobalContext) {
                 bundleUrl = instance.pageName?:([instance.scriptURL absoluteString]?:@"WX_KEY_EXCEPTION_WXBRIDGE");
                 message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@\n%@\n%@\n%@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject], instance.scriptURL.absoluteString, instance.callCreateInstanceContext?:@"", instance.createInstanceContextResult?:@"", instance.executeRaxApiResult?:@""];
                 userInfo = @{@"jsMainBundleStringContentLength":instance.userInfo[@"jsMainBundleStringContentLength"]?:@"",
@@ -1060,9 +1098,9 @@ _Pragma("clang diagnostic pop") \
             if (commitException) {
                 WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:bundleUrl errorCode:errorCode functionName:@"" exception:message userInfo:[userInfo mutableCopy]];
                 
-                [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo];
+                [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo.instanceId errCode:jsExceptionInfo.errorCode function:@"exceptionHandler" exception:jsExceptionInfo.exception extParams:jsExceptionInfo.userInfo];
                 WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_JS_EXECUTE, message);
-                if (instance.onJSRuntimeException) {
+                if (instance.onJSRuntimeException && !tryFindInstanceInfoInGlobalContext) {
                     instance.onJSRuntimeException(jsExceptionInfo);
                 }
             }

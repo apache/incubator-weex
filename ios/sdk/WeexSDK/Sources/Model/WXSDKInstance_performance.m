@@ -72,6 +72,9 @@
     if (diff > 8000) {
         return;
     }
+    if ([targetComponent.type isEqualToString:@"_root"]) {
+        return;
+    }
     
     if (diff < self.interactionTime) {
         //useless calulcate ,for imporove performance
