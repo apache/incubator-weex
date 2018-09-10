@@ -448,6 +448,32 @@ namespace WeexCore
         return 0;
     }
     
+    void IOSSide::InvokeLayoutPlatform(const char* page_id, long render_ptr)
+    {
+        RenderPage *page = RenderManager::GetInstance()->GetPage(page_id);
+        if (page == nullptr) {
+            return;
+        }
+        
+        long long startTime = getCurrentTime();
+        
+        RenderObject* renderObject = reinterpret_cast<RenderObject*>(render_ptr);
+        if (renderObject->getContext() == nullptr) {
+            return;
+        }
+        WXComponent* component = (__bridge WXComponent *)(renderObject->getContext());
+        NSString* ns_instanceId = NSSTRING(page_id);
+        
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return;
+        }
+        
+        [manager layoutComponent:component];
+
+        page->CallBridgeTime(getCurrentTime() - startTime);
+    }
+    
     int IOSSide::UpdateStyle(const char* pageId, const char* ref,
                             std::vector<std::pair<std::string, std::string>> *style,
                             std::vector<std::pair<std::string, std::string>> *margin,
@@ -743,19 +769,19 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
     NSString *optionsString = [WXUtility JSONString:options];
     NSString *dataString = [WXUtility JSONString:data];
-    node_manager->CreatePage([jsBundleString UTF8String], [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "");
+    node_manager->CreatePage([jsBundleString UTF8String] ?: "", [pageId UTF8String] ?: "", [optionsString UTF8String] ?: "", [dataString UTF8String] ?: "");
 }
 
 + (void)destroyDataRenderInstance:(NSString *)pageId
 {
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-    node_manager->ClosePage([pageId UTF8String]);
+    node_manager->ClosePage([pageId UTF8String] ?: "");
 }
 
-+ (void)refreshDataRenderInstance:(NSString *)pageId data:(id)data;
++ (void)refreshDataRenderInstance:(NSString *)pageId data:(NSString *)data;
 {
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-    node_manager->RefreshPage([pageId UTF8String], [data UTF8String]);
+    node_manager->RefreshPage([pageId UTF8String] ?: "", [data UTF8String] ?: "");
 }
 
 + (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
@@ -771,21 +797,21 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
             return;
         }
         
-        platformBridge->core_side()->SetDefaultHeightAndWidthIntoRootDom([pageId UTF8String], (float)width, (float)height, (bool)isWidthWrapContent, (bool)isHeightWrapContent);
+        platformBridge->core_side()->SetDefaultHeightAndWidthIntoRootDom([pageId UTF8String] ?: "", (float)width, (float)height, (bool)isWidthWrapContent, (bool)isHeightWrapContent);
     }
 }
 
 + (void)setViewportWidth:(NSString*)pageId width:(CGFloat)width
 {
     if (platformBridge) {
-        platformBridge->core_side()->SetViewPortWidth([pageId UTF8String], (float)width);
+        platformBridge->core_side()->SetViewPortWidth([pageId UTF8String] ?: "", (float)width);
     }
 }
 
 + (void)layoutPage:(NSString*)pageId forced:(BOOL)forced
 {
     if (platformBridge) {
-        const char* page = [pageId UTF8String];
+        const char* page = [pageId UTF8String] ?: "";
         if (forced) {
             platformBridge->core_side()->SetPageDirty(page);
         }
@@ -799,7 +825,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 + (void)closePage:(NSString*)pageId
 {
     if (platformBridge) {
-        platformBridge->core_side()->OnInstanceClose([pageId UTF8String]);
+        platformBridge->core_side()->OnInstanceClose([pageId UTF8String] ?: "");
     }
 }
 
@@ -845,10 +871,8 @@ static void _traverseTree(WeexCore::RenderObject *render, int index, const char*
     RenderObject* render = static_cast<RenderObject*>(object);
     std::pair<float, float> renderPageSize(size.width, size.height);
     
-    render->LayoutBeforeImpl();
     render->calculateLayout(renderPageSize);
-    render->LayoutAfterImpl();
-    _traverseTree(render, 0, [pageId UTF8String]);
+    _traverseTree(render, 0, [pageId UTF8String] ?: "");
 }
 
 + (void*)copyRenderObject:(void*)source replacedRef:(NSString*)ref
@@ -859,7 +883,7 @@ static void _traverseTree(WeexCore::RenderObject *render, int index, const char*
                                                           
     copyObject->CopyFrom(sourceObject);
     if (ref != nil) {
-        copyObject->set_ref([ref UTF8String]);
+        copyObject->set_ref([ref UTF8String] ?: "");
     }
 
     if (sourceObject->type() == kRenderCellSlot || sourceObject->type() == kRenderCell) {
@@ -933,6 +957,18 @@ static void _convertToCString(id _Nonnull obj, void (^callback)(const char*))
     }
 }
 
+static void _parseStyleBeforehand(NSDictionary* styles, NSString* key, WeexCore::RenderObject* render)
+{
+    id data = styles[key];
+    if (data) {
+        _convertToCString(data, ^(const char * value) {
+            if (value != nullptr) {
+                render->AddStyle([key UTF8String], value);
+            }
+        });
+    }
+}
+
 static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::RenderObject* parent,
                                                   int index, const std::string& pageId)
 {
@@ -955,7 +991,15 @@ static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::
             });
         }];
         
-        [data[@"style"] enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+        // margin/padding/borderWidth should be handled beforehand. Because maringLeft should override margin.
+        NSDictionary* styles = data[@"style"];
+        _parseStyleBeforehand(styles, @"margin", render);
+        _parseStyleBeforehand(styles, @"padding", render);
+        _parseStyleBeforehand(styles, @"borderWidth", render);
+        [styles enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            if ([key isEqualToString:@"margin"] || [key isEqualToString:@"padding"] || [key isEqualToString:@"borderWidth"]) {
+                return;
+            }
             _convertToCString(obj, ^(const char * value) {
                 if (value != nullptr) {
                     render->AddStyle([key UTF8String], value);
@@ -1000,63 +1044,66 @@ static std::vector<std::pair<std::string, std::string>>* _parseMapValuePairs(NSD
 + (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index
 {
     using namespace WeexCore;
-    const std::string page([pageId UTF8String]);
+    const std::string page([pageId UTF8String] ?: "");
     RenderObject* child = _parseRenderObject(data, nullptr, 0, page);
-    RenderManager::GetInstance()->AddRenderObject(page, [parentRef UTF8String], index, child);
+    RenderManager::GetInstance()->AddRenderObject(page, [parentRef UTF8String] ?: "", index, child);
 }
 
 + (void)callCreateBody:(NSString*)pageId data:(NSDictionary*)data
 {
     using namespace WeexCore;
-    const std::string page([pageId UTF8String]);
-    RenderManager::GetInstance()->CreatePage(page, [&] (void) -> RenderObject* {
+    const std::string page([pageId UTF8String] ?: "");
+    RenderManager::GetInstance()->CreatePage(page, [&] (RenderPage* pageInstance) -> RenderObject* {
+        pageInstance->set_before_layout_needed(false); // we do not need before and after layout
+        pageInstance->set_after_layout_needed(false);
+        pageInstance->set_platform_layout_needed(true);
         return _parseRenderObject(data, nullptr, 0, page);
     });
 }
 
 + (void)callRemoveElement:(NSString*)pageId ref:(NSString*)ref
 {
-    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->RemoveElement([pageId UTF8String], [ref UTF8String]);
+    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->RemoveElement([pageId UTF8String] ?: "", [ref UTF8String] ?: "");
 }
 
 + (void)callMoveElement:(NSString*)pageId ref:(NSString*)ref parentRef:(NSString*)parentRef index:(int)index
 {
-    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->MoveElement([pageId UTF8String], [ref UTF8String], [parentRef UTF8String], index);
+    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->MoveElement([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [parentRef UTF8String] ?: "", index);
 }
 
 + (void)callUpdateAttrs:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
 {
-    WeexCore::RenderManager::GetInstance()->UpdateAttr([pageId UTF8String], [ref UTF8String], _parseMapValuePairs(data));
+    WeexCore::RenderManager::GetInstance()->UpdateAttr([pageId UTF8String] ?: "", [ref UTF8String] ?: "", _parseMapValuePairs(data));
 }
 
 + (void)callUpdateStyle:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
 {
-    WeexCore::RenderManager::GetInstance()->UpdateStyle([pageId UTF8String], [ref UTF8String], _parseMapValuePairs(data));
+    WeexCore::RenderManager::GetInstance()->UpdateStyle([pageId UTF8String] ?: "", [ref UTF8String] ?: "", _parseMapValuePairs(data));
 }
 
 + (void)callAddEvent:(NSString*)pageId ref:(NSString*)ref event:(NSString*)event
 {
-    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->AddEvent([pageId UTF8String], [ref UTF8String], [event UTF8String]);
+    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->AddEvent([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [event UTF8String] ?: "");
 }
 
 + (void)callRemoveEvent:(NSString*)pageId ref:(NSString*)ref event:(NSString*)event
 {
-    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->RemoveEvent([pageId UTF8String], [ref UTF8String], [event UTF8String]);
+    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->RemoveEvent([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [event UTF8String] ?: "");
 }
 
 + (void)callCreateFinish:(NSString*)pageId
 {
-    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->CreateFinish([pageId UTF8String]);
+    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->CreateFinish([pageId UTF8String] ?: "");
 }
 
 + (void)callRefreshFinish:(NSString*)pageId
 {
-    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->RefreshFinish([pageId UTF8String], nullptr, nullptr);
+    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->RefreshFinish([pageId UTF8String] ?: "", nullptr, nullptr);
 }
 
 + (void)callUpdateFinish:(NSString*)pageId
 {
-    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->UpdateFinish([pageId UTF8String], nullptr, 0, nullptr, 0);
+    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->UpdateFinish([pageId UTF8String] ?: "", nullptr, 0, nullptr, 0);
 }
 
 @end

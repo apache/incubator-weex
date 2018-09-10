@@ -53,6 +53,8 @@ class RenderObject : public IRenderObject {
  public:
   void LayoutBeforeImpl();
 
+  void LayoutPlatformImpl();
+    
   void LayoutAfterImpl();
 
   void CopyFrom(RenderObject *src);
@@ -82,6 +84,8 @@ class RenderObject : public IRenderObject {
   void BindMeasureFunc();
 
   void OnLayoutBefore();
+    
+  void OnLayoutPlatform();
 
   void OnLayoutAfter(float width, float height);
 

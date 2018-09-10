@@ -258,6 +258,11 @@
         ((WXCellComponent *)subcomponent).delegate = self;
     } else if ([subcomponent isKindOfClass:[WXHeaderComponent class]]) {
         ((WXHeaderComponent *)subcomponent).delegate = self;
+    } else if (![subcomponent isKindOfClass:[WXRefreshComponent class]]
+               && ![subcomponent isKindOfClass:[WXLoadingComponent class]]
+               && subcomponent->_positionType != WXPositionTypeFixed) {
+        WXLogError(@"list only support cell/header/refresh/loading/fixed-component as child.");
+        return NO;
     }
     
     BOOL inserted = [super _insertSubcomponent:subcomponent atIndex:index];

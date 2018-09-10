@@ -56,6 +56,10 @@ void AndroidSide::InvokeLayoutBefore(const char *page_id, long render_ptr) {
       page_id, render_ptr);
 }
 
+void AndroidSide::InvokeLayoutPlatform(const char* page_id, long render_ptr) {
+  // do nothing
+}
+
 void AndroidSide::InvokeLayoutAfter(const char *page_id, long render_ptr,
                                     float width, float height) {
   WeexCoreManager::Instance()->measure_function_adapter()->LayoutAfter(

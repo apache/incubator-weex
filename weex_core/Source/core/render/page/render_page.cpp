@@ -89,9 +89,16 @@ void RenderPage::CalculateLayout() {
 #endif
 
   int64_t start_time = getCurrentTime();
-  this->render_root_->LayoutBeforeImpl();
+  if (is_before_layout_needed_.load()) {
+    this->render_root_->LayoutBeforeImpl();
+  }
   this->render_root_->calculateLayout(this->render_page_size_);
-  this->render_root_->LayoutAfterImpl();
+  if (is_platform_layout_needed_.load()) {
+    this->render_root_->LayoutPlatformImpl();
+  }
+  if (is_after_layout_needed_.load()) {
+    this->render_root_->LayoutAfterImpl();
+  }
   CssLayoutTime(getCurrentTime() - start_time);
   TraverseTree(this->render_root_, 0);
 }

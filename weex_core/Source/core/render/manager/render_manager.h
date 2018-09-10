@@ -57,7 +57,7 @@ class RenderManager {
 
   bool CreatePage(const std::string& page_id, RenderObject *root);
     
-  bool CreatePage(const std::string& page_id, std::function<RenderObject* (void)> constructRoot);
+  bool CreatePage(const std::string& page_id, std::function<RenderObject* (RenderPage*)> constructRoot);
 
   /** use auto constructor is bad idea, it cann't transfer binary, use char* is
    * better */

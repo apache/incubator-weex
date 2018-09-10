@@ -2088,7 +2088,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   private void doReportJSException(String instanceId, String function, String exception){
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
     IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
     if (adapter != null) {
       String exceptionId = instanceId;
@@ -2136,9 +2136,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         }
       }
 
-      WXErrorCode errorCode = (METHOD_CREATE_INSTANCE.equals(function) || METHOD_CREATE_INSTANCE_CONTEXT.equals(function))
-          ?WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE
-          :WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE;
+
+      WXErrorCode errorCode;
+      if (METHOD_CREATE_INSTANCE.equals(function)){
+        errorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE;
+      }else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function)){
+        errorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT;
+      }else {
+        errorCode = WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE;
+      }
+
       WXExceptionUtils.commitCriticalExceptionRT(exceptionId, errorCode,
             function,
           errorCode.getErrorMsg() + exception,

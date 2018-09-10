@@ -144,6 +144,7 @@ class PlatformBridge {
                                              float height,
                                              int height_measure_mode) = 0;
     virtual void InvokeLayoutBefore(const char* page_id, long render_ptr) = 0;
+    virtual void InvokeLayoutPlatform(const char* page_id, long render_ptr) = 0;
     virtual void InvokeLayoutAfter(const char* page_id, long render_ptr,
                                    float width, float height) = 0;
     virtual void SetJSVersion(const char* version) = 0;

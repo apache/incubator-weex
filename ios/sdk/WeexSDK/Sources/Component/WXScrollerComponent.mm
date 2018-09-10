@@ -71,6 +71,7 @@
 @implementation WXScrollerComponent
 {
     CGSize _contentSize;
+    BOOL _needsPlatformLayout;
     BOOL _listenLoadMore;
     BOOL _scrollEvent;
     BOOL _scrollStartEvent;
@@ -124,6 +125,19 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     else if ([subcomponent isKindOfClass:[WXLoadingComponent class]]) {
         _loadingComponent = (WXLoadingComponent*)subcomponent;
+    }
+    
+    // If a vertical list is added to a horizontal scroller, we need platform dependent layout
+    if (_flexCssNode && [self isMemberOfClass:[WXScrollerComponent class]] && (_scrollDirection == WXScrollDirectionHorizontal) &&
+        [subcomponent isKindOfClass:[WXScrollerComponent class]] &&
+        subcomponent->_positionType != WXPositionTypeFixed &&
+        (((WXScrollerComponent*)subcomponent).scrollDirection == WXScrollDirectionVertical)) {
+        if (subcomponent->_flexCssNode) {
+            if (subcomponent->_flexCssNode->getFlex() > 0 && !isnan(subcomponent->_flexCssNode->getStyleWidth())) {
+                _needsPlatformLayout = YES;
+                _flexCssNode->setNeedsPlatformDependentLayout(true);
+            }
+        }
     }
     
     return inserted;
@@ -1001,6 +1015,42 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     else if (_scrollDirection == WXScrollDirectionHorizontal) {
         _contentSize.width = value;
+    }
+}
+
+- (void)_layoutPlatform
+{
+    /* Handle multiple vertical scrollers inside horizontal scroller case. In weexcore,
+     a verticall list with NAN height will be set flex=1, which suppresses its style-width property.
+     This will cause two lists with style-width 750px in a horizontal scroller sharing one screen width.
+     Here we respect its style-width property so that the two lists will both be screen width wide. */
+    
+    if (_needsPlatformLayout) {
+        if (_flexCssNode) {
+            float top = _flexCssNode->getLayoutPositionTop();
+            float left = _flexCssNode->getLayoutPositionLeft();
+            float width = _flexCssNode->getLayoutWidth();
+            float height = _flexCssNode->getLayoutHeight();
+            
+            _flexCssNode->setFlexDirection(WeexCore::kFlexDirectionRow, NO);
+            _flexCssNode->setStyleHeight(_flexCssNode->getLayoutHeight());
+            _flexCssNode->setStyleWidth(FlexUndefined, NO);
+            _flexCssNode->markAllDirty();
+            std::pair<float, float> renderPageSize;
+            renderPageSize.first = self.weexInstance.frame.size.width;
+            renderPageSize.second = self.weexInstance.frame.size.height;
+            auto parent = _flexCssNode->getParent(); // clear parent temporarily
+            _flexCssNode->setParent(nullptr, _flexCssNode);
+            _flexCssNode->calculateLayout(renderPageSize);
+            _flexCssNode->setParent(parent, _flexCssNode);
+            
+            // set origin and size back
+            _flexCssNode->rewriteLayoutResult(left, top, width, height);
+        }
+    }
+    else {
+        // should not happen, set platform layout to false
+        _flexCssNode->setNeedsPlatformDependentLayout(false);
     }
 }
 

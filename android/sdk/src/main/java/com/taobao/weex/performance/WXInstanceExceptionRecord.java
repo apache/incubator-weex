@@ -50,7 +50,7 @@ public class WXInstanceExceptionRecord {
     private boolean mHasReportScreenEmpty = false;
     private boolean mBeginRender = false;
     public boolean isDownLoadBundleFailed = false;
-    public static boolean isReportWriteScreen = true;
+    public static boolean isReportWriteScreen = false;
 
     public WXInstanceExceptionRecord(String instanceId) {
         this.instanceId = instanceId;
@@ -65,6 +65,9 @@ public class WXInstanceExceptionRecord {
      * when checkEmptyScreen, report msg
      */
     public void recordErrorMsg(WXJSExceptionInfo exceptionInfo) {
+        if (isReportWriteScreen){
+            return;
+        }
         if (null == exceptionInfo) {
             return;
         }
@@ -139,10 +142,14 @@ public class WXInstanceExceptionRecord {
     }
 
     public void checkEmptyScreenAndReport() {
-        if (!isReportWriteScreen || isDownLoadBundleFailed){
+        if (!isReportWriteScreen){
             return;
         }
-        if (!mBeginRender || mHasReportScreenEmpty || hasAddView.get() || hasDegrade.get()) {
+        if (isDownLoadBundleFailed || !mBeginRender || mHasReportScreenEmpty || hasAddView.get() || hasDegrade.get()) {
+            return;
+        }
+
+        if (!mStageMap.containsKey(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH)){
             return;
         }
 
@@ -153,18 +160,16 @@ public class WXInstanceExceptionRecord {
         }
         long currentTime = WXUtils.getFixUnixTime();
         long jsExecTime = currentTime - startExecJsTime;
-        //3s limit of instance stayTime (case in\quit very fast case)
-        if (jsExecTime <= 3000){
+        //4s limit of instance stayTime (case in\quit very fast case)
+        if (jsExecTime <= 4000){
             return;
         }
 
         String errorMsg;
         if(errorList.isEmpty()){
-            errorMsg = mStageMap.containsKey(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH)
-                ?"writeScreen :never add view until page destroy(js has execute > 3s)"
-                :"writeScreen :never add view even js executeTime > 3s";
+            errorMsg = "whiteScreen :never add view until page destroy,(js has execute > 4s,has createFinish)";
         }else {
-            errorMsg =  "writeScreen :history exception :"+ convertExceptionListToString();
+            errorMsg =  "whiteScreen :history exception :"+ convertExceptionListToString();
         }
 
 
@@ -175,13 +180,13 @@ public class WXInstanceExceptionRecord {
         flagMap.put("wxHasReportScreenEmpty",String.valueOf(mHasReportScreenEmpty));
         flagMap.put("wxJSExecTime", String.valueOf(jsExecTime));
 
-        WXExceptionUtils.commitCriticalExceptionRT(
-            instanceId,
-            WXErrorCode.WX_RENDER_ERR_JS_RUNTIME,
-            "checkEmptyScreenAndReport",
-            errorMsg,
-            flagMap
-        );
+        //WXExceptionUtils.commitCriticalExceptionRT(
+        //    instanceId,
+        //    WXErrorCode.WX_RENDER_ERR_JS_RUNTIME,
+        //    "checkEmptyScreenAndReport",
+        //    errorMsg,
+        //    flagMap
+        //);
     }
 
     public Long getStageTime(String key){
