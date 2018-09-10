@@ -89,9 +89,11 @@ struct ASTParser final {
           if (class_style.is_string()) {
             args.push_back(
                 factory_->NewStringConstant(wrap_prefix + class_style.string_value()));
-            statement->PushExpression(factory_->NewCallExpression(func_id, args));
-            args.pop_back();
+          } else {
+            args.push_back(ParseBindingExpression(class_style));
           }
+          statement->PushExpression(factory_->NewCallExpression(func_id, args));
+          args.pop_back();
         }
       }
     }

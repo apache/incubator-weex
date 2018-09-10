@@ -387,14 +387,17 @@ static Value SetProps(ExecState *exec_state) {
 // setClassList(node, "class-name");
 static Value SetClassList(ExecState* exec_state) {
   VNode* node = reinterpret_cast<VNode*>(exec_state->GetArgument(0)->cptr);
-  char* key = exec_state->GetArgument(1)->str->c_str();
+  Value* key = exec_state->GetArgument(1);
+  if (key->type != Value::Type::STRING) {
+      return Value();
+  }
 
   if (node == nullptr) {
     return Value();
   }
 
   auto styles = exec_state->context()->style_json();
-  const json11::Json& style = styles[key];
+  const json11::Json& style = styles[key->str->c_str()];
   if (style.is_null()) {
     return Value();
   }
