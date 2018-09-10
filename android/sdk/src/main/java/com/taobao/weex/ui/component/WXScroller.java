@@ -34,6 +34,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -81,10 +84,18 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private Point mLastReport = new Point(-1, -1);
   private boolean mHasAddScrollEvent = false;
 
+  private static final int SWIPE_MIN_DISTANCE = 5;
+  private static final int SWIPE_THRESHOLD_VELOCITY = 300;
+  private int mActiveFeature = 0;
   /**
    * scroll start and scroll end event
    * */
   private ScrollStartEndHelper mScrollStartEndHelper;
+
+  private GestureDetector mGestureDetector;
+
+  private int pageSize = 0;
+  private boolean pageEnable = false;
 
   public static class Creator implements ComponentCreator {
     @Override
@@ -392,12 +403,28 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       scroll = "vertical";
     } else {
       scroll = getAttrs().getScrollDirection();
+
+      Object o = getAttrs().get(Constants.Name.PAGE_ENABLED);
+
+      pageEnable = o != null && Boolean.parseBoolean(o.toString());
+
+      Object pageSize = getAttrs().get(Constants.Name.PAGE_SIZE);
+      if (pageSize != null) {
+        float aFloat = WXUtils.getFloat(pageSize);
+
+
+        float realPxByWidth = WXViewUtils.getRealPxByWidth(aFloat, getInstance().getInstanceViewPortWidth());
+        if (realPxByWidth != 0) {
+          this.pageSize = (int) realPxByWidth;
+        }
+      }
+
     }
 
     ViewGroup host;
     if(("horizontal").equals(scroll)){
       mOrientation = Constants.Orientation.HORIZONTAL;
-      WXHorizontalScrollView scrollView = new WXHorizontalScrollView(context);
+      final WXHorizontalScrollView scrollView = new WXHorizontalScrollView(context);
       mRealView = new FrameLayout(context);
       scrollView.setScrollViewListener(new WXHorizontalScrollView.ScrollViewListener() {
         @Override
@@ -409,6 +436,30 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
               LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
       scrollView.addView(mRealView, layoutParams);
       scrollView.setHorizontalScrollBarEnabled(false);
+
+      if(pageEnable && this.pageSize != 0) {
+        mGestureDetector = new GestureDetector(new MyGestureDetector(scrollView));
+        scrollView.setOnTouchListener(new View.OnTouchListener() {
+          @Override
+          public boolean onTouch(View v, MotionEvent event) {
+            if (mGestureDetector.onTouchEvent(event)) {
+              return true;
+            }
+            else if(event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL ){
+              int scrollX = getScrollX();
+              int featureWidth = pageSize;
+              mActiveFeature = ((scrollX + (featureWidth/2))/featureWidth);
+              int scrollTo = mActiveFeature*featureWidth;
+              scrollView.smoothScrollTo(scrollTo, 0);
+              return true;
+            }
+            else{
+              return false;
+            }
+          }
+        });
+      }
+
 
       host = scrollView;
     }else{
@@ -768,5 +819,42 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       mScrollStartEndHelper = new ScrollStartEndHelper(this);
     }
     return mScrollStartEndHelper;
+  }
+
+
+  class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
+    public WXHorizontalScrollView getScrollView() {
+      return scrollView;
+    }
+
+    private final WXHorizontalScrollView scrollView;
+
+    MyGestureDetector(WXHorizontalScrollView horizontalScrollView) {
+      scrollView = horizontalScrollView;
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+      int mItems = mChildren.size();
+      try {
+        //right to left
+        if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+          int featureWidth = pageSize;
+          mActiveFeature = (mActiveFeature < (mItems - 1))? mActiveFeature + 1:mItems -1;
+          scrollView.smoothScrollTo(mActiveFeature*featureWidth, 0);
+          return true;
+        }
+        //left to right
+        else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+          int featureWidth = pageSize;
+          mActiveFeature = (mActiveFeature > 0)? mActiveFeature - 1:0;
+          scrollView.smoothScrollTo(mActiveFeature*featureWidth, 0);
+          return true;
+        }
+      } catch (Exception e) {
+        WXLogUtils.e("There was an error processing the Fling event:" + e.getMessage());
+      }
+      return false;
+    }
   }
 }
