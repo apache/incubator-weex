@@ -957,6 +957,18 @@ static void _convertToCString(id _Nonnull obj, void (^callback)(const char*))
     }
 }
 
+static void _parseStyleBeforehand(NSDictionary* styles, NSString* key, WeexCore::RenderObject* render)
+{
+    id data = styles[key];
+    if (data) {
+        _convertToCString(data, ^(const char * value) {
+            if (value != nullptr) {
+                render->AddStyle([key UTF8String], value);
+            }
+        });
+    }
+}
+
 static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::RenderObject* parent,
                                                   int index, const std::string& pageId)
 {
@@ -979,7 +991,15 @@ static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::
             });
         }];
         
-        [data[@"style"] enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+        // margin/padding/borderWidth should be handled beforehand. Because maringLeft should override margin.
+        NSDictionary* styles = data[@"style"];
+        _parseStyleBeforehand(styles, @"margin", render);
+        _parseStyleBeforehand(styles, @"padding", render);
+        _parseStyleBeforehand(styles, @"borderWidth", render);
+        [styles enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            if ([key isEqualToString:@"margin"] || [key isEqualToString:@"padding"] || [key isEqualToString:@"borderWidth"]) {
+                return;
+            }
             _convertToCString(obj, ^(const char * value) {
                 if (value != nullptr) {
                     render->AddStyle([key UTF8String], value);
