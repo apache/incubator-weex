@@ -142,7 +142,7 @@ namespace WeexCore
 
 + (void)destroyDataRenderInstance:(NSString *)pageId;
 
-+ (void)refreshDataRenderInstance:(NSString *)pageId data:(id)data;
++ (void)refreshDataRenderInstance:(NSString *)pageId data:(NSString *)data;
 
 + (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
                  isWidthWrapContent:(BOOL)isWidthWrapContent
