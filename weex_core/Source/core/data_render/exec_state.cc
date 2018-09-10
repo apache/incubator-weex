@@ -454,6 +454,8 @@ void ExecState::endEncode() {
 }
 
 bool ExecState::startDecode() {
+    ValueRef::gs_ref_id = 0;
+
     BinaryFile* file = BinaryFile::instance();
     int magic_number;
     file->read((char*)&magic_number, sizeof(int));
