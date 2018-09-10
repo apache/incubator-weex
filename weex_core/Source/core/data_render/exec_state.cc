@@ -406,11 +406,11 @@ void ExecState::encodeValue(const Value &value) {
 
     if (value.type == Value::Type::FUNC) {
         FuncState* func_state_base = func_state_.get();
-        const std::vector<std::unique_ptr<FuncState>> &children = func_state_base->children();
+        const std::vector<FuncState*> &children = func_state_base->getAllChildren();
         std::vector<FuncState*> func_states;
         func_states.push_back(func_state_base);
         for (auto &func : children) {
-            func_states.push_back(func.get());
+            func_states.push_back(func);
         }
 
         int payload = 0;
@@ -893,7 +893,7 @@ void ExecState::serializeValue(Value &value) {
         if (value.index == 0) {
             value.f = func_state_.get();
         } else {
-            value.f = func_state_->children()[value.index-1].get();
+            value.f = func_state_->getAllChildren()[value.index-1];
         }
     }
 
