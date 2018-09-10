@@ -37,6 +37,7 @@
 #include "core/render/action/render_action_render_success.h"
 #include "core/render/action/render_action_update_attr.h"
 #include "core/render/action/render_action_update_style.h"
+#include "core/render/action/render_action_trigger_vsync.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_type.h"
 #include "core/render/node/render_list.h"
@@ -625,6 +626,13 @@ std::vector<int64_t> RenderPage::PrintRenderSuccessLog() {
 void RenderPage::Batch() {
   if ((kUseVSync && this->need_layout_.load()) || !kUseVSync) {
     LayoutInner();
+  }
+  else {
+#if OS_IOS
+    // vsync may stopped, trigger once
+    RenderAction *action = new RenderActionTriggerVSync(page_id());
+    PostRenderAction(action);
+#endif
   }
 }
 

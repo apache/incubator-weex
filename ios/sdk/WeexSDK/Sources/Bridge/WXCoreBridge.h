@@ -40,6 +40,8 @@ namespace WeexCore
         void InvokeLayoutAfter(const char* page_id, long render_ptr,
                                float width, float height) override {};
         
+        void TriggerVSync(const char* page_id) override;
+        
         void SetJSVersion(const char* version) override;
         
         void ReportException(const char* pageId, const char *func, const char *exception_string) override;
