@@ -690,7 +690,7 @@ typedef NS_ENUM(NSInteger, Direction) {
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
     WXRecycleSliderView *view = (WXRecycleSliderView *)self.delegate;
-    if (![view isKindOfClass:[WXRecycleSliderView class]]) {
+    if (![view isKindOfClass:[UIView class]]) {
         return YES;
     }
     
