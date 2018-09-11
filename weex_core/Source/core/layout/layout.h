@@ -732,7 +732,9 @@ namespace WeexCore {
     inline void removeChild(WXCoreLayoutNode* const child) {
       for (int index = 0; index < mChildList.size(); index++) {
         if (child == mChildList[index]) {
-          child->mParent = nullptr;
+            if (!WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_ANDROID_GC) {
+                child->mParent = nullptr;
+            }
           mChildList.erase(mChildList.begin() + index);
           break;
         }
