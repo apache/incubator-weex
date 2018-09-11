@@ -23,6 +23,7 @@ import com.taobao.weex.utils.batch.Interceptor;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by sospartan on 8/24/16.
@@ -31,7 +32,7 @@ public class BatchOperationHelper implements Interceptor {
 
 
   private BactchExecutor mExecutor;
-  private ArrayList<Runnable> sRegisterTasks = new ArrayList<>();
+  private CopyOnWriteArrayList <Runnable> sRegisterTasks = new CopyOnWriteArrayList<>();
   private boolean isCollecting = false;
 
   public BatchOperationHelper(BactchExecutor executor){
