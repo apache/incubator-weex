@@ -23,6 +23,7 @@
 #include <string>
 
 namespace WeexCore {
+  constexpr char DIRECTION[] = "direction";
 
   constexpr char FLEX[] = "flex";
   constexpr char HORIZONTAL[] = "horizontal";

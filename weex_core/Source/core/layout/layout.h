@@ -285,14 +285,14 @@ namespace WeexCore {
     }
       
     inline void copyStyle(WXCoreLayoutNode *srcNode) {
-      if (memcmp(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle)) != 0) {
+      if (srcNode != nullptr && memcmp(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle)) != 0) {
         memcpy(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle));
         markDirty();
       }
     }
-
+    
     inline void copyMeasureFunc(WXCoreLayoutNode *srcNode) {
-      if (memcmp(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc)) != 0) {
+      if (srcNode != nullptr && memcmp(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc)) != 0) {
         memcpy(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc));
         markDirty();
       }

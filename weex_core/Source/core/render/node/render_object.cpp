@@ -147,6 +147,9 @@ StyleType RenderObject::ApplyStyle(const std::string &key,
       }
     }
     return kTypeLayout;
+  } else if (key == DIRECTION) {
+    setDirection(GetWXCoreDirection(value), updating);
+    return kTypeLayout;
   } else if (key == FLEX_DIRECTION) {
     setFlexDirection(GetWXCoreFlexDirection(value), updating);
     return kTypeLayout;
