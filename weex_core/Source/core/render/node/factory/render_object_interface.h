@@ -40,7 +40,7 @@ class IRenderObject : public WXCoreLayoutNode {
   inline const std::string &type() const { return this->tyle_; }
 
   inline void CopyFrom(IRenderObject *src) {
-    WXCoreLayoutNode::copyFrom(src);
+    WXCoreLayoutNode::copyStyle(src);
     set_ref(src->ref());
     set_page_id(src->page_id());
     set_type(src->type());

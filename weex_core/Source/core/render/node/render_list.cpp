@@ -56,7 +56,7 @@ RenderList::~RenderList() {
 }
 
 void RenderList::AddCellSlotCopyTrack(RenderObject *cell_slot) {
-  cell_slot->setParent(this, cell_slot);
+  cell_slot->setParent(this);
   this->cell_slots_copys_.push_back(cell_slot);
 }
 
@@ -90,7 +90,7 @@ std::map<std::string, std::string> *RenderList::GetDefaultStyle() {
 
 void RenderList::set_flex(const float flex) {
   this->is_set_flex_ = true;
-  WXCoreLayoutNode::set_flex(flex);
+  WXCoreLayoutNode::setFlex(flex);
 }
 
 std::map<std::string, std::string> *RenderList::GetDefaultAttr() {
@@ -238,7 +238,7 @@ int RenderList::AddRenderObject(int index, RenderObject *child) {
   if (type() == kRenderRecycleList &&
       (child->type() == kRenderCellSlot || child->type() == kRenderCell ||
        child->type() == kRenderHeader)) {
-    child->setParent(this, child);
+    child->setParent(this);
     this->cell_slots_.insert(this->cell_slots_.end(), child);
     index = -1;
   } else {

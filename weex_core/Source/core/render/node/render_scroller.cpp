@@ -50,6 +50,6 @@ std::map<std::string, std::string> *RenderScroller::GetDefaultStyle() {
 
 void RenderScroller::set_flex(const float flex) {
   this->is_set_flex_ = true;
-  WXCoreLayoutNode::set_flex(flex);
+  WXCoreLayoutNode::setFlex(flex);
 }
 }  // namespace WeexCore

@@ -253,7 +253,7 @@ namespace WeexCore {
     }
 
     inline bool haveMeasureFunc() const {
-      return measureFunc != nullptr;
+      return nullptr != measureFunc;
     }
 
     /** ================================ context =================================== **/

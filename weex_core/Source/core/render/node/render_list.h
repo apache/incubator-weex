@@ -64,7 +64,7 @@ class RenderList : public RenderObject {
 
   int TakeOrientation();
 
-  inline float CalculateFreeSpaceAlongMainAxis(
+  inline float calcFreeSpaceAlongMainAxis(
       const float &width, const float &height,
       const float &currentLength) const override {
     return NAN;

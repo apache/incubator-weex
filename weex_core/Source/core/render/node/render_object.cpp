@@ -139,11 +139,11 @@ StyleType RenderObject::ApplyStyle(const std::string &key,
     return kTypeLayout;
   } else if (key == FLEX) {
     if (value.empty()) {
-      set_flex(0);
+      setFlex(0);
     } else {
       float ret = getFloat(value.c_str());
       if (!isnan(ret)) {
-        set_flex(ret);
+        setFlex(ret);
       }
     }
     return kTypeLayout;
