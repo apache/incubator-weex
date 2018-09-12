@@ -22,6 +22,7 @@
 #include <core/manager/weex_core_manager.h>
 #include <base/make_copyable.h>
 #include <base/thread/waitable_event.h>
+#include "base/string_util.h"
 #include <wson_parser.h>
 #include "jsfunction_impl_android.h"
 #include "android/base/string/string_utils.h"
@@ -29,6 +30,7 @@
 #include "core/render/manager/render_manager.h"
 #include "IPC/IPCResult.h"
 #include "core/bridge/platform_bridge.h"
+#include "base/ViewUtils.h"
 
 using namespace WeexCore;
 
@@ -86,12 +88,42 @@ void jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, j
   JByteArrayRef arg = JByteArrayRef(env, arguments);
   JByteArrayRef opt = JByteArrayRef(env, options);
 
-  WeexCoreManager::Instance()
+  std::string ret_str = "";
+
+  std::unique_ptr<ValueWithType> ret = WeexCoreManager::Instance()
       ->script_bridge()
       ->core_side()
       ->CallNativeModule(page_id_ref.getChars(), module_ref.getChars(), method_ref.getChars(),
                          arg.getBytes(), arg.length(),
                          opt.getBytes(), opt.length());
+
+
+  switch (ret.get()->type) {
+    case ParamsType::INT32:
+      ret_str = to_string(ret.get()->value.int32Value);
+      break;
+    case ParamsType::INT64:
+      ret_str = to_string(ret.get()->value.int64Value);
+      break;
+    case ParamsType::FLOAT:
+    case ParamsType::DOUBLE:
+      ret_str = to_string(ret.get()->value.doubleValue);
+      break;
+    case ParamsType::VOID:
+      break;
+    case ParamsType::BYTEARRAY:
+      ret.get()->value.byteArray->content;
+      ret.get()->value.byteArray->length;
+      break;
+    case ParamsType::JSONSTRING:
+      weex::base::to_utf8(ret.get()->value.string->content, ret.get()->value.string->length);
+      break;
+    case ParamsType::STRING:
+      weex::base::to_utf8(ret.get()->value.string->content, ret.get()->value.string->length);
+      break;
+    default:
+      break;
+  }
 }
 
 void
