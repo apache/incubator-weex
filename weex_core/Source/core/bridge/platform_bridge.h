@@ -147,6 +147,8 @@ class PlatformBridge {
     virtual void InvokeLayoutPlatform(const char* page_id, long render_ptr) = 0;
     virtual void InvokeLayoutAfter(const char* page_id, long render_ptr,
                                    float width, float height) = 0;
+    virtual void TriggerVSync(const char* page_id) = 0; // vsync loop may stop on some platforms like iOS
+      
     virtual void SetJSVersion(const char* version) = 0;
     virtual void ReportException(const char* page_id, const char* func,
                                  const char* exception_string) = 0;

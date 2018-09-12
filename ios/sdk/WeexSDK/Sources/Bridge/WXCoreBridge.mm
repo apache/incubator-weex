@@ -231,6 +231,21 @@ namespace WeexCore
         // should not enter this function
         assert(false);
     }
+    
+    void IOSSide::TriggerVSync(const char* page_id)
+    {
+        RenderPage *page = RenderManager::GetInstance()->GetPage(page_id);
+        if (page == nullptr) {
+            return;
+        }
+        
+        NSString* ns_instanceId = NSSTRING(page_id);
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return;
+        }
+        [manager startComponentTasks];
+    }
         
     int IOSSide::UpdateFinish(const char* page_id, const char* task, int taskLen,
                                    const char* callback, int callbackLen)

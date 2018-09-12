@@ -60,6 +60,10 @@ void AndroidSide::InvokeLayoutPlatform(const char* page_id, long render_ptr) {
   // do nothing
 }
 
+void AndroidSide::TriggerVSync(const char* page_id) {
+  // do nothing
+}
+
 void AndroidSide::InvokeLayoutAfter(const char *page_id, long render_ptr,
                                     float width, float height) {
   WeexCoreManager::Instance()->measure_function_adapter()->LayoutAfter(
