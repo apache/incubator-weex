@@ -24,6 +24,7 @@
 #import "WXComponent_internal.h"
 #import "WXDiffUtil.h"
 #import "WXComponent+Layout.h"
+#import "WXAssert.h"
 
 @interface WXCellComponent ()
 
@@ -153,6 +154,11 @@
     }
     else {
         frame.origin.y = 0.0f; // only ignore y
+    }
+    
+    WXAssert(!isnan(frame.size.height), @"Height of cell should not be NAN.");
+    if (isnan(frame.size.height)) {
+        frame.size.height = 0.0f;
     }
     _calculatedFrame = frame;
 }
