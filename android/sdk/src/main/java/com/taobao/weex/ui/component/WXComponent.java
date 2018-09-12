@@ -170,6 +170,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private String mLastBoxShadowId;
   public int mDeepInComponentTree = 0;
   public boolean mIsAddElementToTree = false;
+  public long interactionTime;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
@@ -948,9 +949,14 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
 
     //calculate first screen time
-    if (!(mHost instanceof ViewGroup) && !mInstance.mEnd && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
-      mInstance.firstScreenRenderFinished();
-      mInstance.mEnd = true;
+    if (!(mHost instanceof ViewGroup) && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
+      if (!mInstance.mEnd){
+        mInstance.onOldFsRenderTimeLogic();
+      }
+      if (!mInstance.isNewFsEnd){
+        mInstance.isNewFsEnd = true;
+        mInstance.getApmForInstance().arriveNewFsRenderTime();
+      }
     }
 
     MeasureOutput measureOutput = measure(realWidth, realHeight);
