@@ -164,9 +164,6 @@ struct ASTParser final {
     do {
       json11::Json repeat = json["repeat"];
       json11::Json index = repeat["iterator1"];
-      if (!index.is_string()) {
-        break;
-      }
       Handle<DeclarationList> for_init = factory_->NewDeclarationList();
       // var index=0
       for_init->Append(factory_->NewDeclaration(index.is_null() ? "index" : index.string_value(), factory_->NewIntegralConstant(0)));
