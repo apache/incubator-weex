@@ -142,6 +142,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSString * bundleType;
 
 /**
+ *  Which decide whether to use data render,default value is false
+ */
+@property (nonatomic, assign, readonly) BOOL dataRender;
+
+/**
  *  The callback triggered when the instance fails to render.
  *
  *  @return A block that takes a NSError argument, which is the error occured

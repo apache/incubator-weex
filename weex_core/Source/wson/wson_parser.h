@@ -87,6 +87,7 @@ public:
      * */
     inline bool isString(uint8_t type){
         return type == WSON_STRING_TYPE
+               || type == WSON_UINT8_STRING_TYPE
                || type == WSON_NUMBER_BIG_INT_TYPE
                || type == WSON_NUMBER_BIG_DECIMAL_TYPE;
     }

@@ -71,6 +71,17 @@ void VNode::AddChild(VNode *child) {
   child_list_.push_back(child);
 }
 
+void VNode::RemoveChild(VNode *child) {
+  child->parent_ = nullptr;
+  auto it = child_list_.begin();
+  for (; it != child_list_.end(); ++it) {
+    if (*it == child) {
+      child_list_.erase(it);
+      break;
+    }
+  }
+}
+
 void VNode::MapInsertOrAssign(std::map<std::string, std::string> *target_map, const std::string &key,
                               const std::string &value) {
   std::map<std::string, std::string>::iterator it = target_map->find(key);

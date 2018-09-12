@@ -37,8 +37,10 @@ RenderActionUpdateStyle::RenderActionUpdateStyle(
 }
 
 void RenderActionUpdateStyle::ExecuteAction() {
-  WeexCoreManager::getInstance()->getPlatformBridge()->callUpdateStyle(
-      this->page_id_.c_str(), this->ref_.c_str(), this->style_, this->margin_,
-      this->padding_, this->border_);
+  WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->platform_side()
+      ->UpdateStyle(this->page_id_.c_str(), this->ref_.c_str(), this->style_,
+                    this->margin_, this->padding_, this->border_);
 }
 }  // namespace WeexCore

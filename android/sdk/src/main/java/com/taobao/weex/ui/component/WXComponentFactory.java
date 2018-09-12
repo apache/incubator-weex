@@ -22,10 +22,12 @@ import android.text.TextUtils;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.HashMap;
@@ -53,7 +55,10 @@ public class WXComponentFactory {
       //For compatible reason of JS framework, unregistered type will be treated as container.
       holder = WXComponentRegistry.getComponent(WXBasicComponentType.CONTAINER);
       if (holder == null) {
-        throw new WXRuntimeException("Container component not found.");
+        WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
+                WXErrorCode.WX_RENDER_ERR_COMPONENT_NOT_REGISTER, "createComponent",
+                basicComponentData.mComponentType + " not registered", null);
+        return null;
       }
     }
 

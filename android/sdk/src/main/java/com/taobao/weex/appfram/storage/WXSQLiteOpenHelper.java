@@ -191,7 +191,7 @@ public class WXSQLiteOpenHelper extends SQLiteOpenHelper {
         return mContext.deleteDatabase(DATABASE_NAME);
     }
 
-    public void closeDatabase() {
+    public synchronized void closeDatabase() {
         if (mDb != null && mDb.isOpen()) {
             mDb.close();
             mDb = null;

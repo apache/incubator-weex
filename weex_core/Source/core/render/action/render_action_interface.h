@@ -23,6 +23,7 @@ namespace WeexCore {
 
 class RenderAction {
  public:
+  virtual ~RenderAction() {}
   virtual void ExecuteAction() = 0;
 };
 }  // namespace WeexCore

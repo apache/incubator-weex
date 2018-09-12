@@ -18,6 +18,7 @@
  */
 
 #import "WXBridgeManager.h"
+#import "WXBridgeContext.h"
 #import "WXLog.h"
 #import "WXAssert.h"
 #import "WXBridgeMethod.h"
@@ -28,7 +29,6 @@
 #import "WXResourceLoader.h"
 #import "WXDebugTool.h"
 #import "WXTracingManager.h"
-#import "WXBridgeContext.h"
 #import "WXMonitor.h"
 #import "WXSDKInstance_performance.h"
 
@@ -53,7 +53,6 @@ static NSThread *WXBridgeThread;
     });
     return _sharedInstance;
 }
-
 
 - (instancetype)init
 {

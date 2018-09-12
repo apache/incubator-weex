@@ -666,7 +666,6 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)recycleSliderView:(WXRecycleSliderView *)recycleSliderView didScrollToItemAtIndex:(NSInteger)index
 {
-    
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
     }
@@ -691,6 +690,10 @@ typedef NS_ENUM(NSInteger, Direction) {
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
     WXRecycleSliderView *view = (WXRecycleSliderView *)self.delegate;
+    if (![view isKindOfClass:[UIView class]]) {
+        return YES;
+    }
+    
     if ([(id <WXRecycleSliderViewDelegate>) view.wx_component respondsToSelector:@selector(requestGestureShouldStopPropagation:shouldReceiveTouch:)]) {
         return [(id <WXRecycleSliderViewDelegate>) view.wx_component requestGestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
     }

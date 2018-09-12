@@ -97,7 +97,12 @@ WX_EXPORT_METHOD(@selector(save:))
             WXLogWarning(@"image src is nil");
         }
         [self configPlaceHolder:attributes];
-        _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
+        
+        NSString *resizeMode = attributes[@"resize"];
+        if (!resizeMode) {
+            resizeMode = styles[@"resizeMode"];
+        }
+        _resizeMode = [WXConvert UIViewContentMode:resizeMode];
         
         _imageQuality = WXImageQualityNone;
         if (styles[@"quality"]) {

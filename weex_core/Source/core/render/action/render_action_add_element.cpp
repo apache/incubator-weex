@@ -42,7 +42,7 @@ RenderActionAddElement::RenderActionAddElement(const std::string &page_id,
 }
 
 void RenderActionAddElement::ExecuteAction() {
-  WeexCoreManager::getInstance()->getPlatformBridge()->callAddElement(
+  WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->AddElement(
       this->page_id_.c_str(), this->component_type_.c_str(), this->ref_.c_str(),
       this->index_, this->parent_ref_.c_str(), this->styles_, this->attributes_,
       this->events_, this->margins_, this->paddings_, this->borders_,

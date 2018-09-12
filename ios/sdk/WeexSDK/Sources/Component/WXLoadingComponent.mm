@@ -129,14 +129,13 @@
     }
 }
 
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
+- (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
-    if (subcomponent) {
-        [super _insertSubcomponent:subcomponent atIndex:index];
-        if ([subcomponent isKindOfClass:[WXLoadingIndicator class]]) {
-            _indicator = (WXLoadingIndicator*)subcomponent;
-        }
+    BOOL inserted = [super _insertSubcomponent:subcomponent atIndex:index];
+    if ([subcomponent isKindOfClass:[WXLoadingIndicator class]]) {
+        _indicator = (WXLoadingIndicator*)subcomponent;
     }
+    return inserted;
 }
 
 - (BOOL)displayState

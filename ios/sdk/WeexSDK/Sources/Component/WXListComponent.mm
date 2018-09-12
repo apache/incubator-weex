@@ -22,6 +22,7 @@
 #import "WXHeaderComponent.h"
 #import "WXComponent.h"
 #import "WXComponent_internal.h"
+#import "WXComponent+Layout.h"
 #import "NSArray+Weex.h"
 #import "WXAssert.h"
 #import "WXMonitor.h"
@@ -30,7 +31,6 @@
 #import "WXSDKInstance_private.h"
 #import "WXRefreshComponent.h"
 #import "WXLoadingComponent.h"
-#import "WXScrollerComponent+Layout.h"
 #import "WXThreadSafeMutableArray.h"
 
 @interface WXTableView : UITableView
@@ -252,7 +252,7 @@
 
 #pragma mark - Inheritance
 
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
+- (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
     if ([subcomponent isKindOfClass:[WXCellComponent class]]) {
         ((WXCellComponent *)subcomponent).delegate = self;
@@ -262,15 +262,15 @@
                && ![subcomponent isKindOfClass:[WXLoadingComponent class]]
                && subcomponent->_positionType != WXPositionTypeFixed) {
         WXLogError(@"list only support cell/header/refresh/loading/fixed-component as child.");
-        return;
+        return NO;
     }
     
-    [super _insertSubcomponent:subcomponent atIndex:index];
+    BOOL inserted = [super _insertSubcomponent:subcomponent atIndex:index];
     
     if (![subcomponent isKindOfClass:[WXHeaderComponent class]]
         && ![subcomponent isKindOfClass:[WXCellComponent class]]) {
         // Don't insert section if subcomponent is not header or cell
-        return;
+        return inserted;
     }
     
     NSIndexPath *indexPath = [self indexPathForSubIndex:index];
@@ -340,6 +340,8 @@
         }];
         
     }
+    
+    return inserted;
 }
 
 - (void)insertSubview:(WXComponent *)subcomponent atIndex:(NSInteger)index
@@ -355,7 +357,7 @@
 
 - (float)headerWidthForLayout:(WXHeaderComponent *)cell
 {
-        return self.flexScrollerCSSNode->getStyleWidth();
+    return [self safeContainerStyleWidth];
 }
 
 - (void)headerDidLayout:(WXHeaderComponent *)header
@@ -443,7 +445,7 @@
 
 - (float)containerWidthForLayout:(WXCellComponent *)cell
 {
-        return self.flexScrollerCSSNode->getStyleWidth();
+    return [self safeContainerStyleWidth];
 }
 
 - (void)cellDidRemove:(WXCellComponent *)cell

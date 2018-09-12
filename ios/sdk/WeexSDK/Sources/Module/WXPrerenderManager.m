@@ -297,7 +297,7 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
         }
         WXPerformBlockOnComponentThread(^{
             [task.instance.componentManager startComponentTasks];
-            [task.instance.componentManager excutePrerenderUITask:url];
+            [task.instance.componentManager executePrerenderUITask:url];
             task.instance.needPrerender = NO;
         });
         WXPerformBlockOnBridgeThread(^(){

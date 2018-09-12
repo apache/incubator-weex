@@ -208,6 +208,14 @@ public class WXImage extends WXComponent<ImageView> {
 
   @WXComponentProp(name = Constants.Name.SRC)
   public void setSrc(String src) {
+
+    if (getInstance().getImageNetworkHandler() != null) {
+      String localUrl = getInstance().getImageNetworkHandler().fetchLocal(src);
+      if (!TextUtils.isEmpty(localUrl)) {
+        src = localUrl;
+      }
+    }
+
     if (src == null) {
       return;
     }

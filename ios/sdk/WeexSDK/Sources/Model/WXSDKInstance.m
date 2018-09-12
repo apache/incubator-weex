@@ -51,6 +51,7 @@
 #import "WXJSCoreBridge.h"
 #import "WXSDKInstance_performance.h"
 #import "WXPageEventNotifyEvent.h"
+#import "WXCoreBridge.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -74,12 +75,12 @@ typedef enum : NSUInteger {
     WXRootView *_rootView;
     WXThreadSafeMutableDictionary *_moduleEventObservers;
     BOOL _performanceCommit;
-    BOOL _needDestroy;
     BOOL _syncDestroyComponentManager;
     BOOL _debugJS;
     id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context    
     CGFloat _defaultPixelScaleFactor;
     BOOL _bReleaseInstanceInMainThread;
+    BOOL _defaultDataRender;
 }
 
 - (void)dealloc
@@ -128,6 +129,7 @@ typedef enum : NSUInteger {
         }
         _defaultPixelScaleFactor = CGFLOAT_MIN;
         _bReleaseInstanceInMainThread = YES;
+        _defaultDataRender = NO;
         
         [self addObservers];
     }
@@ -149,8 +151,9 @@ typedef enum : NSUInteger {
         _instanceJavaScriptContext = nil;
     }
     
+    // WXDebugger is a singleton actually and should not call its init twice.
     _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
-    if(!_debugJS) {
+    if (!_debugJS) {
         id<WXBridgeProtocol> jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"bridgeCtx.jsBridge"];
         JSContext* globalContex = jsBridge.javaScriptContext;
         JSContextGroupRef contextGroup = JSContextGetGroup([globalContex JSGlobalContextRef]);
@@ -165,7 +168,7 @@ typedef enum : NSUInteger {
         [_instanceJavaScriptContext setJSContext:instanceContext];
     }
     
-    if([_instanceJavaScriptContext respondsToSelector:@selector(setWeexInstanceId:)]) {
+    if ([_instanceJavaScriptContext respondsToSelector:@selector(setWeexInstanceId:)]) {
         [_instanceJavaScriptContext setWeexInstanceId:_instanceId];
     }
     if (!_debugJS) {
@@ -177,7 +180,8 @@ typedef enum : NSUInteger {
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p; id = %@; rootView = %@; url= %@>", NSStringFromClass([self class]), self, _instanceId, _rootView, _scriptURL];
+    // get _rootView.frame in JS thread may cause deaklock.
+    return [NSString stringWithFormat:@"<%@: %p; id = %@; rootView = %p; url= %@>", NSStringFromClass([self class]), self, _instanceId, (__bridge void*)_rootView, _scriptURL];
 }
 
 #pragma mark Public Mehtods
@@ -186,7 +190,6 @@ typedef enum : NSUInteger {
 {
     return _rootView;
 }
-
 
 - (void)setFrame:(CGRect)frame
 {
@@ -210,6 +213,14 @@ typedef enum : NSUInteger {
             }
         });
     }
+}
+
+- (void)setViewportWidth:(CGFloat)viewportWidth
+{
+    _viewportWidth = viewportWidth;
+    
+    // notify weex core
+    [WXCoreBridge setViewportWidth:_instanceId width:viewportWidth];
 }
 
 - (void)renderWithURL:(NSURL *)url
@@ -314,8 +325,7 @@ typedef enum : NSUInteger {
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
      [[NSNotificationCenter defaultCenter] postNotificationName:WX_SDKINSTANCE_WILL_RENDER object:self];
-     
-    _needDestroy = YES;
+    
     _mainBundleString = mainBundleString;
     if ([self _handleConfigCenter]) {
         int wxErrorCode = 9999;
@@ -327,7 +337,6 @@ typedef enum : NSUInteger {
         return;
     }
     
-    _needDestroy = YES;
     [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"renderWithMainBundleString" options:@{@"threadName":WXTMainThread}];
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
     [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"renderWithMainBundleString" options:@{@"threadName":WXTMainThread}];
@@ -533,7 +542,7 @@ typedef enum : NSUInteger {
 {
     [self.apmInstance endRecord];
     NSString *url = @"";
-    if([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
+    if ([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
         url = [self.scriptURL absoluteString];
     }
     if (!self.instanceId) {
@@ -551,12 +560,6 @@ typedef enum : NSUInteger {
 
     [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];
-    
-    if (_needDestroy) {
-        [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
-        _needDestroy = NO;
-    }
-
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
     
     if (_componentManager) {
@@ -565,8 +568,17 @@ typedef enum : NSUInteger {
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnComponentThread(^{
         __strong typeof(self) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        
+        // Destroy components and views in main thread. Unbind with underneath RenderObjects.
         [strongSelf.componentManager unload];
-        //Reading config from orange for Release instance in Main Thread or not, for Bug #15172691 +{
+        
+        // Destroy weexcore c++ page and objects.
+        [WXCoreBridge closePage:strongSelf.instanceId];
+        
+        // Reading config from orange for Release instance in Main Thread or not, for Bug #15172691 +{
         if (!_bReleaseInstanceInMainThread) {
             [WXSDKManager removeInstanceforID:strongSelf.instanceId];
         } else {
@@ -576,10 +588,10 @@ typedef enum : NSUInteger {
         }
         //+}
     });
-    if(url.length > 0){
+    
+    if (url.length > 0) {
         [WXPrerenderManager addGlobalTask:url callback:nil];
     }
-    
 }
 
 - (void)forceGarbageCollection
@@ -679,6 +691,14 @@ typedef enum : NSUInteger {
         _defaultPixelScaleFactor = [WXUtility defaultPixelScaleFactor];
         return _defaultPixelScaleFactor;
     }
+}
+
+- (BOOL)dataRender
+{
+    if ([_options[@"DATA_RENDER"] boolValue]) {
+        return YES;
+    }
+    return _defaultDataRender;
 }
 
 - (NSURL *)completeURL:(NSString *)url

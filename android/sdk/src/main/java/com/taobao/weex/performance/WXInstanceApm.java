@@ -78,7 +78,7 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT = "wxWrongImgSizeCount";
     public static final String KEY_PAGE_STATS_EMBED_COUNT = "wxEmbedCount";
     public static final String KEY_PAGE_STATS_LARGE_IMG_COUNT = "wxLargeImgMaxCount";
-
+    public static final String KEY_PAGE_STATS_BODY_RATIO = "wxBodyRatio";
     public static final String KEY_PAGE_STATS_SCROLLER_NUM = "wxScrollerCount";
     public static final String KEY_PAGE_STATS_CELL_DATA_UN_RECYCLE_NUM = "wxCellDataUnRecycleCount";
     public static final String KEY_PAGE_STATS_CELL_UN_RE_USE_NUM = "wxCellUnReUseCount";

@@ -30,8 +30,6 @@
 
 @property (nonatomic, assign) CGSize contentSize;
 
-- (NSUInteger)childrenCountForScrollerLayout;
-
 - (void)handleAppear;
 
 - (CGPoint)absolutePositionForComponent:(WXComponent *)component;

@@ -25,6 +25,7 @@ namespace WeexCore {
 class IRenderFactory {
  public:
   virtual IRenderObject *CreateRender() = 0;
+  virtual ~IRenderFactory() {}
 };
 }  // namespace WeexCore
 

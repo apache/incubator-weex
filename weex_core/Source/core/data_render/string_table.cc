@@ -22,6 +22,7 @@
 namespace weex {
 namespace core {
 namespace data_render {
+    
 String::String(const char *str, std::size_t len) {
   length_ = len;
   str_ = std::unique_ptr<char[]>(new char[len + 1]);
@@ -40,8 +41,7 @@ String *StringTable::StringFromUTF8(const std::string &str) {
   }
   std::string key = str;
   auto result = new String(key);
-  store_.insert(
-      std::make_pair(std::move(key), std::unique_ptr<String>(result)));
+  store_.insert(std::make_pair(std::move(key), std::unique_ptr<String>(result)));
   return result;
 }
 

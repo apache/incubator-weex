@@ -23,7 +23,8 @@
 #import "WXSDKInstance_private.h"
 #import "WXConvert.h"
 #import "WXAssert.h"
-#import "WXScrollerComponent+Layout.h"
+#import "WXComponent+Layout.h"
+#import "WXCoreBridge.h"
 
 @implementation WXCellSlotComponent
 
@@ -63,28 +64,22 @@
 
 - (void)_didInserted
 {
-    [self triggerLayout];
 }
 
 - (void)triggerLayout
 {
     WXAssertComponentThread();
+    
+    if (self.flexCssNode == nullptr) {
+        return;
+    }
+    
     if (flexIsUndefined(self.flexCssNode->getStyleWidth())) {
-        self.flexCssNode->setStyleWidth(((WXScrollerComponent *)(self.supercomponent)).flexScrollerCSSNode->getStyleWidth(),NO);
+        self.flexCssNode->setStyleWidth(self.supercomponent.flexCssNode->getLayoutWidth(), NO);
     }
     
     if ([self needsLayout]) {
-        std::pair<float, float> renderPageSize;
-        renderPageSize.first = self.weexInstance.frame.size.width;
-        renderPageSize.second = self.weexInstance.frame.size.height;
-        self.flexCssNode->calculateLayout(renderPageSize);
-    }
-    NSMutableSet<WXComponent *> *dirtyComponents = [NSMutableSet set];
-    [self _calculateFrameWithSuperAbsolutePosition:CGPointZero gatherDirtyComponents:dirtyComponents];
-    for (WXComponent *dirtyComponent in dirtyComponents) {
-        [self.weexInstance.componentManager _addUITask:^{
-            [dirtyComponent _layoutDidFinish];
-        }];
+        [WXCoreBridge layoutRenderObject:self.flexCssNode size:self.weexInstance.frame.size page:self.weexInstance.instanceId];
     }
 }
 @end

@@ -60,6 +60,10 @@ namespace WeexCore {
             std::string objectKey = parser.nextMapKeyUTF8();
             if(0 == strcmp(objectKey.c_str(), "ref")){
                  ref = parser.nextStringUTF8(parser.nextType());
+                if (render != nullptr) {
+                    // ref may be after type, so need set to render
+                    render->set_ref(ref);
+                }
             }else if (0 == strcmp(objectKey.c_str(), "type")) {
                 renderType = parser.nextStringUTF8(parser.nextType());
                 render = (RenderObject *) RenderCreator::GetInstance()->CreateRender(renderType, ref);

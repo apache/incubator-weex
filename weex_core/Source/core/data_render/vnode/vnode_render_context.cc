@@ -24,13 +24,11 @@ namespace core {
 namespace data_render {
 
 VNodeRenderContext::VNodeRenderContext()
-    : page_id_(), root_(nullptr), raw_json_() {}
+    : page_id_(), root_(nullptr), raw_json_(), script_() {}
 
 VNodeRenderContext::~VNodeRenderContext() {}
 
-void VNodeRenderContext::Reset() {
-  root_ = nullptr;
-}
+void VNodeRenderContext::Reset() { root_ = nullptr; }
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

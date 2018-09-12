@@ -20,6 +20,7 @@
 #include "base/CoreConstants.h"
 #include <stdlib.h>
 #include <base/ViewUtils.h>
+#include "base/LogDefines.h"
 
 namespace WeexCore {
 
@@ -58,17 +59,19 @@ namespace WeexCore {
     return true;
   }
 
-  const float &WXCoreEnvironment::DeviceWidth() {
+  const float WXCoreEnvironment::DeviceWidth() {
     return mDeviceWidth;
   }
 
-  const float &WXCoreEnvironment::DeviceHeight() {
+  const float WXCoreEnvironment::DeviceHeight() {
     return mDeviceHeight;
   }
 
-  const std::string &WXCoreEnvironment::GetOption(const std::string &key) {
+  const std::string WXCoreEnvironment::GetOption(const std::string &key) {
     std::map<std::string, std::string>::iterator iter = mOptions.find(key);
+      LOGE("KEY = %s", key.c_str());
     if (iter != mOptions.end()) {
+        LOGE("KEY = %s, VALUE = %s", key.c_str(), iter->second.c_str());
       return iter->second;
     } else {
       return "";
