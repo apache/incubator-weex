@@ -529,6 +529,7 @@ struct ASTParser final {
   //        var child = createElement(tag_name, node_id);
   //        appendChild(parent, child);
   //        setClassList(child, class_name);
+  //        setStyle(child, key, value);
   //        setAttr(child, key, value);
   //        {
   //            ...
@@ -616,6 +617,32 @@ struct ASTParser final {
 
       // setClassList(child, class_name)
       AddSetClassListCall(json, child_identifier, component_name);
+
+      // setStyle(child, key, value)
+      json11::Json style = json["style"];
+      if (style.is_object()) {
+        auto items = style.object_items();
+        for (auto it = items.begin(); it != items.end(); ++it) {
+          const auto& key = it->first;
+          const auto& value = it->second;
+          std::vector<Handle<Expression>> args;
+          args.push_back(child_identifier);
+          args.push_back(factory_->NewStringConstant(key));
+          if (value.is_string()) {
+            args.push_back(
+                    factory_->NewStringConstant(value.string_value()));
+          } else {
+            args.push_back(ParseBindingExpression(value));
+          }
+
+          Handle<Expression> set_style_func_expr =
+                  factory_->NewIdentifier("setStyle");
+          Handle<CallExpression> call_func =
+                  factory_->NewCallExpression(set_style_func_expr, args);
+          Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
+          statement->PushExpression(call_func);
+        }
+      }
 
       // setAttr(child, key, value)
       json11::Json attributes = json["attributes"];

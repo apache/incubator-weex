@@ -408,6 +408,19 @@ static Value SetClassList(ExecState* exec_state) {
   return Value();
 }
 
+// setStyle(node, key, value);
+static Value SetStyle(ExecState* exec_state) {
+  VNode* node = reinterpret_cast<VNode*>(exec_state->GetArgument(0)->cptr);
+  Value* key = exec_state->GetArgument(1);
+  Value* value = exec_state->GetArgument(2);
+  if (node == nullptr || key->type != Value::Type::STRING ||
+      value->type == Value::Type::NIL) {
+    return Value();
+  }
+  node->SetStyle(key->str->c_str(), ToString(value));
+  return Value();
+}
+
 void RegisterCFunc(ExecState* state, const std::string& name,
                    CFunction function) {
   Value func;
@@ -439,6 +452,7 @@ void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   RegisterCFunc(state, "setAttr", SetAttr);
   RegisterCFunc(state, "setProps", SetProps);
   RegisterCFunc(state, "setClassList", SetClassList);
+  RegisterCFunc(state, "setStyle", SetStyle);
   RegisterClass(state, "Array", state->class_factory()->ClassArray());
   RegisterClass(state, "String", state->class_factory()->ClassString());
   RegisterClass(state, "JSON", state->class_factory()->ClassJSON());
