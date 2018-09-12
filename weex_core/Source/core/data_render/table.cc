@@ -111,6 +111,22 @@ Value *GetTableVar(Table *table, const Value &key) {
     
     return ret;
 }
+    
+std::vector<std::string> GetTableKeys(Table *table)
+{
+    std::vector<std::string>keys;
+    do {
+        if (!table->map.size()) {
+            break;
+        }
+        for (auto iter = table->map.begin(); iter != table->map.end(); iter++) {
+            keys.push_back(iter->first);
+        }
+        
+    } while (0);
+    
+    return keys;
+}
 
 int SetTableValue(Table *t, Value *key, const Value &val) {
     if (IsString(key)) {

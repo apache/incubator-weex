@@ -342,12 +342,15 @@ void CodeGenerator::Visit(IfElseStatement *node, void *data) {
     
 void CodeGenerator::Visit(ContinueStatement *node, void *data) {
     do {
-        int for_start_index = block_->for_start_index();
-        if (for_start_index < 0) {
-            throw GeneratorError("continue must in for statement");
-            break;
+        FuncState *func_state = func_->func_state();
+        int for_update_index = block_->for_update_index();
+        if (for_update_index >= 0) {
+            func_state->AddInstruction(CREATE_Ax(OP_GOTO, for_update_index));
         }
-        func_->func_state()->AddInstruction(CREATE_Ax(OP_GOTO, for_start_index));
+        else {
+            auto slot = func_state->AddInstruction(0);
+            block_->for_continue_slots().push_back(slot);
+        }
         
     } while (0);
 }
@@ -355,6 +358,7 @@ void CodeGenerator::Visit(ContinueStatement *node, void *data) {
 void CodeGenerator::Visit(ForStatement *node, void *data) {
     BlockScope for_scope(this);  // for var index = 0;
     FuncState *func_state = func_->func_state();
+    block_->set_is_loop(true);
     long condition = block_->NextRegisterId();
     if (node->init().get() != NULL) {
         node->init()->Accept(this, node->kind() == ForKind::kForIn ? &condition : nullptr);
@@ -370,17 +374,25 @@ void CodeGenerator::Visit(ForStatement *node, void *data) {
     if (node->condition().get() != NULL) {
         node->condition()->Accept(this, &condition);
     }
-    auto slot = func_->func_state()->AddInstruction(0);
+    auto slot = func_state->AddInstruction(0);
     if (node->body().get() != NULL) {
         node->body()->Accept(this, nullptr);
     }
+    int for_update_index = condition_start_index;
     if (node->update().get() != NULL) {
+        for_update_index = (int)func_state->instructions().size();  // aka next one.
         long update = block_->NextRegisterId();
         node->update()->Accept(this, &update);
     }
+    block_->set_for_update_index(for_update_index);
     func_state->AddInstruction(CREATE_Ax(OP_GOTO, condition_start_index));
     int for_end_index = (int)func_->func_state()->instructions().size() - 1;
     func_state->ReplaceInstruction(slot, (CREATE_ABx(OP_JMP, condition, for_end_index - slot)));
+    std::vector<size_t> for_contiue_slots = block_->for_continue_slots();
+    for (int i = 0; i < for_contiue_slots.size(); i++) {
+        func_state->ReplaceInstruction(for_contiue_slots[i], CREATE_Ax(OP_GOTO, for_update_index));
+    }
+    for_contiue_slots.clear();
 }
 
 void CodeGenerator::Visit(BlockStatement* node, void* data) {
@@ -1128,17 +1140,53 @@ bool CodeGenerator::BlockCnt::FindVariable(const std::string &name) {
 }
     
 int CodeGenerator::BlockCnt::for_start_index() {
-    if (for_start_index_ >= 0) {
+    if (is_loop()) {
         return for_start_index_;
     }
     if (parent() != nullptr) {
-        if (parent()->func_state() == func_state_) {
+        if (parent()->is_loop()) {
             return parent()->for_start_index();
         }
     }
     return -1;
 }
     
+std::vector<size_t>& CodeGenerator::BlockCnt::for_continue_slots() {
+    if (is_loop()) {
+        return for_continue_slots_;
+    }
+    if (parent() != nullptr) {
+        if (parent()->is_loop()) {
+            return parent()->for_continue_slots_;
+        }
+    }
+    return for_continue_slots_;
+}
+    
+std::vector<size_t>& CodeGenerator::BlockCnt::for_break_slots() {
+    if (is_loop()) {
+        return for_break_slots_;
+    }
+    if (parent() != nullptr) {
+        if (parent()->is_loop()) {
+            return parent()->for_break_slots_;
+        }
+    }
+    return for_break_slots_;
+}
+
+int CodeGenerator::BlockCnt::for_update_index() {
+    if (is_loop()) {
+        return for_update_index_;
+    }
+    if (parent() != nullptr) {
+        if (parent()->is_loop()) {
+            return parent()->for_update_index();
+        }
+    }
+    return -1;
+}
+
 void CodeGenerator::BlockCnt::reset() {
     for (int i = 0; i < reg_refs_.size(); i++) {
         if (func_state()) {

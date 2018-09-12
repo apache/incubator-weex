@@ -830,6 +830,69 @@ Handle<Expression> RAXParser::ParseJSXNodeStatement() {
     return expr;
 }
     
+Handle<Expression> RAXParser::ParseJSXNodeProperty() {
+    Handle<Expression> props = nullptr;
+    ProxyObject proxy;
+    ProxyArray spread_property;
+    std::vector<std::pair<ProxyOrder, std::string>> orders;
+    std::string key;
+    do {
+        Handle<Expression> prop;
+        while (true) {
+            auto tok = Peek();
+            if (tok == Token::STRING) {
+                key = GetStringConstant();
+            }
+            else if (tok == Token::IDENTIFIER || Token::IsKeyword(tok) || tok == Token::NUMBER) {
+                key = lex()->CurrentToken().view();
+            }
+            else if (tok == Token::UNFOLD) {
+                Handle<Expression> unfold_expr = ParseAssignExpression();
+                spread_property.push_back(unfold_expr);
+                orders.push_back(std::make_pair(ProxyOrder::ProxyArray, to_string((int)spread_property.size() - 1)));
+                continue;
+            }
+            else if (tok == Token::RBRACE || tok == Token::LBRACE) {
+                Advance();
+                continue;
+            }
+            else if (tok == Token::DIV) {
+                break;
+            }
+            else {
+                throw SyntaxError(lex()->CurrentToken(), "expected an Identifier or a string");
+            }
+            Advance();
+            if (Peek() == Token::ASSIGN) {
+                Advance();
+                EXPECT(Token::LBRACE);
+                prop = ParseAssignExpression();
+                EXPECT(Token::RBRACE);
+            }
+            if (prop == NULL) {
+                prop = builder()->NewIdentifier(key);
+            }
+            proxy[key] = Handle<Expression>(prop);
+            orders.push_back(std::make_pair(ProxyOrder::ProxyObject, key));
+        }
+        
+    } while (0);
+    
+    if (proxy.size() > 0 || spread_property.size() > 1) {
+        props = builder()->NewObjectConstant(proxy);
+        if (spread_property.size() > 0) {
+            for (int i = 0; i < spread_property.size(); i++) {
+                props->AsObjectConstant()->SpreadProperty().push_back(spread_property[i]);
+            }
+            props->AsObjectConstant()->Orders() = orders;
+        }
+    }
+    else {
+        props = spread_property[0];
+    }
+    return props;
+}
+    
 Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) {
     Handle<Expression> expr = nullptr;
     Handle<Expression> props = nullptr;
@@ -838,9 +901,7 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
     auto tok = Peek();
     // props process
     if (tok == Token::LBRACE) {
-        Advance();
-        props = ParseExpression();
-        EXPECT(Token::RBRACE);
+        props = ParseJSXNodeProperty();
     }
     else if (tok == Token::IDENTIFIER) {
         // props process

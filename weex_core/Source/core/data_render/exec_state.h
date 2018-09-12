@@ -110,7 +110,7 @@ class FuncState {
   std::vector<Instruction> instructions_;
   std::vector<Value> constants_;
   std::vector<std::unique_ptr<FuncState>> children_;
-  FuncState* super_func_;
+  FuncState *super_func_;
   int super_index_;
 };
     

@@ -24,6 +24,7 @@
 #include "core/data_render/class_factory.h"
 #include "core/data_render/class_array.h"
 #include "core/data_render/class_string.h"
+#include "core/data_render/class_object.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/vnode/vcomponent.h"
 #include <base/LogDefines.h>
@@ -50,6 +51,9 @@ static Value Log(ExecState *exec_state) {
         break;
       case Value::Type::TABLE:
         std::cout << "[log]:=>" << TableToString(ValueTo<Table>(a)) << "\n";
+        break;
+      case Value::Type::ARRAY:
+        std::cout << "[log]:=>" << ArrayToString(ValueTo<Array>(a)) << "\n";
         break;
       default:
         break;
@@ -456,6 +460,7 @@ void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   RegisterClass(state, "Array", state->class_factory()->ClassArray());
   RegisterClass(state, "String", state->class_factory()->ClassString());
   RegisterClass(state, "JSON", state->class_factory()->ClassJSON());
+  RegisterClass(state, "Object", state->class_factory()->ClassObject());
 }
 
 Value ParseJson2Value(ExecState* state, const json11::Json& json) {

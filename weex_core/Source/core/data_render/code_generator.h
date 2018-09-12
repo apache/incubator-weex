@@ -93,7 +93,7 @@ class CodeGenerator : public ASTVisitor {
 
   class BlockCnt : public Node<BlockCnt> {
    public:
-    BlockCnt() : reg_refs_(), variables_(), idx_(0), is_loop_(false) {}
+    BlockCnt() : for_continue_slots_(), for_break_slots_(), reg_refs_(), variables_(), idx_(0), is_loop_(false) {}
     ~BlockCnt() {}
 
     inline long NextRegisterId() { return idx_++; }
@@ -113,14 +113,18 @@ class CodeGenerator : public ASTVisitor {
     
     inline ExecState *exec_state() { return exec_state_; }
     int for_start_index();
+    int for_update_index();
+    std::vector<size_t>& for_continue_slots();
+    std::vector<size_t>& for_break_slots();
     void set_for_start_index(int index) { for_start_index_ = index; }
-    inline std::vector<int>& for_break_slots() { return for_break_slots_; }
+    void set_for_update_index(int index) { for_update_index_ = index; }
     inline std::unordered_map<std::string, long> &variables() {
       return variables_;
     }
     inline void set_idx(int idx) { idx_ = idx; }
     inline int idx() { return idx_; }
     inline bool is_loop() { return is_loop_; }
+    inline void set_is_loop(bool is_loop) { is_loop_ = is_loop; }
     inline std::vector<long>& reg_refs() { return reg_refs_; }
     inline bool& is_register_scope() { return is_register_scope_; }
     void reset();
@@ -135,7 +139,9 @@ class CodeGenerator : public ASTVisitor {
     FuncState *func_state_{nullptr};
     ExecState *exec_state_{nullptr};
     int for_start_index_{-1};
-    std::vector<int> for_break_slots_;
+    int for_update_index_{-1};
+    std::vector<size_t> for_break_slots_;
+    std::vector<size_t> for_continue_slots_;
   };
 
   class FuncCnt : public Node<FuncCnt> {
