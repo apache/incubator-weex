@@ -559,9 +559,9 @@ struct ASTParser final {
       }
       json11::Json node_id = json["nodeId"];
       json11::Json tag_name = json["tagName"];
-      // Consider ref as node id if ref exsits
+      json11::Json ref = json11::Json("");
       if (json["attributes"].is_object() && json["attributes"]["ref"].is_string()) {
-        node_id = json["attributes"]["ref"];
+        ref = json["attributes"]["ref"];
       }
       Handle<Expression> node_id_expr = nullptr;
       if (tag_name.is_string()) {
@@ -569,9 +569,9 @@ struct ASTParser final {
         Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
         std::vector<Handle<Expression>> args;
 
-        // var child = createElement(tag_name, node_id);
+        // var child = createElement(tag_name, node_id, ref);
         // or
-        // var child = createComponent(template_id, tag_name, node_id);
+        // var child = createComponent(template_id, tag_name, node_id, ref);
         {
             Handle<Expression> func;
             node_id_expr = ParseNodeId(control, control_exprs, node_id.string_value());
@@ -581,6 +581,7 @@ struct ASTParser final {
                 args.push_back(
                         factory_->NewStringConstant(tag_name.string_value()));
                 args.push_back(node_id_expr);
+                args.push_back(factory_->NewStringConstant(ref.string_value()));
                 call_expr = factory_->NewCallExpression(func, args);
             } else {
                 // Component Node call createComponent
@@ -593,6 +594,7 @@ struct ASTParser final {
                 args.push_back(
                         factory_->NewStringConstant(tag_name.string_value()));
                 args.push_back(node_id_expr);
+                args.push_back(factory_->NewStringConstant(ref.string_value()));
                 call_expr = factory_->NewCallExpression(func, args);
             }
             Handle<Declaration> child_declaration =

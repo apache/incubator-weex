@@ -197,36 +197,41 @@ static Value AppendChildComponent(ExecState* exec_state) {
   return Value();
 }
 
-// createComponent(template_id, "template_name", "tag_name", "id");
+// createComponent(template_id, "template_name", "tag_name", "id", ref);
 static Value CreateComponent(ExecState* exec_state) {
   int template_id = 0;
   if (exec_state->GetArgument(0)->type == Value::Type::NUMBER) {
     template_id = static_cast<int>(exec_state->GetArgument(0)->i);
   }
   auto template_name = exec_state->GetArgument(1)->str;
-  Value* arg_ref = exec_state->GetArgument(3);
-  std::string ref;
-  if (IsString(arg_ref)) {
-    ref = CStringValue(arg_ref);
-  } else if (IsInt(arg_ref)) {
+  Value* arg_node_id = exec_state->GetArgument(3);
+  std::string node_id;
+  if (IsString(arg_node_id)) {
+    node_id = CStringValue(arg_node_id);
+  } else if (IsInt(arg_node_id)) {
     std::ostringstream os;
-    os << IntValue(arg_ref);
-    ref = "vn_" + os.str();
+    os << IntValue(arg_node_id);
+    node_id = "vn_" + os.str();
   } else {
     throw VMExecError("CreateElement only support int for string");
   }
   std::string tag_name = exec_state->GetArgument(2)->str->c_str();
-  LOGD("[VM][VNode][CreateDocument]: %s  %s\n", ref.c_str(), tag_name.c_str());
+  std::string ref = "";
+  if (exec_state->GetArgumentCount() > 4 &&
+      exec_state->GetArgument(4)->type == Value::Type::STRING) {
+    ref = exec_state->GetArgument(4)->str->c_str();
+  }
+  LOGD("[VM][VNode][CreateDocument]: %s  %s\n", node_id.c_str(), tag_name.c_str());
   VComponent* component = NULL;
   if (tag_name == "root") {
     component = new VComponent(exec_state, template_id, template_name->c_str(),
-                               ref, "div");
+                               "div", node_id, ref);
     if (exec_state->context()->root() == nullptr) {
       exec_state->context()->set_root(component);
     }
   } else {
     component = new VComponent(exec_state, template_id, template_name->c_str(),
-                               ref, tag_name);
+                               tag_name, node_id, ref);
   }
   if (exec_state->context()->root() == nullptr) {
     exec_state->context()->set_root(component);
@@ -237,28 +242,31 @@ static Value CreateComponent(ExecState* exec_state) {
   return result;
 }
 
-// createElement("tag_name", "id");
+// createElement("tag_name", "id", ref);
 static Value CreateElement(ExecState *exec_state) {
-    Value *arg_ref = exec_state->GetArgument(1);
-    std::string ref;
-    if (IsString(arg_ref)) {
-        ref = CStringValue(arg_ref);
-    }
-    else if (IsInt(arg_ref)) {
+    Value *arg_node_id = exec_state->GetArgument(1);
+    std::string node_id;
+    if (IsString(arg_node_id)) {
+        node_id = CStringValue(arg_node_id);
+    } else if (IsInt(arg_node_id)) {
         std::ostringstream os;
-        os << IntValue(arg_ref) ;
-        ref = "vn_" + os.str();
-    }
-    else {
+        os << IntValue(arg_node_id) ;
+        node_id = "vn_" + os.str();
+    } else {
         throw VMExecError("CreateElement only support int for string");
     }
     std::string tag_name = exec_state->GetArgument(0)->str->c_str();
-    LOGD("[VM][VNode][CreateElement]: %s  %s\n", ref.c_str(), tag_name.c_str());
+    std::string ref = "";
+    if (exec_state->GetArgumentCount() > 2 &&
+        exec_state->GetArgument(2)->type == Value::Type::STRING) {
+      ref = exec_state->GetArgument(2)->str->c_str();
+    }
+    LOGD("[VM][VNode][CreateElement]: %s  %s\n", node_id.c_str(), tag_name.c_str());
     VNode *node = NULL;
     if (tag_name == "root") {
-        node = new VNode(ref, "div");
+        node = new VNode("div", node_id, ref);
     } else {
-        node = new VNode(ref, tag_name);
+        node = new VNode(tag_name, node_id, ref);
     }
     if (exec_state->context()->root() == nullptr) {
         exec_state->context()->set_root(node);

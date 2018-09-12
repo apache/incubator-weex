@@ -23,9 +23,11 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-VNode::VNode(const std::string &ref, const std::string &tag_name) {
+VNode::VNode(const std::string &tag_name, const std::string &node_id,
+             const std::string &ref) {
   ref_ = ref;
   tag_name_ = tag_name;
+  node_id_ = node_id;
 
   styles_ = new std::map<std::string, std::string>();
   attributes_ = new std::map<std::string, std::string>();

@@ -38,7 +38,8 @@ class VComponent : public VNode {
     virtual void OnDestroyed(VComponent* component) = 0;
   };
   VComponent(ExecState* exec_state, int template_id, const std::string& name,
-             const std::string& ref, const std::string& tag_name);
+             const std::string& tag_name, const std::string& node_id,
+             const std::string& ref);
   ~VComponent();
   void UpdateData(std::unordered_map<std::string, Value> datas);
   void DispatchCreated();

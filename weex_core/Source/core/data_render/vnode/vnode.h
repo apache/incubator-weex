@@ -31,7 +31,8 @@ class VNode;
 
 class VNode {
  public:
-  VNode(const std::string &ref, const std::string &tag_name);
+  VNode(const std::string &tag_name, const std::string &node_id,
+        const std::string &ref);
 
   virtual ~VNode();
 
@@ -48,6 +49,8 @@ class VNode {
 
  public:
   inline const std::string &tag_name() const { return tag_name_; }
+
+  inline const std::string &node_id() const { return ref_; }
 
   inline const std::string &ref() const { return ref_; }
 
@@ -73,6 +76,9 @@ class VNode {
 
  private:
   std::string tag_name_;
+  // Not unique
+  std::string node_id_;
+  // Should be unique
   std::string ref_;
   // Ref point to RenderObject is set when PatchVNode or ParseVNode2RenderObject
   std::string render_object_ref_;
