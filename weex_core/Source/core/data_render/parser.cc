@@ -561,6 +561,10 @@ struct ASTParser final {
       }
       json11::Json node_id = json["nodeId"];
       json11::Json tag_name = json["tagName"];
+      // Consider ref as node id if ref exsits
+      if (json["attributes"].is_object() && json["attributes"]["ref"].is_string()) {
+        node_id = json["attributes"]["ref"];
+      }
       Handle<Expression> node_id_expr = nullptr;
       if (tag_name.is_string()) {
         Handle<Expression> call_expr = nullptr;

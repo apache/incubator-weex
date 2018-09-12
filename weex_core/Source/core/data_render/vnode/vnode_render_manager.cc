@@ -59,10 +59,12 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
                                                 int index,
                                                 const string& pageId) {
   std::string ref_str;
-  if (!isRoot) {
-    ref_str = base::to_string(ref_id++);
-  } else {
+  if (isRoot) {
     ref_str = "_root";
+  } else if (!vnode->ref().empty()) {
+    ref_str = vnode->ref();
+  } else {
+    ref_str = base::to_string(ref_id++);
   }
 
   WeexCore::RenderObject* render_object = static_cast<WeexCore::RenderObject*>(
