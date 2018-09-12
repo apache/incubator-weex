@@ -367,6 +367,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     setJSFrameworkInit(false);
     WXModuleManager.resetAllModuleState();
     initWXBridge(WXEnvironment.sRemoteDebugMode);
+    mWXBridge.resetWXBridge(WXEnvironment.sRemoteDebugMode);
   }
 
   /**

@@ -225,6 +225,14 @@ static void RegisterCoreEnv(JNIEnv* env, jobject jcaller, jstring key,
       ->RegisterCoreEnv(jString2StrFast(env, key), jString2StrFast(env, value));
 }
 
+static void ResetWXBridge(JNIEnv* env, jobject jcaller,
+                         jobject bridge,
+                         jstring className) {
+  ScopedJStringUTF8 classNameRef = ScopedJStringUTF8(env, className);
+  WXBridge::Instance()->Reset(env, bridge);
+  WXBridge::Instance()->reset_clazz(env, classNameRef.getChars());
+}
+
 static void SetViewPortWidth(JNIEnv* env, jobject jcaller, jstring instanceId,
                              jfloat value) {
   WeexCoreManager::Instance()

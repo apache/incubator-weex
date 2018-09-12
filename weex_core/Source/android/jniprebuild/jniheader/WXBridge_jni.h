@@ -138,6 +138,10 @@ static void RegisterCoreEnv(JNIEnv* env, jobject jcaller,
     jstring key,
     jstring value);
 
+static void ResetWXBridge(JNIEnv* env, jobject jcaller,
+    jobject bridge,
+    jstring className);
+
 static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
     jstring config);
 
@@ -1042,6 +1046,12 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(RegisterCoreEnv) },
+    { "nativeResetWXBridge",
+"("
+"Ljava/lang/Object;"
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(ResetWXBridge) },
     { "nativeUpdateGlobalConfig",
 "("
 "Ljava/lang/String;"

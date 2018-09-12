@@ -198,4 +198,6 @@ public interface IWXBridge extends IWXObject {
   void setTimeoutNative(String callbackId, String time);
 
   void setJSFrmVersion(String version);
+
+  void resetWXBridge(boolean remoteDebug);
 }

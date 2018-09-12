@@ -98,6 +98,8 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeRegisterCoreEnv(String key, String value);
 
+  private native void nativeResetWXBridge(Object bridge, String className);
+
   /**
    * update global config,
    * @param config params
@@ -302,6 +304,12 @@ public class WXBridge implements IWXBridge {
     if (version != null) {
       WXEnvironment.JS_LIB_SDK_VERSION = version;
     }
+  }
+
+  @Override
+  public void resetWXBridge(boolean remoteDebug) {
+    final String className = this.getClass().getName().replace('.', '/');
+    nativeResetWXBridge(this, className);
   }
 
   @Override

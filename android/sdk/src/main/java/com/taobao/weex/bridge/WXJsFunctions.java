@@ -31,7 +31,7 @@ import com.taobao.weex.wson.WsonUtils;
 
 public class WXJsFunctions implements IWXJsFunctions {
     @Override
-    public native void initWxBridge(Object bridge, String className);
+    public native void resetWXBridge(Object bridge, String className);
 
     @Override
     public native void jsHandleSetJSVersion(String jsVersion);

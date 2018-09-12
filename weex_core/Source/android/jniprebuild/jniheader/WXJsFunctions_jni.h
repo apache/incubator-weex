@@ -21,7 +21,7 @@ namespace {
 
 }  // namespace
 
-static void initWxBridge(JNIEnv *env, jobject object, jobject bridge, jstring className);
+static void resetWXBridge(JNIEnv *env, jobject object, jobject bridge, jstring className);
 
 static void jsHandleSetJSVersion(JNIEnv *env, jobject object, jstring jsVersion);
 
@@ -90,9 +90,9 @@ static void jsHandleCallGCanvasLinkNative(JNIEnv *env, jobject object, jstring c
 
 
 static const JNINativeMethod kMethodsWXJsFunctions[] = {
-        {"initWxBridge",
+        {"resetWXBridge",
                 "(Ljava/lang/Object;Ljava/lang/String;)V",
-                reinterpret_cast<void *>(initWxBridge)},
+                reinterpret_cast<void *>(resetWXBridge)},
         {"jsHandleSetJSVersion",
                 "(Ljava/lang/String;)V",
                 reinterpret_cast<void *>(jsHandleSetJSVersion)},

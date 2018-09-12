@@ -38,7 +38,7 @@ namespace WeexCore {
   }
 }
 
-void initWxBridge(JNIEnv *env, jobject object, jobject bridge, jstring className) {
+void resetWXBridge(JNIEnv *env, jobject object, jobject bridge, jstring className) {
   ScopedJStringUTF8 classNameRef = ScopedJStringUTF8(env, className);
   WXBridge::Instance()->Reset(env, bridge);
   WXBridge::Instance()->reset_clazz(env, classNameRef.getChars());
