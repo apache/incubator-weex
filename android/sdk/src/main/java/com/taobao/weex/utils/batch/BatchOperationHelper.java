@@ -32,7 +32,7 @@ public class BatchOperationHelper implements Interceptor {
 
 
   private BactchExecutor mExecutor;
-  private CopyOnWriteArrayList <Runnable> sRegisterTasks = new CopyOnWriteArrayList<>();
+  private ArrayList <Runnable> sRegisterTasks = new ArrayList<>();
   private boolean isCollecting = false;
 
   public BatchOperationHelper(BactchExecutor executor){
