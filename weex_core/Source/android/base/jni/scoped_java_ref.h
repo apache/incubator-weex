@@ -76,7 +76,7 @@ public:
       ResetNewLocalRef(env, obj);
     }
 
-    T Get() const { return (T)obj_; }
+    T Get() const { return static_cast<T>(obj_); }
 
 private:
     JNIEnv *env_;
@@ -115,6 +115,8 @@ public:
     void Reset(JNIEnv *env, jobject obj) {
       ResetNewGlobalRef(env, obj);
     }
+
+    T Get() const { return static_cast<T>(obj_); }
 };
 
 }  // namespace android

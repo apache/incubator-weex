@@ -26,6 +26,7 @@ namespace weex {
 namespace core {
 namespace data_render {
 
+class ParserContext;
 class TokenizerState;
 
 /*
@@ -33,14 +34,15 @@ class TokenizerState;
  */
 class Tokenizer {
  public:
-  Tokenizer(CharacterStream* stream);
+  Tokenizer(CharacterStream *stream);
+  Tokenizer(CharacterStream *stream, ParserContext *context);
   ~Tokenizer();
   Token::Type Peek();
 
   void Advance(bool divide_expected = false);
 
   void Reset(CharacterStream* stream);
-
+  ParserContext *context() { return context_; }
   Token& CurrentToken();
 
  private:
@@ -49,7 +51,8 @@ class Tokenizer {
   Token ParseNumber(char start);
   Token ParseRegex(bool* ok);
 
-  TokenizerState* state_;
+  TokenizerState *state_;
+  ParserContext *context_{nullptr};
 };
 }  // namespace data_render
 }  // namespace core

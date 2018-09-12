@@ -31,7 +31,7 @@ RenderActionAddEvent::RenderActionAddEvent(const std::string &page_id,
 }
 
 void RenderActionAddEvent::ExecuteAction() {
-  WeexCoreManager::getInstance()->getPlatformBridge()->callAddEvent(
+  WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->AddEvent(
       this->page_id_.c_str(), this->ref_.c_str(), this->event_.c_str());
 }
 

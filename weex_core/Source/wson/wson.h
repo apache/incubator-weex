@@ -47,6 +47,7 @@ typedef struct wson_buffer{
  * */
 #define  WSON_NULL_TYPE   '0'
 #define  WSON_STRING_TYPE  's'
+#define  WSON_UINT8_STRING_TYPE 'u'
 #define  WSON_BOOLEAN_TYPE_TRUE 't'
 #define  WSON_BOOLEAN_TYPE_FALSE 'f'
 #define  WSON_NUMBER_INT_TYPE  'i'
@@ -73,7 +74,9 @@ void wson_push_type_boolean(wson_buffer *buffer, uint8_t value);
 void wson_push_type_int(wson_buffer *buffer, int32_t num);
 void wson_push_type_long(wson_buffer *buffer, int64_t num);
 void wson_push_type_double(wson_buffer *buffer, double num);
+void wson_push_type_float(wson_buffer *buffer, float num);
 void wson_push_type_string(wson_buffer *buffer, const void *src, int32_t length);
+void wson_push_type_uint8_string(wson_buffer *buffer, const uint8_t *src, int32_t length);
 void wson_push_type_null(wson_buffer *buffer);
 void wson_push_type_map(wson_buffer *buffer, uint32_t size);
 void wson_push_type_array(wson_buffer *buffer, uint32_t size);

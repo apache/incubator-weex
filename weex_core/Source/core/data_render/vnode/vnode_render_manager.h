@@ -25,6 +25,7 @@
 
 #include "core/data_render/vm.h"
 #include "core/data_render/vnode/vnode.h"
+#include "core/data_render/vnode/vcomponent.h"
 #include "core/data_render/vnode/vnode_exec_env.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/render_object.h"
@@ -40,8 +41,7 @@ class VNodeRenderManager {
   ~VNodeRenderManager() {}
 
  public:
-  void CreatePage(const std::string &input, const std::string &page_id,
-                  const std::string &init_data);
+  void CreatePage(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data);
   bool RefreshPage(const std::string &page_id, const std::string &init_data);
   bool ClosePage(const std::string &page_id);
 
@@ -62,6 +62,7 @@ class VNodeRenderManager {
   static VNodeRenderManager *g_instance;
 
   std::map<std::string, VNode *> vnode_trees_;
+  std::unordered_map<int, VComponent *> vcomponent_tree_;
   std::map<std::string, ExecState *> exec_states_;
 };
 }  // namespace data_render

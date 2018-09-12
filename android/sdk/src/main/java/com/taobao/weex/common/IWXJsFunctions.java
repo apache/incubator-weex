@@ -24,7 +24,7 @@ package com.taobao.weex.common;
 
 public interface IWXJsFunctions {
 
-    void initWxBridge(Object bridge, String className);
+    void resetWXBridge(Object bridge, String className);
 
     void jsHandleSetJSVersion(String jsVersion);
 

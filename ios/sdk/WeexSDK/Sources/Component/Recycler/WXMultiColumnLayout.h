@@ -54,4 +54,7 @@ extern NSString * const kCollectionSupplementaryViewKindHeader;
 @property (nonatomic, assign, readonly) int computedColumnCount;
 @property (nonatomic, assign, readonly) CGFloat computedHeaderWidth;
 
+//Under system version 10.0, UICollectionViewLayout.collectionView seems be unsafe_unretain rather than weak. so here add one weak collectionview to use inside the imp to avoid bad access.
+@property (nonatomic, weak) UICollectionView *weak_collectionView;
+
 @end

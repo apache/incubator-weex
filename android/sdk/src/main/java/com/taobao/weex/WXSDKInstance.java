@@ -83,6 +83,7 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -208,6 +209,51 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private List<InstanceOnFireEventInterceptor> mInstanceOnFireEventInterceptorList;
 
+
+  /**
+   * network handler
+   */
+  public interface ImageNetworkHandler {
+    public String fetchLocal(String url);
+  }
+
+  public interface StreamNetworkHandler {
+    public String fetchLocal(String url);
+  }
+
+  public interface CustomFontNetworkHandler {
+    public String fetchLocal(String url);
+  }
+
+  private ImageNetworkHandler mImageNetworkHandler;
+
+  private StreamNetworkHandler mStreamNetworkHandler;
+
+  private CustomFontNetworkHandler mCustomFontNetworkHandler;
+
+  public ImageNetworkHandler getImageNetworkHandler() {
+    return mImageNetworkHandler;
+  }
+
+  public void setImageNetworkHandler(ImageNetworkHandler imageNetworkHandler) {
+    this.mImageNetworkHandler = imageNetworkHandler;
+  }
+
+  public StreamNetworkHandler getStreamNetworkHandler() {
+    return mStreamNetworkHandler;
+  }
+
+  public void setStreamNetworkHandler(StreamNetworkHandler streamNetworkHandler) {
+    this.mStreamNetworkHandler = streamNetworkHandler;
+  }
+
+  public CustomFontNetworkHandler getCustomFontNetworkHandler() {
+    return mCustomFontNetworkHandler;
+  }
+
+  public void setCustomFontNetworkHandler(CustomFontNetworkHandler customFontNetworkHandler) {
+    this.mCustomFontNetworkHandler = customFontNetworkHandler;
+  }
 
   /**
    * set make weexCore run in single process mode
@@ -940,7 +986,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
 
     mGlobalEventReceiver=new WXGlobalEventReceiver(this);
-    getContext().registerReceiver(mGlobalEventReceiver,new IntentFilter(WXGlobalEventReceiver.EVENT_ACTION));
+    try {
+      getContext().registerReceiver(mGlobalEventReceiver, new IntentFilter(WXGlobalEventReceiver.EVENT_ACTION));
+    } catch (Exception e) {
+      // Huawei may throw a exception if register more than 500 BroadcastReceivers
+      WXLogUtils.e(e.getMessage());
+    }
+
   }
 
   @Override
@@ -1565,8 +1617,19 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mWXScrollListeners.add(wxScrollListener);
   }
 
+  static int sScreenHeight = -1;
   public void setSize(int width, int height) {
     if (width > 0 && height > 0 & !isDestroy && mRendered && mRenderContainer != null) {
+        if (sScreenHeight < 0){
+            sScreenHeight = WXViewUtils.getScreenHeight(getContext());
+        }
+        if (sScreenHeight>0){
+            double screenRatio = (double)height/(double)sScreenHeight *100;
+            if(screenRatio>100){
+              screenRatio =100;
+            }
+            getApmForInstance().addStats(WXInstanceApm.KEY_PAGE_STATS_BODY_RATIO,screenRatio);
+        }
       ViewGroup.LayoutParams layoutParams = mRenderContainer.getLayoutParams();
       if (layoutParams != null) {
         final float realWidth = width;

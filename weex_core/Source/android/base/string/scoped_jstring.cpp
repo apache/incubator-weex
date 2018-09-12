@@ -32,6 +32,8 @@ ScopedJString::~ScopedJString() {
 const jchar *ScopedJString::getChars() {
   if (m_chars)
     return m_chars;
+  if (m_jstring == nullptr)
+    return nullptr;
   m_chars = m_env->GetStringChars(m_jstring, nullptr);
   m_len = m_env->GetStringLength(m_jstring);
   return m_chars;
@@ -40,6 +42,8 @@ const jchar *ScopedJString::getChars() {
 size_t ScopedJString::getCharsLength() {
   if (m_chars)
     return m_len;
+  if (m_jstring == nullptr)
+    return 0;
   m_len = m_env->GetStringLength(m_jstring);
   return m_len;
 }

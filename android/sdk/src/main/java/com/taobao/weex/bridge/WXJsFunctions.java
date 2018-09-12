@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.bridge;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.common.IWXJsFunctions;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
@@ -29,7 +31,7 @@ import com.taobao.weex.wson.WsonUtils;
 
 public class WXJsFunctions implements IWXJsFunctions {
     @Override
-    public native void initWxBridge(Object bridge, String className);
+    public native void resetWXBridge(Object bridge, String className);
 
     @Override
     public native void jsHandleSetJSVersion(String jsVersion);
@@ -42,7 +44,7 @@ public class WXJsFunctions implements IWXJsFunctions {
 
 
     @Override
-    public void jsHandleCallNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options){
+    public void jsHandleCallNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
         jsHandleCallNativeModule(instanceId, module, method,
                 WXWsonJSONSwitch.convertJSONToWsonIfUseWson(arguments), WXWsonJSONSwitch.convertJSONToWsonIfUseWson(options), true);
     }
@@ -105,10 +107,12 @@ public class WXJsFunctions implements IWXJsFunctions {
 
     @Override
     public void jsFunctionCallUpdateStyle(String pageId, String ref, String data){
-        jsFunctionCallUpdateStyle(pageId, ref, WsonUtils.toWson(JSON.parseObject(data)), true);
+        byte[] data1 = WsonUtils.toWson(JSON.parseObject(data));
+        Log.e("WxDebug" ,"jsFunctionCallUpdateStyle");
+        jsFunctionCallUpdateStyleNative(pageId, ref, data1, true);
     }
 
-    public native void jsFunctionCallUpdateStyle(String pageId, String ref, byte[] data, boolean h5);
+    public native void jsFunctionCallUpdateStyleNative(String pageId, String ref, byte[] data, boolean h5);
 
 
     @Override

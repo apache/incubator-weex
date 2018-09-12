@@ -21,26 +21,35 @@
 #include <sstream>
 #include "core/data_render/object.h"
 #include "core/data_render/table.h"
-#include "core/data_render/table_factory.h"
+#include "core/data_render/class_factory.h"
+#include "core/data_render/class_array.h"
+#include "core/data_render/class_string.h"
+#include "core/data_render/common_error.h"
+#include "core/data_render/vnode/vcomponent.h"
+#include <base/LogDefines.h>
 
 namespace weex {
 namespace core {
 namespace data_render {
+
 json11::Json ParseValue2Json(const Value& value);
 
-static Value Log(ExecState* exec_state) {
+static Value Log(ExecState *exec_state) {
   size_t length = exec_state->GetArgumentCount();
   for (int i = 0; i < length; ++i) {
-    Value* a = exec_state->GetArgument(i);
+    Value *a = exec_state->GetArgument(i);
     switch (a->type) {
       case Value::Type::NUMBER:
-        std::cout << a->n << "\n";
+        std::cout << "[log]:=>" << a->n << "\n";
         break;
       case Value::Type::INT:
-        std::cout << a->i << "\n";
+        std::cout << "[log]:=>" << a->i << "\n";
         break;
       case Value::Type::STRING:
-        std::cout << a->str->c_str() << "\n";
+        std::cout << "[log]:=>" << a->str->c_str() << "\n";
+        break;
+      case Value::Type::TABLE:
+        std::cout << "[log]:=>" << TableToString(ValueTo<Table>(a)) << "\n";
         break;
       default:
         break;
@@ -49,34 +58,40 @@ static Value Log(ExecState* exec_state) {
   return Value();
 }
 
-static Value GetTableSize(ExecState* exec_state) {
-  size_t length = exec_state->GetArgumentCount();
-  if (length > 0) {
-    Value* value = exec_state->GetArgument(0);
-    if (IsTable(value)) {
-      return Value(static_cast<int64_t>(GetTableSize(TableValue(value))));
+static Value SizeOf(ExecState *exec_state) {
+    size_t length = exec_state->GetArgumentCount();
+    if (length > 0) {
+        Value *value = exec_state->GetArgument(0);
+        if (IsTable(value)) {
+            return Value(static_cast<int64_t>(GetTableSize(ValueTo<Table>(value))));
+        }
+        else if (IsArray(value)) {
+            return GetArraySizeValue(ValueTo<Array>(value));
+        }
     }
-  }
-  return Value(static_cast<int64_t>(-1));
+    return Value(static_cast<int64_t>(-1));
 }
 
-static Value Merge(ExecState* exec_state) {
-  size_t length = exec_state->GetArgumentCount();
-  if (length != 2) {
-    return Value();
-  }
-  Value* lvalue = exec_state->GetArgument(0);
-  Value* rvalue = exec_state->GetArgument(1);
-  if (!IsTable(lvalue) || !IsTable(rvalue)) {
-    return Value();
-  }
-  Table* l_table = TableValue(lvalue);
-  Table* r_table = TableValue(rvalue);
-  Value* new_value = exec_state->getTableFactory()->CreateTable();
-  Table* new_table = TableValue(new_value);
-  new_table->map->insert(r_table->map->begin(), r_table->map->end());
-  new_table->map->insert(l_table->map->begin(), l_table->map->end());
-  return Value(*new_value);
+static Value Merge(ExecState *exec_state) {
+    size_t length = exec_state->GetArgumentCount();
+    if (length != 2) {
+        return Value();
+    }
+    Value *lhs = exec_state->GetArgument(0);
+    Value *rhs = exec_state->GetArgument(1);
+    if (!IsTable(lhs) && !IsTable(rhs)) {
+        return Value();
+    }
+    Value new_value = exec_state->class_factory()->CreateTable();
+    if (IsTable(lhs)) {
+        TableCopy(*lhs, new_value);
+//        LOGD("[Merge]:lhs:%s\n", TableToString(ValueTo<Table>(lhs)).c_str());
+    }
+    if (IsTable(rhs)) {
+        TableCopy(*rhs, new_value);
+//        LOGD("[Merge]:rhs:%s\n", TableToString(ValueTo<Table>(rhs)).c_str());
+    }
+    return new_value;
 }
 
 static Value ToString(ExecState* exec_state) {
@@ -96,31 +111,29 @@ static Value ToString(ExecState* exec_state) {
   return Value(new_value);
 }
 
-static Value Slice(ExecState* exec_state) {
-  size_t length = exec_state->GetArgumentCount();
-  if (length != 3) {
-    return Value();
-  }
-  Value* table = exec_state->GetArgument(0);
-  Value* start = exec_state->GetArgument(1);
-  Value* end = exec_state->GetArgument(2);
-  if (!IsTable(table) || !IsInt(start) || !IsInt(end)) {
-    return Value();
-  }
-  Table* p_table = TableValue(table);
-  unsigned int v_start = static_cast<unsigned int>(IntValue(start));
-  unsigned int v_end = static_cast<unsigned int>(IntValue(end));
-  if (v_end > p_table->array->size()) {
-    v_end = p_table->array->size();
-  }
-  if (v_start > v_end) {
-    v_start = v_end;
-  }
-  Value* new_value = exec_state->getTableFactory()->CreateTable();
-  Table* new_table = TableValue(new_value);
-  new_table->array->insert(new_table->array->end(),
-                           p_table->array->begin() + v_start, p_table->array->begin() + v_end);
-  return Value(*new_value);
+static Value Slice(ExecState *exec_state) {
+    size_t length = exec_state->GetArgumentCount();
+    if (length != 3) {
+        return Value();
+    }
+    Value *array = exec_state->GetArgument(0);
+    Value *start = exec_state->GetArgument(1);
+    Value *end = exec_state->GetArgument(2);
+    if (!IsArray(array) || !IsInt(start) || !IsInt(end)) {
+        return Value();
+    }
+    unsigned int v_start = static_cast<unsigned int>(IntValue(start));
+    unsigned int v_end = static_cast<unsigned int>(IntValue(end));
+    size_t size = GetArraySize(ValueTo<Array>(array));
+    if (v_end > size) {
+        v_end = static_cast<unsigned int>(size);
+    }
+    if (v_start > v_end) {
+        v_start = v_end;
+    }
+    Value new_value = exec_state->class_factory()->CreateArray();
+    ArrayCopyFrom(*array, new_value, v_start, v_end);
+    return new_value;
 }
 
 static Value AppendUrlParam(ExecState* exec_state) {
@@ -130,22 +143,22 @@ static Value AppendUrlParam(ExecState* exec_state) {
   }
   Value* url = exec_state->GetArgument(0);
   Value* array = exec_state->GetArgument(1);
-  if (!IsString(url) || !IsTable(array)) {
+  if (!IsString(url) || !IsArray(array)) {
     return Value();
   }
   String* p_string = StringValue(url);
-  Table* p_array = TableValue(array);
+  Array* p_array = ValueTo<Array>(array);
   std::stringstream ss;
   ss << p_string->c_str();
 
-  std::vector<Value>* kv_array = p_array->array;
-  for (auto it = kv_array->begin(); it != kv_array->end(); it++) {
+  std::vector<Value> kv_array = p_array->items;
+  for (auto it = kv_array.begin(); it != kv_array.end(); it++) {
     Value& kv_map = *it;
-    Table* p_table = TableValue(&kv_map);
-    if (p_table != nullptr && p_table->map->find("key") != p_table->map->end() &&
-        p_table->map->find("value") != p_table->map->end()) {
-      Value& key = p_table->map->find("key")->second;
-      Value& value = p_table->map->find("value")->second;
+    Table* p_table = ValueTo<Table>(&kv_map);
+    if (p_table != nullptr && p_table->map.find("key") != p_table->map.end() &&
+        p_table->map.find("value") != p_table->map.end()) {
+      Value& key = p_table->map.find("key")->second;
+      Value& value = p_table->map.find("value")->second;
       if (IsString(&key) && IsString(&value)) {
         ss << "&" << key.str->c_str() << "=" << value.str->c_str();
       }
@@ -156,32 +169,138 @@ static Value AppendUrlParam(ExecState* exec_state) {
   return Value(new_value);
 }
 
-// createElement("tag_name", "id");
-static Value CreateElement(ExecState* exec_state) {
-  VNode* node = new VNode(exec_state->GetArgument(1)->str->c_str(),
-                          exec_state->GetArgument(0)->str->c_str());
+// saveComponentDataAndProps(component, data, props);
+static Value SaveComponentDataAndProps(ExecState* exec_state) {
+  VComponent *component = exec_state->GetArgument(0)->type == Value::Type::NIL ?
+                    nullptr : reinterpret_cast<VComponent *>(exec_state->GetArgument(0)->cptr);
+  Value *data = exec_state->GetArgument(1);
+  Value *props = exec_state->GetArgument(2);
+  if (component) {
+      component->set_data(ValueTo<Table>(data));
+      component->set_props(ValueTo<Table>(props));
+  }
+  return Value();
+}
+
+// appendChildComponent(parent, child);
+static Value AppendChildComponent(ExecState* exec_state) {
+  VNode *parent = exec_state->GetArgument(0)->type == Value::Type::NIL ?
+                    nullptr : reinterpret_cast<VNode *>(exec_state->GetArgument(0)->cptr);
+  VNode *child = reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);
+  if (parent && child) {
+      static_cast<VComponent *>(parent)->AppendChildComponent(static_cast<VComponent *>(child));
+  }
+  return Value();
+}
+
+// createComponent(template_id, "template_name", "tag_name", "id");
+static Value CreateComponent(ExecState* exec_state) {
+  int template_id = 0;
+  if (exec_state->GetArgument(0)->type == Value::Type::NUMBER) {
+    template_id = static_cast<int>(exec_state->GetArgument(0)->i);
+  }
+  auto template_name = exec_state->GetArgument(1)->str;
+  Value* arg_ref = exec_state->GetArgument(3);
+  std::string ref;
+  if (IsString(arg_ref)) {
+    ref = CStringValue(arg_ref);
+  } else if (IsInt(arg_ref)) {
+    std::ostringstream os;
+    os << IntValue(arg_ref);
+    ref = "vn_" + os.str();
+  } else {
+    throw VMExecError("CreateElement only support int for string");
+  }
+  std::string tag_name = exec_state->GetArgument(2)->str->c_str();
+  LOGD("[VM][VNode][CreateDocument]: %s  %s\n", ref.c_str(), tag_name.c_str());
+  VComponent* component = NULL;
+  if (tag_name == "root") {
+    component = new VComponent(exec_state, template_id, template_name->c_str(),
+                               ref, "div");
+    if (exec_state->context()->root() == nullptr) {
+      exec_state->context()->set_root(component);
+    }
+  } else {
+    component = new VComponent(exec_state, template_id, template_name->c_str(),
+                               ref, tag_name);
+  }
+  if (exec_state->context()->root() == nullptr) {
+    exec_state->context()->set_root(component);
+  }
   Value result;
   result.type = Value::Type::CPTR;
-  result.cptr = node;
+  result.cptr = component;
   return result;
 }
 
+// createElement("tag_name", "id");
+static Value CreateElement(ExecState *exec_state) {
+    Value *arg_ref = exec_state->GetArgument(1);
+    std::string ref;
+    if (IsString(arg_ref)) {
+        ref = CStringValue(arg_ref);
+    }
+    else if (IsInt(arg_ref)) {
+        std::ostringstream os;
+        os << IntValue(arg_ref) ;
+        ref = "vn_" + os.str();
+    }
+    else {
+        throw VMExecError("CreateElement only support int for string");
+    }
+    std::string tag_name = exec_state->GetArgument(0)->str->c_str();
+    LOGD("[VM][VNode][CreateElement]: %s  %s\n", ref.c_str(), tag_name.c_str());
+    VNode *node = NULL;
+    if (tag_name == "root") {
+        node = new VNode(ref, "div");
+    } else {
+        node = new VNode(ref, tag_name);
+    }
+    if (exec_state->context()->root() == nullptr) {
+        exec_state->context()->set_root(node);
+    }
+    Value result;
+    result.type = Value::Type::CPTR;
+    result.cptr = node;
+    return result;
+}
+    
+static void AppendChild(ExecState *exec_state, VNode *parent, VNode *children) {
+    if (parent && children) {
+        parent->AddChild(children);
+    }
+}
+
 // appendChild(parent, node);
-static Value AppendChild(ExecState* exec_state) {
-  VNode* parent =
-      exec_state->GetArgument(0)->type == Value::Type::NIL
-      ? nullptr
-      : reinterpret_cast<VNode*>(exec_state->GetArgument(0)->cptr);
-  VNode* child = reinterpret_cast<VNode*>(exec_state->GetArgument(1)->cptr);
-
-  if (parent == nullptr && exec_state->context()->root() == nullptr) {
-    exec_state->context()->set_root(child);
+static Value AppendChild(ExecState *exec_state) {
+  VNode *parent = exec_state->GetArgument(0)->type == Value::Type::NIL ?
+    nullptr : reinterpret_cast<VNode *>(exec_state->GetArgument(0)->cptr);
+  Value *childrens = exec_state->GetArgument(1);
+  if (IsString(childrens) && parent->tag_name() != "text") {
+      throw VMExecError("AppendChild only support string for span");
   }
-  if (parent == nullptr || child == nullptr) {
-    return Value();
+  else if (!IsArray(childrens) && !IsCptr(childrens) && !IsString(childrens)) {
+      throw VMExecError("AppendChild unsupport array or cptr");
   }
-  parent->AddChild(child);
-
+  if (IsArray(childrens)) {
+      std::vector<Value> items = ValueTo<Array>(childrens)->items;
+      for (int i = 0; i < items.size(); i++) {
+          if (!IsCptr(&items[i])) {
+              throw VMExecError("AppendChild unspport array or cptr");
+          }
+          VNode *children = reinterpret_cast<VNode *>(items[i].cptr);
+          AppendChild(exec_state, parent, children);
+      }
+  }
+  else if (IsString(childrens) && parent) {
+      LOGD("[VM][VNode][AppendChild]:string:%s\n", CStringValue(childrens));
+      parent->SetAttribute("value", CStringValue(childrens));
+  }
+  else {
+      VNode *children = reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);
+      LOGD("[VM][VNode][AppendChild]: %s  %s\n", parent ? parent->ref().c_str() : "null", children->ref().c_str());
+      AppendChild(exec_state, parent, children);
+  }
   return Value();
 }
 
@@ -205,6 +324,64 @@ static Value SetAttr(ExecState* exec_state) {
   }
 
   return Value();
+}
+
+
+// setProps(node, "value");
+static Value SetProps(ExecState *exec_state) {
+    VNode *node = reinterpret_cast<VNode *>(exec_state->GetArgument(0)->cptr);
+    if (node == nullptr) {
+        return Value();
+    }
+    Value *p_value = exec_state->GetArgument(1);
+    if (p_value->type == Value::TABLE) {
+        Table *table = ValueTo<Table>(p_value);
+        //LOGD("[SetProps]:table:%s\n", TableToString(table).c_str());
+        for (auto iter = table->map.begin(); iter != table->map.end(); iter++) {
+            if (iter->first == "style") {
+                Value style = iter->second;
+                if (style.type == Value::TABLE) {
+                    Table *style_table = ValueTo<Table>(&style);
+                    for (auto iter_style = style_table->map.begin(); iter_style != style_table->map.end(); iter_style++) {
+                        switch (iter_style->second.type) {
+                            case Value::STRING:
+                            {
+                                node->SetStyle(iter_style->first, iter_style->second.str->c_str());
+                                break;
+                            }
+                            case Value::INT:
+                            {
+                                node->SetStyle(iter_style->first, to_string(iter_style->second.i));
+                                break;
+                            }
+                            default:
+                                LOGE("can't support type:%i", iter_style->second.type);
+                                break;
+                        }
+                    }
+                }
+            }
+            else {
+                switch (iter->second.type) {
+                    case Value::STRING:
+                    {
+                        node->SetAttribute(iter->first, iter->second.str->c_str());
+                        break;
+                    }
+                    case Value::INT:
+                    {
+                        node->SetAttribute(iter->first, to_string(iter->second.i));
+                        break;
+                    }
+                    default:
+                        LOGE("can't support type:%i", iter->second.type);
+                        break;
+                }
+
+            }
+        }
+    }
+    return Value();
 }
 
 // setClassList(node, "class-name");
@@ -236,18 +413,30 @@ void RegisterCFunc(ExecState* state, const std::string& name,
   state->global()->Add(name, func);
 }
 
+void RegisterClass(ExecState *state, const std::string& name, Value value) {
+    state->global()->Add(name, value);
+}
+
 void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   // log
   RegisterCFunc(state, "log", Log);
-  RegisterCFunc(state, "sizeof", GetTableSize);
+  RegisterCFunc(state, "sizeof", SizeOf);
   RegisterCFunc(state, "slice", Slice);
   RegisterCFunc(state, "appendUrlParam", AppendUrlParam);
   RegisterCFunc(state, "merge", Merge);
   RegisterCFunc(state, "tostring", ToString);
   RegisterCFunc(state, "createElement", CreateElement);
+  RegisterCFunc(state, "createComponent", CreateComponent);
+  RegisterCFunc(state, "saveComponentDataAndProps", SaveComponentDataAndProps);
+  RegisterCFunc(state, "appendChildComponent", AppendChildComponent);
   RegisterCFunc(state, "appendChild", AppendChild);
+  RegisterCFunc(state, "encodeURIComponent", encodeURIComponent);
   RegisterCFunc(state, "setAttr", SetAttr);
+  RegisterCFunc(state, "setProps", SetProps);
   RegisterCFunc(state, "setClassList", SetClassList);
+  RegisterClass(state, "Array", state->class_factory()->ClassArray());
+  RegisterClass(state, "String", state->class_factory()->ClassString());
+  RegisterClass(state, "JSON", state->class_factory()->ClassJSON());
 }
 
 Value ParseJson2Value(ExecState* state, const json11::Json& json) {
@@ -268,57 +457,56 @@ Value ParseJson2Value(ExecState* state, const json11::Json& json) {
     String* p_str = state->string_table()->StringFromUTF8(json.string_value());
     return Value(p_str);
   } else if (json.is_array()) {
-    Value* value = state->getTableFactory()->CreateTable();
+    Value value = state->class_factory()->CreateArray();
     const json11::Json::array& data_objects = json.array_items();
     int64_t array_size = data_objects.size();
-    for (int64_t index = 0; index < array_size; index++) {
+    for (int index = 0; index < array_size; index++) {
       // will be free by table
       Value key(index);
       Value val(ParseJson2Value(state, json[index]));
-      SetTabValue(TableValue(value), &key, val);
+      SetArray(ValueTo<Array>(&value), &key, val);
     }
-    return Value(*value);
+    return value;
   } else if (json.is_object()) {
-    Value* value = state->getTableFactory()->CreateTable();
+    Value value = state->class_factory()->CreateTable();
     const json11::Json::object& data_objects = json.object_items();
     for (auto it = data_objects.begin(); it != data_objects.end(); it++) {
       // will be free by table
       Value key(state->string_table()->StringFromUTF8(it->first));
       Value val(ParseJson2Value(state, it->second));
-      SetTabValue(TableValue(value), &key, val);
+      SetTableValue(ValueTo<Table>(&value), &key, val);
     }
-    return Value(*value);
+    return value;
   } else {
     return Value();
   }
 };
 
 json11::Json ParseValue2Json(const Value& value) {
-  if (value.type != Value::TABLE) {
-    return json11::Json();
-  }
-
-  Table* p_table = TableValue(&value);
-  if (p_table->array->size() > 0) {
-    json11::Json::array array;
-
-    for (auto it = p_table->array->begin(); it != p_table->array->end(); it++) {
-      if ((*it).type == Value::STRING) {
-        array.push_back(json11::Json((*it).str->c_str()));
-        continue;
-      }
-
-      if ((*it).type == Value::TABLE) {
-        array.push_back(ParseValue2Json((*it)));
-        continue;
-      }
+    if (value.type != Value::TABLE) {
+        return json11::Json();
     }
-
-    return json11::Json(array);
-  }
+    Table *p_table = ValueTo<Table>(&value);
+//  if (p_table->array.size() > 0) {
+//    json11::Json::array array;
+//
+//    for (auto it = p_table->array.begin(); it != p_table->array.end(); it++) {
+//      if ((*it).type == Value::STRING) {
+//        array.push_back(json11::Json((*it).str->c_str()));
+//        continue;
+//      }
+//
+//      if ((*it).type == Value::TABLE) {
+//        array.push_back(ParseValue2Json((*it)));
+//        continue;
+//      }
+//    }
+//
+//    return json11::Json(array);
+//  }
 
   json11::Json::object object;
-  for (auto it = p_table->map->begin(); it != p_table->map->end(); it++) {
+  for (auto it = p_table->map.begin(); it != p_table->map.end(); it++) {
     if (it->second.type == Value::STRING) {
       object.insert({it->first, json11::Json(it->second.str->c_str())});
       continue;
@@ -329,37 +517,59 @@ json11::Json ParseValue2Json(const Value& value) {
       continue;
     }
   }
-  
+
   return json11::Json(object);
 }
 
 void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   const json11::Json& json = state->context()->raw_json();
-  Global* global = state->global();
+  Variables* global = state->global();
   const json11::Json& data = json["data"];
   Value value = ParseJson2Value(state, data);
   if (value.type != Value::Type::TABLE) {
-    value = *(state->getTableFactory()->CreateTable());
+    value = state->class_factory()->CreateTable();
   }
   global->Add("_data_main", value);
+
+  // Set component data and props
+  Value components_data = state->class_factory()->CreateTable();
+  Value components_props = state->class_factory()->CreateTable();
+  const json11::Json& components_obj = json["components"];
+  if (components_obj.is_array()) {
+    for (auto it = components_obj.array_items().begin();
+         it != components_obj.array_items().end(); it++) {
+      const json11::Json name = (*it)["name"];
+      if (!name.is_string()) {
+        continue;
+      }
+      auto temp_data = ParseJson2Value(state, (*it)["data"]);
+      Value key(state->string_table()->StringFromUTF8(name.string_value()));
+      SetTableValue(ValueTo<Table>(&components_data), &key, temp_data);
+      auto temp_props = ParseJson2Value(state, (*it)["props"]);
+      SetTableValue(ValueTo<Table>(&components_props), &key, temp_props);
+    }
+  }
+  global->Add("_components_data", components_data);
+  global->Add("_components_props", components_props);
 }
 
-void VNodeExecEnv::InitInitDataValue(ExecState* state,
-                                     const std::string& init_data_str) {
+void VNodeExecEnv::InitInitDataValue(ExecState *state, const std::string& init_data_str) {
   std::string err;
   const json11::Json& json = json11::Json::parse(init_data_str, err);
   if (!err.empty()) {
     LOGE("error parsing init data");
-    Value value = *(state->getTableFactory()->CreateTable());
+    Value value = state->class_factory()->CreateTable();
     state->global()->Set("_init_data", value);
+    state->global()->Set("__weex_data__", value);
     return;
   }
 
   Value value = ParseJson2Value(state, json);
   if (value.type != Value::Type::TABLE) {
-    value = *(state->getTableFactory()->CreateTable());
+    value = state->class_factory()->CreateTable();
   }
   state->global()->Set("_init_data", value);
+  state->global()->Set("__weex_data__", value);
 }
 
 void AddStyles(ExecState* state, const std::string& prefix, const json11::Json& style_obj) {

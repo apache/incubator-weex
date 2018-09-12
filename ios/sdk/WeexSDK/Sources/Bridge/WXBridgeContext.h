@@ -21,10 +21,6 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import "WXBridgeProtocol.h"
 
-#import "WXBridgeProtocol.h"
-
-#import "WXBridgeProtocol.h"
-
 @class WXCallJSMethod;
 @class WXSDKInstance;
 

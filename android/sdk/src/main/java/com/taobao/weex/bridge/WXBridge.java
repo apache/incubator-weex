@@ -26,6 +26,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.CSSShorthand;
@@ -96,6 +97,8 @@ public class WXBridge implements IWXBridge {
   private native void nativeMarkDirty(String instanceId, String ref, boolean dirty);
 
   private native void nativeRegisterCoreEnv(String key, String value);
+
+  private native void nativeResetWXBridge(Object bridge, String className);
 
   /**
    * update global config,
@@ -169,6 +172,7 @@ public class WXBridge implements IWXBridge {
    * @param tasks
    * @param callback
    */
+  @CalledByNative
   public int callNative(String instanceId, byte[] tasks, String callback) {
     return callNative(instanceId, (JSONArray) JSON.parseArray(new String(tasks)), callback);
   }
@@ -204,6 +208,7 @@ public class WXBridge implements IWXBridge {
     return errorCode;
   }
 
+  @CalledByNative
   public void reportJSException(String instanceId, String func, String exception) {
     WXBridgeManager.getInstance().reportJSException(instanceId, func, exception);
   }
@@ -221,6 +226,7 @@ public class WXBridge implements IWXBridge {
    * @return the result
    */
   @Override
+  @CalledByNative
   public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
     try {
       long start = WXUtils.getFixUnixTime();
@@ -275,6 +281,7 @@ public class WXBridge implements IWXBridge {
    * @param options      option arguments for extending
    */
   @Override
+  @CalledByNative
   public void callNativeComponent(String instanceId, String ref, String method, byte[] arguments, byte[] optionsData) {
     try{
       JSONArray argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
@@ -285,10 +292,14 @@ public class WXBridge implements IWXBridge {
     }
   }
 
+  @Override
+  @CalledByNative
   public void setTimeoutNative(String callbackId, String time) {
     WXBridgeManager.getInstance().setTimeout(callbackId, time);
   }
 
+  @Override
+  @CalledByNative
   public void setJSFrmVersion(String version) {
     if (version != null) {
       WXEnvironment.JS_LIB_SDK_VERSION = version;
@@ -296,6 +307,13 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  public void resetWXBridge(boolean remoteDebug) {
+    final String className = this.getClass().getName().replace('.', '/');
+    nativeResetWXBridge(this, className);
+  }
+
+  @Override
+  @CalledByNative
   public int callUpdateFinish(String instanceId, byte[] tasks, String callback) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -310,6 +328,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callRefreshFinish(String instanceId, byte[] tasks, String callback) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -324,6 +343,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public void reportServerCrash(String instanceId, String crashFile) {
     WXLogUtils.e(TAG, "reportServerCrash instanceId:" + instanceId + " crashFile: " + crashFile);
     int errorCode = IWXBridge.INSTANCE_RENDERING;
@@ -340,6 +360,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callCreateBody(String instanceId, String componentType, String ref,
                             HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                             float[] margins, float[] paddings, float[] borders) {
@@ -358,6 +379,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callAddElement(String instanceId, String componentType, String ref, int index, String parentRef,
                             HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                             float[] margins, float[] paddings, float[] borders,  boolean willLayout) {
@@ -377,6 +399,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callRemoveElement(String instanceId, String ref) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -390,6 +413,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callMoveElement(String instanceId, String ref, String parentref, int index) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -403,6 +427,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callAddEvent(String instanceId, String ref, String event) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -417,6 +442,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callRemoveEvent(String instanceId, String ref, String event) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -431,6 +457,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callUpdateStyle(String instanceId, String ref,
                              HashMap<String, Object> styles,
                              HashMap<String, String> paddings,
@@ -449,6 +476,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callUpdateAttrs(String instanceId, String ref, HashMap<String, String> attrs) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -463,6 +491,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, int index) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -477,6 +506,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callCreateFinish(String instanceId) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -488,6 +518,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callRenderSuccess(String instanceId) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -499,6 +530,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callAppendTreeCreateFinish(String instanceId, String ref) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -510,6 +542,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
@@ -523,6 +556,7 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
+  @CalledByNative
   public ContentBoxMeasurement getMeasurementFunc(String instanceId, long renderObjectPtr) {
     ContentBoxMeasurement obj = null;
     try {
@@ -610,6 +644,7 @@ public class WXBridge implements IWXBridge {
     nativeRegisterCoreEnv(key, value);
   }
 
+  @CalledByNative
   public void reportNativeInitStatus(String statusCode, String errorMsg) {
     if (WXErrorCode.WX_JS_FRAMEWORK_INIT_SINGLE_PROCESS_SUCCESS.getErrorCode().equals(statusCode)
             || WXErrorCode.WX_JS_FRAMEWORK_INIT_FAILED.getErrorCode().equals(statusCode)) {

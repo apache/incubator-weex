@@ -58,7 +58,7 @@ public class CellRenderContext {
      * get current render state
      * */
     public CellRenderState getRenderState() {
-        if(renderState != null){
+        if(renderState != null) {
             renderState =  templateList.getCellDataManager().getRenderState(position);
         }
         return renderState;
