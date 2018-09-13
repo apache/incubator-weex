@@ -76,7 +76,7 @@ async function build (name) {
     case 'native': pkgName = 'weex-js-framework'; break
     case 'env': pkgName = 'weex-env'; break
     case 'polyfill': pkgName = 'weex-polyfill'; break
-    case 'vue': pkgName = 'weex-vue'; break
+    case 'vue': pkgName = 'weex-vue-api'; break
     case 'rax': pkgName = 'weex-rax'; break
     case 'runtime': pkgName = 'weex-js-runtime'; break
     case 'legacy': pkgName = 'weex-legacy'; break

@@ -17,7 +17,45 @@
  * under the License.
  */
 
-import setup from './setup'
-import * as Vue from 'weex-vue-framework'
+const instanceOptions = {}
 
-setup({ Vue })
+const Vue = {
+  createInstanceContext (instanceId, runtimeContext, data) {
+    const weex = runtimeContext.weex
+    const instance = instanceOptions[instanceId] = {
+      document: weex.document,
+      lifecycle: {}
+    }
+
+    const instanceContext = {
+      __weex_instance_id__: instanceId,
+      __weex_document__: weex.document,
+      __weex_data__: data || {},
+      __weex_config__: weex.config,
+      __instance_lifecycle__: instance.lifecycle
+    };
+
+    return instanceContext
+  },
+
+  destroyInstance (instanceId) {
+    const instance = instanceOptions[instanceId]
+    if (instance) {
+      try {
+        instance.lifecycle.onDestory && instance.lifecycle.onDestory()
+        instance.document.destroy()
+      } catch (e) {}
+      delete instance.document
+    }
+    delete instanceOptions[instanceId]
+  },
+
+  refreshInstance (instanceId, data) {
+    const instance = instanceOptions[instanceId]
+    instance.lifecycle.onRefresh && instance.lifecycle.onRefresh({ instance, data })
+    // Finally `refreshFinish` signal needed.
+    instance.document.taskCenter.send('dom', { action: 'refreshFinish' }, [])
+  }
+}
+
+export default Vue

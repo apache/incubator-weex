@@ -116,3 +116,31 @@ export function checkLevel (type) {
 export function debugLog (text) {
   global.nativeLog('wxInteractionAnalyzer: [jsfm]' + text, '__DEBUG')
 }
+
+/**
+ * Get current runtime context object
+ */
+export function getContextObject () {
+  return typeof global !== 'undefined'
+    ? global
+    : typeof self !== 'undefined'
+      ? self
+      : (new Function('return this'))() // tslint:disable-line
+}
+
+/**
+ * Set a global API to current context
+ */
+export function setGlobalAPI (name, value, readonly) {
+  const context = getContextObject()
+  try {
+    Object.defineProperty(context, name, {
+      value,
+      configurable: true,
+      enumerable: true,
+      writable: !readonly
+    })
+  } catch (e) {
+    context[name] = value
+  }
+}

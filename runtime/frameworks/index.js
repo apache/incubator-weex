@@ -17,9 +17,9 @@
  * under the License.
  */
 import * as Vanilla from './vanilla/index'
-import * as Vue from 'weex-vue-framework'
 import * as Weex from './legacy/index'
 import Rax from 'weex-rax-framework'
+import Vue from '../entries/vue'
 
 export default {
   Vanilla,

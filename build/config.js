@@ -61,11 +61,11 @@ const configs = {
       file: absolute('dist/weex-polyfill')
     }
   },
-  'weex-vue': {
-    input: absolute('runtime/entries/vue.js'),
+  'weex-vue-api': {
+    input: absolute('runtime/entries/vue-api.js'),
     output: {
       name: 'WeexVue',
-      file: absolute('dist/weex-vue'),
+      file: absolute('dist/weex-vue-api'),
       banner: `(this.nativeLog || function(s) {console.log(s)})`
         + `('Weex JS Framework ${subversion.framework}, Build ${now()}. `
         + `(Vue: ${deps['weex-vue-framework']})');\n`
