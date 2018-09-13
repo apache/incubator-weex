@@ -40,8 +40,8 @@ function createVueModuleInstance () {
   Vue.config.parsePlatformTagName = name => name.replace(weexRegex, '')
 
   // expose weex-specific info
-  Vue.prototype.$instanceId = __weex_instance_id__
-  Vue.prototype.$document = __weex_document__
+  Vue.prototype.$instanceId = weex['[[CurrentInstanceId]]']
+  Vue.prototype.$document = weex.document
 
   // expose weex native module getter on subVue prototype so that
   // vdom runtime modules can access native modules via vnode.context

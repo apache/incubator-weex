@@ -28,10 +28,7 @@ const Vue = {
     }
 
     const instanceContext = {
-      __weex_instance_id__: instanceId,
-      __weex_document__: weex.document,
       __weex_data__: data || {},
-      __weex_config__: weex.config,
       __instance_lifecycle__: instance.lifecycle
     };
 
