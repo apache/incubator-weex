@@ -31,6 +31,8 @@ import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -131,7 +133,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       lp.width = width;
       lp.height = height;
       if(lp instanceof ViewGroup.MarginLayoutParams){
-        ((ViewGroup.MarginLayoutParams) lp).setMargins(left,top,right,bottom);
+        WXComponent.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, left, top, right, bottom);
       }
     }
     return lp;
@@ -588,8 +590,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
           int bottom = (int) (padding.get(CSSShorthand.EDGE.BOTTOM) + border.get(CSSShorthand.EDGE.BOTTOM));
 
           ViewGroup.MarginLayoutParams layoutParams = new ViewGroup.MarginLayoutParams(hostView.getLayoutParams()) ;
-          layoutParams.setMargins(-left, -top, -right, -bottom);
-
+          WXComponent.setMarginsSupportRTL(layoutParams, -left, -top, -right, -bottom);
           mBoxShadowHost.setLayoutParams(layoutParams);
 
           hostView.addView(mBoxShadowHost);

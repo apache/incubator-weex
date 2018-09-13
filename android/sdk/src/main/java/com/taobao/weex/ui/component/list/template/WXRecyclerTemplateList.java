@@ -29,6 +29,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -69,6 +70,8 @@ import com.taobao.weex.ui.component.binding.Statements;
 import com.taobao.weex.ui.component.helper.ScrollStartEndHelper;
 import com.taobao.weex.ui.component.list.RecyclerTransform;
 import com.taobao.weex.ui.component.list.WXCell;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
 import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
@@ -1283,7 +1286,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         } else {
             params.width = width;
             params.height = height;
-            params.setMargins(left, 0, right, 0);
+
+            WXComponent.setMarginsSupportRTL(params, left, 0, right, 0);
         }
         return params;
     }

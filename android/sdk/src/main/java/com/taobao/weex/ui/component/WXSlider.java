@@ -20,6 +20,7 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
@@ -38,6 +39,8 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.WXCirclePageAdapter;
 import com.taobao.weex.ui.view.WXCircleViewPager;
@@ -145,9 +148,9 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     if (lp instanceof ViewGroup.MarginLayoutParams) {
       //expect indicator .
       if (child instanceof WXIndicator) {
-        ((ViewGroup.MarginLayoutParams) lp).setMargins(left, top, right, bottom);
+        WXComponent.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, left, top, right, bottom);
       } else {
-        ((ViewGroup.MarginLayoutParams) lp).setMargins(0, 0, 0, 0);
+        WXComponent.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, 0, 0, 0, 0);
       }
     }
     return lp;

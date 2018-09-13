@@ -61,6 +61,8 @@ import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.helper.ScrollStartEndHelper;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
 import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
@@ -248,7 +250,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     } else {
       params.width = width;
       params.height = height;
-      params.setMargins(left, 0, right, 0);
+
+      WXComponent.setMarginsSupportRTL(params, left, 0, right, 0);
     }
     return params;
   }

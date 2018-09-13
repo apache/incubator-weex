@@ -1545,6 +1545,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     return 0;
   }
 
+  public int getRenderContainerPaddingRight() {
+    if(mRenderContainer != null) {
+      return mRenderContainer.getPaddingRight();
+    }
+    return 0;
+  }
+
   public int getRenderContainerPaddingTop() {
     if(mRenderContainer != null) {
       return mRenderContainer.getPaddingTop();

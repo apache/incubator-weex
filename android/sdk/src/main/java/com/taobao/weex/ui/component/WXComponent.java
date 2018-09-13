@@ -46,6 +46,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.TextUtils;
 import android.util.Pair;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,6 +88,7 @@ import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
 import com.taobao.weex.ui.component.binding.Statements;
 import com.taobao.weex.ui.component.list.WXCell;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
 import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
@@ -153,6 +155,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private int mPreRealWidth = 0;
   private int mPreRealHeight = 0;
   private int mPreRealLeft = 0;
+  private int mPreRealRight = 0;
   private int mPreRealTop = 0;
   private int mStickyOffset = 0;
   protected WXGesture mGesture;
@@ -231,6 +234,17 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     this.contentBoxMeasurement = contentBoxMeasurement;
     mInstance.addContentBoxMeasurement(getRenderObjectPtr(), contentBoxMeasurement);
     WXBridgeManager.getInstance().bindMeasurementToRenderObject(getRenderObjectPtr());
+  }
+
+
+  public static void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
+      lp.setMargins(left, top, right, bottom);
+      if (lp instanceof FrameLayout.LayoutParams) {
+          FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
+          lp_frameLayout.gravity = Gravity.LEFT | Gravity.TOP;
+      } else {
+          lp.setMargins(left, top, right, bottom);
+      }
   }
 
   public void updateStyles(WXComponent component) {
@@ -910,25 +924,36 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     int realLeft = 0;
     int realTop = 0;
+    int realRight = 0;
 
     if (isFixed()) {
       realLeft = (int) (getLayoutPosition().getLeft() - getInstance().getRenderContainerPaddingLeft());
+      realRight = (int) (getLayoutPosition().getRight() - getInstance().getRenderContainerPaddingRight());
       realTop = (int) (getLayoutPosition().getTop() - getInstance().getRenderContainerPaddingTop()) + siblingOffset;
     } else {
       realLeft = (int) (getLayoutPosition().getLeft() -
               parentPadding.get(CSSShorthand.EDGE.LEFT) - parentBorder.get(CSSShorthand.EDGE.LEFT));
+
+//      float parentWidth = 1080;
+//      if (this.getParent() != null) {
+//          parentWidth = this.getParent().getLayoutWidth();
+//      } else {
+//          parentWidth = getInstance().getWeexWidth();
+//      }
+//      realRight = (int) (parentWidth - getLayoutPosition().getRight() -
+//                parentPadding.get(CSSShorthand.EDGE.RIGHT) - parentBorder.get(CSSShorthand.EDGE.RIGHT));
       realTop = (int) (getLayoutPosition().getTop() -
               parentPadding.get(CSSShorthand.EDGE.TOP) - parentBorder.get(CSSShorthand.EDGE.TOP)) + siblingOffset;
     }
 
-    int realRight = (int) getMargin().get(CSSShorthand.EDGE.RIGHT);
+    realRight = (int) getMargin().get(CSSShorthand.EDGE.RIGHT);
     int realBottom = (int) getMargin().get(CSSShorthand.EDGE.BOTTOM);
 
     Point rawOffset = new Point(
             (int) getLayoutPosition().getLeft(),
             (int) getLayoutPosition().getTop());
 
-    if (mPreRealWidth == realWidth && mPreRealHeight == realHeight && mPreRealLeft == realLeft && mPreRealTop == realTop) {
+    if (mPreRealWidth == realWidth && mPreRealHeight == realHeight && mPreRealLeft == realLeft && mPreRealRight == realRight && mPreRealTop == realTop) {
       return;
     }
 
@@ -989,6 +1014,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       mPreRealWidth = realWidth;
       mPreRealHeight = realHeight;
       mPreRealLeft = realLeft;
+      mPreRealRight = realRight;
       mPreRealTop = realTop;
       onFinishLayout();
       // restore box shadow
@@ -1042,14 +1068,14 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   protected void setHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom) {
     ViewGroup.LayoutParams lp;
     if (mParent == null) {
-      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
-      params.setMargins(left, top, right, bottom);
-      lp = params;
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
+        WXComponent.setMarginsSupportRTL(params, left, top, right, bottom);
+        lp = params;
     } else {
-      lp = mParent.getChildLayoutParams(this, host, width, height, left, right, top, bottom);
+        lp = mParent.getChildLayoutParams(this, host, width, height, left, right, top, bottom);
     }
     if (lp != null) {
-      host.setLayoutParams(lp);
+        host.setLayoutParams(lp);
     }
   }
 
@@ -1058,7 +1084,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     params.width = width;
     params.height = height;
-    params.setMargins(left, top, right, bottom);
+
+    WXComponent.setMarginsSupportRTL(params, left, top, right, bottom);
+
     host.setLayoutParams(params);
     mInstance.moveFixedView(host);
 
@@ -1839,6 +1867,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public View detachViewAndClearPreInfo() {
     View original = mHost;
     mPreRealLeft = 0;
+    mPreRealRight = 0;
     mPreRealWidth = 0;
     mPreRealHeight = 0;
     mPreRealTop = 0;
@@ -1848,6 +1877,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   public void clearPreLayout() {
     mPreRealLeft = 0;
+    mPreRealRight = 0;
     mPreRealWidth = 0;
     mPreRealHeight = 0;
     mPreRealTop = 0;

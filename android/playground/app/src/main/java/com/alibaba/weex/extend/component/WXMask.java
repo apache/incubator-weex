@@ -24,6 +24,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -37,6 +38,8 @@ import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -124,7 +127,9 @@ public class WXMask extends WXVContainer {
     top = get(TOP);
     bottom = get(BOTTOM);
     FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
-    params.setMargins(left, top, right, bottom);
+
+    WXComponent.setMarginsSupportRTL(params, left, top, right, bottom);
+
     getHostView().setLayoutParams(params);
   }
 
