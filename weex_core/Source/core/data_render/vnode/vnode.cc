@@ -31,6 +31,7 @@ VNode::VNode(const std::string &tag_name, const std::string &node_id,
 
   styles_ = new std::map<std::string, std::string>();
   attributes_ = new std::map<std::string, std::string>();
+  events_ = new std::map<std::string, void *>();
 }
 
 VNode::~VNode() {
@@ -45,7 +46,10 @@ VNode::~VNode() {
     delete attributes_;
     attributes_ = nullptr;
   }
-
+  if (events_) {
+      delete events_;
+      events_ = nullptr;
+  }
   for (auto it = child_list_.begin(); it != child_list_.end(); it++) {
     VNode *&reference = *it;
     if (reference != nullptr) {
@@ -62,12 +66,41 @@ void VNode::SetStyle(const std::string &key, const std::string &value) {
 void VNode::SetAttribute(const std::string &key, const std::string &value) {
   MapInsertOrAssign(attributes_, key, value);
 }
+    
+void VNode::AddEvent(const std::string &event, void *func) {
+    std::map<std::string, void *>::iterator it = events_->find(event);
+    if (it != events_->end()) {
+        it->second = func;
+    }
+    else {
+        events_->insert({event, func});
+    }
+}
+    
+VNode *VNode::FindNode(const std::string &ref) {
+    VNode *node = nullptr;
+    do {
+        if (this->ref() == ref) {
+            node = this;
+            break;
+        }
+        for (int i = 0; i < child_list_.size(); i++) {
+            node = child_list_[i]->FindNode(ref);
+            if (node) {
+                break;
+            }
+        }
+        
+    } while (0);
+    
+    return node;
+}
 
 void VNode::AddEvent(const std::string &event, const std::string &function,
                      const std::vector<std::string> &params) {
   //todo
 }
-
+    
 void VNode::AddChild(VNode *child) {
   child->parent_ = this;
   child_list_.push_back(child);

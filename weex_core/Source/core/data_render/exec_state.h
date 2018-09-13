@@ -132,8 +132,9 @@ class ExecState {
   virtual ~ExecState() {}
   void Compile(std::string& error);
   void Execute(std::string& error);
-  const Value Call(const std::string& func_name, const std::vector<Value>& params);
-  const Value Call(Value *func, const std::vector<Value>& params);
+  const Value Call(const std::string& func_name, const std::vector<Value>& args);
+  const Value Call(Value *func, const std::vector<Value>& args);
+  const Value Call(FuncState *func, const std::vector<Value>& args);
   size_t GetArgumentCount();
   Value* GetArgument(int index);
   ValueRef *AddRef(FuncState *func_state, long register_id);

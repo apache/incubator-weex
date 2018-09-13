@@ -86,8 +86,10 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
   }
 
   // event,todo
-  //  std::set<string> *event = vnode->event();
-  //  renderObject->events()->insert(event->begin(), event->end());
+  std::map<std::string, void *> *events = vnode->events();
+  for (auto iter = events->begin(); iter != events->end(); iter++) {
+      render_object->events()->insert(iter->first);
+  }
 
   // child
   vector<VNode*>* children = (const_cast<VNode*>(vnode))->child_list();
@@ -203,7 +205,7 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
 }
 
 void VNodeRenderManager::CreatePage(const char* contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data) {
-    BinaryFile *file =  BinaryFile::instance();
+    BinaryFile *file = BinaryFile::instance();
     file->set_input(contents);
     file->set_length(length);
 
@@ -274,7 +276,37 @@ bool VNodeRenderManager::ClosePage(const std::string& page_id) {
   exec_states_.erase(it);
   return true;
 }
-
+    
+void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args) {
+    do {
+        auto iter = exec_states_.find(page_id);
+        if (iter == exec_states_.end()) {
+            break;
+        }
+        auto node = vnode_trees_.find(page_id);
+        if (node == vnode_trees_.end()) {
+            break;
+        }
+        auto vnode = node->second->FindNode(ref);
+        if (!vnode) {
+            break;
+        }
+        auto iter_event = vnode->events()->find(event);
+        if (iter_event == vnode->events()->end()) {
+            break;
+        }
+        FuncState *func = (FuncState *)iter_event->second;
+        if (!func) {
+            break;
+        }
+        ExecState *exec_state = iter->second;
+        std::vector<Value> caller_args;
+        caller_args.push_back(StringToValue(exec_state, args));
+        exec_state->Call(func, caller_args);
+        
+    } while (0);
+}
+    
 void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node);
 
 bool SameNode(VNode* a, VNode* b) {

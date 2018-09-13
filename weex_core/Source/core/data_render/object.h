@@ -106,7 +106,9 @@ struct Value {
   Value(bool value) : b(value), type(BOOL) {}
 
   Value(String *value) : str(value), type(STRING) {}
-
+    
+  explicit Value(FuncState *func) : f(func), type(FUNC) {}
+    
   Value(const Value &value) {
     type = value.type;
     index = value.index;

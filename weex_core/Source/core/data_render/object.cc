@@ -279,7 +279,7 @@ void SetRefValue(Value *o) {
         value = value->ref;
     }
 }
-
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

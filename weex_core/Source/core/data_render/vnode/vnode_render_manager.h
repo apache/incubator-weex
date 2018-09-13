@@ -47,7 +47,7 @@ class VNodeRenderManager {
 
   bool RefreshPage(const std::string &page_id, const std::string &init_data);
   bool ClosePage(const std::string &page_id);
-
+  void FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args);
   static VNodeRenderManager *GetInstance() {
     if (!g_instance) {
       g_instance = new VNodeRenderManager();

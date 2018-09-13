@@ -909,22 +909,37 @@ void ExecState::serializeValue(Value &value) {
 }
 
 const Value ExecState::Call(const std::string& func_name,
-                             const std::vector<Value>& params) {
+                             const std::vector<Value>& args) {
   Value ret;
   auto it = global_variables_.find(func_name);
   if (it != global_variables_.end()) {
     long reg = it->second;
     Value* function = *stack_->top() + 1;
     *function = *(stack_->base() + reg);
-    for (int i = 0; i < params.size(); ++i) {
-      *(function + i + 1) = params[i];
+    for (int i = 0; i < args.size(); ++i) {
+      *(function + i + 1) = args[i];
     }
-    CallFunction(function, params.size(), &ret);
+    CallFunction(function, args.size(), &ret);
   }
   return ret;
 }
     
-const Value ExecState::Call(Value *func, const std::vector<Value>& params) {
+const Value ExecState::Call(FuncState *func_state, const std::vector<Value>& args) {
+    Value ret;
+    do {
+        Value func(func_state);
+        **stack_->top() = func;
+        for (int i = 0; i < args.size(); i++) {
+            *(*stack_->top() + i + 1) = args[i];
+        }
+        CallFunction(*stack_->top(), args.size(), &ret);
+        
+    } while (0);
+    
+    return ret;
+}
+    
+const Value ExecState::Call(Value *func, const std::vector<Value>& args) {
     Value ret;
     do {
         // 首先检查函数是否属于堆栈函数
@@ -933,10 +948,10 @@ const Value ExecState::Call(Value *func, const std::vector<Value>& params) {
             throw VMExecError("call function out of stack");
             break;
         }
-        for (int i = 0; i < params.size(); i++) {
-            *(func + i + 1) = params[i];
+        for (int i = 0; i < args.size(); i++) {
+            *(func + i + 1) = args[i];
         }
-        CallFunction(func, params.size(), &ret);
+        CallFunction(func, args.size(), &ret);
         
     } while (0);
     

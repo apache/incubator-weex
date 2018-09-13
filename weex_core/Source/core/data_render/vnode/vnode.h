@@ -42,10 +42,13 @@ class VNode {
 
   void AddEvent(const std::string &event, const std::string &function,
                 const std::vector<std::string> &params);
+  void AddEvent(const std::string &event, void *func);
 
   void AddChild(VNode *child);
 
   void RemoveChild(VNode *child);
+
+  VNode *FindNode(const std::string &ref);
 
  public:
   inline const std::string &tag_name() const { return tag_name_; }
@@ -71,6 +74,9 @@ class VNode {
   inline std::map<std::string, std::string> *attributes() const {
     return attributes_;
   }
+  inline std::map<std::string, void *> *events() const {
+    return events_;
+  }
 
   inline bool HasChildren() { return !child_list_.empty(); }
 
@@ -85,10 +91,9 @@ class VNode {
 
   VNode *parent_ = nullptr;
   std::vector<VNode *> child_list_;
-
   std::map<std::string, std::string> *styles_;
   std::map<std::string, std::string> *attributes_;
-
+  std::map<std::string, void *> *events_;
   void MapInsertOrAssign(std::map<std::string, std::string> *target_map,
                          const std::string &key, const std::string &value);
 };

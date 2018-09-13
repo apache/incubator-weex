@@ -33,7 +33,7 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-json11::Json ParseValue2Json(const Value& value);
+json11::Json ValueToJSON(const Value& value);
 
 static Value Log(ExecState *exec_state) {
   size_t length = exec_state->GetArgumentCount();
@@ -108,7 +108,7 @@ static Value ToString(ExecState* exec_state) {
     return Value();
   }
 
-  const json11::Json& json = ParseValue2Json(*table);
+  const json11::Json& json = ValueToJSON(*table);
   std::string s;
   json.dump(s);
   String* new_value = exec_state->string_table()->StringFromUTF8(s);
@@ -385,6 +385,17 @@ static Value SetProps(ExecState *exec_state) {
                         node->SetAttribute(iter->first, to_string(iter->second.i));
                         break;
                     }
+                    case Value::FUNC:
+                    {
+                        std::string::size_type pos = iter->first.find("on");
+                        if (pos != 0) {
+                            throw VMExecError("AddEvent isn't a function");
+                        }
+                        std::string event = iter->first.substr(pos + 2);
+                        transform(event.begin(), event.end(), event.begin(), ::tolower);
+                        node->AddEvent(event, iter->second.f);
+                        break;
+                    }
                     default:
                         LOGE("can't support type:%i", iter->second.type);
                         break;
@@ -471,93 +482,81 @@ void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   RegisterClass(state, "Object", state->class_factory()->ClassObject());
 }
 
-Value ParseJson2Value(ExecState* state, const json11::Json& json) {
-  if (json.is_null()) {
-    return Value();
-  } else if (json.is_bool()) {
-    return Value(json.bool_value());
-  } else if (json.is_number()) {
-    std::string value;
-    json.dump(value);
-    if (value.find('.') == std::string::npos) {
-      //int
-      return Value(static_cast<int64_t>(json.number_value()));
-    } else {
-      return Value(json.number_value());
+Value JSONToValue(ExecState *state, const json11::Json& json) {
+    if (json.is_null()) {
+        return Value();
     }
-  } else if (json.is_string()) {
-    String* p_str = state->string_table()->StringFromUTF8(json.string_value());
-    return Value(p_str);
-  } else if (json.is_array()) {
-    Value value = state->class_factory()->CreateArray();
-    const json11::Json::array& data_objects = json.array_items();
-    int64_t array_size = data_objects.size();
-    for (int index = 0; index < array_size; index++) {
-      // will be free by table
-      Value key(index);
-      Value val(ParseJson2Value(state, json[index]));
-      SetArray(ValueTo<Array>(&value), &key, val);
+    else if (json.is_bool()) {
+        return Value(json.bool_value());
     }
-    return value;
-  } else if (json.is_object()) {
-    Value value = state->class_factory()->CreateTable();
-    const json11::Json::object& data_objects = json.object_items();
-    for (auto it = data_objects.begin(); it != data_objects.end(); it++) {
-      // will be free by table
-      Value key(state->string_table()->StringFromUTF8(it->first));
-      Value val(ParseJson2Value(state, it->second));
-      SetTableValue(ValueTo<Table>(&value), &key, val);
+    else if (json.is_number()) {
+        std::string value;
+        json.dump(value);
+        if (value.find('.') == std::string::npos) {
+            //int
+            return Value(static_cast<int64_t>(json.number_value()));
+        }
+        else {
+            return Value(json.number_value());
+        }
     }
-    return value;
-  } else {
-    return Value();
-  }
+    else if (json.is_string()) {
+        String *p_str = state->string_table()->StringFromUTF8(json.string_value());
+        return Value(p_str);
+    }
+    else if (json.is_array()) {
+        Value value = state->class_factory()->CreateArray();
+        const json11::Json::array& data_objects = json.array_items();
+        int64_t array_size = data_objects.size();
+        for (int index = 0; index < array_size; index++) {
+            // will be free by table
+            Value key(index);
+            Value val(JSONToValue(state, json[index]));
+            SetArray(ValueTo<Array>(&value), &key, val);
+        }
+        return value;
+    }
+    else if (json.is_object()) {
+        Value value = state->class_factory()->CreateTable();
+        const json11::Json::object& data_objects = json.object_items();
+        for (auto it = data_objects.begin(); it != data_objects.end(); it++) {
+            // will be free by table
+            Value key(state->string_table()->StringFromUTF8(it->first));
+            Value val(JSONToValue(state, it->second));
+            SetTableValue(ValueTo<Table>(&value), &key, val);
+        }
+        return value;
+        
+    }
+    else {
+        return Value();
+    }
 };
 
-json11::Json ParseValue2Json(const Value& value) {
+json11::Json ValueToJSON(const Value& value) {
     if (value.type != Value::TABLE) {
         return json11::Json();
     }
     Table *p_table = ValueTo<Table>(&value);
-//  if (p_table->array.size() > 0) {
-//    json11::Json::array array;
-//
-//    for (auto it = p_table->array.begin(); it != p_table->array.end(); it++) {
-//      if ((*it).type == Value::STRING) {
-//        array.push_back(json11::Json((*it).str->c_str()));
-//        continue;
-//      }
-//
-//      if ((*it).type == Value::TABLE) {
-//        array.push_back(ParseValue2Json((*it)));
-//        continue;
-//      }
-//    }
-//
-//    return json11::Json(array);
-//  }
-
-  json11::Json::object object;
-  for (auto it = p_table->map.begin(); it != p_table->map.end(); it++) {
-    if (it->second.type == Value::STRING) {
-      object.insert({it->first, json11::Json(it->second.str->c_str())});
-      continue;
+    json11::Json::object object;
+    for (auto it = p_table->map.begin(); it != p_table->map.end(); it++) {
+        if (it->second.type == Value::STRING) {
+            object.insert({it->first, json11::Json(it->second.str->c_str())});
+            continue;
+        }
+        if (it->second.type == Value::TABLE) {
+            object.insert({it->first, ValueToJSON(it->second)});
+            continue;
+        }
     }
-
-    if (it->second.type == Value::TABLE) {
-      object.insert({it->first, ParseValue2Json(it->second)});
-      continue;
-    }
-  }
-
-  return json11::Json(object);
+    return json11::Json(object);
 }
 
 void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   const json11::Json& json = state->context()->raw_json();
   Variables* global = state->global();
   const json11::Json& data = json["data"];
-  Value value = ParseJson2Value(state, data);
+  Value value = JSONToValue(state, data);
   if (value.type != Value::Type::TABLE) {
     value = state->class_factory()->CreateTable();
   }
@@ -574,10 +573,10 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
       if (!name.is_string()) {
         continue;
       }
-      auto temp_data = ParseJson2Value(state, (*it)["data"]);
+      auto temp_data = JSONToValue(state, (*it)["data"]);
       Value key(state->string_table()->StringFromUTF8(name.string_value()));
       SetTableValue(ValueTo<Table>(&components_data), &key, temp_data);
-      auto temp_props = ParseJson2Value(state, (*it)["props"]);
+      auto temp_props = JSONToValue(state, (*it)["props"]);
       SetTableValue(ValueTo<Table>(&components_props), &key, temp_props);
     }
   }
@@ -596,7 +595,7 @@ void VNodeExecEnv::InitInitDataValue(ExecState *state, const std::string& init_d
     return;
   }
 
-  Value value = ParseJson2Value(state, json);
+  Value value = JSONToValue(state, json);
   if (value.type != Value::Type::TABLE) {
     value = state->class_factory()->CreateTable();
   }
@@ -631,6 +630,22 @@ void VNodeExecEnv::InitStyleList(ExecState* state) {
     }
   }
 
+}
+    
+Value StringToValue(ExecState *exec_state,const std::string &str) {
+    Value ret;
+    do {
+        std::string err;
+        json11::Json json = json11::Json::parse(str, err);
+        if (!err.empty() || json.is_null()) {
+            ret = exec_state->string_table()->StringFromUTF8(str);
+            break;
+        }
+        ret = JSONToValue(exec_state, json);
+        
+    } while (0);
+    
+    return ret;
 }
 
 }  // namespace data_render
