@@ -28,8 +28,6 @@ import com.taobao.weex.ui.component.WXComponent;
  */
 
 public class NativeRenderObjectUtils {
-
-
     /**
      * getRenderObject
      * */

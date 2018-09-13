@@ -735,8 +735,8 @@ namespace WeexCore {
             if (!WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_ANDROID_GC) {
                 child->mParent = nullptr;
             }
-          mChildList.erase(mChildList.begin() + index);
-          break;
+            mChildList.erase(mChildList.begin() + index);
+            break;
         }
       }
       markDirty();
