@@ -7,14 +7,14 @@
 // For
 //     com/taobao/weex/bridge/JsFunctions
 
-#ifndef WEEX_PROJECT_WXJSFUNCTIONS_JNI_H
-#define WEEX_PROJECT_WXJSFUNCTIONS_JNI_H
+#ifndef WEEX_PROJECT_WXDEBUGJSBRIDGE_JNI_H
+#define WEEX_PROJECT_WXDEBUGJSBRIDGE_JNI_H
 
 #include <jni.h>
 #include "../../base/jni/android_jni.h"
 
 namespace {
-    const char kWXJsFunctionClassPath[] = "com/taobao/weex/bridge/WXJsFunctions";
+    const char kWXDebugJsBridgeClassPath[] = "com/taobao/weex/bridge/WXDebugJsBridge";
 // Leaking this jclass as we cannot use LazyInstance from some threads.
     jclass g_WXJsFunction_clazz = NULL;
 #define WXJsFunction_clazz(env) g_WXJsFunction_clazz
@@ -89,7 +89,7 @@ static void jsHandleCallGCanvasLinkNative(JNIEnv *env, jobject object, jstring c
                                           jstring val);
 
 
-static const JNINativeMethod kMethodsWXJsFunctions[] = {
+static const JNINativeMethod kMethodsWXDebugJsBridge[] = {
         {"resetWXBridge",
                 "(Ljava/lang/Object;Ljava/lang/String;)V",
                 reinterpret_cast<void *>(resetWXBridge)},
@@ -162,15 +162,15 @@ static const JNINativeMethod kMethodsWXJsFunctions[] = {
 static bool RegisterNativesImpl(JNIEnv *env) {
 
     g_WXJsFunction_clazz = reinterpret_cast<jclass>(env->NewGlobalRef(
-            base::android::GetClass(env, kWXJsFunctionClassPath).Get()));
+            base::android::GetClass(env, kWXDebugJsBridgeClassPath).Get()));
 
-    const int kMethodsWXJsFunctionsSize =
-            sizeof(kMethodsWXJsFunctions) / sizeof(kMethodsWXJsFunctions[0]);
+    const int kMethodsWXDebugJsBridgeSize =
+            sizeof(kMethodsWXDebugJsBridge) / sizeof(kMethodsWXDebugJsBridge[0]);
 
     return 0 <= env->RegisterNatives(WXJsFunction_clazz(env),
-                                     kMethodsWXJsFunctions,
-                                     kMethodsWXJsFunctionsSize);
+                                     kMethodsWXDebugJsBridge,
+                                     kMethodsWXDebugJsBridgeSize);
 
 }
 
-#endif //WEEX_PROJECT_WXJSFUNCTIONS_JNI_H
+#endif //WEEX_PROJECT_WXDEBUGJSBRIDGE_JNI_H

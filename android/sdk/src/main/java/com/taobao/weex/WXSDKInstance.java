@@ -52,7 +52,7 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
-import com.taobao.weex.common.IWXDebugProxy;
+import com.taobao.weex.common.IDebugProxy;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
@@ -86,7 +86,6 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -820,7 +819,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (reloadThis) {
       if (mContext != null)  {
         Intent intent = new Intent();
-        intent.setAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
+        intent.setAction(IDebugProxy.ACTION_INSTANCE_RELOAD);
         intent.putExtra("url", mBundleUrl);
         mContext.sendBroadcast(intent);
       }

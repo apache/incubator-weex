@@ -21,12 +21,13 @@ package com.taobao.weex.common;
 /**
  * Created by budao on 16/6/25.
  */
-public interface IWXDebugProxy {
+public interface IDebugProxy {
+
     String ACTION_DEBUG_INSTANCE_REFRESH = "DEBUG_INSTANCE_REFRESH";
 
     String ACTION_INSTANCE_RELOAD = "INSTANCE_RELOAD";
 
-    void start(IWXJsFunctions jsFunctions);
+    void start(IWXDebugJsBridge jsFunctions);
 
     void stop(boolean reload);
 

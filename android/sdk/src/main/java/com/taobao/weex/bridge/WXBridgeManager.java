@@ -171,7 +171,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    */
   private WXThread mJSThread;
   private IWXBridge mWXBridge;
-  private IWXDebugProxy mWxDebugProxy;
+  private IDebugProxy mWxDebugProxy;
 
   private boolean mMock = false;
 
@@ -287,10 +287,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           if (clazz != null) {
             Constructor constructor = clazz.getConstructor(Context.class, WXBridgeManager.class);
             if (constructor != null) {
-              mWxDebugProxy = (IWXDebugProxy) constructor.newInstance(
+              mWxDebugProxy = (IDebugProxy) constructor.newInstance(
                       WXEnvironment.getApplication(), WXBridgeManager.this);
               if (mWxDebugProxy != null) {
-                mWxDebugProxy.start(new WXJsFunctions());
+                mWxDebugProxy.start(new WXDebugJsBridge());
               }
             }
           }

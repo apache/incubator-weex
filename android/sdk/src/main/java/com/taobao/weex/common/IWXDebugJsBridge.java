@@ -22,7 +22,7 @@ package com.taobao.weex.common;
  * Created by darin on 27/03/2018.
  */
 
-public interface IWXJsFunctions {
+public interface IWXDebugJsBridge {
 
     void resetWXBridge(Object bridge, String className);
 

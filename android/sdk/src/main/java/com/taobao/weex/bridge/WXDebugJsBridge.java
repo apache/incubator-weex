@@ -18,10 +18,8 @@
  */
 package com.taobao.weex.bridge;
 
-import android.util.Log;
-
 import com.alibaba.fastjson.JSON;
-import com.taobao.weex.common.IWXJsFunctions;
+import com.taobao.weex.common.IWXDebugJsBridge;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
 import com.taobao.weex.wson.WsonUtils;
 
@@ -29,7 +27,8 @@ import com.taobao.weex.wson.WsonUtils;
  * Created by darin on 27/03/2018.
  */
 
-public class WXJsFunctions implements IWXJsFunctions {
+public class WXDebugJsBridge implements IWXDebugJsBridge {
+
     @Override
     public native void resetWXBridge(Object bridge, String className);
 
@@ -41,7 +40,6 @@ public class WXJsFunctions implements IWXJsFunctions {
 
     @Override
     public native void jsHandleCallNative(String instanceId, byte[] tasks, String callback);
-
 
     @Override
     public void jsHandleCallNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
@@ -108,7 +106,6 @@ public class WXJsFunctions implements IWXJsFunctions {
     @Override
     public void jsFunctionCallUpdateStyle(String pageId, String ref, String data){
         byte[] data1 = WsonUtils.toWson(JSON.parseObject(data));
-        Log.e("WxDebug" ,"jsFunctionCallUpdateStyle");
         jsFunctionCallUpdateStyleNative(pageId, ref, data1, true);
     }
 

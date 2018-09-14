@@ -24,9 +24,9 @@
 #include <base/thread/waitable_event.h>
 #include "base/string_util.h"
 #include <wson_parser.h>
-#include "jsfunction_impl_android.h"
+#include "wx_debug_js_bridge.h"
 #include "android/base/string/string_utils.h"
-#include "android/jniprebuild/jniheader/WXJsFunctions_jni.h"
+#include "android/jniprebuild/jniheader/WXDebugJsBridge_jni.h"
 #include "core/render/manager/render_manager.h"
 #include "IPC/IPCResult.h"
 #include "core/bridge/platform_bridge.h"
