@@ -55,10 +55,12 @@ private:
     int func_index_;
     Value value_;
 };
+    
+struct ClassInstance;
 
 class FuncState {
  public:
-  FuncState() : instructions_(), constants_(), children_(), super_func_(nullptr), super_index_(-1) {}
+  FuncState() : instructions_(), constants_(), children_(), super_index_(-1) {}
   virtual ~FuncState() {}
 
   int AddConstant(Value value) {
@@ -93,7 +95,10 @@ class FuncState {
   inline std::vector<Value>& constants() {return constants_;}
   inline FuncState* super_func() {return super_func_;}
   inline void set_super_func(FuncState* func) {super_func_ = func;}
-  std::vector<FuncState*> getAllChildren() {
+  inline void set_is_class_func(bool is_class_func) { is_class_func_ = is_class_func; }
+  inline bool is_class_func() { return is_class_func_; }
+  inline ClassInstance * &class_inst() { return class_inst_; }
+  std::vector<FuncState *> getAllChildren() {
       std::vector<FuncState*> all_children;
       for (auto &child : children_) {
           all_children.push_back(child.get());
@@ -110,8 +115,10 @@ class FuncState {
   std::vector<Instruction> instructions_;
   std::vector<Value> constants_;
   std::vector<std::unique_ptr<FuncState>> children_;
-  FuncState *super_func_;
+  FuncState *super_func_{nullptr};
   int super_index_;
+  bool is_class_func_{false};
+  ClassInstance *class_inst_{nullptr};
 };
     
 // TODO Each Func should contain a stack whose size is 256

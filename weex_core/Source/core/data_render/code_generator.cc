@@ -422,7 +422,8 @@ void CodeGenerator::Visit(FunctionStatement *node, void *data) {
             value.f = func_->func_state();
             value.type = Value::FUNC;
             ClassDescriptor *class_desc = ValueTo<ClassDescriptor>(class_->class_value());
-            class_desc->funcs_->Add(proto->GetName(), value);
+            class_desc->funcs_->Add(proto->GetName(), value);            
+            func_->func_state()->set_is_class_func(is_class_func);
         }
         // skip func value in the fornt of stack;
         block_->NextRegisterId();
@@ -482,16 +483,29 @@ void CodeGenerator::Visit(ThisExpression *node, void *data) {
     
 void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
     RegisterScope register_scope(block_);
-    long ret = data == nullptr ? block_->NextRegisterId()
-    : *static_cast<long *>(data);
+    long ret = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
+    bool is_class_func = func_->parent() == nullptr && class_ ? true : false;
     // body
     // Slot
     auto slot = func_->func_state()->AddInstruction(0);
     {
         FuncScope scope(this);
+        if (is_class_func) {
+            Value value;
+            value.f = func_->func_state();
+            value.type = Value::FUNC;
+            ClassDescriptor *class_desc = ValueTo<ClassDescriptor>(class_->class_value());
+            if (node->name().size() > 0) {
+                class_desc->funcs_->Add(node->name(), value);
+            }
+            func_->func_state()->set_is_class_func(is_class_func);
+        }
         // skip func value in the fornt of stack;
         block_->NextRegisterId();
-
+        // make arguments var in thie front of stack;
+        if (is_class_func) {
+            block_->AddVariable("this", block_->NextRegisterId());
+        }
         // make arguments var in thie front of stack;
         for (int i = 0; i < node->args().size(); i++) {
             assert(node->args()[i]->IsIdentifier());
@@ -509,14 +523,16 @@ void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
     }
     // associate function_name and function_state
     if (func_->parent() == nullptr) {
-        // in chunk
-        Value value;
-        assert(data);
-        value.f = func_->func_state()->GetChild(func_->func_state()->children().size() - 1);
-        value.type = Value::FUNC;
-        int index = exec_state_->global()->Add(value);
-        if (index >= 0) {
-            func_->func_state()->AddInstruction(CREATE_ABx(OP_GETGLOBAL, ret, index));
+        if (!is_class_func) {
+            // in chunk
+            Value value;
+            assert(data);
+            value.f = func_->func_state()->GetChild(func_->func_state()->children().size() - 1);
+            value.type = Value::FUNC;
+            int index = exec_state_->global()->Add(value);
+            if (index >= 0) {
+                func_->func_state()->AddInstruction(CREATE_ABx(OP_GETGLOBAL, ret, index));
+            }
         }
     }
     else {

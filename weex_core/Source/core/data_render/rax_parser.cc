@@ -1086,6 +1086,10 @@ Handle<Expression> RAXParser::ParseClassBody(std::string &clsname) {
         auto one = ParseClassMethodStatement(clsname);
         clsbody->Insert(one);
         auto tok = Peek();
+        if (tok == Token::SEMICOLON) {
+            Advance();
+            tok = Peek();
+        }
         if (tok == Token::RBRACE) {
             break;
         }
@@ -1101,11 +1105,20 @@ Handle<Expression> RAXParser::ParseClassMethodStatement(std::string &clsname) {
     }
     std::string identifier = GetIdentifierName();
     Advance();
-    auto args = ParseParameterList();
-    auto body = ParseBlockStatement();
-    auto proto = builder()->NewFunctionPrototype(identifier, args);
-    proto->AsFunctionPrototype()->SetClassName(clsname);
-    return builder()->NewFunctionStatement(proto->AsFunctionPrototype(), body);
+    tok = Peek();
+    if (tok == Token::ASSIGN) {
+        Advance();
+        Handle<Expression> arrow_function = ParseAssignExpression();
+        arrow_function->AsArrowFunctionStatement()->name() = identifier;
+        return arrow_function;
+    }
+    else {
+        auto args = ParseParameterList();
+        auto body = ParseBlockStatement();
+        auto proto = builder()->NewFunctionPrototype(identifier, args);
+        proto->AsFunctionPrototype()->SetClassName(clsname);
+        return builder()->NewFunctionStatement(proto->AsFunctionPrototype(), body);
+    }
 }
     
 Handle<Expression> RAXParser::ParseIfStatement()

@@ -30,6 +30,7 @@ namespace data_render {
 
 void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
 #define LOGTEMP(...)
+    
 #if DEBUG
   //TimeCost tc;
 #endif
@@ -205,7 +206,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
           a = frame.reg + GET_ARG_A(instruction);
           size_t argc = GET_ARG_B(instruction);
           c = frame.reg + GET_ARG_C(instruction);
-          if (!IsFunc(c)) {
+          if (!IsFunction(c)) {
               throw VMExecError("Unspport Type With OP_CODE [OP_CALL]");
           }
           exec_state->CallFunction(c, argc, a);
@@ -519,13 +520,14 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_SETMEMBERVAR:
         {
-            LOGTEMP("OP_SETMEMBER A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            LOGTEMP("OP_SETMEMBERVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             if (!IsValueRef(a)) {
                 throw VMExecError("Only ValueRef Support With OP_CODE [OP_SETMEMBER]");
             }
             *a->var = *b;
+            SetNil(a);
             break;
         }
         case OP_GETCLASS:
@@ -589,6 +591,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 }
                 else {
                     Value *ret = funcs->Find(index);
+                    if (IsPrototypeFunction(ret) && ret->f->is_class_func()) {
+                        ret->f->class_inst() = ValueTo<ClassInstance>(b);
+                    }
                     if (op == OP_GETMEMBER) {
                         *a = *ret;
                     }

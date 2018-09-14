@@ -346,8 +346,10 @@ inline int64_t ShiftLeft(const int64_t &a, const int64_t &b) {
 
 inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
     
-inline bool IsFunc(const Value *o) { return Value::Type::FUNC == o->type || Value::Type::CFUNC == o->type; }
-
+inline bool IsFunction(const Value *o) { return Value::Type::FUNC == o->type || Value::Type::CFUNC == o->type; }
+    
+inline bool IsPrototypeFunction(const Value *o) { return Value::Type::FUNC == o->type; }
+    
 inline bool IsValueRef(const Value *o) { return Value::Type::VALUE_REF == o->type; }
     
 inline bool IsNil(const Value *o) {

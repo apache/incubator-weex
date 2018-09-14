@@ -150,7 +150,7 @@ static Value forEach(ExecState *exec_state) {
             throw VMExecError("forEach caller isn't a Array");
         }
         Value *func = exec_state->GetArgument(1);
-        if (!IsFunc(func)) {
+        if (!IsFunction(func)) {
             throw VMExecError("forEach => isn't a function");
         }
         std::vector<Value> items = ValueTo<Array>(array)->items;
