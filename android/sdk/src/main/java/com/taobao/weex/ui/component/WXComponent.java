@@ -237,7 +237,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
 
-  public static void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
+  public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
       lp.setMargins(left, top, right, bottom);
       if (lp instanceof FrameLayout.LayoutParams) {
           FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
@@ -245,6 +245,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       } else {
           lp.setMargins(left, top, right, bottom);
       }
+  }
+
+  public boolean isLayoutRTL() {
+      return NativeRenderObjectUtils.nativeRenderObjectGetLayoutDirectionFromPathNode(this.getRenderObjectPtr()) == NativeRenderLayoutDirection.rtl;
   }
 
   public void updateStyles(WXComponent component) {
@@ -921,7 +925,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
             || component.getLayoutSize() == null) {
       return;
     }
-    applyLayoutDirection();
+
     setLayoutSize(component.getLayoutSize());
     setLayoutPosition(component.getLayoutPosition());
     setPaddings(component.getPadding());
@@ -947,7 +951,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     if (isFixed()) {
       realLeft = (int) (getLayoutPosition().getLeft() - getInstance().getRenderContainerPaddingLeft());
-      realRight = (int) (getLayoutPosition().getRight() - getInstance().getRenderContainerPaddingRight());
+//      realRight = (int) (getLayoutPosition().getRight() - getInstance().getRenderContainerPaddingRight());
       realTop = (int) (getLayoutPosition().getTop() - getInstance().getRenderContainerPaddingTop()) + siblingOffset;
     } else {
       realLeft = (int) (getLayoutPosition().getLeft() -
@@ -1088,7 +1092,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     ViewGroup.LayoutParams lp;
     if (mParent == null) {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
-        WXComponent.setMarginsSupportRTL(params, left, top, right, bottom);
+        this.setMarginsSupportRTL(params, left, top, right, bottom);
         lp = params;
     } else {
         lp = mParent.getChildLayoutParams(this, host, width, height, left, right, top, bottom);
@@ -1104,7 +1108,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     params.width = width;
     params.height = height;
 
-    WXComponent.setMarginsSupportRTL(params, left, top, right, bottom);
+    this.setMarginsSupportRTL(params, left, top, right, bottom);
 
     host.setLayoutParams(params);
     mInstance.moveFixedView(host);

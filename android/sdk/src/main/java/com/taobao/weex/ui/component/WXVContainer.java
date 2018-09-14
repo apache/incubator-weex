@@ -133,7 +133,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       lp.width = width;
       lp.height = height;
       if(lp instanceof ViewGroup.MarginLayoutParams){
-        WXComponent.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, left, top, right, bottom);
+        this.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, left, top, right, bottom);
       }
     }
     return lp;
@@ -590,7 +590,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
           int bottom = (int) (padding.get(CSSShorthand.EDGE.BOTTOM) + border.get(CSSShorthand.EDGE.BOTTOM));
 
           ViewGroup.MarginLayoutParams layoutParams = new ViewGroup.MarginLayoutParams(hostView.getLayoutParams()) ;
-          WXComponent.setMarginsSupportRTL(layoutParams, -left, -top, -right, -bottom);
+          this.setMarginsSupportRTL(layoutParams, -left, -top, -right, -bottom);
           mBoxShadowHost.setLayoutParams(layoutParams);
 
           hostView.addView(mBoxShadowHost);

@@ -246,7 +246,7 @@ namespace WeexCore {
 
     /** ================================ Engine Entry Function =================================== **/
 
-    void calculateLayout(const std::pair<float,float>&);
+    virtual void calculateLayout(const std::pair<float,float>&);
 
     /** ================================ measureFunc =================================== **/
 
@@ -634,15 +634,13 @@ namespace WeexCore {
 
     /** ================================ layout =================================== **/
 
-    void layout(float left, float top, float right, float bottom, bool, const std::pair<float,float>* = nullptr);
+    virtual void layout(float left, float top, float right, float bottom, bool, const std::pair<float,float>* = nullptr);
 
     void calcRelativeOffset(float &left, float &top, float &right, float &bottom) const ;
 
     void calcAbsoluteOffset(float &left, float &top, float &right, float &bottom, const std::pair<float,float>* = nullptr);
 
     void positionAbsoluteFlexItem(float &left, float &top, float &right, float &bottom);
-
-    void onLayout(float left, float top, float right, float bottom, WXCoreLayoutNode* = nullptr, WXCoreFlexLine *const flexLine = nullptr);
 
     void layoutHorizontal(bool isRtl, float left, float top, float right, float bottom,
                           WXCoreLayoutNode*, WXCoreFlexLine *const flexLine);
@@ -703,8 +701,9 @@ namespace WeexCore {
 
 
   public:
+    virtual void onLayout(float left, float top, float right, float bottom, WXCoreLayoutNode* = nullptr, WXCoreFlexLine *const flexLine = nullptr);
 
-    /** ================================ tree =================================== **/
+      /** ================================ tree =================================== **/
 
     inline Index getChildCount(FormattingContext formattingContext) const {
       switch (formattingContext) {
@@ -742,7 +741,7 @@ namespace WeexCore {
       markDirty();
     }
 
-    inline void addChildAt(WXCoreLayoutNode* const child, Index index) {
+    virtual inline void addChildAt(WXCoreLayoutNode* const child, Index index) {
       mChildList.insert(mChildList.begin() + index, child);
       child->mParent = this;
       markDirty();
@@ -1122,10 +1121,13 @@ namespace WeexCore {
       return mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeRight);
     }
       
-    inline WXCoreDirection getLayoutDirection() const {
+    virtual inline WXCoreDirection getLayoutDirection() const {
       return mLayoutResult->mLayoutDirection;
     }
-      
+
+    inline void setLayoutDirection(WXCoreDirection direction) {
+        mLayoutResult->mLayoutDirection = direction;
+    }
     inline bool hasNewLayout() const {
       return mHasNewLayout;
     }

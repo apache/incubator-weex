@@ -34,6 +34,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -366,6 +367,23 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     }
   }
 
+  @Override
+  public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
+    if (lp instanceof FrameLayout.LayoutParams) {
+      if (this.isLayoutRTL()) {
+        FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
+        lp_frameLayout.gravity = Gravity.RIGHT | Gravity.TOP;
+        lp.setMargins(right, top, left, bottom);
+      } else {
+        FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
+        lp_frameLayout.gravity = Gravity.LEFT | Gravity.TOP;
+        lp.setMargins(left, top, right, bottom);
+      }
+
+    } else {
+      lp.setMargins(left, top, right, bottom);
+    }
+  }
   @Override
   protected MeasureOutput measure(int width, int height) {
     MeasureOutput measureOutput = new MeasureOutput();

@@ -37,6 +37,22 @@ class RenderScroller : public RenderObject {
       const float &current_length) const override {
     return NAN;
   }
+
+public:
+    virtual void onLayout(const float left, const float top, const float right, const float bottom,
+                                  WXCoreLayoutNode *const absoulteItem, WXCoreFlexLine *const flexLine);
+
+    inline WXCoreDirection getLayoutDirection() const {
+        WXCoreDirection styleDirection = this->getDirection();
+        if (styleDirection != kDirectionInherit) {
+            return styleDirection;
+        } else if (this->getParent() != nullptr) {
+            WXCoreLayoutNode *parent = this->getParent();
+            return parent->getLayoutDirection();
+        }
+        return kDirectionLTR;
+    }
+
 };
 }  // namespace WeexCore
 #endif  // CORE_RENDER_NODE_RENDER_SCROLLER_H_

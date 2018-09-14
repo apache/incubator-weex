@@ -24,32 +24,40 @@
 
 namespace WeexCore {
 
-std::map<std::string, std::string> *RenderScroller::GetDefaultStyle() {
-  std::map<std::string, std::string> *style =
-      new std::map<std::string, std::string>();
 
-  bool is_vertical = true;
-  RenderObject *parent = static_cast<RenderObject *>(getParent());
+    std::map<std::string, std::string> *RenderScroller::GetDefaultStyle() {
+      std::map<std::string, std::string> *style =
+          new std::map<std::string, std::string>();
 
-  if (parent != nullptr) {
-    if (parent->GetAttr(SCROLL_DIRECTION) == HORIZONTAL) {
-      is_vertical = false;
+      bool is_vertical = true;
+      RenderObject *parent = static_cast<RenderObject *>(getParent());
+
+      if (parent != nullptr) {
+        if (parent->GetAttr(SCROLL_DIRECTION) == HORIZONTAL) {
+          is_vertical = false;
+        }
+      }
+
+      std::string prop = is_vertical ? HEIGHT : WIDTH;
+
+      if (prop == HEIGHT && isnan(getStyleHeight()) && !this->is_set_flex_) {
+        style->insert(std::pair<std::string, std::string>(FLEX, "1"));
+      } else if (prop == WIDTH && isnan(getStyleWidth()) && !this->is_set_flex_) {
+        style->insert(std::pair<std::string, std::string>(FLEX, "1"));
+      }
+
+      return style;
     }
-  }
 
-  std::string prop = is_vertical ? HEIGHT : WIDTH;
+    void RenderScroller::set_flex(const float flex) {
+      this->is_set_flex_ = true;
+      WXCoreLayoutNode::setFlex(flex);
+    }
 
-  if (prop == HEIGHT && isnan(getStyleHeight()) && !this->is_set_flex_) {
-    style->insert(std::pair<std::string, std::string>(FLEX, "1"));
-  } else if (prop == WIDTH && isnan(getStyleWidth()) && !this->is_set_flex_) {
-    style->insert(std::pair<std::string, std::string>(FLEX, "1"));
-  }
-
-  return style;
-}
-
-void RenderScroller::set_flex(const float flex) {
-  this->is_set_flex_ = true;
-  WXCoreLayoutNode::setFlex(flex);
-}
+    void RenderScroller::onLayout(const float left, const float top, const float right, const float bottom,
+                                    WXCoreLayoutNode *const absoulteItem, WXCoreFlexLine *const flexLine) {
+        this->determineChildLayoutDirection(this->getLayoutDirection());
+        this->setLayoutDirection(kDirectionLTR);
+        RenderObject::onLayout(left, top, right, bottom, absoulteItem, flexLine);
+    }
 }  // namespace WeexCore

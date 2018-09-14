@@ -106,6 +106,11 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     super(instance, parent, basicComponentData);
   }
 
+  //  @Override
+//  public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
+//
+//  }
+
   @Override
   protected FrameLayout initComponentHostView(@NonNull Context context) {
     FrameLayout view = new FrameLayout(context);
@@ -148,9 +153,9 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     if (lp instanceof ViewGroup.MarginLayoutParams) {
       //expect indicator .
       if (child instanceof WXIndicator) {
-        WXComponent.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, left, top, right, bottom);
+        this.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, left, top, right, bottom);
       } else {
-        WXComponent.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, 0, 0, 0, 0);
+        this.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, 0, 0, 0, 0);
       }
     }
     return lp;

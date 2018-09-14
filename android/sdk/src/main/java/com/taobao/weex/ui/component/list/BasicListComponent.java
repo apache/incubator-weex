@@ -169,6 +169,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private  Runnable keepPositionCellRunnable = null;
   private  long keepPositionLayoutDelay = 150;
 
+//  @Override
+//  public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
+//
+//  }
 
   public BasicListComponent(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     super(instance, parent, basicComponentData);
@@ -251,7 +255,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       params.width = width;
       params.height = height;
 
-      WXComponent.setMarginsSupportRTL(params, left, 0, right, 0);
+      this.setMarginsSupportRTL(params, left, 0, right, 0);
     }
     return params;
   }
