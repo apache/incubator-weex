@@ -20,6 +20,7 @@
 #import "WXHeaderComponent.h"
 #import "WXComponent_internal.h"
 #import "WXComponent+Layout.h"
+#import "WXAssert.h"
 
 @implementation WXHeaderComponent
 {
@@ -75,6 +76,10 @@
 - (void)_assignCalculatedFrame:(CGRect)frame
 {
     frame.origin = CGPointZero;
+    WXAssert(!isnan(frame.size.height), @"Height of header should not be NAN.");
+    if (isnan(frame.size.height) || frame.size.height < 0.0f) {
+        frame.size.height = 0.0f;
+    }
     _calculatedFrame = frame;
 }
 

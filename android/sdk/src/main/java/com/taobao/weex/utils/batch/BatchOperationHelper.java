@@ -32,7 +32,7 @@ public class BatchOperationHelper implements Interceptor {
 
 
   private BactchExecutor mExecutor;
-  private ArrayList <Runnable> sRegisterTasks = new ArrayList<>();
+  private CopyOnWriteArrayList<Runnable> sRegisterTasks = new CopyOnWriteArrayList<>();
   private boolean isCollecting = false;
 
   public BatchOperationHelper(BactchExecutor executor){
@@ -62,7 +62,8 @@ public class BatchOperationHelper implements Interceptor {
         while(iterator.hasNext()){
           Runnable item = iterator.next();
           item.run();
-          iterator.remove();
+//          iterator.remove();
+          sRegisterTasks.remove(item);
         }
       }
     });
