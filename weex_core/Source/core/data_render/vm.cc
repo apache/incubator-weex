@@ -19,6 +19,7 @@
 #include "core/data_render/vm.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/object.h"
+#include "core/data_render/class.h"
 #include "core/data_render/table.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/class_array.h"
@@ -568,38 +569,20 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             std::string var_name = CStringValue(c);
             // first find member func
             if (IsClassInstance(b)) {
-                Variables *funcs = ValueTo<ClassInstance>(b)->p_desc_->funcs_.get();
-                int index = funcs->IndexOf(var_name);
-                if (index < 0) {
-                    Variables *vars = ValueTo<ClassInstance>(b)->vars_.get();
-                    index = vars->IndexOf(var_name);
-                    if (index < 0 && op == OP_GETMEMBER) {
+                Value *ret = nullptr;
+                if (op == OP_GETMEMBER) {
+                    ret = GetClassMember(ValueTo<ClassInstance>(b), var_name);
+                    if (!ret) {
                         throw VMExecError("can't find " + var_name + "[OP_GETMEMBER]");
                     }
-                    if (index < 0) {
-                        Value var;
-                        SetNil(&var);
-                        index = vars->Add(var_name, var);
-                    }
-                    Value *ret = vars->Find(index);
-                    if (op == OP_GETMEMBER) {
-                        *a = *ret;
-                    }
-                    else {
-                        SetValueRef(a, ret);
-                    }
-                }
-                else {
-                    Value *ret = funcs->Find(index);
                     if (IsPrototypeFunction(ret) && ret->f->is_class_func()) {
                         ret->f->class_inst() = ValueTo<ClassInstance>(b);
                     }
-                    if (op == OP_GETMEMBER) {
-                        *a = *ret;
-                    }
-                    else {
-                        SetValueRef(a, ret);
-                    }
+                    *a = *ret;
+                }
+                else {
+                    ret = GetClassMemberVar(ValueTo<ClassInstance>(b), var_name);
+                    SetValueRef(a, ret);
                 }
             }
             else if (IsArray(b)) {

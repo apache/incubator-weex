@@ -285,35 +285,42 @@ static void AppendChild(ExecState *exec_state, VNode *parent, VNode *children) {
 
 // appendChild(parent, node);
 static Value AppendChild(ExecState *exec_state) {
-  VNode *parent = exec_state->GetArgument(0)->type == Value::Type::NIL ?
-    nullptr : reinterpret_cast<VNode *>(exec_state->GetArgument(0)->cptr);
-  Value *childrens = exec_state->GetArgument(1);
-  if (IsString(childrens) && parent->tag_name() != "text") {
-      throw VMExecError("AppendChild only support string for span");
-  }
-  else if (!IsArray(childrens) && !IsCptr(childrens) && !IsString(childrens)) {
-      throw VMExecError("AppendChild unsupport array or cptr");
-  }
-  if (IsArray(childrens)) {
-      std::vector<Value> items = ValueTo<Array>(childrens)->items;
-      for (int i = 0; i < items.size(); i++) {
-          if (!IsCptr(&items[i])) {
-              throw VMExecError("AppendChild unspport array or cptr");
-          }
-          VNode *children = reinterpret_cast<VNode *>(items[i].cptr);
-          AppendChild(exec_state, parent, children);
-      }
-  }
-  else if (IsString(childrens) && parent) {
-      LOGD("[VM][VNode][AppendChild]:string:%s\n", CStringValue(childrens));
-      parent->SetAttribute("value", CStringValue(childrens));
-  }
-  else {
-      VNode *children = reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);
-      LOGD("[VM][VNode][AppendChild]: %s  %s\n", parent ? parent->ref().c_str() : "null", children->ref().c_str());
-      AppendChild(exec_state, parent, children);
-  }
-  return Value();
+    do {
+        VNode *parent = exec_state->GetArgument(0)->type == Value::Type::NIL ?
+        nullptr : reinterpret_cast<VNode *>(exec_state->GetArgument(0)->cptr);
+        Value *childrens = exec_state->GetArgument(1);
+        if (IsString(childrens) && parent->tag_name() != "text") {
+            throw VMExecError("AppendChild only support string for span");
+        }
+        else if (IsNil(childrens)) {
+            break;
+        }
+        else if (!IsArray(childrens) && !IsCptr(childrens) && !IsString(childrens)) {
+            throw VMExecError("AppendChild unsupport array or cptr");
+        }
+        if (IsArray(childrens)) {
+            std::vector<Value> items = ValueTo<Array>(childrens)->items;
+            for (int i = 0; i < items.size(); i++) {
+                if (!IsCptr(&items[i])) {
+                    throw VMExecError("AppendChild unspport array or cptr");
+                }
+                VNode *children = reinterpret_cast<VNode *>(items[i].cptr);
+                AppendChild(exec_state, parent, children);
+            }
+        }
+        else if (IsString(childrens) && parent) {
+            LOGD("[VM][VNode][AppendChild]:string:%s\n", CStringValue(childrens));
+            parent->SetAttribute("value", CStringValue(childrens));
+        }
+        else {
+            VNode *children = reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);
+            LOGD("[VM][VNode][AppendChild]: %s  %s\n", parent ? parent->ref().c_str() : "null", children->ref().c_str());
+            AppendChild(exec_state, parent, children);
+        }
+        
+    } while (0);
+    
+    return Value();
 }
 
 // setAttr(node, "value");
