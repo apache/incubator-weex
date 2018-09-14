@@ -892,6 +892,25 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return mBackgroundDrawable;
   }
 
+  public void applyLayoutDirection() {
+      View view = this.getRealView();
+      int direction = NativeRenderObjectUtils.nativeRenderObjectGetLayoutDirectionFromPathNode(this.getRenderObjectPtr());
+      switch (direction) {
+          case  NativeRenderLayoutDirection.ltr: {
+              ViewCompat.setLayoutDirection(view, View.LAYOUT_DIRECTION_LTR);
+              break;
+          }
+          case NativeRenderLayoutDirection.rtl: {
+              ViewCompat.setLayoutDirection(view, View.LAYOUT_DIRECTION_RTL);
+              break;
+          }
+          default: {
+              ViewCompat.setLayoutDirection(view, View.LAYOUT_DIRECTION_INHERIT);
+              break;
+          }
+      }
+  }
+
   /**
    * layout view
    */
@@ -902,7 +921,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
             || component.getLayoutSize() == null) {
       return;
     }
-
+    applyLayoutDirection();
     setLayoutSize(component.getLayoutSize());
     setLayoutPosition(component.getLayoutPosition());
     setPaddings(component.getPadding());
