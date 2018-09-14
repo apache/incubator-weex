@@ -44,25 +44,25 @@ public interface IWXDebugJsBridge {
 
     void jsHandleCallNativeLog(byte[] str_array);
 
-    void jsFunctionCallCreateBody(String pageId, String domStr);
+    void jsHandleCallCreateBody(String pageId, String domStr);
 
-    void jsFunctionCallUpdateFinish(String instanceId, byte[] tasks, String callback);
+    void jsHandleCallUpdateFinish(String instanceId, byte[] tasks, String callback);
 
-    void jsFunctionCallCreateFinish(String pageId);
+    void jsHandleCallCreateFinish(String pageId);
 
-    void jsFunctionCallRefreshFinish(String instanceId, byte[] tasks, String callback);
+    void jsHandleCallRefreshFinish(String instanceId, byte[] tasks, String callback);
 
-    void jsFunctionCallUpdateAttrs(String pageId, String ref, String data);
+    void jsHandleCallUpdateAttrs(String pageId, String ref, String data);
 
-    void jsFunctionCallUpdateStyle(String pageId, String ref, String data);
+    void jsHandleCallUpdateStyle(String pageId, String ref, String data);
 
-    void jsFunctionCallRemoveElement(String pageId, String ref);
+    void jsHandleCallRemoveElement(String pageId, String ref);
 
-    void jsFunctionCallMoveElement(String pageId, String ref, String parentRef, String index_str);
+    void jsHandleCallMoveElement(String pageId, String ref, String parentRef, String index_str);
 
-    void jsFunctionCallAddEvent(String pageId, String ref, String event);
+    void jsHandleCallAddEvent(String pageId, String ref, String event);
 
-    void jsFunctionCallRemoveEvent(String pageId, String ref, String event);
+    void jsHandleCallRemoveEvent(String pageId, String ref, String event);
 
     void jsHandleSetInterval(String instanceId, String callbackId, String time);
 

@@ -36,7 +36,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
   base::android::InitVM(vm);
   JNIEnv *env = base::android::AttachCurrentThread();
   bool result = WeexCore::RegisterJNIContentBoxMeasurement(env) &&
-                WeexCore::RegisterWXJsFunction(env) &&
+      WeexCore::RegisterWXDebugJsBridge(env) &&
                 WeexCore::RegisterJNINativeRenderObjectUtils(env) &&
                 weex::base::MessagePumpAndroid::RegisterJNIUtils(env) &&
                 WeexCore::WXBridge::RegisterJNIUtils(env) &&

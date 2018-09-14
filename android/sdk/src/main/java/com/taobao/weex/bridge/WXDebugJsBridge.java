@@ -76,56 +76,56 @@ public class WXDebugJsBridge implements IWXDebugJsBridge {
 
 
     @Override
-    public void jsFunctionCallCreateBody(String pageId, String domStr){
-        jsFunctionCallCreateBody(pageId, WsonUtils.toWson(JSON.parse(domStr)), true);
+    public void jsHandleCallCreateBody(String pageId, String domStr){
+        jsHandleCallCreateBody(pageId, WsonUtils.toWson(JSON.parse(domStr)), true);
     }
 
-    public native void jsFunctionCallCreateBody(String pageId, byte[] domStr, boolean h5);
+    public native void jsHandleCallCreateBody(String pageId, byte[] domStr, boolean h5);
 
 
     @Override
-    public native void jsFunctionCallUpdateFinish(String instanceId, byte[] tasks, String callback);
+    public native void jsHandleCallUpdateFinish(String instanceId, byte[] tasks, String callback);
 
 
     @Override
-    public native void jsFunctionCallCreateFinish(String pageId);
+    public native void jsHandleCallCreateFinish(String pageId);
 
 
     @Override
-    public native void jsFunctionCallRefreshFinish(String instanceId, byte[] tasks, String callback);
+    public native void jsHandleCallRefreshFinish(String instanceId, byte[] tasks, String callback);
 
 
     @Override
-    public void jsFunctionCallUpdateAttrs(String pageId, String ref, String data){
-        jsFunctionCallUpdateAttrs(pageId, ref, WsonUtils.toWson(JSON.parseObject(data)), true);
+    public void jsHandleCallUpdateAttrs(String pageId, String ref, String data){
+        jsHandleCallUpdateAttrs(pageId, ref, WsonUtils.toWson(JSON.parseObject(data)), true);
     }
 
-    public native void jsFunctionCallUpdateAttrs(String pageId, String ref, byte[] data, boolean h5);
+    public native void jsHandleCallUpdateAttrs(String pageId, String ref, byte[] data, boolean h5);
 
 
     @Override
-    public void jsFunctionCallUpdateStyle(String pageId, String ref, String data){
+    public void jsHandleCallUpdateStyle(String pageId, String ref, String data){
         byte[] data1 = WsonUtils.toWson(JSON.parseObject(data));
-        jsFunctionCallUpdateStyleNative(pageId, ref, data1, true);
+        jsHandleCallUpdateStyleNative(pageId, ref, data1, true);
     }
 
-    public native void jsFunctionCallUpdateStyleNative(String pageId, String ref, byte[] data, boolean h5);
+    public native void jsHandleCallUpdateStyleNative(String pageId, String ref, byte[] data, boolean h5);
 
 
     @Override
-    public native void jsFunctionCallRemoveElement(String pageId, String ref);
+    public native void jsHandleCallRemoveElement(String pageId, String ref);
 
 
     @Override
-    public native void jsFunctionCallMoveElement(String pageId, String ref, String parentRef, String index_str);
+    public native void jsHandleCallMoveElement(String pageId, String ref, String parentRef, String index_str);
 
 
     @Override
-    public native void jsFunctionCallAddEvent(String pageId, String ref, String event);
+    public native void jsHandleCallAddEvent(String pageId, String ref, String event);
 
 
     @Override
-    public native void jsFunctionCallRemoveEvent(String pageId, String ref, String event);
+    public native void jsHandleCallRemoveEvent(String pageId, String ref, String event);
 
 
     @Override

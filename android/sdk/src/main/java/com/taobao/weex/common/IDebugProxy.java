@@ -27,7 +27,7 @@ public interface IDebugProxy {
 
     String ACTION_INSTANCE_RELOAD = "INSTANCE_RELOAD";
 
-    void start(IWXDebugJsBridge jsFunctions);
+    void start(IWXDebugJsBridge wxDebugJsBridge);
 
     void stop(boolean reload);
 

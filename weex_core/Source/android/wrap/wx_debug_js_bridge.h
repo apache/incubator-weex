@@ -17,12 +17,12 @@
  * under the License.
  */
 
-#ifndef WEEX_PROJECT_WXJSFUNCTION_IMPL_ANDROID_H
-#define WEEX_PROJECT_WXJSFUNCTION_IMPL_ANDROID_H
+#ifndef WEEX_PROJECT_WXDEBUGJSBRIDGE_IMPL_ANDROID_H
+#define WEEX_PROJECT_WXDEBUGJSBRIDGE_IMPL_ANDROID_H
 
 #include <jni.h>
 
 namespace WeexCore {
-    bool RegisterWXJsFunction(JNIEnv *env);
+    bool RegisterWXDebugJsBridge(JNIEnv *env);
 }
-#endif //WEEX_PROJECT_WXJSFUNCTION_IMPL_ANDROID_H
+#endif //WEEX_PROJECT_WXDEBUGJSBRIDGE_IMPL_ANDROID_H
