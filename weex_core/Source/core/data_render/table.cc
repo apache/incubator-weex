@@ -148,24 +148,37 @@ size_t GetTableSize(Table *table) {
     
 json11::Json TableToJson(Table *table);
     
-json11::Json ArrayToJson(Array *array) {
-    json11::Json::array json;
-    for (int i = 0; i < array->items.size(); i++) {
-        Value item = array->items[i];
-        if (item.type == Value::Type::TABLE) {
-            json.push_back(TableToJson(ValueTo<Table>(&item)));
+json11::Json ArrayToJson(Array *p_array) {
+    json11::Json::array array;
+    for (auto it = p_array->items.begin(); it != p_array->items.end(); it++) {
+        if (it->type == Value::STRING) {
+            array.push_back(json11::Json(it->str->c_str()));
+            continue;
         }
-        else if (item.type == Value::Type::STRING) {
-            json.push_back(CStringValue(&item));
+        if (it->type == Value::BOOL) {
+            array.push_back(json11::Json(it->b));
+            continue;
         }
-        else if (item.type == Value::Type::INT) {
-            json.push_back(to_string(IntValue(&item)));
+        if (it->type == Value::Type::INT) {
+            array.push_back(json11::Json(static_cast<double>(it->i)));
+            continue;
         }
-        else if (item.type == Value::Type::ARRAY) {
-            json.push_back(ArrayToJson(ValueTo<Array>(&item)));
+        if (it->type == Value::Type::NUMBER) {
+            array.push_back(json11::Json(it->n));
+            continue;
+        }
+
+        if (it->type == Value::TABLE) {
+            array.push_back(TableToJson(ValueTo<Table>(&*it)));
+            continue;
+        }
+
+        if (it->type == Value::ARRAY) {
+            array.push_back(ArrayToJson(ValueTo<Array>(&*it)));
+            continue;
         }
     }
-    return json;
+    return json11::Json(array);
 }
     
 std::string ArrayToString(Array *array) {
@@ -176,22 +189,38 @@ std::string ArrayToString(Array *array) {
 }
     
 json11::Json TableToJson(Table *table) {
-    json11::Json::object obj;
-    for (auto iter = table->map.begin(); iter != table->map.end(); iter++) {
-        if (iter->second.type == Value::Type::TABLE) {
-            obj.insert(std::make_pair(iter->first, TableToJson(ValueTo<Table>(&iter->second))));
+    json11::Json::object object;
+    for (auto it = table->map.begin(); it != table->map.end(); it++) {
+        if (it->second.type == Value::STRING) {
+            object.insert({it->first, json11::Json(it->second.str->c_str())});
+            continue;
         }
-        else if (iter->second.type == Value::Type::STRING) {
-            obj.insert(std::make_pair(iter->first, CStringValue(&iter->second)));
+        if (it->second.type == Value::BOOL) {
+            object.insert({it->first, json11::Json(it->second.b)});
+            continue;
         }
-        else if (iter->second.type == Value::Type::INT) {
-            obj.insert(std::make_pair(iter->first, to_string(IntValue(&iter->second))));
+        if (it->second.type == Value::Type::INT) {
+            object.insert(
+                std::make_pair(it->first, json11::Json(static_cast<double>(it->second.i))));
+            continue;
         }
-        else if (iter->second.type == Value::Type::ARRAY) {
-            obj.insert(std::make_pair(iter->first, ArrayToJson(ValueTo<Array>(&iter->second))));
+        if (it->second.type == Value::Type::NUMBER) {
+            object.insert(
+                std::make_pair(it->first, json11::Json(NumValue(&it->second))));
+            continue;
+        }
+
+        if (it->second.type == Value::TABLE) {
+            object.insert({it->first, TableToJson(ValueTo<Table>(&it->second))});
+            continue;
+        }
+
+        if (it->second.type == Value::ARRAY) {
+            object.insert({it->first, ArrayToJson(ValueTo<Array>(&it->second))});
+            continue;
         }
     }
-    return json11::Json(obj);
+    return json11::Json(object);
 }
     
 std::string TableToString(Table *table) {

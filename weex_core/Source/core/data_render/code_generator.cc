@@ -694,6 +694,30 @@ void CodeGenerator::Visit(BinaryExpression *node, void *data) {
             func_state->AddInstruction(CREATE_ABC(OP_ADD, ret, left, right));
             break;
         }
+        case BinaryOperation::kSubtraction:
+        {
+            // a - b
+            func_state->AddInstruction(CREATE_ABC(OP_SUB, ret, left, right));
+            break;
+        }
+        case BinaryOperation::kMultiplication:
+        {
+            // a * b
+            func_state->AddInstruction(CREATE_ABC(OP_MUL, ret, left, right));
+            break;
+        }
+        case BinaryOperation::kDivision:
+        {
+            // a / b
+            func_state->AddInstruction(CREATE_ABC(OP_DIV, ret, left, right));
+            break;
+        }
+        case BinaryOperation::kMod:
+        {
+            // a % b
+            func_state->AddInstruction(CREATE_ABC(OP_MOD, ret, left, right));
+            break;
+        }
         case BinaryOperation::kLessThan:
         {
             func_state->AddInstruction(CREATE_ABC(OP_LT, ret, left, right));

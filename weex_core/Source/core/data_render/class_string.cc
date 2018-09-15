@@ -34,11 +34,13 @@ namespace data_render {
 
 static Value split(ExecState *exec_state);
 static Value trim(ExecState* exec_state);
+static Value indexOf(ExecState* exec_state);
 
 ClassDescriptor *NewClassString() {
     ClassDescriptor *array_desc = new ClassDescriptor(nullptr);
     AddClassCFunc(array_desc, "split", split);
     AddClassCFunc(array_desc, "trim", trim);
+    AddClassCFunc(array_desc, "indexOf", indexOf);
     return array_desc;
 }
     
@@ -186,7 +188,29 @@ Value encodeURIComponent(ExecState *exec_state) {
     }
     return exec_state->string_table()->StringFromUTF8(dst);
 }
-    
+
+Value indexOf(ExecState* exec_state) {
+    size_t length = exec_state->GetArgumentCount();
+    if (length != 2) {
+        throw VMExecError("trim caller args wrong");
+    }
+
+    Value* string = exec_state->GetArgument(0);
+    Value* subs = exec_state->GetArgument(1);
+    if (!IsString(string) || !IsString(subs)) {
+        throw VMExecError("trim caller isn't a string");
+    }
+
+    std::string src = CStringValue(string);
+    std::string sub_src = CStringValue(subs);
+
+    auto pos = src.find(sub_src);
+    if (pos == std::string::npos) {
+        return Value(-1);
+    }
+
+    return Value(static_cast<int64_t>(pos));
+}
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
