@@ -191,7 +191,7 @@ typedef enum : NSUInteger {
         CGFloat screenHeight =  [[UIScreen mainScreen] bounds].size.height;
         if (screenHeight>0) {
             CGFloat pageRatio = frame.size.height/screenHeight *100;
-            self.apmInstance.wxPageRatio = pageRatio>100?100:pageRatio;
+            self.apmInstance.pageRatio = pageRatio>100?100:pageRatio;
         }
         WXPerformBlockOnMainThread(^{
             if (_rootView) {
