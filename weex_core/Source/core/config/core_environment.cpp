@@ -82,5 +82,9 @@ namespace WeexCore {
 
   void WXCoreEnvironment::AddOption(std::string key, std::string value) {
     mOptions.insert(std::pair<std::string, std::string>(key, value));
+    if (key == "switchInteractionLog"){
+      mInteractionLogSwitch = "true" == value;
+    }
+
   }
 }
