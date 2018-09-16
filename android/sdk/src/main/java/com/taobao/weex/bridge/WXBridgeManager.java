@@ -54,6 +54,7 @@ import com.taobao.weex.utils.batch.Interceptor;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -88,6 +89,7 @@ import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
  */
 public class WXBridgeManager implements Callback, BactchExecutor {
 
+  private static Class clazz_debugProxy = null;
   public static final String METHOD_CREATE_INSTANCE = "createInstance";
   public static final String METHOD_DESTROY_INSTANCE = "destroyInstance";
   public static final String METHOD_CALL_JS = "callJS";
@@ -171,7 +173,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    */
   private WXThread mJSThread;
   private IWXBridge mWXBridge;
-  private IDebugProxy mWxDebugProxy;
+  private Object mWxDebugProxy;
 
   private boolean mMock = false;
 
@@ -277,20 +279,22 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXEnvironment.sDebugServerConnectable = true;
     }
 
-//    if (mWxDebugProxy != null) {
-//      mWxDebugProxy.stop(false);
-//    }
     if (WXEnvironment.sDebugServerConnectable && (WXEnvironment.isApkDebugable() || WXEnvironment.sForceEnableDevTool)) {
       if (WXEnvironment.getApplication() != null) {
         try {
-          Class clazz = Class.forName("com.taobao.weex.devtools.debug.DebugServerProxy");
-          if (clazz != null) {
-            Constructor constructor = clazz.getConstructor(Context.class, WXBridgeManager.class);
+          if (clazz_debugProxy == null) {
+            clazz_debugProxy = Class.forName("com.taobao.weex.devtools.debug.DebugServerProxy");
+          }
+          if (clazz_debugProxy != null) {
+            Constructor constructor = clazz_debugProxy.getConstructor(Context.class, WXBridgeManager.class);
             if (constructor != null) {
-              mWxDebugProxy = (IDebugProxy) constructor.newInstance(
+              mWxDebugProxy = constructor.newInstance(
                       WXEnvironment.getApplication(), WXBridgeManager.this);
               if (mWxDebugProxy != null) {
-                mWxDebugProxy.start(new WXDebugJsBridge());
+                Method method_start = clazz_debugProxy.getMethod("start", WXDebugJsBridge.class);
+                if (method_start != null) {
+                  method_start.invoke(mWxDebugProxy, new WXDebugJsBridge());
+                }
               }
             }
           }
@@ -304,7 +308,19 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
     }
     if (remoteDebug && mWxDebugProxy != null) {
-      mWXBridge = mWxDebugProxy.getWXBridge();
+      try {
+        if (clazz_debugProxy == null ) {
+          clazz_debugProxy = Class.forName("com.taobao.weex.devtools.debug.DebugServerProxy");
+        }
+        if (clazz_debugProxy != null) {
+          Method method_getWXBridge = clazz_debugProxy.getMethod("getWXBridge");
+          if (method_getWXBridge != null) {
+            mWXBridge = (IWXBridge) method_getWXBridge.invoke(mWxDebugProxy);
+          }
+        }
+      } catch (Throwable e) {
+        //Ignore, It will throw Exception on Release environment
+      }
     } else {
       mWXBridge = new WXBridge();
     }
@@ -312,7 +328,19 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   public void stopRemoteDebug() {
     if (mWxDebugProxy != null) {
-      mWxDebugProxy.stop(true);
+      try {
+        if (clazz_debugProxy == null) {
+          clazz_debugProxy = Class.forName("com.taobao.weex.devtools.debug.DebugServerProxy");
+        }
+        if (clazz_debugProxy != null) {
+          Method method_stop = clazz_debugProxy.getMethod("stop", boolean.class);
+          if (method_stop != null) {
+            method_stop.invoke(mWxDebugProxy, true);
+          }
+        }
+      } catch (Throwable e) {
+        //Ignore, It will throw Exception on Release environment
+      }
     }
   }
 

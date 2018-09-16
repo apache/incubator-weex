@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.common;
 
+import com.taobao.weex.bridge.WXDebugJsBridge;
+
 /**
  * Created by budao on 16/6/25.
  */
@@ -27,7 +29,7 @@ public interface IDebugProxy {
 
     String ACTION_INSTANCE_RELOAD = "INSTANCE_RELOAD";
 
-    void start(IWXDebugJsBridge wxDebugJsBridge);
+    void start(WXDebugJsBridge wxDebugJsBridge);
 
     void stop(boolean reload);
 
