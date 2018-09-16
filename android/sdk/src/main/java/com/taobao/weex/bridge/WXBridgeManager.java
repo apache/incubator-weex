@@ -286,14 +286,24 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             clazz_debugProxy = Class.forName("com.taobao.weex.devtools.debug.DebugServerProxy");
           }
           if (clazz_debugProxy != null) {
-            Constructor constructor = clazz_debugProxy.getConstructor(Context.class, WXBridgeManager.class);
+            Constructor constructor = clazz_debugProxy.getConstructor(Context.class, IWXDebugConfig.class);
             if (constructor != null) {
-              mWxDebugProxy = constructor.newInstance(
-                      WXEnvironment.getApplication(), WXBridgeManager.this);
+              mWxDebugProxy = constructor.newInstance(WXEnvironment.getApplication(),
+                      new IWXDebugConfig() {
+                        @Override
+                        public WXBridgeManager getWXJSManager() {
+                          return WXBridgeManager.this;
+                        }
+
+                        @Override
+                        public WXDebugJsBridge getWXDebugJsBridge() {
+                          return new WXDebugJsBridge();
+                        }
+                      });
               if (mWxDebugProxy != null) {
-                Method method_start = clazz_debugProxy.getMethod("start", WXDebugJsBridge.class);
+                Method method_start = clazz_debugProxy.getMethod("start");
                 if (method_start != null) {
-                  method_start.invoke(mWxDebugProxy, new WXDebugJsBridge());
+                  method_start.invoke(mWxDebugProxy);
                 }
               }
             }
