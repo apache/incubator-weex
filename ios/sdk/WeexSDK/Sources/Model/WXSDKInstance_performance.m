@@ -29,6 +29,9 @@
 #import "WXUtility.h"
 
 @interface WXPerformance()
+{
+    NSMutableArray<WXComponent*>* _mCountDownComponentList;
+}
 @property (nonatomic, assign) bool hasRecordFsRenderTimeByPosition;
 @property (nonatomic, assign) double interactionAddCountRecord;
 @end
@@ -67,6 +70,9 @@
 
 - (void) _handleRenderTime:(WXComponent*)targetComponent withModifyTime:(double)modifyTime
 {
+    if (nil == targetComponent) {
+        return;
+    }
     double diff = modifyTime - self.renderTimeOrigin;
     if (diff > 8000) {
         return;
@@ -89,7 +95,7 @@
     if (!self.hasRecordFsRenderTimeByPosition && rightBottom.y > rootFrame.size.height +1 && ![self _isViewGroup:targetComponent] ) {
         self.newFsRenderTime = diff;
         self.hasRecordFsRenderTimeByPosition = true;
-        [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_FSRENDER];
+        [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_NEW_FSRENDER];
     }
     
     UIView *root = targetComponent.weexInstance.rootView;
@@ -122,9 +128,24 @@
         targetComponent.weexInstance.apmInstance.hasRecordFirstInterationView = YES;
         [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW];
     }
-    [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_INTERACTION];
+    self.lastRealInteractionTime = [WXUtility getUnixFixTimeMillis];
+    
+    targetComponent.interactionTime = self.lastRealInteractionTime ;
+    if (nil == _mCountDownComponentList) {
+        _mCountDownComponentList = [[NSMutableArray alloc] init];
+    }
+    if (_mCountDownComponentList.count <10) {
+        [_mCountDownComponentList addObject:targetComponent];
+        return;
+    }
+    [_mCountDownComponentList addObject:targetComponent];
+    WXComponent* preComponent = [_mCountDownComponentList objectAtIndex:0];
+    [_mCountDownComponentList removeObjectAtIndex:0];
+    
+    [targetComponent.weexInstance.apmInstance onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:preComponent.interactionTime];
     self.interactionLimitAddOpCount++;
     self.interactionAddCount = self.interactionAddCountRecord;
+    diff = modifyTime - self.renderTimeOrigin;
     self.interactionTime = self.interactionTime < diff ? diff :self.interactionTime;
 }
 
@@ -169,12 +190,13 @@
     return isViewGroup;
 }
 
-- (void)onInstanceCreateFinish
+- (void)onInstanceRenderSuccess:(WXSDKInstance*) instance;
 {
     if (self.hasRecordFsRenderTimeByPosition) {
         return;
     }
     self.newFsRenderTime = CACurrentMediaTime()*1000 - self.renderTimeOrigin;
+    [instance.apmInstance onStage:KEY_PAGE_STAGES_NEW_FSRENDER];
 }
 
 @end

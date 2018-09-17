@@ -252,6 +252,7 @@ typedef enum : NSUInteger {
     
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
     
+    [self _setPageNameValue:nil];
     [self _renderWithMainBundleString:source];
     
     [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
@@ -274,6 +275,7 @@ typedef enum : NSUInteger {
     self.apmInstance.isStartRender = YES;
     
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
+    self.performance.renderUnixTimeOrigin = [WXUtility getUnixFixTimeMillis];
     [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
     
     if (![WXUtility isBlankString:self.pageName]) {
@@ -384,6 +386,19 @@ typedef enum : NSUInteger {
     [self _renderWithMainBundleString:_mainBundleString];
 }
 
+- (void) _setPageNameValue:(NSURL*) url
+{
+    if (!self.pageName || [self.pageName isEqualToString:@""]) {
+        self.pageName = url.absoluteString;
+    }
+    if (nil == self.pageName && nil != self.viewController) {
+        self.pageName = NSStringFromClass(self.viewController.class);
+    }
+    if (nil == self.pageName) {
+        self.pageName = @"unSetPageNameOrUrl-checkByRenderWithRequest";
+    }
+}
+
 - (void)_renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
 {
     NSURL *url = request.URL;
@@ -401,9 +416,7 @@ typedef enum : NSUInteger {
     }
     _options = [newOptions copy];
   
-    if (!self.pageName || [self.pageName isEqualToString:@""]) {
-        self.pageName = url.absoluteString ? : @"";
-    }
+    [self _setPageNameValue:url];
     
     request.userAgent = [WXUtility userAgent];
     
@@ -445,7 +458,7 @@ typedef enum : NSUInteger {
             [WXExceptionUtils commitCriticalExceptionRT:strongSelf.instanceId
                                                 errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_JS_DOWNLOAD]
                                                function:@"_renderWithRequest:options:data:"
-                                              exception:@"no data return"
+                                              exception:errorMessage
                                               extParams:nil];
             
             if (strongSelf.onFailed) {
@@ -491,7 +504,6 @@ typedef enum : NSUInteger {
     };
     
     _mainBundleLoader.onFailed = ^(NSError *loadError) {
-        [weakSelf.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_END];
         NSString *errorMessage = [NSString stringWithFormat:@"Request to %@ occurs an error:%@", request.URL, loadError.localizedDescription];
         long wxErrorCode = [loadError.domain isEqualToString:NSURLErrorDomain] && loadError.code == NSURLErrorNotConnectedToInternet ? WX_ERR_NOT_CONNECTED_TO_INTERNET : WX_ERR_JSBUNDLE_DOWNLOAD;
 

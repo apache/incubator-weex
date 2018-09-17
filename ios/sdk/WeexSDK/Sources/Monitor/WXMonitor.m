@@ -236,6 +236,11 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
         if (appMonitor && [appMonitor respondsToSelector:@selector(commitAppMonitorArgs:)]){
             [appMonitor commitAppMonitorArgs:commitDict];
         }
+        long oldFSRenderCostTime = [commitDict[FSRENDERTIME] longValue];
+        if (oldFSRenderCostTime > 0) {
+            long oldFSRenderTime = instance.performance.renderUnixTimeOrigin + oldFSRenderCostTime;
+            [instance.apmInstance onStageWithTime:KEY_PAGE_STAGES_FSRENDER time:oldFSRenderTime];
+        }
         
         [self printPerformance:commitDict];
         [WXTracingManager commitTracingSummaryInfo:commitDict withInstanceId:instance.instanceId];

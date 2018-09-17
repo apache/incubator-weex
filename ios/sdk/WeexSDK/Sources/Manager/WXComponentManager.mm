@@ -818,7 +818,6 @@ static NSThread *WXComponentThread;
     
     WXSDKInstance *instance  = self.weexInstance;
     [self _addUITask:^{
-        [instance.performance onInstanceCreateFinish];
         
         WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, instance);
         WX_MONITOR_INSTANCE_PERF_END(WXPTAllRender, instance);
@@ -863,6 +862,7 @@ static NSThread *WXComponentThread;
     WXSDKInstance *instance  = self.weexInstance;
     [self _addUITask:^{
         UIView *rootView = instance.rootView;
+        [instance.performance onInstanceRenderSuccess:instance];
         if (instance.renderFinish) {
             [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:@{@"threadName":WXTUIThread}];
             instance.renderFinish(rootView);

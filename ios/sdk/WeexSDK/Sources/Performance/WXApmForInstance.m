@@ -9,6 +9,7 @@
 #import "WXSDKEngine.h"
 #import "WXSDKError.h"
 #import "WXExceptionUtils.h"
+#import "WXSDKInstance_performance.h"
 
 
 #pragma mark - const static string
@@ -39,6 +40,7 @@ NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_START  = @"wxStartLoadBundle";
 NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_END  = @"wxEndLoadBundle";
 NSString* const KEY_PAGE_STAGES_CREATE_FINISH = @"wxJSBundleCreateFinish";
 NSString* const KEY_PAGE_STAGES_FSRENDER  = @"wxFsRender";
+NSString* const KEY_PAGE_STAGES_NEW_FSRENDER = @"wxNewFsRender";
 NSString* const KEY_PAGE_STAGES_INTERACTION  = @"wxInteraction";
 NSString* const KEY_PAGE_STAGES_DESTROY  = @"wxDestroy";
 
@@ -90,6 +92,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     BOOL _isRecord;
     BOOL _isEnd;
     NSDictionary* _responseHeader;
+    BOOL _hasRecordInteractionTime;
 }
 
 @property (nonatomic,strong) id<WXApmProtocol> apmProtocolInstance;
@@ -131,11 +134,21 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (nil == _apmProtocolInstance || _isEnd) {
         return;
     }
-    long time = [WXUtility getUnixFixTimeMillis];
-    [self.apmProtocolInstance onStage:name withValue:time];
+    [self onStageWithTime:name time:[WXUtility getUnixFixTimeMillis]];
+}
+
+- (void) onStageWithTime:(NSString*)name time:(long)unixTime
+{
+    if (nil == _apmProtocolInstance || _isEnd) {
+        return;
+    }
+    if ([KEY_PAGE_STAGES_INTERACTION isEqualToString:name]) {
+        _hasRecordInteractionTime = YES;
+    }
+    [self.apmProtocolInstance onStage:name withValue:unixTime];
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnComponentThread(^{
-        [weakSelf.recordStageMap setObject:@(time) forKey:name];
+        [weakSelf.recordStageMap setObject:@(unixTime) forKey:name];
     });
 }
 
@@ -166,7 +179,6 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     _instanceId = instanceId;
     
     [self.apmProtocolInstance onStart:instanceId topic:WEEX_PAGE_TOPIC];
-    [self onStage:KEY_PAGE_STAGES_START];
     WXSDKInstance* instance = [WXSDKManager instanceForID:instanceId];
     if (nil != instance) {
         for (NSString* key in instance.continerInfo) {
@@ -201,20 +213,15 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
         return;
     }
     _isEnd = YES;
+    WXSDKInstance* instance = [WXSDKManager instanceForID:self.instanceId];
+    if (!_hasRecordInteractionTime && nil!= instance.performance && instance.performance.lastRealInteractionTime > 0) {
+        [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:instance.performance.lastRealInteractionTime];
+        _hasRecordInteractionTime = YES;
+    }
     
     [self onStage:KEY_PAGE_STAGES_DESTROY];
     [self.apmProtocolInstance onEnd];
     [self _checkScreenEmptyAndReport];
-}
-
-- (void) arriveFSRenderTime
-{
-    if (nil == _apmProtocolInstance || _isFSEnd) {
-        return;
-    }
-    self.isFSEnd = true;
-    
-    [self onStage:KEY_PAGE_STAGES_FSRENDER];
 }
 
 - (void) updateFSDiffStats:(NSString *)name withDiffValue:(double)diff
