@@ -244,7 +244,7 @@ struct ClassDescriptor;
     
 typedef struct ClassDescriptor {
     CommonHeader;
-    ClassDescriptor *p_super_;
+    ClassDescriptor *p_super_{nullptr};
     std::unique_ptr<Variables> static_funcs_;
     std::unique_ptr<Variables> funcs_;
     ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), static_funcs_(new Variables), super_index_(-1) {}
@@ -253,8 +253,8 @@ typedef struct ClassDescriptor {
 
 typedef struct ClassInstance {
     CommonHeader;
-    ClassInstance *p_super_;
-    ClassDescriptor *p_desc_;
+    ClassInstance *p_super_{nullptr};
+    ClassDescriptor *p_desc_{nullptr};
     std::unique_ptr<Variables> vars_;
     ClassInstance(ClassDescriptor *p_desc) : p_desc_(p_desc), vars_(new Variables) {}
     
@@ -553,6 +553,9 @@ inline int ToBool(const Value *o, bool &b) {
     }
     else if (Value::Type::NUMBER == o->type) {
         b = NumValue(o);
+    }
+    else if (ttype(o) == Value::Type::STRING) {
+        b = o->str ? true : false;
     }
     else if (Value::Type::VALUE_REF == o->type) {
         return ToBool(o->var, b);

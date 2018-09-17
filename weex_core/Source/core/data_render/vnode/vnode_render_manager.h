@@ -35,6 +35,7 @@ namespace core {
 namespace data_render {
 
 class VNodeRenderManager {
+ friend class VNode;
  private:
   VNodeRenderManager() {}
 
@@ -48,6 +49,7 @@ class VNodeRenderManager {
   bool RefreshPage(const std::string &page_id, const std::string &init_data);
   bool ClosePage(const std::string &page_id);
   void FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args);
+  void PatchVNode(ExecState * exec_state, VNode *v_node, VNode *new_node);
   static VNodeRenderManager *GetInstance() {
     if (!g_instance) {
       g_instance = new VNodeRenderManager();

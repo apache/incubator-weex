@@ -27,6 +27,7 @@
 #include "core/data_render/class_object.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/vnode/vcomponent.h"
+#include "core/data_render/vnode/vnode_render_manager.h"
 #include <base/LogDefines.h>
 
 namespace weex {
@@ -55,6 +56,12 @@ static Value Log(ExecState *exec_state) {
       case Value::Type::ARRAY:
         std::cout << "[log]:=>" << ArrayToString(ValueTo<Array>(a)) << "\n";
         break;
+      case Value::Type::CPTR:
+      {
+          VNode *node = (VNode *)a->cptr;
+          std::cout << "[log]:=> cptr" << node->tag_name() <<"\n";
+          break;
+      }
       default:
         break;
     }
@@ -241,6 +248,25 @@ static Value CreateComponent(ExecState* exec_state) {
   result.cptr = component;
   return result;
 }
+    
+static Value UpdateElement(ExecState *exec_state) {
+    do {
+        if (exec_state->GetArgumentCount() < 2) {
+            throw VMExecError("UpdateElement needs >= 2 args");
+        }
+        Value *prev = exec_state->GetArgument(0);
+        Value *next = exec_state->GetArgument(1);
+        if (!IsCptr(prev) || !IsCptr(next)) {
+            throw VMExecError("UpdateElement only supporting cptr");
+        }
+        VNode *vn_prev = reinterpret_cast<VNode *>(prev->cptr);
+        VNode *vn_next = reinterpret_cast<VNode *>(next->cptr);
+        VNodeRenderManager::GetInstance()->PatchVNode(exec_state, vn_prev, vn_next);
+        
+    } while (0);
+    
+    return Value();
+}
 
 // createElement("tag_name", "id", ref);
 static Value CreateElement(ExecState *exec_state) {
@@ -264,12 +290,14 @@ static Value CreateElement(ExecState *exec_state) {
     LOGD("[VM][VNode][CreateElement]: %s  %s\n", node_id.c_str(), tag_name.c_str());
     VNode *node = NULL;
     if (tag_name == "root") {
-        node = new VNode("div", node_id, ref);
-    } else {
-        node = new VNode(tag_name, node_id, ref);
-    }
-    if (exec_state->context()->root() == nullptr) {
+        node = new VNode(ref, "div");
         exec_state->context()->set_root(node);
+    }
+    else {
+        node = new VNode(ref, tag_name);
+        if (exec_state->context()->root() == nullptr) {
+            exec_state->context()->set_root(node);
+        }
     }
     Value result;
     result.type = Value::Type::CPTR;
@@ -474,6 +502,7 @@ void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
   RegisterCFunc(state, "merge", Merge);
   RegisterCFunc(state, "tostring", ToString);
   RegisterCFunc(state, "createElement", CreateElement);
+  RegisterCFunc(state, "updateElement", UpdateElement);
   RegisterCFunc(state, "createComponent", CreateComponent);
   RegisterCFunc(state, "saveComponentDataAndProps", SaveComponentDataAndProps);
   RegisterCFunc(state, "appendChildComponent", AppendChildComponent);

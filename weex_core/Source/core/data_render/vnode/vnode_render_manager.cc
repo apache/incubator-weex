@@ -49,6 +49,8 @@ using std::string;
 using std::vector;
 using WeexCore::RenderManager;
 
+void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node);
+
 VNodeRenderManager* VNodeRenderManager::g_instance = nullptr;
 VM* VNodeRenderManager::g_vm = nullptr;
 // TODO establish linkages between page ref_id
@@ -198,7 +200,7 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
         return;
     }
     CreatePageInternal(page_id, exec_state->context()->root());
-    exec_state->context()->Reset();
+    //exec_state->context()->Reset();
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
 
     LOGE("DATA_RENDER, All time %lld", duration_post.count());
@@ -307,8 +309,18 @@ void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string
     } while (0);
 }
     
-void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node);
-
+void VNodeRenderManager::PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node) {
+    do {
+        for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {
+            if (iter->second == exec_state) {
+                Patch(iter->first, v_node, new_node);
+                break;
+            }
+        }
+        
+    } while (0);
+}
+    
 bool SameNode(VNode* a, VNode* b) {
   return a->tag_name() == b->tag_name() &&
          a->ref() == b->ref();  // todo to be more accurate
@@ -561,7 +573,7 @@ void RemoveNodes(const string& pageId, vector<VNode*>& vec,
                  vector<VNode*>& ref_list, unsigned int start,
                  unsigned int end) {
   for (int i = start; i <= end; ++i) {
-    auto p_node = vec[start];
+    auto p_node = vec[i];
     // some might already been used for patch, which is null.
     if (p_node == nullptr) {
       continue;
@@ -642,10 +654,22 @@ void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
   }
 }
 
-void Patch(const string& page_id, VNode* old_root, VNode* new_root) {
-  // root must be the same;
-  PatchVNode(page_id, old_root, new_root);
+void Patch(const string& page_id, VNode *old_node, VNode *new_node) {
+    if (old_node->parent() == NULL || SameNode(old_node, new_node)) {
+        // root must be the same;
+        PatchVNode(page_id, old_node, new_node);
+    }
+    else {
+        VNode *parent = (VNode *)old_node->parent();
+        vector<VNode *> &old_children = *parent->child_list();
+        WeexCore::RenderObject *new_render_object = VNode2RenderObject(new_node, page_id);
+        auto pos = std::find(old_children.begin(), old_children.end(), old_node);
+        int index = static_cast<int>(std::distance(old_children.begin(), pos));
+        RenderManager::GetInstance()->AddRenderObject(page_id, parent->render_object_ref(), index, new_render_object);
+        RenderManager::GetInstance()->RemoveRenderObject(page_id, old_node->render_object_ref());
+    }
 }
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

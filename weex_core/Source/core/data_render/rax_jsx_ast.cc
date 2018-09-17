@@ -98,8 +98,14 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
             Handle<Expression> render_expr = factory->NewIdentifier("render");
             Handle<MemberExpression> member_func_expr = factory->NewMemberExpression(MemberAccessKind::kClass, class_inst_expr, render_expr);
             funcexprs_.push_back(factory->NewDeclaration(vnode_ptr));
-            Handle<Expression> assign_expr = factory->NewAssignExpression(factory->NewIdentifier(vnode_ptr), factory->NewCallExpression(MemberAccessKind::kCall, class_inst_expr, render_expr, {}));
-            funcexprs_.push_back(factory->NewIfStatement(member_func_expr, assign_expr));
+            Handle<ExpressionList> if_then_stmts = factory->NewExpressionList();
+            if_then_stmts->Insert(factory->NewAssignExpression(factory->NewIdentifier(vnode_ptr), factory->NewCallExpression(MemberAccessKind::kCall, class_inst_expr, render_expr, {})));
+            Handle<Expression> compoent_expr = factory->NewIdentifier("vcompoent_ptr");
+            Handle<Expression> compoent_member_expr = factory->NewMemberExpression(MemberAccessKind::kClass, class_inst_expr, compoent_expr);
+            compoent_member_expr->AsMemberExpression()->is_assignment() = true;
+            if_then_stmts->Insert(factory->NewAssignExpression(compoent_member_expr, factory->NewIdentifier(vnode_ptr)));
+            Handle<Expression> if_block_expr = factory->NewBlockStatement(if_then_stmts);
+            funcexprs_.push_back(factory->NewIfStatement(member_func_expr, if_block_expr));
         }
     }
     return funcexprs_;
