@@ -457,7 +457,8 @@ export default class Element extends Node {
         else {
           result = handler.call(this, event)
         }
-      } catch (error) {
+      }
+      catch (error) {
         console.error(`[JS Framework] Failed to invoke the event handler of "${type}" `
           + `on ${this.type} (${this.ref}):\n ${error.toString()}`)
       }
