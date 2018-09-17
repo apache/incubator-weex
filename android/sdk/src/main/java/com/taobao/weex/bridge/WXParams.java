@@ -40,6 +40,7 @@ public class WXParams implements Serializable {
   private String useSingleProcess;
   private String crashFilePath;
   private String libJssPath;
+  private String layoutDirection;
 
   private Map<String, String> options;
 
@@ -106,6 +107,10 @@ public class WXParams implements Serializable {
   public void setDeviceModel(String deviceModel) {
     this.deviceModel = deviceModel;
   }
+
+  public String getLayoutDirection() {return layoutDirection;}
+
+  public void setLayoutDirection(String direction) { this.layoutDirection = direction; }
 
   public String getAppName() {
     return appName;

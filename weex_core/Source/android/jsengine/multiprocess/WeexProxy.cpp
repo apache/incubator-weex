@@ -785,6 +785,20 @@ namespace WeexCore {
         ADDSTRING(weexVersion);
         env->DeleteLocalRef(weexVersion);
 
+        jmethodID m_getLayoutDirection = env->GetMethodID(c_params, "getLayoutDirection", "()Ljava/lang/String;");
+        if (m_getLayoutDirection == nullptr) {
+            ADDSTRING(nullptr);
+            reportNativeInitStatus("-1012", "get m_getLayoutDirection failed");
+            return initFrameworkParams;
+        }
+        jobject layoutDirection = env->CallObjectMethod(params, m_getLayoutDirection);
+        if (layoutDirection == nullptr) {
+            ADDSTRING(nullptr);
+            reportNativeInitStatus("-1012", "get layoutDirection failed");
+            return initFrameworkParams;
+        }
+        ADDSTRING(layoutDirection);
+        env->DeleteLocalRef(layoutDirection);
 
         jmethodID m_deviceModel = env->GetMethodID(c_params, "getDeviceModel", "()Ljava/lang/String;");
         if (m_deviceModel == nullptr) {

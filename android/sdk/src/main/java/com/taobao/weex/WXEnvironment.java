@@ -143,6 +143,13 @@ public class WXEnvironment {
     configs.put(WXConfig.sysModel, SYS_MODEL);
     configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
     configs.put(WXConfig.logLevel,sLogLevel.getName());
+
+    try {
+      configs.put(WXConfig.layoutDirection, sApplication.getApplicationContext().getResources().getBoolean(R.bool.weex_is_right_to_left) ? "rtl" : "ltr");
+    } catch (Exception e) {
+      configs.put(WXConfig.layoutDirection, "ltr");
+    }
+
     try {
       if (isApkDebugable()) {
         options.put(WXConfig.debugMode, "true");

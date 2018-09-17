@@ -56,7 +56,7 @@ public final class WXDomModule extends WXModule {
    * Methods expose to js. Every method which will be called in js should add to this array.
    */
   public static final String[] METHODS = {SCROLL_TO_ELEMENT, ADD_RULE, GET_COMPONENT_RECT,
-      INVOKE_METHOD};
+          GET_COMPONENT_DIRECTION, INVOKE_METHOD};
 
   public WXDomModule(WXSDKInstance instance){
     mWXSDKInstance = instance;

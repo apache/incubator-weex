@@ -67,10 +67,9 @@ public class ActionGetLayoutDirection extends BasicGraphicAction {
         return;
       }
 
-      Map<String, Object> options = new HashMap<>();
+      String directionRet = "ltr";
       if (component != null) {
         int direction = NativeRenderObjectUtils.nativeRenderObjectGetLayoutDirectionFromPathNode(component.getRenderObjectPtr());
-        String directionRet = "";
         switch (direction) {
           case 0: {
             directionRet = "inherit";
@@ -90,12 +89,8 @@ public class ActionGetLayoutDirection extends BasicGraphicAction {
           }
 
         }
-        options.put("direction", directionRet);
-        options.put("result", true);
-      } else {
-        options.put("errMsg", "Component does not exist");
       }
-      jsCallback.invoke(options);
+      jsCallback.invoke(directionRet);
     }
   }
 
