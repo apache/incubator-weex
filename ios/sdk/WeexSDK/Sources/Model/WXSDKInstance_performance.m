@@ -29,9 +29,6 @@
 #import "WXUtility.h"
 
 @interface WXPerformance()
-{
-    NSMutableArray<WXComponent*>* _mCountDownComponentList;
-}
 @property (nonatomic, assign) bool hasRecordFsRenderTimeByPosition;
 @property (nonatomic, assign) double interactionAddCountRecord;
 @end
@@ -128,24 +125,9 @@
         targetComponent.weexInstance.apmInstance.hasRecordFirstInterationView = YES;
         [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW];
     }
-    self.lastRealInteractionTime = [WXUtility getUnixFixTimeMillis];
-    
-    targetComponent.interactionTime = self.lastRealInteractionTime ;
-    if (nil == _mCountDownComponentList) {
-        _mCountDownComponentList = [[NSMutableArray alloc] init];
-    }
-    if (_mCountDownComponentList.count <10) {
-        [_mCountDownComponentList addObject:targetComponent];
-        return;
-    }
-    [_mCountDownComponentList addObject:targetComponent];
-    WXComponent* preComponent = [_mCountDownComponentList objectAtIndex:0];
-    [_mCountDownComponentList removeObjectAtIndex:0];
-    
-    [targetComponent.weexInstance.apmInstance onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:preComponent.interactionTime];
+    [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_INTERACTION];
     self.interactionLimitAddOpCount++;
     self.interactionAddCount = self.interactionAddCountRecord;
-    diff = modifyTime - self.renderTimeOrigin;
     self.interactionTime = self.interactionTime < diff ? diff :self.interactionTime;
 }
 

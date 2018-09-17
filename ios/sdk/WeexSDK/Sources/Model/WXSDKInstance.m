@@ -228,12 +228,25 @@ typedef enum : NSUInteger {
     [self renderWithURL:url options:nil data:nil];
 }
 
+- (void)_checkPageName
+{
+    if (nil == self.pageName || [self.pageName isEqualToString:@""]) {
+        self.pageName = [self.scriptURL isFileURL] ? self.scriptURL.path.lastPathComponent: self.scriptURL.absoluteString;
+    }
+    if (nil == self.pageName || [self.pageName isEqualToString:@""]) {
+        self.pageName = NSStringFromClass(self.viewController.class)?:@"unkonwPageCauseUnsetNameAndUrlAndVc";
+    }
+}
+
 - (void)renderWithURL:(NSURL *)url options:(NSDictionary *)options data:(id)data
 {
     if (!url) {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
     }
+  
+    _scriptURL = url;
+    [self _checkPageName];
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
     
@@ -251,7 +264,6 @@ typedef enum : NSUInteger {
     
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
     
-    [self _setPageNameValue:nil];
     if ([source isKindOfClass:[NSString class]]) {
         [self _renderWithMainBundleString:source];
     } else if ([source isKindOfClass:[NSData class]]) {
@@ -343,6 +355,7 @@ typedef enum : NSUInteger {
     }
 
     //some case , with out render (url)
+    [self _checkPageName];
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
     
@@ -458,18 +471,6 @@ typedef enum : NSUInteger {
     [self _renderWithMainBundleString:_mainBundleString];
 }
 
-- (void) _setPageNameValue:(NSURL*) url
-{
-    if (!self.pageName || [self.pageName isEqualToString:@""]) {
-        self.pageName = url.absoluteString;
-    }
-    if (nil == self.pageName && nil != self.viewController) {
-        self.pageName = NSStringFromClass(self.viewController.class);
-    }
-    if (nil == self.pageName) {
-        self.pageName = @"unSetPageNameOrUrl-checkByRenderWithRequest";
-    }
-}
 
 - (void)_renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
 {
@@ -488,8 +489,6 @@ typedef enum : NSUInteger {
     }
     _options = [newOptions copy];
   
-    [self _setPageNameValue:url];
-    
     request.userAgent = [WXUtility userAgent];
     
     WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, self);
