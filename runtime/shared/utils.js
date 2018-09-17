@@ -114,5 +114,5 @@ export function checkLevel (type) {
  * This methods can avoid "double level check" compared with using wrapped console.debug
  */
 export function debugLog (text) {
-  global.nativeLog(text, '__DEBUG')
+  global.nativeLog('wxInteractionAnalyzer: [jsfm]' + text, '__DEBUG')
 }
