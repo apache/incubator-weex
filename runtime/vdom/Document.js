@@ -169,19 +169,40 @@ export default class Document {
     if (domChanges) {
       updateElement(el, domChanges)
     }
-    const isBubble = this.getRef('_root').attr['bubble'] === 'true'
-    return el.fireEvent(type, event, isBubble, options)
+    let result
+    const $root = this.getRef('_root')
+    if ($root && $root.attr) {
+      const isBubble = $root.attr['bubble'] === 'true'
+      result = el.fireEvent(type, event, isBubble, options)
+    }
+    return result
   }
 
   /**
   * Destroy current document, and remove itself form docMap.
   */
   destroy () {
-    this.taskCenter.destroyCallback()
-    delete this.listener
-    delete this.nodeMap
-    delete this.taskCenter
     removeDoc(this.id)
+    delete this.id
+    delete this.URL
+    delete this.documentElement
+    delete this.ownerDocument
+
+    // remove listener and taskCenter
+    delete this.listener
+    this.taskCenter.destroyCallback()
+    delete this.taskCenter
+
+    // remove nodeMap
+    for (const id in this.nodeMap) {
+      try {
+        if (typeof this.nodeMap[id] !== 'undefined') {
+          this.nodeMap[id].destroy()
+        }
+      }
+      catch (e) {}
+    }
+    delete this.nodeMap
   }
 }
 
