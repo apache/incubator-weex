@@ -128,7 +128,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     
     // If a vertical list is added to a horizontal scroller, we need platform dependent layout
-    if (_flexCssNode && [self isMemberOfClass:[WXScrollerComponent class]] && (_scrollDirection == WXScrollDirectionHorizontal) &&
+    if (_flexCssNode && [self isKindOfClass:[WXScrollerComponent class]] &&
         [subcomponent isKindOfClass:[WXScrollerComponent class]] &&
         subcomponent->_positionType != WXPositionTypeFixed &&
         (((WXScrollerComponent*)subcomponent).scrollDirection == WXScrollDirectionVertical)) {
@@ -139,7 +139,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             }
         }
     }
-    
+
     return inserted;
 }
 
@@ -175,6 +175,19 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _listenLoadMore = [events containsObject:@"loadmore"];
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         _offsetAccuracy = attributes[@"offsetAccuracy"] ? [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
+
+        /* let scroller fill the rest space if it is a child component and has no fixed height & width.
+         WeexCore also does this in C++, but only for "scroller" and "list" not including for
+         subclasses of WXScrollerComponent. */
+        if (_flexCssNode != nullptr) {
+            if (((_scrollDirection == WXScrollDirectionVertical &&
+                  flexIsUndefined(_flexCssNode->getStyleHeight())) ||
+                 (_scrollDirection == WXScrollDirectionHorizontal &&
+                  flexIsUndefined(_flexCssNode->getStyleWidth()))) &&
+                _flexCssNode->getFlex() <= 0.0) {
+                _flexCssNode->set_flex(1.0);
+            }
+        }
         
         id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
@@ -1032,9 +1045,15 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             float width = _flexCssNode->getLayoutWidth();
             float height = _flexCssNode->getLayoutHeight();
             
-            _flexCssNode->setFlexDirection(WeexCore::kFlexDirectionRow, NO);
-            _flexCssNode->setStyleHeight(_flexCssNode->getLayoutHeight());
-            _flexCssNode->setStyleWidth(FlexUndefined, NO);
+            if (_scrollDirection == WXScrollDirectionVertical) {
+                _flexCssNode->setFlexDirection(WeexCore::kFlexDirectionColumn, NO);
+                _flexCssNode->setStyleWidth(_flexCssNode->getLayoutWidth(), NO);
+                _flexCssNode->setStyleHeight(FlexUndefined);
+            } else {
+                _flexCssNode->setFlexDirection(WeexCore::kFlexDirectionRow, NO);
+                _flexCssNode->setStyleHeight(_flexCssNode->getLayoutHeight());
+                _flexCssNode->setStyleWidth(FlexUndefined, NO);
+            }
             _flexCssNode->markAllDirty();
             std::pair<float, float> renderPageSize;
             renderPageSize.first = self.weexInstance.frame.size.width;

@@ -27,6 +27,7 @@
 #import "WXMonitor.h"
 #import "WXSDKInstance_performance.h"
 #import "WXCellComponent.h"
+#import "WXCoreBridge.h"
 
 bool flexIsUndefined(float value) {
     return isnan(value);
@@ -65,6 +66,13 @@ bool flexIsUndefined(float value) {
 - (void)layoutDidFinish
 {
     WXAssertMainThread();
+}
+
+- (void)updateLayoutStyles:(NSDictionary*)styles
+{
+    WXPerformBlockOnComponentThread(^{
+        [WXCoreBridge callUpdateStyle:self.weexInstance.instanceId ref:self.ref data:styles];
+    });
 }
 
 #pragma mark Private
