@@ -146,6 +146,12 @@ static BOOL bNeedRemoveEvents = YES;
             _testId = [WXConvert NSString:attributes[@"testId"]];
         }
         
+        //may be removed when this feature is stable
+        if (attributes[@"clipRadius"])
+        {
+            _clipRadius = [WXConvert NSString:attributes[@"clipRadius"]];
+        }
+        
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> init component: ref : %@ , styles: %@",ref,styles);
         WXLogDebug(@"flexLayout -> init component: ref : %@ , attributes: %@",ref,attributes);
