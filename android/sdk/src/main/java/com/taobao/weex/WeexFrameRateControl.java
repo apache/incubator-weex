@@ -73,6 +73,7 @@ public class WeexFrameRateControl {
                     if (mListener != null && (vSyncListener = mListener.get()) != null) {
                         try {
                             vSyncListener.OnVSync();
+                            WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(runnable, VSYNC_FRAME);
                         }catch (UnsatisfiedLinkError e){
                             if(vSyncListener instanceof WXSDKInstance){
                                 ((WXSDKInstance) vSyncListener).onRenderError(
@@ -80,7 +81,6 @@ public class WeexFrameRateControl {
                                     Log.getStackTraceString(e));
                             }
                         }
-                        WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(runnable, VSYNC_FRAME);
                     }
                 }
             };
