@@ -33,6 +33,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -369,19 +370,26 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   @Override
   public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
-    if (lp instanceof FrameLayout.LayoutParams) {
-      if (this.isLayoutRTL()) {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      if (lp instanceof FrameLayout.LayoutParams) {
         FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
-        lp_frameLayout.gravity = Gravity.RIGHT | Gravity.TOP;
-        lp.setMargins(right, top, left, bottom);
-      } else {
+        lp_frameLayout.gravity = Gravity.START | Gravity.TOP;
+      }
+      lp.setMargins(left, top, right, bottom);
+      lp.setMarginStart(left);
+      lp.setMarginEnd(right);
+    } else {
+      if (lp instanceof FrameLayout.LayoutParams) {
         FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
         lp_frameLayout.gravity = Gravity.LEFT | Gravity.TOP;
+        if (this.isLayoutRTL()) {
+          lp.setMargins(right, top, left, bottom);
+        } else {
+          lp.setMargins(left, top, right, bottom);
+        }
+      } else {
         lp.setMargins(left, top, right, bottom);
       }
-
-    } else {
-      lp.setMargins(left, top, right, bottom);
     }
   }
   @Override
