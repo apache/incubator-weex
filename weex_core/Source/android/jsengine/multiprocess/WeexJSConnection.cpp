@@ -296,8 +296,13 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
 }
 
 void WeexJSConnection::end() {
-  m_impl->serverSender.reset();
-  m_impl->futexPageQueue.reset();
+  try {
+    m_impl->serverSender.reset();
+    m_impl->futexPageQueue.reset();
+  } catch (IPCException &e) {
+    //avoid crash
+  }
+    
   if (m_impl->child) {
     int wstatus;
     pid_t child;
