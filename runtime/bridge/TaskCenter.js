@@ -19,7 +19,7 @@
 
 import CallbackManager from './CallbackManager'
 import Element from '../vdom/Element'
-import { typof } from '../shared/utils'
+import { typof, checkLevel, debugLog } from '../shared/utils'
 import { normalizePrimitive } from './normalize'
 
 let fallback = function () {}
@@ -106,12 +106,20 @@ export class TaskCenter {
     }
 
     switch (type) {
-      case 'dom':
+      case 'dom': {
+        if (checkLevel('debug')) {
+          debugLog(`[task](${this.instanceId},${this.type},${action}) ${JSON.stringify(args)}`)
+        }
         return this[action](this.instanceId, args)
+      }
       case 'component':
         return this.componentHandler(this.instanceId, ref, method, args, Object.assign({ component }, options))
-      default:
+      default: {
+        if (checkLevel('debug')) {
+          debugLog(`[task](${this.instanceId},${module},${method}) ${JSON.stringify(args)}`)
+        }
         return this.moduleHandler(this.instanceId, module, method, args, options)
+      }
     }
   }
 
