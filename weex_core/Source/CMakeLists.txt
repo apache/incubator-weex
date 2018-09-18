@@ -74,6 +74,7 @@ set(COMMON_SRCS
    ./core/data_render/class_json.cc
    ./core/data_render/class_string.cc
    ./core/data_render/class_factory.cc
+   ./core/data_render/class_object.cc
    ./core/data_render/code_generator.cc
    ./core/data_render/exec_state.cc
    ./core/data_render/object.cc
