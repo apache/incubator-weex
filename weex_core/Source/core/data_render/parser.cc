@@ -19,6 +19,7 @@
 
 #include "core/data_render/parser.h"
 #include <sstream>
+#include <cstdlib>
 #include "base/string_util.h"
 #include "core/data_render/ast_factory.h"
 #include "core/data_render/rax_parser_builder.h"
