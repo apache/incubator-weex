@@ -279,3 +279,16 @@ typedef enum : NSUInteger {
 }
 
 @end
+
+@implementation NSNull (WXDiffable)
+
+- (BOOL)weex_isEqualTo:(id<WXDiffable>)object
+{
+    if ([object isKindOfClass:[NSNull class]]) {
+        return YES;
+    }
+    return NO;
+}
+
+@end
+

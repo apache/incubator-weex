@@ -68,3 +68,6 @@
 
 @end
 
+@interface NSNull (WXDiffable) <WXDiffable>
+
+@end
