@@ -206,7 +206,7 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
     LOGE("DATA_RENDER, All time %lld", duration_post.count());
 }
 
-void VNodeRenderManager::CreatePage(const char* contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data) {
+void VNodeRenderManager::CreatePage(const char *contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data) {
     BinaryFile *file = BinaryFile::instance();
     file->set_input(contents);
     file->set_length(length);
@@ -249,12 +249,12 @@ bool VNodeRenderManager::RefreshPage(const std::string& page_id,
         ExecState *exec_state = it->second;
         VNodeExecEnv::InitInitDataValue(exec_state, init_data);
         std::string err;
+        exec_state->context()->Reset();
         exec_state->Execute(err);  // refresh root
         if (!err.empty()) {
             break;
         }
         RefreshPageInternal(page_id, exec_state->context()->root());
-        exec_state->context()->Reset();
         WeexCore::WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
