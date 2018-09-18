@@ -47,6 +47,8 @@ class VNode {
   void AddChild(VNode *child);
 
   void RemoveChild(VNode *child);
+    
+  void InsertChild(VNode *child, int index);
 
   VNode *FindNode(const std::string &ref);
 

@@ -112,7 +112,7 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
   return render_object;
 }
 
-WeexCore::RenderObject* VNode2RenderObject(VNode* root, const string& page_id) {
+WeexCore::RenderObject *VNode2RenderObject(VNode *root, const string& page_id) {
   return ParseVNode2RenderObject(root, nullptr, true, 0, page_id);
 }
 
@@ -662,10 +662,12 @@ void Patch(const string& page_id, VNode *old_node, VNode *new_node) {
     else {
         VNode *parent = (VNode *)old_node->parent();
         vector<VNode *> &old_children = *parent->child_list();
-        WeexCore::RenderObject *new_render_object = VNode2RenderObject(new_node, page_id);
+        WeexCore::RenderObject *new_render_object = ParseVNode2RenderObject(new_node, nullptr, false, 0, page_id);
         auto pos = std::find(old_children.begin(), old_children.end(), old_node);
         int index = static_cast<int>(std::distance(old_children.begin(), pos));
+        parent->InsertChild(new_node, index);
         RenderManager::GetInstance()->AddRenderObject(page_id, parent->render_object_ref(), index, new_render_object);
+        parent->RemoveChild(old_node);
         RenderManager::GetInstance()->RemoveRenderObject(page_id, old_node->render_object_ref());
     }
 }

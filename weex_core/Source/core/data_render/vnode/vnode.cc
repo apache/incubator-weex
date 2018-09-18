@@ -105,13 +105,29 @@ void VNode::AddChild(VNode *child) {
   child->parent_ = this;
   child_list_.push_back(child);
 }
+    
+void VNode::InsertChild(VNode *child, int index) {
+    do {
+        child->parent_ = this;
+        if (index < child_list_.size()) {
+            child_list_.insert(child_list_.begin() + index, child);
+            break;
+        }
+        child_list_.push_back(child);
+        
+    } while (0);
+}
 
 void VNode::RemoveChild(VNode *child) {
   child->parent_ = nullptr;
   auto it = child_list_.begin();
   for (; it != child_list_.end(); ++it) {
     if (*it == child) {
+      VNode *&reference = *it;
       child_list_.erase(it);
+      if (reference != nullptr) {
+          delete reference;
+      }
       break;
     }
   }
