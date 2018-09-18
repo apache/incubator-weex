@@ -24,6 +24,7 @@
 #import "WXSDKManager.h"
 #import "WXUtility.h"
 #import "WXComponent+Layout.h"
+#import "WXComponent+Events.h"
 
 typedef NS_ENUM(NSInteger, Direction) {
     DirectionNone = 1 << 0,
@@ -40,15 +41,16 @@ typedef NS_ENUM(NSInteger, Direction) {
 - (void)recycleSliderView:(WXRecycleSliderView *)recycleSliderView didScrollToItemAtIndex:(NSInteger)index;
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView;
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate;
+- (BOOL)requestGestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch;
 
 @end
+
 
 @interface WXRecycleSliderView : UIView <UIScrollViewDelegate>
 
 @property (nonatomic, strong) WXIndicatorView *indicator;
 @property (nonatomic, weak) id<WXRecycleSliderViewDelegate> delegate;
-
-@property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) WXRecycleSliderScrollView *scrollView;
 @property (nonatomic, strong) NSMutableArray *itemViews;
 @property (nonatomic, assign) Direction direction;
 @property (nonatomic, assign) NSInteger currentIndex;
@@ -70,7 +72,7 @@ typedef NS_ENUM(NSInteger, Direction) {
     if (self) {
         _currentIndex = 0;
         _itemViews = [[NSMutableArray alloc] init];
-        _scrollView = [[UIScrollView alloc] init];
+        _scrollView = [[WXRecycleSliderScrollView alloc] init];
         _scrollView.backgroundColor = [UIColor clearColor];
         _scrollView.delegate = self;
         _scrollView.showsHorizontalScrollIndicator = NO;
@@ -256,7 +258,6 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)lastPage
 {
-    
     NSInteger lastIndex = [self currentIndex]-1;
     if (_itemViews.count > 1) {
         if (_infinite) {
@@ -589,6 +590,11 @@ typedef NS_ENUM(NSInteger, Direction) {
     }
 }
 
+- (BOOL)requestGestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return [self gestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
+}
+
 #pragma mark WXIndicatorComponentDelegate Methods
 
 -(void)setIndicatorView:(WXIndicatorView *)indicatorView
@@ -660,7 +666,6 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)recycleSliderView:(WXRecycleSliderView *)recycleSliderView didScrollToItemAtIndex:(NSInteger)index
 {
-    
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
     }
@@ -680,3 +685,21 @@ typedef NS_ENUM(NSInteger, Direction) {
 }
 
 @end
+
+@implementation WXRecycleSliderScrollView
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    WXRecycleSliderView *view = (WXRecycleSliderView *)self.delegate;
+    if (![view isKindOfClass:[UIView class]]) {
+        return YES;
+    }
+    
+    if ([(id <WXRecycleSliderViewDelegate>) view.wx_component respondsToSelector:@selector(requestGestureShouldStopPropagation:shouldReceiveTouch:)]) {
+        return [(id <WXRecycleSliderViewDelegate>) view.wx_component requestGestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
+    }
+    else{
+        return YES;
+    }
+}
+@end
+

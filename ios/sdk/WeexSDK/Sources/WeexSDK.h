@@ -19,6 +19,9 @@
 
 #ifdef __OBJC__
 
+#import "style.h"
+#import "layout.h"
+#import "flex_enum.h"
 #import "WXWebSocketHandler.h"
 #import "WXVoiceOverModule.h"
 #import "WXView.h"
@@ -57,11 +60,9 @@
 #import "WXExceptionUtils.h"
 #import "WXEventModuleProtocol.h"
 #import "WXErrorView.h"
+#import "WXDisplayLinkManager.h"
 #import "WXDefine.h"
 #import "WXDebugTool.h"
-#import "WXCoreStyle.h"
-#import "WXCoreLayout.h"
-#import "WXCoreFlexEnum.h"
 #import "WXConvert.h"
 #import "WXConfigCenterProtocol.h"
 #import "WXComponentManager.h"
@@ -72,6 +73,8 @@
 #import "WXBaseViewController.h"
 #import "WXAppMonitorProtocol.h"
 #import "WXAppConfiguration.h"
+#import "WXApmProtocol.h"
+#import "WXApmForInstance.h"
 #import "WXAnalyzerProtocol.h"
 #import "WXAnalyzerCenter.h"
 #import "WXAComponent.h"

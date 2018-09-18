@@ -29,8 +29,10 @@
 
 // Should be used in the private: declarations to define a class to be
 // uncopyable and unssignable.
+#ifndef DISALLOW_COPY_AND_ASSIGN
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
   TypeName(const TypeName&);               \
   void operator=(const TypeName&)
+#endif
 
 #endif  // BASE_COMMON_H_

@@ -217,6 +217,10 @@ public class Constants {
     String INCLUDE_FONT_PADDING = "includeFontPadding";
     String ENABLE_COPY = "enableCopy";
 
+    String PAGE_ENABLED = "pagingEnabled";
+    String PAGE_SIZE = "pageSize";
+
+
 
     interface  Recycler{
       String LIST_DATA = "listData";

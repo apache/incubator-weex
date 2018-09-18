@@ -34,6 +34,7 @@ import android.support.annotation.VisibleForTesting;
 import android.util.SparseArray;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
@@ -41,6 +42,7 @@ import com.taobao.weex.bridge.WXHashMap;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import java.lang.annotation.Retention;
@@ -72,6 +74,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
       if (null != mWXSDKInstance.getWXPerformance()){
         mWXSDKInstance.getWXPerformance().timerInvokeCount++;
       }
+      mWXSDKInstance.getApmForInstance().updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_TIMER_NUM,1);
     }
   }
 
@@ -82,6 +85,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
       if (null != mWXSDKInstance.getWXPerformance()){
         mWXSDKInstance.getWXPerformance().timerInvokeCount++;
       }
+      mWXSDKInstance.getApmForInstance().updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_TIMER_NUM,1);
     }
   }
 
@@ -126,6 +130,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
           if (msg.obj == null) {
             break;
           }
+          checkIfTimerInBack(msg.arg1);
           args = createTimerArgs(msg.arg1, (Integer) msg.obj, false);
           WXBridgeManager.getInstance().invokeExecJS(String.valueOf(msg.arg1), null, METHOD_CALL_JS, args, true);
           ret = true;
@@ -134,6 +139,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
           if (msg.obj == null) {
             break;
           }
+          checkIfTimerInBack(msg.arg1);
           postMessage(MODULE_INTERVAL, (Integer) msg.obj, msg.arg2, msg.arg1);
           args = createTimerArgs(msg.arg1, (Integer) msg.obj, true);
           WXBridgeManager.getInstance().invokeExecJS(String.valueOf(msg.arg1), null, METHOD_CALL_JS, args, true);
@@ -144,6 +150,16 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
       }
     }
     return ret;
+  }
+
+  private void checkIfTimerInBack(int instanceId){
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(String.valueOf(instanceId));
+    if (null == instance){
+      return;
+    }
+    if (instance.isViewDisAppear()){
+      instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_TIMER_BACK_NUM,1);
+    }
   }
 
   @VisibleForTesting

@@ -18,6 +18,7 @@
  */
 
 #import "WXBridgeManager.h"
+#import "WXBridgeContext.h"
 #import "WXLog.h"
 #import "WXAssert.h"
 #import "WXBridgeMethod.h"
@@ -28,7 +29,6 @@
 #import "WXResourceLoader.h"
 #import "WXDebugTool.h"
 #import "WXTracingManager.h"
-#import "WXBridgeContext.h"
 #import "WXMonitor.h"
 #import "WXSDKInstance_performance.h"
 
@@ -53,7 +53,6 @@ static NSThread *WXBridgeThread;
     });
     return _sharedInstance;
 }
-
 
 - (instancetype)init
 {
@@ -155,6 +154,11 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
         } else {
             [self.instanceIdStack insertObject:instance atIndex:0];
         }
+    }
+    //third team impl...
+    WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:instance];
+    if (sdkInstance) {
+        sdkInstance.apmInstance.isStartRender = YES;
     }
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
@@ -351,11 +355,15 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     {
         instance.performance.fsCallEventNum++;
     }
+    if (instance && !instance.apmInstance.isFSEnd) {
+        [instance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_EVENT_NUM withDiffValue:1];
+    }
+    
     WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"fireEvent" arguments:args instance:instance];
     [self callJsMethod:method];
 }
 
-- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase args:(NSArray*)args competion:(void (^)(JSValue * value))complection
+- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase args:(NSArray*)args competion:(void (^)(JSValue * value))completion
 {
     WXPerformBlockOnBridgeThread(^{
         if (!type || !instanceId || !hookPhase) {
@@ -365,7 +373,7 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
         NSArray *newArgs = @[componentId, type, hookPhase, args?:@[]];
         
         WXCallJSMethod * method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"componentHook" arguments:newArgs instance:[WXSDKManager instanceForID:instanceId]];
-        [self.bridgeCtx callJSMethod:@"callJS" args:@[instanceId, @[method.callJSTask]] onContext:nil completion:complection];
+        [self.bridgeCtx callJSMethod:@"callJS" args:@[instanceId, @[method.callJSTask]] onContext:nil completion:completion];
     });
 }
 

@@ -23,14 +23,16 @@
 #include <string>
 
 #include "core/css/constants_value.h"
+#include "core/render/node/render_object.h"
 
 namespace WeexCore {
 
 class RenderPage;
+class RenderObject;
 
 class RenderManager {
  private:
-  RenderManager() {}
+  RenderManager() : pages_() {}
 
   ~RenderManager() {}
 
@@ -50,13 +52,22 @@ class RenderManager {
   void Batch(const std::string &page_id);
 
   // create root node
-  bool CreatePage(std::string page_id, const char *data);
+  bool CreatePage(const std::string& page_id, const char *data);
+    
+
+  bool CreatePage(const std::string& page_id, RenderObject *root);
+    
+  bool CreatePage(const std::string& page_id, std::function<RenderObject* (RenderPage*)> constructRoot);
 
   /** use auto constructor is bad idea, it cann't transfer binary, use char* is
    * better */
   bool AddRenderObject(const std::string &page_id,
                        const std::string &parent_ref, int index,
                        const char *data);
+
+  bool AddRenderObject(const std::string &page_id,
+                       const std::string &parent_ref, int index,
+                       RenderObject *root);
 
   bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
 
@@ -66,8 +77,14 @@ class RenderManager {
   bool UpdateAttr(const std::string &page_id, const std::string &ref,
                   const char *data);
 
+  bool UpdateAttr(const std::string &page_id, const std::string &ref,
+                  std::vector<std::pair<std::string, std::string>> *attrPair);
+
   bool UpdateStyle(const std::string &page_id, const std::string &ref,
                    const char *data);
+
+  bool UpdateStyle(const std::string &page_id, const std::string &ref,
+                   std::vector<std::pair<std::string, std::string>> *stylePair);
 
   bool AddEvent(const std::string &page_id, const std::string &ref,
                 const std::string &event);
@@ -92,12 +109,11 @@ class RenderManager {
   void set_viewport_width(const std::string &page_id, float viewport_width);
 
   static RenderManager *GetInstance() {
-    if (!g_pInstance) {
+    if (NULL == g_pInstance) {
       g_pInstance = new RenderManager();
     }
     return g_pInstance;
   }
-
  private:
   static RenderManager *g_pInstance;
   std::map<std::string, RenderPage *> pages_;

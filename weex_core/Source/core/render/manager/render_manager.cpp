@@ -19,7 +19,9 @@
 
 #include <utility>
 #include <vector>
-#include <wson_parser.h>
+#include "wson_parser.h"
+#include <base/LogDefines.h>
+#include <chrono>
 
 #include "base/ViewUtils.h"
 #include "core/css/constants_name.h"
@@ -34,7 +36,33 @@ namespace WeexCore {
 
 RenderManager *RenderManager::g_pInstance = nullptr;
 
-bool RenderManager::CreatePage(std::string page_id, const char *data) {
+bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
+    
+#if RENDER_LOG
+  wson_parser parser(data);
+  LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s",
+       pageId.c_str(), parser.toStringUTF8().c_str());
+#endif
+
+  RenderPage *page = new RenderPage(page_id);
+  pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
+
+  std::map<std::string, float>::iterator iter =
+      this->viewports_.find(page_id);
+  if (iter != this->viewports_.end()) {
+    this->set_viewport_width(page_id, iter->second);
+    this->viewports_.erase(page_id);
+  }
+
+  int64_t start_time = getCurrentTime();
+  RenderObject *root = Wson2RenderObject(data, page_id);
+  page->ParseJsonTime(getCurrentTime() - start_time);
+
+  page->set_is_dirty(true);
+  return page->CreateRootRender(root);
+}
+
+bool RenderManager::CreatePage(const std::string& page_id, RenderObject *root) {
 #if RENDER_LOG
   wson_parser parser(data);
   LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s",
@@ -51,12 +79,31 @@ bool RenderManager::CreatePage(std::string page_id, const char *data) {
     this->viewports_.erase(page_id);
   }
 
-  int64_t start_time = getCurrentTime();
-  RenderObject *root = Wson2RenderObject(data, page_id);
-  page->ParseJsonTime(getCurrentTime() - start_time);
-
   page->set_is_dirty(true);
   return page->CreateRootRender(root);
+}
+    
+bool RenderManager::CreatePage(const std::string& page_id, std::function<RenderObject* (RenderPage*)> constructRoot) {
+#if RENDER_LOG
+    LOGD("[RenderManager] CreatePage >>>> pageId: %s", pageId.c_str());
+#endif
+    
+    RenderPage *page = new RenderPage(page_id);
+    this->pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
+    
+    std::map<std::string, float>::iterator iter =
+    this->viewports_.find(page_id);
+    if (iter != this->viewports_.end()) {
+        RenderManager::GetInstance()->set_viewport_width(page_id, iter->second);
+        this->viewports_.erase(page_id);
+    }
+    
+    int64_t start_time = getCurrentTime();
+    RenderObject *root = constructRoot(page);
+    page->ParseJsonTime(getCurrentTime() - start_time);
+    
+    page->set_is_dirty(true);
+    return page->CreateRootRender(root);
 }
 
 bool RenderManager::AddRenderObject(const std::string &page_id,
@@ -81,6 +128,25 @@ bool RenderManager::AddRenderObject(const std::string &page_id,
 
   page->set_is_dirty(true);
   return page->AddRenderObject(parent_ref, index, child);
+}
+
+bool RenderManager::AddRenderObject(const std::string &page_id, const std::string &parent_ref,
+                                    int index,  RenderObject *root) {
+  RenderPage *page = GetPage(page_id);
+  if (page == nullptr) return false;
+
+#if RENDER_LOG
+  wson_parser parser(data);
+  LOGD(
+      "[RenderManager] AddRenderObject >>>> pageId: %s, parentRef: %s, index: "
+      "%d, dom data: %s",
+      pageId.c_str(), parentRef.c_str(), index, parser.toStringUTF8().c_str());
+#endif
+
+  if (root == nullptr) return false;
+
+  page->set_is_dirty(true);
+  return page->AddRenderObject(parent_ref, index, root);
 }
 
 bool RenderManager::RemoveRenderObject(const std::string &page_id,
@@ -133,6 +199,21 @@ bool RenderManager::UpdateAttr(const std::string &page_id,
   return page->UpdateAttr(ref, attrs);
 }
 
+bool RenderManager::UpdateAttr(const std::string &page_id, const std::string &ref,
+                               std::vector<std::pair<std::string, std::string>> *attrPair) {
+  RenderPage *page = this->GetPage(page_id);
+  if (page == nullptr) return false;
+
+#if RENDER_LOG
+  wson_parser parser(data);
+  LOGD("[RenderManager] UpdateAttr >>>> pageId: %s, ref: %s, data: %s",
+       pageId.c_str(), ref.c_str(), parser.toStringUTF8().c_str());
+#endif
+
+  page->set_is_dirty(true);
+  return page->UpdateAttr(ref, attrPair);
+}
+
 bool RenderManager::UpdateStyle(const std::string &page_id,
                                 const std::string &ref, const char *data) {
   RenderPage *page = this->GetPage(page_id);
@@ -151,6 +232,24 @@ bool RenderManager::UpdateStyle(const std::string &page_id,
   page->set_is_dirty(true);
   return page->UpdateStyle(ref, styles);
 }
+
+
+bool RenderManager::UpdateStyle(const std::string &page_id, const std::string &ref,
+                                std::vector<std::pair<std::string, std::string>> *stylePair) {
+  RenderPage *page = this->GetPage(page_id);
+  if (page == nullptr) return false;
+
+#if RENDER_LOG
+  wson_parser parser(data);
+  LOGD("[RenderManager] UpdateStyle >>>> pageId: %s, ref: %s, data: %s",
+       pageId.c_str(), ref.c_str(), parser.toStringUTF8().c_str());
+#endif
+
+
+  page->set_is_dirty(true);
+  return page->UpdateStyle(ref, stylePair);
+}
+
 
 bool RenderManager::AddEvent(const std::string &page_id, const std::string &ref,
                              const std::string &event) {
@@ -190,7 +289,13 @@ bool RenderManager::CreateFinish(const std::string &page_id) {
 #endif
 
   page->set_is_dirty(true);
-  return page->CreateFinish();
+  bool b = page->CreateFinish();
+
+#if RENDER_LOG
+  auto end_time = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
+  LOGE("DATA_RENDER, Wx End %lld",end_time);
+#endif
+  return b;
 }
 
 void RenderManager::CallNativeModule(const char *page_id, const char *module, const char *method,
@@ -244,6 +349,7 @@ bool RenderManager::ClosePage(const std::string &page_id) {
   this->pages_.erase(page_id);
   delete page;
   page = nullptr;
+    return true;
 }
 
 float RenderManager::viewport_width(const std::string &page_id) {

@@ -199,7 +199,10 @@
     
     [self cancelImage];
     __weak typeof(self) weakSelf = self;
-    weakSelf.imageOperation = [[self imageLoader] downloadImageWithURL:posterURL.absoluteString imageFrame:self.posterImageView.frame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {
+    weakSelf.imageOperation = [[self imageLoader] downloadImageWithURL:posterURL.absoluteString imageFrame:self.posterImageView.frame
+                                                              userInfo:@{@"instanceId":self.weexSDKInstance.instanceId}
+                                                             completed:^(UIImage *image, NSError *error, BOOL finished)
+    {
         dispatch_async(dispatch_get_main_queue(), ^{
             __strong typeof(self) strongSelf = weakSelf;
             if (!error) {
@@ -317,27 +320,20 @@
     return self;
 }
 
--(UIView *)loadView
+- (UIView *)loadView
 {
     WXVideoView* videoView = [[WXVideoView alloc] init];
     videoView.weexSDKInstance = self.weexInstance;
-    
     return videoView;
 }
 
--(void)viewDidLoad
+- (void)viewDidLoad
 {
     _videoView = (WXVideoView *)self.view;
+    _videoView.layer.mask = [self drawBorderRadiusMaskLayer:_videoView.bounds];
     [_videoView setURL:_videoURL];
     [_videoView setPosterURL:_posterURL];
-    if (_playStatus) {
-        [_videoView play];
-    } else {
-        [_videoView pause];
-    }
-    if (_autoPlay) {
-        [_videoView play];
-    }
+    
     __weak __typeof__(self) weakSelf = self;
     _videoView.posterClickHandle = ^{
         [weakSelf.videoView play];
@@ -364,6 +360,14 @@
         }
         [weakSelf fireEvent:eventType params:nil];
     };
+    if (_playStatus) {
+        [_videoView play];
+    } else {
+        [_videoView pause];
+    }
+    if (_autoPlay) {
+        [_videoView play];
+    }
 }
 
 -(void)updateAttributes:(NSDictionary *)attributes

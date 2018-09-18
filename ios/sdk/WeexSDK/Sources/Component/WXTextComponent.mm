@@ -280,8 +280,12 @@ do {\
         _observerIconfont = YES;
     }
     
+    if (self.flexCssNode == nullptr) {
+        return;
+    }
+    
         UIEdgeInsets flex_padding = {
-            WXFloorPixelValue(self.flexCssNode->getPaddingTop()+ self.flexCssNode->getBorderWidthTop()),
+            WXFloorPixelValue(self.flexCssNode->getPaddingTop() + self.flexCssNode->getBorderWidthTop()),
             WXFloorPixelValue(self.flexCssNode->getPaddingLeft() + self.flexCssNode->getBorderWidthLeft()),
             WXFloorPixelValue(self.flexCssNode->getPaddingBottom() + self.flexCssNode->getBorderWidthBottom()),
             WXFloorPixelValue(self.flexCssNode->getPaddingRight() + self.flexCssNode->getBorderWidthRight())
@@ -379,6 +383,15 @@ do {\
 {
     __weak typeof(self) weakSelf = self;
     return ^CGSize (CGSize constrainedSize) {
+        __strong typeof(self) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return CGSizeZero;
+        }
+        
+        if (strongSelf.flexCssNode == nullptr) {
+            return CGSizeZero;
+        }
+        
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> measureblock %@, constrainedSize:%@",
               self.type,
@@ -389,36 +402,36 @@ do {\
         NSTextStorage *textStorage = nil;
         
         //TODO:more elegant way to use max and min constrained size
-            if (!isnan(weakSelf.flexCssNode->getMinWidth())) {
-                constrainedSize.width = MAX(constrainedSize.width, weakSelf.flexCssNode->getMinWidth());
+            if (!isnan(strongSelf.flexCssNode->getMinWidth())) {
+                constrainedSize.width = MAX(constrainedSize.width, strongSelf.flexCssNode->getMinWidth());
             }
             
-            if (!isnan(weakSelf.flexCssNode->getMaxWidth())) {
-                constrainedSize.width = MIN(constrainedSize.width, weakSelf.flexCssNode->getMaxWidth());
+            if (!isnan(strongSelf.flexCssNode->getMaxWidth())) {
+                constrainedSize.width = MIN(constrainedSize.width, strongSelf.flexCssNode->getMaxWidth());
             }
         
         if (![self useCoreText]) {
-            textStorage = [weakSelf textStorageWithWidth:constrainedSize.width];
+            textStorage = [strongSelf textStorageWithWidth:constrainedSize.width];
             NSLayoutManager *layoutManager = textStorage.layoutManagers.firstObject;
             NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
             computedSize = [layoutManager usedRectForTextContainer:textContainer].size;
         } else {
-            computedSize = [weakSelf calculateTextHeightWithWidth:constrainedSize.width];
+            computedSize = [strongSelf calculateTextHeightWithWidth:constrainedSize.width];
         }
-            if (!isnan(weakSelf.flexCssNode->getMinWidth())) {
-                computedSize.width = MAX(computedSize.width, weakSelf.flexCssNode->getMinWidth());
+            if (!isnan(strongSelf.flexCssNode->getMinWidth())) {
+                computedSize.width = MAX(computedSize.width, strongSelf.flexCssNode->getMinWidth());
             }
             
-            if (!isnan(weakSelf.flexCssNode->getMaxWidth())) {
-                computedSize.width = MIN(computedSize.width, weakSelf.flexCssNode->getMaxWidth());
+            if (!isnan(strongSelf.flexCssNode->getMaxWidth())) {
+                computedSize.width = MIN(computedSize.width, strongSelf.flexCssNode->getMaxWidth());
             }
             
-            if (!isnan(weakSelf.flexCssNode->getMinHeight())) {
-                computedSize.height = MAX(computedSize.height, weakSelf.flexCssNode->getMinHeight());
+            if (!isnan(strongSelf.flexCssNode->getMinHeight())) {
+                computedSize.height = MAX(computedSize.height, strongSelf.flexCssNode->getMinHeight());
             }
             
-            if (!isnan(weakSelf.flexCssNode->getMaxHeight())) {
-                computedSize.height = MIN(computedSize.height, weakSelf.flexCssNode->getMaxHeight());
+            if (!isnan(strongSelf.flexCssNode->getMaxHeight())) {
+                computedSize.height = MIN(computedSize.height, strongSelf.flexCssNode->getMaxHeight());
             }
         if (textStorage && [WXUtility isBlankString:textStorage.string]) {
             //  if the text value is empty or nil, then set the height is 0.

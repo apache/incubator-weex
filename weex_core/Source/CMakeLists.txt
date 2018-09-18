@@ -5,9 +5,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 #add_compile_options(-std=c++11)
 add_compile_options(-fexceptions)
 
+
 add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
 add_definitions(-DDEBUG=1)
+add_definitions(-DOS_ANDROID=1)
 
 add_definitions(-DRENDER_LOG=0)
 add_definitions(-DPERFORMANCE_LOG=0)
@@ -16,7 +18,12 @@ add_definitions(-DJSAPI_LOG=0)
 add_definitions(-DDOM_PARSER_LOG=0)
 
 set(COMMON_SRCS
-
+  ./base/time_point.cc
+  ./base/thread/thread_impl_posix.cc
+  ./base/thread/thread_impl_android.cc
+  ./base/message_loop/message_loop.cc
+  ./base/message_loop/message_pump_posix.cc
+  ./base/message_loop/message_pump_android.cc
   ./core/render/manager/render_manager.cpp
   ./core/render/page/render_page.cpp
 
@@ -40,6 +47,7 @@ set(COMMON_SRCS
   ./core/render/action/render_action_update_attr.cpp
   ./core/render/action/render_action_update_style.cpp
   ./core/render/action/render_action_render_success.cpp
+  ./core/render/action/render_action_trigger_vsync.cpp
 
   ./core/layout/layout.cpp
   ./core/layout/style.cpp
@@ -49,18 +57,49 @@ set(COMMON_SRCS
   ./core/config/core_environment.cpp
 
   ./core/moniter/render_performance.cpp
-  ./core/manager/weex_core_manager.cpp
-  ./core/bridge/js_bridge.cpp
+  ./core/bridge/platform/core_side_in_platform.cpp
+  ./core/bridge/script/core_side_in_script.cpp
   ./core/parser/dom_wson.cpp
-   ./core/bridge/bridge.cpp
+
+   ./core/data_render/ast.cc
+   ./core/data_render/ast_builder.cc
+   ./core/data_render/ast_factory.cc
+   ./core/data_render/class.cc
+   ./core/data_render/class_array.cc
+   ./core/data_render/class_json.cc
+   ./core/data_render/class_string.cc
+   ./core/data_render/class_factory.cc
+   ./core/data_render/code_generator.cc
+   ./core/data_render/exec_state.cc
+   ./core/data_render/object.cc
+   ./core/data_render/parser.cc
+   ./core/data_render/rax_jsx_ast.cc
+   ./core/data_render/rax_parser.cc
+   ./core/data_render/rax_parser_builder.cc
+   ./core/data_render/rax_parser_context.cc
+   ./core/data_render/rax_parser_scope.cc
+   ./core/data_render/rax_parser_statistics.cc
+   ./core/data_render/rax_source_locator.cc
+   ./core/data_render/statement.cc
+   ./core/data_render/string_table.cc
+   ./core/data_render/table.cc
+   ./core/data_render/token.cc
+   ./core/data_render/tokenizer.cc
+   ./core/data_render/vm.cc
+   ./core/data_render/vnode/vnode.cc
+   ./core/data_render/vnode/vcomponent.cc
+   ./core/data_render/vnode/vnode_exec_env.cc
+   ./core/data_render/vnode/vnode_render_manager.cc
+   ./core/data_render/vnode/vnode_render_context.cc
         )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/json11)
 
 SET(FINAL_ADD_LIBRARY
         ${COMMON_SRCS}
 )
-SET(FINAL_TARGET_LINK_LIBRARIES wson)
+SET(FINAL_TARGET_LINK_LIBRARIES wson json11)
 
 if (ANDROID)
   ## add_subdirectory for subdirectory has a CMakeLists.txt
@@ -78,20 +117,33 @@ if (ANDROID)
     ./android/base/string/scoped_jstring.cpp
     ./android/base/string/scoped_jstring_utf8.cpp
     ./android/base/string/jstring_cache.cpp
-    ./android/bridge/impl/bridge_impl_android.cpp
-    ./android/bridge/impl/weexcore_impl_android.cpp
-    ./android/bridge/impl/measure_mode_impl_android.cpp
-    ./android/bridge/impl/content_box_measurement_impl_android.cpp
-    ./android/bridge/impl/jsfunction_impl_android.cpp
-    ./android/bridge/impl/native_render_object_utils_impl_android.cpp
+    ./android/wrap/content_box_measurement_impl_android.cpp
+    ./android/wrap/jsfunction_impl_android.cpp
+    ./android/wrap/native_render_object_utils_impl_android.cpp
+    ./android/bridge/platform/android_side.cpp
+    ./android/bridge/platform/android_bridge.cpp
+    ./android/bridge/script/script_side_in_multi_so.cpp
+    ./android/bridge/script/script_side_in_multi_process.cpp
+    ./android/bridge/script_bridge_in_multi_so.cpp
+    ./android/bridge/script_bridge_in_multi_process.cpp
+
+    ./android/bridge/multi_process_and_so_initializer.cpp
+    ./android/bridge/multi_so_initializer.cpp
+    ./android/wrap/wml_bridge.cpp
+    ./android/utils/cache_utils.cpp
+    ./android/utils/params_utils.cpp
+    ./android/utils/so_utils.cpp
+    ./android/utils/IPCStringResult.cpp
+    ./android/wrap/log_utils.cpp
+    ./android/wrap/hash_set.cpp
+    ./android/wrap/wx_map.cpp
+    ./android/wrap/wx_js_object.cpp
+    ./android/wrap/wx_bridge.cpp
+    ./android/wrap/wx_params.cpp
+    ./android/base/jni_type.cpp
 
     ./android/jsengine/multiprocess/WeexJSConnection.cpp
-    ./android/jsengine/multiprocess/WeexProxy.cpp
     ./android/jsengine/multiprocess/ExtendJSApi.cpp
-
-
-    ./android/jsengine/api/WeexJSCoreApi.cpp
-     
 
   )
   SET(FINAL_ADD_LIBRARY
@@ -109,6 +161,12 @@ if (ANDROID)
           )
 
 endif (ANDROID)
+
+##if(iOS)
+  add_definitions(-DTARGET_OS_IPHONE=1)
+
+##endif(iOS)
+
 
 add_library(${WEEXCORE_LIBRARY_NAME} SHARED ${FINAL_ADD_LIBRARY})
 target_include_directories(${WEEXCORE_LIBRARY_NAME} PUBLIC .)

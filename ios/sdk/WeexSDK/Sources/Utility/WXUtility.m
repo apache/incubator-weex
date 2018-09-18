@@ -258,19 +258,10 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 + (id)objectFromJSON:(NSString *)json
 {
-    if (!json) return nil;
-    
-    NSData *data = [json dataUsingEncoding:NSUTF8StringEncoding];
-    NSError *error = nil;
-    id obj = [NSJSONSerialization JSONObjectWithData:data
-                                             options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
-                                               error:&error];
-    if(error){
-        WXLogError(@"%@", [error description]);
-        return nil;
-    }
-    
-    return obj;
+    // in weex there are cases that json is empty container
+    if ([json isEqualToString:@"{}"]) return @{}.mutableCopy;
+    if ([json isEqualToString:@"[]"]) return @[].mutableCopy;
+    return [self JSONObject:[json dataUsingEncoding:NSUTF8StringEncoding] error:nil];
 }
 
 + (id)JSONObject:(NSData*)data error:(NSError **)error
@@ -282,7 +273,9 @@ CGFloat WXFloorPixelValue(CGFloat value)
                                                   options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
                                                     error:error];
     } @catch (NSException *exception) {
-        *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{NSLocalizedDescriptionKey: [exception description]}];
+        if (error) {
+            *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{NSLocalizedDescriptionKey: [exception description]}];
+        }
     }
     return jsonObj;
 }
@@ -291,37 +284,43 @@ CGFloat WXFloorPixelValue(CGFloat value)
 {
     if(!object) return nil;
     
-    NSError *error = nil;
-    if([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]){
-        NSData *data = [NSJSONSerialization dataWithJSONObject:object
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
-        if (error) {
-            WXLogError(@"%@", [error description]);
-            return nil;
-        }
-        
-        return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    @try {
     
-    } else if ([object isKindOfClass:[NSString class]]) {
-        NSArray *array = @[object];
-        NSData *data = [NSJSONSerialization dataWithJSONObject:array
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
-        if (error) {
-            WXLogError(@"%@", [error description]);
+        NSError *error = nil;
+        if ([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]) {
+            NSData *data = [NSJSONSerialization dataWithJSONObject:object
+                                                           options:NSJSONWritingPrettyPrinted
+                                                             error:&error];
+            if (error) {
+                WXLogError(@"%@", [error description]);
+                return nil;
+            }
+            
+            return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        
+        } else if ([object isKindOfClass:[NSString class]]) {
+            NSArray *array = @[object];
+            NSData *data = [NSJSONSerialization dataWithJSONObject:array
+                                                           options:NSJSONWritingPrettyPrinted
+                                                             error:&error];
+            if (error) {
+                WXLogError(@"%@", [error description]);
+                return nil;
+            }
+            
+            NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            if (string.length <= 4) {
+                WXLogError(@"json convert length less than 4 chars.");
+                return nil;
+            }
+            
+            return [string substringWithRange:NSMakeRange(2, string.length - 4)];
+        } else {
+            WXLogError(@"object isn't avaliable class");
             return nil;
         }
         
-        NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if (string.length <= 4) {
-            WXLogError(@"json convert length less than 4 chars.");
-            return nil;
-        }
-        
-        return [string substringWithRange:NSMakeRange(2, string.length - 4)];
-    } else {
-        WXLogError(@"object isn't avaliable class");
+    } @catch (NSException *exception) {
         return nil;
     }
 }
@@ -403,7 +402,11 @@ CGFloat WXFloorPixelValue(CGFloat value)
             if ([subStr hasPrefix:@"rgb"]) {
                 gradientType = [WXConvert gradientType:gradientTypeStr];
                 
-                range = [subStr rangeOfString:@")"];
+                if ([subStr containsString:@"%"]) {
+                    range = [subStr rangeOfString:@"%"];
+                } else {
+                    range = [subStr rangeOfString:@")"];
+                }
                 NSString *startColorStr = [subStr substringToIndex:range.location + 1];
                 NSString *endColorStr = [subStr substringFromIndex:range.location + 2];
                 startColor = [WXConvert UIColor:startColorStr];
@@ -969,6 +972,18 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
     }
     return nil;
 }
+
++ (long) getUnixFixTimeMillis
+{
+    static long sInterval;
+    static dispatch_once_t unixTimeToken;
+    
+    dispatch_once(&unixTimeToken, ^{
+        sInterval = [[NSDate date] timeIntervalSince1970] * 1000 - CACurrentMediaTime()*1000;
+    });
+    return sInterval+CACurrentMediaTime()*1000;
+}
+
 @end
 
 

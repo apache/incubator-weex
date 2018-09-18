@@ -20,7 +20,8 @@ package com.taobao.weex.common;
 
 public enum WXRenderStrategy {
   APPEND_ASYNC("APPEND_ASYNC"),
-  APPEND_ONCE("APPEND_ONCE");
+  APPEND_ONCE("APPEND_ONCE"),
+  DATA_RENDER("DATA_RENDER");
 
   private String flag;
 

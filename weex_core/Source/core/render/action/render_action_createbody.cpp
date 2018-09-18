@@ -37,7 +37,7 @@ RenderActionCreateBody::RenderActionCreateBody(const std::string &page_id,
 }
 
 void RenderActionCreateBody::ExecuteAction() {
-  WeexCoreManager::getInstance()->getPlatformBridge()->callCreateBody(
+  WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->CreateBody(
       this->page_id_.c_str(), this->component_type_.c_str(), this->ref_.c_str(),
       this->styles_, this->attributes_, this->events_, this->margins_,
       this->paddings_, this->borders_);

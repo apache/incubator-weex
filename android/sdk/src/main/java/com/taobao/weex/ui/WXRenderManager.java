@@ -24,11 +24,14 @@ import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.RenderContext;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.ArrayList;
@@ -122,7 +125,15 @@ public class WXRenderManager {
   }
 
   public void registerInstance(WXSDKInstance instance) {
-    mRenderContext.put(instance.getInstanceId(), new RenderContextImpl(instance));
+    if (instance.getInstanceId() == null) {
+      WXExceptionUtils.commitCriticalExceptionRT(null,
+              WXErrorCode.WX_RENDER_ERR_INSTANCE_ID_NULL,
+              "registerInstance",
+              WXErrorCode.WX_RENDER_ERR_INSTANCE_ID_NULL.getErrorMsg() + "instanceId is null",
+              null);
+    } else {
+      mRenderContext.put(instance.getInstanceId(), new RenderContextImpl(instance));
+    }
   }
 
   public List<WXSDKInstance> getAllInstances() {
@@ -143,12 +154,24 @@ public class WXRenderManager {
     RenderContextImpl statement = mRenderContext.get(instanceId);
     if (statement != null) {
       statement.registerComponent(ref, comp);
+      if (null != statement.getInstance()){
+        statement.getInstance().getApmForInstance().updateMaxStats(
+            WXInstanceApm.KEY_PAGE_STATS_MAX_COMPONENT_NUM,
+            statement.getComponentCount()
+        );
+      }
     }
   }
 
   public WXComponent unregisterComponent(String instanceId, String ref) {
     RenderContextImpl statement = mRenderContext.get(instanceId);
     if (statement != null) {
+      if (null != statement.getInstance()){
+        statement.getInstance().getApmForInstance().updateMaxStats(
+            WXInstanceApm.KEY_PAGE_STATS_MAX_COMPONENT_NUM,
+            statement.getComponentCount()
+        );
+      }
       return statement.unregisterComponent(ref);
     } else {
       return null;

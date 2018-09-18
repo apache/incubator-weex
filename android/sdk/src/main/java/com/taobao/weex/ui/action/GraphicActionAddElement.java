@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.WorkerThread;
@@ -43,7 +44,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
   private GraphicPosition layoutPosition;
   private GraphicSize layoutSize;
 
-  public GraphicActionAddElement(String pageId, String ref,
+  public GraphicActionAddElement(@NonNull WXSDKInstance instance, String ref,
                                  String componentType, String parentRef,
                                  int index,
                                  Map<String, String> style,
@@ -52,7 +53,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
                                  float[] margins,
                                  float[] paddings,
                                  float[] borders) {
-    super(pageId, ref);
+    super(instance, ref);
     this.mComponentType = componentType;
     this.mParentRef = parentRef;
     this.mIndex = index;
@@ -63,8 +64,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
     this.mMargins = margins;
     this.mBorders = borders;
 
-    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
-    if (instance == null || instance.getContext() == null) {
+    if (instance.getContext() == null) {
       return;
     }
 
@@ -75,11 +75,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
           mParentRef);
       child = createComponent(instance, parent, basicComponentData);
       child.setTransition(WXTransition.fromMap(child.getStyles(), child));
-
-      if (child == null || parent == null) {
-        return;
-      }
-    }catch (ClassCastException e){
+    } catch (ClassCastException e) {
       Map<String, String> ext = new ArrayMap<>();
       WXComponent parent = WXSDKManager.getInstance().getWXRenderManager()
           .getWXComponent(getPageId(), mParentRef);
@@ -159,7 +155,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
   public void executeAction() {
     super.executeAction();
     try {
-      if (!TextUtils.equals("mComponentType", "video") && !TextUtils.equals("mComponentType", "videoplus"))
+      if (!TextUtils.equals(mComponentType, "video") && !TextUtils.equals(mComponentType, "videoplus"))
         child.mIsAddElementToTree = true;
 
       parent.addChild(child, mIndex);
@@ -170,7 +166,6 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
       }
       child.applyLayoutAndEvent(child);
       child.bindData(child);
-
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);
     }

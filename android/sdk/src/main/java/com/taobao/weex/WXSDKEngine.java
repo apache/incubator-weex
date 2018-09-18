@@ -32,6 +32,7 @@ import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.appfram.clipboard.WXClipboardModule;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
+import com.taobao.weex.appfram.navigator.INavigator;
 import com.taobao.weex.appfram.navigator.WXNavigatorModule;
 import com.taobao.weex.appfram.pickers.WXPickersModule;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
@@ -104,6 +105,7 @@ public class WXSDKEngine implements Serializable {
   public static final String JS_FRAMEWORK_RELOAD="js_framework_reload";
   private static final String V8_SO_NAME = CORE_SO_NAME;
   private volatile static boolean mIsInit = false;
+  private volatile static boolean mIsSoInit = false;
   private static final Object mLock = new Object();
   private static final String TAG = "WXSDKEngine";
 
@@ -140,6 +142,12 @@ public class WXSDKEngine implements Serializable {
     synchronized(mLock) {
 
       return mIsInit && WXEnvironment.JsFrameworkInit;
+    }
+  }
+
+  public static boolean isSoInitialized(){
+    synchronized(mLock) {
+      return mIsSoInit;
     }
   }
 
@@ -214,14 +222,13 @@ public class WXSDKEngine implements Serializable {
         WXSoInstallMgrSdk.init(application,
                 sm.getIWXSoLoaderAdapter(),
                 sm.getWXStatisticsListener());
-        boolean isSoInitSuccess = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
-        if (!isSoInitSuccess) {
+        mIsSoInit = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
+        if (!mIsSoInit) {
           WXExceptionUtils.commitCriticalExceptionRT(null,
                   WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
                   "doInitInternal",
                   WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorMsg() + "isSoInit false",
                   null);
-
           return;
         }
         sm.initScriptsFramework(config!=null?config.getFramework():null);
@@ -304,12 +311,28 @@ public class WXSDKEngine implements Serializable {
               true,
               WXBasicComponentType.SLIDER_NEIGHBOR
       );
+      registerComponent(
+              new SimpleComponentHolder(
+                      WXCell.class,
+                      new WXCell.Creator()
+              ),
+              true,
+              WXBasicComponentType.CELL);
+      registerComponent(
+              new SimpleComponentHolder(
+                      WXListComponent.class,
+                      new WXListComponent.Creator()
+              ),
+              true,
+              WXBasicComponentType.LIST,
+              WXBasicComponentType.VLIST,
+              WXBasicComponentType.RECYCLER,
+              WXBasicComponentType.WATERFALL);
+
       String simpleList = "simplelist";
       registerComponent(SimpleListComponent.class,false,simpleList);
-      registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST,WXBasicComponentType.RECYCLER,WXBasicComponentType.WATERFALL);
       registerComponent(WXRecyclerTemplateList.class, false,WXBasicComponentType.RECYCLE_LIST);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
-      registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
       registerComponent(WXBasicComponentType.CELL_SLOT, WXCell.class, true);
       registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
       registerComponent(WXBasicComponentType.VIDEO, WXVideo.class, false);
@@ -324,18 +347,18 @@ public class WXSDKEngine implements Serializable {
       registerComponent(WXBasicComponentType.LOADING_INDICATOR, WXLoadingIndicator.class);
       registerComponent(WXBasicComponentType.HEADER, WXHeader.class);
 
-      registerModule("modal", WXModalUIModule.class, false);
-      registerModule("instanceWrap", WXInstanceWrap.class, false);
-      registerModule("animation", WXAnimationModule.class, false);
-      registerModule("webview", WXWebViewModule.class, true);
+      registerModule("modal", WXModalUIModule.class);
+      registerModule("instanceWrap", WXInstanceWrap.class);
+      registerModule("animation", WXAnimationModule.class);
+      registerModule("webview", WXWebViewModule.class);
       registerModule("navigator", WXNavigatorModule.class);
       registerModule("stream", WXStreamModule.class);
-      registerModule("timer", WXTimerModule.class, false);
-      registerModule("storage", WXStorageModule.class, true);
-      registerModule("clipboard", WXClipboardModule.class, true);
+      registerModule("timer", WXTimerModule.class);
+      registerModule("storage", WXStorageModule.class);
+      registerModule("clipboard", WXClipboardModule.class);
       registerModule("globalEvent",WXGlobalEventModule.class);
       registerModule("picker", WXPickersModule.class);
-      registerModule("meta", WXMetaModule.class,true);
+      registerModule("meta", WXMetaModule.class);
       registerModule("webSocket", WebSocketModule.class);
       registerModule("locale", WXLocaleModule.class);
     } catch (WXException e) {
@@ -510,6 +533,14 @@ public class WXSDKEngine implements Serializable {
 
   public static IActivityNavBarSetter getActivityNavBarSetter() {
     return WXSDKManager.getInstance().getActivityNavBarSetter();
+  }
+
+  public static INavigator getNavigator() {
+    return WXSDKManager.getInstance().getNavigator();
+  }
+
+  public static  void setNavigator(INavigator navigator) {
+    WXSDKManager.getInstance().setNavigator(navigator);
   }
 
   public static void setActivityNavBarSetter(IActivityNavBarSetter activityNavBarSetter) {

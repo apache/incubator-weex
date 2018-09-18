@@ -22,8 +22,6 @@ import { isRegisteredModule, getModuleDescription } from './module'
 import { isRegisteredComponent } from './component'
 import { getTaskCenter } from '../vdom/operation'
 
-const moduleProxies = {}
-
 function setId (weex, id) {
   Object.defineProperty(weex, '[[CurrentInstanceId]]', { value: id })
 }
@@ -79,37 +77,19 @@ export default class WeexInstance {
       return
     }
 
-    // create new module proxy
-    const proxyName = `${moduleName}#${id}`
-    if (!moduleProxies[proxyName]) {
-      // create registered module apis
-      const moduleDefine = getModuleDescription(moduleName)
-      const moduleApis = {}
-      for (const methodName in moduleDefine) {
-        Object.defineProperty(moduleApis, methodName, {
-          enumerable: true,
-          configurable: true,
-          get: () => moduleGetter(id, moduleName, methodName),
-          set: fn => moduleSetter(id, moduleName, methodName, fn)
-        })
-      }
-
-      // create module Proxy
-      // if (typeof Proxy === 'function') {
-      //   moduleProxies[proxyName] = new Proxy(moduleApis, {
-      //     get (target, methodName) {
-      //       if (methodName in target) {
-      //         return target[methodName]
-      //       }
-      //       console.warn(`[JS Framework] using unregistered method "${moduleName}.${methodName}"`)
-      //       return moduleGetter(id, moduleName, methodName)
-      //     }
-      //   })
-      // }
-      moduleProxies[proxyName] = moduleApis
+    // create registered module apis
+    const moduleProxy = {}
+    const moduleDefine = getModuleDescription(moduleName)
+    for (const methodName in moduleDefine) {
+      Object.defineProperty(moduleProxy, methodName, {
+        enumerable: true,
+        configurable: true,
+        get: () => moduleGetter(id, moduleName, methodName),
+        set: fn => moduleSetter(id, moduleName, methodName, fn)
+      })
     }
 
-    return moduleProxies[proxyName]
+    return moduleProxy
   }
 
   supports (condition) {
@@ -132,7 +112,7 @@ export default class WeexInstance {
   importScript (src, options = {}) {
     const id = getId(this)
     const taskCenter = getTaskCenter(id)
-    return new Promise((resolve, reject) => {
+    return new Promise(function (resolve, reject) {
       if (!taskCenter || typeof taskCenter.send !== 'function') {
         reject(new Error(`[JS Framework] Failed to import script "${src}", `
           + `no taskCenter (${id}) matched.`))

@@ -46,6 +46,7 @@
         
         if (weexInstance && !weexInstance.isJSCreateFinish) {
             weexInstance.performance.timerNum++;
+            [weexInstance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_TIMER_NUM withDiffValue:1];
         }
     }
     
@@ -55,6 +56,19 @@
 - (void)trigger
 {
     [[WXSDKManager bridgeMgr] callBack:_weexInstance.instanceId funcId:_callbackID params:nil keepAlive:_shouldRepeat];
+}
+
++ (void) checkExcuteInBack:(NSString*) instanceId
+{
+    //todo,if instance is nil or instance has detroy ,can't record timer in back.....
+    WXSDKInstance* instance = [WXSDKManager instanceForID:instanceId];
+    if (nil == instance) {
+        return;
+    }
+    if (instance.state == WeexInstanceBackground || instance.state == WeexInstanceDisappear
+        || instance.state == WeexInstanceDestroy) {
+        [instance.apmInstance updateDiffStats:KEY_PAGE_TIMER_BACK_NUM withDiffValue:1];
+    }
 }
 
 @end

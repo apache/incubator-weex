@@ -23,6 +23,7 @@
 #import "WXResourceResponse.h"
 #import "WXResourceRequest.h"
 #import "WXBridgeProtocol.h"
+#import "WXApmForInstance.h"
 
 extern NSString *const bundleUrlOptionKey;
 
@@ -141,6 +142,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSString * bundleType;
 
 /**
+ *  Which decide whether to use data render,default value is false
+ */
+@property (nonatomic, assign, readonly) BOOL dataRender;
+
+/**
  *  The callback triggered when the instance fails to render.
  *
  *  @return A block that takes a NSError argument, which is the error occured
@@ -187,6 +193,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  */
 @property (nonatomic, copy) BOOL (^onRenderTerminateWhenJSDownloadedFinish)(WXResourceResponse *response,WXResourceRequest *request,NSData *data, NSError* error);
 
+@property(nonatomic,strong) NSDictionary* continerInfo;
 
 /**
  *  the frame of current instance.
@@ -285,6 +292,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  */
 - (NSUInteger)numberOfComponents;
 
+/**
+ * Enumerate components using breadth-first search algorithm,
+ must be called on component thread by calling WXPerformBlockOnComponentThread
+ */
+- (void)enumerateComponentsUsingBlock:(void (^)(WXComponent *component, BOOL *stop))block;
 
 /**
  * check whether the module eventName is registered
@@ -310,17 +322,28 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 - (NSURL *)completeURL:(NSString *)url;
 
 /**
+ * jsbundle str ,may be nil (weak)
+ */
+- (NSString*) bundleTemplate;
+
+/**
  * application performance statistics
  */
 @property (nonatomic, strong) NSString *bizType;
 @property (nonatomic, strong) NSString *pageName;
 @property (nonatomic, weak) id pageObject;
+//Deprecated, use @WXApmForInstance
 @property (nonatomic, strong) NSMutableDictionary *performanceDict;
+
+@property (nonatomic ,strong) WXApmForInstance* apmInstance;
+
 
 
 /** 
  * Deprecated 
  */
+
+
 @property (nonatomic, strong) NSDictionary *properties DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, assign) NSTimeInterval networkTime DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, copy) void (^updateFinish)(UIView *);

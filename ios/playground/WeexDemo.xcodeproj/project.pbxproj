@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		17036A5720FDF9AA0029AE3D /* WXApmGeneratorImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 17036A5620FDF9AA0029AE3D /* WXApmGeneratorImpl.m */; };
+		17036A5A20FDF9DF0029AE3D /* WXApmImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 17036A5920FDF9DF0029AE3D /* WXApmImpl.m */; };
 		17C1DB57206B675D000E0CEB /* DebugAnzlyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = 17C1DB56206B675D000E0CEB /* DebugAnzlyzer.m */; };
 		2AE88A2C1C8544E6003329DE /* WXScannerVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AE88A2B1C8544E6003329DE /* WXScannerVC.m */; };
 		564B94671DD9C65000441C8D /* WeexUITestDemo-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 564B94661DD9C65000441C8D /* WeexUITestDemo-Info.plist */; };
 		59EA0DA71D2E7D19004F904A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 59EA0DA61D2E7D19004F904A /* Images.xcassets */; };
-		741DFE091DDDD519009B020F /* libstdc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 741DFE081DDDD519009B020F /* libstdc++.tbd */; };
 		7478481E1E0CD4910044500D /* WXSyncTestModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 7478481D1E0CD4910044500D /* WXSyncTestModule.m */; };
 		747DF6681E2F176A005C53A8 /* UIView+UIThreadCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 747DF6671E2F176A005C53A8 /* UIView+UIThreadCheck.m */; };
 		74CC79EB1C2B9E4700829368 /* UIViewController+WXDemoNaviBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 74CC79EA1C2B9E4700829368 /* UIViewController+WXDemoNaviBar.m */; };
@@ -36,6 +37,7 @@
 		847CAF311F39E3F100551725 /* WXExtModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 847CAF301F39E3F100551725 /* WXExtModule.m */; };
 		84D7CAC71CE3266C00D48D46 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7475ACA01CD8444A0044E96C /* libsqlite3.0.tbd */; };
 		8A0B5EFFF75BF82EA481983D /* libPods-WeexUITestDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E48C20F443AA337D1FE97622 /* libPods-WeexUITestDemo.a */; };
+		B83A6C5220FF16D50053BCEF /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = B83A6C5120FF16D50053BCEF /* libc++.tbd */; };
 		C43CDA031F1C6E01005A6B03 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C43CDA021F1C6E01005A6B03 /* libz.tbd */; };
 		C47B78D21F299E27001D3B0C /* WXExtendCallNativeTest.m in Sources */ = {isa = PBXBuildFile; fileRef = C47B78D11F299E27001D3B0C /* WXExtendCallNativeTest.m */; };
 		DC15A3C7200C505C009C8977 /* WXTitleBarModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DC15A3C6200C505C009C8977 /* WXTitleBarModule.m */; };
@@ -67,6 +69,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		17036A5520FDF9AA0029AE3D /* WXApmGeneratorImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WXApmGeneratorImpl.h; path = extend/handler/WXApmGeneratorImpl.h; sourceTree = "<group>"; };
+		17036A5620FDF9AA0029AE3D /* WXApmGeneratorImpl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WXApmGeneratorImpl.m; path = extend/handler/WXApmGeneratorImpl.m; sourceTree = "<group>"; };
+		17036A5820FDF9DF0029AE3D /* WXApmImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WXApmImpl.h; path = extend/handler/WXApmImpl.h; sourceTree = "<group>"; };
+		17036A5920FDF9DF0029AE3D /* WXApmImpl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WXApmImpl.m; path = extend/handler/WXApmImpl.m; sourceTree = "<group>"; };
 		17C1DB55206B6729000E0CEB /* DebugAnalyzer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DebugAnalyzer.h; path = debug/DebugAnalyzer.h; sourceTree = "<group>"; };
 		17C1DB56206B675D000E0CEB /* DebugAnzlyzer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DebugAnzlyzer.m; path = debug/DebugAnzlyzer.m; sourceTree = "<group>"; };
 		1888E2C5769382461DEDC97D /* Pods-WeexUITestDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeexUITestDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-WeexUITestDemo/Pods-WeexUITestDemo.release.xcconfig"; sourceTree = "<group>"; };
@@ -102,6 +108,7 @@
 		847CAF2F1F39E3F100551725 /* WXExtModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXExtModule.h; sourceTree = "<group>"; };
 		847CAF301F39E3F100551725 /* WXExtModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXExtModule.m; sourceTree = "<group>"; };
 		9420131417A731ED089B0814 /* Pods-WeexDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeexDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-WeexDemo/Pods-WeexDemo.release.xcconfig"; sourceTree = "<group>"; };
+		B83A6C5120FF16D50053BCEF /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		C43CDA021F1C6E01005A6B03 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		C47B78D01F299E27001D3B0C /* WXExtendCallNativeTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXExtendCallNativeTest.h; sourceTree = "<group>"; };
 		C47B78D11F299E27001D3B0C /* WXExtendCallNativeTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXExtendCallNativeTest.m; sourceTree = "<group>"; };
@@ -135,8 +142,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B83A6C5220FF16D50053BCEF /* libc++.tbd in Frameworks */,
 				C43CDA031F1C6E01005A6B03 /* libz.tbd in Frameworks */,
-				741DFE091DDDD519009B020F /* libstdc++.tbd in Frameworks */,
 				DC6DD9D21CFE9BC400549297 /* libsqlite3.0.tbd in Frameworks */,
 				EAEC716BE3E43DBC8494EC51 /* libPods-WeexDemo.a in Frameworks */,
 			);
@@ -176,6 +183,7 @@
 		327BB19797F63D5309FB91BF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B83A6C5120FF16D50053BCEF /* libc++.tbd */,
 				C43CDA021F1C6E01005A6B03 /* libz.tbd */,
 				741DFE081DDDD519009B020F /* libstdc++.tbd */,
 				7475ACA01CD8444A0044E96C /* libsqlite3.0.tbd */,
@@ -336,6 +344,10 @@
 				DC20B8E51ECADA2500845F39 /* WXConfigCenterDefaultImpl.m */,
 				DCABAFFC1D029753001C8592 /* WXImgLoaderDefaultImpl.h */,
 				DCABAFFD1D029753001C8592 /* WXImgLoaderDefaultImpl.m */,
+				17036A5520FDF9AA0029AE3D /* WXApmGeneratorImpl.h */,
+				17036A5620FDF9AA0029AE3D /* WXApmGeneratorImpl.m */,
+				17036A5820FDF9DF0029AE3D /* WXApmImpl.h */,
+				17036A5920FDF9DF0029AE3D /* WXApmImpl.m */,
 			);
 			name = handler;
 			sourceTree = "<group>";
@@ -361,7 +373,6 @@
 				775BEE771C1E8ECC008D1629 /* Sources */,
 				775BEE781C1E8ECC008D1629 /* Frameworks */,
 				775BEE791C1E8ECC008D1629 /* Resources */,
-				685399B3421CD1410375A2AD /* [CP] Embed Pods Frameworks */,
 				C715566148067A7FFAB7797D /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -400,7 +411,6 @@
 				84361D3C1CA10F8E00F43825 /* Frameworks */,
 				84361D431CA10F8E00F43825 /* Resources */,
 				84361D6F1CA10F8E00F43825 /* [CP] Copy Pods Resources */,
-				84361D701CA10F8E00F43825 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -483,20 +493,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		685399B3421CD1410375A2AD /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-WeexDemo/Pods-WeexDemo-frameworks.sh\"\n";
-		};
 		74CC7A221C2C13BF00829368 /* Start Samples */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -526,7 +522,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		84361D6F1CA10F8E00F43825 /* [CP] Copy Pods Resources */ = {
@@ -539,35 +535,26 @@
 				"${PODS_ROOT}/ATSDK-Weex/ATSDK.framework/Versions/A/Resources/ATSDK.bundle",
 				"${PODS_ROOT}/ATSDK-Weex/ATSDK.framework/Versions/A/Resources/en.lproj",
 				"${PODS_ROOT}/ATSDK-Weex/ATSDK.framework/Versions/A/Resources/zh-Hans.lproj",
-				"${PODS_ROOT}/GCanvas/GCanvas.framework/default.glsl",
-				"${PODS_ROOT}/GCanvas/GCanvas.framework/grad.glsl",
-				"${PODS_ROOT}/GCanvas/GCanvas.framework/pattern.glsl",
-				"${PODS_ROOT}/GCanvas/GCanvas.framework/radiation.glsl",
 				"${PODS_ROOT}/../../../pre-build/native-bundle-main.js",
+				"${PODS_ROOT}/../../../pre-build/weex-main-jsfm.js",
+				"${PODS_ROOT}/../../../pre-build/weex-polyfill.js",
+				"${PODS_ROOT}/../../../pre-build/weex-rax-api.js",
 				"${PODS_ROOT}/../../sdk/WeexSDK/Resources/wx_load_error@3x.png",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ATSDK.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/en.lproj",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/zh-Hans.lproj",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/native-bundle-main.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/weex-main-jsfm.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/weex-polyfill.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/weex-rax-api.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/wx_load_error@3x.png",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-WeexUITestDemo/Pods-WeexUITestDemo-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		84361D701CA10F8E00F43825 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-WeexUITestDemo/Pods-WeexUITestDemo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		B5825066F03BDD65A25F2701 /* [CP] Check Pods Manifest.lock */ = {
@@ -585,7 +572,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C715566148067A7FFAB7797D /* [CP] Copy Pods Resources */ = {
@@ -598,16 +585,22 @@
 				"${PODS_ROOT}/ATSDK-Weex/ATSDK.framework/Versions/A/Resources/ATSDK.bundle",
 				"${PODS_ROOT}/ATSDK-Weex/ATSDK.framework/Versions/A/Resources/en.lproj",
 				"${PODS_ROOT}/ATSDK-Weex/ATSDK.framework/Versions/A/Resources/zh-Hans.lproj",
-				"${PODS_ROOT}/GCanvas/GCanvas.framework/default.glsl",
-				"${PODS_ROOT}/GCanvas/GCanvas.framework/grad.glsl",
-				"${PODS_ROOT}/GCanvas/GCanvas.framework/pattern.glsl",
-				"${PODS_ROOT}/GCanvas/GCanvas.framework/radiation.glsl",
 				"${PODS_ROOT}/../../../pre-build/native-bundle-main.js",
+				"${PODS_ROOT}/../../../pre-build/weex-main-jsfm.js",
+				"${PODS_ROOT}/../../../pre-build/weex-polyfill.js",
+				"${PODS_ROOT}/../../../pre-build/weex-rax-api.js",
 				"${PODS_ROOT}/../../sdk/WeexSDK/Resources/wx_load_error@3x.png",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ATSDK.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/en.lproj",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/zh-Hans.lproj",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/native-bundle-main.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/weex-main-jsfm.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/weex-polyfill.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/weex-rax-api.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/wx_load_error@3x.png",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -625,6 +618,7 @@
 				DCABAFF31D029685001C8592 /* WXATLoggerPlugin.m in Sources */,
 				DC15A3D0200E30FC009C8977 /* WXNavigationHandlerImpl.m in Sources */,
 				2AE88A2C1C8544E6003329DE /* WXScannerVC.m in Sources */,
+				17036A5720FDF9AA0029AE3D /* WXApmGeneratorImpl.m in Sources */,
 				775BEE861C1E8ECC008D1629 /* WXDemoViewController.m in Sources */,
 				DC5B53691E8CED9400E02125 /* WXScannerHistoryVC.m in Sources */,
 				74CC79EB1C2B9E4700829368 /* UIViewController+WXDemoNaviBar.m in Sources */,
@@ -633,6 +627,7 @@
 				775BEE831C1E8ECC008D1629 /* AppDelegate.m in Sources */,
 				847CAF311F39E3F100551725 /* WXExtModule.m in Sources */,
 				DC15A3C7200C505C009C8977 /* WXTitleBarModule.m in Sources */,
+				17036A5A20FDF9DF0029AE3D /* WXApmImpl.m in Sources */,
 				DC20B8E61ECADA2500845F39 /* WXConfigCenterDefaultImpl.m in Sources */,
 				DCABAFF41D029685001C8592 /* WXATViewHierarchyPlugin.m in Sources */,
 				775BEE801C1E8ECC008D1629 /* main.m in Sources */,

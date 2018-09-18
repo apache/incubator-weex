@@ -73,6 +73,7 @@ import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.IFComponentHolder;
@@ -169,6 +170,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private String mLastBoxShadowId;
   public int mDeepInComponentTree = 0;
   public boolean mIsAddElementToTree = false;
+  public long interactionTime;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
@@ -517,7 +519,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     };
     try{
       fireEvent(type, params, null, callback);
-      waitLatch.await(10, TimeUnit.MILLISECONDS);
+      waitLatch.await(50, TimeUnit.MILLISECONDS);
       return  callback;
     }catch (Exception e){
       if(WXEnvironment.isApkDebugable()){
@@ -864,13 +866,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (mBackgroundDrawable == null) {
       mBackgroundDrawable = new BorderDrawable();
       if (mHost != null) {
-        WXViewUtils.setBackGround(mHost, null);
+        WXViewUtils.setBackGround(mHost, null, this);
         if (mRippleBackground == null) {
-          WXViewUtils.setBackGround(mHost, mBackgroundDrawable);
+          WXViewUtils.setBackGround(mHost, mBackgroundDrawable, this);
         } else {
           //TODO Not strictly clip according to background-clip:border-box
           WXViewUtils.setBackGround(mHost, new LayerDrawable(new Drawable[]{
-                  mRippleBackground, mBackgroundDrawable}));
+                  mRippleBackground, mBackgroundDrawable}), this);
         }
       }
     }
@@ -932,6 +934,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
 
     if (this instanceof WXCell && realHeight >= WXPerformance.VIEW_LIMIT_HEIGHT && realWidth>=WXPerformance.VIEW_LIMIT_WIDTH){
+      mInstance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_CELL_EXCEED_NUM,1);
       mInstance.getWXPerformance().cellExceedNum++;
     }
 
@@ -946,9 +949,14 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
 
     //calculate first screen time
-    if (!(mHost instanceof ViewGroup) && !mInstance.mEnd && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
-      mInstance.firstScreenRenderFinished();
-      mInstance.mEnd = true;
+    if (!(mHost instanceof ViewGroup) && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
+      if (!mInstance.mEnd){
+        mInstance.onOldFsRenderTimeLogic();
+      }
+      if (!mInstance.isNewFsEnd){
+        mInstance.isNewFsEnd = true;
+        mInstance.getApmForInstance().arriveNewFsRenderTime();
+      }
     }
 
     MeasureOutput measureOutput = measure(realWidth, realHeight);
@@ -1345,7 +1353,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         initView();
       }
       if (mHost != null) {
-        mHost.setId(WXViewUtils.generateViewId());
+        if(mHost.getId() == View.NO_ID)
+          mHost.setId(WXViewUtils.generateViewId());
         if(TextUtils.isEmpty(mHost.getContentDescription()) && WXEnvironment.isApkDebugable()){
           mHost.setContentDescription(getRef());
         }
@@ -1536,10 +1545,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         mRippleBackground = prepareBackgroundRipple();
         if (mRippleBackground != null) {
           if (mBackgroundDrawable == null) {
-            WXViewUtils.setBackGround(mHost, mRippleBackground);
+            WXViewUtils.setBackGround(mHost, mRippleBackground, this);
           } else {
             LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{mRippleBackground, mBackgroundDrawable});
-            WXViewUtils.setBackGround(mHost, layerDrawable);
+            WXViewUtils.setBackGround(mHost, layerDrawable, this);
           }
           return;
         }
@@ -2014,7 +2023,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   private void updateStyleByPesudo(Map<String, Object> styles) {
-    new GraphicActionUpdateStyle(getInstanceId(), getRef(), styles, getPadding(), getMargin(), getBorder(), true)
+    new GraphicActionUpdateStyle(getInstance(), getRef(), styles, getPadding(), getMargin(), getBorder(), true)
             .executeActionOnRender();
     if (getLayoutWidth() == 0 && getLayoutWidth() == 0) {
     } else {
@@ -2171,15 +2180,15 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
 
-  /** component key id in native,
-   *  differ with ref, ref + position
+  /** component uniquie key id in native for recycle-list,
+   *  should be unique for every native component differ with ref
    *  */
   public  String getViewTreeKey(){
     if(mViewTreeKey == null){
       if(getParent() == null){
-        mViewTreeKey = getRef();
+        mViewTreeKey = hashCode() + "_" + getRef();
       }else{
-        mViewTreeKey = getRef() + "_" + getParent().indexOf(this);
+        mViewTreeKey = hashCode() + "_" + getRef() + "_" + getParent().indexOf(this);
       }
     }
     return mViewTreeKey;
@@ -2212,7 +2221,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       if (!TextUtils.isEmpty(pair.first)) {
         final WXAnimationBean animationBean = createAnimationBean(pair.first, pair.second);
         if (animationBean != null) {
-          GraphicActionAnimation action = new GraphicActionAnimation(getInstanceId(), getRef(), animationBean);
+          GraphicActionAnimation action = new GraphicActionAnimation(getInstance(), getRef(), animationBean);
           action.executeAction();
         }
       }

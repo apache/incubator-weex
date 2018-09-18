@@ -17,12 +17,15 @@
  * under the License.
  */
 
+//Deprecated, use @WXApmForInstance
+
 #import "WXSDKInstance.h"
 #import "WXImageComponent.h"
 
 @interface WXPerformance : NSObject
 
 
+@property (nonatomic, assign) double renderUnixTimeOrigin;
 @property (nonatomic, assign) double renderTimeOrigin;
 @property (nonatomic, assign) double jsCreateFinishTime;
 
@@ -59,11 +62,12 @@
 @property (nonatomic,assign) double componentCreateTime;
 
 @property (nonatomic,assign) double newFsRenderTime;
+@property (nonatomic,assign) long lastRealInteractionTime;
 //for performance record
 
 - (void)onViewLoad:(WXComponent *)targetComponent;
 - (void)recordComponentCreatePerformance:(double) diffTime forComponent:(WXComponent *)targetComponent;
-- (void)onInstanceCreateFinish;
+- (void)onInstanceRenderSuccess:(WXSDKInstance*) instance;
 
 @end
 
@@ -71,6 +75,7 @@
 @interface WXSDKInstance ()
 
 @property (nonatomic, assign) BOOL isJSCreateFinish;
+//Deprecated, use @WXApmForInstance
 @property (nonatomic,strong) WXPerformance* performance;
 
 @end

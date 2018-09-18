@@ -152,11 +152,12 @@
     if (params) {
         [dict addEntriesFromDictionary:params];
     }
-    WXRecycleListComponent * recyleListComponent  = (WXRecycleListComponent*)[self getRecycleListComponent];
+    WXRecycleListComponent *recyleListComponent  = (WXRecycleListComponent*)[self getRecycleListComponent];
     if (recyleListComponent) {
-        NSIndexPath * indexPath = [((UICollectionView*)recyleListComponent.view) indexPathForItemAtPoint:[self.view.superview
+        NSIndexPath *indexPath = [((UICollectionView*)recyleListComponent.view) indexPathForItemAtPoint:[self.view.superview
                                                                                                           convertPoint:self.view.center toView:recyleListComponent.view]];
-        NSString * virtualComponentId = [recyleListComponent.dataManager virtualComponentIdWithIndexPath:indexPath];
+        NSString *templateId = [self recursiveFindTemplateIdWithComponent:self];
+        NSString *virtualComponentId = [recyleListComponent.dataManager virtualComponentIdWithIndexPath:indexPath templateId:templateId];
         if (virtualComponentId) {
             dict[@"componentId"] = virtualComponentId;
         }
@@ -166,6 +167,20 @@
     NSString *ref = _templateComponent ? _templateComponent.ref  : self.ref;
     
     [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:ref type:eventName params:dict domChanges:domChanges handlerArguments:handlerArguments];
+}
+
+- (NSString *)recursiveFindTemplateIdWithComponent:(WXComponent *)component
+{
+    if (!component) {
+        return nil;
+    }
+    if ([component isKindOfClass:NSClassFromString(@"WXCellSlotComponent")]) {
+        return nil;
+    }
+    if (component.attributes[@"@templateId"]) {
+        return component.attributes[@"@templateId"];
+    }
+    return [self recursiveFindTemplateIdWithComponent:component.supercomponent];
 }
 
 - (void)addEvent:(NSString *)addEventName
@@ -297,7 +312,14 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
     [self removeTouchCancelEvent];
     [self removeSwipeEvent];
     [self removePseudoTouchEvent];
+}
 
+- (void)_collectSubcomponents:(NSMutableArray *)components
+{
+    for (WXComponent* c in _subcomponents) {
+        [components addObject:c];
+        [c _collectSubcomponents:components];
+    }
 }
 
 #pragma mark - Appear & Disappear

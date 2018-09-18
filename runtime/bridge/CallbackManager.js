@@ -78,8 +78,9 @@ export default class CallbackManager {
     if (typeof callback === 'function') {
       try {
         return callback.call(null, data)
-      } catch (error) {
-        console.error(`[JS Framework] Failed to execute the callback function:\n + ${error.toString()}`)
+      }
+      catch (error) {
+        console.error(`[JS Framework] Failed to execute the callback function:\n ${error.toString()}`)
       }
     }
     return new Error(`invalid callback id "${callbackId}"`)

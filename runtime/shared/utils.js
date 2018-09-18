@@ -69,3 +69,50 @@ export function isEmpty (any) {
   }
   return true
 }
+
+const LEVELS = ['off', 'error', 'warn', 'info', 'log', 'debug']
+let levelMap = {}
+
+/**
+ * Generate map for which types of message will be sent in a certain message level
+ * as the order of LEVELS.
+ */
+export function generateLevelMap () {
+  LEVELS.forEach(level => {
+    const levelIndex = LEVELS.indexOf(level)
+    levelMap[level] = {}
+    LEVELS.forEach(type => {
+      const typeIndex = LEVELS.indexOf(type)
+      if (typeIndex <= levelIndex) {
+        levelMap[level][type] = true
+      }
+    })
+  })
+}
+
+/**
+ * Reset level map to empty object,
+ * then the log level can be toggled at runtime.
+ */
+export function resetLevelMap () {
+  levelMap = {}
+}
+
+/**
+ * Check if a certain type of message will be sent in current log level of env.
+ * @param  {string} type
+ * @return {boolean}
+ */
+export function checkLevel (type) {
+  const logLevel = (global.WXEnvironment && global.WXEnvironment.logLevel) || 'log'
+  return levelMap[logLevel] && levelMap[logLevel][type]
+}
+
+/**
+ * Print debug log regardless of level check.
+ *
+ * This methods can avoid "double level check" compared with using wrapped console.debug
+ */
+export function debugLog (text) {
+  global.nativeLog('wxInteractionAnalyzer: [jsfm]' + text, '__DEBUG')
+}

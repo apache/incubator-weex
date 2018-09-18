@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.action;
 
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.tracing.Stopwatch;
@@ -30,8 +31,8 @@ public class GraphicActionRemoveEvent extends BasicGraphicAction {
 
   private final String mEvent;
 
-  public GraphicActionRemoveEvent(String pageId, String ref, Object event) {
-    super(pageId, ref);
+  public GraphicActionRemoveEvent(WXSDKInstance instance, String ref, Object event) {
+    super(instance, ref);
     this.mEvent = WXEvent.getEventName(event);
   }
 

@@ -18,6 +18,9 @@
  */
 package com.taobao.weex.common;
 
+import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.base.CalledByNative;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.dom.CSSShorthand;
@@ -51,6 +54,8 @@ public interface IWXBridge extends IWXObject {
    * @return
    */
   int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
+
+  void refreshInstance(String instanceId, String namespace, String function, WXJSObject[] args);
 
   /**
    * execute javascript function
@@ -189,4 +194,10 @@ public interface IWXBridge extends IWXObject {
   void registerCoreEnv(String key, String value);
 
   void reportNativeInitStatus(String statusCode, String errorMsg);
+
+  void setTimeoutNative(String callbackId, String time);
+
+  void setJSFrmVersion(String version);
+
+  void resetWXBridge(boolean remoteDebug);
 }

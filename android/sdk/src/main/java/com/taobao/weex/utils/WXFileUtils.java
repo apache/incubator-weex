@@ -192,12 +192,20 @@ public class WXFileUtils {
       if(zipEntry.isDirectory()){
         continue;
       }
-      if(zipEntry.getName().contains("lib/armeabi/") && zipEntry.getName().contains("weex")){
+      if(zipEntry.getName().contains("lib/armeabi/") &&
+              (zipEntry.getName().contains("weex") || zipEntry.getName().equals("libJavaScriptCore.so"))){
         String[] fileNames = zipEntry.getName().split("/");
         String fileName = fileNames[fileNames.length - 1];
         InputStream inputStream = zip.getInputStream(zipEntry);
         byte[] data = new byte[1024];
-        FileOutputStream outputStream =new FileOutputStream(path + "/" + fileName);
+        File zipFile = new File(path + "/" + fileName);
+        if(zipFile.exists()) {
+          zipFile.delete();
+        }
+
+        zipFile.createNewFile();
+
+        FileOutputStream outputStream =new FileOutputStream(zipFile);
         while (inputStream.read(data) != -1) {
           outputStream.write(data);
         }
@@ -208,5 +216,36 @@ public class WXFileUtils {
     zin.closeEntry();
   }
 
+  public static void copyFile(File oldFile, File newFile) {
+    FileInputStream inputStream = null;
+    FileOutputStream outputStream = null;
+    try {
+      inputStream = new FileInputStream(oldFile);
+      byte[] data = new byte[1024];
+      outputStream = new FileOutputStream(newFile);
+      while (inputStream.read(data) != -1) {
+        outputStream.write(data);
+      }
+      inputStream.close();
+      outputStream.close();
+    } catch (Exception e) {
+      WXLogUtils.e("copyFile " + e.getMessage() + ": " + oldFile.getAbsolutePath() + ": " + newFile.getAbsolutePath());
+      if (inputStream != null) {
+        try {
+          inputStream.close();
+        } catch (IOException e1) {
+          e1.printStackTrace();
+        }
+      }
+
+      if (outputStream != null) {
+        try {
+          outputStream.close();
+        } catch (IOException e1) {
+          e1.printStackTrace();
+        }
+      }
+    }
+  }
 
 }

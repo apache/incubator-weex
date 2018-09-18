@@ -44,6 +44,11 @@ struct TypeTrait<int32_t> {
 };
 
 template <>
+struct TypeTrait<int64_t> {
+    static const IPCType s_type = IPCType::INT64;
+};
+
+template <>
 struct TypeTrait<double> {
     static const IPCType s_type = IPCType::DOUBLE;
 };
@@ -66,28 +71,6 @@ private:
     value_type m_value;
     static const IPCType s_type = trait_type::s_type;
 };
-
-class StringResult : public IPCResult {
-public:
-    StringResult(JNIEnv* env, jstring val);
-    ~StringResult();
-
-    const void* getData() override;
-    IPCType getType() override;
-    const uint16_t* getStringContent() override;
-    size_t getStringLength() override;
-    const char* getByteArrayContent() override;
-    size_t getByteArrayLength() override;
-    void setJSON();
-
-private:
-    JNIEnv* m_env;
-    jstring m_value;
-    const jchar* m_cvalue{ nullptr };
-    size_t m_length{ 0U };
-    bool m_isJSON{ false };
-};
-
 
 class ByteArrayResult: public IPCResult{
 public:
@@ -178,56 +161,6 @@ size_t ValueResult<T>::getByteArrayLength()
     return 0U;
 }
 
-StringResult::StringResult(JNIEnv* env, jstring val)
-    : m_env(env)
-    , m_value(static_cast<jstring>(env->NewLocalRef(val)))
-{
-    m_cvalue = env->GetStringChars(m_value, nullptr);
-    m_length = env->GetStringLength(m_value);
-}
-
-StringResult::~StringResult()
-{
-    if (m_cvalue)
-        m_env->ReleaseStringChars(m_value, m_cvalue);
-    m_env->DeleteLocalRef(m_value);
-}
-
-const void* StringResult::getData()
-{
-    return nullptr;
-}
-
-IPCType StringResult::getType()
-{
-    return m_isJSON ? IPCType::JSONSTRING : IPCType::STRING;
-}
-
-const uint16_t* StringResult::getStringContent()
-{
-    return m_cvalue;
-}
-
-size_t StringResult::getStringLength()
-{
-    return m_length;
-}
-
-const char* StringResult::getByteArrayContent()
-{
-    return nullptr;
-}
-
-size_t StringResult::getByteArrayLength()
-{
-    return 0U;
-}
-
-void StringResult::setJSON()
-{
-    m_isJSON = true;
-}
-
 ByteArrayResult::ByteArrayResult(const char* data, size_t length):m_length(length)
 {
     if(length > 0){
@@ -286,21 +219,14 @@ std::unique_ptr<IPCResult> createInt32Result(int32_t val)
     return std::unique_ptr<IPCResult>(new ValueResult<int32_t>(val));
 }
 
+std::unique_ptr<IPCResult> createInt64Result(int64_t val)
+{
+    return std::unique_ptr<IPCResult>(new ValueResult<int64_t>(val));
+}
+
 std::unique_ptr<IPCResult> createDoubleResult(double val)
 {
     return std::unique_ptr<IPCResult>(new ValueResult<double>(val));
-}
-
-std::unique_ptr<IPCResult> createStringResult(JNIEnv* env, jstring str)
-{
-    return std::unique_ptr<IPCResult>(new StringResult(env, str));
-}
-
-std::unique_ptr<IPCResult> createJSONStringResult(JNIEnv* env, jstring str)
-{
-    std::unique_ptr<StringResult> result(new StringResult(env, str));
-    result->setJSON();
-    return std::unique_ptr<IPCResult>(result.release());
 }
 
 std::unique_ptr<IPCResult> createByteArrayResult(const char* data, size_t length){

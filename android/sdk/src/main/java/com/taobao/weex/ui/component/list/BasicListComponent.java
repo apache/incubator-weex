@@ -276,7 +276,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     recyclerViewBaseAdapter.setHasStableIds(true);
     bounceRecyclerView.setRecyclerViewBaseAdapter(recyclerViewBaseAdapter);
     bounceRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-    bounceRecyclerView.getInnerView().clearOnScrollListeners();
     bounceRecyclerView.getInnerView().addOnScrollListener(mViewOnScrollListener);
     if(getAttrs().get(Constants.Name.HAS_FIXED_SIZE) != null){
       boolean hasFixedSize = WXUtils.getBoolean(getAttrs().get(Constants.Name.HAS_FIXED_SIZE), false);
@@ -289,8 +288,14 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         super.onScrollStateChanged(recyclerView, newState);
 
         List<OnWXScrollListener> listeners = getInstance().getWXScrollListeners();
-        if (listeners != null && listeners.size() > 0) {
-          for (OnWXScrollListener listener : listeners) {
+        int size;
+        OnWXScrollListener listener;
+        if (listeners != null && (size = listeners.size()) > 0) {
+          for (int i=0; i<size; ++i) {
+            if(i >= listeners.size()){
+              break;
+            }
+            listener = listeners.get(i);
             if (listener != null) {
               View topView = recyclerView.getChildAt(0);
               if (topView != null) {

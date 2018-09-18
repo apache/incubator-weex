@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.action;
 
+import com.taobao.weex.WXSDKInstance;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKManager;
@@ -29,8 +30,8 @@ public class GraphicActionMoveElement extends BasicGraphicAction {
   private String mParentref;
   private int mIndex;
 
-  public GraphicActionMoveElement(String pageId, String ref, String parentRef, int index) {
-    super(pageId, ref);
+  public GraphicActionMoveElement(WXSDKInstance instance, String ref, String parentRef, int index) {
+    super(instance, ref);
     this.mParentref = parentRef;
     this.mIndex = index;
   }
@@ -45,20 +46,18 @@ public class GraphicActionMoveElement extends BasicGraphicAction {
       return;
     }
 
-    if (component.getHostView() != null && !TextUtils.equals("mComponentType", "video") && !TextUtils.equals("mComponentType", "videoplus")) {
+    if (component.getHostView() != null && !TextUtils.equals(component.getComponentType(), "video") && !TextUtils.equals(component.getComponentType(), "videoplus")) {
       int[] location = new  int[2] ;
       component.getHostView().getLocationInWindow(location);
-      component.getInstance().onChangeElement(oldParent, location[1] > component.getInstance().getWeexHeight() + 1);
     }
 
     oldParent.remove(component, false);
 
     ((WXVContainer) newParent).addChild(component, mIndex);
 
-    if (component.getHostView() != null && !TextUtils.equals("mComponentType", "video") && !TextUtils.equals("mComponentType", "videoplus")) {
+    if (component.getHostView() != null && !TextUtils.equals(component.getComponentType(), "video") && !TextUtils.equals(component.getComponentType(), "videoplus")) {
       int[] location = new  int[2] ;
       component.getHostView().getLocationInWindow(location);
-      component.getInstance().onChangeElement(newParent, location[1] > component.getInstance().getWeexHeight() + 1);
     }
 
     if (!component.isVirtualComponent()) {

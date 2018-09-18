@@ -19,14 +19,16 @@
 package com.taobao.weex.ui.action;
 
 import android.text.TextUtils;
+
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 
 public class GraphicActionRemoveElement extends BasicGraphicAction {
 
-  public GraphicActionRemoveElement(String pageId, String ref) {
-    super(pageId, ref);
+  public GraphicActionRemoveElement(WXSDKInstance instance, String ref) {
+    super(instance, ref);
   }
 
   @Override
@@ -38,10 +40,10 @@ public class GraphicActionRemoveElement extends BasicGraphicAction {
     clearRegistryForComponent(component);
     WXVContainer parent = component.getParent();
 
-    if (component.getHostView() != null && !TextUtils.equals("mComponentType", "video") && !TextUtils.equals("mComponentType", "videoplus")) {
+    if (component.getHostView() != null && !TextUtils.equals(component.getComponentType(), "video") && !TextUtils.equals(component.getComponentType(), "videoplus")) {
       int[] location = new  int[2];
       component.getHostView().getLocationInWindow(location);
-      component.getInstance().onChangeElement(parent, location[1] > component.getInstance().getWeexHeight() + 1);
+      //component.getInstance().onChangeElement(parent, location[1] > component.getInstance().getWeexHeight() + 1);
     }
 
     parent.remove(component, true);

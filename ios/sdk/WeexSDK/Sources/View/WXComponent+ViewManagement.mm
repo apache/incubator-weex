@@ -175,6 +175,7 @@ do {\
         _lastBoxShadow = _boxShadow;
     }
 }
+
 - (void)_transitionUpdateViewProperty:(NSDictionary *)styles
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
@@ -230,11 +231,9 @@ do {\
             if (positionType == WXPositionTypeFixed) {
                 [self.weexInstance.componentManager addFixedComponent:self];
                 _isNeedJoinLayoutSystem = NO;
-                [self.supercomponent _recomputeCSSNodeChildren];
             } else if (_positionType == WXPositionTypeFixed) {
                 [self.weexInstance.componentManager removeFixedComponent:self];
                 _isNeedJoinLayoutSystem = YES;
-                [self.supercomponent _recomputeCSSNodeChildren];
             }
             
             _positionType = positionType;
@@ -258,7 +257,7 @@ do {\
             [_layer setNeedsDisplay];
         }
         self.transform = transform;
-    }else if (styles[@"transformOrigin"]) {
+    } else if (styles[@"transformOrigin"]) {
         [_transform setTransformOrigin:[WXConvert NSString:styles[@"transformOrigin"]]];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [_transform applyTransformForView:_view];
@@ -267,7 +266,7 @@ do {\
     }
 }
 
--(void)resetBorder:(NSArray *)styles
+- (void)resetBorder:(NSArray *)styles
 {
     WX_BOARD_RADIUS_RESET_ALL(borderRadius);
     WX_BOARD_RADIUS_RESET(borderTopLeftRadius);
@@ -288,7 +287,7 @@ do {\
     WX_BOARD_COLOR_RESET(borderBottomColor);
 }
 
--(void)_resetStyles:(NSArray *)styles
+- (void)_resetStyles:(NSArray *)styles
 {
     if (styles && [styles containsObject:@"backgroundColor"]) {
         _backgroundColor = [UIColor clearColor];
@@ -321,7 +320,7 @@ do {\
     
     [self _removeAllEvents];
     
-    if(self.ancestorScroller){
+    if (self.ancestorScroller) {
         [self.ancestorScroller removeStickyComponent:self];
         [self.ancestorScroller removeScrollToListener:self];
     }

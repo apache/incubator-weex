@@ -22,10 +22,12 @@ import android.text.TextUtils;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.HashMap;
@@ -37,26 +39,11 @@ import java.util.Set;
  * Component factory
  */
 public class WXComponentFactory {
-  private static Map<String, Set<String>> sComponentTypes = new HashMap<>();
-
-  public static Set<String> getComponentTypesByInstanceId(String instanceId) {
-    return sComponentTypes.get(instanceId);
-  }
-
-  public static void removeComponentTypesByInstanceId(String instanceId) {
-    sComponentTypes.remove(instanceId);
-  }
 
   public static WXComponent newInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     if (instance == null || TextUtils.isEmpty(basicComponentData.mComponentType)) {
       return null;
     }
-
-    if (sComponentTypes.get(instance.getInstanceId()) == null) {
-      Set<String> types = new HashSet<>();
-      sComponentTypes.put(instance.getInstanceId(), types);
-    }
-    sComponentTypes.get(instance.getInstanceId()).add(basicComponentData.mComponentType);
 
     IFComponentHolder holder = WXComponentRegistry.getComponent(basicComponentData.mComponentType);
     if (holder == null) {
@@ -68,7 +55,10 @@ public class WXComponentFactory {
       //For compatible reason of JS framework, unregistered type will be treated as container.
       holder = WXComponentRegistry.getComponent(WXBasicComponentType.CONTAINER);
       if (holder == null) {
-        throw new WXRuntimeException("Container component not found.");
+        WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
+                WXErrorCode.WX_RENDER_ERR_COMPONENT_NOT_REGISTER, "createComponent",
+                basicComponentData.mComponentType + " not registered", null);
+        return null;
       }
     }
 

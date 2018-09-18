@@ -18,38 +18,31 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.support.annotation.NonNull;
+
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 
 public class GraphicActionRenderSuccess extends BasicGraphicAction {
 
-    private int mLayoutWidth;
-    private int mLayoutHeight;
-
-    public GraphicActionRenderSuccess(String pageId) {
-        super(pageId, "");
-        final WXSDKInstance instance = WXSDKManager.getInstance()
-                .getWXRenderManager().getWXSDKInstance(pageId);
-        if (instance == null) {
-            return;
-        }
-        WXComponent component = instance.getRootComponent();
-        if (null != component) {
-            this.mLayoutWidth = (int) component.getLayoutWidth();
-            this.mLayoutHeight = (int) component.getLayoutHeight();
-        }
+    public GraphicActionRenderSuccess(@NonNull WXSDKInstance instance) {
+        super(instance, "");
     }
 
     @Override
     public void executeAction() {
-        final WXSDKInstance instance = WXSDKManager.getInstance()
-                .getWXRenderManager().getWXSDKInstance(getPageId());
+        final WXSDKInstance instance = getWXSDKIntance();
         if (instance == null || instance.getContext() == null) {
             return;
         }
-
-        instance.onRenderSuccess(mLayoutWidth, mLayoutHeight);
+        WXComponent component = instance.getRootComponent();
+        int layoutWidth = 0;
+        int layoutHeight = 0;
+        if (null != component) {
+            layoutWidth = (int) component.getLayoutWidth();
+            layoutHeight = (int) component.getLayoutHeight();
+        }
+        instance.onRenderSuccess(layoutWidth, layoutHeight);
     }
 
 }

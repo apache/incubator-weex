@@ -46,7 +46,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   private static final String TAG = "WXVContainer";
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
   private BoxShadowHost mBoxShadowHost;
-  private  boolean requestDisallowInterceptTouchEvent = false;
 
   @Deprecated
   public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
@@ -312,6 +311,10 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     } else {
       getRealView().addView(child, index);
     }
+    WXSDKInstance instance = getInstance();
+    if (null != instance){
+      instance.getExceptionRecorder().hasAddView.set(true);
+    }
   }
 
   public void remove(WXComponent child, boolean destroy) {
@@ -541,14 +544,14 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
 
   public void requestDisallowInterceptTouchEvent(boolean requestDisallowInterceptTouchEvent) {
-    if(this.requestDisallowInterceptTouchEvent != requestDisallowInterceptTouchEvent){
-      this.requestDisallowInterceptTouchEvent = requestDisallowInterceptTouchEvent;
-      if(mGesture != null){
-        mGesture.setRequestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
+    if(mGesture != null){
+      if(mGesture.isRequestDisallowInterceptTouchEvent()){
+        return;
       }
-      if(getParent() != null){
-        getParent().requestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
-      }
+      mGesture.setRequestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
+    }
+    if(getParent() != null){
+      getParent().requestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
     }
   }
 
@@ -574,7 +577,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
         WXLogUtils.d("BoxShadow", "Draw box-shadow with BoxShadowHost on div: " + toString());
         if (mBoxShadowHost == null) {
           mBoxShadowHost = new BoxShadowHost(getContext());
-          WXViewUtils.setBackGround(mBoxShadowHost, null);
+          WXViewUtils.setBackGround(mBoxShadowHost, null, this);
 
           CSSShorthand padding = this.getPadding();
           CSSShorthand border = this.getBorder();
