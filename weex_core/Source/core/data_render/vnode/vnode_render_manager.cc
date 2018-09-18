@@ -233,7 +233,7 @@ void VNodeRenderManager::CreatePage(const char* contents, unsigned long length, 
         return;
     }
     CreatePageInternal(page_id, exec_state->context()->root());
-    exec_state->context()->Reset();
+    //exec_state->context()->Reset();
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
 
     LOGE("DATA_RENDER, All time %lld", duration_post.count());
@@ -271,8 +271,7 @@ bool VNodeRenderManager::ClosePage(const std::string& page_id) {
   if (it == exec_states_.end()) {
     return false;
   }
-  ExecState* exec_state = it->second;
-
+  ExecState *exec_state = it->second;
   ClosePageInternal(page_id);
   delete exec_state;
   exec_states_.erase(it);
