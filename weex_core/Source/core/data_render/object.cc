@@ -19,7 +19,6 @@
 
 #include <sstream>
 #include "core/data_render/object.h"
-#include "core/data_render/vm_mem.h"
 
 namespace weex {
 namespace core {
@@ -57,58 +56,228 @@ int ToInteger(const Value *o, const int &mode, int64_t &v) {
     return 0;
   }
 }
-
-bool ValueEqulas(const Value *a, const Value *b) {
-  double d1, d2;
-  if (IsNumber(a)) {
-    return NumEq(NumValue(a), NumValue(b));
-  } else if (IsInt(a)) {
-    return IntValue(a) == IntValue(b);
-  } else if (IsBool(a)) {
-    return BoolValue(a) == BoolValue(b);
-  } else if (ToNum(a, d1) && ToNum(b, d2)) {
-    return NumEq(d1, d2);
-  } else {
-    return false;
-  }
+        
+bool ObjectEquals(const Value *a, const Value *b) {
+    bool equal = false;
+    do {
+        if (a->type != b->type) {
+            break;
+        }
+        switch (a->type) {
+            case Value::STRING:
+            {
+                equal = std::string(CStringValue(a)) == std::string(CStringValue(b));
+                break;
+            }
+            case Value::BOOL:
+            {
+                equal = BoolValue(a) == BoolValue(b);
+                break;
+            }
+            case Value::INT:
+            {
+                equal = IntValue(a) == IntValue(b);
+                break;
+            }
+            case Value::NUMBER:
+            {
+                equal = NumValue(a) == NumValue(b);
+                break;
+            }
+            default:
+                break;
+        }
+        
+    } while (0);
+    
+    return equal;
 }
 
-bool ValueLE(const Value *a, const Value *b) {
-  double d1, d2;
-  d1 = NumValue(a);
-  d2 = NumValue(b);
-  if (IsNumber(a) && IsNumber(b)) {
-    return NumLT(d1, d2) || NumEq(d1, d2);
-  } else if (IsInt(a) && IsInt(b)) {
-    return IntValue(a) <= IntValue(b);
-  } else if (ToNum(a, d1) && ToNum(b, d2)) {
-    return NumLT(d1, d2) || NumEq(d1, d2);
-  } else {
+bool ValueEquals(const Value *a, const Value *b) {
+    double d1, d2;
+    if (IsNumber(a)) {
+        return NumEq(NumValue(a), NumValue(b));
+    }
+    else if (IsInt(a)) {
+        return IntValue(a) == IntValue(b);
+    }
+    else if (IsBool(a)) {
+        return BoolValue(a) == BoolValue(b);
+    }
+    else if (ToNum(a, d1) && ToNum(b, d2)) {
+        return NumEq(d1, d2);
+    }
+    else if (IsString(a) && IsString(b)) {
+        return strcmp(CStringValue(a), CStringValue(b)) == 0;
+    }
+    else {
+        return false;
+    }
+}
+    
+bool ValueStrictEquals(const Value *a, const Value *b) {
+    double d1, d2;
+    if (IsNumber(a)) {
+        return NumEq(NumValue(a), NumValue(b));
+    }
+    else if (IsInt(a)) {
+        return IntValue(a) == IntValue(b);
+    }
+    else if (IsBool(a)) {
+        return BoolValue(a) == BoolValue(b);
+    }
+    else if (ToNum(a, d1) && ToNum(b, d2)) {
+        return NumEq(d1, d2);
+    }
+    else if (IsString(a) && IsString(b)) {
+        return strcmp(CStringValue(a), CStringValue(b)) == 0;
+    }
+    else if (IsNil(a)) {
+        return IsNil(b) ? true : false;
+    }
+    else if (IsNil(b)) {
+        return IsNil(a) ? true : false;
+    }
+    else {
+        return false;
+    }
+}
+    
+bool ValueAND(const Value *a, const Value *b) {
+    if (IsBool(a) && IsBool(b)) {
+        return BoolValue(a) && BoolValue(b);
+    }
     return false;
-  }
+}
+    
+bool ValueOR(const Value *a, const Value *b) {
+    if (IsBool(a) && IsBool(b)) {
+        return BoolValue(a) || BoolValue(b);
+    }
+    return false;
 }
 
 bool ValueLT(const Value *a, const Value *b) {
-  double d1, d2;
-  if (IsNumber(a) && IsNumber(b)) {
-    return NumLT(NumValue(a), NumValue(b));
-  } else if (IsInt(a) && IsInt(b)) {
-    return IntValue(a) < IntValue(b);
-  } else if (ToNum(a, d1) && ToNum(b, d2)) {
-    return NumLT(d1, d2);
-  } else {
-    return false;
-  }
+    double d1, d2;
+    if (IsNumber(a) && IsNumber(b)) {
+        return NumLT(NumValue(a), NumValue(b));
+    }
+    else if (IsInt(a) && IsInt(b)) {
+        return IntValue(a) < IntValue(b);
+    }
+    else if (ToNum(a, d1) && ToNum(b, d2)) {
+        return NumLT(d1, d2);
+    }
+    else {
+        return false;
+    }
+}
+    
+bool ValueLTE(const Value *a, const Value *b) {
+    double d1, d2;
+    if (IsNumber(a) && IsNumber(b)) {
+        return NumLTE(NumValue(a), NumValue(b));
+    }
+    else if (IsInt(a) && IsInt(b)) {
+        return IntValue(a) <= IntValue(b);
+    }
+    else if (ToNum(a, d1) && ToNum(b, d2)) {
+        return NumLTE(d1, d2);
+    }
+    else {
+        return false;
+    }
+}
+    
+bool ValueGT(const Value *a, const Value *b) {
+    double d1, d2;
+    if (IsNumber(a) && IsNumber(b)) {
+        return NumGT(NumValue(a), NumValue(b));
+    }
+    else if (IsInt(a) && IsInt(b)) {
+        return IntValue(a) > IntValue(b);
+    }
+    else if (ToNum(a, d1) && ToNum(b, d2)) {
+        return NumGT(d1, d2);
+    }
+    else {
+        return false;
+    }
 }
 
-void FreeValue(Value *o) {
-  if (nullptr == o) {
-    return;
-  }
-  if (Value::Type::TABLE == o->type) {
-    freeMem(o->gc);
-    delete o;
-  }
+bool ValueGTE(const Value *a, const Value *b) {
+    double d1, d2;
+    if (IsNumber(a) && IsNumber(b)) {
+        return NumGTE(NumValue(a), NumValue(b));
+    }
+    else if (IsInt(a) && IsInt(b)) {
+        return IntValue(a) >= IntValue(b);
+    }
+    else if (ToNum(a, d1) && ToNum(b, d2)) {
+        return NumGTE(d1, d2);
+    }
+    else {
+        return false;
+    }
+}
+
+Value* Variables::Find(int index) {
+    if (index >= values_.size() || index < 0) {
+        return nullptr;
+    }
+    return &values_[index];
+}
+
+int Variables::IndexOf(const std::string& name) {
+    auto iter = map_.find(name);
+    if (iter != map_.end()) {
+        return iter->second;
+    }
+    return -1;
+}
+
+int Variables::Add(const std::string& name, Value value) {
+    auto iter = map_.find(name);
+    if (iter != map_.end()) {
+        return iter->second;
+    }
+    values_.push_back(value);
+    GCRetain(&value);
+    int index = (int)values_.size() - 1;
+    map_.insert(std::make_pair(name, index));
+    return index;
+}
+
+int Variables::Add(Value value) {
+    values_.push_back(value);
+    GCRetain(&value);
+    return (int)values_.size() - 1;
+}
+
+int Variables::Set(const std::string& name, Value value) {
+    auto iter = map_.find(name);
+    if (iter != map_.end()) {
+        int index = iter->second;
+        GCRelease(&values_[static_cast<size_t>(index)]);
+        values_[static_cast<size_t>(index)] = value;
+        GCRetain(&values_[static_cast<size_t>(index)]);
+        return index;
+    }
+    else {
+        values_.push_back(value);
+        int index = (int)values_.size() - 1;
+        map_.insert(std::make_pair(name, index));
+        GCRetain(&value);
+        return index;
+    }
+}
+    
+void SetRefValue(Value *o) {
+    Value *value = o;
+    while (value->ref) {
+        *value->ref = *value;
+        value = value->ref;
+    }
 }
 
 }  // namespace data_render

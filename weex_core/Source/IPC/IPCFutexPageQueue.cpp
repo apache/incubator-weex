@@ -140,7 +140,7 @@ void IPCFutexPageQueue::lock(size_t id, bool checkFinish)
             volatile uint32_t* pageStart1 = static_cast<volatile uint32_t*>(getPage(1));
             volatile uint32_t* pageStart2 = static_cast<volatile uint32_t*>(getPage(2));
             volatile uint32_t* pageStart3 = static_cast<volatile uint32_t*>(getPage(3));
-            throw IPCException("futex lock pi failed: %s, %x %x (%x %x %x %x)", strerror(errno), *pageStart, m_tid, *pageStart0, *pageStart1, *pageStart2, *pageStart3);
+            throw IPCException("futex lock pi failed: %s, %x %d (%x %x %x %x)", strerror(errno), *pageStart, m_tid, *pageStart0, *pageStart1, *pageStart2, *pageStart3);
         }
         if (futexReturn == -1)
             continue;

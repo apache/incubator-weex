@@ -35,7 +35,6 @@
 #import "WXComponent+Events.h"
 #import "WXRecyclerDragController.h"
 #import "WXComponent+Layout.h"
-#import "WXScrollerComponent+Layout.h"
 
 static NSString * const kCollectionCellReuseIdentifier = @"WXRecyclerCell";
 static NSString * const kCollectionHeaderReuseIdentifier = @"WXRecyclerHeader";
@@ -52,6 +51,16 @@ typedef enum : NSUInteger {
 @end
 
 @implementation WXCollectionView
+
+- (void)dealloc
+{
+    self.delegate = nil;
+    self.dataSource = nil;
+    if ([self.collectionViewLayout isKindOfClass:[WXMultiColumnLayout class]]) {
+        WXMultiColumnLayout* wxLayout = (WXMultiColumnLayout *)self.collectionViewLayout;
+        wxLayout.weak_collectionView = nil;
+    }
+}
 
 - (void)insertSubview:(UIView *)view atIndex:(NSInteger)index
 {
@@ -171,6 +180,10 @@ typedef enum : NSUInteger {
 {
     _collectionView.delegate = nil;
     _collectionView.dataSource = nil;
+    if ([_collectionViewlayout isKindOfClass:[WXMultiColumnLayout class]]) {
+        WXMultiColumnLayout* wxLayout = (WXMultiColumnLayout *)_collectionViewlayout;
+        wxLayout.weak_collectionView = nil;
+    }
 }
 
 #pragma mark - Public Subclass Methods
@@ -189,7 +202,10 @@ typedef enum : NSUInteger {
     _collectionView.allowsMultipleSelection = NO;
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
-    
+    if ([_collectionViewlayout isKindOfClass:[WXMultiColumnLayout class]]) {
+        WXMultiColumnLayout* wxLayout = (WXMultiColumnLayout *)_collectionViewlayout;
+        wxLayout.weak_collectionView = _collectionView;
+    }
     [_collectionView registerClass:[WXCollectionViewCell class] forCellWithReuseIdentifier:kCollectionCellReuseIdentifier];
     [_collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:kCollectionSupplementaryViewKindHeader withReuseIdentifier:kCollectionHeaderReuseIdentifier];
     
@@ -207,6 +223,10 @@ typedef enum : NSUInteger {
     
     _collectionView.dataSource = nil;
     _collectionView.delegate = nil;
+    if ([_collectionViewlayout isKindOfClass:[WXMultiColumnLayout class]]) {
+        WXMultiColumnLayout* wxLayout = (WXMultiColumnLayout *)_collectionViewlayout;
+        wxLayout.weak_collectionView = nil;
+    }
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
@@ -340,7 +360,7 @@ typedef enum : NSUInteger {
     [_updateController performUpdatesWithNewData:newData oldData:oldData view:_collectionView];
 }
 
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
+- (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
     if ([subcomponent isKindOfClass:[WXCellComponent class]]) {
         ((WXCellComponent *)subcomponent).delegate = self;
@@ -348,18 +368,20 @@ typedef enum : NSUInteger {
         ((WXHeaderComponent *)subcomponent).delegate = self;
     }
     
-    [super _insertSubcomponent:subcomponent atIndex:index];
+    BOOL inserted = [super _insertSubcomponent:subcomponent atIndex:index];
     
     if (![subcomponent isKindOfClass:[WXHeaderComponent class]]
         && ![subcomponent isKindOfClass:[WXCellComponent class]]) {
-        return;
+        return inserted;
     }
     
     WXPerformBlockOnMainThread(^{
         [self performUpdatesWithCompletion:^(BOOL finished) {
-            
+            // void
         }];
     });
+    
+    return inserted;
 }
 
 - (void)insertSubview:(WXComponent *)subcomponent atIndex:(NSInteger)index
@@ -468,7 +490,7 @@ typedef enum : NSUInteger {
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView contentWidthForLayout:(UICollectionViewLayout *)collectionViewLayout
 {
-        return self.flexScrollerCSSNode->getStyleWidth();
+    return [self safeContainerStyleWidth];
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout heightForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -638,6 +660,10 @@ typedef enum : NSUInteger {
 
 - (void)_fillPadding
 {
+    if (self.flexCssNode == nullptr) {
+        return;
+    }
+    
     UIEdgeInsets padding = {
             WXFloorPixelValue(self.flexCssNode->getPaddingTop() + self.flexCssNode->getBorderWidthTop()),
             WXFloorPixelValue(self.flexCssNode->getPaddingLeft() + self.flexCssNode->getBorderWidthLeft()),

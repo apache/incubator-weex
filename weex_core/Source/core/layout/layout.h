@@ -160,8 +160,8 @@ namespace WeexCore {
         mLayoutResult = new WXCorelayoutResult();
       }
 
-      ~WXCoreLayoutNode() {
-          mIsDestroy = true;
+      virtual ~WXCoreLayoutNode() {
+        mIsDestroy = true;
         mHasNewLayout = true;
         dirty = true;
         measureFunc = nullptr;
@@ -234,10 +234,12 @@ namespace WeexCore {
     bool dirty, widthDirty, heightDirty;
 
     bool mIsDestroy = true;
+      
+    bool mNeedsPlatformDependentLayout = false;
 
     WXCoreMeasureFunc measureFunc = nullptr;
 
-    void *context;
+    void *context = nullptr;
 
     /** ================================ Cache：Last calculate result =================================== **/
 
@@ -304,7 +306,16 @@ namespace WeexCore {
         markDirty();
       }
     }
-
+      
+      /** ================================ custom =================================== **/
+    inline bool getNeedsPlatformDependentLayout() const {
+      return mNeedsPlatformDependentLayout;
+    }
+      
+    inline void setNeedsPlatformDependentLayout(bool v) {
+      this->mNeedsPlatformDependentLayout = v;
+    }
+      
   private:
 
     /** ================================ measure =================================== **/
@@ -1144,6 +1155,13 @@ namespace WeexCore {
         }
       }
     }
+      
+    void markAllDirty() {
+      markDirty(false);
+      for (WXCoreLayoutNode* c : mChildList) {
+          c->markAllDirty();
+      }
+    }
 
     bool markChildrenDirty(const bool updatedNode = false) {
       bool ret = false;
@@ -1174,6 +1192,17 @@ namespace WeexCore {
         largestSize = std::max(largestSize, flexLine->mMainSize);
       }
       return largestSize + sumPaddingBorderAlongAxis(this, isMainAxisHorizontal(this));
+    }
+      
+    inline void rewriteLayoutResult(float left, float top, float width, float height) {
+      if (mLayoutResult != nullptr) {
+          mLayoutResult->mLayoutPosition.setPosition(kPositionEdgeLeft, left);
+          mLayoutResult->mLayoutPosition.setPosition(kPositionEdgeTop, top);
+          mLayoutResult->mLayoutPosition.setPosition(kPositionEdgeRight, left + width);
+          mLayoutResult->mLayoutPosition.setPosition(kPositionEdgeBottom, top + height);
+          mLayoutResult->mLayoutSize.width = width;
+          mLayoutResult->mLayoutSize.height = height;
+      }
     }
   };
 }

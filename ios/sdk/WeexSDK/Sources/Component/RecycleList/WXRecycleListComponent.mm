@@ -510,9 +510,9 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 
 #pragma mark - WXComponent Internal Methods
 
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
+- (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
-   [super _insertSubcomponent:subcomponent atIndex:index];
+    BOOL inserted = [super _insertSubcomponent:subcomponent atIndex:index];
     if ([subcomponent isKindOfClass:[WXCellSlotComponent class]]) {
         WXCellSlotComponent *cell = (WXCellSlotComponent*)subcomponent;
         [self.weexInstance.componentManager _addUITask:^{
@@ -520,6 +520,7 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
         }];
         //TODO: update collection view if adding template
     }
+    return inserted;
 }
 
 #pragma mark - Private
@@ -584,7 +585,9 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 {
     if (![newData isKindOfClass:[NSArray class]]) {
         WXLogError(@"wrong format of list data:%@", newData);
-        completion(NO);
+        if (completion) {
+            completion(NO);
+        }
         return;
     }
     

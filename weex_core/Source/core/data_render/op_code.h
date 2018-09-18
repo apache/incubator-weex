@@ -29,11 +29,23 @@ enum OpCode {
   OP_LOADNULL,   //	A       R(A) = null
   OP_GETGLOBAL,  //	A Bx	R(A) = Global[B]
   OP_GETFUNC,    //	A Bx  	R(A) = Function[B]
-
-  OP_NEWTABLE,  // A B C   R(A) = {} (size = B,C)
+  OP_NEW,
+  OP_GETCLASS,   // A B C R(A) = B->C
+  OP_GETMEMBER,
+  OP_GETMEMBERVAR,
+  OP_SETMEMBERVAR,
+  OP_GETSUPER,   // A B C     R(A) = super[B] C = super func
+  
+  OP_SETOUTVAR,     // A B C R(A) = B->C
+  OP_RESETOUTVAR,
+  OP_GETOUTVAR,     // A B C R(A) = B->C
+    
   OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)
-  OP_GETTABLE,  //	A B C	R(A) = R(B)[R(C)]
 
+  OP_SETARRAY,  //    A B C    R(A)[R(B)] = RK(C)
+  OP_GETINDEX,  //    A B C    R(A) = R(B)[R(C)]
+  OP_GETINDEXVAR,
+    
   OP_ADD,   //	A B C	R(A) = R(B) + R(C)
   OP_SUB,   //	A B C	R(A) = R(B) - R(C)
   OP_MUL,   //	A B C	R(A) = R(B) * R(C)
@@ -52,17 +64,27 @@ enum OpCode {
   OP_JMP,   //	A Bx	if (!R(A)) pc += Bx
   OP_GOTO,  //   Ax      pc = Ax
   OP_EQ,    //	A B C	R(A) = R(B) == R(C)
+  OP_SEQ,
   OP_LT,    //	A B C	R(A) = R(A) <  R(B)
-  OP_LE,    //	A B C	R(A) = R(A) <= R(B)
+  OP_LTE,
+  OP_GT,
+  OP_GTE,
+  OP_AND,
+  OP_OR,
+  OP_IN,
+  OP_NOT,
 
   OP_CALL,     //	A B C	R(A) = R(B)(R(B+1), ... ,R(B+C-1))
   OP_RETURN0,  //	Return
   OP_RETURN1,  //	Return R(A)
 
-  OP_INVALID,
-
   OP_PRE_INCR,  // A      if (B >= 0) R(B) = ++R(A) else ++R(A)
   OP_PRE_DECR,  // A      if (B >= 0) R(B) = --R(A) else --R(A)
+    
+  OP_POST_INCR,  // A      if (B >= 0) R(B) = R(A)++ else R(A)++
+  OP_POST_DECR,  // A      if (B >= 0) R(B) = R(A)++ else R(A)--
+
+  OP_INVALID,
 
 };
 

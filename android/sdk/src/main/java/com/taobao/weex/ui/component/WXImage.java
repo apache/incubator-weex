@@ -208,6 +208,14 @@ public class WXImage extends WXComponent<ImageView> {
 
   @WXComponentProp(name = Constants.Name.SRC)
   public void setSrc(String src) {
+
+    if (getInstance().getImageNetworkHandler() != null) {
+      String localUrl = getInstance().getImageNetworkHandler().fetchLocal(src);
+      if (!TextUtils.isEmpty(localUrl)) {
+        src = localUrl;
+      }
+    }
+
     if (src == null) {
       return;
     }
@@ -473,10 +481,17 @@ public class WXImage extends WXComponent<ImageView> {
     int imgWidth = img.getIntrinsicWidth();
     if (!preImgUrlStr.equals(currentImgUrlStr)){
       preImgUrlStr = currentImgUrlStr;
-      if (imgHeight > 1921 && imgWidth > 1081){
+      if (imgHeight > 1081 && imgWidth > 721){
         instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_LARGE_IMG_COUNT,1);
       }
-      if (imgHeight * imgWidth > imageView.getMeasuredHeight() * imageView.getMeasuredWidth() +10){
+      long imgSize = imgHeight * imgWidth;
+      long viewSize = imageView.getMeasuredHeight() * imageView.getMeasuredWidth();
+      if (viewSize == 0){
+          return;
+      }
+      double scaleSize =  imgSize/(double)viewSize;
+      //max diff 40*40
+      if (scaleSize >1.2 && imgSize-viewSize > 1600){
         instance.getWXPerformance().wrongImgSizeCount++;
         instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,1);
       }

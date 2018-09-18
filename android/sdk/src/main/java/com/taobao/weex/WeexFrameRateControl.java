@@ -22,10 +22,11 @@ package com.taobao.weex;
  * Created by shiwentao on 2017/8/24.
  */
 
-import android.annotation.TargetApi;
+import android.annotation.SuppressLint;
 import android.os.Build;
+import android.util.Log;
 import android.view.Choreographer;
-
+import com.taobao.weex.common.WXErrorCode;
 import java.lang.ref.WeakReference;
 
 public class WeexFrameRateControl {
@@ -44,11 +45,21 @@ public class WeexFrameRateControl {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
             mChoreographer = Choreographer.getInstance();
             mVSyncFrameCallback = new Choreographer.FrameCallback() {
+                @SuppressLint("NewApi")
                 @Override
                 public void doFrame(long frameTimeNanos) {
-                    mChoreographer.postFrameCallback(mVSyncFrameCallback);
-                    if (mListener != null && mListener.get() != null) {
-                        mListener.get().OnVSync();
+                    VSyncListener vSyncListener;
+                    if (mListener != null && (vSyncListener=mListener.get()) != null) {
+                        try {
+                            vSyncListener.OnVSync();
+                            mChoreographer.postFrameCallback(mVSyncFrameCallback);
+                        }catch (UnsatisfiedLinkError e){
+                            if(vSyncListener instanceof WXSDKInstance){
+                                ((WXSDKInstance) vSyncListener).onRenderError(
+                                    WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
+                                    Log.getStackTraceString(e));
+                            }
+                        }
                     }
                 }
             };
@@ -58,9 +69,18 @@ public class WeexFrameRateControl {
             runnable = new Runnable() {
                 @Override
                 public void run() {
-                    WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(runnable, VSYNC_FRAME);
-                    if (mListener != null && mListener.get() != null) {
-                        mListener.get().OnVSync();
+                    VSyncListener vSyncListener;
+                    if (mListener != null && (vSyncListener = mListener.get()) != null) {
+                        try {
+                            vSyncListener.OnVSync();
+                            WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(runnable, VSYNC_FRAME);
+                        }catch (UnsatisfiedLinkError e){
+                            if(vSyncListener instanceof WXSDKInstance){
+                                ((WXSDKInstance) vSyncListener).onRenderError(
+                                    WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
+                                    Log.getStackTraceString(e));
+                            }
+                        }
                     }
                 }
             };
@@ -69,6 +89,7 @@ public class WeexFrameRateControl {
         }
     }
 
+    @SuppressLint("NewApi")
     public void start() {
         if (mChoreographer != null) {
             mChoreographer.postFrameCallback(mVSyncFrameCallback);
@@ -78,6 +99,7 @@ public class WeexFrameRateControl {
         }
     }
 
+    @SuppressLint("NewApi")
     public void stop() {
         if (mChoreographer != null) {
             mChoreographer.removeFrameCallback(mVSyncFrameCallback);

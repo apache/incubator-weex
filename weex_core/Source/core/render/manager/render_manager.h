@@ -28,10 +28,11 @@
 namespace WeexCore {
 
 class RenderPage;
+class RenderObject;
 
 class RenderManager {
  private:
-  RenderManager() {}
+  RenderManager() : pages_() {}
 
   ~RenderManager() {}
 
@@ -51,9 +52,12 @@ class RenderManager {
   void Batch(const std::string &page_id);
 
   // create root node
-  bool CreatePage(std::string page_id, const char *data);
+  bool CreatePage(const std::string& page_id, const char *data);
+    
 
-  bool CreatePage(std::string page_id, RenderObject *root);
+  bool CreatePage(const std::string& page_id, RenderObject *root);
+    
+  bool CreatePage(const std::string& page_id, std::function<RenderObject* (RenderPage*)> constructRoot);
 
   /** use auto constructor is bad idea, it cann't transfer binary, use char* is
    * better */
@@ -105,7 +109,7 @@ class RenderManager {
   void set_viewport_width(const std::string &page_id, float viewport_width);
 
   static RenderManager *GetInstance() {
-    if (!g_pInstance) {
+    if (NULL == g_pInstance) {
       g_pInstance = new RenderManager();
     }
     return g_pInstance;

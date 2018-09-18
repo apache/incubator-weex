@@ -43,25 +43,46 @@
             instanceIdCommit = instanceId;
             instance = [WXSDKManager instanceForID:instanceId];
             if(instance){
-                bundleUrlCommit = instance.pageName?:([instance.scriptURL absoluteString]?:bundleUrlCommit);
-               
+                bundleUrlCommit = instance.pageName?:instance.scriptURL.absoluteString;
+                if(nil == bundleUrlCommit || [@"" isEqualToString:bundleUrlCommit]){
+                    bundleUrlCommit = @"instanceUnSetPageNameOrUrl";
+                }
+
                 if (instance.containerInfo && instance.containerInfo.count >0) {
                     [extInfo addEntriesFromDictionary:instance.containerInfo];
                 }
+                if (nil != instance.viewController) {
+                    [extInfo setObject:NSStringFromClass(instance.viewController.class)?:@"unKnowVCName" forKey:KEY_PAGE_PROPERTIES_CONTAINER_NAME];
+                }
                 [extInfo setObject:[self _convertInstanceStageToStr:instance] forKey:@"wxStageList"];
-                [extInfo setObject:instance.pageName?:@"unKnowPageNameCaseUnSet" forKey:@"wxPageName"];
-                [extInfo setObject:instance.bundleTemplate?:@"has recycle" forKey:@"wxTemplateOfBundle"];
+                [extInfo setObject:instance.pageName?:@"unKnowPageNameCaseUnSet" forKey:@"wxBundlePageName"];
+                NSString* bundleTemplateCommit = @"has recycle";
+                if (nil != instance.bundleTemplate) {
+                    NSUInteger strLength = instance.bundleTemplate.length;
+                    bundleTemplateCommit = [instance.bundleTemplate substringWithRange:NSMakeRange(0, strLength>300?300:strLength)];
+                }
+                [extInfo setObject:bundleTemplateCommit forKey:@"wxTemplateOfBundle"];
+                [extInfo setObject:[instance.apmInstance templateInfo] forKey:@"templateInfo"];
+                NSNumber* pageStartTime = [instance.apmInstance.stageDic objectForKey:KEY_PAGE_STAGES_DOWN_BUNDLE_START];
+                if (nil == pageStartTime) {
+                    pageStartTime = [instance.apmInstance.stageDic objectForKey:KEY_PAGE_STAGES_RENDER_ORGIGIN];
+                }
+                if (nil != pageStartTime) {
+                    long useTime = [WXUtility getUnixFixTimeMillis] - pageStartTime.longValue;
+                    [extInfo setObject:@(useTime) forKey:@"wxUseTime"];
+                }
+                
             }else if([instanceIdCommit hasPrefix:@"WX_KEY_EXCEPTION"]){
                 bundleUrlCommit = instanceId;
             }
         }
         WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instanceIdCommit bundleUrl:bundleUrlCommit errorCode:errCode functionName:function exception:exception userInfo: [extInfo mutableCopy]];
         
-        //record top5 erromsg ,if errorType is not WX_RENDER_ERROR
-        WXSDKErrorType type = [WXSDKErrCodeUtil getErrorTypeByCode:errCode.intValue];
-        if (type != WX_RENDER_ERROR && nil != instance) {
-            [instance.apmInstance recordErrorMsg:jsExceptionInfo];
-        }
+//        //record top5 erromsg ,if errorType is not WX_RENDER_ERROR
+//        WXSDKErrorType type = [WXSDKErrCodeUtil getErrorTypeByCode:errCode.intValue];
+//        if (type != WX_RENDER_ERROR && nil != instance) {
+//            [instance.apmInstance recordErrorMsg:jsExceptionInfo];
+//        }
         [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo];
     });
 }

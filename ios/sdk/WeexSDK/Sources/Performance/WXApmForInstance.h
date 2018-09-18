@@ -29,6 +29,7 @@ extern NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_START;
 extern NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_END;
 extern NSString* const KEY_PAGE_STAGES_CREATE_FINISH;
 extern NSString* const KEY_PAGE_STAGES_FSRENDER;
+extern NSString* const KEY_PAGE_STAGES_NEW_FSRENDER;
 extern NSString* const KEY_PAGE_STAGES_INTERACTION;
 extern NSString* const KEY_PAGE_STAGES_DESTROY;
 
@@ -69,6 +70,8 @@ extern NSString* const KEY_PAGE_STATS_IMG_LOAD_FAIL_NUM;
 extern NSString* const KEY_PAGE_STATS_NET_NUM;
 extern NSString* const KEY_PAGE_STATS_NET_SUCCESS_NUM;
 extern NSString* const KEY_PAGE_STATS_NET_FAIL_NUM;
+extern NSString* const KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW;
+extern NSString* const KEY_PAGE_STATS_BODY_RATIO;
 
 ///************** value *****************/
 extern NSString* const VALUE_ERROR_CODE_DEFAULT;
@@ -83,11 +86,14 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 @property (nonatomic, assign) BOOL hasAddView;
 @property (nonatomic, assign) BOOL isDegrade;
 @property (nonatomic, assign) BOOL isStartRender;
+@property (nonatomic,assign)  BOOL  hasRecordFirstInterationView;
+@property (nonatomic, assign) BOOL isDownLoadFailed;
 
 #pragma mark - basic method
 
 - (void) onEvent:(NSString *)name withValue:(id)value;
 - (void) onStage:(NSString *)name;
+- (void) onStageWithTime:(NSString*)name time:(long)unixTime;
 - (void) setProperty:(NSString *)name withValue:(id)value;
 - (void) setStatistic:(NSString *)name withValue:(double)value;
 
@@ -95,11 +101,10 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 
 - (void) startRecord:(NSString*) instanceId;
 - (void) endRecord;
-- (void) arriveFSRenderTime;
 - (void) updateFSDiffStats:(NSString *)name withDiffValue:(double)diff;
 - (void) updateDiffStats:(NSString *)name withDiffValue:(double)diff;
 - (void) updateMaxStats:(NSString *)name curMaxValue:(double)maxValue;
-- (void) updateExtInfo:(NSDictionary*) extInfo;
+- (void) updateExtInfoFromResponseHeader:(NSDictionary*) extInfo;
 
 
 #pragma mark - called by IWXHttpAdapter implementer
@@ -114,4 +119,7 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 #pragma mark record top5 errorMsg
 - (void) recordErrorMsg:(WXJSExceptionInfo *)exception;
 - (NSDictionary<NSString*,NSNumber*>*) stageDic;
+
+#pragma templateinfo
+- (NSString*) templateInfo;
 @end

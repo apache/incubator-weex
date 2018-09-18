@@ -122,9 +122,9 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID_PLATFORM=android-19',
+                arguments '-DANDROID_PLATFORM=android-14',
                         '-DANDROID_TOOLCHAIN=gcc',
-                        '-DANDROID_STL=gnustl_static',
+                        '-DANDROID_STL=c++_static',
                         '-DCMAKE_BUILD_TYPE=Release'
             }
         }

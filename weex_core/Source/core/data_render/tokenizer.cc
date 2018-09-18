@@ -15,7 +15,12 @@ namespace data_render {
 
 // TokenizerState implementation
 // -------------------------------
-
+    
+#ifdef __ANDROID__
+#undef EOF
+    static const char EOF = -1;
+#endif
+    
 class TokenizerState {
  public:
   static std::unordered_map<std::string, Token::Type> keywords;
@@ -78,6 +83,7 @@ class TokenizerState {
     } else if (ch == EOF) {
       // in case of EOF we don't want to go outside the limit
       // of our source code
+      seek_++;
       return EOF;
     } else {
       position_.col()++;
@@ -195,6 +201,19 @@ Token::Type IsOneCharacterSymbol(char ch) {
 
 Token::Type IsTwoCharacterSymbol(char ch1, char ch2) {
 // returns the type of symbol of two characters
+    switch (ch1) {
+        case '=':
+            switch (ch2) {
+                case '>':
+                    return Token::ARROW_FUNCTION;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
   switch (ch2) {
     case '=':
       switch (ch1) {
@@ -263,6 +282,9 @@ Token::Type IsThreeCharacterSymbol(char ch1, char ch2, char ch3) {
     return Token::ASSIGN_SAR;
   else if (ch1 == '<' && ch2 == '<' && ch3 == '=')
     return Token::ASSIGN_SHL;
+  else if (ch1 == '.' && ch2 == '.' && ch3 == '.')
+      return Token::UNFOLD;
+
   return Token::INVALID;
 }
 
@@ -274,8 +296,11 @@ bool IsSpace(char ch) {
 // Tokenizer implementation
 // --------------------------
 
-Tokenizer::Tokenizer(CharacterStream* stream)
-    : state_{new TokenizerState(stream)} {}
+Tokenizer::Tokenizer(CharacterStream *stream, ParserContext *context)
+    : state_{new TokenizerState(stream)}, context_{ context } {}
+
+Tokenizer::Tokenizer(CharacterStream *stream)
+: state_{new TokenizerState(stream)} {}
 
 Tokenizer::~Tokenizer() {
   delete state_;
@@ -465,7 +490,7 @@ Token Tokenizer::ParseRegex(bool* ok) {
       if (ch == '\n') {
         _ PutBack('\n');
       }
-      for (int i = buffer.length() - 1; i >= 0; i--) {
+      for (long i = buffer.length() - 1; i >= 0; i--) {
         _ PutBack(buffer[i]);
       }
       return Token(std::string("ERROR"), Token::ERROR, position, seek);

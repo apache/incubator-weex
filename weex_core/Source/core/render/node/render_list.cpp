@@ -280,10 +280,10 @@ void RenderList::UpdateAttr(std::string key, std::string value) {
       return;
     }
 
-    int count = getChildCount();
+    Index count = getChildCount();
     for (Index i = 0; i < count; i++) {
       RenderObject *child = GetChild(i);
-      AddRenderObjectWidth(this, true);
+      AddRenderObjectWidth(child, true);
     }
   }
 }

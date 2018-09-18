@@ -30,11 +30,10 @@
 #import "WXConfigCenterProtocol.h"
 #import "WXSDKEngine.h"
 #import "WXComponent+Events.h"
-#import "WXScrollerComponent+Layout.h"
-#import "WXCoreLayout.h"
 #import "WXPageEventNotifyEvent.h"
+#import "WXComponent+Layout.h"
 
-@interface WXScrollerComponentView:UIScrollView
+@interface WXScrollerComponentView : UIScrollView
 @end
 
 @implementation WXScrollerComponentView
@@ -75,11 +74,13 @@
 @implementation WXScrollerComponent
 {
     CGSize _contentSize;
+    BOOL _needsPlatformLayout;
     BOOL _listenLoadMore;
     BOOL _scrollEvent;
     BOOL _scrollStartEvent;
     BOOL _scrollEndEvent;
     BOOL _isScrolling;
+    CGFloat _pageSize;
     CGFloat _loadMoreOffset;
     CGFloat _previousLoadMoreContentHeight;
     CGFloat _offsetAccuracy;
@@ -118,9 +119,9 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     _previousLoadMoreContentHeight=0;
 }
 
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
+- (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
-    [super _insertSubcomponent:subcomponent atIndex:index];
+    BOOL inserted = [super _insertSubcomponent:subcomponent atIndex:index];
     
     if ([subcomponent isKindOfClass:[WXRefreshComponent class]]) {
         _refreshComponent = (WXRefreshComponent*)subcomponent;
@@ -128,6 +129,21 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     else if ([subcomponent isKindOfClass:[WXLoadingComponent class]]) {
         _loadingComponent = (WXLoadingComponent*)subcomponent;
     }
+    
+    // If a vertical list is added to a horizontal scroller, we need platform dependent layout
+    if (_flexCssNode && [self isMemberOfClass:[WXScrollerComponent class]] && (_scrollDirection == WXScrollDirectionHorizontal) &&
+        [subcomponent isKindOfClass:[WXScrollerComponent class]] &&
+        subcomponent->_positionType != WXPositionTypeFixed &&
+        (((WXScrollerComponent*)subcomponent).scrollDirection == WXScrollDirectionVertical)) {
+        if (subcomponent->_flexCssNode) {
+            if (subcomponent->_flexCssNode->getFlex() > 0 && !isnan(subcomponent->_flexCssNode->getStyleWidth())) {
+                _needsPlatformLayout = YES;
+                _flexCssNode->setNeedsPlatformDependentLayout(true);
+            }
+        }
+    }
+    
+    return inserted;
 }
 
 -(instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
@@ -153,21 +169,16 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _bounces = attributes[@"bounce"]?[WXConvert BOOL:attributes[@"bounce"]]:YES;
         _refreshType = [WXConvert NSString:attributes[@"refreshType"]]?:@"refreshForWholeVisible";
         _pagingEnabled = attributes[@"pagingEnabled"] ? [WXConvert BOOL:attributes[@"pagingEnabled"]] : NO;
+        _pageSize = attributes[@"pageSize"] ? [WXConvert WXPixelType:attributes[@"pageSize"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
+        if (_pageSize < 0) {
+            _pageSize = 0;
+        }
         _loadMoreOffset = attributes[@"loadmoreoffset"] ? [WXConvert WXPixelType:attributes[@"loadmoreoffset"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
         _loadmoreretry = attributes[@"loadmoreretry"] ? [WXConvert NSUInteger:attributes[@"loadmoreretry"]] : 0;
         _listenLoadMore = [events containsObject:@"loadmore"];
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         _offsetAccuracy = attributes[@"offsetAccuracy"] ? [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
         
-            _flexScrollerCSSNode = new WeexCore::WXCoreLayoutNode();
-            // let scroller fill the rest space if it is a child component and has no fixed height & width
-            if (((_scrollDirection == WXScrollDirectionVertical &&
-                  flexIsUndefined(self.flexCssNode->getStyleHeight())) ||
-                 (_scrollDirection == WXScrollDirectionHorizontal &&
-                  flexIsUndefined(self.flexCssNode->getStyleWidth()))) &&
-                self.flexCssNode->getFlex() <= 0.0) {
-                self.flexCssNode->setFlex(1.0);
-            }
         id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
         if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
             BOOL shouldNotifiAppearDescendantView = [[configCenter configForKey:@"iOS_weex_ext_config.shouldNotifiAppearDescendantView" defaultValue:@(YES) isDefault:NULL] boolValue];
@@ -228,6 +239,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     } else {
         scrollView.scrollsToTop = YES;
     }
+    
+    if (_pagingEnabled && _pageSize > 0) {
+        scrollView.pagingEnabled = NO; // turn off system default paging
+        scrollView.decelerationRate = UIScrollViewDecelerationRateFast;
+    }
+    else {
+        scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
+    }
 }
 
 - (void)layoutDidFinish
@@ -257,11 +276,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     ((UIScrollView *)_view).delegate = nil;
     [self.stickyArray removeAllObjects];
     [self.listenerArray removeAllObjects];
-        if(_flexScrollerCSSNode){
-            [WXComponent recycleNodeOnComponentThread:_flexScrollerCSSNode gabRef:self.ref];
-            
-            _flexScrollerCSSNode=nullptr;
-        }
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
@@ -277,9 +291,28 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         ((UIScrollView *)self.view).pagingEnabled = _pagingEnabled;
     }
     
+    if (attributes[@"pageSize"]) {
+        _pageSize = [WXConvert WXPixelType:attributes[@"pageSize"]
+                               scaleFactor:self.weexInstance.pixelScaleFactor];
+        if (_pageSize < 0) {
+            _pageSize = 0;
+        }
+    }
+    
+    if ([self isViewLoaded]) {
+        if (_pagingEnabled && _pageSize > 0) {
+            ((UIScrollView *)self.view).pagingEnabled = NO; // turn off system default paging
+            ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateFast;
+        }
+        else {
+            ((UIScrollView *)self.view).decelerationRate = UIScrollViewDecelerationRateNormal;
+        }
+    }
+    
     if (attributes[@"loadmoreoffset"]) {
         _loadMoreOffset = [WXConvert WXPixelType:attributes[@"loadmoreoffset"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
+    
     if (attributes[@"bounce"]) {
         _bounces = [WXConvert BOOL:attributes[@"bounce"]];
         ((UIScrollView *)self.view).bounces = _bounces;
@@ -292,6 +325,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         }
         self.loadmoreretry = loadmoreretry;
     }
+    
     if (attributes[@"scrollable"]) {
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         ((UIScrollView *)self.view).scrollEnabled = _scrollable;
@@ -617,6 +651,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 }
 
 #pragma mark UIScrollViewDelegate
+
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
     if ([_refreshType isEqualToString:@"refreshForAppear"] && _refreshComponent) {
@@ -690,6 +725,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     if (self.onScroll) {
         self.onScroll(scrollView);
     }
+    
     if (_scrollEvent || _scrollEventListener) {
         CGFloat distance = 0;
         if (_scrollDirection == WXScrollDirectionHorizontal) {
@@ -713,6 +749,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             _lastScrollEventFiredOffset = scrollView.contentOffset;
         }
     }
+    
     NSHashTable *delegates = [_delegates copy];
     for (id<UIScrollViewDelegate> delegate in delegates) {
         if ([delegate respondsToSelector:@selector(scrollViewDidScroll:)]) {
@@ -766,6 +803,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             }
         }
     }
+    
     if (!_isScrolling) {
         _scrollEndPoint = scrollView.contentOffset;
         id<WXPageEventNotifyEventProtocol> eventNotify = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
@@ -784,6 +822,59 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
 {
+    // Page stop effect
+    if (_pagingEnabled && _pageSize > 0) {
+        if (_scrollDirection == WXScrollDirectionVertical) {
+            CGFloat targetY = scrollView.contentOffset.y + velocity.y * 120.0;
+            CGFloat targetIndex = round(targetY / _pageSize);
+            
+            /*
+             When user's finger departs from screen with any velocity (like swipe gesture).
+             We make sure that target index is changed.
+             */
+            CGFloat sourceIndex = round(_scrollStartPoint.y / _pageSize);
+            if (velocity.y > 0.3) {
+                if (targetIndex <= sourceIndex) {
+                    targetIndex = sourceIndex + 1;
+                }
+            }
+            else if (velocity.y < -0.3) {
+                if (targetIndex >= sourceIndex) {
+                    targetIndex = sourceIndex - 1;
+                }
+            }
+            
+            if (targetIndex < 0)
+                targetIndex = 0;
+            
+            targetContentOffset->y = targetIndex * _pageSize;
+        }
+        else {
+            CGFloat targetX = scrollView.contentOffset.x + velocity.x * 120.0;
+            CGFloat targetIndex = round(targetX / _pageSize);
+            
+            /*
+             When user's finger departs from screen with any velocity (like swipe gesture).
+             We make sure that target index is changed.
+             */
+            CGFloat sourceIndex = round(_scrollStartPoint.x / _pageSize);
+            if (velocity.x > 0.3) {
+                if (targetIndex <= sourceIndex) {
+                    targetIndex = sourceIndex + 1;
+                }
+            }
+            else if (velocity.x < -0.3) {
+                if (targetIndex >= sourceIndex) {
+                    targetIndex = sourceIndex - 1;
+                }
+            }
+            
+            if (targetIndex < 0)
+                targetIndex = 0;
+            targetContentOffset->x = targetIndex * _pageSize;
+        }
+    }
+    
     if ([_refreshType isEqualToString:@"refreshForAppear"]) {
         if(targetContentOffset == nil)
             return;
@@ -930,60 +1021,64 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 #pragma mark Layout
 
-- (NSUInteger)_childrenCountForLayout;
+- (CGFloat)_getInnerContentMainSize
 {
-    return 0;
+    if (_scrollDirection == WXScrollDirectionVertical) {
+        return _contentSize.height;
+    }
+    else if (_scrollDirection == WXScrollDirectionHorizontal) {
+        return _contentSize.width;
+    }
+    else {
+        return -1.0f;
+    }
 }
 
-- (NSUInteger)childrenCountForScrollerLayout
+- (void)_assignInnerContentMainSize:(CGFloat)value
 {
-    return [super _childrenCountForLayout];
+    if (_scrollDirection == WXScrollDirectionVertical) {
+        _contentSize.height = value;
+    }
+    else if (_scrollDirection == WXScrollDirectionHorizontal) {
+        _contentSize.width = value;
+    }
 }
 
-- (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition
-                          gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
+- (void)_layoutPlatform
 {
-    /**
-     *  Pretty hacky way
-     *  layout from root to scroller to get scroller's frame,
-     *  layout from children to scroller to get scroller's contentSize
-     */
-    if ([self needsLayout]) {
-        _flexScrollerCSSNode->copyStyle(_flexCssNode);
-        _flexScrollerCSSNode->copyMeasureFunc(_flexCssNode);
-        
-        if (_scrollDirection == WXScrollDirectionVertical) {
-            _flexScrollerCSSNode->setFlexDirection(WeexCore::kFlexDirectionColumn,NO);
-            _flexScrollerCSSNode->setStyleWidth(self.flexCssNode->getLayoutWidth(),NO);
-            _flexScrollerCSSNode->setStyleHeight(FlexUndefined);
-        } else {
-            _flexScrollerCSSNode->setFlexDirection(WeexCore::kFlexDirectionRow,NO);
-            _flexScrollerCSSNode->setStyleHeight(self.flexCssNode->getLayoutHeight());
-            _flexScrollerCSSNode->setStyleWidth(FlexUndefined,NO);
-        }
-        _flexScrollerCSSNode->markDirty();
-        std::pair<float, float> renderPageSize;
-        renderPageSize.first = self.weexInstance.frame.size.width;
-        renderPageSize.second = self.weexInstance.frame.size.height;
-        
-        // this is scroll rtl solution.
-        // scroll layout not use direction, use self tranform
-        // but we need inherit direction in CSS, so we set children layout diretion manually
-        _flexScrollerCSSNode->determineChildLayoutDirection(_flexCssNode->getLayoutDirection());
-        
-        _flexScrollerCSSNode->calculateLayout(renderPageSize);
-        CGSize size = {
-            WXRoundPixelValue(_flexScrollerCSSNode->getLayoutWidth()),
-            WXRoundPixelValue(_flexScrollerCSSNode->getLayoutHeight())
-        };
-        if (!CGSizeEqualToSize(size, _contentSize)) {
-            // content size
-            _contentSize = size;
-            [dirtyComponents addObject:self];
+    /* Handle multiple vertical scrollers inside horizontal scroller case. In weexcore,
+     a verticall list with NAN height will be set flex=1, which suppresses its style-width property.
+     This will cause two lists with style-width 750px in a horizontal scroller sharing one screen width.
+     Here we respect its style-width property so that the two lists will both be screen width wide. */
+    
+    if (_needsPlatformLayout) {
+        if (_flexCssNode) {
+            float top = _flexCssNode->getLayoutPositionTop();
+            float left = _flexCssNode->getLayoutPositionLeft();
+            float width = _flexCssNode->getLayoutWidth();
+            float height = _flexCssNode->getLayoutHeight();
+            
+            _flexCssNode->setFlexDirection(WeexCore::kFlexDirectionRow, NO);
+            _flexCssNode->setStyleHeight(_flexCssNode->getLayoutHeight());
+            _flexCssNode->setStyleWidth(FlexUndefined, NO);
+            _flexCssNode->markAllDirty();
+            std::pair<float, float> renderPageSize;
+            renderPageSize.first = self.weexInstance.frame.size.width;
+            renderPageSize.second = self.weexInstance.frame.size.height;
+            auto parent = _flexCssNode->getParent(); // clear parent temporarily
+            _flexCssNode->determineChildLayoutDirection(_flexCssNode->getLayoutDirection());
+            _flexCssNode->setParent(nullptr, _flexCssNode);
+            _flexCssNode->calculateLayout(renderPageSize);
+            _flexCssNode->setParent(parent, _flexCssNode);
+            
+            // set origin and size back
+            _flexCssNode->rewriteLayoutResult(left, top, width, height);
         }
     }
-    
-    [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
+    else {
+        // should not happen, set platform layout to false
+        _flexCssNode->setNeedsPlatformDependentLayout(false);
+    }
 }
 
 @end

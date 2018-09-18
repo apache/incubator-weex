@@ -43,17 +43,6 @@ public class GraphicActionCreateFinish extends BasicGraphicAction {
     }
     instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH);
     instance.getApmForInstance().extInfo.put(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH,true);
-
-    // todo add LayoutFinishListener
-//    final LayoutFinishListener listener;
-//    if(instance != null && (listener = instance.getLayoutFinishListener()) != null) {
-//      WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(WXThread.secure(new Runnable() {
-//          @Override
-//          public void run() {
-//              listener.onLayoutFinish(instance);
-//          }
-//      }),0);
-//    }
   }
 
   @Override

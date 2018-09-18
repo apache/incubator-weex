@@ -18,14 +18,20 @@
  */
 package com.taobao.weex.performance;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android.text.TextUtils;
+import android.util.Log;
+import com.taobao.weex.BuildConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXUtils;
 
@@ -78,7 +84,7 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT = "wxWrongImgSizeCount";
     public static final String KEY_PAGE_STATS_EMBED_COUNT = "wxEmbedCount";
     public static final String KEY_PAGE_STATS_LARGE_IMG_COUNT = "wxLargeImgMaxCount";
-
+    public static final String KEY_PAGE_STATS_BODY_RATIO = "wxBodyRatio";
     public static final String KEY_PAGE_STATS_SCROLLER_NUM = "wxScrollerCount";
     public static final String KEY_PAGE_STATS_CELL_DATA_UN_RECYCLE_NUM = "wxCellDataUnRecycleCount";
     public static final String KEY_PAGE_STATS_CELL_UN_RE_USE_NUM = "wxCellUnReUseCount";
@@ -107,12 +113,15 @@ public class WXInstanceApm {
     private Map<String, Double> recordStatsMap;
     private boolean isFSEnd;
     private boolean mHasInit = false;
+    private boolean mEnd = false;
     private boolean hasRecordFistInteractionView =false;
     public final Map<String,Object> extInfo;
+    private List<WXComponent> mCountDownInteractionComponentList;
 
     public WXInstanceApm(String instanceId) {
         mInstanceId = instanceId;
         extInfo = new ConcurrentHashMap<>();
+        mCountDownInteractionComponentList = new ArrayList<>(10);
         IApmGenerator generator = WXSDKManager.getInstance().getApmGenerater();
         if (null != generator) {
             apmInstance = generator.generateApmInstance(WEEX_PAGE_TOPIC);
@@ -148,7 +157,7 @@ public class WXInstanceApm {
         if (null != instance){
             instance.getExceptionRecorder().recordStage(name, time);
         }
-        if (null == apmInstance) {
+        if (null == apmInstance || mEnd) {
             return;
         }
         apmInstance.onStage(name, time);
@@ -159,7 +168,7 @@ public class WXInstanceApm {
      * record property
      */
     public void addProperty(String key, Object value) {
-        if (null == apmInstance) {
+        if (null == apmInstance || mEnd) {
             return;
         }
         apmInstance.addProperty(key, value);
@@ -169,7 +178,7 @@ public class WXInstanceApm {
      * record statistic
      */
     public void addStats(String key, double value) {
-        if (null == apmInstance) {
+        if (null == apmInstance || mEnd) {
             return;
         }
         apmInstance.addStats(key, value);
@@ -234,36 +243,68 @@ public class WXInstanceApm {
      * end record
      */
     public void onEnd() {
-        if (null == apmInstance) {
+        if (null == apmInstance || mEnd) {
             return;
         }
         onStage(KEY_PAGE_STAGES_DESTROY);
         apmInstance.onEnd();
+        mEnd = true;
+    }
+
+    public void arriveNewFsRenderTime(){
+        if (null == apmInstance){
+            return;
+        }
+        onStage(WXInstanceApm.KEY_PAGE_STAGES_NEW_FSRENDER);
     }
 
     public void arriveFSRenderTime() {
         if (null == apmInstance){
             return;
         }
-        onStage(WXInstanceApm.KEY_PAGE_STAGES_NEW_FSRENDER);
-        if (isFSEnd) {
-            return;
-        }
-        isFSEnd = true;
         onStage(WXInstanceApm.KEY_PAGE_STAGES_FSRENDER);
     }
 
-    public void arriveInteraction(int screenViewCount, int allViewCount) {
-        if (null == apmInstance) {
+    public void arriveInteraction(WXComponent targetComponent) {
+        if (null == apmInstance || null == targetComponent || targetComponent.getInstance() == null ) {
             return;
         }
+        targetComponent.interactionTime = WXUtils.getFixUnixTime();
+        WXPerformance performanceRecord = targetComponent.getInstance().getWXPerformance();
+        if (null == performanceRecord){
+            return;
+        }
+
+        if (BuildConfig.DEBUG){
+            Log.d("wxapm", "screenComponent ["+targetComponent.getComponentType()+","+targetComponent.getRef()
+                +"], renderTime:"+ (targetComponent.interactionTime -performanceRecord.renderTimeOrigin)
+                +",style:"+targetComponent.getStyles()
+                +",attrs:"+targetComponent.getAttrs());
+        }
+
         if (!hasRecordFistInteractionView){
             onStage(KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW);
             hasRecordFistInteractionView = true;
         }
-        onStage(KEY_PAGE_STAGES_INTERACTION);
-        updateMaxStats(KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT, screenViewCount);
-        updateMaxStats(KEY_PAGE_STATS_I_ALL_VIEW_COUNT, allViewCount);
+        if (mCountDownInteractionComponentList.size() <10){
+            mCountDownInteractionComponentList.add(targetComponent);
+            return;
+        }
+        mCountDownInteractionComponentList.add(targetComponent);
+        WXComponent preComponent = mCountDownInteractionComponentList.remove(0);
+        if (null == preComponent){
+            return;
+        }
+
+        if (BuildConfig.DEBUG){
+            Log.d("wxapm", "interaction record component ["+preComponent.getComponentType()+","+preComponent.getRef());
+        }
+
+        performanceRecord.interactionTime = preComponent.interactionTime - performanceRecord.renderTimeOrigin;
+        onStageWithTime(KEY_PAGE_STAGES_INTERACTION,preComponent.interactionTime);
+
+        updateDiffStats(KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT, 1);
+        updateMaxStats(KEY_PAGE_STATS_I_ALL_VIEW_COUNT, performanceRecord.localInteractionViewAddCount);
         WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
         if (null != instance) {
             updateMaxStats(KEY_PAGE_STATS_I_COMPONENT_CREATE_COUNT, instance.getWXPerformance().componentCount);

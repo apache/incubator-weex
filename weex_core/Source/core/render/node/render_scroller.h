@@ -28,9 +28,9 @@ namespace WeexCore {
 class RenderScroller : public RenderObject {
   bool is_set_flex_ = false;
 
-  std::map<std::string, std::string> *GetDefaultStyle();
+  std::map<std::string, std::string> *GetDefaultStyle() override;
 
-  void set_flex(const float flex);
+  void set_flex(const float flex) override;
 
   inline float calcFreeSpaceAlongMainAxis(
       const float &width, const float &height,

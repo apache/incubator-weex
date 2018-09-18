@@ -32,13 +32,13 @@ class RenderList : public RenderObject {
  public:
   ~RenderList();
 
-  void set_flex(const float flex);
+  void set_flex(const float flex) override;
 
   void AddCellSlotCopyTrack(RenderObject *cell_slot);
 
-  std::map<std::string, std::string> *GetDefaultStyle();
+  std::map<std::string, std::string> *GetDefaultStyle() override;
 
-  std::map<std::string, std::string> *GetDefaultAttr();
+  std::map<std::string, std::string> *GetDefaultAttr() override;
 
   void PreCalculateCellWidth();
 
@@ -46,11 +46,11 @@ class RenderList : public RenderObject {
 
   float TakeStyleWidth();
 
-  int AddRenderObject(int index, RenderObject *child);
+  int AddRenderObject(int index, RenderObject *child) override;
 
   void AddRenderObjectWidth(RenderObject *child, const bool updating);
 
-  void UpdateAttr(std::string key, std::string value);
+  void UpdateAttr(std::string key, std::string value) override;
 
   float TakeColumnCount();
 

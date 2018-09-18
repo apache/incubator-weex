@@ -67,13 +67,23 @@ public class FontDO {
 
   private void parseSrc(String src, WXSDKInstance instance) {
     src = (src != null )? src.trim() : "";
+
+    if (instance != null) {
+      if (instance.getCustomFontNetworkHandler() != null) {
+        String localUrl = instance.getCustomFontNetworkHandler().fetchLocal(src);
+        if (!TextUtils.isEmpty(localUrl)) {
+          src = localUrl;
+        }
+      }
+    }
+
     if (src.isEmpty()) {
       mState = STATE_INVALID;
       WXLogUtils.e("TypefaceUtil", "font src is empty.");
       return;
     }
 
-    if (src.matches("^url\\('.*'\\)$")) {
+    if (src.matches("^url\\((('.*')|(\".*\"))\\)$")) {
       String url = src.substring(5, src.length() - 2);
       Uri uri = Uri.parse(url);
       if( instance != null){

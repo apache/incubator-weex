@@ -40,8 +40,14 @@ import com.taobao.weex.utils.WXUtils;
 
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,12 +116,20 @@ public class WXEnvironment {
 
   public static final String CORE_SO_NAME = "weexcore";
   public static final String CORE_JSS_SO_NAME = "weexjss";
+  public static final String CORE_JSC_SO_NAME = "JavaScriptCore";
   /**
    * this marked jsb.so's version, Change this if we want to update jsb.so
    */
   public static final int CORE_JSB_SO_VERSION = 1;
 
   private static  String CORE_JSS_SO_PATH = null;
+
+  private static String CORE_JSS_ICU_PATH = null;
+
+  private static String CORE_JSC_SO_PATH = null;
+
+  private static String LIB_LD_PATH = null;
+
 
   private static Map<String, String> options = new HashMap<>();
   static {
@@ -372,12 +386,6 @@ public class WXEnvironment {
     }
   }
 
-  public static String findSoPath(String libName) {
-    final String libPath = ((PathClassLoader) (WXEnvironment.class.getClassLoader())).findLibrary(libName);
-    WXLogUtils.e(libName + "'s Path is" + libPath);
-    return libPath;
-  }
-
   public static String getCacheDir() {
     final Application application = getApplication();
     if (application == null || application.getApplicationContext() == null)
@@ -392,7 +400,8 @@ public class WXEnvironment {
       try {
         WXFileUtils.extractSo(sourceFile.getAbsolutePath(), cacheDir);
       } catch (IOException e) {
-        e.printStackTrace();
+        WXLogUtils.e("extractSo error " + e.getMessage());
+//        e.printStackTrace();
         return false;
       }
       return true;
@@ -400,36 +409,129 @@ public class WXEnvironment {
     return false;
   }
 
-  private static String findLibJssRealPath() {
-    String soPath = findSoPath(CORE_JSS_SO_NAME);
-    String realName = "lib" + CORE_JSS_SO_NAME + ".so";
-    if (TextUtils.isEmpty(soPath)) {
-      String cacheDir = getCacheDir();
-      if (TextUtils.isEmpty(cacheDir)) {
-        return "";
+  private static String findIcuPath() {
+    File file = new File("/proc/self/maps");
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new FileReader(file));
+      String tempString = null;
+      while ((tempString = reader.readLine()) != null) {
+        if (tempString.contains("icudt")) {
+
+          int i = tempString.indexOf('/');
+
+          String substring = tempString.substring(i);
+          return substring.trim();
+        }
       }
-      if (cacheDir.indexOf("/cache") > 0) {
-        soPath = new File(cacheDir.replace("/cache", "/lib"), realName).getAbsolutePath();
+      reader.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException e1) {
+        }
       }
     }
+
+    return null;
+  }
+
+
+  public static String findSoPath(String libName) {
+    String soPath = ((PathClassLoader) (WXEnvironment.class.getClassLoader())).findLibrary(libName);
+    if (!TextUtils.isEmpty(soPath)) {
+      File soFile = new File(soPath);
+      if (soFile.exists()) {
+        WXLogUtils.e(libName + "'s Path is" + soPath);
+        return soFile.getAbsolutePath();
+      } else {
+        WXLogUtils.e(libName + "'s Path is " + soPath + " but file is not exist");
+      }
+    }
+
+    String realName = "lib" + libName + ".so";
+    String cacheDir = getCacheDir();
+    if (TextUtils.isEmpty(cacheDir)) {
+      WXLogUtils.e("cache dir is null");
+      return "";
+    }
+
+
+    if (cacheDir.indexOf("/cache") > 0) {
+      soPath = new File(cacheDir.replace("/cache", "/lib"), realName).getAbsolutePath();
+    }
+
+
     final File soFile = new File(soPath);
-    if (soFile.exists())
+    if (soFile.exists()) {
+      WXLogUtils.e(libName + "use lib so");
       return soPath;
-    else {
+    } else {
       //unzip from apk file
       final boolean success = extractSo();
-      if (success)
+      if (success) {
         return new File(getCacheDir(), realName).getAbsolutePath();
+      }
     }
-    return "";
+    return soPath;
+  }
+
+  public static String getLibJScRealPath() {
+    if(TextUtils.isEmpty(CORE_JSC_SO_PATH)) {
+      CORE_JSC_SO_PATH = findSoPath(CORE_JSC_SO_NAME);
+      WXLogUtils.e("findLibJscRealPath " + CORE_JSC_SO_PATH);
+    }
+    return CORE_JSC_SO_PATH;
   }
 
   public static String getLibJssRealPath() {
     if(TextUtils.isEmpty(CORE_JSS_SO_PATH)) {
-      CORE_JSS_SO_PATH = findLibJssRealPath();
+      CORE_JSS_SO_PATH = findSoPath(CORE_JSS_SO_NAME);
       WXLogUtils.e("findLibJssRealPath " + CORE_JSS_SO_PATH);
     }
 
     return CORE_JSS_SO_PATH;
+  }
+
+  public static String getLibJssIcuPath() {
+    if(TextUtils.isEmpty(CORE_JSS_ICU_PATH)){
+      CORE_JSS_ICU_PATH = findIcuPath();
+    }
+
+    return CORE_JSS_ICU_PATH;
+  }
+
+  public static String getLibLdPath() {
+    if (TextUtils.isEmpty(LIB_LD_PATH)) {
+      ClassLoader classLoader = WXEnvironment.class.getClassLoader();
+      try {
+        Method getLdLibraryPath = classLoader.getClass().getMethod("getLdLibraryPath", new Class[0]);
+        LIB_LD_PATH = (String) getLdLibraryPath.invoke(classLoader, new Object[0]);
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
+      } catch (NoSuchMethodException e) {
+        e.printStackTrace();
+      }
+    }
+
+    if(TextUtils.isEmpty(LIB_LD_PATH)) {
+      try {
+        String property = System.getProperty("java.library.path");
+        String libJScRealPath = getLibJScRealPath();
+        if(!TextUtils.isEmpty(libJScRealPath)) {
+          LIB_LD_PATH = new File(libJScRealPath).getParent() + ":" + property;
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+
+    WXLogUtils.e("getLibLdPath is " + LIB_LD_PATH);
+    return LIB_LD_PATH;
   }
 }

@@ -96,7 +96,9 @@
     
     if (!_collectionView) {
         WXLogError(@"Update list with no collection view");
-        completion(NO);
+        if (completion) {
+            completion(NO);
+        }
         return;
     }
     

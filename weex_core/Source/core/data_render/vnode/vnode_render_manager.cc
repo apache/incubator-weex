@@ -20,6 +20,7 @@
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include <chrono>
 #include <sstream>
+#include "base/string_util.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vnode/vnode.h"
@@ -27,12 +28,13 @@
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_creator.h"
+#include "core/bridge/platform_bridge.h"
 
 #define VRENDER_LOG true
 
 #if VRENDER_LOG
 
-#include "android/base/log_utils.h"
+#include "base/LogDefines.h"
 
 #endif
 
@@ -55,9 +57,13 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
                                                 WeexCore::RenderObject* parent, bool isRoot,
                                                 int index,
                                                 const string& pageId) {
-  std::stringstream ss;
-  ss << ref_id++;
-  std::string ref_str = isRoot ? "_root" : ss.str();
+  std::string ref_str;
+  if (!isRoot) {
+    ref_str = base::to_string(ref_id++);
+  } else {
+    ref_str = "_root";
+  }
+
   WeexCore::RenderObject* render_object = static_cast<WeexCore::RenderObject*>(
       WeexCore::RenderCreator::GetInstance()->CreateRender(vnode->tag_name(),
                                                            ref_str));
@@ -154,54 +160,77 @@ void VNodeRenderManager::InitVM() {
 
 void VNodeRenderManager::CreatePage(const std::string& input,
                                     const std::string& page_id,
+                                    const std::string& options,
                                     const std::string& init_data) {
-  InitVM();
-  auto start = std::chrono::steady_clock::now();
-
-  ExecState* exec_state = new ExecState(g_vm);
-  exec_states_.insert({page_id, exec_state});
-
-  VNodeExecEnv::InitCFuncEnv(exec_state);
-
-  std::string err;
-  exec_state->context()->raw_json() = json11::Json::parse(input, err);
-
-  VNodeExecEnv::InitGlobalValue(exec_state);
-  VNodeExecEnv::InitInitDataValue(exec_state, init_data);
-  VNodeExecEnv::InitStyleList(exec_state);
-
-  exec_state->context()->page_id(page_id);
-  auto compile_start = std::chrono::steady_clock::now();
-  exec_state->Compile();
-
-  auto exec_start = std::chrono::steady_clock::now();
-  exec_state->Execute();
-
-  CreatePageInternal(page_id, exec_state->context()->root());
-  exec_state->context()->Reset();
-
-  auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(
-      std::chrono::steady_clock::now() - start);
-
-  LOGE("DATA_RENDER, All time %lld", duration_post.count());
+    do {
+        InitVM();
+        auto start = std::chrono::steady_clock::now();
+        ExecState *exec_state = new ExecState(g_vm);
+        exec_states_.insert({page_id, exec_state});
+        VNodeExecEnv::InitCFuncEnv(exec_state);
+        std::string err;
+        json11::Json json = json11::Json::parse(input, err);
+        if (!err.empty() || json.is_null()) {
+            exec_state->context()->raw_source() = input;
+        }
+        else {
+            exec_state->context()->raw_json() = json;
+            if (json["script"].is_string()) {
+                exec_state->context()->set_script(json["script"].string_value());
+            }
+        }
+        VNodeExecEnv::InitGlobalValue(exec_state);
+        if (init_data.length() > 0) {
+            VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+        }
+        VNodeExecEnv::InitStyleList(exec_state);
+        exec_state->context()->page_id(page_id);
+        //auto compile_start = std::chrono::steady_clock::now();
+        exec_state->Compile(err);
+        if (!err.empty()) {
+            break;
+        }
+        //auto exec_start = std::chrono::steady_clock::now();
+        exec_state->Execute(err);
+        if (!err.empty()) {
+            break;
+        }
+        if (exec_state->context()->root() == NULL) {
+            break;
+        }
+        CreatePageInternal(page_id, exec_state->context()->root());
+        exec_state->context()->Reset();
+        auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+        
+        LOGE("DATA_RENDER, All time %lld", duration_post.count());
+        
+    } while (0);
 }
 bool VNodeRenderManager::RefreshPage(const std::string& page_id,
                                      const std::string& init_data) {
-  auto it = exec_states_.find(page_id);
-  if (it == exec_states_.end()) {
+    do {
+        auto it = exec_states_.find(page_id);
+        if (it == exec_states_.end()) {
+            break;
+        }
+        ExecState *exec_state = it->second;
+        VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+        std::string err;
+        exec_state->Execute(err);  // refresh root
+        if (!err.empty()) {
+            break;
+        }
+        RefreshPageInternal(page_id, exec_state->context()->root());
+        exec_state->context()->Reset();
+        WeexCore::WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->platform_side()
+        ->RefreshFinish(page_id.c_str(), nullptr, "");
+        return true;
+        
+    } while (0);
+    
     return false;
-  }
-  ExecState* exec_state = it->second;
-
-  VNodeExecEnv::InitInitDataValue(exec_state, init_data);
-
-  exec_state->Execute();  // refresh root
-  RefreshPageInternal(page_id, exec_state->context()->root());
-  exec_state->context()->Reset();
-  WeexCore::WeexCoreManager::getInstance()
-      ->getPlatformBridge()
-      ->callRefreshFinish(page_id.c_str(), nullptr, "");
-  return true;
 }
 
 bool VNodeRenderManager::ClosePage(const std::string& page_id) {
@@ -213,6 +242,7 @@ bool VNodeRenderManager::ClosePage(const std::string& page_id) {
 
   ClosePageInternal(page_id);
   delete exec_state;
+  exec_states_.erase(it);
   return true;
 }
 
@@ -223,7 +253,7 @@ bool SameNode(VNode* a, VNode* b) {
          a->ref() == b->ref();  // todo to be more accurate
 }
 
-inline VNode* GetOrNull(vector<VNode*>& vec, unsigned int index) {
+inline VNode* GetOrNull(vector<VNode*>& vec, int index) {
   if (index < 0 || index >= vec.size()) {
     return nullptr;
   }
@@ -269,9 +299,9 @@ void UpdateChildren(const string& page_id, VNode* old_node, VNode* new_node) {
   }
 
   unsigned int old_start = 0;
-  unsigned int old_end = old_children.size() - 1;
+  unsigned int old_end = static_cast<unsigned int >(old_children.size()) - 1;
   unsigned int new_start = 0;
-  unsigned int new_end = new_children.size() - 1;
+  unsigned int new_end = static_cast<unsigned int >(new_children.size()) - 1;
   VNode* old_start_node = GetOrNull(old_children, old_start);
   VNode* old_end_node = GetOrNull(old_children, old_end);
   VNode* new_start_node = GetOrNull(new_children, new_start);
@@ -378,7 +408,7 @@ void UpdateChildren(const string& page_id, VNode* old_node, VNode* new_node) {
 void CreateAndInsertElm(const string& page_id, VNode* node,
                         vector<VNode*>& ref_list, const VNode* ref) {
   auto insert_pos = IndexOf(ref_list, ref);
-  int index = std::distance(ref_list.begin(), insert_pos);
+  int index = static_cast<int>(std::distance(ref_list.begin(), insert_pos));
   ref_list.insert(insert_pos, node);
 
   WeexCore::RenderObject* root = ParseVNode2RenderObject(node, nullptr, false, 0, page_id);
@@ -389,7 +419,7 @@ void CreateAndInsertElm(const string& page_id, VNode* node,
 int MoveToBackOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
                     const VNode* anchor_ref) {
   auto move_pos = IndexOf(ref_list, move_ref);
-  int index = std::distance(ref_list.begin(), move_pos);
+  int index = static_cast<int>(std::distance(ref_list.begin(), move_pos));
   if (move_pos == ref_list.end()) {
 #if VRENDER_LOG
     LOGE("[VRenderManager] moveToBackOfRef movePos == refList.end() ref: %s",
@@ -414,7 +444,7 @@ int MoveToBackOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
 int MoveToFrontOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
                      const VNode* anchor_ref) {
   auto move_pos = IndexOf(ref_list, move_ref);
-  int index = std::distance(ref_list.begin(), move_pos);
+  int index = static_cast<int>(std::distance(ref_list.begin(), move_pos));
   if (move_pos == ref_list.end()) {
 #if VRENDER_LOG
     LOGE("[VRenderManager] moveToFrontOfRef movePos == refList.end() ref: %s",
