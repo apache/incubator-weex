@@ -39,10 +39,10 @@ class RenderScroller : public RenderObject {
   }
 
 public:
-    virtual void onLayout(const float left, const float top, const float right, const float bottom,
-                                  WXCoreLayoutNode *const absoulteItem, WXCoreFlexLine *const flexLine);
+    void onLayout(const float left, const float top, const float right, const float bottom,
+                                  WXCoreLayoutNode *const absoulteItem, WXCoreFlexLine *const flexLine) override;
 
-    inline WXCoreDirection getLayoutDirection() const {
+    inline WXCoreDirection getLayoutDirection() const override {
         WXCoreDirection styleDirection = this->getDirection();
         if (styleDirection != kDirectionInherit) {
             return styleDirection;
@@ -50,7 +50,7 @@ public:
             WXCoreLayoutNode *parent = this->getParent();
             return parent->getLayoutDirection();
         }
-        return kDirectionLTR;
+        return WEEXCORE_CSS_DEFAULT_DIRECTION;
     }
 
 };

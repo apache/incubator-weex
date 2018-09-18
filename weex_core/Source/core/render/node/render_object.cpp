@@ -150,17 +150,16 @@ StyleType RenderObject::ApplyStyle(const std::string &key,
     return kTypeLayout;
   } else if (key == FLEX) {
     if (value.empty()) {
-      setFlex(0);
+      set_flex(0);
     } else {
       float ret = getFloat(value.c_str());
       if (!isnan(ret)) {
-        setFlex(ret);
+        set_flex(ret);
       }
     }
     return kTypeLayout;
   } else if (key == DIRECTION) {
     WeexCore::WXCoreDirection direction = GetWXCoreDirection(value);
-      WeexCore::kDirectionInherit;
     if (direction ==  WeexCore::kDirectionInherit && this->is_root_render_ ) {
         direction = WeexCore::kDirectionLTR;
     } 

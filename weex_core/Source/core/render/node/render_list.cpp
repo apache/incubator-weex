@@ -90,7 +90,7 @@ std::map<std::string, std::string> *RenderList::GetDefaultStyle() {
 
 void RenderList::set_flex(const float flex) {
   this->is_set_flex_ = true;
-  WXCoreLayoutNode::setFlex(flex);
+  WXCoreLayoutNode::set_flex(flex);
 }
 
 std::map<std::string, std::string> *RenderList::GetDefaultAttr() {

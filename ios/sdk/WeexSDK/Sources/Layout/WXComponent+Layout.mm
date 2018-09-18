@@ -169,7 +169,7 @@ bool flexIsUndefined(float value) {
 - (void)_adjustForRTL {
     if (self->_positionType == WXPositionTypeFixed) return;
     
-    if (self.supercomponent && self.supercomponent->_flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL && [self.supercomponent shouldTranformSubviewsWhenRTL]) {
+    if (self.supercomponent && self.supercomponent->_flexCssNode && self.supercomponent->_flexCssNode->getLayoutDirectionFromPathNode() == WeexCore::kDirectionRTL && [self.supercomponent shouldTranformSubviewsWhenRTL]) {
         if (_transform) {
             self.view.layer.transform = CATransform3DConcat(self.view.layer.transform, CATransform3DScale(CATransform3DIdentity, -1, 1, 1));
         } else {
@@ -208,7 +208,8 @@ bool flexIsUndefined(float value) {
         if ([self.ref isEqualToString:WX_SDK_ROOT_REF] && _flexCssNode->getDirection() == WeexCore::kDirectionInherit) {
             // if root element have not specify direction, then we use system layout direction
             WeexCore::WXCoreDirection direction = self.weexInstance.usedLayoutDirection == WXLayoutDirectionRTL ? WeexCore::kDirectionRTL : WeexCore::kDirectionLTR;
-            _flexCssNode->setDirection(direction, NO);
+//            _flexCssNode->setDirection(direction, NO);
+            _flexCssNode->setDirection(WeexCore::kDirectionRTL, NO);
         }
     
         // flex

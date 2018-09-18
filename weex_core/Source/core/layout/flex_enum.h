@@ -22,6 +22,8 @@
 #ifndef WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 
+#define WEEXCORE_CSS_DEFAULT_DIRECTION kDirectionRTL
+
 namespace WeexCore {
     /**
      * MainAxis direction

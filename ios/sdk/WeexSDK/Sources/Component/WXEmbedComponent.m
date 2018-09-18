@@ -128,7 +128,6 @@
     
     [_embedInstance destroyInstance];
     _embedInstance = [[WXSDKInstance alloc] init];
-    _embedInstance.layoutDirection = self.weexInstance.usedLayoutDirection;
     _embedInstance.parentInstance = self.weexInstance;
     _embedInstance.parentNodeRef = self.ref;
     _embedInstance.frame = CGRectMake(0.0f, 0.0f, self.view.frame.size.width, self.view.frame.size.height);

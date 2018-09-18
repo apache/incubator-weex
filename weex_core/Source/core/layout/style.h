@@ -21,7 +21,6 @@
 #ifndef WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUMS_H
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUMS_H
 
-
 #include "flex_enum.h"
 #include <cmath>
 

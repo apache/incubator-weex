@@ -22,13 +22,6 @@
 #ifndef WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_H
 #define WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_H
 
-#if __ANDROID__
-    // android
-    #define WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_ANDROID_GC 1
-#else
-    #define WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_ANDROID_GC 0
-#endif
-
 #include "style.h"
 #include "flex_enum.h"
 #include <vector>
@@ -165,16 +158,6 @@ namespace WeexCore {
         mHasNewLayout = true;
         dirty = true;
         measureFunc = nullptr;
-        if (!WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_ANDROID_GC) {
-            if(nullptr != mParent){
-                mParent->removeChild(this);
-            }
-            for(WXCoreLayoutNode* childNode : mChildList){
-                if(nullptr != childNode){
-                    childNode->mParent = nullptr;
-                }
-            }
-        }
         mParent = nullptr;
         mChildList.clear();
         BFCs.clear();
@@ -742,9 +725,6 @@ namespace WeexCore {
     inline void removeChild(WXCoreLayoutNode* const child) {
       for (int index = 0; index < mChildList.size(); index++) {
         if (child == mChildList[index]) {
-            if (!WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_ANDROID_GC) {
-                child->mParent = nullptr;
-            }
             mChildList.erase(mChildList.begin() + index);
             break;
         }
@@ -1095,7 +1075,7 @@ namespace WeexCore {
       return mCssStyle->mAlignSelf;
     }
 
-    virtual void setFlex(const float flex) {
+    virtual void set_flex(const float flex) {
       if (mCssStyle->mFlexGrow != flex) {
         mCssStyle->mFlexGrow = flex;
         markDirty();

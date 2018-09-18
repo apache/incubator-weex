@@ -274,7 +274,7 @@
 		77D161621C02ED790010B15B /* WXLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 77D161601C02ED790010B15B /* WXLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		77D161631C02ED790010B15B /* WXLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D161611C02ED790010B15B /* WXLog.m */; };
 		77E659DA1C07F594008B8775 /* WXDomModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 77E659D81C07F594008B8775 /* WXDomModule.h */; };
-		77E659DB1C07F594008B8775 /* WXDomModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E659D91C07F594008B8775 /* WXDomModule.m */; };
+		77E659DB1C07F594008B8775 /* WXDomModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = 77E659D91C07F594008B8775 /* WXDomModule.mm */; };
 		77E659F11C0C3612008B8775 /* WXModuleFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 77E659EF1C0C3612008B8775 /* WXModuleFactory.h */; };
 		77E659F21C0C3612008B8775 /* WXModuleFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E659F01C0C3612008B8775 /* WXModuleFactory.m */; };
 		77E65A0D1C155E99008B8775 /* WXDivComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 77E65A0B1C155E99008B8775 /* WXDivComponent.h */; };
@@ -783,7 +783,7 @@
 		DCA445681EFA55B300D0CFA8 /* WXStreamModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 74A4BAA51CB4F98300195969 /* WXStreamModule.m */; };
 		DCA445691EFA55B300D0CFA8 /* WXAnimationModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 594C28901CF9E61A009793A4 /* WXAnimationModule.m */; };
 		DCA4456B1EFA55B300D0CFA8 /* WXInstanceWrap.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AFEB17A1C747139000507FA /* WXInstanceWrap.m */; };
-		DCA4456C1EFA55B300D0CFA8 /* WXDomModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E659D91C07F594008B8775 /* WXDomModule.m */; };
+		DCA4456C1EFA55B300D0CFA8 /* WXDomModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = 77E659D91C07F594008B8775 /* WXDomModule.mm */; };
 		DCA4456D1EFA55B300D0CFA8 /* WXTimerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D3FC0DF61C508B2A002B9E31 /* WXTimerModule.m */; };
 		DCA4456E1EFA55B300D0CFA8 /* WXModalUIModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 746319281C71B92600EFEBD4 /* WXModalUIModule.m */; };
 		DCA4456F1EFA55B300D0CFA8 /* WXWebViewModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D362F94E1C83EDA20003F546 /* WXWebViewModule.m */; };
@@ -1252,7 +1252,7 @@
 		77D161601C02ED790010B15B /* WXLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXLog.h; sourceTree = "<group>"; };
 		77D161611C02ED790010B15B /* WXLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXLog.m; sourceTree = "<group>"; };
 		77E659D81C07F594008B8775 /* WXDomModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDomModule.h; sourceTree = "<group>"; };
-		77E659D91C07F594008B8775 /* WXDomModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDomModule.m; sourceTree = "<group>"; };
+		77E659D91C07F594008B8775 /* WXDomModule.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXDomModule.mm; sourceTree = "<group>"; };
 		77E659EF1C0C3612008B8775 /* WXModuleFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXModuleFactory.h; sourceTree = "<group>"; };
 		77E659F01C0C3612008B8775 /* WXModuleFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXModuleFactory.m; sourceTree = "<group>"; };
 		77E65A0B1C155E99008B8775 /* WXDivComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDivComponent.h; sourceTree = "<group>"; };
@@ -2062,7 +2062,7 @@
 				2AFEB1791C747139000507FA /* WXInstanceWrap.h */,
 				2AFEB17A1C747139000507FA /* WXInstanceWrap.m */,
 				77E659D81C07F594008B8775 /* WXDomModule.h */,
-				77E659D91C07F594008B8775 /* WXDomModule.m */,
+				77E659D91C07F594008B8775 /* WXDomModule.mm */,
 				D3FC0DF51C508B2A002B9E31 /* WXTimerModule.h */,
 				D3FC0DF61C508B2A002B9E31 /* WXTimerModule.m */,
 				746319271C71B92600EFEBD4 /* WXModalUIModule.h */,
@@ -3429,7 +3429,7 @@
 				B8D66BC92125572F003960BD /* ast.cc in Sources */,
 				740451EB1E14BB26004157CB /* WXServiceFactory.m in Sources */,
 				B8D66C6521255730003960BD /* render_mask.cpp in Sources */,
-				77E659DB1C07F594008B8775 /* WXDomModule.m in Sources */,
+				77E659DB1C07F594008B8775 /* WXDomModule.mm in Sources */,
 				D3FC0DF81C508B2A002B9E31 /* WXTimerModule.m in Sources */,
 				594C28921CF9E61A009793A4 /* WXAnimationModule.m in Sources */,
 				B8D66C6F21255730003960BD /* render_object.cpp in Sources */,
@@ -3714,7 +3714,7 @@
 				B8D66C4021255730003960BD /* render_action_update_style.cpp in Sources */,
 				DCA445691EFA55B300D0CFA8 /* WXAnimationModule.m in Sources */,
 				DCA4456B1EFA55B300D0CFA8 /* WXInstanceWrap.m in Sources */,
-				DCA4456C1EFA55B300D0CFA8 /* WXDomModule.m in Sources */,
+				DCA4456C1EFA55B300D0CFA8 /* WXDomModule.mm in Sources */,
 				DCA4456D1EFA55B300D0CFA8 /* WXTimerModule.m in Sources */,
 				B8A72CA1213F8BAE0024E7BE /* class_string.cc in Sources */,
 				DCA4456E1EFA55B300D0CFA8 /* WXModalUIModule.m in Sources */,

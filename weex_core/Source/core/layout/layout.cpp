@@ -642,7 +642,7 @@ namespace WeexCore {
       if (mLayoutResult->mLayoutDirection == kDirectionInherit) {
           if(mCssStyle->mDirection == kDirectionInherit) {
               // default direction in css is inherit, inherit direction from parent node
-              mLayoutResult->mLayoutDirection = NULL == mParent ? kDirectionLTR : mParent->mLayoutResult->mLayoutDirection;
+              mLayoutResult->mLayoutDirection = NULL == mParent ? WEEXCORE_CSS_DEFAULT_DIRECTION : mParent->mLayoutResult->mLayoutDirection;
           } else {
               // specific direction in current Node's style
               mLayoutResult->mLayoutDirection = mCssStyle->mDirection;
@@ -1111,18 +1111,16 @@ namespace WeexCore {
     }
     
     WXCoreDirection WXCoreLayoutNode::getLayoutDirectionFromPathNode() {
-        if (nullptr != this) {
-            WXCoreLayoutNode *node = this;
-            if (node->getLayoutDirection() != kDirectionInherit) return node->getLayoutDirection();
-            if (node->getDirection() != kDirectionInherit) {
-                node->mLayoutResult->mLayoutDirection = node->getDirection();
-                return node->getLayoutDirection();
-            } else if (nullptr != node->mParent) {
-                node->mLayoutResult->mLayoutDirection = node->mParent->getLayoutDirectionFromPathNode();
-                return node->getLayoutDirection();
-            }
+        WXCoreLayoutNode *node = this;
+        if (node->getLayoutDirection() != kDirectionInherit) return node->getLayoutDirection();
+        if (node->getDirection() != kDirectionInherit) {
+            node->mLayoutResult->mLayoutDirection = node->getDirection();
+            return node->getLayoutDirection();
+        } else if (nullptr != node->mParent) {
+            node->mLayoutResult->mLayoutDirection = node->mParent->getLayoutDirectionFromPathNode();
+            return node->getLayoutDirection();
         }
-        return kDirectionLTR;
+        return WEEXCORE_CSS_DEFAULT_DIRECTION;
     }
 }
 

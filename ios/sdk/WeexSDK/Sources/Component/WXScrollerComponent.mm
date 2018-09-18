@@ -409,7 +409,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 {
     // this is scroll rtl solution.
     // scroll layout not use direction, use self tranform
-    if (self.view && _flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL
+    if (self.view && _flexCssNode && _flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL
         ) {
         if (_transform) {
             self.view.layer.transform = CATransform3DConcat(self.view.layer.transform, CATransform3DScale(CATransform3DIdentity, -1, 1, 1));
@@ -1057,20 +1057,25 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             float left = _flexCssNode->getLayoutPositionLeft();
             float width = _flexCssNode->getLayoutWidth();
             float height = _flexCssNode->getLayoutHeight();
-            
+
             _flexCssNode->setFlexDirection(WeexCore::kFlexDirectionRow, NO);
             _flexCssNode->setStyleHeight(_flexCssNode->getLayoutHeight());
             _flexCssNode->setStyleWidth(FlexUndefined, NO);
             _flexCssNode->markAllDirty();
+            
+            // this is scroll rtl solution.
+            // scroll layout not use direction, use self tranform
+            // but we need inherit direction in CSS, so we set children layout diretion manually
+            _flexCssNode->determineChildLayoutDirection(_flexCssNode->getLayoutDirection());
+            
             std::pair<float, float> renderPageSize;
             renderPageSize.first = self.weexInstance.frame.size.width;
             renderPageSize.second = self.weexInstance.frame.size.height;
             auto parent = _flexCssNode->getParent(); // clear parent temporarily
-            _flexCssNode->determineChildLayoutDirection(_flexCssNode->getLayoutDirection());
-            _flexCssNode->setParent(nullptr, _flexCssNode);
+            _flexCssNode->setParent(nullptr);
             _flexCssNode->calculateLayout(renderPageSize);
-            _flexCssNode->setParent(parent, _flexCssNode);
-            
+            _flexCssNode->setParent(parent);
+
             // set origin and size back
             _flexCssNode->rewriteLayoutResult(left, top, width, height);
         }

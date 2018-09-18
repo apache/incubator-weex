@@ -51,7 +51,7 @@ namespace WeexCore {
 
     void RenderScroller::set_flex(const float flex) {
       this->is_set_flex_ = true;
-      WXCoreLayoutNode::setFlex(flex);
+      WXCoreLayoutNode::set_flex(flex);
     }
 
     void RenderScroller::onLayout(const float left, const float top, const float right, const float bottom,
