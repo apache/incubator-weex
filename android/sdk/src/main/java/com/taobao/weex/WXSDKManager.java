@@ -281,7 +281,7 @@ public class WXSDKManager {
     mBridgeManager.fireEventOnNode(instanceId, ref, type, params,domChanges);
   }
 
-  void createInstance(WXSDKInstance instance, String code, Map<String, Object> options, String jsonInitData) {
+  void createInstance(WXSDKInstance instance, Script code, Map<String, Object> options, String jsonInitData) {
     mWXRenderManager.registerInstance(instance);
     mBridgeManager.createInstance(instance.getInstanceId(), code, options, jsonInitData);
     if (mLifeCycleCallbacks != null) {

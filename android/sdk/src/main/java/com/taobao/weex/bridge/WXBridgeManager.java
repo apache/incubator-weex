@@ -34,6 +34,7 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.Script;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
@@ -1252,12 +1253,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    */
   public void createInstance(final String instanceId, final String template,
                              final Map<String, Object> options, final String data) {
+    createInstance(instanceId, new Script(template), options, data);
+  }
+
+  public void createInstance(final String instanceId, final Script template,
+                             final Map<String, Object> options, final String data) {
     final WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance == null) {
       WXLogUtils.e("WXBridgeManager", "createInstance failed, SDKInstance is not exist");
       return;
     }
-    if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(template) || mJSHandler == null) {
+    if (TextUtils.isEmpty(instanceId) || template == null || template.isEmpty() || mJSHandler == null) {
       instance.onRenderError(
               WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
               WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg() +
@@ -1294,7 +1300,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }, instanceId);
   }
 
-  private void invokeCreateInstance(@NonNull WXSDKInstance instance, String template,
+  private void invokeCreateInstance(@NonNull WXSDKInstance instance, Script template,
                                     Map<String, Object> options, String data) {
     // add for sandbox, will delete on sandbox ok
     initFramework("");
@@ -1318,7 +1324,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         BundType type = BundType.Others;
         try {
           long start = System.currentTimeMillis();
-          type = getBundleType(instance.getBundleUrl(), template);
+          type = getBundleType(instance.getBundleUrl(), template.getContent());
 
           if (WXEnvironment.isOpenDebugLog()) {
             long end = System.currentTimeMillis();
@@ -1360,7 +1366,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXJSObject instanceIdObj = new WXJSObject(WXJSObject.String,
                 instance.getInstanceId());
         WXJSObject instanceObj = new WXJSObject(WXJSObject.String,
-                template);
+                template.getContent());
 
         WXJSObject optionsObj = new WXJSObject(WXJSObject.JSON,
                 options == null ? "{}"
@@ -1385,12 +1391,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXJSObject renderStrategy = null;
         if (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER) {
           renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.DATA_RENDER.getFlag());
+        } else if (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY) {
+          renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.DATA_RENDER_BINARY.getFlag());
+          // In DATA_RENDER_BINARY strategy script is binary
+          instanceObj.data = template.getBinary();
         }
 
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
                 dataObj, apiObj, renderStrategy};
 
-        instance.setTemplate(template);
+        instance.setTemplate(template.getContent());
 
         instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
 
@@ -1401,7 +1411,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           return;
         }
         if (type == BundType.Vue || type == BundType.Rax
-                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER) {
+                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
+                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY) {
           invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
           return;
         } else {

@@ -92,7 +92,7 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
       const char *instanceId, const char *nameSpace, const char *func,
       std::vector<VALUE_WITH_TYPE *> &params) override;
   int CreateInstance(const char *instanceId, const char *func,
-                     const char *script, const char *opts, const char *initData,
+                     const char *script, int script_length, const char *opts, const char *initData,
                      const char *extendsApi, const char* render_strategy) override;
   std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char *instanceId,
                                const char *script) override;
