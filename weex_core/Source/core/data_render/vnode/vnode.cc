@@ -67,7 +67,7 @@ void VNode::SetAttribute(const std::string &key, const std::string &value) {
   MapInsertOrAssign(attributes_, key, value);
 }
     
-void VNode::AddEvent(const std::string &event, void *func) {
+void VNode::AddEvent(const std::string &event, void *func, void *inst) {
     std::map<std::string, void *>::iterator it = events_->find(event);
     if (it != events_->end()) {
         it->second = func;
@@ -75,6 +75,7 @@ void VNode::AddEvent(const std::string &event, void *func) {
     else {
         events_->insert({event, func});
     }
+    inst_ = inst;
 }
     
 VNode *VNode::FindNode(const std::string &ref) {

@@ -458,7 +458,8 @@ static Value SetProps(ExecState *exec_state) {
                         }
                         std::string event = iter->first.substr(pos + 2);
                         transform(event.begin(), event.end(), event.begin(), ::tolower);
-                        node->AddEvent(event, iter->second.f);
+                        FuncState *func_state = iter->second.f;
+                        node->AddEvent(event, func_state, func_state->class_inst());
                         break;
                     }
                     case Value::NUMBER:

@@ -944,11 +944,6 @@ const Value ExecState::Call(FuncState *func_state, const std::vector<Value>& arg
         Value func(func_state);
         **stack_->top() = func;
         int index = 0;
-        if (func_state->is_class_func() && func_state->class_inst()) {
-            Value *inst = *stack_->top() + 1;
-            SetCIValue(inst, reinterpret_cast<GCObject *>(func_state->class_inst()));
-            index++;
-        }
         for (int i = 0; i < args.size(); i++) {
             *(*stack_->top() + i + 1 + index) = args[i];
         }

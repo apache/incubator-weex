@@ -42,7 +42,7 @@ class VNode {
 
   void AddEvent(const std::string &event, const std::string &function,
                 const std::vector<std::string> &params);
-  void AddEvent(const std::string &event, void *func);
+  void AddEvent(const std::string &event, void *func, void *inst);
 
   void AddChild(VNode *child);
 
@@ -66,7 +66,7 @@ class VNode {
   inline void set_render_object_ref(std::string ref) {
     render_object_ref_ = std::move(ref);
   }
-
+  inline void *& inst() { return inst_; }
   inline const VNode *parent() const { return parent_; }
 
   inline std::vector<VNode *> *child_list() { return &child_list_; }
@@ -92,6 +92,7 @@ class VNode {
   std::string render_object_ref_;
 
   VNode *parent_ = nullptr;
+  void *inst_ = nullptr;
   std::vector<VNode *> child_list_;
   std::map<std::string, std::string> *styles_;
   std::map<std::string, std::string> *attributes_;

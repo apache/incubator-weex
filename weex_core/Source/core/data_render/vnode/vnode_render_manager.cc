@@ -307,14 +307,19 @@ void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string
         if (iter_event == vnode->events()->end()) {
             break;
         }
-        FuncState *func = (FuncState *)iter_event->second;
-        if (!func) {
+        FuncState *func_state = (FuncState *)iter_event->second;
+        if (!func_state) {
             break;
         }
         ExecState *exec_state = iter->second;
         std::vector<Value> caller_args;
+        if (func_state->is_class_func() && vnode->inst()) {
+            Value inst;
+            SetCIValue(&inst, reinterpret_cast<GCObject *>(vnode->inst()));
+            caller_args.push_back(inst);
+        }
         caller_args.push_back(StringToValue(exec_state, args));
-        exec_state->Call(func, caller_args);
+        exec_state->Call(func_state, caller_args);
         
     } while (0);
 }
