@@ -595,6 +595,7 @@ static BOOL bNeedRemoveEvents = YES;
 {
     pthread_mutex_lock(&_propertyMutex);
     [_subcomponents removeObject:subcomponent];
+    [self removeSubcomponentCssNode:subcomponent];
     pthread_mutex_unlock(&_propertyMutex);
 }
 
