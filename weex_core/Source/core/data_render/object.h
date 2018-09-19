@@ -565,15 +565,11 @@ inline int ToBool(const Value *o, bool &b) {
     else if (ToNum(o, d1)) {
         b = d1;
     }
-    else if (Value::Type::NIL == o->type) {
-        b = false;
-    }
     else if (Value::Type::FUNC == o->type) {
         b = o->f ? true : false;
     }
     else {
-        b = false;
-        return 0;
+        b = ttype(o) == Value::Type::NIL ? false : true;
     }
     return 1;
 }

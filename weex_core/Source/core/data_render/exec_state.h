@@ -124,13 +124,13 @@ class FuncState {
 // TODO Each Func should contain a stack whose size is 256
 class ExecStack {
  public:
-  ExecStack() : stack_(VM_EXEC_STACK_SIZE) {}
+  ExecStack() : stack_(VM_EXEC_STACK_SIZE), top_(&stack_[0]) {}
   Value** top() { return &top_; }
   Value* base() { return &stack_[0]; }
   void reset();
  private:
   std::vector<Value> stack_;
-  Value* top_;
+  Value *top_;
 };
 
 class ExecState {
@@ -142,10 +142,13 @@ class ExecState {
   const Value Call(const std::string& func_name, const std::vector<Value>& args);
   const Value Call(Value *func, const std::vector<Value>& args);
   const Value Call(FuncState *func, const std::vector<Value>& args);
+    
   size_t GetArgumentCount();
   Value* GetArgument(int index);
   ValueRef *AddRef(FuncState *func_state, long register_id);
   ValueRef *FindRef(int index);
+  void Register(const std::string& name, CFunction function);
+  void Register(const std::string& name, Value value);
   std::vector<ValueRef *> &refs() { return refs_; };
   inline Variables* global() { return global_.get(); }
   inline ExecStack* stack() { return stack_.get(); }
@@ -185,7 +188,7 @@ class ExecState {
   void decodeRefSection();
   void decodeClassSection();
   void serializeValue(Value &value);
-
+  void resetArguments(Value *func, size_t argc);
   void CallFunction(Value *func, size_t argc, Value *ret);
   int findSuperIndex(const std::vector<FuncState*>& func_states);
 

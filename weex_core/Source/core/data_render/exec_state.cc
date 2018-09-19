@@ -27,6 +27,7 @@
 #include "core/data_render/rax_parser_context.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/binary_file.h"
+#include "core/data_render/class_array.h"
 
 #if DEBUG
 #include "core/data_render/monitor/vm_monitor.h"
@@ -107,9 +108,9 @@ void ExecState::Execute(std::string& err) {
   Value chunk;
   chunk.type = Value::Type::FUNC;
   chunk.f = func_state_.get();
-  *stack_->base() = chunk;
+  **stack_->top() = chunk;
   try {
-      CallFunction(stack_->base(), 0, nullptr);
+      CallFunction(*stack_->top(), 0, nullptr);
   } catch (std::exception &e) {
       auto error = static_cast<Error *>(&e);
       if (error) {
@@ -908,20 +909,33 @@ void ExecState::serializeValue(Value &value) {
     }
 }
 
-const Value ExecState::Call(const std::string& func_name,
-                             const std::vector<Value>& args) {
-  Value ret;
-  auto it = global_variables_.find(func_name);
-  if (it != global_variables_.end()) {
-    long reg = it->second;
-    Value* function = *stack_->top() + 1;
-    *function = *(stack_->base() + reg);
-    for (int i = 0; i < args.size(); ++i) {
-      *(function + i + 1) = args[i];
-    }
-    CallFunction(function, args.size(), &ret);
-  }
-  return ret;
+const Value ExecState::Call(const std::string& func_name, const std::vector<Value>& args) {
+    Value ret;
+    do {
+        int index = global()->IndexOf(func_name);
+        long caller = -1;
+        if (index >= 0) {
+            **stack_->top() = *(global()->Find(index));
+        }
+        else {
+            auto iter = global_variables_.find(func_name);
+            if (iter == global_variables_.end()) {
+                break;
+            }
+            caller = iter->second;
+            if (caller < 0) {
+                break;
+            }
+            **stack_->top() = *(stack_->base() + caller);
+        }
+        for (int i = 0; i < args.size(); ++i) {
+            *(*stack_->top() + i + 1) = args[i];
+        }
+        CallFunction(*stack_->top(), args.size(), &ret);
+
+    } while (0);
+    
+    return ret;
 }
     
 const Value ExecState::Call(FuncState *func_state, const std::vector<Value>& args) {
@@ -963,6 +977,40 @@ const Value ExecState::Call(Value *func, const std::vector<Value>& args) {
     
     return ret;
 }
+    
+void ExecState::resetArguments(Value *func, size_t argc) {
+    do {
+        auto iter = global_variables_.find(JS_GLOBAL_ARGUMENTS);
+        if (iter == global_variables_.end()) {
+            break;
+        }
+        long caller = iter->second;
+        if (caller < 0) {
+            break;
+        }
+        Value *arguments = stack_->base() + caller;
+        if (!IsArray(arguments)) {
+            break;
+        }
+        ClearArray(ValueTo<Array>(arguments));
+        for (int i = 0; i < argc; i++) {
+            PushArray(ValueTo<Array>(arguments), *(func + i + 1));
+        }
+        
+    } while (0);
+}
+    
+void ExecState::Register(const std::string& name, CFunction func) {
+    Value funcVal;
+    funcVal.type = Value::Type::CFUNC;
+    funcVal.cf = reinterpret_cast<void *>(func);
+    Register(name, funcVal);
+}
+    
+void ExecState::Register(const std::string& name, Value value) {
+    global()->Add(name, value);
+    global()->incrementRegisterSize();
+}
 
 void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
     *stack_->top() = func + argc;
@@ -985,6 +1033,7 @@ void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
         frame.pc = &(*func->f->instructions().begin());
         frame.end = &(*func->f->instructions().end());
         frames_.push_back(frame);
+        resetArguments(func, argc);
         vm_->RunFrame(this, frame, ret);
         stack_->reset();
         frames_.pop_back();

@@ -450,10 +450,10 @@ class CallExpression : public Expression {
 
  private:
   MemberAccessKind kind_;
-  Handle<Expression> expr_;
-  Handle<Expression> member_;
-  Handle<Expression> callee_;
-  Handle<Expression> args_expr_;
+  Handle<Expression> expr_{nullptr};
+  Handle<Expression> member_{nullptr};
+  Handle<Expression> callee_{nullptr};
+  Handle<Expression> args_expr_{nullptr};
   std::vector<Handle<Expression>> args_;
 };
 
@@ -572,9 +572,12 @@ public:
 
     Handle<Expression> member() { return member_; }
     bool ProduceRValue() override { return false; }
+    void set_is_class_(bool is_class) { is_class_ = is_class; };
+    bool is_class() { return is_class_; }
     DEFINE_NODE_TYPE(NewExpression, Expression);
 private:
     Handle<Expression> member_;
+    bool is_class_{false};
 };
     
 class ThisExpression : public Expression {

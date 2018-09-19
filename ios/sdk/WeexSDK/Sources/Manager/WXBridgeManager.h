@@ -128,6 +128,12 @@ extern void WXPerformBlockOnBridgeThread(void (^block)(void));
 - (void)registerModules:(NSDictionary *)modules;
 
 /**
+ *  Register Weex Light Modules Method
+ *  @param modules   :   module list
+ **/
+- (void)registerWXLModules:(NSDictionary *)modules;
+
+/**
  *  Register Components Method
  *  @param components   component list
  **/

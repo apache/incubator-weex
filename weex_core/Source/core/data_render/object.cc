@@ -52,6 +52,10 @@ int ToInteger(const Value *o, const int &mode, int64_t &v) {
     SetDValue(&tmp, d);
     o = &tmp;
     goto label;
+  } else if (IsString(o)) {
+      v = atoi(CStringValue(o));
+      return 1;
+      
   } else {
     return 0;
   }

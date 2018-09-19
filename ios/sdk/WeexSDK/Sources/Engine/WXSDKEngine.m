@@ -77,6 +77,9 @@
     NSDictionary *dict = [WXModuleFactory moduleMethodMapsWithName:moduleName];
     
     [[WXSDKManager bridgeMgr] registerModules:dict];
+    if ([NSStringFromClass(clazz) hasPrefix:@"TBXSearch"]) {
+        [[WXSDKManager bridgeMgr] registerWXLModules:dict];
+    }
 }
 
 # pragma mark Component Register

@@ -844,6 +844,13 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     vnode_manager->FireEvent([pageId UTF8String] ? : "", [ref UTF8String] ? : "", [event UTF8String] ? : "", [params UTF8String] ? : "");
 }
 
++ (void)registerModules:(NSDictionary *)modules {
+    NSString *setting = [WXUtility JSONString:modules];
+    if (setting.length > 0) {
+        weex::core::data_render::VNodeRenderManager::GetInstance()->RegisterModules([setting UTF8String] ? : "");
+    }
+}
+
 + (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
                  isWidthWrapContent:(BOOL)isWidthWrapContent
                 isHeightWrapContent:(BOOL)isHeightWrapContent

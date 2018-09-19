@@ -31,7 +31,8 @@ namespace data_render {
 
 void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
 #define LOGTEMP(...)
-    
+//#define LOGTEMP(...)     printf(__VA_ARGS__)
+
 #if DEBUG
   //TimeCost tc;
 #endif
@@ -304,7 +305,20 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
-            SetBValue(a, ValueOR(b, c));
+            bool bval = false;
+            ToBool(b, bval);
+            if (bval) {
+                *a = *b;
+            }
+            else {
+                ToBool(c, bval);
+                if (bval) {
+                    *a = *c;
+                }
+                else {
+                    SetNil(a);
+                }
+            }
             break;
         }
       case OP_UNM: {
@@ -484,11 +498,11 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                   }
                   case Value::CLASS_DESC:
                   {
-                      b = exec_state->global()->Find((int)(GET_ARG_C(instruction)));
-                      if (!IsClass(b)) {
+                      c = frame.reg + GET_ARG_C(instruction);
+                      if (!IsClass(c)) {
                           throw VMExecError("Unspport Find Desc with OP_CODE [OP_NEWCLASS]");
                       }
-                      *a = exec_state->class_factory()->CreateClassInstance(ValueTo<ClassDescriptor>(b));
+                      *a = exec_state->class_factory()->CreateClassInstance(ValueTo<ClassDescriptor>(c));
                       break;
                   }
                   default:
@@ -543,11 +557,14 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             if (!IsString(c)) {
                 throw VMExecError("Type Error For Member with OP_CODE [OP_GETCLASS]");
             }
-            int index = ValueTo<ClassInstance>(b)->p_desc_->funcs_->IndexOf(StringValue(c)->c_str());
+            std::string var_name = CStringValue(c);
+            int index = ValueTo<ClassInstance>(b)->p_desc_->funcs_->IndexOf(var_name);
             if (index < 0) {
-                throw VMExecError("Can't Find " + std::string(StringValue(c)->c_str()) + " With OP_CODE [OP_GETCLASS]");
+                SetNil(a);
             }
-            *a = *ValueTo<ClassInstance>(b)->p_desc_->funcs_->Find(index);
+            else {
+                *a = *ValueTo<ClassInstance>(b)->p_desc_->funcs_->Find(index);
+            }
             break;
         }
         case OP_GETMEMBERVAR:

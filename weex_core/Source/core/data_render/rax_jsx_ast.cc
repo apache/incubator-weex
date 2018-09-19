@@ -43,7 +43,7 @@ bool JSXNodeExpression::LowerIdentifier() {
     std::string name = Identifier()->AsIdentifier()->GetName();
     return name[0] == tolower(name[0]) ? true : false;
 }
-
+    
 std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
     if (!funcexprs_.size()) {
         ASTFactory *factory = ASTFactory::GetFactoryInstance();
@@ -68,20 +68,9 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
                 funcexprs_.push_back(factory->NewCallExpression(set_props_func_expr, args));
             }
         }
-        else if (!is_class_) {
-            Handle<Expression> call_func_expr = factory->NewIdentifier(name);
-            std::vector<Handle<Expression>> args;
-            if (props_) {
-                args.push_back(props_);
-            }
-            else {
-                ProxyObject proxy;
-                args.push_back(factory->NewObjectConstant(proxy));
-            }
-            funcexprs_.push_back(factory->NewDeclaration(vnode_ptr,factory->NewCallExpression(call_func_expr, args)));
-        }
-        else {
+        else if (is_class_) {
             std::string class_inst = vnode_ptr + "_inst";
+            funcexprs_.push_back(factory->NewDeclaration(vnode_ptr));
             funcexprs_.push_back(factory->NewDeclaration(class_inst, factory->NewNewExpression(identifier_)));
             // call constructor
             std::vector<Handle<Expression>> args;
@@ -97,7 +86,6 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
             // if (vnode_ptr.xxxx) then vnode_ptr.xxxx()
             Handle<Expression> render_expr = factory->NewIdentifier("render");
             Handle<MemberExpression> member_func_expr = factory->NewMemberExpression(MemberAccessKind::kClass, class_inst_expr, render_expr);
-            funcexprs_.push_back(factory->NewDeclaration(vnode_ptr));
             Handle<ExpressionList> if_then_stmts = factory->NewExpressionList();
             if_then_stmts->Insert(factory->NewAssignExpression(factory->NewIdentifier(vnode_ptr), factory->NewCallExpression(MemberAccessKind::kCall, class_inst_expr, render_expr, {})));
             Handle<Expression> compoent_expr = factory->NewIdentifier("vcompoent_ptr");
@@ -106,6 +94,59 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
             if_then_stmts->Insert(factory->NewAssignExpression(compoent_member_expr, factory->NewIdentifier(vnode_ptr)));
             Handle<Expression> if_block_expr = factory->NewBlockStatement(if_then_stmts);
             funcexprs_.push_back(factory->NewIfStatement(member_func_expr, if_block_expr));
+        }
+        else {
+            std::string class_inst = vnode_ptr + "_inst";
+            std::vector<Handle<Expression>> args;
+            // vnode_ptr = null, vnode_inst = null;
+            funcexprs_.push_back(factory->NewDeclaration(class_inst));
+            funcexprs_.push_back(factory->NewDeclaration(vnode_ptr));
+            Handle<Expression> identifier = factory->NewIdentifier(name);
+            Handle<Expression> is_class_func_expr = factory->NewIdentifier("isClass");
+            args.push_back(identifier);
+            Handle<ExpressionList> if_then_stmts = factory->NewExpressionList();
+            Handle<Expression> if_block_expr = factory->NewBlockStatement(if_then_stmts);
+            Handle<ExpressionList> if_else_stmts = factory->NewExpressionList();
+            Handle<Expression> if_else_expr = factory->NewBlockStatement(if_else_stmts);
+            funcexprs_.push_back(factory->NewIfElseStatement(factory->NewCallExpression(is_class_func_expr, args), if_block_expr, if_else_expr));
+            // if isClass
+            {
+                Handle<Expression> class_inst_expr = factory->NewIdentifier(class_inst);
+                Handle<Expression> new_expr = factory->NewNewExpression(identifier_);
+                new_expr->AsNewExpression()->set_is_class_(true);
+                if_then_stmts->Insert(factory->NewAssignExpression(class_inst_expr, new_expr));
+                // call constructor
+                args.clear();
+                if (props_) {
+                    args.push_back(props_);
+                }
+                else {
+                    ProxyObject proxy;
+                    args.push_back(factory->NewObjectConstant(proxy));
+                }
+                if_then_stmts->Insert(factory->NewCallExpression(MemberAccessKind::kCall, class_inst_expr, factory->NewIdentifier("constructor"), args));
+                // if (vnode_ptr.xxxx) then vnode_ptr.xxxx()
+                Handle<Expression> render_expr = factory->NewIdentifier("render");
+                Handle<MemberExpression> member_func_expr = factory->NewMemberExpression(MemberAccessKind::kClass, class_inst_expr, render_expr);
+                Handle<ExpressionList> if_then_stmts_inner = factory->NewExpressionList();
+                if_then_stmts_inner->Insert(factory->NewAssignExpression(factory->NewIdentifier(vnode_ptr), factory->NewCallExpression(MemberAccessKind::kCall, class_inst_expr, render_expr, {})));
+                Handle<Expression> compoent_expr = factory->NewIdentifier("vcompoent_ptr");
+                Handle<Expression> compoent_member_expr = factory->NewMemberExpression(MemberAccessKind::kClass, class_inst_expr, compoent_expr);
+                compoent_member_expr->AsMemberExpression()->is_assignment() = true;
+                if_then_stmts_inner->Insert(factory->NewAssignExpression(compoent_member_expr, factory->NewIdentifier(vnode_ptr)));
+                Handle<Expression> if_block_expr_inner = factory->NewBlockStatement(if_then_stmts_inner);
+                if_then_stmts->Insert(factory->NewIfStatement(member_func_expr, if_block_expr_inner));
+            }
+            // else
+            args.clear();
+            if (props_) {
+                args.push_back(props_);
+            }
+            else {
+                ProxyObject proxy;
+                args.push_back(factory->NewObjectConstant(proxy));
+            }
+            if_else_stmts->Insert(factory->NewAssignExpression(factory->NewIdentifier(vnode_ptr), factory->NewCallExpression(identifier, args)));
         }
     }
     return funcexprs_;

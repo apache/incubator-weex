@@ -508,9 +508,21 @@ void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
         }
         // make arguments var in thie front of stack;
         for (int i = 0; i < node->args().size(); i++) {
-            assert(node->args()[i]->IsIdentifier());
-            std::string arg = node->args()[i]->AsIdentifier()->GetName();
-            block_->AddVariable(arg, block_->NextRegisterId());
+            if (node->args()[i]->IsIdentifier()) {
+                std::string arg = node->args()[i]->AsIdentifier()->GetName();
+                block_->AddVariable(arg, block_->NextRegisterId());
+            }
+            else if (node->args()[i]->IsCommaExpression()) {
+                Handle<ExpressionList> arg_list = node->args()[i]->AsCommaExpression()->exprs();
+                for (int j = 0; j < arg_list->Size(); j++) {
+                    std::string arg = arg_list->raw_list()[j]->AsIdentifier()->GetName();
+                    block_->AddVariable(arg, block_->NextRegisterId());
+                }
+            }
+            else {
+                // force to error
+                throw GeneratorError("arrow function only supporting args list");
+            }
         }
         if (node->body()->IsJSXNodeExpression()) {
             long return1 = block_->NextRegisterId();
@@ -591,14 +603,21 @@ void CodeGenerator::Visit(NewExpression *node, void *data) {
             FuncState *state = func_->func_state();
             long rhs = block_->FindRegisterId(node->member()->AsIdentifier()->GetName());
             if (rhs >= 0) {
-                state->AddInstruction(CREATE_ABC(OP_MOVE, lhs, rhs, 0));
+                if (node->is_class()) {
+                    state->AddInstruction(CREATE_ABC(OP_NEW, lhs, Value::CLASS_DESC, rhs));
+                }
+                else {
+                    state->AddInstruction(CREATE_ABC(OP_MOVE, lhs, rhs, 0));
+                }
                 break;
             }
             int index = exec_state_->global()->IndexOf(node->member()->AsIdentifier()->GetName());
             if (index >= 0) {
                 Value *value = exec_state_->global()->Find(index);
                 if (IsClass(value)) {
-                    state->AddInstruction(CREATE_ABC(OP_NEW, lhs, Value::CLASS_DESC ,index));
+                    rhs = block_->NextRegisterId();
+                    state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, rhs, index));
+                    state->AddInstruction(CREATE_ABC(OP_NEW, lhs, Value::CLASS_DESC, rhs));
                 }
                 else {
                     state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, lhs, index));

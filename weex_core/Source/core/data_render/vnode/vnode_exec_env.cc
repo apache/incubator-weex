@@ -26,6 +26,7 @@
 #include "core/data_render/class_string.h"
 #include "core/data_render/class_object.h"
 #include "core/data_render/common_error.h"
+#include "core/data_render/js_common_function.h"
 #include "core/data_render/vnode/vcomponent.h"
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include <base/LogDefines.h>
@@ -146,8 +147,29 @@ static Value Slice(ExecState *exec_state) {
     ArrayCopyFrom(*array, new_value, v_start, v_end);
     return new_value;
 }
+    
+static Value CallNativeModule(ExecState *exec_state) {
+    do {
+        if (exec_state->GetArgumentCount() < 1) {
+            break;
+        }
+        Value *arg = exec_state->GetArgument(0);
+        if (!IsTable(arg)) {
+            break;
+        }
+        std::cout << "[log]:=>" << TableToString(ValueTo<Table>(arg)) << "\n";
+        
+    } while(0);
+    
+    return Value();
+}
+    
+static Value RegisterModules(ExecState *exec_state) {
+    weex::core::data_render::VNodeRenderManager::GetInstance()->ExecuteRegisterModules(exec_state);
+    return Value();
+}
 
-static Value AppendUrlParam(ExecState* exec_state) {
+static Value AppendUrlParam(ExecState *exec_state) {
   size_t length = exec_state->GetArgumentCount();
   if (length != 2) {
     return Value();
@@ -329,6 +351,9 @@ static Value AppendChild(ExecState *exec_state) {
         if (IsArray(childrens)) {
             std::vector<Value> items = ValueTo<Array>(childrens)->items;
             for (int i = 0; i < items.size(); i++) {
+                if (IsNil(&items[i])) {
+                    continue;
+                }
                 if (!IsCptr(&items[i])) {
                     throw VMExecError("AppendChild unspport array or cptr");
                 }
@@ -401,8 +426,13 @@ static Value SetProps(ExecState *exec_state) {
                                 node->SetStyle(iter_style->first, to_string(iter_style->second.i));
                                 break;
                             }
+                            case Value::NUMBER:
+                            {
+                                node->SetStyle(iter_style->first, to_string(iter_style->second.n));
+                                break;
+                            }
                             default:
-                                LOGE("can't support type:%i", iter_style->second.type);
+                                LOGE("can't support type:%i\n", iter_style->second.type);
                                 break;
                         }
                     }
@@ -431,8 +461,13 @@ static Value SetProps(ExecState *exec_state) {
                         node->AddEvent(event, iter->second.f);
                         break;
                     }
+                    case Value::NUMBER:
+                    {
+                        node->SetStyle(iter->first, to_string(iter->second.n));
+                        break;
+                    }
                     default:
-                        LOGE("can't support type:%i", iter->second.type);
+                        LOGE("can't support type:%i\n", iter->second.type);
                         break;
                 }
 
@@ -479,43 +514,31 @@ static Value SetStyle(ExecState* exec_state) {
   return Value();
 }
 
-void RegisterCFunc(ExecState* state, const std::string& name,
-                   CFunction function) {
-  Value func;
-  func.type = Value::Type::CFUNC;
-  func.cf = reinterpret_cast<void*>(function);
-  state->global()->Add(name, func);
-  state->global()->incrementRegisterSize();
-}
-
-void RegisterClass(ExecState *state, const std::string& name, Value value) {
-    state->global()->Add(name, value);
-    state->global()->incrementRegisterSize();
-}
-
-void VNodeExecEnv::InitCFuncEnv(ExecState* state) {
-  // log
-  RegisterCFunc(state, "log", Log);
-  RegisterCFunc(state, "sizeof", SizeOf);
-  RegisterCFunc(state, "slice", Slice);
-  RegisterCFunc(state, "appendUrlParam", AppendUrlParam);
-  RegisterCFunc(state, "merge", Merge);
-  RegisterCFunc(state, "tostring", ToString);
-  RegisterCFunc(state, "createElement", CreateElement);
-  RegisterCFunc(state, "updateElement", UpdateElement);
-  RegisterCFunc(state, "createComponent", CreateComponent);
-  RegisterCFunc(state, "saveComponentDataAndProps", SaveComponentDataAndProps);
-  RegisterCFunc(state, "appendChildComponent", AppendChildComponent);
-  RegisterCFunc(state, "appendChild", AppendChild);
-  RegisterCFunc(state, "encodeURIComponent", encodeURIComponent);
-  RegisterCFunc(state, "setAttr", SetAttr);
-  RegisterCFunc(state, "setProps", SetProps);
-  RegisterCFunc(state, "setClassList", SetClassList);
-  RegisterCFunc(state, "setStyle", SetStyle);
-  RegisterClass(state, "Array", state->class_factory()->ClassArray());
-  RegisterClass(state, "String", state->class_factory()->ClassString());
-  RegisterClass(state, "JSON", state->class_factory()->ClassJSON());
-  RegisterClass(state, "Object", state->class_factory()->ClassObject());
+void VNodeExecEnv::InitCFuncEnv(ExecState *state) {
+    state->Register("log", Log);
+    state->Register("sizeof", SizeOf);
+    state->Register("slice", Slice);
+    state->Register("appendUrlParam", AppendUrlParam);
+    state->Register("merge", Merge);
+    state->Register("tostring", ToString);
+    state->Register("createElement", CreateElement);
+    state->Register("updateElement", UpdateElement);
+    state->Register("createComponent", CreateComponent);
+    state->Register("saveComponentDataAndProps", SaveComponentDataAndProps);
+    state->Register("appendChildComponent", AppendChildComponent);
+    state->Register("appendChild", AppendChild);
+    state->Register("encodeURIComponent", encodeURIComponent);
+    state->Register("setAttr", SetAttr);
+    state->Register("setProps", SetProps);
+    state->Register("setClassList", SetClassList);
+    state->Register("setStyle", SetStyle);
+    state->Register("__callNativeModule", CallNativeModule);
+    state->Register("__registerModules", RegisterModules);
+    state->Register("Array", state->class_factory()->ClassArray());
+    state->Register("String", state->class_factory()->ClassString());
+    state->Register("JSON", state->class_factory()->ClassJSON());
+    state->Register("Object", state->class_factory()->ClassObject());
+    RegisterJSCommonFunction(state);
 }
 
 Value JSONToValue(ExecState *state, const json11::Json& json) {

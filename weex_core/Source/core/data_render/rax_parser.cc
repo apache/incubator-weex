@@ -1250,12 +1250,13 @@ Handle<Expression> RAXParser::ParseProgram()
     Handle<ExpressionList> exprs = builder()->NewExpressionList();
     Handle<ChunkStatement> chunk = builder()->NewChunkStatement(exprs);
     exprs->Insert(builder()->NewDeclaration(JSX_GLOBAL_VNODE_INDEX, builder()->NewIntegralConstant(0)));
+    exprs->Insert(builder()->NewDeclaration(JS_GLOBAL_ARGUMENTS, builder()->NewArrayConstant({})));
     try {
         while (Peek() != Token::EOS) {
             exprs->Insert(ParseStatement());
         }
     } catch (std::exception &e) {
-        auto error = static_cast<SyntaxError*>(&e);
+        auto error = static_cast<SyntaxError *>(&e);
         
         if (error) {
             std::cerr << error->what() << " (" << error->token().position().row()
@@ -1364,6 +1365,9 @@ Handle<Expression> RAXParser::ParseVariableStatement()
             break;
         }
         else if (tok == Token::IN || tok == Token::CONST) {
+            break;
+        }
+        else if (tok == Token::CLASS) {
             break;
         }
         else if (tok != Token::COMMA) {

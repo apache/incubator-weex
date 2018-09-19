@@ -65,6 +65,10 @@ Value *GetClassMember(ClassInstance *inst, std::string &name) {
             if (ret) {
                 break;
             }
+            // 构造函数不找super
+            if (name == "constructor") {
+                break;
+            }
             inst_current = inst_current->p_super_;
         }
         

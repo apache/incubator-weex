@@ -190,7 +190,6 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
     if (!err.empty()) {
         return;
     }
-
     //auto exec_start = std::chrono::steady_clock::now();
     exec_state->Execute(err);
     if (!err.empty()) {
@@ -200,10 +199,23 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
         return;
     }
     CreatePageInternal(page_id, exec_state->context()->root());
-    //exec_state->context()->Reset();
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
 
     LOGE("DATA_RENDER, All time %lld", duration_post.count());
+}
+    
+void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state) {
+    do {
+        if (!modules_.size()) {
+            break;
+        }
+        const std::string func_name = "registerModule";
+        for (auto iter = modules_.begin(); iter != modules_.end(); iter++) {
+            Value arg = StringToValue(exec_state, *iter);
+            exec_state->Call(func_name, {arg});
+        }
+        
+    } while (0);
 }
 
 void VNodeRenderManager::CreatePage(const char *contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data) {
@@ -223,7 +235,6 @@ void VNodeRenderManager::CreatePage(const char *contents, unsigned long length, 
     if (init_data.length() > 0) {
         VNodeExecEnv::InitInitDataValue(exec_state, init_data);
     }
-
     //auto exec_start = std::chrono::steady_clock::now();
     exec_state->Execute(err);
     if (!err.empty()) {
@@ -277,7 +288,7 @@ bool VNodeRenderManager::ClosePage(const std::string& page_id) {
   exec_states_.erase(it);
   return true;
 }
-    
+        
 void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args) {
     do {
         auto iter = exec_states_.find(page_id);

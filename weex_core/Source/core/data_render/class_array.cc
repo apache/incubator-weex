@@ -74,6 +74,14 @@ int SetArray(Array *array, Value *index, const Value &val) {
     return ret;
 }
     
+void ClearArray(Array *array) {
+    array->items.clear();
+}
+    
+void PushArray(Array *array, Value val) {
+    array->items.push_back(val);
+}
+    
 int SetArray(Array *array, int index, const Value &val) {
     int ret = 0;
     do {

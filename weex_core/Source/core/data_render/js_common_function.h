@@ -21,27 +21,20 @@
 // Created by pentao.pt on 2018/7/25.
 //
 
-#ifndef DATA_RENDER_ARRAY_CLASS_H
-#define DATA_RENDER_ARRAY_CLASS_H
+#ifndef DATA_RENDER_JS_COMMON_FUNCTION_H
+#define DATA_RENDER_JS_COMMON_FUNCTION_H
 
 #include "core/data_render/object.h"
+#include "core/data_render/exec_state.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-        
-ClassDescriptor *NewClassArray();
-int SetArray(Array *array, Value *index, const Value &val);
-int SetArray(Array *array, int index, const Value &val);
-Value GetArrayValue(Array *array, const Value &index);
-Value* GetArrayVar(Array *array, const Value &index);
-Value GetArraySizeValue(Array *array);
-size_t GetArraySize(Array *array);
-void ClearArray(Array *array);
-void PushArray(Array *array, Value val);
-
+ 
+void RegisterJSCommonFunction(ExecState *state);
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
 
-#endif  // DATA_RENDER_ARRAY_CLASS_H
+#endif  // DATA_RENDER_JS_COMMON_FUNCTION_H

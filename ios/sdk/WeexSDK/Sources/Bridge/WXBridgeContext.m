@@ -869,6 +869,16 @@ _Pragma("clang diagnostic pop") \
     [self callJSMethod:@"registerModules" args:@[modules]];
 }
 
+- (void)registerWXLModules:(NSDictionary *)modules {
+    WXAssertBridgeThread();
+    if (!modules) {
+        return;
+    }
+    WXPerformBlockOnComponentThread(^{
+        [WXCoreBridge registerModules:modules];
+    });
+}
+
 - (void)registerComponents:(NSArray *)components
 {
     WXAssertBridgeThread();
@@ -882,7 +892,8 @@ _Pragma("clang diagnostic pop") \
 {
     if (self.frameworkLoadFinished) {
         [self.jsBridge callJSMethod:method args:args];
-    } else {
+    }
+    else {
         [_methodQueue addObject:@{@"method":method, @"args":args}];
     }
 }

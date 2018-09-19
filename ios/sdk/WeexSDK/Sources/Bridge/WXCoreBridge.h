@@ -188,6 +188,8 @@ namespace WeexCore
 
 + (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args;
 
++ (void)registerModules:(NSDictionary *)modules;
+
 @end
 
 #endif
