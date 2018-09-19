@@ -182,7 +182,6 @@
     void (^updates)(void) = [^{
         [self.delegate updateManager:self willUpdateData:newData];
         [UIView setAnimationsEnabled:NO];
-        NSLog(@"UICollectionView update:%@", recycleListDiffResult);
         [self applyUpdateWithDiffResult:recycleListDiffResult];
     } copy];
     
@@ -190,7 +189,6 @@
         [UIView setAnimationsEnabled:YES];
         self.isUpdating = NO;
         [self.delegate updateManager:self didUpdateData:newData withSuccess:finished];
-        
         [self.reloadIndexPaths removeAllObjects];
         [self checkUpdates];
     } copy];
@@ -243,9 +241,15 @@
     NSMutableSet *reloadIndexPaths = self.reloadIndexPaths ? [[diffResult.reloadIndexPaths setByAddingObjectsFromSet:self.reloadIndexPaths] mutableCopy]: [diffResult.reloadIndexPaths mutableCopy];
     [reloadIndexPaths minusSet:diffResult.deleteIndexPaths];
     
-    [_collectionView deleteItemsAtIndexPaths:[diffResult.deleteIndexPaths allObjects]];
-    [_collectionView insertItemsAtIndexPaths:[diffResult.insertIndexPaths allObjects]];
-    [_collectionView reloadItemsAtIndexPaths:[reloadIndexPaths allObjects]];
+    if (diffResult.deleteIndexPaths.count > 0) {
+        [_collectionView deleteItemsAtIndexPaths:[diffResult.deleteIndexPaths allObjects]];
+    }
+    if (diffResult.insertIndexPaths.count > 0) {
+        [_collectionView insertItemsAtIndexPaths:[diffResult.insertIndexPaths allObjects]];
+    }
+    if (reloadIndexPaths.count > 0) {
+        [_collectionView reloadItemsAtIndexPaths:[reloadIndexPaths allObjects]];
+    }
 }
 
 - (void)cleanup
