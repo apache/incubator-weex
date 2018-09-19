@@ -22,10 +22,14 @@
 
 #include <sstream>
 #include <string>
-#include <codecvt>
+#include <malloc.h>
+
+#include "base/third_party/icu/icu_utf.h"
 
 namespace weex {
 namespace base {
+
+constexpr int32_t kErrorCodePoint = 0xFFFD;
 
 template <typename T>
 std::string to_string(T value) {
@@ -34,11 +38,50 @@ std::string to_string(T value) {
   return os.str();
 }
 
+static bool IsValidCodepoint(uint32_t code_point) {
+  // Excludes the surrogate code points ([0xD800, 0xDFFF]) and
+  // codepoints larger than 0x10FFFF (the highest codepoint allowed).
+  // Non-characters and unassigned codepoints are allowed.
+  return code_point < 0xD800u ||
+         (code_point >= 0xE000u && code_point <= 0x10FFFFu);
+}
+
+static uint32_t convert_single_char(char16_t in) {
+  if (!CBU16_IS_SINGLE(in) || !IsValidCodepoint(in)) {
+    return kErrorCodePoint;
+  }
+  return in;
+}
+
 inline static std::string to_utf8(uint16_t* utf16, size_t length) {
   char16_t *WC = reinterpret_cast<char16_t *>(utf16);
-  std::u16string str(WC, length);
-  /* 转换宽字符字符串 */
-  return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(str);
+  char* dest = static_cast<char*>(malloc(length * sizeof(char16_t) + sizeof(char16_t)));
+  memset(dest, 0, length * sizeof(char16_t) + sizeof(char16_t));
+  int32_t i = 0;
+  int32_t d_len = 0;
+  int32_t* dest_len = &d_len;
+  // Always have another symbol in order to avoid checking boundaries in the
+  // middle of the surrogate pair.
+  while (i < length - 1) {
+    int32_t code_point;
+
+    if (CBU16_IS_LEAD(WC[i]) && CBU16_IS_TRAIL(WC[i + 1])) {
+      code_point = CBU16_GET_SUPPLEMENTARY(WC[i], WC[i + 1]);
+      i += 2;
+    } else {
+      code_point = convert_single_char(WC[i]);
+      ++i;
+    }
+
+    CBU8_APPEND_UNSAFE(dest, *dest_len, code_point);
+  }
+
+  if (i < length)
+    CBU8_APPEND_UNSAFE(dest, *dest_len, convert_single_char(WC[i]));
+
+  std::string output(dest);
+  free(dest);
+  return output;
 }
 
 }  // namespace base

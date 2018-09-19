@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <malloc.h>
 #include "IPCStringResult.h"
 
 
