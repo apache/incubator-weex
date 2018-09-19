@@ -180,6 +180,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)layoutDidFinish;
 
+/**
+ * @abstract Update component's CSS style values for external components.
+ *  Could be called in any thread and will be scheduled to component thread.
+ */
+- (void)updateLayoutStyles:(NSDictionary*)styles;
 
 ///--------------------------------------
 /// @name View Management
