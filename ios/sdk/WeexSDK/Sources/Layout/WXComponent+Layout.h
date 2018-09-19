@@ -64,4 +64,9 @@ extern "C" {
  */
 - (CGFloat)safeContainerStyleWidth;
 
+/**
+ * @abstract Delete css node of a subcomponent.
+ */
+- (void)removeSubcomponentCssNode:(WXComponent *)subcomponent;
+
 @end

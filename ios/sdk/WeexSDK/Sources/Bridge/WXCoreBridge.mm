@@ -156,30 +156,40 @@ namespace WeexCore
         return result;
     }
     
-    static void MergeBorderWidthValues(NSMutableDictionary* dict, const WXCoreBorderWidth & borders, bool isUpdate)
+    static void MergeBorderWidthValues(NSMutableDictionary* dict,
+                                       const WXCoreBorderWidth & borders,
+                                       bool isUpdate, float pixelScaleFactor)
     {
+        if (pixelScaleFactor <= 0) {
+            pixelScaleFactor = 1.0f;
+        }
         if (borders.getBorderWidth(kBorderWidthTop) != (float)0.0f || isUpdate) {
-            dict[@"borderTopWidth"] = @(borders.getBorderWidth(kBorderWidthTop));
+            dict[@"borderTopWidth"] = @(borders.getBorderWidth(kBorderWidthTop) / pixelScaleFactor);
         }
         if (borders.getBorderWidth(kBorderWidthLeft) != (float)0.0f || isUpdate) {
-            dict[@"borderLeftWidth"] = @(borders.getBorderWidth(kBorderWidthLeft));
+            dict[@"borderLeftWidth"] = @(borders.getBorderWidth(kBorderWidthLeft) / pixelScaleFactor);
         }
         if (borders.getBorderWidth(kBorderWidthBottom) != (float)0.0f || isUpdate) {
-            dict[@"borderBottomWidth"] = @(borders.getBorderWidth(kBorderWidthBottom));
+            dict[@"borderBottomWidth"] = @(borders.getBorderWidth(kBorderWidthBottom) / pixelScaleFactor);
         }
         if (borders.getBorderWidth(kBorderWidthRight) != (float)0.0f || isUpdate) {
-            dict[@"borderRightWidth"] = @(borders.getBorderWidth(kBorderWidthRight));
+            dict[@"borderRightWidth"] = @(borders.getBorderWidth(kBorderWidthRight) / pixelScaleFactor);
         }
     }
     
-    static void MergeBorderWidthValues(NSMutableDictionary* dict, std::vector<std::pair<std::string, std::string>>* borders)
+    static void MergeBorderWidthValues(NSMutableDictionary* dict,
+                                       std::vector<std::pair<std::string, std::string>>* borders,
+                                       float pixelScaleFactor)
     {
         if (borders == nullptr) {
             return;
         }
+        if (pixelScaleFactor <= 0) {
+            pixelScaleFactor = 1.0f;
+        }
         
         for (auto& p : *borders) {
-            dict[NSSTRING(p.first.c_str())] = NSSTRING(p.second.c_str());
+            dict[NSSTRING(p.first.c_str())] = @(atof(p.second.c_str()) / pixelScaleFactor);
         }
     }
     
@@ -367,13 +377,15 @@ namespace WeexCore
         NSMutableDictionary* ns_styles = NSDICTIONARY(styles);
         NSDictionary* ns_attributes = NSDICTIONARY(attributes);
         NSArray* ns_events = NSARRAY(events);
-        MergeBorderWidthValues(ns_styles, borders, false);
+        
+        WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:ns_instanceId];
+        MergeBorderWidthValues(ns_styles, borders, false, sdkInstance.pixelScaleFactor);
         
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> action: createBody %@ ref:%@", ns_type, ns_ref);
 #endif
         
-        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        WXComponentManager* manager = sdkInstance.componentManager;
         if (!manager.isValid) {
             return -1;
         }
@@ -412,13 +424,15 @@ namespace WeexCore
         NSDictionary* ns_attributes = NSDICTIONARY(attributes);
         NSArray* ns_events = NSARRAY(events);
         NSInteger ns_index = index;
-        MergeBorderWidthValues(ns_styles, borders, false);
+        
+        WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:ns_instanceId];
+        MergeBorderWidthValues(ns_styles, borders, false, sdkInstance.pixelScaleFactor);
         
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> action: addElement : %@", ns_componentType);
 #endif
         
-        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        WXComponentManager* manager = sdkInstance.componentManager;
         if (!manager.isValid) {
             return -1;
         }
@@ -505,13 +519,15 @@ namespace WeexCore
         NSString* ns_instanceId = NSSTRING(pageId);
         NSString* ns_ref = NSSTRING(ref);
         NSMutableDictionary* ns_style = NSDICTIONARY(style);
-        MergeBorderWidthValues(ns_style, border);
+        
+        WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:ns_instanceId];
+        MergeBorderWidthValues(ns_style, border, sdkInstance.pixelScaleFactor);
         
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> action: updateStyles ref:%@, styles:%@", ns_ref, ns_style);
 #endif
         
-        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        WXComponentManager* manager = sdkInstance.componentManager;
         if (!manager.isValid) {
             return -1;
         }
