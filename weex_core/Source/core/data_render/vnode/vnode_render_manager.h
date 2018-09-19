@@ -51,7 +51,8 @@ class VNodeRenderManager {
   void FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args);
   void ExecuteRegisterModules(ExecState *exec_state);
   void RegisterModules(const std::string &modules) { modules_.push_back(modules); }
-  void PatchVNode(ExecState * exec_state, VNode *v_node, VNode *new_node);
+  void PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node);
+  void CallNativeModule(ExecState *exec_state, const std::string &module, const std::string &method, const std::string &args, int argc = 0);
   static VNodeRenderManager *GetInstance() {
     if (!g_instance) {
       g_instance = new VNodeRenderManager();

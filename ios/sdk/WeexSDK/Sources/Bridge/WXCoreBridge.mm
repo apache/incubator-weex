@@ -215,12 +215,33 @@ namespace WeexCore
         assert(false);
     }
     
-    std::unique_ptr<ValueWithType> IOSSide::CallNativeModule(const char* pageId, const char *module, const char *method,
-                                         const char *arguments, int argumentsLength,
+    std::unique_ptr<ValueWithType> IOSSide::CallNativeModule(const char *page_id, const char *module, const char *method,
+                                         const char *args, int argc,
                                          const char *options, int optionsLength)
     {
         // should not enter this function
-        assert(false);
+        do {
+            RenderPage *page = RenderManager::GetInstance()->GetPage(page_id);
+            if (page == nullptr) {
+                break;
+            }
+            NSString *instanceId = NSSTRING(page_id);
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            if (!instance) {
+                break;
+            }
+            NSString *moduleName = [NSString stringWithUTF8String:module];
+            NSString *methodName = [NSString stringWithUTF8String:method];
+            NSArray *newArguments;
+            if (argc > 0 && args) {
+                NSString *arguments = [NSString stringWithUTF8String:args];
+                newArguments = [WXUtility objectFromJSON:arguments];
+            }
+            WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:newArguments options:nil instance:instance];
+            [method invoke];
+            
+        } while (0);
+        
         return std::unique_ptr<ValueWithType>();
     }
         

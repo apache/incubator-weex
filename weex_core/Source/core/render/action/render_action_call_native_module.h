@@ -16,36 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_CALL_NATIVE_MODULE_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_CALL_NATIVE_MODULE_H_
 
-#ifndef DATA_RENDER_TABLE_H
-#define DATA_RENDER_TABLE_H
+#include <string>
 
-#include "core/data_render/object.h"
+#include "core/render/action/render_action_interface.h"
 
-namespace weex {
-namespace core {
-namespace data_render {
+namespace WeexCore {
 
-int SetTableValue(Table *, Value *, const Value &);
-    
-Value *GetTableValue(Table *, const Value &);
-    
-Value *GetTableVar(Table *table, const Value &key);
-    
-Value *GetTableValue(Table *table, std::string key);
-    
-std::vector<std::string> GetTableKeys(Table *table);
-    
-size_t GetTableSize(Table *);
-    
-std::string TableToString(Table *table);
-    
-std::string ArrayToString(Array *array);
-    
-int TableInKey(StringTable *string_table,Table *table, Value *condition, Value *var);
-    
-}  // namespace data_render
-}  // namespace core
-}  // namespace weex
+class RenderActionCallNativeModule: public RenderAction {
+ public:
+  explicit RenderActionCallNativeModule(const std::string &page_id,
+                                   const std::string &module,
+                                   const std::string &method, const std::string &args, int argc = 0);
 
-#endif  // DATA_RENDER_TABLE_H
+  void ExecuteAction();
+
+ public:
+  std::string page_id_;
+  std::string module_;
+  std::string method_;
+  std::string args_;
+  int argc_;
+};
+}  // namespace WeexCore
+
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_CALL_NATIVE_MODULE_H_

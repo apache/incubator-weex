@@ -324,6 +324,19 @@ void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string
     } while (0);
 }
     
+void VNodeRenderManager::CallNativeModule(ExecState *exec_state, const std::string &module, const std::string &method, const std::string &args, int argc) {
+    do {
+        for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {
+            if (iter->second == exec_state) {
+                RenderManager::GetInstance()->CallNativeModule(iter->first, module, method, args, argc);
+                break;
+            }
+        }
+        
+    } while (0);
+
+}
+    
 void VNodeRenderManager::PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node) {
     do {
         for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {

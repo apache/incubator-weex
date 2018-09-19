@@ -157,7 +157,20 @@ static Value CallNativeModule(ExecState *exec_state) {
         if (!IsTable(arg)) {
             break;
         }
-        std::cout << "[log]:=>" << TableToString(ValueTo<Table>(arg)) << "\n";
+        Value *module = GetTableValue(ValueTo<Table>(arg), std::string("module"));
+        if (!module || !IsString(module)) {
+            break;
+        }
+        Value *method = GetTableValue(ValueTo<Table>(arg), std::string("method"));
+        if (!method || !IsString(method)) {
+            break;
+        }
+        Value *args = GetTableValue(ValueTo<Table>(arg), std::string("args"));
+        if (!args || !IsArray(args)) {
+            break;
+        }
+        int argc = (int)GetArraySize(ValueTo<Array>(args));
+        weex::core::data_render::VNodeRenderManager::GetInstance()->CallNativeModule(exec_state, CStringValue(module), CStringValue(method), argc > 0 ? ArrayToString(ValueTo<Array>(args)) : "", argc);
         
     } while(0);
     

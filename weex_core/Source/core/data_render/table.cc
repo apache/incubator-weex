@@ -75,16 +75,18 @@ int SetTableForKey(Table *t, const Value *key, const Value &val) {
     GCRetain((Value *)&val);
     return 1;
 }
-
-Value *GetTableForKey(Table *t, const Value *key) {
-    std::string str = CStringValue(key);
-    if (!str.empty()) {
-        auto it = t->map.find(str);
-        if (it != t->map.end()) {
-            return &(it->second);
-        }
+    
+Value *GetTableForKey(Table *table, const std::string &key) {
+    auto iter = table->map.find(key);
+    if (iter != table->map.end()) {
+        return &(iter->second);
     }
     return nullptr;
+}
+
+Value *GetTableForKey(Table *table, const Value *key) {
+    std::string keystr = CStringValue(key);
+    return GetTableForKey(table, keystr);
 }
 
 Value *GetTableValue(Table *t, const Value &key) {
@@ -110,6 +112,11 @@ Value *GetTableVar(Table *table, const Value &key) {
     } while (0);
     
     return ret;
+}
+    
+Value *GetTableValue(Table *table, std::string key)
+{
+    return GetTableForKey(table, key);
 }
     
 std::vector<std::string> GetTableKeys(Table *table)
