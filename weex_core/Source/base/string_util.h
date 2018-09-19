@@ -22,8 +22,11 @@
 
 #include <sstream>
 #include <string>
+#ifdef OS_ANDROID
 #include <malloc.h>
-
+#else
+#include <malloc/malloc.h>
+#endif
 #include "base/third_party/icu/icu_utf.h"
 
 namespace weex {
