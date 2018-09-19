@@ -411,6 +411,15 @@
     }
     
     CGContextStrokePath(context);
+    
+    //clipRadius is beta feature
+    //TO DO: remove _clipRadius property
+    if (_clipToBounds && _clipRadius) {
+        BOOL radiusEqual = _borderTopLeftRadius == _borderTopRightRadius && _borderTopRightRadius == _borderBottomRightRadius && _borderBottomRightRadius == _borderBottomLeftRadius;
+        if (!radiusEqual) {
+            self.layer.mask = [self drawBorderRadiusMaskLayer:rect];
+        }
+    }
 }
 
 - (BOOL)_needsDrawBorder
