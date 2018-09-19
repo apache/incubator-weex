@@ -213,12 +213,6 @@ bool flexIsUndefined(float value) {
         if (styles[@"direction"]) {
             _flexCssNode->setDirection([self fxDirection:styles[@"direction"]], isUpdate);
         }
-        if ([self.ref isEqualToString:WX_SDK_ROOT_REF] && _flexCssNode->getDirection() == WeexCore::kDirectionInherit) {
-            // if root element have not specify direction, then we use system layout direction
-            WeexCore::WXCoreDirection direction = self.weexInstance.usedLayoutDirection == WXLayoutDirectionRTL ? WeexCore::kDirectionRTL : WeexCore::kDirectionLTR;
-//            _flexCssNode->setDirection(direction, NO);
-            _flexCssNode->setDirection(WeexCore::kDirectionRTL, NO);
-        }
     
         // flex
         if (styles[@"flex"]) {

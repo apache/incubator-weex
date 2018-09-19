@@ -41,8 +41,6 @@
 
 @property (nonatomic, readonly, strong) WXComponentManager *componentManager;
 
-@property (nonatomic, readonly, assign) WXLayoutDirection usedLayoutDirection;
-
 - (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary*)option moduleClassName:(NSString*)moduleClassName;
 - (void)_addModuleEventObserversWithModuleMethod:(WXModuleMethod*)method;
 - (void)removeModuleEventObserver:(NSString*)event moduleClassName:(NSString*)moduleClassName;

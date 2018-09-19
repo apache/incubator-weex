@@ -266,6 +266,10 @@ do {\
             [_layer setNeedsDisplay];
         }
     }
+    // for RTL
+    if (styles[@"direction"]) {
+        [self _adjustForRTL];
+    }
 }
 
 - (void)resetBorder:(NSArray *)styles

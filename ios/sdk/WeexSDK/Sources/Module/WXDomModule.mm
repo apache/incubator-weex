@@ -253,7 +253,7 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     [self performBlockOnComponentManager:^(WXComponentManager * manager) {
         if ([ref isEqualToString:@"viewport"]) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSString *direction = manager.weexInstance.usedLayoutDirection == WXLayoutDirectionRTL ? @"rtl" : @"ltr";
+                NSString *direction = [WXUtility getEnvLayoutDirection] == WXLayoutDirectionRTL ? @"rtl" : @"ltr";
                 if (callback) {
                     callback(direction, false);
                 }
