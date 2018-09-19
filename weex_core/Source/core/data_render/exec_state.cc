@@ -853,7 +853,7 @@ void ExecState::endDecode() {
     int count = 0;
     for (auto desc : descs) {
         count++;
-        if (count <= 3) {
+        if (count <= 4) {
             continue;
         }
         if (desc->super_index_ != -1) {

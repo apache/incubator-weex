@@ -577,7 +577,6 @@ inline int ToBool(const Value *o, bool &b) {
 }
 
 inline std::string ToString(const Value *o) {
-    double d1;
     switch (o->type) {
         case Value::Type::BOOL:
             return std::to_string(o->b);
