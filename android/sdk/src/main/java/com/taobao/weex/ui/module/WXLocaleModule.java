@@ -48,11 +48,6 @@ public class WXLocaleModule extends WXModule {
   }
 
   @JSMethod(uiThread = false)
-  public void getLanguage(JSCallback callback) {
-    callback.invoke(getLanguageTags());
-  }
-
-  @JSMethod(uiThread = false)
   public List<String> getLanguages() {
     String[] tags = getLanguageTags().split(",");
     return Arrays.asList(tags);
