@@ -19,6 +19,7 @@
 #include "core/data_render/vm.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/object.h"
+#include "core/data_render/class.h"
 #include "core/data_render/table.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/class_array.h"
@@ -30,6 +31,8 @@ namespace data_render {
 
 void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
 #define LOGTEMP(...)
+//#define LOGTEMP(...)     printf(__VA_ARGS__)
+
 #if DEBUG
   //TimeCost tc;
 #endif
@@ -205,7 +208,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
           a = frame.reg + GET_ARG_A(instruction);
           size_t argc = GET_ARG_B(instruction);
           c = frame.reg + GET_ARG_C(instruction);
-          if (!IsFunc(c)) {
+          if (!IsFunction(c)) {
               throw VMExecError("Unspport Type With OP_CODE [OP_CALL]");
           }
           exec_state->CallFunction(c, argc, a);
@@ -302,7 +305,20 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             c = frame.reg + GET_ARG_C(instruction);
-            SetBValue(a, ValueOR(b, c));
+            bool bval = false;
+            ToBool(b, bval);
+            if (bval) {
+                *a = *b;
+            }
+            else {
+                ToBool(c, bval);
+                if (bval) {
+                    *a = *c;
+                }
+                else {
+                    SetNil(a);
+                }
+            }
             break;
         }
       case OP_UNM: {
@@ -482,11 +498,11 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                   }
                   case Value::CLASS_DESC:
                   {
-                      b = exec_state->global()->Find((int)(GET_ARG_C(instruction)));
-                      if (!IsClass(b)) {
+                      c = frame.reg + GET_ARG_C(instruction);
+                      if (!IsClass(c)) {
                           throw VMExecError("Unspport Find Desc with OP_CODE [OP_NEWCLASS]");
                       }
-                      *a = exec_state->class_factory()->CreateClassInstance(ValueTo<ClassDescriptor>(b));
+                      *a = exec_state->class_factory()->CreateClassInstance(ValueTo<ClassDescriptor>(c));
                       break;
                   }
                   default:
@@ -519,13 +535,14 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_SETMEMBERVAR:
         {
-            LOGTEMP("OP_SETMEMBER A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            LOGTEMP("OP_SETMEMBERVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             b = frame.reg + GET_ARG_B(instruction);
             if (!IsValueRef(a)) {
                 throw VMExecError("Only ValueRef Support With OP_CODE [OP_SETMEMBER]");
             }
             *a->var = *b;
+            SetNil(a);
             break;
         }
         case OP_GETCLASS:
@@ -540,11 +557,14 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             if (!IsString(c)) {
                 throw VMExecError("Type Error For Member with OP_CODE [OP_GETCLASS]");
             }
-            int index = ValueTo<ClassInstance>(b)->p_desc_->funcs_->IndexOf(StringValue(c)->c_str());
+            std::string var_name = CStringValue(c);
+            int index = ValueTo<ClassInstance>(b)->p_desc_->funcs_->IndexOf(var_name);
             if (index < 0) {
-                throw VMExecError("Can't Find " + std::string(StringValue(c)->c_str()) + " With OP_CODE [OP_GETCLASS]");
+                SetNil(a);
             }
-            *a = *ValueTo<ClassInstance>(b)->p_desc_->funcs_->Find(index);
+            else {
+                *a = *ValueTo<ClassInstance>(b)->p_desc_->funcs_->Find(index);
+            }
             break;
         }
         case OP_GETMEMBERVAR:
@@ -566,35 +586,20 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             std::string var_name = CStringValue(c);
             // first find member func
             if (IsClassInstance(b)) {
-                Variables *funcs = ValueTo<ClassInstance>(b)->p_desc_->funcs_.get();
-                int index = funcs->IndexOf(var_name);
-                if (index < 0) {
-                    Variables *vars = ValueTo<ClassInstance>(b)->vars_.get();
-                    index = vars->IndexOf(var_name);
-                    if (index < 0 && op == OP_GETMEMBER) {
+                Value *ret = nullptr;
+                if (op == OP_GETMEMBER) {
+                    ret = GetClassMember(ValueTo<ClassInstance>(b), var_name);
+                    if (!ret) {
                         throw VMExecError("can't find " + var_name + "[OP_GETMEMBER]");
                     }
-                    if (index < 0) {
-                        Value var;
-                        SetNil(&var);
-                        index = vars->Add(var_name, var);
+                    if (IsPrototypeFunction(ret) && ret->f->is_class_func()) {
+                        ret->f->class_inst() = ValueTo<ClassInstance>(b);
                     }
-                    Value *ret = vars->Find(index);
-                    if (op == OP_GETMEMBER) {
-                        *a = *ret;
-                    }
-                    else {
-                        SetValueRef(a, ret);
-                    }
+                    *a = *ret;
                 }
                 else {
-                    Value *ret = funcs->Find(index);
-                    if (op == OP_GETMEMBER) {
-                        *a = *ret;
-                    }
-                    else {
-                        SetValueRef(a, ret);
-                    }
+                    ret = GetClassMemberVar(ValueTo<ClassInstance>(b), var_name);
+                    SetValueRef(a, ret);
                 }
             }
             else if (IsArray(b)) {
@@ -639,9 +644,6 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 if (op == OP_GETMEMBER) {
                     Value *ret = GetTableValue(ValueTo<Table>(b), *c);
                     if (!IsNil(ret)) {
-                        if (IsTable(ret)) {
-                            LOGTEMP("[OP_GETMEMBER]:%s\n", TableToString(ValueTo<Table>(ret)).c_str());
-                        }
                         *a = *ret;
                     }
                     else {

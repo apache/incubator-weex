@@ -142,6 +142,8 @@ namespace WeexCore
 
 + (void)createDataRenderInstance:(NSString *)pageId template:(NSString *)temp options:(NSDictionary *)options data:(id)data;
 
++ (void)createDataRenderInstance:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary *)options  data:(id)data;
+
 + (void)destroyDataRenderInstance:(NSString *)pageId;
 
 + (void)refreshDataRenderInstance:(NSString *)pageId data:(NSString *)data;
@@ -183,6 +185,10 @@ namespace WeexCore
 + (void)callRefreshFinish:(NSString*)pageId;
 
 + (void)callUpdateFinish:(NSString*)pageId;
+
++ (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args;
+
++ (void)registerModules:(NSDictionary *)modules;
 
 @end
 

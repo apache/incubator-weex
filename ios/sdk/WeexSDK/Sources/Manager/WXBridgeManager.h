@@ -45,6 +45,18 @@ extern void WXPerformBlockOnBridgeThread(void (^block)(void));
                   data:(id)data;
 
 /**
+ *  Create Instance with opcode
+ *  @param instance  :   instance id
+ *  @param contents  :   opcode data
+ *  @param options   :   parameters
+ *  @param data      :   external data
+ **/
+- (void)createInstance:(NSString *)instance
+              contents:(NSData *)contents
+               options:(NSDictionary *)options
+                  data:(id)data;
+
+/**
  * @abstract return currentInstanceId
  **/
 - (NSArray *)getInstanceIdStack;

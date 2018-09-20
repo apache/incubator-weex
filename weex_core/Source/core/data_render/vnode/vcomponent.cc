@@ -27,9 +27,9 @@ namespace data_render {
 static int g_component_id = 0;
 
 VComponent::VComponent(ExecState *exec_state, int template_id,
-                       const std::string &name, const std::string &ref,
-                       const std::string &tag_name)
-    : VNode(ref, tag_name),
+                       const std::string &name, const std::string &tag_name,
+                       const std::string &node_id, const std::string &ref)
+    : VNode(tag_name, node_id, ref),
       exec_state_(exec_state),
       id_(g_component_id++),
       template_id_(template_id),

@@ -20,6 +20,7 @@
 #include "android/wrap/wx_bridge.h"
 #include <fstream>
 #include "android/base/jni_type.h"
+#include "android/base/jni/jbytearray_ref.h"
 #include "android/base/string/string_utils.h"
 #include "android/bridge/platform/android_bridge.h"
 #include "android/bridge/platform/android_bridge_in_multi_process.h"
@@ -38,6 +39,7 @@
 #include "core/layout/layout.h"
 #include "core/layout/measure_func_adapter_impl_android.h"
 #include "core/manager/weex_core_manager.h"
+#include "core/data_render/vnode/vnode_render_manager.h"
 
 using namespace WeexCore;
 jlongArray jFirstScreenRenderTime = nullptr;
@@ -369,6 +371,23 @@ static void RefreshInstance(JNIEnv* env, jobject jcaller, jstring instanceId,
   freeParams(params);
 }
 
+static void FireEventOnRenderNode(JNIEnv* env, jobject jcaller, jstring instanceId,
+                            jstring _namespace, jstring _function,jstring _event,
+                            jstring _ref,
+                            jstring _args) {
+  ScopedJStringUTF8 instance_id(env, instanceId);
+  ScopedJStringUTF8 name_space(env, _namespace);
+  ScopedJStringUTF8 function(env, _function);
+  ScopedJStringUTF8 event(env, _event);
+  ScopedJStringUTF8 ref(env, _ref);
+  ScopedJStringUTF8 args(env, _args);
+
+  weex::core::data_render::VNodeRenderManager::GetInstance()->FireEvent(
+      instance_id.getChars(),
+      event.getChars(),ref.getChars(),args.getChars()
+  );
+}
+
 static jint ExecJSService(JNIEnv* env, jobject object, jstring script) {
   if (script == nullptr) return false;
   ScopedJStringUTF8 source(env, script);
@@ -513,20 +532,35 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
   auto japi = arg4->GetData(env);
   ScopedJStringUTF8 scoped_id(env, instanceId);
   ScopedJStringUTF8 scoped_func(env, function);
-  ScopedJStringUTF8 scoped_script(env, static_cast<jstring>(jscript.Get()));
   ScopedJStringUTF8 scoped_opts(env, opts.Get());
   ScopedJStringUTF8 scoped_init_data(env, initData.Get());
   ScopedJStringUTF8 scoped_api(env, static_cast<jstring>(japi.Get()));
   ScopedJStringUTF8 scoped_render_strategy(
       env, static_cast<jstring>(render_strategy->GetData(env).Release()));
 
-  return WeexCoreManager::Instance()
-      ->getPlatformBridge()
-      ->core_side()
-      ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
-                       scoped_script.getChars(), scoped_opts.getChars(),
-                       scoped_init_data.getChars(), scoped_api.getChars(),
-                       scoped_render_strategy.getChars());
+  // If strategy is DATA_RENDER_BINARY, jscript is a jbyteArray, otherwise jstring
+  // TODO use better way
+  if (scoped_render_strategy.getChars() != nullptr
+      && strcmp(scoped_render_strategy.getChars(), "DATA_RENDER_BINARY") == 0) {
+    JByteArrayRef byte_array(env, static_cast<jbyteArray>(jscript.Get()));
+    return WeexCoreManager::Instance()
+            ->getPlatformBridge()
+            ->core_side()
+            ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
+                             byte_array.getBytes(), byte_array.length(), scoped_opts.getChars(),
+                             scoped_init_data.getChars(), scoped_api.getChars(),
+                             scoped_render_strategy.getChars());
+  } else {
+    ScopedJStringUTF8 scoped_script(env, static_cast<jstring>(jscript.Get()));
+    return WeexCoreManager::Instance()
+            ->getPlatformBridge()
+            ->core_side()
+            ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
+                             scoped_script.getChars(), strlen(scoped_script.getChars()), scoped_opts.getChars(),
+                             scoped_init_data.getChars(), scoped_api.getChars(),
+                             scoped_render_strategy.getChars());
+  }
+
 }
 
 static jint DestoryInstance(JNIEnv* env, jobject jcaller, jstring instanceId,

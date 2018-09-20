@@ -44,6 +44,8 @@
 #include "base/TimeUtils.h"
 
 #import <objc/runtime.h>
+#include <fstream>
+
 
 #define NSSTRING(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCString(NULL, (const char *)(cstr), kCFStringEncodingUTF8)))
 #define NSSTRING_NO_COPY(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCStringNoCopy(NULL, (const char *)(cstr), kCFStringEncodingUTF8, kCFAllocatorNull)))
@@ -213,12 +215,33 @@ namespace WeexCore
         assert(false);
     }
     
-    std::unique_ptr<ValueWithType> IOSSide::CallNativeModule(const char* pageId, const char *module, const char *method,
-                                         const char *arguments, int argumentsLength,
+    std::unique_ptr<ValueWithType> IOSSide::CallNativeModule(const char *page_id, const char *module, const char *method,
+                                         const char *args, int argc,
                                          const char *options, int optionsLength)
     {
         // should not enter this function
-        assert(false);
+        do {
+            RenderPage *page = RenderManager::GetInstance()->GetPage(page_id);
+            if (page == nullptr) {
+                break;
+            }
+            NSString *instanceId = NSSTRING(page_id);
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            if (!instance) {
+                break;
+            }
+            NSString *moduleName = [NSString stringWithUTF8String:module];
+            NSString *methodName = [NSString stringWithUTF8String:method];
+            NSArray *newArguments;
+            if (argc > 0 && args) {
+                NSString *arguments = [NSString stringWithUTF8String:args];
+                newArguments = [WXUtility objectFromJSON:arguments];
+            }
+            WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:newArguments options:nil instance:instance];
+            [method invoke];
+            
+        } while (0);
+        
         return std::unique_ptr<ValueWithType>();
     }
         
@@ -803,6 +826,26 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     node_manager->CreatePage([jsBundleString UTF8String] ?: "", [pageId UTF8String] ?: "", [optionsString UTF8String] ?: "", [dataString UTF8String] ?: "");
 }
 
++ (void)createDataRenderInstance:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary *)options data:(id)data
+{
+    auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+    NSString *optionsString = [WXUtility JSONString:options];
+    NSString *dataString = [WXUtility JSONString:data];
+
+//    NSString *documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+//    NSString *txtPath = [documentsPath stringByAppendingPathComponent:@"test.wasm"];
+//    std::string path = [txtPath UTF8String];
+//    std::ifstream fin(path, std::ios::in|std::ios::binary|std::ios::ate);
+//    unsigned length = static_cast<unsigned>(fin.tellg());
+//
+//    char* buffer = new char[length];
+//    fin.seekg (0, std::ios::beg);
+//    fin.read(buffer, length);
+//    fin.close();
+
+    node_manager->CreatePage(static_cast<const char*>(contents.bytes), contents.length, [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "");
+}
+
 + (void)destroyDataRenderInstance:(NSString *)pageId
 {
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
@@ -813,6 +856,20 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 {
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
     node_manager->RefreshPage([pageId UTF8String] ?: "", [data UTF8String] ?: "");
+}
+
++ (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args
+{
+    NSString *params = [WXUtility JSONString:args];
+    auto vnode_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
+    vnode_manager->FireEvent([pageId UTF8String] ? : "", [ref UTF8String] ? : "", [event UTF8String] ? : "", [params UTF8String] ? : "");
+}
+
++ (void)registerModules:(NSDictionary *)modules {
+    NSString *setting = [WXUtility JSONString:modules];
+    if (setting.length > 0) {
+        weex::core::data_render::VNodeRenderManager::GetInstance()->RegisterModules([setting UTF8String] ? : "");
+    }
 }
 
 + (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height

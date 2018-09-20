@@ -596,6 +596,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
+    render(pageName, new Script(template), options, jsonInitData, flag);
+  }
+
+  public void render(String pageName, Script template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
     mWXPerformance.beforeInstanceRender(mInstanceId);
 
     if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
@@ -615,6 +619,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     renderInternal(pageName,template,options,jsonInitData,flag);
   }
 
+  /**
+   * Render binary template asynchronously in DATA_RENDER_BINARY strategy.
+   */
+  public void render(String pageName, byte[] template, Map<String, Object> options, String jsonInitData) {
+    render(pageName, new Script(template), options, jsonInitData, WXRenderStrategy.DATA_RENDER_BINARY);
+  }
+
   private void ensureRenderArchor(){
     if(mRenderContainer == null){
       if (getContext() != null) {
@@ -631,8 +642,19 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
                               String template,
                               Map<String, Object> options,
                               String jsonInitData,
-                              WXRenderStrategy flag){
+                              WXRenderStrategy flag) {
     if (mRendered || TextUtils.isEmpty(template)) {
+      return;
+    }
+    renderInternal(pageName, new Script(template), options, jsonInitData, flag);
+  }
+
+  private void renderInternal(String pageName,
+                              Script template,
+                              Map<String, Object> options,
+                              String jsonInitData,
+                              WXRenderStrategy flag){
+    if (mRendered || template == null || template.isEmpty()) {
       return;
     }
 

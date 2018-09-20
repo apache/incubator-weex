@@ -413,18 +413,28 @@ std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSWithResult(
 }
 
 int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
-                                       const char *script, const char *opts,
+                                       const char *script, int script_length,
+                                       const char *opts,
                                        const char *initData,
                                        const char *extendsApi,
                                        const char *render_strategy) {
-  if (render_strategy != nullptr &&
-      strcmp(render_strategy, "DATA_RENDER") == 0) {
-    auto node_manager =
-        weex::core::data_render::VNodeRenderManager::GetInstance();
-    node_manager->CreatePage(script, instanceId, render_strategy, initData);
+  // First check about DATA_RENDER mode
+  if (render_strategy != nullptr) {
+    if (strcmp(render_strategy, "DATA_RENDER") == 0) {
+      auto node_manager =
+              weex::core::data_render::VNodeRenderManager::GetInstance();
+      node_manager->CreatePage(script, instanceId, render_strategy, initData);
 
-    return true;
+      return true;
+    } else if (strcmp(render_strategy, "DATA_RENDER_BINARY") == 0) {
+      auto node_manager =
+              weex::core::data_render::VNodeRenderManager::GetInstance();
+      node_manager->CreatePage(script, script_length, instanceId, render_strategy, initData);
+
+      return true;
+    }
   }
+
   return WeexCoreManager::Instance()
       ->script_bridge()
       ->script_side()

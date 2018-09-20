@@ -66,6 +66,8 @@ public class WXBridge implements IWXBridge {
 
   public native String nativeExecJSOnInstance(String instanceId, String script, int type);
 
+  public native void nativeFireEventOnDataRenderNode(String instanceId, String ref, String type, String data, String params);
+
   private native void nativeTakeHeapSnapshot(String filename);
 
   private native void nativeBindMeasurementToRenderObject(long ptr);
@@ -676,5 +678,10 @@ public class WXBridge implements IWXBridge {
         break;
       }
     }
+  }
+
+  @Override
+  public void fireEventOnDataRenderNode(String instanceId, String ref, String type, String data, String params) {
+    nativeFireEventOnDataRenderNode(instanceId,ref,type,data,params);
   }
 }

@@ -200,4 +200,6 @@ public interface IWXBridge extends IWXObject {
   void setJSFrmVersion(String version);
 
   void resetWXBridge(boolean remoteDebug);
+
+  void fireEventOnDataRenderNode(String instanceId, String ref, String type, String data, String params);
 }

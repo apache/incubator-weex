@@ -37,6 +37,13 @@ static void RefreshInstance(JNIEnv* env, jobject jcaller,
     jstring function,
     jobjectArray args);
 
+static void FireEventOnRenderNode(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring _namespace,
+    jstring function,
+    jstring event,
+    jstring ref, jstring args);
+
 static jint ExecJS(JNIEnv* env, jobject jcaller,
     jstring instanceId,
     jstring name,

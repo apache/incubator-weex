@@ -830,6 +830,69 @@ Handle<Expression> RAXParser::ParseJSXNodeStatement() {
     return expr;
 }
     
+Handle<Expression> RAXParser::ParseJSXNodeProperty() {
+    Handle<Expression> props = nullptr;
+    ProxyObject proxy;
+    ProxyArray spread_property;
+    std::vector<std::pair<ProxyOrder, std::string>> orders;
+    std::string key;
+    do {
+        Handle<Expression> prop;
+        while (true) {
+            auto tok = Peek();
+            if (tok == Token::STRING) {
+                key = GetStringConstant();
+            }
+            else if (tok == Token::IDENTIFIER || Token::IsKeyword(tok) || tok == Token::NUMBER) {
+                key = lex()->CurrentToken().view();
+            }
+            else if (tok == Token::UNFOLD) {
+                Handle<Expression> unfold_expr = ParseAssignExpression();
+                spread_property.push_back(unfold_expr);
+                orders.push_back(std::make_pair(ProxyOrder::ProxyArray, to_string((int)spread_property.size() - 1)));
+                continue;
+            }
+            else if (tok == Token::RBRACE || tok == Token::LBRACE) {
+                Advance();
+                continue;
+            }
+            else if (tok == Token::DIV) {
+                break;
+            }
+            else {
+                throw SyntaxError(lex()->CurrentToken(), "expected an Identifier or a string");
+            }
+            Advance();
+            if (Peek() == Token::ASSIGN) {
+                Advance();
+                EXPECT(Token::LBRACE);
+                prop = ParseAssignExpression();
+                EXPECT(Token::RBRACE);
+            }
+            if (prop == NULL) {
+                prop = builder()->NewIdentifier(key);
+            }
+            proxy[key] = Handle<Expression>(prop);
+            orders.push_back(std::make_pair(ProxyOrder::ProxyObject, key));
+        }
+        
+    } while (0);
+    
+    if (proxy.size() > 0 || spread_property.size() > 1) {
+        props = builder()->NewObjectConstant(proxy);
+        if (spread_property.size() > 0) {
+            for (int i = 0; i < spread_property.size(); i++) {
+                props->AsObjectConstant()->SpreadProperty().push_back(spread_property[i]);
+            }
+            props->AsObjectConstant()->Orders() = orders;
+        }
+    }
+    else {
+        props = spread_property[0];
+    }
+    return props;
+}
+    
 Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) {
     Handle<Expression> expr = nullptr;
     Handle<Expression> props = nullptr;
@@ -838,9 +901,7 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
     auto tok = Peek();
     // props process
     if (tok == Token::LBRACE) {
-        Advance();
-        props = ParseExpression();
-        EXPECT(Token::RBRACE);
+        props = ParseJSXNodeProperty();
     }
     else if (tok == Token::IDENTIFIER) {
         // props process
@@ -1025,6 +1086,10 @@ Handle<Expression> RAXParser::ParseClassBody(std::string &clsname) {
         auto one = ParseClassMethodStatement(clsname);
         clsbody->Insert(one);
         auto tok = Peek();
+        if (tok == Token::SEMICOLON) {
+            Advance();
+            tok = Peek();
+        }
         if (tok == Token::RBRACE) {
             break;
         }
@@ -1040,11 +1105,20 @@ Handle<Expression> RAXParser::ParseClassMethodStatement(std::string &clsname) {
     }
     std::string identifier = GetIdentifierName();
     Advance();
-    auto args = ParseParameterList();
-    auto body = ParseBlockStatement();
-    auto proto = builder()->NewFunctionPrototype(identifier, args);
-    proto->AsFunctionPrototype()->SetClassName(clsname);
-    return builder()->NewFunctionStatement(proto->AsFunctionPrototype(), body);
+    tok = Peek();
+    if (tok == Token::ASSIGN) {
+        Advance();
+        Handle<Expression> arrow_function = ParseAssignExpression();
+        arrow_function->AsArrowFunctionStatement()->name() = identifier;
+        return arrow_function;
+    }
+    else {
+        auto args = ParseParameterList();
+        auto body = ParseBlockStatement();
+        auto proto = builder()->NewFunctionPrototype(identifier, args);
+        proto->AsFunctionPrototype()->SetClassName(clsname);
+        return builder()->NewFunctionStatement(proto->AsFunctionPrototype(), body);
+    }
 }
     
 Handle<Expression> RAXParser::ParseIfStatement()
@@ -1176,12 +1250,13 @@ Handle<Expression> RAXParser::ParseProgram()
     Handle<ExpressionList> exprs = builder()->NewExpressionList();
     Handle<ChunkStatement> chunk = builder()->NewChunkStatement(exprs);
     exprs->Insert(builder()->NewDeclaration(JSX_GLOBAL_VNODE_INDEX, builder()->NewIntegralConstant(0)));
+    exprs->Insert(builder()->NewDeclaration(JS_GLOBAL_ARGUMENTS, builder()->NewArrayConstant({})));
     try {
         while (Peek() != Token::EOS) {
             exprs->Insert(ParseStatement());
         }
     } catch (std::exception &e) {
-        auto error = static_cast<SyntaxError*>(&e);
+        auto error = static_cast<SyntaxError *>(&e);
         
         if (error) {
             std::cerr << error->what() << " (" << error->token().position().row()
@@ -1290,6 +1365,9 @@ Handle<Expression> RAXParser::ParseVariableStatement()
             break;
         }
         else if (tok == Token::IN || tok == Token::CONST) {
+            break;
+        }
+        else if (tok == Token::CLASS) {
             break;
         }
         else if (tok != Token::COMMA) {

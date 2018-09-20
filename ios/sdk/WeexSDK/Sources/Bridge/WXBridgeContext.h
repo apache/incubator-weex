@@ -44,6 +44,18 @@
                   data:(id)data;
 
 /**
+ *  Create Instance with opcode
+ *  @param instance  :   instance id
+ *  @param contents  :   opcode data
+ *  @param options   :   parameters
+ *  @param data      :   external data
+ **/
+- (void)createInstance:(NSString *)instance
+              contents:(NSData *)contents
+               options:(NSDictionary *)options
+                  data:(id)data;
+
+/**
  *  Destroy Instance Method
  *  @param instance  :   instance id
  **/

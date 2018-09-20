@@ -159,10 +159,12 @@ class ArrowFunctionStatement : public Expression {
     DEFINE_NODE_TYPE(ArrowFunctionStatement, Expression);
 public:
     ArrowFunctionStatement(Position &loc, Scope *scope, Handle<Expression> body, std::vector<Handle<Expression>> args)
-    : Expression(loc, scope), body_{ body }, args_{std::move(args)} { }
+    : Expression(loc, scope), body_{ body }, args_{std::move(args) } { }
     Handle<Expression> body() { return body_; }
     std::vector<Handle<Expression>>& args() { return args_; }
+    std::string &name() { return name_; }
 private:
+    std::string name_;
     Handle<Expression> body_;
     std::vector<Handle<Expression>> args_;
 };

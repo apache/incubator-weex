@@ -117,6 +117,24 @@ public class WXFileUtils {
     return "";
   }
 
+  public static byte[] readBytesFromAssets(String path, Context context) {
+    if (context == null || TextUtils.isEmpty(path)) {
+      return null;
+    }
+    InputStream inputStream = null;
+    try {
+      inputStream = context.getAssets().open(path);
+      byte[] data = new byte[4096];
+      int length = inputStream.read(data);
+      byte[] result = new byte[length];
+      System.arraycopy(data, 0, result, 0, length);
+      return result;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
   public static boolean saveFile(String path, byte[] content, Context context) {
     if (TextUtils.isEmpty(path) || content == null || context == null) {
       return false;

@@ -37,6 +37,8 @@ Value GetArrayValue(Array *array, const Value &index);
 Value* GetArrayVar(Array *array, const Value &index);
 Value GetArraySizeValue(Array *array);
 size_t GetArraySize(Array *array);
+void ClearArray(Array *array);
+void PushArray(Array *array, Value val);
 
 }  // namespace data_render
 }  // namespace core

@@ -66,6 +66,9 @@ class RenderPage {
       RenderObject *render,
       std::vector<std::pair<std::string, std::string>> *attrs);
 
+  void SendCallNativeModuleAction(const std::string &module,
+                                  const std::string &method, const std::string &args, int argc = 0);
+    
   void SendCreateFinishAction();
 
   void SendRenderSuccessAction();
@@ -73,7 +76,7 @@ class RenderPage {
   void SendAppendTreeCreateFinish(const std::string &ref);
 
   void PostRenderAction(RenderAction *action);
-
+  
   void LayoutInner();
 
 public:
@@ -127,6 +130,9 @@ public:
                             std::map<std::string, std::string> *attrs);
 
   RenderObject *GetRenderObject(const std::string &ref);
+    
+  void CallNativeModule(const std::string &module,
+                          const std::string &method, const std::string &args, int argc = 0);
 
   void SetRootRenderObject(RenderObject *root);
 

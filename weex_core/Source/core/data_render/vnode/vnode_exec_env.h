@@ -25,6 +25,7 @@
 namespace weex {
 namespace core {
 namespace data_render {
+    
 class VNodeExecEnv {
  public:
   static void InitCFuncEnv(ExecState* state);
@@ -33,6 +34,9 @@ class VNodeExecEnv {
                                 const std::string& init_data_str);
   static void InitStyleList(ExecState* state);
 };
+    
+Value StringToValue(ExecState *exec_state, const std::string &str);
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

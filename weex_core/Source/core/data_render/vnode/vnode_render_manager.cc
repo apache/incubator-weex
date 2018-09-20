@@ -29,6 +29,7 @@
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_creator.h"
 #include "core/bridge/platform_bridge.h"
+#include "core/data_render/binary_file.h"
 
 #define VRENDER_LOG true
 
@@ -48,6 +49,8 @@ using std::string;
 using std::vector;
 using WeexCore::RenderManager;
 
+void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node);
+
 VNodeRenderManager* VNodeRenderManager::g_instance = nullptr;
 VM* VNodeRenderManager::g_vm = nullptr;
 // TODO establish linkages between page ref_id
@@ -58,10 +61,12 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
                                                 int index,
                                                 const string& pageId) {
   std::string ref_str;
-  if (!isRoot) {
-    ref_str = base::to_string(ref_id++);
-  } else {
+  if (isRoot) {
     ref_str = "_root";
+  } else if (!vnode->ref().empty()) {
+    ref_str = vnode->ref();
+  } else {
+    ref_str = base::to_string(ref_id++);
   }
 
   WeexCore::RenderObject* render_object = static_cast<WeexCore::RenderObject*>(
@@ -83,8 +88,10 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
   }
 
   // event,todo
-  //  std::set<string> *event = vnode->event();
-  //  renderObject->events()->insert(event->begin(), event->end());
+  std::map<std::string, void *> *events = vnode->events();
+  for (auto iter = events->begin(); iter != events->end(); iter++) {
+      render_object->events()->insert(iter->first);
+  }
 
   // child
   vector<VNode*>* children = (const_cast<VNode*>(vnode))->child_list();
@@ -105,7 +112,7 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
   return render_object;
 }
 
-WeexCore::RenderObject* VNode2RenderObject(VNode* root, const string& page_id) {
+WeexCore::RenderObject *VNode2RenderObject(VNode *root, const string& page_id) {
   return ParseVNode2RenderObject(root, nullptr, true, 0, page_id);
 }
 
@@ -158,54 +165,91 @@ void VNodeRenderManager::InitVM() {
   }
 }
 
-void VNodeRenderManager::CreatePage(const std::string& input,
-                                    const std::string& page_id,
-                                    const std::string& options,
-                                    const std::string& init_data) {
+void VNodeRenderManager::CreatePage(const std::string &input, const std::string &page_id, const  std::string &options, const std::string &init_data) {
+    InitVM();
+    auto start = std::chrono::steady_clock::now();
+    ExecState *exec_state = new ExecState(g_vm);
+    exec_states_.insert({page_id, exec_state});
+    VNodeExecEnv::InitCFuncEnv(exec_state);
+    std::string err;
+    json11::Json json = json11::Json::parse(input, err);
+    if (!err.empty() || json.is_null()) {
+        exec_state->context()->raw_source() = input;
+    }
+    else {
+        exec_state->context()->raw_json() = json;
+    }
+    VNodeExecEnv::InitGlobalValue(exec_state);
+    if (init_data.length() > 0) {
+        VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+    }
+    VNodeExecEnv::InitStyleList(exec_state);
+    exec_state->context()->page_id(page_id);
+    //auto compile_start = std::chrono::steady_clock::now();
+    exec_state->Compile(err);
+    if (!err.empty()) {
+        return;
+    }
+    //auto exec_start = std::chrono::steady_clock::now();
+    exec_state->Execute(err);
+    if (!err.empty()) {
+        return;
+    }
+    if (exec_state->context()->root() == NULL) {
+        return;
+    }
+    CreatePageInternal(page_id, exec_state->context()->root());
+    auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+
+    LOGE("DATA_RENDER, All time %lld", duration_post.count());
+}
+    
+void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state) {
     do {
-        InitVM();
-        auto start = std::chrono::steady_clock::now();
-        ExecState *exec_state = new ExecState(g_vm);
-        exec_states_.insert({page_id, exec_state});
-        VNodeExecEnv::InitCFuncEnv(exec_state);
-        std::string err;
-        json11::Json json = json11::Json::parse(input, err);
-        if (!err.empty() || json.is_null()) {
-            exec_state->context()->raw_source() = input;
-        }
-        else {
-            exec_state->context()->raw_json() = json;
-            if (json["script"].is_string()) {
-                exec_state->context()->set_script(json["script"].string_value());
-            }
-        }
-        VNodeExecEnv::InitGlobalValue(exec_state);
-        if (init_data.length() > 0) {
-            VNodeExecEnv::InitInitDataValue(exec_state, init_data);
-        }
-        VNodeExecEnv::InitStyleList(exec_state);
-        exec_state->context()->page_id(page_id);
-        //auto compile_start = std::chrono::steady_clock::now();
-        exec_state->Compile(err);
-        if (!err.empty()) {
+        if (!modules_.size()) {
             break;
         }
-        //auto exec_start = std::chrono::steady_clock::now();
-        exec_state->Execute(err);
-        if (!err.empty()) {
-            break;
+        const std::string func_name = "registerModule";
+        for (auto iter = modules_.begin(); iter != modules_.end(); iter++) {
+            Value arg = StringToValue(exec_state, *iter);
+            exec_state->Call(func_name, {arg});
         }
-        if (exec_state->context()->root() == NULL) {
-            break;
-        }
-        CreatePageInternal(page_id, exec_state->context()->root());
-        exec_state->context()->Reset();
-        auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
-        
-        LOGE("DATA_RENDER, All time %lld", duration_post.count());
         
     } while (0);
 }
+
+void VNodeRenderManager::CreatePage(const char *contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data) {
+    BinaryFile *file = BinaryFile::instance();
+    file->set_input(contents);
+    file->set_length(length);
+
+    InitVM();
+    auto start = std::chrono::steady_clock::now();
+    ExecState *exec_state = new ExecState(g_vm);
+    exec_states_.insert({page_id, exec_state});
+    VNodeExecEnv::InitCFuncEnv(exec_state);
+
+    std::string err;
+    exec_state->startDecode();
+    exec_state->endDecode();
+    if (init_data.length() > 0) {
+        VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+    }
+    //auto exec_start = std::chrono::steady_clock::now();
+    exec_state->Execute(err);
+    if (!err.empty()) {
+        return;
+    }
+    if (exec_state->context()->root() == NULL) {
+        return;
+    }
+    CreatePageInternal(page_id, exec_state->context()->root());
+    //exec_state->context()->Reset();
+    auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+
+    LOGE("DATA_RENDER, All time %lld", duration_post.count());
+}
+
 bool VNodeRenderManager::RefreshPage(const std::string& page_id,
                                      const std::string& init_data) {
     do {
@@ -216,12 +260,12 @@ bool VNodeRenderManager::RefreshPage(const std::string& page_id,
         ExecState *exec_state = it->second;
         VNodeExecEnv::InitInitDataValue(exec_state, init_data);
         std::string err;
+        exec_state->context()->Reset();
         exec_state->Execute(err);  // refresh root
         if (!err.empty()) {
             break;
         }
         RefreshPageInternal(page_id, exec_state->context()->root());
-        exec_state->context()->Reset();
         WeexCore::WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
@@ -238,16 +282,73 @@ bool VNodeRenderManager::ClosePage(const std::string& page_id) {
   if (it == exec_states_.end()) {
     return false;
   }
-  ExecState* exec_state = it->second;
-
+  ExecState *exec_state = it->second;
   ClosePageInternal(page_id);
   delete exec_state;
   exec_states_.erase(it);
   return true;
 }
+        
+void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args) {
+    do {
+        auto iter = exec_states_.find(page_id);
+        if (iter == exec_states_.end()) {
+            break;
+        }
+        auto node = vnode_trees_.find(page_id);
+        if (node == vnode_trees_.end()) {
+            break;
+        }
+        auto vnode = node->second->FindNode(ref);
+        if (!vnode) {
+            break;
+        }
+        auto iter_event = vnode->events()->find(event);
+        if (iter_event == vnode->events()->end()) {
+            break;
+        }
+        FuncState *func_state = (FuncState *)iter_event->second;
+        if (!func_state) {
+            break;
+        }
+        ExecState *exec_state = iter->second;
+        std::vector<Value> caller_args;
+        if (func_state->is_class_func() && vnode->inst()) {
+            Value inst;
+            SetCIValue(&inst, reinterpret_cast<GCObject *>(vnode->inst()));
+            caller_args.push_back(inst);
+        }
+        caller_args.push_back(StringToValue(exec_state, args));
+        exec_state->Call(func_state, caller_args);
+        
+    } while (0);
+}
+    
+void VNodeRenderManager::CallNativeModule(ExecState *exec_state, const std::string &module, const std::string &method, const std::string &args, int argc) {
+    do {
+        for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {
+            if (iter->second == exec_state) {
+                RenderManager::GetInstance()->CallNativeModule(iter->first, module, method, args, argc);
+                break;
+            }
+        }
+        
+    } while (0);
 
-void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node);
-
+}
+    
+void VNodeRenderManager::PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node) {
+    do {
+        for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {
+            if (iter->second == exec_state) {
+                Patch(iter->first, v_node, new_node);
+                break;
+            }
+        }
+        
+    } while (0);
+}
+    
 bool SameNode(VNode* a, VNode* b) {
   return a->tag_name() == b->tag_name() &&
          a->ref() == b->ref();  // todo to be more accurate
@@ -500,7 +601,7 @@ void RemoveNodes(const string& pageId, vector<VNode*>& vec,
                  vector<VNode*>& ref_list, unsigned int start,
                  unsigned int end) {
   for (int i = start; i <= end; ++i) {
-    auto p_node = vec[start];
+    auto p_node = vec[i];
     // some might already been used for patch, which is null.
     if (p_node == nullptr) {
       continue;
@@ -581,10 +682,24 @@ void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
   }
 }
 
-void Patch(const string& page_id, VNode* old_root, VNode* new_root) {
-  // root must be the same;
-  PatchVNode(page_id, old_root, new_root);
+void Patch(const string& page_id, VNode *old_node, VNode *new_node) {
+    if (old_node->parent() == NULL || SameNode(old_node, new_node)) {
+        // root must be the same;
+        PatchVNode(page_id, old_node, new_node);
+    }
+    else {
+        VNode *parent = (VNode *)old_node->parent();
+        vector<VNode *> &old_children = *parent->child_list();
+        WeexCore::RenderObject *new_render_object = ParseVNode2RenderObject(new_node, nullptr, false, 0, page_id);
+        auto pos = std::find(old_children.begin(), old_children.end(), old_node);
+        int index = static_cast<int>(std::distance(old_children.begin(), pos));
+        parent->InsertChild(new_node, index);
+        RenderManager::GetInstance()->AddRenderObject(page_id, parent->render_object_ref(), index, new_render_object);
+        parent->RemoveChild(old_node);
+        RenderManager::GetInstance()->RemoveRenderObject(page_id, old_node->render_object_ref());
+    }
 }
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

@@ -243,9 +243,11 @@ typedef enum : NSUInteger {
     [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTNetworkHanding phase:WXTracingBegin functionName:@"renderWithURL" options:@{@"bundleUrl":url?[url absoluteString]:@"",@"threadName":WXTMainThread}];
 }
 
-- (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data
+- (void)renderView:(id)source options:(NSDictionary *)options data:(id)data
 {
     WXLogDebug(@"Render source: %@, data:%@", self, [WXUtility JSONString:data]);
+    NSData* data1;
+    data1 = source;
     
     _options = options;
     _jsData = data;
@@ -253,7 +255,11 @@ typedef enum : NSUInteger {
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
     
     [self _setPageNameValue:nil];
-    [self _renderWithMainBundleString:source];
+    if ([source isKindOfClass:[NSString class]]) {
+        [self _renderWithMainBundleString:source];
+    } else if ([source isKindOfClass:[NSData class]]) {
+        [self _renderWithOpcode:source];
+    }
     
     [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
 }
@@ -263,13 +269,82 @@ typedef enum : NSUInteger {
     return self.mainBundleString;
 }
 
+- (void)_renderWithOpcode:(NSData *)contents
+{
+    if (!self.instanceId) {
+        WXLogError(@"Fail to find instance！");
+        return;
+    }
+
+    //some case , with out render (url)
+    [self.apmInstance startRecord:self.instanceId];
+    self.apmInstance.isStartRender = YES;
+
+    self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
+    [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
+
+    if (![WXUtility isBlankString:self.pageName]) {
+        WXLog(@"Start rendering page:%@", self.pageName);
+    } else {
+        WXLogWarning(@"WXSDKInstance's pageName should be specified.");
+        id<WXJSExceptionProtocol> jsExceptionHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSExceptionProtocol)];
+        if ([jsExceptionHandler respondsToSelector:@selector(onRuntimeCheckException:)]) {
+            WXRuntimeCheckException * runtimeCheckException = [WXRuntimeCheckException new];
+            runtimeCheckException.exception = @"We highly recommend you to set pageName.\n Using WXSDKInstance * instance = [WXSDKInstance new]; instance.pageName = @\"your page name\" to fix it";
+            [jsExceptionHandler onRuntimeCheckException:runtimeCheckException];
+        }
+    }
+
+    id<WXPageEventNotifyEventProtocol> pageEvent = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
+    if ([pageEvent respondsToSelector:@selector(pageStart:)]) {
+        [pageEvent pageStart:self.instanceId];
+    }
+
+    WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, self);
+    WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, self);
+
+    NSMutableDictionary *dictionary = [_options mutableCopy];
+    if ([WXLog logLevel] >= WXLogLevelLog) {
+        dictionary[@"debug"] = @(YES);
+    }
+
+    //TODO WXRootView
+    WXPerformBlockOnMainThread(^{
+        _rootView = [[WXRootView alloc] initWithFrame:self.frame];
+        _rootView.instance = self;
+        if(self.onCreate) {
+            self.onCreate(_rootView);
+        }
+    });
+    // ensure default modules/components/handlers are ready before create instance
+    [WXSDKEngine registerDefaults];
+    [[NSNotificationCenter defaultCenter] postNotificationName:WX_SDKINSTANCE_WILL_RENDER object:self];
+
+    if ([self _handleConfigCenter]) {
+        int wxErrorCode = 9999;
+        NSError * error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:wxErrorCode userInfo:nil];
+        if (self.onFailed) {
+            self.onFailed(error);
+        }
+        [self.apmInstance setProperty:KEY_PROPERTIES_ERROR_CODE withValue:[@(wxErrorCode) stringValue]];
+        return;
+    }
+
+    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"renderWithOpcode" options:@{@"threadName":WXTMainThread}];
+    [[WXSDKManager bridgeMgr] createInstance:self.instanceId contents:contents options:dictionary data:_jsData];
+
+    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"renderWithOpcode" options:@{@"threadName":WXTMainThread}];
+
+   // WX_MONITOR_PERF_SET(WXPTBundleSize, [data length], self);
+}
+
 - (void)_renderWithMainBundleString:(NSString *)mainBundleString
 {
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
         return;
     }
-  
+
     //some case , with out render (url)
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
@@ -469,6 +544,11 @@ typedef enum : NSUInteger {
             return;
         }
         
+        if ([options[@"DATA_RENDER"] boolValue] && [options[@"RENDER_WITH_BINARY"] boolValue]) {
+            [strongSelf _renderWithOpcode:data];
+            return;
+        }
+
         NSString *jsBundleString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if (!jsBundleString) {
             WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_STRING_CONVERT, @"data converting to string failed.", strongSelf.pageName)

@@ -74,6 +74,14 @@ int SetArray(Array *array, Value *index, const Value &val) {
     return ret;
 }
     
+void ClearArray(Array *array) {
+    array->items.clear();
+}
+    
+void PushArray(Array *array, Value val) {
+    array->items.push_back(val);
+}
+    
 int SetArray(Array *array, int index, const Value &val) {
     int ret = 0;
     do {
@@ -150,7 +158,7 @@ static Value forEach(ExecState *exec_state) {
             throw VMExecError("forEach caller isn't a Array");
         }
         Value *func = exec_state->GetArgument(1);
-        if (!IsFunc(func)) {
+        if (!IsFunction(func)) {
             throw VMExecError("forEach => isn't a function");
         }
         std::vector<Value> items = ValueTo<Array>(array)->items;

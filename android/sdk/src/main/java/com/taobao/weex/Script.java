@@ -16,33 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.taobao.weex;
 
-//
-// Created by pentao.pt on 2018/7/25.
-//
+import android.text.TextUtils;
 
-#ifndef DATA_RENDER_CLASS_H
-#define DATA_RENDER_CLASS_H
+public class Script {
+    private String mContent;
+    private byte[] mBinary;
 
-#include "core/data_render/object.h"
+    public Script(String content) {
+        mContent = content;
+    }
 
-namespace weex {
-namespace core {
-namespace data_render {
+    public Script(byte[] binary) {
+        mBinary = binary;
+    }
 
-ClassDescriptor *NewClassDescriptor(ClassDescriptor *p_super = nullptr);
+    public String getContent() {
+        return mContent;
+    }
 
-void AddClassStaticCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function);
+    public byte[] getBinary() {
+        return mBinary;
+    }
 
-void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function);
+    public int length() {
+        if (mContent != null) {
+            return mContent.length();
+        } else if (mBinary != null){
+            return mBinary.length;
+        }
+        return 0;
+    }
 
-ClassInstance *NewClassInstance(ClassDescriptor *p_desc);
-    
-Value *GetClassMember(ClassInstance *inst, std::string &name);
-Value *GetClassMemberVar(ClassInstance *inst, std::string &name);
-
-}  // namespace data_render
-}  // namespace core
-}  // namespace weex
-
-#endif  // DATA_RENDER_CLASS_H
+    public boolean isEmpty() {
+        return TextUtils.isEmpty(mContent) && (mBinary == null || mBinary.length == 0);
+    }
+}

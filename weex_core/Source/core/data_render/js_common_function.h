@@ -21,28 +21,20 @@
 // Created by pentao.pt on 2018/7/25.
 //
 
-#ifndef DATA_RENDER_CLASS_H
-#define DATA_RENDER_CLASS_H
+#ifndef DATA_RENDER_JS_COMMON_FUNCTION_H
+#define DATA_RENDER_JS_COMMON_FUNCTION_H
 
 #include "core/data_render/object.h"
+#include "core/data_render/exec_state.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-
-ClassDescriptor *NewClassDescriptor(ClassDescriptor *p_super = nullptr);
-
-void AddClassStaticCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function);
-
-void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function);
-
-ClassInstance *NewClassInstance(ClassDescriptor *p_desc);
+ 
+void RegisterJSCommonFunction(ExecState *state);
     
-Value *GetClassMember(ClassInstance *inst, std::string &name);
-Value *GetClassMemberVar(ClassInstance *inst, std::string &name);
-
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
 
-#endif  // DATA_RENDER_CLASS_H
+#endif  // DATA_RENDER_JS_COMMON_FUNCTION_H

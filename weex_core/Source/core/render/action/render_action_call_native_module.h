@@ -16,33 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_CALL_NATIVE_MODULE_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_CALL_NATIVE_MODULE_H_
 
-//
-// Created by pentao.pt on 2018/7/25.
-//
+#include <string>
 
-#ifndef DATA_RENDER_CLASS_H
-#define DATA_RENDER_CLASS_H
+#include "core/render/action/render_action_interface.h"
 
-#include "core/data_render/object.h"
+namespace WeexCore {
 
-namespace weex {
-namespace core {
-namespace data_render {
+class RenderActionCallNativeModule: public RenderAction {
+ public:
+  explicit RenderActionCallNativeModule(const std::string &page_id,
+                                   const std::string &module,
+                                   const std::string &method, const std::string &args, int argc = 0);
 
-ClassDescriptor *NewClassDescriptor(ClassDescriptor *p_super = nullptr);
+  void ExecuteAction();
 
-void AddClassStaticCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function);
+ public:
+  std::string page_id_;
+  std::string module_;
+  std::string method_;
+  std::string args_;
+  int argc_;
+};
+}  // namespace WeexCore
 
-void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function);
-
-ClassInstance *NewClassInstance(ClassDescriptor *p_desc);
-    
-Value *GetClassMember(ClassInstance *inst, std::string &name);
-Value *GetClassMemberVar(ClassInstance *inst, std::string &name);
-
-}  // namespace data_render
-}  // namespace core
-}  // namespace weex
-
-#endif  // DATA_RENDER_CLASS_H
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_CALL_NATIVE_MODULE_H_

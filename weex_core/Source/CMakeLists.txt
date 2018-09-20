@@ -43,6 +43,7 @@ set(COMMON_SRCS
   ./core/render/action/render_action_add_event.cpp
   ./core/render/action/render_action_remove_event.cpp
   ./core/render/action/render_action_add_element.cpp
+  ./core/render/action/render_action_call_native_module.cpp
   ./core/render/action/render_action_remove_element.cpp
   ./core/render/action/render_action_move_element.cpp
   ./core/render/action/render_action_createbody.cpp
@@ -74,11 +75,13 @@ set(COMMON_SRCS
    ./core/data_render/class_json.cc
    ./core/data_render/class_string.cc
    ./core/data_render/class_factory.cc
+   ./core/data_render/class_object.cc
    ./core/data_render/code_generator.cc
    ./core/data_render/exec_state.cc
    ./core/data_render/object.cc
    ./core/data_render/parser.cc
    ./core/data_render/rax_jsx_ast.cc
+   ./core/data_render/js_common_function.cc
    ./core/data_render/rax_parser.cc
    ./core/data_render/rax_parser_builder.cc
    ./core/data_render/rax_parser_context.cc
@@ -91,6 +94,7 @@ set(COMMON_SRCS
    ./core/data_render/token.cc
    ./core/data_render/tokenizer.cc
    ./core/data_render/vm.cc
+   ./core/data_render/binary_file.cc
    ./core/data_render/vnode/vnode.cc
    ./core/data_render/vnode/vcomponent.cc
    ./core/data_render/vnode/vnode_exec_env.cc

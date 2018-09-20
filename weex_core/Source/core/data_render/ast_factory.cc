@@ -132,7 +132,7 @@ Handle<Expression> ASTFactory::NewNullConstant() {
 Handle<Expression> ASTFactory::NewCallExpression(MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> member, std::vector<Handle<Expression>> args) {
     return MakeHandle<CallExpression>(kind, expr, member, args);
 }
-    
+        
 Handle<Expression> ASTFactory::NewCallExpression(Handle<Expression> func, std::vector<Handle<Expression>> args) {
   return MakeHandle<CallExpression>(func, args);
 }
@@ -164,6 +164,11 @@ Handle<Expression> ASTFactory::NewAssignExpression(Handle<Expression> lhs, Handl
 
 Handle<Expression> ASTFactory::NewIfStatement(Handle<Expression> condition, Handle<Expression> then) {
   return MakeHandle<IfStatement>(condition, then);
+}
+    
+Handle<Expression> ASTFactory::NewIfElseStatement(Handle<Expression> condition, Handle<Expression> then, Handle<Expression> els)
+{
+    return MakeHandle<IfElseStatement>(condition, then, els);
 }
 
 Handle<Expression> ASTFactory::NewUndefinedConstant(Position &loc, Scope *scope)

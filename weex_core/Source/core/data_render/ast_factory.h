@@ -67,7 +67,7 @@ public:
     virtual Handle<Expression> NewObjectConstant(ProxyObject obj);
     virtual Handle<Expression> NewAssignExpression(Handle<Expression> lhs, Handle<Expression> rhs);
     virtual Handle<Expression> NewIfStatement(Handle<Expression> condition, Handle<Expression> then);
-    
+    virtual Handle<Expression> NewIfElseStatement(Handle<Expression> condition, Handle<Expression> then, Handle<Expression> els);
     virtual Handle<ChunkStatement> NewChunkStatement(Position &loc, Scope *scope, Handle<ExpressionList> list);
     virtual Handle<Expression> NewLabelledStatement(Position &loc, Scope *scope, std::string label, Handle<Expression> expr);
     // create a new node representing undefined

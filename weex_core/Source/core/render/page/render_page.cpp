@@ -38,6 +38,7 @@
 #include "core/render/action/render_action_update_attr.h"
 #include "core/render/action/render_action_update_style.h"
 #include "core/render/action/render_action_trigger_vsync.h"
+#include "core/render/action/render_action_call_native_module.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_type.h"
 #include "core/render/node/render_list.h"
@@ -405,9 +406,16 @@ bool RenderPage::CreateFinish() {
   SendCreateFinishAction();
   // RenderSuccess means the Dom created after executing script finishes layout
   // and render, it will be trigger even though body not yet attaches to parent.
+#ifdef OS_ANDROID
   LayoutInner();
+#endif
   SendRenderSuccessAction();
   return true;
+}
+    
+void RenderPage::CallNativeModule(const std::string &module,
+                      const std::string &method, const std::string &args, int argc) {
+  SendCallNativeModuleAction(module, method, args, argc);
 }
 
 void RenderPage::LayoutInner() {
@@ -537,6 +545,12 @@ void RenderPage::SendLayoutAction(RenderObject *render, int index) {
   if (render == nullptr) return;
 
   RenderAction *action = new RenderActionLayout(page_id(), render, index);
+  PostRenderAction(action);
+}
+    
+void RenderPage::SendCallNativeModuleAction(const std::string &module,
+                                const std::string &method, const std::string &args, int argc) {
+  RenderAction *action = new RenderActionCallNativeModule(page_id(), module, method, args, argc);
   PostRenderAction(action);
 }
 
