@@ -18,6 +18,7 @@
  */
 
 #include <sstream>
+#include <cstdlib>
 #include "core/data_render/object.h"
 
 namespace weex {

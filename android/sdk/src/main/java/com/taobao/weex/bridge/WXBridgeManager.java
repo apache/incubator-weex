@@ -1156,7 +1156,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         } catch (Throwable e) {
           String err = "[WXBridgeManager] fireEventOnDataRenderNode " + WXLogUtils.getStackTrace(e);
           WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE, "fireEventOnDataRenderNode",
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_BRIDGE, "fireEventOnDataRenderNode",
               err, null);
           WXLogUtils.e(err);
         }
