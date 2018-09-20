@@ -159,7 +159,7 @@ public class WXEnvironment {
     configs.put(WXConfig.logLevel,sLogLevel.getName());
 
     try {
-      configs.put(WXConfig.layoutDirection, sApplication.getApplicationContext().getResources().getBoolean(R.bool.weex_is_right_to_left) ? "rtl" : "ltr");
+      configs.put(WXConfig.layoutDirection, isLayoutDirectionRTL() ? "rtl" : "ltr");
     } catch (Exception e) {
       configs.put(WXConfig.layoutDirection, "ltr");
     }
@@ -232,6 +232,9 @@ public class WXEnvironment {
     return isHardwareSupport() && isInitialized;
   }
 
+  public static boolean isLayoutDirectionRTL() {
+    return sApplication.getApplicationContext().getResources().getBoolean(R.bool.weex_is_right_to_left);
+  }
   /**
    * Tell whether Weex can run on current hardware.
    * @return true if weex can run on current hardware, otherwise false.

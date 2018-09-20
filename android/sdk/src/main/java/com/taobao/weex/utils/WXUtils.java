@@ -26,6 +26,8 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
+
+import com.taobao.weex.R;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXConfig;

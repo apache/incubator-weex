@@ -382,20 +382,30 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   @Override
   public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      lp.setMargins(left, top, right, bottom);
       if (lp instanceof FrameLayout.LayoutParams) {
         FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
-        lp_frameLayout.gravity = Gravity.START | Gravity.TOP;
+        if (this.isLayoutRTL() == WXEnvironment.isLayoutDirectionRTL()) {
+          lp_frameLayout.gravity = Gravity.START | Gravity.TOP;
+          lp.setMarginStart(left);
+          lp.setMarginEnd(right);
+        } else {
+          lp_frameLayout.gravity = Gravity.END | Gravity.TOP;
+          lp.setMarginStart(right);
+          lp.setMarginEnd(left);
+        }
+      } else {
+        lp.setMarginStart(left);
+        lp.setMarginEnd(right);
       }
-      lp.setMargins(left, top, right, bottom);
-      lp.setMarginStart(left);
-      lp.setMarginEnd(right);
     } else {
       if (lp instanceof FrameLayout.LayoutParams) {
         FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
-        lp_frameLayout.gravity = Gravity.LEFT | Gravity.TOP;
         if (this.isLayoutRTL()) {
+          lp_frameLayout.gravity = Gravity.RIGHT | Gravity.TOP;
           lp.setMargins(right, top, left, bottom);
         } else {
+          lp_frameLayout.gravity = Gravity.LEFT | Gravity.TOP;
           lp.setMargins(left, top, right, bottom);
         }
       } else {
