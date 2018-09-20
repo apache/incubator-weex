@@ -317,6 +317,10 @@
 		B85ED3032126715100EBEC11 /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; };
 		B863DF322107308000EA887D /* WXBridgeContext.m in Sources */ = {isa = PBXBuildFile; fileRef = B863DF312107307F00EA887D /* WXBridgeContext.m */; };
 		B863DF332107313400EA887D /* WXBridgeContext.m in Sources */ = {isa = PBXBuildFile; fileRef = B863DF312107307F00EA887D /* WXBridgeContext.m */; };
+		B87B9E7D21539B3300B6DC61 /* WXVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = B87B9E7B21539B3300B6DC61 /* WXVersion.h */; };
+		B87B9E7E21539B3300B6DC61 /* WXVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = B87B9E7B21539B3300B6DC61 /* WXVersion.h */; };
+		B87B9E7F21539B3300B6DC61 /* WXVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = B87B9E7C21539B3300B6DC61 /* WXVersion.m */; };
+		B87B9E8021539B3300B6DC61 /* WXVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = B87B9E7C21539B3300B6DC61 /* WXVersion.m */; };
 		B89543F320EB18B5006EAD63 /* WXCoreBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543ED20EB18B4006EAD63 /* WXCoreBridge.mm */; };
 		B89543F420EB18B5006EAD63 /* WXCoreBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543ED20EB18B4006EAD63 /* WXCoreBridge.mm */; };
 		B89543F520EB18B5006EAD63 /* WXJSCoreBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = B89543EE20EB18B4006EAD63 /* WXJSCoreBridge.mm */; };
@@ -1295,6 +1299,8 @@
 		B8394F3521468AF100CA1EFF /* render_action_trigger_vsync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_action_trigger_vsync.h; sourceTree = "<group>"; };
 		B8394F3621468AF100CA1EFF /* render_action_trigger_vsync.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_action_trigger_vsync.cpp; sourceTree = "<group>"; };
 		B863DF312107307F00EA887D /* WXBridgeContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXBridgeContext.m; sourceTree = "<group>"; };
+		B87B9E7B21539B3300B6DC61 /* WXVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXVersion.h; sourceTree = "<group>"; };
+		B87B9E7C21539B3300B6DC61 /* WXVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXVersion.m; sourceTree = "<group>"; };
 		B89543ED20EB18B4006EAD63 /* WXCoreBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXCoreBridge.mm; sourceTree = "<group>"; };
 		B89543EE20EB18B4006EAD63 /* WXJSCoreBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXJSCoreBridge.mm; sourceTree = "<group>"; };
 		B89543EF20EB18B4006EAD63 /* WXCoreBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCoreBridge.h; sourceTree = "<group>"; };
@@ -2033,6 +2039,8 @@
 				77D161601C02ED790010B15B /* WXLog.h */,
 				77D161611C02ED790010B15B /* WXLog.m */,
 				775BEE4D1C16F993008D1629 /* WXDefine.h */,
+				B87B9E7B21539B3300B6DC61 /* WXVersion.h */,
+				B87B9E7C21539B3300B6DC61 /* WXVersion.m */,
 				742389991C3174EB00D748CA /* WXWeakObjectWrapper.h */,
 				7423899A1C3174EB00D748CA /* WXWeakObjectWrapper.m */,
 				7423899D1C32733800D748CA /* WXType.h */,
@@ -2744,6 +2752,7 @@
 				B8D66CB521255730003960BD /* ViewUtils.h in Headers */,
 				77E659DA1C07F594008B8775 /* WXDomModule.h in Headers */,
 				74EF31AD1DE58BE200667A07 /* WXURLRewriteDefaultImpl.h in Headers */,
+				B87B9E7D21539B3300B6DC61 /* WXVersion.h in Headers */,
 				746B923B1F46BE36009AE86B /* WXCellSlotComponent.h in Headers */,
 				744D61101E49979000B624B3 /* WXFooterComponent.h in Headers */,
 				744D61141E4AF23E00B624B3 /* WXDiffUtil.h in Headers */,
@@ -3090,6 +3099,7 @@
 				B8D66CB621255730003960BD /* ViewUtils.h in Headers */,
 				33CE190F2153443000CF9670 /* WXJSFrameworkLoadDefaultImpl.h in Headers */,
 				DCA445F41EFA5A2800D0CFA8 /* WXNavigationDefaultImpl.h in Headers */,
+				B87B9E7E21539B3300B6DC61 /* WXVersion.h in Headers */,
 				B8D66C9421255730003960BD /* dom_wson.h in Headers */,
 				DCA445E51EFA59E100D0CFA8 /* WXDivComponent.h in Headers */,
 				DCA446211EFA5ABA00D0CFA8 /* WXSDKInstance_private.h in Headers */,
@@ -3367,7 +3377,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = ". \"${PROJECT_DIR}/buildScripts.sh\"\n\ngenerateSDKHeader 'WeexSDK'\n";
+			shellScript = ". \"${PROJECT_DIR}/buildScripts.sh\"\n\ngenerateSDKHeader 'WeexSDK'\ngenerateBuildTime \"${PROJECT_DIR}/WeexSDK/Sources/Utility/WXVersion.m\"\n";
 		};
 		DCA445C81EFA584000D0CFA8 /* Generate WeexSDK.h */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3382,7 +3392,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = ". \"${PROJECT_DIR}/buildScripts.sh\"\n\ngenerateSDKHeader 'WeexSDK'";
+			shellScript = ". \"${PROJECT_DIR}/buildScripts.sh\"\n\ngenerateSDKHeader 'WeexSDK'\ngenerateBuildTime \"${PROJECT_DIR}/WeexSDK/Sources/Utility/WXVersion.m\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3519,6 +3529,7 @@
 				74862F7E1E03A0F300B7A041 /* WXModuleMethod.m in Sources */,
 				B8D66C4D21255730003960BD /* render_action_move_element.cpp in Sources */,
 				742AD7341DF98C45007DC46C /* WXResourceResponse.m in Sources */,
+				B87B9E7F21539B3300B6DC61 /* WXVersion.m in Sources */,
 				77E65A161C155EB5008B8775 /* WXTextComponent.mm in Sources */,
 				C4D872261E5DDF7500E39BC1 /* WXBoxShadow.m in Sources */,
 				B8D66BB32125572F003960BD /* parser.cc in Sources */,
@@ -3785,6 +3796,7 @@
 				DCA445751EFA55B300D0CFA8 /* WXUtility.m in Sources */,
 				74B81AEA1F73C3E900D3A61D /* WXRecycleListUpdateManager.m in Sources */,
 				74B81AF01F73C3E900D3A61D /* WXComponent+DataBinding.mm in Sources */,
+				B87B9E8021539B3300B6DC61 /* WXVersion.m in Sources */,
 				DCA445761EFA55B300D0CFA8 /* WXLog.m in Sources */,
 				DCA445771EFA55B300D0CFA8 /* WXWeakObjectWrapper.m in Sources */,
 				B8D66C9621255730003960BD /* dom_wson.cpp in Sources */,
