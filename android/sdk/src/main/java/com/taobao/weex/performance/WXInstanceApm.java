@@ -18,8 +18,6 @@
  */
 package com.taobao.weex.performance;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -116,12 +114,10 @@ public class WXInstanceApm {
     private boolean mEnd = false;
     private boolean hasRecordFistInteractionView =false;
     public final Map<String,Object> extInfo;
-    private List<WXComponent> mCountDownInteractionComponentList;
 
     public WXInstanceApm(String instanceId) {
         mInstanceId = instanceId;
         extInfo = new ConcurrentHashMap<>();
-        mCountDownInteractionComponentList = new ArrayList<>(10);
         IApmGenerator generator = WXSDKManager.getInstance().getApmGenerater();
         if (null != generator) {
             apmInstance = generator.generateApmInstance(WEEX_PAGE_TOPIC);
@@ -262,6 +258,7 @@ public class WXInstanceApm {
         if (null == apmInstance){
             return;
         }
+        isFSEnd = true;
         onStage(WXInstanceApm.KEY_PAGE_STAGES_FSRENDER);
     }
 
@@ -269,39 +266,27 @@ public class WXInstanceApm {
         if (null == apmInstance || null == targetComponent || targetComponent.getInstance() == null ) {
             return;
         }
-        targetComponent.interactionTime = WXUtils.getFixUnixTime();
         WXPerformance performanceRecord = targetComponent.getInstance().getWXPerformance();
         if (null == performanceRecord){
             return;
-        }
-
-        if (BuildConfig.DEBUG){
-            Log.d("wxapm", "screenComponent ["+targetComponent.getComponentType()+","+targetComponent.getRef()
-                +"], renderTime:"+ (targetComponent.interactionTime -performanceRecord.renderTimeOrigin)
-                +",style:"+targetComponent.getStyles()
-                +",attrs:"+targetComponent.getAttrs());
         }
 
         if (!hasRecordFistInteractionView){
             onStage(KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW);
             hasRecordFistInteractionView = true;
         }
-        if (mCountDownInteractionComponentList.size() <10){
-            mCountDownInteractionComponentList.add(targetComponent);
-            return;
-        }
-        mCountDownInteractionComponentList.add(targetComponent);
-        WXComponent preComponent = mCountDownInteractionComponentList.remove(0);
-        if (null == preComponent){
-            return;
-        }
+
+        long curTIme = WXUtils.getFixUnixTime();
 
         if (BuildConfig.DEBUG){
-            Log.d("wxapm", "interaction record component ["+preComponent.getComponentType()+","+preComponent.getRef());
+            Log.d("wxapm", "screenComponent ["+targetComponent.getComponentType()+","+targetComponent.getRef()
+                +"], renderTime:"+ (curTIme -performanceRecord.renderTimeOrigin)
+                +",style:"+targetComponent.getStyles()
+                +",attrs:"+targetComponent.getAttrs());
         }
 
-        performanceRecord.interactionTime = preComponent.interactionTime - performanceRecord.renderTimeOrigin;
-        onStageWithTime(KEY_PAGE_STAGES_INTERACTION,preComponent.interactionTime);
+        performanceRecord.interactionTime = curTIme - performanceRecord.renderTimeOrigin;
+        onStageWithTime(KEY_PAGE_STAGES_INTERACTION,curTIme);
 
         updateDiffStats(KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT, 1);
         updateMaxStats(KEY_PAGE_STATS_I_ALL_VIEW_COUNT, performanceRecord.localInteractionViewAddCount);

@@ -707,6 +707,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
 
     mApmForInstance.doInit();
+    mApmForInstance.setPageName(pageName);
 
     Uri uri = Uri.parse(url);
     if (uri != null && TextUtils.equals(uri.getScheme(), "file")) {
@@ -735,6 +736,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXHttpListener httpListener =
             new WXHttpListener(pageName, renderOptions, jsonInitData, flag, System.currentTimeMillis());
     httpListener.setSDKInstance(this);
+    mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
     adapter.sendRequest(wxRequest, (IWXHttpAdapter.OnHttpListener) httpListener);
   }
 
@@ -1876,7 +1878,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
               && this.instance.getWXStatisticsListener() != null) {
         this.instance.getWXStatisticsListener().onHttpStart();
       }
-      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
     }
 
     @Override

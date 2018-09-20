@@ -2097,6 +2097,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             + ", exception function:" + function + ", exception:"
             + exception);
     WXSDKInstance instance = null;
+    WXErrorCode reportErrorCode = WXErrorCode.WX_ERR_JS_EXECUTE;
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
       exception +=   "\n getTemplateInfo==" +instance.getTemplateInfo();//add network header info
       if (METHOD_CREATE_INSTANCE.equals(function) || !instance.isContentMd5Match()) {
@@ -2127,12 +2128,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           e.printStackTrace();
         }
       }
-      instance.onJSException(WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception);
+      if (METHOD_CREATE_INSTANCE.equals(function) && !instance.getExceptionRecorder().hasAddView.get()){
+        reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE;
+      }else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function) && !instance.getExceptionRecorder().hasAddView.get()){
+        reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT;
+      }
+      instance.onJSException(reportErrorCode.getErrorCode(), function, exception);
     }
-    doReportJSException(instanceId,function,exception);
+    doReportJSException(instanceId,function,reportErrorCode,exception);
   }
 
-  private void doReportJSException(String instanceId, String function, String exception){
+  private void doReportJSException(String instanceId, String function,WXErrorCode reportCode, String exception){
     WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
     IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
     if (adapter != null) {
@@ -2182,18 +2188,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
 
 
-      WXErrorCode errorCode;
-      if (METHOD_CREATE_INSTANCE.equals(function)){
-        errorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE;
-      }else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function)){
-        errorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT;
-      }else {
-        errorCode = WXErrorCode.WX_KEY_EXCEPTION_WXBRIDGE;
-      }
-
-      WXExceptionUtils.commitCriticalExceptionRT(exceptionId, errorCode,
+      WXExceptionUtils.commitCriticalExceptionRT(exceptionId, reportCode,
             function,
-          errorCode.getErrorMsg() + exception,
+          reportCode.getErrorMsg() + exception,
             null);
 
     }
