@@ -258,13 +258,13 @@ typedef enum : NSUInteger {
 
 - (void)renderView:(id)source options:(NSDictionary *)options data:(id)data
 {
-    WXLogDebug(@"Render source: %@, data:%@", self, [WXUtility JSONString:data]);
     _options = options;
     _jsData = data;
     
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
     
     if ([source isKindOfClass:[NSString class]]) {
+        WXLogDebug(@"Render source: %@, data:%@", self, [WXUtility JSONString:data]);
         [self _renderWithMainBundleString:source];
     } else if ([source isKindOfClass:[NSData class]]) {
         [self _renderWithOpcode:source];

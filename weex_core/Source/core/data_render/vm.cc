@@ -216,7 +216,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
           break;
       }
       case OP_JMP: {
-          LOGTEMP("OP_JMP A:%ld\n", GET_ARG_A(instruction));
+          LOGTEMP("OP_JMP A:%ld  B:%ld \n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
           a = frame.reg + GET_ARG_A(instruction);
           bool con = false;
           if (!ToBool(a, con)) {
@@ -292,12 +292,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
               LOGTEMP("OP_NOT A:%ld B:%ld \n", GET_ARG_A(instruction), GET_ARG_B(instruction));
               a = frame.reg + GET_ARG_A(instruction);
               b = frame.reg + GET_ARG_B(instruction);
-              if (!IsBool(b)) {
-                  // TODO error
-                  throw VMExecError("Not Bool Type Error With OP_CODE [OP_NOT]");
-              }
-              a->type =Value::Type::BOOL;
-              a->b = !b->b;
+              a->type = Value::Type::BOOL;
+              ToBool(b, a->b);
+              a->b = !a->b;
               break;
           }
         case OP_OR: {
@@ -700,8 +697,6 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             }
             *a = ref->value();
             a->ref = &ref->value();
-//            int value_index = a - exec_state->stack()->base();
-//            Value *test = exec_state->stack()->base() + value_index;
             break;
         }
         case OP_GETINDEXVAR:
@@ -802,7 +797,6 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
           }
           if (IsString(b) || IsTable(b)) {
               int ret = SetTableValue(reinterpret_cast<Table *>(a->gc), b, *c);
-              //LOGTEMP("[OP_SETTABLE]:%s\n", TableToString(ValueTo<Table>(a)).c_str());
               if (!ret) {
                   // TODO set faile
                   throw VMExecError("Set Table Error With OP_CODE [OP_SETTABLE]");

@@ -635,14 +635,7 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
         if (!node->LowerIdentifier()) {
             std::string name = node->Identifier()->AsIdentifier()->GetName();
             int index = exec_state_->global()->IndexOf(name);
-            if (index < 0) {
-                bool exist = block_->FindVariable(name);
-                if (!exist) {
-                    throw GeneratorError("can't find identifier:" + name);
-                    break;
-                }
-            }
-            else {
+            if (index >= 0) {
                 node->SetClass(true);
             }
         }
@@ -1092,6 +1085,9 @@ void CodeGenerator::Visit(PrefixExpression *node, void *data) {
     // --i
     else if (operation == PrefixOperation::kDecrement) {
         func_->func_state()->AddInstruction(CREATE_ABC(OP_PRE_DECR, reg, ret, 0));
+    }
+    else if (operation == PrefixOperation::kNot) {
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_NOT, ret, reg));
     }
     else if (operation == PrefixOperation::kUnfold) {
         func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, ret, reg, 0));
