@@ -53,6 +53,17 @@ public class WXLocaleModule extends WXModule {
     return language;
   }
 
+//  @JSMethod(uiThread = false)
+//  public void getLanguage(JSCallback callback) {
+//    Locale locale;
+//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//      locale = LocaleList.getDefault().get(0);
+//    } else locale = Locale.getDefault();
+//
+//    String language = locale.getLanguage() + "-" + locale.getCountry();
+//    callback.invoke(language);
+//  }
+
   @JSMethod(uiThread = false)
   public List<String> getLanguages() {
     String[] tags = getLanguageTags().split(",");
