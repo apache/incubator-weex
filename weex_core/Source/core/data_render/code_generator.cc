@@ -408,8 +408,8 @@ void CodeGenerator::Visit(BlockStatement* node, void* data) {
 void CodeGenerator::Visit(FunctionPrototype *node, void *data) {}
 
 void CodeGenerator::Visit(FunctionStatement *node, void *data) {
-    RegisterScope register_scope(block_);
     long ret = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
+    RegisterScope register_scope(block_);
     Handle<FunctionPrototype> proto = node->proto();
     bool is_class_func = func_->parent() == nullptr && class_ ? true : false;
     // body
@@ -817,11 +817,26 @@ void CodeGenerator::Visit(AssignExpression *node, void *data) {
     }
     // a = b
     FuncState *func_state = func_->func_state();
-    if (class_ && node->lhs()->IsMemberExpression() && node->lhs()->AsMemberExpression()->expr()->IsThisExpression()) {
-        func_state->AddInstruction(CREATE_ABC(OP_SETMEMBERVAR, left, right, 0));
-    }
-    else {
-        func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, right, 0));
+    switch (node->op()) {
+        case AssignOperation::kAssign:
+        {
+            if (class_ && node->lhs()->IsMemberExpression() && node->lhs()->AsMemberExpression()->expr()->IsThisExpression()) {
+                func_state->AddInstruction(CREATE_ABC(OP_SETMEMBERVAR, left, right, 0));
+            }
+            else {
+                func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, right, 0));
+            }
+            break;
+        }
+        case AssignOperation::kAssignAdd:
+        {
+            long ret = block_->NextRegisterId();
+            func_state->AddInstruction(CREATE_ABC(OP_ADD, ret, left, right));
+            func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, ret, 0));
+            break;
+        }
+        default:
+        break;
     }
 }
 

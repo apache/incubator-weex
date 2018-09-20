@@ -538,6 +538,11 @@ class ArrayConstant : public Expression {
  private:
   ProxyArray exprs_;
 };
+    
+enum class AssignOperation {
+    kAssign,
+    kAssignAdd
+};
 
 class AssignExpression : public Expression {
  public:
@@ -547,11 +552,13 @@ class AssignExpression : public Expression {
       : Expression(), lhs_(lhs), rhs_(rhs) {}
   Handle<Expression> lhs() { return lhs_; }
   Handle<Expression> rhs() { return rhs_; }
+  AssignOperation& op() { return op_; }
   DEFINE_NODE_TYPE(AssignExpression, Expression);
 
  private:
   Handle<Expression> lhs_;
   Handle<Expression> rhs_;
+  AssignOperation op_{AssignOperation::kAssign};
 };
 
 class UndefinedConstant : public Expression {
