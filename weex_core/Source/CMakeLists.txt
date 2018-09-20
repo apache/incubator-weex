@@ -43,6 +43,7 @@ set(COMMON_SRCS
   ./core/render/action/render_action_add_event.cpp
   ./core/render/action/render_action_remove_event.cpp
   ./core/render/action/render_action_add_element.cpp
+  ./core/render/action/render_action_call_native_module.cpp
   ./core/render/action/render_action_remove_element.cpp
   ./core/render/action/render_action_move_element.cpp
   ./core/render/action/render_action_createbody.cpp
@@ -80,6 +81,7 @@ set(COMMON_SRCS
    ./core/data_render/object.cc
    ./core/data_render/parser.cc
    ./core/data_render/rax_jsx_ast.cc
+   ./core/data_render/js_common_function.cc
    ./core/data_render/rax_parser.cc
    ./core/data_render/rax_parser_builder.cc
    ./core/data_render/rax_parser_context.cc

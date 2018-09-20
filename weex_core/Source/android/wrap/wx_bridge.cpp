@@ -39,6 +39,7 @@
 #include "core/layout/layout.h"
 #include "core/layout/measure_func_adapter_impl_android.h"
 #include "core/manager/weex_core_manager.h"
+#include "core/data_render/vnode/vnode_render_manager.h"
 
 using namespace WeexCore;
 jlongArray jFirstScreenRenderTime = nullptr;
@@ -368,6 +369,23 @@ static void RefreshInstance(JNIEnv* env, jobject jcaller, jstring instanceId,
                         function.getChars(), params);
 
   freeParams(params);
+}
+
+static void FireEventOnRenderNode(JNIEnv* env, jobject jcaller, jstring instanceId,
+                            jstring _namespace, jstring _function,jstring _event,
+                            jstring _ref,
+                            jstring _args) {
+  ScopedJStringUTF8 instance_id(env, instanceId);
+  ScopedJStringUTF8 name_space(env, _namespace);
+  ScopedJStringUTF8 function(env, _function);
+  ScopedJStringUTF8 event(env, _event);
+  ScopedJStringUTF8 ref(env, _ref);
+  ScopedJStringUTF8 args(env, _args);
+
+  weex::core::data_render::VNodeRenderManager::GetInstance()->FireEvent(
+      instance_id.getChars(),
+      event.getChars(),ref.getChars(),args.getChars()
+  );
 }
 
 static jint ExecJSService(JNIEnv* env, jobject object, jstring script) {
