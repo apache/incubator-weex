@@ -49,6 +49,9 @@
 #import "WXSDKInstance_performance.h"
 #import "JSContext+Weex.h"
 #import "WXCoreBridge.h"
+#import "WXJSFrameworkLoadProtocol.h"
+#import "WXJSFrameworkLoadDefaultImpl.h"
+#import "WXHandlerFactory.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -418,7 +421,6 @@ _Pragma("clang diagnostic pop") \
     WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instanceIdString]);
     WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
     BOOL shoudMultiContext = [WXSDKManager sharedInstance].multiContext;
-    __weak typeof(self) weakSelf = self;
     NSString * bundleType = nil;
     
     if (shoudMultiContext) {
@@ -432,20 +434,18 @@ _Pragma("clang diagnostic pop") \
         }
         [newOptions addEntriesFromDictionary:@{@"env":[WXUtility getEnvironment]}];
         newOptions[@"bundleType"] = bundleType;
-        NSString *raxAPIScript = nil;
-        NSString *raxAPIScriptPath = nil;
+        __block NSString *raxAPIScript = nil;
+        __block NSString *raxAPIScriptPath = nil;
+        id<WXJSFrameworkLoadProtocol> handler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSFrameworkLoadProtocol)];
         sdkInstance.bundleType = bundleType;
         if ([bundleType.lowercaseString isEqualToString:@"rax"]) {
-            raxAPIScriptPath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-rax-api" ofType:@"js"];
-            if (raxAPIScriptPath == nil) {
-                raxAPIScriptPath = [[NSBundle mainBundle] pathForResource:@"weex-rax-api" ofType:@"js"];
-            }
-            raxAPIScript = [NSString stringWithContentsOfFile:raxAPIScriptPath encoding:NSUTF8StringEncoding error:nil];
-            if (!raxAPIScript) {
-                WXLogError(@"weex-rax-api can not found");
+            if (handler && [handler respondsToSelector:@selector(loadRaxFramework:)]) {
+                [handler loadRaxFramework:^(NSString *path, NSString *script) {
+                    raxAPIScriptPath = path;
+                    raxAPIScript = script;
+                }];
             }
         }
-        
         if ([WXDebugTool isDevToolDebug]) {
             [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[],raxAPIScript?:@""]];
             
@@ -481,15 +481,14 @@ _Pragma("clang diagnostic pop") \
                 }
                 
                 if (WX_SYS_VERSION_LESS_THAN(@"10.2")) {
-                    NSString *filePath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-polyfill" ofType:@"js"];
-                    if (filePath == nil) {
-                        filePath = [[NSBundle mainBundle] pathForResource:@"weex-polyfill" ofType:@"js"];
-                    }
-                    NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
-                    if (script) {
-                        [sdkInstance.instanceJavaScriptContext executeJavascript:script withSourceURL:[NSURL URLWithString:filePath]];
-                    } else {
-                        WXLogError(@"weex-pollyfill can not found");
+                    if (handler && [handler respondsToSelector:@selector(loadPolyfillFramework:)]) {
+                        [handler loadPolyfillFramework:^(NSString *path, NSString *script) {
+                            if (script) {
+                                [sdkInstance.instanceJavaScriptContext executeJavascript:script withSourceURL:[NSURL URLWithString:path]];
+                            } else {
+                                WXLogError(@"weex-pollyfill can not found");
+                            }
+                        }];
                     }
                 }
                 

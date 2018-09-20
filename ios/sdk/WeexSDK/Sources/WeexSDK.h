@@ -52,6 +52,7 @@
 #import "WXModalUIModule.h"
 #import "WXLog.h"
 #import "WXListComponent.h"
+#import "WXJSFrameworkLoadProtocol.h"
 #import "WXJSExceptionProtocol.h"
 #import "WXJSExceptionInfo.h"
 #import "WXIndicatorComponent.h"
