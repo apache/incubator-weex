@@ -45,6 +45,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
      */
     UIColor *_backgroundColor;
     NSString *_backgroundImage;
+    NSString *_clipRadius;
     WXClipType _clipToBounds;
     UIView *_view;
     CGFloat _opacity;

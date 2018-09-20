@@ -666,4 +666,25 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
     return WeexCore::kJustifyFlexStart;
 }
 
+- (void)removeSubcomponentCssNode:(WXComponent *)subcomponent
+{
+    auto node = subcomponent->_flexCssNode;
+    if (node) {
+        if (_flexCssNode) {
+            _flexCssNode->removeChild(node);
+        }
+        
+        [subcomponent _setRenderObject:nullptr];
+        
+        // unbind subcomponents of subcomponent
+        NSMutableArray* sub_subcomponents = [[NSMutableArray alloc] init];
+        [subcomponent _collectSubcomponents:sub_subcomponents];
+        for (WXComponent* c in sub_subcomponents) {
+            [c _setRenderObject:nullptr];
+        }
+        
+        delete node; // also will delete all children recursively
+    }
+}
+
 @end

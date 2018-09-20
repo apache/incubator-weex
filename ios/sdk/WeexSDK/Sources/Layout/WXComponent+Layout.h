@@ -69,4 +69,9 @@ extern "C" {
 // if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
 - (BOOL)shouldTranformSubviewsWhenRTL;
 
+/**
+ * @abstract Delete css node of a subcomponent.
+ */
+- (void)removeSubcomponentCssNode:(WXComponent *)subcomponent;
+
 @end

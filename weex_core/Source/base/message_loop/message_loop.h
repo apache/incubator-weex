@@ -19,6 +19,7 @@
 #ifndef BASE_MESSAGE_LOOP_MESSAGE_LOOP_H
 #define BASE_MESSAGE_LOOP_MESSAGE_LOOP_H
 
+#include <memory>
 #include <deque>
 #include <mutex>
 #include <queue>

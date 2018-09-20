@@ -196,7 +196,6 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 - (void)loadMore
 {
     [super loadMore];
-    
     _previousLoadMoreCellNumber = [_collectionView numberOfItemsInSection:0];
 }
 

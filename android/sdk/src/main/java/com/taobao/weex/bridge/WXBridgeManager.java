@@ -1630,7 +1630,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
     // }
-    return mWXBridge.execJSOnInstance(instanceId, js, type);
+    if (isJSFrameworkInit()) {
+      return mWXBridge.execJSOnInstance(instanceId, js, type);
+    }
+    return null;
   }
 
   private byte[] invokeExecJSWithResult(String instanceId, String namespace, String function,
@@ -1644,7 +1647,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
-    return  mWXBridge.execJSWithResult(instanceId, namespace, function, args);
+    if (isJSFrameworkInit()) {
+      return mWXBridge.execJSWithResult(instanceId, namespace, function, args);
+    }
+    return null;
   }
 
   public @NonNull static String argsToJSON(WXJSObject[] args) {
@@ -2747,7 +2753,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
   
   public void bindMeasurementToRenderObject(long ptr){
-    mWXBridge.bindMeasurementToRenderObject(ptr);
+    if (isJSFrameworkInit()) {
+      mWXBridge.bindMeasurementToRenderObject(ptr);
+    }
   }
 
 
@@ -2758,12 +2766,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    */
   @UiThread
   public boolean notifyLayout(String instanceId) {
-    return mWXBridge.notifyLayout(instanceId);
+    if (isJSFrameworkInit()) {
+      return mWXBridge.notifyLayout(instanceId);
+    }
+    return false;
   }
 
   @UiThread
   public void forceLayout(String instanceId) {
-    mWXBridge.forceLayout(instanceId);
+    if (isJSFrameworkInit()) {
+      mWXBridge.forceLayout(instanceId);
+    }
   }
 
   /**
@@ -2784,7 +2797,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    * @param defaultHeight
    */
   public void setDefaultRootSize(final String instanceId, final float defaultWidth, final float defaultHeight, final boolean isWidthWrapContent, final boolean isHeightWrapContent) {
-    mWXBridge.setDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
+    if (isJSFrameworkInit()) {
+      mWXBridge.setDefaultHeightAndWidthIntoRootDom(instanceId, defaultWidth, defaultHeight, isWidthWrapContent, isHeightWrapContent);
+    }
   }
 
   public void setRenderContentWrapContentToCore(boolean wrap, final String instanceId) {
@@ -2794,35 +2809,53 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public void setStyleWidth(String instanceId, String ref, float value) {
-    mWXBridge.setStyleWidth(instanceId, ref, value);
+    if (isJSFrameworkInit()) {
+      mWXBridge.setStyleWidth(instanceId, ref, value);
+    }
   }
 
   public void setStyleHeight(String instanceId, String ref, float value) {
-    mWXBridge.setStyleHeight(instanceId, ref, value);
+    if (isJSFrameworkInit()) {
+      mWXBridge.setStyleHeight(instanceId, ref, value);
+    }
   }
 
   public long[] getFirstScreenRenderTime(String instanceId) {
-    return mWXBridge.getFirstScreenRenderTime(instanceId);
+    if (isJSFrameworkInit()) {
+      return mWXBridge.getFirstScreenRenderTime(instanceId);
+    }
+    return null;
   }
 
   public long[] getRenderFinishTime(String instanceId) {
-    return mWXBridge.getRenderFinishTime(instanceId);
+    if (isJSFrameworkInit()) {
+      return mWXBridge.getRenderFinishTime(instanceId);
+    }
+    return null;
   }
 
   public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-    mWXBridge.setMargin(instanceId, ref, edge, value);
+    if (isJSFrameworkInit()) {
+      mWXBridge.setMargin(instanceId, ref, edge, value);
+    }
   }
 
   public void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-    mWXBridge.setPadding(instanceId, ref, edge, value);
+    if (isJSFrameworkInit()) {
+      mWXBridge.setPadding(instanceId, ref, edge, value);
+    }
   }
 
   public void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-    mWXBridge.setPosition(instanceId, ref, edge, value);
+    if (isJSFrameworkInit()) {
+      mWXBridge.setPosition(instanceId, ref, edge, value);
+    }
   }
 
   public void markDirty(String instanceId, String ref, boolean dirty) {
-    mWXBridge.markDirty(instanceId, ref, dirty);
+    if (isJSFrameworkInit()) {
+      mWXBridge.markDirty(instanceId, ref, dirty);
+    }
   }
 
   public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
