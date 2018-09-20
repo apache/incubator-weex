@@ -574,62 +574,62 @@ bool WXBridge::RegisterJNIUtils(JNIEnv* env) {
 
 base::android::ScopedLocalJavaRef<jobject> WXBridge::GetMeasureFunc(
     JNIEnv* env, const char* page_id, jlong render_object_ptr) {
-  jstring jni_page_id = getKeyFromCache(env, page_id);
-  return Java_WXBridge_getMeasurementFunc(env, jni_object(), jni_page_id,
+  auto jni_page_id = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  return Java_WXBridge_getMeasurementFunc(env, jni_object(), jni_page_id.Get(),
                                           render_object_ptr);
 }
 
 int WXBridge::HasTransitionPros(
     JNIEnv* env, const char* page_id, const char* ref,
     const std::vector<std::pair<std::string, std::string>>& styles) {
-  jstring jni_page_id = getKeyFromCache(env, page_id);
-  jstring jni_ref = getKeyFromCache(env, ref);
+  auto jni_page_id = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  auto jni_ref = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
 
   auto styles_map = std::unique_ptr<WXMap>(new WXMap);
   if (!styles.empty()) {
     styles_map->Put(env, styles);
   }
 
-  return Java_WXBridge_callHasTransitionPros(env, jni_object(), jni_page_id,
-                                             jni_ref, styles_map->jni_object());
+  return Java_WXBridge_callHasTransitionPros(env, jni_object(), jni_page_id.Get(),
+                                             jni_ref.Get(), styles_map->jni_object());
 }
 
 int WXBridge::AppendTreeCreateFinish(JNIEnv* env, const char* page_id,
                                      const char* ref) {
-  jstring jni_page_id = getKeyFromCache(env, page_id);
-  jstring jni_ref = getKeyFromCache(env, ref);
+  auto jni_page_id = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  auto jni_ref = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
   return Java_WXBridge_callAppendTreeCreateFinish(env, jni_object(),
-                                                  jni_page_id, jni_ref);
+                                                  jni_page_id.Get(), jni_ref.Get());
 }
 
 int WXBridge::MoveElement(JNIEnv* env, const char* page_id, const char* ref,
                           const char* parent_ref, int index) {
-  jstring jni_page_id = getKeyFromCache(env, page_id);
-  jstring jni_ref = getKeyFromCache(env, ref);
-  jstring jni_parent_ref = getKeyFromCache(env, parent_ref);
+  auto jni_page_id = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  auto jni_ref = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
+  auto jni_parent_ref = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(parent_ref));
 
-  return Java_WXBridge_callMoveElement(env, jni_object(), jni_page_id, jni_ref,
-                                       jni_parent_ref, index);
+  return Java_WXBridge_callMoveElement(env, jni_object(), jni_page_id.Get(), jni_ref.Get(),
+                                       jni_parent_ref.Get(), index);
 }
 
 int WXBridge::RemoveElement(JNIEnv* env, const char* page_id, const char* ref) {
-  jstring jni_page_id = getKeyFromCache(env, page_id);
-  jstring jni_ref = getKeyFromCache(env, ref);
+  auto jni_page_id = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  auto jni_ref = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
 
-  return Java_WXBridge_callRemoveElement(env, jni_object(), jni_page_id,
-                                         jni_ref);
+  return Java_WXBridge_callRemoveElement(env, jni_object(), jni_page_id.Get(),
+                                         jni_ref.Get());
 }
 
 int WXBridge::CreateFinish(JNIEnv* env, const char* page_id) {
-  jstring jni_page_id = getKeyFromCache(env, page_id);
-  return Java_WXBridge_callCreateFinish(env, jni_object(), jni_page_id);
+  auto jni_page_id = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  return Java_WXBridge_callCreateFinish(env, jni_object(), jni_page_id.Get());
 }
 
 int WXBridge::UpdateAttr(
     JNIEnv* env, const char* page_id, const char* ref,
     std::vector<std::pair<std::string, std::string>>* attrs) {
-  jstring jni_page_id = getKeyFromCache(env, page_id);
-  jstring jni_ref = getKeyFromCache(env, ref);
+  auto jni_page_id = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  auto jni_ref = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
 
   auto attributes_map = std::unique_ptr<WXMap>();
   if (attrs != nullptr) {
@@ -639,7 +639,7 @@ int WXBridge::UpdateAttr(
 
   jobject jni_attributes =
       attributes_map.get() != nullptr ? attributes_map->jni_object() : nullptr;
-  return Java_WXBridge_callUpdateAttrs(env, jni_object(), jni_page_id, jni_ref,
+  return Java_WXBridge_callUpdateAttrs(env, jni_object(), jni_page_id.Get(), jni_ref.Get(),
                                        jni_attributes);
 }
 
@@ -649,8 +649,8 @@ int WXBridge::UpdateStyle(
     std::vector<std::pair<std::string, std::string>>* margin,
     std::vector<std::pair<std::string, std::string>>* padding,
     std::vector<std::pair<std::string, std::string>>* border) {
-  jstring jni_page_id = getKeyFromCache(env, page_id);
-  jstring jni_ref = getKeyFromCache(env, ref);
+  auto jni_page_id = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  auto jni_ref = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
 
   auto styles_map = std::unique_ptr<WXMap>();
   if (style != nullptr) {
@@ -682,7 +682,7 @@ int WXBridge::UpdateStyle(
   jobject jni_borders =
       borders_map.get() != nullptr ? borders_map->jni_object() : nullptr;
 
-  return Java_WXBridge_callUpdateStyle(env, jni_object(), jni_page_id, jni_ref,
+  return Java_WXBridge_callUpdateStyle(env, jni_object(), jni_page_id.Get(), jni_ref.Get(),
                                        jni_styles, jni_margins, jni_paddings,
                                        jni_borders);
 }
@@ -690,10 +690,10 @@ int WXBridge::UpdateStyle(
 int WXBridge::Layout(JNIEnv* env, const char* page_id, const char* ref, int top,
                      int bottom, int left, int right, int height, int width,
                      int index) {
-  jstring jPageId = getKeyFromCache(env, page_id);
-  jstring jRef = getKeyFromCache(env, ref);
+  auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  auto jRef = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
 
-  return Java_WXBridge_callLayout(env, jni_object(), jPageId, jRef, top, bottom,
+  return Java_WXBridge_callLayout(env, jni_object(), jPageId.Get(), jRef.Get(), top, bottom,
                                   left, right, height, width, index);
 }
 
@@ -706,9 +706,9 @@ int WXBridge::AddElement(JNIEnv* env, const char* page_id,
                          const WXCoreMargin& margins,
                          const WXCorePadding& paddings,
                          const WXCoreBorderWidth& borders, bool willLayout) {
-  jstring jni_page_id = getKeyFromCache(env, page_id);
-  jstring jni_ref = getKeyFromCache(env, ref);
-  jstring jni_parent_ref = getKeyFromCache(env, parentRef);
+  auto jni_page_id = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  auto jni_ref = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
+  auto jni_parent_ref = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(parentRef));
 
   auto styles_map = std::unique_ptr<WXMap>(new WXMap);
   styles_map->Put(env, *styles);
@@ -758,8 +758,8 @@ int WXBridge::AddElement(JNIEnv* env, const char* page_id,
   }
 
   return Java_WXBridge_callAddElement(
-      env, jni_object(), jni_page_id, jni_component_type, jni_ref, index,
-      jni_parent_ref, styles_map->jni_object(), attributes_map->jni_object(),
+      env, jni_object(), jni_page_id.Get(), jni_component_type, jni_ref.Get(), index,
+      jni_parent_ref.Get(), styles_map->jni_object(), attributes_map->jni_object(),
       events_set->jni_object(), jni_margins.Get(), jni_paddings.Get(),
       jni_borders.Get(), willLayout);
 }
@@ -772,8 +772,8 @@ int WXBridge::CreateBody(JNIEnv* env, const char* page_id,
                          const WXCoreMargin& margins,
                          const WXCorePadding& paddings,
                          const WXCoreBorderWidth& borders) {
-  jstring jni_pageId = getKeyFromCache(env, page_id);
-  jstring jni_ref = getKeyFromCache(env, ref);
+  auto jni_pageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  auto jni_ref = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
 
   auto styles_map = std::unique_ptr<WXMap>(new WXMap);
   styles_map->Put(env, *styles);
@@ -823,7 +823,7 @@ int WXBridge::CreateBody(JNIEnv* env, const char* page_id,
   }
 
   int flag = Java_WXBridge_callCreateBody(
-      env, jni_object(), jni_pageId, jni_component_type, jni_ref,
+      env, jni_object(), jni_pageId.Get(), jni_component_type, jni_ref.Get(),
       styles_map->jni_object(), attributes_map->jni_object(),
       events_set->jni_object(), jni_margins.Get(), jni_paddings.Get(),
       jni_borders.Get());
@@ -832,24 +832,24 @@ int WXBridge::CreateBody(JNIEnv* env, const char* page_id,
 
 int WXBridge::RemoveEvent(JNIEnv* env, const char* page_id, const char* ref,
                           const char* event) {
-  jstring jPageId = getKeyFromCache(env, page_id);
-  jstring jRef = getKeyFromCache(env, ref);
+  auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  auto jRef = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
 
   auto jEventId =
       base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(event));
 
-  return Java_WXBridge_callRemoveEvent(env, jni_object(), jPageId, jRef,
+  return Java_WXBridge_callRemoveEvent(env, jni_object(), jPageId.Get(), jRef.Get(),
                                        jEventId.Get());
 }
 
 int WXBridge::AddEvent(JNIEnv* env, const char* page_id, const char* ref,
                        const char* event) {
-  jstring jPageId = getKeyFromCache(env, page_id);
-  jstring jRef = getKeyFromCache(env, ref);
+  auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  auto jRef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(ref));
 
   auto jEventId =
       base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(event));
-  return Java_WXBridge_callAddEvent(env, jni_object(), jPageId, jRef,
+  return Java_WXBridge_callAddEvent(env, jni_object(), jPageId.Get(), jRef.Get(),
                                     jEventId.Get());
 }
 
@@ -859,14 +859,14 @@ int WXBridge::RefreshFinish(JNIEnv* env, const char* page_id, const char* task,
       env, newJByteArray(env, task));
   auto jCallback = base::android::ScopedLocalJavaRef<jstring>(
       env, env->NewStringUTF(callback));
-  jstring jPageId = getKeyFromCache(env, page_id);
-  return Java_WXBridge_callRefreshFinish(env, jni_object(), jPageId,
+  auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  return Java_WXBridge_callRefreshFinish(env, jni_object(), jPageId.Get(),
                                          jTask.Get(), jCallback.Get());
 }
 
 int WXBridge::RenderSuccess(JNIEnv* env, const char* page_id) {
-  jstring jPageId = getKeyFromCache(env, page_id);
-  return Java_WXBridge_callRenderSuccess(env, jni_object(), jPageId);
+  auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  return Java_WXBridge_callRenderSuccess(env, jni_object(), jPageId.Get());
 }
 
 int WXBridge::UpdateFinish(JNIEnv* env, const char* page_id, const char* task,
@@ -875,9 +875,9 @@ int WXBridge::UpdateFinish(JNIEnv* env, const char* page_id, const char* task,
       env, newJByteArray(env, task));
   auto jCallback = base::android::ScopedLocalJavaRef<jstring>(
       env, env->NewStringUTF(callback));
-  jstring jPageId = getKeyFromCache(env, page_id);
+  auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
 
-  return Java_WXBridge_callUpdateFinish(env, jni_object(), jPageId, jTask.Get(),
+  return Java_WXBridge_callUpdateFinish(env, jni_object(), jPageId.Get(), jTask.Get(),
                                         jCallback.Get());
 }
 
@@ -902,11 +902,11 @@ void WXBridge::CallNativeComponent(JNIEnv* env, const char* page_id,
       env, newJByteArray(env, arguments, arguments_length));
   auto jOptString = base::android::ScopedLocalJavaRef<jbyteArray>(
       env, newJByteArray(env, options, options_length));
-  jstring jPageId = getKeyFromCache(env, page_id);
-  jstring jRef = getKeyFromCache(env, ref);
+  auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
+  auto jRef = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
 
   if (!jMethod.IsNull()) {
-    Java_WXBridge_callNativeComponent(env, jni_object(), jPageId, jRef,
+    Java_WXBridge_callNativeComponent(env, jni_object(), jPageId.Get(), jRef.Get(),
                                       jMethod.Get(), jArgString.Get(),
                                       jOptString.Get());
   }
@@ -924,10 +924,10 @@ base::android::ScopedLocalJavaRef<jobject> WXBridge::CallNativeModule(
       env, newJByteArray(env, arguments, arguments_length));
   auto jOptString = base::android::ScopedLocalJavaRef<jbyteArray>(
       env, newJByteArray(env, options, options_length));
-  jstring jPageId = getKeyFromCache(env, page_id);
+  auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
 
   if (!jModule.IsNull() && !jMethod.IsNull()) {
-    return Java_WXBridge_callNativeModule(env, jni_object(), jPageId,
+    return Java_WXBridge_callNativeModule(env, jni_object(), jPageId.Get(),
                                           jModule.Get(), jMethod.Get(),
                                           jArgString.Get(), jOptString.Get());
   }
@@ -940,10 +940,10 @@ int WXBridge::CallNative(JNIEnv* env, const char* page_id, const char* task,
       env, newJByteArray(env, task));
   auto jCallback = base::android::ScopedLocalJavaRef<jstring>(
       env, env->NewStringUTF(callback));
-  jstring jPageId = getKeyFromCache(env, page_id);
+  auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
 
   if (!jTask.IsNull()) {
-    return Java_WXBridge_callNative(env, jni_object(), jPageId, jTask.Get(),
+    return Java_WXBridge_callNative(env, jni_object(), jPageId.Get(), jTask.Get(),
                                     jCallback.Get());
   }
   return -1;
@@ -955,9 +955,9 @@ void WXBridge::ReportException(JNIEnv* env, const char* page_id,
       base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(func));
   auto jExceptionString = base::android::ScopedLocalJavaRef<jstring>(
       env, env->NewStringUTF(exception_string));
-  jstring jPageId = getKeyFromCache(env, page_id);
+  auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
 
-  Java_WXBridge_reportJSException(env, jni_object(), jPageId, jFunc.Get(),
+  Java_WXBridge_reportJSException(env, jni_object(), jPageId.Get(), jFunc.Get(),
                                   jExceptionString.Get());
 }
 

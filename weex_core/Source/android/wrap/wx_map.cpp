@@ -69,10 +69,11 @@ void WXMap::Put(
   jbyteArray jni_value;
 
   for (int i = 0; i < vector.size(); ++i) {
-    jni_key = getKeyFromCache(env, vector[i].first.c_str());
+    jni_key = env->NewStringUTF(vector[i].first.c_str());
     jni_value = newJByteArray(env, vector[i].second.c_str());
     Java_WXMap_put(env, jni_object(), jni_key, jni_value);
     env->DeleteLocalRef(jni_value);
+    env->DeleteLocalRef(jni_key);
   }
 }
 
@@ -83,10 +84,11 @@ void WXMap::Put(JNIEnv* env, const std::map<std::string, std::string>& map) {
   jbyteArray jni_value;
 
   for (; it != end; ++it) {
-    jni_key = getKeyFromCache(env, it->first.c_str());
+    jni_key = env->NewStringUTF(it->first.c_str());
     jni_value = newJByteArray(env, it->second.c_str());
     Java_WXMap_put(env, jni_object(), jni_key, jni_value);
     env->DeleteLocalRef(jni_value);
+    env->DeleteLocalRef(jni_key);
   }
 }
 }  // namespace WeexCore
