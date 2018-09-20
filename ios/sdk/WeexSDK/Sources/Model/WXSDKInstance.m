@@ -246,9 +246,6 @@ typedef enum : NSUInteger {
 - (void)renderView:(id)source options:(NSDictionary *)options data:(id)data
 {
     WXLogDebug(@"Render source: %@, data:%@", self, [WXUtility JSONString:data]);
-    NSData* data1;
-    data1 = source;
-    
     _options = options;
     _jsData = data;
     
