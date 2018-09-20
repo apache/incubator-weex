@@ -1,3 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 #import "WXApmForInstance.h"
 #import "WXApmProtocol.h"
 #import "WXHandlerFactory.h"
@@ -93,6 +112,8 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     BOOL _isEnd;
     NSDictionary* _responseHeader;
     BOOL _hasRecordInteractionTime;
+    BOOL _hasRecordDownLoadStart;
+    BOOL _hasRecordDownLoadEnd;
 }
 
 @property (nonatomic,strong) id<WXApmProtocol> apmProtocolInstance;
@@ -142,6 +163,19 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (nil == _apmProtocolInstance || _isEnd) {
         return;
     }
+    if ([KEY_PAGE_STAGES_DOWN_BUNDLE_START isEqualToString:name]) {
+        if (_hasRecordDownLoadStart) {
+            return;
+        }
+        _hasRecordDownLoadStart = YES;
+    }
+    if ([KEY_PAGE_STAGES_DOWN_BUNDLE_END isEqualToString:name]) {
+        if (_hasRecordDownLoadEnd) {
+            return;
+        }
+        _hasRecordDownLoadEnd = YES;
+    }
+    
     if ([KEY_PAGE_STAGES_INTERACTION isEqualToString:name]) {
         _hasRecordInteractionTime = YES;
     }
@@ -175,30 +209,26 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (nil == _apmProtocolInstance || _isRecord) {
         return;
     }
-    _isRecord = YES;
-    _instanceId = instanceId;
-    
-    [self.apmProtocolInstance onStart:instanceId topic:WEEX_PAGE_TOPIC];
     WXSDKInstance* instance = [WXSDKManager instanceForID:instanceId];
-    if (nil != instance) {
-        for (NSString* key in instance.continerInfo) {
-            id value = [instance.continerInfo objectForKey:key];
-            [self setProperty:key withValue:value];
-        }
+    if (nil == instance) {
+        return;
     }
-    NSString* pageUrl = instance.scriptURL.absoluteString;
-    pageUrl = nil == pageUrl || [@"" isEqualToString:pageUrl]?@"unKnowUrl":pageUrl;
-    NSString* pageName = instance.pageName?:@"unKnowPageName";
-    NSString* vcName = @"unKnowVCName";
-    if (nil != instance.viewController) {
-        vcName = NSStringFromClass(instance.viewController.class);
+    
+    _isRecord = YES;
+
+    
+    [self.apmProtocolInstance onStart:instance.instanceId topic:WEEX_PAGE_TOPIC];
+    for (NSString* key in instance.continerInfo) {
+        id value = [instance.continerInfo objectForKey:key];
+        [self setProperty:key withValue:value];
     }
-    [self setProperty:KEY_PAGE_PROPERTIES_CONTAINER_NAME withValue:vcName];
+
+    [self setProperty:KEY_PAGE_PROPERTIES_CONTAINER_NAME withValue:NSStringFromClass(instance.viewController.class)?:@"unknownVCName"];
     [self setProperty:KEY_PAGE_PROPERTIES_INSTANCE_TYPE withValue:@"page"];
-    [self setProperty:KEY_PAGE_PROPERTIES_BIZ_ID withValue:pageName];
-    [self setProperty:KEY_PAGE_PROPERTIES_BUBDLE_URL withValue:pageUrl];
+    [self setProperty:KEY_PAGE_PROPERTIES_BIZ_ID withValue: instance.pageName?:@"unknownPageName"];
+    [self setProperty:KEY_PAGE_PROPERTIES_BUBDLE_URL withValue:instance.scriptURL.absoluteString?:@"unknownUrl"];
     [self setProperty:KEY_PROPERTIES_ERROR_CODE withValue:VALUE_ERROR_CODE_DEFAULT];
-    [self setProperty:KEY_PAGE_PROPERTIES_JSLIB_VERSION withValue:[WXAppConfiguration JSFrameworkVersion]];
+    [self setProperty:KEY_PAGE_PROPERTIES_JSLIB_VERSION withValue:[WXAppConfiguration JSFrameworkVersion]?:@"unknownJSFrameworkVersion"];
     [self setProperty:KEY_PAGE_PROPERTIES_WEEX_VERSION withValue:WX_SDK_VERSION];
     
     //for apm protocl
