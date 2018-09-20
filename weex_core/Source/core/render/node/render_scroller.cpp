@@ -56,7 +56,7 @@ namespace WeexCore {
 
     void RenderScroller::onLayout(const float left, const float top, const float right, const float bottom,
                                     WXCoreLayoutNode *const absoulteItem, WXCoreFlexLine *const flexLine) {
-        this->determineChildLayoutDirection(this->getLayoutDirection());
+        // In scroller only use left to right direction to caculate children frame
         this->setLayoutDirection(kDirectionLTR);
         RenderObject::onLayout(left, top, right, bottom, absoulteItem, flexLine);
     }

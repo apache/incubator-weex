@@ -642,7 +642,7 @@ namespace WeexCore {
       if (mLayoutResult->mLayoutDirection == kDirectionInherit) {
           if(mCssStyle->mDirection == kDirectionInherit) {
               // default direction in css is inherit, inherit direction from parent node
-              mLayoutResult->mLayoutDirection = NULL == mParent ? WEEXCORE_CSS_DEFAULT_DIRECTION : mParent->mLayoutResult->mLayoutDirection;
+              mLayoutResult->mLayoutDirection = NULL == mParent ? WEEXCORE_CSS_DEFAULT_DIRECTION : mParent->getLayoutDirection();
           } else {
               // specific direction in current Node's style
               mLayoutResult->mLayoutDirection = mCssStyle->mDirection;
