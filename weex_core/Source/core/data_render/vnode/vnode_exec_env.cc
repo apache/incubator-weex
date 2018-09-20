@@ -290,11 +290,11 @@ static Value CreateElement(ExecState *exec_state) {
     LOGD("[VM][VNode][CreateElement]: %s  %s\n", node_id.c_str(), tag_name.c_str());
     VNode *node = NULL;
     if (tag_name == "root") {
-        node = new VNode(ref, "div");
+        node = new VNode("div", node_id, ref);
         exec_state->context()->set_root(node);
     }
     else {
-        node = new VNode(ref, tag_name);
+        node = new VNode(tag_name, node_id, ref);
         if (exec_state->context()->root() == nullptr) {
             exec_state->context()->set_root(node);
         }

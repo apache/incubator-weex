@@ -25,6 +25,8 @@
 #include <cmath>
 #include <sstream>
 #include <map>
+#include <memory>
+#include "base/string_util.h"
 #include "core/data_render/object.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
@@ -579,11 +581,11 @@ inline int ToBool(const Value *o, bool &b) {
 inline std::string ToString(const Value *o) {
     switch (o->type) {
         case Value::Type::BOOL:
-            return std::to_string(o->b);
+            return weex::base::to_string(o->b);
         case Value::Type::INT:
-            return std::to_string(o->n);
+            return weex::base::to_string(o->n);
         case Value::Type::NUMBER:
-            return std::to_string(o->n);
+            return weex::base::to_string(o->n);
         case Value::Type::STRING:
             return o->str->c_str();
         case Value::Type::NIL:

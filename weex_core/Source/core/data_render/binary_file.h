@@ -21,6 +21,8 @@
 #define CORE_DATA_RENDER_BINARY_FILE_H_
 
 #include <fstream>
+#include <memory>
+
 namespace weex {
 namespace core {
 namespace data_render {
