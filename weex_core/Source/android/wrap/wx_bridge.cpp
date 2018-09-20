@@ -268,26 +268,53 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   // If parse init params error, return false
   if (params_vector.empty()) return false;
   // Set project mode
-  if (isSingleProcess()) {
-    WeexCoreManager::Instance()->set_project_mode(
-        WeexCoreManager::ProjectMode::MULTI_SO);
-  } else {
-    WeexCoreManager::Instance()->set_project_mode(
-        WeexCoreManager::ProjectMode::MULTI_PROCESS);
-  }
-  // Init script bridge
-  if (WeexCoreManager::Instance()->project_mode() ==
-      WeexCoreManager::ProjectMode::MULTI_PROCESS) {
-    WeexCoreManager::Instance()->set_script_bridge(
-        new ScriptBridgeInMultiProcess);
-  } else {
-    WeexCoreManager::Instance()->set_script_bridge(new ScriptBridgeInMultiSo);
-  }
+
+
+  WeexCoreManager::Instance()->set_project_mode(
+          WeexCoreManager::ProjectMode::MULTI_PROCESS);
+
+  WeexCoreManager::Instance()->set_script_bridge(
+          new ScriptBridgeInMultiProcess);
+
   // It means initialization failed when any bridge is not passable
   if (!WeexCoreManager::Instance()->getPlatformBridge()->is_passable() ||
       !WeexCoreManager::Instance()->script_bridge()->is_passable()) {
-    return false;
+
+    if(isSingleProcess()) {
+      WeexCoreManager::Instance()->set_project_mode(
+              WeexCoreManager::ProjectMode::MULTI_SO);
+      WeexCoreManager::Instance()->set_script_bridge(new ScriptBridgeInMultiSo);
+
+      if (!WeexCoreManager::Instance()->getPlatformBridge()->is_passable() ||
+          !WeexCoreManager::Instance()->script_bridge()->is_passable()) {
+        return false;
+      }
+    }
   }
+
+
+//  if (isSingleProcess()) {
+//    WeexCoreManager::Instance()->set_project_mode(
+//        WeexCoreManager::ProjectMode::MULTI_SO);
+//  } else {
+//    WeexCoreManager::Instance()->set_project_mode(
+//        WeexCoreManager::ProjectMode::MULTI_PROCESS);
+//  }
+//  // Init script bridge
+//  if (WeexCoreManager::Instance()->project_mode() ==
+//      WeexCoreManager::ProjectMode::MULTI_PROCESS) {
+//    WeexCoreManager::Instance()->set_script_bridge(
+//        new ScriptBridgeInMultiProcess);
+//  } else {
+//    WeexCoreManager::Instance()->set_script_bridge(new ScriptBridgeInMultiSo);
+//  }
+//  // It means initialization failed when any bridge is not passable
+//  if (!WeexCoreManager::Instance()->getPlatformBridge()->is_passable() ||
+//      !WeexCoreManager::Instance()->script_bridge()->is_passable()) {
+//    return false;
+//  }
+
+
   // for environment
   bridge->core_side()->SetPlatform(
       WXCoreEnvironment::getInstance()->platform());

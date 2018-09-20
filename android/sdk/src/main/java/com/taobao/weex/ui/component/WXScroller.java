@@ -437,11 +437,15 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       scrollView.addView(mRealView, layoutParams);
       scrollView.setHorizontalScrollBarEnabled(false);
 
-      if(pageEnable && this.pageSize != 0) {
+      if(pageEnable) {
         mGestureDetector = new GestureDetector(new MyGestureDetector(scrollView));
         scrollView.setOnTouchListener(new View.OnTouchListener() {
           @Override
           public boolean onTouch(View v, MotionEvent event) {
+            if (pageSize == 0)  {
+              pageSize = v.getMeasuredWidth();
+            }
+
             if (mGestureDetector.onTouchEvent(event)) {
               return true;
             }
@@ -684,6 +688,11 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         }
       }
     }
+
+    if(pageEnable) {
+      mActiveFeature = mChildren.indexOf(component);
+    }
+
 
     int viewYInScroller=component.getAbsoluteY() - getAbsoluteY();
     int viewXInScroller=component.getAbsoluteX() - getAbsoluteX();

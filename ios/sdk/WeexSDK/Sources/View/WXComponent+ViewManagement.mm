@@ -175,6 +175,7 @@ do {\
         _lastBoxShadow = _boxShadow;
     }
 }
+
 - (void)_transitionUpdateViewProperty:(NSDictionary *)styles
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
@@ -256,7 +257,7 @@ do {\
             [_layer setNeedsDisplay];
         }
         self.transform = transform;
-    }else if (styles[@"transformOrigin"]) {
+    } else if (styles[@"transformOrigin"]) {
         [_transform setTransformOrigin:[WXConvert NSString:styles[@"transformOrigin"]]];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [_transform applyTransformForView:_view];
@@ -265,7 +266,7 @@ do {\
     }
 }
 
--(void)resetBorder:(NSArray *)styles
+- (void)resetBorder:(NSArray *)styles
 {
     WX_BOARD_RADIUS_RESET_ALL(borderRadius);
     WX_BOARD_RADIUS_RESET(borderTopLeftRadius);
@@ -286,7 +287,7 @@ do {\
     WX_BOARD_COLOR_RESET(borderBottomColor);
 }
 
--(void)_resetStyles:(NSArray *)styles
+- (void)_resetStyles:(NSArray *)styles
 {
     if (styles && [styles containsObject:@"backgroundColor"]) {
         _backgroundColor = [UIColor clearColor];
@@ -319,7 +320,7 @@ do {\
     
     [self _removeAllEvents];
     
-    if(self.ancestorScroller){
+    if (self.ancestorScroller) {
         [self.ancestorScroller removeStickyComponent:self];
         [self.ancestorScroller removeScrollToListener:self];
     }

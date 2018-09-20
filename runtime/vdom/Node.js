@@ -38,10 +38,34 @@ export default class Node {
     const doc = getDoc(this.docId)
     if (doc) {
       delete this.docId
+      delete this.ownerDocument
       delete doc.nodeMap[this.nodeId]
     }
-    this.children.forEach(child => {
-      child.destroy()
-    })
+
+    // node props
+    delete this.nodeId
+    delete this.ref
+    delete this.parentNode
+    delete this.nextSibling
+    delete this.previousSibling
+
+    // element props
+    delete this.nodeType
+    delete this.type
+    delete this.attr
+    delete this.style
+    delete this.classStyle
+    delete this.event
+    delete this.depth
+
+    // child nodes
+    try {
+      this.children.forEach(child => {
+        child.destroy()
+      })
+    }
+    catch (e) {}
+    delete this.children
+    delete this.pureChildren
   }
 }

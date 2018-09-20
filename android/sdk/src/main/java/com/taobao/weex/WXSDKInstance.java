@@ -113,7 +113,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   //Performance
   public boolean mEnd = false;
   public boolean mHasCreateFinish = false;
-  public boolean mHasSetCreateFinishFsTime = false;
   public static final String BUNDLE_URL = "bundleUrl";
   private IWXUserTrackAdapter mUserTrackAdapter;
   private IWXRenderListener mRenderListener;
@@ -145,6 +144,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private Map<String,String> mContainerInfo;
 
   private WXInstanceExceptionRecord mExceptionRecorder;
+  public boolean isNewFsEnd = false;
 
   /**
    * bundle type
@@ -1240,7 +1240,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void onRenderSuccess(final int width, final int height) {
-    firstScreenRenderFinished();
+    if (!isNewFsEnd){
+      getApmForInstance().arriveNewFsRenderTime();
+    }
 
     long time = System.currentTimeMillis() - mRenderStartTime;
     long[] renderFinishTime = WXBridgeManager.getInstance().getRenderFinishTime(getInstanceId());
@@ -1298,7 +1300,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     long lazyLoadTime;
 
     if (mHasCreateFinish){
-      lazyLoadTime = lastElementChangeTime - mWXPerformance.renderTimeOrigin - mWXPerformance.callCreateFinishTime;
+      lazyLoadTime = lastElementChangeTime - mWXPerformance.renderTimeOrigin;
       if (lazyLoadTime > 8000) {
         //bad case
         return;
@@ -1313,12 +1315,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
 
     if (!isOutOfScreen) {
-      getWXPerformance().interactionViewAddCount = getWXPerformance().localInteractionViewAddCount;
-      getWXPerformance().interactionTime = lastElementChangeTime - mWXPerformance.renderTimeOrigin;
+
 //      WXLogUtils.renderPerformanceLog("   interactionViewAddCount", getWXPerformance().interactionViewAddCount);
 //      WXLogUtils.renderPerformanceLog("   interactionViewAddLimitCount", getWXPerformance().interactionViewAddLimitCount);
 //      WXLogUtils.renderPerformanceLog("   interactionTime", getWXPerformance().interactionTime);
-      mApmForInstance.arriveInteraction(getWXPerformance().interactionViewAddLimitCount,getWXPerformance().interactionViewAddCount);
+      mApmForInstance.arriveInteraction(component);
     }
   }
 
@@ -1422,24 +1423,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       mApmForInstance.arriveFSRenderTime();
       mWXPerformance.fsRenderTime = System.currentTimeMillis();
       mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
+
       long[] fitstScreenPerformance = WXBridgeManager.getInstance().getFirstScreenRenderTime(getInstanceId());
       WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
       WXLogUtils.renderPerformanceLog("    firstScreenJSFExecuteTime", mWXPerformance.firstScreenJSFExecuteTime);
       WXLogUtils.renderPerformanceLog("    firstScreenCallBridgeTime", fitstScreenPerformance[0]);
       WXLogUtils.renderPerformanceLog("    firstScreenCssLayoutTime", fitstScreenPerformance[1]);
       WXLogUtils.renderPerformanceLog("    firstScreenParseJsonTime", fitstScreenPerformance[2]);
-  }
-
-  public void firstScreenRenderFinished() {
-
-      mApmForInstance.arriveFSRenderTime();
-      mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
-      if (!mHasSetCreateFinishFsTime) {
-        mWXPerformance.fsRenderTime = System.currentTimeMillis();
-        if (mHasCreateFinish)
-          mHasSetCreateFinishFsTime = true;
-      }
-      mWXPerformance.newFsRenderTime = System.currentTimeMillis() - mRenderStartTime;
   }
 
   private void destroyView(View rootView) {

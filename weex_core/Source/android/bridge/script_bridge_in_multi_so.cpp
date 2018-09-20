@@ -20,6 +20,7 @@
 #include "script_bridge_in_multi_so.h"
 #include <base/thread/waitable_event.h>
 #include <dlfcn.h>
+#include <malloc.h>
 #include "android/base/log_utils.h"
 #include "android/bridge/multi_so_initializer.h"
 #include "android/bridge/script/script_side_in_multi_so.h"

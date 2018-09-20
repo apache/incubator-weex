@@ -29,6 +29,7 @@ extern NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_START;
 extern NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_END;
 extern NSString* const KEY_PAGE_STAGES_CREATE_FINISH;
 extern NSString* const KEY_PAGE_STAGES_FSRENDER;
+extern NSString* const KEY_PAGE_STAGES_NEW_FSRENDER;
 extern NSString* const KEY_PAGE_STAGES_INTERACTION;
 extern NSString* const KEY_PAGE_STAGES_DESTROY;
 
@@ -92,6 +93,7 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 
 - (void) onEvent:(NSString *)name withValue:(id)value;
 - (void) onStage:(NSString *)name;
+- (void) onStageWithTime:(NSString*)name time:(long)unixTime;
 - (void) setProperty:(NSString *)name withValue:(id)value;
 - (void) setStatistic:(NSString *)name withValue:(double)value;
 
@@ -99,7 +101,6 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 
 - (void) startRecord:(NSString*) instanceId;
 - (void) endRecord;
-- (void) arriveFSRenderTime;
 - (void) updateFSDiffStats:(NSString *)name withDiffValue:(double)diff;
 - (void) updateDiffStats:(NSString *)name withDiffValue:(double)diff;
 - (void) updateMaxStats:(NSString *)name curMaxValue:(double)maxValue;

@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.4.1)
 set(WEEXCORE_LIBRARY_NAME weexcore)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-#add_compile_options(-std=c++11)
+message("${ANDROID_STL} ")
+if ("${ANDROID_STL}" STREQUAL "c++_static")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+elseif ("${ANDROID_STL}" STREQUAL "gnustl_static")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++1y")
+endif ()
 add_compile_options(-fexceptions)
 
 
@@ -24,6 +28,7 @@ set(COMMON_SRCS
   ./base/message_loop/message_loop.cc
   ./base/message_loop/message_pump_posix.cc
   ./base/message_loop/message_pump_android.cc
+  ./base/third_party/icu/icu_utf.cpp
   ./core/render/manager/render_manager.cpp
   ./core/render/page/render_page.cpp
 
