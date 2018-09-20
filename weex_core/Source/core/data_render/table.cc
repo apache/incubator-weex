@@ -216,15 +216,16 @@ json11::Json TableToJson(Table *table) {
                 std::make_pair(it->first, json11::Json(NumValue(&it->second))));
             continue;
         }
-
         if (it->second.type == Value::TABLE) {
             object.insert({it->first, TableToJson(ValueTo<Table>(&it->second))});
             continue;
         }
-
         if (it->second.type == Value::ARRAY) {
             object.insert({it->first, ArrayToJson(ValueTo<Array>(&it->second))});
             continue;
+        }
+        if (it->second.type == Value::FUNC) {
+            object.insert({it->first, json11::Json("FUNC")});
         }
     }
     return json11::Json(object);

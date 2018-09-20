@@ -148,10 +148,10 @@ bool ValueStrictEquals(const Value *a, const Value *b) {
 }
     
 bool ValueAND(const Value *a, const Value *b) {
-    if (IsBool(a) && IsBool(b)) {
-        return BoolValue(a) && BoolValue(b);
-    }
-    return false;
+    bool aval = false, bval = false;
+    ToBool(a, aval);
+    ToBool(b, bval);
+    return aval && bval;
 }
     
 bool ValueOR(const Value *a, const Value *b) {

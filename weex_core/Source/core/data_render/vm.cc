@@ -644,9 +644,6 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 if (op == OP_GETMEMBER) {
                     Value *ret = GetTableValue(ValueTo<Table>(b), *c);
                     if (!IsNil(ret)) {
-                        if (IsTable(ret)) {
-                            LOGTEMP("[OP_GETMEMBER]:%s\n", TableToString(ValueTo<Table>(ret)).c_str());
-                        }
                         *a = *ret;
                     }
                     else {
