@@ -123,7 +123,7 @@ if (ANDROID)
     ./android/base/string/scoped_jstring_utf8.cpp
     ./android/base/string/jstring_cache.cpp
     ./android/wrap/content_box_measurement_impl_android.cpp
-    ./android/wrap/jsfunction_impl_android.cpp
+    ./android/wrap/wx_debug_js_bridge.cpp
     ./android/wrap/native_render_object_utils_impl_android.cpp
     ./android/bridge/platform/android_side.cpp
     ./android/bridge/platform/android_bridge.cpp

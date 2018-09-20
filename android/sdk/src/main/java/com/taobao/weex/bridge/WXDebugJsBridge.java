@@ -18,10 +18,7 @@
  */
 package com.taobao.weex.bridge;
 
-import android.util.Log;
-
 import com.alibaba.fastjson.JSON;
-import com.taobao.weex.common.IWXJsFunctions;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
 import com.taobao.weex.wson.WsonUtils;
 
@@ -29,21 +26,16 @@ import com.taobao.weex.wson.WsonUtils;
  * Created by darin on 27/03/2018.
  */
 
-public class WXJsFunctions implements IWXJsFunctions {
-    @Override
+public class WXDebugJsBridge {
+
     public native void resetWXBridge(Object bridge, String className);
 
-    @Override
     public native void jsHandleSetJSVersion(String jsVersion);
 
-    @Override
     public native void jsHandleReportException(String instanceId, String func, String exceptionString);
 
-    @Override
     public native void jsHandleCallNative(String instanceId, byte[] tasks, String callback);
 
-
-    @Override
     public void jsHandleCallNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
         jsHandleCallNativeModule(instanceId, module, method,
                 WXWsonJSONSwitch.convertJSONToWsonIfUseWson(arguments), WXWsonJSONSwitch.convertJSONToWsonIfUseWson(options), true);
@@ -51,8 +43,6 @@ public class WXJsFunctions implements IWXJsFunctions {
 
     public native void jsHandleCallNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options, boolean h5);
 
-
-    @Override
     public void jsHandleCallNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options){
         jsHandleCallNativeComponent(instanceId, componentRef, method, WXWsonJSONSwitch.convertJSONToWsonIfUseWson(arguments), WXWsonJSONSwitch.convertJSONToWsonIfUseWson(options), true);
     }
@@ -60,85 +50,52 @@ public class WXJsFunctions implements IWXJsFunctions {
 
     public native void jsHandleCallNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options, boolean from);
 
-
-    @Override
     public void jsHandleCallAddElement(String instanceId, String ref, String dom, String index){
         jsHandleCallAddElement(instanceId, ref, WsonUtils.toWson(JSON.parse(dom)), index, true);
     }
 
     public native void jsHandleCallAddElement(String instanceId, String ref, byte[] dom, String index, boolean h5);
 
-
-    @Override
     public native void jsHandleSetTimeout(String callbackId, String time);
 
-
-    @Override
     public native void jsHandleCallNativeLog(byte[] str_array);
 
-
-    @Override
-    public void jsFunctionCallCreateBody(String pageId, String domStr){
-        jsFunctionCallCreateBody(pageId, WsonUtils.toWson(JSON.parse(domStr)), true);
+    public void jsHandleCallCreateBody(String pageId, String domStr){
+        jsHandleCallCreateBody(pageId, WsonUtils.toWson(JSON.parse(domStr)), true);
     }
 
-    public native void jsFunctionCallCreateBody(String pageId, byte[] domStr, boolean h5);
+    public native void jsHandleCallCreateBody(String pageId, byte[] domStr, boolean h5);
 
+    public native void jsHandleCallUpdateFinish(String instanceId, byte[] tasks, String callback);
 
-    @Override
-    public native void jsFunctionCallUpdateFinish(String instanceId, byte[] tasks, String callback);
+    public native void jsHandleCallCreateFinish(String pageId);
 
+    public native void jsHandleCallRefreshFinish(String instanceId, byte[] tasks, String callback);
 
-    @Override
-    public native void jsFunctionCallCreateFinish(String pageId);
-
-
-    @Override
-    public native void jsFunctionCallRefreshFinish(String instanceId, byte[] tasks, String callback);
-
-
-    @Override
-    public void jsFunctionCallUpdateAttrs(String pageId, String ref, String data){
-        jsFunctionCallUpdateAttrs(pageId, ref, WsonUtils.toWson(JSON.parseObject(data)), true);
+    public void jsHandleCallUpdateAttrs(String pageId, String ref, String data){
+        jsHandleCallUpdateAttrs(pageId, ref, WsonUtils.toWson(JSON.parseObject(data)), true);
     }
 
-    public native void jsFunctionCallUpdateAttrs(String pageId, String ref, byte[] data, boolean h5);
+    public native void jsHandleCallUpdateAttrs(String pageId, String ref, byte[] data, boolean h5);
 
-
-    @Override
-    public void jsFunctionCallUpdateStyle(String pageId, String ref, String data){
+    public void jsHandleCallUpdateStyle(String pageId, String ref, String data){
         byte[] data1 = WsonUtils.toWson(JSON.parseObject(data));
-        Log.e("WxDebug" ,"jsFunctionCallUpdateStyle");
-        jsFunctionCallUpdateStyleNative(pageId, ref, data1, true);
+        jsHandleCallUpdateStyleNative(pageId, ref, data1, true);
     }
 
-    public native void jsFunctionCallUpdateStyleNative(String pageId, String ref, byte[] data, boolean h5);
+    public native void jsHandleCallUpdateStyleNative(String pageId, String ref, byte[] data, boolean h5);
 
+    public native void jsHandleCallRemoveElement(String pageId, String ref);
 
-    @Override
-    public native void jsFunctionCallRemoveElement(String pageId, String ref);
+    public native void jsHandleCallMoveElement(String pageId, String ref, String parentRef, String index_str);
 
+    public native void jsHandleCallAddEvent(String pageId, String ref, String event);
 
-    @Override
-    public native void jsFunctionCallMoveElement(String pageId, String ref, String parentRef, String index_str);
+    public native void jsHandleCallRemoveEvent(String pageId, String ref, String event);
 
-
-    @Override
-    public native void jsFunctionCallAddEvent(String pageId, String ref, String event);
-
-
-    @Override
-    public native void jsFunctionCallRemoveEvent(String pageId, String ref, String event);
-
-
-    @Override
     public native void jsHandleSetInterval(String instanceId, String callbackId, String time);
 
-
-    @Override
     public native void jsHandleClearInterval(String instanceId, String callbackId);
 
-
-    @Override
     public native void jsHandleCallGCanvasLinkNative(String contextId, int type, String val);
 }

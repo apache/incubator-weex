@@ -54,18 +54,14 @@ import com.alibaba.weex.https.WXHttpTask;
 import com.alibaba.weex.https.WXRequestListener;
 import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.RenderContainer;
-import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
-import com.taobao.weex.bridge.WXBridgeManager;
-import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXFileUtils;
-import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.File;
@@ -516,8 +512,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   private void registerBroadcastReceiver() {
     mReceiver = new RefreshBroadcastReceiver();
     IntentFilter filter = new IntentFilter();
-    filter.addAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH);
-    filter.addAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
+    filter.addAction(WXSDKInstance.ACTION_DEBUG_INSTANCE_REFRESH);
+    filter.addAction(WXSDKInstance.ACTION_INSTANCE_RELOAD);
 
     registerReceiver(mReceiver, filter);
   }
@@ -587,8 +583,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   public class RefreshBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-      if (IWXDebugProxy.ACTION_INSTANCE_RELOAD.equals(intent.getAction()) ||
-              IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH.equals(intent.getAction())) {
+      if (WXSDKInstance.ACTION_INSTANCE_RELOAD.equals(intent.getAction()) ||
+              WXSDKInstance.ACTION_DEBUG_INSTANCE_REFRESH.equals(intent.getAction())) {
         // String myUrl = intent.getStringExtra("url");
         // Log.e("WXPageActivity", "RefreshBroadcastReceiver reload onReceive ACTION_DEBUG_INSTANCE_REFRESH mBundleUrl:" + myUrl + " mUri:" + mUri);
 

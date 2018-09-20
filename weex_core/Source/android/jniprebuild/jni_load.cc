@@ -23,7 +23,7 @@
 #include "android/utils/so_utils.h"
 #include "android/wrap/content_box_measurement_impl_android.h"
 #include "android/wrap/hash_set.h"
-#include "android/wrap/jsfunction_impl_android.h"
+#include "android/wrap/wx_debug_js_bridge.h"
 #include "android/wrap/log_utils.h"
 #include "android/wrap/native_render_object_utils_impl_android.h"
 #include "android/wrap/wml_bridge.h"
@@ -36,7 +36,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
   base::android::InitVM(vm);
   JNIEnv *env = base::android::AttachCurrentThread();
   bool result = WeexCore::RegisterJNIContentBoxMeasurement(env) &&
-                WeexCore::RegisterWXJsFunction(env) &&
+      WeexCore::RegisterWXDebugJsBridge(env) &&
                 WeexCore::RegisterJNINativeRenderObjectUtils(env) &&
                 weex::base::MessagePumpAndroid::RegisterJNIUtils(env) &&
                 WeexCore::WXBridge::RegisterJNIUtils(env) &&

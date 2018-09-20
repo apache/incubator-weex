@@ -52,7 +52,6 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
-import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
@@ -86,7 +85,6 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,6 +103,12 @@ import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChangeListener {
 
   private static  final  String SOURCE_TEMPLATE_BASE64_MD5 = "templateSourceBase64MD5";
+
+  /**
+   * Devtool protocol
+   */
+  public static String ACTION_DEBUG_INSTANCE_REFRESH = "DEBUG_INSTANCE_REFRESH";
+  public static String ACTION_INSTANCE_RELOAD = "INSTANCE_RELOAD";
 
   //Performance
   public boolean mEnd = false;
@@ -820,7 +824,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (reloadThis) {
       if (mContext != null)  {
         Intent intent = new Intent();
-        intent.setAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
+        intent.setAction(ACTION_INSTANCE_RELOAD);
         intent.putExtra("url", mBundleUrl);
         mContext.sendBroadcast(intent);
       }
