@@ -43,13 +43,23 @@ import java.util.Locale;
 public class WXLocaleModule extends WXModule {
 
   @JSMethod(uiThread = false)
-  public String getLanguage() {
-    return getLanguageTags();
+  public String getLanguageSync() {
+    return getLanguageImpl();
   }
 
   @JSMethod(uiThread = false)
   public void getLanguage(JSCallback callback) {
-    callback.invoke(getLanguageTags());
+    callback.invoke(getLanguageImpl());
+  }
+
+  private String getLanguageImpl() {
+    Locale locale;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      locale = LocaleList.getDefault().get(0);
+    } else locale = Locale.getDefault();
+
+    String language = locale.getLanguage() + "-" + locale.getCountry();
+    return language;
   }
 
   @JSMethod(uiThread = false)
