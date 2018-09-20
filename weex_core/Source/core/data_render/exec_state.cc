@@ -845,7 +845,7 @@ void ExecState::endDecode() {
         if (ref->func_index_ == 0) {
             ref->func_state_ = func_state_.get();
         } else {
-            ref->func_state_ = func_state_->children()[ref->func_index_-1].get();
+            ref->func_state_ = func_state_->getAllChildren()[ref->func_index_-1];
         }
         serializeValue(ref->value_);
     }
