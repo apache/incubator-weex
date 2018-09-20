@@ -266,11 +266,10 @@ typedef enum : NSUInteger {
     if ([source isKindOfClass:[NSString class]]) {
         WXLogDebug(@"Render source: %@, data:%@", self, [WXUtility JSONString:data]);
         [self _renderWithMainBundleString:source];
+        [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
     } else if ([source isKindOfClass:[NSData class]]) {
         [self _renderWithOpcode:source];
     }
-    
-    [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
 }
 
 - (NSString*) bundleTemplate
