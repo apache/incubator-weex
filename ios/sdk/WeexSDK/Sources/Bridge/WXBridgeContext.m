@@ -867,13 +867,6 @@ _Pragma("clang diagnostic pop") \
     if(!modules) return;
     
     [self callJSMethod:@"registerModules" args:@[modules]];
-}
-
-- (void)registerWXLModules:(NSDictionary *)modules {
-    WXAssertBridgeThread();
-    if (!modules) {
-        return;
-    }
     WXPerformBlockOnComponentThread(^{
         [WXCoreBridge registerModules:modules];
     });

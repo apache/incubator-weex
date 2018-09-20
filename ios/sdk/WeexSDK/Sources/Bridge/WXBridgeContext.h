@@ -103,12 +103,6 @@
 - (void)registerModules:(NSDictionary *)modules;
 
 /**
- *  Register Weex Light Modules Method
- *  @param modules   :   module list
- **/
-- (void)registerWXLModules:(NSDictionary *)modules;
-
-/**
  *  Execute JS Service
  *  @param script    :   JS services script
  *  @param name      :   JS services name

@@ -346,16 +346,6 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     });
 }
 
-- (void)registerWXLModules:(NSDictionary *)modules
-{
-    if (!modules) return;
-    
-    __weak typeof(self) weakSelf = self;
-    WXPerformBlockOnBridgeThread(^(){
-        [weakSelf.bridgeCtx registerWXLModules:modules];
-    });
-}
-
 - (void)registerComponents:(NSArray *)components
 {
     if (!components) return;
