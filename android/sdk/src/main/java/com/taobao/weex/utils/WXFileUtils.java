@@ -78,7 +78,7 @@ public class WXFileUtils {
     try {
       inputStream = context.getAssets().open(path);
       return readStreamToString(inputStream);
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
     return "";
