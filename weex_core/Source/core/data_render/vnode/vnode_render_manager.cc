@@ -63,8 +63,8 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
   std::string ref_str;
   if (isRoot) {
     ref_str = "_root";
-  } else if (!vnode->ref().empty()) {
-    ref_str = vnode->ref();
+  } else if (!vnode->node_id().empty()) {
+    ref_str = vnode->node_id();
   } else {
     ref_str = base::to_string(ref_id++);
   }
@@ -653,44 +653,6 @@ vector<pair<string, string>>* CompareMap(const map<string, string>& oldMap,
   return p_vec;
 };
  
-// Dom Diff 有坑暂时用简单实现
-void PatchVRNode(const string& page_id, VNode* old_node, VNode* new_node) {
-    // patch render object link
-    new_node->set_render_object_ref(old_node->render_object_ref());
-
-    // compare attr, ptr will be delete by RenderPage
-    auto p_vec = CompareMap(*(old_node->attributes()), *(new_node->attributes()));
-    if (p_vec->size() > 0) {
-        RenderManager::GetInstance()->UpdateAttr(page_id, new_node->render_object_ref(), p_vec);
-    }
-    else {
-        delete p_vec;
-        p_vec = nullptr;
-    }
-    // compare style, ptr will be delete by RenderPage
-    p_vec = CompareMap(*(old_node->styles()), *(new_node->styles()));
-    if (p_vec->size()) {
-        RenderManager::GetInstance()->UpdateStyle(page_id, new_node->render_object_ref(), p_vec);
-    }
-    else {
-        delete p_vec;
-        p_vec = nullptr;
-    }
-    if (old_node->HasChildren()) {
-        for (auto i = old_node->child_list()->cbegin(); i != old_node->child_list()->cend(); i++) {
-            RenderManager::GetInstance()->RemoveRenderObject(page_id, (*i)->render_object_ref());
-        }
-    }
-    if (new_node->HasChildren()) {
-        int index = 0;
-        for (auto it = new_node->child_list()->cbegin(); it != new_node->child_list()->cend(); it++) {
-            WeexCore::RenderObject *new_render_object = ParseVNode2RenderObject(*it, nullptr, false, 0, page_id);
-            RenderManager::GetInstance()->AddRenderObject(page_id, (*it)->parent()->render_object_ref(), index, new_render_object);
-            ++index;
-        }
-    }
-}
-
 void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
   // patch render object link
   new_node->set_render_object_ref(old_node->render_object_ref());
@@ -741,7 +703,7 @@ void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
 void Patch(const string& page_id, VNode *old_node, VNode *new_node) {
     if (old_node->parent() == NULL || SameNode(old_node, new_node)) {
         // root must be the same;
-        PatchVRNode(page_id, old_node, new_node);
+        PatchVNode(page_id, old_node, new_node);
     }
     else {
         VNode *parent = (VNode *)old_node->parent();

@@ -325,30 +325,43 @@ static Value UpdateElement(ExecState *exec_state) {
     
     return Value();
 }
+    
+static size_t g_node_id = 0;
 
 // createElement("tag_name", "id", ref);
 static Value CreateElement(ExecState *exec_state) {
-    Value *arg_node_id = exec_state->GetArgument(1);
-    std::string node_id;
-    if (IsString(arg_node_id)) {
-        node_id = CStringValue(arg_node_id);
-    } else if (IsInt(arg_node_id)) {
+    size_t argc = exec_state->GetArgumentCount();
+    std::string tag_name = exec_state->GetArgument(0)->str->c_str();
+    Value *arg_id = exec_state->GetArgument(1);
+    std::string arg_id_str;
+    if (IsString(arg_id)) {
+        arg_id_str = CStringValue(arg_id);
+    }
+    else if (IsInt(arg_id)) {
         std::ostringstream os;
-        os << IntValue(arg_node_id) ;
-        node_id = "vn_" + os.str();
-    } else {
+        os << IntValue(arg_id) ;
+        arg_id_str = "vn_" + os.str();
+    }
+    else {
         throw VMExecError("CreateElement only support int for string");
     }
-    std::string tag_name = exec_state->GetArgument(0)->str->c_str();
-    std::string ref = "";
-    if (exec_state->GetArgumentCount() > 2 &&
-        exec_state->GetArgument(2)->type == Value::Type::STRING) {
-      ref = exec_state->GetArgument(2)->str->c_str();
+    std::string node_id,ref;
+    if (argc > 2) {
+        node_id = arg_id_str;
+    }
+    else {
+        std::ostringstream os;
+        os << g_node_id++;
+        node_id = "vn_" + os.str();
+        ref = arg_id_str;
+    }
+    if (exec_state->GetArgumentCount() > 2 && exec_state->GetArgument(2)->type == Value::Type::STRING) {
+        ref = exec_state->GetArgument(2)->str->c_str();
     }
     LOGD("[VM][VNode][CreateElement]: %s  %s\n", node_id.c_str(), tag_name.c_str());
     VNode *node = NULL;
     if (tag_name == "root") {
-        node = new VNode("div", "vn_0", "vn_0");
+        node = new VNode("div", "vn_r", "vn_r");
         exec_state->context()->set_root(node);
     }
     else {
