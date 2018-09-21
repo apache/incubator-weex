@@ -639,6 +639,7 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
             [c _setRenderObject:nullptr];
         }
         
+        [WXCoreBridge removeRenderObjectFromMap:subcomponent.weexInstance.instanceId object:node];
         delete node; // also will delete all children recursively
     }
 }

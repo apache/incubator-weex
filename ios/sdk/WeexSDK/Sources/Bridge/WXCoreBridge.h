@@ -164,6 +164,8 @@ namespace WeexCore
 
 + (void)addChildRenderObject:(void*)child toParent:(void*)parent;
 
++ (void)removeRenderObjectFromMap:(NSString*)pageId object:(void*)object;
+
 + (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index;
 
 + (void)callCreateBody:(NSString*)pageId data:(NSDictionary*)data;

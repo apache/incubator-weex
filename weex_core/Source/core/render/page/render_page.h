@@ -40,10 +40,6 @@ class RenderPage {
  private:
   void TraverseTree(RenderObject *render, long index);
 
-  void PushRenderToRegisterMap(RenderObject *render);
-
-  void RemoveRenderFromRegisterMap(RenderObject *render);
-
   void SendCreateBodyAction(RenderObject *render);
 
   void SendAddElementAction(RenderObject *child, RenderObject *parent,
@@ -137,6 +133,12 @@ public:
                           const std::string &method, const std::string &args, int argc = 0);
 
   void SetRootRenderObject(RenderObject *root);
+    
+  // ****** Render object managing ****** //
+  
+  void PushRenderToRegisterMap(RenderObject *render);
+    
+  void RemoveRenderFromRegisterMap(RenderObject *render);
 
   // ****** Life Cycle ****** //
 
