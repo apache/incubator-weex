@@ -108,6 +108,10 @@ class RenderManager {
 
   void set_viewport_width(const std::string &page_id, float viewport_width);
 
+  bool round_off_deviation(const std::string &page_id);
+
+  void set_round_off_deviation(const std::string &page_id, bool round_off_deviation);
+
   static RenderManager *GetInstance() {
     if (NULL == g_pInstance) {
       g_pInstance = new RenderManager();
@@ -118,6 +122,7 @@ class RenderManager {
   static RenderManager *g_pInstance;
   std::map<std::string, RenderPage *> pages_;
   std::map<std::string, float> viewports_;
+  std::map<std::string, bool> round_off_deviations_;
 };
 }  // namespace WeexCore
 

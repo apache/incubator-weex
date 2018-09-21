@@ -59,5 +59,6 @@ namespace WeexCore {
   constexpr int VERTICAL_VALUE = 1;
 
   constexpr float kDefaultViewPortWidth = 750.0f;
+  constexpr bool kDefaultRoundOffDeviation = true;
 }
 #endif //WEEXV8_CONSTANTSVALUE_H
