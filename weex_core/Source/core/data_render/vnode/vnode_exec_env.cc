@@ -178,7 +178,30 @@ static Value CallNativeModule(ExecState *exec_state) {
 }
     
 static Value RegisterModules(ExecState *exec_state) {
-    weex::core::data_render::VNodeRenderManager::GetInstance()->ExecuteRegisterModules(exec_state);
+    do {
+        if (!exec_state->GetArgumentCount()) {
+            break;
+        }
+        Value *arg = exec_state->GetArgument(0);
+        if (!IsArray(arg)) {
+            break;
+        }
+        Array *array = ValueTo<Array>(arg);
+        if (array->items.size() > 0) {
+            std::vector<std::string> args;
+            for (int i = 0; i < array->items.size(); i++) {
+                Value item = array->items[i];
+                if (!IsString(&item)) {
+                    continue;
+                }
+                args.push_back(CStringValue(&item));
+            }
+            if (args.size() > 0) {
+                weex::core::data_render::VNodeRenderManager::GetInstance()->ExecuteRegisterModules(exec_state, args);
+            }
+        }
+        
+    } while (0);
     return Value();
 }
 
@@ -325,7 +348,7 @@ static Value CreateElement(ExecState *exec_state) {
     LOGD("[VM][VNode][CreateElement]: %s  %s\n", node_id.c_str(), tag_name.c_str());
     VNode *node = NULL;
     if (tag_name == "root") {
-        node = new VNode("div", node_id, ref);
+        node = new VNode("div", "vn_0", "vn_0");
         exec_state->context()->set_root(node);
     }
     else {

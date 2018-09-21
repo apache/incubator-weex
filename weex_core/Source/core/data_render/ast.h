@@ -541,7 +541,8 @@ class ArrayConstant : public Expression {
     
 enum class AssignOperation {
     kAssign,
-    kAssignAdd
+    kAssignAdd,
+    kAssignSub
 };
 
 class AssignExpression : public Expression {

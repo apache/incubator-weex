@@ -190,6 +190,9 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
     if (!err.empty()) {
         return;
     }
+    auto compile_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+    LOGD("[DATA_RENDER], Compile time:[%lld]\n", compile_post.count());
+
     //auto exec_start = std::chrono::steady_clock::now();
     exec_state->Execute(err);
     if (!err.empty()) {
@@ -201,18 +204,24 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
     CreatePageInternal(page_id, exec_state->context()->root());
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
 
-    LOGE("DATA_RENDER, All time %lld", duration_post.count());
+    LOGD("DATA_RENDER, All time %lld\n", duration_post.count());
 }
     
-void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state) {
+void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state, std::vector<std::string>& registers) {
     do {
         if (!modules_.size()) {
             break;
         }
         const std::string func_name = "registerModule";
         for (auto iter = modules_.begin(); iter != modules_.end(); iter++) {
-            Value arg = StringToValue(exec_state, *iter);
-            exec_state->Call(func_name, {arg});
+            for (int j = 0; j < registers.size(); j++) {
+                std::string prefix = registers[j];
+                if ((*iter).find(prefix) <= 10) {
+                    Value arg = StringToValue(exec_state, *iter);
+                    exec_state->Call(func_name, {arg});
+                    break;
+                }
+            }
         }
         
     } while (0);
@@ -222,20 +231,19 @@ void VNodeRenderManager::CreatePage(const char *contents, unsigned long length, 
     BinaryFile *file = BinaryFile::instance();
     file->set_input(contents);
     file->set_length(length);
-
     InitVM();
     auto start = std::chrono::steady_clock::now();
     ExecState *exec_state = new ExecState(g_vm);
     exec_states_.insert({page_id, exec_state});
     VNodeExecEnv::InitCFuncEnv(exec_state);
-
     std::string err;
     exec_state->startDecode();
     exec_state->endDecode();
     if (init_data.length() > 0) {
         VNodeExecEnv::InitInitDataValue(exec_state, init_data);
     }
-    //auto exec_start = std::chrono::steady_clock::now();
+    auto decoder_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+    LOGD("[DATA_RENDER], Decoder time:[%lld]\n", decoder_post.count());
     exec_state->Execute(err);
     if (!err.empty()) {
         return;
@@ -244,10 +252,8 @@ void VNodeRenderManager::CreatePage(const char *contents, unsigned long length, 
         return;
     }
     CreatePageInternal(page_id, exec_state->context()->root());
-    //exec_state->context()->Reset();
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
-
-    LOGE("DATA_RENDER, All time %lld", duration_post.count());
+    LOGD("[DATA_RENDER], All time:[%lld]\n", duration_post.count());
 }
 
 bool VNodeRenderManager::RefreshPage(const std::string& page_id,
@@ -263,6 +269,9 @@ bool VNodeRenderManager::RefreshPage(const std::string& page_id,
         exec_state->context()->Reset();
         exec_state->Execute(err);  // refresh root
         if (!err.empty()) {
+            break;
+        }
+        if (exec_state->context()->root() == NULL) {
             break;
         }
         RefreshPageInternal(page_id, exec_state->context()->root());
@@ -643,6 +652,44 @@ vector<pair<string, string>>* CompareMap(const map<string, string>& oldMap,
   }
   return p_vec;
 };
+ 
+// Dom Diff 有坑暂时用简单实现
+void PatchVRNode(const string& page_id, VNode* old_node, VNode* new_node) {
+    // patch render object link
+    new_node->set_render_object_ref(old_node->render_object_ref());
+
+    // compare attr, ptr will be delete by RenderPage
+    auto p_vec = CompareMap(*(old_node->attributes()), *(new_node->attributes()));
+    if (p_vec->size() > 0) {
+        RenderManager::GetInstance()->UpdateAttr(page_id, new_node->render_object_ref(), p_vec);
+    }
+    else {
+        delete p_vec;
+        p_vec = nullptr;
+    }
+    // compare style, ptr will be delete by RenderPage
+    p_vec = CompareMap(*(old_node->styles()), *(new_node->styles()));
+    if (p_vec->size()) {
+        RenderManager::GetInstance()->UpdateStyle(page_id, new_node->render_object_ref(), p_vec);
+    }
+    else {
+        delete p_vec;
+        p_vec = nullptr;
+    }
+    if (old_node->HasChildren()) {
+        for (auto i = old_node->child_list()->cbegin(); i != old_node->child_list()->cend(); i++) {
+            RenderManager::GetInstance()->RemoveRenderObject(page_id, (*i)->render_object_ref());
+        }
+    }
+    if (new_node->HasChildren()) {
+        int index = 0;
+        for (auto it = new_node->child_list()->cbegin(); it != new_node->child_list()->cend(); it++) {
+            WeexCore::RenderObject *new_render_object = ParseVNode2RenderObject(*it, nullptr, false, 0, page_id);
+            RenderManager::GetInstance()->AddRenderObject(page_id, (*it)->parent()->render_object_ref(), index, new_render_object);
+            ++index;
+        }
+    }
+}
 
 void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
   // patch render object link
@@ -650,13 +697,22 @@ void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
 
   // compare attr, ptr will be delete by RenderPage
   auto p_vec = CompareMap(*(old_node->attributes()), *(new_node->attributes()));
-  RenderManager::GetInstance()->UpdateAttr(
-      page_id, new_node->render_object_ref(), p_vec);
-
+  if (p_vec->size() > 0) {
+      RenderManager::GetInstance()->UpdateAttr(page_id, new_node->render_object_ref(), p_vec);
+  }
+  else {
+      delete p_vec;
+      p_vec = nullptr;
+  }
   // compare style, ptr will be delete by RenderPage
   p_vec = CompareMap(*(old_node->styles()), *(new_node->styles()));
-  RenderManager::GetInstance()->UpdateStyle(
-      page_id, new_node->render_object_ref(), p_vec);
+  if (p_vec->size()) {
+      RenderManager::GetInstance()->UpdateStyle(page_id, new_node->render_object_ref(), p_vec);
+  }
+  else {
+      delete p_vec;
+      p_vec = nullptr;
+  }
 
   // compare event
   // todo
@@ -674,7 +730,7 @@ void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
     int index = 0;
     for (auto it = new_node->child_list()->cbegin();
          it != new_node->child_list()->cend(); it++) {
-      WeexCore::RenderObject* root = VNode2RenderObject(*it, page_id);
+      WeexCore::RenderObject *root = VNode2RenderObject(*it, page_id);
       RenderManager::GetInstance()->AddRenderObject(
           page_id, (*it)->parent()->render_object_ref(), index, root);
       ++index;
@@ -685,7 +741,7 @@ void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
 void Patch(const string& page_id, VNode *old_node, VNode *new_node) {
     if (old_node->parent() == NULL || SameNode(old_node, new_node)) {
         // root must be the same;
-        PatchVNode(page_id, old_node, new_node);
+        PatchVRNode(page_id, old_node, new_node);
     }
     else {
         VNode *parent = (VNode *)old_node->parent();

@@ -835,6 +835,13 @@ void CodeGenerator::Visit(AssignExpression *node, void *data) {
             func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, ret, 0));
             break;
         }
+        case AssignOperation::kAssignSub:
+        {
+            long ret = block_->NextRegisterId();
+            func_state->AddInstruction(CREATE_ABC(OP_SUB, ret, left, right));
+            func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, ret, 0));
+            break;
+        }
         default:
         break;
     }
