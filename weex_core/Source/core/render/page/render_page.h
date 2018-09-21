@@ -26,6 +26,8 @@
 #include <utility>
 #include <vector>
 
+#include "core/css/constants_value.h"
+
 namespace WeexCore {
 
 class RenderAction;
@@ -169,8 +171,14 @@ public:
     this->viewport_width_ = viewport_width;
   }
 
+  inline bool round_off_deviation() const { return this->round_off_deviation_; }
+
+  inline void set_round_off_deviation(float round_off_deviation) { this->round_off_deviation_ = round_off_deviation; }
+
   inline void set_before_layout_needed(bool v) { is_before_layout_needed_.store(v); }
+
   inline void set_platform_layout_needed(bool v) { is_platform_layout_needed_.store(v); }
+
   inline void set_after_layout_needed(bool v) { is_after_layout_needed_.store(v); }
 
  public:
@@ -191,6 +199,7 @@ public:
   std::atomic_bool is_platform_layout_needed_{false};
   std::atomic_bool is_after_layout_needed_{true};
   float viewport_width_ = -1;
+  bool round_off_deviation_ = kDefaultRoundOffDeviation;
 };
 }  // namespace WeexCore
 
