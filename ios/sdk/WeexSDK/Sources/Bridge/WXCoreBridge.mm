@@ -988,6 +988,15 @@ static void _traverseTree(WeexCore::RenderObject *render, int index, const char*
     (static_cast<WeexCore::RenderObject*>(parent))->AddRenderObject(-1, (static_cast<WeexCore::RenderObject*>(child)));
 }
 
++ (void)removeRenderObjectFromMap:(NSString*)pageId object:(void*)object
+{
+    using namespace WeexCore;
+    RenderPage* page = RenderManager::GetInstance()->GetPage([pageId UTF8String] ?: "");
+    if (page != nullptr) {
+        page->RemoveRenderFromRegisterMap(static_cast<RenderObject*>(object));
+    }
+}
+
 static void _convertToCString(id _Nonnull obj, void (^callback)(const char*))
 {
     if ([obj isKindOfClass:[NSString class]]) {
