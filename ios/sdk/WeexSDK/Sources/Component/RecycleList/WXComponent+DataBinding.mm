@@ -261,7 +261,7 @@ static JSContext *jsContext;
         }
     }];
     
-    // set displaty:none to the redundant components;
+    // set display:none to the redundant components;
     NSUInteger i = startIndex + repeatData.count;
     while (i < self.supercomponent.subcomponents.count) {
         WXComponent *component = self.supercomponent.subcomponents[i];

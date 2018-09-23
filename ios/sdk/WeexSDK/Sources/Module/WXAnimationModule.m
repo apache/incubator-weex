@@ -153,6 +153,9 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     _isAnimationedSuccess = YES;
     WXPerformBlockOnComponentThread(^{
         NSArray *stringArray = [nodeRef componentsSeparatedByString:@"@"];
+        if ([stringArray count] == 0) {
+            return;
+        }
         WXComponent *targetComponent = [self.weexInstance componentForRef:stringArray[0]];
         if (!targetComponent) {
             if (callback) {
