@@ -765,34 +765,28 @@ do {\
         CGContextScaleCTM(context, 1.0, -1.0);
         
         NSAttributedString * attributedStringCopy = [self ctAttributedString];
-        //add path
-        CGPathRef cgPath = NULL;
-        cgPath = CGPathCreateWithRect(textFrame, NULL);
-        CTFrameRef _coreTextFrameRef = NULL;
-        if (_coreTextFrameRef) {
-            CFRelease(_coreTextFrameRef);
-            _coreTextFrameRef = NULL;
-        }
-        if(!attributedStringCopy) {
+        if (!attributedStringCopy) {
             return;
         }
+        //add path
+        CGPathRef cgPath = CGPathCreateWithRect(textFrame, NULL);
         CTFramesetterRef ctframesetterRef = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(attributedStringCopy));
-        _coreTextFrameRef = CTFramesetterCreateFrame(ctframesetterRef, CFRangeMake(0, attributedStringCopy.length), cgPath, NULL);
-        CFArrayRef ctLines = NULL;
-        if (NULL == _coreTextFrameRef) {
+        CTFrameRef coreTextFrameRef = CTFramesetterCreateFrame(ctframesetterRef, CFRangeMake(0, attributedStringCopy.length), cgPath, NULL);
+        if (NULL == coreTextFrameRef) {
             // try to protect crash from frame is NULL
+            CFRelease(ctframesetterRef);
+            CGPathRelease(cgPath);
             return;
         }
         CFRelease(ctframesetterRef);
-        ctframesetterRef = NULL;
-        ctLines = CTFrameGetLines(_coreTextFrameRef);
+        CFArrayRef ctLines = CTFrameGetLines(coreTextFrameRef);
         CFIndex lineCount = CFArrayGetCount(ctLines);
         NSMutableArray * mutableLines = [NSMutableArray new];
         CGPoint lineOrigins[lineCount];
         NSUInteger rowCount = 0;
         BOOL needTruncation = NO;
         CTLineRef ctTruncatedLine = NULL;
-        CTFrameGetLineOrigins(_coreTextFrameRef, CFRangeMake(0, 0), lineOrigins);
+        CTFrameGetLineOrigins(coreTextFrameRef, CFRangeMake(0, 0), lineOrigins);
         
         CGFloat fixDescent = 0;
         if (lineCount > 0 && _lineHeight && WX_SYS_VERSION_LESS_THAN(@"10.0")) {
@@ -844,16 +838,14 @@ do {\
                     ctTruncatedLine = NULL;
                     continue;
                 }
-            }else {
+            } else {
                 [self drawTextWithRuns:runs context:context lineOrigin:lineOrigin];
             }
         }
         
         [mutableLines removeAllObjects];
         CGPathRelease(cgPath);
-        CFRelease(_coreTextFrameRef);
-        _coreTextFrameRef = NULL;
-        cgPath = NULL;
+        CFRelease(coreTextFrameRef);
         CGContextRestoreGState(context);
     }
 }
