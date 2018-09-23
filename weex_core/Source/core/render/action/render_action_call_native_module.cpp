@@ -38,7 +38,7 @@ void RenderActionCallNativeModule::ExecuteAction() {
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()
-    ->CallNativeModule(page_id_.c_str(), module_.c_str(), method_.c_str(), args_.length() > 0 ? args_.c_str() : nullptr, argc_, nullptr, 0);
+      ->CallNativeModule(page_id_.c_str(), module_.c_str(), method_.c_str(), args_.length() > 0 ? args_.c_str() : nullptr, args_.size(), nullptr, 0);
     
 }
 }  // namespace WeexCore

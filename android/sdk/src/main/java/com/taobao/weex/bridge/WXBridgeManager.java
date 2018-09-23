@@ -1143,7 +1143,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               "fireEvent must be called by main thread");
     }
     if (WXSDKManager.getInstance().getAllInstanceMap().get(instanceId)!=null && WXSDKManager.getInstance().getAllInstanceMap().get(instanceId).getRenderStrategy()== WXRenderStrategy.DATA_RENDER) {
-      fireEventOnDataRenderNode(instanceId, ref, type, data, domChanges, params, callback);
+      fireEventOnDataRenderNode(instanceId, ref, type, data);
     } else {
       if(callback == null) {
         addJSEventTask(METHOD_FIRE_EVENT, instanceId, params, ref, type, data, domChanges);
@@ -1155,8 +1155,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   private void fireEventOnDataRenderNode(final String instanceId, final String ref,
-                                         final String type, final Map<String, Object> data,
-                                         final Map<String, Object> domChanges, final List<Object> params, EventResult callback) {
+                                         final String type, final Map<String, Object> data) {
     mJSHandler.postDelayed(WXThread.secure(new Runnable() {
       @Override
       public void run() {
@@ -1167,7 +1166,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             WXLogUtils.d("fireEventOnDataRenderNode >>>> instanceId:" + instanceId
                 + ", data:" + data);
           }
-          mWXBridge.fireEventOnDataRenderNode(instanceId, ref,type,JSON.toJSONString(data),JSON.toJSONString(params));
+          mWXBridge.fireEventOnDataRenderNode(instanceId, ref,type,JSON.toJSONString(data));
           WXLogUtils.renderPerformanceLog("fireEventOnDataRenderNode", System.currentTimeMillis() - start);
         } catch (Throwable e) {
           String err = "[WXBridgeManager] fireEventOnDataRenderNode " + WXLogUtils.getStackTrace(e);
@@ -2108,6 +2107,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     WXJSObject[] args = {WXWsonJSONSwitch.toWsonOrJsonWXJSObject(modules)};
     String errorMsg = null;
+    try{
+      mWXBridge.registerModuleOnDataRenderNode(WXJsonUtils.fromObjectToJSONString(modules));
+    } catch (Throwable e){
+      WXLogUtils.e("Weex [data_render register err]", e);
+    }
     try {
         if(0 == mWXBridge.execJS("", null, METHOD_REGISTER_MODULES, args)) {
             errorMsg = "execJS error";

@@ -18,6 +18,7 @@
  */
 package com.alibaba.weex;
 
+import android.content.res.AssetFileDescriptor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -31,14 +32,19 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.IWXRenderListener;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.common.WXException;
+import com.taobao.weex.common.WXModule;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,9 +59,21 @@ public class SliceTestActivity extends AppCompatActivity {
   private WXInstanceAdapter mAdapter;
   private final Set<WXSDKInstance> mInstances = new HashSet<>();
 
+  public static class SearchModule extends WXModule {
+    @JSMethod(uiThread = true)
+    public void search(JSONObject options) {
+      Log.e("TestModuel", options.toJSONString());
+    }
+  }
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    try {
+      WXSDKEngine.registerModule("searchEvent", SearchModule.class);
+    } catch (WXException e) {
+      e.printStackTrace();
+    }
     setContentView(R.layout.activity_slice_test);
     mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
     mReportTextView = (TextView) findViewById(R.id.report_text);
@@ -69,6 +87,14 @@ public class SliceTestActivity extends AppCompatActivity {
   static int i = 0;
 
   public void addCellClick(View view) {
+    //rax case.js
+//    if (i++ % 2 == 0) {
+//      mData.add("{\"model\":{\"tips\":[{\"show\":\"雪纺\",\"q\":\"连衣裙 雪纺\",\"params\":[{\"key\":\"from\",\"value\":\"tips_1\"},{\"key\":\"vClickTrace\",\"value\":\"%7B%22tips_oriq%22%3A%22%E8%BF%9E%E8%A1%A3%E8%A3%99%22%2C%22tips_srppage%22%3A%222%22%2C%22tips_type%22%3A%221%22%2C%22tips_pos%22%3A%221%22%2C%22pre_rn%22%3A%220189c4d06e11f32262fa896f5f364f76%22%7D\"}]},{\"show\":\"中长款\",\"q\":\"连衣裙 中长款\",\"params\":[{\"key\":\"from\",\"value\":\"tips_1\"},{\"key\":\"vClickTrace\",\"value\":\"%7B%22tips_oriq%22%3A%22%E8%BF%9E%E8%A1%A3%E8%A3%99%22%2C%22tips_srppage%22%3A%222%22%2C%22tips_type%22%3A%221%22%2C%22tips_pos%22%3A%222%22%2C%22pre_rn%22%3A%220189c4d06e11f32262fa896f5f364f76%22%7D\"}]},{\"show\":\"假两件\",\"q\":\"连衣裙 假两件\",\"params\":[{\"key\":\"from\",\"value\":\"tips_1\"},{\"key\":\"vClickTrace\",\"value\":\"%7B%22tips_oriq%22%3A%22%E8%BF%9E%E8%A1%A3%E8%A3%99%22%2C%22tips_srppage%22%3A%222%22%2C%22tips_type%22%3A%221%22%2C%22tips_pos%22%3A%223%22%2C%22pre_rn%22%3A%220189c4d06e11f32262fa896f5f364f76%22%7D\"}]},{\"show\":\"A字款\",\"q\":\"连衣裙 A字款\",\"params\":[{\"key\":\"from\",\"value\":\"tips_1\"},{\"key\":\"vClickTrace\",\"value\":\"%7B%22tips_oriq%22%3A%22%E8%BF%9E%E8%A1%A3%E8%A3%99%22%2C%22tips_srppage%22%3A%222%22%2C%22tips_type%22%3A%221%22%2C%22tips_pos%22%3A%224%22%2C%22pre_rn%22%3A%220189c4d06e11f32262fa896f5f364f76%22%7D\"}]},{\"show\":\"气质淑女\",\"q\":\"连衣裙 气质淑女\",\"params\":[{\"key\":\"from\",\"value\":\"tips_1\"},{\"key\":\"vClickTrace\",\"value\":\"%7B%22tips_oriq%22%3A%22%E8%BF%9E%E8%A1%A3%E8%A3%99%22%2C%22tips_srppage%22%3A%222%22%2C%22tips_type%22%3A%221%22%2C%22tips_pos%22%3A%225%22%2C%22pre_rn%22%3A%220189c4d06e11f32262fa896f5f364f76%22%7D\"}]}],\"pos\":\"3\",\"src\":\"graph\",\"topic\":\"细选\",\"type\":\"1\",\"tItemType\":\"wx_text\",\"tShowTmpl\":\"wx_text\",\"rl\":\"query_type-1|tip_show_type-1|tip_show_page-2\"},\"status\":{\"layoutStyle\":0}}");
+//    } else {
+//      mData.add("{\"model\":{\"tips\":[{\"show\":\"雪纺\",\"q\":\"连衣裙 雪纺\",\"params\":[{\"key\":\"from\",\"value\":\"tips_1\"},{\"key\":\"vClickTrace\",\"value\":\"%7B%22tips_oriq%22%3A%22%E8%BF%9E%E8%A1%A3%E8%A3%99%22%2C%22tips_srppage%22%3A%222%22%2C%22tips_type%22%3A%221%22%2C%22tips_pos%22%3A%221%22%2C%22pre_rn%22%3A%220189c4d06e11f32262fa896f5f364f76%22%7D\"}]},{\"show\":\"中长款\",\"q\":\"连衣裙 中长款\",\"params\":[{\"key\":\"from\",\"value\":\"tips_1\"},{\"key\":\"vClickTrace\",\"value\":\"%7B%22tips_oriq%22%3A%22%E8%BF%9E%E8%A1%A3%E8%A3%99%22%2C%22tips_srppage%22%3A%222%22%2C%22tips_type%22%3A%221%22%2C%22tips_pos%22%3A%222%22%2C%22pre_rn%22%3A%220189c4d06e11f32262fa896f5f364f76%22%7D\"}]},{\"show\":\"假两件\",\"q\":\"连衣裙 假两件\",\"params\":[{\"key\":\"from\",\"value\":\"tips_1\"},{\"key\":\"vClickTrace\",\"value\":\"%7B%22tips_oriq%22%3A%22%E8%BF%9E%E8%A1%A3%E8%A3%99%22%2C%22tips_srppage%22%3A%222%22%2C%22tips_type%22%3A%221%22%2C%22tips_pos%22%3A%223%22%2C%22pre_rn%22%3A%220189c4d06e11f32262fa896f5f364f76%22%7D\"}]},{\"show\":\"A字款\",\"q\":\"连衣裙 A字款\",\"params\":[{\"key\":\"from\",\"value\":\"tips_1\"},{\"key\":\"vClickTrace\",\"value\":\"%7B%22tips_oriq%22%3A%22%E8%BF%9E%E8%A1%A3%E8%A3%99%22%2C%22tips_srppage%22%3A%222%22%2C%22tips_type%22%3A%221%22%2C%22tips_pos%22%3A%224%22%2C%22pre_rn%22%3A%220189c4d06e11f32262fa896f5f364f76%22%7D\"}]},{\"show\":\"气质淑女\",\"q\":\"连衣裙 气质淑女\",\"params\":[{\"key\":\"from\",\"value\":\"tips_1\"},{\"key\":\"vClickTrace\",\"value\":\"%7B%22tips_oriq%22%3A%22%E8%BF%9E%E8%A1%A3%E8%A3%99%22%2C%22tips_srppage%22%3A%222%22%2C%22tips_type%22%3A%221%22%2C%22tips_pos%22%3A%225%22%2C%22pre_rn%22%3A%220189c4d06e11f32262fa896f5f364f76%22%7D\"}]}],\"pos\":\"3\",\"src\":\"graph\",\"topic\":\"细选\",\"type\":\"1\",\"tItemType\":\"wx_text\",\"tShowTmpl\":\"wx_text\",\"rl\":\"query_type-1|tip_show_type-1|tip_show_page-2\"},\"status\":{\"layoutStyle\":1}}");
+//    }
+
+    //card.wasm
     if (i++ % 2 == 0) {
       mData.add("{\n" +
           "    \"model\": {\n" +
@@ -400,126 +426,20 @@ public class SliceTestActivity extends AppCompatActivity {
     }
 
     public void render(String initData, int position) {
-      String template = "{\n" +
-          "  \"styles\": {\n" +
-          "    \"container\": {\n" +
-          "      \"backgroundColor\": \"#eee\",\n" +
-          "      \"flexDirection\": \"row\",\n" +
-          "      \"flexWrap\": \"wrap\",\n" +
-          "      \"alignItems\": \"flex-start\"\n" +
-          "    },\n" +
-          "    \"text\": {\n" +
-          "      \"fontSize\": \"70px\",\n" +
-          "      \"color\": \"#ff0000\"\n" +
-          "    },\n" +
-          "    \"top\": {\n" +
-          "      \"width\": \"750px\",\n" +
-          "      \"flexDirection\": \"row\",\n" +
-          "      \"justifyContent\": \"center\",\n" +
-          "      \"alignItems\": \"center\",\n" +
-          "      \"height\": \"60px\",\n" +
-          "      \"margin-top\": \"10px\"\n" +
-          "    },\n" +
-          "    \"lpixel\": {\n" +
-          "      \"height\": \"1px\",\n" +
-          "      \"width\": \"150px\",\n" +
-          "      \"backgroundColor\": \"black\",\n" +
-          "      \"marginRight\": \"20px\"\n" +
-          "    },\n" +
-          "    \"rpixel\": {\n" +
-          "      \"height\": \"1px\",\n" +
-          "      \"width\": \"150px\",\n" +
-          "      \"backgroundColor\": \"black\",\n" +
-          "      \"marginLeft\": \"20px\"\n" +
-          "    },\n" +
-          "    \"item\": {\n" +
-          "      \"marginTop\": \"10px\",\n" +
-          "      \"backgroundColor\": \"white\",\n" +
-          "      \"borderRadius\": \"30px\",\n" +
-          "      \"width\": \"150px\",\n" +
-          "      \"height\": \"60px\",\n" +
-          "      \"justifyContent\": \"center\",\n" +
-          "      \"alignItems\": \"center\",\n" +
-          "      \"marginLeft\": \"15px\",\n" +
-          "      \"marginRight\": \"15px\"\n" +
-          "    }\n" +
-          "  },\n" +
-          "  \"body\": {\n" +
-          "    \"tagName\": \"div\",\n" +
-          "    \"nodeId\": \"1\",\n" +
-          "    \"classList\": [\n" +
-          "      \"container\"\n" +
-          "    ],\n" +
-          "    \"childNodes\": [\n" +
-          "      {\n" +
-          "        \"tagName\": \"div\",\n" +
-          "        \"nodeId\": \"2\",\n" +
-          "        \"classList\": [\n" +
-          "          \"top\"\n" +
-          "        ],\n" +
-          "        \"childNodes\": [\n" +
-          "          {\n" +
-          "            \"tagName\": \"div\",\n" +
-          "            \"nodeId\": \"3\",\n" +
-          "            \"classList\": [\n" +
-          "              \"lpixel\"\n" +
-          "            ]\n" +
-          "          },\n" +
-          "          {\n" +
-          "            \"tagName\": \"text\",\n" +
-          "            \"nodeId\": \"4\",\n" +
-          "            \"attributes\": {\n" +
-          "              \"value\": \"细选\"\n" +
-          "            }\n" +
-          "          },\n" +
-          "          {\n" +
-          "            \"tagName\": \"div\",\n" +
-          "            \"nodeId\": \"5\",\n" +
-          "            \"classList\": [\n" +
-          "              \"rpixel\"\n" +
-          "            ]\n" +
-          "          }\n" +
-          "        ]\n" +
-          "      },\n" +
-          "      {\n" +
-          "        \"tagName\": \"div\",\n" +
-          "        \"nodeId\": \"6\",\n" +
-          "        \"control\": {\n" +
-          "          \"repeat\": {\n" +
-          "            \"for\": \"items\",\n" +
-          "            \"alias\": \"item\"\n" +
-          "          }\n" +
-          "        },\n" +
-          "        \"classList\": [\n" +
-          "          \"item\"\n" +
-          "        ],\n" +
-          "        \"childNodes\": [\n" +
-          "          {\n" +
-          "            \"tagName\": \"text\",\n" +
-          "            \"nodeId\": \"7\",\n" +
-          "            \"classList\": [\n" +
-          "              \"item-text\"\n" +
-          "            ],\n" +
-          "            \"attributes\": {\n" +
-          "              \"value\": {\"@binding\": \"item\"}\n" +
-          "            }\n" +
-          "          }\n" +
-          "        ]\n" +
-          "      }\n" +
-          "    ]\n" +
-          "  },\n" +
-          "  \"components\": [],\n" +
-          "  \"data\": {\n" +
-          "    \"items\": [\"修身\", \"潮流\", \"休闲\", \"弹力\", \"薄款\", \"中年\", \"超薄\", \"韩版\"]\n" +
-          "  }\n" +
-          "}";
-      template = loadAssets();
+//
+//      mInstance.render(
+//          "testPage",
+//          loadAssets(),
+//          null,
+//          initData,
+//          WXRenderStrategy.DATA_RENDER
+//      );
+//
       mInstance.render(
           "testPage",
-          template,
+          loadBytes(),
           null,
-          initData,
-          WXRenderStrategy.DATA_RENDER
+          initData
       );
       mRendered = true;
       mTextView.setText(String.valueOf(position));
@@ -558,7 +478,7 @@ public class SliceTestActivity extends AppCompatActivity {
   private String loadAssets() {
     StringBuilder buf = new StringBuilder();
     try {
-      InputStream json = getAssets().open("lite_template/case.json");
+      InputStream json = getAssets().open("lite_template/case.js");
       BufferedReader in =
           new BufferedReader(new InputStreamReader(json, "UTF-8"));
       String str;
@@ -573,5 +493,20 @@ public class SliceTestActivity extends AppCompatActivity {
     }
 
     return buf.toString();
+  }
+
+  private byte[] loadBytes() {
+    try {
+      AssetFileDescriptor assetFileDescriptor = getAssets().openFd("lite_template/card.wasm");
+      long len = assetFileDescriptor.getDeclaredLength();
+      ByteBuffer buf = ByteBuffer.allocate((int) len);
+      InputStream json = assetFileDescriptor.createInputStream();
+      json.read(buf.array());
+      json.close();
+      return buf.array();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 }

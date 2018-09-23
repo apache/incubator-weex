@@ -39,34 +39,36 @@ json11::Json ValueToJSON(const Value& value);
 
 static Value Log(ExecState *exec_state) {
   size_t length = exec_state->GetArgumentCount();
+  std::stringstream ss;
   for (int i = 0; i < length; ++i) {
     Value *a = exec_state->GetArgument(i);
     switch (a->type) {
       case Value::Type::NUMBER:
-        std::cout << "[log]:=>" << a->n << "\n";
+        ss << "[log]:=>" << a->n << "\n";
         break;
       case Value::Type::INT:
-        std::cout << "[log]:=>" << a->i << "\n";
+        ss << "[log]:=>" << a->i << "\n";
         break;
       case Value::Type::STRING:
-        std::cout << "[log]:=>" << a->str->c_str() << "\n";
+        ss << "[log]:=>" << a->str->c_str() << "\n";
         break;
       case Value::Type::TABLE:
-        std::cout << "[log]:=>" << TableToString(ValueTo<Table>(a)) << "\n";
+        ss << "[log]:=>" << TableToString(ValueTo<Table>(a)) << "\n";
         break;
       case Value::Type::ARRAY:
-        std::cout << "[log]:=>" << ArrayToString(ValueTo<Array>(a)) << "\n";
+        ss << "[log]:=>" << ArrayToString(ValueTo<Array>(a)) << "\n";
         break;
       case Value::Type::CPTR:
       {
           VNode *node = (VNode *)a->cptr;
-          std::cout << "[log]:=> cptr" << node->tag_name() <<"\n";
+          ss << "[log]:=> cptr" << node->tag_name() <<"\n";
           break;
       }
       default:
         break;
     }
   }
+  LOGD("%s",ss.str().c_str());
   return Value();
 }
 

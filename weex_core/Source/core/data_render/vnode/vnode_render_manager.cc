@@ -188,7 +188,8 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
     //auto compile_start = std::chrono::steady_clock::now();
     exec_state->Compile(err);
     if (!err.empty()) {
-        return;
+      LOGE("DATA_RENDER, compile err: %s",err.c_str());
+      return;
     }
     auto compile_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], Compile time:[%lld]\n", compile_post.count());
@@ -196,6 +197,7 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
     //auto exec_start = std::chrono::steady_clock::now();
     exec_state->Execute(err);
     if (!err.empty()) {
+        LOGE("DATA_RENDER, exec err: %s",err.c_str());
         return;
     }
     if (exec_state->context()->root() == NULL) {
