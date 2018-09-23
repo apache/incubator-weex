@@ -18,12 +18,17 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.render.font.FontManager;
+import com.taobao.weex.render.font.FontWatchTask;
+import com.taobao.weex.ui.component.document.DocumentFontReceiver;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.TypefaceUtil;
 
@@ -55,6 +60,15 @@ public class ActionAddRule implements IExecutable {
 
     FontDO fontDO = parseFontDO(mData, instance);
     if (fontDO != null && !TextUtils.isEmpty(fontDO.getFontFamilyName())) {
+      FontWatchTask fontWatchTask = FontManager.getInstance().getFontWatchTask(fontDO.getFontFamilyName(), fontDO.getUrl());
+      if(!fontWatchTask.isLoaded()){
+        if(!fontWatchTask.isLoading()){
+           fontWatchTask.setLoading(true);
+           LocalBroadcastManager.getInstance(instance.getContext()).registerReceiver(
+                   new DocumentFontReceiver(instance, fontWatchTask),
+                   new IntentFilter(TypefaceUtil.ACTION_TYPE_FACE_AVAILABLE));
+        }
+      }
       FontDO cacheFontDO = TypefaceUtil.getFontDO(fontDO.getFontFamilyName());
       if (cacheFontDO == null || !TextUtils.equals(cacheFontDO.getUrl(), fontDO.getUrl())) {
         TypefaceUtil.putFontDO(fontDO);
@@ -63,6 +77,9 @@ public class ActionAddRule implements IExecutable {
         TypefaceUtil.loadTypeface(cacheFontDO);
       }
     }
+
+
+
 
   }
 

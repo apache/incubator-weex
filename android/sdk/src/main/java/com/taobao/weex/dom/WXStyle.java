@@ -64,6 +64,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     mStyles = new ArrayMap<>();
   }
 
+  @Deprecated
   public WXStyle(Map<String, Object> styles){
     this.mStyles = styles;
     processPesudoClasses(this.mStyles);
@@ -520,6 +521,11 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   public ArrayMap<String, Object> getBindingStyle() {
     return mBindingStyle;
+  }
+
+  @NonNull
+  public Map<String, Object> getStyles() {
+    return mStyles;
   }
 
   @Override

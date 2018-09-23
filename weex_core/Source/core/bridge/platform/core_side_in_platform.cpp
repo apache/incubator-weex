@@ -159,6 +159,7 @@ void CoreSideInPlatform::MarkDirty(const std::string &instance_id,
   RenderObject *render = page->GetRenderObject(render_ref);
   if (render == nullptr) return;
   render->markDirty();
+  page->set_is_dirty(true);
 }
 
 void CoreSideInPlatform::SetViewPortWidth(const std::string &instance_id,

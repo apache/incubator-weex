@@ -21,6 +21,7 @@ package com.taobao.weex.ui.action;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.document.WXDocumentComponent;
 
 import java.util.Map;
 
@@ -40,6 +41,13 @@ public class GraphicActionUpdateAttr extends BasicGraphicAction {
     }
     if (mAttrs != null) {
       component.addAttr(mAttrs);
+    }
+
+    if(instance.isHasDocumentSegment()) {
+      WXDocumentComponent documentComponent = WXDocumentComponent.getDocument(component);
+      if (documentComponent != null) {
+        documentComponent.actionUpdateAttrs(ref, attrs);
+      }
     }
   }
 

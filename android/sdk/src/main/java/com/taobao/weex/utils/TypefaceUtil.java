@@ -225,7 +225,7 @@ public class TypefaceUtil {
     });
   }
 
-  private static boolean loadLocalFontFile(String path, final String fontFamily, boolean hasNetworkDowload) {
+  private static boolean loadLocalFontFile(final String path, final String fontFamily, boolean hasNetworkDowload) {
     if (TextUtils.isEmpty(path) || TextUtils.isEmpty(fontFamily)) {
       return false;
     }
@@ -238,6 +238,7 @@ public class TypefaceUtil {
       if (typeface != null) {
         FontDO fontDo = sCacheMap.get(fontFamily);
         if (fontDo != null) {
+          fontDo.setFilePath(path);
           fontDo.setState(FontDO.STATE_SUCCESS);
           fontDo.setTypeface(typeface);
           if(WXEnvironment.isApkDebugable()) {
@@ -255,12 +256,14 @@ public class TypefaceUtil {
               public void run() {
                 Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
                 intent.putExtra("fontFamily", fontFamily);
+                intent.putExtra("filePath", path);
                 LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
               }
             }, 100);
           }else{
             Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
             intent.putExtra("fontFamily", fontFamily);
+            intent.putExtra("filePath", path);
             LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
           }
           return true;

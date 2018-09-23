@@ -39,6 +39,7 @@ set(COMMON_SRCS
   ./core/render/node/render_mask.cpp
   ./core/render/node/render_scroller.cpp
   ./core/render/node/render_text.cpp
+  ./core/render/node/render_document.cpp
 
   ./core/render/action/render_action_add_event.cpp
   ./core/render/action/render_action_remove_event.cpp

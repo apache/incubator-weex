@@ -23,6 +23,7 @@ import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.document.WXDocumentComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 
 public class GraphicActionMoveElement extends BasicGraphicAction {
@@ -34,6 +35,13 @@ public class GraphicActionMoveElement extends BasicGraphicAction {
     super(instance, ref);
     this.mParentref = parentRef;
     this.mIndex = index;
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    if(instance.isHasDocumentSegment()) {
+      WXDocumentComponent documentComponent = WXDocumentComponent.getDocument(component);
+      if (documentComponent != null) {
+        documentComponent.actionMoveElement(ref, parentRef, index);
+      }
+    }
   }
 
   @Override
