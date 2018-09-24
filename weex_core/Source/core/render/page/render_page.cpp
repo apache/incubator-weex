@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <android/base/log_utils.h>
+
 #include "core/render/page/render_page.h"
 #include "core/render/node/render_document.h"
 #include "base/TimeUtils.h"

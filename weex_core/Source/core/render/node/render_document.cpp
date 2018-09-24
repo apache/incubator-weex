@@ -67,8 +67,8 @@ namespace WeexCore {
 
         Index count = documentChilds.size();
         index = index >= count ? -1 : index;
-        if(index < 0){
-            index = count;
+        if (index < 0) {
+            index = static_cast<int>(count);
         }
         documentChilds.insert(documentChilds.begin() + count, child);
         child->setParent(this, child);
