@@ -467,12 +467,49 @@ _Pragma("clang diagnostic pop") \
                     }
                 }
                 
-                NSDictionary* envDic = [instanceContextEnvironment toDictionary];
-                sdkInstance.createInstanceContextResult = [NSString stringWithFormat:@"%@", [envDic allKeys]];
+                JSContextRef contextRef = instanceContextEnvironment.context.JSGlobalContextRef;
+                WXAssert([instanceContextEnvironment isObject], @"Invalid instance context.");
+                JSObjectRef instanceContextObjectRef = JSValueToObject(contextRef, instanceContextEnvironment.JSValueRef, NULL);
+                JSPropertyNameArrayRef allKeyRefs = JSObjectCopyPropertyNames(contextRef, instanceContextObjectRef);
+                size_t keyCount = JSPropertyNameArrayGetCount(allKeyRefs);
+                
+                BOOL somethingWrong = NO;
+                NSMutableArray* allKeys = [[NSMutableArray alloc] initWithCapacity:keyCount];
+                for (size_t i = 0; i < keyCount; i ++) {
+                    JSStringRef nameRef = JSPropertyNameArrayGetNameAtIndex(allKeyRefs, i);
+                    size_t len = JSStringGetMaximumUTF8CStringSize(nameRef);
+                    if (len > 1024) {
+                        somethingWrong = YES;
+                        break;
+                    }
+                    char* buf = (char*)malloc(len + 5);
+                    if (buf == NULL) {
+                        somethingWrong = YES;
+                        break;
+                    }
+                    bzero(buf, len + 5);
+                    if (JSStringGetUTF8CString(nameRef, buf, len + 5) > 0) {
+                        [allKeys addObject:[NSString stringWithUTF8String:buf]];
+                    }
+                    else {
+                        somethingWrong = YES;
+                        free(buf);
+                        break;
+                    }
+                    free(buf);
+                }
+                JSPropertyNameArrayRelease(allKeyRefs);
+                
+                if (somethingWrong) {
+                    // [instanceContextEnvironment toDictionary] may contain retain-cycle.
+                    allKeys = (NSMutableArray*)[[instanceContextEnvironment toDictionary] allKeys];
+                }
+                
+                sdkInstance.createInstanceContextResult = [NSString stringWithFormat:@"%@", allKeys];
                 JSGlobalContextRef instanceContextRef = sdkInstance.instanceJavaScriptContext.javaScriptContext.JSGlobalContextRef;
                 JSObjectRef instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
                 
-                for (NSString * key in [envDic allKeys]) {
+                for (NSString * key in allKeys) {
                     JSStringRef propertyName = JSStringCreateWithUTF8CString([key cStringUsingEncoding:NSUTF8StringEncoding]);
                     if ([key isEqualToString:@"Vue"]) {
                         JSObjectSetPrototype(instanceContextRef, JSValueToObject(instanceContextRef, [instanceContextEnvironment valueForProperty:key].JSValueRef, NULL), JSObjectGetPrototype(instanceContextRef, instanceGlobalObject));
