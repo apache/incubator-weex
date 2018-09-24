@@ -23,6 +23,7 @@ import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
+import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
@@ -46,6 +47,7 @@ public class InitConfig {
   private String framework;
   private ClassLoaderAdapter classLoaderAdapter;
   private IApmGenerator apmGenerater;
+  private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
 
   public IWXHttpAdapter getHttpAdapter() {
     return httpAdapter;
@@ -91,6 +93,10 @@ public class InitConfig {
     return apmGenerater;
   }
 
+  public IWXJsFileLoaderAdapter getJsFileLoaderAdapter() {
+    return jsFileLoaderAdapter;
+  }
+
   public InitConfig setClassLoaderAdapter(ClassLoaderAdapter classLoaderAdapter) {
     this.classLoaderAdapter = classLoaderAdapter;
     return this;
@@ -116,6 +122,7 @@ public class InitConfig {
     IWebSocketAdapterFactory webSocketAdapterFactory;
     ClassLoaderAdapter classLoaderAdapter;
     IApmGenerator apmGenerater;
+    private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
 
     public Builder(){
 
@@ -181,6 +188,11 @@ public class InitConfig {
       return this;
     }
 
+    public Builder setJsFileLoaderAdapter(IWXJsFileLoaderAdapter jsFileLoaderAdapter) {
+      this.jsFileLoaderAdapter = jsFileLoaderAdapter;
+      return this;
+    }
+
     public InitConfig build(){
       InitConfig config =  new InitConfig();
       config.httpAdapter = this.httpAdapter;
@@ -195,6 +207,7 @@ public class InitConfig {
       config.mJSExceptionAdapter=this.mJSExceptionAdapter;
       config.classLoaderAdapter = this.classLoaderAdapter;
       config.apmGenerater = this.apmGenerater;
+      config.jsFileLoaderAdapter = this.jsFileLoaderAdapter;
       return config;
     }
   }

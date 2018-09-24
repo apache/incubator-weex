@@ -33,6 +33,7 @@ import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
+import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
@@ -82,6 +83,7 @@ public class WXSDKManager {
   private IWXAccessibilityRoleAdapter mRoleAdapter;
   private List<IWXAnalyzer> mWXAnalyzerList;
   private IApmGenerator mApmGenerater;
+  private IWXJsFileLoaderAdapter mWXJsFileLoaderAdapter;
 
   private ICrashInfoReporter mCrashInfo;
 
@@ -325,6 +327,10 @@ public class WXSDKManager {
     return mIWXImgLoaderAdapter;
   }
 
+  public IWXJsFileLoaderAdapter getIWXJsFileLoaderAdapter() {
+    return mWXJsFileLoaderAdapter;
+  }
+
   public IDrawableLoader getDrawableLoader() {
     return mDrawableLoader;
   }
@@ -392,6 +398,7 @@ public class WXSDKManager {
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
     this.mClassLoaderAdapter = config.getClassLoaderAdapter();
     this.mApmGenerater = config.getApmGenerater();
+    this.mWXJsFileLoaderAdapter = config.getJsFileLoaderAdapter();
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){

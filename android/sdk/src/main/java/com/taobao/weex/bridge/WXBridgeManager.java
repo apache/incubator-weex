@@ -41,6 +41,7 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
+import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.*;
 import com.taobao.weex.dom.CSSShorthand;
@@ -1442,7 +1443,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXJSObject apiObj;
         if (type == BundType.Rax) {
           if (mRaxApi == null) {
-            mRaxApi =  WXFileUtils.loadAsset("weex-rax-api.js", WXEnvironment.getApplication());
+            IWXJsFileLoaderAdapter iwxJsFileLoaderAdapter = WXSDKEngine.getIWXJsFileLoaderAdapter();
+            if(iwxJsFileLoaderAdapter != null) {
+              mRaxApi = iwxJsFileLoaderAdapter.loadRaxApi();
+            }
+
+            if(TextUtils.isEmpty(mRaxApi)) {
+              mRaxApi =  WXFileUtils.loadAsset("weex-rax-api.js", WXEnvironment.getApplication());
+            }
           }
           apiObj = new WXJSObject(WXJSObject.String,
                   mRaxApi);
@@ -1798,10 +1806,25 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         // if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("weex JS framework from assets");
         // }
+
+        IWXJsFileLoaderAdapter wxJsFileLoaderAdapter = WXSDKEngine.getIWXJsFileLoaderAdapter();
+
         if (!isSandBoxContext) {
-          framework = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
+          if(wxJsFileLoaderAdapter != null) {
+            framework = wxJsFileLoaderAdapter.loadJsFramework();
+          }
+
+          if(TextUtils.isEmpty(framework)) {
+            framework = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
+          }
         } else {
-          framework = WXFileUtils.loadAsset("weex-main-jsfm.js", WXEnvironment.getApplication());
+          if(wxJsFileLoaderAdapter != null) {
+            framework = wxJsFileLoaderAdapter.loadJsFrameworkForSandBox();
+          }
+
+          if(TextUtils.isEmpty(framework)) {
+            framework = WXFileUtils.loadAsset("weex-main-jsfm.js", WXEnvironment.getApplication());
+          }
         }
         sInitFrameWorkMsg.append("| weex JS framework from assets, isSandBoxContext: ").append(isSandBoxContext);
       }
