@@ -489,7 +489,13 @@ _Pragma("clang diagnostic pop") \
                     }
                     bzero(buf, len + 5);
                     if (JSStringGetUTF8CString(nameRef, buf, len + 5) > 0) {
-                        [allKeys addObject:[NSString stringWithUTF8String:buf]];
+                        NSString* keyString = [NSString stringWithUTF8String:buf];
+                        if ([keyString length] == 0) {
+                            somethingWrong = YES;
+                            free(buf);
+                            break;
+                        }
+                        [allKeys addObject:keyString];
                     }
                     else {
                         somethingWrong = YES;
