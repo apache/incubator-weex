@@ -22,6 +22,12 @@
 #import "WXConvert.h"
 #import "WXTransform.h"
 #import "WXTransition.h"
+
+#ifdef __cplusplus
+#import "WXJSASTParser.h"
+#include <vector>
+#endif // __cplusplus
+
 @class WXTouchGestureRecognizer;
 @class WXThreadSafeCounter;
 
@@ -151,6 +157,9 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingAttributes;
     NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingStyles;
     NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingEvents;
+#ifdef __cplusplus
+    std::vector<WXJSExpression *> *_bindingExpressions;
+#endif // __cplusplus
     
     NSMutableDictionary<NSString *, NSArray *> *_eventParameters;
 }

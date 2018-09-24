@@ -260,6 +260,15 @@ static BOOL bNeedRemoveEvents = YES;
             [self _removeAllEvents];
         }
     }
+    
+    if (_bindingExpressions != nullptr) {
+        for (WXJSExpression* expr : *_bindingExpressions) {
+            if (expr != nullptr) {
+                delete expr;
+            }
+        }
+        delete _bindingExpressions;
+    }
 
     pthread_mutex_destroy(&_propertyMutex);
     pthread_mutexattr_destroy(&_propertMutexAttr);

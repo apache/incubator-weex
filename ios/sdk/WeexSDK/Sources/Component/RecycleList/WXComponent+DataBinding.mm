@@ -261,7 +261,7 @@ static JSContext *jsContext;
         }
     }];
     
-    // set displaty:none to the redundant components;
+    // set display:none to the redundant components;
     NSUInteger i = startIndex + repeatData.count;
     while (i < self.supercomponent.subcomponents.count) {
         WXComponent *component = self.supercomponent.subcomponents[i];
@@ -310,6 +310,10 @@ static JSContext *jsContext;
 {
     WXAssertComponentThread();
     
+    if (_bindingExpressions == nullptr) {
+        _bindingExpressions = new std::vector<WXJSExpression *>();
+    }
+    
     NSMutableDictionary *bindingMap;
     switch (type) {
         case WXDataBindingTypeProp:
@@ -334,6 +338,7 @@ static JSContext *jsContext;
             NSString *bindingExpression = binding[WXBindingIdentify];
             WXJSASTParser *parser = [WXJSASTParser parserWithScript:bindingExpression];
             WXJSExpression *expression = [parser parseExpression];
+            self->_bindingExpressions->push_back(expression);
             WXDataBindingBlock block = [self bindingBlockWithExpression:expression];
             bindingMap[name] = block;
         } else if ([binding isKindOfClass:[NSArray class]]) {
@@ -346,6 +351,7 @@ static JSContext *jsContext;
                     NSString *bindingExpression = bindingInArray[WXBindingIdentify];
                     WXJSASTParser *parser = [WXJSASTParser parserWithScript:bindingExpression];
                     WXJSExpression *expression = [parser parseExpression];
+                    self->_bindingExpressions->push_back(expression);
                     WXDataBindingBlock block = [self bindingBlockWithExpression:expression];
                     bindingBlocksForIndex[@(idx)] = block;
                 }
@@ -372,17 +378,19 @@ static JSContext *jsContext;
         
         if (type == WXDataBindingTypeAttributes) {
             if ([WXBindingOnceIdentify isEqualToString:name]) {
-                _dataBindOnce = [WXConvert BOOL:binding];
+                self->_dataBindOnce = [WXConvert BOOL:binding];
             } else if ([WXBindingMatchIdentify isEqualToString:name]) {
                 WXJSASTParser *parser = [WXJSASTParser parserWithScript:binding];
                 WXJSExpression *expression = [parser parseExpression];
-                _bindingMatch = [self bindingBlockWithExpression:expression];
+                self->_bindingExpressions->push_back(expression);
+                self->_bindingMatch = [self bindingBlockWithExpression:expression];
             } else if ([WXBindingRepeatIdentify isEqualToString:name]) {
                 WXJSASTParser *parser = [WXJSASTParser parserWithScript:binding[WXBindingRepeatExprIdentify]];
                 WXJSExpression *expression = [parser parseExpression];
-                _bindingRepeat = [self bindingBlockWithExpression:expression];
-                _repeatIndexIdentify = binding[WXBindingRepeatIndexIdentify];
-                _repeatLabelIdentify = binding[WXBindingRepeatLabelIdentify];
+                self->_bindingExpressions->push_back(expression);
+                self->_bindingRepeat = [self bindingBlockWithExpression:expression];
+                self->_repeatIndexIdentify = binding[WXBindingRepeatIndexIdentify];
+                self->_repeatLabelIdentify = binding[WXBindingRepeatLabelIdentify];
             }
         }
     }];
