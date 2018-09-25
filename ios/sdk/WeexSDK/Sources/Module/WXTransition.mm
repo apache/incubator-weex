@@ -310,6 +310,10 @@
 
 - (void)_calculatetransitionProcessingStyle
 {
+    if (_targetComponent == nil) {
+        return;
+    }
+    
     if (_propertyArray.count == 0) {
         return;
     }
