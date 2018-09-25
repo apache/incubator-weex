@@ -201,5 +201,6 @@ public interface IWXBridge extends IWXObject {
 
   void resetWXBridge(boolean remoteDebug);
 
-  void fireEventOnDataRenderNode(String instanceId, String ref, String type, String data, String params);
+  void fireEventOnDataRenderNode(String instanceId, String ref, String type, String data);
+
 }

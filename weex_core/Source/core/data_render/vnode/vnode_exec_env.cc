@@ -39,34 +39,36 @@ json11::Json ValueToJSON(const Value& value);
 
 static Value Log(ExecState *exec_state) {
   size_t length = exec_state->GetArgumentCount();
+  std::stringstream ss;
   for (int i = 0; i < length; ++i) {
     Value *a = exec_state->GetArgument(i);
     switch (a->type) {
       case Value::Type::NUMBER:
-        std::cout << "[log]:=>" << a->n << "\n";
+        ss << "[log]:=>" << a->n << "\n";
         break;
       case Value::Type::INT:
-        std::cout << "[log]:=>" << a->i << "\n";
+        ss << "[log]:=>" << a->i << "\n";
         break;
       case Value::Type::STRING:
-        std::cout << "[log]:=>" << a->str->c_str() << "\n";
+        ss << "[log]:=>" << a->str->c_str() << "\n";
         break;
       case Value::Type::TABLE:
-        std::cout << "[log]:=>" << TableToString(ValueTo<Table>(a)) << "\n";
+        ss << "[log]:=>" << TableToString(ValueTo<Table>(a)) << "\n";
         break;
       case Value::Type::ARRAY:
-        std::cout << "[log]:=>" << ArrayToString(ValueTo<Array>(a)) << "\n";
+        ss << "[log]:=>" << ArrayToString(ValueTo<Array>(a)) << "\n";
         break;
       case Value::Type::CPTR:
       {
           VNode *node = (VNode *)a->cptr;
-          std::cout << "[log]:=> cptr" << node->tag_name() <<"\n";
+          ss << "[log]:=> cptr" << node->tag_name() <<"\n";
           break;
       }
       default:
         break;
     }
   }
+  LOGD("%s",ss.str().c_str());
   return Value();
 }
 
@@ -178,7 +180,30 @@ static Value CallNativeModule(ExecState *exec_state) {
 }
     
 static Value RegisterModules(ExecState *exec_state) {
-    weex::core::data_render::VNodeRenderManager::GetInstance()->ExecuteRegisterModules(exec_state);
+    do {
+        if (!exec_state->GetArgumentCount()) {
+            break;
+        }
+        Value *arg = exec_state->GetArgument(0);
+        if (!IsArray(arg)) {
+            break;
+        }
+        Array *array = ValueTo<Array>(arg);
+        if (array->items.size() > 0) {
+            std::vector<std::string> args;
+            for (int i = 0; i < array->items.size(); i++) {
+                Value item = array->items[i];
+                if (!IsString(&item)) {
+                    continue;
+                }
+                args.push_back(CStringValue(&item));
+            }
+            if (args.size() > 0) {
+                weex::core::data_render::VNodeRenderManager::GetInstance()->ExecuteRegisterModules(exec_state, args);
+            }
+        }
+        
+    } while (0);
     return Value();
 }
 
@@ -302,30 +327,37 @@ static Value UpdateElement(ExecState *exec_state) {
     
     return Value();
 }
+    
+static size_t g_node_id = 0;
 
 // createElement("tag_name", "id", ref);
 static Value CreateElement(ExecState *exec_state) {
-    Value *arg_node_id = exec_state->GetArgument(1);
-    std::string node_id;
-    if (IsString(arg_node_id)) {
-        node_id = CStringValue(arg_node_id);
-    } else if (IsInt(arg_node_id)) {
+    std::string tag_name = exec_state->GetArgument(0)->str->c_str();
+    Value *arg_id = exec_state->GetArgument(1);
+    std::string arg_id_str;
+    if (IsString(arg_id)) {
+        arg_id_str = CStringValue(arg_id);
+    }
+    else if (IsInt(arg_id)) {
         std::ostringstream os;
-        os << IntValue(arg_node_id) ;
-        node_id = "vn_" + os.str();
-    } else {
+        os << IntValue(arg_id) ;
+        arg_id_str = "vn_" + os.str();
+    }
+    else {
         throw VMExecError("CreateElement only support int for string");
     }
-    std::string tag_name = exec_state->GetArgument(0)->str->c_str();
-    std::string ref = "";
-    if (exec_state->GetArgumentCount() > 2 &&
-        exec_state->GetArgument(2)->type == Value::Type::STRING) {
-      ref = exec_state->GetArgument(2)->str->c_str();
+    std::string node_id,ref;
+    std::ostringstream os;
+    os << g_node_id++;
+    node_id = "vn_" + os.str();
+    ref = arg_id_str;
+    if (exec_state->GetArgumentCount() > 2 && exec_state->GetArgument(2)->type == Value::Type::STRING) {
+        ref = exec_state->GetArgument(2)->str->c_str();
     }
     LOGD("[VM][VNode][CreateElement]: %s  %s\n", node_id.c_str(), tag_name.c_str());
     VNode *node = NULL;
     if (tag_name == "root") {
-        node = new VNode("div", node_id, ref);
+        node = new VNode("div", "vn_r", "vn_r");
         exec_state->context()->set_root(node);
     }
     else {

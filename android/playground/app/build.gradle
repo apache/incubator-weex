@@ -64,7 +64,9 @@ android {
     dexOptions {
         preDexLibraries false
     }
-
+    aaptOptions {
+        noCompress 'wasm'
+    }
 }
 
 

@@ -306,13 +306,6 @@ void RenderManager::CallNativeModule(const char *page_id, const char *module, co
   }
 }
     
-void RenderManager::CallNativeModule(const std::string &page_id, const std::string &module, const std::string &method, const std::string &args, int argc) {
-    RenderPage *page = GetPage(page_id);
-    if (page) {
-        page->CallNativeModule(module, method, args, argc);
-    }
-}
-
 void RenderManager::CallMetaModule(const char *page_id, const char *method, const char *arguments) {
   if (strcmp(method, "setViewport") == 0) {
     wson_parser parser(arguments);

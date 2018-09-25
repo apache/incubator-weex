@@ -44,7 +44,6 @@ set(COMMON_SRCS
   ./core/render/action/render_action_add_event.cpp
   ./core/render/action/render_action_remove_event.cpp
   ./core/render/action/render_action_add_element.cpp
-  ./core/render/action/render_action_call_native_module.cpp
   ./core/render/action/render_action_remove_element.cpp
   ./core/render/action/render_action_move_element.cpp
   ./core/render/action/render_action_createbody.cpp

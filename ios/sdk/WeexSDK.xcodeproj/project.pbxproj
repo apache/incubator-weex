@@ -87,10 +87,6 @@
 		4547FD0E215392FA00E79971 /* js_common_function.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4547FD0C215392F900E79971 /* js_common_function.cc */; };
 		4547FD0F2153931000E79971 /* js_common_function.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4547FD0C215392F900E79971 /* js_common_function.cc */; };
 		4547FD102153932A00E79971 /* js_common_function.h in Headers */ = {isa = PBXBuildFile; fileRef = 4547FD0B215392F900E79971 /* js_common_function.h */; };
-		4547FD192153BC3D00E79971 /* render_action_call_native_module.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4547FD172153BC3C00E79971 /* render_action_call_native_module.cpp */; };
-		4547FD1A2153BC3D00E79971 /* render_action_call_native_module.h in Headers */ = {isa = PBXBuildFile; fileRef = 4547FD182153BC3C00E79971 /* render_action_call_native_module.h */; };
-		4547FD1B2153BC7600E79971 /* render_action_call_native_module.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4547FD172153BC3C00E79971 /* render_action_call_native_module.cpp */; };
-		4547FD1C2153BC8E00E79971 /* render_action_call_native_module.h in Headers */ = {isa = PBXBuildFile; fileRef = 4547FD182153BC3C00E79971 /* render_action_call_native_module.h */; };
 		591324A31D49B7F1004E89ED /* WXTimerModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */; };
 		591DD3311D23AD5800BE8709 /* WXErrorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 591DD32F1D23AD5800BE8709 /* WXErrorView.m */; };
 		591DD3321D23AD5800BE8709 /* WXErrorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 591DD3301D23AD5800BE8709 /* WXErrorView.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1099,8 +1095,6 @@
 		4547FD002152048600E79971 /* class_object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = class_object.h; sourceTree = "<group>"; };
 		4547FD0B215392F900E79971 /* js_common_function.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = js_common_function.h; sourceTree = "<group>"; };
 		4547FD0C215392F900E79971 /* js_common_function.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = js_common_function.cc; sourceTree = "<group>"; };
-		4547FD172153BC3C00E79971 /* render_action_call_native_module.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_action_call_native_module.cpp; sourceTree = "<group>"; };
-		4547FD182153BC3C00E79971 /* render_action_call_native_module.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_action_call_native_module.h; sourceTree = "<group>"; };
 		591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTimerModuleTests.m; sourceTree = "<group>"; };
 		591DD32F1D23AD5800BE8709 /* WXErrorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXErrorView.m; sourceTree = "<group>"; };
 		591DD3301D23AD5800BE8709 /* WXErrorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXErrorView.h; sourceTree = "<group>"; };
@@ -2434,8 +2428,6 @@
 				B8D66B412125572F003960BD /* render_action_move_element.h */,
 				B8D66B422125572F003960BD /* render_action_update_attr.cpp */,
 				B8D66B432125572F003960BD /* render_action_layout.cpp */,
-				4547FD172153BC3C00E79971 /* render_action_call_native_module.cpp */,
-				4547FD182153BC3C00E79971 /* render_action_call_native_module.h */,
 				B8D66B442125572F003960BD /* render_action_update_style.h */,
 				B8D66B452125572F003960BD /* render_action_createfinish.h */,
 				B8D66B462125572F003960BD /* render_action_update_style.cpp */,
@@ -2688,7 +2680,6 @@
 				74915F471C8EB02B00BEBCC0 /* WXAssert.h in Headers */,
 				2A8E658A1C7C7AA20025C7B7 /* WXVideoComponent.h in Headers */,
 				59A5961C1CB630F10012CD52 /* WXComponent+Navigation.h in Headers */,
-				4547FD1A2153BC3D00E79971 /* render_action_call_native_module.h in Headers */,
 				B8D66C3D21255730003960BD /* render_action_createfinish.h in Headers */,
 				775BEE6E1C1BD8F4008D1629 /* WXImgLoaderProtocol.h in Headers */,
 				B8D66C1321255730003960BD /* core_side_in_script.h in Headers */,
@@ -3000,7 +2991,6 @@
 				B8D66BC42125572F003960BD /* vnode_render_context.h in Headers */,
 				DCA445AF1EFA575D00D0CFA8 /* WXModuleProtocol.h in Headers */,
 				4547FD102153932A00E79971 /* js_common_function.h in Headers */,
-				4547FD1C2153BC8E00E79971 /* render_action_call_native_module.h in Headers */,
 				4547FD032152049F00E79971 /* class_object.h in Headers */,
 				ED053501207F4DEB007B4568 /* JSContext+Weex.h in Headers */,
 				DCA4459F1EFA56EC00D0CFA8 /* WXURLRewriteProtocol.h in Headers */,
@@ -3590,7 +3580,6 @@
 				B8D66C3F21255730003960BD /* render_action_update_style.cpp in Sources */,
 				74915F481C8EB02B00BEBCC0 /* WXAssert.m in Sources */,
 				59A596251CB6311F0012CD52 /* WXStorageModule.m in Sources */,
-				4547FD192153BC3D00E79971 /* render_action_call_native_module.cpp in Sources */,
 				2AFEB17C1C747139000507FA /* WXInstanceWrap.m in Sources */,
 				74A4BA5C1CABBBD000195969 /* WXDebugTool.m in Sources */,
 				742AD73B1DF98C8B007DC46C /* WXResourceLoader.m in Sources */,
@@ -3673,7 +3662,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4547FD1B2153BC7600E79971 /* render_action_call_native_module.cpp in Sources */,
 				4547FD0F2153931000E79971 /* js_common_function.cc in Sources */,
 				4547FD04215204AB00E79971 /* class_object.cc in Sources */,
 				4532670D213FCFB400DAA620 /* WXDisplayLinkManager.m in Sources */,

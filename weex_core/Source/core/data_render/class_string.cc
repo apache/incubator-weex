@@ -35,13 +35,60 @@ namespace data_render {
 static Value split(ExecState *exec_state);
 static Value trim(ExecState* exec_state);
 static Value indexOf(ExecState* exec_state);
+static Value replaceAll(ExecState *exec_state);
 
 ClassDescriptor *NewClassString() {
     ClassDescriptor *array_desc = new ClassDescriptor(nullptr);
     AddClassCFunc(array_desc, "split", split);
     AddClassCFunc(array_desc, "trim", trim);
     AddClassCFunc(array_desc, "indexOf", indexOf);
+    AddClassCFunc(array_desc, "replaceAll", replaceAll);
     return array_desc;
+}
+    
+std::string& replace_all(std::string& str, std::string& old_value, std::string& new_value)
+{
+    while (true)
+    {
+        std::string::size_type pos(0);
+        if ((pos = str.find(old_value)) != std::string::npos) {
+            str.replace(pos, old_value.length(),new_value);
+        }
+        else {
+            break;
+        }
+    }
+    return str;
+}
+    
+static Value replaceAll(ExecState *exec_state) {
+    Value ret;
+    do {
+        size_t length = exec_state->GetArgumentCount();
+        if (length < 3) {
+            break;
+        }
+        Value *src = exec_state->GetArgument(0);
+        if (!IsString(src)) {
+            throw VMExecError("replaceAll caller isn't a string");
+        }
+        Value *oldValue = exec_state->GetArgument(1);
+        if (!IsString(oldValue)) {
+            throw VMExecError("old caller isn't a string");
+        }
+        Value *newValue = exec_state->GetArgument(2);
+        if (!IsString(newValue)) {
+            throw VMExecError("split caller isn't a string");
+        }
+        std::string srcstr = CStringValue(src);
+        std::string oldstr = CStringValue(oldValue);
+        std::string newstr = CStringValue(newValue);
+        std::string dststr = replace_all(srcstr, oldstr, newstr);
+        ret = exec_state->string_table()->StringFromUTF8(dststr);
+        
+    } while (0);
+    
+    return ret;
 }
     
 template <class Container>

@@ -42,6 +42,8 @@ std::string("expected a ") + Token::Str(tok)); \
 Advance();  \
 } while (0)
     
+AssignOperation MapAssignOperation(Token& tok);
+    
 class ForInLoopParsingEnvironment {
 public:
     ForInLoopParsingEnvironment(RAXParser *parser)
@@ -109,12 +111,16 @@ Handle<Expression> RAXParser::ParseAssignExpression()
 
     // TODO: information about what kind of assignment is done here should
     //  be stored here. (in the AST?)
+    auto token = lex()->CurrentToken();
+    AssignOperation op = MapAssignOperation(token);
     Advance();
     if (lhs->IsMemberExpression()) {
         lhs->AsMemberExpression()->is_assignment() = true;
     }
     auto rhs = ParseAssignExpression();
-    return builder()->NewAssignExpression((lhs), (rhs));
+    Handle<AssignExpression>expr = builder()->NewAssignExpression((lhs), (rhs));
+    expr->op() = op;
+    return expr;
 }
     
 Handle<Expression> RAXParser::ParseTernaryExpression()
@@ -216,6 +222,21 @@ PrefixOperation MapTokenWithPrefixOperator(Token& tok) {
             LOGE("error prefix opration: %s", tok.view().c_str());
     }
     return PrefixOperation::kUnknown;
+}
+    
+AssignOperation MapAssignOperation(Token& tok) {
+    switch (tok.type()) {
+        case Token::ASSIGN_ADD:
+        return AssignOperation::kAssignAdd;
+        case Token::ASSIGN:
+        return AssignOperation::kAssign;
+        case Token::ASSIGN_SUB:
+        return AssignOperation::kAssignSub;
+        default:
+        LOGE("unexpected token as binary operator %s", tok.view().c_str());
+        throw SyntaxError(tok, "unexpected token as binary operator");
+    }
+    return AssignOperation::kAssign;
 }
     
 Handle<Expression> RAXParser::ParseBinaryExpressionRhs(int prec, Handle<Expression> lhs)
@@ -1249,7 +1270,7 @@ Handle<Expression> RAXParser::ParseProgram()
 {
     Handle<ExpressionList> exprs = builder()->NewExpressionList();
     Handle<ChunkStatement> chunk = builder()->NewChunkStatement(exprs);
-    exprs->Insert(builder()->NewDeclaration(JSX_GLOBAL_VNODE_INDEX, builder()->NewIntegralConstant(0)));
+    exprs->Insert(builder()->NewDeclaration(JSX_GLOBAL_VNODE_INDEX, builder()->NewIntegralConstant(1)));
     exprs->Insert(builder()->NewDeclaration(JS_GLOBAL_ARGUMENTS, builder()->NewArrayConstant({})));
     try {
         while (Peek() != Token::EOS) {

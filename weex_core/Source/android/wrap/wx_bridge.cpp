@@ -19,6 +19,7 @@
 
 #include "android/wrap/wx_bridge.h"
 #include <fstream>
+#include "core/data_render/common_error.h"
 #include "android/base/jni_type.h"
 #include "android/base/jni/jbytearray_ref.h"
 #include "android/base/string/string_utils.h"
@@ -377,23 +378,6 @@ static void RefreshInstance(JNIEnv* env, jobject jcaller, jstring instanceId,
   freeParams(params);
 }
 
-static void FireEventOnRenderNode(JNIEnv* env, jobject jcaller, jstring instanceId,
-                            jstring _namespace, jstring _function,jstring _event,
-                            jstring _ref,
-                            jstring _args) {
-  ScopedJStringUTF8 instance_id(env, instanceId);
-  ScopedJStringUTF8 name_space(env, _namespace);
-  ScopedJStringUTF8 function(env, _function);
-  ScopedJStringUTF8 event(env, _event);
-  ScopedJStringUTF8 ref(env, _ref);
-  ScopedJStringUTF8 args(env, _args);
-
-  weex::core::data_render::VNodeRenderManager::GetInstance()->FireEvent(
-      instance_id.getChars(),
-      event.getChars(),ref.getChars(),args.getChars()
-  );
-}
-
 static jint ExecJSService(JNIEnv* env, jobject object, jstring script) {
   if (script == nullptr) return false;
   ScopedJStringUTF8 source(env, script);
@@ -467,8 +451,8 @@ static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
 
     auto wx_js_object = std::unique_ptr<WXJSObject>(
         new WXJSObject(env, base::android::ScopedLocalJavaRef<jobject>(
-                                env, env->GetObjectArrayElement(args, i))
-                                .Get()));
+            env, env->GetObjectArrayElement(args, i))
+            .Get()));
     addParamsFromJArgs(params, param, env, wx_js_object);
   }
 
@@ -479,7 +463,7 @@ static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
           ->ExecJSWithResult(instance_id.getChars(), name_space.getChars(),
                              function.getChars(), params);
 
-  if(result.get() == nullptr || result->data.get() == nullptr)
+  if (result.get() == nullptr || result->data.get() == nullptr)
     return nullptr;
 
   jbyteArray array = env->NewByteArray(result->length);
@@ -518,8 +502,8 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
   }
   auto arg1 = std::unique_ptr<WXJSObject>(
       new WXJSObject(env, base::android::ScopedLocalJavaRef<jobject>(
-                              env, env->GetObjectArrayElement(args, 1))
-                              .Get()));
+          env, env->GetObjectArrayElement(args, 1))
+          .Get()));
   auto jscript = arg1->GetData(env);
   auto opts = base::android::ScopedLocalJavaRef<jstring>(
       env, getJsonData(env, args, 2));
@@ -528,13 +512,13 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
       env, getJsonData(env, args, 3));
   auto arg4 = std::unique_ptr<WXJSObject>(
       new WXJSObject(env, base::android::ScopedLocalJavaRef<jobject>(
-                              env, env->GetObjectArrayElement(args, 4))
-                              .Get()));
+          env, env->GetObjectArrayElement(args, 4))
+          .Get()));
   // get render strategy
   auto render_strategy = std::unique_ptr<WXJSObject>(
       new WXJSObject(env, base::android::ScopedLocalJavaRef<jobject>(
-                              env, env->GetObjectArrayElement(args, 5))
-                              .Get()));
+          env, env->GetObjectArrayElement(args, 5))
+          .Get()));
   auto japi = arg4->GetData(env);
   ScopedJStringUTF8 scoped_id(env, instanceId);
   ScopedJStringUTF8 scoped_func(env, function);
@@ -550,21 +534,22 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
       && strcmp(scoped_render_strategy.getChars(), "DATA_RENDER_BINARY") == 0) {
     JByteArrayRef byte_array(env, static_cast<jbyteArray>(jscript.Get()));
     return WeexCoreManager::Instance()
-            ->getPlatformBridge()
-            ->core_side()
-            ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
-                             byte_array.getBytes(), byte_array.length(), scoped_opts.getChars(),
-                             scoped_init_data.getChars(), scoped_api.getChars(),
-                             scoped_render_strategy.getChars());
+        ->getPlatformBridge()
+        ->core_side()
+        ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
+                         byte_array.getBytes(), byte_array.length(), scoped_opts.getChars(),
+                         scoped_init_data.getChars(), scoped_api.getChars(),
+                         scoped_render_strategy.getChars());
   } else {
     ScopedJStringUTF8 scoped_script(env, static_cast<jstring>(jscript.Get()));
     return WeexCoreManager::Instance()
-            ->getPlatformBridge()
-            ->core_side()
-            ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
-                             scoped_script.getChars(), strlen(scoped_script.getChars()), scoped_opts.getChars(),
-                             scoped_init_data.getChars(), scoped_api.getChars(),
-                             scoped_render_strategy.getChars());
+        ->getPlatformBridge()
+        ->core_side()
+        ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
+                         scoped_script.getChars(), strlen(scoped_script.getChars()),
+                         scoped_opts.getChars(),
+                         scoped_init_data.getChars(), scoped_api.getChars(),
+                         scoped_render_strategy.getChars());
   }
 
 }
@@ -598,10 +583,54 @@ static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
           ->core_side()
           ->ExecJSOnInstance(idChar.getChars(), scriptChar.getChars());
 
-  if(result.get() == nullptr || result->data.get() == nullptr)
+  if (result.get() == nullptr || result->data.get() == nullptr)
     return nullptr;
 
   return env->NewStringUTF(result->data.get());
+}
+
+static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
+                                      jstring instanceId, jstring ref, jstring type, jstring data) {
+  if (instanceId == NULL || ref == NULL || type == NULL || data == NULL) {
+    return;
+  }
+
+  ScopedJStringUTF8 idChar(env, instanceId);
+  ScopedJStringUTF8 refChar(env, ref);
+  ScopedJStringUTF8 typeChar(env, type);
+  ScopedJStringUTF8 dataChar(env, data);
+
+  try {
+    weex::core::data_render::VNodeRenderManager::GetInstance()->FireEvent(
+        idChar.getChars(), refChar.getChars(), typeChar.getChars(), dataChar.getChars()
+    );
+  } catch (std::exception &e) {
+    auto error = static_cast<weex::core::data_render::Error *>(&e);
+    if (error) {
+      LOGE("Error on FireEventOnDataRenderNode %s", error->what());
+    }
+    return;
+  }
+}
+
+static void RegisterModuleOnDataRenderNode(JNIEnv* env, jobject jcaller,
+                                      jstring data) {
+  if (data == NULL) {
+    return;
+  }
+
+  ScopedJStringUTF8 dataChar(env, data);
+
+  try {
+    weex::core::data_render::VNodeRenderManager::GetInstance()->RegisterModules(dataChar.getChars());
+  } catch (std::exception &e) {
+    auto error = static_cast<weex::core::data_render::Error *>(&e);
+    if (error) {
+      LOGE("Error on RegisterModuleOnDataRenderNode %s", error->what());
+
+    }
+    return;
+  }
 }
 
 namespace WeexCore {
@@ -778,19 +807,19 @@ int WXBridge::AddElement(JNIEnv* env, const char* page_id,
 
   auto jni_margins =
       0 == c_margins[0] && 0 == c_margins[1] && 0 == c_margins[2] &&
-              0 == c_margins[3]
-          ? base::android::ScopedLocalJavaRef<jfloatArray>()
-          : base::android::JNIType::NewFloatArray(env, 4, c_margins);
+      0 == c_margins[3]
+      ? base::android::ScopedLocalJavaRef<jfloatArray>()
+      : base::android::JNIType::NewFloatArray(env, 4, c_margins);
   auto jni_paddings =
       0 == c_paddings[0] && 0 == c_paddings[1] && 0 == c_paddings[2] &&
-              0 == c_paddings[3]
-          ? base::android::ScopedLocalJavaRef<jfloatArray>()
-          : base::android::JNIType::NewFloatArray(env, 4, c_paddings);
+      0 == c_paddings[3]
+      ? base::android::ScopedLocalJavaRef<jfloatArray>()
+      : base::android::JNIType::NewFloatArray(env, 4, c_paddings);
   auto jni_borders =
       0 == c_borders[0] && 0 == c_borders[1] && 0 == c_borders[2] &&
-              0 == c_borders[3]
-          ? base::android::ScopedLocalJavaRef<jfloatArray>()
-          : base::android::JNIType::NewFloatArray(env, 4, c_borders);
+      0 == c_borders[3]
+      ? base::android::ScopedLocalJavaRef<jfloatArray>()
+      : base::android::JNIType::NewFloatArray(env, 4, c_borders);
 
   jstring jni_component_type = getComponentTypeFromCache(component_type);
   if (jni_component_type == nullptr) {
@@ -843,19 +872,19 @@ int WXBridge::CreateBody(JNIEnv* env, const char* page_id,
 
   auto jni_margins =
       0 == c_margins[0] && 0 == c_margins[1] && 0 == c_margins[2] &&
-              0 == c_margins[3]
-          ? base::android::ScopedLocalJavaRef<jfloatArray>()
-          : base::android::JNIType::NewFloatArray(env, 4, c_margins);
+      0 == c_margins[3]
+      ? base::android::ScopedLocalJavaRef<jfloatArray>()
+      : base::android::JNIType::NewFloatArray(env, 4, c_margins);
   auto jni_paddings =
       0 == c_paddings[0] && 0 == c_paddings[1] && 0 == c_paddings[2] &&
-              0 == c_paddings[3]
-          ? base::android::ScopedLocalJavaRef<jfloatArray>()
-          : base::android::JNIType::NewFloatArray(env, 4, c_paddings);
+      0 == c_paddings[3]
+      ? base::android::ScopedLocalJavaRef<jfloatArray>()
+      : base::android::JNIType::NewFloatArray(env, 4, c_paddings);
   auto jni_borders =
       0 == c_borders[0] && 0 == c_borders[1] && 0 == c_borders[2] &&
-              0 == c_borders[3]
-          ? base::android::ScopedLocalJavaRef<jfloatArray>()
-          : base::android::JNIType::NewFloatArray(env, 4, c_borders);
+      0 == c_borders[3]
+      ? base::android::ScopedLocalJavaRef<jfloatArray>()
+      : base::android::JNIType::NewFloatArray(env, 4, c_borders);
 
   jstring jni_component_type = getComponentTypeFromCache(component_type);
   if (jni_component_type == nullptr) {
@@ -1029,7 +1058,7 @@ void WXBridge::ReportNativeInitStatus(JNIEnv* env, const char* statusCode,
 
 void WXBridge::reset_clazz(JNIEnv* env, const char* className) {
   LOGE("class Name is %s", className);
-  Java_WXBridge_reset_clazz(env,className);
+  Java_WXBridge_reset_clazz(env, className);
 }
 
 }  // namespace WeexCore

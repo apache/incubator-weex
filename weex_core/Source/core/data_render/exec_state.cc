@@ -108,9 +108,11 @@ void ExecState::Execute(std::string& err) {
   Value chunk;
   chunk.type = Value::Type::FUNC;
   chunk.f = func_state_.get();
-  **stack_->top() = chunk;
+  // reset stack top pointer when main call
+  *stack_->top() = stack_->base();
+  *stack_->base() = chunk;
   try {
-      CallFunction(*stack_->top(), 0, nullptr);
+      CallFunction(stack_->base(), 0, nullptr);
   } catch (std::exception &e) {
       auto error = static_cast<Error *>(&e);
       if (error) {
