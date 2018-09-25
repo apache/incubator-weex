@@ -40,7 +40,6 @@
 #include "core/render/action/render_action_update_attr.h"
 #include "core/render/action/render_action_update_style.h"
 #include "core/render/action/render_action_trigger_vsync.h"
-#include "core/render/action/render_action_call_native_module.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_type.h"
 #include "core/render/node/render_list.h"
@@ -416,11 +415,6 @@ bool RenderPage::CreateFinish() {
   return true;
 }
     
-void RenderPage::CallNativeModule(const std::string &module,
-                      const std::string &method, const std::string &args, int argc) {
-  SendCallNativeModuleAction(module, method, args, argc);
-}
-
 void RenderPage::LayoutInner() {
   CalculateLayout();
   this->need_layout_.store(false);
@@ -570,12 +564,6 @@ void RenderPage::SendLayoutAction(RenderObject *render, int index) {
   PostRenderAction(action);
 }
     
-void RenderPage::SendCallNativeModuleAction(const std::string &module,
-                                const std::string &method, const std::string &args, int argc) {
-  RenderAction *action = new RenderActionCallNativeModule(page_id(), module, method, args, argc);
-  PostRenderAction(action);
-}
-
 void RenderPage::SendUpdateStyleAction(
     RenderObject *render,
     std::vector<std::pair<std::string, std::string>> *style,

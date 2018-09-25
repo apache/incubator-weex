@@ -334,20 +334,25 @@ void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string
         
     } while (0);
 }
-    
-void VNodeRenderManager::CallNativeModule(ExecState *exec_state, const std::string &module, const std::string &method, const std::string &args, int argc) {
-    do {
-        for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {
-            if (iter->second == exec_state) {
-                RenderManager::GetInstance()->CallNativeModule(iter->first, module, method, args, argc);
-                break;
-            }
-        }
-        
-    } while (0);
 
+void VNodeRenderManager::CallNativeModule(ExecState* exec_state,
+                                          const std::string& module,
+                                          const std::string& method,
+                                          const std::string& args, int argc) {
+  for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {
+    if (iter->second == exec_state) {
+      WeexCoreManager::Instance()
+          ->getPlatformBridge()
+          ->platform_side()
+          ->CallNativeModule(iter->first.c_str(), module.c_str(),
+                             method.c_str(),
+                             args.length() > 0 ? args.c_str() : nullptr,
+                             static_cast<int>(args.length()), nullptr, 0);
+      break;
+    }
+  }
 }
-    
+
 void VNodeRenderManager::PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node) {
     do {
         for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {
