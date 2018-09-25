@@ -152,10 +152,26 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     _needLayout = NO;
     _isAnimationedSuccess = YES;
     WXPerformBlockOnComponentThread(^{
-        NSArray *stringArray = [nodeRef componentsSeparatedByString:@"@"];
-        if ([stringArray count] == 0) {
+        if (nodeRef == nil || ![nodeRef isKindOfClass:[NSString class]] ||
+            ![args isKindOfClass:[NSDictionary class]]) {
+            if (callback) {
+                NSDictionary *message = @{@"result":@"Fail",
+                                          @"message":@"Argument type error."};
+                callback(message, NO);
+            }
             return;
         }
+        
+        NSArray *stringArray = [nodeRef componentsSeparatedByString:@"@"];
+        if ([stringArray count] == 0) {
+            if (callback) {
+                NSDictionary *message = @{@"result":@"Fail",
+                                          @"message":@"Node ref format error."};
+                callback(message, NO);
+            }
+            return;
+        }
+        
         WXComponent *targetComponent = [self.weexInstance componentForRef:stringArray[0]];
         if (!targetComponent) {
             if (callback) {
