@@ -399,7 +399,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         int screenH = WXViewUtils.getScreenHeight(WXEnvironment.sApplication);
         int weexH = WXViewUtils.getWeexHeight(getInstanceId());
         int outHeight = height > (weexH >= screenH ? screenH : weexH) ? weexH - getAbsoluteY() : height;
-        return super.measure((int)(width+mColumnGap), outHeight);
+        return super.measure(width, outHeight);
     }
 
 
