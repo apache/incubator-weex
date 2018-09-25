@@ -38,11 +38,6 @@
 - (void)adjustSticky;
 
 /**
- * @abstract adjust for RTL
- */
-- (void)adjustForRTL;
-
-/**
  * @abstract add scroll listener
  */
 - (void)addScrollToListener:(WXComponent *)target;
@@ -78,7 +73,13 @@
 - (WXScrollDirection)scrollDirection;
 
 @optional
+
 - (NSString*)refreshType;
 - (BOOL)requestGestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch;
+/**
+ * @abstract adjust for RTL
+ */
+- (void)adjustForRTL;
+
 @end
 
