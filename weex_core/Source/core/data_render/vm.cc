@@ -139,17 +139,21 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         break;
 
       case OP_DIV:
-        a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
-        c = frame.reg + GET_ARG_C(instruction);
-        if (IsInt(b) && IsInt(c)) {
-          SetIValue(a, static_cast<int>(NUM_OP(/, IntValue(b), IntValue(c))));
-        } else if (ToNum(b, d1) && ToNum(c, d2)) {
-          SetDValue(a, NUM_OP(/, IntValue(b), IntValue(c)));
-        } else {
-          LOGE("Unspport Type[%d,%d] with OP_CODE[OP_DIV]", b->type, c->type);
-        }
-        break;
+          a = frame.reg + GET_ARG_A(instruction);
+          b = frame.reg + GET_ARG_B(instruction);
+          c = frame.reg + GET_ARG_C(instruction);
+          if (IsInt(b) && IsInt(c)) {
+              SetIValue(a, static_cast<int>(NUM_OP(/, IntValue(b), IntValue(c))));
+          } else if (ToNum(b, d1) && ToNum(c, d2)) {
+              SetDValue(a, NUM_OP(/, IntValue(b), IntValue(c)));
+          } else if (IsInt(c) && IsString(b)) {
+              int64_t bval = 0;
+              ToInteger(b, 0, bval);
+              SetIValue(a, static_cast<int>(NUM_OP(/, bval, IntValue(c))));
+          } else {
+              LOGE("Unspport Type[%d,%d] with OP_CODE[OP_DIV]", b->type, c->type);
+          }
+          break;
 
       case OP_IDIV:
         a = frame.reg + GET_ARG_A(instruction);
