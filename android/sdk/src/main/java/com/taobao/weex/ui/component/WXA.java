@@ -27,7 +27,7 @@ import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.ATagUtil;
 
 @Component(lazyload = false)
-public class WXA extends WXDiv implements WXComponent.OnClickListener {
+public class WXA extends WXDiv {
 
   @Deprecated
   public WXA(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
@@ -40,7 +40,16 @@ public class WXA extends WXDiv implements WXComponent.OnClickListener {
 
   @Override
   protected void onHostViewInitialized(WXFrameLayout host) {
-    addClickListener(this);
+    addClickListener(new OnClickListener() {
+      @Override
+      public void onHostViewClick() {
+        String href;
+        WXAttr attr = getAttrs();
+        if (attr !=null && (href = (String)attr.get("href")) != null) {
+          ATagUtil.onClick(null, getInstanceId(), href);
+        }
+      }
+    });
     super.onHostViewInitialized(host);
   }
 
@@ -51,14 +60,5 @@ public class WXA extends WXDiv implements WXComponent.OnClickListener {
         return true;
     }
     return super.setProperty(key, param);
-  }
-
-  @Override
-  public void onHostViewClick() {
-    String href;
-    WXAttr attr = getAttrs();
-    if (attr !=null && (href = (String)attr.get("href")) != null) {
-      ATagUtil.onClick(null, getInstanceId(), href);
-    }
   }
 }

@@ -26,19 +26,8 @@ namespace WeexCore {
 class IRenderObject;
 
 class RenderCreator {
-
-  public:
-   void setSegmentSwitch(bool segmentSwitch){
-     _segmentSwitch = segmentSwitch;
-   }
-
-    bool isSegmentSwitchOpen(){
-      return _segmentSwitch;
-    }
  private:
-  RenderCreator() {
-      _segmentSwitch = false;
-  }
+  RenderCreator() {}
 
   ~RenderCreator() {}
 
@@ -65,7 +54,6 @@ class RenderCreator {
   IRenderObject *CreateRender(const std::string &type, const std::string &ref);
 
  private:
-  bool _segmentSwitch;
   static RenderCreator *g_pInstance;
 };
 }  // namespace WeexCore

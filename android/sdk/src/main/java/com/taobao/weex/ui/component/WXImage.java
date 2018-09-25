@@ -320,13 +320,21 @@ public class WXImage extends WXComponent<ImageView> {
       @Override
       public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
         if (getEvents().contains(Constants.Event.ONLOAD)) {
-          int width = 0;
-          int height = 0;
+          Map<String, Object> params = new HashMap<String, Object>();
+          Map<String, Object> size = new HashMap<>(2);
           if (imageView != null && imageView instanceof Measurable) {
-               width =  ((Measurable) imageView).getNaturalWidth();
-               height = ((Measurable) imageView).getNaturalHeight();
+            size.put("naturalWidth", ((Measurable) imageView).getNaturalWidth());
+            size.put("naturalHeight", ((Measurable) imageView).getNaturalHeight());
+          } else {
+            size.put("naturalWidth", 0);
+            size.put("naturalHeight", 0);
           }
-          fireImageOnLoad(width, height, result);
+
+          if (containsEvent(Constants.Event.ONLOAD)) {
+            params.put("success", result);
+            params.put("size", size);
+            fireEvent(Constants.Event.ONLOAD, params);
+          }
         }
         monitorImgSize(imageView,rewritedStr);
       }
@@ -453,20 +461,6 @@ public class WXImage extends WXComponent<ImageView> {
         }
       }
     });
-  }
-
-  public void fireImageOnLoad(int width, int height, boolean result){
-    if (getEvents().contains(Constants.Event.ONLOAD)) {
-      Map<String, Object> params = new HashMap<String, Object>();
-      Map<String, Object> size = new HashMap<>(2);
-      size.put("naturalWidth", width);
-      size.put("naturalHeight", height);
-      if (containsEvent(Constants.Event.ONLOAD)) {
-        params.put("success", result);
-        params.put("size", size);
-        fireEvent(Constants.Event.ONLOAD, params);
-      }
-    }
   }
 
   private String preImgUrlStr = "";
