@@ -472,7 +472,7 @@ _Pragma("clang diagnostic pop") \
                 JSValueRef jsException = NULL;
                 JSObjectRef instanceContextObjectRef = JSValueToObject(contextRef, instanceContextEnvironment.JSValueRef, &jsException);
                 if (jsException != NULL) {
-                    WXLogError(@"JSValueToObject Exception");
+                    WXLogError(@"JSValueToObject Exception during create instance.");
                 }
                 BOOL somethingWrong = NO;
                 NSMutableArray* allKeys = nil;
