@@ -203,5 +203,4 @@ public interface IWXBridge extends IWXObject {
 
   void fireEventOnDataRenderNode(String instanceId, String ref, String type, String data);
 
-  void registerModuleOnDataRenderNode(String data);
 }

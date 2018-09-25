@@ -239,7 +239,9 @@ public class WXBridge implements IWXBridge {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       JSONArray argArray = null;
       if (arguments != null){
-        if (instance!=null && instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER){
+        // TODO use a better way
+        if (instance!=null && (instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
+                || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY)){
           argArray = (JSONArray) JSON.parse(new String(arguments, "UTF-8"));
         } else {
           argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
@@ -699,7 +701,6 @@ public class WXBridge implements IWXBridge {
     nativeFireEventOnDataRenderNode(instanceId,ref,type,data);
   }
 
-  @Override
   public void registerModuleOnDataRenderNode(String data) {
     nativeRegisterModuleOnDataRenderNode(data);
   }

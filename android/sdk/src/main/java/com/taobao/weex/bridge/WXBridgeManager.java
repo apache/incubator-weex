@@ -2108,7 +2108,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXJSObject[] args = {WXWsonJSONSwitch.toWsonOrJsonWXJSObject(modules)};
     String errorMsg = null;
     try{
-      mWXBridge.registerModuleOnDataRenderNode(WXJsonUtils.fromObjectToJSONString(modules));
+      // TODO use a better way
+      if (mWXBridge instanceof WXBridge) {
+        ((WXBridge) mWXBridge).registerModuleOnDataRenderNode(WXJsonUtils.fromObjectToJSONString(modules));
+      }
     } catch (Throwable e){
       WXLogUtils.e("Weex [data_render register err]", e);
     }

@@ -332,7 +332,6 @@ static size_t g_node_id = 0;
 
 // createElement("tag_name", "id", ref);
 static Value CreateElement(ExecState *exec_state) {
-    size_t argc = exec_state->GetArgumentCount();
     std::string tag_name = exec_state->GetArgument(0)->str->c_str();
     Value *arg_id = exec_state->GetArgument(1);
     std::string arg_id_str;
@@ -348,15 +347,10 @@ static Value CreateElement(ExecState *exec_state) {
         throw VMExecError("CreateElement only support int for string");
     }
     std::string node_id,ref;
-    if (argc > 2) {
-        node_id = arg_id_str;
-    }
-    else {
-        std::ostringstream os;
-        os << g_node_id++;
-        node_id = "vn_" + os.str();
-        ref = arg_id_str;
-    }
+    std::ostringstream os;
+    os << g_node_id++;
+    node_id = "vn_" + os.str();
+    ref = arg_id_str;
     if (exec_state->GetArgumentCount() > 2 && exec_state->GetArgument(2)->type == Value::Type::STRING) {
         ref = exec_state->GetArgument(2)->str->c_str();
     }
