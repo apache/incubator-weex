@@ -187,6 +187,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 - (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index;
 
 - (void)_removeFromSupercomponent;
+- (void)_removeFromSupercomponent:(BOOL)remove;
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index;
 
 - (BOOL)_isTransitionNone;
