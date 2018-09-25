@@ -467,59 +467,65 @@ _Pragma("clang diagnostic pop") \
                     }
                 }
                 
-                JSContextRef contextRef = instanceContextEnvironment.context.JSGlobalContextRef;
-                WXAssert([instanceContextEnvironment isObject], @"Invalid instance context.");
-                JSValueRef jsException = NULL;
-                JSObjectRef instanceContextObjectRef = JSValueToObject(contextRef, instanceContextEnvironment.JSValueRef, &jsException);
-                if (jsException != NULL) {
-                    WXLogError(@"JSValueToObject Exception during create instance.");
-                }
-                BOOL somethingWrong = NO;
                 NSMutableArray* allKeys = nil;
-                if (instanceContextObjectRef != NULL) {
-                    JSPropertyNameArrayRef allKeyRefs = JSObjectCopyPropertyNames(contextRef, instanceContextObjectRef);
-                    size_t keyCount = JSPropertyNameArrayGetCount(allKeyRefs);
-                    
-                    allKeys = [[NSMutableArray alloc] initWithCapacity:keyCount];
-                    for (size_t i = 0; i < keyCount; i ++) {
-                        JSStringRef nameRef = JSPropertyNameArrayGetNameAtIndex(allKeyRefs, i);
-                        size_t len = JSStringGetMaximumUTF8CStringSize(nameRef);
-                        if (len > 1024) {
-                            somethingWrong = YES;
-                            break;
-                        }
-                        char* buf = (char*)malloc(len + 5);
-                        if (buf == NULL) {
-                            somethingWrong = YES;
-                            break;
-                        }
-                        bzero(buf, len + 5);
-                        if (JSStringGetUTF8CString(nameRef, buf, len + 5) > 0) {
-                            NSString* keyString = [NSString stringWithUTF8String:buf];
-                            if ([keyString length] == 0) {
+                
+                if ([WXUtility useJSCApiForCreateInstance]) {
+                    JSContextRef contextRef = instanceContextEnvironment.context.JSGlobalContextRef;
+                    WXAssert([instanceContextEnvironment isObject], @"Invalid instance context.");
+                    JSValueRef jsException = NULL;
+                    JSObjectRef instanceContextObjectRef = JSValueToObject(contextRef, instanceContextEnvironment.JSValueRef, &jsException);
+                    if (jsException != NULL) {
+                        WXLogError(@"JSValueToObject Exception during create instance.");
+                    }
+                    BOOL somethingWrong = NO;
+                    if (instanceContextObjectRef != NULL) {
+                        JSPropertyNameArrayRef allKeyRefs = JSObjectCopyPropertyNames(contextRef, instanceContextObjectRef);
+                        size_t keyCount = JSPropertyNameArrayGetCount(allKeyRefs);
+                        
+                        allKeys = [[NSMutableArray alloc] initWithCapacity:keyCount];
+                        for (size_t i = 0; i < keyCount; i ++) {
+                            JSStringRef nameRef = JSPropertyNameArrayGetNameAtIndex(allKeyRefs, i);
+                            size_t len = JSStringGetMaximumUTF8CStringSize(nameRef);
+                            if (len > 1024) {
+                                somethingWrong = YES;
+                                break;
+                            }
+                            char* buf = (char*)malloc(len + 5);
+                            if (buf == NULL) {
+                                somethingWrong = YES;
+                                break;
+                            }
+                            bzero(buf, len + 5);
+                            if (JSStringGetUTF8CString(nameRef, buf, len + 5) > 0) {
+                                NSString* keyString = [NSString stringWithUTF8String:buf];
+                                if ([keyString length] == 0) {
+                                    somethingWrong = YES;
+                                    free(buf);
+                                    break;
+                                }
+                                [allKeys addObject:keyString];
+                            }
+                            else {
                                 somethingWrong = YES;
                                 free(buf);
                                 break;
                             }
-                            [allKeys addObject:keyString];
-                        }
-                        else {
-                            somethingWrong = YES;
                             free(buf);
-                            break;
                         }
-                        free(buf);
+                        JSPropertyNameArrayRelease(allKeyRefs);
+                    } else {
+                        somethingWrong = YES;
                     }
-                    JSPropertyNameArrayRelease(allKeyRefs);
-                } else {
-                    somethingWrong = YES;
+                    
+                    if (somethingWrong) {
+                        // [instanceContextEnvironment toDictionary] may contain retain-cycle.
+                        allKeys = (NSMutableArray*)[[instanceContextEnvironment toDictionary] allKeys];
+                    }
                 }
-                
-                if (somethingWrong) {
-                    // [instanceContextEnvironment toDictionary] may contain retain-cycle.
+                else {
                     allKeys = (NSMutableArray*)[[instanceContextEnvironment toDictionary] allKeys];
                 }
-                
+
                 sdkInstance.createInstanceContextResult = [NSString stringWithFormat:@"%@", allKeys];
                 JSGlobalContextRef instanceContextRef = sdkInstance.instanceJavaScriptContext.javaScriptContext.JSGlobalContextRef;
                 JSObjectRef instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
