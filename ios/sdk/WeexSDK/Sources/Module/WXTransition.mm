@@ -36,7 +36,6 @@
 
 @interface WXTransition()
 {
-    WXComponent *_targetComponent;
     double ax;
     double bx;
     double cx;
@@ -55,7 +54,7 @@
     NSMutableDictionary *_filterStyles;
     NSMutableDictionary *_oldFilterStyles;
 }
-
+@property (nonatomic,weak) WXComponent *targetComponent;
 @end
 
 @implementation WXTransition
@@ -100,6 +99,10 @@
         [self _suspendTransitionDisplayLink];
     }
     
+    if (!targetComponent) {
+        return;
+    }
+    
     _filterStyles = _filterStyles ?:[NSMutableDictionary new];
     _oldFilterStyles = _oldFilterStyles ?: [NSMutableDictionary new];
     NSMutableDictionary *futileStyles = [NSMutableDictionary new];
@@ -125,11 +128,10 @@
         }
     }
     [self updateFutileStyles:futileStyles resetStyles:nil target:targetComponent];
-
+    
     _targetComponent = targetComponent;
     NSMutableDictionary *componentStyles = [NSMutableDictionary dictionaryWithDictionary:styles];
     [componentStyles addEntriesFromDictionary:targetComponent.styles];
-
     _transitionDuration = componentStyles[kWXTransitionDuration] ? [WXConvert CGFloat:componentStyles[kWXTransitionDuration]] : 0;
     _transitionDelay = componentStyles[kWXTransitionDelay] ? [WXConvert CGFloat:componentStyles[kWXTransitionDelay]] : 0;
     _transitionTimingFunction = [WXConvert CAMediaTimingFunction:componentStyles[kWXTransitionTimingFunction]];
@@ -162,6 +164,9 @@
 
 - (void)updateFutileStyles:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles target:(WXComponent *)targetComponent
 {
+    if (!targetComponent) {
+        return;
+    }
     [targetComponent _updateCSSNodeStyles:styles];
     [targetComponent _resetCSSNodeStyles:resetStyles];
     WXPerformBlockOnMainThread(^{
@@ -204,7 +209,7 @@
         else if ([singleProperty isEqualToString:@"transform"]) {
             NSString *transformOrigin = _filterStyles[@"transformOrigin"];
             WXTransform *wxTransform = [[WXTransform alloc] initWithCSSValue:_filterStyles[singleProperty] origin:transformOrigin instance:_targetComponent.weexInstance];
-            WXTransform *oldTransform = _targetComponent->_transform;
+            WXTransform *oldTransform = _targetComponent?_targetComponent->_transform:wxTransform;
             if (wxTransform.rotateAngle != oldTransform.rotateAngle) {
                 WXTransitionInfo *info = [WXTransitionInfo new];
                 info.propertyName = @"transform.rotation";
@@ -304,6 +309,10 @@
 
 - (void)_calculatetransitionProcessingStyle
 {
+    if (_targetComponent == nil) {
+        return;
+    }
+    
     if (_propertyArray.count == 0) {
         return;
     }
@@ -356,11 +365,11 @@
                 transformString = [transformString stringByAppendingFormat:@" %@",newString];
             }
             if ([info.propertyName isEqualToString:@"transform.translation.x"]) {
-                newString = [NSString stringWithFormat:@"translateX(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+                newString = [NSString stringWithFormat:@"translateX(%lfpx)",currentValue / (_targetComponent.weexInstance.pixelScaleFactor?_targetComponent.weexInstance.pixelScaleFactor:[WXUtility defaultPixelScaleFactor])];
                 transformString = [transformString stringByAppendingFormat:@" %@",newString];
             }
             if ([info.propertyName isEqualToString:@"transform.translation.y"]) {
-                newString = [NSString stringWithFormat:@"translateY(%lfpx)",currentValue / _targetComponent.weexInstance.pixelScaleFactor];
+                newString = [NSString stringWithFormat:@"translateY(%lfpx)",currentValue / (_targetComponent.weexInstance.pixelScaleFactor?_targetComponent.weexInstance.pixelScaleFactor:[WXUtility defaultPixelScaleFactor])];
                 transformString = [transformString stringByAppendingFormat:@" %@",newString];
             }
             [_oldFilterStyles setObject:transformString forKey:@"transform"];
