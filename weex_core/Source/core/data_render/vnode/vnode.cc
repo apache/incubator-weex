@@ -78,15 +78,15 @@ void VNode::AddEvent(const std::string &event, void *func, void *inst) {
     inst_ = inst;
 }
     
-VNode *VNode::FindNode(const std::string &node_id) {
+VNode *VNode::FindNode(const std::string &render_object_ref) {
     VNode *node = nullptr;
     do {
-        if (this->node_id() == node_id) {
+        if (this->render_object_ref() == render_object_ref) {
             node = this;
             break;
         }
         for (int i = 0; i < child_list_.size(); i++) {
-            node = child_list_[i]->FindNode(node_id);
+            node = child_list_[i]->FindNode(render_object_ref);
             if (node) {
                 break;
             }
