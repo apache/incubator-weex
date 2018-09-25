@@ -205,6 +205,11 @@ bool ValueGT(const Value *a, const Value *b) {
     else if (ToNum(a, d1) && ToNum(b, d2)) {
         return NumGT(d1, d2);
     }
+    else if (IsInt(b) && IsString(a)) {
+        int64_t aval = 0;
+        ToInteger(a, 0, aval);
+        return aval > IntValue(b);
+    }
     else {
         return false;
     }
