@@ -50,7 +50,7 @@ class VNode {
     
   void InsertChild(VNode *child, int index);
 
-  VNode *FindNode(const std::string &node_id);
+  VNode *FindNode(const std::string &render_object_ref);
 
  public:
   inline const std::string &tag_name() const { return tag_name_; }
