@@ -408,9 +408,7 @@ bool RenderPage::CreateFinish() {
   SendCreateFinishAction();
   // RenderSuccess means the Dom created after executing script finishes layout
   // and render, it will be trigger even though body not yet attaches to parent.
-#ifdef OS_ANDROID
   LayoutInner();
-#endif
   SendRenderSuccessAction();
   return true;
 }
