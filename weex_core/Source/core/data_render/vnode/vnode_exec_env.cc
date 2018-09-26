@@ -407,8 +407,12 @@ static Value AppendChild(ExecState *exec_state) {
             }
         }
         else if (IsString(childrens) && parent) {
-            LOGD("[VM][VNode][AppendChild]:string:%s\n", CStringValue(childrens));
-            parent->SetAttribute("value", CStringValue(childrens));
+            std::string value = CStringValue(childrens);
+            if (value == "\\ue7f4") {
+                value = "\ue7f4";
+            }
+            LOGD("[VM][VNode][AppendChild]:string:%s\n", value.c_str());
+            parent->SetAttribute("value", value);
         }
         else {
             VNode *children = reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);

@@ -221,10 +221,6 @@ namespace WeexCore
     {
         // should not enter this function
         do {
-            RenderPage *page = RenderManager::GetInstance()->GetPage(page_id);
-            if (page == nullptr) {
-                break;
-            }
             NSString *instanceId = NSSTRING(page_id);
             WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
             if (!instance) {

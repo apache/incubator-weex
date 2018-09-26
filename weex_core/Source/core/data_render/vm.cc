@@ -150,6 +150,11 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
               int64_t bval = 0;
               ToInteger(b, 0, bval);
               SetIValue(a, static_cast<int>(NUM_OP(/, bval, IntValue(c))));
+          } else if (IsString(c) && IsString(b)) {
+              int64_t bval = 0, cval = 0;
+              ToInteger(b, 0, bval);
+              ToInteger(c, 0, cval);
+              SetIValue(a, static_cast<int>(NUM_OP(/, bval, cval)));
           } else {
               LOGE("Unspport Type[%d,%d] with OP_CODE[OP_DIV]", b->type, c->type);
           }
