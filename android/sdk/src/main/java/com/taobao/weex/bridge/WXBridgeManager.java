@@ -999,20 +999,21 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           WXJSObject[] jsArgs = {
                   new WXJSObject(WXJSObject.String, instanceId),
                   WXWsonJSONSwitch.toWsonOrJsonWXJSObject(tasks)};
-          byte[] taskResult = invokeExecJSWithResult(String.valueOf(instanceId), null, METHOD_CALL_JS, jsArgs, true);
-          if(eventCallback == null){
-            return;
+          ResultCallback<byte[]> resultCallback = null;
+          if (eventCallback != null) {
+            resultCallback = new ResultCallback<byte[]>() {
+              @Override
+              public void onReceiveResult(byte[] result) {
+                JSONArray arrayResult = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(result);
+                if(arrayResult != null && arrayResult.size() > 0){
+                  eventCallback.onCallback(arrayResult.get(0));
+                }
+              }
+            };
           }
-          if(taskResult != null){
-            JSONArray arrayResult = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(taskResult);
-            if(arrayResult != null && arrayResult.size() > 0){
-              result = arrayResult.get(0);
-            }
-          }
-          eventCallback.onCallback(result);
+          invokeExecJSWithCallback(String.valueOf(instanceId), null, METHOD_CALL_JS,
+                  jsArgs, resultCallback, true);
           jsArgs[0] = null;
-          taskResult = null;
-          jsArgs = null;
         }catch (Exception e){
           WXLogUtils.e("asyncCallJSEventWithResult" , e);
         }
@@ -1741,8 +1742,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return null;
   }
 
-  private byte[] invokeExecJSWithResult(String instanceId, String namespace, String function,
-                                        WXJSObject[] args,boolean logTaskDetail){
+  private void invokeExecJSWithCallback(String instanceId, String namespace, String function,
+                                        WXJSObject[] args , ResultCallback callback, boolean logTaskDetail){
     if (WXEnvironment.isOpenDebugLog() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
               .append("function:").append(function);
@@ -1753,9 +1754,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mLodBuilder.setLength(0);
     }
     if (isJSFrameworkInit()) {
-      return mWXBridge.execJSWithResult(instanceId, namespace, function, args);
+      mWXBridge.execJSWithCallback(instanceId, namespace, function, args, callback);
     }
-    return null;
   }
 
   public @NonNull static String argsToJSON(WXJSObject[] args) {

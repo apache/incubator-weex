@@ -28,6 +28,7 @@
 #include "android/base/jni/scoped_java_ref.h"
 #include "android/wrap/jni_object_wrap.h"
 #include "base/common.h"
+#include "include/WeexApiHeader.h"
 
 namespace WeexCore {
 class WXCoreMargin;
@@ -103,6 +104,8 @@ class WXBridge : public JNIObjectWrap {
                          const char *info);
   void ReportNativeInitStatus(JNIEnv *env, const char *statusCode,
                               const char *errorMsg);
+  void OnReceivedResult(JNIEnv *env, long callback_id,
+                        std::unique_ptr<WeexJSResult> &result);
 
   void reset_clazz(JNIEnv* env, const char* className);
  private:

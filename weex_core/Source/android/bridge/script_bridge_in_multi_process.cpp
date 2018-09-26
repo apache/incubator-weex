@@ -906,6 +906,31 @@ std::unique_ptr<IPCResult> HandleDispatchMessage(IPCArguments *arguments) {
   return createInt32Result(static_cast<int32_t>(true));
 }
 
+std::unique_ptr<IPCResult> OnReceivedResult(IPCArguments *arguments) {
+  long callback_id = arguments->get<long>(0);
+  std::unique_ptr<WeexJSResult> result;
+  result.reset(new WeexJSResult);
+  if (arguments->getType(1) == IPCType::BYTEARRAY &&
+      arguments->getByteArray(1)->length > 0) {
+    result->length = arguments->getByteArray(1)->length;
+    char *string = new char[result->length + 1];
+    result->data.reset(string);
+    memset(string, 0, result->length);
+    memcpy(string, arguments->getByteArray(1)->content, result->length);
+    string[result->length] = '\0';
+  }
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+      weex::base::MakeCopyable([callback_id, result = std::move(result)]() {
+        WeexCoreManager::Instance()
+            ->script_bridge()
+            ->core_side()
+            ->OnReceivedResult(
+                callback_id,
+                const_cast<std::unique_ptr<WeexJSResult> &>(result));
+      }));
+  return createInt32Result(static_cast<int32_t>(true));
+}
+
 ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   set_script_side(new bridge::script::ScriptSideInMultiProcess);
   set_core_side(new CoreSideInScript);
@@ -995,6 +1020,8 @@ void ScriptBridgeInMultiProcess::RegisterIPCCallback(IPCHandler *handler) {
                            HandlePostMessage);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::DISPATCHMESSAGE),
                            HandleDispatchMessage);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::ONRECEIVEDRESULT),
+                           OnReceivedResult);
 }
 
 }  // namespace WeexCore
