@@ -276,17 +276,17 @@ public class WXInstanceApm {
             hasRecordFistInteractionView = true;
         }
 
-        long curTIme = WXUtils.getFixUnixTime();
+        long curTime = WXUtils.getFixUnixTime();
 
         if (BuildConfig.DEBUG){
             Log.d("wxapm", "screenComponent ["+targetComponent.getComponentType()+","+targetComponent.getRef()
-                +"], renderTime:"+ (curTIme -performanceRecord.renderTimeOrigin)
+                +"], renderTime:"+ (curTime -performanceRecord.renderUnixTimeOrigin)
                 +",style:"+targetComponent.getStyles()
                 +",attrs:"+targetComponent.getAttrs());
         }
 
-        performanceRecord.interactionTime = curTIme - performanceRecord.renderTimeOrigin;
-        onStageWithTime(KEY_PAGE_STAGES_INTERACTION,curTIme);
+        performanceRecord.interactionTime = curTime - performanceRecord.renderUnixTimeOrigin;
+        onStageWithTime(KEY_PAGE_STAGES_INTERACTION,curTime);
 
         updateDiffStats(KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT, 1);
         updateMaxStats(KEY_PAGE_STATS_I_ALL_VIEW_COUNT, performanceRecord.localInteractionViewAddCount);
