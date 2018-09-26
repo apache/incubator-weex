@@ -24,7 +24,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.ui.component.document.WXDocumentComponent;
 
 public class GraphicActionRemoveElement extends BasicGraphicAction {
 
@@ -38,14 +37,6 @@ public class GraphicActionRemoveElement extends BasicGraphicAction {
     if (component == null || component.getParent() == null || component.getInstance() == null) {
       return;
     }
-
-    if(component.getInstance().isHasDocumentSegment()) {
-      WXDocumentComponent documentComponent = WXDocumentComponent.getDocument(component);
-      if (documentComponent != null) {
-        documentComponent.actionRemoveElement(getRef());
-      }
-    }
-
     clearRegistryForComponent(component);
     WXVContainer parent = component.getParent();
 

@@ -26,7 +26,6 @@
 #include "core/render/node/factory/render_text_factory.h"
 #include "core/render/node/factory/render_type.h"
 #include "core/render/node/factory/simple_render_factory.h"
-#include "core/render/node/factory/render_document_factory.h"
 
 namespace WeexCore {
 
@@ -46,8 +45,6 @@ IRenderObject *RenderCreator::CreateRender(const std::string &type,
     factory = new RenderScrollerFactory();
   } else if (type == kRenderAppBar) {
     factory = new RenderAppBarFactory();
-  } else if (type == kRenderDocument) {
-    factory = new RenderDocumentFactory();
   } else {
     factory = new RenderCommonFactory();
   }

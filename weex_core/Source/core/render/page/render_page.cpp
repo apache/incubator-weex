@@ -18,7 +18,6 @@
  */
 
 #include "core/render/page/render_page.h"
-#include "core/render/node/render_document.h"
 #include "base/TimeUtils.h"
 #include "base/ViewUtils.h"
 #include "base/LogDefines.h"
@@ -43,7 +42,6 @@
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_type.h"
 #include "core/render/node/render_list.h"
-#include "core/render/node/render_document.h"
 #include "core/render/node/render_object.h"
 
 namespace WeexCore {
@@ -233,7 +231,7 @@ bool RenderPage::UpdateStyle(
   // Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId.c_str(),
   // ref.c_str(), src);
 
-  if (result == 1 || WeexCore::isRenderDocumentChild(render)) {
+  if (result == 1) {
     SendUpdateStyleAction(render, src, margin, padding, border);
   } else {
     for (auto iter = src->begin(); iter != src->end(); iter++) {
@@ -487,15 +485,9 @@ void RenderPage::SendCreateBodyAction(RenderObject *render) {
 void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent,
                                       int index, bool is_recursion,
                                       bool will_layout) {
-
   if (child == nullptr || parent == nullptr) return;
   if (parent != nullptr && parent->type() == WeexCore::kRenderRecycleList) {
     will_layout = false;
-  }
-
-  if(WeexCore::isRenderDocumentChild(parent)){
-      will_layout = false;
-      child->setIsSegmentChild(true);
   }
 
   RenderAction *action =
@@ -523,19 +515,6 @@ void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent,
       ++i;
     }
   }
-
-  if (child->type() == WeexCore::kRenderDocument) {
-    RenderDocument *render_document = static_cast<RenderDocument*>(child);
-    std::vector<RenderObject *> &documentChilds = render_document->GetDocumentChilds();
-    for (auto it = documentChilds.begin(); it != documentChilds.end(); it++) {
-      RenderObject *grandson = static_cast<RenderObject *>(*it);
-      if (grandson != nullptr) {
-        SendAddElementAction(grandson, child, -1, true, will_layout);
-      }
-      ++i;
-    }
-  }
-
 
   if (!is_recursion && i > 0 && child->IsAppendTree()) {
     SendAppendTreeCreateFinish(child->ref());

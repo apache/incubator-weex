@@ -23,7 +23,6 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.document.WXDocumentComponent;
 
 /**
  * Created by listen on 18/01/11.
@@ -31,19 +30,10 @@ import com.taobao.weex.ui.component.document.WXDocumentComponent;
 public class GraphicActionAddEvent extends BasicGraphicAction {
 
   private final String mEvent;
-  private WXDocumentComponent documentComponent;
-
 
   public GraphicActionAddEvent(WXSDKInstance instance, String ref, Object event) {
     super(instance, ref);
     this.mEvent = WXEvent.getEventName(event);
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
-    if(instance.isHasDocumentSegment()) {
-      documentComponent = WXDocumentComponent.getDocument(component);
-      if (documentComponent != null) {
-        documentComponent.actionAddEvent(ref, event);
-      }
-    }
   }
 
   @Override
@@ -58,9 +48,6 @@ public class GraphicActionAddEvent extends BasicGraphicAction {
       component.getEvents().addEvent(mEvent);
     }
     component.addEvent(mEvent);
-    if(documentComponent != null){
-        documentComponent.updateWatchComponentStatus();
-    }
     Stopwatch.split("addEventToComponent");
   }
 }

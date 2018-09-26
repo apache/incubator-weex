@@ -150,8 +150,6 @@ static void RegisterCoreEnv(JNIEnv* env, jobject jcaller,
 static void ResetWXBridge(JNIEnv* env, jobject jcaller,
     jobject bridge,
     jstring className);
-static void SetSegmentSwitch(JNIEnv* env, jobject jcaller,
-    jboolean segmentSwitch);
 
 static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
     jstring config);
@@ -1076,11 +1074,6 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(ResetWXBridge) },
-    { "nativeSetSegmentSwitch",
-"("
-"Z"
-")"
-"V", reinterpret_cast<void*>(SetSegmentSwitch) },
     { "nativeUpdateGlobalConfig",
 "("
 "Ljava/lang/String;"

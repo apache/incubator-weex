@@ -34,7 +34,6 @@ public class FontDO {
   private int mType = TYPE_NETWORK;
   private Typeface mTypeface;
   private int mState = STATE_INVALID;
-  private String filePath;
 
   public final static int STATE_INVALID = -1;
   public final static int STATE_INIT = 0;
@@ -168,13 +167,5 @@ public class FontDO {
 
   public void setState(int state) {
     this.mState = state;
-  }
-
-  public String getFilePath() {
-    return filePath;
-  }
-
-  public void setFilePath(String filePath) {
-    this.filePath = filePath;
   }
 }

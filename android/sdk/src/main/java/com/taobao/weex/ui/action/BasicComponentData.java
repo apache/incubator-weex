@@ -60,9 +60,11 @@ public class BasicComponentData<T extends View> {
       return;
     }
     if (mStyles == null) {
-      mStyles = new WXStyle();
+      mStyles = new WXStyle(styles);
     }
-    mStyles.putAll(styles, byPesudo);
+    else {
+      mStyles.putAll(styles, byPesudo);
+    }
   }
 
   public final void addAttr(Map<String, Object> attrs) {
@@ -70,9 +72,9 @@ public class BasicComponentData<T extends View> {
       return;
     }
     if (mAttributes == null) {
-      mAttributes = new WXAttr();
-      mAttributes.putAllDirect(attrs);
-    }else {
+      mAttributes = new WXAttr(attrs, 0);
+    }
+    else {
       mAttributes.putAll(attrs);
     }
   }

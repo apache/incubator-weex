@@ -78,7 +78,6 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     attr = standardMap;
   }
 
-  @Deprecated
   public WXAttr(@NonNull Map<String,Object> standardMap, int extra){
     attr = standardMap;
   }
@@ -433,10 +432,6 @@ public class WXAttr implements Map<String, Object>,Cloneable {
       return null;
     }
     return attr.put(key,value);
-  }
-
-  public void putAllDirect(Map<? extends String, ?> map) {
-    this.attr.putAll(map);
   }
 
   @Override

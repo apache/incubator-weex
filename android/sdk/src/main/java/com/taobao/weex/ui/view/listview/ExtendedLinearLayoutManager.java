@@ -24,8 +24,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 
-import com.taobao.weex.utils.WXViewUtils;
-
 /**
  * Created by moxun on 17/2/16.
  */
@@ -37,17 +35,12 @@ public class ExtendedLinearLayoutManager extends LinearLayoutManager{
 
     private OnSmoothScrollEndListener onScrollEndListener;
 
-    private int extraLayoutSpace;
-
-
     public ExtendedLinearLayoutManager(Context context) {
         super(context, VERTICAL, false);
-        extraLayoutSpace = WXViewUtils.getScreenWidth(context);
     }
 
     public ExtendedLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
         super(context, orientation, reverseLayout);
-        extraLayoutSpace = WXViewUtils.getScreenWidth(context);
     }
 
     @Override
@@ -83,11 +76,6 @@ public class ExtendedLinearLayoutManager extends LinearLayoutManager{
         }
         smoothScroller.setTargetPosition(position);
         startSmoothScroll(smoothScroller);
-    }
-
-    @Override
-    protected int getExtraLayoutSpace(RecyclerView.State state) {
-        return super.getExtraLayoutSpace(state) + extraLayoutSpace;
     }
 
     private class TopSnappedSmoothScroller extends LinearSmoothScroller {
