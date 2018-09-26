@@ -444,6 +444,9 @@ typedef enum : NSUInteger {
 
 		BOOL listSectionRowThreadSafe = [[configCenter configForKey:@"iOS_weex_ext_config.listSectionRowThreadSafe" defaultValue:@(YES) isDefault:NULL] boolValue];
 		[WXUtility setListSectionRowThreadSafe:listSectionRowThreadSafe];
+        
+        BOOL useJSCApiForCreateInstance = [[configCenter configForKey:@"iOS_weex_ext_config.useJSCApiForCreateInstance" defaultValue:@(YES) isDefault:NULL] boolValue];
+        [WXUtility setUseJSCApiForCreateInstance:useJSCApiForCreateInstance];
 		
         //Reading config from orange for Release instance in Main Thread or not
         _bReleaseInstanceInMainThread = [[configCenter configForKey:@"iOS_weex_ext_config.releaseInstanceInMainThread" defaultValue:@(YES) isDefault:nil] boolValue];

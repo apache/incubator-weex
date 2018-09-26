@@ -913,7 +913,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     }
 }
 
-static void _traverseTree(WeexCore::RenderObject *render, int index, const char* pageId)
++ (void)_traverseTree:(WeexCore::RenderObject *)render index:(int)index pageId:(const char *)pageId
 {
     using namespace WeexCore;
     if (render == nullptr) return;
@@ -944,7 +944,7 @@ static void _traverseTree(WeexCore::RenderObject *render, int index, const char*
     for (auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd(); it ++) {
         WeexCore::RenderObject *child = static_cast<WeexCore::RenderObject *>(*it);
         if (child != nullptr) {
-            _traverseTree(child, (int)(it - render->ChildListIterBegin()), pageId);
+            [self _traverseTree:child index:(int)(it - render->ChildListIterBegin()) pageId:pageId];
         }
     }
 }
@@ -956,7 +956,7 @@ static void _traverseTree(WeexCore::RenderObject *render, int index, const char*
     std::pair<float, float> renderPageSize(size.width, size.height);
     
     render->calculateLayout(renderPageSize);
-    _traverseTree(render, 0, [pageId UTF8String] ?: "");
+    [self _traverseTree:render index:0 pageId:[pageId UTF8String] ?: ""];
 }
 
 + (void*)copyRenderObject:(void*)source replacedRef:(NSString*)ref
@@ -999,45 +999,7 @@ static void _convertToCString(id _Nonnull obj, void (^callback)(const char*))
         callback([obj UTF8String]);
     }
     else if ([obj isKindOfClass:[NSNumber class]]) {
-        NSNumber* num = (NSNumber*)obj;
-        char objcType = [num objCType][0];
-        char buffer[128];
-        switch (objcType) {
-            case _C_DBL:
-            case _C_FLT:
-                snprintf(buffer, sizeof(buffer), "%f", [num doubleValue]);
-                callback(buffer);
-                break;
-            case _C_INT:
-            case _C_CHR:
-            case _C_SHT:
-                snprintf(buffer, sizeof(buffer), "%d", [num intValue]);
-                callback(buffer);
-                break;
-            case _C_USHT:
-            case _C_UINT:
-            case _C_UCHR:
-                snprintf(buffer, sizeof(buffer), "%u", [num unsignedIntValue]);
-                callback(buffer);
-                break;
-            case _C_LNG:
-            case _C_LNG_LNG:
-                snprintf(buffer, sizeof(buffer), "%lld", [num longLongValue]);
-                callback(buffer);
-                break;
-            case _C_ULNG:
-            case _C_ULNG_LNG:
-                snprintf(buffer, sizeof(buffer), "%llu", [num unsignedLongLongValue]);
-                callback(buffer);
-                break;
-            case _C_BFLD:
-            case _C_BOOL:
-                callback([num boolValue] ? "true" : "false");
-                break;
-            default:
-                callback([[num stringValue] UTF8String]);
-                break;
-        }
+        callback([[(NSNumber*)obj stringValue] UTF8String]);
     }
     else if ([obj isKindOfClass:[NSNull class]]) {
         callback([JSONSTRING_SUFFIX UTF8String]);
@@ -1050,7 +1012,7 @@ static void _convertToCString(id _Nonnull obj, void (^callback)(const char*))
     }
 }
 
-static void _parseStyleBeforehand(NSDictionary* styles, NSString* key, WeexCore::RenderObject* render)
++ (void)_parseStyleBeforehand:(NSDictionary *)styles key:(NSString *)key render:(WeexCore::RenderObject*)render
 {
     id data = styles[key];
     if (data) {
@@ -1062,8 +1024,7 @@ static void _parseStyleBeforehand(NSDictionary* styles, NSString* key, WeexCore:
     }
 }
 
-static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::RenderObject* parent,
-                                                  int index, const std::string& pageId)
++ (WeexCore::RenderObject*)_parseRenderObject:(NSDictionary *)data parent:(WeexCore::RenderObject *)parent index:(int)index pageId:(const std::string&)pageId
 {
     using namespace WeexCore;
     
@@ -1086,9 +1047,9 @@ static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::
         
         // margin/padding/borderWidth should be handled beforehand. Because maringLeft should override margin.
         NSDictionary* styles = data[@"style"];
-        _parseStyleBeforehand(styles, @"margin", render);
-        _parseStyleBeforehand(styles, @"padding", render);
-        _parseStyleBeforehand(styles, @"borderWidth", render);
+        [self _parseStyleBeforehand:styles key:@"margin" render:render];
+        [self _parseStyleBeforehand:styles key:@"padding" render:render];
+        [self _parseStyleBeforehand:styles key:@"borderWidth" render:render];
         [styles enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
             if ([key isEqualToString:@"margin"] || [key isEqualToString:@"padding"] || [key isEqualToString:@"borderWidth"]) {
                 return;
@@ -1110,7 +1071,7 @@ static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::
         
         int childIndex = 0;
         for (NSDictionary* obj in data[@"children"]) {
-            _parseRenderObject(obj, render, childIndex ++, pageId);
+            [self _parseRenderObject:obj parent:render index:childIndex ++ pageId:pageId];
         }
         
         render->ApplyDefaultStyle();
@@ -1121,7 +1082,7 @@ static WeexCore::RenderObject* _parseRenderObject(NSDictionary* data, WeexCore::
     return nullptr;
 }
 
-static std::vector<std::pair<std::string, std::string>>* _parseMapValuePairs(NSDictionary* data)
++ (std::vector<std::pair<std::string, std::string>>*)_parseMapValuePairs:(NSDictionary *)data
 {
     std::vector<std::pair<std::string, std::string>>* result = new std::vector<std::pair<std::string, std::string>>();
     [data enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
@@ -1138,7 +1099,7 @@ static std::vector<std::pair<std::string, std::string>>* _parseMapValuePairs(NSD
 {
     using namespace WeexCore;
     const std::string page([pageId UTF8String] ?: "");
-    RenderObject* child = _parseRenderObject(data, nullptr, 0, page);
+    RenderObject* child = [self _parseRenderObject:data parent:nullptr index:0 pageId:page];
     RenderManager::GetInstance()->AddRenderObject(page, [parentRef UTF8String] ?: "", index, child);
 }
 
@@ -1150,7 +1111,7 @@ static std::vector<std::pair<std::string, std::string>>* _parseMapValuePairs(NSD
         pageInstance->set_before_layout_needed(false); // we do not need before and after layout
         pageInstance->set_after_layout_needed(false);
         pageInstance->set_platform_layout_needed(true);
-        return _parseRenderObject(data, nullptr, 0, page);
+        return [self _parseRenderObject:data parent:nullptr index:0 pageId:page];
     });
 }
 
@@ -1166,12 +1127,12 @@ static std::vector<std::pair<std::string, std::string>>* _parseMapValuePairs(NSD
 
 + (void)callUpdateAttrs:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
 {
-    WeexCore::RenderManager::GetInstance()->UpdateAttr([pageId UTF8String] ?: "", [ref UTF8String] ?: "", _parseMapValuePairs(data));
+    WeexCore::RenderManager::GetInstance()->UpdateAttr([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [self _parseMapValuePairs:data]);
 }
 
 + (void)callUpdateStyle:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
 {
-    WeexCore::RenderManager::GetInstance()->UpdateStyle([pageId UTF8String] ?: "", [ref UTF8String] ?: "", _parseMapValuePairs(data));
+    WeexCore::RenderManager::GetInstance()->UpdateStyle([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [self _parseMapValuePairs:data]);
 }
 
 + (void)callAddEvent:(NSString*)pageId ref:(NSString*)ref event:(NSString*)event

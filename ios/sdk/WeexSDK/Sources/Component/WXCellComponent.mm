@@ -113,7 +113,7 @@
 {
     if (self.delegate == (id<WXCellRenderDelegate>)newSupercomponent) {
         [self.delegate cell:self didMoveToIndex:index];
-        [super _removeFromSupercomponent];
+        [super _removeFromSupercomponent:NO]; // no remove underlayer render object
         [newSupercomponent _insertSubcomponent:self atIndex:index];
     } else {
         [super _moveToSupercomponent:newSupercomponent atIndex:index];
