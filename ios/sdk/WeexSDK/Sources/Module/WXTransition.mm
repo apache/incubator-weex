@@ -128,11 +128,10 @@
         }
     }
     [self updateFutileStyles:futileStyles resetStyles:nil target:targetComponent];
-
+    
     _targetComponent = targetComponent;
     NSMutableDictionary *componentStyles = [NSMutableDictionary dictionaryWithDictionary:styles];
     [componentStyles addEntriesFromDictionary:targetComponent.styles];
-
     _transitionDuration = componentStyles[kWXTransitionDuration] ? [WXConvert CGFloat:componentStyles[kWXTransitionDuration]] : 0;
     _transitionDelay = componentStyles[kWXTransitionDelay] ? [WXConvert CGFloat:componentStyles[kWXTransitionDelay]] : 0;
     _transitionTimingFunction = [WXConvert CAMediaTimingFunction:componentStyles[kWXTransitionTimingFunction]];
