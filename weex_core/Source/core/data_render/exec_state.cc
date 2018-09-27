@@ -686,7 +686,7 @@ void ExecState::decodeGlobalVariableSection() {
         }
 
         long value;
-        file->read((char*)&value, sizeof(long));
+        file->read((char*)&value, sizeof(int64_t));
         global_variables_.insert(std::pair<std::string, long>(key, value));
     }
 }
@@ -761,7 +761,7 @@ void ExecState::decodeRefSection() {
         Value value;
         decodeValue(value);
         long register_id;
-        file->read((char*)&register_id, sizeof(long));
+        file->read((char*)&register_id, sizeof(int64_t));
         ValueRef *ref = new ValueRef(nullptr, register_id);
         ref->func_index_ = value.index;
         decodeValue(ref->value_);
