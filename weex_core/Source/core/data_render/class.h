@@ -38,6 +38,9 @@ void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction f
 
 ClassInstance *NewClassInstance(ClassDescriptor *p_desc);
     
+Value *GetClassMember(ClassInstance *inst, std::string &name);
+Value *GetClassMemberVar(ClassInstance *inst, std::string &name);
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

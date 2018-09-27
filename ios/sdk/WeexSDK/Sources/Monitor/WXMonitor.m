@@ -67,6 +67,9 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     }
     
     dict[kEndKey] = @(CACurrentMediaTime() * 1000);
+    if (tag == WXPTFirstScreenRender) {
+        [instance.apmInstance onStage:KEY_PAGE_STAGES_FSRENDER];
+    }
 
 //    if (tag == WXPTAllRender) {
 //        [self performanceFinish:instance];
@@ -235,11 +238,6 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
         id<WXAppMonitorProtocol> appMonitor = [WXHandlerFactory handlerForProtocol:@protocol(WXAppMonitorProtocol)];
         if (appMonitor && [appMonitor respondsToSelector:@selector(commitAppMonitorArgs:)]){
             [appMonitor commitAppMonitorArgs:commitDict];
-        }
-        long oldFSRenderCostTime = [commitDict[FSRENDERTIME] longValue];
-        if (oldFSRenderCostTime > 0) {
-            long oldFSRenderTime = instance.performance.renderUnixTimeOrigin + oldFSRenderCostTime;
-            [instance.apmInstance onStageWithTime:KEY_PAGE_STAGES_FSRENDER time:oldFSRenderTime];
         }
         
         [self printPerformance:commitDict];

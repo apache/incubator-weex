@@ -44,6 +44,62 @@ void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction f
 ClassInstance *NewClassInstance(ClassDescriptor *p_desc) {
     return new ClassInstance(p_desc);
 }
+    
+Value *GetClassMember(ClassInstance *inst, std::string &name) {
+    Value *ret = nullptr;
+    do {
+        ClassInstance *inst_current = inst;
+        while (inst_current) {
+            Variables *funcs = inst_current->p_desc_->funcs_.get();
+            int index = funcs->IndexOf(name);
+            if (index < 0) {
+                Variables *vars = inst_current->vars_.get();
+                index = vars->IndexOf(name);
+                if (index >= 0) {
+                    ret = vars->Find(index);
+                }
+            }
+            else {
+                ret = funcs->Find(index);
+            }
+            if (ret) {
+                break;
+            }
+            // 构造函数不找super
+            if (name == "constructor") {
+                break;
+            }
+            inst_current = inst_current->p_super_;
+        }
+        
+    } while (0);
+    
+    return ret;
+}
+
+Value *GetClassMemberVar(ClassInstance *inst, std::string &name) {
+    Value *ret = nullptr;
+    do {
+        Variables *funcs = inst->p_desc_->funcs_.get();
+        int index = funcs->IndexOf(name);
+        if (index < 0) {
+            Variables *vars = inst->vars_.get();
+            index = vars->IndexOf(name);
+            if (index < 0) {
+                Value var;
+                SetNil(&var);
+                index = vars->Add(name, var);
+            }
+            ret = vars->Find(index);
+        }
+        else {
+            ret = funcs->Find(index);
+        }
+        
+    } while (0);
+    
+    return ret;
+}
 
 }  // namespace data_render
 }  // namespace core

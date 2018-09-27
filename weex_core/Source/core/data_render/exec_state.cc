@@ -26,6 +26,8 @@
 #include "core/data_render/rax_parser.h"
 #include "core/data_render/rax_parser_context.h"
 #include "core/data_render/common_error.h"
+#include "core/data_render/binary_file.h"
+#include "core/data_render/class_array.h"
 
 #if DEBUG
 #include "core/data_render/monitor/vm_monitor.h"
@@ -106,6 +108,8 @@ void ExecState::Execute(std::string& err) {
   Value chunk;
   chunk.type = Value::Type::FUNC;
   chunk.f = func_state_.get();
+  // reset stack top pointer when main call
+  *stack_->top() = stack_->base();
   *stack_->base() = chunk;
   try {
       CallFunction(stack_->base(), 0, nullptr);
@@ -119,23 +123,840 @@ void ExecState::Execute(std::string& err) {
   }
 }
 
-const Value ExecState::Call(const std::string& func_name,
-                             const std::vector<Value>& params) {
-  Value ret;
-  auto it = global_variables_.find(func_name);
-  if (it != global_variables_.end()) {
-    long reg = it->second;
-    Value* function = *stack_->top() + 1;
-    *function = *(stack_->base() + reg);
-    for (int i = 0; i < params.size(); ++i) {
-      *(function + i + 1) = params[i];
+void ExecState::startEncode() {
+    BinaryFile* file = BinaryFile::instance();
+
+    int magic_number = 0x6d736100;
+    unsigned version = 1;
+    file->write((char*)&magic_number, sizeof(int));
+    file->write((char*)&version, sizeof(unsigned));
+
+    encodeStringSection();
+    encodeTableSection();
+    encodeFunctionSection();
+    encodeStartSection();
+    encodeGlobalSection();
+    encodeStyleSection();
+    encodeArraySection();
+    encodeRefSection();
+    encodeClassSection();
+}
+
+void ExecState::encodeStringSection() {
+    unsigned id = Section::STRING_SECTION; //string_section
+
+    const std::vector<std::pair<std::string, std::unique_ptr<String>>>& store = string_table_->store();
+    unsigned size = static_cast<unsigned>(store.size());
+    BinaryFile* file = BinaryFile::instance();
+
+    file->write((char*)&id, sizeof(unsigned));
+    file->write((char*)&size, sizeof(unsigned));
+    for (auto &mapString : store) {
+        unsigned length = static_cast<unsigned int>(mapString.first.length()) + 1;
+        file->write(mapString.first.c_str(), static_cast<unsigned int>(sizeof(char) * length));
     }
-    CallFunction(function, params.size(), &ret);
-  }
-  return ret;
+}
+
+void ExecState::encodeArraySection() {
+    unsigned id = Section::ARRAY_SECTION;
+    std::vector<Array*> arrays = class_factory_->arrays();
+    unsigned size = static_cast<unsigned>(arrays.size());
+    BinaryFile* file = BinaryFile::instance();
+
+    file->write((char*)&id, sizeof(unsigned));
+    file->write((char*)&size, sizeof(unsigned));
+    for (auto array : arrays) {
+        unsigned itemSize = static_cast<unsigned>(array->items.size());
+        file->write((char*)&itemSize, sizeof(unsigned));
+        for (auto &value : array->items) {
+            encodeValue(value);
+        }
+    }
+}
+
+void ExecState::encodeTableSection() {
+    unsigned id = Section::TABLE_SECTION;
+    std::vector<Table *> tables = class_factory_->tables();
+
+    unsigned size = static_cast<unsigned>(tables.size());
+    BinaryFile* file = BinaryFile::instance();
+
+    file->write((char*)&id, sizeof(unsigned));
+    file->write((char*)&size, sizeof(unsigned));
+
+    for (auto table : tables) {
+        unsigned mapSize = static_cast<unsigned>(table->map.size());
+        file->write((char*)&mapSize, sizeof(unsigned));
+        for (auto &map : table->map) {
+            std::string name = map.first;
+            Value value = map.second;
+            String str(name);
+            unsigned length = static_cast<unsigned>(str.length()) + 1;
+            file->write(str.c_str(), static_cast<unsigned>(sizeof(char) * length));
+            encodeValue(value);
+        }
+    }
+}
+
+void ExecState::encodeFunctionSection() {
+    BinaryFile* file = BinaryFile::instance();
+    unsigned id = Section::FUNCTION_SECTION;
+
+    FuncState* func_state_base = func_state_.get();
+    std::vector<FuncState*> children = func_state_base->getAllChildren();
+    std::vector<FuncState*> func_states;
+    func_states.push_back(func_state_base);
+    for (auto &func : children) {
+        func_states.push_back(func);
+    }
+    unsigned size = static_cast<unsigned>(func_states.size());
+    file->write((char*)&id, sizeof(unsigned));
+    file->write((char*)&size, sizeof(unsigned));
+
+    for (auto &func_state : func_states) {
+        auto it = std::find(func_states.begin(), func_states.end(), func_state->super_func());
+        int super_index = -1;
+        if (it != func_states.end()) {
+            super_index = static_cast<int>(it - func_states.begin());
+        }
+        file->write((char*)&super_index, sizeof(int));
+        unsigned opcodeSize = static_cast<unsigned>(func_state->instructions().size());
+        file->write((char*)&opcodeSize, sizeof(unsigned));
+        for (int i=0; i<opcodeSize; i++) {
+            unsigned opcode = static_cast<unsigned>(func_state->instructions()[i]);
+            file->write((char*)&opcode, sizeof(unsigned));
+        }
+
+        unsigned constantSize = static_cast<unsigned>(func_state->GetConstantSize());
+        file->write((char*)&constantSize, sizeof(unsigned));
+        for (int i=0; i<constantSize; i++) {
+            encodeValue(*(func_state->GetConstant(i)));
+        }
+    }
+}
+
+void ExecState::encodeStartSection() {
+    BinaryFile* file = BinaryFile::instance();
+    unsigned id = Section::START_SECTION;
+    unsigned index = 0;
+    file->write((char*)&id, sizeof(unsigned));
+    file->write((char*)&index, sizeof(unsigned));
+}
+
+void ExecState::encodeGlobalSection() {
+    BinaryFile* file = BinaryFile::instance();
+    unsigned id = Section::GLOBAL_SECTION;
+    unsigned size = static_cast<unsigned>(global_->size()) - global_->register_size();
+
+    file->write((char*)&id, sizeof(unsigned));
+    file->write((char*)&size, sizeof(unsigned));
+    int init_data_index = global_->IndexOf("_init_data");
+    int weex_data_index = global_->IndexOf("__weex_data__");
+    file->write((char*)&init_data_index, sizeof(int));
+    file->write((char*)&weex_data_index, sizeof(int));
+
+    for (int i=global_->register_size(); i<global_->size(); i++) {
+        Value* value = global_->Find(i);
+        encodeValue(*value);
+    }
+}
+
+void ExecState::encodeStyleSection() {
+    unsigned id = Section::STYLE_SECTION;
+    std::map<std::string, json11::Json>& styles = render_context_->style_json();
+
+    unsigned size = static_cast<unsigned>(styles.size());
+    BinaryFile* file = BinaryFile::instance();
+
+    file->write((char*)&id, sizeof(unsigned));
+    file->write((char*)&size, sizeof(unsigned));
+
+    for (auto style : styles) {
+        Value value(string_table()->StringFromUTF8(style.first));
+        encodeValue(value);
+        const json11::Json::object& items = style.second.object_items();
+        unsigned itemsSize = static_cast<unsigned>(items.size());
+        file->write((char*)&itemsSize, sizeof(unsigned));
+        for (auto it = items.begin(); it != items.end(); it++) {
+            unsigned length = static_cast<unsigned>(it->first.length()) + 1;
+            file->write(it->first.c_str(), static_cast<unsigned int>(sizeof(char) * length));
+
+            unsigned strLen = static_cast<unsigned int>(it->second.string_value().length()) + 1;
+            file->write(it->second.string_value().c_str(), static_cast<unsigned int>(sizeof(char) * strLen));
+        }
+    }
+}
+
+void ExecState::encodeRefSection() {
+    unsigned id = Section::REF_SECTION;
+    unsigned size = static_cast<unsigned>(refs_.size());
+    BinaryFile* file = BinaryFile::instance();
+
+    file->write((char*)&id, sizeof(unsigned));
+    file->write((char*)&size, sizeof(unsigned));
+    for (auto ref : refs_) {
+        Value value;
+        value.type = Value::Type::FUNC;
+        value.f = ref->func_state_;
+        encodeValue(value);
+        long register_id = ref->register_id();
+        file->write((char*)&register_id, sizeof(long));
+        encodeValue(ref->value_);
+    }
+}
+
+void ExecState::encodeClassSection() {
+    unsigned id = Section::CLASS_SECTION;
+    std::vector<ClassDescriptor *> descs = class_factory_->descs();
+
+    unsigned size = static_cast<unsigned>(descs.size());
+    BinaryFile* file = BinaryFile::instance();
+
+    file->write((char*)&id, sizeof(unsigned));
+    file->write((char*)&size, sizeof(unsigned));
+
+    int count = 0;
+    for (auto desc : descs) {
+        count++;
+        if (count <= 3) {
+            continue;
+        }
+
+        int superIndex = class_factory_->findDesc(desc->p_super_);
+        file->write((char*)&superIndex, sizeof(int));
+        unsigned static_func_size = static_cast<unsigned>(desc->static_funcs_->size());
+        file->write((char*)&static_func_size, sizeof(unsigned));
+        for (int i=0; i<static_func_size; i++) {
+            Value* value = desc->static_funcs_->Find(i);
+            encodeValue(*value);
+
+            unsigned length = 0;
+            for (auto &item : desc->static_funcs_->map()) {
+                if (item.second == i) {
+                    length = static_cast<unsigned>(item.first.length()) + 1;
+                    file->write((char*)&length, sizeof(unsigned));
+                    file->write(item.first.c_str(), static_cast<unsigned int>(sizeof(char) * length));
+                    break;
+                }
+            }
+            if (length == 0) {
+                file->write((char*)&length, sizeof(unsigned));
+            }
+        }
+
+        unsigned class_func_size = static_cast<unsigned>(desc->funcs_->size());
+        file->write((char*)&class_func_size, sizeof(unsigned));
+        for (int i=0; i<class_func_size; i++) {
+            Value* value = desc->funcs_->Find(i);
+            encodeValue(*value);
+
+            unsigned length = 0;
+            for (auto &item : desc->funcs_->map()) {
+                if (item.second == i) {
+                    length = static_cast<unsigned>(item.first.length()) + 1;
+                    file->write((char*)&length, sizeof(unsigned));
+                    file->write(item.first.c_str(), static_cast<unsigned int>(sizeof(char) * length));
+                    break;
+                }
+            }
+            if (length == 0) {
+                file->write((char*)&length, sizeof(unsigned));
+            }
+        }
+    }
+}
+
+void ExecState::encodeValue(const Value &value) {
+    BinaryFile* file = BinaryFile::instance();
+    file->write((char*)&value.type, sizeof(unsigned));
+
+    if (value.type == Value::Type::TABLE) {
+        std::vector<Table *> tables = class_factory_->tables();
+        int payload = 0;
+        for (auto table : tables) {
+            if (value.gc == reinterpret_cast<GCObject *>(table)) {
+                break;
+            }
+            payload++;
+        }
+        file->write((char*)&payload, sizeof(int));
+    }
+
+    if (value.type == Value::Type::STRING) {
+        //int payload = static_cast<int>(strings.size());
+        int payload = 0;
+        for (auto &store : string_table_->store() ) {
+            if (value.str == store.second.get()) {
+                // printf("---- %s  \n", str.get()->c_str());
+                break;
+            }
+            payload++;
+        }
+        file->write((char*)&payload, sizeof(int));
+    }
+
+    if (value.type == Value::Type::INT) {
+        file->write((char*)&value.i, sizeof(int64_t));
+    }
+
+    if (value.type == Value::Type::NUMBER) {
+        file->write((char*)&value.n, sizeof(double));
+    }
+
+    if (value.type == Value::Type::BOOL) {
+        file->write((char*)&value.b, sizeof(char));
+    }
+
+    if (value.type == Value::Type::FUNC) {
+        FuncState* func_state_base = func_state_.get();
+        const std::vector<FuncState*> &children = func_state_base->getAllChildren();
+        std::vector<FuncState*> func_states;
+        func_states.push_back(func_state_base);
+        for (auto &func : children) {
+            func_states.push_back(func);
+        }
+
+        int payload = 0;
+        for (auto func_state : func_states) {
+            if (value.f == func_state) {
+                break;
+            }
+            payload++;
+        }
+        file->write((char*)&payload, sizeof(int));
+    }
+
+    if (value.type == Value::Type::ARRAY) {
+        std::vector<Array*> arrays = class_factory_->arrays();
+        int payload = 0;
+        for (auto array : arrays ) {
+            if (value.gc == reinterpret_cast<GCObject *>(array)) {
+                break;
+            }
+            payload++;
+        }
+        file->write((char*)&payload, sizeof(int));
+    }
+
+    if (value.type == Value::Type::CLASS_DESC) {
+        int payload = 0;
+        std::vector<ClassDescriptor *> descs = class_factory_->descs();
+        for (auto desc : descs) {
+            if (value.gc == reinterpret_cast<GCObject *>(desc)) {
+                break;
+            }
+            payload++;
+        }
+        file->write((char*)&payload, sizeof(int));
+    }
+}
+
+void ExecState::endEncode() {
+    BinaryFile* file = BinaryFile::instance();
+    file->writeFinish();
+}
+
+bool ExecState::startDecode() {
+    ValueRef::gs_ref_id = 0;
+
+    BinaryFile* file = BinaryFile::instance();
+    int magic_number;
+    file->read((char*)&magic_number, sizeof(int));
+    if (magic_number != 0x6d736100) {
+        return false;
+    }
+    unsigned version;
+    file->read((char*)&version, sizeof(unsigned));
+    if (version != 1) {
+        return false;
+    }
+
+    while (!file->eof()) {
+        Section section_id = NULL_SECTION;
+        file->read((char*)&section_id, sizeof(unsigned));
+        switch (section_id) {
+            case STRING_SECTION:
+                decodeStringSection();
+                break;
+            case TABLE_SECTION:
+                decodeTableSection();
+                break;
+            case FUNCTION_SECTION:
+                decodeFunctionSection();
+                break;
+            case START_SECTION:
+                decodeStartSection();
+                break;
+            case GLOBAL_SECTION:
+                decodeGlobalSection();
+                break;
+            case STYLE_SECTION:
+                decodeStyleSection();
+                break;
+            case ARRAY_SECTION:
+                decodeArraySection();
+                break;
+            case REF_SECTION:
+                decodeRefSection();
+                break;
+            case CLASS_SECTION:
+                decodeClassSection();
+                break;
+            default:
+                break;
+        }
+    }
+    return true;
+}
+
+void ExecState::decodeStringSection()
+{
+    BinaryFile* file = BinaryFile::instance();
+
+    unsigned count = 0;
+    file->read((char*)&count, sizeof(unsigned));
+    if (count == 0) {
+        return;
+    }
+
+    for (int i=0; i<count; i++) {
+        std::string str;
+        char c;
+        while (true) {
+            file->read(&c, sizeof(char));
+            if (c == 0) {
+                break;
+            }
+            str += c;
+        }
+        string_table_->StringFromUTF8(str);
+    }
+}
+
+void ExecState::decodeTableSection() {
+    BinaryFile* file = BinaryFile::instance();
+
+    unsigned count = 0;
+    file->read((char*)&count, sizeof(unsigned));
+    if (count == 0) {
+        return;
+    }
+
+    for (int i=0; i<count; i++) {
+        Value tableValue = class_factory_->CreateTable();
+        Table* table = reinterpret_cast<Table *>(tableValue.gc);
+        unsigned mapSize=0;
+        file->read((char*)&mapSize, sizeof(unsigned));
+        for (int j=0; j<mapSize; j++) {
+            std::string str;
+            char c;
+            while (true) {
+                file->read(&c, sizeof(char));
+                if (c == 0) {
+                    break;
+                }
+                str += c;
+            }
+            Value value;
+            decodeValue(value);
+            table->map.insert(std::make_pair(str, value));
+        }
+    }
+}
+
+void ExecState::decodeFunctionSection() {
+    BinaryFile* file = BinaryFile::instance();
+
+    unsigned count = 0;
+    file->read((char*)&count, sizeof(unsigned));
+    if (count == 0) {
+        return;
+    }
+
+    std::vector<FuncState*> func_states;
+    for (int i=0; i<count; i++) {
+        FuncState* func_state = new FuncState;
+        int super_index = -1;
+        file->read((char*)&super_index, sizeof(int));
+        func_state->set_super_index(super_index);
+
+        unsigned op_code_count = 0;
+        file->read((char*)&op_code_count, sizeof(unsigned));
+        for (int j=0; j<op_code_count; j++) {
+            unsigned opcode;
+            file->read((char*)&opcode, sizeof(unsigned));
+            func_state->AddInstruction(opcode);
+        }
+        unsigned local_count = 0;
+        file->read((char*)&local_count, sizeof(unsigned));
+        for (int j=0; j<local_count; j++) {
+            Value value;
+            decodeValue(value);
+            func_state->AddConstant(value);
+        }
+        func_states.push_back(func_state);
+    }
+
+    func_state_.reset(func_states[0]);
+    for (auto func : func_states) {
+        int index = func->super_index();
+        if (index > -1) {
+            func_states[index]->AddChild(func);
+        }
+    }
+}
+
+void ExecState::decodeStartSection() {
+    BinaryFile* file = BinaryFile::instance();
+    unsigned start_index;
+    file->read((char*)&start_index, sizeof(unsigned));
+}
+
+void ExecState::decodeGlobalSection() {
+    BinaryFile* file = BinaryFile::instance();
+
+    unsigned count = 0;
+    file->read((char*)&count, sizeof(unsigned));
+
+    int init_data_index = -1;
+    int weex_data_index = -1;
+    file->read((char*)&init_data_index, sizeof(int));
+    file->read((char*)&weex_data_index, sizeof(int));
+
+    unsigned register_size = global_->register_size();
+    for (int i=0; i<count; i++) {
+        Value value;
+        decodeValue(value);
+        if (value.type != Value::Type::CFUNC) {
+            if (register_size + i == init_data_index) {
+                global_->Add("_init_data", value);
+            } else if (register_size + i == weex_data_index) {
+                global_->Add("__weex_data__", value);
+            } else  {
+                global_->Add(value);
+            }
+        }
+    }
+}
+
+void ExecState::decodeStyleSection() {
+    BinaryFile* file = BinaryFile::instance();
+
+    unsigned count = 0;
+    file->read((char*)&count, sizeof(unsigned));
+    if (count == 0) {
+        return;
+    }
+
+    for (int i=0; i<count; i++) {
+        Value value;
+        decodeValue(value);
+
+        unsigned itemsSize = 0;
+        file->read((char*)&itemsSize, sizeof(unsigned));
+        //json11::Json::object items;
+        std::unordered_map<std::string, json11::Json> items;
+        for (int j=0; j<itemsSize; j++) {
+            std::string key;
+            char c;
+            while (true) {
+                file->read(&c, sizeof(char));
+                if (c == 0) {
+                    break;
+                }
+                key += c;
+            }
+
+            std::string value;
+            char v;
+            while (true) {
+                file->read(&v, sizeof(char));
+                if (v == 0) {
+                    break;
+                }
+                value += v;
+            }
+            json11::Json json(value);
+            items.insert(std::make_pair(std::move(key), std::move(json)));
+        }
+        json11::Json json(std::move(items));
+        styles_.insert(std::make_pair(value.index, std::move(json)));
+    }
+}
+
+void ExecState::decodeArraySection() {
+    BinaryFile* file = BinaryFile::instance();
+    unsigned count = 0;
+    file->read((char*)&count, sizeof(unsigned));
+    for (int i=0; i<count; i++) {
+        Value value = class_factory_->CreateArray();
+        Array* array = reinterpret_cast<Array *>(value.gc);
+        unsigned itemSize = 0;
+        file->read((char*)&itemSize, sizeof(unsigned));
+        for (int j=0; j<itemSize; j++) {
+            Value itemValue;
+            decodeValue(itemValue);
+            array->items.push_back(itemValue);
+        }
+    }
+}
+
+void ExecState::decodeRefSection() {
+    BinaryFile* file = BinaryFile::instance();
+    unsigned count = 0;
+    file->read((char*)&count, sizeof(unsigned));
+    for (int i=0; i<count; i++) {
+        Value value;
+        decodeValue(value);
+        long register_id;
+        file->read((char*)&register_id, sizeof(long));
+        ValueRef *ref = new ValueRef(nullptr, register_id);
+        ref->func_index_ = value.index;
+        decodeValue(ref->value_);
+        refs_.push_back(ref);
+    }
+}
+
+void ExecState::decodeClassSection() {
+    BinaryFile* file = BinaryFile::instance();
+    unsigned count = 0;
+    file->read((char*)&count, sizeof(unsigned));
+
+    size_t size = class_factory_->descs().size();
+    for (int i=0; i<count - size; i++) {
+        Value value = class_factory_->CreateClassDescriptor(nullptr);
+        ClassDescriptor* desc = reinterpret_cast<ClassDescriptor *>(value.gc);
+        int super_index = -1;
+        file->read((char*)&super_index, sizeof(int));
+        desc->super_index_ = super_index;
+
+        unsigned static_func_size = 0;
+        file->read((char*)&static_func_size, sizeof(unsigned));
+        for (int j=0; j<static_func_size; j++) {
+            Value static_value;
+            decodeValue(static_value);
+            unsigned length = 0;
+            file->read((char*)&length, sizeof(unsigned));
+            if (length > 0) {
+                std::unique_ptr<char[]> str(new char[length]);
+                file->read(str.get(), sizeof(char)*length);
+                desc->static_funcs_->Add(str.get(), static_value);
+            } else {
+                desc->static_funcs_->Add(static_value);
+            }
+        }
+
+        unsigned class_func_size = 0;
+        file->read((char*)&class_func_size, sizeof(unsigned));
+        for (int j=0; j<class_func_size; j++) {
+            Value class_value;
+            decodeValue(class_value);
+
+            unsigned length = 0;
+            file->read((char*)&length, sizeof(unsigned));
+            if (length > 0) {
+                std::unique_ptr<char[]> str(new char[length]);
+                file->read(str.get(), sizeof(char)*length);
+                desc->funcs_->Add(str.get(), class_value);
+            } else {
+                desc->funcs_->Add(class_value);
+            }
+        }
+    }
+}
+
+void ExecState::decodeValue(Value &value) {
+    BinaryFile* file = BinaryFile::instance();
+    unsigned valueType;
+    file->read((char*)&valueType, sizeof(int));
+    value.type = Value::Type(valueType);
+
+    switch (valueType) {
+        case Value::Type::TABLE:
+        case Value::Type::STRING:
+        case Value::Type::FUNC:
+        case Value::Type::ARRAY:
+        case Value::Type::CLASS_DESC: {
+            value.gc = nullptr;
+            file->read((char*)&(value.index), sizeof(int));
+        }
+            break;
+        case Value::Type::INT: {
+            file->read((char*)&(value.i), sizeof(int64_t));
+        }
+            break;
+        case Value::Type::NUMBER: {
+            file->read((char*)&(value.n), sizeof(double));
+        }
+            break;
+        case Value::Type::BOOL: {
+            file->read((char*)&(value.b), sizeof(char));
+        }
+            break;
+        default:
+            break;
+    }
+}
+
+void ExecState::endDecode() {
+    BinaryFile* file = BinaryFile::instance();
+    file->readFinish();
+
+    std::vector<Table *> tables = class_factory_->tables();
+    for (auto table : tables ) {
+        for (auto &map : table->map) {
+            Value& value = map.second;
+            serializeValue(value);
+        }
+    }
+
+    std::vector<Value>& constants = func_state_->constants();
+    for (auto &value : constants) {
+        serializeValue(value);
+    }
+    std::vector<FuncState*> children = func_state_->getAllChildren();
+    for (auto func_state : children) {
+        std::vector<Value>& child_constants = func_state->constants();
+        for (auto &value : child_constants) {
+            serializeValue(value);
+        }
+    }
+
+    for (int i=0; i<global_->size(); i++) {
+        Value* value = global_->Find(i);
+        serializeValue(*value);
+    }
+
+    std::map<std::string, json11::Json>& styles = render_context_->style_json();
+    for (auto &style : styles_) {
+        Value value;
+        value.index = style.first;
+        value.type = Value::Type::STRING;
+        serializeValue(value);
+        styles.insert(std::make_pair(value.str->c_str(), style.second));
+    }
+
+    std::vector<Array *> arrays = class_factory_->arrays();
+    for (auto array : arrays) {
+        for (auto &value : array->items) {
+            serializeValue(value);
+        }
+    }
+
+    for (auto ref : refs_) {
+        if (ref->func_index_ == 0) {
+            ref->func_state_ = func_state_.get();
+        } else {
+            ref->func_state_ = func_state_->getAllChildren()[ref->func_index_-1];
+        }
+        serializeValue(ref->value_);
+    }
+
+    std::vector<ClassDescriptor *> descs = class_factory_->descs();
+    int count = 0;
+    for (auto desc : descs) {
+        count++;
+        if (count <= 4) {
+            continue;
+        }
+        if (desc->super_index_ != -1) {
+            desc->p_super_ = descs[desc->super_index_];
+        }
+        for (int i=0; i<desc->static_funcs_->size(); i++) {
+            Value* value = desc->static_funcs_->Find(i);
+            serializeValue(*value);
+        }
+        for (int i=0; i<desc->funcs_->size(); i++) {
+            Value* value = desc->funcs_->Find(i);
+            serializeValue(*value);
+        }
+    }
+}
+
+void ExecState::serializeValue(Value &value) {
+    if (value.index == -1) {
+        return;
+    }
+
+    if (value.type == Value::Type::TABLE) {
+        std::vector<Table *> tables = class_factory_->tables();
+        value.gc = reinterpret_cast<GCObject *>(tables[value.index]);
+    }
+
+    if (value.type == Value::Type::STRING) {
+        const std::vector<std::pair<std::string, std::unique_ptr<String>>>& store = string_table_->store();
+        if (value.index >= store.size()) {
+            value.str = store[0].second.get();
+        } else {
+            value.str = store[value.index].second.get();
+        }
+    }
+
+    if (value.type == Value::Type::FUNC) {
+        if (value.index == 0) {
+            value.f = func_state_.get();
+        } else {
+            value.f = func_state_->getAllChildren()[value.index-1];
+        }
+    }
+
+    if (value.type == Value::Type::ARRAY) {
+        std::vector<Array *> arrays = class_factory_->arrays();
+        value.gc = reinterpret_cast<GCObject *>(arrays[value.index]);
+    }
+
+    if (value.type == Value::Type::CLASS_DESC) {
+        std::vector<ClassDescriptor *> descs = class_factory_->descs();
+        value.gc = reinterpret_cast<GCObject *>(descs[value.index]);
+    }
+}
+
+const Value ExecState::Call(const std::string& func_name, const std::vector<Value>& args) {
+    Value ret;
+    do {
+        int index = global()->IndexOf(func_name);
+        long caller = -1;
+        if (index >= 0) {
+            **stack_->top() = *(global()->Find(index));
+        }
+        else {
+            auto iter = global_variables_.find(func_name);
+            if (iter == global_variables_.end()) {
+                break;
+            }
+            caller = iter->second;
+            if (caller < 0) {
+                break;
+            }
+            **stack_->top() = *(stack_->base() + caller);
+        }
+        for (int i = 0; i < args.size(); ++i) {
+            *(*stack_->top() + i + 1) = args[i];
+        }
+        CallFunction(*stack_->top(), args.size(), &ret);
+
+    } while (0);
+    
+    return ret;
 }
     
-const Value ExecState::Call(Value *func, const std::vector<Value>& params) {
+const Value ExecState::Call(FuncState *func_state, const std::vector<Value>& args) {
+    Value ret;
+    do {
+        Value func(func_state);
+        **stack_->top() = func;
+        int index = 0;
+        for (int i = 0; i < args.size(); i++) {
+            *(*stack_->top() + i + 1 + index) = args[i];
+        }
+        CallFunction(*stack_->top(), args.size(), &ret);
+        
+    } while (0);
+    
+    return ret;
+}
+    
+const Value ExecState::Call(Value *func, const std::vector<Value>& args) {
     Value ret;
     do {
         // 首先检查函数是否属于堆栈函数
@@ -144,14 +965,48 @@ const Value ExecState::Call(Value *func, const std::vector<Value>& params) {
             throw VMExecError("call function out of stack");
             break;
         }
-        for (int i = 0; i < params.size(); i++) {
-            *(func + i + 1) = params[i];
+        for (int i = 0; i < args.size(); i++) {
+            *(func + i + 1) = args[i];
         }
-        CallFunction(func, params.size(), &ret);
+        CallFunction(func, args.size(), &ret);
         
     } while (0);
     
     return ret;
+}
+    
+void ExecState::resetArguments(Value *func, size_t argc) {
+    do {
+        auto iter = global_variables_.find(JS_GLOBAL_ARGUMENTS);
+        if (iter == global_variables_.end()) {
+            break;
+        }
+        long caller = iter->second;
+        if (caller < 0) {
+            break;
+        }
+        Value *arguments = stack_->base() + caller;
+        if (!IsArray(arguments)) {
+            break;
+        }
+        ClearArray(ValueTo<Array>(arguments));
+        for (int i = 0; i < argc; i++) {
+            PushArray(ValueTo<Array>(arguments), *(func + i + 1));
+        }
+        
+    } while (0);
+}
+    
+void ExecState::Register(const std::string& name, CFunction func) {
+    Value funcVal;
+    funcVal.type = Value::Type::CFUNC;
+    funcVal.cf = reinterpret_cast<void *>(func);
+    Register(name, funcVal);
+}
+    
+void ExecState::Register(const std::string& name, Value value) {
+    global()->Add(name, value);
+    global()->incrementRegisterSize();
 }
 
 void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
@@ -175,6 +1030,7 @@ void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
         frame.pc = &(*func->f->instructions().begin());
         frame.end = &(*func->f->instructions().end());
         frames_.push_back(frame);
+        resetArguments(func, argc);
         vm_->RunFrame(this, frame, ret);
         stack_->reset();
         frames_.pop_back();

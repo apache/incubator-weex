@@ -365,8 +365,9 @@ bool RenderObject::UpdateStyleInternal(const std::string key,
     functor(fallback);
     ret = true;
   } else {
-    float fvalue = getFloatByViewport(
-        value, RenderManager::GetInstance()->viewport_width(page_id()));
+    float fvalue = getFloatByViewport(value,
+                                      RenderManager::GetInstance()->viewport_width(page_id()),
+                                      RenderManager::GetInstance()->round_off_deviation(page_id()));
     if (!isnan(fvalue)) {
       functor(fvalue);
       ret = true;
@@ -475,7 +476,7 @@ StyleType RenderObject::AddStyle(std::string key, std::string value) {
 }
 
 void RenderObject::AddEvent(std::string event) {
-  if (this->events_ == nullptr || this->events_->empty()) {
+  if (this->events_ == nullptr) {
     this->events_ = new std::set<std::string>();
   }
   this->events_->insert(event);

@@ -114,7 +114,7 @@ class PlatformBridge {
         const char* instanceId, const char* nameSpace, const char* func,
         std::vector<VALUE_WITH_TYPE*>& params) = 0;
     virtual int CreateInstance(const char* instanceId, const char* func,
-                               const char* script, const char* opts,
+                               const char* script, int script_length, const char* opts,
                                const char* initData, const char* extendsApi,
                                const char* render_strategy) = 0;
     virtual std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char* instanceId,

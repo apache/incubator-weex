@@ -25,6 +25,8 @@
 #include <cmath>
 #include <sstream>
 #include <map>
+#include <memory>
+#include "base/string_util.h"
 #include "core/data_render/object.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
@@ -93,6 +95,8 @@ struct Value {
 
   Type type;
 
+  int index = -1;
+
   Value() : type(NIL) {}
     
   Value(int value) : i(value), type(INT) {}
@@ -104,9 +108,12 @@ struct Value {
   Value(bool value) : b(value), type(BOOL) {}
 
   Value(String *value) : str(value), type(STRING) {}
-
+    
+  explicit Value(FuncState *func) : f(func), type(FUNC) {}
+    
   Value(const Value &value) {
     type = value.type;
+    index = value.index;
     switch (type) {
       case INT:i = value.i;
         break;
@@ -129,7 +136,8 @@ struct Value {
       case CLASS_DESC:
       case CLASS_INST:
         gc = value.gc;
-        gc->increment();
+        if(gc)
+          gc->increment();
         break;
       default:break;
     }
@@ -138,6 +146,7 @@ struct Value {
   inline Value operator=(Value value) {
       GCRelease(this);
       type = value.type;
+      index = value.index;
       switch (type) {
           case INT:
               i = value.i;
@@ -168,7 +177,8 @@ struct Value {
           case CLASS_DESC:
           case CLASS_INST:
               gc = value.gc;
-              gc->increment();
+              if(gc)
+                gc->increment();
               break;
           default:break;
       }
@@ -176,6 +186,7 @@ struct Value {
   }
   friend bool operator==(const Value &left, const Value &right) {
     if (left.type != right.type) return false;
+    if (left.index != right.index) return false;
     switch (left.type) {
       case NIL:return true;
       case INT:return left.i == right.i;
@@ -220,27 +231,32 @@ public:
     int Add(Value value);
     int Add(const std::string& name, Value value);
     int Set(const std::string& name, Value value);
+    inline size_t size() {return values_.size();}
+    inline const std::map<std::string, int>& map() {return map_;}
+    inline unsigned register_size() {return register_size_;}
+    void incrementRegisterSize() {register_size_++;}
     
 private:
     std::map<std::string, int> map_;
     std::vector<Value> values_;
+    unsigned register_size_ = 0;
 };
 
 struct ClassDescriptor;
     
 typedef struct ClassDescriptor {
     CommonHeader;
-    ClassDescriptor *p_super_;
+    ClassDescriptor *p_super_{nullptr};
     std::unique_ptr<Variables> static_funcs_;
     std::unique_ptr<Variables> funcs_;
-    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), static_funcs_(new Variables) {}
-    
+    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), static_funcs_(new Variables), super_index_(-1) {}
+    int super_index_;
 } ClassDescriptor;
 
 typedef struct ClassInstance {
     CommonHeader;
-    ClassInstance *p_super_;
-    ClassDescriptor *p_desc_;
+    ClassInstance *p_super_{nullptr};
+    ClassDescriptor *p_desc_{nullptr};
     std::unique_ptr<Variables> vars_;
     ClassInstance(ClassDescriptor *p_desc) : p_desc_(p_desc), vars_(new Variables) {}
     
@@ -332,8 +348,10 @@ inline int64_t ShiftLeft(const int64_t &a, const int64_t &b) {
 
 inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
     
-inline bool IsFunc(const Value *o) { return Value::Type::FUNC == o->type || Value::Type::CFUNC == o->type; }
-
+inline bool IsFunction(const Value *o) { return Value::Type::FUNC == o->type || Value::Type::CFUNC == o->type; }
+    
+inline bool IsPrototypeFunction(const Value *o) { return Value::Type::FUNC == o->type; }
+    
 inline bool IsValueRef(const Value *o) { return Value::Type::VALUE_REF == o->type; }
     
 inline bool IsNil(const Value *o) {
@@ -341,13 +359,13 @@ inline bool IsNil(const Value *o) {
 }
     
 inline void GCRelease(Value *o) {
-    if (iscollectable(o)) {
+    if (iscollectable(o) && o->gc) {
         o->gc->decrement();
     }
 }
     
 inline void GCRetain(Value *o) {
-    if (iscollectable(o)) {
+    if (iscollectable(o) && o->gc) {
         o->gc->increment();
     }
 }
@@ -538,23 +556,40 @@ inline int ToBool(const Value *o, bool &b) {
     else if (Value::Type::NUMBER == o->type) {
         b = NumValue(o);
     }
+    else if (ttype(o) == Value::Type::STRING) {
+        b = o->str ? true : false;
+    }
     else if (Value::Type::VALUE_REF == o->type) {
         return ToBool(o->var, b);
     }
     else if (ToNum(o, d1)) {
         b = d1;
     }
-    else if (Value::Type::NIL == o->type) {
-        b = false;
-    }
     else if (Value::Type::FUNC == o->type) {
         b = o->f ? true : false;
     }
     else {
-        b = false;
-        return 0;
+        b = ttype(o) == Value::Type::NIL ? false : true;
     }
     return 1;
+}
+
+inline std::string ToString(const Value *o) {
+    switch (o->type) {
+        case Value::Type::BOOL:
+            return weex::base::to_string(o->b);
+        case Value::Type::INT:
+            return weex::base::to_string(o->n);
+        case Value::Type::NUMBER:
+            return weex::base::to_string(o->n);
+        case Value::Type::STRING:
+            return o->str->c_str();
+        case Value::Type::NIL:
+            return "[nil]";
+        default:
+            return "[not support]";
+    }
+    return std::string();
 }
 
 inline void ArrayCopyFrom(Value &src, Value &dest, int start, int end) {

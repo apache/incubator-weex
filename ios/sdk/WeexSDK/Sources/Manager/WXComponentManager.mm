@@ -328,12 +328,6 @@ static NSThread *WXComponentThread;
     WXAssertComponentExist(component);
     WXAssertComponentExist(newSupercomponent);
     
-    if (component.supercomponent == newSupercomponent && [newSupercomponent.subcomponents indexOfObject:component] < index) {
-        // if the supercomponent moved to is the same as original supercomponent,
-        // unify it into the index after removing.
-        index--;
-    }
-    
     [component _moveToSupercomponent:newSupercomponent atIndex:index];
     __weak typeof(self) weakSelf = self;
     [self _addUITask:^{

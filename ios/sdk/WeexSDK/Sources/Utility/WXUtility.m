@@ -44,6 +44,7 @@
 static BOOL threadSafeCollectionUsingLock = YES;
 static BOOL unregisterFontWhenCollision = NO;
 static BOOL listSectionRowThreadSafe = YES;
+static BOOL useJSCApiForCreateInstance = YES;
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
@@ -162,6 +163,16 @@ CGFloat WXFloorPixelValue(CGFloat value)
 + (BOOL)listSectionRowThreadSafe
 {
 	return listSectionRowThreadSafe;
+}
+
++ (void)setUseJSCApiForCreateInstance:(BOOL)value
+{
+    useJSCApiForCreateInstance = value;
+}
+
++ (BOOL)useJSCApiForCreateInstance
+{
+    return useJSCApiForCreateInstance;
 }
 
 + (void)performBlock:(void (^)(void))block onThread:(NSThread *)thread

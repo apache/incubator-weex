@@ -89,9 +89,11 @@ struct ASTParser final {
           if (class_style.is_string()) {
             args.push_back(
                 factory_->NewStringConstant(wrap_prefix + class_style.string_value()));
-            statement->PushExpression(factory_->NewCallExpression(func_id, args));
-            args.pop_back();
+          } else {
+            args.push_back(ParseBindingExpression(class_style));
           }
+          statement->PushExpression(factory_->NewCallExpression(func_id, args));
+          args.pop_back();
         }
       }
     }
@@ -162,9 +164,6 @@ struct ASTParser final {
     do {
       json11::Json repeat = json["repeat"];
       json11::Json index = repeat["iterator1"];
-      if (!index.is_string()) {
-        break;
-      }
       Handle<DeclarationList> for_init = factory_->NewDeclarationList();
       // var index=0
       for_init->Append(factory_->NewDeclaration(index.is_null() ? "index" : index.string_value(), factory_->NewIntegralConstant(0)));
@@ -527,6 +526,7 @@ struct ASTParser final {
   //        var child = createElement(tag_name, node_id);
   //        appendChild(parent, child);
   //        setClassList(child, class_name);
+  //        setStyle(child, key, value);
   //        setAttr(child, key, value);
   //        {
   //            ...
@@ -559,15 +559,19 @@ struct ASTParser final {
       }
       json11::Json node_id = json["nodeId"];
       json11::Json tag_name = json["tagName"];
+      json11::Json ref = json11::Json("");
+      if (json["attributes"].is_object() && json["attributes"]["ref"].is_string()) {
+        ref = json["attributes"]["ref"];
+      }
       Handle<Expression> node_id_expr = nullptr;
       if (tag_name.is_string()) {
         Handle<Expression> call_expr = nullptr;
         Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
         std::vector<Handle<Expression>> args;
 
-        // var child = createElement(tag_name, node_id);
+        // var child = createElement(tag_name, node_id, ref);
         // or
-        // var child = createComponent(template_id, tag_name, node_id);
+        // var child = createComponent(template_id, tag_name, node_id, ref);
         {
             Handle<Expression> func;
             node_id_expr = ParseNodeId(control, control_exprs, node_id.string_value());
@@ -577,6 +581,7 @@ struct ASTParser final {
                 args.push_back(
                         factory_->NewStringConstant(tag_name.string_value()));
                 args.push_back(node_id_expr);
+                args.push_back(factory_->NewStringConstant(ref.string_value()));
                 call_expr = factory_->NewCallExpression(func, args);
             } else {
                 // Component Node call createComponent
@@ -589,6 +594,7 @@ struct ASTParser final {
                 args.push_back(
                         factory_->NewStringConstant(tag_name.string_value()));
                 args.push_back(node_id_expr);
+                args.push_back(factory_->NewStringConstant(ref.string_value()));
                 call_expr = factory_->NewCallExpression(func, args);
             }
             Handle<Declaration> child_declaration =
@@ -610,6 +616,32 @@ struct ASTParser final {
 
       // setClassList(child, class_name)
       AddSetClassListCall(json, child_identifier, component_name);
+
+      // setStyle(child, key, value)
+      json11::Json style = json["style"];
+      if (style.is_object()) {
+        auto items = style.object_items();
+        for (auto it = items.begin(); it != items.end(); ++it) {
+          const auto& key = it->first;
+          const auto& value = it->second;
+          std::vector<Handle<Expression>> args;
+          args.push_back(child_identifier);
+          args.push_back(factory_->NewStringConstant(key));
+          if (value.is_string()) {
+            args.push_back(
+                    factory_->NewStringConstant(value.string_value()));
+          } else {
+            args.push_back(ParseBindingExpression(value));
+          }
+
+          Handle<Expression> set_style_func_expr =
+                  factory_->NewIdentifier("setStyle");
+          Handle<CallExpression> call_func =
+                  factory_->NewCallExpression(set_style_func_expr, args);
+          Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
+          statement->PushExpression(call_func);
+        }
+      }
 
       // setAttr(child, key, value)
       json11::Json attributes = json["attributes"];

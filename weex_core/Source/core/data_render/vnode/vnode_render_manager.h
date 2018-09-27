@@ -35,6 +35,7 @@ namespace core {
 namespace data_render {
 
 class VNodeRenderManager {
+ friend class VNode;
  private:
   VNodeRenderManager() {}
 
@@ -42,9 +43,16 @@ class VNodeRenderManager {
 
  public:
   void CreatePage(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data);
+
+  void CreatePage(const char* contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data);
+
   bool RefreshPage(const std::string &page_id, const std::string &init_data);
   bool ClosePage(const std::string &page_id);
-
+  void FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args);
+  void ExecuteRegisterModules(ExecState *exec_state, std::vector<std::string>& registers);
+  void RegisterModules(const std::string &modules) { modules_.push_back(modules); }
+  void PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node);
+  void CallNativeModule(ExecState *exec_state, const std::string &module, const std::string &method, const std::string &args, int argc = 0);
   static VNodeRenderManager *GetInstance() {
     if (!g_instance) {
       g_instance = new VNodeRenderManager();
@@ -64,6 +72,7 @@ class VNodeRenderManager {
   std::map<std::string, VNode *> vnode_trees_;
   std::unordered_map<int, VComponent *> vcomponent_tree_;
   std::map<std::string, ExecState *> exec_states_;
+  std::vector<std::string> modules_;
 };
 }  // namespace data_render
 }  // namespace core

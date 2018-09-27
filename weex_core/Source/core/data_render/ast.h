@@ -450,10 +450,10 @@ class CallExpression : public Expression {
 
  private:
   MemberAccessKind kind_;
-  Handle<Expression> expr_;
-  Handle<Expression> member_;
-  Handle<Expression> callee_;
-  Handle<Expression> args_expr_;
+  Handle<Expression> expr_{nullptr};
+  Handle<Expression> member_{nullptr};
+  Handle<Expression> callee_{nullptr};
+  Handle<Expression> args_expr_{nullptr};
   std::vector<Handle<Expression>> args_;
 };
 
@@ -538,6 +538,12 @@ class ArrayConstant : public Expression {
  private:
   ProxyArray exprs_;
 };
+    
+enum class AssignOperation {
+    kAssign,
+    kAssignAdd,
+    kAssignSub
+};
 
 class AssignExpression : public Expression {
  public:
@@ -547,11 +553,13 @@ class AssignExpression : public Expression {
       : Expression(), lhs_(lhs), rhs_(rhs) {}
   Handle<Expression> lhs() { return lhs_; }
   Handle<Expression> rhs() { return rhs_; }
+  AssignOperation& op() { return op_; }
   DEFINE_NODE_TYPE(AssignExpression, Expression);
 
  private:
   Handle<Expression> lhs_;
   Handle<Expression> rhs_;
+  AssignOperation op_{AssignOperation::kAssign};
 };
 
 class UndefinedConstant : public Expression {
@@ -572,9 +580,12 @@ public:
 
     Handle<Expression> member() { return member_; }
     bool ProduceRValue() override { return false; }
+    void set_is_class_(bool is_class) { is_class_ = is_class; };
+    bool is_class() { return is_class_; }
     DEFINE_NODE_TYPE(NewExpression, Expression);
 private:
     Handle<Expression> member_;
+    bool is_class_{false};
 };
     
 class ThisExpression : public Expression {

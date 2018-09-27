@@ -54,11 +54,14 @@ static const WXLogLevel defaultLogLevel = WXLogLevelWarning;
 
 static id<WXLogProtocol> _externalLog;
 
+static BOOL _logToWebSocket = NO;
+
 @interface WXSafeLog : NSObject
 /**
  * @abstract This is a safer but slower log to resolve DEBUG log crash when there is a retain cycle in the object
  */
 + (NSString *)getLogMessage:(NSString *)format arguments:(va_list)args;
+
 @end
 
 @implementation WXLog
@@ -71,12 +74,14 @@ static id<WXLogProtocol> _externalLog;
     static WXLog *_sharedInstance = nil;
     static dispatch_once_t oncePredicate;
     dispatch_once(&oncePredicate, ^{
+        if (NSClassFromString(@"WXDebugLoggerBridge")) {
+            _logToWebSocket = YES;
+        }
         _sharedInstance = [[self alloc] init];
         _sharedInstance->_logLevel = defaultLogLevel;
     });
     return _sharedInstance;
 }
-
 
 + (void)setLogLevel:(WXLogLevel)level
 {
@@ -88,7 +93,7 @@ static id<WXLogProtocol> _externalLog;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
     Class propertyClass = NSClassFromString(@"WXTracingViewControllerManager");
-    SEL sel =NSSelectorFromString(@"loadTracingView");
+    SEL sel = NSSelectorFromString(@"loadTracingView");
     if(propertyClass && [propertyClass respondsToSelector:sel]){
         [propertyClass performSelector:sel];
     }
@@ -154,12 +159,13 @@ static id<WXLogProtocol> _externalLog;
 
     NSString *logMessage = [NSString stringWithFormat:@"<Weex>[%@]%s:%ld, %@", flagString, fileName, (unsigned long)line, message];
 
-
     if ([_externalLog logLevel] & flag) {
         [_externalLog log:flag message:logMessage];
     }
 
-    [[WXSDKManager bridgeMgr] logToWebSocket:flagString message:message];
+    if (_logToWebSocket) {
+        [[WXSDKManager bridgeMgr] logToWebSocket:flagString message:message];
+    }
 
     if ([WXLog logLevel] & flag) {
         NSLog(@"%@", logMessage);
@@ -394,6 +400,7 @@ static void dealWithValue(NSMutableString *result, id value, NSMutableSet *outSe
 }
 
 @implementation WXSafeLog
+
 + (NSString *)getLogMessage:(NSString *)format arguments:(va_list)args
 {
     NSMutableString *mutableFormat = [NSMutableString stringWithString:format];
@@ -492,4 +499,5 @@ static void dealWithValue(NSMutableString *result, id value, NSMutableSet *outSe
     }
     return result;
 }
+
 @end

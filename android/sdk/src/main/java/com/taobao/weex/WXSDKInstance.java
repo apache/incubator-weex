@@ -52,7 +52,6 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
-import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
@@ -86,7 +85,6 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,6 +103,12 @@ import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChangeListener {
 
   private static  final  String SOURCE_TEMPLATE_BASE64_MD5 = "templateSourceBase64MD5";
+
+  /**
+   * Devtool protocol
+   */
+  public static String ACTION_DEBUG_INSTANCE_REFRESH = "DEBUG_INSTANCE_REFRESH";
+  public static String ACTION_INSTANCE_RELOAD = "INSTANCE_RELOAD";
 
   //Performance
   public boolean mEnd = false;
@@ -592,6 +596,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
+    render(pageName, new Script(template), options, jsonInitData, flag);
+  }
+
+  public void render(String pageName, Script template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
     mWXPerformance.beforeInstanceRender(mInstanceId);
 
     if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
@@ -611,6 +619,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     renderInternal(pageName,template,options,jsonInitData,flag);
   }
 
+  /**
+   * Render binary template asynchronously in DATA_RENDER_BINARY strategy.
+   */
+  public void render(String pageName, byte[] template, Map<String, Object> options, String jsonInitData) {
+    render(pageName, new Script(template), options, jsonInitData, WXRenderStrategy.DATA_RENDER_BINARY);
+  }
+
   private void ensureRenderArchor(){
     if(mRenderContainer == null){
       if (getContext() != null) {
@@ -627,8 +642,19 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
                               String template,
                               Map<String, Object> options,
                               String jsonInitData,
-                              WXRenderStrategy flag){
+                              WXRenderStrategy flag) {
     if (mRendered || TextUtils.isEmpty(template)) {
+      return;
+    }
+    renderInternal(pageName, new Script(template), options, jsonInitData, flag);
+  }
+
+  private void renderInternal(String pageName,
+                              Script template,
+                              Map<String, Object> options,
+                              String jsonInitData,
+                              WXRenderStrategy flag){
+    if (mRendered || template == null || template.isEmpty()) {
       return;
     }
 
@@ -703,6 +729,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
 
     mApmForInstance.doInit();
+    mApmForInstance.setPageName(pageName);
 
     Uri uri = Uri.parse(url);
     if (uri != null && TextUtils.equals(uri.getScheme(), "file")) {
@@ -731,6 +758,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXHttpListener httpListener =
             new WXHttpListener(pageName, renderOptions, jsonInitData, flag, System.currentTimeMillis());
     httpListener.setSDKInstance(this);
+    mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
     adapter.sendRequest(wxRequest, (IWXHttpAdapter.OnHttpListener) httpListener);
   }
 
@@ -820,7 +848,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (reloadThis) {
       if (mContext != null)  {
         Intent intent = new Intent();
-        intent.setAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
+        intent.setAction(ACTION_INSTANCE_RELOAD);
         intent.putExtra("url", mBundleUrl);
         mContext.sendBroadcast(intent);
       }
@@ -1879,7 +1907,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
               && this.instance.getWXStatisticsListener() != null) {
         this.instance.getWXStatisticsListener().onHttpStart();
       }
-      mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
     }
 
     @Override

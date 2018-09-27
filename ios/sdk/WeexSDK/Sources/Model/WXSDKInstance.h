@@ -250,7 +250,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  *
  * @param data The data the bundle needs when rendered. Defalut is nil.
  **/
-- (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data;
+- (void)renderView:(id)source options:(NSDictionary *)options data:(id)data;
 
 /**
  * Reload the js bundle from the current URL and rerender.

@@ -49,6 +49,9 @@
 #import "WXSDKInstance_performance.h"
 #import "JSContext+Weex.h"
 #import "WXCoreBridge.h"
+#import "WXJSFrameworkLoadProtocol.h"
+#import "WXJSFrameworkLoadDefaultImpl.h"
+#import "WXHandlerFactory.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -418,7 +421,6 @@ _Pragma("clang diagnostic pop") \
     WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instanceIdString]);
     WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
     BOOL shoudMultiContext = [WXSDKManager sharedInstance].multiContext;
-    __weak typeof(self) weakSelf = self;
     NSString * bundleType = nil;
     
     if (shoudMultiContext) {
@@ -432,20 +434,18 @@ _Pragma("clang diagnostic pop") \
         }
         [newOptions addEntriesFromDictionary:@{@"env":[WXUtility getEnvironment]}];
         newOptions[@"bundleType"] = bundleType;
-        NSString *raxAPIScript = nil;
-        NSString *raxAPIScriptPath = nil;
+        __block NSString *raxAPIScript = nil;
+        __block NSString *raxAPIScriptPath = nil;
+        id<WXJSFrameworkLoadProtocol> handler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSFrameworkLoadProtocol)];
         sdkInstance.bundleType = bundleType;
         if ([bundleType.lowercaseString isEqualToString:@"rax"]) {
-            raxAPIScriptPath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-rax-api" ofType:@"js"];
-            if (raxAPIScriptPath == nil) {
-                raxAPIScriptPath = [[NSBundle mainBundle] pathForResource:@"weex-rax-api" ofType:@"js"];
-            }
-            raxAPIScript = [NSString stringWithContentsOfFile:raxAPIScriptPath encoding:NSUTF8StringEncoding error:nil];
-            if (!raxAPIScript) {
-                WXLogError(@"weex-rax-api can not found");
+            if (handler && [handler respondsToSelector:@selector(loadRaxFramework:)]) {
+                [handler loadRaxFramework:^(NSString *path, NSString *script) {
+                    raxAPIScriptPath = path;
+                    raxAPIScript = script;
+                }];
             }
         }
-        
         if ([WXDebugTool isDevToolDebug]) {
             [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[],raxAPIScript?:@""]];
             
@@ -467,12 +467,70 @@ _Pragma("clang diagnostic pop") \
                     }
                 }
                 
-                NSDictionary* envDic = [instanceContextEnvironment toDictionary];
-                sdkInstance.createInstanceContextResult = [NSString stringWithFormat:@"%@", [envDic allKeys]];
+                NSMutableArray* allKeys = nil;
+                
+                if ([WXUtility useJSCApiForCreateInstance]) {
+                    JSContextRef contextRef = instanceContextEnvironment.context.JSGlobalContextRef;
+                    WXAssert([instanceContextEnvironment isObject], @"Invalid instance context.");
+                    JSValueRef jsException = NULL;
+                    JSObjectRef instanceContextObjectRef = JSValueToObject(contextRef, instanceContextEnvironment.JSValueRef, &jsException);
+                    if (jsException != NULL) {
+                        WXLogError(@"JSValueToObject Exception during create instance.");
+                    }
+                    BOOL somethingWrong = NO;
+                    if (instanceContextObjectRef != NULL) {
+                        JSPropertyNameArrayRef allKeyRefs = JSObjectCopyPropertyNames(contextRef, instanceContextObjectRef);
+                        size_t keyCount = JSPropertyNameArrayGetCount(allKeyRefs);
+                        
+                        allKeys = [[NSMutableArray alloc] initWithCapacity:keyCount];
+                        for (size_t i = 0; i < keyCount; i ++) {
+                            JSStringRef nameRef = JSPropertyNameArrayGetNameAtIndex(allKeyRefs, i);
+                            size_t len = JSStringGetMaximumUTF8CStringSize(nameRef);
+                            if (len > 1024) {
+                                somethingWrong = YES;
+                                break;
+                            }
+                            char* buf = (char*)malloc(len + 5);
+                            if (buf == NULL) {
+                                somethingWrong = YES;
+                                break;
+                            }
+                            bzero(buf, len + 5);
+                            if (JSStringGetUTF8CString(nameRef, buf, len + 5) > 0) {
+                                NSString* keyString = [NSString stringWithUTF8String:buf];
+                                if ([keyString length] == 0) {
+                                    somethingWrong = YES;
+                                    free(buf);
+                                    break;
+                                }
+                                [allKeys addObject:keyString];
+                            }
+                            else {
+                                somethingWrong = YES;
+                                free(buf);
+                                break;
+                            }
+                            free(buf);
+                        }
+                        JSPropertyNameArrayRelease(allKeyRefs);
+                    } else {
+                        somethingWrong = YES;
+                    }
+                    
+                    if (somethingWrong) {
+                        // [instanceContextEnvironment toDictionary] may contain retain-cycle.
+                        allKeys = (NSMutableArray*)[[instanceContextEnvironment toDictionary] allKeys];
+                    }
+                }
+                else {
+                    allKeys = (NSMutableArray*)[[instanceContextEnvironment toDictionary] allKeys];
+                }
+
+                sdkInstance.createInstanceContextResult = [NSString stringWithFormat:@"%@", allKeys];
                 JSGlobalContextRef instanceContextRef = sdkInstance.instanceJavaScriptContext.javaScriptContext.JSGlobalContextRef;
                 JSObjectRef instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
                 
-                for (NSString * key in [envDic allKeys]) {
+                for (NSString * key in allKeys) {
                     JSStringRef propertyName = JSStringCreateWithUTF8CString([key cStringUsingEncoding:NSUTF8StringEncoding]);
                     if ([key isEqualToString:@"Vue"]) {
                         JSObjectSetPrototype(instanceContextRef, JSValueToObject(instanceContextRef, [instanceContextEnvironment valueForProperty:key].JSValueRef, NULL), JSObjectGetPrototype(instanceContextRef, instanceGlobalObject));
@@ -481,15 +539,14 @@ _Pragma("clang diagnostic pop") \
                 }
                 
                 if (WX_SYS_VERSION_LESS_THAN(@"10.2")) {
-                    NSString *filePath = [[NSBundle bundleForClass:[weakSelf class]] pathForResource:@"weex-polyfill" ofType:@"js"];
-                    if (filePath == nil) {
-                        filePath = [[NSBundle mainBundle] pathForResource:@"weex-polyfill" ofType:@"js"];
-                    }
-                    NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
-                    if (script) {
-                        [sdkInstance.instanceJavaScriptContext executeJavascript:script withSourceURL:[NSURL URLWithString:filePath]];
-                    } else {
-                        WXLogError(@"weex-pollyfill can not found");
+                    if (handler && [handler respondsToSelector:@selector(loadPolyfillFramework:)]) {
+                        [handler loadPolyfillFramework:^(NSString *path, NSString *script) {
+                            if (script) {
+                                [sdkInstance.instanceJavaScriptContext executeJavascript:script withSourceURL:[NSURL URLWithString:path]];
+                            } else {
+                                WXLogError(@"weex-pollyfill can not found");
+                            }
+                        }];
                     }
                 }
                 
@@ -499,11 +556,17 @@ _Pragma("clang diagnostic pop") \
                 }
                 
                 [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
+                NSDictionary* funcInfo = @{
+                                           @"func":@"createInstance",
+                                           @"arg":@"start"
+                                        };
+                sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"]= funcInfo;
                 if ([NSURL URLWithString:sdkInstance.pageName] || sdkInstance.scriptURL) {
                     [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]?:sdkInstance.scriptURL];
                 } else {
                     [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
                 }
+                sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = nil;
                 WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
             }];
         }
@@ -516,8 +579,15 @@ _Pragma("clang diagnostic pop") \
         } else {
             args = @[instanceIdString, jsBundleString, options ?: @{}];
         }
-        [self _mountInstanceInfoToGlobalContext:sdkInstance];
+        NSDictionary* funcInfo = @{
+                                   @"func":@"createInstance",
+                                   @"arg":@"start",
+                                   @"instanceId":sdkInstance.instanceId?:@"unknownId"
+                                   };
+        sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = funcInfo;
         [self callJSMethod:@"createInstance" args:args];
+        sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = nil;
+        
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
     }
 }
@@ -532,19 +602,40 @@ _Pragma("clang diagnostic pop") \
     return shouldMountInstanceContextExtInfo;
 }
 
-- (void) _mountInstanceInfoToGlobalContext:(WXSDKInstance*) instance
+- (void)createInstance:(NSString *)instanceIdString
+              contents:(NSData *)contents
+               options:(NSDictionary *)options
+                  data:(id)data
 {
-    if (![self _shouldMountExtInfoToInstanceContxt]) {
+    WXAssertBridgeThread();
+    WXAssertParam(instanceIdString);
+
+    @synchronized(self) {
+        if (![self.insStack containsObject:instanceIdString]) {
+            if ([options[@"RENDER_IN_ORDER"] boolValue]) {
+                [self.insStack addObject:instanceIdString];
+            } else {
+                [self.insStack insertObject:instanceIdString atIndex:0];
+            }
+        }
+    }
+    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
+    [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_START];
+
+    //create a sendQueue bind to the current instance
+    NSMutableArray *sendQueue = [NSMutableArray array];
+    [self.sendQueue setValue:sendQueue forKey:instanceIdString];
+
+    if (sdkInstance.dataRender) {
+        WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instanceIdString]);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+
+        WXPerformBlockOnComponentThread(^{
+            [WXCoreBridge createDataRenderInstance:instanceIdString contents:contents options:options data:data];
+            WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+        });
         return;
     }
-    JSContext* globalContext = self.jsBridge.javaScriptContext;
-    if (!globalContext && [globalContext.name isEqualToString:@"Weex Context"]) {
-        return;
-    }
-    NSMutableDictionary *extInfo = [NSMutableDictionary dictionaryWithDictionary:@{
-                @"wxInstanceId":instance.instanceId?:@"unSetInstanceId"
-    }];
-    globalContext[@"wxInstanceExtInfo"] = extInfo;
 }
 
 - (NSString *)_pareJSBundleType:(NSString*)instanceIdString jsBundleString:(NSString*)jsBundleString
@@ -806,12 +897,18 @@ _Pragma("clang diagnostic pop") \
 {
     if(self.frameworkLoadFinished) {
         WXAssert(script, @"param script required!");
+        NSDictionary* funcInfo = @{
+                                   @"func":@"executeJsService",
+                                   @"arg":name?:@"unsetScriptName"
+                                   };
+        self.jsBridge.javaScriptContext[@"wxExtFuncInfo"] = funcInfo;
         [self.jsBridge executeJavascript:script];
+        self.jsBridge.javaScriptContext[@"wxExtFuncInfo"] = nil;
         
         if ([self.jsBridge exception]) {
             NSString *exception = [[self.jsBridge exception] toString];
-            NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE] %@",exception];
-            [WXExceptionUtils commitCriticalExceptionRT:@"WX_KEY_EXCEPTION_INVOKE" errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_INVOKE] function:@"" exception:errMsg extParams:nil];
+            NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE] name:%@,arg:%@,exception :$@",name,exception];
+            [WXExceptionUtils commitCriticalExceptionRT:@"WX_KEY_EXCEPTION_INVOKE" errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_INVOKE] function:@"executeJsService" exception:errMsg extParams:nil];
             WX_MONITOR_FAIL(WXMTJSService, WX_ERR_JSFRAMEWORK_EXECUTE, errMsg);
         } else {
             // success
@@ -831,6 +928,9 @@ _Pragma("clang diagnostic pop") \
     if(!modules) return;
     
     [self callJSMethod:@"registerModules" args:@[modules]];
+    WXPerformBlockOnComponentThread(^{
+        [WXCoreBridge registerModules:modules];
+    });
 }
 
 - (void)registerComponents:(NSArray *)components
@@ -846,7 +946,8 @@ _Pragma("clang diagnostic pop") \
 {
     if (self.frameworkLoadFinished) {
         [self.jsBridge callJSMethod:method args:args];
-    } else {
+    }
+    else {
         [_methodQueue addObject:@{@"method":method, @"args":args}];
     }
 }
@@ -991,23 +1092,25 @@ _Pragma("clang diagnostic pop") \
                         bundleUrl = @"weex-main-jsfm";
                     }
                     userInfo = [NSDictionary dictionary];
-                    tryFindInstanceInfoInGlobalContext = YES;
-                    JSValue* instanceExtInfoValue = [context objectForKeyedSubscript:@"wxInstanceExtInfo"];
-                    if (nil != instanceExtInfoValue) {
-                        NSDictionary* instanceInfo = [instanceExtInfoValue toDictionary];
-                        NSString* exceptionInstanceId = [instanceInfo objectForKey:@"wxInstanceId"];
-                        if (nil != exceptionInstanceId) {
-                            instance = [WXSDKManager instanceForID:exceptionInstanceId];
-                        }
-                    }
-                    errorCode = [NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_EMPTY_SCREEN_JS];
                 }
             } else {
                 instance = [WXSDKEngine topInstance];
             }
             
+            NSDictionary* wxExtFuncInfo = [context[@"wxExtFuncInfo"] toDictionary];
+            NSString* recordFunc = [wxExtFuncInfo objectForKey:@"func"];
+            NSString* recordArg = [wxExtFuncInfo objectForKey:@"arg"];
+            NSString* recordInsstanceId = [wxExtFuncInfo objectForKey:@"instanceId"];
+            if (nil == instance) {
+                instance = [WXSDKManager instanceForID:recordInsstanceId];
+                tryFindInstanceInfoInGlobalContext = nil!= instance;
+            }
+            
+            if(nil != instance && [recordFunc isEqualToString:@"createInstance"] && !instance.apmInstance.hasAddView){
+                errorCode = [NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_EMPTY_SCREEN_JS];
+            }
 
-            if (instance && !tryFindInstanceInfoInGlobalContext) {
+            if (instance) {
                 bundleUrl = instance.pageName?:([instance.scriptURL absoluteString]?:@"WX_KEY_EXCEPTION_WXBRIDGE");
                 message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@\n%@\n%@\n%@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject], instance.scriptURL.absoluteString, instance.callCreateInstanceContext?:@"", instance.createInstanceContextResult?:@"", instance.executeRaxApiResult?:@""];
                 userInfo = @{@"jsMainBundleStringContentLength":instance.userInfo[@"jsMainBundleStringContentLength"]?:@"",
@@ -1015,9 +1118,17 @@ _Pragma("clang diagnostic pop") \
             }
             
             if (commitException) {
-                WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:bundleUrl errorCode:errorCode functionName:@"" exception:message userInfo:[userInfo mutableCopy]];
+                NSMutableDictionary* reportInfo = [[NSMutableDictionary alloc] initWithDictionary:[userInfo mutableCopy]];
+                [reportInfo setObject:context.name?:@"unknownContextName" forKey:@"wxContextName"];
                 
-                [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo.instanceId errCode:jsExceptionInfo.errorCode function:@"exceptionHandler" exception:jsExceptionInfo.exception extParams:jsExceptionInfo.userInfo];
+                WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:bundleUrl errorCode:errorCode functionName:[NSString stringWithFormat:@"func: %@ arg:%@",recordFunc,recordArg]?:@"exceptionHandler" exception:message userInfo:reportInfo];
+                
+                if (nil == instance) {
+                    [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo];
+                }else{
+                    [WXExceptionUtils commitCriticalExceptionRT:jsExceptionInfo.instanceId errCode:jsExceptionInfo.errorCode function:jsExceptionInfo.functionName exception:jsExceptionInfo.exception extParams:jsExceptionInfo.userInfo];
+                }
+      
                 WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_JS_EXECUTE, message);
                 if (instance.onJSRuntimeException && !tryFindInstanceInfoInGlobalContext) {
                     instance.onJSRuntimeException(jsExceptionInfo);

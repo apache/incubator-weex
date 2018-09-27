@@ -22,18 +22,20 @@
 #include <core/manager/weex_core_manager.h>
 #include <base/make_copyable.h>
 #include <base/thread/waitable_event.h>
+#include "base/string_util.h"
 #include <wson_parser.h>
-#include "jsfunction_impl_android.h"
+#include "wx_debug_js_bridge.h"
 #include "android/base/string/string_utils.h"
-#include "android/jniprebuild/jniheader/WXJsFunctions_jni.h"
+#include "android/jniprebuild/jniheader/WXDebugJsBridge_jni.h"
 #include "core/render/manager/render_manager.h"
 #include "IPC/IPCResult.h"
 #include "core/bridge/platform_bridge.h"
+#include "base/ViewUtils.h"
 
 using namespace WeexCore;
 
 namespace WeexCore {
-  bool RegisterWXJsFunction(JNIEnv *env) {
+  bool RegisterWXDebugJsBridge(JNIEnv *env) {
     return RegisterNativesImpl(env);
   }
 }
@@ -86,16 +88,45 @@ void jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, j
   JByteArrayRef arg = JByteArrayRef(env, arguments);
   JByteArrayRef opt = JByteArrayRef(env, options);
 
-  WeexCoreManager::Instance()
+  std::string ret_str = "";
+
+  std::unique_ptr<ValueWithType> ret = WeexCoreManager::Instance()
       ->script_bridge()
       ->core_side()
       ->CallNativeModule(page_id_ref.getChars(), module_ref.getChars(), method_ref.getChars(),
                          arg.getBytes(), arg.length(),
                          opt.getBytes(), opt.length());
+
+
+  switch (ret.get()->type) {
+    case ParamsType::INT32:
+      ret_str = to_string(ret.get()->value.int32Value);
+      break;
+    case ParamsType::INT64:
+      ret_str = to_string(ret.get()->value.int64Value);
+      break;
+    case ParamsType::FLOAT:
+    case ParamsType::DOUBLE:
+      ret_str = to_string(ret.get()->value.doubleValue);
+      break;
+    case ParamsType::VOID:
+      break;
+    case ParamsType::BYTEARRAY:
+      ret.get()->value.byteArray->content;
+      ret.get()->value.byteArray->length;
+      break;
+    case ParamsType::JSONSTRING:
+      weex::base::to_utf8(ret.get()->value.string->content, ret.get()->value.string->length);
+      break;
+    case ParamsType::STRING:
+      weex::base::to_utf8(ret.get()->value.string->content, ret.get()->value.string->length);
+      break;
+    default:
+      break;
+  }
 }
 
-void
-jsHandleCallNativeComponent(JNIEnv *env, jobject object, jstring instanceId, jstring componentRef,
+void jsHandleCallNativeComponent(JNIEnv *env, jobject object, jstring instanceId, jstring componentRef,
                             jstring method,
                             jbyteArray arguments, jbyteArray options, jboolean from) {
 
@@ -113,8 +144,7 @@ jsHandleCallNativeComponent(JNIEnv *env, jobject object, jstring instanceId, jst
                             arg.getBytes(), arg.length(), opt.getBytes(), opt.length());
 }
 
-void
-jsHandleCallAddElement(JNIEnv *env, jobject object, jstring instanceId, jstring ref, jbyteArray dom,
+void jsHandleCallAddElement(JNIEnv *env, jobject object, jstring instanceId, jstring ref, jbyteArray dom,
                        jstring index) {
 
   ScopedJStringUTF8 page_id_ref = ScopedJStringUTF8(env, instanceId);
@@ -142,7 +172,7 @@ void jsHandleCallNativeLog(JNIEnv *env, jobject object, jbyteArray str_array) {
   WeexCoreManager::Instance()->script_bridge()->core_side()->NativeLog(str_array_ref.getBytes());
 }
 
-void jsFunctionCallCreateBody(JNIEnv *env, jobject object, jstring pageId, jbyteArray domStr,
+void jsHandleCallCreateBody(JNIEnv *env, jobject object, jstring pageId, jbyteArray domStr,
                               jboolean from) {
   ScopedJStringUTF8 page_id_ref = ScopedJStringUTF8(env, pageId);
   JByteArrayRef dom_str_ref = JByteArrayRef(env, domStr);
@@ -151,7 +181,7 @@ void jsFunctionCallCreateBody(JNIEnv *env, jobject object, jstring pageId, jbyte
                                                                         dom_str_ref.length());
 }
 
-void jsFunctionCallUpdateFinish(JNIEnv *env, jobject object, jstring instanceId, jbyteArray tasks,
+void jsHandleCallUpdateFinish(JNIEnv *env, jobject object, jstring instanceId, jbyteArray tasks,
                                 jstring callback) {
 
   ScopedJStringUTF8 page_id_ref = ScopedJStringUTF8(env, instanceId);
@@ -166,12 +196,12 @@ void jsFunctionCallUpdateFinish(JNIEnv *env, jobject object, jstring instanceId,
                      callback_ref.getChars(), strlen(callback_ref.getChars()));
 }
 
-void jsFunctionCallCreateFinish(JNIEnv *env, jobject object, jstring pageId) {
+void jsHandleCallCreateFinish(JNIEnv *env, jobject object, jstring pageId) {
   ScopedJStringUTF8 page_id_ref = ScopedJStringUTF8(env, pageId);
   WeexCoreManager::Instance()->script_bridge()->core_side()->CreateFinish(page_id_ref.getChars());
 }
 
-void jsFunctionCallRefreshFinish(JNIEnv *env, jobject object, jstring instanceId, jbyteArray tasks,
+void jsHandleCallRefreshFinish(JNIEnv *env, jobject object, jstring instanceId, jbyteArray tasks,
                                  jstring callback) {
 
   ScopedJStringUTF8 page_id_ref = ScopedJStringUTF8(env, instanceId);
@@ -184,8 +214,7 @@ void jsFunctionCallRefreshFinish(JNIEnv *env, jobject object, jstring instanceId
       ->RefreshFinish(page_id_ref.getChars(), tasks_ref.getBytes(), callback_ref.getChars());
 }
 
-void
-jsFunctionCallUpdateAttrs(JNIEnv *env, jobject object, jstring pageId, jstring ref, jbyteArray data,
+void jsHandleCallUpdateAttrs(JNIEnv *env, jobject object, jstring pageId, jstring ref, jbyteArray data,
                           jboolean from) {
 
   ScopedJStringUTF8 page_id_ref = ScopedJStringUTF8(env, pageId);
@@ -198,8 +227,7 @@ jsFunctionCallUpdateAttrs(JNIEnv *env, jobject object, jstring pageId, jstring r
                                                                          data_ref.length());
 }
 
-void
-jsFunctionCallUpdateStyle(JNIEnv *env, jobject object, jstring pageId, jstring ref, jbyteArray data,
+void jsHandleCallUpdateStyle(JNIEnv *env, jobject object, jstring pageId, jstring ref, jbyteArray data,
                           jboolean from) {
 
   ScopedJStringUTF8 page_id_ref = ScopedJStringUTF8(env, pageId);
@@ -212,7 +240,7 @@ jsFunctionCallUpdateStyle(JNIEnv *env, jobject object, jstring pageId, jstring r
                                                                          data_ref.length());
 }
 
-void jsFunctionCallRemoveElement(JNIEnv *env, jobject object, jstring pageId, jstring ref) {
+void jsHandleCallRemoveElement(JNIEnv *env, jobject object, jstring pageId, jstring ref) {
 
   ScopedJStringUTF8 page_id_ref = ScopedJStringUTF8(env, pageId);
   ScopedJStringUTF8 ref_ref = ScopedJStringUTF8(env, ref);
@@ -224,7 +252,7 @@ void jsFunctionCallRemoveElement(JNIEnv *env, jobject object, jstring pageId, js
                       ref_ref.getChars());
 }
 
-void jsFunctionCallMoveElement(JNIEnv *env, jobject object, jstring pageId, jstring ref,
+void jsHandleCallMoveElement(JNIEnv *env, jobject object, jstring pageId, jstring ref,
                                jstring parentRef, jstring index_str) {
 
   ScopedJStringUTF8 page_id_ref = ScopedJStringUTF8(env, pageId);
@@ -240,8 +268,7 @@ void jsFunctionCallMoveElement(JNIEnv *env, jobject object, jstring pageId, jstr
       index_number);
 }
 
-void
-jsFunctionCallAddEvent(JNIEnv *env, jobject object, jstring pageId, jstring ref, jstring event) {
+void jsHandleCallAddEvent(JNIEnv *env, jobject object, jstring pageId, jstring ref, jstring event) {
 
   ScopedJStringUTF8 page_id_ref = ScopedJStringUTF8(env, pageId);
   ScopedJStringUTF8 ref_ref = ScopedJStringUTF8(env, ref);
@@ -251,7 +278,7 @@ jsFunctionCallAddEvent(JNIEnv *env, jobject object, jstring pageId, jstring ref,
                                                                       event_ref.getChars());
 }
 
-void jsFunctionCallRemoveEvent(JNIEnv *env, jobject object, jstring pageId, jstring ref,
+void jsHandleCallRemoveEvent(JNIEnv *env, jobject object, jstring pageId, jstring ref,
                                jstring event) {
 
   ScopedJStringUTF8 page_id_ref = ScopedJStringUTF8(env, pageId);

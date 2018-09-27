@@ -69,6 +69,15 @@ static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
     jstring script,
     jint type);
 
+static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
+    jstring instanceId,
+    jstring ref,
+    jstring type,
+    jstring data);
+
+static void RegisterModuleOnDataRenderNode(JNIEnv* env, jobject jcaller,
+    jstring data);
+
 static void TakeHeapSnapshot(JNIEnv* env, jobject jcaller,
     jstring filename);
 
@@ -945,6 +954,19 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "I"
 ")"
 "Ljava/lang/String;", reinterpret_cast<void*>(ExecJSOnInstance) },
+    { "nativeFireEventOnDataRenderNode",
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(FireEventOnDataRenderNode) },
+    { "nativeRegisterModuleOnDataRenderNode",
+"("
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(RegisterModuleOnDataRenderNode) },
     { "nativeTakeHeapSnapshot",
 "("
 "Ljava/lang/String;"

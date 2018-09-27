@@ -43,6 +43,7 @@ namespace WeexCore {
 
   constexpr char DEFAULT_WIDTH[] = "defaultWidth";
   constexpr char WIDTH[] = "width";
+  constexpr char ROUND_OFF_DEVIATION[] = "roundOffDeviation";
   constexpr char SCROLL_DIRECTION[] = "scrollDirection";
 
   constexpr char POSITION[] = "position";

@@ -32,6 +32,10 @@ Value *GetTableValue(Table *, const Value &);
     
 Value *GetTableVar(Table *table, const Value &key);
     
+Value *GetTableValue(Table *table, std::string key);
+    
+std::vector<std::string> GetTableKeys(Table *table);
+    
 size_t GetTableSize(Table *);
     
 std::string TableToString(Table *table);

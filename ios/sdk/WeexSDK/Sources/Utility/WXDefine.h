@@ -183,3 +183,11 @@ return;\
 #endif
 
 #endif
+
+WX_EXTERN_C_BEGIN
+
+NSString* GetWeexSDKVersion(void);
+NSString* GetWeexSDKBuildTime(void);
+unsigned long GetWeexSDKBuildTimestamp(void);
+
+WX_EXTERN_C_END

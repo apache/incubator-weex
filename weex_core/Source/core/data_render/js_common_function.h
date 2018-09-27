@@ -17,12 +17,24 @@
  * under the License.
  */
 
-#ifndef WEEX_PROJECT_WXJSFUNCTION_IMPL_ANDROID_H
-#define WEEX_PROJECT_WXJSFUNCTION_IMPL_ANDROID_H
+//
+// Created by pentao.pt on 2018/7/25.
+//
 
-#include <jni.h>
+#ifndef DATA_RENDER_JS_COMMON_FUNCTION_H
+#define DATA_RENDER_JS_COMMON_FUNCTION_H
 
-namespace WeexCore {
-    bool RegisterWXJsFunction(JNIEnv *env);
-}
-#endif //WEEX_PROJECT_WXJSFUNCTION_IMPL_ANDROID_H
+#include "core/data_render/object.h"
+#include "core/data_render/exec_state.h"
+
+namespace weex {
+namespace core {
+namespace data_render {
+ 
+void RegisterJSCommonFunction(ExecState *state);
+    
+}  // namespace data_render
+}  // namespace core
+}  // namespace weex
+
+#endif  // DATA_RENDER_JS_COMMON_FUNCTION_H

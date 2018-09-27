@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 #include "core/render/page/render_page.h"
 #include "base/TimeUtils.h"
 #include "base/ViewUtils.h"
@@ -409,7 +410,7 @@ bool RenderPage::CreateFinish() {
   SendRenderSuccessAction();
   return true;
 }
-
+    
 void RenderPage::LayoutInner() {
   CalculateLayout();
   this->need_layout_.store(false);
@@ -539,7 +540,7 @@ void RenderPage::SendLayoutAction(RenderObject *render, int index) {
   RenderAction *action = new RenderActionLayout(page_id(), render, index);
   PostRenderAction(action);
 }
-
+    
 void RenderPage::SendUpdateStyleAction(
     RenderObject *render,
     std::vector<std::pair<std::string, std::string>> *style,

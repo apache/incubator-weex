@@ -493,6 +493,10 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
 
 + (void)setListSectionRowThreadSafe:(BOOL)value;
 
++ (void)setUseJSCApiForCreateInstance:(BOOL)value;
+
++ (BOOL)useJSCApiForCreateInstance;
+
 + (BOOL)listSectionRowThreadSafe;
 
 + (long) getUnixFixTimeMillis;

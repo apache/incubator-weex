@@ -260,6 +260,15 @@ static BOOL bNeedRemoveEvents = YES;
             [self _removeAllEvents];
         }
     }
+    
+    if (_bindingExpressions != nullptr) {
+        for (WXJSExpression* expr : *_bindingExpressions) {
+            if (expr != nullptr) {
+                delete expr;
+            }
+        }
+        delete _bindingExpressions;
+    }
 
     pthread_mutex_destroy(&_propertyMutex);
     pthread_mutexattr_destroy(&_propertMutexAttr);
@@ -599,31 +608,38 @@ static BOOL bNeedRemoveEvents = YES;
     return YES;
 }
 
-- (void)_removeSubcomponent:(WXComponent *)subcomponent
+- (void)_removeSubcomponent:(WXComponent *)subcomponent removeCssNode:(BOOL)removeCssNode
 {
     pthread_mutex_lock(&_propertyMutex);
     [_subcomponents removeObject:subcomponent];
-    [self removeSubcomponentCssNode:subcomponent];
+    if (removeCssNode) {
+        [self removeSubcomponentCssNode:subcomponent];
+    }
     pthread_mutex_unlock(&_propertyMutex);
 }
 
 - (void)_removeFromSupercomponent
 {
-    [self.supercomponent _removeSubcomponent:self];
+    [self _removeFromSupercomponent:YES]; // really do remove
+}
+
+- (void)_removeFromSupercomponent:(BOOL)remove
+{
+    [self.supercomponent _removeSubcomponent:self removeCssNode:remove];
     [self.supercomponent setNeedsLayout];
     
     if (_positionType == WXPositionTypeFixed) {
         [self.weexInstance.componentManager removeFixedComponent:self];
         self->_isNeedJoinLayoutSystem = YES;
     }
-	if (_positionType == WXPositionTypeSticky) {
-		[self.ancestorScroller removeStickyComponent:self];
-	}
+    if (_positionType == WXPositionTypeSticky) {
+        [self.ancestorScroller removeStickyComponent:self];
+    }
 }
 
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index
 {
-    [self _removeFromSupercomponent];
+    [self _removeFromSupercomponent:NO]; // no remove underlayer render object
     [newSupercomponent _insertSubcomponent:self atIndex:index];
 }
 

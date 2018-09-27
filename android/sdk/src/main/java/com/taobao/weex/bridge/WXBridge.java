@@ -29,6 +29,7 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
@@ -65,6 +66,10 @@ public class WXBridge implements IWXBridge {
   public native int nativeDestoryInstance(String instanceId, String name, String function, WXJSObject[] args);
 
   public native String nativeExecJSOnInstance(String instanceId, String script, int type);
+
+  public native void nativeFireEventOnDataRenderNode(String instanceId, String ref, String type, String data);
+
+  public native void nativeRegisterModuleOnDataRenderNode( String data);
 
   private native void nativeTakeHeapSnapshot(String filename);
 
@@ -230,9 +235,17 @@ public class WXBridge implements IWXBridge {
   public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
     try {
       long start = WXUtils.getFixUnixTime();
+      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       JSONArray argArray = null;
-      if (arguments != null)
-        argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
+      if (arguments != null){
+        // TODO use a better way
+        if (instance!=null && (instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
+                || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY)){
+          argArray = (JSONArray) JSON.parse(new String(arguments, "UTF-8"));
+        } else {
+          argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
+        }
+      }
       JSONObject optionsObj = null;
       if (options != null) {
         optionsObj = (JSONObject) WXWsonJSONSwitch.parseWsonOrJSON(options);
@@ -256,7 +269,6 @@ public class WXBridge implements IWXBridge {
 
       Object object = WXBridgeManager.getInstance().callNativeModule(instanceId, module, method, argArray, optionsObj);
 
-      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (null != instance){
         instance.getApmForInstance().updateFSDiffStats(WXInstanceApm.KEY_PAGE_STATS_FS_CALL_NATIVE_NUM,1);
         instance.getApmForInstance().updateFSDiffStats(
@@ -676,5 +688,14 @@ public class WXBridge implements IWXBridge {
         break;
       }
     }
+  }
+
+  @Override
+  public void fireEventOnDataRenderNode(String instanceId, String ref, String type, String data) {
+    nativeFireEventOnDataRenderNode(instanceId,ref,type,data);
+  }
+
+  public void registerModuleOnDataRenderNode(String data) {
+    nativeRegisterModuleOnDataRenderNode(data);
   }
 }

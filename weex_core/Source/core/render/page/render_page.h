@@ -26,6 +26,8 @@
 #include <utility>
 #include <vector>
 
+#include "core/css/constants_value.h"
+
 namespace WeexCore {
 
 class RenderAction;
@@ -37,10 +39,6 @@ class RenderPerformance;
 class RenderPage {
  private:
   void TraverseTree(RenderObject *render, long index);
-
-  void PushRenderToRegisterMap(RenderObject *render);
-
-  void RemoveRenderFromRegisterMap(RenderObject *render);
 
   void SendCreateBodyAction(RenderObject *render);
 
@@ -66,6 +64,9 @@ class RenderPage {
       RenderObject *render,
       std::vector<std::pair<std::string, std::string>> *attrs);
 
+  void SendCallNativeModuleAction(const std::string &module,
+                                  const std::string &method, const std::string &args, int argc = 0);
+    
   void SendCreateFinishAction();
 
   void SendRenderSuccessAction();
@@ -73,7 +74,7 @@ class RenderPage {
   void SendAppendTreeCreateFinish(const std::string &ref);
 
   void PostRenderAction(RenderAction *action);
-
+  
   void LayoutInner();
 
 public:
@@ -127,8 +128,17 @@ public:
                             std::map<std::string, std::string> *attrs);
 
   RenderObject *GetRenderObject(const std::string &ref);
+    
+  void CallNativeModule(const std::string &module,
+                          const std::string &method, const std::string &args, int argc = 0);
 
   void SetRootRenderObject(RenderObject *root);
+    
+  // ****** Render object managing ****** //
+  
+  void PushRenderToRegisterMap(RenderObject *render);
+    
+  void RemoveRenderFromRegisterMap(RenderObject *render);
 
   // ****** Life Cycle ****** //
 
@@ -163,8 +173,14 @@ public:
     this->viewport_width_ = viewport_width;
   }
 
+  inline bool round_off_deviation() const { return this->round_off_deviation_; }
+
+  inline void set_round_off_deviation(float round_off_deviation) { this->round_off_deviation_ = round_off_deviation; }
+
   inline void set_before_layout_needed(bool v) { is_before_layout_needed_.store(v); }
+
   inline void set_platform_layout_needed(bool v) { is_platform_layout_needed_.store(v); }
+
   inline void set_after_layout_needed(bool v) { is_after_layout_needed_.store(v); }
 
  public:
@@ -185,6 +201,7 @@ public:
   std::atomic_bool is_platform_layout_needed_{false};
   std::atomic_bool is_after_layout_needed_{true};
   float viewport_width_ = -1;
+  bool round_off_deviation_ = kDefaultRoundOffDeviation;
 };
 }  // namespace WeexCore
 

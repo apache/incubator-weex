@@ -47,11 +47,18 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
   RenderPage *page = new RenderPage(page_id);
   pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
 
-  std::map<std::string, float>::iterator iter =
+  std::map<std::string, float>::iterator iter_viewport =
       this->viewports_.find(page_id);
-  if (iter != this->viewports_.end()) {
-    this->set_viewport_width(page_id, iter->second);
+  if (iter_viewport != this->viewports_.end()) {
+    this->set_viewport_width(page_id, iter_viewport->second);
     this->viewports_.erase(page_id);
+  }
+
+  std::map<std::string, bool>::iterator iter_deviation =
+      this->round_off_deviations_.find(page_id);
+  if (iter_deviation != this->round_off_deviations_.end()) {
+    this->set_round_off_deviation(page_id, iter_deviation->second);
+    this->round_off_deviations_.erase(page_id);
   }
 
   int64_t start_time = getCurrentTime();
@@ -305,7 +312,7 @@ void RenderManager::CallNativeModule(const char *page_id, const char *module, co
     CallMetaModule(page_id, method, arguments);
   }
 }
-
+    
 void RenderManager::CallMetaModule(const char *page_id, const char *method, const char *arguments) {
   if (strcmp(method, "setViewport") == 0) {
     wson_parser parser(arguments);
@@ -320,6 +327,9 @@ void RenderManager::CallMetaModule(const char *page_id, const char *method, cons
             std::string value = parser.nextStringUTF8(parser.nextType());
             if (strcmp(key.c_str(), WIDTH) == 0) {
               viewports_.insert(std::pair<std::string, float>(page_id, getFloat(value.c_str())));
+            }
+            if (strcmp(key.c_str(), ROUND_OFF_DEVIATION) == 0) {
+              round_off_deviations_.insert(std::pair<std::string, bool>(page_id, getBool(value.c_str())));
             }
           }
         }
@@ -364,6 +374,20 @@ void RenderManager::set_viewport_width(const std::string &page_id, float viewpor
   if (page == nullptr) return;
 
   page->set_viewport_width(viewport_width);
+}
+
+bool RenderManager::round_off_deviation(const std::string &page_id) {
+  RenderPage *page = GetPage(page_id);
+  if (page == nullptr) return kDefaultRoundOffDeviation;
+
+  return page->round_off_deviation();
+}
+
+void RenderManager::set_round_off_deviation(const std::string &page_id, bool round_off_deviation) {
+  RenderPage *page = GetPage(page_id);
+  if (page == nullptr) return;
+
+  page->set_round_off_deviation(round_off_deviation);
 }
 
 void RenderManager::Batch(const std::string &page_id) {

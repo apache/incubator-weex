@@ -18,6 +18,7 @@
  */
 
 #include <sstream>
+#include <cstdlib>
 #include "core/data_render/object.h"
 
 namespace weex {
@@ -52,6 +53,10 @@ int ToInteger(const Value *o, const int &mode, int64_t &v) {
     SetDValue(&tmp, d);
     o = &tmp;
     goto label;
+  } else if (IsString(o)) {
+      v = atoi(CStringValue(o));
+      return 1;
+      
   } else {
     return 0;
   }
@@ -144,10 +149,10 @@ bool ValueStrictEquals(const Value *a, const Value *b) {
 }
     
 bool ValueAND(const Value *a, const Value *b) {
-    if (IsBool(a) && IsBool(b)) {
-        return BoolValue(a) && BoolValue(b);
-    }
-    return false;
+    bool aval = false, bval = false;
+    ToBool(a, aval);
+    ToBool(b, bval);
+    return aval && bval;
 }
     
 bool ValueOR(const Value *a, const Value *b) {
@@ -199,6 +204,11 @@ bool ValueGT(const Value *a, const Value *b) {
     }
     else if (ToNum(a, d1) && ToNum(b, d2)) {
         return NumGT(d1, d2);
+    }
+    else if (IsInt(b) && IsString(a)) {
+        int64_t aval = 0;
+        ToInteger(a, 0, aval);
+        return aval > IntValue(b);
     }
     else {
         return false;
@@ -279,7 +289,7 @@ void SetRefValue(Value *o) {
         value = value->ref;
     }
 }
-
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,19 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.common;
 
-/**
- * Created by budao on 16/6/25.
- */
-public interface IWXDebugProxy {
-    String ACTION_DEBUG_INSTANCE_REFRESH = "DEBUG_INSTANCE_REFRESH";
+#import <Foundation/Foundation.h>
+#import "WXJSFrameworkLoadProtocol.h"
 
-    String ACTION_INSTANCE_RELOAD = "INSTANCE_RELOAD";
+@interface WXJSFrameworkLoadDefaultImpl : NSObject <WXJSFrameworkLoadProtocol>
 
-    void start(IWXJsFunctions jsFunctions);
 
-    void stop(boolean reload);
-
-    IWXBridge getWXBridge();
-}
+@end
