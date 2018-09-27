@@ -136,6 +136,7 @@ void ExecState::startEncode() {
     encodeFunctionSection();
     encodeStartSection();
     encodeGlobalSection();
+    encodeGlobalVariableSection();
     encodeStyleSection();
     encodeArraySection();
     encodeRefSection();
@@ -220,6 +221,10 @@ void ExecState::encodeFunctionSection() {
             super_index = static_cast<int>(it - func_states.begin());
         }
         file->write((char*)&super_index, sizeof(int));
+
+        bool is_class_func = func_state->is_class_func();
+        file->write((char*)&is_class_func, sizeof(int));
+
         unsigned opcodeSize = static_cast<unsigned>(func_state->instructions().size());
         file->write((char*)&opcodeSize, sizeof(unsigned));
         for (int i=0; i<opcodeSize; i++) {
@@ -258,6 +263,20 @@ void ExecState::encodeGlobalSection() {
     for (int i=global_->register_size(); i<global_->size(); i++) {
         Value* value = global_->Find(i);
         encodeValue(*value);
+    }
+}
+
+void ExecState::encodeGlobalVariableSection() {
+    BinaryFile* file = BinaryFile::instance();
+    unsigned id = Section::GLOBAL_VARIABLE_SECTION;
+    unsigned size = static_cast<unsigned>(global_variables_.size());
+
+    file->write((char*)&id, sizeof(unsigned));
+    file->write((char*)&size, sizeof(unsigned));
+    for (auto variable : global_variables_) {
+        unsigned length = static_cast<unsigned>(variable.first.length()) + 1;
+        file->write(variable.first.c_str(), static_cast<unsigned int>(sizeof(char) * length));
+        file->write((char*)&variable.second, sizeof(long));
     }
 }
 
@@ -490,6 +509,9 @@ bool ExecState::startDecode() {
             case GLOBAL_SECTION:
                 decodeGlobalSection();
                 break;
+            case GLOBAL_VARIABLE_SECTION:
+                decodeGlobalVariableSection();
+                break;
             case STYLE_SECTION:
                 decodeStyleSection();
                 break;
@@ -580,6 +602,10 @@ void ExecState::decodeFunctionSection() {
         file->read((char*)&super_index, sizeof(int));
         func_state->set_super_index(super_index);
 
+        bool is_class_func = false;
+        file->read((char*)&is_class_func, sizeof(bool));
+        func_state->set_is_class_func(is_class_func);
+
         unsigned op_code_count = 0;
         file->read((char*)&op_code_count, sizeof(unsigned));
         for (int j=0; j<op_code_count; j++) {
@@ -636,6 +662,32 @@ void ExecState::decodeGlobalSection() {
                 global_->Add(value);
             }
         }
+    }
+}
+
+void ExecState::decodeGlobalVariableSection() {
+    BinaryFile* file = BinaryFile::instance();
+
+    unsigned count = 0;
+    file->read((char*)&count, sizeof(unsigned));
+    if (count == 0) {
+        return;
+    }
+
+    for (int i=0; i<count; i++) {
+        std::string key;
+        char c;
+        while (true) {
+            file->read(&c, sizeof(char));
+            if (c == 0) {
+                break;
+            }
+            key += c;
+        }
+
+        long value;
+        file->read((char*)&value, sizeof(long));
+        global_variables_.insert(std::pair<std::string, long>(key, value));
     }
 }
 

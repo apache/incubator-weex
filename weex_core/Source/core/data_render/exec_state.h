@@ -167,6 +167,7 @@ class ExecState {
   friend class CodeGenerator;
 
   void encodeGlobalSection();
+  void encodeGlobalVariableSection();
   void encodeFunctionSection();
   void encodeStartSection();
   void encodeTableSection();
@@ -183,6 +184,7 @@ class ExecState {
   void decodeFunctionSection();
   void decodeStartSection();
   void decodeGlobalSection();
+  void decodeGlobalVariableSection();
   void decodeStyleSection();
   void decodeArraySection();
   void decodeRefSection();

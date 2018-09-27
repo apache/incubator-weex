@@ -33,6 +33,7 @@ namespace data_render {
         FUNCTION_SECTION,
         START_SECTION,
         GLOBAL_SECTION,
+        GLOBAL_VARIABLE_SECTION,
         STYLE_SECTION,
         ARRAY_SECTION,
         REF_SECTION,
