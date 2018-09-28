@@ -167,7 +167,7 @@ void RenderList::PreCalculateCellWidth() {
 
     this->is_pre_calculate_cell_width_ = true;
     if (TakeColumnCount() > 0 || TakeColumnWidth() > 0 ||
-        this->column_count_ > COLUMN_COUNT_NORMAL) {
+        this->column_count_ >= COLUMN_COUNT_NORMAL) {
       attrs->insert(std::pair<std::string, std::string>(
           COLUMN_COUNT, to_string(this->column_count_)));
       attrs->insert(std::pair<std::string, std::string>(
