@@ -2949,14 +2949,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (isJSFrameworkInit()) {
       return mWXBridge.getFirstScreenRenderTime(instanceId);
     }
-    return null;
+    return new long[]{0, 0, 0};
   }
 
   public long[] getRenderFinishTime(String instanceId) {
     if (isJSFrameworkInit()) {
       return mWXBridge.getRenderFinishTime(instanceId);
     }
-    return null;
+    return new long[]{0, 0, 0};
   }
 
   public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
