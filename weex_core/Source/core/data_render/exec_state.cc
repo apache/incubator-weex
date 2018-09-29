@@ -482,12 +482,12 @@ bool ExecState::startDecode() {
     int magic_number;
     file->read((char*)&magic_number, sizeof(int));
     if (magic_number != 0x6d736100) {
-        return false;
+        throw OpcodeDecodeError("The format of file is not wasm");
     }
     unsigned version;
     file->read((char*)&version, sizeof(unsigned));
-    if (version != 1) {
-        return false;
+    if (version > 1) {
+        throw OpcodeDecodeError("The version of file can not support");
     }
 
     while (!file->eof()) {

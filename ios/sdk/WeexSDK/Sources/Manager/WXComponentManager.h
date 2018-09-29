@@ -202,6 +202,11 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 - (void)renderFinish;
 
 /**
+ * @abstract called when render failed
+ **/
+- (void)renderFailed:(NSError *)error;
+
+/**
  * @abstract unload
  **/
 - (void)unload;
