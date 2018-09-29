@@ -385,7 +385,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       lp.setMargins(left, top, right, bottom);
       if (lp instanceof FrameLayout.LayoutParams) {
         FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
-        if (this.isLayoutRTL() == WXEnvironment.isLayoutDirectionRTL()) {
+        if (this.isNativeLayoutRTL() == WXComponent.isLayoutRTL(this)) {
           lp_frameLayout.gravity = Gravity.START | Gravity.TOP;
           lp.setMarginStart(left);
           lp.setMarginEnd(right);
@@ -401,7 +401,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     } else {
       if (lp instanceof FrameLayout.LayoutParams) {
         FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
-        if (this.isLayoutRTL()) {
+        if (this.isNativeLayoutRTL()) {
           lp_frameLayout.gravity = Gravity.RIGHT | Gravity.TOP;
           lp.setMargins(right, top, left, bottom);
         } else {

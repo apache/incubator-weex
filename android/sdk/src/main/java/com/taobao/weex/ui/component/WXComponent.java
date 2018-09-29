@@ -247,8 +247,31 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
   }
 
-  public boolean isLayoutRTL() {
+  public boolean isNativeLayoutRTL() {
       return NativeRenderObjectUtils.nativeRenderObjectGetLayoutDirectionFromPathNode(this.getRenderObjectPtr()) == NativeRenderLayoutDirection.rtl;
+  }
+
+  public static boolean isLayoutRTL(WXComponent cmp) {
+    if (cmp == null) return false;
+
+    View view = cmp.getHostView();
+    if (ViewCompat.isLayoutDirectionResolved(view)) {
+      return ViewCompat.getLayoutDirection(view) == View.LAYOUT_DIRECTION_RTL;
+    } else if (cmp.getParent() != null){
+      return isLayoutRTL(cmp.getParent());
+    } else {
+      return isLayoutRTL((View) view.getParent());
+    }
+  }
+
+  public static boolean isLayoutRTL(View view) {
+    if (view == null) return false;
+
+    if (ViewCompat.isLayoutDirectionResolved(view)) {
+      return ViewCompat.getLayoutDirection(view) == View.LAYOUT_DIRECTION_RTL;
+    } else {
+      return isLayoutRTL((View) view.getParent());
+    }
   }
 
   public void updateStyles(WXComponent component) {
