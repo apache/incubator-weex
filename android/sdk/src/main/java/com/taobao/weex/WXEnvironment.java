@@ -233,7 +233,11 @@ public class WXEnvironment {
   }
 
   public static boolean isLayoutDirectionRTL() {
-    return sApplication.getApplicationContext().getResources().getBoolean(R.bool.weex_is_right_to_left);
+    // support RTL
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      return sApplication.getApplicationContext().getResources().getBoolean(R.bool.weex_is_right_to_left);
+    }
+    return false;
   }
   /**
    * Tell whether Weex can run on current hardware.
