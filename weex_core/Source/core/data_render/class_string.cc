@@ -182,7 +182,7 @@ char *url_encode(char *str) {
         if (isalnum(*pstr) || *pstr == '-' || *pstr == '_' || *pstr == '.' || *pstr == '~')
             *pbuf++ = *pstr;
         else if (*pstr == ' ')
-            *pbuf++ = '+';
+            *pbuf++ = '%', *pbuf++ = '2', *pbuf++ = '0';
         else
             *pbuf++ = '%', *pbuf++ = to_hex(*pstr >> 4), *pbuf++ = to_hex(*pstr & 15);
         pstr++;
