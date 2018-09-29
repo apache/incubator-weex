@@ -1062,9 +1062,8 @@ void ExecState::Register(const std::string& name, Value value) {
 }
 
 void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
-    *stack_->top() = func + argc;
-    //LOGD("ExecStack::CallFunction:%i\n", (int)(func - stack_->base()));
     if (func->type == Value::Type::CFUNC) {
+        *stack_->top() = func + argc;
         Frame frame;
         frame.reg = func;
         frames_.push_back(frame);
@@ -1076,6 +1075,11 @@ void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
         frames_.pop_back();
     }
     else {
+        if (argc < func->f->argc()) {
+            size_t size = (func->f->argc() - argc) * sizeof(Value);
+            memset(func + argc + 1, 0, size);
+        }
+        *stack_->top() = func + argc;
         Frame frame;
         frame.func = func;
         frame.reg = func;
