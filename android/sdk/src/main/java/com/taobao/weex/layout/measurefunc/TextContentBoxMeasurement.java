@@ -50,6 +50,7 @@ import com.taobao.weex.layout.MeasureSize;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
+import com.taobao.weex.utils.StaticLayoutProxy;
 import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
@@ -335,9 +336,10 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
   @NonNull
   Layout createLayout(final float textWidth, @Nullable Layout previousLayout) {
     Layout layout;
+    boolean forceRtl = mComponent.isNativeLayoutRTL();
     if (previousWidth != textWidth || previousLayout == null) {
-      layout = new StaticLayout(spanned, mTextPaint, (int) Math.ceil(textWidth),
-              Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+      layout = StaticLayoutProxy.create(spanned, mTextPaint, (int) Math.ceil(textWidth),
+              Layout.Alignment.ALIGN_NORMAL, 1, 0, false, forceRtl);
     } else {
       layout = previousLayout;
     }
@@ -356,8 +358,9 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
         builder.append(truncate(lastLine, mTextPaint, (int) Math.ceil(textWidth), textOverflow));
         adjustSpansRange(spanned, builder);
         spanned = builder;
-        return new StaticLayout(spanned, mTextPaint, (int) Math.ceil(textWidth),
-                Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+
+        return StaticLayoutProxy.create(spanned, mTextPaint, (int) Math.ceil(textWidth),
+                Layout.Alignment.ALIGN_NORMAL, 1, 0, false, forceRtl);
       }
     }
     return layout;
@@ -394,6 +397,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
       }
 
       StaticLayout layout;
+      boolean forceRtl = mComponent.isNativeLayoutRTL();
       int startOffset;
 
       while (source.length() > 1) {
@@ -402,7 +406,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
           startOffset -= 1;
         }
         source.delete(startOffset, startOffset + 1);
-        layout = new StaticLayout(source, paint, desired, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+        layout = StaticLayoutProxy.create(source, paint, desired, Layout.Alignment.ALIGN_NORMAL, 1, 0, forceRtl, false);
         if (layout.getLineCount() <= 1) {
           ret = source;
           break;
