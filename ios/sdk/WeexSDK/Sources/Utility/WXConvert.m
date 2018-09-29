@@ -536,6 +536,22 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     return UIReturnKeyDefault;
 }
 
++ (UITextAutocapitalizationType)UITextAutocapitalizationType:(id)value
+{
+    if([value isKindOfClass:[NSString class]]){
+        NSString *string = (NSString *)value;
+        if ([string isEqualToString:@"none"])
+            return UITextAutocapitalizationTypeNone;
+        else if ([string isEqualToString:@"words"])
+            return UITextAutocapitalizationTypeWords;
+        else if ([string isEqualToString:@"sentences"])
+            return UITextAutocapitalizationTypeSentences;
+        else if ([string isEqualToString:@"allcharacters"])
+            return UITextAutocapitalizationTypeAllCharacters;
+    }
+    return UITextAutocapitalizationTypeSentences;
+}
+
 + (WXTextStyle)WXTextStyle:(id)value
 {
     if([value isKindOfClass:[NSString class]]){

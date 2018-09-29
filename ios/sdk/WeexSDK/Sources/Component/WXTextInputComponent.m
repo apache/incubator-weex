@@ -134,6 +134,11 @@
 {
     _inputView.returnKeyType = returnKeyType;
 }
+
+- (void)setAutocapitalizationType:(UITextAutocapitalizationType)type {
+    _inputView.autocapitalizationType = type;
+}
+
 -(void)setInputAccessoryView:(UIView *)inputAccessoryView
 {
     _inputView.inputAccessoryView = inputAccessoryView;

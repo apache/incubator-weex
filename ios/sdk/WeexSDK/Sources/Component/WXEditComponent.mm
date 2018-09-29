@@ -43,6 +43,7 @@
 @property (nonatomic, copy) NSString *inputType;
 @property (nonatomic) NSUInteger rows;
 @property (nonatomic) BOOL hideDoneButton;
+@property (nonatomic) UITextAutocapitalizationType autocapitalizationType;
 
 //style
 @property (nonatomic) WXPixelType fontSize;
@@ -154,6 +155,10 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         }else {
             _placeholderColor = [UIColor colorWithRed:0x99/255.0 green:0x99/255.0 blue:0x99/255.0 alpha:1.0];
         }
+        
+        if (attributes[@"autoCapitalizationType"]) {
+            _autocapitalizationType = [WXConvert UITextAutocapitalizationType:attributes[@"autoCapitalizationType"]];
+        }
     }
     
     return self;
@@ -182,6 +187,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     [self setEnabled:!_disabled];
     [self setRows:_rows];
     [self setReturnKeyType:_returnKeyType];
+    [self setAutocapitalizationType:_autocapitalizationType];
     [self updatePattern];
     
     if (!self.hideDoneButton) {
@@ -303,6 +309,10 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 
 -(void)setReturnKeyType:(UIReturnKeyType)returnKeyType
 {
+}
+
+- (void)setAutocapitalizationType:(UITextAutocapitalizationType)autocapitalizationType {
+    
 }
 
 -(void)setInputAccessoryView:(UIView *)inputAccessoryView
@@ -446,6 +456,11 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     } else {
         _rows = 2;
         [self setRows:_rows];
+    }
+    
+    if (attributes[@"autoCapitalizationType"]) {
+        _autocapitalizationType = [WXConvert UITextAutocapitalizationType:attributes[@"autoCapitalizationType"]];
+        [self setAutocapitalizationType:_autocapitalizationType];
     }
 }
 
