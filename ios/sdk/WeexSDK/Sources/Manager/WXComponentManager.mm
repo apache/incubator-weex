@@ -864,6 +864,17 @@ static NSThread *WXComponentThread;
     }];
 }
 
+- (void)renderFailed:(NSError *)error {
+    WXAssertComponentThread();
+
+    WXSDKInstance *instance  = self.weexInstance;
+    [self _addUITask:^{
+        if (instance.onFailed) {
+            instance.onFailed(error);
+        }
+    }];
+}
+
 - (void)unload
 {
     WXAssertComponentThread();

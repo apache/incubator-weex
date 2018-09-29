@@ -205,8 +205,16 @@ namespace WeexCore
     
     void IOSSide::ReportException(const char* pageId, const char *func, const char *exception_string)
     {
-        // should not enter this function
-        assert(false);
+        NSString* ns_instanceId = NSSTRING(pageId);
+
+        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        if (!manager.isValid) {
+            return;
+        }
+
+        int wxErrorCode = 9999;
+        NSError * error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:wxErrorCode userInfo:@{@"message":[NSString stringWithUTF8String:exception_string]}];
+        [manager renderFailed:error];
     }
     
     int IOSSide::CallNative(const char* pageId, const char *task, const char *callback)

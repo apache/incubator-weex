@@ -18,6 +18,7 @@
  */
 
 #include "core/data_render/binary_file.h"
+#include "core/data_render/common_error.h"
 
 namespace weex {
 namespace core {
@@ -51,6 +52,9 @@ namespace data_render {
     }
 
     void BinaryFile::read(char *stream, unsigned count) {
+        if (position_ + count > length_) {
+            throw OpcodeDecodeError("Read data is error");
+        }
         for (int i=0; i<count; i++) {
             stream[i] = input_[position_++];
         }
