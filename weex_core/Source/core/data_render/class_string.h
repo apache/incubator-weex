@@ -32,6 +32,7 @@ namespace data_render {
         
 ClassDescriptor *NewClassString();
 Value encodeURIComponent(ExecState *exec_state);
+std::string utf8_decode(std::string &input);
     
 }  // namespace data_render
 }  // namespace core
