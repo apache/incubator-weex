@@ -363,6 +363,11 @@ void AndroidSide::DispatchMessage(const char *client_id,
   wml_bridge_->DispatchMessage(env, client_id,  data, dataLength, callback, vm_id);
 }
 
+void AndroidSide::OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult>& result) {
+  JNIEnv *env = base::android::AttachCurrentThread();
+  wx_bridge_->OnReceivedResult(env, callback_id,  result);
+}
+
 jobject AndroidSide::getMeasureFunc(const char *pageId, jlong renderObjectPtr) {
   JNIEnv *env = base::android::AttachCurrentThread();
   return wx_bridge_->GetMeasureFunc(env, pageId, renderObjectPtr).Release();
