@@ -225,6 +225,9 @@ void ExecState::encodeFunctionSection() {
         bool is_class_func = func_state->is_class_func();
         file->write((char*)&is_class_func, sizeof(int8_t));
 
+        int argc = func_state->argc();
+        file->write((char*)&argc, sizeof(int32_t));
+
         unsigned opcodeSize = static_cast<unsigned>(func_state->instructions().size());
         file->write((char*)&opcodeSize, sizeof(u_int32_t));
         for (int i=0; i<opcodeSize; i++) {
@@ -605,6 +608,10 @@ void ExecState::decodeFunctionSection() {
         bool is_class_func = false;
         file->read((char*)&is_class_func, sizeof(int8_t));
         func_state->set_is_class_func(is_class_func);
+
+        int argc = 0;
+        file->read((char*)&argc, sizeof(int32_t));
+        func_state->argc() = argc;
 
         unsigned op_code_count = 0;
         file->read((char*)&op_code_count, sizeof(u_int32_t));
