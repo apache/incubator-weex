@@ -314,12 +314,6 @@
 		B8394F3821468AF100CA1EFF /* render_action_trigger_vsync.h in Headers */ = {isa = PBXBuildFile; fileRef = B8394F3521468AF100CA1EFF /* render_action_trigger_vsync.h */; };
 		B8394F3921468AF100CA1EFF /* render_action_trigger_vsync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8394F3621468AF100CA1EFF /* render_action_trigger_vsync.cpp */; };
 		B8394F3A21468AF100CA1EFF /* render_action_trigger_vsync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8394F3621468AF100CA1EFF /* render_action_trigger_vsync.cpp */; };
-		B858E1272158BE0A00722366 /* render_document.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B858E1252158BE0900722366 /* render_document.cpp */; };
-		B858E1282158BE0A00722366 /* render_document.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B858E1252158BE0900722366 /* render_document.cpp */; };
-		B858E1292158BE0A00722366 /* render_document.h in Headers */ = {isa = PBXBuildFile; fileRef = B858E1262158BE0A00722366 /* render_document.h */; };
-		B858E12A2158BE0A00722366 /* render_document.h in Headers */ = {isa = PBXBuildFile; fileRef = B858E1262158BE0A00722366 /* render_document.h */; };
-		B858E12C2158BE1000722366 /* render_document_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = B858E12B2158BE1000722366 /* render_document_factory.h */; };
-		B858E12D2158BE1000722366 /* render_document_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = B858E12B2158BE1000722366 /* render_document_factory.h */; };
 		B85ED3032126715100EBEC11 /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; };
 		B863DF322107308000EA887D /* WXBridgeContext.m in Sources */ = {isa = PBXBuildFile; fileRef = B863DF312107307F00EA887D /* WXBridgeContext.m */; };
 		B863DF332107313400EA887D /* WXBridgeContext.m in Sources */ = {isa = PBXBuildFile; fileRef = B863DF312107307F00EA887D /* WXBridgeContext.m */; };
@@ -1304,9 +1298,6 @@
 		9B9E74781FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTestBridgeMethodDummy.m; sourceTree = "<group>"; };
 		B8394F3521468AF100CA1EFF /* render_action_trigger_vsync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_action_trigger_vsync.h; sourceTree = "<group>"; };
 		B8394F3621468AF100CA1EFF /* render_action_trigger_vsync.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_action_trigger_vsync.cpp; sourceTree = "<group>"; };
-		B858E1252158BE0900722366 /* render_document.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_document.cpp; sourceTree = "<group>"; };
-		B858E1262158BE0A00722366 /* render_document.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_document.h; sourceTree = "<group>"; };
-		B858E12B2158BE1000722366 /* render_document_factory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_document_factory.h; sourceTree = "<group>"; };
 		B863DF312107307F00EA887D /* WXBridgeContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXBridgeContext.m; sourceTree = "<group>"; };
 		B87B9E7B21539B3300B6DC61 /* WXVersion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXVersion.h; sourceTree = "<group>"; };
 		B87B9E7C21539B3300B6DC61 /* WXVersion.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXVersion.m; sourceTree = "<group>"; };
@@ -2454,8 +2445,6 @@
 		B8D66B572125572F003960BD /* node */ = {
 			isa = PBXGroup;
 			children = (
-				B858E1252158BE0900722366 /* render_document.cpp */,
-				B858E1262158BE0A00722366 /* render_document.h */,
 				B8D66B582125572F003960BD /* render_cell.h */,
 				B8D66B592125572F003960BD /* render_text.cpp */,
 				B8D66B5A2125572F003960BD /* render_mask.cpp */,
@@ -2477,7 +2466,6 @@
 		B8D66B652125572F003960BD /* factory */ = {
 			isa = PBXGroup;
 			children = (
-				B858E12B2158BE1000722366 /* render_document_factory.h */,
 				B8D66B662125572F003960BD /* render_mask_factory.h */,
 				B8D66B672125572F003960BD /* render_text_factory.h */,
 				B8D66B682125572F003960BD /* render_scroller_factory.h */,
@@ -2756,7 +2744,6 @@
 				77D1614B1C02E3790010B15B /* WXConvert.h in Headers */,
 				1746EA7320E9D253007E55BD /* WXComponent_performance.h in Headers */,
 				59A596221CB6311F0012CD52 /* WXNavigatorModule.h in Headers */,
-				B858E12C2158BE1000722366 /* render_document_factory.h in Headers */,
 				B8F2C7082133A83C00635B37 /* rax_parser_context.h in Headers */,
 				33CE190E2153443000CF9670 /* WXJSFrameworkLoadDefaultImpl.h in Headers */,
 				C47B78CE1F2998EE001D3B0C /* WXExtendCallNativeManager.h in Headers */,
@@ -2818,7 +2805,6 @@
 				C4F0127D1E1502A6003378D0 /* WXWebSocketHandler.h in Headers */,
 				B8D66C9D21255730003960BD /* json11.hpp in Headers */,
 				DC03ADBA1D508719003F76E7 /* WXTextAreaComponent.h in Headers */,
-				B858E1292158BE0A00722366 /* render_document.h in Headers */,
 				B8D66C5721255730003960BD /* render_action_layout.h in Headers */,
 				2AC750241C7565690041D390 /* WXIndicatorComponent.h in Headers */,
 				B8F2C6E82133A83C00635B37 /* class_array.h in Headers */,
@@ -3017,7 +3003,6 @@
 				B8D66C8821255730003960BD /* simple_render_factory.h in Headers */,
 				DCA445A41EFA570E00D0CFA8 /* WXSDKInstance.h in Headers */,
 				DCA445C51EFA57E800D0CFA8 /* WXAComponent.h in Headers */,
-				B858E12A2158BE0A00722366 /* render_document.h in Headers */,
 				B8D66C4A21255730003960BD /* render_action_interface.h in Headers */,
 				B8D66C002125572F003960BD /* constants_name.h in Headers */,
 				DCA445B11EFA576800D0CFA8 /* WXLog.h in Headers */,
@@ -3164,7 +3149,6 @@
 				B8D66BE62125572F003960BD /* object.h in Headers */,
 				DCA4461A1EFA5AA000D0CFA8 /* WXInvocationConfig.h in Headers */,
 				DCA445DC1EFA59AD00D0CFA8 /* WXRecyclerDataController.h in Headers */,
-				B858E12D2158BE1000722366 /* render_document_factory.h in Headers */,
 				DCA446191EFA5A9E00D0CFA8 /* WXServiceFactory.h in Headers */,
 				DCA446121EFA5A8A00D0CFA8 /* WXComponentMethod.h in Headers */,
 				33CE19142153444900CF9670 /* WXJSFrameworkLoadProtocol.h in Headers */,
@@ -3546,7 +3530,6 @@
 				B8D66C4D21255730003960BD /* render_action_move_element.cpp in Sources */,
 				742AD7341DF98C45007DC46C /* WXResourceResponse.m in Sources */,
 				B87B9E7F21539B3300B6DC61 /* WXVersion.m in Sources */,
-				B858E1272158BE0A00722366 /* render_document.cpp in Sources */,
 				77E65A161C155EB5008B8775 /* WXTextComponent.mm in Sources */,
 				C4D872261E5DDF7500E39BC1 /* WXBoxShadow.m in Sources */,
 				B8D66BB32125572F003960BD /* parser.cc in Sources */,
@@ -3675,7 +3658,6 @@
 				DCA445301EFA55B300D0CFA8 /* WXComponent+Events.m in Sources */,
 				DCA445311EFA55B300D0CFA8 /* WXComponent+BoxShadow.m in Sources */,
 				DCA445321EFA55B300D0CFA8 /* WXInnerLayer.m in Sources */,
-				B858E1282158BE0A00722366 /* render_document.cpp in Sources */,
 				B8D66BFA2125572F003960BD /* exec_state.cc in Sources */,
 				B8D66CAC21255730003960BD /* wson_util.cpp in Sources */,
 				DCA445331EFA55B300D0CFA8 /* WXDisplayQueue.m in Sources */,
