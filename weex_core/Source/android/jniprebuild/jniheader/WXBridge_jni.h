@@ -16,10 +16,13 @@
 //#include "base/android/jni_int_wrapper.h"
 
 // Step 1: forward declarations.
+namespace {
 const char kWXBridgeClassPath[] = "com/taobao/weex/bridge/WXBridge";
 // Leaking this jclass as we cannot use LazyInstance from some threads.
 jclass g_WXBridge_clazz = NULL;
 #define WXBridge_clazz(env) g_WXBridge_clazz
+
+}  // namespace
 
 static jint InitFrameworkEnv(JNIEnv* env, jobject jcaller,
     jstring framework,
@@ -46,11 +49,12 @@ static jint ExecJS(JNIEnv* env, jobject jcaller,
 static jint ExecJSService(JNIEnv* env, jobject jcaller,
     jstring javascript);
 
-static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
+static void ExecJSWithCallback(JNIEnv* env, jobject jcaller,
     jstring instanceId,
     jstring _namespace,
     jstring _function,
-    jobjectArray args);
+    jobjectArray args,
+    jlong callbackId);
 
 static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
     jstring instanceId,
@@ -155,6 +159,32 @@ static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
     jstring config);
 
 // Step 2: method stubs.
+
+static intptr_t g_WXBridge_onReceivedResult = 0;
+static void Java_WXBridge_onReceivedResult(JNIEnv* env, jobject obj, jlong
+    callbackId,
+    jbyteArray result) {
+  /* Must call RegisterNativesImpl()  */
+  //CHECK_CLAZZ(env, obj,
+  //    WXBridge_clazz(env));
+  jmethodID method_id =
+      base::android::GetMethod(
+      env, WXBridge_clazz(env),
+      base::android::INSTANCE_METHOD,
+      "onReceivedResult",
+
+"("
+"J"
+"[B"
+")"
+"V",
+      &g_WXBridge_onReceivedResult);
+
+     env->CallVoidMethod(obj,
+          method_id, callbackId, result);
+  base::android::CheckException(env);
+
+}
 
 static intptr_t g_WXBridge_callNative = 0;
 static jint Java_WXBridge_callNative(JNIEnv* env, jobject obj, jstring
@@ -923,14 +953,15 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "I", reinterpret_cast<void*>(ExecJSService) },
-    { "nativeExecJSWithResult",
+    { "nativeExecJSWithCallback",
 "("
 "Ljava/lang/String;"
 "Ljava/lang/String;"
 "Ljava/lang/String;"
 "[Lcom/taobao/weex/bridge/WXJSObject;"
+"J"
 ")"
-"[B", reinterpret_cast<void*>(ExecJSWithResult) },
+"V", reinterpret_cast<void*>(ExecJSWithCallback) },
     { "nativeCreateInstanceContext",
 "("
 "Ljava/lang/String;"
@@ -1100,16 +1131,11 @@ static bool RegisterNativesImpl(JNIEnv* env) {
   return true;
 }
 
-
-
 static void Java_WXBridge_reset_clazz(JNIEnv* env, const char* className) {
     LOGE("Java_WXBridge_reset_clazz class Name is %s", className);
     g_WXBridge_clazz = reinterpret_cast<jclass>(env->NewGlobalRef(
-            base::android::GetClass(env, className).Get()));
-
-
-
-    g_WXBridge_callNative = 0;
+                    base::android::GetClass(env, className).Get()));
+                            g_WXBridge_callNative = 0;
     g_WXBridge_reportJSException = 0;
     g_WXBridge_callNativeModule = 0;
     g_WXBridge_callNativeComponent = 0;

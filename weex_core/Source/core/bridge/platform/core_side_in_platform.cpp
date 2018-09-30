@@ -412,6 +412,15 @@ std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSWithResult(
       ->ExecJSWithResult(instanceId, nameSpace, func, params);
 }
 
+void CoreSideInPlatform::ExecJSWithCallback(
+    const char *instanceId, const char *nameSpace, const char *func,
+    std::vector<VALUE_WITH_TYPE *> &params, long callback_id) {
+  WeexCoreManager::Instance()
+      ->script_bridge()
+      ->script_side()
+      ->ExecJSWithCallback(instanceId, nameSpace, func, params, callback_id);
+}
+
 int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
                                        const char *script, int script_length,
                                        const char *opts,

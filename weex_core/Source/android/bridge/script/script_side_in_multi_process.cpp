@@ -391,6 +391,46 @@ std::unique_ptr<WeexJSResult> ScriptSideInMultiProcess::ExecJSWithResult(
   }
 }
 
+void ScriptSideInMultiProcess::ExecJSWithCallback(
+    const char *instanceId, const char *nameSpace, const char *func,
+    std::vector<VALUE_WITH_TYPE *> &params, long callback_id) {
+    std::unique_ptr<WeexJSResult> ret;
+  try {
+    if(sender_ == nullptr) {
+      LOGE("ExecJSWithResult sender is null");
+      return;
+    }
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::EXECJSWITHCALLBACK));
+    serializer->add(instanceId, strlen(instanceId));
+    if (nameSpace)
+      serializer->add(nameSpace, strlen(nameSpace));
+    else {
+      uint16_t tmp = 0;
+      serializer->add(&tmp, 0);
+    }
+    serializer->add(func, strlen(func));
+    // pass callback_id before params
+    serializer->add(static_cast<int64_t>(callback_id));
+
+    for (int i = 0; i < params.size(); i++) {
+      VALUE_WITH_TYPE *param = params[i];
+      addParamsToIPCSerializer(serializer.get(), param);
+    }
+
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
+
+  } catch (IPCException &e) {
+    LOGE("%s", e.msg());
+    // report crash here
+    WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->platform_side()
+        ->ReportServerCrash(instanceId);
+  }
+}
+
 int ScriptSideInMultiProcess::CreateInstance(
     const char *instanceId, const char *func, const char *script,
     const char *opts, const char *initData, const char *extendsApi) {

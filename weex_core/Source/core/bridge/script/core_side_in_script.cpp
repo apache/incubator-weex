@@ -451,4 +451,12 @@ void CoreSideInScript::SetJSVersion(const char *js_version) {
       ->platform_side()
       ->SetJSVersion(js_version);
 }
+
+void CoreSideInScript::OnReceivedResult(long callback_id,
+                                        std::unique_ptr<WeexJSResult> &result) {
+  WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->platform_side()
+      ->OnReceivedResult(callback_id, result);
+}
 }  // namespace WeexCore
