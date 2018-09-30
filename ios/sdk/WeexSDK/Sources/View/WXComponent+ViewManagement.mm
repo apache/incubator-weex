@@ -99,6 +99,17 @@ do {\
     if (subcomponent.displayType == WXDisplayTypeNone) {
         return;
     }
+    
+    if (_isViewTreeIgnored) {
+        // self not added to views, children also ignored.
+        subcomponent->_isViewTreeIgnored = YES;
+        return;
+    }
+    
+    if (subcomponent->_isViewTreeIgnored) {
+        // children not added to views, such as div in list, we do not create view.
+        return;
+    }
   
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (subcomponent->_positionType == WXPositionTypeFixed) {

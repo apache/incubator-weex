@@ -262,7 +262,7 @@
                && ![subcomponent isKindOfClass:[WXLoadingComponent class]]
                && subcomponent->_positionType != WXPositionTypeFixed) {
         WXLogError(@"list only support cell/header/refresh/loading/fixed-component as child.");
-        return NO;
+        subcomponent->_isViewTreeIgnored = YES; // do not show this element.
     }
     
     BOOL inserted = [super _insertSubcomponent:subcomponent atIndex:index];

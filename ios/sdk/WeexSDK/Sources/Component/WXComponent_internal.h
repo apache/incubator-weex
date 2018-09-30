@@ -129,7 +129,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     WXBorderStyle _borderBottomStyle;
     WXBorderStyle _borderLeftStyle;
     
-    
+    BOOL _isViewTreeIgnored; // Component is added to super, but it is not added to views.
     BOOL _isFixed;
     BOOL _async;
     BOOL _lazyCreateView;
