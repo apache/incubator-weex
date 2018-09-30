@@ -99,7 +99,6 @@ static BOOL bNeedRemoveEvents = YES;
         _absolutePosition = CGPointMake(NAN, NAN);
         
         _displayType = WXDisplayTypeBlock;
-        _isNeedJoinLayoutSystem = YES;
         _isViewFrameSyncWithCalculated = YES;
         _ariaHidden = nil;
         _accessible = nil;
@@ -323,13 +322,11 @@ static BOOL bNeedRemoveEvents = YES;
     if (_displayType != displayType) {
         _displayType = displayType;
         if (displayType == WXDisplayTypeNone) {
-            _isNeedJoinLayoutSystem = NO;
             [self _removeFromSupercomponent];
             WXPerformBlockOnMainThread(^{
                 [self removeFromSuperview];
             });
         } else {
-            _isNeedJoinLayoutSystem = YES;
             WXPerformBlockOnMainThread(^{
                 [self _buildViewHierarchyLazily];
                 // TODO: insert into the correct index
@@ -594,7 +591,6 @@ static BOOL bNeedRemoveEvents = YES;
     
     if (subcomponent->_positionType == WXPositionTypeFixed) {
         [self.weexInstance.componentManager addFixedComponent:subcomponent];
-        subcomponent->_isNeedJoinLayoutSystem = NO;
     }
     
     if (_useCompositing || _isCompositingChild) {
@@ -628,7 +624,6 @@ static BOOL bNeedRemoveEvents = YES;
     
     if (_positionType == WXPositionTypeFixed) {
         [self.weexInstance.componentManager removeFixedComponent:self];
-        self->_isNeedJoinLayoutSystem = YES;
     }
     if (_positionType == WXPositionTypeSticky) {
         [self.ancestorScroller removeStickyComponent:self];

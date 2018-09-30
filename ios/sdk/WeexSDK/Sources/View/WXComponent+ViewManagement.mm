@@ -230,10 +230,8 @@ do {\
         WXPerformBlockOnComponentThread(^{
             if (positionType == WXPositionTypeFixed) {
                 [self.weexInstance.componentManager addFixedComponent:self];
-                _isNeedJoinLayoutSystem = NO;
             } else if (_positionType == WXPositionTypeFixed) {
                 [self.weexInstance.componentManager removeFixedComponent:self];
-                _isNeedJoinLayoutSystem = YES;
             }
             
             _positionType = positionType;

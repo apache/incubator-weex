@@ -132,7 +132,6 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     
     BOOL _isFixed;
     BOOL _async;
-    BOOL _isNeedJoinLayoutSystem;
     BOOL _lazyCreateView;
     
     WXTransform *_transform;
