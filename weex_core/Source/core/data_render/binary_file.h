@@ -59,6 +59,7 @@ namespace data_render {
         const char* input_;
         unsigned long position_;
         unsigned long length_;
+        bool little_endian_;
     };
 }  // namespace data_render
 }  // namespace core
