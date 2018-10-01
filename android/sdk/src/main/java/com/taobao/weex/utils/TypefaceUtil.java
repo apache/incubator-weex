@@ -47,6 +47,12 @@ public class TypefaceUtil {
 
   public static final String ACTION_TYPE_FACE_AVAILABLE = "type_face_available";
 
+  public static boolean isFontLoaded(String fontFamily){
+    if(!sCacheMap.containsKey(fontFamily)) return false;
+    FontDO fontDO = sCacheMap.get(fontFamily);
+    return fontDO.getState() == FontDO.STATE_SUCCESS;
+  }
+
   public static void putFontDO(FontDO fontDO) {
     if (fontDO != null && !TextUtils.isEmpty(fontDO.getFontFamilyName())) {
       sCacheMap.put(fontDO.getFontFamilyName(), fontDO);
@@ -112,7 +118,7 @@ public class TypefaceUtil {
     return Typeface.create(family, style);
   }
 
-  private static void loadFromAsset(FontDO fontDo,String path){
+  private static void loadFromAsset(final FontDO fontDo,final String path){
     try {
       Typeface typeface = Typeface.createFromAsset(WXEnvironment.getApplication().getAssets(), path);
       if (typeface != null) {
@@ -124,6 +130,14 @@ public class TypefaceUtil {
       } else {
         WXLogUtils.e(TAG, "Font asset file not found " + fontDo.getUrl());
       }
+      WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
+          intent.putExtra("fontFamily", fontDo.getFontFamilyName());
+          LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+        }
+      }, 100);
     } catch (Exception e) {
       WXLogUtils.e(TAG, e.toString());
     }

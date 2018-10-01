@@ -558,12 +558,16 @@ public class WXTextDomObject extends WXDomObject {
 
   @Override
   public void destroy() {
+    removeTypefaceObserver();
+    super.destroy();
+  }
+
+  private void removeTypefaceObserver() {
     if (WXEnvironment.getApplication() != null && mTypefaceObserver != null) {
       WXLogUtils.d("WXText", "Unregister the typeface observer");
       LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).unregisterReceiver(mTypefaceObserver);
       mTypefaceObserver = null;
     }
-    super.destroy();
   }
 
   private void registerTypefaceObserverIfNeed(String desiredFontFamily) {
@@ -575,13 +579,14 @@ public class WXTextDomObject extends WXDomObject {
       return;
     }
     mFontFamily = desiredFontFamily;
-    if (mTypefaceObserver != null) {
+    if (mTypefaceObserver != null || TypefaceUtil.isFontLoaded(mFontFamily)) {
       return;
     }
 
     mTypefaceObserver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
+        removeTypefaceObserver();
         String fontFamily = intent.getStringExtra("fontFamily");
         if (!mFontFamily.equals(fontFamily)) {
           return;
