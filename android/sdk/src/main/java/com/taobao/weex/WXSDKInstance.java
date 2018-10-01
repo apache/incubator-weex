@@ -1379,6 +1379,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void onRootCreated(WXComponent root) {
     this.mRootComp = root;
+    if(root.getHostView().getParent()!=null && root.getHostView().getParent() instanceof RenderContainer){
+      ((RenderContainer)root.getHostView().getParent()).removeView(root.getHostView());
+    }
     mRenderContainer.addView(root.getHostView());
     setSize(mRenderContainer.getWidth(),mRenderContainer.getHeight());
   }
