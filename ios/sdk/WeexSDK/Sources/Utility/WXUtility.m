@@ -35,7 +35,7 @@
 #import <CommonCrypto/CommonCrypto.h>
 #import <CoreText/CoreText.h>
 #import "WXAppMonitorProtocol.h"
-
+#import "WXConfigCenterProtocol.h"
 #import "WXTextComponent.h"
 
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
@@ -45,6 +45,8 @@ static BOOL threadSafeCollectionUsingLock = YES;
 static BOOL unregisterFontWhenCollision = NO;
 static BOOL listSectionRowThreadSafe = YES;
 static BOOL useJSCApiForCreateInstance = YES;
+static BOOL jsfmEnableNativePromiseOnIOS11AndLater = YES; // 是否在高版本 iOS (11/12) 中使用原生 Promise
+static BOOL jsfmEnableNativeTimer = NO; // 是否使用原生 timer 接口
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
@@ -196,6 +198,16 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 + (NSDictionary *)getEnvironment
 {
+    id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        // update
+        jsfmEnableNativePromiseOnIOS11AndLater = [[configCenter configForKey:@"iOS_weex_ext_config.jsfmEnableNativePromiseOnIOS11AndLater" defaultValue:@(YES) isDefault:NULL] boolValue];
+        jsfmEnableNativeTimer = [[configCenter configForKey:@"iOS_weex_ext_config.jsfmEnableNativeTimer" defaultValue:@(NO) isDefault:NULL] boolValue];
+    }
+    
+    BOOL jsfmEnableNativePromise = jsfmEnableNativePromiseOnIOS11AndLater &&
+        [[[UIDevice currentDevice] systemVersion] integerValue] >= 11;
+    
     NSString *platform = @"iOS";
     NSString *sysVersion = [[UIDevice currentDevice] systemVersion] ?: @"";
     NSString *weexVersion = WX_SDK_VERSION;
@@ -218,7 +230,9 @@ CGFloat WXFloorPixelValue(CGFloat value)
                                     @"deviceWidth":@(deviceWidth * scale),
                                     @"deviceHeight":@(deviceHeight * scale),
                                     @"scale":@(scale),
-                                    @"logLevel":[WXLog logLevelString] ?: @"error"
+                                    @"logLevel":[WXLog logLevelString] ?: @"error",
+                                    @"__enable_native_promise__": @(jsfmEnableNativePromise),
+                                    @"__enable_native_timer__": @(jsfmEnableNativeTimer)
                                 }];
     if ([WXSDKEngine customEnvironment]) {
         [data addEntriesFromDictionary:[WXSDKEngine customEnvironment]];
