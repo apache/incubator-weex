@@ -200,6 +200,9 @@ public class WXModuleManager {
     }
   }
 
+  public static WXModule findModule(String instanceId, String moduleStr) {
+    return findModule(instanceId, moduleStr, null);
+  }
 
 
   private static WXModule findModule(String instanceId, String moduleStr,ModuleFactory factory) {
@@ -217,6 +220,9 @@ public class WXModuleManager {
       wxModule = moduleMap.get(moduleStr);
       if (wxModule == null) {
         try {
+          if (factory == null) {
+            factory = sModuleFactoryMap.get(moduleStr);
+          }
           wxModule = factory.buildInstance();
           wxModule.setModuleName(moduleStr);
         } catch (Exception e) {
