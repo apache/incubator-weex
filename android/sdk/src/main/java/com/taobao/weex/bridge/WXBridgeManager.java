@@ -1312,7 +1312,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                              final Map<String, Object> options, final String data) {
     final WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance == null) {
-      WXLogUtils.e("WXBridgeManager", "createInstance failed, SDKInstance is not exist");
+      WXLogUtils.e("WXBridgeManager", "createInstance failed, SDKInstance does not exist");
       return;
     }
     if (TextUtils.isEmpty(instanceId) || template == null || template.isEmpty() || mJSHandler == null) {
