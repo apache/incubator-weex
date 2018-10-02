@@ -18,15 +18,11 @@
  */
 package com.taobao.weex.common;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.bridge.ResultCallback;
-import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
-
 import java.util.HashMap;
 import java.util.HashSet;
 

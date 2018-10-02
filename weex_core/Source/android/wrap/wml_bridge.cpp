@@ -188,22 +188,22 @@ const char kWMLBridgeClassPath[] = "com/taobao/windmill/bridge/WMLBridge";
 jclass g_WMLBridge_clazz = nullptr;
 
 static JNINativeMethod gWMMethods[] = {
-    {"initAppFramework",
+    {"nativeInitAppFramework",
      "(Ljava/lang/String;Ljava/lang/String;[Lcom/taobao/weex/bridge/"
      "WXJSObject;)I",
      (void*)InitAppFramework},
-    {"createAppContext",
+    {"nativeCreateAppContext",
      "(Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)I",
      (void*)CreateAppContext},
-    {"execJsOnApp",
+    {"nativeExecJsOnApp",
      "(Ljava/lang/String;Ljava/lang/String;"
      "[Lcom/taobao/weex/bridge/WXJSObject;)I",
      (void*)ExecJsOnApp},
-    {"execJsOnAppWithResult",
+    {"nativeExecJsOnAppWithResult",
      "(Ljava/lang/String;Ljava/lang/String;"
      "Ljava/util/Map;)[B",
      (void*)ExecJsOnAppWithResult},
-    {"destoryAppContext", "(Ljava/lang/String;)I", (void*)DestoryAppContext},
+    {"nativeDestoryAppContext", "(Ljava/lang/String;)I", (void*)DestoryAppContext},
 };
 
 static int registerWMLBridgeNativeMethods(JNIEnv* env, JNINativeMethod* methods,
