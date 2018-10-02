@@ -1128,7 +1128,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       throw new WXRuntimeException(
               "fireEvent must be called by main thread");
     }
-    if (WXSDKManager.getInstance().getAllInstanceMap().get(instanceId)!=null && WXSDKManager.getInstance().getAllInstanceMap().get(instanceId).getRenderStrategy()== WXRenderStrategy.DATA_RENDER) {
+    WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
+    if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER ||
+            instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
       fireEventOnDataRenderNode(instanceId, ref, type, data);
     } else {
       if(callback == null) {

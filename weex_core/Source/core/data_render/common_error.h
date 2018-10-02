@@ -63,6 +63,12 @@ public:
     VMExecError(std::string str)
     : Error("[VMExecError]", std::move(str)) { }
 };
+
+class OpcodeDecodeError : public Error {
+public:
+    OpcodeDecodeError(std::string str)
+    : Error("[OpcodeDecodeError]", std::move(str)) { }
+};
     
 class SyntaxError : public JSError {
 public:

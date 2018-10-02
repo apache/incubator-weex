@@ -1,6 +1,7 @@
 #include "core/data_render/tokenizer.h"
 #include "core/data_render/token.h"
 #include "core/data_render/scanner.h"
+#include "core/data_render/class_string.h"
 
 #include <cstring>
 #include <cassert>
@@ -556,11 +557,15 @@ Token Tokenizer::ParseString(char delim) {
   auto seek = _ seek();
   auto position = _ position();
   char ch = _ ReadChar();
+  bool utf8 = false;
   while (ch != EOF && ch != delim) {
     // escape characters
     if (ch == '\\') {
       buffer.push_back(ch);
       ch = _ ReadChar();
+      if (tolower(ch) == 'u') {
+          utf8 = true;
+      }
       if (ch == EOF) {
         break;
       }
@@ -568,13 +573,15 @@ Token Tokenizer::ParseString(char delim) {
     buffer.push_back(ch);
     ch = _ ReadChar();
   }
-
   if (ch == EOF) {
     return Token(std::string("EOF"), Token::ERROR, position, seek);
   }
 
   Token::Type type = delim == '`' ? Token::TEMPLATE : Token::STRING;
-
+  
+  if (utf8) {
+      buffer = utf8_decode(buffer);
+  }
   return Token(buffer, type, position, seek);
 }
 

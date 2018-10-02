@@ -73,7 +73,7 @@ class FuncState {
     return (int)constants_.size() - 1;
   }
 
-  inline Value* GetConstant(int index) { return &constants_[index]; }
+  inline Value *GetConstant(int index) { return &constants_[index]; }
   inline size_t GetConstantSize() { return constants_.size();}
   inline size_t AddInstruction(Instruction i) {
     instructions_.push_back(i);
@@ -98,6 +98,7 @@ class FuncState {
   inline void set_is_class_func(bool is_class_func) { is_class_func_ = is_class_func; }
   inline bool is_class_func() { return is_class_func_; }
   inline ClassInstance * &class_inst() { return class_inst_; }
+  inline int &argc() { return argc_; }
   std::vector<FuncState *> getAllChildren() {
       std::vector<FuncState*> all_children;
       for (auto &child : children_) {
@@ -119,6 +120,7 @@ class FuncState {
   int super_index_;
   bool is_class_func_{false};
   ClassInstance *class_inst_{nullptr};
+  int argc_{0};
 };
     
 // TODO Each Func should contain a stack whose size is 256

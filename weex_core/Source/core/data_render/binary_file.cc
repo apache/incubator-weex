@@ -18,13 +18,21 @@
  */
 
 #include "core/data_render/binary_file.h"
+#include "core/data_render/common_error.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
     BinaryFile* BinaryFile::g_instance_ = nullptr;
 
-    BinaryFile::BinaryFile():fout_(nullptr), position_(0), length_(0){
+    BinaryFile::BinaryFile():fout_(nullptr), position_(0), length_(0) {
+        int32_t i=1;
+        char *b=(char *)&i;
+        if (*b == 1) {
+            little_endian_ = true;
+        } else {
+            little_endian_ = false;
+        }
     }
 
     BinaryFile* BinaryFile::instance() {
@@ -51,8 +59,17 @@ namespace data_render {
     }
 
     void BinaryFile::read(char *stream, unsigned count) {
-        for (int i=0; i<count; i++) {
-            stream[i] = input_[position_++];
+        if (position_ + count > length_) {
+            throw OpcodeDecodeError("Read data is error");
+        }
+        if (!little_endian_ && count > 1) {
+            for (int i=count-1; i>=0; i--) {
+                stream[i] = input_[position_++];
+            }
+        } else {
+            for (int i=0; i<count; i++) {
+                stream[i] = input_[position_++];
+            }
         }
     }
 
