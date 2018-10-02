@@ -170,10 +170,13 @@ static jlongArray GetRenderFinishTime(JNIEnv* env, jobject jcaller,
 
 // Notice that this method is invoked from main thread.
 static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
-  return WeexCoreManager::Instance()
-      ->getPlatformBridge()
-      ->core_side()
-      ->NotifyLayout(jString2StrFast(env, instanceId));
+  if (WeexCoreManager::Instance()->getPlatformBridge()) {
+    return WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->core_side()
+        ->NotifyLayout(jString2StrFast(env, instanceId));
+  }
+  return false;
 }
 
 // Notice that this method is invoked from JS thread.
