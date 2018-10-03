@@ -35,7 +35,7 @@
 #import <CommonCrypto/CommonCrypto.h>
 #import <CoreText/CoreText.h>
 #import "WXAppMonitorProtocol.h"
-
+#import "WXConfigCenterProtocol.h"
 #import "WXTextComponent.h"
 
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
@@ -209,7 +209,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
     
     NSMutableDictionary *data = [NSMutableDictionary dictionaryWithDictionary:@{
                                     @"platform":platform,
-                                    @"osName":platform,//osName is eaqual to platorm name in native
+                                    @"osName":platform, //osName is eaqual to platorm name in native
                                     @"osVersion":sysVersion,
                                     @"weexVersion":weexVersion,
                                     @"deviceModel":machine,
@@ -220,6 +220,20 @@ CGFloat WXFloorPixelValue(CGFloat value)
                                     @"scale":@(scale),
                                     @"logLevel":[WXLog logLevelString] ?: @"error"
                                 }];
+    
+    if ([[[UIDevice currentDevice] systemVersion] integerValue] >= 11) {
+        id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+        if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+            // update
+            BOOL isDefault = YES;
+            BOOL jsfmEnableNativePromiseOnIOS11AndLater = [[configCenter configForKey:@"iOS_weex_ext_config.jsfmEnableNativePromiseOnIOS11AndLater" defaultValue:@(NO) isDefault:&isDefault] boolValue];
+            if (!isDefault) {
+                // has this config explicitly
+                data[@"__enable_native_promise__"] = @(jsfmEnableNativePromiseOnIOS11AndLater);
+            }
+        }
+    }
+    
     if ([WXSDKEngine customEnvironment]) {
         [data addEntriesFromDictionary:[WXSDKEngine customEnvironment]];
     }
