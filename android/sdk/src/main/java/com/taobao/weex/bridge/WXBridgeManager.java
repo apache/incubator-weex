@@ -1472,7 +1472,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         if (type == BundType.Vue || type == BundType.Rax
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY) {
-          invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
+          int ret = invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
+          if(ret == 0) {
+            String err = "[WXBridgeManager] invokeCreateInstance : " + instance.getTemplateInfo();
+
+            instance.onRenderError(
+                    WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
+                    WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg() + err);
+          }
           return;
         } else {
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
@@ -1695,7 +1702,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
   }
 
-  public void invokeCreateInstanceContext(String instanceId, String namespace, String function,
+  public int invokeCreateInstanceContext(String instanceId, String namespace, String function,
                                           WXJSObject[] args, boolean logTaskDetail) {
     WXLogUtils.d("invokeCreateInstanceContext instanceId:" + instanceId + " function:"
             + function + " isJSFrameworkInit：%d" + isJSFrameworkInit());
@@ -1706,7 +1713,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
     // }
-    mWXBridge.createInstanceContext(instanceId, namespace, function, args);
+    return mWXBridge.createInstanceContext(instanceId, namespace, function, args);
   }
 
   public void invokeDestoryInstance(String instanceId, String namespace, String function,
