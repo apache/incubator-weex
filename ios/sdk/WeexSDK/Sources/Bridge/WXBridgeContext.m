@@ -458,6 +458,13 @@ _Pragma("clang diagnostic pop") \
             [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
         } else {
             sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@", instanceIdString, newOptions, data];
+            //add instanceId to weexContext ,if fucn createInstanceContext failure ，then we will know which instance has problem (exceptionhandler)
+            self.jsBridge.javaScriptContext[@"wxExtFuncInfo"]= @{
+                                                                 @"func":@"createInstanceContext",
+                                                                 @"arg":@"start",
+                                                                 @"instanceId":sdkInstance.instanceId?:@"unknownId"
+                                                                };
+            __weak typeof(self) weakSelf = self;
             [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
                 if (sdkInstance.pageName) {
                     if (@available(iOS 8.0, *)) {
@@ -466,6 +473,7 @@ _Pragma("clang diagnostic pop") \
                         // Fallback
                     }
                 }
+                weakSelf.jsBridge.javaScriptContext[@"wxExtFuncInfo"]= nil;
                 
                 NSMutableArray* allKeys = nil;
                 
@@ -558,7 +566,8 @@ _Pragma("clang diagnostic pop") \
                 [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
                 NSDictionary* funcInfo = @{
                                            @"func":@"createInstance",
-                                           @"arg":@"start"
+                                           @"arg":@"start",
+                                           @"instanceId":sdkInstance.instanceId?:@"unknownId"
                                         };
                 sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"]= funcInfo;
                 if ([NSURL URLWithString:sdkInstance.pageName] || sdkInstance.scriptURL) {
