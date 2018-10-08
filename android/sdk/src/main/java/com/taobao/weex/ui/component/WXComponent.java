@@ -260,17 +260,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     } else if (cmp.getParent() != null){
       return isLayoutRTL(cmp.getParent());
     } else {
-      return isLayoutRTL((View) view.getParent());
+      return isLayoutRTL((ViewGroup) view.getParent());
     }
   }
 
-  public static boolean isLayoutRTL(View view) {
-    if (view == null) return false;
+  public static boolean isLayoutRTL(ViewGroup viewGroup) {
+    if (viewGroup == null) return false;
 
-    if (ViewCompat.isLayoutDirectionResolved(view)) {
-      return ViewCompat.getLayoutDirection(view) == View.LAYOUT_DIRECTION_RTL;
+    if (ViewCompat.isLayoutDirectionResolved(viewGroup)) {
+      return ViewCompat.getLayoutDirection(viewGroup) == View.LAYOUT_DIRECTION_RTL;
+    } else if (viewGroup.getParent() instanceof ViewGroup) {
+      return isLayoutRTL((ViewGroup) viewGroup.getParent());
     } else {
-      return isLayoutRTL((View) view.getParent());
+      return false;
     }
   }
 
