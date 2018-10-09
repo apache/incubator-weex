@@ -76,7 +76,15 @@ extern NSString *const bundleUrlOptionKey;
  **/
 @property (nonatomic, assign) BOOL needPrerender;
 
-@property (nonatomic , strong) NSDictionary* containerInfo;
+/**
+ * Custom info.
+ **/
+@property (nonatomic, strong) NSDictionary* containerInfo;
+
+/**
+ * Whether this instance is rendered or not. Please MUST not render an instance twice.
+ **/
+@property (nonatomic, assign, readonly) BOOL isRendered;
 
 /**
  * The state of current instance.

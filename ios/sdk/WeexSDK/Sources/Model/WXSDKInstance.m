@@ -100,13 +100,14 @@ typedef enum : NSUInteger {
     self = [super init];
     if(self){
         NSInteger instanceId = 0;
-        @synchronized(self){
+        @synchronized(bundleUrlOptionKey) {
             static NSInteger __instance = 0;
             instanceId = __instance % (1024*1024);
             __instance++;
         }
         _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
         
+        // TODO self is retained here.
         [WXSDKManager storeInstance:self forID:_instanceId];
         
         _bizType = @"";
@@ -282,6 +283,11 @@ typedef enum : NSUInteger {
         WXLogError(@"Fail to find instance！");
         return;
     }
+    
+    if (_isRendered) {
+        [WXExceptionUtils commitCriticalExceptionRT:self.instanceId errCode:[NSString stringWithFormat:@"%d", WX_ERR_RENDER_TWICE] function:@"_renderWithOpcode:" exception:[NSString stringWithFormat:@"instance is rendered twice"] extParams:nil];
+        return;
+    }
 
     //some case , with out render (url)
     [self.apmInstance startRecord:self.instanceId];
@@ -339,16 +345,21 @@ typedef enum : NSUInteger {
 
     [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"renderWithOpcode" options:@{@"threadName":WXTMainThread}];
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId contents:contents options:dictionary data:_jsData];
-
     [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"renderWithOpcode" options:@{@"threadName":WXTMainThread}];
 
    // WX_MONITOR_PERF_SET(WXPTBundleSize, [data length], self);
+    _isRendered = YES;
 }
 
 - (void)_renderWithMainBundleString:(NSString *)mainBundleString
 {
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
+        return;
+    }
+    
+    if (_isRendered) {
+        [WXExceptionUtils commitCriticalExceptionRT:self.instanceId errCode:[NSString stringWithFormat:@"%d", WX_ERR_RENDER_TWICE] function:@"_renderWithMainBundleString:" exception:[NSString stringWithFormat:@"instance is rendered twice"] extParams:nil];
         return;
     }
 
@@ -427,6 +438,8 @@ typedef enum : NSUInteger {
     [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"renderWithMainBundleString" options:@{@"threadName":WXTMainThread}];
     
     WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
+    
+    _isRendered = YES;
 }
 
 - (BOOL)_handleConfigCenter
@@ -681,6 +694,8 @@ typedef enum : NSUInteger {
     if (url.length > 0) {
         [WXPrerenderManager addGlobalTask:url callback:nil];
     }
+    
+    _isRendered = NO;
 }
 
 - (void)forceGarbageCollection

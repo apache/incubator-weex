@@ -220,6 +220,7 @@ static NSThread *WXComponentThread;
     WXAssertParam(ref);
     WXAssertParam(type);
     WXAssertParam(renderObject);
+    WXAssert(_rootComponent == nil, @"Create body is invoked twice.");
     
     _rootComponent = [self _buildComponent:ref type:type supercomponent:nil styles:styles attributes:attributes events:events renderObject:renderObject];
     
