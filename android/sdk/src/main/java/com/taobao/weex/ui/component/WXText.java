@@ -18,29 +18,62 @@
  */
 package com.taobao.weex.ui.component;
 
+import static com.taobao.weex.dom.WXStyle.UNSET;
+import static com.taobao.weex.utils.WXUtils.isUndefined;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.os.Build;
+import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Editable;
 import android.text.Layout;
-import android.view.ViewGroup;
-
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.SpannedString;
+import android.text.StaticLayout;
+import android.text.TextPaint;
+import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.AlignmentSpan;
+import android.text.style.ForegroundColorSpan;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.TextDecorationSpan;
+import com.taobao.weex.dom.WXAttr;
+import com.taobao.weex.dom.WXCustomStyleSpan;
+import com.taobao.weex.dom.WXLineHeightSpan;
+import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.layout.MeasureMode;
+import com.taobao.weex.layout.MeasureSize;
+import com.taobao.weex.layout.measurefunc.TextContentBoxMeasurement;
 import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.flat.FlatComponent;
 import com.taobao.weex.ui.flat.widget.TextWidget;
 import com.taobao.weex.ui.view.WXTextView;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.TypefaceUtil;
+import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXLogUtils;
-
+import com.taobao.weex.utils.WXResourceUtils;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Text component
@@ -59,7 +92,10 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
 
   @Override
   public boolean promoteToView(boolean checkAncestor) {
-    return getInstance().getFlatUIContext().promoteToView(this, checkAncestor, WXText.class);
+    if (null != getInstance().getFlatUIContext()) {
+      return getInstance().getFlatUIContext().promoteToView(this, checkAncestor, WXText.class);
+    }
+    return false;
   }
 
   @Override
@@ -77,31 +113,32 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
   }
 
   public static class Creator implements ComponentCreator {
-
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXText(instance, node, parent);
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXText(instance, parent, basicComponentData);
     }
   }
 
   @Deprecated
-  public WXText(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent);
+  public WXText(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
-  public WXText(WXSDKInstance instance, WXDomObject node,
-                WXVContainer parent) {
-    super(instance, node, parent);
+  public WXText(WXSDKInstance instance,
+                WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
+    setContentBoxMeasurement(new TextContentBoxMeasurement(this));
   }
 
   @Override
   protected WXTextView initComponentHostView(@NonNull Context context) {
-    WXTextView textView =new WXTextView(context);
+    WXTextView textView = new WXTextView(context);
     textView.holdComponent(this);
     return textView;
   }
 
   @Override
   public void updateExtra(Object extra) {
+    super.updateExtra(extra);
     if(extra instanceof Layout) {
       final Layout layout = (Layout) extra;
       if (!promoteToView(true)) {
@@ -116,7 +153,7 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
   @Override
   protected void setAriaLabel(String label) {
     WXTextView text = getHostView();
-    if(text != null){
+    if (text != null) {
       text.setAriaLabel(label);
     }
   }
@@ -125,7 +162,7 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
   public void refreshData(WXComponent component) {
     super.refreshData(component);
     if (component instanceof WXText) {
-      updateExtra(component.getDomObject().getExtra());
+      updateExtra(component.getExtra());
     }
   }
 

@@ -25,10 +25,8 @@ import android.text.TextUtils;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.ImmutableDomObject;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.ui.view.WXLoadingLayout;
 import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
@@ -46,8 +44,8 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
 
   public static final String HIDE = "hide";
 
-  public WXLoading(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  public WXLoading(WXSDKInstance instance, WXVContainer parent, boolean lazy, BasicComponentData basicComponentData) {
+    super(instance, parent, lazy, basicComponentData);
   }
 
   @Override
@@ -57,16 +55,14 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
 
   @Override
   public void onLoading() {
-    ImmutableDomObject domObject = getDomObject();
-    if (domObject != null && domObject.getEvents().contains(Constants.Event.ONLOADING)) {
+    if (getEvents().contains(Constants.Event.ONLOADING)) {
       fireEvent(Constants.Event.ONLOADING);
     }
   }
 
   @Override
   public void onPullingUp(float dy, int pullOutDistance, float viewHeight) {
-    ImmutableDomObject domObject = getDomObject();
-    if (domObject != null && domObject.getEvents().contains(Constants.Event.ONPULLING_UP)) {
+    if (getEvents().contains(Constants.Event.ONPULLING_UP)) {
       Map<String, Object> data = new HashMap<>();
       data.put(Constants.Name.DISTANCE_Y, dy);
       data.put(Constants.Name.PULLING_DISTANCE, pullOutDistance);
@@ -96,9 +92,7 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
   public void setDisplay(String display) {
     if (!TextUtils.isEmpty(display)) {
       if (display.equals(HIDE)) {
-        if (getParent() instanceof WXRecyclerTemplateList
-                || getParent() instanceof WXListComponent
-                || getParent() instanceof WXScroller) {
+        if (getParent() instanceof WXListComponent || getParent() instanceof WXScroller) {
           if (((BaseBounceView)getParent().getHostView()).getSwipeLayout().isRefreshing()) {
             ((BaseBounceView) getParent().getHostView()).finishPullLoad();
             ((BaseBounceView) getParent().getHostView()).onLoadmoreComplete();

@@ -27,20 +27,39 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.taobao.weappplus_sdk.R;
+import com.taobao.weex.R;
 import com.taobao.weex.IWXRenderListener;
-import com.taobao.weex.WXRenderErrorCode;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
+import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
+
+import java.util.ArrayDeque;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 @Component(lazyload = false)
 public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
+
+  public static final  String STRATEGY_NONE =  "none";
+  public static final  String STRATEGY_NORMAL =  "normal";
+  public static final  String STRATEGY_HIGH =  "high";
+
+
+  public static final  String PRIORITY_LOW =  "low";
+  public static final  String PRIORITY_NORMAL =  "normal";
+  public static final  String PRIORITY_HIGH =  "high";
 
   public static final String ITEM_ID = "itemId";
 
@@ -51,6 +70,16 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   private boolean mIsVisible = true;
   private EmbedRenderListener mListener;
+  private EmbedInstanceOnScrollFireEventInterceptor mInstanceOnScrollFireEventInterceptor;
+
+
+  private String priority = PRIORITY_NORMAL;
+
+  private String strategy = "normal";  //none, normal, high(ignore priority)
+
+  private long hiddenTime;
+
+
 
   public interface EmbedManager {
     WXEmbed getEmbed(String itemId);
@@ -90,10 +119,11 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   public static class ClickToReloadListener implements OnNestedInstanceEventListener {
     @Override
     public void onException(NestedContainer container, String errCode, String msg) {
-      if (TextUtils.equals(errCode, WXRenderErrorCode.WX_NETWORK_ERROR) && container instanceof WXEmbed) {
+      if (TextUtils.equals(errCode, WXErrorCode.
+              WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode()) && container instanceof WXEmbed) {
         final WXEmbed comp = ((WXEmbed)container);
         final ImageView imageView = new ImageView(comp.getContext());
-        imageView.setImageResource(R.drawable.error);
+        imageView.setImageResource(R.drawable.weex_error);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ERROR_IMG_WIDTH, ERROR_IMG_HEIGHT);
         layoutParams.gravity = Gravity.CENTER;
         imageView.setLayoutParams(layoutParams);
@@ -158,6 +188,10 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
     @Override
     public void onException(WXSDKInstance instance, String errCode, String msg) {
+        if (null != instance){
+            //degrade or reload,should not report
+            instance.getExceptionRecorder().hasDegrade.set(true);
+        }
       if (mEventListener != null) {
         mEventListener.onException(mComponent, errCode, msg);
       }
@@ -165,22 +199,26 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   }
 
   @Deprecated
-  public WXEmbed(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent);
+  public WXEmbed(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
-  public WXEmbed(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
-    super(instance, node, parent);
+  public WXEmbed(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
     mListener = new EmbedRenderListener(this);
+    mInstanceOnScrollFireEventInterceptor = new EmbedInstanceOnScrollFireEventInterceptor(this);
 
-    ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270,instance.getInstanceViewPortWidth());
-    ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260,instance.getInstanceViewPortWidth());
-    if(instance instanceof EmbedManager) {
-      Object itemId = node.getAttrs().get(ITEM_ID);
+    ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270, instance.getInstanceViewPortWidth());
+    ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260, instance.getInstanceViewPortWidth());
+    if (instance instanceof EmbedManager) {
+      Object itemId = getAttrs().get(ITEM_ID);
       if (itemId != null) {
         ((EmbedManager) instance).putEmbed(itemId.toString(), this);
       }
     }
+    this.priority = WXUtils.getString(getAttrs().get(Constants.Name.PRIORITY), PRIORITY_NORMAL);
+    this.strategy = WXUtils.getString(getAttrs().get(Constants.Name.STRATEGY), STRATEGY_NONE);
+    instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_EMBED_COUNT,1);
   }
 
   @Override
@@ -197,9 +235,15 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   protected boolean setProperty(String key, Object param) {
     switch (key) {
       case Constants.Name.SRC:
-        String src = WXUtils.getString(param,null);
+        String src = WXUtils.getString(param, null);
         if (src != null)
           setSrc(src);
+        return true;
+      case Constants.Name.PRIORITY:
+        String priority = WXUtils.getString(param, null);
+        if (priority != null) {
+          setPriority(priority);
+        }
         return true;
     }
     return super.setProperty(key, param);
@@ -228,6 +272,19 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   private String originUrl;
 
+
+  @Override
+  public void addEvent(String type) {
+    super.addEvent(type);
+    if(Constants.Event.SCROLL_START.equals(type)){
+      mInstanceOnScrollFireEventInterceptor.addInterceptEvent(type);
+    }else if(Constants.Event.SCROLL_END.equals(type)){
+      mInstanceOnScrollFireEventInterceptor.addInterceptEvent(type);
+    }else if(Constants.Event.SCROLL.equals(type)){
+      mInstanceOnScrollFireEventInterceptor.addInterceptEvent(type);
+    }
+  }
+
   @WXComponentProp(name = Constants.Name.SRC)
   public void setSrc(String src) {
     originUrl=src;
@@ -244,6 +301,15 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     return src;
   }
 
+
+  @WXComponentProp(name = Constants.Name.PRIORITY)
+  public void setPriority(String priority) {
+    if(TextUtils.isEmpty(priority)){
+      return;
+    }
+    this.priority = priority;
+  }
+
   /**
    * Load embed content, default behavior is create a nested instance.
    */
@@ -257,10 +323,27 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     }
   }
 
+  private static final int getLevel(WXEmbed embed){
+    String priority = embed.priority;
+    String strategy = embed.strategy;
+    int level  = 5;
+    if(!STRATEGY_HIGH.equals(strategy)) {
+      if (TextUtils.equals(priority, PRIORITY_LOW)) {
+        level = 0;
+      } else if (TextUtils.equals(priority, PRIORITY_HIGH)) {
+        level = 10;
+      }
+    }
+    return  level;
+  }
+
   private WXSDKInstance createInstance() {
     WXSDKInstance sdkInstance = getInstance().createNestedInstance(this);
     getInstance().addOnInstanceVisibleListener(this);
     sdkInstance.registerRenderListener(mListener);
+    mInstanceOnScrollFireEventInterceptor.resetFirstLaterScroller();;
+    sdkInstance.addInstanceOnFireEventInterceptor(mInstanceOnScrollFireEventInterceptor);
+    sdkInstance.registerOnWXScrollListener(mInstanceOnScrollFireEventInterceptor);
 
     String url=src;
     if(mListener != null && mListener.mEventListener != null){
@@ -272,16 +355,19 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     }
 
     if(TextUtils.isEmpty(url)){
-      mListener.mEventListener.onException(this,WXRenderErrorCode.WX_USER_INTERCEPT_ERROR,"degradeToH5");
+      mListener.mEventListener.onException(this,
+              WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorCode(),
+              WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorMsg() + "!!wx embed src url is null"
+      );
       return sdkInstance;
     }
+    sdkInstance.setContainerInfo(WXInstanceApm.KEY_PAGE_PROPERTIES_INSTANCE_TYPE,"embed");
+    sdkInstance.setContainerInfo(WXInstanceApm.KEY_PAGE_PROPERTIES_PARENT_PAGE,getInstance().getWXPerformance().pageName);
+    sdkInstance.renderByUrl(url,
+            url,
+            null, null,
+            WXRenderStrategy.APPEND_ASYNC);
 
-    ViewGroup.LayoutParams layoutParams = getHostView().getLayoutParams();
-    sdkInstance.renderByUrl(WXPerformance.DEFAULT,
-                            url,
-                            null, null, layoutParams.width,
-                            layoutParams.height,
-                            WXRenderStrategy.APPEND_ASYNC);
     return sdkInstance;
   }
 
@@ -289,33 +375,82 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   public void setVisibility(String visibility) {
     super.setVisibility(visibility);
     boolean visible = TextUtils.equals(visibility, Constants.Value.VISIBLE);
-    if (!TextUtils.isEmpty(src) && visible) {
-      if (mNestedInstance == null) {
-        loadContent();
-      } else {
-        mNestedInstance.onViewAppear();
-      }
-    }
+    if(mIsVisible != visible){
 
-    if (!visible) {
-      if (mNestedInstance != null) {
-        mNestedInstance.onViewDisappear();
+      if (!TextUtils.isEmpty(src) && visible) {
+        if (mNestedInstance == null) {
+          loadContent();
+        } else {
+          mNestedInstance.onViewAppear();
+        }
       }
+
+      if (!visible) {
+        if (mNestedInstance != null) {
+          mNestedInstance.onViewDisappear();
+        }
+      }
+      mIsVisible = visible;
+      doAutoEmbedMemoryStrategy();
     }
-    mIsVisible = visible;
   }
 
   @Override
   public void destroy() {
     super.destroy();
-    if (mNestedInstance != null) {
-      mNestedInstance.destroy();
-      mNestedInstance = null;
-    }
+    destoryNestInstance();
     src = null;
     if (getInstance() != null) {
       getInstance().removeOnInstanceVisibleListener(this);
     }
+  }
+
+  private void  doAutoEmbedMemoryStrategy(){
+    /**
+     * auto manage embed amount in current instance, save memory
+     * */
+    if(!STRATEGY_NONE.equals(this.strategy)){
+      if(!mIsVisible && mNestedInstance != null){
+        if(PRIORITY_LOW.equals(this.priority)){
+          destoryNestInstance();
+        }else{
+          if(getInstance().hiddenEmbeds == null){ // low is in front, when priority is same, hidden time pre in first
+            getInstance().hiddenEmbeds = new PriorityQueue<>(8, new Comparator<WXEmbed>() {
+              @Override
+              public int compare(WXEmbed o1, WXEmbed o2) {
+                int level =  getLevel(o1) - getLevel(o2);
+                if(level != 0){
+                  return  level;
+                }
+                return (int) (o1.hiddenTime - o2.hiddenTime);
+              }
+            });
+          }
+          //getInstance().hiddenEmbeds.remove(this);
+          if(!getInstance().hiddenEmbeds.contains(this)) {
+            this.hiddenTime = System.currentTimeMillis();
+            getInstance().hiddenEmbeds.add(this);
+          }
+          if(getInstance().hiddenEmbeds != null && getInstance().getMaxHiddenEmbedsNum() >= 0){
+            while (getInstance().hiddenEmbeds.size() > getInstance().getMaxHiddenEmbedsNum()){
+              WXEmbed embed = getInstance().hiddenEmbeds.poll();
+              if(embed.mIsVisible){
+                continue;
+              }
+              if(embed != null) {
+                embed.destoryNestInstance();
+              }
+            }
+          }
+        }
+      }
+      if(mIsVisible && mNestedInstance != null){
+        if(getInstance().hiddenEmbeds != null && getInstance().hiddenEmbeds.contains(this)){
+          getInstance().hiddenEmbeds.remove(this);
+        }
+      }
+    }
+
   }
 
   @Override
@@ -377,4 +512,130 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
       mNestedInstance.onActivityDestroy();
     }
   }
+
+  public void setStrategy(String strategy) {
+    this.strategy = strategy;
+  }
+
+  private void destoryNestInstance(){
+    if(getInstance().hiddenEmbeds != null && getInstance().hiddenEmbeds.contains(this)){
+      getInstance().hiddenEmbeds.remove(this);
+    }
+    if (mNestedInstance != null) {
+      mNestedInstance.destroy();
+      mNestedInstance = null;
+    }
+    if(WXEnvironment.isApkDebugable()){
+      WXLogUtils.w("WXEmbed destoryNestInstance priority " + priority + " index " + getAttrs().get("index")
+              + "  " + hiddenTime  + " embeds size " + (getInstance().hiddenEmbeds == null ?  0 : getInstance().hiddenEmbeds.size())
+              + " strategy " + this.strategy);
+    }
+  }
+
+  @Override
+  public void addLayerOverFlowListener(String ref) {
+    if (mNestedInstance != null)
+      mNestedInstance.addLayerOverFlowListener(getRef());
+  }
+
+  @Override
+  public void removeLayerOverFlowListener(String ref) {
+    if (mNestedInstance != null)
+      mNestedInstance.removeLayerOverFlowListener(ref);
+  }
+
+  static class EmbedInstanceOnScrollFireEventInterceptor extends InstanceOnFireEventInterceptor implements OnWXScrollListener{
+
+    private WXEmbed mEmbed;
+    private WXComponent firstLayerScroller;
+
+    public EmbedInstanceOnScrollFireEventInterceptor(WXEmbed embed) {
+      this.mEmbed = embed;
+    }
+
+    public void resetFirstLaterScroller(){
+      firstLayerScroller = null;
+    }
+
+    @Override
+    public void onFireEvent(String instanceId, String elementRef, String type, Map<String, Object> params, Map<String, Object> domChanges) {
+      if(mEmbed == null
+              || mEmbed.mNestedInstance == null
+              || !mEmbed.mNestedInstance.getInstanceId().equals(instanceId)){
+        return;
+      }
+      if(firstLayerScroller == null){
+          initFirstLayerScroller();
+      }
+      if(firstLayerScroller == null){
+        return;
+      }
+      if(firstLayerScroller.getRef().equals(elementRef)){
+         mEmbed.getInstance().fireEvent(mEmbed.getRef(), type, params, domChanges);
+      }
+    }
+
+
+    private void initFirstLayerScroller(){
+      if(firstLayerScroller == null){
+          firstLayerScroller = findFirstLayerScroller();
+          if(firstLayerScroller != null){
+            for(String event : getListenEvents()){
+              if(!firstLayerScroller.containsEvent(event)){
+                  firstLayerScroller.getEvents().add(event);
+                  firstLayerScroller.addEvent(event);
+              }
+            }
+          }
+      }
+    }
+
+    /**
+     * get first layer scroller ref
+     * */
+    private WXComponent findFirstLayerScroller(){
+         if(mEmbed.mNestedInstance == null){
+           return null;
+         }
+         WXComponent rootComponent = mEmbed.mNestedInstance.getRootComponent();
+        if(rootComponent instanceof  Scrollable){
+          return rootComponent;
+        }
+        Queue<WXComponent> queues = new ArrayDeque<>();
+        queues.offer(rootComponent);
+        while (!queues.isEmpty()){
+             WXComponent component = queues.poll();
+             if(component == null){
+               break;
+             }
+             if(component instanceof  Scrollable){
+                return  component;
+             }
+             if(component instanceof WXVContainer){
+               WXVContainer container = (WXVContainer) component;
+               for(int i=0; i<container.getChildCount(); i++){
+                  queues.offer(container.getChild(i));
+               }
+             }
+        }
+        return null;
+    }
+
+
+    @Override
+    public void onScrolled(View view, int x, int y) {
+      if(firstLayerScroller != null){
+        return;
+      }
+      if(getListenEvents().size() > 0){
+        initFirstLayerScroller();
+      }
+    }
+
+    @Override
+    public void onScrollStateChanged(View view, int x, int y, int newState) {
+
+    }
+  }
+
 }

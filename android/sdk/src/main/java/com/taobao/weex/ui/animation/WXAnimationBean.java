@@ -27,6 +27,7 @@ import android.util.Pair;
 import android.util.Property;
 import android.view.View;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.utils.FunctionParser;
@@ -45,6 +46,11 @@ import java.util.Map.Entry;
 
 public class WXAnimationBean {
 
+  public final static String LINEAR = "linear";
+  public final static String EASE_IN_OUT = "ease-in-out";
+  public final static String EASE_IN = "ease-in";
+  public final static String EASE_OUT = "ease-out";
+  public final static String CUBIC_BEZIER = "cubic-bezier";
   public final static int NUM_CUBIC_PARAM = 4;
   public long delay;
   public long duration;
@@ -82,7 +88,7 @@ public class WXAnimationBean {
 
     static {
       wxToAndroidMap.put(WX_TRANSLATE, Arrays.asList
-          (View.TRANSLATION_X, View.TRANSLATION_Y));
+              (View.TRANSLATION_X, View.TRANSLATION_Y));
       wxToAndroidMap.put(WX_TRANSLATE_X, Collections.singletonList(View.TRANSLATION_X));
       wxToAndroidMap.put(WX_TRANSLATE_Y, Collections.singletonList(View.TRANSLATION_Y));
       wxToAndroidMap.put(WX_ROTATE, Collections.singletonList(View.ROTATION));
@@ -113,10 +119,6 @@ public class WXAnimationBean {
     private List<PropertyValuesHolder> holders=new LinkedList<>();
     private float cameraDistance = Float.MAX_VALUE;
 
-    private static Map<Property<View,Float>, Float> parseTransForm(@Nullable String rawTransform, final int width,
-                                                final int height,final int viewportW) {
-      return  TransformParser.parseTransForm(rawTransform, width, height, viewportW);
-    }
 
     private static Pair<Float, Float> parsePivot(@Nullable String transformOrigin,
                                                  int width, int height,int viewportW) {
@@ -142,7 +144,7 @@ public class WXAnimationBean {
 
     private static Pair<Float, Float> parsePivot(@NonNull List<String> list, int width, int height,int viewportW) {
       return new Pair<>(
-          parsePivotX(list.get(0), width,viewportW), parsePivotY(list.get(1), height,viewportW));
+              parsePivotX(list.get(0), width,viewportW), parsePivotY(list.get(1), height,viewportW));
     }
 
     private static float parsePivotX(String x, int width,int viewportW) {
@@ -197,9 +199,9 @@ public class WXAnimationBean {
     }
 
     public void init(@Nullable String transformOrigin,@Nullable String rawTransform,
-                     final int width, final int height,int viewportW){
+                     final int width, final int height,int viewportW, WXSDKInstance instance){
       pivot = parsePivot(transformOrigin,width,height,viewportW);
-      transformMap.putAll(parseTransForm(rawTransform,width,height,viewportW));
+      transformMap.putAll(TransformParser.parseTransForm(instance.getInstanceId(), rawTransform, width,height,viewportW));
       resetToDefaultIfAbsent();
       if (transformMap.containsKey(CameraDistanceProperty.getInstance())) {
         cameraDistance = transformMap.remove(CameraDistanceProperty.getInstance());
@@ -237,3 +239,4 @@ public class WXAnimationBean {
     }
   }
 }
+

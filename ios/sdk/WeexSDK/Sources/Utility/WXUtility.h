@@ -89,19 +89,19 @@ extern "C" {
  * @abstract execute asynchronous action block on the main thread.
  *
  */
-void WXPerformBlockOnMainThread( void (^ _Nonnull block)());
+void WXPerformBlockOnMainThread( void (^ _Nonnull block)(void));
 
 /**
  * @abstract execute synchronous action block on the main thread.
  *
  */
-void WXPerformBlockSyncOnMainThread( void (^ _Nonnull block)());
+void WXPerformBlockSyncOnMainThread( void (^ _Nonnull block)(void));
 
 /**
  * @abstract execute action block on the specific thread.
  *
  */
-void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *_Nonnull thread);
+void WXPerformBlockOnThread(void (^ _Nonnull block)(void), NSThread *_Nonnull thread);
 
 /**
  * @abstract swizzling methods.
@@ -119,7 +119,7 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 
 @interface WXUtility : NSObject
 
-+ (void)performBlock:(void (^_Nonnull)())block onThread:(NSThread *_Nonnull)thread;
++ (void)performBlock:(void (^_Nonnull)(void))block onThread:(NSThread *_Nonnull)thread;
 
 /**
  * @abstract Returns the environment of current application, you can get some necessary properties such as appVersion、sdkVersion、appName etc.
@@ -203,6 +203,15 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  */
 + (BOOL)isBlankString:(NSString * _Nullable)string ;
 
+
+/**
+ check a point is valid or not. A zero point is also valid
+
+ @param point a point value to check
+ @return true if point.x and point.y are all valid value for a number.
+ */
++ (BOOL)isValidPoint:(CGPoint)point;
+
 /**
  * @abstract Returns a standard error object
  *
@@ -253,11 +262,14 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  */
 + (CGFloat)defaultPixelScaleFactor;
 
+#if defined __cplusplus
+extern "C" {
+#endif
 /**
  * @abstract Returns the scale of the main screen.
  *
  */
-CGFloat WXScreenScale();
+CGFloat WXScreenScale(void);
 
 /**
  * @abstract Returns a Round float coordinates to the main screen pixel.
@@ -276,7 +288,11 @@ CGFloat WXFloorPixelValue(CGFloat value);
  *
  */
 CGFloat WXCeilPixelValue(CGFloat value);
-
+    
+#if defined __cplusplus
+};
+#endif
+    
 /**
  *  @abstract check whether the file is exist
  *
@@ -404,6 +420,10 @@ CGPoint WXPixelPointResize(CGPoint value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelS
  */
 + (NSDictionary *_Nullable)linearGradientWithBackgroundImage:(NSString *_Nullable)backgroundImage;
 
+#if defined __cplusplus
+extern "C" {
+#endif
+    
 /**
  *  @abstract compare float a and b, if a equal b, return true,or reture false.
  *
@@ -435,6 +455,10 @@ BOOL WXFloatGreaterThan(CGFloat a, CGFloat b);
  */
 BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
 
+#if defined __cplusplus
+};
+#endif
+
 /**
  *  @abstract convert returnKeyType to type string .
  *
@@ -458,5 +482,21 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
  *
  */
 + (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict;
+
++ (void)setThreadSafeCollectionUsingLock:(BOOL)usingLock;
+
++ (BOOL)threadSafeCollectionUsingLock;
+
++ (void)setUnregisterFontWhenCollision:(BOOL)value;
+
++ (void)setListSectionRowThreadSafe:(BOOL)value;
+
++ (void)setUseJSCApiForCreateInstance:(BOOL)value;
+
++ (BOOL)useJSCApiForCreateInstance;
+
++ (BOOL)listSectionRowThreadSafe;
+
++ (long) getUnixFixTimeMillis;
 
 @end

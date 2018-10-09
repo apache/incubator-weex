@@ -18,12 +18,16 @@
  */
 package com.taobao.weex.http;
 
-import android.net.Uri;
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
-import com.alibaba.fastjson.JSON;
+import android.net.Uri;
+import android.text.TextUtils;
+
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.annotation.JSMethod;
@@ -33,7 +37,6 @@ import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.utils.WXLogUtils;
-
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,8 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 public class WXStreamModule extends WXModule {
 
@@ -55,7 +56,7 @@ public class WXStreamModule extends WXModule {
     this(null);
   }
   public WXStreamModule(IWXHttpAdapter adapter){
-   mAdapter = adapter;
+    mAdapter = adapter;
   }
 
   /**
@@ -67,9 +68,8 @@ public class WXStreamModule extends WXModule {
    */
   @Deprecated
   @JSMethod(uiThread = false)
-  public void sendHttp(String params, final String callback) {
+  public void sendHttp(JSONObject paramsObj, final String callback) {
 
-    JSONObject paramsObj = JSON.parseObject(params);
     String method = paramsObj.getString("method");
     String url = paramsObj.getString("url");
     JSONObject headers = paramsObj.getJSONObject("header");
@@ -94,46 +94,42 @@ public class WXStreamModule extends WXModule {
       public void onResponse(WXResponse response, Map<String, String> headers) {
         if(callback != null && mWXSDKInstance != null)
           WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback,
-            (response == null || response.originalData == null) ? "{}" :
-              readAsString(response.originalData,
-                headers!=null?getHeader(headers,"Content-Type"):""
-              ));
+                  (response == null || response.originalData == null) ? "{}" :
+                          readAsString(response.originalData,
+                                  headers!=null?getHeader(headers,"Content-Type"):""
+                          ));
       }
-    }, null);
+    }, null, mWXSDKInstance.getInstanceId(), mWXSDKInstance.getBundleUrl());
   }
 
   /**
    *
    * @param optionsStr request options include:
    *  method: GET 、POST、PUT、DELETE、HEAD、PATCH
-   *  headers：object，请求header
+   *  headers：object，request header
    *  url:
    *  body: "Any body that you want to add to your request"
-   *  type: json、text、jsonp（native实现时等价与json）
+   *  type: json、text、jsonp（json）
    * @param callback finished callback,response object:
    *  status：status code
-   *  ok：boolean 是否成功，等价于status200～299
-   *  statusText：状态消息，用于定位具体错误原因
-   *  data: 响应数据，当请求option中type为json，时data为object，否则data为string类型
-   *  headers: object 响应头
+   *  ok：boolean is success，http status200～299
+   *  statusText： statusText
+   *  data:  option type is json，data is object，not data is string
+   *  headers: headers
    *
    * @param progressCallback in progress callback,for download progress and request state,response object:
-   *  readyState: number 请求状态，1 OPENED，开始连接；2 HEADERS_RECEIVED；3 LOADING
+   *  readyState: number connection status 1 OPENED 2 HEADERS_RECEIVED 3 LOADING
    *  status：status code
-   *  length：当前获取的字节数，总长度从headers里「Content-Length」获取
-   *  statusText：状态消息，用于定位具体错误原因
-   *  headers: object 响应头
+   *  length：headers Content-Length
+   *  statusText：statusText
+   *  headers: headers
    */
   @JSMethod(uiThread = false)
-  public void fetch(String optionsStr, final JSCallback callback, JSCallback progressCallback){
+  public void fetch(JSONObject optionsObj , final JSCallback callback, JSCallback progressCallback){
+    fetch(optionsObj, callback, progressCallback, mWXSDKInstance.getInstanceId(), mWXSDKInstance.getBundleUrl());
+  }
 
-    JSONObject optionsObj = null;
-    try {
-      optionsObj = JSON.parseObject(optionsStr);
-    }catch (JSONException e){
-      WXLogUtils.e("", e);
-    }
-
+  public void fetch(JSONObject optionsObj , final JSCallback callback, JSCallback progressCallback, String instanceId, String bundleURL){
     boolean invaildOption = optionsObj==null || optionsObj.getString("url")==null;
     if(invaildOption){
       if(callback != null) {
@@ -151,18 +147,28 @@ public class WXStreamModule extends WXModule {
     String type = optionsObj.getString("type");
     int timeout = optionsObj.getIntValue("timeout");
 
+    WXSDKInstance wxsdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if (wxsdkInstance != null) {
+      if (wxsdkInstance.getStreamNetworkHandler() != null) {
+        String localUrl = wxsdkInstance.getStreamNetworkHandler().fetchLocal(url);
+        if (!TextUtils.isEmpty(localUrl)) {
+          url = localUrl;
+        }
+      }
+    }
+
     if (method != null) method = method.toUpperCase();
     Options.Builder builder = new Options.Builder()
-            .setMethod(!"GET".equals(method)
-                    &&!"POST".equals(method)
-                    &&!"PUT".equals(method)
-                    &&!"DELETE".equals(method)
-                    &&!"HEAD".equals(method)
-                    &&!"PATCH".equals(method)?"GET":method)
-            .setUrl(url)
-            .setBody(body)
-            .setType(type)
-            .setTimeout(timeout);
+        .setMethod(!"GET".equals(method)
+            &&!"POST".equals(method)
+            &&!"PUT".equals(method)
+            &&!"DELETE".equals(method)
+            &&!"HEAD".equals(method)
+            &&!"PATCH".equals(method)?"GET":method)
+        .setUrl(url)
+        .setBody(body)
+        .setType(type)
+        .setTimeout(timeout);
 
     extractHeaders(headers,builder);
     final Options options = builder.createOptions();
@@ -182,7 +188,7 @@ public class WXStreamModule extends WXModule {
               resp.put("data", null);
             } else {
               String respData = readAsString(response.originalData,
-                      headers != null ? getHeader(headers, "Content-Type") : ""
+                  headers != null ? getHeader(headers, "Content-Type") : ""
               );
               try {
                 resp.put("data", parseData(respData, options.getType()));
@@ -198,7 +204,7 @@ public class WXStreamModule extends WXModule {
           callback.invoke(resp);
         }
       }
-    }, progressCallback);
+    }, progressCallback, instanceId, bundleURL);
   }
 
   Object parseData(String data, Options.Type type) throws JSONException{
@@ -267,22 +273,23 @@ public class WXStreamModule extends WXModule {
   }
 
 
-  private void sendRequest(Options options,ResponseCallback callback,JSCallback progressCallback){
+  private void sendRequest(Options options,ResponseCallback callback,JSCallback progressCallback,String instanceId, String bundleURL){
     WXRequest wxRequest = new WXRequest();
     wxRequest.method = options.getMethod();
-    wxRequest.url = mWXSDKInstance.rewriteUri(Uri.parse(options.getUrl()), URIAdapter.REQUEST).toString();
+    wxRequest.url = WXSDKManager.getInstance().getURIAdapter().rewrite(bundleURL, URIAdapter.REQUEST,Uri.parse(options.getUrl())).toString();
     wxRequest.body = options.getBody();
     wxRequest.timeoutMs = options.getTimeout();
+    wxRequest.instanceId = instanceId;
 
-    if(options.getHeaders()!=null)
-    if (wxRequest.paramMap == null) {
-      wxRequest.paramMap = options.getHeaders();
-    }else{
-      wxRequest.paramMap.putAll(options.getHeaders());
+    if(options.getHeaders()!=null) {
+      if (wxRequest.paramMap == null) {
+        wxRequest.paramMap = options.getHeaders();
+      } else {
+        wxRequest.paramMap.putAll(options.getHeaders());
+      }
     }
 
-
-    IWXHttpAdapter adapter = ( mAdapter==null && mWXSDKInstance != null) ? mWXSDKInstance.getWXHttpAdapter() : mAdapter;
+    IWXHttpAdapter adapter = ( mAdapter==null) ? WXSDKManager.getInstance().getIWXHttpAdapter() : mAdapter;
     if (adapter != null) {
       adapter.sendRequest(wxRequest, new StreamHttpListener(callback,progressCallback));
     }else{
@@ -309,9 +316,9 @@ public class WXStreamModule extends WXModule {
     @Override
     public void onHttpStart() {
       if(mProgressCallback !=null) {
-        mResponse.put("readyState",1);//readyState: number 请求状态，1 OPENED，开始连接；2 HEADERS_RECEIVED；3 LOADING
+        mResponse.put("readyState",1);//readyState: number 1 OPENED 2 HEADERS_RECEIVED 3 LOADING
         mResponse.put("length",0);
-        mProgressCallback.invokeAndKeepAlive(mResponse);
+        mProgressCallback.invokeAndKeepAlive(new HashMap<>(mResponse));
       }
     }
 
@@ -339,7 +346,7 @@ public class WXStreamModule extends WXModule {
       mResponse.put("headers", simpleHeaders);
       mRespHeaders = simpleHeaders;
       if (mProgressCallback != null) {
-        mProgressCallback.invokeAndKeepAlive(mResponse);
+        mProgressCallback.invokeAndKeepAlive(new HashMap<>(mResponse));
       }
     }
 
@@ -347,7 +354,7 @@ public class WXStreamModule extends WXModule {
     public void onHttpResponseProgress(int loadedLength) {
       mResponse.put("length",loadedLength);
       if(mProgressCallback!=null){
-        mProgressCallback.invokeAndKeepAlive(mResponse);
+        mProgressCallback.invokeAndKeepAlive(new HashMap<>(mResponse));
       }
 
     }

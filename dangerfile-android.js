@@ -30,7 +30,6 @@ const type_ios_test = 3;
 const type_android_test = 4;
 const type_jsfm = 5;
 const type_jsfm_test = 6;
-const type_doc = 7;
 const type_ui_test = 8;
 
 const getFileType = file => {
@@ -48,8 +47,6 @@ const getFileType = file => {
     return type_jsfm;
   } else if (file.match(/html5\/test\/.+\.js/)) {
     return type_jsfm_test;
-  } else if (file.match(/doc\/\.+\.md/)) {
-    return type_doc;
   } else if(file.match(/test\/scripts\/.+\.js/) || file.match(/test\/pages\/.+\.vue/)){
     return type_ui_test
   }else{
@@ -93,18 +90,18 @@ if (!hasAndroidFile && danger.git.deleted_files) {
 }
 console.log('-----------------------------hasAndroidFile-----------------------------:'+hasAndroidFile);
 if(hasAndroidFile){
-  var runTestCmd='source ~/.bash_profile; '
+  var runTryBuildCmd='source ~/.bash_profile; '
     +'cd android; '
-    +'./gradlew clean assembleDebug :weex_sdk:testDebugUnitTest --info -PdisableCov=true '
+    +'./gradlew clean assembleDebug --info -PdisableCov=true '
     +'-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m '
     +'-XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8 '
-  var runSuccess = shell.exec(runTestCmd,{ async: false, timeout: 8 * 60 * 1000, maxBuffer: 200 * 1024 * 1024 }).code == 0;
+  var runSuccess = shell.exec(runTryBuildCmd,{ async: false, timeout: 8 * 60 * 1000, maxBuffer: 200 * 1024 * 1024 }).code == 0;
   if(!runSuccess){
-    fail("android platform run unit test failed!");
+    fail("Failed to run assembleDebug task for android.");
   }
 }else{
-  console.log('has no android file changed.');
-  message('has no android file changed.')
+  console.log('No android file has been changed.');
+  message('No android file has been changed.')
 }
 
-message('android test finished.')
+message('android build verification finished.')

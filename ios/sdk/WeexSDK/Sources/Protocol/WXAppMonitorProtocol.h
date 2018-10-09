@@ -19,13 +19,19 @@
 
 #import "WXModuleProtocol.h"
 
+/**  dimenValue  */
 #define BIZTYPE             @"bizType"
 #define PAGENAME            @"pageName"
 #define WXSDKVERSION        @"WXSDKVersion"
 #define JSLIBVERSION        @"JSLibVersion"
+#define JSLIBSIZE           @"JSLibSize"
 #define WXREQUESTTYPE       @"requestType"
 #define WXCONNECTIONTYPE    @"connectionType"
+#define NETWORKTYPE         @"networkType"
+#define CACHETYPE           @"cacheType"
 #define WXCUSTOMMONITORINFO @"customMonitorInfo"
+
+/**  measureValue  */
 
 #define SDKINITTIME         @"SDKInitTime"
 #define SDKINITINVOKETIME   @"SDKInitInvokeTime"
@@ -37,13 +43,41 @@
 #define TOTALTIME           @"totalTime"
 #define FIRSETSCREENJSFEXECUTETIME  @"firstScreenJSFExecuteTime"
 
+#define CALLCREATEINSTANCETIME  @"callCreateInstanceTime"
+#define COMMUNICATETOTALTIME    @"communicateTotalTime"
+#define FSRENDERTIME    @"fsRenderTime"
+#define COMPONENTCOUNT      @"componentCount"
+#define M_COMPONENT_TIME    @"componentCreateTime"
+
 #define CACHEPROCESSTIME    @"cacheProcessTime"
 #define CACHERATIO          @"cacheRatio"
+
+//todo new point
+#define M_FS_CALL_JS_TIME       @"fsCallJsTotalTime"
+#define M_FS_CALL_JS_NUM        @"fsCallJsTotalNum"
+#define M_FS_CALL_NATIVE_TIME   @"fsCallNativeTotalTime"
+#define M_FS_CALL_NATIVE_NUM    @"fsCallNativeTotalNum"
+#define M_FS_CALL_EVENT_NUM     @"fsCallEventTotalNum"
+#define M_FS_REQUEST_NET_NUM    @"fsRequestNum"
+#define M_CELL_EXCEED_NUM       @"cellExceedNum"
+#define M_MAX_DEEP_VDOM         @"maxDeepVDomLayer"
+#define M_IMG_WRONG_SIZE_NUM    @"imgSizeCount"
+#define M_TIMER_NUM             @"timerCount"
+#define M_WRONG_IMG_NUM         @"imgSizeCount"
+#define M_INTERACTION_TIME      @"interactionTime"
+#define M_INTERACTION_ADD_COUNT    @"interactionViewAddCount"
+#define M_INTERACTION_LIMIT_ADD_COUNT    @"interactionViewAddLimitCount"
+#define M_NEW_FS_RENDER_TIME             @"newFsRenderTime"
+
 
 @protocol WXAppMonitorProtocol <WXModuleProtocol>
 
 - (void)commitAppMonitorArgs:(NSDictionary *)args;
 
 - (void)commitAppMonitorAlarm:(NSString *)pageName monitorPoint:(NSString *)monitorPoint success:(BOOL)success errorCode:(NSString *)errorCode errorMsg:(NSString *)errorMsg arg:(NSString *)arg;
+
+@optional
+
+- (void)commitMonitorWithPage:(NSString *)pageName monitorPoint:(NSString *)monitorPoint args:(NSDictionary *)args;
 
 @end

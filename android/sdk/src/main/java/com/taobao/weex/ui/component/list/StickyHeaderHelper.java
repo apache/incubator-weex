@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by sospartan on 17/03/2017.
@@ -102,7 +103,7 @@ public class StickyHeaderHelper {
         headerView.setTranslationY(translationY);
       }
       changeFrontStickyVisible();
-      if (headComponent.getDomObject().getEvents().contains("sticky")) {
+      if (headComponent.getEvents().contains("sticky")) {
         headComponent.fireEvent("sticky");
       }
     }
@@ -112,9 +113,8 @@ public class StickyHeaderHelper {
   public void notifyStickyRemove(WXCell compToRemove) {
     if (compToRemove == null)
       return;
-    final WXCell component = mHeaderComps.remove(compToRemove.getRef());
+    final WXCell component = mHeaderComps.containsValue(compToRemove) ? mHeaderComps.remove(compToRemove.getRef()) : compToRemove;
     final View headerView = mHeaderViews.remove(compToRemove.getRef());
-
 
     if(component == null || headerView == null){
       if(WXEnvironment.isApkDebugable()) {
@@ -129,14 +129,14 @@ public class StickyHeaderHelper {
       public void run() {
         mParent.removeView(headerView);
         if(headerView.getVisibility() != View.VISIBLE){
-           headerView.setVisibility(View.VISIBLE);
+          headerView.setVisibility(View.VISIBLE);
         }
         component.recoverySticky();
         changeFrontStickyVisible();
 
       }
     }));
-    if (component.getDomObject().getEvents().contains("unsticky")) {
+    if (component.getEvents().contains("unsticky")) {
       component.fireEvent("unsticky");
     }
   }
@@ -165,6 +165,20 @@ public class StickyHeaderHelper {
     }
   }
 
+  public void  clearStickyHeaders(){
+    if(mHeaderViews.size() <= 0){
+      return;
+    }
+    Iterator<Map.Entry<String, WXCell>> iterator = mHeaderComps.entrySet().iterator();
+
+    while (iterator.hasNext()) {
+      Map.Entry<String, WXCell> next = iterator.next();
+      WXCell value = next.getValue();
+      iterator.remove();
+      notifyStickyRemove(value);
+    }
+  }
+
 
   private void changeFrontStickyVisible(){
     if(mHeaderViews.size() <= 0){
@@ -172,19 +186,19 @@ public class StickyHeaderHelper {
     }
     boolean  fontVisible = false;
     for(int i=mParent.getChildCount()-1; i>=0; i--){
-         View view = mParent.getChildAt(i);
-         if(fontVisible && view.getTag() instanceof  StickyHeaderHelper){
-             if(view.getVisibility() != View.GONE){
-                  view.setVisibility(View.GONE);
-             }
-         }else{
-           if(view.getTag() instanceof  StickyHeaderHelper){
-               fontVisible = true;
-               if(view != null && view.getVisibility() != View.VISIBLE){
-                   view.setVisibility(View.VISIBLE);
-               }
-           }
-         }
+      View view = mParent.getChildAt(i);
+      if(fontVisible && view.getTag() instanceof  StickyHeaderHelper){
+        if(view.getVisibility() != View.GONE){
+          view.setVisibility(View.GONE);
+        }
+      }else{
+        if(view.getTag() instanceof  StickyHeaderHelper){
+          fontVisible = true;
+          if(view != null && view.getVisibility() != View.VISIBLE){
+            view.setVisibility(View.VISIBLE);
+          }
+        }
+      }
     }
   }
 }

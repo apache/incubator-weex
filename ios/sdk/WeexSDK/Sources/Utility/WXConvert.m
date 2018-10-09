@@ -22,6 +22,7 @@
 #import "WXBoxShadow.h"
 #import "WXLength.h"
 #import "WXAssert.h"
+#import "WXSDKEngine.h"
 
 @implementation WXConvert
 
@@ -65,10 +66,100 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
         if ([valueString hasSuffix:@"px"] || [valueString hasSuffix:@"wx"]) {
             valueString = [valueString substringToIndex:(valueString.length - 2)];
         }
+        if ([value hasPrefix:@"env(safe-area-inset-"] &&[value hasSuffix:@")"]){
+            NSUInteger start = [value rangeOfString:@"env(safe-area-inset-"].location +@"env(safe-area-inset-".length;
+            NSUInteger end = [value rangeOfString:@")" options:NSBackwardsSearch].location;
+            value = [value substringWithRange:NSMakeRange(start, end-start)];
+            return [self safeAreaInset:value];
+        }
         return [valueString doubleValue];
     }
     
     return [self double:value];
+}
+
++ (CGFloat)flexCGFloat:(id)value
+{
+    if ([value isKindOfClass:[NSString class]]) {
+        NSString *valueString = (NSString *)value;
+        if (valueString.length <=0) {
+            return NAN;
+        }
+        if ([valueString hasSuffix:@"px"] || [valueString hasSuffix:@"wx"]) {
+            valueString = [valueString substringToIndex:(valueString.length - 2)];
+        }
+        if ([value hasPrefix:@"env(safe-area-inset-"] &&[value hasSuffix:@")"]){
+            NSUInteger start = [value rangeOfString:@"env(safe-area-inset-"].location +@"env(safe-area-inset-".length;
+            NSUInteger end = [value rangeOfString:@")" options:NSBackwardsSearch].location;
+            value = [value substringWithRange:NSMakeRange(start, end-start)];
+            return [self safeAreaInset:value];
+        }
+        //value maybe not number ,such as 100%
+        if (![WXConvert checkStringIsRealNum:valueString]) {
+            return NAN;
+        }
+        return [valueString doubleValue];
+    }
+    return [self double:value];
+}
+
++ (BOOL)checkStringIsRealNum:(NSString *)checkedNumString {
+    NSScanner* scan = [NSScanner scannerWithString:checkedNumString];
+    int intVal;
+    BOOL isInt = [scan scanInt:&intVal] && [scan isAtEnd];
+    if (isInt) {
+        return YES;
+    }
+    float floatVal;
+    BOOL isFloat = [scan scanFloat:&floatVal] && [scan isAtEnd];
+    if (isFloat) {
+        return YES;
+    }
+    
+    return NO;
+}
+
++ (CGFloat)safeAreaInset:(NSString*)value
+{
+    static NSArray * directionArray = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        directionArray = [NSArray arrayWithObjects:@"top",@"right",@"bottom",@"left", nil];
+    });
+    if ([directionArray containsObject:value]) {
+        __block UIEdgeInsets safeAreaInsets = UIEdgeInsetsZero;
+#if __IPHONE_11_0
+        if (@available(iOS 11.0, *)) {
+            WXSDKInstance * topInstance = [WXSDKEngine topInstance];
+            WXPerformBlockSyncOnMainThread(^{
+                safeAreaInsets = topInstance.rootView.safeAreaInsets;
+            });
+            
+        } else {
+            // Fallback on earlier versions
+        }
+#endif
+        NSUInteger key = [directionArray indexOfObject:value];
+        CGFloat retValue = 0;
+        switch (key) {
+            case 0:
+                retValue = safeAreaInsets.top;
+                break;
+            case 1:
+                retValue = safeAreaInsets.right;
+                break;
+            case 2:
+                retValue = safeAreaInsets.bottom;
+                break;
+            case 3:
+                retValue = safeAreaInsets.left;
+                break;
+            default:
+                break;
+        }
+        return retValue;
+    }
+    return 0;
 }
 
 + (NSString *)NSString:(id)value
@@ -88,95 +179,20 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 {
     CGFloat pixel = [self CGFloat:value];
     
-    if ([value isKindOfClass:[NSString class]] && [value hasSuffix:@"wx"]) {
+    if ([value isKindOfClass:[NSString class]] && ([value hasSuffix:@"wx"]|| [value hasPrefix:@"env(safe-area-inset-"])) {
         return pixel;
     }
     return pixel * scaleFactor;
 }
 
-#pragma mark CSS Layout
-
-+(css_position_type_t)css_position_type_t:(id)value
++ (WXPixelType)WXFlexPixelType:(id)value scaleFactor:(CGFloat)scaleFactor
 {
-    if([value isKindOfClass:[NSString class]]){
-        if ([value isEqualToString:@"absolute"]) {
-            return CSS_POSITION_ABSOLUTE;
-        } else if ([value isEqualToString:@"relative"]) {
-            return CSS_POSITION_RELATIVE;
-        } else if ([value isEqualToString:@"fixed"]) {
-            return CSS_POSITION_ABSOLUTE;
-        } else if ([value isEqualToString:@"sticky"]) {
-            return CSS_POSITION_RELATIVE;
-        }
-    }
-    return CSS_POSITION_RELATIVE;
-}
-
-+ (css_flex_direction_t)css_flex_direction_t:(id)value
-{
-    if([value isKindOfClass:[NSString class]]){
-        if ([value isEqualToString:@"column"]) {
-            return CSS_FLEX_DIRECTION_COLUMN;
-        } else if ([value isEqualToString:@"column-reverse"]) {
-            return CSS_FLEX_DIRECTION_COLUMN_REVERSE;
-        } else if ([value isEqualToString:@"row"]) {
-            return CSS_FLEX_DIRECTION_ROW;
-        } else if ([value isEqualToString:@"row-reverse"]) {
-            return CSS_FLEX_DIRECTION_ROW_REVERSE;
-        }
-    }
-    return CSS_FLEX_DIRECTION_COLUMN;
-}
-
-+ (css_align_t)css_align_t:(id)value
-{
-    if([value isKindOfClass:[NSString class]]){
-        if ([value isEqualToString:@"stretch"]) {
-            return CSS_ALIGN_STRETCH;
-        } else if ([value isEqualToString:@"flex-start"]) {
-            return CSS_ALIGN_FLEX_START;
-        } else if ([value isEqualToString:@"flex-end"]) {
-            return CSS_ALIGN_FLEX_END;
-        } else if ([value isEqualToString:@"center"]) {
-            return CSS_ALIGN_CENTER;
-        } else if ([value isEqualToString:@"auto"]) {
-            return CSS_ALIGN_AUTO;
-        }
-    }
+    CGFloat pixel = [self flexCGFloat:value];
     
-    return CSS_ALIGN_STRETCH;
-}
-
-+ (css_wrap_type_t)css_wrap_type_t:(id)value
-{
-    if([value isKindOfClass:[NSString class]]) {
-        if ([value isEqualToString:@"nowrap"]) {
-            return CSS_NOWRAP;
-        } else if ([value isEqualToString:@"wrap"]) {
-            return CSS_WRAP;
-        }
+    if ([value isKindOfClass:[NSString class]] && ([value hasSuffix:@"wx"]|| [value hasPrefix:@"env(safe-area-inset-"])) {
+        return pixel;
     }
-    
-    return CSS_NOWRAP;
-}
-
-+ (css_justify_t)css_justify_t:(id)value
-{
-    if([value isKindOfClass:[NSString class]]){
-        if ([value isEqualToString:@"flex-start"]) {
-            return CSS_JUSTIFY_FLEX_START;
-        } else if ([value isEqualToString:@"center"]) {
-            return CSS_JUSTIFY_CENTER;
-        } else if ([value isEqualToString:@"flex-end"]) {
-            return CSS_JUSTIFY_FLEX_END;
-        } else if ([value isEqualToString:@"space-between"]) {
-            return CSS_JUSTIFY_SPACE_BETWEEN;
-        } else if ([value isEqualToString:@"space-around"]) {
-            return CSS_JUSTIFY_SPACE_AROUND;
-        }
-    }
-    
-    return CSS_JUSTIFY_FLEX_START;
+    return pixel * scaleFactor;
 }
 
 #pragma mark Style
@@ -206,8 +222,8 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     if([value isKindOfClass:[NSString class]]){
         // 2. check if is color keyword or transparent
         static NSDictionary *knownColors;
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
+        static dispatch_once_t onceTokenKnownColors;
+        dispatch_once(&onceTokenKnownColors, ^{
             knownColors = @{
                             // https://www.w3.org/TR/css3-color/#svg-color
                             @"aliceblue": @"#f0f8ff",
@@ -854,7 +870,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 
 + (WXPixelType)WXPixelType:(id)value
 {
-    CGFloat pixel = [self CGFloat:value];
+    CGFloat pixel = [self WXPixelType:value scaleFactor:1.0];
     
     return pixel * WXScreenResizeRadio();
 }

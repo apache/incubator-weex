@@ -31,6 +31,16 @@ import java.math.BigDecimal;
 public class WXReflectionUtils {
 
   public static Object parseArgument(Type paramClazz, Object value) {
+    if(value != null){
+      if(value.getClass() == paramClazz){
+        return  value;
+      }
+      if(paramClazz instanceof  Class){
+        if( ((Class<?>) paramClazz).isAssignableFrom(value.getClass()))   {
+          return value;
+        }
+      }
+    }
     if (paramClazz == String.class) {
       return value instanceof String ? value : JSON.toJSONString(value);
     } else if (paramClazz == int.class) {
@@ -115,8 +125,8 @@ public class WXReflectionUtils {
    * @throws NoSuchMethodException
    */
   public static void setProperty(Object bean, Field field, Object value) throws IllegalAccessException,
-                                                                                InvocationTargetException,
-                                                                                NoSuchMethodException {
+          InvocationTargetException,
+          NoSuchMethodException {
 
     if (bean == null || field == null) {
       return;

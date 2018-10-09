@@ -157,7 +157,7 @@
     if (_async) {
         WXThreadSafeCounter *displayCounter = _displayCounter;
         int32_t displayValue = [displayCounter increase];
-        BOOL (^isCancelled)() = ^BOOL(){
+        BOOL (^isCancelled)(void) = ^BOOL(){
             return displayValue != displayCounter.value;
         };
         
@@ -411,6 +411,15 @@
     }
     
     CGContextStrokePath(context);
+    
+    //clipRadius is beta feature
+    //TO DO: remove _clipRadius property
+    if (_clipToBounds && _clipRadius) {
+        BOOL radiusEqual = _borderTopLeftRadius == _borderTopRightRadius && _borderTopRightRadius == _borderBottomRightRadius && _borderBottomRightRadius == _borderBottomLeftRadius;
+        if (!radiusEqual) {
+            self.layer.mask = [self drawBorderRadiusMaskLayer:rect];
+        }
+    }
 }
 
 - (BOOL)_needsDrawBorder
@@ -567,6 +576,22 @@ do {\
     WXRadii *radii = borderRect.radii;
     BOOL hasBorderRadius = [radii hasBorderRadius];
     return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha(_backgroundColor.CGColor) == 1.0 && [self _needsDrawBorder];
+}
+
+- (CAShapeLayer *)drawBorderRadiusMaskLayer:(CGRect)rect
+{
+    if ([self hasBorderRadiusMaskLayer]) {
+        UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+        CAShapeLayer *maskLayer = [CAShapeLayer layer];
+        maskLayer.path = bezierPath.CGPath;
+        return maskLayer;
+    }
+    return nil;
+}
+
+- (BOOL)hasBorderRadiusMaskLayer
+{
+    return _borderTopLeftRadius > 0.001 || _borderTopRightRadius > 0.001 || _borderBottomLeftRadius > 0.001 || _borderBottomLeftRadius > 0.001;
 }
 
 #pragma mark - Deprecated

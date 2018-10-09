@@ -30,4 +30,10 @@
 
 - (WXCellSlotComponent *)templateWithType:(NSString *)type;
 
+- (WXCellSlotComponent *)topTemplate;
+
+- (BOOL)isTemplateRegistered:(NSString *)aTemplate;
+
+- (NSString *)anyRegisteredTemplate;
+
 @end

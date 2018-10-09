@@ -18,21 +18,20 @@
  */
 package com.taobao.weex.ui;
 
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
-import com.taobao.weex.dom.RenderAction;
-import com.taobao.weex.dom.RenderActionContext;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.action.AbstractAddElementAction;
-import com.taobao.weex.dom.action.TraceableAction;
-import com.taobao.weex.tracing.Stopwatch;
-import com.taobao.weex.tracing.WXTracing;
+import com.taobao.weex.dom.RenderContext;
+import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.ArrayList;
@@ -41,132 +40,108 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Manager class for render operation, mainly for managing {@link RenderActionContextImpl}.
+ * Manager class for render operation, mainly for managing {@link RenderContextImpl}.
  * This is <strong>not</strong> a thread-safe class
  */
 public class WXRenderManager {
 
-  private ConcurrentHashMap<String, RenderActionContextImpl> mRegistries;
+  private volatile ConcurrentHashMap<String, RenderContextImpl> mRenderContext;
   private WXRenderHandler mWXRenderHandler;
 
   public WXRenderManager() {
-    mRegistries = new ConcurrentHashMap<>();
+    mRenderContext = new ConcurrentHashMap<>();
     mWXRenderHandler = new WXRenderHandler();
   }
 
-  public RenderActionContext getRenderContext(String instanceId) {
-    return mRegistries.get(instanceId);
+  public RenderContext getRenderContext(String instanceId) {
+    return mRenderContext.get(instanceId);
   }
 
-  public @Nullable WXComponent getWXComponent(String instanceId, String ref) {
-    if(instanceId == null || TextUtils.isEmpty(ref)){
+  public @Nullable
+  WXComponent getWXComponent(String instanceId, String ref) {
+    if (instanceId == null || TextUtils.isEmpty(ref)) {
       return null;
     }
-    RenderActionContext stmt = getRenderContext(instanceId);
-    return stmt == null?null:stmt.getComponent(ref);
+    RenderContext stmt = getRenderContext(instanceId);
+    return stmt == null ? null : stmt.getComponent(ref);
   }
 
   public WXSDKInstance getWXSDKInstance(String instanceId) {
-    RenderActionContextImpl statement = mRegistries.get(instanceId);
+    RenderContextImpl statement = mRenderContext.get(instanceId);
     if (statement == null) {
       return null;
     }
     return statement.getWXSDKInstance();
   }
 
+  @RestrictTo(Scope.LIBRARY)
   public void postOnUiThread(Runnable runnable, long delayMillis) {
     mWXRenderHandler.postDelayed(WXThread.secure(runnable), delayMillis);
   }
 
+  @RestrictTo(Scope.LIBRARY)
+  public void postOnUiThread(Runnable runnable,final String instanceId){
+    mWXRenderHandler.post(instanceId, WXThread.secure(runnable));
+  }
+
+  @RestrictTo(Scope.LIBRARY)
+  public void postOnUiThread(Runnable runnable){
+    mWXRenderHandler.post(WXThread.secure(runnable));
+  }
+
+  @RestrictTo(Scope.LIBRARY)
+  public void removeTask(Runnable runnable){
+    mWXRenderHandler.removeCallbacks(runnable);
+  }
+
   /**
    * Remove renderStatement, can only be invoked in UI thread.
+   *
    * @param instanceId {@link WXSDKInstance#mInstanceId}
    */
   public void removeRenderStatement(String instanceId) {
     if (!WXUtils.isUiThread()) {
       throw new WXRuntimeException("[WXRenderManager] removeRenderStatement can only be called in main thread");
     }
-    RenderActionContextImpl statement = mRegistries.remove(instanceId);
+    RenderContextImpl statement = mRenderContext.remove(instanceId);
+
     if (statement != null) {
       statement.destroy();
     }
+    if(instanceId == null) {
+      mWXRenderHandler.removeCallbacksAndMessages(null);
+    } else {
+      // use hashCode to match message's what.
+      mWXRenderHandler.removeMessages(instanceId.hashCode());
+    }
   }
 
-  //TODO Use runnable temporarily
-  public void runOnThread(final String instanceId, final IWXRenderTask task) {
-    mWXRenderHandler.post(WXThread.secure(new Runnable() {
-
-      @Override
-      public void run() {
-        if (mRegistries.get(instanceId) == null) {
-          return;
-        }
-        task.execute();
-      }
-    }));
-  }
-
-  public void runOnThread(final String instanceId, final RenderAction action) {
-    final long start = SystemClock.uptimeMillis();
-    mWXRenderHandler.post(WXThread.secure(new Runnable() {
-      @Override
-      public void run() {
-        if (mRegistries.get(instanceId) == null) {
-          return;
-        }
-        if (WXTracing.isAvailable() && action instanceof TraceableAction) {
-          ((TraceableAction) action).mUIQueueTime = SystemClock.uptimeMillis() - start;
-        }
-
-        long start = System.currentTimeMillis();
-        long uiNanos = System.nanoTime();
-        action.executeRender(getRenderContext(instanceId));
-
-        if (WXTracing.isAvailable()) {
-          uiNanos = System.nanoTime() - uiNanos;
-          if (action instanceof TraceableAction) {
-            if (!(action instanceof AbstractAddElementAction)) {
-              WXTracing.TraceEvent uiExecuteEvent = WXTracing.newEvent("UIExecute", instanceId, ((TraceableAction) action).mTracingEventId);
-              uiExecuteEvent.duration = Stopwatch.nanosToMillis(uiNanos);
-              uiExecuteEvent.ts = start;
-              uiExecuteEvent.submit();
-            }
-            ((TraceableAction) action).onFinishUIExecute();
-          }
-        }
-      }
-    }));
+  public void postGraphicAction(final String instanceId, final BasicGraphicAction action) {
+    final RenderContextImpl renderContext = mRenderContext.get(instanceId);
+    if (renderContext == null) {
+      return;
+    }
+    mWXRenderHandler.post(instanceId, action);
   }
 
   public void registerInstance(WXSDKInstance instance) {
-    mRegistries.put(instance.getInstanceId(), new RenderActionContextImpl(instance));
-  }
-
-  public void setLayout(String instanceId, String ref, WXDomObject domObject) {
-    RenderActionContextImpl statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+    if (instance.getInstanceId() == null) {
+      WXExceptionUtils.commitCriticalExceptionRT(null,
+              WXErrorCode.WX_RENDER_ERR_INSTANCE_ID_NULL,
+              "registerInstance",
+              WXErrorCode.WX_RENDER_ERR_INSTANCE_ID_NULL.getErrorMsg() + "instanceId is null",
+              null);
+    } else {
+      mRenderContext.put(instance.getInstanceId(), new RenderContextImpl(instance));
     }
-    statement.setLayout(ref, domObject);
-  }
-
-  /**
-   * Set extra info, other than attribute and style
-   */
-  public void setExtra(String instanceId, String ref, Object extra) {
-    RenderActionContextImpl statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.setExtra(ref, extra);
   }
 
   public List<WXSDKInstance> getAllInstances() {
     ArrayList<WXSDKInstance> instances = null;
-    if (mRegistries != null && !mRegistries.isEmpty()) {
+    if (mRenderContext != null && !mRenderContext.isEmpty()) {
       instances = new ArrayList<WXSDKInstance>();
-      for (Map.Entry<String, RenderActionContextImpl> entry : mRegistries.entrySet()) {
-        RenderActionContextImpl renderStatement = entry.getValue();
+      for (Map.Entry<String, RenderContextImpl> entry : mRenderContext.entrySet()) {
+        RenderContextImpl renderStatement = entry.getValue();
         if (renderStatement != null) {
           instances.add(renderStatement.getWXSDKInstance());
         }
@@ -176,10 +151,30 @@ public class WXRenderManager {
   }
 
   public void registerComponent(String instanceId, String ref, WXComponent comp) {
-    RenderActionContextImpl statement = mRegistries.get(instanceId);
+    RenderContextImpl statement = mRenderContext.get(instanceId);
     if (statement != null) {
-      statement.registerComponent(ref,comp);
+      statement.registerComponent(ref, comp);
+      if (null != statement.getInstance()){
+        statement.getInstance().getApmForInstance().updateMaxStats(
+            WXInstanceApm.KEY_PAGE_STATS_MAX_COMPONENT_NUM,
+            statement.getComponentCount()
+        );
+      }
     }
   }
 
+  public WXComponent unregisterComponent(String instanceId, String ref) {
+    RenderContextImpl statement = mRenderContext.get(instanceId);
+    if (statement != null) {
+      if (null != statement.getInstance()){
+        statement.getInstance().getApmForInstance().updateMaxStats(
+            WXInstanceApm.KEY_PAGE_STATS_MAX_COMPONENT_NUM,
+            statement.getComponentCount()
+        );
+      }
+      return statement.unregisterComponent(ref);
+    } else {
+      return null;
+    }
+  }
 }

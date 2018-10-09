@@ -35,6 +35,14 @@
 #import <ATSDK/ATManager.h>
 #import "WXConfigCenterProtocol.h"
 #import "WXConfigCenterDefaultImpl.h"
+#import "WXNavigationHandlerImpl.h"
+//#import "WXAnalyzerCenter.h"
+#import "WXApmGeneratorImpl.h"
+
+
+#ifdef DEBUG
+#import "DebugAnalyzer.h"
+#endif
 
 @interface AppDelegate ()
 @end
@@ -115,13 +123,18 @@
     [WXSDKEngine registerHandler:[WXImgLoaderDefaultImpl new] withProtocol:@protocol(WXImgLoaderProtocol)];
     [WXSDKEngine registerHandler:[WXEventModule new] withProtocol:@protocol(WXEventModuleProtocol)];
     [WXSDKEngine registerHandler:[WXConfigCenterDefaultImpl new] withProtocol:@protocol(WXConfigCenterProtocol)];
-
+    [WXSDKEngine registerHandler:[WXNavigationHandlerImpl new] withProtocol:@protocol(WXNavigationProtocol)];
+    [WXSDKEngine registerHandler:[WXApmGeneratorImpl new] withProtocol:@protocol(WXApmGeneratorProtocol)];
     
     [WXSDKEngine registerComponent:@"select" withClass:NSClassFromString(@"WXSelectComponent")];
     [WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];
     [WXSDKEngine registerModule:@"syncTest" withClass:[WXSyncTestModule class]];
+    [WXSDKEngine registerModule:@"titleBar" withClass:NSClassFromString(@"WXTitleBarModule")];
     [WXSDKEngine registerExtendCallNative:@"test" withClass:NSClassFromString(@"WXExtendCallNativeTest")];
     [WXSDKEngine registerModule:@"ext" withClass:[WXExtModule class]];
+#ifdef DEBUG
+    [WXAnalyzerCenter addWxAnalyzer:[DebugAnalyzer new]];
+#endif
     
 #if !(TARGET_IPHONE_SIMULATOR)
     [self checkUpdate];
@@ -144,13 +157,7 @@
 - (UIViewController *)demoController
 {
     UIViewController *demo = [[WXDemoViewController alloc] init];
-    
-#if DEBUG
-    //If you are debugging in device , please change the host to current IP of your computer.
-    ((WXDemoViewController *)demo).url = [NSURL URLWithString:HOME_URL];
-#else
     ((WXDemoViewController *)demo).url = [NSURL URLWithString:BUNDLE_URL];
-#endif
     return demo;
 }
 
@@ -213,12 +220,13 @@
 #pragma mark
 
 - (void)atAddPlugin {
-    
+#if DEBUG
     [[ATManager shareInstance] addPluginWithId:@"weex" andName:@"weex" andIconName:@"../weex" andEntry:@"" andArgs:@[@""]];
     [[ATManager shareInstance] addSubPluginWithParentId:@"weex" andSubId:@"logger" andName:@"logger" andIconName:@"log" andEntry:@"WXATLoggerPlugin" andArgs:@[@""]];
 //    [[ATManager shareInstance] addSubPluginWithParentId:@"weex" andSubId:@"viewHierarchy" andName:@"hierarchy" andIconName:@"log" andEntry:@"WXATViewHierarchyPlugin" andArgs:@[@""]];
     [[ATManager shareInstance] addSubPluginWithParentId:@"weex" andSubId:@"test2" andName:@"test" andIconName:@"at_arr_refresh" andEntry:@"" andArgs:@[]];
     [[ATManager shareInstance] addSubPluginWithParentId:@"weex" andSubId:@"test3" andName:@"test" andIconName:@"at_arr_refresh" andEntry:@"" andArgs:@[]];
+#endif
 }
 
 - (void)checkUpdate {

@@ -21,7 +21,7 @@
 
 @interface WXWebSocketLoader : NSObject<NSCopying>
 
-@property (nonatomic, copy) void (^onOpen)();
+@property (nonatomic, copy) void (^onOpen)(void);
 @property (nonatomic, copy) void (^onReceiveMessage)(id);
 @property (nonatomic, copy) void (^onClose)(NSInteger,NSString *,BOOL);
 @property (nonatomic, copy) void (^onFail)(NSError *);

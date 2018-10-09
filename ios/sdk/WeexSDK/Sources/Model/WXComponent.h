@@ -17,8 +17,13 @@
  * under the License.
  */
 
+/**
+ *  def : use weex_flex_engin
+ *  ndef: use yoga
+ **/
+
+
 #import <Foundation/Foundation.h>
-#import "WXLayoutDefine.h"
 #import "WXType.h"
 
 @class WXSDKInstance;
@@ -33,6 +38,7 @@ typedef enum : NSUInteger {
  * @discussion callback data to js, the id of callback function will be removed to save memory.
  */
 typedef void (^WXCallback)(_Nonnull id result);
+// DEPRECATED_MSG_ATTRIBUTE("use WXKeepAliveCallback, you can specify keep the callback or not, if keeped, it can be called multi times, or it will be removed after called.")
 
 /**
  * @abstract the component callback , result can be string or dictionary.
@@ -142,13 +148,6 @@ NS_ASSUME_NONNULL_BEGIN
 //@property(nonatomic, assign) CGPoint absolutePosition;
 
 /**
- * @abstract Return the css node used to layout.
- *
- * @warning Subclasses must not override this.
- */
-@property(nonatomic, readonly, assign) css_node_t *cssNode;
-
-/**
  * @abstract Invalidates the component's layout and marks it as needing an update.
  *
  * @discussion You can call this method to indicate that the layout of a component has changed and must be updated. Weex typically calls this method automatically when the layout-related styles change or when subcomponents are added or removed.
@@ -181,6 +180,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)layoutDidFinish;
 
+/**
+ * @abstract Update component's CSS style values for external components.
+ *  Could be called in any thread and will be scheduled to component thread.
+ */
+- (void)updateLayoutStyles:(NSDictionary*)styles;
 
 ///--------------------------------------
 /// @name View Management
@@ -406,6 +410,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (UIImage *)endDrawContext:(CGContextRef)context;
 
+/**
+ * @abstract Return a shapelayer when compoent need border radius.（Especially video components）
+ *
+ * @discussion You can add this shadelayer to your view.layer attached to component.
+ *
+ */
+- (CAShapeLayer *)drawBorderRadiusMaskLayer:(CGRect)rect;
+
 ///--------------------------------------
 /// @name Data Binding
 ///--------------------------------------
@@ -438,7 +450,6 @@ typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
  *
  */
 - (WXDisplayCompletionBlock)displayCompletionBlock DEPRECATED_MSG_ATTRIBUTE("use didFinishDrawingLayer: method instead.");
-
 
 @end
 

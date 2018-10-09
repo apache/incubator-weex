@@ -25,6 +25,17 @@
 @implementation WXRecycleListDataManager
 {
     NSArray *_data;
+    NSMapTable<NSString*, NSDictionary*>* _virtualComponentData;
+    NSMapTable<NSIndexPath*, NSMutableSet*>* _renderStatus;
+}
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _virtualComponentData = [NSMapTable strongToStrongObjectsMapTable];
+        _renderStatus = [NSMapTable strongToStrongObjectsMapTable];
+    }
+    return self;
 }
 
 - (instancetype)initWithData:(NSArray *)data
@@ -66,6 +77,61 @@
     WXAssertMainThread();
     
     return [_data count];
+}
+
+- (void)updateVirtualComponentData:(NSString *)componentId data:(NSDictionary *)data
+{
+    if (!componentId) {
+        return;
+    }
+    [_virtualComponentData setObject:data forKey:componentId];
+
+    NSIndexPath *indexPath = [data objectForKey:@"indexPath"];
+    NSMutableSet *ids = [_renderStatus objectForKey:indexPath];
+    if (!ids) {
+        ids = [NSMutableSet set];
+    }
+    [ids addObject:componentId];
+    [_renderStatus setObject:ids forKey:indexPath];
+}
+
+- (void)deleteVirtualComponentAtIndexPaths:(NSArray<NSIndexPath*>*)indexPaths
+{
+    [_virtualComponentData removeAllObjects];
+    [_renderStatus removeAllObjects];
+}
+
+- (NSDictionary *)virtualComponentDataWithId:(NSString *)componentId
+{
+    return [_virtualComponentData objectForKey:componentId];
+}
+
+- (NSString *)virtualComponentIdWithIndexPath:(NSIndexPath *)indexPath templateId:(NSString *)templateId
+{
+    if (!templateId) {
+        return nil;
+    }
+    NSSet *ids = [_renderStatus objectForKey:indexPath];
+    if (!ids) {
+        return nil;
+    }
+    for (NSString *componentId in ids) {
+        if ([componentId containsString:templateId]) {
+            return componentId;
+        }
+    }
+    return nil;
+}
+
+- (NSDictionary *)virtualComponentDataWithIndexPath:(NSIndexPath*)indexPath templateId:(NSString *)templateId
+{
+    NSString *componentId = [self virtualComponentIdWithIndexPath:indexPath templateId:templateId];
+    return [self virtualComponentDataWithId:componentId];
+}
+
+- (NSInteger)numberOfVirtualComponent
+{
+    return [_virtualComponentData count];
 }
 
 @end

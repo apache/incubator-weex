@@ -27,7 +27,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.view.WXLoadingLayout;
 import com.taobao.weex.ui.view.WXRefreshLayout;
@@ -119,11 +118,10 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
         if (swipeLayout != null) {
             WXRefreshView refreshView = swipeLayout.getHeaderView();
             if (refreshView != null) {
-                ImmutableDomObject immutableDomObject = refresh.getDomObject();
-                if (immutableDomObject != null) {
-                    int refreshHeight = (int) immutableDomObject.getLayoutHeight();
+                if (refresh != null) {
+                    int refreshHeight = (int) refresh.getLayoutHeight();
                     swipeLayout.setRefreshHeight(refreshHeight);
-                    String colorStr = (String) immutableDomObject.getStyles().get(Constants.Name.BACKGROUND_COLOR);
+                    String colorStr = (String) refresh.getStyles().get(Constants.Name.BACKGROUND_COLOR);
                     String bgColor = WXUtils.getString(colorStr, null);
                     if (bgColor != null) {
                         if (!TextUtils.isEmpty(bgColor)) {
@@ -148,11 +146,10 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
         if (swipeLayout != null) {
             WXRefreshView refreshView = swipeLayout.getFooterView();
             if (refreshView != null) {
-                ImmutableDomObject immutableDomObject = loading.getDomObject();
-                if (immutableDomObject != null) {
-                    int loadingHeight = (int) immutableDomObject.getLayoutHeight();
+                if (loading != null) {
+                    int loadingHeight = (int) loading.getLayoutHeight();
                     swipeLayout.setLoadingHeight(loadingHeight);
-                    String colorStr = (String) immutableDomObject.getStyles().get(Constants.Name.BACKGROUND_COLOR);
+                    String colorStr = (String) loading.getStyles().get(Constants.Name.BACKGROUND_COLOR);
                     String bgColor = WXUtils.getString(colorStr, null);
                     if (bgColor != null) {
                         if (!TextUtils.isEmpty(bgColor)) {
@@ -200,24 +197,24 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
             swipeLayout.setPullLoadEnable(enable);
     }
 
-  @Override
-  public void removeView(View view) {
-    if (view instanceof WXLoadingLayout) {
-      finishPullLoad();
-      setLoadmoreEnable(false);
-      if (swipeLayout != null) {
-        swipeLayout.removeView(swipeLayout.getFooterView());
-      }
-    } else if (view instanceof WXRefreshLayout) {
-      finishPullRefresh();
-      setRefreshEnable(false);
-      if (swipeLayout != null) {
-        swipeLayout.removeView(swipeLayout.getHeaderView());
-      }
-    } else {
-      super.removeView(view);
+    @Override
+    public void removeView(View view) {
+        if (view instanceof WXLoadingLayout) {
+            finishPullLoad();
+            setLoadmoreEnable(false);
+            if (swipeLayout != null) {
+                swipeLayout.removeView(swipeLayout.getFooterView());
+            }
+        } else if (view instanceof WXRefreshLayout) {
+            finishPullRefresh();
+            setRefreshEnable(false);
+            if (swipeLayout != null) {
+                swipeLayout.removeView(swipeLayout.getHeaderView());
+            }
+        } else {
+            super.removeView(view);
+        }
     }
-  }
 
     public WXSwipeLayout getSwipeLayout() {
         return swipeLayout;

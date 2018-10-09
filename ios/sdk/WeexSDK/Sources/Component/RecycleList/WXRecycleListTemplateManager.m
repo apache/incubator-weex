@@ -31,12 +31,14 @@
 
 @implementation WXRecycleListTemplateManager
 {
+    NSMutableSet<NSString *> *_registeredTemplates;
     NSMapTable<NSString *, WXCellSlotComponent *> *_templateTypeMap;
 }
 
 - (instancetype)init
 {
     if (self = [super init]) {
+        _registeredTemplates = [NSMutableSet set];
         _templateTypeMap = [NSMapTable strongToWeakObjectsMapTable];
     }
     
@@ -62,7 +64,7 @@
 {
     WXAssertMainThread();
     
-    NSString *templateType = component.templateType;
+    NSString *templateType = component.templateCaseType;
     WXAssert(templateType != nil, @"cell-slot:%@ must have a template id!", component);
     
     [_templateTypeMap setObject:component forKey:templateType];
@@ -87,8 +89,32 @@
 - (void)_registerCellClassForReuseID:(NSString *)templateID
 {
     WXLogDebug(@"register cell class for template id:%@", templateID);
-    //TODO: register class update TemplateId
+    [_registeredTemplates addObject:templateID];
     [_collectionView registerClass:[WXReusableCollectionViewCell class] forCellWithReuseIdentifier:templateID];
+}
+
+- (WXCellSlotComponent *)topTemplate
+{
+    WXCellSlotComponent * cellTemplate = nil;
+    for (NSString *templateType in [_templateTypeMap.keyEnumerator.allObjects copy]) {
+        cellTemplate = [self templateWithType:templateType];
+        if (!cellTemplate) {
+            break;
+        }
+    }
+    return cellTemplate;
+}
+
+- (BOOL)isTemplateRegistered:(NSString *)aTemplate
+{
+    WXAssertMainThread();
+    return [_registeredTemplates containsObject:aTemplate];
+}
+
+- (NSString *)anyRegisteredTemplate
+{
+    WXAssertMainThread();
+    return [_registeredTemplates anyObject];
 }
 
 @end

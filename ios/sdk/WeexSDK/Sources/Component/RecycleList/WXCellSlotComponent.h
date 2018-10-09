@@ -20,13 +20,12 @@
 #import <Foundation/Foundation.h>
 #import "WXComponent.h"
 
+static const NSString *WXDefaultRecycleTemplateType = @"default";
 @interface WXCellSlotComponent : WXComponent
 
-@property (nonatomic, strong) NSString *templateType;
+@property (nonatomic, strong) NSString *templateCaseType;
 
 - (void)updateCellData:(NSDictionary *)data;
-
 - (void)triggerLayout;
-
 
 @end

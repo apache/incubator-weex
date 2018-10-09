@@ -25,6 +25,8 @@
 #import "WXURLRewriteProtocol.h"
 #import "WXResourceLoader.h"
 #import "WXSDKEngine.h"
+#import "WXSDKInstance_performance.h"
+#import "WXMonitor.h"
 
 @implementation WXStreamModule
 
@@ -34,7 +36,7 @@ WX_EXPORT_METHOD(@selector(sendHttp:callback:))
 WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
 WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallback:))
 
-- (void)fetch:(NSDictionary *)options callback:(WXModuleCallback)callback progressCallback:(WXModuleKeepAliveCallback)progressCallback
+- (void)fetch:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback progressCallback:(WXModuleKeepAliveCallback)progressCallback
 {
     __block NSInteger received = 0;
     __block NSHTTPURLResponse *httpResponse = nil;
@@ -45,7 +47,7 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
     WXResourceRequest * request = [self _buildRequestWithOptions:options callbackRsp:callbackRsp];
     if (!request) {
         if (callback) {
-            callback(callbackRsp);
+            callback(callbackRsp, NO);
         }
         // failed with some invaild inputs
         return ;
@@ -85,27 +87,23 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
     };
     
     loader.onFinished = ^(const WXResourceResponse * response, NSData *data) {
-        if (weakSelf) {
-            [weakSelf _loadFinishWithResponse:[response copy] data:data callbackRsp:callbackRsp];
-            if (callback) {
-                callback(callbackRsp);
-            }
+        if (weakSelf && callback) {
+             [weakSelf _loadFinishWithResponse:[response copy] data:data callbackRsp:callbackRsp];
+             callback(callbackRsp, NO);
         }
     };
     
     loader.onFailed = ^(NSError *error) {
-        if (weakSelf) {
+        if (weakSelf && callback) {
             [weakSelf _loadFailedWithError:error callbackRsp:callbackRsp];
-            if (callback) {
-                callback(callbackRsp);
-            }
+            callback(callbackRsp, NO);
         }
     };
     
     [loader start];
 }
 
-- (void)fetchWithArrayBuffer:(id)arrayBuffer options:(NSDictionary *)options callback:(WXModuleCallback)callback progressCallback:(WXModuleKeepAliveCallback)progressCallback
+- (void)fetchWithArrayBuffer:(id)arrayBuffer options:(NSDictionary *)options callback:(WXModuleKeepAliveCallback)callback progressCallback:(WXModuleKeepAliveCallback)progressCallback
 {
     NSMutableDictionary *newOptions = [options mutableCopy];
     if([arrayBuffer isKindOfClass:[NSDictionary class]]){
@@ -121,6 +119,14 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
 {
     // parse request url
     NSString *urlStr = [options objectForKey:@"url"];
+    if (![urlStr isKindOfClass:[NSString class]]) {
+        if (callbackRsp) {
+            [callbackRsp setObject:@(-1) forKey:@"status"];
+            [callbackRsp setObject:@NO forKey:@"ok"];
+        }
+        return nil;
+    }
+    
     NSString *newURL = [urlStr copy];
     WX_REWRITE_URL(urlStr, WXResourceTypeLink, self.weexInstance)
     urlStr = newURL;
@@ -130,6 +136,10 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
         [callbackRsp setObject:@NO forKey:@"ok"];
         
         return nil;
+    }
+    
+    if (self.weexInstance && !weexInstance.isJSCreateFinish) {
+        self.weexInstance.performance.fsReqNetNum++;
     }
     
     WXResourceRequest *request = [WXResourceRequest requestWithURL:[NSURL URLWithString:urlStr] resourceType:WXResourceTypeOthers referrer:nil cachePolicy:NSURLRequestUseProtocolCachePolicy];
@@ -268,7 +278,7 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
     NSError * error = nil;
     id jsonObj = [WXUtility JSONObject:data error:&error];
     if (error) {
-        WXLogError(@"%@", [error description]);
+        WXLogDebug(@"%@", [error description]);
     }
     return jsonObj;
 }
@@ -414,7 +424,7 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
 
 #pragma mark - Deprecated
 
-- (void)sendHttp:(NSDictionary*)param callback:(WXModuleCallback)callback
+- (void)sendHttp:(NSDictionary*)param callback:(WXModuleKeepAliveCallback)callback
 {
     NSString* method = [param objectForKey:@"method"];
     NSString* urlStr = [param objectForKey:@"url"];
@@ -438,12 +448,12 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
     WXResourceLoader *loader = [[WXResourceLoader alloc] initWithRequest:request];
     loader.onFinished = ^(const WXResourceResponse * response, NSData *data) {
         NSString* responseData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        callback(responseData);
+        callback(responseData,NO);
     };
     
     loader.onFailed = ^(NSError *error) {
         if (callback) {
-            callback(nil);
+            callback(nil,NO);
         }
     };
 

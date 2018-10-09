@@ -19,7 +19,8 @@
 
 #import "WXEventModule.h"
 #import "WXDemoViewController.h"
-#import <WeexSDK/WXBaseViewController.h>
+#import "WXScannerVC.h"
+#import <WeexSDK/WeexSDK.h>
 
 @implementation WXEventModule
 
@@ -34,6 +35,10 @@ WX_EXPORT_METHOD(@selector(fireNativeGlobalEvent:callback:))
     NSString *newURL = url;
     if ([url hasPrefix:@"//"]) {
         newURL = [NSString stringWithFormat:@"http:%@", url];
+    } else if ([url hasPrefix:@"weex://go/scan"]){
+        WXScannerVC * sannerVC = [WXScannerVC new];
+        [[weexInstance.viewController navigationController] pushViewController:sannerVC animated:YES];
+        return;
     } else if (![url hasPrefix:@"http"]) {
         // relative path
         newURL = [NSURL URLWithString:url relativeToURL:weexInstance.scriptURL].absoluteString;
@@ -50,12 +55,12 @@ WX_EXPORT_METHOD(@selector(fireNativeGlobalEvent:callback:))
  a test method for macaca case, you can fire globalEvent when download finish、device shaked and so on.
  @param event event name
  */
-- (void)fireNativeGlobalEvent:(NSString *)event callback:(WXModuleCallback)callback
+- (void)fireNativeGlobalEvent:(NSString *)event callback:(WXKeepAliveCallback)callback
 {
     [weexInstance fireGlobalEvent:event params:@{@"eventParam":@"eventValue"}];
     if (callback) {
         NSDictionary * result = @{@"ok": @true};
-        callback(result);
+        callback(result,false);
     }
 }
 

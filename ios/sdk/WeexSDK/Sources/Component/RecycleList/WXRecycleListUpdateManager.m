@@ -96,7 +96,9 @@
     
     if (!_collectionView) {
         WXLogError(@"Update list with no collection view");
-        completion(NO);
+        if (completion) {
+            completion(NO);
+        }
         return;
     }
     
@@ -177,10 +179,9 @@
         return;
     }
     
-    void (^updates)() = [^{
+    void (^updates)(void) = [^{
         [self.delegate updateManager:self willUpdateData:newData];
         [UIView setAnimationsEnabled:NO];
-        NSLog(@"UICollectionView update:%@", recycleListDiffResult);
         [self applyUpdateWithDiffResult:recycleListDiffResult];
     } copy];
     
@@ -188,7 +189,6 @@
         [UIView setAnimationsEnabled:YES];
         self.isUpdating = NO;
         [self.delegate updateManager:self didUpdateData:newData withSuccess:finished];
-        
         [self.reloadIndexPaths removeAllObjects];
         [self checkUpdates];
     } copy];
@@ -207,11 +207,6 @@
     NSMutableSet<NSIndexPath *> *reloadIndexPaths = [NSMutableSet set];
     NSMutableSet<NSIndexPath *> *deleteIndexPaths = [NSMutableSet set];
     NSMutableSet<NSIndexPath *> *insertIndexPaths = [NSMutableSet set];
-    
-    for (WXDiffUpdateIndex *update in diffResult.updates) {
-        NSIndexPath *reloadIndexPath = [NSIndexPath indexPathForItem:update.oldIndex inSection:0];
-        [reloadIndexPaths addObject:reloadIndexPath];
-    }
     
     [diffResult.updates enumerateObjectsUsingBlock:^(WXDiffUpdateIndex * _Nonnull update, NSUInteger idx, BOOL * _Nonnull stop) {
         NSIndexPath *reloadIndexPath = [NSIndexPath indexPathForItem:update.oldIndex inSection:0];
@@ -246,9 +241,15 @@
     NSMutableSet *reloadIndexPaths = self.reloadIndexPaths ? [[diffResult.reloadIndexPaths setByAddingObjectsFromSet:self.reloadIndexPaths] mutableCopy]: [diffResult.reloadIndexPaths mutableCopy];
     [reloadIndexPaths minusSet:diffResult.deleteIndexPaths];
     
-    [_collectionView deleteItemsAtIndexPaths:[diffResult.deleteIndexPaths allObjects]];
-    [_collectionView insertItemsAtIndexPaths:[diffResult.insertIndexPaths allObjects]];
-    [_collectionView reloadItemsAtIndexPaths:[reloadIndexPaths allObjects]];
+    if (diffResult.deleteIndexPaths.count > 0) {
+        [_collectionView deleteItemsAtIndexPaths:[diffResult.deleteIndexPaths allObjects]];
+    }
+    if (diffResult.insertIndexPaths.count > 0) {
+        [_collectionView insertItemsAtIndexPaths:[diffResult.insertIndexPaths allObjects]];
+    }
+    if (reloadIndexPaths.count > 0) {
+        [_collectionView reloadItemsAtIndexPaths:[reloadIndexPaths allObjects]];
+    }
 }
 
 - (void)cleanup

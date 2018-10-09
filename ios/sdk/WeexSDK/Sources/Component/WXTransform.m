@@ -23,6 +23,8 @@
 #import "WXUtility.h"
 #import "WXSDKInstance.h"
 #import "WXConvert.h"
+#import "WXSDKEngine.h"
+#import "WXConfigCenterProtocol.h"
 
 @interface WXTransform()
 
@@ -174,7 +176,8 @@
 {
     CATransform3D nativeTansform3D = CATransform3DIdentity;
     
-    if (_perspective && !isinf(_perspective)) {
+    // CGFLOAT_MAX is not INF on 32-bit device
+    if(_perspective && _perspective != CGFLOAT_MAX && !isinf(_perspective)) {
         nativeTansform3D.m34 = -1.0/_perspective;
     }
     if (!view || view.bounds.size.width <= 0 || view.bounds.size.height <= 0) {
@@ -256,7 +259,19 @@
         SEL method = NSSelectorFromString([NSString stringWithFormat:@"parse%@:", [name capitalizedString]]);
         if ([self respondsToSelector:method]) {
             @try {
-                [self performSelectorOnMainThread:method withObject:value waitUntilDone:YES];
+                id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+                BOOL parseTransformIfWaitUntilDone = NO;
+                if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+                    parseTransformIfWaitUntilDone = [[configCenter configForKey:@"iOS_weex_ext_config.parseTransformIfWaitUntilDone" defaultValue:@(NO) isDefault:NULL] boolValue];
+                }
+                if (parseTransformIfWaitUntilDone) {
+                    [self performSelectorOnMainThread:method withObject:value waitUntilDone:YES];
+                }
+                else{
+                    IMP imp = [self methodForSelector:method];
+                    void (*func)(id, SEL,NSArray *) = (void *)imp;
+                    func(self, method,value);
+                }
             }
             @catch (NSException *exception) {
                 WXLogError(@"WXTransform exception:%@", [exception reason]);
@@ -312,7 +327,6 @@
             }
         }
     }
-    
     _originX = [WXLength lengthWithFloat:originX type:typeX];
     _originY = [WXLength lengthWithFloat:originY type:typeY];
 }
@@ -348,6 +362,14 @@
 
 - (void)parseTranslate:(NSArray *)value
 {
+    [self parseTranslatex:@[value[0]]];
+    if (value.count > 1) {
+        [self parseTranslatey:@[value[1]]];
+    }
+}
+
+- (void)parseTranslatex:(NSArray *)value
+{
     WXLength *translateX;
     double x = [value[0] doubleValue];
     if ([value[0] hasSuffix:@"%"]) {
@@ -356,30 +378,20 @@
         x = WXPixelScale(x, self.weexInstance.pixelScaleFactor);
         translateX = [WXLength lengthWithFloat:x type:WXLengthTypeFixed];
     }
-
-    WXLength *translateY;
-    if (value.count > 1) {
-        double y = [value[1] doubleValue];
-        if ([value[1] hasSuffix:@"%"]) {
-            translateY = [WXLength lengthWithFloat:y type:WXLengthTypePercent];
-        } else {
-            y = WXPixelScale(y, self.weexInstance.pixelScaleFactor);
-            translateY = [WXLength lengthWithFloat:y type:WXLengthTypeFixed];
-        }
-    }
-    
     _translateX = translateX;
-    _translateY = translateY;
-}
-
-- (void)parseTranslatex:(NSArray *)value
-{
-    [self parseTranslate:@[value[0], @"0"]];
 }
 
 - (void)parseTranslatey:(NSArray *)value
 {
-    [self parseTranslate:@[@"0", value[0]]];
+    WXLength *translateY;
+    double y = [value[0] doubleValue];
+    if ([value[0] hasSuffix:@"%"]) {
+        translateY = [WXLength lengthWithFloat:y type:WXLengthTypePercent];
+    } else {
+        y = WXPixelScale(y, self.weexInstance.pixelScaleFactor);
+        translateY = [WXLength lengthWithFloat:y type:WXLengthTypeFixed];
+    }
+    _translateY = translateY;
 }
 
 - (void)parseScale:(NSArray *)value
@@ -395,12 +407,12 @@
 
 - (void)parseScalex:(NSArray *)value
 {
-    [self parseScale:@[value[0], @1]];
+	_scaleX = [value[0] doubleValue];
 }
 
 - (void)parseScaley:(NSArray *)value
 {
-    [self parseScale:@[@1, value[0]]];
+	_scaleY = [value[0] doubleValue];
 }
 
 // Angle in radians

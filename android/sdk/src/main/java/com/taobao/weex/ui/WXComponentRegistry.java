@@ -19,29 +19,35 @@
 package com.taobao.weex.ui;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
+import com.taobao.weex.ui.config.AutoScanConfigRegister;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * All components must be registered within this class before used.
  */
 public class WXComponentRegistry {
 
-  private static Map<String, IFComponentHolder> sTypeComponentMap = new HashMap<>();
+  private static Map<String, IFComponentHolder> sTypeComponentMap = new ConcurrentHashMap<>();
   private static ArrayList<Map<String, Object>> sComponentInfos=new ArrayList<>();
 
-  public static boolean registerComponent(final String type, final IFComponentHolder holder, final Map<String, Object> componentInfo) throws WXException {
+  public static synchronized boolean registerComponent(final String type, final IFComponentHolder holder, final Map<String, Object> componentInfo) throws WXException {
     if (holder == null || TextUtils.isEmpty(type)) {
       return false;
     }
+
+    //register component
+    AutoScanConfigRegister.preLoad(holder);
 
     //execute task in js thread to make sure register order is same as the order invoke register method.
     WXBridgeManager.getInstance()

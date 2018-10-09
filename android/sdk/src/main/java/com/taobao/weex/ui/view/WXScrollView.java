@@ -52,7 +52,7 @@ import java.util.Map.Entry;
  * Custom-defined scrollView
  */
 public class WXScrollView extends ScrollView implements Callback, IWXScroller,
-                                                        WXGestureObservable,NestedScrollingChild {
+        WXGestureObservable,NestedScrollingChild {
 
   private NestedScrollingChildHelper childHelper;
   private float ox;
@@ -147,8 +147,8 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
 
       if (mRedirectTouchToStickyView) {
         mRedirectTouchToStickyView = ev.getY() <= mCurrentStickyView.getHeight()
-                                     && ev.getX() >= mCurrentStickyView.getLeft()
-                                     && ev.getX() <= mCurrentStickyView.getRight();
+                && ev.getX() >= mCurrentStickyView.getLeft()
+                && ev.getX() <= mCurrentStickyView.getRight();
       }
     }
 
@@ -160,7 +160,11 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
       mCurrentStickyView.getLocationOnScreen(stickyViewP);
       ev.offsetLocation(0, stickyViewP[1] - mScrollRect.top);
     }
-    return super.dispatchTouchEvent(ev);
+    boolean result = super.dispatchTouchEvent(ev);
+    if (wxGesture != null) {
+      result |= wxGesture.onTouch(this, ev);
+    }
+    return result;
   }
 
   @Override
@@ -172,7 +176,7 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
       int realOffset = (mStickyOffset <= 0 ? mStickyOffset : 0);
       canvas.translate(mStickyP[0], getScrollY() + realOffset);
       canvas.clipRect(0, realOffset, mCurrentStickyView.getWidth(),
-                      mCurrentStickyView.getHeight());
+              mCurrentStickyView.getHeight());
       mCurrentStickyView.draw(canvas);
       canvas.restore();
     }
@@ -231,11 +235,7 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
       oy = ev.getY();
     }
 
-    boolean result = super.onTouchEvent(ev);
-    if (wxGesture != null) {
-      result |= wxGesture.onTouch(this, ev);
-    }
-    return result;
+    return super.onTouchEvent(ev);
   }
 
   @Override
@@ -438,6 +438,11 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
   @Override
   public void registerGestureListener(WXGesture wxGesture) {
     this.wxGesture = wxGesture;
+  }
+
+  @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
   }
 
   public Rect getContentFrame() {

@@ -31,4 +31,6 @@
 
 - (void)pullingdown:(NSDictionary*)param;
 
+- (void)setIndicatorHidden:(BOOL)hidden;
+
 @end

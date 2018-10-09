@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -24,12 +24,19 @@ import android.os.Message;
 
 class WXRenderHandler extends Handler {
 
-  public WXRenderHandler() {
-    super(Looper.getMainLooper());
-  }
+    public WXRenderHandler() {
+        super(Looper.getMainLooper());
+    }
 
-  @Override
-  public void handleMessage(Message msg) {
-    super.handleMessage(msg);
-  }
+    public final boolean post(String instanceId, Runnable r) {
+        Message msg = Message.obtain(this, r);
+        // Use what to match runnable. Make sure don't override callback method.
+        msg.what = instanceId.hashCode();
+        return sendMessageDelayed(msg, 0);
+    }
+
+    @Override
+    public void handleMessage(Message msg) {
+        super.handleMessage(msg);
+    }
 }

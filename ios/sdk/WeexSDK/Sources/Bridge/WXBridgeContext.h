@@ -18,6 +18,8 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <JavaScriptCore/JavaScriptCore.h>
+#import "WXBridgeProtocol.h"
 
 @class WXCallJSMethod;
 @class WXSDKInstance;
@@ -38,6 +40,18 @@
  **/
 - (void)createInstance:(NSString *)instance
               template:(NSString *)temp
+               options:(NSDictionary *)options
+                  data:(id)data;
+
+/**
+ *  Create Instance with opcode
+ *  @param instance  :   instance id
+ *  @param contents  :   opcode data
+ *  @param options   :   parameters
+ *  @param data      :   external data
+ **/
+- (void)createInstance:(NSString *)instance
+              contents:(NSData *)contents
                options:(NSDictionary *)options
                   data:(id)data;
 
@@ -79,6 +93,9 @@
  *  @param method    :   object of bridge method
  **/
 - (void)executeJsMethod:(WXCallJSMethod *)method;
+
+- (JSValue *)excuteJSMethodWithResult:(WXCallJSMethod *)method;
+
 /**
  *  Register Modules Method
  *  @param modules   :   module list
@@ -121,5 +138,8 @@
  *  Reset Environment
  **/
 - (void)resetEnvironment;
+
++ (void)mountContextEnvironment:(JSContext*)context;
+- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(id<WXBridgeProtocol>)bridge completion:(void (^)(JSValue * value))complection;
 
 @end

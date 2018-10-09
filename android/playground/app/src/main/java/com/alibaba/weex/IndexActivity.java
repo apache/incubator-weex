@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -40,10 +40,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.weex.commons.AbstractWeexActivity;
+import com.alibaba.weex.update.CheckForUpdateUtil;
 import com.google.zxing.client.android.CaptureActivity;
-import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 
@@ -83,7 +84,8 @@ public class IndexActivity extends AbstractWeexActivity {
     }
 
     if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-      renderPage(WXFileUtils.loadAsset("index.js", this), getIndexUrl());
+      renderPage(WXFileUtils.loadAsset("landing.weex.js", this), getIndexUrl());
+//      renderPageByURL("http://dotwe.org/raw/dist/2bbe1860da4669a68595c1aed01d7fd2.bundle.wx");
     } else {
       renderPageByURL(getIndexUrl());
     }
@@ -94,7 +96,7 @@ public class IndexActivity extends AbstractWeexActivity {
       public void onReceive(Context context, Intent intent) {
         createWeexInstance();
         if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-          renderPage(WXFileUtils.loadAsset("index.js", getApplicationContext()), getIndexUrl());
+          renderPage(WXFileUtils.loadAsset("landing.weex.js", getApplicationContext()), getIndexUrl());
         } else {
           renderPageByURL(getIndexUrl());
         }
@@ -103,6 +105,8 @@ public class IndexActivity extends AbstractWeexActivity {
     };
 
     LocalBroadcastManager.getInstance(this).registerReceiver(mReloadReceiver, new IntentFilter(WXSDKEngine.JS_FRAMEWORK_RELOAD));
+
+    CheckForUpdateUtil.checkForUpdate(this);
   }
 
   @Override
@@ -166,10 +170,10 @@ public class IndexActivity extends AbstractWeexActivity {
     super.onException(wxsdkInstance,s,s1);
     mProgressBar.setVisibility(View.GONE);
     mTipView.setVisibility(View.VISIBLE);
-    if (TextUtils.equals(s, WXRenderErrorCode.WX_NETWORK_ERROR)) {
+    if (TextUtils.equals(s, WXErrorCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode())) {
       mTipView.setText(R.string.index_tip);
     } else {
-      mTipView.setText("render error:" + s1);
+      mTipView.setText("network render error:" + s1);
     }
   }
 

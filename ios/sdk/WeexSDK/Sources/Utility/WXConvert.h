@@ -20,7 +20,6 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 #import "WXLog.h"
-#import "WXLayoutDefine.h"
 #import "WXType.h"
 
 @class WXLength;
@@ -28,7 +27,21 @@
 @interface WXConvert : NSObject
 
 + (BOOL)BOOL:(id)value;
+
+/**
+ *  @abstract       convert value to CGFloat value
+ *  @param value    value
+ *  @return         CGFloat value
+ */
 + (CGFloat)CGFloat:(id)value;
+
+/**
+ *  @abstract       convert value to CGFloat value, notice that it will return nan if input value is unsupported
+ *  @param value    value
+ *  @return         CGFloat value or nan(unsupported input)
+ */
++ (CGFloat)flexCGFloat:(id)value;
+
 + (NSUInteger)NSUInteger:(id)value;
 + (NSInteger)NSInteger:(id)value;
 + (NSString *)NSString:(id)value;
@@ -39,12 +52,9 @@
 typedef CGFloat WXPixelType;
 // @parameter scaleFactor: please use weexInstance's pixelScaleFactor property
 + (WXPixelType)WXPixelType:(id)value scaleFactor:(CGFloat)scaleFactor;
+// WXPixelType that use flexCGFloat to convert
++ (WXPixelType)WXFlexPixelType:(id)value scaleFactor:(CGFloat)scaleFactor;
 
-+ (css_flex_direction_t)css_flex_direction_t:(id)value;
-+ (css_align_t)css_align_t:(id)value;
-+ (css_wrap_type_t)css_wrap_type_t:(id)value;
-+ (css_justify_t)css_justify_t:(id)value;
-+ (css_position_type_t)css_position_type_t:(id)value;
 
 + (UIViewContentMode)UIViewContentMode:(id)value;
 + (WXImageQuality)WXImageQuality:(id)value;

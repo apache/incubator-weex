@@ -52,6 +52,8 @@
     <div class="container">
         <text class="boxShadow1"></text>
         <text class="boxShadow2"></text>
+        <text class="boxShadow3"></text>
+        <text class="boxShadow4"></text>
         <text test-id="test-text">box shadow</text>
     </div>
     <div class="container">
@@ -295,6 +297,22 @@
   box-shadow: 30px 15px 0px -10px lime;
   border-bottom-right-radius: 50px;
   margin:30px;
+}
+.boxShadow3 {
+  width: 100px;
+  height: 45px;
+  background-color: #000000;
+  box-shadow: 0px 0px 1px 1px rgba(0,0,0,0.06);
+  border-bottom-right-radius: 50px;
+  margin:30px;
+}
+.boxShadow4 {
+  width: 100px;
+  height: 45px;
+  background-color: red;
+  box-shadow: 0px 0px 10px 0px green;
+  padding: 20px;
+  border-width: 5px;
 }
 
 .circle {

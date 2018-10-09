@@ -22,7 +22,6 @@ import android.view.View;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.ui.SimpleComponentHolder;
 import com.taobao.weex.ui.view.IWebView;
 import org.junit.After;
@@ -34,8 +33,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.lang.reflect.InvocationTargetException;
-
-import static org.junit.Assert.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by sospartan on 28/09/2016.
@@ -56,6 +55,7 @@ public class WXWebTest {
     IWebView mIWebView;
     OnPageListener mOnPageListener;
     OnErrorListener mOnErrorListener;
+    OnMessageListener mOnMessageListener;
 
     ProxyWebView(IWebView proxy){
       mIWebView = proxy;
@@ -77,6 +77,11 @@ public class WXWebTest {
     }
 
     @Override
+    public void loadDataWithBaseURL(String source) {
+      mIWebView.loadDataWithBaseURL(source);
+    }
+
+    @Override
     public void reload() {
       mIWebView.reload();
     }
@@ -90,6 +95,9 @@ public class WXWebTest {
     public void goForward() {
       mIWebView.goForward();
     }
+
+    @Override
+    public void postMessage(Object msg) {}
 
     @Override
     public void setShowLoading(boolean shown) {
@@ -106,6 +114,12 @@ public class WXWebTest {
     public void setOnPageListener(OnPageListener listener) {
       mIWebView.setOnPageListener(listener);
       mOnPageListener = listener;
+    }
+
+    @Override
+    public void setOnMessageListener(OnMessageListener listener) {
+      mIWebView.setOnMessageListener(listener);
+      mOnMessageListener = listener;
     }
   }
 
@@ -127,24 +141,34 @@ public class WXWebTest {
   public void testSetProperty() throws Exception {
     component.setProperty(Constants.Name.SHOW_LOADING,true);
     component.setProperty(Constants.Name.SRC,"http://taobao.com");
+    component.setProperty(Constants.Name.SOURCE, "<p><span>hello weex</span></p>");
   }
 
   @Test
   public void testSetAction() throws Exception {
-    component.setAction(WXWeb.GO_BACK);
-    component.setAction(WXWeb.GO_FORWARD);
-    component.setAction(WXWeb.RELOAD);
+    Map<String, Object> msg = new HashMap<>();
+    msg.put("test1", 1);
+    msg.put("test2", "2");
+    component.setAction(WXWeb.GO_BACK, null);
+    component.setAction(WXWeb.GO_FORWARD, null);
+    component.setAction(WXWeb.RELOAD, null);
+    component.setAction(WXWeb.POST_MESSAGE, msg);
   }
 
   @Test
   public void testListener() throws Exception {
+    Map<String, Object> msg = new HashMap<>();
+    msg.put("test1", 1);
+    msg.put("test2", "2");
     component.addEvent(Constants.Event.RECEIVEDTITLE);
     component.addEvent(Constants.Event.PAGESTART);
     component.addEvent(Constants.Event.PAGEFINISH);
     component.addEvent(Constants.Event.ERROR);
+    component.addEvent(Constants.Event.ONMESSAGE);
     mWebView.mOnPageListener.onPageFinish("http://taobao.com",true,true);
     mWebView.mOnPageListener.onReceivedTitle("test");
     mWebView.mOnPageListener.onPageStart("http://taobao.com");
     mWebView.mOnErrorListener.onError("test","error occurred");
+    mWebView.mOnMessageListener.onMessage(msg);
   }
 }

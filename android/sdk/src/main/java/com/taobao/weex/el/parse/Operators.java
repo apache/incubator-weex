@@ -19,7 +19,6 @@
 package com.taobao.weex.el.parse;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +62,13 @@ public class Operators {
         if(context == null){
             return  null;
         }
+        // TODO
+//        if(context instanceof CellRenderContext){
+//            if(WXEnvironment.isApkDebugable()){
+//                throw new IllegalArgumentException("rong context CellRenderContext, you should pass it's stack");
+//            }
+//            context = ((CellRenderContext) context).stack;
+//        }
         if(context instanceof ArrayStack){
             ArrayStack stack = (ArrayStack) context;
             for(int index=stack.size()-1; index >= 0; index--){
@@ -257,7 +263,7 @@ public class Operators {
         }
         Object leftValue =  null;
         if(left != null){
-            leftValue  = left.execute(context);;
+            leftValue  = left.execute(context);
         }
         Object rightValue = null;
         if(right != null) {

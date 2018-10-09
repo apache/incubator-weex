@@ -22,7 +22,7 @@
 @implementation NSTimer (Weex)
 
 + (NSTimer *)wx_scheduledTimerWithTimeInterval:(NSTimeInterval)interval
-                                         block:(void(^)())block
+                                         block:(void(^)(void))block
                                        repeats:(BOOL)repeats
 {
     return [self scheduledTimerWithTimeInterval:interval
@@ -34,7 +34,7 @@
 
 + (void)blockInvoke:(NSTimer*)timer
 {
-    void (^block)() = timer.userInfo;
+    void (^block)(void) = timer.userInfo;
     if (block) {
         block();
     }

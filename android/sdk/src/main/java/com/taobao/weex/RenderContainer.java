@@ -22,6 +22,8 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 
 
@@ -31,24 +33,30 @@ import java.lang.ref.WeakReference;
  * Created by sospartan on 08/10/2016.
  */
 
-public class RenderContainer extends FrameLayout {
+public class RenderContainer extends FrameLayout implements WeexFrameRateControl.VSyncListener{
   private WeakReference<WXSDKInstance> mSDKInstance;
+  private WeexFrameRateControl mFrameRateControl;
+  private boolean mHasConsumeEvent = false;
 
   public RenderContainer(Context context) {
     super(context);
+    mFrameRateControl = new WeexFrameRateControl(this);
   }
 
   public RenderContainer(Context context, AttributeSet attrs) {
     super(context, attrs);
+    mFrameRateControl = new WeexFrameRateControl(this);
   }
 
   public RenderContainer(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
+    mFrameRateControl = new WeexFrameRateControl(this);
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   public RenderContainer(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
     super(context, attrs, defStyleAttr, defStyleRes);
+    mFrameRateControl = new WeexFrameRateControl(this);
   }
 
   public void setSDKInstance(WXSDKInstance instance) {
@@ -63,5 +71,51 @@ public class RenderContainer extends FrameLayout {
       //re-render instance
       instance.setSize(w, h);
     }
+  }
+
+  @Override
+  public void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    if (mFrameRateControl != null) {
+      mFrameRateControl.start();
+    }
+  }
+
+  @Override
+  protected void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
+    if (mFrameRateControl != null) {
+      mFrameRateControl.stop();
+    }
+  }
+  @Override
+  public void dispatchWindowVisibilityChanged(int visibility) {
+    super.dispatchWindowVisibilityChanged(visibility);
+    if (visibility == View.GONE) {
+      if (mFrameRateControl != null) {
+        mFrameRateControl.stop();
+      }
+    } else if (visibility == View.VISIBLE) {
+      if (mFrameRateControl != null) {
+        mFrameRateControl.start();
+      }
+    }
+  }
+
+  @Override
+  public void OnVSync() {
+    if (mSDKInstance != null && mSDKInstance.get() != null) {
+      mSDKInstance.get().OnVSync();
+    }
+  }
+
+  @Override
+  public boolean dispatchTouchEvent(MotionEvent ev) {
+    mHasConsumeEvent = true;
+    return super.dispatchTouchEvent(ev);
+  }
+
+  public boolean hasConsumeEvent(){
+    return mHasConsumeEvent;
   }
 }

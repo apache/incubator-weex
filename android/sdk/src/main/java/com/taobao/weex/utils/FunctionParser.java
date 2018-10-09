@@ -79,12 +79,16 @@ public class FunctionParser<K, V> {
   }
 
   private String match(Token token) {
-    if (token == lexer.getCurrentToken()) {
-      String value = lexer.getCurrentTokenValue();
-      lexer.moveOn();
-      return value;
+    try {
+      if (token == lexer.getCurrentToken()) {
+        String value = lexer.getCurrentTokenValue();
+        lexer.moveOn();
+        return value;
+      }
+    } catch (Exception e) {
+      WXLogUtils.e(token + "Token doesn't match" + lexer.source);
     }
-    throw new WXInterpretationException(token + "Token doesn't match" + lexer.source);
+    return "";
   }
 
   private enum Token {
@@ -175,7 +179,7 @@ public class FunctionParser<K, V> {
             break;
           }
         } else if (isCharacterOrDigit(curChar) || curChar == DOT
-                   || curChar == WXUtils.PERCENT || curChar == MINUS || curChar == PLUS) {
+                || curChar == WXUtils.PERCENT || curChar == MINUS || curChar == PLUS) {
           pointer++;
         } else {
           if (start == pointer) {
@@ -219,8 +223,8 @@ public class FunctionParser<K, V> {
       for (int i = 0; i < funcName.length(); i++) {
         letter = funcName.charAt(i);
         if (!((A_LOWER <= letter && letter <= Z_LOWER) ||
-              (A_UPPER <= letter && letter <= Z_UPPER) ||
-              letter == MINUS)) {
+                (A_UPPER <= letter && letter <= Z_UPPER) ||
+                letter == MINUS)) {
           return false;
         }
       }

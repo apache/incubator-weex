@@ -57,7 +57,6 @@ class Block extends Token {
         return token.execute(context);
     }
 
-    /**
     @Override
     public String toString() {
         if(getType() == TYPE_ARRAY){
@@ -68,5 +67,5 @@ class Block extends Token {
             }
             return "{" + tokens + '}';
         }
-    }*/
+    }
 }

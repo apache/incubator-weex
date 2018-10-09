@@ -106,7 +106,7 @@
 
 - (NSString *) unregisterServiceScript: (NSString *) name
 {
-    NSString *script = [NSString stringWithFormat:@";global.unregisterService(%@);", name];
+    NSString *script = [NSString stringWithFormat:@";global.unregisterService('%@');", name];
     return script;
 }
 

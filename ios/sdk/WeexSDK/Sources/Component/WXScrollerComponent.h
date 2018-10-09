@@ -22,15 +22,13 @@
 
 @interface WXScrollerComponent : WXComponent <WXScrollerProtocol, UIScrollViewDelegate>
 
-@property (nonatomic, copy) void (^onScroll)(UIScrollView *);
+@property (nonatomic, copy) void (^onScroll)(UIScrollView *scrollView);
+
+@property (nonatomic, copy) void (^scrollEventListener)(WXScrollerComponent* sender, NSString* event, NSDictionary* params);
 
 @property (nonatomic, assign) NSUInteger loadmoreretry;
 
 @property (nonatomic, assign) CGSize contentSize;
-
-@property (nonatomic, readonly, assign) css_node_t *scrollerCSSNode;
-
-- (NSUInteger)childrenCountForScrollerLayout;
 
 - (void)handleAppear;
 
