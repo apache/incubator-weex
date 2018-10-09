@@ -1016,9 +1016,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mGlobalEventReceiver=new WXGlobalEventReceiver(this);
     try {
       getContext().registerReceiver(mGlobalEventReceiver, new IntentFilter(WXGlobalEventReceiver.EVENT_ACTION));
-    } catch (Exception e) {
+    } catch (Throwable e) {
       // Huawei may throw a exception if register more than 500 BroadcastReceivers
       WXLogUtils.e(e.getMessage());
+      mGlobalEventReceiver = null;
     }
 
   }
