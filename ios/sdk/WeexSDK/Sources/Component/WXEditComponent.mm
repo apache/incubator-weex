@@ -904,8 +904,9 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     if(![self.view isFirstResponder]) {
         return;
     }
+    
+    CGRect end = [[[notification userInfo] objectForKey:@"UIKeyboardFrameEndUserInfoKey"] CGRectValue];
     if (!_disableMoveViewUp) {
-        CGRect end = [[[notification userInfo] objectForKey:@"UIKeyboardFrameEndUserInfoKey"] CGRectValue];
         _keyboardSize = end.size;
         UIView * rootView = self.weexInstance.rootView;
         CGRect screenRect = [[UIScreen mainScreen] bounds];
@@ -922,7 +923,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     }
     
     if (_keyboardEvent) {
-        [self fireEvent:@"keyboard" params:@{ @"isShow": @YES }];
+        [self fireEvent:@"keyboard" params:@{ @"isShow": @YES, @"keyboardSize": @{@"width": @(end.size.width), @"height": @(end.size.height)} }];
     }
     
     _keyboardHidden = NO;
