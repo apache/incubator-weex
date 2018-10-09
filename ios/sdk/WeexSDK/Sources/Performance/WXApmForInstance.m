@@ -230,6 +230,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     [self setProperty:KEY_PROPERTIES_ERROR_CODE withValue:VALUE_ERROR_CODE_DEFAULT];
     [self setProperty:KEY_PAGE_PROPERTIES_JSLIB_VERSION withValue:[WXAppConfiguration JSFrameworkVersion]?:@"unknownJSFrameworkVersion"];
     [self setProperty:KEY_PAGE_PROPERTIES_WEEX_VERSION withValue:WX_SDK_VERSION];
+    [self setStatistic:KEY_PAGE_STATS_BODY_RATIO withValue:self.wxPageRatio];
     
     //for apm protocl
     //iOS/Android we default recycle img when imgView disapper form screen
