@@ -37,6 +37,7 @@
 #import "WXAppMonitorProtocol.h"
 #import "WXConfigCenterProtocol.h"
 #import "WXTextComponent.h"
+#import "WXAssert.h"
 
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
@@ -1007,6 +1008,77 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
         sInterval = [[NSDate date] timeIntervalSince1970] * 1000 - CACurrentMediaTime()*1000;
     });
     return sInterval+CACurrentMediaTime()*1000;
+}
+
++ (NSArray<NSString *> *)extractPropertyNamesOfJSValueObject:(JSValue *)jsvalue
+{
+    if (!jsvalue) {
+        return nil;
+    }
+    
+    NSMutableArray* allKeys = nil;
+    
+    if ([self useJSCApiForCreateInstance]) {
+        JSContextRef contextRef = jsvalue.context.JSGlobalContextRef;
+        if (![jsvalue isObject]) {
+            WXAssert(NO, @"Invalid jsvalue for property enumeration.");
+            return nil;
+        }
+        JSValueRef jsException = NULL;
+        JSObjectRef instanceContextObjectRef = JSValueToObject(contextRef, jsvalue.JSValueRef, &jsException);
+        if (jsException != NULL) {
+            WXLogError(@"JSValueToObject Exception during create instance.");
+        }
+        BOOL somethingWrong = NO;
+        if (instanceContextObjectRef != NULL) {
+            JSPropertyNameArrayRef allKeyRefs = JSObjectCopyPropertyNames(contextRef, instanceContextObjectRef);
+            size_t keyCount = JSPropertyNameArrayGetCount(allKeyRefs);
+            
+            allKeys = [[NSMutableArray alloc] initWithCapacity:keyCount];
+            for (size_t i = 0; i < keyCount; i ++) {
+                JSStringRef nameRef = JSPropertyNameArrayGetNameAtIndex(allKeyRefs, i);
+                size_t len = JSStringGetMaximumUTF8CStringSize(nameRef);
+                if (len > 1024) {
+                    somethingWrong = YES;
+                    break;
+                }
+                char* buf = (char*)malloc(len + 5);
+                if (buf == NULL) {
+                    somethingWrong = YES;
+                    break;
+                }
+                bzero(buf, len + 5);
+                if (JSStringGetUTF8CString(nameRef, buf, len + 5) > 0) {
+                    NSString* keyString = [NSString stringWithUTF8String:buf];
+                    if ([keyString length] == 0) {
+                        somethingWrong = YES;
+                        free(buf);
+                        break;
+                    }
+                    [allKeys addObject:keyString];
+                }
+                else {
+                    somethingWrong = YES;
+                    free(buf);
+                    break;
+                }
+                free(buf);
+            }
+            JSPropertyNameArrayRelease(allKeyRefs);
+        } else {
+            somethingWrong = YES;
+        }
+        
+        if (somethingWrong) {
+            // may contain retain-cycle.
+            allKeys = (NSMutableArray*)[[jsvalue toDictionary] allKeys];
+        }
+    }
+    else {
+        allKeys = (NSMutableArray*)[[jsvalue toDictionary] allKeys];
+    }
+    
+    return allKeys;
 }
 
 @end
