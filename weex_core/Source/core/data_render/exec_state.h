@@ -60,7 +60,7 @@ struct ClassInstance;
 
 class FuncState {
  public:
-  FuncState() : instructions_(), constants_(), children_(), super_index_(-1) {}
+  FuncState() : instructions_(), args_(), constants_(), children_(), super_index_(-1) {}
   virtual ~FuncState() {}
 
   int AddConstant(Value value) {
@@ -84,7 +84,7 @@ class FuncState {
     return pos;
   }
   inline std::vector<Instruction>& instructions() { return instructions_; }
-  inline void AddChild(FuncState* func) {
+  inline void AddChild(FuncState *func) {
     func->super_func_ = this;
     children_.push_back(std::unique_ptr<FuncState>(func));
   }
@@ -99,14 +99,15 @@ class FuncState {
   inline bool is_class_func() { return is_class_func_; }
   inline ClassInstance * &class_inst() { return class_inst_; }
   inline int &argc() { return argc_; }
-  std::vector<FuncState *> getAllChildren() {
-      std::vector<FuncState*> all_children;
+  inline std::vector<long> &args() { return args_; }
+  std::vector<FuncState *> all_childrens() {
+      std::vector<FuncState *> all_childrens;
       for (auto &child : children_) {
-          all_children.push_back(child.get());
-          std::vector<FuncState*> children = child->getAllChildren();
-          all_children.insert(all_children.end(), children.begin(), children.end());
+          all_childrens.push_back(child.get());
+          std::vector<FuncState *> children = child->all_childrens();
+          all_childrens.insert(all_childrens.end(), children.begin(), children.end());
       }
-      return all_children;
+      return all_childrens;
   }
 
   inline int super_index() const {return super_index_;}
@@ -116,6 +117,7 @@ class FuncState {
   std::vector<Instruction> instructions_;
   std::vector<Value> constants_;
   std::vector<std::unique_ptr<FuncState>> children_;
+  std::vector<long> args_;
   FuncState *super_func_{nullptr};
   int super_index_;
   bool is_class_func_{false};

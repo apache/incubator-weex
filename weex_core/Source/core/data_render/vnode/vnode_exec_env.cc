@@ -179,6 +179,27 @@ static Value CallNativeModule(ExecState *exec_state) {
     return Value();
 }
     
+static Value RequireModule(ExecState *exec_state) {
+    do {
+        if (!exec_state->GetArgumentCount()) {
+            break;
+        }
+        Value *arg = exec_state->GetArgument(0);
+        if (!IsString(arg)) {
+            break;
+        }
+        std::string module_name = CStringValue(arg);
+        std::string module_info;
+        if (!weex::core::data_render::VNodeRenderManager::GetInstance()->RequireModule(exec_state, module_name, module_info)) {
+            break;
+        }
+        return StringToValue(exec_state, module_info);
+        
+    } while (0);
+    
+    return Value();
+}
+    
 static Value RegisterModules(ExecState *exec_state) {
     do {
         if (!exec_state->GetArgumentCount()) {
@@ -578,7 +599,10 @@ void VNodeExecEnv::InitCFuncEnv(ExecState *state) {
     state->Register("setClassList", SetClassList);
     state->Register("setStyle", SetStyle);
     state->Register("__callNativeModule", CallNativeModule);
+    // __registerModules deprecated in sversion 5.8 +
     state->Register("__registerModules", RegisterModules);
+    // __requireModule supporting in sversion 5.8 +
+    state->Register("__requireModule", RequireModule);
     state->Register("Array", state->class_factory()->ClassArray());
     state->Register("String", state->class_factory()->ClassString());
     state->Register("JSON", state->class_factory()->ClassJSON());

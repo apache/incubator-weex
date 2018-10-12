@@ -217,6 +217,26 @@ std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const s
     return err;
 }
     
+bool VNodeRenderManager::RequireModule(ExecState *exec_state, std::string &name, std::string &result)
+{
+    bool finished = false;
+    do {
+        if (!modules_.size()) {
+            break;
+        }
+        for (auto iter = modules_.begin(); iter != modules_.end(); iter++) {
+            if ((*iter).find(name) <= 10) {
+                result = *iter;
+                finished = true;
+                break;
+            }
+        }
+        
+    } while (0);
+    
+    return finished;
+}
+    
 void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state, std::vector<std::string>& registers) {
     do {
         if (!modules_.size()) {

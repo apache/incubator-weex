@@ -204,7 +204,7 @@ void ExecState::encodeFunctionSection() {
     unsigned id = Section::FUNCTION_SECTION;
 
     FuncState* func_state_base = func_state_.get();
-    std::vector<FuncState*> children = func_state_base->getAllChildren();
+    std::vector<FuncState*> children = func_state_base->all_childrens();
     std::vector<FuncState*> func_states;
     func_states.push_back(func_state_base);
     for (auto &func : children) {
@@ -431,7 +431,7 @@ void ExecState::encodeValue(const Value &value) {
 
     if (value.type == Value::Type::FUNC) {
         FuncState* func_state_base = func_state_.get();
-        const std::vector<FuncState*> &children = func_state_base->getAllChildren();
+        const std::vector<FuncState*> &children = func_state_base->all_childrens();
         std::vector<FuncState*> func_states;
         func_states.push_back(func_state_base);
         for (auto &func : children) {
@@ -873,7 +873,7 @@ void ExecState::endDecode() {
     for (auto &value : constants) {
         serializeValue(value);
     }
-    std::vector<FuncState*> children = func_state_->getAllChildren();
+    std::vector<FuncState*> children = func_state_->all_childrens();
     for (auto func_state : children) {
         std::vector<Value>& child_constants = func_state->constants();
         for (auto &value : child_constants) {
@@ -906,7 +906,7 @@ void ExecState::endDecode() {
         if (ref->func_index_ == 0) {
             ref->func_state_ = func_state_.get();
         } else {
-            ref->func_state_ = func_state_->getAllChildren()[ref->func_index_-1];
+            ref->func_state_ = func_state_->all_childrens()[ref->func_index_-1];
         }
         serializeValue(ref->value_);
     }
@@ -955,7 +955,7 @@ void ExecState::serializeValue(Value &value) {
         if (value.index == 0) {
             value.f = func_state_.get();
         } else {
-            value.f = func_state_->getAllChildren()[value.index-1];
+            value.f = func_state_->all_childrens()[value.index-1];
         }
     }
 
