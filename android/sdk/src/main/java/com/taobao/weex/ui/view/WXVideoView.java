@@ -29,6 +29,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
@@ -106,7 +107,7 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
     private MediaPlayer.OnErrorListener mOnErrorListener;
     private MediaPlayer.OnCompletionListener mOnCompletionListener;
     private WXVideoView.VideoPlayListener mVideoPlayListener;
-
+    private boolean mControls = true;
 
     public Wrapper(Context context) {
       super(context);
@@ -226,6 +227,17 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
       }
     }
 
+    public void setControls(boolean controls) {
+      mControls = controls;
+      if (mVideoView != null && mMediaController != null) {
+        if (!mControls) {
+          mMediaController.setVisibility(View.GONE);
+        } else {
+          mMediaController.setVisibility(View.VISIBLE);
+        }
+      }
+    }
+
     private synchronized void createVideoView() {
       if(mVideoView != null){
         return;
@@ -246,7 +258,11 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
       controller.setAnchorView(this);
       video.setMediaController(controller);
       controller.setMediaPlayer(video);
-
+      if (!mControls) {
+        controller.setVisibility(View.GONE);
+      } else {
+        controller.setVisibility(View.VISIBLE);
+      }
       mMediaController = controller;
       mVideoView = video;
 
