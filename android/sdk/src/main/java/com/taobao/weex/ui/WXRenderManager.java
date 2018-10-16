@@ -128,6 +128,7 @@ public class WXRenderManager {
       throw new WXRuntimeException("[WXRenderManager] removeRenderStatement can only be called in main thread");
     }
     RenderContextImpl statement = mRenderContext.remove(instanceId);
+    mPreRenderContextMap.remove(instanceId);
 
     if (statement != null) {
       statement.destroy();

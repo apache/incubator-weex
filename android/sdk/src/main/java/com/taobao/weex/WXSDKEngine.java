@@ -319,14 +319,24 @@ public class WXSDKEngine implements Serializable {
               new SimpleComponentHolder(
                       WXCell.class,
                       new WXCell.Creator()
-              ),
+              ) {
+                @Override
+                public String getComponentType() {
+                  return WXBasicComponentType.CELL;
+                }
+              },
               true,
               WXBasicComponentType.CELL);
       registerComponent(
               new SimpleComponentHolder(
                       WXListComponent.class,
                       new WXListComponent.Creator()
-              ),
+              ) {
+                @Override
+                public String getComponentType() {
+                  return WXBasicComponentType.LIST;
+                }
+              },
               true,
               WXBasicComponentType.LIST,
               WXBasicComponentType.VLIST,

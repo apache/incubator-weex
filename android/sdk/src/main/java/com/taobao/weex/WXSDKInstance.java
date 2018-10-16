@@ -274,6 +274,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (mPrerenderContext.interceptRenderState.compareAndSet(PreRenderContext.INTERCEPT_RENDER_CLOSE, PreRenderContext.INTERCEPT_RENDER_OPEN)) {
       mPrerenderContext.width = width;
       mPrerenderContext.height = height;
+      mPrerenderContext.onPreRender();
       renderByUrl(pageName, url, options, jsonInitData, flag);
     }
   }
@@ -282,6 +283,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (mPrerenderContext.interceptRenderState.compareAndSet(PreRenderContext.INTERCEPT_RENDER_CLOSE, PreRenderContext.INTERCEPT_RENDER_OPEN)) {
       mPrerenderContext.width = width;
       mPrerenderContext.height = height;
+      mPrerenderContext.onPreRender();
       render(pageName, template, options, jsonInitData, flag);
     }
   }
@@ -289,6 +291,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void realRender(@NonNull Context context) {
     if (mPrerenderContext.interceptRenderState.compareAndSet(PreRenderContext.INTERCEPT_RENDER_OPEN, PreRenderContext.INTERCEPT_RENDER_CLOSE)) {
       mContext = context;
+      mPrerenderContext.onRealRender();
       WXComponentNode rootNode = mPrerenderContext.rootNode;
       if (rootNode != null) {
         mPrerenderContext.rootNode.startTransform();

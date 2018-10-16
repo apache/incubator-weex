@@ -116,8 +116,11 @@ public class WXComponentNode implements Runnable {
     public void startTransform() {
         postTransformAction();
         if (mChildNodes.size() > 0) {
+            int i = 0;
             for (WXComponentNode node : mChildNodes) {
                 node.startTransform();
+                node.setIndex(i);
+                i++;
             }
         }
         mIsRenderSuccuess = true;
@@ -160,7 +163,7 @@ public class WXComponentNode implements Runnable {
         }
 
         if (data == null) {
-            WXLogUtils.d(TAG, "node real create component");
+            WXLogUtils.d(TAG, "node real create component, type:" + mComponentData.mComponentType);
             long createComponentStart = System.currentTimeMillis();
             String pageId = mWxInstance.getInstanceId();
             WXVContainer parent = null;

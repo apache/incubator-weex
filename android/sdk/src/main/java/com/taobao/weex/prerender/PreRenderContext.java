@@ -21,6 +21,7 @@ package com.taobao.weex.prerender;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.taobao.weex.WeexFrameRateControl;
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
 import java.util.HashMap;
@@ -31,12 +32,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by luciolong on 18/07/2018.
  */
-public class PreRenderContext {
+public class PreRenderContext implements WeexFrameRateControl.VSyncListener {
     public static final int INTERCEPT_RENDER_CLOSE = 0;
     public static final int INTERCEPT_RENDER_OPEN = 1;
 
     // need intercept real render
     public AtomicInteger interceptRenderState = new AtomicInteger(INTERCEPT_RENDER_CLOSE);
+
+    private WeexFrameRateControl mFrameRateControl;
 
     @Nullable
     public WXComponentNode rootNode;
@@ -48,4 +51,25 @@ public class PreRenderContext {
     public int height = 0;
 
     public AtomicBoolean isRenderSuccess = new AtomicBoolean(false);
+
+    @Override
+    public void OnVSync() {
+        if (rootNode != null) {
+            rootNode.getWxInstance().OnVSync();
+        }
+    }
+
+    public void onPreRender() {
+        if (mFrameRateControl == null) {
+            mFrameRateControl = new WeexFrameRateControl(this);
+        }
+        mFrameRateControl.start();
+    }
+
+    public void onRealRender() {
+        if (mFrameRateControl != null) {
+            mFrameRateControl.stop();
+            mFrameRateControl = null;
+        }
+    }
 }
