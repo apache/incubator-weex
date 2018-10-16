@@ -20,6 +20,7 @@ package com.taobao.weex.ui.component;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -59,6 +60,7 @@ import com.taobao.weex.utils.TypefaceUtil;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -889,7 +891,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     if (host == null) {
       return;
     }
-    Context context = host.getContext();
+    final Context context = host.getContext();
     if (context != null && context instanceof Activity) {
       SoftKeyboardDetector.registerKeyboardEventListener((Activity) context, new SoftKeyboardDetector.OnKeyboardEventListener() {
         @Override
@@ -897,6 +899,13 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
           if (mListeningKeyboard) {
             Map<String, Object> event = new HashMap<>(1);
             event.put("isShow", isShown);
+            if (isShown) {
+              Rect r = new Rect();
+              ((Activity) context).getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
+              float keyboardSize = WXViewUtils.getWebPxByWidth(WXViewUtils.getScreenHeight(context) - (r.bottom - r.top),
+                      getInstance().getInstanceViewPortWidth());
+              event.put("keyboardSize", keyboardSize);
+            }
             fireEvent(Constants.Event.KEYBOARD, event);
           }
           if (!isShown) {
