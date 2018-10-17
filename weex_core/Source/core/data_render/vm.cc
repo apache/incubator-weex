@@ -24,6 +24,7 @@
 #include "core/data_render/common_error.h"
 #include "core/data_render/class_array.h"
 #include "core/data_render/monitor/vm_monitor.h"
+#include "core/data_render/class_function.h"
 
 namespace weex {
 namespace core {
@@ -73,7 +74,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
       case OP_LOADK:
         LOGTEMP("OP_LOADK A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
         a = frame.reg + GET_ARG_A(instruction);
-        b = frame.func->f->GetConstant((int)GET_ARG_Bx(instruction));
+        b = frame.func->GetConstant((int)GET_ARG_Bx(instruction));
         *a = *b;
         break;
       case OP_GETGLOBAL:
@@ -85,8 +86,15 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
       case OP_GETFUNC: {
         LOGTEMP("OP_GETFUNC A:%ld\n", GET_ARG_A(instruction));
         a = frame.reg + GET_ARG_A(instruction);
-        a->type = Value::Type::FUNC;
-        a->f = frame.func->f->GetChild(GET_ARG_Bx(instruction));
+        FuncState *func_state = frame.func->GetChild(GET_ARG_Bx(instruction));
+        if (func_state->in_closure().size() > 0) {
+            *a = exec_state->class_factory()->CreateFuncInstance(func_state);
+            AddClosure(exec_state, a);
+        }
+        else {
+            a->type = Value::Type::FUNC;
+            a->f = func_state;
+        }
         break;
       }
 
@@ -706,6 +714,51 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             }
             *a = ref->value();
             a->ref = &ref->value();
+            break;
+        }
+        case OP_OUT_CLOSURE:
+        {
+            LOGTEMP("OP_OUT_CLOSURE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            int index = (int)GET_ARG_Bx(instruction);
+            ValueRef *ref = exec_state->FindRef(index);
+            if (!ref) {
+                throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_OUT_CLOSURE]");
+            }
+            ref->value() = *a;
+            ref->value().ref = a;
+            if (ref->is_closure() && ref->closure()) {
+                ref->closure()->value() = *a;
+            }
+            break;
+        }
+        case OP_IN_CLOSURE:
+        {
+            LOGTEMP("OP_IN_CLOSURE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            int index = (int)GET_ARG_Bx(instruction);
+            ValueRef *ref = exec_state->FindRef(index);
+            if (!ref) {
+                throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_IN_CLOSURE]");
+            }
+            Value *ret = LoadClosure(frame.reg, ref);
+            if (!ret) {
+                throw VMExecError("Can't Find Closure [OP_IN_CLOSURE]");
+            }
+            *a = *ret;
+            a->ref = ret;
+            break;
+        }
+        case OP_REMOVE_CLOSURE:
+        {
+            LOGTEMP("OP_REMOVE_CLOSURE A:%ld \n", GET_ARG_Ax(instruction));
+            int index =  (int)GET_ARG_Ax(instruction);
+            ValueRef *ref = exec_state->FindRef(index);
+            if (!ref) {
+                throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_REMOVE_CLOSURE]");
+            }
+            ref->value().ref = nullptr;
+            ref->closure()->SetValueRef(nullptr);
             break;
         }
         case OP_GETINDEXVAR:

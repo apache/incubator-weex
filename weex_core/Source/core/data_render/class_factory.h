@@ -35,6 +35,7 @@ public:
     ClassFactory() {};
     virtual Value CreateClassDescriptor(ClassDescriptor *p_super);
     virtual Value CreateClassInstance(ClassDescriptor *p_desc);
+    virtual Value CreateFuncInstance(FuncState *func_state);
     virtual Value ClassArray();
     virtual Value ClassString();
     virtual Value ClassJSON();

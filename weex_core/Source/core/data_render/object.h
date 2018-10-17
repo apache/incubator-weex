@@ -52,6 +52,8 @@ class Frame;
 class ExecState;
 
 class FuncState;
+    
+class FuncClosure;
 
 class String;
 
@@ -59,8 +61,10 @@ class StringTable;
 
 class Value;
     
+class ValueRef;
+    
 class Variables;
-
+    
 typedef struct GCObject {
     CommonHeader;
     inline int decrement() { return --ref_; }
@@ -91,7 +95,7 @@ struct Value {
 
   struct Value *ref {nullptr};
 
-  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, VALUE_REF, ARRAY, TABLE, CLASS_DESC, CLASS_INST };
+  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, VALUE_REF, ARRAY, TABLE, CLASS_DESC, CLASS_INST, FUNC_INST };
 
   Type type;
 
@@ -135,6 +139,7 @@ struct Value {
       case ARRAY:
       case CLASS_DESC:
       case CLASS_INST:
+      case FUNC_INST:
         gc = value.gc;
         if(gc)
           gc->increment();
@@ -176,6 +181,7 @@ struct Value {
           case ARRAY:
           case CLASS_DESC:
           case CLASS_INST:
+          case FUNC_INST:
               gc = value.gc;
               if(gc)
                 gc->increment();
@@ -200,6 +206,7 @@ struct Value {
       case TABLE:
       case CLASS_DESC:
       case CLASS_INST:
+      case FUNC_INST:
             return left.gc == right.gc;
       default:break;
     }
@@ -223,7 +230,7 @@ typedef struct Table {
     Table() : map() {}
 
 } Table;
-    
+        
 class Variables {
 public:
     Value *Find(int index);
@@ -261,6 +268,14 @@ typedef struct ClassInstance {
     ClassInstance(ClassDescriptor *p_desc) : p_desc_(p_desc), vars_(new Variables) {}
     
 } ClassInstance;
+    
+typedef struct FuncInstance {
+    CommonHeader;
+    FuncState *func_{nullptr};
+    std::vector<FuncClosure *> closures_;
+    FuncInstance(FuncState *func) : func_(func), closures_() { }
+    
+} FuncInstance;
 
 /*
 ** try to convert a value to an integer, rounding according to 'mode':
@@ -348,7 +363,7 @@ inline int64_t ShiftLeft(const int64_t &a, const int64_t &b) {
 
 inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
     
-inline bool IsFunction(const Value *o) { return Value::Type::FUNC == o->type || Value::Type::CFUNC == o->type; }
+inline bool IsFunction(const Value *o) { return Value::Type::FUNC == o->type || Value::Type::CFUNC == o->type || Value::Type::FUNC_INST == o->type; }
     
 inline bool IsPrototypeFunction(const Value *o) { return Value::Type::FUNC == o->type; }
     
@@ -399,7 +414,7 @@ inline int IntMod(const int &a, const int &b) {
     return ret;
   }
 }
-
+    
 inline bool IsNumber(const Value *o) { return Value::Type::NUMBER == o->type; }
 
 inline bool IsCptr(const Value *o) { return Value::Type::CPTR == o->type; }
@@ -415,6 +430,8 @@ inline bool IsString(const Value *o) { return nullptr != o && Value::Type::STRIN
 inline bool IsClass(const Value *o) { return nullptr != o && Value::Type::CLASS_DESC == o->type; }
     
 inline bool IsClassInstance(const Value *o) { return nullptr != o && Value::Type::CLASS_INST == o->type; }
+    
+inline bool IsFuncInstance(const Value *o) { return nullptr != o && Value::Type::FUNC_INST == o->type; }
     
 inline int64_t IntValue(const Value *o) { return o->i; }
 
@@ -446,7 +463,7 @@ inline int ToNumber_(const Value *value, double &ret) {
     return 0;
   }
 }
-
+    
 inline int ToNum(const Value *o, double &n) {
   return IsNumber(o) ? (static_cast<void>(n = NumValue(o)), 1) : ToNumber_(o, n);
 }
@@ -456,6 +473,7 @@ inline void SetIValue(Value *o, int iv) {
     o->type = Value::Type::INT;
     o->i = iv;
 }
+    
     
 void SetRefValue(Value *o);
 
@@ -495,6 +513,13 @@ inline void SetCDValue(Value *v, GCObject *o) {
 inline void SetCIValue(Value *v, GCObject *o) {
     GCRelease(v);
     v->type = Value::Type::CLASS_INST;
+    v->gc = o;
+    GCRetain(v);
+}
+
+inline void SetGCFuncValue(Value *v, GCObject *o) {
+    GCRelease(v);
+    v->type = Value::Type::FUNC_INST;
     v->gc = o;
     GCRetain(v);
 }

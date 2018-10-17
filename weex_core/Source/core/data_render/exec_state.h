@@ -43,9 +43,12 @@ class ValueRef {
 public:
     ValueRef(FuncState *func_state, long register_id) : func_state_(func_state), register_id_(register_id), ref_id_(gs_ref_id++), func_index_(-1) { SetNil(&value_); };
     inline int ref_id() { return ref_id_; }
+    inline void SetClosure(FuncClosure *closure) { closure_ = closure; }
     inline FuncState *func_state() { return func_state_; }
     inline long register_id() { return register_id_; }
     inline Value &value() { return value_; }
+    inline bool &is_closure() { return is_closure_; }
+    inline FuncClosure *closure() { return closure_; }
     ~ValueRef() {}
 private:
     static int gs_ref_id;
@@ -54,13 +57,30 @@ private:
     long register_id_;
     int func_index_;
     Value value_;
+    FuncClosure *closure_{nullptr};
+    bool is_closure_{false};
 };
     
 struct ClassInstance;
 
+class FuncClosure {
+public:
+    explicit FuncClosure(ValueRef *ref);
+    virtual ~FuncClosure() {}
+    inline void SetValueRef(ValueRef *ref) { ref_ = ref; value_.ref = ref ? &ref->value() : nullptr;  }
+    inline FuncState *func_state() { return func_state_; }
+    inline long register_id() { return register_id_; }
+    inline Value &value() { return value_; }
+private:
+    FuncState *func_state_{nullptr};
+    long register_id_{-1};
+    Value value_;
+    ValueRef *ref_;
+};
+
 class FuncState {
  public:
-  FuncState() : instructions_(), args_(), constants_(), children_(), super_index_(-1) {}
+  FuncState() : instructions_(), args_(), in_closure_(), out_closure_(), constants_(), children_(), super_index_(-1) {}
   virtual ~FuncState() {}
 
   int AddConstant(Value value) {
@@ -72,9 +92,19 @@ class FuncState {
     constants_.push_back(std::move(value));
     return (int)constants_.size() - 1;
   }
-
+  void AddInClosure(ValueRef *ref) {
+      if (std::find(in_closure_.begin(), in_closure_.end(), ref) == in_closure_.end()) {
+          in_closure_.push_back(ref);
+      }
+  }
+  void AddOutClosure(ValueRef *ref) {
+      if (std::find(out_closure_.begin(), out_closure_.end(), ref) == out_closure_.end()) {
+          out_closure_.push_back(ref);
+      }
+  }
   inline Value *GetConstant(int index) { return &constants_[index]; }
   inline size_t GetConstantSize() { return constants_.size();}
+  inline bool Inclusive(long arg) { return std::find(args_.begin(), args_.end(), arg) == args_.end() ? false : true; }
   inline size_t AddInstruction(Instruction i) {
     instructions_.push_back(i);
     return instructions_.size() - 1;
@@ -91,10 +121,10 @@ class FuncState {
   inline const std::vector<std::unique_ptr<FuncState>>& children() {
     return children_;
   }
-  inline FuncState* GetChild(size_t pos) { return children_[pos].get(); }
-  inline std::vector<Value>& constants() {return constants_;}
-  inline FuncState* super_func() {return super_func_;}
-  inline void set_super_func(FuncState* func) {super_func_ = func;}
+  inline FuncState *GetChild(size_t pos) { return children_[pos].get(); }
+  inline std::vector<Value>& constants() { return constants_; }
+  inline FuncState *super_func() { return super_func_; }
+  inline void set_super_func(FuncState *func) { super_func_ = func; }
   inline void set_is_class_func(bool is_class_func) { is_class_func_ = is_class_func; }
   inline bool is_class_func() { return is_class_func_; }
   inline ClassInstance * &class_inst() { return class_inst_; }
@@ -109,22 +139,25 @@ class FuncState {
       }
       return all_childrens;
   }
-
-  inline int super_index() const {return super_index_;}
-  inline void set_super_index(int super_index) {super_index_ = super_index;}
+  inline std::vector<ValueRef *> &in_closure() { return in_closure_; }
+  inline std::vector<ValueRef *> &out_closure() { return out_closure_; }
+  inline int super_index() const { return super_index_; }
+  inline void set_super_index(int super_index) { super_index_ = super_index; }
 
  private:
   std::vector<Instruction> instructions_;
   std::vector<Value> constants_;
   std::vector<std::unique_ptr<FuncState>> children_;
   std::vector<long> args_;
+  std::vector<ValueRef *> in_closure_;
+  std::vector<ValueRef *> out_closure_;
   FuncState *super_func_{nullptr};
   int super_index_;
   bool is_class_func_{false};
   ClassInstance *class_inst_{nullptr};
   int argc_{0};
 };
-    
+        
 // TODO Each Func should contain a stack whose size is 256
 class ExecStack {
  public:

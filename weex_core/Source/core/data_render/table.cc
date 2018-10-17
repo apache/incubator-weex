@@ -227,6 +227,9 @@ json11::Json TableToJson(Table *table) {
         if (it->second.type == Value::FUNC) {
             object.insert({it->first, json11::Json("FUNC")});
         }
+        if (it->second.type == Value::FUNC_INST) {
+            object.insert({it->first, json11::Json("FUNC_INST")});
+        }
     }
     return json11::Json(object);
 }

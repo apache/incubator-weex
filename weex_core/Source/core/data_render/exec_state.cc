@@ -38,6 +38,20 @@ namespace core {
 namespace data_render {
     
 int ValueRef::gs_ref_id = 0;
+    
+FuncClosure::FuncClosure(ValueRef *ref) {
+    if (ref) {
+        func_state_ = ref->func_state();
+        register_id_ = ref->register_id();
+        value_ = ref->value();
+        value_.ref = &ref->value();
+    }
+    else {
+        SetNil(&value_);
+        value_.ref = nullptr;
+    }
+    ref_ = ref;
+}
 
 void ExecStack::reset() {
     size_t size = (VM_EXEC_STACK_SIZE - (top_ - base()) - 1) * sizeof(Value);
@@ -1082,16 +1096,17 @@ void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
         frames_.pop_back();
     }
     else {
-        if (argc < func->f->argc()) {
-            size_t size = (func->f->argc() - argc) * sizeof(Value);
+        FuncState *func_state = func->type == Value::Type::FUNC ? func->f : ValueTo<FuncInstance>(func)->func_;
+        if (argc < func_state->argc()) {
+            size_t size = (func_state->argc() - argc) * sizeof(Value);
             memset(func + argc + 1, 0, size);
         }
         *stack_->top() = func + argc;
         Frame frame;
-        frame.func = func;
+        frame.func = func_state;
         frame.reg = func;
-        frame.pc = &(*func->f->instructions().begin());
-        frame.end = &(*func->f->instructions().end());
+        frame.pc = &(*func_state->instructions().begin());
+        frame.end = &(*func_state->instructions().end());
         frames_.push_back(frame);
         resetArguments(func, argc);
         vm_->RunFrame(this, frame, ret);

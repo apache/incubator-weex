@@ -40,6 +40,9 @@ enum OpCode {
   OP_RESETOUTVAR,
   OP_GETOUTVAR,     // A B C R(A) = B->C
     
+  OP_OUT_CLOSURE,
+  OP_IN_CLOSURE,
+  OP_REMOVE_CLOSURE,
   OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)
 
   OP_SETARRAY,  //    A B C    R(A)[R(B)] = RK(C)

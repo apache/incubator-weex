@@ -9,6 +9,7 @@
 #include "core/data_render/class_json.h"
 #include "core/data_render/class_object.h"
 #include "core/data_render/table.h"
+#include "core/data_render/exec_state.h"
 
 namespace weex {
 namespace core {
@@ -106,6 +107,13 @@ Value ClassFactory::CreateClassInstance(ClassDescriptor *p_desc) {
     return value;
 }
 
+Value ClassFactory::CreateFuncInstance(FuncState *func_state) {
+    FuncInstance *func_inst = new FuncInstance(func_state);
+    Value value;
+    SetGCFuncValue(&value, reinterpret_cast<GCObject *>(func_inst));
+    return value;
+}
+
 ClassFactory::~ClassFactory() {
     for (auto iter = stores_.begin(); iter != stores_.end(); iter++) {
         switch (iter->second) {
@@ -127,6 +135,15 @@ ClassFactory::~ClassFactory() {
             case Value::Type::CLASS_INST:
             {
                 delete reinterpret_cast<ClassInstance *>(iter->first);
+                break;
+            }
+            case Value::Type::FUNC_INST:
+            {
+                FuncInstance *inst = reinterpret_cast<FuncInstance *>(iter->first);
+                for (int i = 0; i < inst->closures_.size(); i++) {
+                    delete inst->closures_[i];
+                }
+                delete inst;
                 break;
             }
             default:

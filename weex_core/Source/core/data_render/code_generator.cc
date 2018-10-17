@@ -430,15 +430,24 @@ void CodeGenerator::Visit(FunctionStatement *node, void *data) {
 
         // make arguments var in thie front of stack;
         if (is_class_func) {
-            block_->AddVariable("this", block_->NextRegisterId());
+            long arg = block_->NextRegisterId();
+            block_->AddVariable("this", arg);
             func_->func_state()->argc()++;
+            func_->func_state()->args().push_back(arg);
         }
         for (int i = 0; i < proto->GetArgs().size(); i++) {
-            std::string arg = proto->GetArgs().at(i);
-            block_->AddVariable(arg, block_->NextRegisterId());
+            long arg = block_->NextRegisterId();
+            block_->AddVariable(proto->GetArgs().at(i), arg);
+            func_->func_state()->args().push_back(arg);
             func_->func_state()->argc()++;
         }
         node->body()->Accept(this, nullptr);
+        if (func_->func_state()->out_closure().size() > 0) {
+            for (int i = 0; i < func_->func_state()->out_closure().size(); i++) {
+                ValueRef *ref = func_->func_state()->out_closure()[i];
+                func_->func_state()->AddInstruction(CREATE_Ax(OP_REMOVE_CLOSURE, ref->ref_id()));
+            }
+        }
     }
     
     // function prototype
@@ -506,22 +515,26 @@ void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
         block_->NextRegisterId();
         // make arguments var in thie front of stack;
         if (is_class_func) {
-            block_->AddVariable("this", block_->NextRegisterId());
+            long arg = block_->NextRegisterId();
+            block_->AddVariable("this", arg);
             func_->func_state()->argc()++;
+            func_->func_state()->args().push_back(arg);
         }
         // make arguments var in thie front of stack;
         for (int i = 0; i < node->args().size(); i++) {
             if (node->args()[i]->IsIdentifier()) {
-                std::string arg = node->args()[i]->AsIdentifier()->GetName();
-                block_->AddVariable(arg, block_->NextRegisterId());
+                long arg = block_->NextRegisterId();
+                block_->AddVariable(node->args()[i]->AsIdentifier()->GetName(), arg);
                 func_->func_state()->argc()++;
+                func_->func_state()->args().push_back(arg);
             }
             else if (node->args()[i]->IsCommaExpression()) {
                 Handle<ExpressionList> arg_list = node->args()[i]->AsCommaExpression()->exprs();
                 for (int j = 0; j < arg_list->Size(); j++) {
-                    std::string arg = arg_list->raw_list()[j]->AsIdentifier()->GetName();
-                    block_->AddVariable(arg, block_->NextRegisterId());
+                    long arg = block_->NextRegisterId();
+                    block_->AddVariable(arg_list->raw_list()[j]->AsIdentifier()->GetName(), arg);
                     func_->func_state()->argc()++;
+                    func_->func_state()->args().push_back(arg);
                 }
             }
             else {
@@ -536,6 +549,12 @@ void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
         }
         else {
             node->body()->Accept(this, nullptr);
+        }
+        if (func_->func_state()->out_closure().size() > 0) {
+            for (int i = 0; i < func_->func_state()->out_closure().size(); i++) {
+                ValueRef *ref = func_->func_state()->out_closure()[i];
+                func_->func_state()->AddInstruction(CREATE_Ax(OP_REMOVE_CLOSURE, ref->ref_id()));
+            }
         }
     }
     // associate function_name and function_state
@@ -1301,7 +1320,13 @@ long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
                 }
                 reg_ref = root_block->NextRegisterId();
                 root_block->reg_refs().push_back(reg_ref);
-                func_state_->AddInstruction(CREATE_ABx(OP_GETOUTVAR, reg_ref, ref->ref_id()));
+                if (ref->is_closure()) {
+                    func_state_->AddInClosure(ref);
+                    func_state_->AddInstruction(CREATE_ABx(OP_IN_CLOSURE, reg_ref, ref->ref_id()));
+                }
+                else {
+                    func_state_->AddInstruction(CREATE_ABx(OP_GETOUTVAR, reg_ref, ref->ref_id()));
+                }
             }
             return reg_ref;
         }
@@ -1312,14 +1337,19 @@ long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
 ValueRef *CodeGenerator::BlockCnt::FindValueRef(const std::string &name, long &reg_ref) {
     auto iter = variables_.find(name);
     if (iter != variables_.end()) {
-        if (exec_state_ && func_state_) {
+        if (exec_state_ && func_state_ ) {
             ValueRef *ref = exec_state_->AddRef(func_state_, iter->second);
+            bool is_closure = func_state_->Inclusive(iter->second);
+            if (is_closure) {
+                ref->is_closure() = is_closure;
+                func_state_->AddOutClosure(ref);
+            }
             Instruction instruction = func_state_->instructions().size() > 0 ? func_state_->instructions()[func_state_->instructions().size() - 1] : 0;
             OpCode op(GET_OP_CODE(instruction));
             if (instruction && (op == OP_RETURN0 || op == OP_RETURN1)) {
                 func_state_->instructions().pop_back();
             }
-            func_state_->AddInstruction(CREATE_ABx(OP_SETOUTVAR, iter->second, ref->ref_id()));
+            func_state_->AddInstruction(CREATE_ABx(is_closure ? OP_OUT_CLOSURE : OP_SETOUTVAR, iter->second, ref->ref_id()));
             if (instruction && (op == OP_RETURN0 || op == OP_RETURN1)) {
                 func_state_->AddInstruction(instruction);
             }
