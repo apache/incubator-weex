@@ -44,7 +44,7 @@
 static NSThread *WXComponentThread;
 
 #define WXAssertComponentExist(component)  WXAssert(component, @"component not exists")
-
+#define MAX_DROP_FRAME_FOR_BATCH   20
 
 @implementation WXComponentManager
 {
@@ -991,8 +991,35 @@ static NSThread *WXComponentThread;
 
 - (void)_syncUITasks
 {
-    NSArray<dispatch_block_t> *blocks = _uiTaskQueue;
-    _uiTaskQueue = [NSMutableArray array];
+    static NSInteger _syncUITaskCount = 0;
+    NSInteger mismatchBeginIndex = _uiTaskQueue.count;
+    for (NSInteger i = _uiTaskQueue.count - 1;i >= 0;i --) {
+        if (_uiTaskQueue[i] == WXPerformUITaskBatchEndBlock) {
+            break;
+        }
+        if (_uiTaskQueue[i] == WXPerformUITaskBatchBeginBlock) {
+            mismatchBeginIndex = i;
+            break;
+        }
+    }
+    
+    NSArray<dispatch_block_t> *blocks = nil;
+    if (mismatchBeginIndex == _uiTaskQueue.count) {
+        // we find end tag or no end or begin
+    } else {
+        _syncUITaskCount ++;
+        // we only find begin tag but missing end tag,
+        if (_syncUITaskCount > (MAX_DROP_FRAME_FOR_BATCH)) {
+            mismatchBeginIndex = _uiTaskQueue.count;
+            _syncUITaskCount = 0;
+        }
+    }
+    
+    if (mismatchBeginIndex > 0) {
+        blocks = [_uiTaskQueue subarrayWithRange:NSMakeRange(0, mismatchBeginIndex)];
+        [_uiTaskQueue removeObjectsInRange:NSMakeRange(0, blocks.count)];
+    }
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         for(dispatch_block_t block in blocks) {
             block();
@@ -1049,6 +1076,27 @@ static NSThread *WXComponentThread;
             break;
         }
     }
+}
+
+static void (^WXPerformUITaskBatchBeginBlock)(void) = ^ () {
+#if DEBUG
+    WXLogDebug(@"directive BatchBeginBlock");
+#endif
+};
+static void (^WXPerformUITaskBatchEndBlock)(void) = ^ () {
+#if DEBUG
+    WXLogDebug(@"directive BatchEndBlock");
+#endif
+};
+
+- (void)performBatchBegin
+{
+    [self _addUITask:WXPerformUITaskBatchBeginBlock];
+}
+
+- (void)performBatchEnd
+{
+    [self _addUITask:WXPerformUITaskBatchEndBlock];
 }
 
 - (void)handleDisplayLink {
