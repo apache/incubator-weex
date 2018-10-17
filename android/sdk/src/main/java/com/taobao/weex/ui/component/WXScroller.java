@@ -729,9 +729,20 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       mActiveFeature = mChildren.indexOf(component);
     }
 
-
-    int viewYInScroller=component.getAbsoluteY() - getAbsoluteY();
-    int viewXInScroller=component.getAbsoluteX() - getAbsoluteX();
+    int viewYInScroller = component.getAbsoluteY() - getAbsoluteY();
+    int viewXInScroller = 0;
+    if (this.isNativeLayoutRTL()) {
+      // if layout direction is rtl, we need calculate rtl scroll x;
+      if (getInnerView().getChildCount() > 0) {
+        int totalWidth = getInnerView().getChildAt(0).getWidth();
+        int displayWidth = getInnerView().getMeasuredWidth();
+        viewXInScroller = totalWidth - (component.getAbsoluteX() - getAbsoluteX()) - displayWidth;
+      } else {
+        viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
+      }
+    } else {
+      viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
+    }
 
     scrollBy(viewXInScroller - getScrollX() + (int) offsetFloat, viewYInScroller - getScrollY() + (int) offsetFloat, smooth);
   }
