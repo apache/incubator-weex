@@ -230,8 +230,12 @@ public class WXVideo extends WXComponent<FrameLayout> {
   }
 
   @WXComponentProp(name = Constants.Name.CONTROLS)
-  public void setControls(boolean controls) {
-    mWrapper.setControls(controls);
+  public void setControls(String controls) {
+    if (TextUtils.equals("controls", controls)) {
+      mWrapper.setControls(true);
+    } else if (TextUtils.equals("nocontrols", controls)) {
+      mWrapper.setControls(false);
+    }
   }
 
   private boolean mStopped;
