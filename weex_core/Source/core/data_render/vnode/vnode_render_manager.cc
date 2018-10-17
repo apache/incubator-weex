@@ -393,7 +393,7 @@ void VNodeRenderManager::CallNativeModule(ExecState* exec_state,
           ->CallNativeModule(iter->first.c_str(), module.c_str(),
                              method.c_str(),
                              args.length() > 0 ? args.c_str() : nullptr,
-                             static_cast<int>(args.length()), nullptr, 0);
+                             argc, nullptr, 0);
       break;
     }
   }
