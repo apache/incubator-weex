@@ -1089,7 +1089,7 @@ void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
         frame.reg = func;
         frames_.push_back(frame);
         auto result = reinterpret_cast<CFunction>(func->cf)(this);
-        if (ret != nullptr && !IsNil(&result)) {
+        if (ret) {
             *ret = result;
         }
         stack_->reset();
