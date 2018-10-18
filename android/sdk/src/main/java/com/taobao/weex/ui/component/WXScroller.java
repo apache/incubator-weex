@@ -769,6 +769,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       } else {
         viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
       }
+      offsetFloat = - offsetFloat;
     } else {
       viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
     }
