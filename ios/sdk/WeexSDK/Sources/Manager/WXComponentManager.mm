@@ -995,6 +995,8 @@ static NSThread *WXComponentThread;
     NSInteger mismatchBeginIndex = _uiTaskQueue.count;
     for (NSInteger i = _uiTaskQueue.count - 1;i >= 0;i --) {
         if (_uiTaskQueue[i] == WXPerformUITaskBatchEndBlock) {
+            _syncUITaskCount = 0;
+            // clear when find the matches for end and begin tag
             break;
         }
         if (_uiTaskQueue[i] == WXPerformUITaskBatchBeginBlock) {
@@ -1005,11 +1007,12 @@ static NSThread *WXComponentThread;
     
     NSArray<dispatch_block_t> *blocks = nil;
     if (mismatchBeginIndex == _uiTaskQueue.count) {
-        // we find end tag or no end or begin
+        // here we get end tag or there are not begin and end directives
     } else {
         _syncUITaskCount ++;
         // we only find begin tag but missing end tag,
         if (_syncUITaskCount > (MAX_DROP_FRAME_FOR_BATCH)) {
+            // when the wait times come to MAX_DROP_FRAME_FOR_BATCH, we will pop all the stashed operation for user experience.
             mismatchBeginIndex = _uiTaskQueue.count;
             _syncUITaskCount = 0;
         }
