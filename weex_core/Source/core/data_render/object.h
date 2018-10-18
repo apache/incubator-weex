@@ -435,6 +435,15 @@ inline T* ValueTo(const Value *o) {
     return reinterpret_cast<T*>(o->gc);
 }
 
+inline int StringToNum(const std::string &str, double& ret) {
+  try {
+    ret = std::stod(str, nullptr);
+    return 1;
+  } catch (const std::exception &e) {
+    return -1;
+  }
+}
+
 inline int ToNumber_(const Value *value, double &ret) {
   if (IsInt(value)) {
     ret = IntValue(value);
@@ -442,6 +451,8 @@ inline int ToNumber_(const Value *value, double &ret) {
   } else if (IsNumber(value)) {
     ret = NumValue(value);
     return 1;
+  } else if (IsString(value)) {
+    return StringToNum(CStringValue(value), ret);
   } else {
     return 0;
   }

@@ -145,7 +145,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
           if (IsInt(b) && IsInt(c)) {
               SetIValue(a, static_cast<int>(NUM_OP(/, IntValue(b), IntValue(c))));
           } else if (ToNum(b, d1) && ToNum(c, d2)) {
-              SetDValue(a, NUM_OP(/, IntValue(b), IntValue(c)));
+              SetDValue(a, NUM_OP(/, d1, d2));
           } else if (IsInt(c) && IsString(b)) {
               int64_t bval = 0;
               ToInteger(b, 0, bval);
