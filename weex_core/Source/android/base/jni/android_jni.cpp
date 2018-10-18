@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <android/base/log_utils.h>
 #include "android_jni.h"
 
 namespace {
@@ -39,6 +40,10 @@ JNIEnv *AttachCurrentThread() {
   args.group = nullptr;
 
   jint ret = g_jvm->AttachCurrentThread(&env, &args);
+  if(ret != JNI_OK) {
+      LOGE("weex AttachCurrentThread failed");
+      env = nullptr;
+  }
   return env;
 }
 
