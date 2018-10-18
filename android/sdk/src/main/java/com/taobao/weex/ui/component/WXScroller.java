@@ -34,6 +34,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.util.Log;
@@ -472,6 +473,34 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
               LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
       scrollView.addView(mRealView, layoutParams);
       scrollView.setHorizontalScrollBarEnabled(false);
+      if (isNativeLayoutRTL()) {
+        final WXScroller component = this;
+        final View.OnLayoutChangeListener listener = new View.OnLayoutChangeListener() {
+          @Override
+          public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+            final View frameLayout = view;
+              scrollView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                  int mw = frameLayout.getMeasuredWidth();
+                                  scrollView.scrollTo(mw, component.getScrollY());
+                                }
+                              }
+              );
+          }
+        };
+        mRealView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+          @Override
+          public void onViewAttachedToWindow(View view) {
+            view.addOnLayoutChangeListener(listener);
+          }
+
+          @Override
+          public void onViewDetachedFromWindow(View view) {
+            view.removeOnLayoutChangeListener(listener);
+          }
+        });
+      }
 
       if(pageEnable) {
         mGestureDetector = new GestureDetector(new MyGestureDetector(scrollView));
