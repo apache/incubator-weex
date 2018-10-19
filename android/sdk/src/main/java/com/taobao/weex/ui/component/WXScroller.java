@@ -384,21 +384,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
       lp.setMargins(left, top, right, bottom);
-      if (lp instanceof FrameLayout.LayoutParams) {
-        FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
-        if (this.isNativeLayoutRTL() == WXComponent.isLayoutRTL(this)) {
-          lp_frameLayout.gravity = Gravity.START | Gravity.TOP;
-          lp.setMarginStart(left);
-          lp.setMarginEnd(right);
-        } else {
-          lp_frameLayout.gravity = Gravity.END | Gravity.TOP;
-          lp.setMarginStart(right);
-          lp.setMarginEnd(left);
-        }
-      } else {
-        lp.setMarginStart(left);
-        lp.setMarginEnd(right);
-      }
+      lp.setMarginStart(left);
+      lp.setMarginEnd(right);
     } else {
       if (lp instanceof FrameLayout.LayoutParams) {
         FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
@@ -414,6 +401,21 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       }
     }
   }
+
+  @Override
+  public void setLayout(WXComponent component) {
+    if (TextUtils.isEmpty(component.getComponentType())
+            || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
+            || component.getLayoutSize() == null) {
+      return;
+    }
+    if (component.getHostView() != null) {
+      int layoutDirection = component.isNativeLayoutRTL() ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR;
+      ViewCompat.setLayoutDirection(component.getHostView(), layoutDirection);
+    }
+    super.setLayout(component);
+  }
+
   @Override
   protected MeasureOutput measure(int width, int height) {
     MeasureOutput measureOutput = new MeasureOutput();
@@ -473,20 +475,23 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
               LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
       scrollView.addView(mRealView, layoutParams);
       scrollView.setHorizontalScrollBarEnabled(false);
-      if (isNativeLayoutRTL()) {
+
         final WXScroller component = this;
         final View.OnLayoutChangeListener listener = new View.OnLayoutChangeListener() {
           @Override
-          public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+          public void onLayoutChange(View view, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
             final View frameLayout = view;
-              scrollView.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                  int mw = frameLayout.getMeasuredWidth();
-                                  scrollView.scrollTo(mw, component.getScrollY());
-                                }
-                              }
-              );
+            scrollView.post(new Runnable() {
+              @Override
+              public void run() {
+                if (isNativeLayoutRTL()) {
+                  int mw = frameLayout.getMeasuredWidth();
+                  scrollView.scrollTo(mw, component.getScrollY());
+                } else {
+                  scrollView.scrollTo(0, component.getScrollY());
+                }
+              }
+            });
           }
         };
         mRealView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
@@ -500,7 +505,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
             view.removeOnLayoutChangeListener(listener);
           }
         });
-      }
+
 
       if(pageEnable) {
         mGestureDetector = new GestureDetector(new MyGestureDetector(scrollView));

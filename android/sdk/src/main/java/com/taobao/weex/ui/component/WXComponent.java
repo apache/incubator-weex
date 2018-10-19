@@ -242,8 +242,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       if (lp instanceof FrameLayout.LayoutParams) {
           FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
           lp_frameLayout.gravity = Gravity.LEFT | Gravity.TOP;
-      } else {
-          lp.setMargins(left, top, right, bottom);
       }
   }
 
@@ -943,8 +941,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   /**
    * layout view
    */
-  public final void setLayout(WXComponent component) {
-
+  public void setLayout(WXComponent component) {
     if (TextUtils.isEmpty(component.getComponentType())
             || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
             || component.getLayoutSize() == null) {
