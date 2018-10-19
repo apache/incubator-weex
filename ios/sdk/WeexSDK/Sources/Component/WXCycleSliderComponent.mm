@@ -467,7 +467,7 @@ typedef NS_ENUM(NSInteger, Direction) {
 {
     // this is scroll rtl solution.
     // scroll layout not use direction, use self tranform
-    if (_flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL
+    if (self.view && _flexCssNode && _flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL
         ) {
         WXRecycleSliderView *slider = (WXRecycleSliderView *)self.view;
         CATransform3D transform = CATransform3DScale(CATransform3DIdentity, -1, 1, 1);
