@@ -999,20 +999,21 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           WXJSObject[] jsArgs = {
                   new WXJSObject(WXJSObject.String, instanceId),
                   WXWsonJSONSwitch.toWsonOrJsonWXJSObject(tasks)};
-          byte[] taskResult = invokeExecJSWithResult(String.valueOf(instanceId), null, METHOD_CALL_JS, jsArgs, true);
-          if(eventCallback == null){
-            return;
+          ResultCallback<byte[]> resultCallback = null;
+          if (eventCallback != null) {
+            resultCallback = new ResultCallback<byte[]>() {
+              @Override
+              public void onReceiveResult(byte[] result) {
+                JSONArray arrayResult = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(result);
+                if(arrayResult != null && arrayResult.size() > 0){
+                  eventCallback.onCallback(arrayResult.get(0));
+                }
+              }
+            };
           }
-          if(taskResult != null){
-            JSONArray arrayResult = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(taskResult);
-            if(arrayResult != null && arrayResult.size() > 0){
-              result = arrayResult.get(0);
-            }
-          }
-          eventCallback.onCallback(result);
+          invokeExecJSWithCallback(String.valueOf(instanceId), null, METHOD_CALL_JS,
+                  jsArgs, resultCallback, true);
           jsArgs[0] = null;
-          taskResult = null;
-          jsArgs = null;
         }catch (Exception e){
           WXLogUtils.e("asyncCallJSEventWithResult" , e);
         }
@@ -1127,7 +1128,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       throw new WXRuntimeException(
               "fireEvent must be called by main thread");
     }
-    if (WXSDKManager.getInstance().getAllInstanceMap().get(instanceId)!=null && WXSDKManager.getInstance().getAllInstanceMap().get(instanceId).getRenderStrategy()== WXRenderStrategy.DATA_RENDER) {
+    WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
+    if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER ||
+            instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
       fireEventOnDataRenderNode(instanceId, ref, type, data);
     } else {
       if(callback == null) {
@@ -1469,7 +1472,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         if (type == BundType.Vue || type == BundType.Rax
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY) {
-          invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
+          int ret = invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
+          if(ret == 0) {
+            String err = "[WXBridgeManager] invokeCreateInstance : " + instance.getTemplateInfo();
+
+            instance.onRenderError(
+                    WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
+                    WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg() + err);
+          }
           return;
         } else {
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
@@ -1692,7 +1702,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
   }
 
-  public void invokeCreateInstanceContext(String instanceId, String namespace, String function,
+  public int invokeCreateInstanceContext(String instanceId, String namespace, String function,
                                           WXJSObject[] args, boolean logTaskDetail) {
     WXLogUtils.d("invokeCreateInstanceContext instanceId:" + instanceId + " function:"
             + function + " isJSFrameworkInit：%d" + isJSFrameworkInit());
@@ -1703,7 +1713,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
     // }
-    mWXBridge.createInstanceContext(instanceId, namespace, function, args);
+    return mWXBridge.createInstanceContext(instanceId, namespace, function, args);
   }
 
   public void invokeDestoryInstance(String instanceId, String namespace, String function,
@@ -1741,8 +1751,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return null;
   }
 
-  private byte[] invokeExecJSWithResult(String instanceId, String namespace, String function,
-                                        WXJSObject[] args,boolean logTaskDetail){
+  private void invokeExecJSWithCallback(String instanceId, String namespace, String function,
+                                        WXJSObject[] args , ResultCallback callback, boolean logTaskDetail){
     if (WXEnvironment.isOpenDebugLog() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
               .append("function:").append(function);
@@ -1753,9 +1763,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mLodBuilder.setLength(0);
     }
     if (isJSFrameworkInit()) {
-      return mWXBridge.execJSWithResult(instanceId, namespace, function, args);
+      mWXBridge.execJSWithCallback(instanceId, namespace, function, args, callback);
     }
-    return null;
   }
 
   public @NonNull static String argsToJSON(WXJSObject[] args) {

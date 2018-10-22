@@ -30,6 +30,7 @@
 #include "core/render/node/factory/render_creator.h"
 #include "core/bridge/platform_bridge.h"
 #include "core/data_render/binary_file.h"
+#include "core/data_render/common_error.h"
 
 #define VRENDER_LOG true
 
@@ -166,6 +167,13 @@ void VNodeRenderManager::InitVM() {
 }
 
 void VNodeRenderManager::CreatePage(const std::string &input, const std::string &page_id, const  std::string &options, const std::string &init_data) {
+    std::string err = CreatePageImpl(input, page_id, options, init_data);
+    if (!err.empty()) {
+        WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id.c_str(), nullptr, err.c_str());
+    }
+}
+
+std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data) {
     InitVM();
     auto start = std::chrono::steady_clock::now();
     ExecState *exec_state = new ExecState(g_vm);
@@ -188,8 +196,8 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
     //auto compile_start = std::chrono::steady_clock::now();
     exec_state->Compile(err);
     if (!err.empty()) {
-      LOGE("DATA_RENDER, compile err: %s",err.c_str());
-      return;
+        LOGE("DATA_RENDER, compile err: %s",err.c_str());
+        return err;
     }
     auto compile_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], Compile time:[%lld]\n", compile_post.count());
@@ -198,15 +206,15 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
     exec_state->Execute(err);
     if (!err.empty()) {
         LOGE("DATA_RENDER, exec err: %s",err.c_str());
-        return;
+        return err;
     }
     if (exec_state->context()->root() == NULL) {
-        return;
+        return err;
     }
     CreatePageInternal(page_id, exec_state->context()->root());
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
-
     LOGD("DATA_RENDER, All time %lld\n", duration_post.count());
+    return err;
 }
     
 void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state, std::vector<std::string>& registers) {
@@ -229,17 +237,23 @@ void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state, std::vect
     } while (0);
 }
 
-void VNodeRenderManager::CreatePage(const char *contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data) {
-    BinaryFile *file = BinaryFile::instance();
-    file->set_input(contents);
-    file->set_length(length);
+std::string VNodeRenderManager::CreatePageWithOpcode(const std::string& page_id, const std::string& options, const std::string& init_data) {
     InitVM();
     auto start = std::chrono::steady_clock::now();
     ExecState *exec_state = new ExecState(g_vm);
     exec_states_.insert({page_id, exec_state});
     VNodeExecEnv::InitCFuncEnv(exec_state);
     std::string err;
-    exec_state->startDecode();
+    try {
+        exec_state->startDecode();
+    } catch (std::exception &e) {
+        auto error = static_cast<Error *>(&e);
+        if (error) {
+            err = error->what();
+            std::cerr << error->what() << std::endl;
+        }
+        return err;
+    }
     exec_state->endDecode();
     if (init_data.length() > 0) {
         VNodeExecEnv::InitInitDataValue(exec_state, init_data);
@@ -248,14 +262,26 @@ void VNodeRenderManager::CreatePage(const char *contents, unsigned long length, 
     LOGD("[DATA_RENDER], Decoder time:[%lld]\n", decoder_post.count());
     exec_state->Execute(err);
     if (!err.empty()) {
-        return;
+        return err;
     }
     if (exec_state->context()->root() == NULL) {
-        return;
+        err = "Root vonde is null";
+        return err;
     }
     CreatePageInternal(page_id, exec_state->context()->root());
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], All time:[%lld]\n", duration_post.count());
+    return err;
+}
+
+void VNodeRenderManager::CreatePage(const char *contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data) {
+    BinaryFile *file = BinaryFile::instance();
+    file->set_input(contents);
+    file->set_length(length);
+    string err = CreatePageWithOpcode(page_id, options, init_data);
+    if (!err.empty()) {
+        WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id.c_str(), nullptr, err.c_str());
+    }
 }
 
 bool VNodeRenderManager::RefreshPage(const std::string& page_id,

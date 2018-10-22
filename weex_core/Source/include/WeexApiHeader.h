@@ -146,6 +146,9 @@ typedef void (*FuncCallHandlePostMessage)(const char *vimId, const char *data, i
 typedef void
 (*FuncCallDIspatchMessage)(const char *clientId, const char *data, int dataLength, const char *callback, const char *vmId);
 
+typedef void
+(*FuncOnReceivedResult)(long callback_id, std::unique_ptr<WeexJSResult>& result);
+
 
 typedef struct FunctionsExposedByCore {
     FuncSetJSVersion funcSetJSVersion;
@@ -172,6 +175,7 @@ typedef struct FunctionsExposedByCore {
     FuncT3dLinkNative funcT3dLinkNative;
     FuncCallHandlePostMessage funcCallHandlePostMessage;
     FuncCallDIspatchMessage funcCallDIspatchMessage;
+    FuncOnReceivedResult  funcOnReceivedResult;
 } FunctionsExposedByCore;
 
 typedef void (*FuncCallSetJSVersion)(const char* version);
@@ -270,6 +274,9 @@ typedef int (*FuncExeJS)(const char *instanceId, const char *nameSpace, const ch
 typedef std::unique_ptr<WeexJSResult>(*FuncExeJSWithResult)(const char *instanceId, const char *nameSpace, const char *func,
                                            std::vector<VALUE_WITH_TYPE *> &params);
 
+typedef void(*FuncExeJSWithResultId)(const char *instanceId, const char *nameSpace, const char *func,
+                                           std::vector<VALUE_WITH_TYPE *> &params, long callback_id);
+
 typedef int (*FuncCreateInstance)(const char *instanceId, const char *func, const char *script, const char *opts,
                                   const char *initData, const char *extendsApi);
 
@@ -290,6 +297,7 @@ typedef struct FunctionsExposedByJS {
     FuncExeCTimeCallback funcExeCTimeCallback;
     FuncExeJS funcExeJS;
     FuncExeJSWithResult funcExeJSWithResult;
+    FuncExeJSWithResultId funcExeJSWithResultId;
     FuncCreateInstance funcCreateInstance;
     FuncExeJSOnInstance funcExeJSOnInstance;
     FuncDestroyInstance funcDestroyInstance;

@@ -442,6 +442,20 @@ static void DispatchMessage(const char *client_id, const char *data, int dataLen
                                   callback.c_str(), vm_id.c_str());
           }));
 }
+
+static void OnReceivedResult(long callback_id,
+                             std::unique_ptr<WeexJSResult> &result) {
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+      weex::base::MakeCopyable([callback_id, result = std::move(result)]() {
+        WeexCoreManager::Instance()
+            ->script_bridge()
+            ->core_side()
+            ->OnReceivedResult(
+                callback_id,
+                const_cast<std::unique_ptr<WeexJSResult> &>(result));
+      }));
+}
+
 static void ReportException(const char *page_id, const char *func,
                             const char *exception_string) {
   //  WeexCoreManager::Instance()->script_bridge()->core_side()->ReportException(
@@ -491,7 +505,8 @@ FunctionsExposedByCore *ScriptBridgeInMultiSo::GetExposedFunctions() {
                                  CallGCanvasLinkNative,
                                  CallT3DLinkNative,
                                  PostMessage,
-                                 DispatchMessage};
+                                 DispatchMessage,
+                                 OnReceivedResult};
   auto functions =
       (FunctionsExposedByCore *)malloc(sizeof(FunctionsExposedByCore));
   memset(functions, 0, sizeof(FunctionsExposedByCore));

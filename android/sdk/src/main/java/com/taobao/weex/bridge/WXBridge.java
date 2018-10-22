@@ -19,6 +19,7 @@
 package com.taobao.weex.bridge;
 
 import android.util.Log;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -60,6 +61,7 @@ public class WXBridge implements IWXBridge {
   private native int nativeExecJSService(String javascript);
 
   public native byte[] nativeExecJSWithResult(String instanceId, String _namespace, String _function, WXJSObject[] args);
+  public native void nativeExecJSWithCallback(String instanceId, String _namespace, String _function, WXJSObject[] args, long callbackId);
 
   public native int nativeCreateInstanceContext(String instanceId, String name, String function, WXJSObject[] args);
 
@@ -138,8 +140,21 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public byte[] execJSWithResult(String instanceId, String namespace, String function, WXJSObject[] args) {
-    return nativeExecJSWithResult(instanceId, namespace, function, args);
+  public void execJSWithCallback(String instanceId, String namespace, String function, WXJSObject[] args, ResultCallback callback) {
+    if (callback == null) {
+      execJS(instanceId, namespace, function, args);
+    }
+    nativeExecJSWithCallback(instanceId, namespace, function, args,
+            ResultCallbackManager.generateCallbackId(callback));
+  }
+
+  // Result from js engine
+  @CalledByNative
+  public void onReceivedResult(long callbackId, byte[] result) {
+    ResultCallback callback = ResultCallbackManager.removeCallbackById(callbackId);
+    if (callback != null) {
+       callback.onReceiveResult(result);
+    }
   }
 
   @Override

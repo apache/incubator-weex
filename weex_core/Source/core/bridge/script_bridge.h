@@ -79,6 +79,8 @@ class ScriptBridge {
     virtual void ReportException(const char *page_id, const char *func,
                                  const char *exception_string) = 0;
     virtual void SetJSVersion(const char *js_version) = 0;
+    virtual void OnReceivedResult(long callback_id,
+                                  std::unique_ptr<WeexJSResult> &result) = 0;
 
     inline ScriptBridge *bridge() { return bridge_; }
 
@@ -123,6 +125,11 @@ class ScriptBridge {
     virtual std::unique_ptr<WeexJSResult>  ExecJSWithResult(
         const char *instanceId, const char *nameSpace, const char *func,
         std::vector<VALUE_WITH_TYPE *> &params) = 0;
+
+    virtual void ExecJSWithCallback(const char *instanceId,
+                                    const char *nameSpace, const char *func,
+                                    std::vector<VALUE_WITH_TYPE *> &params,
+                                    long callback_id) = 0;
 
     virtual int CreateInstance(const char *instanceId, const char *func,
                                const char *script, const char *opts,

@@ -200,29 +200,11 @@ export default class Document {
       debugLog(`[destroy](${this.id},document,${this.ref}) `
         + `Destroy document (id: "${this.id}", URL: "${this.URL}")`)
     }
-
-    removeDoc(this.id)
-    delete this.id
-    delete this.URL
-    delete this.documentElement
-    delete this.ownerDocument
-    delete this.body
-
-    // remove listener and taskCenter
-    delete this.listener
     this.taskCenter.destroyCallback()
-    delete this.taskCenter
-
-    // remove nodeMap
-    for (const id in this.nodeMap) {
-      try {
-        if (typeof this.nodeMap[id] !== 'undefined') {
-          this.nodeMap[id].destroy()
-        }
-      }
-      catch (e) {}
-    }
+    delete this.listener
     delete this.nodeMap
+    delete this.taskCenter
+    removeDoc(this.id)
   }
 }
 

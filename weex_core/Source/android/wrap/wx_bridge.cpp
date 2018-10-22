@@ -170,10 +170,13 @@ static jlongArray GetRenderFinishTime(JNIEnv* env, jobject jcaller,
 
 // Notice that this method is invoked from main thread.
 static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
-  return WeexCoreManager::Instance()
-      ->getPlatformBridge()
-      ->core_side()
-      ->NotifyLayout(jString2StrFast(env, instanceId));
+  if (WeexCoreManager::Instance()->getPlatformBridge()) {
+    return WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->core_side()
+        ->NotifyLayout(jString2StrFast(env, instanceId));
+  }
+  return false;
 }
 
 // Notice that this method is invoked from JS thread.
@@ -422,12 +425,15 @@ static jint ExecJS(JNIEnv* env, jobject jthis, jstring jinstanceid,
   return result;
 }
 
-static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
-                                   jstring instanceId, jstring _namespace,
-                                   jstring _function, jobjectArray args) {
+static void ExecJSWithCallback(JNIEnv* env, jobject jcaller,
+                             jstring instanceId,
+                             jstring _namespace,
+                             jstring _function,
+                             jobjectArray args,
+                             jlong callbackId) {
   if (_function == NULL || instanceId == NULL) {
     LOGE("native_execJS function is NULL");
-    return NULL;
+    return;
   }
   ScopedJStringUTF8 instance_id(env, instanceId);
   ScopedJStringUTF8 name_space(env, _namespace);
@@ -444,27 +450,19 @@ static jbyteArray ExecJSWithResult(JNIEnv* env, jobject jcaller,
     param = getValueWithTypePtr();
 
     auto wx_js_object = std::unique_ptr<WXJSObject>(
-        new WXJSObject(env, base::android::ScopedLocalJavaRef<jobject>(
-            env, env->GetObjectArrayElement(args, i))
-            .Get()));
+            new WXJSObject(env, base::android::ScopedLocalJavaRef<jobject>(
+                    env, env->GetObjectArrayElement(args, i))
+                    .Get()));
     addParamsFromJArgs(params, param, env, wx_js_object);
   }
 
-  auto result =
-      WeexCoreManager::Instance()
-          ->getPlatformBridge()
-          ->core_side()
-          ->ExecJSWithResult(instance_id.getChars(), name_space.getChars(),
-                             function.getChars(), params);
+  WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->core_side()
+      ->ExecJSWithCallback(instance_id.getChars(), name_space.getChars(),
+                           function.getChars(), params, callbackId);
 
-  if (result.get() == nullptr || result->data.get() == nullptr)
-    return nullptr;
-
-  jbyteArray array = env->NewByteArray(result->length);
-  env->SetByteArrayRegion(array, 0, result->length,
-                          reinterpret_cast<const jbyte*>(result->data.get()));
   freeParams(params);
-  return array;
 }
 
 static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller, jstring config) {
@@ -1048,6 +1046,20 @@ void WXBridge::ReportNativeInitStatus(JNIEnv* env, const char* statusCode,
       env, env->NewStringUTF(errorMsg));
   Java_WXBridge_reportNativeInitStatus(env, jni_object(), jni_status_code.Get(),
                                        jni_error_msg.Get());
+}
+
+
+void WXBridge::OnReceivedResult(JNIEnv *env, long callback_id,
+                                std::unique_ptr<WeexJSResult>& result) {
+
+  auto array = base::android::ScopedLocalJavaRef<jbyteArray>();
+  if (result != nullptr && result->length != 0) {
+    array.Reset(env, env->NewByteArray(result->length));
+    env->SetByteArrayRegion(array.Get(), 0, result->length,
+                            reinterpret_cast<const jbyte*>(result->data.get()));
+  }
+  Java_WXBridge_onReceivedResult(env, jni_object(), callback_id, array.Get());
+
 }
 
 void WXBridge::reset_clazz(JNIEnv* env, const char* className) {

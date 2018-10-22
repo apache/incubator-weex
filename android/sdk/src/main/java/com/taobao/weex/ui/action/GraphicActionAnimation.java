@@ -41,6 +41,7 @@ import android.view.animation.LinearInterpolator;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.animation.BackgroundColorProperty;
 import com.taobao.weex.ui.animation.HeightProperty;
 import com.taobao.weex.ui.animation.WXAnimationBean;
@@ -120,6 +121,12 @@ public class GraphicActionAnimation extends BasicGraphicAction {
 
     if (null != mAnimationBean.styles) {
       if(styleNeedInit) {
+        // Synchronize transformOrigin between component styles and animation style before
+        // animation start.
+        String transformOrigin = (String) component.getStyles().get(Constants.Name.TRANSFORM_ORIGIN);
+        if (TextUtils.isEmpty(mAnimationBean.styles.transformOrigin)) {
+          mAnimationBean.styles.transformOrigin = transformOrigin;
+        }
         mAnimationBean.styles.init(mAnimationBean.styles.transformOrigin,
             mAnimationBean.styles.transform, (int) component.getLayoutWidth(),
             (int) component.getLayoutHeight(),

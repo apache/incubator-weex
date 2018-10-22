@@ -21,8 +21,7 @@
 #import "WXLog.h"
 #import "WXSDKInstance.h"
 
-
-NSString *const WXURLLocalScheme = @"local";
+static NSString *const WXURLLocalScheme = @"local";
 
 @implementation WXURLRewriteDefaultImpl
 

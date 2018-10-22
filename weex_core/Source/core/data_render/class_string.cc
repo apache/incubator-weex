@@ -182,7 +182,7 @@ char *url_encode(char *str) {
         if (isalnum(*pstr) || *pstr == '-' || *pstr == '_' || *pstr == '.' || *pstr == '~')
             *pbuf++ = *pstr;
         else if (*pstr == ' ')
-            *pbuf++ = '+';
+            *pbuf++ = '%', *pbuf++ = '2', *pbuf++ = '0';
         else
             *pbuf++ = '%', *pbuf++ = to_hex(*pstr >> 4), *pbuf++ = to_hex(*pstr & 15);
         pstr++;
@@ -229,6 +229,73 @@ Value encodeURIComponent(ExecState *exec_state) {
         free(uri);
     }
     return exec_state->string_table()->StringFromUTF8(dst);
+}
+    
+std::string utf8chr(int cp)
+{
+    char c[5] = { 0x00,0x00,0x00,0x00,0x00 };
+    if (cp <= 0x7F) {
+        c[0] = cp;
+    }
+    else if (cp <= 0x7FF) {
+        c[0] = (cp >> 6) + 192;
+        c[1] = (cp & 63) + 128;
+    }
+    else if (0xd800 <= cp && cp <= 0xdfff) {
+        //invalid block of utf8
+    }
+    else if (cp <= 0xFFFF)
+    {
+        c[0] = (cp >> 12) + 224;
+        c[1]= ((cp >> 6) & 63) + 128;
+        c[2] = (cp & 63) + 128;
+    }
+    else if (cp <= 0x10FFFF) {
+        c[0] = (cp >> 18) + 240;
+        c[1] = ((cp >> 12) & 63) + 128;
+        c[2] = ((cp >> 6) & 63) + 128;
+        c[3] = (cp & 63) + 128;
+    }
+    return std::string(c);
+}
+    
+std::string utf8_decode(std::string &input) {
+    do {
+        size_t length = input.length();
+        if (!length) {
+            break;
+        }
+        const char *chars = input.c_str();
+        std::string utf8str = "";
+        for (int i = 0; i < length; i++) {
+            char c = chars[i];
+            if (c == '\\' && chars[i + 1] == 'u') {
+                int cc = 0;
+                for (int j = 0; j < 4; j++)
+                {
+                    char ch = tolower(chars[i + 2 + j]);
+                    if (('0' <= ch && ch <= '9') || ('a' <= ch && ch <= 'f')) {
+                        cc|= (from_hex(ch) << (3 - j) * 4);
+                    }
+                    else
+                    {
+                        cc = 0;
+                        break;
+                    }
+                }
+                if (cc) {
+                    i += 5;
+                    utf8str += utf8chr(cc);
+                    continue;
+                }
+            }
+            utf8str.push_back(c);
+        }
+        return utf8str;
+        
+    } while (0);
+    
+    return input;
 }
 
 Value indexOf(ExecState* exec_state) {

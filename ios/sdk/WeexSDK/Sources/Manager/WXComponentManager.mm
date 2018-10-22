@@ -220,6 +220,7 @@ static NSThread *WXComponentThread;
     WXAssertParam(ref);
     WXAssertParam(type);
     WXAssertParam(renderObject);
+    WXAssert(_rootComponent == nil, @"Create body is invoked twice.");
     
     _rootComponent = [self _buildComponent:ref type:type supercomponent:nil styles:styles attributes:attributes events:events renderObject:renderObject];
     
@@ -860,6 +861,17 @@ static NSThread *WXComponentThread;
         if (instance.renderFinish) {
             [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:@{@"threadName":WXTUIThread}];
             instance.renderFinish(rootView);
+        }
+    }];
+}
+
+- (void)renderFailed:(NSError *)error {
+    WXAssertComponentThread();
+
+    WXSDKInstance *instance  = self.weexInstance;
+    [self _addUITask:^{
+        if (instance.onFailed) {
+            instance.onFailed(error);
         }
     }];
 }

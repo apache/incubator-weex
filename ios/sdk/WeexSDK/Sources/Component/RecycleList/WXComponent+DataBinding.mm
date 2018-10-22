@@ -170,7 +170,7 @@ static JSContext *jsContext;
         if (!needDisplay) {
             self.displayType = WXDisplayTypeNone;
             return;
-        } else if (needDisplay && !_isNeedJoinLayoutSystem) {
+        } else if (needDisplay) {
             self.displayType = WXDisplayTypeBlock;
         }
     }

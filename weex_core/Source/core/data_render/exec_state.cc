@@ -128,8 +128,8 @@ void ExecState::startEncode() {
 
     int magic_number = 0x6d736100;
     unsigned version = 1;
-    file->write((char*)&magic_number, sizeof(int));
-    file->write((char*)&version, sizeof(unsigned));
+    file->write((char*)&magic_number, sizeof(int32_t));
+    file->write((char*)&version, sizeof(u_int32_t));
 
     encodeStringSection();
     encodeTableSection();
@@ -150,8 +150,8 @@ void ExecState::encodeStringSection() {
     unsigned size = static_cast<unsigned>(store.size());
     BinaryFile* file = BinaryFile::instance();
 
-    file->write((char*)&id, sizeof(unsigned));
-    file->write((char*)&size, sizeof(unsigned));
+    file->write((char*)&id, sizeof(u_int32_t));
+    file->write((char*)&size, sizeof(u_int32_t));
     for (auto &mapString : store) {
         unsigned length = static_cast<unsigned int>(mapString.first.length()) + 1;
         file->write(mapString.first.c_str(), static_cast<unsigned int>(sizeof(char) * length));
@@ -164,11 +164,11 @@ void ExecState::encodeArraySection() {
     unsigned size = static_cast<unsigned>(arrays.size());
     BinaryFile* file = BinaryFile::instance();
 
-    file->write((char*)&id, sizeof(unsigned));
-    file->write((char*)&size, sizeof(unsigned));
+    file->write((char*)&id, sizeof(u_int32_t));
+    file->write((char*)&size, sizeof(u_int32_t));
     for (auto array : arrays) {
         unsigned itemSize = static_cast<unsigned>(array->items.size());
-        file->write((char*)&itemSize, sizeof(unsigned));
+        file->write((char*)&itemSize, sizeof(u_int32_t));
         for (auto &value : array->items) {
             encodeValue(value);
         }
@@ -182,12 +182,12 @@ void ExecState::encodeTableSection() {
     unsigned size = static_cast<unsigned>(tables.size());
     BinaryFile* file = BinaryFile::instance();
 
-    file->write((char*)&id, sizeof(unsigned));
-    file->write((char*)&size, sizeof(unsigned));
+    file->write((char*)&id, sizeof(u_int32_t));
+    file->write((char*)&size, sizeof(u_int32_t));
 
     for (auto table : tables) {
         unsigned mapSize = static_cast<unsigned>(table->map.size());
-        file->write((char*)&mapSize, sizeof(unsigned));
+        file->write((char*)&mapSize, sizeof(u_int32_t));
         for (auto &map : table->map) {
             std::string name = map.first;
             Value value = map.second;
@@ -211,8 +211,8 @@ void ExecState::encodeFunctionSection() {
         func_states.push_back(func);
     }
     unsigned size = static_cast<unsigned>(func_states.size());
-    file->write((char*)&id, sizeof(unsigned));
-    file->write((char*)&size, sizeof(unsigned));
+    file->write((char*)&id, sizeof(u_int32_t));
+    file->write((char*)&size, sizeof(u_int32_t));
 
     for (auto &func_state : func_states) {
         auto it = std::find(func_states.begin(), func_states.end(), func_state->super_func());
@@ -220,20 +220,23 @@ void ExecState::encodeFunctionSection() {
         if (it != func_states.end()) {
             super_index = static_cast<int>(it - func_states.begin());
         }
-        file->write((char*)&super_index, sizeof(int));
+        file->write((char*)&super_index, sizeof(int32_t));
 
         bool is_class_func = func_state->is_class_func();
-        file->write((char*)&is_class_func, sizeof(int));
+        file->write((char*)&is_class_func, sizeof(int8_t));
+
+        int argc = func_state->argc();
+        file->write((char*)&argc, sizeof(int32_t));
 
         unsigned opcodeSize = static_cast<unsigned>(func_state->instructions().size());
-        file->write((char*)&opcodeSize, sizeof(unsigned));
+        file->write((char*)&opcodeSize, sizeof(u_int32_t));
         for (int i=0; i<opcodeSize; i++) {
             unsigned opcode = static_cast<unsigned>(func_state->instructions()[i]);
-            file->write((char*)&opcode, sizeof(unsigned));
+            file->write((char*)&opcode, sizeof(u_int32_t));
         }
 
         unsigned constantSize = static_cast<unsigned>(func_state->GetConstantSize());
-        file->write((char*)&constantSize, sizeof(unsigned));
+        file->write((char*)&constantSize, sizeof(u_int32_t));
         for (int i=0; i<constantSize; i++) {
             encodeValue(*(func_state->GetConstant(i)));
         }
@@ -244,8 +247,8 @@ void ExecState::encodeStartSection() {
     BinaryFile* file = BinaryFile::instance();
     unsigned id = Section::START_SECTION;
     unsigned index = 0;
-    file->write((char*)&id, sizeof(unsigned));
-    file->write((char*)&index, sizeof(unsigned));
+    file->write((char*)&id, sizeof(u_int32_t));
+    file->write((char*)&index, sizeof(u_int32_t));
 }
 
 void ExecState::encodeGlobalSection() {
@@ -253,12 +256,12 @@ void ExecState::encodeGlobalSection() {
     unsigned id = Section::GLOBAL_SECTION;
     unsigned size = static_cast<unsigned>(global_->size()) - global_->register_size();
 
-    file->write((char*)&id, sizeof(unsigned));
-    file->write((char*)&size, sizeof(unsigned));
+    file->write((char*)&id, sizeof(u_int32_t));
+    file->write((char*)&size, sizeof(u_int32_t));
     int init_data_index = global_->IndexOf("_init_data");
     int weex_data_index = global_->IndexOf("__weex_data__");
-    file->write((char*)&init_data_index, sizeof(int));
-    file->write((char*)&weex_data_index, sizeof(int));
+    file->write((char*)&init_data_index, sizeof(int32_t));
+    file->write((char*)&weex_data_index, sizeof(int32_t));
 
     for (int i=global_->register_size(); i<global_->size(); i++) {
         Value* value = global_->Find(i);
@@ -271,12 +274,12 @@ void ExecState::encodeGlobalVariableSection() {
     unsigned id = Section::GLOBAL_VARIABLE_SECTION;
     unsigned size = static_cast<unsigned>(global_variables_.size());
 
-    file->write((char*)&id, sizeof(unsigned));
-    file->write((char*)&size, sizeof(unsigned));
+    file->write((char*)&id, sizeof(u_int32_t));
+    file->write((char*)&size, sizeof(u_int32_t));
     for (auto variable : global_variables_) {
         unsigned length = static_cast<unsigned>(variable.first.length()) + 1;
         file->write(variable.first.c_str(), static_cast<unsigned int>(sizeof(char) * length));
-        file->write((char*)&variable.second, sizeof(long));
+        file->write((char*)&variable.second, sizeof(int64_t));
     }
 }
 
@@ -287,15 +290,15 @@ void ExecState::encodeStyleSection() {
     unsigned size = static_cast<unsigned>(styles.size());
     BinaryFile* file = BinaryFile::instance();
 
-    file->write((char*)&id, sizeof(unsigned));
-    file->write((char*)&size, sizeof(unsigned));
+    file->write((char*)&id, sizeof(u_int32_t));
+    file->write((char*)&size, sizeof(u_int32_t));
 
     for (auto style : styles) {
         Value value(string_table()->StringFromUTF8(style.first));
         encodeValue(value);
         const json11::Json::object& items = style.second.object_items();
         unsigned itemsSize = static_cast<unsigned>(items.size());
-        file->write((char*)&itemsSize, sizeof(unsigned));
+        file->write((char*)&itemsSize, sizeof(u_int32_t));
         for (auto it = items.begin(); it != items.end(); it++) {
             unsigned length = static_cast<unsigned>(it->first.length()) + 1;
             file->write(it->first.c_str(), static_cast<unsigned int>(sizeof(char) * length));
@@ -311,15 +314,15 @@ void ExecState::encodeRefSection() {
     unsigned size = static_cast<unsigned>(refs_.size());
     BinaryFile* file = BinaryFile::instance();
 
-    file->write((char*)&id, sizeof(unsigned));
-    file->write((char*)&size, sizeof(unsigned));
+    file->write((char*)&id, sizeof(u_int32_t));
+    file->write((char*)&size, sizeof(u_int32_t));
     for (auto ref : refs_) {
         Value value;
         value.type = Value::Type::FUNC;
         value.f = ref->func_state_;
         encodeValue(value);
         long register_id = ref->register_id();
-        file->write((char*)&register_id, sizeof(long));
+        file->write((char*)&register_id, sizeof(int64_t));
         encodeValue(ref->value_);
     }
 }
@@ -331,8 +334,8 @@ void ExecState::encodeClassSection() {
     unsigned size = static_cast<unsigned>(descs.size());
     BinaryFile* file = BinaryFile::instance();
 
-    file->write((char*)&id, sizeof(unsigned));
-    file->write((char*)&size, sizeof(unsigned));
+    file->write((char*)&id, sizeof(u_int32_t));
+    file->write((char*)&size, sizeof(u_int32_t));
 
     int count = 0;
     for (auto desc : descs) {
@@ -342,9 +345,9 @@ void ExecState::encodeClassSection() {
         }
 
         int superIndex = class_factory_->findDesc(desc->p_super_);
-        file->write((char*)&superIndex, sizeof(int));
+        file->write((char*)&superIndex, sizeof(int32_t));
         unsigned static_func_size = static_cast<unsigned>(desc->static_funcs_->size());
-        file->write((char*)&static_func_size, sizeof(unsigned));
+        file->write((char*)&static_func_size, sizeof(u_int32_t));
         for (int i=0; i<static_func_size; i++) {
             Value* value = desc->static_funcs_->Find(i);
             encodeValue(*value);
@@ -353,18 +356,18 @@ void ExecState::encodeClassSection() {
             for (auto &item : desc->static_funcs_->map()) {
                 if (item.second == i) {
                     length = static_cast<unsigned>(item.first.length()) + 1;
-                    file->write((char*)&length, sizeof(unsigned));
+                    file->write((char*)&length, sizeof(u_int32_t));
                     file->write(item.first.c_str(), static_cast<unsigned int>(sizeof(char) * length));
                     break;
                 }
             }
             if (length == 0) {
-                file->write((char*)&length, sizeof(unsigned));
+                file->write((char*)&length, sizeof(u_int32_t));
             }
         }
 
         unsigned class_func_size = static_cast<unsigned>(desc->funcs_->size());
-        file->write((char*)&class_func_size, sizeof(unsigned));
+        file->write((char*)&class_func_size, sizeof(u_int32_t));
         for (int i=0; i<class_func_size; i++) {
             Value* value = desc->funcs_->Find(i);
             encodeValue(*value);
@@ -373,13 +376,13 @@ void ExecState::encodeClassSection() {
             for (auto &item : desc->funcs_->map()) {
                 if (item.second == i) {
                     length = static_cast<unsigned>(item.first.length()) + 1;
-                    file->write((char*)&length, sizeof(unsigned));
+                    file->write((char*)&length, sizeof(u_int32_t));
                     file->write(item.first.c_str(), static_cast<unsigned int>(sizeof(char) * length));
                     break;
                 }
             }
             if (length == 0) {
-                file->write((char*)&length, sizeof(unsigned));
+                file->write((char*)&length, sizeof(u_int32_t));
             }
         }
     }
@@ -387,7 +390,7 @@ void ExecState::encodeClassSection() {
 
 void ExecState::encodeValue(const Value &value) {
     BinaryFile* file = BinaryFile::instance();
-    file->write((char*)&value.type, sizeof(unsigned));
+    file->write((char*)&value.type, sizeof(u_int32_t));
 
     if (value.type == Value::Type::TABLE) {
         std::vector<Table *> tables = class_factory_->tables();
@@ -398,7 +401,7 @@ void ExecState::encodeValue(const Value &value) {
             }
             payload++;
         }
-        file->write((char*)&payload, sizeof(int));
+        file->write((char*)&payload, sizeof(int32_t));
     }
 
     if (value.type == Value::Type::STRING) {
@@ -411,7 +414,7 @@ void ExecState::encodeValue(const Value &value) {
             }
             payload++;
         }
-        file->write((char*)&payload, sizeof(int));
+        file->write((char*)&payload, sizeof(int32_t));
     }
 
     if (value.type == Value::Type::INT) {
@@ -442,7 +445,7 @@ void ExecState::encodeValue(const Value &value) {
             }
             payload++;
         }
-        file->write((char*)&payload, sizeof(int));
+        file->write((char*)&payload, sizeof(int32_t));
     }
 
     if (value.type == Value::Type::ARRAY) {
@@ -454,7 +457,7 @@ void ExecState::encodeValue(const Value &value) {
             }
             payload++;
         }
-        file->write((char*)&payload, sizeof(int));
+        file->write((char*)&payload, sizeof(int32_t));
     }
 
     if (value.type == Value::Type::CLASS_DESC) {
@@ -466,7 +469,7 @@ void ExecState::encodeValue(const Value &value) {
             }
             payload++;
         }
-        file->write((char*)&payload, sizeof(int));
+        file->write((char*)&payload, sizeof(int32_t));
     }
 }
 
@@ -480,19 +483,19 @@ bool ExecState::startDecode() {
 
     BinaryFile* file = BinaryFile::instance();
     int magic_number;
-    file->read((char*)&magic_number, sizeof(int));
+    file->read((char*)&magic_number, sizeof(int32_t));
     if (magic_number != 0x6d736100) {
-        return false;
+        throw OpcodeDecodeError("The format of file is not wasm");
     }
     unsigned version;
-    file->read((char*)&version, sizeof(unsigned));
-    if (version != 1) {
-        return false;
+    file->read((char*)&version, sizeof(u_int32_t));
+    if (version > 1) {
+        throw OpcodeDecodeError("The version of file can not support");
     }
 
     while (!file->eof()) {
         Section section_id = NULL_SECTION;
-        file->read((char*)&section_id, sizeof(unsigned));
+        file->read((char*)&section_id, sizeof(u_int32_t));
         switch (section_id) {
             case STRING_SECTION:
                 decodeStringSection();
@@ -536,7 +539,7 @@ void ExecState::decodeStringSection()
     BinaryFile* file = BinaryFile::instance();
 
     unsigned count = 0;
-    file->read((char*)&count, sizeof(unsigned));
+    file->read((char*)&count, sizeof(u_int32_t));
     if (count == 0) {
         return;
     }
@@ -559,7 +562,7 @@ void ExecState::decodeTableSection() {
     BinaryFile* file = BinaryFile::instance();
 
     unsigned count = 0;
-    file->read((char*)&count, sizeof(unsigned));
+    file->read((char*)&count, sizeof(u_int32_t));
     if (count == 0) {
         return;
     }
@@ -568,7 +571,7 @@ void ExecState::decodeTableSection() {
         Value tableValue = class_factory_->CreateTable();
         Table* table = reinterpret_cast<Table *>(tableValue.gc);
         unsigned mapSize=0;
-        file->read((char*)&mapSize, sizeof(unsigned));
+        file->read((char*)&mapSize, sizeof(u_int32_t));
         for (int j=0; j<mapSize; j++) {
             std::string str;
             char c;
@@ -590,7 +593,7 @@ void ExecState::decodeFunctionSection() {
     BinaryFile* file = BinaryFile::instance();
 
     unsigned count = 0;
-    file->read((char*)&count, sizeof(unsigned));
+    file->read((char*)&count, sizeof(u_int32_t));
     if (count == 0) {
         return;
     }
@@ -599,22 +602,26 @@ void ExecState::decodeFunctionSection() {
     for (int i=0; i<count; i++) {
         FuncState* func_state = new FuncState;
         int super_index = -1;
-        file->read((char*)&super_index, sizeof(int));
+        file->read((char*)&super_index, sizeof(int32_t));
         func_state->set_super_index(super_index);
 
         bool is_class_func = false;
-        file->read((char*)&is_class_func, sizeof(bool));
+        file->read((char*)&is_class_func, sizeof(int8_t));
         func_state->set_is_class_func(is_class_func);
 
+        int argc = 0;
+        file->read((char*)&argc, sizeof(int32_t));
+        func_state->argc() = argc;
+
         unsigned op_code_count = 0;
-        file->read((char*)&op_code_count, sizeof(unsigned));
+        file->read((char*)&op_code_count, sizeof(u_int32_t));
         for (int j=0; j<op_code_count; j++) {
             unsigned opcode;
-            file->read((char*)&opcode, sizeof(unsigned));
+            file->read((char*)&opcode, sizeof(u_int32_t));
             func_state->AddInstruction(opcode);
         }
         unsigned local_count = 0;
-        file->read((char*)&local_count, sizeof(unsigned));
+        file->read((char*)&local_count, sizeof(u_int32_t));
         for (int j=0; j<local_count; j++) {
             Value value;
             decodeValue(value);
@@ -635,19 +642,19 @@ void ExecState::decodeFunctionSection() {
 void ExecState::decodeStartSection() {
     BinaryFile* file = BinaryFile::instance();
     unsigned start_index;
-    file->read((char*)&start_index, sizeof(unsigned));
+    file->read((char*)&start_index, sizeof(u_int32_t));
 }
 
 void ExecState::decodeGlobalSection() {
     BinaryFile* file = BinaryFile::instance();
 
     unsigned count = 0;
-    file->read((char*)&count, sizeof(unsigned));
+    file->read((char*)&count, sizeof(u_int32_t));
 
     int init_data_index = -1;
     int weex_data_index = -1;
-    file->read((char*)&init_data_index, sizeof(int));
-    file->read((char*)&weex_data_index, sizeof(int));
+    file->read((char*)&init_data_index, sizeof(int32_t));
+    file->read((char*)&weex_data_index, sizeof(int32_t));
 
     unsigned register_size = global_->register_size();
     for (int i=0; i<count; i++) {
@@ -669,7 +676,7 @@ void ExecState::decodeGlobalVariableSection() {
     BinaryFile* file = BinaryFile::instance();
 
     unsigned count = 0;
-    file->read((char*)&count, sizeof(unsigned));
+    file->read((char*)&count, sizeof(u_int32_t));
     if (count == 0) {
         return;
     }
@@ -695,7 +702,7 @@ void ExecState::decodeStyleSection() {
     BinaryFile* file = BinaryFile::instance();
 
     unsigned count = 0;
-    file->read((char*)&count, sizeof(unsigned));
+    file->read((char*)&count, sizeof(u_int32_t));
     if (count == 0) {
         return;
     }
@@ -705,7 +712,7 @@ void ExecState::decodeStyleSection() {
         decodeValue(value);
 
         unsigned itemsSize = 0;
-        file->read((char*)&itemsSize, sizeof(unsigned));
+        file->read((char*)&itemsSize, sizeof(u_int32_t));
         //json11::Json::object items;
         std::unordered_map<std::string, json11::Json> items;
         for (int j=0; j<itemsSize; j++) {
@@ -739,12 +746,12 @@ void ExecState::decodeStyleSection() {
 void ExecState::decodeArraySection() {
     BinaryFile* file = BinaryFile::instance();
     unsigned count = 0;
-    file->read((char*)&count, sizeof(unsigned));
+    file->read((char*)&count, sizeof(u_int32_t));
     for (int i=0; i<count; i++) {
         Value value = class_factory_->CreateArray();
         Array* array = reinterpret_cast<Array *>(value.gc);
         unsigned itemSize = 0;
-        file->read((char*)&itemSize, sizeof(unsigned));
+        file->read((char*)&itemSize, sizeof(u_int32_t));
         for (int j=0; j<itemSize; j++) {
             Value itemValue;
             decodeValue(itemValue);
@@ -756,7 +763,7 @@ void ExecState::decodeArraySection() {
 void ExecState::decodeRefSection() {
     BinaryFile* file = BinaryFile::instance();
     unsigned count = 0;
-    file->read((char*)&count, sizeof(unsigned));
+    file->read((char*)&count, sizeof(u_int32_t));
     for (int i=0; i<count; i++) {
         Value value;
         decodeValue(value);
@@ -772,23 +779,23 @@ void ExecState::decodeRefSection() {
 void ExecState::decodeClassSection() {
     BinaryFile* file = BinaryFile::instance();
     unsigned count = 0;
-    file->read((char*)&count, sizeof(unsigned));
+    file->read((char*)&count, sizeof(u_int32_t));
 
     size_t size = class_factory_->descs().size();
     for (int i=0; i<count - size; i++) {
         Value value = class_factory_->CreateClassDescriptor(nullptr);
         ClassDescriptor* desc = reinterpret_cast<ClassDescriptor *>(value.gc);
         int super_index = -1;
-        file->read((char*)&super_index, sizeof(int));
+        file->read((char*)&super_index, sizeof(int32_t));
         desc->super_index_ = super_index;
 
         unsigned static_func_size = 0;
-        file->read((char*)&static_func_size, sizeof(unsigned));
+        file->read((char*)&static_func_size, sizeof(u_int32_t));
         for (int j=0; j<static_func_size; j++) {
             Value static_value;
             decodeValue(static_value);
             unsigned length = 0;
-            file->read((char*)&length, sizeof(unsigned));
+            file->read((char*)&length, sizeof(u_int32_t));
             if (length > 0) {
                 std::unique_ptr<char[]> str(new char[length]);
                 file->read(str.get(), sizeof(char)*length);
@@ -799,13 +806,13 @@ void ExecState::decodeClassSection() {
         }
 
         unsigned class_func_size = 0;
-        file->read((char*)&class_func_size, sizeof(unsigned));
+        file->read((char*)&class_func_size, sizeof(u_int32_t));
         for (int j=0; j<class_func_size; j++) {
             Value class_value;
             decodeValue(class_value);
 
             unsigned length = 0;
-            file->read((char*)&length, sizeof(unsigned));
+            file->read((char*)&length, sizeof(u_int32_t));
             if (length > 0) {
                 std::unique_ptr<char[]> str(new char[length]);
                 file->read(str.get(), sizeof(char)*length);
@@ -820,7 +827,7 @@ void ExecState::decodeClassSection() {
 void ExecState::decodeValue(Value &value) {
     BinaryFile* file = BinaryFile::instance();
     unsigned valueType;
-    file->read((char*)&valueType, sizeof(int));
+    file->read((char*)&valueType, sizeof(u_int32_t));
     value.type = Value::Type(valueType);
 
     switch (valueType) {
@@ -830,7 +837,7 @@ void ExecState::decodeValue(Value &value) {
         case Value::Type::ARRAY:
         case Value::Type::CLASS_DESC: {
             value.gc = nullptr;
-            file->read((char*)&(value.index), sizeof(int));
+            file->read((char*)&(value.index), sizeof(int32_t));
         }
             break;
         case Value::Type::INT: {
@@ -1062,9 +1069,8 @@ void ExecState::Register(const std::string& name, Value value) {
 }
 
 void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
-    *stack_->top() = func + argc;
-    //LOGD("ExecStack::CallFunction:%i\n", (int)(func - stack_->base()));
     if (func->type == Value::Type::CFUNC) {
+        *stack_->top() = func + argc;
         Frame frame;
         frame.reg = func;
         frames_.push_back(frame);
@@ -1076,6 +1082,11 @@ void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
         frames_.pop_back();
     }
     else {
+        if (argc < func->f->argc()) {
+            size_t size = (func->f->argc() - argc) * sizeof(Value);
+            memset(func + argc + 1, 0, size);
+        }
+        *stack_->top() = func + argc;
         Frame frame;
         frame.func = func;
         frame.reg = func;

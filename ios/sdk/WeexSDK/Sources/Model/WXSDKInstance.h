@@ -24,7 +24,6 @@
 #import "WXResourceRequest.h"
 #import "WXBridgeProtocol.h"
 #import "WXApmForInstance.h"
-#import "WXType.h"
 
 extern NSString *const bundleUrlOptionKey;
 
@@ -77,7 +76,15 @@ extern NSString *const bundleUrlOptionKey;
  **/
 @property (nonatomic, assign) BOOL needPrerender;
 
+/**
+ * Custom info.
+ **/
 @property (nonatomic, strong) NSDictionary* containerInfo;
+
+/**
+ * Whether this instance is rendered or not. Please MUST not render an instance twice.
+ **/
+@property (nonatomic, assign, readonly) BOOL isRendered;
 
 /**
  * The state of current instance.
@@ -91,6 +98,7 @@ typedef NS_ENUM(NSInteger, WXState) {//state.code
     WeexInstanceBindChanged,
     WeexInstanceDestroy
 };
+
 
 typedef NS_ENUM(NSInteger, WXErrorType) {//error.domain
     TemplateErrorType = 1,

@@ -117,7 +117,7 @@ WeexJSConnection::WeexJSConnection()
     if (checkDirOrFileIsLink(SoUtils::crash_file_path())) {
         std::string tmp = SoUtils::crash_file_path();
         size_t length = tmp.length();
-        char buf[length];
+        char *buf = new char[length];
         memset(buf, 0, length);
         if (!getDirOrFileLink(SoUtils::crash_file_path(), buf, length)) {
             LOGE("getDirOrFileLink filePath(%s) error\n", SoUtils::crash_file_path());
@@ -125,6 +125,7 @@ WeexJSConnection::WeexJSConnection()
         } else {
             g_crashFileName = buf;
         }
+        delete []buf;
     } else {
         g_crashFileName = SoUtils::crash_file_path();
     }

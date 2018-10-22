@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,15 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.taobao.weex.bridge;
 
-// fix Promise Problem on JSContext of iOS7~8
-// @see https://bugs.webkit.org/show_bug.cgi?id=135866
-
-const { WXEnvironment } = global
-
-/* istanbul ignore next */
-if (typeof WXEnvironment !== 'undefined'
-  && WXEnvironment.platform === 'iOS'
-  && !WXEnvironment.__enable_native_promise__) {
-  global.Promise = undefined
+public interface ResultCallback<T> {
+    void onReceiveResult(T result);
 }

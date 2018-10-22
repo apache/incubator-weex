@@ -431,10 +431,12 @@ void CodeGenerator::Visit(FunctionStatement *node, void *data) {
         // make arguments var in thie front of stack;
         if (is_class_func) {
             block_->AddVariable("this", block_->NextRegisterId());
+            func_->func_state()->argc()++;
         }
         for (int i = 0; i < proto->GetArgs().size(); i++) {
             std::string arg = proto->GetArgs().at(i);
             block_->AddVariable(arg, block_->NextRegisterId());
+            func_->func_state()->argc()++;
         }
         node->body()->Accept(this, nullptr);
     }
@@ -505,18 +507,21 @@ void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
         // make arguments var in thie front of stack;
         if (is_class_func) {
             block_->AddVariable("this", block_->NextRegisterId());
+            func_->func_state()->argc()++;
         }
         // make arguments var in thie front of stack;
         for (int i = 0; i < node->args().size(); i++) {
             if (node->args()[i]->IsIdentifier()) {
                 std::string arg = node->args()[i]->AsIdentifier()->GetName();
                 block_->AddVariable(arg, block_->NextRegisterId());
+                func_->func_state()->argc()++;
             }
             else if (node->args()[i]->IsCommaExpression()) {
                 Handle<ExpressionList> arg_list = node->args()[i]->AsCommaExpression()->exprs();
                 for (int j = 0; j < arg_list->Size(); j++) {
                     std::string arg = arg_list->raw_list()[j]->AsIdentifier()->GetName();
                     block_->AddVariable(arg, block_->NextRegisterId());
+                    func_->func_state()->argc()++;
                 }
             }
             else {
