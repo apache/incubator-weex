@@ -17,8 +17,8 @@
  * under the License.
  */
 
-#ifndef CORE_DATA_RENDER_CONTEXT_H_
-#define CORE_DATA_RENDER_CONTEXT_H_
+#ifndef CORE_DATA_RENDER_EXEC_STATE_H
+#define CORE_DATA_RENDER_EXEC_STATE_H
 
 #include <cmath>
 #include <map>
@@ -169,28 +169,28 @@ class ExecStack {
   std::vector<Value> stack_;
   Value *top_;
 };
-
+    
 class ExecState {
  public:
-  ExecState(VM* vm);
+  ExecState(VM *vm);
   virtual ~ExecState() {}
   void Compile(std::string& error);
   void Execute(std::string& error);
   const Value Call(const std::string& func_name, const std::vector<Value>& args);
   const Value Call(Value *func, const std::vector<Value>& args);
   const Value Call(FuncState *func, const std::vector<Value>& args);
-    
   size_t GetArgumentCount();
-  Value* GetArgument(int index);
+  Value *GetArgument(int index);
   ValueRef *AddRef(FuncState *func_state, long register_id);
   ValueRef *FindRef(int index);
   void Register(const std::string& name, CFunction function);
   void Register(const std::string& name, Value value);
   std::vector<ValueRef *> &refs() { return refs_; };
-  inline Variables* global() { return global_.get(); }
-  inline ExecStack* stack() { return stack_.get(); }
-  inline StringTable* string_table() { return string_table_.get(); }
-  inline VNodeRenderContext* context() { return render_context_.get(); }
+  inline Variables *global() { return global_.get(); }
+  inline FuncState *func_state() { return func_state_.get(); }
+  inline ExecStack *stack() { return stack_.get(); }
+  inline StringTable *string_table() { return string_table_.get(); }
+  inline VNodeRenderContext *context() { return render_context_.get(); }
   inline ClassFactory *class_factory() { return class_factory_.get(); }
 
   void startEncode();
@@ -230,12 +230,8 @@ class ExecState {
   void resetArguments(Value *func, size_t argc);
   void CallFunction(Value *func, size_t argc, Value *ret);
   int findSuperIndex(const std::vector<FuncState*>& func_states);
-
-  VM* vm_;
-
+  VM *vm_;
   std::unique_ptr<ClassFactory> class_factory_;
-
-
   std::vector<Frame> frames_;
   std::vector<ValueRef *> refs_;
   std::unique_ptr<Variables> global_;
@@ -245,10 +241,11 @@ class ExecState {
   std::unique_ptr<VNodeRenderContext> render_context_;
   std::unordered_map<std::string, long> global_variables_;
   std::unordered_map<int, json11::Json> styles_;
+  size_t global_compile_index_{0};
 };
 
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
 
-#endif  // CORE_DATA_RENDER_CONTEXT_H_
+#endif  // CORE_DATA_RENDER_EXEC_STATE_H

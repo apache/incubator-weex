@@ -20,7 +20,6 @@ Value ClassFactory::CreateClassDescriptor(ClassDescriptor *p_super) {
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
-    descs_.push_back(desc);
     return value;
 }
     
@@ -29,7 +28,6 @@ Value ClassFactory::CreateArray() {
     Value value;
     SetAValue(&value, reinterpret_cast<GCObject *>(array));
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(array), value.type));
-    arrays_.push_back(array);
     return value;
 }
     
@@ -38,7 +36,6 @@ Value ClassFactory::CreateTable() {
     Value value;
     SetTValue(&value, reinterpret_cast<GCObject *>(table));
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(table), value.type));
-    tables_.push_back(table);
     return value;
 }
     
@@ -47,7 +44,6 @@ Value ClassFactory::ClassString() {
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
-    descs_.push_back(desc);
     return value;
 }
     
@@ -56,7 +52,6 @@ Value ClassFactory::ClassJSON() {
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
-    descs_.push_back(desc);
     return value;
 }
     
@@ -65,7 +60,6 @@ Value ClassFactory::ClassArray() {
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
-    descs_.push_back(desc);
     return value;
 }
     
@@ -74,13 +68,13 @@ Value ClassFactory::ClassObject() {
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
-    descs_.push_back(desc);
     return value;
 }
     
-int ClassFactory::findDesc(const ClassDescriptor *desc) {
+int ClassFactory::find(const ClassDescriptor *desc) {
+    std::vector<ClassDescriptor *> descs = this->descs();
     int index = 0;
-    for (auto d : descs_) {
+    for (auto d : descs) {
         if (desc == d) {
             return index;
         }
@@ -153,6 +147,16 @@ ClassFactory::~ClassFactory() {
     stores_.clear();
 }
 
+std::vector<ClassDescriptor *> ClassFactory::descs() {
+    std::vector<ClassDescriptor *> descs;
+    for (auto iter = stores_.begin(); iter != stores_.end(); iter++) {
+        if (iter->second == Value::Type::CLASS_DESC) {
+            descs.push_back(reinterpret_cast<ClassDescriptor *>(iter->first));
+        }
+    }
+    return descs;
+}
+    
 }
 }
 }

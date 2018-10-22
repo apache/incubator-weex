@@ -239,14 +239,10 @@ public:
     int Add(const std::string& name, Value value);
     int Set(const std::string& name, Value value);
     inline size_t size() {return values_.size();}
-    inline const std::map<std::string, int>& map() {return map_;}
-    inline unsigned register_size() {return register_size_;}
-    void incrementRegisterSize() {register_size_++;}
-    
+    inline const std::map<std::string, int>& map() { return map_; }    
 private:
     std::map<std::string, int> map_;
     std::vector<Value> values_;
-    unsigned register_size_ = 0;
 };
 
 struct ClassDescriptor;
@@ -582,7 +578,7 @@ inline int ToBool(const Value *o, bool &b) {
         b = NumValue(o);
     }
     else if (ttype(o) == Value::Type::STRING) {
-        b = o->str ? true : false;
+        b = (o->str && o->str->length() > 0) ? true : false;
     }
     else if (Value::Type::VALUE_REF == o->type) {
         return ToBool(o->var, b);

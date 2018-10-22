@@ -70,12 +70,12 @@ ExecState::ExecState(VM *vm)
       render_context_(new VNodeRenderContext),
       class_factory_(new ClassFactory()),
       global_variables_() {}
-
+    
 void ExecState::Compile(std::string& err) {
-
 #if DEBUG
   TimeCost tc("Compile");
 #endif
+  global_compile_index_ = global()->size();
   ValueRef::gs_ref_id = 0;
   err.clear();
   CodeGenerator generator(this);
@@ -173,44 +173,44 @@ void ExecState::encodeStringSection() {
 }
 
 void ExecState::encodeArraySection() {
-    unsigned id = Section::ARRAY_SECTION;
-    std::vector<Array*> arrays = class_factory_->arrays();
-    unsigned size = static_cast<unsigned>(arrays.size());
-    BinaryFile* file = BinaryFile::instance();
-
-    file->write((char*)&id, sizeof(u_int32_t));
-    file->write((char*)&size, sizeof(u_int32_t));
-    for (auto array : arrays) {
-        unsigned itemSize = static_cast<unsigned>(array->items.size());
-        file->write((char*)&itemSize, sizeof(u_int32_t));
-        for (auto &value : array->items) {
-            encodeValue(value);
-        }
-    }
+//    unsigned id = Section::ARRAY_SECTION;
+//    std::vector<Array*> arrays = class_factory_->arrays();
+//    unsigned size = static_cast<unsigned>(arrays.size());
+//    BinaryFile* file = BinaryFile::instance();
+//
+//    file->write((char*)&id, sizeof(u_int32_t));
+//    file->write((char*)&size, sizeof(u_int32_t));
+//    for (auto array : arrays) {
+//        unsigned itemSize = static_cast<unsigned>(array->items.size());
+//        file->write((char*)&itemSize, sizeof(u_int32_t));
+//        for (auto &value : array->items) {
+//            encodeValue(value);
+//        }
+//    }
 }
 
 void ExecState::encodeTableSection() {
-    unsigned id = Section::TABLE_SECTION;
-    std::vector<Table *> tables = class_factory_->tables();
-
-    unsigned size = static_cast<unsigned>(tables.size());
-    BinaryFile* file = BinaryFile::instance();
-
-    file->write((char*)&id, sizeof(u_int32_t));
-    file->write((char*)&size, sizeof(u_int32_t));
-
-    for (auto table : tables) {
-        unsigned mapSize = static_cast<unsigned>(table->map.size());
-        file->write((char*)&mapSize, sizeof(u_int32_t));
-        for (auto &map : table->map) {
-            std::string name = map.first;
-            Value value = map.second;
-            String str(name);
-            unsigned length = static_cast<unsigned>(str.length()) + 1;
-            file->write(str.c_str(), static_cast<unsigned>(sizeof(char) * length));
-            encodeValue(value);
-        }
-    }
+//    unsigned id = Section::TABLE_SECTION;
+//    std::vector<Table *> tables = class_factory_->tables();
+//
+//    unsigned size = static_cast<unsigned>(tables.size());
+//    BinaryFile* file = BinaryFile::instance();
+//
+//    file->write((char*)&id, sizeof(u_int32_t));
+//    file->write((char*)&size, sizeof(u_int32_t));
+//
+//    for (auto table : tables) {
+//        unsigned mapSize = static_cast<unsigned>(table->map.size());
+//        file->write((char*)&mapSize, sizeof(u_int32_t));
+//        for (auto &map : table->map) {
+//            std::string name = map.first;
+//            Value value = map.second;
+//            String str(name);
+//            unsigned length = static_cast<unsigned>(str.length()) + 1;
+//            file->write(str.c_str(), static_cast<unsigned>(sizeof(char) * length));
+//            encodeValue(value);
+//        }
+//    }
 }
 
 void ExecState::encodeFunctionSection() {
@@ -266,21 +266,21 @@ void ExecState::encodeStartSection() {
 }
 
 void ExecState::encodeGlobalSection() {
-    BinaryFile* file = BinaryFile::instance();
-    unsigned id = Section::GLOBAL_SECTION;
-    unsigned size = static_cast<unsigned>(global_->size()) - global_->register_size();
-
-    file->write((char*)&id, sizeof(u_int32_t));
-    file->write((char*)&size, sizeof(u_int32_t));
-    int init_data_index = global_->IndexOf("_init_data");
-    int weex_data_index = global_->IndexOf("__weex_data__");
-    file->write((char*)&init_data_index, sizeof(int32_t));
-    file->write((char*)&weex_data_index, sizeof(int32_t));
-
-    for (int i=global_->register_size(); i<global_->size(); i++) {
-        Value* value = global_->Find(i);
-        encodeValue(*value);
-    }
+//    BinaryFile* file = BinaryFile::instance();
+//    unsigned id = Section::GLOBAL_SECTION;
+//    unsigned size = static_cast<unsigned>(global_->size()) - global_->register_size();
+//
+//    file->write((char*)&id, sizeof(u_int32_t));
+//    file->write((char*)&size, sizeof(u_int32_t));
+//    int init_data_index = global_->IndexOf("_init_data");
+//    int weex_data_index = global_->IndexOf("__weex_data__");
+//    file->write((char*)&init_data_index, sizeof(int32_t));
+//    file->write((char*)&weex_data_index, sizeof(int32_t));
+//
+//    for (int i=global_->register_size(); i<global_->size(); i++) {
+//        Value* value = global_->Find(i);
+//        encodeValue(*value);
+//    }
 }
 
 void ExecState::encodeGlobalVariableSection() {
@@ -358,7 +358,7 @@ void ExecState::encodeClassSection() {
             continue;
         }
 
-        int superIndex = class_factory_->findDesc(desc->p_super_);
+        int superIndex = class_factory_->find(desc->p_super_);
         file->write((char*)&superIndex, sizeof(int32_t));
         unsigned static_func_size = static_cast<unsigned>(desc->static_funcs_->size());
         file->write((char*)&static_func_size, sizeof(u_int32_t));
@@ -406,17 +406,17 @@ void ExecState::encodeValue(const Value &value) {
     BinaryFile* file = BinaryFile::instance();
     file->write((char*)&value.type, sizeof(u_int32_t));
 
-    if (value.type == Value::Type::TABLE) {
-        std::vector<Table *> tables = class_factory_->tables();
-        int payload = 0;
-        for (auto table : tables) {
-            if (value.gc == reinterpret_cast<GCObject *>(table)) {
-                break;
-            }
-            payload++;
-        }
-        file->write((char*)&payload, sizeof(int32_t));
-    }
+//    if (value.type == Value::Type::TABLE) {
+//        std::vector<Table *> tables = class_factory_->tables();
+//        int payload = 0;
+//        for (auto table : tables) {
+//            if (value.gc == reinterpret_cast<GCObject *>(table)) {
+//                break;
+//            }
+//            payload++;
+//        }
+//        file->write((char*)&payload, sizeof(int32_t));
+//    }
 
     if (value.type == Value::Type::STRING) {
         //int payload = static_cast<int>(strings.size());
@@ -462,17 +462,17 @@ void ExecState::encodeValue(const Value &value) {
         file->write((char*)&payload, sizeof(int32_t));
     }
 
-    if (value.type == Value::Type::ARRAY) {
-        std::vector<Array*> arrays = class_factory_->arrays();
-        int payload = 0;
-        for (auto array : arrays ) {
-            if (value.gc == reinterpret_cast<GCObject *>(array)) {
-                break;
-            }
-            payload++;
-        }
-        file->write((char*)&payload, sizeof(int32_t));
-    }
+//    if (value.type == Value::Type::ARRAY) {
+//        std::vector<Array*> arrays = class_factory_->arrays();
+//        int payload = 0;
+//        for (auto array : arrays ) {
+//            if (value.gc == reinterpret_cast<GCObject *>(array)) {
+//                break;
+//            }
+//            payload++;
+//        }
+//        file->write((char*)&payload, sizeof(int32_t));
+//    }
 
     if (value.type == Value::Type::CLASS_DESC) {
         int payload = 0;
@@ -670,20 +670,20 @@ void ExecState::decodeGlobalSection() {
     file->read((char*)&init_data_index, sizeof(int32_t));
     file->read((char*)&weex_data_index, sizeof(int32_t));
 
-    unsigned register_size = global_->register_size();
-    for (int i=0; i<count; i++) {
-        Value value;
-        decodeValue(value);
-        if (value.type != Value::Type::CFUNC) {
-            if (register_size + i == init_data_index) {
-                global_->Add("_init_data", value);
-            } else if (register_size + i == weex_data_index) {
-                global_->Add("__weex_data__", value);
-            } else  {
-                global_->Add(value);
-            }
-        }
-    }
+//    unsigned register_size = global_->register_size();
+//    for (int i=0; i<count; i++) {
+//        Value value;
+//        decodeValue(value);
+//        if (value.type != Value::Type::CFUNC) {
+//            if (register_size + i == init_data_index) {
+//                global_->Add("_init_data", value);
+//            } else if (register_size + i == weex_data_index) {
+//                global_->Add("__weex_data__", value);
+//            } else  {
+//                global_->Add(value);
+//            }
+//        }
+//    }
 }
 
 void ExecState::decodeGlobalVariableSection() {
@@ -875,13 +875,13 @@ void ExecState::endDecode() {
     BinaryFile* file = BinaryFile::instance();
     file->readFinish();
 
-    std::vector<Table *> tables = class_factory_->tables();
-    for (auto table : tables ) {
-        for (auto &map : table->map) {
-            Value& value = map.second;
-            serializeValue(value);
-        }
-    }
+//    std::vector<Table *> tables = class_factory_->tables();
+//    for (auto table : tables ) {
+//        for (auto &map : table->map) {
+//            Value& value = map.second;
+//            serializeValue(value);
+//        }
+//    }
 
     std::vector<Value>& constants = func_state_->constants();
     for (auto &value : constants) {
@@ -909,12 +909,12 @@ void ExecState::endDecode() {
         styles.insert(std::make_pair(value.str->c_str(), style.second));
     }
 
-    std::vector<Array *> arrays = class_factory_->arrays();
-    for (auto array : arrays) {
-        for (auto &value : array->items) {
-            serializeValue(value);
-        }
-    }
+//    std::vector<Array *> arrays = class_factory_->arrays();
+//    for (auto array : arrays) {
+//        for (auto &value : array->items) {
+//            serializeValue(value);
+//        }
+//    }
 
     for (auto ref : refs_) {
         if (ref->func_index_ == 0) {
@@ -951,10 +951,10 @@ void ExecState::serializeValue(Value &value) {
         return;
     }
 
-    if (value.type == Value::Type::TABLE) {
-        std::vector<Table *> tables = class_factory_->tables();
-        value.gc = reinterpret_cast<GCObject *>(tables[value.index]);
-    }
+//    if (value.type == Value::Type::TABLE) {
+//        std::vector<Table *> tables = class_factory_->tables();
+//        value.gc = reinterpret_cast<GCObject *>(tables[value.index]);
+//    }
 
     if (value.type == Value::Type::STRING) {
         const std::vector<std::pair<std::string, std::unique_ptr<String>>>& store = string_table_->store();
@@ -973,10 +973,10 @@ void ExecState::serializeValue(Value &value) {
         }
     }
 
-    if (value.type == Value::Type::ARRAY) {
-        std::vector<Array *> arrays = class_factory_->arrays();
-        value.gc = reinterpret_cast<GCObject *>(arrays[value.index]);
-    }
+//    if (value.type == Value::Type::ARRAY) {
+//        std::vector<Array *> arrays = class_factory_->arrays();
+//        value.gc = reinterpret_cast<GCObject *>(arrays[value.index]);
+//    }
 
     if (value.type == Value::Type::CLASS_DESC) {
         std::vector<ClassDescriptor *> descs = class_factory_->descs();
@@ -1079,7 +1079,6 @@ void ExecState::Register(const std::string& name, CFunction func) {
     
 void ExecState::Register(const std::string& name, Value value) {
     global()->Add(name, value);
-    global()->incrementRegisterSize();
 }
 
 void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {

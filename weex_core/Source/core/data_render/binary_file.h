@@ -26,6 +26,7 @@
 namespace weex {
 namespace core {
 namespace data_render {
+    
     enum Section {
         NULL_SECTION,
         STRING_SECTION,
@@ -64,4 +65,5 @@ namespace data_render {
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
+
 #endif //CORE_DATA_RENDER_BINARY_FILE_H_

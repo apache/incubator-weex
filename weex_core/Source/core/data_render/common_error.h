@@ -64,6 +64,12 @@ public:
     : Error("[VMExecError]", std::move(str)) { }
 };
 
+class EncoderError : public Error {
+public:
+    EncoderError(std::string str)
+    : Error("[EncoderError]", std::move(str)) { }
+};
+
 class OpcodeDecodeError : public Error {
 public:
     OpcodeDecodeError(std::string str)
