@@ -47,6 +47,11 @@ public class ListBaseViewHolder extends RecyclerView.ViewHolder {
     isRecycled = component.canRecycled();
   }
 
+  public ListBaseViewHolder(WXComponent component, int viewType, boolean forceBindData) {
+    this(component, viewType);
+    isRecycled = isRecycled || forceBindData;
+  }
+
   public ListBaseViewHolder(View view, int viewType) {
     super(view);
     mViewType = viewType;
