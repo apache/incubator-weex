@@ -664,9 +664,6 @@ typedef enum : NSUInteger {
     [WXPrerenderManager destroyTask:self.instanceId];
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
     
-    if (_componentManager) {
-        [_componentManager invalidate];
-    }
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnComponentThread(^{
         __strong typeof(self) strongSelf = weakSelf;
