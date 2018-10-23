@@ -25,6 +25,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -193,7 +194,9 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     if (view instanceof WXCircleIndicator) {
       return;
     }
+
     mAdapter.addPageView(view);
+
     hackTwoItemsInfiniteScroll();
     if (initIndex != -1 && mAdapter.getRealCount() > initIndex) {
       if(initRunnable == null){
@@ -201,7 +204,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
           @Override
           public void run() {
             initIndex = getInitIndex();
-            mViewPager.setCurrentItem(initIndex);
+            mViewPager.setCurrentItem(getRealIndex(initIndex));
             initIndex = -1;
             initRunnable = null;
           }
@@ -211,13 +214,19 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       mViewPager.postDelayed(initRunnable, 50);
     } else {
       if (!keepIndex) {
-        mViewPager.setCurrentItem(0);
+        mViewPager.setCurrentItem(getRealIndex(0));
       }
     }
     if (mIndicator != null) {
       mIndicator.getHostView().forceLayout();
       mIndicator.getHostView().requestLayout();
     }
+  }
+
+  @Override
+  public void setLayout(WXComponent component) {
+    mAdapter.setLayoutDirectionRTL(this.isNativeLayoutRTL());
+    super.setLayout(component);
   }
 
   @Override
@@ -282,9 +291,22 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     if(select >= mAdapter.getRealCount()){
       select = select%mAdapter.getRealCount();
     }
+
     return select;
   }
 
+  private int getRealIndex(int idx) {
+    int retIdx = idx;
+
+    if (mAdapter.getRealCount() > 0) {
+      if(idx >= mAdapter.getRealCount()) retIdx = mAdapter.getRealCount() - 1;
+      if (isNativeLayoutRTL()) {
+        retIdx = mAdapter.getRealCount() - 1 - retIdx;
+      }
+    }
+    retIdx = retIdx + 0;
+    return retIdx;
+  }
 
   @Override
   protected boolean setProperty(String key, Object param) {
@@ -391,7 +413,9 @@ public class WXSlider extends WXVContainer<FrameLayout> {
         initIndex = index;
         return;
       }
-      mViewPager.setCurrentItem(index);
+
+      index = getRealIndex(index);
+
       if (mIndicator != null && mIndicator.getHostView() != null
               && mIndicator.getHostView().getRealCurrentItem() != index) {
         //OnPageChangeListener not triggered
