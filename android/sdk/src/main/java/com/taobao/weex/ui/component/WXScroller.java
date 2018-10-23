@@ -34,7 +34,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -96,6 +95,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   private int pageSize = 0;
   private boolean pageEnable = false;
+  private boolean mIsHostAttachedToWindow = false;
 
   public static class Creator implements ComponentCreator {
     @Override
@@ -537,6 +537,19 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         }
       }
     });
+    host.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+      @Override
+      public void onViewAttachedToWindow(View v) {
+        mIsHostAttachedToWindow = true;
+        procAppear(getScrollX(), getScrollY(), getScrollX(), getScrollY());
+      }
+
+      @Override
+      public void onViewDetachedFromWindow(View v) {
+        mIsHostAttachedToWindow = false;
+        dispatchDisappearEvent();
+      }
+    });
     return host;
   }
 
@@ -741,11 +754,28 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     procAppear( x, y, oldx, oldy);
   }
 
+  @Override
+  public void notifyAppearStateChange(String wxEventType, String direction) {
+    if (containsEvent(Constants.Event.APPEAR) || containsEvent(Constants.Event.DISAPPEAR)) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("direction", direction);
+      fireEvent(wxEventType, params);
+    }
+    // No-op. The moment to notify children is decided by the time when scroller is attached
+    // or detached to window. Do not call super as scrollview has different disposal.
+  }
+
   /**
    * Process event like appear and disappear
+   *
+   * This method will be invoked in several situation below.
+   *    1. bind or unbind event
+   *    2. host view is attached to window
+   *    3. when scrollview is scrolling
    */
   private void procAppear(int x, int y, int oldx,
                           int oldy) {
+    if (!mIsHostAttachedToWindow) return;
     int moveY = y - oldy;
     int moveX = x - oldx;
     String direction = moveY > 0 ? Constants.Value.DIRECTION_UP :
@@ -760,11 +790,51 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       if (!helper.isWatch()) {
         continue;
       }
-      boolean visible = helper.isViewVisible(false);
+      boolean visible = checkItemVisibleInScroller(helper.getAwareChild());
 
       int result = helper.setAppearStatus(visible);
       if (result != AppearanceHelper.RESULT_NO_CHANGE) {
         helper.getAwareChild().notifyAppearStateChange(result == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
+      }
+    }
+  }
+
+  /**
+   * Check the view of given component is visible in scrollview.
+   *
+   * @param component ready to be check
+   * @return item is visible
+   */
+  private boolean checkItemVisibleInScroller(WXComponent component) {
+    boolean visible = false;
+    while (component != null && !(component instanceof WXScroller)) {
+      if (component.getParent() instanceof WXScroller) {
+        if (mOrientation == Constants.Orientation.HORIZONTAL) {
+          int offsetLeft = (int) component.getLayoutPosition().getLeft() - getScrollX();
+          visible = (offsetLeft > 0 - component.getLayoutWidth() && offsetLeft < getLayoutWidth());
+        } else {
+          int offsetTop = (int) component.getLayoutPosition().getTop() - getScrollY();
+          visible = (offsetTop > 0 - component.getLayoutHeight() && offsetTop < getLayoutHeight());
+        }
+      }
+      component = component.getParent();
+    }
+    return visible;
+  }
+
+  /**
+   * Dispatch disappear event to the child components in need.
+   */
+  private void dispatchDisappearEvent() {
+    for (Entry<String, AppearanceHelper> item : mAppearanceComponents.entrySet()) {
+      AppearanceHelper helper = item.getValue();
+      if (!helper.isWatch()) {
+        continue;
+      }
+      int result = helper.setAppearStatus(false);
+      if (result != AppearanceHelper.RESULT_NO_CHANGE) {
+        helper.getAwareChild().notifyAppearStateChange(result == AppearanceHelper.RESULT_APPEAR ?
+                Constants.Event.APPEAR : Constants.Event.DISAPPEAR, "");
       }
     }
   }
