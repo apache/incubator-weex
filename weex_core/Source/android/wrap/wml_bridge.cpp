@@ -235,6 +235,21 @@ static void Java_WMLBridge_dispatchMessage(JNIEnv* env, jobject obj,
   base::android::CheckException(env);
 }
 
+static intptr_t g_WMLBridge_dispatchMessageSync = 0;
+static base::android::ScopedLocalJavaRef<jbyteArray>
+Java_WMLBridge_dispatchMessageSync(JNIEnv* env, jobject obj, jstring clientID,
+                                   jstring vmID, jbyteArray data) {
+  jmethodID method_id = base::android::GetMethod(
+      env, g_WMLBridge_clazz, base::android::INSTANCE_METHOD,
+      "dispatchMessageSync", "(Ljava/lang/String;Ljava/lang/String;[B)[B",
+      &g_WMLBridge_dispatchMessageSync);
+
+  auto result = env->CallObjectMethod(obj, method_id, clientID, vmID, data);
+  base::android::CheckException(env);
+  return base::android::ScopedLocalJavaRef<jbyteArray>(
+      env, static_cast<jbyteArray>(result));
+}
+
 static intptr_t g_WMLBridge_postMessage = 0;
 
 static void Java_WMLBridge_postMessage(JNIEnv* env, jobject obj, jstring vmID,
@@ -292,6 +307,23 @@ void WMLBridge::DispatchMessage(JNIEnv *env, const char *client_id,
                                    jni_vm_id.Get(), jni_array.Get(),
                                    jni_callback.Get());
   }
+}
+
+base::android::ScopedLocalJavaRef<jbyteArray> WMLBridge::DispatchMessageSync(
+    JNIEnv* env, const char* client_id, const char* data, int dataLength,
+    const char* vm_id) {
+  if (jni_object() != NULL) {
+    auto jni_client_id = base::android::ScopedLocalJavaRef<jstring>(
+        env, newJString(env, client_id));
+    auto jni_array = base::android::ScopedLocalJavaRef<jbyteArray>(
+        env, newJByteArray(env, data, dataLength));
+    auto jni_vm_id =
+        base::android::ScopedLocalJavaRef<jstring>(env, newJString(env, vm_id));
+    return Java_WMLBridge_dispatchMessageSync(env, jni_object(),
+                                              jni_client_id.Get(),
+                                              jni_vm_id.Get(), jni_array.Get());
+  }
+  return base::android::ScopedLocalJavaRef<jbyteArray>();
 }
 
 }  // namespace WeexCore

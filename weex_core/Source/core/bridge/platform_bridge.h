@@ -226,8 +226,12 @@ class PlatformBridge {
         const char* pageId, const char* ref,
         std::vector<std::pair<std::string, std::string>>* style) = 0;
     virtual void PostMessage(const char* vm_id, const char* data, int dataLength) = 0;
-    virtual void DispatchMessage(const char* client_id,
-                                 const char* data, int dataLength, const char* callback, const char* vm_id) = 0;
+    virtual void DispatchMessage(const char* client_id, const char* data,
+                                 int dataLength, const char* callback,
+                                 const char* vm_id) = 0;
+    virtual std::unique_ptr<WeexJSResult> DispatchMessageSync(
+        const char* client_id, const char* data, int dataLength,
+        const char* vm_id) = 0;
     virtual void OnReceivedResult(long callback_id,
                                   std::unique_ptr<WeexJSResult>& result) = 0;
 
