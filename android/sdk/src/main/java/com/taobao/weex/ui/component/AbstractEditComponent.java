@@ -413,6 +413,19 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   @Override
   protected boolean setProperty(String key, Object param) {
     switch (key) {
+      case Constants.Name.DISABLED:
+        Boolean disabled = WXUtils.getBoolean(param, null);
+        if (disabled != null) {
+          if (disabled) {
+            mHost.setFocusable(false);
+            mHost.setFocusableInTouchMode(false);
+          } else {
+            mHost.setFocusableInTouchMode(true);
+            mHost.setFocusable(true);
+            mHost.requestFocus();
+          }
+        }
+        return true;
       case Constants.Name.PLACEHOLDER:
         String placeholder = WXUtils.getString(param, null);
         if (placeholder != null)
