@@ -415,7 +415,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     switch (key) {
       case Constants.Name.DISABLED:
         Boolean disabled = WXUtils.getBoolean(param, null);
-        if (disabled != null) {
+        if (disabled != null && mHost != null) {
           if (disabled) {
             mHost.setFocusable(false);
             mHost.setFocusableInTouchMode(false);
