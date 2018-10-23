@@ -731,7 +731,8 @@ CGFloat WXFloorPixelValue(CGFloat value)
 + (CGSize)portraitScreenSize
 {
     if ([[UIDevice currentDevice].model isEqualToString:@"iPad"]) {
-        return [UIScreen mainScreen].bounds.size;
+        CGRect windowRect = [UIApplication sharedApplication].keyWindow.bounds;
+        return windowRect.size;
     }
     static CGSize portraitScreenSize;
     static dispatch_once_t onceToken;
@@ -747,7 +748,8 @@ CGFloat WXFloorPixelValue(CGFloat value)
 + (CGFloat)defaultPixelScaleFactor
 {
     if ([[UIDevice currentDevice].model isEqualToString:@"iPad"]) {
-        return [self portraitScreenSize].width / WXDefaultScreenWidth;
+        CGRect windowRect = [UIApplication sharedApplication].keyWindow.bounds;
+        return windowRect.size.width / WXDefaultScreenWidth;
     }
     static CGFloat defaultScaleFactor;
     static dispatch_once_t onceToken;

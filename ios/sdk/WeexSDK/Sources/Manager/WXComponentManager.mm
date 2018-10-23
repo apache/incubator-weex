@@ -173,6 +173,7 @@ static NSThread *WXComponentThread;
 {
     WXAssertComponentThread();
     CGSize size = _weexInstance.frame.size;
+    [WXCoreBridge setDeviceWidth:size.width];
     [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId
                                         width:size.width height:size.height
                            isWidthWrapContent:size.width == 0.0f isHeightWrapContent:size.height == 0.0f];

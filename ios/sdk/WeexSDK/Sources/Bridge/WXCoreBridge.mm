@@ -893,6 +893,10 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     }
 }
 
++ (void)setDeviceWidth:(CGFloat)width {
+    WXCoreEnvironment::getInstance()->SetDeviceWidth(std::to_string(width));
+}
+
 + (void)setViewportWidth:(NSString*)pageId width:(CGFloat)width
 {
     if (platformBridge) {

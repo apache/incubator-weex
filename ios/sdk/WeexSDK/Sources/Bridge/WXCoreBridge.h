@@ -153,6 +153,8 @@ namespace WeexCore
                  isWidthWrapContent:(BOOL)isWidthWrapContent
                 isHeightWrapContent:(BOOL)isHeightWrapContent;
 
++ (void)setDeviceWidth:(CGFloat)width;
+
 + (void)setViewportWidth:(NSString*)pageId width:(CGFloat)width;
 
 + (void)layoutPage:(NSString*)pageId forced:(BOOL)forced;
