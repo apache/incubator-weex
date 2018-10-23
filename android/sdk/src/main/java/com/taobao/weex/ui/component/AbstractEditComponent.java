@@ -422,7 +422,6 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
           } else {
             mHost.setFocusableInTouchMode(true);
             mHost.setFocusable(true);
-            mHost.requestFocus();
           }
         }
         return true;
