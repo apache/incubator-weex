@@ -190,13 +190,11 @@ namespace WeexCore {
         (widthMeasureMode == kUnspecified
             || heightMeasureMode == kUnspecified)) {
       float constrainsWidth = width;
-      if(isnan(width)){
-        if(!isnan(mCssStyle->mMaxWidth)){
+      if(isnan(width) && !isnan(mCssStyle->mMaxWidth)){
           constrainsWidth = mCssStyle->mMaxWidth;
-        }
       }
 
-      if((!isnan(width)&&widthMeasureMode == kExactly) ||
+      if((!isnan(width)) ||
           (isnan(width) && !isnan(mCssStyle->mMaxWidth))) {
         constrainsWidth -= sumPaddingBorderAlongAxis(this, true);
       }
