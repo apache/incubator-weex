@@ -514,7 +514,7 @@ static BOOL bNeedRemoveEvents = YES;
 {
 }
 
-- (BOOL)_isCaculatedFrameChanged:(CGRect)frame
+- (BOOL)_isCalculatedFrameChanged:(CGRect)frame
 {
     return !CGRectEqualToRect(frame, _calculatedFrame);
 }
