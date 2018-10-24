@@ -87,7 +87,6 @@ typedef enum : NSUInteger {
 {
     [_moduleEventObservers removeAllObjects];
     [self removeObservers];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     if (_syncDestroyComponentManager) {
         WXPerformBlockSyncOnComponentThread(^{
             _componentManager = nil;
@@ -922,12 +921,17 @@ typedef enum : NSUInteger {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(moduleEventNotification:) name:WX_MODULE_EVENT_FIRE_NOTIFICATION object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-    [self addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionNew context:nil];
+    [self addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionNew context:NULL];
 }
 
 - (void)removeObservers
 {
-    [self removeObserver:self forKeyPath:@"state"];
+    @try {
+        [self removeObserver:self forKeyPath:@"state" context:NULL];
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+    }
+    @catch (NSException *exception) {
+    }
 }
 
 - (void)applicationWillResignActive:(NSNotification*)notification
