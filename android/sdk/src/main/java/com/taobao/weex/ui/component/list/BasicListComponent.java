@@ -975,10 +975,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             if (component.getRealView() != null) {
               return new ListBaseViewHolder(component, viewType);
             } else {
-              ((WXCell) component).lazy(false);
+              component.lazy(false);
               component.createView();
               component.applyLayoutAndEvent(component);
-              return new ListBaseViewHolder(component, viewType);
+              return new ListBaseViewHolder(component, viewType, true);
             }
           } else if (component instanceof WXBaseRefresh) {
             return createVHForRefreshComponent(viewType);

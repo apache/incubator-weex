@@ -90,7 +90,10 @@ public class StickyHeaderHelper {
           existedParent.removeView(headerView);
         }
         headerView.setTag(headComponent.getRef());
-        mParent.addView(headerView);
+        ViewGroup.MarginLayoutParams mlp =
+                new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+        mParent.addView(headerView, mlp);
         headerView.setTag(this);
         if(headComponent.getStickyOffset() > 0) {
           ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) headerView.getLayoutParams();
