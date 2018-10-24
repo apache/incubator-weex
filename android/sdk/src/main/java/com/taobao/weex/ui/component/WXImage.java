@@ -164,6 +164,7 @@ public class WXImage extends WXComponent<ImageView> {
   @WXComponentProp(name = Constants.Name.RESIZE_MODE)
   public void setResizeMode(String resizeMode) {
     (getHostView()).setScaleType(getResizeMode(resizeMode));
+    getHostView().setImageDrawable(getHostView().getDrawable());
   }
 
   @RestrictTo(Scope.LIBRARY_GROUP)
@@ -191,7 +192,7 @@ public class WXImage extends WXComponent<ImageView> {
 
   @WXComponentProp(name = Constants.Name.RESIZE)
   public void setResize(String resize) {
-    (getHostView()).setScaleType(getResizeMode(resize));
+    setResizeMode(resize);
   }
 
   /**

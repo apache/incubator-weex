@@ -88,7 +88,7 @@ public class WXImageView extends ImageView implements WXGestureObservable,
 
   @Override
   public void setImageDrawable(@Nullable Drawable drawable) {
-    setImageDrawable(drawable, false);
+    setImageDrawable(drawable, gif);
   }
 
   @Override
