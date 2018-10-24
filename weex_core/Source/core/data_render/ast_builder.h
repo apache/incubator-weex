@@ -80,6 +80,8 @@ public:
     Handle<Expression> NewNullConstant();
     // create a new node representing JavaScript string
     Handle<Expression> NewStringConstant(const std::string &str);
+
+    Handle<Expression> NewRegexConstant(const std::string &str);
     // create a new node representing JavaScript boolean
     Handle<Expression> NewBooleanConstant(bool value);
     // create a new node representing JavaScript 'this'

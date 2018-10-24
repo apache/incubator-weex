@@ -166,6 +166,12 @@ Handle<Expression> ASTBuilder::NewStringConstant(const std::string &str)
     COUNT();
     return save(factory()->NewStringConstant(locator()->location(), manager()->current(), str));
 }
+
+Handle<Expression> ASTBuilder::NewRegexConstant(const std::string &str)
+{
+    COUNT();
+    return save(factory()->NewRegexConstant(locator()->location(), manager()->current(), str));
+}
     
 Handle<Expression> ASTBuilder::NewThisExpression()
 {

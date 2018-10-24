@@ -88,6 +88,7 @@ public:
     virtual Handle<Expression> NewMemberExpression(Position &loc, Scope *scope, MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> mem);
     virtual Handle<Expression> NewNullConstant(Position &loc, Scope *scope);
     virtual Handle<Expression> NewStringConstant(Position &loc, Scope *scope, std::string str);
+    virtual Handle<Expression> NewRegexConstant(Position &loc, Scope *scope, std::string str);
     virtual Handle<Expression> NewThisExpression(Position &loc, Scope *scope);
     virtual Handle<Expression> NewBooleanConstant(Position &loc, Scope *scope, bool val);
     virtual Handle<Expression> NewArrayConstant(Position &loc, Scope *scope, ProxyArray arr);

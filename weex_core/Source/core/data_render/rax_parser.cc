@@ -443,8 +443,7 @@ Handle<Expression> RAXParser::ParsePrimary()
         throw SyntaxError(lex()->CurrentToken(), "can't support template");
     }
     else if (tok == Token::REGEXP_LITERAL) {
-        // can't support
-        throw SyntaxError(lex()->CurrentToken(), "can't support regexp");
+        result = builder()->NewRegexConstant(lex()->CurrentToken().view());
     }
     else if (tok == Token::STRING) {
         result = builder()->NewStringConstant(lex()->CurrentToken().view());
@@ -844,7 +843,9 @@ Handle<Expression> RAXParser::ParseJSXNodeStatement() {
         throw SyntaxError(lex()->CurrentToken(), "expected a identifier name");
     }
     Handle<Expression>expr = ParseJSXNodeExpression();
-    EXPECT(Token::GT); // eat '>'
+    if (Peek() == Token::JSX_TAG_END || Peek() == Token::GT) {
+        Advance(); // eat '>' or '/>'
+    }
     if (tok == Token::LPAREN && Peek() == Token::RPAREN) {
         Advance(); // eat ')'
     }
@@ -877,7 +878,7 @@ Handle<Expression> RAXParser::ParseJSXNodeProperty() {
                 Advance();
                 continue;
             }
-            else if (tok == Token::DIV) {
+            else if (tok == Token::JSX_TAG_END) {
                 break;
             }
             else {
@@ -929,7 +930,7 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
         ProxyObject proxyObj;
         while (true) {
             auto token = Peek();
-            if (token == Token::DIV || token == Token::GT) {
+            if (token == Token::JSX_TAG_END || token == Token::GT) {
                 break;
             }
             std::string key = GetIdentifierName();
@@ -950,15 +951,15 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
     }
     tok = Peek();
     expr = builder()->NewJSXNodeExpression(builder()->NewIdentifier(name), props, parent, {});
-    if (tok == Token::DIV) {
+    if (tok == Token::JSX_TAG_END) {
         // no childrens
-        Advance(); // eat '/'
+//        Advance(); // eat '/'
     }
     else if (tok == Token::GT) {
         Advance();
         while (true) {
             tok = Peek();
-            if (tok != Token::LBRACE && tok != Token::LT && tok != Token::STRING && tok != Token::IDENTIFIER) {
+            if (tok != Token::LBRACE && tok != Token::LT && tok != Token::JSX_TAG_CLOSE && tok != Token::STRING && tok != Token::IDENTIFIER) {
                 throw SyntaxError(lex()->CurrentToken(), "expected a string name");
                 break;
             }
@@ -981,20 +982,21 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
                 if (tok == Token::IDENTIFIER) {
                     Handle<Expression> children = ParseJSXNodeExpression(expr);
                     expr->AsJSXNodeExpression()->childrens().push_back(children);
-                    EXPECT(Token::GT); // eat '>'
-                }
-                else if (tok == Token::DIV) {
-                    Advance();
-                    auto tok = Peek();
-                    if (tok != Token::IDENTIFIER) {
-                        throw SyntaxError(lex()->CurrentToken(), "expected a identifier name");
+                    if (Peek() == Token::JSX_TAG_END || Peek() == Token::GT) {
+                        Advance(); // eat '>' or '/>'
                     }
-                    if (name != GetIdentifierName()) {
-                        throw SyntaxError(lex()->CurrentToken(), "expected identifier name not equal");
-                    }
-                    Advance(); // eat 'Identifier'
-                    break;
                 }
+            } else if(tok == Token::JSX_TAG_CLOSE){
+                Advance();
+                auto tok = Peek();
+                if (tok != Token::IDENTIFIER) {
+                    throw SyntaxError(lex()->CurrentToken(), "expected a identifier name");
+                }
+                if (name != GetIdentifierName()) {
+                    throw SyntaxError(lex()->CurrentToken(), "expected identifier name not equal");
+                }
+                Advance(); // eat 'Identifier'
+                break;
             }
         }
     }

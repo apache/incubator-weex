@@ -248,7 +248,12 @@ Handle<Expression> ASTFactory::NewStringConstant(Position &loc, Scope *scope, st
 {
     return MakeHandle<StringConstant>(loc, scope, str);
 }
-   
+
+Handle<Expression> ASTFactory::NewRegexConstant(Position &loc, Scope *scope, std::string str)
+{
+    return MakeHandle<RegexConstant>(loc, scope, str);
+}
+
 Handle<Expression> ASTFactory::NewBooleanConstant(Position &loc, Scope *scope, bool val)
 {
     return MakeHandle<BooleanConstant>(loc, scope, val);

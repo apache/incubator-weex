@@ -71,6 +71,7 @@ namespace data_render {
   M(FunctionPrototype)   \
   M(FunctionStatement)   \
   M(StringConstant)      \
+  M(RegexConstant)       \
   M(BinaryExpression)    \
   M(TernaryExpression)   \
   M(AssignExpression)    \
@@ -132,7 +133,7 @@ class Expression : public RefCountObject {
   virtual ASTNodeType type() const = 0;
   virtual void SetScope(Scope *scope) { scope_ = scope; }
   virtual Scope *GetScope() { return scope_; }
-    
+
   // helper conversion functions
 #define AS_EXPRESSION_FUNCTION(Type) \
   virtual Handle<Type> As##Type() { assert(0 && "Expression is not " #Type); }
@@ -174,17 +175,17 @@ class ExpressionList : public Expression {
  private:
   std::vector<Handle<Expression>> exprs_;
 };
-    
+
 class ClassBody : public Expression {
 public:
     using iterator = std::vector<Handle<Expression>>::iterator;
-    
+
     void Insert(Handle<Expression> expr) { body_.push_back(expr); }
-    
+
     size_t Size() { return body_.size(); }
-    
+
     std::vector<Handle<Expression>>& raw_list() { return body_; }
-    
+
     iterator begin() { return body_.begin(); }
     iterator end() { return body_.end(); }
     DEFINE_NODE_TYPE(ClassBody, Expression);
@@ -233,6 +234,38 @@ class StringConstant : public Expression {
       : Expression(), str_(str) {}
   std::string& string() { return str_; }
   DEFINE_NODE_TYPE(StringConstant, Expression);
+};
+
+class RegexConstant : public Expression {
+ private:
+  std::string str_;
+  std::string str_flag_;
+
+ public:
+  RegexConstant(Position &loc, Scope *scope, const std::string &str)
+    : Expression(loc, scope)
+    {
+      auto p = str.find_last_of('$');
+      if (p==std::string::npos){
+        str_ = str;
+      } else {
+        str_ = str.substr(0,p);
+        str_flag_ = str.substr(p+1);
+      }
+    }
+  RegexConstant(const std::string& str)
+      : Expression() {
+    auto p = str.find_last_of('$');
+    if (p==std::string::npos){
+      str_ = str;
+    } else {
+      str_ = str.substr(0,p);
+      str_flag_ = str.substr(p+1);
+    }
+  }
+  std::string& reg() { return str_; }
+  std::string& flag() { return str_flag_; }
+  DEFINE_NODE_TYPE(RegexConstant, Expression);
 };
 
 class TernaryExpression : public Expression {
@@ -305,7 +338,7 @@ class BinaryExpression : public Expression {
   Handle<Expression> lhs_;
   Handle<Expression> rhs_;
 };
-    
+
 enum class DeclarationKind {
     kConst,
 };
@@ -497,7 +530,7 @@ class PostfixExpression : public Expression {
   PostfixOperation op_;
   Handle<Expression> expr_;
 };
-    
+
 enum class ProxyOrder { ProxyArray, ProxyObject };
 
 class ObjectConstant : public Expression {
@@ -538,7 +571,7 @@ class ArrayConstant : public Expression {
  private:
   ProxyArray exprs_;
 };
-    
+
 enum class AssignOperation {
     kAssign,
     kAssignAdd,
@@ -567,10 +600,10 @@ public:
     UndefinedConstant(Position &loc, Scope *scope)
     : Expression(loc, scope)
     { }
-    
+
     DEFINE_NODE_TYPE(UndefinedConstant, Expression);
 };
-    
+
 class NewExpression : public Expression {
 public:
     NewExpression(Position &loc, Scope *scope, Handle<Expression> member)
@@ -587,17 +620,17 @@ private:
     Handle<Expression> member_;
     bool is_class_{false};
 };
-    
+
 class ThisExpression : public Expression {
 public:
     ThisExpression(Position &loc, Scope *scope)
     : Expression(loc, scope)
     { }
-    
+
     bool ProduceRValue() override { return false; }
     DEFINE_NODE_TYPE(ThisExpression, Expression);
 };
-    
+
 class CommaExpression : public Expression {
 public:
     CommaExpression(Handle<ExpressionList> exprs)
@@ -605,13 +638,13 @@ public:
     CommaExpression(Position &loc, Scope *scope, Handle<ExpressionList> exprs)
     : Expression(loc, scope), exprs_{ exprs }
     { }
-    
+
     Handle<ExpressionList> exprs() { return exprs_; }
     DEFINE_NODE_TYPE(CommaExpression, Expression);
 private:
     Handle<ExpressionList> exprs_;
 };
-    
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
