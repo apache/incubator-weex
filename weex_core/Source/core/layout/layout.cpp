@@ -252,25 +252,28 @@ namespace WeexCore {
    */
     void WXCoreLayoutNode::determineCrossSize(const float width, const float height, const bool stretch) {
       if (mFlexLines.size() == 1 && isCrossExactly()) {
-        bool horizontal = isMainAxisHorizontal(this);
-        float size = mFlexLines[0]->mCrossSize;
-        float paddingAlongCrossAxis = sumPaddingBorderAlongAxis(this, !horizontal);
-        if (horizontal) {
-          if (heightMeasureMode == kExactly) {
-            size = height - paddingAlongCrossAxis;
-          }
-        } else {
-          if (widthMeasureMode == kExactly) {
-            size = width - paddingAlongCrossAxis;
-          }
-        }
-        mFlexLines[0]->mCrossSize = size;
+        determineCrossSize(width, height, mFlexLines[0]);
       }
       if (stretch) {
         stretchViewCrossSize();
       }
     }
 
+    void WXCoreLayoutNode::determineCrossSize(const float width, const float height, WXCoreFlexLine* const flexLine){
+      bool horizontal = isMainAxisHorizontal(this);
+      float size = flexLine->mCrossSize;
+      float paddingAlongCrossAxis = sumPaddingBorderAlongAxis(this, !horizontal);
+      if (horizontal) {
+        if (heightMeasureMode == kExactly) {
+          size = height - paddingAlongCrossAxis;
+        }
+      } else {
+        if (widthMeasureMode == kExactly) {
+          size = width - paddingAlongCrossAxis;
+        }
+      }
+      flexLine->mCrossSize = size;
+    }
 
     void WXCoreLayoutNode::measureInternalNode(const float width, const float height, const bool needMeasure,
                                                const bool hypotheticalMeasurment) {
@@ -633,6 +636,9 @@ namespace WeexCore {
                           absoluteFlexItem->getLayoutWidth() + absoluteFlexItem->getMarginLeft()
                               + absoluteFlexItem->getMarginRight();
     flexLine->mItemCount = 1;
+    determineCrossSize(getLayoutWidth(),
+                       getLayoutHeight(),
+                       flexLine);
   }
 
   void WXCoreLayoutNode::onLayout(const float left, const float top, const float right, const float bottom,

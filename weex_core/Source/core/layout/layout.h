@@ -588,6 +588,9 @@ namespace WeexCore {
     void
     determineCrossSize(float, float, bool);
 
+    void
+    determineCrossSize(float, float, WXCoreFlexLine *);
+
     void setFrame(float, float, float, float);
 
     void setFrame(WXCorePosition*,float, float, float, float);
