@@ -993,6 +993,8 @@ namespace WeexCore {
     }
 
       inline void setDirection(const WXCoreDirection direction, const bool updating) {
+          if (nullptr == mCssStyle) return;
+          
           if (mCssStyle->mDirection != direction) {
               mCssStyle->mDirection = direction;
               markDirty();
@@ -1005,6 +1007,9 @@ namespace WeexCore {
       }
 
     inline WXCoreDirection getDirection() const {
+        if (mCssStyle == nullptr) {
+            return WEEXCORE_CSS_DEFAULT_DIRECTION;
+        }
         return mCssStyle->mDirection;
     }
     
@@ -1113,10 +1118,14 @@ namespace WeexCore {
     }
       
     virtual inline WXCoreDirection getLayoutDirection() const {
+      if (nullptr == mLayoutResult) {
+        return WEEXCORE_CSS_DEFAULT_DIRECTION;
+      }
       return mLayoutResult->mLayoutDirection;
     }
 
     inline void setLayoutDirection(WXCoreDirection direction) {
+        if (nullptr == mLayoutResult) return;
         mLayoutResult->mLayoutDirection = direction;
     }
     inline bool hasNewLayout() const {
