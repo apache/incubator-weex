@@ -835,19 +835,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
     NSString *optionsString = [WXUtility JSONString:options];
     NSString *dataString = [WXUtility JSONString:data];
-
-//    NSString *documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-//    NSString *txtPath = [documentsPath stringByAppendingPathComponent:@"test.wasm"];
-//    std::string path = [txtPath UTF8String];
-//    std::ifstream fin(path, std::ios::in|std::ios::binary|std::ios::ate);
-//    unsigned length = static_cast<unsigned>(fin.tellg());
-//
-//    char* buffer = new char[length];
-//    fin.seekg (0, std::ios::beg);
-//    fin.read(buffer, length);
-//    fin.close();
-
-    node_manager->CreatePage(static_cast<const char*>(contents.bytes), contents.length, [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "");
+    node_manager->CreatePage(static_cast<const char *>(contents.bytes), contents.length, [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "");
 }
 
 + (void)destroyDataRenderInstance:(NSString *)pageId

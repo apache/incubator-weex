@@ -268,16 +268,16 @@ typedef enum : NSUInteger {
         [self _renderWithMainBundleString:source];
         [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
     } else if ([source isKindOfClass:[NSData class]]) {
-        [self _renderWithOpcode:source];
+        [self _renderWithData:source];
     }
 }
 
-- (NSString*) bundleTemplate
+- (NSString *) bundleTemplate
 {
     return self.mainBundleString;
 }
 
-- (void)_renderWithOpcode:(NSData *)contents
+- (void)_renderWithData:(NSData *)contents
 {
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
@@ -543,7 +543,7 @@ typedef enum : NSUInteger {
         }
         
         if ([options[@"DATA_RENDER"] boolValue] && [options[@"RENDER_WITH_BINARY"] boolValue]) {
-            [strongSelf _renderWithOpcode:data];
+            [strongSelf _renderWithData:data];
             return;
         }
 

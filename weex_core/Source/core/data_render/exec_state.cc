@@ -83,8 +83,10 @@ void ExecState::Compile(std::string& err) {
 #if DEBUG
   TimeCost tc("Compile");
 #endif
+  ValueRef::reset();
   class_compile_index_ = static_cast<uint32_t>(class_factory_->descs().size());
   global_compile_index_ = static_cast<uint32_t>(global()->size());
+  string_compile_index_ = static_cast<uint32_t>(string_table_->store().size());
   ValueRef::gs_ref_id = 0;
   err.clear();
   CodeGenerator generator(this);

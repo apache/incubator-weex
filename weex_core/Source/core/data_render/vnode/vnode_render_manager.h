@@ -44,7 +44,7 @@ class VNodeRenderManager {
  public:
   void CreatePage(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data);
 
-  void CreatePage(const char* contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data);
+  void CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& init_data);
 
   bool RefreshPage(const std::string &page_id, const std::string &init_data);
   bool ClosePage(const std::string &page_id);
@@ -66,8 +66,8 @@ class VNodeRenderManager {
   bool CreatePageInternal(const std::string &page_id, VNode *v_node);
   bool RefreshPageInternal(const std::string &page_id, VNode *new_node);
   bool ClosePageInternal(const std::string &page_id);
-  std::string CreatePageWithOpcode(const std::string& page_id, const std::string& options, const std::string& init_data);
-  std::string CreatePageImpl(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data);
+  std::string CreatePageWithContent(const uint8_t *contents, size_t length, const std::string &page_id, const std::string &options, const std::string &init_data);
+  std::string CreatePageWithContent(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data);
 
   static VM *g_vm;
   static VNodeRenderManager *g_instance;

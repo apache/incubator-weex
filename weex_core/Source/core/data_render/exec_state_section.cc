@@ -113,11 +113,12 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
                 if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, &target, (uint8_t *)&payload, &bytes_decoding))) {
                     break;
                 }
-                if (payload < 0 || target != kValuePayload) {
+                std::vector<ClassDescriptor *> descs = decoder()->exec_state()->class_factory()->descs();
+                if (payload < 0 || payload >= descs.size() || target != kValuePayload) {
                     throw DecoderError("decoding value payload class desc error");
                     break;
                 }
-                pval->type = Value::Type::CLASS_DESC;
+                SetCDValue(pval, reinterpret_cast<GCObject *>(descs[payload]));
                 LOGD("decoding class desc value:%i\n", payload);
                 break;
             }
@@ -144,6 +145,7 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
                     pval->f = func_state->all_childrens()[payload - 1];
                 }
                 pval->type = Value::Type::FUNC;
+                LOGD("decoding function value:%i\n", payload);
                 break;
             }
             case Value::Type::STRING:
@@ -163,7 +165,7 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
                     break;
                 }
                 pval->str = store[payload].second.get();
-                LOGD("decoding string value:%s\n", pval->str->c_str());
+                LOGD("decoding string value:[%i] %s\n", payload, pval->str->c_str());
                 pval->type = Value::Type::STRING;
                 break;
             }
@@ -300,7 +302,7 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
                 if (!(bytes_write = encodingToBuffer(buffer, buffer_len, kValuePayload, sizeof(int32_t), &payload))) {
                     break;
                 }
-                printf("encoding string value:%i\n", payload);
+                LOGD("encoding string value:[%i] %s\n", payload, pval->str->c_str());
                 break;
             }
             case Value::Type::INT:
@@ -622,13 +624,56 @@ bool SectionHeader::decoding() {
 }
 
 uint32_t SectionString::size() {
+    ExecState *exec_state = encoder()->exec_state();
+    StringTable *string_table = exec_state->string_table();
+    ClassFactory *class_factory = exec_state->class_factory();
+    std::vector<ClassDescriptor *> descs = class_factory->descs();
+    int32_t class_compile_index = static_cast<int32_t>(exec_state->class_compile_index());
+    int32_t descs_size = static_cast<int32_t>(descs.size()) - class_compile_index;
+    if (descs_size > 0) {
+        // import decs string to table
+        for (int i = class_compile_index; i < descs.size(); i++) {
+            ClassDescriptor *desc = descs[i];
+            uint32_t static_func_size = static_cast<uint32_t>(desc->static_funcs_->size());
+            if (static_func_size > 0) {
+                for (int j = 0; j < static_func_size; j++) {
+                    Value *func = desc->static_funcs_->Find(j);
+                    if (!func) {
+                        continue;
+                    }
+                    for (auto &item : desc->static_funcs_->map()) {
+                        if (item.second == j) {
+                            string_table->StringFromUTF8(item.first);
+                            break;
+                        }
+                    }
+                }
+            }
+            uint32_t class_func_size = static_cast<uint32_t>(desc->funcs_->size());
+            if (class_func_size > 0) {
+                for (int j = 0; j < class_func_size; j++) {
+                    Value *func = desc->funcs_->Find(j);
+                    if (!func) {
+                        continue;
+                    }
+                    for (auto &item : desc->funcs_->map()) {
+                        if (item.second == j) {
+                            string_table->StringFromUTF8(item.first);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
     uint32_t size = 0;
-    StringTable *string_table = encoder()->exec_state()->string_table();
     const std::vector<std::pair<std::string, std::unique_ptr<String>>> &store = string_table->store();
-    if (store.size() > 0) {
+    int32_t string_compile_index = exec_state->string_compile_index();
+    int32_t count = static_cast<int32_t>(store.size()) - string_compile_index;
+    if (count > 0) {
         size += GetFTLVLength(kValueStringSize, sizeof(uint32_t));
-        for (auto &iter : store) {
-            size += GetFTLVLength(kValueStringPayload, (uint32_t)iter.first.length());
+        for (auto iter = store.begin() + string_compile_index; iter != store.end(); iter++) {
+            size += GetFTLVLength(kValueStringPayload, (uint32_t)iter->first.length());
         }
     }
     return size;
@@ -645,20 +690,25 @@ bool SectionString::encoding() {
         if (!Section::encoding((uint16_t)ExecSection::EXEC_SECTION_STRING, size)) {
             break;
         }
-        StringTable *string_table = encoder()->exec_state()->string_table();
+        ExecState *exec_state = encoder()->exec_state();
+        StringTable *string_table = exec_state->string_table();
         const std::vector<std::pair<std::string, std::unique_ptr<String>>> &store = string_table->store();
-        uint32_t count = (uint32_t)store.size();
+        int32_t string_compile_index = exec_state->string_compile_index();
+        int32_t count = static_cast<int32_t>(store.size()) - string_compile_index;
         if (!Section::encoding(kValueStringSize, sizeof(uint32_t), &count)) {
             break;
         }
         bool error = false;
-        for (auto &iter : store) {
-            const char *pcstr = iter.first.c_str();
-            uint32_t length = (uint32_t)iter.first.length();
+        int index = 0;
+        for (auto iter = store.begin() + string_compile_index; iter != store.end(); iter++) {
+            const char *pcstr = iter->first.c_str();
+            uint32_t length = (uint32_t)iter->first.length();
             if (!Section::encoding(kValueStringPayload, length, (void *)pcstr)) {
                 error = true;
                 break;
             }
+            index++;
+            LOGD("encoding string:[%i] %s\n", index, pcstr);
         }
         finished = !error;
         
@@ -692,12 +742,14 @@ bool SectionString::decoding() {
         int index = 0;
         for (index = 0; index < string_count; index++) {
             uint16_t vindex = 0;
-            uint32_t varlen = 0;
-            if ((varlen = stream->ReadTarget(&vindex, NULL, NULL)) == 0) {
-                break;
-            }
+            uint32_t varlen = stream->ReadTarget(&vindex, NULL, NULL);
             if (vindex != kValueStringPayload) {
                 break;
+            }
+            if (varlen == 0) {
+                std::string str = "";
+                string_table->StringFromUTF8(str);
+                continue;
             }
             char *pstr = (char *)malloc(varlen + 1);
             if (!pstr) {
@@ -708,6 +760,7 @@ bool SectionString::decoding() {
                 throw EncoderError("decoding string content error");
             }
             string_table->StringFromUTF8(pstr);
+            LOGD("decoding string:%s\n", pstr);
             free(pstr);
         }
         if (index != string_count) {
@@ -823,7 +876,7 @@ bool SectionFunction::encoding() {
                 memset(buffer, 0, size);
                 for (int i = 0; i < func_state->in_closure().size(); i++) {
                     buffer[i] = func_state->in_closure()[i]->ref_id();
-                    printf("encoding in_closure:%i\n", buffer[i]);
+                    LOGD("encoding in_closure:%i\n", buffer[i]);
                 }
                 if (!Section::encoding(kValueFunctionInClosure, (uint32_t)size, buffer)) {
                     break;
@@ -840,7 +893,7 @@ bool SectionFunction::encoding() {
                 memset(buffer, 0, size);
                 for (int i = 0; i < func_state->out_closure().size(); i++) {
                     buffer[i] = func_state->out_closure()[i]->ref_id();
-                    printf("encoding out_closure:%i\n", buffer[i]);
+                    LOGD("encoding out_closure:%i\n", buffer[i]);
                 }
                 if (!Section::encoding(kValueFunctionOutClosure, (uint32_t)size, buffer)) {
                     break;
@@ -857,7 +910,7 @@ bool SectionFunction::encoding() {
                 memset(buffer, 0, size);
                 for (int i = 0; i < func_state->instructions().size(); i++) {
                     buffer[i] = static_cast<uint32_t>(func_state->instructions()[i]);
-                    printf("encoding instructions:%i\n", buffer[i]);
+                    LOGD("encoding instructions:%i\n", buffer[i]);
                 }
                 if (!Section::encoding(kValueFunctionInstructions, (uint32_t)size, buffer)) {
                     break;
@@ -981,7 +1034,7 @@ bool SectionFunction::decoding() {
                         int instructions_count = readbytes / sizeof(uint32_t);
                         for (int i = 0; i < instructions_count; i++) {
                             func_state->AddInstruction(buffer[i]);
-                            printf("decoding instructions:%i\n", buffer[i]);
+                            LOGD("decoding instructions:%i\n", buffer[i]);
                         }
                         free(buffer);
                         break;
@@ -1020,6 +1073,7 @@ bool SectionFunction::decoding() {
                             }
                             read_buffer += bytes_read;
                             remain_length -= bytes_read;
+                            func_state->AddConstant(value);
                         }
                         free(buffer);
                         break;
@@ -1038,7 +1092,7 @@ bool SectionFunction::decoding() {
                         int32_t size = readbytes / sizeof(int32_t);
                         for (int i = 0; i < size; i++) {
                             func_state->out_closure_refs().push_back(buffer[i]);
-                            printf("decoding function out closure:%i\n", buffer[i]);
+                            LOGD("decoding function out closure:%i\n", buffer[i]);
                         }
                         break;
                     }
@@ -1056,7 +1110,7 @@ bool SectionFunction::decoding() {
                         int32_t size = readbytes / sizeof(int32_t);
                         for (int i = 0; i < size; i++) {
                             func_state->in_closure_refs().push_back(buffer[i]);
-                            printf("decoding function in closure:%i\n", buffer[i]);
+                            LOGD("decoding function in closure:%i\n", buffer[i]);
                         }
                         break;
                     }
@@ -1319,7 +1373,7 @@ bool SectionGlobalVariables::decoding() {
                 throw DecoderError("decoding global variables target error");
                 break;
             }
-            char *pstr = new char[readbytes + 1];
+            char *pstr = (char *)malloc(readbytes + 1);
             if (!pstr) {
                 throw DecoderError("decoding global variables low memory error");
                 break;
@@ -1450,7 +1504,7 @@ bool SectionStyles::decoding() {
                 throw DecoderError("decoding styles target error");
                 break;
             }
-            char *pstr = new char[readbytes + 1];
+            char *pstr = (char *)malloc(readbytes + 1);
             if (!pstr) {
                 throw DecoderError("decoding styles low memory error");
                 break;
@@ -1477,7 +1531,7 @@ bool SectionStyles::decoding() {
                     throw DecoderError("decoding styles target error");
                     break;
                 }
-                char *pstr_key = new char[readbytes + 1];
+                char *pstr_key = (char *)malloc(readbytes + 1);
                 if (!pstr_key) {
                     throw DecoderError("decoding styles low memory error");
                     break;
@@ -1495,7 +1549,7 @@ bool SectionStyles::decoding() {
                     throw DecoderError("decoding styles target error");
                     break;
                 }
-                char *pstr_value = new char[readbytes + 1];
+                char *pstr_value = (char *)malloc(readbytes + 1);
                 if (!pstr_value) {
                     throw DecoderError("decoding styles low memory error");
                     break;
@@ -1623,6 +1677,7 @@ bool SectionVaueRef::decoding() {
             break;
         }
         int64_t seek_end = stream->Tell() + length();
+        ValueRef::reset();
         for (uint32_t i = 0; i < refs_size; i++) {
             FuncState *func_state = nullptr;
             ValueRef *ref = nullptr;
@@ -1888,8 +1943,8 @@ bool SectionClass::encoding() {
                         throw EncoderError("encoding class static func value error");
                         break;
                     }
-                    remain_length -= bytes_write;
                     write_buffer += bytes_write;
+                    remain_length -= bytes_write;
                     uint8_t has_key_value = false;
                     Value key;
                     for (auto &item : desc->static_funcs_->map()) {
@@ -1903,14 +1958,17 @@ bool SectionClass::encoding() {
                     if (!(bytes_write = Section::encodingToBuffer(write_buffer, remain_length, kValueClassFunctionKey, sizeof(uint8_t), &has_key_value))) {
                         break;
                     }
-                    remain_length -= bytes_write;
                     write_buffer += bytes_write;
+                    remain_length -= bytes_write;
                     if (has_key_value) {
+                        length = GetValueLength(&key);
                         bytes_write = Section::encodingValueToBuffer(write_buffer, remain_length, &key);
                         if (bytes_write != length) {
                             throw EncoderError("encoding class static func value error");
                             break;
                         }
+                        write_buffer += bytes_write;
+                        remain_length -= bytes_write;
                     }
                 }
                 if (!Section::encoding(kValueClassStaticFunction, static_func_length, buffer)) {
@@ -1931,7 +1989,6 @@ bool SectionClass::encoding() {
                     class_func_length += GetFTLVLength(kValueClassFunctionKey, sizeof(uint8_t));
                     for (auto &item : desc->funcs_->map()) {
                         if (item.second == j) {
-                            LOGD("encoding class function key:%s\n", item.first.c_str());
                             Value key(string_table->StringFromUTF8(item.first));
                             class_func_length += GetValueLength(&key);
                             break;
@@ -1953,8 +2010,8 @@ bool SectionClass::encoding() {
                         throw EncoderError("encoding class func value error");
                         break;
                     }
-                    remain_length -= bytes_write;
                     write_buffer += bytes_write;
+                    remain_length -= bytes_write;
                     uint8_t has_key_value = false;
                     Value key;
                     for (auto &item : desc->funcs_->map()) {
@@ -1967,14 +2024,18 @@ bool SectionClass::encoding() {
                     if (!(bytes_write = Section::encodingToBuffer(write_buffer, remain_length, kValueClassFunctionKey, sizeof(uint8_t), &has_key_value))) {
                         break;
                     }
-                    remain_length -= bytes_write;
                     write_buffer += bytes_write;
+                    remain_length -= bytes_write;
                     if (has_key_value) {
+                        length = GetValueLength(&key);
                         bytes_write = Section::encodingValueToBuffer(write_buffer, remain_length, &key);
                         if (bytes_write != length) {
-                            throw EncoderError("encoding class func value error");
+                            throw EncoderError("encoding class func value key error");
                             break;
                         }
+                        write_buffer += bytes_write;
+                        remain_length -= bytes_write;
+                        LOGD("encoding class function key:%s\n", key.str->c_str());
                     }
                 }
                 if (!Section::encoding(kValueClassMemberFunction, class_func_length, buffer)) {
@@ -1984,7 +2045,7 @@ bool SectionClass::encoding() {
             }
             uint8_t class_finished = SECTION_VALUE_FINISHED;
             if (!Section::encoding(kValueClassFinished, sizeof(uint8_t), &class_finished)) {
-                throw DecoderError("decoding class finished error");
+                throw DecoderError("encoding class finished error");
                 break;
             }
         }
@@ -2014,9 +2075,11 @@ bool SectionClass::decoding() {
             break;
         }
         int64_t seek_end = stream->Tell() + length();
+        std::vector<ClassDescriptor *> descs = class_factory->descs();
         for (uint32_t i = 0; i < descs_size; i++) {
             Value value = class_factory->CreateClassDescriptor(nullptr);
             ClassDescriptor *desc = ValueTo<ClassDescriptor>(&value);
+            descs.push_back(desc);
             uint32_t class_funcs_size = 0;
             uint32_t class_static_funcs_size = 0;
             do {
@@ -2031,10 +2094,11 @@ bool SectionClass::decoding() {
                             throw DecoderError("decoding class super error");
                             break;
                         }
-                        if (super_index < 0) {
+                        if (super_index < 0 || super_index >= descs.size()) {
                             throw DecoderError("decoding class super error");
                         }
-                        desc->super_index_ = super_index;
+                        desc->p_super_ = descs[super_index];
+                        LOGD("decoding class super index:%i\n", super_index);
                         break;
                     }
                     case kValueClassStaticFunctionSize:
@@ -2047,6 +2111,8 @@ bool SectionClass::decoding() {
                             throw DecoderError("decoding class static funcs size error");
                             break;
                         }
+                        LOGD("decoding class static function size:%d\n", class_static_funcs_size);
+                        break;
                     }
                     case kValueClassStaticFunction:
                     {
@@ -2066,7 +2132,7 @@ bool SectionClass::decoding() {
                         uint8_t *read_buffer = buffer;
                         uint32_t remain_length = readbytes;
                         uint32_t bytes_read = 0;
-                        for (int i = 0; i < class_static_funcs_size; i++) {
+                        for (int j = 0; j < class_static_funcs_size; j++) {
                             Value func, key;
                             if (!(bytes_read = decodingValueFromBuffer(read_buffer, remain_length, &func))) {
                                 throw DecoderError("decoding class static func payload error");
@@ -2090,6 +2156,8 @@ bool SectionClass::decoding() {
                                     throw DecoderError("decoding class static func key error");
                                     break;
                                 }
+                                read_buffer += bytes_read;
+                                remain_length -= bytes_read;
                                 if (!IsString(&key)) {
                                     throw DecoderError("decoding class static func key error");
                                     break;
@@ -2113,6 +2181,8 @@ bool SectionClass::decoding() {
                             throw DecoderError("decoding class funcs size error");
                             break;
                         }
+                        LOGD("decoding class function size:%d\n", class_funcs_size);
+                        break;
                     }
                     case kValueClassMemberFunction:
                     {
@@ -2132,7 +2202,7 @@ bool SectionClass::decoding() {
                         uint8_t *read_buffer = buffer;
                         uint32_t remain_length = readbytes;
                         uint32_t bytes_read = 0;
-                        for (int i = 0; i < class_funcs_size; i++) {
+                        for (int j = 0; j < class_funcs_size; j++) {
                             Value func, key;
                             if (!(bytes_read = decodingValueFromBuffer(read_buffer, remain_length, &func))) {
                                 throw DecoderError("decoding class func payload error");
@@ -2149,12 +2219,12 @@ bool SectionClass::decoding() {
                             if (!(bytes_read = decodingFromBuffer(read_buffer, remain_length, &target, (uint8_t *)&has_key_value, &bytes_decoding))) {
                                 break;
                             }
+                            read_buffer += bytes_read;
+                            remain_length -= bytes_read;
                             if (target != kValueClassFunctionKey) {
                                 throw DecoderError("decoding class func key error");
                                 break;
                             }
-                            read_buffer += bytes_read;
-                            remain_length -= bytes_read;
                             if (has_key_value) {
                                 if (!(bytes_read = decodingValueFromBuffer(read_buffer, remain_length, &key))) {
                                     throw DecoderError("decoding class func key error");
@@ -2164,6 +2234,8 @@ bool SectionClass::decoding() {
                                     throw DecoderError("decoding class static func key error");
                                     break;
                                 }
+                                read_buffer += bytes_read;
+                                remain_length -= bytes_read;
                                 desc->funcs_->Add(key.str->c_str(), func);
                             }
                             else {

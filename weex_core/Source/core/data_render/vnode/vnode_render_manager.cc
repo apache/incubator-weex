@@ -20,6 +20,7 @@
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include <chrono>
 #include <sstream>
+#include "core/data_render/exec_state_binary.h"
 #include "base/string_util.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
@@ -29,7 +30,6 @@
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_creator.h"
 #include "core/bridge/platform_bridge.h"
-#include "core/data_render/binary_file.h"
 #include "core/data_render/common_error.h"
 
 #define VRENDER_LOG true
@@ -167,13 +167,13 @@ void VNodeRenderManager::InitVM() {
 }
 
 void VNodeRenderManager::CreatePage(const std::string &input, const std::string &page_id, const  std::string &options, const std::string &init_data) {
-    std::string err = CreatePageImpl(input, page_id, options, init_data);
+    std::string err = CreatePageWithContent(input, page_id, options, init_data);
     if (!err.empty()) {
         WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id.c_str(), nullptr, err.c_str());
     }
 }
 
-std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data) {
+std::string VNodeRenderManager::CreatePageWithContent(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data) {
     InitVM();
     auto start = std::chrono::steady_clock::now();
     ExecState *exec_state = new ExecState(g_vm);
@@ -257,24 +257,16 @@ void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state, std::vect
     } while (0);
 }
 
-std::string VNodeRenderManager::CreatePageWithOpcode(const std::string& page_id, const std::string& options, const std::string& init_data) {
+std::string VNodeRenderManager::CreatePageWithContent(const uint8_t *contents, size_t length, const std::string &page_id, const std::string &options, const std::string &init_data) {
     InitVM();
     auto start = std::chrono::steady_clock::now();
     ExecState *exec_state = new ExecState(g_vm);
     exec_states_.insert({page_id, exec_state});
     VNodeExecEnv::InitCFuncEnv(exec_state);
     std::string err;
-    try {
-        exec_state->startDecode();
-    } catch (std::exception &e) {
-        auto error = static_cast<Error *>(&e);
-        if (error) {
-            err = error->what();
-            std::cerr << error->what() << std::endl;
-        }
+    if (!weex::core::data_render::WXExecDecoder(exec_state, (uint8_t *)contents, length, err)) {
         return err;
     }
-    exec_state->endDecode();
     if (init_data.length() > 0) {
         VNodeExecEnv::InitDataValue(exec_state, init_data);
     }
@@ -294,11 +286,8 @@ std::string VNodeRenderManager::CreatePageWithOpcode(const std::string& page_id,
     return err;
 }
 
-void VNodeRenderManager::CreatePage(const char *contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data) {
-    BinaryFile *file = BinaryFile::instance();
-    file->set_input(contents);
-    file->set_length(length);
-    string err = CreatePageWithOpcode(page_id, options, init_data);
+void VNodeRenderManager::CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& init_data) {
+    string err = CreatePageWithContent((const uint8_t *)contents, length, page_id, options, init_data);
     if (!err.empty()) {
         WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id.c_str(), nullptr, err.c_str());
     }

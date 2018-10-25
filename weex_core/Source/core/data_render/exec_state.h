@@ -49,6 +49,7 @@ public:
     inline Value &value() { return value_; }
     inline bool &is_closure() { return is_closure_; }
     inline FuncClosure *closure() { return closure_; }
+    static void reset() { gs_ref_id = 0; }
     ~ValueRef() {}
 private:
     static int gs_ref_id;
@@ -198,6 +199,7 @@ class ExecState {
   inline ClassFactory *class_factory() { return class_factory_.get(); }
   inline uint32_t global_compile_index() { return global_compile_index_; }
   inline uint32_t class_compile_index() { return class_compile_index_; }
+  inline uint32_t string_compile_index() { return string_compile_index_; }
   inline std::unordered_map<std::string, long>& global_variables() { return global_variables_; }
   void startEncode();
   void endEncode();
@@ -249,6 +251,7 @@ class ExecState {
   std::unordered_map<int, json11::Json> styles_;
   uint32_t global_compile_index_{0};
   uint32_t class_compile_index_{0};
+  uint32_t string_compile_index_{0};
 };
 
 }  // namespace data_render

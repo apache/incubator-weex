@@ -385,12 +385,6 @@ bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
 bool WXExecDecoder(ExecState *exec_state, uint8_t *buffer, size_t size, std::string &error) {
     bool finished = false;
     do {
-#ifdef DEBUG
-        if (!exec_state) {
-            VM *vm = new VM();
-            exec_state = new ExecState(vm);
-        }
-#endif
         std::string err;
         ExecStateDecoder decoder(exec_state, buffer, size);
         if (!decoder.decoding(err)) {
