@@ -652,10 +652,9 @@ void AddNodes(const string& pageId, vector<VNode*>& vec,
   for (int i = start; i <= end; ++i) {
     auto p_node = vec[i];
     ref_list.insert(ref_list.begin() + i, p_node);
-
-    WeexCore::RenderObject* root = VNode2RenderObject(p_node, pageId);
+    WeexCore::RenderObject *node = ParseVNode2RenderObject(p_node, nullptr, false, 0, pageId);
     RenderManager::GetInstance()->AddRenderObject(
-        pageId, p_node->parent()->render_object_ref(), i, root);
+        pageId, p_node->parent()->render_object_ref(), i, node);
   }
 }
 
