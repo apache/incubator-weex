@@ -712,7 +712,7 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   global->Add("_components_props", components_props);
 }
 
-void VNodeExecEnv::InitInitDataValue(ExecState *state, const std::string& init_data_str) {
+void VNodeExecEnv::InitDataValue(ExecState *state, const std::string& init_data_str) {
   std::string err;
   const json11::Json& json = json11::Json::parse(init_data_str, err);
   if (!err.empty()) {

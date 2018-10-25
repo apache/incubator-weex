@@ -44,16 +44,6 @@ ClassDescriptor *NewClassArray() {
     AddClassCFunc(array_desc, "indexOf", indexOf);
     return array_desc;
 }
-    
-int IndexOf(const std::vector<Value> &items, const Value *val) {
-    auto iterator = std::find(items.begin(), items.end(), val);
-    if (iterator != items.end()) {
-        return (int)std::distance(items.begin(), iterator);
-    }
-    else {
-        return -1;
-    }
-}
 
 int SetArray(Array *array, Value *index, const Value &val) {
     int ret = 0;

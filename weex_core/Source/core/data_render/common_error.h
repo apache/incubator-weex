@@ -69,6 +69,12 @@ public:
     EncoderError(std::string str)
     : Error("[EncoderError]", std::move(str)) { }
 };
+    
+class DecoderError : public Error {
+public:
+    DecoderError(std::string str)
+    : Error("[DecoderError]", std::move(str)) { }
+};
 
 class OpcodeDecodeError : public Error {
 public:

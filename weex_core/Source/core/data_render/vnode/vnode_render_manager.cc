@@ -189,7 +189,7 @@ std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const s
     }
     VNodeExecEnv::InitGlobalValue(exec_state);
     if (init_data.length() > 0) {
-        VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+        VNodeExecEnv::InitDataValue(exec_state, init_data);
     }
     VNodeExecEnv::InitStyleList(exec_state);
     exec_state->context()->page_id(page_id);
@@ -276,7 +276,7 @@ std::string VNodeRenderManager::CreatePageWithOpcode(const std::string& page_id,
     }
     exec_state->endDecode();
     if (init_data.length() > 0) {
-        VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+        VNodeExecEnv::InitDataValue(exec_state, init_data);
     }
     auto decoder_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], Decoder time:[%lld]\n", decoder_post.count());
@@ -312,7 +312,7 @@ bool VNodeRenderManager::RefreshPage(const std::string& page_id,
             break;
         }
         ExecState *exec_state = it->second;
-        VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+        VNodeExecEnv::InitDataValue(exec_state, init_data);
         std::string err;
         exec_state->context()->Reset();
         exec_state->Execute(err);  // refresh root

@@ -47,6 +47,31 @@ bool ExecStateEncoder::encoding(std::string &err) {
                 err = "function section encoding error";
                 break;
             }
+            SectionClass classDescriptor(this);
+            if (!classDescriptor.encoding()) {
+                err = "class encoding error";
+                break;
+            }
+            SectionGlobalConstants constants(this);
+            if (!constants.encoding()) {
+                err = "global constants section encoding error";
+                break;
+            }
+            SectionGlobalVariables variables(this);
+            if (!variables.encoding()) {
+                err = "global variables section encoding error";
+                break;
+            }
+            SectionStyles styles(this);
+            if (!styles.encoding()) {
+                err = "style section encoding error";
+                break;
+            }
+            SectionVaueRef valueRef(this);
+            if (!valueRef.encoding()) {
+                err = "value ref section encoding error";
+                break;
+            }
         }
         catch (std::exception &e) {
             auto error = static_cast<Error *>(&e);
@@ -98,6 +123,7 @@ bool ExecStateDecoder::decoding(std::string &err) {
                         if (!string.decoding()) {
                             throw EncoderError("string section decoding error");
                         }
+                        break;
                     }
                     case ExecSection::EXEC_SECTION_FUNCTION:
                     {
@@ -107,8 +133,53 @@ bool ExecStateDecoder::decoding(std::string &err) {
                         }
                         break;
                     }
-                    default:
+                    case ExecSection::EXEC_SECTION_GLOBAL_CONSTANTS:
+                    {
+                        SectionGlobalConstants constants(this, section_length);
+                        if (!constants.decoding()) {
+                            throw EncoderError("function global constants decoding error");
+                        }
                         break;
+                    }
+                    case ExecSection::EXEC_SECTION_GLOBAL_VARIABLES:
+                    {
+                        SectionGlobalVariables variables(this, section_length);
+                        if (!variables.decoding()) {
+                            throw EncoderError("function global variables decoding error");
+                        }
+                        break;
+                    }
+                    case ExecSection::EXEC_SECTION_STYLES:
+                    {
+                        SectionStyles styles(this, section_length);
+                        if (!styles.decoding()) {
+                            throw EncoderError("function global variables decoding error");
+                        }
+                        break;
+                    }
+                    case ExecSection::EXEC_SECTION_VALUEREF:
+                    {
+                        SectionVaueRef valueRef(this, section_length);
+                        if (!valueRef.decoding()) {
+                            throw EncoderError("value ref decoding error");
+                        }
+                        break;
+                    }
+                    case ExecSection::EXEC_SECTION_CLASS:
+                    {
+                        SectionClass classDescriptor(this, section_length);
+                        if (!classDescriptor.decoding()) {
+                            throw EncoderError("class decoding error");
+                        }
+                        break;
+                    }
+                    default:
+                    {
+                        if (stream_->Seek(section_length, SEEK_CUR) < 0) {
+                            throw EncoderError("section decoding length error");
+                        }
+                        break;
+                    }
                 }
                 
             } while (stream_->Tell() < fileSize);

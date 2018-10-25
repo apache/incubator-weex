@@ -71,7 +71,7 @@ Value ClassFactory::ClassObject() {
     return value;
 }
     
-int ClassFactory::find(const ClassDescriptor *desc) {
+int ClassFactory::Find(const ClassDescriptor *desc) {
     std::vector<ClassDescriptor *> descs = this->descs();
     int index = 0;
     for (auto d : descs) {

@@ -43,7 +43,7 @@ public:
     virtual Value ClassObject();
     virtual Value CreateArray();
     virtual Value CreateTable();
-    int find(const ClassDescriptor *desc);
+    int Find(const ClassDescriptor *desc);
     inline const std::vector<std::pair<GCObject *, Value::Type>>& stores() { return stores_; }
     std::vector<ClassDescriptor *> descs();
 private:

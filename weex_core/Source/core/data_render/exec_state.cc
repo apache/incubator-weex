@@ -38,7 +38,7 @@ namespace core {
 namespace data_render {
     
 int ValueRef::gs_ref_id = 0;
-    
+       
 FuncClosure::FuncClosure(ValueRef *ref) {
     if (ref) {
         func_state_ = ref->func_state();
@@ -71,11 +71,20 @@ ExecState::ExecState(VM *vm)
       class_factory_(new ClassFactory()),
       global_variables_() {}
     
+ExecState::~ExecState() {
+    for (ValueRef *ref : refs_) {
+        if (ref) {
+            delete ref;
+        }
+    }
+}
+    
 void ExecState::Compile(std::string& err) {
 #if DEBUG
   TimeCost tc("Compile");
 #endif
-  global_compile_index_ = global()->size();
+  class_compile_index_ = static_cast<uint32_t>(class_factory_->descs().size());
+  global_compile_index_ = static_cast<uint32_t>(global()->size());
   ValueRef::gs_ref_id = 0;
   err.clear();
   CodeGenerator generator(this);
@@ -358,7 +367,7 @@ void ExecState::encodeClassSection() {
             continue;
         }
 
-        int superIndex = class_factory_->find(desc->p_super_);
+        int superIndex = class_factory_->Find(desc->p_super_);
         file->write((char*)&superIndex, sizeof(int32_t));
         unsigned static_func_size = static_cast<unsigned>(desc->static_funcs_->size());
         file->write((char*)&static_func_size, sizeof(u_int32_t));
@@ -509,7 +518,7 @@ bool ExecState::startDecode() {
 
     while (!file->eof()) {
         Section section_id = NULL_SECTION;
-        file->read((char*)&section_id, sizeof(u_int32_t));
+        file->read((char *)&section_id, sizeof(u_int32_t));
         switch (section_id) {
             case STRING_SECTION:
                 decodeStringSection();

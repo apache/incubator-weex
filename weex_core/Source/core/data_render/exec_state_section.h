@@ -34,14 +34,13 @@ namespace data_render {
 
 enum ExecSection {
     EXEC_SECTION_NONE = 0,
-    EXEC_SECTION_STRING,
-    EXEC_SECTION_TABLE,
-    EXEC_SECTION_FUNCTION,
     EXEC_SECTION_HEADER,
-    EXEC_SECTION_GLOBAL_VARIABLE,
-    EXEC_SECTION_STYLE,
-    EXEC_SECTION_ARRAY,
-    EXEC_SECTION_REFVALUE,
+    EXEC_SECTION_STRING,
+    EXEC_SECTION_FUNCTION,
+    EXEC_SECTION_GLOBAL_CONSTANTS,
+    EXEC_SECTION_GLOBAL_VARIABLES,
+    EXEC_SECTION_STYLES,
+    EXEC_SECTION_VALUEREF,
     EXEC_SECTION_CLASS
 };
 
@@ -52,16 +51,18 @@ struct Value;
     
 class Section {
 public:
-    enum {
+    enum SectionKey {
         kValueType,
-        kValuePlayload,
+        kValuePayload,
     };
     explicit Section(ExecStateEncoder *encoder) : encoder_(encoder) {}
     explicit Section(ExecStateDecoder *decoder, uint32_t length) : decoder_(decoder), length_(length) {}
     virtual ~Section() {};
     bool encoding(uint16_t index, uint32_t len, void *buffer = nullptr);
     uint32_t encodingToBuffer(uint8_t *dst_buffer, uint32_t dst_buffer_len, uint16_t index, uint32_t len, void *buffer = nullptr);
-    uint32_t encodingValueToBuffer(uint8_t *dst_buffer, uint32_t dst_buffer_len, Value *value);
+    uint32_t decodingFromBuffer(uint8_t *src_buffer, uint32_t src_buffer_len, uint16_t *index, uint8_t *buffer, uint32_t *len);
+    uint32_t encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Value *pval);
+    uint32_t decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, Value *pval);
     virtual bool encoding() { return false; };
     virtual bool decoding() { return false; };
     virtual uint32_t size() { return 0; };
@@ -98,9 +99,9 @@ private:
     
 class SectionString : public Section {
 public:
-    enum Value {
-        kValueStringCount,
-        kValueStringContent,
+    enum SectionKey {
+        kValueStringSize,
+        kValueStringPayload,
     };
     SectionString(ExecStateEncoder *encoder) : Section(encoder) {}
     SectionString(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
@@ -112,8 +113,8 @@ public:
     
 class SectionFunction : public Section {
 public:
-    enum Value {
-        kValueFunctionCount,
+    enum SectionKey {
+        kValueFunctionSize,
         kValueFunctionSuper,
         kValueFunctionClass,
         kValueFunctionArgs,
@@ -122,6 +123,7 @@ public:
         kValueFunctionInstructions,
         kValueFunctionConstantCount,
         kValueFunctionConstantPayload,
+        kValueFunctionFinished = 255,
     };
     SectionFunction(ExecStateEncoder *encoder) : Section(encoder) {}
     SectionFunction(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
@@ -131,7 +133,88 @@ public:
     virtual uint32_t size();
 };
 
-    
+class SectionGlobalConstants : public Section {
+public:
+    enum SectionKey {
+        kValueGlobalConstantsSize,
+        kValueGlobalConstantsPayload,
+    };
+    SectionGlobalConstants(ExecStateEncoder *encoder) : Section(encoder) {}
+    SectionGlobalConstants(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
+    virtual ~SectionGlobalConstants() {};
+    virtual bool encoding();
+    virtual bool decoding();
+    virtual uint32_t size();
+};
+
+class SectionGlobalVariables: public Section {
+public:
+    enum SectionKey {
+        kValueGlobalVariablesSize,
+        kValueGlobalVariablesKey,
+        kValueGlobalVariablesRegister
+    };
+    SectionGlobalVariables(ExecStateEncoder *encoder) : Section(encoder) {}
+    SectionGlobalVariables(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
+    virtual ~SectionGlobalVariables() {};
+    virtual bool encoding();
+    virtual bool decoding();
+    virtual uint32_t size();
+};
+
+class SectionStyles: public Section {
+public:
+    enum SectionKey {
+        kValueStyleSize,
+        kValueStyleKey,
+        kValueStyleValue,
+        kValueStyleItemSize,
+    };
+    SectionStyles(ExecStateEncoder *encoder) : Section(encoder) {}
+    SectionStyles(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
+    virtual ~SectionStyles() {};
+    virtual bool encoding();
+    virtual bool decoding();
+    virtual uint32_t size();
+};
+
+class SectionVaueRef : public Section {
+public:
+    enum SectionKey {
+        kValueRefSize,
+        kValueFuncState,
+        kValueIsClosure,
+        kValueRegister,
+        kValueRefFinished,
+    };
+    SectionVaueRef(ExecStateEncoder *encoder) : Section(encoder) {}
+    SectionVaueRef(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
+    virtual ~SectionVaueRef() {};
+    virtual bool encoding();
+    virtual bool decoding();
+    virtual uint32_t size();
+};
+
+class SectionClass : public Section {
+public:
+    enum SectionKey {
+        kValueClassSize,
+        kValueClassSuper,
+        kValueClassFunctionKey,
+        kValueClassStaticFunctionSize,
+        kValueClassStaticFunction,
+        kValueClassMemberFunctionSize,
+        kValueClassMemberFunction,
+        kValueClassFinished,
+    };
+    SectionClass(ExecStateEncoder *encoder) : Section(encoder) {}
+    SectionClass(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
+    virtual ~SectionClass() {};
+    virtual bool encoding();
+    virtual bool decoding();
+    virtual uint32_t size();
+};
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

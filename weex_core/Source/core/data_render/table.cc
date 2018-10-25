@@ -26,15 +26,6 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-int IndexOf(const std::vector<Value> *arr, const Value *val) {
-  auto it = std::find(arr->begin(), arr->end(), val);
-  if (it != arr->end()) {
-    return static_cast<int>(std::distance(arr->begin(), it));
-  } else {
-    return -1;
-  }
-}
-
 int SetTableForTable(Table *table, const Value *src) {
     int ret = 0;
     do {

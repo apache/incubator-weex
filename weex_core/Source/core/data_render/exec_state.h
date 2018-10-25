@@ -80,7 +80,7 @@ private:
 
 class FuncState {
  public:
-  FuncState() : instructions_(), args_(), in_closure_(), out_closure_(), constants_(), children_(), super_index_(-1) {}
+  FuncState() : instructions_(), args_(), in_closure_(), out_closure_(), constants_(), children_(), super_index_(-1), in_closure_refs_(), out_closure_refs_() {}
   virtual ~FuncState() {}
 
   int AddConstant(Value value) {
@@ -143,7 +143,8 @@ class FuncState {
   inline std::vector<ValueRef *> &out_closure() { return out_closure_; }
   inline int super_index() const { return super_index_; }
   inline void set_super_index(int super_index) { super_index_ = super_index; }
-
+  inline std::vector<int32_t>& in_closure_refs() { return in_closure_refs_; }
+  inline std::vector<int32_t>& out_closure_refs() { return out_closure_refs_; }
  private:
   std::vector<Instruction> instructions_;
   std::vector<Value> constants_;
@@ -151,6 +152,8 @@ class FuncState {
   std::vector<long> args_;
   std::vector<ValueRef *> in_closure_;
   std::vector<ValueRef *> out_closure_;
+  std::vector<int32_t> in_closure_refs_;
+  std::vector<int32_t> out_closure_refs_;
   FuncState *super_func_{nullptr};
   int super_index_;
   bool is_class_func_{false};
@@ -173,7 +176,7 @@ class ExecStack {
 class ExecState {
  public:
   ExecState(VM *vm);
-  virtual ~ExecState() {}
+  virtual ~ExecState();
   void Compile(std::string& error);
   void Execute(std::string& error);
   const Value Call(const std::string& func_name, const std::vector<Value>& args);
@@ -185,14 +188,17 @@ class ExecState {
   ValueRef *FindRef(int index);
   void Register(const std::string& name, CFunction function);
   void Register(const std::string& name, Value value);
-  std::vector<ValueRef *> &refs() { return refs_; };
+  inline std::vector<ValueRef *> &refs() { return refs_; };
   inline Variables *global() { return global_.get(); }
+  inline void reset(FuncState *func_state) { func_state_.reset(func_state); }
   inline FuncState *func_state() { return func_state_.get(); }
   inline ExecStack *stack() { return stack_.get(); }
   inline StringTable *string_table() { return string_table_.get(); }
   inline VNodeRenderContext *context() { return render_context_.get(); }
   inline ClassFactory *class_factory() { return class_factory_.get(); }
-
+  inline uint32_t global_compile_index() { return global_compile_index_; }
+  inline uint32_t class_compile_index() { return class_compile_index_; }
+  inline std::unordered_map<std::string, long>& global_variables() { return global_variables_; }
   void startEncode();
   void endEncode();
 
@@ -241,7 +247,8 @@ class ExecState {
   std::unique_ptr<VNodeRenderContext> render_context_;
   std::unordered_map<std::string, long> global_variables_;
   std::unordered_map<int, json11::Json> styles_;
-  size_t global_compile_index_{0};
+  uint32_t global_compile_index_{0};
+  uint32_t class_compile_index_{0};
 };
 
 }  // namespace data_render

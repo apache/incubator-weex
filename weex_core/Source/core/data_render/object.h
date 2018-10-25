@@ -109,7 +109,7 @@ struct Value {
 
   Value(double value) : n(value), type(NUMBER) {}
 
-  Value(bool value) : b(value), type(BOOL) {}
+  explicit Value(bool value) : b(value), type(BOOL) {}
 
   Value(String *value) : str(value), type(STRING) {}
     
