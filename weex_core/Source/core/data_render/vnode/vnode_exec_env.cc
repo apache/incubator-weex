@@ -536,7 +536,6 @@ static Value SetProps(ExecState *exec_state) {
                         LOGE("can't support type:%i\n", iter->second.type);
                         break;
                 }
-
             }
         }
     }
@@ -580,7 +579,7 @@ static Value SetStyle(ExecState* exec_state) {
   return Value();
 }
 
-void VNodeExecEnv::InitCFuncEnv(ExecState *state) {
+void VNodeExecEnv::ImportExecEnv(ExecState *state) {
     state->Register("log", Log);
     state->Register("sizeof", SizeOf);
     state->Register("slice", Slice);
@@ -680,7 +679,7 @@ json11::Json ValueToJSON(const Value& value) {
     return json11::Json(object);
 }
 
-void VNodeExecEnv::InitGlobalValue(ExecState* state) {
+void VNodeExecEnv::ParseData(ExecState* state) {
   const json11::Json& json = state->context()->raw_json();
   Variables* global = state->global();
   const json11::Json& data = json["data"];
@@ -712,7 +711,7 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   global->Add("_components_props", components_props);
 }
 
-void VNodeExecEnv::InitDataValue(ExecState *state, const std::string& init_data_str) {
+void VNodeExecEnv::ImportExecData(ExecState *state, const std::string& init_data_str) {
   std::string err;
   const json11::Json& json = json11::Json::parse(init_data_str, err);
   if (!err.empty()) {
@@ -739,7 +738,7 @@ void AddStyles(ExecState* state, const std::string& prefix, const json11::Json& 
   }
 }
 
-void VNodeExecEnv::InitStyleList(ExecState* state) {
+void VNodeExecEnv::ParseStyle(ExecState *state) {
   json11::Json& json = state->context()->raw_json();
   //body styles
 

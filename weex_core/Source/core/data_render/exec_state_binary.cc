@@ -23,10 +23,13 @@
 #include "core/data_render/exec_state.h"
 #include "third_party/json11/json11.hpp"
 #include "core/data_render/vnode/vnode_exec_env.h"
+#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
+    
+#define EXECSTATE_ENCODING_COMPARE           0
         
 bool ExecStateEncoder::encoding(std::string &err) {
     bool finished = false;
@@ -321,6 +324,10 @@ int64_t fStream::Seek(int64_t pos, int type) {
     return (int64_t)seek_;
 }
     
+#if EXECSTATE_ENCODING_COMPARE
+static ExecState *gs_encoder = nullptr;
+#endif
+    
 bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
     bool finished = false;
     VM *vm = nullptr;
@@ -342,7 +349,7 @@ bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
             break;
         }
         exec_state = new ExecState(vm);
-        VNodeExecEnv::InitCFuncEnv(exec_state);
+        VNodeExecEnv::ImportExecEnv(exec_state);
         if (!exec_state) {
             error = "low memory";
             break;
@@ -354,8 +361,15 @@ bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
         }
         else {
             exec_state->context()->raw_json() = json;
+            VNodeExecEnv::ParseData(exec_state);
+            VNodeExecEnv::ParseStyle(exec_state);
         }
-        VNodeExecEnv::InitStyleList(exec_state);
+        if (exec_state->global()->IndexOf("__weex_data__") < 0) {
+            exec_state->global()->Set("__weex_data__", Value());
+        }
+        if (exec_state->global()->IndexOf("_init_data") < 0) {
+            exec_state->global()->Set("_init_data", Value());
+        }
         exec_state->Compile(err);
         if (!err.empty()) {
             error = err;
@@ -366,13 +380,19 @@ bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
             error = err;
             break;
         }
+#if EXECSTATE_ENCODING_COMPARE
+        gs_encoder = exec_state;
+#endif
         finished = true;
         
     } while (0);
     
+#if EXECSTATE_ENCODING_COMPARE
+#else
     if (exec_state) {
         delete exec_state;
     }
+#endif
     if (vm) {
         delete vm;
     }
@@ -381,6 +401,8 @@ bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
     }    
     return finished;
 }
+    
+static void compare(ExecState *encoder, ExecState *decoder);
     
 bool WXExecDecoder(ExecState *exec_state, uint8_t *buffer, size_t size, std::string &error) {
     bool finished = false;
@@ -391,6 +413,9 @@ bool WXExecDecoder(ExecState *exec_state, uint8_t *buffer, size_t size, std::str
             error = err;
             break;
         }
+#if EXECSTATE_ENCODING_COMPARE
+        compare(gs_encoder, exec_state);
+#endif
         finished = true;
         
     } while (0);
@@ -398,6 +423,141 @@ bool WXExecDecoder(ExecState *exec_state, uint8_t *buffer, size_t size, std::str
     return finished;
 }
     
+#if EXECSTATE_ENCODING_COMPARE
+static void compare_value(Value *encoder_value, Value *decoder_value);
+static void compare_variables(Variables *encoder_var, Variables *decoder_var, bool map_diff = true);
+static void compare_class_desc(ClassDescriptor *encoder_desc, ClassDescriptor *decoder_desc) {
+    if (encoder_desc->p_super_) {
+        assert(decoder_desc->p_super_);
+        compare_class_desc(encoder_desc->p_super_, decoder_desc->p_super_);
+    }
+    compare_variables(encoder_desc->static_funcs_.get(), decoder_desc->static_funcs_.get());
+    compare_variables(encoder_desc->funcs_.get(), decoder_desc->funcs_.get());
+}
+    
+static void compare_func_state(FuncState *encoder_func_state, FuncState *decoder_func_state) {
+    assert(encoder_func_state->is_class_func() == decoder_func_state->is_class_func());
+    assert(encoder_func_state->argc() == decoder_func_state->argc());
+    for (int i = 0; i < encoder_func_state->args().size(); i++) {
+        assert(encoder_func_state->args()[i] == decoder_func_state->args()[i]);
+    }
+    assert(encoder_func_state->in_closure().size() == decoder_func_state->in_closure().size());
+    assert(encoder_func_state->out_closure().size() == decoder_func_state->out_closure().size());
+    assert(encoder_func_state->instructions().size() == decoder_func_state->instructions().size());
+    for (int i = 0; i < encoder_func_state->instructions().size(); i++) {
+        assert(encoder_func_state->instructions()[i] == decoder_func_state->instructions()[i]);
+    }
+    assert(encoder_func_state->constants().size() == decoder_func_state->constants().size());
+    for (int i = 0; i < encoder_func_state->constants().size(); i++) {
+        Value encoder_value = encoder_func_state->constants()[i];
+        Value decoder_value = decoder_func_state->constants()[i];
+        compare_value(&encoder_value, &decoder_value);
+    }
+    auto encoder_all_childrens = encoder_func_state->all_childrens();
+    auto decoder_all_childrens = decoder_func_state->all_childrens();
+    assert(encoder_all_childrens.size() == decoder_all_childrens.size());
+    for (int i = 0; i < encoder_all_childrens.size(); i++) {
+        compare_func_state(encoder_all_childrens[i], decoder_all_childrens[i]);
+    }
+}
+    
+static void compare_value(Value *encoder_value, Value *decoder_value) {
+    assert(encoder_value->type == decoder_value->type);
+    switch (encoder_value->type) {
+        case Value::STRING:
+        {
+            assert(std::string(encoder_value->str->c_str()) == std::string(decoder_value->str->c_str()));
+            break;
+        }
+        case Value::FUNC:
+        {
+            compare_func_state(encoder_value->f, decoder_value->f);
+            break;
+        }
+        case Value::CLASS_DESC:
+        {
+            compare_class_desc(ValueTo<ClassDescriptor>(encoder_value), ValueTo<ClassDescriptor>(decoder_value));
+            break;
+        }
+        default:
+            assert(*encoder_value == *decoder_value);
+            break;
+    }
+}
+    
+static void compare_variables(Variables *encoder_var, Variables *decoder_var, bool map_diff) {
+    assert(encoder_var->size() == encoder_var->size());
+    for (int i = 0; i < encoder_var->size(); i++) {
+        Value *encoder_value = encoder_var->Find(i);
+        Value *decoder_value = encoder_var->Find(i);
+        compare_value(encoder_value, decoder_value);
+    }
+    if (map_diff) {
+        std::map<std::string, int> &encoder_var_map = (std::map<std::string, int> &)encoder_var->map();
+        std::map<std::string, int> &decoder_var_map = (std::map<std::string, int> &)decoder_var->map();
+        assert(encoder_var_map.size() == decoder_var_map.size());
+        std::map<std::string, int>::iterator encoder_iter = encoder_var_map.begin();
+        std::map<std::string, int>::iterator decoder_iter = decoder_var_map.begin();
+        for (int i = 0; i < encoder_var_map.size(); i++) {
+            LOGD("compare_variables key:%s : %s\n", encoder_iter->first.c_str(), decoder_iter->first.c_str());
+            assert(encoder_iter->first == decoder_iter->first);
+            assert(encoder_iter->second == decoder_iter->second);
+            encoder_iter++;
+            decoder_iter++;
+        }
+    }
+}
+    
+static void compare_value_ref(ValueRef *encoder_ref, ValueRef *decoder_ref) {
+    assert(encoder_ref->ref_id() == decoder_ref->ref_id());
+    assert(encoder_ref->register_id() == decoder_ref->register_id());
+    compare_func_state(encoder_ref->func_state(), decoder_ref->func_state());
+}
+    
+static void compare(ExecState *encoder, ExecState *decoder) {
+    do {
+        StringTable *encoder_string_table = encoder->string_table();
+        StringTable *decoder_string_table = encoder->string_table();
+        assert(encoder_string_table->store().size() == decoder_string_table->store().size());
+        for (int i = 0; i < encoder_string_table->store().size(); i++) {
+            assert(encoder_string_table->store()[i].first == decoder_string_table->store()[i].first);
+            std::string encoder_string = encoder_string_table->store()[i].second->c_str();
+            std::string decoder_string = decoder_string_table->store()[i].second->c_str();
+            assert(encoder_string == decoder_string);
+        }
+        FuncState *encoder_func_state = encoder->func_state();
+        FuncState *decoder_func_state = decoder->func_state();
+        compare_func_state(encoder_func_state, decoder_func_state);        
+        std::vector<ClassDescriptor *> encoder_descs = encoder->class_factory()->descs();
+        std::vector<ClassDescriptor *> decoder_descs = decoder->class_factory()->descs();
+        assert(encoder_descs.size() == decoder_descs.size());
+        for (int i = 0; i < encoder_descs.size(); i++) {
+            compare_class_desc(encoder_descs[i], decoder_descs[i]);
+        }
+        compare_variables(encoder->global(), decoder->global(), false);
+        std::unordered_map<std::string, long> &encoder_global_variables = encoder->global_variables();
+        std::unordered_map<std::string, long> &decoder_global_variables = decoder->global_variables();
+        assert(encoder_global_variables.size() == decoder_global_variables.size());
+        std::unordered_map<std::string, long>::iterator encoder_iter = encoder_global_variables.begin();
+        std::unordered_map<std::string, long>::iterator decoder_iter = encoder_global_variables.begin();
+        for (int i = 0; i < encoder_global_variables.size(); i++) {
+            LOGD("compare map key:%s : %s\n", encoder_iter->first.c_str(), decoder_iter->first.c_str());
+            assert(encoder_iter->first == decoder_iter->first);
+            assert(encoder_iter->second == decoder_iter->second);
+            encoder_iter++;
+            decoder_iter++;
+        }
+        std::vector<ValueRef *> &encoder_refs = encoder->refs();
+        std::vector<ValueRef *> &decoder_refs = decoder->refs();
+        assert(encoder_refs.size() == decoder_refs.size());
+        for (int i = 0; i < encoder_refs.size(); i++) {
+            compare_value_ref(encoder_refs[i], decoder_refs[i]);
+        }
+        
+    } while (0);
+}
+    
+#endif
     
 }  // namespace data_render
 }  // namespace core

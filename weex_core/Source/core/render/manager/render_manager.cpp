@@ -19,7 +19,7 @@
 
 #include <utility>
 #include <vector>
-#include "wson_parser.h"
+#include "wson/wson_parser.h"
 #include <base/LogDefines.h>
 #include <chrono>
 
@@ -75,7 +75,6 @@ bool RenderManager::CreatePage(const std::string& page_id, RenderObject *root) {
   LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s",
        pageId.c_str(), parser.toStringUTF8().c_str());
 #endif
-
   RenderPage *page = new RenderPage(page_id);
   this->pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
 

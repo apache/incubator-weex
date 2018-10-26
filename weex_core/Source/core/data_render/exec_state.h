@@ -201,40 +201,9 @@ class ExecState {
   inline uint32_t class_compile_index() { return class_compile_index_; }
   inline uint32_t string_compile_index() { return string_compile_index_; }
   inline std::unordered_map<std::string, long>& global_variables() { return global_variables_; }
-  void startEncode();
-  void endEncode();
-
-  bool startDecode();
-  void endDecode();
-
  private:
   friend class VM;
   friend class CodeGenerator;
-
-  void encodeGlobalSection();
-  void encodeGlobalVariableSection();
-  void encodeFunctionSection();
-  void encodeStartSection();
-  void encodeTableSection();
-  void encodeStringSection();
-  void encodeStyleSection();
-  void encodeArraySection();
-  void encodeRefSection();
-  void encodeClassSection();
-  void encodeValue(const Value &value);
-
-  void decodeValue(Value &value);
-  void decodeStringSection();
-  void decodeTableSection();
-  void decodeFunctionSection();
-  void decodeStartSection();
-  void decodeGlobalSection();
-  void decodeGlobalVariableSection();
-  void decodeStyleSection();
-  void decodeArraySection();
-  void decodeRefSection();
-  void decodeClassSection();
-  void serializeValue(Value &value);
   void resetArguments(Value *func, size_t argc);
   void CallFunction(Value *func, size_t argc, Value *ret);
   int findSuperIndex(const std::vector<FuncState*>& func_states);

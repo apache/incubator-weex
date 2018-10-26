@@ -99,8 +99,6 @@ struct Value {
 
   Type type;
 
-  int index = -1;
-
   Value() : type(NIL) {}
     
   Value(int value) : i(value), type(INT) {}
@@ -117,7 +115,6 @@ struct Value {
     
   Value(const Value &value) {
     type = value.type;
-    index = value.index;
     switch (type) {
       case INT:i = value.i;
         break;
@@ -151,7 +148,6 @@ struct Value {
   inline Value operator=(Value value) {
       GCRelease(this);
       type = value.type;
-      index = value.index;
       switch (type) {
           case INT:
               i = value.i;
@@ -192,7 +188,6 @@ struct Value {
   }
   friend bool operator==(const Value &left, const Value &right) {
     if (left.type != right.type) return false;
-    if (left.index != right.index) return false;
     switch (left.type) {
       case NIL:return true;
       case INT:return left.i == right.i;
@@ -252,8 +247,7 @@ typedef struct ClassDescriptor {
     ClassDescriptor *p_super_{nullptr};
     std::unique_ptr<Variables> static_funcs_;
     std::unique_ptr<Variables> funcs_;
-    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), static_funcs_(new Variables), super_index_(-1) {}
-    int super_index_;
+    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), static_funcs_(new Variables) {}
 } ClassDescriptor;
 
 typedef struct ClassInstance {

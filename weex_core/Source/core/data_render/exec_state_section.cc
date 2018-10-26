@@ -260,18 +260,19 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
             {
                 int32_t payload = -1;
                 FuncState *func_state = encoder_->exec_state()->func_state();
-                if (func_state != pval->f) {
-                    const std::vector<FuncState *> &childrens = func_state->all_childrens();
+                if (func_state == pval->f) {
                     payload++;
-                    for (auto &func : childrens) {
-                        if (pval->f == func) {
-                            break;
-                        }
-                        payload++;
-                    }
                 }
                 else {
-                    payload++;
+                    const std::vector<FuncState *> &childrens = func_state->all_childrens();
+                    int index = 0;
+                    for (auto &func : childrens) {
+                        if (pval->f == func) {
+                            payload = index + 1;
+                            break;
+                        }
+                        index++;
+                    }
                 }
                 if (payload < 0) {
                     throw EncoderError("encoder value function can't find error");
@@ -1269,6 +1270,12 @@ bool SectionGlobalConstants::decoding() {
         uint32_t remain_length = readbytes;
         uint32_t bytes_read = 0;
         Variables *global = decoder()->exec_state()->global();
+        if (global->IndexOf("__weex_data__") < 0) {
+            global->Set("__weex_data__", Value());
+        }
+        if (global->IndexOf("_init_data") < 0) {
+            global->Set("_init_data", Value());
+        }
         for (int i = 0; i < constants_count; i++) {
             Value value;
             if (!(bytes_read = decodingValueFromBuffer(read_buffer, remain_length, &value))) {
@@ -1363,7 +1370,7 @@ bool SectionGlobalVariables::decoding() {
         if (!readbytes || target != kValueGlobalVariablesSize || !global_variables_size) {
             break;
         }
-        std::unordered_map<std::string, long> global_variables = decoder()->exec_state()->global_variables();
+        std::unordered_map<std::string, long> &global_variables = decoder()->exec_state()->global_variables();
         for (int i = 0; i < global_variables_size; i++) {
             if ((readbytes = stream->ReadTarget(&target, NULL, NULL)) == 0) {
                 throw DecoderError("decoding global variables target error");
@@ -1921,7 +1928,7 @@ bool SectionClass::encoding() {
                     static_func_length += GetValueLength(func);
                     static_func_length += GetFTLVLength(kValueClassFunctionKey, sizeof(uint8_t));
                     for (auto &item : desc->static_funcs_->map()) {
-                        if (item.second == i) {
+                        if (item.second == j) {
                             Value key(string_table->StringFromUTF8(item.first));
                             static_func_length += GetValueLength(&key);
                             break;
