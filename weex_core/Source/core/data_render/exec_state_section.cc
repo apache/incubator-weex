@@ -785,6 +785,8 @@ uint32_t SectionFunction::size() {
     for (auto &func : childrens) {
         func_states.push_back(func);
     }
+    uint32_t total_constancts_length = 0;
+    uint32_t total_instructions_length = 0;
     if (func_states.size() > 0) {
         size += GetFTLVLength(kValueFunctionSize, sizeof(uint32_t));
         for (auto &func_state : func_states) {
@@ -800,6 +802,7 @@ uint32_t SectionFunction::size() {
                 size += GetFTLVLength(kValueFunctionOutClosure, sizeof(int32_t) * (uint32_t)func_state->out_closure().size());
             }
             if (func_state->instructions().size() > 0) {
+                total_instructions_length += GetFTLVLength(kValueFunctionInstructions, sizeof(int32_t) * (uint32_t)func_state->instructions().size());
                 size += GetFTLVLength(kValueFunctionInstructions, sizeof(int32_t) * (uint32_t)func_state->instructions().size());
             }
             if (func_state->constants().size() > 0) {
@@ -809,10 +812,13 @@ uint32_t SectionFunction::size() {
                     constant_length += GetValueLength(&func_state->constants()[i]);
                 }
                 size += GetFTLVLength(kValueFunctionConstantPayload, constant_length);
+                total_constancts_length += constant_length;
             }
             size += GetFTLVLength(kValueFunctionFinished, sizeof(uint8_t));
         }
     }
+    LOGD("[WXExecEncoder]: instructions:%.02f K\n", (double)total_instructions_length / 1024);
+    LOGD("[WXExecEncoder]: constancts:%.02f K\n", (double)total_constancts_length / 1024);
     return size;
 }
     
@@ -1794,7 +1800,7 @@ bool SectionVaueRef::decoding() {
                     if (ref_id >= refs.size()) {
                         throw DecoderError("decoding value ref finder error");
                     }
-                    func->AddInClosure(refs[i]);
+                    func->AddInClosure(refs[ref_id]);
                 }
             }
             if (func->out_closure_refs().size() > 0) {
@@ -1803,7 +1809,7 @@ bool SectionVaueRef::decoding() {
                     if (ref_id >= refs.size()) {
                         throw DecoderError("decoding value ref finder error");
                     }
-                    func->AddOutClosure(refs[i]);
+                    func->AddOutClosure(refs[ref_id]);
                 }
             }
         }

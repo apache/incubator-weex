@@ -426,6 +426,8 @@ bool WXExecDecoder(ExecState *exec_state, uint8_t *buffer, size_t size, std::str
 #if EXECSTATE_ENCODING_COMPARE
 static void compare_value(Value *encoder_value, Value *decoder_value);
 static void compare_variables(Variables *encoder_var, Variables *decoder_var, bool map_diff = true);
+static void compare_value_ref(ValueRef *encoder_ref, ValueRef *decoder_ref);
+static void compare_func_state(FuncState *encoder_func_state, FuncState *decoder_func_state, bool is_ref = true, bool is_children = true);
 static void compare_class_desc(ClassDescriptor *encoder_desc, ClassDescriptor *decoder_desc) {
     if (encoder_desc->p_super_) {
         assert(decoder_desc->p_super_);
@@ -435,14 +437,26 @@ static void compare_class_desc(ClassDescriptor *encoder_desc, ClassDescriptor *d
     compare_variables(encoder_desc->funcs_.get(), decoder_desc->funcs_.get());
 }
     
-static void compare_func_state(FuncState *encoder_func_state, FuncState *decoder_func_state) {
+static void compare_func_state(FuncState *encoder_func_state, FuncState *decoder_func_state, bool is_ref, bool is_children) {
     assert(encoder_func_state->is_class_func() == decoder_func_state->is_class_func());
     assert(encoder_func_state->argc() == decoder_func_state->argc());
     for (int i = 0; i < encoder_func_state->args().size(); i++) {
         assert(encoder_func_state->args()[i] == decoder_func_state->args()[i]);
     }
     assert(encoder_func_state->in_closure().size() == decoder_func_state->in_closure().size());
+    if (is_ref) {
+        for (int i = 0; i < encoder_func_state->in_closure().size(); i++) {
+            compare_value_ref(encoder_func_state->in_closure()[i], decoder_func_state->in_closure()[i]);
+        }
+    }
     assert(encoder_func_state->out_closure().size() == decoder_func_state->out_closure().size());
+    if (is_ref) {
+        for (int i = 0; i < encoder_func_state->out_closure().size(); i++) {
+            ValueRef *ref_encoder = encoder_func_state->out_closure()[i];
+            ValueRef *ref_decoder = decoder_func_state->out_closure()[i];
+            compare_value_ref(ref_encoder, ref_decoder);
+        }
+    }
     assert(encoder_func_state->instructions().size() == decoder_func_state->instructions().size());
     for (int i = 0; i < encoder_func_state->instructions().size(); i++) {
         assert(encoder_func_state->instructions()[i] == decoder_func_state->instructions()[i]);
@@ -453,11 +467,13 @@ static void compare_func_state(FuncState *encoder_func_state, FuncState *decoder
         Value decoder_value = decoder_func_state->constants()[i];
         compare_value(&encoder_value, &decoder_value);
     }
-    auto encoder_all_childrens = encoder_func_state->all_childrens();
-    auto decoder_all_childrens = decoder_func_state->all_childrens();
-    assert(encoder_all_childrens.size() == decoder_all_childrens.size());
-    for (int i = 0; i < encoder_all_childrens.size(); i++) {
-        compare_func_state(encoder_all_childrens[i], decoder_all_childrens[i]);
+    if (is_children) {
+        auto encoder_all_childrens = encoder_func_state->all_childrens();
+        auto decoder_all_childrens = decoder_func_state->all_childrens();
+        assert(encoder_all_childrens.size() == decoder_all_childrens.size());
+        for (int i = 0; i < encoder_all_childrens.size(); i++) {
+            compare_func_state(encoder_all_childrens[i], decoder_all_childrens[i], true, false);
+        }
     }
 }
     
@@ -509,9 +525,11 @@ static void compare_variables(Variables *encoder_var, Variables *decoder_var, bo
 }
     
 static void compare_value_ref(ValueRef *encoder_ref, ValueRef *decoder_ref) {
-    assert(encoder_ref->ref_id() == decoder_ref->ref_id());
+    int encoder_ref_id = encoder_ref->ref_id();
+    int decoder_ref_id = decoder_ref->ref_id();
+    assert(encoder_ref_id == decoder_ref_id);
     assert(encoder_ref->register_id() == decoder_ref->register_id());
-    compare_func_state(encoder_ref->func_state(), decoder_ref->func_state());
+    compare_func_state(encoder_ref->func_state(), decoder_ref->func_state(), false, false);
 }
     
 static void compare(ExecState *encoder, ExecState *decoder) {
