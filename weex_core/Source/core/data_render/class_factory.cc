@@ -77,7 +77,6 @@ Value ClassFactory::ClassRegExp() {
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
-    descs_.push_back(desc);
     return value;
 }
     
