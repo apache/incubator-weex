@@ -60,7 +60,9 @@ public:
     virtual ~Section() {};
     bool encoding(uint16_t index, uint32_t len, void *buffer = nullptr);
     uint32_t encodingToBuffer(uint8_t *dst_buffer, uint32_t dst_buffer_len, uint16_t index, uint32_t len, void *buffer = nullptr);
+    uint32_t encodingToBuffer(uint8_t *dst_buffer, uint32_t dst_buffer_len, uint32_t len, void *buffer);
     uint32_t decodingFromBuffer(uint8_t *src_buffer, uint32_t src_buffer_len, uint16_t *index, uint8_t *buffer, uint32_t *len);
+    uint32_t decodingFromBuffer(uint8_t *src_buffer, uint32_t src_buffer_len, uint8_t *buffer, uint32_t *len);
     uint32_t encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Value *pval);
     uint32_t decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, Value *pval);
     virtual bool encoding() { return false; };

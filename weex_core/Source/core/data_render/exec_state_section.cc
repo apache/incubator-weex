@@ -93,28 +93,29 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
     uint32_t total_bytes_read = 0;
     do {
         uint32_t bytes_read = 0;
-        uint32_t bytes_decoding = sizeof(uint8_t);;
-        uint16_t target = 0;
+        uint32_t bytes_decoding = sizeof(uint8_t);
         int8_t type = 0;
-        if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, &target, (uint8_t *)&type, &bytes_decoding))) {
+        if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&type, &bytes_decoding))) {
             break;
         }
         total_bytes_read += bytes_read;
         buffer += bytes_read;
         buffer_len -= bytes_read;
-        if (target != kValueType || (type < Value::Type::NIL && type > Value::Type::FUNC_INST)) {
+        if (type < Value::Type::NIL && type > Value::Type::FUNC_INST) {
             break;
         }
         switch (type) {
             case Value::Type::CLASS_DESC:
             {
                 int32_t payload = -1;
-                bytes_decoding = sizeof(int32_t);
-                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, &target, (uint8_t *)&payload, &bytes_decoding))) {
+                uint16_t u16_payload = 0;
+                bytes_decoding = sizeof(uint16_t);
+                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&u16_payload, &bytes_decoding))) {
                     break;
                 }
+                payload = u16_payload;
                 std::vector<ClassDescriptor *> descs = decoder()->exec_state()->class_factory()->descs();
-                if (payload < 0 || payload >= descs.size() || target != kValuePayload) {
+                if (payload < 0 || payload >= descs.size()) {
                     throw DecoderError("decoding value payload class desc error");
                     break;
                 }
@@ -125,11 +126,13 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
             case Value::Type::FUNC:
             {
                 int32_t payload = -1;
-                bytes_decoding = sizeof(int32_t);
-                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, &target, (uint8_t *)&payload, &bytes_decoding))) {
+                uint16_t u16_payload = 0;
+                bytes_decoding = sizeof(uint16_t);
+                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&u16_payload, &bytes_decoding))) {
                     break;
                 }
-                if (payload < 0 || target != kValuePayload) {
+                payload = u16_payload;
+                if (payload < 0) {
                     throw DecoderError("decoding value payload function error");
                     break;
                 }
@@ -151,11 +154,13 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
             case Value::Type::STRING:
             {
                 int32_t payload = -1;
-                bytes_decoding = sizeof(int32_t);
-                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, &target, (uint8_t *)&payload, &bytes_decoding))) {
+                uint16_t u16_payload = 0;
+                bytes_decoding = sizeof(uint16_t);
+                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&u16_payload, &bytes_decoding))) {
                     break;
                 }
-                if (payload < 0 || target != kValuePayload) {
+                payload = u16_payload;
+                if (payload < 0) {
                     throw DecoderError("decoding value payload string error");
                     break;
                 }
@@ -171,14 +176,12 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
             }
             case Value::Type::INT:
             {
-                bytes_decoding = sizeof(int64_t);
-                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, &target, (uint8_t *)&pval->i, &bytes_decoding))) {
+                int32_t i32_payload = 0;
+                bytes_decoding = sizeof(int32_t);
+                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&i32_payload, &bytes_decoding))) {
                     break;
                 }
-                if (target != kValuePayload) {
-                    throw DecoderError("decoding int value payload function error");
-                    break;
-                }
+                pval->i = i32_payload;
                 pval->type = Value::Type::INT;
                 LOGD("decoding int value:%i\n", (int32_t)pval->i);
                 break;
@@ -186,11 +189,7 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
             case Value::Type::NUMBER:
             {
                 bytes_decoding = sizeof(double);
-                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, &target, (uint8_t *)&pval->n, &bytes_decoding))) {
-                    break;
-                }
-                if (target != kValuePayload) {
-                    throw DecoderError("decoding number value payload error");
+                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&pval->n, &bytes_decoding))) {
                     break;
                 }
                 pval->type = Value::Type::NUMBER;
@@ -200,11 +199,7 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
             case Value::Type::BOOL:
             {
                 bytes_decoding = sizeof(uint8_t);
-                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, &target, (uint8_t *)&pval->b, &bytes_decoding))) {
-                    break;
-                }
-                if (target != kValuePayload) {
-                    throw DecoderError("decoding bool value payload error");
+                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&pval->b, &bytes_decoding))) {
                     break;
                 }
                 pval->type = Value::Type::BOOL;
@@ -227,7 +222,7 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
     do {
         uint32_t bytes_write = 0;
         uint8_t type = ttype(pval);
-        if (!(bytes_write = encodingToBuffer(buffer, buffer_len, kValueType, sizeof(uint8_t), &type))) {
+        if (!(bytes_write = encodingToBuffer(buffer, buffer_len, sizeof(uint8_t), &type))) {
             break;
         }
         buffer += bytes_write;
@@ -250,7 +245,8 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
                     throw EncoderError("encoder value class desc can't find error");
                     break;
                 }
-                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, kValuePayload, sizeof(int32_t), &payload))) {
+                uint16_t u16_payload = static_cast<uint16_t>(payload);
+                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, sizeof(uint16_t), &u16_payload))) {
                     break;
                 }
                 LOGD("encoding class value:%i\n", payload);
@@ -278,7 +274,8 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
                     throw EncoderError("encoder value function can't find error");
                     break;
                 }
-                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, kValuePayload, sizeof(int32_t), &payload))) {
+                uint16_t u16_payload = static_cast<uint16_t>(payload);
+                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, sizeof(uint16_t), &u16_payload))) {
                     break;
                 }
                 LOGD("encoding function value:%i\n", payload);
@@ -300,7 +297,8 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
                     throw EncoderError("encoder value string can't find error");
                     break;
                 }
-                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, kValuePayload, sizeof(int32_t), &payload))) {
+                uint16_t u16_payload = static_cast<uint16_t>(payload);
+                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, sizeof(uint16_t), &u16_payload))) {
                     break;
                 }
                 LOGD("encoding string value:[%i] %s\n", payload, pval->str->c_str());
@@ -308,7 +306,8 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
             }
             case Value::Type::INT:
             {
-                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, kValuePayload, sizeof(int64_t), &pval->i))) {
+                int32_t i32_payload = static_cast<int32_t>(pval->i);
+                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, sizeof(int32_t), &i32_payload))) {
                     break;
                 }
                 LOGD("encoding int value:%i\n", (int32_t)pval->i);
@@ -316,7 +315,7 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
             }
             case Value::Type::NUMBER:
             {
-                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, kValuePayload, sizeof(double), &pval->n))) {
+                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, sizeof(double), &pval->n))) {
                     break;
                 }
                 LOGD("encoding int value:%f\n", pval->n);
@@ -324,7 +323,7 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
             }
             case Value::Type::BOOL:
             {
-                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, kValuePayload, sizeof(uint8_t), &pval->b))) {
+                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, sizeof(uint8_t), &pval->b))) {
                     break;
                 }
                 LOGD("encoding bool value:%i\n", pval->b);
@@ -339,6 +338,23 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
     } while (0);
     
     return total_bytes_write;
+}
+    
+uint32_t Section::decodingFromBuffer(uint8_t *src_buffer, uint32_t src_buffer_len, uint8_t *buffer, uint32_t *len) {
+    uint32_t bytes_reader = 0;
+    do {
+        if (!buffer || !len) {
+            break;
+        }
+        if (*len > src_buffer_len) {
+            break;
+        }
+        memcpy(buffer, src_buffer, *len);
+        bytes_reader = *len;
+        
+    } while (0);
+    
+    return bytes_reader;
 }
     
 uint32_t Section::decodingFromBuffer(uint8_t *src_buffer, uint32_t src_buffer_len, uint16_t *target, uint8_t *buffer, uint32_t *len) {
@@ -413,6 +429,21 @@ uint32_t Section::decodingFromBuffer(uint8_t *src_buffer, uint32_t src_buffer_le
     return bytes_reader;    
 }
     
+uint32_t Section::encodingToBuffer(uint8_t *dst_buffer, uint32_t dst_buffer_len, uint32_t len, void *buffer)
+{
+    uint32_t byte_write = 0;
+    do {
+        if (dst_buffer_len < len || !buffer) {
+            break;
+        }
+        memcpy(dst_buffer, buffer, len);
+        byte_write = len;
+        
+    } while (0);
+    
+    return byte_write;
+}
+    
 uint32_t Section::encodingToBuffer(uint8_t *dst_buffer, uint32_t dst_buffer_len, uint16_t index, uint32_t len, void *buffer)
 {
     uint32_t byte_write = 0;
@@ -484,29 +515,28 @@ bool Section::encoding(uint16_t index, uint32_t len, void *buffer) {
 }
     
 uint32_t Section::GetValueLength(Value *value) {
-    uint32_t length = 0;
-    length += GetFTLVLength(kValueType, sizeof(uint8_t));
+    uint32_t length = sizeof(uint8_t);
     switch (ttype(value)) {
         case Value::Type::CLASS_DESC:
         case Value::Type::FUNC:
         case Value::Type::STRING:
         {
-            length += GetFTLVLength(kValuePayload, sizeof(int32_t));
+            length += sizeof(uint16_t);
             break;
         }
         case Value::Type::INT:
         {
-            length += GetFTLVLength(kValuePayload, sizeof(int64_t));
+            length += sizeof(int32_t);
             break;
         }
         case Value::Type::NUMBER:
         {
-            length += GetFTLVLength(kValuePayload, sizeof(double));
+            length += sizeof(double);
             break;
         }
         case Value::Type::BOOL:
         {
-            length += GetFTLVLength(kValuePayload, sizeof(char));
+            length += sizeof(uint8_t);
             break;
         }
         default:
