@@ -40,6 +40,7 @@ class CodeGenerator : public ASTVisitor {
   ~CodeGenerator() {}
   void Visit(ChunkStatement *node, void *data) override;
   void Visit(StringConstant *node, void *data) override;
+  void Visit(RegexConstant *node, void *data) override;
   void Visit(CallExpression *node, void *data) override;
   void Visit(ArgumentList *node, void *data) override;
   void Visit(IfStatement *node, void *data) override;

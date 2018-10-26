@@ -1,10 +1,15 @@
 /* eslint-disable react/react-in-jsx-scope */
 /* global __weex_data__, print, createElement */
+var a= /(a.)/g;
+var b = a.exec('abc,aac, ssa2, dda');
+log(b);
+
+log('aabccbddBc'.match(/(bss.)/g));
 class Component {
     constructor(props) {
         this.props = props;
     }
-    
+
     setState(newData) {
         this.state = { ...this.state,
             ...newData
@@ -20,7 +25,7 @@ var nativeModules = {};
 const registerModule = moduleName => {
     var sourceKeys = Object.keys(moduleName);
     var key;
-    
+
     for (var i = 0; i < sourceKeys.length; i++) {
         key = sourceKeys[i];
         nativeModules[key] = moduleName[key];
@@ -49,9 +54,9 @@ const require = name => {
         log("register",methods);
         return target;
     };
-    
+
     const MODULE_NAME_PREFIX = '@weex-module/';
-    
+
     if (name.split(MODULE_NAME_PREFIX).length > 1) {
         const weexModuleName = name.split(MODULE_NAME_PREFIX)[1];
         return requireModule(weexModuleName);
@@ -155,7 +160,7 @@ class TipTag extends Component {
         if (this.props.data.q) {
             searchParams.q = this.props.data.q;
         }
-        
+
         if (this.props.data.params && this.props.data.params.length > 0) {
             this.props.data.params.forEach(item => {
                                            if (item.key) {
@@ -176,11 +181,11 @@ class TipTag extends Component {
                                });
         }
     };
-    
+
     render() {
         let data = this.props.data;
         let tagStyle = styles.tag;
-        
+
         if (!this.props.isListMode) {
             tagStyle = { ...styles.tag,
             marginLeft: 5.5,
@@ -193,7 +198,7 @@ class TipTag extends Component {
         <Text style={styles.tagText}>{data.show}</Text>
         </View>;
     }
-    
+
 }
 
 const _tiptag_export = {
@@ -205,15 +210,15 @@ const TipTag_import_default_from__WidgetInWFStyle__tiptag = _tiptag_export.defau
 const WidgetInWFStyle = props => {
     let tips = props.tips,
     tiptype = props.tiptype;
-    
+
     if (!tips || tips.length === 0) {
         return null;
     }
-    
+
     if (tips.length > 8) {
         tips = tips.slice(0, 8);
     }
-    
+
     let wfTitle = <View style={waterfallStyles.wfTitle}>
     <View style={waterfallStyles.wfDivideLine} />
     <Text style={waterfallStyles.titleText}>{props.topic || '相关搜索'}</Text>
@@ -221,7 +226,7 @@ const WidgetInWFStyle = props => {
     </View>;
     let wfLines = [];
     let tipLength = tips.length;
-    
+
     function createWfLine(leftTip, rightTip) {
         let tag1 = <TipTag_import_default_from__WidgetInWFStyle__tiptag data={leftTip} isListMode={false} tiptype={tiptype} />;
         let tag2 = rightTip ? <TipTag_import_default_from__WidgetInWFStyle__tiptag data={rightTip} isListMode={false} tiptype={tiptype} /> : null;
@@ -309,11 +314,11 @@ const WidgetInListStyle = props => {
     if (!tips || tips.length === 0) {
         return null;
     }
-    
+
     if (tips.length > 8) {
         tips = tips.slice(0, 8);
     }
-    
+
     const listTitle = <View style={listStyles.listTitle}>
     <View style={listStyles.divideLine} />
     <Text style={listStyles.titleText}>{props.topic || '相关搜索'}</Text>
@@ -327,7 +332,7 @@ const WidgetInListStyle = props => {
                  firstLineTips.push(tipTag);
                  } else {
                  const firstLineCount = parseInt(tips.length / 2, 10) + tips.length % 2;
-                 
+
                  if (index < firstLineCount) {
                  firstLineTips.push(tipTag);
                  } else if (index < 8) {
@@ -371,7 +376,7 @@ class Widget extends Component {
         return <View style={{ ...defaultStyle__lib.container
         }}>{content}</View>;
     }
-    
+
 }
 
 const _lib_export = {
@@ -400,7 +405,8 @@ class Segment extends Component {
         <Widget_import_default_from___lib {...data} />
         </View>;
     }
-    
+
 }
 
 render(<Segment />);
+

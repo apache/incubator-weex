@@ -43,8 +43,14 @@ static Value Log(ExecState *exec_state) {
   for (int i = 0; i < length; ++i) {
     Value *a = exec_state->GetArgument(i);
     switch (a->type) {
+      case Value::Type::NIL:
+        ss << "[log]:=>" << "null" << "\n";
+        break;
       case Value::Type::NUMBER:
         ss << "[log]:=>" << a->n << "\n";
+        break;
+      case Value::Type::BOOL:
+        ss << "[log]:=>" << (a->b?"true":"false") << "\n";
         break;
       case Value::Type::INT:
         ss << "[log]:=>" << a->i << "\n";
@@ -58,6 +64,12 @@ static Value Log(ExecState *exec_state) {
       case Value::Type::ARRAY:
         ss << "[log]:=>" << ArrayToString(ValueTo<Array>(a)) << "\n";
         break;
+      case Value::Type::CLASS_DESC:
+        ss << "[log]:=>" << "CLASS_DESC" << "\n";
+        break;
+      case Value::Type::CLASS_INST:
+        ss << "[log]:=>" << "CLASS_INST" << "\n";
+        break;
       case Value::Type::CPTR:
       {
           VNode *node = (VNode *)a->cptr;
@@ -65,6 +77,7 @@ static Value Log(ExecState *exec_state) {
           break;
       }
       default:
+        ss << "[log]:=>" << "unknown type" << "\n";
         break;
     }
   }
@@ -606,6 +619,7 @@ void VNodeExecEnv::ImportExecEnv(ExecState *state) {
     state->Register("String", state->class_factory()->ClassString());
     state->Register("JSON", state->class_factory()->ClassJSON());
     state->Register("Object", state->class_factory()->ClassObject());
+    state->Register("RegExp", state->class_factory()->ClassRegExp());
     RegisterJSCommonFunction(state);
 }
 

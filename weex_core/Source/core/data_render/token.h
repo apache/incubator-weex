@@ -94,7 +94,11 @@ namespace data_render {
   T(GT, ">", 10)                                                   \
   T(LTE, "<=", 10)                                                 \
   T(GTE, ">=", 10)                                                 \
-  T(ARROW_FUNCTION, "=>", 10)                                               \
+  T(ARROW_FUNCTION, "=>", 10)                                      \
+                                                                   \
+  /*jsx */                                                         \
+  T(JSX_TAG_CLOSE,"</",0)                                          \
+  T(JSX_TAG_END,"/>",0)                                            \
                                                                    \
   /* Unary operators. */                                           \
   /* IsUnaryOp() relies on this block of enum values */            \

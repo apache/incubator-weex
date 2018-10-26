@@ -122,6 +122,46 @@ void CodeGenerator::Visit(StringConstant* node, void* data) {
   }
 }
 
+void CodeGenerator::Visit(RegexConstant* node, void* data) {
+  RegisterScope scope(block_);
+
+  long reg = data == nullptr ? -1 : *static_cast<long*>(data);
+  if (reg >= 0) {
+    FuncState *func_state = func_->func_state();
+    auto reg_ex = exec_state_->string_table_->StringFromUTF8(node->reg());
+    auto flag = exec_state_->string_table_->StringFromUTF8(node->flag());
+    auto reg_mem_name = exec_state_->string_table_->StringFromUTF8("_reg");
+    auto flag_mem_name = exec_state_->string_table_->StringFromUTF8("_flag");
+
+    int r_index = func_state->AddConstant(std::move(reg_ex));
+    int f_index = func_state->AddConstant(std::move(flag));
+    int mr_index = func_state->AddConstant(std::move(reg_mem_name));
+    int mf_index = func_state->AddConstant(std::move(flag_mem_name));
+    auto reg_class_index = exec_state_->global()->IndexOf("RegExp");
+
+    auto mr_id = block_->NextRegisterId();
+    auto mf_id = block_->NextRegisterId();
+    auto r_id = block_->NextRegisterId();
+    auto f_id = block_->NextRegisterId();
+    auto class_id = block_->NextRegisterId();
+    auto tmp = block_->NextRegisterId();
+
+    func_state->AddInstruction(CREATE_ABx(OpCode::OP_LOADK, mr_id, mr_index));
+    func_state->AddInstruction(CREATE_ABx(OpCode::OP_LOADK, mf_id, mf_index));
+    func_state->AddInstruction(CREATE_ABx(OpCode::OP_LOADK, r_id, r_index));
+    func_state->AddInstruction(CREATE_ABx(OpCode::OP_LOADK, f_id, f_index));
+    func_state->AddInstruction(CREATE_ABx(OpCode::OP_GETGLOBAL, class_id, reg_class_index));
+
+    func_state->AddInstruction(CREATE_ABC(OpCode::OP_NEW, reg, Value::Type::CLASS_DESC, class_id));
+
+    func_state->AddInstruction(CREATE_ABC(OpCode::OP_GETMEMBERVAR, tmp, reg, mr_id));
+    func_state->AddInstruction(CREATE_ABC(OpCode::OP_MOVE, tmp, r_id, 0));
+
+    func_state->AddInstruction(CREATE_ABC(OpCode::OP_GETMEMBERVAR, tmp, reg, mf_id));
+    func_state->AddInstruction(CREATE_ABC(OpCode::OP_MOVE, tmp, f_id, 0));
+  }
+}
+
 void CodeGenerator::Visit(ExpressionList* node, void* data) {
   for (auto it = node->raw_list().begin(); it != node->raw_list().end(); ++it) {
     auto temp = (*it).get();

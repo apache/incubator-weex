@@ -45,7 +45,7 @@ ClassInstance *NewClassInstance(ClassDescriptor *p_desc) {
     return new ClassInstance(p_desc);
 }
     
-Value *GetClassMember(ClassInstance *inst, std::string &name) {
+Value *GetClassMember(ClassInstance *inst,const std::string &name) {
     Value *ret = nullptr;
     do {
         ClassInstance *inst_current = inst;
@@ -77,7 +77,7 @@ Value *GetClassMember(ClassInstance *inst, std::string &name) {
     return ret;
 }
 
-Value *GetClassMemberVar(ClassInstance *inst, std::string &name) {
+Value *GetClassMemberVar(ClassInstance *inst,const std::string &name) {
     Value *ret = nullptr;
     do {
         Variables *funcs = inst->p_desc_->funcs_.get();

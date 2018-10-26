@@ -10,6 +10,7 @@
 #include "core/data_render/class_object.h"
 #include "core/data_render/table.h"
 #include "core/data_render/exec_state.h"
+#include "class_regex.h"
 
 namespace weex {
 namespace core {
@@ -68,6 +69,15 @@ Value ClassFactory::ClassObject() {
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
+    return value;
+}
+
+Value ClassFactory::ClassRegExp() {
+    ClassDescriptor *desc = NewClassRegex();
+    Value value;
+    SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
+    descs_.push_back(desc);
     return value;
 }
     
