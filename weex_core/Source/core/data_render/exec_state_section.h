@@ -129,6 +129,7 @@ public:
     };
     SectionFunction(ExecStateEncoder *encoder) : Section(encoder) {}
     SectionFunction(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
+    static uint32_t GetInstructionsSize(std::vector<unsigned long>& instructions);
     virtual ~SectionFunction() {};
     virtual bool encoding();
     virtual bool decoding();

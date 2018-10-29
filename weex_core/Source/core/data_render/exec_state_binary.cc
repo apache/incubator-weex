@@ -36,11 +36,18 @@ namespace data_render {
 std::once_flag device_little_endian;
 
 static bool gs_device_is_little_endian = false;
+static uint8_t gs_op_code_bits = 0;
     
 void determine_little_endian()
 {
     short i = 0x1;
     gs_device_is_little_endian = !((i >> 8) == 0x1);
+    gs_op_code_bits = 0;
+    uint32_t op_code_value = OP_INVALID;
+    while (op_code_value / 2 > 0) {
+        op_code_value = op_code_value / 2;
+        gs_op_code_bits++;
+    }
 }
    
 bool ExecStateEncoder::encoding(std::string &err) {
@@ -344,8 +351,8 @@ int64_t fStream::Seek(int64_t pos, int type) {
 #if EXECSTATE_ENCODING_COMPARE
 static ExecState *gs_encoder = nullptr;
 #endif
-    
-bool WXExecEncoder(std::string &input, std::string &path, std::int32_t &version, std::string &error) {
+  
+bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
     bool finished = false;
     VM *vm = nullptr;
     ExecState *exec_state = nullptr;
@@ -400,7 +407,6 @@ bool WXExecEncoder(std::string &input, std::string &path, std::int32_t &version,
 #if EXECSTATE_ENCODING_COMPARE
         gs_encoder = exec_state;
 #endif
-        version = EXEC_BINARY_COMPATIBLE_VERSION;
         finished = true;
         
     } while (0);

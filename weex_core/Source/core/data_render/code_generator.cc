@@ -117,7 +117,7 @@ void CodeGenerator::Visit(StringConstant* node, void* data) {
     FuncState *func_state = func_->func_state();
     auto value = exec_state_->string_table_->StringFromUTF8(node->string());
     int index = func_state->AddConstant(std::move(value));
-    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
+    Instruction i = CREATE_ABx(OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
 }
@@ -146,19 +146,19 @@ void CodeGenerator::Visit(RegexConstant* node, void* data) {
     auto class_id = block_->NextRegisterId();
     auto tmp = block_->NextRegisterId();
 
-    func_state->AddInstruction(CREATE_ABx(OpCode::OP_LOADK, mr_id, mr_index));
-    func_state->AddInstruction(CREATE_ABx(OpCode::OP_LOADK, mf_id, mf_index));
-    func_state->AddInstruction(CREATE_ABx(OpCode::OP_LOADK, r_id, r_index));
-    func_state->AddInstruction(CREATE_ABx(OpCode::OP_LOADK, f_id, f_index));
-    func_state->AddInstruction(CREATE_ABx(OpCode::OP_GETGLOBAL, class_id, reg_class_index));
+    func_state->AddInstruction(CREATE_ABx(OP_LOADK, mr_id, mr_index));
+    func_state->AddInstruction(CREATE_ABx(OP_LOADK, mf_id, mf_index));
+    func_state->AddInstruction(CREATE_ABx(OP_LOADK, r_id, r_index));
+    func_state->AddInstruction(CREATE_ABx(OP_LOADK, f_id, f_index));
+    func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, class_id, reg_class_index));
 
-    func_state->AddInstruction(CREATE_ABC(OpCode::OP_NEW, reg, Value::Type::CLASS_DESC, class_id));
+    func_state->AddInstruction(CREATE_ABC(OP_NEW, reg, Value::Type::CLASS_DESC, class_id));
 
-    func_state->AddInstruction(CREATE_ABC(OpCode::OP_GETMEMBERVAR, tmp, reg, mr_id));
-    func_state->AddInstruction(CREATE_ABC(OpCode::OP_MOVE, tmp, r_id, 0));
+    func_state->AddInstruction(CREATE_ABC(OP_GETMEMBERVAR, tmp, reg, mr_id));
+    func_state->AddInstruction(CREATE_ABC(OP_MOVE, tmp, r_id, 0));
 
-    func_state->AddInstruction(CREATE_ABC(OpCode::OP_GETMEMBERVAR, tmp, reg, mf_id));
-    func_state->AddInstruction(CREATE_ABC(OpCode::OP_MOVE, tmp, f_id, 0));
+    func_state->AddInstruction(CREATE_ABC(OP_GETMEMBERVAR, tmp, reg, mf_id));
+    func_state->AddInstruction(CREATE_ABC(OP_MOVE, tmp, f_id, 0));
   }
 }
 
@@ -947,7 +947,7 @@ void CodeGenerator::Visit(IntegralConstant* node, void* data) {
     FuncState* func_state = func_->func_state();
     int value = node->value();
     int index = func_state->AddConstant(static_cast<int64_t>(value));
-    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
+    Instruction i = CREATE_ABx(OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
 }
@@ -958,7 +958,7 @@ void CodeGenerator::Visit(BooleanConstant* node, void* data) {
     FuncState* func_state = func_->func_state();
     bool value = node->pred();
     int index = func_state->AddConstant(static_cast<bool>(value));
-    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
+    Instruction i = CREATE_ABx(OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
 }
@@ -969,7 +969,7 @@ void CodeGenerator::Visit(DoubleConstant* node, void* data) {
     FuncState* func_state = func_->func_state();
     double value = node->value();
     int index = func_state->AddConstant(static_cast<double>(value));
-    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
+    Instruction i = CREATE_ABx(OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
 }
@@ -1140,7 +1140,7 @@ void CodeGenerator::Visit(Identifier *node, void *data) {
       int tableIndex = func_state->AddConstant(std::move(value));
 
       func_state->AddInstruction(
-          CREATE_ABx(OpCode::OP_LOADK, right, tableIndex));
+          CREATE_ABx(OP_LOADK, right, tableIndex));
       func_state->AddInstruction(
           CREATE_ABC(OP_GETMEMBER, reg_a, this_idx, right));
     } else {
@@ -1385,7 +1385,7 @@ ValueRef *CodeGenerator::BlockCnt::FindValueRef(const std::string &name, long &r
                 func_state_->AddOutClosure(ref);
             }
             Instruction instruction = func_state_->instructions().size() > 0 ? func_state_->instructions()[func_state_->instructions().size() - 1] : 0;
-            OpCode op(GET_OP_CODE(instruction));
+            WX_OP_CODE op(GET_OP_CODE(instruction));
             if (instruction && (op == OP_RETURN0 || op == OP_RETURN1)) {
                 func_state_->instructions().pop_back();
             }

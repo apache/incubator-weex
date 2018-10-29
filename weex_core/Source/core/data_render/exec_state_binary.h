@@ -46,9 +46,11 @@ public:
     ~ExecStateEncoder() {}
     bool encoding(std::string &err);
     ExecState *exec_state() { return exec_state_; }
+    uint8_t &op_code_bits() { return op_code_bits_; }
 private:
     FILE *fout_{nullptr};
     ExecState *exec_state_{nullptr};
+    uint8_t op_code_bits_{0};
 };
     
 class fStream {
@@ -75,12 +77,14 @@ public:
     ~ExecStateDecoder() { if (stream_) delete stream_; }
     ExecState *exec_state() { return exec_state_; }
     bool decoding(std::string &err);
+    uint8_t &op_code_bits() { return op_code_bits_; }
 private:
     fStream *stream_;
     ExecState *exec_state_{nullptr};
+    uint8_t op_code_bits_{0};
 };
 
-bool WXExecEncoder(std::string &src, std::string &path, std::int32_t &version, std::string &error);
+bool WXExecEncoder(std::string &src, std::string &path, std::string &error);
 bool WXExecDecoder(ExecState *exec_state, uint8_t *buffer, size_t size, std::string &error);
 
 }  // namespace data_render

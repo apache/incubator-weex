@@ -45,7 +45,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
   while (pc != frame.end) {
     Instruction instruction = *pc++;
     double d1, d2;
-    OpCode op(GET_OP_CODE(instruction));
+    WX_OP_CODE op(GET_OP_CODE(instruction));
 #if DEBUG
     //tc.op_start(op);
 #endif

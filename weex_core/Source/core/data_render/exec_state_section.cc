@@ -960,6 +960,20 @@ bool SectionString::decoding() {
     return finished;
 }
     
+uint32_t SectionFunction::GetInstructionsSize(std::vector<Instruction>& instructions) {
+    uint32_t numBits = 0;
+    do {
+        if (!instructions.size()) {
+            break;
+        }
+        numBits += sizeof(uint32_t) * 8;
+        
+        
+    } while (0);
+    
+    return 0;
+}
+    
 uint32_t SectionFunction::size() {
     uint32_t size = 0;
     std::vector<FuncState *> func_states;

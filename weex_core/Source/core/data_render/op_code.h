@@ -23,8 +23,8 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-enum OpCode {
-  OP_MOVE,       //	A B	    R(A) = R(B)
+enum WX_OP_CODE {
+  OP_MOVE = 0,       //	A B	    R(A) = R(B)
   OP_LOADK,      //	A Bx	R(A) = Constant[Bx]
   OP_LOADNULL,   //	A       R(A) = null
   OP_GETGLOBAL,  //	A Bx	R(A) = Global[B]
@@ -112,7 +112,7 @@ typedef unsigned long Instruction;
         : ((Instruction)op_code << POS_OP) | ((Instruction)(a) << POS_A)    \
              | ((Instruction)(bx) << POS_Bx)
 
-#define GET_OP_CODE(i) (OpCode)(((i) >> POS_OP) & 0xFF)
+#define GET_OP_CODE(i) (WX_OP_CODE)(((i) >> POS_OP) & 0xFF)
 #define GET_ARG_A(i) (long)(((i) >> POS_A) & 0xFF)
 #define GET_ARG_B(i) (long)(((i) >> POS_B) & 0xFF)
 #define GET_ARG_C(i) (long)(((i) >> POS_C) & 0xFF)
