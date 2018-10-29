@@ -21,7 +21,7 @@
 #define CORE_BASE_STRING_UTIL_H
 
 #include <sstream>
-#include <string>
+#include <string.h>
 #ifdef OS_ANDROID
 #include <malloc.h>
 #else
