@@ -483,7 +483,7 @@ typedef NS_ENUM(NSInteger, Direction) {
     [self adjustForRTL];
 }
 
-- (BOOL)shouldTranformSubviewsWhenRTL {
+- (BOOL)shouldTransformSubviewsWhenRTL {
     return YES;
 }
 
