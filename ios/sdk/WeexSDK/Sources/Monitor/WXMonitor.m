@@ -30,12 +30,10 @@
 #import "WXTracingManager.h"
 #import "WXAnalyzerProtocol.h"
 #import "WXSDKInstance_performance.h"
-
 #import "WXAnalyzerCenter+Transfer.h"
 
-
-NSString *const kStartKey = @"start";
-NSString *const kEndKey = @"end";
+static NSString *const kStartKey = @"start";
+static NSString *const kEndKey = @"end";
 
 @implementation WXMonitor
 

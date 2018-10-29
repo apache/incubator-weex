@@ -19,8 +19,8 @@
 
 #import "WXResourceRequest.h"
 
-NSString * const kHTTPHeaderNameUserAgent = @"User-Agent";
-NSString * const kHTTPHeaderNameReferrer = @"Referer"; // The misspelling referer originated in the original proposal by computer "scientist" Phillip Hallam-Baker to incorporate the field into the HTTP specification. ╮(╯_╰)╭
+static NSString * const kHTTPHeaderNameUserAgent = @"User-Agent";
+static NSString * const kHTTPHeaderNameReferrer = @"Referer"; // The misspelling referer originated in the original proposal by computer "scientist" Phillip Hallam-Baker to incorporate the field into the HTTP specification. ╮(╯_╰)╭
 
 @implementation WXResourceRequest
 
