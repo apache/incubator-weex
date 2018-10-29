@@ -29,12 +29,10 @@ ThreadImplDarwin::~ThreadImplDarwin() {}
 
 void ThreadImplDarwin::SetName(const std::string& name) {
   ThreadImpl::SetName(name);
-#ifdef OS_IOS
-    pthread_setname_np(name.c_str());
-#elif OS_ANDROID
-    pthread_setname_np(name.c_str());
-#else
+#ifdef OS_LINUX
     pthread_setname_np(pthread_self(), name.c_str());
+#else
+    pthread_setname_np(name.c_str());
 #endif
 
 }
