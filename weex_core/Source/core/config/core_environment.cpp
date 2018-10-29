@@ -16,9 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include <math.h>
+#include <stdlib.h>
 #include "core_environment.h"
 #include "base/CoreConstants.h"
-#include <stdlib.h>
 #include <base/ViewUtils.h>
 #include "base/LogDefines.h"
 

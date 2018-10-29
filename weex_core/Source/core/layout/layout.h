@@ -21,12 +21,14 @@
 #ifndef WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_H
 #define WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_H
 
-#include "style.h"
-#include "flex_enum.h"
+#include <string.h>
+#include <math.h>
 #include <vector>
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include "style.h"
+#include "flex_enum.h"
 
 namespace WeexCore {
 

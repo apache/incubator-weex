@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include <string.h>
 #include <algorithm>
 #include "core/data_render/object.h"
 #include "core/data_render/table.h"

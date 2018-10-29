@@ -33,6 +33,162 @@ namespace data_render {
 #define SECTION_VALUE_FINISHED              0xff
 #define SECTION_SET_LENGTH_LEN_FLAG(flag, LenLen) if (LenLen == 4) LenLen = 3; flag |= (LenLen << SECTION_LEN_OFF);
     
+class CBitsReader {
+public:
+    CBitsReader(std::uint8_t *data, std::uint32_t size)
+    : data_(data),
+    size_(size),
+    byteOffset_(0),
+    currentValue_(0),
+    currentBits_(0) {}
+    std::uint32_t remainingBits() {
+        return 8 * (size_ - byteOffset_) + currentBits_;
+    }
+    std::uint32_t nextBits(std::uint32_t numBits) {
+        assert(numBits <= remainingBits() && "attempt to read more bits than available");
+        // Collect bytes until we have enough bits:
+        while (currentBits_ < numBits) {
+            currentValue_ = (currentValue_ << 8) + (std::uint32_t)(data_[byteOffset_]);
+            currentBits_ = currentBits_ + 8;
+            byteOffset_ = byteOffset_ + 1;
+        }
+        // Extract result:
+        std::uint32_t remaining = currentBits_ - numBits;
+        std::uint32_t result = currentValue_ >> remaining;
+        // Update remaining bits:
+        currentValue_ = currentValue_ & ((1 << remaining) - 1);
+        currentBits_ = remaining;
+        return result;
+    }
+private:
+    std::uint8_t *data_;
+    std::uint32_t byteOffset_;
+    std::uint32_t currentValue_;
+    std::uint32_t currentBits_;
+    std::uint32_t size_;
+};
+    
+class CBitsWriter {
+public:
+    CBitsWriter(std::uint32_t size = 1024);
+    ~CBitsWriter();
+    virtual void WriteBits(std::uint32_t data, std::uint32_t numBits);
+    void WriteByte(std::uint8_t uByte);
+    virtual void Finish();
+    std::uint8_t *GetBuffer();
+    inline std::uint32_t Seek() { return seek_; };
+    inline std::uint32_t Size() { return size_; };
+    inline std::uint32_t TotalBits() { return totalBits_; }
+    void Reset();
+    bool WriteStream(const std::uint8_t *data, std::uint32_t size);
+private:
+    bool bFinish_{false};
+    std::uint32_t size_;
+    std::uint8_t *data_;
+    std::uint32_t totalBits_{0};
+    std::uint32_t seek_{0};
+    unsigned long bytesTemp_{0};
+    std::uint32_t currentBits_{0};
+};
+
+CBitsWriter::CBitsWriter(uint32_t size) : size_(size)
+{
+    data_ = new uint8_t(size_);
+}
+    
+CBitsWriter::~CBitsWriter()
+{
+    if (data_) {
+        delete []data_;
+    }
+}
+
+void InvBits4(std::uint8_t& uChar)
+{
+    static std::uint8_t table[16] = {0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E, 0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07, 0x0F};
+    uChar = table[uChar];
+}
+
+void InvBits(std::uint8_t& uChar)
+{
+    std::uint8_t uH4 = uChar >> 4;
+    std::uint8_t uL4 = uChar & 0xFF;
+    InvBits4(uH4);
+    InvBits4(uL4);
+    uChar = uL4 << 4 | uH4;
+}
+
+void CBitsWriter::WriteBits(std::uint32_t data, std::uint32_t numBits) //data的低nBitCount位为写入数据 低位先写
+{
+    do {
+        if (!numBits) {
+            break;
+        }
+        assert(numBits < 24);
+        const std::uint32_t maxBitCount = sizeof(bytesTemp_) * 8;
+        bytesTemp_ |= data << ((maxBitCount - currentBits_) - numBits) ;
+        currentBits_ += numBits;
+        while (currentBits_ >= 8)
+        {
+            std::uint8_t byte = (std::uint8_t)(bytesTemp_ >> (maxBitCount - 8));
+            WriteByte(byte);
+            bytesTemp_ <<= 8;
+            currentBits_ -= 8;
+        }
+        totalBits_ += numBits;
+        
+    } while (0);
+}
+
+void CBitsWriter::WriteByte(std::uint8_t uByte)
+{
+    if (seek_ < size_)
+    {
+        data_[seek_++] = uByte;
+    }
+    else {
+        throw EncoderError("encoding bits not bits buffer error");
+    }
+}
+
+void CBitsWriter::Finish()
+{
+    if(!bFinish_)
+    {
+        // fill bits for byte
+        if(currentBits_ > 0 && currentBits_ < 8)
+        {
+            unsigned int kMaxBits = sizeof(bytesTemp_) * 8 ;
+            unsigned char h8 = (unsigned char)(bytesTemp_ >> (kMaxBits - 8));//24
+            totalBits_ += (8 - currentBits_);
+            WriteByte(h8);
+        }
+        currentBits_ = 0;
+        bytesTemp_ = 0;
+        bFinish_ = true;
+        seek_ = 0;
+    }
+}
+
+std::uint8_t *CBitsWriter::GetBuffer()
+{
+    return data_;
+}
+    
+void CBitsWriter::Reset()
+{
+    seek_ = 0;
+    bFinish_ = false;
+    totalBits_ = 0;
+}
+
+bool CBitsWriter::WriteStream(const std::uint8_t *data, std::uint32_t size)
+{
+    for (unsigned int i = 0; i < size; i++)
+        WriteByte(data[i]);
+    return true;
+}
+    
 static uint8_t indexForU16(uint16_t index, uint32_t bytes, uint32_t len)
 {
     uint8_t flags = 0;

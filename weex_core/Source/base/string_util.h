@@ -25,7 +25,7 @@
 #ifdef OS_ANDROID
 #include <malloc.h>
 #else
-#include <malloc/malloc.h>
+#include <stdlib.h>
 #endif
 #include "base/third_party/icu/icu_utf.h"
 

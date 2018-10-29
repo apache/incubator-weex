@@ -35,20 +35,16 @@ enum OpCode {
   OP_GETMEMBERVAR,
   OP_SETMEMBERVAR,
   OP_GETSUPER,   // A B C     R(A) = super[B] C = super func
-  
   OP_SETOUTVAR,     // A B C R(A) = B->C
   OP_RESETOUTVAR,
   OP_GETOUTVAR,     // A B C R(A) = B->C
-    
   OP_OUT_CLOSURE,
   OP_IN_CLOSURE,
   OP_REMOVE_CLOSURE,
   OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)
-
   OP_SETARRAY,  //    A B C    R(A)[R(B)] = RK(C)
   OP_GETINDEX,  //    A B C    R(A) = R(B)[R(C)]
   OP_GETINDEXVAR,
-    
   OP_ADD,   //	A B C	R(A) = R(B) + R(C)
   OP_SUB,   //	A B C	R(A) = R(B) - R(C)
   OP_MUL,   //	A B C	R(A) = R(B) * R(C)
@@ -63,7 +59,6 @@ enum OpCode {
   OP_SHR,   //	A B C	R(A) = R(B) >> R(C)
   OP_UNM,   //	A B	    R(A) = -R(B)
   OP_BNOT,  //	A B	    R(A) = ~R(B)
-
   OP_JMP,   //	A Bx	if (!R(A)) pc += Bx
   OP_GOTO,  //   Ax      pc = Ax
   OP_EQ,    //	A B C	R(A) = R(B) == R(C)
@@ -76,19 +71,14 @@ enum OpCode {
   OP_OR,
   OP_IN,
   OP_NOT,
-
   OP_CALL,     //	A B C	R(A) = R(B)(R(B+1), ... ,R(B+C-1))
   OP_RETURN0,  //	Return
   OP_RETURN1,  //	Return R(A)
-
   OP_PRE_INCR,  // A      if (B >= 0) R(B) = ++R(A) else ++R(A)
   OP_PRE_DECR,  // A      if (B >= 0) R(B) = --R(A) else --R(A)
-    
   OP_POST_INCR,  // A      if (B >= 0) R(B) = R(A)++ else R(A)++
   OP_POST_DECR,  // A      if (B >= 0) R(B) = R(A)++ else R(A)--
-
   OP_INVALID,
-
 };
 
 typedef unsigned long Instruction;

@@ -30,11 +30,26 @@ namespace core {
 namespace data_render {
     
 #define EXECSTATE_ENCODING_COMPARE           0
-        
+    
+std::once_flag device_little_endian;
+
+static bool gs_device_is_little_endian = false;
+    
+void determine_little_endian()
+{
+    short i = 0x1;
+    gs_device_is_little_endian = !((i >> 8) == 0x1);
+}
+   
 bool ExecStateEncoder::encoding(std::string &err) {
     bool finished = false;
     do {
         try {
+            std::call_once(device_little_endian, determine_little_endian);
+            if (!gs_device_is_little_endian) {
+                err = "device must be little endian error";
+                break;
+            }
             SectionHeader header(this);
             if (!header.encoding()) {
                 err = "header encoding error";
@@ -387,8 +402,7 @@ bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
         
     } while (0);
     
-#if EXECSTATE_ENCODING_COMPARE
-#else
+#if ! EXECSTATE_ENCODING_COMPARE
     if (exec_state) {
         delete exec_state;
     }
@@ -402,11 +416,18 @@ bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
     return finished;
 }
     
+#if EXECSTATE_ENCODING_COMPARE
 static void compare(ExecState *encoder, ExecState *decoder);
+#endif
     
 bool WXExecDecoder(ExecState *exec_state, uint8_t *buffer, size_t size, std::string &error) {
     bool finished = false;
     do {
+        std::call_once(device_little_endian, determine_little_endian);
+        if (!gs_device_is_little_endian) {
+            error = "device must be little endian error";
+            break;
+        }
         std::string err;
         ExecStateDecoder decoder(exec_state, buffer, size);
         if (!decoder.decoding(err)) {
