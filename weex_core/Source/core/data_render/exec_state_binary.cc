@@ -345,7 +345,7 @@ int64_t fStream::Seek(int64_t pos, int type) {
 static ExecState *gs_encoder = nullptr;
 #endif
     
-bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
+bool WXExecEncoder(std::string &input, std::string &path, std::int32_t &version, std::string &error) {
     bool finished = false;
     VM *vm = nullptr;
     ExecState *exec_state = nullptr;
@@ -400,6 +400,7 @@ bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
 #if EXECSTATE_ENCODING_COMPARE
         gs_encoder = exec_state;
 #endif
+        version = EXEC_BINARY_COMPATIBLE_VERSION;
         finished = true;
         
     } while (0);

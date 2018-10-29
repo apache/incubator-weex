@@ -34,7 +34,7 @@ namespace data_render {
 #define SECTION_LEN_MASK                     0x0c
 #define SECTION_LEN_OFF                         0x2
 #define SECTION_TEST_FLAG(flag, mask)        (flag & mask)
-#define SECTION_GET_LENGTH_LEN(flag, len)    len = ((flags & SECTION_LEN_MASK) >> SECTION_LEN_OFF); if (len == 3) len=4;
+#define SECTION_GET_LENGTH_LEN(flag, len)    len = ((flags & SECTION_LEN_MASK) >> SECTION_LEN_OFF); if (len == 3) len = 4;
 
 class ExecState;
 class fStream;
@@ -80,7 +80,7 @@ private:
     ExecState *exec_state_{nullptr};
 };
 
-bool WXExecEncoder(std::string &src, std::string &path, std::string &error);
+bool WXExecEncoder(std::string &src, std::string &path, std::int32_t &version, std::string &error);
 bool WXExecDecoder(ExecState *exec_state, uint8_t *buffer, size_t size, std::string &error);
 
 }  // namespace data_render
