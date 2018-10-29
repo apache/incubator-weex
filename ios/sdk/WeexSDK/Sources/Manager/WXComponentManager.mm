@@ -44,7 +44,7 @@
 static NSThread *WXComponentThread;
 
 #define WXAssertComponentExist(component)  WXAssert(component, @"component not exists")
-#define MAX_DROP_FRAME_FOR_BATCH   20
+#define MAX_DROP_FRAME_FOR_BATCH   200
 
 @implementation WXComponentManager
 {
