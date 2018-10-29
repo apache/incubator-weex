@@ -61,8 +61,6 @@ import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.helper.ScrollStartEndHelper;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
 import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
@@ -169,10 +167,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private  Runnable keepPositionCellRunnable = null;
   private  long keepPositionLayoutDelay = 150;
 
-//  @Override
-//  public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
-//
-//  }
 
   public BasicListComponent(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     super(instance, parent, basicComponentData);

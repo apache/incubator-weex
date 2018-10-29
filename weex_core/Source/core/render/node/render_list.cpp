@@ -56,7 +56,7 @@ RenderList::~RenderList() {
 }
 
 void RenderList::AddCellSlotCopyTrack(RenderObject *cell_slot) {
-  cell_slot->setParent(this);
+  cell_slot->setParent(this, cell_slot);
   this->cell_slots_copys_.push_back(cell_slot);
 }
 
@@ -242,7 +242,7 @@ int RenderList::AddRenderObject(int index, RenderObject *child) {
   if (type() == kRenderRecycleList &&
       (child->type() == kRenderCellSlot || child->type() == kRenderCell ||
        child->type() == kRenderHeader)) {
-    child->setParent(this);
+    child->setParent(this, child);
     this->cell_slots_.insert(this->cell_slots_.end(), child);
     index = -1;
   } else {

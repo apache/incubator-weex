@@ -32,7 +32,7 @@ class RenderScroller : public RenderObject {
 
   void set_flex(const float flex) override;
 
-  inline float calcFreeSpaceAlongMainAxis(
+  inline float CalculateFreeSpaceAlongMainAxis(
       const float &width, const float &height,
       const float &current_length) const override {
     return NAN;

@@ -31,8 +31,6 @@ import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.action.BasicComponentData;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;

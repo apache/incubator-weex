@@ -19,8 +19,6 @@
 
 #import "WXDomModule.h"
 #import "WXComponent+Layout.h"
-#import "layout.h"
-#import "flex_enum.h"
 #import "WXDefine.h"
 #import "WXSDKManager.h"
 #import "WXComponentManager.h"

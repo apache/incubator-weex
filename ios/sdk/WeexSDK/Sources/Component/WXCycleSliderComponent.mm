@@ -17,7 +17,6 @@
  * under the License.
  */
 
-#import "WXAssert.h"
 #import "WXCycleSliderComponent.h"
 #import "WXIndicatorComponent.h"
 #import "WXComponent_internal.h"

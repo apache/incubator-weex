@@ -37,7 +37,6 @@
 @end
 
 @implementation WXScrollerComponentView
-
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
     if ([(id <WXScrollerProtocol>) self.wx_component respondsToSelector:@selector(requestGestureShouldStopPropagation:shouldReceiveTouch:)]) {
@@ -47,7 +46,6 @@
         return YES;
     }
 }
-
 @end
 
 @interface WXScrollToTarget : NSObject
@@ -1092,10 +1090,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             renderPageSize.first = self.weexInstance.frame.size.width;
             renderPageSize.second = self.weexInstance.frame.size.height;
             auto parent = _flexCssNode->getParent(); // clear parent temporarily
-            _flexCssNode->setParent(nullptr);
+            _flexCssNode->setParent(nullptr, _flexCssNode);
             _flexCssNode->calculateLayout(renderPageSize);
-            _flexCssNode->setParent(parent);
-
+            _flexCssNode->setParent(parent, _flexCssNode);
+            
             // set origin and size back
             _flexCssNode->rewriteLayoutResult(left, top, width, height);
         }

@@ -264,6 +264,7 @@
         WXLogError(@"list only support cell/header/refresh/loading/fixed-component as child.");
         subcomponent->_isViewTreeIgnored = YES; // do not show this element.
     }
+    
     BOOL inserted = [super _insertSubcomponent:subcomponent atIndex:index];
     
     if (![subcomponent isKindOfClass:[WXHeaderComponent class]]

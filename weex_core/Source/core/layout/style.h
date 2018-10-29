@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -20,6 +20,7 @@
 
 #ifndef WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUMS_H
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUMS_H
+
 
 #include "flex_enum.h"
 #include <cmath>
@@ -134,7 +135,7 @@ namespace WeexCore {
     }
 
     inline bool isNAN() {
-        return std::isnan(mTop) || std::isnan(mBottom) || std::isnan(mLeft) || std::isnan(mRight);
+      return isnan(mTop) || isnan(mBottom) || isnan(mLeft) || isnan(mRight);
     }
 
     inline void reset() {

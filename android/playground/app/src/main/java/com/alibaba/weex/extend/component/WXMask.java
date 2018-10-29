@@ -24,7 +24,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -38,8 +37,6 @@ import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 
 import java.util.HashMap;
 import java.util.Map;

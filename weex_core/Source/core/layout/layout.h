@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 #ifdef __cplusplus
 
 #ifndef WEEXCORE_FLEXLAYOUT_WXCORELAYOUTNODE_H
@@ -28,7 +27,6 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
-#include <cfloat>
 
 namespace WeexCore {
 
@@ -42,7 +40,7 @@ namespace WeexCore {
   } ;
 
   enum MeasureMode {
-    kUnspecified,
+    kUnspecified = 0,
     kExactly,
   } ;
 
@@ -231,7 +229,7 @@ namespace WeexCore {
 
     /** ================================ Engine Entry Function =================================== **/
 
-    virtual void calculateLayout(const std::pair<float,float>&);
+    void calculateLayout(const std::pair<float,float>&);
 
     /** ================================ measureFunc =================================== **/
 
@@ -240,15 +238,15 @@ namespace WeexCore {
       markDirty();
     }
 
-    inline WXCoreMeasureFunc getMeasureFunc() const {
-      return measureFunc;
-    }
-
     inline bool haveMeasureFunc() const {
       return nullptr != measureFunc;
     }
 
-    /** ================================ context =================================== **/
+    inline WXCoreMeasureFunc getMeasureFunc() const {
+      return measureFunc;
+    }
+
+      /** ================================ context =================================== **/
 
 
     inline void *getContext() const {
@@ -265,7 +263,13 @@ namespace WeexCore {
         markDirty();
       }
     }
-    
+      
+    void copyFrom(WXCoreLayoutNode* srcNode){
+        if (srcNode == nullptr) return;
+        
+        memcpy(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle));
+    }
+
     inline void copyMeasureFunc(WXCoreLayoutNode *srcNode) {
       if (srcNode != nullptr && memcmp(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc)) != 0) {
         memcpy(&measureFunc, &srcNode->measureFunc, sizeof(WXCoreMeasureFunc));
@@ -288,10 +292,6 @@ namespace WeexCore {
 
     inline void reset() {
       if (isDirty()) {
-        //todo tmp solution if mLayoutResult is nil (mutil thread ?)
-        if (nullptr == mLayoutResult) {
-            mLayoutResult = new WXCorelayoutResult();
-        }
         mLayoutResult->reset();
         for (WXCoreFlexLine *flexLine : mFlexLines) {
           if (flexLine != nullptr) {
@@ -388,28 +388,14 @@ namespace WeexCore {
     }
 
     inline bool isWrapRequired(const float &width, const float &height,
-                             const float &currentLength, const float &childLength) const {
-        float freeMainSize = calcFreeSpaceAlongMainAxis(width, height, currentLength);
-        return !isSingleFlexLine(freeMainSize)
-        && freeMainSize < childLength
-        && !almostEqualRelative(childLength,freeMainSize);          //childLength is bigger than freeMainSize but not almost equal (precision)
-    }
-      
-    inline bool almostEqualRelative(const float A, const float B) const{
-        float maxRelDiff = FLT_EPSILON;
-        // Calculate the difference.
-        float diff = std::fabs(A - B);
-        float absA = std::fabs(A);
-        float absB = std::fabs(B);
-        // Find the largest
-        float largest = (absB > absA) ? absB : absA;
-      
-        if (diff <= largest * maxRelDiff) return true;
-        return false;
+                               const float &currentLength, const float &childLength) const {
+      float freeMainSize = CalculateFreeSpaceAlongMainAxis(width, height, currentLength);
+      return !isSingleFlexLine(freeMainSize) && freeMainSize < childLength;
     }
 
     //If width/height is NAN, ret is NAN, which property we use on purpose.
-    virtual float calcFreeSpaceAlongMainAxis(const float &width, const float &height, const float &currentLength) const{
+    virtual float CalculateFreeSpaceAlongMainAxis(const float &width, const float &height,
+                                                  const float &currentLength) const{
       float ret;
       if(isMainAxisHorizontal(this)){
         ret = width - sumPaddingBorderAlongAxis(this, true) - currentLength;
@@ -614,7 +600,7 @@ namespace WeexCore {
 
     /** ================================ layout =================================== **/
 
-    virtual void layout(float left, float top, float right, float bottom, bool, const std::pair<float,float>* = nullptr);
+    void layout(float left, float top, float right, float bottom, bool, const std::pair<float,float>* = nullptr);
 
     void calcRelativeOffset(float &left, float &top, float &right, float &bottom) const ;
 
@@ -671,19 +657,18 @@ namespace WeexCore {
 
     std::tuple<bool, float, float> calculateBFCDimension(const std::pair<float,float>&);
 
-    virtual void onLayoutBefore() {
+    virtual void OnLayoutBefore() {
 
     }
 
-    virtual void onLayoutAfter(float width, float height) {
+    virtual void OnLayoutAfter(float width, float height) {
 
     }
 
 
   public:
     virtual void onLayout(float left, float top, float right, float bottom, WXCoreLayoutNode* = nullptr, WXCoreFlexLine *const flexLine = nullptr);
-
-      /** ================================ tree =================================== **/
+    /** ================================ tree =================================== **/
 
     inline Index getChildCount(FormattingContext formattingContext) const {
       switch (formattingContext) {
@@ -708,17 +693,25 @@ namespace WeexCore {
       return mChildList.cend();
     }
 
-    inline void removeChild(WXCoreLayoutNode* const child) {
+    inline bool hasChild(const WXCoreLayoutNode* const child){
+       if(std::find(mChildList.begin(), mChildList.end(), child) != mChildList.end()){
+         return true;
+       }else{
+         return false;
+       }
+    }
+
+    inline void removeChild(const WXCoreLayoutNode* const child) {
       for (int index = 0; index < mChildList.size(); index++) {
         if (child == mChildList[index]) {
-            mChildList.erase(mChildList.begin() + index);
-            break;
+          mChildList.erase(mChildList.begin() + index);
+          break;
         }
       }
       markDirty();
     }
 
-    virtual inline void addChildAt(WXCoreLayoutNode* const child, Index index) {
+    inline void addChildAt(WXCoreLayoutNode* const child, Index index) {
       mChildList.insert(mChildList.begin() + index, child);
       child->mParent = this;
       markDirty();
@@ -743,8 +736,8 @@ namespace WeexCore {
       return mParent;
     }
 
-    inline void setParent(WXCoreLayoutNode *parentNode) {
-        mParent = parentNode;
+    inline void setParent(WXCoreLayoutNode * const parent, WXCoreLayoutNode * const child) const {
+       child->mParent = parent;
     }
 
     inline bool isBFC(WXCoreLayoutNode* const node) const {
@@ -1022,7 +1015,7 @@ namespace WeexCore {
     inline WXCoreFlexDirection getFlexDirection() const {
       return mCssStyle->mFlexDirection;
     }
-      
+
     inline void setFlexWrap(const WXCoreFlexWrap flexWrap) {
       if (mCssStyle->mFlexWrap != flexWrap) {
         mCssStyle->mFlexWrap = flexWrap;

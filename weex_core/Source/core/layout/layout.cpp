@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -61,7 +61,7 @@ namespace WeexCore {
     }
     reset();
   }
-    
+
   std::tuple<bool, float, float> WXCoreLayoutNode::calculateBFCDimension(const std::pair<float,float>& renderPageSize) {
     bool sizeChanged = false;
     float width = mCssStyle->mStyleWidth, height = mCssStyle->mStyleHeight;
@@ -101,10 +101,10 @@ namespace WeexCore {
             mCssStyle->mStylePosition.getPosition(kPositionEdgeLeft) -
             mCssStyle->mStylePosition.getPosition(kPositionEdgeRight);
         if (!isnan(mCssStyle->mMargin.getMargin(kMarginLeft))) {
-            width -= mCssStyle->mMargin.getMargin(kMarginLeft);
+          width -= mCssStyle->mMargin.getMargin(kMarginLeft);
         }
         if (!isnan(mCssStyle->mMargin.getMargin(kMarginRight))) {
-            width -= mCssStyle->mMargin.getMargin(kMarginRight);
+          width -= mCssStyle->mMargin.getMargin(kMarginRight);
         }
         setWidthMeasureMode(kExactly);
         sizeChanged = true;
@@ -242,6 +242,7 @@ namespace WeexCore {
         }
       }
     }
+
 
   /**
    * @param flexDirection         the flex direction attribute

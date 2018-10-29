@@ -20,12 +20,10 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
 import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,8 +38,6 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.WXCirclePageAdapter;
 import com.taobao.weex.ui.view.WXCircleViewPager;
@@ -106,11 +102,6 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   public WXSlider(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     super(instance, parent, basicComponentData);
   }
-
-  //  @Override
-//  public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
-//
-//  }
 
   @Override
   protected FrameLayout initComponentHostView(@NonNull Context context) {
@@ -194,9 +185,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     if (view instanceof WXCircleIndicator) {
       return;
     }
-
     mAdapter.addPageView(view);
-
     hackTwoItemsInfiniteScroll();
     if (initIndex != -1 && mAdapter.getRealCount() > initIndex) {
       if(initRunnable == null){
@@ -415,7 +404,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       }
 
       index = getRealIndex(index);
-
+      mViewPager.setCurrentItem(index);
       if (mIndicator != null && mIndicator.getHostView() != null
               && mIndicator.getHostView().getRealCurrentItem() != index) {
         //OnPageChangeListener not triggered

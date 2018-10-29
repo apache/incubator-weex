@@ -973,20 +973,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     if (isFixed()) {
       realLeft = (int) (getLayoutPosition().getLeft() - getInstance().getRenderContainerPaddingLeft());
-//      realRight = (int) (getLayoutPosition().getRight() - getInstance().getRenderContainerPaddingRight());
       realTop = (int) (getLayoutPosition().getTop() - getInstance().getRenderContainerPaddingTop()) + siblingOffset;
     } else {
       realLeft = (int) (getLayoutPosition().getLeft() -
               parentPadding.get(CSSShorthand.EDGE.LEFT) - parentBorder.get(CSSShorthand.EDGE.LEFT));
-
-//      float parentWidth = 1080;
-//      if (this.getParent() != null) {
-//          parentWidth = this.getParent().getLayoutWidth();
-//      } else {
-//          parentWidth = getInstance().getWeexWidth();
-//      }
-//      realRight = (int) (parentWidth - getLayoutPosition().getRight() -
-//                parentPadding.get(CSSShorthand.EDGE.RIGHT) - parentBorder.get(CSSShorthand.EDGE.RIGHT));
       realTop = (int) (getLayoutPosition().getTop() -
               parentPadding.get(CSSShorthand.EDGE.TOP) - parentBorder.get(CSSShorthand.EDGE.TOP)) + siblingOffset;
     }

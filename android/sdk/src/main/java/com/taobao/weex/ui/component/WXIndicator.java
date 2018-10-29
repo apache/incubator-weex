@@ -20,7 +20,6 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -31,8 +30,6 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.ui.action.BasicComponentData;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
