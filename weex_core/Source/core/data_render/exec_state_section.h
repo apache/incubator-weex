@@ -20,6 +20,7 @@
 #ifndef CORE_DATA_RENDER_EXEC_STATE_SECTION_H
 #define CORE_DATA_RENDER_EXEC_STATE_SECTION_H
 
+#include <vector>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -127,13 +128,15 @@ public:
         kValueFunctionConstantPayload,
         kValueFunctionFinished = 255,
     };
-    SectionFunction(ExecStateEncoder *encoder) : Section(encoder) {}
-    SectionFunction(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
-    static uint32_t GetInstructionsSize(std::vector<unsigned long>& instructions);
+    SectionFunction(ExecStateEncoder *encoder, uint8_t op_code_bits) : Section(encoder), op_code_bits_(op_code_bits)  {}
+    SectionFunction(ExecStateDecoder *decoder, uint8_t op_code_bits, uint32_t length) : Section(decoder, length), op_code_bits_(op_code_bits) {}
+    uint32_t GetInstructionsSize(std::vector<unsigned long>& instructions);
     virtual ~SectionFunction() {};
     virtual bool encoding();
     virtual bool decoding();
     virtual uint32_t size();
+private:
+    uint8_t op_code_bits_{0};
 };
 
 class SectionGlobalConstants : public Section {

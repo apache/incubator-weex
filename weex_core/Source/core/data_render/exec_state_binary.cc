@@ -42,7 +42,7 @@ void determine_little_endian()
 {
     short i = 0x1;
     gs_device_is_little_endian = !((i >> 8) == 0x1);
-    gs_op_code_bits = 0;
+    gs_op_code_bits = 1;
     uint32_t op_code_value = OP_INVALID;
     while (op_code_value / 2 > 0) {
         op_code_value = op_code_value / 2;
@@ -54,11 +54,6 @@ bool ExecStateEncoder::encoding(std::string &err) {
     bool finished = false;
     do {
         try {
-            std::call_once(device_little_endian, determine_little_endian);
-            if (!gs_device_is_little_endian) {
-                err = "device must be little endian error";
-                break;
-            }
             SectionHeader header(this);
             if (!header.encoding()) {
                 err = "header encoding error";
@@ -69,7 +64,7 @@ bool ExecStateEncoder::encoding(std::string &err) {
                 err = "string section encoding error";
                 break;
             }
-            SectionFunction function(this);
+            SectionFunction function(this, gs_op_code_bits);
             if (!function.encoding()) {
                 err = "function section encoding error";
                 break;
@@ -154,7 +149,7 @@ bool ExecStateDecoder::decoding(std::string &err) {
                     }
                     case ExecSection::EXEC_SECTION_FUNCTION:
                     {
-                        SectionFunction function(this, section_length);
+                        SectionFunction function(this, gs_op_code_bits, section_length);
                         if (!function.decoding()) {
                             throw EncoderError("function section decoding error");
                         }
@@ -358,6 +353,11 @@ bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
     ExecState *exec_state = nullptr;
     FILE *fout = nullptr;
     do {
+        std::call_once(device_little_endian, determine_little_endian);
+        if (!gs_device_is_little_endian) {
+            error = "device must be little endian error";
+            break;
+        }
         fout = fopen(path.c_str(), "wb");
         if (fout == nullptr) {
             error = "can't open " + path;

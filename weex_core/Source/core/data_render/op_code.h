@@ -25,23 +25,24 @@ namespace data_render {
 
 enum WX_OP_CODE {
   OP_MOVE = 0,       //	A B	    R(A) = R(B)
+  OP_SETTABLE,  //    A B C    R(A)[R(B)] = RK(C)
+  OP_SETOUTVAR,     // A B C R(A) = B->C
   OP_LOADK,      //	A Bx	R(A) = Constant[Bx]
+  OP_CALL,     //    A B C    R(A) = R(B)(R(B+1), ... ,R(B+C-1))
+  OP_GETMEMBER,
   OP_LOADNULL,   //	A       R(A) = null
   OP_GETGLOBAL,  //	A Bx	R(A) = Global[B]
   OP_GETFUNC,    //	A Bx  	R(A) = Function[B]
   OP_NEW,
   OP_GETCLASS,   // A B C R(A) = B->C
-  OP_GETMEMBER,
   OP_GETMEMBERVAR,
   OP_SETMEMBERVAR,
   OP_GETSUPER,   // A B C     R(A) = super[B] C = super func
-  OP_SETOUTVAR,     // A B C R(A) = B->C
   OP_RESETOUTVAR,
   OP_GETOUTVAR,     // A B C R(A) = B->C
   OP_OUT_CLOSURE,
   OP_IN_CLOSURE,
   OP_REMOVE_CLOSURE,
-  OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)
   OP_SETARRAY,  //    A B C    R(A)[R(B)] = RK(C)
   OP_GETINDEX,  //    A B C    R(A) = R(B)[R(C)]
   OP_GETINDEXVAR,
@@ -71,7 +72,6 @@ enum WX_OP_CODE {
   OP_OR,
   OP_IN,
   OP_NOT,
-  OP_CALL,     //	A B C	R(A) = R(B)(R(B+1), ... ,R(B+C-1))
   OP_RETURN0,  //	Return
   OP_RETURN1,  //	Return R(A)
   OP_PRE_INCR,  // A      if (B >= 0) R(B) = ++R(A) else ++R(A)

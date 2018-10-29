@@ -967,6 +967,18 @@ uint32_t SectionFunction::GetInstructionsSize(std::vector<Instruction>& instruct
             break;
         }
         numBits += sizeof(uint32_t) * 8;
+        for (int i = 0; i < instructions.size(); i++) {
+            numBits += op_code_bits_;
+            Instruction instruction = instructions[i];
+            WX_OP_CODE code = GET_OP_CODE(instruction);
+            if (code > 8) {
+                printf("\n");
+            }
+            long A = GET_ARG_A(instruction);
+            long B = GET_ARG_B(instruction);
+            long C = GET_ARG_C(instruction);
+            printf("code:%i A:%i  B:%i C:%i\n", code, (int32_t)A, (int32_t)B, (int32_t)C);
+        }
         
         
     } while (0);
@@ -1002,6 +1014,7 @@ uint32_t SectionFunction::size() {
                 size += GetFTLVLength(kValueFunctionOutClosure, sizeof(int32_t) * (uint32_t)func_state->out_closure().size());
             }
             if (func_state->instructions().size() > 0) {
+                GetInstructionsSize(func_state->instructions());
                 total_instructions_length += GetFTLVLength(kValueFunctionInstructions, sizeof(int32_t) * (uint32_t)func_state->instructions().size());
                 size += GetFTLVLength(kValueFunctionInstructions, sizeof(int32_t) * (uint32_t)func_state->instructions().size());
             }
