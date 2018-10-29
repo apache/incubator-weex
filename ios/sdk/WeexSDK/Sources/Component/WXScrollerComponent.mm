@@ -418,6 +418,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)adjustForRTL
 {
+    if (![WXUtility enableRTLLayoutDirection]) return;
+    
     // this is scroll rtl solution.
     // scroll layout not use direction, use self tranform
     if (self.view && _flexCssNode && _flexCssNode->getLayoutDirection() == WeexCore::kDirectionRTL
@@ -435,6 +437,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 }
 
 - (void)_adjustForRTL {
+    if (![WXUtility enableRTLLayoutDirection]) return;
+    
     [super _adjustForRTL];
     [self adjustForRTL];
 }
