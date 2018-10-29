@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <mutex>
 #include "core/data_render/exec_state_binary.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/vm.h"
