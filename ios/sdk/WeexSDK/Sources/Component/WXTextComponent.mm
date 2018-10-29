@@ -123,7 +123,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 @interface WXTextComponent()
 @property (nonatomic, strong) NSString *useCoreTextAttr;
-@property (nonatomic, assign, readonly) BOOL isDirectionRTL;
 @end
 
 @implementation WXTextComponent
@@ -376,12 +375,6 @@ do {\
     }
     
     return nil;
-}
-
-- (BOOL)isDirectionRTL {
-    WeexCore::WXCoreDirection direction = _flexCssNode->getLayoutDirectionFromPathNode();
-    if (direction != WeexCore::kDirectionInherit) return direction == WeexCore::kDirectionRTL;
-    return NO;
 }
 
 - (CGSize (^)(CGSize))measureBlock

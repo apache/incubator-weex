@@ -263,8 +263,7 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSString *direction = @"unknow";
                 if (component) {
-                    WeexCore::WXCoreDirection layoutDirection = component->_flexCssNode->getLayoutDirectionFromPathNode();
-                    direction = layoutDirection == WeexCore::kDirectionInherit ? @"unknow" : layoutDirection == WeexCore::kDirectionRTL ? @"rtl" : @"ltr";
+                    direction = [component isDirectionRTL] ? @"rtl" : @"ltr";
                 }
                 if (callback) {
                     callback(direction, false);

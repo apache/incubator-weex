@@ -174,29 +174,6 @@ bool flexIsUndefined(float value) {
     [self layoutDidFinish];
 }
 
-- (void)_adjustForRTL {
-    if (self->_positionType == WXPositionTypeFixed) return;
-    
-    if (self.supercomponent && self.supercomponent->_flexCssNode && self.supercomponent->_flexCssNode->getLayoutDirectionFromPathNode() == WeexCore::kDirectionRTL && [self.supercomponent shouldTranformSubviewsWhenRTL]) {
-        if (_transform) {
-            self.view.layer.transform = CATransform3DConcat(self.view.layer.transform, CATransform3DScale(CATransform3DIdentity, -1, 1, 1));
-        } else {
-            self.view.layer.transform = CATransform3DScale(CATransform3DIdentity, -1, 1, 1);
-        }
-    } else {
-        if (!_transform) {
-            self.view.layer.transform = CATransform3DIdentity;
-        }
-    }
-}
-
-// Now we scrollView RTL solution is tranform
-// so scrollView need tranform subviews when RTL by default
-// if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
-- (BOOL)shouldTranformSubviewsWhenRTL {
-    return [self.view isKindOfClass:[UIScrollView class]];
-}
-
 #define WX_STYLE_FLEX_NODE_JUDGE_LEGAL(key) styles[key]&&!isnan([WXConvert WXPixelType:styles[key] scaleFactor:self.weexInstance.pixelScaleFactor])
 
 - (CGFloat)WXPixelType:(id)value
@@ -686,6 +663,41 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
         [WXCoreBridge removeRenderObjectFromMap:subcomponent.weexInstance.instanceId object:node];
         delete node; // also will delete all children recursively
     }
+}
+
+#pragma mark - RTL
+
+- (BOOL)isDirectionRTL {
+    if (![WXUtility enableRTLLayoutDirection]) return NO;
+    
+    WeexCore::WXCoreDirection direction = _flexCssNode == nullptr ? WeexCore::WEEXCORE_CSS_DEFAULT_DIRECTION : _flexCssNode->getLayoutDirectionFromPathNode();
+    if (direction != WeexCore::kDirectionInherit) return direction == WeexCore::kDirectionRTL;
+    return NO;
+}
+
+- (void)_adjustForRTL {
+    if (![WXUtility enableRTLLayoutDirection]) return;
+    
+    if (self->_positionType == WXPositionTypeFixed) return;
+    
+    if (self.supercomponent && self.supercomponent->_flexCssNode && self.supercomponent->_flexCssNode->getLayoutDirectionFromPathNode() == WeexCore::kDirectionRTL && [self.supercomponent shouldTransformSubviewsWhenRTL]) {
+        if (_transform) {
+            self.view.layer.transform = CATransform3DConcat(self.view.layer.transform, CATransform3DScale(CATransform3DIdentity, -1, 1, 1));
+        } else {
+            self.view.layer.transform = CATransform3DScale(CATransform3DIdentity, -1, 1, 1);
+        }
+    } else {
+        if (!_transform) {
+            self.view.layer.transform = CATransform3DIdentity;
+        }
+    }
+}
+
+// Now we scrollView RTL solution is tranform
+// so scrollView need tranform subviews when RTL by default
+// if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
+- (BOOL)shouldTransformSubviewsWhenRTL {
+    return [self.view isKindOfClass:[UIScrollView class]];
 }
 
 @end

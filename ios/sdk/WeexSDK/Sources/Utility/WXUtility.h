@@ -499,6 +499,10 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
 
 + (BOOL)listSectionRowThreadSafe;
 
++ (void)setEnableRTLLayoutDirection:(BOOL)value;
+
++ (BOOL)enableRTLLayoutDirection;
+
 + (long) getUnixFixTimeMillis;
 
 + (NSArray<NSString *> *_Nullable)extractPropertyNamesOfJSValueObject:(JSValue *_Nullable)jsvalue;

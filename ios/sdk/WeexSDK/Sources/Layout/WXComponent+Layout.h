@@ -64,14 +64,18 @@ extern "C" {
  */
 - (CGFloat)safeContainerStyleWidth;
 
-// Now we scrollView RTL solution is tranform
-// so scrollView need tranform subviews when RTL by default
-// if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
-- (BOOL)shouldTranformSubviewsWhenRTL;
-
 /**
  * @abstract Delete css node of a subcomponent.
  */
 - (void)removeSubcomponentCssNode:(WXComponent *)subcomponent;
+
+#pragma mark - RTL
+
+@property (nonatomic, assign, readonly) BOOL isDirectionRTL;
+
+// Now we scrollView RTL solution is tranform
+// so scrollView need tranform subviews when RTL by default
+// if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
+- (BOOL)shouldTransformSubviewsWhenRTL;
 
 @end

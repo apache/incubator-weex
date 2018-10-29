@@ -258,23 +258,6 @@ namespace WeexCore {
     inline void setContext(void * const context) {
       this->context = context;
     }
-
-    inline void copyParentNode(WXCoreLayoutNode *srcNode) {
-        if (nullptr == srcNode->mParent) {
-            if (nullptr != mParent) {
-                mParent = nullptr;
-                markDirty();
-            }
-            return;
-        }
-        if (mParent == nullptr) {
-            mParent = new WXCoreLayoutNode();
-        }
-        if (memcmp(mParent, srcNode->mParent, sizeof(WXCoreLayoutNode)) != 0) {
-            memcpy(mParent, srcNode->mParent, sizeof(WXCoreLayoutNode));
-          markDirty();
-      }
-    }
       
     inline void copyStyle(WXCoreLayoutNode *srcNode) {
       if (srcNode != nullptr && memcmp(mCssStyle, srcNode->mCssStyle, sizeof(WXCoreCSSStyle)) != 0) {

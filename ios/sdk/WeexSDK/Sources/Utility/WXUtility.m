@@ -46,6 +46,7 @@ static BOOL threadSafeCollectionUsingLock = YES;
 static BOOL unregisterFontWhenCollision = NO;
 static BOOL listSectionRowThreadSafe = YES;
 static BOOL useJSCApiForCreateInstance = YES;
+static BOOL enableRTLLayoutDirection = YES;
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
@@ -771,6 +772,17 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return defaultScaleFactor;
 }
 
+#pragma mark - RTL
+
++ (void)setEnableRTLLayoutDirection:(BOOL)value
+{
+    enableRTLLayoutDirection = value;
+}
+
++ (BOOL)enableRTLLayoutDirection
+{
+    return enableRTLLayoutDirection;
+}
 
 #pragma mark - get deviceID
 + (NSString *)getDeviceID {

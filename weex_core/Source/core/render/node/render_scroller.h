@@ -42,7 +42,7 @@ public:
     void onLayout(const float left, const float top, const float right, const float bottom,
                                   WXCoreLayoutNode *const absoulteItem, WXCoreFlexLine *const flexLine) override;
 
-    // Since scroll only use rtl to layout children actually,
+    // Since scroll only use ltr to layout children actually,
     // so we need override this method to return calculated inherit direction as normal render_object do
     inline WXCoreDirection getLayoutDirection() const override {
         WXCoreDirection styleDirection = this->getDirection();
