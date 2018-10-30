@@ -41,8 +41,8 @@
 + /packages
 + /build
 + /build/**
-+ /pre-build
-+ /pre-build/**
+- /pre-build
+- /pre-build/**
 
 ###### weexcore ######
 + /weex_core
@@ -54,7 +54,7 @@
 + /android
 + /android/build.gradle
 + /android/sdk/
-- /android/sdk/assets/main.js
+- /android/sdk/assets/*.js
 - /android/sdk/.gradle
 - /android/sdk/build
 - /android/sdk/NOTICE
