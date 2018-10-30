@@ -23,6 +23,7 @@
 #include <vector>
 #include <stdlib.h>
 #include <stdio.h>
+#include "core/data_render/op_code.h"
 
 namespace weex {
 namespace core {
@@ -130,7 +131,9 @@ public:
     };
     SectionFunction(ExecStateEncoder *encoder, uint8_t op_code_bits) : Section(encoder), op_code_bits_(op_code_bits)  {}
     SectionFunction(ExecStateDecoder *decoder, uint8_t op_code_bits, uint32_t length) : Section(decoder, length), op_code_bits_(op_code_bits) {}
-    uint32_t GetInstructionsSize(std::vector<unsigned long>& instructions);
+    uint32_t GetInstructionsBytes(std::vector<Instruction>& instructions);
+    uint32_t encodingInstructionsToBuffer(uint8_t *buffer, uint32_t bytes, std::vector<Instruction>& instructions);
+    uint32_t decodingInstructionsFromBuffer(uint8_t *buffer, uint32_t bytes, std::vector<Instruction>& instructions);
     virtual ~SectionFunction() {};
     virtual bool encoding();
     virtual bool decoding();

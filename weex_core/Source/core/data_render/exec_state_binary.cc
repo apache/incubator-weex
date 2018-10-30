@@ -419,6 +419,7 @@ bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
     if (vm) {
         delete vm;
     }
+    LOGD("encoding file size:%.02fK\n", (double)ftell(fout) / 1024);
     if (fout) {
         fclose(fout);
     }    

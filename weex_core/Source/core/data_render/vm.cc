@@ -45,16 +45,16 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
   while (pc != frame.end) {
     Instruction instruction = *pc++;
     double d1, d2;
-    WX_OP_CODE op(GET_OP_CODE(instruction));
+    OPCode op(GET_OP_CODE(instruction));
 #if DEBUG
     //tc.op_start(op);
 #endif
       switch (op) {
         case OP_MOVE:
         {
-            LOGTEMP("OP_MOVE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            LOGTEMP("OP_MOVE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
             a = frame.reg + GET_ARG_A(instruction);
-            b = frame.reg + GET_ARG_B(instruction);
+            b = frame.reg + GET_ARG_Bx(instruction);
             if (IsValueRef(a)) {
                 *a->var = *b;
                 SetNil(a);
@@ -68,7 +68,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             break;
         }
       case OP_LOADNULL:
-        a = frame.reg + GET_ARG_A(instruction);
+        a = frame.reg + GET_ARG_Ax(instruction);
         a->type = Value::Type::NIL;
         break;
       case OP_LOADK:
@@ -306,9 +306,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
           case OP_NOT:
           {
-              LOGTEMP("OP_NOT A:%ld B:%ld \n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+              LOGTEMP("OP_NOT A:%ld B:%ld \n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
               a = frame.reg + GET_ARG_A(instruction);
-              b = frame.reg + GET_ARG_B(instruction);
+              b = frame.reg + GET_ARG_Bx(instruction);
               a->type = Value::Type::BOOL;
               ToBool(b, a->b);
               a->b = !a->b;
@@ -414,7 +414,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         break;
         case OP_POST_INCR: {
             a = frame.reg + GET_ARG_A(instruction);
-            b = frame.reg + GET_ARG_B(instruction);
+            b = frame.reg + GET_ARG_Bx(instruction);
             if (IsInt(a)) {
                 if (NULL != b) {
                     SetIValue(b, (int)IntValue(a));
@@ -437,15 +437,15 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             
         case OP_POST_DECR: {
             a = frame.reg + GET_ARG_A(instruction);
-            b = frame.reg + GET_ARG_B(instruction);
+            b = frame.reg + GET_ARG_Bx(instruction);
             if (IsInt(a)) {
-                if (GET_ARG_B(instruction) != 0) {
+                if (GET_ARG_Bx(instruction) != 0) {
                     SetIValue(b, (int)IntValue(a));
                 }
                 SetIValue(a, (int)IntValue(a) - 1);
             }
             else if (IsNumber(a)) {
-                if (GET_ARG_B(instruction) != 0) {
+                if (GET_ARG_Bx(instruction) != 0) {
                     SetDValue(b, NumValue(a));
                 }
                 SetDValue(a, NumValue(a) - 1);
@@ -456,9 +456,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
             break;
 
-      case OP_PRE_INCR: {
+      case OP_PREV_INCR: {
         a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
+        b = frame.reg + GET_ARG_Bx(instruction);
         if (IsInt(a)) {
           SetIValue(a, (int)IntValue(a) + 1);
           SetRefValue(a);
@@ -477,17 +477,17 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
       }
         break;
 
-      case OP_PRE_DECR: {
+      case OP_PREV_DECR: {
         a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
+        b = frame.reg + GET_ARG_Bx(instruction);
         if (IsInt(a)) {
           SetIValue(a, static_cast<int>(IntValue(a)) - 1);
-          if (GET_ARG_B(instruction) != 0) {
+          if (GET_ARG_Bx(instruction) != 0) {
             SetIValue(b, static_cast<int>(IntValue(a)));
           }
         } else if (IsNumber(a)) {
           SetDValue(a, NumValue(a) - 1);
-          if (GET_ARG_B(instruction) != 0) {
+          if (GET_ARG_Bx(instruction) != 0) {
             SetDValue(b, NumValue(a));
           }
         } else {
@@ -549,9 +549,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_SETMEMBERVAR:
         {
-            LOGTEMP("OP_SETMEMBERVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            LOGTEMP("OP_SETMEMBERVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
             a = frame.reg + GET_ARG_A(instruction);
-            b = frame.reg + GET_ARG_B(instruction);
+            b = frame.reg + GET_ARG_Bx(instruction);
             if (!IsValueRef(a)) {
                 throw VMExecError("Only ValueRef Support With OP_CODE [OP_SETMEMBER]");
             }
@@ -685,7 +685,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_SETOUTVAR:
         {
-            LOGTEMP("OP_SETOUTVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            LOGTEMP("OP_SETOUTVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             int index = (int)GET_ARG_Bx(instruction);
             ValueRef *ref = exec_state->FindRef(index);
@@ -698,8 +698,8 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
         case OP_RESETOUTVAR:
         {
-            LOGTEMP("OP_RESETOUTVAR A:%ld\n", GET_ARG_A(instruction));
-            a = frame.reg + GET_ARG_A(instruction);
+            LOGTEMP("OP_RESETOUTVAR A:%ld\n", GET_ARG_Ax(instruction));
+            a = frame.reg + GET_ARG_Ax(instruction);
             a->ref = NULL;
             break;
         }
@@ -870,12 +870,12 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             return;
         }
         case OP_RETURN1: {
-            LOGTEMP("OP_RETURN1 A:%ld\n", GET_ARG_A(instruction));
+            LOGTEMP("OP_RETURN1 A:%ld\n", GET_ARG_Ax(instruction));
             if (ret == nullptr) {
                 return;
             }
             else {
-                a = frame.reg + GET_ARG_A(instruction);
+                a = frame.reg + GET_ARG_Ax(instruction);
                 *ret = *a;
                 return;
             }

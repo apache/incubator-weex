@@ -117,7 +117,7 @@ void CodeGenerator::Visit(StringConstant* node, void* data) {
     FuncState *func_state = func_->func_state();
     auto value = exec_state_->string_table_->StringFromUTF8(node->string());
     int index = func_state->AddConstant(std::move(value));
-    Instruction i = CREATE_ABx(OP_LOADK, reg, index);
+      Instruction i = CREATE_ABx(OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
 }
@@ -151,14 +151,14 @@ void CodeGenerator::Visit(RegexConstant* node, void* data) {
     func_state->AddInstruction(CREATE_ABx(OP_LOADK, r_id, r_index));
     func_state->AddInstruction(CREATE_ABx(OP_LOADK, f_id, f_index));
     func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, class_id, reg_class_index));
-
+      
     func_state->AddInstruction(CREATE_ABC(OP_NEW, reg, Value::Type::CLASS_DESC, class_id));
 
     func_state->AddInstruction(CREATE_ABC(OP_GETMEMBERVAR, tmp, reg, mr_id));
-    func_state->AddInstruction(CREATE_ABC(OP_MOVE, tmp, r_id, 0));
+    func_state->AddInstruction(CREATE_ABx(OP_MOVE, tmp, r_id));
 
     func_state->AddInstruction(CREATE_ABC(OP_GETMEMBERVAR, tmp, reg, mf_id));
-    func_state->AddInstruction(CREATE_ABC(OP_MOVE, tmp, f_id, 0));
+    func_state->AddInstruction(CREATE_ABx(OP_MOVE, tmp, f_id));
   }
 }
 
@@ -197,7 +197,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
         if (block_->idx() > caller + 1) {
             long reg_old_caller = caller;
             caller = block_->NextRegisterId();
-            func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, reg_old_caller, 0));
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, caller, reg_old_caller));
         }
         caller_regs_order.push_back(caller);
     }
@@ -250,7 +250,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
                 if (block_->idx() > caller + 1) {
                     long reg_old_caller = caller;
                     caller = block_->NextRegisterId();
-                    func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, reg_old_caller, 0));
+                    func_state->AddInstruction(CREATE_ABx(OP_MOVE, caller, reg_old_caller));
                 }
                 caller_regs_order.push_back(caller);
                 if (stms->expr()->IsMemberExpression()) {
@@ -304,10 +304,10 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
     }
     if (call_reorder) {
         caller = block_->NextRegisterId();
-        func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, caller_regs_order[0], 0));
+        func_state->AddInstruction(CREATE_ABx(OP_MOVE, caller, caller_regs_order[0]));
         for (int i = 1; i < caller_regs_order.size(); i++) {
             long arg = block_->NextRegisterId();
-            func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg, caller_regs_order[i], 0));
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, arg, caller_regs_order[i]));
         }
         state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
     }
@@ -527,7 +527,7 @@ void CodeGenerator::Visit(ThisExpression *node, void *data) {
         long rhs = block_->FindRegisterId("this");
         if (rhs != ret) {
             // a = b
-            func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, ret, rhs, 0));
+            func_->func_state()->AddInstruction(CREATE_ABx(OP_MOVE, ret, rhs));
         }
     }
 }
@@ -585,7 +585,7 @@ void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
         if (node->body()->IsJSXNodeExpression()) {
             long return1 = block_->NextRegisterId();
             node->body()->Accept(this, &return1);
-            func_->func_state()->AddInstruction(CREATE_ABC(OP_RETURN1, return1, 0, 0));
+            func_->func_state()->AddInstruction(CREATE_Ax(OP_RETURN1, return1));
         }
         else {
             node->body()->Accept(this, nullptr);
@@ -671,7 +671,7 @@ void CodeGenerator::Visit(NewExpression *node, void *data) {
                     state->AddInstruction(CREATE_ABC(OP_NEW, lhs, Value::CLASS_DESC, rhs));
                 }
                 else {
-                    state->AddInstruction(CREATE_ABC(OP_MOVE, lhs, rhs, 0));
+                    state->AddInstruction(CREATE_ABx(OP_MOVE, lhs, rhs));
                 }
                 break;
             }
@@ -726,14 +726,14 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
                     throw GeneratorError("can't find identifier appendChild");
                 }
                 func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, caller, index));
-                func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg_0, reg_parent, 0));
+                func_state->AddInstruction(CREATE_ABx(OP_MOVE, arg_0, reg_parent));
                 childrens[i]->Accept(this, &arg_1);
                 func_state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
             }
         }
         if (data) {
             long ret = *static_cast<long *>(data);
-            func_state->AddInstruction(CREATE_ABC(OP_MOVE, ret, reg_parent, 0));
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, ret, reg_parent));
         }
         
     } while (0);
@@ -885,10 +885,10 @@ void CodeGenerator::Visit(AssignExpression *node, void *data) {
         case AssignOperation::kAssign:
         {
             if (class_ && node->lhs()->IsMemberExpression() && node->lhs()->AsMemberExpression()->expr()->IsThisExpression()) {
-                func_state->AddInstruction(CREATE_ABC(OP_SETMEMBERVAR, left, right, 0));
+                func_state->AddInstruction(CREATE_ABx(OP_SETMEMBERVAR, left, right));
             }
             else {
-                func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, right, 0));
+                func_state->AddInstruction(CREATE_ABx(OP_MOVE, left, right));
             }
             break;
         }
@@ -896,14 +896,14 @@ void CodeGenerator::Visit(AssignExpression *node, void *data) {
         {
             long ret = block_->NextRegisterId();
             func_state->AddInstruction(CREATE_ABC(OP_ADD, ret, left, right));
-            func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, ret, 0));
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, left, ret));
             break;
         }
         case AssignOperation::kAssignSub:
         {
             long ret = block_->NextRegisterId();
             func_state->AddInstruction(CREATE_ABC(OP_SUB, ret, left, right));
-            func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, ret, 0));
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, left, ret));
             break;
         }
         default:
@@ -919,7 +919,7 @@ void CodeGenerator::Visit(Declaration *node, void *data) {
         node->expr()->Accept(this, &reg);
     }
     else {
-        func_state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
+        func_state->AddInstruction(CREATE_Ax(OP_LOADNULL, reg));
     }
 }
 
@@ -978,7 +978,7 @@ void CodeGenerator::Visit(NullConstant *node, void *data) {
     long reg = data == nullptr ? -1 : *static_cast<long *>(data);
     if (reg >= 0) {
         FuncState *func_state = func_->func_state();
-        func_state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
+        func_state->AddInstruction(CREATE_Ax(OP_LOADNULL, reg));
     }
 }
     
@@ -986,7 +986,7 @@ void CodeGenerator::Visit(UndefinedConstant *node, void *data) {
     long reg = data == nullptr ? -1 : *static_cast<long*>(data);
     if (reg >= 0) {
         FuncState *func_state = func_->func_state();
-        func_state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
+        func_state->AddInstruction(CREATE_Ax(OP_LOADNULL, reg));
     }
 }
 
@@ -1118,7 +1118,7 @@ void CodeGenerator::Visit(Identifier *node, void *data) {
     FuncState *state = func_->func_state();
     long reg_b = block_->FindRegisterId(node->GetName());
     if (reg_b >= 0) {
-      state->AddInstruction(CREATE_ABC(OP_MOVE, reg_a, reg_b, 0));
+      state->AddInstruction(CREATE_ABx(OP_MOVE, reg_a, reg_b));
       return;
     }
 
@@ -1145,7 +1145,7 @@ void CodeGenerator::Visit(Identifier *node, void *data) {
           CREATE_ABC(OP_GETMEMBER, reg_a, this_idx, right));
     } else {
       // make data undefined.
-      state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg_a, 0, 0));
+      state->AddInstruction(CREATE_Ax(OP_LOADNULL, reg_a));
     }
   }
 }
@@ -1166,17 +1166,17 @@ void CodeGenerator::Visit(PrefixExpression *node, void *data) {
     PrefixOperation operation = node->op();
     // ++i
     if (operation == PrefixOperation::kIncrement) {
-        func_->func_state()->AddInstruction(CREATE_ABC(OP_PRE_INCR, reg, ret, 0));
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_PREV_INCR, reg, ret));
     }
     // --i
     else if (operation == PrefixOperation::kDecrement) {
-        func_->func_state()->AddInstruction(CREATE_ABC(OP_PRE_DECR, reg, ret, 0));
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_PREV_DECR, reg, ret));
     }
     else if (operation == PrefixOperation::kNot) {
         func_->func_state()->AddInstruction(CREATE_ABx(OP_NOT, ret, reg));
     }
     else if (operation == PrefixOperation::kUnfold) {
-        func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, ret, reg, 0));
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_MOVE, ret, reg));
     }
 }
     
@@ -1196,23 +1196,23 @@ void CodeGenerator::Visit(PostfixExpression *node, void *data) {
     PostfixOperation operation = node->op();
     // i++
     if (operation == PostfixOperation::kIncrement) {
-        func_->func_state()->AddInstruction(CREATE_ABC(OP_POST_INCR, reg, ret, 0));
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_POST_INCR, reg, ret));
     }
     // i++
     else if (operation == PostfixOperation::kDecrement) {
-        func_->func_state()->AddInstruction(CREATE_ABC(OP_POST_DECR, reg, ret, 0));
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_POST_DECR, reg, ret));
     }
 }
 
 void CodeGenerator::Visit(ReturnStatement *node, void *data) {
     FuncState *func_state = func_->func_state();
     if (node->expr() == nullptr) {
-        func_state->AddInstruction(CREATE_ABC(OP_RETURN0, 0, 0, 0));
+        func_state->AddInstruction(CREATE_Ax(OP_RETURN0, 0));
     }
     else {
         long ret = block_->NextRegisterId();
         node->expr()->Accept(this, &ret);
-        func_state->AddInstruction(CREATE_ABC(OP_RETURN1, ret, 0, 0));
+        func_state->AddInstruction(CREATE_Ax(OP_RETURN1, ret));
     }
 }
 
@@ -1246,7 +1246,7 @@ CodeGenerator::RegisterScope::~RegisterScope()
                 while (iter != block->reg_refs().end()) {
                     long reg_ref = *iter;
                     if (reg_ref >= start_idx) {
-                        func_state->AddInstruction(CREATE_ABC(OP_RESETOUTVAR, reg_ref, 0, 0));
+                        func_state->AddInstruction(CREATE_Ax(OP_RESETOUTVAR, reg_ref));
                         iter = block->reg_refs().erase(iter);
                     }
                     else {
@@ -1331,7 +1331,7 @@ int CodeGenerator::BlockCnt::for_update_index() {
 void CodeGenerator::BlockCnt::reset() {
     for (int i = 0; i < reg_refs_.size(); i++) {
         if (func_state()) {
-            func_state()->AddInstruction(CREATE_ABC(OP_RESETOUTVAR, reg_refs_[i], 0, 0));
+            func_state()->AddInstruction(CREATE_Ax(OP_RESETOUTVAR, reg_refs_[i]));
         }
     }
 }
@@ -1385,7 +1385,7 @@ ValueRef *CodeGenerator::BlockCnt::FindValueRef(const std::string &name, long &r
                 func_state_->AddOutClosure(ref);
             }
             Instruction instruction = func_state_->instructions().size() > 0 ? func_state_->instructions()[func_state_->instructions().size() - 1] : 0;
-            WX_OP_CODE op(GET_OP_CODE(instruction));
+            OPCode op(GET_OP_CODE(instruction));
             if (instruction && (op == OP_RETURN0 || op == OP_RETURN1)) {
                 func_state_->instructions().pop_back();
             }

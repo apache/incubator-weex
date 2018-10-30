@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <math.h>
 #include "core/data_render/object.h"
 #include "core/data_render/exec_state_section.h"
 #include "core/data_render/exec_state_binary.h"
@@ -32,6 +33,7 @@ namespace data_render {
 #define SECTION_FUNCTION_MAXARGS            256
 #define SECTION_VALUE_FINISHED              0xff
 #define SECTION_SET_LENGTH_LEN_FLAG(flag, LenLen) if (LenLen == 4) LenLen = 3; flag |= (LenLen << SECTION_LEN_OFF);
+#define SECTION_REGISTER_MAX                255
     
 class CBitsReader {
 public:
@@ -41,14 +43,32 @@ public:
     byteOffset_(0),
     currentValue_(0),
     currentBits_(0) {}
+    std::uint32_t remainingBytes() {
+        return size_ - byteOffset_;
+    }
     std::uint32_t remainingBits() {
         return 8 * (size_ - byteOffset_) + currentBits_;
+    }
+    std::uint32_t readStream(std::uint8_t *buffer, std::uint32_t size) {
+        std::uint32_t bytes_reading = 0;
+        do {
+            if (size > size_ - byteOffset_) {
+                break;
+            }
+            memcpy(buffer, data_ + byteOffset_, size);
+            byteOffset_ += size;
+            bytes_reading += size;
+            
+        } while (0);
+        
+        return bytes_reading;
     }
     std::uint32_t nextBits(std::uint32_t numBits) {
         assert(numBits <= remainingBits() && "attempt to read more bits than available");
         // Collect bytes until we have enough bits:
         while (currentBits_ < numBits) {
             currentValue_ = (currentValue_ << 8) + (std::uint32_t)(data_[byteOffset_]);
+            //currentValue_ = ((std::uint32_t)(data_[byteOffset_]) << currentBits_) + currentValue_;
             currentBits_ = currentBits_ + 8;
             byteOffset_ = byteOffset_ + 1;
         }
@@ -70,8 +90,8 @@ private:
     
 class CBitsWriter {
 public:
-    CBitsWriter(std::uint32_t size = 1024);
-    ~CBitsWriter();
+    CBitsWriter(std::uint8_t *data, std::uint32_t size) : data_(data), size_(size) {}
+    ~CBitsWriter() {}
     virtual void WriteBits(std::uint32_t data, std::uint32_t numBits);
     void WriteByte(std::uint8_t uByte);
     virtual void Finish();
@@ -87,22 +107,10 @@ private:
     std::uint8_t *data_;
     std::uint32_t totalBits_{0};
     std::uint32_t seek_{0};
-    unsigned long bytesTemp_{0};
+    std::uint32_t bytesTemp_{0};
     std::uint32_t currentBits_{0};
 };
-
-CBitsWriter::CBitsWriter(uint32_t size) : size_(size)
-{
-    data_ = new uint8_t(size_);
-}
     
-CBitsWriter::~CBitsWriter()
-{
-    if (data_) {
-        delete []data_;
-    }
-}
-
 void InvBits4(std::uint8_t& uChar)
 {
     static std::uint8_t table[16] = {0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E, 0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07, 0x0F};
@@ -131,6 +139,7 @@ void CBitsWriter::WriteBits(std::uint32_t data, std::uint32_t numBits) //data的
         while (currentBits_ >= 8)
         {
             std::uint8_t byte = (std::uint8_t)(bytesTemp_ >> (maxBitCount - 8));
+            uint32_t test = byte;
             WriteByte(byte);
             bytesTemp_ <<= 8;
             currentBits_ -= 8;
@@ -144,6 +153,7 @@ void CBitsWriter::WriteByte(std::uint8_t uByte)
 {
     if (seek_ < size_)
     {
+        uint32_t test = uByte;
         data_[seek_++] = uByte;
     }
     else {
@@ -186,6 +196,7 @@ bool CBitsWriter::WriteStream(const std::uint8_t *data, std::uint32_t size)
 {
     for (unsigned int i = 0; i < size; i++)
         WriteByte(data[i]);
+    totalBits_ += size * 8;
     return true;
 }
     
@@ -960,30 +971,283 @@ bool SectionString::decoding() {
     return finished;
 }
     
-uint32_t SectionFunction::GetInstructionsSize(std::vector<Instruction>& instructions) {
+uint32_t SectionFunction::GetInstructionsBytes(std::vector<Instruction>& instructions) {
     uint32_t numBits = 0;
     do {
         if (!instructions.size()) {
             break;
         }
         numBits += sizeof(uint32_t) * 8;
+        uint8_t half_bits_op_code = op_code_bits_ / 2;
+        int half_bits_op_code_value = pow(2, half_bits_op_code);
         for (int i = 0; i < instructions.size(); i++) {
-            numBits += op_code_bits_;
             Instruction instruction = instructions[i];
-            WX_OP_CODE code = GET_OP_CODE(instruction);
-            if (code > 8) {
-                printf("\n");
+            numBits += 1;
+            OPCode code = GET_OP_CODE(instruction);
+            numBits += code >= half_bits_op_code_value ? op_code_bits_ : half_bits_op_code;
+            int ops = OPUtil::ops(code);
+            if (code == OP_GOTO) {
+                long A = GET_ARG_Ax(instruction);
+                numBits += 1;
+                numBits += A > 2047 ? 24 : 12;
             }
-            long A = GET_ARG_A(instruction);
-            long B = GET_ARG_B(instruction);
-            long C = GET_ARG_C(instruction);
-            printf("code:%i A:%i  B:%i C:%i\n", code, (int32_t)A, (int32_t)B, (int32_t)C);
+            else if (code == OP_JMP) {
+                long A = GET_ARG_A(instruction);
+                long B = GET_ARG_Bx(instruction);
+                numBits += 1;
+                numBits += A > 15 ? 8 : 4;
+                numBits += 1;
+                numBits += B > 2047 ? 24 : 12;
+            }
+            else {
+                switch (ops) {
+                    case 1:
+                    {
+                        long A = GET_ARG_Ax(instruction);
+                        numBits += 1;
+                        numBits += A > 15 ? 8 : 4;
+                        if (A > SECTION_REGISTER_MAX) {
+                            throw EncoderError("register overflow error， please decrease function body");
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        long A = GET_ARG_A(instruction);
+                        long B = GET_ARG_Bx(instruction);
+                        numBits += 1;
+                        numBits += A > 15 ? 8 : 4;
+                        numBits += 1;
+                        numBits += B > 15 ? 8 : 4;
+                        if (A > SECTION_REGISTER_MAX || B > SECTION_REGISTER_MAX) {
+                            throw EncoderError("register overflow error， please decrease function body");
+                        }
+                        break;
+                    }
+                    case 3:
+                    {
+                        long A = GET_ARG_A(instruction);
+                        long B = GET_ARG_B(instruction);
+                        long C = GET_ARG_C(instruction);
+                        numBits += 1;
+                        numBits += A > 15 ? 8 : 4;
+                        numBits += 1;
+                        numBits += B > 15 ? 8 : 4;
+                        numBits += 1;
+                        numBits += C > 15 ? 8 : 4;
+                        if (A > SECTION_REGISTER_MAX || B > SECTION_REGISTER_MAX || C > SECTION_REGISTER_MAX)
+                        {
+                            throw EncoderError("register overflow error， please decrease function body");
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
         }
-        
         
     } while (0);
     
-    return 0;
+    return (numBits + 7) / 8;
+}
+    
+uint32_t SectionFunction::decodingInstructionsFromBuffer(uint8_t *buffer, uint32_t bytes, std::vector<Instruction>& instructions) {
+    uint32_t bytes_reading = 0;
+    do {
+        CBitsReader reader(buffer, bytes);
+        uint32_t count = 0;
+        if (reader.readStream((uint8_t *)&count, sizeof(uint32_t)) != sizeof(uint32_t) || !count) {
+            throw DecoderError("decoding instructions buffer count zero error");
+            break;
+        }
+        uint8_t half_bits_op_code = op_code_bits_ / 2;
+        for (int i = 0; i < count; i++) {
+            uint8_t using_full_bits_op_code = reader.nextBits(1);
+            uint32_t codeBits = reader.nextBits(using_full_bits_op_code ? op_code_bits_ : half_bits_op_code);
+            if (codeBits >= OP_INVALID) {
+                throw DecoderError("decoding instructions code error");
+                break;
+            }
+            uint32_t A = 0, B = 0, C = 0;
+            uint8_t using8bits = 0, using24bits = 0;
+            OPCode code = static_cast<OPCode>(codeBits);
+            int ops = OPUtil::ops(code);
+            Instruction instruction;
+            if (code == OP_GOTO) {
+                using24bits = reader.nextBits(1);
+                A = reader.nextBits(using24bits ? 24 : 12);
+                instruction = CREATE_Ax(code, A);
+            }
+            else if (code == OP_JMP) {
+                using8bits = reader.nextBits(1);
+                A = reader.nextBits(using8bits ? 8 : 4);
+                using24bits = reader.nextBits(1);
+                B = reader.nextBits(using24bits ? 24 : 12);
+                instruction = CREATE_ABx(code, A, B);
+            }
+            else {
+                switch (ops) {
+                    case 1:
+                    {
+                        using8bits = reader.nextBits(1);
+                        A = reader.nextBits(using8bits ? 8 : 4);
+                        instruction = CREATE_Ax(code, A);
+                        break;
+                    }
+                    case 2:
+                    {
+                        using8bits = reader.nextBits(1);
+                        A = reader.nextBits(using8bits ? 8 : 4);
+                        using8bits = reader.nextBits(1);
+                        B = reader.nextBits(using8bits ? 8 : 4);
+                        instruction = CREATE_ABx(code, A, B);
+                        break;
+                    }
+                    case 3:
+                    {
+                        using8bits = reader.nextBits(1);
+                        A = reader.nextBits(using8bits ? 8 : 4);
+                        using8bits = reader.nextBits(1);
+                        B = reader.nextBits(using8bits ? 8 : 4);
+                        using8bits = reader.nextBits(1);
+                        C = reader.nextBits(using8bits ? 8 : 4);
+                        instruction = CREATE_ABC(code, A, B, C);
+                        break;
+                    }
+                    default:
+                        instruction = CREATE_Ax(code, 0);
+                        break;
+                }
+            }
+            LOGD("decoding Instructions:%ld\n", instruction);
+            instructions.push_back(instruction);
+        }
+        if (reader.remainingBytes()) {
+            throw DecoderError("decoding instructions code error");
+            break;
+        }
+        bytes_reading = bytes;
+        
+    } while (0);
+    
+    return bytes_reading;
+}
+    
+uint32_t SectionFunction::encodingInstructionsToBuffer(uint8_t *buffer, uint32_t bytes, std::vector<Instruction>& instructions) {
+    uint32_t bytes_writed = 0;
+    do {
+        if (!instructions.size()) {
+            break;
+        }
+        CBitsWriter writer(buffer, bytes);
+        uint32_t count = static_cast<uint32_t>(instructions.size());
+        if (!writer.WriteStream((const uint8_t *)&count, sizeof(uint32_t))) {
+            throw EncoderError("write instructions size error");
+            break;
+        }
+        uint8_t half_bits_op_code = op_code_bits_ / 2;
+        int half_bits_op_code_value = pow(2, half_bits_op_code);
+        for (int i = 0; i < count; i++) {
+            Instruction instruction = instructions[i];
+            OPCode code = GET_OP_CODE(instruction);
+            std::uint32_t bits_data = code >= half_bits_op_code_value ? 1 : 0;
+            writer.WriteBits(bits_data, 1);
+            std::uint32_t numBits = bits_data ? op_code_bits_ : half_bits_op_code;
+            bits_data = code;
+            writer.WriteBits(bits_data, numBits);
+            int ops = OPUtil::ops(code);
+            bool using8bits = false;
+            bool using24bits = false;
+            if (code == OP_GOTO) {
+                long A = GET_ARG_Ax(instruction);
+                using24bits = A > 2047 ? true : false;
+                bits_data = using24bits ? 1 : 0;
+                writer.WriteBits(bits_data, 1);
+                bits_data = static_cast<std::uint32_t>(A);
+                writer.WriteBits(bits_data, using24bits ? 24 : 12);
+            }
+            else if (code == OP_JMP) {
+                long A = GET_ARG_A(instruction);
+                long B = GET_ARG_Bx(instruction);
+                using8bits = A > 15 ? true : false;
+                bits_data = using8bits ? 1 : 0;
+                writer.WriteBits(bits_data, 1);
+                bits_data = static_cast<std::uint32_t>(A);
+                writer.WriteBits(bits_data, using8bits ? 8 : 4);
+                using24bits = B > 2047 ? true : false;
+                bits_data = using24bits ? 1 : 0;
+                writer.WriteBits(bits_data, 1);
+                bits_data = static_cast<std::uint32_t>(B);
+                writer.WriteBits(bits_data, using24bits ? 24 : 12);
+            }
+            else {
+                switch (ops) {
+                    case 1:
+                    {
+                        long A = GET_ARG_Ax(instruction);
+                        using8bits = A > 15 ? true : false;
+                        bits_data = using8bits ? 1 : 0;
+                        writer.WriteBits(bits_data, 1);
+                        bits_data = static_cast<std::uint32_t>(A);
+                        writer.WriteBits(bits_data, using8bits ? 8 : 4);
+                        break;
+                    }
+                    case 2:
+                    {
+                        long A = GET_ARG_A(instruction);
+                        long B = GET_ARG_Bx(instruction);
+                        using8bits = A > 15 ? true : false;
+                        bits_data = using8bits ? 1 : 0;
+                        writer.WriteBits(bits_data, 1);
+                        bits_data = static_cast<std::uint32_t>(A);
+                        writer.WriteBits(bits_data, using8bits ? 8 : 4);
+                        using8bits = B > 15 ? true : false;
+                        bits_data = using8bits ? 1 : 0;
+                        writer.WriteBits(bits_data, 1);
+                        bits_data = static_cast<std::uint32_t>(B);
+                        writer.WriteBits(bits_data, using8bits ? 8 : 4);
+                        break;
+                    }
+                    case 3:
+                    {
+                        long A = GET_ARG_A(instruction);
+                        long B = GET_ARG_B(instruction);
+                        long C = GET_ARG_C(instruction);
+                        using8bits = A > 15 ? true : false;
+                        bits_data = using8bits ? 1 : 0;
+                        writer.WriteBits(bits_data, 1);
+                        bits_data = static_cast<std::uint32_t>(A);
+                        writer.WriteBits(bits_data, using8bits ? 8 : 4);
+                        using8bits = B > 15 ? true : false;
+                        bits_data = using8bits ? 1 : 0;
+                        writer.WriteBits(bits_data, 1);
+                        bits_data = static_cast<std::uint32_t>(B);
+                        writer.WriteBits(bits_data, using8bits ? 8 : 4);
+                        using8bits = C > 15 ? true : false;
+                        bits_data = using8bits ? 1 : 0;
+                        writer.WriteBits(bits_data, 1);
+                        bits_data = static_cast<std::uint32_t>(C);
+                        writer.WriteBits(bits_data, using8bits ? 8 : 4);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+            LOGD("encoding Instructions:%ld\n", instruction);
+        }
+        writer.Finish();
+        LOGD("Writer Instructions: numBits:%i\n", (int)writer.TotalBits());
+        if (writer.TotalBits() / 8 != bytes) {
+            throw EncoderError("encoding instructions buffer size error");
+            break;
+        }
+        bytes_writed += bytes;
+        
+    } while (0);
+    
+    return bytes_writed;
 }
     
 uint32_t SectionFunction::size() {
@@ -997,8 +1261,8 @@ uint32_t SectionFunction::size() {
     for (auto &func : childrens) {
         func_states.push_back(func);
     }
-    uint32_t total_constancts_length = 0;
-    uint32_t total_instructions_length = 0;
+    uint32_t total_constancts_bytes = 0;
+    uint32_t total_instructions_bytes = 0;
     if (func_states.size() > 0) {
         size += GetFTLVLength(kValueFunctionSize, sizeof(uint32_t));
         for (auto &func_state : func_states) {
@@ -1014,24 +1278,26 @@ uint32_t SectionFunction::size() {
                 size += GetFTLVLength(kValueFunctionOutClosure, sizeof(int32_t) * (uint32_t)func_state->out_closure().size());
             }
             if (func_state->instructions().size() > 0) {
-                GetInstructionsSize(func_state->instructions());
-                total_instructions_length += GetFTLVLength(kValueFunctionInstructions, sizeof(int32_t) * (uint32_t)func_state->instructions().size());
-                size += GetFTLVLength(kValueFunctionInstructions, sizeof(int32_t) * (uint32_t)func_state->instructions().size());
+                uint32_t instructions_bytes = GetInstructionsBytes(func_state->instructions());
+                instructions_bytes = GetFTLVLength(kValueFunctionInstructions, instructions_bytes);
+                total_instructions_bytes += instructions_bytes;
+                size += instructions_bytes;
             }
             if (func_state->constants().size() > 0) {
                 size += GetFTLVLength(kValueFunctionConstantCount, sizeof(int32_t));
-                uint32_t constant_length = 0;
+                uint32_t constant_bytes = 0;
                 for (int i = 0; i < func_state->constants().size(); i++) {
-                    constant_length += GetValueLength(&func_state->constants()[i]);
+                    constant_bytes += GetValueLength(&func_state->constants()[i]);
                 }
-                size += GetFTLVLength(kValueFunctionConstantPayload, constant_length);
-                total_constancts_length += constant_length;
+                constant_bytes = GetFTLVLength(kValueFunctionConstantPayload, constant_bytes);
+                total_constancts_bytes += constant_bytes;
+                size += constant_bytes;
             }
             size += GetFTLVLength(kValueFunctionFinished, sizeof(uint8_t));
         }
     }
-    LOGD("[WXExecEncoder]: instructions:%.02f K\n", (double)total_instructions_length / 1024);
-    LOGD("[WXExecEncoder]: constancts:%.02f K\n", (double)total_constancts_length / 1024);
+    LOGD("[WXExecEncoder]: instructions:%.02f K\n", (double)total_instructions_bytes / 1024);
+    LOGD("[WXExecEncoder]: constancts:%.02f K\n", (double)total_constancts_bytes / 1024);
     return size;
 }
     
@@ -1121,18 +1387,18 @@ bool SectionFunction::encoding() {
                 free(buffer);
             }
             if (func_state->instructions().size() > 0) {
-                size_t size = sizeof(uint32_t) * func_state->instructions().size();
-                uint32_t *buffer = (uint32_t *)malloc(size);
+                uint32_t instructions_bytes = GetInstructionsBytes(func_state->instructions());
+                uint8_t *buffer = (uint8_t *)malloc(instructions_bytes);
                 if (!buffer) {
                     throw EncoderError("low memory error");
                     break;
                 }
-                memset(buffer, 0, size);
-                for (int i = 0; i < func_state->instructions().size(); i++) {
-                    buffer[i] = static_cast<uint32_t>(func_state->instructions()[i]);
-                    LOGD("encoding instructions:%i\n", buffer[i]);
+                memset(buffer, 0, instructions_bytes);
+                if (encodingInstructionsToBuffer(buffer, instructions_bytes, func_state->instructions()) != instructions_bytes) {
+                    LOGD("encoding instructions error\n");
+                    break;
                 }
-                if (!Section::encoding(kValueFunctionInstructions, (uint32_t)size, buffer)) {
+                if (!Section::encoding(kValueFunctionInstructions, (uint32_t)instructions_bytes, buffer)) {
                     break;
                 }
                 free(buffer);
@@ -1242,7 +1508,7 @@ bool SectionFunction::decoding() {
                     }
                     case kValueFunctionInstructions:
                     {
-                        uint32_t *buffer = (uint32_t *)malloc(readbytes);
+                        uint8_t *buffer = (uint8_t *)malloc(readbytes);
                         if (!buffer) {
                             throw DecoderError("decoding read function low memory error");
                             break;
@@ -1251,10 +1517,9 @@ bool SectionFunction::decoding() {
                             throw DecoderError("decoding read function instructions error");
                             break;
                         }
-                        int instructions_count = readbytes / sizeof(uint32_t);
-                        for (int i = 0; i < instructions_count; i++) {
-                            func_state->AddInstruction(buffer[i]);
-                            LOGD("decoding instructions:%i\n", buffer[i]);
+                        if (decodingInstructionsFromBuffer(buffer, readbytes, func_state->instructions())  != readbytes) {
+                            throw DecoderError("decoding read function instructions error");
+                            break;
                         }
                         free(buffer);
                         break;
