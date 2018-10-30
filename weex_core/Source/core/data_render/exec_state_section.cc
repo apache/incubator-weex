@@ -68,7 +68,6 @@ public:
         // Collect bytes until we have enough bits:
         while (currentBits_ < numBits) {
             currentValue_ = (currentValue_ << 8) + (std::uint32_t)(data_[byteOffset_]);
-            //currentValue_ = ((std::uint32_t)(data_[byteOffset_]) << currentBits_) + currentValue_;
             currentBits_ = currentBits_ + 8;
             byteOffset_ = byteOffset_ + 1;
         }
@@ -126,7 +125,7 @@ void InvBits(std::uint8_t& uChar)
     uChar = uL4 << 4 | uH4;
 }
 
-void CBitsWriter::WriteBits(std::uint32_t data, std::uint32_t numBits) //data的低nBitCount位为写入数据 低位先写
+void CBitsWriter::WriteBits(std::uint32_t data, std::uint32_t numBits)
 {
     do {
         if (!numBits) {
@@ -139,7 +138,6 @@ void CBitsWriter::WriteBits(std::uint32_t data, std::uint32_t numBits) //data的
         while (currentBits_ >= 8)
         {
             std::uint8_t byte = (std::uint8_t)(bytesTemp_ >> (maxBitCount - 8));
-            uint32_t test = byte;
             WriteByte(byte);
             bytesTemp_ <<= 8;
             currentBits_ -= 8;
