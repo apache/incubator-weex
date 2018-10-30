@@ -21,6 +21,7 @@
 #define CORE_DATA_RENDER_OP_CODE_H_
 
 #include <assert.h>
+#include <cstdint>
 
 namespace weex {
 namespace core {
