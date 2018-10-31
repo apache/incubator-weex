@@ -553,13 +553,13 @@ Handle<Expression> RAXParser::ParseObjectConstant()
             Handle<Expression> unfold_expr = ParseAssignExpression();
             if (Peek() == Token::COMMA) {
                 spread_property.push_back(unfold_expr);
-                orders.push_back(std::make_pair(ProxyOrder::ProxyArray, to_string((int)spread_property.size() - 1)));
+                orders.push_back(std::make_pair(ProxyOrder::ProxyArray, base::to_string((int)spread_property.size() - 1)));
                 Advance();
                 continue;
             }
             else if (spread_property.size() > 0) {
                 spread_property.push_back(unfold_expr);
-                orders.push_back(std::make_pair(ProxyOrder::ProxyArray, to_string((int)spread_property.size() - 1)));
+                orders.push_back(std::make_pair(ProxyOrder::ProxyArray, base::to_string((int)spread_property.size() - 1)));
                 break;
             }
             return unfold_expr;
@@ -871,7 +871,7 @@ Handle<Expression> RAXParser::ParseJSXNodeProperty() {
             else if (tok == Token::UNFOLD) {
                 Handle<Expression> unfold_expr = ParseAssignExpression();
                 spread_property.push_back(unfold_expr);
-                orders.push_back(std::make_pair(ProxyOrder::ProxyArray, to_string((int)spread_property.size() - 1)));
+                orders.push_back(std::make_pair(ProxyOrder::ProxyArray, base::to_string((int)spread_property.size() - 1)));
                 continue;
             }
             else if (tok == Token::RBRACE || tok == Token::LBRACE) {
@@ -1280,15 +1280,11 @@ Handle<Expression> RAXParser::ParseProgram()
         }
     } catch (std::exception &e) {
         auto error = static_cast<SyntaxError *>(&e);
-        
         if (error) {
-            std::cerr << error->what() << " (" << error->token().position().row()
-            << ":" << error->token().position().col()
-            << ") (" << error->token().view() << ")" << std::endl;
+            std::cerr << error->what() << std::endl;
         }
         throw;
     }
-    
     return chunk;
 }
     

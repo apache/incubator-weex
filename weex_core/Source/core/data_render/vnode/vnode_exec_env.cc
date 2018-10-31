@@ -501,12 +501,12 @@ static Value SetProps(ExecState *exec_state) {
                             }
                             case Value::INT:
                             {
-                                node->SetStyle(iter_style->first, to_string(iter_style->second.i));
+                                node->SetStyle(iter_style->first, base::to_string(iter_style->second.i));
                                 break;
                             }
                             case Value::NUMBER:
                             {
-                                node->SetStyle(iter_style->first, to_string(iter_style->second.n));
+                                node->SetStyle(iter_style->first, base::to_string(iter_style->second.n));
                                 break;
                             }
                             default:
@@ -525,7 +525,7 @@ static Value SetProps(ExecState *exec_state) {
                     }
                     case Value::INT:
                     {
-                        node->SetAttribute(iter->first, to_string(iter->second.i));
+                        node->SetAttribute(iter->first, base::to_string(iter->second.i));
                         break;
                     }
                     case Value::FUNC:
@@ -542,7 +542,7 @@ static Value SetProps(ExecState *exec_state) {
                     }
                     case Value::NUMBER:
                     {
-                        node->SetStyle(iter->first, to_string(iter->second.n));
+                        node->SetStyle(iter->first, base::to_string(iter->second.n));
                         break;
                     }
                     default:

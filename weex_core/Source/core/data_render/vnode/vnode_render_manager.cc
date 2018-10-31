@@ -17,11 +17,11 @@
  * under the License.
  */
 
-#include "core/data_render/vnode/vnode_render_manager.h"
 #include <chrono>
 #include <sstream>
+#include "core/data_render/vnode/vnode_render_manager.h"
+#include "core/data_render/common_error.h"
 #include "core/data_render/exec_state_binary.h"
-#include "base/string_util.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vnode/vnode.h"
@@ -30,7 +30,6 @@
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_creator.h"
 #include "core/bridge/platform_bridge.h"
-#include "core/data_render/common_error.h"
 
 #define VRENDER_LOG true
 

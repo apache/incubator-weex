@@ -690,7 +690,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             int index = (int)GET_ARG_Bx(instruction);
             ValueRef *ref = exec_state->FindRef(index);
             if (!ref) {
-                throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_SETOUTVAR]");
+                throw VMExecError("Can't Find ValueRef " + base::to_string(index) + " [OP_SETOUTVAR]");
             }
             ref->value() = *a;
             ref->value().ref = a;
@@ -710,7 +710,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             int index = (int)GET_ARG_Bx(instruction);
             ValueRef *ref = exec_state->FindRef(index);
             if (!ref) {
-                throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_GETOUTVAR]");
+                throw VMExecError("Can't Find ValueRef " + base::to_string(index) + " [OP_GETOUTVAR]");
             }
             *a = ref->value();
             a->ref = &ref->value();
@@ -723,7 +723,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             int index = (int)GET_ARG_Bx(instruction);
             ValueRef *ref = exec_state->FindRef(index);
             if (!ref) {
-                throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_OUT_CLOSURE]");
+                throw VMExecError("Can't Find ValueRef " + base::to_string(index) + " [OP_OUT_CLOSURE]");
             }
             ref->value() = *a;
             ref->value().ref = a;
@@ -739,7 +739,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             int index = (int)GET_ARG_Bx(instruction);
             ValueRef *ref = exec_state->FindRef(index);
             if (!ref) {
-                throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_IN_CLOSURE]");
+                throw VMExecError("Can't Find ValueRef " + base::to_string(index) + " [OP_IN_CLOSURE]");
             }
             Value *ret = LoadClosure(frame.reg, ref);
             if (!ret) {
@@ -755,7 +755,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             int index =  (int)GET_ARG_Ax(instruction);
             ValueRef *ref = exec_state->FindRef(index);
             if (!ref) {
-                throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_REMOVE_CLOSURE]");
+                throw VMExecError("Can't Find ValueRef " + base::to_string(index) + " [OP_REMOVE_CLOSURE]");
             }
             ref->value().ref = nullptr;
             ref->closure()->SetValueRef(nullptr);
