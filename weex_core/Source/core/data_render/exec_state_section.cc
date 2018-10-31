@@ -151,7 +151,6 @@ void CBitsWriter::WriteByte(std::uint8_t uByte)
 {
     if (seek_ < size_)
     {
-        uint32_t test = uByte;
         data_[seek_++] = uByte;
     }
     else {
