@@ -324,7 +324,12 @@ Handle<Expression> RAXParser::ParseUnaryExpression()
     else if (tok == Token::ARROW_FUNCTION) {
         Advance();
         auto body = ParseStatement();
-        return builder()->NewArrowFunctionStatement(body, {left});
+        if (left) {
+            return builder()->NewArrowFunctionStatement(body, {left});
+        }
+        else {
+            return builder()->NewArrowFunctionStatement(body, {});
+        }
     }
     else {
         return left;
@@ -465,7 +470,10 @@ Handle<Expression> RAXParser::ParsePrimary()
     }
     else if (tok == Token::LPAREN) {
         Advance();    // eat '('
-        result = ParseCommaExpression();
+        tok = Peek();
+        if (tok != Token::RPAREN) {
+            result = ParseCommaExpression();
+        }
         tok = Peek();
         if (tok != Token::RPAREN) {
             throw SyntaxError(lex()->CurrentToken(), "expected a ')'");
@@ -944,7 +952,7 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
             if (Peek() == Token::LBRACE) {
                 if (key.length() > 0) {
                     EXPECT(Token::LBRACE);
-                    proxyObj.insert(std::make_pair(key, ParseExpression()));
+                    proxyObj.insert(std::make_pair(key, ParseAssignExpression()));
                     orders.push_back(std::make_pair(ProxyOrder::ProxyObject, key));
                     EXPECT(Token::RBRACE);
                 }
