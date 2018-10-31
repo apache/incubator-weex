@@ -927,27 +927,53 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
     }
     else if (tok == Token::IDENTIFIER) {
         // props process
+        std::vector<std::pair<ProxyOrder, std::string>> orders;
+        ProxyArray spread_property;
         ProxyObject proxyObj;
         while (true) {
             auto token = Peek();
             if (token == Token::JSX_TAG_END || token == Token::GT) {
                 break;
             }
-            std::string key = GetIdentifierName();
-            Advance();
-            EXPECT(Token::ASSIGN);
+            std::string key;
+            if (token == Token::IDENTIFIER) {
+                key = GetIdentifierName();
+                Advance();
+                EXPECT(Token::ASSIGN);
+            }
             if (Peek() == Token::LBRACE) {
-                EXPECT(Token::LBRACE);
-                proxyObj.insert(std::make_pair(key, ParseExpression()));
-                EXPECT(Token::RBRACE);
+                if (key.length() > 0) {
+                    EXPECT(Token::LBRACE);
+                    proxyObj.insert(std::make_pair(key, ParseExpression()));
+                    orders.push_back(std::make_pair(ProxyOrder::ProxyObject, key));
+                    EXPECT(Token::RBRACE);
+                }
+                else {
+                    Advance();
+                    token = Peek();
+                    if (token == Token::UNFOLD) {
+                        Handle<Expression> unfold_expr = ParseAssignExpression();
+                        spread_property.push_back(unfold_expr);
+                        orders.push_back(std::make_pair(ProxyOrder::ProxyArray, base::to_string((int)spread_property.size() - 1)));
+                    }
+                    EXPECT(Token::RBRACE);
+                    continue;
+                }
             }
             else {
                 std::string value = GetIdentifierName();
                 EXPECT(Token::STRING);
                 proxyObj.insert(std::make_pair(key, builder()->NewStringConstant(value)));
+                orders.push_back(std::make_pair(ProxyOrder::ProxyObject, key));
             }
         }
         props = builder()->NewObjectConstant(proxyObj);
+        if (spread_property.size() > 0) {
+            for (int i = 0; i < spread_property.size(); i++) {
+                props->AsObjectConstant()->SpreadProperty().push_back(spread_property[i]);
+            }
+            props->AsObjectConstant()->Orders() = orders;
+        }
     }
     tok = Peek();
     expr = builder()->NewJSXNodeExpression(builder()->NewIdentifier(name), props, parent, {});
