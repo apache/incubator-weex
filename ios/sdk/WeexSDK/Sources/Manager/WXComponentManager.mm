@@ -1018,14 +1018,15 @@ static NSThread *WXComponentThread;
     }
     
     if (mismatchBeginIndex > 0) {
-        NSArray<dispatch_block_t> *blocks = nil;
-        blocks = [_uiTaskQueue subarrayWithRange:NSMakeRange(0, mismatchBeginIndex)];
+        NSArray<dispatch_block_t> *blocks = [_uiTaskQueue subarrayWithRange:NSMakeRange(0, mismatchBeginIndex)];
         [_uiTaskQueue removeObjectsInRange:NSMakeRange(0, mismatchBeginIndex)];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            for(dispatch_block_t block in blocks) {
-                block();
-            }
-        });
+        if (blocks.count) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                for(dispatch_block_t block in blocks) {
+                    block();
+                }
+            });
+        }
     }
 }
 
