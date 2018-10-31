@@ -64,6 +64,7 @@ static NSThread *WXComponentThread;
 
     pthread_mutex_t _propertyMutex;
     pthread_mutexattr_t _propertMutexAttr;
+    NSUInteger _syncUITaskCount;
 }
 
 + (instancetype)sharedManager
@@ -80,7 +81,7 @@ static NSThread *WXComponentThread;
 {
     if (self = [self init]) {
         _weexInstance = weexInstance;
-        
+        _syncUITaskCount = 0;
         _indexDict = [NSMapTable strongToWeakObjectsMapTable];
         _fixedComponents = [NSMutableArray wx_mutableArrayUsingWeakReferences];
         _uiTaskQueue = [NSMutableArray array];
@@ -991,7 +992,6 @@ static NSThread *WXComponentThread;
 
 - (void)_syncUITasks
 {
-    static NSInteger _syncUITaskCount = 0;
     NSInteger mismatchBeginIndex = _uiTaskQueue.count;
     for (NSInteger i = _uiTaskQueue.count - 1;i >= 0;i --) {
         if (_uiTaskQueue[i] == WXPerformUITaskBatchEndBlock) {
@@ -1005,29 +1005,28 @@ static NSThread *WXComponentThread;
         }
     }
     
-    NSArray<dispatch_block_t> *blocks = nil;
     if (mismatchBeginIndex == _uiTaskQueue.count) {
         // here we get end tag or there are not begin and end directives
     } else {
         _syncUITaskCount ++;
         // we only find begin tag but missing end tag,
         if (_syncUITaskCount > (MAX_DROP_FRAME_FOR_BATCH)) {
-            // when the wait times come to MAX_DROP_FRAME_FOR_BATCH, we will pop all the stashed operation for user experience.
+            // when the wait times come to MAX_DROP_FRAME_FOR_BATCH, we will pop all the stashed operations for user experience.
             mismatchBeginIndex = _uiTaskQueue.count;
             _syncUITaskCount = 0;
         }
     }
     
     if (mismatchBeginIndex > 0) {
+        NSArray<dispatch_block_t> *blocks = nil;
         blocks = [_uiTaskQueue subarrayWithRange:NSMakeRange(0, mismatchBeginIndex)];
-        [_uiTaskQueue removeObjectsInRange:NSMakeRange(0, blocks.count)];
+        [_uiTaskQueue removeObjectsInRange:NSMakeRange(0, mismatchBeginIndex)];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            for(dispatch_block_t block in blocks) {
+                block();
+            }
+        });
     }
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        for(dispatch_block_t block in blocks) {
-            block();
-        }
-    });
 }
 
 #pragma mark Fixed 

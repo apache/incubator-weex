@@ -265,13 +265,13 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 #pragma mark batch mark
 
 /**
- a start native batch tag for a group of UI operation  , company with performBatchEnd
+ a start native batch tag for a group of UI operations, company with performBatchEnd
  @see performBatchEnd
  */
 - (void)performBatchBegin;
 
 /**
- an end native batch tag for a group of UI operation, company with performBatchBegin
+ an end native batch tag for a group of UI operations, company with performBatchBegin
  @see performBatchBegin
  */
 - (void)performBatchEnd;
