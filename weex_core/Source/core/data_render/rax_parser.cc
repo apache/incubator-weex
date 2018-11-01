@@ -1368,7 +1368,7 @@ Handle<Expression> RAXParser::ParseProgram()
 {
     Handle<ExpressionList> exprs = builder()->NewExpressionList();
     Handle<ChunkStatement> chunk = builder()->NewChunkStatement(exprs);
-    exprs->Insert(builder()->NewDeclaration(JSX_GLOBAL_VNODE_INDEX, builder()->NewIntegralConstant(1)));
+    exprs->Insert(builder()->NewDeclaration(JS_GLOBAL_VNODE_INDEX, builder()->NewIntegralConstant(1)));
     exprs->Insert(builder()->NewDeclaration(JS_GLOBAL_ARGUMENTS, builder()->NewArrayConstant({})));
     try {
         while (Peek() != Token::EOS) {

@@ -29,9 +29,9 @@ namespace weex {
 namespace core {
 namespace data_render {
     
-#define JSX_GLOBAL_VNODE_INDEX               "global_vnode_index"
+#define JS_GLOBAL_VNODE_INDEX                "global_vnode_index"
 #define JS_GLOBAL_ARGUMENTS                  "arguments"
-
+#define JS_GLOBAL_CONSTRUCTOR                "constructor"
     
 class JSXNodeExpression : public Expression {
 public:

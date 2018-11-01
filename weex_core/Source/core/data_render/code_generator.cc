@@ -665,7 +665,7 @@ void CodeGenerator::Visit(NewExpression *node, void *data) {
         long lhs = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
         if (lhs >= 0) {
             FuncState *state = func_->func_state();
-            long rhs = block_->FindRegisterId(node->member()->AsIdentifier()->GetName());
+            long rhs = block_->FindRegisterId(node->name()->AsIdentifier()->GetName());
             if (rhs >= 0) {
                 if (node->is_class()) {
                     state->AddInstruction(CREATE_ABC(OP_NEW, lhs, Value::CLASS_DESC, rhs));
@@ -675,13 +675,23 @@ void CodeGenerator::Visit(NewExpression *node, void *data) {
                 }
                 break;
             }
-            int index = exec_state_->global()->IndexOf(node->member()->AsIdentifier()->GetName());
+            int index = exec_state_->global()->IndexOf(node->name()->AsIdentifier()->GetName());
             if (index >= 0) {
-                Value *value = exec_state_->global()->Find(index);
-                if (IsClass(value)) {
+                Value *name = exec_state_->global()->Find(index);
+                if (IsClass(name)) {
                     rhs = block_->NextRegisterId();
                     state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, rhs, index));
                     state->AddInstruction(CREATE_ABC(OP_NEW, lhs, Value::CLASS_DESC, rhs));
+                    // class must call constructor
+                    ClassDescriptor *class_descriptor = ValueTo<ClassDescriptor>(name);
+                    int class_constractor_func_index = class_descriptor->funcs_->IndexOf(JS_GLOBAL_CONSTRUCTOR);
+                    if (class_constractor_func_index >= 0) {
+                        long right = block_->NextRegisterId();
+                        auto value = exec_state_->string_table_->StringFromUTF8(JS_GLOBAL_CONSTRUCTOR);
+//                        int tableIndex = func_state->AddConstant(std::move(value));
+//                        func_state->AddInstruction(CREATE_ABx(OP_LOADK, right, tableIndex));
+
+                    }
                 }
                 else {
                     state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, lhs, index));

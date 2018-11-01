@@ -53,7 +53,7 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
             node_ptr_ = factory->NewStringConstant(vnode_ptr);
         }
         if (LowerIdentifier()) {
-            Handle<Expression> vnode_index_expr = factory->NewIdentifier(JSX_GLOBAL_VNODE_INDEX);
+            Handle<Expression> vnode_index_expr = factory->NewIdentifier(JS_GLOBAL_VNODE_INDEX);
             std::vector<Handle<Expression>> args;
             Handle<Expression> create_element_func_expr = factory->NewIdentifier("createElement");
             args.push_back(factory->NewStringConstant(name));
