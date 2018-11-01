@@ -162,6 +162,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   // add for cloud setting, default value is false.
   // weexcore use single process or not
   private static boolean isUseSingleProcess = false;
+  private static boolean isRebootJscWhenWhiteScreen = false;
+  private static long DEFAULT_REBOOT_JSC_TIMEOUT = 5000;
+  private static long rebootJscTimeout = DEFAULT_REBOOT_JSC_TIMEOUT;
 
   public enum BundType {
     Vue,
@@ -222,7 +225,24 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     return mBridgeManager;
   }
+  public  boolean isIsRebootJscWhenWhiteScreen() {
+    return isRebootJscWhenWhiteScreen;
+  }
 
+  public  void setIsRebootJscWhenWhiteScreen(boolean _isRebootJscWhenWhiteScreen) {
+    isRebootJscWhenWhiteScreen = _isRebootJscWhenWhiteScreen;
+  }
+
+  public  long getRebootJscTimeout() {
+    return rebootJscTimeout;
+  }
+
+  public  void setRebootJscTimeout(long timeout) {
+    if(timeout <= DEFAULT_REBOOT_JSC_TIMEOUT) {
+      return;
+    }
+    rebootJscTimeout = timeout;
+  }
   public void setUseSingleProcess(final boolean flag) {
     if (flag != isUseSingleProcess) {
       isUseSingleProcess = flag;
@@ -770,21 +790,27 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public int callReportCrashReloadPage(String instanceId, String crashFile) {
+    boolean isCrashFileEmpty = TextUtils.isEmpty(crashFile);
     try {
       String url = null;
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
         url = instance.getBundleUrl();
       }
-      try {
-        if (WXEnvironment.getApplication() != null) {
-          crashFile = mInitParams.getCrashFilePath() + crashFile;
-          Log.d("jsengine", "callReportCrashReloadPage crashFile:" + crashFile);
+      if(!isCrashFileEmpty) {
+        try {
+            if (WXEnvironment.getApplication() != null) {
+                crashFile = mInitParams.getCrashFilePath() + crashFile;
+                Log.d("jsengine", "callReportCrashReloadPage crashFile:" + crashFile);
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
-      } catch (Throwable e) {
-        e.printStackTrace();
+        callReportCrash(crashFile, instanceId, url);
+      } else {
+         commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_RELOAD_PAGE, "reboot jsc Engine", instanceId, url);
       }
-      callReportCrash(crashFile, instanceId, url);
+
       if (reInitCount > CRASHREINIT) {
         return IWXBridge.INSTANCE_RENDERING_ERROR;
       }

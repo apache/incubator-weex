@@ -705,6 +705,25 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
     mRendered = true;
+
+
+    if(WXBridgeManager.getInstance().isIsRebootJscWhenWhiteScreen()) {
+      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          if(isDestroy) {
+            return;
+          }
+
+          View containerView = getContainerView();
+          if(containerView instanceof ViewGroup) {
+            if(0 == ((ViewGroup) containerView).getChildCount()) {
+              WXBridgeManager.getInstance().callReportCrashReloadPage(mInstanceId, null);
+            }
+          }
+        }
+      }, WXBridgeManager.getInstance().getRebootJscTimeout());
+    }
   }
 
   private void renderByUrlInternal(String pageName,
