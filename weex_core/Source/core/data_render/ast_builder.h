@@ -107,6 +107,8 @@ public:
     // create a new node representing JavaScript for loop
     Handle<Expression> NewForStatement(ForKind kind, Handle<Expression> init, Handle<Expression> cond, Handle<Expression> update, Handle<Expression> body);
     // create a new node representing JavaScript break statement
+    Handle<Expression> NewCaseStatement(Handle<Expression> test_case,Handle<ExpressionList> expr);
+    Handle<Expression> NewSwitchStatement(Handle<Expression> test_value,std::vector<Handle<Expression>> cases);
     Handle<Expression> NewBreakStatement(Handle<Expression> label = nullptr);
     
     // create a new node representing JavaScript continue statement

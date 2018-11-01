@@ -67,6 +67,8 @@ namespace data_render {
   M(ForStatement)        \
   M(ContinueStatement)   \
   M(BreakStatement)      \
+  M(CaseStatement)       \
+  M(SwitchStatement)     \
   M(BlockStatement)      \
   M(FunctionPrototype)   \
   M(FunctionStatement)   \

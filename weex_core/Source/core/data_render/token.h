@@ -109,6 +109,8 @@ namespace data_render {
                                                                    \
   /* Keywords (ECMA-262, section 7.5.2, page 13). */               \
   K(BREAK, "break", 0)                                             \
+  K(CASE, "case", 0)                                               \
+  K(DEFAULT, "default", 0)                                               \
   K(CONTINUE, "continue", 0)                                       \
   K(ELSE, "else", 0)                                               \
   K(FOR, "for", 0)                                                 \

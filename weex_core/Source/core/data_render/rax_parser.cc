@@ -1038,6 +1038,65 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
     }
     return expr;
 }
+
+Handle<Expression> RAXParser::ParseSwitchStatement()
+{
+    Advance();
+    EXPECT(Token::LPAREN);
+
+    Handle<Expression> expr = ParseAssignExpression();
+    EXPECT(Token::RPAREN);
+    EXPECT(Token::LBRACE);
+
+    bool has_default = false;
+    std::vector<Handle<Expression>> list;
+    while (true) {
+        Handle<Expression> temp = nullptr;
+        if (Peek() == Token::CASE) {
+            Handle<Expression> tempList = ParseCaseBlock();
+
+            list.push_back(tempList);
+        } else if (Peek() == Token::DEFAULT) {
+            if (has_default) {
+                throw SyntaxError(lex()->CurrentToken(),"switch statement has already has one default case");
+            }
+            Handle<Expression> tempList = ParseCaseBlock(true);
+            has_default = true;
+            list.push_back(tempList);
+        } else if (Peek() != Token::RBRACE) {
+            throw SyntaxError(lex()->CurrentToken(), "expected a '}'");
+        } else {
+            Advance();
+            break;
+        }
+    }
+
+    return builder()->NewSwitchStatement(expr, list);
+}
+
+Handle<Expression> RAXParser::ParseCaseBlock(bool is_default) {
+    Advance();
+
+    Handle<Expression> clause;
+    if (!is_default) {
+        clause = ParseAssignExpression();
+    }
+    EXPECT(Token::COLON);
+
+    Handle<ExpressionList> list = builder()->NewExpressionList();
+
+    if (Peek() != Token::CASE && Peek() != Token::DEFAULT && Peek() != Token::RBRACE){
+        //not empty case;
+        do {
+            Handle<Expression> stmt = ParseStatement();
+            list->Insert(stmt);
+        } while (Peek() != Token::CASE && Peek() != Token::DEFAULT && Peek() != Token::RBRACE);
+    }
+
+    auto block = builder()->NewCaseStatement(clause, list);
+    block->AsCaseStatement()->set_default(is_default);
+    return block;
+}
     
 Handle<Expression> RAXParser::ParseBreakStatement()
 {
@@ -1046,6 +1105,7 @@ Handle<Expression> RAXParser::ParseBreakStatement()
     if (Peek() == Token::IDENTIFIER) {
         label = builder()->NewIdentifier(GetIdentifierName());
     }
+    EXPECT(Token::SEMICOLON);
     return builder()->NewBreakStatement(label);
 }
     
@@ -1107,8 +1167,8 @@ Handle<Expression> RAXParser::ParseStatement()
             return ParseBreakStatement();
         case Token::CONTINUE:
             return ParseContinueStatement();
-//        case SWITCH:
-//            return ParseSwitchStatement();
+        case Token::SWITCH:
+            return ParseSwitchStatement();
 //        case TRY:
 //            return ParseTryCatchStatement();
 //        case THROW:

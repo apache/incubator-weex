@@ -1295,6 +1295,87 @@ void CodeGenerator::Visit(ReturnStatement *node, void *data) {
     }
 }
 
+void CodeGenerator::Visit(SwitchStatement* node, void* data) {
+    BlockScope for_scope(this);
+    block_->set_is_switch(true);
+
+    long test_value_id = block_->NextRegisterId();
+    long case_value_id = block_->NextRegisterId();
+    long test_result_id = block_->NextRegisterId();
+
+    FuncState *func_state = func_->func_state();
+    auto &cases = node->get_cases();
+    //load test value into [test_value_id]
+    node->test_case()->Accept(this,&test_value_id);
+    std::vector<size_t> switch_case_index;
+    std::vector<size_t> jump_slots;
+
+    //value test for cases
+    int defaultIndex = -1;
+    Handle<CaseStatement> defaultCase;
+    int index = 0;
+    for(auto& a_case: cases){
+        //load case value into [case_value_id]
+        const Handle<CaseStatement>& caseStatement = a_case->AsCaseStatement();
+        if (caseStatement->is_default()){
+            jump_slots.push_back(0);
+            defaultCase = caseStatement;
+            defaultIndex = index;
+            continue;
+        }
+        caseStatement->test_case()->Accept(this, &case_value_id);
+        func_state->AddInstruction(CREATE_ABC(OP_EQ, test_result_id, test_value_id, case_value_id));
+        size_t jump_slot = func_state->AddInstruction(0);
+        jump_slots.push_back(jump_slot);
+        index++;
+    }
+
+    size_t skip_to_end_slot = 0;
+    if (defaultIndex != -1){
+        //has default case
+        size_t defaultJump = func_state->AddInstruction(0);
+        jump_slots[defaultIndex] = defaultJump;
+    } else {
+        //no default
+        skip_to_end_slot = func_state->AddInstruction(0);
+    }
+
+    //expression list for cases
+    for(auto& a_case: cases){
+        size_t lable_index = func_state->instructions().size();
+        switch_case_index.push_back(lable_index);
+
+        a_case->AsCaseStatement()->statements()->Accept(this, nullptr);
+    }
+
+    //replace case jump;
+    index = 0;
+    for(size_t to_replace:jump_slots){
+        if(index == defaultIndex){
+            func_state->ReplaceInstruction(to_replace,CREATE_Ax(OP_GOTO,switch_case_index[index]));
+        } else {
+            func_state->ReplaceInstruction(to_replace,CREATE_ABx(OP_TRUE_JMPTO,test_result_id,switch_case_index[index]));
+        }
+        index++;
+    }
+
+    //replace break;
+    size_t end_index = func_state->instructions().size();;
+    for(auto& to_replace:block_->break_slots()){
+        func_state->ReplaceInstruction(to_replace, CREATE_Ax(OP_GOTO,end_index));
+    }
+
+    if (defaultIndex == -1){
+        //no default, replace skip instruction;
+      func_state->ReplaceInstruction(skip_to_end_slot, CREATE_Ax(OP_GOTO,end_index));
+    }
+}
+
+void CodeGenerator::Visit(BreakStatement* node, void* data) {
+    auto slot = func_->func_state()->AddInstruction(0);
+    block_->break_slots().push_back(slot);
+}
+
 CodeGenerator::RegisterScope::~RegisterScope()
 {
     int start_idx = stored_idx_;
@@ -1382,15 +1463,13 @@ std::vector<size_t>& CodeGenerator::BlockCnt::for_continue_slots() {
     }
     return for_continue_slots_;
 }
-    
-std::vector<size_t>& CodeGenerator::BlockCnt::for_break_slots() {
-    if (is_loop()) {
+
+std::vector<size_t>& CodeGenerator::BlockCnt::break_slots() {
+    if (is_loop()||is_switch()) {
         return for_break_slots_;
     }
     if (parent() != nullptr) {
-        if (parent()->is_loop()) {
-            return parent()->for_break_slots_;
-        }
+        return parent()->break_slots();
     }
     return for_break_slots_;
 }

@@ -266,7 +266,18 @@ Handle<Expression> ASTBuilder::NewClassStatement(Handle<Expression> identifier, 
     COUNT();
     return save(factory()->NewClassStatement(locator()->location(), manager()->current(), identifier, superClass, body));
 }
-    
+
+Handle<Expression> ASTBuilder::NewCaseStatement(Handle<Expression> test_case,Handle<ExpressionList> expr) {
+    COUNT();
+    return save(factory()->NewCaseStatement(locator()->location(), manager()->current(), test_case, expr));
+}
+
+Handle<Expression> ASTBuilder::NewSwitchStatement(Handle<Expression> test_value,
+                                                  std::vector<Handle<weex::core::data_render::Expression>> cases) {
+    COUNT();
+    return save(factory()->NewSwitchStatement(locator()->location(), manager()->current(), test_value, cases));
+}
+
 }
 }
 }
