@@ -607,18 +607,20 @@ public:
 
 class NewExpression : public Expression {
 public:
-    NewExpression(Position &loc, Scope *scope, Handle<Expression> member)
-    : Expression(loc, scope), member_{ member } { }
-    NewExpression(Handle<Expression> member)
-    : Expression(), member_{ member } { }
+    NewExpression(Position &loc, Scope *scope, Handle<Expression> member, Handle<ExpressionList> args = nullptr)
+    : Expression(loc, scope), member_(member), args_(args) { }
+    NewExpression(Handle<Expression> member, Handle<ExpressionList> args = nullptr)
+    : Expression(), member_(member), args_(args) { }
 
     Handle<Expression> member() { return member_; }
+    Handle<ExpressionList> args() { return args_; }
     bool ProduceRValue() override { return false; }
     void set_is_class_(bool is_class) { is_class_ = is_class; };
     bool is_class() { return is_class_; }
     DEFINE_NODE_TYPE(NewExpression, Expression);
 private:
     Handle<Expression> member_;
+    Handle<ExpressionList> args_;
     bool is_class_{false};
 };
 

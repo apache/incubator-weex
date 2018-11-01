@@ -63,7 +63,7 @@ public:
     // create a new node representing JavaScript postfix operation
     Handle<Expression> NewPostfixExpression(PostfixOperation op, Handle<Expression> expr);
     // create a new node representing JavaScript `new` expression
-    Handle<Expression> NewNewExpression(Handle<Expression> expr);
+    Handle<Expression> NewNewExpression(Handle<Expression> expr, Handle<ExpressionList> args = nullptr);
     // create a new node representing JavaScript Identifier
     Handle<Expression> NewIdentifier(std::string name);
     // create a new node representing JavaScript argument list

@@ -71,18 +71,17 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
         else if (is_class_) {
             std::string class_inst = vnode_ptr + "_inst";
             funcexprs_.push_back(factory->NewDeclaration(vnode_ptr));
-            funcexprs_.push_back(factory->NewDeclaration(class_inst, factory->NewNewExpression(identifier_)));
+            Handle<ExpressionList> args = factory->NewExpressionList();
             // call constructor
-            std::vector<Handle<Expression>> args;
             if (props_) {
-                args.push_back(props_);
+                args->Insert(props_);
             }
             else {
                 ProxyObject proxy;
-                args.push_back(factory->NewObjectConstant(proxy));
+                args->Insert(factory->NewObjectConstant(proxy));
             }
+            funcexprs_.push_back(factory->NewDeclaration(class_inst, factory->NewNewExpression(identifier_, args)));
             Handle<Expression> class_inst_expr = factory->NewIdentifier(class_inst);
-            funcexprs_.push_back(factory->NewCallExpression(MemberAccessKind::kCall, class_inst_expr, factory->NewIdentifier("constructor"), args));
             // if (vnode_ptr.xxxx) then vnode_ptr.xxxx()
             Handle<Expression> render_expr = factory->NewIdentifier("render");
             Handle<MemberExpression> member_func_expr = factory->NewMemberExpression(MemberAccessKind::kClass, class_inst_expr, render_expr);

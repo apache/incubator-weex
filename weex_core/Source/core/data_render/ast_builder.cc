@@ -106,10 +106,10 @@ Handle<Expression> ASTBuilder::NewPrefixExpression(PrefixOperation op, Handle<Ex
     return save(factory()->NewPrefixExpression(locator()->location(), manager()->current(), op, expr));
 }
     
-Handle<Expression> ASTBuilder::NewNewExpression(Handle<Expression> expr)
+Handle<Expression> ASTBuilder::NewNewExpression(Handle<Expression> expr, Handle<ExpressionList> args)
 {
     COUNT();
-    return save(factory()->NewNewExpression(locator()->location(), manager()->current(), expr));
+    return save(factory()->NewNewExpression(locator()->location(), manager()->current(), expr, args));
 }
     
 Handle<Expression> ASTBuilder::NewPostfixExpression(PostfixOperation op,

@@ -51,8 +51,8 @@ Handle<Expression> ASTFactory::NewThisExpression() {
   return MakeHandle<ThisExpression>();
 }
     
-Handle<Expression> ASTFactory::NewNewExpression(Handle<Expression> expr) {
-    return MakeHandle<NewExpression>(expr);
+Handle<Expression> ASTFactory::NewNewExpression(Handle<Expression> expr, Handle<ExpressionList> args) {
+    return MakeHandle<NewExpression>(expr, args);
 }
     
 Handle<Expression> ASTFactory::NewIdentifier(std::string name) {
@@ -215,9 +215,9 @@ Handle<Expression> ASTFactory::NewDoubleConstant(Position &loc, Scope *scope, do
     return MakeHandle<DoubleConstant>(loc, scope, value);
 }
     
-Handle<Expression> ASTFactory::NewNewExpression(Position &loc, Scope *scope, Handle<Expression> expr)
+Handle<Expression> ASTFactory::NewNewExpression(Position &loc, Scope *scope, Handle<Expression> expr, Handle<ExpressionList> args)
 {
-    return MakeHandle<NewExpression>(loc, scope, expr);
+    return MakeHandle<NewExpression>(loc, scope, expr, args);
 }
     
 Handle<Expression> ASTFactory::NewIdentifier(Position &loc, Scope *scope, std::string name)

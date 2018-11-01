@@ -40,7 +40,7 @@ public:
     virtual Handle<ExpressionList> NewExpressionList(const std::vector<Handle<Expression>>& list);
     virtual Handle<ClassBody> NewClassBody();
     virtual Handle<Expression> NewThisExpression();
-    virtual Handle<Expression> NewNewExpression(Handle<Expression> expr);
+    virtual Handle<Expression> NewNewExpression(Handle<Expression> expr, Handle<ExpressionList> args = nullptr);
     virtual Handle<Expression> NewIdentifier(std::string name);
     virtual Handle<ChunkStatement> NewChunkStatement(Handle<ExpressionList> list);
     virtual Handle<Expression> NewBlockStatement(Handle<ExpressionList> list);
@@ -80,7 +80,7 @@ public:
     virtual Handle<Expression> NewPostfixExpression(Position &loc, Scope *scope, PostfixOperation op, Handle<Expression> expr);
     virtual Handle<Expression> NewIntegralConstant(Position &loc, Scope *scope, int value);
     virtual Handle<Expression> NewDoubleConstant(Position &loc, Scope *scope, double value);
-    virtual Handle<Expression> NewNewExpression(Position &loc, Scope *scope, Handle<Expression> expr);
+    virtual Handle<Expression> NewNewExpression(Position &loc, Scope *scope, Handle<Expression> expr, Handle<ExpressionList> args = nullptr);
     virtual Handle<Expression> NewIdentifier(Position &loc, Scope *scope, std::string name);
     virtual Handle<Expression> NewArgumentList(Position &loc, Scope *scope, Handle<ExpressionList>);
     virtual Handle<Expression> NewCallExpression(Position &loc, Scope *scope, MemberAccessKind kind, Handle<Expression> func, Handle<Expression> args);
