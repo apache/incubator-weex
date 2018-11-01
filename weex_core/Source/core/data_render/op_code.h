@@ -50,6 +50,7 @@ T(OP_REMOVE_CLOSURE, "OP_REMOVE_CLOSURE", 1)                                    
 T(OP_SETARRAY,       "OP_SETARRAY",       3)                                                    \
 T(OP_GETINDEX,       "OP_GETINDEX",       3)                                                    \
 T(OP_GETINDEXVAR,    "OP_GETINDEXVAR",    3)                                                    \
+T(OP_TYPEOF,         "OP_TYPEOF",         2)                                                    \
 T(OP_ADD,            "OP_ADD",            3)                                                    \
 T(OP_SUB,            "OP_SUB",            3)                                                    \
 T(OP_MUL,            "OP_MUL",            3)                                                    \

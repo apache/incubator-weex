@@ -1178,6 +1178,9 @@ void CodeGenerator::Visit(PrefixExpression *node, void *data) {
     else if (operation == PrefixOperation::kUnfold) {
         func_->func_state()->AddInstruction(CREATE_ABx(OP_MOVE, ret, reg));
     }
+    else if (operation == PrefixOperation::kTypeof) {
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_TYPEOF, ret, reg));
+    }
 }
     
 void CodeGenerator::Visit(PostfixExpression *node, void *data) {

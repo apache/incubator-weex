@@ -696,6 +696,27 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             ref->value().ref = a;
             break;
         }
+        case OP_TYPEOF:
+        {
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_Bx(instruction);
+            if (IsNil(b)) {
+                SetSValue(a, exec_state->string_table()->StringFromUTF8("undefined"));
+            }
+            else if (IsTable(b)) {
+                SetSValue(a, exec_state->string_table()->StringFromUTF8("object"));
+            }
+            else if (IsBool(b)) {
+                SetSValue(a, exec_state->string_table()->StringFromUTF8("boolean"));
+            }
+            else if (IsString(b)) {
+                SetSValue(a, exec_state->string_table()->StringFromUTF8("string"));
+            }
+            else {
+                throw VMExecError("Can't Supporting typeof [OP_TYPEOF]");
+            }
+            break;
+        }
         case OP_RESETOUTVAR:
         {
             LOGTEMP("OP_RESETOUTVAR A:%ld\n", GET_ARG_Ax(instruction));

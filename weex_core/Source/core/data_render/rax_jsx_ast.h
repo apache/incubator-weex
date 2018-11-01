@@ -30,7 +30,7 @@ namespace core {
 namespace data_render {
     
 #define JSX_GLOBAL_VNODE_INDEX               "global_vnode_index"
-#define JS_GLOBAL_ARGUMENTS                  "__arguments"
+#define JS_GLOBAL_ARGUMENTS                  "arguments"
 
     
 class JSXNodeExpression : public Expression {

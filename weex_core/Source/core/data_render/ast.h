@@ -495,7 +495,8 @@ enum class PrefixOperation {
   kIncrement,
   kDecrement,
   kNot,
-  kUnfold
+  kUnfold,
+  kTypeof,
 };
 
 class PrefixExpression : public Expression {

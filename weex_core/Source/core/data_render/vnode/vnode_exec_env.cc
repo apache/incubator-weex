@@ -606,6 +606,7 @@ void VNodeExecEnv::ImportExecEnv(ExecState *state) {
     state->Register("appendChildComponent", AppendChildComponent);
     state->Register("appendChild", AppendChild);
     state->Register("encodeURIComponent", encodeURIComponent);
+    state->Register("encodeURI", encodeURIComponent);
     state->Register("setAttr", SetAttr);
     state->Register("setProps", SetProps);
     state->Register("setClassList", SetClassList);

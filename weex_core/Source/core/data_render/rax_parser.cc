@@ -218,6 +218,8 @@ PrefixOperation MapTokenWithPrefixOperator(Token& tok) {
             return PrefixOperation::kNot;
         case Token::UNFOLD:
             return PrefixOperation::kUnfold;
+        case Token::TYPEOF:
+            return PrefixOperation::kTypeof;
         default:
             LOGE("error prefix opration: %s", tok.view().c_str());
     }
