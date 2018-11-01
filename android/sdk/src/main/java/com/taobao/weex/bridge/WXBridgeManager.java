@@ -238,9 +238,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public  void setRebootJscTimeout(long timeout) {
-    if(timeout <= DEFAULT_REBOOT_JSC_TIMEOUT) {
-      return;
-    }
     rebootJscTimeout = timeout;
   }
   public void setUseSingleProcess(final boolean flag) {

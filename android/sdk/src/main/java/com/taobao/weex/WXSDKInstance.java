@@ -127,6 +127,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private String mBundleUrl = "";
   public static String requestUrl = "requestUrl";
   private boolean isDestroy=false;
+  private boolean hasException = false;
+  private boolean isRenderSuccess = false;
   private Map<String,Serializable> mUserTrackParams;
   private NativeInvokeHelper mNativeInvokeHelper;
   private boolean isCommit=false;
@@ -711,7 +713,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
         public void run() {
-          if(isDestroy) {
+          if(isDestroy || hasException || isRenderSuccess) {
             return;
           }
 
@@ -1284,6 +1286,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void onRenderSuccess(final int width, final int height) {
+    isRenderSuccess = true;
     if (!isNewFsEnd){
       getApmForInstance().arriveNewFsRenderTime();
     }
@@ -1384,6 +1387,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void onJSException(final String errCode, final String function, final String exception) {
     getExceptionRecorder().recordReportErrorMsg("["+errCode+","+function+","+exception+"]");
+    hasException = true;
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
 
