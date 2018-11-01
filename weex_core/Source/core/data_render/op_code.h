@@ -57,6 +57,9 @@ T(OP_MUL,            "OP_MUL",            3)                                    
 T(OP_MOD,            "OP_MOD",            3)                                                    \
 T(OP_DIV,            "OP_DIV",            3)                                                    \
 T(OP_JMP,            "OP_JMP",            2)                                                    \
+T(OP_TRUE_JMP,       "OP_TRUE_JMP",       2)                                                    \
+T(OP_JMPTO,          "OP_JMPTO",          2)                                                    \
+T(OP_TRUE_JMPTO,     "OP_TRUE_JMPTO",     2)                                                    \
 T(OP_GOTO,           "OP_GOTO",           1)                                                    \
 T(OP_EQ,             "OP_EQ",             3)                                                    \
 T(OP_SEQ,            "OP_SEQ",            3)                                                    \

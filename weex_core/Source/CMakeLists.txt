@@ -94,6 +94,7 @@ set(COMMON_SRCS
    ./core/data_render/table.cc
    ./core/data_render/token.cc
    ./core/data_render/tokenizer.cc
+   ./core/data_render/op_code.cc
    ./core/data_render/vm.cc
    ./core/data_render/exec_state_binary.cc
    ./core/data_render/exec_state_section.cc

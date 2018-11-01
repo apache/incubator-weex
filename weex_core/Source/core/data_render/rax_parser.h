@@ -91,6 +91,8 @@ public:
     Handle<Expression> ParseIfStatement();
     Handle<Expression> ParseElseBranch();
     Handle<Expression> ParseContinueStatement();
+    Handle<Expression> ParseSwitchStatement();
+    Handle<Expression> ParseCaseBlock(bool is_default = false);
     Handle<Expression> ParseBreakStatement();
     Handle<Expression> ParseReturnStatement();
     Handle<Expression> ParseForStatement();

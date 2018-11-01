@@ -5,6 +5,22 @@ var b = a.exec('abc,aac, ssa2, dda');
 log(b);
 
 log('aabccbddBc'.match(/(bss.)/g));
+
+var a = 3;
+
+log('start');
+switch(a){
+    case 1:
+        log('switch 1');
+        break;
+    case 2:
+        log('switch 2');
+        break;
+    default:
+        log('default branch');
+}
+log('end');
+
 class Component {
     constructor(props) {
         this.props = props;

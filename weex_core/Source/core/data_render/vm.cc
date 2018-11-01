@@ -244,7 +244,42 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
           }
           break;
       }
-
+      case OP_TRUE_JMP: {
+        LOGTEMP("OP_TRUE_JMP A:%ld  B:%ld \n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+        a = frame.reg + GET_ARG_A(instruction);
+        bool con = false;
+        if (!ToBool(a, con)) {
+          throw VMExecError("Unspport Type With OP_CODE [OP_JMP]");
+        }
+        if (con) {
+          pc += GET_ARG_Bx(instruction);
+        }
+        break;
+      }
+      case OP_JMPTO: {
+        LOGTEMP("OP_JMPTO A:%ld  B:%ld \n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+        a = frame.reg + GET_ARG_A(instruction);
+        bool con = false;
+        if (!ToBool(a, con)) {
+          throw VMExecError("Unspport Type With OP_CODE [OP_JMP]");
+        }
+        if (!con) {
+          pc = frame.pc +  GET_ARG_Bx(instruction);
+        }
+        break;
+      }
+      case OP_TRUE_JMPTO: {
+        LOGTEMP("OP_TRUE_JMPTO A:%ld  B:%ld \n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+        a = frame.reg + GET_ARG_A(instruction);
+        bool con = false;
+        if (!ToBool(a, con)) {
+          throw VMExecError("Unspport Type With OP_CODE [OP_JMP]");
+        }
+        if (con) {
+          pc = frame.pc + GET_ARG_Bx(instruction);
+        }
+        break;
+      }
       case OP_GOTO: {
         pc = frame.pc + GET_ARG_Ax(instruction);
       }

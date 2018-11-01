@@ -362,7 +362,20 @@ Handle<Expression> ASTFactory::NewJSXNodeExpression(Position &loc, Scope *scope,
 Handle<Expression> ASTFactory::NewClassStatement(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body) {
     return MakeHandle<ClassStatement>(loc, scope, identifier, superClass, body);
 }
-    
+
+Handle<Expression> ASTFactory::NewCaseStatement(Position& loc,
+                                                Scope* scope,
+                                                Handle<Expression> test_value,Handle<ExpressionList> expr) {
+  return MakeHandle<CaseStatement>(test_value,expr);
+}
+
+Handle<Expression> ASTFactory::NewSwitchStatement(Position& loc,
+                                                  Scope* scope,
+                                                  Handle<Expression> test_case,
+                                                  std::vector<Handle<weex::core::data_render::Expression>> cases) {
+  return MakeHandle<SwitchStatement>(test_case,cases);
+}
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

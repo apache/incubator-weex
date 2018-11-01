@@ -98,6 +98,8 @@ public:
     virtual Handle<Expression> NewBlockStatement(Position &loc, Scope *scope, Handle<ExpressionList> list);
     virtual Handle<Expression> NewForStatement(Position &loc, Scope *scope, ForKind kind, Handle<Expression> init, Handle<Expression> condition, Handle<Expression> update, Handle<Expression> body);
     virtual Handle<Expression> NewBreakStatement(Position &loc, Scope *scope, Handle<Expression> label = nullptr);
+    virtual Handle<Expression> NewCaseStatement(Position &loc, Scope *scope, Handle<Expression> test_value,Handle<ExpressionList> expr);
+    virtual Handle<Expression> NewSwitchStatement(Position &loc, Scope *scope, Handle<Expression> test_case, std::vector<Handle<Expression>> cases);
     virtual Handle<Expression> NewContinueStatement(Position &loc, Scope *scope, Handle<Expression> label = nullptr);
     virtual Handle<Expression> NewIfStatement(Position &loc, Scope *scope, Handle<Expression> condition, Handle<Expression> then);
     virtual Handle<Expression> NewIfElseStatement(Position &loc, Scope *scope, Handle<Expression> condition, Handle<Expression> then, Handle<Expression> els);

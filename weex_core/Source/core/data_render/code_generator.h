@@ -76,6 +76,9 @@ class CodeGenerator : public ASTVisitor {
   void Visit(PostfixExpression *node, void *data) override;
   void Visit(ContinueStatement *node, void *data) override;
 
+  void Visit(SwitchStatement *node, void *data) override;
+  void Visit(BreakStatement *node, void *data) override;
+
  private:
   template <class T>
   class Node {
@@ -116,7 +119,7 @@ class CodeGenerator : public ASTVisitor {
     int for_start_index();
     int for_update_index();
     std::vector<size_t>& for_continue_slots();
-    std::vector<size_t>& for_break_slots();
+    std::vector<size_t>& break_slots();
     void set_for_start_index(int index) { for_start_index_ = index; }
     void set_for_update_index(int index) { for_update_index_ = index; }
     inline std::unordered_map<std::string, long> &variables() {
@@ -126,6 +129,8 @@ class CodeGenerator : public ASTVisitor {
     inline int idx() { return idx_; }
     inline bool is_loop() { return is_loop_; }
     inline void set_is_loop(bool is_loop) { is_loop_ = is_loop; }
+    inline bool is_switch() { return is_switch_; }
+    inline void set_is_switch(bool flag) { is_switch_ = flag; }
     inline std::vector<long>& reg_refs() { return reg_refs_; }
     inline bool& is_register_scope() { return is_register_scope_; }
     void reset();
@@ -136,6 +141,7 @@ class CodeGenerator : public ASTVisitor {
     std::vector<long> reg_refs_;
     int idx_;
     bool is_loop_;
+    bool is_switch_;
     bool is_register_scope_;
     FuncState *func_state_{nullptr};
     ExecState *exec_state_{nullptr};
