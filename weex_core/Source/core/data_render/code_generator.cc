@@ -759,94 +759,170 @@ void CodeGenerator::Visit(BinaryExpression *node, void *data) {
         int for_start_index = (int)func_state->instructions().size();  // aka next one.
         block_->set_for_start_index(for_start_index);
     }
-    long right = block_->NextRegisterId();
-    if (node->rhs().get() != NULL) {
-        node->rhs()->Accept(this, &right);
-    }
     switch (opeartion) {
         case BinaryOperation::kAddition:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             // a + b
             func_state->AddInstruction(CREATE_ABC(OP_ADD, ret, left, right));
             break;
         }
         case BinaryOperation::kSubtraction:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             // a - b
             func_state->AddInstruction(CREATE_ABC(OP_SUB, ret, left, right));
             break;
         }
         case BinaryOperation::kMultiplication:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             // a * b
             func_state->AddInstruction(CREATE_ABC(OP_MUL, ret, left, right));
             break;
         }
         case BinaryOperation::kDivision:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             // a / b
             func_state->AddInstruction(CREATE_ABC(OP_DIV, ret, left, right));
             break;
         }
         case BinaryOperation::kMod:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             // a % b
             func_state->AddInstruction(CREATE_ABC(OP_MOD, ret, left, right));
             break;
         }
         case BinaryOperation::kLessThan:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_LT, ret, left, right));
             break;
         }
         case BinaryOperation::kGreaterThan:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_GT, ret, left, right));
             break;
         }
         case BinaryOperation::kLessThanEqual:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_LTE, ret, left, right));
             break;
         }
         case BinaryOperation::kGreaterThanEqual:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_GTE, ret, left, right));
             break;
         }
         case BinaryOperation::kAnd:
         {
+            auto slot = func_state->AddInstruction(0);
+            int second_index = (int)func_state->instructions().size() - 1;
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_AND, ret, left, right));
+            auto goto_slot = func_state->AddInstruction(0);
+            int third_index = (int)func_state->instructions().size() - 1;
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, ret, left));
+            int end_index = (int)func_state->instructions().size();
+            func_state->ReplaceInstruction(slot, CREATE_ABx(OP_JMP, left, third_index - second_index));
+            func_state->ReplaceInstruction(goto_slot, CREATE_Ax(OP_GOTO, end_index));
             break;
         }
         case BinaryOperation::kStrictEqual:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_SEQ, ret, left, right));
             break;
         }
         case BinaryOperation::kIn:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_IN, ret, left, right));
             break;
         }
         case BinaryOperation::kOr:
         {
+            auto slot = func_state->AddInstruction(0);
+            int second_index = (int)func_state->instructions().size() - 1;
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, ret, left));
+            auto goto_slot = func_state->AddInstruction(0);
+            int third_index = (int)func_state->instructions().size() - 1;
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_OR, ret, left, right));
+            int end_index = (int)func_state->instructions().size();
+            func_state->ReplaceInstruction(slot, CREATE_ABx(OP_JMP, left, third_index - second_index));
+            func_state->ReplaceInstruction(goto_slot, CREATE_Ax(OP_GOTO, end_index));
             break;
         }
         case BinaryOperation::kEqual:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_EQ, ret, left, right));
             break;
         }
         case BinaryOperation::kNotEqual:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_EQ, ret, left, right));
             func_state->AddInstruction(CREATE_ABx(OP_NOT, ret, ret));
             break;
         }
         case BinaryOperation::kStrictNotEqual:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_SEQ, ret, left, right));
             func_state->AddInstruction(CREATE_ABx(OP_NOT, ret, ret));
             break;

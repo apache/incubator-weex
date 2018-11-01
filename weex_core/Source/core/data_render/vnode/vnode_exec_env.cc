@@ -780,7 +780,6 @@ Value StringToValue(ExecState *exec_state,const std::string &str) {
         std::string err;
         json11::Json json = json11::Json::parse(str, err);
         if (!err.empty() || json.is_null()) {
-            ret = exec_state->string_table()->StringFromUTF8(str);
             break;
         }
         ret = JSONToValue(exec_state, json);

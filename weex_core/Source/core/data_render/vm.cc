@@ -712,6 +712,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             else if (IsString(b)) {
                 SetSValue(a, exec_state->string_table()->StringFromUTF8("string"));
             }
+            else if (IsFunction(b) || IsFuncInstance(b)) {
+                SetSValue(a, exec_state->string_table()->StringFromUTF8("function"));
+            }
             else {
                 throw VMExecError("Can't Supporting typeof [OP_TYPEOF]");
             }
