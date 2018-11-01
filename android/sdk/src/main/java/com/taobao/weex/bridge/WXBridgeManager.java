@@ -163,7 +163,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   // weexcore use single process or not
   private static boolean isUseSingleProcess = false;
   private static boolean isRebootJscWhenWhiteScreen = false;
-  private static long DEFAULT_REBOOT_JSC_TIMEOUT = 5000;
+  public final static long DEFAULT_REBOOT_JSC_TIMEOUT = 5000;
   private static long rebootJscTimeout = DEFAULT_REBOOT_JSC_TIMEOUT;
 
   public enum BundType {
