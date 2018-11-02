@@ -93,6 +93,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 
@@ -720,6 +721,17 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           View containerView = getContainerView();
           if(containerView instanceof ViewGroup) {
             if(0 == ((ViewGroup) containerView).getChildCount()) {
+              boolean isWxActivity = false;
+              if(mContext != null && mContext.getClass() != null) {
+                String name = mContext.getClass().getName();
+                if(!TextUtils.isEmpty(name)) {
+                  isWxActivity = name.contains("WXActivity");
+                }
+              }
+
+              if(!isWxActivity) {
+                onJSException(String.valueOf(WX_ERR_RELOAD_PAGE),"jsc reboot","jsc reboot");
+              }
               WXBridgeManager.getInstance().callReportCrashReloadPage(mInstanceId, null);
             }
           }
