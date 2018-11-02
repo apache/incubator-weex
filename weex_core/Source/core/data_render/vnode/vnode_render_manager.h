@@ -54,6 +54,7 @@ class VNodeRenderManager {
   bool RequireModule(ExecState *exec_state, std::string &name, std::string &result);
   void PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node);
   void CallNativeModule(ExecState *exec_state, const std::string &module, const std::string &method, const std::string &args, int argc = 0);
+  void WXLogNative(ExecState *exec_state, const std::string &info);
   static VNodeRenderManager *GetInstance() {
     if (!g_instance) {
       g_instance = new VNodeRenderManager();

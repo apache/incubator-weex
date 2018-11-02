@@ -8,6 +8,7 @@
 #include "core/data_render/class_string.h"
 #include "core/data_render/class_json.h"
 #include "core/data_render/class_object.h"
+#include "core/data_render/class_console.h"
 #include "core/data_render/table.h"
 #include "core/data_render/exec_state.h"
 #include "class_regex.h"
@@ -74,6 +75,14 @@ Value ClassFactory::ClassObject() {
 
 Value ClassFactory::ClassRegExp() {
     ClassDescriptor *desc = NewClassRegex();
+    Value value;
+    SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
+    return value;
+}
+    
+Value ClassFactory::ClassConsole() {
+    ClassDescriptor *desc = NewClassConsole();
     Value value;
     SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));

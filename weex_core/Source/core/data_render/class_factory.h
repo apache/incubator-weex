@@ -42,6 +42,7 @@ public:
     virtual Value ClassJSON();
     virtual Value ClassObject();
     virtual Value ClassRegExp();
+    virtual Value ClassConsole();
     virtual Value CreateArray();
     virtual Value CreateTable();
     int Find(const ClassDescriptor *desc);

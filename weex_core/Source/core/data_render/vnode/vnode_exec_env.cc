@@ -17,8 +17,8 @@
  * under the License.
  */
 
-#include "core/data_render/vnode/vnode_exec_env.h"
 #include <sstream>
+#include "core/data_render/vnode/vnode_exec_env.h"
 #include "core/data_render/object.h"
 #include "core/data_render/table.h"
 #include "core/data_render/class_factory.h"
@@ -36,54 +36,6 @@ namespace core {
 namespace data_render {
 
 json11::Json ValueToJSON(const Value& value);
-
-static Value Log(ExecState *exec_state) {
-  size_t length = exec_state->GetArgumentCount();
-  std::stringstream ss;
-  for (int i = 0; i < length; ++i) {
-    Value *a = exec_state->GetArgument(i);
-    switch (a->type) {
-      case Value::Type::NIL:
-        ss << "[log]:=>" << "null" << "\n";
-        break;
-      case Value::Type::NUMBER:
-        ss << "[log]:=>" << a->n << "\n";
-        break;
-      case Value::Type::BOOL:
-        ss << "[log]:=>" << (a->b?"true":"false") << "\n";
-        break;
-      case Value::Type::INT:
-        ss << "[log]:=>" << a->i << "\n";
-        break;
-      case Value::Type::STRING:
-        ss << "[log]:=>" << a->str->c_str() << "\n";
-        break;
-      case Value::Type::TABLE:
-        ss << "[log]:=>" << TableToString(ValueTo<Table>(a)) << "\n";
-        break;
-      case Value::Type::ARRAY:
-        ss << "[log]:=>" << ArrayToString(ValueTo<Array>(a)) << "\n";
-        break;
-      case Value::Type::CLASS_DESC:
-        ss << "[log]:=>" << "CLASS_DESC" << "\n";
-        break;
-      case Value::Type::CLASS_INST:
-        ss << "[log]:=>" << "CLASS_INST" << "\n";
-        break;
-      case Value::Type::CPTR:
-      {
-          VNode *node = (VNode *)a->cptr;
-          ss << "[log]:=> cptr" << node->tag_name() <<"\n";
-          break;
-      }
-      default:
-        ss << "[log]:=>" << "unknown type" << "\n";
-        break;
-    }
-  }
-  LOGD("%s",ss.str().c_str());
-  return Value();
-}
 
 static Value SizeOf(ExecState *exec_state) {
     size_t length = exec_state->GetArgumentCount();
@@ -593,7 +545,6 @@ static Value SetStyle(ExecState* exec_state) {
 }
 
 void VNodeExecEnv::ImportExecEnv(ExecState *state) {
-    state->Register("log", Log);
     state->Register("sizeof", SizeOf);
     state->Register("slice", Slice);
     state->Register("appendUrlParam", AppendUrlParam);
@@ -621,6 +572,7 @@ void VNodeExecEnv::ImportExecEnv(ExecState *state) {
     state->Register("JSON", state->class_factory()->ClassJSON());
     state->Register("Object", state->class_factory()->ClassObject());
     state->Register("RegExp", state->class_factory()->ClassRegExp());
+    state->Register("console", state->class_factory()->ClassConsole());
     RegisterJSCommonFunction(state);
 }
 

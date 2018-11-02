@@ -1177,7 +1177,7 @@ _Pragma("clang diagnostic pop") \
     };
 }
 
-+ (void)handleConsoleOutputWithArgument:(NSArray*)arguments logLevel:(WXLogFlag)logLevel
++ (void)handleConsoleOutputWithArgument:(NSArray *)arguments logLevel:(WXLogFlag)logLevel
 {
     NSMutableString *string = [NSMutableString string];
     [string appendString:@"jsLog: "];

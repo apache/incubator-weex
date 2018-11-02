@@ -370,7 +370,7 @@ void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string
     } while (0);
 }
 
-void VNodeRenderManager::CallNativeModule(ExecState* exec_state,
+void VNodeRenderManager::CallNativeModule(ExecState *exec_state,
                                           const std::string& module,
                                           const std::string& method,
                                           const std::string& args, int argc) {
@@ -386,6 +386,18 @@ void VNodeRenderManager::CallNativeModule(ExecState* exec_state,
       break;
     }
   }
+}
+    
+void VNodeRenderManager::WXLogNative(ExecState *exec_state, const std::string &info) {
+    for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {
+        if (iter->second == exec_state) {
+            WeexCoreManager::Instance()
+            ->getPlatformBridge()
+            ->platform_side()
+            ->NativeLog(info.c_str());
+            break;
+        }
+    }
 }
 
 void VNodeRenderManager::PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node) {

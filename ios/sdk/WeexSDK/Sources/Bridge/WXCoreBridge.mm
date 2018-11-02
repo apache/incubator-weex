@@ -28,6 +28,8 @@
 #import "WXUtility.h"
 #import "WXAssert.h"
 #import "WXAppConfiguration.h"
+#import "WXSDKEngine.h"
+#import "WXAppMonitorProtocol.h"
 
 #include "base/CoreConstants.h"
 #include "core/manager/weex_core_manager.h"
@@ -158,6 +160,32 @@ namespace WeexCore
         return result;
     }
     
+    static void consoleWithArguments(NSArray *arguments, WXLogFlag logLevel)
+    {
+        NSMutableString *jsLog = [NSMutableString string];
+        [jsLog appendString:@"jsLog: "];
+        [arguments enumerateObjectsUsingBlock:^(NSString *jsVal, NSUInteger idx, BOOL *stop) {
+            if (idx == arguments.count - 1) {
+                if (logLevel) {
+                    if (WXLogFlagWarning == logLevel) {
+                        id<WXAppMonitorProtocol> appMonitorHandler = [WXSDKEngine handlerForProtocol:@protocol(WXAppMonitorProtocol)];
+                        if ([appMonitorHandler respondsToSelector:@selector(commitAppMonitorAlarm:monitorPoint:success:errorCode:errorMsg:arg:)]) {
+                            [appMonitorHandler commitAppMonitorAlarm:@"weex" monitorPoint:@"jswarning" success:FALSE errorCode:@"99999" errorMsg:jsLog arg:[WXSDKEngine topInstance].pageName];
+                        }
+                    }
+                    WX_LOG(logLevel, @"%@", jsLog);
+                }
+                else {
+                    [jsLog appendFormat:@"%@ ", jsVal]                                  ;
+                    WXLogInfo(@"%@", jsLog);
+                }
+            }
+            else {
+                [jsLog appendFormat:@"%@ ", jsVal];
+            }
+        }];
+    }
+    
     static void MergeBorderWidthValues(NSMutableDictionary* dict,
                                        const WXCoreBorderWidth & borders,
                                        bool isUpdate, float pixelScaleFactor)
@@ -241,6 +269,7 @@ namespace WeexCore
                 NSString *arguments = [NSString stringWithUTF8String:args];
                 newArguments = [WXUtility objectFromJSON:arguments];
             }
+            LOGD("CallNativeModule:[%s]:[%s]=>%s \n", module, method, args);
             WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:newArguments options:nil instance:instance];
             [method invoke];
             
@@ -262,11 +291,35 @@ namespace WeexCore
         // should not enter this function
         assert(false);
     }
-        
-    void IOSSide::NativeLog(const char* str_array)
+
+    void IOSSide::NativeLog(const char *args)
     {
         // should not enter this function
-        assert(false);
+        do {
+            if (!args) {
+                break;
+            }
+            NSArray *newArguments;
+            if (args) {
+                NSString *arguments = [NSString stringWithUTF8String:args];
+                newArguments = [WXUtility objectFromJSON:arguments];
+            }
+            if (![newArguments isKindOfClass:[NSArray class]] || !newArguments.count) {
+                break;
+            }
+            static NSDictionary *levelMap;
+            static dispatch_once_t onceToken;
+            dispatch_once(&onceToken, ^{
+                levelMap = @{@"__ERROR": @(WXLogFlagError),
+                          @"__WARN": @(WXLogFlagWarning),
+                          @"__INFO": @(WXLogFlagInfo),
+                          @"__DEBUG": @(WXLogFlagDebug),
+                          @"__LOG": @(WXLogFlagLog)};
+            });
+            NSString *levelStr = [newArguments lastObject];
+            consoleWithArguments(newArguments, (WXLogFlag)[levelMap[levelStr] integerValue]);
+            
+        } while (0);
     }
     
     void IOSSide::TriggerVSync(const char* page_id)
