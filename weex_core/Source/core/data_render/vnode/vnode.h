@@ -22,12 +22,17 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <unordered_set>
 #include "core/render/node/render_object.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-class VNode;
+class VComponent;
+class Value;
+
+typedef std::function<void()> OnAttachedListener;
+typedef std::function<void()> OnDettachedListener;
 
 class VNode {
  public:
@@ -41,7 +46,7 @@ class VNode {
   void SetAttribute(const std::string &key, const std::string &value);
 
   void AddEvent(const std::string &event, const std::string &function,
-                const std::vector<std::string> &params);
+                const std::vector<Value> &params);
   void AddEvent(const std::string &event, void *func, void *inst);
 
   void AddChild(VNode *child);
@@ -59,7 +64,7 @@ class VNode {
 
   inline const std::string &ref() const { return ref_; }
 
-  inline const std::string &render_object_ref() const {
+  virtual inline const std::string &render_object_ref() const {
     return render_object_ref_;
   }
 
@@ -82,12 +87,24 @@ class VNode {
 
   inline bool HasChildren() { return !child_list_.empty(); }
 
+  inline void set_component(VComponent* c) {
+    component_ = c;
+  }
+
+  inline VComponent* component() {
+    return component_;
+  }
+
+  virtual bool IsVirtualComponent() const { return false; }
+
  private:
   std::string tag_name_;
   // Not unique
   std::string node_id_;
   // Should be unique
   std::string ref_;
+  // Context of vnode
+  VComponent* component_ = nullptr;
   // Ref point to RenderObject is set when PatchVNode or ParseVNode2RenderObject
   std::string render_object_ref_;
 
@@ -97,8 +114,11 @@ class VNode {
   std::map<std::string, std::string> *styles_;
   std::map<std::string, std::string> *attributes_;
   std::map<std::string, void *> *events_;
+
   void MapInsertOrAssign(std::map<std::string, std::string> *target_map,
                          const std::string &key, const std::string &value);
+  inline virtual void DispatchAttachedToParent() {}
+  inline virtual void DispatchDetachedFromParent() {}
 };
 
 }  // namespace data_render

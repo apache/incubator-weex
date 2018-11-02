@@ -46,7 +46,7 @@ ClassDescriptor *NewClassArray() {
 }
     
 int IndexOf(const std::vector<Value> &items, const Value *val) {
-    auto iterator = std::find(items.begin(), items.end(), val);
+    auto iterator = std::find(items.begin(), items.end(), *val);
     if (iterator != items.end()) {
         return (int)std::distance(items.begin(), iterator);
     }

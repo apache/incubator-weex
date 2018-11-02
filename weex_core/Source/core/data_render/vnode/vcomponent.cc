@@ -19,6 +19,8 @@
 
 #include "core/data_render/vnode/vcomponent.h"
 #include "core/data_render/exec_state.h"
+#include "vnode_render_manager.h"
+
 namespace weex {
 namespace core {
 namespace data_render {
@@ -27,21 +29,20 @@ namespace data_render {
 static int g_component_id = 0;
 
 VComponent::VComponent(ExecState *exec_state, int template_id,
-                       const std::string &name, const std::string &tag_name,
-                       const std::string &node_id, const std::string &ref)
-    : VNode(tag_name, node_id, ref),
-      exec_state_(exec_state),
+                       const std::string &name, const std::string &func_name)
+    : VNode("", "", ""),
+      is_dirty_(false),
+      has_dispatch_created_(false),
       id_(g_component_id++),
       template_id_(template_id),
       name_(name),
-      // This function name definition rule is in parser.cc
-      func_name_("createComponent_" + name),
-      data_(nullptr),
-      props_(nullptr),
+      func_name_(func_name),
+      data_(exec_state->class_factory()->CreateTable()),
+      props_(exec_state->class_factory()->CreateTable()),
       listener_(nullptr),
-      dirty_(false),
-      children_(),
-      parent_(nullptr) {}
+      old_root_vnode_(nullptr),
+      root_vnode_(nullptr),
+      exec_state_(exec_state) {}
 
 VComponent::~VComponent() {}
 
@@ -85,55 +86,134 @@ static bool Equals(Value a, Value b) {
   return true;
 }
 
-void VComponent::Compare(VComponent *old_component) {
+bool VComponent::Equal(VComponent *old_component) {
   VComponent *new_component = this;
-  if (old_component == new_component) return;
+  if (old_component == new_component) return true;
   // Mainly compare props
-  for (auto it = old_component->props_->map.begin();
-       it != old_component->props_->map.end(); ++it) {
+  Table *old_table = ValueTo<Table>(&old_component->props_);
+  Table *new_table = ValueTo<Table>(&new_component->props_);
+  if (updated_props_.type == Value::Type::NIL) {
+    updated_props_ = exec_state_->class_factory()->CreateTable();
+  } else {
+    ValueTo<Table>(&updated_props_)->map.clear();
+  }
+  bool equal = true;
+  for (auto it = old_table->map.begin(); it != old_table->map.end(); ++it) {
     auto old_value = it->second;
-    auto new_value = new_component->props_->map[it->first];
+    auto new_value = new_table->map[it->first];
     if (old_value.type != new_value.type || !Equals(old_value, new_value)) {
-      updated_props_[it->first] = new_value;
-      dirty_ = true;
+      ValueTo<Table>(&updated_props_)->map.insert({it->first, new_value});
+      equal = false;
     }
+  }
+  return equal;
+}
+
+void VComponent::MoveTo(VComponent *new_component) {
+  new_component->has_dispatch_created_ = has_dispatch_created_;
+  new_component->SetRootNode(root_vnode_.release());
+  if (!Equal(new_component)) {
+    new_component->UpdateData();
   }
 }
 
-void VComponent::UpdateData(std::unordered_map<std::string, Value> datas) {
+void VComponent::UpdateData() {
+  // Merge data and props
   Value new_value = exec_state_->class_factory()->CreateTable();
-  TableMapAddAll(props_, ValueTo<Table>(&new_value));
-  TableMapAddAll(data_, ValueTo<Table>(&new_value));
-  //Value new_component = exec_state_->Call(func_name_, {new_value}).cptr;
+  TableAddAll(props_, new_value);
+  TableAddAll(data_, new_value);
+
+  Value component;
+  component.cptr = this;
+  component.type = Value::CPTR;
+  exec_state_->Call(func_name_, {new_value, component, Value(false)});
+  VNodeRenderManager::GetInstance()->PatchVNode(
+      exec_state_, old_root_vnode_.get(), root_vnode_.get());
+
+  TravelVComponentsWithFunc(&VComponent::DispatchDestroyed,
+                            old_root_vnode_.get());
+  old_root_vnode_.reset(nullptr);
+  if (has_dispatch_created_) {
+    is_dirty_ = true;
+    DispatchUpdated();
+  }
+}
+
+void VComponent::UpdateData(Value *data) {
+  if (TableAddAll(*data, data_)) {
+    UpdateData();
+  }
+}
+
+void VComponent::OnEvent(VNode *node, const std::string event,
+                         std::vector<Value> params) {}
+
+// TODO Depth-first traversal
+void VComponent::TravelVComponentsWithFunc(TravelTreeFunc func, VNode *root) {
+  if (!root) return;
+  std::vector<VNode *> list;
+  list.push_back(root);
+  VNode *node = nullptr;
+  while (!list.empty()) {
+    node = list.front();
+    list.erase(list.begin());
+    if (node->IsVirtualComponent()) {
+      (static_cast<VComponent *>(node)->*func)();
+      continue;
+    }
+    for (auto it = node->child_list()->begin(); it != node->child_list()->end();
+         it++) {
+      list.push_back(*it);
+    }
+  }
 }
 
 void VComponent::DispatchCreated() {
-  for (auto it = children_.begin(); it != children_.end(); ++it) {
-    (*it)->DispatchCreated();
+  if (has_dispatch_created_) return;
+  if (listener_) {
+    listener_->OnCreated(this, ValueTo<Table>(&data_), ValueTo<Table>(&props_));
   }
+  TravelVComponentsWithFunc(&VComponent::DispatchCreated, root_vnode());
+  has_dispatch_created_ = true;
 }
 
 void VComponent::DispatchUpdated() {
-  if (dirty_) {
-    for (auto it = children_.begin(); it != children_.end(); ++it) {
-      if ((*it)->dirty_) {
-        (*it)->DispatchUpdated();
-      }
-    }
-    dirty_ = false;
+  if (!has_dispatch_created_) {
+    DispatchCreated();
+    return;
   }
+  if (!is_dirty_) return;
+  if (listener_) {
+    listener_->OnUpdated(this, ValueTo<Table>(&updated_props_));
+  }
+  TravelVComponentsWithFunc(&VComponent::DispatchUpdated, root_vnode());
+  is_dirty_ = false;
 }
 
 void VComponent::DispatchDestroyed() {
-  for (auto it = children_.begin(); it != children_.end(); ++it) {
-    (*it)->DispatchDestroyed();
+  if (listener_) {
+    listener_->OnDestroyed(this);
+  }
+  TravelVComponentsWithFunc(&VComponent::DispatchDestroyed, root_vnode());
+}
+
+void VComponent::SetRootNode(VNode *node) {
+  if (root_vnode_) {
+    old_root_vnode_ = std::move(root_vnode_);
+  }
+  root_vnode_.reset(node);
+  if (root_vnode_) {
+    root_vnode_->set_component(this);
   }
 }
 
-void VComponent::AppendChildComponent(VComponent *child) {
-  children_.push_back(child);
-  child->parent_ = this;
-}
+void VComponent::SetData(Value *data) { TableCopy(*data, data_); }
+
+void VComponent::SetProps(Value *props) { TableCopy(*props, props_); }
+
+void VComponent::DispatchAttachedToParent() {}
+
+void VComponent::DispatchDetachedFromParent() { DispatchDestroyed(); }
 
 }  // namespace data_render
 }  // namespace core

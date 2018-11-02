@@ -84,7 +84,7 @@ static Value replaceAll(ExecState *exec_state) {
         std::string oldstr = CStringValue(oldValue);
         std::string newstr = CStringValue(newValue);
         std::string dststr = replace_all(srcstr, oldstr, newstr);
-        ret = exec_state->string_table()->StringFromUTF8(dststr);
+        ret = Value(exec_state->string_table()->StringFromUTF8(dststr));
         
     } while (0);
     
@@ -127,7 +127,7 @@ static Value split(ExecState *exec_state) {
         split_string<std::vector<std::string>>(src, split_array, delim);
         Array *array = ValueTo<Array>(&ret);
         for (int i = 0; i < split_array.size(); i++) {
-            Value string_value = exec_state->string_table()->StringFromUTF8(split_array[i]);
+            Value string_value(exec_state->string_table()->StringFromUTF8(split_array[i]));
             array->items.push_back(string_value);
         }
         
@@ -159,7 +159,7 @@ static Value trim(ExecState* exec_state) {
     std::string src = CStringValue(string);
     trim(src);
     
-    Value string_value = exec_state->string_table()->StringFromUTF8(src);
+    Value string_value(exec_state->string_table()->StringFromUTF8(src));
     return string_value;
 }
     
@@ -228,7 +228,7 @@ Value encodeURIComponent(ExecState *exec_state) {
         dst = uri;
         free(uri);
     }
-    return exec_state->string_table()->StringFromUTF8(dst);
+    return Value(exec_state->string_table()->StringFromUTF8(dst));
 }
     
 std::string utf8chr(int cp)

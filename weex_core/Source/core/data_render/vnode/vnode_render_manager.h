@@ -72,7 +72,6 @@ class VNodeRenderManager {
   static VNodeRenderManager *g_instance;
 
   std::map<std::string, VNode *> vnode_trees_;
-  std::unordered_map<int, VComponent *> vcomponent_tree_;
   std::map<std::string, ExecState *> exec_states_;
   std::vector<std::string> modules_;
 };

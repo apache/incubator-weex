@@ -1078,6 +1078,8 @@ void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
         if (ret != nullptr && !IsNil(&result)) {
             *ret = result;
         }
+        // back to the top of params for clear register
+        *stack_->top() = func + 1;
         stack_->reset();
         frames_.pop_back();
     }
@@ -1095,6 +1097,8 @@ void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
         frames_.push_back(frame);
         resetArguments(func, argc);
         vm_->RunFrame(this, frame, ret);
+        // back to the top of params for clear register
+        *stack_->top() = func + 1;
         stack_->reset();
         frames_.pop_back();
     }

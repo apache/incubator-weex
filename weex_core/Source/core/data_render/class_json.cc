@@ -54,7 +54,7 @@ static Value stringify(ExecState *exec_state) {
         else if (IsArray(value)) {
             json_string = ArrayToString(ValueTo<Array>(value));
         }
-        ret = exec_state->string_table()->StringFromUTF8(json_string);
+        ret = Value(exec_state->string_table()->StringFromUTF8(json_string));
         
     } while (0);
     

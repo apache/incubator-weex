@@ -116,7 +116,7 @@ void CodeGenerator::Visit(StringConstant* node, void* data) {
   if (reg >= 0) {
     FuncState *func_state = func_->func_state();
     auto value = exec_state_->string_table_->StringFromUTF8(node->string());
-    int index = func_state->AddConstant(std::move(value));
+    int index = func_state->AddConstant(Value(value));
     Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
@@ -188,7 +188,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
             if (stms->expr()->IsIdentifier() && stms->member() && stms->member()->IsIdentifier()) {
                 long reg_member = block_->NextRegisterId();
                 auto value = exec_state_->string_table_->StringFromUTF8(stms->member()->AsIdentifier()->GetName());
-                int tableIndex = func_state->AddConstant(std::move(value));
+                int tableIndex = func_state->AddConstant(Value(value));
                 func_state->AddInstruction(CREATE_ABx(OP_LOADK, reg_member, tableIndex));
                 long reg_class = block_->FindRegisterId(stms->expr()->AsIdentifier()->GetName());
                 if (reg_class < 0) {
@@ -417,6 +417,7 @@ void CodeGenerator::Visit(FunctionStatement *node, void *data) {
     auto slot = func_->func_state()->AddInstruction(0);
     {
         FuncScope scope(this);
+        func_->func_state()->set_name(proto->GetName());
         if (is_class_func) {
             Value value;
             value.f = func_->func_state();
@@ -563,7 +564,7 @@ void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
 void CodeGenerator::Visit(ClassStatement *node, void *data) {
     do {
         Handle<Expression> super_expr = node->Super();
-        Value *super_value = nullptr,class_value = nullptr;
+        Value *super_value = nullptr;
         if (super_expr) {
             if (!super_expr->IsIdentifier()) {
                 throw GeneratorError("super isn't a Identifier");
@@ -586,7 +587,7 @@ void CodeGenerator::Visit(ClassStatement *node, void *data) {
             throw GeneratorError(class_name + "redefine");
             break;
         }
-        class_value = exec_state_->class_factory()->CreateClassDescriptor(super_value ? ValueTo<ClassDescriptor>(super_value) : nullptr);
+        Value class_value(exec_state_->class_factory()->CreateClassDescriptor(super_value ? ValueTo<ClassDescriptor>(super_value) : nullptr));
         exec_state_->global()->Add(class_name, class_value);
         ClassScope scope(this, &class_value);
         node->Body()->Accept(this, nullptr);
@@ -887,7 +888,7 @@ void CodeGenerator::Visit(IntegralConstant* node, void* data) {
   if (reg >= 0) {
     FuncState* func_state = func_->func_state();
     int value = node->value();
-    int index = func_state->AddConstant(static_cast<int64_t>(value));
+    int index = func_state->AddConstant(Value(static_cast<int64_t>(value)));
     Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
@@ -898,7 +899,7 @@ void CodeGenerator::Visit(BooleanConstant* node, void* data) {
   if (reg >= 0) {
     FuncState* func_state = func_->func_state();
     bool value = node->pred();
-    int index = func_state->AddConstant(static_cast<bool>(value));
+    int index = func_state->AddConstant(Value(static_cast<bool>(value)));
     Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
@@ -909,7 +910,7 @@ void CodeGenerator::Visit(DoubleConstant* node, void* data) {
   if (reg >= 0) {
     FuncState* func_state = func_->func_state();
     double value = node->value();
-    int index = func_state->AddConstant(static_cast<double>(value));
+    int index = func_state->AddConstant(Value(static_cast<double>(value)));
     Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
@@ -959,7 +960,7 @@ void CodeGenerator::Visit(ObjectConstant *node, void *data) {
                             long key = block_->NextRegisterId();
                             iter->second->Accept(this, &item);
                             auto value = exec_state_->string_table_->StringFromUTF8(iter->first);
-                            int keyIndex = func_state->AddConstant(std::move(value));
+                            int keyIndex = func_state->AddConstant(Value(value));
                             func_state->AddInstruction(CREATE_ABx(OP_LOADK, key, keyIndex));
                             func_state->AddInstruction(CREATE_ABC(OP_SETTABLE, ret, key, item));
                         }
@@ -979,7 +980,7 @@ void CodeGenerator::Visit(ObjectConstant *node, void *data) {
                 auto ktemp = (*it).second;
                 ktemp->Accept(this, &item);
                 auto value = exec_state_->string_table_->StringFromUTF8(it->first);
-                int keyIndex = func_state->AddConstant(std::move(value));
+                int keyIndex = func_state->AddConstant(Value(value));
                 func_state->AddInstruction(CREATE_ABx(OP_LOADK, key, keyIndex));
                 func_state->AddInstruction(CREATE_ABC(OP_SETTABLE, ret, key, item));
             }
@@ -1027,7 +1028,7 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
         left->Accept(this, &ret);
         long right = block_->NextRegisterId();
         auto value = exec_state_->string_table_->StringFromUTF8(node->member()->AsIdentifier()->GetName());
-        int tableIndex = func_state->AddConstant(std::move(value));
+        int tableIndex = func_state->AddConstant(Value(value));
         func_state->AddInstruction(CREATE_ABx(OP_LOADK, right, tableIndex));
         if (!node->ProduceRValue()) {
             func_state->AddInstruction(CREATE_ABC(OP_GETMEMBERVAR, ret, ret, right));
@@ -1041,7 +1042,7 @@ void CodeGenerator::Visit(MemberExpression *node, void *data) {
         left->Accept(this, &ret);
         long right = block_->NextRegisterId();
         auto value = exec_state_->string_table_->StringFromUTF8(node->member()->AsIdentifier()->GetName());
-        int tableIndex = func_state->AddConstant(std::move(value));
+        int tableIndex = func_state->AddConstant(Value(value));
         func_state->AddInstruction(CREATE_ABx(OP_LOADK, right, tableIndex));
         if (!node->ProduceRValue()) {
             func_state->AddInstruction(CREATE_ABC(OP_GETMEMBERVAR, ret, ret, right));
@@ -1078,7 +1079,7 @@ void CodeGenerator::Visit(Identifier *node, void *data) {
 
       FuncState* func_state = func_->func_state();
       auto value = exec_state_->string_table_->StringFromUTF8(node->GetName());
-      int tableIndex = func_state->AddConstant(std::move(value));
+      int tableIndex = func_state->AddConstant(Value(value));
 
       func_state->AddInstruction(
           CREATE_ABx(OpCode::OP_LOADK, right, tableIndex));
@@ -1096,14 +1097,8 @@ void CodeGenerator::Visit(PrefixExpression *node, void *data) {
     long ret = data == nullptr ? block_->NextRegisterId()
                              : *static_cast<long *>(data);
     Handle<Expression> expr = node->expr();
-    long reg = -1;
-    if (expr->IsIdentifier()) {
-        reg = block_->FindRegisterId(expr->AsIdentifier()->GetName());
-    }
-    else {
-        reg = block_->NextRegisterId();
-        expr->Accept(this, &reg);
-    }
+    long reg = block_->NextRegisterId();
+    expr->Accept(this, &reg);
     PrefixOperation operation = node->op();
     // ++i
     if (operation == PrefixOperation::kIncrement) {
@@ -1295,8 +1290,8 @@ long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
             ValueRef *ref = parent()->FindValueRef(name, reg_ref);
             if (ref) {
                 BlockCnt *root_block = this;
-                while (root_block->children() && root_block->children()->func_state() == func_state_)
-                {
+                while (root_block->children() &&
+                       root_block->children()->func_state() == func_state_) {
                     root_block = root_block->children();
                 }
                 reg_ref = root_block->NextRegisterId();

@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <core/data_render/object.h>
 #include "core/render/node/factory/render_creator.h"
 #include "core/data_render/vnode/vnode.h"
 
@@ -98,25 +99,26 @@ VNode *VNode::FindNode(const std::string &render_object_ref) {
 }
 
 void VNode::AddEvent(const std::string &event, const std::string &function,
-                     const std::vector<std::string> &params) {
+                     const std::vector<Value> &params) {
   //todo
 }
     
 void VNode::AddChild(VNode *child) {
   child->parent_ = this;
+  child->component_ = component_;
   child_list_.push_back(child);
+  child->DispatchAttachedToParent();
 }
     
 void VNode::InsertChild(VNode *child, int index) {
-    do {
-        child->parent_ = this;
-        if (index < child_list_.size()) {
-            child_list_.insert(child_list_.begin() + index, child);
-            break;
-        }
-        child_list_.push_back(child);
-        
-    } while (0);
+  if (!child) return;
+  child->parent_ = this;
+  if (index < child_list_.size()) {
+    child_list_.insert(child_list_.begin() + index, child);
+  } else {
+    child_list_.push_back(child);
+  }
+  child->DispatchAttachedToParent();
 }
 
 void VNode::RemoveChild(VNode *child) {
@@ -124,6 +126,7 @@ void VNode::RemoveChild(VNode *child) {
   auto it = child_list_.begin();
   for (; it != child_list_.end(); ++it) {
     if (*it == child) {
+      child->DispatchDetachedFromParent();
       VNode *&reference = *it;
       child_list_.erase(it);
       if (reference != nullptr) {

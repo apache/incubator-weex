@@ -111,6 +111,7 @@ class FuncState {
 
   inline int super_index() const {return super_index_;}
   inline void set_super_index(int super_index) {super_index_ = super_index;}
+  inline void set_name(const std::string& name) {name_ = name;}
 
  private:
   std::vector<Instruction> instructions_;
@@ -121,6 +122,7 @@ class FuncState {
   bool is_class_func_{false};
   ClassInstance *class_inst_{nullptr};
   int argc_{0};
+  std::string name_{""};
 };
     
 // TODO Each Func should contain a stack whose size is 256

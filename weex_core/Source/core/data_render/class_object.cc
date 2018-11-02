@@ -52,7 +52,7 @@ static Value keys(ExecState *exec_state) {
             std::vector<std::string> keys = GetTableKeys(ValueTo<Table>(value));
             Array *array = ValueTo<Array>(&ret);
             for (int i = 0; i < keys.size(); i++) {
-                SetArray(array, i, exec_state->string_table()->StringFromUTF8(keys[i]));
+                SetArray(array, i, Value(exec_state->string_table()->StringFromUTF8(keys[i])));
             }
         }
         

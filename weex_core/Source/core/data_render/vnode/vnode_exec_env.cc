@@ -93,7 +93,11 @@ static Value Merge(ExecState *exec_state) {
     }
     Value *lhs = exec_state->GetArgument(0);
     Value *rhs = exec_state->GetArgument(1);
-    if (!IsTable(lhs) && !IsTable(rhs)) {
+    if (IsTable(lhs) && IsNil(rhs)) {
+        return *lhs;
+    } else if (IsNil(lhs) && IsTable(rhs)) {
+        return *rhs;
+    } else if (!IsTable(lhs) && !IsTable(rhs)) {
         return Value();
     }
     Value new_value = exec_state->class_factory()->CreateTable();
@@ -241,71 +245,46 @@ static Value AppendUrlParam(ExecState *exec_state) {
 }
 
 // saveComponentDataAndProps(component, data, props);
-static Value SaveComponentDataAndProps(ExecState* exec_state) {
+static Value saveComponentPropsAndData(ExecState *exec_state) {
   VComponent *component = exec_state->GetArgument(0)->type == Value::Type::NIL ?
                     nullptr : reinterpret_cast<VComponent *>(exec_state->GetArgument(0)->cptr);
-  Value *data = exec_state->GetArgument(1);
-  Value *props = exec_state->GetArgument(2);
+  Value *props = exec_state->GetArgument(1);
+  Value *data = exec_state->GetArgument(2);
   if (component) {
-      component->set_data(ValueTo<Table>(data));
-      component->set_props(ValueTo<Table>(props));
+      component->SetData(data);
+      component->SetProps(props);
   }
   return Value();
 }
 
-// appendChildComponent(parent, child);
-static Value AppendChildComponent(ExecState* exec_state) {
-  VNode *parent = exec_state->GetArgument(0)->type == Value::Type::NIL ?
-                    nullptr : reinterpret_cast<VNode *>(exec_state->GetArgument(0)->cptr);
-  VNode *child = reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);
-  if (parent && child) {
-      static_cast<VComponent *>(parent)->AppendChildComponent(static_cast<VComponent *>(child));
+// setComponentRoot(component, node);
+static Value SetComponentRoot(ExecState* exec_state) {
+  VComponent *component = exec_state->GetArgument(0)->type == Value::Type::NIL ?
+                    nullptr : reinterpret_cast<VComponent *>(exec_state->GetArgument(0)->cptr);
+  VNode* node = exec_state->GetArgument(1)->type == Value::Type::NIL ?
+                nullptr : reinterpret_cast<VNode *>(exec_state->GetArgument(1)->cptr);
+  if (component && node) {
+      component->SetRootNode(node);
   }
   return Value();
 }
 
-// createComponent(template_id, "template_name", "tag_name", "id", ref);
+// createComponent(template_id, "template_name", func_name);
 static Value CreateComponent(ExecState* exec_state) {
   int template_id = 0;
-  if (exec_state->GetArgument(0)->type == Value::Type::NUMBER) {
+  if (exec_state->GetArgument(0)->type == Value::Type::INT) {
     template_id = static_cast<int>(exec_state->GetArgument(0)->i);
   }
   auto template_name = exec_state->GetArgument(1)->str;
-  Value* arg_node_id = exec_state->GetArgument(3);
-  std::string node_id;
-  if (IsString(arg_node_id)) {
-    node_id = CStringValue(arg_node_id);
-  } else if (IsInt(arg_node_id)) {
-    std::ostringstream os;
-    os << IntValue(arg_node_id);
-    node_id = "vn_" + os.str();
-  } else {
-    throw VMExecError("CreateElement only support int for string");
-  }
-  std::string tag_name = exec_state->GetArgument(2)->str->c_str();
-  std::string ref = "";
-  if (exec_state->GetArgumentCount() > 4 &&
-      exec_state->GetArgument(4)->type == Value::Type::STRING) {
-    ref = exec_state->GetArgument(4)->str->c_str();
-  }
-  LOGD("[VM][VNode][CreateDocument]: %s  %s\n", node_id.c_str(), tag_name.c_str());
-  VComponent* component = NULL;
-  if (tag_name == "root") {
-    component = new VComponent(exec_state, template_id, template_name->c_str(),
-                               "div", node_id, ref);
-    if (exec_state->context()->root() == nullptr) {
-      exec_state->context()->set_root(component);
-    }
-  } else {
-    component = new VComponent(exec_state, template_id, template_name->c_str(),
-                               tag_name, node_id, ref);
-  }
-  if (exec_state->context()->root() == nullptr) {
-    exec_state->context()->set_root(component);
-  }
+  auto func_name = exec_state->GetArgument(2)->str;
+  VComponent* component = new VComponent(
+      exec_state, template_id, template_name->c_str(), func_name->c_str());
   Value result;
   result.type = Value::Type::CPTR;
   result.cptr = component;
+  if (exec_state->context()->root() == nullptr) {
+    exec_state->context()->set_root(component);
+  }
   return result;
 }
     
@@ -569,8 +548,8 @@ void VNodeExecEnv::InitCFuncEnv(ExecState *state) {
     state->Register("createElement", CreateElement);
     state->Register("updateElement", UpdateElement);
     state->Register("createComponent", CreateComponent);
-    state->Register("saveComponentDataAndProps", SaveComponentDataAndProps);
-    state->Register("appendChildComponent", AppendChildComponent);
+    state->Register("saveComponentPropsAndData", saveComponentPropsAndData);
+    state->Register("setComponentRoot", SetComponentRoot);
     state->Register("appendChild", AppendChild);
     state->Register("encodeURIComponent", encodeURIComponent);
     state->Register("setAttr", SetAttr);
@@ -742,7 +721,7 @@ Value StringToValue(ExecState *exec_state,const std::string &str) {
         std::string err;
         json11::Json json = json11::Json::parse(str, err);
         if (!err.empty() || json.is_null()) {
-            ret = exec_state->string_table()->StringFromUTF8(str);
+            ret = Value(exec_state->string_table()->StringFromUTF8(str));
             break;
         }
         ret = JSONToValue(exec_state, json);
