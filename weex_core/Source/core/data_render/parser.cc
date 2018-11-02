@@ -33,6 +33,7 @@ namespace data_render {
 
 static const char kCreateComponentRecursively[] = "__createComponentRecursively";
 static const char kCreateBodyFunction[] = "main";
+static const char kAttrRepeatControl[] = "[[repeat]]";
 
 struct ASTParser final {
   /* State */
@@ -58,6 +59,14 @@ struct ASTParser final {
     } else {
       return std::atoi(json_template_id.string_value().c_str());
     }
+  }
+
+  inline void SetAttributeStatement(std::vector<Handle<Expression>> args,
+                                    Handle<BlockStatement>& block) {
+    Handle<Expression> set_attr_func_id = factory_->NewIdentifier("setAttr");
+    Handle<CallExpression> call_func =
+        factory_->NewCallExpression(set_attr_func_id, args);
+    block->PushExpression(call_func);
   }
 
     void AddAppendChildCall(json11::Json& json, Handle<Identifier>& parent_identifier,
@@ -580,6 +589,12 @@ struct ASTParser final {
       std::vector<Handle<Expression>> control_exprs;
       if (control.is_object()) {
         control_exprs = ParseControl(control);
+        if (control["repeat"].is_string()) {
+            SetAttributeStatement({child_identifier,
+                                   factory_->NewStringConstant(kAttrRepeatControl),
+                                   factory_->NewStringConstant("")},
+                                  stacks_[stacks_.size() - 1]);
+        }
       }
       json11::Json node_id = json["nodeId"];
       json11::Json tag_name = json["tagName"];
@@ -655,22 +670,12 @@ struct ASTParser final {
         for (auto it = items.begin(); it != items.end(); ++it) {
           const auto& key = it->first;
           const auto& value = it->second;
-          std::vector<Handle<Expression>> args;
-          args.push_back(child_identifier);
-          args.push_back(factory_->NewStringConstant(key));
-          if (value.is_string()) {
-            args.push_back(
-                factory_->NewStringConstant(value.string_value()));
-          } else {
-            args.push_back(ParseBindingExpression(value));
-          }
-
-          Handle<Expression> set_attr_func_id =
-              factory_->NewIdentifier("setAttr");
-          Handle<CallExpression> call_func =
-              factory_->NewCallExpression(set_attr_func_id, args);
-          Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
-          statement->PushExpression(call_func);
+          SetAttributeStatement(
+              {child_identifier, factory_->NewStringConstant(key),
+               value.is_string()
+                   ? factory_->NewStringConstant(value.string_value())
+                   : ParseBindingExpression(value)},
+              stacks_[stacks_.size() - 1]);
         }
       }
 

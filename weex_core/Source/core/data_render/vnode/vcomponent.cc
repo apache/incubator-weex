@@ -86,6 +86,40 @@ static bool Equals(Value a, Value b) {
   return true;
 }
 
+static void BuildRefsInner(
+    std::unordered_map<std::string, VComponent::VNodeRefs> &ref_map,
+    VNode *node, bool in_for_loop) {
+  if (!node->ref().empty()) {
+    VComponent::VNodeRef ref;
+    ref.insert({"ref", node->render_object_ref()});
+    auto it = ref_map.find(node->ref());
+    if (it != ref_map.end()) {
+      if (!in_for_loop) {
+        return;
+      }
+      it->second.push_back(ref);
+    } else {
+      VComponent::VNodeRefs refs;
+      refs.push_back(ref);
+      ref_map.insert({node->ref(), refs});
+    }
+  }
+  if (node->child_list()->size() > 0 && !node->IsVirtualComponent()) {
+    if (node->attributes()->find("[[repeat]]") != node->attributes()->end()) {
+      in_for_loop = true;
+    }
+    for (auto it = node->child_list()->begin(); it != node->child_list()->end();
+         it++) {
+      BuildRefsInner(ref_map, *it, in_for_loop);
+    }
+  }
+}
+
+void VComponent::BuildRefMap() {
+  ref_map_.clear();
+  BuildRefsInner(ref_map_, root_vnode(), false);
+}
+
 bool VComponent::Equal(VComponent *old_component) {
   VComponent *new_component = this;
   if (old_component == new_component) return true;
@@ -170,8 +204,10 @@ void VComponent::TravelVComponentsWithFunc(TravelTreeFunc func, VNode *root) {
 
 void VComponent::DispatchCreated() {
   if (has_dispatch_created_) return;
+  BuildRefMap();
   if (listener_) {
-    listener_->OnCreated(this, ValueTo<Table>(&data_), ValueTo<Table>(&props_));
+    listener_->OnCreated(this, ValueTo<Table>(&data_), ValueTo<Table>(&props_),
+                         ref_map_);
   }
   TravelVComponentsWithFunc(&VComponent::DispatchCreated, root_vnode());
   has_dispatch_created_ = true;
@@ -183,6 +219,7 @@ void VComponent::DispatchUpdated() {
     return;
   }
   if (!is_dirty_) return;
+  BuildRefMap();
   if (listener_) {
     listener_->OnUpdated(this, ValueTo<Table>(&updated_props_));
   }

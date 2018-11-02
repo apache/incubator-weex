@@ -28,11 +28,16 @@ namespace core {
 namespace data_render {
 class VComponent : public VNode {
  public:
+  typedef std::unordered_map<std::string, std::string> VNodeRef;
+  typedef std::vector<std::unordered_map<std::string, std::string>> VNodeRefs;
   class LifecycleListener {
    public:
-    virtual void OnCreated(VComponent* component, Table* data,
-                           Table* props) = 0;
+    virtual void OnCreated(
+        VComponent* component, Table* data, Table* props,
+        const std::unordered_map<std::string, VNodeRefs>& ref_map) = 0;
     virtual void OnUpdated(VComponent* component, Table* props) = 0;
+    virtual void OnEvent(VComponent* component, const std::string& func,
+                         Array* params) = 0;
     virtual void OnDestroyed(VComponent* component) = 0;
   };
   VComponent(ExecState* exec_state, int template_id, const std::string& name,
@@ -71,6 +76,7 @@ class VComponent : public VNode {
   typedef void (VComponent::*TravelTreeFunc)();
   void TravelVComponentsWithFunc(TravelTreeFunc func, VNode* root);
 
+  void BuildRefMap();
   bool Equal(VComponent* old_component);
   void DispatchAttachedToParent() override;
   void DispatchDetachedFromParent() override;
@@ -90,7 +96,7 @@ class VComponent : public VNode {
   Value props_;
   Value updated_props_;
   std::unique_ptr<LifecycleListener> listener_;
-  std::unordered_map<std::string, VNode*> refs_;
+  std::unordered_map<std::string, VNodeRefs> ref_map_;
   std::unique_ptr<VNode> old_root_vnode_;
   std::unique_ptr<VNode> root_vnode_;
   ExecState* exec_state_;

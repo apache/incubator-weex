@@ -31,9 +31,6 @@ namespace data_render {
 class VComponent;
 class Value;
 
-typedef std::function<void()> OnAttachedListener;
-typedef std::function<void()> OnDettachedListener;
-
 class VNode {
  public:
   VNode(const std::string &tag_name, const std::string &node_id,
