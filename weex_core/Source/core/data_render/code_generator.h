@@ -225,6 +225,7 @@ class CodeGenerator : public ASTVisitor {
         CodeGenerator *cg_;
         DISALLOW_COPY_AND_ASSIGN(ClassScope);
   };
+  void AddCallInstruction(long ret, OPCode code, std::vector<long> orders);
   void EnterClass(Value *class_value);
   void LeaveClass();
   void EnterFunction();

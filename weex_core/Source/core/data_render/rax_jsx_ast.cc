@@ -71,16 +71,16 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
         else if (is_class_) {
             std::string class_inst = vnode_ptr + "_inst";
             funcexprs_.push_back(factory->NewDeclaration(vnode_ptr));
-            Handle<ExpressionList> args = factory->NewExpressionList();
+            Handle<ExpressionList> argsList = factory->NewExpressionList();
             // call constructor
             if (props_) {
-                args->Insert(props_);
+                argsList->Insert(props_);
             }
             else {
                 ProxyObject proxy;
-                args->Insert(factory->NewObjectConstant(proxy));
+                argsList->Insert(factory->NewObjectConstant(proxy));
             }
-            funcexprs_.push_back(factory->NewDeclaration(class_inst, factory->NewNewExpression(identifier_, args)));
+            funcexprs_.push_back(factory->NewDeclaration(class_inst, factory->NewNewExpression(identifier_, argsList)));
             Handle<Expression> class_inst_expr = factory->NewIdentifier(class_inst);
             // if (vnode_ptr.xxxx) then vnode_ptr.xxxx()
             Handle<Expression> render_expr = factory->NewIdentifier("render");
@@ -111,19 +111,16 @@ std::vector<Handle<Expression>>& JSXNodeExpression::funcexprs() {
             // if isClass
             {
                 Handle<Expression> class_inst_expr = factory->NewIdentifier(class_inst);
-                Handle<Expression> new_expr = factory->NewNewExpression(identifier_);
-                new_expr->AsNewExpression()->set_is_class_(true);
-                if_then_stmts->Insert(factory->NewAssignExpression(class_inst_expr, new_expr));
-                // call constructor
-                args.clear();
+                Handle<ExpressionList> argsList = factory->NewExpressionList();
                 if (props_) {
-                    args.push_back(props_);
+                    argsList->Insert(props_);
                 }
                 else {
                     ProxyObject proxy;
-                    args.push_back(factory->NewObjectConstant(proxy));
+                    argsList->Insert(factory->NewObjectConstant(proxy));
                 }
-                if_then_stmts->Insert(factory->NewCallExpression(MemberAccessKind::kCall, class_inst_expr, factory->NewIdentifier("constructor"), args));
+                Handle<Expression> new_expr = factory->NewNewExpression(identifier_, argsList);
+                if_then_stmts->Insert(factory->NewAssignExpression(class_inst_expr, new_expr));
                 // if (vnode_ptr.xxxx) then vnode_ptr.xxxx()
                 Handle<Expression> render_expr = factory->NewIdentifier("render");
                 Handle<MemberExpression> member_func_expr = factory->NewMemberExpression(MemberAccessKind::kClass, class_inst_expr, render_expr);

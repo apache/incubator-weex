@@ -560,6 +560,24 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
               }
               break;
           }
+          case OP_CONSTRUCTOR:
+          {
+              a = frame.reg + GET_ARG_A(instruction);
+              int argc = (int)GET_ARG_B(instruction);
+              c = frame.reg + GET_ARG_C(instruction);
+              if (!IsClassInstance(a)) {
+                  throw VMExecError("only support class instance in [OP_CONSTRUCTOR]");
+                  break;
+              }
+              if (argc < 1) {
+                  throw VMExecError("constructor with no args in [OP_CONSTRUCTOR]");
+                  break;
+              }
+              if (FindConstructor(ValueTo<ClassInstance>(a), c, c + 1)) {
+                  exec_state->CallFunction(c, argc, a);
+              }
+              break;
+          }
         case OP_GETSUPER:
         {
             LOGTEMP("OP_GETSUPER A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
@@ -574,12 +592,14 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             if (!inst_super) {
                 throw VMExecError("Instance Can't Find Super With OP_CODE [OP_GETSUPER]");
             }
-            int index = inst_super->p_desc_->funcs_->IndexOf("constructor");
-            if (index < 0) {
-                throw VMExecError("Can't Find Super Constructor With OP_CODE [OP_GETSUPER]");
-            }
             SetCIValue(a, reinterpret_cast<GCObject *>(inst->p_super_));
-            *c = *inst_super->p_desc_->funcs_->Find(index);
+            int index = inst_super->p_desc_->funcs_->IndexOf("constructor");
+            if (index >= 0) {
+                *c = *inst_super->p_desc_->funcs_->Find(index);
+            }
+            else {
+                SetNil(c);
+            }
             break;
         }
         case OP_SETMEMBERVAR:

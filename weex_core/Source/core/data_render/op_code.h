@@ -38,6 +38,7 @@ T(OP_LOADNULL,       "OP_LOADNULL",       1)                                    
 T(OP_GETGLOBAL,      "OP_GETGLOBAL",      2)                                                    \
 T(OP_GETFUNC,        "OP_GETFUNC",        2)                                                    \
 T(OP_NEW,            "OP_NEW",            3)                                                    \
+T(OP_CONSTRUCTOR,    "OP_CONSTRUCTOR",    3)                                                    \
 T(OP_GETCLASS,       "OP_GETCLASS",       3)                                                    \
 T(OP_GETMEMBERVAR,   "OP_GETMEMBERVAR",   3)                                                    \
 T(OP_SETMEMBERVAR,   "OP_SETMEMBERVAR",   2)                                                    \

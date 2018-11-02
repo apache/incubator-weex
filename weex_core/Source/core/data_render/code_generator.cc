@@ -21,6 +21,7 @@
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/common_error.h"
+#include "core/data_render/class.h"
 
 namespace weex {
 namespace core {
@@ -202,14 +203,14 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
         caller_regs_order.push_back(caller);
     }
     else if (stms->expr().get()) {
-        if (class_ && stms->expr()->IsIdentifier() && stms->expr()->AsIdentifier()->GetName() == "super")
+        if (class_ && stms->expr()->IsIdentifier() && stms->expr()->AsIdentifier()->GetName() == JS_GLOBAL_SUPER)
         {
             ClassDescriptor *class_desc = ValueTo<ClassDescriptor>(class_->class_value());
             if (!class_desc->p_super_) {
                 throw GeneratorError("can't call super without class desc");
             }
             ClassDescriptor *class_desc_super = class_desc->p_super_;
-            int index = class_desc_super->funcs_->IndexOf("constructor");
+            int index = class_desc_super->funcs_->IndexOf(JS_GLOBAL_CONSTRUCTOR);
             if (index < 0) {
                 throw GeneratorError("can't call super without class desc");
             }
@@ -290,35 +291,40 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
         }
         argc += arg_list->length();
     }
-    FuncState *state = func_->func_state();
-    bool call_reorder = false;
-    int regs_count = (int)caller_regs_order.size();
+    AddCallInstruction(ret, OP_CALL, caller_regs_order);
+}
+    
+void CodeGenerator::AddCallInstruction(long ret, OPCode code, std::vector<long> orders) {
+    FuncState *func_state = func_->func_state();
+    bool reorder = false;
+    int regs_count =  static_cast<int>(orders.size());
     for (int i = 1; i < regs_count; i++) {
-        if (caller_regs_order[i] - caller_regs_order[i - 1] != 1) {
-            call_reorder = true;
+        if (orders[i] - orders[i - 1] != 1) {
+            reorder = true;
             break;
         }
     }
-    if (!call_reorder && regs_count > 0) {
-        call_reorder = caller_regs_order[regs_count - 1] + 1 >= block_->idx() ? false : true;
+    if (!reorder && regs_count > 0) {
+        reorder = orders[regs_count - 1] + 1 >= block_->idx() ? false : true;
     }
-    if (call_reorder) {
-        caller = block_->NextRegisterId();
-        func_state->AddInstruction(CREATE_ABx(OP_MOVE, caller, caller_regs_order[0]));
-        for (int i = 1; i < caller_regs_order.size(); i++) {
+    int argc = regs_count - 1;
+    if (reorder) {
+        long caller = block_->NextRegisterId();
+        func_state->AddInstruction(CREATE_ABx(OP_MOVE, caller, orders[0]));
+        for (int i = 1; i < orders.size(); i++) {
             long arg = block_->NextRegisterId();
-            func_state->AddInstruction(CREATE_ABx(OP_MOVE, arg, caller_regs_order[i]));
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, arg, orders[i]));
         }
-        state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
+        func_state->AddInstruction(CREATE_ABC(code, ret, argc, caller));
     }
     else {
-        state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
+        func_state->AddInstruction(CREATE_ABC(code, ret, argc, orders[0]));
     }
 }
 
-void CodeGenerator::Visit(ArgumentList* node, void* data) {
-  Handle<ExpressionList> exprList = node->args();
-  exprList->Accept(this, data);
+void CodeGenerator::Visit(ArgumentList *node, void *data) {
+    Handle<ExpressionList> exprList = node->args();
+    exprList->Accept(this, data);
 }
 
 void CodeGenerator::Visit(IfStatement *node, void *data) {
@@ -664,39 +670,39 @@ void CodeGenerator::Visit(NewExpression *node, void *data) {
         RegisterScope scope(block_);
         long lhs = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
         if (lhs >= 0) {
-            FuncState *state = func_->func_state();
+            FuncState *func_state = func_->func_state();
             long rhs = block_->FindRegisterId(node->name()->AsIdentifier()->GetName());
-            if (rhs >= 0) {
-                if (node->is_class()) {
-                    state->AddInstruction(CREATE_ABC(OP_NEW, lhs, Value::CLASS_DESC, rhs));
-                }
-                else {
-                    state->AddInstruction(CREATE_ABx(OP_MOVE, lhs, rhs));
-                }
-                break;
-            }
-            int index = exec_state_->global()->IndexOf(node->name()->AsIdentifier()->GetName());
-            if (index >= 0) {
-                Value *name = exec_state_->global()->Find(index);
-                if (IsClass(name)) {
-                    rhs = block_->NextRegisterId();
-                    state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, rhs, index));
-                    state->AddInstruction(CREATE_ABC(OP_NEW, lhs, Value::CLASS_DESC, rhs));
-                    // class must call constructor
-                    ClassDescriptor *class_descriptor = ValueTo<ClassDescriptor>(name);
-                    int class_constractor_func_index = class_descriptor->funcs_->IndexOf(JS_GLOBAL_CONSTRUCTOR);
-                    if (class_constractor_func_index >= 0) {
-                        long right = block_->NextRegisterId();
-                        auto value = exec_state_->string_table_->StringFromUTF8(JS_GLOBAL_CONSTRUCTOR);
-//                        int tableIndex = func_state->AddConstant(std::move(value));
-//                        func_state->AddInstruction(CREATE_ABx(OP_LOADK, right, tableIndex));
-
+            if (rhs < 0) {
+                int index = exec_state_->global()->IndexOf(node->name()->AsIdentifier()->GetName());
+                if (index >= 0) {
+                    Value *name = exec_state_->global()->Find(index);
+                    if (IsClass(name)) {
+                        rhs = block_->NextRegisterId();
+                        func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, rhs, index));
+                    }
+                    else {
+                        // function call
+                        func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, lhs, index));
+                        break;
                     }
                 }
                 else {
-                    state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, lhs, index));
+                    throw GeneratorError("can't find new identifier: " + node->name()->AsIdentifier()->GetName());
                 }
             }
+            func_state->AddInstruction(CREATE_ABC(OP_NEW, lhs, Value::CLASS_DESC, rhs));
+            long caller = block_->NextRegisterId();
+            long inst = block_->NextRegisterId();
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, inst, lhs));
+            std::vector<long> orders = { caller, inst };
+            if (node->args()->Size() > 0) {
+                for (int i = 0; i < node->args()->Size(); i++) {
+                    long arg = block_->NextRegisterId();
+                    orders.push_back(arg);
+                    node->args()->raw_list()[i]->Accept(this, &arg);
+                }
+            }
+            AddCallInstruction(lhs, OP_CONSTRUCTOR, orders);
         }
             
     } while (0);

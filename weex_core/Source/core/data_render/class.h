@@ -36,6 +36,8 @@ void AddClassStaticCFunc(ClassDescriptor *p_desc, const std::string& name, CFunc
 
 void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function);
 
+bool FindConstructor(ClassInstance *p_inst, Value *caller, Value *caller_inst);
+
 ClassInstance *NewClassInstance(ClassDescriptor *p_desc);
     
 Value *GetClassMember(ClassInstance *inst, const std::string &name);

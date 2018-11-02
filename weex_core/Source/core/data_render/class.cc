@@ -18,6 +18,7 @@
  */
 #include <algorithm>
 #include "core/data_render/class.h"
+#include "core/data_render/rax_jsx_ast.h"
 
 namespace weex {
 namespace core {
@@ -43,6 +44,21 @@ void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction f
 
 ClassInstance *NewClassInstance(ClassDescriptor *p_desc) {
     return new ClassInstance(p_desc);
+}
+    
+bool FindConstructor(ClassInstance *p_inst, Value *caller, Value *caller_inst) {
+    bool constructor = false;
+    while (p_inst) {
+        int index = p_inst->p_desc_->funcs_->IndexOf(JS_GLOBAL_CONSTRUCTOR);
+        if (index >= 0) {
+            *caller = *p_inst->p_desc_->funcs_->Find(index);
+            SetCIValue(caller_inst, reinterpret_cast<GCObject *>(p_inst));
+            constructor = true;
+            break;
+        }
+        p_inst = p_inst->p_super_;
+    }
+    return constructor;
 }
     
 Value *GetClassMember(ClassInstance *inst,const std::string &name) {
