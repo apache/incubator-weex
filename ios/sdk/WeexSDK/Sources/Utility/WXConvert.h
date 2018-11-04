@@ -82,6 +82,7 @@ typedef BOOL WXClipType;
 + (WXTextDecoration)WXTextDecoration:(id)value;
 + (NSTextAlignment)NSTextAlignment:(id)value;
 + (UIReturnKeyType)UIReturnKeyType:(id)value;
++ (UITextAutocapitalizationType)UITextAutocapitalizationType:(id)value;
 
 + (WXScrollDirection)WXScrollDirection:(id)value;
 + (UITableViewRowAnimation)UITableViewRowAnimation:(id)value;

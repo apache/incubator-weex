@@ -221,6 +221,10 @@ typedef UITextView WXTextAreaView;
     [self setNeedsLayout];
 }
 
+- (void)setAutocapitalizationType:(UITextAutocapitalizationType)type {
+    _textView.autocapitalizationType = type;
+}
+
 #pragma mark -Private Method
 - (void)_updateTextContentInset
 {
