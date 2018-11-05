@@ -53,7 +53,7 @@ ClassDescriptor *NewClassConsole() {
     return desc;
 }
     
-static std::stringstream loginfo2string(ExecState *exec_state, std::string level) {
+static std::string loginfo2string(ExecState *exec_state, std::string level) {
     size_t argc = exec_state->GetArgumentCount();
     std::stringstream stream;
     stream << "[";
@@ -96,36 +96,36 @@ static std::stringstream loginfo2string(ExecState *exec_state, std::string level
         }
     }
     stream << ",\"" <<  level << "\"" << "]";
-    return stream;
+    return stream.str();
 }
 
 static Value log(ExecState *exec_state) {
-    std::stringstream stream = loginfo2string(exec_state, WXLOG_LOG);
-    weex::core::data_render::VNodeRenderManager::GetInstance()->WXLogNative(exec_state, stream.str());
+    const std::string& stream = loginfo2string(exec_state, WXLOG_LOG);
+    weex::core::data_render::VNodeRenderManager::GetInstance()->WXLogNative(exec_state, stream);
     return Value();
 }
     
 static Value info(ExecState *exec_state) {
-    std::stringstream stream = loginfo2string(exec_state, WXLOG_INFO);
-    weex::core::data_render::VNodeRenderManager::GetInstance()->WXLogNative(exec_state, stream.str());
+    const std::string& stream = loginfo2string(exec_state, WXLOG_INFO);
+    weex::core::data_render::VNodeRenderManager::GetInstance()->WXLogNative(exec_state, stream);
     return Value();
 }
 
 static Value debug(ExecState *exec_state) {
-    std::stringstream stream = loginfo2string(exec_state, WXLOG_DEBUG);
-    weex::core::data_render::VNodeRenderManager::GetInstance()->WXLogNative(exec_state, stream.str());
+    const std::string& stream = loginfo2string(exec_state, WXLOG_DEBUG);
+    weex::core::data_render::VNodeRenderManager::GetInstance()->WXLogNative(exec_state, stream);
     return Value();
 }
 
 static Value warn(ExecState *exec_state) {
-    std::stringstream stream = loginfo2string(exec_state, WXLOG_WARN);
-    weex::core::data_render::VNodeRenderManager::GetInstance()->WXLogNative(exec_state, stream.str());
+    const std::string& stream = loginfo2string(exec_state, WXLOG_WARN);
+    weex::core::data_render::VNodeRenderManager::GetInstance()->WXLogNative(exec_state, stream);
     return Value();
 }
 
 static Value error(ExecState *exec_state) {
-    std::stringstream stream = loginfo2string(exec_state, WXLOG_ERROR);
-    weex::core::data_render::VNodeRenderManager::GetInstance()->WXLogNative(exec_state, stream.str());
+    const std::string& stream = loginfo2string(exec_state, WXLOG_ERROR);
+    weex::core::data_render::VNodeRenderManager::GetInstance()->WXLogNative(exec_state, stream);
     return Value();
 }
 

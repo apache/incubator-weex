@@ -2,24 +2,24 @@
 /* global __weex_data__, print, createElement */
 var a= /(a.)/g;
 var b = a.exec('abc,aac, ssa2, dda');
-log(b);
+console.log(b);
 
-log('aabccbddBc'.match(/(bss.)/g));
+console.log('aabccbddBc'.match(/(bss.)/g));
 
 var a = 3;
 
-log('start');
+console.log('start');
 switch(a){
     case 1:
-        log('switch 1');
+        console.log('switch 1');
         break;
     case 2:
-        log('switch 2');
+        console.log('switch 2');
         break;
     default:
-        log('default branch');
+        console.log('default branch');
 }
-log('end');
+console.log('end');
 
 class Component {
     constructor(props) {
@@ -67,7 +67,7 @@ const require = name => {
                 loop(methods[i]);
             }
         }
-        log("register",methods);
+        console.log("register",methods);
         return target;
     };
 
@@ -171,7 +171,7 @@ class TipTag extends Component {
         super(props);
     }
     _onClick = e => {
-        log("click go");
+        console.log("click go");
         let searchParams = {};
         if (this.props.data.q) {
             searchParams.q = this.props.data.q;
@@ -186,12 +186,12 @@ class TipTag extends Component {
         }
         if (this.props.tiptype && this.props.tiptype == 'voice_smarttips') {
             searchParams['voiceFrom'] = '1';
-            log("se go");
+            console.log("se go");
             searchEvent.searchOption("searchOption", {
                                      params: searchParams
                                      });
         } else {
-            log("se go2");
+            console.log("se go2");
             searchEvent.search("search", {
                                params: searchParams
                                });
