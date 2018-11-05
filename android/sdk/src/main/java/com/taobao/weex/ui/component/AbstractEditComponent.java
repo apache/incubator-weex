@@ -350,6 +350,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         public void onTextChanged(CharSequence s, int start, int before, int count) {
           if (mIgnoreNextOnInputEvent) {
             mIgnoreNextOnInputEvent = false;
+            mBeforeText = s.toString();
             return;
           }
 
