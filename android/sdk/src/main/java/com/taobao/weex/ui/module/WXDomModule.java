@@ -124,6 +124,9 @@ public final class WXDomModule extends WXModule {
           new UpdateComponentDataAction(mWXSDKInstance, args.getString(0), JSONUtils.toJSON(args.get(1)), args.getString(2)).executeAction();
           break;
         case BATCH_BEGIN: {
+          if(args == null){
+            return null;
+          }
           String ref = args.size() >= 1 ? args.getString(0) : null;
           new GraphicActionBatchBegin(mWXSDKInstance, ref).executeActionOnRender();
           break;
