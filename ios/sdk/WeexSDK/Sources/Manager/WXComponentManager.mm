@@ -717,7 +717,7 @@ static NSThread *WXComponentThread;
         }
     }
     
-    if ([component _isCaculatedFrameChanged:frame]) {
+    if ([component _isCalculatedFrameChanged:frame]) {
         [component _assignCalculatedFrame:frame];
         [component _assignInnerContentMainSize:innerMainSize];
         [component _frameDidCalculated:YES];
