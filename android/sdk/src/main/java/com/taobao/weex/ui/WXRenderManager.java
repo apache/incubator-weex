@@ -50,7 +50,7 @@ public class WXRenderManager {
   private volatile ConcurrentHashMap<String, RenderContextImpl> mRenderContext;
   private WXRenderHandler mWXRenderHandler;
   private ArrayList<Map<String,Object>> mBatchActions = new ArrayList<>();
-  private final int MAX_DROP_FRAME_NATIVE_BATCH = 200;
+  private final int MAX_DROP_FRAME_NATIVE_BATCH = 2000;
   private final static  String sKeyAction = "Action";
   private static int nativeBatchTimes = 0;
 
