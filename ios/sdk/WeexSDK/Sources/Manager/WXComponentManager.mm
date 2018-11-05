@@ -44,7 +44,7 @@
 static NSThread *WXComponentThread;
 
 #define WXAssertComponentExist(component)  WXAssert(component, @"component not exists")
-
+#define MAX_DROP_FRAME_FOR_BATCH   200
 
 @implementation WXComponentManager
 {
@@ -64,6 +64,7 @@ static NSThread *WXComponentThread;
 
     pthread_mutex_t _propertyMutex;
     pthread_mutexattr_t _propertMutexAttr;
+    NSUInteger _syncUITaskCount;
 }
 
 + (instancetype)sharedManager
@@ -80,7 +81,7 @@ static NSThread *WXComponentThread;
 {
     if (self = [self init]) {
         _weexInstance = weexInstance;
-        
+        _syncUITaskCount = 0;
         _indexDict = [NSMapTable strongToWeakObjectsMapTable];
         _fixedComponents = [NSMutableArray wx_mutableArrayUsingWeakReferences];
         _uiTaskQueue = [NSMutableArray array];
@@ -991,13 +992,42 @@ static NSThread *WXComponentThread;
 
 - (void)_syncUITasks
 {
-    NSArray<dispatch_block_t> *blocks = _uiTaskQueue;
-    _uiTaskQueue = [NSMutableArray array];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        for(dispatch_block_t block in blocks) {
-            block();
+    NSInteger mismatchBeginIndex = _uiTaskQueue.count;
+    for (NSInteger i = _uiTaskQueue.count - 1;i >= 0;i --) {
+        if (_uiTaskQueue[i] == WXPerformUITaskBatchEndBlock) {
+            _syncUITaskCount = 0;
+            // clear when find the matches for end and begin tag
+            break;
         }
-    });
+        if (_uiTaskQueue[i] == WXPerformUITaskBatchBeginBlock) {
+            mismatchBeginIndex = i;
+            break;
+        }
+    }
+    
+    if (mismatchBeginIndex == _uiTaskQueue.count) {
+        // here we get end tag or there are not begin and end directives
+    } else {
+        _syncUITaskCount ++;
+        // we only find begin tag but missing end tag,
+        if (_syncUITaskCount > (MAX_DROP_FRAME_FOR_BATCH)) {
+            // when the wait times come to MAX_DROP_FRAME_FOR_BATCH, we will pop all the stashed operations for user experience.
+            mismatchBeginIndex = _uiTaskQueue.count;
+            _syncUITaskCount = 0;
+        }
+    }
+    
+    if (mismatchBeginIndex > 0) {
+        NSArray<dispatch_block_t> *blocks = [_uiTaskQueue subarrayWithRange:NSMakeRange(0, mismatchBeginIndex)];
+        [_uiTaskQueue removeObjectsInRange:NSMakeRange(0, mismatchBeginIndex)];
+        if (blocks.count) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                for(dispatch_block_t block in blocks) {
+                    block();
+                }
+            });
+        }
+    }
 }
 
 #pragma mark Fixed 
@@ -1049,6 +1079,27 @@ static NSThread *WXComponentThread;
             break;
         }
     }
+}
+
+static void (^WXPerformUITaskBatchBeginBlock)(void) = ^ () {
+#if DEBUG
+    WXLogDebug(@"directive BatchBeginBlock");
+#endif
+};
+static void (^WXPerformUITaskBatchEndBlock)(void) = ^ () {
+#if DEBUG
+    WXLogDebug(@"directive BatchEndBlock");
+#endif
+};
+
+- (void)performBatchBegin
+{
+    [self _addUITask:WXPerformUITaskBatchBeginBlock];
+}
+
+- (void)performBatchEnd
+{
+    [self _addUITask:WXPerformUITaskBatchEndBlock];
 }
 
 - (void)handleDisplayLink {
