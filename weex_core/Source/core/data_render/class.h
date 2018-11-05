@@ -41,8 +41,9 @@ bool FindConstructor(ClassInstance *p_inst, Value *caller, Value *caller_inst);
 ClassInstance *NewClassInstance(ClassDescriptor *p_desc);
     
 Value *GetClassMember(ClassInstance *inst, const std::string &name);
-Value *GetClassMemberVar(ClassInstance *inst,const std::string &name);
-
+Value *GetClassMemberVar(ClassInstance *inst, const std::string &name);
+Value *GetClassStaticMemberVar(ClassDescriptor *desc, const std::string &name);
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

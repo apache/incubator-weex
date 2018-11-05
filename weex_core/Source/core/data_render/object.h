@@ -245,9 +245,9 @@ struct ClassDescriptor;
 typedef struct ClassDescriptor {
     CommonHeader;
     ClassDescriptor *p_super_{nullptr};
-    std::unique_ptr<Variables> static_funcs_;
+    std::unique_ptr<Variables> statics_;
     std::unique_ptr<Variables> funcs_;
-    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), static_funcs_(new Variables) {}
+    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), statics_(new Variables) {}
 } ClassDescriptor;
 
 typedef struct ClassInstance {

@@ -135,6 +135,7 @@ namespace data_render {
   K(EXTENDS, "extends", 0)                                         \
   K(SUPER, "super", 0)                                             \
   K(LET, "let", 0)                                                 \
+  K(STATIC, "static", 0)                                                 \
                                                                    \
   T(EOS, "EOS", 0)                                                 \
   T(INTEGER, "INTEGER", 0)                                         \

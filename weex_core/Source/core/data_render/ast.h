@@ -102,6 +102,7 @@ namespace data_render {
   M(NewExpression)        \
   M(ArrowFunctionStatement) \
   M(ClassBody)              \
+  M(ClassProperty)          \
   M(ExpressionList)
 
 class ASTVisitor;
@@ -120,7 +121,7 @@ enum class ASTNodeType {
       kNrType
 };
 
-extern const char* type_as_string[(int)ASTNodeType::kNrType];
+extern const char *type_as_string[(int)ASTNodeType::kNrType];
 
 class Expression : public RefCountObject {
  protected:
@@ -646,6 +647,22 @@ public:
 private:
     Handle<ExpressionList> exprs_;
 };
+    
+class ClassProperty : public Expression {
+public:
+    ClassProperty(Position &loc, Scope *scope, std::string name, Handle<Expression> init)
+    : Expression(loc, scope), name_(name), init_{init} { }
+    inline void set_is_static(bool is_static) { is_static_ = is_static; }
+    inline bool is_static() { return is_static_; }
+    inline std::string &name() { return name_; }
+    inline Handle<Expression>& init() { return init_; }
+    DEFINE_NODE_TYPE(ClassProperty, Expression);
+private:
+    std::string name_;
+    Handle<Expression> init_;
+    bool is_static_{false};
+};
+
 
 }  // namespace data_render
 }  // namespace core

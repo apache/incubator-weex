@@ -111,6 +111,8 @@ public:
     virtual Handle<Expression> NewArrowFunctionStatement(Position &loc, Scope *scope, Handle<Expression> body, std::vector<Handle<Expression>> args);
     virtual Handle<Expression> NewJSXNodeExpression(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens);
     virtual Handle<Expression> NewClassStatement(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body);
+    virtual Handle<Expression> NewClassProperty(Position &loc, Scope *scope, std::string name, Handle<Expression> init = nullptr);
+
 };
 
 }  // namespace data_render

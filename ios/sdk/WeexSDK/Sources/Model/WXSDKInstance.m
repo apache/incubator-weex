@@ -53,6 +53,8 @@
 #import "WXPageEventNotifyEvent.h"
 #import "WXCoreBridge.h"
 
+#define WEEX_LITE_URL_SUFFIX           @"wlasm"
+
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
 NSTimeInterval JSLibInitTime = 0;
@@ -244,7 +246,9 @@ typedef enum : NSUInteger {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
     }
-  
+    if ([url.absoluteString hasSuffix:WEEX_LITE_URL_SUFFIX]) {
+        _defaultDataRender = YES;
+    }
     _scriptURL = url;
     [self _checkPageName];
     [self.apmInstance startRecord:self.instanceId];
@@ -542,7 +546,7 @@ typedef enum : NSUInteger {
             return;
         }
         
-        if ([options[@"DATA_RENDER"] boolValue] && [options[@"RENDER_WITH_BINARY"] boolValue]) {
+        if (strongSelf.dataRender) {
             [strongSelf _renderWithData:data];
             return;
         }
@@ -785,7 +789,7 @@ typedef enum : NSUInteger {
 
 - (BOOL)dataRender
 {
-    if ([_options[@"DATA_RENDER"] boolValue]) {
+    if ([_options[@"DATA_RENDER"] boolValue] || [_options[@"RENDER_WITH_BINARY"] boolValue]) {
         return YES;
     }
     return _defaultDataRender;

@@ -103,7 +103,7 @@ public:
     Handle<Declaration> ParseDeclaration();
     Handle<Expression> ParseClassStatement();
     Handle<Expression> ParseClassBody(std::string &clsname);
-    Handle<Expression> ParseClassMethodStatement(std::string &clsname);
+    Handle<Expression> ParseClassMemberStatement(std::string &clsname);
     Handle<Expression> ParseJSXNodeProperty();
 private:
     const std::string& GetIdentifierName();

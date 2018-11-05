@@ -829,14 +829,14 @@ uint32_t SectionString::size() {
         // import decs string to table
         for (int i = class_compile_index; i < descs.size(); i++) {
             ClassDescriptor *desc = descs[i];
-            uint32_t static_func_size = static_cast<uint32_t>(desc->static_funcs_->size());
+            uint32_t static_func_size = static_cast<uint32_t>(desc->statics_->size());
             if (static_func_size > 0) {
                 for (int j = 0; j < static_func_size; j++) {
-                    Value *func = desc->static_funcs_->Find(j);
+                    Value *func = desc->statics_->Find(j);
                     if (!func) {
                         continue;
                     }
-                    for (auto &item : desc->static_funcs_->map()) {
+                    for (auto &item : desc->statics_->map()) {
                         if (item.second == j) {
                             string_table->StringFromUTF8(item.first);
                             break;
@@ -2313,19 +2313,19 @@ uint32_t SectionClass::size() {
             if (desc->p_super_) {
                 size += GetFTLVLength(kValueClassSuper, sizeof(int32_t));
             }
-            uint32_t static_func_size = static_cast<uint32_t>(desc->static_funcs_->size());
+            uint32_t static_func_size = static_cast<uint32_t>(desc->statics_->size());
             if (static_func_size > 0) {
                 size += GetFTLVLength(kValueClassStaticFunctionSize, sizeof(uint32_t));
                 uint32_t static_func_length = 0;
                 for (int j = 0; j < static_func_size; j++) {
-                    Value *func = desc->static_funcs_->Find(j);
+                    Value *func = desc->statics_->Find(j);
                     if (!func) {
                         throw EncoderError("can't find class static funcs error");
                         break;
                     }
                     static_func_length += GetValueLength(func);
                     static_func_length += GetFTLVLength(kValueClassFunctionKey, sizeof(uint8_t));
-                    for (auto &item : desc->static_funcs_->map()) {
+                    for (auto &item : desc->statics_->map()) {
                         if (item.second == j) {
                             Value key(string_table->StringFromUTF8(item.first));
                             static_func_length += GetValueLength(&key);
@@ -2397,7 +2397,7 @@ bool SectionClass::encoding() {
                 }
                 LOGD("encoding class super index:%i\n", super_index);
             }
-            uint32_t static_func_size = static_cast<uint32_t>(desc->static_funcs_->size());
+            uint32_t static_func_size = static_cast<uint32_t>(desc->statics_->size());
             if (static_func_size > 0) {
                 if (!Section::encoding(kValueClassStaticFunctionSize, sizeof(uint32_t), &static_func_size)) {
                     break;
@@ -2405,10 +2405,10 @@ bool SectionClass::encoding() {
                 LOGD("encoding class static function size:%d\n", static_func_size);
                 uint32_t static_func_length = 0;
                 for (int j = 0; j < static_func_size; j++) {
-                    Value *func = desc->static_funcs_->Find(j);
+                    Value *func = desc->statics_->Find(j);
                     static_func_length += GetValueLength(func);
                     static_func_length += GetFTLVLength(kValueClassFunctionKey, sizeof(uint8_t));
-                    for (auto &item : desc->static_funcs_->map()) {
+                    for (auto &item : desc->statics_->map()) {
                         if (item.second == j) {
                             Value key(string_table->StringFromUTF8(item.first));
                             static_func_length += GetValueLength(&key);
@@ -2424,7 +2424,7 @@ bool SectionClass::encoding() {
                 uint8_t *write_buffer = buffer;
                 uint32_t remain_length = static_func_length;
                 for (int j = 0; j < static_func_size; j++) {
-                    Value *func = desc->static_funcs_->Find(j);
+                    Value *func = desc->statics_->Find(j);
                     uint32_t length = GetValueLength(func);
                     uint32_t bytes_write = Section::encodingValueToBuffer(write_buffer, remain_length, func);
                     if (bytes_write != length) {
@@ -2435,7 +2435,7 @@ bool SectionClass::encoding() {
                     remain_length -= bytes_write;
                     uint8_t has_key_value = false;
                     Value key;
-                    for (auto &item : desc->static_funcs_->map()) {
+                    for (auto &item : desc->statics_->map()) {
                         if (item.second == j) {
                             LOGD("encoding class static function key:%s\n", item.first.c_str());
                             key = Value(string_table->StringFromUTF8(item.first));
@@ -2650,10 +2650,10 @@ bool SectionClass::decoding() {
                                     throw DecoderError("decoding class static func key error");
                                     break;
                                 }
-                                desc->static_funcs_->Add(key.str->c_str(), func);
+                                desc->statics_->Add(key.str->c_str(), func);
                             }
                             else {
-                                desc->static_funcs_->Add(func);
+                                desc->statics_->Add(func);
                             }
                         }
                         free(buffer);

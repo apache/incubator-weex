@@ -1202,7 +1202,7 @@ Handle<Expression> RAXParser::ParseClassBody(std::string &clsname) {
     Handle<ClassBody> clsbody = builder()->NewClassBody();
     EXPECT(Token::LBRACE);
     while (true) {
-        auto one = ParseClassMethodStatement(clsname);
+        auto one = ParseClassMemberStatement(clsname);
         clsbody->Insert(one);
         auto tok = Peek();
         if (tok == Token::SEMICOLON) {
@@ -1217,8 +1217,14 @@ Handle<Expression> RAXParser::ParseClassBody(std::string &clsname) {
     return clsbody;
 }
     
-Handle<Expression> RAXParser::ParseClassMethodStatement(std::string &clsname) {
+Handle<Expression> RAXParser::ParseClassMemberStatement(std::string &clsname) {
     auto tok = Peek();
+    bool is_static = false;
+    if (tok == Token::STATIC) {
+        is_static = true;
+        Advance();
+        tok = Peek();
+    }
     if (tok != Token::IDENTIFIER) {
         throw SyntaxError(lex()->CurrentToken(), "expected a method identifier name");
     }
@@ -1227,9 +1233,16 @@ Handle<Expression> RAXParser::ParseClassMethodStatement(std::string &clsname) {
     tok = Peek();
     if (tok == Token::ASSIGN) {
         Advance();
-        Handle<Expression> arrow_function = ParseAssignExpression();
-        arrow_function->AsArrowFunctionStatement()->name() = identifier;
-        return arrow_function;
+        Handle<Expression> expr = ParseAssignExpression();
+        if (expr->IsArrowFunctionStatement()) {
+            expr->AsArrowFunctionStatement()->name() = identifier;
+            return expr;
+        }
+        else {
+            Handle<ClassProperty> props = builder()->NewClassProperty(identifier, expr);
+            props->set_is_static(is_static);
+            return props;
+        }
     }
     else {
         auto args = ParseParameterList();

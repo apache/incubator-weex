@@ -691,23 +691,18 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 }
             }
             else if (IsString(b)) {
-                if (var_name == "length") {
-                    //*a = GetStringLength(ValueTo<Array>(b));
+                int index = exec_state->global()->IndexOf("String");
+                if (index < 0) {
+                    throw VMExecError("Can't Find String Class With OP_CODE OP_GETMEMBER");
                 }
-                else {
-                    int index = exec_state->global()->IndexOf("String");
-                    if (index < 0) {
-                        throw VMExecError("Can't Find String Class With OP_CODE OP_GETMEMBER");
-                    }
-                    Value *class_desc = exec_state->global()->Find(index);
-                    Variables *funcs = ValueTo<ClassDescriptor>(class_desc)->funcs_.get();
-                    index = funcs->IndexOf(var_name);
-                    if (index < 0) {
-                        throw VMExecError("Can't Find String Func " + var_name + " With OP_CODE [OP_GETMEMBER]");
-                    }
-                    Value *func = funcs->Find(index);
-                    *a = *func;
+                Value *class_desc = exec_state->global()->Find(index);
+                Variables *funcs = ValueTo<ClassDescriptor>(class_desc)->funcs_.get();
+                index = funcs->IndexOf(var_name);
+                if (index < 0) {
+                    throw VMExecError("Can't Find String Func " + var_name + " With OP_CODE [OP_GETMEMBER]");
                 }
+                Value *func = funcs->Find(index);
+                *a = *func;
             }
             else if (IsTable(b)) {
                 if (op == OP_GETMEMBER) {
@@ -728,13 +723,20 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             }
             else {
                 // only can find class static funcs;
-                Variables *funcs = ValueTo<ClassDescriptor>(b)->static_funcs_.get();
-                int index = funcs->IndexOf(var_name);
+                Variables *statics = ValueTo<ClassDescriptor>(b)->statics_.get();
+                int index = statics->IndexOf(var_name);
                 if (index < 0) {
-                    throw VMExecError("Can't Find Static Func " + var_name + " With OP_CODE [OP_GETMEMBER]");
+                    if (op == OP_GETMEMBER) {
+                        throw VMExecError("Can't Find Static Func " + var_name + " With OP_CODE [OP_GETMEMBER]");
+                        break;
+                    }
+                    Value *ret = GetClassStaticMemberVar(ValueTo<ClassDescriptor>(b), var_name);
+                    SetValueRef(a, ret);
                 }
-                Value *func = funcs->Find(index);
-                *a = *func;
+                else {
+                    Value *svar = statics->Find(index);
+                    *a = *svar;
+                }
             }
             break;
         }

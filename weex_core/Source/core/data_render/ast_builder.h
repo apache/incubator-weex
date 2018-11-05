@@ -115,7 +115,9 @@ public:
     Handle<Expression> NewContinueStatement(Handle<Expression> label = nullptr);
     Handle<Expression> NewArrowFunctionStatement(Handle<Expression> body, std::vector<Handle<Expression>> args);
     Handle<Expression> NewJSXNodeExpression(Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens);
-    Handle<Expression> NewClassStatement(Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body);
+    Handle<Expression> NewClassStatement(Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body);    
+    Handle<Expression> NewClassProperty(std::string name, Handle<Expression> init = nullptr);
+    
     Handle<ClassBody> NewClassBody();
 
     ASTFactory *factory() { return factory_; }

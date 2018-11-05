@@ -376,6 +376,11 @@ Handle<Expression> ASTFactory::NewSwitchStatement(Position& loc,
   return MakeHandle<SwitchStatement>(test_case,cases);
 }
 
+Handle<Expression> ASTFactory::NewClassProperty(Position &loc, Scope *scope, std::string name, Handle<Expression> init)
+{
+    return MakeHandle<ClassProperty>(loc, scope, name, init);
+}
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

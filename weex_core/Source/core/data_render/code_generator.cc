@@ -654,6 +654,7 @@ void CodeGenerator::Visit(ClassStatement *node, void *data) {
         class_value = exec_state_->class_factory()->CreateClassDescriptor(super_value ? ValueTo<ClassDescriptor>(super_value) : nullptr);
         exec_state_->global()->Add(class_name, class_value);
         ClassScope scope(this, &class_value);
+        class_->class_name() = class_name;
         node->Body()->Accept(this, nullptr);
         
     } while (0);
@@ -1153,6 +1154,36 @@ void CodeGenerator::Visit(ArrayConstant *node, void *data) {
             func_state->AddInstruction(i);
         }
     }
+}
+    
+void CodeGenerator::Visit(ClassProperty *node, void *data) {
+    RegisterScope scope(block_);
+    assert(class_);
+    do {
+        FuncState *func_state = func_->func_state();
+        if (node->is_static()) {
+            long lhs = block_->NextRegisterId();
+            long rhs = block_->NextRegisterId();
+            int index = exec_state_->global()->IndexOf(class_->class_name());
+            if (index <= 0) {
+                throw GeneratorError("can't find class name " + class_->class_name());
+                break;
+            }
+            func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, lhs, index));
+            auto constant = exec_state_->string_table_->StringFromUTF8(node->name());
+            index = func_state->AddConstant(std::move(constant));
+            func_state->AddInstruction(CREATE_ABx(OP_LOADK, rhs, index));
+            func_state->AddInstruction(CREATE_ABC(OP_GETMEMBERVAR, lhs, lhs, rhs));
+            if (node->init()) {
+                node->init()->Accept(this, &rhs);
+                func_state->AddInstruction(CREATE_ABx(OP_MOVE, lhs, rhs));
+            }
+            else {
+                func_state->AddInstruction(CREATE_Ax(OP_LOADNULL, lhs));
+            }
+        }
+        
+    } while (0);
 }
 
 void CodeGenerator::Visit(MemberExpression *node, void *data) {

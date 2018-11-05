@@ -75,9 +75,9 @@ class CodeGenerator : public ASTVisitor {
   void Visit(NewExpression *node, void *data) override;
   void Visit(PostfixExpression *node, void *data) override;
   void Visit(ContinueStatement *node, void *data) override;
-
   void Visit(SwitchStatement *node, void *data) override;
   void Visit(BreakStatement *node, void *data) override;
+  void Visit(ClassProperty *node, void *data) override;
 
  private:
   template <class T>
@@ -176,14 +176,16 @@ class CodeGenerator : public ASTVisitor {
 
   class ClassCnt : public Node<ClassCnt> {
     public:
-        ClassCnt() {}
-        ~ClassCnt() {}
-        inline void set_class_value(Value *class_value) {
-            class_value_ = class_value;
-        }
-        inline Value *class_value() { return class_value_; }
+      ClassCnt() {}
+      ~ClassCnt() {}
+      inline void set_class_value(Value *class_value) {
+          class_value_ = class_value;
+      }
+      inline Value *class_value() { return class_value_; }
+      inline std::string &class_name() { return class_name_; }
     private:
       Value *class_value_;
+      std::string class_name_;
   };
   class RegisterScope {
    public:

@@ -266,6 +266,11 @@ Handle<Expression> ASTBuilder::NewClassStatement(Handle<Expression> identifier, 
     COUNT();
     return save(factory()->NewClassStatement(locator()->location(), manager()->current(), identifier, superClass, body));
 }
+    
+Handle<Expression> ASTBuilder::NewClassProperty(std::string name, Handle<Expression> init) {
+    COUNT();
+    return save(factory()->NewClassProperty(locator()->location(), manager()->current(), name, init));
+}
 
 Handle<Expression> ASTBuilder::NewCaseStatement(Handle<Expression> test_case,Handle<ExpressionList> expr) {
     COUNT();

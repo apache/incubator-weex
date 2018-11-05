@@ -32,7 +32,7 @@ void AddClassStaticCFunc(ClassDescriptor *p_desc, const std::string& name, CFunc
     Value func;
     func.type = Value::Type::CFUNC;
     func.cf = reinterpret_cast<void *>(function);
-    p_desc->static_funcs_->Add(name, func);
+    p_desc->statics_->Add(name, func);
 }
 
 void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function) {
@@ -110,6 +110,25 @@ Value *GetClassMemberVar(ClassInstance *inst,const std::string &name) {
         }
         else {
             ret = funcs->Find(index);
+        }
+        
+    } while (0);
+    
+    return ret;
+}
+    
+Value *GetClassStaticMemberVar(ClassDescriptor *desc, const std::string &name) {
+    Value *ret = nullptr;
+    do {
+        Variables *static_vars = desc->statics_.get();
+        int index = static_vars->IndexOf(name);
+        if (index < 0) {
+            Value var;
+            index = static_vars->Add(name, var);
+            ret = static_vars->Find(index);
+        }
+        else {
+            ret = static_vars->Find(index);
         }
         
     } while (0);
