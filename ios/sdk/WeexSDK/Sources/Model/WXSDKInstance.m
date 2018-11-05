@@ -789,7 +789,7 @@ typedef enum : NSUInteger {
 
 - (BOOL)dataRender
 {
-    if ([_options[@"WL_RENDER"] boolValue]) {
+    if ([_options[@"WLASM_RENDER"] boolValue]) {
         return YES;
     }
     return _defaultDataRender;
