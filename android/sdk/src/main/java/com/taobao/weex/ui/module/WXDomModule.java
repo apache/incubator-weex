@@ -27,6 +27,8 @@ import com.taobao.weex.dom.binding.JSONUtils;
 import com.taobao.weex.ui.action.ActionAddRule;
 import com.taobao.weex.ui.action.ActionGetComponentRect;
 import com.taobao.weex.ui.action.ActionInvokeMethod;
+import com.taobao.weex.ui.action.GraphicActionBatchBegin;
+import com.taobao.weex.ui.action.GraphicActionBatchEnd;
 import com.taobao.weex.ui.action.GraphicActionScrollToElement;
 import com.taobao.weex.ui.action.UpdateComponentDataAction;
 import com.taobao.weex.utils.WXLogUtils;
@@ -50,11 +52,14 @@ public final class WXDomModule extends WXModule {
 
   public static final String UPDATE_COMPONENT_DATA = "updateComponentData";
 
+  public static final String BATCH_BEGIN = "beginBatchMark";
+  public static final String BATCH_END = "endBatchMark";
+
   /**
    * Methods expose to js. Every method which will be called in js should add to this array.
    */
   public static final String[] METHODS = {SCROLL_TO_ELEMENT, ADD_RULE, GET_COMPONENT_RECT,
-      INVOKE_METHOD};
+      INVOKE_METHOD, BATCH_BEGIN, BATCH_END};
 
   public WXDomModule(WXSDKInstance instance){
     mWXSDKInstance = instance;
@@ -118,6 +123,19 @@ public final class WXDomModule extends WXModule {
           }
           new UpdateComponentDataAction(mWXSDKInstance, args.getString(0), JSONUtils.toJSON(args.get(1)), args.getString(2)).executeAction();
           break;
+        case BATCH_BEGIN: {
+          if(args == null){
+            return null;
+          }
+          String ref = args.size() >= 1 ? args.getString(0) : null;
+          new GraphicActionBatchBegin(mWXSDKInstance, ref).executeActionOnRender();
+          break;
+        }
+        case BATCH_END: {
+          String ref = args.size() >= 1 ? args.getString(0) : null;
+          new GraphicActionBatchEnd(mWXSDKInstance, ref).executeActionOnRender();
+          break;
+        }
         default:
           WXLogUtils.e("Unknown dom action.");
           break;
