@@ -82,7 +82,7 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, strong) NSDictionary* containerInfo;
 
 /**
- * Whether this instance is rendered or not. Please MUST not render an instance twice.
+ * Whether this instance is rendered or not. Please MUST not render an instance twice even if you have called destroyInstance.
  **/
 @property (nonatomic, assign, readonly) BOOL isRendered;
 
@@ -276,7 +276,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 - (void)refreshInstance:(id)data;
 
 /**
- * Destroys current instance.
+ * Destroys current instance. An instance destroyed should not be used for rendering again, please create another instance.
  **/
 - (void)destroyInstance;
 

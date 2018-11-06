@@ -31,12 +31,13 @@
 #import "WXTracingManager.h"
 #import "WXMonitor.h"
 #import "WXSDKInstance_performance.h"
+#import "WXThreadSafeMutableArray.h"
 
 @interface WXBridgeManager ()
 
-@property (nonatomic, strong) WXBridgeContext   *bridgeCtx;
-@property (nonatomic, assign) BOOL  stopRunning;
-@property (nonatomic, strong) NSMutableArray *instanceIdStack;
+@property (nonatomic, assign) BOOL stopRunning;
+@property (nonatomic, strong) WXBridgeContext *bridgeCtx;
+@property (nonatomic, strong) WXThreadSafeMutableArray *instanceIdStack;
 
 @end
 
@@ -202,26 +203,24 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
 }
 
 
-- (NSMutableArray *)instanceIdStack
+- (WXThreadSafeMutableArray *)instanceIdStack
 {
     if (_instanceIdStack) return _instanceIdStack;
     
-    _instanceIdStack = [NSMutableArray array];
+    _instanceIdStack = [[WXThreadSafeMutableArray alloc] init];
     
     return _instanceIdStack;
 }
 
 - (NSArray *)getInstanceIdStack;
 {
-    return self.instanceIdStack;
+    return [self.instanceIdStack copy];
 }
 
 - (void)destroyInstance:(NSString *)instance
 {
     if (!instance) return;
-    if([self.instanceIdStack containsObject:instance]){
-        [self.instanceIdStack removeObject:instance];
-    }
+    [self.instanceIdStack removeObject:instance];
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){

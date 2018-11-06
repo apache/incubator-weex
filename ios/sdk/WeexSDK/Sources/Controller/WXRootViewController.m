@@ -19,14 +19,13 @@
 
 #import "WXRootViewController.h"
 #import "WXBaseViewController.h"
-#import "WXThreadSafeMutableArray.h"
 #import "WXDefine.h"
 
 typedef void(^OperationBlock)(void);
 
 @interface WXRootViewController() <UIGestureRecognizerDelegate>
 
-@property(nonatomic, strong) WXThreadSafeMutableArray *operationArray;
+@property (nonatomic, strong) NSMutableArray *operationArray;
 @property (nonatomic, assign) BOOL operationInProcess;
 
 @end
@@ -131,11 +130,10 @@ typedef void(^OperationBlock)(void);
     return YES;
 }
 
-- (NSMutableArray *)pendingBlocks
+- (NSMutableArray *)operationArray
 {
-    
     if (nil == _operationArray) {
-        _operationArray = [[WXThreadSafeMutableArray alloc] init];
+        _operationArray = [[NSMutableArray alloc] init];
     }
     
     return _operationArray;

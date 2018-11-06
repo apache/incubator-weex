@@ -483,19 +483,11 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
  */
 + (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict;
 
-+ (void)setThreadSafeCollectionUsingLock:(BOOL)usingLock;
-
-+ (BOOL)threadSafeCollectionUsingLock;
-
 + (void)setUnregisterFontWhenCollision:(BOOL)value;
-
-+ (void)setListSectionRowThreadSafe:(BOOL)value;
 
 + (void)setUseJSCApiForCreateInstance:(BOOL)value;
 
 + (BOOL)useJSCApiForCreateInstance;
-
-+ (BOOL)listSectionRowThreadSafe;
 
 + (long) getUnixFixTimeMillis;
 

@@ -30,8 +30,6 @@
 #import "WXConvert.h"
 #import "WXMonitor.h"
 #import "WXAssert.h"
-#import "WXThreadSafeMutableDictionary.h"
-#import "WXThreadSafeMutableArray.h"
 #import "WXTransform.h"
 #import "WXRoundedRect.h"
 #import <pthread/pthread.h>

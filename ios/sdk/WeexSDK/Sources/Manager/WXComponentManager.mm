@@ -89,7 +89,11 @@ static NSThread *WXComponentThread;
         pthread_mutexattr_init(&_propertMutexAttr);
         pthread_mutexattr_settype(&_propertMutexAttr, PTHREAD_MUTEX_RECURSIVE);
         pthread_mutex_init(&_propertyMutex, &_propertMutexAttr);
-        [self _startDisplayLink];
+        
+        WXPerformBlockOnComponentThread(^{
+            // We should ensure that [WXDisplayLinkManager sharedInstance] is only invoked in component thread.
+            [self _startDisplayLink];
+        });
     }
     
     return self;
