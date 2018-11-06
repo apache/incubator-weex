@@ -11,8 +11,8 @@
 #include "core/data_render/class_console.h"
 #include "core/data_render/table.h"
 #include "core/data_render/exec_state.h"
-#include "class_regex.h"
-#include "class_window.h"
+#include "core/data_render/class_regex.h"
+#include "core/data_render/class_window.h"
 
 namespace weex {
 namespace core {

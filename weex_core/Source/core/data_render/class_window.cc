@@ -2,11 +2,11 @@
 // Created by Xu Jiacheng on 2018/11/6.
 //
 
-#include "class_window.h"
-#include "exec_state.h"
-#include "class.h"
-#include "common_error.h"
-#include "json11.hpp"
+#include "core/data_render/class_window.h"
+#include "core/data_render/exec_state.h"
+#include "core/data_render/class.h"
+#include "core/data_render/common_error.h"
+#include "third_party/json11/json11.hpp"
 #include "vnode/vnode_render_manager.h"
 
 namespace weex {
