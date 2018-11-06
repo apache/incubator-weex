@@ -952,8 +952,10 @@ Handle<Expression> RAXParser::ParseJSXNodeExpression(Handle<Expression> parent) 
             }
             std::string key;
             if (token == Token::IDENTIFIER) {
-                key = GetIdentifierName();
-                Advance();
+                while (Peek() == Token::SUB || Peek() == Token::IDENTIFIER) {
+                    key += lex_->CurrentToken().view();
+                    Advance();
+                }
                 EXPECT(Token::ASSIGN);
             }
             if (Peek() == Token::LBRACE) {
