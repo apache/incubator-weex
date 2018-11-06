@@ -251,9 +251,7 @@ namespace WeexCore
         assert(false);
     }
     
-    std::unique_ptr<ValueWithType> IOSSide::CallNativeModule(const char *page_id, const char *module, const char *method,
-                                         const char *args, int argc,
-                                         const char *options, int optionsLength)
+    std::unique_ptr<ValueWithType> IOSSide::CallNativeModule(const char *page_id, const char *module, const char *method, const char *args, int args_length, const char *options, int options_length)
     {
         // should not enter this function
         do {
@@ -265,7 +263,7 @@ namespace WeexCore
             NSString *moduleName = [NSString stringWithUTF8String:module];
             NSString *methodName = [NSString stringWithUTF8String:method];
             NSArray *newArguments;
-            if (argc > 0 && args) {
+            if (args && args_length > 0) {
                 NSString *arguments = [NSString stringWithUTF8String:args];
                 newArguments = [WXUtility objectFromJSON:arguments];
             }
