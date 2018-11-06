@@ -325,7 +325,12 @@ Handle<Expression> RAXParser::ParseUnaryExpression()
     }
     else if (tok == Token::ARROW_FUNCTION) {
         Advance();
-        auto body = ParseStatement();
+        Handle <Expression> body;
+        if(Peek() == Token::LBRACE){
+            body = ParseStatement();
+        } else{
+            body = ParseExpression();
+        }
         if (left) {
             return builder()->NewArrowFunctionStatement(body, {left});
         }
