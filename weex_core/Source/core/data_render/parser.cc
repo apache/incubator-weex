@@ -69,6 +69,14 @@ struct ASTParser final {
     block->PushExpression(call_func);
   }
 
+  inline void AddEventStatement(std::vector<Handle<Expression>> args,
+                                    Handle<BlockStatement>& block) {
+    Handle<Expression> set_attr_func_id = factory_->NewIdentifier("addEvent");
+    Handle<CallExpression> call_func =
+        factory_->NewCallExpression(set_attr_func_id, args);
+    block->PushExpression(call_func);
+  }
+
     void AddAppendChildCall(json11::Json& json, Handle<Identifier>& parent_identifier,
                           Handle<Identifier>& child_identifier) {
     Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
@@ -109,6 +117,35 @@ struct ASTParser final {
           statement->PushExpression(factory_->NewCallExpression(func_id, args));
           args.pop_back();
         }
+      }
+    }
+  }
+
+  void AddEventForVNode(
+      const json11::Json& events,
+      Handle<weex::core::data_render::Identifier> child_identifier) {
+    if (!events.is_array()) return;
+    for (auto it = events.array_items().begin();
+         it != events.array_items().end(); it++) {
+      auto event = *it;
+      if (event.is_object()) {
+        auto event_type = event["type"];
+        auto params = event["params"];
+          Handle<StringConstant> event_constant =
+                  factory_->NewStringConstant(event_type.string_value());
+        std::vector<Handle<Expression>> args{child_identifier, event_constant};
+        if (params.is_array()) {
+          for (auto jt = params.array_items().begin();
+               jt != params.array_items().end(); jt++) {
+            args.push_back(ParseExpression(*jt));
+          }
+        }
+        AddEventStatement(args, stacks_[stacks_.size() - 1]);
+      } else if (event.is_string()) {
+        Handle<StringConstant> event_constant =
+            factory_->NewStringConstant(event.string_value());
+        AddEventStatement({child_identifier, event_constant},
+                          stacks_[stacks_.size() - 1]);
       }
     }
   }
@@ -256,6 +293,14 @@ struct ASTParser final {
     } while (0);
 
     return exprs;
+  }
+
+  inline Handle<Expression> ParseExpression(const json11::Json& json) {
+    if (json.is_string()) {
+      return factory_->NewStringConstant(json.string_value());
+    } else {
+      return ParseBindingExpression(json);
+    }
   }
 
   Handle<Expression> ParseBindingExpression(const json11::Json& json) {
@@ -681,6 +726,9 @@ struct ASTParser final {
               stacks_[stacks_.size() - 1]);
         }
       }
+
+      // addEvent
+      AddEventForVNode(json["event"], child_identifier);
 
       // new block for appending grandson
       // {

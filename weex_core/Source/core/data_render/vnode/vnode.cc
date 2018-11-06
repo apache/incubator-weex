@@ -25,7 +25,7 @@ namespace core {
 namespace data_render {
 
 VNode::VNode(const std::string &tag_name, const std::string &node_id,
-             const std::string &ref) {
+             const std::string &ref)  {
   ref_ = ref;
   tag_name_ = tag_name;
   node_id_ = node_id;
@@ -33,6 +33,7 @@ VNode::VNode(const std::string &tag_name, const std::string &node_id,
   styles_ = new std::map<std::string, std::string>();
   attributes_ = new std::map<std::string, std::string>();
   events_ = new std::map<std::string, void *>();
+  event_params_map_.reset(new EventParamsMap);
 }
 
 VNode::~VNode() {
@@ -58,6 +59,11 @@ VNode::~VNode() {
       *it = nullptr;
     }
   }
+}
+
+const VNode::ParamsList &VNode::GetParamsList(const std::string &event) {
+  auto it = event_params_map_->find(event);
+  return it != event_params_map_->end() ? it->second : ParamsList();
 }
 
 void VNode::SetStyle(const std::string &key, const std::string &value) {
@@ -98,11 +104,16 @@ VNode *VNode::FindNode(const std::string &render_object_ref) {
     return node;
 }
 
-void VNode::AddEvent(const std::string &event, const std::string &function,
+void VNode::AddEvent(const std::string &event,
                      const std::vector<Value> &params) {
-  //todo
+  auto it = event_params_map_->find(event);
+  if (it != event_params_map_->end()) {
+    it->second.push_back(params);
+  } else {
+    event_params_map_->insert({event, {params}});
+  }
 }
-    
+
 void VNode::AddChild(VNode *child) {
   child->parent_ = this;
   child->component_ = component_;

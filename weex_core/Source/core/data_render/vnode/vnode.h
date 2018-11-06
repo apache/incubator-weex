@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 #include <unordered_set>
+#include <unordered_map>
+#include <memory>
 #include "core/render/node/render_object.h"
 
 namespace weex {
@@ -33,6 +35,10 @@ class Value;
 
 class VNode {
  public:
+  typedef std::vector<Value> Params;
+  typedef std::vector<Params> ParamsList;
+  typedef std::unordered_map<std::string, ParamsList> EventParamsMap;
+
   VNode(const std::string &tag_name, const std::string &node_id,
         const std::string &ref);
 
@@ -42,7 +48,7 @@ class VNode {
 
   void SetAttribute(const std::string &key, const std::string &value);
 
-  void AddEvent(const std::string &event, const std::string &function,
+  void AddEvent(const std::string &event,
                 const std::vector<Value> &params);
   void AddEvent(const std::string &event, void *func, void *inst);
 
@@ -82,6 +88,12 @@ class VNode {
     return events_;
   }
 
+  inline EventParamsMap *event_params_map() const {
+    return event_params_map_.get();
+  }
+
+  const ParamsList& GetParamsList(const std::string& event);
+
   inline bool HasChildren() { return !child_list_.empty(); }
 
   inline void set_component(VComponent* c) {
@@ -111,6 +123,7 @@ class VNode {
   std::map<std::string, std::string> *styles_;
   std::map<std::string, std::string> *attributes_;
   std::map<std::string, void *> *events_;
+  std::unique_ptr<EventParamsMap> event_params_map_;
 
   void MapInsertOrAssign(std::map<std::string, std::string> *target_map,
                          const std::string &key, const std::string &value);
