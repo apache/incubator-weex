@@ -33,7 +33,6 @@
     
     if (self) {
         _async = YES;
-        _isNeedJoinLayoutSystem = NO;
         _keepScrollPosition = attributes[@"keepScrollPosition"] ? [WXConvert BOOL:attributes[@"keepScrollPosition"]] : NO;
     }
     

@@ -32,7 +32,13 @@ void InitVM(JavaVM *vm) {
 
 JNIEnv *AttachCurrentThread() {
   JNIEnv *env = nullptr;
-  jint ret = g_jvm->AttachCurrentThread(&env, nullptr);
+
+  JavaVMAttachArgs args;
+  args.version = JNI_VERSION_1_4;
+  args.name = "weex_sdk_runtime";
+  args.group = nullptr;
+
+  jint ret = g_jvm->AttachCurrentThread(&env, &args);
   return env;
 }
 

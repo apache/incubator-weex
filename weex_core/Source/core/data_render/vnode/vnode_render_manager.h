@@ -67,6 +67,7 @@ class VNodeRenderManager {
   bool CreatePageInternal(const std::string &page_id, VNode *v_node);
   bool RefreshPageInternal(const std::string &page_id, VNode *new_node);
   bool ClosePageInternal(const std::string &page_id);
+
   std::string CreatePageWithContent(const uint8_t *contents, size_t length, const std::string &page_id, const std::string &options, const std::string &init_data);
   std::string CreatePageWithContent(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data);
 

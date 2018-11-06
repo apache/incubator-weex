@@ -55,6 +55,11 @@ class ScriptSideInMultiProcess : public ScriptBridge::ScriptSide {
                                 const char *func,
                                 std::vector<VALUE_WITH_TYPE *> &params) override;
 
+  void ExecJSWithCallback(const char *instanceId, const char *nameSpace,
+                          const char *func,
+                          std::vector<VALUE_WITH_TYPE *> &params,
+                          long callback_id) override;
+
   int CreateInstance(const char *instanceId, const char *func,
                      const char *script, const char *opts, const char *initData,
                      const char *extendsApi) override;

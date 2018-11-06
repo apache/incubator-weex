@@ -125,6 +125,18 @@ std::unique_ptr<WeexJSResult> ScriptSideInMultiSo::ExecJSWithResult(
                                                      func, params);
 }
 
+void ScriptSideInMultiSo::ExecJSWithCallback(
+    const char *instanceId, const char *nameSpace, const char *func,
+    std::vector<VALUE_WITH_TYPE *> &params, long callback_id) {
+  if (script_side_functions_ == nullptr) {
+    LOGE(
+        "ScriptSideInMultiSo::ExecJSWithCallback script_side_functions_ is null");
+    return;
+  }
+  script_side_functions_->funcExeJSWithResultId(instanceId, nameSpace, func,
+                                                params, callback_id);
+}
+
 int ScriptSideInMultiSo::CreateInstance(const char *instanceId,
                                         const char *func, const char *script,
                                         const char *opts, const char *initData,

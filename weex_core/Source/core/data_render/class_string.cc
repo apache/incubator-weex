@@ -344,7 +344,7 @@ Value encodeURIComponent(ExecState *exec_state) {
     }
     return exec_state->string_table()->StringFromUTF8(dst);
 }
-
+    
 std::string utf8chr(int cp)
 {
     char c[5] = { 0x00,0x00,0x00,0x00,0x00 };
@@ -372,7 +372,7 @@ std::string utf8chr(int cp)
     }
     return std::string(c);
 }
-
+    
 std::string utf8_decode(std::string &input) {
     do {
         size_t length = input.length();
@@ -406,9 +406,9 @@ std::string utf8_decode(std::string &input) {
             utf8str.push_back(c);
         }
         return utf8str;
-
+        
     } while (0);
-
+    
     return input;
 }
 

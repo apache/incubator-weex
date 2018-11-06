@@ -113,6 +113,10 @@ class PlatformBridge {
     virtual std::unique_ptr<WeexJSResult> ExecJSWithResult(
         const char* instanceId, const char* nameSpace, const char* func,
         std::vector<VALUE_WITH_TYPE*>& params) = 0;
+    virtual void ExecJSWithCallback(const char* instanceId,
+                                    const char* nameSpace, const char* func,
+                                    std::vector<VALUE_WITH_TYPE*>& params,
+                                    long callback_id) = 0;
     virtual int CreateInstance(const char* instanceId, const char* func,
                                const char* script, int script_length, const char* opts,
                                const char* initData, const char* extendsApi,
@@ -224,6 +228,8 @@ class PlatformBridge {
     virtual void PostMessage(const char* vm_id, const char* data, int dataLength) = 0;
     virtual void DispatchMessage(const char* client_id,
                                  const char* data, int dataLength, const char* callback, const char* vm_id) = 0;
+    virtual void OnReceivedResult(long callback_id,
+                                  std::unique_ptr<WeexJSResult>& result) = 0;
 
     inline PlatformBridge* bridge() { return bridge_; }
 

@@ -103,6 +103,7 @@ class FuncState {
           out_closure_.push_back(ref);
       }
   }
+
   inline Value *GetConstant(int index) { return &constants_[index]; }
   inline size_t GetConstantSize() { return constants_.size();}
   inline bool Inclusive(long arg) { return std::find(args_.begin(), args_.end(), arg) == args_.end() ? false : true; }

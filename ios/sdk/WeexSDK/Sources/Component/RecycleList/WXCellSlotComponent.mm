@@ -43,7 +43,6 @@
         }
         _templateCaseType = attributes[@"case"] ? [WXConvert NSString:attributes[@"case"]] :const_cast<NSString *>(WXDefaultRecycleTemplateType);
         _lazyCreateView = YES;
-        _isNeedJoinLayoutSystem = NO;
     }
     
     return self;
