@@ -125,7 +125,6 @@ Value ClassFactory::CreateClassInstance(ClassDescriptor *p_desc) {
     ClassInstance *inst = CreateClassInstanceFromSuper(p_desc);
     Value value;
     SetCIValue(&value, reinterpret_cast<GCObject *>(inst));
-    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(inst), Value::Type::CLASS_INST));
     return value;
 }
 
