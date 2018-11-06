@@ -1,5 +1,14 @@
 /* eslint-disable react/react-in-jsx-scope */
 /* global __weex_data__, print, createElement */
+
+try{
+    console.log("abc in try");
+} catch(err) {
+    console.log("err");
+} finally{
+    console.log("finally");
+}
+
 var a= /(a.)/g;
 var b = a.exec('abc,aac, ssa2, dda');
 console.log(b);

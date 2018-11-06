@@ -110,7 +110,7 @@ namespace data_render {
   /* Keywords (ECMA-262, section 7.5.2, page 13). */               \
   K(BREAK, "break", 0)                                             \
   K(CASE, "case", 0)                                               \
-  K(DEFAULT, "default", 0)                                               \
+  K(DEFAULT, "default", 0)                                         \
   K(CONTINUE, "continue", 0)                                       \
   K(ELSE, "else", 0)                                               \
   K(FOR, "for", 0)                                                 \
@@ -118,6 +118,9 @@ namespace data_render {
   K(IF, "if", 0)                                                   \
   K(RETURN, "return", 0)                                           \
   K(SWITCH, "switch", 0)                                           \
+  K(TRY, "try", 0)                                                 \
+  K(CATCH, "catch", 0)                                             \
+  K(FINALLY, "finally", 0)                                         \
   K(VAR, "var", 0)                                                 \
                                                                    \
   /* Literals (ECMA-262, section 7.8, page 16). */                 \
@@ -135,7 +138,7 @@ namespace data_render {
   K(EXTENDS, "extends", 0)                                         \
   K(SUPER, "super", 0)                                             \
   K(LET, "let", 0)                                                 \
-  K(STATIC, "static", 0)                                                 \
+  K(STATIC, "static", 0)                                           \
                                                                    \
   T(EOS, "EOS", 0)                                                 \
   T(INTEGER, "INTEGER", 0)                                         \

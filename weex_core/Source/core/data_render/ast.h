@@ -69,6 +69,7 @@ namespace data_render {
   M(BreakStatement)      \
   M(CaseStatement)       \
   M(SwitchStatement)     \
+  M(TryCatchStatement)   \
   M(BlockStatement)      \
   M(FunctionPrototype)   \
   M(FunctionStatement)   \
@@ -661,6 +662,27 @@ private:
     std::string name_;
     Handle<Expression> init_;
     bool is_static_{false};
+};
+
+class TryCatchStatement : public Expression {
+ public:
+  TryCatchStatement(Handle<Expression> try_block,
+                    Handle<Expression> catch_expr, Handle<Expression> catch_block, Handle<Expression> finally)
+      : Expression(), try_block_{ try_block }, catch_expr_{ catch_expr },
+        catch_block_{ catch_block }, finally_{ finally }
+  { }
+
+
+  Handle<Expression> try_block() { return try_block_; }
+  Handle<Expression> catch_expr() { return catch_expr_; }
+  Handle<Expression> catch_block() { return catch_block_; }
+  Handle<Expression> finally() { return finally_; }
+  DEFINE_NODE_TYPE(TryCatchStatement,Expression);
+ private:
+  Handle<Expression> try_block_;
+  Handle<Expression> catch_expr_;
+  Handle<Expression> catch_block_;
+  Handle<Expression> finally_;
 };
 
 

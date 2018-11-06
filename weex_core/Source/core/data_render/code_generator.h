@@ -76,6 +76,7 @@ class CodeGenerator : public ASTVisitor {
   void Visit(PostfixExpression *node, void *data) override;
   void Visit(ContinueStatement *node, void *data) override;
   void Visit(SwitchStatement *node, void *data) override;
+  void Visit(TryCatchStatement *node, void *data) override;
   void Visit(BreakStatement *node, void *data) override;
   void Visit(ClassProperty *node, void *data) override;
 

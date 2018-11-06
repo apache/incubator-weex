@@ -1169,8 +1169,8 @@ Handle<Expression> RAXParser::ParseStatement()
             return ParseContinueStatement();
         case Token::SWITCH:
             return ParseSwitchStatement();
-//        case TRY:
-//            return ParseTryCatchStatement();
+        case Token::TRY:
+            return ParseTryCatchStatement();
 //        case THROW:
 //            return ParseThrowStatement();
     }
@@ -1506,7 +1506,29 @@ Handle<Expression> RAXParser::ParseVariableStatement()
     
     return builder()->factory()->NewDeclarationList(builder()->locator()->location(), scope_manager()->current(), decl_list);
 }
-    
+
+Handle<Expression> RAXParser::ParseTryCatchStatement() {
+    Handle<Expression> try_block = nullptr;
+    Handle<Expression> catch_expr = nullptr;
+    Handle<Expression> catch_block = nullptr;
+    Handle<Expression> finally = nullptr;
+    EXPECT(Token::TRY);
+    try_block = ParseBlockStatement();
+    if (Peek() == Token::CATCH) {
+        Advance();
+        EXPECT(Token::LPAREN);
+        catch_expr = ParseExpression();
+        EXPECT(Token::RPAREN);
+        catch_block = ParseBlockStatement();
+    }
+    if (Peek() == Token::FINALLY) {
+        Advance();
+        finally = ParseBlockStatement();
+    }
+    return builder()->NewTryCatchStatement(try_block, catch_expr, catch_block,
+                                           finally);
+}
+
 Handle<Expression> ParseProgram(RAXParser *parser)
 {
     // parse program and return AST

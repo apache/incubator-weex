@@ -100,6 +100,11 @@ public:
     virtual Handle<Expression> NewBreakStatement(Position &loc, Scope *scope, Handle<Expression> label = nullptr);
     virtual Handle<Expression> NewCaseStatement(Position &loc, Scope *scope, Handle<Expression> test_value,Handle<ExpressionList> expr);
     virtual Handle<Expression> NewSwitchStatement(Position &loc, Scope *scope, Handle<Expression> test_case, std::vector<Handle<Expression>> cases);
+    virtual Handle<Expression> NewTryCatchStatement(Position &loc, Scope *scope,
+                                                    Handle<Expression> try_block,
+                                                    Handle<Expression> catch_expr,
+                                                    Handle<Expression> catch_block,
+                                                    Handle<Expression> finally );
     virtual Handle<Expression> NewContinueStatement(Position &loc, Scope *scope, Handle<Expression> label = nullptr);
     virtual Handle<Expression> NewIfStatement(Position &loc, Scope *scope, Handle<Expression> condition, Handle<Expression> then);
     virtual Handle<Expression> NewIfElseStatement(Position &loc, Scope *scope, Handle<Expression> condition, Handle<Expression> then, Handle<Expression> els);

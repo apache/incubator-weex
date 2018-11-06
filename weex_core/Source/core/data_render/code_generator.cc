@@ -1423,6 +1423,13 @@ void CodeGenerator::Visit(BreakStatement* node, void* data) {
     block_->break_slots().push_back(slot);
 }
 
+void CodeGenerator::Visit(TryCatchStatement* node, void* data) {
+    node->try_block()->Accept(this, nullptr);
+    if(node->finally()!= nullptr){
+        node->finally()->Accept(this, nullptr);
+    }
+}
+
 CodeGenerator::RegisterScope::~RegisterScope()
 {
     int start_idx = stored_idx_;

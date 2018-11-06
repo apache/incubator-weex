@@ -282,6 +282,13 @@ Handle<Expression> ASTBuilder::NewSwitchStatement(Handle<Expression> test_value,
     COUNT();
     return save(factory()->NewSwitchStatement(locator()->location(), manager()->current(), test_value, cases));
 }
+Handle<Expression> ASTBuilder::NewTryCatchStatement(Handle<Expression> try_block,
+                                                    Handle<weex::core::data_render::Expression> catch_expr,
+                                                    Handle<weex::core::data_render::Expression> catch_block,
+                                                    Handle<weex::core::data_render::Expression> finally) {
+    COUNT();
+    return save(factory()->NewTryCatchStatement(locator()->location(), manager()->current(),try_block,catch_expr,catch_block,finally));
+}
 
 }
 }
