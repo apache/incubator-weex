@@ -572,6 +572,7 @@ void VNodeExecEnv::ImportExecEnv(ExecState *state) {
     state->Register("JSON", state->class_factory()->ClassJSON());
     state->Register("Object", state->class_factory()->ClassObject());
     state->Register("RegExp", state->class_factory()->ClassRegExp());
+    state->Register("window", state->class_factory()->ClassWindow());
     state->Register("console", state->class_factory()->ClassConsole());
     RegisterJSCommonFunction(state);
 }

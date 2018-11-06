@@ -75,6 +75,7 @@ set(COMMON_SRCS
    ./core/data_render/class_string.cc
    ./core/data_render/class_regex.cc
    ./core/data_render/class_console.cc
+   ./core/data_render/class_window.cc
    ./core/data_render/class_factory.cc
    ./core/data_render/class_function.cc
    ./core/data_render/class_object.cc

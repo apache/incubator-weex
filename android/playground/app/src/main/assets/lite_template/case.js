@@ -20,7 +20,6 @@ switch(a){
         console.log('default branch');
 }
 console.log('end');
-
 class Component {
     constructor(props) {
         this.props = props;
