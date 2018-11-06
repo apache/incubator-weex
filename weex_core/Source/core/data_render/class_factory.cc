@@ -113,11 +113,11 @@ int ClassFactory::Find(const ClassDescriptor *desc) {
 ClassInstance *ClassFactory::CreateClassInstanceFromSuper(ClassDescriptor *p_desc) {
     ClassInstance *p_super = nullptr;
     ClassInstance *inst = NewClassInstance(p_desc);
-    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(inst), Value::Type::CLASS_INST));
     if (p_desc->p_super_) {
         p_super = CreateClassInstanceFromSuper(p_desc->p_super_);
         inst->p_super_ = p_super;
     }
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(inst), Value::Type::CLASS_INST));
     return inst;
 }
     
@@ -125,6 +125,7 @@ Value ClassFactory::CreateClassInstance(ClassDescriptor *p_desc) {
     ClassInstance *inst = CreateClassInstanceFromSuper(p_desc);
     Value value;
     SetCIValue(&value, reinterpret_cast<GCObject *>(inst));
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(inst), Value::Type::CLASS_INST));
     return value;
 }
 
@@ -132,6 +133,7 @@ Value ClassFactory::CreateFuncInstance(FuncState *func_state) {
     FuncInstance *func_inst = new FuncInstance(func_state);
     Value value;
     SetGCFuncValue(&value, reinterpret_cast<GCObject *>(func_inst));
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(func_inst), Value::Type::FUNC_INST));
     return value;
 }
 

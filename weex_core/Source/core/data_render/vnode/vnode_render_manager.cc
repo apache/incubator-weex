@@ -353,19 +353,43 @@ void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string
         if (iter_event == vnode->events()->end()) {
             break;
         }
-        FuncState *func_state = (FuncState *)iter_event->second;
-        if (!func_state) {
+        if (!iter_event->second) {
             break;
         }
+        FuncState *func_state = nullptr;
+        FuncInstance *func_inst = nullptr;
         ExecState *exec_state = iter->second;
+        bool finder = false;
+        for (auto iter : exec_state->class_factory()->stores()) {
+            if (iter.first == iter_event->second) {
+                if (iter.second == Value::Type::FUNC_INST) {
+                    func_inst = reinterpret_cast<FuncInstance *>(iter.first);
+                }
+                finder = true;
+            }
+        }
+        if (!finder) {
+            func_state = reinterpret_cast<FuncState *>(iter_event->second);
+        }
+        if (!func_state && !func_inst) {
+            break;
+        }
         std::vector<Value> caller_args;
+        if (func_inst) {
+            func_state = func_inst->func_;
+        }
         if (func_state->is_class_func() && vnode->inst()) {
             Value inst;
             SetCIValue(&inst, reinterpret_cast<GCObject *>(vnode->inst()));
             caller_args.push_back(inst);
         }
         caller_args.push_back(StringToValue(exec_state, args));
-        exec_state->Call(func_state, caller_args);
+        if (func_inst) {
+            exec_state->Call(func_inst, caller_args);
+        }
+        else {
+            exec_state->Call(func_state, caller_args);
+        }
         
     } while (0);
 }

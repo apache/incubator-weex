@@ -176,6 +176,23 @@ const Value ExecState::Call(const std::string& func_name, const std::vector<Valu
     return ret;
 }
     
+const Value ExecState::Call(FuncInstance *func, const std::vector<Value>& args) {
+    Value ret;
+    do {
+        Value functor;
+        SetGCFuncValue(&functor, reinterpret_cast<GCObject *>(func));
+        **stack_->top() = functor;
+        int index = 0;
+        for (int i = 0; i < args.size(); i++) {
+            *(*stack_->top() + i + 1 + index) = args[i];
+        }
+        CallFunction(*stack_->top(), args.size(), &ret);
+        
+    } while (0);
+    
+    return ret;
+}
+    
 const Value ExecState::Call(FuncState *func_state, const std::vector<Value>& args) {
     Value ret;
     do {

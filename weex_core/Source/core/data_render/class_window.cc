@@ -25,7 +25,7 @@ static Value Open(ExecState *exec_state){
   json11::Json::array args_array;
   json11::Json::object obj{
       {"url",CStringValue(url_value)},
-      {"animated",true},
+      {"animated", "true"},
   };
   args_array.push_back(obj);
 

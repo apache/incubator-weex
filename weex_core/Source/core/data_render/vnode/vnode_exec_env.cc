@@ -492,6 +492,19 @@ static Value SetProps(ExecState *exec_state) {
                         node->AddEvent(event, func_state, func_state->class_inst());
                         break;
                     }
+                    case Value::FUNC_INST:
+                    {
+                        std::string::size_type pos = iter->first.find("on");
+                        if (pos != 0) {
+                            throw VMExecError("AddEvent isn't a function");
+                        }
+                        std::string event = iter->first.substr(pos + 2);
+                        transform(event.begin(), event.end(), event.begin(), ::tolower);
+                        FuncInstance *func_inst = ValueTo<FuncInstance>(&iter->second);
+                        FuncState *func_state = func_inst->func_;
+                        node->AddEvent(event, func_inst, func_state->class_inst());
+                        break;
+                    }
                     case Value::NUMBER:
                     {
                         node->SetStyle(iter->first, base::to_string(iter->second.n));
