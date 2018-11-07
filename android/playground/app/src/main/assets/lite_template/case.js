@@ -15,6 +15,39 @@ console.log(b);
 
 console.log('aabccbddBc'.match(/(bss.)/g));
 
+console.log("ceil");
+console.log(Math.ceil(0.95)," == 1");
+console.log(Math.ceil(4)," == 4");
+console.log(Math.ceil(7.004)," == 8");
+console.log(Math.ceil(-0.95)," == -0");
+console.log(Math.ceil(-4)," == -4");
+console.log(Math.ceil(-7.004)," == -7");
+
+console.log("floor");
+console.log(Math.floor( 45.95)," ==  45");
+console.log(Math.floor( 45.05)," ==  45");
+console.log(Math.floor( 4 )," ==  4");
+console.log(Math.floor(-45.05)," ==  -46");
+console.log(Math.floor(-45.95)," ==  -46");
+
+console.log("random");
+console.log(Math.random());
+console.log(Math.random());
+console.log(Math.random());
+console.log(Math.random());
+
+console.log("max");
+console.log(Math.max(1,2,3)," == 3");
+console.log(Math.max(1,2.2, 4.2), "== 4.2");
+console.log(Math.max(1,"a"),"== null");
+console.log(Math.max(),"== INT_MIN");
+
+console.log("min");
+console.log(Math.min(1,2,3)," == 1");
+console.log(Math.min(0.5,2.2, 4), "== 0.5");
+console.log(Math.min(1,"a"),"== null");
+console.log(Math.min(),"== INT_MAX");
+
 var a = 3;
 
 console.log('start');

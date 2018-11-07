@@ -43,13 +43,14 @@ public:
     virtual Value ClassObject();
     virtual Value ClassRegExp();
     virtual Value ClassWindow();
+    virtual Value ClassMath();
     virtual Value ClassConsole();
     virtual Value CreateArray();
     virtual Value CreateTable();
     int Find(const ClassDescriptor *desc);
     inline const std::vector<std::pair<GCObject *, Value::Type>>& stores() { return stores_; }
     std::vector<ClassDescriptor *> descs();
-private:
+ private:
     ClassInstance *CreateClassInstanceFromSuper(ClassDescriptor *p_desc);
     std::vector<std::pair<GCObject *, Value::Type>> stores_;
 };
