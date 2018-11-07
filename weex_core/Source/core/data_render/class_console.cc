@@ -73,7 +73,7 @@ static std::string loginfo2string(ExecState *exec_state, std::string level) {
                 stream << a->i;
                 break;
             case Value::Type::STRING:
-                stream << a->str->c_str();
+                stream << "\"" << a->str->c_str() << "\"";
                 break;
             case Value::Type::TABLE:
                 stream << TableToString(ValueTo<Table>(a));
