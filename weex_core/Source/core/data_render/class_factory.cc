@@ -13,6 +13,7 @@
 #include "core/data_render/exec_state.h"
 #include "core/data_render/class_regex.h"
 #include "core/data_render/class_window.h"
+#include "class_math.h"
 
 namespace weex {
 namespace core {
@@ -89,7 +90,15 @@ Value ClassFactory::ClassWindow() {
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
     return value;
 }
-    
+
+Value ClassFactory::ClassMath() {
+    ClassDescriptor *desc = NewClassMath();
+    Value value;
+    SetCDValue(&value, reinterpret_cast<GCObject *>(desc));
+    stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
+    return value;
+}
+
 Value ClassFactory::ClassConsole() {
     ClassDescriptor *desc = NewClassConsole();
     Value value;
@@ -97,7 +106,7 @@ Value ClassFactory::ClassConsole() {
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
     return value;
 }
-    
+
 int ClassFactory::Find(const ClassDescriptor *desc) {
     std::vector<ClassDescriptor *> descs = this->descs();
     int index = 0;
@@ -120,7 +129,7 @@ ClassInstance *ClassFactory::CreateClassInstanceFromSuper(ClassDescriptor *p_des
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(inst), Value::Type::CLASS_INST));
     return inst;
 }
-    
+
 Value ClassFactory::CreateClassInstance(ClassDescriptor *p_desc) {
     ClassInstance *inst = CreateClassInstanceFromSuper(p_desc);
     Value value;
@@ -174,7 +183,6 @@ ClassFactory::~ClassFactory() {
     }
     stores_.clear();
 }
-
 std::vector<ClassDescriptor *> ClassFactory::descs() {
     std::vector<ClassDescriptor *> descs;
     for (auto iter = stores_.begin(); iter != stores_.end(); iter++) {
@@ -184,7 +192,7 @@ std::vector<ClassDescriptor *> ClassFactory::descs() {
     }
     return descs;
 }
-    
+
 }
 }
 }
