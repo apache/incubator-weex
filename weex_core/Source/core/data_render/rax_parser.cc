@@ -726,7 +726,17 @@ Handle<Expression> RAXParser::ParseReturnStatement()
         return builder()->NewReturnStatement(nullptr);
     }
     if (tok == Token::LPAREN) {
-        auto stmt = builder()->NewReturnStatement(ParseJSXNodeStatement());
+        Advance();
+        tok = Peek();
+        Handle<Expression> content;
+        if (tok == Token::LT) {
+            content = ParseJSXNodeStatement();
+        }
+        else {
+            content = ParseExpression();
+        }
+        EXPECT(Token::RPAREN); // eat ')'
+        auto stmt = builder()->NewReturnStatement(content);
         EXPECT(Token::SEMICOLON);
         return stmt;
     }
