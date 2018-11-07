@@ -75,7 +75,6 @@ typedef enum : NSUInteger {
     WXRootView *_rootView;
     WXThreadSafeMutableDictionary *_moduleEventObservers;
     BOOL _performanceCommit;
-    BOOL _syncDestroyComponentManager;
     BOOL _debugJS;
     id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context    
     CGFloat _defaultPixelScaleFactor;
@@ -87,11 +86,6 @@ typedef enum : NSUInteger {
 {
     [_moduleEventObservers removeAllObjects];
     [self removeObservers];
-    if (_syncDestroyComponentManager) {
-        WXPerformBlockSyncOnComponentThread(^{
-            _componentManager = nil;
-        });
-    }
 }
 
 - (instancetype)init
@@ -123,10 +117,6 @@ typedef enum : NSUInteger {
         _performance = [[WXPerformance alloc] init];
         _apmInstance = [[WXApmForInstance alloc] init];
         
-        id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
-        if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-            _syncDestroyComponentManager = [[configCenter configForKey:@"iOS_weex_ext_config.syncDestroyComponentManager" defaultValue:@(YES) isDefault:NULL] boolValue];
-        }
         _defaultPixelScaleFactor = CGFLOAT_MIN;
         _bReleaseInstanceInMainThread = YES;
         _defaultDataRender = NO;
@@ -447,14 +437,9 @@ typedef enum : NSUInteger {
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
         BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@YES isDefault:NULL] boolValue];
         [WXTextComponent setRenderUsingCoreText:useCoreText];
-        BOOL useThreadSafeLock = [[configCenter configForKey:@"iOS_weex_ext_config.useThreadSafeLock" defaultValue:@YES isDefault:NULL] boolValue];
-        [WXUtility setThreadSafeCollectionUsingLock:useThreadSafeLock];
         
         BOOL unregisterFontWhenCollision = [[configCenter configForKey:@"iOS_weex_ext_config.unregisterFontWhenCollision" defaultValue:@NO isDefault:NULL] boolValue];
         [WXUtility setUnregisterFontWhenCollision:unregisterFontWhenCollision];
-
-		BOOL listSectionRowThreadSafe = [[configCenter configForKey:@"iOS_weex_ext_config.listSectionRowThreadSafe" defaultValue:@(YES) isDefault:NULL] boolValue];
-		[WXUtility setListSectionRowThreadSafe:listSectionRowThreadSafe];
         
         BOOL useJSCApiForCreateInstance = [[configCenter configForKey:@"iOS_weex_ext_config.useJSCApiForCreateInstance" defaultValue:@(YES) isDefault:NULL] boolValue];
         [WXUtility setUseJSCApiForCreateInstance:useJSCApiForCreateInstance];
@@ -663,25 +648,22 @@ typedef enum : NSUInteger {
     [WXPrerenderManager destroyTask:self.instanceId];
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
     
-    __weak typeof(self) weakSelf = self;
+    WXComponentManager* componentManager = self.componentManager;
+    NSString* instanceId = self.instanceId;
+    
     WXPerformBlockOnComponentThread(^{
-        __strong typeof(self) strongSelf = weakSelf;
-        if (strongSelf == nil) {
-            return;
-        }
-        
         // Destroy components and views in main thread. Unbind with underneath RenderObjects.
-        [strongSelf.componentManager unload];
+        [componentManager unload];
         
         // Destroy weexcore c++ page and objects.
-        [WXCoreBridge closePage:strongSelf.instanceId];
+        [WXCoreBridge closePage:instanceId];
         
         // Reading config from orange for Release instance in Main Thread or not, for Bug #15172691 +{
         if (!_bReleaseInstanceInMainThread) {
-            [WXSDKManager removeInstanceforID:strongSelf.instanceId];
+            [WXSDKManager removeInstanceforID:instanceId];
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [WXSDKManager removeInstanceforID:strongSelf.instanceId];
+                [WXSDKManager removeInstanceforID:instanceId];
             });
         }
         //+}
@@ -690,8 +672,6 @@ typedef enum : NSUInteger {
     if (url.length > 0) {
         [WXPrerenderManager addGlobalTask:url callback:nil];
     }
-    
-    _isRendered = NO;
 }
 
 - (void)forceGarbageCollection
