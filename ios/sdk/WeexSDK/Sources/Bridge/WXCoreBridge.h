@@ -193,6 +193,10 @@ namespace WeexCore
 
 + (void)registerModules:(NSDictionary *)modules;
 
++ (void)registerComponentAffineType:(NSString *)type asType:(NSString *)baseType;
+
++ (BOOL)isComponentAffineType:(NSString *)type asType:(NSString *)baseType;
+
 @end
 
 #endif

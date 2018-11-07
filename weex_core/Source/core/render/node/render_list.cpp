@@ -26,6 +26,7 @@
 #include "core/render/node/render_list.h"
 #include "core/render/node/render_object.h"
 #include "core/render/page/render_page.h"
+#include "core/render/node/factory/render_creator.h"
 
 namespace WeexCore {
 
@@ -261,7 +262,7 @@ int RenderList::AddRenderObject(int index, RenderObject *child) {
 
 void RenderList::AddRenderObjectWidth(RenderObject *child,
                                       const bool updating) {
-  if (type() == kRenderWaterfall || type() == kRenderRecycleList) {
+  if ((RenderCreator::GetInstance()->IsAffineType(type(), kRenderWaterfall)) || type() == kRenderRecycleList) {
     if (child->type() == kRenderHeader || child->type() == kRenderFooter) {
       child->ApplyStyle(WIDTH, to_string(this->available_width_), updating);
     } else if (child->is_sticky()) {

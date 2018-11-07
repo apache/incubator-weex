@@ -495,6 +495,11 @@ static BOOL bNeedRemoveEvents = YES;
     }
 }
 
+- (BOOL)_isAffineTypeAs:(NSString *)type
+{
+    return [WXCoreBridge isComponentAffineType:_type asType:type];
+}
+
 - (CALayer *)layer
 {
     return _layer;
