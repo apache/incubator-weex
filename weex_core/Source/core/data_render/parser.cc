@@ -18,20 +18,21 @@
  */
 
 #include "core/data_render/parser.h"
-#include <sstream>
 #include <cstdlib>
+#include <sstream>
 #include "base/string_util.h"
 #include "core/data_render/ast_factory.h"
 #include "core/data_render/rax_parser_builder.h"
 #include "core/data_render/rax_parser_context.h"
-#include "third_party/json11/json11.hpp"
 #include "core/data_render/statement.h"
+#include "third_party/json11/json11.hpp"
 
 namespace weex {
 namespace core {
 namespace data_render {
 
-static const char kCreateComponentRecursively[] = "__createComponentRecursively";
+static const char kCreateComponentRecursively[] =
+    "__createComponentRecursively";
 static const char kCreateBodyFunction[] = "main";
 static const char kAttrRepeatControl[] = "[[repeat]]";
 
@@ -70,14 +71,15 @@ struct ASTParser final {
   }
 
   inline void AddEventStatement(std::vector<Handle<Expression>> args,
-                                    Handle<BlockStatement>& block) {
+                                Handle<BlockStatement>& block) {
     Handle<Expression> set_attr_func_id = factory_->NewIdentifier("addEvent");
     Handle<CallExpression> call_func =
         factory_->NewCallExpression(set_attr_func_id, args);
     block->PushExpression(call_func);
   }
 
-    void AddAppendChildCall(json11::Json& json, Handle<Identifier>& parent_identifier,
+  void AddAppendChildCall(json11::Json& json,
+                          Handle<Identifier>& parent_identifier,
                           Handle<Identifier>& child_identifier) {
     Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
 
@@ -90,8 +92,10 @@ struct ASTParser final {
     statement->PushExpression(call_append_expr);
   }
 
-    void AddSetClassListCall(json11::Json& json, Handle<weex::core::data_render::Identifier> child_identifier,
-                           const std::string& prefix) {
+  void AddSetClassListCall(
+      json11::Json& json,
+      Handle<weex::core::data_render::Identifier> child_identifier,
+      const std::string& prefix) {
     std::string wrap_prefix;
     if (!prefix.empty() && prefix.compare(kCreateBodyFunction) != 0) {
       wrap_prefix = "_" + prefix + "_";
@@ -106,8 +110,8 @@ struct ASTParser final {
         for (int i = 0; i < class_list.array_items().size(); i++) {
           json11::Json class_style = class_list[i];
           if (class_style.is_string()) {
-            args.push_back(
-                factory_->NewStringConstant(wrap_prefix + class_style.string_value()));
+            args.push_back(factory_->NewStringConstant(
+                wrap_prefix + class_style.string_value()));
           } else {
             args.push_back(factory_->NewBinaryExpression(
                 BinaryOperation::kAddition,
@@ -131,8 +135,8 @@ struct ASTParser final {
       if (event.is_object()) {
         auto event_type = event["type"];
         auto params = event["params"];
-          Handle<StringConstant> event_constant =
-                  factory_->NewStringConstant(event_type.string_value());
+        Handle<StringConstant> event_constant =
+            factory_->NewStringConstant(event_type.string_value());
         std::vector<Handle<Expression>> args{child_identifier, event_constant};
         if (params.is_array()) {
           for (auto jt = params.array_items().begin();
@@ -169,7 +173,8 @@ struct ASTParser final {
       stacks_.push_back(chunk);
       auto& component = json["components"];
       if (component.is_array()) {
-        for (auto it = component.array_items().begin(); it != component.array_items().end(); it++) {
+        for (auto it = component.array_items().begin();
+             it != component.array_items().end(); it++) {
           if (!it->is_object()) {
             continue;
           }
@@ -196,7 +201,7 @@ struct ASTParser final {
         break;
       }
       RAXParserBuilder builder(match.string_value());
-      RAXParser *parser = builder.parser();
+      RAXParser* parser = builder.parser();
       Handle<Expression> expr = parser->ParseExpression();
       Handle<Expression> if_block =
           MakeHandle<BlockStatement>(factory_->NewExpressionList());
@@ -217,7 +222,9 @@ struct ASTParser final {
       json11::Json index = repeat["iterator1"];
       Handle<DeclarationList> for_init = factory_->NewDeclarationList();
       // var index=0
-      for_init->Append(factory_->NewDeclaration(index.is_null() ? "index" : index.string_value(), factory_->NewIntegralConstant(0)));
+      for_init->Append(factory_->NewDeclaration(
+          index.is_null() ? "index" : index.string_value(),
+          factory_->NewIntegralConstant(0)));
       json11::Json expression = repeat["for"];
       if (!expression.is_string()) {
         break;
@@ -227,34 +234,32 @@ struct ASTParser final {
         break;
       }
       RAXParserBuilder builder(expression.string_value());
-      RAXParser *parser = builder.parser();
+      RAXParser* parser = builder.parser();
       Handle<Expression> list_expr = parser->ParseExpression();
-      Handle<Identifier> index_var =
-          factory_->NewIdentifier(index.is_null() ? "index" : index.string_value());
+      Handle<Identifier> index_var = factory_->NewIdentifier(
+          index.is_null() ? "index" : index.string_value());
       // expr[index]
       Handle<MemberExpression> indexMember = factory_->NewMemberExpression(
           MemberAccessKind::kIndex, list_expr, index_var);
       // var iter = expr[index]
       for_init->Append(
           factory_->NewDeclaration(alias.string_value(), indexMember));
-      Handle<Identifier> size_of_func_id =
-          factory_->NewIdentifier("sizeof");
+      Handle<Identifier> size_of_func_id = factory_->NewIdentifier("sizeof");
       // sizeof(expr)
       Handle<CallExpression> size_of_call =
-        factory_->NewCallExpression(size_of_func_id, {list_expr});
+          factory_->NewCallExpression(size_of_func_id, {list_expr});
 
       // index<sizeof(expr)
-      Handle<Expression> for_condition = factory_->NewBinaryExpression(BinaryOperation::kLessThan, index_var, size_of_call);
+      Handle<Expression> for_condition = factory_->NewBinaryExpression(
+          BinaryOperation::kLessThan, index_var, size_of_call);
       // index++
-      Handle<Expression> index_update = factory_->NewPrefixExpression(PrefixOperation::kIncrement, index_var);
+      Handle<Expression> index_update =
+          factory_->NewPrefixExpression(PrefixOperation::kIncrement, index_var);
       // iter = expr[index]
       Handle<Expression> alias_update = factory_->NewAssignExpression(
           factory_->NewIdentifier(alias.string_value()),
-          factory_->NewMemberExpression(
-              MemberAccessKind::kIndex,
-              list_expr, index_var
-          )
-      );
+          factory_->NewMemberExpression(MemberAccessKind::kIndex, list_expr,
+                                        index_var));
       std::vector<Handle<Expression>> updates;
       updates.push_back(index_update);
       updates.push_back(alias_update);
@@ -262,9 +267,8 @@ struct ASTParser final {
 
       Handle<Expression> for_block =
           MakeHandle<BlockStatement>(factory_->NewExpressionList());
-      for_expr =
-          factory_->NewForStatement(ForKind::kForOf, for_init,
-                                    for_condition, for_update, for_block);
+      for_expr = factory_->NewForStatement(
+          ForKind::kForOf, for_init, for_condition, for_update, for_block);
       if (!for_expr) {
         break;
       }
@@ -307,16 +311,15 @@ struct ASTParser final {
     const json11::Json& exp_str = json["@binding"];
     if (exp_str.is_string()) {
       RAXParserBuilder builder(exp_str.string_value());
-      RAXParser *parser = builder.parser();
+      RAXParser* parser = builder.parser();
       return parser->ParseExpression();
-    }
-    else {
+    } else {
       return factory_->NewNullConstant();
     }
   }
 
-  std::string ParseCreateNodeInComponentFunction(json11::Json& template_object,
-                                          const std::string& component_name) {
+  std::string ParseCreateNodeInComponentFunction(
+      json11::Json& template_object, const std::string& component_name) {
     std::string function_name("createNodeInComponent_" + component_name);
 
     // Declare function createNodeInComponent_xxx(this)
@@ -347,7 +350,7 @@ struct ASTParser final {
     return function_name;
   }
 
-  //function createComponent_xxx(nodeId, this){
+  // function createComponent_xxx(nodeId, this){
   //  //initialState
   //  this = {
   //    count: this.start
@@ -371,12 +374,13 @@ struct ASTParser final {
       return "";
     }
 
-    return ParseComponentFunction(template_obj, name.string_value(), template_id, false);
+    return ParseComponentFunction(template_obj, name.string_value(),
+                                  template_id, false);
   }
 
-  std::string ParseComponentFunction(json11::Json& template_obj, const std::string& template_name,
-                              int template_id, bool is_body) {
-
+  std::string ParseComponentFunction(json11::Json& template_obj,
+                                     const std::string& template_name,
+                                     int template_id, bool is_body) {
     Handle<BlockStatement> chunk = stacks_.back();
 
     std::string function_name("createComponent_" + template_name);
@@ -429,20 +433,17 @@ struct ASTParser final {
     }
 
     // Declare createNodeInComponent function in global
-    const std::string& create_node_func = ParseCreateNodeInComponentFunction(template_obj, template_name);
+    const std::string& create_node_func =
+        ParseCreateNodeInComponentFunction(template_obj, template_name);
 
     // Component Node call createComponent
-    Handle<Expression> func =
-            factory_->NewIdentifier("createComponent");
+    Handle<Expression> func = factory_->NewIdentifier("createComponent");
     std::vector<Handle<Expression>> args;
-    args.push_back(
-            factory_->NewIdentifier("template_id"));
-    args.push_back(
-            factory_->NewIdentifier("template_name"));
-    args.push_back(
-            factory_->NewStringConstant(create_node_func));
-    Handle<Declaration> component_declaration
-            = factory_->NewDeclaration("component", factory_->NewCallExpression(func, args));
+    args.push_back(factory_->NewIdentifier("template_id"));
+    args.push_back(factory_->NewIdentifier("template_name"));
+    args.push_back(factory_->NewStringConstant(create_node_func));
+    Handle<Declaration> component_declaration = factory_->NewDeclaration(
+        "component", factory_->NewCallExpression(func, args));
     func_body->statements()->Insert(component_declaration);
     args.clear();
     args.push_back(factory_->NewIdentifier("component"));
@@ -459,29 +460,31 @@ struct ASTParser final {
     args.clear();
     auto if_expression_list = factory_->NewExpressionList();
 
-
     if_expression_list->Insert(factory_->NewAssignExpression(
-            factory_->NewIdentifier("this"), factory_->NewIdentifier("props")));
+        factory_->NewIdentifier("this"), factory_->NewIdentifier("props")));
     merge_args.clear();
     merge_args.push_back(factory_->NewIdentifier("data"));
     merge_args.push_back(factory_->NewIdentifier("this"));
     if_expression_list->Insert(factory_->NewAssignExpression(
-            factory_->NewIdentifier("this"),
-            factory_->NewCallExpression(factory_->NewIdentifier("merge"),
-                                        merge_args)));
+        factory_->NewIdentifier("this"),
+        factory_->NewCallExpression(factory_->NewIdentifier("merge"),
+                                    merge_args)));
 
     args.clear();
     args.push_back(factory_->NewIdentifier("this"));
     args.push_back(factory_->NewIdentifier("component"));
     args.push_back(factory_->NewIdentifier(kCreateComponentRecursively));
-    auto call_create_node = factory_->NewCallExpression(factory_->NewIdentifier(create_node_func), args);
+    auto call_create_node = factory_->NewCallExpression(
+        factory_->NewIdentifier(create_node_func), args);
     if_expression_list->Insert(call_create_node);
     auto if_block = factory_->NewBlockStatement(if_expression_list);
-    auto if_stat = factory_->NewIfStatement(factory_->NewIdentifier(kCreateComponentRecursively), if_block);
+    auto if_stat = factory_->NewIfStatement(
+        factory_->NewIdentifier(kCreateComponentRecursively), if_block);
     func_body->statements()->Insert(if_stat);
 
-    //return function
-    func_body->statements()->Insert(factory_->NewReturnStatement(factory_->NewIdentifier("component")));
+    // return function
+    func_body->statements()->Insert(
+        factory_->NewReturnStatement(factory_->NewIdentifier("component")));
     stacks_.pop_back();
 
     // Declare createComponent function in global
@@ -491,14 +494,15 @@ struct ASTParser final {
     return function_name;
   }
 
-  //function main(this);
+  // function main(this);
   bool ParseBodyFunction(json11::Json& body) {
-    const std::string& main = ParseComponentFunction(body, kCreateBodyFunction, -1, true);
+    const std::string& main =
+        ParseComponentFunction(body, kCreateBodyFunction, 0, true);
     Handle<BlockStatement> chunk = stacks_[stacks_.size() - 1];
     std::vector<Handle<Expression>> args;
     args.push_back(factory_->NewIdentifier("_init_data"));
     args.push_back(factory_->NewBooleanConstant(true));
-      // main(merge(_data_main,_init_data)
+    // main(merge(_data_main,_init_data)
     chunk->statements()->Insert(
         factory_->NewCallExpression(factory_->NewIdentifier(main), args));
     return true;
@@ -509,8 +513,7 @@ struct ASTParser final {
         factory_->NewIdentifier("parent");
     static Handle<Identifier> child_identifier =
         factory_->NewIdentifier("child");
-    static Handle<Identifier> attr_identifier =
-        factory_->NewIdentifier("attr");
+    static Handle<Identifier> attr_identifier = factory_->NewIdentifier("attr");
 
     json11::Json control = json["control"];
     std::vector<Handle<Expression>> control_exprs;
@@ -522,14 +525,14 @@ struct ASTParser final {
     json11::Json component_alias = json["componentAlias"];
 
     if (node_id.is_string() && tag_name.is_string()) {
-      const std::string& component_real_name = component_alias[tag_name.string_value()].string_value();
-
+      const std::string& component_real_name =
+          component_alias[tag_name.string_value()].string_value();
 
       Handle<Expression> call_expr = nullptr;
       Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
       std::vector<Handle<Expression>> args;
 
-      //var attr = { key1:value1 }
+      // var attr = { key1:value1 }
       ProxyObject attr_obj;
       json11::Json attributes = json["attributes"];
       if (attributes.is_object()) {
@@ -551,8 +554,9 @@ struct ASTParser final {
 
       // var child = createComponent_xxx("node_id", attr);
       {
-        //createComponent_xxx("node_id", attr))
-        Handle<Expression> func = factory_->NewIdentifier("createComponent_" + component_real_name);
+        // createComponent_xxx("node_id", attr))
+        Handle<Expression> func =
+            factory_->NewIdentifier("createComponent_" + component_real_name);
 
         args.push_back(attr_init);
         args.push_back(factory_->NewIdentifier(kCreateComponentRecursively));
@@ -562,26 +566,24 @@ struct ASTParser final {
         Handle<Declaration> child_declaration =
             factory_->NewDeclaration("child", call_expr);
         statement->PushExpression(child_declaration);
-
       }
 
-      //appendChild(parent, child);
+      // appendChild(parent, child);
       AddAppendChildCall(json, parent_identifier, child_identifier);
-
     }
     for (int i = 0; i < control_exprs.size(); i++) {
-        stacks_.pop_back();
+      stacks_.pop_back();
     }
     return true;
   }
-  Handle<Expression> ParseNodeId(const json11::Json& body,
-                                 const std::vector<Handle<Expression>>& control_exprs,
-                                 const std::string& node_id) {
+  Handle<Expression> ParseNodeId(
+      const json11::Json& body,
+      const std::vector<Handle<Expression>>& control_exprs,
+      const std::string& node_id) {
     Handle<Expression> node_id_expr = nullptr;
     node_id_expr = this->factory_->NewStringConstant(node_id);
     return node_id_expr;
   }
-
 
   // Code Detail:
   //    var parent = nil;
@@ -626,7 +628,8 @@ struct ASTParser final {
   //        setClassList(child, class_name);
   //      end for / end if
   //    }
-  bool ParseNode(json11::Json& json, bool component_root, const std::string& component_name) {
+  bool ParseNode(json11::Json& json, bool component_root,
+                 const std::string& component_name) {
     static Handle<Identifier> parent_identifier =
         factory_->NewIdentifier("parent");
     static Handle<Identifier> child_identifier =
@@ -638,16 +641,18 @@ struct ASTParser final {
       if (control.is_object()) {
         control_exprs = ParseControl(control);
         if (control["repeat"].is_string()) {
-            SetAttributeStatement({child_identifier,
-                                   factory_->NewStringConstant(kAttrRepeatControl),
-                                   factory_->NewStringConstant("")},
-                                  stacks_[stacks_.size() - 1]);
+          SetAttributeStatement(
+              {child_identifier,
+               factory_->NewStringConstant(kAttrRepeatControl),
+               factory_->NewStringConstant("")},
+              stacks_[stacks_.size() - 1]);
         }
       }
       json11::Json node_id = json["nodeId"];
       json11::Json tag_name = json["tagName"];
       json11::Json ref = json11::Json("");
-      if (json["attributes"].is_object() && json["attributes"]["ref"].is_string()) {
+      if (json["attributes"].is_object() &&
+          json["attributes"]["ref"].is_string()) {
         ref = json["attributes"]["ref"];
       }
       Handle<Expression> node_id_expr = nullptr;
@@ -658,23 +663,23 @@ struct ASTParser final {
 
         // var child = createElement(tag_name, node_id, ref);
         {
-            Handle<Expression> func = factory_->NewIdentifier("createElement");
-            node_id_expr = ParseNodeId(control, control_exprs, node_id.string_value());
-            args.push_back(
-                    factory_->NewStringConstant(tag_name.string_value()));
-            args.push_back(node_id_expr);
-            args.push_back(factory_->NewStringConstant(ref.string_value()));
-            call_expr = factory_->NewCallExpression(func, args);
-            Handle<Declaration> child_declaration =
-                    factory_->NewDeclaration("child", call_expr);
-            statement->PushExpression(child_declaration);
-            if (component_root) {
-              args.clear();
-              args.push_back(factory_->NewIdentifier("component"));
-              args.push_back(child_identifier);
-              statement->PushExpression(factory_->NewCallExpression(
-                      factory_->NewIdentifier("setComponentRoot"), args));
-            }
+          Handle<Expression> func = factory_->NewIdentifier("createElement");
+          node_id_expr =
+              ParseNodeId(control, control_exprs, node_id.string_value());
+          args.push_back(factory_->NewStringConstant(tag_name.string_value()));
+          args.push_back(node_id_expr);
+          args.push_back(factory_->NewStringConstant(ref.string_value()));
+          call_expr = factory_->NewCallExpression(func, args);
+          Handle<Declaration> child_declaration =
+              factory_->NewDeclaration("child", call_expr);
+          statement->PushExpression(child_declaration);
+          if (component_root) {
+            args.clear();
+            args.push_back(factory_->NewIdentifier("component"));
+            args.push_back(child_identifier);
+            statement->PushExpression(factory_->NewCallExpression(
+                factory_->NewIdentifier("setComponentRoot"), args));
+          }
         }
         if (!component_root) {
           // appendChild(parent, child);
@@ -696,16 +701,15 @@ struct ASTParser final {
           args.push_back(child_identifier);
           args.push_back(factory_->NewStringConstant(key));
           if (value.is_string()) {
-            args.push_back(
-                    factory_->NewStringConstant(value.string_value()));
+            args.push_back(factory_->NewStringConstant(value.string_value()));
           } else {
             args.push_back(ParseBindingExpression(value));
           }
 
           Handle<Expression> set_style_func_expr =
-                  factory_->NewIdentifier("setStyle");
+              factory_->NewIdentifier("setStyle");
           Handle<CallExpression> call_func =
-                  factory_->NewCallExpression(set_style_func_expr, args);
+              factory_->NewCallExpression(set_style_func_expr, args);
           Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
           statement->PushExpression(call_func);
         }
@@ -718,11 +722,27 @@ struct ASTParser final {
         for (auto it = items.begin(); it != items.end(); ++it) {
           const auto& key = it->first;
           const auto& value = it->second;
+          Handle<Expression> value_statements;
+          if (value.is_string()) {
+            value_statements =
+                factory_->NewStringConstant(value.string_value());
+          } else if (value.is_array()) {
+            for (auto jt = value.array_items().begin();
+                 jt != value.array_items().end(); jt++) {
+              if (value_statements) {
+                value_statements = factory_->NewBinaryExpression(
+                    BinaryOperation::kAddition, value_statements,
+                    ParseExpression(*jt));
+              } else {
+                value_statements = ParseExpression(*jt);
+              }
+            }
+          } else {
+            value_statements = ParseBindingExpression(value);
+          }
           SetAttributeStatement(
               {child_identifier, factory_->NewStringConstant(key),
-               value.is_string()
-                   ? factory_->NewStringConstant(value.string_value())
-                   : ParseBindingExpression(value)},
+               value_statements},
               stacks_[stacks_.size() - 1]);
         }
       }
