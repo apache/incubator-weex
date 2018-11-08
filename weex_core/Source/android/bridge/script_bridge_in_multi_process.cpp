@@ -931,6 +931,21 @@ std::unique_ptr<IPCResult> OnReceivedResult(IPCArguments *arguments) {
   return createInt32Result(static_cast<int32_t>(true));
 }
 
+std::unique_ptr<IPCResult> UpdateComponentData(IPCArguments *arguments) {
+    auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+    auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+    auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+    WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+        weex::base::MakeCopyable(
+            [page_id = std::move(arg1), cid = std::move(arg2), json_data = std::move(arg3)]() {
+              WeexCoreManager::Instance()
+                  ->script_bridge()
+                  ->core_side()
+                  ->UpdateComponentData(page_id.get(), cid.get(), json_data.get());
+            }));
+    return createInt32Result(static_cast<int32_t>(true));
+}
+
 ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   set_script_side(new bridge::script::ScriptSideInMultiProcess);
   set_core_side(new CoreSideInScript);
@@ -1022,6 +1037,8 @@ void ScriptBridgeInMultiProcess::RegisterIPCCallback(IPCHandler *handler) {
                            HandleDispatchMessage);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::ONRECEIVEDRESULT),
                            OnReceivedResult);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::UPDATECOMPONENTDATA),
+                           UpdateComponentData);
 }
 
 }  // namespace WeexCore

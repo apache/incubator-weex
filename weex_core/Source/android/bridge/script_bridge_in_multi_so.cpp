@@ -456,6 +456,19 @@ static void OnReceivedResult(long callback_id,
       }));
 }
 
+static void UpdateComponentData(const char* page_id,
+                                const char* cid,
+                                const char* json_data) {
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+      weex::base::MakeCopyable(
+          [page_id = std::string(page_id), cid = std::string(cid), json_data = std::string(json_data)]() {
+            WeexCoreManager::Instance()
+                ->script_bridge()
+                ->core_side()
+                ->UpdateComponentData(page_id.c_str(), cid.c_str(), json_data.c_str());
+          }));
+}
+
 static void ReportException(const char *page_id, const char *func,
                             const char *exception_string) {
   //  WeexCoreManager::Instance()->script_bridge()->core_side()->ReportException(
@@ -506,7 +519,8 @@ FunctionsExposedByCore *ScriptBridgeInMultiSo::GetExposedFunctions() {
                                  CallT3DLinkNative,
                                  PostMessage,
                                  DispatchMessage,
-                                 OnReceivedResult};
+                                 OnReceivedResult,
+                                 UpdateComponentData};
   auto functions =
       (FunctionsExposedByCore *)malloc(sizeof(FunctionsExposedByCore));
   memset(functions, 0, sizeof(FunctionsExposedByCore));

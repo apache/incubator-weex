@@ -75,7 +75,7 @@ class VNode {
     render_object_ref_ = std::move(ref);
   }
   inline void *& inst() { return inst_; }
-  inline const VNode *parent() const { return parent_; }
+  inline VNode *parent() const { return parent_; }
 
   inline std::vector<VNode *> *child_list() { return &child_list_; }
 

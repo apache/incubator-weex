@@ -53,11 +53,22 @@ class VNodeRenderManager {
   void RegisterModules(const std::string &modules) { modules_.push_back(modules); }
   void PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node);
   void CallNativeModule(ExecState *exec_state, const std::string &module, const std::string &method, const std::string &args, int argc = 0);
+  void UpdateComponentData(const std::string& page_id, const char* cid, const std::string& json_data);
   static VNodeRenderManager *GetInstance() {
     if (!g_instance) {
       g_instance = new VNodeRenderManager();
     }
     return g_instance;
+  }
+
+  inline ExecState *GetExecState(const std::string &instance_id) {
+    auto it = exec_states_.find(instance_id);
+    return it != exec_states_.end() ? it->second : nullptr;
+  }
+
+  inline VNode *GetRootVNode(const std::string &instance_id) {
+    auto it = vnode_trees_.find(instance_id);
+    return it != vnode_trees_.end() ? it->second : nullptr;
   }
 
  private:

@@ -47,6 +47,15 @@ class VNodeRenderContext {
     return style_json_;
   }
 
+  inline void add_component(int ref, VComponent* component) {
+    vcomponent_trees_.insert({ref, component});
+  }
+
+  inline VComponent* GetComponent(int ref) {
+    auto it = vcomponent_trees_.find(ref);
+    return it != vcomponent_trees_.end() ? it->second : nullptr;
+  }
+
  private:
   // node context
   std::string page_id_;
@@ -56,6 +65,7 @@ class VNodeRenderContext {
   // script to execute
   std::string script_;
   std::map<std::string, json11::Json> style_json_;
+  std::unordered_map<int, VComponent *> vcomponent_trees_;
 };
 }  // namespace data_render
 }  // namespace core

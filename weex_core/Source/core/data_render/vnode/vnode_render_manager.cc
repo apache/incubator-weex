@@ -66,7 +66,7 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
     if (component->root_vnode() == nullptr) {
       component->UpdateData();
     }
-    return ParseVNode2RenderObject(component->root_vnode(), parent, false,
+    return ParseVNode2RenderObject(component->root_vnode(), parent, isRoot,
                                    index, pageId);
   }
   std::string ref_str;
@@ -404,6 +404,18 @@ void VNodeRenderManager::CallNativeModule(ExecState* exec_state,
   }
 }
 
+void VNodeRenderManager::UpdateComponentData(const std::string& page_id,
+                                             const char* cid,
+                                             const std::string& json_data) {
+  ExecState* exec_state = GetExecState(page_id);
+  if (!exec_state) return;
+  VComponent* component = exec_state->context()->GetComponent(atoi(cid));
+  if (component) {
+    Value value(StringToValue(exec_state, json_data));
+    component->UpdateData(&value);
+  }
+}
+
 void VNodeRenderManager::PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node) {
     for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {
         if (iter->second == exec_state) {
@@ -468,10 +480,10 @@ void UpdateChildren(const string& page_id, VNode* old_node, VNode* new_node) {
     ref_list.push_back((*begin));
   }
 
-  unsigned int old_start = 0;
-  unsigned int old_end = static_cast<unsigned int >(old_children.size()) - 1;
-  unsigned int new_start = 0;
-  unsigned int new_end = static_cast<unsigned int >(new_children.size()) - 1;
+  int old_start = 0;
+  int old_end = static_cast<int>(old_children.size()) - 1;
+  int new_start = 0;
+  int new_end = static_cast<int>(new_children.size()) - 1;
   VNode* old_start_node = GetOrNull(old_children, old_start);
   VNode* old_end_node = GetOrNull(old_children, old_end);
   VNode* new_start_node = GetOrNull(new_children, new_start);

@@ -35,9 +35,9 @@ class VComponent : public VNode {
     virtual void OnCreated(
         VComponent* component, Table* data, Table* props,
         const std::unordered_map<std::string, VNodeRefs>& ref_map) = 0;
-    virtual void OnUpdated(VComponent* component, Table* props) = 0;
-    virtual void OnEvent(VComponent* component, const std::string& func,
-                         Array* params) = 0;
+    virtual void OnUpdated(
+        VComponent* component, Table* props,
+        const std::unordered_map<std::string, VNodeRefs>& ref_map) = 0;
     virtual void OnDestroyed(VComponent* component) = 0;
   };
   VComponent(ExecState* exec_state, int template_id, const std::string& name,
@@ -57,6 +57,7 @@ class VComponent : public VNode {
 
   inline int id() { return id_; }
   inline int template_id() { return template_id_; }
+  inline ExecState* exec_state() { return exec_state_; }
   void SetData(Value* data);
   void SetProps(Value* props);
   inline VNode* root_vnode() { return root_vnode_.get(); }

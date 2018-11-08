@@ -174,7 +174,7 @@ void VComponent::UpdateData() {
 }
 
 void VComponent::UpdateData(Value *data) {
-  if (TableAddAll(*data, data_)) {
+  if (data->type == Value::Type::TABLE && TableAddAll(*data, data_)) {
     UpdateData();
   }
 }
@@ -221,7 +221,10 @@ void VComponent::DispatchUpdated() {
   if (!is_dirty_) return;
   BuildRefMap();
   if (listener_) {
-    listener_->OnUpdated(this, ValueTo<Table>(&updated_props_));
+    if (updated_props_.type == Value::Type::NIL) {
+      updated_props_ = exec_state_->class_factory()->CreateTable();
+    }
+    listener_->OnUpdated(this, ValueTo<Table>(&updated_props_), ref_map_);
   }
   TravelVComponentsWithFunc(&VComponent::DispatchUpdated, root_vnode());
   is_dirty_ = false;

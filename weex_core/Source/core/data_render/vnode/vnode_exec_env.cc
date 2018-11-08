@@ -29,6 +29,7 @@
 #include "core/data_render/js_common_function.h"
 #include "core/data_render/vnode/vcomponent.h"
 #include "core/data_render/vnode/vnode_render_manager.h"
+#include "core/data_render/vnode/vcomponent_lifecycle_listener.h"
 #include <base/LogDefines.h>
 
 namespace weex {
@@ -285,6 +286,10 @@ static Value CreateComponent(ExecState* exec_state) {
   if (exec_state->context()->root() == nullptr) {
     exec_state->context()->set_root(component);
   }
+  component->set_life_cycle_listener(
+      std::unique_ptr<VComponent::LifecycleListener>(
+          new VComponentLifecycleListener));
+  exec_state->context()->add_component(component->id(), component);
   return result;
 }
     
@@ -538,6 +543,23 @@ static Value SetStyle(ExecState* exec_state) {
   return Value();
 }
 
+// addEvent(node, event, value);
+static Value AddEvent(ExecState* exec_state) {
+  VNode* node = reinterpret_cast<VNode*>(exec_state->GetArgument(0)->cptr);
+  Value *event = exec_state->GetArgument(1);
+  size_t argc = exec_state->GetArgumentCount() - 2;
+  std::vector<Value> args;
+  for (uint i = 0; i < argc; i++) {
+    Value *params = exec_state->GetArgument(2 + i);
+    args.push_back(*params);
+  }
+  if (node == nullptr || event->type != Value::Type::STRING) {
+    return Value();
+  }
+  node->AddEvent(event->str->c_str(), args);
+  return Value();
+}
+
 void VNodeExecEnv::InitCFuncEnv(ExecState *state) {
     state->Register("log", Log);
     state->Register("sizeof", SizeOf);
@@ -556,6 +578,7 @@ void VNodeExecEnv::InitCFuncEnv(ExecState *state) {
     state->Register("setProps", SetProps);
     state->Register("setClassList", SetClassList);
     state->Register("setStyle", SetStyle);
+    state->Register("addEvent", AddEvent);
     state->Register("__callNativeModule", CallNativeModule);
     state->Register("__registerModules", RegisterModules);
     state->Register("Array", state->class_factory()->ClassArray());

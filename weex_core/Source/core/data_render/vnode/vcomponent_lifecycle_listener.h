@@ -17,18 +17,25 @@
  * under the License.
  */
 
-#include "core/data_render/vnode/vnode_render_context.h"
+#ifndef WEEX_PROJECT_VCOMPONENT_LIFECYCLE_LISTENER_H
+#define WEEX_PROJECT_VCOMPONENT_LIFECYCLE_LISTENER_H
+
+#include "core/data_render/vnode/vcomponent.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-
-VNodeRenderContext::VNodeRenderContext()
-    : page_id_(), root_(nullptr), raw_json_(), script_(), vcomponent_trees_() {}
-
-VNodeRenderContext::~VNodeRenderContext() {}
-
-void VNodeRenderContext::Reset() { root_ = nullptr; }
+class VComponentLifecycleListener : public VComponent::LifecycleListener {
+  void OnCreated(
+      VComponent* component, Table* data, Table* props,
+      const std::unordered_map<std::string, VComponent::VNodeRefs>& ref_map);
+  void OnUpdated(
+      VComponent* component, Table* props,
+      const std::unordered_map<std::string, VComponent::VNodeRefs>& ref_map);
+  void OnDestroyed(VComponent* component);
+};
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
+
+#endif  // WEEX_PROJECT_VCOMPONENT_LIFECYCLE_LISTENER_H
