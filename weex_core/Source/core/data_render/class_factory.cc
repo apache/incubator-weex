@@ -193,6 +193,31 @@ std::vector<ClassDescriptor *> ClassFactory::descs() {
     return descs;
 }
 
+std::vector<Value> ClassFactory::constants() {
+    std::vector<Value> constants;
+    for (auto iter = stores_.begin(); iter != stores_.end(); iter++) {
+        switch (iter->second) {
+            case Value::Type::ARRAY:
+            {
+                Value array;
+                SetAValue(&array, iter->first);
+                constants.push_back(array);
+                break;
+            }
+            case Value::Type::TABLE:
+            {
+                Value table;
+                SetTValue(&table, iter->first);
+                constants.push_back(table);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    return constants;
+}
+    
 }
 }
 }

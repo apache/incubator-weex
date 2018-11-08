@@ -27,7 +27,7 @@
 #include "core/data_render/rax_parser_context.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/class_array.h"
-
+#include "core/data_render/vnode/vnode_exec_env.h"
 #if DEBUG
 #include "core/data_render/monitor/vm_monitor.h"
 #endif
@@ -90,6 +90,8 @@ void ExecState::Compile(std::string& err) {
   err.clear();
   CodeGenerator generator(this);
   if (!context()->raw_json().is_null()) {
+      VNodeExecEnv::ParseData(this);
+      VNodeExecEnv::ParseStyle((this));
       ParseResult result = Parser::Parse(context()->raw_json(),err);
       generator.Visit(result.expr().get(), nullptr);
   }

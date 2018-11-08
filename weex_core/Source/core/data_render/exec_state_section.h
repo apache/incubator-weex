@@ -38,6 +38,7 @@ enum ExecSection {
     EXEC_SECTION_NONE = 0,
     EXEC_SECTION_HEADER,
     EXEC_SECTION_STRING,
+    EXEC_SECTION_DATA,
     EXEC_SECTION_FUNCTION,
     EXEC_SECTION_GLOBAL_CONSTANTS,
     EXEC_SECTION_GLOBAL_VARIABLES,
@@ -53,10 +54,6 @@ struct Value;
     
 class Section {
 public:
-    enum SectionKey {
-        kValueType,
-        kValuePayload,
-    };
     explicit Section(ExecStateEncoder *encoder) : encoder_(encoder) {}
     explicit Section(ExecStateDecoder *decoder, uint32_t length) : decoder_(decoder), length_(length) {}
     virtual ~Section() {};
@@ -110,6 +107,20 @@ public:
     SectionString(ExecStateEncoder *encoder) : Section(encoder) {}
     SectionString(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
     virtual ~SectionString() {};
+    virtual bool encoding();
+    virtual bool decoding();
+    virtual uint32_t size();
+};
+    
+class SectionData : public Section {
+public:
+    enum SectionKey {
+        kValueDataSize,
+        kValueDataPayload
+    };
+    SectionData(ExecStateEncoder *encoder) : Section(encoder) {}
+    SectionData(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
+    virtual ~SectionData() {};
     virtual bool encoding();
     virtual bool decoding();
     virtual uint32_t size();

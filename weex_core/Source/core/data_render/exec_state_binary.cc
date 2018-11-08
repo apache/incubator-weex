@@ -64,6 +64,11 @@ bool ExecStateEncoder::encoding(std::string &err) {
                 err = "string section encoding error";
                 break;
             }
+            SectionData data(this);
+            if (!data.encoding()) {
+                err = "data section encoding error";
+                break;
+            }
             SectionFunction function(this, gs_op_code_bits);
             if (!function.encoding()) {
                 err = "function section encoding error";
@@ -144,6 +149,14 @@ bool ExecStateDecoder::decoding(std::string &err) {
                         SectionString string(this, section_length);
                         if (!string.decoding()) {
                             throw EncoderError("string section decoding error");
+                        }
+                        break;
+                    }
+                    case ExecSection::EXEC_SECTION_DATA:
+                    {
+                        SectionData data(this, section_length);
+                        if (!data.decoding()) {
+                            throw EncoderError("data section decoding error");
                         }
                         break;
                     }
@@ -385,8 +398,6 @@ bool WXExecEncoder(std::string &input, std::string &path, std::string &error) {
         }
         else {
             exec_state->context()->raw_json() = json;
-            VNodeExecEnv::ParseData(exec_state);
-            VNodeExecEnv::ParseStyle(exec_state);
         }
         if (exec_state->global()->IndexOf("__weex_data__") < 0) {
             exec_state->global()->Set("__weex_data__", Value());

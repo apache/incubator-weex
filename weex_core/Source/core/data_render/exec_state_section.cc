@@ -24,6 +24,7 @@
 #include "core/data_render/common_error.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
+#include "core/data_render/table.h"
 #include "base/LogDefines.h"
 
 namespace weex {
@@ -253,18 +254,18 @@ fStream *Section::stream() {
     return decoder_ ? decoder_->stream_ : nullptr;
 }
     
-uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, Value *pval) {
+uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t remain, Value *pval) {
     uint32_t total_bytes_read = 0;
     do {
         uint32_t bytes_read = 0;
         uint32_t bytes_decoding = sizeof(uint8_t);
         int8_t type = 0;
-        if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&type, &bytes_decoding))) {
+        if (!(bytes_read = decodingFromBuffer(buffer, remain, (uint8_t *)&type, &bytes_decoding))) {
             break;
         }
         total_bytes_read += bytes_read;
         buffer += bytes_read;
-        buffer_len -= bytes_read;
+        remain -= bytes_read;
         if (type < Value::Type::NIL && type > Value::Type::FUNC_INST) {
             break;
         }
@@ -274,7 +275,7 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
                 int32_t payload = -1;
                 uint16_t u16_payload = 0;
                 bytes_decoding = sizeof(uint16_t);
-                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&u16_payload, &bytes_decoding))) {
+                if (!(bytes_read = decodingFromBuffer(buffer, remain, (uint8_t *)&u16_payload, &bytes_decoding))) {
                     break;
                 }
                 payload = u16_payload;
@@ -285,6 +286,7 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
                 }
                 SetCDValue(pval, reinterpret_cast<GCObject *>(descs[payload]));
                 LOGD("decoding class desc value:%i\n", payload);
+                total_bytes_read += bytes_read;
                 break;
             }
             case Value::Type::FUNC:
@@ -292,7 +294,7 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
                 int32_t payload = -1;
                 uint16_t u16_payload = 0;
                 bytes_decoding = sizeof(uint16_t);
-                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&u16_payload, &bytes_decoding))) {
+                if (!(bytes_read = decodingFromBuffer(buffer, remain, (uint8_t *)&u16_payload, &bytes_decoding))) {
                     break;
                 }
                 payload = u16_payload;
@@ -313,6 +315,7 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
                 }
                 pval->type = Value::Type::FUNC;
                 LOGD("decoding function value:%i\n", payload);
+                total_bytes_read += bytes_read;
                 break;
             }
             case Value::Type::STRING:
@@ -320,7 +323,7 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
                 int32_t payload = -1;
                 uint16_t u16_payload = 0;
                 bytes_decoding = sizeof(uint16_t);
-                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&u16_payload, &bytes_decoding))) {
+                if (!(bytes_read = decodingFromBuffer(buffer, remain, (uint8_t *)&u16_payload, &bytes_decoding))) {
                     break;
                 }
                 payload = u16_payload;
@@ -336,45 +339,122 @@ uint32_t Section::decodingValueFromBuffer(uint8_t *buffer, uint32_t buffer_len, 
                 pval->str = store[payload].second.get();
                 LOGD("decoding string value:[%i] %s\n", payload, pval->str->c_str());
                 pval->type = Value::Type::STRING;
+                total_bytes_read += bytes_read;
                 break;
             }
             case Value::Type::INT:
             {
                 int32_t i32_payload = 0;
                 bytes_decoding = sizeof(int32_t);
-                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&i32_payload, &bytes_decoding))) {
+                if (!(bytes_read = decodingFromBuffer(buffer, remain, (uint8_t *)&i32_payload, &bytes_decoding))) {
                     break;
                 }
                 pval->i = i32_payload;
                 pval->type = Value::Type::INT;
                 LOGD("decoding int value:%i\n", (int32_t)pval->i);
+                total_bytes_read += bytes_read;
                 break;
             }
             case Value::Type::NUMBER:
             {
                 bytes_decoding = sizeof(double);
-                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&pval->n, &bytes_decoding))) {
+                if (!(bytes_read = decodingFromBuffer(buffer, remain, (uint8_t *)&pval->n, &bytes_decoding))) {
                     break;
                 }
                 pval->type = Value::Type::NUMBER;
                 LOGD("decoding number value:%f\n", pval->n);
+                total_bytes_read += bytes_read;
                 break;
             }
             case Value::Type::BOOL:
             {
                 bytes_decoding = sizeof(uint8_t);
-                if (!(bytes_read = decodingFromBuffer(buffer, buffer_len, (uint8_t *)&pval->b, &bytes_decoding))) {
+                if (!(bytes_read = decodingFromBuffer(buffer, remain, (uint8_t *)&pval->b, &bytes_decoding))) {
                     break;
                 }
                 pval->type = Value::Type::BOOL;
                 LOGD("decoding bool value:%i\n", pval->b);
+                total_bytes_read += bytes_read;
+                break;
+            }
+            case Value::Type::ARRAY:
+            {
+                uint8_t item_size = 0;
+                bytes_decoding = sizeof(uint8_t);
+                if (!(bytes_read = decodingFromBuffer(buffer, remain, (uint8_t *)&item_size, &bytes_decoding))) {
+                    break;
+                }
+                total_bytes_read += bytes_read;
+                buffer += bytes_read;
+                remain -= bytes_read;
+                ClassFactory *class_factory = decoder()->exec_state()->class_factory();
+                Value array_value = class_factory->CreateArray();
+                if (!item_size) {
+                    break;
+                }
+                Array *array = ValueTo<Array>(&array_value);
+                for (int i = 0; i < item_size; i++) {
+                    Value item;
+                    if (!(bytes_read = decodingValueFromBuffer(buffer, remain, &item))) {
+                        throw DecoderError("decoding array item payload error");
+                        break;
+                    }
+                    total_bytes_read += bytes_read;
+                    buffer += bytes_read;
+                    remain -= bytes_read;
+                    array->items.push_back(item);
+                }
+                *pval = array_value;
+                LOGD("decoding array:%s\n", ArrayToString(array).c_str());
+                break;
+            }
+            case Value::Type::TABLE:
+            {
+                uint8_t keys_size = 0;
+                bytes_decoding = sizeof(uint8_t);
+                if (!(bytes_read = decodingFromBuffer(buffer, remain, (uint8_t *)&keys_size, &bytes_decoding))) {
+                    break;
+                }
+                total_bytes_read += bytes_read;
+                buffer += bytes_read;
+                remain -= bytes_read;
+                ClassFactory *class_factory = decoder()->exec_state()->class_factory();
+                Value table_value = class_factory->CreateTable();
+                if (!keys_size) {
+                    break;
+                }
+                Table *table = ValueTo<Table>(&table_value);
+                for (int i = 0; i < keys_size; i++) {
+                    Value key;
+                    if (!(bytes_read = decodingValueFromBuffer(buffer, remain, &key))) {
+                        throw DecoderError("decoding table key payload error");
+                        break;
+                    }
+                    if (!IsString(&key)) {
+                        throw DecoderError("decoding table key payload error");
+                        break;
+                    }
+                    total_bytes_read += bytes_read;
+                    buffer += bytes_read;
+                    remain -= bytes_read;
+                    Value val;
+                    if (!(bytes_read = decodingValueFromBuffer(buffer, remain, &val))) {
+                        throw DecoderError("decoding table value payload error");
+                        break;
+                    }
+                    total_bytes_read += bytes_read;
+                    buffer += bytes_read;
+                    remain -= bytes_read;
+                    table->map.insert(std::make_pair(CStringValue(&key), val));
+                }
+                *pval = table_value;
+                LOGD("decoding table:%s\n", TableToString(table).c_str());
                 break;
             }
             default:
                 throw EncoderError("decoding value type unkown error");
                 break;
         }
-        total_bytes_read += bytes_read;
         
     } while (0);
     
@@ -414,6 +494,7 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
                     break;
                 }
                 LOGD("encoding class value:%i\n", payload);
+                total_bytes_write += bytes_write;
                 break;
             }
             case Value::Type::FUNC:
@@ -443,6 +524,7 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
                     break;
                 }
                 LOGD("encoding function value:%i\n", payload);
+                total_bytes_write += bytes_write;
                 break;
             }
             case Value::Type::STRING:
@@ -466,6 +548,7 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
                     break;
                 }
                 LOGD("encoding string value:[%i] %s\n", payload, pval->str->c_str());
+                total_bytes_write += bytes_write;
                 break;
             }
             case Value::Type::INT:
@@ -475,6 +558,7 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
                     break;
                 }
                 LOGD("encoding int value:%i\n", (int32_t)pval->i);
+                total_bytes_write += bytes_write;
                 break;
             }
             case Value::Type::NUMBER:
@@ -483,6 +567,7 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
                     break;
                 }
                 LOGD("encoding int value:%f\n", pval->n);
+                total_bytes_write += bytes_write;
                 break;
             }
             case Value::Type::BOOL:
@@ -491,13 +576,75 @@ uint32_t Section::encodingValueToBuffer(uint8_t *buffer, uint32_t buffer_len, Va
                     break;
                 }
                 LOGD("encoding bool value:%i\n", pval->b);
+                total_bytes_write += bytes_write;
+                break;
+            }
+            case Value::Type::ARRAY:
+            {
+                Array *array = ValueTo<Array>(pval);
+                uint8_t items_size = static_cast<uint8_t>(array->items.size());
+                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, sizeof(uint8_t), &items_size))) {
+                    throw EncoderError("encoder array item size error");
+                    break;
+                }
+                buffer += bytes_write;
+                buffer_len -= bytes_write;
+                total_bytes_write += bytes_write;
+                for (auto &item : array->items) {
+                    uint32_t length = GetValueLength(&item);
+                    uint32_t bytes_write = Section::encodingValueToBuffer(buffer, buffer_len, &item);
+                    if (bytes_write != length) {
+                        throw EncoderError("encoding array payload error");
+                        break;
+                    }
+                    buffer += bytes_write;
+                    buffer_len -= bytes_write;
+                    total_bytes_write += bytes_write;
+                }
+                LOGD("encoding array:%s\n", ArrayToString(array).c_str());
+                break;
+            }
+            case Value::Type::TABLE:
+            {
+                StringTable *string_table = encoder()->exec_state()->string_table();
+                Table *table = ValueTo<Table>(pval);
+                uint8_t keys_size = static_cast<uint8_t>(table->map.size());
+                if (!(bytes_write = encodingToBuffer(buffer, buffer_len, sizeof(uint8_t), &keys_size))) {
+                    throw EncoderError("encoder table key size error");
+                    break;
+                }
+                buffer += bytes_write;
+                buffer_len -= bytes_write;
+                total_bytes_write += bytes_write;
+                for (auto &map : table->map) {
+                    Value key(string_table->StringFromUTF8(map.first));
+                    Value val = map.second;
+                    uint32_t length = GetValueLength(&key);
+                    uint32_t bytes_write = Section::encodingValueToBuffer(buffer, buffer_len, &key);
+                    if (bytes_write != length) {
+                        throw EncoderError("encoding table key payload error");
+                        break;
+                    }
+                    buffer += bytes_write;
+                    buffer_len -= bytes_write;
+                    total_bytes_write += bytes_write;
+                    length = GetValueLength(&val);
+                    bytes_write = Section::encodingValueToBuffer(buffer, buffer_len, &val);
+                    if (bytes_write != length) {
+                        throw EncoderError("encoding table key value payload error");
+                        break;
+                    }
+                    buffer += bytes_write;
+                    buffer_len -= bytes_write;
+                    total_bytes_write += bytes_write;
+                }
+                LOGD("encoding table:%s\n", TableToString(table).c_str());
                 break;
             }
             default:
                 throw EncoderError("encoder value type unkown error");
                 break;
         }
-        total_bytes_write += bytes_write;
         
     } while (0);
     
@@ -701,6 +848,28 @@ uint32_t Section::GetValueLength(Value *value) {
         case Value::Type::BOOL:
         {
             length += sizeof(uint8_t);
+            break;
+        }
+        case Value::Type::ARRAY:
+        {
+            length += sizeof(uint8_t);
+            Array *array = ValueTo<Array>(value);
+            for (auto item : array->items) {
+                length += GetValueLength(&item);
+            }
+            break;
+        }
+        case Value::Type::TABLE:
+        {
+            StringTable *string_table = encoder()->exec_state()->string_table();
+            length += sizeof(uint8_t);
+            Table *table = ValueTo<Table>(value);
+            for (auto &map : table->map) {
+                Value key(string_table->StringFromUTF8(map.first));
+                Value val = map.second;
+                length += GetValueLength(&key);
+                length += GetValueLength(&val);
+            }
             break;
         }
         default:
@@ -961,6 +1130,144 @@ bool SectionString::decoding() {
         if (index != string_count) {
             break;
         }
+        finished = true;
+        
+    } while (0);
+    
+    return finished;
+}
+ 
+uint32_t SectionData::size() {
+    ExecState *exec_state = encoder()->exec_state();
+    ClassFactory *class_factory = exec_state->class_factory();
+    std::vector<Value> constants = class_factory->constants();
+    uint32_t data_size = static_cast<uint32_t>(constants.size());
+    uint32_t size = 0;
+    if (data_size > 0) {
+        size += GetFTLVLength(kValueDataSize, sizeof(uint32_t));
+        uint32_t constants_length = 0;
+        for (auto constant : constants) {
+            constants_length += GetValueLength(&constant);
+        }
+        size += GetFTLVLength(kValueDataPayload, constants_length);
+    }
+    return size;
+}
+    
+bool SectionData::encoding() {
+    bool finished = false;
+    do {
+        uint32_t size = this->size();
+        if (!size) {
+            finished = true;
+            break;
+        }
+        if (!Section::encoding((uint16_t)ExecSection::EXEC_SECTION_DATA, size)) {
+            break;
+        }
+        ExecState *exec_state = encoder()->exec_state();
+        ClassFactory *class_factory = exec_state->class_factory();
+        std::vector<Value> constants = class_factory->constants();
+        uint32_t data_size = static_cast<uint32_t>(constants.size());
+        if (!Section::encoding(kValueDataSize, sizeof(uint32_t), &data_size)) {
+            break;
+        }
+        uint32_t payload_length = 0;
+        for (int i = 0; i < constants.size(); i++) {
+            payload_length += GetValueLength(&constants[i]);
+        }
+        uint8_t *buffer = (uint8_t *)malloc(payload_length);
+        if (!buffer) {
+            throw EncoderError("low memory error");
+            break;
+        }
+        uint8_t *write_buffer = buffer;
+        uint32_t remain_length = payload_length;
+        for (int i = 0; i < constants.size(); i++) {
+            uint32_t length = GetValueLength(&constants[i]);
+            uint32_t bytes_write = Section::encodingValueToBuffer(write_buffer, remain_length, &constants[i]);
+            if (bytes_write != length) {
+                throw EncoderError("encoding data payload error");
+                break;
+            }
+            remain_length -= bytes_write;
+            write_buffer += bytes_write;
+        }
+        if (remain_length) {
+            free(buffer);
+            throw EncoderError("encoding data payload error");
+            break;
+        }
+        if (!Section::encoding(kValueDataPayload, payload_length, buffer)) {
+            free(buffer);
+            throw EncoderError("encoding data payload error");
+            break;
+        }
+        free(buffer);
+        finished = true;
+        
+    } while (0);
+    
+    return finished;
+}
+    
+bool SectionData::decoding() {
+    bool finished = false;
+    do {
+        fStream *stream = Section::stream();
+        if (!stream) {
+            break;
+        }
+        if (stream->Tell() < 0) {
+            break;
+        }
+        uint16_t target = 0;
+        uint32_t data_size = 0;
+        uint32_t size = sizeof(uint32_t);
+        uint32_t readbytes = stream->ReadTarget(&target, (uint8_t *)&data_size, &size);
+        if (readbytes != size || target != kValueDataSize) {
+            throw EncoderError("decoding data size error");
+            break;
+        }
+        if (!data_size) {
+            break;
+        }
+        if ((readbytes = stream->ReadTarget(&target, NULL, NULL)) == 0) {
+            throw DecoderError("decoding data payload error");
+            break;
+        }
+        if (target != kValueDataPayload) {
+            throw DecoderError("decoding data payload target error");
+            break;
+        }
+        uint8_t *buffer = (uint8_t *)malloc(readbytes);
+        if (!buffer) {
+            throw DecoderError("low memory error");
+            break;
+        }
+        if (stream->Read(buffer, 1, readbytes) != readbytes) {
+            free(buffer);
+            throw DecoderError("decoding data payload error");
+            break;
+        }
+        uint8_t *read_buffer = buffer;
+        uint32_t remain_length = readbytes;
+        uint32_t bytes_read = 0;
+        for (int i = 0; i < data_size; i++) {
+            Value data;
+            if (!(bytes_read = decodingValueFromBuffer(read_buffer, remain_length, &data))) {
+                throw DecoderError("decoding data payload error");
+                break;
+            }
+            read_buffer += bytes_read;
+            remain_length -= bytes_read;
+        }
+        if (remain_length) {
+            free(buffer);
+            throw DecoderError("decoding array item payload error");
+            break;
+        }
+        free(buffer);
         finished = true;
         
     } while (0);

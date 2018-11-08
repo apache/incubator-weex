@@ -50,6 +50,7 @@ public:
     int Find(const ClassDescriptor *desc);
     inline const std::vector<std::pair<GCObject *, Value::Type>>& stores() { return stores_; }
     std::vector<ClassDescriptor *> descs();
+    std::vector<Value> constants();
  private:
     ClassInstance *CreateClassInstanceFromSuper(ClassDescriptor *p_desc);
     std::vector<std::pair<GCObject *, Value::Type>> stores_;
