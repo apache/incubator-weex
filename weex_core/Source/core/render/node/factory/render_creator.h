@@ -20,10 +20,12 @@
 #define CORE_RENDER_NODE_FACTORY_RENDER_CREATOR_H_
 
 #include <string>
+#include <map>
 
 namespace WeexCore {
 
 class IRenderObject;
+class IRenderFactory;
 
 class RenderCreator {
  private:
@@ -51,10 +53,16 @@ class RenderCreator {
     return g_pInstance;
   }
 
+  IRenderFactory *CreateFactory(const std::string &type);
   IRenderObject *CreateRender(const std::string &type, const std::string &ref);
+  
+  void RegisterAffineType(const std::string &type, const std::string& asType);
+  bool IsAffineType(const std::string &type, const std::string& asType);
 
  private:
   static RenderCreator *g_pInstance;
+  
+  std::map<std::string, std::string> affineTypes_; // affineTypes_[A] = B means A is rendered like B
 };
 }  // namespace WeexCore
 

@@ -876,6 +876,16 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     }
 }
 
++ (void)registerComponentAffineType:(NSString *)type asType:(NSString *)baseType
+{
+    WeexCore::RenderCreator::GetInstance()->RegisterAffineType([type UTF8String] ?: "", [baseType UTF8String] ?: "");
+}
+
++ (BOOL)isComponentAffineType:(NSString *)type asType:(NSString *)baseType
+{
+    return WeexCore::RenderCreator::GetInstance()->IsAffineType([type UTF8String] ?: "", [baseType UTF8String] ?: "");
+}
+
 + (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
                  isWidthWrapContent:(BOOL)isWidthWrapContent
                 isHeightWrapContent:(BOOL)isHeightWrapContent
