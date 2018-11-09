@@ -24,6 +24,10 @@
  */
 @interface WXThreadSafeMutableArray : NSMutableArray
 
+/* WXThreadSafeMutableArray inherites from NSMutableArray for backward capability.
+ Keep in mind that only the following methods are thread safe guaranteed.
+ And MUST not use other methods provideded by NSMutableArray. */
+
 - (instancetype)init;
 - (instancetype)initWithCapacity:(NSUInteger)numItems;
 - (instancetype)initWithArray:(NSArray *)array;

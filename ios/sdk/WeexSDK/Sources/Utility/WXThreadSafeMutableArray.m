@@ -36,7 +36,7 @@
     self = [super init];
     if (self) {
         pthread_mutexattr_init(&(_safeThreadArrayMutexAttr));
-        pthread_mutexattr_settype(&(_safeThreadArrayMutexAttr), PTHREAD_MUTEX_DEFAULT);
+        pthread_mutexattr_settype(&(_safeThreadArrayMutexAttr), PTHREAD_MUTEX_RECURSIVE); // must use recursive lock
         pthread_mutex_init(&(_safeThreadArrayMutex), &(_safeThreadArrayMutexAttr));
     }
     return self;

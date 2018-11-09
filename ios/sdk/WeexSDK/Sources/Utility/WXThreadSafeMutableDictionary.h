@@ -24,6 +24,10 @@
  */
 @interface WXThreadSafeMutableDictionary<KeyType, ObjectType> : NSMutableDictionary
 
+/* WXThreadSafeMutableDictionary inherites from NSMutableDictionary for backward capability.
+ Keep in mind that only the following methods are thread safe guaranteed.
+ And MUST not use other methods provideded by NSMutableDictionary. */
+
 - (instancetype)init;
 - (instancetype)initWithCapacity:(NSUInteger)numItems;
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;
