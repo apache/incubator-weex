@@ -16,24 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#ifdef OS_ANDROID
 
-#include "core/data_render/vnode/vnode_render_context.h"
+#ifndef CORE_DATA_RENDER_VNODE_ANDROID_CONVERSION_H_
+#define CORE_DATA_RENDER_VNODE_ANDROID_CONVERSION_H_
+
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include "include/WeexApiHeader.h"
+#include "third_party/json11/json11.hpp"
 
 namespace weex {
 namespace core {
 namespace data_render {
+class Value;
+class Conversion {
+ public:
+  static json11::Json GenJSON(const Value* v);
+  static VALUE_WITH_TYPE* GenValueWithType(const char* event_str);
+};
 
-VNodeRenderContext::VNodeRenderContext()
-    : page_id_(),
-      root_(nullptr),
-      raw_json_(),
-      script_(),
-      vcomponent_trees_(),
-      vnode_trees_() {}
-
-VNodeRenderContext::~VNodeRenderContext() {}
-
-void VNodeRenderContext::Reset() { root_ = nullptr; }
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
+
+#endif  // CORE_DATA_RENDER_VNODE_ANDROID_CONVERSION_H_
+#endif

@@ -30,6 +30,7 @@
 #include "core/data_render/vnode/vcomponent.h"
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/data_render/vnode/vcomponent_lifecycle_listener.h"
+#include "core/data_render/vnode/vnode_on_event_listener.h"
 #include <base/LogDefines.h>
 
 namespace weex {
@@ -289,7 +290,7 @@ static Value CreateComponent(ExecState* exec_state) {
   component->set_life_cycle_listener(
       std::unique_ptr<VComponent::LifecycleListener>(
           new VComponentLifecycleListener));
-  exec_state->context()->add_component(component->id(), component);
+  exec_state->context()->AddComponent(component->id(), component);
   return result;
 }
     
@@ -557,6 +558,8 @@ static Value AddEvent(ExecState* exec_state) {
     return Value();
   }
   node->AddEvent(event->str->c_str(), args);
+  node->set_on_event_listener(
+      std::unique_ptr<VNodeOnEventListener>(new VNodeOnEventListener));
   return Value();
 }
 

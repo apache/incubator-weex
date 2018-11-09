@@ -19,7 +19,7 @@
 #ifndef CORE_DATA_RENDER_VNODE_VCOMPONENT_H_
 #define CORE_DATA_RENDER_VNODE_VCOMPONENT_H_
 
-#include <core/data_render/object.h>
+#include "core/data_render/object.h"
 #include <unordered_map>
 #include "core/data_render/vnode/vnode.h"
 
@@ -29,9 +29,10 @@ namespace data_render {
 class VComponent : public VNode {
  public:
   typedef std::unordered_map<std::string, std::string> VNodeRef;
-  typedef std::vector<std::unordered_map<std::string, std::string>> VNodeRefs;
+  typedef std::vector<VNodeRef> VNodeRefs;
   class LifecycleListener {
    public:
+    ~LifecycleListener() {}
     virtual void OnCreated(
         VComponent* component, Table* data, Table* props,
         const std::unordered_map<std::string, VNodeRefs>& ref_map) = 0;
@@ -45,7 +46,6 @@ class VComponent : public VNode {
   ~VComponent();
   void UpdateData();
   void UpdateData(Value* datas);
-  void OnEvent(VNode* node, const std::string event, std::vector<Value> params);
   inline bool IsSameNode(VComponent* old_component) {
     return template_id_ == old_component->template_id_;
   }

@@ -17,8 +17,8 @@
  * under the License.
  */
 
-#ifndef WEEX_PROJECT_VCOMPONENT_LIFECYCLE_LISTENER_H
-#define WEEX_PROJECT_VCOMPONENT_LIFECYCLE_LISTENER_H
+#ifndef CORE_DATA_RENDER_VNODE_VCOMPONENT_LIFECYCLE_LISTENER_H_
+#define CORE_DATA_RENDER_VNODE_VCOMPONENT_LIFECYCLE_LISTENER_H_
 
 #include "core/data_render/vnode/vcomponent.h"
 
@@ -38,4 +38,4 @@ class VComponentLifecycleListener : public VComponent::LifecycleListener {
 }  // namespace core
 }  // namespace weex
 
-#endif  // WEEX_PROJECT_VCOMPONENT_LIFECYCLE_LISTENER_H
+#endif  // CORE_DATA_RENDER_VNODE_VCOMPONENT_LIFECYCLE_LISTENER_H_

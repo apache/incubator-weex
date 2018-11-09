@@ -96,7 +96,9 @@ set(COMMON_SRCS
    ./core/data_render/binary_file.cc
    ./core/data_render/vnode/vnode.cc
    ./core/data_render/vnode/vcomponent.cc
-   ./core/data_render/vnode/vcomponent_lifecycle_listener.cc
+   ./core/data_render/vnode/android/vcomponent_lifecycle_listener.cc
+   ./core/data_render/vnode/android/vnode_on_event_listener.cc
+   ./core/data_render/vnode/android/conversion.cc
    ./core/data_render/vnode/vnode_exec_env.cc
    ./core/data_render/vnode/vnode_render_manager.cc
    ./core/data_render/vnode/vnode_render_context.cc

@@ -34,6 +34,7 @@ VNode::VNode(const std::string &tag_name, const std::string &node_id,
   attributes_ = new std::map<std::string, std::string>();
   events_ = new std::map<std::string, void *>();
   event_params_map_.reset(new EventParamsMap);
+  on_event_listener_.reset();
 }
 
 VNode::~VNode() {
@@ -61,9 +62,15 @@ VNode::~VNode() {
   }
 }
 
-const VNode::ParamsList &VNode::GetParamsList(const std::string &event) {
+void VNode::OnEvent(const std::string &event, const std::string args) {
+  if (!on_event_listener_) return;
+
   auto it = event_params_map_->find(event);
-  return it != event_params_map_->end() ? it->second : ParamsList();
+  if (it == event_params_map_->end()) return;
+  auto params_list = it->second;
+  for (auto it = params_list.begin(); it != params_list.end(); it++) {
+    on_event_listener_->OnEvent(this, event, args, *it);
+  }
 }
 
 void VNode::SetStyle(const std::string &key, const std::string &value) {

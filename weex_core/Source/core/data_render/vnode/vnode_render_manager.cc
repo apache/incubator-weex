@@ -96,14 +96,19 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
     render_object->AddAttr(it->first, it->second);
   }
 
-  // event,todo
+  // event
   std::map<std::string, void *> *events = vnode->events();
   for (auto iter = events->begin(); iter != events->end(); iter++) {
       render_object->events()->insert(iter->first);
   }
+  auto event_params_map = vnode->event_params_map();
+  for (auto it = event_params_map->begin(); it != event_params_map->end();
+       it++) {
+    render_object->events()->insert(it->first);
+  }
 
   // child
-  vector<VNode*>* children = (const_cast<VNode*>(vnode))->child_list();
+  vector<VNode*>* children = vnode->child_list();
   for (int i = 0; i < children->size(); i++) {
     ParseVNode2RenderObject((*children)[i], render_object, false, i, pageId);
   }
@@ -361,7 +366,23 @@ void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string
         if (node == vnode_trees_.end()) {
             break;
         }
+        // TODO merge two way to fire event
+        {
+            // First way to fire event from VNode::OnEvent
+            auto vnode = iter->second->context()->GetVNode(ref);
+            if (vnode) {
+                auto hit_test = vnode->event_params_map()->find(event);
+                if (hit_test != vnode->event_params_map()->end()) {
+                    // If vnode has eat event, return.
+                    vnode->OnEvent(event, args);
+                    return;
+                }
+            }
+        }
+
+        // Second way to fire event from call vm func
         auto vnode = node->second->FindNode(ref);
+        if (vnode == nullptr)
         if (!vnode) {
             break;
         }
@@ -707,7 +728,6 @@ vector<pair<string, string>>* CompareMap(const map<string, string>& oldMap,
   auto p_vec = new vector<pair<string, string>>();
   for (auto it = newMap.cbegin(); it != newMap.cend(); it++) {
     auto pos = oldMap.find(it->first);
-
     if (pos == oldMap.end() || pos->second != it->second) {
       // key not exist, or value not same
       p_vec->push_back({it->first, it->second});
@@ -716,7 +736,6 @@ vector<pair<string, string>>* CompareMap(const map<string, string>& oldMap,
 
   for (auto it = oldMap.cbegin(); it != oldMap.cend(); it++) {
     auto pos = newMap.find(it->first);
-
     if (pos == newMap.end()) {
       // key not exist, remove //todo check if this is correct
       p_vec->push_back({it->first, ""});
@@ -724,7 +743,63 @@ vector<pair<string, string>>* CompareMap(const map<string, string>& oldMap,
   }
   return p_vec;
 };
- 
+
+void CompareAndApplyEvents1(const std::string& page_id, VNode* old_node,
+                            VNode* new_node) {
+  std::map<std::string, void*> old_events = *old_node->events();
+  std::map<std::string, void*> new_events = *new_node->events();
+
+  for (auto it = old_events.cbegin(); it != old_events.cend(); it++) {
+    auto pos = new_events.find(it->first);
+    if (pos == new_events.end()) {
+      new_events.erase(pos);
+    }
+  }
+  for (auto it = new_events.cbegin(); it != new_events.cend(); it++) {
+    auto pos = old_events.find(it->first);
+    if (pos == old_events.end()) {
+      old_events.erase(pos);
+    }
+  }
+  for (auto it = old_events.cbegin(); it != old_events.cend(); it++) {
+    RenderManager::GetInstance()->RemoveEvent(
+        page_id, new_node->render_object_ref(), it->first);
+  }
+  for (auto it = new_events.cbegin(); it != new_events.cend(); it++) {
+    RenderManager::GetInstance()->AddEvent(
+        page_id, new_node->render_object_ref(), it->first);
+  }
+}
+
+void CompareAndApplyEvents2(const std::string& page_id, VNode* old_node,
+                            VNode* new_node) {
+  VNode::EventParamsMap old_events = *old_node->event_params_map();
+  VNode::EventParamsMap new_events = *new_node->event_params_map();
+
+  for (auto it = old_events.cbegin(); it != old_events.cend(); it++) {
+    auto pos = new_events.find(it->first);
+
+    if (pos == new_events.end()) {
+      new_events.erase(pos);
+    }
+  }
+  for (auto it = new_events.cbegin(); it != new_events.cend(); it++) {
+    auto pos = old_events.find(it->first);
+
+    if (pos == old_events.end()) {
+      old_events.erase(pos);
+    }
+  }
+  for (auto it = old_events.cbegin(); it != old_events.cend(); it++) {
+    RenderManager::GetInstance()->RemoveEvent(
+        page_id, new_node->render_object_ref(), it->first);
+  }
+  for (auto it = new_events.cbegin(); it != new_events.cend(); it++) {
+    RenderManager::GetInstance()->AddEvent(
+        page_id, new_node->render_object_ref(), it->first);
+  }
+}
+
 void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
   if (old_node->IsVirtualComponent()) {
     static_cast<VComponent*>(old_node)
@@ -752,8 +827,9 @@ void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
       p_vec = nullptr;
   }
 
-  // compare event
-  // todo
+  // compare and apply event
+  CompareAndApplyEvents1(page_id, old_node, new_node);
+  CompareAndApplyEvents2(page_id, old_node, new_node);
 
   // compare children
   if (old_node->HasChildren() && new_node->HasChildren()) {

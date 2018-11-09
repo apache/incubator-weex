@@ -39,6 +39,14 @@ class VNode {
   typedef std::vector<Params> ParamsList;
   typedef std::unordered_map<std::string, ParamsList> EventParamsMap;
 
+  class OnEventListener {
+   public:
+    ~OnEventListener() {}
+    virtual void OnEvent(VNode *node, const std::string &event,
+                         const std::string &json_args,
+                         const Params &params) = 0;
+  };
+
   VNode(const std::string &tag_name, const std::string &node_id,
         const std::string &ref);
 
@@ -51,6 +59,8 @@ class VNode {
   void AddEvent(const std::string &event,
                 const std::vector<Value> &params);
   void AddEvent(const std::string &event, void *func, void *inst);
+
+  void AddOnEventListener();
 
   void AddChild(VNode *child);
 
@@ -92,7 +102,11 @@ class VNode {
     return event_params_map_.get();
   }
 
-  const ParamsList& GetParamsList(const std::string& event);
+  void OnEvent(const std::string& event, const std::string args);
+
+  inline void set_on_event_listener(std::unique_ptr<OnEventListener> listener) {
+    on_event_listener_ = std::move(listener);
+  }
 
   inline bool HasChildren() { return !child_list_.empty(); }
 
@@ -122,8 +136,11 @@ class VNode {
   std::vector<VNode *> child_list_;
   std::map<std::string, std::string> *styles_;
   std::map<std::string, std::string> *attributes_;
+  // This events if record event with func from vm
   std::map<std::string, void *> *events_;
+  // This events if record event with value from vm
   std::unique_ptr<EventParamsMap> event_params_map_;
+  std::unique_ptr<OnEventListener> on_event_listener_;
 
   void MapInsertOrAssign(std::map<std::string, std::string> *target_map,
                          const std::string &key, const std::string &value);

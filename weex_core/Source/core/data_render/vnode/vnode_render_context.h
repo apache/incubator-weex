@@ -47,13 +47,38 @@ class VNodeRenderContext {
     return style_json_;
   }
 
-  inline void add_component(int ref, VComponent* component) {
+  inline void AddComponent(int ref, VComponent *component) {
     vcomponent_trees_.insert({ref, component});
+  }
+
+  inline void RemoveComponent(int ref) {
+    vcomponent_trees_.erase(ref);
   }
 
   inline VComponent* GetComponent(int ref) {
     auto it = vcomponent_trees_.find(ref);
     return it != vcomponent_trees_.end() ? it->second : nullptr;
+  }
+
+  inline void RemoveVNode(const std::string& ref) {
+    auto it = vnode_trees_.find(ref);
+    if (it != vnode_trees_.end()) {
+      vnode_trees_.erase(it);
+    }
+  }
+
+  inline void AddVNode(const std::string& ref, VNode* node) {
+    auto it = vnode_trees_.find(ref);
+    if (it != vnode_trees_.end()) {
+      vnode_trees_[ref] = node;
+    } else {
+      vnode_trees_.insert({ref, node});
+    }
+  }
+
+  inline VNode* GetVNode(const std::string &ref) {
+    auto it = vnode_trees_.find(ref);
+    return it != vnode_trees_.end() ? it->second : nullptr;
   }
 
  private:
@@ -66,6 +91,7 @@ class VNodeRenderContext {
   std::string script_;
   std::map<std::string, json11::Json> style_json_;
   std::unordered_map<int, VComponent *> vcomponent_trees_;
+  std::unordered_map<std::string, VNode*> vnode_trees_;
 };
 }  // namespace data_render
 }  // namespace core

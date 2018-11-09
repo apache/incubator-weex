@@ -104,6 +104,8 @@ static void BuildRefsInner(
       ref_map.insert({node->ref(), refs});
     }
   }
+  // Record { ref : node } in context
+  node->component()->exec_state()->context()->AddVNode(node->render_object_ref(), node);
   if (node->child_list()->size() > 0 && !node->IsVirtualComponent()) {
     if (node->attributes()->find("[[repeat]]") != node->attributes()->end()) {
       in_for_loop = true;
@@ -111,6 +113,22 @@ static void BuildRefsInner(
     for (auto it = node->child_list()->begin(); it != node->child_list()->end();
          it++) {
       BuildRefsInner(ref_map, *it, in_for_loop);
+    }
+  }
+}
+
+static void DetachVNodesInContext(VNode *node) {
+  // Remove { ref : node } in context
+  if (!node || node->IsVirtualComponent()) return;;
+  auto context = node->component()->exec_state()->context();
+  auto record = context->GetVNode(node->render_object_ref());
+  if (record != node) {
+    context->RemoveVNode(node->render_object_ref());
+  }
+  if (node->child_list()->size() > 0 && !node->IsVirtualComponent()) {
+    for (auto it = node->child_list()->begin(); it != node->child_list()->end();
+         it++) {
+      DetachVNodesInContext(*it);
     }
   }
 }
@@ -179,9 +197,6 @@ void VComponent::UpdateData(Value *data) {
   }
 }
 
-void VComponent::OnEvent(VNode *node, const std::string event,
-                         std::vector<Value> params) {}
-
 // TODO Depth-first traversal
 void VComponent::TravelVComponentsWithFunc(TravelTreeFunc func, VNode *root) {
   if (!root) return;
@@ -235,6 +250,8 @@ void VComponent::DispatchDestroyed() {
     listener_->OnDestroyed(this);
   }
   TravelVComponentsWithFunc(&VComponent::DispatchDestroyed, root_vnode());
+  exec_state_->context()->RemoveComponent(id_);
+  DetachVNodesInContext(root_vnode());
 }
 
 void VComponent::SetRootNode(VNode *node) {
