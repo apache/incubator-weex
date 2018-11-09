@@ -903,7 +903,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     if (!decelerate) {
         _isScrolling = NO;
-        [self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:nil afterDelay:0.1];
+        [self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:scrollView afterDelay:0.1];
     }
     
     NSHashTable *delegates = [_delegates copy];
