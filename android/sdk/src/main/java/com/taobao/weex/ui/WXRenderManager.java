@@ -30,11 +30,13 @@ import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.RenderContext;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.action.BasicGraphicAction;
+import com.taobao.weex.ui.action.GraphicActionBatchAction;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,6 +49,10 @@ public class WXRenderManager {
 
   private volatile ConcurrentHashMap<String, RenderContextImpl> mRenderContext;
   private WXRenderHandler mWXRenderHandler;
+  private ArrayList<Map<String,Object>> mBatchActions = new ArrayList<>();
+  private final int MAX_DROP_FRAME_NATIVE_BATCH = 2000;
+  private final static  String sKeyAction = "Action";
+  private static int nativeBatchTimes = 0;
 
   public WXRenderManager() {
     mRenderContext = new ConcurrentHashMap<>();
@@ -116,11 +122,43 @@ public class WXRenderManager {
     }
   }
 
+  private void postAllStashedGraphicAction(final String instanceId,final BasicGraphicAction action) {
+      ArrayList<Map<String, Object>> tmpList = new ArrayList<>(mBatchActions);
+      this.mBatchActions.clear();
+      ArrayList<BasicGraphicAction> actions = new ArrayList<>(tmpList.size());
+      for (int i = 0 ; i < tmpList.size(); i ++) {
+          Map<String, Object> item = tmpList.get(i);
+          BasicGraphicAction tmpAction = (BasicGraphicAction)item.get(sKeyAction);
+          if (tmpAction.mActionType == BasicGraphicAction.ActionTypeBatchBegin || tmpAction.mActionType == BasicGraphicAction.ActionTypeBatchEnd) {
+              continue;
+          }
+          actions.add(tmpAction);
+      }
+      nativeBatchTimes = 0;
+      postGraphicAction(instanceId, new GraphicActionBatchAction(action.getWXSDKIntance(),action.getRef(), actions));
+  }
+
   public void postGraphicAction(final String instanceId, final BasicGraphicAction action) {
     final RenderContextImpl renderContext = mRenderContext.get(instanceId);
     if (renderContext == null) {
       return;
     }
+
+    if (action.mActionType == BasicGraphicAction.ActionTypeBatchEnd) {
+        postAllStashedGraphicAction(instanceId,action);
+        return;
+    } else if (action.mActionType == BasicGraphicAction.ActionTypeBatchBegin || this.mBatchActions.size() > 0 ) {
+        nativeBatchTimes ++ ;
+        if (nativeBatchTimes > MAX_DROP_FRAME_NATIVE_BATCH) {
+            postAllStashedGraphicAction(instanceId,action);
+        } else {
+            HashMap<String, Object> item = new HashMap<>(1);
+            item.put(sKeyAction, action);
+            mBatchActions.add(item);
+            return;
+        }
+    }
+
     mWXRenderHandler.post(instanceId, action);
   }
 

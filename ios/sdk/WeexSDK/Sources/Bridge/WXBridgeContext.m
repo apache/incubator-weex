@@ -30,7 +30,6 @@
 #import "WXSDKManager.h"
 #import "WXDebugTool.h"
 #import "WXSDKInstance_private.h"
-#import "WXThreadSafeMutableArray.h"
 #import "WXAppConfiguration.h"
 #import "WXInvocationConfig.h"
 #import "WXComponentMethod.h"

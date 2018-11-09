@@ -597,6 +597,9 @@ WX_EXPORT_METHOD(@selector(save:))
 
 - (void)cancelImage
 {
+    if ([[self imageLoader] respondsToSelector:@selector(cancelCurrentImageLoad:)]) {
+        [[self imageLoader] cancelCurrentImageLoad:(UIImageView*)_view];
+    }
     [_imageOperation cancel];
     _imageOperation = nil;
     [_placeholderOperation cancel];

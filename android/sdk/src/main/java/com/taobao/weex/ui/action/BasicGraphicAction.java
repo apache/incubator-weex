@@ -28,6 +28,11 @@ public abstract class BasicGraphicAction implements IExecutable, Runnable {
 
   private WXSDKInstance mInstance;
   private final String mRef;
+  public int mActionType = ActionTypeNormal;
+  public static final int ActionTypeBatchBegin = 1;
+  public static final int ActionTypeBatchEnd = 2;
+  public static final int ActionTypeNormal = 0;
+
 
   public BasicGraphicAction(WXSDKInstance instance, String ref) {
     this.mInstance = instance;

@@ -85,12 +85,12 @@ android {
     if(project.hasProperty('asfRelease')){
         //download so file if not exist, when compile in source release
         download{
-            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/armeabi/libweexcore.so;hb=refs/heads/master'
+            src 'https://gitbox.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/armeabi/libweexcore.so;hb=refs/heads/master'
             dest "${projectDir}/libs/armeabi/libweexcore.so"
             overwrite false
         }
         download{
-            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexcore.so;hb=refs/heads/master'
+            src 'https://gitbox.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexcore.so;hb=refs/heads/master'
             dest "${projectDir}/libs/x86/libweexcore.so"
             overwrite false
         }
@@ -214,12 +214,12 @@ if(file('../license/LICENSE').exists()){
     }
 
     task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
-        source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc']).
+        source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc', '**/*.c']).
                 exclude(['Source/rapidjson/**/*.h','Source/rapidjson/**/*.cpp',
                          'Source/android/base/base64/**/*.h','Source/android/base/base64/**/*.cpp',
                          'Source/android/jniprebuild/jniheader/*.h',
                          'Source/base/Compatible.cpp',
-                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp'])
+                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c'])
     }
     preBuild.dependsOn licenseFormat
 }

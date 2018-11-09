@@ -82,6 +82,17 @@
 
 # pragma mark Component Register
 
++ (void)_registerAffineTypes
+{
+    /* register weex core types that should match RenderList or RenderScroller.
+     "list" and "waterfall" must be registered before "scroller" because "WXListComponent" and "WXRecyclerComponent"
+     are both subclasses of "WXScrollerComponent".
+     */
+    [WXComponentFactory registerBaseType:@"list" withClass:NSClassFromString(@"WXListComponent")];
+    [WXComponentFactory registerBaseType:@"waterfall" withClass:NSClassFromString(@"WXRecyclerComponent")];
+    [WXComponentFactory registerBaseType:@"scroller" withClass:NSClassFromString(@"WXScrollerComponent")];
+}
+
 // register some default components when the engine initializes.
 + (void)_registerDefaultComponents
 {
@@ -117,6 +128,8 @@
     [self registerComponent:@"recycle-list" withClass:NSClassFromString(@"WXRecycleListComponent")];
     [self registerComponent:@"cell-slot" withClass:NSClassFromString(@"WXCellSlotComponent") withProperties: @{@"append":@"tree", @"isTemplate":@YES}];
     
+    // other non-default components should be checked with affine-base types.
+    [self _registerAffineTypes];
 }
 
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz

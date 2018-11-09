@@ -262,4 +262,18 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
  */
 - (void)enumerateComponentsUsingBlock:(void (^)(WXComponent *, BOOL *stop))block;
 
+#pragma mark batch mark
+
+/**
+ a start native batch tag for a group of UI operations, company with performBatchEnd
+ @see performBatchEnd
+ */
+- (void)performBatchBegin;
+
+/**
+ an end native batch tag for a group of UI operations, company with performBatchBegin
+ @see performBatchBegin
+ */
+- (void)performBatchEnd;
+
 @end

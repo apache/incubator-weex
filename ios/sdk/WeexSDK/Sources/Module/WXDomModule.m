@@ -57,6 +57,8 @@ WX_EXPORT_METHOD(@selector(addRule:rule:))
 WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 WX_EXPORT_METHOD(@selector(getLayoutDirection:callback:))
 WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
+WX_EXPORT_METHOD(@selector(beginBatchMark))
+WX_EXPORT_METHOD(@selector(endBatchMark))
 
 - (void)performBlockOnComponentManager:(void(^)(WXComponentManager *))block
 {
@@ -82,6 +84,20 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     WXPerformBlockOnComponentThread(^{
         block();
     });
+}
+
+- (void)beginBatchMark
+{
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
+        [manager performBatchBegin];
+    }];
+}
+
+- (void)endBatchMark
+{
+    [self performBlockOnComponentManager:^(WXComponentManager * manager) {
+        [manager performBatchEnd];
+    }];
 }
 
 - (NSThread *)targetExecuteThread
