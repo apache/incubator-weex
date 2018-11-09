@@ -290,14 +290,14 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
 
 -(void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options
 {
-    if (!name || !serviceScriptUrl || !options) return;
+    if (!name || !serviceScriptUrl) return;
     __weak typeof(self) weakSelf = self;
     WXResourceRequest *request = [WXResourceRequest requestWithURL:serviceScriptUrl resourceType:WXResourceTypeServiceBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     WXResourceLoader *serviceBundleLoader = [[WXResourceLoader alloc] initWithRequest:request];;
     serviceBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         NSString *jsServiceString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        [strongSelf registerService:name withService:jsServiceString withOptions:options];
+        [strongSelf registerService:name withService:jsServiceString withOptions:options ? : @{}];
     };
     
     serviceBundleLoader.onFailed = ^(NSError *loadError) {
