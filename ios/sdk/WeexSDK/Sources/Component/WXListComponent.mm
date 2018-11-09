@@ -33,7 +33,8 @@
 #import "WXScrollerComponent+Layout.h"
 
 @interface WXTableView : UITableView
-
+// Set whether the content offset position all the way to the bottom
+@property (nonatomic) BOOL isContentAttachBottom;
 @end
 
 @implementation WXTableView
@@ -78,6 +79,16 @@
     
     [super setContentOffset:contentOffset];
 }
+
+- (void)setFrame:(CGRect)frame {
+    [super setFrame:frame];
+    if (_isContentAttachBottom) {
+        CGFloat offsetHeight = self.contentSize.height - CGRectGetHeight(self.bounds);
+        if (offsetHeight >= 0)
+        [self setContentOffset:CGPointMake(0, offsetHeight) animated:NO];
+    }
+}
+
 
 @end
 
@@ -136,6 +147,8 @@
     BOOL _isUpdating;
     NSMutableArray<void(^)(void)> *_updates;
     NSTimeInterval _reloadInterval;
+    // Set whether the content offset position all the way to the bottom
+    BOOL _isContentAttachBottom;
 }
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
@@ -145,6 +158,7 @@
         _completedSections = [NSMutableArray array];
         _reloadInterval = attributes[@"reloadInterval"] ? [WXConvert CGFloat:attributes[@"reloadInterval"]]/1000 : 0;
         _updataType = [WXConvert NSString:attributes[@"updataType"]]?:@"insert";
+        _isContentAttachBottom = [WXConvert BOOL:attributes[@"isContentAttachBottom"]];
         [self fixFlicker];
     }
     
@@ -179,6 +193,8 @@
     _tableView.estimatedRowHeight = 0;
     _tableView.estimatedSectionFooterHeight = 0;
     _tableView.estimatedSectionHeaderHeight = 0;
+    // set the tableView atttibutes
+    [(WXTableView *)_tableView setIsContentAttachBottom:_isContentAttachBottom];
 }
 
 - (void)viewWillUnload
@@ -198,6 +214,10 @@
     }
     if (attributes[@"updataType"]) {
         _updataType = [WXConvert NSString:attributes[@"updataType"]];
+    }
+    if (attributes[@"isContentAttachBottom"]) {
+        _isContentAttachBottom = [WXConvert BOOL:attributes[@"isContentAttachBottom"]];
+        [(WXTableView *)_tableView setIsContentAttachBottom:_isContentAttachBottom];
     }
 }
 
