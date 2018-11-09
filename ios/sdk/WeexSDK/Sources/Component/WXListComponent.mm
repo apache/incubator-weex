@@ -33,8 +33,7 @@
 #import "WXScrollerComponent+Layout.h"
 
 @interface WXTableView : UITableView
-// Set whether the content offset position all the way to the bottom
-@property (nonatomic) BOOL isContentAttachBottom;
+
 @end
 
 @implementation WXTableView
@@ -82,7 +81,9 @@
 
 - (void)setFrame:(CGRect)frame {
     [super setFrame:frame];
-    if (_isContentAttachBottom) {
+    if (![self.wx_component isKindOfClass:[WXListComponent class]]) return;
+    BOOL isContentAttachBottom = [(WXListComponent *)self.wx_component isContentAttachBottom];
+    if (isContentAttachBottom) {
         CGFloat offsetHeight = self.contentSize.height - CGRectGetHeight(self.bounds);
         if (offsetHeight >= 0)
         [self setContentOffset:CGPointMake(0, offsetHeight) animated:NO];
@@ -129,7 +130,7 @@
 @interface WXListComponent () <UITableViewDataSource, UITableViewDelegate, WXCellRenderDelegate, WXHeaderRenderDelegate>
 
 @property (nonatomic, assign) NSUInteger currentTopVisibleSection;
-
+                                  
 @end
 
 @implementation WXListComponent
@@ -147,8 +148,6 @@
     BOOL _isUpdating;
     NSMutableArray<void(^)(void)> *_updates;
     NSTimeInterval _reloadInterval;
-    // Set whether the content offset position all the way to the bottom
-    BOOL _isContentAttachBottom;
 }
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
@@ -193,8 +192,6 @@
     _tableView.estimatedRowHeight = 0;
     _tableView.estimatedSectionFooterHeight = 0;
     _tableView.estimatedSectionHeaderHeight = 0;
-    // set the tableView atttibutes
-    [(WXTableView *)_tableView setIsContentAttachBottom:_isContentAttachBottom];
 }
 
 - (void)viewWillUnload
@@ -217,7 +214,6 @@
     }
     if (attributes[@"isContentAttachBottom"]) {
         _isContentAttachBottom = [WXConvert BOOL:attributes[@"isContentAttachBottom"]];
-        [(WXTableView *)_tableView setIsContentAttachBottom:_isContentAttachBottom];
     }
 }
 
