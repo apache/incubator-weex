@@ -180,6 +180,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public static final int TYPE_VIRTUAL = 1;
 
   private boolean waste = false;
+  public boolean isIgnoreInteraction = false;
 
   private ContentBoxMeasurement contentBoxMeasurement;
   private WXTransition mTransition;
@@ -987,8 +988,20 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getCSSLayoutTop());
     mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + getCSSLayoutLeft());
 
-    if (mIsAddElementToTree)
-      mInstance.onChangeElement(this, mAbsoluteY > mInstance.getWeexHeight() + 1);
+    if (mIsAddElementToTree){
+      if (null == getInstance().getApmForInstance().instanceRect){
+        getInstance().getApmForInstance().instanceRect = new Rect();
+      }
+      Rect instanceRect = getInstance().getApmForInstance().instanceRect;
+      instanceRect.set(0,0,mInstance.getWeexWidth(),mInstance.getWeexHeight());
+      boolean inScreen =
+          instanceRect.contains(mAbsoluteX,mAbsoluteY) //leftTop
+          || instanceRect.contains(mAbsoluteX+realWidth,mAbsoluteY)//rightTop
+          || instanceRect.contains(mAbsoluteX,mAbsoluteY+realHeight)//leftBottom
+          || instanceRect.contains(mAbsoluteX+realWidth,mAbsoluteY+realHeight);//rightBottom
+      mInstance.onChangeElement(this,!inScreen);
+    }
+
 
     if (mHost == null) {
       return;

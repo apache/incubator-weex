@@ -75,6 +75,13 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
           mParentRef);
       child = createComponent(instance, parent, basicComponentData);
       child.setTransition(WXTransition.fromMap(child.getStyles(), child));
+      if (null != parent && parent.isIgnoreInteraction){
+        child.isIgnoreInteraction = true;
+      }
+      if (null!= child && null != child.getAttrs() && "1".equals(child.getAttrs().get("ignoreInteraction"))){
+        child.isIgnoreInteraction = true;
+      }
+
     } catch (ClassCastException e) {
       Map<String, String> ext = new ArrayMap<>();
       WXComponent parent = WXSDKManager.getInstance().getWXRenderManager()

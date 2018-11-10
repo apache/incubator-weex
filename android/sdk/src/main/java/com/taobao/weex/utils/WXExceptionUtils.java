@@ -95,7 +95,7 @@ public class WXExceptionUtils {
             instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
 
             if (null != instance) {
-                bundleUrlCommit = instance.getBundleUrl();
+                bundleUrlCommit = instance.getApmForInstance().reportPageName;
                 commitMap.put("templateInfo",instance.getTemplateInfo());
                 if (TextUtils.isEmpty(bundleUrlCommit) || bundleUrlCommit.equals(WXPerformance.DEFAULT)) {
                     if (!TextUtils.equals(degradeUrl, "BundleUrlDefaultDegradeUrl")) {
