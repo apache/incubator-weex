@@ -381,8 +381,7 @@ void CodeGenerator::Visit(ForStatement *node, void *data) {
     int for_update_index = condition_start_index;
     if (node->update().get() != NULL) {
         for_update_index = (int)func_state->instructions().size();  // aka next one.
-        long update = block_->NextRegisterId();
-        node->update()->Accept(this, &update);
+        node->update()->Accept(this, nullptr);
     }
     block_->set_for_update_index(for_update_index);
     func_state->AddInstruction(CREATE_Ax(OP_GOTO, condition_start_index));
@@ -1098,7 +1097,11 @@ void CodeGenerator::Visit(PrefixExpression *node, void *data) {
                              : *static_cast<long *>(data);
     Handle<Expression> expr = node->expr();
     long reg = block_->NextRegisterId();
-    expr->Accept(this, &reg);
+    if (expr->IsIdentifier()) {
+        reg = block_->FindRegisterId(expr->AsIdentifier()->GetName());
+    } else {
+        expr->Accept(this, &reg);
+    }
     PrefixOperation operation = node->op();
     // ++i
     if (operation == PrefixOperation::kIncrement) {
