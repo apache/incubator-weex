@@ -160,6 +160,19 @@ bool flexIsUndefined(float value) {
             }
             [strongSelf setNeedsDisplay];
         }];
+    } else {
+        // if frame is not change, we still need check was layoutDirection changed
+        if ([self isDirectionRTL] != _isLastLayoutDirectionRTL) {
+            _isLastLayoutDirectionRTL = [self isDirectionRTL];
+            __weak typeof(self) weakSelf = self;
+            [self.weexInstance.componentManager _addUITask:^{
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (strongSelf->_transform) {
+                    [strongSelf->_transform applyTransformForView:strongSelf.view];
+                }
+                [strongSelf _adjustForRTL];
+            }];
+        }
     }
 }
 

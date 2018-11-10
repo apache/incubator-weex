@@ -43,6 +43,7 @@ extern "C" {
     CGRect _calculatedFrame;
     CGPoint _absolutePosition;
     WXPositionType _positionType;
+    BOOL _isLastLayoutDirectionRTL;
 }
 
 /**

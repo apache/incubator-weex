@@ -164,7 +164,7 @@ StyleType RenderObject::ApplyStyle(const std::string &key,
         direction = WeexCore::kDirectionLTR;
     } 
     setDirection(direction, updating);
-    return kTypeLayout;
+    return kTypeInheritableLayout;
   } else if (key == FLEX_DIRECTION) {
     setFlexDirection(GetWXCoreFlexDirection(value), updating);
     return kTypeLayout;

@@ -979,7 +979,7 @@ namespace WeexCore {
               markDirty();
               if (updating) {
                   for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
-                      (*it)->markDirty(false);
+                      (*it)->markInheritableDirty();
                   }
               }
           }
@@ -1150,6 +1150,38 @@ namespace WeexCore {
       return ret;
     }
 
+    void markInheritableDirty() {
+        if (resetInheritableSet()) {
+            // if some style was inherited from parent, reset those styles
+            // then mark self dirty
+            markDirty(false);
+            
+            // traverse children to mark dirty
+            if(getChildCount() == 0){
+                return;
+            }
+            else {
+                for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+                    (*it)->markInheritableDirty();
+                }
+            }
+        }
+    }
+      
+    /**
+    * if some style was inherited from parent, reset those styles, then return true, eles return false
+    */
+    bool resetInheritableSet() {
+      if (mCssStyle == nullptr || mLayoutResult == nullptr) return false;
+        
+      bool hasInheritedStyle = false;
+      if (mCssStyle->mDirection == kDirectionInherit) {
+          mLayoutResult->mLayoutDirection = kDirectionInherit;
+          hasInheritedStyle = true;
+      }
+      return hasInheritedStyle;
+    }
+      
     inline void setHasNewLayout(const bool hasNewLayout) {
       this->mHasNewLayout = hasNewLayout;
     }
