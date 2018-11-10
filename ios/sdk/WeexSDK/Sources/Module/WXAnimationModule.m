@@ -123,7 +123,7 @@
         _animationInfo.target.view.layer.anchorPoint = _animationInfo.originAnchorPoint;
         _animationInfo.target.view.layer.frame = originFrame;
     }
-    [_animationInfo.target.layer removeAllAnimations];
+    [_animationInfo.target.layer removeAnimationForKey:_animationInfo.propertyName];
     
     if (_finishBlock) {
         _finishBlock(flag);
