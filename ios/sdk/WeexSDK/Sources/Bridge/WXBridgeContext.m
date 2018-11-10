@@ -134,6 +134,15 @@ _Pragma("clang diagnostic pop") \
     
     [WXCoreBridge install];
     
+    [_jsBridge registerCallUpdateComponentData:^NSInteger(NSString *instanceId, NSString *componentId, NSString *jsonData) {
+
+        WXPerformBlockOnComponentThread(^{
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:componentId className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"__updateComponentData" options:@{@"threadName":WXTDOMThread}];
+            [WXCoreBridge callUpdateComponentData:instanceId componentId:componentId jsonData:jsonData];
+        });
+        return 0;
+    }];
+
     [_jsBridge registerCallAddElement:^NSInteger(NSString *instanceId, NSString *parentRef, NSDictionary *elementData, NSInteger index) {
         
         WXPerformBlockOnComponentThread(^{

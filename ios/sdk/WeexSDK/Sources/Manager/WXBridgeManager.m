@@ -468,6 +468,16 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     });
 }
 
+- (void)callJSMethod:(NSString *)method args:(NSArray *)args
+{
+    if (!method) return;
+
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnBridgeThread(^(){
+        [weakSelf.bridgeCtx callJSMethod:method args:args onContext:nil completion:nil];
+    });
+}
+
 #pragma mark - Deprecated
 
 - (void)executeJsMethod:(WXCallJSMethod *)method
