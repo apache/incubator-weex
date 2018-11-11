@@ -89,6 +89,9 @@ static bool Equals(Value a, Value b) {
 static void BuildRefsInner(
     std::unordered_map<std::string, VComponent::VNodeRefs> &ref_map,
     VNode *node, bool in_for_loop) {
+  if (node->attributes()->find("[[repeat]]") != node->attributes()->end()) {
+    in_for_loop = true;
+  }
   if (!node->ref().empty()) {
     VComponent::VNodeRef ref;
     ref.insert({"ref", node->render_object_ref()});
@@ -107,9 +110,6 @@ static void BuildRefsInner(
   // Record { ref : node } in context
   node->component()->exec_state()->context()->AddVNode(node->render_object_ref(), node);
   if (node->child_list()->size() > 0 && !node->IsVirtualComponent()) {
-    if (node->attributes()->find("[[repeat]]") != node->attributes()->end()) {
-      in_for_loop = true;
-    }
     for (auto it = node->child_list()->begin(); it != node->child_list()->end();
          it++) {
       BuildRefsInner(ref_map, *it, in_for_loop);

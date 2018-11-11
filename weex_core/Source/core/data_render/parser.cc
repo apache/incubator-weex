@@ -640,7 +640,7 @@ struct ASTParser final {
       std::vector<Handle<Expression>> control_exprs;
       if (control.is_object()) {
         control_exprs = ParseControl(control);
-        if (control["repeat"].is_string()) {
+        if (!control["repeat"].is_null()) {
           SetAttributeStatement(
               {child_identifier,
                factory_->NewStringConstant(kAttrRepeatControl),
