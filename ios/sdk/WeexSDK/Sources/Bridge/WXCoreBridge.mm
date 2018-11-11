@@ -43,6 +43,7 @@
 #include "core/bridge/platform/core_side_in_platform.h"
 #include "core/bridge/script/core_side_in_script.h"
 #include "base/TimeUtils.h"
+#include "core/network/http_module.h"
 
 #import <objc/runtime.h>
 #include <fstream>
@@ -717,7 +718,15 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
     NSString *optionsString = [WXUtility JSONString:options];
     NSString *dataString = [WXUtility JSONString:data];
-    node_manager->CreatePage([jsBundleString UTF8String] ?: "", [pageId UTF8String] ?: "", [optionsString UTF8String] ?: "", [dataString UTF8String] ?: "");
+    weex::core::data_render::HttpModule downloadJS;
+    downloadJS.set_func([=](const char* url){
+        NSURL* ns_url = [NSURL URLWithString:NSSTRING(url)];
+        WXPerformBlockOnMainThread(^{
+            [[WXSDKManager bridgeMgr] DownloadJS:pageId scriptUrl:ns_url];
+        });
+    });
+
+    node_manager->CreatePage([jsBundleString UTF8String] ?: "", [pageId UTF8String] ?: "", [optionsString UTF8String] ?: "", [dataString UTF8String] ?: "", &downloadJS);
 }
 
 + (void)createDataRenderInstance:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary *)options data:(id)data

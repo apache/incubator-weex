@@ -31,6 +31,7 @@
 #include "core/bridge/platform_bridge.h"
 #include "core/data_render/binary_file.h"
 #include "core/data_render/common_error.h"
+#include "core/network/http_module.h"
 
 #define VRENDER_LOG true
 
@@ -179,15 +180,15 @@ void VNodeRenderManager::InitVM() {
   }
 }
 
-void VNodeRenderManager::CreatePage(const std::string &input, const std::string &page_id, const  std::string &options, const std::string &init_data) {
-    std::string err = CreatePageImpl(input, page_id, options, init_data);
+void VNodeRenderManager::CreatePage(const std::string &input, const std::string &page_id, const  std::string &options, const std::string &init_data, HttpModule *downloadJS) {
+    std::string err = CreatePageImpl(input, page_id, options, init_data, downloadJS);
     if (!err.empty()) {
         WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id.c_str(), nullptr, err.c_str());
     }
 }
 
 
-std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data) {
+std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data, HttpModule *downloadJS) {
     InitVM();
     auto start = std::chrono::steady_clock::now();
     ExecState *exec_state = new ExecState(g_vm);
@@ -225,6 +226,13 @@ std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const s
     if (exec_state->context()->root() == NULL) {
         return err;
     }
+
+    const json11::Json& javascript_obj = exec_state->context()->raw_json()["javascript"];
+    std::string javacript_url = javascript_obj.string_value();
+    if (!javacript_url.empty()) {
+        downloadJS->Send(javacript_url.c_str());
+    }
+
     CreatePageInternal(page_id, exec_state->context()->root());
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("DATA_RENDER, All time %lld\n", duration_post.count());

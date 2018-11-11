@@ -34,6 +34,7 @@ namespace weex {
 namespace core {
 namespace data_render {
 
+class HttpModule;
 class VNodeRenderManager {
  friend class VNode;
  private:
@@ -42,7 +43,7 @@ class VNodeRenderManager {
   ~VNodeRenderManager() {}
 
  public:
-  void CreatePage(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data);
+  void CreatePage(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data, HttpModule *downloadJS);
 
   void CreatePage(const char* contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data);
 
@@ -77,7 +78,7 @@ class VNodeRenderManager {
   bool RefreshPageInternal(const std::string &page_id, VNode *new_node);
   bool ClosePageInternal(const std::string &page_id);
   std::string CreatePageWithOpcode(const std::string& page_id, const std::string& options, const std::string& init_data);
-  std::string CreatePageImpl(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data);
+  std::string CreatePageImpl(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data, HttpModule *downloadJS);
 
   static VM *g_vm;
   static VNodeRenderManager *g_instance;

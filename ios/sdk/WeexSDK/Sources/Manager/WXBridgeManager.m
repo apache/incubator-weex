@@ -289,6 +289,27 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     return value;
 }
 
+- (void)DownloadJS:(NSString *)instance scriptUrl:(NSURL *)scriptUrl
+{
+    if (!instance || !scriptUrl) {
+        return;
+    }
+    __weak typeof(self) weakSelf = self;
+    WXResourceRequest* request = [WXResourceRequest requestWithURL:scriptUrl];
+    WXResourceLoader* jsLoader = [[WXResourceLoader alloc] initWithRequest:request];
+    jsLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
+        NSString* jsString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        WXPerformBlockOnBridgeThread(^(){
+            [weakSelf createInstance:instance template:jsString options:nil data:nil];
+        });
+    };
+    jsLoader.onFailed = ^(NSError *loadError) {
+        WXLogError(@"No js URL found");
+    };
+
+   [jsLoader start];
+}
+
 -(void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options
 {
     if (!name || !serviceScriptUrl || !options) return;

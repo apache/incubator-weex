@@ -432,7 +432,7 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
     if (strcmp(render_strategy, "DATA_RENDER") == 0) {
       auto node_manager =
               weex::core::data_render::VNodeRenderManager::GetInstance();
-      node_manager->CreatePage(script, instanceId, render_strategy, initData);
+      node_manager->CreatePage(script, instanceId, render_strategy, initData, nullptr);
 
       return true;
     } else if (strcmp(render_strategy, "DATA_RENDER_BINARY") == 0) {

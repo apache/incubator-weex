@@ -98,6 +98,12 @@ extern void WXPerformBlockOnBridgeThread(void (^block)(void));
 - (void)executeJsFramework:(NSString *)script;
 
 /**
+ + *  download JS Script
+ + *  @param scriptUrl    :   script url
+ + **/
+- (void)DownloadJS:(NSString *)instance scriptUrl:(NSURL *)scriptUrl;
+
+/**
  *  Register JS service Script
  *  @param name      :   service name
  *  @param serviceScript    :   script code
