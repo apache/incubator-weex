@@ -44,6 +44,7 @@ class VNode {
     ~OnEventListener() {}
     virtual void OnEvent(VNode *node, const std::string &event,
                          const std::string &json_args,
+                         const std::string dom_changes,
                          const Params &params) = 0;
   };
 
@@ -102,7 +103,8 @@ class VNode {
     return event_params_map_.get();
   }
 
-  void OnEvent(const std::string& event, const std::string args);
+  void OnEvent(const std::string &event, const std::string args,
+               const std::string dom_changes);
 
   inline void set_on_event_listener(std::unique_ptr<OnEventListener> listener) {
     on_event_listener_ = std::move(listener);

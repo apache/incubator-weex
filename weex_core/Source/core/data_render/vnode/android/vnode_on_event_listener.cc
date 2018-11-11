@@ -38,13 +38,14 @@ static const char* kKeyParams = "params";
 
 void VNodeOnEventListener::OnEvent(VNode* node, const std::string& event,
                                    const std::string& json_args,
+                                   const std::string dom_changes,
                                    const VNode::Params& param_list) {
   auto page_id = node->component()->exec_state()->context()->page_id();
   std::vector<VALUE_WITH_TYPE*> params;
   // page_id
   params.push_back(Conversion::GenValueWithType(page_id.c_str()));
 
-  // args -> { method: 'fireEvent', args: [ref, event, args ,{params: [...]}] }
+  // args -> { method: 'fireEvent', args: [ref, "nodeEvent", args , domChanges, {params: [ {"templateId": templateId, "componentId": id, "type": type, "params" : [...]} ]}] }
   VALUE_WITH_TYPE* args = getValueWithTypePtr();
   args->type = ParamsType::JSONSTRING;
   std::vector<json11::Json> args_object_list;
@@ -53,18 +54,33 @@ void VNodeOnEventListener::OnEvent(VNode* node, const std::string& event,
   args_object.insert({kKeyMethod, kMethodFireEvent});
 
   std::vector<json11::Json> args_in_args_object;
-  // nodeId
-  args_in_args_object.push_back(node->render_object_ref());
-  // event
-  args_in_args_object.push_back(event);
+  // ref TODO make sure the difference between node id and ref
+  args_in_args_object.push_back(node->node_id());
+  // type -> "nodeEvent"
+  args_in_args_object.push_back("nodeEvent");
   // args
   std::string error;
   args_in_args_object.push_back(json11::Json::parse(json_args, error));
-  // params
+  // domChanges
+  args_in_args_object.push_back(json11::Json::parse(dom_changes, error));
+  // params -> [ {"templateId": templateId, "componentId": id, "type": type, "params" : [...]} ]
   std::map<std::string, json11::Json> params_object;
   std::vector<json11::Json> array_in_params_object;
-  for (auto it = param_list.begin(); it != param_list.end(); it++) {
-    array_in_params_object.push_back(Conversion::GenJSON(&*it));
+  {
+    std::map<std::string, json11::Json> inner_object;
+    // templateId
+    inner_object.insert({"templateId", node->component()->template_id()});
+    // componentId
+    inner_object.insert({"componentId", node->component()->id()});
+    // type
+    inner_object.insert({"type", event});
+    // params
+    std::vector<json11::Json> array_in_inner_object;
+    for (auto it = param_list.begin(); it != param_list.end(); it++) {
+      array_in_inner_object.push_back(Conversion::GenJSON(&*it));
+    }
+    inner_object.insert({kKeyParams, array_in_inner_object});
+    array_in_params_object.push_back(inner_object);
   }
   params_object.insert({kKeyParams, array_in_params_object});
   args_in_args_object.push_back(params_object);

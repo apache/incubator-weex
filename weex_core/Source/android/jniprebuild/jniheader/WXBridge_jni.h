@@ -77,7 +77,8 @@ static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
     jstring instanceId,
     jstring ref,
     jstring type,
-    jstring data);
+    jstring data,
+    jstring domChanges);
 
 static void RegisterModuleOnDataRenderNode(JNIEnv* env, jobject jcaller,
     jstring data);
@@ -987,6 +988,7 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;", reinterpret_cast<void*>(ExecJSOnInstance) },
     { "nativeFireEventOnDataRenderNode",
 "("
+"Ljava/lang/String;"
 "Ljava/lang/String;"
 "Ljava/lang/String;"
 "Ljava/lang/String;"

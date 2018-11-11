@@ -582,7 +582,9 @@ static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
 }
 
 static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
-                                      jstring instanceId, jstring ref, jstring type, jstring data) {
+                                      jstring instanceId, jstring ref,
+                                      jstring type, jstring data,
+                                      jstring domChanges) {
   if (instanceId == NULL || ref == NULL || type == NULL || data == NULL) {
     return;
   }
@@ -591,13 +593,14 @@ static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
   ScopedJStringUTF8 refChar(env, ref);
   ScopedJStringUTF8 typeChar(env, type);
   ScopedJStringUTF8 dataChar(env, data);
+  ScopedJStringUTF8 domChangesChar(env, domChanges);
 
   try {
     weex::core::data_render::VNodeRenderManager::GetInstance()->FireEvent(
-        idChar.getChars(), refChar.getChars(), typeChar.getChars(), dataChar.getChars()
-    );
-  } catch (std::exception &e) {
-    auto error = static_cast<weex::core::data_render::Error *>(&e);
+        idChar.getChars(), refChar.getChars(), typeChar.getChars(),
+        dataChar.getChars(), domChangesChar.getChars());
+  } catch (std::exception& e) {
+    auto error = static_cast<weex::core::data_render::Error*>(&e);
     if (error) {
       LOGE("Error on FireEventOnDataRenderNode %s", error->what());
     }
