@@ -82,8 +82,8 @@
 - (void)setFrame:(CGRect)frame {
     [super setFrame:frame];
     if (![self.wx_component isKindOfClass:[WXListComponent class]]) return;
-    BOOL isContentAttachBottom = [(WXListComponent *)self.wx_component isContentAttachBottom];
-    if (isContentAttachBottom) {
+    BOOL contentAttachBottom = [(WXListComponent *)self.wx_component contentAttachBottom];
+    if (contentAttachBottom) {
         CGFloat offsetHeight = self.contentSize.height - CGRectGetHeight(self.bounds);
         if (offsetHeight >= 0)
         [self setContentOffset:CGPointMake(0, offsetHeight) animated:NO];
@@ -130,7 +130,7 @@
 @interface WXListComponent () <UITableViewDataSource, UITableViewDelegate, WXCellRenderDelegate, WXHeaderRenderDelegate>
 
 @property (nonatomic, assign) NSUInteger currentTopVisibleSection;
-                                  
+
 @end
 
 @implementation WXListComponent
@@ -157,7 +157,7 @@
         _completedSections = [NSMutableArray array];
         _reloadInterval = attributes[@"reloadInterval"] ? [WXConvert CGFloat:attributes[@"reloadInterval"]]/1000 : 0;
         _updataType = [WXConvert NSString:attributes[@"updataType"]]?:@"insert";
-        _isContentAttachBottom = [WXConvert BOOL:attributes[@"isContentAttachBottom"]];
+        _contentAttachBottom = [WXConvert BOOL:attributes[@"contentAttachBottom"]];
         [self fixFlicker];
     }
     
@@ -212,8 +212,8 @@
     if (attributes[@"updataType"]) {
         _updataType = [WXConvert NSString:attributes[@"updataType"]];
     }
-    if (attributes[@"isContentAttachBottom"]) {
-        _isContentAttachBottom = [WXConvert BOOL:attributes[@"isContentAttachBottom"]];
+    if (attributes[@"contentAttachBottom"]) {
+        _contentAttachBottom = [WXConvert BOOL:attributes[@"contentAttachBottom"]];
     }
 }
 

@@ -22,6 +22,6 @@
 @interface WXListComponent : WXScrollerComponent
 
 // Set whether the content offset position all the way to the bottom
-@property (assign, nonatomic) BOOL isContentAttachBottom;
+@property (assign, nonatomic) BOOL contentAttachBottom;
 
 @end
