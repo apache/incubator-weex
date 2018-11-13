@@ -64,7 +64,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   public static final String ITEM_ID = "itemId";
 
   private String src;
-  private WXSDKInstance mNestedInstance;
+  protected WXSDKInstance mNestedInstance;
   private static int ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270,750);
   private static int ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260,750);
 
