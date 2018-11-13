@@ -744,7 +744,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
                                    final String url,
                                    Map<String, Object> options,
                                    final String jsonInitData,
-                                   final WXRenderStrategy flag) {
+                                   WXRenderStrategy flag) {
 
     ensureRenderArchor();
     pageName = wrapPageName(pageName, url);
@@ -771,6 +771,16 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END);
       render(pageName,template , renderOptions, jsonInitData, flag);
       return;
+    }
+
+    boolean is_wlasm = false;
+    if (uri != null && uri.getPath()!=null) {
+      if(uri.getPath().endsWith(".wlasm")){
+        is_wlasm =  true;
+      }
+    }
+    if (is_wlasm){
+      flag = WXRenderStrategy.DATA_RENDER_BINARY;
     }
 
     IWXHttpAdapter adapter = WXSDKManager.getInstance().getIWXHttpAdapter();
@@ -2045,8 +2055,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       String wxErrorCode = WXInstanceApm.VALUE_ERROR_CODE_DEFAULT;
       if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
         mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END);
-        String template = new String(response.originalData);
-        render(pageName, template, options, jsonInitData, flag);
+        if (flag==WXRenderStrategy.DATA_RENDER_BINARY){
+          render(pageName, response.originalData, options, jsonInitData);
+        } else {
+          String template = new String(response.originalData);
+          render(pageName, template, options, jsonInitData, flag);
+        }
 
         // check content-type
       } else if (TextUtils.equals(WXErrorCode.WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR.getErrorCode(),

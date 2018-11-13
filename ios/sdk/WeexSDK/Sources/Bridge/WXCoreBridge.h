@@ -116,6 +116,8 @@ namespace WeexCore
         void PostMessage(const char* vm_id, const char* data, int dataLength) override {};
         void DispatchMessage(const char* client_id,
                              const char* data, int dataLength, const char* callback, const char* vm_id) override {};
+        void OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult>& result) override {};
+
     };
     
     class WXCoreMeasureFunctionBridge : public MeasureFunctionAdapter

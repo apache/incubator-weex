@@ -29,10 +29,11 @@ namespace weex {
 namespace core {
 namespace data_render {
     
-#define JSX_GLOBAL_VNODE_INDEX               "global_vnode_index"
-#define JS_GLOBAL_ARGUMENTS                  "__arguments"
+#define JS_GLOBAL_VNODE_INDEX                "global_vnode_index"
+#define JS_GLOBAL_ARGUMENTS                  "arguments"
+#define JS_GLOBAL_CONSTRUCTOR                "constructor"
+#define JS_GLOBAL_SUPER                      "super"
 
-    
 class JSXNodeExpression : public Expression {
 public:
     JSXNodeExpression(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens)

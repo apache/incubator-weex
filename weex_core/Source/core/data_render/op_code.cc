@@ -17,39 +17,20 @@
  * under the License.
  */
 
-#include <string.h>
-#include "core/data_render/string_table.h"
+#include "core/data_render/op_code.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
+
+#define T(name, string, ops) #name,
+    const char *const OPUtil::s_name_[NUM_OPCODES] = {OP_CODE_LIST(T)};
+#undef T
     
-String::String(const char *str, std::size_t len) {
-  length_ = len;
-  str_ = std::unique_ptr<char[]>(new char[len + 1]);
-  memcpy(str_.get(), str, len);
-  str_[len] = 0;
-}
-
-String::String(const std::string &str) : String(str.c_str(), str.length()) {}
-
-String::~String() {}
-
-String *StringTable::StringFromUTF8(const std::string &str) {
-    for (auto &it : store_) {
-        if (it.first == str) {
-            return it.second.get();
-        }
-    }
-    std::string key = str;
-    auto result = new String(key);
-    store_.push_back(std::make_pair(std::move(key), std::unique_ptr<String>(result)));
-    return result;
-}
-
-StringTable::~StringTable() {}
-
+#define T(name, string, ops) ops,
+    const int8_t OPUtil::s_ops_[NUM_OPCODES] = {OP_CODE_LIST(T)};
+#undef T
+    
 }  // namespace data_render
-
 }  // namespace core
 }  // namespace weex

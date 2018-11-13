@@ -33,7 +33,7 @@
 namespace weex {
 namespace core {
 namespace data_render {
-  
+
 class ASTBuilder {
 public:
     ASTBuilder(ParserContext *ctx, ASTFactory *factory,
@@ -51,7 +51,7 @@ public:
     // create a new node representing JavaScript ternary expression
     Handle<Expression> NewTernaryExpression(Handle<Expression> first, Handle<Expression> second, Handle<Expression> third);
     // create a new node representing JavaScript binary expression
-    Handle<Expression> NewBinaryExpression(BinaryOperation op, Handle<Expression> lhs, Handle<Expression> rhs);    
+    Handle<Expression> NewBinaryExpression(BinaryOperation op, Handle<Expression> lhs, Handle<Expression> rhs);
     // create a new node representing JavaScript assign expression
     Handle<Expression> NewAssignExpression(Handle<Expression> lhs, Handle<Expression> rhs);
     Handle<Expression> NewDeclaration(std::string name, Handle<Expression> init = nullptr);
@@ -63,7 +63,7 @@ public:
     // create a new node representing JavaScript postfix operation
     Handle<Expression> NewPostfixExpression(PostfixOperation op, Handle<Expression> expr);
     // create a new node representing JavaScript `new` expression
-    Handle<Expression> NewNewExpression(Handle<Expression> expr);
+    Handle<Expression> NewNewExpression(Handle<Expression> expr, Handle<ExpressionList> args = nullptr);
     // create a new node representing JavaScript Identifier
     Handle<Expression> NewIdentifier(std::string name);
     // create a new node representing JavaScript argument list
@@ -80,6 +80,8 @@ public:
     Handle<Expression> NewNullConstant();
     // create a new node representing JavaScript string
     Handle<Expression> NewStringConstant(const std::string &str);
+
+    Handle<Expression> NewRegexConstant(const std::string &str);
     // create a new node representing JavaScript boolean
     Handle<Expression> NewBooleanConstant(bool value);
     // create a new node representing JavaScript 'this'
@@ -105,19 +107,25 @@ public:
     // create a new node representing JavaScript for loop
     Handle<Expression> NewForStatement(ForKind kind, Handle<Expression> init, Handle<Expression> cond, Handle<Expression> update, Handle<Expression> body);
     // create a new node representing JavaScript break statement
+    Handle<Expression> NewCaseStatement(Handle<Expression> test_case,Handle<ExpressionList> expr);
+    Handle<Expression> NewSwitchStatement(Handle<Expression> test_value,std::vector<Handle<Expression>> cases);
+    Handle<Expression> NewTryCatchStatement(Handle<Expression> try_block,
+                                            Handle<Expression> catch_expr, Handle<Expression> catch_block, Handle<Expression> finally);
     Handle<Expression> NewBreakStatement(Handle<Expression> label = nullptr);
-    
+
     // create a new node representing JavaScript continue statement
     Handle<Expression> NewContinueStatement(Handle<Expression> label = nullptr);
     Handle<Expression> NewArrowFunctionStatement(Handle<Expression> body, std::vector<Handle<Expression>> args);
     Handle<Expression> NewJSXNodeExpression(Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens);
     Handle<Expression> NewClassStatement(Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body);
+    Handle<Expression> NewClassProperty(std::string name, Handle<Expression> init = nullptr);
+
     Handle<ClassBody> NewClassBody();
 
     ASTFactory *factory() { return factory_; }
     SourceLocator *locator() { return locator_; }
     ScopeManager *manager() { return manager_; }
-    
+
     template <typename T>
     inline Handle<Expression> save(Handle<T> handle) {
         exprs_.push_back(handle);

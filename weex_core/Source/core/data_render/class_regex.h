@@ -17,39 +17,23 @@
  * under the License.
  */
 
-#include <string.h>
-#include "core/data_render/string_table.h"
+//
+// Created by pentao.pt on 2018/7/25.
+//
+
+#ifndef DATA_RENDER_REGEX_CLASS_H
+#define DATA_RENDER_REGEX_CLASS_H
+
+#include "core/data_render/object.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
+        
+ClassDescriptor *NewClassRegex();
     
-String::String(const char *str, std::size_t len) {
-  length_ = len;
-  str_ = std::unique_ptr<char[]>(new char[len + 1]);
-  memcpy(str_.get(), str, len);
-  str_[len] = 0;
-}
-
-String::String(const std::string &str) : String(str.c_str(), str.length()) {}
-
-String::~String() {}
-
-String *StringTable::StringFromUTF8(const std::string &str) {
-    for (auto &it : store_) {
-        if (it.first == str) {
-            return it.second.get();
-        }
-    }
-    std::string key = str;
-    auto result = new String(key);
-    store_.push_back(std::make_pair(std::move(key), std::unique_ptr<String>(result)));
-    return result;
-}
-
-StringTable::~StringTable() {}
-
 }  // namespace data_render
-
 }  // namespace core
 }  // namespace weex
+
+#endif  // DATA_RENDER_JSON_CLASS_H

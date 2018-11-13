@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include <math.h>
 #include "core/render/node/render_object.h"
 #include "base/ViewUtils.h"
 #include "core/css/constants_name.h"

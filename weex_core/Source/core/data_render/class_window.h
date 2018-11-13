@@ -16,40 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+//
+// Created by Xu Jiacheng on 2018/11/6.
+//
 
-#include <string.h>
-#include "core/data_render/string_table.h"
+#ifndef WEEX_PROJECT_CLASS_WINDOW_H
+#define WEEX_PROJECT_CLASS_WINDOW_H
+
+
+#include "object.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-    
-String::String(const char *str, std::size_t len) {
-  length_ = len;
-  str_ = std::unique_ptr<char[]>(new char[len + 1]);
-  memcpy(str_.get(), str, len);
-  str_[len] = 0;
-}
 
-String::String(const std::string &str) : String(str.c_str(), str.length()) {}
-
-String::~String() {}
-
-String *StringTable::StringFromUTF8(const std::string &str) {
-    for (auto &it : store_) {
-        if (it.first == str) {
-            return it.second.get();
-        }
-    }
-    std::string key = str;
-    auto result = new String(key);
-    store_.push_back(std::make_pair(std::move(key), std::unique_ptr<String>(result)));
-    return result;
-}
-
-StringTable::~StringTable() {}
+ClassDescriptor *NewClassWindow();
 
 }  // namespace data_render
-
 }  // namespace core
 }  // namespace weex
+
+
+#endif //WEEX_PROJECT_CLASS_WINDOW_H

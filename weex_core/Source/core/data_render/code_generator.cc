@@ -21,6 +21,7 @@
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/common_error.h"
+#include "core/data_render/class.h"
 
 namespace weex {
 namespace core {
@@ -117,8 +118,48 @@ void CodeGenerator::Visit(StringConstant* node, void* data) {
     FuncState *func_state = func_->func_state();
     auto value = exec_state_->string_table_->StringFromUTF8(node->string());
     int index = func_state->AddConstant(std::move(value));
-    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
+      Instruction i = CREATE_ABx(OP_LOADK, reg, index);
     func_state->AddInstruction(i);
+  }
+}
+
+void CodeGenerator::Visit(RegexConstant* node, void* data) {
+  RegisterScope scope(block_);
+
+  long reg = data == nullptr ? -1 : *static_cast<long*>(data);
+  if (reg >= 0) {
+    FuncState *func_state = func_->func_state();
+    auto reg_ex = exec_state_->string_table_->StringFromUTF8(node->reg());
+    auto flag = exec_state_->string_table_->StringFromUTF8(node->flag());
+    auto reg_mem_name = exec_state_->string_table_->StringFromUTF8("_reg");
+    auto flag_mem_name = exec_state_->string_table_->StringFromUTF8("_flag");
+
+    int r_index = func_state->AddConstant(std::move(reg_ex));
+    int f_index = func_state->AddConstant(std::move(flag));
+    int mr_index = func_state->AddConstant(std::move(reg_mem_name));
+    int mf_index = func_state->AddConstant(std::move(flag_mem_name));
+    auto reg_class_index = exec_state_->global()->IndexOf("RegExp");
+
+    auto mr_id = block_->NextRegisterId();
+    auto mf_id = block_->NextRegisterId();
+    auto r_id = block_->NextRegisterId();
+    auto f_id = block_->NextRegisterId();
+    auto class_id = block_->NextRegisterId();
+    auto tmp = block_->NextRegisterId();
+
+    func_state->AddInstruction(CREATE_ABx(OP_LOADK, mr_id, mr_index));
+    func_state->AddInstruction(CREATE_ABx(OP_LOADK, mf_id, mf_index));
+    func_state->AddInstruction(CREATE_ABx(OP_LOADK, r_id, r_index));
+    func_state->AddInstruction(CREATE_ABx(OP_LOADK, f_id, f_index));
+    func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, class_id, reg_class_index));
+      
+    func_state->AddInstruction(CREATE_ABC(OP_NEW, reg, Value::Type::CLASS_DESC, class_id));
+
+    func_state->AddInstruction(CREATE_ABC(OP_GETMEMBERVAR, tmp, reg, mr_id));
+    func_state->AddInstruction(CREATE_ABx(OP_MOVE, tmp, r_id));
+
+    func_state->AddInstruction(CREATE_ABC(OP_GETMEMBERVAR, tmp, reg, mf_id));
+    func_state->AddInstruction(CREATE_ABx(OP_MOVE, tmp, f_id));
   }
 }
 
@@ -157,19 +198,19 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
         if (block_->idx() > caller + 1) {
             long reg_old_caller = caller;
             caller = block_->NextRegisterId();
-            func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, reg_old_caller, 0));
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, caller, reg_old_caller));
         }
         caller_regs_order.push_back(caller);
     }
     else if (stms->expr().get()) {
-        if (class_ && stms->expr()->IsIdentifier() && stms->expr()->AsIdentifier()->GetName() == "super")
+        if (class_ && stms->expr()->IsIdentifier() && stms->expr()->AsIdentifier()->GetName() == JS_GLOBAL_SUPER)
         {
             ClassDescriptor *class_desc = ValueTo<ClassDescriptor>(class_->class_value());
             if (!class_desc->p_super_) {
                 throw GeneratorError("can't call super without class desc");
             }
             ClassDescriptor *class_desc_super = class_desc->p_super_;
-            int index = class_desc_super->funcs_->IndexOf("constructor");
+            int index = class_desc_super->funcs_->IndexOf(JS_GLOBAL_CONSTRUCTOR);
             if (index < 0) {
                 throw GeneratorError("can't call super without class desc");
             }
@@ -210,7 +251,7 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
                 if (block_->idx() > caller + 1) {
                     long reg_old_caller = caller;
                     caller = block_->NextRegisterId();
-                    func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, reg_old_caller, 0));
+                    func_state->AddInstruction(CREATE_ABx(OP_MOVE, caller, reg_old_caller));
                 }
                 caller_regs_order.push_back(caller);
                 if (stms->expr()->IsMemberExpression()) {
@@ -250,35 +291,40 @@ void CodeGenerator::Visit(CallExpression *stms, void *data) {
         }
         argc += arg_list->length();
     }
-    FuncState *state = func_->func_state();
-    bool call_reorder = false;
-    int regs_count = (int)caller_regs_order.size();
+    AddCallInstruction(ret, OP_CALL, caller_regs_order);
+}
+    
+void CodeGenerator::AddCallInstruction(long ret, OPCode code, std::vector<long> orders) {
+    FuncState *func_state = func_->func_state();
+    bool reorder = false;
+    int regs_count =  static_cast<int>(orders.size());
     for (int i = 1; i < regs_count; i++) {
-        if (caller_regs_order[i] - caller_regs_order[i - 1] != 1) {
-            call_reorder = true;
+        if (orders[i] - orders[i - 1] != 1) {
+            reorder = true;
             break;
         }
     }
-    if (!call_reorder && regs_count > 0) {
-        call_reorder = caller_regs_order[regs_count - 1] + 1 >= block_->idx() ? false : true;
+    if (!reorder && regs_count > 0) {
+        reorder = orders[regs_count - 1] + 1 >= block_->idx() ? false : true;
     }
-    if (call_reorder) {
-        caller = block_->NextRegisterId();
-        func_state->AddInstruction(CREATE_ABC(OP_MOVE, caller, caller_regs_order[0], 0));
-        for (int i = 1; i < caller_regs_order.size(); i++) {
+    int argc = regs_count - 1;
+    if (reorder) {
+        long caller = block_->NextRegisterId();
+        func_state->AddInstruction(CREATE_ABx(OP_MOVE, caller, orders[0]));
+        for (int i = 1; i < orders.size(); i++) {
             long arg = block_->NextRegisterId();
-            func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg, caller_regs_order[i], 0));
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, arg, orders[i]));
         }
-        state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
+        func_state->AddInstruction(CREATE_ABC(code, ret, argc, caller));
     }
     else {
-        state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
+        func_state->AddInstruction(CREATE_ABC(code, ret, argc, orders[0]));
     }
 }
 
-void CodeGenerator::Visit(ArgumentList* node, void* data) {
-  Handle<ExpressionList> exprList = node->args();
-  exprList->Accept(this, data);
+void CodeGenerator::Visit(ArgumentList *node, void *data) {
+    Handle<ExpressionList> exprList = node->args();
+    exprList->Accept(this, data);
 }
 
 void CodeGenerator::Visit(IfStatement *node, void *data) {
@@ -430,15 +476,24 @@ void CodeGenerator::Visit(FunctionStatement *node, void *data) {
 
         // make arguments var in thie front of stack;
         if (is_class_func) {
-            block_->AddVariable("this", block_->NextRegisterId());
+            long arg = block_->NextRegisterId();
+            block_->AddVariable("this", arg);
             func_->func_state()->argc()++;
+            func_->func_state()->args().push_back(arg);
         }
         for (int i = 0; i < proto->GetArgs().size(); i++) {
-            std::string arg = proto->GetArgs().at(i);
-            block_->AddVariable(arg, block_->NextRegisterId());
+            long arg = block_->NextRegisterId();
+            block_->AddVariable(proto->GetArgs().at(i), arg);
+            func_->func_state()->args().push_back(arg);
             func_->func_state()->argc()++;
         }
         node->body()->Accept(this, nullptr);
+        if (func_->func_state()->out_closure().size() > 0) {
+            for (int i = 0; i < func_->func_state()->out_closure().size(); i++) {
+                ValueRef *ref = func_->func_state()->out_closure()[i];
+                func_->func_state()->AddInstruction(CREATE_Ax(OP_REMOVE_CLOSURE, ref->ref_id()));
+            }
+        }
     }
     
     // function prototype
@@ -478,7 +533,7 @@ void CodeGenerator::Visit(ThisExpression *node, void *data) {
         long rhs = block_->FindRegisterId("this");
         if (rhs != ret) {
             // a = b
-            func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, ret, rhs, 0));
+            func_->func_state()->AddInstruction(CREATE_ABx(OP_MOVE, ret, rhs));
         }
     }
 }
@@ -506,22 +561,26 @@ void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
         block_->NextRegisterId();
         // make arguments var in thie front of stack;
         if (is_class_func) {
-            block_->AddVariable("this", block_->NextRegisterId());
+            long arg = block_->NextRegisterId();
+            block_->AddVariable("this", arg);
             func_->func_state()->argc()++;
+            func_->func_state()->args().push_back(arg);
         }
         // make arguments var in thie front of stack;
         for (int i = 0; i < node->args().size(); i++) {
             if (node->args()[i]->IsIdentifier()) {
-                std::string arg = node->args()[i]->AsIdentifier()->GetName();
-                block_->AddVariable(arg, block_->NextRegisterId());
+                long arg = block_->NextRegisterId();
+                block_->AddVariable(node->args()[i]->AsIdentifier()->GetName(), arg);
                 func_->func_state()->argc()++;
+                func_->func_state()->args().push_back(arg);
             }
             else if (node->args()[i]->IsCommaExpression()) {
                 Handle<ExpressionList> arg_list = node->args()[i]->AsCommaExpression()->exprs();
                 for (int j = 0; j < arg_list->Size(); j++) {
-                    std::string arg = arg_list->raw_list()[j]->AsIdentifier()->GetName();
-                    block_->AddVariable(arg, block_->NextRegisterId());
+                    long arg = block_->NextRegisterId();
+                    block_->AddVariable(arg_list->raw_list()[j]->AsIdentifier()->GetName(), arg);
                     func_->func_state()->argc()++;
+                    func_->func_state()->args().push_back(arg);
                 }
             }
             else {
@@ -532,10 +591,16 @@ void CodeGenerator::Visit(ArrowFunctionStatement *node, void *data) {
         if (node->body()->IsJSXNodeExpression()) {
             long return1 = block_->NextRegisterId();
             node->body()->Accept(this, &return1);
-            func_->func_state()->AddInstruction(CREATE_ABC(OP_RETURN1, return1, 0, 0));
+            func_->func_state()->AddInstruction(CREATE_Ax(OP_RETURN1, return1));
         }
         else {
             node->body()->Accept(this, nullptr);
+        }
+        if (func_->func_state()->out_closure().size() > 0) {
+            for (int i = 0; i < func_->func_state()->out_closure().size(); i++) {
+                ValueRef *ref = func_->func_state()->out_closure()[i];
+                func_->func_state()->AddInstruction(CREATE_Ax(OP_REMOVE_CLOSURE, ref->ref_id()));
+            }
         }
     }
     // associate function_name and function_state
@@ -589,6 +654,7 @@ void CodeGenerator::Visit(ClassStatement *node, void *data) {
         class_value = exec_state_->class_factory()->CreateClassDescriptor(super_value ? ValueTo<ClassDescriptor>(super_value) : nullptr);
         exec_state_->global()->Add(class_name, class_value);
         ClassScope scope(this, &class_value);
+        class_->class_name() = class_name;
         node->Body()->Accept(this, nullptr);
         
     } while (0);
@@ -605,29 +671,39 @@ void CodeGenerator::Visit(NewExpression *node, void *data) {
         RegisterScope scope(block_);
         long lhs = data == nullptr ? block_->NextRegisterId() : *static_cast<long *>(data);
         if (lhs >= 0) {
-            FuncState *state = func_->func_state();
-            long rhs = block_->FindRegisterId(node->member()->AsIdentifier()->GetName());
-            if (rhs >= 0) {
-                if (node->is_class()) {
-                    state->AddInstruction(CREATE_ABC(OP_NEW, lhs, Value::CLASS_DESC, rhs));
+            FuncState *func_state = func_->func_state();
+            long rhs = block_->FindRegisterId(node->name()->AsIdentifier()->GetName());
+            if (rhs < 0) {
+                int index = exec_state_->global()->IndexOf(node->name()->AsIdentifier()->GetName());
+                if (index >= 0) {
+                    Value *name = exec_state_->global()->Find(index);
+                    if (IsClass(name)) {
+                        rhs = block_->NextRegisterId();
+                        func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, rhs, index));
+                    }
+                    else {
+                        // function call
+                        func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, lhs, index));
+                        break;
+                    }
                 }
                 else {
-                    state->AddInstruction(CREATE_ABC(OP_MOVE, lhs, rhs, 0));
-                }
-                break;
-            }
-            int index = exec_state_->global()->IndexOf(node->member()->AsIdentifier()->GetName());
-            if (index >= 0) {
-                Value *value = exec_state_->global()->Find(index);
-                if (IsClass(value)) {
-                    rhs = block_->NextRegisterId();
-                    state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, rhs, index));
-                    state->AddInstruction(CREATE_ABC(OP_NEW, lhs, Value::CLASS_DESC, rhs));
-                }
-                else {
-                    state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, lhs, index));
+                    throw GeneratorError("can't find new identifier: " + node->name()->AsIdentifier()->GetName());
                 }
             }
+            func_state->AddInstruction(CREATE_ABC(OP_NEW, lhs, Value::CLASS_DESC, rhs));
+            long caller = block_->NextRegisterId();
+            long inst = block_->NextRegisterId();
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, inst, lhs));
+            std::vector<long> orders = { caller, inst };
+            if (node->args()->Size() > 0) {
+                for (int i = 0; i < node->args()->Size(); i++) {
+                    long arg = block_->NextRegisterId();
+                    orders.push_back(arg);
+                    node->args()->raw_list()[i]->Accept(this, &arg);
+                }
+            }
+            AddCallInstruction(lhs, OP_CONSTRUCTOR, orders);
         }
             
     } while (0);
@@ -667,14 +743,14 @@ void CodeGenerator::Visit(JSXNodeExpression *node, void *data) {
                     throw GeneratorError("can't find identifier appendChild");
                 }
                 func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, caller, index));
-                func_state->AddInstruction(CREATE_ABC(OP_MOVE, arg_0, reg_parent, 0));
+                func_state->AddInstruction(CREATE_ABx(OP_MOVE, arg_0, reg_parent));
                 childrens[i]->Accept(this, &arg_1);
                 func_state->AddInstruction(CREATE_ABC(OP_CALL, ret, argc, caller));
             }
         }
         if (data) {
             long ret = *static_cast<long *>(data);
-            func_state->AddInstruction(CREATE_ABC(OP_MOVE, ret, reg_parent, 0));
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, ret, reg_parent));
         }
         
     } while (0);
@@ -700,94 +776,170 @@ void CodeGenerator::Visit(BinaryExpression *node, void *data) {
         int for_start_index = (int)func_state->instructions().size();  // aka next one.
         block_->set_for_start_index(for_start_index);
     }
-    long right = block_->NextRegisterId();
-    if (node->rhs().get() != NULL) {
-        node->rhs()->Accept(this, &right);
-    }
     switch (opeartion) {
         case BinaryOperation::kAddition:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             // a + b
             func_state->AddInstruction(CREATE_ABC(OP_ADD, ret, left, right));
             break;
         }
         case BinaryOperation::kSubtraction:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             // a - b
             func_state->AddInstruction(CREATE_ABC(OP_SUB, ret, left, right));
             break;
         }
         case BinaryOperation::kMultiplication:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             // a * b
             func_state->AddInstruction(CREATE_ABC(OP_MUL, ret, left, right));
             break;
         }
         case BinaryOperation::kDivision:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             // a / b
             func_state->AddInstruction(CREATE_ABC(OP_DIV, ret, left, right));
             break;
         }
         case BinaryOperation::kMod:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             // a % b
             func_state->AddInstruction(CREATE_ABC(OP_MOD, ret, left, right));
             break;
         }
         case BinaryOperation::kLessThan:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_LT, ret, left, right));
             break;
         }
         case BinaryOperation::kGreaterThan:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_GT, ret, left, right));
             break;
         }
         case BinaryOperation::kLessThanEqual:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_LTE, ret, left, right));
             break;
         }
         case BinaryOperation::kGreaterThanEqual:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_GTE, ret, left, right));
             break;
         }
         case BinaryOperation::kAnd:
         {
+            auto slot = func_state->AddInstruction(0);
+            int second_index = (int)func_state->instructions().size() - 1;
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_AND, ret, left, right));
+            auto goto_slot = func_state->AddInstruction(0);
+            int third_index = (int)func_state->instructions().size() - 1;
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, ret, left));
+            int end_index = (int)func_state->instructions().size();
+            func_state->ReplaceInstruction(slot, CREATE_ABx(OP_JMP, left, third_index - second_index));
+            func_state->ReplaceInstruction(goto_slot, CREATE_Ax(OP_GOTO, end_index));
             break;
         }
         case BinaryOperation::kStrictEqual:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_SEQ, ret, left, right));
             break;
         }
         case BinaryOperation::kIn:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_IN, ret, left, right));
             break;
         }
         case BinaryOperation::kOr:
         {
+            auto slot = func_state->AddInstruction(0);
+            int second_index = (int)func_state->instructions().size() - 1;
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, ret, left));
+            auto goto_slot = func_state->AddInstruction(0);
+            int third_index = (int)func_state->instructions().size() - 1;
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_OR, ret, left, right));
+            int end_index = (int)func_state->instructions().size();
+            func_state->ReplaceInstruction(slot, CREATE_ABx(OP_JMP, left, third_index - second_index));
+            func_state->ReplaceInstruction(goto_slot, CREATE_Ax(OP_GOTO, end_index));
             break;
         }
         case BinaryOperation::kEqual:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_EQ, ret, left, right));
             break;
         }
         case BinaryOperation::kNotEqual:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_EQ, ret, left, right));
             func_state->AddInstruction(CREATE_ABx(OP_NOT, ret, ret));
             break;
         }
         case BinaryOperation::kStrictNotEqual:
         {
+            long right = block_->NextRegisterId();
+            if (node->rhs().get() != NULL) {
+                node->rhs()->Accept(this, &right);
+            }
             func_state->AddInstruction(CREATE_ABC(OP_SEQ, ret, left, right));
             func_state->AddInstruction(CREATE_ABx(OP_NOT, ret, ret));
             break;
@@ -826,10 +978,10 @@ void CodeGenerator::Visit(AssignExpression *node, void *data) {
         case AssignOperation::kAssign:
         {
             if (class_ && node->lhs()->IsMemberExpression() && node->lhs()->AsMemberExpression()->expr()->IsThisExpression()) {
-                func_state->AddInstruction(CREATE_ABC(OP_SETMEMBERVAR, left, right, 0));
+                func_state->AddInstruction(CREATE_ABx(OP_SETMEMBERVAR, left, right));
             }
             else {
-                func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, right, 0));
+                func_state->AddInstruction(CREATE_ABx(OP_MOVE, left, right));
             }
             break;
         }
@@ -837,14 +989,14 @@ void CodeGenerator::Visit(AssignExpression *node, void *data) {
         {
             long ret = block_->NextRegisterId();
             func_state->AddInstruction(CREATE_ABC(OP_ADD, ret, left, right));
-            func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, ret, 0));
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, left, ret));
             break;
         }
         case AssignOperation::kAssignSub:
         {
             long ret = block_->NextRegisterId();
             func_state->AddInstruction(CREATE_ABC(OP_SUB, ret, left, right));
-            func_state->AddInstruction(CREATE_ABC(OP_MOVE, left, ret, 0));
+            func_state->AddInstruction(CREATE_ABx(OP_MOVE, left, ret));
             break;
         }
         default:
@@ -860,7 +1012,7 @@ void CodeGenerator::Visit(Declaration *node, void *data) {
         node->expr()->Accept(this, &reg);
     }
     else {
-        func_state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
+        func_state->AddInstruction(CREATE_Ax(OP_LOADNULL, reg));
     }
 }
 
@@ -888,7 +1040,7 @@ void CodeGenerator::Visit(IntegralConstant* node, void* data) {
     FuncState* func_state = func_->func_state();
     int value = node->value();
     int index = func_state->AddConstant(static_cast<int64_t>(value));
-    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
+    Instruction i = CREATE_ABx(OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
 }
@@ -899,7 +1051,7 @@ void CodeGenerator::Visit(BooleanConstant* node, void* data) {
     FuncState* func_state = func_->func_state();
     bool value = node->pred();
     int index = func_state->AddConstant(static_cast<bool>(value));
-    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
+    Instruction i = CREATE_ABx(OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
 }
@@ -910,7 +1062,7 @@ void CodeGenerator::Visit(DoubleConstant* node, void* data) {
     FuncState* func_state = func_->func_state();
     double value = node->value();
     int index = func_state->AddConstant(static_cast<double>(value));
-    Instruction i = CREATE_ABx(OpCode::OP_LOADK, reg, index);
+    Instruction i = CREATE_ABx(OP_LOADK, reg, index);
     func_state->AddInstruction(i);
   }
 }
@@ -919,7 +1071,7 @@ void CodeGenerator::Visit(NullConstant *node, void *data) {
     long reg = data == nullptr ? -1 : *static_cast<long *>(data);
     if (reg >= 0) {
         FuncState *func_state = func_->func_state();
-        func_state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
+        func_state->AddInstruction(CREATE_Ax(OP_LOADNULL, reg));
     }
 }
     
@@ -927,7 +1079,7 @@ void CodeGenerator::Visit(UndefinedConstant *node, void *data) {
     long reg = data == nullptr ? -1 : *static_cast<long*>(data);
     if (reg >= 0) {
         FuncState *func_state = func_->func_state();
-        func_state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg, 0, 0));
+        func_state->AddInstruction(CREATE_Ax(OP_LOADNULL, reg));
     }
 }
 
@@ -1003,6 +1155,36 @@ void CodeGenerator::Visit(ArrayConstant *node, void *data) {
         }
     }
 }
+    
+void CodeGenerator::Visit(ClassProperty *node, void *data) {
+    RegisterScope scope(block_);
+    assert(class_);
+    do {
+        FuncState *func_state = func_->func_state();
+        if (node->is_static()) {
+            long lhs = block_->NextRegisterId();
+            long rhs = block_->NextRegisterId();
+            int index = exec_state_->global()->IndexOf(class_->class_name());
+            if (index <= 0) {
+                throw GeneratorError("can't find class name " + class_->class_name());
+                break;
+            }
+            func_state->AddInstruction(CREATE_ABx(OP_GETGLOBAL, lhs, index));
+            auto constant = exec_state_->string_table_->StringFromUTF8(node->name());
+            index = func_state->AddConstant(std::move(constant));
+            func_state->AddInstruction(CREATE_ABx(OP_LOADK, rhs, index));
+            func_state->AddInstruction(CREATE_ABC(OP_GETMEMBERVAR, lhs, lhs, rhs));
+            if (node->init()) {
+                node->init()->Accept(this, &rhs);
+                func_state->AddInstruction(CREATE_ABx(OP_MOVE, lhs, rhs));
+            }
+            else {
+                func_state->AddInstruction(CREATE_Ax(OP_LOADNULL, lhs));
+            }
+        }
+        
+    } while (0);
+}
 
 void CodeGenerator::Visit(MemberExpression *node, void *data) {
     RegisterScope registerScope(block_);
@@ -1059,7 +1241,7 @@ void CodeGenerator::Visit(Identifier *node, void *data) {
     FuncState *state = func_->func_state();
     long reg_b = block_->FindRegisterId(node->GetName());
     if (reg_b >= 0) {
-      state->AddInstruction(CREATE_ABC(OP_MOVE, reg_a, reg_b, 0));
+      state->AddInstruction(CREATE_ABx(OP_MOVE, reg_a, reg_b));
       return;
     }
 
@@ -1081,12 +1263,12 @@ void CodeGenerator::Visit(Identifier *node, void *data) {
       int tableIndex = func_state->AddConstant(std::move(value));
 
       func_state->AddInstruction(
-          CREATE_ABx(OpCode::OP_LOADK, right, tableIndex));
+          CREATE_ABx(OP_LOADK, right, tableIndex));
       func_state->AddInstruction(
           CREATE_ABC(OP_GETMEMBER, reg_a, this_idx, right));
     } else {
       // make data undefined.
-      state->AddInstruction(CREATE_ABC(OP_LOADNULL, reg_a, 0, 0));
+      state->AddInstruction(CREATE_Ax(OP_LOADNULL, reg_a));
     }
   }
 }
@@ -1107,17 +1289,20 @@ void CodeGenerator::Visit(PrefixExpression *node, void *data) {
     PrefixOperation operation = node->op();
     // ++i
     if (operation == PrefixOperation::kIncrement) {
-        func_->func_state()->AddInstruction(CREATE_ABC(OP_PRE_INCR, reg, ret, 0));
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_PREV_INCR, reg, ret));
     }
     // --i
     else if (operation == PrefixOperation::kDecrement) {
-        func_->func_state()->AddInstruction(CREATE_ABC(OP_PRE_DECR, reg, ret, 0));
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_PREV_DECR, reg, ret));
     }
     else if (operation == PrefixOperation::kNot) {
         func_->func_state()->AddInstruction(CREATE_ABx(OP_NOT, ret, reg));
     }
     else if (operation == PrefixOperation::kUnfold) {
-        func_->func_state()->AddInstruction(CREATE_ABC(OP_MOVE, ret, reg, 0));
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_MOVE, ret, reg));
+    }
+    else if (operation == PrefixOperation::kTypeof) {
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_TYPEOF, ret, reg));
     }
 }
     
@@ -1137,23 +1322,111 @@ void CodeGenerator::Visit(PostfixExpression *node, void *data) {
     PostfixOperation operation = node->op();
     // i++
     if (operation == PostfixOperation::kIncrement) {
-        func_->func_state()->AddInstruction(CREATE_ABC(OP_POST_INCR, reg, ret, 0));
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_POST_INCR, reg, ret));
     }
     // i++
     else if (operation == PostfixOperation::kDecrement) {
-        func_->func_state()->AddInstruction(CREATE_ABC(OP_POST_DECR, reg, ret, 0));
+        func_->func_state()->AddInstruction(CREATE_ABx(OP_POST_DECR, reg, ret));
     }
 }
 
 void CodeGenerator::Visit(ReturnStatement *node, void *data) {
     FuncState *func_state = func_->func_state();
     if (node->expr() == nullptr) {
-        func_state->AddInstruction(CREATE_ABC(OP_RETURN0, 0, 0, 0));
+        func_state->AddInstruction(CREATE_Ax(OP_RETURN0, 0));
     }
     else {
         long ret = block_->NextRegisterId();
         node->expr()->Accept(this, &ret);
-        func_state->AddInstruction(CREATE_ABC(OP_RETURN1, ret, 0, 0));
+        func_state->AddInstruction(CREATE_Ax(OP_RETURN1, ret));
+    }
+}
+
+void CodeGenerator::Visit(SwitchStatement* node, void* data) {
+    BlockScope for_scope(this);
+    block_->set_is_switch(true);
+
+    long test_value_id = block_->NextRegisterId();
+    long case_value_id = block_->NextRegisterId();
+    long test_result_id = block_->NextRegisterId();
+
+    FuncState *func_state = func_->func_state();
+    auto &cases = node->get_cases();
+    //load test value into [test_value_id]
+    node->test_case()->Accept(this,&test_value_id);
+    std::vector<size_t> switch_case_index;
+    std::vector<size_t> jump_slots;
+
+    //value test for cases
+    int defaultIndex = -1;
+    Handle<CaseStatement> defaultCase;
+    int index = 0;
+    for(auto& a_case: cases){
+        //load case value into [case_value_id]
+        const Handle<CaseStatement>& caseStatement = a_case->AsCaseStatement();
+        if (caseStatement->is_default()){
+            jump_slots.push_back(0);
+            defaultCase = caseStatement;
+            defaultIndex = index;
+            continue;
+        }
+        caseStatement->test_case()->Accept(this, &case_value_id);
+        func_state->AddInstruction(CREATE_ABC(OP_EQ, test_result_id, test_value_id, case_value_id));
+        size_t jump_slot = func_state->AddInstruction(0);
+        jump_slots.push_back(jump_slot);
+        index++;
+    }
+
+    size_t skip_to_end_slot = 0;
+    if (defaultIndex != -1){
+        //has default case
+        size_t defaultJump = func_state->AddInstruction(0);
+        jump_slots[defaultIndex] = defaultJump;
+    } else {
+        //no default
+        skip_to_end_slot = func_state->AddInstruction(0);
+    }
+
+    //expression list for cases
+    for(auto& a_case: cases){
+        size_t lable_index = func_state->instructions().size();
+        switch_case_index.push_back(lable_index);
+
+        a_case->AsCaseStatement()->statements()->Accept(this, nullptr);
+    }
+
+    //replace case jump;
+    index = 0;
+    for(size_t to_replace:jump_slots){
+        if(index == defaultIndex){
+            func_state->ReplaceInstruction(to_replace,CREATE_Ax(OP_GOTO,switch_case_index[index]));
+        } else {
+            func_state->ReplaceInstruction(to_replace,CREATE_ABx(OP_TRUE_JMPTO,test_result_id,switch_case_index[index]));
+        }
+        index++;
+    }
+
+    //replace break;
+    size_t end_index = func_state->instructions().size();;
+    for(auto& to_replace:block_->break_slots()){
+        func_state->ReplaceInstruction(to_replace, CREATE_Ax(OP_GOTO,end_index));
+    }
+
+    if (defaultIndex == -1){
+        //no default, replace skip instruction;
+      func_state->ReplaceInstruction(skip_to_end_slot, CREATE_Ax(OP_GOTO,end_index));
+    }
+}
+
+void CodeGenerator::Visit(BreakStatement* node, void* data) {
+    auto slot = func_->func_state()->AddInstruction(0);
+    block_->break_slots().push_back(slot);
+}
+
+void CodeGenerator::Visit(TryCatchStatement* node, void* data) {
+    node->try_block()->Accept(this, nullptr);
+    if(node->finally()!= nullptr){
+        node->finally()->Accept(this, nullptr);
     }
 }
 
@@ -1187,7 +1460,7 @@ CodeGenerator::RegisterScope::~RegisterScope()
                 while (iter != block->reg_refs().end()) {
                     long reg_ref = *iter;
                     if (reg_ref >= start_idx) {
-                        func_state->AddInstruction(CREATE_ABC(OP_RESETOUTVAR, reg_ref, 0, 0));
+                        func_state->AddInstruction(CREATE_Ax(OP_RESETOUTVAR, reg_ref));
                         iter = block->reg_refs().erase(iter);
                     }
                     else {
@@ -1244,15 +1517,13 @@ std::vector<size_t>& CodeGenerator::BlockCnt::for_continue_slots() {
     }
     return for_continue_slots_;
 }
-    
-std::vector<size_t>& CodeGenerator::BlockCnt::for_break_slots() {
-    if (is_loop()) {
+
+std::vector<size_t>& CodeGenerator::BlockCnt::break_slots() {
+    if (is_loop()||is_switch()) {
         return for_break_slots_;
     }
     if (parent() != nullptr) {
-        if (parent()->is_loop()) {
-            return parent()->for_break_slots_;
-        }
+        return parent()->break_slots();
     }
     return for_break_slots_;
 }
@@ -1272,7 +1543,7 @@ int CodeGenerator::BlockCnt::for_update_index() {
 void CodeGenerator::BlockCnt::reset() {
     for (int i = 0; i < reg_refs_.size(); i++) {
         if (func_state()) {
-            func_state()->AddInstruction(CREATE_ABC(OP_RESETOUTVAR, reg_refs_[i], 0, 0));
+            func_state()->AddInstruction(CREATE_Ax(OP_RESETOUTVAR, reg_refs_[i]));
         }
     }
 }
@@ -1301,7 +1572,13 @@ long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
                 }
                 reg_ref = root_block->NextRegisterId();
                 root_block->reg_refs().push_back(reg_ref);
-                func_state_->AddInstruction(CREATE_ABx(OP_GETOUTVAR, reg_ref, ref->ref_id()));
+                if (ref->is_closure()) {
+                    func_state_->AddInClosure(ref);
+                    func_state_->AddInstruction(CREATE_ABx(OP_IN_CLOSURE, reg_ref, ref->ref_id()));
+                }
+                else {
+                    func_state_->AddInstruction(CREATE_ABx(OP_GETOUTVAR, reg_ref, ref->ref_id()));
+                }
             }
             return reg_ref;
         }
@@ -1312,14 +1589,19 @@ long CodeGenerator::BlockCnt::FindRegisterId(const std::string &name) {
 ValueRef *CodeGenerator::BlockCnt::FindValueRef(const std::string &name, long &reg_ref) {
     auto iter = variables_.find(name);
     if (iter != variables_.end()) {
-        if (exec_state_ && func_state_) {
+        if (exec_state_ && func_state_ ) {
             ValueRef *ref = exec_state_->AddRef(func_state_, iter->second);
+            bool is_closure = func_state_->Inclusive(iter->second);
+            if (is_closure) {
+                ref->is_closure() = is_closure;
+                func_state_->AddOutClosure(ref);
+            }
             Instruction instruction = func_state_->instructions().size() > 0 ? func_state_->instructions()[func_state_->instructions().size() - 1] : 0;
-            OpCode op(GET_OP_CODE(instruction));
+            OPCode op(GET_OP_CODE(instruction));
             if (instruction && (op == OP_RETURN0 || op == OP_RETURN1)) {
                 func_state_->instructions().pop_back();
             }
-            func_state_->AddInstruction(CREATE_ABx(OP_SETOUTVAR, iter->second, ref->ref_id()));
+            func_state_->AddInstruction(CREATE_ABx(is_closure ? OP_OUT_CLOSURE : OP_SETOUTVAR, iter->second, ref->ref_id()));
             if (instruction && (op == OP_RETURN0 || op == OP_RETURN1)) {
                 func_state_->AddInstruction(instruction);
             }
