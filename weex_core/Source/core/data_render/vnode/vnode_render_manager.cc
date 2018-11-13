@@ -174,7 +174,9 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
 
 std::string VNodeRenderManager::CreatePageWithContent(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data) {
     InitVM();
+#ifdef DEBUG
     auto start = std::chrono::steady_clock::now();
+#endif
     ExecState *exec_state = new ExecState(g_vm);
     exec_states_.insert({page_id, exec_state});
     VNodeExecEnv::ImportExecEnv(exec_state);
@@ -198,9 +200,10 @@ std::string VNodeRenderManager::CreatePageWithContent(const std::string &input, 
         LOGE("DATA_RENDER, compile err: %s",err.c_str());
         return err;
     }
+#ifdef DEBUG
     auto compile_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], Compile time:[%lld]\n", compile_post.count());
-
+#endif
     //auto exec_start = std::chrono::steady_clock::now();
     exec_state->Execute(err);
     if (!err.empty()) {
@@ -211,8 +214,10 @@ std::string VNodeRenderManager::CreatePageWithContent(const std::string &input, 
         return err;
     }
     CreatePageInternal(page_id, exec_state->context()->root());
+#ifdef DEBUG
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("DATA_RENDER, All time %lld\n", duration_post.count());
+#endif
     return err;
 }
     
@@ -258,7 +263,9 @@ void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state, std::vect
 
 std::string VNodeRenderManager::CreatePageWithContent(const uint8_t *contents, size_t length, const std::string &page_id, const std::string &options, const std::string &init_data) {
     InitVM();
+#ifdef DEBUG
     auto start = std::chrono::steady_clock::now();
+#endif
     ExecState *exec_state = new ExecState(g_vm);
     exec_states_.insert({page_id, exec_state});
     VNodeExecEnv::ImportExecEnv(exec_state);
@@ -270,8 +277,10 @@ std::string VNodeRenderManager::CreatePageWithContent(const uint8_t *contents, s
     if (init_data.length() > 0) {
         VNodeExecEnv::ImportExecData(exec_state, init_data);
     }
+#ifdef DEBUG
     auto decoder_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], Decoder time:[%lld]\n", decoder_post.count());
+#endif
     exec_state->Execute(err);
     if (!err.empty()) {
         return err;
@@ -281,8 +290,10 @@ std::string VNodeRenderManager::CreatePageWithContent(const uint8_t *contents, s
         return err;
     }
     CreatePageInternal(page_id, exec_state->context()->root());
+#ifdef DEBUG
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], All time:[%lld]\n", duration_post.count());
+#endif
     return err;
 }
 
