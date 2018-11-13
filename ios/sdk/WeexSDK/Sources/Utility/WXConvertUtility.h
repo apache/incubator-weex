@@ -29,33 +29,31 @@
 #define NSSTRING(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCString(NULL, (const char *)(cstr), kCFStringEncodingUTF8)))
 #define NSSTRING_NO_COPY(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCStringNoCopy(NULL, (const char *)(cstr), kCFStringEncodingUTF8, kCFAllocatorNull)))
 
-id GenValue(weex::core::data_render::Value* value);
+id _Nonnull GenValue(weex::core::data_render::Value* _Nonnull value);
 
-NSString* TO_JSON(id object);
+NSString* _Nullable TO_JSON(id _Nullable object);
 
-id TO_OBJECT(NSString* s);
+id _Nonnull TO_OBJECT(NSString* _Nonnull s);
 
-NSMutableDictionary* NSDICTIONARY(std::map<std::string, std::string>* map);
+NSMutableDictionary* _Nonnull NSDICTIONARY(std::map<std::string, std::string>* _Nullable map);
 
-NSMutableDictionary* NSDICTIONARY(std::unordered_map<std::string, std::string>* map);
+NSMutableDictionary* _Nonnull NSDICTIONARY(std::unordered_map<std::string, std::string>* _Nullable map);
 
-NSMutableDictionary* NSDICTIONARY(std::vector<std::pair<std::string, std::string>>* vec);
+NSMutableDictionary* _Nonnull NSDICTIONARY(std::vector<std::pair<std::string, std::string>>* _Nullable vec);
 
-NSMutableDictionary* NSDICTIONARY(const std::unordered_map<std::string, weex::core::data_render::VComponent::VNodeRefs>& ref_map);
+NSMutableDictionary* _Nonnull NSDICTIONARY(const std::unordered_map<std::string, weex::core::data_render::VComponent::VNodeRefs>& ref_map);
 
-NSMutableDictionary* NSDICTIONARY(weex::core::data_render::Table* table);
+NSMutableDictionary* _Nonnull NSDICTIONARY(weex::core::data_render::Table* _Nullable table);
 
-NSMutableArray* NSARRAY(std::set<std::string>* set);
+NSMutableArray* _Nonnull NSARRAY(std::set<std::string>* _Nullable set);
 
-NSMutableArray* NSARRAY(weex::core::data_render::Array* array);
+NSMutableArray* _Nonnull NSARRAY(weex::core::data_render::Array* _Nullable array);
 
-NSMutableArray* NSARRAY(std::vector<std::unordered_map<std::string, std::string>> refs);
+NSMutableArray* _Nonnull NSARRAY(std::vector<std::unordered_map<std::string, std::string>> refs);
 
-NSMutableArray* NSARRAY(const std::vector<weex::core::data_render::Value>& params);
+NSMutableArray* _Nonnull NSARRAY(const std::vector<weex::core::data_render::Value>& params);
 
-id GenValue(weex::core::data_render::Value* value);
-
-void ConvertToCString(id _Nonnull obj, void (^callback)(const char*));
+void ConvertToCString(id _Nonnull obj, void (^ _Nonnull callback)(const char* _Nullable));
 
 #endif
 

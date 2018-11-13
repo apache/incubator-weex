@@ -769,7 +769,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 {
     NSString *params = [WXUtility JSONString:args];
     auto vnode_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-    vnode_manager->FireEvent([pageId UTF8String] ? : "", [ref UTF8String] ? : "", [event UTF8String] ? : "", [params UTF8String] ? : "");
+    vnode_manager->FireEvent([pageId UTF8String] ? : "", [ref UTF8String] ? : "", [event UTF8String] ? : "", [params UTF8String] ? : "", "");
 }
 
 + (void)registerModules:(NSDictionary *)modules {

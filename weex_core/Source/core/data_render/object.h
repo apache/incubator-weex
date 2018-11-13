@@ -609,7 +609,7 @@ inline void ArrayCopy(Value &src, Value &dest) {
     ArrayCopyFrom(src, dest, 0, 0);
 }
 
-static void TableCopy(Value &src, Value &dest) {
+inline void TableCopy(Value &src, Value &dest) {
   if (IsNil(&src)) {
     return;
   }

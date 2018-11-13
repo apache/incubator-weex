@@ -27,6 +27,7 @@ namespace data_render {
 
 class RequestHandler {
 public:
+    virtual ~RequestHandler() {}
     virtual void Send(const char* url, std::function<void(const char*)> callback) = 0;
 };
 

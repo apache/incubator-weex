@@ -41,7 +41,7 @@ class VNode {
 
   class OnEventListener {
    public:
-    ~OnEventListener() {}
+    virtual ~OnEventListener() {}
     virtual void OnEvent(VNode *node, const std::string &event,
                          const std::string &json_args,
                          const std::string dom_changes,

@@ -87,6 +87,7 @@ inline static std::string to_utf8(uint16_t* utf16, size_t length) {
   return output;
 }
 
+#ifdef OS_ANDROID
 static std::u16string to_utf16(char* utf8, size_t length) {
   std::u16string dest_str;
   dest_str.resize(length);
@@ -97,7 +98,7 @@ static std::u16string to_utf16(char* utf8, size_t length) {
 
   for (int32_t i = 0; i < length;) {
     int32_t code_point;
-    CBU8_NEXT(utf8, i, length, code_point);
+    CBU8_NEXT(utf8, i, static_cast<int32_t>(length), code_point);
 
     if (!IsValidCodepoint(code_point)) {
       success = false;
@@ -113,6 +114,7 @@ static std::u16string to_utf16(char* utf8, size_t length) {
   dest_str.shrink_to_fit();
   return dest_str;
 }
+#endif
 
 }  // namespace base
 }  // namespace weex

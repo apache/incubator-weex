@@ -32,7 +32,7 @@ class VComponent : public VNode {
   typedef std::vector<VNodeRef> VNodeRefs;
   class LifecycleListener {
    public:
-    ~LifecycleListener() {}
+    virtual ~LifecycleListener() {}
     virtual void OnCreated(
         VComponent* component, Table* data, Table* props,
         const std::unordered_map<std::string, VNodeRefs>& ref_map) = 0;

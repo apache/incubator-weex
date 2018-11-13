@@ -28,9 +28,10 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-void VNodeOnEventListener::OnEvent(VNode* node, const std::string& event,
-                                   const std::string& json_args,
-                                   const VNode::Params& param_list) {
+void VNodeOnEventListener::OnEvent(VNode *node, const std::string &event,
+                                            const std::string &json_args, const std::string dom_changes,
+                                            const VNode::Params &params)
+ {
     std::string page_id = node->component()->exec_state()->context()->page_id();
     NSString *instanceId = NSSTRING(page_id.c_str());
     WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
@@ -38,7 +39,7 @@ void VNodeOnEventListener::OnEvent(VNode* node, const std::string& event,
         return;
     }
     node->render_object_ref();
-    [[WXSDKManager bridgeMgr] callJSMethod:@"callJS" args:@[instanceId, @[@{@"method":@"fireEvent", @"args":@[NSSTRING(node->render_object_ref().c_str()), NSSTRING(event.c_str()), [WXUtility objectFromJSON:NSSTRING(json_args.c_str())], @{@"params": NSARRAY(param_list)}]}]]];
+    [[WXSDKManager bridgeMgr] callJSMethod:@"callJS" args:@[instanceId, @[@{@"method":@"fireEvent", @"args":@[NSSTRING(node->render_object_ref().c_str()), NSSTRING(event.c_str()), [WXUtility objectFromJSON:NSSTRING(json_args.c_str())], @{@"params": NSARRAY(params)}]}]]];
   }
 
 }  // namespace data_render

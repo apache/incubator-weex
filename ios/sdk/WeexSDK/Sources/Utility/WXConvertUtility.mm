@@ -210,10 +210,6 @@ NSMutableArray* NSARRAY(const std::vector<weex::core::data_render::Value>& param
 
 id GenValue(weex::core::data_render::Value* value)
 {
-    if (!value) {
-        return nil;
-    }
-
     switch (value->type) {
         case weex::core::data_render::Value::Type::ARRAY:
             return NSARRAY( weex::core::data_render::ValueTo<weex::core::data_render::Array>(value));
@@ -228,7 +224,7 @@ id GenValue(weex::core::data_render::Value* value)
         case weex::core::data_render::Value::Type::BOOL:
             return [NSNumber numberWithBool:value->b];
         default:
-            return nil;
+            return [NSNull null];
     }
 }
 
