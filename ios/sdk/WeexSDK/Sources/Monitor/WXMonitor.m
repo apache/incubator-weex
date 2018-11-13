@@ -55,7 +55,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     NSMutableDictionary *performanceDict = [self performanceDictForInstance:instance];
     NSMutableDictionary *dict = performanceDict[@(tag)];
     if (!dict) {
-        WXLogError(@"Performance point:%ld, in instance:%@, did not have a start", (unsigned long)tag, instance.instanceId);
+        WXLogDebug(@"Performance point:%ld, in instance:%@, did not have a start", (unsigned long)tag, instance.instanceId);
         return;
     }
     
@@ -202,7 +202,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
         
         if (!start || !end) {
             if (state == MonitorCommit) {
-                WXLogWarning(@"Performance point:%d, in instance:%@, did not have a start or end", tag, instance);
+                WXLogDebug(@"Performance point:%d, in instance:%@, did not have a start or end", tag, instance);
             }
             continue;
         }

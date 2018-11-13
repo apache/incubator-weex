@@ -21,6 +21,7 @@
 
 @interface WXComponent()
 
-@property (nonatomic,assign) bool hasAdd;
+@property (nonatomic,assign) BOOL hasAdd;
+@property (nonatomic,assign) BOOL ignoreInteraction;
 
 @end

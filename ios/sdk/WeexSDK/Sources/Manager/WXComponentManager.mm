@@ -40,6 +40,7 @@
 #import "WXRootView.h"
 #import "WXComponent+Layout.h"
 #import "WXCoreBridge.h"
+#import "WXComponent_performance.h"
 
 static NSThread *WXComponentThread;
 
@@ -278,6 +279,12 @@ static NSThread *WXComponentThread;
         index = 0;
     } else {
         index = (index == -1 ? supercomponent->_subcomponents.count : index);
+    }
+    if (supercomponent.ignoreInteraction) {
+        component.ignoreInteraction = YES;
+    }
+    if ([[component.attributes objectForKey:@"ignoreInteraction"] isEqualToString:@"1"]) {
+        component.ignoreInteraction = YES;
     }
     
 #ifdef DEBUG
