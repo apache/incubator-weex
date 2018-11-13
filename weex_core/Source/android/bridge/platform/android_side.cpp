@@ -20,6 +20,7 @@
 #include "android/bridge/platform/android_side.h"
 #include "IPC/IPCResult.h"
 #include "android/base/jni/android_jni.h"
+#include "android/base/jni/jbytearray_ref.h"
 #include "android/base/jni_type.h"
 #include "android/base/string/string_utils.h"
 #include "android/utils/IPCStringResult.h"
@@ -361,6 +362,22 @@ void AndroidSide::DispatchMessage(const char *client_id,
                                   const char *data, int dataLength, const char *callback, const char *vm_id) {
   JNIEnv *env = base::android::AttachCurrentThread();
   wml_bridge_->DispatchMessage(env, client_id,  data, dataLength, callback, vm_id);
+}
+
+std::unique_ptr<WeexJSResult> AndroidSide::DispatchMessageSync(
+    const char *client_id, const char *data, int dataLength,
+    const char *vm_id) {
+  JNIEnv *env = base::android::AttachCurrentThread();
+  auto jni_result =
+      wml_bridge_->DispatchMessageSync(env, client_id, data, dataLength, vm_id);
+  JByteArrayRef byte_array(env, jni_result.Get());
+  char *copy = nullptr;
+  if (byte_array.length() > 0) {
+    copy = new char[byte_array.length()];
+    strcpy(copy, byte_array.getBytes());
+  }
+  return std::unique_ptr<WeexJSResult>(
+      new WeexJSResult(std::unique_ptr<char[]>(copy), byte_array.length()));
 }
 
 void AndroidSide::OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult>& result) {
