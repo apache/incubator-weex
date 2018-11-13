@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include <string.h>
 #include <algorithm>
 #include "core/data_render/object.h"
 #include "core/data_render/table.h"
@@ -25,15 +27,6 @@
 namespace weex {
 namespace core {
 namespace data_render {
-
-int IndexOf(const std::vector<Value> *arr, const Value *val) {
-  auto it = std::find(arr->begin(), arr->end(), val);
-  if (it != arr->end()) {
-    return static_cast<int>(std::distance(arr->begin(), it));
-  } else {
-    return -1;
-  }
-}
 
 int SetTableForTable(Table *table, const Value *src) {
     int ret = 0;
@@ -226,6 +219,9 @@ json11::Json TableToJson(Table *table) {
         }
         if (it->second.type == Value::FUNC) {
             object.insert({it->first, json11::Json("FUNC")});
+        }
+        if (it->second.type == Value::FUNC_INST) {
+            object.insert({it->first, json11::Json("FUNC_INST")});
         }
     }
     return json11::Json(object);

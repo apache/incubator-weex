@@ -73,7 +73,12 @@ set(COMMON_SRCS
    ./core/data_render/class_array.cc
    ./core/data_render/class_json.cc
    ./core/data_render/class_string.cc
+   ./core/data_render/class_regex.cc
+   ./core/data_render/class_console.cc
+   ./core/data_render/class_window.cc
+   ./core/data_render/class_math.cc
    ./core/data_render/class_factory.cc
+   ./core/data_render/class_function.cc
    ./core/data_render/class_object.cc
    ./core/data_render/code_generator.cc
    ./core/data_render/exec_state.cc
@@ -92,8 +97,10 @@ set(COMMON_SRCS
    ./core/data_render/table.cc
    ./core/data_render/token.cc
    ./core/data_render/tokenizer.cc
+   ./core/data_render/op_code.cc
    ./core/data_render/vm.cc
-   ./core/data_render/binary_file.cc
+   ./core/data_render/exec_state_binary.cc
+   ./core/data_render/exec_state_section.cc
    ./core/data_render/vnode/vnode.cc
    ./core/data_render/vnode/vcomponent.cc
    ./core/data_render/vnode/vnode_exec_env.cc

@@ -96,7 +96,7 @@ public:
 private:
     Handle<Expression> label_;
 };
-    
+
 // FunctionPrototype - captures the prototype of the function
 // which includes the name of the function and
 class FunctionPrototype : public Expression {
@@ -118,7 +118,7 @@ private:
     std::string name_;
     std::vector<std::string> args_;
 };
-    
+
 class MethodStatement : public Expression {
     DEFINE_NODE_TYPE(MethodStatement, Expression);
 public:
@@ -133,7 +133,7 @@ private:
     Handle<Expression> function_;
     bool static_;
 };
-    
+
 // FunctionStatement - captures the function statement
 class FunctionStatement : public Expression {
     DEFINE_NODE_TYPE(FunctionStatement, Expression);
@@ -153,7 +153,7 @@ private:
     Handle<FunctionPrototype> proto_{nullptr};
     Handle<Expression> body_;
 };
-    
+
 // ArrowFunctionStatement
 class ArrowFunctionStatement : public Expression {
     DEFINE_NODE_TYPE(ArrowFunctionStatement, Expression);
@@ -196,7 +196,7 @@ public:
     : Expression(), condition_{ (cond) },
       body_{ (body) },
       else_{ (el) } { }
-    
+
     Handle<Expression> condition() { return condition_; }
     Handle<Expression> body() { return body_; }
     Handle<Expression> els() { return else_; }
@@ -205,16 +205,16 @@ private:
     Handle<Expression> body_;
     Handle<Expression> else_;
 };
-    
+
 class LabelledStatement : public Expression {
 public:
     LabelledStatement(Position &loc, Scope *scope, std::string &label, Handle<Expression> expr)
     : Expression(loc, scope), label_{ label }, expr_{ expr }
     { }
-    
+
     Handle<Expression> expr() { return expr_; }
     std::string &label() { return label_; }
-    
+
     DEFINE_NODE_TYPE(LabelledStatement, Expression);
 private:
     std::string label_;
@@ -234,12 +234,45 @@ public:
 private:
     Handle<Expression> expr_;
 };
-    
+
+class CaseStatement : public Expression {
+ public:
+  CaseStatement(Handle<Expression> text_case, Handle<ExpressionList> statements)
+      : Expression(), text_case_{(text_case)}, expr_(statements) {
+      default_ = false;
+  }
+
+  Handle<Expression> test_case() { return text_case_; }
+  Handle<ExpressionList> statements() { return expr_; }
+  void set_default(bool flag) { default_ = flag; }
+  bool is_default() { return default_; }
+
+ DEFINE_NODE_TYPE(CaseStatement, Expression);
+ private:
+  Handle<Expression> text_case_;
+  Handle<ExpressionList> expr_;
+  bool default_;
+};
+
+class SwitchStatement : public Expression {
+ public:
+  SwitchStatement(Handle<Expression> test_value,std::vector<Handle<Expression>> cases)
+      : Expression(), test_value_{ test_value },cases_ { cases}{}
+
+  Handle<Expression> test_case() { return test_value_; }
+  const std::vector<Handle<Expression>>& get_cases(){ return cases_;}
+
+ DEFINE_NODE_TYPE(SwitchStatement, Expression);
+ private:
+  Handle<Expression> test_value_;
+  std::vector<Handle<Expression>> cases_;
+};
+
 class ClassStatement : public Expression {
 public:
     ClassStatement(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> super_class, Handle<Expression> body)
     : Expression(loc, scope), identifier_{ identifier }, super_class_{super_class}, body_{body}  { }
-    
+
     Handle<Expression> &Identifier() { return identifier_; }
     Handle<Expression> &Body () { return body_; }
     Handle<Expression> &Super() { return super_class_; }

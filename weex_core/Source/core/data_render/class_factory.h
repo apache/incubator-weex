@@ -33,30 +33,27 @@ namespace data_render {
 class ClassFactory {
 public:
     ClassFactory() {};
+    ~ClassFactory();
     virtual Value CreateClassDescriptor(ClassDescriptor *p_super);
     virtual Value CreateClassInstance(ClassDescriptor *p_desc);
+    virtual Value CreateFuncInstance(FuncState *func_state);
     virtual Value ClassArray();
     virtual Value ClassString();
     virtual Value ClassJSON();
     virtual Value ClassObject();
+    virtual Value ClassRegExp();
+    virtual Value ClassWindow();
+    virtual Value ClassMath();
+    virtual Value ClassConsole();
     virtual Value CreateArray();
     virtual Value CreateTable();
-    int findDesc(const ClassDescriptor *desc);
-    inline const std::vector<std::pair<GCObject *, Value::Type>>& stores() {return stores_;}
-    inline std::vector<Array *> arrays() {return arrays_;}
-    inline std::vector<ClassDescriptor *> descs() {return descs_;}
-    inline std::vector<Table *> tables() {return tables_;}
-
-    ~ClassFactory();
-    
-private:
+    int Find(const ClassDescriptor *desc);
+    inline const std::vector<std::pair<GCObject *, Value::Type>>& stores() { return stores_; }
+    std::vector<ClassDescriptor *> descs();
+    std::vector<Value> constants();
+ private:
     ClassInstance *CreateClassInstanceFromSuper(ClassDescriptor *p_desc);
     std::vector<std::pair<GCObject *, Value::Type>> stores_;
-
-    //for binary encode and decode
-    std::vector<ClassDescriptor *> descs_;
-    std::vector<Array *> arrays_;
-    std::vector<Table *> tables_;
 };
 
 }

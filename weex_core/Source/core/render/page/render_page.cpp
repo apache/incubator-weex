@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <math.h>
 #include "core/render/page/render_page.h"
 #include "base/TimeUtils.h"
 #include "base/ViewUtils.h"

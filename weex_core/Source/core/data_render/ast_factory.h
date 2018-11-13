@@ -40,7 +40,7 @@ public:
     virtual Handle<ExpressionList> NewExpressionList(const std::vector<Handle<Expression>>& list);
     virtual Handle<ClassBody> NewClassBody();
     virtual Handle<Expression> NewThisExpression();
-    virtual Handle<Expression> NewNewExpression(Handle<Expression> expr);
+    virtual Handle<Expression> NewNewExpression(Handle<Expression> expr, Handle<ExpressionList> args = nullptr);
     virtual Handle<Expression> NewIdentifier(std::string name);
     virtual Handle<ChunkStatement> NewChunkStatement(Handle<ExpressionList> list);
     virtual Handle<Expression> NewBlockStatement(Handle<ExpressionList> list);
@@ -80,7 +80,7 @@ public:
     virtual Handle<Expression> NewPostfixExpression(Position &loc, Scope *scope, PostfixOperation op, Handle<Expression> expr);
     virtual Handle<Expression> NewIntegralConstant(Position &loc, Scope *scope, int value);
     virtual Handle<Expression> NewDoubleConstant(Position &loc, Scope *scope, double value);
-    virtual Handle<Expression> NewNewExpression(Position &loc, Scope *scope, Handle<Expression> expr);
+    virtual Handle<Expression> NewNewExpression(Position &loc, Scope *scope, Handle<Expression> expr, Handle<ExpressionList> args = nullptr);
     virtual Handle<Expression> NewIdentifier(Position &loc, Scope *scope, std::string name);
     virtual Handle<Expression> NewArgumentList(Position &loc, Scope *scope, Handle<ExpressionList>);
     virtual Handle<Expression> NewCallExpression(Position &loc, Scope *scope, MemberAccessKind kind, Handle<Expression> func, Handle<Expression> args);
@@ -88,6 +88,7 @@ public:
     virtual Handle<Expression> NewMemberExpression(Position &loc, Scope *scope, MemberAccessKind kind, Handle<Expression> expr, Handle<Expression> mem);
     virtual Handle<Expression> NewNullConstant(Position &loc, Scope *scope);
     virtual Handle<Expression> NewStringConstant(Position &loc, Scope *scope, std::string str);
+    virtual Handle<Expression> NewRegexConstant(Position &loc, Scope *scope, std::string str);
     virtual Handle<Expression> NewThisExpression(Position &loc, Scope *scope);
     virtual Handle<Expression> NewBooleanConstant(Position &loc, Scope *scope, bool val);
     virtual Handle<Expression> NewArrayConstant(Position &loc, Scope *scope, ProxyArray arr);
@@ -97,6 +98,13 @@ public:
     virtual Handle<Expression> NewBlockStatement(Position &loc, Scope *scope, Handle<ExpressionList> list);
     virtual Handle<Expression> NewForStatement(Position &loc, Scope *scope, ForKind kind, Handle<Expression> init, Handle<Expression> condition, Handle<Expression> update, Handle<Expression> body);
     virtual Handle<Expression> NewBreakStatement(Position &loc, Scope *scope, Handle<Expression> label = nullptr);
+    virtual Handle<Expression> NewCaseStatement(Position &loc, Scope *scope, Handle<Expression> test_value,Handle<ExpressionList> expr);
+    virtual Handle<Expression> NewSwitchStatement(Position &loc, Scope *scope, Handle<Expression> test_case, std::vector<Handle<Expression>> cases);
+    virtual Handle<Expression> NewTryCatchStatement(Position &loc, Scope *scope,
+                                                    Handle<Expression> try_block,
+                                                    Handle<Expression> catch_expr,
+                                                    Handle<Expression> catch_block,
+                                                    Handle<Expression> finally );
     virtual Handle<Expression> NewContinueStatement(Position &loc, Scope *scope, Handle<Expression> label = nullptr);
     virtual Handle<Expression> NewIfStatement(Position &loc, Scope *scope, Handle<Expression> condition, Handle<Expression> then);
     virtual Handle<Expression> NewIfElseStatement(Position &loc, Scope *scope, Handle<Expression> condition, Handle<Expression> then, Handle<Expression> els);
@@ -108,6 +116,8 @@ public:
     virtual Handle<Expression> NewArrowFunctionStatement(Position &loc, Scope *scope, Handle<Expression> body, std::vector<Handle<Expression>> args);
     virtual Handle<Expression> NewJSXNodeExpression(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> props, Handle<Expression> parent, std::vector<Handle<Expression>> childrens);
     virtual Handle<Expression> NewClassStatement(Position &loc, Scope *scope, Handle<Expression> identifier, Handle<Expression> superClass, Handle<Expression> body);
+    virtual Handle<Expression> NewClassProperty(Position &loc, Scope *scope, std::string name, Handle<Expression> init = nullptr);
+
 };
 
 }  // namespace data_render
