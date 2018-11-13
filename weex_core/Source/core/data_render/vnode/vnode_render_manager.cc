@@ -190,7 +190,9 @@ void VNodeRenderManager::CreatePage(const std::string &input, const std::string 
 
 std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data, std::function<void(const char*)> exec_js) {
     InitVM();
+#ifdef DEBUG
     auto start = std::chrono::steady_clock::now();
+#endif
     ExecState *exec_state = new ExecState(g_vm);
     exec_states_.insert({page_id, exec_state});
     VNodeExecEnv::InitCFuncEnv(exec_state);
@@ -214,8 +216,10 @@ std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const s
         LOGE("DATA_RENDER, compile err: %s",err.c_str());
         return err;
     }
+#ifdef DEBUG
     auto compile_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], Compile time:[%lld]\n", compile_post.count());
+#endif
 
     //auto exec_start = std::chrono::steady_clock::now();
     exec_state->Execute(err);
@@ -228,8 +232,10 @@ std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const s
     }
 
     CreatePageInternal(page_id, exec_state->context()->root());
+#ifdef DEBUG
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("DATA_RENDER, All time %lld\n", duration_post.count());
+#endif
 
     const json11::Json& javascript_obj = exec_state->context()->raw_json()["javascript"];
     std::string javacript_url = javascript_obj.string_value();
@@ -262,7 +268,9 @@ void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state, std::vect
 
 std::string VNodeRenderManager::CreatePageWithOpcode(const std::string& page_id, const std::string& options, const std::string& init_data) {
     InitVM();
+#ifdef DEBUG
     auto start = std::chrono::steady_clock::now();
+#endif
     ExecState *exec_state = new ExecState(g_vm);
     exec_states_.insert({page_id, exec_state});
     VNodeExecEnv::InitCFuncEnv(exec_state);
@@ -281,8 +289,10 @@ std::string VNodeRenderManager::CreatePageWithOpcode(const std::string& page_id,
     if (init_data.length() > 0) {
         VNodeExecEnv::InitInitDataValue(exec_state, init_data);
     }
+#ifdef DEBUG
     auto decoder_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], Decoder time:[%lld]\n", decoder_post.count());
+#endif
     exec_state->Execute(err);
     if (!err.empty()) {
         return err;
@@ -292,8 +302,10 @@ std::string VNodeRenderManager::CreatePageWithOpcode(const std::string& page_id,
         return err;
     }
     CreatePageInternal(page_id, exec_state->context()->root());
+#ifdef DEBUG
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], All time:[%lld]\n", duration_post.count());
+#endif
     return err;
 }
 

@@ -216,7 +216,8 @@ id GenValue(weex::core::data_render::Value* value)
         case weex::core::data_render::Value::Type::TABLE:
             return NSDICTIONARY( weex::core::data_render::ValueTo<weex::core::data_render::Table>(value));
         case weex::core::data_render::Value::Type::INT:
-            return [NSNumber numberWithLong:value->i];
+            return [NSNumber numberWithLong:
+                   static_cast<long>(value->i)];
         case weex::core::data_render::Value::Type::NUMBER:
             return [NSNumber numberWithDouble:value->n];
         case weex::core::data_render::Value::Type::STRING:
