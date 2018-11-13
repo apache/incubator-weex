@@ -62,8 +62,6 @@
 
 #else
 
-#define LOGE(...) ((void) 0)
-#define LOGA(...) ((void) 0)
 #define LOGV(...) ((void) 0)
 #define LOGD(...) ((void) 0)
 #define LOGI(...) ((void) 0)
