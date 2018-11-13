@@ -361,7 +361,7 @@ bool VNodeRenderManager::ClosePage(const std::string& page_id) {
   return true;
 }
         
-void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args) {
+void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args,const std::string &dom_changes) {
     do {
         auto iter = exec_states_.find(page_id);
         if (iter == exec_states_.end()) {
@@ -379,7 +379,7 @@ void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string
                 auto hit_test = vnode->event_params_map()->find(event);
                 if (hit_test != vnode->event_params_map()->end()) {
                     // If vnode has eat event, return.
-                    vnode->OnEvent(event, args);
+                    vnode->OnEvent(event, args, dom_changes);
                     return;
                 }
             }

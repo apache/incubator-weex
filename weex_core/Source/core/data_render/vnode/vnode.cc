@@ -62,14 +62,15 @@ VNode::~VNode() {
   }
 }
 
-void VNode::OnEvent(const std::string &event, const std::string args) {
+void VNode::OnEvent(const std::string &event, const std::string args,
+                    const std::string dom_changes) {
   if (!on_event_listener_) return;
 
   auto it = event_params_map_->find(event);
   if (it == event_params_map_->end()) return;
   auto params_list = it->second;
   for (auto it = params_list.begin(); it != params_list.end(); it++) {
-    on_event_listener_->OnEvent(this, event, args, *it);
+    on_event_listener_->OnEvent(this, event, args, dom_changes, *it);
   }
 }
 
