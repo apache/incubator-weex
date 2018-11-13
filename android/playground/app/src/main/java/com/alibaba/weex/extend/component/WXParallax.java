@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -37,7 +37,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXComponent;
@@ -72,16 +72,15 @@ public class WXParallax extends WXDiv implements OnWXScrollListener, ICheckBindi
   private int mBackGroundColor = 0;
   private float mOffsetY = 0;
 
-  public WXParallax(WXSDKInstance instance, WXDomObject dom, WXVContainer parent) {
-    super(instance, dom, parent);
-    initTransform(dom.getAttrs().get(WX_TRANSFORM));
-    initOpacity(dom.getAttrs().get(Constants.Name.OPACITY));
-    initBackgroundColor(dom.getAttrs().get(Constants.Name.BACKGROUND_COLOR));
+  public WXParallax(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
+    initTransform(getAttrs().get(WX_TRANSFORM));
+    initOpacity(getAttrs().get(Constants.Name.OPACITY));
+    initBackgroundColor(getAttrs().get(Constants.Name.BACKGROUND_COLOR));
 
-    mBindingRef = (String) (dom.getAttrs().get(BINDING_SCROLLER));
+    mBindingRef = (String) (getAttrs().get(BINDING_SCROLLER));
     instance.registerOnWXScrollListener(this);
   }
-
 
   private void initBackgroundColor(Object obj) {
     if (obj == null)
@@ -136,7 +135,7 @@ public class WXParallax extends WXDiv implements OnWXScrollListener, ICheckBindi
   @Override
   public boolean isNeedScroller(String ref, Object option) {
 
-    mBindingRef = (String) (getDomObject().getAttrs().get(BINDING_SCROLLER));
+    mBindingRef = (String) (getAttrs().get(BINDING_SCROLLER));
     if (TextUtils.isEmpty(mBindingRef)) {
       WXComponent root = getInstance().getRootComponent();
       if (root != null && root instanceof WXVContainer) {

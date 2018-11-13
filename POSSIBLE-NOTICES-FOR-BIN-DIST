@@ -1,5 +1,5 @@
 Apache Weex
-Copyright 2017 The Apache Software Foundation
+Copyright 2018 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
@@ -10,22 +10,13 @@ by Tom Preston-Werner , licensed under the Creative Commons - CC BY 3.0 License.
 This product contains software core-js(https://github.com/zloirock/core-js) developed
 by Denis Pushkarev , licensed under the MIT License.
 
-This product contains software autoprefixer(https://github.com/postcss/autoprefixer) developed
-by postcss , licensed under the MIT License.
-
-This product contains software query-string(https://github.com/sindresorhus/query-string) developed
-by sindresorhus  , licensed under the MIT License.
-
-This product contains software weex-picker(https://github.com/weexteam/weex-picker) developed
-by abigtree  , licensed under the Apache 2.0 License.
-
 This product contains software weex-rax-framework(https://github.com/alibaba/rax) developed
 by yuanyan  , licensed under the BSD-3-Clause License.
 
 This product contains software weex-vue-framework(https://github.com/vuejs/vue) developed
 by fkysly  , licensed under the MIT License.
 
-This product contains software weex-vue-render(https://github.com/vuejs/vue) developed
+This product contains software weex-vue-render(https://github.com/weexteam/weex-vue-render) developed
 by MrRaindrop  , licensed under the Apache 2.0 License.
 
 This product contains software weex-styler(https://github.com/weexteam/weex-styler) developed
@@ -47,9 +38,6 @@ This product contains software fresco(https://github.com/facebook/fresco) develo
 by facebook , licensed under the BSD-3-Clause License.
 
 This product contains software animated-gif(https://github.com/facebook/fresco) developed
-by facebook , licensed under the BSD-3-Clause License.
-
-This product contains software yoga(https://github.com/facebook/yoga) developed
 by facebook , licensed under the BSD-3-Clause License.
 
 This product contains software SocketRocket(https://github.com/facebook/SocketRocket) developed
@@ -81,3 +69,24 @@ by google  , licensed under the Apache License.
 
 This product contains shelljs Guava(https://github.com/shelljs/shelljs) developed
 by shelljs  , licensed under BSD 3-clause "New" or "Revised" License.
+
+This product contains software fpconv(https://github.com/night-shift/fpconv) developed
+by night-shift  , licensed under the MIT License.
+
+This product contains software rapidjson(https://github.com/Tencent/rapidjson) developed
+by tencent  , licensed under the MIT License.
+
+This product contains software flexbox-layout(https://github.com/google/flexbox-layout) developed
+by google  , licensed under the Apache License.
+
+This product contains software IPC(https://source.android.com/) developed
+by google  , licensed under the Apache License.
+
+This product contains software JNI(https://chromium.googlesource.com/) developed
+by google, licensed under the BSD-style License.
+
+This product contains software modp(http://modp.com/release/base64) developed
+by modp, licensed under the BSD-style License.
+
+This product contains software jni_generator(https://chromium.googlesource.com/) developed
+by google, licensed under the BSD-style License.

@@ -25,6 +25,8 @@
 #import "WXURLRewriteProtocol.h"
 #import "WXResourceLoader.h"
 #import "WXSDKEngine.h"
+#import "WXSDKInstance_performance.h"
+#import "WXMonitor.h"
 
 @implementation WXStreamModule
 
@@ -117,6 +119,14 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
 {
     // parse request url
     NSString *urlStr = [options objectForKey:@"url"];
+    if (![urlStr isKindOfClass:[NSString class]]) {
+        if (callbackRsp) {
+            [callbackRsp setObject:@(-1) forKey:@"status"];
+            [callbackRsp setObject:@NO forKey:@"ok"];
+        }
+        return nil;
+    }
+    
     NSString *newURL = [urlStr copy];
     WX_REWRITE_URL(urlStr, WXResourceTypeLink, self.weexInstance)
     urlStr = newURL;
@@ -126,6 +136,10 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
         [callbackRsp setObject:@NO forKey:@"ok"];
         
         return nil;
+    }
+    
+    if (self.weexInstance && !weexInstance.isJSCreateFinish) {
+        self.weexInstance.performance.fsReqNetNum++;
     }
     
     WXResourceRequest *request = [WXResourceRequest requestWithURL:[NSURL URLWithString:urlStr] resourceType:WXResourceTypeOthers referrer:nil cachePolicy:NSURLRequestUseProtocolCachePolicy];

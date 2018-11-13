@@ -24,6 +24,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.NestedScrollingParent;
@@ -41,6 +42,9 @@ import android.view.ViewParent;
 import android.widget.AbsListView;
 import android.widget.FrameLayout;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent, NestedScrollingChild {
 
   private NestedScrollingParentHelper mNestedScrollingParentHelper;
@@ -52,6 +56,12 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   private WXOnLoadingListener onLoadingListener;
 
   private ViewParent mNestedScrollAcceptedParent;
+
+  private final List<OnRefreshOffsetChangedListener> mRefreshOffsetChangedListeners = new LinkedList<>();
+
+  public interface OnRefreshOffsetChangedListener {
+    void onOffsetChanged(int verticalOffset);
+  }
 
   /**
    * On refresh Callback, call on start refresh
@@ -241,20 +251,20 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   public boolean startNestedScroll(int axes) {
     boolean result = mNestedScrollingChildHelper.startNestedScroll(axes);
     if(result){
-       if(mNestedScrollAcceptedParent == null){
-            ViewParent parent  = this.getParent();
-            View child = this;
-            while (parent != null) {
-              if (ViewParentCompat.onStartNestedScroll(parent, child, this, axes)){
-                 mNestedScrollAcceptedParent = parent;
-                 break;
-              }
-              if(parent instanceof  View){
-                child = (View) parent;
-              }
-              parent = parent.getParent();
-            }
-       }
+      if(mNestedScrollAcceptedParent == null){
+        ViewParent parent  = this.getParent();
+        View child = this;
+        while (parent != null) {
+          if (ViewParentCompat.onStartNestedScroll(parent, child, this, axes)){
+            mNestedScrollAcceptedParent = parent;
+            break;
+          }
+          if(parent instanceof  View){
+            child = (View) parent;
+          }
+          parent = parent.getParent();
+        }
+      }
     }
     return result;
   }
@@ -385,6 +395,8 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
     int spinnerDy = (int) calculateDistanceY(target, dy);
 
+    mRefreshing = false;
+
     if (!isConfirm) {
       if (spinnerDy < 0 && !canChildScrollUp()) {
         mCurrentAction = PULL_REFRESH;
@@ -403,7 +415,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       }else if (!canChildScrollDown() && mPullLoadEnable
               && mTargetView.getTranslationY() < 0
               && dy < 0){
-         consumed[1] += dy;
+        consumed[1] += dy;
       }else{
         consumed[1] += spinnerDy;
       }
@@ -477,6 +489,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       }
       headerView.setLayoutParams(lp);
       onRefreshListener.onPullingDown(distanceY, lp.height, refreshViewFlowHeight);
+      notifyOnRefreshOffsetChangedListener(lp.height);
       headerView.setProgressRotation(lp.height / refreshViewFlowHeight);
       moveTargetView(lp.height);
       return true;
@@ -555,6 +568,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       public void onAnimationUpdate(ValueAnimator animation) {
         LayoutParams lp = (LayoutParams) headerView.getLayoutParams();
         lp.height = (int) ((Float) animation.getAnimatedValue()).floatValue();
+        notifyOnRefreshOffsetChangedListener(lp.height);
         headerView.setLayoutParams(lp);
         moveTargetView(lp.height);
       }
@@ -586,6 +600,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       public void onAnimationUpdate(ValueAnimator animation) {
         LayoutParams lp = (LayoutParams) headerView.getLayoutParams();
         lp.height = (int) ((Float) animation.getAnimatedValue()).floatValue();
+        notifyOnRefreshOffsetChangedListener(lp.height);
         headerView.setLayoutParams(lp);
         moveTargetView(lp.height);
       }
@@ -685,8 +700,8 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       if (mTargetView instanceof AbsListView) {
         final AbsListView absListView = (AbsListView) mTargetView;
         return absListView.getChildCount() > 0
-               && (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
-                                                                    .getTop() < absListView.getPaddingTop());
+                && (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
+                .getTop() < absListView.getPaddingTop());
       } else {
         return ViewCompat.canScrollVertically(mTargetView, -1) || mTargetView.getScrollY() > 0;
       }
@@ -708,9 +723,9 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
         final AbsListView absListView = (AbsListView) mTargetView;
         if (absListView.getChildCount() > 0) {
           int lastChildBottom = absListView.getChildAt(absListView.getChildCount() - 1)
-              .getBottom();
+                  .getBottom();
           return absListView.getLastVisiblePosition() == absListView.getAdapter().getCount() - 1
-                 && lastChildBottom <= absListView.getMeasuredHeight();
+                  && lastChildBottom <= absListView.getMeasuredHeight();
         } else {
           return false;
         }
@@ -734,6 +749,36 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   public void setOnRefreshListener(WXOnRefreshListener onRefreshListener) {
     this.onRefreshListener = onRefreshListener;
+  }
+
+  @SuppressWarnings("unused")
+  public void addOnRefreshOffsetChangedListener(@Nullable OnRefreshOffsetChangedListener listener) {
+    if(listener != null && !mRefreshOffsetChangedListeners.contains(listener)) {
+      mRefreshOffsetChangedListeners.add(listener);
+    }
+  }
+
+  @SuppressWarnings("unused")
+  public boolean removeOnRefreshOffsetChangedListener(@Nullable OnRefreshOffsetChangedListener listener) {
+    if(listener != null) {
+      return mRefreshOffsetChangedListeners.remove(listener);
+    }
+    return false;
+  }
+
+  private void notifyOnRefreshOffsetChangedListener(int verticalOffset) {
+    int size = mRefreshOffsetChangedListeners.size();
+    OnRefreshOffsetChangedListener listener;
+    for (int i=0; i<size; i++) {
+      if(i >= mRefreshOffsetChangedListeners.size()){
+        break;
+      }
+      listener = mRefreshOffsetChangedListeners.get(i);
+
+      if (listener != null) {
+        listener.onOffsetChanged(verticalOffset);
+      }
+    }
   }
 
   /**

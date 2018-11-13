@@ -23,7 +23,6 @@ import android.content.Context;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.utils.WXLogUtils;
 
 /**
  * Created by furture on 2018/2/7.

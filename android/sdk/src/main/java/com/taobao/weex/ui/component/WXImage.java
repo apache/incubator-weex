@@ -18,11 +18,19 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
+import com.taobao.weex.dom.WXImageQuality;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -32,11 +40,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
@@ -48,25 +54,19 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.dom.ImmutableDomObject;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.ImageDrawable;
 import com.taobao.weex.utils.ImgURIUtil;
 import com.taobao.weex.utils.SingleFunctionParser;
-import com.taobao.weex.utils.WXViewToImageUtil;
 import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewToImageUtil;
 import com.taobao.weex.utils.WXViewUtils;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Image component
@@ -89,21 +89,20 @@ public class WXImage extends WXComponent<ImageView> {
     }
   };
 
-  public static class Ceator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        return new WXImage(instance,node,parent);
+  public static class Creator implements ComponentCreator {
+    @Override
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXImage(instance, parent, basicComponentData);
     }
   }
 
-
   @Deprecated
-  public WXImage(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-      this(instance,dom,parent);
+  public WXImage(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
-  public WXImage(WXSDKInstance instance, WXDomObject node,
-                  WXVContainer parent) {
-      super(instance, node, parent);
+  public WXImage(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
   }
 
   @Override
@@ -117,56 +116,59 @@ public class WXImage extends WXComponent<ImageView> {
     return view;
   }
 
-    @Override
-    protected boolean setProperty(String key, Object param) {
-      switch (key) {
-        case Constants.Name.RESIZE_MODE:
-          String resize_mode = WXUtils.getString(param, null);
-          if (resize_mode != null)
-            setResizeMode(resize_mode);
-          return true;
-        case Constants.Name.RESIZE:
-          String resize = WXUtils.getString(param, null);
-          if (resize != null)
-            setResize(resize);
-          return true;
-        case Constants.Name.SRC:
-          String src = WXUtils.getString(param, null);
-          if (src != null)
-            setSrc(src);
-          return true;
-        case Constants.Name.IMAGE_QUALITY:
-          return true;
-        case Constants.Name.AUTO_RECYCLE:
-          mAutoRecycle = WXUtils.getBoolean(param, mAutoRecycle);
-          return true;
-        case Constants.Name.FILTER:
-          int blurRadius = 0;
-          if(param != null && param instanceof String) {
-            blurRadius = parseBlurRadius((String)param);
-          }
-          if(!TextUtils.isEmpty(this.mSrc)) {
-            setBlurRadius(this.mSrc,blurRadius);
-          }
-          return true;
-      }
-    return super.setProperty(key, param);
+  @Override
+  protected boolean setProperty(String key, Object param) {
+    switch (key) {
+      case Constants.Name.RESIZE_MODE:
+        String resizeMode = WXUtils.getString(param, null);
+        if (resizeMode != null) { setResizeMode(resizeMode); }
+        return true;
+      case Constants.Name.RESIZE:
+        String resize = WXUtils.getString(param, null);
+        if (resize != null) { setResize(resize); }
+        return true;
+      case Constants.Name.SRC:
+        String src = WXUtils.getString(param, null);
+        if (src != null) { setSrc(src); }
+        return true;
+      case Constants.Name.IMAGE_QUALITY:
+        return true;
+      case Constants.Name.AUTO_RECYCLE:
+        mAutoRecycle = WXUtils.getBoolean(param, mAutoRecycle);
+        if (!mAutoRecycle && null != getInstance()){
+          getInstance().getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_IMG_UN_RECYCLE_NUM,1);
+        }
+        return true;
+      case Constants.Name.FILTER:
+        int blurRadius = 0;
+        if (param != null && param instanceof String) {
+          blurRadius = parseBlurRadius((String)param);
+        }
+        if (!TextUtils.isEmpty(this.mSrc)) {
+          setBlurRadius(this.mSrc, blurRadius);
+        }
+        return true;
+      default:
+        return super.setProperty(key, param);
+    }
   }
 
   @Override
   public void refreshData(WXComponent component) {
     super.refreshData(component);
     if (component instanceof WXImage) {
-      setSrc(component.getDomObject().getAttrs().getImageSrc());
+      setSrc(component.getAttrs().getImageSrc());
     }
   }
 
   @WXComponentProp(name = Constants.Name.RESIZE_MODE)
   public void setResizeMode(String resizeMode) {
     (getHostView()).setScaleType(getResizeMode(resizeMode));
+    getHostView().setImageDrawable(getHostView().getDrawable());
   }
 
-  private ScaleType getResizeMode(String resizeMode) {
+  @RestrictTo(Scope.LIBRARY_GROUP)
+  protected ScaleType getResizeMode(String resizeMode) {
     ScaleType scaleType = ScaleType.FIT_XY;
     if (TextUtils.isEmpty(resizeMode)) {
       return scaleType;
@@ -182,13 +184,15 @@ public class WXImage extends WXComponent<ImageView> {
       case "stretch":
         scaleType = ScaleType.FIT_XY;
         break;
+      default:
+        break;
     }
     return scaleType;
   }
 
   @WXComponentProp(name = Constants.Name.RESIZE)
   public void setResize(String resize) {
-    (getHostView()).setScaleType(getResizeMode(resize));
+    setResizeMode(resize);
   }
 
   /**
@@ -205,6 +209,14 @@ public class WXImage extends WXComponent<ImageView> {
 
   @WXComponentProp(name = Constants.Name.SRC)
   public void setSrc(String src) {
+
+    if (getInstance().getImageNetworkHandler() != null) {
+      String localUrl = getInstance().getImageNetworkHandler().fetchLocal(src);
+      if (!TextUtils.isEmpty(localUrl)) {
+        src = localUrl;
+      }
+    }
+
     if (src == null) {
       return;
     }
@@ -217,7 +229,7 @@ public class WXImage extends WXComponent<ImageView> {
 
     if(image != null){
       if(image.getDrawable() != null){
-         image.setImageDrawable(null);
+        image.setImageDrawable(null);
       }
     }
 
@@ -230,10 +242,8 @@ public class WXImage extends WXComponent<ImageView> {
       setLocalSrc(rewrited);
     } else {
       int blur = 0;
-      if(getDomObject() != null) {
-        String blurStr = getDomObject().getStyles().getBlur();
-        blur = parseBlurRadius(blurStr);
-      }
+      String blurStr = getStyles().getBlur();
+      blur = parseBlurRadius(blurStr);
       setRemoteSrc(rewrited, blur);
     }
   }
@@ -254,7 +264,7 @@ public class WXImage extends WXComponent<ImageView> {
     SingleFunctionParser<Integer> parser = new SingleFunctionParser<Integer>(rawRadius,BLUR_RADIUS_MAPPER);
     List<Integer> list = null;
     try {
-       list = parser.parse("blur");
+      list = parser.parse("blur");
     }catch (Exception e) {
       return 0;
     }
@@ -295,84 +305,97 @@ public class WXImage extends WXComponent<ImageView> {
     }
   }
 
-  private void setRemoteSrc(Uri rewrited,int blurRadius) {
+  private void setRemoteSrc(Uri rewrited, int blurRadius) {
 
-      WXImageStrategy imageStrategy = new WXImageStrategy();
-      imageStrategy.isClipping = true;
+    WXImageStrategy imageStrategy = new WXImageStrategy(getInstanceId());
+    imageStrategy.isClipping = true;
 
-      WXImageSharpen imageSharpen = getDomObject().getAttrs().getImageSharpen();
-      imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
+    WXImageSharpen imageSharpen = getAttrs().getImageSharpen();
+    imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
 
-      imageStrategy.blurRadius = Math.max(0, blurRadius);
-      this.mBlurRadius = blurRadius;
+    imageStrategy.blurRadius = Math.max(0, blurRadius);
+    this.mBlurRadius = blurRadius;
 
-      imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
-        @Override
-        public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
-          if (getDomObject() != null && getDomObject().getEvents().contains(Constants.Event.ONLOAD)) {
-            Map<String, Object> params = new HashMap<String, Object>();
-            Map<String, Object> size = new HashMap<>(2);
-            if (imageView != null && imageView instanceof Measurable) {
-              size.put("naturalWidth", ((Measurable) imageView).getNaturalWidth());
-              size.put("naturalHeight", ((Measurable) imageView).getNaturalHeight());
-            } else {
-              size.put("naturalWidth", 0);
-              size.put("naturalHeight", 0);
-            }
-
-            if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
-              params.put("success", result);
-              params.put("size", size);
-              fireEvent(Constants.Event.ONLOAD, params);
-            }
+    final String rewritedStr = rewrited.toString();
+    imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
+      @Override
+      public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
+        if (getEvents().contains(Constants.Event.ONLOAD)) {
+          Map<String, Object> params = new HashMap<String, Object>();
+          Map<String, Object> size = new HashMap<>(2);
+          if (imageView != null && imageView instanceof Measurable) {
+            size.put("naturalWidth", ((Measurable) imageView).getNaturalWidth());
+            size.put("naturalHeight", ((Measurable) imageView).getNaturalHeight());
+          } else {
+            size.put("naturalWidth", 0);
+            size.put("naturalHeight", 0);
           }
-          monitorImgSize(imageView);
-        }
-      });
 
-        String placeholder=null;
-        if(getDomObject().getAttrs().containsKey(Constants.Name.PLACEHOLDER)){
-            placeholder= (String) getDomObject().getAttrs().get(Constants.Name.PLACEHOLDER);
-        }else if(getDomObject().getAttrs().containsKey(Constants.Name.PLACE_HOLDER)){
-            placeholder=(String)getDomObject().getAttrs().get(Constants.Name.PLACE_HOLDER);
+          if (containsEvent(Constants.Event.ONLOAD)) {
+            params.put("success", result);
+            params.put("size", size);
+            fireEvent(Constants.Event.ONLOAD, params);
+          }
         }
-        if(!TextUtils.isEmpty(placeholder)){
-            imageStrategy.placeHolder = getInstance().rewriteUri(Uri.parse(placeholder),URIAdapter.IMAGE).toString();
-        }
-
-      IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
-      if (imgLoaderAdapter != null) {
-        imgLoaderAdapter.setImage(rewrited.toString(), getHostView(),
-            getDomObject().getAttrs().getImageQuality(), imageStrategy);
+        monitorImgSize(imageView,rewritedStr);
       }
+    });
+
+    String placeholder=null;
+    if(getAttrs().containsKey(Constants.Name.PLACEHOLDER)){
+      placeholder= (String) getAttrs().get(Constants.Name.PLACEHOLDER);
+    }else if(getAttrs().containsKey(Constants.Name.PLACE_HOLDER)){
+      placeholder=(String)getAttrs().get(Constants.Name.PLACE_HOLDER);
+    }
+    if(placeholder!=null){
+      imageStrategy.placeHolder = getInstance().rewriteUri(Uri.parse(placeholder),URIAdapter.IMAGE).toString();
+    }
+
+    imageStrategy.instanceId = getInstanceId();
+    IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
+    if (imgLoaderAdapter != null) {
+      imgLoaderAdapter.setImage(rewritedStr, getHostView(),
+          getImageQuality(), imageStrategy);
+    }
+  }
+
+  @RestrictTo(Scope.LIBRARY_GROUP)
+  protected WXImageQuality getImageQuality(){
+    return getAttrs().getImageQuality();
+  }
+
+  @Override
+  protected void onFinishLayout() {
+    super.onFinishLayout();
+    updateBorderRadius();
   }
 
   @Override
   public void updateProperties(Map<String, Object> props) {
     super.updateProperties(props);
-    WXImageView imageView;
-    ImmutableDomObject imageDom;
-    if ((imageDom = getDomObject()) != null &&
-        getHostView() instanceof WXImageView) {
-      imageView = (WXImageView) getHostView();
+    updateBorderRadius();
+  }
+
+  private void updateBorderRadius() {
+    if (getHostView() instanceof WXImageView) {
+      final WXImageView imageView = (WXImageView)getHostView();
       BorderDrawable borderDrawable = WXViewUtils.getBorderDrawable(getHostView());
       float[] borderRadius;
       if (borderDrawable != null) {
-        RectF borderBox = new RectF(0, 0, WXDomUtils.getContentWidth(imageDom), WXDomUtils.getContentHeight(imageDom));
-        borderRadius = borderDrawable.getBorderRadius(borderBox);
+        RectF borderBox = new RectF(0, 0, WXDomUtils.getContentWidth(this), WXDomUtils.getContentHeight(this));
+        borderRadius = borderDrawable.getBorderInnerRadius(borderBox);
       } else {
-        borderRadius = new float[]{0, 0, 0, 0, 0, 0, 0, 0};
+        borderRadius = new float[] {0, 0, 0, 0, 0, 0, 0, 0};
       }
       imageView.setBorderRadius(borderRadius);
 
       if (imageView.getDrawable() instanceof ImageDrawable) {
-        ImageDrawable imageDrawable = (ImageDrawable) imageView.getDrawable();
+        ImageDrawable imageDrawable = (ImageDrawable)imageView.getDrawable();
         float[] previousRadius = imageDrawable.getCornerRadii();
         if (!Arrays.equals(previousRadius, borderRadius)) {
           imageDrawable.setCornerRadii(borderRadius);
         }
       }
-      readyToRender();
     }
   }
 
@@ -441,7 +464,8 @@ public class WXImage extends WXComponent<ImageView> {
     });
   }
 
-  private void monitorImgSize(ImageView imageView){
+  private String preImgUrlStr = "";
+  private void monitorImgSize(ImageView imageView,String currentImgUrlStr){
     if (null == imageView){
       return;
     }
@@ -454,17 +478,33 @@ public class WXImage extends WXComponent<ImageView> {
     if (null == params || null ==img){
       return;
     }
-
-    if (img.getIntrinsicHeight() * img.getIntrinsicWidth() > imageView.getMeasuredHeight() *
-                                                             imageView.getMeasuredWidth()){
-      instance.getWXPerformance().wrongImgSizeCount++;
+    int imgHeight = img.getIntrinsicHeight();
+    int imgWidth = img.getIntrinsicWidth();
+    if (!preImgUrlStr.equals(currentImgUrlStr)){
+      preImgUrlStr = currentImgUrlStr;
+      if (imgHeight > 1081 && imgWidth > 721){
+        instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_LARGE_IMG_COUNT,1);
+      }
+      long imgSize = imgHeight * imgWidth;
+      long viewSize = imageView.getMeasuredHeight() * imageView.getMeasuredWidth();
+      if (viewSize == 0){
+          return;
+      }
+      double scaleSize =  imgSize/(double)viewSize;
+      //max diff 40*40
+      if (scaleSize >1.2 && imgSize-viewSize > 1600){
+        instance.getWXPerformance().wrongImgSizeCount++;
+        instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,1);
+      }
     }
+
   }
 
+  @Override
   public void destroy() {
     if(getHostView() instanceof WXImageView){
       if (getInstance().getImgLoaderAdapter() != null) {
-          getInstance().getImgLoaderAdapter().setImage(null, mHost, null, null);
+        getInstance().getImgLoaderAdapter().setImage(null, mHost, null, null);
       }
     }
     super.destroy();

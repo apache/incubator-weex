@@ -10,6 +10,8 @@ build/
 _demo/
 DerivedData
 
+sdk/Products
+
 ## Various settings
 *.pbxuser
 !default.pbxuser

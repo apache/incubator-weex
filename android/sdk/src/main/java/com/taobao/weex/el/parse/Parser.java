@@ -20,6 +20,7 @@ package com.taobao.weex.el.parse;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.utils.WXLogUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class Parser {
     /**
      * parse code to ast block.
      * */
-    public static  Token parse(String code){
+    public static Token parse(String code){
         try{
             Parser parser = new Parser(code);
             return parser.parse();

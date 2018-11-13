@@ -18,20 +18,27 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Layout;
-
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.layout.measurefunc.TextContentBoxMeasurement;
 import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.flat.FlatComponent;
 import com.taobao.weex.ui.flat.widget.TextWidget;
 import com.taobao.weex.ui.view.WXTextView;
-import com.taobao.weex.utils.WXUtils;
-
+import com.taobao.weex.utils.FontDO;
+import com.taobao.weex.utils.TypefaceUtil;
+import com.taobao.weex.utils.WXLogUtils;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -46,10 +53,15 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
    * The default text size
    **/
   public static final int sDEFAULT_SIZE = 32;
+  private BroadcastReceiver mTypefaceObserver;
+  private String mFontFamily;
 
   @Override
   public boolean promoteToView(boolean checkAncestor) {
-    return getInstance().getFlatUIContext().promoteToView(this, checkAncestor, WXText.class);
+    if (null != getInstance().getFlatUIContext()) {
+      return getInstance().getFlatUIContext().promoteToView(this, checkAncestor, WXText.class);
+    }
+    return false;
   }
 
   @Override
@@ -67,31 +79,32 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
   }
 
   public static class Creator implements ComponentCreator {
-
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXText(instance, node, parent);
+    public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXText(instance, parent, basicComponentData);
     }
   }
 
   @Deprecated
-  public WXText(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent);
+  public WXText(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    this(instance, parent, basicComponentData);
   }
 
-  public WXText(WXSDKInstance instance, WXDomObject node,
-                WXVContainer parent) {
-    super(instance, node, parent);
+  public WXText(WXSDKInstance instance,
+                WXVContainer parent, BasicComponentData basicComponentData) {
+    super(instance, parent, basicComponentData);
+    setContentBoxMeasurement(new TextContentBoxMeasurement(this));
   }
 
   @Override
   protected WXTextView initComponentHostView(@NonNull Context context) {
-    WXTextView textView =new WXTextView(context);
+    WXTextView textView = new WXTextView(context);
     textView.holdComponent(this);
     return textView;
   }
 
   @Override
   public void updateExtra(Object extra) {
+    super.updateExtra(extra);
     if(extra instanceof Layout) {
       final Layout layout = (Layout) extra;
       if (!promoteToView(true)) {
@@ -106,7 +119,7 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
   @Override
   protected void setAriaLabel(String label) {
     WXTextView text = getHostView();
-    if(text != null){
+    if (text != null) {
       text.setAriaLabel(label);
     }
   }
@@ -115,7 +128,7 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
   public void refreshData(WXComponent component) {
     super.refreshData(component);
     if (component instanceof WXText) {
-      updateExtra(component.getDomObject().getExtra());
+      updateExtra(component.getExtra());
     }
   }
 
@@ -134,11 +147,8 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
       case Constants.Name.VALUE:
         return true;
       case Constants.Name.FONT_FAMILY:
-        return true;
-      case Constants.Name.ENABLE_COPY:
-        boolean enabled = WXUtils.getBoolean(param, false);
-        if (getHostView() != null) {
-          getHostView().enableCopy(enabled);
+        if (param != null) {
+          registerTypefaceObserver(param.toString());
         }
         return true;
       default:
@@ -167,6 +177,48 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
   @Override
   public void destroy() {
     super.destroy();
+    if (WXEnvironment.getApplication() != null && mTypefaceObserver != null) {
+      WXLogUtils.d("WXText", "Unregister the typeface observer");
+      LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).unregisterReceiver(mTypefaceObserver);
+      mTypefaceObserver = null;
+    }
   }
 
+  private void registerTypefaceObserver(String desiredFontFamily) {
+    if (WXEnvironment.getApplication() == null) {
+      WXLogUtils.w("WXText", "ApplicationContent is null on register typeface observer");
+      return;
+    }
+    mFontFamily = desiredFontFamily;
+    if (mTypefaceObserver != null) {
+      return;
+    }
+
+    mTypefaceObserver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        String fontFamily = intent.getStringExtra("fontFamily");
+        if (!mFontFamily.equals(fontFamily)) {
+          return;
+        }
+
+        FontDO fontDO = TypefaceUtil.getFontDO(fontFamily);
+        if (fontDO != null && fontDO.getTypeface() != null && getHostView() != null) {
+          WXTextView hostView = getHostView();
+          Layout layout = hostView.getTextLayout();
+          if (layout != null) {
+            layout.getPaint().setTypeface(fontDO.getTypeface());
+            WXLogUtils.d("WXText", "Apply font family " + fontFamily + " to paint");
+          } else {
+            WXLogUtils.w("WXText", "Layout not created");
+          }
+          WXBridgeManager
+              .getInstance().markDirty(getInstanceId(), getRef(), true);
+        }
+        WXLogUtils.d("WXText", "Font family " + fontFamily + " is available");
+      }
+    };
+
+    LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).registerReceiver(mTypefaceObserver, new IntentFilter(TypefaceUtil.ACTION_TYPE_FACE_AVAILABLE));
+  }
 }

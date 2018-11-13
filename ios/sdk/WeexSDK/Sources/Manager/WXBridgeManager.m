@@ -29,12 +29,15 @@
 #import "WXResourceLoader.h"
 #import "WXDebugTool.h"
 #import "WXTracingManager.h"
+#import "WXMonitor.h"
+#import "WXSDKInstance_performance.h"
+#import "WXThreadSafeMutableArray.h"
 
 @interface WXBridgeManager ()
 
-@property (nonatomic, strong) WXBridgeContext   *bridgeCtx;
-@property (nonatomic, assign) BOOL  stopRunning;
-@property (nonatomic, strong) NSMutableArray *instanceIdStack;
+@property (nonatomic, assign) BOOL stopRunning;
+@property (nonatomic, strong) WXBridgeContext *bridgeCtx;
+@property (nonatomic, strong) WXThreadSafeMutableArray *instanceIdStack;
 
 @end
 
@@ -51,7 +54,6 @@ static NSThread *WXBridgeThread;
     });
     return _sharedInstance;
 }
-
 
 - (instancetype)init
 {
@@ -70,11 +72,6 @@ static NSThread *WXBridgeThread;
 - (void)unload
 {
     _bridgeCtx = nil;
-}
-
-- (void)dealloc
-{
-   
 }
 
 #pragma mark Thread Management
@@ -127,6 +124,23 @@ void WXPerformBlockOnBridgeThread(void (^block)(void))
     }
 }
 
+void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
+{
+    [WXBridgeManager _performBlockSyncOnBridgeThread:block];
+}
+
++ (void)_performBlockSyncOnBridgeThread:(void (^)(void))block
+{
+    if ([NSThread currentThread] == [self jsThread]) {
+        block();
+    } else {
+        [self performSelector:@selector(_performBlockSyncOnBridgeThread:)
+                     onThread:[self jsThread]
+                   withObject:[block copy]
+                waitUntilDone:YES];
+    }
+}
+
 #pragma mark JSBridge Management
 
 - (void)createInstance:(NSString *)instance
@@ -142,6 +156,11 @@ void WXPerformBlockOnBridgeThread(void (^block)(void))
             [self.instanceIdStack insertObject:instance atIndex:0];
         }
     }
+    //third team impl...
+    WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:instance];
+    if (sdkInstance) {
+        sdkInstance.apmInstance.isStartRender = YES;
+    }
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
         [WXTracingManager startTracingWithInstanceId:instance ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"createInstance" options:@{@"threadName":WXTJSBridgeThread}];
@@ -154,26 +173,54 @@ void WXPerformBlockOnBridgeThread(void (^block)(void))
     });
 }
 
-- (NSMutableArray *)instanceIdStack
+- (void)createInstance:(NSString *)instance
+              contents:(NSData *)contents
+               options:(NSDictionary *)options
+                  data:(id)data
+{
+    if (!instance || !contents) return;
+    if (![self.instanceIdStack containsObject:instance]) {
+        if ([options[@"RENDER_IN_ORDER"] boolValue]) {
+            [self.instanceIdStack addObject:instance];
+        } else {
+            [self.instanceIdStack insertObject:instance atIndex:0];
+        }
+    }
+    //third team impl...
+    WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:instance];
+    if (sdkInstance) {
+        sdkInstance.apmInstance.isStartRender = YES;
+    }
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnBridgeThread(^(){
+        [WXTracingManager startTracingWithInstanceId:instance ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"createInstance" options:@{@"threadName":WXTJSBridgeThread}];
+        [weakSelf.bridgeCtx createInstance:instance
+                                  contents:contents
+                                   options:options
+                                      data:data];
+        [WXTracingManager startTracingWithInstanceId:instance ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"createInstance" options:@{@"threadName":WXTJSBridgeThread}];
+    });
+}
+
+
+- (WXThreadSafeMutableArray *)instanceIdStack
 {
     if (_instanceIdStack) return _instanceIdStack;
     
-    _instanceIdStack = [NSMutableArray array];
+    _instanceIdStack = [[WXThreadSafeMutableArray alloc] init];
     
     return _instanceIdStack;
 }
 
 - (NSArray *)getInstanceIdStack;
 {
-    return self.instanceIdStack;
+    return [self.instanceIdStack copy];
 }
 
 - (void)destroyInstance:(NSString *)instance
 {
     if (!instance) return;
-    if([self.instanceIdStack containsObject:instance]){
-        [self.instanceIdStack removeObject:instance];
-    }
+    [self.instanceIdStack removeObject:instance];
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
@@ -228,6 +275,17 @@ void WXPerformBlockOnBridgeThread(void (^block)(void))
     WXPerformBlockOnBridgeThread(^(){
         [weakSelf.bridgeCtx executeJsMethod:method];
     });
+}
+
+- (JSValue *)callJSMethodWithResult:(WXCallJSMethod *)method
+{
+    if (!method) return nil;
+    __weak typeof(self) weakSelf = self;
+    __block JSValue *value;
+    WXPerformBlockSyncOnBridgeThread(^(){
+        value = [weakSelf.bridgeCtx excuteJSMethodWithResult:method];
+    });
+    return value;
 }
 
 -(void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options
@@ -322,11 +380,19 @@ void WXPerformBlockOnBridgeThread(void (^block)(void))
     }
     WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
     
+    if(instance && !instance.isJSCreateFinish)
+    {
+        instance.performance.fsCallEventNum++;
+    }
+    if (instance && !instance.apmInstance.isFSEnd) {
+        [instance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_EVENT_NUM withDiffValue:1];
+    }
+    
     WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"fireEvent" arguments:args instance:instance];
     [self callJsMethod:method];
 }
 
-- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase args:(NSArray*)args competion:(void (^)(JSValue * value))complection
+- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase args:(NSArray*)args competion:(void (^)(JSValue * value))completion
 {
     WXPerformBlockOnBridgeThread(^{
         if (!type || !instanceId || !hookPhase) {
@@ -336,8 +402,20 @@ void WXPerformBlockOnBridgeThread(void (^block)(void))
         NSArray *newArgs = @[componentId, type, hookPhase, args?:@[]];
         
         WXCallJSMethod * method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"componentHook" arguments:newArgs instance:[WXSDKManager instanceForID:instanceId]];
-        [self.bridgeCtx callJSMethod:@"callJS" args:@[instanceId, @[method.callJSTask]] onContext:nil completion:complection];
+        [self.bridgeCtx callJSMethod:@"callJS" args:@[instanceId, @[method.callJSTask]] onContext:nil completion:completion];
     });
+}
+
+- (JSValue *)fireEventWithResult:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges
+{
+    if (!type || !ref) {
+        WXLogError(@"Event type and component ref should not be nil");
+        return nil;
+    }
+    NSArray *args = @[ref, type, params?:@{}, domChanges?:@{}];
+    WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+    WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"fireEvent" arguments:args instance:instance];
+    return [self callJSMethodWithResult:method];
 }
 
 - (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(id)params keepAlive:(BOOL)keepAlive

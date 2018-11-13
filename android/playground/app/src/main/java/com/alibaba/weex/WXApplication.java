@@ -25,13 +25,13 @@ import android.os.Bundle;
 import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.commons.adapter.JSExceptionAdapter;
+import com.alibaba.weex.extend.adapter.ApmGenerator;
 import com.alibaba.weex.extend.adapter.DefaultAccessibilityRoleAdapter;
 import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
 import com.alibaba.weex.extend.component.RichText;
 import com.alibaba.weex.extend.component.WXComponentSyncTest;
 import com.alibaba.weex.extend.component.WXMask;
 import com.alibaba.weex.extend.component.WXParallax;
-import com.alibaba.weex.extend.component.dom.WXMaskDomObject;
 import com.alibaba.weex.extend.module.GeolocationModule;
 import com.alibaba.weex.extend.module.MyModule;
 import com.alibaba.weex.extend.module.RenderModule;
@@ -75,6 +75,7 @@ public class WXApplication extends Application {
                                .setWebSocketAdapterFactory(new DefaultWebSocketAdapterFactory())
                                .setJSExceptionAdapter(new JSExceptionAdapter())
                                .setHttpAdapter(new InterceptWXHttpAdapter())
+                               .setApmGenerater(new ApmGenerator())
                                .build()
                           );
 
@@ -91,8 +92,6 @@ public class WXApplication extends Application {
       WXSDKEngine.registerModule("syncTest", SyncTestModule.class);
 
       WXSDKEngine.registerComponent("mask",WXMask.class);
-      WXSDKEngine.registerDomObject("mask", WXMaskDomObject.class);
-
       WXSDKEngine.registerModule("myModule", MyModule.class);
       WXSDKEngine.registerModule("geolocation", GeolocationModule.class);
 

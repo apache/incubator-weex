@@ -29,6 +29,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
@@ -52,6 +53,11 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
   @Override
   public void registerGestureListener(WXGesture wxGesture) {
     this.wxGesture = wxGesture;
+  }
+
+  @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
   }
 
   public void setOnVideoPauseListener(VideoPlayListener listener) {
@@ -101,7 +107,7 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
     private MediaPlayer.OnErrorListener mOnErrorListener;
     private MediaPlayer.OnCompletionListener mOnCompletionListener;
     private WXVideoView.VideoPlayListener mVideoPlayListener;
-
+    private boolean mControls = true;
 
     public Wrapper(Context context) {
       super(context);
@@ -122,8 +128,8 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
       setBackgroundColor(WXResourceUtils.getColor("#ee000000"));
       mProgressBar = new ProgressBar(context);
       FrameLayout.LayoutParams pLayoutParams =
-          new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-              FrameLayout.LayoutParams.WRAP_CONTENT);
+              new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                      FrameLayout.LayoutParams.WRAP_CONTENT);
       mProgressBar.setLayoutParams(pLayoutParams);
       pLayoutParams.gravity = Gravity.CENTER;
       addView(mProgressBar);
@@ -221,6 +227,17 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
       }
     }
 
+    public void setControls(boolean controls) {
+      mControls = controls;
+      if (mVideoView != null && mMediaController != null) {
+        if (!mControls) {
+          mMediaController.setVisibility(View.GONE);
+        } else {
+          mMediaController.setVisibility(View.VISIBLE);
+        }
+      }
+    }
+
     private synchronized void createVideoView() {
       if(mVideoView != null){
         return;
@@ -228,8 +245,8 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
       Context context = getContext();
       WXVideoView video = new WXVideoView(context);
       FrameLayout.LayoutParams videoLayoutParams =
-          new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-              FrameLayout.LayoutParams.MATCH_PARENT);
+              new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                      FrameLayout.LayoutParams.MATCH_PARENT);
       videoLayoutParams.gravity = Gravity.CENTER;
       video.setLayoutParams(videoLayoutParams);
       addView(video, 0);//first child
@@ -241,7 +258,11 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
       controller.setAnchorView(this);
       video.setMediaController(controller);
       controller.setMediaPlayer(video);
-
+      if (!mControls) {
+        controller.setVisibility(View.GONE);
+      } else {
+        controller.setVisibility(View.VISIBLE);
+      }
       mMediaController = controller;
       mVideoView = video;
 

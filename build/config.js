@@ -38,7 +38,7 @@ const configs = {
     input: absolute('runtime/entries/index.js'),
     output: {
       name: 'Weex',
-      file: absolute('pre-build/weex-js-framework'),
+      file: absolute('dist/weex-js-framework'),
       banner: `(this.nativeLog || function(s) {console.log(s)})`
         + `('START JS FRAMEWORK ${subversion.framework}, Build ${now()}. `
         + `(Vue: ${deps['weex-vue-framework']}, Rax: ${deps['weex-rax-framework']})');\n`
@@ -49,16 +49,23 @@ const configs = {
     input: absolute('runtime/entries/env.js'),
     output: {
       name: 'WeexEnvironmentAPIs',
-      file: absolute('pre-build/weex-env'),
+      file: absolute('dist/weex-env'),
       banner: `/* Prepare Weex Environment APIs ${subversion.framework}, Build ${now()}. */\n\n`
         + `var global = this; var process = {env:{}};`
+    }
+  },
+  'weex-polyfill': {
+    input: absolute('runtime/entries/polyfill.js'),
+    output: {
+      format: 'iife',
+      file: absolute('dist/weex-polyfill')
     }
   },
   'weex-vue': {
     input: absolute('runtime/entries/vue.js'),
     output: {
       name: 'WeexVue',
-      file: absolute('pre-build/weex-vue'),
+      file: absolute('dist/weex-vue'),
       banner: `(this.nativeLog || function(s) {console.log(s)})`
         + `('Weex JS Framework ${subversion.framework}, Build ${now()}. `
         + `(Vue: ${deps['weex-vue-framework']})');\n`
@@ -69,7 +76,7 @@ const configs = {
     input: absolute('runtime/entries/rax.js'),
     output: {
       name: 'WeexRax',
-      file: absolute('pre-build/weex-rax'),
+      file: absolute('dist/weex-rax'),
       banner: `(this.nativeLog || function(s) {console.log(s)})`
         + `('Weex JS Framework ${subversion.framework}, Build ${now()}. `
         + `(Rax: ${deps['weex-rax-framework']})');\n`
@@ -88,7 +95,7 @@ const configs = {
     input: absolute('runtime/entries/legacy.js'),
     output: {
       name: 'WeexLegacy',
-      file: absolute('pre-build/weex-legacy'),
+      file: absolute('dist/weex-legacy'),
       banner: `(this.nativeLog || function(s) {console.log(s)})`
         + `('Weex Legacy Framework ${subversion.framework}, Build ${now()}.');\n`
         + frameworkBanner

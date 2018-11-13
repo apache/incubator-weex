@@ -21,19 +21,23 @@ package com.taobao.weex.utils;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
+import android.system.ErrnoException;
+import android.system.Os;
 import android.text.TextUtils;
 
 import com.taobao.weex.IWXStatisticsListener;
-import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
-import com.taobao.weex.common.WXPerformance;
 
+import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -111,10 +115,10 @@ public class WXSoInstallMgrSdk {
   public static boolean initSo(String libName, int version, IWXUserTrackAdapter utAdapter) {
     String cpuType = _cpuType();
     if (cpuType.equalsIgnoreCase(MIPS) ) {
-	  WXExceptionUtils.commitCriticalExceptionRT(null,
-			  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
-			  "initSo", "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for android cpuType is MIPS",
-			  null);
+      WXExceptionUtils.commitCriticalExceptionRT(null,
+              WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
+              "initSo", "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for android cpuType is MIPS",
+              null);
       return false;
     }
 
@@ -122,7 +126,7 @@ public class WXSoInstallMgrSdk {
     copyStartUpSo();
 
     boolean InitSuc = false;
-    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
+//    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
 
       /**
        * Load library with {@link System#loadLibrary(String)}
@@ -139,11 +143,11 @@ public class WXSoInstallMgrSdk {
         InitSuc = true;
       } catch (Exception | Error e2) {
         if (cpuType.contains(ARMEABI) || cpuType.contains(X86)) {
-		  WXExceptionUtils.commitCriticalExceptionRT(null,
-				  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
-				  "initSo", "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for android cpuType is " +cpuType +
-				  "\n Detail Error is: " +e2.getMessage(),
-				  null);
+          WXExceptionUtils.commitCriticalExceptionRT(null,
+                  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
+                  "initSo", "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for android cpuType is " +cpuType +
+                          "\n Detail Error is: " +e2.getMessage(),
+                  null);
         }
         InitSuc = false;
       }
@@ -179,7 +183,7 @@ public class WXSoInstallMgrSdk {
         InitSuc = false;
         e.printStackTrace();
       }
-    }
+  //  }
     return InitSuc;
   }
 
@@ -213,8 +217,29 @@ public class WXSoInstallMgrSdk {
         } else {
           newfile = new File(cacheFile + STARTUPSO);
         }
-        if (newfile.exists()) {
-          return;
+
+        String jsbVersionFile = "jsb.version";
+
+        File versionFile = new File(cacheFile,jsbVersionFile);
+        Closeable r = null;
+
+        if(newfile.exists() && versionFile.exists()) {
+          try {
+            FileReader fileReader = new FileReader(versionFile);
+            r = fileReader;
+            BufferedReader br = new BufferedReader(fileReader);
+            String s = br.readLine();
+            if(!TextUtils.isEmpty(s)) {
+              boolean same = String.valueOf(WXEnvironment.CORE_JSB_SO_VERSION).equals(s.trim());
+              if(same)
+                return;
+            }
+          } catch (FileNotFoundException e) {
+            //do nothing and copy so file
+          } finally {
+            if (r != null)
+              r.close();
+          }
         }
 
         String path = "/data/data/" + pkgName + "/lib";
@@ -231,15 +256,26 @@ public class WXSoInstallMgrSdk {
 
         File oldfile = new File(soName);
         if (oldfile.exists()) {
-          FileInputStream inputStream = new FileInputStream(oldfile);
-          byte[] data = new byte[1024];
-          FileOutputStream outputStream =new FileOutputStream(newfile);
-          while (inputStream.read(data) != -1) {
-            outputStream.write(data);
-          }
-          inputStream.close();
-          outputStream.close();
+          WXFileUtils.copyFile(oldfile, newfile);
+        } else {
+          WXEnvironment.extractSo();
         }
+
+        Closeable w = null;
+        try {
+          if(!versionFile.exists())
+            versionFile.createNewFile();
+          FileWriter fileWriter = new FileWriter(versionFile);
+          w = fileWriter;
+          fileWriter.write(String.valueOf(WXEnvironment.CORE_JSB_SO_VERSION));
+          fileWriter.flush();
+        } catch (Exception e ) {
+          // do nothing
+        } finally {
+          if(w != null)
+            w.close();
+        }
+
       }
     } catch (Throwable e) {
       e.printStackTrace();
@@ -294,11 +330,11 @@ public class WXSoInstallMgrSdk {
         }
       }
     }catch(Throwable e ){
-	  WXExceptionUtils.commitCriticalExceptionRT(null,
-			  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
-			  "checkSoIsValid", "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for " +
-					  "weex so size check fail exception :"+e.getMessage(),
-			  null);
+      WXExceptionUtils.commitCriticalExceptionRT(null,
+              WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
+              "checkSoIsValid", "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for " +
+                      "weex so size check fail exception :"+e.getMessage(),
+              null);
       WXLogUtils.e("weex so size check fail exception :"+e.getMessage());
     }
 
@@ -373,20 +409,20 @@ public class WXSoInstallMgrSdk {
       }
       initSuc = true;
     } catch (Throwable e) {
-	  initSuc = false;
-	  WXExceptionUtils.commitCriticalExceptionRT(null,
-			  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT,
-			  "_loadUnzipSo", "[WX_KEY_EXCEPTION_SDK_INIT_WX_ERR_COPY_FROM_APK] " +
-			  "\n Detail Msg is : " +  e.getMessage(),
-			  null);
+      initSuc = false;
+      WXExceptionUtils.commitCriticalExceptionRT(null,
+              WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT,
+              "_loadUnzipSo", "[WX_KEY_EXCEPTION_SDK_INIT_WX_ERR_COPY_FROM_APK] " +
+                      "\n Detail Msg is : " +  e.getMessage(),
+              null);
       WXLogUtils.e("", e);
     }
     return initSuc;
   }
 
   static boolean unZipSelectedFiles(String libName,
-      int version,
-      IWXUserTrackAdapter utAdapter) throws ZipException, IOException {
+                                    int version,
+                                    IWXUserTrackAdapter utAdapter) throws ZipException, IOException {
     String sourcePath = "lib/armeabi/lib" + libName + ".so";
 
     String zipPath = "";
@@ -420,7 +456,7 @@ public class WXSoInstallMgrSdk {
             //Copy file
             in = zf.getInputStream(entry);
             os = context.openFileOutput("lib" + libName + "bk" + version + ".so",
-                                        Context.MODE_PRIVATE);
+                    Context.MODE_PRIVATE);
             channel = os.getChannel();
 
             byte[] buffers = new byte[1024];
@@ -472,11 +508,11 @@ public class WXSoInstallMgrSdk {
       }
     } catch (java.io.IOException e) {
       e.printStackTrace();
-	  WXExceptionUtils.commitCriticalExceptionRT(null,
-			  WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT,
-			  "unZipSelectedFiles", "[WX_KEY_EXCEPTION_SDK_INIT_unZipSelectedFiles] " +
-			  "\n Detail msg is: " + e.getMessage(),
-			  null);
+      WXExceptionUtils.commitCriticalExceptionRT(null,
+              WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT,
+              "unZipSelectedFiles", "[WX_KEY_EXCEPTION_SDK_INIT_unZipSelectedFiles] " +
+                      "\n Detail msg is: " + e.getMessage(),
+              null);
 
     } finally {
 

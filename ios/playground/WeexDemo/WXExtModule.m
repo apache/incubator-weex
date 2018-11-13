@@ -32,8 +32,15 @@ WX_EXPORT_METHOD(@selector(generateCover:))
     setenv("GCOV_PREFIX", [documentsDirectory cStringUsingEncoding:NSUTF8StringEncoding], 1);
     setenv("GCOV_PREFIX_STRIP", "6", 1);
 #endif
+    
+#if defined __cplusplus
+    extern "C" {
+#endif
     extern void __gcov_flush(void);
     __gcov_flush();
+#if defined __cplusplus
+    };
+#endif
     
     if (callback) {
         NSDictionary * result = @{@"ok": @true};

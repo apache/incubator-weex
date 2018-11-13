@@ -35,13 +35,15 @@
 #import <CommonCrypto/CommonCrypto.h>
 #import <CoreText/CoreText.h>
 #import "WXAppMonitorProtocol.h"
-
+#import "WXConfigCenterProtocol.h"
 #import "WXTextComponent.h"
+#import "WXAssert.h"
 
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
 
-static BOOL threadSafeCollectionUsingLock = YES;
+static BOOL unregisterFontWhenCollision = NO;
+static BOOL useJSCApiForCreateInstance = YES;
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
@@ -81,7 +83,7 @@ void WXSwizzleInstanceMethod(Class className, SEL original, SEL replaced)
     
     BOOL didAddMethod = class_addMethod(className, original, method_getImplementation(newMethod), method_getTypeEncoding(newMethod));
     if (didAddMethod) {
-        class_replaceMethod(className, replaced, method_getImplementation(newMethod), method_getTypeEncoding(newMethod));
+        class_replaceMethod(className, replaced, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
     } else {
         method_exchangeImplementations(originalMethod, newMethod);
     }
@@ -137,14 +139,19 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 @implementation WXUtility
 
-+ (void)setThreadSafeCollectionUsingLock:(BOOL)usingLock
++ (void)setUnregisterFontWhenCollision:(BOOL)value
 {
-    threadSafeCollectionUsingLock = usingLock;
+    unregisterFontWhenCollision = value;
 }
 
-+ (BOOL)threadSafeCollectionUsingLock
++ (void)setUseJSCApiForCreateInstance:(BOOL)value
 {
-    return threadSafeCollectionUsingLock;
+    useJSCApiForCreateInstance = value;
+}
+
++ (BOOL)useJSCApiForCreateInstance
+{
+    return useJSCApiForCreateInstance;
 }
 
 + (void)performBlock:(void (^)(void))block onThread:(NSThread *)thread
@@ -181,7 +188,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
     
     NSMutableDictionary *data = [NSMutableDictionary dictionaryWithDictionary:@{
                                     @"platform":platform,
-                                    @"osName":platform,//osName is eaqual to platorm name in native
+                                    @"osName":platform, //osName is eaqual to platorm name in native
                                     @"osVersion":sysVersion,
                                     @"weexVersion":weexVersion,
                                     @"deviceModel":machine,
@@ -192,6 +199,20 @@ CGFloat WXFloorPixelValue(CGFloat value)
                                     @"scale":@(scale),
                                     @"logLevel":[WXLog logLevelString] ?: @"error"
                                 }];
+    
+    if ([[[UIDevice currentDevice] systemVersion] integerValue] >= 11) {
+        id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+        if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+            // update
+            BOOL isDefault = YES;
+            BOOL jsfmEnableNativePromiseOnIOS11AndLater = [[configCenter configForKey:@"iOS_weex_ext_config.jsfmEnableNativePromiseOnIOS11AndLater" defaultValue:@(NO) isDefault:&isDefault] boolValue];
+            if (!isDefault) {
+                // has this config explicitly
+                data[@"__enable_native_promise__"] = @(jsfmEnableNativePromiseOnIOS11AndLater);
+            }
+        }
+    }
+    
     if ([WXSDKEngine customEnvironment]) {
         [data addEntriesFromDictionary:[WXSDKEngine customEnvironment]];
     }
@@ -241,19 +262,10 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 + (id)objectFromJSON:(NSString *)json
 {
-    if (!json) return nil;
-    
-    NSData *data = [json dataUsingEncoding:NSUTF8StringEncoding];
-    NSError *error = nil;
-    id obj = [NSJSONSerialization JSONObjectWithData:data
-                                             options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
-                                               error:&error];
-    if(error){
-        WXLogError(@"%@", [error description]);
-        return nil;
-    }
-    
-    return obj;
+    // in weex there are cases that json is empty container
+    if ([json isEqualToString:@"{}"]) return @{}.mutableCopy;
+    if ([json isEqualToString:@"[]"]) return @[].mutableCopy;
+    return [self JSONObject:[json dataUsingEncoding:NSUTF8StringEncoding] error:nil];
 }
 
 + (id)JSONObject:(NSData*)data error:(NSError **)error
@@ -265,7 +277,9 @@ CGFloat WXFloorPixelValue(CGFloat value)
                                                   options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
                                                     error:error];
     } @catch (NSException *exception) {
-        *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{NSLocalizedDescriptionKey: [exception description]}];
+        if (error) {
+            *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{NSLocalizedDescriptionKey: [exception description]}];
+        }
     }
     return jsonObj;
 }
@@ -274,37 +288,43 @@ CGFloat WXFloorPixelValue(CGFloat value)
 {
     if(!object) return nil;
     
-    NSError *error = nil;
-    if([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]){
-        NSData *data = [NSJSONSerialization dataWithJSONObject:object
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
-        if (error) {
-            WXLogError(@"%@", [error description]);
-            return nil;
-        }
-        
-        return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    @try {
     
-    } else if ([object isKindOfClass:[NSString class]]) {
-        NSArray *array = @[object];
-        NSData *data = [NSJSONSerialization dataWithJSONObject:array
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
-        if (error) {
-            WXLogError(@"%@", [error description]);
+        NSError *error = nil;
+        if ([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]) {
+            NSData *data = [NSJSONSerialization dataWithJSONObject:object
+                                                           options:NSJSONWritingPrettyPrinted
+                                                             error:&error];
+            if (error) {
+                WXLogError(@"%@", [error description]);
+                return nil;
+            }
+            
+            return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        
+        } else if ([object isKindOfClass:[NSString class]]) {
+            NSArray *array = @[object];
+            NSData *data = [NSJSONSerialization dataWithJSONObject:array
+                                                           options:NSJSONWritingPrettyPrinted
+                                                             error:&error];
+            if (error) {
+                WXLogError(@"%@", [error description]);
+                return nil;
+            }
+            
+            NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            if (string.length <= 4) {
+                WXLogError(@"json convert length less than 4 chars.");
+                return nil;
+            }
+            
+            return [string substringWithRange:NSMakeRange(2, string.length - 4)];
+        } else {
+            WXLogError(@"object isn't avaliable class");
             return nil;
         }
         
-        NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if (string.length <= 4) {
-            WXLogError(@"json convert length less than 4 chars.");
-            return nil;
-        }
-        
-        return [string substringWithRange:NSMakeRange(2, string.length - 4)];
-    } else {
-        WXLogError(@"object isn't avaliable class");
+    } @catch (NSException *exception) {
         return nil;
     }
 }
@@ -352,6 +372,11 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return false;
 }
 
++ (BOOL)isValidPoint:(CGPoint)point
+{
+    return !(isnan(point.x)) && !(isnan(point.y));
+}
+
 + (NSError *)errorWithCode:(NSInteger)code message:(NSString *)message
 {
     message = message ? : @"";
@@ -381,7 +406,11 @@ CGFloat WXFloorPixelValue(CGFloat value)
             if ([subStr hasPrefix:@"rgb"]) {
                 gradientType = [WXConvert gradientType:gradientTypeStr];
                 
-                range = [subStr rangeOfString:@")"];
+                if ([subStr containsString:@"%"]) {
+                    range = [subStr rangeOfString:@"%"];
+                } else {
+                    range = [subStr rangeOfString:@")"];
+                }
                 NSString *startColorStr = [subStr substringToIndex:range.location + 1];
                 NSString *endColorStr = [subStr substringFromIndex:range.location + 2];
                 startColor = [WXConvert UIColor:startColorStr];
@@ -481,14 +510,18 @@ CGFloat WXFloorPixelValue(CGFloat value)
                     CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL(fontURL);
                     if (fontDataProvider) {
                         CGFontRef newFont = CGFontCreateWithDataProvider(fontDataProvider);
-                        CFErrorRef error = nil;
-                        CTFontManagerRegisterGraphicsFont(newFont, &error);
-                        // the same font family, remove it and register new one.
-                        if (error) {
-                            CTFontManagerUnregisterGraphicsFont(newFont, NULL);
+                        if (unregisterFontWhenCollision) {
+                            CFErrorRef error = nil;
+                            CTFontManagerRegisterGraphicsFont(newFont, &error);
+                            // the same font family, remove it and register new one.
+                            if (error) {
+                                CTFontManagerUnregisterGraphicsFont(newFont, NULL);
+                                CTFontManagerRegisterGraphicsFont(newFont, NULL);
+                                CFRelease(error);
+                            }
+                        }
+                        else {
                             CTFontManagerRegisterGraphicsFont(newFont, NULL);
-                            CFRelease(error);
-                            error = nil;
                         }
                         fontFamily = (__bridge_transfer  NSString*)CGFontCopyPostScriptName(newFont);
                         CGFontRelease(newFont);
@@ -496,12 +529,16 @@ CGFloat WXFloorPixelValue(CGFloat value)
                         CFRelease(fontDataProvider);
                     }
                 } else {
-                    CFErrorRef error = nil;
-                    CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
-                    if (error) {
-                        CFRelease(error);
-                        error = nil;
-                        CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                    if (unregisterFontWhenCollision) {
+                        CFErrorRef error = nil;
+                        CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
+                        if (error) {
+                            CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                            CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                            CFRelease(error);
+                        }
+                    }
+                    else {
                         CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
                     }
                     NSArray *descriptors = (__bridge_transfer NSArray *)CTFontManagerCreateFontDescriptorsFromURL(fontURL);
@@ -939,6 +976,89 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
     }
     return nil;
 }
+
++ (long) getUnixFixTimeMillis
+{
+    static long sInterval;
+    static dispatch_once_t unixTimeToken;
+    
+    dispatch_once(&unixTimeToken, ^{
+        sInterval = [[NSDate date] timeIntervalSince1970] * 1000 - CACurrentMediaTime()*1000;
+    });
+    return sInterval+CACurrentMediaTime()*1000;
+}
+
++ (NSArray<NSString *> *)extractPropertyNamesOfJSValueObject:(JSValue *)jsvalue
+{
+    if (!jsvalue) {
+        return nil;
+    }
+    
+    NSMutableArray* allKeys = nil;
+    
+    if ([self useJSCApiForCreateInstance]) {
+        JSContextRef contextRef = jsvalue.context.JSGlobalContextRef;
+        if (![jsvalue isObject]) {
+            WXAssert(NO, @"Invalid jsvalue for property enumeration.");
+            return nil;
+        }
+        JSValueRef jsException = NULL;
+        JSObjectRef instanceContextObjectRef = JSValueToObject(contextRef, jsvalue.JSValueRef, &jsException);
+        if (jsException != NULL) {
+            WXLogError(@"JSValueToObject Exception during create instance.");
+        }
+        BOOL somethingWrong = NO;
+        if (instanceContextObjectRef != NULL) {
+            JSPropertyNameArrayRef allKeyRefs = JSObjectCopyPropertyNames(contextRef, instanceContextObjectRef);
+            size_t keyCount = JSPropertyNameArrayGetCount(allKeyRefs);
+            
+            allKeys = [[NSMutableArray alloc] initWithCapacity:keyCount];
+            for (size_t i = 0; i < keyCount; i ++) {
+                JSStringRef nameRef = JSPropertyNameArrayGetNameAtIndex(allKeyRefs, i);
+                size_t len = JSStringGetMaximumUTF8CStringSize(nameRef);
+                if (len > 1024) {
+                    somethingWrong = YES;
+                    break;
+                }
+                char* buf = (char*)malloc(len + 5);
+                if (buf == NULL) {
+                    somethingWrong = YES;
+                    break;
+                }
+                bzero(buf, len + 5);
+                if (JSStringGetUTF8CString(nameRef, buf, len + 5) > 0) {
+                    NSString* keyString = [NSString stringWithUTF8String:buf];
+                    if ([keyString length] == 0) {
+                        somethingWrong = YES;
+                        free(buf);
+                        break;
+                    }
+                    [allKeys addObject:keyString];
+                }
+                else {
+                    somethingWrong = YES;
+                    free(buf);
+                    break;
+                }
+                free(buf);
+            }
+            JSPropertyNameArrayRelease(allKeyRefs);
+        } else {
+            somethingWrong = YES;
+        }
+        
+        if (somethingWrong) {
+            // may contain retain-cycle.
+            allKeys = (NSMutableArray*)[[jsvalue toDictionary] allKeys];
+        }
+    }
+    else {
+        allKeys = (NSMutableArray*)[[jsvalue toDictionary] allKeys];
+    }
+    
+    return allKeys;
+}
+
 @end
 
 

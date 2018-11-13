@@ -22,6 +22,7 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.support.annotation.NonNull;
+import android.support.v4.util.LruCache;
 import android.util.Pair;
 import android.text.TextUtils;
 
@@ -44,38 +45,38 @@ public class WXResourceUtils {
   private final static String RGB = "rgb";
   private final static String RGBA = "rgba";
   private final static SingleFunctionParser.FlatMapper<Integer> FUNCTIONAL_RGB_MAPPER =
-      new SingleFunctionParser.FlatMapper<Integer>() {
-        @Override
-        public Integer map(String raw) {
-          int color = WXUtils.parseUnitOrPercent(raw, COLOR_RANGE);
-          if (color < 0) {
-            color = 0;
-          } else if (color > COLOR_RANGE) {
-            color = COLOR_RANGE;
-          }
-          return color;
-        }
-      };
+          new SingleFunctionParser.FlatMapper<Integer>() {
+            @Override
+            public Integer map(String raw) {
+              int color = WXUtils.parseUnitOrPercent(raw, COLOR_RANGE);
+              if (color < 0) {
+                color = 0;
+              } else if (color > COLOR_RANGE) {
+                color = COLOR_RANGE;
+              }
+              return color;
+            }
+          };
 
   private final static SingleFunctionParser.NonUniformMapper<Number> FUNCTIONAL_RGBA_MAPPER =
-      new SingleFunctionParser.NonUniformMapper<Number>() {
-        @Override
-        public List<Number> map(List<String> raw) {
-          List<Number> result = new ArrayList<>(RGBA_SIZE);
-          int i, color;
-          for (i = 0; i < RGB_SIZE; i++) {
-            color = WXUtils.parseUnitOrPercent(raw.get(i), COLOR_RANGE);
-            if (color < 0) {
-              color = 0;
-            } else if (color > COLOR_RANGE) {
-              color = COLOR_RANGE;
+          new SingleFunctionParser.NonUniformMapper<Number>() {
+            @Override
+            public List<Number> map(List<String> raw) {
+              List<Number> result = new ArrayList<>(RGBA_SIZE);
+              int i, color;
+              for (i = 0; i < RGB_SIZE; i++) {
+                color = WXUtils.parseUnitOrPercent(raw.get(i), COLOR_RANGE);
+                if (color < 0) {
+                  color = 0;
+                } else if (color > COLOR_RANGE) {
+                  color = COLOR_RANGE;
+                }
+                result.add(color);
+              }
+              result.add(Float.valueOf(raw.get(i)));
+              return result;
             }
-            result.add(color);
-          }
-          result.add(Float.valueOf(raw.get(i)));
-          return result;
-        }
-      };
+          };
 
   static {
     colorMap.put("aliceblue", 0XFFF0F8FF);
@@ -238,21 +239,28 @@ public class WXResourceUtils {
     }
     color = color.trim(); //remove non visible codes
 
-    int resultColor = defaultColor;
-    Pair<Boolean, Integer> result;
-    ColorConvertHandler[] handlers = ColorConvertHandler.values();
-    for (ColorConvertHandler handler : handlers) {
-      try {
-        result = handler.handle(color);
-        if (result.first) {
-          resultColor = result.second;
-          break;
-        }
-      } catch (RuntimeException e) {
-        WXLogUtils.v("Color_Parser", WXLogUtils.getStackTrace(e));
-      }
+    Integer cache = WXUtils.sCache.get(color);
+    if(cache!=null){
+      return cache;
     }
-    return resultColor;
+    else {
+      int resultColor = defaultColor;
+      Pair<Boolean, Integer> result;
+      ColorConvertHandler[] handlers = ColorConvertHandler.values();
+      for (ColorConvertHandler handler : handlers) {
+        try {
+          result = handler.handle(color);
+          if (result.first) {
+            resultColor = result.second;
+            WXUtils.sCache.put(color, resultColor);
+            break;
+          }
+        } catch (RuntimeException e) {
+          WXLogUtils.v("Color_Parser", WXLogUtils.getStackTrace(e));
+        }
+      }
+      return resultColor;
+    }
   }
 
   /**
@@ -267,9 +275,9 @@ public class WXResourceUtils {
     if (valueList != null && valueList.size() == 3) {
       float[] points = parseGradientDirection(valueList.get(0), width, height);
       Shader shader = new LinearGradient(points[0], points[1],
-                                         points[2], points[3],
-                                         getColor(valueList.get(1), Color.WHITE), getColor(valueList.get(2), Color.WHITE),
-                                         Shader.TileMode.REPEAT);
+              points[2], points[3],
+              getColor(valueList.get(1), Color.WHITE), getColor(valueList.get(2), Color.WHITE),
+              Shader.TileMode.CLAMP);
       return shader;
     }
     return null;
@@ -398,7 +406,7 @@ public class WXResourceUtils {
       @NonNull Pair<Boolean, Integer> handle(String rawColor) {
         SingleFunctionParser<Integer> functionParser = new SingleFunctionParser<>(rawColor, FUNCTIONAL_RGB_MAPPER);
         List<Integer> rgb = functionParser.parse(RGB);
-        if (rgb.size() == RGB_SIZE) {
+        if (null != rgb && rgb.size() == RGB_SIZE) {
           return new Pair<>(Boolean.TRUE, Color.rgb(rgb.get(0), rgb.get(1), rgb.get(2)));
         } else {
           return new Pair<>(Boolean.FALSE, Color.TRANSPARENT);
@@ -413,10 +421,10 @@ public class WXResourceUtils {
         List<Number> rgba = functionParser.parse(RGBA);
         if (rgba.size() == RGBA_SIZE) {
           return new Pair<>(Boolean.TRUE, Color.argb(
-              parseAlpha(rgba.get(3).floatValue()),
-              rgba.get(0).intValue(),
-              rgba.get(1).intValue(),
-              rgba.get(2).intValue()));
+                  parseAlpha(rgba.get(3).floatValue()),
+                  rgba.get(0).intValue(),
+                  rgba.get(1).intValue(),
+                  rgba.get(2).intValue()));
         } else {
           return new Pair<>(Boolean.FALSE, Color.TRANSPARENT);
         }

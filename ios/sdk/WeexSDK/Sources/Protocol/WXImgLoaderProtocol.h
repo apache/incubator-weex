@@ -72,7 +72,7 @@ typedef NS_ENUM(NSInteger, WXImageLoaderCacheType) {
  *
  * @param options : The options to be used for download operation
  *
- * @param progressBlock: A block called while the download start
+ * @param progressBlock : A block called while the download start
  *
  * @param completedBlock : A block called once the download is completed.
  *                 image : the image which has been download to local.
@@ -85,5 +85,10 @@ typedef NS_ENUM(NSInteger, WXImageLoaderCacheType) {
                     options:(NSDictionary*)options
                    progress:(void(^)(NSInteger receivedSize, NSInteger expectedSize))progressBlock
                   completed:(void(^)(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL))completedBlock;
+
+/**
+ * Cancel the current download image
+ */
+- (void)cancelCurrentImageLoad:(UIImageView*)imageView;
 
 @end

@@ -90,7 +90,10 @@ public class StickyHeaderHelper {
           existedParent.removeView(headerView);
         }
         headerView.setTag(headComponent.getRef());
-        mParent.addView(headerView);
+        ViewGroup.MarginLayoutParams mlp =
+                new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+        mParent.addView(headerView, mlp);
         headerView.setTag(this);
         if(headComponent.getStickyOffset() > 0) {
           ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) headerView.getLayoutParams();
@@ -103,7 +106,7 @@ public class StickyHeaderHelper {
         headerView.setTranslationY(translationY);
       }
       changeFrontStickyVisible();
-      if (headComponent.getDomObject().getEvents().contains("sticky")) {
+      if (headComponent.getEvents().contains("sticky")) {
         headComponent.fireEvent("sticky");
       }
     }
@@ -113,9 +116,8 @@ public class StickyHeaderHelper {
   public void notifyStickyRemove(WXCell compToRemove) {
     if (compToRemove == null)
       return;
-    final WXCell component = mHeaderComps.remove(compToRemove.getRef());
+    final WXCell component = mHeaderComps.containsValue(compToRemove) ? mHeaderComps.remove(compToRemove.getRef()) : compToRemove;
     final View headerView = mHeaderViews.remove(compToRemove.getRef());
-
 
     if(component == null || headerView == null){
       if(WXEnvironment.isApkDebugable()) {
@@ -130,14 +132,14 @@ public class StickyHeaderHelper {
       public void run() {
         mParent.removeView(headerView);
         if(headerView.getVisibility() != View.VISIBLE){
-           headerView.setVisibility(View.VISIBLE);
+          headerView.setVisibility(View.VISIBLE);
         }
         component.recoverySticky();
         changeFrontStickyVisible();
 
       }
     }));
-    if (component.getDomObject().getEvents().contains("unsticky")) {
+    if (component.getEvents().contains("unsticky")) {
       component.fireEvent("unsticky");
     }
   }
@@ -167,13 +169,17 @@ public class StickyHeaderHelper {
   }
 
   public void  clearStickyHeaders(){
-      if(mHeaderViews.size() <= 0){
-        return;
-      }
-      Set<String> keys = mHeaderViews.keySet();
-      for(String key : keys){
-        notifyStickyRemove(mHeaderComps.get(key));
-      }
+    if(mHeaderViews.size() <= 0){
+      return;
+    }
+    Iterator<Map.Entry<String, WXCell>> iterator = mHeaderComps.entrySet().iterator();
+
+    while (iterator.hasNext()) {
+      Map.Entry<String, WXCell> next = iterator.next();
+      WXCell value = next.getValue();
+      iterator.remove();
+      notifyStickyRemove(value);
+    }
   }
 
 
@@ -183,19 +189,19 @@ public class StickyHeaderHelper {
     }
     boolean  fontVisible = false;
     for(int i=mParent.getChildCount()-1; i>=0; i--){
-         View view = mParent.getChildAt(i);
-         if(fontVisible && view.getTag() instanceof  StickyHeaderHelper){
-             if(view.getVisibility() != View.GONE){
-                  view.setVisibility(View.GONE);
-             }
-         }else{
-           if(view.getTag() instanceof  StickyHeaderHelper){
-               fontVisible = true;
-               if(view != null && view.getVisibility() != View.VISIBLE){
-                   view.setVisibility(View.VISIBLE);
-               }
-           }
-         }
+      View view = mParent.getChildAt(i);
+      if(fontVisible && view.getTag() instanceof  StickyHeaderHelper){
+        if(view.getVisibility() != View.GONE){
+          view.setVisibility(View.GONE);
+        }
+      }else{
+        if(view.getTag() instanceof  StickyHeaderHelper){
+          fontVisible = true;
+          if(view != null && view.getVisibility() != View.VISIBLE){
+            view.setVisibility(View.VISIBLE);
+          }
+        }
+      }
     }
   }
 }

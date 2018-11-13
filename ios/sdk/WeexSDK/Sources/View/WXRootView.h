@@ -24,4 +24,6 @@
 
 @property (nonatomic, weak) WXSDKInstance *instance;
 
+- (BOOL)isHasEvent;
+
 @end

@@ -21,17 +21,24 @@
 
 @implementation WXLocaleModule
 
-WX_EXPORT_METHOD_SYNC(@selector(getLanguage:))
+WX_EXPORT_METHOD(@selector(getLanguage:))
+WX_EXPORT_METHOD_SYNC(@selector(getLanguageSync))
 WX_EXPORT_METHOD_SYNC(@selector(getLanguages))
 
 /**
  Get preferred language of the user
  */
-- (NSString *)getLanguage:(WXKeepAliveCallback)callback {
+- (void)getLanguage:(WXKeepAliveCallback)callback {
     if (callback) {
         callback([NSLocale preferredLanguages][0], NO);
     }
-	return [NSLocale preferredLanguages][0];
+}
+
+/**
+ Get preferred language of the user
+ */
+- (NSString *)getLanguageSync {
+    return [NSLocale preferredLanguages][0];
 }
 
 /**

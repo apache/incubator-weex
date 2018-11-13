@@ -1,0 +1,6 @@
+com/taobao/weex/bridge/WXDebugJsBridge.java
+com/taobao/weex/bridge/WXParams.java
+com/taobao/weex/ui/component/list/template/jni/NativeRenderObjectUtils.java
+com/taobao/weex/base/SystemMessageHandler.java
+com/taobao/weex/bridge/WXBridge.java
+com/taobao/weex/layout/ContentBoxMeasurement.java

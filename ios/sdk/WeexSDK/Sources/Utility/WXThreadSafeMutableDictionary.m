@@ -18,49 +18,16 @@
  */
 
 #import "WXThreadSafeMutableDictionary.h"
-#import "WXUtility.h"
 #import <pthread/pthread.h>
-#import <os/lock.h>
 
 @interface WXThreadSafeMutableDictionary ()
 {
+    NSMutableDictionary* _dict;
     pthread_mutex_t _safeThreadDictionaryMutex;
     pthread_mutexattr_t _safeThreadDictionaryMutexAttr;
-    os_unfair_lock _unfairLock;// this type of lock is not recurisive
 }
 
-@property (nonatomic, strong) dispatch_queue_t queue;
-@property (nonatomic, strong) NSMutableDictionary* dict;
-
 @end
-
-#define OVERRIDE_METHOD(method,retValue) \
-do { \
-    _Pragma("clang diagnostic push") \
-    _Pragma("clang diagnostic ignored \"-Warc-performSelector-leaks\"") \
-    if (![WXUtility threadSafeCollectionUsingLock]) {\
-        dispatch_sync(_queue, ^{\
-            if ([_dict respondsToSelector:method]) {\
-            retValue = [_dict performSelector:method];\
-            }\
-        });\
-    } else {\
-        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {\
-            os_unfair_lock_lock(&_unfairLock);\
-            if ([_dict respondsToSelector:method]) {\
-                retValue = [_dict performSelector:method];\
-            }\
-            os_unfair_lock_unlock(&_unfairLock);\
-        } else {\
-            pthread_mutex_lock(&_safeThreadDictionaryMutex);\
-            if ([_dict respondsToSelector:method]) {\
-                retValue = [_dict performSelector:method];\
-            }\
-            pthread_mutex_unlock(&_safeThreadDictionaryMutex);\
-        }\
-    }\
-    _Pragma("clang diagnostic pop")\
-} while (0)
 
 @implementation WXThreadSafeMutableDictionary
 
@@ -68,14 +35,9 @@ do { \
 {
     self = [super init];
     if (self) {
-        NSString* uuid = [NSString stringWithFormat:@"com.taobao.weex.dictionary_%p", self];
-        _queue = dispatch_queue_create([uuid UTF8String], DISPATCH_QUEUE_CONCURRENT);
         pthread_mutexattr_init(&(_safeThreadDictionaryMutexAttr));
-        pthread_mutexattr_settype(&(_safeThreadDictionaryMutexAttr), PTHREAD_MUTEX_RECURSIVE);
+        pthread_mutexattr_settype(&(_safeThreadDictionaryMutexAttr), PTHREAD_MUTEX_RECURSIVE); // must use recursive lock
         pthread_mutex_init(&(_safeThreadDictionaryMutex), &(_safeThreadDictionaryMutexAttr));
-        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            _unfairLock = OS_UNFAIR_LOCK_INIT;
-        }
     }
     return self;
 }
@@ -98,11 +60,11 @@ do { \
     return self;
 }
 
-- (NSDictionary *)initWithContentsOfFile:(NSString *)path
+- (instancetype)initWithDictionary:(NSDictionary *)dictionary
 {
     self = [self initCommon];
     if (self) {
-        _dict = [NSMutableDictionary dictionaryWithContentsOfFile:path];
+        _dict = [NSMutableDictionary dictionaryWithDictionary:dictionary];
     }
     return self;
 }
@@ -131,161 +93,131 @@ do { \
 
 - (NSUInteger)count
 {
-    __block NSUInteger count;
-    if (![WXUtility threadSafeCollectionUsingLock]) {
-        dispatch_sync(_queue, ^{
-            count = _dict.count;
-        });
-    } else {
-        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(&_unfairLock);
-            count = [_dict count];
-            os_unfair_lock_unlock(&_unfairLock);
-        } else {
-            pthread_mutex_lock(&_safeThreadDictionaryMutex);
-            count = [_dict count];
-            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
-        }
+    @try {
+        pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        return [_dict count];
     }
-    return count;
+    @finally {
+        pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+    }
 }
 
-- (id)objectForKey:(id)aKey
+- (id)objectForKey:(id)key
 {
-    if (nil == aKey){
+    if (nil == key) {
         return nil;
     }
-    __block id obj;
-    if (![WXUtility threadSafeCollectionUsingLock]) {
-        dispatch_sync(_queue, ^{
-            obj = _dict[aKey];
-        });
-    } else {
-        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(&_unfairLock);
-            obj = _dict[aKey];
-            os_unfair_lock_unlock(&_unfairLock);
-        } else {
-            pthread_mutex_lock(&_safeThreadDictionaryMutex);
-            obj = _dict[aKey];
-            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
-        }
+    
+    @try {
+        pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        return [_dict objectForKey:key];
     }
-    return obj;
+    @finally {
+        pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+    }
+}
+
+- (id)objectForKeyedSubscript:(id)key
+{
+    if (nil == key) {
+        return nil;
+    }
+    
+    @try {
+        pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        return [_dict objectForKeyedSubscript:key];
+    }
+    @finally {
+        pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+    }
 }
 
 - (NSEnumerator *)keyEnumerator
 {
-    __block NSEnumerator *enu;
-    if (![WXUtility threadSafeCollectionUsingLock]) {
-        dispatch_sync(_queue, ^{
-            enu = [_dict keyEnumerator];
-        });
-    } else {
-        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(&_unfairLock);
-            enu = [_dict keyEnumerator];
-            os_unfair_lock_unlock(&_unfairLock);
-        } else {
-            pthread_mutex_lock(&_safeThreadDictionaryMutex);
-            enu = [_dict keyEnumerator];
-            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
-        }
+    @try {
+        pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        return [_dict keyEnumerator];
     }
-    return enu;
+    @finally {
+        pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+    }
 }
 
 - (void)setObject:(id)anObject forKey:(id<NSCopying>)aKey
 {
-    aKey = [aKey copyWithZone:NULL];
-    if (![WXUtility threadSafeCollectionUsingLock]) {
-        dispatch_barrier_async(_queue, ^{
-        _dict[aKey] = anObject;
-        });
-    } else {
-        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(&_unfairLock);
-            _dict[aKey] = anObject;
-            os_unfair_lock_unlock(&_unfairLock);
-        }else {
-            pthread_mutex_lock(&_safeThreadDictionaryMutex);
-            _dict[aKey] = anObject;
-            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
-        }
+    @try {
+        pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        [_dict setObject:anObject forKey:aKey];
+    }
+    @finally {
+        pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+    }
+}
+
+- (void)setObject:(id)anObject forKeyedSubscript:(id <NSCopying>)key
+{
+    @try {
+        pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        [_dict setObject:anObject forKeyedSubscript:key];
+    }
+    @finally {
+        pthread_mutex_unlock(&_safeThreadDictionaryMutex);
     }
 }
 
 - (NSArray *)allKeys
 {
-    __block NSArray *allKeys = nil;
-    OVERRIDE_METHOD(_cmd, allKeys);
-    return allKeys;
+    @try {
+        pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        return [_dict allKeys];
+    }
+    @finally {
+        pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+    }
 }
 
 - (NSArray *)allValues
 {
-    __block NSArray *allValues = nil;
-    OVERRIDE_METHOD(_cmd, allValues);
-    return allValues;
+    @try {
+        pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        return [_dict allValues];
+    }
+    @finally {
+        pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+    }
 }
 
 - (void)removeObjectForKey:(id)aKey
 {
-    if (![WXUtility threadSafeCollectionUsingLock]) {
-        dispatch_barrier_async(_queue, ^{
-            [_dict removeObjectForKey:aKey];
-        });
-    } else {
-        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(&_unfairLock);
-            [_dict removeObjectForKey:aKey];
-            os_unfair_lock_unlock(&_unfairLock);
-        }else {
-            pthread_mutex_lock(&_safeThreadDictionaryMutex);
-            [_dict removeObjectForKey:aKey];
-            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
-        }
+    @try {
+        pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        [_dict removeObjectForKey:aKey];
+    }
+    @finally {
+        pthread_mutex_unlock(&_safeThreadDictionaryMutex);
     }
 }
 
 - (void)removeAllObjects
 {
-    if (![WXUtility threadSafeCollectionUsingLock]) {
-        dispatch_barrier_async(_queue, ^{
-            [_dict removeAllObjects];
-        });
-    }else {
-        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(&_unfairLock);
-            [_dict removeAllObjects];
-            os_unfair_lock_unlock(&_unfairLock);
-        } else {
-            pthread_mutex_lock(&_safeThreadDictionaryMutex);
-            [_dict removeAllObjects];
-            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
-        }
+    @try {
+        pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        [_dict removeAllObjects];
+    }
+    @finally {
+        pthread_mutex_unlock(&_safeThreadDictionaryMutex);
     }
 }
 
-- (id)copy{
-    __block id copyInstance;
-    if (![WXUtility threadSafeCollectionUsingLock]) {
-        dispatch_sync(_queue, ^{
-            copyInstance = [_dict copy];
-        });
-    } else {
-        if (WX_SYS_VERSION_GREATER_THAN(@"10.0")) {
-            os_unfair_lock_lock(&_unfairLock);
-            copyInstance = [_dict copy];
-            os_unfair_lock_unlock(&_unfairLock);
-        } else {
-            pthread_mutex_lock(&_safeThreadDictionaryMutex);
-            copyInstance = [_dict copy];
-            pthread_mutex_unlock(&_safeThreadDictionaryMutex);
-        }
+- (id)copy
+{
+    @try {
+        pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        return [_dict copy];
     }
-    
-    return copyInstance;
+    @finally {
+        pthread_mutex_unlock(&_safeThreadDictionaryMutex);
+    }
 }
 
 - (void)dealloc

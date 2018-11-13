@@ -25,24 +25,27 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.view.View;
+
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 
 @RestrictTo(Scope.LIBRARY)
 public class AndroidViewWidget extends BaseWidget implements Destroyable {
 
-  private @Nullable View mView;
+  private @Nullable
+  View mView;
+
   public AndroidViewWidget(@NonNull FlatGUIContext context) {
     super(context);
   }
 
-  public void setContentView(@Nullable View view){
+  public void setContentView(@Nullable View view) {
     this.mView = view;
   }
 
   @Override
   public void setContentBox(int leftOffset, int topOffset, int rightOffset, int bottomOffset) {
-    if(mView!=null) {
+    if (mView != null) {
       mView.setPadding(leftOffset, topOffset, rightOffset, bottomOffset);
       invalidate();
     }
@@ -50,7 +53,7 @@ public class AndroidViewWidget extends BaseWidget implements Destroyable {
 
   @Override
   public void onDraw(@NonNull Canvas canvas) {
-    if(mView!=null) {
+    if (mView != null) {
       mView.draw(canvas);
     }
   }
@@ -63,7 +66,8 @@ public class AndroidViewWidget extends BaseWidget implements Destroyable {
     }
   }
 
-  public @Nullable View getView() {
+  public @Nullable
+  View getView() {
     return mView;
   }
 

@@ -21,31 +21,21 @@ package com.taobao.weex.dom;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import android.support.v4.util.ArrayMap;
 import android.text.Layout;
 import android.text.TextUtils;
-
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.binding.ELUtils;
-import com.taobao.weex.dom.binding.WXStatement;
-import com.taobao.weex.dom.flex.CSSAlign;
-import com.taobao.weex.dom.flex.CSSFlexDirection;
-import com.taobao.weex.dom.flex.CSSJustify;
-import com.taobao.weex.dom.flex.CSSPositionType;
-import com.taobao.weex.dom.flex.CSSWrap;
-import com.taobao.weex.el.parse.Parser;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import static com.taobao.weex.dom.binding.ELUtils.COMPONENT_PROPS;
-import static com.taobao.weex.dom.binding.ELUtils.EXCLUDES_BINDING;
 
 /**
  * Store value of component style
@@ -56,9 +46,14 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   private static final long serialVersionUID = 611132641365274134L;
   public static final int UNSET = -1;
 
-  private @NonNull final Map<String,Object> mStyles;
-  private Map<String,Map<String,Object>> mPesudoStyleMap = new ArrayMap<>();// clz_group:{styleMap}
-  private Map<String,Object> mPesudoResetStyleMap = new ArrayMap<>();
+  @NonNull
+  private Map<String,Object> mStyles;
+
+  @Nullable
+  private Map<String,Map<String,Object>> mPesudoStyleMap;// clz_group:{styleMap}
+
+  @Nullable
+  private Map<String,Object> mPesudoResetStyleMap;
 
   /**
    * dynamic binding attrs, can be null, only weex use
@@ -69,9 +64,14 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     mStyles = new ArrayMap<>();
   }
 
+  public WXStyle(Map<String, Object> styles){
+    this.mStyles = styles;
+    processPesudoClasses(this.mStyles);
+  }
+
   public WXStyle(Map<String, Object> mStyles, boolean byPesudo) {
     this();
-    this.putAll(filterBindingStyles(mStyles), byPesudo);
+    this.putAll(mStyles, byPesudo);
   }
 
   @Nullable
@@ -216,165 +216,13 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     }
     return (int) WXViewUtils.getRealPxByWidth(lineHeight,viewPortW);
   }
-  /*
-   * flexbox
-   **/
-  public CSSAlign getAlignItems() {
-    Object alignItems = get(Constants.Name.ALIGN_ITEMS);
-    if (alignItems == null) {
-      return CSSAlign.STRETCH;
-    }
-    return CSSAlignConvert.convert2AlignItems(alignItems.toString().trim());
-  }
 
-  public CSSAlign getAlignSelf() {
-    Object alignSelf = get(Constants.Name.ALIGN_SELF);
-    if (alignSelf == null) {
-      return CSSAlign.AUTO;
-    }
-    return CSSAlignConvert.convert2AlignSelf(alignSelf.toString().trim());
-  }
-
-  public float getFlex() {
-    return WXUtils.getFloat(get(Constants.Name.FLEX));
-  }
-
-  public CSSFlexDirection getFlexDirection() {
-    Object flexDirection = get(Constants.Name.FLEX_DIRECTION);
-    if (flexDirection == null) {
-      return CSSFlexDirection.COLUMN;
-    }
-    return CSSFlexDirectionConvert.convert(flexDirection.toString().trim());
-  }
-
-  public CSSJustify getJustifyContent() {
-    Object justifyContent = get(Constants.Name.JUSTIFY_CONTENT);
-    if (justifyContent == null) {
-      return CSSJustify.FLEX_START;
-    }
-    return CSSJustifyConvert.convert(justifyContent.toString().trim());
-  }
-
-  public CSSWrap getCSSWrap() {
-    Object cssWrap = get(Constants.Name.FLEX_WRAP);
-    if (cssWrap == null) {
-      return CSSWrap.NOWRAP;
-    }
-    return CSSWrapConvert.convert(cssWrap.toString().trim());
-  }
-
-  /*
-   * base
-   * @see getWidth(int viewport)
-   **/
-  @Deprecated
-  public float getWidth() {
-    return WXUtils.getFloat(get(Constants.Name.WIDTH));
-  }
-
-  public float getDefaultWidth() {
-    return WXUtils.getFloat(get(Constants.Name.DEFAULT_WIDTH));
-  }
-
-  public float getMinWidth() {
-    return WXUtils.getFloat(get(Constants.Name.MIN_WIDTH));
-  }
-
-  public float getMaxWidth() {
-    return WXUtils.getFloat(get(Constants.Name.MAX_WIDTH));
-  }
-
-  @Deprecated
-  public float getHeight() {
-    return WXUtils.getFloat(get(Constants.Name.HEIGHT));
-  }
-
-  public float getDefaultHeight() {
-    return WXUtils.getFloat(get(Constants.Name.DEFAULT_HEIGHT));
-  }
-
-  public float getMinHeight() {
-    return WXUtils.getFloat(get(Constants.Name.MIN_HEIGHT));
-  }
-
-  public float getMaxHeight() {
-    return WXUtils.getFloat(get(Constants.Name.MAX_HEIGHT));
-  }
-
-
-  public float getWidth(int viewport) {
-    return WXUtils.getFloatByViewport(get(Constants.Name.WIDTH), viewport);
-  }
-
-  public float getMinWidth(int viewport) {
-    return WXUtils.getFloatByViewport(get(Constants.Name.MIN_WIDTH), viewport);
-  }
-
-  public float getMaxWidth(int viewport) {
-    return WXUtils.getFloatByViewport(get(Constants.Name.MAX_WIDTH), viewport);
-  }
-
-  public float getHeight(int viewport) {
-    return WXUtils.getFloatByViewport(get(Constants.Name.HEIGHT), viewport);
-  }
-
-  public float getMinHeight(int viewport) {
-    return WXUtils.getFloatByViewport(get(Constants.Name.MIN_HEIGHT), viewport);
-  }
-
-  public float getMaxHeight(int viewport) {
-    return WXUtils.getFloatByViewport(get(Constants.Name.MAX_HEIGHT), viewport);
-  }
-  /*
-   * border
-   **/
   public float getBorderRadius() {
     float temp = WXUtils.getFloat(get(Constants.Name.BORDER_RADIUS));
     if (WXUtils.isUndefined(temp)) {
       return Float.NaN;
     }
     return temp;
-  }
-
-  private float getBorderWidth(String key) {
-    float temp = WXUtils.getFloat(get(key));
-    if (WXUtils.isUndefined(temp)) {
-      return getBorderWidth();
-    }
-    return temp;
-  }
-
-  private float getBorderWidth(String key, int viewport) {
-    float temp = WXUtils.getFloatByViewport(get(key), viewport);
-    if (WXUtils.isUndefined(temp)) {
-      return getBorderWidth(viewport);
-    }
-    return temp;
-  }
-  //TODO fix : only when set backgroundColor
-  @Deprecated
-  public float getBorderWidth() {
-    return WXUtils.getFloat(get(Constants.Name.BORDER_WIDTH));
-  }
-
-  public float getBorderWidth(int viewport) {
-    return WXUtils.getFloatByViewport(get(Constants.Name.BORDER_WIDTH), viewport);
-  }
-
-  public float getBorderRightWidth(int viewport) {
-    return getBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH, viewport);
-  }
-
-  public float getBorderTopWidth(int viewport) {
-    return getBorderWidth(Constants.Name.BORDER_TOP_WIDTH, viewport);
-  }
-
-  public float getBorderBottomWidth(int viewport) {
-    return getBorderWidth(Constants.Name.BORDER_BOTTOM_WIDTH, viewport);
-  }
-
-  public float getBorderLeftWidth(int viewport) {
-    return getBorderWidth(Constants.Name.BORDER_LEFT_WIDTH, viewport);
   }
 
   public String getBorderColor() {
@@ -385,176 +233,6 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   public String getBorderStyle() {
     Object borderStyle = get(Constants.Name.BORDER_STYLE);
     return borderStyle == null ? null : borderStyle.toString();
-  }
-
-  @Deprecated
-  public float getMargin(){
-    return WXUtils.getFloat(get(Constants.Name.MARGIN));
-  }
-
-  @Deprecated
-  public float getPadding(){
-    return WXUtils.getFloat(get(Constants.Name.PADDING));
-  }
-
-  public float getMargin(int viewport){
-    return WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
-  }
-
-  public float getPadding(int viewport){
-    return WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
-  }
-
-  /*
-   * margin
-   **/
-  public float getMarginTop() {
-    float temp = WXUtils.getFloat(get(Constants.Name.MARGIN_TOP));
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloat(get(Constants.Name.MARGIN));
-    }
-    return temp;
-  }
-
-  public float getMarginLeft() {
-    float temp = WXUtils.getFloat(get(Constants.Name.MARGIN_LEFT));
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloat(get(Constants.Name.MARGIN));
-    }
-    return temp;
-  }
-
-  public float getMarginRight() {
-    float temp = WXUtils.getFloat(get(Constants.Name.MARGIN_RIGHT));
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloat(get(Constants.Name.MARGIN));
-    }
-    return temp;
-  }
-
-  public float getMarginBottom() {
-    float temp = WXUtils.getFloat(get(Constants.Name.MARGIN_BOTTOM));
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloat(get(Constants.Name.MARGIN));
-    }
-    return temp;
-  }
-
-  /*
-   * margin
-   **/
-  public float getMarginTop(int viewport) {
-    float temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN_TOP), viewport);
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
-    }
-    return temp;
-  }
-
-  public float getMarginLeft(int viewport) {
-    float temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN_LEFT), viewport);
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
-    }
-    return temp;
-  }
-
-  public float getMarginRight(int viewport) {
-    float temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN_RIGHT), viewport);
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
-    }
-    return temp;
-  }
-
-  public float getMarginBottom(int viewport) {
-    float temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN_BOTTOM), viewport);
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
-    }
-    return temp;
-  }
-
-  /*
-   * padding
-   **/
-  public float getPaddingTop() {
-    float temp = WXUtils.getFloat(get(Constants.Name.PADDING_TOP));
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloat(get(Constants.Name.PADDING));
-    }
-    return temp;
-  }
-
-  public float getPaddingLeft() {
-    float temp = WXUtils.getFloat(get(Constants.Name.PADDING_LEFT));
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloat(get(Constants.Name.PADDING));
-    }
-    return temp;
-  }
-
-  public float getPaddingRight() {
-    float temp = WXUtils.getFloat(get(Constants.Name.PADDING_RIGHT));
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloat(get(Constants.Name.PADDING));
-    }
-    return temp;
-  }
-
-  public float getPaddingBottom() {
-    float temp = WXUtils.getFloat(get(Constants.Name.PADDING_BOTTOM));
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloat(get(Constants.Name.PADDING));
-    }
-    return temp;
-  }
-
-
-  /*
-   * padding
-   **/
-  public float getPaddingTop(int viewport) {
-    float temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING_TOP), viewport);
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
-    }
-    return temp;
-  }
-
-  public float getPaddingLeft(int viewport) {
-    float temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING_LEFT), viewport);
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
-    }
-    return temp;
-  }
-
-  public float getPaddingRight(int viewport) {
-    float temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING_RIGHT), viewport);
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
-    }
-    return temp;
-  }
-
-  public float getPaddingBottom(int viewport) {
-    float temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING_BOTTOM), viewport);
-    if (WXUtils.isUndefined(temp)) {
-      temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
-    }
-    return temp;
-  }
-
-  /*
-   * position
-   **/
-  public CSSPositionType getPosition() {
-    Object position = get(Constants.Name.POSITION);
-    if (position == null) {
-      return CSSPositionType.RELATIVE;
-    }
-    return CSSPositionTypeConvert.convert(position.toString().trim());
   }
 
   public boolean isSticky() {
@@ -574,35 +252,35 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   }
 
   public float getLeft() {
-    return WXUtils.getFloat(get(Constants.Name.LEFT));
-  }
-
-  public float getTop() {
-    return WXUtils.getFloat(get(Constants.Name.TOP));
+    float temp = WXUtils.getFloat(get(Constants.Name.LEFT));
+    if (WXUtils.isUndefined(temp)) {
+      return Float.NaN;
+    }
+    return temp;
   }
 
   public float getRight() {
-    return WXUtils.getFloat(get(Constants.Name.RIGHT));
+    float temp = WXUtils.getFloat(get(Constants.Name.RIGHT));
+    if (WXUtils.isUndefined(temp)) {
+      return Float.NaN;
+    }
+    return temp;
+  }
+
+  public float getTop() {
+    float temp = WXUtils.getFloat(get(Constants.Name.TOP));
+    if (WXUtils.isUndefined(temp)) {
+      return Float.NaN;
+    }
+    return temp;
   }
 
   public float getBottom() {
-    return WXUtils.getFloat(get(Constants.Name.BOTTOM));
-  }
-
-  public float getLeft(int viewport) {
-    return WXUtils.getFloatByViewport(get(Constants.Name.LEFT), viewport);
-  }
-
-  public float getTop(int viewport) {
-    return WXUtils.getFloatByViewport(get(Constants.Name.TOP), viewport);
-  }
-
-  public float getRight(int viewport) {
-    return WXUtils.getFloatByViewport(get(Constants.Name.RIGHT), viewport);
-  }
-
-  public float getBottom(int viewport) {
-    return WXUtils.getFloatByViewport(get(Constants.Name.BOTTOM), viewport);
+    float temp = WXUtils.getFloat(get(Constants.Name.BOTTOM));
+    if (WXUtils.isUndefined(temp)) {
+      return Float.NaN;
+    }
+    return temp;
   }
 
   /*
@@ -684,6 +362,9 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   @Override
   public Object put(String key, Object value) {
+    if(addBindingStyleIfStatement(key, value)){
+      return null;
+    }
     return mStyles.put(key,value);
   }
 
@@ -700,47 +381,63 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   public void putAll(Map<? extends String, ?> map, boolean byPesudo) {
     this.mStyles.putAll(map);
     if (!byPesudo) {
-      this.mPesudoResetStyleMap.putAll(map);
       processPesudoClasses(map);
     }
   }
 
+  public void updateStyle(Map<? extends String, ?> map, boolean byPesudo){
+      parseBindingStylesStatements(map);
+      putAll(map, byPesudo);
+  }
+
 
   public Map<String, Object> getPesudoResetStyles() {
+    if(mPesudoResetStyleMap == null){
+      mPesudoResetStyleMap = new ArrayMap<>();
+    }
     return mPesudoResetStyleMap;
   }
 
   public Map<String, Map<String, Object>> getPesudoStyles() {
+    if(mPesudoStyleMap == null){
+      mPesudoStyleMap = new ArrayMap<>();
+    }
     return mPesudoStyleMap;
   }
 
   <T extends String, V> void processPesudoClasses(Map<T, V> styles) {
-    Iterator<Map.Entry<T, V>> iterator = styles.entrySet().iterator();
-    Map<String, Map<String, Object>> pesudoStyleMap = mPesudoStyleMap;
-    while (iterator.hasNext()) {
-      Map.Entry<T, V> entry = iterator.next();
+    Map<String, Object> tempMap = null;
+    for(Map.Entry<T, V> entry:styles.entrySet()){
       //Key Format: "style-prop:pesudo_clz1:pesudo_clz2"
       String key = entry.getKey();
       int i;
       if ((i = key.indexOf(":")) > 0) {
+        initPesudoMapsIfNeed(styles);
         String clzName = key.substring(i);
         if (clzName.equals(Constants.PSEUDO.ENABLED)) {
           //enabled, use as regular style
           String styleKey = key.substring(0, i);
-          this.mStyles.put(styleKey, entry.getValue());
-          this.mPesudoResetStyleMap.put(styleKey, entry.getValue());
+          if(tempMap == null){
+            tempMap = new ArrayMap<>();
+          }
+          tempMap.put(styleKey, entry.getValue());
+          mPesudoResetStyleMap.put(styleKey, entry.getValue());
           continue;
         } else {
           clzName = clzName.replace(Constants.PSEUDO.ENABLED, "");//remove ':enabled' which is ignored
         }
 
-        Map<String, Object> stylesMap = pesudoStyleMap.get(clzName);
+        Map<String, Object> stylesMap = mPesudoStyleMap.get(clzName);
         if (stylesMap == null) {
           stylesMap = new ArrayMap<>();
-          pesudoStyleMap.put(clzName, stylesMap);
+          mPesudoStyleMap.put(clzName, stylesMap);
         }
         stylesMap.put(key.substring(0, i), entry.getValue());
       }
+    }
+
+    if (tempMap != null && !tempMap.isEmpty()) {
+      this.mStyles.putAll(tempMap);
     }
   }
 
@@ -760,27 +457,32 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return mStyles.values();
   }
 
-  @Override
-  protected WXStyle clone(){
-    WXStyle style = new WXStyle();
-    style.mStyles.putAll(this.mStyles);
-    style.mBindingStyle = mBindingStyle;
 
-    for(Entry<String,Map<String,Object>> entry:this.mPesudoStyleMap.entrySet()){
-      Map<String,Object> valueClone = new ArrayMap<>();
-      valueClone.putAll(entry.getValue());
-      style.mPesudoStyleMap.put(entry.getKey(),valueClone);
+
+  private void initPesudoMapsIfNeed(Map<? extends String, ?> styles){
+    if(mPesudoStyleMap == null){
+      mPesudoStyleMap = new ArrayMap<>();
     }
-
-    style.mPesudoResetStyleMap.putAll(this.mPesudoResetStyleMap);
-    return style;
+    if(mPesudoResetStyleMap == null){
+      mPesudoResetStyleMap = new ArrayMap<>();
+    }
+    if(mPesudoResetStyleMap.isEmpty()){
+      mPesudoResetStyleMap.putAll(styles);
+    }
   }
 
+
+
+  public void  parseStatements(){
+    if(this.mStyles != null){
+      this.mStyles = parseBindingStylesStatements(this.mStyles);
+    }
+  }
 
   /**
    * filter dynamic state ment
    * */
-  private Map<String, Object> filterBindingStyles(Map styles) {
+  private Map<String, Object> parseBindingStylesStatements(Map styles) {
     if(styles == null || styles.size() == 0){
       return styles;
     }
@@ -788,7 +490,13 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     Iterator<Entry<String,Object>> it =  entries.iterator();
     while (it.hasNext()){
       Map.Entry<String,Object> entry = it.next();
-      if(filterBindingStyle(entry.getKey(), entry.getValue())){
+      if(addBindingStyleIfStatement(entry.getKey(), entry.getValue())){
+        if(mPesudoStyleMap != null){
+          mPesudoStyleMap.remove(entry.getKey());
+        }
+        if(mPesudoResetStyleMap != null){
+          mPesudoResetStyleMap.remove(entry.getKey());
+        }
         it.remove();
       }
     }
@@ -798,19 +506,50 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   /**
    * filter dynamic attrs and statements
    * */
-  private boolean filterBindingStyle(String key, Object value) {
+  private boolean addBindingStyleIfStatement(String key, Object value) {
     if(ELUtils.isBinding(value)){
-        if(mBindingStyle == null){
-          mBindingStyle = new ArrayMap<String, Object>();
-        }
-        value = ELUtils.bindingBlock(value);
-        mBindingStyle.put(key, value);
-        return  true;
+      if(mBindingStyle == null){
+        mBindingStyle = new ArrayMap<String, Object>();
+      }
+      value = ELUtils.bindingBlock(value);
+      mBindingStyle.put(key, value);
+      return  true;
     }
     return  false;
   }
 
   public ArrayMap<String, Object> getBindingStyle() {
     return mBindingStyle;
+  }
+
+  @Override
+  public WXStyle clone(){
+    WXStyle style = new WXStyle();
+    style.mStyles.putAll(this.mStyles);
+    if(mBindingStyle != null){
+      style.mBindingStyle = new ArrayMap<>(mBindingStyle);
+    }
+    if(mPesudoStyleMap != null) {
+      style.mPesudoStyleMap = new ArrayMap<>();
+      for (Entry<String, Map<String, Object>> entry : this.mPesudoStyleMap.entrySet()) {
+        Map<String, Object> valueClone = new ArrayMap<>();
+        valueClone.putAll(entry.getValue());
+        style.mPesudoStyleMap.put(entry.getKey(), valueClone);
+      }
+    }
+
+    if(mPesudoResetStyleMap!=null) {
+      style.mPesudoResetStyleMap = new ArrayMap<>();
+      style.mPesudoResetStyleMap.putAll(this.mPesudoResetStyleMap);
+    }
+
+
+    return style;
+  }
+
+  @Override
+  @RestrictTo(Scope.LIBRARY)
+  public String toString() {
+    return mStyles.toString();
   }
 }

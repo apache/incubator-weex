@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -64,29 +64,29 @@ public class WXLogUtils {
 
   public static void renderPerformanceLog(String type, long time) {
     if (WXEnvironment.isApkDebugable() || WXEnvironment.isPerf()) {
-      builder.setLength(0);
-      builder.append("[render time]").append(type).append(":").append(time);
-      Log.d(WEEX_PERF_TAG, builder.substring(0));
-      writeConsoleLog("debug", builder.substring(0));
+//      builder.setLength(0);
+//      builder.append("[render time]").append(type).append(":").append(time);
+//      Log.d(WEEX_PERF_TAG, builder.substring(0));
+//      writeConsoleLog("debug", builder.substring(0));
     }
   }
 
   private static void log(String tag, String msg, LogLevel level){
-	if(msg != null && tag != null && sLogWatcher !=null){
-	  sLogWatcher.onLog(level.getName(), tag, msg);
-	}
+    if(msg != null && tag != null && sLogWatcher !=null){
+      sLogWatcher.onLog(level.getName(), tag, msg);
+    }
 
-	if (WXEnvironment.isApkDebugable()) {
-        Log.println(level.getPriority(),tag, msg);
+    if (WXEnvironment.isApkDebugable()) {
+      Log.println(level.getPriority(),tag, msg);
       // if not debug level then print log
       if(!level.getName().equals("debug")){
-		writeConsoleLog(level.getName(), msg);
-	  }
+        writeConsoleLog(level.getName(), msg);
+      }
     }else {
-	  if(level.getPriority() - LogLevel.WARN.getPriority() >=0){
-		Log.println(level.getPriority(),tag, msg);
-	  }
-	}
+      if(level.getPriority() - LogLevel.WARN.getPriority() >=0){
+        Log.println(level.getPriority(),tag, msg);
+      }
+    }
   }
 
   public static void d(String msg) {
@@ -123,11 +123,11 @@ public class WXLogUtils {
 
   public static void d(String tag, String msg) {
 
-	if(!TextUtils.isEmpty(tag) && !TextUtils.isEmpty(msg)){
-	  log(tag, msg, LogLevel.DEBUG);
+    if(!TextUtils.isEmpty(tag) && !TextUtils.isEmpty(msg)){
+      log(tag, msg, LogLevel.DEBUG);
 
-	  if(WXEnvironment.isApkDebugable()){//sLogLevel in debug mode is "LogLevel.DEBUG"
-		if ("jsLog".equals(tag) && jsLogWatcherList != null && jsLogWatcherList.size() > 0) {
+      if(WXEnvironment.isApkDebugable()){//sLogLevel in debug mode is "LogLevel.DEBUG"
+        if ("jsLog".equals(tag) && jsLogWatcherList != null && jsLogWatcherList.size() > 0) {
           for (JsLogWatcher jsLogWatcher : jsLogWatcherList) {
             if (msg.endsWith("__DEBUG")) {
               jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__DEBUG", ""));
@@ -141,20 +141,20 @@ public class WXLogUtils {
               jsLogWatcher.onJsLog(Log.DEBUG, msg);
             }
           }
-		}
+        }
 
-		/** This log method will be invoked from jni code, so try to extract loglevel from message. **/
-		writeConsoleLog("debug", tag + ":" + msg);
-		if(msg.contains(" | __")){
-		  String[] msgs=msg.split(" | __");
-		  LogLevel level;
-		  if( msgs!=null && msgs.length==4 && !TextUtils.isEmpty(msgs[0]) && !TextUtils.isEmpty(msgs[2])){
-			level=getLogLevel(msgs[2]);
-			return;
-		  }
-		}
-	  }
-	}
+        /** This log method will be invoked from jni code, so try to extract loglevel from message. **/
+        writeConsoleLog("debug", tag + ":" + msg);
+        if(msg.contains(" | __")){
+          String[] msgs=msg.split(" | __");
+          LogLevel level;
+          if( msgs!=null && msgs.length==4 && !TextUtils.isEmpty(msgs[0]) && !TextUtils.isEmpty(msgs[2])){
+            level=getLogLevel(msgs[2]);
+            return;
+          }
+        }
+      }
+    }
   }
 
   private static LogLevel getLogLevel(String level) {
@@ -220,12 +220,12 @@ public class WXLogUtils {
   }
 
   public static void w(String prefix, Throwable e) {
-      w(prefix + getStackTrace(e));
+    w(prefix + getStackTrace(e));
 
   }
 
   public static void e(String prefix, Throwable e) {
-      e(prefix + getStackTrace(e));
+    e(prefix + getStackTrace(e));
 
   }
 

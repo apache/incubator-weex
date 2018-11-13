@@ -23,16 +23,15 @@ package com.taobao.weex.bridge;
  */
 
 public class ModuleFactoryImpl {
-    public ModuleFactory mFactory = null;
-    public boolean hasRigster = false;
+  public ModuleFactory mFactory = null;
+  public boolean hasRigster = false;
 
-    public ModuleFactoryImpl(ModuleFactory factory) {
-        mFactory = factory;
-    }
+  public ModuleFactoryImpl(ModuleFactory factory) {
+    mFactory = factory;
+  }
 
-    public ModuleFactoryImpl(ModuleFactory factory, boolean rigister) {
-        mFactory = factory;
-        hasRigster = rigister;
-    }
+  public ModuleFactoryImpl(ModuleFactory factory, boolean rigister) {
+    mFactory = factory;
+    hasRigster = rigister;
+  }
 }
-

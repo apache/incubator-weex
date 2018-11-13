@@ -30,25 +30,27 @@ import java.lang.reflect.Type;
  * Created by sospartan on 10/11/2016.
  */
 
-public final class NativeInvokeHelper {
+public class NativeInvokeHelper {
   private String mInstanceId;
 
   public NativeInvokeHelper(String instanceId){
-      mInstanceId = instanceId;
+    mInstanceId = instanceId;
   }
 
   public Object invoke(final Object target,final Invoker invoker,JSONArray args) throws Exception {
     final Object[] params = prepareArguments(
-        invoker.getParameterTypes(),
-        args);
+            invoker.getParameterTypes(),
+            args);
     if (invoker.isRunOnUIThread()) {
       WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
         public void run() {
-          try {
-            invoker.invoke(target, params);
-          } catch (Exception e) {
-            throw new RuntimeException(target + "Invoker " + invoker.toString() ,e);
+          if (invoker != null) {
+            try {
+              invoker.invoke(target, params);
+            } catch (Exception e) {
+              throw new RuntimeException(target + "Invoker " + invoker.toString(), e);
+            }
           }
         }
       }, 0);
@@ -58,7 +60,7 @@ public final class NativeInvokeHelper {
     return null;
   }
 
-  private Object[] prepareArguments(Type[] paramClazzs, JSONArray args) throws Exception {
+  protected Object[] prepareArguments(Type[] paramClazzs, JSONArray args) throws Exception {
     Object[] params = new Object[paramClazzs.length];
     Object value;
     Type paramClazz;

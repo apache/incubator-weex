@@ -107,7 +107,7 @@ public class Wson {
 
 
     /**
-     * serialize object to wson data, please use WXJsonUtils.wsonWXJSObject
+     * serialize object to wson data, please use WXJsonUtils.toWsonOrJsonWXJSObject
      * */
     public static final byte[] toWson(Object object){
         if(object == null){

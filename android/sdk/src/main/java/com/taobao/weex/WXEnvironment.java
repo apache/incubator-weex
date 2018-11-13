@@ -27,26 +27,41 @@ import android.graphics.Typeface;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 
-import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
-import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.TypefaceUtil;
-import com.taobao.weex.utils.WXExceptionUtils;
+import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
 
+import org.w3c.dom.Text;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+
+import dalvik.system.PathClassLoader;
 
 public class WXEnvironment {
 
   public static final String OS = "android";
-  public static final String SYS_VERSION = android.os.Build.VERSION.RELEASE;
+  public static String SYS_VERSION = android.os.Build.VERSION.RELEASE;
+  static{
+    if(SYS_VERSION != null && SYS_VERSION.toUpperCase().equals("P")){
+        SYS_VERSION = "9.0.0";
+    }
+  }
   public static final String SYS_MODEL = android.os.Build.MODEL;
   public static final String ENVIRONMENT = "environment";
   public static final String WEEX_CURRENT_KEY = "wx_current_url";
@@ -70,7 +85,7 @@ public class WXEnvironment {
    * Debug model
    */
   public static boolean sDebugMode = false;
-  public static boolean sForceEnableDevTool = false;
+  public static final boolean sForceEnableDevTool = true;
   public static String sDebugWsUrl = "";
   public static boolean sDebugServerConnectable = false;
   public static boolean sRemoteDebugMode = false;
@@ -84,6 +99,13 @@ public class WXEnvironment {
   /** from init to sdk-ready **/
   public static long sSDKInitTime =0;
 
+  /**
+   * component and modules ready
+   * */
+  public static long sComponentsAndModulesReadyTime = 0;
+
+  public static boolean sInAliWeex = false;
+
   public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
   public static boolean isPerf = false;
@@ -91,6 +113,23 @@ public class WXEnvironment {
   private static boolean openDebugLog = false;
 
   private static String sGlobalFontFamily;
+
+  public static final String CORE_SO_NAME = "weexcore";
+  public static final String CORE_JSS_SO_NAME = "weexjss";
+  public static final String CORE_JSC_SO_NAME = "JavaScriptCore";
+  /**
+   * this marked jsb.so's version, Change this if we want to update jsb.so
+   */
+  public static final int CORE_JSB_SO_VERSION = 1;
+
+  private static  String CORE_JSS_SO_PATH = null;
+
+  private static String CORE_JSS_ICU_PATH = null;
+
+  private static String CORE_JSC_SO_PATH = null;
+
+  private static String LIB_LD_PATH = null;
+
 
   private static Map<String, String> options = new HashMap<>();
   static {
@@ -129,7 +168,7 @@ public class WXEnvironment {
     }
     configs.putAll(options);
     if(configs!=null&&configs.get(WXConfig.appName)==null && sApplication!=null){
-       configs.put(WXConfig.appName, sApplication.getPackageName());
+      configs.put(WXConfig.appName, sApplication.getPackageName());
     }
     return configs;
   }
@@ -209,7 +248,7 @@ public class WXEnvironment {
     boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport() && !isX86AndExcluded;
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("WXEnvironment.sSupport:" + isCPUSupport
-                   + "isX86AndExclueded: "+ isX86AndExcluded);
+              + "isX86AndExclueded: "+ isX86AndExcluded);
     }
     return isCPUSupport;
   }
@@ -236,7 +275,7 @@ public class WXEnvironment {
        */
       e.printStackTrace();
     }
-    return false;
+    return true;
   }
 
   public static boolean isPerf() {
@@ -245,7 +284,7 @@ public class WXEnvironment {
 
   private static String getDevId() {
     return sApplication == null ? "" : ((TelephonyManager) sApplication
-        .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+            .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
   }
 
   public static Application getApplication() {
@@ -293,6 +332,20 @@ public class WXEnvironment {
     return path;
   }
 
+  public static String getCrashFilePath(Context context) {
+    if (context == null) {
+        return "";
+    }
+
+    File dir = context.getDir("crash", Context.MODE_PRIVATE);
+    if (dir == null)
+        return "";
+
+    String crashDir = dir.getAbsolutePath();
+
+    return crashDir;
+  }
+
   public static String getGlobalFontFamilyName() {
     return sGlobalFontFamily;
   }
@@ -322,8 +375,156 @@ public class WXEnvironment {
   public static void  setApkDebugable(boolean debugable){
     isApkDebug  = debugable;
     if(!isApkDebug){
-       openDebugLog = false;
+      openDebugLog = false;
     }
   }
 
+  public static String getCacheDir() {
+    final Application application = getApplication();
+    if (application == null || application.getApplicationContext() == null)
+      return null;
+    return application.getApplicationContext().getCacheDir().getPath();
+  }
+
+  public static boolean extractSo() {
+    File sourceFile = new File(getApplication().getApplicationContext().getApplicationInfo().sourceDir);
+    final String cacheDir = getCacheDir();
+    if (sourceFile.exists() && !TextUtils.isEmpty(cacheDir)) {
+      try {
+        WXFileUtils.extractSo(sourceFile.getAbsolutePath(), cacheDir);
+      } catch (IOException e) {
+        WXLogUtils.e("extractSo error " + e.getMessage());
+//        e.printStackTrace();
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  private static String findIcuPath() {
+    File file = new File("/proc/self/maps");
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new FileReader(file));
+      String tempString = null;
+      while ((tempString = reader.readLine()) != null) {
+        if (tempString.contains("icudt")) {
+
+          int i = tempString.indexOf('/');
+
+          String substring = tempString.substring(i);
+          return substring.trim();
+        }
+      }
+      reader.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException e1) {
+        }
+      }
+    }
+
+    return null;
+  }
+
+
+  public static String findSoPath(String libName) {
+    String soPath = ((PathClassLoader) (WXEnvironment.class.getClassLoader())).findLibrary(libName);
+    if (!TextUtils.isEmpty(soPath)) {
+      File soFile = new File(soPath);
+      if (soFile.exists()) {
+        WXLogUtils.e(libName + "'s Path is" + soPath);
+        return soFile.getAbsolutePath();
+      } else {
+        WXLogUtils.e(libName + "'s Path is " + soPath + " but file is not exist");
+      }
+    }
+
+    String realName = "lib" + libName + ".so";
+    String cacheDir = getCacheDir();
+    if (TextUtils.isEmpty(cacheDir)) {
+      WXLogUtils.e("cache dir is null");
+      return "";
+    }
+
+
+    if (cacheDir.indexOf("/cache") > 0) {
+      soPath = new File(cacheDir.replace("/cache", "/lib"), realName).getAbsolutePath();
+    }
+
+
+    final File soFile = new File(soPath);
+    if (soFile.exists()) {
+      WXLogUtils.e(libName + "use lib so");
+      return soPath;
+    } else {
+      //unzip from apk file
+      final boolean success = extractSo();
+      if (success) {
+        return new File(getCacheDir(), realName).getAbsolutePath();
+      }
+    }
+    return soPath;
+  }
+
+  public static String getLibJScRealPath() {
+    if(TextUtils.isEmpty(CORE_JSC_SO_PATH)) {
+      CORE_JSC_SO_PATH = findSoPath(CORE_JSC_SO_NAME);
+      WXLogUtils.e("findLibJscRealPath " + CORE_JSC_SO_PATH);
+    }
+    return CORE_JSC_SO_PATH;
+  }
+
+  public static String getLibJssRealPath() {
+    if(TextUtils.isEmpty(CORE_JSS_SO_PATH)) {
+      CORE_JSS_SO_PATH = findSoPath(CORE_JSS_SO_NAME);
+      WXLogUtils.e("findLibJssRealPath " + CORE_JSS_SO_PATH);
+    }
+
+    return CORE_JSS_SO_PATH;
+  }
+
+  public static String getLibJssIcuPath() {
+    if(TextUtils.isEmpty(CORE_JSS_ICU_PATH)){
+      CORE_JSS_ICU_PATH = findIcuPath();
+    }
+
+    return CORE_JSS_ICU_PATH;
+  }
+
+  public static String getLibLdPath() {
+    if (TextUtils.isEmpty(LIB_LD_PATH)) {
+      ClassLoader classLoader = WXEnvironment.class.getClassLoader();
+      try {
+        Method getLdLibraryPath = classLoader.getClass().getMethod("getLdLibraryPath", new Class[0]);
+        LIB_LD_PATH = (String) getLdLibraryPath.invoke(classLoader, new Object[0]);
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
+      } catch (NoSuchMethodException e) {
+        e.printStackTrace();
+      }
+    }
+
+    if(TextUtils.isEmpty(LIB_LD_PATH)) {
+      try {
+        String property = System.getProperty("java.library.path");
+        String libJScRealPath = getLibJScRealPath();
+        if(!TextUtils.isEmpty(libJScRealPath)) {
+          LIB_LD_PATH = new File(libJScRealPath).getParent() + ":" + property;
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+
+    WXLogUtils.e("getLibLdPath is " + LIB_LD_PATH);
+    return LIB_LD_PATH;
+  }
 }

@@ -20,24 +20,32 @@ package com.taobao.weex.ui.component.list;
 
 import android.content.Context;
 import android.os.Build;
-import android.os.Build.VERSION_CODES;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
-import android.support.annotation.RestrictTo.Scope;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
-import com.taobao.weex.common.Constants.Name;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXAttr;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXHeader;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.flat.WidgetContainer;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
+import org.w3c.dom.Text;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
 
 import static com.taobao.weex.common.Constants.Name.STICKY_OFFSET;
 
@@ -54,7 +62,7 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     private View mHeadView;
 
     /** used in list sticky detect **/
-    private int mScrollPositon = -1;
+    private int mScrollPosition = -1;
     private boolean mFlatUIEnabled = false;
 
 
@@ -62,26 +70,43 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
 
     private boolean isSourceUsed = false;
 
+    private boolean isAppendTreeDone;
 
-    @Deprecated
-    public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-        super(instance, dom, parent);
-        lazy(true);
+    private CellAppendTreeListener cellAppendTreeListener;
+
+    public static class Creator implements ComponentCreator {
+        public WXComponent createInstance(WXSDKInstance instance,
+                                          WXVContainer parent,
+                                          BasicComponentData basicComponentData)
+                throws IllegalAccessException, InvocationTargetException, InstantiationException {
+            return new WXCell(instance, parent, true, basicComponentData);
+        }
     }
 
-    public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
-        super(instance, dom, parent);
+    @Deprecated
+    public WXCell(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+        super(instance, parent, basicComponentData);
+    }
+
+    public WXCell(WXSDKInstance instance, WXVContainer parent, boolean isLazy, BasicComponentData basicComponentData) {
+        super(instance, parent, basicComponentData);
         lazy(true);
-        if(Build.VERSION.SDK_INT< VERSION_CODES.LOLLIPOP) {
+        if(Build.VERSION.SDK_INT< Build.VERSION_CODES.LOLLIPOP) {
             try {
                 //TODO a WTF is necessary if anyone try to change the flat flag during update attrs.
-                WXAttr attr = getDomObject().getAttrs();
-                if (attr.containsKey(Name.FLAT)) {
-                    mFlatUIEnabled = WXUtils.getBoolean(attr.get(Name.FLAT), false);
+                WXAttr attr = getAttrs();
+                if (attr.containsKey(Constants.Name.FLAT)) {
+                    mFlatUIEnabled = WXUtils.getBoolean(attr.get(Constants.Name.FLAT), false);
                 }
             } catch (NullPointerException e) {
                 WXLogUtils.e("Cell", WXLogUtils.getStackTrace(e));
             }
+        }
+        if (!canRecycled()){
+            instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_CELL_DATA_UN_RECYCLE_NUM,1);
+        }
+        if (TextUtils.isEmpty(getAttrs().getScope())){
+            instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_CELL_UN_RE_USE_NUM,1);
         }
     }
 
@@ -90,10 +115,8 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
         return super.isLazy() && !isFixed();
     }
 
-
-
     @Override
-    @RestrictTo(Scope.LIBRARY)
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
     public boolean isFlatUIEnabled() {
         return mFlatUIEnabled;
     }
@@ -103,7 +126,7 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
      */
     @Override
     protected WXFrameLayout initComponentHostView(@NonNull Context context) {
-        if (isSticky()) {
+        if (isSticky() || this instanceof WXHeader) {
             WXFrameLayout view = new WXFrameLayout(context);
             mRealView = new WXFrameLayout(context);
             view.addView(mRealView);
@@ -130,12 +153,12 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
         mLastLocationY = l;
     }
 
-    public void setScrollPositon(int pos){
-        mScrollPositon = pos;
+    void setScrollPositon(int pos){
+        mScrollPosition = pos;
     }
 
     public int getScrollPositon() {
-        return mScrollPositon;
+        return mScrollPosition;
     }
 
     @Override
@@ -155,8 +178,8 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
             getHostView().removeView(mHeadView);
             mRealView = (ViewGroup) mHeadView;
             mTempStickyView = new FrameLayout(getContext());
-            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) getDomObject().getLayoutWidth(),
-                    (int) getDomObject().getLayoutHeight());
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) getLayoutWidth(),
+                    (int) getLayoutHeight());
             getHostView().addView(mTempStickyView, lp);
             mHeadView.setTranslationX(headerViewOffsetX);
             mHeadView.setTranslationY(headerViewOffsetY);
@@ -177,10 +200,8 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
             if(mHeadView.getParent() != null){
                 ((ViewGroup)mHeadView.getParent()).removeView(mHeadView);
             }
-            if(getHostView() != null) {
-                getHostView().removeView(mTempStickyView);
-                getHostView().addView(mHeadView);
-            }
+            getHostView().removeView(mTempStickyView);
+            getHostView().addView(mHeadView);
             mHeadView.setTranslationX(0);
             mHeadView.setTranslationY(0);
         }
@@ -188,9 +209,12 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
 
     @Override
     protected void mountFlatGUI() {
-      if(getHostView()!=null) {
-        getHostView().mountFlatGUI(widgets);
-      }
+        if(getHostView()!=null) {
+            if(widgets == null){
+                widgets = new LinkedList<>();
+            }
+            getHostView().mountFlatGUI(widgets);
+        }
     }
 
     @Override
@@ -206,15 +230,11 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     }
 
     public int getStickyOffset(){
-        if(getDomObject() == null){
-            return  0;
-        }
-        WXDomObject domObject = (WXDomObject) getDomObject();
-        if(domObject.getAttrs().get(STICKY_OFFSET) == null){
+        if(getAttrs().get(STICKY_OFFSET) == null){
             return 0;
         }
-        float  offset = WXUtils.getFloat(domObject.getAttrs().get(STICKY_OFFSET));
-        return (int)(WXViewUtils.getRealPxByWidth(offset,domObject.getViewPortWidth()));
+        float  offset = WXUtils.getFloat(getAttrs().get(STICKY_OFFSET));
+        return (int)(WXViewUtils.getRealPxByWidth(offset, getViewPortWidth()));
     }
 
     public Object getRenderData() {
@@ -233,4 +253,28 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
         isSourceUsed = sourceUsed;
     }
 
+
+    public boolean isAppendTreeDone(){
+        return isAppendTreeDone;
+    }
+
+    @Override
+    public void appendTreeCreateFinish() {
+        super.appendTreeCreateFinish();
+        isAppendTreeDone = true;
+        if(cellAppendTreeListener != null){
+            cellAppendTreeListener.onAppendTreeDone();
+        }
+    }
+
+    public void setCellAppendTreeListener(CellAppendTreeListener cellAppendTreeListener) {
+        this.cellAppendTreeListener = cellAppendTreeListener;
+        if(isAppendTreeDone){
+            cellAppendTreeListener.onAppendTreeDone();
+        }
+    }
+
+    public interface CellAppendTreeListener{
+        public void onAppendTreeDone();
+    }
 }

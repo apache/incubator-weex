@@ -29,6 +29,4 @@
 @property(nonatomic, strong) WXRecycleListDataManager *dataManager;
 @property(nonatomic, strong) WXRecycleListTemplateManager *templateManager;
 @property(nonatomic, strong) WXRecycleListUpdateManager *updateManager;
-
-
 @end

@@ -23,59 +23,24 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
-
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.CSSShorthand;
 
 class BorderUtil {
 
-  static <T> T fetchFromSparseArray(@Nullable SparseArray<T> array, int position, T fallback) {
-    return array == null ? fallback :
-           array.get(position, array.get(Spacing.ALL));
-  }
-
   static int fetchFromSparseArray(@Nullable SparseIntArray array, int position, int fallback) {
     return array == null ? fallback :
-           array.get(position, array.get(Spacing.ALL));
-  }
-
-  static <T> void updateSparseArray(@NonNull SparseArray<T> array, int position, T value) {
-    updateSparseArray(array, position, value, false);
+            array.get(position, array.get(CSSShorthand.EDGE.ALL.ordinal()));
   }
 
   static void updateSparseArray(@NonNull SparseIntArray array, int position, int value) {
-      if (position == Spacing.ALL) {
-        array.put(Spacing.ALL, value);
-        array.put(Spacing.TOP, value);
-        array.put(Spacing.LEFT, value);
-        array.put(Spacing.RIGHT, value);
-        array.put(Spacing.BOTTOM, value);
-      } else {
-        array.put(position, value);
-      }
-    }
-
-  static <T> void updateSparseArray(@NonNull SparseArray<T> array, int position, T value,
-                             boolean borderRadius) {
-    if (borderRadius) {
-      if (position == BorderDrawable.BORDER_RADIUS_ALL) {
-        array.put(BorderDrawable.BORDER_RADIUS_ALL, value);
-        array.put(BorderDrawable.BORDER_TOP_LEFT_RADIUS, value);
-        array.put(BorderDrawable.BORDER_TOP_RIGHT_RADIUS, value);
-        array.put(BorderDrawable.BORDER_BOTTOM_LEFT_RADIUS, value);
-        array.put(BorderDrawable.BORDER_BOTTOM_RIGHT_RADIUS, value);
-      } else {
-        array.put(position, value);
-      }
+    if (position == CSSShorthand.EDGE.ALL.ordinal()) {
+      array.put(CSSShorthand.EDGE.ALL.ordinal(), value);
+      array.put(CSSShorthand.EDGE.TOP.ordinal(), value);
+      array.put(CSSShorthand.EDGE.LEFT.ordinal(), value);
+      array.put(CSSShorthand.EDGE.RIGHT.ordinal(), value);
+      array.put(CSSShorthand.EDGE.BOTTOM.ordinal(), value);
     } else {
-      if (position == Spacing.ALL) {
-        array.put(Spacing.ALL, value);
-        array.put(Spacing.TOP, value);
-        array.put(Spacing.LEFT, value);
-        array.put(Spacing.RIGHT, value);
-        array.put(Spacing.BOTTOM, value);
-      } else {
-        array.put(position, value);
-      }
+      array.put(position, value);
     }
   }
 }

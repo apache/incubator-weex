@@ -2,7 +2,7 @@
   "name": "weex",
   "version": "0.12.2",
   "subversion": {
-    "framework": "0.23.9",
+    "framework": "0.29.0",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -37,13 +37,14 @@
   "scripts": {
     "build:jsfm": "node build/build.js jsfm",
     "build:env": "WEEX_FREEZE=true node build/build.js env",
+    "build:polyfill": "node build/build.js polyfill",
     "build:native": "node build/build.js native",
     "build:vue": "node build/build.js vue",
     "build:rax": "node build/build.js rax",
     "build:runtime": "node build/build.js runtime",
     "build:legacy": "node build/build.js legacy",
     "build:vanilla": "node build/build.js vanilla",
-    "install:buildtools": "npm i webpack@^1.0 rollup rollup-watch rollup-plugin-buble rollup-plugin-json rollup-plugin-eslint rollup-plugin-commonjs rollup-plugin-postcss rollup-plugin-replace rollup-plugin-uglify rollup-plugin-node-resolve babel-core babel-eslint babel-istanbul babel-loader babel-plugin-coverage babel-preset-es2015 babel-runtime",
+    "install:buildtools": "npm i webpack@^1.0 rollup rollup-watch rollup-plugin-buble rollup-plugin-json rollup-plugin-eslint rollup-plugin-commonjs rollup-plugin-postcss rollup-plugin-replace rollup-plugin-uglify rollup-plugin-node-resolve babel-core babel-eslint babel-istanbul babel-loader babel-plugin-coverage babel-preset-es2015 babel-runtime uglify-es eslint-plugin-flowtype eslint",
     "build:source": "npm run build:native",
     "build:examples": "npm run build:examples:native && npm run build:examples:web",
     "build:examples:native": "webpack --config build/webpack.examples.config.js",
@@ -78,17 +79,13 @@
   },
   "dependencies": {
     "@weex-project/downgrade": "^1.0.3",
-    "autoprefixer": "^6.7.7",
     "blink-diff": "~1.0.12",
     "core-js": "^2.4.0",
-    "query-string": "^4.2.3",
     "semver": "^5.1.0",
-    "weex-picker": "^0.1.0",
     "weex-rax-framework": "0.4.20",
-    "weex-vue-framework": "2.5.11-weex.1"
+    "weex-vue-framework": "2.5.13-weex.5"
   },
   "devDependencies": {
-    "@weex-project/weex-picker": "^0.2.4",
     "babel-core": "^6.17.0",
     "babel-eslint": "^7.2.1",
     "babel-istanbul": "^0.11.0",
@@ -122,7 +119,6 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "^2.0.1",
-    "rollup-watch": "^4.3.1",
     "selenium-server": "2.53.1",
     "serve": "^1.4.0",
     "shelljs": "^0.7.8",
@@ -138,6 +134,7 @@
     "weex-gcanvas": "^0.4.2",
     "weex-loader": "^0.5.3",
     "weex-vdom-tester": "^0.2.0",
+    "weex-vue-render": "^1.0.24",
     "weex-wd": "^1.0.23",
     "xmldom": "^0.1.27"
   }

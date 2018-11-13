@@ -20,7 +20,6 @@ package com.taobao.weex.utils;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXEnvironment;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,6 +46,7 @@ public class WXLogUtilsTest {
 
   @Before
   public void setUp() throws Exception {
+    WXLogUtils.isShowLineNumber = true;
     PowerMockito.mockStatic(WXEnvironment.class);
     PowerMockito.when(WXEnvironment.isApkDebugable()).thenReturn(true);
   }
@@ -92,17 +92,4 @@ public class WXLogUtilsTest {
     Log.e("tag",new Throwable("test"));
   }
 
-  @Test
-  public void testLogLevel() throws Exception {
-    WXEnvironment.sLogLevel = LogLevel.DEBUG;
-    Log.d("LogLevel.DEBUG", "test debug");
-    Log.w("LogLevel.DEBUG", "test warning");
-    Log.e("LogLevel.DEBUG", "test error");
-
-    WXEnvironment.sLogLevel = LogLevel.WARN;
-
-    Log.d("LogLevel.WARN", "test debug");
-    Log.w("LogLevel.WARN", "test warning");
-    Log.e("LogLevel.WARN", "test error");
-  }
-  }
+}

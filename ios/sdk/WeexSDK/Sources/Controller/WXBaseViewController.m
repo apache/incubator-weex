@@ -126,11 +126,10 @@
     }
     
     [_instance destroyInstance];
+    _instance = [[WXSDKInstance alloc] init];
     if([WXPrerenderManager isTaskReady:[self.sourceURL absoluteString]]){
         _instance = [WXPrerenderManager instanceFromUrl:self.sourceURL.absoluteString];
     }
-
-    _instance = [[WXSDKInstance alloc] init];
     _instance.frame = CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, self.view.bounds.size.height);
     _instance.pageObject = self;
     _instance.pageName = sourceURL.absoluteString;

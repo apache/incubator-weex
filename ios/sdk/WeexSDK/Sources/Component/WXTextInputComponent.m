@@ -50,7 +50,13 @@
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
 {
     // this behavior will hide the action like copy, cut, paste, selectAll and so on.
-    return [[self.wx_component valueForKey:@"allowCopyPaste"] boolValue];
+    // fixed textfield issue
+    // fixed menu item show by system default(like: if word not be selected ,menu item not show "cut")
+    BOOL allowCopyPaste = [[self.wx_component valueForKey:@"allowCopyPaste"] boolValue];
+    if (allowCopyPaste) {
+        return [super canPerformAction:action withSender:sender];
+    }
+    return NO;
 }
 
 - (CGRect)editingRectForBounds:(CGRect)bounds

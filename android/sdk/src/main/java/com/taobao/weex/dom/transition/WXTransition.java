@@ -32,13 +32,16 @@ import android.text.TextUtils;
 import android.util.Property;
 import android.view.View;
 import android.view.animation.Interpolator;
+
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.DOMActionContext;
-import com.taobao.weex.dom.WXDomHandler;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.flex.Spacing;
+//import com.taobao.weex.dom.DOMActionContext;
+//import com.taobao.weex.dom.WXDomHandler;
+//import com.taobao.weex.dom.WXDomObject;
+//import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.animation.BackgroundColorProperty;
 import com.taobao.weex.ui.animation.TransformParser;
 import com.taobao.weex.ui.component.WXComponent;
@@ -117,7 +120,7 @@ public class WXTransition {
     private Interpolator  interpolator;
     private long  duration;
     private long delay;
-    private WXDomObject domObject;
+    private WXComponent mWXComponent;
     private Handler handler;
     private ValueAnimator layoutValueAnimator;
     private Map<String, Object> layoutPendingUpdates;
@@ -142,7 +145,7 @@ public class WXTransition {
     /**
      * create transition from map styles if style contains transitionProperty
      * */
-    public static WXTransition fromMap(Map<String, Object> style, WXDomObject domObject){
+    public static WXTransition fromMap(Map<String, Object> style, WXComponent component){
         if(style.get(TRANSITION_PROPERTY) == null){
             return  null;
         }
@@ -158,10 +161,9 @@ public class WXTransition {
         transition.duration = parseTimeMillis(style, TRANSITION_DURATION, 0);
         transition.delay =  parseTimeMillis(style, TRANSITION_DELAY, 0);
         transition.interpolator = createTimeInterpolator(WXUtils.getString(style.get(TRANSITION_TIMING_FUNCTION), null));
-        transition.domObject = domObject;
+        transition.mWXComponent = component;
         return  transition;
     }
-
 
     /**
      * check updates has transition property
@@ -177,23 +179,23 @@ public class WXTransition {
 
     public void updateTranstionParams(Map<String, Object> updates){
         if(updates.containsKey(TRANSITION_DELAY)){
-            domObject.getStyles().put(TRANSITION_DELAY, updates.remove(TRANSITION_DELAY));
-            this.delay = parseTimeMillis(domObject.getStyles(), TRANSITION_DELAY, 0);
+            mWXComponent.getStyles().put(TRANSITION_DELAY, updates.remove(TRANSITION_DELAY));
+            this.delay = parseTimeMillis(mWXComponent.getStyles(), TRANSITION_DELAY, 0);
         }
 
         if(updates.containsKey(TRANSITION_TIMING_FUNCTION) && updates.get(TRANSITION_TIMING_FUNCTION) != null){
-            domObject.getStyles().put(TRANSITION_TIMING_FUNCTION, updates.remove(TRANSITION_TIMING_FUNCTION));
-            this.interpolator = createTimeInterpolator(domObject.getStyles().get(TRANSITION_TIMING_FUNCTION).toString());
+            mWXComponent.getStyles().put(TRANSITION_TIMING_FUNCTION, updates.remove(TRANSITION_TIMING_FUNCTION));
+            this.interpolator = createTimeInterpolator(mWXComponent.getStyles().get(TRANSITION_TIMING_FUNCTION).toString());
         }
 
         if(updates.containsKey(TRANSITION_DURATION)){
-            domObject.getStyles().put(TRANSITION_DURATION, updates.remove(TRANSITION_DURATION));
-            this.duration = parseTimeMillis(domObject.getStyles(), TRANSITION_DURATION, 0);
+            mWXComponent.getStyles().put(TRANSITION_DURATION, updates.remove(TRANSITION_DURATION));
+            this.duration = parseTimeMillis(mWXComponent.getStyles(), TRANSITION_DURATION, 0);
         }
 
         if(updates.containsKey(TRANSITION_PROPERTY)){
-            domObject.getStyles().put(TRANSITION_PROPERTY, updates.remove(TRANSITION_PROPERTY));
-            updateTransitionProperties(this, WXUtils.getString(domObject.getStyles().get(TRANSITION_PROPERTY), null));
+            mWXComponent.getStyles().put(TRANSITION_PROPERTY, updates.remove(TRANSITION_PROPERTY));
+            updateTransitionProperties(this, WXUtils.getString(mWXComponent.getStyles().get(TRANSITION_PROPERTY), null));
         }
     }
 
@@ -219,7 +221,7 @@ public class WXTransition {
                 }
             }
 
-            int delay = WXUtils.getNumberInt(domObject.getAttrs().get("actionDelay"), 16);
+            int delay = WXUtils.getNumberInt(mWXComponent.getAttrs().get("actionDelay"), 16);
             if(delay > duration){
                 delay = (int) duration;
             }
@@ -268,12 +270,12 @@ public class WXTransition {
                     if(targetStyles.containsKey(property)){
                         //reset pre transition style
                         Object targetValue = targetStyles.remove(property);
-                        domObject.getStyles().put(property, targetValue);
-                        WXComponent component = getComponent();
-                        if(component != null
-                                && component.getDomObject() != null){
-                            component.getDomObject().getStyles().put(property, targetValue);
-                        }
+                        mWXComponent.getStyles().put(property, targetValue);
+//                        domObject.getStyles().put(property, targetValue);
+//                        WXComponent component = getComponent();
+//                        if(component != null && component.getDomObject() != null){
+//                            component.getDomObject().getStyles().put(property, targetValue);
+//                        }
                     }
                 }
             }
@@ -292,9 +294,8 @@ public class WXTransition {
                     if(duration < Float.MIN_NORMAL){
                         return;
                     }
-                    WXComponent component = getComponent();
-                    if(component != null && domObject.getEvents().contains(Constants.Event.ON_TRANSITION_END)){
-                        component.fireEvent(Constants.Event.ON_TRANSITION_END);
+                    if(mWXComponent != null && mWXComponent.getEvents().contains(Constants.Event.ON_TRANSITION_END)){
+                        mWXComponent.fireEvent(Constants.Event.ON_TRANSITION_END);
                     }
                 }
             };
@@ -335,7 +336,7 @@ public class WXTransition {
         List<PropertyValuesHolder> holders = new ArrayList<>(8);
         String transform  = WXUtils.getString(transformPendingUpdates.remove(Constants.Name.TRANSFORM), null);
         if(!TextUtils.isEmpty(transform)){
-            Map<Property<View,Float>, Float>  properties = TransformParser.parseTransForm(transform, (int)domObject.getLayoutWidth(), (int)domObject.getLayoutHeight(), domObject.getViewPortWidth());
+            Map<Property<View,Float>, Float>  properties = TransformParser.parseTransForm(mWXComponent.getInstanceId(), transform, (int)mWXComponent.getLayoutWidth(), (int)mWXComponent.getLayoutHeight(), mWXComponent.getViewPortWidth());
             PropertyValuesHolder[]  transformHolders = TransformParser.toHolders(properties);
             for(PropertyValuesHolder holder : transformHolders){
                 holders.add(holder);
@@ -363,7 +364,7 @@ public class WXTransition {
                 }
                 break;
                 case Constants.Name.BACKGROUND_COLOR:{
-                    int fromColor = WXResourceUtils.getColor(WXUtils.getString(domObject.getStyles().getBackgroundColor(), null), 0);
+                    int fromColor = WXResourceUtils.getColor(WXUtils.getString(mWXComponent.getStyles().getBackgroundColor(), null), 0);
                     int toColor = WXResourceUtils.getColor(WXUtils.getString(value, null), 0);
                     if(WXViewUtils.getBorderDrawable(taregtView) != null){
                         fromColor = WXViewUtils.getBorderDrawable(taregtView).getColor();
@@ -403,9 +404,6 @@ public class WXTransition {
                 }
                 super.onAnimationEnd(animation);
                 WXTransition.this.onTransitionAnimationEnd();
-                if(WXEnvironment.isApkDebugable()){
-                    WXLogUtils.d("WXTransition transform onTransitionAnimationEnd " +  domObject.getRef());
-                }
             }
         });
         transformAnimator.start();
@@ -444,73 +442,73 @@ public class WXTransition {
         PropertyValuesHolder holder = null;
         switch (property){
             case Constants.Name.WIDTH:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.WIDTH, domObject.getLayoutWidth(),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloat(value, 0.0f), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.WIDTH, mWXComponent.getLayoutWidth(),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloat(value, 0.0f), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.HEIGHT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.HEIGHT, domObject.getLayoutHeight(),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloat(value, 0.0f), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.HEIGHT, mWXComponent.getLayoutHeight(),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloat(value, 0.0f), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.MARGIN_TOP:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_TOP,  domObject.getMargin().get(Spacing.TOP),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_TOP,  mWXComponent.getMargin().get(CSSShorthand.EDGE.TOP),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.MARGIN_LEFT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_LEFT,  domObject.getMargin().get(Spacing.LEFT),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_LEFT,  mWXComponent.getMargin().get(CSSShorthand.EDGE.LEFT),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.MARGIN_RIGHT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_RIGHT,  domObject.getMargin().get(Spacing.RIGHT),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_RIGHT,  mWXComponent.getMargin().get(CSSShorthand.EDGE.RIGHT),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.MARGIN_BOTTOM:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_BOTTOM,  domObject.getMargin().get(Spacing.BOTTOM),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_BOTTOM,  mWXComponent.getMargin().get(CSSShorthand.EDGE.BOTTOM),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.LEFT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.LEFT,  domObject.getPositionLeft(),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.LEFT,  mWXComponent.getLayoutPosition().getLeft(),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.RIGHT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.RIGHT,  domObject.getPositionRight(),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.RIGHT,  mWXComponent.getLayoutPosition().getRight(),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.BOTTOM:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.BOTTOM,  domObject.getPositionBottom(),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.BOTTOM,  mWXComponent.getLayoutPosition().getBottom(),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.TOP:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  domObject.getPositionTop(),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  mWXComponent.getLayoutPosition().getTop(),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.PADDING_TOP:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_TOP,  domObject.getPadding().get(Spacing.TOP),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_TOP,  mWXComponent.getPadding().get(CSSShorthand.EDGE.TOP),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.PADDING_BOTTOM:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_BOTTOM,  domObject.getPadding().get(Spacing.BOTTOM),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_BOTTOM,  mWXComponent.getPadding().get(CSSShorthand.EDGE.BOTTOM),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.PADDING_LEFT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_LEFT,  domObject.getPadding().get(Spacing.LEFT),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_LEFT,  mWXComponent.getPadding().get(CSSShorthand.EDGE.LEFT),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.PADDING_RIGHT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_RIGHT,  domObject.getPadding().get(Spacing.RIGHT),
-                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, domObject.getViewPortWidth()), domObject.getViewPortWidth()));
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_RIGHT,  mWXComponent.getPadding().get(CSSShorthand.EDGE.RIGHT),
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             default:
@@ -526,22 +524,14 @@ public class WXTransition {
         layoutValueAnimator = ValueAnimator.ofPropertyValuesHolder(holders);
         layoutValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
+            public void onAnimationUpdate(final ValueAnimator animation) {
                 PropertyValuesHolder holders[] = animation.getValues();
                 for(PropertyValuesHolder holder : holders){
-                    String property =  holder.getPropertyName();
-                    updateShadowLayoutPropertyByName(domObject,property,(Float)animation.getAnimatedValue(property));
-                }
 
-                DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(domObject.getDomContext().getInstanceId());
-                if(domActionContext == null){
-                    return;
+                    final String property =  holder.getPropertyName();
+                    asynchronouslyUpdateLayout(mWXComponent, property, (Float) animation.getAnimatedValue(property));
                 }
-                domActionContext.markDirty();
-                WXSDKManager.getInstance().getWXDomManager().sendEmptyMessageDelayed(WXDomHandler.MsgType.WX_DOM_TRANSITION_BATCH, 0);
-                if(WXEnvironment.isApkDebugable()){
-                    WXLogUtils.d("WXTransition send layout batch msg");
-                }
+//                WXBridgeManager.getInstance().calculateLayoutPostToJSThread(mWXComponent.getInstanceId(), mWXComponent.getRef(), false);
             }
         });
         layoutValueAnimator.addListener(new AnimatorListenerAdapter() {
@@ -559,9 +549,6 @@ public class WXTransition {
                     return;
                 }
                 super.onAnimationEnd(animation);
-                if(WXEnvironment.isApkDebugable()){
-                    WXLogUtils.d("WXTransition layout onTransitionAnimationEnd " +  domObject.getRef());
-                }
                 WXTransition.this.onTransitionAnimationEnd();
             }
         });
@@ -573,89 +560,82 @@ public class WXTransition {
         layoutValueAnimator.start();
     }
 
-    private static void updateShadowLayoutPropertyByName(WXDomObject domObject, String propertyName, float propertyValue) {
-        if(domObject == null || TextUtils.isEmpty(propertyName)) {
-            return;
-        }
-        switch (propertyName){
-            case Constants.Name.WIDTH:{
-                domObject.setStyleWidth(propertyValue);
-            }
-            break;
-            case Constants.Name.HEIGHT:{
-                domObject.setStyleHeight(propertyValue);
-            }
-            break;
-            case Constants.Name.MARGIN_TOP:{
-                domObject.setMargin(Spacing.TOP, propertyValue);
-            }
-            break;
-            case Constants.Name.MARGIN_LEFT:{
-                domObject.setMargin(Spacing.LEFT, propertyValue);
-            }
-            break;
-            case Constants.Name.MARGIN_RIGHT:{
-                domObject.setMargin(Spacing.RIGHT, propertyValue);
-            }
-            break;
-            case Constants.Name.MARGIN_BOTTOM:{
-                domObject.setMargin(Spacing.BOTTOM, propertyValue);
-            }
-            break;
-            case Constants.Name.LEFT:{
-                domObject.setPositionLeft(propertyValue);
-            }
-            break;
-            case Constants.Name.RIGHT:{
-                domObject.setPositionRight(propertyValue);
-            }
-            break;
-            case Constants.Name.BOTTOM:{
-                domObject.setPositionBottom(propertyValue);
-            }
-            break;
-            case Constants.Name.TOP:{
-                domObject.setPositionTop(propertyValue);
-            }
-            break;
-            case Constants.Name.PADDING_TOP:{
-                domObject.setPadding(Spacing.TOP, propertyValue);
-            }
-            break;
-            case Constants.Name.PADDING_BOTTOM:{
-                domObject.setPadding(Spacing.BOTTOM, propertyValue);
-            }
-            break;
-            case Constants.Name.PADDING_LEFT:{
-                domObject.setPadding(Spacing.LEFT, propertyValue);
-            }
-            break;
-            case Constants.Name.PADDING_RIGHT:{
-                domObject.setPadding(Spacing.RIGHT, propertyValue);
-            }
-            break;
-            default:
-                break;
-        }
-    }
-
     @SuppressWarnings("unused")
-    public static void asynchronouslyUpdateLayout(WXComponent component, String propertyName, float propertyValue) {
-        if(component == null || TextUtils.isEmpty(propertyName)) {
+    public static void asynchronouslyUpdateLayout(WXComponent component, final String propertyName, final float propertyValue) {
+        if(component == null) {
             return;
         }
-        String instanceId = component.getInstanceId();
-        DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(instanceId);
-        if(domActionContext == null){
+        final String ref = component.getRef();
+        final String instanceId = component.getInstanceId();
+        if(TextUtils.isEmpty(ref) || TextUtils.isEmpty(instanceId)) {
             return;
         }
-        WXDomObject domObject = domActionContext.getDomByRef(component.getRef());
-        if(domObject == null || TextUtils.isEmpty(instanceId)) {
-            return;
-        }
-        updateShadowLayoutPropertyByName(domObject, propertyName, propertyValue);
-        domActionContext.markDirty();
-        WXSDKManager.getInstance().getWXDomManager().sendEmptyMessageDelayed(WXDomHandler.MsgType.WX_DOM_TRANSITION_BATCH, 0);
+
+        WXSDKManager.getInstance().getWXBridgeManager().post(new Runnable() {
+            @Override
+            public void run() {
+                switch (propertyName){
+                    case Constants.Name.WIDTH:{
+                        WXBridgeManager.getInstance().setStyleWidth(instanceId, ref, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.HEIGHT:{
+                        WXBridgeManager.getInstance().setStyleHeight(instanceId, ref, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.MARGIN_TOP:{
+                        WXBridgeManager.getInstance().setMargin(instanceId, ref, CSSShorthand.EDGE.TOP, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.MARGIN_LEFT:{
+                        WXBridgeManager.getInstance().setMargin(instanceId, ref, CSSShorthand.EDGE.LEFT, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.MARGIN_RIGHT:{
+                        WXBridgeManager.getInstance().setMargin(instanceId, ref, CSSShorthand.EDGE.RIGHT, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.MARGIN_BOTTOM:{
+                        WXBridgeManager.getInstance().setMargin(instanceId, ref, CSSShorthand.EDGE.BOTTOM, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.LEFT:{
+                        WXBridgeManager.getInstance().setPosition(instanceId, ref, CSSShorthand.EDGE.LEFT, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.RIGHT:{
+                        WXBridgeManager.getInstance().setPosition(instanceId, ref, CSSShorthand.EDGE.RIGHT, (propertyValue));
+                    }
+                    break;
+                    case Constants.Name.BOTTOM:{
+                        WXBridgeManager.getInstance().setPosition(instanceId, ref, CSSShorthand.EDGE.BOTTOM, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.TOP:{
+                        WXBridgeManager.getInstance().setPosition(instanceId, ref, CSSShorthand.EDGE.TOP, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.PADDING_TOP:{
+                        WXBridgeManager.getInstance().setPadding(instanceId, ref, CSSShorthand.EDGE.TOP, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.PADDING_BOTTOM:{
+                        WXBridgeManager.getInstance().setPadding(instanceId, ref, CSSShorthand.EDGE.BOTTOM, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.PADDING_LEFT:{
+                        WXBridgeManager.getInstance().setPadding(instanceId, ref, CSSShorthand.EDGE.LEFT, propertyValue);
+                    }
+                    break;
+                    case Constants.Name.PADDING_RIGHT:{
+                        WXBridgeManager.getInstance().setPadding(instanceId, ref, CSSShorthand.EDGE.RIGHT, propertyValue);
+                    }
+                    break;
+                    default:
+                        break;
+                }
+            }
+        });
     }
 
     private synchronized void onTransitionAnimationEnd(){
@@ -670,14 +650,10 @@ public class WXTransition {
         }
         synchronized (targetStyles){
             if(targetStyles.size() > 0){
-                WXComponent component = getComponent();
                 for(String property : properties) {
                     if(targetStyles.containsKey(property)){
                         Object targetValue = targetStyles.remove(property);
-                        domObject.getStyles().put(property, targetValue);
-                        if(component != null && component.getDomObject() != null){
-                            component.getDomObject().getStyles().put(property, targetValue);
-                        }
+                        mWXComponent.getStyles().put(property, targetValue);
                     }
                 }
                 targetStyles.clear();
@@ -685,31 +661,9 @@ public class WXTransition {
         }
     }
 
-    private WXComponent getComponent(){
-        DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(domObject.getDomContext().getInstanceId());
-        if(domActionContext != null){
-            WXComponent component = domActionContext.getCompByRef(domObject.getRef());
-            return  component;
-        }
-        return null;
-    }
-
-
     private View getTargetView(){
-        if(domObject.getDomContext() == null){
-            return null;
-        }
-        DOMActionContext domActionContext = WXSDKManager.getInstance().getWXDomManager().getDomContext(domObject.getDomContext().getInstanceId());
-        if(domActionContext != null){
-            WXComponent component = domActionContext.getCompByRef(domObject.getRef());
-            if(component != null && component.getHostView() != null) {
-                return  component.getHostView();
-            }
-        }
-        return null;
+        return null != mWXComponent ? mWXComponent.getHostView() : null;
     }
-
-
 
 
     /**
@@ -794,4 +748,7 @@ public class WXTransition {
         }
     }
 
+    public List<String> getProperties() {
+        return properties;
+    }
 }

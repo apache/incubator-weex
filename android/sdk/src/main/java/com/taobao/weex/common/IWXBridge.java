@@ -18,11 +18,13 @@
  */
 package com.taobao.weex.common;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.bridge.ResultCallback;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
+import com.taobao.weex.dom.CSSShorthand;
+import com.taobao.weex.layout.ContentBoxMeasurement;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Bridge interface, native bridge and debug bridge both need to implement this interface
@@ -50,18 +52,28 @@ public interface IWXBridge extends IWXObject {
    */
   int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
 
+  void refreshInstance(String instanceId, String namespace, String function, WXJSObject[] args);
+
   /**
    * execute javascript function
    */
   int execJS(String instanceId, String namespace, String function, WXJSObject[] args);
 
   /**
-   * execute javascript function, return execute result as json array
+   * execute javascript function with asynchronous callback
    */
-  byte[] execJSWithResult(String instanceId, String namespace, String function, WXJSObject[] args);
+  void execJSWithCallback(String instanceId, String namespace, String function, WXJSObject[] args, ResultCallback callback);
 
+  int execJSService(String javascript);
 
-/**
+  /**
+   * take the heap snapshot and serialize the heap to a local file.
+   *
+   * @param filename
+   */
+  void takeHeapSnapshot(String filename);
+
+  /**
    * createInstance
    * @param instanceId
    * @param namespace
@@ -80,59 +92,112 @@ public interface IWXBridge extends IWXObject {
    * @return
    */
   int destoryInstance(String instanceId, String namespace, String function, WXJSObject[] args);
-  int execJSService(String javascript);
-  
-    /**
+
+  /**
    * execJSOnInstance
    * @param instanceId
    * @param script
    * @param type
    * @return
    */
-
   String execJSOnInstance(String instanceId, String script, int type);
 
   /**
-   * take the heap snapshot and serialize the heap to a local file.
-   *
-   * @param filename
-   */
-  void takeHeapSnapshot(String filename);
-
-  /**
    * js call native
-
    */
-  int callNative(String instanceId, JSONArray tasks, String callback);
+  int callNative(String instanceId, byte[] tasks, String callback);
 
-  int callAddElement(String instanceId, String ref, JSONObject dom, String index, String callback);
+
+  int callNative(String instanceId, String tasks, String callback);
 
   void reportJSException(String instanceId, String func, String exception);
 
-  Object callNativeModule(String instanceId, String module, String method,  byte [] arguments,  byte [] options);
+  Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options);
 
-  void callNativeComponent(String instanceId, String componentRef, String method,  byte [] arguments,  byte [] options);
+  void callNativeComponent(String instanceId, String ref, String method, byte[] arguments, byte[] options);
 
-  int callCreateBody(String instanceId, String tasks, String callback);
+  int callUpdateFinish(String instanceId, byte[] tasks, String callback);
 
-  int callUpdateFinish(String instanceId,  byte [] tasks, String callback);
-
-  int callCreateFinish(String instanceId,  byte [] tasks, String callback);
-
-  int callRefreshFinish(String instanceId,  byte [] tasks, String callback);
-
-  int callUpdateAttrs(String instanceId, String ref,  byte [] tasks, String callback);
-
-  int callUpdateStyle(String instanceId, String ref,  byte [] tasks, String callback);
-
-  int callRemoveElement(String instanceId, String ref, String callback);
-
-  int callMoveElement(String instanceId, String ref, String parentref, String index, String callback);
-
-  int callAddEvent(String instanceId, String ref, String event, String callback);
-
-  int callRemoveEvent(String instanceId, String ref, String event, String callback);
+  int callRefreshFinish(String instanceId, byte[] tasks, String callback);
 
   void reportServerCrash(String instanceId, String crashFile);
+
+
+  int callCreateBody(String instanceId, String componentType, String ref,
+                            HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
+                            float[] margins, float[] paddings, float[] borders);
+
+  int callAddElement(String instanceId, String componentType, String ref, int index, String parentRef,
+                            HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
+                            float[] margins, float[] paddings, float[] borders, boolean willLayout);
+
+  int callRemoveElement(String instanceId, String ref);
+
+  int callMoveElement(String instanceId, String ref, String parentref, int index);
+
+  int callAddEvent(String instanceId, String ref, String event);
+
+  int callRemoveEvent(String instanceId, String ref, String event);
+
+  int callUpdateStyle(String instanceId, String ref,
+                             HashMap<String, Object> styles,
+                             HashMap<String, String> paddings,
+                             HashMap<String, String> margins,
+                             HashMap<String, String> borders);
+
+  int callUpdateAttrs(String instanceId, String ref,
+                      HashMap<String, String> attrs);
+
+  int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, int index);
+
+  int callCreateFinish(String instanceId);
+
+  int callRenderSuccess(String instanceId);
+
+  int callAppendTreeCreateFinish(String instanceId, String ref);
+
+  int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles);
+
+  ContentBoxMeasurement getMeasurementFunc(String instanceId, long renderObjectPtr);
+
+  void bindMeasurementToRenderObject(long ptr);
+
+  void setRenderContainerWrapContent(boolean wrap, String instanceId);
+
+  long[] getFirstScreenRenderTime(String instanceId);
+
+  long[] getRenderFinishTime(String instanceId);
+
+  void setDefaultHeightAndWidthIntoRootDom(String instanceId, float defaultWidth, float defaultHeight, boolean isWidthWrapContent, boolean isHeightWrapContent);
+
+  void onInstanceClose(String instanceId);
+
+  void forceLayout(String instanceId);
+
+  boolean notifyLayout(String instanceId);
+
+  void setStyleWidth(String instanceId, String ref, float value);
+
+  void setStyleHeight(String instanceId, String ref, float value);
+
+  void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
+
+  void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
+
+  void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
+
+  void markDirty(String instanceId, String ref, boolean dirty);
+
+  void registerCoreEnv(String key, String value);
+
+  void reportNativeInitStatus(String statusCode, String errorMsg);
+
+  void setTimeoutNative(String callbackId, String time);
+
+  void setJSFrmVersion(String version);
+
+  void resetWXBridge(boolean remoteDebug);
+
+  void fireEventOnDataRenderNode(String instanceId, String ref, String type, String data);
 
 }

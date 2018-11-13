@@ -115,14 +115,14 @@ abstract class BaseWidget implements Widget {
     Rect dirtyRegion = new Rect(borderBox);
     dirtyRegion.offset(offsetOfContainer.x, offsetOfContainer.y);
     View widgetContainer;
-    if ((widgetContainer = context.getWidgetContainerView(this)) != null) {
+    if (context != null && (widgetContainer = context.getWidgetContainerView(this)) != null) {
       widgetContainer.invalidate(dirtyRegion);
     }
   }
 
   protected void setCallback(@NonNull Drawable drawable) {
     View widgetContainer;
-    if ((widgetContainer = context.getWidgetContainerView(this)) != null) {
+    if (context != null && (widgetContainer = context.getWidgetContainerView(this)) != null) {
       drawable.setCallback(widgetContainer);
     }
   }

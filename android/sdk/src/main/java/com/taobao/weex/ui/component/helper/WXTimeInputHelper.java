@@ -29,42 +29,42 @@ import com.taobao.weex.ui.component.AbstractEditComponent;
  */
 
 public class WXTimeInputHelper {
-    public static void pickDate(String max, String min, final AbstractEditComponent component) {
-        final TextView target = component.getHostView();
+  public static void pickDate(String max, String min, final AbstractEditComponent component) {
+    final TextView target = component.getHostView();
 
-        DatePickerImpl.pickDate(
-                target.getContext(),
-                target.getText().toString(),
-                max,
-                min,
-                new DatePickerImpl.OnPickListener() {
-                    @Override
-                    public void onPick(boolean set, @Nullable String result) {
-                        if (set) {
-                            target.setText(result);
-                            component.performOnChange(result);
-                        }
-                    }
-                },
-                null);
-    }
+    DatePickerImpl.pickDate(
+            target.getContext(),
+            target.getText().toString(),
+            max,
+            min,
+            new DatePickerImpl.OnPickListener() {
+              @Override
+              public void onPick(boolean set, @Nullable String result) {
+                if (set) {
+                  target.setText(result);
+                  component.performOnChange(result);
+                }
+              }
+            },
+            null);
+  }
 
-    public static void pickTime(final AbstractEditComponent component) {
-        final TextView target = component.getHostView();
+  public static void pickTime(final AbstractEditComponent component) {
+    final TextView target = component.getHostView();
 
-        DatePickerImpl.pickTime(
-                target.getContext(),
-                target.getText().toString(),
-                new DatePickerImpl.OnPickListener() {
-                    @Override
-                    public void onPick(boolean set, @Nullable String result) {
-                        if (set) {
-                            target.setText(result);
-                            component.performOnChange(result);
-                        }
-                    }
-                },
-                null
-        );
-    }
+    DatePickerImpl.pickTime(
+            target.getContext(),
+            target.getText().toString(),
+            new DatePickerImpl.OnPickListener() {
+              @Override
+              public void onPick(boolean set, @Nullable String result) {
+                if (set) {
+                  target.setText(result);
+                  component.performOnChange(result);
+                }
+              }
+            },
+            null
+    );
+  }
 }

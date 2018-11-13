@@ -1,5 +1,5 @@
-# Weex Apache Source Release   
-Weex produce SDKs to integrate to iOS/Android/Mobile web applications. This file will cover how to build Weex from source. You can either use the script we provided or manually build from source step by step.   
+# Weex Apache Source Release
+Weex produce SDKs to integrate to iOS/Android/Mobile web applications. This file will cover how to build Weex from source. You can either use the script we provided or manually build from source step by step.
 See `README.md` for further information about Weex Framework.
 
 Weex SDK includes 3 different SDKs to use in corresponding system/browser:
@@ -16,6 +16,8 @@ The environment required to build weex as follow:
     * JDK 1.6+
     * Android SDK(`$ANDROID_HOME` must be set properly)
     * Gradle 2.0+
+    * NDK r16
+    * CMake 3.9.0+
 * iOS SDK:
     * NodeJS 4.0+
     * XCode & Command Tools 8.0+
@@ -26,7 +28,7 @@ This article was tested in MacOSX system.
 
 # Build All by Script
 
-This script will build Android and iOS SDKs:   
+This script will build Android and iOS SDKs:
 > `$ bash scripts/build_from_source.sh`
 
 This's may take a while. After that, you can look into `dist/`, `android/sdk/build/output/` and `ios/sdk/Products` for Web/Android/iOS SDK artifacts.
@@ -47,14 +49,14 @@ Build the javascript libraries:
 > `$ npm run build:source`
 
 ### Before build Native SDK
-Move `min` version to Native SDK folder, which will be used by native SDK build.   
-> `cp packages/weex-js-framework/index.min.js ios_sdk/WeexSDK/Resources/main.js`   
+Move `min` version to Native SDK folder, which will be used by native SDK build.
+> `cp packages/weex-js-framework/index.min.js ios_sdk/WeexSDK/Resources/main.js`
 > `cp packages/weex-js-framework/index.min.js android_sdk/assets/main.js`
 
-## Build Android SDK    
-Make sure you have install gradle, see more details about 'how to install gradle' in [gradle website](https://gradle.org/install).   
-execute root folder of project   
-> `$ gradle wrapper --gradle-version 2.14.1`   
+## Build Android SDK
+Make sure you have install gradle, see more details about 'how to install gradle' in [gradle website](https://gradle.org/install).
+execute root folder of project
+> `$ gradle wrapper --gradle-version 2.14.1`
 
 Create a Gradle setting file
 > `$ echo 'include ":android_sdk"'>settings.gradle`

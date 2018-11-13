@@ -19,7 +19,7 @@
 
 import CallbackManager from './CallbackManager'
 import Element from '../vdom/Element'
-import { typof } from '../shared/utils'
+import { typof, checkLevel, debugLog } from '../shared/utils'
 import { normalizePrimitive } from './normalize'
 
 let fallback = function () {}
@@ -67,7 +67,7 @@ export class TaskCenter {
    * @param  {any}        v
    * @return {primitive}
    */
-  normalize (v) {
+  normalize (v, deep = false) {
     const type = typof(v)
     if (v && v instanceof Element) {
       return v.ref
@@ -78,21 +78,48 @@ export class TaskCenter {
     if (type === 'Function') {
       return this.callbackManager.add(v).toString()
     }
+    if (deep) {
+      if (type === 'Object') {
+        const object = {}
+        for (const key in v) {
+          object[key] = this.normalize(v[key], true)
+        }
+        return object
+      }
+      if (type === 'Array') {
+        return v.map(item => this.normalize(item, true))
+      }
+    }
+    if (v && v.ref && v['[[VirtualElement]]']) {
+      return v.ref
+    }
     return normalizePrimitive(v)
   }
 
   send (type, params, args, options) {
     const { action, component, ref, module, method } = params
 
+    // normalize args and options
     args = args.map(arg => this.normalize(arg))
+    if (typof(options) === 'Object') {
+      options = this.normalize(options, true)
+    }
 
     switch (type) {
-      case 'dom':
+      case 'dom': {
+        if (checkLevel('debug')) {
+          debugLog(`[task](${this.instanceId},${this.type},${action}) ${JSON.stringify(args)}`)
+        }
         return this[action](this.instanceId, args)
+      }
       case 'component':
         return this.componentHandler(this.instanceId, ref, method, args, Object.assign({ component }, options))
-      default:
+      default: {
+        if (checkLevel('debug')) {
+          debugLog(`[task](${this.instanceId},${module},${method}) ${JSON.stringify(args)}`)
+        }
         return this.moduleHandler(this.instanceId, module, method, args, options)
+      }
     }
   }
 

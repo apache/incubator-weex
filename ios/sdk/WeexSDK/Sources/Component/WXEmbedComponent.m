@@ -25,6 +25,7 @@
 #import "WXSDKManager.h"
 #import "WXConvert.h"
 #import "WXUtility.h"
+#import "WXApmForInstance.h"
 
 @interface WXEmbedComponent ()
 
@@ -144,7 +145,9 @@
     }
     
     [_embedInstance renderWithURL:[NSURL URLWithString:newURL] options:@{@"bundleUrl":[sourceURL absoluteString]} data:nil];
-    
+    [_embedInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_INSTANCE_TYPE withValue:@"embed"];
+    [_embedInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_PARENT_PAGE withValue:_embedInstance.parentInstance.pageName];
+    [self.weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_EMBED_COUNT withDiffValue:1];
     __weak typeof(self) weakSelf = self;
     _embedInstance.onCreate = ^(UIView *view) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -162,6 +165,7 @@
     };
     
     _embedInstance.onFailed = ^(NSError *error) {
+        weakSelf.weexInstance.apmInstance.isDegrade = YES;
         dispatch_async(dispatch_get_main_queue(), ^{
             if (weakSelf.errorView) {
                 return ;

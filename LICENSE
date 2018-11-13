@@ -202,104 +202,63 @@
    limitations under the License.
 
 
-   BSD License
+==============================================================================
 
-For the CSSLayout components:
-android/sdk/src/main/java/com/taobao/weex/dom/flex/CachedCSSLayout.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSAlign.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSDirection.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSFlexDirection.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSJustify.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSLayout.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSLayoutContext.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSNode.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSPositionType.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSStyle.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSWrap.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/FloatUtil.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/LayoutEngine.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/MeasureOutput.java
-android/sdk/src/main/java/com/taobao/weex/dom/flex/Spacing.java
-ios/sdk/WeexSDK/Sources/Layout/Layout.c
-ios/sdk/WeexSDK/Sources/Layout/Layout.h
+Apache Weex Submodules:
 
-/*
-BSD License
+Apache Weex includes a number of submodules with separate copyright notices
+and license terms. Your use of these submodules is subject to the terms and
+conditions of the following licenses.
 
-Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
+This product bundles vuejs v1.0.12, which is available under a
+"MIT" license. For details, see https://github.com/vuejs/vue/blob/v1.0.12/LICENSE and following files:
+  runtime/frameworks/legacy/core/array.js
+  runtime/frameworks/legacy/core/dep.js
+  runtime/frameworks/legacy/core/object.js
+  runtime/frameworks/legacy/core/observer.js
+  runtime/frameworks/legacy/core/state.js
+  runtime/frameworks/legacy/core/watcher.js
 
-Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:
+  The MIT License (MIT)
 
- * Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+  Copyright (c) 2013-2014 Yuxi Evan You
 
- * Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
- * Neither the name Facebook nor the names of its contributors may be used to
-   endorse or promote products derived from this software without specific
-   prior written permission.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
 
-*/
 
-For the vuejs components:
-html5/frameworks/legacy/core/array.js
-html5/frameworks/legacy/core/dep.js
-html5/frameworks/legacy/core/object.js
-html5/frameworks/legacy/core/observer.js
-html5/frameworks/legacy/core/state.js
-html5/frameworks/legacy/core/watcher.js
-/*
-The MIT License (MIT)
+This product bundles Guava v20.0, which is available under a "Apache" license. For details, see https://github.com/google/guava/blob/v20.0/COPYING and following files:
+  android_sdk/src/main/java/org/apache/taobao/weex/utils/WXDataStructureUtil.java
 
-Copyright (c) 2013-2015 Yuxi Evan You
+This product bundles chromium v66.0.3344.2, which is available under a "BSD-style" license. For details, see https://github.com/chromium/chromium/blob/66.0.3344.2/third_party/modp_b64/LICENSE and following files:
+  weex_core/Source/android/base/base64/base64.cpp
+  weex_core/Source/android/base/base64/base64.h
+  weex_core/Source/android/base/base64/modp_base64/modp_b64_data.h
+  weex_core/Source/android/base/base64/modp_base64/modp_b64.cc
+  weex_core/Source/android/base/base64/modp_base64/modp_b64.h
+  weex_core/Source/android/jniprebuild/jniheader/ContentBoxMeasurement_jni.h
+  weex_core/Source/android/jniprebuild/jniheader/MeasureMode_jni.h
+  weex_core/Source/android/jniprebuild/jniheader/NativeRenderObjectUtils_jni.h
+  weex_core/Source/android/jniprebuild/jniheader/SystemMessageHandler_jni.h
+  weex_core/Source/android/jniprebuild/jniheader/WXBridge_jni.h
+  weex_core/Source/android/jniprebuild/jniheader/WXJsFunctions_jni.h
+  weex_core/Source/android/jniprebuild/jni_generator.py
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This product bundles Android Open Source Project vandroid-4.2.2_r1, which is available under a "BSD" license. For details, see https://android.googlesource.com/platform/bionic/+/android-4.2.2_r1/libc/README and following files:
+  weex_core/Source/IPC/futex.h
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
-
-For Guava
-android/sdk/src/main/java/com/taobao/weex/utils/WXDataStructureUtil.java
-/*
- * Copyright (C) 2007 The Guava Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */

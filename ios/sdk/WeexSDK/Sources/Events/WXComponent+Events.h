@@ -18,7 +18,8 @@
  */
 
 #import "WXComponent.h"
+#import <objc/runtime.h>
 
 @interface WXComponent (Events) <UIGestureRecognizerDelegate>
-
+- (BOOL)gestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch;
 @end

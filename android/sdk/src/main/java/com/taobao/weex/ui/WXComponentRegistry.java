@@ -19,10 +19,12 @@
 package com.taobao.weex.ui;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
+import com.taobao.weex.ui.config.AutoScanConfigRegister;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
@@ -43,6 +45,9 @@ public class WXComponentRegistry {
     if (holder == null || TextUtils.isEmpty(type)) {
       return false;
     }
+
+    //register component
+    AutoScanConfigRegister.preLoad(holder);
 
     //execute task in js thread to make sure register order is same as the order invoke register method.
     WXBridgeManager.getInstance()

@@ -26,10 +26,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.JavascriptInvokable;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by furture on 2018/2/7.
@@ -37,22 +40,60 @@ import java.io.IOException;
 
 public class AutoScanConfigRegister {
 
+    private static long scanDelay = 0;
 
     public static final  String TAG  = "WeexScanConfigRegister";
 
+    private static ConcurrentLinkedQueue<JavascriptInvokable> autoLoadClass  = new ConcurrentLinkedQueue<>();
+
+    /**
+     * pre load module class and methods when so&jsf init
+     **/
+    public static void preLoad(JavascriptInvokable invokable){
+        if(invokable instanceof ConfigModuleFactory){
+            return;
+        }
+        if(invokable instanceof ConfigComponentHolder){
+            return;
+        }
+        autoLoadClass.add(invokable);
+    }
 
     /**
      * auto scan config files and do auto config from files, none need center register
      * */
     public static void doScanConfig(){
-       Thread thread = new Thread(new Runnable() {
+        if(scanDelay > 0){
+            WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    doScanConfigAsync();
+                }
+            }, scanDelay);
+        }else{
+            doScanConfigAsync();
+        }
+    }
+
+    public static void doScanConfigAsync(){
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 doScanConfigSync();
+                JavascriptInvokable invokable = autoLoadClass.poll();
+                int count = 0;
+                while (invokable != null){
+                    invokable.getMethods();
+                    invokable = autoLoadClass.poll();
+                    count++;
+                }
+                if(WXEnvironment.isApkDebugable()){
+                    WXLogUtils.d(TAG, "auto preload class's methods count " + count);
+                }
             }
         });
-       thread.setName("AutoScanConfigRegister");
-       thread.start();
+        thread.setName("AutoScanConfigRegister");
+        thread.start();
     }
 
     private static void doScanConfigSync(){
@@ -120,4 +161,7 @@ public class AutoScanConfigRegister {
         }
     }
 
+    public static void setScanDelay(long scanDelay) {
+        AutoScanConfigRegister.scanDelay = scanDelay;
+    }
 }

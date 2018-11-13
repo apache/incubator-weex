@@ -18,6 +18,7 @@
  */
 
 #import "UIBezierPath+Weex.h"
+#import "WXUtility.h"
 
 @implementation UIBezierPath (Weex)
 
@@ -32,12 +33,26 @@ static const float kCircleControlPoint = 0.447715;
                                  bottomRight:(CGFloat)bottomRightRadius
 {
     UIBezierPath *path = [UIBezierPath bezierPath];
-    [path moveToPoint:CGPointMake(rect.origin.x + topLeftRadius, rect.origin.y)];
+    if(isnan(topLeftRadius) || isnan(topRightRadius) || isnan(bottomLeftRadius) || isnan(bottomRightRadius)) {
+        return path;
+    }
+    if (![WXUtility isValidPoint:rect.origin] || isnan(rect.size.height) || isnan(rect.size.width)) {
+        return path;
+    }
+    CGPoint topLeftPoint = CGPointMake(rect.origin.x + topLeftRadius, rect.origin.y);
+    if (![WXUtility isValidPoint:topLeftPoint]) {
+        return path;
+    }
+    [path moveToPoint:topLeftPoint];
     
     // +------------------+
     //  \\      top     //
     //   \\+----------+//
-    [path addLineToPoint:CGPointMake(CGRectGetMaxX(rect) - topRightRadius, rect.origin.y)];
+    CGPoint topRightPoint = CGPointMake(CGRectGetMaxX(rect) - topRightRadius, rect.origin.y);
+    if (![WXUtility isValidPoint:topRightPoint]) {
+        return path;
+    }
+    [path addLineToPoint:topRightPoint];
     if (topRightRadius > 0) {
         [path addCurveToPoint:CGPointMake(CGRectGetMaxX(rect), rect.origin.y + topRightRadius)
                 controlPoint1:CGPointMake(CGRectGetMaxX(rect) - topRightRadius * kCircleControlPoint, rect.origin.y)
@@ -97,5 +112,4 @@ static const float kCircleControlPoint = 0.447715;
     
     return path;
 }
-
 @end

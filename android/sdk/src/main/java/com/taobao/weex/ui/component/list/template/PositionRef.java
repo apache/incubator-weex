@@ -18,11 +18,14 @@
  */
 package com.taobao.weex.ui.component.list.template;
 
+import com.alibaba.fastjson.JSONAware;
+import com.alibaba.fastjson.annotation.JSONType;
+
 /**
  * position render state, when render state change, position changed
  * Created by furture on 2018/2/2.
  */
-public class PositionRef extends  Number{
+public class PositionRef extends  Number implements JSONAware {
 
     private CellRenderState renderState;
 
@@ -59,6 +62,11 @@ public class PositionRef extends  Number{
 
     @Override
     public String toString() {
+        return String.valueOf(getPosition());
+    }
+
+    @Override
+    public String toJSONString() {
         return String.valueOf(getPosition());
     }
 }
