@@ -21,11 +21,11 @@
 #define CORE_BASE_STRING_UTIL_H
 
 #include <sstream>
-#include <string>
+#include <string.h>
 #ifdef OS_ANDROID
 #include <malloc.h>
 #else
-#include <malloc/malloc.h>
+#include <stdlib.h>
 #endif
 #include "base/third_party/icu/icu_utf.h"
 

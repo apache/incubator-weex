@@ -50,7 +50,7 @@ class VNodeRenderContext {
  private:
   // node context
   std::string page_id_;
-  VNode* root_;
+  VNode *root_;
   json11::Json raw_json_;
   std::string raw_source_;
   // script to execute

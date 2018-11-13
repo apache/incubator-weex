@@ -1,10 +1,72 @@
 /* eslint-disable react/react-in-jsx-scope */
 /* global __weex_data__, print, createElement */
+
+try{
+    console.log("abc in try");
+} catch(err) {
+    console.log("err");
+} finally{
+    console.log("finally");
+}
+
+var a= /(a.)/g;
+var b = a.exec('abc,aac, ssa2, dda');
+console.log(b);
+
+console.log('aabccbddBc'.match(/(bss.)/g));
+
+console.log("ceil");
+console.log(Math.ceil(0.95)," == 1");
+console.log(Math.ceil(4)," == 4");
+console.log(Math.ceil(7.004)," == 8");
+console.log(Math.ceil(-0.95)," == -0");
+console.log(Math.ceil(-4)," == -4");
+console.log(Math.ceil(-7.004)," == -7");
+
+console.log("floor");
+console.log(Math.floor( 45.95)," ==  45");
+console.log(Math.floor( 45.05)," ==  45");
+console.log(Math.floor( 4 )," ==  4");
+console.log(Math.floor(-45.05)," ==  -46");
+console.log(Math.floor(-45.95)," ==  -46");
+
+console.log("random");
+console.log(Math.random());
+console.log(Math.random());
+console.log(Math.random());
+console.log(Math.random());
+
+console.log("max");
+console.log(Math.max(1,2,3)," == 3");
+console.log(Math.max(1,2.2, 4.2), "== 4.2");
+console.log(Math.max(1,"a"),"== null");
+console.log(Math.max(),"== INT_MIN");
+
+console.log("min");
+console.log(Math.min(1,2,3)," == 1");
+console.log(Math.min(0.5,2.2, 4), "== 0.5");
+console.log(Math.min(1,"a"),"== null");
+console.log(Math.min(),"== INT_MAX");
+
+var a = 3;
+
+console.log('start');
+switch(a){
+    case 1:
+        console.log('switch 1');
+        break;
+    case 2:
+        console.log('switch 2');
+        break;
+    default:
+        console.log('default branch');
+}
+console.log('end');
 class Component {
     constructor(props) {
         this.props = props;
     }
-    
+
     setState(newData) {
         this.state = { ...this.state,
             ...newData
@@ -20,7 +82,7 @@ var nativeModules = {};
 const registerModule = moduleName => {
     var sourceKeys = Object.keys(moduleName);
     var key;
-    
+
     for (var i = 0; i < sourceKeys.length; i++) {
         key = sourceKeys[i];
         nativeModules[key] = moduleName[key];
@@ -46,12 +108,12 @@ const require = name => {
                 loop(methods[i]);
             }
         }
-        log("register",methods);
+        console.log("register",methods);
         return target;
     };
-    
+
     const MODULE_NAME_PREFIX = '@weex-module/';
-    
+
     if (name.split(MODULE_NAME_PREFIX).length > 1) {
         const weexModuleName = name.split(MODULE_NAME_PREFIX)[1];
         return requireModule(weexModuleName);
@@ -150,12 +212,12 @@ class TipTag extends Component {
         super(props);
     }
     _onClick = e => {
-        log("click go");
+        console.log("click go");
         let searchParams = {};
         if (this.props.data.q) {
             searchParams.q = this.props.data.q;
         }
-        
+
         if (this.props.data.params && this.props.data.params.length > 0) {
             this.props.data.params.forEach(item => {
                                            if (item.key) {
@@ -165,22 +227,22 @@ class TipTag extends Component {
         }
         if (this.props.tiptype && this.props.tiptype == 'voice_smarttips') {
             searchParams['voiceFrom'] = '1';
-            log("se go");
+            console.log("se go");
             searchEvent.searchOption("searchOption", {
                                      params: searchParams
                                      });
         } else {
-            log("se go2");
+            console.log("se go2");
             searchEvent.search("search", {
                                params: searchParams
                                });
         }
     };
-    
+
     render() {
         let data = this.props.data;
         let tagStyle = styles.tag;
-        
+
         if (!this.props.isListMode) {
             tagStyle = { ...styles.tag,
             marginLeft: 5.5,
@@ -193,7 +255,7 @@ class TipTag extends Component {
         <Text style={styles.tagText}>{data.show}</Text>
         </View>;
     }
-    
+
 }
 
 const _tiptag_export = {
@@ -205,15 +267,15 @@ const TipTag_import_default_from__WidgetInWFStyle__tiptag = _tiptag_export.defau
 const WidgetInWFStyle = props => {
     let tips = props.tips,
     tiptype = props.tiptype;
-    
+
     if (!tips || tips.length === 0) {
         return null;
     }
-    
+
     if (tips.length > 8) {
         tips = tips.slice(0, 8);
     }
-    
+
     let wfTitle = <View style={waterfallStyles.wfTitle}>
     <View style={waterfallStyles.wfDivideLine} />
     <Text style={waterfallStyles.titleText}>{props.topic || '相关搜索'}</Text>
@@ -221,7 +283,7 @@ const WidgetInWFStyle = props => {
     </View>;
     let wfLines = [];
     let tipLength = tips.length;
-    
+
     function createWfLine(leftTip, rightTip) {
         let tag1 = <TipTag_import_default_from__WidgetInWFStyle__tiptag data={leftTip} isListMode={false} tiptype={tiptype} />;
         let tag2 = rightTip ? <TipTag_import_default_from__WidgetInWFStyle__tiptag data={rightTip} isListMode={false} tiptype={tiptype} /> : null;
@@ -309,11 +371,11 @@ const WidgetInListStyle = props => {
     if (!tips || tips.length === 0) {
         return null;
     }
-    
+
     if (tips.length > 8) {
         tips = tips.slice(0, 8);
     }
-    
+
     const listTitle = <View style={listStyles.listTitle}>
     <View style={listStyles.divideLine} />
     <Text style={listStyles.titleText}>{props.topic || '相关搜索'}</Text>
@@ -327,7 +389,7 @@ const WidgetInListStyle = props => {
                  firstLineTips.push(tipTag);
                  } else {
                  const firstLineCount = parseInt(tips.length / 2, 10) + tips.length % 2;
-                 
+
                  if (index < firstLineCount) {
                  firstLineTips.push(tipTag);
                  } else if (index < 8) {
@@ -371,7 +433,7 @@ class Widget extends Component {
         return <View style={{ ...defaultStyle__lib.container
         }}>{content}</View>;
     }
-    
+
 }
 
 const _lib_export = {
@@ -400,7 +462,8 @@ class Segment extends Component {
         <Widget_import_default_from___lib {...data} />
         </View>;
     }
-    
+
 }
 
 render(<Segment />);
+

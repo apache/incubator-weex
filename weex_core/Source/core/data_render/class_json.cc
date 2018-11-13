@@ -22,6 +22,7 @@
 #include "core/data_render/exec_state.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/table.h"
+#include "core/data_render/vnode/vnode_exec_env.h"
 #include <base/LogDefines.h>
 
 namespace weex {
@@ -29,10 +30,12 @@ namespace core {
 namespace data_render {
 
 static Value stringify(ExecState *exec_state);
+static Value parse(ExecState *exec_state);
 
 ClassDescriptor *NewClassJSON() {
     ClassDescriptor *array_desc = new ClassDescriptor(nullptr);
     AddClassStaticCFunc(array_desc, "stringify", stringify);
+    AddClassStaticCFunc(array_desc, "parse", parse);
     return array_desc;
 }
     
@@ -59,6 +62,26 @@ static Value stringify(ExecState *exec_state) {
     } while (0);
     
     return ret;
+}
+    
+static Value parse(ExecState *exec_state) {
+    Value ret;
+    do {
+        size_t length = exec_state->GetArgumentCount();
+        if (length < 1) {
+            break;
+        }
+        Value *value = exec_state->GetArgument(0);
+        if (!IsString(value)) {
+            throw VMExecError("json parse caller isn't a String");
+        }
+        std::string json_string = CStringValue(value);
+        ret = StringToValue(exec_state, json_string);        
+        
+    } while (0);
+    
+    return ret;
+
 }
     
 }  // namespace data_render

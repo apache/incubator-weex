@@ -24,6 +24,7 @@
 #include "core/data_render/common_error.h"
 #include "core/data_render/class_array.h"
 #include "core/data_render/monitor/vm_monitor.h"
+#include "core/data_render/class_function.h"
 
 namespace weex {
 namespace core {
@@ -44,16 +45,16 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
   while (pc != frame.end) {
     Instruction instruction = *pc++;
     double d1, d2;
-    OpCode op(GET_OP_CODE(instruction));
+    OPCode op(GET_OP_CODE(instruction));
 #if DEBUG
     //tc.op_start(op);
 #endif
       switch (op) {
         case OP_MOVE:
         {
-            LOGTEMP("OP_MOVE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            LOGTEMP("OP_MOVE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
             a = frame.reg + GET_ARG_A(instruction);
-            b = frame.reg + GET_ARG_B(instruction);
+            b = frame.reg + GET_ARG_Bx(instruction);
             if (IsValueRef(a)) {
                 *a->var = *b;
                 SetNil(a);
@@ -67,13 +68,13 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             break;
         }
       case OP_LOADNULL:
-        a = frame.reg + GET_ARG_A(instruction);
+        a = frame.reg + GET_ARG_Ax(instruction);
         a->type = Value::Type::NIL;
         break;
       case OP_LOADK:
         LOGTEMP("OP_LOADK A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
         a = frame.reg + GET_ARG_A(instruction);
-        b = frame.func->f->GetConstant((int)GET_ARG_Bx(instruction));
+        b = frame.func->GetConstant((int)GET_ARG_Bx(instruction));
         *a = *b;
         break;
       case OP_GETGLOBAL:
@@ -85,8 +86,15 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
       case OP_GETFUNC: {
         LOGTEMP("OP_GETFUNC A:%ld\n", GET_ARG_A(instruction));
         a = frame.reg + GET_ARG_A(instruction);
-        a->type = Value::Type::FUNC;
-        a->f = frame.func->f->GetChild(GET_ARG_Bx(instruction));
+        FuncState *func_state = frame.func->GetChild(GET_ARG_Bx(instruction));
+        if (func_state->in_closure().size() > 0) {
+            *a = exec_state->class_factory()->CreateFuncInstance(func_state);
+            AddClosure(exec_state, a);
+        }
+        else {
+            a->type = Value::Type::FUNC;
+            a->f = func_state;
+        }
         break;
       }
 
@@ -236,7 +244,42 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
           }
           break;
       }
-
+      case OP_TRUE_JMP: {
+        LOGTEMP("OP_TRUE_JMP A:%ld  B:%ld \n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+        a = frame.reg + GET_ARG_A(instruction);
+        bool con = false;
+        if (!ToBool(a, con)) {
+          throw VMExecError("Unspport Type With OP_CODE [OP_JMP]");
+        }
+        if (con) {
+          pc += GET_ARG_Bx(instruction);
+        }
+        break;
+      }
+      case OP_JMPTO: {
+        LOGTEMP("OP_JMPTO A:%ld  B:%ld \n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+        a = frame.reg + GET_ARG_A(instruction);
+        bool con = false;
+        if (!ToBool(a, con)) {
+          throw VMExecError("Unspport Type With OP_CODE [OP_JMP]");
+        }
+        if (!con) {
+          pc = frame.pc +  GET_ARG_Bx(instruction);
+        }
+        break;
+      }
+      case OP_TRUE_JMPTO: {
+        LOGTEMP("OP_TRUE_JMPTO A:%ld  B:%ld \n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+        a = frame.reg + GET_ARG_A(instruction);
+        bool con = false;
+        if (!ToBool(a, con)) {
+          throw VMExecError("Unspport Type With OP_CODE [OP_JMP]");
+        }
+        if (con) {
+          pc = frame.pc + GET_ARG_Bx(instruction);
+        }
+        break;
+      }
       case OP_GOTO: {
         pc = frame.pc + GET_ARG_Ax(instruction);
       }
@@ -298,9 +341,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
           case OP_NOT:
           {
-              LOGTEMP("OP_NOT A:%ld B:%ld \n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+              LOGTEMP("OP_NOT A:%ld B:%ld \n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
               a = frame.reg + GET_ARG_A(instruction);
-              b = frame.reg + GET_ARG_B(instruction);
+              b = frame.reg + GET_ARG_Bx(instruction);
               a->type = Value::Type::BOOL;
               ToBool(b, a->b);
               a->b = !a->b;
@@ -406,7 +449,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         break;
         case OP_POST_INCR: {
             a = frame.reg + GET_ARG_A(instruction);
-            b = frame.reg + GET_ARG_B(instruction);
+            b = frame.reg + GET_ARG_Bx(instruction);
             if (IsInt(a)) {
                 if (NULL != b) {
                     SetIValue(b, (int)IntValue(a));
@@ -429,15 +472,15 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             
         case OP_POST_DECR: {
             a = frame.reg + GET_ARG_A(instruction);
-            b = frame.reg + GET_ARG_B(instruction);
+            b = frame.reg + GET_ARG_Bx(instruction);
             if (IsInt(a)) {
-                if (GET_ARG_B(instruction) != 0) {
+                if (GET_ARG_Bx(instruction) != 0) {
                     SetIValue(b, (int)IntValue(a));
                 }
                 SetIValue(a, (int)IntValue(a) - 1);
             }
             else if (IsNumber(a)) {
-                if (GET_ARG_B(instruction) != 0) {
+                if (GET_ARG_Bx(instruction) != 0) {
                     SetDValue(b, NumValue(a));
                 }
                 SetDValue(a, NumValue(a) - 1);
@@ -448,9 +491,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
         }
             break;
 
-      case OP_PRE_INCR: {
+      case OP_PREV_INCR: {
         a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
+        b = frame.reg + GET_ARG_Bx(instruction);
         if (IsInt(a)) {
           SetIValue(a, (int)IntValue(a) + 1);
           SetRefValue(a);
@@ -469,17 +512,17 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
       }
         break;
 
-      case OP_PRE_DECR: {
+      case OP_PREV_DECR: {
         a = frame.reg + GET_ARG_A(instruction);
-        b = frame.reg + GET_ARG_B(instruction);
+        b = frame.reg + GET_ARG_Bx(instruction);
         if (IsInt(a)) {
           SetIValue(a, static_cast<int>(IntValue(a)) - 1);
-          if (GET_ARG_B(instruction) != 0) {
+          if (GET_ARG_Bx(instruction) != 0) {
             SetIValue(b, static_cast<int>(IntValue(a)));
           }
         } else if (IsNumber(a)) {
           SetDValue(a, NumValue(a) - 1);
-          if (GET_ARG_B(instruction) != 0) {
+          if (GET_ARG_Bx(instruction) != 0) {
             SetDValue(b, NumValue(a));
           }
         } else {
@@ -517,6 +560,24 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
               }
               break;
           }
+          case OP_CONSTRUCTOR:
+          {
+              a = frame.reg + GET_ARG_A(instruction);
+              int argc = (int)GET_ARG_B(instruction);
+              c = frame.reg + GET_ARG_C(instruction);
+              if (!IsClassInstance(a)) {
+                  throw VMExecError("only support class instance in [OP_CONSTRUCTOR]");
+                  break;
+              }
+              if (argc < 1) {
+                  throw VMExecError("constructor with no args in [OP_CONSTRUCTOR]");
+                  break;
+              }
+              if (FindConstructor(ValueTo<ClassInstance>(a), c, c + 1)) {
+                  exec_state->CallFunction(c, argc, a);
+              }
+              break;
+          }
         case OP_GETSUPER:
         {
             LOGTEMP("OP_GETSUPER A:%ld B:%ld C:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction), GET_ARG_C(instruction));
@@ -531,19 +592,21 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             if (!inst_super) {
                 throw VMExecError("Instance Can't Find Super With OP_CODE [OP_GETSUPER]");
             }
-            int index = inst_super->p_desc_->funcs_->IndexOf("constructor");
-            if (index < 0) {
-                throw VMExecError("Can't Find Super Constructor With OP_CODE [OP_GETSUPER]");
-            }
             SetCIValue(a, reinterpret_cast<GCObject *>(inst->p_super_));
-            *c = *inst_super->p_desc_->funcs_->Find(index);
+            int index = inst_super->p_desc_->funcs_->IndexOf("constructor");
+            if (index >= 0) {
+                *c = *inst_super->p_desc_->funcs_->Find(index);
+            }
+            else {
+                SetNil(c);
+            }
             break;
         }
         case OP_SETMEMBERVAR:
         {
-            LOGTEMP("OP_SETMEMBERVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            LOGTEMP("OP_SETMEMBERVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
             a = frame.reg + GET_ARG_A(instruction);
-            b = frame.reg + GET_ARG_B(instruction);
+            b = frame.reg + GET_ARG_Bx(instruction);
             if (!IsValueRef(a)) {
                 throw VMExecError("Only ValueRef Support With OP_CODE [OP_SETMEMBER]");
             }
@@ -628,23 +691,18 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 }
             }
             else if (IsString(b)) {
-                if (var_name == "length") {
-                    //*a = GetStringLength(ValueTo<Array>(b));
+                int index = exec_state->global()->IndexOf("String");
+                if (index < 0) {
+                    throw VMExecError("Can't Find String Class With OP_CODE OP_GETMEMBER");
                 }
-                else {
-                    int index = exec_state->global()->IndexOf("String");
-                    if (index < 0) {
-                        throw VMExecError("Can't Find String Class With OP_CODE OP_GETMEMBER");
-                    }
-                    Value *class_desc = exec_state->global()->Find(index);
-                    Variables *funcs = ValueTo<ClassDescriptor>(class_desc)->funcs_.get();
-                    index = funcs->IndexOf(var_name);
-                    if (index < 0) {
-                        throw VMExecError("Can't Find String Func " + var_name + " With OP_CODE [OP_GETMEMBER]");
-                    }
-                    Value *func = funcs->Find(index);
-                    *a = *func;
+                Value *class_desc = exec_state->global()->Find(index);
+                Variables *funcs = ValueTo<ClassDescriptor>(class_desc)->funcs_.get();
+                index = funcs->IndexOf(var_name);
+                if (index < 0) {
+                    throw VMExecError("Can't Find String Func " + var_name + " With OP_CODE [OP_GETMEMBER]");
                 }
+                Value *func = funcs->Find(index);
+                *a = *func;
             }
             else if (IsTable(b)) {
                 if (op == OP_GETMEMBER) {
@@ -665,33 +723,64 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             }
             else {
                 // only can find class static funcs;
-                Variables *funcs = ValueTo<ClassDescriptor>(b)->static_funcs_.get();
-                int index = funcs->IndexOf(var_name);
+                Variables *statics = ValueTo<ClassDescriptor>(b)->statics_.get();
+                int index = statics->IndexOf(var_name);
                 if (index < 0) {
-                    throw VMExecError("Can't Find Static Func " + var_name + " With OP_CODE [OP_GETMEMBER]");
+                    if (op == OP_GETMEMBER) {
+                        throw VMExecError("Can't Find Static Func " + var_name + " With OP_CODE [OP_GETMEMBER]");
+                        break;
+                    }
+                    Value *ret = GetClassStaticMemberVar(ValueTo<ClassDescriptor>(b), var_name);
+                    SetValueRef(a, ret);
                 }
-                Value *func = funcs->Find(index);
-                *a = *func;
+                else {
+                    Value *svar = statics->Find(index);
+                    *a = *svar;
+                }
             }
             break;
         }
         case OP_SETOUTVAR:
         {
-            LOGTEMP("OP_SETOUTVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_B(instruction));
+            LOGTEMP("OP_SETOUTVAR A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
             a = frame.reg + GET_ARG_A(instruction);
             int index = (int)GET_ARG_Bx(instruction);
             ValueRef *ref = exec_state->FindRef(index);
             if (!ref) {
-                throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_SETOUTVAR]");
+                throw VMExecError("Can't Find ValueRef " + base::to_string(index) + " [OP_SETOUTVAR]");
             }
             ref->value() = *a;
             ref->value().ref = a;
             break;
         }
+        case OP_TYPEOF:
+        {
+            a = frame.reg + GET_ARG_A(instruction);
+            b = frame.reg + GET_ARG_Bx(instruction);
+            if (IsNil(b)) {
+                SetSValue(a, exec_state->string_table()->StringFromUTF8("undefined"));
+            }
+            else if (IsTable(b)) {
+                SetSValue(a, exec_state->string_table()->StringFromUTF8("object"));
+            }
+            else if (IsBool(b)) {
+                SetSValue(a, exec_state->string_table()->StringFromUTF8("boolean"));
+            }
+            else if (IsString(b)) {
+                SetSValue(a, exec_state->string_table()->StringFromUTF8("string"));
+            }
+            else if (IsFunction(b) || IsFuncInstance(b)) {
+                SetSValue(a, exec_state->string_table()->StringFromUTF8("function"));
+            }
+            else {
+                throw VMExecError("Can't Supporting typeof [OP_TYPEOF]");
+            }
+            break;
+        }
         case OP_RESETOUTVAR:
         {
-            LOGTEMP("OP_RESETOUTVAR A:%ld\n", GET_ARG_A(instruction));
-            a = frame.reg + GET_ARG_A(instruction);
+            LOGTEMP("OP_RESETOUTVAR A:%ld\n", GET_ARG_Ax(instruction));
+            a = frame.reg + GET_ARG_Ax(instruction);
             a->ref = NULL;
             break;
         }
@@ -702,10 +791,55 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             int index = (int)GET_ARG_Bx(instruction);
             ValueRef *ref = exec_state->FindRef(index);
             if (!ref) {
-                throw VMExecError("Can't Find ValueRef " + to_string(index) + " [OP_GETOUTVAR]");
+                throw VMExecError("Can't Find ValueRef " + base::to_string(index) + " [OP_GETOUTVAR]");
             }
             *a = ref->value();
             a->ref = &ref->value();
+            break;
+        }
+        case OP_OUT_CLOSURE:
+        {
+            LOGTEMP("OP_OUT_CLOSURE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            int index = (int)GET_ARG_Bx(instruction);
+            ValueRef *ref = exec_state->FindRef(index);
+            if (!ref) {
+                throw VMExecError("Can't Find ValueRef " + base::to_string(index) + " [OP_OUT_CLOSURE]");
+            }
+            ref->value() = *a;
+            ref->value().ref = a;
+            if (ref->is_closure() && ref->closure()) {
+                ref->closure()->value() = *a;
+            }
+            break;
+        }
+        case OP_IN_CLOSURE:
+        {
+            LOGTEMP("OP_IN_CLOSURE A:%ld B:%ld\n", GET_ARG_A(instruction), GET_ARG_Bx(instruction));
+            a = frame.reg + GET_ARG_A(instruction);
+            int index = (int)GET_ARG_Bx(instruction);
+            ValueRef *ref = exec_state->FindRef(index);
+            if (!ref) {
+                throw VMExecError("Can't Find ValueRef " + base::to_string(index) + " [OP_IN_CLOSURE]");
+            }
+            Value *ret = LoadClosure(frame.reg, ref);
+            if (!ret) {
+                throw VMExecError("Can't Find Closure [OP_IN_CLOSURE]");
+            }
+            *a = *ret;
+            a->ref = ret;
+            break;
+        }
+        case OP_REMOVE_CLOSURE:
+        {
+            LOGTEMP("OP_REMOVE_CLOSURE A:%ld \n", GET_ARG_Ax(instruction));
+            int index =  (int)GET_ARG_Ax(instruction);
+            ValueRef *ref = exec_state->FindRef(index);
+            if (!ref) {
+                throw VMExecError("Can't Find ValueRef " + base::to_string(index) + " [OP_REMOVE_CLOSURE]");
+            }
+            ref->value().ref = nullptr;
+            ref->closure()->SetValueRef(nullptr);
             break;
         }
         case OP_GETINDEXVAR:
@@ -817,12 +951,12 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             return;
         }
         case OP_RETURN1: {
-            LOGTEMP("OP_RETURN1 A:%ld\n", GET_ARG_A(instruction));
+            LOGTEMP("OP_RETURN1 A:%ld\n", GET_ARG_Ax(instruction));
             if (ret == nullptr) {
                 return;
             }
             else {
-                a = frame.reg + GET_ARG_A(instruction);
+                a = frame.reg + GET_ARG_Ax(instruction);
                 *ret = *a;
                 return;
             }

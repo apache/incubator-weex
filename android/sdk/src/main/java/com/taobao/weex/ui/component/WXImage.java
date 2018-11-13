@@ -21,6 +21,8 @@ package com.taobao.weex.ui.component;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import com.taobao.weex.dom.WXImageQuality;
+
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -317,29 +319,7 @@ public class WXImage extends WXComponent<ImageView> {
     this.mBlurRadius = blurRadius;
 
     final String rewritedStr = rewrited.toString();
-    imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
-      @Override
-      public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
-        if (getEvents().contains(Constants.Event.ONLOAD)) {
-          Map<String, Object> params = new HashMap<String, Object>();
-          Map<String, Object> size = new HashMap<>(2);
-          if (imageView != null && imageView instanceof Measurable) {
-            size.put("naturalWidth", ((Measurable) imageView).getNaturalWidth());
-            size.put("naturalHeight", ((Measurable) imageView).getNaturalHeight());
-          } else {
-            size.put("naturalWidth", 0);
-            size.put("naturalHeight", 0);
-          }
-
-          if (containsEvent(Constants.Event.ONLOAD)) {
-            params.put("success", result);
-            params.put("size", size);
-            fireEvent(Constants.Event.ONLOAD, params);
-          }
-        }
-        monitorImgSize(imageView,rewritedStr);
-      }
-    });
+    imageStrategy.setImageListener(new MyImageListener(this,rewritedStr));
 
     String placeholder=null;
     if(getAttrs().containsKey(Constants.Name.PLACEHOLDER)){
@@ -513,5 +493,43 @@ public class WXImage extends WXComponent<ImageView> {
   public interface Measurable {
     int getNaturalWidth();
     int getNaturalHeight();
+  }
+
+  public  static class MyImageListener implements WXImageStrategy.ImageListener {
+
+    private WeakReference<WXImage> wxImageWeakReference;
+
+    private String rewritedStr;
+
+    MyImageListener(WXImage image,String rewritedStr) {
+      this.wxImageWeakReference = new WeakReference<WXImage>(image);
+      this.rewritedStr = rewritedStr;
+    }
+
+    @Override
+    public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
+      WXImage image = wxImageWeakReference.get();
+
+      if(image == null)
+        return;
+
+      if (image.getEvents().contains(Constants.Event.ONLOAD)) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> size = new HashMap<>(2);
+        if (imageView != null && imageView instanceof Measurable) {
+          size.put("naturalWidth", ((Measurable) imageView).getNaturalWidth());
+          size.put("naturalHeight", ((Measurable) imageView).getNaturalHeight());
+        } else {
+          size.put("naturalWidth", 0);
+          size.put("naturalHeight", 0);
+        }
+        if (image.containsEvent(Constants.Event.ONLOAD)) {
+          params.put("success", result);
+          params.put("size", size);
+          image.fireEvent(Constants.Event.ONLOAD, params);
+        }
+      }
+      image.monitorImgSize(imageView,rewritedStr);
+    }
   }
 }

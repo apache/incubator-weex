@@ -25,6 +25,7 @@
 
 #include <sstream>
 #include "core/data_render/token.h"
+#include "base/string_util.h"
 
 namespace weex {
 namespace core {
@@ -55,13 +56,19 @@ public:
 class JSError : public Error {
 public:
     JSError(std::string prefix, std::string str)
-    : Error("[JSError]" + prefix, std::move(str)) { }
+    : Error("[JSError]=>" + prefix, std::move(str)) { }
 };
 
 class VMExecError : public Error {
 public:
     VMExecError(std::string str)
-    : Error("[VMExecError]", std::move(str)) { }
+    : Error("[VMExecError]=>", std::move(str)) { }
+};
+
+class EncoderError : public Error {
+public:
+    EncoderError(std::string str)
+    : Error("[EncoderError]=>", std::move(str)) { }
 };
 
 class OpcodeDecodeError : public Error {
@@ -70,11 +77,16 @@ public:
     : Error("[OpcodeDecodeError]", std::move(str)) { }
 };
     
+class DecoderError : public Error {
+public:
+    DecoderError(std::string str)
+    : Error("[DecoderError]=>", std::move(str)) { }
+};
+
 class SyntaxError : public JSError {
 public:
     SyntaxError(Token token, std::string str = "")
-    : JSError("SyntaxError", std::move(str)), token_(token)
-    { }
+    : JSError("SyntaxError(" + base::to_string(token.position().row() + 1) + ":" + base::to_string(token.position().col()) + ") '" + token.view() + "'", std::move(str)), token_(token) { }
     
     const char *what() const noexcept override
     {
@@ -120,15 +132,6 @@ public:
     { }
 };
     
-template <typename T>
-
-std::string to_string(T value)
-{
-    std::ostringstream os ;
-    os << value ;
-    return os.str() ;
-}
-
 }
 }
 }

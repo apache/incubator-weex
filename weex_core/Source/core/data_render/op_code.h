@@ -19,73 +19,95 @@
 
 #ifndef CORE_DATA_RENDER_OP_CODE_H_
 #define CORE_DATA_RENDER_OP_CODE_H_
+
+#include <assert.h>
+#include <cstdint>
+
 namespace weex {
 namespace core {
 namespace data_render {
 
-enum OpCode {
-  OP_MOVE,       //	A B	    R(A) = R(B)
-  OP_LOADK,      //	A Bx	R(A) = Constant[Bx]
-  OP_LOADNULL,   //	A       R(A) = null
-  OP_GETGLOBAL,  //	A Bx	R(A) = Global[B]
-  OP_GETFUNC,    //	A Bx  	R(A) = Function[B]
-  OP_NEW,
-  OP_GETCLASS,   // A B C R(A) = B->C
-  OP_GETMEMBER,
-  OP_GETMEMBERVAR,
-  OP_SETMEMBERVAR,
-  OP_GETSUPER,   // A B C     R(A) = super[B] C = super func
-  
-  OP_SETOUTVAR,     // A B C R(A) = B->C
-  OP_RESETOUTVAR,
-  OP_GETOUTVAR,     // A B C R(A) = B->C
-    
-  OP_SETTABLE,  //	A B C	R(A)[R(B)] = RK(C)
+#define OP_CODE_LIST(T)                                        \
+T(OP_MOVE,           "OP_MOVE",           2)                                                    \
+T(OP_SETTABLE,       "OP_SETTABLE",       3)                                                    \
+T(OP_SETOUTVAR,      "OP_SETOUTVAR",      2)                                                    \
+T(OP_LOADK,          "OP_LOADK",          2)                                                    \
+T(OP_CALL,           "OP_CALL",           3)                                                    \
+T(OP_GETMEMBER,      "OP_GETMEMBER",      3)                                                    \
+T(OP_LOADNULL,       "OP_LOADNULL",       1)                                                    \
+T(OP_GETGLOBAL,      "OP_GETGLOBAL",      2)                                                    \
+T(OP_GETFUNC,        "OP_GETFUNC",        2)                                                    \
+T(OP_NEW,            "OP_NEW",            3)                                                    \
+T(OP_CONSTRUCTOR,    "OP_CONSTRUCTOR",    3)                                                    \
+T(OP_GETCLASS,       "OP_GETCLASS",       3)                                                    \
+T(OP_GETMEMBERVAR,   "OP_GETMEMBERVAR",   3)                                                    \
+T(OP_SETMEMBERVAR,   "OP_SETMEMBERVAR",   2)                                                    \
+T(OP_GETSUPER,       "OP_GETSUPER",       3)                                                    \
+T(OP_RESETOUTVAR,    "OP_RESETOUTVAR",    1)                                                    \
+T(OP_GETOUTVAR,      "OP_GETOUTVAR",      2)                                                    \
+T(OP_OUT_CLOSURE,    "OP_OUT_CLOSURE",    2)                                                    \
+T(OP_IN_CLOSURE,     "OP_IN_CLOSURE",     2)                                                    \
+T(OP_REMOVE_CLOSURE, "OP_REMOVE_CLOSURE", 1)                                                    \
+T(OP_SETARRAY,       "OP_SETARRAY",       3)                                                    \
+T(OP_GETINDEX,       "OP_GETINDEX",       3)                                                    \
+T(OP_GETINDEXVAR,    "OP_GETINDEXVAR",    3)                                                    \
+T(OP_TYPEOF,         "OP_TYPEOF",         2)                                                    \
+T(OP_ADD,            "OP_ADD",            3)                                                    \
+T(OP_SUB,            "OP_SUB",            3)                                                    \
+T(OP_MUL,            "OP_MUL",            3)                                                    \
+T(OP_MOD,            "OP_MOD",            3)                                                    \
+T(OP_DIV,            "OP_DIV",            3)                                                    \
+T(OP_JMP,            "OP_JMP",            2)                                                    \
+T(OP_TRUE_JMP,       "OP_TRUE_JMP",       2)                                                    \
+T(OP_JMPTO,          "OP_JMPTO",          2)                                                    \
+T(OP_TRUE_JMPTO,     "OP_TRUE_JMPTO",     2)                                                    \
+T(OP_GOTO,           "OP_GOTO",           1)                                                    \
+T(OP_EQ,             "OP_EQ",             3)                                                    \
+T(OP_SEQ,            "OP_SEQ",            3)                                                    \
+T(OP_LT,             "OP_LT",             3)                                                    \
+T(OP_LTE,            "OP_LTE",            3)                                                    \
+T(OP_GT,             "OP_GT",             3)                                                    \
+T(OP_GTE,            "OP_GTE",            3)                                                    \
+T(OP_AND,            "OP_AND",            3)                                                    \
+T(OP_OR,             "OP_OR",             3)                                                    \
+T(OP_IN,             "OP_IN",             3)                                                    \
+T(OP_NOT,            "OP_NOT",            2)                                                    \
+T(OP_RETURN0,        "OP_RETURN0",        0)                                                    \
+T(OP_RETURN1,        "OP_RETURN1",        1)                                                    \
+T(OP_PREV_INCR,      "OP_PREV_INCR",      2)                                                    \
+T(OP_PREV_DECR,      "OP_PREV_DECR",      2)                                                    \
+T(OP_POST_INCR,      "OP_POST_INCR",      2)                                                    \
+T(OP_POST_DECR,      "OP_POST_DECR",      2)                                                    \
+T(OP_IDIV,           "OP_IDIV",           3)                                                    \
+T(OP_POW,            "OP_POW",            3)                                                    \
+T(OP_BAND,           "OP_BAND",           3)                                                    \
+T(OP_BOR,            "OP_BOR",            3)                                                    \
+T(OP_BXOR,           "OP_BXOR",           3)                                                    \
+T(OP_SHL,            "OP_SHL",            3)                                                    \
+T(OP_SHR,            "OP_SHR",            3)                                                    \
+T(OP_UNM,            "OP_UNM",            3)                                                    \
+T(OP_BNOT,           "OP_BNOT",           3)                                                    \
+T(OP_INVALID,        "OP_INVALID",        0)                                                    \
 
-  OP_SETARRAY,  //    A B C    R(A)[R(B)] = RK(C)
-  OP_GETINDEX,  //    A B C    R(A) = R(B)[R(C)]
-  OP_GETINDEXVAR,
-    
-  OP_ADD,   //	A B C	R(A) = R(B) + R(C)
-  OP_SUB,   //	A B C	R(A) = R(B) - R(C)
-  OP_MUL,   //	A B C	R(A) = R(B) * R(C)
-  OP_MOD,   //	A B C	R(A) = R(B) % R(C)
-  OP_POW,   //	A B C	R(A) = R(B) ^ R(C)
-  OP_DIV,   //	A B C	R(A) = R(B) / R(C)
-  OP_IDIV,  //	A B C	R(A) = R(B) // R(C)
-  OP_BAND,  //	A B C	R(A) = R(B) & R(C)
-  OP_BOR,   //	A B C	R(A) = R(B) | R(C)
-  OP_BXOR,  //	A B C	R(A) = R(B) ~ R(C)
-  OP_SHL,   //	A B C	R(A) = R(B) << R(C)
-  OP_SHR,   //	A B C	R(A) = R(B) >> R(C)
-  OP_UNM,   //	A B	    R(A) = -R(B)
-  OP_BNOT,  //	A B	    R(A) = ~R(B)
+#define T(name, string, ops) name,
+    enum OPCode {
+        OP_CODE_LIST(T) NUM_OPCODES
+    };
+#undef T
 
-  OP_JMP,   //	A Bx	if (!R(A)) pc += Bx
-  OP_GOTO,  //   Ax      pc = Ax
-  OP_EQ,    //	A B C	R(A) = R(B) == R(C)
-  OP_SEQ,
-  OP_LT,    //	A B C	R(A) = R(A) <  R(B)
-  OP_LTE,
-  OP_GT,
-  OP_GTE,
-  OP_AND,
-  OP_OR,
-  OP_IN,
-  OP_NOT,
-
-  OP_CALL,     //	A B C	R(A) = R(B)(R(B+1), ... ,R(B+C-1))
-  OP_RETURN0,  //	Return
-  OP_RETURN1,  //	Return R(A)
-
-  OP_PRE_INCR,  // A      if (B >= 0) R(B) = ++R(A) else ++R(A)
-  OP_PRE_DECR,  // A      if (B >= 0) R(B) = --R(A) else --R(A)
-    
-  OP_POST_INCR,  // A      if (B >= 0) R(B) = R(A)++ else R(A)++
-  OP_POST_DECR,  // A      if (B >= 0) R(B) = R(A)++ else R(A)--
-
-  OP_INVALID,
-
+class OPUtil {
+public:
+    static const char *name(OPCode code) {
+        assert(code < NUM_OPCODES);
+        return s_name_[code];
+    }
+    static int ops(OPCode code) {
+        assert(code < NUM_OPCODES);  // token is unsigned.
+        return s_ops_[code];
+    }
+private:
+    static const char *const s_name_[NUM_OPCODES];
+    static const int8_t s_ops_[NUM_OPCODES];
 };
 
 typedef unsigned long Instruction;
@@ -106,20 +128,20 @@ typedef unsigned long Instruction;
 
 #define CREATE_ABC(op_code, a, b, c)                                     \
   a < 0 || b < 0 || c < 0                                                \
-      ? ((Instruction)OP_INVALID << POS_OP)                              \
+? ((Instruction)OP_INVALID << POS_OP)                              \
       : ((Instruction)op_code << POS_OP) | ((Instruction)(a) << POS_A) | \
             ((Instruction)(b) << POS_B) | ((Instruction)(c) << POS_C)
 
 #define CREATE_Ax(op_code, ax)                 \
-  ax < 0 ? ((Instruction)OP_INVALID << POS_OP) \
+ax < 0 ? ((Instruction)OP_INVALID << POS_OP) \
          : ((Instruction)op_code << POS_OP) | ((Instruction)(ax) << POS_Ax)
 
 #define CREATE_ABx(op_code, a, bx)                                          \
-  a < 0 || bx < 0 ? ((Instruction)OP_INVALID << POS_OP)                     \
+a < 0 || bx < 0 ? ((Instruction)OP_INVALID << POS_OP)                     \
         : ((Instruction)op_code << POS_OP) | ((Instruction)(a) << POS_A)    \
              | ((Instruction)(bx) << POS_Bx)
 
-#define GET_OP_CODE(i) (OpCode)(((i) >> POS_OP) & 0xFF)
+#define GET_OP_CODE(i) (OPCode)(((i) >> POS_OP) & 0xFF)
 #define GET_ARG_A(i) (long)(((i) >> POS_A) & 0xFF)
 #define GET_ARG_B(i) (long)(((i) >> POS_B) & 0xFF)
 #define GET_ARG_C(i) (long)(((i) >> POS_C) & 0xFF)

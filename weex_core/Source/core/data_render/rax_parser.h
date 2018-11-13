@@ -91,6 +91,9 @@ public:
     Handle<Expression> ParseIfStatement();
     Handle<Expression> ParseElseBranch();
     Handle<Expression> ParseContinueStatement();
+    Handle<Expression> ParseSwitchStatement();
+    Handle<Expression> ParseTryCatchStatement();
+    Handle<Expression> ParseCaseBlock(bool is_default = false);
     Handle<Expression> ParseBreakStatement();
     Handle<Expression> ParseReturnStatement();
     Handle<Expression> ParseForStatement();
@@ -101,7 +104,7 @@ public:
     Handle<Declaration> ParseDeclaration();
     Handle<Expression> ParseClassStatement();
     Handle<Expression> ParseClassBody(std::string &clsname);
-    Handle<Expression> ParseClassMethodStatement(std::string &clsname);
+    Handle<Expression> ParseClassMemberStatement(std::string &clsname);
     Handle<Expression> ParseJSXNodeProperty();
 private:
     const std::string& GetIdentifierName();
@@ -109,7 +112,7 @@ private:
 
     double ParseNumber(const Token &token);
     Token::Type Peek();
-    void Advance(bool not_regex = true);
+    void Advance(bool not_regex = false);
     Tokenizer *lex() { return lex_; }
     ParserContext *context() { return ctx_; }
     ScopeManager *scope_manager() { return manager_; }

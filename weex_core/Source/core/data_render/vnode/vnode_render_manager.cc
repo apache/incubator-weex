@@ -17,10 +17,11 @@
  * under the License.
  */
 
-#include "core/data_render/vnode/vnode_render_manager.h"
 #include <chrono>
 #include <sstream>
-#include "base/string_util.h"
+#include "core/data_render/vnode/vnode_render_manager.h"
+#include "core/data_render/common_error.h"
+#include "core/data_render/exec_state_binary.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vnode/vnode.h"
@@ -29,8 +30,6 @@
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_creator.h"
 #include "core/bridge/platform_bridge.h"
-#include "core/data_render/binary_file.h"
-#include "core/data_render/common_error.h"
 
 #define VRENDER_LOG true
 
@@ -167,18 +166,18 @@ void VNodeRenderManager::InitVM() {
 }
 
 void VNodeRenderManager::CreatePage(const std::string &input, const std::string &page_id, const  std::string &options, const std::string &init_data) {
-    std::string err = CreatePageImpl(input, page_id, options, init_data);
+    std::string err = CreatePageWithContent(input, page_id, options, init_data);
     if (!err.empty()) {
         WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id.c_str(), nullptr, err.c_str());
     }
 }
 
-std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data) {
+std::string VNodeRenderManager::CreatePageWithContent(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data) {
     InitVM();
     auto start = std::chrono::steady_clock::now();
     ExecState *exec_state = new ExecState(g_vm);
     exec_states_.insert({page_id, exec_state});
-    VNodeExecEnv::InitCFuncEnv(exec_state);
+    VNodeExecEnv::ImportExecEnv(exec_state);
     std::string err;
     json11::Json json = json11::Json::parse(input, err);
     if (!err.empty() || json.is_null()) {
@@ -186,12 +185,12 @@ std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const s
     }
     else {
         exec_state->context()->raw_json() = json;
+        VNodeExecEnv::ParseData(exec_state);
+        VNodeExecEnv::ParseStyle(exec_state);
     }
-    VNodeExecEnv::InitGlobalValue(exec_state);
     if (init_data.length() > 0) {
-        VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+        VNodeExecEnv::ImportExecData(exec_state, init_data);
     }
-    VNodeExecEnv::InitStyleList(exec_state);
     exec_state->context()->page_id(page_id);
     //auto compile_start = std::chrono::steady_clock::now();
     exec_state->Compile(err);
@@ -217,6 +216,26 @@ std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const s
     return err;
 }
     
+bool VNodeRenderManager::RequireModule(ExecState *exec_state, std::string &name, std::string &result)
+{
+    bool finished = false;
+    do {
+        if (!modules_.size()) {
+            break;
+        }
+        for (auto iter = modules_.begin(); iter != modules_.end(); iter++) {
+            if ((*iter).find(name) <= 10) {
+                result = *iter;
+                finished = true;
+                break;
+            }
+        }
+        
+    } while (0);
+    
+    return finished;
+}
+    
 void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state, std::vector<std::string>& registers) {
     do {
         if (!modules_.size()) {
@@ -237,26 +256,19 @@ void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state, std::vect
     } while (0);
 }
 
-std::string VNodeRenderManager::CreatePageWithOpcode(const std::string& page_id, const std::string& options, const std::string& init_data) {
+std::string VNodeRenderManager::CreatePageWithContent(const uint8_t *contents, size_t length, const std::string &page_id, const std::string &options, const std::string &init_data) {
     InitVM();
     auto start = std::chrono::steady_clock::now();
     ExecState *exec_state = new ExecState(g_vm);
     exec_states_.insert({page_id, exec_state});
-    VNodeExecEnv::InitCFuncEnv(exec_state);
+    VNodeExecEnv::ImportExecEnv(exec_state);
+    exec_state->context()->page_id(page_id);
     std::string err;
-    try {
-        exec_state->startDecode();
-    } catch (std::exception &e) {
-        auto error = static_cast<Error *>(&e);
-        if (error) {
-            err = error->what();
-            std::cerr << error->what() << std::endl;
-        }
+    if (!weex::core::data_render::WXExecDecoder(exec_state, (uint8_t *)contents, length, err)) {
         return err;
     }
-    exec_state->endDecode();
     if (init_data.length() > 0) {
-        VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+        VNodeExecEnv::ImportExecData(exec_state, init_data);
     }
     auto decoder_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], Decoder time:[%lld]\n", decoder_post.count());
@@ -274,11 +286,8 @@ std::string VNodeRenderManager::CreatePageWithOpcode(const std::string& page_id,
     return err;
 }
 
-void VNodeRenderManager::CreatePage(const char *contents, unsigned long length, const std::string& page_id, const std::string& options, const std::string& init_data) {
-    BinaryFile *file = BinaryFile::instance();
-    file->set_input(contents);
-    file->set_length(length);
-    string err = CreatePageWithOpcode(page_id, options, init_data);
+void VNodeRenderManager::CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& init_data) {
+    string err = CreatePageWithContent((const uint8_t *)contents, length, page_id, options, init_data);
     if (!err.empty()) {
         WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id.c_str(), nullptr, err.c_str());
     }
@@ -292,7 +301,7 @@ bool VNodeRenderManager::RefreshPage(const std::string& page_id,
             break;
         }
         ExecState *exec_state = it->second;
-        VNodeExecEnv::InitInitDataValue(exec_state, init_data);
+        VNodeExecEnv::ImportExecData(exec_state, init_data);
         std::string err;
         exec_state->context()->Reset();
         exec_state->Execute(err);  // refresh root
@@ -344,24 +353,48 @@ void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string
         if (iter_event == vnode->events()->end()) {
             break;
         }
-        FuncState *func_state = (FuncState *)iter_event->second;
-        if (!func_state) {
+        if (!iter_event->second) {
             break;
         }
+        FuncState *func_state = nullptr;
+        FuncInstance *func_inst = nullptr;
         ExecState *exec_state = iter->second;
+        bool finder = false;
+        for (auto iter : exec_state->class_factory()->stores()) {
+            if (iter.first == iter_event->second) {
+                if (iter.second == Value::Type::FUNC_INST) {
+                    func_inst = reinterpret_cast<FuncInstance *>(iter.first);
+                }
+                finder = true;
+            }
+        }
+        if (!finder) {
+            func_state = reinterpret_cast<FuncState *>(iter_event->second);
+        }
+        if (!func_state && !func_inst) {
+            break;
+        }
         std::vector<Value> caller_args;
+        if (func_inst) {
+            func_state = func_inst->func_;
+        }
         if (func_state->is_class_func() && vnode->inst()) {
             Value inst;
             SetCIValue(&inst, reinterpret_cast<GCObject *>(vnode->inst()));
             caller_args.push_back(inst);
         }
         caller_args.push_back(StringToValue(exec_state, args));
-        exec_state->Call(func_state, caller_args);
+        if (func_inst) {
+            exec_state->Call(func_inst, caller_args);
+        }
+        else {
+            exec_state->Call(func_state, caller_args);
+        }
         
     } while (0);
 }
 
-void VNodeRenderManager::CallNativeModule(ExecState* exec_state,
+void VNodeRenderManager::CallNativeModule(ExecState *exec_state,
                                           const std::string& module,
                                           const std::string& method,
                                           const std::string& args, int argc) {
@@ -377,6 +410,18 @@ void VNodeRenderManager::CallNativeModule(ExecState* exec_state,
       break;
     }
   }
+}
+    
+void VNodeRenderManager::WXLogNative(ExecState *exec_state, const std::string &info) {
+    for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {
+        if (iter->second == exec_state) {
+            WeexCoreManager::Instance()
+            ->getPlatformBridge()
+            ->platform_side()
+            ->NativeLog(info.c_str());
+            break;
+        }
+    }
 }
 
 void VNodeRenderManager::PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node) {
@@ -632,10 +677,9 @@ void AddNodes(const string& pageId, vector<VNode*>& vec,
   for (int i = start; i <= end; ++i) {
     auto p_node = vec[i];
     ref_list.insert(ref_list.begin() + i, p_node);
-
-    WeexCore::RenderObject* root = VNode2RenderObject(p_node, pageId);
+    WeexCore::RenderObject *node = ParseVNode2RenderObject(p_node, nullptr, false, 0, pageId);
     RenderManager::GetInstance()->AddRenderObject(
-        pageId, p_node->parent()->render_object_ref(), i, root);
+        pageId, p_node->parent()->render_object_ref(), i, node);
   }
 }
 

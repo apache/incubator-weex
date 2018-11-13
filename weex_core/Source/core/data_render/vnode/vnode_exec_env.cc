@@ -17,8 +17,8 @@
  * under the License.
  */
 
-#include "core/data_render/vnode/vnode_exec_env.h"
 #include <sstream>
+#include "core/data_render/vnode/vnode_exec_env.h"
 #include "core/data_render/object.h"
 #include "core/data_render/table.h"
 #include "core/data_render/class_factory.h"
@@ -36,41 +36,6 @@ namespace core {
 namespace data_render {
 
 json11::Json ValueToJSON(const Value& value);
-
-static Value Log(ExecState *exec_state) {
-  size_t length = exec_state->GetArgumentCount();
-  std::stringstream ss;
-  for (int i = 0; i < length; ++i) {
-    Value *a = exec_state->GetArgument(i);
-    switch (a->type) {
-      case Value::Type::NUMBER:
-        ss << "[log]:=>" << a->n << "\n";
-        break;
-      case Value::Type::INT:
-        ss << "[log]:=>" << a->i << "\n";
-        break;
-      case Value::Type::STRING:
-        ss << "[log]:=>" << a->str->c_str() << "\n";
-        break;
-      case Value::Type::TABLE:
-        ss << "[log]:=>" << TableToString(ValueTo<Table>(a)) << "\n";
-        break;
-      case Value::Type::ARRAY:
-        ss << "[log]:=>" << ArrayToString(ValueTo<Array>(a)) << "\n";
-        break;
-      case Value::Type::CPTR:
-      {
-          VNode *node = (VNode *)a->cptr;
-          ss << "[log]:=> cptr" << node->tag_name() <<"\n";
-          break;
-      }
-      default:
-        break;
-    }
-  }
-  LOGD("%s",ss.str().c_str());
-  return Value();
-}
 
 static Value SizeOf(ExecState *exec_state) {
     size_t length = exec_state->GetArgumentCount();
@@ -175,6 +140,27 @@ static Value CallNativeModule(ExecState *exec_state) {
         weex::core::data_render::VNodeRenderManager::GetInstance()->CallNativeModule(exec_state, CStringValue(module), CStringValue(method), argc > 0 ? ArrayToString(ValueTo<Array>(args)) : "", argc);
         
     } while(0);
+    
+    return Value();
+}
+    
+static Value RequireModule(ExecState *exec_state) {
+    do {
+        if (!exec_state->GetArgumentCount()) {
+            break;
+        }
+        Value *arg = exec_state->GetArgument(0);
+        if (!IsString(arg)) {
+            break;
+        }
+        std::string module_name = CStringValue(arg);
+        std::string module_info;
+        if (!weex::core::data_render::VNodeRenderManager::GetInstance()->RequireModule(exec_state, module_name, module_info)) {
+            break;
+        }
+        return StringToValue(exec_state, module_info);
+        
+    } while (0);
     
     return Value();
 }
@@ -467,12 +453,12 @@ static Value SetProps(ExecState *exec_state) {
                             }
                             case Value::INT:
                             {
-                                node->SetStyle(iter_style->first, to_string(iter_style->second.i));
+                                node->SetStyle(iter_style->first, base::to_string(iter_style->second.i));
                                 break;
                             }
                             case Value::NUMBER:
                             {
-                                node->SetStyle(iter_style->first, to_string(iter_style->second.n));
+                                node->SetStyle(iter_style->first, base::to_string(iter_style->second.n));
                                 break;
                             }
                             default:
@@ -491,7 +477,7 @@ static Value SetProps(ExecState *exec_state) {
                     }
                     case Value::INT:
                     {
-                        node->SetAttribute(iter->first, to_string(iter->second.i));
+                        node->SetAttribute(iter->first, base::to_string(iter->second.i));
                         break;
                     }
                     case Value::FUNC:
@@ -506,16 +492,28 @@ static Value SetProps(ExecState *exec_state) {
                         node->AddEvent(event, func_state, func_state->class_inst());
                         break;
                     }
+                    case Value::FUNC_INST:
+                    {
+                        std::string::size_type pos = iter->first.find("on");
+                        if (pos != 0) {
+                            throw VMExecError("AddEvent isn't a function");
+                        }
+                        std::string event = iter->first.substr(pos + 2);
+                        transform(event.begin(), event.end(), event.begin(), ::tolower);
+                        FuncInstance *func_inst = ValueTo<FuncInstance>(&iter->second);
+                        FuncState *func_state = func_inst->func_;
+                        node->AddEvent(event, func_inst, func_state->class_inst());
+                        break;
+                    }
                     case Value::NUMBER:
                     {
-                        node->SetStyle(iter->first, to_string(iter->second.n));
+                        node->SetStyle(iter->first, base::to_string(iter->second.n));
                         break;
                     }
                     default:
                         LOGE("can't support type:%i\n", iter->second.type);
                         break;
                 }
-
             }
         }
     }
@@ -559,8 +557,7 @@ static Value SetStyle(ExecState* exec_state) {
   return Value();
 }
 
-void VNodeExecEnv::InitCFuncEnv(ExecState *state) {
-    state->Register("log", Log);
+void VNodeExecEnv::ImportExecEnv(ExecState *state) {
     state->Register("sizeof", SizeOf);
     state->Register("slice", Slice);
     state->Register("appendUrlParam", AppendUrlParam);
@@ -573,16 +570,24 @@ void VNodeExecEnv::InitCFuncEnv(ExecState *state) {
     state->Register("appendChildComponent", AppendChildComponent);
     state->Register("appendChild", AppendChild);
     state->Register("encodeURIComponent", encodeURIComponent);
+    state->Register("encodeURI", encodeURIComponent);
     state->Register("setAttr", SetAttr);
     state->Register("setProps", SetProps);
     state->Register("setClassList", SetClassList);
     state->Register("setStyle", SetStyle);
     state->Register("__callNativeModule", CallNativeModule);
+    // __registerModules deprecated in sversion 5.8 +
     state->Register("__registerModules", RegisterModules);
+    // __requireModule supporting in sversion 5.8 +
+    state->Register("__requireModule", RequireModule);
     state->Register("Array", state->class_factory()->ClassArray());
     state->Register("String", state->class_factory()->ClassString());
     state->Register("JSON", state->class_factory()->ClassJSON());
     state->Register("Object", state->class_factory()->ClassObject());
+    state->Register("RegExp", state->class_factory()->ClassRegExp());
+    state->Register("window", state->class_factory()->ClassWindow());
+    state->Register("Math", state->class_factory()->ClassMath());
+    state->Register("console", state->class_factory()->ClassConsole());
     RegisterJSCommonFunction(state);
 }
 
@@ -656,7 +661,7 @@ json11::Json ValueToJSON(const Value& value) {
     return json11::Json(object);
 }
 
-void VNodeExecEnv::InitGlobalValue(ExecState* state) {
+void VNodeExecEnv::ParseData(ExecState* state) {
   const json11::Json& json = state->context()->raw_json();
   Variables* global = state->global();
   const json11::Json& data = json["data"];
@@ -688,7 +693,7 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   global->Add("_components_props", components_props);
 }
 
-void VNodeExecEnv::InitInitDataValue(ExecState *state, const std::string& init_data_str) {
+void VNodeExecEnv::ImportExecData(ExecState *state, const std::string& init_data_str) {
   std::string err;
   const json11::Json& json = json11::Json::parse(init_data_str, err);
   if (!err.empty()) {
@@ -715,7 +720,7 @@ void AddStyles(ExecState* state, const std::string& prefix, const json11::Json& 
   }
 }
 
-void VNodeExecEnv::InitStyleList(ExecState* state) {
+void VNodeExecEnv::ParseStyle(ExecState *state) {
   json11::Json& json = state->context()->raw_json();
   //body styles
 
@@ -742,7 +747,6 @@ Value StringToValue(ExecState *exec_state,const std::string &str) {
         std::string err;
         json11::Json json = json11::Json::parse(str, err);
         if (!err.empty() || json.is_null()) {
-            ret = exec_state->string_table()->StringFromUTF8(str);
             break;
         }
         ret = JSONToValue(exec_state, json);
