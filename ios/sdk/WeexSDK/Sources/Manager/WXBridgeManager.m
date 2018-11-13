@@ -141,6 +141,19 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
 }
 
 #pragma mark JSBridge Management
+- (void)createInstanceForJS:(NSString *)instance
+              template:(NSString *)temp
+               options:(NSDictionary *)options
+                  data:(id)data {
+    if (!instance || !temp) return;
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnBridgeThread(^(){
+        [weakSelf.bridgeCtx createInstance:instance
+                                  template:temp
+                                   options:options
+                                      data:data];
+    });
+}
 
 - (void)createInstance:(NSString *)instance
               template:(NSString *)temp
@@ -289,22 +302,21 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     return value;
 }
 
-- (void)DownloadJS:(NSString *)instance scriptUrl:(NSURL *)scriptUrl
+- (void)DownloadJS:(NSURL *)scriptUrl completion:(void (^)(NSString *script))complection;
 {
-    if (!instance || !scriptUrl) {
+    if (!scriptUrl) {
+        complection(nil);
         return;
     }
-    __weak typeof(self) weakSelf = self;
     WXResourceRequest* request = [WXResourceRequest requestWithURL:scriptUrl];
     WXResourceLoader* jsLoader = [[WXResourceLoader alloc] initWithRequest:request];
     jsLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         NSString* jsString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        WXPerformBlockOnBridgeThread(^(){
-            [weakSelf createInstance:instance template:jsString options:nil data:nil];
-        });
+        complection(jsString);
     };
     jsLoader.onFailed = ^(NSError *loadError) {
         WXLogError(@"No js URL found");
+        complection(nil);
     };
 
    [jsLoader start];

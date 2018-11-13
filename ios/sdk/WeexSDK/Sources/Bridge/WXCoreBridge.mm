@@ -718,15 +718,19 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
     NSString *optionsString = [WXUtility JSONString:options];
     NSString *dataString = [WXUtility JSONString:data];
-    weex::core::data_render::HttpModule downloadJS;
-    downloadJS.set_func([=](const char* url){
-        NSURL* ns_url = [NSURL URLWithString:NSSTRING(url)];
-        WXPerformBlockOnMainThread(^{
-            [[WXSDKManager bridgeMgr] DownloadJS:pageId scriptUrl:ns_url];
+
+    node_manager->CreatePage([jsBundleString UTF8String] ?: "", [pageId UTF8String] ?: "", [optionsString UTF8String] ?: "", [dataString UTF8String] ?: "", [=](const char* javascript){
+        if (!javascript) {
+            return;
+        }
+        [[WXSDKManager bridgeMgr] createInstanceForJS:pageId template:NSSTRING(javascript) options:nil data:data];
+        WXPerformBlockOnComponentThread(^{
+            auto root = node_manager->GetRootVNode([pageId UTF8String] ?: "");
+            if (root && root->IsVirtualComponent()) {
+                static_cast<weex::core::data_render::VComponent*>(root)->DispatchCreated();
+            }
         });
     });
-
-    node_manager->CreatePage([jsBundleString UTF8String] ?: "", [pageId UTF8String] ?: "", [optionsString UTF8String] ?: "", [dataString UTF8String] ?: "", &downloadJS);
 }
 
 + (void)createDataRenderInstance:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary *)options data:(id)data

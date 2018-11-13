@@ -16,28 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-#ifndef HTTP_MODULE_
-#define HTTP_MODULE_
-#include <functional>
-#include <memory>
+#include "core/network/default_request_handler.h"
+#import "WXConvertUtility.h"
+#import "WXSDKManager.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-typedef std::function<void(const char*)> FUNC;
-class RequestHandler;
-
-class HttpModule {
-public:
-    HttpModule();
-    HttpModule(RequestHandler* request_handler);
-    void Send(const char* url, FUNC callback);
-private:
-    std::auto_ptr<RequestHandler> request_handler_;
-};
-
+    void DefaultRequestHandler::Send(const char* url, std::function<void(const char*)> callback) {
+        NSURL* ns_url = [NSURL URLWithString:NSSTRING(url)];
+        [[WXSDKManager bridgeMgr] DownloadJS:ns_url completion:^(NSString *script) {
+            callback([script UTF8String] ? : nullptr);
+        }];
+    }
 }
 }
 }
-#endif

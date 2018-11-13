@@ -17,16 +17,26 @@
  * under the License.
  */
 #include "core/network/http_module.h"
+#include "core/network/request_handler.h"
+#include "core/network/default_request_handler.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-void HttpModule::set_func(std::function<void(const char*)> func) {
-    func_ = func;
+
+HttpModule::HttpModule() : request_handler_(new DefaultRequestHandler) {
 }
 
-void HttpModule::Send(const char* url) {
-    func_(url);
+HttpModule::HttpModule(RequestHandler* request_handler) {
+    if (!request_handler) {
+        request_handler_.reset(new DefaultRequestHandler);
+    } else {
+        request_handler_.reset(request_handler);
+    }
+}
+
+void HttpModule::Send(const char* url, FUNC callback) {
+    request_handler_->Send(url, callback);
 }
 
 }

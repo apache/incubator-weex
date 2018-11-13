@@ -17,24 +17,18 @@
  * under the License.
  */
 
-#ifndef HTTP_MODULE_
-#define HTTP_MODULE_
-#include <functional>
-#include <memory>
+#ifndef DEFAULT_REQUEST_HANDLER_H
+#define DEFAULT_REQUEST_HANDLER_H
+
+#include "core/network/request_handler.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-typedef std::function<void(const char*)> FUNC;
-class RequestHandler;
 
-class HttpModule {
+class DefaultRequestHandler : public RequestHandler{
 public:
-    HttpModule();
-    HttpModule(RequestHandler* request_handler);
-    void Send(const char* url, FUNC callback);
-private:
-    std::auto_ptr<RequestHandler> request_handler_;
+    void Send(const char* url, std::function<void(const char*)> callback) override;
 };
 
 }

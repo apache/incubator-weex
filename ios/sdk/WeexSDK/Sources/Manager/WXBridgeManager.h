@@ -39,6 +39,18 @@ extern void WXPerformBlockOnBridgeThread(void (^block)(void));
  *  @param options   :   parameters
  *  @param data      :   external data
  **/
+- (void)createInstanceForJS:(NSString *)instance
+              template:(NSString *)temp
+               options:(NSDictionary *)options
+                  data:(id)data;
+
+/**
+ *  Create Instance Method
+ *  @param instance  :   instance id
+ *  @param temp  :   template data
+ *  @param options   :   parameters
+ *  @param data      :   external data
+ **/
 - (void)createInstance:(NSString *)instance
               template:(NSString *)temp
                options:(NSDictionary *)options
@@ -101,7 +113,7 @@ extern void WXPerformBlockOnBridgeThread(void (^block)(void));
  + *  download JS Script
  + *  @param scriptUrl    :   script url
  + **/
-- (void)DownloadJS:(NSString *)instance scriptUrl:(NSURL *)scriptUrl;
+- (void)DownloadJS:(NSURL *)scriptUrl completion:(void (^)(NSString *script))complection;
 
 /**
  *  Register JS service Script
