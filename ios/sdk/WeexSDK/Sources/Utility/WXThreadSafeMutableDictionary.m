@@ -145,24 +145,30 @@
 
 - (void)setObject:(id)anObject forKey:(id<NSCopying>)aKey
 {
+    id originalObject = nil; // make sure that object is not released in lock
     @try {
         pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        originalObject = [_dict objectForKey:aKey];
         [_dict setObject:anObject forKey:aKey];
     }
     @finally {
         pthread_mutex_unlock(&_safeThreadDictionaryMutex);
     }
+    originalObject = nil;
 }
 
 - (void)setObject:(id)anObject forKeyedSubscript:(id <NSCopying>)key
 {
+    id originalObject = nil; // make sure that object is not released in lock
     @try {
         pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        originalObject = [_dict objectForKey:key];
         [_dict setObject:anObject forKeyedSubscript:key];
     }
     @finally {
         pthread_mutex_unlock(&_safeThreadDictionaryMutex);
     }
+    originalObject = nil;
 }
 
 - (NSArray *)allKeys
@@ -189,24 +195,32 @@
 
 - (void)removeObjectForKey:(id)aKey
 {
+    id originalObject = nil; // make sure that object is not released in lock
     @try {
         pthread_mutex_lock(&_safeThreadDictionaryMutex);
-        [_dict removeObjectForKey:aKey];
+        originalObject = [_dict objectForKey:aKey];
+        if (originalObject) {
+            [_dict removeObjectForKey:aKey];
+        }
     }
     @finally {
         pthread_mutex_unlock(&_safeThreadDictionaryMutex);
     }
+    originalObject = nil;
 }
 
 - (void)removeAllObjects
 {
+    NSArray* allValues = nil; // make sure that objects are not released in lock
     @try {
         pthread_mutex_lock(&_safeThreadDictionaryMutex);
+        allValues = [_dict allValues];
         [_dict removeAllObjects];
     }
     @finally {
         pthread_mutex_unlock(&_safeThreadDictionaryMutex);
     }
+    allValues = nil;
 }
 
 - (id)copy
