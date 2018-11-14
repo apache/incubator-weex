@@ -665,10 +665,10 @@ namespace WeexCore {
       
       switch (mCssStyle->mFlexDirection) {
         case kFlexDirectionRow:
-            layoutHorizontal(mLayoutResult->mLayoutDirection == kDirectionRTL ? true : false, left, top, right, bottom, absoulteItem, flexLine);
+            layoutHorizontal(mLayoutResult->mLayoutDirection == kDirectionRTL, left, top, right, bottom, absoulteItem, flexLine);
             break;
         case kFlexDirectionRowReverse:
-            layoutHorizontal(mLayoutResult->mLayoutDirection == kDirectionRTL ? false : true, left, top, right, bottom, absoulteItem, flexLine);
+            layoutHorizontal(mLayoutResult->mLayoutDirection != kDirectionRTL, left, top, right, bottom, absoulteItem, flexLine);
             break;
           case kFlexDirectionColumnReverse:
               layoutVertical(verticalRTL, true, left, top, right, bottom, absoulteItem, flexLine);
