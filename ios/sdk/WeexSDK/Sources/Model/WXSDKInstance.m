@@ -235,9 +235,7 @@ typedef enum : NSUInteger {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
     }
-    if ([url.absoluteString hasSuffix:WEEX_LITE_URL_SUFFIX]) {
-        _defaultDataRender = YES;
-    }
+
     _scriptURL = url;
     [self _checkPageName];
     [self.apmInstance startRecord:self.instanceId];
@@ -278,7 +276,7 @@ typedef enum : NSUInteger {
     }
     
     if (_isRendered) {
-        [WXExceptionUtils commitCriticalExceptionRT:self.instanceId errCode:[NSString stringWithFormat:@"%d", WX_ERR_RENDER_TWICE] function:@"_renderWithOpcode:" exception:[NSString stringWithFormat:@"instance is rendered twice"] extParams:nil];
+        [WXExceptionUtils commitCriticalExceptionRT:self.instanceId errCode:[NSString stringWithFormat:@"%d", WX_ERR_RENDER_TWICE] function:@"_renderWithData:" exception:[NSString stringWithFormat:@"instance is rendered twice"] extParams:nil];
         return;
     }
 
@@ -336,9 +334,9 @@ typedef enum : NSUInteger {
         return;
     }
 
-    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"renderWithOpcode" options:@{@"threadName":WXTMainThread}];
+    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"_renderWithData" options:@{@"threadName":WXTMainThread}];
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId contents:contents options:dictionary data:_jsData];
-    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"renderWithOpcode" options:@{@"threadName":WXTMainThread}];
+    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"_renderWithData" options:@{@"threadName":WXTMainThread}];
 
    // WX_MONITOR_PERF_SET(WXPTBundleSize, [data length], self);
     _isRendered = YES;
@@ -484,6 +482,11 @@ typedef enum : NSUInteger {
     if (!newOptions[bundleUrlOptionKey]) {
         newOptions[bundleUrlOptionKey] = url.absoluteString;
     }
+
+    if ([url.absoluteString hasSuffix:WEEX_LITE_URL_SUFFIX]) {
+        newOptions[@"WLASM_RENDER"] = @(YES);
+    }
+
     // compatible with some wrong type, remove this hopefully in the future.
     if ([newOptions[bundleUrlOptionKey] isKindOfClass:[NSURL class]]) {
         WXLogWarning(@"Error type in options with key:bundleUrl, should be of type NSString, not NSURL!");
@@ -542,7 +545,7 @@ typedef enum : NSUInteger {
             return;
         }
         
-        if (strongSelf.dataRender) {
+        if (([options[@"DATA_RENDER"] boolValue] && [options[@"RENDER_WITH_BINARY"] boolValue]) || [options[@"WLASM_RENDER"] boolValue]) {
             [strongSelf _renderWithData:data];
             return;
         }
@@ -779,7 +782,7 @@ typedef enum : NSUInteger {
 
 - (BOOL)dataRender
 {
-    if ([_options[@"WLASM_RENDER"] boolValue]) {
+    if ([_options[@"DATA_RENDER"] boolValue] || [_options[@"WLASM_RENDER"] boolValue]) {
         return YES;
     }
     return _defaultDataRender;
