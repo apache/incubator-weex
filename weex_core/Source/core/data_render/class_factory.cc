@@ -1,6 +1,21 @@
-//
-// Created by chad on 2018/7/19.
-//
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 #include "core/data_render/class_factory.h"
 #include "core/data_render/class.h"
@@ -22,7 +37,7 @@ Value ClassFactory::CreateClassDescriptor(ClassDescriptor *p_super) {
     descs_.push_back(desc);
     return value;
 }
-    
+
 Value ClassFactory::CreateArray() {
     Array *array = new Array();
     Value value;
@@ -31,7 +46,7 @@ Value ClassFactory::CreateArray() {
     arrays_.push_back(array);
     return value;
 }
-    
+
 Value ClassFactory::CreateTable() {
     Table *table = new Table();
     Value value;
@@ -40,7 +55,7 @@ Value ClassFactory::CreateTable() {
     tables_.push_back(table);
     return value;
 }
-    
+
 Value ClassFactory::ClassString() {
     ClassDescriptor *desc = NewClassString();
     Value value;
@@ -49,7 +64,7 @@ Value ClassFactory::ClassString() {
     descs_.push_back(desc);
     return value;
 }
-    
+
 Value ClassFactory::ClassJSON() {
     ClassDescriptor *desc = NewClassJSON();
     Value value;
@@ -58,7 +73,7 @@ Value ClassFactory::ClassJSON() {
     descs_.push_back(desc);
     return value;
 }
-    
+
 Value ClassFactory::ClassArray() {
     ClassDescriptor *desc = NewClassArray();
     Value value;
@@ -67,7 +82,7 @@ Value ClassFactory::ClassArray() {
     descs_.push_back(desc);
     return value;
 }
-    
+
 Value ClassFactory::ClassObject() {
     ClassDescriptor *desc = NewClassOject();
     Value value;
@@ -76,7 +91,7 @@ Value ClassFactory::ClassObject() {
     descs_.push_back(desc);
     return value;
 }
-    
+
 int ClassFactory::findDesc(const ClassDescriptor *desc) {
     int index = 0;
     for (auto d : descs_) {
@@ -98,7 +113,7 @@ ClassInstance *ClassFactory::CreateClassInstanceFromSuper(ClassDescriptor *p_des
     }
     return inst;
 }
-    
+
 Value ClassFactory::CreateClassInstance(ClassDescriptor *p_desc) {
     ClassInstance *inst = CreateClassInstanceFromSuper(p_desc);
     Value value;
