@@ -125,6 +125,7 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 - (void) updateDiffStats:(NSString *)name withDiffValue:(double)diff;
 - (void) updateMaxStats:(NSString *)name curMaxValue:(double)maxValue;
 - (void) updateExtInfoFromResponseHeader:(NSDictionary*) extInfo;
+- (void) forceSetInteractionTime:(long) unixTime;
 
 
 #pragma mark - called by IWXHttpAdapter implementer

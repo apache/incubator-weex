@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include <string.h>
 #include "css_value_getter.h"
 #include "constants_value.h"
 #include "constants_name.h"

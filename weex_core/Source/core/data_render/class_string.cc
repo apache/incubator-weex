@@ -18,6 +18,7 @@
  */
 
 #include <stdlib.h>
+#include <regex>
 #include <algorithm>
 #include "core/data_render/class_string.h"
 #include "core/data_render/class.h"
@@ -35,17 +36,54 @@ namespace data_render {
 static Value split(ExecState *exec_state);
 static Value trim(ExecState* exec_state);
 static Value indexOf(ExecState* exec_state);
+static Value search(ExecState* exec_state);
 static Value replaceAll(ExecState *exec_state);
+static Value replace(ExecState *exec_state);
+static Value match(ExecState *exec_state);
+
+static ClassInstance* to_regex_inst(ExecState *exec_state, Value* v){
+  if (!IsClassInstance(v)){
+    throw VMExecError("not a regex instance");
+  }
+  ClassInstance* instance = ValueTo<ClassInstance>(v);
+  int index = exec_state->global()->IndexOf("RegExp");
+  if (index < 0) {
+    throw VMExecError("split lost RegExp define");
+  }
+  Value* reg_define = exec_state->global()->Find(index);
+  if (!IsClass(reg_define)) {
+    throw VMExecError("split not a RegExp define");
+  }
+  if (instance->p_desc_ != ValueTo<ClassDescriptor>(reg_define)) {
+    throw VMExecError("split not a RegExp instance");
+  }
+  return instance;
+}
+
+std::vector<std::string> split_regex(const std::string& input, const std::string& regex, const std::string& flag) {
+    // passing -1 as the submatch index parameter performs splitting
+    std::regex_constants::syntax_option_type type = std::regex_constants::ECMAScript;
+    if (flag.find('i') != std::string::npos){
+        type |= std::regex_constants::icase;
+    }
+
+    std::regex re(regex,type);
+    std::sregex_token_iterator first{input.begin(), input.end(), re, -1}, last;
+    return {first, last};
+}
 
 ClassDescriptor *NewClassString() {
     ClassDescriptor *array_desc = new ClassDescriptor(nullptr);
     AddClassCFunc(array_desc, "split", split);
     AddClassCFunc(array_desc, "trim", trim);
     AddClassCFunc(array_desc, "indexOf", indexOf);
+    AddClassCFunc(array_desc, "search", search);
+    AddClassCFunc(array_desc, "replace", replace);
     AddClassCFunc(array_desc, "replaceAll", replaceAll);
+    AddClassCFunc(array_desc, "match", match);
     return array_desc;
 }
-    
+
 std::string& replace_all(std::string& str, std::string& old_value, std::string& new_value)
 {
     while (true)
@@ -60,7 +98,16 @@ std::string& replace_all(std::string& str, std::string& old_value, std::string& 
     }
     return str;
 }
-    
+
+std::string& replace_normal(std::string& str, std::string& old_value, std::string& new_value)
+{
+    std::string::size_type pos(0);
+    if ((pos = str.find(old_value)) != std::string::npos) {
+        str.replace(pos, old_value.length(),new_value);
+    }
+    return str;
+}
+
 static Value replaceAll(ExecState *exec_state) {
     Value ret;
     do {
@@ -85,12 +132,61 @@ static Value replaceAll(ExecState *exec_state) {
         std::string newstr = CStringValue(newValue);
         std::string dststr = replace_all(srcstr, oldstr, newstr);
         ret = exec_state->string_table()->StringFromUTF8(dststr);
-        
+
     } while (0);
-    
+
     return ret;
 }
-    
+
+static Value replace(ExecState *exec_state) {
+    Value ret;
+    do {
+        size_t length = exec_state->GetArgumentCount();
+        if (length < 3) {
+            break;
+        }
+        Value *src = exec_state->GetArgument(0);
+        if (!IsString(src)) {
+            throw VMExecError("replaceAll caller isn't a string");
+        }
+        Value *oldValue = exec_state->GetArgument(1);
+        Value *newValue = exec_state->GetArgument(2);
+        if (!IsString(newValue)) {
+            throw VMExecError("new value isn't a string");
+        }
+        std::string srcstr = CStringValue(src);
+        std::string newstr = CStringValue(newValue);
+        if (IsString(oldValue)) {
+
+          std::string oldstr = CStringValue(oldValue);
+          std::string dststr = replace_normal(srcstr, oldstr, newstr);
+          ret = exec_state->string_table()->StringFromUTF8(dststr);
+        } else if (IsClassInstance(oldValue)){
+          ClassInstance* instance = to_regex_inst(exec_state,oldValue);
+          Value* reg = GetClassMember(instance, "_reg");
+          Value* flag = GetClassMember(instance, "_flag");
+          if (!IsString(reg) || !IsString(flag)){
+            throw VMExecError("Regex._reg || _flag is not string");
+          }
+          std::string reg_str = ValueTo<String>(reg)->c_str();
+          std::string flag_str = ValueTo<String>(flag)->c_str();
+
+          std::regex_constants::syntax_option_type type = std::regex_constants::ECMAScript;
+          if (flag_str.find('i') != std::string::npos){
+            type |= std::regex_constants::icase;
+          }
+          std::regex express(reg_str, type);
+
+          std::string dststr = std::regex_replace(srcstr, express, newstr,std::regex_constants::format_first_only);
+          ret = exec_state->string_table()->StringFromUTF8(dststr);
+        } else{
+          throw VMExecError("old caller isn't a string or regex");
+        }
+    } while (0);
+
+    return ret;
+}
+
 template <class Container>
 void split_string(const std::string& str, Container& container, const std::string& delims = " ")
 {
@@ -105,7 +201,7 @@ void split_string(const std::string& str, Container& container, const std::strin
         container.push_back(str.substr(previous, str.length() - previous));
     }
 }
- 
+
 static Value split(ExecState *exec_state) {
     Value ret = exec_state->class_factory()->CreateArray();
     do {
@@ -118,29 +214,47 @@ static Value split(ExecState *exec_state) {
             throw VMExecError("split caller isn't a string");
         }
         Value *split = exec_state->GetArgument(1);
-        if (!IsString(split)) {
-            throw VMExecError("split caller isn't a string");
+        if (IsString(split)) {
+            std::string src = CStringValue(string);
+            std::string delim = CStringValue(split);
+            std::vector<std::string>split_array;
+            split_string<std::vector<std::string>>(src, split_array, delim);
+            Array *array = ValueTo<Array>(&ret);
+            for (int i = 0; i < split_array.size(); i++) {
+                Value string_value = exec_state->string_table()->StringFromUTF8(split_array[i]);
+                array->items.push_back(string_value);
+            }
+        } else if(IsClassInstance(split)){
+            ClassInstance* instance = to_regex_inst(exec_state,split);
+            Value* reg = GetClassMember(instance, "_reg");
+            Value* flag = GetClassMember(instance, "_flag");
+            if (!IsString(reg) || !IsString(flag) || !IsString(string)){
+                throw VMExecError("Regex._reg || _flag is not string");
+            }
+            std::string reg_str = ValueTo<String>(reg)->c_str();
+            std::string flag_str = ValueTo<String>(flag)->c_str();
+            std::string test_str = ValueTo<String>(string)->c_str();
+
+            auto ret_vec = split_regex(test_str,reg_str,flag_str);
+
+            Array *array = ValueTo<Array>(&ret);
+            for(auto st: ret_vec){
+                Value string_value = exec_state->string_table()->StringFromUTF8(st);
+                array->items.push_back(string_value);
+            }
+        } else {
+            throw VMExecError("split caller isn't a string or regex");
         }
-        std::string src = CStringValue(string);
-        std::string delim = CStringValue(split);
-        std::vector<std::string>split_array;
-        split_string<std::vector<std::string>>(src, split_array, delim);
-        Array *array = ValueTo<Array>(&ret);
-        for (int i = 0; i < split_array.size(); i++) {
-            Value string_value = exec_state->string_table()->StringFromUTF8(split_array[i]);
-            array->items.push_back(string_value);
-        }
-        
     } while (0);
-    
+
     return ret;
 }
-    
+
 std::string& trim(std::string &s) {
     if (s.empty()) {
         return s;
     }
-    
+
     s.erase(0, s.find_first_not_of(" "));
     s.erase(s.find_last_not_of(" ") + 1);
     return s;
@@ -155,14 +269,14 @@ static Value trim(ExecState* exec_state) {
     if (!IsString(string)) {
         throw VMExecError("trim caller isn't a string");
     }
-    
+
     std::string src = CStringValue(string);
     trim(src);
-    
+
     Value string_value = exec_state->string_table()->StringFromUTF8(src);
     return string_value;
 }
-    
+
 /* Converts a hex character to its integer value */
 char from_hex(char ch) {
     return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
@@ -190,7 +304,7 @@ char *url_encode(char *str) {
     *pbuf = '\0';
     return buf;
 }
-    
+
 /* Returns a url-decoded version of str */
 /* IMPORTANT: be sure to free() the returned string after use */
 char *url_decode(char *str) {
@@ -211,7 +325,7 @@ char *url_decode(char *str) {
     *pbuf = '\0';
     return buf;
 }
-    
+
 Value encodeURIComponent(ExecState *exec_state) {
     size_t length = exec_state->GetArgumentCount();
     if (length < 1) {
@@ -319,6 +433,120 @@ Value indexOf(ExecState* exec_state) {
     }
 
     return Value(static_cast<int64_t>(pos));
+}
+
+Value search(ExecState* exec_state) {
+    Value ret;
+    size_t length = exec_state->GetArgumentCount();
+    if (length != 2) {
+        throw VMExecError("search arg count wrong");
+    }
+
+    Value *string = exec_state->GetArgument(0);
+    if (!IsString(string)) {
+        throw VMExecError("split caller isn't a string");
+    }
+
+    Value *search_str = exec_state->GetArgument(1);
+    if(IsClassInstance(search_str)){
+        ClassInstance* instance = to_regex_inst(exec_state,search_str);
+
+        Value* reg = GetClassMember(instance, "_reg");
+        Value* flag = GetClassMember(instance, "_flag");
+        if (!IsString(reg) || !IsString(flag)){
+            throw VMExecError("Regex._reg || _flag is not string");
+        }
+        std::string reg_str = ValueTo<String>(reg)->c_str();
+        std::string flag_str = ValueTo<String>(flag)->c_str();
+        std::string test_str = ValueTo<String>(string)->c_str();
+
+        std::regex_constants::syntax_option_type type = std::regex_constants::ECMAScript;
+        if (flag_str.find('i') != std::string::npos){
+            type |= std::regex_constants::icase;
+        }
+        std::regex express(reg_str, type);
+        std::smatch match;
+        bool succ  = std::regex_search(test_str,match,express);
+        if (succ){
+            ret = static_cast<int64_t>(match.position(0));
+        } else{
+            ret = -1;
+        }
+    } else {
+        throw VMExecError("split caller isn't a string or regex");
+    }
+
+    return ret;
+}
+
+Value match(ExecState* exec_state) {
+    Value ret;
+    size_t length = exec_state->GetArgumentCount();
+    if (length != 2) {
+        throw VMExecError("search arg count wrong");
+    }
+
+    Value *string = exec_state->GetArgument(0);
+    if (!IsString(string)) {
+        throw VMExecError("split caller isn't a string");
+    }
+
+    Value *search_str = exec_state->GetArgument(1);
+    if(IsClassInstance(search_str)){
+        ClassInstance* instance = to_regex_inst(exec_state,search_str);
+
+        Value* reg = GetClassMember(instance, "_reg");
+        Value* flag = GetClassMember(instance, "_flag");
+        if (!IsString(reg) || !IsString(flag)){
+            throw VMExecError("Regex._reg || _flag is not string");
+        }
+        std::string reg_str = ValueTo<String>(reg)->c_str();
+        std::string flag_str = ValueTo<String>(flag)->c_str();
+        std::string test_str = ValueTo<String>(string)->c_str();
+
+        std::regex_constants::syntax_option_type type = std::regex_constants::ECMAScript;
+        if (flag_str.find('i') != std::string::npos){
+            type |= std::regex_constants::icase;
+        }
+
+        bool g_mode =flag_str.find('g') != std::string::npos;
+
+        ret = exec_state->class_factory()->CreateArray();
+        Array* arr = ValueTo<Array>(&ret);
+
+        if (g_mode){
+            std::regex express(reg_str, type);
+            std::smatch match;
+            std::string::const_iterator iterStart = test_str.begin();
+            std::string::const_iterator iterEnd = test_str.end();
+            bool succ = false;
+            while (std::regex_search(iterStart,iterEnd,match,express)){
+                arr->items.push_back(exec_state->string_table()->StringFromUTF8(match[0]));
+                iterStart = match[0].second;
+                succ = true;
+            }
+            if (!succ){
+                ret = Value();
+            }
+        } else{
+            std::regex express(reg_str, type);
+            std::smatch match;
+            bool succ  = std::regex_search(test_str,match,express);
+
+            if (succ){
+                for (size_t i = 0; i < match.size(); ++i){
+                    arr->items.push_back(exec_state->string_table()->StringFromUTF8(match[i]));
+                }
+            } else {
+                ret = Value();
+            }
+            // else return []
+        }
+    } else {
+        throw VMExecError("split caller isn't a string or regex");
+    }
+
+    return ret;
 }
 }  // namespace data_render
 }  // namespace core

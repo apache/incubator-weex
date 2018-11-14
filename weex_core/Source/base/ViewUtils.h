@@ -19,6 +19,8 @@
 #ifndef WEEX_PROJECT_VIEWUTILS_H
 #define WEEX_PROJECT_VIEWUTILS_H
 
+#include <string.h>
+#include <math.h>
 #include <core/config/core_environment.h>
 #include <cmath>
 #include <cstdlib>

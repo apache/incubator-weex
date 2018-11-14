@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include <math.h>
 #include <cmath>
 #include <utility>
 #include <core/render/manager/render_manager.h>

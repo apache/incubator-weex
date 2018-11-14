@@ -53,6 +53,8 @@
 #import "WXPageEventNotifyEvent.h"
 #import "WXCoreBridge.h"
 
+#define WEEX_LITE_URL_SUFFIX           @"wlasm"
+
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
 NSTimeInterval JSLibInitTime = 0;
@@ -233,7 +235,9 @@ typedef enum : NSUInteger {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
     }
-  
+    if ([url.absoluteString hasSuffix:WEEX_LITE_URL_SUFFIX]) {
+        _defaultDataRender = YES;
+    }
     _scriptURL = url;
     [self _checkPageName];
     [self.apmInstance startRecord:self.instanceId];
@@ -257,16 +261,16 @@ typedef enum : NSUInteger {
         [self _renderWithMainBundleString:source];
         [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
     } else if ([source isKindOfClass:[NSData class]]) {
-        [self _renderWithOpcode:source];
+        [self _renderWithData:source];
     }
 }
 
-- (NSString*) bundleTemplate
+- (NSString *) bundleTemplate
 {
     return self.mainBundleString;
 }
 
-- (void)_renderWithOpcode:(NSData *)contents
+- (void)_renderWithData:(NSData *)contents
 {
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
@@ -541,8 +545,8 @@ typedef enum : NSUInteger {
             return;
         }
         
-        if ([options[@"DATA_RENDER"] boolValue] && [options[@"RENDER_WITH_BINARY"] boolValue]) {
-            [strongSelf _renderWithOpcode:data];
+        if (strongSelf.dataRender) {
+            [strongSelf _renderWithData:data];
             return;
         }
 
@@ -778,7 +782,7 @@ typedef enum : NSUInteger {
 
 - (BOOL)dataRender
 {
-    if ([_options[@"DATA_RENDER"] boolValue]) {
+    if ([_options[@"WLASM_RENDER"] boolValue]) {
         return YES;
     }
     return _defaultDataRender;

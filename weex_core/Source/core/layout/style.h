@@ -23,6 +23,7 @@
 
 
 #include "flex_enum.h"
+#include <math.h>
 #include <cmath>
 
 namespace WeexCore {

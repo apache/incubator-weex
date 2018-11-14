@@ -443,6 +443,28 @@ static void DispatchMessage(const char *client_id, const char *data, int dataLen
           }));
 }
 
+static std::unique_ptr<WeexJSResult> DispatchMessageSync(const char *client_id,
+                                                         const char *data,
+                                                         int dataLength,
+                                                         const char *vm_id) {
+  weex::base::WaitableEvent event;
+  std::unique_ptr<WeexJSResult> result;
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+      weex::base::MakeCopyable([client_id = std::string(client_id),
+                                data = std::string(data),
+                                vm_id = std::string(vm_id), length = dataLength,
+                                e = &event, r = &result]() {
+        *r = WeexCoreManager::Instance()
+                 ->script_bridge()
+                 ->core_side()
+                 ->DispatchMessageSync(client_id.c_str(), data.c_str(), length,
+                                       vm_id.c_str());
+        e->Signal();
+      }));
+  event.Wait();
+  return result;
+}
+
 static void OnReceivedResult(long callback_id,
                              std::unique_ptr<WeexJSResult> &result) {
   WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
@@ -506,6 +528,7 @@ FunctionsExposedByCore *ScriptBridgeInMultiSo::GetExposedFunctions() {
                                  CallT3DLinkNative,
                                  PostMessage,
                                  DispatchMessage,
+                                 DispatchMessageSync,
                                  OnReceivedResult};
   auto functions =
       (FunctionsExposedByCore *)malloc(sizeof(FunctionsExposedByCore));

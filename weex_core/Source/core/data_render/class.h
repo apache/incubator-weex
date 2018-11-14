@@ -36,11 +36,14 @@ void AddClassStaticCFunc(ClassDescriptor *p_desc, const std::string& name, CFunc
 
 void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function);
 
+bool FindConstructor(ClassInstance *p_inst, Value *caller, Value *caller_inst);
+
 ClassInstance *NewClassInstance(ClassDescriptor *p_desc);
     
-Value *GetClassMember(ClassInstance *inst, std::string &name);
-Value *GetClassMemberVar(ClassInstance *inst, std::string &name);
-
+Value *GetClassMember(ClassInstance *inst, const std::string &name);
+Value *GetClassMemberVar(ClassInstance *inst, const std::string &name);
+Value *GetClassStaticMemberVar(ClassDescriptor *desc, const std::string &name);
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex
