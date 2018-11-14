@@ -80,7 +80,6 @@ typedef enum : NSUInteger {
     BOOL _debugJS;
     id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context    
     CGFloat _defaultPixelScaleFactor;
-    BOOL _bReleaseInstanceInMainThread;
     BOOL _defaultDataRender;
 }
 
@@ -120,7 +119,6 @@ typedef enum : NSUInteger {
         _apmInstance = [[WXApmForInstance alloc] init];
         
         _defaultPixelScaleFactor = CGFLOAT_MIN;
-        _bReleaseInstanceInMainThread = YES;
         _defaultDataRender = NO;
         
         [self addObservers];
@@ -445,9 +443,6 @@ typedef enum : NSUInteger {
         
         BOOL useJSCApiForCreateInstance = [[configCenter configForKey:@"iOS_weex_ext_config.useJSCApiForCreateInstance" defaultValue:@(YES) isDefault:NULL] boolValue];
         [WXUtility setUseJSCApiForCreateInstance:useJSCApiForCreateInstance];
-		
-        //Reading config from orange for Release instance in Main Thread or not
-        _bReleaseInstanceInMainThread = [[configCenter configForKey:@"iOS_weex_ext_config.releaseInstanceInMainThread" defaultValue:@(YES) isDefault:nil] boolValue];
 
         BOOL shoudMultiContext = NO;
         shoudMultiContext = [[configCenter configForKey:@"iOS_weex_ext_config.createInstanceUsingMutliContext" defaultValue:@(YES) isDefault:NULL] boolValue];
@@ -666,13 +661,9 @@ typedef enum : NSUInteger {
         [WXCoreBridge closePage:instanceId];
         
         // Reading config from orange for Release instance in Main Thread or not, for Bug #15172691 +{
-        if (!_bReleaseInstanceInMainThread) {
+        dispatch_async(dispatch_get_main_queue(), ^{
             [WXSDKManager removeInstanceforID:instanceId];
-        } else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [WXSDKManager removeInstanceforID:instanceId];
-            });
-        }
+        });
         //+}
     });
     
