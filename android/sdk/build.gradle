@@ -97,15 +97,15 @@ android {
     }
 
     def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexcore.so").length();
-    def ARMEABIV7A_Size = new File(projectDir,"libs/armeabi-v7a/libweexcore.so").length();
+    def ARMEABIV7_Size = new File(projectDir,"libs/armeabi-v7/libweexcore.so").length();
     def X86_Size = new File(projectDir,"libs/x86/libweexcore.so").length();
     println "ARMEABI_Size: "+ARMEABI_Size;
-    println "ARMEABIV7A_Size:" + ARMEABIV7A_Size;
+    println "ARMEABIV7_Size:" + ARMEABIV7_Size;
     println "X86_Size:" + X86_Size;
 
     defaultConfig {
         buildConfigField "long", "ARMEABI_Size", "${ARMEABI_Size}"
-        buildConfigField "long", "ARMEABIV7A_Size", "${ARMEABIV7A_Size}"
+        buildConfigField "long", "ARMEABIV7_Size", "${ARMEABIV7_Size}"
         buildConfigField "long", "X86_Size", "${X86_Size}"
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
