@@ -38,7 +38,7 @@ class RenderScroller : public RenderObject {
     return NAN;
   }
 
-public:
+protected:
     void onLayout(const float left, const float top, const float right, const float bottom,
                                   WXCoreLayoutNode *const absoulteItem, WXCoreFlexLine *const flexLine) override;
 
