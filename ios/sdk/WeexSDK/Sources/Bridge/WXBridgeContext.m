@@ -412,6 +412,7 @@ _Pragma("clang diagnostic pop") \
         WXPerformBlockOnComponentThread(^{
             [WXCoreBridge createDataRenderInstance:instanceIdString template:jsBundleString options:options data:data];
             WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+            [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
         });
         return;
     }
@@ -584,6 +585,7 @@ _Pragma("clang diagnostic pop") \
         WXPerformBlockOnComponentThread(^{
             [WXCoreBridge createDataRenderInstance:instanceIdString contents:contents options:options data:data];
             WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+            [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
         });
         return;
     }

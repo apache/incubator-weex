@@ -48,6 +48,8 @@ NSString* const KEY_PAGE_PROPERTIES_BUNDLE_TYPE = @"wxBundleType";
 NSString* const KEY_PAGE_PROPERTIES_CONTAINER_NAME = @"wxContainerName";
 NSString* const KEY_PAGE_PROPERTIES_INSTANCE_TYPE = @"wxInstanceType";
 NSString* const KEY_PAGE_PROPERTIES_PARENT_PAGE = @"wxParentPage";
+NSString* const KEY_PAGE_PROPERTIES_RENDER_TYPE = @"wxRenderType";
+
 
 
 ///************** stages *****************/
