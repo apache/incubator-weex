@@ -283,6 +283,9 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_buildViewHierarchyLazily;
 
+
+- (void)_adjustForRTL;
+
 - (BOOL)_isAffineTypeAs:(NSString *)type;
 
 @end

@@ -44,6 +44,7 @@
 
 static BOOL unregisterFontWhenCollision = NO;
 static BOOL useJSCApiForCreateInstance = YES;
+static BOOL enableRTLLayoutDirection = YES;
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
@@ -173,6 +174,18 @@ CGFloat WXFloorPixelValue(CGFloat value)
     block();
 }
 
++ (WXLayoutDirection)getEnvLayoutDirection {
+    // We not use the below technique, because your app maybe not support the first preferredLanguages
+    // _sysLayoutDirection = [NSLocale characterDirectionForLanguage:[[NSLocale preferredLanguages] objectAtIndex:0]] == NSLocaleLanguageDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
+    if (@available(iOS 9.0, *)) {
+        // The view is shown in right-to-left mode right now.
+        return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:UISemanticContentAttributeUnspecified] == UIUserInterfaceLayoutDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
+    } else {
+        // Use the previous technique
+        return [[UIApplication sharedApplication] userInterfaceLayoutDirection] == UIUserInterfaceLayoutDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
+    }
+}
+
 + (NSDictionary *)getEnvironment
 {
     NSString *platform = @"iOS";
@@ -197,7 +210,8 @@ CGFloat WXFloorPixelValue(CGFloat value)
                                     @"deviceWidth":@(deviceWidth * scale),
                                     @"deviceHeight":@(deviceHeight * scale),
                                     @"scale":@(scale),
-                                    @"logLevel":[WXLog logLevelString] ?: @"error"
+                                    @"logLevel":[WXLog logLevelString] ?: @"error",
+                                    @"layoutDirection": [self getEnvLayoutDirection] == WXLayoutDirectionRTL ? @"rtl" : @"ltr"
                                 }];
     
     if ([[[UIDevice currentDevice] systemVersion] integerValue] >= 11) {
@@ -736,6 +750,17 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return defaultScaleFactor;
 }
 
+#pragma mark - RTL
+
++ (void)setEnableRTLLayoutDirection:(BOOL)value
+{
+    enableRTLLayoutDirection = value;
+}
+
++ (BOOL)enableRTLLayoutDirection
+{
+    return enableRTLLayoutDirection;
+}
 
 #pragma mark - get deviceID
 + (NSString *)getDeviceID {

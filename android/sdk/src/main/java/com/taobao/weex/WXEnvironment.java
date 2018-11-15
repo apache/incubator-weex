@@ -157,6 +157,13 @@ public class WXEnvironment {
     configs.put(WXConfig.sysModel, SYS_MODEL);
     configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
     configs.put(WXConfig.logLevel,sLogLevel.getName());
+
+    try {
+      configs.put(WXConfig.layoutDirection, isLayoutDirectionRTL() ? "rtl" : "ltr");
+    } catch (Exception e) {
+      configs.put(WXConfig.layoutDirection, "ltr");
+    }
+
     try {
       if (isApkDebugable()) {
         options.put(WXConfig.debugMode, "true");
@@ -225,6 +232,13 @@ public class WXEnvironment {
     return isHardwareSupport() && isInitialized;
   }
 
+  public static boolean isLayoutDirectionRTL() {
+    // support RTL
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      return sApplication.getApplicationContext().getResources().getBoolean(R.bool.weex_is_right_to_left);
+    }
+    return false;
+  }
   /**
    * Tell whether Weex can run on current hardware.
    * @return true if weex can run on current hardware, otherwise false.

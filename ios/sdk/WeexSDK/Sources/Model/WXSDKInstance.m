@@ -447,6 +447,9 @@ typedef enum : NSUInteger {
         
         BOOL useJSCApiForCreateInstance = [[configCenter configForKey:@"iOS_weex_ext_config.useJSCApiForCreateInstance" defaultValue:@(YES) isDefault:NULL] boolValue];
         [WXUtility setUseJSCApiForCreateInstance:useJSCApiForCreateInstance];
+		
+        BOOL enableRTLLayoutDirection = [[configCenter configForKey:@"iOS_weex_ext_config.enableRTLLayoutDirection" defaultValue:@(YES) isDefault:NULL] boolValue];
+        [WXUtility setEnableRTLLayoutDirection:enableRTLLayoutDirection];
 
         BOOL shoudMultiContext = NO;
         shoudMultiContext = [[configCenter configForKey:@"iOS_weex_ext_config.createInstanceUsingMutliContext" defaultValue:@(YES) isDefault:NULL] boolValue];

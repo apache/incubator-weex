@@ -1283,7 +1283,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         } else {
             params.width = width;
             params.height = height;
-            params.setMargins(left, 0, right, 0);
+
+            this.setMarginsSupportRTL(params, left, 0, right, 0);
         }
         return params;
     }

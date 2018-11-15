@@ -24,6 +24,17 @@
 #include "core/layout/style.h"
 
 namespace WeexCore {
+  const WXCoreDirection GetWXCoreDirection(const std::string &value) {
+    const char *c_value = value.c_str();
+    if(strcmp(c_value, INHERIT) == 0) {
+      return WeexCore::kDirectionInherit;
+    } else if (strcmp(c_value, LTR) == 0) {
+      return WeexCore::kDirectionLTR;
+    } else if (strcmp(c_value, RTL) == 0) {
+      return WeexCore::kDirectionRTL;
+    } 
+    return WeexCore::kDirectionLTR;
+  }
 
   const WXCoreFlexDirection GetWXCoreFlexDirection(const std::string &value) {
     const char *c_value = value.c_str();

@@ -23,6 +23,7 @@
 #include <string>
 
 namespace WeexCore {
+  const WXCoreDirection GetWXCoreDirection(const std::string &value);
 
   const WXCoreFlexDirection GetWXCoreFlexDirection(const std::string &value);
 

@@ -221,7 +221,8 @@ bool RenderPage::UpdateStyle(
   std::vector<std::pair<std::string, std::string>> *margin = nullptr;
   std::vector<std::pair<std::string, std::string>> *padding = nullptr;
   std::vector<std::pair<std::string, std::string>> *border = nullptr;
-
+  bool inheriableLayout = false;
+    
   bool flag = false;
   int result =
       WeexCoreManager::Instance()
@@ -277,13 +278,16 @@ bool RenderPage::UpdateStyle(
                   flag = true;
               });
           break;
+          case kTypeInheritableLayout:
+              inheriableLayout = true;
+              break;
         default: break;
       }
     }
   }
 
   if (style != nullptr || margin != nullptr || padding != nullptr ||
-      border != nullptr)
+      border != nullptr || inheriableLayout)
     SendUpdateStyleAction(render, style, margin, padding, border);
 
   Batch();

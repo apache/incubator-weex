@@ -37,6 +37,24 @@ class RenderScroller : public RenderObject {
       const float &current_length) const override {
     return NAN;
   }
+
+protected:
+    void onLayout(const float left, const float top, const float right, const float bottom,
+                                  WXCoreLayoutNode *const absoulteItem, WXCoreFlexLine *const flexLine) override;
+
+    // Since scroll only use ltr to layout children actually,
+    // so we need override this method to return calculated inherit direction as normal render_object do
+    inline WXCoreDirection getLayoutDirection() const override {
+        WXCoreDirection styleDirection = this->getDirection();
+        if (styleDirection != kDirectionInherit) {
+            return styleDirection;
+        } else if (this->getParent() != nullptr) {
+            WXCoreLayoutNode *parent = this->getParent();
+            return parent->getLayoutDirection();
+        }
+        return WEEXCORE_CSS_DEFAULT_DIRECTION;
+    }
+
 };
 }  // namespace WeexCore
 #endif  // CORE_RENDER_NODE_RENDER_SCROLLER_H_

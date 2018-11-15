@@ -458,6 +458,39 @@ typedef NS_ENUM(NSInteger, Direction) {
     _recycleSliderView.currentIndex = _index;
 }
 
+- (void)_buildViewHierarchyLazily {
+    [super _buildViewHierarchyLazily];
+}
+
+- (void)adjustForRTL
+{
+    if (![WXUtility enableRTLLayoutDirection]) return;
+    
+    // this is scroll rtl solution.
+    // scroll layout not use direction, use self tranform
+    if (self.view && _flexCssNode && _flexCssNode->getLayoutDirectionFromPathNode() == WeexCore::kDirectionRTL
+        ) {
+        WXRecycleSliderView *slider = (WXRecycleSliderView *)self.view;
+        CATransform3D transform = CATransform3DScale(CATransform3DIdentity, -1, 1, 1);
+        slider.scrollView.layer.transform = transform ;
+    } else {
+        WXRecycleSliderView *slider = (WXRecycleSliderView *)self.view;
+        slider.scrollView.layer.transform = CATransform3DIdentity ;
+    }
+
+}
+
+- (void)_adjustForRTL {
+    if (![WXUtility enableRTLLayoutDirection]) return;
+    
+    [super _adjustForRTL];
+    [self adjustForRTL];
+}
+
+- (BOOL)shouldTransformSubviewsWhenRTL {
+    return YES;
+}
+
 - (void)viewDidUnload
 {
     [_childrenView removeAllObjects];
