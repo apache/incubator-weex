@@ -661,6 +661,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       return;
     }
 
+    mRenderStrategy = flag;
+
     //some case ,from render(template),but not render (url)
     if (!mApmForInstance.hasInit()){
       mApmForInstance.doInit();
@@ -702,7 +704,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mApmForInstance.addStats(WXInstanceApm.KEY_PAGE_STATS_BUNDLE_SIZE,mWXPerformance.JSTemplateSize);
 
     mRenderStartTime = System.currentTimeMillis();
-    mRenderStrategy = flag;
 
     WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);
 
@@ -749,6 +750,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     ensureRenderArchor();
     pageName = wrapPageName(pageName, url);
     mBundleUrl = url;
+    mRenderStrategy = flag;
     if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
       mNeedValidate = WXSDKManager.getInstance().getValidateProcessor().needValidate(mBundleUrl);
     }
