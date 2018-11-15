@@ -256,7 +256,8 @@ This product bundles chromium v66.0.3344.2, which is available under a "BSD-styl
   weex_core/Source/android/jniprebuild/jniheader/NativeRenderObjectUtils_jni.h
   weex_core/Source/android/jniprebuild/jniheader/SystemMessageHandler_jni.h
   weex_core/Source/android/jniprebuild/jniheader/WXBridge_jni.h
-  weex_core/Source/android/jniprebuild/jniheader/WXJsFunctions_jni.h
+  weex_core/Source/android/jniprebuild/jniheader/WXDebugJsBridge_jni.h
+  weex_core/Source/android/jniprebuild/jniheader/WXParams_jni.h
   weex_core/Source/android/jniprebuild/jni_generator.py
 
 This product bundles Android Open Source Project vandroid-4.2.2_r1, which is available under a "BSD" license. For details, see https://android.googlesource.com/platform/bionic/+/android-4.2.2_r1/libc/README and following files:
