@@ -92,7 +92,7 @@ extern void WXPerformBlockOnBridgeThread(void (^block)(void));
  *  @param options   :   service options
  *  @param completion   :   completion callback
  **/
-- (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void(^)(void))completion;
+- (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion;
 
 
 /**
@@ -103,7 +103,7 @@ extern void WXPerformBlockOnBridgeThread(void (^block)(void));
  *  @param completion   :   completion callback
  **/
 
--(void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options completion:(void(^)(void))completion;
+-(void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion;
 
 /**
  *  Unregister JS service Script

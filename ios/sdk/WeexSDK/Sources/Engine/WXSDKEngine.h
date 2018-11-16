@@ -82,7 +82,7 @@
  * @param completion completion callback
  *
  */
-+ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void(^)(void))completion;
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion;
 
 /**
  * @abstract Registers a component for a given name, options and js url
@@ -96,7 +96,7 @@
  * @param completion completion callback
  *
  */
-+ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl WithOptions:(NSDictionary *)options completion:(void(^)(void))completion;
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl WithOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion;
 
 /**
  * @abstract Registers a component for a given name, options and js code
