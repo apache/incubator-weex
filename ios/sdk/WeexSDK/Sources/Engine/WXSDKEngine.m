@@ -152,14 +152,14 @@
 
 
 # pragma mark Service Register
-+ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void (^)(void))completion
 {
-    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options];
+    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options completion:completion];
 }
 
-+ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl WithOptions:(NSDictionary *)options
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl WithOptions:(NSDictionary *)options completion:(void (^)(void))completion
 {
-    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options];
+    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options completion:completion];
 }
 
 + (void)unregisterService:(NSString *)name
@@ -339,7 +339,7 @@ static NSDictionary *_customEnvironment;
         NSString *serviceName = [service objectForKey:@"name"];
         NSString *serviceScript = [service objectForKey:@"script"];
         NSDictionary *serviceOptions = [service objectForKey:@"options"];
-        [WXSDKEngine registerService:serviceName withScript:serviceScript withOptions:serviceOptions];
+        [WXSDKEngine registerService:serviceName withScript:serviceScript withOptions:serviceOptions completion:nil];
     }
 }
 

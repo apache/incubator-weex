@@ -79,8 +79,10 @@
  *
  * @param serviceScript service js code to invoke
  *
+ * @param completion completion callback
+ *
  */
-+ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options;
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void(^)(void))completion;
 
 /**
  * @abstract Registers a component for a given name, options and js url
@@ -91,8 +93,10 @@
  *
  * @param serviceScriptUrl The service url to register
  *
+ * @param completion completion callback
+ *
  */
-+ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl WithOptions:(NSDictionary *)options;
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl WithOptions:(NSDictionary *)options completion:(void(^)(void))completion;
 
 /**
  * @abstract Registers a component for a given name, options and js code

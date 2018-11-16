@@ -255,7 +255,7 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     return value;
 }
 
--(void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options
+-(void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options completion:(void (^)(void))completion
 {
     if (!name || !serviceScriptUrl || !options) return;
     __weak typeof(self) weakSelf = self;
@@ -264,7 +264,7 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     serviceBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         NSString *jsServiceString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        [strongSelf registerService:name withService:jsServiceString withOptions:options];
+        [strongSelf registerService:name withService:jsServiceString withOptions:options completion:completion];
     };
     
     serviceBundleLoader.onFailed = ^(NSError *loadError) {
@@ -274,7 +274,7 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     [serviceBundleLoader start];
 }
 
-- (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options
+- (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void (^)(void))completion
 {
     if (!name || !serviceScript || !options) return;
     
@@ -285,6 +285,7 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
         // save it when execute
         [WXDebugTool cacheJsService:name withScript:serviceScript withOptions:options];
         [weakSelf.bridgeCtx executeJsService:script withName:name];
+        if (completion) completion();
     });
 }
 
