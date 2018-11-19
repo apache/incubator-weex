@@ -24,6 +24,7 @@
 @class WXSDKInstance;
 
 extern void WXPerformBlockOnBridgeThread(void (^block)(void));
+extern void WXPerformBlockSyncOnBridgeThread(void (^block)(void));
 
 @interface WXBridgeManager : NSObject
 
