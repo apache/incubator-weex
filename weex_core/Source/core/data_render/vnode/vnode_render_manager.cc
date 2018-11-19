@@ -20,18 +20,19 @@
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include <chrono>
 #include <sstream>
+#include "base/make_copyable.h"
 #include "base/string_util.h"
+#include "core/bridge/platform_bridge.h"
+#include "core/data_render/binary_file.h"
+#include "core/data_render/common_error.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vnode/vnode.h"
 #include "core/data_render/vnode/vnode_exec_env.h"
 #include "core/manager/weex_core_manager.h"
+#include "core/network/http_module.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_creator.h"
-#include "core/bridge/platform_bridge.h"
-#include "core/data_render/binary_file.h"
-#include "core/data_render/common_error.h"
-#include "core/network/http_module.h"
 
 #define VRENDER_LOG true
 
@@ -73,8 +74,6 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
   std::string ref_str;
   if (isRoot) {
     ref_str = "_root";
-  } else if (!vnode->node_id().empty()) {
-    ref_str = vnode->node_id();
   } else {
     ref_str = base::to_string(ref_id++);
   }
@@ -180,8 +179,8 @@ void VNodeRenderManager::InitVM() {
   }
 }
 
-void VNodeRenderManager::CreatePage(const std::string &input, const std::string &page_id, const  std::string &options, const std::string &init_data, std::function<void(const char*)> js_exec) {
-    std::string err = CreatePageImpl(input, page_id, options, init_data, js_exec);
+void VNodeRenderManager::CreatePage(const std::string &input, const std::string &page_id, const  std::string &options, const std::string &init_data, std::function<void(const char*)> exec_js) {
+    std::string err = CreatePageImpl(input, page_id, options, init_data, exec_js);
     if (!err.empty()) {
         WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id.c_str(), nullptr, err.c_str());
     }
@@ -236,16 +235,54 @@ std::string VNodeRenderManager::CreatePageImpl(const std::string &input, const s
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("DATA_RENDER, All time %lld\n", duration_post.count());
 #endif
-
-    const json11::Json& javascript_obj = exec_state->context()->raw_json()["javascript"];
-    std::string javacript_url = javascript_obj.string_value();
-    if (!javacript_url.empty()) {
-        HttpModule http_module;
-        http_module.Send(javacript_url.c_str(), exec_js);
-    }
+    DownloadAndExecScript(exec_state, page_id, exec_js);
     return err;
 }
-    
+
+void VNodeRenderManager::DownloadAndExecScript(
+    ExecState* exec_state, const std::string& page_id,
+    std::function<void(const char*)> exec_js) {
+  // If script exists in json, run script into js vm
+  const json11::Json& script_array =
+      exec_state->context()->raw_json()["script"];
+  if (script_array.is_array()) {
+    for (auto it = script_array.array_items().begin();
+         it != script_array.array_items().end(); it++) {
+      const json11::Json& script_obj = *it;
+      auto src = script_obj["src"];
+      auto content = script_obj["content"];
+      auto callback1 = weex::base::MakeCopyable(
+          [page_id = page_id, exec_js = exec_js](const char* result) {
+            exec_js(result);
+            auto root =
+                VNodeRenderManager::GetInstance()->GetRootVNode(page_id);
+            if (root && root->IsVirtualComponent()) {
+              static_cast<weex::core::data_render::VComponent*>(root)
+                  ->DispatchCreated();
+            }
+          });
+      // callback2, a wrap for callback1, will be post to script thread to
+      // execute callback1
+      auto callback2 = weex::base::MakeCopyable([callback = callback1](
+                                                    const std::string& result) {
+        WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+            weex::base::MakeCopyable([result = std::move(result), callback]() {
+              callback(result.c_str());
+            }));
+      });
+      // If script is a url, first download the script, else run script
+      // directly.
+      if (content.is_string()) {
+        callback1(const_cast<char*>(content.string_value().c_str()));
+      } else if (src.is_string()) {
+        network::HttpModule http_module;
+        http_module.Send(page_id.c_str(), src.string_value().c_str(),
+                         callback2);
+      }
+    }
+  }
+}
+
 void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state, std::vector<std::string>& registers) {
     do {
         if (!modules_.size()) {

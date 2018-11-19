@@ -16,24 +16,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "core/network/http_module.h"
+#if OS_ANDROID
+
+#ifndef CORE_NETWORK_DEFAULT_REQUEST_HANDLER_H
+#define CORE_NETWORK_DEFAULT_REQUEST_HANDLER_H
+
+#include <jni.h>
+#include "android/wrap/jni_object_wrap.h"
 #include "core/network/request_handler.h"
 
 namespace weex {
 namespace core {
 namespace network {
 
-HttpModule::HttpModule()
-    : request_handler_(RequestHandler::CreateDefaultHandler()) {}
+class DefaultRequestHandler : public RequestHandler,
+                              public WeexCore::JNIObjectWrap {
+ public:
+  static bool RegisterJNIUtils(JNIEnv* env);
+  DefaultRequestHandler();
+  ~DefaultRequestHandler() override;
+  void Send(const char* instance_id, const char* url,
+            Callback callback) override;
+};
 
-HttpModule::HttpModule(RequestHandler* request_handler)
-    : request_handler_(request_handler) {}
+class CallbackWrapper {
+ public:
+  CallbackWrapper(Callback callback) : callback_(callback) {}
+  ~CallbackWrapper() {}
+  void Invoke(const std::string& result) { callback_(result); }
 
-void HttpModule::Send(const char* instance_id, const char* url,
-                      Callback callback) {
-  request_handler_->Send(instance_id, url, callback);
-}
+ private:
+  Callback callback_;
+};
 
 }  // namespace network
 }  // namespace core
 }  // namespace weex
+#endif  // CORE_NETWORK_DEFAULT_REQUEST_HANDLER_H
+#endif

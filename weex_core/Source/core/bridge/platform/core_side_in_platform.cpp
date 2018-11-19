@@ -429,16 +429,29 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
                                        const char *render_strategy) {
   // First check about DATA_RENDER mode
   if (render_strategy != nullptr) {
+    std::function<void(const char *)> exec_js =
+        [instanceId = std::string(instanceId), func = std::string(func),
+         opts = std::string(opts), initData = std::string(initData),
+         extendsApi = std::string(extendsApi)](const char *result) {
+          WeexCoreManager::Instance()
+              ->script_bridge()
+              ->script_side()
+              ->CreateInstance(instanceId.c_str(), func.c_str(), result,
+                               opts.c_str(), initData.c_str(),
+                               extendsApi.c_str());
+        };
     if (strcmp(render_strategy, "DATA_RENDER") == 0) {
       auto node_manager =
-              weex::core::data_render::VNodeRenderManager::GetInstance();
-      node_manager->CreatePage(script, instanceId, render_strategy, initData, nullptr);
+          weex::core::data_render::VNodeRenderManager::GetInstance();
+      node_manager->CreatePage(script, instanceId, render_strategy, initData,
+                               exec_js);
 
       return true;
     } else if (strcmp(render_strategy, "DATA_RENDER_BINARY") == 0) {
       auto node_manager =
-              weex::core::data_render::VNodeRenderManager::GetInstance();
-      node_manager->CreatePage(script, script_length, instanceId, render_strategy, initData);
+          weex::core::data_render::VNodeRenderManager::GetInstance();
+      node_manager->CreatePage(script, script_length, instanceId,
+                               render_strategy, initData);
 
       return true;
     }

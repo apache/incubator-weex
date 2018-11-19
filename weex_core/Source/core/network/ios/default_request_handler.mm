@@ -16,18 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "core/network/default_request_handler.h"
+#include "core/network/ios/default_request_handler.h"
 #import "WXConvertUtility.h"
 #import "WXSDKManager.h"
 
 namespace weex {
 namespace core {
-namespace data_render {
-    void DefaultRequestHandler::Send(const char* url, std::function<void(const char*)> callback) {
+namespace network {
+    DefaultRequestHandler::DefaultRequestHandler() {}
+
+    DefaultRequestHandler::~DefaultRequestHandler() {}
+
+    void DefaultRequestHandler::Send(const char* instance_id, const char* url, Callback callback) {
         NSURL* ns_url = [NSURL URLWithString:NSSTRING(url)];
         [[WXSDKManager bridgeMgr] DownloadJS:ns_url completion:^(NSString *script) {
             callback([script UTF8String] ? : nullptr);
         }];
+    }
+
+    RequestHandler* RequestHandler::CreateDefaultHandler() {
+        return new DefaultRequestHandler();
     }
 }
 }

@@ -312,8 +312,6 @@ static Value UpdateElement(ExecState *exec_state) {
     
     return Value();
 }
-    
-static size_t g_node_id = 0;
 
 // createElement("tag_name", "id", ref);
 static Value CreateElement(ExecState *exec_state) {
@@ -332,10 +330,7 @@ static Value CreateElement(ExecState *exec_state) {
         throw VMExecError("CreateElement only support int for string");
     }
     std::string node_id,ref;
-    std::ostringstream os;
-    os << g_node_id++;
-    node_id = "vn_" + os.str();
-    ref = arg_id_str;
+    node_id = arg_id_str;
     if (exec_state->GetArgumentCount() > 2 && exec_state->GetArgument(2)->type == Value::Type::STRING) {
         ref = exec_state->GetArgument(2)->str->c_str();
     }

@@ -96,12 +96,11 @@ set(COMMON_SRCS
    ./core/data_render/binary_file.cc
    ./core/data_render/vnode/vnode.cc
    ./core/data_render/vnode/vcomponent.cc
-   ./core/data_render/vnode/android/vcomponent_lifecycle_listener.cc
-   ./core/data_render/vnode/android/vnode_on_event_listener.cc
-   ./core/data_render/vnode/android/conversion.cc
    ./core/data_render/vnode/vnode_exec_env.cc
    ./core/data_render/vnode/vnode_render_manager.cc
    ./core/data_render/vnode/vnode_render_context.cc
+
+   ./core/network/http_module.cc
         )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
@@ -153,6 +152,11 @@ if (ANDROID)
     ./android/wrap/wx_params.cpp
     ./android/base/jni_type.cpp
 
+    ./core/data_render/vnode/android/vcomponent_lifecycle_listener.cc
+    ./core/data_render/vnode/android/vnode_on_event_listener.cc
+    ./core/data_render/vnode/android/conversion.cc
+    ./core/network/android/default_request_handler.cc
+    
     ./android/jsengine/multiprocess/WeexJSConnection.cpp
     ./android/jsengine/multiprocess/ExtendJSApi.cpp
 

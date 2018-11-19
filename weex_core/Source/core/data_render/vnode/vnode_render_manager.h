@@ -79,6 +79,8 @@ class VNodeRenderManager {
   bool ClosePageInternal(const std::string &page_id);
   std::string CreatePageWithOpcode(const std::string& page_id, const std::string& options, const std::string& init_data);
   std::string CreatePageImpl(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data, std::function<void(const char*)> exec_js);
+  void DownloadAndExecScript(ExecState *exec_state, const std::string &page_id,
+                             std::function<void(const char *)> exec_js);
 
   static VM *g_vm;
   static VNodeRenderManager *g_instance;

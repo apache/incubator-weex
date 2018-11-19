@@ -17,21 +17,26 @@
  * under the License.
  */
 
-#ifndef REQUEST_HANDLER_H
-#define REQUEST_HANDLER_H
+#ifndef CORE_NETWORK_REQUEST_HANDLER_H
+#define CORE_NETWORK_REQUEST_HANDLER_H
 #include <functional>
+#include <memory>
 
 namespace weex {
 namespace core {
-namespace data_render {
+namespace network {
+typedef std::function<void(const std::string&)> Callback;
 
 class RequestHandler {
-public:
-    virtual ~RequestHandler() {}
-    virtual void Send(const char* url, std::function<void(const char*)> callback) = 0;
+ public:
+  RequestHandler() {}
+  virtual ~RequestHandler() {}
+  virtual void Send(const char* instance_id, const char* url,
+                    Callback callback) = 0;
+  static RequestHandler* CreateDefaultHandler();
 };
 
-}
-}
-}
-#endif
+}  // namespace network
+}  // namespace core
+}  // namespace weex
+#endif  // CORE_NETWORK_REQUEST_HANDLER_H

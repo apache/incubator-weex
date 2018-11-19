@@ -17,21 +17,24 @@
  * under the License.
  */
 
-#ifndef DEFAULT_REQUEST_HANDLER_H
-#define DEFAULT_REQUEST_HANDLER_H
+#ifndef CORE_NETWORK_DEFAULT_REQUEST_HANDLER_H
+#define CORE_NETWORK_DEFAULT_REQUEST_HANDLER_H
 
 #include "core/network/request_handler.h"
 
 namespace weex {
 namespace core {
-namespace data_render {
+namespace network {
 
-class DefaultRequestHandler : public RequestHandler{
-public:
-    void Send(const char* url, std::function<void(const char*)> callback) override;
+class DefaultRequestHandler : public RequestHandler {
+ public:
+  DefaultRequestHandler();
+  ~DefaultRequestHandler() override;
+  void Send(const char* instance_id, const char* url,
+            Callback callback) override;
 };
 
-}
-}
-}
-#endif
+}  // namespace network
+}  // namespace core
+}  // namespace weex
+#endif  // CORE_NETWORK_DEFAULT_REQUEST_HANDLER_H
