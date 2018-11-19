@@ -288,28 +288,41 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     return value;
 }
 
--(void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options
+- (void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion
 {
-    if (!name || !serviceScriptUrl || !options) return;
+    if (!name || !serviceScriptUrl || !options) {
+        if (completion) {
+            completion(NO);
+        }
+        return;
+    }
     __weak typeof(self) weakSelf = self;
     WXResourceRequest *request = [WXResourceRequest requestWithURL:serviceScriptUrl resourceType:WXResourceTypeServiceBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     WXResourceLoader *serviceBundleLoader = [[WXResourceLoader alloc] initWithRequest:request];;
     serviceBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         NSString *jsServiceString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        [strongSelf registerService:name withService:jsServiceString withOptions:options];
+        [strongSelf registerService:name withService:jsServiceString withOptions:options completion:completion];
     };
     
     serviceBundleLoader.onFailed = ^(NSError *loadError) {
         WXLogError(@"No script URL found");
+        if (completion) {
+            completion(NO);
+        }
     };
     
     [serviceBundleLoader start];
 }
 
-- (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options
+- (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion
 {
-    if (!name || !serviceScript || !options) return;
+    if (!name || !serviceScript || !options) {
+        if (completion) {
+            completion(NO);
+        }
+        return;
+    }
     
     NSString *script = [WXServiceFactory registerServiceScript:name withRawScript:serviceScript withOptions:options];
     
@@ -318,6 +331,9 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
         // save it when execute
         [WXDebugTool cacheJsService:name withScript:serviceScript withOptions:options];
         [weakSelf.bridgeCtx executeJsService:script withName:name];
+        if (completion) {
+            completion(YES);
+        }
     });
 }
 
