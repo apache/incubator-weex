@@ -29,6 +29,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -52,6 +53,7 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_PROPERTIES_INSTANCE_TYPE = "wxInstanceType";
     public static final String KEY_PAGE_PROPERTIES_PARENT_PAGE = "wxParentPage";
     public static final String KEY_PAGE_PROPERTIES_BUNDLE_TYPE = "wxBundleType";
+    public static final String KEY_PAGE_PROPERTIES_RENDER_TYPE = "wxRenderType";
 
     /************** stages *****************/
     public static final String KEY_PAGE_STAGES_DOWN_BUNDLE_START = "wxStartDownLoadBundle";
@@ -203,6 +205,10 @@ public class WXInstanceApm {
         addProperty(KEY_PROPERTIES_ERROR_CODE, VALUE_ERROR_CODE_DEFAULT);
         addProperty(KEY_PAGE_PROPERTIES_JSLIB_VERSION, WXEnvironment.JS_LIB_SDK_VERSION);
         addProperty(KEY_PAGE_PROPERTIES_WEEX_VERSION, WXEnvironment.WXSDK_VERSION);
+        if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
+                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
+            addProperty(KEY_PAGE_PROPERTIES_RENDER_TYPE, WXEnvironment.EAGLE);
+        }
         if (null != instance) {
             for (Map.Entry<String, String> entry : instance.getContainerInfo().entrySet()) {
                 addProperty(entry.getKey(), entry.getValue());
