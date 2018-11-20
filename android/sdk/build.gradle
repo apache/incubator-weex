@@ -132,7 +132,6 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            testCoverageEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "ENABLE_TRACE", "false"
             consumerProguardFiles 'proguard-rules.pro'
@@ -142,6 +141,7 @@ android {
             buildConfigField "boolean", "ENABLE_TRACE", "true"
             jniDebuggable true
             debuggable true
+            testCoverageEnabled true
             consumerProguardFiles 'proguard-rules.pro'
         }
     }
