@@ -657,7 +657,7 @@ namespace WeexCore {
       }
       
       bool verticalRTL = false;
-      if (mCssStyle->mFlexWrap != kNoWrap && mLayoutResult->mLayoutDirection == kDirectionRTL) {
+      if (mLayoutResult->mLayoutDirection == kDirectionRTL) {
           verticalRTL = mCssStyle->mFlexWrap != kWrapReverse;
       } else {
           verticalRTL = mCssStyle->mFlexWrap == kWrapReverse;
