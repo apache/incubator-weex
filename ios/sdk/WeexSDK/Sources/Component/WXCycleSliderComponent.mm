@@ -73,6 +73,9 @@ typedef NS_ENUM(NSInteger, Direction) {
         _currentIndex = 0;
         _itemViews = [[NSMutableArray alloc] init];
         _scrollView = [[WXRecycleSliderScrollView alloc] init];
+        if (@available(iOS 11.0, *)) {
+            _scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        }
         _scrollView.backgroundColor = [UIColor clearColor];
         _scrollView.delegate = self;
         _scrollView.showsHorizontalScrollIndicator = NO;
