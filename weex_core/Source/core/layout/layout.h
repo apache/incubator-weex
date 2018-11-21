@@ -836,7 +836,7 @@ namespace WeexCore {
       }
     }
 
-    inline WXCorePositionType getStylePositionType() const {
+    inline WXCorePositionType getStypePositionType() const {
       return mCssStyle->mPositionType;
     }
 
