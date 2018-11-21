@@ -70,7 +70,7 @@ IRenderObject *RenderCreator::CreateRender(const std::string &type,
 }
   
 void RenderCreator::RegisterAffineType(const std::string &type, const std::string& asType) {
-  if (!type.empty() && !asType.empty()) {
+  if (!type.empty() && !asType.empty() && type != asType) {
     affineTypes_[type] = asType;
   }
 }
