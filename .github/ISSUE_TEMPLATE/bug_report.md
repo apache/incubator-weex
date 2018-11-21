@@ -9,7 +9,7 @@ Thanks for using Weex. Please follow the [Bug Report Guidelines](http://weex-pro
 -->
 
 <!-- Requirements: please go through this checklist before opening a new issue -->
-  - [ ] Review the documentation: https://weex-project.io/index.html
+  - [ ] Review the documentation: https://weex.apache.org/index.html
   - [ ] Search for existing issues: https://github.com/apache/incubator-weex/issues
   - [ ] Use the latest Weex release: https://github.com/apache/incubator-weex/releases
 
