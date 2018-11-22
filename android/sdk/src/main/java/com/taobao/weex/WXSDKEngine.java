@@ -78,11 +78,13 @@ import com.taobao.weex.ui.component.WXSwitch;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXVideo;
 import com.taobao.weex.ui.component.WXWeb;
+import com.taobao.weex.ui.component.basic.WXBasicComponent;
 import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.SimpleListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
+import com.taobao.weex.ui.component.richtext.WXRichText;
 import com.taobao.weex.ui.config.AutoScanConfigRegister;
 import com.taobao.weex.ui.module.WXLocaleModule;
 import com.taobao.weex.ui.module.WXMetaModule;
@@ -347,6 +349,7 @@ public class WXSDKEngine implements Serializable {
       registerComponent(WXBasicComponentType.LOADING, WXLoading.class);
       registerComponent(WXBasicComponentType.LOADING_INDICATOR, WXLoadingIndicator.class);
       registerComponent(WXBasicComponentType.HEADER, WXHeader.class);
+      registerComponent(WXBasicComponentType.RICHTEXT, WXRichText.class);
 
       registerModule("modal", WXModalUIModule.class);
       registerModule("instanceWrap", WXInstanceWrap.class);
