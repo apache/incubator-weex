@@ -166,14 +166,25 @@
 
 
 # pragma mark Service Register
+
 + (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options
 {
-    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options];
+    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options completion:nil];
 }
 
-+ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl WithOptions:(NSDictionary *)options
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion
 {
-    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options];
+    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options completion:completion];
+}
+
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options
+{
+    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options completion:nil];
+}
+
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion
+{
+    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options completion:completion];
 }
 
 + (void)unregisterService:(NSString *)name

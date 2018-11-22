@@ -16,12 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifdef __cplusplus
 
 #ifndef WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 
+/* These enum definitions may also be used by C files. */
+#ifdef __cplusplus
 namespace WeexCore {
+#endif
 
   /**
    * MainAxis direction
@@ -120,6 +122,8 @@ namespace WeexCore {
     kLeft,
   };
 
+#ifdef __cplusplus
 }
-#endif //WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 #endif
+
+#endif //WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
