@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a reproducible bug to in the weex library.
+about: Report a reproducible bug in the Weex library.
 
 ---
 
