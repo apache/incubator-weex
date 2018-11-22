@@ -118,7 +118,6 @@ do {\
     pthread_mutexattr_destroy(&_propertMutexAttr);
 }
 
-
 - (WXRichTextView *)textView
 {
     if (!textView) {
@@ -249,7 +248,7 @@ do {\
     textView = nil;
 }
 
--(void)viewDidLoad
+- (void)viewDidLoad
 {
     [self innerLayout];
 }
@@ -261,7 +260,7 @@ do {\
 
 - (void)innerLayout
 {
-    if(self.flexCssNode == nullptr) {
+    if (self.flexCssNode == nullptr) {
         return;
     }
     UIEdgeInsets padding = {
