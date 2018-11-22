@@ -1274,6 +1274,69 @@ bool SectionData::decoding() {
     
     return finished;
 }
+
+uint32_t SectionScript::size() {
+    ExecState *exec_state = encoder()->exec_state();
+    const json11::Json& script = exec_state->context()->raw_json()["script"];
+    std::string script_string = script.string_value();
+    uint32_t size = 0;
+    if (!script_string.empty()) {
+        size += GetFTLVLength(kValueScriptPayload, (uint32_t)script_string.length());
+    }
+    return size;
+}
+
+bool SectionScript::encoding() {
+    uint32_t size = this->size();
+    if (!size) {
+        return true;
+    }
+    if (!Section::encoding((uint16_t)ExecSection::EXEC_SECTION_SCRIPT, size)) {
+        return false;
+    }
+    ExecState *exec_state = encoder()->exec_state();
+    const json11::Json& script = exec_state->context()->raw_json()["script"];
+    std::string script_string = script.string_value();
+
+    uint32_t length = (uint32_t)script_string.length();
+    if (!Section::encoding(kValueScriptPayload, length, (void *)script_string.c_str())) {
+        return false;
+    }
+    return true;
+}
+
+bool SectionScript::decoding() {
+    fStream *stream = Section::stream();
+    if (!stream) {
+        return false;
+    }
+    if (stream->Tell() < 0) {
+        return false;
+    }
+    uint16_t vindex = 0;
+    uint32_t varlen = stream->ReadTarget(&vindex, NULL, NULL);
+    if (vindex != kValueScriptPayload) {
+        return false;
+    }
+    if (varlen == 0) {
+        std::string str = "";
+        decoder()->exec_state()->context()->set_script(str);
+        return true;
+    }
+    char *pstr = (char *)malloc(varlen + 1);
+    if (!pstr) {
+        return false;
+    }
+    memset(pstr, 0, varlen + 1);
+    if (stream->Read(pstr, 1, varlen) != varlen) {
+        return false;
+    }
+    decoder()->exec_state()->context()->set_script(pstr);
+    LOGD("decoding script:%s\n", pstr);
+    free(pstr);
+
+    return true;
+}
     
 uint32_t SectionFunction::GetInstructionsBytes(std::vector<Instruction>& instructions) {
     uint32_t numBits = 0;
@@ -2312,7 +2375,7 @@ bool SectionStyles::decoding() {
             size = sizeof(uint32_t);
             uint32_t items_size = 0;
             readbytes = stream->ReadTarget(&target, (uint8_t *)&items_size, &size);
-            if (!readbytes || target != kValueStyleItemSize || !items_size) {
+            if (!readbytes || target != kValueStyleItemSize) {
                 throw DecoderError("decoding styles items size error");
                 break;
             }
