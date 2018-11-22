@@ -1142,15 +1142,15 @@ _Pragma("clang diagnostic pop") \
         [string appendFormat:@"%@ ", jsVal];
         if (idx == arguments.count - 1) {
             if (logLevel) {
-                if (WXLogFlagWarning == logLevel) {
+                if (WXLogFlagWarning == logLevel || WXLogFlagError == logLevel) {
                     id<WXAppMonitorProtocol> appMonitorHandler = [WXSDKEngine handlerForProtocol:@protocol(WXAppMonitorProtocol)];
                     if ([appMonitorHandler respondsToSelector:@selector(commitAppMonitorAlarm:monitorPoint:success:errorCode:errorMsg:arg:)]) {
-                        [appMonitorHandler commitAppMonitorAlarm:@"weex" monitorPoint:@"jswarning" success:FALSE errorCode:@"99999" errorMsg:string arg:[WXSDKEngine topInstance].pageName];
+                        [appMonitorHandler commitAppMonitorAlarm:@"weex" monitorPoint:@"jswarning" success:NO errorCode:@"99999" errorMsg:string arg:[WXSDKEngine topInstance].pageName];
                     }
                 }
                 WX_LOG(logLevel, @"%@", string);
             } else {
-                [string appendFormat:@"%@ ", jsVal]                                  ;
+                [string appendFormat:@"%@ ", jsVal];
                 WXLogInfo(@"%@", string);
             }
         }
