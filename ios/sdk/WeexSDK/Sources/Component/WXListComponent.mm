@@ -31,6 +31,7 @@
 #import "WXRefreshComponent.h"
 #import "WXLoadingComponent.h"
 #import "WXScrollerComponent+Layout.h"
+#import "WXListComponent_internal.h"
 
 @interface WXTableView : UITableView
 

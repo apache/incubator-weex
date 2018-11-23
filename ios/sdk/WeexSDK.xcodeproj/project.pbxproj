@@ -612,6 +612,7 @@
 		DCF0CD9E1EAF3A6B0062CA8F /* native-bundle-main.js in Resources */ = {isa = PBXBuildFile; fileRef = DCF0CD9D1EAF3A6B0062CA8F /* native-bundle-main.js */; };
 		DCF343671E49CAEE00A2FB34 /* WXJSExceptionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DCF343651E49CAEE00A2FB34 /* WXJSExceptionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCF343681E49CAEE00A2FB34 /* WXJSExceptionInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = DCF343661E49CAEE00A2FB34 /* WXJSExceptionInfo.m */; };
+		E6F9D95421A80E780082072E /* WXListComponent_internal.h in Headers */ = {isa = PBXBuildFile; fileRef = E6F9D95321A80E780082072E /* WXListComponent_internal.h */; };
 		ED053500207F4DEB007B4568 /* JSContext+Weex.h in Headers */ = {isa = PBXBuildFile; fileRef = ED0534FE207F4DEB007B4568 /* JSContext+Weex.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ED053501207F4DEB007B4568 /* JSContext+Weex.h in Headers */ = {isa = PBXBuildFile; fileRef = ED0534FE207F4DEB007B4568 /* JSContext+Weex.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ED053502207F4DEB007B4568 /* JSContext+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = ED0534FF207F4DEB007B4568 /* JSContext+Weex.m */; };
@@ -976,6 +977,7 @@
 		DCF0CD9D1EAF3A6B0062CA8F /* native-bundle-main.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "native-bundle-main.js"; path = "../../../../pre-build/native-bundle-main.js"; sourceTree = "<group>"; };
 		DCF343651E49CAEE00A2FB34 /* WXJSExceptionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXJSExceptionInfo.h; sourceTree = "<group>"; };
 		DCF343661E49CAEE00A2FB34 /* WXJSExceptionInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXJSExceptionInfo.m; sourceTree = "<group>"; };
+		E6F9D95321A80E780082072E /* WXListComponent_internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXListComponent_internal.h; sourceTree = "<group>"; };
 		ED0534FE207F4DEB007B4568 /* JSContext+Weex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JSContext+Weex.h"; sourceTree = "<group>"; };
 		ED0534FF207F4DEB007B4568 /* JSContext+Weex.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "JSContext+Weex.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1566,6 +1568,7 @@
 				37B51EE31E97804D0040A743 /* WXCycleSliderComponent.mm */,
 				74CC7A1B1C2BC5F800829368 /* WXCellComponent.mm */,
 				74CC7A1E1C2BF9DC00829368 /* WXListComponent.h */,
+				E6F9D95321A80E780082072E /* WXListComponent_internal.h */,
 				74CC7A1F1C2BF9DC00829368 /* WXListComponent.mm */,
 				2AC750221C7565690041D390 /* WXIndicatorComponent.h */,
 				2AC750231C7565690041D390 /* WXIndicatorComponent.m */,
@@ -1668,6 +1671,7 @@
 				59A583081CF5B2FD0081FD3E /* WXNavigationDefaultImpl.h in Headers */,
 				17B122222090AA9300387E33 /* WXSDKInstance_performance.h in Headers */,
 				775BEE4E1C16F993008D1629 /* WXDefine.h in Headers */,
+				E6F9D95421A80E780082072E /* WXListComponent_internal.h in Headers */,
 				77D161241C02DDD10010B15B /* WXSDKInstance.h in Headers */,
 				DC6836E61EBB12B200AD2D84 /* WXConfigCenterProtocol.h in Headers */,
 				DC7764941F3C2CA300B5727E /* WXRecyclerDragController.h in Headers */,
