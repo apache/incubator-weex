@@ -332,6 +332,15 @@ public class WXSDKEngine implements Serializable {
               WXBasicComponentType.RECYCLER,
               WXBasicComponentType.WATERFALL);
 
+      registerComponent(
+              new SimpleComponentHolder(
+                      WXRichText.class,
+                      new WXRichText.Creator()
+              ),
+              false,
+              WXBasicComponentType.RICHTEXT
+      );
+
       String simpleList = "simplelist";
       registerComponent(SimpleListComponent.class,false,simpleList);
       registerComponent(WXRecyclerTemplateList.class, false,WXBasicComponentType.RECYCLE_LIST);
@@ -349,7 +358,6 @@ public class WXSDKEngine implements Serializable {
       registerComponent(WXBasicComponentType.LOADING, WXLoading.class);
       registerComponent(WXBasicComponentType.LOADING_INDICATOR, WXLoadingIndicator.class);
       registerComponent(WXBasicComponentType.HEADER, WXHeader.class);
-      registerComponent(WXBasicComponentType.RICHTEXT, WXRichText.class);
 
       registerModule("modal", WXModalUIModule.class);
       registerModule("instanceWrap", WXInstanceWrap.class);
