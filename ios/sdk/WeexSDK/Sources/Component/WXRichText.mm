@@ -25,6 +25,7 @@
 #import "WXComponent+Layout.h"
 #import "WXNavigationProtocol.h"
 #import "WXImgLoaderProtocol.h"
+#import "WXLog.h"
 #include <pthread/pthread.h>
 
 @interface WXRichNode : NSObject
@@ -214,6 +215,16 @@ do {\
 
 - (void)recursivelyAddChildNode:(NSDictionary *)nodeValue toSuperNode:(WXRichNode *)superNode
 {
+    if (![nodeValue isKindOfClass:[NSDictionary class]]) {
+        WXLogError(@"Invalid rich text structure.");
+        return;
+    }
+    
+    if (![nodeValue[@"type"] isKindOfClass:[NSString class]]) {
+        WXLogError(@"Invalid rich text structure.");
+        return;
+    }
+    
     WXRichNode *node = [[WXRichNode alloc]init];
     [_richNodes addObject:node];
     
