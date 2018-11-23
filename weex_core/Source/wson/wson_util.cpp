@@ -141,9 +141,8 @@ namespace wson {
         for(int i=0; i<length;){
             u_int16_t c1 = utf16[i++];
             if(isHighSurrogate(c1)){
-                i++;
                 if(i < length){
-                    u_int16_t c2 = utf16[i];
+                    u_int16_t c2 = utf16[i++];
                     if (isLowSurrogate(c2)) {
                         u_int32_t codePoint =  toCodePoint(c1, c2);
                         count += utf16_char_convert_to_utf8_cstr(codePoint, src + count);
@@ -167,9 +166,8 @@ namespace wson {
         for(int i=0; i<length;){
             u_int16_t c1 = utf16[i++];
             if(isHighSurrogate(c1)){
-                i++;
                 if(i < length){
-                    u_int16_t c2 = utf16[i];
+                    u_int16_t c2 = utf16[i++];
                     if (isLowSurrogate(c2)) {
                         u_int32_t codePoint =  toCodePoint(c1, c2);
                         count += utf16_char_convert_to_utf8_cstr(codePoint, src + count);
