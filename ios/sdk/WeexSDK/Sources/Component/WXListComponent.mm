@@ -86,8 +86,9 @@
     BOOL contentAttachBottom = [(WXListComponent *)self.wx_component contentAttachBottom];
     if (contentAttachBottom) {
         CGFloat offsetHeight = self.contentSize.height - CGRectGetHeight(self.bounds);
-        if (offsetHeight >= 0)
-        [self setContentOffset:CGPointMake(0, offsetHeight) animated:NO];
+        if (offsetHeight >= 0) {
+            [self setContentOffset:CGPointMake(0, offsetHeight) animated:NO];
+        }
     }
 }
 
