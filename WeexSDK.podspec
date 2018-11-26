@@ -53,7 +53,7 @@ Pod::Spec.new do |s|
     w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => ['${PODS_ROOT}/Headers/Public/WeexSDK/core/**'] }
     w.header_mappings_dir = 'weex_core/Source'
 
-    w.libraries = "stdc++"
+    w.libraries = "c++"
   end
 
 end
