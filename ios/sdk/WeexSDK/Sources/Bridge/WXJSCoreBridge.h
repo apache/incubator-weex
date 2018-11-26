@@ -21,4 +21,7 @@
 
 @interface WXJSCoreBridge : NSObject <WXBridgeProtocol>
 
+- (instancetype)init;
+- (instancetype)initWithoutDefaultContext;
+
 @end

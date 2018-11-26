@@ -60,53 +60,18 @@
 
 - (instancetype)init
 {
-    self = [super init];
-    
-    if(self){
+    self = [self initWithoutDefaultContext];
+    [self createDefaultContext];
+    return self;
+}
 
-        _jsContext = [[JSContext alloc] init];
-        if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-            _jsContext.name = @"Weex Context";
-        }
+- (instancetype)initWithoutDefaultContext
+{
+    if (self = [super init]) {
         _timers = [NSMutableArray new];
         _callbacks = [NSMutableDictionary new];
         _intervalTimerId = 0;
         _intervaltimers = [NSMutableDictionary new];
-
-        __weak typeof(self) weakSelf = self;
-
-        [WXBridgeContext mountContextEnvironment:_jsContext];
-        
-        _jsContext[@"setTimeout"] = ^(JSValue *function, JSValue *timeout) {
-            // this setTimeout is used by internal logic in JS framework, normal setTimeout called by users will call WXTimerModule's method;
-            [weakSelf performSelector: @selector(triggerTimeout:) withObject:^() {
-                [function callWithArguments:@[]];
-            } afterDelay:[timeout toDouble] / 1000];
-        };
-        
-        _jsContext[@"setTimeoutWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg ) {
-            [weakSelf triggerTimeout:[appId toString] ret:[ret toString] arg:[arg toString]];
-        };
-        
-        _jsContext[@"setIntervalWeex"] = ^(JSValue *appId, JSValue *function,JSValue *arg) {
-            return [weakSelf triggerInterval:[appId toString] function:^() {
-                [function callWithArguments:@[]];
-            } arg:[arg toString]];
-        };
-        
-        _jsContext[@"clearIntervalWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg) {
-            
-            [weakSelf triggerClearInterval:[appId toString] ret:[[ret toNumber] longLongValue]];
-        };
-        
-        _jsContext[@"clearTimeoutWeex"] = ^(JSValue *ret) {
-            [weakSelf triggerClearTimeout:[ret toString]];
-        };
-        
-        _jsContext[@"extendCallNative"] = ^(JSValue *value ) {
-            return [weakSelf extendCallNative:[value toDictionary]];
-        };
-
     }
     return self;
 }
@@ -421,6 +386,49 @@
 }
 
 #pragma mark - Private
+
+- (void)createDefaultContext
+{
+    __weak typeof(self) weakSelf = self;
+    
+    _jsContext = [[JSContext alloc] init];
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
+        _jsContext.name = @"Weex Context";
+    }
+    
+    [WXBridgeContext mountContextEnvironment:_jsContext];
+    
+    _jsContext[@"setTimeout"] = ^(JSValue *function, JSValue *timeout) {
+        // this setTimeout is used by internal logic in JS framework, normal setTimeout called by users will call WXTimerModule's method;
+        [weakSelf performSelector: @selector(triggerTimeout:) withObject:^() {
+            [function callWithArguments:@[]];
+        } afterDelay:[timeout toDouble] / 1000];
+    };
+    
+    _jsContext[@"setTimeoutWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg ) {
+        [weakSelf triggerTimeout:[appId toString] ret:[ret toString] arg:[arg toString]];
+    };
+    
+    _jsContext[@"setIntervalWeex"] = ^(JSValue *appId, JSValue *function,JSValue *arg) {
+        return [weakSelf triggerInterval:[appId toString] function:^() {
+            [function callWithArguments:@[]];
+        } arg:[arg toString]];
+    };
+    
+    _jsContext[@"clearIntervalWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg) {
+        
+        [weakSelf triggerClearInterval:[appId toString] ret:[[ret toNumber] longLongValue]];
+    };
+    
+    _jsContext[@"clearTimeoutWeex"] = ^(JSValue *ret) {
+        [weakSelf triggerClearTimeout:[ret toString]];
+    };
+    
+    _jsContext[@"extendCallNative"] = ^(JSValue *value ) {
+        return [weakSelf extendCallNative:[value toDictionary]];
+    };
+}
+
 -(void)addInstance:(NSString *)instance callback:(NSString *)callback
 {
     if(instance.length > 0){
