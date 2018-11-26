@@ -25,6 +25,7 @@ import android.content.res.Resources;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
+import android.util.Log;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
