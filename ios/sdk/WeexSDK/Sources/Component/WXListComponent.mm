@@ -32,6 +32,14 @@
 #import "WXLoadingComponent.h"
 #import "WXScrollerComponent+Layout.h"
 
+@interface WXListComponent () <UITableViewDataSource, UITableViewDelegate, WXCellRenderDelegate, WXHeaderRenderDelegate>
+
+@property (nonatomic, assign) NSUInteger currentTopVisibleSection;
+// Set whether the content offset position all the way to the bottom
+@property (assign, nonatomic) BOOL contentAttachBottom;
+
+@end
+
 @interface WXTableView : UITableView
 
 @end
@@ -79,6 +87,18 @@
     [super setContentOffset:contentOffset];
 }
 
+- (void)setFrame:(CGRect)frame {
+    [super setFrame:frame];
+    if (![self.wx_component isKindOfClass:[WXListComponent class]]) return;
+    BOOL contentAttachBottom = [(WXListComponent *)self.wx_component contentAttachBottom];
+    if (contentAttachBottom) {
+        CGFloat offsetHeight = self.contentSize.height - CGRectGetHeight(self.bounds);
+        if (offsetHeight >= 0) {
+            [self setContentOffset:CGPointMake(0, offsetHeight) animated:NO];
+        }
+    }
+}
+
 @end
 
 // WXText is a non-public is not permitted
@@ -115,12 +135,6 @@
 }
 @end
 
-@interface WXListComponent () <UITableViewDataSource, UITableViewDelegate, WXCellRenderDelegate, WXHeaderRenderDelegate>
-
-@property (nonatomic, assign) NSUInteger currentTopVisibleSection;
-
-@end
-
 @implementation WXListComponent
 {
     __weak UITableView * _tableView;
@@ -145,6 +159,7 @@
         _completedSections = [NSMutableArray array];
         _reloadInterval = attributes[@"reloadInterval"] ? [WXConvert CGFloat:attributes[@"reloadInterval"]]/1000 : 0;
         _updataType = [WXConvert NSString:attributes[@"updataType"]]?:@"insert";
+        _contentAttachBottom = [WXConvert BOOL:attributes[@"contentAttachBottom"]];
         [self fixFlicker];
     }
     
@@ -198,6 +213,9 @@
     }
     if (attributes[@"updataType"]) {
         _updataType = [WXConvert NSString:attributes[@"updataType"]];
+    }
+    if (attributes[@"contentAttachBottom"]) {
+        _contentAttachBottom = [WXConvert BOOL:attributes[@"contentAttachBottom"]];
     }
 }
 
