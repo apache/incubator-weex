@@ -31,7 +31,14 @@
 #import "WXRefreshComponent.h"
 #import "WXLoadingComponent.h"
 #import "WXScrollerComponent+Layout.h"
-#import "WXListComponent_internal.h"
+
+@interface WXListComponent () <UITableViewDataSource, UITableViewDelegate, WXCellRenderDelegate, WXHeaderRenderDelegate>
+
+@property (nonatomic, assign) NSUInteger currentTopVisibleSection;
+// Set whether the content offset position all the way to the bottom
+@property (assign, nonatomic) BOOL contentAttachBottom;
+
+@end
 
 @interface WXTableView : UITableView
 
@@ -127,12 +134,6 @@
 {
     return [NSString stringWithFormat:@"%@\n%@", [_header description], [_rows description]];
 }
-@end
-
-@interface WXListComponent () <UITableViewDataSource, UITableViewDelegate, WXCellRenderDelegate, WXHeaderRenderDelegate>
-
-@property (nonatomic, assign) NSUInteger currentTopVisibleSection;
-
 @end
 
 @implementation WXListComponent
