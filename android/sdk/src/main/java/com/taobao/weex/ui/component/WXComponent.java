@@ -682,7 +682,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         component = this;
       }
       bindComponent(component);
-      setLayout(component);
+      setSafeLayout(component);
       setPadding(component.getPadding(), component.getBorder());
       applyEvents();
     }
@@ -701,7 +701,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   public void applyLayoutOnly(){
     if(!isLazy()) {
-      setLayout(this);
+      setSafeLayout(this);
       setPadding(this.getPadding(), this.getBorder());
     }
   }
@@ -922,13 +922,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   /**
    * layout view
    */
-  public void setLayout(WXComponent component) {
+  public void setSafeLayout(WXComponent component) {
     if (TextUtils.isEmpty(component.getComponentType())
             || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
             || component.getLayoutSize() == null) {
       return;
     }
+    setLayout(component);
+  }
 
+  /**
+   * layout view
+   */
+  public void setLayout(WXComponent component) {
     setLayoutSize(component.getLayoutSize());
     setLayoutPosition(component.getLayoutPosition());
     setPaddings(component.getPadding());

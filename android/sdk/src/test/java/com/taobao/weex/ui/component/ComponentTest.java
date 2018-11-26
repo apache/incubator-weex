@@ -49,7 +49,7 @@ public class ComponentTest {
       parent.createChildViewAt(-1);
     }
 
-    comp.setLayout(comp);
+    comp.setSafeLayout(comp);
 
 //    domObject = new TestDomObject();
 //    comp.updateDom(domObject);
