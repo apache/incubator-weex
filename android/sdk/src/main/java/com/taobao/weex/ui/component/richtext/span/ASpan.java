@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,26 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.taobao.weex.ui.component.richtext.span;
 
-package com.taobao.weex.adapter;
+import android.text.TextPaint;
+import android.text.style.ClickableSpan;
+import android.view.View;
+import com.taobao.weex.utils.ATagUtil;
 
-import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
+public class ASpan extends ClickableSpan {
 
-public interface IDrawableLoader {
+  private String mInstanceId, mURL;
 
-  interface DrawableTarget {
-    void setDrawable(@Nullable Drawable drawable, boolean resetBounds);
+  public ASpan(String instanceId, String url) {
+    mInstanceId = instanceId;
+    mURL = url;
   }
 
-  interface StaticTarget extends DrawableTarget{
-    void setDrawable(@Nullable Drawable drawable, boolean resetBounds);
+  @Override
+  public void onClick(View widget) {
+    ATagUtil.onClick(widget, mInstanceId, mURL);
   }
 
-  interface AnimatedTarget extends DrawableTarget{
-    void setAnimatedDrawable(@Nullable Drawable drawable);
-  }
+  /**
+   Override super method and do nothing. As no default color or text-decoration is needed.
+   */
+  @Override
+  public void updateDrawState(TextPaint ds) {
 
-  void setDrawable(String url, DrawableTarget drawableTarget, DrawableStrategy drawableStrategy);
+  }
 }
-

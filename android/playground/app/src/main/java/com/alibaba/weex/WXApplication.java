@@ -25,6 +25,7 @@ import android.os.Bundle;
 import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.commons.adapter.JSExceptionAdapter;
+import com.alibaba.weex.commons.adapter.PicassoBasedDrawableLoader;
 import com.alibaba.weex.extend.adapter.ApmGenerator;
 import com.alibaba.weex.extend.adapter.DefaultAccessibilityRoleAdapter;
 import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
@@ -72,6 +73,7 @@ public class WXApplication extends Application {
                            new InitConfig.Builder()
                                //.setImgAdapter(new FrescoImageAdapter())// use fresco adapter
                                .setImgAdapter(new ImageAdapter())
+                                   .setDrawableLoader(new PicassoBasedDrawableLoader(getApplicationContext()))
                                .setWebSocketAdapterFactory(new DefaultWebSocketAdapterFactory())
                                .setJSExceptionAdapter(new JSExceptionAdapter())
                                .setHttpAdapter(new InterceptWXHttpAdapter())
@@ -86,7 +88,6 @@ public class WXApplication extends Application {
       WXSDKEngine.registerComponent("synccomponent", WXComponentSyncTest.class);
       WXSDKEngine.registerComponent(WXParallax.PARALLAX, WXParallax.class);
 
-      WXSDKEngine.registerComponent("richtext", RichText.class);
       WXSDKEngine.registerModule("render", RenderModule.class);
       WXSDKEngine.registerModule("event", WXEventModule.class);
       WXSDKEngine.registerModule("syncTest", SyncTestModule.class);
