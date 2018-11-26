@@ -33,7 +33,13 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
+import android.view.Gravity;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -47,6 +53,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.helper.ScrollStartEndHelper;
@@ -80,14 +87,26 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private Point mLastReport = new Point(-1, -1);
   private boolean mHasAddScrollEvent = false;
 
+  private static final int SWIPE_MIN_DISTANCE = 5;
+  private static final int SWIPE_THRESHOLD_VELOCITY = 300;
+  private int mActiveFeature = 0;
   /**
    * scroll start and scroll end event
    * */
   private ScrollStartEndHelper mScrollStartEndHelper;
 
+  private GestureDetector mGestureDetector;
+
+  private int pageSize = 0;
+  private boolean pageEnable = false;
+  private boolean mIsHostAttachedToWindow = false;
+  private View.OnAttachStateChangeListener mOnAttachStateChangeListener;
+
   public static class Creator implements ComponentCreator {
     @Override
     public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      // For performance message collection
+      instance.setUseScroller(true);
       return new WXScroller(instance, parent, basicComponentData);
     }
   }
@@ -117,6 +136,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   public WXScroller(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     super(instance, parent, basicComponentData);
     stickyHelper = new WXStickyHelper(this);
+    instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_SCROLLER_NUM,1);
   }
 
   /**
@@ -357,9 +377,48 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     if (mStickyMap != null) {
       mStickyMap.clear();
     }
+    if (mOnAttachStateChangeListener != null && getInnerView() != null) {
+      getInnerView().removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
+    }
     if (getInnerView() != null && getInnerView() instanceof IWXScroller) {
       ((IWXScroller) getInnerView()).destroy();
     }
+  }
+
+  @Override
+  public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      lp.setMargins(left, top, right, bottom);
+      lp.setMarginStart(left);
+      lp.setMarginEnd(right);
+    } else {
+      if (lp instanceof FrameLayout.LayoutParams) {
+        FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
+        if (this.isNativeLayoutRTL()) {
+          lp_frameLayout.gravity = Gravity.RIGHT | Gravity.TOP;
+          lp.setMargins(right, top, left, bottom);
+        } else {
+          lp_frameLayout.gravity = Gravity.LEFT | Gravity.TOP;
+          lp.setMargins(left, top, right, bottom);
+        }
+      } else {
+        lp.setMargins(left, top, right, bottom);
+      }
+    }
+  }
+
+  @Override
+  public void setLayout(WXComponent component) {
+    if (TextUtils.isEmpty(component.getComponentType())
+            || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
+            || component.getLayoutSize() == null) {
+      return;
+    }
+    if (component.getHostView() != null) {
+      int layoutDirection = component.isNativeLayoutRTL() ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR;
+      ViewCompat.setLayoutDirection(component.getHostView(), layoutDirection);
+    }
+    super.setLayout(component);
   }
 
   @Override
@@ -388,12 +447,28 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       scroll = "vertical";
     } else {
       scroll = getAttrs().getScrollDirection();
+
+      Object o = getAttrs().get(Constants.Name.PAGE_ENABLED);
+
+      pageEnable = o != null && Boolean.parseBoolean(o.toString());
+
+      Object pageSize = getAttrs().get(Constants.Name.PAGE_SIZE);
+      if (pageSize != null) {
+        float aFloat = WXUtils.getFloat(pageSize);
+
+
+        float realPxByWidth = WXViewUtils.getRealPxByWidth(aFloat, getInstance().getInstanceViewPortWidth());
+        if (realPxByWidth != 0) {
+          this.pageSize = (int) realPxByWidth;
+        }
+      }
+
     }
 
     ViewGroup host;
     if(("horizontal").equals(scroll)){
       mOrientation = Constants.Orientation.HORIZONTAL;
-      WXHorizontalScrollView scrollView = new WXHorizontalScrollView(context);
+      final WXHorizontalScrollView scrollView = new WXHorizontalScrollView(context);
       mRealView = new FrameLayout(context);
       scrollView.setScrollViewListener(new WXHorizontalScrollView.ScrollViewListener() {
         @Override
@@ -405,6 +480,65 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
               LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
       scrollView.addView(mRealView, layoutParams);
       scrollView.setHorizontalScrollBarEnabled(false);
+
+        final WXScroller component = this;
+        final View.OnLayoutChangeListener listener = new View.OnLayoutChangeListener() {
+          @Override
+          public void onLayoutChange(View view, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+            final View frameLayout = view;
+            scrollView.post(new Runnable() {
+              @Override
+              public void run() {
+                if (isNativeLayoutRTL()) {
+                  int mw = frameLayout.getMeasuredWidth();
+                  scrollView.scrollTo(mw, component.getScrollY());
+                } else {
+                  scrollView.scrollTo(0, component.getScrollY());
+                }
+              }
+            });
+          }
+        };
+        mRealView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+          @Override
+          public void onViewAttachedToWindow(View view) {
+            view.addOnLayoutChangeListener(listener);
+          }
+
+          @Override
+          public void onViewDetachedFromWindow(View view) {
+            view.removeOnLayoutChangeListener(listener);
+          }
+        });
+
+
+      if(pageEnable) {
+        mGestureDetector = new GestureDetector(new MyGestureDetector(scrollView));
+        scrollView.setOnTouchListener(new View.OnTouchListener() {
+          @Override
+          public boolean onTouch(View v, MotionEvent event) {
+            if (pageSize == 0)  {
+              pageSize = v.getMeasuredWidth();
+            }
+
+            if (mGestureDetector.onTouchEvent(event)) {
+              return true;
+            }
+            else if(event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL ){
+              int scrollX = getScrollX();
+              int featureWidth = pageSize;
+              mActiveFeature = ((scrollX + (featureWidth/2))/featureWidth);
+              int scrollTo = mActiveFeature*featureWidth;
+              scrollView.smoothScrollTo(scrollTo, 0);
+              return true;
+            }
+            else{
+              return false;
+            }
+          }
+        });
+      }
+
 
       host = scrollView;
     }else{
@@ -478,6 +612,20 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         }
       }
     });
+    mOnAttachStateChangeListener = new View.OnAttachStateChangeListener() {
+      @Override
+      public void onViewAttachedToWindow(View v) {
+        mIsHostAttachedToWindow = true;
+        procAppear(getScrollX(), getScrollY(), getScrollX(), getScrollY());
+      }
+
+      @Override
+      public void onViewDetachedFromWindow(View v) {
+        mIsHostAttachedToWindow = false;
+        dispatchDisappearEvent();
+      }
+    };
+    host.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
     return host;
   }
 
@@ -630,8 +778,25 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       }
     }
 
-    int viewYInScroller=component.getAbsoluteY() - getAbsoluteY();
-    int viewXInScroller=component.getAbsoluteX() - getAbsoluteX();
+    if(pageEnable) {
+      mActiveFeature = mChildren.indexOf(component);
+    }
+
+    int viewYInScroller = component.getAbsoluteY() - getAbsoluteY();
+    int viewXInScroller = 0;
+    if (this.isNativeLayoutRTL()) {
+      // if layout direction is rtl, we need calculate rtl scroll x;
+      if (getInnerView().getChildCount() > 0) {
+        int totalWidth = getInnerView().getChildAt(0).getWidth();
+        int displayWidth = getInnerView().getMeasuredWidth();
+        viewXInScroller = totalWidth - (component.getAbsoluteX() - getAbsoluteX()) - displayWidth;
+      } else {
+        viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
+      }
+      offsetFloat = - offsetFloat;
+    } else {
+      viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
+    }
 
     scrollBy(viewXInScroller - getScrollX() + (int) offsetFloat, viewYInScroller - getScrollY() + (int) offsetFloat, smooth);
   }
@@ -677,11 +842,28 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     procAppear( x, y, oldx, oldy);
   }
 
+  @Override
+  public void notifyAppearStateChange(String wxEventType, String direction) {
+    if (containsEvent(Constants.Event.APPEAR) || containsEvent(Constants.Event.DISAPPEAR)) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("direction", direction);
+      fireEvent(wxEventType, params);
+    }
+    // No-op. The moment to notify children is decided by the time when scroller is attached
+    // or detached to window. Do not call super as scrollview has different disposal.
+  }
+
   /**
    * Process event like appear and disappear
+   *
+   * This method will be invoked in several situation below.
+   *    1. bind or unbind event
+   *    2. host view is attached to window
+   *    3. when scrollview is scrolling
    */
   private void procAppear(int x, int y, int oldx,
                           int oldy) {
+    if (!mIsHostAttachedToWindow) return;
     int moveY = y - oldy;
     int moveX = x - oldx;
     String direction = moveY > 0 ? Constants.Value.DIRECTION_UP :
@@ -696,11 +878,51 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       if (!helper.isWatch()) {
         continue;
       }
-      boolean visible = helper.isViewVisible(false);
+      boolean visible = checkItemVisibleInScroller(helper.getAwareChild());
 
       int result = helper.setAppearStatus(visible);
       if (result != AppearanceHelper.RESULT_NO_CHANGE) {
         helper.getAwareChild().notifyAppearStateChange(result == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
+      }
+    }
+  }
+
+  /**
+   * Check the view of given component is visible in scrollview.
+   *
+   * @param component ready to be check
+   * @return item is visible
+   */
+  private boolean checkItemVisibleInScroller(WXComponent component) {
+    boolean visible = false;
+    while (component != null && !(component instanceof WXScroller)) {
+      if (component.getParent() instanceof WXScroller) {
+        if (mOrientation == Constants.Orientation.HORIZONTAL) {
+          int offsetLeft = (int) component.getLayoutPosition().getLeft() - getScrollX();
+          visible = (offsetLeft > 0 - component.getLayoutWidth() && offsetLeft < getLayoutWidth());
+        } else {
+          int offsetTop = (int) component.getLayoutPosition().getTop() - getScrollY();
+          visible = (offsetTop > 0 - component.getLayoutHeight() && offsetTop < getLayoutHeight());
+        }
+      }
+      component = component.getParent();
+    }
+    return visible;
+  }
+
+  /**
+   * Dispatch disappear event to the child components in need.
+   */
+  private void dispatchDisappearEvent() {
+    for (Entry<String, AppearanceHelper> item : mAppearanceComponents.entrySet()) {
+      AppearanceHelper helper = item.getValue();
+      if (!helper.isWatch()) {
+        continue;
+      }
+      int result = helper.setAppearStatus(false);
+      if (result != AppearanceHelper.RESULT_NO_CHANGE) {
+        helper.getAwareChild().notifyAppearStateChange(result == AppearanceHelper.RESULT_APPEAR ?
+                Constants.Event.APPEAR : Constants.Event.DISAPPEAR, "");
       }
     }
   }
@@ -764,5 +986,42 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       mScrollStartEndHelper = new ScrollStartEndHelper(this);
     }
     return mScrollStartEndHelper;
+  }
+
+
+  class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
+    public WXHorizontalScrollView getScrollView() {
+      return scrollView;
+    }
+
+    private final WXHorizontalScrollView scrollView;
+
+    MyGestureDetector(WXHorizontalScrollView horizontalScrollView) {
+      scrollView = horizontalScrollView;
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+      int mItems = mChildren.size();
+      try {
+        //right to left
+        if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+          int featureWidth = pageSize;
+          mActiveFeature = (mActiveFeature < (mItems - 1))? mActiveFeature + 1:mItems -1;
+          scrollView.smoothScrollTo(mActiveFeature*featureWidth, 0);
+          return true;
+        }
+        //left to right
+        else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+          int featureWidth = pageSize;
+          mActiveFeature = (mActiveFeature > 0)? mActiveFeature - 1:0;
+          scrollView.smoothScrollTo(mActiveFeature*featureWidth, 0);
+          return true;
+        }
+      } catch (Exception e) {
+        WXLogUtils.e("There was an error processing the Fling event:" + e.getMessage());
+      }
+      return false;
+    }
   }
 }

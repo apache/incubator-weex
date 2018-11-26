@@ -20,6 +20,7 @@ package com.taobao.weex.ui.action;
 
 import android.support.v4.util.ArrayMap;
 
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
@@ -35,20 +36,20 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
   private WXComponent component;
   private boolean mIsCausedByPesudo;
 
-  public GraphicActionUpdateStyle(String pageId, String ref,
+  public GraphicActionUpdateStyle(WXSDKInstance instance, String ref,
                                   Map<String, Object> style,
                                   Map<String, String> paddings,
                                   Map<String, String> margins,
                                   Map<String, String> borders) {
-    this(pageId, ref, style, paddings, margins, borders, false);
+    this(instance, ref, style, paddings, margins, borders, false);
   }
 
-  public GraphicActionUpdateStyle(String pageId, String ref,
+  public GraphicActionUpdateStyle(WXSDKInstance instance, String ref,
                                   Map<String, Object> style,
                                   CSSShorthand paddings,
                                   CSSShorthand margins,
                                   CSSShorthand borders, boolean byPesudo) {
-    super(pageId, ref);
+    super(instance, ref);
     this.mStyle = style;
     this.mIsCausedByPesudo = byPesudo;
 
@@ -80,12 +81,12 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     }
   }
 
-  public GraphicActionUpdateStyle(String pageId, String ref,
+  public GraphicActionUpdateStyle(WXSDKInstance instance, String ref,
                                   Map<String, Object> style,
                                   Map<String, String> paddings,
                                   Map<String, String> margins,
                                   Map<String, String> borders, boolean byPesudo) {
-    super(pageId, ref);
+    super(instance, ref);
     this.mStyle = style;
     this.mIsCausedByPesudo = byPesudo;
 
@@ -119,7 +120,7 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
 
   @Override
   public void executeAction() {
-    if (component == null) {
+    if (component == null || mStyle == null) {
       return;
     }
     if(component.getTransition() != null){

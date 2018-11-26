@@ -20,6 +20,8 @@ package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
+import android.text.TextUtils;
 import com.taobao.weex.dom.CSSShorthand.CSSProperty;
 import java.util.Arrays;
 
@@ -108,5 +110,11 @@ public class CSSShorthand<T extends Enum<? extends CSSProperty>> implements Clon
 
   private float getInternal(@NonNull Enum<? extends CSSProperty> edge){
     return (edge == EDGE.ALL || edge == CORNER.ALL) ? 0 : values[edge.ordinal()];
+  }
+
+  @Override
+  @RestrictTo(Scope.LIBRARY)
+  public String toString() {
+    return TextUtils.isEmpty(values.toString()) ? "" : Arrays.toString(values);
   }
 }

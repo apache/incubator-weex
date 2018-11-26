@@ -54,7 +54,7 @@ public class WXIndicator extends WXComponent<WXCircleIndicator> {
   @Override
   protected void setHostLayoutParams(WXCircleIndicator host, int width, int height, int left, int right, int top, int bottom) {
       FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
-      params.setMargins(left, top, right, bottom);
+      this.setMarginsSupportRTL(params, left, top, right, bottom);
       host.setLayoutParams(params);
   }
 

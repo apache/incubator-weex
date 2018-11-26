@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,6 +20,7 @@ package com.taobao.weex.ui.component;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -27,6 +28,7 @@ import android.text.InputType;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.method.DigitsKeyListener;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.util.TypedValue;
@@ -58,6 +60,7 @@ import com.taobao.weex.utils.TypefaceUtil;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -347,6 +350,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         public void onTextChanged(CharSequence s, int start, int before, int count) {
           if (mIgnoreNextOnInputEvent) {
             mIgnoreNextOnInputEvent = false;
+            mBeforeText = s.toString();
             return;
           }
 
@@ -412,6 +416,18 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   @Override
   protected boolean setProperty(String key, Object param) {
     switch (key) {
+      case Constants.Name.DISABLED:
+        Boolean disabled = WXUtils.getBoolean(param, null);
+        if (disabled != null && mHost != null) {
+          if (disabled) {
+            mHost.setFocusable(false);
+            mHost.setFocusableInTouchMode(false);
+          } else {
+            mHost.setFocusableInTouchMode(true);
+            mHost.setFocusable(true);
+          }
+        }
+        return true;
       case Constants.Name.PLACEHOLDER:
         String placeholder = WXUtils.getString(param, null);
         if (placeholder != null)
@@ -549,7 +565,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       return;
     }
     mType = type;
-    ((EditText) getHostView()).setRawInputType(getInputType(mType));
+    ((EditText) getHostView()).setInputType(getInputType(mType));
     switch (mType) {
       case Constants.Value.DATE:
       case Constants.Value.TIME:
@@ -672,20 +688,24 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         break;
       case Constants.Value.PASSWORD:
         inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
-        getHostView().setTransformationMethod(PasswordTransformationMethod.getInstance());
+        if(getHostView() != null){
+            getHostView().setTransformationMethod(PasswordTransformationMethod.getInstance());
+        }
         break;
       case Constants.Value.TEL:
         inputType = InputType.TYPE_CLASS_PHONE;
         break;
       case Constants.Value.TIME:
         inputType = InputType.TYPE_NULL;
-        getHostView().setFocusable(false);
+        if(getHostView() != null){
+            getHostView().setFocusable(false);
+        }
         break;
       case Constants.Value.URL:
         inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
         break;
       case Constants.Value.NUMBER:
-        inputType = InputType.TYPE_CLASS_NUMBER;
+        inputType = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
         break;
       default:
         inputType = InputType.TYPE_CLASS_TEXT;
@@ -884,7 +904,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     if (host == null) {
       return;
     }
-    Context context = host.getContext();
+    final Context context = host.getContext();
     if (context != null && context instanceof Activity) {
       SoftKeyboardDetector.registerKeyboardEventListener((Activity) context, new SoftKeyboardDetector.OnKeyboardEventListener() {
         @Override
@@ -892,6 +912,13 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
           if (mListeningKeyboard) {
             Map<String, Object> event = new HashMap<>(1);
             event.put("isShow", isShown);
+            if (isShown) {
+              Rect r = new Rect();
+              ((Activity) context).getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
+              float keyboardSize = WXViewUtils.getWebPxByWidth(WXViewUtils.getScreenHeight(context) - (r.bottom - r.top),
+                      getInstance().getInstanceViewPortWidth());
+              event.put("keyboardSize", keyboardSize);
+            }
             fireEvent(Constants.Event.KEYBOARD, event);
           }
           if (!isShown) {

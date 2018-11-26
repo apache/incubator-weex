@@ -28,7 +28,7 @@ import {
   moveIndex,
   removeIndex
 } from './operation'
-import { uniqueId, isEmpty } from '../shared/utils'
+import { uniqueId, isEmpty, checkLevel, debugLog } from '../shared/utils'
 import { getWeexElement, setElement } from './WeexElement'
 
 const DEFAULT_TAG_NAME = 'div'
@@ -75,6 +75,10 @@ export default class Element extends Node {
     }
     /* istanbul ignore else */
     if (!node.parentNode) {
+      if (checkLevel('debug')) {
+        debugLog(`[appendChild](${this.docId},${node.type},${node.ref}) `
+          + `Append <${node.type}> to <${this.type}> (${this.ref}).`)
+      }
       linkParent(node, this)
       insertIndex(node, this.children, this.children.length, true)
       if (this.docId) {
@@ -93,6 +97,10 @@ export default class Element extends Node {
       }
     }
     else {
+      if (checkLevel('debug')) {
+        debugLog(`[appendChild](${this.docId},${node.type},${node.ref}) `
+          + `Move <${node.type}> to ${this.children.length} of <${this.type}> (${this.ref}).`)
+      }
       moveIndex(node, this.children, this.children.length, true)
       if (node.nodeType === 1) {
         const index = moveIndex(node, this.pureChildren, this.pureChildren.length)
@@ -122,6 +130,10 @@ export default class Element extends Node {
       return
     }
     if (!node.parentNode) {
+      if (checkLevel('debug')) {
+        debugLog(`[insertBefore](${this.docId},${node.type},${node.ref}) `
+          + `Insert <${node.type}> to <${this.type}> (${this.ref}), before (${before.ref}).`)
+      }
       linkParent(node, this)
       insertIndex(node, this.children, this.children.indexOf(before), true)
       if (this.docId) {
@@ -184,6 +196,10 @@ export default class Element extends Node {
       return
     }
     if (!node.parentNode) {
+      if (checkLevel('debug')) {
+        debugLog(`[insertAfter](${this.docId},${node.type},${node.ref}) `
+          + `Insert <${node.type}> to <${this.type}> (${this.ref}), after (${after.ref}).`)
+      }
       linkParent(node, this)
       insertIndex(node, this.children, this.children.indexOf(after) + 1, true)
       /* istanbul ignore else */
@@ -236,6 +252,10 @@ export default class Element extends Node {
     if (node.parentNode) {
       removeIndex(node, this.children, true)
       if (node.nodeType === 1) {
+        if (checkLevel('debug')) {
+          debugLog(`[removeChild](${this.docId},${node.type},${node.ref}) `
+            + `Remove <${node.type}> from <${this.type}> (${this.ref}).`)
+        }
         removeIndex(node, this.pureChildren)
         const taskCenter = getTaskCenter(this.docId)
         if (taskCenter) {
@@ -403,6 +423,10 @@ export default class Element extends Node {
       this.event = {}
     }
     if (!this.event[type]) {
+      if (checkLevel('debug')) {
+        debugLog(`[addEvent](${this.docId},${this.type},${this.ref}) `
+          + `Add "${type}" event on <${this.type}> (${this.ref}).`)
+      }
       this.event[type] = { handler, params }
       const taskCenter = getTaskCenter(this.docId)
       if (taskCenter) {
@@ -421,6 +445,10 @@ export default class Element extends Node {
    */
   removeEvent (type) {
     if (this.event && this.event[type]) {
+      if (checkLevel('debug')) {
+        debugLog(`[removeEvent](${this.docId},${this.type},${this.ref}) `
+          + `Remove "${type}" event on <${this.type}> (${this.ref}).`)
+      }
       delete this.event[type]
       const taskCenter = getTaskCenter(this.docId)
       if (taskCenter) {
@@ -446,15 +474,25 @@ export default class Element extends Node {
     let isStopPropagation = false
     const eventDesc = this.event[type]
     if (eventDesc && event) {
+      if (checkLevel('debug')) {
+        debugLog(`[fireEvent](${this.docId},${this.type},${this.ref}) `
+          + `Fire "${type}" event on <${this.type}> (${this.ref}).`)
+      }
       const handler = eventDesc.handler
       event.stopPropagation = () => {
         isStopPropagation = true
       }
-      if (options && options.params) {
-        result = handler.call(this, ...options.params, event)
+      try {
+        if (options && options.params) {
+          result = handler.call(this, ...options.params, event)
+        }
+        else {
+          result = handler.call(this, event)
+        }
       }
-      else {
-        result = handler.call(this, event)
+      catch (error) {
+        console.error(`[JS Framework] Failed to invoke the event handler of "${type}" `
+          + `on ${this.type} (${this.ref}):\n ${error.toString()}`)
       }
     }
 
@@ -480,9 +518,10 @@ export default class Element extends Node {
 
   /**
    * Convert current element to JSON like object.
+   * @param {boolean} ignoreChildren whether to ignore child nodes, default false
    * @return {object} element
    */
-  toJSON () {
+  toJSON (ignoreChildren = false) {
     const result = {
       ref: this.ref.toString(),
       type: this.type,
@@ -502,7 +541,7 @@ export default class Element extends Node {
     if (event.length) {
       result.event = event
     }
-    if (this.pureChildren.length) {
+    if (!ignoreChildren && this.pureChildren.length) {
       result.children = this.pureChildren.map((child) => child.toJSON())
     }
     return result

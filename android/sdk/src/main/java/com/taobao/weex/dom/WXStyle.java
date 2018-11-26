@@ -21,6 +21,8 @@ package com.taobao.weex.dom;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import android.support.v4.util.ArrayMap;
 import android.text.Layout;
 import android.text.TextUtils;
@@ -176,13 +178,17 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   }
 
   public static Layout.Alignment getTextAlignment(Map<String, Object> style){
-    Layout.Alignment alignment= Layout.Alignment.ALIGN_NORMAL;
+    return getTextAlignment(style, false);
+  }
+
+  public static Layout.Alignment getTextAlignment(Map<String, Object> style, boolean isRTL){
+    Layout.Alignment alignment= isRTL ? Layout.Alignment.ALIGN_OPPOSITE : Layout.Alignment.ALIGN_NORMAL;
     String textAlign= (String) style.get(Constants.Name.TEXT_ALIGN);
     if(TextUtils.equals(Constants.Value.LEFT,textAlign)){
       alignment= Layout.Alignment.ALIGN_NORMAL;
     }
     else if(TextUtils.equals(Constants.Value.CENTER,textAlign)){
-      alignment=Layout.Alignment.ALIGN_CENTER;
+      alignment= Layout.Alignment.ALIGN_CENTER;
     }
     else if(TextUtils.equals(Constants.Value.RIGHT,textAlign)){
       alignment= Layout.Alignment.ALIGN_OPPOSITE;
@@ -545,4 +551,9 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return style;
   }
 
+  @Override
+  @RestrictTo(Scope.LIBRARY)
+  public String toString() {
+    return mStyles.toString();
+  }
 }

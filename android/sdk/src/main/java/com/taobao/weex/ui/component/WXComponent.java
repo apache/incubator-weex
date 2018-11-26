@@ -46,6 +46,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.TextUtils;
 import android.util.Pair;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,6 +74,7 @@ import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.IFComponentHolder;
@@ -85,6 +87,8 @@ import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
 import com.taobao.weex.ui.component.binding.Statements;
+import com.taobao.weex.ui.component.list.WXCell;
+import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
 import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
@@ -151,6 +155,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private int mPreRealWidth = 0;
   private int mPreRealHeight = 0;
   private int mPreRealLeft = 0;
+  private int mPreRealRight = 0;
   private int mPreRealTop = 0;
   private int mStickyOffset = 0;
   protected WXGesture mGesture;
@@ -166,7 +171,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private int mType = TYPE_COMMON;
   private boolean mNeedLayoutOnAnimation = false;
   private String mLastBoxShadowId;
-  public int deepInComponentTree = 0;
+  public int mDeepInComponentTree = 0;
+  public boolean mIsAddElementToTree = false;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
@@ -228,6 +234,44 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     this.contentBoxMeasurement = contentBoxMeasurement;
     mInstance.addContentBoxMeasurement(getRenderObjectPtr(), contentBoxMeasurement);
     WXBridgeManager.getInstance().bindMeasurementToRenderObject(getRenderObjectPtr());
+  }
+
+
+  public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
+      lp.setMargins(left, top, right, bottom);
+      if (lp instanceof FrameLayout.LayoutParams) {
+          FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
+          lp_frameLayout.gravity = Gravity.LEFT | Gravity.TOP;
+      }
+  }
+
+  public boolean isNativeLayoutRTL() {
+      return NativeRenderObjectUtils.nativeRenderObjectGetLayoutDirectionFromPathNode(this.getRenderObjectPtr()) == NativeRenderLayoutDirection.rtl;
+  }
+
+  public static boolean isLayoutRTL(WXComponent cmp) {
+    if (cmp == null) return false;
+
+    View view = cmp.getHostView();
+    if (ViewCompat.isLayoutDirectionResolved(view)) {
+      return ViewCompat.getLayoutDirection(view) == View.LAYOUT_DIRECTION_RTL;
+    } else if (cmp.getParent() != null){
+      return isLayoutRTL(cmp.getParent());
+    } else {
+      return isLayoutRTL((ViewGroup) view.getParent());
+    }
+  }
+
+  public static boolean isLayoutRTL(ViewGroup viewGroup) {
+    if (viewGroup == null) return false;
+
+    if (ViewCompat.isLayoutDirectionResolved(viewGroup)) {
+      return ViewCompat.getLayoutDirection(viewGroup) == View.LAYOUT_DIRECTION_RTL;
+    } else if (viewGroup.getParent() instanceof ViewGroup) {
+      return isLayoutRTL((ViewGroup) viewGroup.getParent());
+    } else {
+      return false;
+    }
   }
 
   public void updateStyles(WXComponent component) {
@@ -515,7 +559,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     };
     try{
       fireEvent(type, params, null, callback);
-      waitLatch.await(10, TimeUnit.MILLISECONDS);
+      waitLatch.await(50, TimeUnit.MILLISECONDS);
       return  callback;
     }catch (Exception e){
       if(WXEnvironment.isApkDebugable()){
@@ -862,13 +906,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (mBackgroundDrawable == null) {
       mBackgroundDrawable = new BorderDrawable();
       if (mHost != null) {
-        WXViewUtils.setBackGround(mHost, null);
+        WXViewUtils.setBackGround(mHost, null, this);
         if (mRippleBackground == null) {
-          WXViewUtils.setBackGround(mHost, mBackgroundDrawable);
+          WXViewUtils.setBackGround(mHost, mBackgroundDrawable, this);
         } else {
           //TODO Not strictly clip according to background-clip:border-box
           WXViewUtils.setBackGround(mHost, new LayerDrawable(new Drawable[]{
-                  mRippleBackground, mBackgroundDrawable}));
+                  mRippleBackground, mBackgroundDrawable}), this);
         }
       }
     }
@@ -878,8 +922,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   /**
    * layout view
    */
-  public final void setLayout(WXComponent component) {
-
+  public void setLayout(WXComponent component) {
     if (TextUtils.isEmpty(component.getComponentType())
             || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
             || component.getLayoutSize() == null) {
@@ -907,6 +950,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     int realLeft = 0;
     int realTop = 0;
+    int realRight = 0;
 
     if (isFixed()) {
       realLeft = (int) (getLayoutPosition().getLeft() - getInstance().getRenderContainerPaddingLeft());
@@ -918,31 +962,41 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
               parentPadding.get(CSSShorthand.EDGE.TOP) - parentBorder.get(CSSShorthand.EDGE.TOP)) + siblingOffset;
     }
 
-    int realRight = (int) getMargin().get(CSSShorthand.EDGE.RIGHT);
+    realRight = (int) getMargin().get(CSSShorthand.EDGE.RIGHT);
     int realBottom = (int) getMargin().get(CSSShorthand.EDGE.BOTTOM);
 
     Point rawOffset = new Point(
             (int) getLayoutPosition().getLeft(),
             (int) getLayoutPosition().getTop());
 
-    if (mPreRealWidth == realWidth && mPreRealHeight == realHeight && mPreRealLeft == realLeft && mPreRealTop == realTop) {
+    if (mPreRealWidth == realWidth && mPreRealHeight == realHeight && mPreRealLeft == realLeft && mPreRealRight == realRight && mPreRealTop == realTop) {
       return;
     }
 
-    if (realHeight >= WXPerformance.VIEW_LIMIT_HEIGHT && realWidth>=WXPerformance.VIEW_LIMIT_WIDTH){
+    if (this instanceof WXCell && realHeight >= WXPerformance.VIEW_LIMIT_HEIGHT && realWidth>=WXPerformance.VIEW_LIMIT_WIDTH){
+      mInstance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_CELL_EXCEED_NUM,1);
       mInstance.getWXPerformance().cellExceedNum++;
     }
 
     mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getCSSLayoutTop());
     mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + getCSSLayoutLeft());
 
+    if (mIsAddElementToTree)
+      mInstance.onChangeElement(this, mAbsoluteY > mInstance.getWeexHeight() + 1);
+
     if (mHost == null) {
       return;
     }
 
     //calculate first screen time
-    if (!mInstance.mEnd && !(mHost instanceof ViewGroup) && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
-      mInstance.firstScreenRenderFinished();
+    if (!(mHost instanceof ViewGroup) && mAbsoluteY + realHeight > mInstance.getWeexHeight() + 1) {
+      if (!mInstance.mEnd){
+        mInstance.onOldFsRenderTimeLogic();
+      }
+      if (!mInstance.isNewFsEnd){
+        mInstance.isNewFsEnd = true;
+        mInstance.getApmForInstance().arriveNewFsRenderTime();
+      }
     }
 
     MeasureOutput measureOutput = measure(realWidth, realHeight);
@@ -981,6 +1035,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       mPreRealWidth = realWidth;
       mPreRealHeight = realHeight;
       mPreRealLeft = realLeft;
+      mPreRealRight = realRight;
       mPreRealTop = realTop;
       onFinishLayout();
       // restore box shadow
@@ -1034,14 +1089,14 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   protected void setHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom) {
     ViewGroup.LayoutParams lp;
     if (mParent == null) {
-      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
-      params.setMargins(left, top, right, bottom);
-      lp = params;
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
+        this.setMarginsSupportRTL(params, left, top, right, bottom);
+        lp = params;
     } else {
-      lp = mParent.getChildLayoutParams(this, host, width, height, left, right, top, bottom);
+        lp = mParent.getChildLayoutParams(this, host, width, height, left, right, top, bottom);
     }
     if (lp != null) {
-      host.setLayoutParams(lp);
+        host.setLayoutParams(lp);
     }
   }
 
@@ -1050,7 +1105,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     params.width = width;
     params.height = height;
-    params.setMargins(left, top, right, bottom);
+
+    this.setMarginsSupportRTL(params, left, top, right, bottom);
+
     host.setLayoutParams(params);
     mInstance.moveFixedView(host);
 
@@ -1339,7 +1396,11 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         initView();
       }
       if (mHost != null) {
-        mHost.setId(WXViewUtils.generateViewId());
+        if(mHost.getId() == View.NO_ID)
+          mHost.setId(WXViewUtils.generateViewId());
+        if(TextUtils.isEmpty(mHost.getContentDescription()) && WXEnvironment.isApkDebugable()){
+          mHost.setContentDescription(getRef());
+        }
         ComponentObserver observer;
         if ((observer = getInstance().getComponentObserver()) != null) {
           observer.onViewCreated(this, mHost);
@@ -1527,10 +1588,10 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         mRippleBackground = prepareBackgroundRipple();
         if (mRippleBackground != null) {
           if (mBackgroundDrawable == null) {
-            WXViewUtils.setBackGround(mHost, mRippleBackground);
+            WXViewUtils.setBackGround(mHost, mRippleBackground, this);
           } else {
             LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{mRippleBackground, mBackgroundDrawable});
-            WXViewUtils.setBackGround(mHost, layerDrawable);
+            WXViewUtils.setBackGround(mHost, layerDrawable, this);
           }
           return;
         }
@@ -1827,6 +1888,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public View detachViewAndClearPreInfo() {
     View original = mHost;
     mPreRealLeft = 0;
+    mPreRealRight = 0;
     mPreRealWidth = 0;
     mPreRealHeight = 0;
     mPreRealTop = 0;
@@ -1836,6 +1898,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   public void clearPreLayout() {
     mPreRealLeft = 0;
+    mPreRealRight = 0;
     mPreRealWidth = 0;
     mPreRealHeight = 0;
     mPreRealTop = 0;
@@ -2005,7 +2068,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   private void updateStyleByPesudo(Map<String, Object> styles) {
-    new GraphicActionUpdateStyle(getInstanceId(), getRef(), styles, getPadding(), getMargin(), getBorder(), true)
+    new GraphicActionUpdateStyle(getInstance(), getRef(), styles, getPadding(), getMargin(), getBorder(), true)
             .executeActionOnRender();
     if (getLayoutWidth() == 0 && getLayoutWidth() == 0) {
     } else {
@@ -2162,15 +2225,15 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
 
-  /** component key id in native,
-   *  differ with ref, ref + position
+  /** component uniquie key id in native for recycle-list,
+   *  should be unique for every native component differ with ref
    *  */
   public  String getViewTreeKey(){
     if(mViewTreeKey == null){
       if(getParent() == null){
-        mViewTreeKey = getRef();
+        mViewTreeKey = hashCode() + "_" + getRef();
       }else{
-        mViewTreeKey = getRef() + "_" + getParent().indexOf(this);
+        mViewTreeKey = hashCode() + "_" + getRef() + "_" + getParent().indexOf(this);
       }
     }
     return mViewTreeKey;
@@ -2203,7 +2266,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       if (!TextUtils.isEmpty(pair.first)) {
         final WXAnimationBean animationBean = createAnimationBean(pair.first, pair.second);
         if (animationBean != null) {
-          GraphicActionAnimation action = new GraphicActionAnimation(getInstanceId(), getRef(), animationBean);
+          GraphicActionAnimation action = new GraphicActionAnimation(getInstance(), getRef(), animationBean);
           action.executeAction();
         }
       }
@@ -2222,7 +2285,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           int width = (int) getLayoutWidth();
           int height = (int) getLayoutHeight();
           animationBean.styles = new WXAnimationBean.Style();
-          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstanceViewPortWidth(getInstanceId()));
+          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstanceViewPortWidth(getInstanceId()),
+                  getInstance());
           return animationBean;
         }
       }catch (RuntimeException e){

@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include <math.h>
 #include "layout.h"
 #include <tuple>
 
@@ -94,6 +96,7 @@ namespace WeexCore {
             containingBlockWidth = renderPageWidth;
           }
           break;
+        default: break;
       }
       if (!isnan(containingBlockWidth)) {
         width = containingBlockWidth -
@@ -129,6 +132,7 @@ namespace WeexCore {
             containingBlockHeight = renderPageHeight;
           }
           break;
+        default: break;
       }
       if (!isnan(containingBlockHeight)) {
         height = containingBlockHeight -
@@ -188,13 +192,11 @@ namespace WeexCore {
         (widthMeasureMode == kUnspecified
             || heightMeasureMode == kUnspecified)) {
       float constrainsWidth = width;
-      if(isnan(width)){
-        if(!isnan(mCssStyle->mMaxWidth)){
+      if(isnan(width) && !isnan(mCssStyle->mMaxWidth)){
           constrainsWidth = mCssStyle->mMaxWidth;
-        }
       }
 
-      if((!isnan(width)&&widthMeasureMode == kExactly) ||
+      if((!isnan(width)) ||
           (isnan(width) && !isnan(mCssStyle->mMaxWidth))) {
         constrainsWidth -= sumPaddingBorderAlongAxis(this, true);
       }
@@ -252,25 +254,28 @@ namespace WeexCore {
    */
     void WXCoreLayoutNode::determineCrossSize(const float width, const float height, const bool stretch) {
       if (mFlexLines.size() == 1 && isCrossExactly()) {
-        bool horizontal = isMainAxisHorizontal(this);
-        float size = mFlexLines[0]->mCrossSize;
-        float paddingAlongCrossAxis = sumPaddingBorderAlongAxis(this, !horizontal);
-        if (horizontal) {
-          if (heightMeasureMode == kExactly) {
-            size = height - paddingAlongCrossAxis;
-          }
-        } else {
-          if (widthMeasureMode == kExactly) {
-            size = width - paddingAlongCrossAxis;
-          }
-        }
-        mFlexLines[0]->mCrossSize = size;
+        determineCrossSize(width, height, mFlexLines[0]);
       }
       if (stretch) {
         stretchViewCrossSize();
       }
     }
 
+    void WXCoreLayoutNode::determineCrossSize(const float width, const float height, WXCoreFlexLine* const flexLine){
+      bool horizontal = isMainAxisHorizontal(this);
+      float size = flexLine->mCrossSize;
+      float paddingAlongCrossAxis = sumPaddingBorderAlongAxis(this, !horizontal);
+      if (horizontal) {
+        if (heightMeasureMode == kExactly) {
+          size = height - paddingAlongCrossAxis;
+        }
+      } else {
+        if (widthMeasureMode == kExactly) {
+          size = width - paddingAlongCrossAxis;
+        }
+      }
+      flexLine->mCrossSize = size;
+    }
 
     void WXCoreLayoutNode::measureInternalNode(const float width, const float height, const bool needMeasure,
                                                const bool hypotheticalMeasurment) {
@@ -338,9 +343,11 @@ namespace WeexCore {
           child->hypotheticalMeasure(childWidth, childHeight, stretch);
         } else {
           if(isSingleFlexLine(isMainAxisHorizontal(this) ? parentWidth : parentHeight)
-              && !isMainAxisHorizontal(this) && child->widthMeasureMode == kUnspecified){
-            child->setLayoutWidth(parentWidth - sumPaddingBorderAlongAxis(this, true)
-                                      -child->mCssStyle->sumMarginOfDirection(true));
+              && !isMainAxisHorizontal(this)){
+            if(child->widthMeasureMode == kUnspecified) {
+              child->setLayoutWidth(parentWidth - sumPaddingBorderAlongAxis(this, true)
+                                        - child->mCssStyle->sumMarginOfDirection(true));
+            }
             if(child->heightMeasureMode == kUnspecified && child->widthDirty) {
               child->mLayoutResult->mLayoutSize.height = NAN;
             }
@@ -467,6 +474,11 @@ namespace WeexCore {
       if (isMainAxisHorizontal(this)) {
         child->setWidthMeasureMode(kExactly);
         child->setLayoutWidth(childMainSize);
+        //TODO Fix https://jsplayground.taobao.org/raxplayground/97efee70-775f-45a6-b07d-d84c8d1b4387
+        //TODO This is just a temporary fix, we need to make things beauty and clean.
+        if(child->heightMeasureMode == kUnspecified && child->measureFunc != nullptr && child->getChildCount() == 0){
+          child->setLayoutHeight(NAN);
+        }
       } else {
         child->setHeightMeasureMode(kExactly);
         child->setLayoutHeight(childMainSize);
@@ -497,10 +509,11 @@ namespace WeexCore {
 
     void WXCoreLayoutNode::stretchViewCrossSize(WXCoreLayoutNode* const child, float crossSize){
       if (isMainAxisHorizontal(this)) {
-        if (child->heightMeasureMode != kExactly) {
-            crossSize -=
-                child->mCssStyle->mMargin.getMargin(kMarginTop) +
-                    child->mCssStyle->mMargin.getMargin(kMarginBottom);
+        if (child->heightMeasureMode != kExactly &&
+            !(child->measureFunc != nullptr && child->getChildCount() == 0)) {
+          crossSize -=
+              child->mCssStyle->mMargin.getMargin(kMarginTop) +
+                  child->mCssStyle->mMargin.getMargin(kMarginBottom);
           child->setHeightMeasureMode(kExactly);
           child->setLayoutHeight(std::max(0.f, crossSize));
         }
@@ -625,25 +638,46 @@ namespace WeexCore {
                           absoluteFlexItem->getLayoutWidth() + absoluteFlexItem->getMarginLeft()
                               + absoluteFlexItem->getMarginRight();
     flexLine->mItemCount = 1;
+    determineCrossSize(getLayoutWidth(),
+                       getLayoutHeight(),
+                       flexLine);
   }
 
   void WXCoreLayoutNode::onLayout(const float left, const float top, const float right, const float bottom,
                                   WXCoreLayoutNode *const absoulteItem, WXCoreFlexLine *const flexLine) {
-    switch (mCssStyle->mFlexDirection) {
-      case kFlexDirectionRow:
-        layoutHorizontal(false, left, top, right, bottom, absoulteItem, flexLine);
-        break;
-      case kFlexDirectionRowReverse:
-        layoutHorizontal(true, left, top, right, bottom, absoulteItem, flexLine);
-        break;
-      case kFlexDirectionColumnReverse:
-        layoutVertical(mCssStyle->mFlexWrap == kWrapReverse, true, left, top, right, bottom, absoulteItem, flexLine);
-        break;
-      case kFlexDirectionColumn:
-      default:
-        layoutVertical(mCssStyle->mFlexWrap == kWrapReverse, false, left, top, right, bottom, absoulteItem, flexLine);
-        break;
-    }
+      // determin direction
+      if (mLayoutResult->mLayoutDirection == kDirectionInherit) {
+          if(mCssStyle->mDirection == kDirectionInherit) {
+              // default direction in css is inherit, inherit direction from parent node
+              mLayoutResult->mLayoutDirection = NULL == mParent ? WEEXCORE_CSS_DEFAULT_DIRECTION : mParent->getLayoutDirection();
+          } else {
+              // specific direction in current Node's style
+              mLayoutResult->mLayoutDirection = mCssStyle->mDirection;
+          }
+      }
+      
+      bool verticalRTL = false;
+      if (mLayoutResult->mLayoutDirection == kDirectionRTL) {
+          verticalRTL = mCssStyle->mFlexWrap != kWrapReverse;
+      } else {
+          verticalRTL = mCssStyle->mFlexWrap == kWrapReverse;
+      }
+      
+      switch (mCssStyle->mFlexDirection) {
+        case kFlexDirectionRow:
+            layoutHorizontal(mLayoutResult->mLayoutDirection == kDirectionRTL, left, top, right, bottom, absoulteItem, flexLine);
+            break;
+        case kFlexDirectionRowReverse:
+            layoutHorizontal(mLayoutResult->mLayoutDirection != kDirectionRTL, left, top, right, bottom, absoulteItem, flexLine);
+            break;
+          case kFlexDirectionColumnReverse:
+              layoutVertical(verticalRTL, true, left, top, right, bottom, absoulteItem, flexLine);
+              break;
+          case kFlexDirectionColumn:
+          default:
+              layoutVertical(verticalRTL, false, left, top, right, bottom, absoulteItem, flexLine);
+              break;
+      }
   }
 
   /**
@@ -1067,6 +1101,34 @@ namespace WeexCore {
         break;
     }
   }
+    void WXCoreLayoutNode::determineChildLayoutDirection(const WXCoreDirection direction) {
+        for (Index i = 0; i < getChildCount(kBFC); ++i) {
+            WXCoreLayoutNode *child = getChildAt(kBFC, i);
+            // determin direction
+            if (child->mLayoutResult->mLayoutDirection == kDirectionInherit) {
+                if(child->mCssStyle->mDirection == kDirectionInherit) {
+                    // default direction in css is inherit, inherit direction from parent node
+                    child->mLayoutResult->mLayoutDirection = direction;
+                } else {
+                    // specific direction in current Node's style
+                    child->mLayoutResult->mLayoutDirection = child->mCssStyle->mDirection;
+                }
+            }
+        }
+    }
+    
+    WXCoreDirection WXCoreLayoutNode::getLayoutDirectionFromPathNode() {
+        WXCoreLayoutNode *node = this;
+        if (node->getLayoutDirection() != kDirectionInherit) return node->getLayoutDirection();
+        if (node->getDirection() != kDirectionInherit) {
+            node->mLayoutResult->mLayoutDirection = node->getDirection();
+            return node->getLayoutDirection();
+        } else if (nullptr != node->mParent) {
+            node->mLayoutResult->mLayoutDirection = node->mParent->getLayoutDirectionFromPathNode();
+            return node->getLayoutDirection();
+        }
+        return WEEXCORE_CSS_DEFAULT_DIRECTION;
+    }
 }
 
 

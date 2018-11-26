@@ -38,4 +38,12 @@ public interface WXGestureObservable {
    * @param wxGesture The Gesture to register, null for unregister.
    */
   void registerGestureListener(@Nullable WXGesture wxGesture);
+
+  /**
+   * Get gesture listener for corresponding view.
+   *
+   * @return the gesture listener has register before
+   *
+   * */
+  WXGesture getGestureListener();
 }

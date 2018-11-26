@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.action;
 
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.tracing.Stopwatch;
@@ -30,8 +31,8 @@ public class GraphicActionAddEvent extends BasicGraphicAction {
 
   private final String mEvent;
 
-  public GraphicActionAddEvent(String pageId, String ref, Object event) {
-    super(pageId, ref);
+  public GraphicActionAddEvent(WXSDKInstance instance, String ref, Object event) {
+    super(instance, ref);
     this.mEvent = WXEvent.getEventName(event);
   }
 
@@ -48,6 +49,5 @@ public class GraphicActionAddEvent extends BasicGraphicAction {
     }
     component.addEvent(mEvent);
     Stopwatch.split("addEventToComponent");
-
   }
 }

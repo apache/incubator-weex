@@ -93,6 +93,7 @@
     if ([_animationInfo.propertyName hasPrefix:@"transform"]) {
         WXTransform *transform = _animationInfo.target->_transform;
         [transform applyTransformForView:_animationInfo.target.view];
+        [_animationInfo.target _adjustForRTL];
     } else if ([_animationInfo.propertyName isEqualToString:@"backgroundColor"]) {
         _animationInfo.target.view.layer.backgroundColor = (__bridge CGColorRef _Nullable)(_animationInfo.toValue);
     } else if ([_animationInfo.propertyName isEqualToString:@"opacity"]) {
@@ -123,7 +124,7 @@
         _animationInfo.target.view.layer.anchorPoint = _animationInfo.originAnchorPoint;
         _animationInfo.target.view.layer.frame = originFrame;
     }
-    [_animationInfo.target.layer removeAllAnimations];
+    [_animationInfo.target.layer removeAnimationForKey:_animationInfo.propertyName];
     
     if (_finishBlock) {
         _finishBlock(flag);
@@ -152,7 +153,27 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     _needLayout = NO;
     _isAnimationedSuccess = YES;
     WXPerformBlockOnComponentThread(^{
-        WXComponent *targetComponent = [self.weexInstance componentForRef:nodeRef];
+        if (nodeRef == nil || ![nodeRef isKindOfClass:[NSString class]] ||
+            ![args isKindOfClass:[NSDictionary class]]) {
+            if (callback) {
+                NSDictionary *message = @{@"result":@"Fail",
+                                          @"message":@"Argument type error."};
+                callback(message, NO);
+            }
+            return;
+        }
+        
+        NSArray *stringArray = [nodeRef componentsSeparatedByString:@"@"];
+        if ([stringArray count] == 0) {
+            if (callback) {
+                NSDictionary *message = @{@"result":@"Fail",
+                                          @"message":@"Node ref format error."};
+                callback(message, NO);
+            }
+            return;
+        }
+        
+        WXComponent *targetComponent = [self.weexInstance componentForRef:stringArray[0]];
         if (!targetComponent) {
             if (callback) {
                 NSDictionary *message = @{@"result":@"Fail",
@@ -167,7 +188,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     });
 }
 
-
 - (NSArray<WXAnimationInfo *> *)animationInfoArrayFromArgs:(NSDictionary *)args target:(WXComponent *)target
 {
     UIView *view = target.view;
@@ -178,10 +198,12 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     double delay = [args[@"delay"] doubleValue] / 1000;
     if (args[@"needLayout"]) {
         _needLayout = [WXConvert BOOL:args[@"needLayout"]];
-        _transition = [WXTransition new];
-        _transitionDic = [NSMutableDictionary new];
-        _transition.filterStyles = [NSMutableDictionary new];
-        _transition.oldFilterStyles = [NSMutableDictionary new];
+        if (_needLayout) {
+            _transition = [WXTransition new];
+            _transitionDic = [NSMutableDictionary new];
+            _transition.filterStyles = [NSMutableDictionary new];
+            _transition.oldFilterStyles = [NSMutableDictionary new];
+        }
     }
     CAMediaTimingFunction *timingFunction = [WXConvert CAMediaTimingFunction:args[@"timingFunction"]];
     NSDictionary *styles = args[@"styles"];
@@ -264,7 +286,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                 newInfo.toValue = @([wxTransform.translateY valueForMaximum:view.bounds.size.height]);
                 [infos addObject:newInfo];
             }
-            target->_transform = wxTransform;
+            target.transform = wxTransform;
         } else if ([property isEqualToString:@"backgroundColor"]) {
             info.propertyName = @"backgroundColor";
             info.fromValue = (__bridge id)(layer.backgroundColor);

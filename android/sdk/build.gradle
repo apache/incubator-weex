@@ -36,7 +36,7 @@ checkstyle {
 }
 
 
-version = "0.18.13.25"
+version = "0.19.0.4"
 
 android {
 
@@ -85,12 +85,12 @@ android {
     if(project.hasProperty('asfRelease')){
         //download so file if not exist, when compile in source release
         download{
-            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/armeabi/libweexcore.so;hb=refs/heads/master'
+            src 'https://gitbox.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/armeabi/libweexcore.so;hb=refs/heads/master'
             dest "${projectDir}/libs/armeabi/libweexcore.so"
             overwrite false
         }
         download{
-            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexcore.so;hb=refs/heads/master'
+            src 'https://gitbox.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexcore.so;hb=refs/heads/master'
             dest "${projectDir}/libs/x86/libweexcore.so"
             overwrite false
         }
@@ -109,7 +109,7 @@ android {
         buildConfigField "long", "X86_Size", "${X86_Size}"
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
-        minSdkVersion 14
+        minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
 
         multiDexEnabled true
@@ -122,7 +122,7 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID_PLATFORM=android-19',
+                arguments '-DANDROID_PLATFORM=android-14',
                         '-DANDROID_TOOLCHAIN=gcc',
                         '-DANDROID_STL=gnustl_static',
                         '-DCMAKE_BUILD_TYPE=Release'
@@ -132,7 +132,6 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            testCoverageEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "ENABLE_TRACE", "false"
             consumerProguardFiles 'proguard-rules.pro'
@@ -142,6 +141,7 @@ android {
             buildConfigField "boolean", "ENABLE_TRACE", "true"
             jniDebuggable true
             debuggable true
+            testCoverageEnabled true
             consumerProguardFiles 'proguard-rules.pro'
         }
     }
@@ -214,12 +214,57 @@ if(file('../license/LICENSE').exists()){
     }
 
     task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
-        source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc']).
+        source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc', '**/*.c']).
                 exclude(['Source/rapidjson/**/*.h','Source/rapidjson/**/*.cpp',
                          'Source/android/base/base64/**/*.h','Source/android/base/base64/**/*.cpp',
                          'Source/android/jniprebuild/jniheader/*.h',
                          'Source/base/Compatible.cpp',
-                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp'])
+                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c'])
     }
     preBuild.dependsOn licenseFormat
 }
+
+task checkNdkVersion() {
+    def rootDir = project.rootDir
+    def localProperties = new File(rootDir, "local.properties")
+    def ndkDir = ''
+    if (localProperties.exists()) {
+        Properties properties = new Properties()
+        localProperties.withInputStream { instr ->
+            properties.load(instr)
+        }
+        ndkDir = properties.getProperty('ndk.dir')
+    }
+
+    if(!ndkDir.isEmpty()) {
+        def sourcePropertiesFile = new File(ndkDir,"source.properties")
+        def ndkVersion = ''
+        println("sourcePropertiesFile" + sourcePropertiesFile.absolutePath)
+        if(sourcePropertiesFile.exists()) {
+            Properties properties = new Properties()
+            sourcePropertiesFile.withInputStream { instr ->
+                properties.load(instr)
+            }
+
+            ndkVersion = properties.getProperty('Pkg.Revision')
+        }
+
+        if(ndkVersion.length() > 2) {
+            def substring = ndkVersion.substring(0, 2)
+            try {
+                if(substring.toInteger() != 16) {
+                    throw new StopActionException("Ndk Version 16 supported only")
+                }
+            } catch (Exception ignored) {
+                println("Ndk Version 16 supported only")
+            }
+
+        } else {
+            println("Ndk Version 16 supported only")
+        }
+    } else {
+        println("Ndk Version 16 supported only")
+    }
+}
+
+preBuild.dependsOn checkNdkVersion

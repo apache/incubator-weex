@@ -31,22 +31,35 @@ namespace WeexCore {
 
 RenderCreator *RenderCreator::g_pInstance = nullptr;
 
-IRenderObject *RenderCreator::CreateRender(const std::string &type,
-                                           const std::string &ref) {
-  IRenderFactory *factory;
+IRenderFactory *RenderCreator::CreateFactory(const std::string &type) {
   if (type == kRenderText) {
-    factory = new RenderTextFactory();
+    return new RenderTextFactory();
   } else if (type == kRenderList || type == kRenderWaterfall ||
              type == kRenderRecycleList) {
-    factory = new RenderListFactory();
+    return new RenderListFactory();
   } else if (type == kRenderMask) {
-    factory = new RenderMaskFactory();
+    return new RenderMaskFactory();
   } else if (type == kRenderScroller) {
-    factory = new RenderScrollerFactory();
+    return new RenderScrollerFactory();
   } else if (type == kRenderAppBar) {
-    factory = new RenderAppBarFactory();
+    return new RenderAppBarFactory();
   } else {
-    factory = new RenderCommonFactory();
+    // search for affine types
+    auto findAffine = affineTypes_.find(type);
+    if (findAffine != affineTypes_.end()) {
+      return CreateFactory(findAffine->second);
+    }
+    else {
+      return new RenderCommonFactory();
+    }
+  }
+}
+  
+IRenderObject *RenderCreator::CreateRender(const std::string &type,
+                                           const std::string &ref) {
+  IRenderFactory *factory = CreateFactory(type);
+  if (factory == nullptr) {
+    return nullptr;
   }
 
   IRenderObject *render = factory->CreateRender();
@@ -54,5 +67,23 @@ IRenderObject *RenderCreator::CreateRender(const std::string &type,
   render->set_type(type);
   delete factory;
   return render;
+}
+  
+void RenderCreator::RegisterAffineType(const std::string &type, const std::string& asType) {
+  if (!type.empty() && !asType.empty() && type != asType) {
+    affineTypes_[type] = asType;
+  }
+}
+  
+bool RenderCreator::IsAffineType(const std::string &type, const std::string& asType) {
+  if (type == asType) {
+    return true;
+  }
+  
+  auto findAffine = affineTypes_.find(type);
+  if (findAffine == affineTypes_.end()) {
+    return false;
+  }
+  return IsAffineType(findAffine->second, asType);
 }
 }  // namespace WeexCore

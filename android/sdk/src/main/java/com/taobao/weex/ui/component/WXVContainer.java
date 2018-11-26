@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
@@ -38,8 +37,6 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * All container components must implement this class
@@ -49,7 +46,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   private static final String TAG = "WXVContainer";
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
   private BoxShadowHost mBoxShadowHost;
-  private  boolean requestDisallowInterceptTouchEvent = false;
 
   @Deprecated
   public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
@@ -135,7 +131,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       lp.width = width;
       lp.height = height;
       if(lp instanceof ViewGroup.MarginLayoutParams){
-        ((ViewGroup.MarginLayoutParams) lp).setMargins(left,top,right,bottom);
+        this.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, left, top, right, bottom);
       }
     }
     return lp;
@@ -264,8 +260,8 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     if (child == null || index < -1) {
       return;
     }
-    child.deepInComponentTree = this.deepInComponentTree+1;
-    getInstance().setMaxDomDeep(child.deepInComponentTree);
+    child.mDeepInComponentTree = this.mDeepInComponentTree +1;
+    getInstance().setMaxDomDeep(child.mDeepInComponentTree);
     int count = mChildren.size();
     index = index >= count ? -1 : index;
     if (index == -1) {
@@ -314,6 +310,10 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       getRealView().addView(child);
     } else {
       getRealView().addView(child, index);
+    }
+    WXSDKInstance instance = getInstance();
+    if (null != instance){
+      instance.getExceptionRecorder().hasAddView.set(true);
     }
   }
 
@@ -544,14 +544,14 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
 
   public void requestDisallowInterceptTouchEvent(boolean requestDisallowInterceptTouchEvent) {
-    if(this.requestDisallowInterceptTouchEvent != requestDisallowInterceptTouchEvent){
-      this.requestDisallowInterceptTouchEvent = requestDisallowInterceptTouchEvent;
-      if(mGesture != null){
-        mGesture.setRequestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
+    if(mGesture != null){
+      if(mGesture.isRequestDisallowInterceptTouchEvent()){
+        return;
       }
-      if(getParent() != null){
-        getParent().requestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
-      }
+      mGesture.setRequestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
+    }
+    if(getParent() != null){
+      getParent().requestDisallowInterceptTouchEvent(requestDisallowInterceptTouchEvent);
     }
   }
 
@@ -577,7 +577,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
         WXLogUtils.d("BoxShadow", "Draw box-shadow with BoxShadowHost on div: " + toString());
         if (mBoxShadowHost == null) {
           mBoxShadowHost = new BoxShadowHost(getContext());
-          WXViewUtils.setBackGround(mBoxShadowHost, null);
+          WXViewUtils.setBackGround(mBoxShadowHost, null, this);
 
           CSSShorthand padding = this.getPadding();
           CSSShorthand border = this.getBorder();
@@ -588,8 +588,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
           int bottom = (int) (padding.get(CSSShorthand.EDGE.BOTTOM) + border.get(CSSShorthand.EDGE.BOTTOM));
 
           ViewGroup.MarginLayoutParams layoutParams = new ViewGroup.MarginLayoutParams(hostView.getLayoutParams()) ;
-          layoutParams.setMargins(-left, -top, -right, -bottom);
-
+          this.setMarginsSupportRTL(layoutParams, -left, -top, -right, -bottom);
           mBoxShadowHost.setLayoutParams(layoutParams);
 
           hostView.addView(mBoxShadowHost);

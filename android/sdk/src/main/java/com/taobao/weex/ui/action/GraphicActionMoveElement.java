@@ -19,6 +19,8 @@
 package com.taobao.weex.ui.action;
 
 import com.taobao.weex.WXSDKInstance;
+import android.text.TextUtils;
+
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -28,8 +30,8 @@ public class GraphicActionMoveElement extends BasicGraphicAction {
   private String mParentref;
   private int mIndex;
 
-  public GraphicActionMoveElement(String pageId, String ref, String parentRef, int index) {
-    super(pageId, ref);
+  public GraphicActionMoveElement(WXSDKInstance instance, String ref, String parentRef, int index) {
+    super(instance, ref);
     this.mParentref = parentRef;
     this.mIndex = index;
   }
@@ -37,21 +39,32 @@ public class GraphicActionMoveElement extends BasicGraphicAction {
   @Override
   public void executeAction() {
     WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    if(component == null) {
+      return;
+    }
     WXVContainer oldParent = component.getParent();
     WXComponent newParent = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentref);
-    if (component == null || oldParent == null
+    if (oldParent == null
             || newParent == null || !(newParent instanceof WXVContainer)) {
       return;
     }
 
+    if (component.getHostView() != null && !TextUtils.equals(component.getComponentType(), "video") && !TextUtils.equals(component.getComponentType(), "videoplus")) {
+      int[] location = new  int[2] ;
+      component.getHostView().getLocationInWindow(location);
+    }
+
     oldParent.remove(component, false);
+
     ((WXVContainer) newParent).addChild(component, mIndex);
+
+    if (component.getHostView() != null && !TextUtils.equals(component.getComponentType(), "video") && !TextUtils.equals(component.getComponentType(), "videoplus")) {
+      int[] location = new  int[2] ;
+      component.getHostView().getLocationInWindow(location);
+    }
+
     if (!component.isVirtualComponent()) {
       ((WXVContainer) newParent).addSubView(component.getHostView(), mIndex);
-    }
-    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
-    if (null!=instance){
-      instance.onElementChange();
     }
   }
 }

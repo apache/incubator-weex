@@ -81,7 +81,7 @@ static WXSDKManager *_sharedInstance = nil;
 
 + (void)unload
 {
-    for (NSString *instanceID in [self sharedInstance].instanceDict) {
+    for (NSString *instanceID in [[self sharedInstance].instanceDict allKeys]) {
         WXSDKInstance *instance = [[self sharedInstance].instanceDict objectForKey:instanceID];
         [instance destroyInstance];
     }

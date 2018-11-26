@@ -65,7 +65,6 @@ public class WXVideo extends WXComponent<FrameLayout> {
   @Override
   protected FrameLayout initComponentHostView(@NonNull Context context) {
     final WXVideoView.Wrapper video = new WXVideoView.Wrapper(context);
-
     video.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 
       @Override
@@ -227,6 +226,15 @@ public class WXVideo extends WXComponent<FrameLayout> {
     if(autoPlay){
       mWrapper.createIfNotExist();
       mWrapper.start();
+    }
+  }
+
+  @WXComponentProp(name = Constants.Name.CONTROLS)
+  public void setControls(String controls) {
+    if (TextUtils.equals("controls", controls)) {
+      mWrapper.setControls(true);
+    } else if (TextUtils.equals("nocontrols", controls)) {
+      mWrapper.setControls(false);
     }
   }
 

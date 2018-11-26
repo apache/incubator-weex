@@ -16,9 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include <math.h>
+#include "core/render/page/render_page.h"
 #include "base/TimeUtils.h"
 #include "base/ViewUtils.h"
-#include "core/render/page/render_page.h"
+#include "base/LogDefines.h"
 #include "core/config/core_environment.h"
 #include "core/css/constants_value.h"
 #include "core/layout/layout.h"
@@ -33,8 +36,10 @@
 #include "core/render/action/render_action_move_element.h"
 #include "core/render/action/render_action_remove_element.h"
 #include "core/render/action/render_action_remove_event.h"
+#include "core/render/action/render_action_render_success.h"
 #include "core/render/action/render_action_update_attr.h"
 #include "core/render/action/render_action_update_style.h"
+#include "core/render/action/render_action_trigger_vsync.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_type.h"
 #include "core/render/node/render_list.h"
@@ -42,7 +47,13 @@
 
 namespace WeexCore {
 
-RenderPage::RenderPage(std::string page_id) {
+RenderPage::RenderPage(const std::string &page_id)
+    : viewport_width_(0),
+      render_root_(nullptr),
+      page_id_(),
+      render_page_size_(),
+      render_object_registers_(),
+      render_performance_(nullptr) {
 #if RENDER_LOG
   LOGD("[RenderPage] new RenderPage >>>> pageId: %s", pageId.c_str());
 #endif
@@ -52,12 +63,13 @@ RenderPage::RenderPage(std::string page_id) {
   this->render_page_size_.first =
       WXCoreEnvironment::getInstance()->DeviceWidth();
   this->render_page_size_.second = NAN;
+  this->viewport_width_ = kDefaultViewPortWidth;
 }
 
 RenderPage::~RenderPage() {
-#if RENDER_LOG
-  LOGD("[RenderPage] Delete RenderPage >>>> pageId: %s", mPageId.c_str());
-#endif
+  //#if RENDER_LOG
+  LOGE("[RenderPage] Delete RenderPage >>>> pageId: %s", page_id().c_str());
+  //#endif
 
   this->render_object_registers_.clear();
 
@@ -80,18 +92,25 @@ void RenderPage::CalculateLayout() {
 #endif
 
   int64_t start_time = getCurrentTime();
-  this->render_root_->LayoutBeforeImpl();
+  if (is_before_layout_needed_.load()) {
+    this->render_root_->LayoutBeforeImpl();
+  }
   this->render_root_->calculateLayout(this->render_page_size_);
-  this->render_root_->LayoutAfterImpl();
+  if (is_platform_layout_needed_.load()) {
+    this->render_root_->LayoutPlatformImpl();
+  }
+  if (is_after_layout_needed_.load()) {
+    this->render_root_->LayoutAfterImpl();
+  }
   CssLayoutTime(getCurrentTime() - start_time);
   TraverseTree(this->render_root_, 0);
 }
 
-void RenderPage::TraverseTree(RenderObject *render, int index) {
+void RenderPage::TraverseTree(RenderObject *render, long index) {
   if (render == nullptr) return;
 
   if (render->hasNewLayout()) {
-    SendLayoutAction(render, index);
+    SendLayoutAction(render, (int)index);
     render->setHasNewLayout(false);
   }
 
@@ -162,9 +181,9 @@ bool RenderPage::RemoveRenderObject(const std::string &ref) {
   parent->RemoveRenderObject(child);
 
   RemoveRenderFromRegisterMap(child);
-  delete child;
-
   SendRemoveElementAction(ref);
+    
+  delete child;
   return true;
 }
 
@@ -178,9 +197,7 @@ bool RenderPage::MoveRenderObject(const std::string &ref,
   if (old_parent == nullptr || new_parent == nullptr) return false;
 
   if (old_parent->ref() == new_parent->ref()) {
-    if (old_parent->IndexOf(child) < 0) {
-      return false;
-    } else if (old_parent->IndexOf(child) == index) {
+    if (old_parent->IndexOf(child) == index) {
       return false;
     } else if (old_parent->IndexOf(child) < index) {
       index = index - 1;
@@ -204,12 +221,14 @@ bool RenderPage::UpdateStyle(
   std::vector<std::pair<std::string, std::string>> *margin = nullptr;
   std::vector<std::pair<std::string, std::string>> *padding = nullptr;
   std::vector<std::pair<std::string, std::string>> *border = nullptr;
-
+  bool inheriableLayout = false;
+    
   bool flag = false;
   int result =
-      WeexCoreManager::getInstance()
+      WeexCoreManager::Instance()
           ->getPlatformBridge()
-          ->callHasTransitionPros(this->page_id_.c_str(), ref.c_str(), src);
+          ->platform_side()
+          ->HasTransitionPros(this->page_id_.c_str(), ref.c_str(), src);
   // int result =
   // Bridge_Impl_Android::getInstance()->callHasTransitionPros(mPageId.c_str(),
   // ref.c_str(), src);
@@ -232,8 +251,9 @@ bool RenderPage::UpdateStyle(
           }
           render->UpdateStyleInternal(
               (*iter).first, (*iter).second, 0, [=, &flag](float foo) {
-                (*iter).second = to_string(foo),
-                margin->insert(margin->end(), (*iter)), flag = true;
+                  (*iter).second = to_string(foo);
+                  margin->insert(margin->end(), (*iter));
+                  flag = true;
               });
           break;
         case kTypePadding:
@@ -242,8 +262,9 @@ bool RenderPage::UpdateStyle(
           }
           render->UpdateStyleInternal(
               (*iter).first, (*iter).second, 0, [=, &flag](float foo) {
-                (*iter).second = to_string(foo),
-                padding->insert(padding->end(), (*iter)), flag = true;
+                  (*iter).second = to_string(foo);
+                  padding->insert(padding->end(), (*iter));
+                  flag = true;
               });
           break;
         case kTypeBorder:
@@ -252,16 +273,21 @@ bool RenderPage::UpdateStyle(
           }
           render->UpdateStyleInternal(
               (*iter).first, (*iter).second, 0, [=, &flag](float foo) {
-                (*iter).second = to_string(foo),
-                border->insert(border->end(), (*iter)), flag = true;
+                  (*iter).second = to_string(foo);
+                  border->insert(border->end(), (*iter));
+                  flag = true;
               });
           break;
+          case kTypeInheritableLayout:
+              inheriableLayout = true;
+              break;
+        default: break;
       }
     }
   }
 
   if (style != nullptr || margin != nullptr || padding != nullptr ||
-      border != nullptr)
+      border != nullptr || inheriableLayout)
     SendUpdateStyleAction(render, style, margin, padding, border);
 
   Batch();
@@ -371,7 +397,8 @@ bool RenderPage::RemoveEvent(const std::string &ref, const std::string &event) {
 
   render->RemoveEvent(event);
 
-  RenderAction *action = new RenderActionRemoveEvent(this->page_id_, ref, event);
+  RenderAction *action =
+      new RenderActionRemoveEvent(this->page_id_, ref, event);
   PostRenderAction(action);
   return true;
 }
@@ -382,14 +409,22 @@ bool RenderPage::CreateFinish() {
   }
   Batch();
   SendCreateFinishAction();
+  // RenderSuccess means the Dom created after executing script finishes layout
+  // and render, it will be trigger even though body not yet attaches to parent.
+  LayoutInner();
+  SendRenderSuccessAction();
   return true;
+}
+    
+void RenderPage::LayoutInner() {
+  CalculateLayout();
+  this->need_layout_.store(false);
+  set_is_dirty(false);
 }
 
 void RenderPage::LayoutImmediately() {
   if (is_dirty() && kUseVSync) {
-    CalculateLayout();
-    this->need_layout_.store(false);
-    set_is_dirty(false);
+    LayoutInner();
   }
 }
 
@@ -437,7 +472,7 @@ void RenderPage::SendCreateBodyAction(RenderObject *render) {
   RenderAction *action = new RenderActionCreateBody(page_id(), render);
   PostRenderAction(action);
 
-  Index i = 0;
+  int i = 0;
   for (auto it = render->ChildListIterBegin(); it != render->ChildListIterEnd();
        it++) {
     RenderObject *child = static_cast<RenderObject *>(*it);
@@ -464,7 +499,7 @@ void RenderPage::SendAddElementAction(RenderObject *child, RenderObject *parent,
       new RenderActionAddElement(page_id(), child, parent, index, will_layout);
   PostRenderAction(action);
 
-  Index i = 0;
+  int i = 0;
   for (auto it = child->ChildListIterBegin(); it != child->ChildListIterEnd();
        it++) {
     RenderObject *grandson = static_cast<RenderObject *>(*it);
@@ -510,7 +545,7 @@ void RenderPage::SendLayoutAction(RenderObject *render, int index) {
   RenderAction *action = new RenderActionLayout(page_id(), render, index);
   PostRenderAction(action);
 }
-
+    
 void RenderPage::SendUpdateStyleAction(
     RenderObject *render,
     std::vector<std::pair<std::string, std::string>> *style,
@@ -555,6 +590,11 @@ void RenderPage::SendCreateFinishAction() {
   PostRenderAction(action);
 }
 
+void RenderPage::SendRenderSuccessAction() {
+  RenderAction *action = new RenderActionRenderSuccess(page_id());
+  PostRenderAction(action);
+}
+
 void RenderPage::SendAppendTreeCreateFinish(const std::string &ref) {
   RenderAction *action = new RenderActionAppendTreeCreateFinish(page_id(), ref);
   PostRenderAction(action);
@@ -591,10 +631,13 @@ std::vector<int64_t> RenderPage::PrintRenderSuccessLog() {
 
 void RenderPage::Batch() {
   if ((kUseVSync && this->need_layout_.load()) || !kUseVSync) {
-    CalculateLayout();
-    this->need_layout_.store(false);
-    set_is_dirty(false);
+    LayoutInner();
   }
+#if OS_IOS
+  // vsync may stopped, trigger once
+  RenderAction *action = new RenderActionTriggerVSync(page_id());
+  PostRenderAction(action);
+#endif
 }
 
 RenderObject *RenderPage::GetRenderObject(const std::string &ref) {

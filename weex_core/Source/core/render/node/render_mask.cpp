@@ -46,18 +46,22 @@ std::map<std::string, std::string> *RenderMask::GetDefaultStyle() {
                       .c_str());
   }
 
+#if OS_IOS
+  // iOS height includes status bar
+#else
   if (WXCoreEnvironment::getInstance()->GetOption("status_bar_height") != "") {
     int status_bar_height = atoi(WXCoreEnvironment::getInstance()
                                    ->GetOption("status_bar_height")
                                    .c_str());
     height -= status_bar_height;
   }
+#endif
 
   style->insert(std::pair<std::string, std::string>(POSITION, "absolute"));
   style->insert(std::pair<std::string, std::string>(
-      WIDTH, to_string(getWebPxByWidth(width, RenderManager::GetInstance()->viewport_width()))));
+      WIDTH, to_string(getWebPxByWidth(width, RenderManager::GetInstance()->viewport_width(page_id())))));
   style->insert(std::pair<std::string, std::string>(
-      HEIGHT, to_string(getWebPxByWidth(height, RenderManager::GetInstance()->viewport_width()))));
+      HEIGHT, to_string(getWebPxByWidth(height, RenderManager::GetInstance()->viewport_width(page_id())))));
   style->insert(std::pair<std::string, std::string>(TOP, "0"));
   return style;
 }

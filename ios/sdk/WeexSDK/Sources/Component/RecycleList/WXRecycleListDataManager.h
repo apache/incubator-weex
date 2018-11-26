@@ -25,6 +25,10 @@
 
 - (void)updateData:(NSArray *)data;
 
+- (void)updateVirtualComponentData:(NSString *)componentId data:(NSDictionary *)data;
+
+- (void)deleteVirtualComponentAtIndexPaths:(NSArray<NSIndexPath*>*)indexPaths;
+
 - (NSArray *)data;
 
 - (NSDictionary *)dataAtIndex:(NSInteger)index;
@@ -33,13 +37,10 @@
 
 - (NSInteger)numberOfVirtualComponent;
 
-- (NSDictionary*)virtualComponentDataWithId:(NSString*)componentId;
+- (NSDictionary *)virtualComponentDataWithId:(NSString *)componentId;
 
-- (void)updateVirtualComponentData:(NSString*)componentId data:(NSDictionary*)data;
+- (NSDictionary *)virtualComponentDataWithIndexPath:(NSIndexPath *)indexPath templateId:(NSString *)templateId;
 
-- (NSDictionary*)virtualComponentDataWithIndexPath:(NSIndexPath*)indexPath;
+- (NSString *)virtualComponentIdWithIndexPath:(NSIndexPath *)indexPath templateId:(NSString *)templateId;
 
-- (NSString*)virtualComponentIdWithIndexPath:(NSIndexPath*)indexPath;
-
-- (void)deleteVirtualComponentAtIndexPaths:(NSArray<NSIndexPath*>*)indexPaths;
 @end

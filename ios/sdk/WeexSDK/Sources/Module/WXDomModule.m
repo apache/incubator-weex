@@ -18,6 +18,7 @@
  */
 
 #import "WXDomModule.h"
+#import "WXComponent+Layout.h"
 #import "WXDefine.h"
 #import "WXSDKManager.h"
 #import "WXComponentManager.h"
@@ -29,6 +30,7 @@
 #import "WXSDKInstance.h"
 #import "WXTracingManager.h"
 #import "WXRecycleListComponent.h"
+#import "WXCoreBridge.h"
 #import <objc/message.h>
 
 @interface WXDomModule ()
@@ -53,7 +55,10 @@ WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 WX_EXPORT_METHOD(@selector(addRule:rule:))
 WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
+WX_EXPORT_METHOD(@selector(getLayoutDirection:callback:))
 WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
+WX_EXPORT_METHOD(@selector(beginBatchMark))
+WX_EXPORT_METHOD(@selector(endBatchMark))
 
 - (void)performBlockOnComponentManager:(void(^)(WXComponentManager *))block
 {
@@ -71,6 +76,7 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
         block(manager);
     });
 }
+
 - (void)performSelectorOnRuleManager:(void(^)(void))block{
     if (!block) {
         return;
@@ -80,74 +86,104 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     });
 }
 
+- (void)beginBatchMark
+{
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
+        [manager performBatchBegin];
+    }];
+}
+
+- (void)endBatchMark
+{
+    [self performBlockOnComponentManager:^(WXComponentManager * manager) {
+        [manager performBatchEnd];
+    }];
+}
+
 - (NSThread *)targetExecuteThread
 {
     return [WXComponentManager componentThread];
 }
 
-- (void)createBody:(NSDictionary *)body
+- (void)createBody:(NSDictionary *)bodyData
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager createRoot:body];
-    }];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callCreateBody:instanceId data:bodyData];
+    });
 }
 
-- (void)addElement:(NSString *)parentRef element:(NSDictionary *)element atIndex:(NSInteger)index
+- (void)addElement:(NSString *)parentRef element:(NSDictionary *)elementData atIndex:(NSInteger)index
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager addComponent:element toSupercomponent:parentRef atIndex:index appendingInTree:NO];
-    }];
-    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:nil className:nil name:@"dom" phase:WXTracingEnd functionName:@"addElement" options:nil];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callAddElement:instanceId parentRef:parentRef data:elementData index:(int)index];
+    });
 }
 
 - (void)removeElement:(NSString *)ref
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager removeComponent:ref];
-    }];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callRemoveElement:instanceId ref:ref];
+    });
 }
 
-- (void)moveElement:(NSString *)elemRef parentRef:(NSString *)parentRef index:(NSInteger)index
+- (void)moveElement:(NSString *)ref parentRef:(NSString *)parentRef index:(NSInteger)index
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager moveComponent:elemRef toSuper:parentRef atIndex:index];
-    }];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"moveElement" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callMoveElement:instanceId ref:ref parentRef:parentRef index:(int)index];
+    });
 }
 
-- (void)addEvent:(NSString *)elemRef event:(NSString *)event
+- (void)addEvent:(NSString *)ref event:(NSString *)event
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager addEvent:event toComponent:elemRef];
-    }];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addEvent" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callAddEvent:instanceId ref:ref event:event];
+    });
 }
 
-- (void)removeEvent:(NSString *)elemRef event:(NSString *)event
+- (void)removeEvent:(NSString *)ref event:(NSString *)event
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager removeEvent:event fromComponent:elemRef];
-    }];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeEvent" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callRemoveEvent:instanceId ref:ref event:event];
+    });
 }
 
 - (void)createFinish
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager createFinish];
-    }];
-    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:nil className:nil name:@"dom" phase:WXTracingEnd functionName:@"createFinish" options:nil];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callCreateFinish:instanceId];
+    });
 }
 
 - (void)updateFinish
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager updateFinish];
-    }];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateFinish" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callUpdateFinish:instanceId];
+    });
 }
 
 - (void)refreshFinish
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager refreshFinish];
-    }];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"refreshFinish" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callRefreshFinish:instanceId];
+    });
 }
 
 - (void)scrollToElement:(NSString *)elemRef options:(NSDictionary *)dict
@@ -157,18 +193,22 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     }];
 }
 
--(void)updateStyle:(NSString *)elemRef styles:(NSDictionary *)styles
+- (void)updateStyle:(NSString *)ref styles:(NSDictionary *)styles
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager updateStyles:styles forComponent:elemRef];
-    }];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateStyle" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callUpdateStyle:instanceId ref:ref data:styles];
+    });
 }
 
-- (void)updateAttrs:(NSString *)elemRef attrs:(NSDictionary *)attrs
+- (void)updateAttrs:(NSString *)ref attrs:(NSDictionary *)attrs
 {
-    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
-        [manager updateAttributes:attrs forComponent:elemRef];
-    }];
+    NSString* instanceId = self.weexInstance.instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
+        [WXCoreBridge callUpdateAttrs:instanceId ref:ref data:attrs];
+    });
 }
 
 - (void)addRule:(NSString*)type rule:(NSDictionary *)rule {
@@ -179,18 +219,16 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     [self performSelectorOnRuleManager:^{
         [WXRuleManager sharedInstance].instance = weexInstance;
         [[WXRuleManager sharedInstance] addRule:type rule:rule];
-        
     }];
 }
 
 - (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
     [self performBlockOnComponentManager:^(WXComponentManager * manager) {
-        UIView *rootView = manager.weexInstance.rootView;
         if ([ref isEqualToString:@"viewport"]) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSMutableDictionary * callbackRsp = nil;
+                UIView* rootView = manager.weexInstance.rootView;
                 CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView];
-                callbackRsp = [self _componentRectInfoWithViewFrame:rootRect];
+                NSMutableDictionary *callbackRsp = [self _componentRectInfoWithViewFrame:rootRect];
                 [callbackRsp setObject:@(true) forKey:@"result"];
                 if (callback) {
                     callback(callbackRsp, false);
@@ -198,9 +236,8 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
             });
         } else {
             WXComponent *component = [manager componentForRef:ref];
-            __weak typeof (self) weakSelf = self;
             dispatch_async(dispatch_get_main_queue(), ^{
-                __strong typeof (weakSelf) strongSelf = weakSelf;
+                UIView *rootView = manager.weexInstance.rootView;
                 NSMutableDictionary * callbackRsp = nil;
                 if (!component) {
                     callbackRsp = [NSMutableDictionary new];
@@ -214,7 +251,7 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
                     } else {
                         componentRect = component.calculatedFrame;
                     }
-                    callbackRsp = [strongSelf _componentRectInfoWithViewFrame:componentRect];
+                    callbackRsp = [self _componentRectInfoWithViewFrame:componentRect];
                     [callbackRsp setObject:@(true)forKey:@"result"];
                 }
                 if (callback) {
@@ -226,6 +263,30 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     }];
 }
 
+- (void)getLayoutDirection:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
+    [self performBlockOnComponentManager:^(WXComponentManager * manager) {
+        if ([ref isEqualToString:@"viewport"]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *direction = [WXUtility getEnvLayoutDirection] == WXLayoutDirectionRTL ? @"rtl" : @"ltr";
+                if (callback) {
+                    callback(direction, false);
+                }
+            });
+        } else {
+            WXComponent *component = [manager componentForRef:ref];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *direction = @"unknow";
+                if (component) {
+                    direction = [component isDirectionRTL] ? @"rtl" : @"ltr";
+                }
+                if (callback) {
+                    callback(direction, false);
+                }
+            });
+        }
+    }];
+}
+
 - (void)updateComponentData:(NSString*)componentDataId componentData:(NSDictionary*)componentData callback:(NSString*)callbackId
 {
     NSString *recycleListComponentRef = [[componentDataId componentsSeparatedByString:@"@"] objectAtIndex:0];
@@ -233,23 +294,28 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
         return;
     }
     SEL selector = _cmd;
-    [self performBlockOnComponentManager:^(WXComponentManager * manager) {
-        WXRecycleListComponent * recycleListComponent = (WXRecycleListComponent*)[manager componentForRef:recycleListComponentRef];
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
+        WXRecycleListComponent *recycleListComponent = (WXRecycleListComponent*)[manager componentForRef:recycleListComponentRef];
         ((void*(*)(id,SEL,NSString*,NSDictionary*,NSString*))objc_msgSend)(recycleListComponent, selector, componentDataId, componentData,callbackId);
     }];
 }
 
 - (void)destroyInstance
 {
+    NSString* instanceId = self.weexInstance.instanceId;
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
+        [manager invalidate];
         [manager unload];
+        
+        // Destroy weexcore c++ page and objects.
+        [WXCoreBridge closePage:instanceId];
     }];
 }
 
 - (NSMutableDictionary*)_componentRectInfoWithViewFrame:(CGRect)componentRect
 {
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-    NSMutableDictionary * callbackRsp = [NSMutableDictionary new];
+    NSMutableDictionary *callbackRsp = [NSMutableDictionary new];
     [callbackRsp setObject:@{
                              @"width":@(componentRect.size.width /scaleFactor),
                              @"height":@(componentRect.size.height / scaleFactor),

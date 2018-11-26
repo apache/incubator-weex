@@ -23,16 +23,16 @@
 #include <string>
 
 #include "core/css/constants_value.h"
+#include "core/render/node/render_object.h"
 
 namespace WeexCore {
 
 class RenderPage;
+class RenderObject;
 
 class RenderManager {
  private:
-  RenderManager() {
-    this->viewport_width_ = kDefaultViewPortWidth;
-  }
+  RenderManager() : pages_() {}
 
   ~RenderManager() {}
 
@@ -52,13 +52,22 @@ class RenderManager {
   void Batch(const std::string &page_id);
 
   // create root node
-  bool CreatePage(std::string page_id, const char *data);
+  bool CreatePage(const std::string& page_id, const char *data);
+    
+
+  bool CreatePage(const std::string& page_id, RenderObject *root);
+    
+  bool CreatePage(const std::string& page_id, std::function<RenderObject* (RenderPage*)> constructRoot);
 
   /** use auto constructor is bad idea, it cann't transfer binary, use char* is
    * better */
   bool AddRenderObject(const std::string &page_id,
                        const std::string &parent_ref, int index,
                        const char *data);
+
+  bool AddRenderObject(const std::string &page_id,
+                       const std::string &parent_ref, int index,
+                       RenderObject *root);
 
   bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
 
@@ -68,8 +77,14 @@ class RenderManager {
   bool UpdateAttr(const std::string &page_id, const std::string &ref,
                   const char *data);
 
+  bool UpdateAttr(const std::string &page_id, const std::string &ref,
+                  std::vector<std::pair<std::string, std::string>> *attrPair);
+
   bool UpdateStyle(const std::string &page_id, const std::string &ref,
                    const char *data);
+
+  bool UpdateStyle(const std::string &page_id, const std::string &ref,
+                   std::vector<std::pair<std::string, std::string>> *stylePair);
 
   bool AddEvent(const std::string &page_id, const std::string &ref,
                 const std::string &event);
@@ -78,34 +93,36 @@ class RenderManager {
                    const std::string &event);
 
   bool CreateFinish(const std::string &page_id);
+  void CallNativeModule(const std::string &page_id, const std::string &module, const std::string &method, const std::string &args, int argc = 0);
+  void CallNativeModule(const char *page_id, const char *module, const char *method,
+                        const char *arguments, int arguments_length, const char *options,
+                        int options_length);
 
-  bool CallNativeModule(const char *pageId, const char *module, const char *method,
-                        const char *arguments, int argumentsLength, const char *options,
-                        int optionsLength);
-
-  bool CallMetaModule(const char *method, const char *arguments);
+  void CallMetaModule(const char *page_id, const char *method, const char *arguments);
 
   RenderPage *GetPage(const std::string &page_id);
 
   bool ClosePage(const std::string &page_id);
 
+  float viewport_width(const std::string &page_id);
+
+  void set_viewport_width(const std::string &page_id, float viewport_width);
+
+  bool round_off_deviation(const std::string &page_id);
+
+  void set_round_off_deviation(const std::string &page_id, bool round_off_deviation);
+
   static RenderManager *GetInstance() {
-    if (!g_pInstance) {
+    if (NULL == g_pInstance) {
       g_pInstance = new RenderManager();
     }
     return g_pInstance;
   }
-
-  inline float viewport_width() const { return this->viewport_width_; }
-
-  inline void set_viewport_width(float viewport_width) {
-    this->viewport_width_ = viewport_width;
-  }
-
  private:
   static RenderManager *g_pInstance;
   std::map<std::string, RenderPage *> pages_;
-  float viewport_width_ = -1;
+  std::map<std::string, float> viewports_;
+  std::map<std::string, bool> round_off_deviations_;
 };
 }  // namespace WeexCore
 

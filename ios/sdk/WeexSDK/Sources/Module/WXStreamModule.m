@@ -119,6 +119,14 @@ WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallbac
 {
     // parse request url
     NSString *urlStr = [options objectForKey:@"url"];
+    if (![urlStr isKindOfClass:[NSString class]]) {
+        if (callbackRsp) {
+            [callbackRsp setObject:@(-1) forKey:@"status"];
+            [callbackRsp setObject:@NO forKey:@"ok"];
+        }
+        return nil;
+    }
+    
     NSString *newURL = [urlStr copy];
     WX_REWRITE_URL(urlStr, WXResourceTypeLink, self.weexInstance)
     urlStr = newURL;

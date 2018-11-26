@@ -22,7 +22,6 @@ import { receiveTasks } from '../bridge/receiver'
 import { registerModules } from './module'
 import { registerComponents } from './component'
 import { services, register, unregister } from './service'
-import { track } from '../bridge/debug'
 import WeexInstance from './WeexInstance'
 import { getDoc } from '../vdom/operation'
 
@@ -92,7 +91,6 @@ function getFrameworkType (id) {
 
 function createInstanceContext (id, options = {}, data) {
   const weex = new WeexInstance(id, options)
-  Object.freeze(weex)
 
   const bundleType = options.bundleType || 'Vue'
   instanceTypeMap[id] = bundleType
@@ -100,7 +98,6 @@ function createInstanceContext (id, options = {}, data) {
   if (!framework) {
     return new Error(`[JS Framework] Invalid bundle type "${bundleType}".`)
   }
-  track(id, 'bundleType', bundleType)
 
   // prepare js service
   const services = createServices(id, {
@@ -117,6 +114,7 @@ function createInstanceContext (id, options = {}, data) {
   Object.assign(runtimeContext, services, {
     weex,
     getJSFMVersion,
+    requireModule: (...args) => weex.requireModule(...args),
     __WEEX_CALL_JAVASCRIPT__: receiveTasks,
     services // Temporary compatible with some legacy APIs in Rax
   })

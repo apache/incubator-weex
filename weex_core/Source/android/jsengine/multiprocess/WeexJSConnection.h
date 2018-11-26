@@ -30,9 +30,11 @@ public:
 
     ~WeexJSConnection();
 
-    IPCSender *start(IPCHandler *handler, bool reinit = false);
+    IPCSender *start(IPCHandler *handler, IPCHandler *serverHandler, bool reinit);
 
     void end();
+
+    IPCSender* sender();
 
 private:
     struct WeexJSConnectionImpl;

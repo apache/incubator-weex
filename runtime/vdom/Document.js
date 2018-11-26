@@ -20,6 +20,7 @@
 import Comment from './Comment'
 import Element from './Element'
 import Listener from '../bridge/Listener'
+import { checkLevel, debugLog } from '../shared/utils'
 import { TaskCenter } from '../bridge/TaskCenter'
 import { createHandler } from '../bridge/Handler'
 import { addDoc, removeDoc, appendBody, setBody } from './operation'
@@ -109,6 +110,10 @@ export default class Document {
           appendBody(this, node, before)
         }
       })
+
+      if (checkLevel('debug')) {
+        debugLog(`Create document element (id: "${el.docId}", ref: "${el.ref}")`)
+      }
     }
 
     return this.documentElement
@@ -124,6 +129,10 @@ export default class Document {
     if (!this.body) {
       const el = new Element(type, props)
       setBody(this, el)
+      if (checkLevel('debug')) {
+        debugLog(`[createBody](${this.id},${el.type},${el.ref}) `
+          + `(${JSON.stringify(el.toJSON(true))}).`)
+      }
     }
 
     return this.body
@@ -136,7 +145,12 @@ export default class Document {
   * @return {object} element
   */
   createElement (tagName, props) {
-    return new Element(tagName, props)
+    const el = new Element(tagName, props)
+    if (checkLevel('debug')) {
+      debugLog(`[createElement](${this.id},${el.type},${el.ref}) `
+        + `(${JSON.stringify(el.toJSON(true))}).`)
+    }
+    return el
   }
 
   /**
@@ -169,14 +183,24 @@ export default class Document {
     if (domChanges) {
       updateElement(el, domChanges)
     }
-    const isBubble = this.getRef('_root').attr['bubble'] === 'true'
-    return el.fireEvent(type, event, isBubble, options)
+    let result
+    let isBubble
+    const $root = this.getRef('_root')
+    if ($root && $root.attr) {
+      isBubble = $root.attr['bubble'] === 'true'
+    }
+    result = el.fireEvent(type, event, isBubble, options)
+    return result
   }
 
   /**
   * Destroy current document, and remove itself form docMap.
   */
   destroy () {
+    if (checkLevel('debug')) {
+      debugLog(`[destroy](${this.id},document,${this.ref}) `
+        + `Destroy document (id: "${this.id}", URL: "${this.URL}")`)
+    }
     this.taskCenter.destroyCallback()
     delete this.listener
     delete this.nodeMap

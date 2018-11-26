@@ -29,8 +29,11 @@ import android.view.View;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.utils.FunctionParser;
 import com.taobao.weex.utils.WXDataStructureUtil;
+import com.taobao.weex.utils.WXExceptionUtils;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -99,130 +102,140 @@ public class TransformParser {
         return holders;
     }
 
-    public static Map<Property<View,Float>, Float> parseTransForm(@Nullable String rawTransform, final int width,
+    public static Map<Property<View,Float>, Float> parseTransForm(String instanceId, @Nullable String rawTransform, final int width,
                                                                   final int height, final int viewportW) {
-        if (!TextUtils.isEmpty(rawTransform)) {
-            FunctionParser<Property<View,Float>, Float> parser = new FunctionParser<>
-                    (rawTransform, new FunctionParser.Mapper<Property<View,Float>, Float>() {
-                        @Override
-                        public Map<Property<View,Float>, Float> map(String functionName, List<String> raw) {
-                            if (raw != null && !raw.isEmpty()) {
-                                if (wxToAndroidMap.containsKey(functionName)) {
-                                    return convertParam(width, height,viewportW, wxToAndroidMap.get(functionName), raw);
+        try{
+
+            if (!TextUtils.isEmpty(rawTransform)) {
+                FunctionParser<Property<View,Float>, Float> parser = new FunctionParser<>
+                        (rawTransform, new FunctionParser.Mapper<Property<View,Float>, Float>() {
+                            @Override
+                            public Map<Property<View,Float>, Float> map(String functionName, List<String> raw) {
+                                if (raw != null && !raw.isEmpty()) {
+                                    if (wxToAndroidMap.containsKey(functionName)) {
+                                        return convertParam(width, height,viewportW, wxToAndroidMap.get(functionName), raw);
+                                    }
                                 }
+                                return new HashMap<>();
                             }
-                            return new HashMap<>();
-                        }
 
-                        private Map<Property<View,Float>, Float> convertParam(int width, int height, int viewportW,
-                                                                              @NonNull List<Property<View,Float>> propertyList,
-                                                                              @NonNull List<String> rawValue) {
+                            private Map<Property<View,Float>, Float> convertParam(int width, int height, int viewportW,
+                                                                                  @NonNull List<Property<View,Float>> propertyList,
+                                                                                  @NonNull List<String> rawValue) {
 
-                            Map<Property<View,Float>, Float> result = WXDataStructureUtil.newHashMapWithExpectedSize(propertyList.size());
-                            List<Float> convertedList = new ArrayList<>(propertyList.size());
-                            if (propertyList.contains(View.ROTATION) ||
-                                    propertyList.contains(View.ROTATION_X) ||
-                                    propertyList.contains(View.ROTATION_Y)) {
-                                convertedList.addAll(parseRotationZ(rawValue));
-                            }else if (propertyList.contains(View.TRANSLATION_X) ||
-                                    propertyList.contains(View.TRANSLATION_Y)) {
-                                convertedList.addAll(parseTranslation(propertyList, width, height, rawValue,viewportW));
-                            } else if (propertyList.contains(View.SCALE_X) ||
-                                    propertyList.contains(View.SCALE_Y)) {
-                                convertedList.addAll(parseScale(propertyList.size(), rawValue));
-                            }
-                            else if(propertyList.contains(CameraDistanceProperty.getInstance())){
-                                convertedList.add(parseCameraDistance(rawValue));
-                            }
-                            if (propertyList.size() == convertedList.size()) {
-                                for (int i = 0; i < propertyList.size(); i++) {
-                                    result.put(propertyList.get(i), convertedList.get(i));
+                                Map<Property<View,Float>, Float> result = WXDataStructureUtil.newHashMapWithExpectedSize(propertyList.size());
+                                List<Float> convertedList = new ArrayList<>(propertyList.size());
+                                if (propertyList.contains(View.ROTATION) ||
+                                        propertyList.contains(View.ROTATION_X) ||
+                                        propertyList.contains(View.ROTATION_Y)) {
+                                    convertedList.addAll(parseRotationZ(rawValue));
+                                }else if (propertyList.contains(View.TRANSLATION_X) ||
+                                        propertyList.contains(View.TRANSLATION_Y)) {
+                                    convertedList.addAll(parseTranslation(propertyList, width, height, rawValue,viewportW));
+                                } else if (propertyList.contains(View.SCALE_X) ||
+                                        propertyList.contains(View.SCALE_Y)) {
+                                    convertedList.addAll(parseScale(propertyList.size(), rawValue));
                                 }
+                                else if(propertyList.contains(CameraDistanceProperty.getInstance())){
+                                    convertedList.add(parseCameraDistance(rawValue));
+                                }
+                                if (propertyList.size() == convertedList.size()) {
+                                    for (int i = 0; i < propertyList.size(); i++) {
+                                        result.put(propertyList.get(i), convertedList.get(i));
+                                    }
+                                }
+                                return result;
                             }
-                            return result;
-                        }
 
-                        private List<Float> parseScale(int size, @NonNull List<String> rawValue) {
-                            List<Float> convertedList = new ArrayList<>(rawValue.size() * 2);
-                            List<Float> rawFloat = new ArrayList<>(rawValue.size());
-                            for (String item : rawValue) {
-                                rawFloat.add(WXUtils.fastGetFloat(item));
-                            }
-                            convertedList.addAll(rawFloat);
-                            if (size != 1 && rawValue.size() == 1) {
+                            private List<Float> parseScale(int size, @NonNull List<String> rawValue) {
+                                List<Float> convertedList = new ArrayList<>(rawValue.size() * 2);
+                                List<Float> rawFloat = new ArrayList<>(rawValue.size());
+                                for (String item : rawValue) {
+                                    rawFloat.add(WXUtils.fastGetFloat(item));
+                                }
                                 convertedList.addAll(rawFloat);
+                                if (size != 1 && rawValue.size() == 1) {
+                                    convertedList.addAll(rawFloat);
+                                }
+                                return convertedList;
                             }
-                            return convertedList;
-                        }
 
-                        private @NonNull
-                        List<Float> parseRotationZ(@NonNull List<String> rawValue) {
-                            List<Float> convertedList = new ArrayList<>(1);
-                            int suffix;
-                            for (String raw : rawValue) {
-                                if ((suffix = raw.lastIndexOf(DEG)) != -1) {
-                                    convertedList.add(WXUtils.fastGetFloat(raw.substring(0, suffix)));
+                            private @NonNull
+                            List<Float> parseRotationZ(@NonNull List<String> rawValue) {
+                                List<Float> convertedList = new ArrayList<>(1);
+                                int suffix;
+                                for (String raw : rawValue) {
+                                    if ((suffix = raw.lastIndexOf(DEG)) != -1) {
+                                        convertedList.add(WXUtils.fastGetFloat(raw.substring(0, suffix)));
+                                    } else {
+                                        convertedList.add((float) Math.toDegrees(Double.parseDouble(raw)));
+                                    }
+                                }
+                                return convertedList;
+                            }
+
+                            /**
+                             * As "translate(50%, 25%)" or "translate(25px, 30px)" both are valid,
+                             * parsing translate is complicated than other method.
+                             * Add your waste time here if you try to optimize this method like {@link #parseScale(int, List)}
+                             * Time: 0.5h
+                             */
+                            private List<Float> parseTranslation(List<Property<View,Float>> propertyList,
+                                                                 int width, int height,
+                                                                 @NonNull List<String> rawValue, int viewportW) {
+                                List<Float> convertedList = new ArrayList<>(2);
+                                String first = rawValue.get(0);
+                                if (propertyList.size() == 1) {
+                                    parseSingleTranslation(propertyList, width, height, convertedList, first,viewportW);
                                 } else {
-                                    convertedList.add((float) Math.toDegrees(Double.parseDouble(raw)));
+                                    parseDoubleTranslation(width, height, rawValue, convertedList, first,viewportW);
+                                }
+                                return convertedList;
+                            }
+
+                            private void parseSingleTranslation(List<Property<View,Float>> propertyList, int width, int height,
+                                                                List<Float> convertedList, String first, int viewportW) {
+                                if (propertyList.contains(View.TRANSLATION_X)) {
+                                    convertedList.add(parsePercentOrPx(first, width,viewportW));
+                                } else if (propertyList.contains(View.TRANSLATION_Y)) {
+                                    convertedList.add(parsePercentOrPx(first, height,viewportW));
                                 }
                             }
-                            return convertedList;
-                        }
 
-                        /**
-                         * As "translate(50%, 25%)" or "translate(25px, 30px)" both are valid,
-                         * parsing translate is complicated than other method.
-                         * Add your waste time here if you try to optimize this method like {@link #parseScale(int, List)}
-                         * Time: 0.5h
-                         */
-                        private List<Float> parseTranslation(List<Property<View,Float>> propertyList,
-                                                             int width, int height,
-                                                             @NonNull List<String> rawValue, int viewportW) {
-                            List<Float> convertedList = new ArrayList<>(2);
-                            String first = rawValue.get(0);
-                            if (propertyList.size() == 1) {
-                                parseSingleTranslation(propertyList, width, height, convertedList, first,viewportW);
-                            } else {
-                                parseDoubleTranslation(width, height, rawValue, convertedList, first,viewportW);
-                            }
-                            return convertedList;
-                        }
-
-                        private void parseSingleTranslation(List<Property<View,Float>> propertyList, int width, int height,
-                                                            List<Float> convertedList, String first, int viewportW) {
-                            if (propertyList.contains(View.TRANSLATION_X)) {
+                            private void parseDoubleTranslation(int width, int height,
+                                                                @NonNull List<String> rawValue,
+                                                                List<Float> convertedList, String first, int viewportW) {
+                                String second;
+                                if (rawValue.size() == 1) {
+                                    second = first;
+                                } else {
+                                    second = rawValue.get(1);
+                                }
                                 convertedList.add(parsePercentOrPx(first, width,viewportW));
-                            } else if (propertyList.contains(View.TRANSLATION_Y)) {
-                                convertedList.add(parsePercentOrPx(first, height,viewportW));
+                                convertedList.add(parsePercentOrPx(second, height,viewportW));
                             }
-                        }
 
-                        private void parseDoubleTranslation(int width, int height,
-                                                            @NonNull List<String> rawValue,
-                                                            List<Float> convertedList, String first, int viewportW) {
-                            String second;
-                            if (rawValue.size() == 1) {
-                                second = first;
-                            } else {
-                                second = rawValue.get(1);
-                            }
-                            convertedList.add(parsePercentOrPx(first, width,viewportW));
-                            convertedList.add(parsePercentOrPx(second, height,viewportW));
-                        }
-
-                        private Float parseCameraDistance(List<String> rawValue){
-                            float ret= Float.MAX_VALUE;
-                            if(rawValue.size() == 1){
-                                float value = WXViewUtils.getRealPxByWidth(WXUtils.getFloat(rawValue.get(0)), viewportW);
-                                float scale = WXEnvironment.getApplication().getResources().getDisplayMetrics().density;
-                                if (!Float.isNaN(value) && value > 0) {
-                                    ret = value * scale;
+                            private Float parseCameraDistance(List<String> rawValue){
+                                float ret= Float.MAX_VALUE;
+                                if(rawValue.size() == 1){
+                                    float value = WXViewUtils.getRealPxByWidth(WXUtils.getFloat(rawValue.get(0)), viewportW);
+                                    float scale = WXEnvironment.getApplication().getResources().getDisplayMetrics().density;
+                                    if (!Float.isNaN(value) && value > 0) {
+                                        ret = value * scale;
+                                    }
                                 }
+                                return ret;
                             }
-                            return ret;
-                        }
-                    });
-            return parser.parse();
+                        });
+                return parser.parse();
+            }
+        }catch (Exception e){
+            WXLogUtils.e("TransformParser", e);
+            WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+                    WXErrorCode.WX_RENDER_ERR_TRANSITION,
+                    "parse animation transition",
+                    WXErrorCode.WX_RENDER_ERR_TRANSITION.getErrorMsg() + "parse transition error: " +  e.getMessage(),
+                    null);
         }
         return new LinkedHashMap<>();
     }

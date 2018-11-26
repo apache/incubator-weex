@@ -56,6 +56,8 @@ public class WXJSExceptionInfo {
    */
   private String mWeexVersion = WXEnvironment.WXSDK_VERSION;
 
+  public long time;
+
   /**
    * js framework verison
    */
@@ -68,6 +70,7 @@ public class WXJSExceptionInfo {
     this.mFunction = function;
     this.mException = exception;
     this.mExtParams = extParams;
+    this.time = System.currentTimeMillis();
   }
 
   public String getInstanceId() {
@@ -130,15 +133,10 @@ public class WXJSExceptionInfo {
 
   @Override
   public String toString() {
-    StringBuffer buffer = new StringBuffer();
-    buffer.append("WeexSDKVersion:").append(mWeexVersion)
-            .append(" JSFrameworkVersion:").append(mJsFrameworkVersion)
-            .append(" instanceId:").append(mInstanceId)
-            .append(" bundleUrl:").append(mBundleUrl)
-            .append(" errCode:").append(mErrCode.getErrorCode())
-            .append(" function:").append(mFunction)
-            .append(" exception:").append(mException)
-            .append(" extParams:").append(mExtParams);
-    return buffer.toString();
+    return new StringBuilder()
+        .append(" errCode:").append(null == mErrCode?"unSetErrorCode":mErrCode.getErrorCode())
+        .append(",function:").append(null == mFunction?"unSetFuncName":mFunction)
+        .append(",exception:").append(null == mException?"unSetException":mException)
+        .toString();
   }
 }

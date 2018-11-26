@@ -19,6 +19,8 @@
 #ifndef WEEX_PROJECT_VIEWUTILS_H
 #define WEEX_PROJECT_VIEWUTILS_H
 
+#include <string.h>
+#include <math.h>
 #include <core/config/core_environment.h>
 #include <cmath>
 #include <cstdlib>
@@ -58,17 +60,35 @@ namespace WeexCore {
     return ret;
   }
 
-  inline float getFloat(const float &src, const float &viewport) {
+  inline float getFloat(const float &src, const float &viewport, const bool &round_off_deviation) {
     if (isnan(src))
       return NAN;
 
     float realPx = (src * WXCoreEnvironment::getInstance()->DeviceWidth() /
                     viewport);
-    float result = realPx > 0.005 && realPx < 1 ? 1.0f : realPx;
+#if OS_IOS
+    return realPx;
+#else
+
+    float result;
+    if (round_off_deviation) {
+      result = realPx > 0.005 && realPx < 1 ? 1.0f : realPx;
+    } else {
+      result = realPx > 0.005 && realPx < 1 ? 1.0f : rint(realPx);
+    }
     return result;
+#endif
   }
 
-  inline float getFloat(const std::string &src, const float &viewport) {
+  inline bool getBool(const std::string &src) {
+    if (strcmp(src.c_str(), "true") == 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  inline float getFloat(const std::string &src, const float &viewport, const bool &round_off_deviation) {
     float ret = NAN;
     if (UNDEFINE == src
         || AUTO_UNIT == src
@@ -77,7 +97,7 @@ namespace WeexCore {
       return ret;
     }
     float original_value = getFloat(src.c_str());
-    ret = getFloat(original_value, viewport);
+    ret = getFloat(original_value, viewport, round_off_deviation);
     return ret;
   }
 
@@ -96,7 +116,7 @@ namespace WeexCore {
     return density * f * viewport / WXCoreEnvironment::getInstance()->DeviceWidth();
   }
 
-  inline static float getFloatByViewport(std::string src, const float &viewport) {
+  inline static float getFloatByViewport(std::string src, const float &viewport, const bool &round_off_deviation) {
     float ret = NAN;
     if (UNDEFINE == src
         || AUTO_UNIT == src
@@ -106,11 +126,11 @@ namespace WeexCore {
     }
     Trim(src);
     if (endWidth(src, WX)) {
-      ret = getFloat(transferWx(src, viewport), viewport);
+      ret = getFloat(transferWx(src, viewport), viewport, round_off_deviation);
     } else if (endWidth(src, PX)) {
-      ret = getFloat(src.substr(0, src.size() - PX.size()), viewport);
+      ret = getFloat(src.substr(0, src.size() - PX.size()), viewport, round_off_deviation);
     } else {
-      ret = getFloat(src, viewport);
+      ret = getFloat(src, viewport, round_off_deviation);
     }
     return ret;
   }
@@ -120,8 +140,12 @@ namespace WeexCore {
       return NAN;
 
     float realPx = (pxValue * customViewport / WXCoreEnvironment::getInstance()->DeviceWidth());
+#if OS_IOS
+    return realPx;
+#else
     float result = realPx > 0.005 && realPx < 1 ? 1.0f : realPx;
     return result;
+#endif
   }
 }
 

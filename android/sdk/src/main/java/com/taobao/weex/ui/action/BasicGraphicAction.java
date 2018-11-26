@@ -20,21 +20,31 @@ package com.taobao.weex.ui.action;
 
 import android.text.TextUtils;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.utils.WXLogUtils;
 
 public abstract class BasicGraphicAction implements IExecutable, Runnable {
 
-  private final String mPageId;
+  private WXSDKInstance mInstance;
   private final String mRef;
+  public int mActionType = ActionTypeNormal;
+  public static final int ActionTypeBatchBegin = 1;
+  public static final int ActionTypeBatchEnd = 2;
+  public static final int ActionTypeNormal = 0;
 
-  public BasicGraphicAction(String pageId, String ref) {
-    this.mPageId = pageId;
+
+  public BasicGraphicAction(WXSDKInstance instance, String ref) {
+    this.mInstance = instance;
     this.mRef = ref;
   }
 
+  public final WXSDKInstance getWXSDKIntance() {
+    return mInstance;
+  }
+
   public final String getPageId() {
-    return mPageId;
+    return mInstance.getInstanceId();
   }
 
   public final String getRef() {
@@ -42,14 +52,14 @@ public abstract class BasicGraphicAction implements IExecutable, Runnable {
   }
 
   public void executeActionOnRender() {
-    if (TextUtils.isEmpty(mPageId)) {
+    if (TextUtils.isEmpty(mInstance.getInstanceId())) {
         WXLogUtils.e("[BasicGraphicAction] pageId can not be null");
         if (WXEnvironment.isApkDebugable()) {
             throw new RuntimeException("["+getClass().getName()+"] pageId can not be null");
         }
         return;
     }
-    WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(mPageId, this);
+    WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(mInstance.getInstanceId(), this);
   }
 
   @Override

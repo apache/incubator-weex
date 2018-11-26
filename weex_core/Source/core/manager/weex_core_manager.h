@@ -17,64 +17,75 @@
  * under the License.
  */
 
+#ifdef __cplusplus
+
 #ifndef WEEXCORE_WEEX_CORE_MANAGER_H
 #define WEEXCORE_WEEX_CORE_MANAGER_H
 
-#include <core/bridge/bridge.h>
-#include <core/bridge/js_bridge.h>
-#include <core/layout/measure_func_adapter.h>
+#include "base/thread/thread.h"
+#include "core/bridge/platform_bridge.h"
+#include "core/bridge/script_bridge.h"
+#include "base/message_loop/message_loop.h"
 
 namespace WeexCore {
-    class WeexCoreManager {
-    private:
-        static WeexCoreManager *m_pInstance;
-        Bridge *platformBridge = nullptr;
-        MeasureFunctionAdapter *measureFunctionAdapter = nullptr;
-        JSBridge* jsBridge = nullptr;
+class WeexCoreManager {
+ public:
+  enum ProjectMode { MULTI_SO, MULTI_PROCESS, COMMON };
 
-    private:
-        WeexCoreManager() {};
+  static WeexCoreManager *Instance() {
+    static auto s_instance = new WeexCoreManager();
+    return s_instance;
+  };
 
-        ~WeexCoreManager() {
-            delete platformBridge;
-            platformBridge = nullptr;
-            delete jsBridge;
-            jsBridge = nullptr;
-        };
+  inline PlatformBridge *getPlatformBridge() { return platform_bridge_; }
 
-        //just to release singleton object
-        class Garbo {
-        public:
-            ~Garbo() {
-                if (WeexCoreManager::m_pInstance) {
-                    delete WeexCoreManager::m_pInstance;
-                }
-            }
-        };
+  inline void set_platform_bridge(PlatformBridge *bridge) {
+    platform_bridge_ = bridge;
+  }
 
-        static Garbo garbo;
+  inline ScriptBridge *script_bridge() { return script_bridge_; }
 
-    public:
-        static WeexCoreManager *getInstance() {
-            if (nullptr == m_pInstance) {
-                m_pInstance = new WeexCoreManager();
-            }
-            return m_pInstance;
-        };
+  inline void set_script_bridge(ScriptBridge *script_bridge) {
+    script_bridge_ = script_bridge;
+  }
 
-        Bridge *getPlatformBridge();
+  inline void set_measure_function_adapter(MeasureFunctionAdapter *adapter) {
+    measure_function_adapter_ = adapter;
+  }
 
-        void setPlatformBridge(Bridge *pBridge);
+  inline MeasureFunctionAdapter *measure_function_adapter() {
+    return measure_function_adapter_;
+  }
 
-        JSBridge* getJSBridge();
+  inline ProjectMode project_mode() { return project_mode_; }
 
-        void setJSBridge(JSBridge *jsBridge);
+  inline void set_project_mode(ProjectMode mode) { project_mode_ = mode; }
 
-        void SetMeasureFunctionAdapter(MeasureFunctionAdapter *measureFunctionAdapter);
+  // Should be called on ScriptThread
+  inline void InitScriptThread() {
+    script_thread_ =
+        new weex::base::Thread(weex::base::MessageLoop::Type::PLATFORM);
+    script_thread_->Start();
+  }
 
-        MeasureFunctionAdapter *GetMeasureFunctionAdapter();
+  inline weex::base::Thread *script_thread() { return script_thread_; }
 
-    };
-}
+ private:
+  PlatformBridge *platform_bridge_;
+  MeasureFunctionAdapter *measure_function_adapter_;
+  ScriptBridge *script_bridge_;
+  ProjectMode project_mode_;
+  weex::base::Thread *script_thread_;
 
-#endif //WEEXCORE_WEEX_CORE_MANAGER_H
+  WeexCoreManager()
+      : platform_bridge_(nullptr),
+        measure_function_adapter_(nullptr),
+        script_bridge_(nullptr),
+        project_mode_(COMMON),
+        script_thread_(nullptr){};
+  ~WeexCoreManager(){};
+};
+}  // namespace WeexCore
+
+#endif  // WEEXCORE_WEEX_CORE_MANAGER_H
+#endif //#ifdef __cplusplus

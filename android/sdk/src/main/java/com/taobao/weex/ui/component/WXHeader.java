@@ -40,6 +40,7 @@ public class WXHeader extends WXCell {
     String parantType = parent.getComponentType();
     if(WXBasicComponentType.LIST.equals(parantType)
             || WXBasicComponentType.RECYCLE_LIST.equals(parantType)){
+      getStyles().put(Constants.Name.POSITION, Constants.Value.STICKY);
       setSticky(Constants.Value.STICKY);
     }
   }
@@ -50,12 +51,7 @@ public class WXHeader extends WXCell {
   }
 
   @Override
-  public boolean isSticky() {
-    return true;
-  }
-
-  @Override
   public boolean canRecycled() {
-    return false;
+    return !isSticky();
   }
 }

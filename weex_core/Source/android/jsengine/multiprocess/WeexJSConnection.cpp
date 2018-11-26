@@ -19,9 +19,11 @@
 #include "WeexJSConnection.h"
 
 #include "ashmem.h"
-#include "WeexProxy.h"
+#include "ExtendJSApi.h"
+#include <fcntl.h>
 #include <dirent.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/mman.h>
@@ -34,19 +36,70 @@
 #include <unistd.h>
 #include <android/base/log_utils.h>
 #include <errno.h>
+#include <android/utils/so_utils.h>
+#include <IPCListener.h>
+#include <android/bridge/platform/android_bridge_in_multi_process.h>
+#include <core/manager/weex_core_manager.h>
+#include <android/bridge/script_bridge_in_multi_process.h>
+#include <android/base/jni/android_jni.h>
 
-extern const char *s_cacheDir;
-extern const char *g_jssSoPath;
-extern const char *g_jssSoName;
-extern bool s_start_pie;
-
-static void doExec(int fd, bool traceEnable, bool startupPie = true);
+static bool s_in_find_icu = false;
+static std::string g_crashFileName;
+static void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie);
 
 static int copyFile(const char *SourceFile, const char *NewFile);
 
-static void closeAllButThis(int fd);
+static void closeAllButThis(int fd, int fd2);
 
 static void printLogOnFile(const char *log);
+
+static bool checkOrCreateCrashFile(const char* file) {
+    if (file == nullptr) {
+        LOGE("checkOrCreateCrashFile Pass error file name!");
+        return false;
+    }
+
+    int flags = 0;
+    int mode = 0666;
+    int ret = ::access(file,F_OK);
+    if (ret < 0)
+        flags |= O_CREAT;
+    flags |= O_RDWR;
+    int fd = ::open(file, flags, mode);
+    if (fd < 0) {
+        LOGE(" checkOrCreateCrashFile failed, can not create or use crash file errno: %s \n", strerror(errno));
+        return false;
+    }
+    return true;
+}
+
+static bool checkDirOrFileIsLink(const char* path) {
+    if (path == nullptr)
+        return false;
+    struct stat fileStat;
+    int st = stat(path, &fileStat);
+    if (st < 0) {
+        LOGE(" checkDirOrFileIsLink file error: %d\n", errno);
+        return false;
+    }
+    if (!S_ISLNK(fileStat.st_mode))
+        return false;
+    return true;
+}
+
+static bool getDirOrFileLink(const char* path, char* buf, size_t length) {
+    if(path == nullptr || buf == nullptr) {
+        return false;
+    }
+
+    int ret = readlink(path, buf, length);
+    if (ret < 0 ) {
+        return false;
+        LOGE(" checkDirOrFileIsLink check link error: %d\n", errno);
+    }
+
+    return true;
+}
 
 #if PRINT_LOG_CACHEFILE
 static std::string logFilePath = "/data/data/com.taobao.taobao/cache";
@@ -60,14 +113,80 @@ struct WeexJSConnection::WeexJSConnectionImpl {
 
 WeexJSConnection::WeexJSConnection()
         : m_impl(new WeexJSConnectionImpl) {
+  if (SoUtils::crash_file_path() != nullptr) {
+    if (checkDirOrFileIsLink(SoUtils::crash_file_path())) {
+        std::string tmp = SoUtils::crash_file_path();
+        size_t length = tmp.length();
+        char *buf = new char[length];
+        memset(buf, 0, length);
+        if (!getDirOrFileLink(SoUtils::crash_file_path(), buf, length)) {
+            LOGE("getDirOrFileLink filePath(%s) error\n", SoUtils::crash_file_path());
+            g_crashFileName = SoUtils::crash_file_path();
+        } else {
+            g_crashFileName = buf;
+        }
+        delete []buf;
+    } else {
+        g_crashFileName = SoUtils::crash_file_path();
+    }
+    g_crashFileName += "/crash_dump.log";
+  } else {
+    g_crashFileName += "nullfilename";
+  }
+  LOGE("WeexJSConnection g_crashFileName: %s\n", g_crashFileName.c_str());
 }
+
 
 WeexJSConnection::~WeexJSConnection() {
   end();
 }
 
-IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
-  int fd = ashmem_create_region("WEEX_IPC", IPCFutexPageQueue::ipc_size);
+struct ThreadData {
+    int ipcServerFd;
+    IPCHandler *ipcServerHandler;
+};
+// -1 unFinish, 0 error, 1 success
+enum NewThreadStatus {
+    UNFINISH,
+    ERROR,
+    SUCCESS
+};
+static volatile int newThreadStatus = UNFINISH;
+
+static void *newIPCServer(void *_td) {
+    ThreadData *td = static_cast<ThreadData *>(_td);
+    void *base = mmap(nullptr, IPCFutexPageQueue::ipc_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+                      td->ipcServerFd, 0);
+    if (base == MAP_FAILED) {
+        int _errno = errno;
+        close(td->ipcServerFd);
+        //throw IPCException("failed to map ashmem region: %s", strerror(_errno));
+        newThreadStatus = ERROR;
+        return nullptr;
+    }
+
+    IPCHandler *handler = td->ipcServerHandler;
+    std::unique_ptr<IPCFutexPageQueue> futexPageQueue(
+            new IPCFutexPageQueue(base, IPCFutexPageQueue::ipc_size, 0));
+    const std::unique_ptr<IPCHandler> &testHandler = createIPCHandler();
+    std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), handler));
+    std::unique_ptr<IPCListener> listener =std::move(createIPCListener(futexPageQueue.get(), handler)) ;
+    newThreadStatus = SUCCESS;
+
+    try {
+      futexPageQueue->spinWaitPeer();
+      listener->listen();
+    } catch (IPCException &e) {
+        LOGE("server died");
+        close(td->ipcServerFd);
+        base::android::DetachFromVM();
+        pthread_exit(NULL);
+    }
+}
+
+
+IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandler, bool reinit) {
+  int fd = ashmem_create_region("WEEX_IPC_CLIENT", IPCFutexPageQueue::ipc_size);
   if (-1 == fd) {
     throw IPCException("failed to create ashmem region: %s", strerror(errno));
   }
@@ -83,6 +202,32 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
   std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), handler));
   m_impl->serverSender = std::move(sender);
   m_impl->futexPageQueue = std::move(futexPageQueue);
+
+  int fd2 = ashmem_create_region("WEEX_IPC_SERVER", IPCFutexPageQueue::ipc_size);
+  if (-1 == fd2) {
+    throw IPCException("failed to create ashmem region: %s", strerror(errno));
+  }
+  ThreadData td = { static_cast<int>(fd2), static_cast<IPCHandler *>(serverHandler) };
+
+  pthread_attr_t threadAttr;
+  newThreadStatus = UNFINISH;
+
+  pthread_attr_init(&threadAttr);
+  pthread_t ipcServerThread;
+  int i = pthread_create(&ipcServerThread, &threadAttr, newIPCServer, &td);
+  while (newThreadStatus == UNFINISH) {
+    continue;
+  }
+
+  if(newThreadStatus == ERROR) {
+    throw IPCException("failed to map ashmem region");
+  }
+
+  //before process boot up, we prapare a crash file for child process
+  bool success = checkOrCreateCrashFile(g_crashFileName.c_str());
+  if (!success) {
+    LOGE("Create crash for child process failed, if child process crashed, we can not get a crash file now");
+  }
 #if PRINT_LOG_CACHEFILE
   if (s_cacheDir) {
     logFilePath = s_cacheDir;
@@ -98,7 +243,8 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
   }
 #endif
 
-  static bool startupPie = s_start_pie;
+//  static bool startupPie = s_start_pie;
+  static bool startupPie = SoUtils::pie_support();
   LOGE("startupPie :%d", startupPie);
 
   pid_t child;
@@ -119,25 +265,31 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
     int myerrno = errno;
     munmap(base, IPCFutexPageQueue::ipc_size);
     close(fd);
+    close(fd2);
     throw IPCException("failed to fork: %s", strerror(myerrno));
   } else if (child == 0) {
+    LOGE("weexcore fork child success\n");
     // the child
-    closeAllButThis(fd);
+    closeAllButThis(fd, fd2);
     // implements close all but handles[1]
     // do exec
-    doExec(fd, true, startupPie);
+    doExec(fd, fd2, true, startupPie);
     LOGE("exec Failed completely.");
     // failed to exec
     _exit(1);
   } else {
     printLogOnFile("fork success on main process and start m_impl->futexPageQueue->spinWaitPeer()");
     close(fd);
+    close(fd2);
     m_impl->child = child;
     try {
       m_impl->futexPageQueue->spinWaitPeer();
     } catch (IPCException &e) {
       LOGE("WeexJSConnection catch: %s", e.msg());
       // TODO throw exception
+      if(s_in_find_icu) {
+//        WeexCore::WeexProxy::reportNativeInitStatus("-1013", "find icu timeout");
+      }
       return nullptr;
     }
   }
@@ -145,8 +297,13 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, bool reinit) {
 }
 
 void WeexJSConnection::end() {
-  m_impl->serverSender.reset();
-  m_impl->futexPageQueue.reset();
+  try {
+    m_impl->serverSender.reset();
+    m_impl->futexPageQueue.reset();
+  } catch (IPCException &e) {
+    //avoid crash
+  }
+    
   if (m_impl->child) {
     int wstatus;
     pid_t child;
@@ -159,6 +316,10 @@ void WeexJSConnection::end() {
         break;
     }
   }
+}
+
+IPCSender* WeexJSConnection::sender() {
+  return m_impl->serverSender.get();
 }
 
 void printLogOnFile(const char *log) {
@@ -175,6 +336,14 @@ static void findIcuDataPath(std::string &icuDataPath) {
   if (!f) {
     return;
   }
+  fseek(f,0L,SEEK_END);
+  int size=ftell(f);
+
+    LOGE("file size is %d",size);
+    struct stat statbuf;
+    stat("/proc/self/maps",&statbuf);
+    int size1=statbuf.st_size;
+    LOGE("file size1 is %d",size1);
   char buffer[256];
   char *line;
   while ((line = fgets(buffer, 256, f))) {
@@ -233,15 +402,23 @@ std::unique_ptr<const char *[]> EnvPBuilder::build() {
   return ptr;
 }
 
-void doExec(int fd, bool traceEnable, bool startupPie) {
+void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
   std::string executablePath;
   std::string icuDataPath;
-  findIcuDataPath(icuDataPath);
-  if(g_jssSoPath != nullptr) {
-    executablePath = g_jssSoPath;
+  if(SoUtils::jss_icu_path() != nullptr) {
+    LOGE("jss_icu_path not null %s",SoUtils::jss_icu_path());
+    icuDataPath = SoUtils::jss_icu_path();
+  } else {
+    s_in_find_icu = true;
+    findIcuDataPath(icuDataPath);
+    s_in_find_icu = false;
   }
-  if (executablePath.empty()) {
-    executablePath = WeexCore::WeexProxy::findLibJssSoPath();
+//  if(g_jssSoPath != nullptr) {
+//    executablePath = g_jssSoPath;
+  if(SoUtils::jss_so_path() != nullptr) {
+    executablePath = SoUtils::jss_so_path();
+  } else {
+    executablePath = SoUtils::FindLibJssSoPath();
   }
 #if PRINT_LOG_CACHEFILE
   std::ofstream mcfile;
@@ -250,7 +427,7 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
   mcfile << "jsengine WeexJSConnection::doExec icuDataPath:" << icuDataPath << std::endl;
 #endif
   std::string::size_type pos = std::string::npos;
-  std::string libName = g_jssSoName;
+  std::string libName = SoUtils::jss_so_name();
   pos = executablePath.find(libName);
   if (pos != std::string::npos) {
     executablePath.replace(pos, libName.length(), "");
@@ -277,30 +454,28 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
   }
   std::string ldLibraryPathEnv("LD_LIBRARY_PATH=");
   std::string icuDataPathEnv("ICU_DATA_PATH=");
-  std::string crashFilePathEnv("CRASH_FILE_PATH=");
   ldLibraryPathEnv.append(executablePath);
+  if(SoUtils::lib_ld_path() != nullptr && strlen(SoUtils::lib_ld_path()) != 0) {
+    ldLibraryPathEnv.append(":").append(SoUtils::lib_ld_path());
+  }
+
   icuDataPathEnv.append(icuDataPath);
 #if PRINT_LOG_CACHEFILE
   mcfile << "jsengine ldLibraryPathEnv:" << ldLibraryPathEnv << " icuDataPathEnv:" << icuDataPathEnv
          << std::endl;
 #endif
-  if (!s_cacheDir) {
-    crashFilePathEnv.append("/data/data/com.taobao.taobao/cache");
-  } else {
-    crashFilePathEnv.append(s_cacheDir);
-  }
-  crashFilePathEnv.append("/jsserver_crash");
   char fdStr[16];
-  snprintf(fdStr, 16, "%d", fd);
+  char fdServerStr[16];
+  snprintf(fdStr, 16, "%d", fdClient);
+  snprintf(fdServerStr, 16, "%d", fdServer);
   EnvPBuilder envpBuilder;
   envpBuilder.addNew(ldLibraryPathEnv.c_str());
   envpBuilder.addNew(icuDataPathEnv.c_str());
-  envpBuilder.addNew(crashFilePathEnv.c_str());
   auto envp = envpBuilder.build();
   {
     std::string executableName = executablePath + '/' + "libweexjsb64.so";
     chmod(executableName.c_str(), 0755);
-    const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", nullptr};
+    const char *argv[] = {executableName.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0", g_crashFileName.c_str(), nullptr};
     if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                      const_cast<char *const *>(envp.get()))) {
     }
@@ -323,7 +498,7 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
            << result << " startupPie:" << startupPie << std::endl;
 #endif
     if (result == -1) {
-      executableName = std::string(s_cacheDir) + '/' + start_so;
+      executableName = std::string(SoUtils::cache_dir()) + '/' + start_so;
       int result_cache = access(executableName.c_str(), 00);
       if (result_cache == -1) {
         std::string sourceSo = executablePath + '/' + start_so;
@@ -338,7 +513,7 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
       mcfile << "jsengine WeexJSConnection::doExec start path on sdcard, start execve so name:"
              << executableName << std::endl;
 #endif
-      const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", nullptr};
+      const char *argv[] = {executableName.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0", g_crashFileName.c_str(), nullptr};
       if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                        const_cast<char *const *>(envp.get()))) {
 #if PRINT_LOG_CACHEFILE
@@ -352,7 +527,7 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
       mcfile << "jsengine WeexJSConnection::doExec start execve so name:" << executableName
              << std::endl;
 #endif
-      const char *argv[] = {executableName.c_str(), fdStr, traceEnable ? "1" : "0", nullptr};
+      const char *argv[] = {executableName.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0", g_crashFileName.c_str(), nullptr};
       if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                        const_cast<char *const *>(envp.get()))) {
 #if PRINT_LOG_CACHEFILE
@@ -367,7 +542,7 @@ void doExec(int fd, bool traceEnable, bool startupPie) {
 #endif
 }
 
-static void closeAllButThis(int exceptfd) {
+static void closeAllButThis(int exceptfd, int fd2) {
   DIR *dir = opendir("/proc/self/fd");
   if (!dir) {
     return;
@@ -392,7 +567,7 @@ static void closeAllButThis(int exceptfd) {
       continue;
     if (curFd <= 2)
       continue;
-    if ((curFd != dirFd) && (curFd != exceptfd)) {
+    if ((curFd != dirFd) && (curFd != exceptfd) && (curFd != fd2)) {
       close(curFd);
     }
   }

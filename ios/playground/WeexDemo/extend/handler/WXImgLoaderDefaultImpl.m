@@ -19,6 +19,8 @@
 
 #import "WXImgLoaderDefaultImpl.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import "WXLog.h"
+#import "WXSDKManager.h"
 
 #define MIN_IMAGE_WIDTH 36
 #define MIN_IMAGE_HEIGHT 36
@@ -48,6 +50,7 @@
 
 - (id<WXImageOperationProtocol>)downloadImageWithURL:(NSString *)url imageFrame:(CGRect)imageFrame userInfo:(NSDictionary *)userInfo completed:(void(^)(UIImage *image,  NSError *error, BOOL finished))completedBlock
 {
+    [self _recoredImgLoad:url options:userInfo];
     if ([url hasPrefix:@"//"]) {
         url = [@"http:" stringByAppendingString:url];
     }
@@ -57,11 +60,13 @@
         if (completedBlock) {
             completedBlock(image, error, finished);
         }
+        [self _recoredFinish:imageURL error:error loadOptions:userInfo];
     }];
 }
 
 - (void)setImageViewWithURL:(UIImageView *)imageView url:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(NSDictionary *)options progress:(void (^)(NSInteger, NSInteger))progressBlock completed:(void (^)(UIImage *, NSError *, WXImageLoaderCacheType, NSURL *))completedBlock
 {
+    [self _recoredImgLoad:url.absoluteString options:options];
     SDWebImageOptions sdWebimageOption = SDWebImageRetryFailed;
     if (options && options[@"sdWebimageOption"]) {
         [options[@"sdWebimageOption"] intValue];
@@ -75,7 +80,40 @@
         if (completedBlock) {
             completedBlock(image, error, (WXImageLoaderCacheType)cacheType, imageURL);
         }
+        [self _recoredFinish:imageURL error:error loadOptions:options];
     }];
+}
+
+- (void) _recoredImgLoad:(NSString *)url options:(NSDictionary *)options
+{
+    if (nil == url) {
+        return;
+    }
+    NSString* instanceId = [options objectForKey:@"instanceId"];
+    if (nil == instanceId) {
+        WXLogWarning(@"please set instanceId in userInfo,for url %@:",url);
+        return;
+    }
+    WXSDKInstance* instance =[WXSDKManager instanceForID:instanceId];
+    if (nil == instance) {
+        return;
+    }
+    [instance.apmInstance updateDiffStats:KEY_PAGE_STATS_IMG_LOAD_NUM withDiffValue:1];
+}
+
+- (void) _recoredFinish:(NSURL*)imgUrl error:(NSError*)error loadOptions:(NSDictionary*)options
+{
+    NSString* instanceId = [options objectForKey:@"instanceId"];
+    if (nil == instanceId) {
+        WXLogWarning(@"please set instanceId in userInfo,for url %@:",imgUrl.absoluteString);
+        return;
+    }
+    WXSDKInstance* instance =[WXSDKManager instanceForID:instanceId];
+    if (nil == instance) {
+        return;
+    }
+    bool loadSucceed = error == nil;
+    [instance.apmInstance actionImgLoadResult:loadSucceed withErrorCode:nil];
 }
 
 @end

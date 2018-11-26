@@ -22,6 +22,8 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.PopupMenu;
 import android.text.Layout;
@@ -78,6 +80,11 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
   }
 
   @Override
+  public WXGesture getGestureListener() {
+    return wxGesture;
+  }
+
+  @Override
   public CharSequence getText() {
     return textLayout.getText();
   }
@@ -110,6 +117,22 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
       }
     }
 
+  }
+
+  /**
+   * Sets the text color for the text layout, it will be invalid
+   * when {@link #setTextLayout(Layout)} happens, and color has to be
+   * reset.
+   *
+   * @see #setTextLayout(Layout)
+   *
+   * @param color A color value in the form 0xAARRGGBB.
+   */
+  public void setTextColor(@ColorInt int color) {
+    Layout layout = getTextLayout();
+    if (layout != null) {
+      layout.getPaint().setColor(color);
+    }
   }
 
   @Override

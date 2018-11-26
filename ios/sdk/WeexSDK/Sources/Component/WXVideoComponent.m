@@ -39,9 +39,9 @@
 
 @interface WXVideoView()
 
-@property (nonatomic, strong) UIViewController* playerViewController;
-@property (nonatomic, strong) AVPlayerItem* playerItem;
-@property (nonatomic, strong) WXSDKInstance* weexSDKInstance;
+@property (nonatomic, strong) UIViewController *playerViewController;
+@property (nonatomic, strong) AVPlayerItem *playerItem;
+@property (nonatomic, strong) WXSDKInstance *weexSDKInstance;
 @property (nonatomic, strong) UIImageView *posterImageView;
 @property (nonatomic, strong) id<WXImageOperationProtocol> imageOperation;
 @property (nonatomic, assign) BOOL playerDidPlayed;
@@ -192,14 +192,18 @@
     }
 }
 
-- (void)setPosterURL:(NSURL *)posterURL {
+- (void)setPosterURL:(NSURL *)posterURL
+{
     if (!posterURL) {
         return;
     }
     
     [self cancelImage];
     __weak typeof(self) weakSelf = self;
-    weakSelf.imageOperation = [[self imageLoader] downloadImageWithURL:posterURL.absoluteString imageFrame:self.posterImageView.frame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {
+    weakSelf.imageOperation = [[self imageLoader] downloadImageWithURL:posterURL.absoluteString imageFrame:self.posterImageView.frame
+                                                              userInfo:@{@"instanceId":self.weexSDKInstance.instanceId}
+                                                             completed:^(UIImage *image, NSError *error, BOOL finished)
+    {
         dispatch_async(dispatch_get_main_queue(), ^{
             __strong typeof(self) strongSelf = weakSelf;
             if (!error) {
@@ -208,6 +212,19 @@
             }
         });
     }];
+}
+
+- (void)setControlShow:(BOOL)showControl
+{
+    if ([self greater8SysVer]) {
+        AVPlayerViewController *AVVC = (AVPlayerViewController*)_playerViewController;
+        AVVC.showsPlaybackControls = showControl;
+    }
+    else
+    {
+        MPMoviePlayerViewController *MPVC = (MPMoviePlayerViewController*)_playerViewController;
+        MPVC.moviePlayer.controlStyle = showControl ? MPMovieControlStyleEmbedded : MPMovieControlStyleNone;
+    }
 }
 
 - (void)playFinish
@@ -290,6 +307,7 @@
 @property (nonatomic, strong) NSURL *posterURL;
 @property (nonatomic) BOOL autoPlay;
 @property (nonatomic) BOOL playStatus;
+@property (nonatomic) BOOL showControl;
 
 @end
 
@@ -313,31 +331,28 @@
         if (attributes[@"poster"]) {
             _posterURL = [NSURL URLWithString: attributes[@"poster"]];
         }
+        if (attributes[@"controls"]) {
+            _showControl = ![attributes[@"controls"] isEqualToString:@"nocontrols"];
+        }
     }
     return self;
 }
 
--(UIView *)loadView
+- (UIView *)loadView
 {
     WXVideoView* videoView = [[WXVideoView alloc] init];
     videoView.weexSDKInstance = self.weexInstance;
-    
     return videoView;
 }
 
--(void)viewDidLoad
+- (void)viewDidLoad
 {
     _videoView = (WXVideoView *)self.view;
+    _videoView.layer.mask = [self drawBorderRadiusMaskLayer:_videoView.bounds];
     [_videoView setURL:_videoURL];
     [_videoView setPosterURL:_posterURL];
-    if (_playStatus) {
-        [_videoView play];
-    } else {
-        [_videoView pause];
-    }
-    if (_autoPlay) {
-        [_videoView play];
-    }
+    [_videoView setControlShow:_showControl];
+    
     __weak __typeof__(self) weakSelf = self;
     _videoView.posterClickHandle = ^{
         [weakSelf.videoView play];
@@ -364,9 +379,17 @@
         }
         [weakSelf fireEvent:eventType params:nil];
     };
+    if (_playStatus) {
+        [_videoView play];
+    } else {
+        [_videoView pause];
+    }
+    if (_autoPlay) {
+        [_videoView play];
+    }
 }
 
--(void)updateAttributes:(NSDictionary *)attributes
+- (void)updateAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"src"]) {
         _videoURL = [NSURL URLWithString: attributes[@"src"]];
@@ -387,6 +410,10 @@
     if (attributes[@"poster"]) {
         _posterURL = [NSURL URLWithString: attributes[@"poster"]];
         [_videoView setPosterURL:_posterURL];
+    }
+    if (attributes[@"controls"]) {
+        _showControl = ![attributes[@"controls"] isEqualToString:@"nocontrols"];
+        [_videoView setControlShow:_showControl];
     }
 }
 

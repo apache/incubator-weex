@@ -27,6 +27,7 @@ import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.ui.action.GraphicActionAnimation;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.list.template.TemplateDom;
 
 public class WXAnimationModule extends WXModule {
 
@@ -35,10 +36,13 @@ public class WXAnimationModule extends WXModule {
     if (!TextUtils.isEmpty(ref) && !TextUtils.isEmpty(animation) && mWXSDKInstance != null) {
       //Due to animation module rely on the result of the css-layout and the batch mechanism of
       //css-layout, the animation.transition must be delayed the batch time.
-      GraphicActionAnimation action = new GraphicActionAnimation(mWXSDKInstance.getInstanceId(), ref, animation, callBack);
+      GraphicActionAnimation action = new GraphicActionAnimation(mWXSDKInstance, ref, animation, callBack);
       WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
     }
   }
+
+
+ 
 
   //add by moxun on 12/26/2016
   public static class AnimationHolder {
@@ -48,7 +52,7 @@ public class WXAnimationModule extends WXModule {
 
     public void execute(WXSDKInstance instance, WXComponent component) {
       if (null != instance && null != component) {
-        GraphicActionAnimation action = new GraphicActionAnimation(instance.getInstanceId(), component.getRef(), wxAnimationBean, callback);
+        GraphicActionAnimation action = new GraphicActionAnimation(instance, component.getRef(), wxAnimationBean, callback);
         WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
     }

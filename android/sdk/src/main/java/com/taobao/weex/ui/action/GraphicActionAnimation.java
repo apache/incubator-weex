@@ -41,12 +41,14 @@ import android.view.animation.LinearInterpolator;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.animation.BackgroundColorProperty;
 import com.taobao.weex.ui.animation.HeightProperty;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.animation.WidthProperty;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.list.template.TemplateDom;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.SingleFunctionParser;
 import com.taobao.weex.utils.WXLogUtils;
@@ -61,6 +63,8 @@ public class GraphicActionAnimation extends BasicGraphicAction {
 
   private final static String TAG = "GraphicActionAnimation";
 
+  private final boolean styleNeedInit;
+
   @Nullable
   private
   final String callback;
@@ -69,23 +73,26 @@ public class GraphicActionAnimation extends BasicGraphicAction {
   private
   WXAnimationBean mAnimationBean;
 
-  public GraphicActionAnimation(@NonNull String pageId, @NonNull String ref, @NonNull WXAnimationBean animationBean) {
-    super(pageId, ref);
+  public GraphicActionAnimation(@NonNull WXSDKInstance instance, @NonNull String ref, @NonNull WXAnimationBean animationBean) {
+    super(instance, ref);
+    this.styleNeedInit = false;
     this.callback = null;
     this.mAnimationBean = animationBean;
   }
 
-  public GraphicActionAnimation(@NonNull String pageId, @NonNull String ref, @Nullable String animation,
+  public GraphicActionAnimation(@NonNull WXSDKInstance instance, @NonNull String ref, @Nullable String animation,
                                 @Nullable final String callBack) {
-    super(pageId, ref);
+    super(instance, ref);
+    this.styleNeedInit = true;
     this.callback = callBack;
     if (!TextUtils.isEmpty(animation)) {
       this.mAnimationBean = JSONObject.parseObject(animation, WXAnimationBean.class);
     }
   }
-  public GraphicActionAnimation(@NonNull String pageId, @NonNull String ref, @NonNull WXAnimationBean animationBean,
+  public GraphicActionAnimation(@NonNull WXSDKInstance instance, @NonNull String ref, @NonNull WXAnimationBean animationBean,
                                 @Nullable final String callBack) {
-    super(pageId, ref);
+    super(instance, ref);
+    this.styleNeedInit = false;
     this.mAnimationBean = animationBean;
     this.callback = callBack;
   }
@@ -98,7 +105,13 @@ public class GraphicActionAnimation extends BasicGraphicAction {
 
     WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
     if (component == null) {
-      return;
+      if(!TemplateDom.isVirtualDomRef(getRef())){
+        return;
+      }
+      component = TemplateDom.findVirtualComponentByVRef(getPageId(), getRef());
+      if(component == null){
+        return;
+      }
     }
 
     WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
@@ -107,12 +120,23 @@ public class GraphicActionAnimation extends BasicGraphicAction {
     }
 
     if (null != mAnimationBean.styles) {
-      mAnimationBean.styles.init(mAnimationBean.styles.transformOrigin,
-              mAnimationBean.styles.transform, (int) component.getLayoutWidth(), (int) component.getLayoutHeight(),
-              instance.getInstanceViewPortWidth());
+      if(styleNeedInit) {
+        // Synchronize transformOrigin between component styles and animation style before
+        // animation start.
+        String transformOrigin = (String) component.getStyles().get(Constants.Name.TRANSFORM_ORIGIN);
+        if (TextUtils.isEmpty(mAnimationBean.styles.transformOrigin)) {
+          mAnimationBean.styles.transformOrigin = transformOrigin;
+        }
+        mAnimationBean.styles.init(mAnimationBean.styles.transformOrigin,
+            mAnimationBean.styles.transform, (int) component.getLayoutWidth(),
+            (int) component.getLayoutHeight(),
+            instance.getInstanceViewPortWidth(), instance);
+      }
       startAnimation(instance, component);
     }
   }
+
+
 
   private void startAnimation(@NonNull WXSDKInstance instance, @Nullable WXComponent component) {
     if (component != null) {
@@ -262,5 +286,4 @@ public class GraphicActionAnimation extends BasicGraphicAction {
     }
     return null;
   }
-
 }

@@ -27,3 +27,6 @@
 - (void)setIndicatorView:(WXIndicatorView *)indicatorView;
 
 @end
+@interface WXRecycleSliderScrollView: UIScrollView
+@end
+

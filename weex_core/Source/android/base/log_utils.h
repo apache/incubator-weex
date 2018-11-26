@@ -19,22 +19,46 @@
 #ifndef _LOG_UTILS_H_
 #define _LOG_UTILS_H_
 
+#if !defined(__APPLE__)
 #include <android/log.h>
+#endif
 
 #define LOG_TAG "WeexCore"
+
+#if defined(__APPLE__)
+
+#define LOGE(...)    printf(__VA_ARGS__);printf("\n")
+#define LOGA(...)    printf(__VA_ARGS__);printf("\n")
+#define LOGD(...)    printf(__VA_ARGS__);printf("\n")
+
+#else
 
 #define LOGE(...)    __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #define LOGA(...)    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define LOGD(...)    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+
+#endif
 //#define DEBUG
 
 #ifdef DEBUG
+
+#if defined(__APPLE__)
+
+#define LOGV(...)     printf(__VA_ARGS__);printf("\n")
+#define LOGD(...)     printf(__VA_ARGS__);printf("\n")
+#define LOGI(...)     printf(__VA_ARGS__);printf("\n")
+#define LOGW(...)     printf(__VA_ARGS__);printf("\n")
+#define LOG_LINE LOGV("%s, %d", __func__, __LINE__)
+
+#else
 
 #define LOGV(...) 	__android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define LOGD(...) 	__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define LOGI(...) 	__android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
 #define LOG_LINE LOGV("%s, %d", __func__, __LINE__)
+
+#endif
 
 #else
 
@@ -44,12 +68,6 @@
 #define LOGW(...) ((void) 0)
 #define LOG_LINE
 
-#endif
-
-#ifndef DISALLOW_COPY_AND_ASSIGN
-#define DISALLOW_COPY_AND_ASSIGN(TypeName)  \
-  TypeName(const TypeName&) = delete;      \
-  void operator=(const TypeName&) = delete
 #endif
 
 #endif //_LOG_UTILS_H_

@@ -260,16 +260,17 @@
         if ([self respondsToSelector:method]) {
             @try {
                 id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+                BOOL parseTransformIfWaitUntilDone = NO;
                 if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-                    BOOL parseTransformIfWaitUntilDone = [[configCenter configForKey:@"iOS_weex_ext_config.parseTransformIfWaitUntilDone" defaultValue:@(NO) isDefault:NULL] boolValue];
-                    if (parseTransformIfWaitUntilDone) {
-                        [self performSelectorOnMainThread:method withObject:value waitUntilDone:YES];
-                    }
-                    else{
-                        IMP imp = [self methodForSelector:method];
-                        void (*func)(id, SEL,NSArray *) = (void *)imp;
-                        func(self, method,value);
-                    }
+                    parseTransformIfWaitUntilDone = [[configCenter configForKey:@"iOS_weex_ext_config.parseTransformIfWaitUntilDone" defaultValue:@(NO) isDefault:NULL] boolValue];
+                }
+                if (parseTransformIfWaitUntilDone) {
+                    [self performSelectorOnMainThread:method withObject:value waitUntilDone:YES];
+                }
+                else{
+                    IMP imp = [self methodForSelector:method];
+                    void (*func)(id, SEL,NSArray *) = (void *)imp;
+                    func(self, method,value);
                 }
             }
             @catch (NSException *exception) {
@@ -406,12 +407,12 @@
 
 - (void)parseScalex:(NSArray *)value
 {
-    [self parseScale:@[value[0], @1]];
+	_scaleX = [value[0] doubleValue];
 }
 
 - (void)parseScaley:(NSArray *)value
 {
-    [self parseScale:@[@1, value[0]]];
+	_scaleY = [value[0] doubleValue];
 }
 
 // Angle in radians

@@ -18,9 +18,12 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.support.annotation.NonNull;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.component.WXComponent;
 
 /**
@@ -31,40 +34,33 @@ public class GraphicActionCreateFinish extends BasicGraphicAction {
   private int mLayoutWidth;
   private int mLayoutHeight;
 
-  public GraphicActionCreateFinish(String pageId) {
-    super(pageId, "");
-    final WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(pageId);
-    if (instance == null) {
-      return;
-    }
+  public GraphicActionCreateFinish(@NonNull WXSDKInstance instance) {
+    super(instance, "");
     WXComponent component = instance.getRootComponent();
     if (null != component) {
         this.mLayoutWidth = (int) component.getLayoutWidth();
         this.mLayoutHeight = (int) component.getLayoutHeight();
     }
-
-    // todo add LayoutFinishListener
-//    final LayoutFinishListener listener;
-//    if(instance != null && (listener = instance.getLayoutFinishListener()) != null) {
-//      WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(WXThread.secure(new Runnable() {
-//          @Override
-//          public void run() {
-//              listener.onLayoutFinish(instance);
-//          }
-//      }),0);
-//    }
+    instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH);
+    instance.getApmForInstance().extInfo.put(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH,true);
   }
 
   @Override
   public void executeAction() {
-    final WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
+    final WXSDKInstance instance = getWXSDKIntance();
     if (instance == null || instance.getContext() == null) {
       return;
     }
 
+    instance.mHasCreateFinish = true;
+
     if (instance.getRenderStrategy() == WXRenderStrategy.APPEND_ONCE) {
       instance.onCreateFinish();
     }
-    instance.onRenderSuccess(mLayoutWidth, mLayoutHeight);
+
+    if (null != instance.getWXPerformance()){
+      instance.getWXPerformance().callCreateFinishTime = System.currentTimeMillis()-instance.getWXPerformance().renderTimeOrigin;
+    }
+    instance.onOldFsRenderTimeLogic();
   }
 }

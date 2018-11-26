@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include <math.h>
 #include "core/render/node/render_object.h"
 #include "base/ViewUtils.h"
 #include "core/css/constants_name.h"
@@ -28,7 +30,7 @@
 
 namespace WeexCore {
 
-RenderObject::RenderObject() {
+RenderObject::RenderObject() : parent_render_(nullptr) {
   this->styles_ = new std::map<std::string, std::string>();
   this->attributes_ = new std::map<std::string, std::string>();
   this->events_ = new std::set<std::string>();
@@ -57,7 +59,6 @@ RenderObject::~RenderObject() {
     RenderObject *child = static_cast<RenderObject *>(*it);
     if (child != nullptr) {
       delete child;
-      child = nullptr;
     }
   }
 }
@@ -72,7 +73,6 @@ void RenderObject::ApplyDefaultStyle() {
 
   if (style != nullptr) {
     delete style;
-    style = nullptr;
   }
 }
 
@@ -87,38 +87,51 @@ void RenderObject::ApplyDefaultAttr() {
 
   if (attrs != nullptr) {
     delete attrs;
-    attrs = nullptr;
   }
 }
 
-WXCoreSize measureFunc_Impl(WXCoreLayoutNode *node, float width,
+static WXCoreSize measureFunc_Impl(WXCoreLayoutNode *node, float width,
                             MeasureMode widthMeasureMode, float height,
                             MeasureMode heightMeasureMode) {
   WXCoreSize size;
   size.height = 0;
   size.width = 0;
 
-  if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
-    return size;
-
-  return WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->Measure(
-      node, width, widthMeasureMode, height, heightMeasureMode);
+  if (!node->haveMeasureFunc()) return size;
+  return WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->platform_side()
+      ->InvokeMeasureFunction(
+          static_cast<RenderObject *>(node)->page_id().c_str(),
+          reinterpret_cast<intptr_t>(node), width, widthMeasureMode, height,
+          heightMeasureMode);
 }
 
 void RenderObject::BindMeasureFunc() { setMeasureFunc(measureFunc_Impl); }
 
 void RenderObject::OnLayoutBefore() {
-  if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
-    return;
-  WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutBefore(
-      this);
+  if (!haveMeasureFunc()) return;
+  WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->platform_side()
+      ->InvokeLayoutBefore(page_id().c_str(), reinterpret_cast<intptr_t>(this));
+}
+    
+void RenderObject::OnLayoutPlatform() {
+  if (!getNeedsPlatformDependentLayout()) return;
+  WeexCoreManager::Instance()
+    ->getPlatformBridge()
+    ->platform_side()
+    ->InvokeLayoutPlatform(page_id().c_str(), reinterpret_cast<intptr_t>(this));
 }
 
 void RenderObject::OnLayoutAfter(float width, float height) {
-  if (WeexCoreManager::getInstance()->GetMeasureFunctionAdapter() == nullptr)
-    return;
-  WeexCoreManager::getInstance()->GetMeasureFunctionAdapter()->LayoutAfter(
-      this, width, height);
+  if (!haveMeasureFunc()) return;
+  WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->platform_side()
+      ->InvokeLayoutAfter(page_id().c_str(), reinterpret_cast<intptr_t>(this),
+                          width, height);
 }
 
 StyleType RenderObject::ApplyStyle(const std::string &key,
@@ -147,6 +160,13 @@ StyleType RenderObject::ApplyStyle(const std::string &key,
       }
     }
     return kTypeLayout;
+  } else if (key == DIRECTION) {
+    WeexCore::WXCoreDirection direction = GetWXCoreDirection(value);
+    if (direction ==  WeexCore::kDirectionInherit && this->is_root_render_ ) {
+        direction = WeexCore::kDirectionLTR;
+    } 
+    setDirection(direction, updating);
+    return kTypeInheritableLayout;
   } else if (key == FLEX_DIRECTION) {
     setFlexDirection(GetWXCoreFlexDirection(value), updating);
     return kTypeLayout;
@@ -347,7 +367,9 @@ bool RenderObject::UpdateStyleInternal(const std::string key,
     functor(fallback);
     ret = true;
   } else {
-    float fvalue = getFloatByViewport(value, RenderManager::GetInstance()->viewport_width());
+    float fvalue = getFloatByViewport(value,
+                                      RenderManager::GetInstance()->viewport_width(page_id()),
+                                      RenderManager::GetInstance()->round_off_deviation(page_id()));
     if (!isnan(fvalue)) {
       functor(fvalue);
       ret = true;
@@ -365,6 +387,19 @@ void RenderObject::LayoutBeforeImpl() {
     RenderObject *child = static_cast<RenderObject *>(*it);
     if (child != nullptr) {
       child->LayoutBeforeImpl();
+    }
+  }
+}
+    
+void RenderObject::LayoutPlatformImpl() {
+  if (hasNewLayout()) {
+    OnLayoutPlatform();
+  }
+
+  for (auto it = ChildListIterBegin(); it != ChildListIterEnd(); it++) {
+    RenderObject *child = static_cast<RenderObject *>(*it);
+    if (child != nullptr) {
+      child->LayoutPlatformImpl();
     }
   }
 }
@@ -403,7 +438,7 @@ void RenderObject::MapInsertOrAssign(
 bool RenderObject::ViewInit() {
   return (!isnan(getStyleWidth()) && getStyleWidth() > 0) ||
          (is_root_render() && GetRenderPage() != nullptr &&
-             GetRenderPage()->is_render_container_width_wrap_content());
+          GetRenderPage()->is_render_container_width_wrap_content());
 }
 
 RenderPage *RenderObject::GetRenderPage() {
@@ -443,7 +478,7 @@ StyleType RenderObject::AddStyle(std::string key, std::string value) {
 }
 
 void RenderObject::AddEvent(std::string event) {
-  if (this->events_ == nullptr || this->events_->empty()) {
+  if (this->events_ == nullptr) {
     this->events_ = new std::set<std::string>();
   }
   this->events_->insert(event);

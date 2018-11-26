@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.action;
 
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXComponent;
@@ -30,8 +31,8 @@ public class GraphicActionScrollToElement extends BasicGraphicAction {
 
   private final JSONObject mOptions;
 
-  public GraphicActionScrollToElement(String pageId, String ref, JSONObject options) {
-    super(pageId, ref);
+  public GraphicActionScrollToElement(WXSDKInstance instance, String ref, JSONObject options) {
+    super(instance, ref);
     this.mOptions = options;
   }
 

@@ -336,7 +336,7 @@ public class WXTransition {
         List<PropertyValuesHolder> holders = new ArrayList<>(8);
         String transform  = WXUtils.getString(transformPendingUpdates.remove(Constants.Name.TRANSFORM), null);
         if(!TextUtils.isEmpty(transform)){
-            Map<Property<View,Float>, Float>  properties = TransformParser.parseTransForm(transform, (int)mWXComponent.getLayoutWidth(), (int)mWXComponent.getLayoutHeight(), mWXComponent.getViewPortWidth());
+            Map<Property<View,Float>, Float>  properties = TransformParser.parseTransForm(mWXComponent.getInstanceId(), transform, (int)mWXComponent.getLayoutWidth(), (int)mWXComponent.getLayoutHeight(), mWXComponent.getViewPortWidth());
             PropertyValuesHolder[]  transformHolders = TransformParser.toHolders(properties);
             for(PropertyValuesHolder holder : transformHolders){
                 holders.add(holder);
@@ -472,22 +472,22 @@ public class WXTransition {
             }
             break;
             case Constants.Name.LEFT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.LEFT,  mWXComponent.getPadding().get(CSSShorthand.EDGE.LEFT),
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.LEFT,  mWXComponent.getLayoutPosition().getLeft(),
                         WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.RIGHT:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.RIGHT,  mWXComponent.getPadding().get(CSSShorthand.EDGE.RIGHT),
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.RIGHT,  mWXComponent.getLayoutPosition().getRight(),
                         WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.BOTTOM:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.BOTTOM,  mWXComponent.getPadding().get(CSSShorthand.EDGE.BOTTOM),
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.BOTTOM,  mWXComponent.getLayoutPosition().getBottom(),
                         WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.TOP:{
-                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  mWXComponent.getPadding().get(CSSShorthand.EDGE.TOP),
+                holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  mWXComponent.getLayoutPosition().getTop(),
                         WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;

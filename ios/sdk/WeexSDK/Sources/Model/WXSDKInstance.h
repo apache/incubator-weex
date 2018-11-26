@@ -23,6 +23,7 @@
 #import "WXResourceResponse.h"
 #import "WXResourceRequest.h"
 #import "WXBridgeProtocol.h"
+#import "WXApmForInstance.h"
 
 extern NSString *const bundleUrlOptionKey;
 
@@ -74,6 +75,16 @@ extern NSString *const bundleUrlOptionKey;
  * Which indicates current instance needs to be prerender or not,default value is false.
  **/
 @property (nonatomic, assign) BOOL needPrerender;
+
+/**
+ * Custom info.
+ **/
+@property (nonatomic, strong) NSDictionary* containerInfo;
+
+/**
+ * Whether this instance is rendered or not. Please MUST not render an instance twice even if you have called destroyInstance.
+ **/
+@property (nonatomic, assign, readonly) BOOL isRendered;
 
 /**
  * The state of current instance.
@@ -139,6 +150,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSString * bundleType;
 
 /**
+ *  Which decide whether to use data render,default value is false
+ */
+@property (nonatomic, assign, readonly) BOOL dataRender;
+
+/**
  *  The callback triggered when the instance fails to render.
  *
  *  @return A block that takes a NSError argument, which is the error occured
@@ -185,6 +201,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  */
 @property (nonatomic, copy) BOOL (^onRenderTerminateWhenJSDownloadedFinish)(WXResourceResponse *response,WXResourceRequest *request,NSData *data, NSError* error);
 
+@property(nonatomic,strong) NSDictionary* continerInfo;
 
 /**
  *  the frame of current instance.
@@ -241,7 +258,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  *
  * @param data The data the bundle needs when rendered. Defalut is nil.
  **/
-- (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data;
+- (void)renderView:(id)source options:(NSDictionary *)options data:(id)data;
 
 /**
  * Reload the js bundle from the current URL and rerender.
@@ -259,7 +276,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 - (void)refreshInstance:(id)data;
 
 /**
- * Destroys current instance.
+ * Destroys current instance. An instance destroyed should not be used for rendering again, please create another instance.
  **/
 - (void)destroyInstance;
 
@@ -283,6 +300,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  */
 - (NSUInteger)numberOfComponents;
 
+/**
+ * Enumerate components using breadth-first search algorithm,
+ must be called on component thread by calling WXPerformBlockOnComponentThread
+ */
+- (void)enumerateComponentsUsingBlock:(void (^)(WXComponent *component, BOOL *stop))block;
 
 /**
  * check whether the module eventName is registered
@@ -308,17 +330,28 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 - (NSURL *)completeURL:(NSString *)url;
 
 /**
+ * jsbundle str ,may be nil (weak)
+ */
+- (NSString*) bundleTemplate;
+
+/**
  * application performance statistics
  */
 @property (nonatomic, strong) NSString *bizType;
 @property (nonatomic, strong) NSString *pageName;
 @property (nonatomic, weak) id pageObject;
+//Deprecated, use @WXApmForInstance
 @property (nonatomic, strong) NSMutableDictionary *performanceDict;
+
+@property (nonatomic ,strong) WXApmForInstance* apmInstance;
+
 
 
 /** 
  * Deprecated 
  */
+
+
 @property (nonatomic, strong) NSDictionary *properties DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, assign) NSTimeInterval networkTime DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, copy) void (^updateFinish)(UIView *);

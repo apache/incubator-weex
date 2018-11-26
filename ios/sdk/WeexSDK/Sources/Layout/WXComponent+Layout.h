@@ -20,11 +20,12 @@
 #import "WXComponent.h"
 #import "WXSDKInstance.h"
 #import "WXUtility.h"
-#import "WXCoreLayout.h"
 
 #define FlexUndefined NAN
 
 #ifdef __cplusplus
+#include "layout.h"
+
 extern "C" {
 #endif
     bool flexIsUndefined(float value);
@@ -38,10 +39,11 @@ extern "C" {
 #ifdef __cplusplus
     WeexCore::WXCoreLayoutNode *_flexCssNode;
 #endif // __cplusplus
-    BOOL _isLayoutDirty;
+
     CGRect _calculatedFrame;
     CGPoint _absolutePosition;
     WXPositionType _positionType;
+    BOOL _isLastLayoutDirectionRTL;
 }
 
 /**
@@ -53,13 +55,28 @@ extern "C" {
 @property(nonatomic, readonly, assign) WeexCore::WXCoreLayoutNode *flexCssNode;
 #endif
 
-@end
+/**
+ * @abstract Convert layout dimension value like 'left', 'width' to style value in js considering viewport and scale.
+ */
+- (NSString*)convertLayoutValueToStyleValue:(NSString*)valueName;
 
-@interface WXComponent (Layout)
-- (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index;
-- (void)_rmChildCssNode:(WXComponent*)subcomponent;
-- (NSInteger) getActualNodeIndex:(WXComponent*)subcomponent atIndex:(NSInteger) index;
-#ifdef __cplusplus
-+ (void) recycleNodeOnComponentThread:(WeexCore::WXCoreLayoutNode * ) garbageNode gabRef:(NSString *)ref;
-#endif
+/**
+ * @abstract Get style width of a container(scroller like) with safe value. No NAN, No zero.
+ */
+- (CGFloat)safeContainerStyleWidth;
+
+/**
+ * @abstract Delete css node of a subcomponent.
+ */
+- (void)removeSubcomponentCssNode:(WXComponent *)subcomponent;
+
+#pragma mark - RTL
+
+@property (nonatomic, assign, readonly) BOOL isDirectionRTL;
+
+// Now we scrollView RTL solution is tranform
+// so scrollView need tranform subviews when RTL by default
+// if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
+- (BOOL)shouldTransformSubviewsWhenRTL;
+
 @end

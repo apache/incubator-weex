@@ -32,6 +32,16 @@
 @interface WXComponentFactory : NSObject
 
 /**
+ * @abstract Register an affine base type to weex core. So that all subclasses of clazz will use this type to render.
+ *  For example: WXNestedListComponent is a subclass of WXListComponent and uses type of 'nested-list'.
+ *  It should be rendered using RenderList in weexcore.
+ *
+ * @param typeName weex core type identifier
+ * @param clazz The WXComponent subclass to register
+ */
++ (void)registerBaseType:(NSString *)typeName withClass:(Class)clazz;
+
+/**
  * @abstract Register a component for a given name
  *
  * @param name The component name to register;

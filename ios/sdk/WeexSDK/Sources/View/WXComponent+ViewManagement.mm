@@ -99,6 +99,17 @@ do {\
     if (subcomponent.displayType == WXDisplayTypeNone) {
         return;
     }
+    
+    if (_isViewTreeIgnored) {
+        // self not added to views, children also ignored.
+        subcomponent->_isViewTreeIgnored = YES;
+        return;
+    }
+    
+    if (subcomponent->_isViewTreeIgnored) {
+        // children not added to views, such as div in list, we do not create view.
+        return;
+    }
   
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (subcomponent->_positionType == WXPositionTypeFixed) {
@@ -175,6 +186,7 @@ do {\
         _lastBoxShadow = _boxShadow;
     }
 }
+
 - (void)_transitionUpdateViewProperty:(NSDictionary *)styles
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
@@ -229,12 +241,8 @@ do {\
         WXPerformBlockOnComponentThread(^{
             if (positionType == WXPositionTypeFixed) {
                 [self.weexInstance.componentManager addFixedComponent:self];
-                _isNeedJoinLayoutSystem = NO;
-                [self.supercomponent _recomputeCSSNodeChildren];
             } else if (_positionType == WXPositionTypeFixed) {
                 [self.weexInstance.componentManager removeFixedComponent:self];
-                _isNeedJoinLayoutSystem = YES;
-                [self.supercomponent _recomputeCSSNodeChildren];
             }
             
             _positionType = positionType;
@@ -252,21 +260,28 @@ do {\
     }
     if (styles[@"transform"]) {
         id transformOrigin = styles[@"transformOrigin"] ?: self.styles[@"transformOrigin"];
-        _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:transformOrigin] instance:self.weexInstance];
+        WXTransform* transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:transformOrigin] instance:self.weexInstance];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
-            [_transform applyTransformForView:_view];
+            [transform applyTransformForView:_view];
+            [self _adjustForRTL];
             [_layer setNeedsDisplay];
         }
-    }else if (styles[@"transformOrigin"]) {
+        self.transform = transform;
+    } else if (styles[@"transformOrigin"]) {
         [_transform setTransformOrigin:[WXConvert NSString:styles[@"transformOrigin"]]];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [_transform applyTransformForView:_view];
+            [self _adjustForRTL];
             [_layer setNeedsDisplay];
         }
     }
+    // for RTL
+    if (styles[@"direction"]) {
+        [self _adjustForRTL];
+    }
 }
 
--(void)resetBorder:(NSArray *)styles
+- (void)resetBorder:(NSArray *)styles
 {
     WX_BOARD_RADIUS_RESET_ALL(borderRadius);
     WX_BOARD_RADIUS_RESET(borderTopLeftRadius);
@@ -287,7 +302,7 @@ do {\
     WX_BOARD_COLOR_RESET(borderBottomColor);
 }
 
--(void)_resetStyles:(NSArray *)styles
+- (void)_resetStyles:(NSArray *)styles
 {
     if (styles && [styles containsObject:@"backgroundColor"]) {
         _backgroundColor = [UIColor clearColor];
@@ -320,7 +335,7 @@ do {\
     
     [self _removeAllEvents];
     
-    if(self.ancestorScroller){
+    if (self.ancestorScroller) {
         [self.ancestorScroller removeStickyComponent:self];
         [self.ancestorScroller removeScrollToListener:self];
     }

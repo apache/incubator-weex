@@ -27,6 +27,7 @@ import android.util.Pair;
 import android.util.Property;
 import android.view.View;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.utils.FunctionParser;
@@ -118,10 +119,6 @@ public class WXAnimationBean {
     private List<PropertyValuesHolder> holders=new LinkedList<>();
     private float cameraDistance = Float.MAX_VALUE;
 
-    private static Map<Property<View,Float>, Float> parseTransForm(@Nullable String rawTransform, final int width,
-                                                                   final int height,final int viewportW) {
-      return  TransformParser.parseTransForm(rawTransform, width, height, viewportW);
-    }
 
     private static Pair<Float, Float> parsePivot(@Nullable String transformOrigin,
                                                  int width, int height,int viewportW) {
@@ -202,9 +199,9 @@ public class WXAnimationBean {
     }
 
     public void init(@Nullable String transformOrigin,@Nullable String rawTransform,
-                     final int width, final int height,int viewportW){
+                     final int width, final int height,int viewportW, WXSDKInstance instance){
       pivot = parsePivot(transformOrigin,width,height,viewportW);
-      transformMap.putAll(parseTransForm(rawTransform,width,height,viewportW));
+      transformMap.putAll(TransformParser.parseTransForm(instance.getInstanceId(), rawTransform, width,height,viewportW));
       resetToDefaultIfAbsent();
       if (transformMap.containsKey(CameraDistanceProperty.getInstance())) {
         cameraDistance = transformMap.remove(CameraDistanceProperty.getInstance());

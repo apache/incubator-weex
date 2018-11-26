@@ -73,6 +73,12 @@ char* wson_parser::requireDecodingBuffer(int length){
 void wson_parser::toJSONtring(std::string &builder){
     uint8_t  type = wson_next_type(wsonBuffer);
     switch (type) {
+        case WSON_UINT8_STRING_TYPE: {
+            int size = wson_next_uint(wsonBuffer);
+            uint8_t *utf8 = wson_next_bts(wsonBuffer, size);
+            builder.append(reinterpret_cast<char*>(utf8), size);
+        }
+            return;
         case WSON_STRING_TYPE:
         case WSON_NUMBER_BIG_INT_TYPE:
         case WSON_NUMBER_BIG_DECIMAL_TYPE: {
@@ -146,6 +152,12 @@ void wson_parser::toJSONtring(std::string &builder){
 std::string wson_parser::nextStringUTF8(uint8_t type) {
     std::string str;
     switch (type) {
+        case WSON_UINT8_STRING_TYPE: {
+            int size = wson_next_uint(wsonBuffer);
+            uint8_t *utf8 = wson_next_bts(wsonBuffer, size);
+            str.append(reinterpret_cast<char *>(utf8), size);
+            return str;
+        }
         case WSON_STRING_TYPE:
         case WSON_NUMBER_BIG_INT_TYPE:
         case WSON_NUMBER_BIG_DECIMAL_TYPE: {
@@ -195,6 +207,14 @@ std::string wson_parser::nextStringUTF8(uint8_t type) {
 
 double wson_parser::nextNumber(uint8_t type) {
     switch (type) {
+        case WSON_UINT8_STRING_TYPE: {
+            int size = wson_next_uint(wsonBuffer);
+            std::string str;
+            wson_next_bts(wsonBuffer, size);
+            uint8_t *utf8 = wson_next_bts(wsonBuffer, size);
+            str.append(reinterpret_cast<char *>(utf8), size);
+            return atof(str.c_str());
+        }
         case WSON_STRING_TYPE:
         case WSON_NUMBER_BIG_INT_TYPE:
         case WSON_NUMBER_BIG_DECIMAL_TYPE: {
@@ -251,6 +271,7 @@ bool wson_parser::nextBool(uint8_t type) {
 void wson_parser::skipValue(uint8_t type) {
     switch (type) {
         case WSON_STRING_TYPE:
+        case WSON_UINT8_STRING_TYPE:
         case WSON_NUMBER_BIG_INT_TYPE:
         case WSON_NUMBER_BIG_DECIMAL_TYPE: {
             int size = wson_next_uint(wsonBuffer);

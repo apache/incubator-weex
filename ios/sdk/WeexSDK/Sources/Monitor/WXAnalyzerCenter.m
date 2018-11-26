@@ -134,10 +134,11 @@
                              M_IMG_WRONG_SIZE_NUM:          [NSNumber numberWithInt:DebugAfterExist],
                              M_TIMER_NUM:                   [NSNumber numberWithInt:DebugAfterFSFinish],
                              M_INTERACTION_TIME:            [NSNumber numberWithInt:DebugAfterExist],
-                             M_COMPONENT_FS_TIME:           @(DebugAfterFSFinish),
-                             M_COMPONENT_FS_COUNT:          @(DebugAfterFSFinish),
+                             M_INTERACTION_ADD_COUNT:       @(DebugAfterFSFinish),
+                             M_INTERACTION_LIMIT_ADD_COUNT: @(DebugAfterFSFinish),
                              COMPONENTCOUNT:                @(DebugAfterExist),
-                             M_COMPONENT_TIME:              @(DebugAfterExist)
+                             M_COMPONENT_TIME:              @(DebugAfterExist),
+                             M_NEW_FS_RENDER_TIME:                  @(DebugAfterExist),
                              };
         
     });
@@ -199,9 +200,9 @@
         return;
     }
     NSDictionary *dic= @{
-                         @"errorCode":errorInfo.errorCode,
+                         @"errorCode":errorInfo.errorCode?:@"-1",
                          @"errorGroup":@"",
-                         @"errorMsg":errorInfo.exception
+                         @"errorMsg":errorInfo.exception?:@"unSetException"
                          };
     
     [self _transDataToAnaylzer:instance

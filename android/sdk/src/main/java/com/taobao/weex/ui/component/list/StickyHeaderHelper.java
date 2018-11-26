@@ -90,7 +90,10 @@ public class StickyHeaderHelper {
           existedParent.removeView(headerView);
         }
         headerView.setTag(headComponent.getRef());
-        mParent.addView(headerView);
+        ViewGroup.MarginLayoutParams mlp =
+                new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+        mParent.addView(headerView, mlp);
         headerView.setTag(this);
         if(headComponent.getStickyOffset() > 0) {
           ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) headerView.getLayoutParams();
@@ -113,9 +116,8 @@ public class StickyHeaderHelper {
   public void notifyStickyRemove(WXCell compToRemove) {
     if (compToRemove == null)
       return;
-    final WXCell component = mHeaderComps.remove(compToRemove.getRef());
+    final WXCell component = mHeaderComps.containsValue(compToRemove) ? mHeaderComps.remove(compToRemove.getRef()) : compToRemove;
     final View headerView = mHeaderViews.remove(compToRemove.getRef());
-
 
     if(component == null || headerView == null){
       if(WXEnvironment.isApkDebugable()) {
@@ -170,9 +172,13 @@ public class StickyHeaderHelper {
     if(mHeaderViews.size() <= 0){
       return;
     }
-    Set<String> keys = mHeaderViews.keySet();
-    for(String key : keys){
-      notifyStickyRemove(mHeaderComps.get(key));
+    Iterator<Map.Entry<String, WXCell>> iterator = mHeaderComps.entrySet().iterator();
+
+    while (iterator.hasNext()) {
+      Map.Entry<String, WXCell> next = iterator.next();
+      WXCell value = next.getValue();
+      iterator.remove();
+      notifyStickyRemove(value);
     }
   }
 

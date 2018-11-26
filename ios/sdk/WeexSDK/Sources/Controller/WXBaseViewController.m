@@ -126,11 +126,10 @@
     }
     
     [_instance destroyInstance];
+    _instance = [[WXSDKInstance alloc] init];
     if([WXPrerenderManager isTaskReady:[self.sourceURL absoluteString]]){
         _instance = [WXPrerenderManager instanceFromUrl:self.sourceURL.absoluteString];
     }
-
-    _instance = [[WXSDKInstance alloc] init];
     _instance.frame = CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, self.view.bounds.size.height);
     _instance.pageObject = self;
     _instance.pageName = sourceURL.absoluteString;
@@ -143,8 +142,7 @@
     } else {
         newURL = [NSString stringWithFormat:@"%@?random=%d", sourceURL.absoluteString, arc4random()];
     }
-    [_instance renderWithURL:[NSURL URLWithString:newURL] options:@{@"bundleUrl":sourceURL.absoluteString} data:nil];
-    
+
     __weak typeof(self) weakSelf = self;
     _instance.onCreate = ^(UIView *view) {
         [weakSelf.weexView removeFromSuperview];
@@ -159,7 +157,9 @@
     _instance.renderFinish = ^(UIView *view) {
         [weakSelf _updateInstanceState:WeexInstanceAppear];
     };
-    
+
+    [_instance renderWithURL:[NSURL URLWithString:newURL] options:@{@"bundleUrl":sourceURL.absoluteString} data:nil];
+
     if([WXPrerenderManager isTaskReady:[self.sourceURL absoluteString]]){
         WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, _instance);
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, _instance);

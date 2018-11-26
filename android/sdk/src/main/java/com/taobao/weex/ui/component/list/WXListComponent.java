@@ -18,19 +18,20 @@
  */
 package com.taobao.weex.ui.component.list;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import com.alibaba.fastjson.JSON;
+import static com.taobao.weex.ui.view.listview.WXRecyclerView.TYPE_LINEAR_LAYOUT;
 
 import android.content.Context;
+import android.support.v4.util.ArrayMap;
+import android.support.v7.widget.PagerSnapHelper;
 import android.text.TextUtils;
+
+import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -42,8 +43,14 @@ import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Unlike other components, there is immutable bi-directional association between View and
@@ -63,6 +70,15 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   private Float[] mSpanOffsets;
   private boolean hasSetGapItemDecoration = false;
 
+  public static class Creator implements ComponentCreator {
+    public WXComponent createInstance(WXSDKInstance instance,
+                                      WXVContainer parent,
+                                      BasicComponentData basicComponentData)
+            throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXListComponent(instance, parent, true, basicComponentData);
+    }
+  }
+
   @Deprecated
   public WXListComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
     this(instance, parent, isLazy, basicComponentData);
@@ -81,6 +97,22 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
         bounceRecyclerView.getSwipeLayout().setNestedScrollingEnabled(true);
       }
     }
+
+    /**
+     *  enable pagingEnabled attr
+     */
+    if(WXUtils.getBoolean(getAttrs().get(Constants.Name.PAGE_ENABLED),false)){
+      PagerSnapHelper snapHelper = null;
+      String pageSize = WXUtils.getString(getAttrs().get(Constants.Name.PAGE_SIZE), null);
+      if(TextUtils.isEmpty(pageSize)) {
+        snapHelper = new PagerSnapHelper();
+      } else  {
+        snapHelper = new WXPagerSnapHelper();
+      }
+
+      snapHelper.attachToRecyclerView(bounceRecyclerView.getInnerView());
+    }
+
     return bounceRecyclerView;
   }
 
@@ -141,6 +173,17 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   private void updateRecyclerAttr() {
     mColumnCount = WXUtils.parseInt(getAttrs().get(Constants.Name.COLUMN_COUNT));
+    if (mColumnCount <= 0 && mLayoutType != TYPE_LINEAR_LAYOUT) {
+      Map<String, String> ext = new ArrayMap<>();
+      ext.put("componentType", getComponentType());
+      WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
+          WXErrorCode.WX_RENDER_ERR_LIST_INVALID_COLUMN_COUNT, "columnCount",
+          String.format(Locale.ENGLISH,
+              "You are trying to set the list/recycler/vlist/waterfall's column to %d, which is illegal. The column count should be a positive integer",
+              mColumnCount),
+          ext);
+      mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
+    }
     mColumnGap = WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_GAP));
     mColumnWidth = WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_WIDTH));
     mPaddingLeft = WXUtils.parseFloat(getAttrs().get(Constants.Name.PADDING_LEFT));

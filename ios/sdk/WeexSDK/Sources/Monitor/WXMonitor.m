@@ -30,12 +30,10 @@
 #import "WXTracingManager.h"
 #import "WXAnalyzerProtocol.h"
 #import "WXSDKInstance_performance.h"
-
 #import "WXAnalyzerCenter+Transfer.h"
 
-
-NSString *const kStartKey = @"start";
-NSString *const kEndKey = @"end";
+static NSString *const kStartKey = @"start";
+static NSString *const kEndKey = @"end";
 
 @implementation WXMonitor
 
@@ -57,7 +55,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     NSMutableDictionary *performanceDict = [self performanceDictForInstance:instance];
     NSMutableDictionary *dict = performanceDict[@(tag)];
     if (!dict) {
-        WXLogError(@"Performance point:%ld, in instance:%@, did not have a start", (unsigned long)tag, instance.instanceId);
+        WXLogDebug(@"Performance point:%ld, in instance:%@, did not have a start", (unsigned long)tag, instance.instanceId);
         return;
     }
     
@@ -67,6 +65,9 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     }
     
     dict[kEndKey] = @(CACurrentMediaTime() * 1000);
+    if (tag == WXPTFirstScreenRender) {
+        [instance.apmInstance onStage:KEY_PAGE_STAGES_FSRENDER];
+    }
 
 //    if (tag == WXPTAllRender) {
 //        [self performanceFinish:instance];
@@ -181,10 +182,11 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
                           @(WXPTWrongImgSize):M_IMG_WRONG_SIZE_NUM,
                           @(WXPTInteractionTime):M_INTERACTION_TIME,
                           @(WXPTFsReqNetNum):M_FS_REQUEST_NET_NUM,
-                          @(WXPTFsComponentCreateTime):M_COMPONENT_FS_TIME,
-                          @(WXPTFsComponentCount):M_COMPONENT_FS_COUNT,
                           @(WXPTComponentCreateTime):M_COMPONENT_TIME,
-                          @(WXPTComponentCount):COMPONENTCOUNT
+                          @(WXPTComponentCount):COMPONENTCOUNT,
+                          @(WXPTInteractionAddCount):M_INTERACTION_ADD_COUNT,
+                          @(WXPTInteractionLimitAddCount):M_INTERACTION_LIMIT_ADD_COUNT,
+                          @(WXPNewFSRenderTime):M_NEW_FS_RENDER_TIME
                           };
     });
     
@@ -200,7 +202,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
         
         if (!start || !end) {
             if (state == MonitorCommit) {
-                WXLogWarning(@"Performance point:%d, in instance:%@, did not have a start or end", tag, instance);
+                WXLogDebug(@"Performance point:%d, in instance:%@, did not have a start or end", tag, instance);
             }
             continue;
         }
@@ -216,9 +218,9 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     commitDict[@"instanceId"] = [instance instanceId]?:@"";
     
     //new performance point
-    if (!commitDict[SCREENRENDERTIME] && commitDict[TOTALTIME]) {
-        commitDict[SCREENRENDERTIME] = commitDict[TOTALTIME];
-    }
+//    if (!commitDict[SCREENRENDERTIME] && commitDict[TOTALTIME]) {
+//        commitDict[SCREENRENDERTIME] = commitDict[TOTALTIME];
+//    }
     
     commitDict[CALLCREATEINSTANCETIME] = commitDict[COMMUNICATETIME];
     commitDict[COMMUNICATETOTALTIME] = commitDict[TOTALTIME];

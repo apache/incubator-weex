@@ -18,7 +18,10 @@
  */
 package com.taobao.weex.dom;
 
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -68,17 +71,15 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   private WXStatement mStatement;
 
   public WXAttr(){
-    attr =new ArrayMap<>();
+    attr = new HashMap<>();
   }
 
   public WXAttr(@NonNull Map<String,Object> standardMap) {
-    this();
-    attr.putAll(standardMap);
+    attr = standardMap;
   }
 
   public WXAttr(@NonNull Map<String,Object> standardMap, int extra){
-    this();
-    attr.putAll(standardMap);
+    attr = standardMap;
   }
 
   public static String getPrefix(Map<String, Object> attr) {
@@ -580,5 +581,11 @@ public class WXAttr implements Map<String, Object>,Cloneable {
       wxAttr.mStatement = new WXStatement(mStatement);
     }
     return wxAttr;
+  }
+
+  @RestrictTo(Scope.LIBRARY)
+  @Override
+  public String toString() {
+    return attr.toString();
   }
 }

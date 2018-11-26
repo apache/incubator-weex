@@ -24,6 +24,7 @@
 #import "WXSDKManager.h"
 #import "WXUtility.h"
 #import "WXComponent+Layout.h"
+#import "WXComponent+Events.h"
 
 typedef NS_ENUM(NSInteger, Direction) {
     DirectionNone = 1 << 0,
@@ -40,15 +41,16 @@ typedef NS_ENUM(NSInteger, Direction) {
 - (void)recycleSliderView:(WXRecycleSliderView *)recycleSliderView didScrollToItemAtIndex:(NSInteger)index;
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView;
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate;
+- (BOOL)requestGestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch;
 
 @end
+
 
 @interface WXRecycleSliderView : UIView <UIScrollViewDelegate>
 
 @property (nonatomic, strong) WXIndicatorView *indicator;
 @property (nonatomic, weak) id<WXRecycleSliderViewDelegate> delegate;
-
-@property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) WXRecycleSliderScrollView *scrollView;
 @property (nonatomic, strong) NSMutableArray *itemViews;
 @property (nonatomic, assign) Direction direction;
 @property (nonatomic, assign) NSInteger currentIndex;
@@ -70,7 +72,10 @@ typedef NS_ENUM(NSInteger, Direction) {
     if (self) {
         _currentIndex = 0;
         _itemViews = [[NSMutableArray alloc] init];
-        _scrollView = [[UIScrollView alloc] init];
+        _scrollView = [[WXRecycleSliderScrollView alloc] init];
+        if (@available(iOS 11.0, *)) {
+            _scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        }
         _scrollView.backgroundColor = [UIColor clearColor];
         _scrollView.delegate = self;
         _scrollView.showsHorizontalScrollIndicator = NO;
@@ -256,7 +261,6 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)lastPage
 {
-    
     NSInteger lastIndex = [self currentIndex]-1;
     if (_itemViews.count > 1) {
         if (_infinite) {
@@ -457,6 +461,39 @@ typedef NS_ENUM(NSInteger, Direction) {
     _recycleSliderView.currentIndex = _index;
 }
 
+- (void)_buildViewHierarchyLazily {
+    [super _buildViewHierarchyLazily];
+}
+
+- (void)adjustForRTL
+{
+    if (![WXUtility enableRTLLayoutDirection]) return;
+    
+    // this is scroll rtl solution.
+    // scroll layout not use direction, use self tranform
+    if (self.view && _flexCssNode && _flexCssNode->getLayoutDirectionFromPathNode() == WeexCore::kDirectionRTL
+        ) {
+        WXRecycleSliderView *slider = (WXRecycleSliderView *)self.view;
+        CATransform3D transform = CATransform3DScale(CATransform3DIdentity, -1, 1, 1);
+        slider.scrollView.layer.transform = transform ;
+    } else {
+        WXRecycleSliderView *slider = (WXRecycleSliderView *)self.view;
+        slider.scrollView.layer.transform = CATransform3DIdentity ;
+    }
+
+}
+
+- (void)_adjustForRTL {
+    if (![WXUtility enableRTLLayoutDirection]) return;
+    
+    [super _adjustForRTL];
+    [self adjustForRTL];
+}
+
+- (BOOL)shouldTransformSubviewsWhenRTL {
+    return YES;
+}
+
 - (void)viewDidUnload
 {
     [_childrenView removeAllObjects];
@@ -589,6 +626,11 @@ typedef NS_ENUM(NSInteger, Direction) {
     }
 }
 
+- (BOOL)requestGestureShouldStopPropagation:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return [self gestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
+}
+
 #pragma mark WXIndicatorComponentDelegate Methods
 
 -(void)setIndicatorView:(WXIndicatorView *)indicatorView
@@ -660,7 +702,6 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)recycleSliderView:(WXRecycleSliderView *)recycleSliderView didScrollToItemAtIndex:(NSInteger)index
 {
-    
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
     }
@@ -680,3 +721,21 @@ typedef NS_ENUM(NSInteger, Direction) {
 }
 
 @end
+
+@implementation WXRecycleSliderScrollView
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    WXRecycleSliderView *view = (WXRecycleSliderView *)self.delegate;
+    if (![view isKindOfClass:[UIView class]]) {
+        return YES;
+    }
+    
+    if ([(id <WXRecycleSliderViewDelegate>) view.wx_component respondsToSelector:@selector(requestGestureShouldStopPropagation:shouldReceiveTouch:)]) {
+        return [(id <WXRecycleSliderViewDelegate>) view.wx_component requestGestureShouldStopPropagation:gestureRecognizer shouldReceiveTouch:touch];
+    }
+    else{
+        return YES;
+    }
+}
+@end
+

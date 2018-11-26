@@ -16,13 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 #ifdef __cplusplus
 
 #ifndef WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 
-namespace WeexCore {
+#define WEEXCORE_CSS_DEFAULT_DIRECTION kDirectionLTR
 
+namespace WeexCore {
+    /**
+     * MainAxis direction
+     */
+    enum WXCoreDirection {
+        kDirectionInherit,
+        kDirectionLTR,
+        kDirectionRTL
+    };
   /**
    * MainAxis direction
    */
