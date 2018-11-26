@@ -198,11 +198,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public void setLayout(WXComponent component) {
-    if (TextUtils.isEmpty(component.getComponentType())
-            || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
-            || component.getLayoutSize() == null) {
-      return;
-    }
     if (component.getHostView() != null) {
       int layoutDirection = component.isNativeLayoutRTL() ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR;
       ViewCompat.setLayoutDirection(component.getHostView(), layoutDirection);
