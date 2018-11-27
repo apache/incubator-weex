@@ -1274,6 +1274,154 @@ bool SectionData::decoding() {
     
     return finished;
 }
+
+uint32_t SectionScript::size() {
+    uint32_t size = 0;
+    do {
+        const json11::Json& scripts = encoder()->exec_state()->context()->script_json();
+        if (!scripts.array_items().size()) {
+            break;
+        }
+        size += GetFTLVLength(kValueScriptSize, sizeof(uint32_t));
+        for (auto script : scripts.array_items()) {
+            const json11::Json::object& items = script.object_items();
+            size += GetFTLVLength(kValueScriptItemSize, sizeof(uint32_t));
+            for (auto iter = items.begin(); iter != items.end(); iter++) {
+                uint32_t key_length = static_cast<uint32_t>(iter->first.length());
+                size += GetFTLVLength(kValueScriptKey, key_length);
+                uint32_t val_length = static_cast<uint32_t>(iter->second.string_value().length());
+                size += GetFTLVLength(kValueScriptValue, val_length);
+            }
+        }
+    } while (0);
+
+    return size;
+}
+
+bool SectionScript::encoding() {
+    bool finished = false;
+    do {
+        uint32_t size = this->size();
+        if (!size) {
+            finished = true;
+            break;
+        }
+        if (!Section::encoding((uint16_t)ExecSection::EXEC_SECTION_SCRIPT, size)) {
+            break;
+        }
+        const json11::Json& scripts = encoder()->exec_state()->context()->script_json();
+        if (!scripts.is_array()) {
+            break;
+        }
+        uint32_t scripts_size = (uint32_t)scripts.array_items().size();
+        if (!Section::encoding(kValueScriptSize, sizeof(uint32_t), &scripts_size)) {
+            break;
+        }
+        for (auto it = scripts.array_items().begin(); it != scripts.array_items().end(); it++) {
+            uint32_t script_item_size = (uint32_t)it->object_items().size();
+            if (!Section::encoding(kValueScriptItemSize, sizeof(uint32_t), &script_item_size)) {
+                throw DecoderError("decoding script item size error");
+                break;
+            }
+            for (auto item : it->object_items()) {
+                uint32_t length = static_cast<uint32_t>(item.first.length());
+                uint8_t *pstr = (uint8_t *)item.first.c_str();
+                if (!Section::encoding(kValueScriptKey, length, (uint8_t *)pstr)) {
+                    throw DecoderError("decoding script item key error");
+                    break;
+                }
+                length = static_cast<uint32_t>(item.second.string_value().length());
+                const char *pstr_val = item.second.string_value().c_str();
+                if (!Section::encoding(kValueScriptValue, length, (uint8_t *)pstr_val)) {
+                    throw DecoderError("decoding script item value error");
+                    break;
+                }
+            }
+        }
+        finished = true;
+    } while (0);
+
+    return finished;
+}
+
+bool SectionScript::decoding() {
+    bool finished = false;
+    do {
+        fStream *stream = Section::stream();
+        if (!stream) {
+            break;
+        }
+        if (stream->Tell() < 0) {
+            break;
+        }
+        std::vector<json11::Json> scripts;
+        uint16_t target = 0;
+        uint32_t script_size = 0;
+        uint32_t size = sizeof(uint32_t);
+        uint32_t readbytes = stream->ReadTarget(&target, (uint8_t *)&script_size, &size);
+        if (!readbytes || target != kValueScriptSize) {
+            break;
+        }
+        for (uint32_t i = 0; i < script_size; i++) {
+            size = sizeof(uint32_t);
+            uint32_t items_size = 0;
+            readbytes = stream->ReadTarget(&target, (uint8_t *)&items_size, &size);
+            if (!readbytes || target != kValueScriptItemSize) {
+                throw DecoderError("decoding script items size error");
+                break;
+            }
+            std::unordered_map<std::string, json11::Json> items;
+            for (uint32_t j = 0; j < items_size; j++) {
+                if ((readbytes = stream->ReadTarget(&target, NULL, NULL)) == 0) {
+                    throw DecoderError("decoding script target error");
+                    break;
+                }
+                if (target != kValueScriptKey) {
+                    throw DecoderError("decoding script target error");
+                    break;
+                }
+                char *pstr_key = (char *)malloc(readbytes + 1);
+                if (!pstr_key) {
+                    throw DecoderError("decoding script low memory error");
+                    break;
+                }
+                memset(pstr_key, 0, readbytes + 1);
+                if (stream->Read(pstr_key, 1, readbytes) != readbytes) {
+                    throw DecoderError("decoding script key error");
+                    break;
+                }
+                if ((readbytes = stream->ReadTarget(&target, NULL, NULL)) == 0) {
+                    throw DecoderError("decoding script target error");
+                    break;
+                }
+                if (target != kValueScriptValue) {
+                    throw DecoderError("decoding script target error");
+                    break;
+                }
+                char *pstr_value = (char *)malloc(readbytes + 1);
+                if (!pstr_value) {
+                    throw DecoderError("decoding script low memory error");
+                    break;
+                }
+                memset(pstr_value, 0, readbytes + 1);
+                if (stream->Read(pstr_value, 1, readbytes) != readbytes) {
+                    throw DecoderError("decoding script value error");
+                    break;
+                }
+                json11::Json json(pstr_value);
+                items.insert(std::make_pair(pstr_key, json));
+                free(pstr_key);
+                free(pstr_value);
+            }
+            scripts.push_back(std::move(items));
+        }
+        decoder()->exec_state()->context()->set_script_json(scripts);
+        finished = true;
+
+    } while (0);
+
+    return finished;
+}
     
 uint32_t SectionFunction::GetInstructionsBytes(std::vector<Instruction>& instructions) {
     uint32_t numBits = 0;
@@ -2312,7 +2460,7 @@ bool SectionStyles::decoding() {
             size = sizeof(uint32_t);
             uint32_t items_size = 0;
             readbytes = stream->ReadTarget(&target, (uint8_t *)&items_size, &size);
-            if (!readbytes || target != kValueStyleItemSize || !items_size) {
+            if (!readbytes || target != kValueStyleItemSize) {
                 throw DecoderError("decoding styles items size error");
                 break;
             }
