@@ -79,6 +79,10 @@
 - (void)dealloc
 {
     _jsContext.instanceId = nil;
+    __block JSContext* theContext = _jsContext;
+    WXPerformBlockOnBridgeThread(^{
+        theContext = nil; // release the context in js thread to avoid main-thread deadlock
+    });
 }
 
 - (void)setJSContext:(JSContext *)context
