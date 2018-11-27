@@ -44,7 +44,8 @@ enum ExecSection {
     EXEC_SECTION_GLOBAL_VARIABLES,
     EXEC_SECTION_STYLES,
     EXEC_SECTION_VALUEREF,
-    EXEC_SECTION_CLASS
+    EXEC_SECTION_CLASS,
+    EXEC_SECTION_SCRIPT
 };
 
 class fStream;
@@ -121,6 +122,22 @@ public:
     SectionData(ExecStateEncoder *encoder) : Section(encoder) {}
     SectionData(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
     virtual ~SectionData() {};
+    virtual bool encoding();
+    virtual bool decoding();
+    virtual uint32_t size();
+};
+
+class SectionScript : public Section {
+public:
+    enum SectionKey {
+        kValueScriptSize,
+        kValueScriptKey,
+        kValueScriptValue,
+        kValueScriptItemSize,
+    };
+    SectionScript(ExecStateEncoder *encoder) : Section(encoder) {}
+    SectionScript(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}
+    virtual ~SectionScript() {};
     virtual bool encoding();
     virtual bool decoding();
     virtual uint32_t size();

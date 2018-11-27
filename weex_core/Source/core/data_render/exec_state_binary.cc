@@ -69,6 +69,11 @@ bool ExecStateEncoder::encoding(std::string &err) {
                 err = "data section encoding error";
                 break;
             }
+            SectionScript script(this);
+            if (!script.encoding()) {
+                err = "script section encoding error";
+                break;
+            }
             SectionFunction function(this, gs_op_code_bits);
             if (!function.encoding()) {
                 err = "function section encoding error";
@@ -157,6 +162,14 @@ bool ExecStateDecoder::decoding(std::string &err) {
                         SectionData data(this, section_length);
                         if (!data.decoding()) {
                             throw EncoderError("data section decoding error");
+                        }
+                        break;
+                    }
+                    case ExecSection::EXEC_SECTION_SCRIPT:
+                    {
+                        SectionScript script(this, section_length);
+                        if (!script.decoding()) {
+                            throw EncoderError("script section decoding error");
                         }
                         break;
                     }

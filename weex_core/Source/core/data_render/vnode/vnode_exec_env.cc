@@ -740,7 +740,13 @@ void VNodeExecEnv::ParseStyle(ExecState *state) {
   }
 
 }
-    
+
+void VNodeExecEnv::ParseScript(ExecState *state) {
+    json11::Json& json = state->context()->raw_json();
+    const json11::Json& script_array = json["script"];
+    state->context()->set_script_json(script_array);
+}
+
 Value StringToValue(ExecState *exec_state,const std::string &str) {
     Value ret;
     do {
