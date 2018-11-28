@@ -111,10 +111,6 @@ public class InitConfig {
     return jscProcessManager;
   }
 
-  public void setJscProcessManager(IWXJscProcessManager jscProcessManager) {
-    this.jscProcessManager = jscProcessManager;
-  }
-
   private InitConfig() {
   }
 
@@ -137,8 +133,9 @@ public class InitConfig {
       return jscProcessManager;
     }
 
-    public void setJscProcessManager(IWXJscProcessManager jscProcessManager) {
+    public Builder setJscProcessManager(IWXJscProcessManager jscProcessManager) {
       this.jscProcessManager = jscProcessManager;
+      return this;
     }
 
     IWXJscProcessManager jscProcessManager;
