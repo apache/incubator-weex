@@ -40,6 +40,7 @@ import android.widget.ScrollView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IDrawableLoader;
+import com.taobao.weex.adapter.IWXJscProcessManager;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
@@ -710,8 +711,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
     mRendered = true;
 
+    final IWXJscProcessManager wxJscProcessManager = WXSDKManager.getInstance().getWXJscProcessManager();
 
-    if(WXBridgeManager.getInstance().isIsRebootJscWhenWhiteScreen()) {
+    if(wxJscProcessManager != null && wxJscProcessManager.shouldReboot()) {
       WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
         public void run() {
@@ -722,22 +724,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           View containerView = getContainerView();
           if(containerView instanceof ViewGroup) {
             if(0 == ((ViewGroup) containerView).getChildCount()) {
-              boolean isWxActivity = false;
-              if(mContext != null && mContext.getClass() != null) {
-                String name = mContext.getClass().getName();
-                if(!TextUtils.isEmpty(name)) {
-                  isWxActivity = name.contains("WXActivity");
-                }
-              }
-
-              if(!isWxActivity) {
+              if(wxJscProcessManager.withException(WXSDKInstance.this)) {
                 onJSException(String.valueOf(WX_ERR_RELOAD_PAGE),"jsc reboot","jsc reboot");
               }
               WXBridgeManager.getInstance().callReportCrashReloadPage(mInstanceId, null);
             }
           }
         }
-      }, WXBridgeManager.getInstance().getRebootJscTimeout());
+      }, wxJscProcessManager.rebootTimeout());
     }
   }
 

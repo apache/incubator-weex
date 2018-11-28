@@ -162,9 +162,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   // add for cloud setting, default value is false.
   // weexcore use single process or not
   private static boolean isUseSingleProcess = false;
-  private static boolean isRebootJscWhenWhiteScreen = false;
-  public final static long DEFAULT_REBOOT_JSC_TIMEOUT = 5000;
-  private static long rebootJscTimeout = DEFAULT_REBOOT_JSC_TIMEOUT;
 
   public enum BundType {
     Vue,
@@ -225,21 +222,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     return mBridgeManager;
   }
-  public  boolean isIsRebootJscWhenWhiteScreen() {
-    return isRebootJscWhenWhiteScreen;
-  }
 
-  public  void setIsRebootJscWhenWhiteScreen(boolean _isRebootJscWhenWhiteScreen) {
-    isRebootJscWhenWhiteScreen = _isRebootJscWhenWhiteScreen;
-  }
-
-  public  long getRebootJscTimeout() {
-    return rebootJscTimeout;
-  }
-
-  public  void setRebootJscTimeout(long timeout) {
-    rebootJscTimeout = timeout;
-  }
   public void setUseSingleProcess(final boolean flag) {
     if (flag != isUseSingleProcess) {
       isUseSingleProcess = flag;
