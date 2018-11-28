@@ -448,7 +448,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   protected WXSDKInstance newNestedInstance() {
     return new WXSDKInstance(mContext);
   }
+  public boolean isHasException() {
+    return hasException;
+  }
 
+  public void setHasException(boolean hasException) {
+    this.hasException = hasException;
+  }
   public void addOnInstanceVisibleListener(OnInstanceVisibleListener l){
     mVisibleListeners.add(l);
   }
