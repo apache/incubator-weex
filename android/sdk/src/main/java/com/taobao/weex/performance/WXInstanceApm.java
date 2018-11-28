@@ -21,6 +21,7 @@ package com.taobao.weex.performance;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.Log;
 import com.taobao.weex.BuildConfig;
@@ -116,6 +117,10 @@ public class WXInstanceApm {
     private boolean mEnd = false;
     private boolean hasRecordFistInteractionView =false;
     public final Map<String,Object> extInfo;
+    public boolean forceStopRecordInteraction = false;
+    public Rect instanceRect;
+    public String reportPageName;
+    public boolean hasReportLayerOverDraw = false;
 
     public WXInstanceApm(String instanceId) {
         mInstanceId = instanceId;
@@ -223,8 +228,9 @@ public class WXInstanceApm {
                 pageName = instance.getContainerInfo().get(KEY_PAGE_PROPERTIES_CONTAINER_NAME);
             }
         }
-        String fixPageName = TextUtils.isEmpty(pageName) ? "emptyPageName" : pageName;
-        addProperty(KEY_PAGE_PROPERTIES_BIZ_ID, fixPageName);
+        reportPageName = null == apmInstance?pageName:apmInstance.parseReportUrl(pageName);
+        reportPageName = TextUtils.isEmpty(reportPageName) ? "emptyPageName" : reportPageName;
+        addProperty(KEY_PAGE_PROPERTIES_BIZ_ID, reportPageName);
     }
 
     public void onAppear(){
@@ -269,7 +275,7 @@ public class WXInstanceApm {
     }
 
     public void arriveInteraction(WXComponent targetComponent) {
-        if (null == apmInstance || null == targetComponent || targetComponent.getInstance() == null ) {
+        if (null == apmInstance || null == targetComponent || targetComponent.getInstance() == null) {
             return;
         }
         WXPerformance performanceRecord = targetComponent.getInstance().getWXPerformance();
@@ -280,6 +286,9 @@ public class WXInstanceApm {
         if (!hasRecordFistInteractionView){
             onStage(KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW);
             hasRecordFistInteractionView = true;
+        }
+        if (forceStopRecordInteraction){
+            return;
         }
 
         long curTime = WXUtils.getFixUnixTime();

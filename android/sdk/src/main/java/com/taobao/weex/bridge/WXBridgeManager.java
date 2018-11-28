@@ -618,7 +618,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       WXDomModule dom = WXModuleManager.getDomModule(instanceId);
-      dom.invokeMethod(componentRef, method, arguments);
+      if (null != dom){
+        dom.invokeMethod(componentRef, method, arguments);
+      }else {
+        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+        if(null == instance || !instance.isDestroy()){
+          WXLogUtils.e("WXBridgeManager","callNativeComponent exception :null == dom ,method:"+method);
+        }
+      }
+
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callNativeComponent exception: ", e);
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
