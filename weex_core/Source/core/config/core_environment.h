@@ -54,6 +54,8 @@ namespace WeexCore {
 
     std::map<std::string, std::string> mOptions;
 
+    bool mInteractionLogSwitch;
+
   public:
 
     bool SetPlatform(std::string platformName);
@@ -76,6 +78,10 @@ namespace WeexCore {
 
     inline void set_device_width(float width) {
         mDeviceWidth = width;
+    }
+
+    inline bool isInteractionLogOpen(){
+        return mInteractionLogSwitch;
     }
 
     const float DeviceWidth();

@@ -763,6 +763,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       renderOptions.put(BUNDLE_URL, url);
     }
 
+    getWXPerformance().pageName = pageName;
+
     mApmForInstance.doInit();
     mApmForInstance.setPageName(pageName);
 
@@ -1107,7 +1109,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if (mUserTrackAdapter != null) {
         mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
       }
-      WXAnalyzerDataTransfer.transferPerformance(mWXPerformance, getInstanceId());
       isCommit=true;
     }
     // module listen Activity onActivityPause

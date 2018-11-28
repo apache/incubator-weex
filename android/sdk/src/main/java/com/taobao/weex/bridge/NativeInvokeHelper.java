@@ -18,10 +18,13 @@
  */
 package com.taobao.weex.bridge;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.utils.WXReflectionUtils;
 
 import java.lang.reflect.Type;
@@ -41,6 +44,23 @@ public class NativeInvokeHelper {
     final Object[] params = prepareArguments(
             invoker.getParameterTypes(),
             args);
+
+    if (WXAnalyzerDataTransfer.isInteractionLogOpen() && invoker instanceof MethodInvoker) {
+      for (int i = 0; i < params.length; i++) {
+        if (params[i] instanceof SimpleJSCallback) {
+          final String callBackId = ((SimpleJSCallback)params[i]).getCallbackId();
+          Log.d(WXAnalyzerDataTransfer.INTERACTION_TAG, "[client][callNativeModuleStart]," + mInstanceId + "," + ((MethodInvoker) invoker).mMethod.getDeclaringClass() + "," + ((MethodInvoker) invoker).mMethod.getName() + "," + callBackId);
+          ((SimpleJSCallback) params[i]).setInvokerCallback(new SimpleJSCallback.InvokerCallback() {
+            @Override
+            public void onInvokeSuccess() {
+              Log.d(WXAnalyzerDataTransfer.INTERACTION_TAG, "[client][callNativeModuleEnd]," + mInstanceId + "," + ((MethodInvoker) invoker).mMethod.getDeclaringClass() + "," + ((MethodInvoker) invoker).mMethod.getName() + "," + callBackId);
+            }
+          });
+          break;
+        }
+      }
+    }
+
     if (invoker.isRunOnUIThread()) {
       WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
