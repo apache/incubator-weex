@@ -292,9 +292,14 @@ public class WXSoInstallMgrSdk {
   }
 
   private static String _cpuType() {
-
-    String abi = _getFieldReflectively(new Build(), "CPU_ABI");
-    if (abi == null || abi.length() == 0 || abi.equals("Unknown")) {
+    String abi ;
+    try {
+      abi = Build.CPU_ABI;
+    }catch (Exception e){
+      e.printStackTrace();
+      abi = ARMEABI;
+    }
+    if (TextUtils.isEmpty(abi)){
       abi = ARMEABI;
     }
     abi = abi.toLowerCase();

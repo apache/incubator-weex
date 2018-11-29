@@ -208,14 +208,12 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
           Layout layout = hostView.getTextLayout();
           if (layout != null) {
             layout.getPaint().setTypeface(fontDO.getTypeface());
-            WXLogUtils.d("WXText", "Apply font family " + fontFamily + " to paint");
           } else {
-            WXLogUtils.w("WXText", "Layout not created");
+            WXLogUtils.d("WXText", "Layout not created");
           }
           WXBridgeManager
               .getInstance().markDirty(getInstanceId(), getRef(), true);
         }
-        WXLogUtils.d("WXText", "Font family " + fontFamily + " is available");
       }
     };
 
