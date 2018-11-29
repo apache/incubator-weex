@@ -433,11 +433,18 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
         [instanceId = std::string(instanceId), func = std::string(func),
          opts = std::string(opts), initData = std::string(initData),
          extendsApi = std::string(extendsApi)](const char *result) {
+          // FIXME Now only support vue, this should be fixed
+          std::string error;
+          auto opts_json = json11::Json::parse(opts, error);
+          std::map<std::string, json11::Json> &opts_map =
+              const_cast<std::map<std::string, json11::Json> &>(
+                  opts_json.object_items());
+          opts_map["bundleType"] = "Vue";
           WeexCoreManager::Instance()
               ->script_bridge()
               ->script_side()
               ->CreateInstance(instanceId.c_str(), func.c_str(), result,
-                               opts.c_str(), initData.c_str(),
+                               opts_json.dump().c_str(), initData.c_str(),
                                extendsApi.c_str());
         };
     if (strcmp(render_strategy, "DATA_RENDER") == 0) {
