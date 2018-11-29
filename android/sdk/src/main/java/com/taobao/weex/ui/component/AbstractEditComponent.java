@@ -582,6 +582,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     if ((view = getHostView()) == null) {
       return;
     }
+    if (TextUtils.equals(view.getText(), value)) {
+      return;
+    }
 
     mIgnoreNextOnInputEvent = true;
     int oldIndex = view.getSelectionStart();
