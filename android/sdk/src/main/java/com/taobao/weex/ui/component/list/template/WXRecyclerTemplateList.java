@@ -1613,7 +1613,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 }
             }
         } catch (Exception e) {
-            WXLogUtils.d(TAG + " onLoadMore : ", e);
+            if (WXEnvironment.isApkDebugable()){
+                WXLogUtils.d(TAG + " onLoadMore : ", e);
+            }
         }
     }
 

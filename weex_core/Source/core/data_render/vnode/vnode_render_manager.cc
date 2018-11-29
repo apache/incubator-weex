@@ -189,6 +189,7 @@ std::string VNodeRenderManager::CreatePageWithContent(const std::string &input, 
         exec_state->context()->raw_json() = json;
         VNodeExecEnv::ParseData(exec_state);
         VNodeExecEnv::ParseStyle(exec_state);
+        VNodeExecEnv::ParseScript(exec_state);
     }
     if (init_data.length() > 0) {
         VNodeExecEnv::ImportExecData(exec_state, init_data);

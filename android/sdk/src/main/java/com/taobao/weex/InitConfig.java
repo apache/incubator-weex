@@ -20,6 +20,7 @@ package com.taobao.weex;
 
 import com.taobao.weex.adapter.ClassLoaderAdapter;
 import com.taobao.weex.adapter.IDrawableLoader;
+import com.taobao.weex.adapter.IWXJscProcessManager;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
@@ -48,6 +49,7 @@ public class InitConfig {
   private ClassLoaderAdapter classLoaderAdapter;
   private IApmGenerator apmGenerater;
   private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
+  private IWXJscProcessManager jscProcessManager;
 
   public IWXHttpAdapter getHttpAdapter() {
     return httpAdapter;
@@ -105,6 +107,9 @@ public class InitConfig {
   public IWXJSExceptionAdapter getJSExceptionAdapter() {
     return mJSExceptionAdapter;
   }
+  public IWXJscProcessManager getJscProcessManager() {
+    return jscProcessManager;
+  }
 
   private InitConfig() {
   }
@@ -123,6 +128,17 @@ public class InitConfig {
     ClassLoaderAdapter classLoaderAdapter;
     IApmGenerator apmGenerater;
     private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
+
+    public IWXJscProcessManager getJscProcessManager() {
+      return jscProcessManager;
+    }
+
+    public Builder setJscProcessManager(IWXJscProcessManager jscProcessManager) {
+      this.jscProcessManager = jscProcessManager;
+      return this;
+    }
+
+    IWXJscProcessManager jscProcessManager;
 
     public Builder(){
 
@@ -208,6 +224,7 @@ public class InitConfig {
       config.classLoaderAdapter = this.classLoaderAdapter;
       config.apmGenerater = this.apmGenerater;
       config.jsFileLoaderAdapter = this.jsFileLoaderAdapter;
+      config.jscProcessManager = this.jscProcessManager;
       return config;
     }
   }

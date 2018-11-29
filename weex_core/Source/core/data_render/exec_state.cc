@@ -92,6 +92,7 @@ void ExecState::Compile(std::string& err) {
   if (!context()->raw_json().is_null()) {
       VNodeExecEnv::ParseData(this);
       VNodeExecEnv::ParseStyle((this));
+      VNodeExecEnv::ParseScript(this);
       ParseResult result = Parser::Parse(context()->raw_json(),err);
       generator.Visit(result.expr().get(), nullptr);
   }

@@ -42,6 +42,9 @@ bool MessagePumpAndroid::RegisterJNIUtils(JNIEnv* env) {
 
 void MessagePumpAndroid::Run(Delegate* delegate) {
   JNIEnv* env = ::base::android::AttachCurrentThread();
+  if(env == nullptr) {
+    return;
+  }
   Reset(env, Java_SystemMessageHandler_create(
                  env, reinterpret_cast<int64_t>(delegate))
                  .Release());

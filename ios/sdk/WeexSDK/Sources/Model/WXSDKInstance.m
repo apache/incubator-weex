@@ -191,7 +191,7 @@ typedef enum : NSUInteger {
         CGFloat screenHeight =  [[UIScreen mainScreen] bounds].size.height;
         if (screenHeight>0) {
             CGFloat pageRatio = frame.size.height/screenHeight *100;
-            self.apmInstance.wxPageRatio = pageRatio>100?100:pageRatio;
+            self.apmInstance.pageRatio = pageRatio>100?100:pageRatio;
         }
         WXPerformBlockOnMainThread(^{
             if (_rootView) {
@@ -470,7 +470,7 @@ typedef enum : NSUInteger {
         newOptions[bundleUrlOptionKey] = url.absoluteString;
     }
 
-    if ([url.absoluteString hasSuffix:WEEX_LITE_URL_SUFFIX]) {
+    if ([url.absoluteString hasSuffix:WEEX_LITE_URL_SUFFIX] || [url.absoluteString containsString:@"__eagle=true"]) {
         newOptions[@"WLASM_RENDER"] = @(YES);
     }
 
@@ -534,7 +534,7 @@ typedef enum : NSUInteger {
             return;
         }
         
-        if (([options[@"DATA_RENDER"] boolValue] && [options[@"RENDER_WITH_BINARY"] boolValue]) || [options[@"WLASM_RENDER"] boolValue]) {
+        if (([newOptions[@"DATA_RENDER"] boolValue] && [newOptions[@"RENDER_WITH_BINARY"] boolValue]) || [newOptions[@"WLASM_RENDER"] boolValue]) {
             [strongSelf _renderWithData:data];
             return;
         }

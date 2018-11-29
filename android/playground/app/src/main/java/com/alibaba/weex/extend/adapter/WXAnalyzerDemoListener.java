@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,22 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.alibaba.weex.commons.adapter;
+package com.alibaba.weex.extend.adapter;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.adapter.IWXJSExceptionAdapter;
-import com.taobao.weex.common.WXJSExceptionInfo;
-import com.taobao.weex.utils.WXLogUtils;
+import android.util.Log;
+import com.taobao.weex.BuildConfig;
+import com.taobao.weex.performance.IWXAnalyzer;
+import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 
 /**
+ * @author zhongcang
+ * @date 2018/9/17
  */
-
-public class JSExceptionAdapter implements IWXJSExceptionAdapter {
-
-  @Override
-  public void onJSException(WXJSExceptionInfo exception) {
-    if (exception != null && WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d(exception.toString());
+public class WXAnalyzerDemoListener implements IWXAnalyzer {
+    @Override
+    public void transfer(String group, String module, String type, String data) {
+        //WXAnalyzerDataTransfer.switchInteractionLog(true);
+        if (BuildConfig.DEBUG){
+           // Log.d("WXAnalyzerDemoListener", "transfer: ");
+        }
     }
-  }
 }

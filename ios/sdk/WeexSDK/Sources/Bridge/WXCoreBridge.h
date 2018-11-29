@@ -202,6 +202,7 @@ namespace WeexCore
 + (void)registerComponentAffineType:(NSString *)type asType:(NSString *)baseType;
 
 + (BOOL)isComponentAffineType:(NSString *)type asType:(NSString *)baseType;
++ (void)registerCoreEnv:(NSString*)key withValue:(NSString*)value;
 
 @end
 

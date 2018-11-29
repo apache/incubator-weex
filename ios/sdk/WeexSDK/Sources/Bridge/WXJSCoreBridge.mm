@@ -38,6 +38,7 @@
 #import "WXAppMonitorProtocol.h"
 #import "JSContext+Weex.h"
 #import "WXCoreBridge.h"
+#import "WXAnalyzerCenter.h"
 
 #import <dlfcn.h>
 
@@ -163,8 +164,9 @@
         NSDictionary *componentData = [element toDictionary];
         NSString *parentRef = [ref toString];
         NSInteger insertIndex = [[index toNumber] integerValue];
-        WXLogDebug(@"callAddElement...%@, %@, %@, %ld", instanceIdString, parentRef, componentData, (long)insertIndex);
-        
+        if (WXAnalyzerCenter.isInteractionLogOpen) {
+            WXLogDebug(@"wxInteractionAnalyzer : [jsengin][addElementStart],%@,%@",instanceIdString,componentData[@"ref"]);
+        }
         return [JSValue valueWithInt32:(int32_t)callAddElement(instanceIdString, parentRef, componentData, insertIndex) inContext:[JSContext currentContext]];
     };
     
@@ -427,10 +429,6 @@
     _jsContext[@"clearTimeoutWeex"] = ^(JSValue *ret) {
         [weakSelf triggerClearTimeout:[ret toString]];
     };
-    
-    _jsContext[@"extendCallNative"] = ^(JSValue *value ) {
-        return [weakSelf extendCallNative:[value toDictionary]];
-    };
 }
 
 -(void)addInstance:(NSString *)instance callback:(NSString *)callback
@@ -543,14 +541,6 @@
     if([_timers containsObject:ret]){
         [_timers removeObject:ret];
     }
-}
-
--(id)extendCallNative:(NSDictionary *)dict
-{
-    if(dict){
-        return [WXExtendCallNativeManager sendExtendCallNativeEvent:dict];
-    }
-    return @(-1);
 }
 
 @end
