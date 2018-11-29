@@ -20,6 +20,12 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSUInteger, WXLayoutDirection) {
+    WXLayoutDirectionLTR,
+    WXLayoutDirectionRTL,
+    WXLayoutDirectionAuto,
+};
+
 typedef NS_ENUM(NSUInteger, WXComponentType) {
     WXComponentTypeCommon = 0,
     WXComponentTypeVirtual

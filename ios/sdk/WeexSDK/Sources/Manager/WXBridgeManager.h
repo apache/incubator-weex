@@ -23,7 +23,13 @@
 @class WXBridgeMethod;
 @class WXSDKInstance;
 
-extern void WXPerformBlockOnBridgeThread(void (^block)(void));
+#ifdef __cplusplus
+extern "C" {
+#endif
+    void WXPerformBlockOnBridgeThread(void (^block)(void));
+#ifdef __cplusplus
+}
+#endif
 
 @interface WXBridgeManager : NSObject
 
@@ -102,8 +108,9 @@ extern void WXPerformBlockOnBridgeThread(void (^block)(void));
  *  @param name      :   service name
  *  @param serviceScript    :   script code
  *  @param options   :   service options
+ *  @param completion : completion callback
  **/
-- (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options;
+- (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion;
 
 
 /**
@@ -111,9 +118,9 @@ extern void WXPerformBlockOnBridgeThread(void (^block)(void));
  *  @param name         :   service name
  *  @param serviceScriptUrl    :   script url
  *  @param options      :   service options
+ *  @param completion : completion callback
  **/
-
--(void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options;
+-(void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion;
 
 /**
  *  Unregister JS service Script

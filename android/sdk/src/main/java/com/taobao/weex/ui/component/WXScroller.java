@@ -33,7 +33,11 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
+import android.view.Gravity;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -96,6 +100,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private int pageSize = 0;
   private boolean pageEnable = false;
   private boolean mIsHostAttachedToWindow = false;
+  private View.OnAttachStateChangeListener mOnAttachStateChangeListener;
 
   public static class Creator implements ComponentCreator {
     @Override
@@ -372,9 +377,48 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     if (mStickyMap != null) {
       mStickyMap.clear();
     }
+    if (mOnAttachStateChangeListener != null && getInnerView() != null) {
+      getInnerView().removeOnAttachStateChangeListener(mOnAttachStateChangeListener);
+    }
     if (getInnerView() != null && getInnerView() instanceof IWXScroller) {
       ((IWXScroller) getInnerView()).destroy();
     }
+  }
+
+  @Override
+  public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      lp.setMargins(left, top, right, bottom);
+      lp.setMarginStart(left);
+      lp.setMarginEnd(right);
+    } else {
+      if (lp instanceof FrameLayout.LayoutParams) {
+        FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
+        if (this.isNativeLayoutRTL()) {
+          lp_frameLayout.gravity = Gravity.RIGHT | Gravity.TOP;
+          lp.setMargins(right, top, left, bottom);
+        } else {
+          lp_frameLayout.gravity = Gravity.LEFT | Gravity.TOP;
+          lp.setMargins(left, top, right, bottom);
+        }
+      } else {
+        lp.setMargins(left, top, right, bottom);
+      }
+    }
+  }
+
+  @Override
+  public void setLayout(WXComponent component) {
+    if (TextUtils.isEmpty(component.getComponentType())
+            || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
+            || component.getLayoutSize() == null) {
+      return;
+    }
+    if (component.getHostView() != null) {
+      int layoutDirection = component.isNativeLayoutRTL() ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR;
+      ViewCompat.setLayoutDirection(component.getHostView(), layoutDirection);
+    }
+    super.setLayout(component);
   }
 
   @Override
@@ -436,6 +480,37 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
               LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
       scrollView.addView(mRealView, layoutParams);
       scrollView.setHorizontalScrollBarEnabled(false);
+
+        final WXScroller component = this;
+        final View.OnLayoutChangeListener listener = new View.OnLayoutChangeListener() {
+          @Override
+          public void onLayoutChange(View view, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+            final View frameLayout = view;
+            scrollView.post(new Runnable() {
+              @Override
+              public void run() {
+                if (isNativeLayoutRTL()) {
+                  int mw = frameLayout.getMeasuredWidth();
+                  scrollView.scrollTo(mw, component.getScrollY());
+                } else {
+                  scrollView.scrollTo(0, component.getScrollY());
+                }
+              }
+            });
+          }
+        };
+        mRealView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+          @Override
+          public void onViewAttachedToWindow(View view) {
+            view.addOnLayoutChangeListener(listener);
+          }
+
+          @Override
+          public void onViewDetachedFromWindow(View view) {
+            view.removeOnLayoutChangeListener(listener);
+          }
+        });
+
 
       if(pageEnable) {
         mGestureDetector = new GestureDetector(new MyGestureDetector(scrollView));
@@ -537,7 +612,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         }
       }
     });
-    host.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+    mOnAttachStateChangeListener = new View.OnAttachStateChangeListener() {
       @Override
       public void onViewAttachedToWindow(View v) {
         mIsHostAttachedToWindow = true;
@@ -549,7 +624,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         mIsHostAttachedToWindow = false;
         dispatchDisappearEvent();
       }
-    });
+    };
+    host.addOnAttachStateChangeListener(mOnAttachStateChangeListener);
     return host;
   }
 
@@ -706,9 +782,21 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       mActiveFeature = mChildren.indexOf(component);
     }
 
-
-    int viewYInScroller=component.getAbsoluteY() - getAbsoluteY();
-    int viewXInScroller=component.getAbsoluteX() - getAbsoluteX();
+    int viewYInScroller = component.getAbsoluteY() - getAbsoluteY();
+    int viewXInScroller = 0;
+    if (this.isNativeLayoutRTL()) {
+      // if layout direction is rtl, we need calculate rtl scroll x;
+      if (getInnerView().getChildCount() > 0) {
+        int totalWidth = getInnerView().getChildAt(0).getWidth();
+        int displayWidth = getInnerView().getMeasuredWidth();
+        viewXInScroller = totalWidth - (component.getAbsoluteX() - getAbsoluteX()) - displayWidth;
+      } else {
+        viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
+      }
+      offsetFloat = - offsetFloat;
+    } else {
+      viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
+    }
 
     scrollBy(viewXInScroller - getScrollX() + (int) offsetFloat, viewYInScroller - getScrollY() + (int) offsetFloat, smooth);
   }

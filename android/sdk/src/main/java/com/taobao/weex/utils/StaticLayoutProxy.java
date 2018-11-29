@@ -31,6 +31,7 @@ import java.lang.reflect.Constructor;
  */
 
 public class StaticLayoutProxy {
+  private static Constructor<StaticLayout> layoutConstructor;
   public static StaticLayout create(CharSequence source, TextPaint paint,
                                     int width,
                                     Layout.Alignment align, float spacingmult, float spacingadd,
@@ -40,6 +41,8 @@ public class StaticLayoutProxy {
       StaticLayout rtlLayout =  createInternal(source, paint, width, align, textDir, spacingmult, spacingadd, includepad);
       if (rtlLayout != null) {
         return rtlLayout;
+      } else {
+        return new StaticLayout(source, paint, width, align, spacingmult, spacingadd, includepad);
       }
     }
     return new StaticLayout(source, paint, width, align, spacingmult, spacingadd, includepad);
@@ -53,16 +56,19 @@ public class StaticLayoutProxy {
       return null;
     } else {
       try {
-        Class<StaticLayout> clazz = StaticLayout.class;
-        Constructor<StaticLayout> constructor = clazz.getConstructor(CharSequence.class, TextPaint.class,
-                int.class, Layout.Alignment.class, TextDirectionHeuristic.class,
-                float.class, float.class,
-                boolean.class);
-
-        if (constructor != null) {
-          return constructor.newInstance(source, paint, width,
+        if (layoutConstructor == null) {
+          Class<StaticLayout> clazz = StaticLayout.class;
+          Constructor<StaticLayout> constructor = clazz.getConstructor(CharSequence.class, TextPaint.class,
+                  int.class, Layout.Alignment.class, TextDirectionHeuristic.class,
+                  float.class, float.class,
+                  boolean.class);
+          layoutConstructor = constructor;
+        }
+        if (layoutConstructor != null) {
+          return layoutConstructor.newInstance(source, paint, width,
                   align, textDir, spacingmult, spacingadd, includepad);
         }
+
       } catch (Throwable e) {
         e.printStackTrace();
       }

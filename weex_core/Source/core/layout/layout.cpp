@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include <math.h>
 #include "layout.h"
 #include <tuple>
 
@@ -643,21 +645,39 @@ namespace WeexCore {
 
   void WXCoreLayoutNode::onLayout(const float left, const float top, const float right, const float bottom,
                                   WXCoreLayoutNode *const absoulteItem, WXCoreFlexLine *const flexLine) {
-    switch (mCssStyle->mFlexDirection) {
-      case kFlexDirectionRow:
-        layoutHorizontal(false, left, top, right, bottom, absoulteItem, flexLine);
-        break;
-      case kFlexDirectionRowReverse:
-        layoutHorizontal(true, left, top, right, bottom, absoulteItem, flexLine);
-        break;
-      case kFlexDirectionColumnReverse:
-        layoutVertical(mCssStyle->mFlexWrap == kWrapReverse, true, left, top, right, bottom, absoulteItem, flexLine);
-        break;
-      case kFlexDirectionColumn:
-      default:
-        layoutVertical(mCssStyle->mFlexWrap == kWrapReverse, false, left, top, right, bottom, absoulteItem, flexLine);
-        break;
-    }
+      // determin direction
+      if (mLayoutResult->mLayoutDirection == kDirectionInherit) {
+          if(mCssStyle->mDirection == kDirectionInherit) {
+              // default direction in css is inherit, inherit direction from parent node
+              mLayoutResult->mLayoutDirection = NULL == mParent ? WEEXCORE_CSS_DEFAULT_DIRECTION : mParent->getLayoutDirection();
+          } else {
+              // specific direction in current Node's style
+              mLayoutResult->mLayoutDirection = mCssStyle->mDirection;
+          }
+      }
+      
+      bool verticalRTL = false;
+      if (mLayoutResult->mLayoutDirection == kDirectionRTL) {
+          verticalRTL = mCssStyle->mFlexWrap != kWrapReverse;
+      } else {
+          verticalRTL = mCssStyle->mFlexWrap == kWrapReverse;
+      }
+      
+      switch (mCssStyle->mFlexDirection) {
+        case kFlexDirectionRow:
+            layoutHorizontal(mLayoutResult->mLayoutDirection == kDirectionRTL, left, top, right, bottom, absoulteItem, flexLine);
+            break;
+        case kFlexDirectionRowReverse:
+            layoutHorizontal(mLayoutResult->mLayoutDirection != kDirectionRTL, left, top, right, bottom, absoulteItem, flexLine);
+            break;
+          case kFlexDirectionColumnReverse:
+              layoutVertical(verticalRTL, true, left, top, right, bottom, absoulteItem, flexLine);
+              break;
+          case kFlexDirectionColumn:
+          default:
+              layoutVertical(verticalRTL, false, left, top, right, bottom, absoulteItem, flexLine);
+              break;
+      }
   }
 
   /**
@@ -1081,6 +1101,34 @@ namespace WeexCore {
         break;
     }
   }
+    void WXCoreLayoutNode::determineChildLayoutDirection(const WXCoreDirection direction) {
+        for (Index i = 0; i < getChildCount(kBFC); ++i) {
+            WXCoreLayoutNode *child = getChildAt(kBFC, i);
+            // determin direction
+            if (child->mLayoutResult->mLayoutDirection == kDirectionInherit) {
+                if(child->mCssStyle->mDirection == kDirectionInherit) {
+                    // default direction in css is inherit, inherit direction from parent node
+                    child->mLayoutResult->mLayoutDirection = direction;
+                } else {
+                    // specific direction in current Node's style
+                    child->mLayoutResult->mLayoutDirection = child->mCssStyle->mDirection;
+                }
+            }
+        }
+    }
+    
+    WXCoreDirection WXCoreLayoutNode::getLayoutDirectionFromPathNode() {
+        WXCoreLayoutNode *node = this;
+        if (node->getLayoutDirection() != kDirectionInherit) return node->getLayoutDirection();
+        if (node->getDirection() != kDirectionInherit) {
+            node->mLayoutResult->mLayoutDirection = node->getDirection();
+            return node->getLayoutDirection();
+        } else if (nullptr != node->mParent) {
+            node->mLayoutResult->mLayoutDirection = node->mParent->getLayoutDirectionFromPathNode();
+            return node->getLayoutDirection();
+        }
+        return WEEXCORE_CSS_DEFAULT_DIRECTION;
+    }
 }
 
 

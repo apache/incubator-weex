@@ -27,6 +27,7 @@
 #import "WXSDKInstance_private.h"
 #import "WXHandlerFactory.h"
 #import "WXValidateProtocol.h"
+#import "WXAnalyzerCenter.h"
 
 @implementation WXModuleMethod
 
@@ -46,6 +47,9 @@
 
 - (NSInvocation *)invoke
 {
+    if ([WXAnalyzerCenter isInteractionLogOpen]) {
+        WXLogDebug(@"wxInteractionAnalyzer : [client][callnativemodulestart],%@,%@,%@",self.instance.instanceId,self.moduleName,self.methodName);
+    }
     if (self.instance.needValidate) {
         id<WXValidateProtocol> validateHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)];
         if (validateHandler) {
@@ -103,6 +107,9 @@
     
     if (isSync) {
         [invocation invoke];
+        if ([WXAnalyzerCenter isInteractionLogOpen]) {
+            WXLogDebug(@"wxInteractionAnalyzer : [client][callnativemoduleEnd],%@,%@,%@",self.instance.instanceId,self.moduleName,self.methodName);
+        }
         return invocation;
     } else {
         [self _dispatchInvocation:invocation moduleInstance:moduleInstance];
@@ -130,6 +137,9 @@
     // dispatch to user specified queue or thread, default is main thread
     dispatch_block_t dispatchBlock = ^ (){
         [invocation invoke];
+        if ([WXAnalyzerCenter isInteractionLogOpen]) {
+            WXLogDebug(@"wxInteractionAnalyzer : [client][callnativemoduleEnd],%@,%@,%@",self.instance.instanceId,self.moduleName,self.methodName);
+        }
     };
     
     NSThread *targetThread = nil;

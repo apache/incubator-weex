@@ -131,6 +131,8 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 
 + (NSDictionary *_Nonnull)getDebugEnvironment;
 
++ (WXLayoutDirection)getEnvLayoutDirection;
+
 /**
  * @abstract UserAgent Generation
  *
@@ -488,6 +490,10 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
 + (void)setUseJSCApiForCreateInstance:(BOOL)value;
 
 + (BOOL)useJSCApiForCreateInstance;
+
++ (void)setEnableRTLLayoutDirection:(BOOL)value;
+
++ (BOOL)enableRTLLayoutDirection;
 
 + (long) getUnixFixTimeMillis;
 

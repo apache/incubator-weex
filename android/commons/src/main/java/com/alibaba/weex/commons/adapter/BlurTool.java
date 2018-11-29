@@ -85,7 +85,6 @@ public class BlurTool {
                 }
 
                 Bitmap result = stackBlur(sampledImage,radius);
-                WXLogUtils.d(TAG, "elapsed time on blurring image(radius:"+ radius + ",sampling: " + sampling + "): " + (System.currentTimeMillis() - start) + "ms");
                 return result;
             }catch (Exception e) {
                 WXLogUtils.e(TAG, "thrown exception when blurred image(times = " + i + "),"+ e.getMessage());

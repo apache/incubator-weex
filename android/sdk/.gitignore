@@ -14,3 +14,6 @@ lint.xml
 project.properties
 assets/main.js
 .externalNativeBuild
+libs/armeabi/libweexcore.so
+libs/armeabi-v7a/libweexcore.so
+libs/x86/libweexcore.so

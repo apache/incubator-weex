@@ -23,6 +23,10 @@
 #include <string>
 
 namespace WeexCore {
+  // direction
+  constexpr char RTL[] = "rtl";
+  constexpr char LTR[] = "ltr";
+  constexpr char INHERIT[] = "inherit";
 
   // flex-direction
   constexpr char ROW[] = "row";

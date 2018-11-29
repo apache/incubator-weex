@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <string.h>
 #include "core/data_render/string_table.h"
 
 namespace weex {

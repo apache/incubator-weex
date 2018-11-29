@@ -317,13 +317,24 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   }
 
   private void showNextItem() {
-    if (!needLoop && superGetCurrentItem() == getRealCount() - 1) {
-      return;
-    }
-    if (getRealCount() == 2 && superGetCurrentItem() == 1) {
-      superSetCurrentItem(0, true);
+    if (this.getCirclePageAdapter() != null && this.getCirclePageAdapter().isRTL) {
+      if (!needLoop && superGetCurrentItem() == 0) {
+        return;
+      }
+      if (getRealCount() == 2 && superGetCurrentItem() == 0) {
+        superSetCurrentItem(1, true);
+      } else {
+        superSetCurrentItem(superGetCurrentItem() - 1, true);
+      }
     } else {
-      superSetCurrentItem(superGetCurrentItem() + 1, true);
+      if (!needLoop && superGetCurrentItem() == getRealCount() - 1) {
+        return;
+      }
+      if (getRealCount() == 2 && superGetCurrentItem() == 1) {
+        superSetCurrentItem(0, true);
+      } else {
+        superSetCurrentItem(superGetCurrentItem() + 1, true);
+      }
     }
   }
 }

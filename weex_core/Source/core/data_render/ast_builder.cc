@@ -106,10 +106,10 @@ Handle<Expression> ASTBuilder::NewPrefixExpression(PrefixOperation op, Handle<Ex
     return save(factory()->NewPrefixExpression(locator()->location(), manager()->current(), op, expr));
 }
     
-Handle<Expression> ASTBuilder::NewNewExpression(Handle<Expression> expr)
+Handle<Expression> ASTBuilder::NewNewExpression(Handle<Expression> expr, Handle<ExpressionList> args)
 {
     COUNT();
-    return save(factory()->NewNewExpression(locator()->location(), manager()->current(), expr));
+    return save(factory()->NewNewExpression(locator()->location(), manager()->current(), expr, args));
 }
     
 Handle<Expression> ASTBuilder::NewPostfixExpression(PostfixOperation op,
@@ -165,6 +165,12 @@ Handle<Expression> ASTBuilder::NewStringConstant(const std::string &str)
 {
     COUNT();
     return save(factory()->NewStringConstant(locator()->location(), manager()->current(), str));
+}
+
+Handle<Expression> ASTBuilder::NewRegexConstant(const std::string &str)
+{
+    COUNT();
+    return save(factory()->NewRegexConstant(locator()->location(), manager()->current(), str));
 }
     
 Handle<Expression> ASTBuilder::NewThisExpression()
@@ -261,6 +267,29 @@ Handle<Expression> ASTBuilder::NewClassStatement(Handle<Expression> identifier, 
     return save(factory()->NewClassStatement(locator()->location(), manager()->current(), identifier, superClass, body));
 }
     
+Handle<Expression> ASTBuilder::NewClassProperty(std::string name, Handle<Expression> init) {
+    COUNT();
+    return save(factory()->NewClassProperty(locator()->location(), manager()->current(), name, init));
+}
+
+Handle<Expression> ASTBuilder::NewCaseStatement(Handle<Expression> test_case,Handle<ExpressionList> expr) {
+    COUNT();
+    return save(factory()->NewCaseStatement(locator()->location(), manager()->current(), test_case, expr));
+}
+
+Handle<Expression> ASTBuilder::NewSwitchStatement(Handle<Expression> test_value,
+                                                  std::vector<Handle<weex::core::data_render::Expression>> cases) {
+    COUNT();
+    return save(factory()->NewSwitchStatement(locator()->location(), manager()->current(), test_value, cases));
+}
+Handle<Expression> ASTBuilder::NewTryCatchStatement(Handle<Expression> try_block,
+                                                    Handle<weex::core::data_render::Expression> catch_expr,
+                                                    Handle<weex::core::data_render::Expression> catch_block,
+                                                    Handle<weex::core::data_render::Expression> finally) {
+    COUNT();
+    return save(factory()->NewTryCatchStatement(locator()->location(), manager()->current(),try_block,catch_expr,catch_block,finally));
+}
+
 }
 }
 }

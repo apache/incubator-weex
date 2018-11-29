@@ -70,6 +70,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class WXPageActivity extends WXBaseActivity implements IWXRenderListener, Handler.Callback, WXSDKInstance.NestedInstanceInterceptor {
@@ -242,8 +244,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       public void onSuccess(WXHttpTask task) {
         Log.i(TAG, "into--[http:onSuccess] url:" + url);
         try {
+          Uri uri = Uri.parse(url);
           mConfigMap.put("bundleUrl", url);
-          mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
+          if (uri.getPath().endsWith(".wlasm")){
+            mInstance.render(TAG, task.response.data, mConfigMap, null);
+          } else {
+            mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
+          }
         } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
         }
@@ -265,11 +272,25 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
    */
   private void startHotRefresh() {
     try {
-      String host = new URL(mUri.toString()).getHost();
-      String wsUrl = "ws://" + host + ":8082";
+      URL url = new URL(mUri.toString());
+      String host = url.getHost();
+      String query = url.getQuery();
+      String wsport = getUrlParam("wsport", query);
+      String wsUrl = "ws://" + host + ":" + (wsport.equals("") ? "8082" : wsport) ;
       mWXHandler.obtainMessage(Constants.HOT_REFRESH_CONNECT, 0, 0, wsUrl).sendToTarget();
     } catch (MalformedURLException e) {
       e.printStackTrace();
+    }
+  }
+
+  private String getUrlParam(String key, String queryString) {
+    String regex = "[?|&]?" + key + "=([^&]+)";
+    Pattern p = Pattern.compile(regex);
+    Matcher matcher = p.matcher(queryString);
+    if (matcher.find()) {
+      return matcher.group(1);
+    } else {
+      return "";
     }
   }
 

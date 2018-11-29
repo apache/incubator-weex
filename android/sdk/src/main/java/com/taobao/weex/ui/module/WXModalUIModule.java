@@ -260,7 +260,6 @@ public class WXModalUIModule extends WXSDKEngine.DestroyableModule {
   @Override
   public void destroy() {
     if (activeDialog != null && activeDialog.isShowing()) {
-      WXLogUtils.w("Dismiss the active dialog");
       activeDialog.dismiss();
     }
   }

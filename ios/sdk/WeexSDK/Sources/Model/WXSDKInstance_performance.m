@@ -27,6 +27,7 @@
 #import "WXCellComponent.h"
 #import "WXImageComponent.h"
 #import "WXUtility.h"
+#import "WXAnalyzerCenter+Transfer.h"
 
 @interface WXPerformance()
 @property (nonatomic, assign) bool hasRecordFsRenderTimeByPosition;
@@ -70,6 +71,9 @@
     if (nil == targetComponent) {
         return;
     }
+    if (targetComponent.ignoreInteraction) {
+        return;
+    }
     double diff = modifyTime - self.renderTimeOrigin;
     if (diff > 8000) {
         return;
@@ -85,11 +89,8 @@
     
     CGRect absoluteFrame = [targetComponent.view.superview convertRect:targetComponent.view.frame toView:targetComponent.weexInstance.rootView];
     CGRect rootFrame = targetComponent.weexInstance.rootView.frame;
-    CGPoint leftTop = absoluteFrame.origin;
-    CGPoint rightBottom = CGPointMake(absoluteFrame.origin.x+absoluteFrame.size.width, absoluteFrame.origin.y+absoluteFrame.size.height);
-
     
-    if (!self.hasRecordFsRenderTimeByPosition && rightBottom.y > rootFrame.size.height +1 && ![self _isViewGroup:targetComponent] ) {
+    if (!self.hasRecordFsRenderTimeByPosition && absoluteFrame.origin.y+absoluteFrame.size.height > rootFrame.size.height +1 && ![self _isViewGroup:targetComponent] ) {
         self.newFsRenderTime = diff;
         self.hasRecordFsRenderTimeByPosition = true;
         [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_NEW_FSRENDER];
@@ -107,27 +108,21 @@
         return;
     }
     
-    bool inScreen = CGRectContainsPoint(rootFrame, leftTop) || CGRectContainsPoint(rootFrame, rightBottom);
+    bool inScreen = CGRectIntersectsRect(rootFrame, absoluteFrame);
     if (!inScreen) {
         return;
     }
     
-#ifdef DEBUG
-    WXLogDebug(@"onElementChange _-> size, count :%f,inScreen:%d,  lefttop:%@,rightBottom:%@, rootFrame:%@",
-          self.interactionAddCountRecord,
-          inScreen,
-          NSStringFromCGPoint(leftTop),
-          NSStringFromCGPoint(rightBottom),
-          NSStringFromCGRect(targetComponent.weexInstance.rootView.frame)
-          );
-#endif
     if (!targetComponent.weexInstance.apmInstance.hasRecordFirstInterationView) {
         targetComponent.weexInstance.apmInstance.hasRecordFirstInterationView = YES;
         [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW];
     }
+    [WXAnalyzerCenter transferInteractionInfo:targetComponent];
     [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_INTERACTION];
     self.interactionLimitAddOpCount++;
     self.interactionAddCount = self.interactionAddCountRecord;
+    [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT curMaxValue:self.interactionLimitAddOpCount];
+    [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_I_ALL_VIEW_COUNT curMaxValue:self.interactionAddCount];
     self.interactionTime = self.interactionTime < diff ? diff :self.interactionTime;
 }
 

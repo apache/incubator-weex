@@ -99,6 +99,11 @@ public class WXInstanceApmAdapter implements IWXApmMonitorAdapter {
         isAppear = false;
     }
 
+    @Override
+    public String parseReportUrl(String originUrl) {
+        return originUrl;
+    }
+
     private APMInfo getAndCheckAndSubProcedureMap(String procedureName) {
         APMInfo info = mSubProcedureInfo.get(procedureName);
         if (null != info) {

@@ -27,8 +27,18 @@
 #import "WXAnalyzerCenter.h"
 #import "WXAnalyzerCenter+Transfer.h"
 #import "WXUtility.h"
+#import "WXSDKInstance_performance.h"
+#import "WXCoreBridge.h"
+#import "WXBridgeManager.h"
+#import "WXBridgeContext.h"
+
+
+#define MODULE_WX_APM  @"wxapm"
 
 @interface WXAnalyzerCenter ()
+{
+    BOOL _interactionLogSwitch;
+}
 @property (nonatomic, strong) NSMutableArray<WXAnalyzerProtocol> *analyzerList;
 @property (nonatomic, assign) BOOL anzlyzerSwitch;
 @end
@@ -43,173 +53,105 @@
     dispatch_once(&once, ^{
         instance = [[WXAnalyzerCenter alloc] init];
         instance.analyzerList= [NSMutableArray<WXAnalyzerProtocol> new];
-        instance.anzlyzerSwitch = FALSE;
+        instance.anzlyzerSwitch = NO;
     });
 
     return instance;
 }
 
-+ (void) transDataOnState:(CommitState) timeState withInstaneId:(NSString *)instanceId data:(NSDictionary *)data
++ (void) transferPerformance:(NSString*)instanceId withType:(NSString*) type andKey:(NSString*) key andValue:(id)value
 {
     if (![self isOpen]) {
         return;
     }
-    if (!instanceId) {
-        return;
-    }
-    WXSDKInstance * instance = [WXSDKManager instanceForID:instanceId];
-    if (!instance) {
-        return;
+
+    if ([self isInteractionLogOpen] && [type isEqualToString:@"stage"]) {
+        WXLogDebug(@"wxInteractionAnalyzer : [client][stage],%@,%@,%@",instanceId,key,value);
     }
 
-    NSDictionary *commitDimenKeys = [self getKeys:TRUE];
-    NSDictionary *commitMeasureKeys = [self getKeys:FALSE];
-    for(id key in data){
-       if([self checkDataWithSate:timeState checkKey:key limitDic:commitMeasureKeys]){
-           [self _transMeasureValue:instance key:key withVal:[data valueForKey:key]];
-       }else if([self checkDataWithSate:timeState checkKey:key limitDic:commitDimenKeys]){
-           [self _transDimenValue:instance key:key withVal:[data valueForKey:key]];
-       }else{
-           WXLogDebug(@"WXAnalyzerDataTransfer -> unKnowPerformanceKey :%@",key);
-       }
-    }
-}
-
-+(BOOL) checkDataWithSate:(CommitState)timeState checkKey:(id)key limitDic:(NSDictionary *)limitDic
-{
-    if (!key || ![key isKindOfClass:[NSString class]]) {
-        return FALSE;
-    }
-   
-    if (![limitDic objectForKey:key]) {
-        return FALSE;
-    }
-    CommitState limitSate = [[limitDic objectForKey:key] intValue];
-    return timeState == limitSate;
-}
-
-+ (NSDictionary *) getKeys:(BOOL) measureOrDimen
-{
-    static NSDictionary *commitDimenKeys;
-    static NSDictionary *commitMeasureKeys;
-    static dispatch_once_t onceToken;
-    
-    dispatch_once(&onceToken, ^{
-        // non-standard perf commit names, remove this hopefully.
-        
-        commitDimenKeys =@{
-                           BIZTYPE:             [NSNumber numberWithInt:DebugAfterFSFinish],
-                           PAGENAME:            [NSNumber numberWithInt:DebugAfterRequest],
-                           WXSDKVERSION:        [NSNumber numberWithInt:DebugAfterRequest],
-                           JSLIBVERSION:        [NSNumber numberWithInt:DebugAfterRequest],
-                           JSLIBSIZE:           [NSNumber numberWithInt:DebugAfterRequest],
-                           WXREQUESTTYPE:       [NSNumber numberWithInt:DebugAfterRequest],
-                           WXCONNECTIONTYPE:    [NSNumber numberWithInt:DebugAfterRequest],
-                           NETWORKTYPE:         [NSNumber numberWithInt:DebugAfterRequest],
-                           CACHETYPE:           [NSNumber numberWithInt:DebugAfterRequest],
-                           WXCUSTOMMONITORINFO: [NSNumber numberWithInt:DebugAfterRequest]
-        };
-        commitMeasureKeys =@{
-                             SDKINITTIME:                   [NSNumber numberWithInt:DebugAfterFSFinish],
-                             SDKINITINVOKETIME:             [NSNumber numberWithInt:DebugAfterFSFinish],
-                             JSLIBINITTIME:                 [NSNumber numberWithInt:DebugAfterFSFinish],
-                             JSTEMPLATESIZE:                [NSNumber numberWithInt:DebugAfterRequest],
-                             NETWORKTIME:                   [NSNumber numberWithInt:DebugAfterRequest],
-                             COMMUNICATETIME:               [NSNumber numberWithInt:DebugAfterExist],
-                             SCREENRENDERTIME:              [NSNumber numberWithInt:DebugAfterExist],
-                             TOTALTIME:                     [NSNumber numberWithInt:DebugAfterExist],
-                             FIRSETSCREENJSFEXECUTETIME:    [NSNumber numberWithInt:DebugAfterFSFinish],
-                             CALLCREATEINSTANCETIME:        [NSNumber numberWithInt:DebugAfterFSFinish],
-                             COMMUNICATETOTALTIME:          [NSNumber numberWithInt:DebugAfterExist],
-                             FSRENDERTIME:                  [NSNumber numberWithInt:DebugAfterExist],
-                             CACHEPROCESSTIME:              [NSNumber numberWithInt:DebugAfterRequest],
-                             CACHERATIO:                    [NSNumber numberWithInt:DebugAfterRequest],
-                             M_FS_CALL_JS_TIME:             [NSNumber numberWithInt:DebugAfterFSFinish],
-                             M_FS_CALL_JS_NUM:              [NSNumber numberWithInt:DebugAfterFSFinish],
-                             M_FS_CALL_NATIVE_TIME:         [NSNumber numberWithInt:DebugAfterFSFinish],
-                             M_FS_CALL_NATIVE_NUM:          [NSNumber numberWithInt:DebugAfterFSFinish],
-                             M_FS_CALL_EVENT_NUM:           [NSNumber numberWithInt:DebugAfterFSFinish],
-                             M_CELL_EXCEED_NUM:             [NSNumber numberWithInt:DebugAfterFSFinish],
-                             M_MAX_DEEP_VDOM:               [NSNumber numberWithInt:DebugAfterExist],
-                             M_IMG_WRONG_SIZE_NUM:          [NSNumber numberWithInt:DebugAfterExist],
-                             M_TIMER_NUM:                   [NSNumber numberWithInt:DebugAfterFSFinish],
-                             M_INTERACTION_TIME:            [NSNumber numberWithInt:DebugAfterExist],
-                             M_INTERACTION_ADD_COUNT:       @(DebugAfterFSFinish),
-                             M_INTERACTION_LIMIT_ADD_COUNT: @(DebugAfterFSFinish),
-                             COMPONENTCOUNT:                @(DebugAfterExist),
-                             M_COMPONENT_TIME:              @(DebugAfterExist),
-                             M_NEW_FS_RENDER_TIME:                  @(DebugAfterExist),
-                             };
-        
-    });
-    return measureOrDimen?commitMeasureKeys:commitDimenKeys;
-}
-
-+ (void) _transMeasureValue:(WXSDKInstance *)instance key:(NSString *)commitKey withVal:(id)commitVal
-{
-    [self _transDataToAnaylzer:instance
-                        withModule:MODULE_PERFORMANCE
-                        withType:TYPE_MEASURE_REAL
-                        withData:@{commitKey:commitVal}
-     ];
-}
-
-+ (void) _transDimenValue:(WXSDKInstance *)instance key:(NSString *)commitKey withVal:(id)commitVal
-{
-    [self _transDataToAnaylzer:instance
-                        withModule:MODULE_PERFORMANCE
-                        withType:TYPE_DIMEN_REAL
-                        withData:@{commitKey:commitVal}
-     ];
-}
-
-+(void) _transDataToAnaylzer:(WXSDKInstance *)instance withModule:(NSString *)module  withType:(NSString *)type withData:(NSDictionary *)data
-{
     NSMutableArray* analyzerList = [self getAnalyzerList];
     if (nil == analyzerList) {
         return;
     }
     
-    NSMutableDictionary *wrapDic = [data mutableCopy];
-    [wrapDic setObject:instance.instanceId forKey:@"instanceId"];
-    [wrapDic setObject:[instance.scriptURL absoluteString]?:@"unSetscriptURL" forKey:@"url"];
-    [wrapDic setValue:GROUP_ANALYZER forKey:@"group"];
-    [wrapDic setValue:module forKey:@"module"];
-    [wrapDic setValue:type forKey:@"type"];
-
-    
-    if ([self needTransfer]) {
-        for (id analyzer in analyzerList) {
-            if ( [analyzer respondsToSelector:(@selector(transfer:))])
-            {
-                [analyzer performSelector:@selector(transfer:) withObject:wrapDic];
-            }
+    NSDictionary* dic =  @{
+                            @"group":MODULE_WX_APM,
+                            @"module":instanceId,
+                            @"type":type,
+                            @"data":@{key:value}
+                            };
+    for (id analyzer in analyzerList) {
+        if ([analyzer respondsToSelector:(@selector(transfer:))]){
+            [analyzer performSelector:@selector(transfer:) withObject:dic];
         }
     }
+}
+
++ (void) transferInteractionInfo:(WXComponent*)targetComponent
+{
+    if (![self isOpen]) {
+        return;
+    }
+    NSMutableArray* analyzerList = [self getAnalyzerList];
+    if (nil == analyzerList) {
+        return;
+    }
     
+    long renderOriginDiffTime = [WXUtility getUnixFixTimeMillis] - targetComponent.weexInstance.performance.renderUnixTimeOrigin;
     
+    NSDictionary* dic =  @{
+                           @"group":MODULE_WX_APM,
+                           @"module":targetComponent.weexInstance.instanceId,
+                           @"type":@"wxinteraction",
+                           @"data":@{
+                                   @"renderOriginDiffTime":@(renderOriginDiffTime),
+                                   @"type":targetComponent.type,
+                                   @"ref":targetComponent.ref,
+                                   @"style":targetComponent.styles,
+                                   @"attrs":targetComponent.attributes
+                                   }
+                           };
+    for (id analyzer in analyzerList) {
+        if ([analyzer respondsToSelector:(@selector(transfer:))]){
+            [analyzer performSelector:@selector(transfer:) withObject:dic];
+        }
+    }
+    if ([self isInteractionLogOpen]) {
+        WXLogDebug(@"wxInteractionAnalyzer : [client][wxinteraction]%@",dic);
+    }
 }
 
 +(void)transErrorInfo:(WXJSExceptionInfo *)errorInfo
 {
-    if (!errorInfo) {
+    if (![self isOpen] || !errorInfo) {
         return;
     }
+
     WXSDKInstance *instance = [WXSDKManager instanceForID:errorInfo.instanceId];
     if (!instance) {
         return;
     }
+    NSMutableArray* analyzerList = [self getAnalyzerList];
+    if (nil == analyzerList) {
+        return;
+    }
+
     NSDictionary *dic= @{
                          @"errorCode":errorInfo.errorCode?:@"-1",
                          @"errorGroup":@"",
-                         @"errorMsg":errorInfo.exception?:@"unSetException"
-                         };
+                         @"errorMsg":errorInfo.exception?:@"unSetException",
+                         @"instanceId":instance.instanceId,
+                         @"url":[instance.scriptURL absoluteString]?:@"unSetscriptURL",
+                         @"group":GROUP_ANALYZER,
+                         @"module":MODULE_ERROR,
+                         @"type":TYPE_JS_ERROR
+                        };
     
-    [self _transDataToAnaylzer:instance
-                    withModule:MODULE_ERROR
-                      withType:TYPE_JS_ERROR
-                      withData:dic
-     ];
+    for (id analyzer in analyzerList) {
+        if ([analyzer respondsToSelector:(@selector(transfer:))]){
+            [analyzer performSelector:@selector(transfer:) withObject:dic];
+        }
+    }
 }
 
 + (void) addWxAnalyzer:(id<WXAnalyzerProtocol>)handler
@@ -233,17 +175,6 @@
     return [WXAnalyzerCenter sharedInstance].analyzerList;
 }
 
-+(BOOL) needTransfer
-{
-    if(![self isOpen]){
-        return FALSE;
-    }
-    NSMutableArray* analyzerList = [self getAnalyzerList];
-    if (nil == analyzerList || analyzerList.count <= 0) {
-        return FALSE;
-    }
-    return TRUE;
-}
 
 + (void)setOpen:(BOOL)isOpen
 {
@@ -253,6 +184,38 @@
 + (BOOL)isOpen
 {
      return [WXAnalyzerCenter sharedInstance].anzlyzerSwitch;
+}
+
++(void) switchInteractionLog:(BOOL) isOpen
+{
+    if ([WXAnalyzerCenter sharedInstance]->_interactionLogSwitch == isOpen) {
+        return;
+    }
+    [WXAnalyzerCenter sharedInstance]->_interactionLogSwitch = isOpen;
+    [WXCoreBridge registerCoreEnv:@"switchInteractionLog" withValue:isOpen?@"true":@"false"];
+#ifdef DEBUG
+    [WXLog setLogLevel: isOpen?WXLogLevelDebug:WXLogLevelLog];
+#else
+     [WXLog setLogLevel: isOpen?WXLogLevelDebug:WXLogLevelWarning];
+#endif
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
+    if ([WXSDKManager.bridgeMgr respondsToSelector:@selector(bridgeCtx)]) {
+        id bridgeCtx = [WXSDKManager.bridgeMgr performSelector:@selector(bridgeCtx) withObject:nil];
+        if (nil != bridgeCtx && [bridgeCtx respondsToSelector:@selector(callJSMethod:args:)]) {
+            WXPerformBlockOnBridgeThread(^(){
+                NSArray* args = @[isOpen?@(1):@(0)];
+                [bridgeCtx performSelector:@selector(callJSMethod:args:) withObject:@"switchInteractionLog" withObject:args];
+            });
+        }
+    }
+#pragma clang diagnostic pop
+}
+
++(BOOL) isInteractionLogOpen
+{
+    return [WXAnalyzerCenter sharedInstance]->_interactionLogSwitch;
 }
 
 @end

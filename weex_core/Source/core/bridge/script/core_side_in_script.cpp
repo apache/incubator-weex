@@ -415,6 +415,15 @@ void CoreSideInScript::DispatchMessage(const char *client_id, const char *data, 
       ->DispatchMessage(client_id, data, dataLength, callback, vm_id);
 }
 
+std::unique_ptr<WeexJSResult> CoreSideInScript::DispatchMessageSync(
+    const char *client_id, const char *data, int dataLength,
+    const char *vm_id) {
+  return WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->platform_side()
+      ->DispatchMessageSync(client_id, data, dataLength, vm_id);
+}
+
 void CoreSideInScript::ReportException(const char *page_id, const char *func,
                                        const char *exception_string) {
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(

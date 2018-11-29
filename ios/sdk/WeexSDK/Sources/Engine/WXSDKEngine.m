@@ -100,6 +100,8 @@
     [self registerComponent:@"div" withClass:NSClassFromString(@"WXComponent") withProperties:nil];
     [self registerComponent:@"text" withClass:NSClassFromString(@"WXTextComponent") withProperties:nil];
     [self registerComponent:@"image" withClass:NSClassFromString(@"WXImageComponent") withProperties:nil];
+    [self registerComponent:@"richtext" withClass:NSClassFromString(@"WXRichText") withProperties:nil];
+    
     [self registerComponent:@"scroller" withClass:NSClassFromString(@"WXScrollerComponent") withProperties:nil];
     [self registerComponent:@"list" withClass:NSClassFromString(@"WXListComponent") withProperties:nil];
     [self registerComponent:@"recycler" withClass:NSClassFromString(@"WXRecyclerComponent") withProperties:nil];
@@ -166,14 +168,25 @@
 
 
 # pragma mark Service Register
+
 + (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options
 {
-    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options];
+    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options completion:nil];
 }
 
-+ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl WithOptions:(NSDictionary *)options
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion
 {
-    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options];
+    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options completion:completion];
+}
+
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options
+{
+    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options completion:nil];
+}
+
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion
+{
+    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options completion:completion];
 }
 
 + (void)unregisterService:(NSString *)name
@@ -211,15 +224,6 @@
 + (void)initSDKEnvironment
 {
     NSString *fileName = @"weex-main-jsfm";
-    [WXSDKManager sharedInstance].multiContext = YES;
-    
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"createInstanceUsingMutliContext"]) {
-        BOOL createInstanceUsingMutliContext = [[[NSUserDefaults standardUserDefaults] objectForKey:@"createInstanceUsingMutliContext"] boolValue];
-        if (!createInstanceUsingMutliContext) {
-            fileName = @"native-bundle-main";
-            [WXSDKManager sharedInstance].multiContext = NO;
-        }
-    }
     NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:fileName ofType:@"js"];
 	if (filePath == nil) {
 		filePath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"js"];
@@ -317,14 +321,6 @@ static NSDictionary *_customEnvironment;
 + (void)restart
 {
     NSString *fileName = @"weex-main-jsfm";
-    [WXSDKManager sharedInstance].multiContext = YES;
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"createInstanceUsingMutliContext"]) {
-        BOOL createInstanceUsingMutliContext = [[[NSUserDefaults standardUserDefaults] objectForKey:@"createInstanceUsingMutliContext"] boolValue];
-        if (!createInstanceUsingMutliContext) {
-            fileName = @"native-bundle-main";
-            [WXSDKManager sharedInstance].multiContext = NO;
-        }
-    }
     NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:fileName ofType:@"js"];
 	if (filePath == nil) {
 		filePath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"js"];

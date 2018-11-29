@@ -18,7 +18,7 @@
  */
 
 #include <utility>
-
+#include <math.h>
 #include "core/css/constants_name.h"
 #include "core/render/node/render_scroller.h"
 
@@ -52,4 +52,11 @@ void RenderScroller::set_flex(const float flex) {
   this->is_set_flex_ = true;
   WXCoreLayoutNode::set_flex(flex);
 }
+    
+    void RenderScroller::onLayout(const float left, const float top, const float right, const float bottom,
+                                  WXCoreLayoutNode *const absoulteItem, WXCoreFlexLine *const flexLine) {
+        // In scroller only use left to right direction to caculate children frame
+        this->setLayoutDirection(kDirectionLTR);
+        RenderObject::onLayout(left, top, right, bottom, absoulteItem, flexLine);
+    }
 }  // namespace WeexCore

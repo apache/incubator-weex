@@ -27,7 +27,6 @@ function fireEvent (document, nodeId, type, event, domChanges, params) {
     event._nodeId = nodeId
     return document.fireEvent(document.getRef('_documentElement'), type, event, domChanges, params)
   }
-
 }
 
 function callback (document, callbackId, data, ifKeepAlive) {
