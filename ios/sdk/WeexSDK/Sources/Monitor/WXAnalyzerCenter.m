@@ -199,6 +199,8 @@
      [WXLog setLogLevel: isOpen?WXLogLevelDebug:WXLogLevelWarning];
 #endif
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
     if ([WXSDKManager.bridgeMgr respondsToSelector:@selector(bridgeCtx)]) {
         id bridgeCtx = [WXSDKManager.bridgeMgr performSelector:@selector(bridgeCtx) withObject:nil];
         if (nil != bridgeCtx && [bridgeCtx respondsToSelector:@selector(callJSMethod:args:)]) {
@@ -208,6 +210,7 @@
             });
         }
     }
+#pragma clang diagnostic pop
 }
 
 +(BOOL) isInteractionLogOpen
