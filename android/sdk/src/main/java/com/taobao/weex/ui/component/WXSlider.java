@@ -214,7 +214,9 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   @Override
   public void setLayout(WXComponent component) {
-    mAdapter.setLayoutDirectionRTL(this.isNativeLayoutRTL());
+    if (mAdapter != null) {
+      mAdapter.setLayoutDirectionRTL(this.isNativeLayoutRTL());
+    }
     super.setLayout(component);
   }
 

@@ -173,6 +173,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private String mLastBoxShadowId;
   public int mDeepInComponentTree = 0;
   public boolean mIsAddElementToTree = false;
+  //for fix element case
+  public int interactionAbsoluteX=0,interactionAbsoluteY=0;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
@@ -180,6 +182,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public static final int TYPE_VIRTUAL = 1;
 
   private boolean waste = false;
+  public boolean isIgnoreInteraction = false;
 
   private ContentBoxMeasurement contentBoxMeasurement;
   private WXTransition mTransition;
@@ -682,7 +685,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         component = this;
       }
       bindComponent(component);
-      setLayout(component);
+      setSafeLayout(component);
       setPadding(component.getPadding(), component.getBorder());
       applyEvents();
     }
@@ -701,7 +704,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   public void applyLayoutOnly(){
     if(!isLazy()) {
-      setLayout(this);
+      setSafeLayout(this);
       setPadding(this.getPadding(), this.getBorder());
     }
   }
@@ -922,13 +925,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   /**
    * layout view
    */
-  public void setLayout(WXComponent component) {
+  public void setSafeLayout(WXComponent component) {
     if (TextUtils.isEmpty(component.getComponentType())
             || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
             || component.getLayoutSize() == null) {
       return;
     }
+    setLayout(component);
+  }
 
+  /**
+   * layout view
+   */
+  public void setLayout(WXComponent component) {
     setLayoutSize(component.getLayoutSize());
     setLayoutPosition(component.getLayoutPosition());
     setPaddings(component.getPadding());
@@ -981,9 +990,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getCSSLayoutTop());
     mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + getCSSLayoutLeft());
 
-    if (mIsAddElementToTree)
-      mInstance.onChangeElement(this, mAbsoluteY > mInstance.getWeexHeight() + 1);
-
     if (mHost == null) {
       return;
     }
@@ -1032,6 +1038,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       } else {
         setHostLayoutParams(mHost, realWidth, realHeight, realLeft, realRight, realTop, realBottom);
       }
+      recordInteraction(realWidth,realHeight);
       mPreRealWidth = realWidth;
       mPreRealHeight = realHeight;
       mPreRealLeft = realLeft;
@@ -1041,6 +1048,34 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       // restore box shadow
       updateBoxShadow();
     }
+  }
+
+  private void recordInteraction(int realWidth,int realHeight){
+    if (!mIsAddElementToTree){
+      return;
+    }
+    mIsAddElementToTree = false;
+    if (null == mParent){
+      interactionAbsoluteX = 0;
+      interactionAbsoluteY = 0;
+    }else {
+      float cssTop = getCSSLayoutTop();
+      float cssLeft = getCSSLayoutLeft();
+      interactionAbsoluteX = (int)(this.isFixed() ? cssLeft : mParent.interactionAbsoluteX + cssLeft);
+      interactionAbsoluteY = (int)(this.isFixed() ? cssTop  : mParent.interactionAbsoluteY + cssTop);
+    }
+
+    if (null == getInstance().getApmForInstance().instanceRect){
+      getInstance().getApmForInstance().instanceRect = new Rect();
+    }
+    Rect instanceRect = getInstance().getApmForInstance().instanceRect;
+    instanceRect.set(0,0,mInstance.getWeexWidth(),mInstance.getWeexHeight());
+    boolean inScreen =
+          instanceRect.contains(interactionAbsoluteX,interactionAbsoluteY) //leftTop
+              || instanceRect.contains(interactionAbsoluteX+realWidth,interactionAbsoluteY)//rightTop
+              || instanceRect.contains(interactionAbsoluteX,interactionAbsoluteY+realHeight)//leftBottom
+              || instanceRect.contains(interactionAbsoluteX+realWidth,interactionAbsoluteY+realHeight);//rightBottom
+    mInstance.onChangeElement(this,!inScreen);
   }
 
   private void setWidgetParams(Widget widget, FlatGUIContext UIImp, Point rawoffset,

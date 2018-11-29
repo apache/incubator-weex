@@ -100,6 +100,8 @@
     [self registerComponent:@"div" withClass:NSClassFromString(@"WXComponent") withProperties:nil];
     [self registerComponent:@"text" withClass:NSClassFromString(@"WXTextComponent") withProperties:nil];
     [self registerComponent:@"image" withClass:NSClassFromString(@"WXImageComponent") withProperties:nil];
+    [self registerComponent:@"richtext" withClass:NSClassFromString(@"WXRichText") withProperties:nil];
+    
     [self registerComponent:@"scroller" withClass:NSClassFromString(@"WXScrollerComponent") withProperties:nil];
     [self registerComponent:@"list" withClass:NSClassFromString(@"WXListComponent") withProperties:nil];
     [self registerComponent:@"recycler" withClass:NSClassFromString(@"WXRecyclerComponent") withProperties:nil];
@@ -222,15 +224,6 @@
 + (void)initSDKEnvironment
 {
     NSString *fileName = @"weex-main-jsfm";
-    [WXSDKManager sharedInstance].multiContext = YES;
-    
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"createInstanceUsingMutliContext"]) {
-        BOOL createInstanceUsingMutliContext = [[[NSUserDefaults standardUserDefaults] objectForKey:@"createInstanceUsingMutliContext"] boolValue];
-        if (!createInstanceUsingMutliContext) {
-            fileName = @"native-bundle-main";
-            [WXSDKManager sharedInstance].multiContext = NO;
-        }
-    }
     NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:fileName ofType:@"js"];
 	if (filePath == nil) {
 		filePath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"js"];
@@ -328,14 +321,6 @@ static NSDictionary *_customEnvironment;
 + (void)restart
 {
     NSString *fileName = @"weex-main-jsfm";
-    [WXSDKManager sharedInstance].multiContext = YES;
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"createInstanceUsingMutliContext"]) {
-        BOOL createInstanceUsingMutliContext = [[[NSUserDefaults standardUserDefaults] objectForKey:@"createInstanceUsingMutliContext"] boolValue];
-        if (!createInstanceUsingMutliContext) {
-            fileName = @"native-bundle-main";
-            [WXSDKManager sharedInstance].multiContext = NO;
-        }
-    }
     NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:fileName ofType:@"js"];
 	if (filePath == nil) {
 		filePath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"js"];

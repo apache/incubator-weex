@@ -38,6 +38,7 @@
 #import "WXAppMonitorProtocol.h"
 #import "JSContext+Weex.h"
 #import "WXCoreBridge.h"
+#import "WXAnalyzerCenter.h"
 
 #import <dlfcn.h>
 
@@ -60,54 +61,18 @@
 
 - (instancetype)init
 {
-    self = [super init];
-    
-    if(self){
+    self = [self initWithoutDefaultContext];
+    [self createDefaultContext];
+    return self;
+}
 
-        _jsContext = [[JSContext alloc] init];
-        if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-            _jsContext.name = @"Weex Context";
-        }
+- (instancetype)initWithoutDefaultContext
+{
+    if (self = [super init]) {
         _timers = [NSMutableArray new];
         _callbacks = [NSMutableDictionary new];
         _intervalTimerId = 0;
         _intervaltimers = [NSMutableDictionary new];
-        _multiContext = NO;
-
-        __weak typeof(self) weakSelf = self;
-
-        [WXBridgeContext mountContextEnvironment:_jsContext];
-        
-        _jsContext[@"setTimeout"] = ^(JSValue *function, JSValue *timeout) {
-            // this setTimeout is used by internal logic in JS framework, normal setTimeout called by users will call WXTimerModule's method;
-            [weakSelf performSelector: @selector(triggerTimeout:) withObject:^() {
-                [function callWithArguments:@[]];
-            } afterDelay:[timeout toDouble] / 1000];
-        };
-        
-        _jsContext[@"setTimeoutWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg ) {
-            [weakSelf triggerTimeout:[appId toString] ret:[ret toString] arg:[arg toString]];
-        };
-        
-        _jsContext[@"setIntervalWeex"] = ^(JSValue *appId, JSValue *function,JSValue *arg) {
-            return [weakSelf triggerInterval:[appId toString] function:^() {
-                [function callWithArguments:@[]];
-            } arg:[arg toString]];
-        };
-        
-        _jsContext[@"clearIntervalWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg) {
-            
-            [weakSelf triggerClearInterval:[appId toString] ret:[[ret toNumber] longLongValue]];
-        };
-        
-        _jsContext[@"clearTimeoutWeex"] = ^(JSValue *ret) {
-            [weakSelf triggerClearTimeout:[ret toString]];
-        };
-        
-        _jsContext[@"extendCallNative"] = ^(JSValue *value ) {
-            return [weakSelf extendCallNative:[value toDictionary]];
-        };
-
     }
     return self;
 }
@@ -115,6 +80,10 @@
 - (void)dealloc
 {
     _jsContext.instanceId = nil;
+    __block JSContext* theContext = _jsContext;
+    WXPerformBlockOnBridgeThread(^{
+        theContext = nil; // release the context in js thread to avoid main-thread deadlock
+    });
 }
 
 - (void)setJSContext:(JSContext *)context
@@ -145,11 +114,7 @@
 
     WXAssertParam(frameworkScript);
     if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-        NSString * fileName = @"native-bundle-main.js";
-        if ([WXSDKManager sharedInstance].multiContext) {
-            fileName = @"weex-main-jsfm.js";
-        }
-        [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:fileName]];
+        [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:@"weex-main-jsfm.js"]];
     }else{
         [_jsContext evaluateScript:frameworkScript];
     }
@@ -213,8 +178,9 @@
         NSDictionary *componentData = [element toDictionary];
         NSString *parentRef = [ref toString];
         NSInteger insertIndex = [[index toNumber] integerValue];
-        WXLogDebug(@"callAddElement...%@, %@, %@, %ld", instanceIdString, parentRef, componentData, (long)insertIndex);
-        
+        if (WXAnalyzerCenter.isInteractionLogOpen) {
+            WXLogDebug(@"wxInteractionAnalyzer : [jsengin][addElementStart],%@,%@",instanceIdString,componentData[@"ref"]);
+        }
         return [JSValue valueWithInt32:(int32_t)callAddElement(instanceIdString, parentRef, componentData, insertIndex) inContext:[JSContext currentContext]];
     };
     
@@ -440,6 +406,45 @@
 }
 
 #pragma mark - Private
+
+- (void)createDefaultContext
+{
+    __weak typeof(self) weakSelf = self;
+    
+    _jsContext = [[JSContext alloc] init];
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
+        _jsContext.name = @"Weex Context";
+    }
+    
+    [WXBridgeContext mountContextEnvironment:_jsContext];
+    
+    _jsContext[@"setTimeout"] = ^(JSValue *function, JSValue *timeout) {
+        // this setTimeout is used by internal logic in JS framework, normal setTimeout called by users will call WXTimerModule's method;
+        [weakSelf performSelector: @selector(triggerTimeout:) withObject:^() {
+            [function callWithArguments:@[]];
+        } afterDelay:[timeout toDouble] / 1000];
+    };
+    
+    _jsContext[@"setTimeoutWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg ) {
+        [weakSelf triggerTimeout:[appId toString] ret:[ret toString] arg:[arg toString]];
+    };
+    
+    _jsContext[@"setIntervalWeex"] = ^(JSValue *appId, JSValue *function,JSValue *arg) {
+        return [weakSelf triggerInterval:[appId toString] function:^() {
+            [function callWithArguments:@[]];
+        } arg:[arg toString]];
+    };
+    
+    _jsContext[@"clearIntervalWeex"] = ^(JSValue *appId, JSValue *ret,JSValue *arg) {
+        
+        [weakSelf triggerClearInterval:[appId toString] ret:[[ret toNumber] longLongValue]];
+    };
+    
+    _jsContext[@"clearTimeoutWeex"] = ^(JSValue *ret) {
+        [weakSelf triggerClearTimeout:[ret toString]];
+    };
+}
+
 -(void)addInstance:(NSString *)instance callback:(NSString *)callback
 {
     if(instance.length > 0){
@@ -550,14 +555,6 @@
     if([_timers containsObject:ret]){
         [_timers removeObject:ret];
     }
-}
-
--(id)extendCallNative:(NSDictionary *)dict
-{
-    if(dict){
-        return [WXExtendCallNativeManager sendExtendCallNativeEvent:dict];
-    }
-    return @(-1);
 }
 
 @end

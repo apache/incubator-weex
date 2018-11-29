@@ -24,10 +24,8 @@
 
 @interface WXAnalyzerCenter (Transfer)
 
-+(void) transDataOnState:(CommitState) timeState withInstaneId:(NSString *)instanceId data:(NSDictionary *)data ;
-
++ (void) transferPerformance:(NSString*)instanceId withType:(NSString*) type andKey:(NSString*) key andValue:(id)value;
++ (void) transferInteractionInfo:(WXComponent*)targetComponent;
 + (void) transErrorInfo:(WXJSExceptionInfo *)errorInfo;
-
-+ (BOOL) needTransfer;
 
 @end

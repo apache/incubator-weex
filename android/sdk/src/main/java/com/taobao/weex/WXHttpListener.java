@@ -146,11 +146,9 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
             mApmForInstance.updateRecordInfo(response.extendParams);
             Object actualNetworkTime=response.extendParams.get("actualNetworkTime");
             mWXPerformance.actualNetworkTime=actualNetworkTime instanceof Long?(long)actualNetworkTime:0;
-            WXLogUtils.renderPerformanceLog("actualNetworkTime", mWXPerformance.actualNetworkTime);
 
             Object pureNetworkTime=response.extendParams.get("pureNetworkTime");
             mWXPerformance.pureNetworkTime=pureNetworkTime instanceof Long?(long)pureNetworkTime:0;
-            WXLogUtils.renderPerformanceLog("pureNetworkTime", mWXPerformance.pureNetworkTime);
 
             Object connectionType=response.extendParams.get("connectionType");
             mWXPerformance.connectionType=connectionType instanceof String?(String)connectionType:"";
@@ -200,7 +198,6 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
                 }
             }
         }
-        WXLogUtils.renderPerformanceLog("networkTime", mWXPerformance.networkTime);
         String wxErrorCode = WXInstanceApm.VALUE_ERROR_CODE_DEFAULT;
         if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
             mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END);

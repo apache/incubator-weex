@@ -46,6 +46,12 @@ class VNodeRenderContext {
   inline std::map<std::string, json11::Json>& style_json() {
     return style_json_;
   }
+  inline const json11::Json& script_json() {
+    return script_json_;
+  }
+  inline void set_script_json(const json11::Json& script_json) {
+      script_json_ = script_json;
+  }
 
   inline void AddComponent(int ref, VComponent *component) {
     vcomponent_trees_.insert({ref, component});
@@ -92,6 +98,7 @@ class VNodeRenderContext {
   std::map<std::string, json11::Json> style_json_;
   std::unordered_map<int, VComponent *> vcomponent_trees_;
   std::unordered_map<std::string, VNode*> vnode_trees_;
+  json11::Json script_json_;
 };
 }  // namespace data_render
 }  // namespace core

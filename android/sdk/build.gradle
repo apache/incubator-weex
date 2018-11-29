@@ -44,11 +44,6 @@ android {
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
-
-    delete 'libs/armeabi/libweexcore.so'
-    delete 'libs/armeabi-v7a/libweexcore.so'
-    delete 'libs/x86/libweexcore.so'
-
     useLibrary 'org.apache.http.legacy'
     copy {
         from '../../pre-build'
@@ -141,7 +136,7 @@ android {
             buildConfigField "boolean", "ENABLE_TRACE", "true"
             jniDebuggable true
             debuggable true
-            testCoverageEnabled true
+            testCoverageEnabled disableCov.toBoolean()
             consumerProguardFiles 'proguard-rules.pro'
         }
     }
@@ -211,6 +206,7 @@ if(file('../license/LICENSE').exists()){
         header = file('../license/LICENSE')
         mapping('cpp','JAVADOC_STYLE')
         mapping('h','JAVADOC_STYLE')
+        excludes(['com/taobao/weex/utils/WXDataStructureUtil.java'])
     }
 
     task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){

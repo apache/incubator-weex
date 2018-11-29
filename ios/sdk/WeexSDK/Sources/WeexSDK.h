@@ -38,6 +38,7 @@
 #import "WXSDKError.h"
 #import "WXSDKEngine.h"
 #import "WXRootViewController.h"
+#import "WXRichText.h"
 #import "WXResourceResponse.h"
 #import "WXResourceRequestHandler.h"
 #import "WXResourceRequest.h"

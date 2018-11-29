@@ -157,6 +157,10 @@ bool RenderPage::AddRenderObject(const std::string &parent_ref,
   if (parent == nullptr || child == nullptr) {
     return false;
   }
+    
+  if (WeexCore::WXCoreEnvironment::getInstance()->isInteractionLogOpen()){
+    LOGD("wxInteractionAnalyzer: [weexcore][addElementStart],%s,%s,%s",this->page_id().c_str(),child->type().c_str(),child->ref().c_str());
+  }
 
   // add child to Render Tree
   insert_posiotn = parent->AddRenderObject(insert_posiotn, child);
@@ -168,6 +172,9 @@ bool RenderPage::AddRenderObject(const std::string &parent_ref,
   SendAddElementAction(child, parent, insert_posiotn, false);
 
   Batch();
+  if (WeexCore::WXCoreEnvironment::getInstance()->isInteractionLogOpen()){
+    LOGD("wxInteractionAnalyzer: [weexcore][addElementEnd],%s,%s,%s",this->page_id().c_str(),child->type().c_str(),child->ref().c_str());
+  }
   return true;
 }
 

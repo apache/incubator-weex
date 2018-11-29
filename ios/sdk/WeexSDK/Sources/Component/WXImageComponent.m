@@ -56,6 +56,7 @@ static dispatch_queue_t WXImageUpdateQueue;
     NSString * _imageSrc;
     pthread_mutex_t _imageSrcMutex;
     pthread_mutexattr_t _propertMutexAttr;
+    BOOL _shouldUpdateImage;
 }
 
 @property (atomic, strong) NSString *placeholdSrc;
@@ -80,6 +81,7 @@ WX_EXPORT_METHOD(@selector(save:))
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
+        _shouldUpdateImage = NO;
         _async = YES;
         if (!WXImageUpdateQueue) {
             WXImageUpdateQueue = dispatch_queue_create("com.taobao.weex.ImageUpdateQueue", DISPATCH_QUEUE_SERIAL);
@@ -382,8 +384,21 @@ WX_EXPORT_METHOD(@selector(save:))
     [self updateImage];
 }
 
+- (void)layoutDidFinish
+{
+    [super layoutDidFinish];
+    if (_shouldUpdateImage) {
+        [self updateImage];
+        _shouldUpdateImage = NO;
+    }
+}
+
 - (void)updateImage
 {
+    if (CGSizeEqualToSize(_view.frame.size, CGSizeZero)) {
+        _shouldUpdateImage = YES;
+        return;
+    }
     __weak typeof(self) weakSelf = self;
     if (_downloadImageWithURL && [[self imageLoader] respondsToSelector:@selector(setImageViewWithURL:url:placeholderImage:options:progress:completed:)]) {
         NSString *newURL = nil;
@@ -600,6 +615,7 @@ WX_EXPORT_METHOD(@selector(save:))
     if ([[self imageLoader] respondsToSelector:@selector(cancelCurrentImageLoad:)]) {
         [[self imageLoader] cancelCurrentImageLoad:(UIImageView*)_view];
     }
+    _shouldUpdateImage = NO;
     [_imageOperation cancel];
     _imageOperation = nil;
     [_placeholderOperation cancel];

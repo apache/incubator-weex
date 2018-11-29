@@ -23,7 +23,13 @@
 @class WXBridgeMethod;
 @class WXSDKInstance;
 
-extern void WXPerformBlockOnBridgeThread(void (^block)(void));
+#ifdef __cplusplus
+extern "C" {
+#endif
+    void WXPerformBlockOnBridgeThread(void (^block)(void));
+#ifdef __cplusplus
+}
+#endif
 
 @interface WXBridgeManager : NSObject
 

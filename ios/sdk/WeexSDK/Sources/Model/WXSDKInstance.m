@@ -142,7 +142,7 @@ typedef enum : NSUInteger {
     }
     
     // WXDebugger is a singleton actually and should not call its init twice.
-    _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
+    _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] initWithoutDefaultContext];
     if (!_debugJS) {
         id<WXBridgeProtocol> jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"bridgeCtx.jsBridge"];
         JSContext* globalContex = jsBridge.javaScriptContext;
@@ -191,7 +191,7 @@ typedef enum : NSUInteger {
         CGFloat screenHeight =  [[UIScreen mainScreen] bounds].size.height;
         if (screenHeight>0) {
             CGFloat pageRatio = frame.size.height/screenHeight *100;
-            self.apmInstance.wxPageRatio = pageRatio>100?100:pageRatio;
+            self.apmInstance.pageRatio = pageRatio>100?100:pageRatio;
         }
         WXPerformBlockOnMainThread(^{
             if (_rootView) {
@@ -450,29 +450,14 @@ typedef enum : NSUInteger {
 		
         BOOL enableRTLLayoutDirection = [[configCenter configForKey:@"iOS_weex_ext_config.enableRTLLayoutDirection" defaultValue:@(YES) isDefault:NULL] boolValue];
         [WXUtility setEnableRTLLayoutDirection:enableRTLLayoutDirection];
-
-        BOOL shoudMultiContext = NO;
-        shoudMultiContext = [[configCenter configForKey:@"iOS_weex_ext_config.createInstanceUsingMutliContext" defaultValue:@(YES) isDefault:NULL] boolValue];
-        if(shoudMultiContext && ![WXSDKManager sharedInstance].multiContext) {
-            [WXSDKManager sharedInstance].multiContext = YES;
-            [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"createInstanceUsingMutliContext"];
-            [WXSDKEngine restart];
-            return YES;
-        }
-        if (!shoudMultiContext && [WXSDKManager sharedInstance].multiContext) {
-            [WXSDKManager sharedInstance].multiContext = NO;
-            [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:@"createInstanceUsingMutliContext"];
-            [WXSDKEngine restart];
-            return YES;
-        }
     }
     return NO;
 }
 
-- (void)renderWithMainBundleString:(NSNotification*)notification {
+- (void)renderWithMainBundleString:(NSNotification*)notification
+{
     [self _renderWithMainBundleString:_mainBundleString];
 }
-
 
 - (void)_renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
 {
@@ -485,7 +470,7 @@ typedef enum : NSUInteger {
         newOptions[bundleUrlOptionKey] = url.absoluteString;
     }
 
-    if ([url.absoluteString hasSuffix:WEEX_LITE_URL_SUFFIX]) {
+    if ([url.absoluteString hasSuffix:WEEX_LITE_URL_SUFFIX] || [url.absoluteString containsString:@"__eagle=true"]) {
         newOptions[@"WLASM_RENDER"] = @(YES);
     }
 
@@ -549,7 +534,7 @@ typedef enum : NSUInteger {
             return;
         }
         
-        if (([options[@"DATA_RENDER"] boolValue] && [options[@"RENDER_WITH_BINARY"] boolValue]) || [options[@"WLASM_RENDER"] boolValue]) {
+        if (([newOptions[@"DATA_RENDER"] boolValue] && [newOptions[@"RENDER_WITH_BINARY"] boolValue]) || [newOptions[@"WLASM_RENDER"] boolValue]) {
             [strongSelf _renderWithData:data];
             return;
         }

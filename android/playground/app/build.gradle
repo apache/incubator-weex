@@ -12,8 +12,8 @@ android {
         applicationId "com.alibaba.weex"
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
-        versionCode 17
-        versionName "0.19.0"
+        versionCode 20
+        versionName "0.19.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         ndk{
@@ -106,6 +106,8 @@ dependencies {
     compile 'com.loopj.android:android-async-http:1.4.9@aar'
     compile 'com.facebook.fresco:fresco:0.12.0+'
     compile 'com.facebook.fresco:animated-gif:0.12.0'
+
+    compile 'com.google.zxing:core:3.3.3'
 
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
