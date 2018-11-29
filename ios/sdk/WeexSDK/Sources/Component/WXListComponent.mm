@@ -31,7 +31,6 @@
 #import "WXSDKInstance_private.h"
 #import "WXRefreshComponent.h"
 #import "WXLoadingComponent.h"
-#import "WXThreadSafeMutableArray.h"
 
 @interface WXTableView : UITableView
 
@@ -95,12 +94,8 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-		if ([WXUtility listSectionRowThreadSafe]) {
-			_rows = [WXThreadSafeMutableArray array];
-		} else {
-			_rows = [NSMutableArray array];
-		}    }
-    
+        _rows = [NSMutableArray array];
+    }
     return self;
 }
 

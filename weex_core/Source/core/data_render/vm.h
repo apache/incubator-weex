@@ -36,7 +36,7 @@ class Value;
 struct Frame {
   Value *reg;
   Value *ret;
-  Value *func;
+  FuncState *func;
   const Instruction *pc;
   const Instruction *end;
 };

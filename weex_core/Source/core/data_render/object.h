@@ -52,6 +52,8 @@ class Frame;
 class ExecState;
 
 class FuncState;
+    
+class FuncClosure;
 
 class String;
 
@@ -59,8 +61,10 @@ class StringTable;
 
 class Value;
     
+class ValueRef;
+    
 class Variables;
-
+    
 typedef struct GCObject {
     CommonHeader;
     inline int decrement() { return --ref_; }
@@ -91,11 +95,9 @@ struct Value {
 
   struct Value *ref {nullptr};
 
-  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, VALUE_REF, ARRAY, TABLE, CLASS_DESC, CLASS_INST };
+  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, VALUE_REF, ARRAY, TABLE, CLASS_DESC, CLASS_INST, FUNC_INST };
 
   Type type;
-
-  int index = -1;
 
   Value() : type(NIL) {}
 
@@ -113,7 +115,6 @@ struct Value {
     
   Value(const Value &value) {
     type = value.type;
-    index = value.index;
     switch (type) {
       case INT:i = value.i;
         break;
@@ -135,6 +136,7 @@ struct Value {
       case ARRAY:
       case CLASS_DESC:
       case CLASS_INST:
+      case FUNC_INST:
         gc = value.gc;
         if(gc)
           gc->increment();
@@ -146,7 +148,6 @@ struct Value {
   inline Value operator=(Value value) {
       GCRelease(this);
       type = value.type;
-      index = value.index;
       switch (type) {
           case INT:
               i = value.i;
@@ -176,6 +177,7 @@ struct Value {
           case ARRAY:
           case CLASS_DESC:
           case CLASS_INST:
+          case FUNC_INST:
               gc = value.gc;
               if(gc)
                 gc->increment();
@@ -186,7 +188,6 @@ struct Value {
   }
   friend bool operator==(const Value &left, const Value &right) {
     if (left.type != right.type) return false;
-    if (left.index != right.index) return false;
     switch (left.type) {
       case NIL:return true;
       case INT:return left.i == right.i;
@@ -200,6 +201,7 @@ struct Value {
       case TABLE:
       case CLASS_DESC:
       case CLASS_INST:
+      case FUNC_INST:
             return left.gc == right.gc;
       default:break;
     }
@@ -225,7 +227,7 @@ typedef struct Table {
     Table() : map() {}
 
 } Table;
-    
+        
 class Variables {
 public:
     Value *Find(int index);
@@ -234,14 +236,10 @@ public:
     int Add(const std::string& name, Value value);
     int Set(const std::string& name, Value value);
     inline size_t size() {return values_.size();}
-    inline const std::map<std::string, int>& map() {return map_;}
-    inline unsigned register_size() {return register_size_;}
-    void incrementRegisterSize() {register_size_++;}
-    
+    inline const std::map<std::string, int>& map() { return map_; }    
 private:
     std::map<std::string, int> map_;
     std::vector<Value> values_;
-    unsigned register_size_ = 0;
 };
 
 struct ClassDescriptor;
@@ -249,10 +247,9 @@ struct ClassDescriptor;
 typedef struct ClassDescriptor {
     CommonHeader;
     ClassDescriptor *p_super_{nullptr};
-    std::unique_ptr<Variables> static_funcs_;
+    std::unique_ptr<Variables> statics_;
     std::unique_ptr<Variables> funcs_;
-    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), static_funcs_(new Variables), super_index_(-1) {}
-    int super_index_;
+    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), statics_(new Variables) {}
 } ClassDescriptor;
 
 typedef struct ClassInstance {
@@ -263,6 +260,14 @@ typedef struct ClassInstance {
     ClassInstance(ClassDescriptor *p_desc) : p_desc_(p_desc), vars_(new Variables) {}
     
 } ClassInstance;
+    
+typedef struct FuncInstance {
+    CommonHeader;
+    FuncState *func_{nullptr};
+    std::vector<FuncClosure *> closures_;
+    FuncInstance(FuncState *func) : func_(func), closures_() { }
+    
+} FuncInstance;
 
 /*
 ** try to convert a value to an integer, rounding according to 'mode':
@@ -350,7 +355,7 @@ inline int64_t ShiftLeft(const int64_t &a, const int64_t &b) {
 
 inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
     
-inline bool IsFunction(const Value *o) { return Value::Type::FUNC == o->type || Value::Type::CFUNC == o->type; }
+inline bool IsFunction(const Value *o) { return Value::Type::FUNC == o->type || Value::Type::CFUNC == o->type || Value::Type::FUNC_INST == o->type; }
     
 inline bool IsPrototypeFunction(const Value *o) { return Value::Type::FUNC == o->type; }
     
@@ -401,7 +406,7 @@ inline int IntMod(const int &a, const int &b) {
     return ret;
   }
 }
-
+    
 inline bool IsNumber(const Value *o) { return Value::Type::NUMBER == o->type; }
 
 inline bool IsCptr(const Value *o) { return Value::Type::CPTR == o->type; }
@@ -417,6 +422,8 @@ inline bool IsString(const Value *o) { return nullptr != o && Value::Type::STRIN
 inline bool IsClass(const Value *o) { return nullptr != o && Value::Type::CLASS_DESC == o->type; }
     
 inline bool IsClassInstance(const Value *o) { return nullptr != o && Value::Type::CLASS_INST == o->type; }
+    
+inline bool IsFuncInstance(const Value *o) { return nullptr != o && Value::Type::FUNC_INST == o->type; }
     
 inline int64_t IntValue(const Value *o) { return o->i; }
 
@@ -448,7 +455,7 @@ inline int ToNumber_(const Value *value, double &ret) {
     return 0;
   }
 }
-
+    
 inline int ToNum(const Value *o, double &n) {
   return IsNumber(o) ? (static_cast<void>(n = NumValue(o)), 1) : ToNumber_(o, n);
 }
@@ -458,6 +465,7 @@ inline void SetIValue(Value *o, int iv) {
     o->type = Value::Type::INT;
     o->i = iv;
 }
+    
     
 void SetRefValue(Value *o);
 
@@ -497,6 +505,13 @@ inline void SetCDValue(Value *v, GCObject *o) {
 inline void SetCIValue(Value *v, GCObject *o) {
     GCRelease(v);
     v->type = Value::Type::CLASS_INST;
+    v->gc = o;
+    GCRetain(v);
+}
+
+inline void SetGCFuncValue(Value *v, GCObject *o) {
+    GCRelease(v);
+    v->type = Value::Type::FUNC_INST;
     v->gc = o;
     GCRetain(v);
 }
@@ -559,7 +574,7 @@ inline int ToBool(const Value *o, bool &b) {
         b = NumValue(o);
     }
     else if (ttype(o) == Value::Type::STRING) {
-        b = o->str ? true : false;
+        b = (o->str && o->str->length() > 0) ? true : false;
     }
     else if (Value::Type::VALUE_REF == o->type) {
         return ToBool(o->var, b);

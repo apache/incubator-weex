@@ -42,6 +42,7 @@ public class WXParams implements Serializable {
   private String useSingleProcess;
   private String crashFilePath;
   private String libJssPath;
+  private String layoutDirection;
 
   private String libJscPath;
   private String libIcuPath;
@@ -119,6 +120,11 @@ public class WXParams implements Serializable {
   public void setDeviceModel(String deviceModel) {
     this.deviceModel = deviceModel;
   }
+
+  @CalledByNative
+  public String getLayoutDirection() {return layoutDirection;}
+
+  public void setLayoutDirection(String direction) { this.layoutDirection = direction; }
 
   @CalledByNative
   public String getAppName() {
@@ -246,6 +252,7 @@ public class WXParams implements Serializable {
     map.put("deviceHeight", deviceHeight);
     map.put("deviceModel", deviceModel);
     map.put("deviceWidth", deviceWidth);
+    map.put("layoutDirection", layoutDirection);
     map.put("libJssPath", libJssPath);
     map.put("logLevel", logLevel);
     map.put("needInitV8", needInitV8);

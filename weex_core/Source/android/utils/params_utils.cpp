@@ -293,6 +293,22 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
   ADDSTRING(appVersion);
   env->DeleteLocalRef(appVersion);
 
+  jmethodID m_layoutDirection =
+          env->GetMethodID(c_params, "getLayoutDirection", "()Ljava/lang/String;");
+  if (m_layoutDirection == nullptr) {
+    ADDSTRING(nullptr);
+    ReportNativeInitStatus("-1012", "get m_layoutDirection failed");
+    return initFrameworkParams;
+  }
+  jobject layoutDirection = env->CallObjectMethod(params, m_layoutDirection);
+  if (layoutDirection == nullptr) {
+    ADDSTRING(nullptr);
+    ReportNativeInitStatus("-1012", "get layoutDirection failed");
+    return initFrameworkParams;
+  }
+  ADDSTRING(layoutDirection);
+  env->DeleteLocalRef(layoutDirection);
+
   jmethodID m_weexVersion =
       env->GetMethodID(c_params, "getWeexVersion", "()Ljava/lang/String;");
   if (m_weexVersion == nullptr) {

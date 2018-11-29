@@ -86,4 +86,9 @@ typedef NS_ENUM(NSInteger, WXImageLoaderCacheType) {
                    progress:(void(^)(NSInteger receivedSize, NSInteger expectedSize))progressBlock
                   completed:(void(^)(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL))completedBlock;
 
+/**
+ * Cancel the current download image
+ */
+- (void)cancelCurrentImageLoad:(UIImageView*)imageView;
+
 @end

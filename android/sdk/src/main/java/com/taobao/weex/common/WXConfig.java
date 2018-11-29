@@ -33,5 +33,6 @@ public interface WXConfig {
   String externalUserAgent="externalUserAgent";
   String logLevel="logLevel";
   String scale = "scale";
+  String layoutDirection = "layoutDirection";
   String debugMode = "debugMode";
 }

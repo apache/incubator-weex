@@ -19,6 +19,7 @@
 
 #import "WXScrollerComponent.h"
 #import "WXComponent_internal.h"
+#import "WXSDKInstance_private.h"
 #import "WXComponent.h"
 #import "WXDefine.h"
 #import "WXConvert.h"
@@ -413,6 +414,33 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 			[self adjustSticky];
 		});
     }
+}
+
+- (void)adjustForRTL
+{
+    if (![WXUtility enableRTLLayoutDirection]) return;
+    
+    // this is scroll rtl solution.
+    // scroll layout not use direction, use self tranform
+    if (self.view && _flexCssNode && _flexCssNode->getLayoutDirectionFromPathNode() == WeexCore::kDirectionRTL
+        ) {
+        if (_transform) {
+            self.view.layer.transform = CATransform3DConcat(self.view.layer.transform, CATransform3DScale(CATransform3DIdentity, -1, 1, 1));
+        } else {
+            self.view.layer.transform = CATransform3DScale(CATransform3DIdentity, -1, 1, 1);
+        }
+    } else {
+        if (!_transform) {
+            self.view.layer.transform = CATransform3DIdentity;
+        }
+    }
+}
+
+- (void)_adjustForRTL {
+    if (![WXUtility enableRTLLayoutDirection]) return;
+    
+    [super _adjustForRTL];
+    [self adjustForRTL];
 }
 
 - (void)adjustSticky
@@ -903,7 +931,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     if (!decelerate) {
         _isScrolling = NO;
-        [self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:nil afterDelay:0.1];
+        [self performSelector:@selector(scrollViewDidEndDecelerating:) withObject:scrollView afterDelay:0.1];
     }
     
     NSHashTable *delegates = [_delegates copy];
@@ -1044,7 +1072,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             float left = _flexCssNode->getLayoutPositionLeft();
             float width = _flexCssNode->getLayoutWidth();
             float height = _flexCssNode->getLayoutHeight();
-            
+
             if (_scrollDirection == WXScrollDirectionVertical) {
                 _flexCssNode->setFlexDirection(WeexCore::kFlexDirectionColumn, NO);
                 _flexCssNode->setStyleWidth(_flexCssNode->getLayoutWidth(), NO);
@@ -1054,7 +1082,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
                 _flexCssNode->setStyleHeight(_flexCssNode->getLayoutHeight());
                 _flexCssNode->setStyleWidth(FlexUndefined, NO);
             }
+
             _flexCssNode->markAllDirty();
+            
+            // this is scroll rtl solution.
+            // scroll layout not use direction, use self tranform
+            // but we need inherit direction in CSS, so we set children layout diretion manually
+            _flexCssNode->determineChildLayoutDirection(_flexCssNode->getLayoutDirectionFromPathNode());
+            
             std::pair<float, float> renderPageSize;
             renderPageSize.first = self.weexInstance.frame.size.width;
             renderPageSize.second = self.weexInstance.frame.size.height;

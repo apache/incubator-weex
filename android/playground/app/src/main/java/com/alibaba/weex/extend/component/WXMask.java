@@ -124,7 +124,9 @@ public class WXMask extends WXVContainer {
     top = get(TOP);
     bottom = get(BOTTOM);
     FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
-    params.setMargins(left, top, right, bottom);
+
+    this.setMarginsSupportRTL(params, left, top, right, bottom);
+
     getHostView().setLayoutParams(params);
   }
 

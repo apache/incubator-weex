@@ -48,6 +48,8 @@ NSString* const KEY_PAGE_PROPERTIES_BUNDLE_TYPE = @"wxBundleType";
 NSString* const KEY_PAGE_PROPERTIES_CONTAINER_NAME = @"wxContainerName";
 NSString* const KEY_PAGE_PROPERTIES_INSTANCE_TYPE = @"wxInstanceType";
 NSString* const KEY_PAGE_PROPERTIES_PARENT_PAGE = @"wxParentPage";
+NSString* const KEY_PAGE_PROPERTIES_RENDER_TYPE = @"wxRenderType";
+
 
 
 ///************** stages *****************/
@@ -114,6 +116,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     BOOL _hasRecordInteractionTime;
     BOOL _hasRecordDownLoadStart;
     BOOL _hasRecordDownLoadEnd;
+    BOOL _forceRecordInteractionTime;
 }
 
 @property (nonatomic,strong) id<WXApmProtocol> apmProtocolInstance;
@@ -178,6 +181,9 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     
     if ([KEY_PAGE_STAGES_INTERACTION isEqualToString:name]) {
         _hasRecordInteractionTime = YES;
+        if (_forceRecordInteractionTime) {
+            return;
+        }
     }
     [self.apmProtocolInstance onStage:name withValue:unixTime];
     __weak typeof(self) weakSelf = self;
@@ -485,6 +491,12 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     }
     NSString* info = [NSString stringWithFormat:@"bundleVerfiInfo :%@, httpHeaderInfo:%@",bundleVerfiInfo?:@"unSetVerfiInfo",headerStr?:@"unSetHeader"];
     return info;
+}
+
+- (void) forceSetInteractionTime:(long) unixTime
+{
+    [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:unixTime];
+    _forceRecordInteractionTime=YES;
 }
 
 @end

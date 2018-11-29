@@ -332,7 +332,7 @@
             _posterURL = [NSURL URLWithString: attributes[@"poster"]];
         }
         if (attributes[@"controls"]) {
-            _showControl = ![attributes[@"controls"] isEqualToString:@"controls"];
+            _showControl = ![attributes[@"controls"] isEqualToString:@"nocontrols"];
         }
     }
     return self;
@@ -412,7 +412,7 @@
         [_videoView setPosterURL:_posterURL];
     }
     if (attributes[@"controls"]) {
-        _showControl = ![attributes[@"controls"] isEqualToString:@"controls"];
+        _showControl = ![attributes[@"controls"] isEqualToString:@"nocontrols"];
         [_videoView setControlShow:_showControl];
     }
 }

@@ -23,6 +23,7 @@
 
 
 #include "flex_enum.h"
+#include <math.h>
 #include <cmath>
 
 namespace WeexCore {
@@ -200,6 +201,8 @@ namespace WeexCore {
     WXCoreAlignSelf mAlignSelf;
 
     WXCorePositionType mPositionType;
+      
+      WXCoreDirection mDirection;
 
     float mFlexGrow;
 
@@ -241,7 +244,8 @@ namespace WeexCore {
 
     constexpr static WXCorePositionType kWXCorePositionTypeDefault = kRelative;
 
-    WXCoreCSSStyle() : mFlexDirection(kFlexDirectionDefault),
+    WXCoreCSSStyle() : mDirection(kDirectionInherit),
+                       mFlexDirection(kFlexDirectionDefault),
                        mFlexWrap(kFlexWrapDefault),
                        mJustifyContent(kFlexJustifyContentDefault),
                        mAlignItems(kFlexAlignItemsDefault),
@@ -256,6 +260,7 @@ namespace WeexCore {
     }
 
     ~WXCoreCSSStyle() {
+      mDirection = kDirectionInherit;
       mFlexDirection = kFlexDirectionDefault;
       mFlexWrap = kFlexWrapDefault;
       mJustifyContent = kFlexJustifyContentDefault;

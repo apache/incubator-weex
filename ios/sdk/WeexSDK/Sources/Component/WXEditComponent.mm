@@ -38,7 +38,7 @@
 @property (nonatomic) NSNumber *maxLength;
 @property (nonatomic) NSString * value;
 @property (nonatomic) BOOL autofocus;
-@property(nonatomic) UIReturnKeyType returnKeyType;
+@property (nonatomic) UIReturnKeyType returnKeyType;
 @property (nonatomic) BOOL disabled;
 @property (nonatomic, copy) NSString *inputType;
 @property (nonatomic) NSUInteger rows;
@@ -600,21 +600,6 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
             return NO;
         }
     }
-
-    if (_maxLength) {
-        NSUInteger oldLength = [textField.text length];
-        NSUInteger replacementLength = [string length];
-        NSUInteger rangeLength = range.length;
-        
-        NSUInteger newLength = oldLength - rangeLength + replacementLength;
-        if (newLength <= oldLength) {
-            // deleting, we should allow delete
-            return YES;
-        }
-        
-        return newLength <= [_maxLength integerValue] ;
-    }
-    
     return YES;
 }
 
@@ -669,7 +654,6 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         } else {
             textField.text = [newString copy];
             UITextPosition * newPosition = [textField positionFromPosition:textField.beginningOfDocument offset:cursorPosition+adjust];
-            
             textField.selectedTextRange = [textField textRangeFromPosition:newPosition toPosition:newPosition];
         }
 
@@ -677,6 +661,24 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     if (_inputEvent) {
         // bind each other , the key must be attrs
         [self fireEvent:@"input" params:@{@"value":[textField text]} domChanges:@{@"attrs":@{@"value":[textField text]}}];
+    }
+    
+    if (_maxLength) {
+        NSString *toBeString = textField.text;
+        NSString *language = [[UIApplication sharedApplication] textInputMode].primaryLanguage;
+        if ([language isEqualToString:@"zh-Hans"]) {
+            UITextRange *selectedRange = [textField markedTextRange];
+            UITextPosition *position = [textField positionFromPosition:selectedRange.start offset:0];
+            if (!position) {
+                if (toBeString.length > _maxLength.integerValue) {
+                    textField.text = [toBeString substringToIndex:_maxLength.integerValue];
+                }
+            }
+        } else {
+            if (toBeString.length > _maxLength.integerValue) {
+                textField.text = [toBeString substringToIndex:_maxLength.integerValue];
+            }
+        }
     }
 }
 

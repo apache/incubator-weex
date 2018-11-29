@@ -30,7 +30,6 @@
 #import "WXSDKManager.h"
 #import "WXDebugTool.h"
 #import "WXSDKInstance_private.h"
-#import "WXThreadSafeMutableArray.h"
 #import "WXAppConfiguration.h"
 #import "WXInvocationConfig.h"
 #import "WXComponentMethod.h"
@@ -422,6 +421,7 @@ _Pragma("clang diagnostic pop") \
         WXPerformBlockOnComponentThread(^{
             [WXCoreBridge createDataRenderInstance:instanceIdString template:jsBundleString options:options data:data];
             WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+            [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
         });
         return;
     }
@@ -594,6 +594,7 @@ _Pragma("clang diagnostic pop") \
         WXPerformBlockOnComponentThread(^{
             [WXCoreBridge createDataRenderInstance:instanceIdString contents:contents options:options data:data];
             WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+            [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
         });
         return;
     }
@@ -858,13 +859,17 @@ _Pragma("clang diagnostic pop") \
 {
     if(self.frameworkLoadFinished) {
         WXAssert(script, @"param script required!");
-        NSDictionary* funcInfo = @{
-                                   @"func":@"executeJsService",
-                                   @"arg":name?:@"unsetScriptName"
-                                   };
-        self.jsBridge.javaScriptContext[@"wxExtFuncInfo"] = funcInfo;
+        if ([self.jsBridge respondsToSelector:@selector(javaScriptContext)]) {
+            NSDictionary* funcInfo = @{
+                                       @"func":@"executeJsService",
+                                       @"arg":name?:@"unsetScriptName"
+                                       };
+            self.jsBridge.javaScriptContext[@"wxExtFuncInfo"] = funcInfo;
+        }
         [self.jsBridge executeJavascript:script];
-        self.jsBridge.javaScriptContext[@"wxExtFuncInfo"] = nil;
+        if ([self.jsBridge respondsToSelector:@selector(javaScriptContext)]) {
+            self.jsBridge.javaScriptContext[@"wxExtFuncInfo"] = nil;
+        }
         
         if ([self.jsBridge exception]) {
             NSString *exception = [[self.jsBridge exception] toString];
@@ -1138,7 +1143,7 @@ _Pragma("clang diagnostic pop") \
     };
 }
 
-+ (void)handleConsoleOutputWithArgument:(NSArray*)arguments logLevel:(WXLogFlag)logLevel
++ (void)handleConsoleOutputWithArgument:(NSArray *)arguments logLevel:(WXLogFlag)logLevel
 {
     NSMutableString *string = [NSMutableString string];
     [string appendString:@"jsLog: "];

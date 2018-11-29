@@ -44,7 +44,8 @@ typedef enum StyleType {
   kTypeLayout,
   kTypeMargin,
   kTypePadding,
-  kTypeBorder
+  kTypeBorder,
+  kTypeInheritableLayout
 } StyleType;
 
 class RenderObject : public IRenderObject {

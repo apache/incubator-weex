@@ -82,6 +82,17 @@
 
 # pragma mark Component Register
 
++ (void)_registerAffineTypes
+{
+    /* register weex core types that should match RenderList or RenderScroller.
+     "list" and "waterfall" must be registered before "scroller" because "WXListComponent" and "WXRecyclerComponent"
+     are both subclasses of "WXScrollerComponent".
+     */
+    [WXComponentFactory registerBaseType:@"list" withClass:NSClassFromString(@"WXListComponent")];
+    [WXComponentFactory registerBaseType:@"waterfall" withClass:NSClassFromString(@"WXRecyclerComponent")];
+    [WXComponentFactory registerBaseType:@"scroller" withClass:NSClassFromString(@"WXScrollerComponent")];
+}
+
 // register some default components when the engine initializes.
 + (void)_registerDefaultComponents
 {
@@ -117,6 +128,8 @@
     [self registerComponent:@"recycle-list" withClass:NSClassFromString(@"WXRecycleListComponent")];
     [self registerComponent:@"cell-slot" withClass:NSClassFromString(@"WXCellSlotComponent") withProperties: @{@"append":@"tree", @"isTemplate":@YES}];
     
+    // other non-default components should be checked with affine-base types.
+    [self _registerAffineTypes];
 }
 
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz
@@ -153,14 +166,25 @@
 
 
 # pragma mark Service Register
+
 + (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options
 {
-    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options];
+    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options completion:nil];
 }
 
-+ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl WithOptions:(NSDictionary *)options
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion
 {
-    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options];
+    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options completion:completion];
+}
+
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options
+{
+    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options completion:nil];
+}
+
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion
+{
+    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options completion:completion];
 }
 
 + (void)unregisterService:(NSString *)name

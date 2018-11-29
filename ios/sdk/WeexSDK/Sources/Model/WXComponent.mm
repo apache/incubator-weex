@@ -30,8 +30,6 @@
 #import "WXConvert.h"
 #import "WXMonitor.h"
 #import "WXAssert.h"
-#import "WXThreadSafeMutableDictionary.h"
-#import "WXThreadSafeMutableArray.h"
 #import "WXTransform.h"
 #import "WXRoundedRect.h"
 #import <pthread/pthread.h>
@@ -385,10 +383,12 @@ static BOOL bNeedRemoveEvents = YES;
         if (_backgroundImage) {
             [self setGradientLayer];
         }
-        
+
         if (_transform) {
             [_transform applyTransformForView:_view];
         }
+        
+        [self _adjustForRTL];
         
         if (_boxShadow) {
             [self configBoxShadow:_boxShadow];
@@ -495,6 +495,11 @@ static BOOL bNeedRemoveEvents = YES;
     }
 }
 
+- (BOOL)_isAffineTypeAs:(NSString *)type
+{
+    return [WXCoreBridge isComponentAffineType:_type asType:type];
+}
+
 - (CALayer *)layer
 {
     return _layer;
@@ -514,7 +519,7 @@ static BOOL bNeedRemoveEvents = YES;
 {
 }
 
-- (BOOL)_isCaculatedFrameChanged:(CGRect)frame
+- (BOOL)_isCalculatedFrameChanged:(CGRect)frame
 {
     return !CGRectEqualToRect(frame, _calculatedFrame);
 }
@@ -798,6 +803,7 @@ static BOOL bNeedRemoveEvents = YES;
     self.transform = [[WXTransform alloc] initWithNativeTransform:CATransform3DMakeAffineTransform(transform) instance:self.weexInstance];
     if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
         [_transform applyTransformForView:_view];
+        [self _adjustForRTL];
         [_layer setNeedsDisplay];
     }
 }

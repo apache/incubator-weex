@@ -76,6 +76,9 @@ class ScriptBridge {
     virtual void PostMessage(const char *vim_id, const char *data, int dataLength) = 0;
     virtual void DispatchMessage(const char *client_id, const char *data, int dataLength,
                                  const char *callback, const char *vm_id) = 0;
+    virtual std::unique_ptr<WeexJSResult> DispatchMessageSync(
+        const char *client_id, const char *data, int dataLength,
+        const char *vm_id) = 0;
     virtual void ReportException(const char *page_id, const char *func,
                                  const char *exception_string) = 0;
     virtual void SetJSVersion(const char *js_version) = 0;

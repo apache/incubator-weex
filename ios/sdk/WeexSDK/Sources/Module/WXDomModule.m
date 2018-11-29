@@ -18,6 +18,7 @@
  */
 
 #import "WXDomModule.h"
+#import "WXComponent+Layout.h"
 #import "WXDefine.h"
 #import "WXSDKManager.h"
 #import "WXComponentManager.h"
@@ -54,7 +55,10 @@ WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 WX_EXPORT_METHOD(@selector(addRule:rule:))
 WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
+WX_EXPORT_METHOD(@selector(getLayoutDirection:callback:))
 WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
+WX_EXPORT_METHOD(@selector(beginBatchMark))
+WX_EXPORT_METHOD(@selector(endBatchMark))
 
 - (void)performBlockOnComponentManager:(void(^)(WXComponentManager *))block
 {
@@ -80,6 +84,20 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
     WXPerformBlockOnComponentThread(^{
         block();
     });
+}
+
+- (void)beginBatchMark
+{
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
+        [manager performBatchBegin];
+    }];
+}
+
+- (void)endBatchMark
+{
+    [self performBlockOnComponentManager:^(WXComponentManager * manager) {
+        [manager performBatchEnd];
+    }];
 }
 
 - (NSThread *)targetExecuteThread
@@ -241,6 +259,30 @@ WX_EXPORT_METHOD(@selector(updateComponentData:componentData:callback:))
                 }
             });
 
+        }
+    }];
+}
+
+- (void)getLayoutDirection:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
+    [self performBlockOnComponentManager:^(WXComponentManager * manager) {
+        if ([ref isEqualToString:@"viewport"]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *direction = [WXUtility getEnvLayoutDirection] == WXLayoutDirectionRTL ? @"rtl" : @"ltr";
+                if (callback) {
+                    callback(direction, false);
+                }
+            });
+        } else {
+            WXComponent *component = [manager componentForRef:ref];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *direction = @"unknow";
+                if (component) {
+                    direction = [component isDirectionRTL] ? @"rtl" : @"ltr";
+                }
+                if (callback) {
+                    callback(direction, false);
+                }
+            });
         }
     }];
 }

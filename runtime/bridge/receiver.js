@@ -23,8 +23,10 @@ function fireEvent (document, nodeId, type, event, domChanges, params) {
   const el = document.getRef(nodeId)
   if (el) {
     return document.fireEvent(el, type, event, domChanges, params)
+  } else {
+    event._nodeId = nodeId
+    return document.fireEvent(document.getRef('_documentElement'), type, event, domChanges, params)
   }
-  return new Error(`invalid element reference "${nodeId}"`)
 }
 
 function callback (document, callbackId, data, ifKeepAlive) {

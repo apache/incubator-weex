@@ -93,6 +93,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 
@@ -127,6 +128,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private String mBundleUrl = "";
   public static String requestUrl = "requestUrl";
   private boolean isDestroy=false;
+  private boolean hasException = false;
+  private boolean isRenderSuccess = false;
   private Map<String,Serializable> mUserTrackParams;
   private NativeInvokeHelper mNativeInvokeHelper;
   private boolean isCommit=false;
@@ -658,6 +661,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       return;
     }
 
+    mRenderStrategy = flag;
+
     //some case ,from render(template),but not render (url)
     if (!mApmForInstance.hasInit()){
       mApmForInstance.doInit();
@@ -699,23 +704,53 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mApmForInstance.addStats(WXInstanceApm.KEY_PAGE_STATS_BUNDLE_SIZE,mWXPerformance.JSTemplateSize);
 
     mRenderStartTime = System.currentTimeMillis();
-    mRenderStrategy = flag;
 
     WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);
 
     WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
     mRendered = true;
+
+
+    if(WXBridgeManager.getInstance().isIsRebootJscWhenWhiteScreen()) {
+      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          if(isDestroy || hasException || isRenderSuccess) {
+            return;
+          }
+
+          View containerView = getContainerView();
+          if(containerView instanceof ViewGroup) {
+            if(0 == ((ViewGroup) containerView).getChildCount()) {
+              boolean isWxActivity = false;
+              if(mContext != null && mContext.getClass() != null) {
+                String name = mContext.getClass().getName();
+                if(!TextUtils.isEmpty(name)) {
+                  isWxActivity = name.contains("WXActivity");
+                }
+              }
+
+              if(!isWxActivity) {
+                onJSException(String.valueOf(WX_ERR_RELOAD_PAGE),"jsc reboot","jsc reboot");
+              }
+              WXBridgeManager.getInstance().callReportCrashReloadPage(mInstanceId, null);
+            }
+          }
+        }
+      }, WXBridgeManager.getInstance().getRebootJscTimeout());
+    }
   }
 
   private void renderByUrlInternal(String pageName,
                                    final String url,
                                    Map<String, Object> options,
                                    final String jsonInitData,
-                                   final WXRenderStrategy flag) {
+                                   WXRenderStrategy flag) {
 
     ensureRenderArchor();
     pageName = wrapPageName(pageName, url);
     mBundleUrl = url;
+    mRenderStrategy = flag;
     if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
       mNeedValidate = WXSDKManager.getInstance().getValidateProcessor().needValidate(mBundleUrl);
     }
@@ -738,6 +773,16 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END);
       render(pageName,template , renderOptions, jsonInitData, flag);
       return;
+    }
+
+    boolean is_wlasm = false;
+    if (uri != null && uri.getPath()!=null) {
+      if(uri.getPath().endsWith(".wlasm")){
+        is_wlasm =  true;
+      }
+    }
+    if (is_wlasm){
+      flag = WXRenderStrategy.DATA_RENDER_BINARY;
     }
 
     IWXHttpAdapter adapter = WXSDKManager.getInstance().getIWXHttpAdapter();
@@ -1017,9 +1062,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mGlobalEventReceiver=new WXGlobalEventReceiver(this);
     try {
       getContext().registerReceiver(mGlobalEventReceiver, new IntentFilter(WXGlobalEventReceiver.EVENT_ACTION));
-    } catch (Exception e) {
+    } catch (Throwable e) {
       // Huawei may throw a exception if register more than 500 BroadcastReceivers
       WXLogUtils.e(e.getMessage());
+      mGlobalEventReceiver = null;
     }
 
   }
@@ -1265,6 +1311,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void onRenderSuccess(final int width, final int height) {
+    isRenderSuccess = true;
     if (!isNewFsEnd){
       getApmForInstance().arriveNewFsRenderTime();
     }
@@ -1298,7 +1345,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
       WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
     }
-    if(!WXEnvironment.isApkDebugable()){
+    if(WXEnvironment.isPerf()){
       WXLogUtils.e("weex_perf",mWXPerformance.getPerfData());
     }
   }
@@ -1365,6 +1412,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void onJSException(final String errCode, final String function, final String exception) {
     getExceptionRecorder().recordReportErrorMsg("["+errCode+","+function+","+exception+"]");
+    hasException = true;
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
 
@@ -1614,6 +1662,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public int getRenderContainerPaddingLeft() {
     if(mRenderContainer != null) {
       return mRenderContainer.getPaddingLeft();
+    }
+    return 0;
+  }
+
+  public int getRenderContainerPaddingRight() {
+    if(mRenderContainer != null) {
+      return mRenderContainer.getPaddingRight();
     }
     return 0;
   }

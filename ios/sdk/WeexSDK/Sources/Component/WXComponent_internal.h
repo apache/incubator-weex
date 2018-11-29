@@ -219,7 +219,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_setRenderObject:(void *)object;
 
-- (BOOL)_isCaculatedFrameChanged:(CGRect)frame;
+- (BOOL)_isCalculatedFrameChanged:(CGRect)frame;
 
 - (CGFloat)_getInnerContentMainSize;
 
@@ -282,5 +282,10 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 - (void)detachSlotEvent:(NSDictionary *)data;
 
 - (void)_buildViewHierarchyLazily;
+
+
+- (void)_adjustForRTL;
+
+- (BOOL)_isAffineTypeAs:(NSString *)type;
 
 @end

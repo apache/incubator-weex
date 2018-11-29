@@ -153,11 +153,26 @@ bool flexIsUndefined(float value) {
                 [strongSelf->_transform applyTransformForView:strongSelf.view];
             }
             
+            [self _adjustForRTL];
+            
             if (strongSelf->_backgroundImage) {
                 [strongSelf setGradientLayer];
             }
             [strongSelf setNeedsDisplay];
         }];
+    } else {
+        // if frame is not change, we still need check was layoutDirection changed
+        if ([self isDirectionRTL] != _isLastLayoutDirectionRTL) {
+            _isLastLayoutDirectionRTL = [self isDirectionRTL];
+            __weak typeof(self) weakSelf = self;
+            [self.weexInstance.componentManager _addUITask:^{
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (strongSelf->_transform) {
+                    [strongSelf->_transform applyTransformForView:strongSelf.view];
+                }
+                [strongSelf _adjustForRTL];
+            }];
+        }
     }
 }
 
@@ -168,6 +183,7 @@ bool flexIsUndefined(float value) {
     if (_positionType == WXPositionTypeSticky) {
         [self.ancestorScroller adjustSticky];
     }
+
     [self layoutDidFinish];
 }
 
@@ -183,148 +199,187 @@ bool flexIsUndefined(float value) {
     if (_flexCssNode == nullptr) {
         return;
     }
+
+    BOOL needLayout = NO;
     
-        // flex
-        if (styles[@"flex"]) {
-            _flexCssNode->set_flex([WXConvert CGFloat:styles[@"flex"]]);
-        }
-        if (isnan(_flexCssNode->getFlex())) {
-            // to make the default flex value is zero, yoga is nan, maybe this can configured by yoga config
-            _flexCssNode->set_flex(0);
-        }
-        
-        if (styles[@"flexDirection"]) {
-            _flexCssNode->setFlexDirection([self fxFlexDirection:styles[@"flexDirection"]], isUpdate);
-        }
-        if (styles[@"alignItems"]) {
-            _flexCssNode->setAlignItems([self fxAlign:styles[@"alignItems"]]);
-        }
-        if (styles[@"alignSelf"]) {
-            _flexCssNode->setAlignSelf([self fxAlignSelf:styles[@"alignSelf"]]);
-        }
-        if (styles[@"flexWrap"]) {
-            _flexCssNode->setFlexWrap([self fxWrap:styles[@"flexWrap"]]);
-        }
-        if (styles[@"justifyContent"]) {
-            _flexCssNode->setJustifyContent([self fxJustify:styles[@"justifyContent"]]);
-        }
-        
-        // position
-        if (styles[@"position"]) {
-            _flexCssNode->setStylePositionType([self fxPositionType:styles[@"position"]]);
-        }
-        if (styles[@"top"]) {
-            _flexCssNode->setStylePosition(WeexCore::kPositionEdgeTop,
-                                           [self judgePropValuePropValue:styles[@"top"] defaultValue:NAN]);
-        }
-        if (styles[@"left"]) {
-            _flexCssNode->setStylePosition(WeexCore::kPositionEdgeLeft,
-                                           [self judgePropValuePropValue:styles[@"left"] defaultValue:NAN]);
-        }
-        if(styles[@"right"]) {
-            _flexCssNode->setStylePosition(WeexCore::kPositionEdgeRight,
-                                           [self judgePropValuePropValue:styles[@"right"] defaultValue:NAN]);
-        }
-        if (styles[@"bottom"]) {
-            _flexCssNode->setStylePosition(WeexCore::kPositionEdgeBottom,
-                                           [self judgePropValuePropValue:styles[@"bottom"] defaultValue:NAN]);
-        }
-        
-        // dimension
-        if (styles[@"width"]) {
-            _flexCssNode->setStyleWidth([self judgePropValuePropValue:styles[@"width"] defaultValue:NAN]
-                                        ,isUpdate);
-        }
-        if (styles[@"height"]) {
-            _flexCssNode->setStyleHeight([self judgePropValuePropValue:styles[@"height"] defaultValue:NAN]);
-        }
-        if (styles[@"minWidth"]) {
-            _flexCssNode->setMinWidth([self judgePropValuePropValue:styles[@"minWidth"] defaultValue:NAN]
-                                      ,isUpdate);
-        }
-        if (styles[@"minHeight"]) {
-            _flexCssNode->setMinHeight([self judgePropValuePropValue:styles[@"minHeight"] defaultValue:NAN]);
-        }
-        if (styles[@"maxWidth"]) {
-            _flexCssNode->setMaxWidth([self judgePropValuePropValue:styles[@"maxWidth"] defaultValue:NAN]
-                                      ,isUpdate);
-        }
-        if (styles[@"maxHeight"]) {
-            _flexCssNode->setMaxHeight([self judgePropValuePropValue:styles[@"maxHeight"] defaultValue:NAN]);
-        }
-        
-        // margin
-        if (styles[@"margin"]) {
-            _flexCssNode->setMargin(WeexCore::kMarginALL,
-                                    [self judgePropValuePropValue:styles[@"margin"] defaultValue:0]);
-        }
-        if (styles[@"marginTop"]) {
-            _flexCssNode->setMargin(WeexCore::kMarginTop,
-                                    [self judgePropValuePropValue:styles[@"marginTop"] defaultValue:0]);
-        }
-        if (styles[@"marginBottom"]) {
-            _flexCssNode->setMargin(WeexCore::kMarginBottom,
-                                    [self judgePropValuePropValue:styles[@"marginBottom"] defaultValue:0]);
-        }
-        if (styles[@"marginRight"]) {
-            _flexCssNode->setMargin(WeexCore::kMarginRight,
-                                    [self judgePropValuePropValue:styles[@"marginRight"] defaultValue:0]);
-        }
-        if (styles[@"marginLeft"]) {
-            _flexCssNode->setMargin(WeexCore::kMarginLeft,
-                                    [self judgePropValuePropValue:styles[@"marginLeft"] defaultValue:0]);
-        }
-        
-        // border
-        if (styles[@"borderWidth"]) {
-            _flexCssNode->setBorderWidth(WeexCore::kBorderWidthALL,
-                                         [self judgePropValuePropValue:styles[@"borderWidth"] defaultValue:0]);
-        }
-        if (styles[@"borderTopWidth"]) {
-            _flexCssNode->setBorderWidth(WeexCore::kBorderWidthTop,
-                                         [self judgePropValuePropValue:styles[@"borderTopWidth"] defaultValue:0]);
-        }
-        
-        if (styles[@"borderLeftWidth"]) {
-            _flexCssNode->setBorderWidth(WeexCore::kBorderWidthLeft,
-                                         [self judgePropValuePropValue:styles[@"borderLeftWidth"] defaultValue:0]);
-        }
-        
-        if (styles[@"borderBottomWidth"]) {
-            _flexCssNode->setBorderWidth(WeexCore::kBorderWidthBottom,
-                                         [self judgePropValuePropValue:styles[@"borderBottomWidth"] defaultValue:0]);
-        }
-        if (styles[@"borderRightWidth"]) {
-            _flexCssNode->setBorderWidth(WeexCore::kBorderWidthRight,
-                                         [self judgePropValuePropValue:styles[@"borderRightWidth"] defaultValue:0]);
-        }
-        
-        // padding
-        if (styles[@"padding"]) {
-            _flexCssNode->setPadding(WeexCore::kPaddingALL,
-                                     [self judgePropValuePropValue:styles[@"padding"] defaultValue:0]);
-        }
-        if (styles[@"paddingTop"]) {
-            _flexCssNode->setPadding(WeexCore::kPaddingTop,
-                                     [self judgePropValuePropValue:styles[@"paddingTop"] defaultValue:0]);
-        }
-        if (styles[@"paddingLeft"]) {
-            _flexCssNode->setPadding(WeexCore::kPaddingLeft,
-                                     [self judgePropValuePropValue:styles[@"paddingLeft"] defaultValue:0]);
-        }
-        if (styles[@"paddingBottom"]) {
-            _flexCssNode->setPadding(WeexCore::kPaddingBottom,
-                                     [self judgePropValuePropValue:styles[@"paddingBottom"] defaultValue:0]);
-        }
-        if (styles[@"paddingRight"]) {
-            _flexCssNode->setPadding(WeexCore::kPaddingRight,
-                                     [self judgePropValuePropValue:styles[@"paddingRight"] defaultValue:0]);
-        }
-        
+    // CSS direction for RTL Layout
+    if (styles[@"direction"]) {
+        _flexCssNode->setDirection([self fxDirection:styles[@"direction"]], isUpdate);
+        needLayout = YES;
+    }
+    
+    // flex
+    if (styles[@"flex"]) {
+        _flexCssNode->set_flex([WXConvert CGFloat:styles[@"flex"]]);
+        needLayout = YES;
+    }
+    if (isnan(_flexCssNode->getFlex())) {
+        // to make the default flex value is zero, yoga is nan, maybe this can configured by yoga config
+        _flexCssNode->set_flex(0);
+        needLayout = YES;
+    }
+    
+    if (styles[@"flexDirection"]) {
+        _flexCssNode->setFlexDirection([self fxFlexDirection:styles[@"flexDirection"]], isUpdate);
+        needLayout = YES;
+    }
+    if (styles[@"alignItems"]) {
+        _flexCssNode->setAlignItems([self fxAlign:styles[@"alignItems"]]);
+        needLayout = YES;
+    }
+    if (styles[@"alignSelf"]) {
+        _flexCssNode->setAlignSelf([self fxAlignSelf:styles[@"alignSelf"]]);
+        needLayout = YES;
+    }
+    if (styles[@"flexWrap"]) {
+        _flexCssNode->setFlexWrap([self fxWrap:styles[@"flexWrap"]]);
+        needLayout = YES;
+    }
+    if (styles[@"justifyContent"]) {
+        _flexCssNode->setJustifyContent([self fxJustify:styles[@"justifyContent"]]);
+        needLayout = YES;
+    }
+    
+    // position
+    if (styles[@"position"]) {
+        _flexCssNode->setStylePositionType([self fxPositionType:styles[@"position"]]);
+        needLayout = YES;
+    }
+    if (styles[@"top"]) {
+        _flexCssNode->setStylePosition(WeexCore::kPositionEdgeTop,
+                                       [self judgePropValuePropValue:styles[@"top"] defaultValue:NAN]);
+        needLayout = YES;
+    }
+    if (styles[@"left"]) {
+        _flexCssNode->setStylePosition(WeexCore::kPositionEdgeLeft,
+                                       [self judgePropValuePropValue:styles[@"left"] defaultValue:NAN]);
+        needLayout = YES;
+    }
+    if(styles[@"right"]) {
+        _flexCssNode->setStylePosition(WeexCore::kPositionEdgeRight,
+                                       [self judgePropValuePropValue:styles[@"right"] defaultValue:NAN]);
+        needLayout = YES;
+    }
+    if (styles[@"bottom"]) {
+        _flexCssNode->setStylePosition(WeexCore::kPositionEdgeBottom,
+                                       [self judgePropValuePropValue:styles[@"bottom"] defaultValue:NAN]);
+        needLayout = YES;
+    }
+    
+    // dimension
+    if (styles[@"width"]) {
+        _flexCssNode->setStyleWidth([self judgePropValuePropValue:styles[@"width"] defaultValue:NAN], isUpdate);
+        needLayout = YES;
+    }
+    if (styles[@"height"]) {
+        _flexCssNode->setStyleHeight([self judgePropValuePropValue:styles[@"height"] defaultValue:NAN]);
+        needLayout = YES;
+    }
+    if (styles[@"minWidth"]) {
+        _flexCssNode->setMinWidth([self judgePropValuePropValue:styles[@"minWidth"] defaultValue:NAN], isUpdate);
+        needLayout = YES;
+    }
+    if (styles[@"minHeight"]) {
+        _flexCssNode->setMinHeight([self judgePropValuePropValue:styles[@"minHeight"] defaultValue:NAN]);
+        needLayout = YES;
+    }
+    if (styles[@"maxWidth"]) {
+        _flexCssNode->setMaxWidth([self judgePropValuePropValue:styles[@"maxWidth"] defaultValue:NAN], isUpdate);
+        needLayout = YES;
+    }
+    if (styles[@"maxHeight"]) {
+        _flexCssNode->setMaxHeight([self judgePropValuePropValue:styles[@"maxHeight"] defaultValue:NAN]);
+        needLayout = YES;
+    }
+    
+    // margin
+    if (styles[@"margin"]) {
+        _flexCssNode->setMargin(WeexCore::kMarginALL,
+                                [self judgePropValuePropValue:styles[@"margin"] defaultValue:0]);
+        needLayout = YES;
+    }
+    if (styles[@"marginTop"]) {
+        _flexCssNode->setMargin(WeexCore::kMarginTop,
+                                [self judgePropValuePropValue:styles[@"marginTop"] defaultValue:0]);
+        needLayout = YES;
+    }
+    if (styles[@"marginBottom"]) {
+        _flexCssNode->setMargin(WeexCore::kMarginBottom,
+                                [self judgePropValuePropValue:styles[@"marginBottom"] defaultValue:0]);
+        needLayout = YES;
+    }
+    if (styles[@"marginRight"]) {
+        _flexCssNode->setMargin(WeexCore::kMarginRight,
+                                [self judgePropValuePropValue:styles[@"marginRight"] defaultValue:0]);
+    }
+    if (styles[@"marginLeft"]) {
+        _flexCssNode->setMargin(WeexCore::kMarginLeft,
+                                [self judgePropValuePropValue:styles[@"marginLeft"] defaultValue:0]);
+        needLayout = YES;
+    }
+    
+    // border
+    if (styles[@"borderWidth"]) {
+        _flexCssNode->setBorderWidth(WeexCore::kBorderWidthALL,
+                                     [self judgePropValuePropValue:styles[@"borderWidth"] defaultValue:0]);
+        needLayout = YES;
+    }
+    if (styles[@"borderTopWidth"]) {
+        _flexCssNode->setBorderWidth(WeexCore::kBorderWidthTop,
+                                     [self judgePropValuePropValue:styles[@"borderTopWidth"] defaultValue:0]);
+        needLayout = YES;
+    }
+    
+    if (styles[@"borderLeftWidth"]) {
+        _flexCssNode->setBorderWidth(WeexCore::kBorderWidthLeft,
+                                     [self judgePropValuePropValue:styles[@"borderLeftWidth"] defaultValue:0]);
+        needLayout = YES;
+    }
+    
+    if (styles[@"borderBottomWidth"]) {
+        _flexCssNode->setBorderWidth(WeexCore::kBorderWidthBottom,
+                                     [self judgePropValuePropValue:styles[@"borderBottomWidth"] defaultValue:0]);
+        needLayout = YES;
+    }
+    if (styles[@"borderRightWidth"]) {
+        _flexCssNode->setBorderWidth(WeexCore::kBorderWidthRight,
+                                     [self judgePropValuePropValue:styles[@"borderRightWidth"] defaultValue:0]);
+        needLayout = YES;
+    }
+    
+    // padding
+    if (styles[@"padding"]) {
+        _flexCssNode->setPadding(WeexCore::kPaddingALL,
+                                 [self judgePropValuePropValue:styles[@"padding"] defaultValue:0]);
+        needLayout = YES;
+    }
+    if (styles[@"paddingTop"]) {
+        _flexCssNode->setPadding(WeexCore::kPaddingTop,
+                                 [self judgePropValuePropValue:styles[@"paddingTop"] defaultValue:0]);
+        needLayout = YES;
+    }
+    if (styles[@"paddingLeft"]) {
+        _flexCssNode->setPadding(WeexCore::kPaddingLeft,
+                                 [self judgePropValuePropValue:styles[@"paddingLeft"] defaultValue:0]);
+        needLayout = YES;
+    }
+    if (styles[@"paddingBottom"]) {
+        _flexCssNode->setPadding(WeexCore::kPaddingBottom,
+                                 [self judgePropValuePropValue:styles[@"paddingBottom"] defaultValue:0]);
+        needLayout = YES;
+    }
+    if (styles[@"paddingRight"]) {
+        _flexCssNode->setPadding(WeexCore::kPaddingRight,
+                                 [self judgePropValuePropValue:styles[@"paddingRight"] defaultValue:0]);
+        needLayout = YES;
+    }
+    
+    if (needLayout) {
         [self setNeedsLayout];
+    }
 }
 
--(CGFloat)judgePropValuePropValue:(id)propValue defaultValue:(CGFloat)defaultValue
+- (CGFloat)judgePropValuePropValue:(id)propValue defaultValue:(CGFloat)defaultValue
 {
     CGFloat convertValue = (CGFloat)[WXConvert WXFlexPixelType:propValue scaleFactor:self.weexInstance.pixelScaleFactor];
     if (!isnan(convertValue)) {
@@ -420,7 +475,9 @@ do {\
         if (styles.count<=0) {
             return;
         }
-        
+    
+        WX_FLEX_STYLE_RESET_CSS_NODE(direction, @(WeexCore::kDirectionInherit))
+    
         WX_FLEX_STYLE_RESET_CSS_NODE(flex, @0.0)
         WX_FLEX_STYLE_RESET_CSS_NODE(flexDirection, @(WeexCore::kFlexDirectionColumn))
         WX_FLEX_STYLE_RESET_CSS_NODE(alignItems, @(WeexCore::kAlignItemsStretch))
@@ -528,6 +585,18 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
         }
     }
     return WeexCore::kRelative;
+}
+
+- (WeexCore::WXCoreDirection)fxDirection:(id)value
+{
+    if([value isKindOfClass:[NSString class]]){
+        if ([value isEqualToString:@"rtl"]) {
+            return WeexCore::kDirectionRTL;
+        } else if ([value isEqualToString:@"ltr"]) {
+            return WeexCore::kDirectionLTR;
+        }
+    }
+    return WeexCore::kDirectionInherit;
 }
 
 - (WeexCore::WXCoreFlexDirection)fxFlexDirection:(id)value
@@ -642,6 +711,41 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
         [WXCoreBridge removeRenderObjectFromMap:subcomponent.weexInstance.instanceId object:node];
         delete node; // also will delete all children recursively
     }
+}
+
+#pragma mark - RTL
+
+- (BOOL)isDirectionRTL {
+    if (![WXUtility enableRTLLayoutDirection]) return NO;
+    
+    WeexCore::WXCoreDirection direction = _flexCssNode == nullptr ? WeexCore::WEEXCORE_CSS_DEFAULT_DIRECTION : _flexCssNode->getLayoutDirectionFromPathNode();
+    if (direction != WeexCore::kDirectionInherit) return direction == WeexCore::kDirectionRTL;
+    return NO;
+}
+
+- (void)_adjustForRTL {
+    if (![WXUtility enableRTLLayoutDirection]) return;
+    
+    if (self->_positionType == WXPositionTypeFixed) return;
+    
+    if (self.supercomponent && self.supercomponent->_flexCssNode && self.supercomponent->_flexCssNode->getLayoutDirectionFromPathNode() == WeexCore::kDirectionRTL && [self.supercomponent shouldTransformSubviewsWhenRTL]) {
+        if (_transform) {
+            self.view.layer.transform = CATransform3DConcat(self.view.layer.transform, CATransform3DScale(CATransform3DIdentity, -1, 1, 1));
+        } else {
+            self.view.layer.transform = CATransform3DScale(CATransform3DIdentity, -1, 1, 1);
+        }
+    } else {
+        if (!_transform) {
+            self.view.layer.transform = CATransform3DIdentity;
+        }
+    }
+}
+
+// Now we scrollView RTL solution is tranform
+// so scrollView need tranform subviews when RTL by default
+// if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
+- (BOOL)shouldTransformSubviewsWhenRTL {
+    return [self.view isKindOfClass:[UIScrollView class]];
 }
 
 @end

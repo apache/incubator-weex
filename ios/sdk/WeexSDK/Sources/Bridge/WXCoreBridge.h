@@ -116,6 +116,12 @@ namespace WeexCore
         void PostMessage(const char* vm_id, const char* data, int dataLength) override {};
         void DispatchMessage(const char* client_id,
                              const char* data, int dataLength, const char* callback, const char* vm_id) override {};
+        
+        std::unique_ptr<WeexJSResult> DispatchMessageSync(const char* client_id, const char* data,
+                                                          int dataLength, const char* vm_id) override {
+            return std::unique_ptr<WeexJSResult>();
+        }
+        
         void OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult>& result) override {};
     };
     
@@ -194,6 +200,10 @@ namespace WeexCore
 + (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args;
 
 + (void)registerModules:(NSDictionary *)modules;
+
++ (void)registerComponentAffineType:(NSString *)type asType:(NSString *)baseType;
+
++ (BOOL)isComponentAffineType:(NSString *)type asType:(NSString *)baseType;
 
 @end
 

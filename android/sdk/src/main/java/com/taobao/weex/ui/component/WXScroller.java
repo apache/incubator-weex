@@ -33,7 +33,10 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -96,6 +99,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   private int pageSize = 0;
   private boolean pageEnable = false;
+  private boolean mIsHostAttachedToWindow = false;
 
   public static class Creator implements ComponentCreator {
     @Override
@@ -378,6 +382,42 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   }
 
   @Override
+  public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      lp.setMargins(left, top, right, bottom);
+      lp.setMarginStart(left);
+      lp.setMarginEnd(right);
+    } else {
+      if (lp instanceof FrameLayout.LayoutParams) {
+        FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
+        if (this.isNativeLayoutRTL()) {
+          lp_frameLayout.gravity = Gravity.RIGHT | Gravity.TOP;
+          lp.setMargins(right, top, left, bottom);
+        } else {
+          lp_frameLayout.gravity = Gravity.LEFT | Gravity.TOP;
+          lp.setMargins(left, top, right, bottom);
+        }
+      } else {
+        lp.setMargins(left, top, right, bottom);
+      }
+    }
+  }
+
+  @Override
+  public void setLayout(WXComponent component) {
+    if (TextUtils.isEmpty(component.getComponentType())
+            || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
+            || component.getLayoutSize() == null) {
+      return;
+    }
+    if (component.getHostView() != null) {
+      int layoutDirection = component.isNativeLayoutRTL() ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR;
+      ViewCompat.setLayoutDirection(component.getHostView(), layoutDirection);
+    }
+    super.setLayout(component);
+  }
+
+  @Override
   protected MeasureOutput measure(int width, int height) {
     MeasureOutput measureOutput = new MeasureOutput();
     if (this.mOrientation == Constants.Orientation.HORIZONTAL) {
@@ -436,6 +476,37 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
               LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
       scrollView.addView(mRealView, layoutParams);
       scrollView.setHorizontalScrollBarEnabled(false);
+
+        final WXScroller component = this;
+        final View.OnLayoutChangeListener listener = new View.OnLayoutChangeListener() {
+          @Override
+          public void onLayoutChange(View view, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+            final View frameLayout = view;
+            scrollView.post(new Runnable() {
+              @Override
+              public void run() {
+                if (isNativeLayoutRTL()) {
+                  int mw = frameLayout.getMeasuredWidth();
+                  scrollView.scrollTo(mw, component.getScrollY());
+                } else {
+                  scrollView.scrollTo(0, component.getScrollY());
+                }
+              }
+            });
+          }
+        };
+        mRealView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+          @Override
+          public void onViewAttachedToWindow(View view) {
+            view.addOnLayoutChangeListener(listener);
+          }
+
+          @Override
+          public void onViewDetachedFromWindow(View view) {
+            view.removeOnLayoutChangeListener(listener);
+          }
+        });
+
 
       if(pageEnable) {
         mGestureDetector = new GestureDetector(new MyGestureDetector(scrollView));
@@ -535,6 +606,19 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         }else{
           view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
         }
+      }
+    });
+    host.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+      @Override
+      public void onViewAttachedToWindow(View v) {
+        mIsHostAttachedToWindow = true;
+        procAppear(getScrollX(), getScrollY(), getScrollX(), getScrollY());
+      }
+
+      @Override
+      public void onViewDetachedFromWindow(View v) {
+        mIsHostAttachedToWindow = false;
+        dispatchDisappearEvent();
       }
     });
     return host;
@@ -693,9 +777,21 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       mActiveFeature = mChildren.indexOf(component);
     }
 
-
-    int viewYInScroller=component.getAbsoluteY() - getAbsoluteY();
-    int viewXInScroller=component.getAbsoluteX() - getAbsoluteX();
+    int viewYInScroller = component.getAbsoluteY() - getAbsoluteY();
+    int viewXInScroller = 0;
+    if (this.isNativeLayoutRTL()) {
+      // if layout direction is rtl, we need calculate rtl scroll x;
+      if (getInnerView().getChildCount() > 0) {
+        int totalWidth = getInnerView().getChildAt(0).getWidth();
+        int displayWidth = getInnerView().getMeasuredWidth();
+        viewXInScroller = totalWidth - (component.getAbsoluteX() - getAbsoluteX()) - displayWidth;
+      } else {
+        viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
+      }
+      offsetFloat = - offsetFloat;
+    } else {
+      viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
+    }
 
     scrollBy(viewXInScroller - getScrollX() + (int) offsetFloat, viewYInScroller - getScrollY() + (int) offsetFloat, smooth);
   }
@@ -741,11 +837,28 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     procAppear( x, y, oldx, oldy);
   }
 
+  @Override
+  public void notifyAppearStateChange(String wxEventType, String direction) {
+    if (containsEvent(Constants.Event.APPEAR) || containsEvent(Constants.Event.DISAPPEAR)) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("direction", direction);
+      fireEvent(wxEventType, params);
+    }
+    // No-op. The moment to notify children is decided by the time when scroller is attached
+    // or detached to window. Do not call super as scrollview has different disposal.
+  }
+
   /**
    * Process event like appear and disappear
+   *
+   * This method will be invoked in several situation below.
+   *    1. bind or unbind event
+   *    2. host view is attached to window
+   *    3. when scrollview is scrolling
    */
   private void procAppear(int x, int y, int oldx,
                           int oldy) {
+    if (!mIsHostAttachedToWindow) return;
     int moveY = y - oldy;
     int moveX = x - oldx;
     String direction = moveY > 0 ? Constants.Value.DIRECTION_UP :
@@ -760,11 +873,51 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       if (!helper.isWatch()) {
         continue;
       }
-      boolean visible = helper.isViewVisible(false);
+      boolean visible = checkItemVisibleInScroller(helper.getAwareChild());
 
       int result = helper.setAppearStatus(visible);
       if (result != AppearanceHelper.RESULT_NO_CHANGE) {
         helper.getAwareChild().notifyAppearStateChange(result == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
+      }
+    }
+  }
+
+  /**
+   * Check the view of given component is visible in scrollview.
+   *
+   * @param component ready to be check
+   * @return item is visible
+   */
+  private boolean checkItemVisibleInScroller(WXComponent component) {
+    boolean visible = false;
+    while (component != null && !(component instanceof WXScroller)) {
+      if (component.getParent() instanceof WXScroller) {
+        if (mOrientation == Constants.Orientation.HORIZONTAL) {
+          int offsetLeft = (int) component.getLayoutPosition().getLeft() - getScrollX();
+          visible = (offsetLeft > 0 - component.getLayoutWidth() && offsetLeft < getLayoutWidth());
+        } else {
+          int offsetTop = (int) component.getLayoutPosition().getTop() - getScrollY();
+          visible = (offsetTop > 0 - component.getLayoutHeight() && offsetTop < getLayoutHeight());
+        }
+      }
+      component = component.getParent();
+    }
+    return visible;
+  }
+
+  /**
+   * Dispatch disappear event to the child components in need.
+   */
+  private void dispatchDisappearEvent() {
+    for (Entry<String, AppearanceHelper> item : mAppearanceComponents.entrySet()) {
+      AppearanceHelper helper = item.getValue();
+      if (!helper.isWatch()) {
+        continue;
+      }
+      int result = helper.setAppearStatus(false);
+      if (result != AppearanceHelper.RESULT_NO_CHANGE) {
+        helper.getAwareChild().notifyAppearStateChange(result == AppearanceHelper.RESULT_APPEAR ?
+                Constants.Event.APPEAR : Constants.Event.DISAPPEAR, "");
       }
     }
   }

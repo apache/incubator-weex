@@ -267,6 +267,9 @@ Token::Type IsTwoCharacterSymbol(char ch1, char ch2) {
     case '>':
       if (ch1 == '>')
         return Token::SAR;
+    case '/':
+      if (ch1 == '<')
+        return Token::JSX_TAG_CLOSE;
     default:
       return Token::INVALID;
   }
@@ -366,6 +369,8 @@ Token Tokenizer::AdvanceInternal(bool not_regex) {
           return Token(std::string("ERROR"), Token::ERROR,
                        _ position(), _ seek());
         }
+      } else if(next == '>'){
+        return Token("/>",Token::JSX_TAG_END,_ position(), _ seek());
       } else {
         bool ok = true;
         _ PutBack(next);
@@ -514,9 +519,6 @@ Token Tokenizer::ParseRegex(bool* ok) {
         buffer.push_back(ch);
         ch = _ ReadChar();
       }
-
-      if (ch == ']')
-        buffer.push_back(ch);
     }
 
     if (ch == '\\') {

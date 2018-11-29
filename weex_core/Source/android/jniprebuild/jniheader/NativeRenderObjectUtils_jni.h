@@ -50,6 +50,9 @@ static void AddChildRenderObject(JNIEnv* env, jclass jcaller,
     jlong parent,
     jlong child);
 
+static jint RenderObjectGetLayoutDirectionFromPathNode(JNIEnv* env, jclass jcaller,
+    jlong ptr);
+
 static jboolean RenderObjectHasNewLayout(JNIEnv* env, jclass jcaller,
     jlong ptr);
 
@@ -147,6 +150,11 @@ static const JNINativeMethod kMethodsNativeRenderObjectUtils[] = {
 "J"
 ")"
 "V", reinterpret_cast<void*>(AddChildRenderObject) },
+    { "nativeRenderObjectGetLayoutDirectionFromPathNode",
+"("
+"J"
+")"
+"I", reinterpret_cast<void*>(RenderObjectGetLayoutDirectionFromPathNode) },
     { "nativeRenderObjectHasNewLayout",
 "("
 "J"

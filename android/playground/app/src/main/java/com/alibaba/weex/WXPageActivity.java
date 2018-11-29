@@ -242,8 +242,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       public void onSuccess(WXHttpTask task) {
         Log.i(TAG, "into--[http:onSuccess] url:" + url);
         try {
+          Uri uri = Uri.parse(url);
           mConfigMap.put("bundleUrl", url);
-          mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
+          if (uri.getPath().endsWith(".wlasm")){
+            mInstance.render(TAG, task.response.data, mConfigMap, null);
+          } else {
+            mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
+          }
         } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
         }

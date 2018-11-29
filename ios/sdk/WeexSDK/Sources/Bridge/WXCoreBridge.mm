@@ -29,6 +29,8 @@
 #import "WXAssert.h"
 #import "WXAppConfiguration.h"
 #import "WXConvertUtility.h"
+#import "WXSDKEngine.h"
+#import "WXAppMonitorProtocol.h"
 
 #include "base/CoreConstants.h"
 #include "core/manager/weex_core_manager.h"
@@ -50,6 +52,138 @@
 
 namespace WeexCore
 {
+    static NSString* const JSONSTRING_SUFFIX = @"\t\n\t\r";
+    
+    static NSString* TO_JSON(id object)
+    {
+        if (object == nil) {
+            return nil;
+        }
+        
+        @try {
+            if ([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]) {
+                NSError *error = nil;
+                NSData *data = [NSJSONSerialization dataWithJSONObject:object
+                                                               options:0
+                                                                 error:&error];
+                
+                if (error) {
+                    WXLogError(@"%@", error);
+                    WXAssert(NO, @"Fail to convert object to json. %@", error);
+                    return nil;
+                }
+                
+                return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] stringByAppendingString:JSONSTRING_SUFFIX]; // add suffix so that we know this is a json string
+            }
+        } @catch (NSException *exception) {
+            WXLogError(@"%@", exception);
+            WXAssert(NO, @"Fail to convert object to json. %@", exception);
+            return nil;
+        }
+        
+        return nil;
+    }
+    
+    static id TO_OBJECT(NSString* s)
+    {
+        if ([s hasSuffix:JSONSTRING_SUFFIX]) {
+            if ([s length] == [JSONSTRING_SUFFIX length]) {
+                return [NSNull null];
+            }
+            
+            // s is a json string
+            @try {
+                NSError* error = nil;
+                id jsonObj = [NSJSONSerialization JSONObjectWithData:[s dataUsingEncoding:NSUTF8StringEncoding]
+                                                             options:NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
+                                                               error:&error];
+                
+                if (jsonObj == nil) {
+                    WXLogError(@"%@", error);
+                    WXAssert(NO, @"Fail to convert json to object. %@", error);
+                }
+                else {
+                    return jsonObj;
+                }
+            } @catch (NSException *exception) {
+                WXLogError(@"%@", exception);
+                WXAssert(NO, @"Fail to convert json to object. %@", exception);
+            }
+        }
+        return s; // return s instead
+    }
+    
+    static NSMutableDictionary* NSDICTIONARY(std::map<std::string, std::string>* map)
+    {
+        if (map == nullptr || map->size() == 0)
+            return [[NSMutableDictionary alloc] init];
+        
+        NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:map->size()];
+        for (auto it = map->begin(); it != map->end(); it ++) {
+            id object = TO_OBJECT(NSSTRING(it->second.c_str()));
+            if (object) {
+                [result setObject:object forKey:NSSTRING(it->first.c_str())];
+            }
+        }
+        return result;
+    }
+    
+    static NSMutableDictionary* NSDICTIONARY(std::vector<std::pair<std::string, std::string>>* vec)
+    {
+        if (vec == nullptr || vec->size() == 0)
+            return [[NSMutableDictionary alloc] init];
+        
+        NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:vec->size()];
+        for (auto& p : *vec) {
+            id object = TO_OBJECT(NSSTRING(p.second.c_str()));
+            if (object) {
+                [result setObject:object forKey:NSSTRING(p.first.c_str())];
+            }
+        }
+        return result;
+    }
+    
+    static NSMutableArray* NSARRAY(std::set<std::string>* set)
+    {
+        if (set == nullptr || set->size() == 0)
+            return [[NSMutableArray alloc] init];
+        
+        NSMutableArray* result = [[NSMutableArray alloc] initWithCapacity:set->size()];
+        for (auto& s : *set) {
+            id object = TO_OBJECT(NSSTRING(s.c_str()));
+            if (object) {
+                [result addObject:object];
+            }
+        }
+        return result;
+    }
+    
+    static void consoleWithArguments(NSArray *arguments, WXLogFlag logLevel)
+    {
+        NSMutableString *jsLog = [NSMutableString string];
+        [jsLog appendString:@"jsLog: "];
+        [arguments enumerateObjectsUsingBlock:^(NSString *jsVal, NSUInteger idx, BOOL *stop) {
+            if (idx == arguments.count - 1) {
+                if (logLevel) {
+                    if (WXLogFlagWarning == logLevel) {
+                        id<WXAppMonitorProtocol> appMonitorHandler = [WXSDKEngine handlerForProtocol:@protocol(WXAppMonitorProtocol)];
+                        if ([appMonitorHandler respondsToSelector:@selector(commitAppMonitorAlarm:monitorPoint:success:errorCode:errorMsg:arg:)]) {
+                            [appMonitorHandler commitAppMonitorAlarm:@"weex" monitorPoint:@"jswarning" success:FALSE errorCode:@"99999" errorMsg:jsLog arg:[WXSDKEngine topInstance].pageName];
+                        }
+                    }
+                    WX_LOG(logLevel, @"%@", jsLog);
+                }
+                else {
+                    [jsLog appendFormat:@"%@ ", jsVal]                                  ;
+                    WXLogInfo(@"%@", jsLog);
+                }
+            }
+            else {
+                [jsLog appendFormat:@"%@ ", jsVal];
+            }
+        }];
+    }
+    
     static void MergeBorderWidthValues(NSMutableDictionary* dict,
                                        const WXCoreBorderWidth & borders,
                                        bool isUpdate, float pixelScaleFactor)
@@ -115,9 +249,7 @@ namespace WeexCore
         assert(false);
     }
     
-    std::unique_ptr<ValueWithType> IOSSide::CallNativeModule(const char *page_id, const char *module, const char *method,
-                                         const char *args, int argc,
-                                         const char *options, int optionsLength)
+    std::unique_ptr<ValueWithType> IOSSide::CallNativeModule(const char *page_id, const char *module, const char *method, const char *args, int args_length, const char *options, int options_length)
     {
         // should not enter this function
         do {
@@ -129,10 +261,11 @@ namespace WeexCore
             NSString *moduleName = [NSString stringWithUTF8String:module];
             NSString *methodName = [NSString stringWithUTF8String:method];
             NSArray *newArguments;
-            if (argc > 0 && args) {
+            if (args && args_length > 0) {
                 NSString *arguments = [NSString stringWithUTF8String:args];
                 newArguments = [WXUtility objectFromJSON:arguments];
             }
+            LOGD("CallNativeModule:[%s]:[%s]=>%s \n", module, method, args);
             WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:newArguments options:nil instance:instance];
             [method invoke];
             
@@ -154,11 +287,35 @@ namespace WeexCore
         // should not enter this function
         assert(false);
     }
-        
-    void IOSSide::NativeLog(const char* str_array)
+
+    void IOSSide::NativeLog(const char *args)
     {
         // should not enter this function
-        assert(false);
+        do {
+            if (!args) {
+                break;
+            }
+            NSArray *newArguments;
+            if (args) {
+                NSString *arguments = [NSString stringWithUTF8String:args];
+                newArguments = [WXUtility objectFromJSON:arguments];
+            }
+            if (![newArguments isKindOfClass:[NSArray class]] || !newArguments.count) {
+                break;
+            }
+            static NSDictionary *levelMap;
+            static dispatch_once_t onceToken;
+            dispatch_once(&onceToken, ^{
+                levelMap = @{@"__ERROR": @(WXLogFlagError),
+                          @"__WARN": @(WXLogFlagWarning),
+                          @"__INFO": @(WXLogFlagInfo),
+                          @"__DEBUG": @(WXLogFlagDebug),
+                          @"__LOG": @(WXLogFlagLog)};
+            });
+            NSString *levelStr = [newArguments lastObject];
+            consoleWithArguments(newArguments, (WXLogFlag)[levelMap[levelStr] integerValue]);
+            
+        } while (0);
     }
     
     void IOSSide::TriggerVSync(const char* page_id)
@@ -738,19 +895,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
     NSString *optionsString = [WXUtility JSONString:options];
     NSString *dataString = [WXUtility JSONString:data];
-
-//    NSString *documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-//    NSString *txtPath = [documentsPath stringByAppendingPathComponent:@"test.wasm"];
-//    std::string path = [txtPath UTF8String];
-//    std::ifstream fin(path, std::ios::in|std::ios::binary|std::ios::ate);
-//    unsigned length = static_cast<unsigned>(fin.tellg());
-//
-//    char* buffer = new char[length];
-//    fin.seekg (0, std::ios::beg);
-//    fin.read(buffer, length);
-//    fin.close();
-
-    node_manager->CreatePage(static_cast<const char*>(contents.bytes), contents.length, [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "");
+    node_manager->CreatePage(static_cast<const char *>(contents.bytes), contents.length, [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "");
 }
 
 + (void)destroyDataRenderInstance:(NSString *)pageId
@@ -777,6 +922,16 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     if (setting.length > 0) {
         weex::core::data_render::VNodeRenderManager::GetInstance()->RegisterModules([setting UTF8String] ? : "");
     }
+}
+
++ (void)registerComponentAffineType:(NSString *)type asType:(NSString *)baseType
+{
+    WeexCore::RenderCreator::GetInstance()->RegisterAffineType([type UTF8String] ?: "", [baseType UTF8String] ?: "");
+}
+
++ (BOOL)isComponentAffineType:(NSString *)type asType:(NSString *)baseType
+{
+    return WeexCore::RenderCreator::GetInstance()->IsAffineType([type UTF8String] ?: "", [baseType UTF8String] ?: "");
 }
 
 + (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
