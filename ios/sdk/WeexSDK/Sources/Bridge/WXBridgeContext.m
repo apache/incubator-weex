@@ -51,6 +51,7 @@
 #import "WXJSFrameworkLoadProtocol.h"
 #import "WXJSFrameworkLoadDefaultImpl.h"
 #import "WXHandlerFactory.h"
+#import "WXExtendCallNativeManager.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -1125,6 +1126,10 @@ _Pragma("clang diagnostic pop") \
         NSString * levelStr = [[args lastObject] toString];
         [WXBridgeContext handleConsoleOutputWithArgument:args logLevel:(WXLogFlag)[levelMap[levelStr] integerValue]];
     };
+    
+    context[@"extendCallNative"] = ^(JSValue *value ) {
+        return [WXBridgeContext extendCallNative:[value toDictionary]];
+    };
 }
 
 + (void)handleConsoleOutputWithArgument:(NSArray *)arguments logLevel:(WXLogFlag)logLevel
@@ -1148,5 +1153,13 @@ _Pragma("clang diagnostic pop") \
             }
         }
     }];
+}
+
++(id)extendCallNative:(NSDictionary *)dict
+{
+    if(dict){
+        return [WXExtendCallNativeManager sendExtendCallNativeEvent:dict];
+    }
+    return @(-1);
 }
 @end

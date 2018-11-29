@@ -427,10 +427,6 @@
     _jsContext[@"clearTimeoutWeex"] = ^(JSValue *ret) {
         [weakSelf triggerClearTimeout:[ret toString]];
     };
-    
-    _jsContext[@"extendCallNative"] = ^(JSValue *value ) {
-        return [weakSelf extendCallNative:[value toDictionary]];
-    };
 }
 
 -(void)addInstance:(NSString *)instance callback:(NSString *)callback
@@ -543,14 +539,6 @@
     if([_timers containsObject:ret]){
         [_timers removeObject:ret];
     }
-}
-
--(id)extendCallNative:(NSDictionary *)dict
-{
-    if(dict){
-        return [WXExtendCallNativeManager sendExtendCallNativeEvent:dict];
-    }
-    return @(-1);
 }
 
 @end
