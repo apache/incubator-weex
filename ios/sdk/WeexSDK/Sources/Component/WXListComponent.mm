@@ -907,7 +907,7 @@
     
     if (keepScrollPosition) {
         CGPoint afterContentOffset = _tableView.contentOffset;
-        CGPoint newContentOffset = CGPointMake(afterContentOffset.x, afterContentOffset.y + adjustment);
+        CGPoint newContentOffset = CGPointMake(afterContentOffset.x, afterContentOffset.y + ceilf(adjustment));
         _tableView.contentOffset = newContentOffset;
     }
     
