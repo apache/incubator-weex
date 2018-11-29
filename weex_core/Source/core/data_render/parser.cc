@@ -402,35 +402,33 @@ struct ASTParser final {
         "template_name", factory_->NewStringConstant(template_name)));
 
     std::vector<Handle<Expression>> merge_args;
-    if (is_body) {
-      Handle<Declaration> data_declaration = factory_->NewDeclaration(
-          "data", factory_->NewIdentifier("_data_main"));
-      Handle<Declaration> props_declaration =
-          factory_->NewDeclaration("props", factory_->NewNullConstant());
-      func_body->PushExpression(data_declaration);
-      func_body->PushExpression(props_declaration);
-    } else {
-      Handle<Identifier> component_data = factory_->NewMemberExpression(
-          MemberAccessKind::kDot, factory_->NewIdentifier("_components_data"),
-          factory_->NewIdentifier(template_name));
-      Handle<Declaration> data_declaration =
-          factory_->NewDeclaration("data", component_data);
-      Handle<Identifier> component_props = factory_->NewMemberExpression(
-          MemberAccessKind::kDot, factory_->NewIdentifier("_components_props"),
-          factory_->NewIdentifier(template_name));
-      Handle<Declaration> props_declaration =
-          factory_->NewDeclaration("props", component_props);
-      func_body->PushExpression(data_declaration);
-      func_body->PushExpression(props_declaration);
+    Handle<Identifier> component_data = factory_->NewMemberExpression(
+        MemberAccessKind::kDot, factory_->NewIdentifier("_components_data"),
+        factory_->NewIdentifier(template_name));
+    Handle<Declaration> data_declaration =
+        factory_->NewDeclaration("data", component_data);
+    Handle<Identifier> component_props = factory_->NewMemberExpression(
+        MemberAccessKind::kDot, factory_->NewIdentifier("_components_props"),
+        factory_->NewIdentifier(template_name));
+    Handle<Declaration> props_declaration =
+        factory_->NewDeclaration("props", component_props);
+    Handle<Identifier> component_computed = factory_->NewMemberExpression(
+        MemberAccessKind::kDot, factory_->NewIdentifier("_components_computed"),
+        factory_->NewIdentifier(template_name));
+    Handle<Declaration> computed_declaration =
+        factory_->NewDeclaration("computed", component_computed);
+    func_body->PushExpression(data_declaration);
+    func_body->PushExpression(props_declaration);
+    func_body->PushExpression(computed_declaration);
 
-      // Update props
-      merge_args.push_back(factory_->NewIdentifier("props"));
-      merge_args.push_back(factory_->NewIdentifier("this"));
-      func_body->PushExpression(factory_->NewAssignExpression(
-          factory_->NewIdentifier("props"),
-          factory_->NewCallExpression(factory_->NewIdentifier("merge"),
-                                      merge_args)));
-    }
+    // Update props
+    merge_args.clear();
+    merge_args.push_back(factory_->NewIdentifier("props"));
+    merge_args.push_back(factory_->NewIdentifier("this"));
+    func_body->PushExpression(factory_->NewAssignExpression(
+        factory_->NewIdentifier("props"),
+        factory_->NewCallExpression(factory_->NewIdentifier("merge"),
+                                    merge_args)));
 
     // Declare createNodeInComponent function in global
     const std::string& create_node_func =
@@ -459,11 +457,20 @@ struct ASTParser final {
     // }
     args.clear();
     auto if_expression_list = factory_->NewExpressionList();
-
+    // merge props
     if_expression_list->Insert(factory_->NewAssignExpression(
         factory_->NewIdentifier("this"), factory_->NewIdentifier("props")));
+    // merge data
     merge_args.clear();
     merge_args.push_back(factory_->NewIdentifier("data"));
+    merge_args.push_back(factory_->NewIdentifier("this"));
+    if_expression_list->Insert(factory_->NewAssignExpression(
+        factory_->NewIdentifier("this"),
+        factory_->NewCallExpression(factory_->NewIdentifier("merge"),
+                                    merge_args)));
+    // merge computed
+    merge_args.clear();
+    merge_args.push_back(factory_->NewIdentifier("computed"));
     merge_args.push_back(factory_->NewIdentifier("this"));
     if_expression_list->Insert(factory_->NewAssignExpression(
         factory_->NewIdentifier("this"),
@@ -712,6 +719,22 @@ struct ASTParser final {
               factory_->NewCallExpression(set_style_func_expr, args);
           Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
           statement->PushExpression(call_func);
+        }
+      } else if (style.is_array()) {
+        auto items = style.array_items();
+        for (auto it = items.begin(); it != items.end(); ++it) {
+          auto item = *it;
+          if (item.is_object()) {
+            std::vector<Handle<Expression>> args;
+            args.push_back(child_identifier);
+            args.push_back(ParseBindingExpression(item));
+            Handle<Expression> set_style_func_expr =
+                    factory_->NewIdentifier("setStyle");
+            Handle<CallExpression> call_func =
+                    factory_->NewCallExpression(set_style_func_expr, args);
+            Handle<BlockStatement> statement = stacks_[stacks_.size() - 1];
+            statement->PushExpression(call_func);
+          }
         }
       }
 

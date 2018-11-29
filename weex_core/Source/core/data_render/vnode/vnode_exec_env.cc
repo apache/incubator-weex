@@ -527,15 +527,41 @@ static Value SetClassList(ExecState* exec_state) {
 }
 
 // setStyle(node, key, value);
-static Value SetStyle(ExecState* exec_state) {
-  VNode* node = reinterpret_cast<VNode*>(exec_state->GetArgument(0)->cptr);
-  Value* key = exec_state->GetArgument(1);
-  Value* value = exec_state->GetArgument(2);
+inline static Value SetStyle(VNode *node, Value *key, Value *value) {
   if (node == nullptr || key->type != Value::Type::STRING ||
       value->type == Value::Type::NIL) {
     return Value();
   }
   node->SetStyle(key->str->c_str(), ToString(value));
+  return Value();
+}
+
+// setStyle(node, style);
+inline static Value SetStyle(VNode *node, Value *style) {
+  if (node == nullptr || style->type != Value::Type::TABLE) {
+    return Value();
+  }
+  auto style_map = ValueTo<Table>(style)->map;
+  for (auto it = style_map.begin(); it != style_map.end(); it++) {
+    node->SetStyle(it->first, ToString(&it->second));
+  }
+  return Value();
+}
+
+// setStyle(node, key, value);
+// or
+// setStyle(node, style);
+static Value SetStyle(ExecState *exec_state) {
+  VNode *node = reinterpret_cast<VNode *>(exec_state->GetArgument(0)->cptr);
+  auto length = exec_state->GetArgumentCount();
+  if (length == 3) {
+    Value *key = exec_state->GetArgument(1);
+    Value *value = exec_state->GetArgument(2);
+    SetStyle(node, key, value);
+  } else if (length == 2) {
+    Value *style = exec_state->GetArgument(1);
+    SetStyle(node, style);
+  }
   return Value();
 }
 
@@ -659,17 +685,22 @@ json11::Json ValueToJSON(const Value& value) {
 void VNodeExecEnv::InitGlobalValue(ExecState* state) {
   const json11::Json& json = state->context()->raw_json();
   Variables* global = state->global();
-  const json11::Json& data = json["data"];
-  Value value = JSONToValue(state, data);
-  if (value.type != Value::Type::TABLE) {
-    value = state->class_factory()->CreateTable();
-  }
-  global->Add("_data_main", value);
 
   // Set component data and props
   Value components_data = state->class_factory()->CreateTable();
   Value components_props = state->class_factory()->CreateTable();
-  const json11::Json& components_obj = json["components"];
+  Value components_computed = state->class_factory()->CreateTable();
+
+  // main means body
+  Value key(state->string_table()->StringFromUTF8("main"));
+  auto main_data = JSONToValue(state, json["data"]);
+  SetTableValue(ValueTo<Table>(&components_data), &key, main_data);
+  auto main_props = JSONToValue(state, json["props"]);
+  SetTableValue(ValueTo<Table>(&components_props), &key, main_props);
+  auto main_computed = JSONToValue(state, json["computed"]);
+  SetTableValue(ValueTo<Table>(&components_computed), &key, main_computed);
+
+  const json11::Json &components_obj = json["components"];
   if (components_obj.is_array()) {
     for (auto it = components_obj.array_items().begin();
          it != components_obj.array_items().end(); it++) {
@@ -682,10 +713,13 @@ void VNodeExecEnv::InitGlobalValue(ExecState* state) {
       SetTableValue(ValueTo<Table>(&components_data), &key, temp_data);
       auto temp_props = JSONToValue(state, (*it)["props"]);
       SetTableValue(ValueTo<Table>(&components_props), &key, temp_props);
+      auto temp_computed = JSONToValue(state, (*it)["computed"]);
+      SetTableValue(ValueTo<Table>(&components_computed), &key, temp_computed);
     }
   }
   global->Add("_components_data", components_data);
   global->Add("_components_props", components_props);
+  global->Add("_components_computed", components_computed);
 }
 
 void VNodeExecEnv::InitInitDataValue(ExecState *state, const std::string& init_data_str) {
