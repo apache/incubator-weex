@@ -275,7 +275,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       URL url = new URL(mUri.toString());
       String host = url.getHost();
       String query = url.getQuery();
-      String wsport = getUrlParam("wsport", query);
+      String wsport = TextUtils.isEmpty(query)? "8082" : getUrlParam("wsport", query);
       String wsUrl = "ws://" + host + ":" + (wsport.equals("") ? "8082" : wsport) ;
       mWXHandler.obtainMessage(Constants.HOT_REFRESH_CONNECT, 0, 0, wsUrl).sendToTarget();
     } catch (MalformedURLException e) {

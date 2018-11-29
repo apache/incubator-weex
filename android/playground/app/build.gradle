@@ -12,8 +12,8 @@ android {
         applicationId "com.alibaba.weex"
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
-        versionCode 17
-        versionName "0.19.0"
+        versionCode 20
+        versionName "0.19.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         ndk{
