@@ -532,7 +532,8 @@ namespace WeexCore {
       if (mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeLeft) != l
           || mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeTop) != t
           || mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeRight) != r
-          || mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeBottom) != b) {
+          || mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeBottom) != b
+          || (l == 0.0f && t == 0.0f && r == 0.0f && b == 0.0f) ) {
         setHasNewLayout(true);
         setFrame(&mLayoutResult->mLayoutPosition, l, t, r, b);
       }
