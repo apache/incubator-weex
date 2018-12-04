@@ -719,11 +719,12 @@ static NSThread *WXComponentThread;
     return [component _hasTransitionPropertyInStyles:styles];
 }
 
-- (void)layoutComponent:(WXComponent*)component frame:(CGRect)frame innerMainSize:(CGFloat)innerMainSize
+- (void)layoutComponent:(WXComponent*)component frame:(CGRect)frame isRTL:(BOOL)isRTL innerMainSize:(CGFloat)innerMainSize
 {
     WXAssertComponentThread();
     WXAssertParam(component);
     
+    [component setIsLayoutRTL:isRTL];
     if (component == _rootComponent) {
         if (!CGSizeEqualToSize(frame.size, self.weexInstance.frame.size)) {
             // Synchronize view frame with root component, especially for content wrap mode.

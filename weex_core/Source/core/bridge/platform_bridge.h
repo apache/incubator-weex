@@ -199,7 +199,7 @@ class PlatformBridge {
                            bool willLayout = true) = 0;
     virtual int Layout(const char* page_id, const char* ref, float top,
                        float bottom, float left, float right, float height,
-                       float width, int index) = 0;
+                       float width, bool isRTL, int index) = 0;
 
     virtual int UpdateStyle(
         const char* pageId, const char* ref,

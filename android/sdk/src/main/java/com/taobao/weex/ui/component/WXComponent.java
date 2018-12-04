@@ -248,35 +248,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
   }
 
-  public boolean isNativeLayoutRTL() {
-      return NativeRenderObjectUtils.nativeRenderObjectGetLayoutDirectionFromPathNode(this.getRenderObjectPtr()) == NativeRenderLayoutDirection.rtl;
-  }
-
-  public static boolean isLayoutRTL(WXComponent cmp) {
-    if (cmp == null) return false;
-
-    View view = cmp.getHostView();
-    if (ViewCompat.isLayoutDirectionResolved(view)) {
-      return ViewCompat.getLayoutDirection(view) == View.LAYOUT_DIRECTION_RTL;
-    } else if (cmp.getParent() != null){
-      return isLayoutRTL(cmp.getParent());
-    } else {
-      return isLayoutRTL((ViewGroup) view.getParent());
-    }
-  }
-
-  public static boolean isLayoutRTL(ViewGroup viewGroup) {
-    if (viewGroup == null) return false;
-
-    if (ViewCompat.isLayoutDirectionResolved(viewGroup)) {
-      return ViewCompat.getLayoutDirection(viewGroup) == View.LAYOUT_DIRECTION_RTL;
-    } else if (viewGroup.getParent() instanceof ViewGroup) {
-      return isLayoutRTL((ViewGroup) viewGroup.getParent());
-    } else {
-      return false;
-    }
-  }
-
   public void updateStyles(WXComponent component) {
     if (component != null) {
       updateProperties(component.getStyles());
@@ -938,6 +909,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * layout view
    */
   public void setLayout(WXComponent component) {
+    setIsLayoutRTL(component.isLayoutRTL());
     setLayoutSize(component.getLayoutSize());
     setLayoutPosition(component.getLayoutPosition());
     setPaddings(component.getPadding());

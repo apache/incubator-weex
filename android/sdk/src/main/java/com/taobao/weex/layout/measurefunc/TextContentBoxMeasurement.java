@@ -232,7 +232,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
       if (style.containsKey(Constants.Name.FONT_FAMILY)) {
         mFontFamily = WXStyle.getFontFamily(style);
       }
-      mAlignment = WXStyle.getTextAlignment(style, mComponent.isNativeLayoutRTL());
+      mAlignment = WXStyle.getTextAlignment(style, mComponent.isLayoutRTL());
       textOverflow = WXStyle.getTextOverflow(style);
       int lineHeight = WXStyle.getLineHeight(style, mComponent.getViewPortWidth());
       if (lineHeight != UNSET) {

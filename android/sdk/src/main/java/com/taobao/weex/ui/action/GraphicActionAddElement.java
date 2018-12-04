@@ -46,6 +46,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
   private WXComponent child;
   private GraphicPosition layoutPosition;
   private GraphicSize layoutSize;
+  private boolean isLayoutRTL;
 
   public GraphicActionAddElement(@NonNull WXSDKInstance instance, String ref,
                                  String componentType, String parentRef,
@@ -147,6 +148,12 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
   @RestrictTo(Scope.LIBRARY)
   @WorkerThread
+  public void setRTL(boolean isRTL){
+    this.isLayoutRTL = isRTL;
+  }
+
+  @RestrictTo(Scope.LIBRARY)
+  @WorkerThread
   public void setSize(GraphicSize graphicSize){
     this.layoutSize = graphicSize;
   }
@@ -173,6 +180,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
       parent.addChild(child, mIndex);
       parent.createChildViewAt(mIndex);
 
+      child.setIsLayoutRTL(isLayoutRTL);
       if(layoutPosition !=null && layoutSize != null) {
         child.setDemission(layoutSize, layoutPosition);
       }
