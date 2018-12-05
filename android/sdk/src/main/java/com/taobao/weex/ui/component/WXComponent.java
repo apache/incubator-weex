@@ -147,6 +147,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   private int mAbsoluteY = 0;
   private int mAbsoluteX = 0;
+  private boolean isLastLayoutDirectionRTL = false;
   @Nullable
   private Set<String> mGestureType;
 
@@ -184,7 +185,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private boolean waste = false;
   public boolean isIgnoreInteraction = false;
 
-  private ContentBoxMeasurement contentBoxMeasurement;
+  protected ContentBoxMeasurement contentBoxMeasurement;
   private WXTransition mTransition;
   private GraphicSize mPseudoResetGraphicSize;
   @Nullable
@@ -909,12 +910,18 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * layout view
    */
   public void setLayout(WXComponent component) {
-    setIsLayoutRTL(component.isLayoutRTL());
     setLayoutSize(component.getLayoutSize());
     setLayoutPosition(component.getLayoutPosition());
     setPaddings(component.getPadding());
     setMargins(component.getMargin());
     setBorders(component.getBorder());
+
+    boolean isRTL = component.isLayoutRTL();
+    setIsLayoutRTL(isRTL);
+    if (isRTL != component.isLastLayoutDirectionRTL) {
+      component.isLastLayoutDirectionRTL = isRTL;
+      layoutDirectionDidChanged(isRTL);
+    }
 
     parseAnimation();
 
@@ -1020,6 +1027,16 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       // restore box shadow
       updateBoxShadow();
     }
+  }
+
+  /**
+   * layout direction is changed
+   * basic class is a empty implementation
+   * subclass can override this method do some RTL necessary things
+   * such as WXText
+   */
+  protected void layoutDirectionDidChanged(boolean isRTL) {
+
   }
 
   private void recordInteraction(int realWidth,int realHeight){

@@ -36,6 +36,9 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
+import android.support.annotation.WorkerThread;
 
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
@@ -200,6 +203,25 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
   private void updateStyleAndText() {
     updateStyleImp(mComponent.getStyles());
     mText = WXAttr.getValue(mComponent.getAttrs());
+  }
+
+  /**
+   * Force relayout the text, the text must layout before invoke this method.
+   *
+   * Internal method, do not invoke unless you what what you are doing
+   * @param isRTL
+   */
+  @RestrictTo(Scope.LIBRARY)
+  @WorkerThread
+  public void forceRelayout(){
+    //Generate Spans
+    layoutBefore();
+
+    //Measure
+    measure(previousWidth, Float.NaN, MeasureMode.EXACTLY, MeasureMode.UNSPECIFIED);
+
+    //Swap text layout to UI Thread
+    layoutAfter(previousWidth, Float.NaN);
   }
 
   /**

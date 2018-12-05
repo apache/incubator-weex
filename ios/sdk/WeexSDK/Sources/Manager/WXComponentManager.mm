@@ -724,7 +724,7 @@ static NSThread *WXComponentThread;
     WXAssertComponentThread();
     WXAssertParam(component);
     
-    [component setIsLayoutRTL:isRTL];
+    [component _setIsLayoutRTL:isRTL];
     if (component == _rootComponent) {
         if (!CGSizeEqualToSize(frame.size, self.weexInstance.frame.size)) {
             // Synchronize view frame with root component, especially for content wrap mode.
