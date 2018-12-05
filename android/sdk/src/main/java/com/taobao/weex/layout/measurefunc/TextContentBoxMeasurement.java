@@ -23,6 +23,9 @@ import android.os.Build;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
+import android.support.annotation.WorkerThread;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.Spannable;
@@ -111,6 +114,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
   private String mText = null;
   private TextUtils.TruncateAt textOverflow;
   private Layout.Alignment mAlignment;
+  private boolean nativeLayoutRTL = false;
   private WXTextDecoration mTextDecoration = WXTextDecoration.NONE;
   private TextPaint mTextPaint;
   private @Nullable
@@ -197,6 +201,27 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
     }
   }
 
+  /**
+   * Force relayout the text, the text must layout before invoke this method.
+   *
+   * Internal method, do not invoke unless you what what you are doing
+   * @param isRTL
+   */
+  @RestrictTo(Scope.LIBRARY)
+  @WorkerThread
+  public void forceRelayout(boolean isRTL){
+    nativeLayoutRTL = isRTL;
+
+    //Generate Spans
+    layoutBefore();
+
+    //Measure
+    measure(previousWidth, Float.NaN, MeasureMode.EXACTLY, MeasureMode.UNSPECIFIED);
+
+    //Swap text layout to UI Thread
+    layoutAfter(previousWidth, Float.NaN);
+  }
+
   private void updateStyleAndText() {
     updateStyleImp(mComponent.getStyles());
     mText = WXAttr.getValue(mComponent.getAttrs());
@@ -232,7 +257,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
       if (style.containsKey(Constants.Name.FONT_FAMILY)) {
         mFontFamily = WXStyle.getFontFamily(style);
       }
-      mAlignment = WXStyle.getTextAlignment(style, mComponent.isNativeLayoutRTL());
+      mAlignment = WXStyle.getTextAlignment(style, nativeLayoutRTL);
       textOverflow = WXStyle.getTextOverflow(style);
       int lineHeight = WXStyle.getLineHeight(style, mComponent.getViewPortWidth());
       if (lineHeight != UNSET) {

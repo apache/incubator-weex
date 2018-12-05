@@ -219,4 +219,15 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
 
     LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).registerReceiver(mTypefaceObserver, new IntentFilter(TypefaceUtil.ACTION_TYPE_FACE_AVAILABLE));
   }
+
+  private void forceRelayout(final boolean isRTL){
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        if(contentBoxMeasurement instanceof TextContentBoxMeasurement){
+          ((TextContentBoxMeasurement) contentBoxMeasurement).forceRelayout(isRTL);
+        }
+      }
+    });
+  }
 }

@@ -184,7 +184,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private boolean waste = false;
   public boolean isIgnoreInteraction = false;
 
-  private ContentBoxMeasurement contentBoxMeasurement;
+  protected ContentBoxMeasurement contentBoxMeasurement;
   private WXTransition mTransition;
   private GraphicSize mPseudoResetGraphicSize;
   @Nullable
