@@ -227,8 +227,9 @@ CGFloat WXFloorPixelValue(CGFloat value)
         }
     }
     
-    if ([WXSDKEngine customEnvironment]) {
-        [data addEntriesFromDictionary:[WXSDKEngine customEnvironment]];
+    NSDictionary* customEnvironment = [WXSDKEngine customEnvironment];
+    if (customEnvironment) {
+        [data addEntriesFromDictionary:customEnvironment];
     }
     
     return data;
