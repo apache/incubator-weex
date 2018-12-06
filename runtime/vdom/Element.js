@@ -493,6 +493,7 @@ export default class Element extends Node {
       catch (error) {
         console.error(`[JS Framework] Failed to invoke the event handler of "${type}" `
           + `on ${this.type} (${this.ref}):\n ${error.toString()}`)
+        throw error
       }
     }
 
