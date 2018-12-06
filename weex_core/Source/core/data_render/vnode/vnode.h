@@ -31,9 +31,10 @@ class VNode;
 
 class VNode {
  public:
-  VNode(const std::string &ref, const std::string &tag_name);
+  VNode(const std::string &tag_name, const std::string &node_id,
+        const std::string &ref);
 
-  ~VNode();
+  virtual ~VNode();
 
   void SetStyle(const std::string &key, const std::string &value);
 
@@ -41,11 +42,20 @@ class VNode {
 
   void AddEvent(const std::string &event, const std::string &function,
                 const std::vector<std::string> &params);
+  void AddEvent(const std::string &event, void *func, void *inst);
 
   void AddChild(VNode *child);
 
+  void RemoveChild(VNode *child);
+    
+  void InsertChild(VNode *child, int index);
+
+  VNode *FindNode(const std::string &render_object_ref);
+
  public:
   inline const std::string &tag_name() const { return tag_name_; }
+
+  inline const std::string &node_id() const { return node_id_; }
 
   inline const std::string &ref() const { return ref_; }
 
@@ -56,7 +66,7 @@ class VNode {
   inline void set_render_object_ref(std::string ref) {
     render_object_ref_ = std::move(ref);
   }
-
+  inline void *& inst() { return inst_; }
   inline const VNode *parent() const { return parent_; }
 
   inline std::vector<VNode *> *child_list() { return &child_list_; }
@@ -66,21 +76,27 @@ class VNode {
   inline std::map<std::string, std::string> *attributes() const {
     return attributes_;
   }
+  inline std::map<std::string, void *> *events() const {
+    return events_;
+  }
 
   inline bool HasChildren() { return !child_list_.empty(); }
 
  private:
   std::string tag_name_;
+  // Not unique
+  std::string node_id_;
+  // Should be unique
   std::string ref_;
   // Ref point to RenderObject is set when PatchVNode or ParseVNode2RenderObject
   std::string render_object_ref_;
 
   VNode *parent_ = nullptr;
+  void *inst_ = nullptr;
   std::vector<VNode *> child_list_;
-
   std::map<std::string, std::string> *styles_;
   std::map<std::string, std::string> *attributes_;
-
+  std::map<std::string, void *> *events_;
   void MapInsertOrAssign(std::map<std::string, std::string> *target_map,
                          const std::string &key, const std::string &value);
 };

@@ -78,7 +78,7 @@ export default class WeexInstance {
     }
 
     // create registered module apis
-    const moduleProxy = Object.create(null)
+    const moduleProxy = {}
     const moduleDefine = getModuleDescription(moduleName)
     for (const methodName in moduleDefine) {
       Object.defineProperty(moduleProxy, methodName, {

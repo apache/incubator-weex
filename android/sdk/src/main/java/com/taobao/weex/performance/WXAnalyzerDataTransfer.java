@@ -16,17 +16,19 @@
  */
 package com.taobao.weex.performance;
 
+import java.util.List;
+
+import android.util.Log;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXJSExceptionInfo;
-import com.taobao.weex.common.WXPerformance;
-
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXUtils;
 import org.json.JSONObject;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author zhongcang
@@ -36,50 +38,72 @@ import java.util.Map;
 public class WXAnalyzerDataTransfer {
 
   private static final String GROUP = "WXAnalyzer";
-  private static final String MODULE_PERFORMANCE = "WXPerformance";
   private static final String MODULE_ERROR = "WXError";
+  private static final String MODULE_WX_APM = "wxapm";
+  public static boolean isOpenPerformance = false;
+  public static final String INTERACTION_TAG = "wxInteractionAnalyzer";
+  private static boolean sOpenInteractionLog;
 
 
-  public static void transferPerformance(WXPerformance performance, String instanceId) {
-    if (!WXEnvironment.isApkDebugable()) {
+  public static void transferPerformance(String instanceId,String type,String key,Object value)
+  {
+      if (!isOpenPerformance){
+          return;
+      }
+      if (sOpenInteractionLog && "stage".equals(type)){
+          Log.d(INTERACTION_TAG, "[client][stage]"+instanceId+","+key+","+value);
+      }
+      List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzerList();
+      if (null == transferList || transferList.size() == 0) {
+          return;
+      }
+
+      WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
+      if (null == instance){
+          return;
+      }
+
+      String data;
+      try {
+        data = new JSONObject().put(key,value).toString();
+      }catch (Exception e){
+        e.printStackTrace();
+        return;
+      }
+
+      for (IWXAnalyzer transfer : transferList) {
+          transfer.transfer(MODULE_WX_APM, instance.getInstanceId(), type, data);
+      }
+  }
+
+  public static void transferInteractionInfo(WXComponent targetComponent){
+    if (!isOpenPerformance){
       return;
     }
+
     List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzerList();
     if (null == transferList || transferList.size() == 0) {
       return;
     }
-
-
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if (null == instance) {
+    long renderOriginDiffTime = WXUtils.getFixUnixTime() - targetComponent.getInstance().getWXPerformance().renderUnixTimeOrigin;
+    String data;
+    try{
+      data = new JSONObject()
+          .put("renderOriginDiffTime",renderOriginDiffTime)
+          .put("type",targetComponent.getComponentType())
+          .put("ref",targetComponent.getRef())
+          .put("style",targetComponent.getStyles())
+          .put("attrs",targetComponent.getAttrs())
+          .toString();
+    }catch (Exception e){
+      e.printStackTrace();
       return;
     }
-    String data = "";
-    try {
-      JSONObject dimensionMap = new JSONObject();
-      JSONObject measureMap = new JSONObject();
-
-      for (Map.Entry<String, String> entry : performance.getDimensionMap().entrySet()) {
-        dimensionMap.put(entry.getKey(), entry.getValue());
-      }
-      for (Map.Entry<String, Double> entry : performance.getMeasureMap().entrySet()) {
-        measureMap.put(entry.getKey(), entry.getValue());
-      }
-
-      data = new JSONObject()
-              .put("instanceId", instanceId)
-              .put("url", instance.getBundleUrl())
-              .put("dimensionMap", dimensionMap)
-              .put("measureMap", measureMap)
-              .toString();
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
     for (IWXAnalyzer transfer : transferList) {
-      transfer.transfer(GROUP, MODULE_PERFORMANCE, "instance", data);
+      transfer.transfer(MODULE_WX_APM, targetComponent.getInstanceId(), "wxinteraction", data);
     }
   }
+
 
   public static void transferError(WXJSExceptionInfo exceptionInfo, String instanceId) {
     if (!WXEnvironment.isApkDebugable()) {
@@ -112,27 +136,29 @@ public class WXAnalyzerDataTransfer {
     }
   }
 
-  public static void transferFps(long fps) {
-    if (!WXEnvironment.isApkDebugable()) {
-      return;
-    }
-    List<IWXAnalyzer> transferList = WXSDKManager.getInstance().getWXAnalyzerList();
-    if (null == transferList || transferList.size() == 0) {
-      return;
-    }
-    String data = "";
-    try {
-      data = new JSONObject().put("fps", fps).toString();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    for (IWXAnalyzer transfer : transferList) {
-      transfer.transfer(GROUP, MODULE_PERFORMANCE, "fps", data);
-    }
+  public static void switchInteractionLog(final boolean isOpen){
+      if ( sOpenInteractionLog == isOpen || !WXEnvironment.JsFrameworkInit){
+          return;
+      }
+      sOpenInteractionLog = isOpen;
+      //for jsfm && jsengin
+      WXBridgeManager.getInstance().post(new Runnable() {
+          @Override
+          public void run() {
+              WXJSObject[] args = {new WXJSObject(isOpen?1:0)};
+              WXBridgeManager.getInstance().invokeExecJS(
+                  "",
+                  null,
+                  "switchInteractionLog",
+                  args,
+                  false);
+          }
+      });
+      //for weex_core
+      WXBridgeManager.getInstance().registerCoreEnv("switchInteractionLog",String.valueOf(isOpen));
   }
 
-//  @Override
-//  public void transfer2(String tag, String module, String type, String data) {
-//    WXLogUtils.d(tag, module + ":" + type + ":" + data);
-//  }
+  public static boolean isInteractionLogOpen(){
+     return sOpenInteractionLog;
+  }
 }

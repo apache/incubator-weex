@@ -34,13 +34,22 @@ import java.lang.ref.WeakReference;
  */
 public class ListBaseViewHolder extends RecyclerView.ViewHolder {
   private int mViewType;
-  private boolean isRecycled = true;
+  private boolean isRecycled;
   private WeakReference<WXComponent> mComponent;
 
   public ListBaseViewHolder(WXComponent component, int viewType) {
     super(component.getHostView());
     mViewType = viewType;
     mComponent = new WeakReference(component);
+    // This tag is used to determine whether bind / rebind data is needed.
+    // It should be false When component can not be recycled Which means
+    // no need to bind / rebind data.
+    isRecycled = component.canRecycled();
+  }
+
+  public ListBaseViewHolder(WXComponent component, int viewType, boolean forceBindData) {
+    this(component, viewType);
+    isRecycled = isRecycled || forceBindData;
   }
 
   public ListBaseViewHolder(View view, int viewType) {

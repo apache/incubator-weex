@@ -26,16 +26,24 @@ namespace weex {
 namespace core {
 namespace data_render {
 
-Table *NewTable();
-
-int ResizeTab(Table *, size_t, size_t);
-
-Value *GetTabValue(const Table *, const Value &);
-
-int SetTabValue(Table *, Value *, const Value &);
-
-int GetTableSize(Table *);
-
+int SetTableValue(Table *, Value *, const Value &);
+    
+Value *GetTableValue(Table *, const Value &);
+    
+Value *GetTableVar(Table *table, const Value &key);
+    
+Value *GetTableValue(Table *table, std::string key);
+    
+std::vector<std::string> GetTableKeys(Table *table);
+    
+size_t GetTableSize(Table *);
+    
+std::string TableToString(Table *table);
+    
+std::string ArrayToString(Array *array);
+    
+int TableInKey(StringTable *string_table,Table *table, Value *condition, Value *var);
+    
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

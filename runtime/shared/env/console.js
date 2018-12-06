@@ -20,14 +20,14 @@
 /**
  * @fileOverview
  * This file will hack `console` methods by `WXEnvironment.logLevel`.
+ *
  * So we can control how many and which messages will be sent by change the log level.
  * Additionally in native platform the message content must be primitive values and
  * using `nativeLog(...args, logLevelMark)` so we create a new `console` object in
  * global add a format process for its methods.
  */
 
-const LEVELS = ['off', 'error', 'warn', 'info', 'log', 'debug']
-let levelMap = {}
+import { checkLevel, generateLevelMap, resetLevelMap } from '../utils'
 
 const originalConsole = global.console
 
@@ -86,35 +86,8 @@ export function setNativeConsole () {
  */
 /* istanbul ignore next */
 export function resetNativeConsole () {
-  levelMap = {}
+  resetLevelMap()
   global.console = originalConsole
-}
-
-/**
- * Generate map for which types of message will be sent in a certain message level
- * as the order of LEVELS.
- */
-function generateLevelMap () {
-  LEVELS.forEach(level => {
-    const levelIndex = LEVELS.indexOf(level)
-    levelMap[level] = {}
-    LEVELS.forEach(type => {
-      const typeIndex = LEVELS.indexOf(type)
-      if (typeIndex <= levelIndex) {
-        levelMap[level][type] = true
-      }
-    })
-  })
-}
-
-/**
- * Check if a certain type of message will be sent in current log level of env.
- * @param  {string} type
- * @return {boolean}
- */
-function checkLevel (type) {
-  const logLevel = (global.WXEnvironment && global.WXEnvironment.logLevel) || 'log'
-  return levelMap[logLevel] && levelMap[logLevel][type]
 }
 
 /**

@@ -196,7 +196,6 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 - (void)loadMore
 {
     [super loadMore];
-    
     _previousLoadMoreCellNumber = [_collectionView numberOfItemsInSection:0];
 }
 
@@ -293,21 +292,13 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 
 - (void)updateData:(NSUInteger)index data:(id)data
 {
-    NSMutableArray * newListData = [[_dataManager data] mutableCopy];
+    NSMutableArray *newListData = [[_dataManager data] mutableCopy];
     if (!data && index > [newListData count]) {
         return;
     }
-    NSIndexPath * indexPath = [NSIndexPath indexPathForRow:index inSection:0];
-    NSDictionary * virtualComponentData = [_dataManager virtualComponentDataWithIndexPath:indexPath];
-    if ([virtualComponentData[WXBindingOnceIdentify] boolValue]) {
-        return;
-    }
-    
     // TODO: bring the update logic to UpdateManager
     newListData[index] = data;
     [_dataManager updateData:newListData];
-    NSString* virtualComponentId = [_dataManager virtualComponentIdWithIndexPath:indexPath];
-    [_dataManager updateVirtualComponentData:virtualComponentId data:data];
     NSMutableDictionary * newData = nil;
     if (![data isKindOfClass:[NSDictionary class]]) {
          newData = [NSMutableDictionary new];
@@ -316,6 +307,7 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
     }
     newData = [data mutableCopy];
     newData[@"@phase"] = @"update";
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
     [self _updateDataForCellSlotAtIndexPath:indexPath data:[newData copy]];
 }
 
@@ -375,63 +367,65 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
     }];
 }
 
-- (void)scrollTo:(NSString *)virtalElementInfo options:(NSDictionary *)options
+- (void)scrollTo:(NSString *)virtualElementInfo options:(NSDictionary *)options
 {
     NSUInteger position = 0;
-    if ([virtalElementInfo isKindOfClass:[NSNumber class]]) {
-        position = [virtalElementInfo integerValue];
+    if ([virtualElementInfo isKindOfClass:[NSNumber class]]) {
+        position = [virtualElementInfo integerValue];
     }
     else
     {
-        if (virtalElementInfo.length == 0) {
+        if (virtualElementInfo.length == 0) {
             return;
         }
-        position = [self _positionForVirtalElementInfo:virtalElementInfo];
+        position = [self _positionForVirtualElementInfo:virtualElementInfo];
     }
     NSIndexPath *toIndexPath = [NSIndexPath indexPathForItem:position inSection:0];
     BOOL animated = options[@"animated"] ? [WXConvert BOOL:options[@"animated"]] : YES;
     [_collectionView scrollToItemAtIndexPath:toIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:animated];
 }
 
-- (void)scrollToElement:(NSString *)virtalElementInfo options:(NSDictionary *)options
+- (void)scrollToElement:(NSString *)virtualElementInfo options:(NSDictionary *)options
 {
-    [self scrollTo:virtalElementInfo options:options];
+    [self scrollTo:virtualElementInfo options:options];
 }
 
-- (void)queryElement:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
+- (void)queryElement:(NSString *)virtualElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
 {
-    [self _queryElement:virtalElementInfo cssSelector:cssSelector callback:callback isAll:NO];
+    [self _queryElement:virtualElementInfo cssSelector:cssSelector callback:callback isAll:NO];
 }
 
-- (void)queryElementAll:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
+- (void)queryElementAll:(NSString *)virtualElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
 {
-    [self _queryElement:virtalElementInfo cssSelector:cssSelector callback:callback isAll:YES];
+    [self _queryElement:virtualElementInfo cssSelector:cssSelector callback:callback isAll:YES];
 }
 
-- (NSString *)_refForVirtalElementInfo:(NSString *)virtalElementInfo
+- (NSString *)_refForVirtualElementInfo:(NSString *)virtualElementInfo
 {
-    NSArray *stringArray = [virtalElementInfo componentsSeparatedByString:@"@"];
-    if (stringArray.count == 2) {
-        return stringArray[0];
+    if ([virtualElementInfo isKindOfClass:[NSString class]]){
+        NSArray *stringArray = [virtualElementInfo componentsSeparatedByString:@"@"];
+        if (stringArray.count == 2) {
+            return stringArray[0];
+        }
     }
     return nil;
 }
 
-- (NSUInteger )_positionForVirtalElementInfo:(NSString *)virtalElementInfo
+- (NSUInteger )_positionForVirtualElementInfo:(NSString *)virtualElementInfo
 {
-    NSArray *stringArray = [virtalElementInfo componentsSeparatedByString:@"@"];
+    NSArray *stringArray = [virtualElementInfo componentsSeparatedByString:@"@"];
     if (stringArray.count == 2) {
         return [stringArray[1] integerValue];
     }
     return 0;
 }
 
-- (void)closest:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
+- (void)closest:(NSString *)virtualElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback
 {
     if(callback)
     {
         WXPerformBlockOnComponentThread(^{
-            WXComponent *component = [self.weexInstance.componentManager componentForRef:[self _refForVirtalElementInfo:virtalElementInfo]];
+            WXComponent *component = [self.weexInstance.componentManager componentForRef:[self _refForVirtualElementInfo:virtualElementInfo]];
             if (component) {
                 callback([self _closestComponentForCSSSelector:cssSelector component:component]);
             }
@@ -455,12 +449,12 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
     }
 }
 
-- (void)_queryElement:(NSString *)virtalElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback isAll:(BOOL)isAll
+- (void)_queryElement:(NSString *)virtualElementInfo cssSelector:(NSString *)cssSelector callback:(WXModuleCallback)callback isAll:(BOOL)isAll
 {
     if(callback)
     {
         WXPerformBlockSyncOnComponentThread(^{
-            WXComponent *component = [self.weexInstance.componentManager componentForRef:[self _refForVirtalElementInfo:virtalElementInfo]];
+            WXComponent *component = [self.weexInstance.componentManager componentForRef:[self _refForVirtualElementInfo:virtualElementInfo]];
             if (component) {
                 NSMutableArray *infoArray = [NSMutableArray new];
                 [self _matchComponentForCSSSelector:cssSelector component:component infoArray:infoArray];
@@ -515,9 +509,9 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 
 #pragma mark - WXComponent Internal Methods
 
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
+- (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
-   [super _insertSubcomponent:subcomponent atIndex:index];
+    BOOL inserted = [super _insertSubcomponent:subcomponent atIndex:index];
     if ([subcomponent isKindOfClass:[WXCellSlotComponent class]]) {
         WXCellSlotComponent *cell = (WXCellSlotComponent*)subcomponent;
         [self.weexInstance.componentManager _addUITask:^{
@@ -525,6 +519,7 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
         }];
         //TODO: update collection view if adding template
     }
+    return inserted;
 }
 
 #pragma mark - Private
@@ -589,7 +584,9 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 {
     if (![newData isKindOfClass:[NSArray class]]) {
         WXLogError(@"wrong format of list data:%@", newData);
-        completion(NO);
+        if (completion) {
+            completion(NO);
+        }
         return;
     }
     
@@ -636,7 +633,7 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
     // 2. get the template type specified by data, and if template is not found, return an empty view of any template to avoid crash.
     NSString * templateType = [self templateType:indexPath];
     _templateManager.collectionView = collectionView;
-    if (!templateType || (templateType && ![_templateManager isTemplateRegistered:templateType])) {
+    if (!templateType) {
         WXLogError(@"Template %@ not registered for collection view.", templateType);
         UICollectionViewCell *cellView = [_collectionView dequeueReusableCellWithReuseIdentifier:[_templateManager anyRegisteredTemplate] forIndexPath:indexPath];
         for (UIView *view in cellView.contentView.subviews) {
@@ -645,6 +642,9 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
         cellView.wx_component = nil;
         [cellView setAccessibilityIdentifier:nil];
         return cellView;
+    }
+    if (![_templateManager isTemplateRegistered:templateType]) {
+        templateType = @"default";
     }
     
     // 3. dequeue a cell component by template type

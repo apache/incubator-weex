@@ -120,6 +120,7 @@ public class Constants {
     String AUTO_RECYCLE = "autoBitmapRecycle";
     String SHOW_INDICATORS = "showIndicators";
     String AUTO_PLAY = "autoPlay";
+    String CONTROLS = "controls";
     String SCROLL_DIRECTION = "scrollDirection";
     String SCOPE = "scope";
     String RECYCLE = "recycle";
@@ -218,6 +219,7 @@ public class Constants {
     String ENABLE_COPY = "enableCopy";
 
     String PAGE_ENABLED = "pagingEnabled";
+    String PAGE_SIZE = "pageSize";
 
 
 

@@ -39,9 +39,9 @@
 
 @interface WXVideoView()
 
-@property (nonatomic, strong) UIViewController* playerViewController;
-@property (nonatomic, strong) AVPlayerItem* playerItem;
-@property (nonatomic, strong) WXSDKInstance* weexSDKInstance;
+@property (nonatomic, strong) UIViewController *playerViewController;
+@property (nonatomic, strong) AVPlayerItem *playerItem;
+@property (nonatomic, strong) WXSDKInstance *weexSDKInstance;
 @property (nonatomic, strong) UIImageView *posterImageView;
 @property (nonatomic, strong) id<WXImageOperationProtocol> imageOperation;
 @property (nonatomic, assign) BOOL playerDidPlayed;
@@ -192,7 +192,8 @@
     }
 }
 
-- (void)setPosterURL:(NSURL *)posterURL {
+- (void)setPosterURL:(NSURL *)posterURL
+{
     if (!posterURL) {
         return;
     }
@@ -211,6 +212,19 @@
             }
         });
     }];
+}
+
+- (void)setControlShow:(BOOL)showControl
+{
+    if ([self greater8SysVer]) {
+        AVPlayerViewController *AVVC = (AVPlayerViewController*)_playerViewController;
+        AVVC.showsPlaybackControls = showControl;
+    }
+    else
+    {
+        MPMoviePlayerViewController *MPVC = (MPMoviePlayerViewController*)_playerViewController;
+        MPVC.moviePlayer.controlStyle = showControl ? MPMovieControlStyleEmbedded : MPMovieControlStyleNone;
+    }
 }
 
 - (void)playFinish
@@ -293,6 +307,7 @@
 @property (nonatomic, strong) NSURL *posterURL;
 @property (nonatomic) BOOL autoPlay;
 @property (nonatomic) BOOL playStatus;
+@property (nonatomic) BOOL showControl;
 
 @end
 
@@ -316,6 +331,9 @@
         if (attributes[@"poster"]) {
             _posterURL = [NSURL URLWithString: attributes[@"poster"]];
         }
+        if (attributes[@"controls"]) {
+            _showControl = ![attributes[@"controls"] isEqualToString:@"nocontrols"];
+        }
     }
     return self;
 }
@@ -333,6 +351,7 @@
     _videoView.layer.mask = [self drawBorderRadiusMaskLayer:_videoView.bounds];
     [_videoView setURL:_videoURL];
     [_videoView setPosterURL:_posterURL];
+    [_videoView setControlShow:_showControl];
     
     __weak __typeof__(self) weakSelf = self;
     _videoView.posterClickHandle = ^{
@@ -370,7 +389,7 @@
     }
 }
 
--(void)updateAttributes:(NSDictionary *)attributes
+- (void)updateAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"src"]) {
         _videoURL = [NSURL URLWithString: attributes[@"src"]];
@@ -391,6 +410,10 @@
     if (attributes[@"poster"]) {
         _posterURL = [NSURL URLWithString: attributes[@"poster"]];
         [_videoView setPosterURL:_posterURL];
+    }
+    if (attributes[@"controls"]) {
+        _showControl = ![attributes[@"controls"] isEqualToString:@"nocontrols"];
+        [_videoView setControlShow:_showControl];
     }
 }
 

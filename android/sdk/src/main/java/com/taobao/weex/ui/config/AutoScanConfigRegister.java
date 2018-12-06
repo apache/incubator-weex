@@ -151,7 +151,7 @@ public class AutoScanConfigRegister {
                                 WXSDKEngine.registerComponent(configComponentHolder, configComponentHolder.isAppendTree(), configComponentHolder.getType());
                             }
                         }
-                    }catch (Exception e){
+                    }catch (Throwable e){
                         WXLogUtils.e(TAG, e);
                     }
                 }

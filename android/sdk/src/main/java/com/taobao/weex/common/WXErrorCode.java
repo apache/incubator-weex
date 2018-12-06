@@ -66,7 +66,7 @@ public enum WXErrorCode {
   /**
    * Failure for executing JavaScript function.
    */
-  WX_ERR_JS_EXECUTE("-2013", "JavaScript execute error!",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+  WX_ERR_JS_EXECUTE("-2013", "JavaScript execute error!",ErrorType.JS_ERROR,ErrorGroup.JS),
 
 
   /*
@@ -158,7 +158,7 @@ public enum WXErrorCode {
   /**
    * Single progress init error
    */
-  WX_ERR_SINGLE_PROCESS_DLOPEN_FILE_NOT_EXIST("-1004", "so file is not exist",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+  WX_ERR_SINGLE_PROCESS_DLOPEN_FILE_NOT_EXIST("-1004", "so file does not exist",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
   WX_ERR_SINGLE_PROCESS_DLOPEN_FLAIED("-1005", "dlopen so file failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
@@ -170,7 +170,7 @@ public enum WXErrorCode {
 
   WX_JS_FRAMEWORK_REINIT_MULPROCESS_FAILED("-1009", "js framework reinit multiProcess failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
-  WX_JS_FRAMEWORK_INIT_FAILED("-1010", "js framework init  failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+  WX_JS_FRAMEWORK_INIT_FAILED("-1010", "js framework init failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
   WX_JS_FRAMEWORK_INIT_SINGLE_PROCESS_SUCCESS("-1011", "js framework init success in single process",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
@@ -188,7 +188,7 @@ public enum WXErrorCode {
   /**
    * WX Key Exception Commit RT Register
    */
-  WX_KEY_EXCEPTION_INVOKE("-9100", "[WX_KEY_EXCEPTION_INVOKE]",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+  WX_KEY_EXCEPTION_INVOKE_BRIDGE("-9100", "[WX_KEY_EXCEPTION_INVOKE_BRIDGE]",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
   WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED("-9101", "[WX_KEY_EXCEPTION_INVOKE_REGISTER_CONTENT_FAILED] details",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
   WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE("-9102", "[WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE] details",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
   WX_KEY_EXCEPTION_INVOKE_REGISTER_MODULES("-9103", "[WX_KEY_EXCEPTION_INVOKE_REGISTER_MODULES] details",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
@@ -196,30 +196,8 @@ public enum WXErrorCode {
   /**
    * WX Key Exception Commit Bundle Js Download
    */
-  WX_KEY_EXCEPTION_JS_DOWNLOAD("-9200", "[WX_KEY_EXCEPTION_JS_DOWNLOAD]|",ErrorType.NATIVE_ERROR,ErrorGroup.NET),
-  WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED("-9201", "[WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED] | details",ErrorType.NATIVE_ERROR,ErrorGroup.NET),
-
-  /**
-   * WX Key Exception Commit RT DomAction Excute
-   */
-  WX_KEY_EXCEPTION_DOM("-9300", "[WX_KEY_EXCEPTION_DOM]",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_ACTION_FIRST_ACTION("-9301", "[WX_KEY_EXCEPTION dom action exception] details: ACTION_FIRST_ACTION",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_CREATE_BODY("-9302", "[WX_KEY_EXCEPTION dom action exception] details:CREATE_BODY",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_UPDATE_ATTRS("-9303", "[WX_KEY_EXCEPTION dom action exception] details:UPDATE_ATTRS",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_UPDATE_STYLE("-9304", "[WX_KEY_EXCEPTION dom action exception] details:UPDATE_STYLE",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_REMOVE_ELEMENT("-9305", "[WX_KEY_EXCEPTION dom action exception] details:REMOVE_ELEMENT",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_ADD_ELEMENT("-9306", "[WX_KEY_EXCEPTION dom action exception] details:ADD_ELEMENT",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_MOVE_ELEMENT("-9307", "[WX_KEY_EXCEPTION dom action exception] details:MOVE_ELEMENT",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_ADD_EVENT("-9308", "[WX_KEY_EXCEPTION dom action exception] details:DOM_ADD_EVENT",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_REMOVE_EVENT("-9309", "[WX_KEY_EXCEPTION dom action exception] details:DOM_REMOVE_EVENT",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_CREATE_FINISH("-9310", "[WX_KEY_EXCEPTION dom action exception] details:CREATE_FINISH",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_REFRESH_FINISH("-9311", "[WX_KEY_EXCEPTION dom action exception] details:REFRESH_FINISH",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_ADD_RULE("-9313", "[WX_KEY_EXCEPTION_DOM_ADD_RULE] details",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_GET_COMPONENT_RECT("-9314", "[WX_KEY_EXCEPTION_DOM_GET_COMPONENT_RECT] details",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_INVOKE_METHOD("-9315", "[WX_KEY_EXCEPTION_DOM_INVOKE_METHOD] details",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_ANIMATION("-9316", "[WX_KEY_EXCEPTION_DOM_ANIMATION] details",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_DOM_MODULEINVO("-9317", "[WX_KEY_EXCEPTION_DOM_MODULEINVO] details",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
-
+  WX_KEY_EXCEPTION_JS_DOWNLOAD("-9200", "[WX_KEY_EXCEPTION_JS_DOWNLOAD]|",ErrorType.DOWN_LOAD_ERROR,ErrorGroup.NATIVE),
+  WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED("-9201", "[WX_KEY_EXCEPTION_JS_DOWNLOAD_FAILED] | details",ErrorType.DOWN_LOAD_ERROR,ErrorGroup.NATIVE),
 
   /**
    * WX Key Exception Commit RT JsBridge eg. js excute runtime error
@@ -230,22 +208,24 @@ public enum WXErrorCode {
   /**
    * renderErrorCode
    */
-  WX_RENDER_ERR_JS_CREATE_INSTANCE("-9600", "WX_RENDER_ERR_JS_CREATE_INSTANCE",ErrorType.RENDER_ERROR,ErrorGroup.JS),
-  WX_RENDER_ERR_JS_RUNTIME("-9601", "WX_RENDER_ERR for js error",ErrorType.RENDER_ERROR, ErrorGroup.JS),
-  WX_RENDER_ERR_NATIVE_RUNTIME("-9604", "WX_RENDER_ERR for js error",ErrorType.RENDER_ERROR, ErrorGroup.NATIVE),
+  WX_RENDER_ERR_JS_CREATE_INSTANCE("-9600", "white screen cause create instance failed,check js stack ->",ErrorType.RENDER_ERROR,ErrorGroup.JS),
+  WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT("-9601", "white screen cause create instanceContext failed,check js stack ->",ErrorType.RENDER_ERROR,ErrorGroup.JS),
   WX_RENDER_ERR_LAYER_OVERFLOW("-9602", "WX_RENDER_ERR_LAYER_OVERFLOW", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
   WX_RENDER_ERR_NULL_KEY("-9603", "WX_RENDER_ERR_NULL_KEY", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
-
+  WX_RENDER_ERR_NATIVE_RUNTIME("-9604", "WX_RENDER_ERR for js error", ErrorType.RENDER_ERROR, ErrorGroup.NATIVE),
+  WX_RENDER_ERR_COMPONENT_NOT_REGISTER("-9605", "WX_RENDER_ERR_COMPONENT_NOT_REGISTER", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
+  WX_RENDER_ERR_BRIDGE_ARG_NULL("-9610", "WX_RENDER_ERR_BRIDGE_ARG_NULL", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
   WX_RENDER_ERR_CONTAINER_TYPE("-9611", "WX_RENDER_ERR_CONTAINER_TYPE", ErrorType.JS_ERROR,ErrorGroup.JS),
   WX_RENDER_ERR_TRANSITION("-9616", "WX_RENDER_ERR_TRANSITION", ErrorType.JS_ERROR, ErrorGroup.JS),
   WX_RENDER_ERR_INSTANCE_ID_NULL("-9618", "WX_RENDER_ERR_INSTANCE_ID_NULL", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
   WX_RENDER_ERR_LIST_INVALID_COLUMN_COUNT("-9619", "WX_RENDER_ERR_LIST_INVALID_COLUMNJ_CONUNT", ErrorType.JS_ERROR, ErrorGroup.JS),
   WX_RENDER_ERR_TEXTURE_SETBACKGROUND("-9620", "WX_RENDER_ERR_TEXTURE_SETBACKGROUND", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
 
+
   /**
    * degrade code.
    */
-  WX_DEGRAD_ERR("-1000", "degradeToH5|Weex DegradPassivity \n",ErrorType.DEGRAD_ERROR,ErrorGroup.JS),
+  WX_DEGRAD_ERR("-1000", "degradeToH5|Weex DegradPassivity ->",ErrorType.DEGRAD_ERROR,ErrorGroup.JS),
 
   /**
    * degrade for instance create failed, once this case occured,detail js stack and other specific
@@ -257,20 +237,20 @@ public enum WXErrorCode {
    * degrade for network failed download js bundle.once this case occured,network requist response header
    * and statuscode need track into errmsg.
    */
-  WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED("-1002", "|wx_network_error|js bundle download failed",ErrorType.DEGRAD_ERROR,ErrorGroup.NET),
+  WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED("-1002", "|wx_network_error|js bundle download failed",ErrorType.DOWN_LOAD_ERROR,ErrorGroup.NATIVE),
 
   /**
    * degrade for network failed for bundlejs is unbroken , once this case occured,network requist response header
    * and statuscode need track into errmsg.
    */
-  WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED("-1003", "degradeToH5|wx_network_error|js bundle content-length check failed",ErrorType.DEGRAD_ERROR,ErrorGroup.NET),
+  WX_DEGRAD_ERR_NETWORK_CHECK_CONTENT_LENGTH_FAILED("-1003", "degradeToH5|wx_network_error|js bundle content-length check failed",ErrorType.DEGRAD_ERROR,ErrorGroup.NATIVE),
 
   /**
    * degrade for Response header Content-Type is null or not "application/javascript".
    * once this case occured,network requist response header and statuscode need track into errmsg.
    */
   WX_DEGRAD_ERR_BUNDLE_CONTENTTYPE_ERROR("-1004", "degradeToH5|wx_user_intercept_error |Content-Type is not application/javascript, " +
-          "Weex render template must be javascript, please check your request!",ErrorType.DEGRAD_ERROR,ErrorGroup.NET),
+          "Weex render template must be javascript, please check your request!",ErrorType.DEGRAD_ERROR,ErrorGroup.NATIVE),
 
   /**
    * degrade for other reason. such as white screen which block error for some unknown reason.
@@ -337,12 +317,12 @@ public enum WXErrorCode {
     JS_ERROR,
     NATIVE_ERROR,
     RENDER_ERROR,
-    DEGRAD_ERROR
+    DEGRAD_ERROR,
+    DOWN_LOAD_ERROR
   }
 
   public enum ErrorGroup{
     JS,
-    NATIVE,
-    NET
+    NATIVE
   }
 }

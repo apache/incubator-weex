@@ -35,8 +35,6 @@ public class SystemMessageHandler extends Handler implements Serializable {
 
     private long mMessagePumpDelegateNative = 0;
 
-    private boolean mIsRunning = false;
-
     private Method mMessageMethodSetAsynchronous;
 
     private native void nativeRunWork(long delegateNative);
@@ -54,7 +52,6 @@ public class SystemMessageHandler extends Handler implements Serializable {
         } catch (RuntimeException e) {
             Log.e(TAG, "Exception while loading Message.setAsynchronous method: " + e);
         }
-        mIsRunning = true;
     }
 
     @CalledByNative
@@ -68,8 +65,13 @@ public class SystemMessageHandler extends Handler implements Serializable {
     }
 
     @CalledByNative
+    private void scheduleDelayedWork(long delayMillis) {
+        sendMessageDelayed(obtainAsyncMessage(SCHEDULED_WORK), delayMillis);
+    }
+
+    @CalledByNative
     private void stop() {
-        mIsRunning = false;
+        removeMessages(SCHEDULED_WORK);
     }
 
     private Message obtainAsyncMessage(int what) {
@@ -99,8 +101,6 @@ public class SystemMessageHandler extends Handler implements Serializable {
 
     @Override
     public void handleMessage(Message msg) {
-        if(mIsRunning) {
-            nativeRunWork(mMessagePumpDelegateNative);
-        }
+        nativeRunWork(mMessagePumpDelegateNative);
     }
 }

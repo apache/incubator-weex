@@ -22,12 +22,15 @@ if (!process.env.SUPPORT_ES2015) {
   require('./polyfill/objectAssign')
   require('./polyfill/objectSetPrototypeOf')
 
-  // import promise hack and polyfills
-  require('./polyfill/promise')
-  require('core-js/modules/es6.object.to-string')
-  require('core-js/modules/es6.string.iterator')
-  require('core-js/modules/web.dom.iterable')
-  require('core-js/modules/es6.promise')
+  // eslint-disable-next-line
+  if (typeof WXEnvironment === 'undefined' || !WXEnvironment.__enable_native_promise__) {
+    // import promise hack and polyfill
+    require('./polyfill/promise')
+    require('core-js/modules/es6.object.to-string')
+    require('core-js/modules/es6.string.iterator')
+    require('core-js/modules/web.dom.iterable')
+    require('core-js/modules/es6.promise')
+  }
 }
 
 export * from './env/console'

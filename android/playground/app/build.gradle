@@ -12,8 +12,8 @@ android {
         applicationId "com.alibaba.weex"
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
-        versionCode 17
-        versionName "0.18.0-beta-3"
+        versionCode 20
+        versionName "0.19.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         ndk{
@@ -64,7 +64,9 @@ android {
     dexOptions {
         preDexLibraries false
     }
-
+    aaptOptions {
+        noCompress 'wasm'
+    }
 }
 
 
@@ -105,6 +107,8 @@ dependencies {
     compile 'com.facebook.fresco:fresco:0.12.0+'
     compile 'com.facebook.fresco:animated-gif:0.12.0'
 
+    compile 'com.google.zxing:core:3.3.3'
+
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
     compile 'com.squareup.okio:okio:1.0.1'
@@ -116,7 +120,7 @@ dependencies {
     compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     compile 'com.taobao.android.weex_inspection:urlconnection_interceptor:1.0.0'
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
-    compile 'com.taobao.android:weex_inspector:0.16.7'
+    compile 'com.taobao.android:weex_inspector:0.18.10'
     //compile project(":weex_inspector")
 }
 

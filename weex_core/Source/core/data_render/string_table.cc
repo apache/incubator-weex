@@ -17,11 +17,13 @@
  * under the License.
  */
 
+#include <string.h>
 #include "core/data_render/string_table.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
+    
 String::String(const char *str, std::size_t len) {
   length_ = len;
   str_ = std::unique_ptr<char[]>(new char[len + 1]);
@@ -34,15 +36,15 @@ String::String(const std::string &str) : String(str.c_str(), str.length()) {}
 String::~String() {}
 
 String *StringTable::StringFromUTF8(const std::string &str) {
-  auto it = store_.find(str);
-  if (it != store_.end()) {
-    return it->second.get();
-  }
-  std::string key = str;
-  auto result = new String(key);
-  store_.insert(
-      std::make_pair(std::move(key), std::unique_ptr<String>(result)));
-  return result;
+    for (auto &it : store_) {
+        if (it.first == str) {
+            return it.second.get();
+        }
+    }
+    std::string key = str;
+    auto result = new String(key);
+    store_.push_back(std::make_pair(std::move(key), std::unique_ptr<String>(result)));
+    return result;
 }
 
 StringTable::~StringTable() {}

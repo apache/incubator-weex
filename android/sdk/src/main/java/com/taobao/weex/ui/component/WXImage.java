@@ -21,6 +21,8 @@ package com.taobao.weex.ui.component;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import com.taobao.weex.dom.WXImageQuality;
+
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,6 +56,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
@@ -164,6 +167,7 @@ public class WXImage extends WXComponent<ImageView> {
   @WXComponentProp(name = Constants.Name.RESIZE_MODE)
   public void setResizeMode(String resizeMode) {
     (getHostView()).setScaleType(getResizeMode(resizeMode));
+    getHostView().setImageDrawable(getHostView().getDrawable());
   }
 
   @RestrictTo(Scope.LIBRARY_GROUP)
@@ -191,7 +195,7 @@ public class WXImage extends WXComponent<ImageView> {
 
   @WXComponentProp(name = Constants.Name.RESIZE)
   public void setResize(String resize) {
-    (getHostView()).setScaleType(getResizeMode(resize));
+    setResizeMode(resize);
   }
 
   /**
@@ -208,6 +212,14 @@ public class WXImage extends WXComponent<ImageView> {
 
   @WXComponentProp(name = Constants.Name.SRC)
   public void setSrc(String src) {
+
+    if (getInstance().getImageNetworkHandler() != null) {
+      String localUrl = getInstance().getImageNetworkHandler().fetchLocal(src);
+      if (!TextUtils.isEmpty(localUrl)) {
+        src = localUrl;
+      }
+    }
+
     if (src == null) {
       return;
     }
@@ -308,29 +320,7 @@ public class WXImage extends WXComponent<ImageView> {
     this.mBlurRadius = blurRadius;
 
     final String rewritedStr = rewrited.toString();
-    imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
-      @Override
-      public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
-        if (getEvents().contains(Constants.Event.ONLOAD)) {
-          Map<String, Object> params = new HashMap<String, Object>();
-          Map<String, Object> size = new HashMap<>(2);
-          if (imageView != null && imageView instanceof Measurable) {
-            size.put("naturalWidth", ((Measurable) imageView).getNaturalWidth());
-            size.put("naturalHeight", ((Measurable) imageView).getNaturalHeight());
-          } else {
-            size.put("naturalWidth", 0);
-            size.put("naturalHeight", 0);
-          }
-
-          if (containsEvent(Constants.Event.ONLOAD)) {
-            params.put("success", result);
-            params.put("size", size);
-            fireEvent(Constants.Event.ONLOAD, params);
-          }
-        }
-        monitorImgSize(imageView,rewritedStr);
-      }
-    });
+    imageStrategy.setImageListener(new MyImageListener(this,rewritedStr));
 
     String placeholder=null;
     if(getAttrs().containsKey(Constants.Name.PLACEHOLDER)){
@@ -471,17 +461,36 @@ public class WXImage extends WXComponent<ImageView> {
     }
     int imgHeight = img.getIntrinsicHeight();
     int imgWidth = img.getIntrinsicWidth();
-    if (!preImgUrlStr.equals(currentImgUrlStr) && imgHeight > 1920 && imgWidth > 1080){
+    if (!preImgUrlStr.equals(currentImgUrlStr)){
       preImgUrlStr = currentImgUrlStr;
-      instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_LARGE_IMG_COUNT,1);
+      if (imgHeight > 1081 && imgWidth > 721){
+        instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_LARGE_IMG_COUNT,1);
+        if (WXAnalyzerDataTransfer.isOpenPerformance){
+          WXAnalyzerDataTransfer.transferPerformance(getInstanceId(),"details",WXInstanceApm.KEY_PAGE_STATS_LARGE_IMG_COUNT,
+              imgWidth+"*"+imgHeight+","+currentImgUrlStr
+              );
+        }
+      }
+      long imgSize = imgHeight * imgWidth;
+      long viewSize = imageView.getMeasuredHeight() * imageView.getMeasuredWidth();
+      if (viewSize == 0){
+          return;
+      }
+      double scaleSize =  imgSize/(double)viewSize;
+      //max diff 40*40
+      if (scaleSize >1.2 && imgSize-viewSize > 1600){
+        instance.getWXPerformance().wrongImgSizeCount++;
+        instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,1);
+
+        if (WXAnalyzerDataTransfer.isOpenPerformance){
+          WXAnalyzerDataTransfer.transferPerformance(getInstanceId(),"details",WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,
+              String.format("imgSize:[%d,%d],viewSize:[%d,%d],urL:%s",imgWidth,imgHeight,imageView.getMeasuredWidth(),imageView.getMeasuredHeight()
+              ,currentImgUrlStr)
+          );
+        }
+      }
     }
 
-
-    if (imgHeight * imgHeight > imageView.getMeasuredHeight() *
-            imageView.getMeasuredWidth() +10){
-      instance.getWXPerformance().wrongImgSizeCount++;
-      instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,1);
-    }
   }
 
   @Override
@@ -497,5 +506,43 @@ public class WXImage extends WXComponent<ImageView> {
   public interface Measurable {
     int getNaturalWidth();
     int getNaturalHeight();
+  }
+
+  public  static class MyImageListener implements WXImageStrategy.ImageListener {
+
+    private WeakReference<WXImage> wxImageWeakReference;
+
+    private String rewritedStr;
+
+    MyImageListener(WXImage image,String rewritedStr) {
+      this.wxImageWeakReference = new WeakReference<WXImage>(image);
+      this.rewritedStr = rewritedStr;
+    }
+
+    @Override
+    public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
+      WXImage image = wxImageWeakReference.get();
+
+      if(image == null)
+        return;
+
+      if (image.getEvents().contains(Constants.Event.ONLOAD)) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> size = new HashMap<>(2);
+        if (imageView != null && imageView instanceof Measurable) {
+          size.put("naturalWidth", ((Measurable) imageView).getNaturalWidth());
+          size.put("naturalHeight", ((Measurable) imageView).getNaturalHeight());
+        } else {
+          size.put("naturalWidth", 0);
+          size.put("naturalHeight", 0);
+        }
+        if (image.containsEvent(Constants.Event.ONLOAD)) {
+          params.put("success", result);
+          params.put("size", size);
+          image.fireEvent(Constants.Event.ONLOAD, params);
+        }
+      }
+      image.monitorImgSize(imageView,rewritedStr);
+    }
   }
 }

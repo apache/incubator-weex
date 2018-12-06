@@ -18,11 +18,11 @@
  */
 package com.taobao.weex.common;
 
+import com.taobao.weex.bridge.ResultCallback;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
-
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -60,9 +60,9 @@ public interface IWXBridge extends IWXObject {
   int execJS(String instanceId, String namespace, String function, WXJSObject[] args);
 
   /**
-   * execute javascript function, return execute result as json array
+   * execute javascript function with asynchronous callback
    */
-  byte[] execJSWithResult(String instanceId, String namespace, String function, WXJSObject[] args);
+  void execJSWithCallback(String instanceId, String namespace, String function, WXJSObject[] args, ResultCallback callback);
 
   int execJSService(String javascript);
 
@@ -191,4 +191,13 @@ public interface IWXBridge extends IWXObject {
   void registerCoreEnv(String key, String value);
 
   void reportNativeInitStatus(String statusCode, String errorMsg);
+
+  void setTimeoutNative(String callbackId, String time);
+
+  void setJSFrmVersion(String version);
+
+  void resetWXBridge(boolean remoteDebug);
+
+  void fireEventOnDataRenderNode(String instanceId, String ref, String type, String data);
+
 }

@@ -46,12 +46,13 @@ typedef NS_OPTIONS(NSUInteger, WXTransitionOptions) {
 @end
 
 @interface WXTransition : NSObject
-@property(nonatomic,strong) NSMutableDictionary *oldFilterStyles;
-@property(nonatomic,strong) NSMutableDictionary *filterStyles;
-@property(nonatomic,strong) NSMutableArray *propertyArray;
-@property(nonatomic,assign) WXTransitionOptions transitionOptions;
+@property (nonatomic,strong) NSMutableDictionary *oldFilterStyles;
+@property (nonatomic,strong) NSMutableDictionary *filterStyles;
+@property (nonatomic,strong) NSMutableArray *propertyArray;
+@property (nonatomic,assign) WXTransitionOptions transitionOptions;
 - (instancetype) initWithStyles:(NSDictionary *)styles;
 - (void)_handleTransitionWithStyles:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles  target:(WXComponent *)targetComponent;
+- (BOOL)_hasTransitionOptionInStyles:(NSDictionary *)styles;
 @end
 
 

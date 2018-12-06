@@ -131,6 +131,8 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 
 + (NSDictionary *_Nonnull)getDebugEnvironment;
 
++ (WXLayoutDirection)getEnvLayoutDirection;
+
 /**
  * @abstract UserAgent Generation
  *
@@ -483,16 +485,18 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
  */
 + (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict;
 
-+ (void)setThreadSafeCollectionUsingLock:(BOOL)usingLock;
-
-+ (BOOL)threadSafeCollectionUsingLock;
-
 + (void)setUnregisterFontWhenCollision:(BOOL)value;
 
-+ (void)setListSectionRowThreadSafe:(BOOL)value;
++ (void)setUseJSCApiForCreateInstance:(BOOL)value;
 
-+ (BOOL)listSectionRowThreadSafe;
++ (BOOL)useJSCApiForCreateInstance;
 
-+ (long) getUnixCurrentTimeMillis;
++ (void)setEnableRTLLayoutDirection:(BOOL)value;
+
++ (BOOL)enableRTLLayoutDirection;
+
++ (long) getUnixFixTimeMillis;
+
++ (NSArray<NSString *> *_Nullable)extractPropertyNamesOfJSValueObject:(JSValue *_Nullable)jsvalue;
 
 @end

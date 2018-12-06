@@ -21,11 +21,17 @@ package com.taobao.weex.performance;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import android.graphics.Rect;
 import android.text.TextUtils;
+import android.util.Log;
+import com.taobao.weex.BuildConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXUtils;
 
@@ -48,6 +54,7 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_PROPERTIES_INSTANCE_TYPE = "wxInstanceType";
     public static final String KEY_PAGE_PROPERTIES_PARENT_PAGE = "wxParentPage";
     public static final String KEY_PAGE_PROPERTIES_BUNDLE_TYPE = "wxBundleType";
+    public static final String KEY_PAGE_PROPERTIES_RENDER_TYPE = "wxRenderType";
 
     /************** stages *****************/
     public static final String KEY_PAGE_STAGES_DOWN_BUNDLE_START = "wxStartDownLoadBundle";
@@ -55,6 +62,7 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STAGES_RENDER_ORGIGIN = "wxRenderTimeOrigin";
     public static final String KEY_PAGE_STAGES_LOAD_BUNDLE_START = "wxStartLoadBundle";
     public static final String KEY_PAGE_STAGES_LOAD_BUNDLE_END = "wxEndLoadBundle";
+    public static final String KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW = "wxFirstInteractionView";
     public static final String KEY_PAGE_STAGES_CREATE_FINISH= "wxJSBundleCreateFinish";
     public static final String KEY_PAGE_STAGES_FSRENDER = "wxFsRender";
     public static final String KEY_PAGE_STAGES_NEW_FSRENDER = "wxNewFsRender";
@@ -77,7 +85,7 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT = "wxWrongImgSizeCount";
     public static final String KEY_PAGE_STATS_EMBED_COUNT = "wxEmbedCount";
     public static final String KEY_PAGE_STATS_LARGE_IMG_COUNT = "wxLargeImgMaxCount";
-
+    public static final String KEY_PAGE_STATS_BODY_RATIO = "wxBodyRatio";
     public static final String KEY_PAGE_STATS_SCROLLER_NUM = "wxScrollerCount";
     public static final String KEY_PAGE_STATS_CELL_DATA_UN_RECYCLE_NUM = "wxCellDataUnRecycleCount";
     public static final String KEY_PAGE_STATS_CELL_UN_RE_USE_NUM = "wxCellUnReUseCount";
@@ -106,9 +114,17 @@ public class WXInstanceApm {
     private Map<String, Double> recordStatsMap;
     private boolean isFSEnd;
     private boolean mHasInit = false;
+    private boolean mEnd = false;
+    private boolean hasRecordFistInteractionView =false;
+    public final Map<String,Object> extInfo;
+    public boolean forceStopRecordInteraction = false;
+    public Rect instanceRect;
+    public String reportPageName;
+    public boolean hasReportLayerOverDraw = false;
 
     public WXInstanceApm(String instanceId) {
         mInstanceId = instanceId;
+        extInfo = new ConcurrentHashMap<>();
         IApmGenerator generator = WXSDKManager.getInstance().getApmGenerater();
         if (null != generator) {
             apmInstance = generator.generateApmInstance(WEEX_PAGE_TOPIC);
@@ -140,13 +156,21 @@ public class WXInstanceApm {
      * @param time unixTime ,plz use WXUtils.getFixUnixTime
      */
     public void onStageWithTime(String name,long time){
-        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+        WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(mInstanceId);
         if (null != instance){
             instance.getExceptionRecorder().recordStage(name, time);
         }
+        if (mEnd){
+            return;
+        }
+        if(WXAnalyzerDataTransfer.isOpenPerformance){
+            WXAnalyzerDataTransfer.transferPerformance(mInstanceId,"stage",name,time);
+        }
+
         if (null == apmInstance) {
             return;
         }
+
         apmInstance.onStage(name, time);
     }
 
@@ -155,6 +179,14 @@ public class WXInstanceApm {
      * record property
      */
     public void addProperty(String key, Object value) {
+        if (mEnd){
+            return;
+        }
+
+        if(WXAnalyzerDataTransfer.isOpenPerformance){
+            WXAnalyzerDataTransfer.transferPerformance(mInstanceId,"properties",key,value);
+        }
+
         if (null == apmInstance) {
             return;
         }
@@ -165,6 +197,13 @@ public class WXInstanceApm {
      * record statistic
      */
     public void addStats(String key, double value) {
+        if (mEnd){
+            return;
+        }
+        if(WXAnalyzerDataTransfer.isOpenPerformance){
+            WXAnalyzerDataTransfer.transferPerformance(mInstanceId,"stats",key,value);
+        }
+
         if (null == apmInstance) {
             return;
         }
@@ -194,6 +233,10 @@ public class WXInstanceApm {
         addProperty(KEY_PROPERTIES_ERROR_CODE, VALUE_ERROR_CODE_DEFAULT);
         addProperty(KEY_PAGE_PROPERTIES_JSLIB_VERSION, WXEnvironment.JS_LIB_SDK_VERSION);
         addProperty(KEY_PAGE_PROPERTIES_WEEX_VERSION, WXEnvironment.WXSDK_VERSION);
+        if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
+                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
+            addProperty(KEY_PAGE_PROPERTIES_RENDER_TYPE, WXEnvironment.EAGLE);
+        }
         if (null != instance) {
             for (Map.Entry<String, String> entry : instance.getContainerInfo().entrySet()) {
                 addProperty(entry.getKey(), entry.getValue());
@@ -201,9 +244,16 @@ public class WXInstanceApm {
         }
     }
 
-    public void setPageName(String pageName){
-        String fixPageName = TextUtils.isEmpty(pageName)?"emptyPageName":pageName;
-        addProperty(KEY_PAGE_PROPERTIES_BIZ_ID, fixPageName);
+    public void setPageName(String pageName) {
+        if (TextUtils.isEmpty(pageName)) {
+            WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(mInstanceId);
+            if (null != instance) {
+                pageName = instance.getContainerInfo().get(KEY_PAGE_PROPERTIES_CONTAINER_NAME);
+            }
+        }
+        reportPageName = null == apmInstance?pageName:apmInstance.parseReportUrl(pageName);
+        reportPageName = TextUtils.isEmpty(reportPageName) ? "emptyPageName" : reportPageName;
+        addProperty(KEY_PAGE_PROPERTIES_BIZ_ID, reportPageName);
     }
 
     public void onAppear(){
@@ -224,32 +274,73 @@ public class WXInstanceApm {
      * end record
      */
     public void onEnd() {
-        if (null == apmInstance) {
+        if (null == apmInstance || mEnd) {
             return;
         }
-        apmInstance.onStage(KEY_PAGE_STAGES_DESTROY, System.currentTimeMillis());
+        onStage(KEY_PAGE_STAGES_DESTROY);
         apmInstance.onEnd();
+        mEnd = true;
+    }
+
+    public void arriveNewFsRenderTime(){
+        if (null == apmInstance){
+            return;
+        }
+        onStage(WXInstanceApm.KEY_PAGE_STAGES_NEW_FSRENDER);
     }
 
     public void arriveFSRenderTime() {
         if (null == apmInstance){
             return;
         }
-        onStage(WXInstanceApm.KEY_PAGE_STAGES_NEW_FSRENDER);
-        if (isFSEnd) {
-            return;
-        }
         isFSEnd = true;
         onStage(WXInstanceApm.KEY_PAGE_STAGES_FSRENDER);
     }
 
-    public void arriveInteraction(int screenViewCount, int allViewCount) {
-        if (null == apmInstance) {
+    public void arriveInteraction(WXComponent targetComponent) {
+        if (null == apmInstance || null == targetComponent || targetComponent.getInstance() == null) {
             return;
         }
-        onStage(WXInstanceApm.KEY_PAGE_STAGES_INTERACTION);
-        updateMaxStats(KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT, screenViewCount);
-        updateMaxStats(KEY_PAGE_STATS_I_ALL_VIEW_COUNT, allViewCount);
+
+        if (WXAnalyzerDataTransfer.isOpenPerformance){
+            WXAnalyzerDataTransfer.transferInteractionInfo(targetComponent);
+        }
+
+
+        if (null == apmInstance){
+            return;
+        }
+
+        WXPerformance performanceRecord = targetComponent.getInstance().getWXPerformance();
+        if (null == performanceRecord){
+            return;
+        }
+
+        long curTime = WXUtils.getFixUnixTime();
+
+        if (WXAnalyzerDataTransfer.isInteractionLogOpen()){
+            Log.d(WXAnalyzerDataTransfer.INTERACTION_TAG, "[client][wxinteraction]"
+                + targetComponent.getInstance().getInstanceId()
+                +","+targetComponent.getComponentType()
+                +","+targetComponent.getRef()
+                +","+targetComponent.getStyles()
+                +","+targetComponent.getAttrs()
+            );
+        }
+
+        if (!hasRecordFistInteractionView){
+            onStage(KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW);
+            hasRecordFistInteractionView = true;
+        }
+        if (forceStopRecordInteraction){
+            return;
+        }
+
+        performanceRecord.interactionTime = curTime - performanceRecord.renderUnixTimeOrigin;
+        onStageWithTime(KEY_PAGE_STAGES_INTERACTION,curTime);
+
+        updateDiffStats(KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT, 1);
+        updateMaxStats(KEY_PAGE_STATS_I_ALL_VIEW_COUNT, performanceRecord.localInteractionViewAddCount);
         WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
         if (null != instance) {
             updateMaxStats(KEY_PAGE_STATS_I_COMPONENT_CREATE_COUNT, instance.getWXPerformance().componentCount);
@@ -308,7 +399,7 @@ public class WXInstanceApm {
         }
     }
 
-    public void updateExtInfo(Map<String, Object> extParams) {
+    public void updateRecordInfo(Map<String, Object> extParams) {
         if (null == apmInstance || null == extParams) {
             return;
         }

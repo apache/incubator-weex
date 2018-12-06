@@ -46,12 +46,16 @@ std::map<std::string, std::string> *RenderMask::GetDefaultStyle() {
                       .c_str());
   }
 
+#if OS_IOS
+  // iOS height includes status bar
+#else
   if (WXCoreEnvironment::getInstance()->GetOption("status_bar_height") != "") {
     int status_bar_height = atoi(WXCoreEnvironment::getInstance()
                                    ->GetOption("status_bar_height")
                                    .c_str());
     height -= status_bar_height;
   }
+#endif
 
   style->insert(std::pair<std::string, std::string>(POSITION, "absolute"));
   style->insert(std::pair<std::string, std::string>(

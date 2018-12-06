@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.component.list.template;
 
 import static com.taobao.weex.common.Constants.Name.LOADMOREOFFSET;
+import static com.taobao.weex.ui.view.listview.WXRecyclerView.TYPE_LINEAR_LAYOUT;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -110,7 +111,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     // TODO
 //    private WXRecyclerDomObject mDomObject;
-    protected int mLayoutType = WXRecyclerView.TYPE_LINEAR_LAYOUT;
+    protected int mLayoutType = TYPE_LINEAR_LAYOUT;
     protected int mColumnCount = 1;
     protected float mColumnGap = 0;
     protected float mColumnWidth = 0;
@@ -399,7 +400,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         int screenH = WXViewUtils.getScreenHeight(WXEnvironment.sApplication);
         int weexH = WXViewUtils.getWeexHeight(getInstanceId());
         int outHeight = height > (weexH >= screenH ? screenH : weexH) ? weexH - getAbsoluteY() : height;
-        return super.measure((int)(width+mColumnGap), outHeight);
+        return super.measure(width, outHeight);
     }
 
 
@@ -929,13 +930,15 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
     private void updateRecyclerAttr(){
         mLayoutType = getAttrs().getLayoutType();
         mColumnCount = getAttrs().getColumnCount();
-        if (mColumnCount <= 0) {
+        if (mColumnCount <= 0 && mLayoutType != TYPE_LINEAR_LAYOUT) {
+            Map<String, String> ext = new ArrayMap<>();
+            ext.put("componentType", getComponentType());
             WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
                 WXErrorCode.WX_RENDER_ERR_LIST_INVALID_COLUMN_COUNT, "columnCount",
                 String.format(Locale.ENGLISH,
                     "You are trying to set the list/recycler/vlist/waterfall's column to %d, which is illegal. The column count should be a positive integer",
                     mColumnCount),
-                new ArrayMap<String, String>());
+                ext);
             mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
         }
         mColumnGap = getAttrs().getColumnGap();
@@ -1283,7 +1286,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         } else {
             params.width = width;
             params.height = height;
-            params.setMargins(left, 0, right, 0);
+
+            this.setMarginsSupportRTL(params, left, 0, right, 0);
         }
         return params;
     }
@@ -1291,36 +1295,37 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
 
     @Override
     public void destroy() {
-
-        if(getHostView() != null){
-            if(mAppearChangeRunnable != null) {
-                getHostView().removeCallbacks(mAppearChangeRunnable);
-                mAppearChangeRunnable = null;
+        synchronized (this){
+            if(getHostView() != null){
+                if(mAppearChangeRunnable != null) {
+                    getHostView().removeCallbacks(mAppearChangeRunnable);
+                    mAppearChangeRunnable = null;
+                }
+                getHostView().removeCallbacks(listUpdateRunnable);
+                if(getHostView().getInnerView() != null){
+                    getHostView().getInnerView().setAdapter(null);
+                }
             }
-            getHostView().removeCallbacks(listUpdateRunnable);
-            if(getHostView().getInnerView() != null){
-                getHostView().getInnerView().setAdapter(null);
+            if(cellDataManager.listData != null){
+                cellDataManager.setListData(null);
             }
+            if(mStickyHelper != null){
+                mStickyHelper = null;
+            }
+            if(mTemplateViewTypes != null){
+                mTemplateViewTypes.clear();
+            }
+            if(mTemplateSources != null){
+                mTemplateSources.clear();
+            }
+            if(mAppearHelpers != null){
+                mAppearHelpers.clear();
+            }
+            if(mDisAppearWatchList != null){
+                mDisAppearWatchList.clear();
+            }
+            super.destroy();
         }
-        if(cellDataManager.listData != null){
-            cellDataManager.setListData(null);
-        }
-        if(mStickyHelper != null){
-            mStickyHelper = null;
-        }
-        if(mTemplateViewTypes != null){
-            mTemplateViewTypes.clear();
-        }
-        if(mTemplateSources != null){
-            mTemplateSources.clear();
-        }
-        if(mAppearHelpers != null){
-            mAppearHelpers.clear();
-        }
-        if(mDisAppearWatchList != null){
-            mDisAppearWatchList.clear();
-        }
-        super.destroy();
     }
 
 
@@ -1608,7 +1613,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 }
             }
         } catch (Exception e) {
-            WXLogUtils.d(TAG + " onLoadMore : ", e);
+            if (WXEnvironment.isApkDebugable()){
+                WXLogUtils.d(TAG + " onLoadMore : ", e);
+            }
         }
     }
 

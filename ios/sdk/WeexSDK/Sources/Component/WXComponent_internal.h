@@ -22,6 +22,12 @@
 #import "WXConvert.h"
 #import "WXTransform.h"
 #import "WXTransition.h"
+
+#ifdef __cplusplus
+#import "WXJSASTParser.h"
+#include <vector>
+#endif // __cplusplus
+
 @class WXTouchGestureRecognizer;
 @class WXThreadSafeCounter;
 
@@ -45,6 +51,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
      */
     UIColor *_backgroundColor;
     NSString *_backgroundImage;
+    NSString *_clipRadius;
     WXClipType _clipToBounds;
     UIView *_view;
     CGFloat _opacity;
@@ -122,10 +129,9 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     WXBorderStyle _borderBottomStyle;
     WXBorderStyle _borderLeftStyle;
     
-    
+    BOOL _isViewTreeIgnored; // Component is added to super, but it is not added to views.
     BOOL _isFixed;
     BOOL _async;
-    BOOL _isNeedJoinLayoutSystem;
     BOOL _lazyCreateView;
     
     WXTransform *_transform;
@@ -140,7 +146,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     NSString *_repeatIndexIdentify;
     NSString *_repeatLabelIdentify;
     NSString *_virtualComponentId;// for recycleList subcomponent
-    NSMutableDictionary *_virtalElementInfo;
+    NSMutableDictionary *_virtualElementInfo;
 
     BOOL _isRepeating;
     BOOL _isSkipUpdate;
@@ -150,6 +156,9 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingAttributes;
     NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingStyles;
     NSMutableDictionary<NSString *, WXDataBindingBlock> *_bindingEvents;
+#ifdef __cplusplus
+    std::vector<WXJSExpression *> *_bindingExpressions;
+#endif // __cplusplus
     
     NSMutableDictionary<NSString *, NSArray *> *_eventParameters;
 }
@@ -164,9 +173,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 ///--------------------------------------
 
 - (void)_layoutDidFinish;
-- (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition
-                           gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents;
 
+- (void)_layoutPlatform;
 
 - (void)_willDisplayLayer:(CALayer *)layer;
 
@@ -174,10 +182,15 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (id<WXScrollerProtocol>)ancestorScroller;
 
-- (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index;
+// return if the component is actually inserted
+- (BOOL)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index;
+
 - (void)_removeFromSupercomponent;
+- (void)_removeFromSupercomponent:(BOOL)remove;
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index;
 
+- (BOOL)_isTransitionNone;
+- (BOOL)_hasTransitionPropertyInStyles:(NSDictionary *)styles;
 - (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles;
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes;
 - (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles;
@@ -187,6 +200,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 - (void)_removeEventOnComponentThread:(NSString *)eventName;
 - (void)_addEventOnMainThread:(NSString *)eventName;
 - (void)_removeEventOnMainThread:(NSString *)eventName;
+
+- (void)_collectSubcomponents:(NSMutableArray *)components;
 
 ///--------------------------------------
 /// @name Protected Methods
@@ -198,25 +213,27 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_frameDidCalculated:(BOOL)isChanged;
 
-- (NSUInteger)_childrenCountForLayout;
-
 ///--------------------------------------
 /// @name Private Methods
 ///--------------------------------------
+
+- (void)_setRenderObject:(void *)object;
+
+- (BOOL)_isCalculatedFrameChanged:(CGRect)frame;
+
+- (CGFloat)_getInnerContentMainSize;
+
+- (void)_assignInnerContentMainSize:(CGFloat)value;
+
+- (void)_assignCalculatedFrame:(CGRect)frame;
 
 - (void)_modifyStyles:(NSDictionary *)styles;
 
 - (void)_transitionUpdateViewProperty:(NSDictionary *)styles;
 
-- (void)_initCSSNodeWithStyles:(NSDictionary *)styles;
-
-- (void)_initFlexCssNodeWithStyles:(NSDictionary *)styles;
-
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles;
 
 - (void)_resetCSSNodeStyles:(NSArray *)styles;
-
-- (void)_recomputeCSSNodeChildren;
 
 - (void)_handleBorders:(NSDictionary *)styles isUpdating:(BOOL)updating;
 
@@ -260,12 +277,15 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_didInserted;
 
-- (void)_attachSlotEvent:(NSDictionary *)data;
+- (void)attachSlotEvent:(NSDictionary *)data;
 
-- (void)_detachSlotEvent:(NSDictionary *)data;
+- (void)detachSlotEvent:(NSDictionary *)data;
 
 - (void)_buildViewHierarchyLazily;
 
+
+- (void)_adjustForRTL;
+
+- (BOOL)_isAffineTypeAs:(NSString *)type;
+
 @end
-
-

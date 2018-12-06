@@ -24,12 +24,14 @@
 #include <unordered_map>
 #include <cmath>
 #include <sstream>
+#include <map>
+#include <memory>
+#include "base/string_util.h"
+#include "core/data_render/object.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vm.h"
 
-#define CommonHeader GCObject *gc
-
-#define LOGE(...) ((void)0)
+#define CommonHeader GCObject *next_; int ref_;
 
 #define INT_OP(op, v1, v2) CAST_U2S((CAST_S2U(v1))op CAST_S2U(v2))
 #define NUM_OP(op, d1, d2) ((d1)op(d2))
@@ -50,26 +52,33 @@ class Frame;
 class ExecState;
 
 class FuncState;
+    
+class FuncClosure;
 
 class String;
 
 class StringTable;
 
 class Value;
-
+    
+class ValueRef;
+    
+class Variables;
+    
 typedef struct GCObject {
-  CommonHeader;
+    CommonHeader;
+    inline int decrement() { return --ref_; }
+    inline int increment() { return ++ref_; }
+
 } GCObject;
 
-typedef struct Table {
-  CommonHeader;
-
-  std::vector<Value> *array; /* array part */
-  std::unordered_map<std::string, Value> *map;
-
-} Table;
-
 typedef Value (*CFunction)(ExecState *);
+
+#define ttype(o)            ((o)->type)
+#define iscollectable(o)    (ttype(o) >= Value::Type::ARRAY)
+
+inline void GCRelease(Value *o);
+inline void GCRetain(Value *o);
 
 struct Value {
   union {
@@ -81,22 +90,29 @@ struct Value {
     void *cf;
     String *str;
     void *cptr;  // Lifecycle is managed outside vm
+    struct Value *var;
   };
 
-  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, TABLE };
+  struct Value *ref {nullptr};
+
+  enum Type { NIL, INT, NUMBER, BOOL, FUNC, CFUNC, STRING, CPTR, VALUE_REF, ARRAY, TABLE, CLASS_DESC, CLASS_INST, FUNC_INST };
 
   Type type;
 
   Value() : type(NIL) {}
+    
+  Value(int value) : i(value), type(INT) {}
 
   Value(int64_t value) : i(value), type(INT) {}
 
   Value(double value) : n(value), type(NUMBER) {}
 
-  Value(bool value) : b(value), type(BOOL) {}
+  explicit Value(bool value) : b(value), type(BOOL) {}
 
   Value(String *value) : str(value), type(STRING) {}
-
+    
+  explicit Value(FuncState *func) : f(func), type(FUNC) {}
+    
   Value(const Value &value) {
     type = value.type;
     switch (type) {
@@ -113,12 +129,63 @@ struct Value {
       case CFUNC:cf = value.cf;
         break;
       case CPTR:cptr = value.cptr;
-      case TABLE:gc = value.gc;
+        break;
+      case VALUE_REF:var = value.var;
+        break;
+      case TABLE:
+      case ARRAY:
+      case CLASS_DESC:
+      case CLASS_INST:
+      case FUNC_INST:
+        gc = value.gc;
+        if(gc)
+          gc->increment();
         break;
       default:break;
     }
   }
 
+  inline Value operator=(Value value) {
+      GCRelease(this);
+      type = value.type;
+      switch (type) {
+          case INT:
+              i = value.i;
+              break;
+          case NUMBER:
+              n = value.n;
+              break;
+          case BOOL:
+              b = value.b;
+              break;
+          case STRING:
+              str = value.str;
+              break;
+          case FUNC:
+              f = value.f;
+              break;
+          case CFUNC:
+              cf = value.cf;
+              break;
+          case CPTR:
+              cptr = value.cptr;
+              break;
+          case VALUE_REF:
+              var = value.var;
+              break;
+          case TABLE:
+          case ARRAY:
+          case CLASS_DESC:
+          case CLASS_INST:
+          case FUNC_INST:
+              gc = value.gc;
+              if(gc)
+                gc->increment();
+              break;
+          default:break;
+      }
+      return *this;
+  }
   friend bool operator==(const Value &left, const Value &right) {
     if (left.type != right.type) return false;
     switch (left.type) {
@@ -130,30 +197,75 @@ struct Value {
       case FUNC:return left.f == right.f;
       case CFUNC:return left.cf == right.cf;
       case CPTR:return left.cptr == right.cptr;
-      case TABLE:return left.gc == right.gc;
+      case ARRAY:
+      case TABLE:
+      case CLASS_DESC:
+      case CLASS_INST:
+      case FUNC_INST:
+            return left.gc == right.gc;
       default:break;
     }
     return false;
   }
+    friend bool operator!=(const Value &left, const Value &right) {
+        return !(left == right);
+    }
+};
+    
+typedef struct Array {
+    CommonHeader;
+    std::vector<Value> items;
+    Array() : items() {}
+    
+} Array;
+
+typedef struct Table {
+    CommonHeader;
+    std::unordered_map<std::string, Value> map;
+    Table() : map() {}
+
+} Table;
+        
+class Variables {
+public:
+    Value *Find(int index);
+    int IndexOf(const std::string& name);
+    int Add(Value value);
+    int Add(const std::string& name, Value value);
+    int Set(const std::string& name, Value value);
+    inline size_t size() {return values_.size();}
+    inline const std::map<std::string, int>& map() { return map_; }    
+private:
+    std::map<std::string, int> map_;
+    std::vector<Value> values_;
 };
 
-int ToNum(const Value *o, double &n);
+struct ClassDescriptor;
+    
+typedef struct ClassDescriptor {
+    CommonHeader;
+    ClassDescriptor *p_super_{nullptr};
+    std::unique_ptr<Variables> statics_;
+    std::unique_ptr<Variables> funcs_;
+    ClassDescriptor(ClassDescriptor *p_super) : p_super_(p_super), funcs_(new Variables), statics_(new Variables) {}
+} ClassDescriptor;
 
-int ToBool(const Value *o, bool &b);
-
-std::string ToCString(const Value *o);
-
-void SetIValue(Value *o, int iv);
-
-void SetDValue(Value *o, double d);
-
-void SetBValue(Value *o, bool b);
-
-void SetTValue(Value *v, GCObject *o);
-
-void SetSValue(Value *v, String *s);
-
-String *StringAdd(StringTable *t, Value *a, Value *b);
+typedef struct ClassInstance {
+    CommonHeader;
+    ClassInstance *p_super_{nullptr};
+    ClassDescriptor *p_desc_{nullptr};
+    std::unique_ptr<Variables> vars_;
+    ClassInstance(ClassDescriptor *p_desc) : p_desc_(p_desc), vars_(new Variables) {}
+    
+} ClassInstance;
+    
+typedef struct FuncInstance {
+    CommonHeader;
+    FuncState *func_{nullptr};
+    std::vector<FuncClosure *> closures_;
+    FuncInstance(FuncState *func) : func_(func), closures_() { }
+    
+} FuncInstance;
 
 /*
 ** try to convert a value to an integer, rounding according to 'mode':
@@ -163,13 +275,23 @@ String *StringAdd(StringTable *t, Value *a, Value *b);
 */
 int ToInteger(const Value *o, const int &mode, int64_t &v);
 
-bool ValueEqulas(const Value *a, const Value *b);
+bool ValueEquals(const Value *a, const Value *b);
 
-bool ValueLE(const Value *a, const Value *b);
-
+bool ObjectEquals(const Value *a, const Value *b);
+    
+bool ValueStrictEquals(const Value *a, const Value *b);
+    
 bool ValueLT(const Value *a, const Value *b);
+    
+bool ValueLTE(const Value *a, const Value *b);
+    
+bool ValueGT(const Value *a, const Value *b);
 
-void FreeValue(Value *o);
+bool ValueGTE(const Value *a, const Value *b);
+    
+bool ValueAND(const Value *a, const Value *b);
+    
+bool ValueOR(const Value *a, const Value *b);
 
 inline double NumPow(const double &d1, const double &d2) {
   return MATH_OP(pow)(d1, d2);
@@ -191,6 +313,18 @@ inline bool NumLT(const double &d1, const double &d2) {
   return d1 < d2;
 }
 
+inline bool NumLTE(const double &d1, const double &d2) {
+    return d1 <= d2;
+}
+
+inline bool NumGT(const double &d1, const double &d2) {
+    return d1 > d2;
+}
+    
+inline bool NumGTE(const double &d1, const double &d2) {
+    return d1 >= d2;
+}
+    
 inline int Number2Int(const double &n, int64_t &p) {
   if (n >= MININTEGER && n < -MININTEGER) {
     p = n;
@@ -218,21 +352,48 @@ inline int64_t ShiftLeft(const int64_t &a, const int64_t &b) {
 }
 
 inline bool IsInt(const Value *o) { return Value::Type::INT == o->type; }
-
+    
+inline bool IsFunction(const Value *o) { return Value::Type::FUNC == o->type || Value::Type::CFUNC == o->type || Value::Type::FUNC_INST == o->type; }
+    
+inline bool IsPrototypeFunction(const Value *o) { return Value::Type::FUNC == o->type; }
+    
+inline bool IsValueRef(const Value *o) { return Value::Type::VALUE_REF == o->type; }
+    
 inline bool IsNil(const Value *o) {
   return nullptr == o || Value::Type::NIL == o->type;
 }
+    
+inline void GCRelease(Value *o) {
+    if (iscollectable(o) && o->gc) {
+        o->gc->decrement();
+    }
+}
+    
+inline void GCRetain(Value *o) {
+    if (iscollectable(o) && o->gc) {
+        o->gc->increment();
+    }
+}
 
 inline void SetNil(Value *o) {
-  if (nullptr != o) {
-    o->type = Value::Type::NIL;
-  }
+    if (nullptr != o) {
+        GCRelease(o);
+        o->type = Value::Type::NIL;
+    }
+}
+    
+inline void SetValueRef(Value *o, Value *src) {
+    if (nullptr != o) {
+        GCRelease(o);
+        o->type = Value::Type::VALUE_REF;
+        o->var = src;
+    }
 }
 
 inline int IntMod(const int &a, const int &b) {
   if (CAST_S2U(b) + 1u <= 1u) {
     if (b == 0) {
-      LOGE("Error ValueMod Values[%d, %d]", a, b);
+      //LOGE("Error ValueMod Values[%d, %d]", a, b);
     }
     return 0;
   } else {
@@ -243,15 +404,25 @@ inline int IntMod(const int &a, const int &b) {
     return ret;
   }
 }
-
+    
 inline bool IsNumber(const Value *o) { return Value::Type::NUMBER == o->type; }
+
+inline bool IsCptr(const Value *o) { return Value::Type::CPTR == o->type; }
 
 inline bool IsBool(const Value *o) { return Value::Type::BOOL == o->type; }
 
 inline bool IsTable(const Value *o) { return Value::Type::TABLE == o->type; }
 
+inline bool IsArray(const Value *o) { return Value::Type::ARRAY == o->type; }
+    
 inline bool IsString(const Value *o) { return nullptr != o && Value::Type::STRING == o->type; }
-
+    
+inline bool IsClass(const Value *o) { return nullptr != o && Value::Type::CLASS_DESC == o->type; }
+    
+inline bool IsClassInstance(const Value *o) { return nullptr != o && Value::Type::CLASS_INST == o->type; }
+    
+inline bool IsFuncInstance(const Value *o) { return nullptr != o && Value::Type::FUNC_INST == o->type; }
+    
 inline int64_t IntValue(const Value *o) { return o->i; }
 
 inline double NumValue(const Value *o) { return o->n; }
@@ -265,12 +436,10 @@ inline String *StringValue(const Value *o) { return IsString(o) ? o->str : nullp
 inline char *CStringValue(const Value *o) {
   return (IsString(o) && nullptr != o->str) ? o->str->c_str() : nullptr;
 }
-
-inline Table *TableValue(const Value *o) {
-  if (IsTable(o)) {
-    return reinterpret_cast<Table *>(o->gc);
-  }
-  return nullptr;
+    
+template <typename T>
+inline T* ValueTo(const Value *o) {
+    return reinterpret_cast<T*>(o->gc);
 }
 
 inline int ToNumber_(const Value *value, double &ret) {
@@ -284,45 +453,71 @@ inline int ToNumber_(const Value *value, double &ret) {
     return 0;
   }
 }
-
+    
 inline int ToNum(const Value *o, double &n) {
-  return IsNumber(o) ? (n = NumValue(o), 1) : ToNumber_(o, n);
+  return IsNumber(o) ? (static_cast<void>(n = NumValue(o)), 1) : ToNumber_(o, n);
 }
 
 inline void SetIValue(Value *o, int iv) {
-  o->type = Value::Type::INT;
-  o->i = iv;
+    GCRelease(o);
+    o->type = Value::Type::INT;
+    o->i = iv;
 }
+    
+    
+void SetRefValue(Value *o);
 
 inline void SetDValue(Value *o, double d) {
-  o->type = Value::Type::NUMBER;
-  o->n = d;
+    GCRelease(o);
+    o->type = Value::Type::NUMBER;
+    o->n = d;
 }
 
 inline void SetBValue(Value *o, bool b) {
-  o->type = Value::Type::BOOL;
-  o->b = b;
+    GCRelease(o);
+    o->type = Value::Type::BOOL;
+    o->b = b;
 }
 
 inline void SetTValue(Value *v, GCObject *o) {
-  v->type = Value::Type::TABLE;
-  v->gc = o;
+    GCRelease(v);
+    v->type = Value::Type::TABLE;
+    v->gc = o;
+    GCRetain(v);
+}
+    
+inline void SetAValue(Value *v, GCObject *o) {
+    GCRelease(v);
+    v->type = Value::Type::ARRAY;
+    v->gc = o;
+    GCRetain(v);
+}
+    
+inline void SetCDValue(Value *v, GCObject *o) {
+    GCRelease(v);
+    v->type = Value::Type::CLASS_DESC;
+    v->gc = o;
+    GCRetain(v);
+}
+
+inline void SetCIValue(Value *v, GCObject *o) {
+    GCRelease(v);
+    v->type = Value::Type::CLASS_INST;
+    v->gc = o;
+    GCRetain(v);
+}
+
+inline void SetGCFuncValue(Value *v, GCObject *o) {
+    GCRelease(v);
+    v->type = Value::Type::FUNC_INST;
+    v->gc = o;
+    GCRetain(v);
 }
 
 inline void SetSValue(Value *v, String *s) {
-  v->type = Value::Type::STRING;
-  v->str = s;
-}
-
-inline String *StringAdd(StringTable *t, Value *a, Value *b) {
-  std::string str;
-  if (IsString(a)) {
-    str = a->str->c_str();
-    return t->StringFromUTF8(str += ToCString(b));
-  } else {
-    str = b->str->c_str();
-    return t->StringFromUTF8(str += ToCString(a));
-  }
+    GCRelease(v);
+    v->type = Value::Type::STRING;
+    v->str = s;
 }
 
 inline std::string ToCString(const Value *o) {
@@ -354,23 +549,93 @@ inline std::string ToCString(const Value *o) {
   }
 }
 
-inline int ToBool(const Value *o, bool &b) {
-  double d1;
-  if (Value::Type::BOOL == o->type) {
-    b = BoolValue(o);
-  } else if (Value::Type::INT == o->type) {
-    b = IntValue(o);
-  } else if (Value::Type::NUMBER == o->type) {
-    b = NumValue(o);
-  } else if (ToNum(o, d1)) {
-    b = d1;
-  } else if (Value::Type::NIL == o->type) {
-    b = false;
+inline String *StringAdd(StringTable *t, Value *a, Value *b) {
+  std::string str;
+  if (IsString(a)) {
+    str = a->str->c_str();
+    return t->StringFromUTF8(str += ToCString(b));
   } else {
-    b = false;
-    return 0;
+    str = ToCString(a);
+    return t->StringFromUTF8(str += b->str->c_str());
   }
-  return 1;
+}
+
+inline int ToBool(const Value *o, bool &b) {
+    double d1;
+    if (Value::Type::BOOL == o->type) {
+        b = BoolValue(o);
+    }
+    else if (Value::Type::INT == o->type) {
+        b = IntValue(o);
+    }
+    else if (Value::Type::NUMBER == o->type) {
+        b = NumValue(o);
+    }
+    else if (ttype(o) == Value::Type::STRING) {
+        b = (o->str && o->str->length() > 0) ? true : false;
+    }
+    else if (Value::Type::VALUE_REF == o->type) {
+        return ToBool(o->var, b);
+    }
+    else if (ToNum(o, d1)) {
+        b = d1;
+    }
+    else if (Value::Type::FUNC == o->type) {
+        b = o->f ? true : false;
+    }
+    else {
+        b = ttype(o) == Value::Type::NIL ? false : true;
+    }
+    return 1;
+}
+
+inline std::string ToString(const Value *o) {
+    switch (o->type) {
+        case Value::Type::BOOL:
+            return weex::base::to_string(o->b);
+        case Value::Type::INT:
+            return weex::base::to_string(o->n);
+        case Value::Type::NUMBER:
+            return weex::base::to_string(o->n);
+        case Value::Type::STRING:
+            return o->str->c_str();
+        case Value::Type::NIL:
+            return "[nil]";
+        default:
+            return "[not support]";
+    }
+    return std::string();
+}
+
+inline void ArrayCopyFrom(Value &src, Value &dest, int start, int end) {
+    Array *st = ValueTo<Array>(&src);
+    Array *dt = ValueTo<Array>(&dest);
+    auto iter_start = st->items.begin() + start;
+    auto iter_end = end > 0 ? st->items.begin() + end : st->items.end();
+    for (auto iter = iter_start; iter != iter_end; iter++) {
+        GCRetain(&*iter);
+    }
+    dt->items.insert(dt->items.end(), iter_start, iter_end);
+}
+
+inline void ArrayCopy(Value &src, Value &dest) {
+    ArrayCopyFrom(src, dest, 0, 0);
+}
+
+inline void TableCopy(Value &src, Value &dest) {
+    Table *st = ValueTo<Table>(&src);
+    Table *dt = ValueTo<Table>(&dest);
+    for (auto iter = st->map.begin(); iter != st->map.end(); iter++) {
+        GCRetain(&iter->second);
+        dt->map[iter->first] = iter->second;
+    }
+}
+
+inline void TableMapAddAll(Table *src, Table *dest) {
+  for (auto iter = src->map.begin(); iter != src->map.end(); iter++) {
+    GCRetain(&iter->second);
+    dest->map[iter->first] = iter->second;
+  }
 }
 
 }  // namespace data_render

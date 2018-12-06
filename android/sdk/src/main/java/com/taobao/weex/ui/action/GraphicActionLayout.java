@@ -41,7 +41,7 @@ public class GraphicActionLayout extends BasicGraphicAction {
     }
 
     component.setDemission(mLayoutSize, mLayoutPosition);
-    component.setLayout(component);
+    component.setSafeLayout(component);
     component.setPadding(component.getPadding(), component.getBorder());
   }
 }

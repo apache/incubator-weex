@@ -61,6 +61,16 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
   }
 
   @Override
+  protected void setHostLayoutParams(WXFrameLayout host, int width, int height,
+                                     int left, int right, int top, int bottom) {
+    // The view of WXLoading will always be wrapped by a WXRefreshView at some point
+    // which is unknowable for front-end so the margins should always be 0 in LayoutParams,
+    // otherwise it will bring visible layout errors. This means WXLoading do not
+    // support margin.
+    super.setHostLayoutParams(host, width, height, 0, 0, 0, 0);
+  }
+
+  @Override
   public void onPullingUp(float dy, int pullOutDistance, float viewHeight) {
     if (getEvents().contains(Constants.Event.ONPULLING_UP)) {
       Map<String, Object> data = new HashMap<>();

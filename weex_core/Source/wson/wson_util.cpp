@@ -137,13 +137,12 @@ namespace wson {
 
     int utf16_convert_to_utf8_cstr(uint16_t * utf16, int length, char* buffer){
         char* src = buffer;
-        register int count =0;
+        int count =0;
         for(int i=0; i<length;){
             u_int16_t c1 = utf16[i++];
             if(isHighSurrogate(c1)){
-                i++;
                 if(i < length){
-                    u_int16_t c2 = utf16[i];
+                    u_int16_t c2 = utf16[i++];
                     if (isLowSurrogate(c2)) {
                         u_int32_t codePoint =  toCodePoint(c1, c2);
                         count += utf16_char_convert_to_utf8_cstr(codePoint, src + count);
@@ -160,16 +159,15 @@ namespace wson {
     }
 
     int utf16_convert_to_utf8_quote_cstr(uint16_t *utf16, int length, char* buffer){
-        register int count =0;
+        int count =0;
 
         char* src = buffer;
         src[count++] = '"';
         for(int i=0; i<length;){
             u_int16_t c1 = utf16[i++];
             if(isHighSurrogate(c1)){
-                i++;
                 if(i < length){
-                    u_int16_t c2 = utf16[i];
+                    u_int16_t c2 = utf16[i++];
                     if (isLowSurrogate(c2)) {
                         u_int32_t codePoint =  toCodePoint(c1, c2);
                         count += utf16_char_convert_to_utf8_cstr(codePoint, src + count);

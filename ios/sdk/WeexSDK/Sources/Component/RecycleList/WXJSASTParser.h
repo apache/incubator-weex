@@ -21,6 +21,9 @@
 #include <string>
 #include <vector>
 
+#define WXJSObjectFree(obj) \
+    if (obj) delete obj;
+
 typedef enum : NSUInteger {
     WXJSExpressionTypeUnary,
     WXJSExpressionTypeBinary,
@@ -57,37 +60,66 @@ struct WXJSIdentifier : WXJSExpression {
 };
 
 struct WXJSMemberExpression : WXJSExpression {
-    WXJSExpression *object;
-    WXJSExpression *property;
+    virtual ~WXJSMemberExpression() {
+        WXJSObjectFree(object);
+        WXJSObjectFree(property);
+    }
+    WXJSExpression *object = nullptr;
+    WXJSExpression *property = nullptr;
     bool computed;
 };
 
 struct WXJSArrayExpression : WXJSExpression {
+    virtual ~WXJSArrayExpression() {
+        for (WXJSExpression * expr : expressions) {
+            delete expr;
+        }
+    }
     std::vector<WXJSExpression *> expressions;
 };
 
 struct WXJSUnaryExpression : WXJSExpression {
+    virtual ~WXJSUnaryExpression() {
+        WXJSObjectFree(argument);
+    }
+    
     std::string operator_;
     bool prefix;
-    WXJSExpression *argument;
+    WXJSExpression *argument = nullptr;
 };
 
 struct WXJSBinaryExpression : WXJSExpression {
+    virtual ~WXJSBinaryExpression() {
+        WXJSObjectFree(left);
+        WXJSObjectFree(right);
+    }
+    
     std::string operator_;
-    WXJSExpression *left;
-    WXJSExpression *right;
+    WXJSExpression *left = nullptr;
+    WXJSExpression *right = nullptr;
 };
 
 struct WXJSLogicalExpression : WXJSExpression {
+    virtual ~WXJSLogicalExpression() {
+        WXJSObjectFree(left);
+        WXJSObjectFree(right);
+    }
+    
     std::string operator_;
-    WXJSExpression *left;
-    WXJSExpression *right;
+    WXJSExpression *left = nullptr;
+    WXJSExpression *right = nullptr;
 };
 
 struct WXJSConditionalExpression : WXJSExpression {
-    WXJSExpression *test;
-    WXJSExpression *alternate;
-    WXJSExpression *consequent;
+    virtual ~WXJSConditionalExpression() {
+        WXJSObjectFree(test);
+        WXJSObjectFree(alternate);
+        WXJSObjectFree(consequent);
+    }
+    
+    WXJSExpression *test = nullptr;
+    WXJSExpression *alternate = nullptr;
+    WXJSExpression *consequent = nullptr;
 };
 
 

@@ -41,8 +41,13 @@ std::map<std::string, std::string> *RenderAppBar::GetDefaultStyle() {
 
   std::map<std::string, std::string> *style =
       new std::map<std::string, std::string>();
+#if OS_IOS
+  style->insert(std::pair<std::string, std::string>(PADDING_LEFT, "44"));
+  style->insert(std::pair<std::string, std::string>(PADDING_RIGHT, "44"));
+#else
   style->insert(std::pair<std::string, std::string>(PADDING_LEFT, "0"));
   style->insert(std::pair<std::string, std::string>(PADDING_RIGHT, "0"));
+#endif
 
   if (!appbar_color.empty() && appbar_color != "" && !StyleExist(COLOR))
     style->insert(std::pair<std::string, std::string>(COLOR, appbar_color));
@@ -63,9 +68,10 @@ StyleType RenderAppBar::ApplyStyle(const std::string &key,
                                    const bool updating) {
   if (key == PADDING) {
     UpdateStyleInternal(key, value, 0, [=](float foo) {
-      setPadding(kPaddingLeft, foo + this->default_nav_width_),
-          setPadding(kPaddingRight, foo + this->default_overflow_width_),
-          setPadding(kPaddingTop, foo), setPadding(kPaddingBottom, foo);
+        setPadding(kPaddingLeft, foo + this->default_nav_width_);
+        setPadding(kPaddingRight, foo + this->default_overflow_width_);
+        setPadding(kPaddingTop, foo);
+        setPadding(kPaddingBottom, foo);
     });
     return kTypePadding;
   } else if (key == PADDING_LEFT) {

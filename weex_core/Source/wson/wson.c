@@ -1,3 +1,21 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 //
 // Created by furture on 2017/8/4.
 //
@@ -19,8 +37,8 @@ union float_number{
 
 #define WSON_BUFFER_SIZE  1024
 
-#define WSON_BUFFER_ENSURE_SIZE(size)  {if((buffer->length) < (buffer->position + size)){\
-                                           msg_buffer_resize(buffer, size);\
+#define WSON_BUFFER_ENSURE_SIZE(size)  {if((buffer->length) < (buffer->position + (size))){\
+                                           msg_buffer_resize(buffer, (uint32_t)(size));\
                                       }}
 
 static inline void msg_buffer_resize(wson_buffer* buffer, uint32_t size){
@@ -133,6 +151,14 @@ inline void wson_push_type_double(wson_buffer *buffer, double num){
     wson_push_double(buffer, num);
 }
 
+inline void wson_push_type_float(wson_buffer *buffer, float num) {
+    WSON_BUFFER_ENSURE_SIZE(sizeof(uint8_t));
+    uint8_t* data = ((uint8_t*)buffer->data + buffer->position);
+    *data = WSON_NUMBER_FLOAT_TYPE;
+    buffer->position += (sizeof(uint8_t));
+    wson_push_float(buffer, num);
+}
+
 inline void wson_push_type_long(wson_buffer *buffer, int64_t num){
     WSON_BUFFER_ENSURE_SIZE(sizeof(uint8_t));
     uint8_t* data = ((uint8_t*)buffer->data + buffer->position);
@@ -145,6 +171,15 @@ inline void wson_push_type_string(wson_buffer *buffer, const void *src, int32_t 
     WSON_BUFFER_ENSURE_SIZE(sizeof(uint8_t));
     uint8_t* data = ((uint8_t*)buffer->data + buffer->position);
     *data = WSON_STRING_TYPE;
+    buffer->position += (sizeof(uint8_t));
+    wson_push_uint(buffer, length);
+    wson_push_bytes(buffer, src, length);
+}
+
+inline void wson_push_type_uint8_string(wson_buffer *buffer, const uint8_t *src, int32_t length){
+    WSON_BUFFER_ENSURE_SIZE(sizeof(uint8_t));
+    uint8_t* data = ((uint8_t*)buffer->data + buffer->position);
+    *data = WSON_UINT8_STRING_TYPE;
     buffer->position += (sizeof(uint8_t));
     wson_push_uint(buffer, length);
     wson_push_bytes(buffer, src, length);

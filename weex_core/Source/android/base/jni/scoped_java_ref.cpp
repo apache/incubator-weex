@@ -32,6 +32,9 @@ void JavaRef::ResetNewLocalRef(JNIEnv *env, jobject obj) {
   if (!env) {
     env = AttachCurrentThread();
   }
+  if(env == nullptr) {
+    return;
+  }
   if (obj) {
     obj = env->NewLocalRef(obj);
   }
@@ -45,12 +48,18 @@ void JavaRef::ReleaseLocalRef(JNIEnv *env) {
   if (!env) {
     env = AttachCurrentThread();
   }
+  if(env == nullptr) {
+    return;
+  }
   env->DeleteLocalRef(obj_);
 }
 
 void JavaRef::ResetNewGlobalRef(JNIEnv *env, jobject obj) {
   if (!env) {
     env = AttachCurrentThread();
+  }
+  if(env == nullptr) {
+    return;
   }
   if (obj)
     obj = env->NewGlobalRef(obj);
@@ -62,6 +71,9 @@ void JavaRef::ResetNewGlobalRef(JNIEnv *env, jobject obj) {
 void JavaRef::ReleaseGlobalRef(JNIEnv *env) {
   if (!env) {
     env = AttachCurrentThread();
+  }
+  if(env == nullptr) {
+    return;
   }
   env->DeleteGlobalRef(obj_);
 }

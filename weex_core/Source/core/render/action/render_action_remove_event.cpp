@@ -31,7 +31,10 @@ RenderActionRemoveEvent::RenderActionRemoveEvent(const std::string &page_id,
 }
 
 void RenderActionRemoveEvent::ExecuteAction() {
-  WeexCoreManager::getInstance()->getPlatformBridge()->callRemoveEvent(
-      this->page_id_.c_str(), this->ref_.c_str(), this->event_.c_str());
+  WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->platform_side()
+      ->RemoveEvent(this->page_id_.c_str(), this->ref_.c_str(),
+                    this->event_.c_str());
 }
 }  // namespace WeexCore

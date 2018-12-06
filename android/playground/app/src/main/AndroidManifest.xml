@@ -119,6 +119,11 @@ under the License.
         <activity android:name="com.alibaba.weex.BenchmarkActivity"
                   android:screenOrientation="portrait"/>
 
+        <activity android:name=".SliceTestActivity"
+                  android:exported="true"
+                  android:screenOrientation="portrait">
+        </activity>
+
         <service
             android:name=".update.UpdateService"
             android:exported="false" />

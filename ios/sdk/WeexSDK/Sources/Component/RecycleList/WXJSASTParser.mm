@@ -174,18 +174,18 @@ static int binaryPrecedence(WXJSToken *token)
     return self;
 }
 
+- (void)dealloc
+{
+    for (WXJSToken* token : _tokens) {
+        WXJSObjectFree(token);
+    }
+}
+
 - (WXJSToken *)nextToken
 {
     WXJSToken *token = _lookahead;
-    
-    WXJSToken *next = [self lex];
-    
-    _lookahead = next;
-    
-    if (next->type != WXJSTokenTypeEOF) {
-        _tokens.push_back(token);
-    }
-    
+    _lookahead = [self lex]; // next
+    _tokens.push_back(_lookahead);
     return token;
 }
 

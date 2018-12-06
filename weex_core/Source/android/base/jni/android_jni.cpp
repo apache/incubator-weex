@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <android/base/log_utils.h>
 #include "android_jni.h"
 
 namespace {
@@ -32,7 +33,17 @@ void InitVM(JavaVM *vm) {
 
 JNIEnv *AttachCurrentThread() {
   JNIEnv *env = nullptr;
-  jint ret = g_jvm->AttachCurrentThread(&env, nullptr);
+
+  JavaVMAttachArgs args;
+  args.version = JNI_VERSION_1_4;
+  args.name = "weex_sdk_runtime";
+  args.group = nullptr;
+
+  jint ret = g_jvm->AttachCurrentThread(&env, &args);
+  if(ret != JNI_OK) {
+      LOGE("weex AttachCurrentThread failed");
+      env = nullptr;
+  }
   return env;
 }
 
@@ -55,6 +66,7 @@ jclass GetClass(JNIEnv *env, const char *class_name, intptr_t *class_id) {
   ScopedGlobalJavaRef<jclass> clazz;
   clazz.Reset(env, GetClass(env, class_name));
   *class_id = reinterpret_cast<intptr_t>(clazz.Release());
+  return reinterpret_cast<jclass>(*class_id);
 }
 
 jmethodID GetMethod(JNIEnv *env, jclass clazz, MethodType type,

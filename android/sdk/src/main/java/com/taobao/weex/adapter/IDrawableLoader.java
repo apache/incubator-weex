@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
 public interface IDrawableLoader {
 
   interface DrawableTarget {
-
+    void setDrawable(@Nullable Drawable drawable, boolean resetBounds);
   }
 
   interface StaticTarget extends DrawableTarget{

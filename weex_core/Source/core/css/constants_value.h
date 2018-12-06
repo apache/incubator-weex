@@ -23,6 +23,10 @@
 #include <string>
 
 namespace WeexCore {
+  // direction
+  constexpr char RTL[] = "rtl";
+  constexpr char LTR[] = "ltr";
+  constexpr char INHERIT[] = "inherit";
 
   // flex-direction
   constexpr char ROW[] = "row";
@@ -59,5 +63,6 @@ namespace WeexCore {
   constexpr int VERTICAL_VALUE = 1;
 
   constexpr float kDefaultViewPortWidth = 750.0f;
+  constexpr bool kDefaultRoundOffDeviation = true;
 }
 #endif //WEEXV8_CONSTANTSVALUE_H

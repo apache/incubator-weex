@@ -36,7 +36,7 @@ class Value;
 struct Frame {
   Value *reg;
   Value *ret;
-  Value *func;
+  FuncState *func;
   const Instruction *pc;
   const Instruction *end;
 };
@@ -44,7 +44,7 @@ struct Frame {
 class VM {
  public:
   VM() {}
-  ~VM() {}
+  ~VM() {}    
   void RunFrame(ExecState *exec_state, Frame frame, Value* ret);
 };
 }  // namespace data_render

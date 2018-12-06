@@ -64,15 +64,18 @@ public class WXLogUtils {
 
   public static void renderPerformanceLog(String type, long time) {
     if (WXEnvironment.isApkDebugable() || WXEnvironment.isPerf()) {
-      builder.setLength(0);
-      builder.append("[render time]").append(type).append(":").append(time);
-      Log.d(WEEX_PERF_TAG, builder.substring(0));
-      writeConsoleLog("debug", builder.substring(0));
+//      builder.setLength(0);
+//      builder.append("[render time]").append(type).append(":").append(time);
+//      Log.d(WEEX_PERF_TAG, builder.substring(0));
+//      writeConsoleLog("debug", builder.substring(0));
     }
   }
 
   private static void log(String tag, String msg, LogLevel level){
-    if(msg != null && tag != null && sLogWatcher !=null){
+    if(msg == null || tag == null || level == null)
+      return;
+
+    if(sLogWatcher !=null){
       sLogWatcher.onLog(level.getName(), tag, msg);
     }
 

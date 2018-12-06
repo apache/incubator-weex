@@ -21,6 +21,7 @@
 
 #include "ast.h"
 #include "core/data_render/statement.h"
+#include "core/data_render/rax_jsx_ast.h"
 
 namespace weex {
 namespace core {

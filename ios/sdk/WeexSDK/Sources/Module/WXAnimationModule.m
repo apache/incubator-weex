@@ -93,6 +93,7 @@
     if ([_animationInfo.propertyName hasPrefix:@"transform"]) {
         WXTransform *transform = _animationInfo.target->_transform;
         [transform applyTransformForView:_animationInfo.target.view];
+        [_animationInfo.target _adjustForRTL];
     } else if ([_animationInfo.propertyName isEqualToString:@"backgroundColor"]) {
         _animationInfo.target.view.layer.backgroundColor = (__bridge CGColorRef _Nullable)(_animationInfo.toValue);
     } else if ([_animationInfo.propertyName isEqualToString:@"opacity"]) {
@@ -123,7 +124,7 @@
         _animationInfo.target.view.layer.anchorPoint = _animationInfo.originAnchorPoint;
         _animationInfo.target.view.layer.frame = originFrame;
     }
-    [_animationInfo.target.layer removeAllAnimations];
+    [_animationInfo.target.layer removeAnimationForKey:_animationInfo.propertyName];
     
     if (_finishBlock) {
         _finishBlock(flag);
@@ -152,7 +153,26 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     _needLayout = NO;
     _isAnimationedSuccess = YES;
     WXPerformBlockOnComponentThread(^{
+        if (nodeRef == nil || ![nodeRef isKindOfClass:[NSString class]] ||
+            ![args isKindOfClass:[NSDictionary class]]) {
+            if (callback) {
+                NSDictionary *message = @{@"result":@"Fail",
+                                          @"message":@"Argument type error."};
+                callback(message, NO);
+            }
+            return;
+        }
+        
         NSArray *stringArray = [nodeRef componentsSeparatedByString:@"@"];
+        if ([stringArray count] == 0) {
+            if (callback) {
+                NSDictionary *message = @{@"result":@"Fail",
+                                          @"message":@"Node ref format error."};
+                callback(message, NO);
+            }
+            return;
+        }
+        
         WXComponent *targetComponent = [self.weexInstance componentForRef:stringArray[0]];
         if (!targetComponent) {
             if (callback) {

@@ -67,7 +67,8 @@ void IPCListenerImpl::listen()
         }
         std::unique_ptr<IPCArguments> arguments = assembleArguments();
         releaseBlob();
-        std::unique_ptr<IPCResult> sendBack = m_handler->handle(msg, arguments.get());
+        IPCArguments*  pArguments = arguments.get();
+        std::unique_ptr<IPCResult> sendBack = m_handler->handle(msg, pArguments);
         if (!isAsync) {
             std::unique_ptr<IPCBuffer> resultBuffer = generateResultBuffer(sendBack.get());
             doSendBufferOnly(resultBuffer.get());

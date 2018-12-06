@@ -43,6 +43,7 @@ public interface IWXUserTrackAdapter {
   String STREAM_MODULE = "streamModule";
   String INVOKE_MODULE = "invokeModule";
   String INIT_FRAMEWORK = "initFramework";
+  String COUNTER = "counter";
 
   /**
    * monitor keys

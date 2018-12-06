@@ -20,7 +20,7 @@
 #ifndef __WX_DEFINE_H__
 #define __WX_DEFINE_H__
 
-#define WX_SDK_VERSION @"0.18.0"
+#define WX_SDK_VERSION @"0.19.0"
 
 #if defined(__cplusplus)
 #define WX_EXTERN extern "C" __attribute__((visibility("default")))
@@ -183,3 +183,11 @@ return;\
 #endif
 
 #endif
+
+WX_EXTERN_C_BEGIN
+
+NSString* GetWeexSDKVersion(void);
+NSString* GetWeexSDKBuildTime(void);
+unsigned long GetWeexSDKBuildTimestamp(void);
+
+WX_EXTERN_C_END

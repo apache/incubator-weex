@@ -23,6 +23,8 @@
 const { WXEnvironment } = global
 
 /* istanbul ignore next */
-if (WXEnvironment && WXEnvironment.platform === 'iOS') {
+if (typeof WXEnvironment !== 'undefined'
+  && WXEnvironment.platform === 'iOS'
+  && !WXEnvironment.__enable_native_promise__) {
   global.Promise = undefined
 }

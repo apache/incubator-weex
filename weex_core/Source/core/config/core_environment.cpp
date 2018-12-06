@@ -16,10 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include <math.h>
+#include <stdlib.h>
 #include "core_environment.h"
 #include "base/CoreConstants.h"
-#include <stdlib.h>
 #include <base/ViewUtils.h>
+#include "base/LogDefines.h"
 
 namespace WeexCore {
 
@@ -58,17 +61,19 @@ namespace WeexCore {
     return true;
   }
 
-  const float &WXCoreEnvironment::DeviceWidth() {
+  const float WXCoreEnvironment::DeviceWidth() {
     return mDeviceWidth;
   }
 
-  const float &WXCoreEnvironment::DeviceHeight() {
+  const float WXCoreEnvironment::DeviceHeight() {
     return mDeviceHeight;
   }
 
-  const std::string &WXCoreEnvironment::GetOption(const std::string &key) {
+  const std::string WXCoreEnvironment::GetOption(const std::string &key) {
     std::map<std::string, std::string>::iterator iter = mOptions.find(key);
+      LOGE("KEY = %s", key.c_str());
     if (iter != mOptions.end()) {
+        LOGE("KEY = %s, VALUE = %s", key.c_str(), iter->second.c_str());
       return iter->second;
     } else {
       return "";
@@ -77,5 +82,9 @@ namespace WeexCore {
 
   void WXCoreEnvironment::AddOption(std::string key, std::string value) {
     mOptions.insert(std::pair<std::string, std::string>(key, value));
+    if (key == "switchInteractionLog"){
+      mInteractionLogSwitch = "true" == value;
+    }
+
   }
 }
