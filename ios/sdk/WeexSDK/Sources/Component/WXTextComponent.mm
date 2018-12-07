@@ -29,7 +29,6 @@
 #import "WXComponent+Layout.h"
 #import <pthread/pthread.h>
 #import <CoreText/CoreText.h>
-#import "WXComponent+Layout.h"
 
 // WXText is a non-public is not permitted
 @interface WXTextView : WXView
@@ -179,6 +178,8 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
         pthread_mutexattr_init(&(_propertMutexAttr));
         pthread_mutexattr_settype(&(_propertMutexAttr), PTHREAD_MUTEX_RECURSIVE);
         pthread_mutex_init(&(_ctAttributedStringMutex), &(_propertMutexAttr));
+        
+        _textAlign = NSTextAlignmentNatural;
         
         if ([attributes objectForKey:@"coretext"]) {
             _useCoreTextAttr = [WXConvert NSString:attributes[@"coretext"]];
@@ -359,6 +360,10 @@ do {\
     return [[WXTextView alloc] init];
 }
 
+- (void)layoutDirectionDidChanged:(BOOL)isRTL {
+    [self setNeedsRepaint];
+}
+
 - (BOOL)needsDrawRect
 {
     return YES;
@@ -513,11 +518,12 @@ do {\
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
     
     // handle text direction style, default ltr
+    NSTextAlignment retAlign = _textAlign;
     BOOL isRtl = [self isDirectionRTL];
     if (isRtl) {
-        if (0 == _textAlign) {
+        if (0 == retAlign) {
             //force text right-align if don't specified any align.
-            _textAlign = NSTextAlignmentRight;
+            retAlign = NSTextAlignmentRight;
         }
         paragraphStyle.baseWritingDirection = NSWritingDirectionRightToLeft;
     } else {
@@ -527,8 +533,8 @@ do {\
         paragraphStyle.baseWritingDirection =  NSWritingDirectionNatural;
     }
     
-    if (_textAlign) {
-        paragraphStyle.alignment = _textAlign;
+    if (retAlign) {
+        paragraphStyle.alignment = retAlign;
     }
     
     if ([[_wordWrap lowercaseString] isEqualToString:@"break-word"]) {
@@ -596,11 +602,12 @@ do {\
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
 
     // handle text direction style, default ltr
+    NSTextAlignment retAlign = _textAlign;
     BOOL isRtl = [self isDirectionRTL];
     if (isRtl) {
-        if (0 == _textAlign) {
+        if (0 == retAlign) {
             //force text right-align if don't specified any align.
-            _textAlign = NSTextAlignmentRight;
+            retAlign = NSTextAlignmentRight;
         }
         paragraphStyle.baseWritingDirection = NSWritingDirectionRightToLeft;
     } else {
@@ -610,8 +617,8 @@ do {\
         paragraphStyle.baseWritingDirection =  NSWritingDirectionNatural;
     }
     
-    if (_textAlign) {
-        paragraphStyle.alignment = _textAlign;
+    if (retAlign) {
+        paragraphStyle.alignment = retAlign;
     }
     
     if (_lineHeight) {

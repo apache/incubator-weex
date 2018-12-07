@@ -65,10 +65,10 @@ public class GapItemDecoration extends RecyclerView.ItemDecoration {
                     return;
                 }
 
-                int index = listComponent.isNativeLayoutRTL() ? spanOffsets.length - params.getSpanIndex() - 1 : params.getSpanIndex();
+                int index = listComponent.isLayoutRTL() ? spanOffsets.length - params.getSpanIndex() - 1 : params.getSpanIndex();
                 float spanOffset = listComponent.getSpanOffsets()[index];
                 int   spanOffsetPx =  Math.round(WXViewUtils.getRealPxByWidth(spanOffset, listComponent.getViewPortWidth()));
-                if (listComponent.isNativeLayoutRTL()) {
+                if (listComponent.isLayoutRTL()) {
                     outRect.left = -spanOffsetPx;
                     outRect.right = spanOffsetPx;
                 } else {

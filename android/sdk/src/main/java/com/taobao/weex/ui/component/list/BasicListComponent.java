@@ -183,7 +183,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     } else {
       if (lp instanceof FrameLayout.LayoutParams) {
         FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
-        if (this.isNativeLayoutRTL()) {
+        if (this.isLayoutRTL()) {
           lp_frameLayout.gravity = Gravity.RIGHT | Gravity.TOP;
           lp.setMargins(right, top, left, bottom);
         } else {
@@ -199,7 +199,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void setLayout(WXComponent component) {
     if (component.getHostView() != null) {
-      int layoutDirection = component.isNativeLayoutRTL() ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR;
+      int layoutDirection = component.isLayoutRTL() ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR;
       ViewCompat.setLayoutDirection(component.getHostView(), layoutDirection);
     }
     super.setLayout(component);

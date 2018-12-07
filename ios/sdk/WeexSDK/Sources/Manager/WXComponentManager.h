@@ -155,7 +155,7 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 /**
  * @abstract layout a component with frame output by weex core layout engine
  **/
-- (void)layoutComponent:(WXComponent*)component frame:(CGRect)frame innerMainSize:(CGFloat)innerMainSize;
+- (void)layoutComponent:(WXComponent*)component frame:(CGRect)frame isRTL:(BOOL)isRTL innerMainSize:(CGFloat)innerMainSize;
 
 /**
  * @abstract layout a component on platform side
