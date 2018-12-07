@@ -376,7 +376,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
       addClickListener(mClickEventListener);
     } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR))) {
-      if (mHasAddFocusListener){
+      if (!mHasAddFocusListener){
         mHasAddFocusListener = true;
         addFocusChangeListener(new OnFocusChangeListener() {
         @Override
