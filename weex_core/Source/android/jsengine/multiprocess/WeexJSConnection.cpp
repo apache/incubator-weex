@@ -494,7 +494,7 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
     int result = access(executableName.c_str(), 01);
 
 #if PRINT_LOG_CACHEFILE
-    mcfile << "jsengine WeexJSConnection::doExec file exsist result:"
+    mcfile << "jsengine WeexJSConnection::doExec file exist result:"
            << result << " startupPie:" << startupPie << std::endl;
 #endif
     if (result == -1) {

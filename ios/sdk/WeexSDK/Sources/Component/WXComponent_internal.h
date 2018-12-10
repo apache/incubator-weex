@@ -283,6 +283,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 
 - (void)_buildViewHierarchyLazily;
 
+- (void)_setIsLayoutRTL:(BOOL)isRTL;
 
 - (void)_adjustForRTL;
 

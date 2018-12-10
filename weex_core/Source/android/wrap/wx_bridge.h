@@ -63,7 +63,7 @@ class WXBridge : public JNIObjectWrap {
                   std::vector<std::pair<std::string, std::string>> *padding,
                   std::vector<std::pair<std::string, std::string>> *border);
   int Layout(JNIEnv *env, const char *page_id, const char *ref, int top,
-             int bottom, int left, int right, int height, int width, int index);
+             int bottom, int left, int right, int height, int width, bool isRTL, int index);
   int AddElement(JNIEnv *env, const char *page_id, const char *component_type,
                  const char *ref, int &index, const char *parentRef,
                  std::map<std::string, std::string> *styles,

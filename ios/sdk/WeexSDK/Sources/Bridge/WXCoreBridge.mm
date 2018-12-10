@@ -417,7 +417,7 @@ namespace WeexCore
     
     int IOSSide::Layout(const char* pageId, const char* ref,
                        float top, float bottom, float left, float right,
-                       float height, float width, int index)
+                       float height, float width, bool isRTL, int index)
     {
         RenderPage *page = RenderManager::GetInstance()->GetPage(pageId);
         if (page == nullptr) {
@@ -441,7 +441,7 @@ namespace WeexCore
                                   isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
                                   isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
                                   isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
-        [manager layoutComponent:component frame:frame innerMainSize:renderObject->getLargestMainSize()];
+        [manager layoutComponent:component frame:frame isRTL:isRTL innerMainSize:renderObject->getLargestMainSize()];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -889,13 +889,13 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
             float left = render->getLayoutPositionLeft();
             float height = render->getLayoutHeight();
             float width = render->getLayoutWidth();
-            
+            BOOL isRTL = render->getLayoutDirectionFromPathNode() == WeexCore::kDirectionRTL;
             WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
             CGRect frame = CGRectMake(isnan(WXRoundPixelValue(left))?0:WXRoundPixelValue(left),
                                       isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
                                       isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
                                       isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
-            [manager layoutComponent:component frame:frame innerMainSize:render->getLargestMainSize()];
+            [manager layoutComponent:component frame:frame isRTL:isRTL innerMainSize:render->getLargestMainSize()];
         }
         render->setHasNewLayout(false);
     }

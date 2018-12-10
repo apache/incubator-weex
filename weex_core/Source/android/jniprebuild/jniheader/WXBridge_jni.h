@@ -724,6 +724,7 @@ static jint Java_WXBridge_callLayout(JNIEnv* env, jobject obj, jstring
     int right,
     int height,
     int width,
+    bool isRTL,
     int index) {
   /* Must call RegisterNativesImpl()  */
   //CHECK_CLAZZ(env, obj,
@@ -743,6 +744,7 @@ static jint Java_WXBridge_callLayout(JNIEnv* env, jobject obj, jstring
 "I"
 "I"
 "I"
+"Z"
 "I"
 ")"
 "I",
@@ -751,7 +753,7 @@ static jint Java_WXBridge_callLayout(JNIEnv* env, jobject obj, jstring
   jint ret =
       env->CallIntMethod(obj,
           method_id, instanceId, ref, int(top), int(bottom), int(left),
-              int(right), int(height), int(width), int(index));
+              int(right), int(height), int(width), isRTL, int(index));
   base::android::CheckException(env);
   return ret;
 }

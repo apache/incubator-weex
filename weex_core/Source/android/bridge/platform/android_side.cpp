@@ -299,13 +299,13 @@ int AndroidSide::AddElement(const char *page_id, const char *component_type,
 
 int AndroidSide::Layout(const char *page_id, const char *ref, float top,
                         float bottom, float left, float right, float height,
-                        float width, int index) {
+                        float width, bool isRTL, int index) {
   JNIEnv *env = base::android::AttachCurrentThread();
   if(env == nullptr) {
     return -1;
   }
   int flag = 0;
-  wx_bridge_->Layout(env, page_id, ref, top, bottom, left, right, height, width,
+  wx_bridge_->Layout(env, page_id, ref, top, bottom, left, right, height, width, isRTL,
                      index);
 
   if (flag == -1) {

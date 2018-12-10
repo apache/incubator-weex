@@ -34,7 +34,7 @@ RenderActionLayout::RenderActionLayout(const std::string &page_id,
 void RenderActionLayout::ExecuteAction() {
   WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->Layout(
       this->page_id_.c_str(), this->ref_.c_str(), this->top_, this->bottom_,
-      this->left_, this->right_, this->height_, this->width_, this->index_);
+      this->left_, this->right_, this->height_, this->width_, this->isRTL_, this->index_);
 }
 
 void RenderActionLayout::GetLayoutInfo(const WXCoreLayoutNode *node) {
@@ -44,5 +44,6 @@ void RenderActionLayout::GetLayoutInfo(const WXCoreLayoutNode *node) {
   this->left_ = node->getLayoutPositionLeft();
   this->height_ = node->getLayoutHeight();
   this->width_ = node->getLayoutWidth();
+  this->isRTL_ = node->getLayoutDirection() == WeexCore::kDirectionRTL;
 }
 }  // namespace WeexCore
