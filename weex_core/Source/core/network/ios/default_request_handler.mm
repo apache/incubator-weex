@@ -30,7 +30,10 @@ namespace network {
     void DefaultRequestHandler::Send(const char* instance_id, const char* url, Callback callback) {
         NSURL* ns_url = [NSURL URLWithString:NSSTRING(url)];
         [[WXSDKManager bridgeMgr] DownloadJS:ns_url completion:^(NSString *script) {
-            callback([script UTF8String] ? : nullptr);
+            if (!script) {
+                return;
+            }
+            callback([script UTF8String]);
         }];
     }
 

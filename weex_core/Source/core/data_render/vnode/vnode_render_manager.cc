@@ -243,7 +243,7 @@ void VNodeRenderManager::DownloadAndExecScript(
     std::function<void(const char*)> exec_js) {
   // If script exists in json, run script into js vm
   const json11::Json& script_array =
-      exec_state->context()->raw_json()["script"];
+    exec_state->context()->script_json();
   if (script_array.is_array()) {
     for (auto it = script_array.array_items().begin();
          it != script_array.array_items().end(); it++) {
@@ -264,14 +264,18 @@ void VNodeRenderManager::DownloadAndExecScript(
       // execute callback1
       auto callback2 = weex::base::MakeCopyable([callback = callback1](
                                                     const std::string& result) {
+#ifdef OS_ANDROID
         WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
             weex::base::MakeCopyable([result = std::move(result), callback]() {
               callback(result.c_str());
             }));
+#else
+          callback(result.c_str());
+#endif
       });
       // If script is a url, first download the script, else run script
       // directly.
-      if (content.is_string()) {
+      if (content.is_string() && !content.string_value().empty()) {
         callback1(const_cast<char*>(content.string_value().c_str()));
       } else if (src.is_string()) {
         network::HttpModule http_module;
@@ -322,7 +326,7 @@ void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state, std::vect
     } while (0);
 }
 
-std::string VNodeRenderManager::CreatePageWithContent(const uint8_t *contents, size_t length, const std::string &page_id, const std::string &options, const std::string &init_data) {
+std::string VNodeRenderManager::CreatePageWithContent(const uint8_t *contents, size_t length, const std::string &page_id, const std::string &options, const std::string &init_data,  std::function<void(const char*)> exec_js) {
     InitVM();
 #ifdef DEBUG
     auto start = std::chrono::steady_clock::now();
@@ -355,11 +359,12 @@ std::string VNodeRenderManager::CreatePageWithContent(const uint8_t *contents, s
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], All time:[%lld]\n", duration_post.count());
 #endif
+    DownloadAndExecScript(exec_state, page_id, exec_js);
     return err;
 }
 
-void VNodeRenderManager::CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& init_data) {
-    string err = CreatePageWithContent((const uint8_t *)contents, length, page_id, options, init_data);
+void VNodeRenderManager::CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& init_data, std::function<void(const char*)> exec_js) {
+    string err = CreatePageWithContent((const uint8_t *)contents, length, page_id, options, init_data, exec_js);
     if (!err.empty()) {
         WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id.c_str(), nullptr, err.c_str());
     }

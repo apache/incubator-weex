@@ -84,6 +84,7 @@ class VComponent : public VNode {
 
   bool is_dirty_;
   bool has_dispatch_created_;
+  bool has_moved_;
   // unique id for unique component
   int id_;
   // Unique id for unique template, a template to multiple component

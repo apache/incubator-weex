@@ -161,10 +161,11 @@
     id callUpdateComponentDataBlock = ^(JSValue *instanceId, JSValue *cid, JSValue *data, JSValue *ifCallback) {
         NSString *instanceIdString = [instanceId toString];
         NSString *componentId = [cid toString];
-        NSString *jsonData = [data toString];
+        NSDictionary* jsonData = [data toDictionary];
+        NSString* dataString = [WXUtility JSONString:jsonData];
         WXLogDebug(@"CallUpdateComponentData...%@, %@, %@", instanceIdString, componentId, jsonData);
 
-        return [JSValue valueWithInt32:(int32_t)callUpdateComponentData(instanceIdString, componentId, jsonData) inContext:[JSContext currentContext]];
+        return [JSValue valueWithInt32:(int32_t)callUpdateComponentData(instanceIdString, componentId, dataString) inContext:[JSContext currentContext]];
     };
 
     _jsContext[@"__updateComponentData"] = callUpdateComponentDataBlock;

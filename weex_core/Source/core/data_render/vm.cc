@@ -893,8 +893,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 else {
                     SetNil(a);
                 }
-            }
-            else {
+            } else if (IsString(b)) {
+                LOGE("type String can not get from index");
+            } else {
                 throw VMExecError("Unsupport Type Error With OP_CODE [OP_GETINDEX]");
             }
             break;

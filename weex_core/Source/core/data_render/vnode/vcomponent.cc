@@ -33,6 +33,7 @@ VComponent::VComponent(ExecState *exec_state, int template_id,
     : VNode("", "", ""),
       is_dirty_(false),
       has_dispatch_created_(false),
+      has_moved_(false),
       id_(g_component_id++),
       template_id_(template_id),
       name_(name),
@@ -163,10 +164,12 @@ bool VComponent::Equal(VComponent *old_component) {
 
 void VComponent::MoveTo(VComponent *new_component) {
   new_component->has_dispatch_created_ = has_dispatch_created_;
+  new_component->id_ = id_;
   new_component->SetRootNode(root_vnode_.release());
   if (!Equal(new_component)) {
     new_component->UpdateData();
   }
+  has_moved_ = true;
 }
 
 void VComponent::UpdateData() {
@@ -246,7 +249,7 @@ void VComponent::DispatchUpdated() {
 }
 
 void VComponent::DispatchDestroyed() {
-  if (listener_) {
+  if (listener_ && !has_moved_) {
     listener_->OnDestroyed(this);
   }
   TravelVComponentsWithFunc(&VComponent::DispatchDestroyed, root_vnode());

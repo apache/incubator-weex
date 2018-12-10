@@ -48,7 +48,8 @@ Pod::Spec.new do |s|
                     'weex_core/Source/wson/**/*.{h,hpp,m,mm,c,cpp,cc}',
                     'weex_core/Source/third_party/**/*.{h,hpp,m,mm,c,cpp,cc}',
                     'weex_core/Source/include/**/*.{h,hpp,m,mm,c,cpp,cc}'
-    w.exclude_files = 'weex_core/Source/**/*android.{h,hpp,m,mm,c,cpp,cc}'
+    w.exclude_files = 'weex_core/Source/**/*android.{h,hpp,m,mm,c,cpp,cc}',
+                      'weex_core/Source/core/network/android/'
 
     w.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => ['${PODS_ROOT}/Headers/Public/WeexSDK/core/**'] }
     w.header_mappings_dir = 'weex_core/Source'

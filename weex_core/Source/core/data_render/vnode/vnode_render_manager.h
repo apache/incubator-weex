@@ -45,7 +45,7 @@ class VNodeRenderManager {
  public:
   void CreatePage(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data, std::function<void(const char*)> exec_js);
 
-  void CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& init_data);
+  void CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& init_data, std::function<void(const char*)> exec_js);
 
   bool RefreshPage(const std::string &page_id, const std::string &init_data);
   bool ClosePage(const std::string &page_id);
@@ -85,7 +85,8 @@ class VNodeRenderManager {
   std::string CreatePageWithContent(const uint8_t *contents, size_t length,
                                     const std::string &page_id,
                                     const std::string &options,
-                                    const std::string &init_data);
+                                    const std::string &init_data,
+                                    std::function<void(const char*)> exec_js);
   std::string CreatePageWithContent(const std::string &input,
                                     const std::string &page_id,
                                     const std::string &options,

@@ -699,10 +699,19 @@ void VNodeExecEnv::ParseData(ExecState* state) {
   // main means body
   Value key(state->string_table()->StringFromUTF8("main"));
   auto main_data = JSONToValue(state, json["data"]);
+  if (main_data.type != Value::Type::TABLE) {
+      main_data = state->class_factory()->CreateTable();
+  }
   SetTableValue(ValueTo<Table>(&components_data), &key, main_data);
   auto main_props = JSONToValue(state, json["props"]);
+  if (main_props.type != Value::Type::TABLE) {
+      main_props = state->class_factory()->CreateTable();
+  }
   SetTableValue(ValueTo<Table>(&components_props), &key, main_props);
   auto main_computed = JSONToValue(state, json["computed"]);
+  if (main_computed.type != Value::Type::TABLE) {
+      main_computed = state->class_factory()->CreateTable();
+  }
   SetTableValue(ValueTo<Table>(&components_computed), &key, main_computed);
 
   const json11::Json &components_obj = json["components"];
@@ -714,9 +723,15 @@ void VNodeExecEnv::ParseData(ExecState* state) {
         continue;
       }
       auto temp_data = JSONToValue(state, (*it)["data"]);
+      if (temp_data.type != Value::Type::TABLE) {
+          temp_data = state->class_factory()->CreateTable();
+      }
       Value key(state->string_table()->StringFromUTF8(name.string_value()));
       SetTableValue(ValueTo<Table>(&components_data), &key, temp_data);
       auto temp_props = JSONToValue(state, (*it)["props"]);
+        if (temp_props.type != Value::Type::TABLE) {
+            temp_props = state->class_factory()->CreateTable();
+        }
       SetTableValue(ValueTo<Table>(&components_props), &key, temp_props);
       auto temp_computed = JSONToValue(state, (*it)["computed"]);
       SetTableValue(ValueTo<Table>(&components_computed), &key, temp_computed);

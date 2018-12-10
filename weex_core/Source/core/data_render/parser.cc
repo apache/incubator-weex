@@ -302,6 +302,8 @@ struct ASTParser final {
   inline Handle<Expression> ParseExpression(const json11::Json& json) {
     if (json.is_string()) {
       return factory_->NewStringConstant(json.string_value());
+    } if (json.is_number()) {
+        return factory_->NewIntegralConstant(json.number_value());
     } else {
       return ParseBindingExpression(json);
     }

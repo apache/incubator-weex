@@ -131,6 +131,7 @@ class FuncState {
   inline bool is_class_func() { return is_class_func_; }
   inline ClassInstance * &class_inst() { return class_inst_; }
   inline int &argc() { return argc_; }
+  inline const std::string &name() { return name_; }
   inline std::vector<long> &args() { return args_; }
   std::vector<FuncState *> all_childrens() {
       std::vector<FuncState *> all_childrens;

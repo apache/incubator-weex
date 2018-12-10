@@ -470,6 +470,10 @@ typedef enum : NSUInteger {
         newOptions[bundleUrlOptionKey] = url.absoluteString;
     }
 
+    if ( [url.absoluteString containsString:@"__data_render=true"]) {
+        newOptions[@"DATA_RENDER"] = @(YES);
+    }
+
     if ([url.absoluteString hasSuffix:WEEX_LITE_URL_SUFFIX] || [url.absoluteString containsString:@"__eagle=true"]) {
         newOptions[@"WLASM_RENDER"] = @(YES);
     }

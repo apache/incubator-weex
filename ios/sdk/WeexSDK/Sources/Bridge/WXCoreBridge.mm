@@ -51,113 +51,7 @@
 #include <fstream>
 
 namespace WeexCore
-{
-    static NSString* const JSONSTRING_SUFFIX = @"\t\n\t\r";
-    
-    static NSString* TO_JSON(id object)
-    {
-        if (object == nil) {
-            return nil;
-        }
-        
-        @try {
-            if ([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]) {
-                NSError *error = nil;
-                NSData *data = [NSJSONSerialization dataWithJSONObject:object
-                                                               options:0
-                                                                 error:&error];
-                
-                if (error) {
-                    WXLogError(@"%@", error);
-                    WXAssert(NO, @"Fail to convert object to json. %@", error);
-                    return nil;
-                }
-                
-                return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] stringByAppendingString:JSONSTRING_SUFFIX]; // add suffix so that we know this is a json string
-            }
-        } @catch (NSException *exception) {
-            WXLogError(@"%@", exception);
-            WXAssert(NO, @"Fail to convert object to json. %@", exception);
-            return nil;
-        }
-        
-        return nil;
-    }
-    
-    static id TO_OBJECT(NSString* s)
-    {
-        if ([s hasSuffix:JSONSTRING_SUFFIX]) {
-            if ([s length] == [JSONSTRING_SUFFIX length]) {
-                return [NSNull null];
-            }
-            
-            // s is a json string
-            @try {
-                NSError* error = nil;
-                id jsonObj = [NSJSONSerialization JSONObjectWithData:[s dataUsingEncoding:NSUTF8StringEncoding]
-                                                             options:NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
-                                                               error:&error];
-                
-                if (jsonObj == nil) {
-                    WXLogError(@"%@", error);
-                    WXAssert(NO, @"Fail to convert json to object. %@", error);
-                }
-                else {
-                    return jsonObj;
-                }
-            } @catch (NSException *exception) {
-                WXLogError(@"%@", exception);
-                WXAssert(NO, @"Fail to convert json to object. %@", exception);
-            }
-        }
-        return s; // return s instead
-    }
-    
-    static NSMutableDictionary* NSDICTIONARY(std::map<std::string, std::string>* map)
-    {
-        if (map == nullptr || map->size() == 0)
-            return [[NSMutableDictionary alloc] init];
-        
-        NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:map->size()];
-        for (auto it = map->begin(); it != map->end(); it ++) {
-            id object = TO_OBJECT(NSSTRING(it->second.c_str()));
-            if (object) {
-                [result setObject:object forKey:NSSTRING(it->first.c_str())];
-            }
-        }
-        return result;
-    }
-    
-    static NSMutableDictionary* NSDICTIONARY(std::vector<std::pair<std::string, std::string>>* vec)
-    {
-        if (vec == nullptr || vec->size() == 0)
-            return [[NSMutableDictionary alloc] init];
-        
-        NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:vec->size()];
-        for (auto& p : *vec) {
-            id object = TO_OBJECT(NSSTRING(p.second.c_str()));
-            if (object) {
-                [result setObject:object forKey:NSSTRING(p.first.c_str())];
-            }
-        }
-        return result;
-    }
-    
-    static NSMutableArray* NSARRAY(std::set<std::string>* set)
-    {
-        if (set == nullptr || set->size() == 0)
-            return [[NSMutableArray alloc] init];
-        
-        NSMutableArray* result = [[NSMutableArray alloc] initWithCapacity:set->size()];
-        for (auto& s : *set) {
-            id object = TO_OBJECT(NSSTRING(s.c_str()));
-            if (object) {
-                [result addObject:object];
-            }
-        }
-        return result;
-    }
-    
+{    
     static void consoleWithArguments(NSArray *arguments, WXLogFlag logLevel)
     {
         NSMutableString *jsLog = [NSMutableString string];
@@ -881,12 +775,6 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
             return;
         }
         [[WXSDKManager bridgeMgr] createInstanceForJS:pageId template:NSSTRING(javascript) options:nil data:data];
-        WXPerformBlockOnComponentThread(^{
-            auto root = node_manager->GetRootVNode([pageId UTF8String] ?: "");
-            if (root && root->IsVirtualComponent()) {
-                static_cast<weex::core::data_render::VComponent*>(root)->DispatchCreated();
-            }
-        });
     });
 }
 
@@ -895,7 +783,12 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
     NSString *optionsString = [WXUtility JSONString:options];
     NSString *dataString = [WXUtility JSONString:data];
-    node_manager->CreatePage(static_cast<const char *>(contents.bytes), contents.length, [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "");
+    node_manager->CreatePage(static_cast<const char *>(contents.bytes), contents.length, [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "", [=](const char* javascript) {
+        if (!javascript) {
+            return;
+        }
+        [[WXSDKManager bridgeMgr] createInstanceForJS:pageId template:NSSTRING(javascript) options:nil data:data];
+    });
 }
 
 + (void)destroyDataRenderInstance:(NSString *)pageId
@@ -1145,7 +1038,8 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 
 + (void)callUpdateComponentData:(NSString*)pageId componentId:(NSString*)componentId jsonData:(NSString*)jsonData
 {
-    WeexCore::WeexCoreManager::Instance()->script_bridge()->core_side()->UpdateComponentData([pageId UTF8String] ?: "", [componentId UTF8String] ?: "", [jsonData UTF8String] ?: "");
+    weex::core::data_render::VNodeRenderManager::GetInstance()
+    ->UpdateComponentData([pageId UTF8String] ?: "", [componentId UTF8String] ?: "", [jsonData UTF8String] ?: "");
 }
 
 + (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index

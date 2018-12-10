@@ -150,6 +150,7 @@ public:
         kValueFunctionSuper,
         kValueFunctionClass,
         kValueFunctionArgs,
+        kValueFunctionName,
         kValueFunctionInClosure,
         kValueFunctionOutClosure,
         kValueFunctionInstructions,
@@ -174,7 +175,9 @@ class SectionGlobalConstants : public Section {
 public:
     enum SectionKey {
         kValueGlobalConstantsSize,
-        kValueGlobalConstantsPayload,
+        kValueGlobalConstantsName,
+        kValueGlobalConstantsValue,
+        kValueGlobalConstantsFinished = 255,
     };
     SectionGlobalConstants(ExecStateEncoder *encoder) : Section(encoder) {}
     SectionGlobalConstants(ExecStateDecoder *decoder, uint32_t length) : Section(decoder, length) {}

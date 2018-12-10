@@ -458,7 +458,7 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
       auto node_manager =
           weex::core::data_render::VNodeRenderManager::GetInstance();
       node_manager->CreatePage(script, script_length, instanceId,
-                               render_strategy, initData);
+                               render_strategy, initData, exec_js);
 
       return true;
     }
