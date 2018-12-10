@@ -17,22 +17,24 @@
  * under the License.
  */
 
-#ifdef __cplusplus
-
 #ifndef WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 
 #define WEEXCORE_CSS_DEFAULT_DIRECTION kDirectionLTR
 
+/* These enum definitions may also be used by C files. */
+#ifdef __cplusplus
 namespace WeexCore {
-    /**
-     * MainAxis direction
-     */
-    enum WXCoreDirection {
-        kDirectionInherit,
-        kDirectionLTR,
-        kDirectionRTL
-    };
+#endif
+
+  /**
+   * MainAxis direction
+   */
+  enum WXCoreDirection {
+      kDirectionInherit,
+      kDirectionLTR,
+      kDirectionRTL
+  };
   /**
    * MainAxis direction
    */
@@ -130,6 +132,8 @@ namespace WeexCore {
     kLeft,
   };
 
+#ifdef __cplusplus
 }
-#endif //WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
 #endif
+
+#endif //WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUM_H
