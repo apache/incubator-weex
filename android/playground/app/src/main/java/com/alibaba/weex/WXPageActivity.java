@@ -44,7 +44,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.weex.commons.WXAnalyzerDelegate;
 import com.alibaba.weex.constants.Constants;
@@ -63,7 +62,6 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
-
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -246,8 +244,11 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         try {
           Uri uri = Uri.parse(url);
           mConfigMap.put("bundleUrl", url);
-          if (uri.getPath().endsWith(".wlasm")){
+          if(TextUtils.equals(uri.getQueryParameter("__eagle"), Boolean.TRUE.toString())){
             mInstance.render(TAG, task.response.data, mConfigMap, null);
+          }
+          else if (TextUtils.equals(uri.getQueryParameter("__data_render"), Boolean.TRUE.toString())){
+            mInstance.render(TAG, new String(task.response.data, "UTF-8"), mConfigMap, null, WXRenderStrategy.DATA_RENDER);
           } else {
             mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
           }
