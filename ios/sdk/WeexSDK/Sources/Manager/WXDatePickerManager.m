@@ -66,14 +66,23 @@
         CGRect pickerFrame = CGRectMake(0, 44, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-44);
         datePicker.backgroundColor = [UIColor whiteColor];
         datePicker.frame = pickerFrame;
-        UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 44)];
-        [toolBar setBackgroundColor:[UIColor whiteColor]];
-        UIBarButtonItem* noSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-        noSpace.width=10;
-        UIBarButtonItem* doneBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
-        UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-        UIBarButtonItem* cancelBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel:)];
-        [toolBar setItems:[NSArray arrayWithObjects:noSpace,cancelBtn,flexSpace,doneBtn,noSpace, nil]];
+        // UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 44)];
+        // [toolBar setBackgroundColor:[UIColor whiteColor]];
+        // UIBarButtonItem* noSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+        // noSpace.width=10;
+        // UIBarButtonItem* doneBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
+        // UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+        // UIBarButtonItem* cancelBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel:)];
+        // [toolBar setItems:[NSArray arrayWithObjects:noSpace,cancelBtn,flexSpace,doneBtn,noSpace, nil]];
+
+        UIView *toolBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 44)];
+        UIButton *doneBtn = [self createButton:@"确定" action:@selector(done:) andFrame: CGRectMake([UIScreen mainScreen].bounds.size.width-115, 2, 100, 40)];
+        doneBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
+        UIButton *cancelBtn = [self createButton:@"取消" action:@selector(cancel:) andFrame:CGRectMake(15, 2, 100, 40)];
+        cancelBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+        [toolBar addSubview:doneBtn];
+        [toolBar addSubview:cancelBtn];
+
         [self.datePickerView addSubview:datePicker];
         [self.datePickerView addSubview:toolBar];
         [self.backgroudView addSubview:self.datePickerView];
@@ -131,6 +140,16 @@
             }
         }
     }
+}
+
+- (UIButton *)createButton:(NSString *)title action: (SEL)selector andFrame:(CGRect)rect  {
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button setTitle:title forState:UIControlStateNormal];
+    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    button.titleLabel.font = [UIFont systemFontOfSize:16.f];
+    button.frame = rect;
+    [button addTarget:self action:selector forControlEvents:UIControlEventTouchUpInside];
+    return button;
 }
 
 -(UIView *)createBackgroundView
