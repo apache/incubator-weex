@@ -19,7 +19,7 @@
 
 #include "core/data_render/js_common_function.h"
 #include "core/data_render/common_error.h"
-#include <base/LogDefines.h>
+#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {
