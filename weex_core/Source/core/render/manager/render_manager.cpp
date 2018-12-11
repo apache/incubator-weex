@@ -19,13 +19,13 @@
 
 #include <utility>
 #include <vector>
-#include "wson/wson_parser.h"
-#include <base/LogDefines.h>
 #include <chrono>
 
+#include "wson/wson_parser.h"
+#include "base/LogDefines.h"
 #include "base/ViewUtils.h"
-#include "core/css/constants_name.h"
 #include "base/TimeUtils.h"
+#include "core/css/constants_name.h"
 #include "core/layout/measure_func_adapter.h"
 #include "core/parser/dom_wson.h"
 #include "core/render/manager/render_manager.h"

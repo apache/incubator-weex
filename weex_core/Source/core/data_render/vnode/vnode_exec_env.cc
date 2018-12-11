@@ -29,7 +29,7 @@
 #include "core/data_render/js_common_function.h"
 #include "core/data_render/vnode/vcomponent.h"
 #include "core/data_render/vnode/vnode_render_manager.h"
-#include <base/LogDefines.h>
+#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {

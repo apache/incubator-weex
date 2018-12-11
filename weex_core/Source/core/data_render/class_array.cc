@@ -23,7 +23,7 @@
 #include "core/data_render/exec_state.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/table.h"
-#include <base/LogDefines.h>
+#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {

@@ -28,7 +28,7 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
-#include <base/LogDefines.h>
+#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {
