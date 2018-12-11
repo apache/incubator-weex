@@ -166,7 +166,7 @@ void VComponent::MoveTo(VComponent *new_component) {
   new_component->has_dispatch_created_ = has_dispatch_created_;
   new_component->id_ = id_;
   new_component->SetRootNode(root_vnode_.release());
-  if (!Equal(new_component)) {
+  if (!new_component->Equal(this)) {
     new_component->UpdateData();
   }
   has_moved_ = true;
