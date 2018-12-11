@@ -90,7 +90,7 @@ namespace WeexCore
         
         int Layout(const char* pageId, const char* ref,
                        float top, float bottom, float left, float right,
-                       float height, float width, int index) override;
+                       float height, float width, bool isRTL, int index) override;
         
         int UpdateStyle(const char* pageId, const char* ref,
                             std::vector<std::pair<std::string, std::string>> *style,
@@ -116,6 +116,12 @@ namespace WeexCore
         void PostMessage(const char* vm_id, const char* data, int dataLength) override {};
         void DispatchMessage(const char* client_id,
                              const char* data, int dataLength, const char* callback, const char* vm_id) override {};
+        
+        std::unique_ptr<WeexJSResult> DispatchMessageSync(const char* client_id, const char* data,
+                                                          int dataLength, const char* vm_id) override {
+            return std::unique_ptr<WeexJSResult>();
+        }
+        
         void OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult>& result) override {};
     };
     
@@ -196,6 +202,7 @@ namespace WeexCore
 + (void)registerComponentAffineType:(NSString *)type asType:(NSString *)baseType;
 
 + (BOOL)isComponentAffineType:(NSString *)type asType:(NSString *)baseType;
++ (void)registerCoreEnv:(NSString*)key withValue:(NSString*)value;
 
 @end
 

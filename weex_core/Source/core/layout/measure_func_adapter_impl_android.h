@@ -46,6 +46,7 @@ namespace WeexCore {
       }
 
       JNIEnv* env = base::android::AttachCurrentThread();
+      if (!env) return size;
 
       cumsmeasure_Imple_Android(env, measureFunc,
                                 width, height,
@@ -65,6 +66,7 @@ namespace WeexCore {
       }
 
         JNIEnv *env = base::android::AttachCurrentThread();
+      if (!env) return;
       LayoutBeforeImplAndroid(env, measureFunc);
       env->DeleteLocalRef(measureFunc);
     }
@@ -75,6 +77,7 @@ namespace WeexCore {
         return;
       }
         JNIEnv *env = base::android::AttachCurrentThread();
+      if (!env) return;
       LayoutAfterImplAndroid(env, measureFunc, width, height);
       env->DeleteLocalRef(measureFunc);
     }

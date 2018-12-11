@@ -20,5 +20,8 @@
 #import "WXBridgeProtocol.h"
 
 @interface WXJSCoreBridge : NSObject <WXBridgeProtocol>
-@property (nonatomic,assign)BOOL multiContext;
+
+- (instancetype)init;
+- (instancetype)initWithoutDefaultContext;
+
 @end

@@ -128,8 +128,11 @@ static jint LayoutRenderObject(JNIEnv* env, jclass jcaller,
     return (jint)render->getLayoutHeight();
 }
 
-
-
+static jint RenderObjectGetLayoutDirectionFromPathNode(JNIEnv* env, jclass jcaller,
+                                   jlong ptr){
+    RenderObject* renderObject = convert_long_to_render_object(ptr);
+    return renderObject->getLayoutDirectionFromPathNode();
+}
 
 static jboolean RenderObjectHasNewLayout(JNIEnv* env, jclass jcaller,
                                      jlong ptr){

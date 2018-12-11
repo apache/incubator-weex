@@ -26,6 +26,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class WXCirclePageAdapter extends PagerAdapter {
@@ -37,10 +38,24 @@ public class WXCirclePageAdapter extends PagerAdapter {
   private List<View> shadow = new ArrayList<>();
   private boolean needLoop = true;
 
+  public boolean isRTL = false;
+  private List<View> originalViews = new ArrayList<>();
+
   public WXCirclePageAdapter(List<View> views, boolean needLoop) {
     super();
     this.views = new ArrayList<>(views);
+    this.originalViews = new ArrayList<>(views);
     this.needLoop = needLoop;
+  }
+
+  public void setLayoutDirectionRTL(boolean isRTL) {
+    if (isRTL == this.isRTL) return;
+    this.isRTL = isRTL;
+    this.views = new ArrayList<>(this.originalViews);
+    if (isRTL) {
+      Collections.reverse(this.views);
+    }
+    ensureShadow();
   }
 
   public WXCirclePageAdapter() {
@@ -56,7 +71,13 @@ public class WXCirclePageAdapter extends PagerAdapter {
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("onPageSelected >>>> addPageView");
     }
-    views.add(view);
+
+    originalViews.add(view);
+    if (this.isRTL) {
+      views.add(0, view);
+    } else {
+      views.add(view);
+    }
     ensureShadow();
   }
 
@@ -65,6 +86,7 @@ public class WXCirclePageAdapter extends PagerAdapter {
       WXLogUtils.d("onPageSelected >>>> removePageView");
     }
     views.remove(view);
+    originalViews.remove(view);
     ensureShadow();
   }
 
@@ -77,6 +99,10 @@ public class WXCirclePageAdapter extends PagerAdapter {
     views.remove(index);
     views.add(index, newView);
     ensureShadow();
+
+    index = originalViews.indexOf(oldView);
+    originalViews.remove(index);
+    originalViews.add(index, newView);
   }
 
   @Override

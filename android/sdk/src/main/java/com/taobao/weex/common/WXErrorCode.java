@@ -66,7 +66,7 @@ public enum WXErrorCode {
   /**
    * Failure for executing JavaScript function.
    */
-  WX_ERR_JS_EXECUTE("-2013", "JavaScript execute error!",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+  WX_ERR_JS_EXECUTE("-2013", "JavaScript execute error!",ErrorType.JS_ERROR,ErrorGroup.JS),
 
 
   /*
@@ -158,7 +158,7 @@ public enum WXErrorCode {
   /**
    * Single progress init error
    */
-  WX_ERR_SINGLE_PROCESS_DLOPEN_FILE_NOT_EXIST("-1004", "so file is not exist",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+  WX_ERR_SINGLE_PROCESS_DLOPEN_FILE_NOT_EXIST("-1004", "so file does not exist",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
   WX_ERR_SINGLE_PROCESS_DLOPEN_FLAIED("-1005", "dlopen so file failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
@@ -170,7 +170,7 @@ public enum WXErrorCode {
 
   WX_JS_FRAMEWORK_REINIT_MULPROCESS_FAILED("-1009", "js framework reinit multiProcess failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
-  WX_JS_FRAMEWORK_INIT_FAILED("-1010", "js framework init  failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+  WX_JS_FRAMEWORK_INIT_FAILED("-1010", "js framework init failed",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
   WX_JS_FRAMEWORK_INIT_SINGLE_PROCESS_SUCCESS("-1011", "js framework init success in single process",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 

@@ -18,6 +18,7 @@
  */
 #include <algorithm>
 #include "core/data_render/class.h"
+#include "core/data_render/rax_jsx_ast.h"
 
 namespace weex {
 namespace core {
@@ -31,7 +32,7 @@ void AddClassStaticCFunc(ClassDescriptor *p_desc, const std::string& name, CFunc
     Value func;
     func.type = Value::Type::CFUNC;
     func.cf = reinterpret_cast<void *>(function);
-    p_desc->static_funcs_->Add(name, func);
+    p_desc->statics_->Add(name, func);
 }
 
 void AddClassCFunc(ClassDescriptor *p_desc, const std::string& name, CFunction function) {
@@ -45,7 +46,22 @@ ClassInstance *NewClassInstance(ClassDescriptor *p_desc) {
     return new ClassInstance(p_desc);
 }
     
-Value *GetClassMember(ClassInstance *inst, std::string &name) {
+bool FindConstructor(ClassInstance *p_inst, Value *caller, Value *caller_inst) {
+    bool constructor = false;
+    while (p_inst) {
+        int index = p_inst->p_desc_->funcs_->IndexOf(JS_GLOBAL_CONSTRUCTOR);
+        if (index >= 0) {
+            *caller = *p_inst->p_desc_->funcs_->Find(index);
+            SetCIValue(caller_inst, reinterpret_cast<GCObject *>(p_inst));
+            constructor = true;
+            break;
+        }
+        p_inst = p_inst->p_super_;
+    }
+    return constructor;
+}
+    
+Value *GetClassMember(ClassInstance *inst,const std::string &name) {
     Value *ret = nullptr;
     do {
         ClassInstance *inst_current = inst;
@@ -77,7 +93,7 @@ Value *GetClassMember(ClassInstance *inst, std::string &name) {
     return ret;
 }
 
-Value *GetClassMemberVar(ClassInstance *inst, std::string &name) {
+Value *GetClassMemberVar(ClassInstance *inst,const std::string &name) {
     Value *ret = nullptr;
     do {
         Variables *funcs = inst->p_desc_->funcs_.get();
@@ -94,6 +110,25 @@ Value *GetClassMemberVar(ClassInstance *inst, std::string &name) {
         }
         else {
             ret = funcs->Find(index);
+        }
+        
+    } while (0);
+    
+    return ret;
+}
+    
+Value *GetClassStaticMemberVar(ClassDescriptor *desc, const std::string &name) {
+    Value *ret = nullptr;
+    do {
+        Variables *static_vars = desc->statics_.get();
+        int index = static_vars->IndexOf(name);
+        if (index < 0) {
+            Value var;
+            index = static_vars->Add(name, var);
+            ret = static_vars->Find(index);
+        }
+        else {
+            ret = static_vars->Find(index);
         }
         
     } while (0);

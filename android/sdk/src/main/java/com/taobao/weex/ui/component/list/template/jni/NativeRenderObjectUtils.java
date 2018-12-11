@@ -51,6 +51,7 @@ public class NativeRenderObjectUtils {
      * */
     public static native int nativeLayoutRenderObject(long ptr, float width, float height);
 
+    public static native int nativeRenderObjectGetLayoutDirectionFromPathNode(long ptr);
     /**
      * get child length
      * */

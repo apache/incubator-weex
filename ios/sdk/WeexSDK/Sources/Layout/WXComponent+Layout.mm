@@ -33,8 +33,6 @@ bool flexIsUndefined(float value) {
     return isnan(value);
 }
 
-
-
 @implementation WXComponent (Layout)
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -147,18 +145,51 @@ bool flexIsUndefined(float value) {
                 }
             }
             
-            [self _resetNativeBorderRadius];
+            [strongSelf _resetNativeBorderRadius];
+            
+            if ([WXUtility enableRTLLayoutDirection]) {
+                if ([strongSelf isDirectionRTL] != strongSelf -> _isLastLayoutDirectionRTL) {
+                    strongSelf -> _isLastLayoutDirectionRTL = [strongSelf isDirectionRTL];
+                    [strongSelf _layoutDirectionDidChanged:[strongSelf isDirectionRTL]];
+                }
+            }
             
             if (strongSelf->_transform) {
                 [strongSelf->_transform applyTransformForView:strongSelf.view];
             }
             
+            [strongSelf _adjustForRTL];
+            
             if (strongSelf->_backgroundImage) {
                 [strongSelf setGradientLayer];
             }
+            
             [strongSelf setNeedsDisplay];
         }];
+    } else if ([WXUtility enableRTLLayoutDirection]) {
+        // if frame is not change, we still need check was layoutDirection changed
+        if ([self isDirectionRTL] != _isLastLayoutDirectionRTL) {
+            self -> _isLastLayoutDirectionRTL = [self isDirectionRTL];
+            __weak typeof(self) weakSelf = self;
+            [self.weexInstance.componentManager _addUITask:^{
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                [strongSelf _layoutDirectionDidChanged:[strongSelf isDirectionRTL]];
+                if (strongSelf->_transform) {
+                    [strongSelf->_transform applyTransformForView:strongSelf.view];
+                }
+                [strongSelf _adjustForRTL];
+            }];
+        }
     }
+}
+
+- (void)_layoutDirectionDidChanged:(BOOL)isRTL {
+    WXAssertMainThread();
+    [self layoutDirectionDidChanged:isRTL];
+}
+
+- (void)layoutDirectionDidChanged:(BOOL)isRTL {
+    
 }
 
 - (void)_layoutDidFinish
@@ -168,6 +199,7 @@ bool flexIsUndefined(float value) {
     if (_positionType == WXPositionTypeSticky) {
         [self.ancestorScroller adjustSticky];
     }
+
     [self layoutDidFinish];
 }
 
@@ -183,8 +215,14 @@ bool flexIsUndefined(float value) {
     if (_flexCssNode == nullptr) {
         return;
     }
-    
+
     BOOL needLayout = NO;
+    
+    // CSS direction for RTL Layout
+    if (styles[@"direction"]) {
+        _flexCssNode->setDirection([self fxDirection:styles[@"direction"]], isUpdate);
+        needLayout = YES;
+    }
     
     // flex
     if (styles[@"flex"]) {
@@ -446,6 +484,12 @@ bool flexIsUndefined(float value) {
     return _flexCssNode ? _flexCssNode->getStylePositionType() : kRelative;
 }
 
+- (WXCoreDirection)getCssDirection
+{
+    WXAssert(_flexCssNode != nullptr, @"Css node is null.");
+    return _flexCssNode ? _flexCssNode->getDirection() : WEEXCORE_CSS_DEFAULT_DIRECTION;
+}
+
 - (NSString*)convertLayoutValueToStyleValue:(NSString*)valueName
 {
     if (_flexCssNode == nullptr) {
@@ -533,7 +577,9 @@ do {\
         if (styles.count<=0) {
             return;
         }
-        
+    
+        WX_FLEX_STYLE_RESET_CSS_NODE(direction, @(WeexCore::kDirectionInherit))
+    
         WX_FLEX_STYLE_RESET_CSS_NODE(flex, @0.0)
         WX_FLEX_STYLE_RESET_CSS_NODE(flexDirection, @(WeexCore::kFlexDirectionColumn))
         WX_FLEX_STYLE_RESET_CSS_NODE(alignItems, @(WeexCore::kAlignItemsStretch))
@@ -641,6 +687,18 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
         }
     }
     return WeexCore::kRelative;
+}
+
+- (WeexCore::WXCoreDirection)fxDirection:(id)value
+{
+    if([value isKindOfClass:[NSString class]]){
+        if ([value isEqualToString:@"rtl"]) {
+            return WeexCore::kDirectionRTL;
+        } else if ([value isEqualToString:@"ltr"]) {
+            return WeexCore::kDirectionLTR;
+        }
+    }
+    return WeexCore::kDirectionInherit;
 }
 
 - (WeexCore::WXCoreFlexDirection)fxFlexDirection:(id)value
@@ -755,6 +813,43 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
         [WXCoreBridge removeRenderObjectFromMap:subcomponent.weexInstance.instanceId object:node];
         delete node; // also will delete all children recursively
     }
+}
+
+#pragma mark - RTL
+
+- (BOOL)isDirectionRTL {
+    if (![WXUtility enableRTLLayoutDirection]) return NO;
+
+    return _isLayoutDirectionRTL;
+}
+
+- (void)_adjustForRTL {
+    if (![WXUtility enableRTLLayoutDirection]) return;
+    
+    if (self->_positionType == WXPositionTypeFixed) return;
+    
+    if (self.supercomponent && self.supercomponent.isDirectionRTL && [self.supercomponent shouldTransformSubviewsWhenRTL]) {
+        if (_transform) {
+            self.view.layer.transform = CATransform3DConcat(self.view.layer.transform, CATransform3DScale(CATransform3DIdentity, -1, 1, 1));
+        } else {
+            self.view.layer.transform = CATransform3DScale(CATransform3DIdentity, -1, 1, 1);
+        }
+    } else {
+        if (!_transform) {
+            self.view.layer.transform = CATransform3DIdentity;
+        }
+    }
+}
+
+// Now we scrollView RTL solution is tranform
+// so scrollView need tranform subviews when RTL by default
+// if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
+- (BOOL)shouldTransformSubviewsWhenRTL {
+    return [self.view isKindOfClass:[UIScrollView class]];
+}
+
+- (void)_setIsLayoutRTL:(BOOL)isRTL {
+    _isLayoutDirectionRTL = isRTL;
 }
 
 @end

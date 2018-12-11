@@ -80,7 +80,7 @@ class AndroidSide : public PlatformBridge::PlatformSide {
                  const WXCorePadding& paddings,
                  const WXCoreBorderWidth& borders, bool willLayout) override;
   int Layout(const char* page_id, const char* ref, float top, float bottom,
-             float left, float right, float height, float width, int index) override;
+             float left, float right, float height, float width, bool isRTL, int index) override;
 
   int UpdateStyle(
       const char* pageId, const char* ref,
@@ -109,6 +109,10 @@ class AndroidSide : public PlatformBridge::PlatformSide {
   void PostMessage(const char* vm_id, const char* data, int dataLength) override;
   void DispatchMessage(const char* client_id,
                        const char* data, int dataLength, const char* callback, const char* vm_id) override;
+  std::unique_ptr<WeexJSResult> DispatchMessageSync(const char* client_id,
+                                                    const char* data,
+                                                    int dataLength,
+                                                    const char* vm_id) override;
   void OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult>& result) override;
 
   jobject getMeasureFunc(const char* pageId, jlong renderObjectPtr);

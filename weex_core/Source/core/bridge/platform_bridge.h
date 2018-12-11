@@ -199,7 +199,7 @@ class PlatformBridge {
                            bool willLayout = true) = 0;
     virtual int Layout(const char* page_id, const char* ref, float top,
                        float bottom, float left, float right, float height,
-                       float width, int index) = 0;
+                       float width, bool isRTL, int index) = 0;
 
     virtual int UpdateStyle(
         const char* pageId, const char* ref,
@@ -226,8 +226,12 @@ class PlatformBridge {
         const char* pageId, const char* ref,
         std::vector<std::pair<std::string, std::string>>* style) = 0;
     virtual void PostMessage(const char* vm_id, const char* data, int dataLength) = 0;
-    virtual void DispatchMessage(const char* client_id,
-                                 const char* data, int dataLength, const char* callback, const char* vm_id) = 0;
+    virtual void DispatchMessage(const char* client_id, const char* data,
+                                 int dataLength, const char* callback,
+                                 const char* vm_id) = 0;
+    virtual std::unique_ptr<WeexJSResult> DispatchMessageSync(
+        const char* client_id, const char* data, int dataLength,
+        const char* vm_id) = 0;
     virtual void OnReceivedResult(long callback_id,
                                   std::unique_ptr<WeexJSResult>& result) = 0;
 

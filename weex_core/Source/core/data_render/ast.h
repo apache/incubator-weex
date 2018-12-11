@@ -67,10 +67,14 @@ namespace data_render {
   M(ForStatement)        \
   M(ContinueStatement)   \
   M(BreakStatement)      \
+  M(CaseStatement)       \
+  M(SwitchStatement)     \
+  M(TryCatchStatement)   \
   M(BlockStatement)      \
   M(FunctionPrototype)   \
   M(FunctionStatement)   \
   M(StringConstant)      \
+  M(RegexConstant)       \
   M(BinaryExpression)    \
   M(TernaryExpression)   \
   M(AssignExpression)    \
@@ -99,6 +103,7 @@ namespace data_render {
   M(NewExpression)        \
   M(ArrowFunctionStatement) \
   M(ClassBody)              \
+  M(ClassProperty)          \
   M(ExpressionList)
 
 class ASTVisitor;
@@ -117,7 +122,7 @@ enum class ASTNodeType {
       kNrType
 };
 
-extern const char* type_as_string[(int)ASTNodeType::kNrType];
+extern const char *type_as_string[(int)ASTNodeType::kNrType];
 
 class Expression : public RefCountObject {
  protected:
@@ -132,7 +137,7 @@ class Expression : public RefCountObject {
   virtual ASTNodeType type() const = 0;
   virtual void SetScope(Scope *scope) { scope_ = scope; }
   virtual Scope *GetScope() { return scope_; }
-    
+
   // helper conversion functions
 #define AS_EXPRESSION_FUNCTION(Type) \
   virtual Handle<Type> As##Type() { assert(0 && "Expression is not " #Type); }
@@ -174,17 +179,17 @@ class ExpressionList : public Expression {
  private:
   std::vector<Handle<Expression>> exprs_;
 };
-    
+
 class ClassBody : public Expression {
 public:
     using iterator = std::vector<Handle<Expression>>::iterator;
-    
+
     void Insert(Handle<Expression> expr) { body_.push_back(expr); }
-    
+
     size_t Size() { return body_.size(); }
-    
+
     std::vector<Handle<Expression>>& raw_list() { return body_; }
-    
+
     iterator begin() { return body_.begin(); }
     iterator end() { return body_.end(); }
     DEFINE_NODE_TYPE(ClassBody, Expression);
@@ -233,6 +238,38 @@ class StringConstant : public Expression {
       : Expression(), str_(str) {}
   std::string& string() { return str_; }
   DEFINE_NODE_TYPE(StringConstant, Expression);
+};
+
+class RegexConstant : public Expression {
+ private:
+  std::string str_;
+  std::string str_flag_;
+
+ public:
+  RegexConstant(Position &loc, Scope *scope, const std::string &str)
+    : Expression(loc, scope)
+    {
+      auto p = str.find_last_of('$');
+      if (p==std::string::npos){
+        str_ = str;
+      } else {
+        str_ = str.substr(0,p);
+        str_flag_ = str.substr(p+1);
+      }
+    }
+  RegexConstant(const std::string& str)
+      : Expression() {
+    auto p = str.find_last_of('$');
+    if (p==std::string::npos){
+      str_ = str;
+    } else {
+      str_ = str.substr(0,p);
+      str_flag_ = str.substr(p+1);
+    }
+  }
+  std::string& reg() { return str_; }
+  std::string& flag() { return str_flag_; }
+  DEFINE_NODE_TYPE(RegexConstant, Expression);
 };
 
 class TernaryExpression : public Expression {
@@ -305,7 +342,7 @@ class BinaryExpression : public Expression {
   Handle<Expression> lhs_;
   Handle<Expression> rhs_;
 };
-    
+
 enum class DeclarationKind {
     kConst,
 };
@@ -462,7 +499,8 @@ enum class PrefixOperation {
   kIncrement,
   kDecrement,
   kNot,
-  kUnfold
+  kUnfold,
+  kTypeof,
 };
 
 class PrefixExpression : public Expression {
@@ -497,7 +535,7 @@ class PostfixExpression : public Expression {
   PostfixOperation op_;
   Handle<Expression> expr_;
 };
-    
+
 enum class ProxyOrder { ProxyArray, ProxyObject };
 
 class ObjectConstant : public Expression {
@@ -538,7 +576,7 @@ class ArrayConstant : public Expression {
  private:
   ProxyArray exprs_;
 };
-    
+
 enum class AssignOperation {
     kAssign,
     kAssignAdd,
@@ -567,37 +605,36 @@ public:
     UndefinedConstant(Position &loc, Scope *scope)
     : Expression(loc, scope)
     { }
-    
+
     DEFINE_NODE_TYPE(UndefinedConstant, Expression);
 };
-    
+
 class NewExpression : public Expression {
 public:
-    NewExpression(Position &loc, Scope *scope, Handle<Expression> member)
-    : Expression(loc, scope), member_{ member } { }
-    NewExpression(Handle<Expression> member)
-    : Expression(), member_{ member } { }
+    NewExpression(Position &loc, Scope *scope, Handle<Expression> name, Handle<ExpressionList> args = nullptr)
+    : Expression(loc, scope), name_(name), args_(args) { }
+    NewExpression(Handle<Expression> name, Handle<ExpressionList> args = nullptr)
+    : Expression(), name_(name), args_(args) { }
 
-    Handle<Expression> member() { return member_; }
+    Handle<Expression> name() { return name_; }
+    Handle<ExpressionList> args() { return args_; }
     bool ProduceRValue() override { return false; }
-    void set_is_class_(bool is_class) { is_class_ = is_class; };
-    bool is_class() { return is_class_; }
     DEFINE_NODE_TYPE(NewExpression, Expression);
 private:
-    Handle<Expression> member_;
-    bool is_class_{false};
+    Handle<Expression> name_;
+    Handle<ExpressionList> args_;
 };
-    
+
 class ThisExpression : public Expression {
 public:
     ThisExpression(Position &loc, Scope *scope)
     : Expression(loc, scope)
     { }
-    
+
     bool ProduceRValue() override { return false; }
     DEFINE_NODE_TYPE(ThisExpression, Expression);
 };
-    
+
 class CommaExpression : public Expression {
 public:
     CommaExpression(Handle<ExpressionList> exprs)
@@ -605,13 +642,50 @@ public:
     CommaExpression(Position &loc, Scope *scope, Handle<ExpressionList> exprs)
     : Expression(loc, scope), exprs_{ exprs }
     { }
-    
+
     Handle<ExpressionList> exprs() { return exprs_; }
     DEFINE_NODE_TYPE(CommaExpression, Expression);
 private:
     Handle<ExpressionList> exprs_;
 };
     
+class ClassProperty : public Expression {
+public:
+    ClassProperty(Position &loc, Scope *scope, std::string name, Handle<Expression> init)
+    : Expression(loc, scope), name_(name), init_{init} { }
+    inline void set_is_static(bool is_static) { is_static_ = is_static; }
+    inline bool is_static() { return is_static_; }
+    inline std::string &name() { return name_; }
+    inline Handle<Expression>& init() { return init_; }
+    DEFINE_NODE_TYPE(ClassProperty, Expression);
+private:
+    std::string name_;
+    Handle<Expression> init_;
+    bool is_static_{false};
+};
+
+class TryCatchStatement : public Expression {
+ public:
+  TryCatchStatement(Handle<Expression> try_block,
+                    Handle<Expression> catch_expr, Handle<Expression> catch_block, Handle<Expression> finally)
+      : Expression(), try_block_{ try_block }, catch_expr_{ catch_expr },
+        catch_block_{ catch_block }, finally_{ finally }
+  { }
+
+
+  Handle<Expression> try_block() { return try_block_; }
+  Handle<Expression> catch_expr() { return catch_expr_; }
+  Handle<Expression> catch_block() { return catch_block_; }
+  Handle<Expression> finally() { return finally_; }
+  DEFINE_NODE_TYPE(TryCatchStatement,Expression);
+ private:
+  Handle<Expression> try_block_;
+  Handle<Expression> catch_expr_;
+  Handle<Expression> catch_block_;
+  Handle<Expression> finally_;
+};
+
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

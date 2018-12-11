@@ -28,11 +28,11 @@ namespace data_render {
     
 class VNodeExecEnv {
  public:
-  static void InitCFuncEnv(ExecState* state);
-  static void InitGlobalValue(ExecState* state);
-  static void InitInitDataValue(ExecState* state,
-                                const std::string& init_data_str);
-  static void InitStyleList(ExecState* state);
+  static void ImportExecEnv(ExecState *state);
+  static void ImportExecData(ExecState *state, const std::string &init_data_str);
+  static void ParseStyle(ExecState *state);
+  static void ParseData(ExecState *state);
+  static void ParseScript(ExecState *state);
 };
     
 Value StringToValue(ExecState *exec_state, const std::string &str);

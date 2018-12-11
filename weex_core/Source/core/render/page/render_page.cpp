@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <math.h>
 #include "core/render/page/render_page.h"
 #include "base/TimeUtils.h"
 #include "base/ViewUtils.h"
@@ -156,6 +157,10 @@ bool RenderPage::AddRenderObject(const std::string &parent_ref,
   if (parent == nullptr || child == nullptr) {
     return false;
   }
+    
+  if (WeexCore::WXCoreEnvironment::getInstance()->isInteractionLogOpen()){
+    LOGD("wxInteractionAnalyzer: [weexcore][addElementStart],%s,%s,%s",this->page_id().c_str(),child->type().c_str(),child->ref().c_str());
+  }
 
   // add child to Render Tree
   insert_posiotn = parent->AddRenderObject(insert_posiotn, child);
@@ -167,6 +172,9 @@ bool RenderPage::AddRenderObject(const std::string &parent_ref,
   SendAddElementAction(child, parent, insert_posiotn, false);
 
   Batch();
+  if (WeexCore::WXCoreEnvironment::getInstance()->isInteractionLogOpen()){
+    LOGD("wxInteractionAnalyzer: [weexcore][addElementEnd],%s,%s,%s",this->page_id().c_str(),child->type().c_str(),child->ref().c_str());
+  }
   return true;
 }
 
@@ -220,7 +228,8 @@ bool RenderPage::UpdateStyle(
   std::vector<std::pair<std::string, std::string>> *margin = nullptr;
   std::vector<std::pair<std::string, std::string>> *padding = nullptr;
   std::vector<std::pair<std::string, std::string>> *border = nullptr;
-
+  bool inheriableLayout = false;
+    
   bool flag = false;
   int result =
       WeexCoreManager::Instance()
@@ -276,13 +285,16 @@ bool RenderPage::UpdateStyle(
                   flag = true;
               });
           break;
+          case kTypeInheritableLayout:
+              inheriableLayout = true;
+              break;
         default: break;
       }
     }
   }
 
   if (style != nullptr || margin != nullptr || padding != nullptr ||
-      border != nullptr)
+      border != nullptr || inheriableLayout)
     SendUpdateStyleAction(render, style, margin, padding, border);
 
   Batch();

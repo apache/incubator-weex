@@ -34,6 +34,7 @@ static Value push(ExecState *exec_state);
 static Value slice(ExecState *exec_state);
 static Value forEach(ExecState *exec_state);
 static Value indexOf(ExecState *exec_state);
+static Value map(ExecState *exec_state);
 
 ClassDescriptor *NewClassArray() {
     ClassDescriptor *array_desc = new ClassDescriptor(nullptr);
@@ -42,17 +43,8 @@ ClassDescriptor *NewClassArray() {
     AddClassCFunc(array_desc, "slice", slice);
     AddClassCFunc(array_desc, "forEach", forEach);
     AddClassCFunc(array_desc, "indexOf", indexOf);
+    AddClassCFunc(array_desc, "map", map);
     return array_desc;
-}
-    
-int IndexOf(const std::vector<Value> &items, const Value *val) {
-    auto iterator = std::find(items.begin(), items.end(), val);
-    if (iterator != items.end()) {
-        return (int)std::distance(items.begin(), iterator);
-    }
-    else {
-        return -1;
-    }
 }
 
 int SetArray(Array *array, Value *index, const Value &val) {
@@ -160,6 +152,33 @@ static Value forEach(ExecState *exec_state) {
         Value *func = exec_state->GetArgument(1);
         if (!IsFunction(func)) {
             throw VMExecError("forEach => isn't a function");
+        }
+        std::vector<Value> items = ValueTo<Array>(array)->items;
+        for (int i = 0; i < items.size(); i++) {
+            Value item = items[i];
+            Value index = Value(i);
+            std::vector<Value> args = { item, index };
+            exec_state->Call(func, args);
+        }
+        
+    } while (0);
+    
+    return Value();
+}
+    
+static Value map(ExecState *exec_state) {
+    do {
+        size_t length = exec_state->GetArgumentCount();
+        if (length < 2) {
+            break;
+        }
+        Value *array = exec_state->GetArgument(0);
+        if (!IsArray(array)) {
+            throw VMExecError("map caller isn't a Array");
+        }
+        Value *func = exec_state->GetArgument(1);
+        if (!IsFunction(func)) {
+            throw VMExecError("map callback isn't a function");
         }
         std::vector<Value> items = ValueTo<Array>(array)->items;
         for (int i = 0; i < items.size(); i++) {

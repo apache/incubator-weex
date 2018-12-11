@@ -32,6 +32,7 @@ typedef WeexCore::WXCoreJustifyContent WXCoreJustifyContent;
 typedef WeexCore::WXCoreAlignItems WXCoreAlignItems;
 typedef WeexCore::WXCoreAlignSelf WXCoreAlignSelf;
 typedef WeexCore::WXCorePositionType WXCorePositionType;
+typedef WeexCore::WXCoreDirection WXCoreDirection;
 
 extern "C" {
 #endif
@@ -50,6 +51,7 @@ typedef enum WXCoreJustifyContent WXCoreJustifyContent;
 typedef enum WXCoreAlignItems WXCoreAlignItems;
 typedef enum WXCoreAlignSelf WXCoreAlignSelf;
 typedef enum WXCorePositionType WXCorePositionType;
+typedef enum WXCoreDirection WXCoreDirection;
 
 #endif
 
@@ -63,6 +65,8 @@ typedef enum WXCorePositionType WXCorePositionType;
     CGRect _calculatedFrame;
     CGPoint _absolutePosition;
     WXPositionType _positionType;
+    BOOL _isLastLayoutDirectionRTL;
+    BOOL _isLayoutDirectionRTL;
 }
 
 /**
@@ -125,6 +129,11 @@ typedef enum WXCorePositionType WXCorePositionType;
 - (WXCorePositionType)getCssStylePositionType;
 
 /**
+ * @abstract Get css layout direction. Thread usage the same as getCssStyleValueForKey.
+ */
+- (WXCoreDirection)getCssDirection;
+
+/**
  * @abstract Convert layout dimension value like 'left', 'width' to style value in js considering viewport and scale.
  */
 - (NSString*)convertLayoutValueToStyleValue:(NSString*)valueName;
@@ -138,5 +147,16 @@ typedef enum WXCorePositionType WXCorePositionType;
  * @abstract Delete css node of a subcomponent.
  */
 - (void)removeSubcomponentCssNode:(WXComponent *)subcomponent;
+
+#pragma mark - RTL
+
+@property (nonatomic, assign, readonly) BOOL isDirectionRTL;
+
+// Now we scrollView RTL solution is tranform
+// so scrollView need tranform subviews when RTL by default
+// if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
+- (BOOL)shouldTransformSubviewsWhenRTL;
+
+- (void)layoutDirectionDidChanged:(BOOL)isRTL;
 
 @end

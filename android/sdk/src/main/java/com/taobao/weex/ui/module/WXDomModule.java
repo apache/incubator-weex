@@ -26,6 +26,7 @@ import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.binding.JSONUtils;
 import com.taobao.weex.ui.action.ActionAddRule;
 import com.taobao.weex.ui.action.ActionGetComponentRect;
+import com.taobao.weex.ui.action.ActionGetLayoutDirection;
 import com.taobao.weex.ui.action.ActionInvokeMethod;
 import com.taobao.weex.ui.action.GraphicActionBatchBegin;
 import com.taobao.weex.ui.action.GraphicActionBatchEnd;
@@ -47,6 +48,7 @@ public final class WXDomModule extends WXModule {
   public static final String SCROLL_TO_ELEMENT = "scrollToElement";
   public static final String ADD_RULE = "addRule";
   public static final String GET_COMPONENT_RECT = "getComponentRect";
+  public static final String GET_COMPONENT_DIRECTION = "getLayoutDirection";
   public static final String WXDOM = "dom";
   public static final String INVOKE_METHOD = "invokeMethod";
 
@@ -59,7 +61,7 @@ public final class WXDomModule extends WXModule {
    * Methods expose to js. Every method which will be called in js should add to this array.
    */
   public static final String[] METHODS = {SCROLL_TO_ELEMENT, ADD_RULE, GET_COMPONENT_RECT,
-      INVOKE_METHOD, BATCH_BEGIN, BATCH_END};
+      INVOKE_METHOD, GET_COMPONENT_DIRECTION, BATCH_BEGIN, BATCH_END};
 
   public WXDomModule(WXSDKInstance instance){
     mWXSDKInstance = instance;
@@ -82,6 +84,14 @@ public final class WXDomModule extends WXModule {
 
     try {
       switch (method) {
+        case GET_COMPONENT_DIRECTION: {
+          if(args == null){
+            return null;
+          }
+          new ActionGetLayoutDirection(mWXSDKInstance, args.getString(0), args.getString(1))
+                  .executeActionOnRender();
+          break;
+        }
         case SCROLL_TO_ELEMENT:{
           if (args == null) {
             return null;

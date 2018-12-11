@@ -145,9 +145,9 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     if (lp instanceof ViewGroup.MarginLayoutParams) {
       //expect indicator .
       if (child instanceof WXIndicator) {
-        ((ViewGroup.MarginLayoutParams) lp).setMargins(left, top, right, bottom);
+        this.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, left, top, right, bottom);
       } else {
-        ((ViewGroup.MarginLayoutParams) lp).setMargins(0, 0, 0, 0);
+        this.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, 0, 0, 0, 0);
       }
     }
     return lp;
@@ -193,7 +193,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
           @Override
           public void run() {
             initIndex = getInitIndex();
-            mViewPager.setCurrentItem(initIndex);
+            mViewPager.setCurrentItem(getRealIndex(initIndex));
             initIndex = -1;
             initRunnable = null;
           }
@@ -203,13 +203,21 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       mViewPager.postDelayed(initRunnable, 50);
     } else {
       if (!keepIndex) {
-        mViewPager.setCurrentItem(0);
+        mViewPager.setCurrentItem(getRealIndex(0));
       }
     }
     if (mIndicator != null) {
       mIndicator.getHostView().forceLayout();
       mIndicator.getHostView().requestLayout();
     }
+  }
+
+  @Override
+  public void setLayout(WXComponent component) {
+    if (mAdapter != null) {
+      mAdapter.setLayoutDirectionRTL(this.isLayoutRTL());
+    }
+    super.setLayout(component);
   }
 
   @Override
@@ -274,9 +282,22 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     if(select >= mAdapter.getRealCount()){
       select = select%mAdapter.getRealCount();
     }
+
     return select;
   }
 
+  private int getRealIndex(int idx) {
+    int retIdx = idx;
+
+    if (mAdapter.getRealCount() > 0) {
+      if(idx >= mAdapter.getRealCount()) retIdx = mAdapter.getRealCount() - 1;
+      if (isLayoutRTL()) {
+        retIdx = mAdapter.getRealCount() - 1 - retIdx;
+      }
+    }
+    retIdx = retIdx + 0;
+    return retIdx;
+  }
 
   @Override
   protected boolean setProperty(String key, Object param) {
@@ -383,6 +404,8 @@ public class WXSlider extends WXVContainer<FrameLayout> {
         initIndex = index;
         return;
       }
+
+      index = getRealIndex(index);
       mViewPager.setCurrentItem(index);
       if (mIndicator != null && mIndicator.getHostView() != null
               && mIndicator.getHostView().getRealCurrentItem() != index) {

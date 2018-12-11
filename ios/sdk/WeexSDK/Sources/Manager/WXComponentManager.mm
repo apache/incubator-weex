@@ -40,6 +40,8 @@
 #import "WXRootView.h"
 #import "WXComponent+Layout.h"
 #import "WXCoreBridge.h"
+#import "WXComponent_performance.h"
+#import "WXAnalyzerCenter.h"
 
 static NSThread *WXComponentThread;
 
@@ -271,6 +273,10 @@ static NSThread *WXComponentThread;
         WXLogWarning(@"addComponent,superRef from js never exit ! check JS action, supRef:%@", parentRef);
         return;
     }
+    if([WXAnalyzerCenter isInteractionLogOpen]){
+         WXLogDebug(@"wxInteractionAnalyzer: [client][addElementStart]%@,%@,%@",supercomponent.weexInstance.instanceId,type,ref);
+    }
+    
     supercomponent.weexInstance.apmInstance.hasAddView = YES;
     
     WXComponent *component = [self _buildComponent:ref type:type supercomponent:supercomponent styles:styles attributes:attributes events:events renderObject:renderObject];
@@ -279,6 +285,10 @@ static NSThread *WXComponentThread;
     } else {
         index = (index == -1 ? supercomponent->_subcomponents.count : index);
     }
+    if (supercomponent.ignoreInteraction) {
+        component.ignoreInteraction = YES;
+    }
+    component.ignoreInteraction = [[component.attributes objectForKey:@"ignoreInteraction"] boolValue];
     
 #ifdef DEBUG
     WXLogDebug(@"flexLayout -> _recursivelyAddComponent : super:(%@,%@):[%f,%f] ,child:(%@,%@):[%f,%f],childClass:%@",
@@ -307,6 +317,7 @@ static NSThread *WXComponentThread;
     }
     
     [self recordMaximumVirtualDom:component];
+    [component.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_MAX_COMPONENT_NUM curMaxValue:[_indexDict count]];
     
     if (!component->_isTemplate) {
         __weak typeof(self) weakSelf = self;
@@ -320,6 +331,9 @@ static NSThread *WXComponentThread;
             [supercomponent insertSubview:component atIndex:index];
             [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:type phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
         }];
+    }
+    if([WXAnalyzerCenter isInteractionLogOpen]){
+        WXLogDebug(@"wxInteractionAnalyzer: [client][addElementEnd]%@,%@,%@",supercomponent.weexInstance.instanceId,type,ref);
     }
 }
 
@@ -703,11 +717,12 @@ static NSThread *WXComponentThread;
     return [component _hasTransitionPropertyInStyles:styles];
 }
 
-- (void)layoutComponent:(WXComponent*)component frame:(CGRect)frame innerMainSize:(CGFloat)innerMainSize
+- (void)layoutComponent:(WXComponent*)component frame:(CGRect)frame isRTL:(BOOL)isRTL innerMainSize:(CGFloat)innerMainSize
 {
     WXAssertComponentThread();
     WXAssertParam(component);
     
+    [component _setIsLayoutRTL:isRTL];
     if (component == _rootComponent) {
         if (!CGSizeEqualToSize(frame.size, self.weexInstance.frame.size)) {
             // Synchronize view frame with root component, especially for content wrap mode.

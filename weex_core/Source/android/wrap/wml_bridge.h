@@ -36,9 +36,13 @@ class WMLBridge : public JNIObjectWrap {
   static bool RegisterJNIUtils(JNIEnv* env);
   WMLBridge() {}
   virtual ~WMLBridge() {}
-  void PostMessage(JNIEnv* env, const char* vm_id, const char* data, int dataLength);
-  void DispatchMessage(JNIEnv* env, const char* client_id,
-                       const char* data, int dataLength, const char* callback, const char* vm_id);
+  void PostMessage(JNIEnv* env, const char* vm_id, const char* data,
+                   int dataLength);
+  void DispatchMessage(JNIEnv* env, const char* client_id, const char* data,
+                       int dataLength, const char* callback, const char* vm_id);
+  base::android::ScopedLocalJavaRef<jbyteArray> DispatchMessageSync(
+      JNIEnv* env, const char* client_id, const char* data, int dataLength,
+      const char* vm_id);
 
  private:
   static WMLBridge* g_instance;

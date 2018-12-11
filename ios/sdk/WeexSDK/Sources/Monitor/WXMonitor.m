@@ -55,7 +55,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     NSMutableDictionary *performanceDict = [self performanceDictForInstance:instance];
     NSMutableDictionary *dict = performanceDict[@(tag)];
     if (!dict) {
-        WXLogError(@"Performance point:%ld, in instance:%@, did not have a start", (unsigned long)tag, instance.instanceId);
+        WXLogDebug(@"Performance point:%ld, in instance:%@, did not have a start", (unsigned long)tag, instance.instanceId);
         return;
     }
     
@@ -67,6 +67,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     dict[kEndKey] = @(CACurrentMediaTime() * 1000);
     if (tag == WXPTFirstScreenRender) {
         [instance.apmInstance onStage:KEY_PAGE_STAGES_FSRENDER];
+        instance.apmInstance.isFSEnd = YES;
     }
 
 //    if (tag == WXPTAllRender) {
@@ -202,7 +203,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
         
         if (!start || !end) {
             if (state == MonitorCommit) {
-                WXLogWarning(@"Performance point:%d, in instance:%@, did not have a start or end", tag, instance);
+                WXLogDebug(@"Performance point:%d, in instance:%@, did not have a start or end", tag, instance);
             }
             continue;
         }
@@ -240,12 +241,6 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
         
         [self printPerformance:commitDict];
         [WXTracingManager commitTracingSummaryInfo:commitDict withInstanceId:instance.instanceId];
-    }
-    if ([WXAnalyzerCenter isOpen]) {
-        if (state == MonitorCommit) {
-            state = DebugAfterExist;
-        }
-        [WXAnalyzerCenter transDataOnState:state withInstaneId:instance.instanceId data:commitDict];
     }
 }
 

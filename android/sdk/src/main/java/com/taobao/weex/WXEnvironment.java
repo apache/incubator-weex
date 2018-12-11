@@ -63,6 +63,7 @@ public class WXEnvironment {
     }
   }
   public static final String SYS_MODEL = android.os.Build.MODEL;
+  public static final String EAGLE = "eagle";
   public static final String ENVIRONMENT = "environment";
   public static final String WEEX_CURRENT_KEY = "wx_current_url";
   /*********************
@@ -99,6 +100,8 @@ public class WXEnvironment {
   /** from init to sdk-ready **/
   public static long sSDKInitTime =0;
 
+  public static long sJSFMStartListenerTime=0;
+
   /**
    * component and modules ready
    * */
@@ -109,6 +112,7 @@ public class WXEnvironment {
   public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
   public static boolean isPerf = false;
+  private static boolean sDebugFlagInit = false;
 
   private static boolean openDebugLog = false;
 
@@ -157,6 +161,13 @@ public class WXEnvironment {
     configs.put(WXConfig.sysModel, SYS_MODEL);
     configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
     configs.put(WXConfig.logLevel,sLogLevel.getName());
+
+    try {
+      configs.put(WXConfig.layoutDirection, isLayoutDirectionRTL() ? "rtl" : "ltr");
+    } catch (Exception e) {
+      configs.put(WXConfig.layoutDirection, "ltr");
+    }
+
     try {
       if (isApkDebugable()) {
         options.put(WXConfig.debugMode, "true");
@@ -225,6 +236,13 @@ public class WXEnvironment {
     return isHardwareSupport() && isInitialized;
   }
 
+  public static boolean isLayoutDirectionRTL() {
+    // support RTL
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      return sApplication.getApplicationContext().getResources().getBoolean(R.bool.weex_is_right_to_left);
+    }
+    return false;
+  }
   /**
    * Tell whether Weex can run on current hardware.
    * @return true if weex can run on current hardware, otherwise false.
@@ -262,20 +280,26 @@ public class WXEnvironment {
       return false;
     }
 
-    if (!isApkDebug) {
-      return false;
+    if (sDebugFlagInit){
+      return isApkDebug;
     }
     try {
-      ApplicationInfo info = sApplication.getApplicationInfo();
-      isApkDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-      return isApkDebug;
+      String debugModeConfig = getCustomOptions().get(WXConfig.debugMode);
+      if (TextUtils.isEmpty(debugModeConfig)){
+        ApplicationInfo info = sApplication.getApplicationInfo();
+        isApkDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+      }else {
+        isApkDebug = Boolean.valueOf(debugModeConfig);
+      }
     } catch (Exception e) {
       /**
        * Don't call WXLogUtils.e here,will cause stackoverflow
        */
       e.printStackTrace();
+      isApkDebug = false;
     }
-    return true;
+    sDebugFlagInit = true;
+    return isApkDebug;
   }
 
   public static boolean isPerf() {
@@ -441,7 +465,7 @@ public class WXEnvironment {
         WXLogUtils.e(libName + "'s Path is" + soPath);
         return soFile.getAbsolutePath();
       } else {
-        WXLogUtils.e(libName + "'s Path is " + soPath + " but file is not exist");
+        WXLogUtils.e(libName + "'s Path is " + soPath + " but file does not exist");
       }
     }
 

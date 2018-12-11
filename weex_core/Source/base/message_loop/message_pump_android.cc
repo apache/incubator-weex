@@ -42,6 +42,9 @@ bool MessagePumpAndroid::RegisterJNIUtils(JNIEnv* env) {
 
 void MessagePumpAndroid::Run(Delegate* delegate) {
   JNIEnv* env = ::base::android::AttachCurrentThread();
+  if(env == nullptr) {
+    return;
+  }
   Reset(env, Java_SystemMessageHandler_create(
                  env, reinterpret_cast<int64_t>(delegate))
                  .Release());
@@ -49,16 +52,25 @@ void MessagePumpAndroid::Run(Delegate* delegate) {
 
 void MessagePumpAndroid::Stop() {
   JNIEnv* env = ::base::android::AttachCurrentThread();
+  if(!env || !jni_object()) {
+    return;
+  }
   Java_SystemMessageHandler_stop(env, jni_object());
 }
 
 void MessagePumpAndroid::ScheduleWork() {
   JNIEnv* env = ::base::android::AttachCurrentThread();
+  if(!env || !jni_object()) {
+    return;
+  }
   Java_SystemMessageHandler_scheduleWork(env, jni_object());
 }
 
 void MessagePumpAndroid::ScheduleDelayedWork(TimeUnit delayed_time) {
   JNIEnv* env = ::base::android::AttachCurrentThread();
+  if(!env || !jni_object()) {
+    return;
+  }
   Java_SystemMessageHandler_scheduleDelayedWork(env, jni_object(),
                                                 delayed_time.ToMilliseconds());
 }

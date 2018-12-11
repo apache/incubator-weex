@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.ui.component.list;
 
+import static com.taobao.weex.ui.view.listview.WXRecyclerView.TYPE_LINEAR_LAYOUT;
+
 import android.content.Context;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.PagerSnapHelper;
@@ -171,13 +173,15 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   private void updateRecyclerAttr() {
     mColumnCount = WXUtils.parseInt(getAttrs().get(Constants.Name.COLUMN_COUNT));
-    if (mColumnCount <= 0) {
+    if (mColumnCount <= 0 && mLayoutType != TYPE_LINEAR_LAYOUT) {
+      Map<String, String> ext = new ArrayMap<>();
+      ext.put("componentType", getComponentType());
       WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
           WXErrorCode.WX_RENDER_ERR_LIST_INVALID_COLUMN_COUNT, "columnCount",
           String.format(Locale.ENGLISH,
               "You are trying to set the list/recycler/vlist/waterfall's column to %d, which is illegal. The column count should be a positive integer",
               mColumnCount),
-          new ArrayMap<String, String>());
+          ext);
       mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
     }
     mColumnGap = WXUtils.parseFloat(getAttrs().get(Constants.Name.COLUMN_GAP));
