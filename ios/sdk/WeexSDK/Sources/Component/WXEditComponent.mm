@@ -30,6 +30,9 @@
 #import "WXComponent+Layout.h"
 
 @interface WXEditComponent()
+{
+    CGFloat _upriseOffset; // additional space when edit is lifted by keyboard
+}
 
 //@property (nonatomic, strong) WXTextInputView *inputView;
 @property (nonatomic, strong) WXDatePickerManager *datePickerManager;
@@ -108,6 +111,12 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         _disabled = [attributes[@"disabled"] boolValue];
         _value = [WXConvert NSString:attributes[@"value"]]?:@"";
         _placeholderString = [WXConvert NSString:attributes[@"placeholder"]]?:@"";
+        _upriseOffset = 20; // 20 for better appearance
+        
+        if (attributes[@"upriseOffset"]) {
+            _upriseOffset = [WXConvert CGFloat:attributes[@"upriseOffset"]];
+        }
+        
         if(attributes[@"type"]) {
             _inputType = [WXConvert NSString:attributes[@"type"]];
             _attr = attributes;
@@ -460,6 +469,9 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         _rows = 2;
         [self setRows:_rows];
     }
+    if (attributes[@"upriseOffset"]) {
+        _upriseOffset = [WXConvert CGFloat:attributes[@"upriseOffset"]];
+    }
 }
 
 #pragma mark - upate styles
@@ -702,7 +714,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     CGRect rootViewFrame = rootView.frame;
     CGRect inputFrame = [self.view.superview convertRect:self.view.frame toView:rootView];
     if (movedUp) {
-        CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height) + 20;
+        CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height) + _upriseOffset;
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
