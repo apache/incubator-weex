@@ -102,6 +102,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         _clickEvent = NO;
         _keyboardEvent = NO;
         _keyboardHidden = YES;
+        _textAlignForStyle = NSTextAlignmentNatural;
         // handle attributes
         _autofocus = [attributes[@"autofocus"] boolValue];
         _disabled = [attributes[@"disabled"] boolValue];
@@ -176,7 +177,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     [self setAutofocus:_autofocus];
     [self setTextFont];
     [self setPlaceholderAttributedString];
-    [self setTextAlignment:_textAlignForStyle];
+    [self setTextAlignment];
     [self setTextColor:_colorForStyle];
     [self setText:_value];
     [self setEnabled:!_disabled];
@@ -212,6 +213,10 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)layoutDirectionDidChanged:(BOOL)isRTL {
+    [self setTextAlignment];
 }
 
 -(void)focus
@@ -287,6 +292,14 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 
 -(void)setTextColor:(UIColor *)color
 {
+}
+
+- (void)setTextAlignment {
+    if ([self isDirectionRTL] && _textAlignForStyle == NSTextAlignmentNatural) {
+        [self setTextAlignment:NSTextAlignmentRight];
+    } else {
+        [self setTextAlignment:_textAlignForStyle];
+    }
 }
 
 -(void)setTextAlignment:(NSTextAlignment)textAlignForStyle

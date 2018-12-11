@@ -1327,7 +1327,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                              final Map<String, Object> options, final String data) {
     final WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance == null) {
-      WXLogUtils.e("WXBridgeManager", "createInstance failed, SDKInstance is not exist");
+      WXLogUtils.e("WXBridgeManager", "createInstance failed, SDKInstance does not exist");
       return;
     }
     if (TextUtils.isEmpty(instanceId) || template == null || template.isEmpty() || mJSHandler == null) {
@@ -2753,7 +2753,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width, int index) {
+  public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width, boolean isRTL, int index) {
 
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(ref)) {
         if (WXEnvironment.isApkDebugable()){
@@ -2788,6 +2788,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         GraphicPosition position = new GraphicPosition(left, top, right, bottom);
         GraphicActionAddElement addAction = instance.getInActiveAddElementAction(ref);
         if(addAction!=null) {
+          addAction.setRTL(isRTL);
           addAction.setSize(size);
           addAction.setPosition(position);
           if(!TextUtils.equals(ref, WXComponent.ROOT)) {
@@ -2797,7 +2798,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           instance.removeInActiveAddElmentAction(ref);
         }
         else {
-          final BasicGraphicAction action = new GraphicActionLayout(instance, ref, position, size);
+          final BasicGraphicAction action = new GraphicActionLayout(instance, ref, position, size, isRTL);
           WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
         }
       }

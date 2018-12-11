@@ -54,17 +54,29 @@ Move `min` version to Native SDK folder, which will be used by native SDK build.
 > `cp packages/weex-js-framework/index.min.js android_sdk/assets/main.js`
 
 ## Build Android SDK
-Make sure you have gradle installed, see more details about 'how to install gradle' on the [gradle website](https://gradle.org/install).
-At the root folder of the project, execute
-> `$ gradle wrapper --gradle-version 2.14.1`
 
-Create a Gradle setting file
-> `$ echo 'include ":android_sdk"'>settings.gradle`
+check env
 
-Build the SDK
-> `$ ./gradlew :android_sdk:assemble -PasfRelease`
+- you have gradle installed, see more details about 'how to install gradle' on the [gradle website](https://gradle.org/install).
+- NDK r16  [link](https://developer.android.com/ndk/)
+- edit local.propteries (in `Android` dir)
 
-Now, you can see the artifacts under `android_sdk/build/output/`.
+	```
+	ndk.dir=/Users/{user}/Library/Android/sdk/ndk-bundle-r16
+	sdk.dir=/Users/{user}/Library/Android/sdk
+	```
+
+then do buid
+
+> cd Android/sdk
+
+> ../gradlew clean assemble
+
+
+artifacts path:
+
+` android/sdk/build/outputs/aar`
+
 You can now import the aar file to your android project.
 
 ## Build iOS SDK

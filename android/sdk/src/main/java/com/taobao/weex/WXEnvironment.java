@@ -465,7 +465,7 @@ public class WXEnvironment {
         WXLogUtils.e(libName + "'s Path is" + soPath);
         return soFile.getAbsolutePath();
       } else {
-        WXLogUtils.e(libName + "'s Path is " + soPath + " but file is not exist");
+        WXLogUtils.e(libName + "'s Path is " + soPath + " but file does not exist");
       }
     }
 

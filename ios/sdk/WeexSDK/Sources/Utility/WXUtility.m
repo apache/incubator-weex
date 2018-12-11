@@ -227,8 +227,9 @@ CGFloat WXFloorPixelValue(CGFloat value)
         }
     }
     
-    if ([WXSDKEngine customEnvironment]) {
-        [data addEntriesFromDictionary:[WXSDKEngine customEnvironment]];
+    NSDictionary* customEnvironment = [WXSDKEngine customEnvironment];
+    if (customEnvironment) {
+        [data addEntriesFromDictionary:customEnvironment];
     }
     
     return data;
@@ -846,6 +847,10 @@ CGFloat WXFloorPixelValue(CGFloat value)
 + (NSString *)md5:(NSString *)string
 {
     const char *str = string.UTF8String;
+    if (str == NULL) {
+        return nil;
+    }
+    
     unsigned char result[CC_MD5_DIGEST_LENGTH];
     CC_MD5(str, (CC_LONG)strlen(str), result);
     

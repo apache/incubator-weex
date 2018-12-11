@@ -752,13 +752,13 @@ int WXBridge::UpdateStyle(
 }
 
 int WXBridge::Layout(JNIEnv* env, const char* page_id, const char* ref, int top,
-                     int bottom, int left, int right, int height, int width,
+                     int bottom, int left, int right, int height, int width, bool isRTL,
                      int index) {
   auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
   auto jRef = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
 
   return Java_WXBridge_callLayout(env, jni_object(), jPageId.Get(), jRef.Get(), top, bottom,
-                                  left, right, height, width, index);
+                                  left, right, height, width, isRTL, index);
 }
 
 int WXBridge::AddElement(JNIEnv* env, const char* page_id,

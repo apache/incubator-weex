@@ -44,6 +44,7 @@ extern "C" {
     CGPoint _absolutePosition;
     WXPositionType _positionType;
     BOOL _isLastLayoutDirectionRTL;
+    BOOL _isLayoutDirectionRTL;
 }
 
 /**
@@ -78,5 +79,7 @@ extern "C" {
 // so scrollView need tranform subviews when RTL by default
 // if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
 - (BOOL)shouldTransformSubviewsWhenRTL;
+
+- (void)layoutDirectionDidChanged:(BOOL)isRTL;
 
 @end
