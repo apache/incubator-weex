@@ -1,6 +1,21 @@
-//
-// Created by chad on 2018/7/19.
-//
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 #include "core/data_render/class_factory.h"
 #include "core/data_render/class.h"
@@ -26,7 +41,7 @@ Value ClassFactory::CreateClassDescriptor(ClassDescriptor *p_super) {
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
     return value;
 }
-    
+
 Value ClassFactory::CreateArray() {
     Array *array = new Array();
     Value value;
@@ -34,7 +49,7 @@ Value ClassFactory::CreateArray() {
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(array), value.type));
     return value;
 }
-    
+
 Value ClassFactory::CreateTable() {
     Table *table = new Table();
     Value value;
@@ -42,7 +57,7 @@ Value ClassFactory::CreateTable() {
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(table), value.type));
     return value;
 }
-    
+
 Value ClassFactory::ClassString() {
     ClassDescriptor *desc = NewClassString();
     Value value;
@@ -50,7 +65,7 @@ Value ClassFactory::ClassString() {
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
     return value;
 }
-    
+
 Value ClassFactory::ClassJSON() {
     ClassDescriptor *desc = NewClassJSON();
     Value value;
@@ -58,7 +73,7 @@ Value ClassFactory::ClassJSON() {
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
     return value;
 }
-    
+
 Value ClassFactory::ClassArray() {
     ClassDescriptor *desc = NewClassArray();
     Value value;
@@ -66,7 +81,7 @@ Value ClassFactory::ClassArray() {
     stores_.push_back(std::make_pair(reinterpret_cast<GCObject *>(desc), value.type));
     return value;
 }
-    
+
 Value ClassFactory::ClassObject() {
     ClassDescriptor *desc = NewClassOject();
     Value value;

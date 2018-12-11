@@ -231,6 +231,8 @@ namespace WeexCore {
     WXCorePosition mStylePosition;
 
     constexpr static float kFlexGrowDefault  = 0;
+      
+    constexpr static WXCoreDirection kDirectionDefault = kDirectionLTR;
 
     constexpr static WXCoreFlexDirection kFlexDirectionDefault= kFlexDirectionColumn;
 
