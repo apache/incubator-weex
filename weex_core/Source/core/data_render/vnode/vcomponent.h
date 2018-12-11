@@ -19,7 +19,7 @@
 #ifndef CORE_DATA_RENDER_VNODE_VCOMPONENT_H_
 #define CORE_DATA_RENDER_VNODE_VCOMPONENT_H_
 
-#include <core/data_render/object.h>
+#include "core/data_render/object.h"
 #include <unordered_map>
 #include "core/data_render/vnode/vnode.h"
 

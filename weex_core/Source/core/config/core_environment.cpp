@@ -19,7 +19,7 @@
 #include "core_environment.h"
 #include "base/CoreConstants.h"
 #include <stdlib.h>
-#include <base/ViewUtils.h>
+#include "base/ViewUtils.h"
 #include "base/LogDefines.h"
 
 namespace WeexCore {

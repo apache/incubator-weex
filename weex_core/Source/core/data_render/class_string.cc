@@ -26,7 +26,7 @@
 #include "core/data_render/common_error.h"
 #include "core/data_render/table.h"
 #include "core/data_render/string_table.h"
-#include <base/LogDefines.h>
+#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {
