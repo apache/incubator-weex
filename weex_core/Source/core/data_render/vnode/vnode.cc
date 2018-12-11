@@ -53,13 +53,13 @@ VNode::~VNode() {
       delete events_;
       events_ = nullptr;
   }
-  for (auto it = child_list_.begin(); it != child_list_.end(); it++) {
-    VNode *&reference = *it;
-    if (reference != nullptr) {
-      delete reference;
-      *it = nullptr;
-    }
-  }
+//  for (auto it = child_list_.begin(); it != child_list_.end(); it++) {
+//    VNode *&reference = *it;
+//    if (reference != nullptr) {
+//      delete reference;
+//      *it = nullptr;
+//    }
+//  }
 }
 
 void VNode::OnEvent(const std::string &event, const std::string args,
