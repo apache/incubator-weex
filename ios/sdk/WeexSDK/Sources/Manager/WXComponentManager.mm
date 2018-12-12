@@ -724,7 +724,7 @@ static NSThread *WXComponentThread;
     
     [component _setIsLayoutRTL:isRTL];
     if (component == _rootComponent) {
-        if (!CGSizeEqualToSize(frame.size, self.weexInstance.frame.size)) {
+        if (!CGSizeEqualToSize(frame.size, self.weexInstance.frame.size) || !CGSizeEqualToSize(frame.size, self.weexInstance.rootView.frame.size)) {
             // Synchronize view frame with root component, especially for content wrap mode.
             WXPerformBlockOnMainThread(^{
                 if (!self.weexInstance.isRootViewFrozen) {
