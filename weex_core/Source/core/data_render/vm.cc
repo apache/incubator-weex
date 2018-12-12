@@ -646,7 +646,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             if (IsValueRef(b)) {
                 b = b->var;
             }
-            if (!IsClassInstance(b) && !IsClass(b) && !IsArray(b) && !IsTable(b) && !IsString(b)) {
+            if (!IsClassInstance(b) && !IsClass(b) && !IsArray(b) && !IsTable(b) && !IsString(b) && !IsNil(b)) {
                 throw VMExecError("Type Error For Class Instance Or Class With OP_CODE [OP_GETMEMBER]");
             }
             if (!IsString(c)) {
@@ -720,6 +720,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                         SetValueRef(a, ret);
                     }
                 }
+            }
+            else if (IsNil(b)) {
+                SetNil(a);
             }
             else {
                 // only can find class static funcs;
