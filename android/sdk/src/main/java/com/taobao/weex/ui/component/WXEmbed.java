@@ -188,10 +188,6 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
     @Override
     public void onException(WXSDKInstance instance, String errCode, String msg) {
-        if (null != instance){
-            //degrade or reload,should not report
-            instance.getExceptionRecorder().hasDegrade.set(true);
-        }
       if (mEventListener != null) {
         mEventListener.onException(mComponent, errCode, msg);
       }
