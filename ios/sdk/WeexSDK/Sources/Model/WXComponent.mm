@@ -595,6 +595,7 @@ static BOOL bNeedRemoveEvents = YES;
     pthread_mutex_unlock(&_propertyMutex);
     
     if (subcomponent->_positionType == WXPositionTypeFixed) {
+        subcomponent.ignoreInteraction = YES;
         [self.weexInstance.componentManager addFixedComponent:subcomponent];
     }
     
