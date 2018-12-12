@@ -892,13 +892,15 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 Value *ret = GetTableValue(ValueTo<Table>(b), *c);
                 if (!IsNil(ret)) {
                     *a = *ret;
-                }
-                else {
+                } else {
                     SetNil(a);
                 }
             } else if (IsString(b)) {
                 LOGE("type String can not get from index");
-            } else {
+            } else if (IsNil(b)) {
+                SetNil(a);
+            }
+            else {
                 throw VMExecError("Unsupport Type Error With OP_CODE [OP_GETINDEX]");
             }
             break;
