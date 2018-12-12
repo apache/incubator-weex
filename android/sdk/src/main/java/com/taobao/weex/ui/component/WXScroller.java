@@ -120,6 +120,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    **/
   private Map<String, Map<String, WXComponent>> mStickyMap = new HashMap<>();
   private FrameLayout mRealView;
+  private FrameLayout mScrollerView;
 
   private int mContentHeight = 0;
 
@@ -144,7 +145,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   @Override
   public ViewGroup getRealView() {
-    return mRealView;
+    return mScrollerView;
   }
 
 
@@ -280,7 +281,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   @Override
   public void addSubView(View child, int index) {
-    if (child == null || getRealView() == null) {
+    if (child == null || mRealView == null) {
       return;
     }
 
@@ -288,12 +289,12 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       return;
     }
 
-    int count = getRealView().getChildCount();
+    int count = mRealView.getChildCount();
     index = index >= count ? -1 : index;
     if (index == -1) {
-      getRealView().addView(child);
+      mRealView.addView(child);
     } else {
-      getRealView().addView(child, index);
+      mRealView.addView(child, index);
     }
   }
 
@@ -480,7 +481,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
               LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
       scrollView.addView(mRealView, layoutParams);
       scrollView.setHorizontalScrollBarEnabled(false);
-
+      mScrollerView = scrollView;
         final WXScroller component = this;
         final View.OnLayoutChangeListener listener = new View.OnLayoutChangeListener() {
           @Override
@@ -549,6 +550,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       innerView.addScrollViewListener(this);
       FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
               LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+      mScrollerView = innerView;
       innerView.addView(mRealView, layoutParams);
       innerView.setVerticalScrollBarEnabled(true);
       innerView.setNestedScrollingEnabled(WXUtils.getBoolean(getAttrs().get(Constants.Name.NEST_SCROLLING_ENABLED), true));
