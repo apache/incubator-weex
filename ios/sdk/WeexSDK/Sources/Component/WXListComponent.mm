@@ -654,7 +654,7 @@
             // Must invoke synchronously otherwise it will remove the view just added.
             WXCellComponent *cellComponent = (WXCellComponent *)wxCellView.wx_component;
             if (cellComponent.isRecycle) {
-                [wxCellView.wx_component _unloadViewWithReusing:YES];
+                [cellComponent _unloadViewWithReusing:YES];
             }
         }
     }
