@@ -66,9 +66,7 @@ import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
 import com.taobao.weex.layout.ContentBoxMeasurement;
-import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.performance.WXInstanceApm;
-import com.taobao.weex.performance.WXInstanceExceptionRecord;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
@@ -147,7 +145,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private Map<String,String> mContainerInfo;
 
-  private WXInstanceExceptionRecord mExceptionRecorder;
   public boolean isNewFsEnd = false;
 
   /**
@@ -470,7 +467,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     mWXPerformance = new WXPerformance(mInstanceId);
     mApmForInstance = new WXInstanceApm(mInstanceId);
-    mExceptionRecorder = new WXInstanceExceptionRecord(mInstanceId);
     mWXPerformance.WXSDKVersion = WXEnvironment.WXSDK_VERSION;
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
 
@@ -1407,7 +1403,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void onRenderError(final String errCode, final String msg) {
-    getExceptionRecorder().recordReportErrorMsg("["+errCode+",onRenderError,"+msg+"]");
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
 
@@ -1422,7 +1417,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void onJSException(final String errCode, final String function, final String exception) {
-    getExceptionRecorder().recordReportErrorMsg("["+errCode+","+function+","+exception+"]");
     hasException = true;
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
@@ -1533,7 +1527,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public synchronized void destroy() {
     if(!isDestroy()) {
       mApmForInstance.onEnd();
-      getExceptionRecorder().checkEmptyScreenAndReport();
       if(mRendered) {
         WXSDKManager.getInstance().destroyInstance(mInstanceId);
       }
@@ -1867,10 +1860,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     return mApmForInstance;
   }
 
-  public WXInstanceExceptionRecord getExceptionRecorder() {
-    return mExceptionRecorder;
-  }
-
   public Map<String, Serializable> getUserTrackParams() {
     return mUserTrackParams;
   }
@@ -2094,7 +2083,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         );
       }
       else {
-        getExceptionRecorder().isDownLoadBundleFailed = true;
         wxErrorCode = WXErrorCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode();
         onRenderError(wxErrorCode,
                 response.errorMsg);

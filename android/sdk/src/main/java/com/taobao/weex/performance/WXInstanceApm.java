@@ -24,7 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.Log;
-import com.taobao.weex.BuildConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -112,6 +111,7 @@ public class WXInstanceApm {
     private String mInstanceId;
     private IWXApmMonitorAdapter apmInstance;
     private Map<String, Double> recordStatsMap;
+    public final Map<String, Long> stageMap;
     private boolean isFSEnd;
     private boolean mHasInit = false;
     private boolean mEnd = false;
@@ -121,10 +121,12 @@ public class WXInstanceApm {
     public Rect instanceRect;
     public String reportPageName;
     public boolean hasReportLayerOverDraw = false;
+    public boolean hasAddView;
 
     public WXInstanceApm(String instanceId) {
         mInstanceId = instanceId;
         extInfo = new ConcurrentHashMap<>();
+        stageMap = new ConcurrentHashMap<>();
         IApmGenerator generator = WXSDKManager.getInstance().getApmGenerater();
         if (null != generator) {
             apmInstance = generator.generateApmInstance(WEEX_PAGE_TOPIC);
@@ -156,13 +158,10 @@ public class WXInstanceApm {
      * @param time unixTime ,plz use WXUtils.getFixUnixTime
      */
     public void onStageWithTime(String name,long time){
-        WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(mInstanceId);
-        if (null != instance){
-            instance.getExceptionRecorder().recordStage(name, time);
-        }
         if (mEnd){
             return;
         }
+        stageMap.put(name,time);
         if(WXAnalyzerDataTransfer.isOpenPerformance){
             WXAnalyzerDataTransfer.transferPerformance(mInstanceId,"stage",name,time);
         }

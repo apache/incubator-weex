@@ -2249,9 +2249,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           e.printStackTrace();
         }
       }
-      if (METHOD_CREATE_INSTANCE.equals(function) && !instance.getExceptionRecorder().hasAddView.get()){
+      if (METHOD_CREATE_INSTANCE.equals(function) && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE;
-      }else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function) && !instance.getExceptionRecorder().hasAddView.get()){
+      }else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function) && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT;
       }
       instance.onJSException(reportErrorCode.getErrorCode(), function, exception);
