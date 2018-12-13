@@ -13,7 +13,7 @@ android {
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
         versionCode 20
-        versionName "0.19.1"
+        versionName "0.20.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         ndk{
@@ -90,12 +90,8 @@ dependencies {
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
     /*source dependency*/
 
-    debugCompile project(path: ':commons', configuration: 'debug')
-    releaseCompile project(path: ':commons', configuration: 'release')
-
-    debugCompile project(path: ':weex_sdk', configuration: 'debug')
-    releaseCompile project(path: ':weex_sdk', configuration: 'release')
-
+    compile project(':commons')
+    compile project(':weex_sdk')
     //https://github.com/weexteam/weex-analyzer-android
     //Weex-Analyzer provides several convenient tools such as Memory Monitor
     // to optimize your application. It's not available by default,you can

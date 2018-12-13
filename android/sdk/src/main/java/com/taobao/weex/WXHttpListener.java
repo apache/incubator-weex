@@ -226,7 +226,6 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
             onFail(response);
         }
         else {
-            instance.getExceptionRecorder().isDownLoadBundleFailed = true;
             wxErrorCode = WXErrorCode.WX_DEGRAD_ERR_NETWORK_BUNDLE_DOWNLOAD_FAILED.getErrorCode();
             instance.onRenderError(wxErrorCode,
                     response.errorMsg);
@@ -245,8 +244,12 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
     }
 
     public void onSuccess(WXResponse response) {
-        String template = new String(response.originalData);
-        instance.render(pageName, template, options, jsonInitData, flag);
+        if (flag==WXRenderStrategy.DATA_RENDER_BINARY){
+            instance.render(pageName, response.originalData, options, jsonInitData);
+        }else {
+            String template = new String(response.originalData);
+            instance.render(pageName, template, options, jsonInitData, flag);
+        }
     }
 
     public void onFail(WXResponse response) {

@@ -45,7 +45,7 @@
 /** on UI thread **/
 - (void)onViewLoad:(WXComponent *)targetComponent
 {
-    if (targetComponent.hasAdd) {
+    if (targetComponent.hasAdd || targetComponent.ignoreInteraction) {
         return;
     }
     targetComponent.hasAdd = true;
@@ -69,9 +69,6 @@
 - (void) _handleRenderTime:(WXComponent*)targetComponent withModifyTime:(double)modifyTime
 {
     if (nil == targetComponent) {
-        return;
-    }
-    if (targetComponent.ignoreInteraction) {
         return;
     }
     double diff = modifyTime - self.renderTimeOrigin;

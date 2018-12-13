@@ -25,7 +25,7 @@
 #include "core/data_render/common_error.h"
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "third_party/json11/json11.hpp"
-#include <base/LogDefines.h>
+#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {

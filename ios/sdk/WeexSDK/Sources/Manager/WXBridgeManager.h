@@ -27,6 +27,7 @@
 extern "C" {
 #endif
     void WXPerformBlockOnBridgeThread(void (^block)(void));
+    void WXPerformBlockSyncOnBridgeThread(void (^block) (void));
 #ifdef __cplusplus
 }
 #endif

@@ -313,7 +313,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     }
     WXSDKInstance instance = getInstance();
     if (null != instance){
-      instance.getExceptionRecorder().hasAddView.set(true);
+      instance.getApmForInstance().hasAddView = true;
     }
   }
 

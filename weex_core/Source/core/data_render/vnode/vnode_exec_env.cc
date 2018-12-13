@@ -31,7 +31,7 @@
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/data_render/vnode/vcomponent_lifecycle_listener.h"
 #include "core/data_render/vnode/vnode_on_event_listener.h"
-#include <base/LogDefines.h>
+#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {

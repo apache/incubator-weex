@@ -288,9 +288,7 @@ static NSThread *WXComponentThread;
     if (supercomponent.ignoreInteraction) {
         component.ignoreInteraction = YES;
     }
-    if ([[component.attributes objectForKey:@"ignoreInteraction"] isEqualToString:@"1"]) {
-        component.ignoreInteraction = YES;
-    }
+    component.ignoreInteraction = [[component.attributes objectForKey:@"ignoreInteraction"] boolValue];
     
 #ifdef DEBUG
     WXLogDebug(@"flexLayout -> _recursivelyAddComponent : super:(%@,%@):[%f,%f] ,child:(%@,%@):[%f,%f],childClass:%@",
@@ -726,16 +724,15 @@ static NSThread *WXComponentThread;
     
     [component _setIsLayoutRTL:isRTL];
     if (component == _rootComponent) {
-        if (!CGSizeEqualToSize(frame.size, self.weexInstance.frame.size)) {
-            // Synchronize view frame with root component, especially for content wrap mode.
-            WXPerformBlockOnMainThread(^{
-                if (!self.weexInstance.isRootViewFrozen) {
-                    CGRect rect = self.weexInstance.rootView.frame; // no change of origin
-                    rect.size = frame.size;
-                    self.weexInstance.rootView.frame = rect;
-                }
-            });
-        }
+        // Synchronize view frame with root component, especially for content wrap mode.
+        WXPerformBlockOnMainThread(^{
+            if (!self.weexInstance.isRootViewFrozen &&
+                (!CGSizeEqualToSize(frame.size, self.weexInstance.frame.size) || !CGSizeEqualToSize(frame.size, self.weexInstance.rootView.frame.size))) {
+                CGRect rect = self.weexInstance.rootView.frame; // no change of origin
+                rect.size = frame.size;
+                self.weexInstance.rootView.frame = rect;
+            }
+        });
     }
     
     if ([component _isCalculatedFrameChanged:frame]) {
