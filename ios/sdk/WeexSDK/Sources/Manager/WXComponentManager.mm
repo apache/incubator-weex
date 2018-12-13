@@ -724,16 +724,15 @@ static NSThread *WXComponentThread;
     
     [component _setIsLayoutRTL:isRTL];
     if (component == _rootComponent) {
-        if (!CGSizeEqualToSize(frame.size, self.weexInstance.frame.size)) {
-            // Synchronize view frame with root component, especially for content wrap mode.
-            WXPerformBlockOnMainThread(^{
-                if (!self.weexInstance.isRootViewFrozen) {
-                    CGRect rect = self.weexInstance.rootView.frame; // no change of origin
-                    rect.size = frame.size;
-                    self.weexInstance.rootView.frame = rect;
-                }
-            });
-        }
+        // Synchronize view frame with root component, especially for content wrap mode.
+        WXPerformBlockOnMainThread(^{
+            if (!self.weexInstance.isRootViewFrozen &&
+                (!CGSizeEqualToSize(frame.size, self.weexInstance.frame.size) || !CGSizeEqualToSize(frame.size, self.weexInstance.rootView.frame.size))) {
+                CGRect rect = self.weexInstance.rootView.frame; // no change of origin
+                rect.size = frame.size;
+                self.weexInstance.rootView.frame = rect;
+            }
+        });
     }
     
     if ([component _isCalculatedFrameChanged:frame]) {
