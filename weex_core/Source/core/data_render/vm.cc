@@ -699,10 +699,11 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 Variables *funcs = ValueTo<ClassDescriptor>(class_desc)->funcs_.get();
                 index = funcs->IndexOf(var_name);
                 if (index < 0) {
-                    throw VMExecError("Can't Find String Func " + var_name + " With OP_CODE [OP_GETMEMBER]");
+                    SetNil(a);
+                } else {
+                    Value *func = funcs->Find(index);
+                    *a = *func;
                 }
-                Value *func = funcs->Find(index);
-                *a = *func;
             }
             else if (IsTable(b)) {
                 if (op == OP_GETMEMBER) {
@@ -896,7 +897,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                     SetNil(a);
                 }
             } else if (IsString(b)) {
-                LOGE("type String can not get from index");
+                //LOGE("type String can not get from index");
             } else if (IsNil(b)) {
                 SetNil(a);
             }
