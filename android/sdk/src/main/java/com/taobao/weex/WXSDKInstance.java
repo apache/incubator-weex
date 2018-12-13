@@ -18,6 +18,9 @@
  */
 package com.taobao.weex;
 
+import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -37,12 +40,11 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
-
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IDrawableLoader;
-import com.taobao.weex.adapter.IWXJscProcessManager;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
+import com.taobao.weex.adapter.IWXJscProcessManager;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
@@ -57,18 +59,14 @@ import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXPerformance;
-import com.taobao.weex.common.WXPerformance.Dimension;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
-import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
 import com.taobao.weex.layout.ContentBoxMeasurement;
-import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.performance.WXInstanceApm;
-import com.taobao.weex.performance.WXInstanceExceptionRecord;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
@@ -84,7 +82,6 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -93,9 +90,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 
 /**
@@ -147,7 +141,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private Map<String,String> mContainerInfo;
 
-  private WXInstanceExceptionRecord mExceptionRecorder;
   public boolean isNewFsEnd = false;
 
   /**
@@ -470,7 +463,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     mWXPerformance = new WXPerformance(mInstanceId);
     mApmForInstance = new WXInstanceApm(mInstanceId);
-    mExceptionRecorder = new WXInstanceExceptionRecord(mInstanceId);
     mWXPerformance.WXSDKVersion = WXEnvironment.WXSDK_VERSION;
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
 
@@ -1407,7 +1399,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void onRenderError(final String errCode, final String msg) {
-    getExceptionRecorder().recordReportErrorMsg("["+errCode+",onRenderError,"+msg+"]");
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
 
@@ -1422,7 +1413,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void onJSException(final String errCode, final String function, final String exception) {
-    getExceptionRecorder().recordReportErrorMsg("["+errCode+","+function+","+exception+"]");
     hasException = true;
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
@@ -1533,7 +1523,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public synchronized void destroy() {
     if(!isDestroy()) {
       mApmForInstance.onEnd();
-      getExceptionRecorder().checkEmptyScreenAndReport();
       if(mRendered) {
         WXSDKManager.getInstance().destroyInstance(mInstanceId);
       }
@@ -1865,10 +1854,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public WXInstanceApm getApmForInstance() {
     return mApmForInstance;
-  }
-
-  public WXInstanceExceptionRecord getExceptionRecorder() {
-    return mExceptionRecorder;
   }
 
   public Map<String, Serializable> getUserTrackParams() {

@@ -1,3 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
@@ -36,11 +55,10 @@ checkstyle {
 }
 
 
-version = "0.19.0.4"
+version = "0.20.0.1"
 
 android {
 
-    publishNonDefault true
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
@@ -110,7 +128,7 @@ android {
         multiDexEnabled true
 
         versionCode 1
-        versionName "1.0"
+        versionName project.version
         ndk {
             abiFilters "armeabi-v7a","armeabi","x86"
         }
@@ -264,3 +282,66 @@ task checkNdkVersion() {
 }
 
 preBuild.dependsOn checkNdkVersion
+
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+def siteUrl = 'http://weex.incubator.apache.org'
+def gitUrl = 'https://github.com/apache/incubator-weex.git'
+group = "com.taobao.android"
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                name 'weex_sdk'
+                url siteUrl
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'weex alibaba'
+                        name 'weex alibaba'
+                        email 'alibabaweex@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+bintray {
+    configurations = ['archives']
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    pkg {
+        repo = "maven"
+        name = "weex_sdk"
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+        version {
+            //这里填写需要发布的版本号
+            name = project.version
+        }
+    }
+}
