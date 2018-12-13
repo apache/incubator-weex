@@ -28,8 +28,8 @@ namespace network {
     DefaultRequestHandler::~DefaultRequestHandler() {}
 
     void DefaultRequestHandler::Send(const char* instance_id, const char* url, Callback callback) {
-        NSURL* ns_url = [NSURL URLWithString:NSSTRING(url)];
-        [[WXSDKManager bridgeMgr] DownloadJS:ns_url completion:^(NSString *script) {
+        NSURL* nsURL = [NSURL URLWithString:NSSTRING(url)];
+        [[WXSDKManager bridgeMgr] DownloadJS:nsURL completion:^(NSString *script) {
             if (!script) {
                 return;
             }
