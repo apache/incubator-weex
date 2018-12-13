@@ -51,8 +51,11 @@ class VComponent : public VNode {
   }
   void MoveTo(VComponent* new_component);
 
-  inline const std::string& render_object_ref() const override {
-    return root_vnode_->render_object_ref();
+  inline const std::string render_object_ref() const override {
+    if (root_vnode_.get()) {
+      return root_vnode_->render_object_ref();
+    }
+    return "";
   }
 
   inline int id() { return id_; }

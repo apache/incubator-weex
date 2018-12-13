@@ -78,7 +78,7 @@ class VNode {
 
   inline const std::string &ref() const { return ref_; }
 
-  virtual inline const std::string &render_object_ref() const {
+  virtual inline const std::string render_object_ref() const {
     return render_object_ref_;
   }
 
