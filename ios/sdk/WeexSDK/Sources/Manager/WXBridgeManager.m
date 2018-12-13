@@ -148,10 +148,12 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
                   data:(id)data {
     if (!instance || !temp) return;
     __weak typeof(self) weakSelf = self;
+    NSMutableDictionary *newOptions = [options mutableCopy] ?: [NSMutableDictionary new];
+    newOptions[@"EXEC_JS"] = @(YES);
     WXPerformBlockOnBridgeThread(^(){
         [weakSelf.bridgeCtx createInstance:instance
                                   template:temp
-                                   options:options
+                                   options:newOptions
                                       data:data];
     });
 }

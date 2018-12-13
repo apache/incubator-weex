@@ -774,7 +774,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         if (!javascript) {
             return;
         }
-        [[WXSDKManager bridgeMgr] createInstanceForJS:pageId template:NSSTRING(javascript) options:nil data:data];
+        [[WXSDKManager bridgeMgr] createInstanceForJS:pageId template:NSSTRING(javascript) options:options data:data];
     });
 }
 
@@ -787,7 +787,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         if (!javascript) {
             return;
         }
-        [[WXSDKManager bridgeMgr] createInstanceForJS:pageId template:NSSTRING(javascript) options:nil data:data];
+        [[WXSDKManager bridgeMgr] createInstanceForJS:pageId template:NSSTRING(javascript) options:options data:data];
     });
 }
 
