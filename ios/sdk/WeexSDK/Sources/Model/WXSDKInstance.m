@@ -251,9 +251,6 @@ typedef enum : NSUInteger {
     _jsData = data;
     
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
-    if (self.dataRender) {
-        [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"wxEagle"];
-    }
 
     if ([source isKindOfClass:[NSString class]]) {
         WXLogDebug(@"Render source: %@, data:%@", self, [WXUtility JSONString:data]);
@@ -284,6 +281,9 @@ typedef enum : NSUInteger {
     //some case , with out render (url)
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
+    if (self.dataRender) {
+        [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"wxEagle"];
+    }
 
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
     self.performance.renderUnixTimeOrigin = [WXUtility getUnixFixTimeMillis];
@@ -360,6 +360,9 @@ typedef enum : NSUInteger {
     [self _checkPageName];
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
+    if (self.dataRender) {
+        [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"wxEagle"];
+    }
     
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
     self.performance.renderUnixTimeOrigin = [WXUtility getUnixFixTimeMillis];
@@ -480,9 +483,6 @@ typedef enum : NSUInteger {
         newOptions[bundleUrlOptionKey] = ((NSURL*)newOptions[bundleUrlOptionKey]).absoluteString;
     }
     _options = [newOptions copy];
-    if (self.dataRender) {
-        [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"wxEagle"];
-    }
     request.userAgent = [WXUtility userAgent];
     
     WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, self);
