@@ -56,7 +56,7 @@ export default class WeexInstance {
   constructor (id, config, data) {
     setId(this, String(id))
     this.config = config || {}
-    this.data = data || {}
+    this._nativeData = data || {}
     this.document = new Document(id, this.config.bundleUrl)
     this.requireModule = this.requireModule.bind(this)
     this.importScript = this.importScript.bind(this)
