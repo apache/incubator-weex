@@ -666,7 +666,7 @@ _Pragma("clang diagnostic pop") \
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
         useRegEx = [[configCenter configForKey:@"iOS_weex_ext_config.parserTypeByRegEx" defaultValue:@(YES) isDefault:NULL] boolValue];
     }
-    return useRegEx;
+    return false;
 }
 
 - (void)destroyInstance:(NSString *)instance
