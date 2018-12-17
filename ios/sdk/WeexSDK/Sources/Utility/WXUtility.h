@@ -81,6 +81,13 @@ do {\
     }\
 }while(0)
 
+#define WXPointEqualToPoint __WXPointEqualToPoint
+CG_INLINE bool
+__WXPointEqualToPoint(CGPoint point1, CGPoint point2)
+{
+    return fabs (point1.x - point2.x) < 0.00001 && fabs (point1.y - point2.y) < 0.00001;
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
