@@ -464,11 +464,12 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)layoutDidFinish
 {
-    _recycleSliderView.currentIndex = _index;
+    _recycleSliderView.currentIndex = self.currentIndex;
 }
 
 - (void)_buildViewHierarchyLazily {
     [super _buildViewHierarchyLazily];
+    _recycleSliderView.currentIndex = self.currentIndex;
 }
 
 - (void)adjustForRTL
