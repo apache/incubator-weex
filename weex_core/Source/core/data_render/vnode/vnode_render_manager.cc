@@ -951,9 +951,9 @@ void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
     int index = 0;
     for (auto it = new_node->child_list()->cbegin();
          it != new_node->child_list()->cend(); it++) {
-      WeexCore::RenderObject *root = VNode2RenderObject(*it, page_id);
+      WeexCore::RenderObject *child_node = ParseVNode2RenderObject(*it, nullptr, false, 0, page_id);
       RenderManager::GetInstance()->AddRenderObject(
-          page_id, (*it)->parent()->render_object_ref(), index, root);
+                                                      page_id, (*it)->parent()->render_object_ref(), index, child_node);
       ++index;
     }
   }
