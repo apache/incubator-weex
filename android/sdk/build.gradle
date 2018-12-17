@@ -30,6 +30,8 @@ plugins {
 
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
 
 ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
 if(!disableCov.toBoolean()){
@@ -54,8 +56,7 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-
-version = "0.20.0.1"
+version = project.hasProperty('weexVersion')? project.getProperty('weexVersion') : "0.20.0.1"
 
 android {
 
@@ -288,8 +289,6 @@ task checkNdkVersion() {
 
 preBuild.dependsOn checkNdkVersion
 
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'com.github.dcendents.android-maven'
 def siteUrl = 'http://weex.incubator.apache.org'
 def gitUrl = 'https://github.com/apache/incubator-weex.git'
 group = "com.taobao.android"
