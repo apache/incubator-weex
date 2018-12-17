@@ -613,34 +613,50 @@ _Pragma("clang diagnostic pop") \
         // Fallback on earlier versions
         return bundleType;
     }
-    // trim like whiteSpace and newline charset
-    jsBundleString = [jsBundleString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
-    // use the top 100 characters match the bundleType
-    if (jsBundleString.length > 100) {
-        jsBundleString = [jsBundleString substringWithRange:NSMakeRange(0, 100)];
+    // find first character that is not space or new line character
+    NSCharacterSet* voidCharSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    NSUInteger length = [jsBundleString length];
+    NSUInteger validCharacter = 0;
+    while (validCharacter < length && [voidCharSet characterIsMember:[jsBundleString characterAtIndex:validCharacter]]) {
+        validCharacter ++;
     }
-    
-    if (!jsBundleString ) {
+    if (validCharacter >= length) {
         return bundleType;
     }
+    @try {
+        jsBundleString = [jsBundleString substringWithRange:NSMakeRange(validCharacter, MIN(100, length - validCharacter))];
+    }
+    @catch (NSException* e) {
+    }
+    if ([jsBundleString length] == 0) {
+        return bundleType;
+    }
+    
+    static NSRegularExpression* headerExp = nil;
+    static NSRegularExpression* vueExp = nil;
+    static NSRegularExpression* raxExp = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        headerExp = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\/\\/ *(\\{[^}]*\\}) *\\r?\\n" options:NSRegularExpressionCaseInsensitive error:NULL];
+        vueExp = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:vue)" options:NSRegularExpressionCaseInsensitive error:NULL];
+        raxExp = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:rax)" options:NSRegularExpressionCaseInsensitive error:NULL];
+    });
+    
     if ( [self _isParserByRegEx]) {
-        NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\/\\/ *(\\{[^}]*\\}) *\\r?\\n" options:NSRegularExpressionCaseInsensitive error:NULL];
-        NSTextCheckingResult *match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+        NSTextCheckingResult *match = [headerExp firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
         if (match) {
             NSString* bundleTypeStr = [jsBundleString substringWithRange:match.range];
             bundleTypeStr = [bundleTypeStr stringByReplacingOccurrencesOfString:@"//" withString:@""];
             id vale = [WXUtility objectFromJSON:bundleTypeStr];
             bundleType = [vale objectForKey:@"framework"];
         }else{
-            NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:vue)" options:NSRegularExpressionCaseInsensitive error:NULL];
-            NSTextCheckingResult *match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            NSTextCheckingResult *match = [vueExp firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
             if (match) {
                 bundleType = [jsBundleString substringWithRange:match.range];
                 return bundleType;
             }
-            regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:rax)" options:NSRegularExpressionCaseInsensitive error:NULL];
-            match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            match = [raxExp firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
             if (match) {
                 bundleType = [jsBundleString substringWithRange:match.range];
             }
@@ -651,14 +667,12 @@ _Pragma("clang diagnostic pop") \
         } else if ([jsBundleString hasPrefix:@"// { \"framework\": \"Rax\""] || [jsBundleString hasPrefix:@"// { \"framework\": \"rax\""] || [jsBundleString hasPrefix:@"// {\"framework\" : \"Rax\"}"] || [jsBundleString hasPrefix:@"// {\"framework\" : \"rax\"}"]) {
             bundleType = @"Rax";
         }else {
-            NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:vue)" options:NSRegularExpressionCaseInsensitive error:NULL];
-            NSTextCheckingResult *match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            NSTextCheckingResult *match = [vueExp firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
             if (match) {
                 bundleType = [jsBundleString substringWithRange:match.range];
                 return bundleType;
             }
-            regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:rax)" options:NSRegularExpressionCaseInsensitive error:NULL];
-            match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            match = [raxExp firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
             if (match) {
                 bundleType = [jsBundleString substringWithRange:match.range];
             }

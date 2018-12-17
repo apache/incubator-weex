@@ -622,6 +622,10 @@ void UpdateChildren(const string& page_id, VNode* old_node, VNode* new_node) {
     } else if (old_end_node == nullptr) {
       old_end_node = GetOrNull(old_children, --old_end);
 
+    } else if (new_start_node == nullptr) {
+      new_start_node = GetOrNull(new_children, ++new_start);
+    } else if (new_end_node == nullptr) {
+      new_end_node = GetOrNull(new_children, --new_end);
     } else if (SameNode(old_start_node, new_start_node)) {
       PatchVNode(page_id, old_start_node, new_start_node);
       old_start_node = GetOrNull(old_children, ++old_start);
