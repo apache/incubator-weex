@@ -97,14 +97,14 @@ Weex team have developed a [DevTool](https://github.com/weexteam/weex-devtool) t
 
 See more stuff on [this wiki page](https://github.com/alibaba/weex/wiki/Weex-Community)
 
-### Weex Community
-
+## Weex Community
+* [Mailing List](https://weex-project.io/contributing.html#join-in-discussions) Weex Mailing List, where most discussion happens.
 * [StackOverflow](http://stackoverflow.com/questions/tagged/weex): Ask questions about Weex.
 * [SegmentFault (cn)](https://segmentfault.com/t/weex): 中文交流与讨论
 * [FAQ](https://weex.apache.org/faq.html)
 * [Articles (cn)](https://github.com/weexteam/article/issues): Weex 相关文章集合
 * [Telegram Russian Community Group](https://telegram.me/weex_ru)
 
-## Contributing
+### Contributing
 
 See [Weex Contributing Guide](./CONTRIBUTING.md) for more information.
