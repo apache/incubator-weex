@@ -124,7 +124,7 @@
     [WXSDKEngine registerHandler:[WXConfigCenterDefaultImpl new] withProtocol:@protocol(WXConfigCenterProtocol)];
     [WXSDKEngine registerHandler:[WXNavigationHandlerImpl new] withProtocol:@protocol(WXNavigationProtocol)];
     [WXSDKEngine registerHandler:[WXApmGeneratorImpl new] withProtocol:@protocol(WXApmGeneratorProtocol)];
-    [WXSDKEngine registerHandler:[WXWebSocketDefauzltImpl new] withProtocol:@protocol(WXWebSocketHandler)];
+    [WXSDKEngine registerHandler:[WXWebSocketDefaultImpl new] withProtocol:@protocol(WXWebSocketHandler)];
     
     [WXSDKEngine registerComponent:@"select" withClass:NSClassFromString(@"WXSelectComponent")];
     [WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];
