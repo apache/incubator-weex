@@ -681,6 +681,7 @@ static BOOL bNeedRemoveEvents = YES;
         [_transition _handleTransitionWithStyles:[styles mutableCopy] resetStyles:resetStyles target:self];
     } else {
         styles = [self parseStyles:styles];
+        [self resetPseudoClassStyles:resetStyles];
         [self _updateCSSNodeStyles:styles];
         [self _resetCSSNodeStyles:resetStyles];
     }
