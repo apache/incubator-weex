@@ -107,6 +107,7 @@ public class WXInstanceApm {
 
     /************** value *****************/
     public static final String VALUE_ERROR_CODE_DEFAULT = "0";
+    public static final String VALUE_BUNDLE_LOAD_LENGTH = "wxLoadedLength";
 
     private String mInstanceId;
     private IWXApmMonitorAdapter apmInstance;

@@ -100,6 +100,9 @@ public class WXExceptionUtils {
 
             if (null != instance) {
                 bundleUrlCommit = instance.getApmForInstance().reportPageName;
+                Object loadLength = instance.getApmForInstance().extInfo.get(WXInstanceApm.VALUE_BUNDLE_LOAD_LENGTH);
+                String loadLengthStr = (loadLength instanceof Integer)?String.valueOf(loadLength):"unknownLength";
+                commitMap.put(WXInstanceApm.VALUE_BUNDLE_LOAD_LENGTH,loadLengthStr);
                 commitMap.put("templateInfo",instance.getTemplateInfo());
                 if (TextUtils.isEmpty(bundleUrlCommit) || bundleUrlCommit.equals(WXPerformance.DEFAULT)) {
                     if (!TextUtils.equals(degradeUrl, "BundleUrlDefaultDegradeUrl")) {

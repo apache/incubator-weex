@@ -1972,7 +1972,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     @Override
     public void onHttpResponseProgress(int loadedLength) {
-
+        getApmForInstance().extInfo.put(WXInstanceApm.VALUE_BUNDLE_LOAD_LENGTH,loadedLength);
     }
 
     @Override
