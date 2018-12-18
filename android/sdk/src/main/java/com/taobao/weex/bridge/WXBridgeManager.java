@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.bridge;
 
+import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -31,7 +33,6 @@ import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -43,12 +44,38 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.common.*;
+import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.common.IWXDebugConfig;
+import com.taobao.weex.common.WXConfig;
+import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXException;
+import com.taobao.weex.common.WXJSBridgeMsgType;
+import com.taobao.weex.common.WXJSExceptionInfo;
+import com.taobao.weex.common.WXRefreshData;
+import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.WXComponentRegistry;
-import com.taobao.weex.ui.action.*;
+import com.taobao.weex.ui.action.ActionReloadPage;
+import com.taobao.weex.ui.action.BasicGraphicAction;
+import com.taobao.weex.ui.action.GraphicActionAddElement;
+import com.taobao.weex.ui.action.GraphicActionAddEvent;
+import com.taobao.weex.ui.action.GraphicActionAppendTreeCreateFinish;
+import com.taobao.weex.ui.action.GraphicActionCreateBody;
+import com.taobao.weex.ui.action.GraphicActionCreateFinish;
+import com.taobao.weex.ui.action.GraphicActionLayout;
+import com.taobao.weex.ui.action.GraphicActionMoveElement;
+import com.taobao.weex.ui.action.GraphicActionRefreshFinish;
+import com.taobao.weex.ui.action.GraphicActionRemoveElement;
+import com.taobao.weex.ui.action.GraphicActionRemoveEvent;
+import com.taobao.weex.ui.action.GraphicActionRenderSuccess;
+import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
+import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
+import com.taobao.weex.ui.action.GraphicPosition;
+import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.module.WXDomModule;
 import com.taobao.weex.utils.WXExceptionUtils;
@@ -60,7 +87,6 @@ import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -83,8 +109,6 @@ import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
 
 /**
  * Manager class for communication between JavaScript and Android.
@@ -1560,33 +1584,22 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         }
       }
       if (temp != null) {
-        if (temp.startsWith("// { \"framework\": \"Vue\" }") ||
-                temp.startsWith("// { \"framework\": \"vue\" }") ||
-                temp.startsWith("// {\"framework\" : \"Vue\"}") ||
-                temp.startsWith("// {\"framework\" : \"vue\"}")) {
-          return BundType.Vue;
-        } else if (temp.startsWith("// { \"framework\": \"Rax\" }") ||
-                temp.startsWith("// { \"framework\": \"rax\" }")
-                || temp.startsWith("// {\"framework\" : \"Rax\"}") ||
-                temp.startsWith("// {\"framework\" : \"rax\"}")) {
-          return BundType.Rax;
-        } else {
-          if (temp.length() > 500) {
-            temp = temp.substring(0, 500);
-          }
-          String strTrim = temp.replaceAll("\n","").trim();
-          if (strTrim.startsWith("// { \"framework\": \"Vue\" }") ||
-                  strTrim.startsWith("// { \"framework\": \"vue\" }") ||
-                  strTrim.startsWith("// {\"framework\" : \"Vue\"}") ||
-                  strTrim.startsWith("// {\"framework\" : \"vue\"}")) {
-            return BundType.Vue;
-          } else if (strTrim.startsWith("// { \"framework\": \"Rax\" }") ||
-                  strTrim.startsWith("// { \"framework\": \"rax\" }")
-                  || strTrim.startsWith("// {\"framework\" : \"Rax\"}") ||
-                  strTrim.startsWith("// {\"framework\" : \"rax\"}")) {
-            return BundType.Rax;
-          }
+        final String FRAMEWORK="framework", VUE="vue", RAX="rax";
 
+        // Find the first line that starts with '//' and convert it to json
+        int bundleTypeStart = temp.indexOf("//");
+        int bundleTypeEnd = temp.indexOf("\n", bundleTypeStart);
+        JSONObject bundleType = JSONObject.parseObject(
+            temp.substring(bundleTypeStart+2, bundleTypeEnd));
+        String type = bundleType.getString(FRAMEWORK);
+        if(VUE.equalsIgnoreCase(type)){
+          return BundType.Vue;
+        }
+        else if(RAX.equalsIgnoreCase(type)){
+          return BundType.Rax;
+        }
+        else{
+          // '//{ "framework": "Vue"}' is not found.
           String regEx = "(use)(\\s+)(weex:vue)";
           Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
           if (pattern.matcher(temp).find()) {
