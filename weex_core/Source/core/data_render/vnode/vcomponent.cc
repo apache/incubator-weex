@@ -166,9 +166,12 @@ void VComponent::MoveTo(VComponent *new_component) {
   new_component->has_dispatch_created_ = has_dispatch_created_;
   new_component->id_ = id_;
   new_component->SetRootNode(root_vnode_.release());
+  new_component->data_ = data_;
   if (!new_component->Equal(this)) {
     new_component->UpdateData();
   }
+  exec_state_->context()->RemoveComponent(id_);
+  exec_state_->context()->AddComponent(new_component->id(), new_component);
   has_moved_ = true;
 }
 
@@ -253,7 +256,9 @@ void VComponent::DispatchDestroyed() {
     listener_->OnDestroyed(this);
   }
   TravelVComponentsWithFunc(&VComponent::DispatchDestroyed, root_vnode());
-  exec_state_->context()->RemoveComponent(id_);
+  if (!has_moved_) {
+    exec_state_->context()->RemoveComponent(id_);
+  }
   DetachVNodesInContext(root_vnode());
 }
 
