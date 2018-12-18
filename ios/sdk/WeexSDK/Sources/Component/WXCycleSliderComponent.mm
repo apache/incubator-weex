@@ -376,7 +376,7 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 @interface WXCycleSliderComponent () <WXRecycleSliderViewDelegate,WXIndicatorComponentDelegate>
 
-@property (nonatomic, strong) WXRecycleSliderView *recycleSliderView;
+@property (nonatomic, weak) WXRecycleSliderView *recycleSliderView;
 @property (nonatomic, strong) NSTimer *autoTimer;
 @property (nonatomic, assign) NSInteger currentIndex;
 @property (nonatomic, assign) BOOL  autoPlay;
@@ -464,11 +464,12 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)layoutDidFinish
 {
-    _recycleSliderView.currentIndex = _index;
+    _recycleSliderView.currentIndex = self.currentIndex;
 }
 
 - (void)_buildViewHierarchyLazily {
     [super _buildViewHierarchyLazily];
+    _recycleSliderView.currentIndex = self.currentIndex;
 }
 
 - (void)adjustForRTL
