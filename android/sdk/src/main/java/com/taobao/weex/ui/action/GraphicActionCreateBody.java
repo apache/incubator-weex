@@ -47,10 +47,6 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
     this.mPaddings = paddings;
     this.mBorders = borders;
 
-    if (instance.getContext() == null) {
-      return;
-    }
-
     BasicComponentData basicComponentData = new BasicComponentData(getRef(), mComponentType, null);
     node = createNode(instance, basicComponentData).build();
     node.createComponent();
@@ -59,6 +55,8 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
   @Override
   public void executeAction() {
     super.executeAction();
-    node.createBody();
+    if (node != null) {
+      node.createBody();
+    }
   }
 }

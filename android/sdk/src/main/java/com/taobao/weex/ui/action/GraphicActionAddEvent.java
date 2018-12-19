@@ -38,7 +38,7 @@ public class GraphicActionAddEvent extends BasicGraphicAction {
   @Override
   public void executeAction() {
     WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
-    if (instance == null || instance.getContext() == null) {
+    if (instance == null) {
       return;
     }
 

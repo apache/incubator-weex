@@ -40,7 +40,7 @@ public class GraphicActionLayout extends BasicGraphicAction {
   @Override
   public void executeAction() {
     WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
-    if (instance == null || instance.getContext() == null) {
+    if (instance == null) {
       WXLogUtils.w(WXLogUtils.WEEX_TAG);
       return;
     }

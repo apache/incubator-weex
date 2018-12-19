@@ -44,7 +44,7 @@ public class GraphicActionRefreshFinish extends BasicGraphicAction {
   @Override
   public void executeAction() {
     final WXSDKInstance instance = getWXSDKIntance();
-    if (instance == null || instance.getContext() == null) {
+    if (instance == null) {
       return;
     }
 

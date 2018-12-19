@@ -65,12 +65,9 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
     this.mMargins = margins;
     this.mBorders = borders;
 
-    if (instance.getContext() == null) {
-      return;
+    if (WXAnalyzerDataTransfer.isInteractionLogOpen()){
+      Log.d(WXAnalyzerDataTransfer.INTERACTION_TAG, "[client][addelementStart]"+instance.getInstanceId()+","+componentType+","+ref);
     }
-      if (WXAnalyzerDataTransfer.isInteractionLogOpen()){
-        Log.d(WXAnalyzerDataTransfer.INTERACTION_TAG, "[client][addelementStart]"+instance.getInstanceId()+","+componentType+","+ref);
-      }
     try {
       BasicComponentData basicComponentData = new BasicComponentData(ref, mComponentType,
           mParentRef);
