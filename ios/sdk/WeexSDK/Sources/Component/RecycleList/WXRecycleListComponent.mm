@@ -717,6 +717,7 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
 {
+    cell.wx_component = nil;
     WXLogDebug(@"Did end displaying cell:%@, at index path:%@", cell, indexPath);
 }
 
