@@ -118,7 +118,7 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
 
     @Override
     public void onHttpResponseProgress(int loadedLength) {
-
+        instance.getApmForInstance().extInfo.put(WXInstanceApm.VALUE_BUNDLE_LOAD_LENGTH,loadedLength);
     }
 
     @Override
