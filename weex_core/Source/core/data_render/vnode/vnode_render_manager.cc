@@ -251,13 +251,21 @@ void VNodeRenderManager::DownloadAndExecScript(
       auto src = script_obj["src"];
       auto content = script_obj["content"];
       auto callback1 = weex::base::MakeCopyable(
-          [page_id = page_id, exec_js = exec_js](const char* result) {
+          [page_id = page_id, exec_js = exec_js, exec_state = exec_state](const char* result) {
             exec_js(result);
             auto root =
                 VNodeRenderManager::GetInstance()->GetRootVNode(page_id);
             if (root && root->IsVirtualComponent()) {
               static_cast<weex::core::data_render::VComponent*>(root)
                   ->DispatchCreated();
+
+                //fire event
+                exec_state->set_exec_js_finished(true);
+                const std::vector<std::vector<std::string>>& event_queue = exec_state->event_queue();
+                for (auto args : event_queue) {
+                    VNodeRenderManager::GetInstance()->FireEvent(args[0], args[1], args[2], args[3], args[4]);
+                }
+                exec_state->ClearEventQueue();
             }
           });
       // callback2, a wrap for callback1, will be post to script thread to
@@ -428,6 +436,11 @@ void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string
     do {
         auto iter = exec_states_.find(page_id);
         if (iter == exec_states_.end()) {
+            break;
+        }
+        if (!iter->second->exec_js_finished()) {
+            std::vector<std::string> fire_event = {page_id, ref, event, args, dom_changes};
+            iter->second->AddEvent(fire_event);
             break;
         }
         auto node = vnode_trees_.find(page_id);

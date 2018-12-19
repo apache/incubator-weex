@@ -196,6 +196,8 @@ class ExecState {
   ValueRef *FindRef(int index);
   void Register(const std::string& name, CFunction function);
   void Register(const std::string& name, Value value);
+  void AddEvent(const std::vector<std::string>& event) {event_queue_.push_back(event);}
+  void ClearEventQueue() {event_queue_.clear();}
   inline std::vector<ValueRef *> &refs() { return refs_; };
   inline Variables *global() { return global_.get(); }
   inline void reset(FuncState *func_state) { func_state_.reset(func_state); }
@@ -207,6 +209,9 @@ class ExecState {
   inline uint32_t global_compile_index() { return global_compile_index_; }
   inline uint32_t class_compile_index() { return class_compile_index_; }
   inline uint32_t string_compile_index() { return string_compile_index_; }
+  inline bool exec_js_finished() const {return exec_js_finished_;}
+  inline void set_exec_js_finished(bool exec_js_finished) {exec_js_finished_ = exec_js_finished;}
+  inline const std::vector<std::vector<std::string>>& event_queue() const {return event_queue_;}
   inline std::unordered_map<std::string, long>& global_variables() { return global_variables_; }
  private:
   friend class VM;
@@ -228,6 +233,8 @@ class ExecState {
   uint32_t global_compile_index_{0};
   uint32_t class_compile_index_{0};
   uint32_t string_compile_index_{0};
+  bool exec_js_finished_ = false;
+  std::vector<std::vector<std::string>> event_queue_;
 };
 
 }  // namespace data_render
