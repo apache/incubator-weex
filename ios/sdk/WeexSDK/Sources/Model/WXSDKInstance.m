@@ -282,7 +282,7 @@ typedef enum : NSUInteger {
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
     if (self.dataRender) {
-        [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"wxEagle"];
+        [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"eagle"];
     }
 
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
@@ -361,7 +361,7 @@ typedef enum : NSUInteger {
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
     if (self.dataRender) {
-        [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"wxEagle"];
+        [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"eagle"];
     }
     
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
