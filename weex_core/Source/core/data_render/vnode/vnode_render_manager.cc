@@ -871,13 +871,13 @@ void CompareAndApplyEvents1(const std::string& page_id, VNode* old_node,
 
   for (auto it = old_events.cbegin(); it != old_events.cend(); it++) {
     auto pos = new_events.find(it->first);
-    if (pos == new_events.end()) {
+    if (pos != new_events.end()) {
       new_events.erase(pos);
     }
   }
   for (auto it = new_events.cbegin(); it != new_events.cend(); it++) {
     auto pos = old_events.find(it->first);
-    if (pos == old_events.end()) {
+    if (pos != old_events.end()) {
       old_events.erase(pos);
     }
   }
@@ -899,14 +899,14 @@ void CompareAndApplyEvents2(const std::string& page_id, VNode* old_node,
   for (auto it = old_events.cbegin(); it != old_events.cend(); it++) {
     auto pos = new_events.find(it->first);
 
-    if (pos == new_events.end()) {
+    if (pos != new_events.end()) {
       new_events.erase(pos);
     }
   }
   for (auto it = new_events.cbegin(); it != new_events.cend(); it++) {
     auto pos = old_events.find(it->first);
 
-    if (pos == old_events.end()) {
+    if (pos != old_events.end()) {
       old_events.erase(pos);
     }
   }
