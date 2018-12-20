@@ -1460,7 +1460,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 template.getContent());
 
         Object extraOption = null;
-        if(options != null) {
+        if(options != null && options.containsKey("extraOption")) {
            extraOption = options.get("extraOption");
            options.remove("extraOption");
         }
