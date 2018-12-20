@@ -140,13 +140,13 @@ void ScriptSideInMultiSo::ExecJSWithCallback(
 int ScriptSideInMultiSo::CreateInstance(const char *instanceId,
                                         const char *func, const char *script,
                                         const char *opts, const char *initData,
-                                        const char *extendsApi) {
+                                        const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params) {
   if(script_side_functions_ == nullptr) {
     LOGE("ScriptSideInMultiSo::CreateInstance script_side_functions_ is null");
     return false;
   }
   return script_side_functions_->funcCreateInstance(instanceId, func, script,
-                                                    opts, initData, extendsApi);
+                                                    opts, initData, extendsApi,params);
 }
 
 std::unique_ptr<WeexJSResult> ScriptSideInMultiSo::ExecJSOnInstance(const char *instanceId,

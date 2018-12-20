@@ -140,7 +140,7 @@ class ScriptBridge {
     virtual int CreateInstance(const char *instanceId, const char *func,
                                const char *script, const char *opts,
                                const char *initData,
-                               const char *extendsApi) = 0;
+                               const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params) = 0;
 
     virtual std::unique_ptr<WeexJSResult>  ExecJSOnInstance(const char *instanceId,
                                    const char *script) = 0;

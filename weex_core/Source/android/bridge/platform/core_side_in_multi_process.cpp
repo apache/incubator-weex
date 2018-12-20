@@ -571,7 +571,7 @@ namespace WeexCore {
 
     int CoreSideInMultiProcess::CreateInstance(const char *instanceId, const char *func,
                                            const char *script, const char *opts,
-                                           const char *initData, const char *extendsApi,
+                                           const char *initData, const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params,
                                            const char* render_strategy) {
         try {
             std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
@@ -582,7 +582,10 @@ namespace WeexCore {
             serializer->add(opts, strlen(opts));
             serializer->add(initData, strlen(initData));
             serializer->add(extendsApi, strlen(extendsApi));
-
+            for (auto it = params.begin(); it != params.end(); ++it) {
+                serializer->add((*it)->type->content, (*it)->type->length);
+                serializer->add((*it)->value->content, (*it)->value->length);
+            }
             std::unique_ptr<IPCBuffer> buffer = serializer->finish();
             std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
             if (result->getType() != IPCType::INT32) {

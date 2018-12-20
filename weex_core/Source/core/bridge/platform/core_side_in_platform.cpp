@@ -425,7 +425,7 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
                                        const char *script, int script_length,
                                        const char *opts,
                                        const char *initData,
-                                       const char *extendsApi,
+                                       const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params,
                                        const char *render_strategy) {
   // First check about DATA_RENDER mode
   if (render_strategy != nullptr) {
@@ -440,12 +440,13 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
               const_cast<std::map<std::string, json11::Json> &>(
                   opts_json.object_items());
           opts_map["bundleType"] = "Vue";
+          std::vector<INIT_FRAMEWORK_PARAMS*> params;
           WeexCoreManager::Instance()
               ->script_bridge()
               ->script_side()
               ->CreateInstance(instanceId.c_str(), func.c_str(), result,
                                opts_json.dump().c_str(), initData.c_str(),
-                               extendsApi.c_str());
+                               extendsApi.c_str(),params);
         };
     if (strcmp(render_strategy, "DATA_RENDER") == 0) {
       auto node_manager =
@@ -467,7 +468,7 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
   return WeexCoreManager::Instance()
       ->script_bridge()
       ->script_side()
-      ->CreateInstance(instanceId, func, script, opts, initData, extendsApi);
+      ->CreateInstance(instanceId, func, script, opts, initData, extendsApi, params);
 }
 
 std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSOnInstance(const char *instanceId,
