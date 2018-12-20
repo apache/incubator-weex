@@ -1459,6 +1459,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXJSObject instanceObj = new WXJSObject(WXJSObject.String,
                 template.getContent());
 
+        Object extraOption = null;
+        if(options != null && options.containsKey("extraOption")) {
+           extraOption = options.get("extraOption");
+           options.remove("extraOption");
+        }
+
+        WXJSObject extraOptionObj = new WXJSObject(WXJSObject.JSON,
+                extraOption == null ? "{}"
+                        : WXJsonUtils.fromObjectToJSONString(extraOption));
+
+
         WXJSObject optionsObj = new WXJSObject(WXJSObject.JSON,
                 options == null ? "{}"
                         : WXJsonUtils.fromObjectToJSONString(options));
@@ -1496,7 +1507,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         }
 
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
-                dataObj, apiObj, renderStrategy};
+                dataObj, apiObj, renderStrategy, extraOptionObj};
 
         instance.setTemplate(template.getContent());
 

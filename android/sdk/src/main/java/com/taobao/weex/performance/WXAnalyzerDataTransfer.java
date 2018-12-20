@@ -142,18 +142,19 @@ public class WXAnalyzerDataTransfer {
       }
       sOpenInteractionLog = isOpen;
       //for jsfm && jsengin
-      WXBridgeManager.getInstance().post(new Runnable() {
-          @Override
-          public void run() {
-              WXJSObject[] args = {new WXJSObject(isOpen?1:0)};
-              WXBridgeManager.getInstance().invokeExecJS(
-                  "",
-                  null,
-                  "switchInteractionLog",
-                  args,
-                  false);
-          }
-      });
+      //TODO wait for JSFramework
+//      WXBridgeManager.getInstance().post(new Runnable() {
+//          @Override
+//          public void run() {
+//              WXJSObject[] args = {new WXJSObject(isOpen?1:0)};
+//              WXBridgeManager.getInstance().invokeExecJS(
+//                  "",
+//                  null,
+//                  "switchInteractionLog",
+//                  args,
+//                  false);
+//          }
+//      });
       //for weex_core
       WXBridgeManager.getInstance().registerCoreEnv("switchInteractionLog",String.valueOf(isOpen));
   }

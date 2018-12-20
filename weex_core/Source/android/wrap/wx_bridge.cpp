@@ -511,6 +511,10 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
       new WXJSObject(env, base::android::ScopedLocalJavaRef<jobject>(
           env, env->GetObjectArrayElement(args, 5))
           .Get()));
+
+  auto extraOptionString = base::android::ScopedLocalJavaRef<jstring>(
+          env, getJsonData(env, args, 6));
+
   auto japi = arg4->GetData(env);
   ScopedJStringUTF8 scoped_id(env, instanceId);
   ScopedJStringUTF8 scoped_func(env, function);
@@ -519,7 +523,22 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
   ScopedJStringUTF8 scoped_api(env, static_cast<jstring>(japi.Get()));
   ScopedJStringUTF8 scoped_render_strategy(
       env, static_cast<jstring>(render_strategy->GetData(env).Release()));
+  ScopedJStringUTF8 scoped_extra_option(env, extraOptionString.Get());
 
+  std::string err;
+  const std::string input = scoped_extra_option.getChars();
+  const json11::Json &json = json11::Json::parse(input, err);
+
+  const std::map<std::string, json11::Json> &data = json.object_items();
+  auto it = data.begin();
+  std::vector<INIT_FRAMEWORK_PARAMS*> params;
+  while (it != data.end()) {
+    INIT_FRAMEWORK_PARAMS *param = nullptr;
+    const std::string &string = it->second.string_value();
+    param = WeexCore::genInitFrameworkParams(it->first.c_str(),it->second.string_value().c_str());
+    params.push_back(param);
+    it++;
+  }
   // If strategy is DATA_RENDER_BINARY, jscript is a jbyteArray, otherwise jstring
   // TODO use better way
   if (scoped_render_strategy.getChars() != nullptr
@@ -530,7 +549,7 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
         ->core_side()
         ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
                          byte_array.getBytes(), byte_array.length(), scoped_opts.getChars(),
-                         scoped_init_data.getChars(), scoped_api.getChars(),
+                         scoped_init_data.getChars(), scoped_api.getChars(), params,
                          scoped_render_strategy.getChars());
   } else {
     ScopedJStringUTF8 scoped_script(env, static_cast<jstring>(jscript.Get()));
@@ -540,7 +559,7 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
         ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
                          scoped_script.getChars(), strlen(scoped_script.getChars()),
                          scoped_opts.getChars(),
-                         scoped_init_data.getChars(), scoped_api.getChars(),
+                         scoped_init_data.getChars(), scoped_api.getChars(),params,
                          scoped_render_strategy.getChars());
   }
 
