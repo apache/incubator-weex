@@ -2,6 +2,8 @@
 buildscript {
     repositories {
         mavenLocal()
+        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        mavenCentral()
         jcenter()
     }
     dependencies {
@@ -17,6 +19,8 @@ plugins {
 subprojects {
     repositories {
         mavenLocal()
+        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        mavenCentral()
         jcenter()
         maven {
             url 'https://maven.google.com'
