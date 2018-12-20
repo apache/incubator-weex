@@ -202,7 +202,6 @@ namespace WeexCore {
 
     WXCorePositionType mPositionType;
       
-      WXCoreDirection mDirection;
 
     float mFlexGrow;
 
@@ -229,6 +228,8 @@ namespace WeexCore {
     WXCoreBorderWidth mBorderWidth;
 
     WXCorePosition mStylePosition;
+    
+    WXCoreDirection mDirection;
 
     constexpr static float kFlexGrowDefault  = 0;
       
@@ -246,7 +247,7 @@ namespace WeexCore {
 
     constexpr static WXCorePositionType kWXCorePositionTypeDefault = kRelative;
 
-    WXCoreCSSStyle() : mDirection(kDirectionInherit),
+    WXCoreCSSStyle() :
                        mFlexDirection(kFlexDirectionDefault),
                        mFlexWrap(kFlexWrapDefault),
                        mJustifyContent(kFlexJustifyContentDefault),
@@ -257,12 +258,12 @@ namespace WeexCore {
                        mStyleWidth(NAN), mStyleHeight(NAN),
                        mStyleHeightLevel(FALLBACK_STYLE), mStyleWidthLevel(FALLBACK_STYLE),
                        mMaxWidth(NAN), mMaxHeight(NAN),
-                       mMinWidth(NAN), mMinHeight(NAN) {
+                       mMinWidth(NAN), mMinHeight(NAN),
+                       mDirection(kDirectionInherit) {
 
     }
 
     ~WXCoreCSSStyle() {
-      mDirection = kDirectionInherit;
       mFlexDirection = kFlexDirectionDefault;
       mFlexWrap = kFlexWrapDefault;
       mJustifyContent = kFlexJustifyContentDefault;
@@ -277,6 +278,7 @@ namespace WeexCore {
       mMaxHeight = NAN;
       mMinWidth = NAN;
       mMinHeight = NAN;
+      mDirection = kDirectionInherit;
     }
 
     inline float sumPaddingBorderOfEdge(const WXCoreEdge edge){
