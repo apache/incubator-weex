@@ -319,7 +319,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       @Override
       public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
         super.onScrollStateChanged(recyclerView, newState);
-
+        getScrollStartEndHelper().onScrollStateChanged(newState);
         List<OnWXScrollListener> listeners = getInstance().getWXScrollListeners();
         int size;
         OnWXScrollListener listener;

@@ -22,6 +22,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.component.list.BasicListComponent;
@@ -45,6 +46,8 @@ public class ScrollStartEndHelper implements Runnable{
 
     private int x;
     private int y;
+    private boolean hasScrollEnd;
+
 
     public ScrollStartEndHelper(WXComponent component) {
         this.component = component;
@@ -78,10 +81,15 @@ public class ScrollStartEndHelper implements Runnable{
         if(component.isDestoryed()){
             return;
         }
+        if(!hasScrollEnd){
+            return;
+        }
         if(component.getEvents().contains(Constants.Event.SCROLL_END)){
             component.fireEvent(Constants.Event.SCROLL_END, getScrollEvent(this.x, this.y));
         }
         hasStart = false;
+        hasScrollEnd = false;
+
     }
 
     private Map<String, Object> getScrollEvent(int offsetX, int offsetY){
@@ -101,6 +109,14 @@ public class ScrollStartEndHelper implements Runnable{
             return scroller.getScrollEvent(offsetX, offsetY);
         }
         return null;
+    }
+
+    public void onScrollStateChanged(int newState){
+        if(newState == OnWXScrollListener.IDLE){
+            hasScrollEnd = true;
+            handler.removeCallbacks(this);
+            handler.postDelayed(this, minInterval);
+        }
     }
 
 

@@ -290,6 +290,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
+                getScrollStartEndHelper().onScrollStateChanged(newState);
                 List<OnWXScrollListener> listeners = getInstance().getWXScrollListeners();
                 if (listeners != null && listeners.size() > 0) {
                     for (OnWXScrollListener listener : listeners) {
