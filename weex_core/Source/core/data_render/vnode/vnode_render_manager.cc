@@ -868,24 +868,26 @@ void CompareAndApplyEvents1(const std::string& page_id, VNode* old_node,
                             VNode* new_node) {
   std::map<std::string, void*> old_events = *old_node->events();
   std::map<std::string, void*> new_events = *new_node->events();
+  std::map<std::string, void*> remove_events;
+  std::map<std::string, void*> add_events;
 
   for (auto it = old_events.cbegin(); it != old_events.cend(); it++) {
     auto pos = new_events.find(it->first);
-    if (pos != new_events.end()) {
-      new_events.erase(pos);
+    if (pos == new_events.end()) {
+      remove_events.insert(*it);
     }
   }
   for (auto it = new_events.cbegin(); it != new_events.cend(); it++) {
     auto pos = old_events.find(it->first);
-    if (pos != old_events.end()) {
-      old_events.erase(pos);
+    if (pos == old_events.end()) {
+      add_events.insert(*it);
     }
   }
-  for (auto it = old_events.cbegin(); it != old_events.cend(); it++) {
+  for (auto it = remove_events.cbegin(); it != remove_events.cend(); it++) {
     RenderManager::GetInstance()->RemoveEvent(
         page_id, new_node->render_object_ref(), it->first);
   }
-  for (auto it = new_events.cbegin(); it != new_events.cend(); it++) {
+  for (auto it = add_events.cbegin(); it != add_events.cend(); it++) {
     RenderManager::GetInstance()->AddEvent(
         page_id, new_node->render_object_ref(), it->first);
   }
@@ -896,25 +898,27 @@ void CompareAndApplyEvents2(const std::string& page_id, VNode* old_node,
   VNode::EventParamsMap old_events = *old_node->event_params_map();
   VNode::EventParamsMap new_events = *new_node->event_params_map();
 
+  VNode::EventParamsMap remove_events;
+  VNode::EventParamsMap add_events;
   for (auto it = old_events.cbegin(); it != old_events.cend(); it++) {
     auto pos = new_events.find(it->first);
 
-    if (pos != new_events.end()) {
-      new_events.erase(pos);
+    if (pos == new_events.end()) {
+        remove_events.insert(*it);
     }
   }
   for (auto it = new_events.cbegin(); it != new_events.cend(); it++) {
     auto pos = old_events.find(it->first);
 
-    if (pos != old_events.end()) {
-      old_events.erase(pos);
+    if (pos == old_events.end()) {
+        add_events.insert(*it);
     }
   }
-  for (auto it = old_events.cbegin(); it != old_events.cend(); it++) {
+  for (auto it = remove_events.cbegin(); it != remove_events.cend(); it++) {
     RenderManager::GetInstance()->RemoveEvent(
         page_id, new_node->render_object_ref(), it->first);
   }
-  for (auto it = new_events.cbegin(); it != new_events.cend(); it++) {
+  for (auto it = add_events.cbegin(); it != add_events.cend(); it++) {
     RenderManager::GetInstance()->AddEvent(
         page_id, new_node->render_object_ref(), it->first);
   }
