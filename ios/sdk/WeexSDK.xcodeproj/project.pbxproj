@@ -96,9 +96,6 @@
 		4532670D213FCFB400DAA620 /* WXDisplayLinkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 45326709213FC84900DAA620 /* WXDisplayLinkManager.m */; };
 		453267142140E38900DAA620 /* vcomponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 453267122140E38900DAA620 /* vcomponent.h */; };
 		453267152140E38900DAA620 /* vcomponent.cc in Sources */ = {isa = PBXBuildFile; fileRef = 453267132140E38900DAA620 /* vcomponent.cc */; };
-		453267202142731000DAA620 /* binary_file.h in Headers */ = {isa = PBXBuildFile; fileRef = 4532671E2142731000DAA620 /* binary_file.h */; };
-		453267212142731000DAA620 /* binary_file.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4532671F2142731000DAA620 /* binary_file.cc */; };
-		453F374D219A76A600A03F1D /* WXConvertUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F374B219A76A500A03F1D /* WXConvertUtility.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		453F374E219A76A600A03F1D /* WXConvertUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = 453F374C219A76A500A03F1D /* WXConvertUtility.mm */; };
 		453F3756219A76CA00A03F1D /* default_request_handler.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F3750219A76CA00A03F1D /* default_request_handler.h */; };
 		453F3757219A76CA00A03F1D /* http_module.cc in Sources */ = {isa = PBXBuildFile; fileRef = 453F3751219A76CA00A03F1D /* http_module.cc */; };
@@ -111,19 +108,14 @@
 		453F3763219A770900A03F1D /* vnode_on_event_listener.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F3761219A770900A03F1D /* vnode_on_event_listener.h */; };
 		453F3764219A77EE00A03F1D /* vcomponent_lifecycle_listener.mm in Sources */ = {isa = PBXBuildFile; fileRef = 453F375C219A76FA00A03F1D /* vcomponent_lifecycle_listener.mm */; };
 		453F3765219A77FF00A03F1D /* vnode_on_event_listener.mm in Sources */ = {isa = PBXBuildFile; fileRef = 453F375D219A76FA00A03F1D /* vnode_on_event_listener.mm */; };
-		453F3766219A780A00A03F1D /* vcomponent.cc in Sources */ = {isa = PBXBuildFile; fileRef = 453267132140E38900DAA620 /* vcomponent.cc */; };
 		453F3767219A781900A03F1D /* vcomponent_lifecycle_listener.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F3760219A770900A03F1D /* vcomponent_lifecycle_listener.h */; };
 		453F3768219A782900A03F1D /* vnode_on_event_listener.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F3761219A770900A03F1D /* vnode_on_event_listener.h */; };
-		453F3769219A783400A03F1D /* vcomponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 453267122140E38900DAA620 /* vcomponent.h */; };
 		453F376A219A784F00A03F1D /* http_module.cc in Sources */ = {isa = PBXBuildFile; fileRef = 453F3751219A76CA00A03F1D /* http_module.cc */; };
 		453F376B219A785C00A03F1D /* http_module.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F3755219A76CA00A03F1D /* http_module.h */; };
 		453F376C219A786F00A03F1D /* request_handler.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F3754219A76CA00A03F1D /* request_handler.h */; };
 		453F376D219A788800A03F1D /* default_request_handler.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F3750219A76CA00A03F1D /* default_request_handler.h */; };
 		453F376E219A789A00A03F1D /* default_request_handler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 453F3753219A76CA00A03F1D /* default_request_handler.mm */; };
 		453F376F219A78D700A03F1D /* WXConvertUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = 453F374C219A76A500A03F1D /* WXConvertUtility.mm */; };
-		453F3770219A78E200A03F1D /* WXConvertUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F374B219A76A500A03F1D /* WXConvertUtility.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		453F3771219A790100A03F1D /* binary_file.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4532671F2142731000DAA620 /* binary_file.cc */; };
-		453F3772219A790A00A03F1D /* binary_file.h in Headers */ = {isa = PBXBuildFile; fileRef = 4532671E2142731000DAA620 /* binary_file.h */; };
 		4547FD012152048700E79971 /* class_object.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4547FCFF2152048600E79971 /* class_object.cc */; };
 		4547FD022152048700E79971 /* class_object.h in Headers */ = {isa = PBXBuildFile; fileRef = 4547FD002152048600E79971 /* class_object.h */; };
 		4547FD032152049F00E79971 /* class_object.h in Headers */ = {isa = PBXBuildFile; fileRef = 4547FD002152048600E79971 /* class_object.h */; };
@@ -132,6 +124,8 @@
 		4547FD0E215392FA00E79971 /* js_common_function.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4547FD0C215392F900E79971 /* js_common_function.cc */; };
 		4547FD0F2153931000E79971 /* js_common_function.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4547FD0C215392F900E79971 /* js_common_function.cc */; };
 		4547FD102153932A00E79971 /* js_common_function.h in Headers */ = {isa = PBXBuildFile; fileRef = 4547FD0B215392F900E79971 /* js_common_function.h */; };
+		45E0B4C121CB7B82005D1B3B /* WXConvertUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F374B219A76A500A03F1D /* WXConvertUtility.h */; };
+		45E0B4C221CB7B9C005D1B3B /* WXConvertUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F374B219A76A500A03F1D /* WXConvertUtility.h */; };
 		591324A31D49B7F1004E89ED /* WXTimerModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */; };
 		591DD3311D23AD5800BE8709 /* WXErrorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 591DD32F1D23AD5800BE8709 /* WXErrorView.m */; };
 		591DD3321D23AD5800BE8709 /* WXErrorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 591DD3301D23AD5800BE8709 /* WXErrorView.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1145,8 +1139,6 @@
 		45326709213FC84900DAA620 /* WXDisplayLinkManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDisplayLinkManager.m; sourceTree = "<group>"; };
 		453267122140E38900DAA620 /* vcomponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vcomponent.h; sourceTree = "<group>"; };
 		453267132140E38900DAA620 /* vcomponent.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vcomponent.cc; sourceTree = "<group>"; };
-		4532671E2142731000DAA620 /* binary_file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = binary_file.h; sourceTree = "<group>"; };
-		4532671F2142731000DAA620 /* binary_file.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = binary_file.cc; sourceTree = "<group>"; };
 		453F374B219A76A500A03F1D /* WXConvertUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXConvertUtility.h; sourceTree = "<group>"; };
 		453F374C219A76A500A03F1D /* WXConvertUtility.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXConvertUtility.mm; sourceTree = "<group>"; };
 		453F3750219A76CA00A03F1D /* default_request_handler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = default_request_handler.h; sourceTree = "<group>"; };
@@ -2771,7 +2763,6 @@
 			files = (
 				7715EB6221A69DD9001F1108 /* WXRichText.h in Headers */,
 				4532670A213FC84A00DAA620 /* WXDisplayLinkManager.h in Headers */,
-				453F374D219A76A600A03F1D /* WXConvertUtility.h in Headers */,
 				B8D66C1B21255730003960BD /* style.h in Headers */,
 				B8D66C2321255730003960BD /* layout.h in Headers */,
 				B8D66C2521255730003960BD /* flex_enum.h in Headers */,
@@ -2834,6 +2825,7 @@
 				B8D66C7F21255730003960BD /* render_scroller_factory.h in Headers */,
 				74A4BA5B1CABBBD000195969 /* WXDebugTool.h in Headers */,
 				2A837AB41CD9DE9200AEDF03 /* WXLoadingIndicator.h in Headers */,
+				45E0B4C121CB7B82005D1B3B /* WXConvertUtility.h in Headers */,
 				747A787C1D1BAAC900DED9D0 /* WXComponent+ViewManagement.h in Headers */,
 				2AE5B7561CABA04E0082FDDB /* WXEventModuleProtocol.h in Headers */,
 				B8D66C6B21255730003960BD /* render_scroller.h in Headers */,
@@ -3067,7 +3059,6 @@
 				7715EB6321A69DD9001F1108 /* WXRichText.h in Headers */,
 				4532670C213FCF2300DAA620 /* WXDisplayLinkManager.h in Headers */,
 				B8D66C1C21255730003960BD /* style.h in Headers */,
-				453F3770219A78E200A03F1D /* WXConvertUtility.h in Headers */,
 				B8D66C2421255730003960BD /* layout.h in Headers */,
 				B8D66C2621255730003960BD /* flex_enum.h in Headers */,
 				B85ED3032126715100EBEC11 /* WXRecyclerComponent.h in Headers */,
@@ -3128,6 +3119,7 @@
 				B8D66BC42125572F003960BD /* vnode_render_context.h in Headers */,
 				DCA445AF1EFA575D00D0CFA8 /* WXModuleProtocol.h in Headers */,
 				4547FD102153932A00E79971 /* js_common_function.h in Headers */,
+				45E0B4C221CB7B9C005D1B3B /* WXConvertUtility.h in Headers */,
 				453F376D219A788800A03F1D /* default_request_handler.h in Headers */,
 				453F376C219A786F00A03F1D /* request_handler.h in Headers */,
 				453F376B219A785C00A03F1D /* http_module.h in Headers */,
