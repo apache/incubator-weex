@@ -131,6 +131,7 @@ class FuncState {
   inline bool is_class_func() { return is_class_func_; }
   inline ClassInstance * &class_inst() { return class_inst_; }
   inline int &argc() { return argc_; }
+  inline const std::string &name() { return name_; }
   inline std::vector<long> &args() { return args_; }
   std::vector<FuncState *> all_childrens() {
       std::vector<FuncState *> all_childrens;
@@ -141,12 +142,15 @@ class FuncState {
       }
       return all_childrens;
   }
+
   inline std::vector<ValueRef *> &in_closure() { return in_closure_; }
   inline std::vector<ValueRef *> &out_closure() { return out_closure_; }
   inline int super_index() const { return super_index_; }
   inline void set_super_index(int super_index) { super_index_ = super_index; }
   inline std::vector<int32_t>& in_closure_refs() { return in_closure_refs_; }
   inline std::vector<int32_t>& out_closure_refs() { return out_closure_refs_; }
+  inline void set_name(const std::string& name) {name_ = name;}
+
  private:
   std::vector<Instruction> instructions_;
   std::vector<Value> constants_;
@@ -161,6 +165,7 @@ class FuncState {
   bool is_class_func_{false};
   ClassInstance *class_inst_{nullptr};
   int argc_{0};
+  std::string name_{""};
 };
         
 // TODO Each Func should contain a stack whose size is 256
@@ -191,6 +196,8 @@ class ExecState {
   ValueRef *FindRef(int index);
   void Register(const std::string& name, CFunction function);
   void Register(const std::string& name, Value value);
+  void AddEvent(const std::vector<std::string>& event) {event_queue_.push_back(event);}
+  void ClearEventQueue() {event_queue_.clear();}
   inline std::vector<ValueRef *> &refs() { return refs_; };
   inline Variables *global() { return global_.get(); }
   inline void reset(FuncState *func_state) { func_state_.reset(func_state); }
@@ -202,6 +209,9 @@ class ExecState {
   inline uint32_t global_compile_index() { return global_compile_index_; }
   inline uint32_t class_compile_index() { return class_compile_index_; }
   inline uint32_t string_compile_index() { return string_compile_index_; }
+  inline bool exec_js_finished() const {return exec_js_finished_;}
+  inline void set_exec_js_finished(bool exec_js_finished) {exec_js_finished_ = exec_js_finished;}
+  inline const std::vector<std::vector<std::string>>& event_queue() const {return event_queue_;}
   inline std::unordered_map<std::string, long>& global_variables() { return global_variables_; }
  private:
   friend class VM;
@@ -223,6 +233,8 @@ class ExecState {
   uint32_t global_compile_index_{0};
   uint32_t class_compile_index_{0};
   uint32_t string_compile_index_{0};
+  bool exec_js_finished_ = false;
+  std::vector<std::vector<std::string>> event_queue_;
 };
 
 }  // namespace data_render

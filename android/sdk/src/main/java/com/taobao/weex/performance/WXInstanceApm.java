@@ -67,6 +67,10 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STAGES_NEW_FSRENDER = "wxNewFsRender";
     public static final String KEY_PAGE_STAGES_INTERACTION = "wxInteraction";
     public static final String KEY_PAGE_STAGES_DESTROY = "wxDestroy";
+    //Custom preprocessing start, called when activity created or other time. Called by other activity
+    public static final String KEY_PAGE_STAGES_CUSTOM_PREPROCESS_START = "wxCustomPreprocessStart";
+    //Custom preprocessing end, called when you'are able to start weex render. Called by other activity
+    public static final String KEY_PAGE_STAGES_CUSTOM_PREPROCESS_END = "wxCustomPreprocessEnd";
 
     /************** stats *****************/
     public static final String KEY_PAGE_STATS_BUNDLE_SIZE = "wxBundleSize";

@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include "core/data_render/object.h"
 #include "core/render/node/factory/render_creator.h"
 #include "core/data_render/vnode/vnode.h"
 
@@ -24,7 +25,7 @@ namespace core {
 namespace data_render {
 
 VNode::VNode(const std::string &tag_name, const std::string &node_id,
-             const std::string &ref) {
+             const std::string &ref)  {
   ref_ = ref;
   tag_name_ = tag_name;
   node_id_ = node_id;
@@ -32,6 +33,8 @@ VNode::VNode(const std::string &tag_name, const std::string &node_id,
   styles_ = new std::map<std::string, std::string>();
   attributes_ = new std::map<std::string, std::string>();
   events_ = new std::map<std::string, void *>();
+  event_params_map_.reset(new EventParamsMap);
+  on_event_listener_.reset();
 }
 
 VNode::~VNode() {
@@ -50,12 +53,24 @@ VNode::~VNode() {
       delete events_;
       events_ = nullptr;
   }
-  for (auto it = child_list_.begin(); it != child_list_.end(); it++) {
-    VNode *&reference = *it;
-    if (reference != nullptr) {
-      delete reference;
-      *it = nullptr;
-    }
+//  for (auto it = child_list_.begin(); it != child_list_.end(); it++) {
+//    VNode *&reference = *it;
+//    if (reference != nullptr) {
+//      delete reference;
+//      *it = nullptr;
+//    }
+//  }
+}
+
+void VNode::OnEvent(const std::string &event, const std::string args,
+                    const std::string dom_changes) {
+  if (!on_event_listener_) return;
+
+  auto it = event_params_map_->find(event);
+  if (it == event_params_map_->end()) return;
+  auto params_list = it->second;
+  for (auto it = params_list.begin(); it != params_list.end(); it++) {
+    on_event_listener_->OnEvent(this, event, args, dom_changes, *it);
   }
 }
 
@@ -97,26 +112,32 @@ VNode *VNode::FindNode(const std::string &render_object_ref) {
     return node;
 }
 
-void VNode::AddEvent(const std::string &event, const std::string &function,
-                     const std::vector<std::string> &params) {
-  //todo
+void VNode::AddEvent(const std::string &event,
+                     const std::vector<Value> &params) {
+  auto it = event_params_map_->find(event);
+  if (it != event_params_map_->end()) {
+    it->second.push_back(params);
+  } else {
+    event_params_map_->insert({event, {params}});
+  }
 }
-    
+
 void VNode::AddChild(VNode *child) {
   child->parent_ = this;
+  child->component_ = component_;
   child_list_.push_back(child);
+  child->DispatchAttachedToParent();
 }
     
 void VNode::InsertChild(VNode *child, int index) {
-    do {
-        child->parent_ = this;
-        if (index < child_list_.size()) {
-            child_list_.insert(child_list_.begin() + index, child);
-            break;
-        }
-        child_list_.push_back(child);
-        
-    } while (0);
+  if (!child) return;
+  child->parent_ = this;
+  if (index < child_list_.size()) {
+    child_list_.insert(child_list_.begin() + index, child);
+  } else {
+    child_list_.push_back(child);
+  }
+  child->DispatchAttachedToParent();
 }
 
 void VNode::RemoveChild(VNode *child) {
@@ -124,6 +145,7 @@ void VNode::RemoveChild(VNode *child) {
   auto it = child_list_.begin();
   for (; it != child_list_.end(); ++it) {
     if (*it == child) {
+      child->DispatchDetachedFromParent();
       VNode *&reference = *it;
       child_list_.erase(it);
       if (reference != nullptr) {

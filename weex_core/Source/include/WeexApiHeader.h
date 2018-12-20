@@ -153,6 +153,8 @@ typedef std::unique_ptr<WeexJSResult> (*FuncCallDispatchMessageSync)(
 
 typedef void
 (*FuncOnReceivedResult)(long callback_id, std::unique_ptr<WeexJSResult>& result);
+typedef void
+(*FuncUpdateComponentData)(const char* page_id, const char* cid, const char* json_data);
 
 
 typedef struct FunctionsExposedByCore {
@@ -182,6 +184,7 @@ typedef struct FunctionsExposedByCore {
     FuncCallDIspatchMessage funcCallDIspatchMessage;
     FuncCallDispatchMessageSync funcCallDispatchMessageSync;
     FuncOnReceivedResult  funcOnReceivedResult;
+    FuncUpdateComponentData funcUpdateComponentData;
 } FunctionsExposedByCore;
 
 typedef void (*FuncCallSetJSVersion)(const char* version);

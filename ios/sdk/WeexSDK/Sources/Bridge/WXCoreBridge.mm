@@ -28,6 +28,7 @@
 #import "WXUtility.h"
 #import "WXAssert.h"
 #import "WXAppConfiguration.h"
+#import "WXConvertUtility.h"
 #import "WXSDKEngine.h"
 #import "WXAppMonitorProtocol.h"
 
@@ -44,122 +45,13 @@
 #include "core/bridge/platform/core_side_in_platform.h"
 #include "core/bridge/script/core_side_in_script.h"
 #include "base/TimeUtils.h"
+#include "core/network/http_module.h"
 
 #import <objc/runtime.h>
 #include <fstream>
 
-
-#define NSSTRING(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCString(NULL, (const char *)(cstr), kCFStringEncodingUTF8)))
-#define NSSTRING_NO_COPY(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCStringNoCopy(NULL, (const char *)(cstr), kCFStringEncodingUTF8, kCFAllocatorNull)))
-
 namespace WeexCore
-{
-    static NSString* const JSONSTRING_SUFFIX = @"\t\n\t\r";
-    
-    static NSString* TO_JSON(id object)
-    {
-        if (object == nil) {
-            return nil;
-        }
-        
-        @try {
-            if ([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]) {
-                NSError *error = nil;
-                NSData *data = [NSJSONSerialization dataWithJSONObject:object
-                                                               options:0
-                                                                 error:&error];
-                
-                if (error) {
-                    WXLogError(@"%@", error);
-                    WXAssert(NO, @"Fail to convert object to json. %@", error);
-                    return nil;
-                }
-                
-                return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] stringByAppendingString:JSONSTRING_SUFFIX]; // add suffix so that we know this is a json string
-            }
-        } @catch (NSException *exception) {
-            WXLogError(@"%@", exception);
-            WXAssert(NO, @"Fail to convert object to json. %@", exception);
-            return nil;
-        }
-        
-        return nil;
-    }
-    
-    static id TO_OBJECT(NSString* s)
-    {
-        if ([s hasSuffix:JSONSTRING_SUFFIX]) {
-            if ([s length] == [JSONSTRING_SUFFIX length]) {
-                return [NSNull null];
-            }
-            
-            // s is a json string
-            @try {
-                NSError* error = nil;
-                id jsonObj = [NSJSONSerialization JSONObjectWithData:[s dataUsingEncoding:NSUTF8StringEncoding]
-                                                             options:NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
-                                                               error:&error];
-                
-                if (jsonObj == nil) {
-                    WXLogError(@"%@", error);
-                    WXAssert(NO, @"Fail to convert json to object. %@", error);
-                }
-                else {
-                    return jsonObj;
-                }
-            } @catch (NSException *exception) {
-                WXLogError(@"%@", exception);
-                WXAssert(NO, @"Fail to convert json to object. %@", exception);
-            }
-        }
-        return s; // return s instead
-    }
-    
-    static NSMutableDictionary* NSDICTIONARY(std::map<std::string, std::string>* map)
-    {
-        if (map == nullptr || map->size() == 0)
-            return [[NSMutableDictionary alloc] init];
-        
-        NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:map->size()];
-        for (auto it = map->begin(); it != map->end(); it ++) {
-            id object = TO_OBJECT(NSSTRING(it->second.c_str()));
-            if (object) {
-                [result setObject:object forKey:NSSTRING(it->first.c_str())];
-            }
-        }
-        return result;
-    }
-    
-    static NSMutableDictionary* NSDICTIONARY(std::vector<std::pair<std::string, std::string>>* vec)
-    {
-        if (vec == nullptr || vec->size() == 0)
-            return [[NSMutableDictionary alloc] init];
-        
-        NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithCapacity:vec->size()];
-        for (auto& p : *vec) {
-            id object = TO_OBJECT(NSSTRING(p.second.c_str()));
-            if (object) {
-                [result setObject:object forKey:NSSTRING(p.first.c_str())];
-            }
-        }
-        return result;
-    }
-    
-    static NSMutableArray* NSARRAY(std::set<std::string>* set)
-    {
-        if (set == nullptr || set->size() == 0)
-            return [[NSMutableArray alloc] init];
-        
-        NSMutableArray* result = [[NSMutableArray alloc] initWithCapacity:set->size()];
-        for (auto& s : *set) {
-            id object = TO_OBJECT(NSSTRING(s.c_str()));
-            if (object) {
-                [result addObject:object];
-            }
-        }
-        return result;
-    }
-    
+{    
     static void consoleWithArguments(NSArray *arguments, WXLogFlag logLevel)
     {
         NSMutableString *jsLog = [NSMutableString string];
@@ -206,7 +98,7 @@ namespace WeexCore
             dict[@"borderRightWidth"] = @(borders.getBorderWidth(kBorderWidthRight) / pixelScaleFactor);
         }
     }
-    
+
     static void MergeBorderWidthValues(NSMutableDictionary* dict,
                                        std::vector<std::pair<std::string, std::string>>* borders,
                                        float pixelScaleFactor)
@@ -222,7 +114,7 @@ namespace WeexCore
             dict[NSSTRING(p.first.c_str())] = @(atof(p.second.c_str()) / pixelScaleFactor);
         }
     }
-    
+
     void IOSSide::SetJSVersion(const char* version)
     {
         NSString *jsVersion = NSSTRING(version);
@@ -820,7 +712,6 @@ namespace WeexCore
         page->CallBridgeTime(getCurrentTime() - startTime);
         return result;
     }
-    
 #pragma mark - Layout Impl
     
     WXCoreSize WXCoreMeasureFunctionBridge::Measure(const char* page_id, long render_ptr, float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode)
@@ -878,7 +769,13 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
     NSString *optionsString = [WXUtility JSONString:options];
     NSString *dataString = [WXUtility JSONString:data];
-    node_manager->CreatePage([jsBundleString UTF8String] ?: "", [pageId UTF8String] ?: "", [optionsString UTF8String] ?: "", [dataString UTF8String] ?: "");
+
+    node_manager->CreatePage([jsBundleString UTF8String] ?: "", [pageId UTF8String] ?: "", [optionsString UTF8String] ?: "", [dataString UTF8String] ?: "", [=](const char* javascript){
+        if (!javascript) {
+            return;
+        }
+        [[WXSDKManager bridgeMgr] createInstanceForJS:pageId template:NSSTRING(javascript) options:options data:data];
+    });
 }
 
 + (void)createDataRenderInstance:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary *)options data:(id)data
@@ -886,7 +783,12 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
     NSString *optionsString = [WXUtility JSONString:options];
     NSString *dataString = [WXUtility JSONString:data];
-    node_manager->CreatePage(static_cast<const char *>(contents.bytes), contents.length, [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "");
+    node_manager->CreatePage(static_cast<const char *>(contents.bytes), contents.length, [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "", [=](const char* javascript) {
+        if (!javascript) {
+            return;
+        }
+        [[WXSDKManager bridgeMgr] createInstanceForJS:pageId template:NSSTRING(javascript) options:options data:data];
+    });
 }
 
 + (void)destroyDataRenderInstance:(NSString *)pageId
@@ -905,7 +807,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 {
     NSString *params = [WXUtility JSONString:args];
     auto vnode_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-    vnode_manager->FireEvent([pageId UTF8String] ? : "", [ref UTF8String] ? : "", [event UTF8String] ? : "", [params UTF8String] ? : "");
+    vnode_manager->FireEvent([pageId UTF8String] ? : "", [ref UTF8String] ? : "", [event UTF8String] ? : "", [params UTF8String] ? : "", "");
 }
 
 + (void)registerModules:(NSDictionary *)modules {
@@ -1050,30 +952,12 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     }
 }
 
-static void _convertToCString(id _Nonnull obj, void (^callback)(const char*))
-{
-    if ([obj isKindOfClass:[NSString class]]) {
-        callback([obj UTF8String]);
-    }
-    else if ([obj isKindOfClass:[NSNumber class]]) {
-        callback([[(NSNumber*)obj stringValue] UTF8String]);
-    }
-    else if ([obj isKindOfClass:[NSNull class]]) {
-        callback([JSONSTRING_SUFFIX UTF8String]);
-    }
-    else {
-        NSString* jsonstring = WeexCore::TO_JSON(obj);
-        if (jsonstring != nil) {
-            callback([jsonstring UTF8String]);
-        }
-    }
-}
 
 + (void)_parseStyleBeforehand:(NSDictionary *)styles key:(NSString *)key render:(WeexCore::RenderObject*)render
 {
     id data = styles[key];
     if (data) {
-        _convertToCString(data, ^(const char * value) {
+        ConvertToCString(data, ^(const char * value) {
             if (value != nullptr) {
                 render->AddStyle([key UTF8String], value);
             }
@@ -1095,7 +979,7 @@ static void _convertToCString(id _Nonnull obj, void (^callback)(const char*))
         }
         
         [data[@"attr"] enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-            _convertToCString(obj, ^(const char * value) {
+            ConvertToCString(obj, ^(const char * value) {
                 if (value != nullptr) {
                     render->AddAttr([key UTF8String], value);
                 }
@@ -1111,7 +995,7 @@ static void _convertToCString(id _Nonnull obj, void (^callback)(const char*))
             if ([key isEqualToString:@"margin"] || [key isEqualToString:@"padding"] || [key isEqualToString:@"borderWidth"]) {
                 return;
             }
-            _convertToCString(obj, ^(const char * value) {
+            ConvertToCString(obj, ^(const char * value) {
                 if (value != nullptr) {
                     render->AddStyle([key UTF8String], value);
                 }
@@ -1119,7 +1003,7 @@ static void _convertToCString(id _Nonnull obj, void (^callback)(const char*))
         }];
         
         for (id obj in data[@"event"]) {
-            _convertToCString(obj, ^(const char * value) {
+            ConvertToCString(obj, ^(const char * value) {
                 if (value != nullptr) {
                     render->AddEvent(value);
                 }
@@ -1143,13 +1027,19 @@ static void _convertToCString(id _Nonnull obj, void (^callback)(const char*))
 {
     std::vector<std::pair<std::string, std::string>>* result = new std::vector<std::pair<std::string, std::string>>();
     [data enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-        _convertToCString(obj, ^(const char * value) {
+        ConvertToCString(obj, ^(const char * value) {
             if (value != nullptr) {
                 result->emplace_back([key UTF8String], value);
             }
         });
     }];
     return result;
+}
+
++ (void)callUpdateComponentData:(NSString*)pageId componentId:(NSString*)componentId jsonData:(NSString*)jsonData
+{
+    weex::core::data_render::VNodeRenderManager::GetInstance()
+    ->UpdateComponentData([pageId UTF8String] ?: "", [componentId UTF8String] ?: "", [jsonData UTF8String] ?: "");
 }
 
 + (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index

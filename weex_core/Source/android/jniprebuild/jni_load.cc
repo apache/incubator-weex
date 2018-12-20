@@ -31,6 +31,7 @@
 #include "android/wrap/wx_js_object.h"
 #include "android/wrap/wx_map.h"
 #include "base/message_loop/message_pump_android.h"
+#include "core/network/android/default_request_handler.h"
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
   base::android::InitVM(vm);
@@ -44,7 +45,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
                 WeexCore::WXJSObject::RegisterJNIUtils(env) &&
                 WeexCore::LogUtils::RegisterJNIUtils(env) &&
                 WeexCore::WXMap::RegisterJNIUtils(env) &&
-                WeexCore::HashSet::RegisterJNIUtils(env);
+                WeexCore::HashSet::RegisterJNIUtils(env) &&
+                weex::core::network::DefaultRequestHandler::RegisterJNIUtils(env);
   if (result) {
     WeexCore::SoUtils::Init(env);
     WeexCore::WMLBridge::RegisterJNIUtils(env);

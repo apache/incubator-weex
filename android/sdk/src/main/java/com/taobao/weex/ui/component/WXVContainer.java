@@ -579,20 +579,22 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
           mBoxShadowHost = new BoxShadowHost(getContext());
           WXViewUtils.setBackGround(mBoxShadowHost, null, this);
 
-          CSSShorthand padding = this.getPadding();
-          CSSShorthand border = this.getBorder();
-
-          int left = (int) (padding.get(CSSShorthand.EDGE.LEFT) + border.get(CSSShorthand.EDGE.LEFT));
-          int top = (int) (padding.get(CSSShorthand.EDGE.TOP) + border.get(CSSShorthand.EDGE.TOP));
-          int right = (int) (padding.get(CSSShorthand.EDGE.RIGHT) + border.get(CSSShorthand.EDGE.RIGHT));
-          int bottom = (int) (padding.get(CSSShorthand.EDGE.BOTTOM) + border.get(CSSShorthand.EDGE.BOTTOM));
-
-          ViewGroup.MarginLayoutParams layoutParams = new ViewGroup.MarginLayoutParams(hostView.getLayoutParams()) ;
-          this.setMarginsSupportRTL(layoutParams, -left, -top, -right, -bottom);
-          mBoxShadowHost.setLayoutParams(layoutParams);
-
           hostView.addView(mBoxShadowHost);
         }
+
+        CSSShorthand padding = this.getPadding();
+        CSSShorthand border = this.getBorder();
+
+        int left = (int) (padding.get(CSSShorthand.EDGE.LEFT) + border.get(CSSShorthand.EDGE.LEFT));
+        int top = (int) (padding.get(CSSShorthand.EDGE.TOP) + border.get(CSSShorthand.EDGE.TOP));
+        int right = (int) (padding.get(CSSShorthand.EDGE.RIGHT) + border.get(CSSShorthand.EDGE.RIGHT));
+        int bottom = (int) (padding.get(CSSShorthand.EDGE.BOTTOM) + border.get(CSSShorthand.EDGE.BOTTOM));
+
+        ViewGroup.MarginLayoutParams layoutParams = new ViewGroup.MarginLayoutParams(hostView.getLayoutParams()) ;
+        this.setMarginsSupportRTL(layoutParams, -left, -top, -right, -bottom);
+
+        mBoxShadowHost.setLayoutParams(layoutParams);
+        
         hostView.removeView(mBoxShadowHost);
         hostView.addView(mBoxShadowHost);
         return mBoxShadowHost;

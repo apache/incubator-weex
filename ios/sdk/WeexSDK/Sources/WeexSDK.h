@@ -65,6 +65,7 @@
 #import "WXDisplayLinkManager.h"
 #import "WXDefine.h"
 #import "WXDebugTool.h"
+#import "WXConvertUtility.h"
 #import "WXConvert.h"
 #import "WXConfigCenterProtocol.h"
 #import "WXComponentManager.h"

@@ -84,6 +84,9 @@ class ScriptBridge {
     virtual void SetJSVersion(const char *js_version) = 0;
     virtual void OnReceivedResult(long callback_id,
                                   std::unique_ptr<WeexJSResult> &result) = 0;
+    virtual void UpdateComponentData(const char* page_id,
+                                     const char* cid,
+                                     const char* json_data) = 0;
 
     inline ScriptBridge *bridge() { return bridge_; }
 

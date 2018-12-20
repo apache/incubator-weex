@@ -24,9 +24,9 @@ static Value Ceil(ExecState* exec_state){
   }
 
   if (IsNumber(value)){
-    return static_cast<int64_t>(ceil(NumValue(value)));
+    return Value(static_cast<int64_t>(ceil(NumValue(value))));
   } else {
-    return static_cast<int64_t>(ceil(IntValue(value)));
+    return Value(static_cast<int64_t>(ceil(IntValue(value))));
   }
 }
 
@@ -41,15 +41,15 @@ static Value Floor(ExecState* exec_state){
   }
 
   if (IsNumber(value)){
-    return static_cast<int64_t>(floor(NumValue(value)));
+    return Value(static_cast<int64_t>(floor(NumValue(value))));
   } else {
-    return static_cast<int64_t>(floor(IntValue(value)));
+    return Value(static_cast<int64_t>(floor(IntValue(value))));
   }
 }
 
 
 static Value Random(ExecState* exec_state){
-  return static_cast <double> (rand()) / static_cast <double>(RAND_MAX);
+  return Value(static_cast <double> (rand()) / static_cast <double>(RAND_MAX));
 }
 
 static Value Max(ExecState* exec_state){

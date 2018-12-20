@@ -1169,7 +1169,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
     if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER ||
             instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
-      fireEventOnDataRenderNode(instanceId, ref, type, data);
+      fireEventOnDataRenderNode(instanceId, ref, type, data, domChanges);
     } else {
       if(callback == null) {
         addJSEventTask(METHOD_FIRE_EVENT, instanceId, params, ref, type, data, domChanges);
@@ -1181,7 +1181,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   private void fireEventOnDataRenderNode(final String instanceId, final String ref,
-                                         final String type, final Map<String, Object> data) {
+                                         final String type, final Map<String, Object> data, final Map<String, Object> domChanges) {
     mJSHandler.postDelayed(WXThread.secure(new Runnable() {
       @Override
       public void run() {
@@ -1192,7 +1192,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             WXLogUtils.d("fireEventOnDataRenderNode >>>> instanceId:" + instanceId
                 + ", data:" + data);
           }
-          mWXBridge.fireEventOnDataRenderNode(instanceId, ref,type,JSON.toJSONString(data));
+          if (mWXBridge instanceof WXBridge) {
+            ((WXBridge) mWXBridge).fireEventOnDataRenderNode(instanceId, ref,type,JSON.toJSONString(data), JSON.toJSONString(domChanges));
+          }
+          WXLogUtils.renderPerformanceLog("fireEventOnDataRenderNode", System.currentTimeMillis() - start);
         } catch (Throwable e) {
           String err = "[WXBridgeManager] fireEventOnDataRenderNode " + WXLogUtils.getStackTrace(e);
           WXExceptionUtils.commitCriticalExceptionRT(instanceId,

@@ -173,6 +173,8 @@ namespace WeexCore
 
 + (void)removeRenderObjectFromMap:(NSString*)pageId object:(void*)object;
 
++ (void)callUpdateComponentData:(NSString*)pageId componentId:(NSString*)componentId jsonData:(NSString*)jsonData;
+
 + (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index;
 
 + (void)callCreateBody:(NSString*)pageId data:(NSDictionary*)data;

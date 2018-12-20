@@ -69,7 +69,7 @@ static Value test(ExecState *exec_state) {
         }
         std::regex express(reg_str, type);
         std::smatch match;
-        ret  = std::regex_search(test_str,match,express);
+        ret  = Value(std::regex_search(test_str,match,express));
     } while (0);
 
     return ret;
@@ -115,7 +115,7 @@ static Value exec(ExecState *exec_state) {
       std::string::const_iterator iterEnd = test_str.end();
       bool succ = false;
       while (std::regex_search(iterStart,iterEnd,match,express)){
-        arr->items.push_back(exec_state->string_table()->StringFromUTF8(match[0]));
+        arr->items.push_back(Value(exec_state->string_table()->StringFromUTF8(match[0])));
         iterStart = match[0].second;
         succ = true;
       }
@@ -129,7 +129,7 @@ static Value exec(ExecState *exec_state) {
 
       if (succ){
         for (size_t i = 0; i < match.size(); ++i){
-          arr->items.push_back(exec_state->string_table()->StringFromUTF8(match[i]));
+          arr->items.push_back(Value(exec_state->string_table()->StringFromUTF8(match[i])));
         }
       } else {
         ret = Value();

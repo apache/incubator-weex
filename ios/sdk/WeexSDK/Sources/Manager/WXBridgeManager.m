@@ -142,6 +142,21 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
 }
 
 #pragma mark JSBridge Management
+- (void)createInstanceForJS:(NSString *)instance
+              template:(NSString *)temp
+               options:(NSDictionary *)options
+                  data:(id)data {
+    if (!instance || !temp) return;
+    __weak typeof(self) weakSelf = self;
+    NSMutableDictionary *newOptions = [options mutableCopy] ?: [NSMutableDictionary new];
+    newOptions[@"EXEC_JS"] = @(YES);
+    WXPerformBlockOnBridgeThread(^(){
+        [weakSelf.bridgeCtx createInstance:instance
+                                  template:temp
+                                   options:newOptions
+                                      data:data];
+    });
+}
 
 - (void)createInstance:(NSString *)instance
               template:(NSString *)temp
@@ -286,6 +301,26 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
         value = [weakSelf.bridgeCtx excuteJSMethodWithResult:method];
     });
     return value;
+}
+
+- (void)DownloadJS:(NSURL *)scriptUrl completion:(void (^)(NSString *script))complection;
+{
+    if (!scriptUrl) {
+        complection(nil);
+        return;
+    }
+    WXResourceRequest* request = [WXResourceRequest requestWithURL:scriptUrl];
+    WXResourceLoader* jsLoader = [[WXResourceLoader alloc] initWithRequest:request];
+    jsLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
+        NSString* jsString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        complection(jsString);
+    };
+    jsLoader.onFailed = ^(NSError *loadError) {
+        WXLogError(@"No js URL found");
+        complection(nil);
+    };
+
+   [jsLoader start];
 }
 
 - (void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion
@@ -480,6 +515,16 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
         [weakSelf.bridgeCtx resetEnvironment];
+    });
+}
+
+- (void)callJSMethod:(NSString *)method args:(NSArray *)args
+{
+    if (!method) return;
+
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnBridgeThread(^(){
+        [weakSelf.bridgeCtx callJSMethod:method args:args onContext:nil completion:nil];
     });
 }
 

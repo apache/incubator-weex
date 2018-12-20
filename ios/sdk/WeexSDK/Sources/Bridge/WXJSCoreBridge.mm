@@ -156,6 +156,21 @@
     }
 }
 
+- (void)registerCallUpdateComponentData:(WXJSCallUpdateComponentData)callUpdateComponentData;
+{
+    id callUpdateComponentDataBlock = ^(JSValue *instanceId, JSValue *cid, JSValue *data, JSValue *ifCallback) {
+        NSString *instanceIdString = [instanceId toString];
+        NSString *componentId = [cid toString];
+        NSDictionary* jsonData = [data toDictionary];
+        NSString* dataString = [WXUtility JSONString:jsonData];
+        WXLogDebug(@"CallUpdateComponentData...%@, %@, %@", instanceIdString, componentId, jsonData);
+
+        return [JSValue valueWithInt32:(int32_t)callUpdateComponentData(instanceIdString, componentId, dataString) inContext:[JSContext currentContext]];
+    };
+
+    _jsContext[@"__updateComponentData"] = callUpdateComponentDataBlock;
+}
+
 - (void)registerCallAddElement:(WXJSCallAddElement)callAddElement
 {
     id callAddElementBlock = ^(JSValue *instanceId, JSValue *ref, JSValue *element, JSValue *index, JSValue *ifCallback) {

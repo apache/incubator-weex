@@ -167,6 +167,8 @@ class ExpressionList : public Expression {
 
   void Insert(Handle<Expression> expr) { exprs_.push_back(expr); }
 
+  void Insert(iterator position, Handle<Expression> expr) { exprs_.insert(position, expr); }
+
   size_t Size() { return exprs_.size(); }
 
   std::vector<Handle<Expression>>& raw_list() { return exprs_; }

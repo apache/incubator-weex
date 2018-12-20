@@ -100,16 +100,16 @@ struct Value {
   Type type;
 
   Value() : type(NIL) {}
-    
-  Value(int value) : i(value), type(INT) {}
 
-  Value(int64_t value) : i(value), type(INT) {}
+  explicit Value(int value) : i(value), type(INT) {}
 
-  Value(double value) : n(value), type(NUMBER) {}
+  explicit Value(int64_t value) : i(value), type(INT) {}
+
+  explicit Value(double value) : n(value), type(NUMBER) {}
 
   explicit Value(bool value) : b(value), type(BOOL) {}
 
-  Value(String *value) : str(value), type(STRING) {}
+  explicit Value(String *value) : str(value), type(STRING) {}
     
   explicit Value(FuncState *func) : f(func), type(FUNC) {}
     
@@ -210,6 +210,8 @@ struct Value {
     friend bool operator!=(const Value &left, const Value &right) {
         return !(left == right);
     }
+    explicit operator bool() const noexcept
+    { return !(type == NIL); }
 };
     
 typedef struct Array {
@@ -623,19 +625,43 @@ inline void ArrayCopy(Value &src, Value &dest) {
 }
 
 inline void TableCopy(Value &src, Value &dest) {
-    Table *st = ValueTo<Table>(&src);
-    Table *dt = ValueTo<Table>(&dest);
-    for (auto iter = st->map.begin(); iter != st->map.end(); iter++) {
-        GCRetain(&iter->second);
-        dt->map[iter->first] = iter->second;
+  if (IsNil(&src)) {
+    return;
+  }
+  Table *st = ValueTo<Table>(&src);
+  Table *dt = ValueTo<Table>(&dest);
+  for (auto st_it = st->map.begin(); st_it != st->map.end(); st_it++) {
+    GCRetain(&st_it->second);
+    auto dt_it = dt->map.find(st_it->first);
+    if (dt_it != dt->map.end()) {
+      dt_it->second = st_it->second;
+    } else {
+      dt->map.insert({st_it->first, st_it->second});
     }
+  }
 }
 
-inline void TableMapAddAll(Table *src, Table *dest) {
-  for (auto iter = src->map.begin(); iter != src->map.end(); iter++) {
-    GCRetain(&iter->second);
-    dest->map[iter->first] = iter->second;
+inline bool TableAddAll(Value &src, Value &dest) {
+  bool updated = false;
+  if (IsNil(&src)) {
+    return updated;
   }
+  Table *st = ValueTo<Table>(&src);
+  Table *dt = ValueTo<Table>(&dest);
+  for (auto st_it = st->map.begin(); st_it != st->map.end(); st_it++) {
+    GCRetain(&st_it->second);
+    auto dt_it = dt->map.find(st_it->first);
+    if (dt_it != dt->map.end()) {
+      if (dt_it->second != st_it->second) {
+        dt_it->second = st_it->second;
+        updated = true;
+      }
+    } else {
+      dt->map.insert({st_it->first, st_it->second});
+      updated = true;
+    }
+  }
+  return updated;
 }
 
 }  // namespace data_render

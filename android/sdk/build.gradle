@@ -60,6 +60,10 @@ version = project.hasProperty('weexVersion')? project.getProperty('weexVersion')
 
 android {
 
+    delete 'libs/armeabi/libweexcore.so'
+    delete 'libs/armeabi-v7a/libweexcore.so'
+    delete 'libs/x86/libweexcore.so'
+
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"

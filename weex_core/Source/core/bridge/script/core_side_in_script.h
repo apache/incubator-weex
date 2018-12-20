@@ -80,6 +80,9 @@ class CoreSideInScript : public ScriptBridge::CoreSide {
   void SetJSVersion(const char *js_version) override;
   void OnReceivedResult(long callback_id,
                         std::unique_ptr<WeexJSResult> &result) override;
+  void UpdateComponentData(const char* page_id,
+                           const char* cid,
+                           const char* json_data) override;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CoreSideInScript);

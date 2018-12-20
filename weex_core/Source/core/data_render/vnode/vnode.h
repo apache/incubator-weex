@@ -22,15 +22,32 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <unordered_set>
+#include <unordered_map>
+#include <memory>
 #include "core/render/node/render_object.h"
 
 namespace weex {
 namespace core {
 namespace data_render {
-class VNode;
+class VComponent;
+class Value;
 
 class VNode {
  public:
+  typedef std::vector<Value> Params;
+  typedef std::vector<Params> ParamsList;
+  typedef std::unordered_map<std::string, ParamsList> EventParamsMap;
+
+  class OnEventListener {
+   public:
+    virtual ~OnEventListener() {}
+    virtual void OnEvent(VNode *node, const std::string &event,
+                         const std::string &json_args,
+                         const std::string dom_changes,
+                         const Params &params) = 0;
+  };
+
   VNode(const std::string &tag_name, const std::string &node_id,
         const std::string &ref);
 
@@ -40,9 +57,11 @@ class VNode {
 
   void SetAttribute(const std::string &key, const std::string &value);
 
-  void AddEvent(const std::string &event, const std::string &function,
-                const std::vector<std::string> &params);
+  void AddEvent(const std::string &event,
+                const std::vector<Value> &params);
   void AddEvent(const std::string &event, void *func, void *inst);
+
+  void AddOnEventListener();
 
   void AddChild(VNode *child);
 
@@ -59,7 +78,7 @@ class VNode {
 
   inline const std::string &ref() const { return ref_; }
 
-  inline const std::string &render_object_ref() const {
+  virtual inline const std::string render_object_ref() const {
     return render_object_ref_;
   }
 
@@ -67,7 +86,7 @@ class VNode {
     render_object_ref_ = std::move(ref);
   }
   inline void *& inst() { return inst_; }
-  inline const VNode *parent() const { return parent_; }
+  inline VNode *parent() const { return parent_; }
 
   inline std::vector<VNode *> *child_list() { return &child_list_; }
 
@@ -80,7 +99,28 @@ class VNode {
     return events_;
   }
 
+  inline EventParamsMap *event_params_map() const {
+    return event_params_map_.get();
+  }
+
+  void OnEvent(const std::string &event, const std::string args,
+               const std::string dom_changes);
+
+  inline void set_on_event_listener(std::unique_ptr<OnEventListener> listener) {
+    on_event_listener_ = std::move(listener);
+  }
+
   inline bool HasChildren() { return !child_list_.empty(); }
+
+  inline void set_component(VComponent* c) {
+    component_ = c;
+  }
+
+  inline VComponent* component() {
+    return component_;
+  }
+
+  virtual bool IsVirtualComponent() const { return false; }
 
  private:
   std::string tag_name_;
@@ -88,6 +128,8 @@ class VNode {
   std::string node_id_;
   // Should be unique
   std::string ref_;
+  // Context of vnode
+  VComponent* component_ = nullptr;
   // Ref point to RenderObject is set when PatchVNode or ParseVNode2RenderObject
   std::string render_object_ref_;
 
@@ -96,9 +138,16 @@ class VNode {
   std::vector<VNode *> child_list_;
   std::map<std::string, std::string> *styles_;
   std::map<std::string, std::string> *attributes_;
+  // This events if record event with func from vm
   std::map<std::string, void *> *events_;
+  // This events if record event with value from vm
+  std::unique_ptr<EventParamsMap> event_params_map_;
+  std::unique_ptr<OnEventListener> on_event_listener_;
+
   void MapInsertOrAssign(std::map<std::string, std::string> *target_map,
                          const std::string &key, const std::string &value);
+  inline virtual void DispatchAttachedToParent() {}
+  inline virtual void DispatchDetachedFromParent() {}
 };
 
 }  // namespace data_render

@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
            Alibaba-INC copyright
     LICENSE
   }
-  s.authors      = { 
+  s.authors      = {
                     "cxfeng1"      => "cxfeng1@gmail.com",
                     "boboning"     => "ningli928@163.com",
                     "yangshengtao" => "yangshengtao1314@163.com",
@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '8.0'
 
   # use for public
-  # s.source =  { 
+  # s.source =  {
   #  :git => 'https://github.com/apache/incubator-weex.git',
   #  :tag => #{s.version}
   # }
@@ -46,7 +46,8 @@ Pod::Spec.new do |s|
                     'weex_core/Source/wson/**/*.{h,hpp,m,mm,c,cpp,cc}',
                     'weex_core/Source/third_party/**/*.{h,hpp,m,mm,c,cpp,cc}',
                     'weex_core/Source/include/**/*.{h,hpp,m,mm,c,cpp,cc}'
-  s.exclude_files = 'weex_core/Source/**/*android.{h,hpp,m,mm,c,cpp,cc}'
+  s.exclude_files = 'weex_core/Source/**/*android.{h,hpp,m,mm,c,cpp,cc}',
+                    'weex_core/Source/core/network/android/'
 
   s.private_header_files = 'ios/sdk/WeexSDK/Sources/Component/RecycleList/WXJSASTParser.h'
   s.public_header_files = 'ios/sdk/WeexSDK/Sources/WeexSDK.h',
