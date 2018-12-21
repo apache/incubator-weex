@@ -1218,8 +1218,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       }
       float offsetParsed = WXViewUtils.getRealPxByWidth(Integer.parseInt(offset),getInstance().getInstanceViewPortWidth());
 
-      if (offScreenY < offsetParsed) {
-
+      if (offScreenY <= offsetParsed && getEvents().contains(Constants.Event.LOADMORE)) {
         if (mListCellCount != mChildren.size()
             || mForceLoadmoreNextTime) {
           fireEvent(Constants.Event.LOADMORE);
