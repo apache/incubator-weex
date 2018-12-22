@@ -142,10 +142,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private WXInstanceApm mApmForInstance;
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
-  @NonNull
-  private PreRenderContext mPrerenderContext = new PreRenderContext();
+
+  private float mRealWidth = 0;
+  private float mRealHeight = 0;
 
   private Map<String,String> mContainerInfo;
+
+  @NonNull
+  private PreRenderContext mPrerenderContext = new PreRenderContext();
 
   public boolean isNewFsEnd = false;
 
@@ -270,37 +274,66 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXBridgeManager.getInstance().setUseSingleProcess(flag);
   }
 
-  public void preRenderByUrl(String pageName, final String url, Map<String, Object> options, final String jsonInitData, final int width, final int height, final WXRenderStrategy flag) {
+  public void preRenderByUrl(String pageName,
+                                           final String url,
+                                           Map<String, Object> options,
+                                           final String jsonInitData,
+                                           final int width,
+                                           final int height,
+                                           final WXRenderStrategy flag,
+                                           final int layoutMode, final float offset) {
     if (mPrerenderContext.interceptRenderState.compareAndSet(PreRenderContext.INTERCEPT_RENDER_CLOSE, PreRenderContext.INTERCEPT_RENDER_OPEN)) {
       mPrerenderContext.width = width;
       mPrerenderContext.height = height;
+      mPrerenderContext.enableOffset = offset;
+      mPrerenderContext.setLayoutMode(layoutMode);
       mPrerenderContext.onPreRender();
       renderByUrl(pageName, url, options, jsonInitData, flag);
     }
   }
 
-  public void preRenderByTemplate(String pageName, final String template, Map<String, Object> options, final String jsonInitData, final int width, final int height, final WXRenderStrategy flag) {
+  public void preRenderByTemplateWithLayoutMode(String pageName,
+                                                final String template,
+                                                Map<String, Object> options,
+                                                final String jsonInitData,
+                                                final int width,
+                                                final int height,
+                                                final WXRenderStrategy flag,
+                                                final int layoutMode,
+                                                final float offset) {
     if (mPrerenderContext.interceptRenderState.compareAndSet(PreRenderContext.INTERCEPT_RENDER_CLOSE, PreRenderContext.INTERCEPT_RENDER_OPEN)) {
       mPrerenderContext.width = width;
       mPrerenderContext.height = height;
+      mPrerenderContext.enableOffset = offset;
+      mPrerenderContext.setLayoutMode(layoutMode);
       mPrerenderContext.onPreRender();
       render(pageName, template, options, jsonInitData, flag);
     }
   }
 
-  public void realRender(@NonNull Context context) {
+  public boolean realRender(@NonNull Context context) {
     if (mPrerenderContext.interceptRenderState.compareAndSet(PreRenderContext.INTERCEPT_RENDER_OPEN, PreRenderContext.INTERCEPT_RENDER_CLOSE)) {
       mContext = context;
       mPrerenderContext.onRealRender();
       WXComponentNode rootNode = mPrerenderContext.rootNode;
       if (rootNode != null) {
         mPrerenderContext.rootNode.startTransform();
+        return true;
+      } else  {
+        WXLogUtils.w("real render failed, rootNode is null");
       }
+    } else {
+      WXLogUtils.w("real render failed, state wrong");
     }
+    return false;
   }
 
   public void specifiedRootNode(WXComponentNode rootNode) {
-      mPrerenderContext.rootNode = rootNode;
+    mPrerenderContext.rootNode = rootNode;
+  }
+
+  public void updateRootNode() {
+    updateDefaultRootSize(mPrerenderContext.getRenderWidth(), mPrerenderContext.getRenderHeight());
   }
 
   public AtomicBoolean isRenderSuccess() {
@@ -1755,27 +1788,51 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         }
       ViewGroup.LayoutParams layoutParams = mRenderContainer.getLayoutParams();
       if (layoutParams != null) {
-        final float realWidth = width;
-        final float realHeight = height;
+
+
         if (mRenderContainer.getWidth() != width || mRenderContainer.getHeight() != height) {
           layoutParams.width = width;
           layoutParams.height = height;
           mRenderContainer.setLayoutParams(layoutParams);
         }
 
-        if (mRootComp != null && layoutParams != null) {
-          final boolean isWidthWrapContent = layoutParams.width == ViewGroup.LayoutParams.WRAP_CONTENT;
-          final boolean isHeightWrapContent = layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT;
-
-          WXBridgeManager.getInstance().post(new Runnable() {
-            @Override
-            public void run() {
-              WXBridgeManager.getInstance().setDefaultRootSize(getInstanceId(), realWidth, realHeight, isWidthWrapContent,
-                      isHeightWrapContent);
-            }
-          });
-        }
+        updateDefaultRootSize(width, height);
       }
+    }
+  }
+
+  private void updateDefaultRootSize(final int width, final int height) {
+    // 预渲染中定下的宽高需要有个误差值，防止浮点的计算误差
+    float offset = mPrerenderContext.enableOffset;
+    if (Math.abs(mRealWidth - width) < offset && Math.abs(mRealHeight - height) < offset) {
+      WXLogUtils.w("update default root size failed, size not changed");
+      return;
+    }
+    int paramWidth = width;
+    int paramHeight = height;
+
+    if (mRenderContainer != null && mRenderContainer.getLayoutParams() != null) {
+      paramWidth = mRenderContainer.getLayoutParams().width;
+      paramHeight = mRenderContainer.getLayoutParams().height;
+    }
+
+    WXLogUtils.i("update default size, oldSize:(" + mRealWidth + ", " + mRealHeight + "), newSize:(" + width + ", " + height + ")");
+    if (mRootComp != null || mPrerenderContext.rootNode != null) {
+      final boolean isWidthWrapContent = (paramWidth == ViewGroup.LayoutParams.WRAP_CONTENT);
+      final boolean isHeightWrapContent = (paramHeight == ViewGroup.LayoutParams.WRAP_CONTENT);
+
+      final float realWidth = width;
+      final float realHeight = height;
+      mRealWidth = realWidth;
+      mRealHeight = realHeight;
+
+      WXBridgeManager.getInstance().post(new Runnable() {
+        @Override
+        public void run() {
+          WXBridgeManager.getInstance().setDefaultRootSize(getInstanceId(), realWidth, realHeight, isWidthWrapContent,
+                  isHeightWrapContent);
+        }
+      });
     }
   }
 

@@ -21,7 +21,6 @@ package com.taobao.weex.ui.action;
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
 public class GraphicActionRenderSuccess extends BasicGraphicAction {

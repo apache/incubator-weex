@@ -20,6 +20,7 @@ package com.taobao.weex.prerender;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.ViewGroup;
 
 import com.taobao.weex.WeexFrameRateControl;
 import com.taobao.weex.ui.component.node.WXComponentNode;
@@ -36,10 +37,17 @@ public class PreRenderContext implements WeexFrameRateControl.VSyncListener {
     public static final int INTERCEPT_RENDER_CLOSE = 0;
     public static final int INTERCEPT_RENDER_OPEN = 1;
 
+    public static final int LAYOUT_MODE_SPECIFIC = 0;
+    public static final int LAYOUT_MODE_ADAPTIVE = 1;
+    public static final int LAYOUT_MODE_MATCH_PARENT = 2;
+
+    public static final float DEFAULT_OFFSET = 0.00000001f;
+
     // need intercept real render
     public AtomicInteger interceptRenderState = new AtomicInteger(INTERCEPT_RENDER_CLOSE);
 
     private WeexFrameRateControl mFrameRateControl;
+    private int mLayoutMode = LAYOUT_MODE_SPECIFIC;
 
     @Nullable
     public WXComponentNode rootNode;
@@ -49,6 +57,8 @@ public class PreRenderContext implements WeexFrameRateControl.VSyncListener {
 
     public int width = 0;
     public int height = 0;
+
+    public float enableOffset = DEFAULT_OFFSET;
 
     public AtomicBoolean isRenderSuccess = new AtomicBoolean(false);
 
@@ -66,10 +76,50 @@ public class PreRenderContext implements WeexFrameRateControl.VSyncListener {
         mFrameRateControl.start();
     }
 
+    public void setLayoutMode(int layoutMode) {
+        switch (layoutMode) {
+            case LAYOUT_MODE_SPECIFIC:
+                if (width <= 0 || height <= 0) {
+                    mLayoutMode = LAYOUT_MODE_ADAPTIVE;
+                    break;
+                }
+                mLayoutMode = LAYOUT_MODE_SPECIFIC;
+            default:
+                mLayoutMode = layoutMode;
+                break;
+        }
+    }
+
+    public int getLayoutMode() {
+        return mLayoutMode;
+    }
+
     public void onRealRender() {
         if (mFrameRateControl != null) {
             mFrameRateControl.stop();
             mFrameRateControl = null;
+        }
+    }
+
+    public int getRenderWidth() {
+        switch (mLayoutMode) {
+            case LAYOUT_MODE_ADAPTIVE:
+                return ViewGroup.LayoutParams.WRAP_CONTENT;
+            case LAYOUT_MODE_MATCH_PARENT:
+                return ViewGroup.LayoutParams.MATCH_PARENT;
+            default:
+                return width;
+        }
+    }
+
+    public int getRenderHeight() {
+        switch (mLayoutMode) {
+            case LAYOUT_MODE_ADAPTIVE:
+                return ViewGroup.LayoutParams.WRAP_CONTENT;
+            case LAYOUT_MODE_MATCH_PARENT:
+                return ViewGroup.LayoutParams.MATCH_PARENT;
+            default:
+                return height;
         }
     }
 }

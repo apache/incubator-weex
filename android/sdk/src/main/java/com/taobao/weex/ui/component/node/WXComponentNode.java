@@ -134,22 +134,13 @@ public class WXComponentNode implements Runnable {
         switch (mExecuteState) {
             case EXECUTE_STATE_CREATE_BODY:
                 createBody();
-                WXBridgeManager.getInstance().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        WXBridgeManager.getInstance().callCreateFinish(mWxInstance.getInstanceId());
-                    }
-                });
+                mWxInstance.firstScreenCreateInstanceTime(System.currentTimeMillis());
+                onCreateFinish();
                 break;
             case EXECUTE_STATE_ADD_ELEMENT:
                 addElement();
                 if (mIsRenderSuccuess && mWxInstance.isRenderSuccess().compareAndSet(false, true)) {
-                    WXBridgeManager.getInstance().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            WXBridgeManager.getInstance().callRenderSuccess(mWxInstance.getInstanceId());
-                        }
-                    });
+                   onRenderSuccess();
                 }
                 break;
             default:
@@ -199,9 +190,10 @@ public class WXComponentNode implements Runnable {
     }
 
     public void createBody() {
+        mWxInstance.specifiedRootNode(this);
         if (mWxInstance.getNeedInterceptRender()) {
             mExecuteState = EXECUTE_STATE_CREATE_BODY;
-            mWxInstance.specifiedRootNode(this);
+            mWxInstance.updateRootNode();
             return;
         }
         try {
@@ -521,5 +513,38 @@ public class WXComponentNode implements Runnable {
             layoutHeight = (int) data.getLayoutHeight();
         }
         mWxInstance.onRenderSuccess(layoutWidth, layoutHeight);
+    }
+
+    public void onRenderSuccess() {
+        if (mWxInstance.getNeedInterceptRender()) {
+            return;
+        }
+
+        ensureDataNotNull();
+
+        int layoutWidth = 0;
+        int layoutHeight = 0;
+        if (null != data) {
+            layoutWidth = (int) data.getLayoutWidth();
+            layoutHeight = (int) data.getLayoutHeight();
+        }
+        mWxInstance.onRenderSuccess(layoutWidth, layoutHeight);
+    }
+
+    public void onCreateFinish() {
+        if (mWxInstance.getNeedInterceptRender()) {
+            return;
+        }
+
+        mWxInstance.mHasCreateFinish = true;
+
+        if (mWxInstance.getRenderStrategy() == WXRenderStrategy.APPEND_ONCE) {
+            mWxInstance.onCreateFinish();
+        }
+
+        if (null != mWxInstance.getWXPerformance()){
+            mWxInstance.getWXPerformance().callCreateFinishTime = System.currentTimeMillis() - mWxInstance.getWXPerformance().renderTimeOrigin;
+        }
+        mWxInstance.onOldFsRenderTimeLogic();
     }
 }
