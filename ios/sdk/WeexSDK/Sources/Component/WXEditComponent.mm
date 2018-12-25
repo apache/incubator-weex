@@ -950,7 +950,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     }
     
     if (_keyboardEvent) {
-        [self fireEvent:@"keyboard" params:@{ @"isShow": @YES, @"keyboardSize": @{@"width": @(end.size.width), @"height": @(end.size.height)} }];
+        [self fireEvent:@"keyboard" params:@{ @"isShow": @YES, @"keyboardSize": @(end.size.height / self.weexInstance.pixelScaleFactor) }];
     }
     
     _keyboardHidden = NO;
