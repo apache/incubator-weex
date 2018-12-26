@@ -143,15 +143,20 @@ public class DefaultWXStorage implements IWXStorageAdapter {
 
     @Override
     public void close() {
-        try {
-            mDatabaseSupplier.closeDatabase();
-            if (mExecutorService != null) {
-                mExecutorService.shutdown();
-                mExecutorService = null;
+        execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mDatabaseSupplier.closeDatabase();
+                    if (mExecutorService != null) {
+                        mExecutorService.shutdown();
+                        mExecutorService = null;
+                    }
+                } catch (Exception e) {
+                    WXLogUtils.e(WXSQLiteOpenHelper.TAG_STORAGE, e.getMessage());
+                }
             }
-        } catch (Exception e) {
-            WXLogUtils.e(WXSQLiteOpenHelper.TAG_STORAGE, e.getMessage());
-        }
+        });
     }
 
     private boolean performSetItem(String key, String value, boolean isPersistent, boolean allowRetryWhenFull) {
