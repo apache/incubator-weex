@@ -453,6 +453,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     mWXBridge.resetWXBridge(WXEnvironment.sRemoteDebugMode);
   }
 
+  public void recordViewPort(String instanceId, float viewPort) {
+    mWXBridge.recordViewPort(instanceId, viewPort);
+  }
+
   /**
    * Set current Instance
    *

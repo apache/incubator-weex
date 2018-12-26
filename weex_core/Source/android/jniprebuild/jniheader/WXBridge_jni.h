@@ -159,6 +159,9 @@ static void ResetWXBridge(JNIEnv* env, jobject jcaller,
 static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
     jstring config);
 
+static void RecordViewPort(JNIEnv* env, jobject jcaller,
+                           jstring instanceId, jfloat viewPort);
+
 // Step 2: method stubs.
 
 static intptr_t g_WXBridge_onReceivedResult = 0;
@@ -1114,6 +1117,12 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(UpdateGlobalConfig) },
+    { "nativeRecordViewPort",
+"("
+"Ljava/lang/String;"
+"F"
+")"
+"V", reinterpret_cast<void*>(RecordViewPort) },
 };
 
 static bool RegisterNativesImpl(JNIEnv* env) {

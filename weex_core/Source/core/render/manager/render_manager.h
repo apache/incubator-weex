@@ -112,6 +112,8 @@ class RenderManager {
 
   void set_round_off_deviation(const std::string &page_id, bool round_off_deviation);
 
+  void record_viewport_width(const std::string &page_id, float viewport_width);
+
   static RenderManager *GetInstance() {
     if (NULL == g_pInstance) {
       g_pInstance = new RenderManager();

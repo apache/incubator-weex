@@ -396,4 +396,14 @@ void RenderManager::Batch(const std::string &page_id) {
   page->Batch();
 }
 
+void RenderManager::record_viewport_width(const std::string &page_id, float viewport_width) {
+  RenderPage *page = GetPage(page_id);
+  if (page == nullptr) {
+    viewports_.insert(std::pair<std::string, float>(page_id, viewport_width));
+  } else {
+    page->set_viewport_width(viewport_width);
+  }
+}
+
+
 }  // namespace WeexCore

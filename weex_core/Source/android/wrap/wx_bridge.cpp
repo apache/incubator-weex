@@ -477,6 +477,16 @@ static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller, jstring config) {
       ->UpdateGlobalConfig(scoped_config.getChars());
 }
 
+static void RecordViewPort(JNIEnv *env, jobject jcaller, jstring instanceId, jfloat viewPort) {
+  if (instanceId == NULL) {
+    LOGE("native recoreViewPort error, instanceId is null");
+    return;
+  }
+
+  RenderManager::GetInstance()->record_viewport_width(env->GetStringUTFChars(instanceId, JNI_FALSE),
+                                                      viewPort);
+}
+
 static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
                                   jstring instanceId, jstring name,
                                   jstring function, jobjectArray args) {

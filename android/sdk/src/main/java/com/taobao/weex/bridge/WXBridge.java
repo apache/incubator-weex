@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.bridge;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
@@ -106,6 +107,8 @@ public class WXBridge implements IWXBridge {
   private native void nativeRegisterCoreEnv(String key, String value);
 
   private native void nativeResetWXBridge(Object bridge, String className);
+
+  private native void nativeRecordViewPort(String instanceId, float viewPort);
 
   /**
    * update global config,
@@ -716,5 +719,14 @@ public class WXBridge implements IWXBridge {
 
   public void registerModuleOnDataRenderNode(String data) {
     nativeRegisterModuleOnDataRenderNode(data);
+  }
+
+  @Override
+  public void recordViewPort(String instanceId, float viewPort) {
+    if (TextUtils.isEmpty(instanceId)) {
+      WXLogUtils.e(TAG, "recordViewPort error, instance id is null");
+      return;
+    }
+    nativeRecordViewPort(instanceId, viewPort);
   }
 }

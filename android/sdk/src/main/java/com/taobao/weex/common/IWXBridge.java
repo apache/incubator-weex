@@ -198,4 +198,6 @@ public interface IWXBridge extends IWXObject {
 
   void resetWXBridge(boolean remoteDebug);
 
+  void recordViewPort(String instanceId, float viewPort);
+
 }
