@@ -150,33 +150,40 @@ public class WXSQLiteOpenHelper extends SQLiteOpenHelper {
         if (mDb != null && mDb.isOpen()) {
             return;
         }
-        // Sometimes retrieving the database fails. We do 2 retries: first without database deletion
-        // and then with deletion.
-        for (int tries = 0; tries < 2; tries++) {
-            try {
-                if (tries > 0) {
-                    //delete db and recreate
-                    deleteDB();
+
+        try {
+            // Sometimes retrieving the database fails. We do 2 retries: first without database deletion
+            // and then with deletion.
+            for (int tries = 0; tries < 2; tries++) {
+                try {
+                    if (tries > 0) {
+                        //delete db and recreate
+                        deleteDB();
+                    }
+                    mDb = getWritableDatabase();
+                    break;
+                } catch (SQLiteException e) {
+                    e.printStackTrace();
                 }
-                mDb = getWritableDatabase();
-                break;
-            } catch (SQLiteException e) {
-                e.printStackTrace();
+                // Wait before retrying.
+                try {
+                    Thread.sleep(SLEEP_TIME_MS);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
             }
-            // Wait before retrying.
-            try {
-                Thread.sleep(SLEEP_TIME_MS);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
+            if(mDb == null){
+                return;
             }
-        }
-        if(mDb == null){
-            return;
+
+            createTableIfNotExists(mDb);
+
+            mDb.setMaximumSize(mMaximumDatabaseSize);
+        } catch (Throwable e) {
+            mDb = null;
+            WXLogUtils.d(TAG_STORAGE,"ensureDatabase failed, throwable = " + e.getMessage());
         }
 
-        createTableIfNotExists(mDb);
-
-        mDb.setMaximumSize(mMaximumDatabaseSize);
     }
 
     public synchronized void setMaximumSize(long size) {
