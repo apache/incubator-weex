@@ -8,6 +8,7 @@ def common
     pod 'SDWebImage', '3.7.5'
     pod 'SocketRocket', '0.4.2'
     pod 'ATSDK-Weex', '0.0.1',:configurations => ['Debug']
+    pod 'BindingX', '1.0.3'
     
     # WeexGcanvas is added by Weex Plugin, more info at https://market.dotwe.org/ext/list.htm
     #pod 'WeexGcanvas'
