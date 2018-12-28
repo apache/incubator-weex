@@ -19,15 +19,10 @@
 package com.taobao.weex.ui.action;
 
 import android.support.annotation.NonNull;
-import android.widget.ScrollView;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXScroller;
-import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.ui.component.node.WXComponentNode;
 
 import java.util.Map;
 import java.util.Set;
@@ -61,39 +56,12 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
     BasicComponentData basicComponentData = new BasicComponentData(getRef(), mComponentType, null);
     node = createNode(instance, basicComponentData).build();
     node.createComponent();
-    // need merge
-    component = createComponent(instance, null, basicComponentData);
-    if (component == null) {
-      return;
-    }
-    component.setTransition(WXTransition.fromMap(component.getStyles(), component));
   }
 
   @Override
   public void executeAction() {
     super.executeAction();
     node.createBody();
-    // needMerge
-    try {
-      component.createView();
-      component.applyLayoutAndEvent(component);
-      component.bindData(component);
-      WXSDKInstance instance = getWXSDKIntance();
 
-      if (component instanceof WXScroller) {
-        WXScroller scroller = (WXScroller) component;
-        if (scroller.getInnerView() instanceof ScrollView) {
-          instance.setRootScrollView((ScrollView) scroller.getInnerView());
-        }
-      }
-
-      instance.onRootCreated(component);
-
-      if (instance.getRenderStrategy() != WXRenderStrategy.APPEND_ONCE) {
-        instance.onCreateFinish();
-      }
-    } catch (Exception e) {
-      WXLogUtils.e("create body failed.", e);
-    }
   }
 }

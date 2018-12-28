@@ -78,9 +78,8 @@ public class WXComponentNode {
 
     private GraphicPosition mLayoutPosition;
     private GraphicSize mLayoutSize;
+    private boolean mIsLayoutRTL;
     private JSONObject mScrollOptions;
-
-    private boolean mIsJSCreateFinish = false;
 
     private int mExecuteState = EXECUTE_STATE_ADD_ELEMENT;
 
@@ -107,8 +106,8 @@ public class WXComponentNode {
         this.mLayoutSize = layoutSize;
     }
 
-    void setIsJSCreateFinish(boolean isJSCreateFinish) {
-        this.mIsJSCreateFinish = isJSCreateFinish;
+    public void setIsLayoutRTL(boolean isRTL) {
+        this.mIsLayoutRTL = isRTL;
     }
 
     public void startTransform() {
@@ -121,7 +120,7 @@ public class WXComponentNode {
     }
 
     private void postTransformAction() {
-        new GraphicActionTransformNode(this, mWxInstance.getInstanceId(), mComponentData.mRef).executeActionOnRender();
+        new GraphicActionTransformNode(this, mWxInstance, mComponentData.mRef).executeActionOnRender();
     }
 
     public void transformNode() {
@@ -153,6 +152,7 @@ public class WXComponentNode {
                 parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager()
                         .getWXComponent(pageId, mParentNode.mComponentData.mRef);
             }
+
             WXComponent component = WXComponentFactory.newInstance(mWxInstance, parent, mComponentData);
             WXSDKManager.getInstance().getWXRenderManager().registerComponent(pageId, mComponentData.mRef, component);
             WXStyle style = mComponentData.getStyles();
@@ -165,6 +165,16 @@ public class WXComponentNode {
             }
             mWxInstance.onComponentCreate(component, System.currentTimeMillis() - createComponentStart);
             component.setTransition(WXTransition.fromMap(component.getStyles(), component));
+
+            if (null != parent && parent.isIgnoreInteraction){
+                component.isIgnoreInteraction = true;
+            }
+            if (!component.isIgnoreInteraction ){
+                Object flag = component.getAttrs().get("ignoreInteraction");
+                if ("1".equals(flag) || "true".equals(flag) || component.isFixed()){
+                    component.isIgnoreInteraction = true;
+                }
+            }
             data = component;
         }
     }
@@ -194,6 +204,7 @@ public class WXComponentNode {
                     mWxInstance.onCreateFinish();
                 }
             }
+
         } catch (Exception e) {
             WXLogUtils.e("create body failed.", e);
         }
@@ -211,9 +222,12 @@ public class WXComponentNode {
         try {
             ensureDataNotNull();
             if (data != null) {
+                if (!TextUtils.equals(mComponentData.mComponentType, "video") && !TextUtils.equals(mComponentData.mComponentType, "videoplus"))
+                    data.mIsAddElementToTree = true;
                 mParentNode.addChild(this, mIndex);
                 mParentNode.createChildViewAt(mIndex);
 
+                data.setIsLayoutRTL(mIsLayoutRTL);
                 if (mLayoutPosition != null && mLayoutSize != null) {
                     data.setDemission(mLayoutSize, mLayoutPosition);
                 }
@@ -222,8 +236,8 @@ public class WXComponentNode {
 
                 data.bindData(data);
                 scrollToElementInternal();
-                mWxInstance.onElementChange(mIsJSCreateFinish);
             }
+
         } catch (Exception e) {
             WXLogUtils.e("add component failed.", e);
         }
@@ -313,9 +327,10 @@ public class WXComponentNode {
         data.invoke(method, args);
     }
 
-    public void updateLayout(GraphicPosition layoutPosition, GraphicSize layoutSize) {
+    public void updateLayout(GraphicPosition layoutPosition, GraphicSize layoutSize, boolean isLayoutRTL) {
         mLayoutSize = layoutSize;
         mLayoutPosition = layoutPosition;
+        mIsLayoutRTL = isLayoutRTL;
         if (mWxInstance.getNeedInterceptRender()) {
             return;
         }
@@ -326,8 +341,9 @@ public class WXComponentNode {
             return;
         }
 
+        data.setIsLayoutRTL(mIsLayoutRTL);
         data.setDemission(mLayoutSize, mLayoutPosition);
-        data.setLayout(data);
+        data.setSafeLayout(data);
         data.setPadding(data.getPadding(), data.getBorder());
     }
 
@@ -344,8 +360,7 @@ public class WXComponentNode {
         newParent.addElementInternal(this, index);
     }
 
-    public void removeElement(boolean isJSCreateFinish) {
-        mIsJSCreateFinish = isJSCreateFinish;
+    public void removeElement() {
         if (!mWxInstance.getNeedInterceptRender() && data != null) {
             clearRegistryForComponent(data);
         }
@@ -378,7 +393,6 @@ public class WXComponentNode {
                 clearRegistryForComponent(container.getChild(i));
             }
         }
-        mWxInstance.onElementChange(mIsJSCreateFinish);
     }
 
     public void removeEvent(String event) {
@@ -395,9 +409,8 @@ public class WXComponentNode {
     }
 
     public void scrollToElement(JSONObject scrollOptions) {
-        if (mWxInstance.getNeedInterceptRender()) {
-            mScrollOptions = scrollOptions;
-        } else {
+        mScrollOptions = scrollOptions;
+        if (!mWxInstance.getNeedInterceptRender()) {
             scrollToElementInternal();
         }
     }
@@ -447,5 +460,38 @@ public class WXComponentNode {
     @NonNull
     public WXSDKInstance getWxInstance() {
         return mWxInstance;
+    }
+
+    public void onCreateFinish() {
+        if (mWxInstance.getNeedInterceptRender()) {
+            return;
+        }
+
+        mWxInstance.mHasCreateFinish = true;
+
+        if (mWxInstance.getRenderStrategy() == WXRenderStrategy.APPEND_ONCE) {
+            mWxInstance.onCreateFinish();
+        }
+
+        if (null != mWxInstance.getWXPerformance()){
+            mWxInstance.getWXPerformance().callCreateFinishTime = System.currentTimeMillis() - mWxInstance.getWXPerformance().renderTimeOrigin;
+        }
+        mWxInstance.onOldFsRenderTimeLogic();
+    }
+
+    public void onRenderSuccess() {
+        if (mWxInstance.getNeedInterceptRender()) {
+            return;
+        }
+
+        ensureDataNotNull();
+
+        int layoutWidth = 0;
+        int layoutHeight = 0;
+        if (null != data) {
+            layoutWidth = (int) data.getLayoutWidth();
+            layoutHeight = (int) data.getLayoutHeight();
+        }
+        mWxInstance.onRenderSuccess(layoutWidth, layoutHeight);
     }
 }

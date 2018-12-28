@@ -42,8 +42,6 @@ public class WXComponentNodeBuilder {
     private GraphicPosition mLayoutPosition;
     private GraphicSize mLayoutSize;
 
-    private boolean mIsJSCreateFinish = false;
-
     private WXComponentNodeBuilder(@NonNull WXSDKInstance instance, @NonNull BasicComponentData data) {
         mInstance = instance;
         mData = data;
@@ -59,7 +57,6 @@ public class WXComponentNodeBuilder {
         node.setIndex(mIndex);
         node.setLayoutPosition(mLayoutPosition);
         node.setLayoutSize(mLayoutSize);
-        node.setIsJSCreateFinish(mIsJSCreateFinish);
         return node;
     }
 
@@ -75,11 +72,6 @@ public class WXComponentNodeBuilder {
 
     public WXComponentNodeBuilder setLayoutSize(GraphicSize layoutSize) {
         this.mLayoutSize = layoutSize;
-        return this;
-    }
-
-    public WXComponentNodeBuilder setIsJSCreateFinish(boolean isJSCreateFinish) {
-        this.mIsJSCreateFinish = isJSCreateFinish;
         return this;
     }
 }

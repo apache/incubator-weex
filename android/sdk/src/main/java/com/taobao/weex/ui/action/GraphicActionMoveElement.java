@@ -40,35 +40,6 @@ public class GraphicActionMoveElement extends BasicGraphicAction {
     WXComponentNode node = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
     if (node != null) {
       node.moveElement(mParentref, mIndex);
-
-      // need merge
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
-    if(component == null) {
-      return;
-    }
-    WXVContainer oldParent = component.getParent();
-    WXComponent newParent = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentref);
-    if (oldParent == null
-            || newParent == null || !(newParent instanceof WXVContainer)) {
-      return;
-    }
-
-    if (component.getHostView() != null && !TextUtils.equals(component.getComponentType(), "video") && !TextUtils.equals(component.getComponentType(), "videoplus")) {
-      int[] location = new  int[2] ;
-      component.getHostView().getLocationInWindow(location);
-    }
-
-    oldParent.remove(component, false);
-
-    ((WXVContainer) newParent).addChild(component, mIndex);
-
-    if (component.getHostView() != null && !TextUtils.equals(component.getComponentType(), "video") && !TextUtils.equals(component.getComponentType(), "videoplus")) {
-      int[] location = new  int[2] ;
-      component.getHostView().getLocationInWindow(location);
-    }
-
-    if (!component.isVirtualComponent()) {
-      ((WXVContainer) newParent).addSubView(component.getHostView(), mIndex);
     }
   }
 }

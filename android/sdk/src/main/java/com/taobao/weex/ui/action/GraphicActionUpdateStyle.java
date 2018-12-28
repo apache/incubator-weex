@@ -82,8 +82,6 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
 
     if (null != borders) {
       mIsBorderSet = true;
-      // need merge
-      component.setBorders(borders);
       mNode.getComponentData().setBorders(borders);
     }
   }
@@ -124,29 +122,12 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
 
     if (null != borders) {
       mIsBorderSet = true;
-      // need merge
-      component.addShorthand(borders);
       mNode.getComponentData().addShorthand(borders);
     }
   }
 
   @Override
   public void executeAction() { // need merge
-    if (component == null) return;
-    if (mStyle != null) {
-      if(component.getTransition() != null){
-        component.getTransition().updateTranstionParams(mStyle);
-        if(component.getTransition().hasTransitionProperty(mStyle)){
-          component.getTransition().startTransition(mStyle);
-        }
-      } else {
-        component.setTransition(WXTransition.fromMap(mStyle, component));
-        component.updateStyles(mStyle);
-      }
-    } else if (mIsBorderSet) {
-      component.updateStyles(component);
-
-
     mNode = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
     if (mNode == null) {
       return;
@@ -154,14 +135,18 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
 
     if (!mNode.getWxInstance().getNeedInterceptRender() && mNode.data != null) {
       WXComponent component = mNode.data;
-      if (component.getTransition() != null) {
-        component.getTransition().updateTranstionParams(mStyle);
-        if (component.getTransition().hasTransitionProperty(mStyle)) {
-          component.getTransition().startTransition(mStyle);
+      if (mStyle != null) {
+        if (component.getTransition() != null) {
+          component.getTransition().updateTranstionParams(mStyle);
+          if (component.getTransition().hasTransitionProperty(mStyle)) {
+            component.getTransition().startTransition(mStyle);
+          }
+        } else {
+          component.setTransition(WXTransition.fromMap(mStyle, component));
+          component.updateStyles(mStyle);
         }
-      } else {
-        component.setTransition(WXTransition.fromMap(mStyle, component));
-        component.updateStyles(mStyle);
+      } else if (mIsBorderSet) {
+        component.updateStyles(component);
       }
     }
   }

@@ -21,7 +21,6 @@ package com.taobao.weex.ui.action;
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.component.node.WXComponentNodeBuilder;
 
@@ -55,17 +54,6 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
     basicComponentData.addShorthand(mBorders, CSSShorthand.TYPE.BORDER);
 
     return WXComponentNodeBuilder.createInstance(instance, basicComponentData);
-    WXComponent component = WXComponentFactory.newInstance(instance, parent, basicComponentData);
-    WXSDKManager.getInstance().getWXRenderManager().registerComponent(getPageId(), getRef(), component);
-    if(mStyle != null && mStyle.containsKey(Constants.Name.TRANSFORM) && component.getTransition() == null) {
-      Map<String, Object> animationMap = new ArrayMap<>(2);
-      animationMap.put(Constants.Name.TRANSFORM, mStyle.get(Constants.Name.TRANSFORM));
-      animationMap
-          .put(Constants.Name.TRANSFORM_ORIGIN, mStyle.get(Constants.Name.TRANSFORM_ORIGIN));
-      component.addAnimationForElement(animationMap);
-    }
-    instance.onComponentCreate(component,System.currentTimeMillis() -createComponentStart);
-    return component;
   }
 
   @Override

@@ -44,14 +44,10 @@ public class GraphicActionLayout extends BasicGraphicAction {
       WXLogUtils.w(WXLogUtils.WEEX_TAG);
       return;
     }
-// need merge
-    component.setIsLayoutRTL(mIsLayoutRTL);
-    component.setDemission(mLayoutSize, mLayoutPosition);
-    component.setSafeLayout(component);
-    component.setPadding(component.getPadding(), component.getBorder());
+
     WXComponentNode node = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
     if (node != null) {
-      node.updateLayout(mLayoutPosition, mLayoutSize);
+      node.updateLayout(mLayoutPosition, mLayoutSize, mIsLayoutRTL);
     }
   }
 }

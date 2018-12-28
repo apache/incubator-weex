@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.node.WXComponentNode;
 
 public class GraphicActionRenderSuccess extends BasicGraphicAction {
 
@@ -32,17 +33,13 @@ public class GraphicActionRenderSuccess extends BasicGraphicAction {
     @Override
     public void executeAction() {
         final WXSDKInstance instance = getWXSDKIntance();
-        if (instance == null || instance.getContext() == null) {
+        if (instance == null) {
             return;
         }
-        WXComponent component = instance.getRootComponent();
-        int layoutWidth = 0;
-        int layoutHeight = 0;
-        if (null != component) {
-            layoutWidth = (int) component.getLayoutWidth();
-            layoutHeight = (int) component.getLayoutHeight();
+        WXComponentNode rootNode = instance.getPrerenderContext().rootNode;
+        if (rootNode != null) {
+            rootNode.onRenderSuccess();
         }
-        instance.onRenderSuccess(layoutWidth, layoutHeight);
     }
 
 }

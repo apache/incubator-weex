@@ -141,6 +141,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private WXInstanceApm mApmForInstance;
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
+  @NonNull
+  private PreRenderContext mPrerenderContext = new PreRenderContext();
+
+  private Map<String,String> mContainerInfo;
+
+  public boolean isNewFsEnd = false;
 
   /**
    * bundle type

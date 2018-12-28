@@ -20,6 +20,7 @@ package com.taobao.weex.ui.action;
 
 import android.support.annotation.NonNull;
 
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
 /**
@@ -30,8 +31,8 @@ public class GraphicActionTransformNode extends BasicGraphicAction {
     @NonNull
     private final WXComponentNode mNode;
 
-    public GraphicActionTransformNode(@NonNull WXComponentNode node, String pageId, String ref) {
-        super(pageId, ref);
+    public GraphicActionTransformNode(@NonNull WXComponentNode node, WXSDKInstance instance, String ref) {
+        super(instance, ref);
         this.mNode = node;
     }
 
