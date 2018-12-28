@@ -401,11 +401,13 @@ _Pragma("clang diagnostic pop") \
     JSValueRef value = JSObjectGetProperty(ctx, global, funcstr, &exc);
     if (!value) {
         WXLogError(@"%@",exc);
+    	JSStringRelease(funcstr);
         return NULL;
     }
     JSObjectRef funcCtor = JSValueToObject(ctx, value, &exc);
     if (!funcCtor) {
         WXLogError(@"%@",exc);
+    	JSStringRelease(funcstr);
         return NULL;
     }
     JSValueRef funcProto = JSObjectGetPrototype(ctx, funcCtor);
