@@ -103,11 +103,6 @@ public class ConfigComponentHolder implements IFComponentHolder {
     }
 
     @Override
-    public String getComponentType() {
-        return mType;
-    }
-
-    @Override
     public Invoker getMethodInvoker(String name) {
         if(mMethodInvokers == null && !generate()){
             return null;

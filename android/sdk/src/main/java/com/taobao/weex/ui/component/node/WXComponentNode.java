@@ -515,36 +515,4 @@ public class WXComponentNode implements Runnable {
         mWxInstance.onRenderSuccess(layoutWidth, layoutHeight);
     }
 
-    public void onRenderSuccess() {
-        if (mWxInstance.getNeedInterceptRender()) {
-            return;
-        }
-
-        ensureDataNotNull();
-
-        int layoutWidth = 0;
-        int layoutHeight = 0;
-        if (null != data) {
-            layoutWidth = (int) data.getLayoutWidth();
-            layoutHeight = (int) data.getLayoutHeight();
-        }
-        mWxInstance.onRenderSuccess(layoutWidth, layoutHeight);
-    }
-
-    public void onCreateFinish() {
-        if (mWxInstance.getNeedInterceptRender()) {
-            return;
-        }
-
-        mWxInstance.mHasCreateFinish = true;
-
-        if (mWxInstance.getRenderStrategy() == WXRenderStrategy.APPEND_ONCE) {
-            mWxInstance.onCreateFinish();
-        }
-
-        if (null != mWxInstance.getWXPerformance()){
-            mWxInstance.getWXPerformance().callCreateFinishTime = System.currentTimeMillis() - mWxInstance.getWXPerformance().renderTimeOrigin;
-        }
-        mWxInstance.onOldFsRenderTimeLogic();
-    }
 }
