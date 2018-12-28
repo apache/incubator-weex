@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.WorkerThread;
