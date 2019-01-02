@@ -113,11 +113,8 @@ WX_EXPORT_METHOD(@selector(save:))
         if (attributes[@"quality"]) {
             _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
         }
-        id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+        
         _downloadImageWithURL = YES;
-        if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-            _downloadImageWithURL = [[configCenter configForKey:@"iOS_weex_ext_config.downloadImageWithURL" defaultValue:@(YES) isDefault:NULL] boolValue];
-        }
         if (attributes[@"compositing"]) {
             _downloadImageWithURL = [WXConvert BOOL:attributes[@"compositing"]];
         }
