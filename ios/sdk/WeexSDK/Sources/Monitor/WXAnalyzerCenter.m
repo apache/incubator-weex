@@ -61,7 +61,7 @@
 
 + (void) transferPerformance:(NSString*)instanceId withType:(NSString*) type andKey:(NSString*) key andValue:(id)value
 {
-    if (![self isOpen]) {
+    if (![self isOpen] || !instanceId) {
         return;
     }
 
