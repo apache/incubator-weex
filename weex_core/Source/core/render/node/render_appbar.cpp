@@ -18,7 +18,7 @@
  */
 #include <utility>
 
-#include "base/ViewUtils.h"
+#include "core/common/view_utils.h"
 #include "core/config/core_environment.h"
 #include "core/css/constants_name.h"
 #include "core/render/node/render_appbar.h"

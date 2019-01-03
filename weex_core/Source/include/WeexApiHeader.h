@@ -28,7 +28,7 @@
 #include <map>
 #ifdef OS_ANDROID
 #include <jni.h>
-#include "IPC/IPCResult.h"
+#include "third_party/IPC/IPCResult.h"
 #endif
 
 namespace WeexCore {

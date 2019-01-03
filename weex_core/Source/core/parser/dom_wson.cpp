@@ -67,7 +67,7 @@ namespace WeexCore {
             }else if (0 == strcmp(objectKey.c_str(), "type")) {
                 renderType = parser.nextStringUTF8(parser.nextType());
                 render = (RenderObject *) RenderCreator::GetInstance()->CreateRender(renderType, ref);
-              render->set_page_id(pageId);
+                render->set_page_id(pageId);
                 if (parent != nullptr){
                     parent->AddRenderObject(index, render);
                 }

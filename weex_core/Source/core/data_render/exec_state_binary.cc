@@ -17,15 +17,16 @@
  * under the License.
  */
 
+#include "core/data_render/exec_state_binary.h"
 #include <thread>
 #include <mutex>
-#include "core/data_render/exec_state_binary.h"
+
+#include "base/log_defines.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/vm.h"
 #include "core/data_render/exec_state.h"
 #include "third_party/json11/json11.hpp"
 #include "core/data_render/vnode/vnode_exec_env.h"
-#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {

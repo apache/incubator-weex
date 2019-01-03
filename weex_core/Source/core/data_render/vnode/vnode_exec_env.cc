@@ -17,8 +17,10 @@
  * under the License.
  */
 
-#include <sstream>
 #include "core/data_render/vnode/vnode_exec_env.h"
+#include <sstream>
+
+#include "base/log_defines.h"
 #include "core/data_render/object.h"
 #include "core/data_render/table.h"
 #include "core/data_render/class_factory.h"
@@ -31,7 +33,6 @@
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/data_render/vnode/vcomponent_lifecycle_listener.h"
 #include "core/data_render/vnode/vnode_on_event_listener.h"
-#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {

@@ -23,7 +23,7 @@
 #include <jni.h>
 #include <map>
 #include <string>
-#include "android/base/jni/android_jni.h"
+#include "base/android/jni/android_jni.h"
 
 namespace WeexCore {
 

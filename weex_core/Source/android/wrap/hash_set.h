@@ -23,7 +23,7 @@
 #include <jni.h>
 #include <set>
 #include <string>
-#include "android/wrap/jni_object_wrap.h"
+#include "base/android/jni/jni_object_wrap.h"
 
 namespace WeexCore {
 class HashSet : public JNIObjectWrap {
