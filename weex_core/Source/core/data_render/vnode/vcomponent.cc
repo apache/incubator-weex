@@ -45,7 +45,11 @@ VComponent::VComponent(ExecState *exec_state, int template_id,
       root_vnode_(nullptr),
       exec_state_(exec_state) {}
 
-VComponent::~VComponent() {}
+VComponent::~VComponent() {
+  if (listener_ && !has_moved_) {
+    listener_->OnDestroyed(this);
+  }
+}
 
 static bool Equals(Value a, Value b) {
   if (a.type != b.type) {
