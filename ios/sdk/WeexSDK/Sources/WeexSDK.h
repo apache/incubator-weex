@@ -60,7 +60,6 @@
 #import "WXExceptionUtils.h"
 #import "WXEventModuleProtocol.h"
 #import "WXErrorView.h"
-#import "WXDisplayLinkManager.h"
 #import "WXDefine.h"
 #import "WXDebugTool.h"
 #import "WXConvert.h"
