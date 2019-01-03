@@ -51,7 +51,9 @@ Pod::Spec.new do |s|
                     'weex_core/Source/base/crash',
                     'weex_core/Source/base/utils',
                     'weex_core/Source/third_party/IPC',
-                    'weex_core/Source/core/network/android/'
+                    'weex_core/Source/core/network/android/',
+                    'weex_core/Source/include/JavaScriptCore/',
+                    'weex_core/Source/include/wtf'
 
   s.private_header_files = 'ios/sdk/WeexSDK/Sources/Component/RecycleList/WXJSASTParser.h'
   s.public_header_files = 'ios/sdk/WeexSDK/Sources/WeexSDK.h',
