@@ -451,7 +451,7 @@ void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string
         {
             // First way to fire event from VNode::OnEvent
             auto vnode = iter->second->context()->GetVNode(ref);
-            if (vnode) {
+            if (vnode && vnode->event_params_map()) {
                 auto hit_test = vnode->event_params_map()->find(event);
                 if (hit_test != vnode->event_params_map()->end()) {
                     // If vnode has eat event, return.
@@ -463,7 +463,6 @@ void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string
 
         // Second way to fire event from call vm func
         auto vnode = node->second->FindNode(ref);
-        if (vnode == nullptr)
         if (!vnode) {
             break;
         }
