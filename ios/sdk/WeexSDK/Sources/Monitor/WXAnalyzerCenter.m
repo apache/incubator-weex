@@ -23,7 +23,6 @@
 #import "WXAppMonitorProtocol.h"
 #import "WXSDKManager.h"
 #import "WXLog.h"
-#import "WXTracingManager.h"
 #import "WXAnalyzerCenter.h"
 #import "WXAnalyzerCenter+Transfer.h"
 #import "WXUtility.h"

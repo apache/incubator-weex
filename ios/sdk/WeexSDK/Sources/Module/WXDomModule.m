@@ -28,7 +28,6 @@
 #import "WXUtility.h"
 #import "WXRuleManager.h"
 #import "WXSDKInstance.h"
-#import "WXTracingManager.h"
 #import "WXRecycleListComponent.h"
 #import "WXCoreBridge.h"
 #import <objc/message.h>
@@ -109,7 +108,6 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 {
     NSString* instanceId = self.weexInstance.instanceId;
     WXPerformBlockOnComponentThread(^{
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
         [WXCoreBridge callCreateBody:instanceId data:bodyData];
     });
 }
@@ -118,7 +116,6 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 {
     NSString* instanceId = self.weexInstance.instanceId;
     WXPerformBlockOnComponentThread(^{
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
         [WXCoreBridge callAddElement:instanceId parentRef:parentRef data:elementData index:(int)index];
     });
 }
@@ -127,7 +124,6 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 {
     NSString* instanceId = self.weexInstance.instanceId;
     WXPerformBlockOnComponentThread(^{
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
         [WXCoreBridge callRemoveElement:instanceId ref:ref];
     });
 }
@@ -136,7 +132,6 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 {
     NSString* instanceId = self.weexInstance.instanceId;
     WXPerformBlockOnComponentThread(^{
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"moveElement" options:@{@"threadName":WXTDOMThread}];
         [WXCoreBridge callMoveElement:instanceId ref:ref parentRef:parentRef index:(int)index];
     });
 }
@@ -145,7 +140,6 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 {
     NSString* instanceId = self.weexInstance.instanceId;
     WXPerformBlockOnComponentThread(^{
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addEvent" options:@{@"threadName":WXTDOMThread}];
         [WXCoreBridge callAddEvent:instanceId ref:ref event:event];
     });
 }
@@ -154,7 +148,6 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 {
     NSString* instanceId = self.weexInstance.instanceId;
     WXPerformBlockOnComponentThread(^{
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeEvent" options:@{@"threadName":WXTDOMThread}];
         [WXCoreBridge callRemoveEvent:instanceId ref:ref event:event];
     });
 }
@@ -163,7 +156,6 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 {
     NSString* instanceId = self.weexInstance.instanceId;
     WXPerformBlockOnComponentThread(^{
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
         [WXCoreBridge callCreateFinish:instanceId];
     });
 }
@@ -172,7 +164,6 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 {
     NSString* instanceId = self.weexInstance.instanceId;
     WXPerformBlockOnComponentThread(^{
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateFinish" options:@{@"threadName":WXTDOMThread}];
         [WXCoreBridge callUpdateFinish:instanceId];
     });
 }
@@ -181,7 +172,6 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 {
     NSString* instanceId = self.weexInstance.instanceId;
     WXPerformBlockOnComponentThread(^{
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"refreshFinish" options:@{@"threadName":WXTDOMThread}];
         [WXCoreBridge callRefreshFinish:instanceId];
     });
 }
@@ -197,7 +187,6 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 {
     NSString* instanceId = self.weexInstance.instanceId;
     WXPerformBlockOnComponentThread(^{
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateStyle" options:@{@"threadName":WXTDOMThread}];
         [WXCoreBridge callUpdateStyle:instanceId ref:ref data:styles];
     });
 }
@@ -206,7 +195,6 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 {
     NSString* instanceId = self.weexInstance.instanceId;
     WXPerformBlockOnComponentThread(^{
-        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
         [WXCoreBridge callUpdateAttrs:instanceId ref:ref data:attrs];
     });
 }

@@ -35,7 +35,6 @@
 #import <pthread/pthread.h>
 #import "WXComponent+PseudoClassManagement.h"
 #import "WXComponent+BoxShadow.h"
-#import "WXTracingManager.h"
 #import "WXComponent+Events.h"
 #import "WXComponent+Layout.h"
 #import "WXConfigCenterProtocol.h"

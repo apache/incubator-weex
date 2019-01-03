@@ -30,7 +30,6 @@
 #import "JSValue+Weex.h"
 #import "WXSDKManager.h"
 #import "WXExtendCallNativeManager.h"
-#import "WXTracingManager.h"
 #import "WXExceptionUtils.h"
 #import "WXBridgeContext.h"
 #import "WXMonitor.h"
@@ -338,7 +337,6 @@
         
         NSInvocation *invocation = callNativeModuleBlock(instanceIdString, moduleNameString, methodNameString, argsArray, optionsDic);
         JSValue *returnValue = [JSValue wx_valueWithReturnValueFromInvocation:invocation inContext:[JSContext currentContext]];
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:nil className:nil name:moduleNameString phase:WXTracingInstant functionName:methodNameString options:nil];
         return returnValue;
     };
 }

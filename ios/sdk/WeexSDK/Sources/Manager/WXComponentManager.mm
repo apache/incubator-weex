@@ -35,7 +35,6 @@
 #import "WXHandlerFactory.h"
 #import "WXValidateProtocol.h"
 #import "WXPrerenderManager.h"
-#import "WXTracingManager.h"
 #import "WXSDKInstance_performance.h"
 #import "WXRootView.h"
 #import "WXComponent+Layout.h"
@@ -244,10 +243,8 @@ static NSThread *WXComponentThread;
             return;
         }
         
-        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:type phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTUIThread}];
         strongSelf.weexInstance.rootView.wx_component = strongSelf->_rootComponent;
         [strongSelf.weexInstance.rootView addSubview:strongSelf->_rootComponent.view];
-        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:type phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTUIThread}];
     }];
 }
 
@@ -327,9 +324,7 @@ static NSThread *WXComponentThread;
                 return;
             }
             
-            [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:type phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
             [supercomponent insertSubview:component atIndex:index];
-            [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:type phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTUIThread}];
         }];
     }
     if([WXAnalyzerCenter isInteractionLogOpen]){
@@ -356,9 +351,7 @@ static NSThread *WXComponentThread;
             return;
         }
         
-        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"moveElement" options:@{@"threadName":WXTUIThread}];
         [component moveToSuperview:newSupercomponent atIndex:index];
-        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"moveElement" options:@{@"threadName":WXTUIThread}];
     }];
 }
 
@@ -395,12 +388,10 @@ static NSThread *WXComponentThread;
             return;
         }
         
-        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTUIThread}];
         if (component.supercomponent) {
             [component.supercomponent willRemoveSubview:component];
         }
         [component removeFromSuperview];
-        [WXTracingManager startTracingWithInstanceId:weakSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTUIThread}];
     }];
     
     [self _checkFixedSubcomponentToRemove:component];
@@ -690,10 +681,8 @@ static NSThread *WXComponentThread;
             return;
         }
         
-        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTUIThread}];
         [component _updateAttributesOnMainThread:attributes];
         [component readyToRender];
-        [WXTracingManager startTracingWithInstanceId:strongSelf.weexInstance.instanceId ref:ref className:nil name:nil phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTUIThread}];
     }];
 }
 
@@ -878,7 +867,6 @@ static NSThread *WXComponentThread;
         UIView *rootView = instance.rootView;
         [instance.performance onInstanceRenderSuccess:instance];
         if (instance.renderFinish) {
-            [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:@{@"threadName":WXTUIThread}];
             instance.renderFinish(rootView);
         }
     }];
