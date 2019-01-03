@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.performance;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -131,6 +132,11 @@ public class WXInstanceApm {
     public boolean hasReportLayerOverDraw = false;
     public boolean hasAddView;
     private Handler mUIHandler;
+
+    /**
+     * send performance value to js
+     **/
+    private boolean hasSendInteractionToJS = false;
 
     public WXInstanceApm(String instanceId) {
         mInstanceId = instanceId;
@@ -357,6 +363,7 @@ public class WXInstanceApm {
         }
 
         performanceRecord.interactionTime = curTime - performanceRecord.renderUnixTimeOrigin;
+        performanceRecord.interactionRealUnixTime = System.currentTimeMillis();
         onStageWithTime(KEY_PAGE_STAGES_INTERACTION,curTime);
 
         updateDiffStats(KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT, 1);
@@ -473,5 +480,29 @@ public class WXInstanceApm {
         } else {
             updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_IMG_LOAD_FAIL_NUM, 1);
         }
+    }
+
+    public void sendPerformanceToJS() {
+        if (hasSendInteractionToJS) {
+            return;
+        }
+        hasSendInteractionToJS = true;
+        WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(mInstanceId);
+        if (null == instance) {
+            return;
+        }
+
+        Map<String,String> sendProperties = new HashMap<>(2);
+        sendProperties.put(KEY_PAGE_PROPERTIES_BIZ_ID,reportPageName);
+        sendProperties.put(KEY_PAGE_PROPERTIES_BUBDLE_URL,instance.getBundleUrl());
+
+        Map<String,Long> sendStage = new HashMap<>(1);
+        sendStage.put(KEY_PAGE_STAGES_INTERACTION,instance.getWXPerformance().interactionRealUnixTime);
+
+        Map<String, Object> data = new HashMap<>(2);
+        data.put("stage",sendStage);
+        data.put("properties",sendProperties);
+
+        instance.fireGlobalEventCallback("wx_apm", data);
     }
 }
