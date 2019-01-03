@@ -700,9 +700,8 @@ _Pragma("clang diagnostic pop") \
         WXPerformBlockOnComponentThread(^{
             [WXCoreBridge destroyDataRenderInstance:instance];
         });
-    } else {
-        [self callJSMethod:@"destroyInstance" args:@[instance]];
     }
+    [self callJSMethod:@"destroyInstance" args:@[instance]];
 }
 
 - (void)forceGarbageCollection
