@@ -18,6 +18,8 @@
  */
 #include <algorithm>
 #include <sstream>
+
+#include "base/log_defines.h"
 #include "core/data_render/class.h"
 #include "core/data_render/table.h"
 #include "core/data_render/class_console.h"
@@ -25,7 +27,6 @@
 #include "core/data_render/common_error.h"
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "third_party/json11/json11.hpp"
-#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {

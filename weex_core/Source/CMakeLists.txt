@@ -1,23 +1,6 @@
-#
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-#
 cmake_minimum_required(VERSION 3.4.1)
 set(WEEXCORE_LIBRARY_NAME weexcore)
+set(WEEX_CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 message("${ANDROID_STL} ")
 if ("${ANDROID_STL}" STREQUAL "c++_static")
@@ -31,7 +14,6 @@ add_compile_options(-fexceptions)
 add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
 add_definitions(-DDEBUG=1)
-add_definitions(-DOS_ANDROID=1)
 
 add_definitions(-DRENDER_LOG=0)
 add_definitions(-DPERFORMANCE_LOG=0)
@@ -39,14 +21,19 @@ add_definitions(-DLAYOUT_LOG=0)
 add_definitions(-DJSAPI_LOG=0)
 add_definitions(-DDOM_PARSER_LOG=0)
 
+set(LOCAL_LIBRARIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs/${ANDROID_ABI})
+
+if ("${ANDROID_ABI}" STREQUAL "x86")
+    # todo
+else ()
+    if ("${ENABLE_ASAN}" STREQUAL "true")
+       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer -g3 -fPIC")
+    endif ()
+endif ()
+
+add_compile_options(-fexceptions)
+
 set(COMMON_SRCS
-  ./base/time_point.cc
-  ./base/thread/thread_impl_posix.cc
-  ./base/thread/thread_impl_android.cc
-  ./base/message_loop/message_loop.cc
-  ./base/message_loop/message_pump_posix.cc
-  ./base/message_loop/message_pump_android.cc
-  ./base/third_party/icu/icu_utf.cpp
   ./core/render/manager/render_manager.cpp
   ./core/render/page/render_page.cpp
 
@@ -91,12 +78,7 @@ set(COMMON_SRCS
    ./core/data_render/class_array.cc
    ./core/data_render/class_json.cc
    ./core/data_render/class_string.cc
-   ./core/data_render/class_regex.cc
-   ./core/data_render/class_console.cc
-   ./core/data_render/class_window.cc
-   ./core/data_render/class_math.cc
    ./core/data_render/class_factory.cc
-   ./core/data_render/class_function.cc
    ./core/data_render/class_object.cc
    ./core/data_render/code_generator.cc
    ./core/data_render/exec_state.cc
@@ -115,43 +97,48 @@ set(COMMON_SRCS
    ./core/data_render/table.cc
    ./core/data_render/token.cc
    ./core/data_render/tokenizer.cc
-   ./core/data_render/op_code.cc
    ./core/data_render/vm.cc
+   ./core/data_render/binary_file.cc
+   ./core/data_render/class_console.cc
+   ./core/data_render/class_function.cc
+   ./core/data_render/class_math.cc
+   ./core/data_render/class_regex.cc
+   ./core/data_render/class_window.cc
    ./core/data_render/exec_state_binary.cc
    ./core/data_render/exec_state_section.cc
+   ./core/data_render/op_code.cc
    ./core/data_render/vnode/vnode.cc
    ./core/data_render/vnode/vcomponent.cc
    ./core/data_render/vnode/vnode_exec_env.cc
    ./core/data_render/vnode/vnode_render_manager.cc
    ./core/data_render/vnode/vnode_render_context.cc
-
    ./core/network/http_module.cc
         )
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/base)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/json11)
+#link_directories(${LOCAL_LIBRARIES_DIR})
 
 SET(FINAL_ADD_LIBRARY
         ${COMMON_SRCS}
 )
 SET(FINAL_TARGET_LINK_LIBRARIES wson json11)
 
-if (ANDROID)
+if(ANDROID)
+  add_definitions(-DOS_ANDROID=1)
   ## add_subdirectory for subdirectory has a CMakeLists.txt
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/IPC)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/IPC)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/android/jsengine)
   ## include_directories for include head file
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/IPC)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/IPC)
 
   set (ANDROID_SRCS
-    ./android/jniprebuild/jni_load.cc
-    ./android/base/jni/android_jni.cpp
-    ./android/base/jni/jbytearray_ref.cpp
-    ./android/base/jni/scoped_java_ref.cpp
-    ./android/base/base64/base64.cpp
-    ./android/base/base64/modp_base64/modp_b64.cc
-    ./android/base/string/scoped_jstring.cpp
+    ./android/weex_extend_js_api.h
+    ./android/weex_extend_js_api.cpp
     ./android/base/string/scoped_jstring_utf8.cpp
     ./android/base/string/jstring_cache.cpp
+    ./android/base/string/scoped_jstring.cpp
     ./android/wrap/content_box_measurement_impl_android.cpp
     ./android/wrap/wx_debug_js_bridge.cpp
     ./android/wrap/native_render_object_utils_impl_android.cpp
@@ -168,23 +155,20 @@ if (ANDROID)
     ./android/utils/cache_utils.cpp
     ./android/utils/params_utils.cpp
     ./android/utils/so_utils.cpp
-    ./android/utils/IPCStringResult.cpp
+    ./android/utils/ipc_string_result.cpp
     ./android/wrap/log_utils.cpp
     ./android/wrap/hash_set.cpp
     ./android/wrap/wx_map.cpp
     ./android/wrap/wx_js_object.cpp
     ./android/wrap/wx_bridge.cpp
     ./android/wrap/wx_params.cpp
-    ./android/base/jni_type.cpp
+    ./android/multiprocess/weex_js_connection.cpp
+    ./android/utils/jni_load.cc
 
     ./core/data_render/vnode/android/vcomponent_lifecycle_listener.cc
     ./core/data_render/vnode/android/vnode_on_event_listener.cc
     ./core/data_render/vnode/android/conversion.cc
     ./core/network/android/default_request_handler.cc
-    
-    ./android/jsengine/multiprocess/WeexJSConnection.cpp
-    ./android/jsengine/multiprocess/ExtendJSApi.cpp
-
   )
   SET(FINAL_ADD_LIBRARY
           ${FINAL_ADD_LIBRARY}
@@ -193,19 +177,20 @@ if (ANDROID)
 
   SET(FINAL_TARGET_LINK_LIBRARIES
           ${FINAL_TARGET_LINK_LIBRARIES}
+          weexbase
           wson
           android
           weexipc
+          #weexjss
           log
+          c
           z
           )
+endif(ANDROID)
 
-endif (ANDROID)
-
-##if(iOS)
-  add_definitions(-DTARGET_OS_IPHONE=1)
-
-##endif(iOS)
+#if(iOS)
+#add_definitions(-DTARGET_OS_IPHONE=1)
+#endif(iOS)
 
 
 add_library(${WEEXCORE_LIBRARY_NAME} SHARED ${FINAL_ADD_LIBRARY})

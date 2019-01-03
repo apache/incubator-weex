@@ -21,7 +21,7 @@
 #define WEEX_PROJECT_WX_PARAMS_H
 
 #include <string>
-#include "android/wrap/jni_object_wrap.h"
+#include "base/android/jni/jni_object_wrap.h"
 
 namespace WeexCore {
 class WXParams : public JNIObjectWrap {

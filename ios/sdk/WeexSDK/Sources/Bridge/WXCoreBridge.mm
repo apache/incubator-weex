@@ -31,7 +31,8 @@
 #import "WXSDKEngine.h"
 #import "WXAppMonitorProtocol.h"
 
-#include "base/CoreConstants.h"
+#include "base/core_constants.h"
+#include "base/time_utils.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/page/render_page.h"
@@ -43,7 +44,6 @@
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/bridge/platform/core_side_in_platform.h"
 #include "core/bridge/script/core_side_in_script.h"
-#include "base/TimeUtils.h"
 #include "core/network/http_module.h"
 
 #import <objc/runtime.h>

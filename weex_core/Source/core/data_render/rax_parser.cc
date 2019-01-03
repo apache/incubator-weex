@@ -19,16 +19,16 @@
 //
 // Created by pengtao.pt on 2018/7/25.
 //
+#include <sstream>
+#include <string>
+#include <cstdlib>
 
+#include "base/log_defines.h"
 #include "core/data_render/rax_parser.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/rax_parser_context.h"
 #include "core/data_render/rax_parser_statistics.h"
 #include "core/data_render/ast_builder.h"
-#include <sstream>
-#include <string>
-#include <cstdlib>
-#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {

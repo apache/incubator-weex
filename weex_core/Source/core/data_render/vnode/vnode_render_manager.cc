@@ -37,9 +37,7 @@
 #define VRENDER_LOG true
 
 #if VRENDER_LOG
-
-#include "base/LogDefines.h"
-
+#include "base/log_defines.h"
 #endif
 
 namespace weex {

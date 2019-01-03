@@ -19,14 +19,15 @@
 
 #include <android/utils/params_utils.h>
 #include "script_side_in_multi_process.h"
-#include "IPC/Buffering/IPCBuffer.h"
-#include "IPC/IPCException.h"
-#include "IPC/IPCMessageJS.h"
-#include "IPC/IPCSender.h"
-#include "IPC/Serializing/IPCSerializer.h"
-#include "android/base/log_utils.h"
+
 #include "android/bridge/multi_process_and_so_initializer.h"
+#include "base/android/log_utils.h"
 #include "core/manager/weex_core_manager.h"
+#include "third_party/IPC/Buffering/IPCBuffer.h"
+#include "third_party/IPC/IPCException.h"
+#include "third_party/IPC/IPCMessageJS.h"
+#include "third_party/IPC/IPCSender.h"
+#include "third_party/IPC/Serializing/IPCSerializer.h"
 
 namespace WeexCore {
 namespace bridge {
@@ -42,8 +43,6 @@ int ScriptSideInMultiProcess::InitFramework(
       LOGE("InitFramework sender is null");
       return false;
     }
-
-
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
     serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::INITFRAMEWORK));
     serializer->add(script, strlen(script));
@@ -453,6 +452,7 @@ int ScriptSideInMultiProcess::CreateInstance(
       serializer->add((*it)->type->content, (*it)->type->length);
       serializer->add((*it)->value->content, (*it)->value->length);
     }
+
     std::unique_ptr<IPCBuffer> buffer = serializer->finish();
     std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
     if (result->getType() != IPCType::INT32) {

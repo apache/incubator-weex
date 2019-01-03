@@ -18,8 +18,9 @@
  */
 
 #include "android/wrap/log_utils.h"
-#include "android/base/jni/android_jni.h"
+
 #include "android/base/string/string_utils.h"
+#include "base/android/jni/android_jni.h"
 
 namespace WeexCore {
 

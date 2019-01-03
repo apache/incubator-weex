@@ -21,8 +21,8 @@
 #define WEEX_PROJECT_WX_JS_OBJECT_H
 
 #include <jni.h>
-#include "android/base/jni/scoped_java_ref.h"
-#include "android/wrap/jni_object_wrap.h"
+#include "base/android/jni/scoped_java_ref.h"
+#include "base/android/jni/jni_object_wrap.h"
 #include "base/common.h"
 
 namespace WeexCore {

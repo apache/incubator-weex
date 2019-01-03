@@ -18,14 +18,16 @@
  */
 
 #include "multi_process_and_so_initializer.h"
-#include <Buffering/IPCBuffer.h>
-#include <IPCException.h>
-#include <IPCHandler.h>
-#include <IPCResult.h>
-#include <Serializing/IPCSerializer.h>
-#include <android/base/log_utils.h>
-#include <android/jsengine/multiprocess/ExtendJSApi.h>
-#include <android/jsengine/multiprocess/WeexJSConnection.h>
+
+#include "android/weex_extend_js_api.h"
+#include "android/multiprocess/weex_js_connection.h"
+#include "base/android/log_utils.h"
+#include "third_party/IPC/Buffering/IPCBuffer.h"
+#include "third_party/IPC/IPCException.h"
+#include "third_party/IPC/IPCHandler.h"
+#include "third_party/IPC/IPCResult.h"
+#include "third_party/IPC/Serializing/IPCSerializer.h"
+
 
 namespace WeexCore {
 

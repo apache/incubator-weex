@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <android/base/jni/android_jni.h>
-#include <android/jniprebuild/jniheader/ContentBoxMeasurement_jni.h>
 #include "content_box_measurement_impl_android.h"
+
+#include "base/android/jniprebuild/jniheader/ContentBoxMeasurement_jni.h"
+#include "base/android/jni/android_jni.h"
 
 namespace WeexCore {
   bool RegisterJNIContentBoxMeasurement(JNIEnv *env) {

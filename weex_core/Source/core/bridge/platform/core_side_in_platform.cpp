@@ -19,7 +19,7 @@
 
 #include "core/bridge/platform/core_side_in_platform.h"
 #include "base/string_util.h"
-#include "base/LogDefines.h"
+#include "base/log_defines.h"
 #include "core/config/core_environment.h"
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/manager/weex_core_manager.h"

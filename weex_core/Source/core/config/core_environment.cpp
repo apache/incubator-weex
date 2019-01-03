@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
+#include "core_environment.h"
 #include <math.h>
 #include <stdlib.h>
-#include "core_environment.h"
-#include "base/CoreConstants.h"
-#include "base/ViewUtils.h"
-#include "base/LogDefines.h"
+
+#include "base/core_constants.h"
+#include "base/log_defines.h"
+#include "core/common/view_utils.h"
 
 namespace WeexCore {
 
@@ -82,9 +82,8 @@ namespace WeexCore {
 
   void WXCoreEnvironment::AddOption(std::string key, std::string value) {
     mOptions.insert(std::pair<std::string, std::string>(key, value));
-    if (key == "switchInteractionLog"){
+    if (key == "switchInteractionLog") {
       mInteractionLogSwitch = "true" == value;
     }
-
   }
 }
