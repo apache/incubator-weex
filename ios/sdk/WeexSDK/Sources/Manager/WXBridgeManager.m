@@ -28,7 +28,6 @@
 #import "WXResourceRequest.h"
 #import "WXResourceLoader.h"
 #import "WXDebugTool.h"
-#import "WXTracingManager.h"
 #import "WXMonitor.h"
 #import "WXSDKInstance_performance.h"
 #import "WXThreadSafeMutableArray.h"
@@ -178,13 +177,10 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     }
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
-        [WXTracingManager startTracingWithInstanceId:instance ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"createInstance" options:@{@"threadName":WXTJSBridgeThread}];
         [weakSelf.bridgeCtx createInstance:instance
                                   template:temp
                                    options:options
                                       data:data];
-        [WXTracingManager startTracingWithInstanceId:instance ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"createInstance" options:@{@"threadName":WXTJSBridgeThread}];
-        
     });
 }
 
@@ -208,15 +204,12 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     }
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
-        [WXTracingManager startTracingWithInstanceId:instance ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"createInstance" options:@{@"threadName":WXTJSBridgeThread}];
         [weakSelf.bridgeCtx createInstance:instance
                                   contents:contents
                                    options:options
                                       data:data];
-        [WXTracingManager startTracingWithInstanceId:instance ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"createInstance" options:@{@"threadName":WXTJSBridgeThread}];
     });
 }
-
 
 - (WXThreadSafeMutableArray *)instanceIdStack
 {
