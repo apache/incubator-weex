@@ -22,11 +22,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRenderStrategy;
@@ -127,12 +130,14 @@ public class WXInstanceApm {
     public String reportPageName;
     public boolean hasReportLayerOverDraw = false;
     public boolean hasAddView;
+    private Handler mUIHandler;
 
     public WXInstanceApm(String instanceId) {
         mInstanceId = instanceId;
         extInfo = new ConcurrentHashMap<>();
         stageMap = new ConcurrentHashMap<>();
         IApmGenerator generator = WXSDKManager.getInstance().getApmGenerater();
+        mUIHandler = new Handler(Looper.getMainLooper());
         if (null != generator) {
             apmInstance = generator.generateApmInstance(WEEX_PAGE_TOPIC);
             recordStatsMap = new ConcurrentHashMap<>();
@@ -171,6 +176,10 @@ public class WXInstanceApm {
             WXAnalyzerDataTransfer.transferPerformance(mInstanceId,"stage",name,time);
         }
 
+        if (KEY_PAGE_STAGES_RENDER_ORGIGIN.equalsIgnoreCase(name)){
+          mUIHandler.postDelayed(jsPerformanceCallBack,8000);
+        }
+
         if (null == apmInstance) {
             return;
         }
@@ -178,6 +187,12 @@ public class WXInstanceApm {
         apmInstance.onStage(name, time);
     }
 
+    private Runnable jsPerformanceCallBack = new Runnable() {
+        @Override
+        public void run() {
+            sendPerformanceToJS();
+        }
+    };
 
     /**
      * record property
@@ -281,6 +296,7 @@ public class WXInstanceApm {
         if (null == apmInstance || mEnd) {
             return;
         }
+        mUIHandler.removeCallbacks(jsPerformanceCallBack);
         onStage(KEY_PAGE_STAGES_DESTROY);
         apmInstance.onEnd();
         mEnd = true;
