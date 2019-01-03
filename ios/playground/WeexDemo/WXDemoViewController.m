@@ -27,7 +27,6 @@
 #import "DemoDefine.h"
 #import "WXPrerenderManager.h"
 #import "WXMonitor.h"
-#import "WXTracingManager.h"
 
 @interface WXDemoViewController () <UIScrollViewDelegate, UIWebViewDelegate>
 @property (nonatomic, strong) WXSDKInstance *instance;

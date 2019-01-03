@@ -78,7 +78,6 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Monitor/WXMonitor.h',
                           'ios/sdk/WeexSDK/Sources/Monitor/WXExceptionUtils.h',
                           'ios/sdk/WeexSDK/Sources/Monitor/WXAnalyzerCenter.h',
-                          'ios/sdk/WeexSDK/Sources/Manager/WXTracingManager.h',
                           'ios/sdk/WeexSDK/Sources/Manager/WXSDKManager.h',
                           'ios/sdk/WeexSDK/Sources/Manager/WXBridgeManager.h',
                           'ios/sdk/WeexSDK/Sources/Manager/WXComponentManager.h',
