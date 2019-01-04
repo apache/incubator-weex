@@ -49,6 +49,17 @@ WX_EXPORT_METHOD(@selector(onclose:))
 
 - (void)WebSocket:(NSString *)url protocol:(NSString *)protocol
 {
+    // check url
+    NSURL* theURL = [NSURL URLWithString:url];
+    if (theURL == nil) {
+        return;
+    }
+    NSString *scheme = theURL.scheme.lowercaseString;
+    if (!([scheme isEqualToString:@"ws"] || [scheme isEqualToString:@"http"] ||
+          [scheme isEqualToString:@"wss"] || [scheme isEqualToString:@"https"])) {
+        return;
+    }
+    
     if(loader)
     {
         [loader clear];
