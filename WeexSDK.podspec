@@ -87,7 +87,6 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Manager/WXSDKManager.h',
                           'ios/sdk/WeexSDK/Sources/Manager/WXBridgeManager.h',
                           'ios/sdk/WeexSDK/Sources/Manager/WXComponentManager.h',
-                          'ios/sdk/WeexSDK/Sources/Manager/WXDisplayLinkManager.h',
                           'ios/sdk/WeexSDK/Sources/Engine/WXSDKEngine.h',
                           'ios/sdk/WeexSDK/Sources/Engine/WXSDKError.h',
                           'ios/sdk/WeexSDK/Sources/Utility/WXConvert.h',
