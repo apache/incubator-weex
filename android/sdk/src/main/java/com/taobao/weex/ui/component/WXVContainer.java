@@ -26,6 +26,8 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
@@ -329,7 +331,12 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       getInstance().removeFixedView(child.getHostView());
     } else if (getRealView() != null) {
       if (!child.isVirtualComponent()) {
-        getRealView().removeView(child.getHostView());
+        ViewParent parent = child.getHostView().getParent();
+        if(parent != null && parent instanceof  ViewGroup){
+          ((ViewGroup) parent).removeView(child.getHostView());
+        }else{
+          getRealView().removeView(child.getHostView());
+        }
       } else {
         child.removeVirtualComponent();
       }
