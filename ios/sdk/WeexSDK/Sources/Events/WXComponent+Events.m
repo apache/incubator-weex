@@ -819,6 +819,10 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
             }
             BOOL stopPropagation = [[WXEventManager sharedManager]stopPropagation:self.weexInstance.instanceId ref:ref type:_stopPropagationName params:@{@"changedTouches":resultTouch ? @[resultTouch] : @[],@"action":touchState}];
             touch.wx_stopPropagation = stopPropagation ? @1 : @0;
+            
+            //only custom event on custom component will make not receive touch
+            //you can use custom-event="yes" to enable this feature
+            return _customEvent ? !stopPropagation : YES;
         }
     }
     return YES;
