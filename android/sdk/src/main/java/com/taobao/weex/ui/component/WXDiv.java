@@ -69,8 +69,11 @@ public class WXDiv extends WidgetContainer<WXFrameLayout> implements FlatCompone
 
   @Override
   public boolean promoteToView(boolean checkAncestor) {
-    return !intendToBeFlatContainer() ||
+    if (null != getInstance().getFlatUIContext()) {
+      return !intendToBeFlatContainer() ||
             getInstance().getFlatUIContext().promoteToView(this, checkAncestor, WXDiv.class);
+    }
+    return false;
   }
 
   /**
