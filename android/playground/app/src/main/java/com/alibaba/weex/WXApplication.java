@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
+import com.alibaba.android.bindingx.plugin.weex.BindingX;
 import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.commons.adapter.JSExceptionAdapter;
@@ -30,7 +31,6 @@ import com.alibaba.weex.extend.adapter.ApmGenerator;
 import com.alibaba.weex.extend.adapter.DefaultAccessibilityRoleAdapter;
 import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
 import com.alibaba.weex.extend.adapter.WXAnalyzerDemoListener;
-import com.alibaba.weex.extend.component.RichText;
 import com.alibaba.weex.extend.component.WXComponentSyncTest;
 import com.alibaba.weex.extend.component.WXMask;
 import com.alibaba.weex.extend.component.WXParallax;
@@ -104,6 +104,7 @@ public class WXApplication extends Application {
 
       WXSDKEngine.registerModule("wsonTest", WXWsonTestModule.class);
 
+      BindingX.register();
 
       /**
        * override default image tag
