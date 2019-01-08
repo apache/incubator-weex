@@ -1501,16 +1501,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (TextUtils.isEmpty(type)) {
       return;
     }
-    if (getEvents() == null || mAppendEvents == null || mGestureType == null) {
-      return;
-    }
 
     if (type.equals(Constants.Event.LAYEROVERFLOW))
       removeLayerOverFlowListener(getRef());
 
-    getEvents().remove(type);
-    mAppendEvents.remove(type);//only clean append events, not dom's events.
-    mGestureType.remove(type);
+    if(getEvents() != null){
+      getEvents().remove(type);
+    }
+    if(mAppendEvents != null) {
+      mAppendEvents.remove(type);//only clean append events, not dom's events.
+    }
+    if(mGestureType != null){
+      mGestureType.remove(type);
+    }
     removeEventFromView(type);
   }
 
