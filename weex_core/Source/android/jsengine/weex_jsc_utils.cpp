@@ -109,7 +109,7 @@ std::unique_ptr<char[]> getCharOrJSONStringFromState(ExecState *state, int argum
         return nullptr;
     }
     JSValue val = state->argument(argument);
-    if (val.isString()) {
+    if (val.isString() || val.isNumber()) {
         String str(val.toWTFString(state));
         CString data = str.utf8();
         return newCharString(data.data(), data.length());

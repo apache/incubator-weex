@@ -262,6 +262,12 @@ namespace wson {
     JSValue wson_to_js_value(ExecState* exec, wson_buffer* buffer,  IdentifierCache* localIdentifiers, const int& localCount){
         uint8_t  type = wson_next_type(buffer);
         switch (type) {
+            case WSON_UINT8_STRING_TYPE: {
+                int size = wson_next_uint(buffer);
+                uint8_t *utf8 = wson_next_bts(buffer, size);
+                String s = String::fromUTF8(reinterpret_cast<char *>(utf8), size);
+                return jsString(exec, s);
+            }
             case WSON_STRING_TYPE:
             case WSON_NUMBER_BIG_INT_TYPE:
             case WSON_NUMBER_BIG_DECIMAL_TYPE:{
