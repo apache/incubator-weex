@@ -269,11 +269,13 @@ static std::unique_ptr<IPCResult> HandleCallGCanvasLinkNative(
 
   std::unique_ptr<IPCResult> ret = createVoidResult();
   if (retVal) {
-    jstring jDataStr = env->NewStringUTF(retVal);
-    ret = std::unique_ptr<IPCResult>(
-            new IPCStringResult(jstring2WeexString(env, jDataStr)));
-    env->DeleteLocalRef(jDataStr);
-    delete retVal;
+      jstring jDataStr = env->NewStringUTF(retVal);
+      ret = std::unique_ptr<IPCResult>(
+              new IPCStringResult(jstring2WeexString(env, jDataStr)));
+      env->DeleteLocalRef(jDataStr);
+      if (strlen(retVal) > 0) {
+        delete retVal;
+      }
     retVal = NULL;
   }
 //      env->DeleteLocalRef(jPageId);

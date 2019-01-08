@@ -373,7 +373,9 @@ JSFUNCTION functionGCanvasLinkNative(ExecState *state) {
                                                                                 type, arg_str.utf8().data());
     auto result = resultChar;
     auto ret = JSValue::encode(String2JSValue(state, result));
-    delete resultChar;
+    if (strlen(resultChar) > 0) {
+        delete resultChar;
+    }
     return ret;
 }
 
