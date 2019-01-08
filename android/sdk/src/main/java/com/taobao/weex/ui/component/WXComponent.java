@@ -175,7 +175,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public boolean mIsAddElementToTree = false;
   //for fix element case
   public int interactionAbsoluteX=0,interactionAbsoluteY=0;
-  public boolean mHasAddFocusListener = false;
+  private boolean mHasAddFocusListener = false;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
