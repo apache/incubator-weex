@@ -1193,7 +1193,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 + ", data:" + data);
           }
           if (mWXBridge instanceof WXBridge) {
-            ((WXBridge) mWXBridge).fireEventOnDataRenderNode(instanceId, ref,type,JSON.toJSONString(data), JSON.toJSONString(domChanges));
+            ((WXBridge) mWXBridge).fireEventOnDataRenderNode(instanceId, ref, type,
+                (data == null || data.isEmpty()) ? "{}" : JSON.toJSONString(data),
+                (domChanges == null || domChanges.isEmpty()) ? "{}" : JSON.toJSONString(domChanges));
           }
           WXLogUtils.renderPerformanceLog("fireEventOnDataRenderNode", System.currentTimeMillis() - start);
         } catch (Throwable e) {
