@@ -20,11 +20,14 @@ package com.alibaba.weex.extend.module;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -57,8 +60,8 @@ public class WXEventModule extends WXModule {
     if ("weex://go/scan".equals(url)) {
       if (ContextCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
         if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) mWXSDKInstance.getContext(), Manifest.permission.CAMERA)) {
-          Toast.makeText(mWXSDKInstance.getContext(), "Weex playground need the camera permission to scan QR code", Toast.LENGTH_SHORT).show();
-        } else {
+          showCameraPermissionRationale();
+        } else{
           ActivityCompat.requestPermissions((Activity) mWXSDKInstance.getContext(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
         }
       } else {
@@ -89,6 +92,21 @@ public class WXEventModule extends WXModule {
       mWXSDKInstance.fireModuleEvent("event", this, params);
     }
   }
+
+  private void showCameraPermissionRationale() {
+    if (mWXSDKInstance.getContext() instanceof AppCompatActivity) {
+      AlertDialog.Builder builder = new AlertDialog.Builder(((AppCompatActivity) mWXSDKInstance.getContext()));
+      builder.setMessage("Weex playground need the camera permission to scan QR code");
+      builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          ActivityCompat.requestPermissions((Activity) mWXSDKInstance.getContext(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        }
+      });
+      builder.create().show();
+    }
+  }
+
   /*
    * a test method for macaca case, you can fire globalEvent when download finish、device shaked and so on.
    * @param event event name
@@ -108,9 +126,13 @@ public class WXEventModule extends WXModule {
 
   @Override
   public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    if (requestCode == CAMERA_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-      mWXSDKInstance.getContext().startActivity(new Intent(mWXSDKInstance.getContext(), CaptureActivity.class));
-    }
+      super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+      if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+          if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+              mWXSDKInstance.getContext().startActivity(new Intent(mWXSDKInstance.getContext(), CaptureActivity.class));
+          } else {
+              Toast.makeText(mWXSDKInstance.getContext(), "request camara permission fail!", Toast.LENGTH_SHORT).show();
+          }
+      }
   }
 }
