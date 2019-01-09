@@ -70,10 +70,6 @@ static std::unique_ptr<IPCResult> HandleReportException(
     exceptionInfo = exceptionInfoBA->content;
   }
 
-  LOGE(" ReportException : %s", exceptionInfo);
-  WeexCoreManager::Instance()->script_bridge()->core_side()->ReportException(
-      pageId, func, exceptionInfo);
-
   WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
       weex::base::MakeCopyable([pageId = std::string(pageId),
                                 funcS = std::string(func),
