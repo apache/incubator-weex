@@ -61,6 +61,9 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
                                                 WeexCore::RenderObject* parent, bool isRoot,
                                                 int index,
                                                 const string& pageId) {
+  if (!vnode) {
+    return nullptr;
+  }
   if (vnode->IsVirtualComponent()) {
     VComponent* component = static_cast<VComponent*>(vnode);
     if (component->root_vnode() == nullptr) {
