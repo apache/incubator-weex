@@ -31,6 +31,8 @@
 #import "WXMonitor.h"
 #import "WXSDKInstance_performance.h"
 #import "WXThreadSafeMutableArray.h"
+#import "WXComponentManager.h"
+#import "WXCoreBridge.h"
 
 @interface WXBridgeManager ()
 
@@ -411,6 +413,14 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
 
 - (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges handlerArguments:(NSArray *)handlerArguments
 {
+    WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+    if (instance.dataRender) {
+        WXPerformBlockOnComponentThread(^{
+            [WXCoreBridge fireEvent:instanceId ref:ref event:type args:params?:@{} domChanges:domChanges?:@{}];
+        });
+        return;
+    }
+
     if (!type || !ref) {
         WXLogError(@"Event type and component ref should not be nil");
         return;
@@ -422,7 +432,6 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
         [newArgs addObject:@{@"params":handlerArguments}];
         args = newArgs;
     }
-    WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
     
     if(instance && !instance.isJSCreateFinish)
     {
