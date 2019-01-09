@@ -194,7 +194,9 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
       WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
         @Override
         public void run() {
-          mComponent.updateExtra(atomicReference.get());
+          if(mComponent!=null) {
+            mComponent.updateExtra(atomicReference.get());
+          }
         }
       }, mComponent.getInstanceId());
     }
