@@ -66,6 +66,7 @@ class VComponent : public VNode {
   inline VNode* root_vnode() { return root_vnode_.get(); }
   void SetRootNode(VNode* node);
   bool IsVirtualComponent() const override { return true; }
+  VComponent* component() override {return this;}
 
   void DispatchCreated();
   void DispatchUpdated();
