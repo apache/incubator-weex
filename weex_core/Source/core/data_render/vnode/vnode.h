@@ -115,11 +115,13 @@ class VNode {
   void set_component(VComponent* c) {
     component_ = c;
     for (auto child : child_list_) {
-      child->set_component(c);
+      if (!IsVirtualComponent()) {
+        child->set_component(c);
+      }
     }
   }
 
-  inline VComponent* component() {
+  virtual VComponent* component() {
     return component_;
   }
 

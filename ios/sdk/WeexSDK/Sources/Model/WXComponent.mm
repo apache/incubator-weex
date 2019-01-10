@@ -148,6 +148,10 @@ static BOOL bNeedRemoveEvents = YES;
             _clipRadius = [WXConvert NSString:attributes[@"clipRadius"]];
         }
         
+        if (attributes[@"customEvent"]) {
+            _customEvent = [WXConvert BOOL:attributes[@"customEvent"]];
+        }
+        
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> init component: ref : %@ , styles: %@",ref,styles);
         WXLogDebug(@"flexLayout -> init component: ref : %@ , attributes: %@",ref,attributes);

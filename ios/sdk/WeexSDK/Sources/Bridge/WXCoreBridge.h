@@ -197,7 +197,7 @@ namespace WeexCore
 
 + (void)callUpdateFinish:(NSString*)pageId;
 
-+ (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args;
++ (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args domChanges:(NSDictionary *)domChanges;
 
 + (void)registerModules:(NSDictionary *)modules;
 

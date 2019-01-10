@@ -338,7 +338,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   private WXSDKInstance createInstance() {
     WXSDKInstance sdkInstance = getInstance().createNestedInstance(this);
-
+    sdkInstance.setParentInstance(getInstance());
     boolean needsAdd = !getAttrs().containsKey("disableInstanceVisibleListener");
     if(needsAdd){ //prevent switch off fire viewappear event twice
         getInstance().addOnInstanceVisibleListener(this);

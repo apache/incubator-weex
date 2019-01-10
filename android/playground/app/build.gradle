@@ -118,6 +118,10 @@ dependencies {
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
     compile 'com.taobao.android:weex_inspector:0.18.10'
     //compile project(":weex_inspector")
+
+    // Bind actions to effects. See https://alibaba.github.io/bindingx/
+    compile 'com.alibaba.android:bindingx-core:1.1.1.2@aar'
+    compile 'com.alibaba.android:bindingx_weex_plugin:1.1.1@aar'
 }
 
 if(file('../../license/LICENSE').exists()){

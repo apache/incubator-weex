@@ -193,7 +193,6 @@ CGFloat WXFloorPixelValue(CGFloat value)
                                     @"deviceWidth":@(deviceWidth * scale),
                                     @"deviceHeight":@(deviceHeight * scale),
                                     @"scale":@(scale),
-                                    @"logLevel":[WXLog logLevelString] ?: @"error",
                                     @"layoutDirection": [self getEnvLayoutDirection] == WXLayoutDirectionRTL ? @"rtl" : @"ltr"
                                 }];
     

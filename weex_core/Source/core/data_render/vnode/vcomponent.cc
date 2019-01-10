@@ -94,6 +94,9 @@ static bool Equals(Value a, Value b) {
 static void BuildRefsInner(
     std::unordered_map<std::string, VComponent::VNodeRefs> &ref_map,
     VNode *node, bool in_for_loop) {
+  if (!node) {
+    return;
+  }
   if (node->attributes()->find("[[repeat]]") != node->attributes()->end()) {
     in_for_loop = true;
   }
