@@ -1010,6 +1010,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   /********************************
    * begin register listener
    ********************************************************/
+  public IWXRenderListener getWXRenderListener() {
+    return mRenderListener;
+  }
+
   public void registerRenderListener(IWXRenderListener listener) {
     mRenderListener = listener;
   }
