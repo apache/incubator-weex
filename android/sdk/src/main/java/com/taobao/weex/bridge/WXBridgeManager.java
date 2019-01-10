@@ -436,9 +436,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       ext.put("methodName", methodStr);
       ext.put("args", args.toJSONString());
       WXLogUtils.e("[WXBridgeManager] callNative : numberFormatException when parsing string to numbers in args", ext.toString());
-      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-          WXErrorCode.WX_KEY_EXCEPTION_INVOKE_BRIDGE, "callNative",
-              WXLogUtils.getStackTrace(e) , ext);
       return null;
     }
   }
@@ -598,9 +595,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     } catch (Exception e) {
       String err = "[WXBridgeManager] callNativeModule exception: " + WXLogUtils.getStackTrace(e);
       WXLogUtils.e(err);
-      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_BRIDGE, "callNativeModule",
-              err, null);
     }
 
     return null;

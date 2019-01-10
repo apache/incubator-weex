@@ -23,8 +23,12 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.WXModule;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 
 import java.lang.reflect.Type;
@@ -67,9 +71,13 @@ public class NativeInvokeHelper {
         public void run() {
           if (invoker != null) {
             try {
+              WXSDKInstance targetInstance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+              if (null == targetInstance || targetInstance.isDestroy()){
+                return;
+              }
               invoker.invoke(target, params);
             } catch (Exception e) {
-              throw new RuntimeException(target + "Invoker " + invoker.toString(), e);
+              WXLogUtils.e("NativeInvokeHelper",target + " Invoker " + invoker.toString()+" exception:"+e);
             }
           }
         }
