@@ -132,9 +132,10 @@ public class ImageDrawable extends PaintDrawable {
     if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP) {
       // fix api 21 PaintDrawable crash
       paint.setAntiAlias(false);
+    } else {
+      // make android support anti-aliased image
+      paint.setFlags(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     }
-    // add support android anti-aliasing image
-    paint.setFlags(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     super.onDraw(shape, canvas, paint);
   }
 
