@@ -23,9 +23,9 @@
 #include "base/log_defines.h"
 #include "base/make_copyable.h"
 #include "base/thread/waitable_event.h"
-#include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
+#include "core/bridge/eagle_bridge.h"
 #ifdef OS_ANDROID
 #include "android/weex_extend_js_api.h"
 #endif
@@ -473,8 +473,7 @@ void CoreSideInScript::OnReceivedResult(long callback_id,
 void CoreSideInScript::UpdateComponentData(const char* page_id,
                                            const char* cid,
                                            const char* json_data) {
-  weex::core::data_render::VNodeRenderManager::GetInstance()
-      ->UpdateComponentData(page_id, cid, json_data);
+    EagleBridge::GetInstance()->data_render_handler()->UpdateComponentData(page_id, cid, json_data);
 }
 
 }  // namespace WeexCore

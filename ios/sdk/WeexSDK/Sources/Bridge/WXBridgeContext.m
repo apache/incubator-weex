@@ -51,6 +51,7 @@
 #import "WXJSFrameworkLoadDefaultImpl.h"
 #import "WXHandlerFactory.h"
 #import "WXExtendCallNativeManager.h"
+#import "WXDataRenderHandler.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -136,7 +137,12 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallUpdateComponentData:^NSInteger(NSString *instanceId, NSString *componentId, NSString *jsonData) {
 
         WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge callUpdateComponentData:instanceId componentId:componentId jsonData:jsonData];
+            id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+            if (dataRenderHandler) {
+                [dataRenderHandler callUpdateComponentData:instanceId componentId:componentId jsonData:jsonData];
+            } else {
+                WXLogError(@"No data render handler found!");
+            }
         });
         return 0;
     }];
@@ -405,7 +411,12 @@ _Pragma("clang diagnostic pop") \
         WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
 
         WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge createDataRenderInstance:instanceIdString template:jsBundleString options:options data:data];
+            id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+            if (dataRenderHandler) {
+                [dataRenderHandler createPage:instanceIdString template:jsBundleString options:options data:data];
+            } else {
+                WXLogError(@"No data render handler found!");
+            }
             WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
             [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
         });
@@ -574,7 +585,12 @@ _Pragma("clang diagnostic pop") \
         WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
 
         WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge createDataRenderInstance:instanceIdString contents:contents options:options data:data];
+            id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+            if (dataRenderHandler) {
+                [dataRenderHandler createPage:instanceIdString contents:contents options:options data:data];
+            } else {
+                WXLogError(@"No data render handler found!");
+            }
             WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
             [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
         });
@@ -698,7 +714,12 @@ _Pragma("clang diagnostic pop") \
     WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
     if (sdkInstance.dataRender) {
         WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge destroyDataRenderInstance:instance];
+            id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+            if (dataRenderHandler) {
+                [dataRenderHandler destroyDataRenderInstance:instance];
+            } else {
+                WXLogError(@"No data render handler found!");
+            }
         });
     }
     [self callJSMethod:@"destroyInstance" args:@[instance]];
@@ -722,10 +743,16 @@ _Pragma("clang diagnostic pop") \
     WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
     if (sdkInstance.dataRender) {
         WXPerformBlockOnComponentThread(^{
+            id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+            if (!dataRenderHandler) {
+                WXLogError(@"No data render handler found!");
+                return;
+            }
+
             if ([data isKindOfClass:[NSDictionary class]]) {
-                [WXCoreBridge refreshDataRenderInstance:instance data:[WXUtility JSONString:data]];
+                [dataRenderHandler refreshDataRenderInstance:instance data:[WXUtility JSONString:data]];
             } else if ([data isKindOfClass:[NSString class]]) {
-                [WXCoreBridge refreshDataRenderInstance:instance data:data];
+                [dataRenderHandler refreshDataRenderInstance:instance data:data];
             }
         });
     } else {
@@ -890,7 +917,12 @@ _Pragma("clang diagnostic pop") \
     
     [self callJSMethod:@"registerModules" args:@[modules]];
     WXPerformBlockOnComponentThread(^{
-        [WXCoreBridge registerModules:modules];
+        id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+        if (dataRenderHandler) {
+            [dataRenderHandler registerModules:modules];
+        } else {
+            WXLogError(@"No data render handler found!");
+        }
     });
 }
 

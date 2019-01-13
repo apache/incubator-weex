@@ -19,6 +19,7 @@
 #include "core/network/ios/default_request_handler.h"
 #import "WXConvertUtility.h"
 #import "WXSDKManager.h"
+#include <string>
 
 namespace weex {
 namespace core {
