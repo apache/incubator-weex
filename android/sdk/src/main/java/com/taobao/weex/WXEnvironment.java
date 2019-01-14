@@ -27,8 +27,7 @@ import android.graphics.Typeface;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
-
+import com.taobao.weex.BuildConfig;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.LogLevel;
@@ -37,21 +36,16 @@ import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
-
-import org.w3c.dom.Text;
-
+import dalvik.system.PathClassLoader;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
-import dalvik.system.PathClassLoader;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WXEnvironment {
 
@@ -135,7 +129,7 @@ public class WXEnvironment {
   private static String LIB_LD_PATH = null;
 
 
-  private static Map<String, String> options = new HashMap<>();
+  private static Map<String, String> options = new ConcurrentHashMap<>();
   static {
     options.put(WXConfig.os, OS);
     options.put(WXConfig.osName, OS);

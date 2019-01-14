@@ -411,7 +411,7 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     return initFrameworkParams;
   }
 
-  jclass jmapclass = env->FindClass("java/util/HashMap");
+  jclass jmapclass = env->FindClass("java/util/Map");
   jmethodID jkeysetmid =
       env->GetMethodID(jmapclass, "keySet", "()Ljava/util/Set;");
   jmethodID jgetmid = env->GetMethodID(
