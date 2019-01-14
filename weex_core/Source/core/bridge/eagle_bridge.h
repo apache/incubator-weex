@@ -96,16 +96,16 @@ namespace WeexCore {
             }
             return g_instance;
         }
-        DataRenderHandler* data_render_handler() const {return data_render_handler_;}
-        void set_data_render_handler(DataRenderHandler* data_render_handler) {data_render_handler_ = data_render_handler;}
-        WeexCoreHandler* weex_core_handler() const {return weex_core_handler_;}
+        DataRenderHandler* data_render_handler() const {return data_render_handler_.get();}
+        void set_data_render_handler(DataRenderHandler* data_render_handler) {data_render_handler_.reset(data_render_handler);}
+        WeexCoreHandler* weex_core_handler() const {return weex_core_handler_.get();}
         
 
     private:
-        EagleBridge() {}
+        EagleBridge() : weex_core_handler_(new WeexCoreHandler()) {}
         static EagleBridge *g_instance;
-        DataRenderHandler* data_render_handler_;
-        WeexCoreHandler* weex_core_handler_;
+        std::unique_ptr<DataRenderHandler> data_render_handler_;
+        std::unique_ptr<WeexCoreHandler> weex_core_handler_;
     };
 
 }
