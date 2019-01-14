@@ -78,13 +78,15 @@ void WeexObjectHolder::initFromParams(std::vector<INIT_FRAMEWORK_PARAMS *> &para
     else
         globalObject->initFunction();
 
+    globalObject->timeQueue = this->timeQueue;
     m_globalObject.set(vm, globalObject);
     vm.heap.setGarbageCollectionTimerEnabled(true);
     wson::init(&vm);
 }
 
-WeexObjectHolder::WeexObjectHolder(bool isMultiProgress) {
+WeexObjectHolder::WeexObjectHolder(TimerQueue* timeQueue, bool isMultiProgress) {
     this->isMultiProgress = isMultiProgress;
+    this->timeQueue = timeQueue;
 }
 
 WeexGlobalObject *WeexObjectHolder::cloneWeexObject(bool initContext, bool forAppContext) {
@@ -94,7 +96,7 @@ WeexGlobalObject *WeexObjectHolder::cloneWeexObject(bool initContext, bool forAp
                                                  WeexGlobalObject::createStructure(vm, jsNull()));
 
     temp_object->initWxEnvironment(m_globalObject->m_initFrameworkParams, forAppContext, false);
-
+    temp_object->timeQueue = this->timeQueue;
     if (forAppContext)
         temp_object->initFunctionForAppContext();
     else if (initContext)

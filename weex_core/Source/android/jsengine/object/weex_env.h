@@ -44,12 +44,6 @@ public:
 
     void setUseWson(bool useWson);
 
-
-    TimerQueue *timerQueue();
-
-    void setTimerQueue(TimerQueue *timerQueue);
-
-
     WeexCore::ScriptBridge *scriptBridge();
 
     void setScriptBridge(WeexCore::ScriptBridge *scriptBridge);

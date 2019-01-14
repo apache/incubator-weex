@@ -54,7 +54,7 @@ public:
     explicit WeexTask(const String &instanceId, int taskId) : future_(nullptr), global_object_(nullptr) {
         this->instanceId = instanceId;
         this->taskId = taskId;
-        this->timeCalculator = new weex::base::TimeCalculator(weex::base::TaskPlatform::JSS_ENGINE, "");
+        this->timeCalculator = new weex::base::TimeCalculator(weex::base::TaskPlatform::JSS_ENGINE, "", this->instanceId.utf8().data());
     };
 
     explicit WeexTask(const String &instanceId) : WeexTask(instanceId, genTaskId()) {};

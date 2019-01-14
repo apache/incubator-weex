@@ -33,12 +33,12 @@ using namespace WTF;
 using namespace WEEXICU;
 
 
-WeexRuntime::WeexRuntime(bool isMultiProgress) : is_multi_process_(isMultiProgress), script_bridge_(nullptr) {
-    weexObjectHolder.reset(new WeexObjectHolder(isMultiProgress));
+WeexRuntime::WeexRuntime(TimerQueue* timeQueue,bool isMultiProgress) : is_multi_process_(isMultiProgress), script_bridge_(nullptr) {
+    weexObjectHolder.reset(new WeexObjectHolder(timeQueue, isMultiProgress));
     LOGE("WeexRuntime is running and mode is %s", isMultiProgress ? "multiProcess" : "singleProcess");
 }
 
-WeexRuntime::WeexRuntime(WeexCore::ScriptBridge *script_bridge, bool isMultiProgress) : WeexRuntime(isMultiProgress) {
+WeexRuntime::WeexRuntime(TimerQueue* timeQueue, WeexCore::ScriptBridge *script_bridge, bool isMultiProgress) : WeexRuntime(timeQueue, isMultiProgress) {
     this->script_bridge_ = script_bridge;
 }
 
@@ -65,7 +65,7 @@ int WeexRuntime::initAppFrameworkMultiProcess(const String &instanceId, const St
                                               IPCArguments *arguments) {
     auto pHolder = getLightAppObjectHolder(instanceId);
     if (pHolder == nullptr) {
-        auto holder = new WeexObjectHolder(true);
+        auto holder = new WeexObjectHolder(weexObjectHolder->timeQueue, true);
         holder->initFromIPCArguments(arguments, 2, true);
         appWorkerContextHolderMap[instanceId.utf8().data()] = holder;
     }
@@ -79,7 +79,7 @@ int WeexRuntime::initAppFramework(const String &instanceId, const String &appFra
     auto pHolder = getLightAppObjectHolder(instanceId);
     LOGE("Weex jsserver initAppFramework %s",instanceId.utf8().data());
     if (pHolder == nullptr) {
-        auto holder = new WeexObjectHolder(is_multi_process_);
+        auto holder = new WeexObjectHolder(weexObjectHolder->timeQueue, is_multi_process_);
         holder->initFromParams(params, true);
         LOGE("Weex jsserver initAppFramework pHolder == null and id %s",instanceId.utf8().data());
         appWorkerContextHolderMap[instanceId.utf8().data()] = holder;
@@ -309,7 +309,8 @@ int WeexRuntime::destroyAppContext(const String &instanceId) {
         objectMap.erase(instanceId.utf8().data());
     }
 
-    WeexEnv::getEnv()->timerQueue()->destroyPageTimer(instanceId);
+    if(appWorkerObjectHolder->timeQueue != nullptr)
+        appWorkerObjectHolder->timeQueue->destroyPageTimer(instanceId.utf8().data());
 
     // GC on VM
 //    WeexGlobalObject* instanceGlobalObject = mAppInstanceGlobalObjectMap[instanceId.utf8().data()];
@@ -584,7 +585,8 @@ int WeexRuntime::destroyInstance(const String &instanceId) {
     // LOGE("DestoryInstance map 11 length:%d", weexObjectHolder->m_jsGlobalObjectMap.size());
     weexObjectHolder->m_jsInstanceGlobalObjectMap.erase(instanceId.utf8().data());
     // LOGE("DestoryInstance map 22 length:%d", weexObjectHolder->m_jsGlobalObjectMap.size());
-    WeexEnv::getEnv()->timerQueue()->destroyPageTimer(instanceId.utf8().data());
+    if(weexObjectHolder->timeQueue != nullptr)
+    weexObjectHolder->timeQueue->destroyPageTimer(instanceId.utf8().data());
     // release JSGlobalContextRelease
     // when instanceId % 20 == 0 GC
     bool needGc = false;

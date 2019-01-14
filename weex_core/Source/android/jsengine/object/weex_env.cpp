@@ -24,10 +24,6 @@
 
 WeexEnv *WeexEnv::env_ = nullptr;
 
-TimerQueue *WeexEnv::timerQueue() { return weexTimerQueue_.get(); }
-
-void WeexEnv::setTimerQueue(TimerQueue *timerQueue) { weexTimerQueue_.reset(timerQueue); }
-
 WeexCore::ScriptBridge *WeexEnv::scriptBridge() { return scriptBridge_; }
 
 

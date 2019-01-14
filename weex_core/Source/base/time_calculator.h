@@ -37,8 +37,9 @@ enum TaskPlatform {
 
 class TimeCalculator {
  public:
-  TimeCalculator(TaskPlatform taskPlatform, std::string name) :
+  TimeCalculator(TaskPlatform taskPlatform, std::string name, std::string id) :
       task_name(name),
+      instance_id(id),
       end(TimePoint::Now()),
       start(TimePoint::Now()),
       task_end(TimePoint::Now()),
@@ -93,19 +94,21 @@ class TimeCalculator {
       }
 
       LOGE(
-          "dyyLog %s taskName is %s : start : %lld  ---  end : %lld  ---  allCost:%lld  ---  taskCost:%lld  ---  taskWait:%lld",
+          "dyyLog %s taskName is %s : start : %lld  ---  end : %lld  ---  allCost:%lld  ---  taskCost:%lld  ---  taskWait:%lld --- msg:%s",
           task_platform.c_str(),
           task_name.c_str(),
           start.ToTimeUnit().ToMilliseconds(),
           end.ToTimeUnit().ToMilliseconds(),
           allCost.ToMilliseconds(),
           taskCostMS,
-          taskWait.ToMilliseconds());
+          taskWait.ToMilliseconds(),
+          msg.c_str());
     }
   }
 
  private:
   std::string task_name;
+  std::string instance_id;
   TimePoint start;
   TimePoint end;
   TimePoint task_start;

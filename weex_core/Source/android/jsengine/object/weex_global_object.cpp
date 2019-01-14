@@ -26,6 +26,7 @@
 #include "android/jsengine/object/weex_env.h"
 #include "android/jsengine/object/weex_console_object.h"
 #include "android/jsengine/task/timer_task.h"
+#include "android/jsengine/task/timer_queue.h"
 #include "android/jsengine/weex_jsc_utils.h"
 #include "base/utils/log_utils.h"
 #include "core/bridge/script_bridge.h"
@@ -792,7 +793,7 @@ JSFUNCTION functionNativeSetTimeout(ExecState *state) {
     VM &vm = globalObject->vm();
     const JSValue value = state->argument(0);
     const JSValue jsValue = state->argument(1);
-    TimerQueue *timerQueue =WeexEnv::getEnv()->timerQueue();
+    TimerQueue *timerQueue = globalObject->timeQueue;
     if (timerQueue != nullptr) {
         uint32_t function_id = globalObject->genFunctionID();
         globalObject->addTimer(function_id, JSC::Strong<JSC::Unknown> { vm, JSC::asObject(value) });
@@ -817,7 +818,7 @@ JSFUNCTION functionNativeSetInterval(ExecState *state) {
     VM &vm = globalObject->vm();
     const JSValue value = state->argument(0);
     const JSValue jsValue = state->argument(1);
-    TimerQueue *timerQueue =WeexEnv::getEnv()->timerQueue();
+    TimerQueue *timerQueue =globalObject->timeQueue;
     if (timerQueue != nullptr) {
         uint32_t function_id = globalObject->genFunctionID();
         globalObject->addTimer(function_id, JSC::Strong<JSC::Unknown> { vm, JSC::asObject(value) });
@@ -831,7 +832,8 @@ JSFUNCTION functionNativeSetInterval(ExecState *state) {
 }
 
 JSFUNCTION functionNativeClearTimeout(ExecState *state) {
-    TimerQueue *timerQueue = WeexEnv::getEnv()->timerQueue();
+    WeexGlobalObject *globalObject = static_cast<WeexGlobalObject *>(state->lexicalGlobalObject());
+    TimerQueue *timerQueue = globalObject->timeQueue;
     const JSValue& value = state->argument(0);
     if (timerQueue != nullptr) {
         timerQueue->removeTimer(value.asInt32());

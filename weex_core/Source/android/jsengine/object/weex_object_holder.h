@@ -23,6 +23,7 @@
 #ifndef WEEXV8_WEEXOBJECTHOLDER_H
 #define WEEXV8_WEEXOBJECTHOLDER_H
 
+#include "android/jsengine/task/timer_queue.h"
 #include "android/jsengine/object/weex_global_object.h"
 #include "android/jsengine/weex_jsc_utils.h"
 
@@ -36,7 +37,7 @@ public:
     ~WeexObjectHolder();
 
 
-    explicit WeexObjectHolder(bool isMultiProgress);
+    explicit WeexObjectHolder(TimerQueue* timeQueue, bool isMultiProgress);
 
     void initFromIPCArguments(IPCArguments *arguments, size_t startCount, bool forAppContext);
 
@@ -44,6 +45,7 @@ public:
 
     WeexGlobalObject *cloneWeexObject(bool initContext, bool forAppContext);
 
+    TimerQueue* timeQueue;
 
 private:
     bool isMultiProgress;
