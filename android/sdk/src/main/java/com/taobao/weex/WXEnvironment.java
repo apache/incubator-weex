@@ -164,15 +164,15 @@ public class WXEnvironment {
 
     try {
       if (isApkDebugable()) {
-        options.put(WXConfig.debugMode, "true");
+        addCustomOptions(WXConfig.debugMode, "true");
       }
-      options.put(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
+      addCustomOptions(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
     }catch (NullPointerException e){
       //There is little chance of NullPointerException as sApplication may be null.
       WXLogUtils.e("WXEnvironment scale Exception: ", e);
     }
-    configs.putAll(options);
-    if(configs!=null&&configs.get(WXConfig.appName)==null && sApplication!=null){
+    configs.putAll(getCustomOptions());
+    if(configs.get(WXConfig.appName)==null && sApplication!=null){
       configs.put(WXConfig.appName, sApplication.getPackageName());
     }
     return configs;
@@ -210,12 +210,22 @@ public class WXEnvironment {
   }
 
 
+  /**
+   * Use {@link #addCustomOptions(String, String)} to add custom options.
+   * Use {@link #getCustomOptions(String)} to get custom options
+   * @return
+   */
+  @Deprecated
   public static Map<String, String> getCustomOptions() {
     return options;
   }
 
   public static void addCustomOptions(String key, String value) {
     options.put(key, value);
+  }
+
+  public static String getCustomOptions(String key){
+    return options.get(key);
   }
 
   @Deprecated
@@ -255,7 +265,7 @@ public class WXEnvironment {
    * @return true when support
    */
   public static boolean isCPUSupport(){
-    boolean excludeX86 = "true".equals(options.get(SETTING_EXCLUDE_X86SUPPORT));
+    boolean excludeX86 = "true".equals(getCustomOptions().get(SETTING_EXCLUDE_X86SUPPORT));
     boolean isX86AndExcluded = WXSoInstallMgrSdk.isX86() && excludeX86;
     boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport() && !isX86AndExcluded;
     if (WXEnvironment.isApkDebugable()) {

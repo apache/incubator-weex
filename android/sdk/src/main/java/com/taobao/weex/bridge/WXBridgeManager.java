@@ -2363,7 +2363,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     if(!TextUtils.equals(config, globalConfig)){
       globalConfig = config;
-      WXEnvironment.getCustomOptions().put(GLOBAL_CONFIG_KEY, globalConfig);
+      WXEnvironment.addCustomOptions(GLOBAL_CONFIG_KEY, globalConfig);
       Runnable runnable = new Runnable() {
         @Override
         public void run() {
