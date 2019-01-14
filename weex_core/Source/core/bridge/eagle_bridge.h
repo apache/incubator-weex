@@ -20,6 +20,7 @@
 #ifndef CORE_BRIDGE_EAGLE_BRIDGE_H
 #define CORE_BRIDGE_EAGLE_BRIDGE_H
 
+#if defined __cplusplus
 #include <string>
 #include <functional>
 #include "WeexApiHeader.h"
@@ -110,4 +111,5 @@ namespace WeexCore {
 
 }
 
+#endif
 #endif
