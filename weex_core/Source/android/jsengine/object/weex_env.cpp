@@ -37,3 +37,7 @@ void WeexEnv::setUseWson(bool useWson) { isUsingWson = useWson; }
 
 void WeexEnv::setScriptBridge(WeexCore::ScriptBridge *scriptBridge) { scriptBridge_ = scriptBridge; }
 
+void WeexEnv::initIPC() {
+    // init IpcClient in io Thread
+    m_ipc_client_.reset(new WeexIPCClient(ipcClientFd_));
+}

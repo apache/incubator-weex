@@ -901,7 +901,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             } else {
               WXLogUtils.e("[WXBridgeManager] callReportCrash crash file is empty");
             }
-            file.delete();
+            if(!WXEnvironment.isApkDebugable())
+              file.delete();
           }
         } catch (Throwable throwable) {
           WXLogUtils.e("[WXBridgeManager] callReportCrash exception: ", throwable);

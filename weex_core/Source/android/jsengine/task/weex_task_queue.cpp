@@ -110,11 +110,11 @@ static void *startThread(void *td) {
     if (self->weexRuntime == nullptr) {
         self->weexRuntime = new WeexRuntime(WeexEnv::getEnv()->scriptBridge(), self->isMultiProgress);
         // init IpcClient in Js Thread
-        if (self->isMultiProgress) {
-            auto *client = new WeexIPCClient(WeexEnv::getEnv()->getIpcClientFd());
-            static_cast<weex::bridge::js::CoreSideInMultiProcess *>(weex::bridge::js::ScriptBridgeInMultiProcess::Instance()->core_side())->set_ipc_client(
-                    client);
-        }
+//        if (self->isMultiProgress) {
+//            auto *client = new WeexIPCClient(WeexEnv::getEnv()->getIpcClientFd());
+//            static_cast<weex::bridge::js::CoreSideInMultiProcess *>(weex::bridge::js::ScriptBridgeInMultiProcess::Instance()->core_side())->set_ipc_client(
+//                    client);
+//        }
         WeexEnv::getEnv()->setTimerQueue(new TimerQueue(self));
     }
 

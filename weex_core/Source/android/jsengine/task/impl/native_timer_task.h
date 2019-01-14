@@ -20,8 +20,8 @@
 // Created by Darin on 20/07/2018.
 //
 
-#ifndef WEEXV8_TIMERTASK_H
-#define WEEXV8_TIMERTASK_H
+#ifndef WEEXV8_NATIVE_TIMERTASK_H
+#define WEEXV8_NATIVE_TIMERTASK_H
 
 #include "android/jsengine/task/weex_task.h"
 

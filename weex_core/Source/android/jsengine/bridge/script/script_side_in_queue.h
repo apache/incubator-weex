@@ -34,10 +34,14 @@ namespace weex {
             private:
                 WeexTaskQueue *weexTaskQueue_;
 
-            public:
-                explicit ScriptSideInQueue() : weexTaskQueue_(nullptr) {};
+                WeexTaskQueue *weexTaskQueue_bk_;
 
-                explicit ScriptSideInQueue(WeexTaskQueue *taskQueue) { weexTaskQueue_ = taskQueue; }
+            public:
+                explicit ScriptSideInQueue() : weexTaskQueue_(nullptr),
+                                               weexTaskQueue_bk_(nullptr) {};
+
+                explicit ScriptSideInQueue(WeexTaskQueue *taskQueue) : weexTaskQueue_bk_(
+                        nullptr) { weexTaskQueue_ = taskQueue; }
 
             public:
 
@@ -52,7 +56,7 @@ namespace weex {
                 int CreateAppContext(const char *instanceId, const char *jsBundle) override;
 
                 std::unique_ptr<WeexJSResult> ExecJSOnAppWithResult(const char *instanceId,
-                                            const char *jsBundle) override;
+                                                                    const char *jsBundle) override;
 
                 int CallJSOnAppContext(const char *instanceId, const char *func,
                                        std::vector<VALUE_WITH_TYPE *> &params) override;
@@ -66,23 +70,39 @@ namespace weex {
                 int ExecJS(const char *instanceId, const char *nameSpace, const char *func,
                            std::vector<VALUE_WITH_TYPE *> &params) override;
 
-                std::unique_ptr<WeexJSResult>  ExecJSWithResult(const char *instanceId, const char *nameSpace,
-                                              const char *func,
-                                              std::vector<VALUE_WITH_TYPE *> &params) override;
+                std::unique_ptr<WeexJSResult>
+                ExecJSWithResult(const char *instanceId, const char *nameSpace,
+                                 const char *func,
+                                 std::vector<VALUE_WITH_TYPE *> &params) override;
+
                 void ExecJSWithCallback(const char *instanceId, const char *nameSpace,
-                                              const char *func,
-                                              std::vector<VALUE_WITH_TYPE *> &params, long callback_id) override;
+                                        const char *func,
+                                        std::vector<VALUE_WITH_TYPE *> &params,
+                                        long callback_id) override;
 
 
                 int CreateInstance(const char *instanceId, const char *func,
                                    const char *script, const char *opts, const char *initData,
-                                   const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params) override;
+                                   const char *extendsApi,
+                                   std::vector<INIT_FRAMEWORK_PARAMS *> &params) override;
 
-                std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char *instanceId, const char *script) override;
+                std::unique_ptr<WeexJSResult>
+                ExecJSOnInstance(const char *instanceId, const char *script) override;
 
                 int DestroyInstance(const char *instanceId) override;
 
                 int UpdateGlobalConfig(const char *config) override;
+
+            private:
+                std::vector<std::string> usingBackThreadId;
+
+                void useBackUpWeexRuntime(std::string id);
+
+                bool shouldUseBackUpWeexRuntime(std::string id);
+
+                void deleteBackUpRuntimeInstance(std::string id);
+
+                WeexTaskQueue *taskQueue(const char* id);
 
             };
         }  // namespace js

@@ -47,41 +47,31 @@ namespace weex {
 
             void CoreSideInMultiProcess::CallNative(const char *page_id, const char *task,
                                                     const char *callback) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVE));
-                // instacneID args[0]
-                serializer->add(page_id, strlen(page_id));
-                // task args[1]
-                serializer->add(task, strlen(task));
-                // callback args[2]
-                serializer->add(callback, strlen(callback));
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLNATIVE);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(task);
+                ipc_task->addParams(callback);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             std::unique_ptr<ValueWithType> CoreSideInMultiProcess::CallNativeModule(
                     const char *page_id, const char *module, const char *method,
                     const char *arguments, int arguments_length, const char *options,
                     int options_length) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVEMODULE));
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLNATIVEMODULE);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(module);
+                ipc_task->addParams(method);
+                ipc_task->addParams(arguments, arguments_length);
+                ipc_task->addParams(options, options_length);
+                auto future = std::unique_ptr<BackToWeexCoreQueue::Future>(
+                        new BackToWeexCoreQueue::Future());
+                ipc_task->set_future(future.get());
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
 
-                // instacneID args[0]
-                serializer->add(page_id, strlen(page_id));
-                // module args[1]
-                serializer->add(module, strlen(module));
-                // method args[2]
-                serializer->add(method, strlen(method));
-                // arguments args[3]
-                serializer->add(arguments, arguments_length);
-                // options args[4]
-                serializer->add(options, options_length);
-
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-
-                auto ipc_result = sender->send(buffer.get());
+                std::unique_ptr<IPCResult> ipc_result = future.get()->waitResult();
 
                 std::unique_ptr<ValueWithType> ret(new ValueWithType);
 
@@ -92,15 +82,18 @@ namespace weex {
                         break;
                     case IPCType::STRING:
                         ret->type = ParamsType::STRING;
-                        ret->value.string = genWeexStringSS(ipc_result->getStringContent(), ipc_result->getStringLength());
+                        ret->value.string = genWeexStringSS(ipc_result->getStringContent(),
+                                                            ipc_result->getStringLength());
                         break;
                     case IPCType::JSONSTRING:
                         ret->type = ParamsType::JSONSTRING;
-                        ret->value.string = genWeexStringSS(ipc_result->getStringContent(), ipc_result->getStringLength());
+                        ret->value.string = genWeexStringSS(ipc_result->getStringContent(),
+                                                            ipc_result->getStringLength());
                         break;
                     case IPCType::BYTEARRAY: {
                         ret->type = ParamsType::BYTEARRAY;
-                        ret->value.byteArray = genWeexByteArraySS(ipc_result->getByteArrayContent(), ipc_result->getByteArrayLength());
+                        ret->value.byteArray = genWeexByteArraySS(ipc_result->getByteArrayContent(),
+                                                                  ipc_result->getByteArrayLength());
                     }
                         break;
                     default:
@@ -113,271 +106,207 @@ namespace weex {
                     const char *page_id, const char *ref, const char *method,
                     const char *arguments, int arguments_length, const char *options,
                     int options_length) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLNATIVECOMPONENT));
 
-                // instacneID args[0]
-                serializer->add(page_id, strlen(page_id));
-                // module args[1]
-                serializer->add(ref, strlen(ref));
-                // method args[2]
-                serializer->add(method, strlen(method));
-                // arguments args[3]
-                serializer->add(arguments, arguments_length);
-                // options args[4]
-                serializer->add(options, options_length);
-
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::INT32) {
-                    LOGE("functionCallNativeComponent: unexpected result: %d",
-                         result->getType());
-                }
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLNATIVECOMPONENT);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(ref);
+                ipc_task->addParams(method);
+                ipc_task->addParams(arguments, arguments_length);
+                ipc_task->addParams(options, options_length);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
+//                if (result->getType() != IPCType::INT32) {
+//                    LOGE("functionCallNativeComponent: unexpected result: %d",
+//                         result->getType());
+//                }
             }
 
             void CoreSideInMultiProcess::AddElement(const char *page_id,
                                                     const char *parent_ref,
                                                     const char *dom_str, int dom_str_length,
                                                     const char *index_str) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLADDELEMENT) |
-                                   MSG_FLAG_ASYNC);
 
-                // instacneID args[0]
-                serializer->add(page_id, strlen(page_id));
-                // instacneID args[1]
-                serializer->add(parent_ref, strlen(parent_ref));
-                // dom node args[2]
-                serializer->add(dom_str, dom_str_length);
-                // index  args[3]
-                serializer->add(index_str, strlen(index_str));
-
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLADDELEMENT);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(parent_ref);
+                ipc_task->addParams(dom_str, dom_str_length);
+                ipc_task->addParams(index_str);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             void CoreSideInMultiProcess::SetTimeout(const char *callback_id,
                                                     const char *time) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::SETTIMEOUT));
-                // callbackId
-                serializer->add(callback_id, strlen(callback_id));
-                // time
-                serializer->add(time, strlen(time));
 
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::INT32) {
-                    LOGE("functionCallNativeComponent: unexpected result: %d",
-                         result->getType());
-                }
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::SETTIMEOUT);
+                ipc_task->addParams(callback_id);
+                ipc_task->addParams(time);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             void CoreSideInMultiProcess::NativeLog(const char *str_array) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::NATIVELOG) |
-                                   MSG_FLAG_ASYNC);
-                serializer->add(str_array, strlen(str_array));
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                sender->send(buffer.get());
+
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::NATIVELOG);
+                ipc_task->addParams(str_array);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             void CoreSideInMultiProcess::CreateBody(const char *page_id,
                                                     const char *dom_str,
                                                     int dom_str_length) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLCREATEBODY));
 
-                // page id
-                serializer->add(page_id, strlen(page_id));
-                // dom node args[2]
-                serializer->add(dom_str, dom_str_length);
-
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::INT32) {
-                    LOGE("functionCallNative: unexpected result: %d", result->getType());
-                }
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLCREATEBODY);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(dom_str, dom_str_length);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             int CoreSideInMultiProcess::UpdateFinish(const char *page_id, const char *task,
                                                      int task_length, const char *callback,
                                                      int callback_length) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLUPDATEFINISH));
-                serializer->add(page_id, strlen(page_id));
-                serializer->add(task, task_length);
-                serializer->add(callback, callback_length);
 
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::INT32) {
-                    LOGE("functionCallUpdateFinish: unexpected result: %d", result->getType());
+
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLUPDATEFINISH);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(task, task_length);
+                ipc_task->addParams(callback, callback_length);
+                auto future = std::unique_ptr<BackToWeexCoreQueue::Future>(
+                        new BackToWeexCoreQueue::Future());
+                ipc_task->set_future(future.get());
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
+
+                std::unique_ptr<IPCResult> ipc_result = future.get()->waitResult();
+
+                if (ipc_result->getType() != IPCType::INT32) {
+                    LOGE("functionCallUpdateFinish: unexpected result: %d", ipc_result->getType());
                     return 0;
                 }
-                return result->get<int32_t>();
+                return ipc_result->get<int32_t>();
             }
 
             void CoreSideInMultiProcess::CreateFinish(const char *page_id) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLCREATEFINISH));
 
-                serializer->add(page_id, strlen(page_id));
 
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::INT32) {
-                    LOGE("functionCallCreateFinish: unexpected result: %d", result->getType());
-                }
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLCREATEFINISH);
+                ipc_task->addParams(page_id);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             int CoreSideInMultiProcess::RefreshFinish(const char *page_id, const char *task,
                                                       const char *callback) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLREFRESHFINISH));
-                // instacneID args[0]
-                serializer->add(page_id, strlen(page_id));
-                // task args[1]
-                serializer->add(task, strlen(task));
-                // callback args[2]
-                serializer->add(callback, strlen(callback));
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::INT32) {
-                    LOGE("functionCallRefreshFinish: unexpected result: %d", result->getType());
+
+
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLREFRESHFINISH);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(task);
+                ipc_task->addParams(callback);
+                auto future = std::unique_ptr<BackToWeexCoreQueue::Future>(
+                        new BackToWeexCoreQueue::Future());
+                ipc_task->set_future(future.get());
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
+
+                std::unique_ptr<IPCResult> ipc_result = future.get()->waitResult();
+
+                if (ipc_result->getType() != IPCType::INT32) {
+                    LOGE("functionCallRefreshFinish: unexpected result: %d", ipc_result->getType());
                     return 0;
                 }
-                return result->get<int32_t>();
+                return ipc_result->get<int32_t>();
             }
 
             void CoreSideInMultiProcess::UpdateAttrs(const char *page_id, const char *ref,
                                                      const char *data, int data_length) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLUPDATEATTRS));
-                // instacneID args[0]
-                serializer->add(page_id, strlen(page_id));
-                // ref args[1]
-                serializer->add(ref, strlen(ref));
-                // dom node args[2] TODO
-                serializer->add(data, data_length);
 
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::INT32) {
-                    LOGE("functionCallUpdateAttrs: unexpected result: %d", result->getType());
-                }
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLUPDATEATTRS);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(ref);
+                ipc_task->addParams(data, data_length);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             void CoreSideInMultiProcess::UpdateStyle(const char *page_id, const char *ref,
                                                      const char *data, int data_length) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLUPDATESTYLE));
-                // instacneID args[0]
-                serializer->add(page_id, strlen(page_id));
-                // ref args[1]
-                serializer->add(ref, strlen(ref));
-                // dom node styles args[2]
-                serializer->add(data, data_length);
 
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::INT32) {
-                    LOGE("functionCallUpdateStyle: unexpected result: %d", result->getType());
-                }
+
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLUPDATESTYLE);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(ref);
+                ipc_task->addParams(data, data_length);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             void CoreSideInMultiProcess::RemoveElement(const char *page_id,
                                                        const char *ref) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLREMOVEELEMENT));
-                serializer->add(page_id, strlen(page_id));
-                serializer->add(ref, strlen(ref));
 
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::INT32) {
-                    LOGE("functionCallRemoveElement: unexpected result: %d", result->getType());
-                }
+
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLREMOVEELEMENT);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(ref);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             void CoreSideInMultiProcess::MoveElement(const char *page_id, const char *ref,
                                                      const char *parent_ref, int index) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLMOVEELEMENT));
-                serializer->add(page_id, strlen(page_id));
-                serializer->add(ref, strlen(ref));
-                serializer->add(parent_ref, strlen(parent_ref));
-                // Client need string
-                auto temp = std::to_string(index);
-                serializer->add(temp.c_str(), temp.size());
 
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::INT32) {
-                    LOGE("functionCallMoveElement: unexpected result: %d", result->getType());
-                }
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLMOVEELEMENT);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(ref);
+                ipc_task->addParams(parent_ref);
+                auto temp = std::to_string(index);
+                ipc_task->addParams(temp.c_str(), temp.length());
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             void CoreSideInMultiProcess::AddEvent(const char *page_id, const char *ref,
                                                   const char *event) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLADDEVENT));
-                serializer->add(page_id, strlen(page_id));
-                serializer->add(ref, strlen(ref));
-                serializer->add(event, strlen(event));
 
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::INT32) {
-                    LOGE("functionCallAddEvent: unexpected result: %d", result->getType());
-                }
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLADDEVENT);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(ref);
+                ipc_task->addParams(event);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             void CoreSideInMultiProcess::RemoveEvent(const char *page_id, const char *ref,
                                                      const char *event) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLREMOVEEVENT));
-                serializer->add(page_id, strlen(page_id));
-                serializer->add(ref, strlen(ref));
-                serializer->add(event, strlen(event));
 
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::INT32) {
-                    LOGE("functionCallRemoveEvent: unexpected result: %d", result->getType());
-                }
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLREMOVEEVENT);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(ref);
+                ipc_task->addParams(event);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             const char *CoreSideInMultiProcess::CallGCanvasLinkNative(
                     const char *context_id, int type, const char *arg) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLGCANVASLINK));
 
-                // contextId args[0]
-                serializer->add(context_id, strlen(context_id));
-                // type args[1]
-                serializer->add(type);
-                // arg args[2]
-                serializer->add(arg, strlen(arg));
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLGCANVASLINK);
+                ipc_task->addParams(context_id);
+                auto temp = std::to_string(type);
+                ipc_task->addParams(temp.c_str(), temp.length());
+                ipc_task->addParams(arg);
+                auto future = std::unique_ptr<BackToWeexCoreQueue::Future>(
+                        new BackToWeexCoreQueue::Future());
+                ipc_task->set_future(future.get());
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
+
+                std::unique_ptr<IPCResult> result = future.get()->waitResult();
+
 
                 try {
-                    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                    std::unique_ptr<IPCResult> result = sender->send(buffer.get());
                     // LOGE("weexjsc functionGCanvasLinkNative");
                     // if (result->getType() == IPCType::VOID) {
                     //     return JSValue::encode(ret);
@@ -406,91 +335,79 @@ namespace weex {
             int CoreSideInMultiProcess::SetInterval(const char *page_id,
                                                     const char *callback_id,
                                                     const char *time) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::SETINTERVAL));
-                // instacneID args[0]
-                serializer->add(page_id, strlen(page_id));
-                // task args[1]
-                serializer->add(callback_id, strlen(callback_id));
-                // callback args[2]
-                serializer->add(time, strlen(time));
-                try {
-                    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                    std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                    if (result->getType() != IPCType::INT32) {
-                        LOGE("functionSetIntervalWeex: unexpected result: %d", result->getType());
-                        return 0;
-                    }
-                    return result->get<int32_t>();
-                } catch (IPCException &e) {
-                    LOGE("functionSetIntervalWeex exception %s", e.msg());
+
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::SETINTERVAL);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(callback_id);
+                ipc_task->addParams(time);
+                auto future = std::unique_ptr<BackToWeexCoreQueue::Future>(
+                        new BackToWeexCoreQueue::Future());
+                ipc_task->set_future(future.get());
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
+
+                std::unique_ptr<IPCResult> result = future.get()->waitResult();
+                if (result->getType() != IPCType::INT32) {
+                    LOGE("functionSetIntervalWeex: unexpected result: %d", result->getType());
+                    return 0;
                 }
-                return 0;
+                return result->get<int32_t>();
             }
 
             void CoreSideInMultiProcess::ClearInterval(const char *page_id,
                                                        const char *callback_id) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CLEARINTERVAL));
-                // instacneID args[0]
-                serializer->add(page_id, strlen(page_id));
-                // task args[1]
-                serializer->add(callback_id, strlen(callback_id));
-                try {
-                    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                    std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                } catch (IPCException &e) {
-                    LOGE("functionClearIntervalWeex exception %s", e.msg());
-                }
+
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CLEARINTERVAL);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(callback_id);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             const char *CoreSideInMultiProcess::CallT3DLinkNative(int type,
                                                                   const char *arg) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::CALLT3DLINK));
-                // type args[1]
-                serializer->add(type);
-                // arg args[2]
-                serializer->add(arg, strlen(arg));
-                try {
-                    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                    std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                    // LOGE("weexjsc functionT3DLinkNative");
-                    // if (result->getType() == IPCType::VOID) {
-                    //     return JSValue::encode(ret);
-                    // } else if (result->getStringLength() > 0) {
-                    //     WTF::String retWString = jString2String(result->getStringContent(),
-                    //     result->getStringLength()); LOGE("weexjsc functionT3DLinkNative
-                    //     result length > 1 retWString:%s", retWString.utf8().data()); ret =
-                    //     String2JSValue(state, retWString);
 
-                    // }
-                    if (result->getType() != IPCType::VOID) {
-                        if (result->getStringLength() > 0) {
-                            return jString2String(result->getStringContent(),
-                                                  result->getStringLength())
-                                    .utf8()
-                                    .data();
-                        }
+
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::CALLT3DLINK);
+                auto temp = std::to_string(type);
+                ipc_task->addParams(temp.c_str(), temp.length());
+                ipc_task->addParams(arg);
+                auto future = std::unique_ptr<BackToWeexCoreQueue::Future>(
+                        new BackToWeexCoreQueue::Future());
+                ipc_task->set_future(future.get());
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
+
+                std::unique_ptr<IPCResult> result = future.get()->waitResult();
+                // LOGE("weexjsc functionT3DLinkNative");
+                // if (result->getType() == IPCType::VOID) {
+                //     return JSValue::encode(ret);
+                // } else if (result->getStringLength() > 0) {
+                //     WTF::String retWString = jString2String(result->getStringContent(),
+                //     result->getStringLength()); LOGE("weexjsc functionT3DLinkNative
+                //     result length > 1 retWString:%s", retWString.utf8().data()); ret =
+                //     String2JSValue(state, retWString);
+
+                // }
+                if (result->getType() != IPCType::VOID) {
+                    if (result->getStringLength() > 0) {
+                        return jString2String(result->getStringContent(),
+                                              result->getStringLength())
+                                .utf8()
+                                .data();
                     }
-                } catch (IPCException &e) {
-                    LOGE("functionT3DLinkNative exception: %s", e.msg());
-                    _exit(1);
                 }
-                return NULL;
+                return nullptr;
             }
 
-            void CoreSideInMultiProcess::PostMessage(const char *vim_id, const char *data, int dataLength) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::POSTMESSAGE));
-                serializer->add(data, dataLength);
-                serializer->add(vim_id, strlen(vim_id));
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
+            void CoreSideInMultiProcess::PostMessage(const char *vim_id, const char *data,
+                                                     int dataLength) {
+
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::POSTMESSAGE);
+                ipc_task->addParams(data, dataLength);
+                ipc_task->addParams(vim_id);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             void CoreSideInMultiProcess::DispatchMessage(const char *client_id,
@@ -498,19 +415,14 @@ namespace weex {
                                                          int dataLength,
                                                          const char *callback,
                                                          const char *vm_id) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::DISPATCHMESSAGE));
-                // clientid
-                serializer->add(client_id, strlen(client_id));
-                // data
-                serializer->add(data, dataLength);
-                // callback
-                serializer->add(callback, strlen(callback));
-                serializer->add(vm_id, strlen(vm_id));
 
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::DISPATCHMESSAGE);
+                ipc_task->addParams(client_id);
+                ipc_task->addParams(data, dataLength);
+                ipc_task->addParams(callback);
+                ipc_task->addParams(vm_id);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             std::unique_ptr<WeexJSResult>
@@ -518,84 +430,72 @@ namespace weex {
                                                         const char *data,
                                                         int dataLength,
                                                         const char *vm_id) {
-              IPCSender *sender = client_->getSender();
-              std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-              serializer->setMsg(
-                  static_cast<uint32_t>(IPCProxyMsg::DISPATCHMESSAGESYNC));
-              // clientid
-              serializer->add(client_id, strlen(client_id));
-              // data
-              serializer->add(data, dataLength);
-              serializer->add(vm_id, strlen(vm_id));
 
-              std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-              std::unique_ptr<IPCResult> result = sender->send(buffer.get());
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::DISPATCHMESSAGESYNC);
+                ipc_task->addParams(client_id);
+                ipc_task->addParams(data, dataLength);
+                ipc_task->addParams(vm_id);
+                auto future = std::unique_ptr<BackToWeexCoreQueue::Future>(
+                        new BackToWeexCoreQueue::Future());
+                ipc_task->set_future(future.get());
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
 
-              char *copy = nullptr;
-              int length = 0;
-              if (result->getType() == IPCType::BYTEARRAY) {
-                length = result->getByteArrayLength();
-                copy = new char[length];
-                strcpy(copy, result->getByteArrayContent());
-              }
-              return std::unique_ptr<WeexJSResult>(
-                  new WeexJSResult(std::unique_ptr<char[]>(copy), length));
+                std::unique_ptr<IPCResult> result = future.get()->waitResult();
+                char *copy = nullptr;
+                int length = 0;
+                if (result->getType() == IPCType::BYTEARRAY) {
+                    length = result->getByteArrayLength();
+                    copy = new char[length];
+                    strcpy(copy, result->getByteArrayContent());
+                }
+                return std::unique_ptr<WeexJSResult>(
+                        new WeexJSResult(std::unique_ptr<char[]>(copy), length));
             }
 
             void CoreSideInMultiProcess::ReportException(const char *page_id,
                                                          const char *func,
                                                          const char *exception_string) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::REPORTEXCEPTION));
-                serializer->add(page_id, strlen(page_id));
-                serializer->add(func, strlen(func));
-                serializer->add(exception_string, strlen(exception_string));
 
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::VOID) {
-                    LOGE("REPORTEXCEPTION: unexpected result: %d", result->getType());
-                }
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::REPORTEXCEPTION);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(func);
+                ipc_task->addParams(exception_string);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
             void CoreSideInMultiProcess::SetJSVersion(const char *js_version) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::SETJSFVERSION));
-                serializer->add(js_version, strlen(js_version));
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                std::unique_ptr<IPCResult> result = sender->send(buffer.get());
-                if (result->getType() != IPCType::VOID) {
-                    LOGE("setJSFVersion: unexpected result: %d", result->getType());
-                }
+
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::SETJSFVERSION);
+                ipc_task->addParams(js_version);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
-            void CoreSideInMultiProcess::OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult>& result) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::ONRECEIVEDRESULT));
-                serializer->add(static_cast<int64_t>(callback_id));
+            void CoreSideInMultiProcess::OnReceivedResult(long callback_id,
+                                                          std::unique_ptr<WeexJSResult> &result) {
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::ONRECEIVEDRESULT);
+
+                auto temp = std::to_string(callback_id);
+                ipc_task->addParams(temp.c_str(), temp.length());
                 if (result != nullptr) {
-                    serializer->add(result->data.get(), result->length);
-                } else {
-                    serializer->addVoid();
+                    ipc_task->addParams(result->data.get(), result->length);
                 }
-
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                sender->send(buffer.get());
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
 
-            void CoreSideInMultiProcess::UpdateComponentData(const char* page_id, const char* cid, const char* json_data) {
-                IPCSender *sender = client_->getSender();
-                std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-                serializer->setMsg(static_cast<uint32_t>(IPCProxyMsg::UPDATECOMPONENTDATA));
-                serializer->add(page_id, strlen(page_id));
-                serializer->add(cid, strlen(cid));
-                serializer->add(json_data, strlen(json_data));
+            void CoreSideInMultiProcess::UpdateComponentData(const char *page_id, const char *cid,
+                                                             const char *json_data) {
 
-                std::unique_ptr<IPCBuffer> buffer = serializer->finish();
-                sender->send(buffer.get());
+
+                BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                        IPCProxyMsg::UPDATECOMPONENTDATA);
+                ipc_task->addParams(page_id);
+                ipc_task->addParams(cid);
+                ipc_task->addParams(json_data);
+                WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
             }
         }  // namespace js
     }  // namespace bridge
