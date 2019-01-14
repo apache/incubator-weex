@@ -29,7 +29,10 @@
 #include "android/jsengine/object/weex_env.h"
 
 void WeexTaskQueue::run(WeexTask *task) {
+    task->timeCalculator->set_task_name(task->taskName());
+    task->timeCalculator->taskStart();
     task->run(weexRuntime);
+    task->timeCalculator->taskEnd();
     delete task;
 }
 
