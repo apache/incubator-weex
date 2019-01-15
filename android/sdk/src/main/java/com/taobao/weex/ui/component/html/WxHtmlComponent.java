@@ -26,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
@@ -62,6 +63,8 @@ public class WxHtmlComponent extends WXComponent<ScrollView> {
   private String mTableTemplate = HtmlComponent.HTML_TEMPLATE;
   private int mLeftEdge = DEFAULT_PAGE_EDGE;
   private int mRightEdge = DEFAULT_PAGE_EDGE;
+  private String[] mSupportedTags =new String[]{HtmlComponent.TAG_IMAGE, HtmlComponent.TAG_TABLE,
+      HtmlComponent.TAG_VIDEO};
 
   public WxHtmlComponent(
       WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
@@ -87,9 +90,12 @@ public class WxHtmlComponent extends WXComponent<ScrollView> {
   }
 
   /**
-   * image: { resize: 'cover' }, table: { template: "" } template related to {@link
-   * HtmlComponent#HTML_TEMPLATE}
-   *
+   * htmlOption: { image: { resize: 'cover' }, table: { template: '' },
+   * tags:['image','table','video'] }
+   * Template related to {@link HtmlComponent#HTML_TEMPLATE}
+   * Tags indicate the support one,and default contains image,video,table
+   * Once add new tag support, need custom native view in {@link
+   * com.taobao.weex.ui.component.html.adapter.DefaultHtmlTagAdapter#getExtendTagView(String)}
    * @param htmlOption options for html
    */
   @WXComponentProp(name = "htmlOption")
@@ -105,7 +111,17 @@ public class WxHtmlComponent extends WXComponent<ScrollView> {
         JSONObject image = option.getJSONObject("image");
         mImageResize = WXUtils.getString(image.get(Constants.Name.RESIZE), "cover");
         // table
-        mTableTemplate = WXUtils.getString(image.get("template"), HtmlComponent.HTML_TEMPLATE);
+        JSONObject table = option.getJSONObject("table");
+        mTableTemplate =
+            WXUtils.getString(table.get("template"), HtmlComponent.HTML_TEMPLATE);
+        //tags
+        JSONArray tags = option.getJSONArray("tags");
+        if (tags.size() != 0) {
+          mSupportedTags = new String[tags.size()];
+          for (int i = 0; i < tags.size(); i++) {
+            mSupportedTags[i] = tags.getString(i);
+          }
+        }
       }
 
       CSSShorthand padding = getBasicComponentData().getPadding();
@@ -143,7 +159,7 @@ public class WxHtmlComponent extends WXComponent<ScrollView> {
 
     if (mHtmlComponents.size() == 0) {
       mHtmlComponents.addAll(
-          HtmlComponent.parseTags(htmlText, HtmlComponent.TAG_IMAGE, HtmlComponent.TAG_TABLE));
+          HtmlComponent.parseTags(htmlText, mSupportedTags));
     }
 
     LinearLayout.LayoutParams params =

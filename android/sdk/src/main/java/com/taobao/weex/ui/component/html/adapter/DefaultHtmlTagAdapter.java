@@ -25,8 +25,11 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -44,15 +47,19 @@ import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /** Created by Bruce Too On 2019/1/10. At 09:56 */
 public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
 
-  protected static final float DEFAULT_IMAGE_ASPECT_RATIO = 0.75f; // 3 * 1.0f/ 4;
+  protected static final float DEFAULT_IMAGE_ASPECT_RATIO = 0.5625f; // 16:9;
   protected Context context;
   protected WxHtmlComponent component;
   /** All <img> wrapped native views with there "src" value */
   protected Map<View, String> mImageMap = new HashMap<>();
+
+  private static Pattern sWidthPattern;
+  private static Pattern sHeightPattern;
 
   @Override
   public View getHtmlTagView(
@@ -69,6 +76,9 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
         break;
       case HtmlComponent.TAG_IMAGE:
         tagView = getDefaultImageView(html);
+        break;
+      case HtmlComponent.TAG_VIDEO:
+        tagView = getDefaultVideo(html);
         break;
       default: // text
         View extendTagView = getExtendTagView(html);
@@ -109,6 +119,33 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
         "utf-8",
         null);
     return webView;
+  }
+
+  /**
+   * In my case,the video tag info may like below:
+   * <video style="width:**;height:**" src="" poster="">
+   * @param info video tag raw string
+   * @return return video view self
+   */
+  protected View getDefaultVideo(String info){
+    FrameLayout layout = new FrameLayout(context);
+    ImageView icon = new ImageView(context);
+    icon.setImageResource(android.R.drawable.ic_media_play);
+    ImageView bg = new ImageView(context);
+    bg.setScaleType(getResizeMode(component.getImageResize()));
+    String poster = HtmlComponent.getAttributeValue("poster", info);
+    mImageMap.put(bg, poster);
+    WXSDKManager.getInstance().getIWXImgLoaderAdapter().setImage(poster, bg, null, null);
+    LinearLayout.LayoutParams params =
+        new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+    params.width = WXViewUtils.getScreenWidth(context) - component.getEdgesWidth();
+    params.height = (int) (params.width * DEFAULT_IMAGE_ASPECT_RATIO);
+    layout.addView(bg,params);
+    layout.addView(icon,new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                                     ViewGroup.LayoutParams.WRAP_CONTENT,Gravity.CENTER));
+    layout.setOnClickListener(getTagViewClickListener(HtmlComponent.TAG_VIDEO, info));
+    return layout;
   }
 
   protected ImageView getDefaultImageView(String info) {
@@ -184,7 +221,7 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
     }
   }
 
-  private ImageView.ScaleType getResizeMode(String resizeMode) {
+  protected ImageView.ScaleType getResizeMode(String resizeMode) {
     ImageView.ScaleType scaleType = ImageView.ScaleType.FIT_XY;
     if (TextUtils.isEmpty(resizeMode)) {
       return scaleType;
@@ -213,5 +250,21 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
         Toast.makeText(context, "you click the view", Toast.LENGTH_SHORT).show();
       }
     }
+  }
+
+  protected static Pattern getWidthPattern() {
+    if (sWidthPattern == null) {
+      sWidthPattern = Pattern.compile(
+          "(?:\\s+|\\A)width\\s*:\\s*(\\S*)\\b");
+    }
+    return sWidthPattern;
+  }
+
+  protected static Pattern getHeightPattern() {
+    if (sHeightPattern == null) {
+      sHeightPattern = Pattern.compile(
+          "(?:\\s+|\\A)height\\s*:\\s*(\\S*)\\b");
+    }
+    return sHeightPattern;
   }
 }

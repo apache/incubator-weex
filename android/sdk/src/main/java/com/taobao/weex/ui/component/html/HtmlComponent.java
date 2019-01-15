@@ -41,7 +41,7 @@ public class HtmlComponent {
       "<!DOCTYPE html>\n"
           + "<html>\n"
           + " <head> \n"
-          + "  <style tagName=\"text/css\">\n"
+          + "  <style type=\"text/css\">\n"
           + "  .article-content table {\n"
           + "  width: 100%;\n"
           + "  font-size: 14px;\n"
@@ -112,6 +112,7 @@ public class HtmlComponent {
   public static final String TAG_DEFAULT = "text";
   public static final String TAG_TABLE = "table";
   public static final String TAG_IMAGE = "img";
+  public static final String TAG_VIDEO = "video";
 
   public String tagName;
   public String info;

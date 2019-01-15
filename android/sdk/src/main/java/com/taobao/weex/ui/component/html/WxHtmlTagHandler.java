@@ -34,7 +34,7 @@ public class WxHtmlTagHandler implements HtmlCompat.TagHandler {
 
   @Override
   public void handleTag(boolean opening, String tag, Attributes attributes, Editable output, XMLReader xmlReader) {
-
+    //TODO  more tag support by textView (nested <li> etc..)
   }
 
   /** Returns the text contained within a span and deletes it from the output string */
