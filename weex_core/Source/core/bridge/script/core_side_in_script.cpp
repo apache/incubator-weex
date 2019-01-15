@@ -20,6 +20,7 @@
 #include "core/bridge/script/core_side_in_script.h"
 
 #include <cstdlib>
+#include <base/time_calculator.h>
 #include "base/log_defines.h"
 #include "base/make_copyable.h"
 #include "base/thread/waitable_event.h"
@@ -139,6 +140,9 @@ void CoreSideInScript::CallNativeComponent(const char *page_id, const char *ref,
 void CoreSideInScript::AddElement(const char *page_id, const char *parent_ref,
                                   const char *dom_str, int dom_str_length,
                                   const char *index_str) {
+
+  weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::WEEXCORE, "AddElement", page_id);
+
   const char *indexChar = index_str == nullptr ? "\0" : index_str;
   int index = atoi(indexChar);
   if (page_id == nullptr || parent_ref == nullptr || dom_str == nullptr ||
