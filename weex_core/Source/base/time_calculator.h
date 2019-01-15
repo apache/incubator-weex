@@ -94,9 +94,10 @@ class TimeCalculator {
       }
 
       LOGE(
-          "dyyLog %s taskName is %s : start : %lld  ---  end : %lld  ---  allCost:%lld  ---  taskCost:%lld  ---  taskWait:%lld --- msg:%s",
+          "dyyLog %s taskName is %s : instanceId %s : start : %lld  ---  end : %lld  ---  allCost:%lld  ---  taskCost:%lld  ---  taskWait:%lld --- msg:%s",
           task_platform.c_str(),
           task_name.c_str(),
+          instance_id.c_str(),
           start.ToTimeUnit().ToMilliseconds(),
           end.ToTimeUnit().ToMilliseconds(),
           allCost.ToMilliseconds(),
