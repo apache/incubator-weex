@@ -37,7 +37,9 @@ public:
     std::unique_ptr<WeexObjectHolder> weexObjectHolder;
     std::map<std::string, WeexObjectHolder *> appWorkerContextHolderMap;
 
-    explicit WeexRuntime(TimerQueue* timeQueue, bool isMultiProgress = true);
+    RefPtr<VM> m_globalVM;
+
+  explicit WeexRuntime(TimerQueue* timeQueue, bool isMultiProgress = true);
 
     explicit WeexRuntime(TimerQueue* timeQueue, WeexCore::ScriptBridge *script_bridge, bool isMultiProgress = true);
 

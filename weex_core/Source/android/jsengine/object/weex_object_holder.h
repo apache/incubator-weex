@@ -32,12 +32,14 @@ class WeexObjectHolder {
 public:
     Strong<WeexGlobalObject> m_globalObject;
 
+    VM* m_globalVM;
+
     std::map<std::string, WeexGlobalObject *> m_jsInstanceGlobalObjectMap;
 
     ~WeexObjectHolder();
 
 
-    explicit WeexObjectHolder(TimerQueue* timeQueue, bool isMultiProgress);
+    explicit WeexObjectHolder(VM* vm, TimerQueue* timeQueue, bool isMultiProgress);
 
     void initFromIPCArguments(IPCArguments *arguments, size_t startCount, bool forAppContext);
 

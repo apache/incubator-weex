@@ -26,7 +26,6 @@ WeexEnv *WeexEnv::env_ = nullptr;
 
 WeexCore::ScriptBridge *WeexEnv::scriptBridge() { return scriptBridge_; }
 
-
 bool WeexEnv::useWson() { return isUsingWson; }
 
 void WeexEnv::setUseWson(bool useWson) { isUsingWson = useWson; }

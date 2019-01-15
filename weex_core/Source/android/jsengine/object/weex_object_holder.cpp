@@ -56,22 +56,10 @@ void WeexObjectHolder::initFromIPCArguments(IPCArguments *arguments, size_t star
 }
 
 void WeexObjectHolder::initFromParams(std::vector<INIT_FRAMEWORK_PARAMS *> &params, bool forAppContext) {
-    if (!WEEXICU::initICUEnv(isMultiProgress)) {
-        LOGE("failed to init ICUEnv single process");
-        // return false;
-    }
-
-    Options::enableRestrictedOptions(true);
-// Initialize JSC before getting VM.
-    WTF::initializeMainThread();
-    initHeapTimer();
-    JSC::initializeThreading();
-#if ENABLE(WEBASSEMBLY)
-    JSC::Wasm::enableFastMemory();
-#endif
-    VM &vm = VM::sharedInstance();
-    JSLockHolder locker(&vm);
-    WeexGlobalObject *globalObject = WeexGlobalObject::create(vm, WeexGlobalObject::createStructure(vm, jsNull()));
+    JSLockHolder locker(this->m_globalVM);
+    VM& vm = *(this->m_globalVM);
+    WeexGlobalObject *globalObject = WeexGlobalObject::create(vm, WeexGlobalObject::createStructure(
+        vm, jsNull()));
     globalObject->initWxEnvironment(params, forAppContext, true);
     if (forAppContext)
         globalObject->initFunctionForAppContext();
@@ -84,14 +72,15 @@ void WeexObjectHolder::initFromParams(std::vector<INIT_FRAMEWORK_PARAMS *> &para
     wson::init(&vm);
 }
 
-WeexObjectHolder::WeexObjectHolder(TimerQueue* timeQueue, bool isMultiProgress) {
+WeexObjectHolder::WeexObjectHolder(VM* vm,  TimerQueue* timeQueue, bool isMultiProgress) {
     this->isMultiProgress = isMultiProgress;
     this->timeQueue = timeQueue;
+    this->m_globalVM = vm;
 }
 
 WeexGlobalObject *WeexObjectHolder::cloneWeexObject(bool initContext, bool forAppContext) {
-    VM &vm = VM::sharedInstance();
-    JSLockHolder locker(&vm);
+    JSLockHolder locker(this->m_globalVM);
+    VM& vm = *(this->m_globalVM);
     auto *temp_object = WeexGlobalObject::create(vm,
                                                  WeexGlobalObject::createStructure(vm, jsNull()));
 
@@ -108,9 +97,8 @@ WeexGlobalObject *WeexObjectHolder::cloneWeexObject(bool initContext, bool forAp
 }
 
 WeexObjectHolder::~WeexObjectHolder() {
-    VM &vm = VM::sharedInstance();
     wson::destory();
-    JSLockHolder locker(&vm);
-    vm.heap.collectAllGarbage();
+    JSLockHolder locker(this->m_globalVM);
+    this->m_globalVM->heap.collectAllGarbage();
 }
 
