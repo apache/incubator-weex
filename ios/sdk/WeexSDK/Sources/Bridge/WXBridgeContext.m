@@ -37,7 +37,6 @@
 #import "WXCallJSMethod.h"
 #import "WXSDKInstance_private.h"
 #import "WXPrerenderManager.h"
-#import "WXTracingManager.h"
 #import "WXExceptionUtils.h"
 #import "WXSDKEngine.h"
 #import "WXPolyfillSet.h"
@@ -51,6 +50,7 @@
 #import "WXJSFrameworkLoadProtocol.h"
 #import "WXJSFrameworkLoadDefaultImpl.h"
 #import "WXHandlerFactory.h"
+#import "WXExtendCallNativeManager.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -133,10 +133,17 @@ _Pragma("clang diagnostic pop") \
     
     [WXCoreBridge install];
     
+    [_jsBridge registerCallUpdateComponentData:^NSInteger(NSString *instanceId, NSString *componentId, NSString *jsonData) {
+
+        WXPerformBlockOnComponentThread(^{
+            [WXCoreBridge callUpdateComponentData:instanceId componentId:componentId jsonData:jsonData];
+        });
+        return 0;
+    }];
+
     [_jsBridge registerCallAddElement:^NSInteger(NSString *instanceId, NSString *parentRef, NSDictionary *elementData, NSInteger index) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callAddElement:instanceId parentRef:parentRef data:elementData index:(int)index];
         });
         
@@ -146,7 +153,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallCreateBody:^NSInteger(NSString *instanceId, NSDictionary *bodyData) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callCreateBody:instanceId data:bodyData];
         });
         
@@ -156,7 +162,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallRemoveElement:^NSInteger(NSString *instanceId, NSString *ref) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callRemoveElement:instanceId ref:ref];
         });
         
@@ -166,7 +171,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallMoveElement:^NSInteger(NSString *instanceId, NSString *ref, NSString *parentRef, NSInteger index) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"moveElement" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callMoveElement:instanceId ref:ref parentRef:parentRef index:(int)index];
         });
         
@@ -176,7 +180,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallUpdateAttrs:^NSInteger(NSString *instanceId, NSString *ref, NSDictionary *attrsData) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callUpdateAttrs:instanceId ref:ref data:attrsData];
         });
         
@@ -186,7 +189,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallUpdateStyle:^NSInteger(NSString *instanceId, NSString *ref, NSDictionary *stylesData) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateStyle" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callUpdateStyle:instanceId ref:ref data:stylesData];
         });
 
@@ -196,7 +198,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallAddEvent:^NSInteger(NSString *instanceId, NSString *ref, NSString *event) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addEvent" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callAddEvent:instanceId ref:ref event:event];
         });
         
@@ -206,7 +207,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallRemoveEvent:^NSInteger(NSString *instanceId, NSString *ref, NSString *event) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeEvent" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callRemoveEvent:instanceId ref:ref event:event];
         });
         
@@ -219,7 +219,6 @@ _Pragma("clang diagnostic pop") \
         [instance.apmInstance onStage:KEY_PAGE_STAGES_CREATE_FINISH];
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callCreateFinish:instanceId];
         });
         
@@ -230,7 +229,6 @@ _Pragma("clang diagnostic pop") \
         [_jsBridge registerCallRefreshFinish:^NSInteger(NSString *instanceId) {
             
             WXPerformBlockOnComponentThread(^{
-                [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"refreshFinish" options:@{@"threadName":WXTDOMThread}];
                 [WXCoreBridge callRefreshFinish:instanceId];
             });
             
@@ -242,7 +240,6 @@ _Pragma("clang diagnostic pop") \
         [_jsBridge registerCallUpdateFinish:^NSInteger(NSString *instanceId) {
             
             WXPerformBlockOnComponentThread(^{
-                [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateFinish" options:@{@"threadName":WXTDOMThread}];
                 [WXCoreBridge callUpdateFinish:instanceId];
             });
             
@@ -357,12 +354,10 @@ _Pragma("clang diagnostic pop") \
             NSString *ref = task[@"ref"];
             WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:ref methodName:methodName arguments:arguments instance:instance];
             [method invoke];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:task[@"ref"] className:nil name:task[@"component"] phase:WXTracingBegin functionName:task[@"method"] options:nil];
         } else {
             NSString *moduleName = task[@"module"];
             NSDictionary *options = task[@"options"];
             WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments options:options instance:instance];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:task[@"module"] phase:WXTracingBegin functionName:task[@"method"] options:@{@"threadName":WXTJSBridgeThread}];
             [method invoke];
         }
     }
@@ -405,7 +400,7 @@ _Pragma("clang diagnostic pop") \
     NSMutableArray *sendQueue = [NSMutableArray array];
     [self.sendQueue setValue:sendQueue forKey:instanceIdString];
 
-    if (sdkInstance.dataRender) {
+    if (sdkInstance.dataRender && ![options[@"EXEC_JS"] boolValue]) {
         WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instanceIdString]);
         WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
 
@@ -603,34 +598,50 @@ _Pragma("clang diagnostic pop") \
         // Fallback on earlier versions
         return bundleType;
     }
-    // trim like whiteSpace and newline charset
-    jsBundleString = [jsBundleString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
-    // use the top 100 characters match the bundleType
-    if (jsBundleString.length > 100) {
-        jsBundleString = [jsBundleString substringWithRange:NSMakeRange(0, 100)];
+    // find first character that is not space or new line character
+    NSCharacterSet* voidCharSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    NSUInteger length = [jsBundleString length];
+    NSUInteger validCharacter = 0;
+    while (validCharacter < length && [voidCharSet characterIsMember:[jsBundleString characterAtIndex:validCharacter]]) {
+        validCharacter ++;
     }
-    
-    if (!jsBundleString ) {
+    if (validCharacter >= length) {
         return bundleType;
     }
+    @try {
+        jsBundleString = [jsBundleString substringWithRange:NSMakeRange(validCharacter, MIN(100, length - validCharacter))];
+    }
+    @catch (NSException* e) {
+    }
+    if ([jsBundleString length] == 0) {
+        return bundleType;
+    }
+    
+    static NSRegularExpression* headerExp = nil;
+    static NSRegularExpression* vueExp = nil;
+    static NSRegularExpression* raxExp = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        headerExp = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\/\\/ *(\\{[^}]*\\}) *\\r?\\n" options:NSRegularExpressionCaseInsensitive error:NULL];
+        vueExp = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:vue)" options:NSRegularExpressionCaseInsensitive error:NULL];
+        raxExp = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:rax)" options:NSRegularExpressionCaseInsensitive error:NULL];
+    });
+    
     if ( [self _isParserByRegEx]) {
-        NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\/\\/ *(\\{[^}]*\\}) *\\r?\\n" options:NSRegularExpressionCaseInsensitive error:NULL];
-        NSTextCheckingResult *match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+        NSTextCheckingResult *match = [headerExp firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
         if (match) {
             NSString* bundleTypeStr = [jsBundleString substringWithRange:match.range];
             bundleTypeStr = [bundleTypeStr stringByReplacingOccurrencesOfString:@"//" withString:@""];
             id vale = [WXUtility objectFromJSON:bundleTypeStr];
             bundleType = [vale objectForKey:@"framework"];
         }else{
-            NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:vue)" options:NSRegularExpressionCaseInsensitive error:NULL];
-            NSTextCheckingResult *match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            NSTextCheckingResult *match = [vueExp firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
             if (match) {
                 bundleType = [jsBundleString substringWithRange:match.range];
                 return bundleType;
             }
-            regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:rax)" options:NSRegularExpressionCaseInsensitive error:NULL];
-            match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            match = [raxExp firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
             if (match) {
                 bundleType = [jsBundleString substringWithRange:match.range];
             }
@@ -641,14 +652,12 @@ _Pragma("clang diagnostic pop") \
         } else if ([jsBundleString hasPrefix:@"// { \"framework\": \"Rax\""] || [jsBundleString hasPrefix:@"// { \"framework\": \"rax\""] || [jsBundleString hasPrefix:@"// {\"framework\" : \"Rax\"}"] || [jsBundleString hasPrefix:@"// {\"framework\" : \"rax\"}"]) {
             bundleType = @"Rax";
         }else {
-            NSRegularExpression * regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:vue)" options:NSRegularExpressionCaseInsensitive error:NULL];
-            NSTextCheckingResult *match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            NSTextCheckingResult *match = [vueExp firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
             if (match) {
                 bundleType = [jsBundleString substringWithRange:match.range];
                 return bundleType;
             }
-            regEx = [NSRegularExpression regularExpressionWithPattern:@"(use)(\\s+)(weex:rax)" options:NSRegularExpressionCaseInsensitive error:NULL];
-            match = [regEx firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
+            match = [raxExp firstMatchInString:jsBundleString options:0 range:NSMakeRange(0, jsBundleString.length)];
             if (match) {
                 bundleType = [jsBundleString substringWithRange:match.range];
             }
@@ -665,7 +674,7 @@ _Pragma("clang diagnostic pop") \
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
         useRegEx = [[configCenter configForKey:@"iOS_weex_ext_config.parserTypeByRegEx" defaultValue:@(YES) isDefault:NULL] boolValue];
     }
-    return false;
+    return useRegEx;
 }
 
 - (void)destroyInstance:(NSString *)instance
@@ -691,9 +700,8 @@ _Pragma("clang diagnostic pop") \
         WXPerformBlockOnComponentThread(^{
             [WXCoreBridge destroyDataRenderInstance:instance];
         });
-    } else {
-        [self callJSMethod:@"destroyInstance" args:@[instance]];
     }
+    [self callJSMethod:@"destroyInstance" args:@[instance]];
 }
 
 - (void)forceGarbageCollection
@@ -1125,6 +1133,10 @@ _Pragma("clang diagnostic pop") \
         NSString * levelStr = [[args lastObject] toString];
         [WXBridgeContext handleConsoleOutputWithArgument:args logLevel:(WXLogFlag)[levelMap[levelStr] integerValue]];
     };
+    
+    context[@"extendCallNative"] = ^(JSValue *value ) {
+        return [WXBridgeContext extendCallNative:[value toDictionary]];
+    };
 }
 
 + (void)handleConsoleOutputWithArgument:(NSArray *)arguments logLevel:(WXLogFlag)logLevel
@@ -1148,5 +1160,13 @@ _Pragma("clang diagnostic pop") \
             }
         }
     }];
+}
+
++(id)extendCallNative:(NSDictionary *)dict
+{
+    if(dict){
+        return [WXExtendCallNativeManager sendExtendCallNativeEvent:dict];
+    }
+    return @(-1);
 }
 @end

@@ -18,21 +18,22 @@
  */
 
 #include "android_bridge_in_multi_process.h"
-#include "IPC/IPCArguments.h"
-#include "IPC/IPCHandler.h"
-#include "IPC/IPCMessageJS.h"
-#include "IPC/IPCResult.h"
-#include "IPC/IPCSender.h"
-#include "IPC/Serializing/IPCSerializer.h"
+
 #include "android/base/string/string_utils.h"
+#include "android/jsengine/bridge/script/core_side_in_multi_process.h"
 #include "android/bridge/platform/android_side.h"
-#include "android/utils/IPCStringResult.h"
+#include "android/bridge/multi_process_and_so_initializer.h"
+#include "android/utils/ipc_string_result.h"
 #include "core/layout/layout.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
-#include "core_side_in_multi_process.h"
 #include "include/WeexApiHeader.h"
-#include "android/bridge/multi_process_and_so_initializer.h"
+#include "third_party/IPC/IPCArguments.h"
+#include "third_party/IPC/IPCHandler.h"
+#include "third_party/IPC/IPCMessageJS.h"
+#include "third_party/IPC/IPCResult.h"
+#include "third_party/IPC/IPCSender.h"
+#include "third_party/IPC/Serializing/IPCSerializer.h"
 #include "wson/wson_parser.h"
 
 namespace WeexCore {

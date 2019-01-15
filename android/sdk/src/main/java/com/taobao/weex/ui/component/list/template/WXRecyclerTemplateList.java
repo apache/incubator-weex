@@ -81,6 +81,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -290,6 +291,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
+                getScrollStartEndHelper().onScrollStateChanged(newState);
                 List<OnWXScrollListener> listeners = getInstance().getWXScrollListeners();
                 if (listeners != null && listeners.size() > 0) {
                     for (OnWXScrollListener listener : listeners) {
@@ -933,6 +935,8 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         if (mColumnCount <= 0 && mLayoutType != TYPE_LINEAR_LAYOUT) {
             Map<String, String> ext = new ArrayMap<>();
             ext.put("componentType", getComponentType());
+            ext.put("attribute", getAttrs().toString());
+            ext.put("stackTrace", Arrays.toString(Thread.currentThread().getStackTrace()));
             WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
                 WXErrorCode.WX_RENDER_ERR_LIST_INVALID_COLUMN_COUNT, "columnCount",
                 String.format(Locale.ENGLISH,
@@ -1613,7 +1617,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 }
             }
         } catch (Exception e) {
-            WXLogUtils.d(TAG + " onLoadMore : ", e);
+            if (WXEnvironment.isApkDebugable()){
+                WXLogUtils.d(TAG + " onLoadMore : ", e);
+            }
         }
     }
 

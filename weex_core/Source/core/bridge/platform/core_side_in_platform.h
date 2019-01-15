@@ -97,7 +97,7 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
                           long callback_id) override;
   int CreateInstance(const char *instanceId, const char *func,
                      const char *script, int script_length, const char *opts, const char *initData,
-                     const char *extendsApi, const char* render_strategy) override;
+                     const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params, const char* render_strategy) override;
   std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char *instanceId,
                                const char *script) override;
   int DestroyInstance(const char *instanceId) override;

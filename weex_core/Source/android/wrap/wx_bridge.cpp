@@ -19,23 +19,25 @@
 
 #include "android/wrap/wx_bridge.h"
 #include <fstream>
-#include "core/data_render/common_error.h"
-#include "android/base/jni_type.h"
-#include "android/base/jni/jbytearray_ref.h"
+
 #include "android/base/string/string_utils.h"
 #include "android/bridge/platform/android_bridge.h"
 #include "android/bridge/platform/android_bridge_in_multi_process.h"
 #include "android/bridge/platform/android_bridge_in_multi_so.h"
 #include "android/bridge/script_bridge_in_multi_process.h"
 #include "android/bridge/script_bridge_in_multi_so.h"
-#include "android/jniprebuild/jniheader/WXBridge_jni.h"
 #include "android/utils/cache_utils.h"
 #include "android/utils/params_utils.h"
 #include "android/utils/so_utils.h"
 #include "android/wrap/hash_set.h"
 #include "android/wrap/wx_js_object.h"
 #include "android/wrap/wx_map.h"
-#include "base/LogDefines.h"
+#include "base/android/jni_type.h"
+#include "base/android/jni/jbytearray_ref.h"
+#include "base/android/jniprebuild/jniheader/WXBridge_jni.h"
+#include "base/log_defines.h"
+#include "core/data_render/common_error.h"
+#include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/config/core_environment.h"
 #include "core/layout/layout.h"
 #include "core/layout/measure_func_adapter_impl_android.h"
@@ -274,8 +276,6 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   // If parse init params error, return false
   if (params_vector.empty()) return false;
   // Set project mode
-
-
   WeexCoreManager::Instance()->set_project_mode(
           WeexCoreManager::ProjectMode::MULTI_PROCESS);
 
@@ -319,7 +319,6 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
 //      !WeexCoreManager::Instance()->script_bridge()->is_passable()) {
 //    return false;
 //  }
-
 
   // for environment
   bridge->core_side()->SetPlatform(
@@ -512,6 +511,10 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
           env, env->GetObjectArrayElement(args, 5))
           .Get()));
   auto japi = arg4->GetData(env);
+  auto extraOptionString = base::android::ScopedLocalJavaRef<jstring>(
+          env, getJsonData(env, args, 6));
+
+
   ScopedJStringUTF8 scoped_id(env, instanceId);
   ScopedJStringUTF8 scoped_func(env, function);
   ScopedJStringUTF8 scoped_opts(env, opts.Get());
@@ -519,6 +522,25 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
   ScopedJStringUTF8 scoped_api(env, static_cast<jstring>(japi.Get()));
   ScopedJStringUTF8 scoped_render_strategy(
       env, static_cast<jstring>(render_strategy->GetData(env).Release()));
+
+  ScopedJStringUTF8 scoped_extra_option(env, extraOptionString.Get());
+  const std::string input = scoped_extra_option.getChars();
+  std::vector<INIT_FRAMEWORK_PARAMS*> params;
+  if(input.length() > 0) {
+    std::string err;
+
+    const json11::Json &json = json11::Json::parse(input, err);
+    const std::map<std::string, json11::Json> &data = json.object_items();
+    auto it = data.begin();
+
+    while (it != data.end()) {
+      INIT_FRAMEWORK_PARAMS *param = nullptr;
+      const std::string &string = it->second.string_value();
+      param = WeexCore::genInitFrameworkParams(it->first.c_str(),it->second.string_value().c_str());
+      params.push_back(param);
+      it++;
+    }
+  }
 
   // If strategy is DATA_RENDER_BINARY, jscript is a jbyteArray, otherwise jstring
   // TODO use better way
@@ -530,7 +552,7 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
         ->core_side()
         ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
                          byte_array.getBytes(), byte_array.length(), scoped_opts.getChars(),
-                         scoped_init_data.getChars(), scoped_api.getChars(),
+                         scoped_init_data.getChars(), scoped_api.getChars(), params,
                          scoped_render_strategy.getChars());
   } else {
     ScopedJStringUTF8 scoped_script(env, static_cast<jstring>(jscript.Get()));
@@ -540,10 +562,9 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
         ->CreateInstance(scoped_id.getChars(), scoped_func.getChars(),
                          scoped_script.getChars(), strlen(scoped_script.getChars()),
                          scoped_opts.getChars(),
-                         scoped_init_data.getChars(), scoped_api.getChars(),
+                         scoped_init_data.getChars(), scoped_api.getChars(), params,
                          scoped_render_strategy.getChars());
   }
-
 }
 
 static jint DestoryInstance(JNIEnv* env, jobject jcaller, jstring instanceId,
@@ -582,7 +603,9 @@ static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
 }
 
 static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
-                                      jstring instanceId, jstring ref, jstring type, jstring data) {
+                                      jstring instanceId, jstring ref,
+                                      jstring type, jstring data,
+                                      jstring domChanges) {
   if (instanceId == NULL || ref == NULL || type == NULL || data == NULL) {
     return;
   }
@@ -591,10 +614,12 @@ static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
   ScopedJStringUTF8 refChar(env, ref);
   ScopedJStringUTF8 typeChar(env, type);
   ScopedJStringUTF8 dataChar(env, data);
+  ScopedJStringUTF8 domChangesChar(env, domChanges);
 
   try {
     weex::core::data_render::VNodeRenderManager::GetInstance()->FireEvent(
-        idChar.getChars(), refChar.getChars(), typeChar.getChars(), dataChar.getChars()
+        idChar.getChars(), refChar.getChars(), typeChar.getChars(),
+        dataChar.getChars(), domChangesChar.getChars()
     );
   } catch (std::exception &e) {
     auto error = static_cast<weex::core::data_render::Error *>(&e);
@@ -749,13 +774,13 @@ int WXBridge::UpdateStyle(
 }
 
 int WXBridge::Layout(JNIEnv* env, const char* page_id, const char* ref, int top,
-                     int bottom, int left, int right, int height, int width,
+                     int bottom, int left, int right, int height, int width, bool isRTL,
                      int index) {
   auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
   auto jRef = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(ref));
 
   return Java_WXBridge_callLayout(env, jni_object(), jPageId.Get(), jRef.Get(), top, bottom,
-                                  left, right, height, width, index);
+                                  left, right, height, width, isRTL, index);
 }
 
 int WXBridge::AddElement(JNIEnv* env, const char* page_id,
@@ -1047,7 +1072,6 @@ void WXBridge::ReportNativeInitStatus(JNIEnv* env, const char* statusCode,
   Java_WXBridge_reportNativeInitStatus(env, jni_object(), jni_status_code.Get(),
                                        jni_error_msg.Get());
 }
-
 
 void WXBridge::OnReceivedResult(JNIEnv *env, long callback_id,
                                 std::unique_ptr<WeexJSResult>& result) {

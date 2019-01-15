@@ -52,7 +52,7 @@ do {\
 
 #define WX_FREE_FLIST(_ppFree, _count) \
 do {\
-    for(int i = 0; i < _count; i++){\
+    for(int i = 0; i < (_count); i++){\
         if(*(_ppFree + i ) != 0) {\
             free(*(_ppFree + i));\
         }\
@@ -80,6 +80,13 @@ do {\
         default: { [_invocation setArgument:&_obj atIndex:(idx) + 2]; *(_ppFree + idx) = 0; break;}\
     }\
 }while(0)
+
+#define WXPointEqualToPoint __WXPointEqualToPoint
+CG_INLINE bool
+__WXPointEqualToPoint(CGPoint point1, CGPoint point2)
+{
+    return fabs (point1.x - point2.x) < 0.00001 && fabs (point1.y - point2.y) < 0.00001;
+}
 
 #ifdef __cplusplus
 extern "C" {
@@ -484,12 +491,6 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
  *
  */
 + (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict;
-
-+ (void)setUnregisterFontWhenCollision:(BOOL)value;
-
-+ (void)setUseJSCApiForCreateInstance:(BOOL)value;
-
-+ (BOOL)useJSCApiForCreateInstance;
 
 + (void)setEnableRTLLayoutDirection:(BOOL)value;
 

@@ -30,6 +30,9 @@
 #import "WXComponent+Layout.h"
 
 @interface WXEditComponent()
+{
+    CGFloat _upriseOffset; // additional space when edit is lifted by keyboard
+}
 
 //@property (nonatomic, strong) WXTextInputView *inputView;
 @property (nonatomic, strong) WXDatePickerManager *datePickerManager;
@@ -102,11 +105,18 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         _clickEvent = NO;
         _keyboardEvent = NO;
         _keyboardHidden = YES;
+        _textAlignForStyle = NSTextAlignmentNatural;
         // handle attributes
         _autofocus = [attributes[@"autofocus"] boolValue];
         _disabled = [attributes[@"disabled"] boolValue];
         _value = [WXConvert NSString:attributes[@"value"]]?:@"";
         _placeholderString = [WXConvert NSString:attributes[@"placeholder"]]?:@"";
+        _upriseOffset = 20; // 20 for better appearance
+        
+        if (attributes[@"upriseOffset"]) {
+            _upriseOffset = [WXConvert CGFloat:attributes[@"upriseOffset"]];
+        }
+        
         if(attributes[@"type"]) {
             _inputType = [WXConvert NSString:attributes[@"type"]];
             _attr = attributes;
@@ -176,7 +186,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     [self setAutofocus:_autofocus];
     [self setTextFont];
     [self setPlaceholderAttributedString];
-    [self setTextAlignment:_textAlignForStyle];
+    [self setTextAlignment];
     [self setTextColor:_colorForStyle];
     [self setText:_value];
     [self setEnabled:!_disabled];
@@ -212,6 +222,10 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)layoutDirectionDidChanged:(BOOL)isRTL {
+    [self setTextAlignment];
 }
 
 -(void)focus
@@ -287,6 +301,14 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 
 -(void)setTextColor:(UIColor *)color
 {
+}
+
+- (void)setTextAlignment {
+    if ([self isDirectionRTL] && _textAlignForStyle == NSTextAlignmentNatural) {
+        [self setTextAlignment:NSTextAlignmentRight];
+    } else {
+        [self setTextAlignment:_textAlignForStyle];
+    }
 }
 
 -(void)setTextAlignment:(NSTextAlignment)textAlignForStyle
@@ -446,6 +468,9 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     } else {
         _rows = 2;
         [self setRows:_rows];
+    }
+    if (attributes[@"upriseOffset"]) {
+        _upriseOffset = [WXConvert CGFloat:attributes[@"upriseOffset"]];
     }
 }
 
@@ -689,7 +714,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     CGRect rootViewFrame = rootView.frame;
     CGRect inputFrame = [self.view.superview convertRect:self.view.frame toView:rootView];
     if (movedUp) {
-        CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height) + 20;
+        CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height) + _upriseOffset;
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
@@ -925,7 +950,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     }
     
     if (_keyboardEvent) {
-        [self fireEvent:@"keyboard" params:@{ @"isShow": @YES, @"keyboardSize": @{@"width": @(end.size.width), @"height": @(end.size.height)} }];
+        [self fireEvent:@"keyboard" params:@{ @"isShow": @YES, @"keyboardSize": @(end.size.height / self.weexInstance.pixelScaleFactor) }];
     }
     
     _keyboardHidden = NO;

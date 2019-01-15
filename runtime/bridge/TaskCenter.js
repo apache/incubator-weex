@@ -151,7 +151,8 @@ export function init () {
     updateStyle: global.callUpdateStyle,
 
     addEvent: global.callAddEvent,
-    removeEvent: global.callRemoveEvent
+    removeEvent: global.callRemoveEvent,
+    __updateComponentData: global.__updateComponentData
   }
   const proto = TaskCenter.prototype
 

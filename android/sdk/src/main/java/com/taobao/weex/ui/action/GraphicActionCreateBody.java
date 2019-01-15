@@ -56,7 +56,6 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
     if (instance.getContext() == null) {
       return;
     }
-    instance.getExceptionRecorder().setBeginRender(true);
 
     BasicComponentData basicComponentData = new BasicComponentData(getRef(), mComponentType, null);
     component = createComponent(instance, null, basicComponentData);

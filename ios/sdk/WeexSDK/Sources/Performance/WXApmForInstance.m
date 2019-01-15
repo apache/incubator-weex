@@ -29,6 +29,7 @@
 #import "WXSDKError.h"
 #import "WXExceptionUtils.h"
 #import "WXSDKInstance_performance.h"
+#import "WXAnalyzerCenter+Transfer.h"
 
 
 #pragma mark - const static string
@@ -56,6 +57,8 @@ NSString* const KEY_PAGE_PROPERTIES_RENDER_TYPE = @"wxRenderType";
 NSString* const KEY_PAGE_STAGES_START = @"wxRecordStart";
 NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_START  = @"wxStartDownLoadBundle";
 NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_END  = @"wxEndDownLoadBundle";
+NSString* const KEY_PAGE_STAGES_CUSTOM_PREPROCESS_START  = @"wxCustomPreprocessStart";
+NSString* const KEY_PAGE_STAGES_CUSTOM_PREPROCESS_END  = @"wxCustomPreprocessEnd";
 NSString* const KEY_PAGE_STAGES_RENDER_ORGIGIN  = @"wxRenderTimeOrigin";
 NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_START  = @"wxStartLoadBundle";
 NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_END  = @"wxEndLoadBundle";
@@ -147,7 +150,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) onEvent:(NSString *)name withValue:(id)value
 {
-    if (nil == _apmProtocolInstance) {
+    if (nil == _apmProtocolInstance || _isEnd) {
         return;
     }
     [self.apmProtocolInstance onEvent:name withValue:value];
@@ -155,7 +158,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) onStage:(NSString *)name
 {
-    if (nil == _apmProtocolInstance || _isEnd) {
+    if(_isEnd){
         return;
     }
     [self onStageWithTime:name time:[WXUtility getUnixFixTimeMillis]];
@@ -163,7 +166,14 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) onStageWithTime:(NSString*)name time:(long)unixTime
 {
-    if (nil == _apmProtocolInstance || _isEnd) {
+    if(_isEnd){
+        return;
+    }
+    if ([WXAnalyzerCenter isOpen]) {
+        [WXAnalyzerCenter transferPerformance:self.instanceId withType:@"stage" andKey:name andValue:@(unixTime)];
+    }
+
+    if (nil == _apmProtocolInstance) {
         return;
     }
     if ([KEY_PAGE_STAGES_DOWN_BUNDLE_START isEqualToString:name]) {
@@ -194,17 +204,33 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) setProperty:(NSString *)name withValue:(id)value
 {
-    if (nil == _apmProtocolInstance || _isEnd) {
+    if(_isEnd){
         return;
     }
+    
+    if ([WXAnalyzerCenter isOpen]) {
+        [WXAnalyzerCenter transferPerformance:self.instanceId withType:@"properties" andKey:name andValue:value];
+    }
+    
+    if (nil == _apmProtocolInstance) {
+        return;
+    }
+   
     [self.apmProtocolInstance addProperty:name withValue:value];
 }
 
 - (void) setStatistic:(NSString *)name withValue:(double)value
 {
-    if (nil == _apmProtocolInstance || _isEnd) {
+    if(_isEnd){
         return;
     }
+    if ([WXAnalyzerCenter isOpen]) {
+        [WXAnalyzerCenter transferPerformance:self.instanceId withType:@"stats" andKey:name andValue:@(value)];
+    }
+    if (nil == _apmProtocolInstance) {
+        return;
+    }
+  
     [self.apmProtocolInstance addStatistic:name withValue:value];
 }
 
@@ -212,18 +238,22 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) startRecord:(NSString*) instanceId
 {
-    if (nil == _apmProtocolInstance || _isRecord) {
+    if (_isRecord || ![self _shouldRecordInfo]) {
         return;
     }
+  
+    _isRecord = YES;
+    _instanceId = instanceId;
+    
+    if (nil != _apmProtocolInstance) {
+        [self.apmProtocolInstance onStart:instanceId topic:WEEX_PAGE_TOPIC];
+    }
+    [self onStage:KEY_PAGE_STAGES_START];
     WXSDKInstance* instance = [WXSDKManager instanceForID:instanceId];
     if (nil == instance) {
         return;
     }
-    
-    _isRecord = YES;
 
-    
-    [self.apmProtocolInstance onStart:instance.instanceId topic:WEEX_PAGE_TOPIC];
     for (NSString* key in instance.continerInfo) {
         id value = [instance.continerInfo objectForKey:key];
         [self setProperty:key withValue:value];
@@ -236,7 +266,9 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     [self setProperty:KEY_PROPERTIES_ERROR_CODE withValue:VALUE_ERROR_CODE_DEFAULT];
     [self setProperty:KEY_PAGE_PROPERTIES_JSLIB_VERSION withValue:[WXAppConfiguration JSFrameworkVersion]?:@"unknownJSFrameworkVersion"];
     [self setProperty:KEY_PAGE_PROPERTIES_WEEX_VERSION withValue:WX_SDK_VERSION];
-    [self setStatistic:KEY_PAGE_STATS_BODY_RATIO withValue:self.wxPageRatio];
+    if (self.pageRatio >0) {
+        [self setStatistic:KEY_PAGE_STATS_BODY_RATIO withValue:self.pageRatio];
+    }
     
     //for apm protocl
     //iOS/Android we default recycle img when imgView disapper form screen
@@ -244,34 +276,26 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     [self updateDiffStats:KEY_PAGE_STATS_IMG_UN_RECYCLE_NUM withDiffValue:0];
 }
 
-- (void) endRecord;
+- (void) endRecord
 {
-    if (nil == _apmProtocolInstance || _isEnd) {
+    if (_isEnd) {
         return;
     }
     _isEnd = YES;
-    WXSDKInstance* instance = [WXSDKManager instanceForID:self.instanceId];
-    if (!_hasRecordInteractionTime && nil!= instance.performance && instance.performance.lastRealInteractionTime > 0) {
-        [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:instance.performance.lastRealInteractionTime];
-        _hasRecordInteractionTime = YES;
-    }
-    
     [self onStage:KEY_PAGE_STAGES_DESTROY];
-    [self.apmProtocolInstance onEnd];
-    [self _checkScreenEmptyAndReport];
+    if (nil != _apmProtocolInstance) {
+         [self.apmProtocolInstance onEnd];
+    }
 }
 
 - (void) updateFSDiffStats:(NSString *)name withDiffValue:(double)diff
 {
-    if (nil == _apmProtocolInstance || _isFSEnd) {
-        return;
-    }
     [self updateDiffStats:name withDiffValue:diff];
 }
 
 - (void) updateDiffStats:(NSString *)name withDiffValue:(double)diff
 {
-    if (nil == _apmProtocolInstance) {
+    if (![self _shouldRecordInfo]) {
         return;
     }
     __weak typeof(self) weakSelf = self;
@@ -286,7 +310,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) updateMaxStats:(NSString *)name curMaxValue:(double)currentValue
 {
-    if (nil == _apmProtocolInstance) {
+    if (![self _shouldRecordInfo]) {
         return;
     }
     __weak typeof(self) weakSelf = self;
@@ -305,7 +329,8 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 - (void) updateExtInfoFromResponseHeader:(NSDictionary*) extInfo
 {
     _responseHeader = extInfo;
-    if (nil == _apmProtocolInstance || nil == extInfo) {
+    
+    if (![self _shouldRecordInfo] || nil == extInfo) {
         return;
     }
     
@@ -330,7 +355,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) actionNetRequest
 {
-    if (nil == _apmProtocolInstance) {
+    if (![self _shouldRecordInfo]) {
         return;
     }
     if (!self.isFSEnd) {
@@ -341,7 +366,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) actionNetRequestResult:(bool)succeed withErrorCode:(NSString*)errorCode
 {
-    if (nil == _apmProtocolInstance) {
+    if (![self _shouldRecordInfo]) {
         return;
     }
     if (succeed) {
@@ -355,7 +380,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) actionImgLoad
 {
-    if (nil == _apmProtocolInstance) {
+    if (![self _shouldRecordInfo]) {
         return;
     }
     [self updateDiffStats:KEY_PAGE_STATS_IMG_LOAD_NUM withDiffValue:1];
@@ -363,7 +388,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 - (void) actionImgLoadResult:(bool)succeed withErrorCode:(NSString*)errorCode
 {
-    if (nil == _apmProtocolInstance) {
+    if (![self _shouldRecordInfo]) {
         return;
     }
     if (succeed) {
@@ -371,6 +396,14 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     } else {
         [self updateDiffStats:KEY_PAGE_STATS_IMG_LOAD_FAIL_NUM withDiffValue:1];
     }
+}
+
+- (BOOL) _shouldRecordInfo
+{
+    if (_isEnd) {
+        return NO;
+    }
+    return self.apmProtocolInstance != nil || [WXAnalyzerCenter isOpen];
 }
 
 - (void) recordErrorMsg:(WXJSExceptionInfo *)exception

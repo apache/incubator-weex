@@ -90,7 +90,7 @@ function getFrameworkType (id) {
 }
 
 function createInstanceContext (id, options = {}, data) {
-  const weex = new WeexInstance(id, options)
+  const weex = new WeexInstance(id, options, data)
 
   const bundleType = options.bundleType || 'Vue'
   instanceTypeMap[id] = bundleType

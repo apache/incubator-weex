@@ -26,6 +26,8 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
@@ -313,7 +315,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     }
     WXSDKInstance instance = getInstance();
     if (null != instance){
-      instance.getExceptionRecorder().hasAddView.set(true);
+      instance.getApmForInstance().hasAddView = true;
     }
   }
 
@@ -329,7 +331,12 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       getInstance().removeFixedView(child.getHostView());
     } else if (getRealView() != null) {
       if (!child.isVirtualComponent()) {
-        getRealView().removeView(child.getHostView());
+        ViewParent parent = child.getHostView().getParent();
+        if(parent != null && parent instanceof  ViewGroup){
+          ((ViewGroup) parent).removeView(child.getHostView());
+        }else{
+          getRealView().removeView(child.getHostView());
+        }
       } else {
         child.removeVirtualComponent();
       }
@@ -579,20 +586,22 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
           mBoxShadowHost = new BoxShadowHost(getContext());
           WXViewUtils.setBackGround(mBoxShadowHost, null, this);
 
-          CSSShorthand padding = this.getPadding();
-          CSSShorthand border = this.getBorder();
-
-          int left = (int) (padding.get(CSSShorthand.EDGE.LEFT) + border.get(CSSShorthand.EDGE.LEFT));
-          int top = (int) (padding.get(CSSShorthand.EDGE.TOP) + border.get(CSSShorthand.EDGE.TOP));
-          int right = (int) (padding.get(CSSShorthand.EDGE.RIGHT) + border.get(CSSShorthand.EDGE.RIGHT));
-          int bottom = (int) (padding.get(CSSShorthand.EDGE.BOTTOM) + border.get(CSSShorthand.EDGE.BOTTOM));
-
-          ViewGroup.MarginLayoutParams layoutParams = new ViewGroup.MarginLayoutParams(hostView.getLayoutParams()) ;
-          this.setMarginsSupportRTL(layoutParams, -left, -top, -right, -bottom);
-          mBoxShadowHost.setLayoutParams(layoutParams);
-
           hostView.addView(mBoxShadowHost);
         }
+
+        CSSShorthand padding = this.getPadding();
+        CSSShorthand border = this.getBorder();
+
+        int left = (int) (padding.get(CSSShorthand.EDGE.LEFT) + border.get(CSSShorthand.EDGE.LEFT));
+        int top = (int) (padding.get(CSSShorthand.EDGE.TOP) + border.get(CSSShorthand.EDGE.TOP));
+        int right = (int) (padding.get(CSSShorthand.EDGE.RIGHT) + border.get(CSSShorthand.EDGE.RIGHT));
+        int bottom = (int) (padding.get(CSSShorthand.EDGE.BOTTOM) + border.get(CSSShorthand.EDGE.BOTTOM));
+
+        ViewGroup.MarginLayoutParams layoutParams = new ViewGroup.MarginLayoutParams(hostView.getLayoutParams()) ;
+        this.setMarginsSupportRTL(layoutParams, -left, -top, -right, -bottom);
+
+        mBoxShadowHost.setLayoutParams(layoutParams);
+        
         hostView.removeView(mBoxShadowHost);
         hostView.addView(mBoxShadowHost);
         return mBoxShadowHost;

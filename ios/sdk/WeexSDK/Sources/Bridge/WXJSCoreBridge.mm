@@ -30,7 +30,6 @@
 #import "JSValue+Weex.h"
 #import "WXSDKManager.h"
 #import "WXExtendCallNativeManager.h"
-#import "WXTracingManager.h"
 #import "WXExceptionUtils.h"
 #import "WXBridgeContext.h"
 #import "WXMonitor.h"
@@ -38,6 +37,7 @@
 #import "WXAppMonitorProtocol.h"
 #import "JSContext+Weex.h"
 #import "WXCoreBridge.h"
+#import "WXAnalyzerCenter.h"
 
 #import <dlfcn.h>
 
@@ -79,6 +79,10 @@
 - (void)dealloc
 {
     _jsContext.instanceId = nil;
+    __block JSContext* theContext = _jsContext;
+    WXPerformBlockOnBridgeThread(^{
+        theContext = nil; // release the context in js thread to avoid main-thread deadlock
+    });
 }
 
 - (void)setJSContext:(JSContext *)context
@@ -151,6 +155,21 @@
     }
 }
 
+- (void)registerCallUpdateComponentData:(WXJSCallUpdateComponentData)callUpdateComponentData;
+{
+    id callUpdateComponentDataBlock = ^(JSValue *instanceId, JSValue *cid, JSValue *data, JSValue *ifCallback) {
+        NSString *instanceIdString = [instanceId toString];
+        NSString *componentId = [cid toString];
+        NSDictionary* jsonData = [data toDictionary];
+        NSString* dataString = [WXUtility JSONString:jsonData];
+        WXLogDebug(@"CallUpdateComponentData...%@, %@, %@", instanceIdString, componentId, jsonData);
+
+        return [JSValue valueWithInt32:(int32_t)callUpdateComponentData(instanceIdString, componentId, dataString) inContext:[JSContext currentContext]];
+    };
+
+    _jsContext[@"__updateComponentData"] = callUpdateComponentDataBlock;
+}
+
 - (void)registerCallAddElement:(WXJSCallAddElement)callAddElement
 {
     id callAddElementBlock = ^(JSValue *instanceId, JSValue *ref, JSValue *element, JSValue *index, JSValue *ifCallback) {
@@ -159,8 +178,9 @@
         NSDictionary *componentData = [element toDictionary];
         NSString *parentRef = [ref toString];
         NSInteger insertIndex = [[index toNumber] integerValue];
-        WXLogDebug(@"callAddElement...%@, %@, %@, %ld", instanceIdString, parentRef, componentData, (long)insertIndex);
-        
+        if (WXAnalyzerCenter.isInteractionLogOpen) {
+            WXLogDebug(@"wxInteractionAnalyzer : [jsengin][addElementStart],%@,%@",instanceIdString,componentData[@"ref"]);
+        }
         return [JSValue valueWithInt32:(int32_t)callAddElement(instanceIdString, parentRef, componentData, insertIndex) inContext:[JSContext currentContext]];
     };
     
@@ -317,7 +337,6 @@
         
         NSInvocation *invocation = callNativeModuleBlock(instanceIdString, moduleNameString, methodNameString, argsArray, optionsDic);
         JSValue *returnValue = [JSValue wx_valueWithReturnValueFromInvocation:invocation inContext:[JSContext currentContext]];
-        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:nil className:nil name:moduleNameString phase:WXTracingInstant functionName:methodNameString options:nil];
         return returnValue;
     };
 }
@@ -422,10 +441,6 @@
     
     _jsContext[@"clearTimeoutWeex"] = ^(JSValue *ret) {
         [weakSelf triggerClearTimeout:[ret toString]];
-    };
-    
-    _jsContext[@"extendCallNative"] = ^(JSValue *value ) {
-        return [weakSelf extendCallNative:[value toDictionary]];
     };
 }
 
@@ -539,14 +554,6 @@
     if([_timers containsObject:ret]){
         [_timers removeObject:ret];
     }
-}
-
--(id)extendCallNative:(NSDictionary *)dict
-{
-    if(dict){
-        return [WXExtendCallNativeManager sendExtendCallNativeEvent:dict];
-    }
-    return @(-1);
 }
 
 @end

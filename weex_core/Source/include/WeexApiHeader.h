@@ -28,7 +28,7 @@
 #include <map>
 #ifdef OS_ANDROID
 #include <jni.h>
-#include "IPC/IPCResult.h"
+#include "third_party/IPC/IPCResult.h"
 #endif
 
 namespace WeexCore {
@@ -153,6 +153,8 @@ typedef std::unique_ptr<WeexJSResult> (*FuncCallDispatchMessageSync)(
 
 typedef void
 (*FuncOnReceivedResult)(long callback_id, std::unique_ptr<WeexJSResult>& result);
+typedef void
+(*FuncUpdateComponentData)(const char* page_id, const char* cid, const char* json_data);
 
 
 typedef struct FunctionsExposedByCore {
@@ -182,6 +184,7 @@ typedef struct FunctionsExposedByCore {
     FuncCallDIspatchMessage funcCallDIspatchMessage;
     FuncCallDispatchMessageSync funcCallDispatchMessageSync;
     FuncOnReceivedResult  funcOnReceivedResult;
+    FuncUpdateComponentData funcUpdateComponentData;
 } FunctionsExposedByCore;
 
 typedef void (*FuncCallSetJSVersion)(const char* version);
@@ -284,7 +287,7 @@ typedef void(*FuncExeJSWithResultId)(const char *instanceId, const char *nameSpa
                                            std::vector<VALUE_WITH_TYPE *> &params, long callback_id);
 
 typedef int (*FuncCreateInstance)(const char *instanceId, const char *func, const char *script, const char *opts,
-                                  const char *initData, const char *extendsApi);
+                                  const char *initData, const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params);
 
 typedef std::unique_ptr<WeexJSResult> (*FuncExeJSOnInstance)(const char *instanceId, const char *script);
 

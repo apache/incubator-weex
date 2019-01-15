@@ -1,0 +1,4 @@
+{
+    global: serverMain;CallT3dFunc; CallGCanvasFun;ExchangeJSBridgeFunctions;ExchangePlatformBridgeFunctions;
+    local: *;
+};

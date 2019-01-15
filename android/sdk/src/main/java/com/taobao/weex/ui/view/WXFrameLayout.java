@@ -117,7 +117,13 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
     } catch (Throwable e) {
       if (getComponent() != null) {
         notifyLayerOverFlow();
-        reportLayerOverFlowError();
+        if (null != getComponent()){
+          WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(getComponent().getInstanceId());
+          if (null != instance && null != instance.getApmForInstance() &&!instance.getApmForInstance().hasReportLayerOverDraw){
+            instance.getApmForInstance().hasReportLayerOverDraw = true;
+            reportLayerOverFlowError();
+          }
+        }
       }
       WXLogUtils.e("Layer overflow limit error", WXLogUtils.getStackTrace(e));
     }

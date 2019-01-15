@@ -90,7 +90,7 @@ namespace WeexCore
         
         int Layout(const char* pageId, const char* ref,
                        float top, float bottom, float left, float right,
-                       float height, float width, int index) override;
+                       float height, float width, bool isRTL, int index) override;
         
         int UpdateStyle(const char* pageId, const char* ref,
                             std::vector<std::pair<std::string, std::string>> *style,
@@ -173,6 +173,8 @@ namespace WeexCore
 
 + (void)removeRenderObjectFromMap:(NSString*)pageId object:(void*)object;
 
++ (void)callUpdateComponentData:(NSString*)pageId componentId:(NSString*)componentId jsonData:(NSString*)jsonData;
+
 + (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index;
 
 + (void)callCreateBody:(NSString*)pageId data:(NSDictionary*)data;
@@ -195,13 +197,14 @@ namespace WeexCore
 
 + (void)callUpdateFinish:(NSString*)pageId;
 
-+ (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args;
++ (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args domChanges:(NSDictionary *)domChanges;
 
 + (void)registerModules:(NSDictionary *)modules;
 
 + (void)registerComponentAffineType:(NSString *)type asType:(NSString *)baseType;
 
 + (BOOL)isComponentAffineType:(NSString *)type asType:(NSString *)baseType;
++ (void)registerCoreEnv:(NSString*)key withValue:(NSString*)value;
 
 @end
 

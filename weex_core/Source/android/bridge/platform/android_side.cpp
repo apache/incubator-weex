@@ -18,12 +18,9 @@
  */
 
 #include "android/bridge/platform/android_side.h"
-#include "IPC/IPCResult.h"
-#include "android/base/jni/android_jni.h"
-#include "android/base/jni/jbytearray_ref.h"
-#include "android/base/jni_type.h"
+
 #include "android/base/string/string_utils.h"
-#include "android/utils/IPCStringResult.h"
+#include "android/utils/ipc_string_result.h"
 #include "android/utils/cache_utils.h"
 #include "android/utils/params_utils.h"
 #include "android/wrap/hash_set.h"
@@ -31,10 +28,14 @@
 #include "android/wrap/wml_bridge.h"
 #include "android/wrap/wx_js_object.h"
 #include "android/wrap/wx_map.h"
-#include "base/LogDefines.h"
+#include "base/android/jni/android_jni.h"
+#include "base/android/jni/jbytearray_ref.h"
+#include "base/android/jni_type.h"
+#include "base/log_defines.h"
 #include "core/layout/layout.h"
 #include "core/layout/measure_func_adapter.h"
 #include "core/manager/weex_core_manager.h"
+#include "third_party/IPC/IPCResult.h"
 
 namespace WeexCore {
 
@@ -73,17 +74,25 @@ void AndroidSide::InvokeLayoutAfter(const char *page_id, long render_ptr,
 
 void AndroidSide::SetJSVersion(const char *version) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
   wx_bridge_->SetJSFrmVersion(env, version);
 }
 
 void AndroidSide::ReportException(const char *page_id, const char *func,
                                   const char *exception_string) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
   wx_bridge_->ReportException(env, page_id, func, exception_string);
 }
 
 void AndroidSide::ReportServerCrash(const char *instance_id) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
 
   std::string crash_file;
   crash_file.assign("/crash_dump.log");
@@ -93,12 +102,18 @@ void AndroidSide::ReportServerCrash(const char *instance_id) {
 void AndroidSide::ReportNativeInitStatus(const char *status_code,
                                          const char *error_msg) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
   wx_bridge_->ReportNativeInitStatus(env, status_code, error_msg);
 }
 
 int AndroidSide::CallNative(const char *page_id, const char *task,
                             const char *callback) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = wx_bridge_->CallNative(env, page_id, task, callback);
   if (flag == -1) {
     LOGE("instance destroy JFM must stop callNative");
@@ -110,12 +125,15 @@ std::unique_ptr<ValueWithType> AndroidSide::CallNativeModule(
     const char *page_id, const char *module, const char *method,
     const char *arguments, int arguments_length, const char *options,
     int options_length) {
+  std::unique_ptr<ValueWithType> ipc_result(new ValueWithType());
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return ipc_result;
+
   auto result =
       wx_bridge_->CallNativeModule(env, page_id, module, method, arguments,
                                    arguments_length, options, options_length);
 
-  std::unique_ptr<ValueWithType> ipc_result(new ValueWithType());
   ipc_result->type = ParamsType::INT32;
   ipc_result->value.int32Value = -1;
   if (result.IsNull()) {
@@ -159,17 +177,26 @@ void AndroidSide::CallNativeComponent(const char *page_id, const char *ref,
                                       int arguments_length, const char *options,
                                       int options_length) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
   wx_bridge_->CallNativeComponent(env, page_id, ref, method, arguments,
                                   arguments_length, options, options_length);
 }
 
 void AndroidSide::SetTimeout(const char *callback_id, const char *time) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
   wx_bridge_->SetTimeout(env, callback_id, time);
 }
 
 void AndroidSide::NativeLog(const char *str_array) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
   LogUtils::NativeLog(env, str_array);
 }
 
@@ -177,6 +204,9 @@ int AndroidSide::UpdateFinish(const char *page_id, const char *task,
                               int taskLen, const char *callback,
                               int callbackLen) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = wx_bridge_->UpdateFinish(env, page_id, task, callback);
   if (flag == -1) {
     LOGE("instance destroy JFM must stop callUpdateFinish");
@@ -187,6 +217,9 @@ int AndroidSide::UpdateFinish(const char *page_id, const char *task,
 int AndroidSide::RefreshFinish(const char *page_id, const char *task,
                                const char *callback) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = wx_bridge_->RefreshFinish(env, page_id, task, callback);
 
   if (flag == -1) {
@@ -198,6 +231,9 @@ int AndroidSide::RefreshFinish(const char *page_id, const char *task,
 int AndroidSide::AddEvent(const char *page_id, const char *ref,
                           const char *event) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = wx_bridge_->AddEvent(env, page_id, ref, event);
   if (flag == -1) {
     LOGE("instance destroy JFM must stop callAddEvent");
@@ -208,6 +244,9 @@ int AndroidSide::AddEvent(const char *page_id, const char *ref,
 int AndroidSide::RemoveEvent(const char *page_id, const char *ref,
                              const char *event) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = wx_bridge_->RemoveEvent(env, page_id, ref, event);
   if (flag == -1) {
     LOGE("instance destroy JFM must stop callRemoveElement");
@@ -224,6 +263,9 @@ int AndroidSide::CreateBody(const char *page_id, const char *component_type,
                             const WXCorePadding &paddings,
                             const WXCoreBorderWidth &borders) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag =
       wx_bridge_->CreateBody(env, page_id, component_type, ref, styles,
                              attributes, events, margins, paddings, borders);
@@ -242,6 +284,9 @@ int AndroidSide::AddElement(const char *page_id, const char *component_type,
                             const WXCorePadding &paddings,
                             const WXCoreBorderWidth &borders, bool willLayout) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = wx_bridge_->AddElement(env, page_id, component_type, ref, index,
                                     parentRef, styles, attributes, events,
                                     margins, paddings, borders, willLayout);
@@ -254,11 +299,14 @@ int AndroidSide::AddElement(const char *page_id, const char *component_type,
 
 int AndroidSide::Layout(const char *page_id, const char *ref, float top,
                         float bottom, float left, float right, float height,
-                        float width, int index) {
+                        float width, bool isRTL, int index) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = 0;
-  wx_bridge_->Layout(env, page_id, ref, top, bottom, left, right, height, width,
-                     index);
+  wx_bridge_->Layout(env, page_id, ref, top, bottom, left, right,
+                     height, width, isRTL, index);
 
   if (flag == -1) {
     LOGE("instance destroy JFM must stop callLayout");
@@ -273,6 +321,9 @@ int AndroidSide::UpdateStyle(
     std::vector<std::pair<std::string, std::string>> *padding,
     std::vector<std::pair<std::string, std::string>> *border) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = wx_bridge_->UpdateStyle(env, page_id, ref, style, margin, padding,
                                      border);
   if (flag == -1) {
@@ -285,6 +336,9 @@ int AndroidSide::UpdateAttr(
     const char *page_id, const char *ref,
     std::vector<std::pair<std::string, std::string>> *attrs) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = 0;
   flag = wx_bridge_->UpdateAttr(env, page_id, ref, attrs);
   if (flag == -1) {
@@ -295,6 +349,9 @@ int AndroidSide::UpdateAttr(
 
 int AndroidSide::CreateFinish(const char *page_id) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = wx_bridge_->CreateFinish(env, page_id);
 
   if (flag == -1) {
@@ -305,6 +362,9 @@ int AndroidSide::CreateFinish(const char *page_id) {
 
 int AndroidSide::RenderSuccess(const char *page_id) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = wx_bridge_->RenderSuccess(env, page_id);
 
   if (flag == -1) {
@@ -315,6 +375,9 @@ int AndroidSide::RenderSuccess(const char *page_id) {
 
 int AndroidSide::RemoveElement(const char *page_id, const char *ref) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = wx_bridge_->RemoveElement(env, page_id, ref);
   if (flag == -1) {
     LOGE("instance destroy JFM must stop callRemoveElement");
@@ -325,6 +388,9 @@ int AndroidSide::RemoveElement(const char *page_id, const char *ref) {
 int AndroidSide::MoveElement(const char *page_id, const char *ref,
                              const char *parent_ref, int index) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   int flag = wx_bridge_->MoveElement(env, page_id, ref, parent_ref, index);
   if (flag == -1) {
     LOGE("instance destroy JFM must stop callRemoveElement");
@@ -345,6 +411,9 @@ int AndroidSide::HasTransitionPros(
     const char *page_id, const char *ref,
     std::vector<std::pair<std::string, std::string>> *style) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return -1;
+
   if (style == nullptr) {
     return wx_bridge_->HasTransitionPros(env, page_id, ref, *style);
   } else {
@@ -355,12 +424,18 @@ int AndroidSide::HasTransitionPros(
 
 void AndroidSide::PostMessage(const char *vm_id, const char *data, int dataLength) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
   wml_bridge_->PostMessage(env, vm_id, data, dataLength);
 }
 
 void AndroidSide::DispatchMessage(const char *client_id,
                                   const char *data, int dataLength, const char *callback, const char *vm_id) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
   wml_bridge_->DispatchMessage(env, client_id,  data, dataLength, callback, vm_id);
 }
 
@@ -368,6 +443,9 @@ std::unique_ptr<WeexJSResult> AndroidSide::DispatchMessageSync(
     const char *client_id, const char *data, int dataLength,
     const char *vm_id) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return std::unique_ptr<WeexJSResult>();
+
   auto jni_result =
       wml_bridge_->DispatchMessageSync(env, client_id, data, dataLength, vm_id);
   JByteArrayRef byte_array(env, jni_result.Get());
@@ -382,11 +460,17 @@ std::unique_ptr<WeexJSResult> AndroidSide::DispatchMessageSync(
 
 void AndroidSide::OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult>& result) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
   wx_bridge_->OnReceivedResult(env, callback_id,  result);
 }
 
 jobject AndroidSide::getMeasureFunc(const char *pageId, jlong renderObjectPtr) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return nullptr;
+
   return wx_bridge_->GetMeasureFunc(env, pageId, renderObjectPtr).Release();
 }
 }  // namespace WeexCore

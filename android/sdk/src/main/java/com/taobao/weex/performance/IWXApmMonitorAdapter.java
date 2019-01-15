@@ -78,4 +78,5 @@ public interface IWXApmMonitorAdapter {
 
     void onDisappear();
 
+    String parseReportUrl(String originUrl);
 }

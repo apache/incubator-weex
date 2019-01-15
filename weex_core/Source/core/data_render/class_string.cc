@@ -17,17 +17,18 @@
  * under the License.
  */
 
+#include "core/data_render/class_string.h"
 #include <stdlib.h>
 #include <regex>
 #include <algorithm>
-#include "core/data_render/class_string.h"
+
+#include "base/log_defines.h"
 #include "core/data_render/class.h"
 #include "core/data_render/class_array.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/table.h"
 #include "core/data_render/string_table.h"
-#include <base/LogDefines.h>
 
 namespace weex {
 namespace core {
@@ -131,8 +132,8 @@ static Value replaceAll(ExecState *exec_state) {
         std::string oldstr = CStringValue(oldValue);
         std::string newstr = CStringValue(newValue);
         std::string dststr = replace_all(srcstr, oldstr, newstr);
-        ret = exec_state->string_table()->StringFromUTF8(dststr);
-
+        ret = Value(exec_state->string_table()->StringFromUTF8(dststr));
+        
     } while (0);
 
     return ret;
@@ -160,7 +161,7 @@ static Value replace(ExecState *exec_state) {
 
           std::string oldstr = CStringValue(oldValue);
           std::string dststr = replace_normal(srcstr, oldstr, newstr);
-          ret = exec_state->string_table()->StringFromUTF8(dststr);
+          ret = Value(exec_state->string_table()->StringFromUTF8(dststr));
         } else if (IsClassInstance(oldValue)){
           ClassInstance* instance = to_regex_inst(exec_state,oldValue);
           Value* reg = GetClassMember(instance, "_reg");
@@ -178,7 +179,7 @@ static Value replace(ExecState *exec_state) {
           std::regex express(reg_str, type);
 
           std::string dststr = std::regex_replace(srcstr, express, newstr,std::regex_constants::format_first_only);
-          ret = exec_state->string_table()->StringFromUTF8(dststr);
+          ret = Value(exec_state->string_table()->StringFromUTF8(dststr));
         } else{
           throw VMExecError("old caller isn't a string or regex");
         }
@@ -221,7 +222,7 @@ static Value split(ExecState *exec_state) {
             split_string<std::vector<std::string>>(src, split_array, delim);
             Array *array = ValueTo<Array>(&ret);
             for (int i = 0; i < split_array.size(); i++) {
-                Value string_value = exec_state->string_table()->StringFromUTF8(split_array[i]);
+                Value string_value(exec_state->string_table()->StringFromUTF8(split_array[i]));
                 array->items.push_back(string_value);
             }
         } else if(IsClassInstance(split)){
@@ -239,7 +240,7 @@ static Value split(ExecState *exec_state) {
 
             Array *array = ValueTo<Array>(&ret);
             for(auto st: ret_vec){
-                Value string_value = exec_state->string_table()->StringFromUTF8(st);
+                Value string_value(exec_state->string_table()->StringFromUTF8(st));
                 array->items.push_back(string_value);
             }
         } else {
@@ -273,7 +274,7 @@ static Value trim(ExecState* exec_state) {
     std::string src = CStringValue(string);
     trim(src);
 
-    Value string_value = exec_state->string_table()->StringFromUTF8(src);
+    Value string_value(exec_state->string_table()->StringFromUTF8(src));
     return string_value;
 }
 
@@ -342,7 +343,7 @@ Value encodeURIComponent(ExecState *exec_state) {
         dst = uri;
         free(uri);
     }
-    return exec_state->string_table()->StringFromUTF8(dst);
+    return Value(exec_state->string_table()->StringFromUTF8(dst));
 }
     
 std::string utf8chr(int cp)
@@ -468,9 +469,9 @@ Value search(ExecState* exec_state) {
         std::smatch match;
         bool succ  = std::regex_search(test_str,match,express);
         if (succ){
-            ret = static_cast<int64_t>(match.position(0));
+            ret = Value(static_cast<int64_t>(match.position(0)));
         } else{
-            ret = -1;
+            ret = Value(-1);
         }
     } else {
         throw VMExecError("split caller isn't a string or regex");
@@ -521,7 +522,7 @@ Value match(ExecState* exec_state) {
             std::string::const_iterator iterEnd = test_str.end();
             bool succ = false;
             while (std::regex_search(iterStart,iterEnd,match,express)){
-                arr->items.push_back(exec_state->string_table()->StringFromUTF8(match[0]));
+                arr->items.push_back(Value(exec_state->string_table()->StringFromUTF8(match[0])));
                 iterStart = match[0].second;
                 succ = true;
             }
@@ -535,7 +536,7 @@ Value match(ExecState* exec_state) {
 
             if (succ){
                 for (size_t i = 0; i < match.size(); ++i){
-                    arr->items.push_back(exec_state->string_table()->StringFromUTF8(match[i]));
+                    arr->items.push_back(Value(exec_state->string_table()->StringFromUTF8(match[i])));
                 }
             } else {
                 ret = Value();

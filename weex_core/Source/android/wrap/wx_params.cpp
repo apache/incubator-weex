@@ -19,11 +19,11 @@
 
 #include "android/wrap/wx_params.h"
 #include "android/base/string/scoped_jstring_utf8.h"
-#include "android/jniprebuild/jniheader/WXParams_jni.h"
+#include "base/android/jniprebuild/jniheader/WXParams_jni.h"
 
 namespace WeexCore {
 
-bool WXParams::RegisterJNIUtils(JNIEnv* env) { RegisterNativesImpl(env); }
+bool WXParams::RegisterJNIUtils(JNIEnv* env) { return RegisterNativesImpl(env); }
 
 WXParams::WXParams(JNIEnv* env, jobject jni_object) { Reset(env, jni_object); }
 WXParams::~WXParams() {}

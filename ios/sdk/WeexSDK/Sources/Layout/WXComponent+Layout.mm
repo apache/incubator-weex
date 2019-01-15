@@ -33,8 +33,6 @@ bool flexIsUndefined(float value) {
     return isnan(value);
 }
 
-
-
 @implementation WXComponent (Layout)
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -147,26 +145,35 @@ bool flexIsUndefined(float value) {
                 }
             }
             
-            [self _resetNativeBorderRadius];
+            [strongSelf _resetNativeBorderRadius];
+            
+            if ([WXUtility enableRTLLayoutDirection]) {
+                if ([strongSelf isDirectionRTL] != strongSelf -> _isLastLayoutDirectionRTL) {
+                    strongSelf -> _isLastLayoutDirectionRTL = [strongSelf isDirectionRTL];
+                    [strongSelf _layoutDirectionDidChanged:[strongSelf isDirectionRTL]];
+                }
+            }
             
             if (strongSelf->_transform) {
                 [strongSelf->_transform applyTransformForView:strongSelf.view];
             }
             
-            [self _adjustForRTL];
+            [strongSelf _adjustForRTL];
             
             if (strongSelf->_backgroundImage) {
                 [strongSelf setGradientLayer];
             }
+            
             [strongSelf setNeedsDisplay];
         }];
-    } else {
+    } else if ([WXUtility enableRTLLayoutDirection]) {
         // if frame is not change, we still need check was layoutDirection changed
         if ([self isDirectionRTL] != _isLastLayoutDirectionRTL) {
-            _isLastLayoutDirectionRTL = [self isDirectionRTL];
+            self -> _isLastLayoutDirectionRTL = [self isDirectionRTL];
             __weak typeof(self) weakSelf = self;
             [self.weexInstance.componentManager _addUITask:^{
                 __strong typeof(weakSelf) strongSelf = weakSelf;
+                [strongSelf _layoutDirectionDidChanged:[strongSelf isDirectionRTL]];
                 if (strongSelf->_transform) {
                     [strongSelf->_transform applyTransformForView:strongSelf.view];
                 }
@@ -174,6 +181,15 @@ bool flexIsUndefined(float value) {
             }];
         }
     }
+}
+
+- (void)_layoutDirectionDidChanged:(BOOL)isRTL {
+    WXAssertMainThread();
+    [self layoutDirectionDidChanged:isRTL];
+}
+
+- (void)layoutDirectionDidChanged:(BOOL)isRTL {
+    
 }
 
 - (void)_layoutDidFinish
@@ -386,6 +402,92 @@ bool flexIsUndefined(float value) {
         return convertValue;
     }
     return defaultValue;
+}
+
+- (float)getCssStyleValueForKey:(NSString *)key
+{
+    /*
+     *      width, height, min-width, min-height, max-width, max-height,
+     *      margin-(left/right/top/bottom)
+     *      padding-(left/right/top/bottom)
+     *      border-(left/right/top/bottom)-width
+     *      left, right, top, bottom
+     *      flex-grow
+     */
+    WXAssert(_flexCssNode != nullptr, @"Css node is null.");
+    if (_flexCssNode == nullptr) {
+        return NAN;
+    }
+    
+    std::string ckey = [key UTF8String];
+    if (ckey == "width") return _flexCssNode->getStyleWidth();
+    if (ckey == "height") return _flexCssNode->getStyleHeight();
+    if (ckey == "min-width") return _flexCssNode->getMinWidth();
+    if (ckey == "min-height") return _flexCssNode->getMinHeight();
+    if (ckey == "max-width") return _flexCssNode->getMaxWidth();
+    if (ckey == "max-height") return _flexCssNode->getMaxHeight();
+    if (ckey == "margin-left") return _flexCssNode->getMarginLeft();
+    if (ckey == "margin-right") return _flexCssNode->getMarginRight();
+    if (ckey == "margin-top") return _flexCssNode->getMarginTop();
+    if (ckey == "margin-bottom") return _flexCssNode->getMarginBottom();
+    if (ckey == "padding-left") return _flexCssNode->getPaddingLeft();
+    if (ckey == "padding-right") return _flexCssNode->getPaddingRight();
+    if (ckey == "padding-top") return _flexCssNode->getPaddingTop();
+    if (ckey == "padding-bottom") return _flexCssNode->getPaddingBottom();
+    if (ckey == "border-left-width") return _flexCssNode->getBorderWidthLeft();
+    if (ckey == "border-right-width") return _flexCssNode->getBorderWidthRight();
+    if (ckey == "border-top-width") return _flexCssNode->getBorderWidthTop();
+    if (ckey == "border-bottom-width") return _flexCssNode->getBorderWidthBottom();
+    if (ckey == "left") return _flexCssNode->getStylePositionLeft();
+    if (ckey == "right") return _flexCssNode->getStylePositionRight();
+    if (ckey == "top") return _flexCssNode->getStylePositionTop();
+    if (ckey == "bottom") return _flexCssNode->getStylePositionBottom();
+    if (ckey == "flex-grow") return _flexCssNode->getFlex();
+    
+    WXAssert(NO, @"Invalid css style key %@", key);
+    return NAN;
+}
+
+- (WXCoreFlexDirection)getCssStyleFlexDirection
+{
+    WXAssert(_flexCssNode != nullptr, @"Css node is null.");
+    return _flexCssNode ? _flexCssNode->getFlexDirection() : kFlexDirectionColumn;
+}
+
+- (WXCoreFlexWrap)getCssStyleFlexWrap
+{
+    WXAssert(_flexCssNode != nullptr, @"Css node is null.");
+    return _flexCssNode ? _flexCssNode->getFlexWrap() : kNoWrap;
+}
+
+- (WXCoreJustifyContent)getCssStyleJustifyContent
+{
+    WXAssert(_flexCssNode != nullptr, @"Css node is null.");
+    return _flexCssNode ? _flexCssNode->getJustifyContent() : kJustifyFlexStart;
+}
+
+- (WXCoreAlignItems)getCssStyleAlignItems
+{
+    WXAssert(_flexCssNode != nullptr, @"Css node is null.");
+    return _flexCssNode ? _flexCssNode->getAlignItems() : kAlignItemsStretch;
+}
+
+- (WXCoreAlignSelf)getCssStyleAlignSelf
+{
+    WXAssert(_flexCssNode != nullptr, @"Css node is null.");
+    return _flexCssNode ? _flexCssNode->getAlignSelf() : kAlignSelfAuto;
+}
+
+- (WXCorePositionType)getCssStylePositionType
+{
+    WXAssert(_flexCssNode != nullptr, @"Css node is null.");
+    return _flexCssNode ? _flexCssNode->getStylePositionType() : kRelative;
+}
+
+- (WXCoreDirection)getCssDirection
+{
+    WXAssert(_flexCssNode != nullptr, @"Css node is null.");
+    return _flexCssNode ? _flexCssNode->getDirection() : WEEXCORE_CSS_DEFAULT_DIRECTION;
 }
 
 - (NSString*)convertLayoutValueToStyleValue:(NSString*)valueName
@@ -717,10 +819,8 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
 
 - (BOOL)isDirectionRTL {
     if (![WXUtility enableRTLLayoutDirection]) return NO;
-    
-    WeexCore::WXCoreDirection direction = _flexCssNode == nullptr ? WeexCore::WEEXCORE_CSS_DEFAULT_DIRECTION : _flexCssNode->getLayoutDirectionFromPathNode();
-    if (direction != WeexCore::kDirectionInherit) return direction == WeexCore::kDirectionRTL;
-    return NO;
+
+    return _isLayoutDirectionRTL;
 }
 
 - (void)_adjustForRTL {
@@ -728,7 +828,7 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
     
     if (self->_positionType == WXPositionTypeFixed) return;
     
-    if (self.supercomponent && self.supercomponent->_flexCssNode && self.supercomponent->_flexCssNode->getLayoutDirectionFromPathNode() == WeexCore::kDirectionRTL && [self.supercomponent shouldTransformSubviewsWhenRTL]) {
+    if (self.supercomponent && self.supercomponent.isDirectionRTL && [self.supercomponent shouldTransformSubviewsWhenRTL]) {
         if (_transform) {
             self.view.layer.transform = CATransform3DConcat(self.view.layer.transform, CATransform3DScale(CATransform3DIdentity, -1, 1, 1));
         } else {
@@ -746,6 +846,10 @@ static WeexCore::WXCoreSize flexCssNodeMeasure(WeexCore::WXCoreLayoutNode *node,
 // if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
 - (BOOL)shouldTransformSubviewsWhenRTL {
     return [self.view isKindOfClass:[UIScrollView class]];
+}
+
+- (void)_setIsLayoutRTL:(BOOL)isRTL {
+    _isLayoutDirectionRTL = isRTL;
 }
 
 @end

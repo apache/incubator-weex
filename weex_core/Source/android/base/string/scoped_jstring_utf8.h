@@ -19,13 +19,13 @@
 #ifndef _SCOPED_JSTRING_UTF_8_H_
 #define _SCOPED_JSTRING_UTF_8_H_
 
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <type_traits>
-#include "../base64/base64.h"
 #include <jni.h>
+
+#include "base/base64/base64.h"
 
 namespace WeexCore {
 

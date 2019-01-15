@@ -1,16 +1,16 @@
 # Weex Apache Source Release
-Weex produce SDKs to integrate to iOS/Android/Mobile web applications. This file will cover how to build Weex from source. You can either use the script we provided or manually build from source step by step.
-See `README.md` for further information about Weex Framework.
+Weex produce SDKs to integrate with iOS/Android/Mobile web applications. This file will cover how to build Weex from source. You can either use the script we provided or manually build from source step by step.
+See `README.md` for further information about the Weex Framework.
 
 Weex SDK includes 3 different SDKs to use in corresponding system/browser:
 * Android SDK
 * iOS SDK
 * [Mobile Web SDK](https://github.com/weexteam/weex-vue-render)
 
-See our [guide in our website](http://weex.apache.org/guide/integrate-to-your-app.html) to learn more about how to integrate Weex SDK to your app.
+See our [guide in our website](http://weex.apache.org/guide/integrate-to-your-app.html) to learn more about how to integrate Weex SDK into your app.
 
 ## Build Environment
-The environment required to build weex as follow:
+The environment required to build weex is:
 * Android SDK:
     * NodeJS 4.0+
     * JDK 1.6+
@@ -31,11 +31,11 @@ This article was tested in MacOSX system.
 This script will build Android and iOS SDKs:
 > `$ bash scripts/build_from_source.sh`
 
-This's may take a while. After that, you can look into `dist/`, `android/sdk/build/output/` and `ios/sdk/Products` for Web/Android/iOS SDK artifacts.
+This may take a while. After that, you can look in `dist/`, `android/sdk/build/output/` and `ios/sdk/Products` for Web/Android/iOS SDK artifacts.
 
 # Build for Platforms
 
-You can build all SDKs by one script as described above, or just build for a single platform you want step by step.
+You can build all SDKs with one script as described above, or just build for a single platform step by step.
 
 ## Build Javascript Framework
 Javascript Framework is required by native SDKs. **So this must be built first.**
@@ -54,21 +54,33 @@ Move `min` version to Native SDK folder, which will be used by native SDK build.
 > `cp packages/weex-js-framework/index.min.js android_sdk/assets/main.js`
 
 ## Build Android SDK
-Make sure you have install gradle, see more details about 'how to install gradle' in [gradle website](https://gradle.org/install).
-execute root folder of project
-> `$ gradle wrapper --gradle-version 2.14.1`
 
-Create a Gradle setting file
-> `$ echo 'include ":android_sdk"'>settings.gradle`
+check env
 
-Build the SDK
-> `$ ./gradlew :android_sdk:assemble -PasfRelease`
+- you have gradle installed, see more details about 'how to install gradle' on the [gradle website](https://gradle.org/install).
+- NDK r16  [link](https://developer.android.com/ndk/)
+- edit local.propteries (in `Android` dir)
 
-Now, you can see the artifacts under `android_sdk/build/output/`.
+	```
+	ndk.dir=/Users/{user}/Library/Android/sdk/ndk-bundle-r16
+	sdk.dir=/Users/{user}/Library/Android/sdk
+	```
+
+then do buid
+
+> cd Android/sdk
+
+> ../gradlew clean assemble
+
+
+artifacts path:
+
+` android/sdk/build/outputs/aar`
+
 You can now import the aar file to your android project.
 
 ## Build iOS SDK
 Execute command below to compile iOS SDK:
 > `$ xcodebuild -project ios_sdk/WeexSDK.xcodeproj -target WeexSDK_MTL`
 
-Then you'll found iOS library(Framework file) under `ios_sdk/Products`.
+Then you'll find the iOS library(Framework file) under `ios_sdk/Products`.

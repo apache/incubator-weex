@@ -148,7 +148,7 @@ public interface IWXBridge extends IWXObject {
   int callUpdateAttrs(String instanceId, String ref,
                       HashMap<String, String> attrs);
 
-  int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, int index);
+  int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, boolean isRTL, int index);
 
   int callCreateFinish(String instanceId);
 
@@ -197,7 +197,5 @@ public interface IWXBridge extends IWXObject {
   void setJSFrmVersion(String version);
 
   void resetWXBridge(boolean remoteDebug);
-
-  void fireEventOnDataRenderNode(String instanceId, String ref, String type, String data);
 
 }

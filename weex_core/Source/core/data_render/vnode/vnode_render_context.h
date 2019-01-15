@@ -46,6 +46,49 @@ class VNodeRenderContext {
   inline std::map<std::string, json11::Json>& style_json() {
     return style_json_;
   }
+  inline const json11::Json& script_json() {
+    return script_json_;
+  }
+  inline void set_script_json(const json11::Json& script_json) {
+      script_json_ = script_json;
+  }
+
+  inline void AddComponent(int ref, VComponent *component) {
+    vcomponent_trees_.insert({ref, component});
+  }
+
+  inline void RemoveComponent(int ref) {
+    vcomponent_trees_.erase(ref);
+  }
+
+  inline VComponent* GetComponent(int ref) {
+    auto it = vcomponent_trees_.find(ref);
+    return it != vcomponent_trees_.end() ? it->second : nullptr;
+  }
+
+  inline void RemoveVNode(const std::string& ref) {
+    auto it = vnode_trees_.find(ref);
+    if (it != vnode_trees_.end()) {
+      vnode_trees_.erase(it);
+    }
+  }
+
+  inline void AddVNode(const std::string& ref, VNode* node) {
+    if (node->IsVirtualComponent()) {
+      return;
+    }
+    auto it = vnode_trees_.find(ref);
+    if (it != vnode_trees_.end()) {
+      vnode_trees_[ref] = node;
+    } else {
+      vnode_trees_.insert({ref, node});
+    }
+  }
+
+  inline VNode* GetVNode(const std::string &ref) {
+    auto it = vnode_trees_.find(ref);
+    return it != vnode_trees_.end() ? it->second : nullptr;
+  }
 
  private:
   // node context
@@ -56,6 +99,9 @@ class VNodeRenderContext {
   // script to execute
   std::string script_;
   std::map<std::string, json11::Json> style_json_;
+  std::unordered_map<int, VComponent *> vcomponent_trees_;
+  std::unordered_map<std::string, VNode*> vnode_trees_;
+  json11::Json script_json_;
 };
 }  // namespace data_render
 }  // namespace core

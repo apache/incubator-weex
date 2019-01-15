@@ -20,9 +20,9 @@
 // Created by furture on 2018/5/15.
 //
 
-#include <core/render/node/render_object.h>
-#include <core/render/page/render_page.h>
-#include <core/render/node/factory/render_creator.h>
+#include "core/render/node/render_object.h"
+#include "core/render/page/render_page.h"
+#include "core/render/node/factory/render_creator.h"
 #include "dom_wson.h"
 #include "wson/wson.h"
 #include "wson/wson_parser.h"
@@ -67,7 +67,7 @@ namespace WeexCore {
             }else if (0 == strcmp(objectKey.c_str(), "type")) {
                 renderType = parser.nextStringUTF8(parser.nextType());
                 render = (RenderObject *) RenderCreator::GetInstance()->CreateRender(renderType, ref);
-              render->set_page_id(pageId);
+                render->set_page_id(pageId);
                 if (parent != nullptr){
                     parent->AddRenderObject(index, render);
                 }

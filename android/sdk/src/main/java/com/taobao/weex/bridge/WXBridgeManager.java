@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.bridge;
 
+import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -31,7 +33,6 @@ import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -43,12 +44,38 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.common.*;
+import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.common.IWXDebugConfig;
+import com.taobao.weex.common.WXConfig;
+import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXException;
+import com.taobao.weex.common.WXJSBridgeMsgType;
+import com.taobao.weex.common.WXJSExceptionInfo;
+import com.taobao.weex.common.WXRefreshData;
+import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.WXComponentRegistry;
-import com.taobao.weex.ui.action.*;
+import com.taobao.weex.ui.action.ActionReloadPage;
+import com.taobao.weex.ui.action.BasicGraphicAction;
+import com.taobao.weex.ui.action.GraphicActionAddElement;
+import com.taobao.weex.ui.action.GraphicActionAddEvent;
+import com.taobao.weex.ui.action.GraphicActionAppendTreeCreateFinish;
+import com.taobao.weex.ui.action.GraphicActionCreateBody;
+import com.taobao.weex.ui.action.GraphicActionCreateFinish;
+import com.taobao.weex.ui.action.GraphicActionLayout;
+import com.taobao.weex.ui.action.GraphicActionMoveElement;
+import com.taobao.weex.ui.action.GraphicActionRefreshFinish;
+import com.taobao.weex.ui.action.GraphicActionRemoveElement;
+import com.taobao.weex.ui.action.GraphicActionRemoveEvent;
+import com.taobao.weex.ui.action.GraphicActionRenderSuccess;
+import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
+import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
+import com.taobao.weex.ui.action.GraphicPosition;
+import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.module.WXDomModule;
 import com.taobao.weex.utils.WXExceptionUtils;
@@ -60,12 +87,12 @@ import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
@@ -82,8 +109,6 @@ import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
 
 /**
  * Manager class for communication between JavaScript and Android.
@@ -162,9 +187,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   // add for cloud setting, default value is false.
   // weexcore use single process or not
   private static boolean isUseSingleProcess = false;
-  private static boolean isRebootJscWhenWhiteScreen = false;
-  public final static long DEFAULT_REBOOT_JSC_TIMEOUT = 5000;
-  private static long rebootJscTimeout = DEFAULT_REBOOT_JSC_TIMEOUT;
 
   public enum BundType {
     Vue,
@@ -225,21 +247,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     return mBridgeManager;
   }
-  public  boolean isIsRebootJscWhenWhiteScreen() {
-    return isRebootJscWhenWhiteScreen;
-  }
 
-  public  void setIsRebootJscWhenWhiteScreen(boolean _isRebootJscWhenWhiteScreen) {
-    isRebootJscWhenWhiteScreen = _isRebootJscWhenWhiteScreen;
-  }
-
-  public  long getRebootJscTimeout() {
-    return rebootJscTimeout;
-  }
-
-  public  void setRebootJscTimeout(long timeout) {
-    rebootJscTimeout = timeout;
-  }
   public void setUseSingleProcess(final boolean flag) {
     if (flag != isUseSingleProcess) {
       isUseSingleProcess = flag;
@@ -352,7 +360,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXServiceManager.execAllCacheJsService();
       } else {
         WXLogUtils.e("WXBridgeManager", "WXEnvironment.sApplication is null, skip init Inspector");
-        WXLogUtils.w("WXBridgeManager", new Throwable("WXEnvironment.sApplication is null when init Inspector"));
       }
     }
     if (remoteDebug && mWxDebugProxy != null) {
@@ -429,9 +436,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       ext.put("methodName", methodStr);
       ext.put("args", args.toJSONString());
       WXLogUtils.e("[WXBridgeManager] callNative : numberFormatException when parsing string to numbers in args", ext.toString());
-      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-          WXErrorCode.WX_KEY_EXCEPTION_INVOKE_BRIDGE, "callNative",
-              WXLogUtils.getStackTrace(e) , ext);
       return null;
     }
   }
@@ -591,9 +595,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     } catch (Exception e) {
       String err = "[WXBridgeManager] callNativeModule exception: " + WXLogUtils.getStackTrace(e);
       WXLogUtils.e(err);
-      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_BRIDGE, "callNativeModule",
-              err, null);
     }
 
     return null;
@@ -618,7 +619,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     try {
       WXDomModule dom = WXModuleManager.getDomModule(instanceId);
-      dom.invokeMethod(componentRef, method, arguments);
+      if (null != dom){
+        dom.invokeMethod(componentRef, method, arguments);
+      }else {
+        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+        if(null == instance || !instance.isDestroy()){
+          WXLogUtils.e("WXBridgeManager","callNativeComponent exception :null == dom ,method:"+method);
+        }
+      }
+
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callNativeComponent exception: ", e);
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
@@ -1154,7 +1163,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
     if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER ||
             instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
-      fireEventOnDataRenderNode(instanceId, ref, type, data);
+      fireEventOnDataRenderNode(instanceId, ref, type, data, domChanges);
     } else {
       if(callback == null) {
         addJSEventTask(METHOD_FIRE_EVENT, instanceId, params, ref, type, data, domChanges);
@@ -1166,7 +1175,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   private void fireEventOnDataRenderNode(final String instanceId, final String ref,
-                                         final String type, final Map<String, Object> data) {
+                                         final String type, final Map<String, Object> data, final Map<String, Object> domChanges) {
     mJSHandler.postDelayed(WXThread.secure(new Runnable() {
       @Override
       public void run() {
@@ -1177,7 +1186,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             WXLogUtils.d("fireEventOnDataRenderNode >>>> instanceId:" + instanceId
                 + ", data:" + data);
           }
-          mWXBridge.fireEventOnDataRenderNode(instanceId, ref,type,JSON.toJSONString(data));
+          if (mWXBridge instanceof WXBridge) {
+            ((WXBridge) mWXBridge).fireEventOnDataRenderNode(instanceId, ref, type,
+                (data == null || data.isEmpty()) ? "{}" : JSON.toJSONString(data),
+                (domChanges == null || domChanges.isEmpty()) ? "{}" : JSON.toJSONString(domChanges));
+          }
           WXLogUtils.renderPerformanceLog("fireEventOnDataRenderNode", System.currentTimeMillis() - start);
         } catch (Throwable e) {
           String err = "[WXBridgeManager] fireEventOnDataRenderNode " + WXLogUtils.getStackTrace(e);
@@ -1292,7 +1305,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               refreshData.data == null ? "{}" : refreshData.data);
       WXJSObject[] args = {instanceIdObj, dataObj};
       mWXBridge.refreshInstance(instanceId, null, METHOD_REFRESH_INSTANCE, args);
-      WXLogUtils.renderPerformanceLog("invokeRefreshInstance", System.currentTimeMillis() - start);
     } catch (Throwable e) {
       String err = "[WXBridgeManager] invokeRefreshInstance " + WXLogUtils.getStackTrace(e);
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
@@ -1335,7 +1347,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                              final Map<String, Object> options, final String data) {
     final WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance == null) {
-      WXLogUtils.e("WXBridgeManager", "createInstance failed, SDKInstance is not exist");
+      WXLogUtils.e("WXBridgeManager", "createInstance failed, SDKInstance does not exist");
       return;
     }
     if (TextUtils.isEmpty(instanceId) || template == null || template.isEmpty() || mJSHandler == null) {
@@ -1443,6 +1455,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXJSObject instanceObj = new WXJSObject(WXJSObject.String,
                 template.getContent());
 
+        Object extraOption = null;
+        if(options != null && options.containsKey("extraOption")) {
+           extraOption = options.get("extraOption");
+           options.remove("extraOption");
+        }
+
+        WXJSObject extraOptionObj = new WXJSObject(WXJSObject.JSON,
+                extraOption == null ? "{}"
+                        : WXJsonUtils.fromObjectToJSONString(extraOption));
+
+
         WXJSObject optionsObj = new WXJSObject(WXJSObject.JSON,
                 options == null ? "{}"
                         : WXJsonUtils.fromObjectToJSONString(options));
@@ -1480,7 +1503,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         }
 
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
-                dataObj, apiObj, renderStrategy};
+                dataObj, apiObj, renderStrategy, extraOptionObj};
 
         instance.setTemplate(template.getContent());
 
@@ -1571,33 +1594,22 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         }
       }
       if (temp != null) {
-        if (temp.startsWith("// { \"framework\": \"Vue\" }") ||
-                temp.startsWith("// { \"framework\": \"vue\" }") ||
-                temp.startsWith("// {\"framework\" : \"Vue\"}") ||
-                temp.startsWith("// {\"framework\" : \"vue\"}")) {
-          return BundType.Vue;
-        } else if (temp.startsWith("// { \"framework\": \"Rax\" }") ||
-                temp.startsWith("// { \"framework\": \"rax\" }")
-                || temp.startsWith("// {\"framework\" : \"Rax\"}") ||
-                temp.startsWith("// {\"framework\" : \"rax\"}")) {
-          return BundType.Rax;
-        } else {
-          if (temp.length() > 500) {
-            temp = temp.substring(0, 500);
-          }
-          String strTrim = temp.replaceAll("\n","").trim();
-          if (strTrim.startsWith("// { \"framework\": \"Vue\" }") ||
-                  strTrim.startsWith("// { \"framework\": \"vue\" }") ||
-                  strTrim.startsWith("// {\"framework\" : \"Vue\"}") ||
-                  strTrim.startsWith("// {\"framework\" : \"vue\"}")) {
-            return BundType.Vue;
-          } else if (strTrim.startsWith("// { \"framework\": \"Rax\" }") ||
-                  strTrim.startsWith("// { \"framework\": \"rax\" }")
-                  || strTrim.startsWith("// {\"framework\" : \"Rax\"}") ||
-                  strTrim.startsWith("// {\"framework\" : \"rax\"}")) {
-            return BundType.Rax;
-          }
+        final String FRAMEWORK="framework", VUE="vue", RAX="rax";
 
+        // Find the first line that starts with '//' and convert it to json
+        int bundleTypeStart = temp.indexOf("//");
+        int bundleTypeEnd = temp.indexOf("\n", bundleTypeStart);
+        JSONObject bundleType = JSONObject.parseObject(
+            temp.substring(bundleTypeStart+2, bundleTypeEnd));
+        String type = bundleType.getString(FRAMEWORK);
+        if(VUE.equalsIgnoreCase(type)){
+          return BundType.Vue;
+        }
+        else if(RAX.equalsIgnoreCase(type)){
+          return BundType.Rax;
+        }
+        else{
+          // '//{ "framework": "Vue"}' is not found.
           String regEx = "(use)(\\s+)(weex:vue)";
           Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
           if (pattern.matcher(temp).find()) {
@@ -1853,7 +1865,19 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
       try {
         if (WXSDKManager.getInstance().getWXStatisticsListener() != null) {
+          long start = System.currentTimeMillis();
           WXSDKManager.getInstance().getWXStatisticsListener().onJsFrameworkStart();
+          WXEnvironment.sJSFMStartListenerTime = System.currentTimeMillis() - start;
+          try {
+            IWXUserTrackAdapter adapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
+            if (null != adapter){
+              Map<String,Serializable> params = new HashMap<>(1);
+              params.put("time",String.valueOf(WXEnvironment.sJSFMStartListenerTime));
+              adapter.commit(WXEnvironment.getApplication(),"sJSFMStartListener",IWXUserTrackAdapter.COUNTER,null,params);
+            }
+          }catch (Exception e){
+            e.printStackTrace();
+          }
         }
 
         long start = System.currentTimeMillis();
@@ -1876,9 +1900,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         // extends initFramework
         if (mWXBridge.initFrameworkEnv(framework, assembleDefaultOptions(), crashFile, pieSupport) == INIT_FRAMEWORK_OK) {
           WXEnvironment.sJSLibInitTime = System.currentTimeMillis() - start;
-          WXLogUtils.renderPerformanceLog("initFramework", WXEnvironment.sJSLibInitTime);
           WXEnvironment.sSDKInitTime = System.currentTimeMillis() - WXEnvironment.sSDKInitStart;
-          WXLogUtils.renderPerformanceLog("SDKInitTime", WXEnvironment.sSDKInitTime);
           setJSFrameworkInit(true);
 
           if (WXSDKManager.getInstance().getWXStatisticsListener() != null) {
@@ -1914,8 +1936,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       @Override
       public void run() {
         WXEnvironment.sComponentsAndModulesReadyTime = System.currentTimeMillis() - WXEnvironment.sSDKInitStart;
-        WXLogUtils.renderPerformanceLog("ComponentModulesReadyTime", WXEnvironment.sComponentsAndModulesReadyTime);
-        WXLogUtils.d("ComponentModulesReadyTime " + WXEnvironment.sComponentsAndModulesReadyTime);
       }
     });
   }
@@ -2222,10 +2242,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXSDKInstance instance = null;
     WXErrorCode reportErrorCode = WXErrorCode.WX_ERR_JS_EXECUTE;
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
+      instance.setHasException(true);
       exception +=   "\n getTemplateInfo==" +instance.getTemplateInfo();//add network header info
       if (METHOD_CREATE_INSTANCE.equals(function) || !instance.isContentMd5Match()) {
         try {
-          if (isJSFrameworkInit() && reInitCount > 1 && !instance.isNeedReLoad()) {
+          if (isJSFrameworkInit() && (reInitCount > 1 && reInitCount < 10) && !instance.isNeedReLoad()) {
             new ActionReloadPage(instanceId, true).executeAction();
             instance.setNeedLoad(true);
             return;
@@ -2251,9 +2272,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           e.printStackTrace();
         }
       }
-      if (METHOD_CREATE_INSTANCE.equals(function) && !instance.getExceptionRecorder().hasAddView.get()){
+      if (METHOD_CREATE_INSTANCE.equals(function) && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE;
-      }else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function) && !instance.getExceptionRecorder().hasAddView.get()){
+      }else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function) && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT;
       }
       instance.onJSException(reportErrorCode.getErrorCode(), function, exception);
@@ -2453,7 +2474,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                             HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                             float[] margins, float[] paddings, float[] borders,boolean willLayout) {
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(componentType) || TextUtils.isEmpty(ref)) {
-      WXLogUtils.d("[WXBridgeManager] call callAddElement arguments is null");
+      if (WXEnvironment.isApkDebugable()){
+        WXLogUtils.d("[WXBridgeManager] call callAddElement arguments is null");
+      }
       WXExceptionUtils.commitCriticalExceptionRT(pageId,
               WXErrorCode.WX_RENDER_ERR_BRIDGE_ARG_NULL, "callAddElement",
               "arguments is empty, INSTANCE_RENDERING_ERROR will be set", null);
@@ -2499,7 +2522,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public int callRemoveElement(String instanceId, String ref) {
 
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref)) {
-      WXLogUtils.d("[WXBridgeManager] call callRemoveElement arguments is null");
+      if (WXEnvironment.isApkDebugable()){
+        WXLogUtils.d("[WXBridgeManager] call callRemoveElement arguments is null");
+      }
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
               WXErrorCode.WX_RENDER_ERR_BRIDGE_ARG_NULL, "callRemoveElement",
               "arguments is empty, INSTANCE_RENDERING_ERROR will be set", null);
@@ -2542,7 +2567,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public int callMoveElement(String instanceId, String ref, String parentref, int index) {
 
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref) || TextUtils.isEmpty(parentref)) {
-      WXLogUtils.d("[WXBridgeManager] call callMoveElement arguments is null");
+      if (WXEnvironment.isApkDebugable()){
+        WXLogUtils.d("[WXBridgeManager] call callMoveElement arguments is null");
+      }
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
               WXErrorCode.WX_RENDER_ERR_BRIDGE_ARG_NULL, "callMoveElement",
               "arguments is empty, INSTANCE_RENDERING_ERROR will be set", null);
@@ -2581,7 +2608,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public int callAddEvent(String instanceId, String ref, String event) {
 
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref) || TextUtils.isEmpty(event)) {
-      WXLogUtils.d("[WXBridgeManager] call callAddEvent arguments is null");
+      if (WXEnvironment.isApkDebugable()){
+        WXLogUtils.d("[WXBridgeManager] call callAddEvent arguments is null");
+      }
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
               WXErrorCode.WX_RENDER_ERR_BRIDGE_ARG_NULL, "callAddEvent",
               "arguments is empty, INSTANCE_RENDERING_ERROR will be set", null);
@@ -2620,7 +2649,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public int callRemoveEvent(String instanceId, String ref, String event) {
 
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref) || TextUtils.isEmpty(event)) {
-      WXLogUtils.d("[WXBridgeManager] call callRemoveEvent arguments is null");
+      if (WXEnvironment.isApkDebugable()){
+        WXLogUtils.d("[WXBridgeManager] call callRemoveEvent arguments is null");
+      }
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
               WXErrorCode.WX_RENDER_ERR_BRIDGE_ARG_NULL, "callRemoveEvent",
               "arguments is empty, INSTANCE_RENDERING_ERROR will be set", null);
@@ -2662,7 +2693,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                              HashMap<String, String> borders) {
 
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref)) {
-      WXLogUtils.d("[WXBridgeManager] call callUpdateStyle arguments is null");
+      if (WXEnvironment.isApkDebugable()){
+        WXLogUtils.d("[WXBridgeManager] call callUpdateStyle arguments is null");
+      }
+
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
               WXErrorCode.WX_RENDER_ERR_BRIDGE_ARG_NULL, "callUpdateStyle",
               "arguments is empty, INSTANCE_RENDERING_ERROR will be set", null);
@@ -2702,7 +2736,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public int callUpdateAttrs(String instanceId, String ref, HashMap<String, String> attrs) {
 
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref)) {
-      WXLogUtils.d("[WXBridgeManager] call callUpdateAttrs arguments is null");
+      if (WXEnvironment.isApkDebugable()){
+        WXLogUtils.d("[WXBridgeManager] call callUpdateAttrs arguments is null");
+      }
+
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
               WXErrorCode.WX_RENDER_ERR_BRIDGE_ARG_NULL, "callUpdateAttrs",
               "arguments is empty, INSTANCE_RENDERING_ERROR will be set", null);
@@ -2736,10 +2773,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width, int index) {
+  public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width, boolean isRTL, int index) {
 
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(ref)) {
-      WXLogUtils.d("[WXBridgeManager] call callLayout arguments is null");
+        if (WXEnvironment.isApkDebugable()){
+            WXLogUtils.d("[WXBridgeManager] call callLayout arguments is null");
+        }
+
       WXExceptionUtils.commitCriticalExceptionRT(pageId,
               WXErrorCode.WX_RENDER_ERR_BRIDGE_ARG_NULL, "callLayout",
               "arguments is empty, INSTANCE_RENDERING_ERROR will be set", null);
@@ -2768,6 +2808,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         GraphicPosition position = new GraphicPosition(left, top, right, bottom);
         GraphicActionAddElement addAction = instance.getInActiveAddElementAction(ref);
         if(addAction!=null) {
+          addAction.setRTL(isRTL);
           addAction.setSize(size);
           addAction.setPosition(position);
           if(!TextUtils.equals(ref, WXComponent.ROOT)) {
@@ -2777,7 +2818,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           instance.removeInActiveAddElmentAction(ref);
         }
         else {
-          final BasicGraphicAction action = new GraphicActionLayout(instance, ref, position, size);
+          final BasicGraphicAction action = new GraphicActionLayout(instance, ref, position, size, isRTL);
           WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
         }
       }

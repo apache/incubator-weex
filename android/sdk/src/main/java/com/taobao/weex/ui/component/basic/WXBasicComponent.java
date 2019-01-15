@@ -39,6 +39,7 @@ public abstract class WXBasicComponent<T extends View> {
   private String mRef;
   private GraphicPosition mLayoutPosition;
   private GraphicSize mLayoutSize;
+  private boolean mIsLayoutRTL;
   private BasicComponentData mBasicComponentData;
 
   private int mViewPortWidth = 750;
@@ -173,6 +174,14 @@ public abstract class WXBasicComponent<T extends View> {
 
   public String getRef() {
     return mRef;
+  }
+
+  public void setIsLayoutRTL(boolean isRTL) {
+    mIsLayoutRTL = isRTL;
+  }
+
+  public boolean isLayoutRTL() {
+    return mIsLayoutRTL;
   }
 
   public GraphicPosition getLayoutPosition() {

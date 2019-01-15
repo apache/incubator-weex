@@ -27,6 +27,7 @@
 #import "WXCellComponent.h"
 #import "WXImageComponent.h"
 #import "WXUtility.h"
+#import "WXAnalyzerCenter+Transfer.h"
 
 @interface WXPerformance()
 @property (nonatomic, assign) bool hasRecordFsRenderTimeByPosition;
@@ -44,7 +45,7 @@
 /** on UI thread **/
 - (void)onViewLoad:(WXComponent *)targetComponent
 {
-    if (targetComponent.hasAdd) {
+    if (targetComponent.hasAdd || targetComponent.ignoreInteraction) {
         return;
     }
     targetComponent.hasAdd = true;
@@ -68,9 +69,6 @@
 - (void) _handleRenderTime:(WXComponent*)targetComponent withModifyTime:(double)modifyTime
 {
     if (nil == targetComponent) {
-        return;
-    }
-    if (targetComponent.ignoreInteraction) {
         return;
     }
     double diff = modifyTime - self.renderTimeOrigin;
@@ -112,21 +110,16 @@
         return;
     }
     
-#ifdef DEBUG
-    WXLogDebug(@"onElementChange _-> size, count :%f,inScreen:%d, type:%@,attr:%@",
-          self.interactionAddCountRecord,
-          inScreen,
-          targetComponent.type,
-          targetComponent.attributes
-          );
-#endif
     if (!targetComponent.weexInstance.apmInstance.hasRecordFirstInterationView) {
         targetComponent.weexInstance.apmInstance.hasRecordFirstInterationView = YES;
         [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_FIRST_INTERACTION_VIEW];
     }
+    [WXAnalyzerCenter transferInteractionInfo:targetComponent];
     [targetComponent.weexInstance.apmInstance onStage:KEY_PAGE_STAGES_INTERACTION];
     self.interactionLimitAddOpCount++;
     self.interactionAddCount = self.interactionAddCountRecord;
+    [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT curMaxValue:self.interactionLimitAddOpCount];
+    [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_I_ALL_VIEW_COUNT curMaxValue:self.interactionAddCount];
     self.interactionTime = self.interactionTime < diff ? diff :self.interactionTime;
 }
 

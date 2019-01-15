@@ -56,6 +56,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
@@ -230,7 +231,7 @@ public class WXImage extends WXComponent<ImageView> {
     }
 
     if(image != null){
-      if(image.getDrawable() != null){
+      if(image.getDrawable() != null && !TextUtils.equals(mSrc, src)){
         image.setImageDrawable(null);
       }
     }
@@ -464,6 +465,11 @@ public class WXImage extends WXComponent<ImageView> {
       preImgUrlStr = currentImgUrlStr;
       if (imgHeight > 1081 && imgWidth > 721){
         instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_LARGE_IMG_COUNT,1);
+        if (WXAnalyzerDataTransfer.isOpenPerformance){
+          WXAnalyzerDataTransfer.transferPerformance(getInstanceId(),"details",WXInstanceApm.KEY_PAGE_STATS_LARGE_IMG_COUNT,
+              imgWidth+"*"+imgHeight+","+currentImgUrlStr
+              );
+        }
       }
       long imgSize = imgHeight * imgWidth;
       long viewSize = imageView.getMeasuredHeight() * imageView.getMeasuredWidth();
@@ -475,6 +481,13 @@ public class WXImage extends WXComponent<ImageView> {
       if (scaleSize >1.2 && imgSize-viewSize > 1600){
         instance.getWXPerformance().wrongImgSizeCount++;
         instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,1);
+
+        if (WXAnalyzerDataTransfer.isOpenPerformance){
+          WXAnalyzerDataTransfer.transferPerformance(getInstanceId(),"details",WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,
+              String.format("imgSize:[%d,%d],viewSize:[%d,%d],urL:%s",imgWidth,imgHeight,imageView.getMeasuredWidth(),imageView.getMeasuredHeight()
+              ,currentImgUrlStr)
+          );
+        }
       }
     }
 

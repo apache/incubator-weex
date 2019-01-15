@@ -17,15 +17,16 @@
  * under the License.
  */
 
+#include "core/data_render/exec_state_binary.h"
 #include <thread>
 #include <mutex>
-#include "core/data_render/exec_state_binary.h"
+
+#include "base/log_defines.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/vm.h"
 #include "core/data_render/exec_state.h"
 #include "third_party/json11/json11.hpp"
 #include "core/data_render/vnode/vnode_exec_env.h"
-#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {
@@ -67,6 +68,11 @@ bool ExecStateEncoder::encoding(std::string &err) {
             SectionData data(this);
             if (!data.encoding()) {
                 err = "data section encoding error";
+                break;
+            }
+            SectionScript script(this);
+            if (!script.encoding()) {
+                err = "script section encoding error";
                 break;
             }
             SectionFunction function(this, gs_op_code_bits);
@@ -157,6 +163,14 @@ bool ExecStateDecoder::decoding(std::string &err) {
                         SectionData data(this, section_length);
                         if (!data.decoding()) {
                             throw EncoderError("data section decoding error");
+                        }
+                        break;
+                    }
+                    case ExecSection::EXEC_SECTION_SCRIPT:
+                    {
+                        SectionScript script(this, section_length);
+                        if (!script.decoding()) {
+                            throw EncoderError("script section decoding error");
                         }
                         break;
                     }

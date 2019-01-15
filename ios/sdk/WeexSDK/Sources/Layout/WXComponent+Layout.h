@@ -26,11 +26,33 @@
 #ifdef __cplusplus
 #include "layout.h"
 
+typedef WeexCore::WXCoreFlexDirection WXCoreFlexDirection;
+typedef WeexCore::WXCoreFlexWrap WXCoreFlexWrap;
+typedef WeexCore::WXCoreJustifyContent WXCoreJustifyContent;
+typedef WeexCore::WXCoreAlignItems WXCoreAlignItems;
+typedef WeexCore::WXCoreAlignSelf WXCoreAlignSelf;
+typedef WeexCore::WXCorePositionType WXCorePositionType;
+typedef WeexCore::WXCoreDirection WXCoreDirection;
+
 extern "C" {
 #endif
     bool flexIsUndefined(float value);
 #ifdef __cplusplus
 }
+#endif
+
+#ifndef __cplusplus
+// Ensure that .m files can use css style enum definitions.
+#include "flex_enum.h"
+
+typedef enum WXCoreFlexDirection WXCoreFlexDirection;
+typedef enum WXCoreFlexWrap WXCoreFlexWrap;
+typedef enum WXCoreJustifyContent WXCoreJustifyContent;
+typedef enum WXCoreAlignItems WXCoreAlignItems;
+typedef enum WXCoreAlignSelf WXCoreAlignSelf;
+typedef enum WXCorePositionType WXCorePositionType;
+typedef enum WXCoreDirection WXCoreDirection;
+
 #endif
 
 @interface WXComponent ()
@@ -44,6 +66,7 @@ extern "C" {
     CGPoint _absolutePosition;
     WXPositionType _positionType;
     BOOL _isLastLayoutDirectionRTL;
+    BOOL _isLayoutDirectionRTL;
 }
 
 /**
@@ -52,8 +75,63 @@ extern "C" {
  * @warning Subclasses must not override this.
  */
 #ifdef __cplusplus
-@property(nonatomic, readonly, assign) WeexCore::WXCoreLayoutNode *flexCssNode;
+@property (nonatomic, readonly, assign) WeexCore::WXCoreLayoutNode *flexCssNode;
 #endif
+
+/**
+ * @abstract Get css style value for key. The key should be of CSS standard form.
+ *  This method is for convenience use in C/ObjC environment. And if you want to
+ *  retrieve all style values or in C++, you could use flexCssNode directly.
+ *
+ *  Thread usage:
+ *      This method should be invoked in component thread by WXPerformBlockOnComponentThread.
+ *      Note that all initWithRef methods of WXComponent and its subclasses are performed in
+ *      component thread by default. Therefore you can call this method directly in initWithRef.
+ *
+ *  Supported keys:
+ *      width, height, min-width, min-height, max-width, max-height,
+ *      margin-(left/right/top/bottom)
+ *      padding-(left/right/top/bottom)
+ *      border-(left/right/top/bottom)-width
+ *      left, right, top, bottom
+ *      flex-grow
+ */
+- (float)getCssStyleValueForKey:(NSString *)key;
+
+/**
+ * @abstract Get css style flex-direction. Thread usage the same as getCssStyleValueForKey.
+ */
+- (WXCoreFlexDirection)getCssStyleFlexDirection;
+
+/**
+ * @abstract Get css style flex-wrap. Thread usage the same as getCssStyleValueForKey.
+ */
+- (WXCoreFlexWrap)getCssStyleFlexWrap;
+
+/**
+ * @abstract Get css style justify-content. Thread usage the same as getCssStyleValueForKey.
+ */
+- (WXCoreJustifyContent)getCssStyleJustifyContent;
+
+/**
+ * @abstract Get css style align-items. Thread usage the same as getCssStyleValueForKey.
+ */
+- (WXCoreAlignItems)getCssStyleAlignItems;
+
+/**
+ * @abstract Get css style align-self. Thread usage the same as getCssStyleValueForKey.
+ */
+- (WXCoreAlignSelf)getCssStyleAlignSelf;
+
+/**
+ * @abstract Get css style position. Thread usage the same as getCssStyleValueForKey.
+ */
+- (WXCorePositionType)getCssStylePositionType;
+
+/**
+ * @abstract Get css layout direction. Thread usage the same as getCssStyleValueForKey.
+ */
+- (WXCoreDirection)getCssDirection;
 
 /**
  * @abstract Convert layout dimension value like 'left', 'width' to style value in js considering viewport and scale.
@@ -78,5 +156,7 @@ extern "C" {
 // so scrollView need tranform subviews when RTL by default
 // if your component view is not scrollView but also implement RTL layout by tranform，you need return YES
 - (BOOL)shouldTransformSubviewsWhenRTL;
+
+- (void)layoutDirectionDidChanged:(BOOL)isRTL;
 
 @end

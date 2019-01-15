@@ -175,6 +175,8 @@ public class WXPerformance {
 
   public long interactionTime;
 
+  public long interactionRealUnixTime;
+
   public int interactionViewAddCount;
 
   public int interactionViewAddLimitCount;

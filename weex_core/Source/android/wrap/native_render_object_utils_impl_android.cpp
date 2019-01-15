@@ -18,20 +18,20 @@
  */
 
 #include "native_render_object_utils_impl_android.h"
-#include <android/base/jni/android_jni.h>
-#include <android/jniprebuild/jniheader/NativeRenderObjectUtils_jni.h>
-#include <core/render/page/render_page.h>
-#include <core/render/manager/render_manager.h>
-#include <android/base/string/string_utils.h>
-#include <core/render/node/factory/render_creator.h>
-#include <core/render/node/render_object.h>
-#include <core/render/node/factory/render_type.h>
 #include <android/log.h>
-#include <core/render/node/render_list.h>
-#include <android/base/log_utils.h>
-#include <core/config/core_environment.h>
-#include <core/manager/weex_core_manager.h>
 
+#include "android/base/string/string_utils.h"
+#include "android/jniprebuild/jniheader/NativeRenderObjectUtils_jni.h"
+#include "base/android/jni/android_jni.h"
+#include "base/android/log_utils.h"
+#include "core/render/page/render_page.h"
+#include "core/render/manager/render_manager.h"
+#include "core/render/node/factory/render_creator.h"
+#include "core/render/node/render_object.h"
+#include "core/render/node/factory/render_type.h"
+#include "core/render/node/render_list.h"
+#include "core/config/core_environment.h"
+#include "core/manager/weex_core_manager.h"
 
 using namespace WeexCore;
 
@@ -79,7 +79,7 @@ static jlong CopyRenderObject(JNIEnv* env, jclass jcaller, jlong ptr){
 
 static  void showRenderObjectLayout(RenderObject *renderObject, int level){
     LOGE("RenderObject layout %s %d %p %f %f %f %f ", renderObject->type().c_str(),
-         renderObject->getStypePositionType(),
+         renderObject->getStylePositionType(),
          renderObject, renderObject->getLayoutHeight(), renderObject->getLayoutWidth(),
          renderObject->getLayoutPositionLeft(), renderObject->getLayoutPositionRight());
 
@@ -154,7 +154,7 @@ static jlong RenderObjectGetChild(JNIEnv* env, jclass jcaller,
     return convert_render_object_to_long(child);
 }
 
-static jlong RenderObjectUpdateComponent(JNIEnv* env, jclass jcaller,
+static void RenderObjectUpdateComponent(JNIEnv* env, jclass jcaller,
                                          jlong ptr,
                                          jobject component){
     RenderObject* renderObject = convert_long_to_render_object(ptr);
@@ -174,11 +174,11 @@ static void RenderObjectChildWaste(JNIEnv* env, jclass jcaller,
                                    jboolean waster){
     RenderObject* renderObject = convert_long_to_render_object(ptr);
     if(waster){
-        if(renderObject->getStypePositionType() != WXCorePositionType::kFixed){
+        if(renderObject->getStylePositionType() != WXCorePositionType::kFixed){
             renderObject->setStylePositionType(WXCorePositionType::kFixed);
         }
     }else{
-        if(renderObject->getStypePositionType() != WXCorePositionType::kRelative){
+        if(renderObject->getStylePositionType() != WXCorePositionType::kRelative){
             renderObject->setStylePositionType(WXCorePositionType::kRelative);
         }
     }

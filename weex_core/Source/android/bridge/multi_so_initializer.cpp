@@ -18,9 +18,11 @@
  */
 
 #include "multi_so_initializer.h"
-#include <android/base/log_utils.h>
-#include <android/utils/so_utils.h>
+
 #include <dlfcn.h>
+
+#include "android/utils/so_utils.h"
+#include "base/android/log_utils.h"
 
 namespace WeexCore {
 

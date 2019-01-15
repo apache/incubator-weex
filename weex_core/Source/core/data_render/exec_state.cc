@@ -92,6 +92,7 @@ void ExecState::Compile(std::string& err) {
   if (!context()->raw_json().is_null()) {
       VNodeExecEnv::ParseData(this);
       VNodeExecEnv::ParseStyle((this));
+      VNodeExecEnv::ParseScript(this);
       ParseResult result = Parser::Parse(context()->raw_json(),err);
       generator.Visit(result.expr().get(), nullptr);
   }
@@ -273,6 +274,8 @@ void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
         if (ret) {
             *ret = result;
         }
+        // back to the top of params for clear register
+        *stack_->top() = func + 1;
         stack_->reset();
         frames_.pop_back();
     }
@@ -291,6 +294,8 @@ void ExecState::CallFunction(Value *func, size_t argc, Value *ret) {
         frames_.push_back(frame);
         resetArguments(func, argc);
         vm_->RunFrame(this, frame, ret);
+        // back to the top of params for clear register
+        *stack_->top() = func + 1;
         stack_->reset();
         frames_.pop_back();
     }

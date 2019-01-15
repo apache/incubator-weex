@@ -16,14 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <algorithm>
-#include "core/data_render/class.h"
+
 #include "core/data_render/class_object.h"
+#include <algorithm>
+
+#include "base/log_defines.h"
+#include "core/data_render/class.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/table.h"
 #include "core/data_render/class_array.h"
-#include <base/LogDefines.h>
 
 namespace weex {
 namespace core {
@@ -52,7 +54,7 @@ static Value keys(ExecState *exec_state) {
             std::vector<std::string> keys = GetTableKeys(ValueTo<Table>(value));
             Array *array = ValueTo<Array>(&ret);
             for (int i = 0; i < keys.size(); i++) {
-                SetArray(array, i, exec_state->string_table()->StringFromUTF8(keys[i]));
+                SetArray(array, i, Value(exec_state->string_table()->StringFromUTF8(keys[i])));
             }
         }
         

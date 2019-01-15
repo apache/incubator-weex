@@ -17,11 +17,12 @@
  * under the License.
  */
 
-#include <math.h>
 #include "core/render/page/render_page.h"
-#include "base/TimeUtils.h"
-#include "base/ViewUtils.h"
-#include "base/LogDefines.h"
+#include <math.h>
+
+#include "base/log_defines.h"
+#include "base/time_utils.h"
+#include "core/common/view_utils.h"
 #include "core/config/core_environment.h"
 #include "core/css/constants_value.h"
 #include "core/layout/layout.h"
@@ -158,6 +159,11 @@ bool RenderPage::AddRenderObject(const std::string &parent_ref,
     return false;
   }
 
+  if (WeexCore::WXCoreEnvironment::getInstance()->isInteractionLogOpen()) {
+    LOGD("wxInteractionAnalyzer: [weexcore][addElementStart],%s,%s,%s",
+         this->page_id().c_str(),child->type().c_str(),child->ref().c_str());
+  }
+
   // add child to Render Tree
   insert_posiotn = parent->AddRenderObject(insert_posiotn, child);
   if (insert_posiotn < -1) {
@@ -168,6 +174,10 @@ bool RenderPage::AddRenderObject(const std::string &parent_ref,
   SendAddElementAction(child, parent, insert_posiotn, false);
 
   Batch();
+  if (WeexCore::WXCoreEnvironment::getInstance()->isInteractionLogOpen()) {
+    LOGD("wxInteractionAnalyzer: [weexcore][addElementEnd],%s,%s,%s",
+         this->page_id().c_str(),child->type().c_str(),child->ref().c_str());
+  }
   return true;
 }
 

@@ -72,7 +72,11 @@ public class WXLogUtils {
   }
 
   private static void log(String tag, String msg, LogLevel level){
-    if(msg != null && tag != null && sLogWatcher !=null){
+    if(TextUtils.isEmpty(msg) || TextUtils.isEmpty(tag) || level == null || TextUtils.isEmpty(level.getName())){
+      return;
+    }
+
+    if(sLogWatcher !=null){
       sLogWatcher.onLog(level.getName(), tag, msg);
     }
 

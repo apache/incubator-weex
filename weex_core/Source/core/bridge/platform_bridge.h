@@ -119,7 +119,7 @@ class PlatformBridge {
                                     long callback_id) = 0;
     virtual int CreateInstance(const char* instanceId, const char* func,
                                const char* script, int script_length, const char* opts,
-                               const char* initData, const char* extendsApi,
+                               const char* initData, const char* extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params,
                                const char* render_strategy) = 0;
     virtual std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char* instanceId,
                                          const char* script) = 0;
@@ -199,7 +199,7 @@ class PlatformBridge {
                            bool willLayout = true) = 0;
     virtual int Layout(const char* page_id, const char* ref, float top,
                        float bottom, float left, float right, float height,
-                       float width, int index) = 0;
+                       float width, bool isRTL, int index) = 0;
 
     virtual int UpdateStyle(
         const char* pageId, const char* ref,

@@ -20,13 +20,14 @@
 #include "core/bridge/script/core_side_in_script.h"
 
 #include <cstdlib>
-#include "base/LogDefines.h"
+#include "base/log_defines.h"
 #include "base/make_copyable.h"
 #include "base/thread/waitable_event.h"
+#include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #ifdef OS_ANDROID
-#include "android/jsengine/multiprocess/ExtendJSApi.h"
+#include "android/weex_extend_js_api.h"
 #endif
 
 namespace WeexCore {
@@ -468,4 +469,12 @@ void CoreSideInScript::OnReceivedResult(long callback_id,
       ->platform_side()
       ->OnReceivedResult(callback_id, result);
 }
+
+void CoreSideInScript::UpdateComponentData(const char* page_id,
+                                           const char* cid,
+                                           const char* json_data) {
+  weex::core::data_render::VNodeRenderManager::GetInstance()
+      ->UpdateComponentData(page_id, cid, json_data);
+}
+
 }  // namespace WeexCore

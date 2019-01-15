@@ -299,15 +299,21 @@
 }
 
 
-static NSDictionary *_customEnvironment;
+static NSDictionary *_customEnvironment = nil;
 + (void)setCustomEnvironment:(NSDictionary *)environment
 {
-    _customEnvironment = environment;
+    @synchronized (self) {
+        _customEnvironment = environment;
+    }
 }
 
 + (NSDictionary *)customEnvironment
 {
-    return _customEnvironment;
+    NSDictionary* result = nil;
+    @synchronized (self) {
+        result = _customEnvironment;
+    }
+    return result;
 }
 
 # pragma mark Debug

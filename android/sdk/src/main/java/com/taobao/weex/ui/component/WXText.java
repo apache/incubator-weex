@@ -208,17 +208,32 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
           Layout layout = hostView.getTextLayout();
           if (layout != null) {
             layout.getPaint().setTypeface(fontDO.getTypeface());
-            WXLogUtils.d("WXText", "Apply font family " + fontFamily + " to paint");
           } else {
-            WXLogUtils.w("WXText", "Layout not created");
+            WXLogUtils.d("WXText", "Layout not created");
           }
           WXBridgeManager
               .getInstance().markDirty(getInstanceId(), getRef(), true);
         }
-        WXLogUtils.d("WXText", "Font family " + fontFamily + " is available");
       }
     };
 
     LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).registerReceiver(mTypefaceObserver, new IntentFilter(TypefaceUtil.ACTION_TYPE_FACE_AVAILABLE));
+  }
+
+
+  @Override
+  protected void layoutDirectionDidChanged(boolean isRTL) {
+    forceRelayout();
+  }
+
+  private void forceRelayout(){
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        if(contentBoxMeasurement instanceof TextContentBoxMeasurement){
+          ((TextContentBoxMeasurement) contentBoxMeasurement).forceRelayout();
+        }
+      }
+    });
   }
 }

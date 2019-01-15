@@ -16,17 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-#include "IPC/Serializing/IPCSerializer.h"
-#include "IPC/IPCMessageJS.h"
-#include "IPC/IPCSender.h"
-#include "IPC/IPCResult.h"
-#include "IPC/Buffering/IPCBuffer.h"
-#include "IPC/IPCException.h"
-#include "android/base/log_utils.h"
 #include "core_side_in_multi_process.h"
-#include "../../../include/WeexApiHeader.h"
-#include "../../utils/params_utils.h"
+
+#include "android/base/log_utils.h"
+#include "android/utils/params_utils.h"
+#include "core_side_in_multi_process.h"
+#include "include/WeexApiHeader.h"
+#include "third_party/IPC/Serializing/IPCSerializer.h"
+#include "third_party/IPC/IPCMessageJS.h"
+#include "third_party/IPC/IPCSender.h"
+#include "third_party/IPC/IPCResult.h"
+#include "third_party/IPC/Buffering/IPCBuffer.h"
+#include "third_party/IPC/IPCException.h"
 
 namespace WeexCore {
 
@@ -572,6 +573,7 @@ namespace WeexCore {
     int CoreSideInMultiProcess::CreateInstance(const char *instanceId, const char *func,
                                            const char *script, const char *opts,
                                            const char *initData, const char *extendsApi,
+                                           std::vector<INIT_FRAMEWORK_PARAMS*>& params,
                                            const char* render_strategy) {
         try {
             std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
@@ -582,6 +584,10 @@ namespace WeexCore {
             serializer->add(opts, strlen(opts));
             serializer->add(initData, strlen(initData));
             serializer->add(extendsApi, strlen(extendsApi));
+            for (auto it = params.begin(); it != params.end(); ++it) {
+                serializer->add((*it)->type->content, (*it)->type->length);
+                serializer->add((*it)->value->content, (*it)->value->length);
+            }
 
             std::unique_ptr<IPCBuffer> buffer = serializer->finish();
             std::unique_ptr<IPCResult> result = sender_->send(buffer.get());

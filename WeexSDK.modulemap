@@ -1,0 +1,6 @@
+framework module WeexSDK {
+  umbrella header "WeexSDK.h"
+
+  export *
+  module * { export * }
+}

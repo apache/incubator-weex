@@ -19,8 +19,8 @@
 #ifndef _SCOPED_JSTRING_H_
 #define _SCOPED_JSTRING_H_
 
-#include "../base64/base64.h"
 #include <jni.h>
+#include "base/base64/base64.h"
 
 namespace WeexCore {
 

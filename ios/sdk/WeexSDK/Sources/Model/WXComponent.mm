@@ -35,7 +35,6 @@
 #import <pthread/pthread.h>
 #import "WXComponent+PseudoClassManagement.h"
 #import "WXComponent+BoxShadow.h"
-#import "WXTracingManager.h"
 #import "WXComponent+Events.h"
 #import "WXComponent+Layout.h"
 #import "WXConfigCenterProtocol.h"
@@ -147,6 +146,10 @@ static BOOL bNeedRemoveEvents = YES;
         if (attributes[@"clipRadius"])
         {
             _clipRadius = [WXConvert NSString:attributes[@"clipRadius"]];
+        }
+        
+        if (attributes[@"customEvent"]) {
+            _customEvent = [WXConvert BOOL:attributes[@"customEvent"]];
         }
         
 #ifdef DEBUG
@@ -595,6 +598,7 @@ static BOOL bNeedRemoveEvents = YES;
     pthread_mutex_unlock(&_propertyMutex);
     
     if (subcomponent->_positionType == WXPositionTypeFixed) {
+        subcomponent.ignoreInteraction = YES;
         [self.weexInstance.componentManager addFixedComponent:subcomponent];
     }
     
@@ -680,6 +684,7 @@ static BOOL bNeedRemoveEvents = YES;
         [_transition _handleTransitionWithStyles:[styles mutableCopy] resetStyles:resetStyles target:self];
     } else {
         styles = [self parseStyles:styles];
+        [self resetPseudoClassStyles:resetStyles];
         [self _updateCSSNodeStyles:styles];
         [self _resetCSSNodeStyles:resetStyles];
     }

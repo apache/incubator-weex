@@ -150,11 +150,14 @@ public class IndexActivity extends AbstractWeexActivity {
   @Override
   public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    if (requestCode == CAMERA_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-      startActivity(new Intent(this, CaptureActivity.class));
-    } else if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-    } else {
-      Toast.makeText(this, "request camara permission fail!", Toast.LENGTH_SHORT).show();
+    if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        startActivity(new Intent(this, CaptureActivity.class));
+      } else {
+        Toast.makeText(this, "request camara permission fail!", Toast.LENGTH_SHORT).show();
+      }
+    } else if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE
+            && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
     }
   }
 

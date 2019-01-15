@@ -23,7 +23,7 @@
 #include <memory>
 #include "base/common.h"
 #include "include/WeexApiHeader.h"
-#include "base/LogDefines.h"
+#include "base/log_defines.h"
 
 namespace WeexCore {
 class ScriptBridge {
@@ -85,6 +85,10 @@ class ScriptBridge {
     virtual void OnReceivedResult(long callback_id,
                                   std::unique_ptr<WeexJSResult> &result) = 0;
 
+    virtual void UpdateComponentData(const char* page_id,
+                                     const char* cid,
+                                     const char* json_data) = 0;
+
     inline ScriptBridge *bridge() { return bridge_; }
 
    private:
@@ -137,7 +141,7 @@ class ScriptBridge {
     virtual int CreateInstance(const char *instanceId, const char *func,
                                const char *script, const char *opts,
                                const char *initData,
-                               const char *extendsApi) = 0;
+                               const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params) = 0;
 
     virtual std::unique_ptr<WeexJSResult>  ExecJSOnInstance(const char *instanceId,
                                    const char *script) = 0;

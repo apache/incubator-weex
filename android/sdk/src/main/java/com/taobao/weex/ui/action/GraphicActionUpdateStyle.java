@@ -35,6 +35,7 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
   private Map<String, Object> mStyle;
   private WXComponent component;
   private boolean mIsCausedByPesudo;
+  private boolean mIsBorderSet;
 
   public GraphicActionUpdateStyle(WXSDKInstance instance, String ref,
                                   Map<String, Object> style,
@@ -77,6 +78,7 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     }
 
     if (null != borders) {
+      mIsBorderSet = true;
       component.setBorders(borders);
     }
   }
@@ -114,23 +116,26 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     }
 
     if (null != borders) {
+      mIsBorderSet = true;
       component.addShorthand(borders);
     }
   }
 
   @Override
   public void executeAction() {
-    if (component == null || mStyle == null) {
-      return;
-    }
-    if(component.getTransition() != null){
-      component.getTransition().updateTranstionParams(mStyle);
-      if(component.getTransition().hasTransitionProperty(mStyle)){
-        component.getTransition().startTransition(mStyle);
+    if (component == null) return;
+    if (mStyle != null) {
+      if(component.getTransition() != null){
+        component.getTransition().updateTranstionParams(mStyle);
+        if(component.getTransition().hasTransitionProperty(mStyle)){
+          component.getTransition().startTransition(mStyle);
+        }
+      } else {
+        component.setTransition(WXTransition.fromMap(mStyle, component));
+        component.updateStyles(mStyle);
       }
-    } else {
-      component.setTransition(WXTransition.fromMap(mStyle, component));
-      component.updateStyles(mStyle);
+    } else if (mIsBorderSet) {
+      component.updateStyles(component);
     }
   }
 }

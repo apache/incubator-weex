@@ -17,15 +17,16 @@
  * under the License.
  */
 
-#include <math.h>
-#include "core/data_render/object.h"
 #include "core/data_render/exec_state_section.h"
+#include <math.h>
+
+#include "base/log_defines.h"
+#include "core/data_render/object.h"
 #include "core/data_render/exec_state_binary.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/table.h"
-#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {
@@ -1274,6 +1275,154 @@ bool SectionData::decoding() {
     
     return finished;
 }
+
+uint32_t SectionScript::size() {
+    uint32_t size = 0;
+    do {
+        const json11::Json& scripts = encoder()->exec_state()->context()->script_json();
+        if (!scripts.array_items().size()) {
+            break;
+        }
+        size += GetFTLVLength(kValueScriptSize, sizeof(uint32_t));
+        for (auto script : scripts.array_items()) {
+            const json11::Json::object& items = script.object_items();
+            size += GetFTLVLength(kValueScriptItemSize, sizeof(uint32_t));
+            for (auto iter = items.begin(); iter != items.end(); iter++) {
+                uint32_t key_length = static_cast<uint32_t>(iter->first.length());
+                size += GetFTLVLength(kValueScriptKey, key_length);
+                uint32_t val_length = static_cast<uint32_t>(iter->second.string_value().length());
+                size += GetFTLVLength(kValueScriptValue, val_length);
+            }
+        }
+    } while (0);
+
+    return size;
+}
+
+bool SectionScript::encoding() {
+    bool finished = false;
+    do {
+        uint32_t size = this->size();
+        if (!size) {
+            finished = true;
+            break;
+        }
+        if (!Section::encoding((uint16_t)ExecSection::EXEC_SECTION_SCRIPT, size)) {
+            break;
+        }
+        const json11::Json& scripts = encoder()->exec_state()->context()->script_json();
+        if (!scripts.is_array()) {
+            break;
+        }
+        uint32_t scripts_size = (uint32_t)scripts.array_items().size();
+        if (!Section::encoding(kValueScriptSize, sizeof(uint32_t), &scripts_size)) {
+            break;
+        }
+        for (auto it = scripts.array_items().begin(); it != scripts.array_items().end(); it++) {
+            uint32_t script_item_size = (uint32_t)it->object_items().size();
+            if (!Section::encoding(kValueScriptItemSize, sizeof(uint32_t), &script_item_size)) {
+                throw DecoderError("decoding script item size error");
+                break;
+            }
+            for (auto item : it->object_items()) {
+                uint32_t length = static_cast<uint32_t>(item.first.length());
+                uint8_t *pstr = (uint8_t *)item.first.c_str();
+                if (!Section::encoding(kValueScriptKey, length, (uint8_t *)pstr)) {
+                    throw DecoderError("decoding script item key error");
+                    break;
+                }
+                length = static_cast<uint32_t>(item.second.string_value().length());
+                const char *pstr_val = item.second.string_value().c_str();
+                if (!Section::encoding(kValueScriptValue, length, (uint8_t *)pstr_val)) {
+                    throw DecoderError("decoding script item value error");
+                    break;
+                }
+            }
+        }
+        finished = true;
+    } while (0);
+
+    return finished;
+}
+
+bool SectionScript::decoding() {
+    bool finished = false;
+    do {
+        fStream *stream = Section::stream();
+        if (!stream) {
+            break;
+        }
+        if (stream->Tell() < 0) {
+            break;
+        }
+        std::vector<json11::Json> scripts;
+        uint16_t target = 0;
+        uint32_t script_size = 0;
+        uint32_t size = sizeof(uint32_t);
+        uint32_t readbytes = stream->ReadTarget(&target, (uint8_t *)&script_size, &size);
+        if (!readbytes || target != kValueScriptSize) {
+            break;
+        }
+        for (uint32_t i = 0; i < script_size; i++) {
+            size = sizeof(uint32_t);
+            uint32_t items_size = 0;
+            readbytes = stream->ReadTarget(&target, (uint8_t *)&items_size, &size);
+            if (!readbytes || target != kValueScriptItemSize) {
+                throw DecoderError("decoding script items size error");
+                break;
+            }
+            std::unordered_map<std::string, json11::Json> items;
+            for (uint32_t j = 0; j < items_size; j++) {
+                if ((readbytes = stream->ReadTarget(&target, NULL, NULL)) == 0) {
+                    throw DecoderError("decoding script target error");
+                    break;
+                }
+                if (target != kValueScriptKey) {
+                    throw DecoderError("decoding script target error");
+                    break;
+                }
+                char *pstr_key = (char *)malloc(readbytes + 1);
+                if (!pstr_key) {
+                    throw DecoderError("decoding script low memory error");
+                    break;
+                }
+                memset(pstr_key, 0, readbytes + 1);
+                if (stream->Read(pstr_key, 1, readbytes) != readbytes) {
+                    throw DecoderError("decoding script key error");
+                    break;
+                }
+                if ((readbytes = stream->ReadTarget(&target, NULL, NULL)) == 0) {
+                    throw DecoderError("decoding script target error");
+                    break;
+                }
+                if (target != kValueScriptValue) {
+                    throw DecoderError("decoding script target error");
+                    break;
+                }
+                char *pstr_value = (char *)malloc(readbytes + 1);
+                if (!pstr_value) {
+                    throw DecoderError("decoding script low memory error");
+                    break;
+                }
+                memset(pstr_value, 0, readbytes + 1);
+                if (stream->Read(pstr_value, 1, readbytes) != readbytes) {
+                    throw DecoderError("decoding script value error");
+                    break;
+                }
+                json11::Json json(pstr_value);
+                items.insert(std::make_pair(pstr_key, json));
+                free(pstr_key);
+                free(pstr_value);
+            }
+            scripts.push_back(std::move(items));
+        }
+        decoder()->exec_state()->context()->set_script_json(scripts);
+        finished = true;
+
+    } while (0);
+
+    return finished;
+}
     
 uint32_t SectionFunction::GetInstructionsBytes(std::vector<Instruction>& instructions) {
     uint32_t numBits = 0;
@@ -1575,6 +1724,10 @@ uint32_t SectionFunction::size() {
             if (func_state->argc() > 0) {
                 size += GetFTLVLength(kValueFunctionArgs, sizeof(int32_t) * func_state->argc());
             }
+            if (!func_state->name().empty()) {
+                uint32_t length = static_cast<uint32_t>(func_state->name().length());
+                size += GetFTLVLength(kValueFunctionName, length);
+            }
             if (func_state->in_closure().size() > 0) {
                 size += GetFTLVLength(kValueFunctionInClosure, sizeof(int32_t) * (uint32_t)func_state->in_closure().size());
             }
@@ -1653,6 +1806,12 @@ bool SectionFunction::encoding() {
                     args[i] = (int32_t)func_state->args()[i];
                 }
                 if (!Section::encoding(kValueFunctionArgs, sizeof(int32_t) * func_state->argc(), args)) {
+                    break;
+                }
+            }
+            if (!func_state->name().empty()) {
+                uint32_t length = static_cast<uint32_t>(func_state->name().length());
+                if (!Section::encoding(kValueFunctionName, length, (uint8_t *)func_state->name().c_str())) {
                     break;
                 }
             }
@@ -1810,6 +1969,22 @@ bool SectionFunction::decoding() {
                         func_state->argc() = readcnt;
                         break;
                     }
+                    case kValueFunctionName:
+                    {
+                        char *pstr = (char *)malloc(readbytes + 1);
+                        if (!pstr) {
+                            throw DecoderError("decoding read function low memory error");
+                            break;
+                        }
+                        memset(pstr, 0, readbytes + 1);
+                        if (stream->Read(pstr, 1, readbytes) != readbytes) {
+                            throw DecoderError("decoding read function error");
+                            break;
+                        }
+                        func_state->set_name(pstr);
+                        free(pstr);
+                        break;
+                    }
                     case kValueFunctionInstructions:
                     {
                         uint8_t *buffer = (uint8_t *)malloc(readbytes);
@@ -1958,13 +2133,24 @@ uint32_t SectionGlobalConstants::size() {
             break;
         }
         size += GetFTLVLength(kValueGlobalConstantsSize, sizeof(int32_t));
-        uint32_t constant_length = 0;
         for (uint32_t i = compile_index; i < global->size(); i++) {
+            size += GetFTLVLength(kValueGlobalConstantsValue, sizeof(int32_t));
             Value *value = global->Find(compile_index);
-            constant_length += GetValueLength(value);
+            uint32_t length = GetValueLength(value);
+            size += GetFTLVLength(kValueGlobalConstantsValue, length);
+
+            const std::map<std::string, int>& global_map =  global->map();
+            for (auto it : global_map) {
+                if (it.second == compile_index + i) {
+                    if (!it.first.empty()) {
+                        uint32_t length = static_cast<uint32_t>(it.first.length());
+                        size += GetFTLVLength(kValueGlobalConstantsName, length);
+                        break;
+                    }
+                }
+            }
         }
-        size += GetFTLVLength(kValueGlobalConstantsPayload, constant_length);
-        
+        size += GetFTLVLength(kValueGlobalConstantsFinished, sizeof(uint8_t));
     } while (0);
 
     return size;
@@ -1987,33 +2173,40 @@ bool SectionGlobalConstants::encoding() {
         if (!Section::encoding(kValueGlobalConstantsSize, sizeof(uint32_t), &constants_count)) {
             break;
         }
-        uint32_t constants_payload_length = 0;
-        for (int i = 0; i < constants_count; i++) {
-            Value *value = global->Find(compile_index + i);
-            constants_payload_length += GetValueLength(value);
-        }
-        uint8_t *buffer = (uint8_t *)malloc(constants_payload_length);
-        if (!buffer) {
-            throw EncoderError("low memory error");
-            break;
-        }
-        uint8_t *write_buffer = buffer;
-        uint32_t remain_length = constants_payload_length;
         for (int i = 0; i < constants_count; i++) {
             Value *value = global->Find(compile_index + i);
             uint32_t length = GetValueLength(value);
-            uint32_t bytes_write = Section::encodingValueToBuffer(write_buffer, remain_length, value);
+            uint8_t *buffer = (uint8_t *)malloc(length);
+            if (!buffer) {
+                throw EncoderError("low memory error");
+                break;
+            }
+
+            uint32_t bytes_write = Section::encodingValueToBuffer(buffer, length, value);
             if (bytes_write != length) {
                 throw EncoderError("encoding global constants value error");
                 break;
             }
-            remain_length -= bytes_write;
-            write_buffer += bytes_write;
+            if (!Section::encoding(kValueGlobalConstantsValue, length, buffer)) {
+                throw EncoderError("encoding global constants value error");
+                break;
+            }
+            const std::map<std::string, int>& global_map =  global->map();
+            for (auto it : global_map) {
+                if (it.second == compile_index + i) {
+                    if (!it.first.empty()) {
+                        uint32_t length = static_cast<uint32_t>(it.first.length());
+                        if (!Section::encoding(kValueGlobalConstantsName, length, (uint8_t *)it.first.c_str())) {
+                            throw DecoderError("encoding global constants name  error");
+                            break;
+                        }
+                        break;
+                    }
+                }
+            }
+            free(buffer);
         }
-        if (!Section::encoding(kValueGlobalConstantsPayload, constants_payload_length, buffer)) {
-            break;
-        }
-        free(buffer);
+
         finished = true;
         
     } while (0);
@@ -2038,25 +2231,7 @@ bool SectionGlobalConstants::decoding() {
         if (!readbytes || target != kValueGlobalConstantsSize || !constants_count) {
             break;
         }
-        if ((readbytes = stream->ReadTarget(&target, NULL, NULL)) == 0) {
-            throw DecoderError("decoding global constants target error");
-            break;
-        }
-        if (target != kValueGlobalConstantsPayload) {
-            break;
-        }
-        uint8_t *buffer = (uint8_t *)malloc(readbytes);
-        if (!buffer) {
-            throw DecoderError("low memory error");
-            break;
-        }
-        if (stream->Read(buffer, 1, readbytes) != readbytes) {
-            throw DecoderError("decoding global constants payload error");
-            break;
-        }
-        uint8_t *read_buffer = buffer;
-        uint32_t remain_length = readbytes;
-        uint32_t bytes_read = 0;
+
         Variables *global = decoder()->exec_state()->global();
         if (global->IndexOf("__weex_data__") < 0) {
             global->Set("__weex_data__", Value());
@@ -2064,21 +2239,75 @@ bool SectionGlobalConstants::decoding() {
         if (global->IndexOf("_init_data") < 0) {
             global->Set("_init_data", Value());
         }
+
+        bool read_target = true;
         for (int i = 0; i < constants_count; i++) {
-            Value value;
-            if (!(bytes_read = decodingValueFromBuffer(read_buffer, remain_length, &value))) {
-                throw DecoderError("decoding function constants payload error");
+            if (read_target) {
+                if ((readbytes = stream->ReadTarget(&target, NULL, NULL)) == 0) {
+                    throw DecoderError("decoding global constants target error");
+                    break;
+                }
+            }
+            read_target = true;
+            if (target != kValueGlobalConstantsValue) {
+                throw DecoderError("decoding global constants target error");
                 break;
             }
-            read_buffer += bytes_read;
-            remain_length -= bytes_read;
-            global->Add(value);
+            uint8_t *buffer = (uint8_t *)malloc(readbytes);
+            if (!buffer) {
+                throw DecoderError("low memory error");
+                break;
+            }
+            if (stream->Read(buffer, 1, readbytes) != readbytes) {
+                throw DecoderError("decoding global constants payload error");
+                break;
+            }
+            Value value;
+            if (!decodingValueFromBuffer(buffer, readbytes, &value)) {
+                throw DecoderError("decoding global constants value error");
+                break;
+            }
+            free(buffer);
+            if ((readbytes = stream->ReadTarget(&target, NULL, NULL)) == 0) {
+                throw DecoderError("decoding global constants target error");
+                break;
+            }
+            switch (target) {
+                case kValueGlobalConstantsName:
+                {
+                    char *name = (char *)malloc(readbytes + 1);
+                    if (!name) {
+                        throw DecoderError("decoding global constants low memory error");
+                        break;
+                    }
+                    memset(name, 0, readbytes + 1);
+                    if (stream->Read(name, 1, readbytes) != readbytes) {
+                        throw DecoderError("decoding global constants name error");
+                        break;
+                    }
+                    global->Add(name, value);
+                    free(name);
+                    break;
+                }
+                case kValueGlobalConstantsValue:
+                {
+                    global->Add(value);
+                    read_target = false;
+                    break;
+                }
+                case SECTION_VALUE_FINISHED:
+                {
+                    break;
+                }
+                default:
+                {
+                    if (stream->Seek(readbytes, SEEK_CUR) < 0) {
+                        throw DecoderError("decoding global constants error");
+                    }
+                    break;
+                }
+            }
         }
-        if (remain_length != 0) {
-            throw DecoderError("decoding function constants payload error");
-            break;
-        }
-        free(buffer);
         finished = true;
         
     } while (0);
@@ -2312,7 +2541,7 @@ bool SectionStyles::decoding() {
             size = sizeof(uint32_t);
             uint32_t items_size = 0;
             readbytes = stream->ReadTarget(&target, (uint8_t *)&items_size, &size);
-            if (!readbytes || target != kValueStyleItemSize || !items_size) {
+            if (!readbytes || target != kValueStyleItemSize) {
                 throw DecoderError("decoding styles items size error");
                 break;
             }

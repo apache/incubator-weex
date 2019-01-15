@@ -1,4 +1,29 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 buildscript {
+    repositories {
+        mavenLocal()
+        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        mavenCentral()
+        jcenter()
+    }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
@@ -11,6 +36,8 @@ plugins {
 
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
 
 ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
 if(!disableCov.toBoolean()){
@@ -35,20 +62,19 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-
-version = "0.19.0.4"
+version = project.hasProperty('weexVersion')? project.getProperty('weexVersion') : "0.20.0.1"
 
 android {
-
-    publishNonDefault true
-    compileSdkVersion project.compileSdkVersion
-    buildToolsVersion project.buildToolsVersion
-    resourcePrefix "weex"
-
     delete 'libs/armeabi/libweexcore.so'
     delete 'libs/armeabi-v7a/libweexcore.so'
     delete 'libs/x86/libweexcore.so'
+    delete 'libs/armeabi/libweexjss.so'
+    delete 'libs/armeabi-v7a/libweexjss.so'
+    delete 'libs/x86/libweexjss.so'
 
+    compileSdkVersion project.compileSdkVersion
+    buildToolsVersion project.buildToolsVersion
+    resourcePrefix "weex"
     useLibrary 'org.apache.http.legacy'
     copy {
         from '../../pre-build'
@@ -99,6 +125,15 @@ android {
     def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexcore.so").length();
     def ARMEABIV7_Size = new File(projectDir,"libs/armeabi-v7/libweexcore.so").length();
     def X86_Size = new File(projectDir,"libs/x86/libweexcore.so").length();
+    def ndkversion = 16;
+    def api_level = "";
+    def compile_tool = "clang";
+    def cxx_stl = "c++_static";
+    if (ndkversion < 16) {
+        api_level = "android-14";
+    } else {
+        api_level = "android-19";
+    }
     println "ARMEABI_Size: "+ARMEABI_Size;
     println "ARMEABIV7_Size:" + ARMEABIV7_Size;
     println "X86_Size:" + X86_Size;
@@ -115,17 +150,18 @@ android {
         multiDexEnabled true
 
         versionCode 1
-        versionName "1.0"
+        versionName project.version
         ndk {
             abiFilters "armeabi-v7a","armeabi","x86"
         }
 
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID_PLATFORM=android-14',
-                        '-DANDROID_TOOLCHAIN=gcc',
-                        '-DANDROID_STL=gnustl_static',
-                        '-DCMAKE_BUILD_TYPE=Release'
+                arguments '-DANDROID_PLATFORM='+"${api_level}",
+                        '-DANDROID_TOOLCHAIN='+"${compile_tool}",
+                        '-DANDROID_STL='+"${cxx_stl}",
+                        '-DCMAKE_BUILD_TYPE=Release',
+                        '-DENABLE_ASAN=false'
             }
         }
     }
@@ -211,6 +247,7 @@ if(file('../license/LICENSE').exists()){
         header = file('../license/LICENSE')
         mapping('cpp','JAVADOC_STYLE')
         mapping('h','JAVADOC_STYLE')
+        excludes(['com/taobao/weex/utils/WXDataStructureUtil.java'])
     }
 
     task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
@@ -234,6 +271,11 @@ task checkNdkVersion() {
             properties.load(instr)
         }
         ndkDir = properties.getProperty('ndk.dir')
+    }
+
+    if(null == ndkDir){
+        def errMsg ='please set ndk.dir path in project/local.properties and ndk-16 supported only,example: ndk.dir=/Users/xxx/Library/Android/sdk/ndk-bundle-r16'
+        throw new StopActionException(errMsg)
     }
 
     if(!ndkDir.isEmpty()) {
@@ -268,3 +310,64 @@ task checkNdkVersion() {
 }
 
 preBuild.dependsOn checkNdkVersion
+
+def siteUrl = 'http://weex.incubator.apache.org'
+def gitUrl = 'https://github.com/apache/incubator-weex.git'
+group = "com.taobao.android"
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                name 'weex_sdk'
+                url siteUrl
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'weex alibaba'
+                        name 'weex alibaba'
+                        email 'alibabaweex@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+bintray {
+    configurations = ['archives']
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    pkg {
+        repo = "maven"
+        name = "weex_sdk"
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+        version {
+            //这里填写需要发布的版本号
+            name = project.version
+        }
+    }
+}

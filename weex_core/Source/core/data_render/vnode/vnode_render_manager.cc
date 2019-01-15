@@ -17,26 +17,27 @@
  * under the License.
  */
 
+#include "core/data_render/vnode/vnode_render_manager.h"
 #include <chrono>
 #include <sstream>
-#include "core/data_render/vnode/vnode_render_manager.h"
+#include "base/make_copyable.h"
+#include "base/string_util.h"
+#include "core/bridge/platform_bridge.h"
 #include "core/data_render/common_error.h"
-#include "core/data_render/exec_state_binary.h"
 #include "core/data_render/exec_state.h"
+#include "core/data_render/exec_state_binary.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/vnode/vnode.h"
 #include "core/data_render/vnode/vnode_exec_env.h"
 #include "core/manager/weex_core_manager.h"
+#include "core/network/http_module.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_creator.h"
-#include "core/bridge/platform_bridge.h"
 
 #define VRENDER_LOG true
 
 #if VRENDER_LOG
-
-#include "base/LogDefines.h"
-
+#include "base/log_defines.h"
 #endif
 
 namespace weex {
@@ -60,11 +61,20 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
                                                 WeexCore::RenderObject* parent, bool isRoot,
                                                 int index,
                                                 const string& pageId) {
+  if (!vnode) {
+    return nullptr;
+  }
+  if (vnode->IsVirtualComponent()) {
+    VComponent* component = static_cast<VComponent*>(vnode);
+    if (component->root_vnode() == nullptr) {
+      component->UpdateData();
+    }
+    return ParseVNode2RenderObject(component->root_vnode(), parent, isRoot,
+                                   index, pageId);
+  }
   std::string ref_str;
   if (isRoot) {
     ref_str = "_root";
-  } else if (!vnode->node_id().empty()) {
-    ref_str = vnode->node_id();
   } else {
     ref_str = base::to_string(ref_id++);
   }
@@ -87,14 +97,19 @@ WeexCore::RenderObject* ParseVNode2RenderObject(VNode* vnode,
     render_object->AddAttr(it->first, it->second);
   }
 
-  // event,todo
+  // event
   std::map<std::string, void *> *events = vnode->events();
   for (auto iter = events->begin(); iter != events->end(); iter++) {
       render_object->events()->insert(iter->first);
   }
+  auto event_params_map = vnode->event_params_map();
+  for (auto it = event_params_map->begin(); it != event_params_map->end();
+       it++) {
+    render_object->events()->insert(it->first);
+  }
 
   // child
-  vector<VNode*>* children = (const_cast<VNode*>(vnode))->child_list();
+  vector<VNode*>* children = vnode->child_list();
   for (int i = 0; i < children->size(); i++) {
     ParseVNode2RenderObject((*children)[i], render_object, false, i, pageId);
   }
@@ -165,14 +180,14 @@ void VNodeRenderManager::InitVM() {
   }
 }
 
-void VNodeRenderManager::CreatePage(const std::string &input, const std::string &page_id, const  std::string &options, const std::string &init_data) {
-    std::string err = CreatePageWithContent(input, page_id, options, init_data);
+void VNodeRenderManager::CreatePage(const std::string &input, const std::string &page_id, const  std::string &options, const std::string &init_data, std::function<void(const char*)> exec_js) {
+    std::string err = CreatePageWithContent(input, page_id, options, init_data, exec_js);
     if (!err.empty()) {
         WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id.c_str(), nullptr, err.c_str());
     }
 }
 
-std::string VNodeRenderManager::CreatePageWithContent(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data) {
+std::string VNodeRenderManager::CreatePageWithContent(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data, std::function<void(const char*)> exec_js) {
     InitVM();
 #ifdef DEBUG
     auto start = std::chrono::steady_clock::now();
@@ -189,6 +204,7 @@ std::string VNodeRenderManager::CreatePageWithContent(const std::string &input, 
         exec_state->context()->raw_json() = json;
         VNodeExecEnv::ParseData(exec_state);
         VNodeExecEnv::ParseStyle(exec_state);
+        VNodeExecEnv::ParseScript(exec_state);
     }
     if (init_data.length() > 0) {
         VNodeExecEnv::ImportExecData(exec_state, init_data);
@@ -213,14 +229,72 @@ std::string VNodeRenderManager::CreatePageWithContent(const std::string &input, 
     if (exec_state->context()->root() == NULL) {
         return err;
     }
+
     CreatePageInternal(page_id, exec_state->context()->root());
 #ifdef DEBUG
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("DATA_RENDER, All time %lld\n", duration_post.count());
 #endif
+    DownloadAndExecScript(exec_state, page_id, exec_js);
     return err;
 }
-    
+
+void VNodeRenderManager::DownloadAndExecScript(
+    ExecState* exec_state, const std::string& page_id,
+    std::function<void(const char*)> exec_js) {
+  // If script exists in json, run script into js vm
+  const json11::Json& script_array =
+    exec_state->context()->script_json();
+  if (script_array.is_array()) {
+    for (auto it = script_array.array_items().begin();
+         it != script_array.array_items().end(); it++) {
+      const json11::Json& script_obj = *it;
+      auto src = script_obj["src"];
+      auto content = script_obj["content"];
+      auto callback1 = weex::base::MakeCopyable(
+          [page_id = page_id, exec_js = exec_js, exec_state = exec_state](const char* result) {
+            exec_js(result);
+            auto root =
+                VNodeRenderManager::GetInstance()->GetRootVNode(page_id);
+            if (root && root->IsVirtualComponent()) {
+              static_cast<weex::core::data_render::VComponent*>(root)
+                  ->DispatchCreated();
+
+                //fire event
+                exec_state->set_exec_js_finished(true);
+                const std::vector<std::vector<std::string>>& event_queue = exec_state->event_queue();
+                for (auto args : event_queue) {
+                    VNodeRenderManager::GetInstance()->FireEvent(args[0], args[1], args[2], args[3], args[4]);
+                }
+                exec_state->ClearEventQueue();
+            }
+          });
+      // callback2, a wrap for callback1, will be post to script thread to
+      // execute callback1
+      auto callback2 = weex::base::MakeCopyable([callback = callback1](
+                                                    const std::string& result) {
+#ifdef OS_ANDROID
+        WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+            weex::base::MakeCopyable([result = std::move(result), callback]() {
+              callback(result.c_str());
+            }));
+#else
+          callback(result.c_str());
+#endif
+      });
+      // If script is a url, first download the script, else run script
+      // directly.
+      if (content.is_string() && !content.string_value().empty()) {
+        callback1(const_cast<char*>(content.string_value().c_str()));
+      } else if (src.is_string()) {
+        network::HttpModule http_module;
+        http_module.Send(page_id.c_str(), src.string_value().c_str(),
+                         callback2);
+      }
+    }
+  }
+}
+
 bool VNodeRenderManager::RequireModule(ExecState *exec_state, std::string &name, std::string &result)
 {
     bool finished = false;
@@ -261,7 +335,7 @@ void VNodeRenderManager::ExecuteRegisterModules(ExecState *exec_state, std::vect
     } while (0);
 }
 
-std::string VNodeRenderManager::CreatePageWithContent(const uint8_t *contents, size_t length, const std::string &page_id, const std::string &options, const std::string &init_data) {
+std::string VNodeRenderManager::CreatePageWithContent(const uint8_t *contents, size_t length, const std::string &page_id, const std::string &options, const std::string &init_data,  std::function<void(const char*)> exec_js) {
     InitVM();
 #ifdef DEBUG
     auto start = std::chrono::steady_clock::now();
@@ -294,11 +368,12 @@ std::string VNodeRenderManager::CreatePageWithContent(const uint8_t *contents, s
     auto duration_post = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
     LOGD("[DATA_RENDER], All time:[%lld]\n", duration_post.count());
 #endif
+    DownloadAndExecScript(exec_state, page_id, exec_js);
     return err;
 }
 
-void VNodeRenderManager::CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& init_data) {
-    string err = CreatePageWithContent((const uint8_t *)contents, length, page_id, options, init_data);
+void VNodeRenderManager::CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& init_data, std::function<void(const char*)> exec_js) {
+    string err = CreatePageWithContent((const uint8_t *)contents, length, page_id, options, init_data, exec_js);
     if (!err.empty()) {
         WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id.c_str(), nullptr, err.c_str());
     }
@@ -312,6 +387,18 @@ bool VNodeRenderManager::RefreshPage(const std::string& page_id,
             break;
         }
         ExecState *exec_state = it->second;
+        // If component exsit, refresh by component
+        auto it_vnode = vnode_trees_.find(page_id);
+        if (it_vnode == vnode_trees_.end()) {
+            return false;
+        }
+        if (it_vnode->second->IsVirtualComponent()) {
+            auto component = static_cast<VComponent*>(it_vnode->second);
+            Value data = StringToValue(exec_state, init_data);
+            component->UpdateData(&data);
+            return true;
+        }
+        // Otherwise re-execute
         VNodeExecEnv::ImportExecData(exec_state, init_data);
         std::string err;
         exec_state->context()->Reset();
@@ -324,9 +411,9 @@ bool VNodeRenderManager::RefreshPage(const std::string& page_id,
         }
         RefreshPageInternal(page_id, exec_state->context()->root());
         WeexCore::WeexCoreManager::Instance()
-        ->getPlatformBridge()
-        ->platform_side()
-        ->RefreshFinish(page_id.c_str(), nullptr, "");
+            ->getPlatformBridge()
+            ->platform_side()
+            ->RefreshFinish(page_id.c_str(), nullptr, "");
         return true;
         
     } while (0);
@@ -346,16 +433,36 @@ bool VNodeRenderManager::ClosePage(const std::string& page_id) {
   return true;
 }
         
-void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args) {
+void VNodeRenderManager::FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args,const std::string &dom_changes) {
     do {
         auto iter = exec_states_.find(page_id);
         if (iter == exec_states_.end()) {
+            break;
+        }
+        if (!iter->second->exec_js_finished()) {
+            std::vector<std::string> fire_event = {page_id, ref, event, args, dom_changes};
+            iter->second->AddEvent(fire_event);
             break;
         }
         auto node = vnode_trees_.find(page_id);
         if (node == vnode_trees_.end()) {
             break;
         }
+        // TODO merge two way to fire event
+        {
+            // First way to fire event from VNode::OnEvent
+            auto vnode = iter->second->context()->GetVNode(ref);
+            if (vnode && vnode->event_params_map()) {
+                auto hit_test = vnode->event_params_map()->find(event);
+                if (hit_test != vnode->event_params_map()->end()) {
+                    // If vnode has eat event, return.
+                    vnode->OnEvent(event, args, dom_changes);
+                    return;
+                }
+            }
+        }
+
+        // Second way to fire event from call vm func
         auto vnode = node->second->FindNode(ref);
         if (!vnode) {
             break;
@@ -435,21 +542,35 @@ void VNodeRenderManager::WXLogNative(ExecState *exec_state, const std::string &i
     }
 }
 
-void VNodeRenderManager::PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node) {
-    do {
-        for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {
-            if (iter->second == exec_state) {
-                Patch(iter->first, v_node, new_node);
-                break;
-            }
-        }
-        
-    } while (0);
+void VNodeRenderManager::UpdateComponentData(const std::string& page_id,
+                                             const char* cid,
+                                             const std::string& json_data) {
+  ExecState* exec_state = GetExecState(page_id);
+  if (!exec_state) return;
+  VComponent* component = exec_state->context()->GetComponent(atoi(cid));
+  if (component) {
+    Value value(StringToValue(exec_state, json_data));
+    component->UpdateData(&value);
+  }
 }
-    
+
+void VNodeRenderManager::PatchVNode(ExecState *exec_state, VNode *v_node, VNode *new_node) {
+    for (auto iter = exec_states_.begin(); iter != exec_states_.end(); iter++) {
+        if (iter->second == exec_state) {
+            Patch(iter->first, v_node, new_node);
+            break;
+        }
+    }
+}
+
 bool SameNode(VNode* a, VNode* b) {
-  return a->tag_name() == b->tag_name() &&
-         a->ref() == b->ref();  // todo to be more accurate
+  if (a->IsVirtualComponent() && b->IsVirtualComponent()) {
+    return static_cast<VComponent*>(a)->IsSameNode(static_cast<VComponent*>(b));
+  } else {
+    // todo to be more accurate
+    return a->tag_name() == b->tag_name() && a->ref() == b->ref() &&
+           a->IsVirtualComponent() == b->IsVirtualComponent();
+  }
 }
 
 inline VNode* GetOrNull(vector<VNode*>& vec, int index) {
@@ -497,10 +618,10 @@ void UpdateChildren(const string& page_id, VNode* old_node, VNode* new_node) {
     ref_list.push_back((*begin));
   }
 
-  unsigned int old_start = 0;
-  unsigned int old_end = static_cast<unsigned int >(old_children.size()) - 1;
-  unsigned int new_start = 0;
-  unsigned int new_end = static_cast<unsigned int >(new_children.size()) - 1;
+  int old_start = 0;
+  int old_end = static_cast<int>(old_children.size()) - 1;
+  int new_start = 0;
+  int new_end = static_cast<int>(new_children.size()) - 1;
   VNode* old_start_node = GetOrNull(old_children, old_start);
   VNode* old_end_node = GetOrNull(old_children, old_end);
   VNode* new_start_node = GetOrNull(new_children, new_start);
@@ -514,6 +635,10 @@ void UpdateChildren(const string& page_id, VNode* old_node, VNode* new_node) {
     } else if (old_end_node == nullptr) {
       old_end_node = GetOrNull(old_children, --old_end);
 
+    } else if (new_start_node == nullptr) {
+      new_start_node = GetOrNull(new_children, ++new_start);
+    } else if (new_end_node == nullptr) {
+      new_end_node = GetOrNull(new_children, --new_end);
     } else if (SameNode(old_start_node, new_start_node)) {
       PatchVNode(page_id, old_start_node, new_start_node);
       old_start_node = GetOrNull(old_children, ++old_start);
@@ -541,7 +666,7 @@ void UpdateChildren(const string& page_id, VNode* old_node, VNode* new_node) {
         ref_to_index = new map<string, unsigned int>();
         for (unsigned int i = old_start; i <= old_end; ++i) {
           auto vnode = GetOrNull(old_children, i);
-          if (vnode == nullptr) {
+          if (vnode == nullptr || vnode->ref().empty()) {
             continue;
           }
           ref_to_index->insert({vnode->ref(), i});
@@ -618,7 +743,7 @@ void CreateAndInsertElm(const string& page_id, VNode* node,
 int MoveToBackOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
                     const VNode* anchor_ref) {
   auto move_pos = IndexOf(ref_list, move_ref);
-  int index = static_cast<int>(std::distance(ref_list.begin(), move_pos));
+  auto anchor_pos = IndexOf(ref_list, anchor_ref);
   if (move_pos == ref_list.end()) {
 #if VRENDER_LOG
     LOGE("[VRenderManager] moveToBackOfRef movePos == refList.end() ref: %s",
@@ -626,9 +751,6 @@ int MoveToBackOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
 #endif
     return -1;  // wtf!
   }
-  VNode* value = *move_pos;
-  ref_list.erase(move_pos);
-  auto anchor_pos = IndexOf(ref_list, anchor_ref);
   if (anchor_pos == ref_list.end()) {
 #if VRENDER_LOG
     LOGE("[VRenderManager] moveToBackOfRef anchorPos == refList.end() ref: %s",
@@ -636,14 +758,17 @@ int MoveToBackOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
 #endif
     return -1;  // wtf
   }
-  ref_list.insert(++anchor_pos, value);
+  int index = static_cast<int>(std::distance(ref_list.begin(), anchor_pos));
+  VNode* value = *move_pos;
+  ref_list.erase(move_pos);
+  ref_list.insert(anchor_pos, value);
   return index;
 }
 
 int MoveToFrontOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
                      const VNode* anchor_ref) {
   auto move_pos = IndexOf(ref_list, move_ref);
-  int index = static_cast<int>(std::distance(ref_list.begin(), move_pos));
+  auto anchor_pos = IndexOf(ref_list, anchor_ref);
   if (move_pos == ref_list.end()) {
 #if VRENDER_LOG
     LOGE("[VRenderManager] moveToFrontOfRef movePos == refList.end() ref: %s",
@@ -651,9 +776,6 @@ int MoveToFrontOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
 #endif
     return -1;  // wtf!
   }
-  VNode* value = *move_pos;
-  ref_list.erase(move_pos);
-  auto anchor_pos = IndexOf(ref_list, anchor_ref);
   if (anchor_pos == ref_list.end()) {
 #if VRENDER_LOG
     LOGE("[VRenderManager] moveToFrontOfRef anchorPos == refList.end() ref: %s",
@@ -661,6 +783,9 @@ int MoveToFrontOfRef(vector<VNode*>& ref_list, const VNode* move_ref,
 #endif
     return -1;  // wtf
   }
+  int index = static_cast<int>(std::distance(ref_list.begin(), anchor_pos));
+  VNode* value = *move_pos;
+  ref_list.erase(move_pos);
   ref_list.insert(anchor_pos, value);
   return index;
 }
@@ -723,7 +848,6 @@ vector<pair<string, string>>* CompareMap(const map<string, string>& oldMap,
   auto p_vec = new vector<pair<string, string>>();
   for (auto it = newMap.cbegin(); it != newMap.cend(); it++) {
     auto pos = oldMap.find(it->first);
-
     if (pos == oldMap.end() || pos->second != it->second) {
       // key not exist, or value not same
       p_vec->push_back({it->first, it->second});
@@ -732,7 +856,6 @@ vector<pair<string, string>>* CompareMap(const map<string, string>& oldMap,
 
   for (auto it = oldMap.cbegin(); it != oldMap.cend(); it++) {
     auto pos = newMap.find(it->first);
-
     if (pos == newMap.end()) {
       // key not exist, remove //todo check if this is correct
       p_vec->push_back({it->first, ""});
@@ -740,8 +863,74 @@ vector<pair<string, string>>* CompareMap(const map<string, string>& oldMap,
   }
   return p_vec;
 };
- 
+
+void CompareAndApplyEvents1(const std::string& page_id, VNode* old_node,
+                            VNode* new_node) {
+  std::map<std::string, void*> old_events = *old_node->events();
+  std::map<std::string, void*> new_events = *new_node->events();
+  std::map<std::string, void*> remove_events;
+  std::map<std::string, void*> add_events;
+
+  for (auto it = old_events.cbegin(); it != old_events.cend(); it++) {
+    auto pos = new_events.find(it->first);
+    if (pos == new_events.end()) {
+      remove_events.insert(*it);
+    }
+  }
+  for (auto it = new_events.cbegin(); it != new_events.cend(); it++) {
+    auto pos = old_events.find(it->first);
+    if (pos == old_events.end()) {
+      add_events.insert(*it);
+    }
+  }
+  for (auto it = remove_events.cbegin(); it != remove_events.cend(); it++) {
+    RenderManager::GetInstance()->RemoveEvent(
+        page_id, new_node->render_object_ref(), it->first);
+  }
+  for (auto it = add_events.cbegin(); it != add_events.cend(); it++) {
+    RenderManager::GetInstance()->AddEvent(
+        page_id, new_node->render_object_ref(), it->first);
+  }
+}
+
+void CompareAndApplyEvents2(const std::string& page_id, VNode* old_node,
+                            VNode* new_node) {
+  VNode::EventParamsMap old_events = *old_node->event_params_map();
+  VNode::EventParamsMap new_events = *new_node->event_params_map();
+
+  VNode::EventParamsMap remove_events;
+  VNode::EventParamsMap add_events;
+  for (auto it = old_events.cbegin(); it != old_events.cend(); it++) {
+    auto pos = new_events.find(it->first);
+
+    if (pos == new_events.end()) {
+        remove_events.insert(*it);
+    }
+  }
+  for (auto it = new_events.cbegin(); it != new_events.cend(); it++) {
+    auto pos = old_events.find(it->first);
+
+    if (pos == old_events.end()) {
+        add_events.insert(*it);
+    }
+  }
+  for (auto it = remove_events.cbegin(); it != remove_events.cend(); it++) {
+    RenderManager::GetInstance()->RemoveEvent(
+        page_id, new_node->render_object_ref(), it->first);
+  }
+  for (auto it = add_events.cbegin(); it != add_events.cend(); it++) {
+    RenderManager::GetInstance()->AddEvent(
+        page_id, new_node->render_object_ref(), it->first);
+  }
+}
+
 void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
+  if (old_node->IsVirtualComponent()) {
+    static_cast<VComponent*>(old_node)
+        ->MoveTo(static_cast<VComponent*>(new_node));
+    return;
+  }
+
   // patch render object link
   new_node->set_render_object_ref(old_node->render_object_ref());
 
@@ -749,8 +938,7 @@ void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
   auto p_vec = CompareMap(*(old_node->attributes()), *(new_node->attributes()));
   if (p_vec->size() > 0) {
       RenderManager::GetInstance()->UpdateAttr(page_id, new_node->render_object_ref(), p_vec);
-  }
-  else {
+  } else {
       delete p_vec;
       p_vec = nullptr;
   }
@@ -758,14 +946,14 @@ void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
   p_vec = CompareMap(*(old_node->styles()), *(new_node->styles()));
   if (p_vec->size()) {
       RenderManager::GetInstance()->UpdateStyle(page_id, new_node->render_object_ref(), p_vec);
-  }
-  else {
+  } else {
       delete p_vec;
       p_vec = nullptr;
   }
 
-  // compare event
-  // todo
+  // compare and apply event
+  CompareAndApplyEvents1(page_id, old_node, new_node);
+  CompareAndApplyEvents2(page_id, old_node, new_node);
 
   // compare children
   if (old_node->HasChildren() && new_node->HasChildren()) {
@@ -780,32 +968,39 @@ void PatchVNode(const string& page_id, VNode* old_node, VNode* new_node) {
     int index = 0;
     for (auto it = new_node->child_list()->cbegin();
          it != new_node->child_list()->cend(); it++) {
-      WeexCore::RenderObject *root = VNode2RenderObject(*it, page_id);
+      WeexCore::RenderObject *child_node = ParseVNode2RenderObject(*it, nullptr, false, 0, page_id);
       RenderManager::GetInstance()->AddRenderObject(
-          page_id, (*it)->parent()->render_object_ref(), index, root);
+                                                      page_id, (*it)->parent()->render_object_ref(), index, child_node);
       ++index;
     }
   }
 }
 
 void Patch(const string& page_id, VNode *old_node, VNode *new_node) {
-    if (old_node->parent() == NULL || SameNode(old_node, new_node)) {
+    if (!old_node) {
+        ParseVNode2RenderObject(new_node, nullptr, false, 0, page_id);
+    } else if (old_node->parent() == NULL || SameNode(old_node, new_node)) {
         // root must be the same;
         PatchVNode(page_id, old_node, new_node);
-    }
-    else {
-        VNode *parent = (VNode *)old_node->parent();
-        vector<VNode *> &old_children = *parent->child_list();
+    } else {
         WeexCore::RenderObject *new_render_object = ParseVNode2RenderObject(new_node, nullptr, false, 0, page_id);
-        auto pos = std::find(old_children.begin(), old_children.end(), old_node);
-        int index = static_cast<int>(std::distance(old_children.begin(), pos));
-        parent->InsertChild(new_node, index);
-        RenderManager::GetInstance()->AddRenderObject(page_id, parent->render_object_ref(), index, new_render_object);
-        parent->RemoveChild(old_node);
-        RenderManager::GetInstance()->RemoveRenderObject(page_id, old_node->render_object_ref());
+        VNode *parent = (VNode *)old_node->parent();
+        if (!parent && old_node->component()) {
+            parent = const_cast<VNode*>(old_node->component()->parent());
+            old_node = old_node->component();
+        }
+        if (parent) {
+            vector<VNode *> &old_children = *parent->child_list();
+            auto pos = std::find(old_children.begin(), old_children.end(), old_node);
+            int index = static_cast<int>(std::distance(old_children.begin(), pos));
+            parent->InsertChild(new_node, index);
+            RenderManager::GetInstance()->AddRenderObject(page_id, parent->render_object_ref(), index, new_render_object);
+            parent->RemoveChild(old_node);
+            RenderManager::GetInstance()->RemoveRenderObject(page_id, old_node->render_object_ref());
+        }
     }
 }
-    
+
 }  // namespace data_render
 }  // namespace core
 }  // namespace weex

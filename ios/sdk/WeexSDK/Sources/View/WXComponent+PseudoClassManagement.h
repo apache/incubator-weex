@@ -28,6 +28,12 @@
 -(NSMutableDictionary *)parseStyles:(NSDictionary *)styles;
 
 /**
+ *  @abstract reset pseudoClassStyles.
+ *
+ */
+- (void)resetPseudoClassStyles:(NSArray *)resetstyle;
+
+/**
  *  @abstract filter common styles and pseudoClassStyles.
  *
  */

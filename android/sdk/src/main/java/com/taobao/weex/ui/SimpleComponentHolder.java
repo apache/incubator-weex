@@ -211,7 +211,12 @@ public class SimpleComponentHolder implements IFComponentHolder{
       generate();
     }
     Set<String> keys = mMethodInvokers.keySet();
-    return keys.toArray(new String[keys.size()]);
+    try {
+      return keys.toArray(new String[keys.size()]);
+    } catch (Throwable throwable) {
+      return new String[1];
+    }
+
   }
 
 }

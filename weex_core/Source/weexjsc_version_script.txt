@@ -1,4 +1,4 @@
 {
-    global: *Inject_GCanvasFunc*; Java_com*; JNI_OnLoad; JNI_OnUnload;
+    global: *Inject_GCanvasFunc*; CallT3dFunc; CallGCanvasFun; Java_com*; JNI_OnLoad; JNI_OnUnload;
     local: *;
 };

@@ -32,6 +32,7 @@ class VNodeExecEnv {
   static void ImportExecData(ExecState *state, const std::string &init_data_str);
   static void ParseStyle(ExecState *state);
   static void ParseData(ExecState *state);
+  static void ParseScript(ExecState *state);
 };
     
 Value StringToValue(ExecState *exec_state, const std::string &str);

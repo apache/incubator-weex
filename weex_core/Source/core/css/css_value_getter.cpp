@@ -32,7 +32,7 @@ namespace WeexCore {
       return WeexCore::kDirectionLTR;
     } else if (strcmp(c_value, RTL) == 0) {
       return WeexCore::kDirectionRTL;
-    } 
+    }
     return WeexCore::kDirectionLTR;
   }
 

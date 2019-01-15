@@ -34,7 +34,7 @@ class String {
   explicit String(const std::string &str);
   ~String();
 
-  char *c_str() { return str_.get(); }
+  char *c_str() const { return str_.get(); }
 
   std::size_t length() { return length_; }
 

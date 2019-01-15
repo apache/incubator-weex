@@ -22,6 +22,7 @@
 namespace weex {
 namespace base {
 
+#ifdef OS_IOS
 ThreadImplDarwin::ThreadImplDarwin(const ThreadParams& params)
     : ThreadImplPosix(params) {}
 
@@ -29,13 +30,9 @@ ThreadImplDarwin::~ThreadImplDarwin() {}
 
 void ThreadImplDarwin::SetName(const std::string& name) {
   ThreadImpl::SetName(name);
-#ifdef OS_LINUX
-    pthread_setname_np(pthread_self(), name.c_str());
-#else
-    pthread_setname_np(name.c_str());
-#endif
-
+  pthread_setname_np(name.c_str());
 }
+#endif
 
 }  // namespace base
 }  // namespace weex

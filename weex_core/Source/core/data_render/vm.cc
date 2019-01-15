@@ -646,7 +646,7 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
             if (IsValueRef(b)) {
                 b = b->var;
             }
-            if (!IsClassInstance(b) && !IsClass(b) && !IsArray(b) && !IsTable(b) && !IsString(b)) {
+            if (!IsClassInstance(b) && !IsClass(b) && !IsArray(b) && !IsTable(b) && !IsString(b) && !IsNil(b)) {
                 throw VMExecError("Type Error For Class Instance Or Class With OP_CODE [OP_GETMEMBER]");
             }
             if (!IsString(c)) {
@@ -699,10 +699,11 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 Variables *funcs = ValueTo<ClassDescriptor>(class_desc)->funcs_.get();
                 index = funcs->IndexOf(var_name);
                 if (index < 0) {
-                    throw VMExecError("Can't Find String Func " + var_name + " With OP_CODE [OP_GETMEMBER]");
+                    SetNil(a);
+                } else {
+                    Value *func = funcs->Find(index);
+                    *a = *func;
                 }
-                Value *func = funcs->Find(index);
-                *a = *func;
             }
             else if (IsTable(b)) {
                 if (op == OP_GETMEMBER) {
@@ -720,6 +721,9 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                         SetValueRef(a, ret);
                     }
                 }
+            }
+            else if (IsNil(b)) {
+                SetNil(a);
             }
             else {
                 // only can find class static funcs;
@@ -889,10 +893,13 @@ void VM::RunFrame(ExecState *exec_state, Frame frame, Value *ret) {
                 Value *ret = GetTableValue(ValueTo<Table>(b), *c);
                 if (!IsNil(ret)) {
                     *a = *ret;
-                }
-                else {
+                } else {
                     SetNil(a);
                 }
+            } else if (IsString(b)) {
+                //LOGE("type String can not get from index");
+            } else if (IsNil(b)) {
+                SetNil(a);
             }
             else {
                 throw VMExecError("Unsupport Type Error With OP_CODE [OP_GETINDEX]");

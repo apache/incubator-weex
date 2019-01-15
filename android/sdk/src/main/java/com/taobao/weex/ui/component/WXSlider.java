@@ -215,7 +215,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   @Override
   public void setLayout(WXComponent component) {
     if (mAdapter != null) {
-      mAdapter.setLayoutDirectionRTL(this.isNativeLayoutRTL());
+      mAdapter.setLayoutDirectionRTL(this.isLayoutRTL());
     }
     super.setLayout(component);
   }
@@ -291,7 +291,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
     if (mAdapter.getRealCount() > 0) {
       if(idx >= mAdapter.getRealCount()) retIdx = mAdapter.getRealCount() - 1;
-      if (isNativeLayoutRTL()) {
+      if (isLayoutRTL()) {
         retIdx = mAdapter.getRealCount() - 1 - retIdx;
       }
     }

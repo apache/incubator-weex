@@ -44,7 +44,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.weex.commons.WXAnalyzerDelegate;
 import com.alibaba.weex.constants.Constants;
@@ -63,13 +62,14 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
-
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class WXPageActivity extends WXBaseActivity implements IWXRenderListener, Handler.Callback, WXSDKInstance.NestedInstanceInterceptor {
@@ -244,8 +244,11 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         try {
           Uri uri = Uri.parse(url);
           mConfigMap.put("bundleUrl", url);
-          if (uri.getPath().endsWith(".wlasm")){
+          if(TextUtils.equals(uri.getQueryParameter("__eagle"), Boolean.TRUE.toString())){
             mInstance.render(TAG, task.response.data, mConfigMap, null);
+          }
+          else if (TextUtils.equals(uri.getQueryParameter("__data_render"), Boolean.TRUE.toString())){
+            mInstance.render(TAG, new String(task.response.data, "UTF-8"), mConfigMap, null, WXRenderStrategy.DATA_RENDER);
           } else {
             mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
           }
@@ -270,11 +273,25 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
    */
   private void startHotRefresh() {
     try {
-      String host = new URL(mUri.toString()).getHost();
-      String wsUrl = "ws://" + host + ":8082";
+      URL url = new URL(mUri.toString());
+      String host = url.getHost();
+      String query = url.getQuery();
+      String wsport = TextUtils.isEmpty(query)? "8082" : getUrlParam("wsport", query);
+      String wsUrl = "ws://" + host + ":" + (wsport.equals("") ? "8082" : wsport) ;
       mWXHandler.obtainMessage(Constants.HOT_REFRESH_CONNECT, 0, 0, wsUrl).sendToTarget();
     } catch (MalformedURLException e) {
       e.printStackTrace();
+    }
+  }
+
+  private String getUrlParam(String key, String queryString) {
+    String regex = "[?|&]?" + key + "=([^&]+)";
+    Pattern p = Pattern.compile(regex);
+    Matcher matcher = p.matcher(queryString);
+    if (matcher.find()) {
+      return matcher.group(1);
+    } else {
+      return "";
     }
   }
 

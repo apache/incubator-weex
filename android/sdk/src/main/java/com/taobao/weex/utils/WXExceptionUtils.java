@@ -18,8 +18,13 @@
  */
 package com.taobao.weex.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -32,7 +37,6 @@ import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.performance.WXInstanceApm;
-import com.taobao.weex.performance.WXInstanceExceptionRecord;
 
 /**
  * Created on 2017/10/13.
@@ -95,7 +99,10 @@ public class WXExceptionUtils {
             instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
 
             if (null != instance) {
-                bundleUrlCommit = instance.getBundleUrl();
+                bundleUrlCommit = instance.getApmForInstance().reportPageName;
+                Object loadLength = instance.getApmForInstance().extInfo.get(WXInstanceApm.VALUE_BUNDLE_LOAD_LENGTH);
+                String loadLengthStr = (loadLength instanceof Integer)?String.valueOf(loadLength):"unknownLength";
+                commitMap.put(WXInstanceApm.VALUE_BUNDLE_LOAD_LENGTH,loadLengthStr);
                 commitMap.put("templateInfo",instance.getTemplateInfo());
                 if (TextUtils.isEmpty(bundleUrlCommit) || bundleUrlCommit.equals(WXPerformance.DEFAULT)) {
                     if (!TextUtils.equals(degradeUrl, "BundleUrlDefaultDegradeUrl")) {
@@ -106,7 +113,7 @@ public class WXExceptionUtils {
                 for (Map.Entry<String,String> entry: instance.getContainerInfo().entrySet()){
                     commitMap.put(entry.getKey(),entry.getValue());
                 }
-                commitMap.put(WXInstanceExceptionRecord.KEY_EXP_STAGE_LIST,instance.getExceptionRecorder().convertStageToStr());
+                commitMap.put("wxStageList",convertStageToStr(instance));
                 String bundleTemplate = instance.getTemplate();
                 if (null == bundleTemplate){
                     bundleTemplate = "has recycle by gc";
@@ -116,9 +123,9 @@ public class WXExceptionUtils {
                 }
                 commitMap.put("wxTemplateOfBundle",bundleTemplate);
 
-                Long pageStartTime = instance.getExceptionRecorder().getStageTime(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
+                Long pageStartTime = instance.getApmForInstance().stageMap.get(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
                 if (null == pageStartTime){
-                    pageStartTime = instance.getExceptionRecorder().getStageTime(WXInstanceApm.KEY_PAGE_STAGES_RENDER_ORGIGIN);
+                    pageStartTime = instance.getApmForInstance().stageMap.get(WXInstanceApm.KEY_PAGE_STAGES_RENDER_ORGIGIN);
                 }
                 if (null != pageStartTime){
                     commitMap.put("wxUseTime", String.valueOf(WXUtils.getFixUnixTime() - pageStartTime));
@@ -141,11 +148,26 @@ public class WXExceptionUtils {
             adapter.onJSException(exceptionCommit);
         }
 
-        if (null != instance ){
-            instance.getExceptionRecorder().recordErrorMsg(exceptionCommit);
-        }
-
         WXAnalyzerDataTransfer.transferError(exceptionCommit, instanceId);
+    }
+
+    private static String convertStageToStr(WXSDKInstance instance) {
+        if (null == instance || null == instance.getApmForInstance() || instance.getApmForInstance().stageMap.isEmpty()) {
+            return "noStageRecord";
+        }
+        List<Entry<String, Long>> list = new ArrayList<>(instance.getApmForInstance().stageMap.entrySet());
+        Collections.sort(list, new Comparator<Entry<String, Long>>() {
+            @Override
+            public int compare(Entry<String, Long> o1, Entry<String, Long> o2) {
+                return (int)(o1.getValue() - o2.getValue());
+            }
+        });
+
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<String, Long> entry : list) {
+            builder.append(entry.getKey()).append(':').append(entry.getValue()).append("->");
+        }
+        return builder.toString();
     }
 
 }

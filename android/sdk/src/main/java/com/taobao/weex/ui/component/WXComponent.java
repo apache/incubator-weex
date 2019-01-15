@@ -147,6 +147,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
   private int mAbsoluteY = 0;
   private int mAbsoluteX = 0;
+  private boolean isLastLayoutDirectionRTL = false;
   @Nullable
   private Set<String> mGestureType;
 
@@ -173,6 +174,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private String mLastBoxShadowId;
   public int mDeepInComponentTree = 0;
   public boolean mIsAddElementToTree = false;
+  //for fix element case
+  public int interactionAbsoluteX=0,interactionAbsoluteY=0;
+  private boolean mHasAddFocusListener = false;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
@@ -180,8 +184,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public static final int TYPE_VIRTUAL = 1;
 
   private boolean waste = false;
+  public boolean isIgnoreInteraction = false;
 
-  private ContentBoxMeasurement contentBoxMeasurement;
+  protected ContentBoxMeasurement contentBoxMeasurement;
   private WXTransition mTransition;
   private GraphicSize mPseudoResetGraphicSize;
   @Nullable
@@ -243,35 +248,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
           lp_frameLayout.gravity = Gravity.LEFT | Gravity.TOP;
       }
-  }
-
-  public boolean isNativeLayoutRTL() {
-      return NativeRenderObjectUtils.nativeRenderObjectGetLayoutDirectionFromPathNode(this.getRenderObjectPtr()) == NativeRenderLayoutDirection.rtl;
-  }
-
-  public static boolean isLayoutRTL(WXComponent cmp) {
-    if (cmp == null) return false;
-
-    View view = cmp.getHostView();
-    if (ViewCompat.isLayoutDirectionResolved(view)) {
-      return ViewCompat.getLayoutDirection(view) == View.LAYOUT_DIRECTION_RTL;
-    } else if (cmp.getParent() != null){
-      return isLayoutRTL(cmp.getParent());
-    } else {
-      return isLayoutRTL((ViewGroup) view.getParent());
-    }
-  }
-
-  public static boolean isLayoutRTL(ViewGroup viewGroup) {
-    if (viewGroup == null) return false;
-
-    if (ViewCompat.isLayoutDirectionResolved(viewGroup)) {
-      return ViewCompat.getLayoutDirection(viewGroup) == View.LAYOUT_DIRECTION_RTL;
-    } else if (viewGroup.getParent() instanceof ViewGroup) {
-      return isLayoutRTL((ViewGroup) viewGroup.getParent());
-    } else {
-      return false;
-    }
   }
 
   public void updateStyles(WXComponent component) {
@@ -372,7 +348,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
       addClickListener(mClickEventListener);
     } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR))) {
-      addFocusChangeListener(new OnFocusChangeListener() {
+      if (!mHasAddFocusListener){
+        mHasAddFocusListener = true;
+        addFocusChangeListener(new OnFocusChangeListener() {
         @Override
         public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
@@ -380,6 +358,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
           fireEvent(hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
         }
       });
+      }
     } else if (needGestureDetector(type)) {
       if (null == view) {
         // wait next time to add.
@@ -532,7 +511,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     void onHostViewClick();
   }
 
-  interface OnFocusChangeListener {
+  public interface OnFocusChangeListener{
     void onFocusChange(boolean hasFocus);
   }
 
@@ -941,6 +920,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     setMargins(component.getMargin());
     setBorders(component.getBorder());
 
+    boolean isRTL = component.isLayoutRTL();
+    setIsLayoutRTL(isRTL);
+    if (isRTL != component.isLastLayoutDirectionRTL) {
+      component.isLastLayoutDirectionRTL = isRTL;
+      layoutDirectionDidChanged(isRTL);
+    }
+
     parseAnimation();
 
     boolean nullParent = mParent == null;//parent is nullable
@@ -986,9 +972,6 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
 
     mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getCSSLayoutTop());
     mAbsoluteX = (int) (nullParent ? 0 : mParent.getAbsoluteX() + getCSSLayoutLeft());
-
-    if (mIsAddElementToTree)
-      mInstance.onChangeElement(this, mAbsoluteY > mInstance.getWeexHeight() + 1);
 
     if (mHost == null) {
       return;
@@ -1038,6 +1021,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       } else {
         setHostLayoutParams(mHost, realWidth, realHeight, realLeft, realRight, realTop, realBottom);
       }
+      recordInteraction(realWidth,realHeight);
       mPreRealWidth = realWidth;
       mPreRealHeight = realHeight;
       mPreRealLeft = realLeft;
@@ -1047,6 +1031,44 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       // restore box shadow
       updateBoxShadow();
     }
+  }
+
+  /**
+   * layout direction is changed
+   * basic class is a empty implementation
+   * subclass can override this method do some RTL necessary things
+   * such as WXText
+   */
+  protected void layoutDirectionDidChanged(boolean isRTL) {
+
+  }
+
+  private void recordInteraction(int realWidth,int realHeight){
+    if (!mIsAddElementToTree){
+      return;
+    }
+    mIsAddElementToTree = false;
+    if (null == mParent){
+      interactionAbsoluteX = 0;
+      interactionAbsoluteY = 0;
+    }else {
+      float cssTop = getCSSLayoutTop();
+      float cssLeft = getCSSLayoutLeft();
+      interactionAbsoluteX = (int)(this.isFixed() ? cssLeft : mParent.interactionAbsoluteX + cssLeft);
+      interactionAbsoluteY = (int)(this.isFixed() ? cssTop  : mParent.interactionAbsoluteY + cssTop);
+    }
+
+    if (null == getInstance().getApmForInstance().instanceRect){
+      getInstance().getApmForInstance().instanceRect = new Rect();
+    }
+    Rect instanceRect = getInstance().getApmForInstance().instanceRect;
+    instanceRect.set(0,0,mInstance.getWeexWidth(),mInstance.getWeexHeight());
+    boolean inScreen =
+          instanceRect.contains(interactionAbsoluteX,interactionAbsoluteY) //leftTop
+              || instanceRect.contains(interactionAbsoluteX+realWidth,interactionAbsoluteY)//rightTop
+              || instanceRect.contains(interactionAbsoluteX,interactionAbsoluteY+realHeight)//leftBottom
+              || instanceRect.contains(interactionAbsoluteX+realWidth,interactionAbsoluteY+realHeight);//rightBottom
+    mInstance.onChangeElement(this,!inScreen);
   }
 
   private void setWidgetParams(Widget widget, FlatGUIContext UIImp, Point rawoffset,
@@ -1483,16 +1505,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (TextUtils.isEmpty(type)) {
       return;
     }
-    if (getEvents() == null || mAppendEvents == null || mGestureType == null) {
-      return;
-    }
 
     if (type.equals(Constants.Event.LAYEROVERFLOW))
       removeLayerOverFlowListener(getRef());
 
-    getEvents().remove(type);
-    mAppendEvents.remove(type);//only clean append events, not dom's events.
-    mGestureType.remove(type);
+    if(getEvents() != null){
+      getEvents().remove(type);
+    }
+    if(mAppendEvents != null) {
+      mAppendEvents.remove(type);//only clean append events, not dom's events.
+    }
+    if(mGestureType != null){
+      mGestureType.remove(type);
+    }
     removeEventFromView(type);
   }
 

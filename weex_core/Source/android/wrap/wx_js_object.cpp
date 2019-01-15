@@ -18,7 +18,8 @@
  */
 
 #include "android/wrap/wx_js_object.h"
-#include "android/base/jni/android_jni.h"
+
+#include "base/android/jni/android_jni.h"
 
 namespace WeexCore {
 const char kWXJSObjectClassPath[] = "com/taobao/weex/bridge/WXJSObject";

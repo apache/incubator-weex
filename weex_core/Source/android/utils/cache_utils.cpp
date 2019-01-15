@@ -35,6 +35,9 @@ jstring getComponentTypeFromCache(const std::string type) {
 
 jstring putComponentTypeToCache(const std::string type) {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return nullptr;
+
   jstring jType = env->NewStringUTF(type.c_str());
   jobject jGlobalType = env->NewGlobalRef(jType);
   componentTypeCache.insert(std::pair<std::string, jobject>(type, jGlobalType));
@@ -44,6 +47,9 @@ jstring putComponentTypeToCache(const std::string type) {
 
 void clearComponentTypeCache() {
   JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
   for (auto iter = componentTypeCache.begin(); iter != componentTypeCache.end();
        iter++) {
     if (iter->second != nullptr) {

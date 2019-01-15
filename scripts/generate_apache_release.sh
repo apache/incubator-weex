@@ -32,8 +32,9 @@ rm -rf $dest/android/sdk/src/test/java/com
 
 mv $dest/ios/sdk $dest/ios_sdk
 mv $dest/android/sdk $dest/android_sdk
-$SED_CMD -i '' 's/\.\.\/\.\.\/weex_core/\.\.\/weex_core/g' $dest/android_sdk/build.gradle
+$SED_CMD -i '' 's/\.\.\/\.\.\/weex_core/\.\.\/weex_core/g' $dest/android_sdk/build.gradle $dest/ios_sdk/WeexSDK.xcodeproj/project.pbxproj
 $SED_CMD -i '' 's/\.\.\/\.\.\/pre-build/\.\.\/pre-build/g' $dest/android_sdk/build.gradle $dest/ios_sdk/WeexSDK.xcodeproj/project.pbxproj
+[ -d "$dest/ios_sdk/build" ] && rm -rf "$dest/ios_sdk/build"
 mv $dest/android/build.gradle $dest/build.gradle
 rm -rf $dest/android $dest/ios
 

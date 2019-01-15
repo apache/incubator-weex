@@ -476,10 +476,10 @@ public class Parser {
         char ch = code.charAt(position);
         while (ch == ' '){
             position ++;
-            if(code.length() >= position){
+            if(code.length() <= position){
                 break;
             }
-            code.charAt(position);
+            ch = code.charAt(position);
         }
         return ch;
     }

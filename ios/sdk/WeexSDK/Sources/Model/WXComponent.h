@@ -17,12 +17,6 @@
  * under the License.
  */
 
-/**
- *  def : use weex_flex_engin
- *  ndef: use yoga
- **/
-
-
 #import <Foundation/Foundation.h>
 #import "WXType.h"
 

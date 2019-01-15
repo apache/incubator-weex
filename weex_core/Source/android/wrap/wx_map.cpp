@@ -18,9 +18,10 @@
  */
 
 #include "android/wrap/wx_map.h"
-#include "android/base/jni/android_jni.h"
+
 #include "android/base/string/string_utils.h"
 #include "android/utils/cache_utils.h"
+#include "base/android/jni/android_jni.h"
 
 namespace WeexCore {
 const char kWXMapClassPath[] = "com/taobao/weex/utils/WXMap";

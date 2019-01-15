@@ -49,6 +49,28 @@
     }
 }
 
+- (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated
+{
+    [super setContentOffset:contentOffset animated:animated];
+    BOOL scrollStartEvent = [[self.wx_component valueForKey:@"_scrollStartEvent"] boolValue];
+    id scrollEventListener = [self.wx_component valueForKey:@"_scrollEventListener"];
+    
+    if (animated && (scrollStartEvent ||scrollEventListener)  && !WXPointEqualToPoint(contentOffset, self.contentOffset)) {
+        CGFloat scaleFactor = self.wx_component.weexInstance.pixelScaleFactor;
+        NSDictionary *contentSizeData = @{@"width":@(self.contentSize.width / scaleFactor),
+                                          @"height":@(self.contentSize.height / scaleFactor)};
+        NSDictionary *contentOffsetData = @{@"x":@(-self.contentOffset.x / scaleFactor),
+                                            @"y":@(-self.contentOffset.y / scaleFactor)};
+        if (scrollStartEvent) {
+            [self.wx_component fireEvent:@"scrollstart" params:@{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData} domChanges:nil];
+        }
+        if (scrollEventListener) {
+            WXScrollerComponent *component = (WXScrollerComponent *)self.wx_component;
+            component.scrollEventListener(component, @"scrollstart", @{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData});
+        }
+    }
+}
+
 @end
 
 @interface WXRecycleListComponent () <WXRecycleListLayoutDelegate, WXRecycleListUpdateDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource>
@@ -695,6 +717,7 @@ WX_EXPORT_METHOD(@selector(closest:cssSelector:callback:))
 
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
 {
+    cell.wx_component = nil;
     WXLogDebug(@"Did end displaying cell:%@, at index path:%@", cell, indexPath);
 }
 

@@ -19,6 +19,8 @@
 package com.taobao.weex.utils;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -28,13 +30,17 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
+import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.provider.Settings;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -101,7 +107,7 @@ public class WXViewUtils {
   }
 
   private static int mScreenWidth;
-  private static int mScreenHeight;
+  private static int mScreenHeight = -1;
 
 
   public static int getWeexHeight(String instanceId){
@@ -178,12 +184,35 @@ public class WXViewUtils {
     return getScreenHeight(WXEnvironment.sApplication);
   }
 
+  public static boolean isMiUiForceFsgNavBar = false;
+
   public static int getScreenHeight(Context cxt) {
     if(cxt!=null){
-      Resources res = cxt.getResources();
-      mScreenHeight =cxt.getResources().getDisplayMetrics().heightPixels;
+      boolean useNewApiForAdapterFullScreen = false;
+
+      if (Build.VERSION.SDK_INT > VERSION_CODES.JELLY_BEAN){
+        if ("xiaomi".equalsIgnoreCase(Build.MANUFACTURER)){
+          useNewApiForAdapterFullScreen = isMiUiForceFsgNavBar;
+        }else {
+          useNewApiForAdapterFullScreen = true;
+        }
+      }
+
+      if (useNewApiForAdapterFullScreen){
+        WindowManager wm = (WindowManager)cxt.getSystemService(Context.WINDOW_SERVICE);
+        if (null == wm){
+          mScreenHeight =cxt.getResources().getDisplayMetrics().heightPixels;
+        }else {
+          DisplayMetrics size = new DisplayMetrics();
+          wm.getDefaultDisplay().getRealMetrics(size);
+          mScreenHeight = size.heightPixels;
+        }
+      }else {
+        mScreenHeight =cxt.getResources().getDisplayMetrics().heightPixels;
+      }
+
       if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
-        mScreenWidth = res
+        mScreenWidth = cxt.getResources()
                 .getDisplayMetrics()
                 .widthPixels;
         mScreenHeight = mScreenHeight > mScreenWidth ? mScreenHeight : mScreenWidth;

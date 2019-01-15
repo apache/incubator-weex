@@ -99,6 +99,28 @@
     }
 }
 
+- (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated
+{
+    [super setContentOffset:contentOffset animated:animated];
+    BOOL scrollStartEvent = [[self.wx_component valueForKey:@"_scrollStartEvent"] boolValue];
+    id scrollEventListener = [self.wx_component valueForKey:@"_scrollEventListener"];
+    
+    if (animated && (scrollStartEvent ||scrollEventListener)  && !WXPointEqualToPoint(contentOffset, self.contentOffset)) {
+        CGFloat scaleFactor = self.wx_component.weexInstance.pixelScaleFactor;
+        NSDictionary *contentSizeData = @{@"width":@(self.contentSize.width / scaleFactor),
+                                          @"height":@(self.contentSize.height / scaleFactor)};
+        NSDictionary *contentOffsetData = @{@"x":@(-self.contentOffset.x / scaleFactor),
+                                            @"y":@(-self.contentOffset.y / scaleFactor)};
+        if (scrollStartEvent) {
+            [self.wx_component fireEvent:@"scrollstart" params:@{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData} domChanges:nil];
+        }
+        if (scrollEventListener) {
+            WXScrollerComponent *component = (WXScrollerComponent *)self.wx_component;
+            component.scrollEventListener(component, @"scrollstart", @{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData});
+        }
+    }
+}
+
 @end
 
 // WXText is a non-public is not permitted
@@ -654,7 +676,7 @@
             // Must invoke synchronously otherwise it will remove the view just added.
             WXCellComponent *cellComponent = (WXCellComponent *)wxCellView.wx_component;
             if (cellComponent.isRecycle) {
-                [wxCellView.wx_component _unloadViewWithReusing:YES];
+                [cellComponent _unloadViewWithReusing:YES];
             }
         }
     }
@@ -907,7 +929,7 @@
     
     if (keepScrollPosition) {
         CGPoint afterContentOffset = _tableView.contentOffset;
-        CGPoint newContentOffset = CGPointMake(afterContentOffset.x, afterContentOffset.y + adjustment);
+        CGPoint newContentOffset = CGPointMake(afterContentOffset.x, afterContentOffset.y + ceilf(adjustment));
         _tableView.contentOffset = newContentOffset;
     }
     

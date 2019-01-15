@@ -85,11 +85,8 @@ static BOOL _logToWebSocket = NO;
 
 + (void)setLogLevel:(WXLogLevel)level
 {
-    if (((WXLog*)[self sharedInstance])->_logLevel != level) {
-        ((WXLog*)[self sharedInstance])->_logLevel = level;
+    ((WXLog*)[self sharedInstance])->_logLevel = level;
 
-        [[WXSDKManager bridgeMgr] resetEnvironment];
-    }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
     Class propertyClass = NSClassFromString(@"WXTracingViewControllerManager");

@@ -48,6 +48,7 @@ class RenderActionLayout : public RenderAction {
   float left_;
   float bottom_;
   float right_;
+  bool isRTL_;
   int index_;
 };
 }  // namespace WeexCore

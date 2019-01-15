@@ -532,7 +532,8 @@ namespace WeexCore {
       if (mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeLeft) != l
           || mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeTop) != t
           || mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeRight) != r
-          || mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeBottom) != b) {
+          || mLayoutResult->mLayoutPosition.getPosition(kPositionEdgeBottom) != b
+          || (l == 0.0f && t == 0.0f && r == 0.0f && b == 0.0f) ) {
         setHasNewLayout(true);
         setFrame(&mLayoutResult->mLayoutPosition, l, t, r, b);
       }
@@ -1118,14 +1119,14 @@ namespace WeexCore {
     }
     
     WXCoreDirection WXCoreLayoutNode::getLayoutDirectionFromPathNode() {
-        WXCoreLayoutNode *node = this;
-        if (node->getLayoutDirection() != kDirectionInherit) return node->getLayoutDirection();
-        if (node->getDirection() != kDirectionInherit) {
-            node->mLayoutResult->mLayoutDirection = node->getDirection();
-            return node->getLayoutDirection();
-        } else if (nullptr != node->mParent) {
-            node->mLayoutResult->mLayoutDirection = node->mParent->getLayoutDirectionFromPathNode();
-            return node->getLayoutDirection();
+        if (getLayoutDirection() != kDirectionInherit)
+            return getLayoutDirection();
+        if (getDirection() != kDirectionInherit) {
+            mLayoutResult->mLayoutDirection = getDirection();
+            return getLayoutDirection();
+        } else if (nullptr != mParent) {
+            mLayoutResult->mLayoutDirection = mParent->getLayoutDirectionFromPathNode();
+            return getLayoutDirection();
         }
         return WEEXCORE_CSS_DEFAULT_DIRECTION;
     }

@@ -128,7 +128,7 @@ bool ValueStrictEquals(const Value *a, const Value *b) {
     else if (IsInt(a)) {
         return IntValue(a) == IntValue(b);
     }
-    else if (IsBool(a)) {
+    else if (IsBool(a) && IsBool(b)) {
         return BoolValue(a) == BoolValue(b);
     }
     else if (ToNum(a, d1) && ToNum(b, d2)) {

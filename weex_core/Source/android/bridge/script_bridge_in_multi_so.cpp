@@ -18,15 +18,16 @@
  */
 
 #include "script_bridge_in_multi_so.h"
-#include <base/thread/waitable_event.h>
 #include <dlfcn.h>
 #include <malloc.h>
-#include "android/base/log_utils.h"
+
 #include "android/bridge/multi_so_initializer.h"
 #include "android/bridge/script/script_side_in_multi_so.h"
-#include "android/utils/IPCStringResult.h"
+#include "android/utils/ipc_string_result.h"
 #include "android/utils/params_utils.h"
+#include "base/android/log_utils.h"
 #include "base/make_copyable.h"
+#include "base/thread/waitable_event.h"
 #include "core/bridge/script/core_side_in_script.h"
 #include "core/manager/weex_core_manager.h"
 
@@ -478,6 +479,19 @@ static void OnReceivedResult(long callback_id,
       }));
 }
 
+static void UpdateComponentData(const char* page_id,
+                                const char* cid,
+                                const char* json_data) {
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+      weex::base::MakeCopyable(
+          [page_id = std::string(page_id), cid = std::string(cid), json_data = std::string(json_data)]() {
+            WeexCoreManager::Instance()
+                ->script_bridge()
+                ->core_side()
+                ->UpdateComponentData(page_id.c_str(), cid.c_str(), json_data.c_str());
+          }));
+}
+
 static void ReportException(const char *page_id, const char *func,
                             const char *exception_string) {
   //  WeexCoreManager::Instance()->script_bridge()->core_side()->ReportException(
@@ -529,7 +543,8 @@ FunctionsExposedByCore *ScriptBridgeInMultiSo::GetExposedFunctions() {
                                  PostMessage,
                                  DispatchMessage,
                                  DispatchMessageSync,
-                                 OnReceivedResult};
+                                 OnReceivedResult,
+                                 UpdateComponentData};
   auto functions =
       (FunctionsExposedByCore *)malloc(sizeof(FunctionsExposedByCore));
   memset(functions, 0, sizeof(FunctionsExposedByCore));

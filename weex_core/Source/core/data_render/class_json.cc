@@ -16,14 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <algorithm>
-#include "core/data_render/class.h"
 #include "core/data_render/class_json.h"
+#include <algorithm>
+
+#include "base/log_defines.h"
+#include "core/data_render/class.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/table.h"
+
 #include "core/data_render/vnode/vnode_exec_env.h"
-#include <base/LogDefines.h>
 
 namespace weex {
 namespace core {
@@ -57,7 +59,7 @@ static Value stringify(ExecState *exec_state) {
         else if (IsArray(value)) {
             json_string = ArrayToString(ValueTo<Array>(value));
         }
-        ret = exec_state->string_table()->StringFromUTF8(json_string);
+        ret = Value(exec_state->string_table()->StringFromUTF8(json_string));
         
     } while (0);
     

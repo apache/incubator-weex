@@ -69,7 +69,7 @@ public class WXBridge implements IWXBridge {
 
   public native String nativeExecJSOnInstance(String instanceId, String script, int type);
 
-  public native void nativeFireEventOnDataRenderNode(String instanceId, String ref, String type, String data);
+  public native void nativeFireEventOnDataRenderNode(String instanceId, String ref, String type, String data, String domChanges);
 
   public native void nativeRegisterModuleOnDataRenderNode( String data);
 
@@ -256,7 +256,12 @@ public class WXBridge implements IWXBridge {
         // TODO use a better way
         if (instance!=null && (instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
                 || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY)){
-          argArray = (JSONArray) JSON.parse(new String(arguments, "UTF-8"));
+          try {
+            argArray = (JSONArray) JSON.parse(new String(arguments, "UTF-8"));
+          } catch (Exception e) {
+            // For wson use in data render mode
+            argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
+          }
         } else {
           argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
         }
@@ -519,10 +524,10 @@ public class WXBridge implements IWXBridge {
 
   @Override
   @CalledByNative
-  public int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, int index) {
+  public int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, boolean isRTL, int index) {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
-      errorCode = WXBridgeManager.getInstance().callLayout(instanceId, ref, top, bottom, left, right, height, width, index);
+      errorCode = WXBridgeManager.getInstance().callLayout(instanceId, ref, top, bottom, left, right, height, width, isRTL, index);
     } catch (Throwable e) {
       //catch everything during call native.
       if (WXEnvironment.isApkDebugable()) {
@@ -705,9 +710,8 @@ public class WXBridge implements IWXBridge {
     }
   }
 
-  @Override
-  public void fireEventOnDataRenderNode(String instanceId, String ref, String type, String data) {
-    nativeFireEventOnDataRenderNode(instanceId,ref,type,data);
+  public void fireEventOnDataRenderNode(String instanceId, String ref, String type, String data, String domChanges) {
+    nativeFireEventOnDataRenderNode(instanceId,ref,type,data, domChanges);
   }
 
   public void registerModuleOnDataRenderNode(String data) {

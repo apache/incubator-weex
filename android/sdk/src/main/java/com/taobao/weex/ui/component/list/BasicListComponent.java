@@ -183,7 +183,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     } else {
       if (lp instanceof FrameLayout.LayoutParams) {
         FrameLayout.LayoutParams lp_frameLayout = (FrameLayout.LayoutParams) lp;
-        if (this.isNativeLayoutRTL()) {
+        if (this.isLayoutRTL()) {
           lp_frameLayout.gravity = Gravity.RIGHT | Gravity.TOP;
           lp.setMargins(right, top, left, bottom);
         } else {
@@ -199,7 +199,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void setLayout(WXComponent component) {
     if (component.getHostView() != null) {
-      int layoutDirection = component.isNativeLayoutRTL() ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR;
+      int layoutDirection = component.isLayoutRTL() ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR;
       ViewCompat.setLayoutDirection(component.getHostView(), layoutDirection);
     }
     super.setLayout(component);
@@ -319,7 +319,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       @Override
       public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
         super.onScrollStateChanged(recyclerView, newState);
-
+        getScrollStartEndHelper().onScrollStateChanged(newState);
         List<OnWXScrollListener> listeners = getInstance().getWXScrollListeners();
         int size;
         OnWXScrollListener listener;
@@ -1218,8 +1218,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       }
       float offsetParsed = WXViewUtils.getRealPxByWidth(Integer.parseInt(offset),getInstance().getInstanceViewPortWidth());
 
-      if (offScreenY < offsetParsed) {
-
+      if (offScreenY <= offsetParsed && getEvents().contains(Constants.Event.LOADMORE)) {
         if (mListCellCount != mChildren.size()
             || mForceLoadmoreNextTime) {
           fireEvent(Constants.Event.LOADMORE);

@@ -11,6 +11,8 @@
 		17036A5A20FDF9DF0029AE3D /* WXApmImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 17036A5920FDF9DF0029AE3D /* WXApmImpl.m */; };
 		17C1DB57206B675D000E0CEB /* DebugAnzlyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = 17C1DB56206B675D000E0CEB /* DebugAnzlyzer.m */; };
 		2AE88A2C1C8544E6003329DE /* WXScannerVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AE88A2B1C8544E6003329DE /* WXScannerVC.m */; };
+		3375BEE821C74C5C003CAAB8 /* WXWebSocketDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 3375BEE521C74C5C003CAAB8 /* WXWebSocketDefaultImpl.m */; };
+		3375BEE921C74C5C003CAAB8 /* SRWebSocket+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = 3375BEE721C74C5C003CAAB8 /* SRWebSocket+Weex.m */; };
 		564B94671DD9C65000441C8D /* WeexUITestDemo-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 564B94661DD9C65000441C8D /* WeexUITestDemo-Info.plist */; };
 		59EA0DA71D2E7D19004F904A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 59EA0DA61D2E7D19004F904A /* Images.xcassets */; };
 		7478481E1E0CD4910044500D /* WXSyncTestModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 7478481D1E0CD4910044500D /* WXSyncTestModule.m */; };
@@ -80,6 +82,10 @@
 		22E4D2883CC56188A2CA9C13 /* Pods-WeexDemo.uitest.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeexDemo.uitest.xcconfig"; path = "Pods/Target Support Files/Pods-WeexDemo/Pods-WeexDemo.uitest.xcconfig"; sourceTree = "<group>"; };
 		2AE88A2A1C8544E6003329DE /* WXScannerVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WXScannerVC.h; path = Scanner/WXScannerVC.h; sourceTree = "<group>"; };
 		2AE88A2B1C8544E6003329DE /* WXScannerVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WXScannerVC.m; path = Scanner/WXScannerVC.m; sourceTree = "<group>"; };
+		3375BEE421C74C5C003CAAB8 /* SRWebSocket+Weex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRWebSocket+Weex.h"; sourceTree = "<group>"; };
+		3375BEE521C74C5C003CAAB8 /* WXWebSocketDefaultImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXWebSocketDefaultImpl.m; sourceTree = "<group>"; };
+		3375BEE621C74C5C003CAAB8 /* WXWebSocketDefaultImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXWebSocketDefaultImpl.h; sourceTree = "<group>"; };
+		3375BEE721C74C5C003CAAB8 /* SRWebSocket+Weex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SRWebSocket+Weex.m"; sourceTree = "<group>"; };
 		564B94661DD9C65000441C8D /* WeexUITestDemo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "WeexUITestDemo-Info.plist"; sourceTree = "<group>"; };
 		59EA0DA61D2E7D19004F904A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		5AF8846546DAC65CAC038806 /* Pods-WeexDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeexDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-WeexDemo/Pods-WeexDemo.debug.xcconfig"; sourceTree = "<group>"; };
@@ -191,6 +197,17 @@
 				E48C20F443AA337D1FE97622 /* libPods-WeexUITestDemo.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3375BEE321C74C5C003CAAB8 /* Websocket */ = {
+			isa = PBXGroup;
+			children = (
+				3375BEE421C74C5C003CAAB8 /* SRWebSocket+Weex.h */,
+				3375BEE521C74C5C003CAAB8 /* WXWebSocketDefaultImpl.m */,
+				3375BEE621C74C5C003CAAB8 /* WXWebSocketDefaultImpl.h */,
+				3375BEE721C74C5C003CAAB8 /* SRWebSocket+Weex.m */,
+			);
+			path = Websocket;
 			sourceTree = "<group>";
 		};
 		74CC79EC1C2B9FC600829368 /* Demo */ = {
@@ -338,6 +355,7 @@
 		DCABAFF71D0296E8001C8592 /* handler */ = {
 			isa = PBXGroup;
 			children = (
+				3375BEE321C74C5C003CAAB8 /* Websocket */,
 				DC15A3CF200E30FC009C8977 /* WXNavigationHandlerImpl.h */,
 				DC15A3CE200E30FC009C8977 /* WXNavigationHandlerImpl.m */,
 				DC20B8E41ECADA2500845F39 /* WXConfigCenterDefaultImpl.h */,
@@ -617,6 +635,7 @@
 				17C1DB57206B675D000E0CEB /* DebugAnzlyzer.m in Sources */,
 				DCABAFF31D029685001C8592 /* WXATLoggerPlugin.m in Sources */,
 				DC15A3D0200E30FC009C8977 /* WXNavigationHandlerImpl.m in Sources */,
+				3375BEE921C74C5C003CAAB8 /* SRWebSocket+Weex.m in Sources */,
 				2AE88A2C1C8544E6003329DE /* WXScannerVC.m in Sources */,
 				17036A5720FDF9AA0029AE3D /* WXApmGeneratorImpl.m in Sources */,
 				775BEE861C1E8ECC008D1629 /* WXDemoViewController.m in Sources */,
@@ -634,6 +653,7 @@
 				DCABAFFE1D029753001C8592 /* WXImgLoaderDefaultImpl.m in Sources */,
 				747DF6681E2F176A005C53A8 /* UIView+UIThreadCheck.m in Sources */,
 				C47B78D21F299E27001D3B0C /* WXExtendCallNativeTest.m in Sources */,
+				3375BEE821C74C5C003CAAB8 /* WXWebSocketDefaultImpl.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

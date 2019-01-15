@@ -12,8 +12,8 @@ android {
         applicationId "com.alibaba.weex"
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
-        versionCode 17
-        versionName "0.19.0"
+        versionCode 20
+        versionName "0.20.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         ndk{
@@ -90,12 +90,8 @@ dependencies {
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
     /*source dependency*/
 
-    debugCompile project(path: ':commons', configuration: 'debug')
-    releaseCompile project(path: ':commons', configuration: 'release')
-
-    debugCompile project(path: ':weex_sdk', configuration: 'debug')
-    releaseCompile project(path: ':weex_sdk', configuration: 'release')
-
+    compile project(':commons')
+    compile project(':weex_sdk')
     //https://github.com/weexteam/weex-analyzer-android
     //Weex-Analyzer provides several convenient tools such as Memory Monitor
     // to optimize your application. It's not available by default,you can
@@ -106,6 +102,8 @@ dependencies {
     compile 'com.loopj.android:android-async-http:1.4.9@aar'
     compile 'com.facebook.fresco:fresco:0.12.0+'
     compile 'com.facebook.fresco:animated-gif:0.12.0'
+
+    compile 'com.google.zxing:core:3.3.3'
 
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
@@ -120,6 +118,10 @@ dependencies {
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
     compile 'com.taobao.android:weex_inspector:0.18.10'
     //compile project(":weex_inspector")
+
+    // Bind actions to effects. See https://alibaba.github.io/bindingx/
+    compile 'com.alibaba.android:bindingx-core:1.1.1.2@aar'
+    compile 'com.alibaba.android:bindingx_weex_plugin:1.1.1@aar'
 }
 
 if(file('../../license/LICENSE').exists()){

@@ -31,4 +31,7 @@
 +(void) setOpen:(BOOL)isOpen;
 +(BOOL) isOpen;
 
++(void) switchInteractionLog:(BOOL) isOpen;
++(BOOL) isInteractionLogOpen;
+
 @end

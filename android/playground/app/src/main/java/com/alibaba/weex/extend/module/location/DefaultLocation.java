@@ -33,6 +33,7 @@ import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.utils.WXLogUtils;
@@ -128,7 +129,9 @@ public class DefaultLocation implements ILocatable {
 
   @Override
   public void watchPosition(final String successCallback, final String errorCallback, final String params) {
-    WXLogUtils.d("into--[watchPosition] successCallback:" + successCallback + " errorCallback:" + errorCallback + "\nparams:" + params);
+    if (WXEnvironment.isApkDebugable()){
+      WXLogUtils.d("into--[watchPosition] successCallback:" + successCallback + " errorCallback:" + errorCallback + "\nparams:" + params);
+    }
     if (!TextUtils.isEmpty(params)) {
       try {
         JSONObject jsObj = new JSONObject(params);

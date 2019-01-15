@@ -19,11 +19,11 @@
 
 #ifndef CORE_BASE_MESSAGE_LOOP_MESSAGE_PUMP_ANDROID_H
 #define CORE_BASE_MESSAGE_LOOP_MESSAGE_PUMP_ANDROID_H
-#ifdef OS_ANDROID
+#ifdef __ANDROID__
 
 #include <jni.h>
-#include "android/base/jni/scoped_java_ref.h"
-#include "android/wrap/jni_object_wrap.h"
+#include "base/android/jni/scoped_java_ref.h"
+#include "base/android/jni/jni_object_wrap.h"
 #include "base/message_loop/message_pump.h"
 
 namespace weex {

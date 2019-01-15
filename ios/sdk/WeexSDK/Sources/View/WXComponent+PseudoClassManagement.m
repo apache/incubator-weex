@@ -47,6 +47,17 @@
     return newStyles;
 }
 
+- (void)resetPseudoClassStyles:(NSArray *)resetstyle {
+    for (NSString* key in resetstyle) {
+        if([key rangeOfString:@":"].location != NSNotFound){
+            [_pseudoClassStyles removeObjectForKey:key];
+        }
+    }
+    if([_pseudoClassStyles count] == 0) {
+        _isListenPseudoTouch = NO;
+    }
+}
+
 - (void)updatePseudoClassStyles:(NSDictionary *)pseudoClassStyles
 {
     WXAssertMainThread();

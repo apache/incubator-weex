@@ -33,6 +33,7 @@ typedef NSInteger(^WXJSCallRefreshFinish)(NSString *instanceId);
 typedef NSInteger(^WXJSCallUpdateFinish)(NSString *instanceId);
 typedef NSInvocation *(^WXJSCallNativeModule)(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options);
 typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options);
+typedef NSInteger(^WXJSCallUpdateComponentData)(NSString *instanceId, NSString *componentId, NSString *jsonData);
 
 @protocol WXBridgeProtocol <NSObject>
 
@@ -73,6 +74,11 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
 - (void)garbageCollect;
 
 @required
+
+/**
+ * Register callback when call __updateComponentData tasks occur. only use for data render
+ */
+- (void)registerCallUpdateComponentData:(WXJSCallUpdateComponentData)callUpdateComponentData;
 
 /**
  * Register callback when call native tasks occur
