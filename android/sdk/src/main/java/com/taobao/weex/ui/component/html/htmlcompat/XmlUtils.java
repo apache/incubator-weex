@@ -20,6 +20,8 @@ package com.taobao.weex.ui.component.html.htmlcompat;
 
 import android.util.Xml;
 
+import com.taobao.weex.utils.WXResourceUtils;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
@@ -103,6 +105,8 @@ public class XmlUtils
         {
             index++;
             base = 16;
+        } else if (nm.startsWith("rgb")){
+          return WXResourceUtils.getColor(nm.concat(")"));
         }
         return Integer.parseInt(nm.substring(index), base) * sign;
     }
@@ -136,6 +140,8 @@ public class XmlUtils
         } else if ('#' == value.charAt(index)) {
             index++;
             base = 16;
+        } else if (value.startsWith("rgb")){
+          return WXResourceUtils.getColor(value.concat(")"));
         }
         return (int) Long.parseLong(value.substring(index), base);
     }

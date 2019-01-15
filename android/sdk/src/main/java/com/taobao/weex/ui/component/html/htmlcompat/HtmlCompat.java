@@ -39,7 +39,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -76,22 +75,6 @@ import org.xml.sax.XMLReader;
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class HtmlCompat {
-
-    /**
-     * Retrieves images for HTML &lt;img&gt; tags.
-     */
-    public interface ImageGetter {
-        /**
-         * This method is called when the HTML parser encounters an
-         * &lt;img&gt; tag.  The <code>source</code> argument is the
-         * string from the "src" attribute; the return value should be
-         * a Drawable representation of the image or <code>null</code>
-         * for a generic replacement image.  Make sure you call
-         * setBounds() on your Drawable if it doesn't already have
-         * its bounds set.
-         */
-        Drawable getDrawable(String source, Attributes attributes);
-    }
 
     /**
      * Is notified when HTML tags are encountered that the parser does
@@ -181,13 +164,13 @@ public class HtmlCompat {
      */
     public static final int FROM_HTML_OPTION_USE_CSS_COLORS = 0x00000100;
     /**
-     * Flags for {@link #fromHtml(Context, String, int, ImageGetter, TagHandler)}: Separate block-level
+     * Flags for {@link #fromHtml(Context, String, int, TagHandler)}: Separate block-level
      * elements with blank lines (two newline characters) in between. This is the legacy behavior
      * prior to N.
      */
     public static final int FROM_HTML_MODE_LEGACY = 0x00000000;
     /**
-     * Flags for {@link #fromHtml(Context, String, int, ImageGetter, TagHandler)}: Separate block-level
+     * Flags for {@link #fromHtml(Context, String, int, TagHandler)}: Separate block-level
      * elements with line breaks (single newline character) in between. This inverts the
      * {@link Spanned} to HTML string conversion done with the option
      * {@link #TO_HTML_PARAGRAPH_LINES_INDIVIDUAL}.
@@ -227,42 +210,29 @@ public class HtmlCompat {
         private static final HTMLSchema schema = new HTMLSchema();
     }
 
-
     /**
      * Returns displayable styled text from the provided HTML string. Any &lt;img&gt; tags in the
-     * HTML will not use an ImageGetter to request a representation of the image or TagHandler to
-     * handle unknown tags.
-     * <p>
-     * <p>This uses TagSoup to handle real HTML, including all of the brokenness found in the wild.
-     */
-    public static Spanned fromHtml(@NonNull Context context, @NonNull String source, int flags,
-                                   @Nullable ImageGetter imageGetter) {
-        return fromHtml(context, source, flags, imageGetter, null, null);
-    }
-
-    /**
-     * Returns displayable styled text from the provided HTML string. Any &lt;img&gt; tags in the
-     * HTML will use the specified ImageGetter to request a representation of the image (use null
+     * HTML will use the specified to request a representation of the image (use null
      * if you don't want this) and the specified TagHandler to handle unknown tags (specify null if
      * you don't want this).
      * <p>
      * <p>This uses TagSoup to handle real HTML, including all of the brokenness found in the wild.
      */
     public static Spanned fromHtml(@NonNull Context context, @NonNull String source, int flags,
-                                   @Nullable ImageGetter imageGetter, @Nullable TagHandler tagHandler) {
-        return fromHtml(context, source, flags, imageGetter, tagHandler, null);
+                                   @Nullable TagHandler tagHandler) {
+        return fromHtml(context, source, flags, tagHandler, null);
     }
 
     /**
      * Returns displayable styled text from the provided HTML string. Any &lt;img&gt; tags in the
-     * HTML will use the specified ImageGetter to request a representation of the image (use null
+     * HTML will use the specified to request a representation of the image (use null
      * if you don't want this) and the specified TagHandler to handle unknown tags (specify null if
      * you don't want this).
      * <p>
      * <p>This uses TagSoup to handle real HTML, including all of the brokenness found in the wild.
      */
     public static Spanned fromHtml(@NonNull Context context, @NonNull String source, int flags,
-                                   @Nullable ImageGetter imageGetter, @Nullable TagHandler tagHandler,
+                                   @Nullable TagHandler tagHandler,
                                    @Nullable SpanCallback spanCallback) {
         if (source == null) {
             return null;
@@ -275,7 +245,7 @@ public class HtmlCompat {
             throw new RuntimeException(e);
         }
         HtmlToSpannedConverter converter =
-                new HtmlToSpannedConverter(context, source, imageGetter, tagHandler, spanCallback, parser, flags);
+                new HtmlToSpannedConverter(context, source, tagHandler, spanCallback, parser, flags);
         return converter.convert();
     }
 
@@ -368,7 +338,7 @@ public class HtmlCompat {
 //        final char[] buffer = TextUtils.obtain(len);
 //        TextUtils.getChars(text, start, end, buffer, 0);
 //        int paraDir = AndroidBidi.bidi(Layout.DIR_REQUEST_DEFAULT_LTR, buffer, levels, len,
-//                false /* no info */);
+//                false /* no extra */);
         switch (paraDir) {
             case Layout.DIR_RIGHT_TO_LEFT:
                 return " dir=\"rtl\"";

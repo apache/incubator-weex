@@ -55,21 +55,21 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
   protected Map<View, String> mImageMap = new HashMap<>();
 
   @Override
-  public View getHtmlTagView(Context context, WxHtmlComponent component, int tagType, String html) {
+  public View getHtmlTagView(
+      Context context, WxHtmlComponent component, String tagName, String html) {
     this.context = context;
     this.component = component;
     View tagView = null;
-    switch (tagType) {
-      case HtmlComponent.TEXT_VIEW:
+    switch (tagName) {
+      case HtmlComponent.TAG_DEFAULT:
         tagView = getDefaultTextView(html);
         break;
-      case HtmlComponent.TABLE_VIEW:
+      case HtmlComponent.TAG_TABLE:
         tagView = getDefaultTabView(html);
         break;
-      case HtmlComponent.IMAGE_VIEW:
+      case HtmlComponent.TAG_IMAGE:
         tagView = getDefaultImageView(html);
         break;
-      case HtmlComponent.VIDEO_VIEW:
       default: // text
         View extendTagView = getExtendTagView(html);
         tagView = extendTagView == null ? getDefaultTextView(html) : extendTagView;
@@ -79,22 +79,7 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
   }
 
   @Override
-  public View.OnClickListener getTagViewClickListener(int tagType, String html) {
-    //    View.OnClickListener onClickListener = null;
-    //    switch (tagType) {
-    //      case HtmlComponent.TEXT_VIEW:
-    //        break;
-    //      case HtmlComponent.TABLE_VIEW:
-    //        break;
-    //      case HtmlComponent.IMAGE_VIEW:
-    //        onClickListener = new EmptyClickListener();
-    //        break;
-    //      case HtmlComponent.VIDEO_VIEW:
-    //        onClickListener = new EmptyClickListener();
-    //        break;
-    //      default: // text
-    //        break;
-    //    }
+  public View.OnClickListener getTagViewClickListener(String tagName, String html) {
     return new EmptyClickListener();
   }
 
@@ -155,7 +140,7 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
     String src = HtmlComponent.getAttributeValue("src", info);
     WXSDKManager.getInstance().getIWXImgLoaderAdapter().setImage(src, imageView, null, null);
 
-    imageView.setOnClickListener(getTagViewClickListener(HtmlComponent.IMAGE_VIEW, info));
+    imageView.setOnClickListener(getTagViewClickListener(HtmlComponent.TAG_IMAGE, info));
     mImageMap.put(imageView, src);
     return imageView;
   }
@@ -164,7 +149,7 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
     JellyBeanSpanFixTextView textView = new JellyBeanSpanFixTextView(context);
     WxHtmlTagHandler tagHandler = new WxHtmlTagHandler();
     textView.setText(
-        HtmlCompat.fromHtml(context, html, HtmlCompat.FROM_HTML_MODE_LEGACY, null, tagHandler));
+        HtmlCompat.fromHtml(context, html, HtmlCompat.FROM_HTML_MODE_LEGACY, tagHandler));
 
     textView.setMovementMethod(LinkMovementMethod.getInstance());
     CharSequence text = textView.getText();
@@ -173,7 +158,7 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
       URLSpan[] oldUrlSpans = sp.getSpans(0, text.length(), URLSpan.class);
       SpannableStringBuilder ssb = new SpannableStringBuilder(text);
       for (URLSpan oldUrlSpan : oldUrlSpans) {
-        //        ssb.removeSpan(oldUrlSpan);
+        ssb.removeSpan(oldUrlSpan);
         DefaultURLSpan defaultURLSpan = new DefaultURLSpan(oldUrlSpan.getURL());
         ssb.setSpan(
             defaultURLSpan,
@@ -195,7 +180,7 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
 
     @Override
     public void onClick(View view) {
-      getTagViewClickListener(HtmlComponent.TEXT_VIEW, url).onClick(view);
+      getTagViewClickListener(HtmlComponent.TAG_DEFAULT, url).onClick(view);
     }
   }
 

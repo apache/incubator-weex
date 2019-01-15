@@ -143,7 +143,7 @@ public class WxHtmlComponent extends WXComponent<ScrollView> {
 
     if (mHtmlComponents.size() == 0) {
       mHtmlComponents.addAll(
-          HtmlComponent.parseTags(htmlText, HtmlComponent.IMAGE, HtmlComponent.TABLE));
+          HtmlComponent.parseTags(htmlText, HtmlComponent.TAG_IMAGE, HtmlComponent.TAG_TABLE));
     }
 
     LinearLayout.LayoutParams params =
@@ -153,7 +153,7 @@ public class WxHtmlComponent extends WXComponent<ScrollView> {
       layout.addView(
           getInstance()
               .getHtmlTextAdapter()
-              .getHtmlTagView(getContext(), this, htmlComponent.type, htmlComponent.info),
+              .getHtmlTagView(getContext(), this, htmlComponent.tagName, htmlComponent.info),
           params);
     }
   }

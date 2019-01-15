@@ -19,10 +19,8 @@
 package com.taobao.weex.ui.component.html.htmlcompat;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.Spannable;
@@ -32,11 +30,8 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.BackgroundColorSpan;
-import android.text.style.BulletSpan;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.ImageSpan;
 import android.text.style.ParagraphStyle;
-import android.text.style.QuoteSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
@@ -45,7 +40,8 @@ import android.text.style.SuperscriptSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.UnderlineSpan;
 
-import com.taobao.weex.R;
+import com.taobao.weex.ui.component.html.spans.WxBulletSpan;
+import com.taobao.weex.ui.component.html.spans.WxQuoteSpan;
 
 import org.ccil.cowan.tagsoup.Parser;
 import org.xml.sax.Attributes;
@@ -72,7 +68,6 @@ class HtmlToSpannedConverter implements ContentHandler {
     private final HtmlCompat.SpanCallback mSpanCallback;
     private XMLReader mReader;
     private SpannableStringBuilder mSpannableStringBuilder;
-    private HtmlCompat.ImageGetter mImageGetter;
     private HtmlCompat.TagHandler mTagHandler;
     private int mFlags;
     private static Pattern sTextAlignPattern;
@@ -276,13 +271,12 @@ class HtmlToSpannedConverter implements ContentHandler {
         return sTextFontSizePattern;
     }
 
-    HtmlToSpannedConverter(Context context, String source, HtmlCompat.ImageGetter imageGetter,
+    HtmlToSpannedConverter(Context context, String source,
                            HtmlCompat.TagHandler tagHandler, HtmlCompat.SpanCallback spanCallback,
                            Parser parser, int flags) {
         mContext = context;
         mSource = source;
         mSpannableStringBuilder = new SpannableStringBuilder();
-        mImageGetter = imageGetter;
         mTagHandler = tagHandler;
         mSpanCallback = spanCallback;
         mReader = parser;
@@ -300,7 +294,7 @@ class HtmlToSpannedConverter implements ContentHandler {
             // TagSoup doesn't throw parse exceptions.
             throw new RuntimeException(e);
         }
-        // Fix flags and range for paragraph-type markup.
+        // Fix flags and range for paragraph-tagName markup.
         Object[] spans = mSpannableStringBuilder.getSpans(0, mSpannableStringBuilder.length(), ParagraphStyle.class);
         for (Object span : spans) {
             int start = mSpannableStringBuilder.getSpanStart(span);
@@ -376,10 +370,6 @@ class HtmlToSpannedConverter implements ContentHandler {
                 Character.toLowerCase(tag.charAt(0)) == 'h' &&
                 tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
             startHeading(mSpannableStringBuilder, attributes, tag.charAt(1) - '1');
-        } else if (tag.equalsIgnoreCase("img")) {
-            startImg(mSpannableStringBuilder, attributes, mImageGetter);
-        } else if (mTagHandler != null) {
-            mTagHandler.handleTag(true, tag, attributes, mSpannableStringBuilder, mReader);
         }
     }
 
@@ -437,8 +427,6 @@ class HtmlToSpannedConverter implements ContentHandler {
                 Character.toLowerCase(tag.charAt(0)) == 'h' &&
                 tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
             endHeading(tag, mSpannableStringBuilder);
-        } else if (mTagHandler != null) {
-            mTagHandler.handleTag(false, tag, null, mSpannableStringBuilder, mReader);
         }
     }
 
@@ -539,7 +527,7 @@ class HtmlToSpannedConverter implements ContentHandler {
     private void endLi(String tag, Editable text) {
         endCssStyle(tag, text);
         endBlockElement(tag, text);
-        end(tag, text, Bullet.class, new BulletSpan());
+        end(tag, text, Bullet.class, new WxBulletSpan());
     }
 
     private void startBlockquote(Editable text, Attributes attributes) {
@@ -549,7 +537,7 @@ class HtmlToSpannedConverter implements ContentHandler {
 
     private void endBlockquote(String tag, Editable text) {
         endBlockElement(tag, text);
-        end(tag, text, Blockquote.class, new QuoteSpan());
+        end(tag, text, Blockquote.class, new WxQuoteSpan());
     }
 
     private void startHeading(Editable text, Attributes attributes, int level) {
@@ -603,7 +591,11 @@ class HtmlToSpannedConverter implements ContentHandler {
     private void end(String tag, Editable text, Class kind, Object repl) {
         Object obj = getLast(text, kind);
         if (obj != null) {
-            setSpanFromMark(tag, text, obj, repl);
+            if(repl instanceof WxQuoteSpan){
+                setSpanFromMark(tag, text, obj, repl,new ForegroundColorSpan(((WxQuoteSpan) repl).getColor()));
+            }else {
+                setSpanFromMark(tag, text, obj, repl);
+            }
         }
     }
 
@@ -670,23 +662,6 @@ class HtmlToSpannedConverter implements ContentHandler {
         if (r != null) {
             setSpanFromMark(tag, text, r, new RelativeSizeSpan(r.getTextProportion()));
         }
-    }
-
-    private void startImg(Editable text, Attributes attributes, HtmlCompat.ImageGetter img) {
-        String src = attributes.getValue("", "src");
-        Drawable d = null;
-        if (img != null) {
-            d = img.getDrawable(src, attributes);
-        }
-        if (d == null) {
-            Resources res = mContext.getResources();
-            d = res.getDrawable(R.drawable.weex_error);
-            d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-        }
-        int len = text.length();
-        text.append("\uFFFC");
-        text.setSpan(new ImageSpan(d, src), len, text.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     private void startFont(Editable text, Attributes attributes) {

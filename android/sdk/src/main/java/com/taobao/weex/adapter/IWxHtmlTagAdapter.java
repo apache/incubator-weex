@@ -21,7 +21,6 @@ package com.taobao.weex.adapter;
 import android.content.Context;
 import android.view.View;
 
-import com.taobao.weex.ui.component.html.HtmlComponent;
 import com.taobao.weex.ui.component.html.WxHtmlComponent;
 
 /** Created by Bruce Too On 2019/1/10. At 09:39 */
@@ -31,13 +30,11 @@ public interface IWxHtmlTagAdapter<T extends View> {
    * com.taobao.weex.ui.component.html.adapter.DefaultHtmlTagAdapter}
    *
    * @param context current activity context
-   * @param tagType tag's type define in {@link HtmlComponent.ViewType}
+   * @param tagName tag's name
    * @param html html string
    * @return the custom native view self
    */
-  public T getHtmlTagView(
-      Context context, WxHtmlComponent component, @HtmlComponent.ViewType int tagType, String html);
+  public T getHtmlTagView(Context context, WxHtmlComponent component, String tagName, String html);
 
-  public View.OnClickListener getTagViewClickListener(
-      @HtmlComponent.ViewType int tagType, String html);
+  public View.OnClickListener getTagViewClickListener(String tagName, String html);
 }

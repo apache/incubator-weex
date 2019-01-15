@@ -18,17 +18,13 @@
  */
 package com.taobao.weex.ui.component.html;
 
-import android.support.annotation.IntDef;
-import android.support.annotation.StringDef;
 import android.text.TextUtils;
 
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,7 +41,7 @@ public class HtmlComponent {
       "<!DOCTYPE html>\n"
           + "<html>\n"
           + " <head> \n"
-          + "  <style type=\"text/css\">\n"
+          + "  <style tagName=\"text/css\">\n"
           + "  .article-content table {\n"
           + "  width: 100%;\n"
           + "  font-size: 14px;\n"
@@ -113,49 +109,28 @@ public class HtmlComponent {
    */
   private static final String ATTRIBUTE_REGEX = "(key|KEY)=(\\\"|\\')(.*?)(\\\"|\\')";
 
-  public static final String TABLE = "table";
-  public static final String VIDEO = "video";
-  public static final String IMAGE = "img";
+  public static final String TAG_DEFAULT = "text";
+  public static final String TAG_TABLE = "table";
+  public static final String TAG_IMAGE = "img";
 
-  @StringDef({TABLE, VIDEO, IMAGE})
-  public @interface TAG {}
-
-  public static final int TEXT_VIEW = 1; // for normal tag can be formatted by text view
-  public static final int TABLE_VIEW = 2; // for table tag
-  public static final int VIDEO_VIEW = 3; // for video tag
-  public static final int IMAGE_VIEW = 4; // for img tag
-
-  @IntDef({TEXT_VIEW, TABLE_VIEW, VIDEO_VIEW, IMAGE_VIEW})
-  public @interface ViewType {}
-
-  @ViewType public int type;
+  public String tagName;
   public String info;
 
-  private static Map<String, Integer> sSupportTagMap = new HashMap<>();
-
-  /**
-   * All support tags parse need be mapped with extra native view,and register here for remarking
-   */
-  static {
-    sSupportTagMap.put(TABLE, TABLE_VIEW);
-    sSupportTagMap.put(IMAGE, IMAGE_VIEW);
-  }
-
-  private static HtmlComponent getComponent(@ViewType int type, String info) {
+  private static HtmlComponent getComponent(String tagName, String info) {
     HtmlComponent htmlComponent = new HtmlComponent();
-    htmlComponent.type = type;
+    htmlComponent.tagName = tagName;
     htmlComponent.info = info;
     return htmlComponent;
   }
 
-  private static Matcher matcher(String originHtml, @TAG String tagName) {
+  private static Matcher matcher(String originHtml,String tagName) {
     Pattern pattern = Pattern.compile(regexByTagName(tagName));
     return pattern.matcher(originHtml);
   }
 
   private static String regexByTagName(String tagName) {
     String regex;
-    if (tagName.endsWith(TABLE)) {
+    if (tagName.endsWith(TAG_TABLE)) {
       regex = TABLE_REGEX.replace("tag", tagName).replace("TAG", tagName.toUpperCase());
     } else {
       regex = SINGLE_TAG_REGEX.replace("tag", tagName).replace("TAG", tagName.toUpperCase());
@@ -164,25 +139,25 @@ public class HtmlComponent {
   }
 
   private static ArrayList<HtmlComponent> getInnerComponents(
-      String originHtml, @TAG String tagName) {
+      String originHtml, String tagName) {
     ArrayList<HtmlComponent> htmlComponents = new ArrayList<>();
     // trim useless symbols in case failed regex
     originHtml = originHtml.replaceAll("[\\t\\n\\r]", "");
     Matcher tagMatcher = matcher(originHtml, tagName);
     String[] tagSplit = originHtml.split(regexByTagName(tagName));
     if (tagSplit.length == 1) {
-      htmlComponents.add(HtmlComponent.getComponent(HtmlComponent.TEXT_VIEW, originHtml));
+      htmlComponents.add(HtmlComponent.getComponent(TAG_DEFAULT, originHtml));
     } else {
       int index = 0;
       while (tagMatcher.find()) {
-        htmlComponents.add(HtmlComponent.getComponent(HtmlComponent.TEXT_VIEW, tagSplit[index]));
+        htmlComponents.add(HtmlComponent.getComponent(TAG_DEFAULT, tagSplit[index]));
         htmlComponents.add(
-            HtmlComponent.getComponent(sSupportTagMap.get(tagName), tagMatcher.group()));
+            HtmlComponent.getComponent(tagName, tagMatcher.group()));
         WXLogUtils.e(
             "find " + tagName + " -> start:" + tagMatcher.start() + " end:" + tagMatcher.end());
         index++;
       }
-      htmlComponents.add(HtmlComponent.getComponent(HtmlComponent.TEXT_VIEW, tagSplit[index]));
+      htmlComponents.add(HtmlComponent.getComponent(TAG_DEFAULT, tagSplit[index]));
     }
     return htmlComponents;
   }
@@ -225,33 +200,31 @@ public class HtmlComponent {
   }
 
   /**
-   * Parse html tags that need be implemented by android view, we need two steps: 1、custom tag info,
-   * remark by {@link TAG} 2、custom native view, remarks by {@link ViewType}
+   * Parse html tags that need be implemented by android view, we need two steps:
+   * 1、custom tag info
+   * 2、custom native view
    *
    * @param originHtml the formatted html
    * @param tagNames tags will support
    * @return the {@link HtmlComponent} list use by native view
    */
-  public static List<HtmlComponent> parseTags(String originHtml, @TAG String... tagNames) {
+  public static List<HtmlComponent> parseTags(String originHtml, String... tagNames) {
     originHtml = originHtml.replaceAll("\\\\", "");
     CopyOnWriteArrayList<HtmlComponent> htmlComponents = new CopyOnWriteArrayList<>();
     // make sure, table tag must be the first one to be parsed, in case <table> can hold
     // any other tags inside.
     List<String> allTagNames = new ArrayList<>(Arrays.asList(tagNames));
-    if (allTagNames.size() != 0 && allTagNames.contains(TABLE)) {
-      allTagNames.remove(TABLE);
-      allTagNames.add(0, TABLE);
+    if (allTagNames.size() != 0 && allTagNames.contains(TAG_TABLE)) {
+      allTagNames.remove(TAG_TABLE);
+      allTagNames.add(0, TAG_TABLE);
     }
     for (String tagName : allTagNames) {
-      // check rationality
-      if (!sSupportTagMap.containsKey(tagName)) {
-        throw new IllegalArgumentException(tagName + " tag is not supported now!");
-      }
       if (htmlComponents.size() == 0) { // parse first tag. named <table>..
         htmlComponents.addAll(getInnerComponents(originHtml, tagName));
       } else {
         for (HtmlComponent htmlComponent : htmlComponents) {
-          if (htmlComponent.type == TEXT_VIEW) { // only text-view type can be spitted again
+          if (htmlComponent.tagName.equalsIgnoreCase(TAG_DEFAULT)) { // only text-view tagName can
+            // be spitted again
             ArrayList<HtmlComponent> innerHtmlComponents =
                 getInnerComponents(htmlComponent.info, tagName);
             if (innerHtmlComponents.size() == 1) { // don't find the tag in this text-view info
