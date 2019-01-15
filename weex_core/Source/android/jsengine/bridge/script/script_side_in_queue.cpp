@@ -142,7 +142,7 @@ namespace weex {
                   weexTaskQueue_->addTask(task->clone());
                   weexTaskQueue_bk_->addTask(task->clone());
                 } else {
-                  taskQueue(instanceId)->addTask(task);
+                  taskQueue(instanceId, false)->addTask(task);
                 }
                 return 1;
             }
@@ -159,7 +159,7 @@ namespace weex {
 
                 task->addExtraArg(String::fromUTF8(nameSpace));
                 task->addExtraArg(String::fromUTF8(func));
-                taskQueue(instanceId)->addTask(task);
+              taskQueue(instanceId, false)->addTask(task);
                 return std::move(future->waitResult());
             }
 
@@ -172,7 +172,7 @@ namespace weex {
 
                 task->addExtraArg(String::fromUTF8(nameSpace));
                 task->addExtraArg(String::fromUTF8(func));
-                taskQueue(instanceId)->addTask(task);
+              taskQueue(instanceId, false)->addTask(task);
             }
 
             int ScriptSideInQueue::CreateInstance(const char *instanceId, const char *func,
@@ -206,8 +206,7 @@ namespace weex {
                 task->addExtraArg(String::fromUTF8(opts));
                 task->addExtraArg(String::fromUTF8(initData));
                 task->addExtraArg(String::fromUTF8(extendsApi));
-                LOGE("dyyLog instance create and id is %s, and time is %lld",instanceId, microTime());
-                auto pQueue = taskQueue(instanceId);
+                auto pQueue = taskQueue(instanceId, true);
                 pQueue->addTask(task);
                 if(!pQueue->isInitOk) {
                     pQueue->init();
@@ -220,7 +219,7 @@ namespace weex {
                 LOGD("ScriptSideInQueue::ExecJSOnInstance");
                 ExeJsOnInstanceTask *task = new ExeJsOnInstanceTask(String::fromUTF8(instanceId),
                                                                     String::fromUTF8(script));
-                taskQueue(instanceId)->addTask(task);
+              taskQueue(instanceId, false)->addTask(task);
                 auto future = std::unique_ptr<WeexTask::Future>(new WeexTask::Future());
                 task->set_future(future.get());
                 return std::move(future->waitResult());
@@ -228,7 +227,8 @@ namespace weex {
 
             int ScriptSideInQueue::DestroyInstance(const char *instanceId) {
                 LOGD("ScriptSideInQueue::DestroyInstance instanceId: %s \n", instanceId);
-                taskQueue(instanceId)->addTask(new DestoryInstanceTask(String::fromUTF8(instanceId)));
+              taskQueue(instanceId,
+                        false)->addTask(new DestoryInstanceTask(String::fromUTF8(instanceId)));
                 deleteBackUpRuntimeInstance(instanceId);
                 return 1;
             }
@@ -259,17 +259,19 @@ namespace weex {
                 }
             }
 
-            WeexTaskQueue *ScriptSideInQueue::taskQueue(const char* id) {
+            WeexTaskQueue *ScriptSideInQueue::taskQueue(const char *id, bool log) {
                 if(id != nullptr && shouldUseBackUpWeexRuntime(id)) {
                     if(weexTaskQueue_bk_ == nullptr) {
                         weexTaskQueue_bk_ = new WeexTaskQueue(weexTaskQueue_->isMultiProgress);
                     }
-                    LOGE("dyyLog instance %s use back up thread time is %lld", id, microTime());
+                    if(log) {
+                      LOGE("dyyLog instance %s use back up thread time is %lld", id, microTime());
+                    }
                     return weexTaskQueue_bk_;
                 }
-//                if(id != nullptr) {
-//                    LOGD("dyyLog instance %s use main thread time is %lld", id, microTime());
-//                }
+                if(log && id != nullptr) {
+                    LOGE("dyyLog instance %s use main thread time is %lld", id, microTime());
+                }
                 return weexTaskQueue_;
             }
         }  // namespace js

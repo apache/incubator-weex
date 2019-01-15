@@ -376,7 +376,6 @@ int WeexRuntime::exeJS(const String &instanceId, const String &nameSpace, const 
     //LOGE("jsengine shopp EXECJS func:%s and params size is %d", func.utf8().data(), params.size());
 
     String runFunc = func;
-    LOGE("dyyLog exeJS is running and id is %s, and time is %lld, threadId is %ld",instanceId.utf8().data(), microTime(), pthread_self());
     JSGlobalObject *globalObject;
     // fix instanceof Object error
     // if function is callJs on instance, should us Instance object to call __WEEX_CALL_JAVASCRIPT__
@@ -639,7 +638,6 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
                                 const String &extendsApi,
                                 std::vector<INIT_FRAMEWORK_PARAMS*>& params) {
 
-    LOGE("dyyLog createInstance is running and id is %s, and time is %lld, threadId is %ld",instanceId.utf8().data(), microTime(), pthread_self());
     JSGlobalObject *impl_globalObject = weexObjectHolder->m_globalObject.get();
     JSGlobalObject *globalObject;
     if (instanceId == "") {

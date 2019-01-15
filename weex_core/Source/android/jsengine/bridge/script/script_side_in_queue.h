@@ -102,7 +102,7 @@ namespace weex {
 
                 void deleteBackUpRuntimeInstance(std::string id);
 
-                WeexTaskQueue *taskQueue(const char* id);
+                WeexTaskQueue *taskQueue(const char *id, bool log);
 
             };
         }  // namespace js
