@@ -521,9 +521,15 @@ JSFUNCTION functionCallUpdateFinish(ExecState *state) {
     getWsonArgsFromState(state, 1, taskChar);
     getWsonArgsFromState(state, 2, callBackChar);
     WeexGlobalObject *globalObject = static_cast<WeexGlobalObject *>(state->lexicalGlobalObject());
+    weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::JSS_ENGINE, "functionCallUpdateFinish",globalObject->id);
+    timeCalculator.taskStart();
+
+
     auto result = globalObject->js_bridge()->core_side()->UpdateFinish(idChar.getValue(), taskChar.getValue(),
                                                                        taskChar.getLength(), callBackChar.getValue(),
                                                                        callBackChar.getLength());
+
+    timeCalculator.taskEnd();
     return JSValue::encode(jsNumber(result));
 }
 
@@ -547,9 +553,14 @@ JSFUNCTION functionCallRefreshFinish(ExecState *state) {
     getStringArgsFromState(state, 1, taskChar);
     getStringArgsFromState(state, 2, callBackChar);
     WeexGlobalObject *globalObject = static_cast<WeexGlobalObject *>(state->lexicalGlobalObject());
+    weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::JSS_ENGINE, "functionCallRefreshFinish",globalObject->id);
+    timeCalculator.taskStart();
+
     int result = globalObject->js_bridge()->core_side()->RefreshFinish(idChar.getValue(),
                                                                        taskChar.getValue(),
                                                                        callBackChar.getValue());
+
+    timeCalculator.taskEnd();
     return JSValue::encode(jsNumber(result));
 }
 

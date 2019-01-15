@@ -60,10 +60,20 @@ class TimeCalculator {
   }
 
   void taskStart() {
+    LOGE(
+        "dyyLog %s taskName is %s : instanceId %s : taskStart",
+        task_platform.c_str(),
+        task_name.c_str(),
+        instance_id.c_str());
     this->task_start = TimePoint::Now();
   }
 
   void taskEnd() {
+    LOGE(
+        "dyyLog %s taskName is %s : instanceId %s : taskEnd",
+        task_platform.c_str(),
+        task_name.c_str(),
+        instance_id.c_str());
     this->task_end = TimePoint::Now();
     task_end_flag = true;
   }
