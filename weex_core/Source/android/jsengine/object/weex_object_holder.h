@@ -45,7 +45,7 @@ public:
 
     void initFromParams(std::vector<INIT_FRAMEWORK_PARAMS *> &params, bool forAppContext);
 
-    WeexGlobalObject *cloneWeexObject(bool initContext, bool forAppContext);
+    WeexGlobalObject *cloneWeexObject(std::string page_id, bool initContext, bool forAppContext);
 
     TimerQueue* timeQueue;
 
