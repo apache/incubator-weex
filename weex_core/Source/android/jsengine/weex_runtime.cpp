@@ -695,12 +695,35 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
             // use it to set Vue prototype to instance context
             JSObject *object = ret.toObject(state, temp_object);
             JSObjectRef ref = toRef(object);
-            JSGlobalContextRef contextRef = toGlobalRef(state);
-            JSValueRef vueRef = JSObjectGetProperty(contextRef, ref, JSStringCreateWithUTF8CString("Vue"), nullptr);
+            JSGlobalContextRef globalContextRef = toGlobalRef(state);
+            JSGlobalContextRef instanceContextRef = toGlobalRef(temp_object->globalExec());
+            auto instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
+            auto pArray = JSObjectCopyPropertyNames(globalContextRef, ref);
+            size_t keyCount = JSPropertyNameArrayGetCount(pArray);
+            LOGE("dyyLog instance create and id is %s, and time is %lld, currentThread is %u", instanceId.utf8().data(), microTime(), pthread_self());
+            for (size_t i = 0; i < keyCount; ++i) {
+                auto propertyName_ = JSPropertyNameArrayGetNameAtIndex(pArray, i);
+                auto propertyValue_ = JSObjectGetProperty(globalContextRef, ref, propertyName_, NULL);
+                if(propertyValue_ == nullptr) {
+                    LOGE("dyy create instance propertyValue_ == null");
+                    continue;
+                }
+
+                if(propertyName_ == nullptr) {
+                    LOGE("dyy create instance propertyName_ == null");
+                    continue;
+                }
+
+                JSObjectSetProperty(instanceContextRef, instanceGlobalObject, propertyName_, propertyValue_, 0, NULL);
+            }
+
+
+
+            JSValueRef vueRef = JSObjectGetProperty(globalContextRef, ref, JSStringCreateWithUTF8CString("Vue"), nullptr);
             if (vueRef != nullptr) {
-                JSObjectRef vueObject = JSValueToObject(contextRef, vueRef, nullptr);
+                JSObjectRef vueObject = JSValueToObject(globalContextRef, vueRef, nullptr);
                 if (vueObject != nullptr) {
-                    JSGlobalContextRef instanceContextRef = toGlobalRef(temp_object->globalExec());
+
                     JSObjectSetPrototype(instanceContextRef, vueObject,
                                          JSObjectGetPrototype(instanceContextRef,
                                                               JSContextGetGlobalObject(instanceContextRef)));
@@ -708,7 +731,7 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
             }
             //-------------------------------------------------
 
-            temp_object->resetPrototype(vm, ret);
+//            temp_object->resetPrototype(vm, ret);
             weexObjectHolder->m_jsInstanceGlobalObjectMap[instanceId.utf8().data()] = temp_object;
 //            LOGE("create Instance instanceId.utf8().data() %s",instanceId.utf8().data());
             // -----------------------------------------
