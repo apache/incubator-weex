@@ -902,7 +902,6 @@ int WeexRuntime::exeTimerFunction(const String &instanceId, uint32_t timerFuncti
     }
 
     ArgList a;
-
     JSValue ret = call(globalObject->globalExec(), value, callType, callData, globalObject, a, returnedException);
     uint64_t end = microTime();
 

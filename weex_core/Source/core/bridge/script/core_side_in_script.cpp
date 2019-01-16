@@ -27,6 +27,7 @@
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
+#include "wson/wson_parser.h"
 #ifdef OS_ANDROID
 #include "android/weex_extend_js_api.h"
 #endif
@@ -141,7 +142,12 @@ void CoreSideInScript::AddElement(const char *page_id, const char *parent_ref,
                                   const char *dom_str, int dom_str_length,
                                   const char *index_str) {
 
-  weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::WEEXCORE, "AddElement", page_id);
+  
+  std::string msg = "AddElement :";
+  wson_parser parser(dom_str);
+  msg.append(parser.toStringUTF8().c_str());
+
+  weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::WEEXCORE, msg.c_str(), page_id);
 
   const char *indexChar = index_str == nullptr ? "\0" : index_str;
   int index = atoi(indexChar);
