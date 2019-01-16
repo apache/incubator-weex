@@ -78,7 +78,7 @@ WeexObjectHolder::WeexObjectHolder(VM* vm,  TimerQueue* timeQueue, bool isMultiP
     this->m_globalVM = vm;
 }
 
-WeexGlobalObject *WeexObjectHolder::cloneWeexObject(bool initContext, bool forAppContext) {
+WeexGlobalObject *WeexObjectHolder::cloneWeexObject(std::string page_id, bool initContext, bool forAppContext) {
     JSLockHolder locker(this->m_globalVM);
     VM& vm = *(this->m_globalVM);
     auto *temp_object = WeexGlobalObject::create(vm,
@@ -93,6 +93,7 @@ WeexGlobalObject *WeexObjectHolder::cloneWeexObject(bool initContext, bool forAp
     else
         temp_object->initFunction();
 
+    temp_object->id = page_id;
     return temp_object;
 }
 

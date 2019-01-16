@@ -157,7 +157,7 @@ int WeexRuntime::createAppContext(const String &instanceId, const String &jsBund
 
         JSLockHolder locker_global(this->m_globalVM.get());
 
-        WeexGlobalObject *app_globalObject = appWorkerObjectHolder->cloneWeexObject(true, true);
+        WeexGlobalObject *app_globalObject = appWorkerObjectHolder->cloneWeexObject(final_instanceId.utf8().data(),true, true);
         weex::GlobalObjectDelegate *delegate = NULL;
         app_globalObject->SetScriptBridge(script_bridge_);
 //        VM &vm = worker_globalObject->vm();
@@ -653,11 +653,10 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
 //                JSLockHolder locker_global(&vm_global);
 //            }
 
-            temp_object = weexObjectHolder->cloneWeexObject(true, false);
+            temp_object = weexObjectHolder->cloneWeexObject(instanceId.utf8().data(), true, false);
             VM &vm = temp_object->vm();
             JSLockHolder locker(&vm);
             temp_object->addExtraOptions(params);
-            temp_object->id = instanceId.utf8().data();
             temp_object->SetScriptBridge(script_bridge_);
 
 
