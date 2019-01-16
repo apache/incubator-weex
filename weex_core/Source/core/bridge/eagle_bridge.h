@@ -28,6 +28,7 @@
 namespace WeexCore {
     class RenderObject;
     class DataRenderHandler;
+    class RenderPage;
     
     class EagleRenderObject {
     public:
@@ -54,6 +55,7 @@ namespace WeexCore {
         public:
             EagleRenderObject GetEagleRenderObject(const std::string &type, const std::string &ref);
             bool CreatePage(const std::string& page_id, RenderObject *root);
+            RenderPage* GetPage(const std::string& page_id);
             bool CreateFinish(const std::string &page_id);
             bool ClosePage(const std::string &page_id);
             void ReportException(const char* page_id, const char* func, const char* exception_string);

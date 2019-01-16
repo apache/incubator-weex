@@ -69,6 +69,10 @@ namespace WeexCore {
     bool EagleBridge::WeexCoreHandler::CreatePage(const std::string& page_id, RenderObject *root) {
         return RenderManager::GetInstance()->CreatePage(page_id, root);
     }
+
+    RenderPage* EagleBridge::WeexCoreHandler::GetPage(const std::string& page_id) {
+        return RenderManager::GetInstance()->GetPage(page_id);
+    }
     
     bool EagleBridge::WeexCoreHandler::CreateFinish(const std::string &page_id) {
         return RenderManager::GetInstance()->CreateFinish(page_id);
