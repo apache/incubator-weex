@@ -408,9 +408,7 @@ JSFUNCTION functionCallNativeModule(ExecState *state) {
     a.append(moduleChar.getValue());
     a.append(":");
     a.append(methodChar.getValue());
-
-
-    weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::JSS_ENGINE, a.utf8().data(), globalObject->id);
+    weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::JSS_ENGINE, a.utf8().data(), instanceId.getValue());
     timeCalculator.taskStart();
     auto result = globalObject->js_bridge()->core_side()->CallNativeModule(instanceId.getValue(),
                                                                            moduleChar.getValue(),
