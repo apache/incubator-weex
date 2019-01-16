@@ -86,7 +86,7 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
 
   @Override
   public CharSequence getText() {
-    return textLayout.getText();
+    return textLayout != null ? textLayout.getText() : null;
   }
 
   public Layout getTextLayout() {
