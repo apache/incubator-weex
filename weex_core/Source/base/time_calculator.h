@@ -43,12 +43,18 @@ class TimeCalculator {
       end(TimePoint::Now()),
       start(TimePoint::Now()),
       task_end(TimePoint::Now()),
-      task_start(TimePoint::Now()) {
+      task_start(TimePoint::Now()),
+      task_id(genTaskId()) {
     if (taskPlatform == TaskPlatform::JSS_ENGINE) {
       task_platform = "jsengine";
     } else {
       task_platform = "weexcore";
     }
+  }
+
+  int genTaskId() {
+    static int taskIdGenerator = 0;
+    return __sync_fetch_and_add(&taskIdGenerator, 1);
   }
 
   ~TimeCalculator() {
@@ -61,19 +67,21 @@ class TimeCalculator {
 
   void taskStart() {
     LOGE(
-        "dyyLog %s taskName is %s : instanceId %s : taskStart",
+        "dyyLog %s taskName is %s : instanceId %s : task_id %d: taskStart",
         task_platform.c_str(),
         task_name.c_str(),
-        instance_id.c_str());
+        instance_id.c_str(),
+        task_id);
     this->task_start = TimePoint::Now();
   }
 
   void taskEnd() {
     LOGE(
-        "dyyLog %s taskName is %s : instanceId %s : taskEnd",
+        "dyyLog %s taskName is %s : instanceId %s : task_id %d: taskEnd",
         task_platform.c_str(),
         task_name.c_str(),
-        instance_id.c_str());
+        instance_id.c_str(),
+        task_id);
     this->task_end = TimePoint::Now();
     task_end_flag = true;
   }
@@ -104,10 +112,11 @@ class TimeCalculator {
       }
 
       LOGE(
-          "dyyLog %s taskName is %s : instanceId %s : start : %lld  ---  end : %lld  ---  allCost:%lld  ---  taskCost:%lld  ---  taskWait:%lld --- msg:%s",
+          "dyyLog %s taskName is %s : instanceId %s : task_id %d: start : %lld  ---  end : %lld  ---  allCost:%lld  ---  taskCost:%lld  ---  taskWait:%lld --- msg:%s",
           task_platform.c_str(),
           task_name.c_str(),
           instance_id.c_str(),
+          task_id,
           start.ToTimeUnit().ToMilliseconds(),
           end.ToTimeUnit().ToMilliseconds(),
           allCost.ToMilliseconds(),
@@ -119,6 +128,7 @@ class TimeCalculator {
 
  private:
   std::string task_name;
+  int task_id;
   std::string instance_id;
   TimePoint start;
   TimePoint end;
