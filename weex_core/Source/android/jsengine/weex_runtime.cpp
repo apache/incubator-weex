@@ -820,16 +820,25 @@ WeexRuntime::_getArgListFromIPCArguments(MarkedArgumentBuffer *obj, ExecState *s
 
 void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *state,
                                           std::vector<VALUE_WITH_TYPE *> &params) {
+
+    //dyyLog delete
+    String msg = "exejs Args ";
+
     for (unsigned int i = 0; i < params.size(); i++) {
         VALUE_WITH_TYPE *paramsObject = params[i];
         switch (paramsObject->type) {
             case ParamsType::DOUBLE:
                 obj->append(jsNumber(paramsObject->value.doubleValue));
+                msg.append(":");
+                msg.append(std::to_string(paramsObject->value.doubleValue).c_str());
                 break;
             case ParamsType::STRING: {
                 WeexString *ipcstr = paramsObject->value.string;
                 const String &string2String = weexString2String(ipcstr);
                 obj->append(jString2JSValue(state, ipcstr->content, ipcstr->length));
+
+                msg.append(":");
+                msg.append(string2String.utf8().data());
             }
                 break;
             case ParamsType::JSONSTRING: {
@@ -838,12 +847,19 @@ void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *
                 String str = jString2String(ipcstr->content, ipcstr->length);
                 JSValue o = parseToObject(state, str);
                 obj->append(o);
+
+                msg.append(":");
+                msg.append(str.utf8().data());
             }
                 break;
             case ParamsType::BYTEARRAY: {
                 const WeexByteArray *array = paramsObject->value.byteArray;
                 JSValue o = wson::toJSValue(state, (void *) array->content, array->length);
+
                 obj->append(o);
+
+                msg.append(":");
+                msg.append(JSONStringify(state, o, 0).utf8().data());
             }
                 break;
             default:
@@ -851,6 +867,8 @@ void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *
                 break;
         }
     }
+
+    LOGE("dyyLog exejs Args is %s", msg.utf8().data());
 }
 
 WeexObjectHolder *WeexRuntime::getLightAppObjectHolder(const String &instanceId) {
