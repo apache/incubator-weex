@@ -195,4 +195,48 @@ public class WXSDKInstanceTest {
     mInstance.onJSException(null,null,null);
     mInstance.onJSException("100","test","some error");
   }
+
+  @Test
+  public void testWrapperWXRenderListener() {
+    IWXRenderListener renderListener = mInstance.getWXRenderListener();
+    // wrapper render listener
+    mInstance.registerRenderListener(new WXRenderListenerWrapper(renderListener));
+    mInstance.onJSException("100","test","some error");
+  }
+
+  private static class WXRenderListenerWrapper implements IWXRenderListener {
+    private IWXRenderListener businessListener;
+    WXRenderListenerWrapper(IWXRenderListener businessListener) {
+      this.businessListener = businessListener;
+    }
+    @Override
+    public void onViewCreated(WXSDKInstance instance, View view) {
+      if (businessListener != null) {
+        businessListener.onViewCreated(instance, view);
+      }
+    }
+
+    @Override
+    public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
+      if (businessListener != null) {
+        businessListener.onRenderSuccess(instance, width, height);
+      }
+    }
+
+    @Override
+    public void onRefreshSuccess(WXSDKInstance instance, int width, int height) {
+      if (businessListener != null) {
+        businessListener.onRefreshSuccess(instance, width, height);
+      }
+    }
+
+    @Override
+    public void onException(WXSDKInstance instance, String errCode, String msg) {
+      if (businessListener != null) {
+        businessListener.onException(instance, errCode, msg);
+      }
+      // track error render
+      System.out.printf("track error render. \nerrorCode: %s message: %s\n", errCode, msg);
+    }
+  }
 }
