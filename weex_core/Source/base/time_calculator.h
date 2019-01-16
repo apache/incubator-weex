@@ -60,20 +60,20 @@ class TimeCalculator {
   }
 
   void taskStart() {
-//    LOGD(
-//        "dyyLog %s taskName is %s : instanceId %s : taskStart",
-//        task_platform.c_str(),
-//        task_name.c_str(),
-//        instance_id.c_str());
+    LOGE(
+        "dyyLog %s taskName is %s : instanceId %s : taskStart",
+        task_platform.c_str(),
+        task_name.c_str(),
+        instance_id.c_str());
     this->task_start = TimePoint::Now();
   }
 
   void taskEnd() {
-//    LOGE(
-//        "dyyLog %s taskName is %s : instanceId %s : taskEnd",
-//        task_platform.c_str(),
-//        task_name.c_str(),
-//        instance_id.c_str());
+    LOGE(
+        "dyyLog %s taskName is %s : instanceId %s : taskEnd",
+        task_platform.c_str(),
+        task_name.c_str(),
+        instance_id.c_str());
     this->task_end = TimePoint::Now();
     task_end_flag = true;
   }
@@ -87,34 +87,34 @@ class TimeCalculator {
     const TimeUnit &taskWait = task_start.ToTimeUnit() - start.ToTimeUnit();
     const TimeUnit &taskCost = task_end.ToTimeUnit() - task_start.ToTimeUnit();
 
-//    int64_t taskCostMS = taskCost.ToMilliseconds();
-//    if (taskCostMS < 5) {
-//      LOGD("dyyLog %s taskName is %s cost less than 5ms", task_platform.c_str(),
-//           task_name.c_str());
-//    } else {
-//      std::string msg = "normal";
-//
-//      if (taskCostMS > 100) {
-//        msg = "task cost than 100, ";
-//      }
-//
-//      if (taskWait.ToMilliseconds() > 100) {
-//        std::string a = "wait to long time than 100ms";
-//        msg += a;
-//      }
-//
-//      LOGD(
-//          "dyyLog %s taskName is %s : instanceId %s : start : %lld  ---  end : %lld  ---  allCost:%lld  ---  taskCost:%lld  ---  taskWait:%lld --- msg:%s",
-//          task_platform.c_str(),
-//          task_name.c_str(),
-//          instance_id.c_str(),
-//          start.ToTimeUnit().ToMilliseconds(),
-//          end.ToTimeUnit().ToMilliseconds(),
-//          allCost.ToMilliseconds(),
-//          taskCostMS,
-//          taskWait.ToMilliseconds(),
-//          msg.c_str());
-//    }
+    int64_t taskCostMS = taskCost.ToMilliseconds();
+    if (taskCostMS < 5) {
+      LOGD("dyyLog %s taskName is %s cost less than 5ms", task_platform.c_str(),
+           task_name.c_str());
+    } else {
+      std::string msg = "normal";
+
+      if (taskCostMS > 100) {
+        msg = "task cost than 100, ";
+      }
+
+      if (taskWait.ToMilliseconds() > 100) {
+        std::string a = "wait to long time than 100ms";
+        msg += a;
+      }
+
+      LOGE(
+          "dyyLog %s taskName is %s : instanceId %s : start : %lld  ---  end : %lld  ---  allCost:%lld  ---  taskCost:%lld  ---  taskWait:%lld --- msg:%s",
+          task_platform.c_str(),
+          task_name.c_str(),
+          instance_id.c_str(),
+          start.ToTimeUnit().ToMilliseconds(),
+          end.ToTimeUnit().ToMilliseconds(),
+          allCost.ToMilliseconds(),
+          taskCostMS,
+          taskWait.ToMilliseconds(),
+          msg.c_str());
+    }
   }
 
  private:

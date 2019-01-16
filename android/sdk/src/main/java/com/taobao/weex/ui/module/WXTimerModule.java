@@ -31,6 +31,7 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.IntDef;
 import android.support.annotation.IntRange;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.taobao.weex.WXEnvironment;
@@ -132,6 +133,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
           }
           checkIfTimerInBack(msg.arg1);
           args = createTimerArgs(msg.arg1, (Integer) msg.obj, false);
+          WXLogUtils.d("dyyLog timeout invoke ExecJs");
           WXBridgeManager.getInstance().invokeExecJS(String.valueOf(msg.arg1), null, METHOD_CALL_JS, args, true);
           ret = true;
           break;

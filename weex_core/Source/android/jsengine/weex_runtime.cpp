@@ -373,7 +373,7 @@ int WeexRuntime::exeCTimeCallback(const String &source) {
 
 int WeexRuntime::exeJS(const String &instanceId, const String &nameSpace, const String &func,
                        std::vector<VALUE_WITH_TYPE *> &params) {
-    //LOGE("jsengine shopp EXECJS func:%s and params size is %d", func.utf8().data(), params.size());
+    LOGE("dyyLog EXECJS func:%s and params size is %d", func.utf8().data(), params.size());
 
     String runFunc = func;
     JSGlobalObject *globalObject;
