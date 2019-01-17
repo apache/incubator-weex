@@ -373,7 +373,7 @@ int WeexRuntime::exeCTimeCallback(const String &source) {
 
 int WeexRuntime::exeJS(const String &instanceId, const String &nameSpace, const String &func,
                        std::vector<VALUE_WITH_TYPE *> &params) {
-    LOGE("dyyLog EXECJS func:%s and params size is %d", func.utf8().data(), params.size());
+//    LOGE("dyyLog EXECJS func:%s and params size is %d", func.utf8().data(), params.size());
 
     String runFunc = func;
     JSGlobalObject *globalObject;
@@ -699,7 +699,7 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
             auto instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
             auto pArray = JSObjectCopyPropertyNames(globalContextRef, ref);
             size_t keyCount = JSPropertyNameArrayGetCount(pArray);
-            LOGE("dyyLog instance create and id is %s, and time is %lld, currentThread is %u", instanceId.utf8().data(), microTime(), pthread_self());
+//            LOGE("dyyLog instance create and id is %s, and time is %lld, currentThread is %u", instanceId.utf8().data(), microTime(), pthread_self());
             for (size_t i = 0; i < keyCount; ++i) {
                 auto propertyName_ = JSPropertyNameArrayGetNameAtIndex(pArray, i);
                 auto propertyValue_ = JSObjectGetProperty(globalContextRef, ref, propertyName_, NULL);
@@ -822,23 +822,23 @@ void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *
                                           std::vector<VALUE_WITH_TYPE *> &params) {
 
     //dyyLog delete
-    String msg = "exejs Args ";
+//    String msg = "exejs Args ";
 
     for (unsigned int i = 0; i < params.size(); i++) {
         VALUE_WITH_TYPE *paramsObject = params[i];
         switch (paramsObject->type) {
             case ParamsType::DOUBLE:
                 obj->append(jsNumber(paramsObject->value.doubleValue));
-                msg.append(":");
-                msg.append(std::to_string(paramsObject->value.doubleValue).c_str());
+//                msg.append(":");
+//                msg.append(std::to_string(paramsObject->value.doubleValue).c_str());
                 break;
             case ParamsType::STRING: {
                 WeexString *ipcstr = paramsObject->value.string;
                 const String &string2String = weexString2String(ipcstr);
                 obj->append(jString2JSValue(state, ipcstr->content, ipcstr->length));
 
-                msg.append(":");
-                msg.append(string2String.utf8().data());
+//                msg.append(":");
+//                msg.append(string2String.utf8().data());
             }
                 break;
             case ParamsType::JSONSTRING: {
@@ -848,8 +848,8 @@ void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *
                 JSValue o = parseToObject(state, str);
                 obj->append(o);
 
-                msg.append(":");
-                msg.append(str.utf8().data());
+//                msg.append(":");
+//                msg.append(str.utf8().data());
             }
                 break;
             case ParamsType::BYTEARRAY: {
@@ -858,8 +858,8 @@ void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *
 
                 obj->append(o);
 
-                msg.append(":");
-                msg.append(JSONStringify(state, o, 0).utf8().data());
+//                msg.append(":");
+//                msg.append(JSONStringify(state, o, 0).utf8().data());
             }
                 break;
             default:
@@ -868,7 +868,7 @@ void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *
         }
     }
 
-    LOGE("dyyLog exejs Args is %s", msg.utf8().data());
+//    LOGE("dyyLog exejs Args is %s", msg.utf8().data());
 }
 
 WeexObjectHolder *WeexRuntime::getLightAppObjectHolder(const String &instanceId) {
