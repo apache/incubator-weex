@@ -49,6 +49,8 @@ public class ImageDrawable extends PaintDrawable {
               (bm = ((BitmapDrawable) original).getBitmap()) != null) {
         ImageDrawable imageDrawable;
         imageDrawable = new ImageDrawable();
+        // fix android 9 image antialiasing
+        imageDrawable.getPaint().setFilterBitmap(true);
         imageDrawable.bitmapWidth = bm.getWidth();
         imageDrawable.bitmapHeight = bm.getHeight();
         BitmapShader bitmapShader = new BitmapShader(bm, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
