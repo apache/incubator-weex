@@ -184,7 +184,7 @@ namespace WeexCore {
 
 WMLBridge* WMLBridge::g_instance = nullptr;
 
-const char kWMLBridgeClassPath[] = "com/taobao/windmill/bridge/WMLBridge";
+const char kWMLBridgeClassPath[] =  "com/taobao/windmill/bundle/bridge/WeexBridge";
 jclass g_WMLBridge_clazz = nullptr;
 
 static JNINativeMethod gWMMethods[] = {
