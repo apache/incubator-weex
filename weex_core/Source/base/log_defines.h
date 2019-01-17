@@ -22,7 +22,7 @@
 
 #define LOG_TAG "WeexCore"
 
-static bool is_debug = true;
+static bool is_debug = false;
 
 #ifdef __ANDROID__  //for android platform
 
@@ -47,8 +47,8 @@ if(condition) {__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__);}
 if(condition) {__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__);}
 
 
-#define LOGD(...)    \
-if(is_debug) {__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__);}
+#define LOGD(...)    ((void) 0)
+//if(is_debug) {__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__);}
 
 
 #ifdef DEBUG

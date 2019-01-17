@@ -170,6 +170,7 @@ public class WXEnvironment {
 
     try {
       if (isApkDebugable()) {
+        WXLogUtils.e("isApkDebugable " + true);
         options.put(WXConfig.debugMode, "true");
       }
       options.put(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
