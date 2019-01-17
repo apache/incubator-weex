@@ -24,6 +24,8 @@
 #include "base/log_defines.h"
 #include "core/common/view_utils.h"
 
+extern bool is_debug;
+
 namespace WeexCore {
 
   WXCoreEnvironment *WXCoreEnvironment::m_pInstance = nullptr;
@@ -84,6 +86,10 @@ namespace WeexCore {
     mOptions.insert(std::pair<std::string, std::string>(key, value));
     if (key == "switchInteractionLog") {
       mInteractionLogSwitch = "true" == value;
+    }
+
+    if(key == "debugMode") {
+      is_debug = "true" == value;
     }
   }
 }

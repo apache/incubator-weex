@@ -456,7 +456,7 @@ void CoreSideInScript::ReportException(const char *page_id, const char *func,
 }
 
 void CoreSideInScript::SetJSVersion(const char *js_version) {
-  LOGA("init JSFrm version %s", js_version);
+  LOGD("init JSFrm version %s", js_version);
 
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(

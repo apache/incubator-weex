@@ -39,6 +39,8 @@
 
 static WeexJSServer *server = nullptr;
 
+extern bool is_debug;
+
 static unsigned long parseUL(const char *s) {
     unsigned long val;
     errno = 0;
@@ -76,6 +78,7 @@ static void *threadEntry(void *_td) {
 }
 
 extern "C" int serverMain(int argc, char **argv) {
+    is_debug = false;
     unsigned long fd;
     unsigned long fd_client = 0;
     unsigned long enableTrace;

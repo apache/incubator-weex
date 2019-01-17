@@ -20,23 +20,14 @@
 #define _LOG_UTILS_H_
 
 #if !defined(__APPLE__)
-#include <android/log.h>
+#include "base/log_defines.h"
 #endif
-
 #define LOG_TAG "WeexCore"
 
 #if defined(__APPLE__)
-
 #define LOGE(...)    printf(__VA_ARGS__);printf("\n")
 #define LOGA(...)    printf(__VA_ARGS__);printf("\n")
 #define LOGD(...)    printf(__VA_ARGS__);printf("\n")
-
-#else
-
-#define LOGE(...)    __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-#define LOGA(...)    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#define LOGD(...)    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-
 #endif
 //#define DEBUG
 

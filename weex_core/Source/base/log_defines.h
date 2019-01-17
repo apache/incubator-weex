@@ -22,13 +22,34 @@
 
 #define LOG_TAG "WeexCore"
 
+static bool is_debug = true;
+
 #ifdef __ANDROID__  //for android platform
 
 #include <android/log.h>
 
-#define LOGE(...)    __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-#define LOGA(...)    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#define LOGD(...)    __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOG(condition, level, tag ...) \
+if(condition) __android_log_print(level, #tag, __VA_ARGS__);
+
+#define LOGE_C_TAG(condition, tag ...)   \
+if(condition) {__android_log_print(ANDROID_LOG_ERROR, #tag, __VA_ARGS__);}
+
+#define LOGD_C_TAG(condition, tag ...)   \
+if(condition) {__android_log_print(ANDROID_LOG_DEBUG, #tag, __VA_ARGS__);}
+
+#define LOGE_C(condition, ...)   \
+if(condition) {__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__);}
+
+
+#define LOGE(...)    __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__);
+
+#define LOGD_C(condition, ...)   \
+if(condition) {__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__);}
+
+
+#define LOGD(...)    \
+if(is_debug) {__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__);}
+
 
 #ifdef DEBUG
 

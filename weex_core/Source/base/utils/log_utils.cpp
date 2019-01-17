@@ -19,10 +19,13 @@
 
 #include "base/utils/log_utils.h"
 
+extern bool is_debug;
+
 namespace Weex{
   bool LogUtil::mDebugMode = false;
   void LogUtil::setDebugMode(bool debug){
     mDebugMode = debug;
+    is_debug = debug;
   }
   void LogUtil::ConsoleLogPrint(int level, const char* tag, const char* log) {
         // Log = 1, 
