@@ -49,6 +49,8 @@ public class ImageDrawable extends PaintDrawable {
               (bm = ((BitmapDrawable) original).getBitmap()) != null) {
         ImageDrawable imageDrawable;
         imageDrawable = new ImageDrawable();
+        // fix android 9 image antialiasing
+        imageDrawable.getPaint().setFilterBitmap(true);
         imageDrawable.bitmapWidth = bm.getWidth();
         imageDrawable.bitmapHeight = bm.getHeight();
         BitmapShader bitmapShader = new BitmapShader(bm, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
@@ -132,9 +134,6 @@ public class ImageDrawable extends PaintDrawable {
     if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP) {
       // fix api 21 PaintDrawable crash
       paint.setAntiAlias(false);
-    } else {
-      // make android support anti-aliased image
-      paint.setFlags(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     }
     super.onDraw(shape, canvas, paint);
   }
