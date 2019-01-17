@@ -89,7 +89,7 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
   }
 
   @Override
-  public View.OnClickListener getTagViewClickListener(String tagName, String html) {
+  public View.OnClickListener getTagViewClickListener(View clickView, String tagName, String html) {
     return new EmptyClickListener();
   }
 
@@ -122,12 +122,13 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
   }
 
   /**
-   * In my case,the video tag info may like below:
-   * <video style="width:**;height:**" src="" poster="">
+   * In my case,the video tag info may like below: <video style="width:**;height:**" src=""
+   * poster="">
+   *
    * @param info video tag raw string
    * @return return video view self
    */
-  protected View getDefaultVideo(String info){
+  protected View getDefaultVideo(String info) {
     FrameLayout layout = new FrameLayout(context);
     ImageView icon = new ImageView(context);
     icon.setImageResource(android.R.drawable.ic_media_play);
@@ -141,21 +142,26 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
     params.width = WXViewUtils.getScreenWidth(context) - component.getEdgesWidth();
     params.height = (int) (params.width * DEFAULT_IMAGE_ASPECT_RATIO);
-    layout.addView(bg,params);
-    layout.addView(icon,new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                                     ViewGroup.LayoutParams.WRAP_CONTENT,Gravity.CENTER));
-    layout.setOnClickListener(getTagViewClickListener(HtmlComponent.TAG_VIDEO, info));
+    layout.addView(bg, params);
+    layout.addView(
+        icon,
+        new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            Gravity.CENTER));
+    layout.setOnClickListener(getTagViewClickListener(layout,HtmlComponent.TAG_VIDEO, info));
     return layout;
   }
 
-  protected ImageView getDefaultImageView(String info) {
+  protected View getDefaultImageView(String info) {
+    FrameLayout layout = new FrameLayout(context);
     ImageView imageView = new ImageView(context);
     imageView.setScaleType(getResizeMode(component.getImageResize()));
-    int hegiht = -1;
+    int height = -1;
     int width = -1;
     try {
       // [a-zA-Z]{2}$ for unit of px or wx
-      hegiht =
+      height =
           Integer.valueOf(
               HtmlComponent.getAttributeValue("height", info).replaceAll("[a-zA-Z]{2}$", ""));
       width =
@@ -168,22 +174,25 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
         new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
     params.width = WXViewUtils.getScreenWidth(context) - component.getEdgesWidth();
-    if (hegiht == -1 || width == -1) { // don't have explicit height or width
+    params.height = (int) (params.width * DEFAULT_IMAGE_ASPECT_RATIO);
+    if (height == -1 || width == -1) { // don't have explicit height or width
       params.height = (int) (params.width * DEFAULT_IMAGE_ASPECT_RATIO);
     } else {
-      params.height = (int) (params.width * hegiht * 1.0f / width);
+      params.height = (int) (params.width * height * 1.0f / width);
     }
-    imageView.setLayoutParams(params);
+    layout.addView(imageView,params);
     String src = HtmlComponent.getAttributeValue("src", info);
     WXSDKManager.getInstance().getIWXImgLoaderAdapter().setImage(src, imageView, null, null);
 
-    imageView.setOnClickListener(getTagViewClickListener(HtmlComponent.TAG_IMAGE, info));
+    imageView.setOnClickListener(getTagViewClickListener(imageView,HtmlComponent.TAG_IMAGE, info));
     mImageMap.put(imageView, src);
-    return imageView;
+    return layout;
   }
 
   protected View getDefaultTextView(String html) {
     JellyBeanSpanFixTextView textView = new JellyBeanSpanFixTextView(context);
+    //padding top 20
+    textView.setPadding(0,20,0,0);
     WxHtmlTagHandler tagHandler = new WxHtmlTagHandler();
     textView.setText(
         HtmlCompat.fromHtml(context, html, HtmlCompat.FROM_HTML_MODE_LEGACY, tagHandler));
@@ -217,7 +226,7 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
 
     @Override
     public void onClick(View view) {
-      getTagViewClickListener(HtmlComponent.TAG_DEFAULT, url).onClick(view);
+      getTagViewClickListener(view,HtmlComponent.TAG_DEFAULT, url).onClick(view);
     }
   }
 
@@ -254,16 +263,14 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
 
   protected static Pattern getWidthPattern() {
     if (sWidthPattern == null) {
-      sWidthPattern = Pattern.compile(
-          "(?:\\s+|\\A)width\\s*:\\s*(\\S*)\\b");
+      sWidthPattern = Pattern.compile("(?:\\s+|\\A)width\\s*:\\s*(\\S*)\\b");
     }
     return sWidthPattern;
   }
 
   protected static Pattern getHeightPattern() {
     if (sHeightPattern == null) {
-      sHeightPattern = Pattern.compile(
-          "(?:\\s+|\\A)height\\s*:\\s*(\\S*)\\b");
+      sHeightPattern = Pattern.compile("(?:\\s+|\\A)height\\s*:\\s*(\\S*)\\b");
     }
     return sHeightPattern;
   }

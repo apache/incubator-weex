@@ -36,5 +36,5 @@ public interface IWxHtmlTagAdapter<T extends View> {
    */
   public T getHtmlTagView(Context context, WxHtmlComponent component, String tagName, String html);
 
-  public View.OnClickListener getTagViewClickListener(String tagName, String html);
+  public View.OnClickListener getTagViewClickListener(View clickView, String tagName, String html);
 }
