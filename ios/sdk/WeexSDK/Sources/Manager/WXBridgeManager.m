@@ -302,7 +302,7 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
 
 - (void)DownloadJS:(NSURL *)scriptUrl completion:(void (^)(NSString *script))complection;
 {
-    if (!scriptUrl) {
+    if (!scriptUrl || ![scriptUrl.absoluteString length]) {
         complection(nil);
         return;
     }
