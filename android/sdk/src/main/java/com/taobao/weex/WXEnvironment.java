@@ -27,8 +27,7 @@ import android.graphics.Typeface;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
-
+import com.taobao.weex.BuildConfig;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.LogLevel;
@@ -37,21 +36,16 @@ import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
-
-import org.w3c.dom.Text;
-
+import dalvik.system.PathClassLoader;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
-import dalvik.system.PathClassLoader;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WXEnvironment {
 
@@ -135,7 +129,7 @@ public class WXEnvironment {
   private static String LIB_LD_PATH = null;
 
 
-  private static Map<String, String> options = new HashMap<>();
+  private static Map<String, String> options = new ConcurrentHashMap<>();
   static {
     options.put(WXConfig.os, OS);
     options.put(WXConfig.osName, OS);
@@ -170,15 +164,15 @@ public class WXEnvironment {
 
     try {
       if (isApkDebugable()) {
-        options.put(WXConfig.debugMode, "true");
+        addCustomOptions(WXConfig.debugMode, "true");
       }
-      options.put(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
+      addCustomOptions(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
     }catch (NullPointerException e){
       //There is little chance of NullPointerException as sApplication may be null.
       WXLogUtils.e("WXEnvironment scale Exception: ", e);
     }
-    configs.putAll(options);
-    if(configs!=null&&configs.get(WXConfig.appName)==null && sApplication!=null){
+    configs.putAll(getCustomOptions());
+    if(configs.get(WXConfig.appName)==null && sApplication!=null){
       configs.put(WXConfig.appName, sApplication.getPackageName());
     }
     return configs;
@@ -216,12 +210,22 @@ public class WXEnvironment {
   }
 
 
+  /**
+   * Use {@link #addCustomOptions(String, String)} to add custom options.
+   * Use {@link #getCustomOptions(String)} to get custom options
+   * @return
+   */
+  @Deprecated
   public static Map<String, String> getCustomOptions() {
     return options;
   }
 
   public static void addCustomOptions(String key, String value) {
     options.put(key, value);
+  }
+
+  public static String getCustomOptions(String key){
+    return options.get(key);
   }
 
   @Deprecated
@@ -261,7 +265,7 @@ public class WXEnvironment {
    * @return true when support
    */
   public static boolean isCPUSupport(){
-    boolean excludeX86 = "true".equals(options.get(SETTING_EXCLUDE_X86SUPPORT));
+    boolean excludeX86 = "true".equals(getCustomOptions().get(SETTING_EXCLUDE_X86SUPPORT));
     boolean isX86AndExcluded = WXSoInstallMgrSdk.isX86() && excludeX86;
     boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport() && !isX86AndExcluded;
     if (WXEnvironment.isApkDebugable()) {

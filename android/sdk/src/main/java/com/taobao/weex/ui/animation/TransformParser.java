@@ -168,7 +168,7 @@ public class TransformParser {
                                     if ((suffix = raw.lastIndexOf(DEG)) != -1) {
                                         convertedList.add(WXUtils.fastGetFloat(raw.substring(0, suffix)));
                                     } else {
-                                        convertedList.add((float) Math.toDegrees(Double.parseDouble(raw)));
+                                        convertedList.add((float) Math.toDegrees(WXUtils.fastGetFloat(raw)));
                                     }
                                 }
                                 return convertedList;
