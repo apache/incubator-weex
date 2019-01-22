@@ -46,9 +46,6 @@ public class WXComponentRegistry {
       return false;
     }
 
-    //register component
-    AutoScanConfigRegister.preLoad(holder);
-
     //execute task in js thread to make sure register order is same as the order invoke register method.
     WXBridgeManager.getInstance()
         .post(new Runnable() {
