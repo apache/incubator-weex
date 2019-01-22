@@ -44,20 +44,6 @@ public class AutoScanConfigRegister {
 
     public static final  String TAG  = "WeexScanConfigRegister";
 
-    private static ConcurrentLinkedQueue<JavascriptInvokable> autoLoadClass  = new ConcurrentLinkedQueue<>();
-
-    /**
-     * pre load module class and methods when so&jsf init
-     **/
-    public static void preLoad(JavascriptInvokable invokable){
-        if(invokable instanceof ConfigModuleFactory){
-            return;
-        }
-        if(invokable instanceof ConfigComponentHolder){
-            return;
-        }
-        autoLoadClass.add(invokable);
-    }
 
     /**
      * auto scan config files and do auto config from files, none need center register
@@ -80,16 +66,6 @@ public class AutoScanConfigRegister {
             @Override
             public void run() {
                 doScanConfigSync();
-                JavascriptInvokable invokable = autoLoadClass.poll();
-                int count = 0;
-                while (invokable != null){
-                    invokable.getMethods();
-                    invokable = autoLoadClass.poll();
-                    count++;
-                }
-                if(WXEnvironment.isApkDebugable()){
-                    WXLogUtils.d(TAG, "auto preload class's methods count " + count);
-                }
             }
         });
         thread.setName("AutoScanConfigRegister");
