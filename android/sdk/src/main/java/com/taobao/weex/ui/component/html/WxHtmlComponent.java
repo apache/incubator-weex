@@ -19,7 +19,9 @@
 package com.taobao.weex.ui.component.html;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -50,43 +52,100 @@ import java.util.List;
  * A Component that handle unsupported tags by custom native view
  * Util now, we use {@link TextView} to map normal text-string, support
  * <ol> <ul> <li> in {@link TextView} (Not handle nested li now...WIP)
- * And can extend {@link WxHtmlTagHandler} to support more tag
- *
- * ImageView to map <img> tag
- * WebView to map <table> tag with custom wrap html template {@link HtmlComponent#HTML_TEMPLATE}
+ * And can extend {@link WxHtmlTagHandler} to support more tag, and we can
+ * add header & footer view inside this component,like below:
+ * <html-text :html-text="formatHtml"
+ *            :html-option="htmlOption">
+ *      <div> Any Header View</div>
+ *      <div> Any Footer View</div>
+ * </html-text>
+ * <html-text> only parse({@link #addSubView(View, int)})the first two direct views,
+ * the first one as header({@link #mHeaderContainer})
+ * the second one as footer({@link #mFooterContainer})
  */
-public class WxHtmlComponent extends WXComponent<ScrollView> {
+public class WxHtmlComponent extends WXVContainer<ScrollView> {
 
   private static final int DEFAULT_PAGE_EDGE = 20;
+  private static final String TAG_DIRECT_CHILD = "direct_child";
+  private static final int TAG_DIRECT_CHILD_ID = 1 + 2 << 24;
   private List<HtmlComponent> mHtmlComponents = new ArrayList<>();
   private String mImageResize = "cover";
   private String mTableTemplate = HtmlComponent.HTML_TEMPLATE;
   private int mLeftEdge = DEFAULT_PAGE_EDGE;
   private int mRightEdge = DEFAULT_PAGE_EDGE;
+  private FrameLayout mHeaderContainer;
+  private LinearLayout mCenterContainer;
+  private FrameLayout mFooterContainer;
   private String[] mSupportedTags =new String[]{HtmlComponent.TAG_IMAGE, HtmlComponent.TAG_TABLE,
       HtmlComponent.TAG_VIDEO};
+  //this params for adjust the second child view's top margin
+  private int mFirstChildViewHeight;
 
   public WxHtmlComponent(
       WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     super(instance, parent, basicComponentData);
   }
 
-  public WxHtmlComponent(
-      WXSDKInstance instance,
-      WXVContainer parent,
-      int type,
-      BasicComponentData basicComponentData) {
-    super(instance, parent, type, basicComponentData);
+  @Override
+  protected ScrollView initComponentHostView(@NonNull final Context context) {
+    LinearLayout container = new LinearLayout(context);
+    mHeaderContainer = new FrameLayout(getContext());
+    mCenterContainer = new LinearLayout(getContext());
+    mFooterContainer = new FrameLayout(getContext());
+    mFooterContainer.setBackgroundColor(Color.LTGRAY);
+    container.addView(mHeaderContainer);
+    container.addView(mCenterContainer);
+    container.addView(mFooterContainer);
+    mCenterContainer.setOrientation(LinearLayout.VERTICAL);
+    container.setOrientation(LinearLayout.VERTICAL);
+    ScrollView scrollView = new ScrollView(context);
+    scrollView.setVerticalScrollBarEnabled(false);
+    scrollView.addView(
+        container, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+    return scrollView;
   }
 
   @Override
-  protected ScrollView initComponentHostView(@NonNull final Context context) {
-    LinearLayout layout = new LinearLayout(context);
-    layout.setOrientation(LinearLayout.VERTICAL);
-    ScrollView scrollView = new ScrollView(context);
-    scrollView.addView(
-        layout, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-    return scrollView;
+  public void addSubView(View child, int index) {
+    if (child == null || getRealView() == null) {
+      return;
+    }
+    //remark the direct sub view
+    child.setTag(TAG_DIRECT_CHILD_ID, TAG_DIRECT_CHILD);
+    if(index == 0){ //header view
+      mHeaderContainer.removeAllViews();
+      mHeaderContainer.addView(child,FrameLayout.LayoutParams.MATCH_PARENT,
+                               FrameLayout.LayoutParams.WRAP_CONTENT);
+    }else if(index == 1){ //footer view
+      mFooterContainer.removeAllViews();
+      mFooterContainer.addView(child,FrameLayout.LayoutParams.MATCH_PARENT,
+                               FrameLayout.LayoutParams.WRAP_CONTENT);
+    }
+    //ignore other index..
+  }
+
+  @Override
+  public ViewGroup.LayoutParams getChildLayoutParams(WXComponent child, View childView, int width, int height, int left, int right, int top, int bottom) {
+    ViewGroup.LayoutParams lp = childView.getLayoutParams();
+    if (lp == null) {
+      lp = new FrameLayout.LayoutParams(width, height);
+    } else {
+      lp.width = width;
+      lp.height = height;
+    }
+
+    if (lp instanceof ViewGroup.MarginLayoutParams) {
+      View hostView = child.getHostView();
+      //reset the opposite top margin of the direct sub view
+      if (hostView != null && TAG_DIRECT_CHILD.equals(hostView.getTag(TAG_DIRECT_CHILD_ID))) {
+        this.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, left, top - mFirstChildViewHeight, right,
+                                  bottom);
+        if (mFirstChildViewHeight == 0) {
+          mFirstChildViewHeight = height;
+        }
+      }
+    }
+    return lp;
   }
 
   /**
@@ -152,9 +211,8 @@ public class WxHtmlComponent extends WXComponent<ScrollView> {
 
     extractOption(WXUtils.getString(getAttrs().get("htmlOption"), ""));
 
-    ViewGroup layout = (ViewGroup) getHostView().getChildAt(0);
-    if (layout.getChildCount() != 0) {
-      layout.removeAllViews();
+    if (mCenterContainer.getChildCount() != 0) {
+      mCenterContainer.removeAllViews();
     }
 
     if (mHtmlComponents.size() == 0) {
@@ -166,7 +224,7 @@ public class WxHtmlComponent extends WXComponent<ScrollView> {
         new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
     for (HtmlComponent htmlComponent : mHtmlComponents) {
-      layout.addView(
+      mCenterContainer.addView(
           getInstance()
               .getHtmlTextAdapter()
               .getHtmlTagView(getContext(), this, htmlComponent.tagName, htmlComponent.info),

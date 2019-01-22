@@ -191,11 +191,12 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
 
   protected View getDefaultTextView(String html) {
     JellyBeanSpanFixTextView textView = new JellyBeanSpanFixTextView(context);
-    //padding top 20
-    textView.setPadding(0,20,0,0);
     WxHtmlTagHandler tagHandler = new WxHtmlTagHandler();
-    textView.setText(
-        HtmlCompat.fromHtml(context, html, HtmlCompat.FROM_HTML_MODE_LEGACY, tagHandler));
+    SpannableStringBuilder span = (SpannableStringBuilder) HtmlCompat.fromHtml(context, html, HtmlCompat.FROM_HTML_MODE_LEGACY, tagHandler);
+    //remove the last "\n" and add it to start
+    span.replace(span.length() - "\n".length(), span.length(), "");
+    span.insert(0, "\n");
+    textView.setText(span);
 
     textView.setMovementMethod(LinkMovementMethod.getInstance());
     CharSequence text = textView.getText();
