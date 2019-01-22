@@ -81,7 +81,7 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
         tagView = getDefaultVideo(html);
         break;
       default: // text
-        View extendTagView = getExtendTagView(html);
+        View extendTagView = getExtendTagView(tagName,html);
         tagView = extendTagView == null ? getDefaultTextView(html) : extendTagView;
         break;
     }
@@ -99,7 +99,7 @@ public class DefaultHtmlTagAdapter implements IWxHtmlTagAdapter {
    * @param info html string
    * @return tag's native view
    */
-  protected View getExtendTagView(String info) {
+  protected View getExtendTagView(String tagName,String info) {
     return null;
   }
 
