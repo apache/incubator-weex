@@ -16,18 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.CSSShorthand;
+import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.ui.action.GraphicActionBaseAddElement;
 import com.taobao.weex.ui.component.node.WXComponentNodeBuilder;
 
 import java.util.Map;
 import java.util.Set;
 
-public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction {
+public abstract class PrerenderGraphicActionAbstractAddElement extends GraphicActionBaseAddElement {
 
   protected String mComponentType;
   protected String mParentRef;
@@ -40,7 +42,7 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
   protected float[] mBorders;
   private long startTime;
 
-  public GraphicActionAbstractAddElement(WXSDKInstance instance, String ref) {
+  public PrerenderGraphicActionAbstractAddElement(WXSDKInstance instance, String ref) {
     super(instance, ref);
     startTime = System.currentTimeMillis();
   }

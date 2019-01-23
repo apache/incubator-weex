@@ -21,24 +21,28 @@ package com.taobao.weex.ui.action;
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.component.node.WXComponentNode;
+import com.taobao.weex.ui.component.WXComponent;
 
 public class GraphicActionRenderSuccess extends BasicGraphicAction {
 
-    public GraphicActionRenderSuccess(@NonNull WXSDKInstance instance) {
+    GraphicActionRenderSuccess(@NonNull WXSDKInstance instance) {
         super(instance, "");
     }
 
     @Override
     public void executeAction() {
         final WXSDKInstance instance = getWXSDKIntance();
-        if (instance == null) {
+        if (instance == null || instance.getContext() == null) {
             return;
         }
-        WXComponentNode rootNode = instance.getPrerenderContext().rootNode;
-        if (rootNode != null) {
-            rootNode.onRenderSuccess();
+        WXComponent component = instance.getRootComponent();
+        int layoutWidth = 0;
+        int layoutHeight = 0;
+        if (null != component) {
+            layoutWidth = (int) component.getLayoutWidth();
+            layoutHeight = (int) component.getLayoutHeight();
         }
+        instance.onRenderSuccess(layoutWidth, layoutHeight);
     }
 
 }

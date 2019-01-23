@@ -16,19 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
 import com.taobao.weex.WXSDKInstance;
-
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
-public class GraphicActionMoveElement extends BasicGraphicAction {
+public class PrerenderGraphicActionMoveElement extends BasicGraphicAction {
 
   private String mParentref;
   private int mIndex;
 
-  public GraphicActionMoveElement(WXSDKInstance instance, String ref, String parentRef, int index) {
+  PrerenderGraphicActionMoveElement(WXSDKInstance instance, String ref, String parentRef, int index) {
     super(instance, ref);
     this.mParentref = parentRef;
     this.mIndex = index;

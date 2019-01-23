@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
 import android.support.v4.util.ArrayMap;
 
@@ -26,31 +26,32 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.transition.WXTransition;
+import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
 import java.util.Map;
 
-public class GraphicActionUpdateStyle extends BasicGraphicAction {
+public class PrerenderGraphicActionUpdateStyle extends BasicGraphicAction {
 
   private Map<String, Object> mStyle;
   private WXComponentNode mNode;
   private boolean mIsCausedByPesudo;
   private boolean mIsBorderSet;
 
-  public GraphicActionUpdateStyle(WXSDKInstance instance, String ref,
-                                  Map<String, Object> style,
-                                  Map<String, String> paddings,
-                                  Map<String, String> margins,
-                                  Map<String, String> borders) {
+  PrerenderGraphicActionUpdateStyle(WXSDKInstance instance, String ref,
+                                           Map<String, Object> style,
+                                           Map<String, String> paddings,
+                                           Map<String, String> margins,
+                                           Map<String, String> borders) {
     this(instance, ref, style, paddings, margins, borders, false);
   }
 
-  public GraphicActionUpdateStyle(WXSDKInstance instance, String ref,
-                                  Map<String, Object> style,
-                                  CSSShorthand paddings,
-                                  CSSShorthand margins,
-                                  CSSShorthand borders, boolean byPesudo) {
+  public PrerenderGraphicActionUpdateStyle(WXSDKInstance instance, String ref,
+                                           Map<String, Object> style,
+                                           CSSShorthand paddings,
+                                           CSSShorthand margins,
+                                           CSSShorthand borders, boolean byPesudo) {
     super(instance, ref);
     this.mStyle = style;
     this.mIsCausedByPesudo = byPesudo;
@@ -86,11 +87,11 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     }
   }
 
-  public GraphicActionUpdateStyle(WXSDKInstance instance, String ref,
-                                  Map<String, Object> style,
-                                  Map<String, String> paddings,
-                                  Map<String, String> margins,
-                                  Map<String, String> borders, boolean byPesudo) {
+  public PrerenderGraphicActionUpdateStyle(WXSDKInstance instance, String ref,
+                                           Map<String, Object> style,
+                                           Map<String, String> paddings,
+                                           Map<String, String> margins,
+                                           Map<String, String> borders, boolean byPesudo) {
     super(instance, ref);
     this.mStyle = style;
     this.mIsCausedByPesudo = byPesudo;

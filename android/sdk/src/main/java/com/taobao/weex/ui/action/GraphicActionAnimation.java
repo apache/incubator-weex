@@ -115,7 +115,7 @@ public class GraphicActionAnimation extends BasicGraphicAction {
     }
 
     WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
-    if (instance == null || instance.getNeedInterceptRender()) {
+    if (instance == null) {
       return;
     }
 

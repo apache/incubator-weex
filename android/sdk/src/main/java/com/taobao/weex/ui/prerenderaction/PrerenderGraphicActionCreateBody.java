@@ -16,28 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
 import java.util.Map;
 import java.util.Set;
 
-public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
+public class PrerenderGraphicActionCreateBody extends PrerenderGraphicActionAbstractAddElement {
 
   private WXComponentNode node;
 
-  public GraphicActionCreateBody(@NonNull WXSDKInstance instance, String ref,
-                                 String componentType,
-                                 Map<String, String> style,
-                                 Map<String, String> attributes,
-                                 Set<String> events,
-                                 float[] margins,
-                                 float[] paddings,
-                                 float[] borders) {
+  PrerenderGraphicActionCreateBody(@NonNull WXSDKInstance instance, String ref,
+                                          String componentType,
+                                          Map<String, String> style,
+                                          Map<String, String> attributes,
+                                          Set<String> events,
+                                          float[] margins,
+                                          float[] paddings,
+                                          float[] borders) {
     super(instance, ref);
     this.mComponentType = componentType;
     this.mStyle = style;

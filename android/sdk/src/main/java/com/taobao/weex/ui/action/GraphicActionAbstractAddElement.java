@@ -18,16 +18,18 @@
  */
 package com.taobao.weex.ui.action;
 
-import android.support.annotation.NonNull;
-
+import android.support.v4.util.ArrayMap;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.CSSShorthand;
-import com.taobao.weex.ui.component.node.WXComponentNodeBuilder;
-
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentFactory;
+import com.taobao.weex.ui.component.WXVContainer;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction {
+public abstract class GraphicActionAbstractAddElement extends GraphicActionBaseAddElement {
 
   protected String mComponentType;
   protected String mParentRef;
@@ -45,15 +47,28 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
     startTime = System.currentTimeMillis();
   }
 
-  protected WXComponentNodeBuilder createNode(WXSDKInstance instance, @NonNull BasicComponentData basicComponentData) {
-    basicComponentData.addStyle(mStyle);
-    basicComponentData.addAttr(mAttributes);
-    basicComponentData.addEvent(mEvents);
-    basicComponentData.addShorthand(mMargins, CSSShorthand.TYPE.MARGIN);
-    basicComponentData.addShorthand(mPaddings, CSSShorthand.TYPE.PADDING);
-    basicComponentData.addShorthand(mBorders, CSSShorthand.TYPE.BORDER);
+  protected WXComponent createComponent(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    long createComponentStart = System.currentTimeMillis();
+    if (basicComponentData != null) {
+      basicComponentData.addStyle(mStyle);
+      basicComponentData.addAttr(mAttributes);
+      basicComponentData.addEvent(mEvents);
+      basicComponentData.addShorthand(mMargins, CSSShorthand.TYPE.MARGIN);
+      basicComponentData.addShorthand(mPaddings, CSSShorthand.TYPE.PADDING);
+      basicComponentData.addShorthand(mBorders, CSSShorthand.TYPE.BORDER);
+    }
 
-    return WXComponentNodeBuilder.createInstance(instance, basicComponentData);
+    WXComponent component = WXComponentFactory.newInstance(instance, parent, basicComponentData);
+    WXSDKManager.getInstance().getWXRenderManager().registerComponent(getPageId(), getRef(), component);
+    if(mStyle != null && mStyle.containsKey(Constants.Name.TRANSFORM) && component.getTransition() == null) {
+      Map<String, Object> animationMap = new ArrayMap<>(2);
+      animationMap.put(Constants.Name.TRANSFORM, mStyle.get(Constants.Name.TRANSFORM));
+      animationMap
+          .put(Constants.Name.TRANSFORM_ORIGIN, mStyle.get(Constants.Name.TRANSFORM_ORIGIN));
+      component.addAnimationForElement(animationMap);
+    }
+    instance.onComponentCreate(component,System.currentTimeMillis() -createComponentStart);
+    return component;
   }
 
   @Override
@@ -84,4 +99,5 @@ public abstract class GraphicActionAbstractAddElement extends BasicGraphicAction
   public Set<String> getEvents() {
     return mEvents;
   }
+
 }

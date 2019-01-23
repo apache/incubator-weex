@@ -62,6 +62,8 @@ public class PreRenderContext implements WeexFrameRateControl.VSyncListener {
 
     public AtomicBoolean isRenderSuccess = new AtomicBoolean(false);
 
+    private boolean mIsPrerenderMode = false;
+
     @Override
     public void OnVSync() {
         if (rootNode != null) {
@@ -74,6 +76,7 @@ public class PreRenderContext implements WeexFrameRateControl.VSyncListener {
             mFrameRateControl = new WeexFrameRateControl(this);
         }
         mFrameRateControl.start();
+        mIsPrerenderMode = true;
     }
 
     public void setLayoutMode(int layoutMode) {
@@ -121,5 +124,9 @@ public class PreRenderContext implements WeexFrameRateControl.VSyncListener {
             default:
                 return height;
         }
+    }
+
+    public boolean isPrerenderMode() {
+        return mIsPrerenderMode;
     }
 }

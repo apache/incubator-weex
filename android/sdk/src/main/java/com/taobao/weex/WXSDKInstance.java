@@ -71,6 +71,7 @@ import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.prerender.PreRenderContext;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
+import com.taobao.weex.ui.action.GraphicActionBaseAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXEmbed;
@@ -216,7 +217,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private boolean mCurrentGround = false;
   private ComponentObserver mComponentObserver;
-  private Map<String, GraphicActionAddElement> inactiveAddElementAction = new ArrayMap<>();
+  private Map<String, GraphicActionBaseAddElement> inactiveAddElementAction = new ArrayMap<>();
 
   private Map<Long, ContentBoxMeasurement> mContentBoxMeasurements = new ArrayMap<>();
 
@@ -377,7 +378,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   @WorkerThread
   @RestrictTo(Scope.LIBRARY)
-  public void addInActiveAddElementAction(String ref, GraphicActionAddElement action){
+  public void addInActiveAddElementAction(String ref, GraphicActionBaseAddElement action){
     inactiveAddElementAction.put(ref, action);
   }
 
@@ -389,7 +390,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   @WorkerThread
   @RestrictTo(Scope.LIBRARY)
-  public GraphicActionAddElement getInActiveAddElementAction(String ref){
+  public GraphicActionBaseAddElement getInActiveAddElementAction(String ref){
     return inactiveAddElementAction.get(ref);
   }
 
@@ -2147,5 +2148,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(!getInstanceOnFireEventInterceptorList().contains(instanceOnFireEventInterceptor)){
       getInstanceOnFireEventInterceptorList().add(instanceOnFireEventInterceptor);
     }
+  }
+
+  public boolean hasPrerender() {
+    return mPrerenderContext.isPrerenderMode();
   }
 }

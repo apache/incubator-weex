@@ -21,7 +21,6 @@ package com.taobao.weex.ui.action;
 import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.node.WXComponentNode;
 import com.taobao.weex.utils.WXLogUtils;
 
 /**
@@ -36,7 +35,7 @@ public class ActionInvokeMethod implements IExecutable {
   private String mPageId;
   private String mRef;
 
-  public ActionInvokeMethod(String pageId, String ref, String method, JSONArray args) {
+  ActionInvokeMethod(String pageId, String ref, String method, JSONArray args) {
     this.mPageId = pageId;
     this.mRef = ref;
     this.mMethod = method;
@@ -45,9 +44,11 @@ public class ActionInvokeMethod implements IExecutable {
 
   @Override
   public void executeAction() {
-    WXComponentNode node = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(mPageId, mRef);
-    if (node != null) {
-      node.invokeMethod(mMethod, mArgs);
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mRef);
+    if(component == null){
+      WXLogUtils.e(TAG,"target component not found.");
+      return;
     }
+    component.invoke(mMethod,mArgs);
   }
 }

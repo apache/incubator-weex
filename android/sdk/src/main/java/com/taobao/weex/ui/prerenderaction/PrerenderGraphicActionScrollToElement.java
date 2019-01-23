@@ -16,21 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
 /**
  * Created by listen on 18/01/09.
  */
-public class GraphicActionScrollToElement extends BasicGraphicAction {
+public class PrerenderGraphicActionScrollToElement extends BasicGraphicAction {
 
   private final JSONObject mOptions;
 
-  public GraphicActionScrollToElement(WXSDKInstance instance, String ref, JSONObject options) {
+  PrerenderGraphicActionScrollToElement(WXSDKInstance instance, String ref, JSONObject options) {
     super(instance, ref);
     this.mOptions = options;
   }

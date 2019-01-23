@@ -16,19 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.ui.action.BasicGraphicAction;
 
 /**
  * Created by listen on 18/01/09.
  */
-public class GraphicActionCreateFinish extends BasicGraphicAction {
+public class PrerenderGraphicActionCreateFinish extends BasicGraphicAction {
 
-  public GraphicActionCreateFinish(@NonNull WXSDKInstance instance) {
+  PrerenderGraphicActionCreateFinish(@NonNull WXSDKInstance instance) {
     super(instance, "");
     instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH);
     instance.getApmForInstance().extInfo.put(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH,true);

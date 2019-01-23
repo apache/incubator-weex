@@ -36,7 +36,6 @@ import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.ui.action.BasicComponentData;
-import com.taobao.weex.ui.action.GraphicActionTransformNode;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.component.Scrollable;
@@ -44,6 +43,7 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.prerenderaction.PrerenderGraphicActionTransformNode;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
@@ -479,7 +479,7 @@ public class WXComponentNode implements Runnable {
 
     @Override
     public void run() {
-        new GraphicActionTransformNode(this, mWxInstance, mComponentData.mRef).executeActionOnRender();
+        new PrerenderGraphicActionTransformNode(this, mWxInstance, mComponentData.mRef).executeActionOnRender();
     }
 
     public void onCreateFinish() {

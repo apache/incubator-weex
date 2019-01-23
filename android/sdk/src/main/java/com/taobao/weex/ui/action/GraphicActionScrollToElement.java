@@ -21,7 +21,8 @@ package com.taobao.weex.ui.action;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.ui.component.node.WXComponentNode;
+import com.taobao.weex.ui.component.Scrollable;
+import com.taobao.weex.ui.component.WXComponent;
 
 /**
  * Created by listen on 18/01/09.
@@ -30,16 +31,22 @@ public class GraphicActionScrollToElement extends BasicGraphicAction {
 
   private final JSONObject mOptions;
 
-  public GraphicActionScrollToElement(WXSDKInstance instance, String ref, JSONObject options) {
+  GraphicActionScrollToElement(WXSDKInstance instance, String ref, JSONObject options) {
     super(instance, ref);
     this.mOptions = options;
   }
 
   @Override
   public void executeAction() {
-    WXComponentNode node = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
-    if (node != null) {
-      node.scrollToElement(mOptions);
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    if (component == null) {
+      return;
     }
+
+    Scrollable scroller = component.getParentScroller();
+    if (scroller == null) {
+      return;
+    }
+    scroller.scrollTo(component, mOptions);
   }
 }

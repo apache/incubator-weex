@@ -16,21 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.WorkerThread;
-
 import android.support.v4.util.ArrayMap;
 import android.util.Log;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
-import com.taobao.weex.ui.component.node.WXComponentNode;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
+import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.ui.action.GraphicPosition;
+import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.node.WXComponentNode;
 import com.taobao.weex.utils.WXExceptionUtils;
 
 import java.util.Arrays;
@@ -38,22 +41,22 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
+public class PrerenderGraphicActionAddElement extends PrerenderGraphicActionAbstractAddElement {
 
   private GraphicPosition layoutPosition;
   private GraphicSize layoutSize;
   private boolean isLayoutRTL;
   private WXComponentNode childNode;
 
-  public GraphicActionAddElement(@NonNull WXSDKInstance instance, String ref,
-                                 String componentType, String parentRef,
-                                 int index,
-                                 Map<String, String> style,
-                                 Map<String, String> attributes,
-                                 Set<String> events,
-                                 float[] margins,
-                                 float[] paddings,
-                                 float[] borders) {
+  PrerenderGraphicActionAddElement(@NonNull WXSDKInstance instance, String ref,
+                                          String componentType, String parentRef,
+                                          int index,
+                                          Map<String, String> style,
+                                          Map<String, String> attributes,
+                                          Set<String> events,
+                                          float[] margins,
+                                          float[] paddings,
+                                          float[] borders) {
     super(instance, ref);
     this.mComponentType = componentType;
     this.mParentRef = parentRef;
@@ -127,7 +130,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
         WXExceptionUtils.commitCriticalExceptionRT(instance.getInstanceId(),
                 WXErrorCode.WX_RENDER_ERR_CONTAINER_TYPE,
-                "GraphicActionAddElement",
+                "PrerenderGraphicActionAddElement",
                 String.format(Locale.ENGLISH, "You are trying to add a %s to a %2$s, which is illegal as %2$s is not a container",
                         componentType,
                         WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), mParentRef).getComponentType()),
@@ -139,6 +142,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
   @RestrictTo(Scope.LIBRARY)
   @WorkerThread
+  @Override
   public void setRTL(boolean isRTL){
     isLayoutRTL = isRTL;
     childNode.setIsLayoutRTL(isRTL);
@@ -146,6 +150,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
   @RestrictTo(Scope.LIBRARY)
   @WorkerThread
+  @Override
   public void setSize(GraphicSize graphicSize){
     this.layoutSize = graphicSize;
     childNode.setLayoutSize(graphicSize);
@@ -153,6 +158,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
   @RestrictTo(Scope.LIBRARY)
   @WorkerThread
+  @Override
   public void setPosition(GraphicPosition position){
     this.layoutPosition = position;
     childNode.setLayoutPosition(position);
@@ -160,6 +166,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
   @RestrictTo(Scope.LIBRARY)
   @WorkerThread
+  @Override
   public void setIndex(int index){
     childNode.setIndex(index);
   }

@@ -21,16 +21,17 @@ package com.taobao.weex.ui.prerenderaction;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXEvent;
+import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
 /**
  * Created by listen on 18/01/11.
  */
-public class GraphicActionAddEvent extends BasicGraphicAction {
+public class PrerenderGraphicActionAddEvent extends BasicGraphicAction {
 
   private final String mEvent;
 
-  public GraphicActionAddEvent(WXSDKInstance instance, String ref, Object event) {
+  PrerenderGraphicActionAddEvent(WXSDKInstance instance, String ref, Object event) {
     super(instance, ref);
     this.mEvent = WXEvent.getEventName(event);
   }

@@ -21,30 +21,46 @@ package com.taobao.weex.ui.action;
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.ui.component.WXComponent;
 
 /**
  * Created by listen on 18/01/09.
  */
 public class GraphicActionCreateFinish extends BasicGraphicAction {
 
-  public GraphicActionCreateFinish(@NonNull WXSDKInstance instance) {
+  private int mLayoutWidth;
+  private int mLayoutHeight;
+
+  GraphicActionCreateFinish(@NonNull WXSDKInstance instance) {
     super(instance, "");
+    WXComponent component = instance.getRootComponent();
+    if (null != component) {
+        this.mLayoutWidth = (int) component.getLayoutWidth();
+        this.mLayoutHeight = (int) component.getLayoutHeight();
+    }
     instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH);
     instance.getApmForInstance().extInfo.put(WXInstanceApm.KEY_PAGE_STAGES_CREATE_FINISH,true);
-
   }
 
   @Override
   public void executeAction() {
     final WXSDKInstance instance = getWXSDKIntance();
-    if (instance == null) {
+    if (instance == null || instance.getContext() == null) {
       return;
     }
 
-    if (instance.getPrerenderContext().rootNode != null) {
-      instance.getPrerenderContext().rootNode.onCreateFinish();
+    instance.mHasCreateFinish = true;
+
+    if (instance.getRenderStrategy() == WXRenderStrategy.APPEND_ONCE) {
+      instance.onCreateFinish();
     }
 
+    if (null != instance.getWXPerformance()){
+      instance.getWXPerformance().callCreateFinishTime = System.currentTimeMillis()-instance.getWXPerformance().renderTimeOrigin;
+    }
+    instance.onOldFsRenderTimeLogic();
   }
 }

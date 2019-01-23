@@ -16,16 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
-public class GraphicActionRenderSuccess extends BasicGraphicAction {
+public class PrerenderGraphicActionRenderSuccess extends BasicGraphicAction {
 
-    public GraphicActionRenderSuccess(@NonNull WXSDKInstance instance) {
+    PrerenderGraphicActionRenderSuccess(@NonNull WXSDKInstance instance) {
         super(instance, "");
     }
 

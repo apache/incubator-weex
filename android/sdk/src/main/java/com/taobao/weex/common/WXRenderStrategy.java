@@ -24,6 +24,7 @@ public enum WXRenderStrategy {
   DATA_RENDER("DATA_RENDER"),
   DATA_RENDER_BINARY("DATA_RENDER_BINARY");
 
+
   private String flag;
 
   WXRenderStrategy(String flag) {

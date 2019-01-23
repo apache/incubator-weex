@@ -27,18 +27,17 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.node.WXComponentNode;
 
 import java.util.Map;
 
 public class GraphicActionUpdateStyle extends BasicGraphicAction {
 
   private Map<String, Object> mStyle;
-  private WXComponentNode mNode;
+  private WXComponent component;
   private boolean mIsCausedByPesudo;
   private boolean mIsBorderSet;
 
-  public GraphicActionUpdateStyle(WXSDKInstance instance, String ref,
+  GraphicActionUpdateStyle(WXSDKInstance instance, String ref,
                                   Map<String, Object> style,
                                   Map<String, String> paddings,
                                   Map<String, String> margins,
@@ -55,34 +54,32 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     this.mStyle = style;
     this.mIsCausedByPesudo = byPesudo;
 
-    mNode = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
-    if (mNode == null) {
+    component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    if (component == null) {
       return;
     }
     if (null != mStyle) {
-      mNode.getComponentData().getStyles().updateStyle(mStyle, mIsCausedByPesudo);
-      if (!mNode.getWxInstance().getNeedInterceptRender() && mNode.data != null) {
-        if (style.containsKey(Constants.Name.TRANSFORM) && mNode.data.getTransition() == null) {
-          Map<String, Object> animationMap = new ArrayMap<>(2);
-          animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
-          animationMap
-                  .put(Constants.Name.TRANSFORM_ORIGIN, style.get(Constants.Name.TRANSFORM_ORIGIN));
-          mNode.data.addAnimationForElement(animationMap);
-        }
+      component.updateStyle(mStyle, mIsCausedByPesudo);
+      if(style.containsKey(Constants.Name.TRANSFORM) && component.getTransition() == null) {
+        Map<String, Object> animationMap = new ArrayMap<>(2);
+        animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
+        animationMap
+            .put(Constants.Name.TRANSFORM_ORIGIN, style.get(Constants.Name.TRANSFORM_ORIGIN));
+        component.addAnimationForElement(animationMap);
       }
     }
 
     if (null != paddings) {
-      mNode.getComponentData().setPaddings(paddings);
+      component.setPaddings(paddings);
     }
 
     if (null != margins) {
-      mNode.getComponentData().setMargins(margins);
+      component.setMargins(margins);
     }
 
     if (null != borders) {
       mIsBorderSet = true;
-      mNode.getComponentData().setBorders(borders);
+      component.setBorders(borders);
     }
   }
 
@@ -95,59 +92,50 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
     this.mStyle = style;
     this.mIsCausedByPesudo = byPesudo;
 
-    mNode = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
-    if (mNode == null) {
+    component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    if (component == null) {
       return;
     }
     if (null != mStyle) {
-      mNode.getComponentData().addStyle(mStyle, mIsCausedByPesudo);
-      if (!mNode.getWxInstance().getNeedInterceptRender() && mNode.data != null) {
-        if (style.containsKey(Constants.Name.TRANSFORM) && mNode.data.getTransition() == null) {
-          Map<String, Object> animationMap = new ArrayMap<>(2);
-          animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
-          animationMap.put(Constants.Name.TRANSFORM_ORIGIN, style.get(Constants.Name.TRANSFORM_ORIGIN));
-          mNode.data.addAnimationForElement(animationMap);
-          WXBridgeManager.getInstance().markDirty(getPageId(), getRef(), true);
-        }
+      component.addStyle(mStyle, mIsCausedByPesudo);
+      if(style.containsKey(Constants.Name.TRANSFORM) && component.getTransition() == null){
+        Map<String, Object> animationMap = new ArrayMap<>(2);
+        animationMap.put(Constants.Name.TRANSFORM, style.get(Constants.Name.TRANSFORM));
+        animationMap.put(Constants.Name.TRANSFORM_ORIGIN, style.get(Constants.Name.TRANSFORM_ORIGIN));
+        component.addAnimationForElement(animationMap);
+        WXBridgeManager.getInstance().markDirty(component.getInstanceId(), component.getRef(), true);
       }
     }
 
     if (null != paddings) {
-      mNode.getComponentData().addShorthand(paddings);
+      component.addShorthand(paddings);
     }
 
     if (null != margins) {
-      mNode.getComponentData().addShorthand(margins);
+      component.addShorthand(margins);
     }
 
     if (null != borders) {
       mIsBorderSet = true;
-      mNode.getComponentData().addShorthand(borders);
+      component.addShorthand(borders);
     }
   }
 
   @Override
-  public void executeAction() { // need merge
-    mNode = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
-    if (mNode == null) {
-      return;
-    }
-
-    if (!mNode.getWxInstance().getNeedInterceptRender() && mNode.data != null) {
-      WXComponent component = mNode.data;
-      if (mStyle != null) {
-        if (component.getTransition() != null) {
-          component.getTransition().updateTranstionParams(mStyle);
-          if (component.getTransition().hasTransitionProperty(mStyle)) {
-            component.getTransition().startTransition(mStyle);
-          }
-        } else {
-          component.setTransition(WXTransition.fromMap(mStyle, component));
-          component.updateStyles(mStyle);
+  public void executeAction() {
+    if (component == null) return;
+    if (mStyle != null) {
+      if(component.getTransition() != null){
+        component.getTransition().updateTranstionParams(mStyle);
+        if(component.getTransition().hasTransitionProperty(mStyle)){
+          component.getTransition().startTransition(mStyle);
         }
-      } else if (mIsBorderSet) {
-        component.updateStyles(component);
+      } else {
+        component.setTransition(WXTransition.fromMap(mStyle, component));
+        component.updateStyles(mStyle);
       }
+    } else if (mIsBorderSet) {
+      component.updateStyles(component);
     }
   }
 }

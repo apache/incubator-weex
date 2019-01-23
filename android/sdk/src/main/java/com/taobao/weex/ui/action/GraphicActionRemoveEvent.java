@@ -21,7 +21,8 @@ package com.taobao.weex.ui.action;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXEvent;
-import com.taobao.weex.ui.component.node.WXComponentNode;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.ui.component.WXComponent;
 
 /**
  * Created by listen on 18/01/11.
@@ -30,16 +31,20 @@ public class GraphicActionRemoveEvent extends BasicGraphicAction {
 
   private final String mEvent;
 
-  public GraphicActionRemoveEvent(WXSDKInstance instance, String ref, Object event) {
+  GraphicActionRemoveEvent(WXSDKInstance instance, String ref, Object event) {
     super(instance, ref);
     this.mEvent = WXEvent.getEventName(event);
   }
 
   @Override
   public void executeAction() {
-    WXComponentNode node = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
-    if (node != null) {
-      node.removeEvent(mEvent);
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    if (component == null) {
+      return;
     }
+
+    Stopwatch.tick();
+    component.removeEvent(mEvent);
+    Stopwatch.split("removeEventFromComponent");
   }
 }

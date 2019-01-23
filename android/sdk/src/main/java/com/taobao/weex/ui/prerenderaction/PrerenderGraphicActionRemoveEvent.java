@@ -16,21 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXEvent;
+import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
 /**
  * Created by listen on 18/01/11.
  */
-public class GraphicActionRemoveEvent extends BasicGraphicAction {
+public class PrerenderGraphicActionRemoveEvent extends BasicGraphicAction {
 
   private final String mEvent;
 
-  public GraphicActionRemoveEvent(WXSDKInstance instance, String ref, Object event) {
+  PrerenderGraphicActionRemoveEvent(WXSDKInstance instance, String ref, Object event) {
     super(instance, ref);
     this.mEvent = WXEvent.getEventName(event);
   }

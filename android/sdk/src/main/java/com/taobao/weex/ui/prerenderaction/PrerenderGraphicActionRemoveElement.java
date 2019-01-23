@@ -16,15 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.component.node.WXComponentNode;
 
-public class GraphicActionRemoveElement extends BasicGraphicAction {
+public class PrerenderGraphicActionRemoveElement extends BasicGraphicAction {
 
-  public GraphicActionRemoveElement(WXSDKInstance instance, String ref) {
+  PrerenderGraphicActionRemoveElement(WXSDKInstance instance, String ref) {
     super(instance, ref);
   }
 

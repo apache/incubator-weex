@@ -18,21 +18,49 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.text.TextUtils;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.ui.component.node.WXComponentNode;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXVContainer;
 
 public class GraphicActionRemoveElement extends BasicGraphicAction {
 
-  public GraphicActionRemoveElement(WXSDKInstance instance, String ref) {
+  GraphicActionRemoveElement(WXSDKInstance instance, String ref) {
     super(instance, ref);
   }
 
   @Override
   public void executeAction() {
-    WXComponentNode node = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
-    if (node != null) {
-      node.removeElement();
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    if (component == null || component.getParent() == null || component.getInstance() == null) {
+      return;
+    }
+    clearRegistryForComponent(component);
+    WXVContainer parent = component.getParent();
+
+    if (component.getHostView() != null && !TextUtils.equals(component.getComponentType(), "video") && !TextUtils.equals(component.getComponentType(), "videoplus")) {
+      int[] location = new  int[2];
+      component.getHostView().getLocationInWindow(location);
+      //component.getInstance().onChangeElement(parent, location[1] > component.getInstance().getWeexHeight() + 1);
+    }
+
+    parent.remove(component, true);
+  }
+
+  private void clearRegistryForComponent(WXComponent component) {
+    WXComponent removedComponent = WXSDKManager.getInstance().getWXRenderManager().unregisterComponent(getPageId(), getRef());
+    if (removedComponent != null) {
+      removedComponent.removeAllEvent();
+      removedComponent.removeStickyStyle();
+    }
+    if (component instanceof WXVContainer) {
+      WXVContainer container = (WXVContainer) component;
+      int count = container.childCount();
+      for (int i = count - 1; i >= 0; --i) {
+        clearRegistryForComponent(container.getChild(i));
+      }
     }
   }
 }

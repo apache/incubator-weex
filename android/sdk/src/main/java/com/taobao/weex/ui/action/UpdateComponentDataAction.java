@@ -51,7 +51,6 @@ public class UpdateComponentDataAction extends BasicGraphicAction{
 
     @Override
     public void executeAction() {
-        // todo recyclerList这里暂时还不支持预渲染，后续再补上
         if(TextUtils.isEmpty(getRef())){
             WXLogUtils.e("wrong virtualComponentId split error " + virtualComponentId);
             return;

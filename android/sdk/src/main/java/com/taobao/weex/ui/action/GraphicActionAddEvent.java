@@ -21,7 +21,8 @@ package com.taobao.weex.ui.action;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXEvent;
-import com.taobao.weex.ui.component.node.WXComponentNode;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.ui.component.WXComponent;
 
 /**
  * Created by listen on 18/01/11.
@@ -30,21 +31,23 @@ public class GraphicActionAddEvent extends BasicGraphicAction {
 
   private final String mEvent;
 
-  public GraphicActionAddEvent(WXSDKInstance instance, String ref, Object event) {
+  GraphicActionAddEvent(WXSDKInstance instance, String ref, Object event) {
     super(instance, ref);
     this.mEvent = WXEvent.getEventName(event);
   }
 
   @Override
   public void executeAction() {
-    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
-    if (instance == null) {
+    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
+    if (component == null) {
       return;
     }
 
-    WXComponentNode node = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
-    if (node != null) {
-      node.addEvent(mEvent);
+    Stopwatch.tick();
+    if (!component.getEvents().contains(mEvent)) {
+      component.getEvents().addEvent(mEvent);
     }
+    component.addEvent(mEvent);
+    Stopwatch.split("addEventToComponent");
   }
 }
