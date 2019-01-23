@@ -20,16 +20,17 @@
 #define _STRING_UTILS_H_
 
 #include <jni.h>
-#include <IPC/IPCArguments.h>
-#include <IPC/Serializing/IPCSerializer.h>
-#include <IPC/IPCString.h>
-#include <IPC/IPCByteArray.h>
 #include <malloc.h>
-#include "scoped_jstring.h"
-#include "scoped_jstring_utf8.h"
 #include <iostream>
 #include <sstream>
 #include <string>
+
+#include "scoped_jstring.h"
+#include "scoped_jstring_utf8.h"
+#include "third_party/IPC/IPCArguments.h"
+#include "third_party/IPC/Serializing/IPCSerializer.h"
+#include "third_party/IPC/IPCString.h"
+#include "third_party/IPC/IPCByteArray.h"
 
 namespace WeexCore {
 

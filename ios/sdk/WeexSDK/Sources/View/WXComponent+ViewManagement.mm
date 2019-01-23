@@ -24,7 +24,6 @@
 #import "WXView.h"
 #import "WXSDKInstance_private.h"
 #import "WXTransform.h"
-#import "WXTracingManager.h"
 #import "WXSDKManager.h"
 #import "WXComponent+Layout.h"
 

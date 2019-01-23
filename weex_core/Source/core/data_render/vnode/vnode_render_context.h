@@ -74,6 +74,9 @@ class VNodeRenderContext {
   }
 
   inline void AddVNode(const std::string& ref, VNode* node) {
+    if (node->IsVirtualComponent()) {
+      return;
+    }
     auto it = vnode_trees_.find(ref);
     if (it != vnode_trees_.end()) {
       vnode_trees_[ref] = node;

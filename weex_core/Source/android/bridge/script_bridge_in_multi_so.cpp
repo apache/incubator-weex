@@ -18,15 +18,16 @@
  */
 
 #include "script_bridge_in_multi_so.h"
-#include <base/thread/waitable_event.h>
 #include <dlfcn.h>
 #include <malloc.h>
-#include "android/base/log_utils.h"
+
 #include "android/bridge/multi_so_initializer.h"
 #include "android/bridge/script/script_side_in_multi_so.h"
-#include "android/utils/IPCStringResult.h"
+#include "android/utils/ipc_string_result.h"
 #include "android/utils/params_utils.h"
+#include "base/android/log_utils.h"
 #include "base/make_copyable.h"
+#include "base/thread/waitable_event.h"
 #include "core/bridge/script/core_side_in_script.h"
 #include "core/manager/weex_core_manager.h"
 

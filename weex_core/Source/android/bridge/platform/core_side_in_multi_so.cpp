@@ -207,7 +207,7 @@ int CoreSideInMultiSo::CreateInstance(const char *instanceId, const char *func,
                                       const char *initData,
                                       const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params, const char* render_strategy) {
   return core_side_functions_->create_instance(instanceId, func, script, opts,
-                                               initData, extendsApi,params);
+                                               initData, extendsApi, params);
 }
 
 std::unique_ptr<WeexJSResult> CoreSideInMultiSo::ExecJSOnInstance(const char *instanceId,

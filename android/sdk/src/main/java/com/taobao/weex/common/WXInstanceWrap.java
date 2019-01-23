@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.common;
 
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.JSMethod;
 
 /**
@@ -28,7 +29,13 @@ public class WXInstanceWrap extends WXModule {
   @JSMethod
   public void error(String type, String code, String info) {
     if (mWXSDKInstance != null) {
-      mWXSDKInstance.onRenderError(type + "|" + code, info);
+      WXSDKInstance root = mWXSDKInstance;
+      if(info != null && info.contains("downgrade_to_root")){
+        while (root.getParentInstance() != null){
+          root = root.getParentInstance();
+        }
+      }
+      root.onRenderError(type + "|" + code, info);
     }
   }
 }

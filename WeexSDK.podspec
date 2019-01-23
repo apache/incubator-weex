@@ -47,7 +47,20 @@ Pod::Spec.new do |s|
                     'weex_core/Source/third_party/**/*.{h,hpp,m,mm,c,cpp,cc}',
                     'weex_core/Source/include/**/*.{h,hpp,m,mm,c,cpp,cc}'
   s.exclude_files = 'weex_core/Source/**/*android.{h,hpp,m,mm,c,cpp,cc}',
-                    'weex_core/Source/core/network/android/'
+                    'weex_core/Source/base/android',
+                    'weex_core/Source/base/base64',
+                    'weex_core/Source/base/crash',
+                    'weex_core/Source/base/utils',
+                    'weex_core/Source/base/thread',
+                    'weex_core/Source/base/third_party',
+                    'weex_core/Source/base/message_loop',
+                    'weex_core/Source/base/time_point.*',
+                    'weex_core/Source/base/time_utils.*',
+                    'weex_core/Source/base/time_unit.*',
+                    'weex_core/Source/third_party/IPC',
+                    'weex_core/Source/core/network/android/',
+                    'weex_core/Source/include/JavaScriptCore/',
+                    'weex_core/Source/include/wtf'
 
   s.private_header_files = 'ios/sdk/WeexSDK/Sources/Component/RecycleList/WXJSASTParser.h'
   s.public_header_files = 'ios/sdk/WeexSDK/Sources/WeexSDK.h',
@@ -78,11 +91,9 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Monitor/WXMonitor.h',
                           'ios/sdk/WeexSDK/Sources/Monitor/WXExceptionUtils.h',
                           'ios/sdk/WeexSDK/Sources/Monitor/WXAnalyzerCenter.h',
-                          'ios/sdk/WeexSDK/Sources/Manager/WXTracingManager.h',
                           'ios/sdk/WeexSDK/Sources/Manager/WXSDKManager.h',
                           'ios/sdk/WeexSDK/Sources/Manager/WXBridgeManager.h',
                           'ios/sdk/WeexSDK/Sources/Manager/WXComponentManager.h',
-                          'ios/sdk/WeexSDK/Sources/Manager/WXDisplayLinkManager.h',
                           'ios/sdk/WeexSDK/Sources/Engine/WXSDKEngine.h',
                           'ios/sdk/WeexSDK/Sources/Engine/WXSDKError.h',
                           'ios/sdk/WeexSDK/Sources/Utility/WXConvert.h',

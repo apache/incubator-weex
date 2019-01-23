@@ -16,14 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <algorithm>
-#include "core/data_render/class.h"
+
 #include "core/data_render/class_object.h"
+#include <algorithm>
+
+#include "base/log_defines.h"
+#include "core/data_render/class.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/table.h"
 #include "core/data_render/class_array.h"
-#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {

@@ -54,7 +54,7 @@ IRenderFactory *RenderCreator::CreateFactory(const std::string &type) {
     }
   }
 }
-  
+
 IRenderObject *RenderCreator::CreateRender(const std::string &type,
                                            const std::string &ref) {
   IRenderFactory *factory = CreateFactory(type);
@@ -68,18 +68,18 @@ IRenderObject *RenderCreator::CreateRender(const std::string &type,
   delete factory;
   return render;
 }
-  
+
 void RenderCreator::RegisterAffineType(const std::string &type, const std::string& asType) {
   if (!type.empty() && !asType.empty() && type != asType) {
     affineTypes_[type] = asType;
   }
 }
-  
+
 bool RenderCreator::IsAffineType(const std::string &type, const std::string& asType) {
   if (type == asType) {
     return true;
   }
-  
+
   auto findAffine = affineTypes_.find(type);
   if (findAffine == affineTypes_.end()) {
     return false;

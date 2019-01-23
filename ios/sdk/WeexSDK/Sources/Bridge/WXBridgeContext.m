@@ -37,7 +37,6 @@
 #import "WXCallJSMethod.h"
 #import "WXSDKInstance_private.h"
 #import "WXPrerenderManager.h"
-#import "WXTracingManager.h"
 #import "WXExceptionUtils.h"
 #import "WXSDKEngine.h"
 #import "WXPolyfillSet.h"
@@ -137,7 +136,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallUpdateComponentData:^NSInteger(NSString *instanceId, NSString *componentId, NSString *jsonData) {
 
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:componentId className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"__updateComponentData" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callUpdateComponentData:instanceId componentId:componentId jsonData:jsonData];
         });
         return 0;
@@ -146,7 +144,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallAddElement:^NSInteger(NSString *instanceId, NSString *parentRef, NSDictionary *elementData, NSInteger index) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callAddElement:instanceId parentRef:parentRef data:elementData index:(int)index];
         });
         
@@ -156,7 +153,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallCreateBody:^NSInteger(NSString *instanceId, NSDictionary *bodyData) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callCreateBody:instanceId data:bodyData];
         });
         
@@ -166,7 +162,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallRemoveElement:^NSInteger(NSString *instanceId, NSString *ref) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callRemoveElement:instanceId ref:ref];
         });
         
@@ -176,7 +171,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallMoveElement:^NSInteger(NSString *instanceId, NSString *ref, NSString *parentRef, NSInteger index) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"moveElement" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callMoveElement:instanceId ref:ref parentRef:parentRef index:(int)index];
         });
         
@@ -186,7 +180,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallUpdateAttrs:^NSInteger(NSString *instanceId, NSString *ref, NSDictionary *attrsData) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callUpdateAttrs:instanceId ref:ref data:attrsData];
         });
         
@@ -196,7 +189,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallUpdateStyle:^NSInteger(NSString *instanceId, NSString *ref, NSDictionary *stylesData) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateStyle" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callUpdateStyle:instanceId ref:ref data:stylesData];
         });
 
@@ -206,7 +198,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallAddEvent:^NSInteger(NSString *instanceId, NSString *ref, NSString *event) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addEvent" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callAddEvent:instanceId ref:ref event:event];
         });
         
@@ -216,7 +207,6 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallRemoveEvent:^NSInteger(NSString *instanceId, NSString *ref, NSString *event) {
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeEvent" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callRemoveEvent:instanceId ref:ref event:event];
         });
         
@@ -229,7 +219,6 @@ _Pragma("clang diagnostic pop") \
         [instance.apmInstance onStage:KEY_PAGE_STAGES_CREATE_FINISH];
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
             [WXCoreBridge callCreateFinish:instanceId];
         });
         
@@ -240,7 +229,6 @@ _Pragma("clang diagnostic pop") \
         [_jsBridge registerCallRefreshFinish:^NSInteger(NSString *instanceId) {
             
             WXPerformBlockOnComponentThread(^{
-                [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"refreshFinish" options:@{@"threadName":WXTDOMThread}];
                 [WXCoreBridge callRefreshFinish:instanceId];
             });
             
@@ -252,7 +240,6 @@ _Pragma("clang diagnostic pop") \
         [_jsBridge registerCallUpdateFinish:^NSInteger(NSString *instanceId) {
             
             WXPerformBlockOnComponentThread(^{
-                [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateFinish" options:@{@"threadName":WXTDOMThread}];
                 [WXCoreBridge callUpdateFinish:instanceId];
             });
             
@@ -367,12 +354,10 @@ _Pragma("clang diagnostic pop") \
             NSString *ref = task[@"ref"];
             WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:ref methodName:methodName arguments:arguments instance:instance];
             [method invoke];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:task[@"ref"] className:nil name:task[@"component"] phase:WXTracingBegin functionName:task[@"method"] options:nil];
         } else {
             NSString *moduleName = task[@"module"];
             NSDictionary *options = task[@"options"];
             WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments options:options instance:instance];
-            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:task[@"module"] phase:WXTracingBegin functionName:task[@"method"] options:@{@"threadName":WXTJSBridgeThread}];
             [method invoke];
         }
     }
@@ -715,9 +700,8 @@ _Pragma("clang diagnostic pop") \
         WXPerformBlockOnComponentThread(^{
             [WXCoreBridge destroyDataRenderInstance:instance];
         });
-    } else {
-        [self callJSMethod:@"destroyInstance" args:@[instance]];
     }
+    [self callJSMethod:@"destroyInstance" args:@[instance]];
 }
 
 - (void)forceGarbageCollection

@@ -42,9 +42,7 @@
 #import "WXTextComponent.h"
 #import "WXConvert.h"
 #import "WXPrerenderManager.h"
-#import "WXTracingManager.h"
 #import "WXJSExceptionProtocol.h"
-#import "WXTracingManager.h"
 #import "WXExceptionUtils.h"
 #import "WXMonitor.h"
 #import "WXBridgeContext.h"
@@ -242,7 +240,6 @@ typedef enum : NSUInteger {
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:url];
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
-    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTNetworkHanding phase:WXTracingBegin functionName:@"renderWithURL" options:@{@"bundleUrl":url?[url absoluteString]:@"",@"threadName":WXTMainThread}];
 }
 
 - (void)renderView:(id)source options:(NSDictionary *)options data:(id)data
@@ -255,7 +252,6 @@ typedef enum : NSUInteger {
     if ([source isKindOfClass:[NSString class]]) {
         WXLogDebug(@"Render source: %@, data:%@", self, [WXUtility JSONString:data]);
         [self _renderWithMainBundleString:source];
-        [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
     } else if ([source isKindOfClass:[NSData class]]) {
         [self _renderWithData:source];
     }
@@ -336,11 +332,9 @@ typedef enum : NSUInteger {
         return;
     }
 
-    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"_renderWithData" options:@{@"threadName":WXTMainThread}];
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId contents:contents options:dictionary data:_jsData];
-    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"_renderWithData" options:@{@"threadName":WXTMainThread}];
 
-   // WX_MONITOR_PERF_SET(WXPTBundleSize, [data length], self);
+    // WX_MONITOR_PERF_SET(WXPTBundleSize, [data length], self);
     _isRendered = YES;
 }
 
@@ -429,9 +423,7 @@ typedef enum : NSUInteger {
         return;
     }
     
-    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingBegin functionName:@"renderWithMainBundleString" options:@{@"threadName":WXTMainThread}];
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
-    [WXTracingManager startTracingWithInstanceId:self.instanceId ref:nil className:nil name:WXTExecJS phase:WXTracingEnd functionName:@"renderWithMainBundleString" options:@{@"threadName":WXTMainThread}];
     
     WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
     
@@ -441,16 +433,7 @@ typedef enum : NSUInteger {
 - (BOOL)_handleConfigCenter
 {
     id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
-    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-        BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@YES isDefault:NULL] boolValue];
-        [WXTextComponent setRenderUsingCoreText:useCoreText];
-        
-        BOOL unregisterFontWhenCollision = [[configCenter configForKey:@"iOS_weex_ext_config.unregisterFontWhenCollision" defaultValue:@NO isDefault:NULL] boolValue];
-        [WXUtility setUnregisterFontWhenCollision:unregisterFontWhenCollision];
-        
-        BOOL useJSCApiForCreateInstance = [[configCenter configForKey:@"iOS_weex_ext_config.useJSCApiForCreateInstance" defaultValue:@(YES) isDefault:NULL] boolValue];
-        [WXUtility setUseJSCApiForCreateInstance:useJSCApiForCreateInstance];
-		
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {		
         BOOL enableRTLLayoutDirection = [[configCenter configForKey:@"iOS_weex_ext_config.enableRTLLayoutDirection" defaultValue:@(YES) isDefault:NULL] boolValue];
         [WXUtility setEnableRTLLayoutDirection:enableRTLLayoutDirection];
     }
@@ -567,14 +550,11 @@ typedef enum : NSUInteger {
                 return;
             }
         }
-      
         
         [strongSelf.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_END];
         [strongSelf.apmInstance updateExtInfoFromResponseHeader:response.allHeaderFields];
         [strongSelf _renderWithMainBundleString:jsBundleString];
-        [WXTracingManager setBundleJSType:jsBundleString instanceId:weakSelf.instanceId];
         [WXMonitor performanceFinishWithState:DebugAfterRequest instance:strongSelf];
-    
     };
     
     _mainBundleLoader.onFailed = ^(NSError *loadError) {
@@ -641,8 +621,6 @@ typedef enum : NSUInteger {
         [pageEvent pageDestroy:self.instanceId];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_WILL_DESTROY_NOTIFICATION object:nil userInfo:@{@"instanceId":self.instanceId}];
-    
-    [WXTracingManager destroyTraincgTaskWithInstance:self.instanceId];
 
     [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];

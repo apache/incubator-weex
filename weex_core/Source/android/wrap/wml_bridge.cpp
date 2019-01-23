@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 #include "android/wrap/wml_bridge.h"
-#include "android/base/jni/android_jni.h"
-#include "android/base/jni_type.h"
-#include "android/base/log_utils.h"
+
 #include "android/base/string/string_utils.h"
 #include "android/utils/params_utils.h"
+#include "base/android/jni/android_jni.h"
+#include "base/android/jni_type.h"
+#include "base/android/log_utils.h"
 #include "core/manager/weex_core_manager.h"
 
 static intptr_t jDoubleValueMethodId = 0;
@@ -279,6 +279,7 @@ bool WMLBridge::RegisterJNIUtils(JNIEnv* env) {
                                    sizeof(gWMMethods) / sizeof(gWMMethods[0]));
     return true;
   }
+  return false;
 }
 
 void WMLBridge::PostMessage(JNIEnv* env, const char* vm_id, const char* data, int dataLength) {

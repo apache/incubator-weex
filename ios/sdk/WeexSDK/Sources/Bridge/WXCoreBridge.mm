@@ -23,7 +23,6 @@
 #import "WXComponentManager.h"
 #import "WXSDKInstance_private.h"
 #import "WXLog.h"
-#import "WXTracingManager.h"
 #import "WXBridgeProtocol.h"
 #import "WXUtility.h"
 #import "WXAssert.h"
@@ -32,7 +31,8 @@
 #import "WXSDKEngine.h"
 #import "WXAppMonitorProtocol.h"
 
-#include "base/CoreConstants.h"
+#include "base/core_constants.h"
+#include "base/time_utils.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/page/render_page.h"
@@ -44,7 +44,6 @@
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/bridge/platform/core_side_in_platform.h"
 #include "core/bridge/script/core_side_in_script.h"
-#include "base/TimeUtils.h"
 #include "core/network/http_module.h"
 
 #import <objc/runtime.h>
@@ -242,8 +241,7 @@ namespace WeexCore
         }
         [manager startComponentTasks];
         [manager updateFinish];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateFinish" options:@{@"threadName":WXTDOMThread}];
-        
+
         return 0;
     }
         
@@ -261,7 +259,6 @@ namespace WeexCore
         }
         [manager startComponentTasks];
         [manager refreshFinish];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"refreshFinish" options:@{@"threadName":WXTDOMThread}];
         
         return 0;
     }
@@ -289,7 +286,6 @@ namespace WeexCore
         }
         [manager startComponentTasks];
         [manager addEvent:ns_event toComponent:ns_ref];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addEvent" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -318,7 +314,6 @@ namespace WeexCore
         }
         [manager startComponentTasks];
         [manager removeEvent:ns_event fromComponent:ns_ref];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeEvent" options:@{@"threadName":WXTDOMThread}];
     
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -361,7 +356,6 @@ namespace WeexCore
         }
         [manager startComponentTasks];
         [manager createBody:ns_ref type:ns_type styles:ns_styles attributes:ns_attributes events:ns_events renderObject:renderObject];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -409,7 +403,6 @@ namespace WeexCore
         
         [manager startComponentTasks];
         [manager addComponent:ns_ref type:ns_componentType parentRef:ns_parentRef styles:ns_styles attributes:ns_attributes events:ns_events index:ns_index renderObject:renderObject];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -504,7 +497,6 @@ namespace WeexCore
         
         [manager startComponentTasks];
         [manager updateStyles:ns_style forComponent:ns_ref];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateStyles" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -541,7 +533,6 @@ namespace WeexCore
         }
         [manager startComponentTasks];
         [manager updateAttributes:ns_attributes forComponent:ns_ref];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -568,7 +559,6 @@ namespace WeexCore
         }
         [manager startComponentTasks];
         [manager createFinish];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -595,7 +585,6 @@ namespace WeexCore
         }
         [manager startComponentTasks];
         [manager renderFinish];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"renderFinish" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -624,7 +613,6 @@ namespace WeexCore
         
         [manager startComponentTasks];
         [manager removeComponent:ns_ref];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -655,7 +643,6 @@ namespace WeexCore
         
         [manager startComponentTasks];
         [manager moveComponent:ns_ref toSuper:ns_parentRef atIndex:ns_index];
-        [WXTracingManager startTracingWithInstanceId:ns_instanceId ref:ns_ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"moveElement" options:@{@"threadName":WXTDOMThread}];
         
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
@@ -803,11 +790,12 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     node_manager->RefreshPage([pageId UTF8String] ?: "", [data UTF8String] ?: "");
 }
 
-+ (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args
++ (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args domChanges:(NSDictionary *)domChanges
 {
     NSString *params = [WXUtility JSONString:args];
+    NSString* nsDomChanges = [WXUtility JSONString:domChanges];
     auto vnode_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-    vnode_manager->FireEvent([pageId UTF8String] ? : "", [ref UTF8String] ? : "", [event UTF8String] ? : "", [params UTF8String] ? : "", "");
+    vnode_manager->FireEvent([pageId UTF8String] ? : "", [ref UTF8String] ? : "", [event UTF8String] ? : "", [params UTF8String] ? : "", [nsDomChanges UTF8String] ? : "");
 }
 
 + (void)registerModules:(NSDictionary *)modules {

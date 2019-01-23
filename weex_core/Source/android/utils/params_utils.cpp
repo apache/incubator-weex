@@ -18,10 +18,10 @@
  */
 
 #include "android/utils/params_utils.h"
-#include "android/base/jni_type.h"
-#include "android/base/log_utils.h"
 #include "android/base/string/string_utils.h"
 #include "android/utils/so_utils.h"
+#include "base/android/jni_type.h"
+#include "base/android/log_utils.h"
 #include "core/config/core_environment.h"
 
 namespace WeexCore {
@@ -169,6 +169,22 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
   ADDSTRING(platform);
   env->DeleteLocalRef(platform);
 
+  jmethodID m_layoutDirection =
+          env->GetMethodID(c_params, "getLayoutDirection", "()Ljava/lang/String;");
+  if (m_layoutDirection == nullptr) {
+    ADDSTRING(nullptr);
+    ReportNativeInitStatus("-1012", "get m_layoutDirection failed");
+    return initFrameworkParams;
+  }
+  jobject layoutDirection = env->CallObjectMethod(params, m_layoutDirection);
+  if (layoutDirection == nullptr) {
+    ADDSTRING(nullptr);
+    ReportNativeInitStatus("-1012", "get layoutDirection failed");
+    return initFrameworkParams;
+  }
+  ADDSTRING(layoutDirection);
+  env->DeleteLocalRef(layoutDirection);
+
   jmethodID m_use_single_process =
       env->GetMethodID(c_params, "getUseSingleProcess", "()Ljava/lang/String;");
   if (m_use_single_process == nullptr) {
@@ -293,22 +309,6 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
   ADDSTRING(appVersion);
   env->DeleteLocalRef(appVersion);
 
-  jmethodID m_layoutDirection =
-          env->GetMethodID(c_params, "getLayoutDirection", "()Ljava/lang/String;");
-  if (m_layoutDirection == nullptr) {
-    ADDSTRING(nullptr);
-    ReportNativeInitStatus("-1012", "get m_layoutDirection failed");
-    return initFrameworkParams;
-  }
-  jobject layoutDirection = env->CallObjectMethod(params, m_layoutDirection);
-  if (layoutDirection == nullptr) {
-    ADDSTRING(nullptr);
-    ReportNativeInitStatus("-1012", "get layoutDirection failed");
-    return initFrameworkParams;
-  }
-  ADDSTRING(layoutDirection);
-  env->DeleteLocalRef(layoutDirection);
-
   jmethodID m_weexVersion =
       env->GetMethodID(c_params, "getWeexVersion", "()Ljava/lang/String;");
   if (m_weexVersion == nullptr) {
@@ -411,7 +411,7 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     return initFrameworkParams;
   }
 
-  jclass jmapclass = env->FindClass("java/util/HashMap");
+  jclass jmapclass = env->FindClass("java/util/Map");
   jmethodID jkeysetmid =
       env->GetMethodID(jmapclass, "keySet", "()Ljava/util/Set;");
   jmethodID jgetmid = env->GetMethodID(

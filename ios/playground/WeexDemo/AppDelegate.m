@@ -37,7 +37,7 @@
 //#import "WXAnalyzerCenter.h"
 #import "WXApmGeneratorImpl.h"
 #import "WXWebSocketDefaultImpl.h"
-
+#import <WeexPluginLoader/WeexPluginLoader.h>
 
 #ifdef DEBUG
 #import "DebugAnalyzer.h"
@@ -132,6 +132,7 @@
     [WXSDKEngine registerModule:@"titleBar" withClass:NSClassFromString(@"WXTitleBarModule")];
     [WXSDKEngine registerExtendCallNative:@"test" withClass:NSClassFromString(@"WXExtendCallNativeTest")];
     [WXSDKEngine registerModule:@"ext" withClass:[WXExtModule class]];
+    [WPRegister registerPlugins];
 #ifdef DEBUG
     [WXAnalyzerCenter addWxAnalyzer:[DebugAnalyzer new]];
 #endif

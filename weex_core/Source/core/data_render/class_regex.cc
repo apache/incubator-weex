@@ -16,15 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+#include "core/data_render/class_regex.h"
 #include <algorithm>
 #include <regex>
 #include <vector>
+
+#include "base/log_defines.h"
 #include "core/data_render/class.h"
-#include "core/data_render/class_regex.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/table.h"
-#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {

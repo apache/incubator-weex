@@ -18,7 +18,7 @@
  */
 
 #include "script_side_in_multi_so.h"
-#include <android/base/log_utils.h>
+#include "base/android/log_utils.h"
 
 namespace WeexCore {
 namespace bridge {
@@ -146,7 +146,7 @@ int ScriptSideInMultiSo::CreateInstance(const char *instanceId,
     return false;
   }
   return script_side_functions_->funcCreateInstance(instanceId, func, script,
-                                                    opts, initData, extendsApi,params);
+                                                    opts, initData, extendsApi, params);
 }
 
 std::unique_ptr<WeexJSResult> ScriptSideInMultiSo::ExecJSOnInstance(const char *instanceId,

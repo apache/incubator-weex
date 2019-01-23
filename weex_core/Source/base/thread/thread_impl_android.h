@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#ifdef OS_ANDROID
+#ifdef __ANDROID__ 
 #ifndef WEEX_PROJECT_THREAD_IMPL_ANDROID_H
 #define WEEX_PROJECT_THREAD_IMPL_ANDROID_H
 

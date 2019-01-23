@@ -17,20 +17,21 @@
  * under the License.
  */
 
-#include <android/base/jni/jbytearray_ref.h>
-#include <android/wrap/wx_bridge.h>
-#include <core/manager/weex_core_manager.h>
-#include <base/make_copyable.h>
-#include <base/thread/waitable_event.h>
-#include "base/string_util.h"
-#include <wson_parser.h>
 #include "wx_debug_js_bridge.h"
+
 #include "android/base/string/string_utils.h"
-#include "android/jniprebuild/jniheader/WXDebugJsBridge_jni.h"
+#include "android/wrap/wx_bridge.h"
+#include "base/android/jniprebuild/jniheader/WXDebugJsBridge_jni.h"
+#include "base/android/jni/jbytearray_ref.h"
+#include "base/make_copyable.h"
+#include "base/thread/waitable_event.h"
+#include "base/string_util.h"
 #include "core/render/manager/render_manager.h"
-#include "IPC/IPCResult.h"
 #include "core/bridge/platform_bridge.h"
-#include "base/ViewUtils.h"
+#include "core/common/view_utils.h"
+#include "core/manager/weex_core_manager.h"
+#include "third_party/IPC/IPCResult.h"
+#include "wson/wson_parser.h"
 
 using namespace WeexCore;
 
@@ -112,8 +113,8 @@ void jsHandleCallNativeModule(JNIEnv *env, jobject object, jstring instanceId, j
     case ParamsType::VOID:
       break;
     case ParamsType::BYTEARRAY:
-      ret.get()->value.byteArray->content;
-      ret.get()->value.byteArray->length;
+      //ret.get()->value.byteArray->content;
+      //ret.get()->value.byteArray->length;
       break;
     case ParamsType::JSONSTRING:
       weex::base::to_utf8(ret.get()->value.string->content, ret.get()->value.string->length);

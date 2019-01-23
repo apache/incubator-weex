@@ -18,11 +18,12 @@
  */
 
 #include <algorithm>
+
+#include "base/log_defines.h"
 #include "core/data_render/class.h"
 #include "core/data_render/class_function.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/common_error.h"
-#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {

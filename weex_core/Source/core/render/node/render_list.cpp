@@ -20,10 +20,10 @@
 #include <math.h>
 #include <cmath>
 #include <utility>
-#include "core/render/manager/render_manager.h"
 
-#include "base/ViewUtils.h"
+#include "core/common/view_utils.h"
 #include "core/css/constants_name.h"
+#include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_type.h"
 #include "core/render/node/render_list.h"
 #include "core/render/node/render_object.h"

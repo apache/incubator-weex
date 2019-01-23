@@ -21,7 +21,8 @@
 #define WEEX_PROJECT_WML_BRIDGE_H
 
 #include <jni.h>
-#include "android/wrap/jni_object_wrap.h"
+
+#include "base/android/jni/jni_object_wrap.h"
 #include "base/common.h"
 
 namespace WeexCore {

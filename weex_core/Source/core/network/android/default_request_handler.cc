@@ -19,9 +19,9 @@
 #if OS_ANDROID
 
 #include "core/network/android/default_request_handler.h"
-#include "android/base/jni/android_jni.h"
 #include "android/base/string/scoped_jstring_utf8.h"
-#include "android/jniprebuild/jniheader/RequestHandler_jni.h"
+#include "base/android/jniprebuild/jniheader/RequestHandler_jni.h"
+#include "base/android/jni/android_jni.h"
 
 using namespace weex::core::network;
 

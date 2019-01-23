@@ -276,7 +276,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     [self updateDiffStats:KEY_PAGE_STATS_IMG_UN_RECYCLE_NUM withDiffValue:0];
 }
 
-- (void) endRecord;
+- (void) endRecord
 {
     if (_isEnd) {
         return;

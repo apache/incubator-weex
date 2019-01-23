@@ -23,7 +23,6 @@
 #import "WXAppMonitorProtocol.h"
 #import "WXSDKManager.h"
 #import "WXLog.h"
-#import "WXTracingManager.h"
 #import "WXAnalyzerCenter.h"
 #import "WXAnalyzerCenter+Transfer.h"
 #import "WXUtility.h"
@@ -61,7 +60,7 @@
 
 + (void) transferPerformance:(NSString*)instanceId withType:(NSString*) type andKey:(NSString*) key andValue:(id)value
 {
-    if (![self isOpen]) {
+    if (![self isOpen] || !instanceId) {
         return;
     }
 

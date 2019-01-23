@@ -166,14 +166,7 @@
     
     NSArray *handlerArguments = [self _paramsForEvent:eventName];
     NSString *ref = _templateComponent ? _templateComponent.ref  : self.ref;
-    if (self.weexInstance.dataRender) {
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge fireEvent:self.weexInstance.instanceId ref:ref event:eventName args:dict];
-        });
-    }
-    else {
-        [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:ref type:eventName params:dict domChanges:domChanges handlerArguments:handlerArguments];
-    }
+    [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:ref type:eventName params:dict domChanges:domChanges handlerArguments:handlerArguments];
 }
 
 - (NSString *)recursiveFindTemplateIdWithComponent:(WXComponent *)component
@@ -819,6 +812,10 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
             }
             BOOL stopPropagation = [[WXEventManager sharedManager]stopPropagation:self.weexInstance.instanceId ref:ref type:_stopPropagationName params:@{@"changedTouches":resultTouch ? @[resultTouch] : @[],@"action":touchState}];
             touch.wx_stopPropagation = stopPropagation ? @1 : @0;
+            
+            //only custom event on custom component will make not receive touch
+            //you can use custom-event="yes" to enable this feature
+            return _customEvent ? !stopPropagation : YES;
         }
     }
     return YES;

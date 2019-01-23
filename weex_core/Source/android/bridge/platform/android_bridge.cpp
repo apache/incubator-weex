@@ -17,9 +17,10 @@
  * under the License.
  */
 
-#include <base/LogDefines.h>
 #include "android_bridge.h"
+
 #include "android/bridge/platform/android_side.h"
+#include "base/log_defines.h"
 #include "core/bridge/platform/core_side_in_platform.h"
 
 namespace WeexCore {

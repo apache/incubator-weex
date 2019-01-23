@@ -446,8 +446,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     
     // this is scroll rtl solution.
     // scroll layout not use direction, use self tranform
-    if (self.view && _flexCssNode && _flexCssNode->getLayoutDirectionFromPathNode() == WeexCore::kDirectionRTL
-        ) {
+    if (self.view && [self isDirectionRTL]) {
         if (_transform) {
             self.view.layer.transform = CATransform3DConcat(self.view.layer.transform, CATransform3DScale(CATransform3DIdentity, -1, 1, 1));
         } else {

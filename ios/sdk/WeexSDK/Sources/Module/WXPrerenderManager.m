@@ -25,7 +25,6 @@
 #import "WXBridgeManager.h"
 #import "WXSDKEngine.h"
 #import "WXUtility.h"
-#import "WXTracingManager.h"
 
 static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
 static NSString *const MSG_PRERENDER_SUCCESS = @"success";

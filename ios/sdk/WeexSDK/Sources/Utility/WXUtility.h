@@ -52,7 +52,7 @@ do {\
 
 #define WX_FREE_FLIST(_ppFree, _count) \
 do {\
-    for(int i = 0; i < _count; i++){\
+    for(int i = 0; i < (_count); i++){\
         if(*(_ppFree + i ) != 0) {\
             free(*(_ppFree + i));\
         }\
@@ -77,6 +77,7 @@ do {\
         WX_ENUMBER_CASE(_invocation, idx, _C_FLT, _obj, float, floatValue, _ppFree)\
         WX_ENUMBER_CASE(_invocation, idx, _C_DBL, _obj, double, doubleValue, _ppFree)\
         WX_ENUMBER_CASE(_invocation, idx, _C_BOOL, _obj, bool, boolValue, _ppFree)\
+        WX_ENUMBER_CASE(_invocation, idx, _C_CHR, _obj, char, charValue, _ppFree)\
         default: { [_invocation setArgument:&_obj atIndex:(idx) + 2]; *(_ppFree + idx) = 0; break;}\
     }\
 }while(0)
@@ -491,12 +492,6 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
  *
  */
 + (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict;
-
-+ (void)setUnregisterFontWhenCollision:(BOOL)value;
-
-+ (void)setUseJSCApiForCreateInstance:(BOOL)value;
-
-+ (BOOL)useJSCApiForCreateInstance;
 
 + (void)setEnableRTLLayoutDirection:(BOOL)value;
 

@@ -112,11 +112,16 @@ class VNode {
 
   inline bool HasChildren() { return !child_list_.empty(); }
 
-  inline void set_component(VComponent* c) {
+  void set_component(VComponent* c) {
     component_ = c;
+    for (auto child : child_list_) {
+      if (!IsVirtualComponent()) {
+        child->set_component(c);
+      }
+    }
   }
 
-  inline VComponent* component() {
+  virtual VComponent* component() {
     return component_;
   }
 

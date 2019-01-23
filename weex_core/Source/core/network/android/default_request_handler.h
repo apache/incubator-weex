@@ -22,7 +22,7 @@
 #define CORE_NETWORK_DEFAULT_REQUEST_HANDLER_H
 
 #include <jni.h>
-#include "android/wrap/jni_object_wrap.h"
+#include "base/android/jni/jni_object_wrap.h"
 #include "core/network/request_handler.h"
 
 namespace weex {

@@ -192,6 +192,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private List<String> mLayerOverFlowListeners;
 
+  private WXSDKInstance mParentInstance;
+
   public List<String> getLayerOverFlowListeners() {
     return mLayerOverFlowListeners;
   }
@@ -1588,6 +1590,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
   }
 
+  public WXSDKInstance getParentInstance() {
+    return mParentInstance;
+  }
+
+  public void setParentInstance(WXSDKInstance mParentInstance) {
+    this.mParentInstance = mParentInstance;
+  }
+
   private void destroyView(View rootView) {
     try {
       if (rootView instanceof ViewGroup) {
@@ -1611,6 +1621,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public synchronized void destroy() {
     if(!isDestroy()) {
+      if(mParentInstance != null){
+         mParentInstance = null;
+      }
       mApmForInstance.onEnd();
       if(mRendered) {
         WXSDKManager.getInstance().destroyInstance(mInstanceId);

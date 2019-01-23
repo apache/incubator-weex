@@ -228,7 +228,7 @@ namespace WeexCore {
     WXCoreBorderWidth mBorderWidth;
 
     WXCorePosition mStylePosition;
-    
+
     WXCoreDirection mDirection;
 
     constexpr static float kFlexGrowDefault  = 0;

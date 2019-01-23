@@ -436,9 +436,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       ext.put("methodName", methodStr);
       ext.put("args", args.toJSONString());
       WXLogUtils.e("[WXBridgeManager] callNative : numberFormatException when parsing string to numbers in args", ext.toString());
-      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-          WXErrorCode.WX_KEY_EXCEPTION_INVOKE_BRIDGE, "callNative",
-              WXLogUtils.getStackTrace(e) , ext);
       return null;
     }
   }
@@ -598,9 +595,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     } catch (Exception e) {
       String err = "[WXBridgeManager] callNativeModule exception: " + WXLogUtils.getStackTrace(e);
       WXLogUtils.e(err);
-      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
-              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_BRIDGE, "callNativeModule",
-              err, null);
     }
 
     return null;
@@ -1193,7 +1187,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 + ", data:" + data);
           }
           if (mWXBridge instanceof WXBridge) {
-            ((WXBridge) mWXBridge).fireEventOnDataRenderNode(instanceId, ref,type,JSON.toJSONString(data), JSON.toJSONString(domChanges));
+            ((WXBridge) mWXBridge).fireEventOnDataRenderNode(instanceId, ref, type,
+                (data == null || data.isEmpty()) ? "{}" : JSON.toJSONString(data),
+                (domChanges == null || domChanges.isEmpty()) ? "{}" : JSON.toJSONString(domChanges));
           }
           WXLogUtils.renderPerformanceLog("fireEventOnDataRenderNode", System.currentTimeMillis() - start);
         } catch (Throwable e) {
@@ -2367,7 +2363,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     if(!TextUtils.equals(config, globalConfig)){
       globalConfig = config;
-      WXEnvironment.getCustomOptions().put(GLOBAL_CONFIG_KEY, globalConfig);
+      WXEnvironment.addCustomOptions(GLOBAL_CONFIG_KEY, globalConfig);
       Runnable runnable = new Runnable() {
         @Override
         public void run() {

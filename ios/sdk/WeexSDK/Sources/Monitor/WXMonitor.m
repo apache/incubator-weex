@@ -27,7 +27,6 @@
 #import "WXComponentManager.h"
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXAppConfiguration.h"
-#import "WXTracingManager.h"
 #import "WXAnalyzerProtocol.h"
 #import "WXSDKInstance_performance.h"
 #import "WXAnalyzerCenter+Transfer.h"
@@ -240,7 +239,6 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
         }
         
         [self printPerformance:commitDict];
-        [WXTracingManager commitTracingSummaryInfo:commitDict withInstanceId:instance.instanceId];
     }
 }
 

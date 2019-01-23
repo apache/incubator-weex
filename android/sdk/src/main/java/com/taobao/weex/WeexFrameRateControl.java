@@ -30,7 +30,7 @@ import com.taobao.weex.common.WXErrorCode;
 import java.lang.ref.WeakReference;
 
 public class WeexFrameRateControl {
-    private static final long VSYNC_FRAME = 1000 / 16;
+    private static final long VSYNC_FRAME = 1000 / 60;
     private WeakReference<VSyncListener> mListener;
     private final Choreographer mChoreographer;
     private final Choreographer.FrameCallback mVSyncFrameCallback;

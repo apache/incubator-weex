@@ -66,7 +66,10 @@ public class ScrollStartEndHelper implements Runnable{
             this.y = y;
             if(!hasStart){
                 if(component.getEvents().contains(Constants.Event.SCROLL_START)){
-                    component.fireEvent(Constants.Event.SCROLL_START, getScrollEvent(x, y));
+                    Map<String, Object> event = getScrollEvent(x,y);
+                    if (null !=event && !event.isEmpty()){
+                        component.fireEvent(Constants.Event.SCROLL_START,event);
+                    }
                 }
                 hasStart = true;
             }

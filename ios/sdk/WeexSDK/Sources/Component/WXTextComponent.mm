@@ -115,10 +115,8 @@
 
 @end
 
-static BOOL textRenderUsingCoreText = YES;
-
-NSString *const WXTextTruncationToken = @"\u2026";
-CGFloat WXTextDefaultLineThroughWidth = 1.2;
+static NSString *const WXTextTruncationToken = @"\u2026";
+static CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 @interface WXTextComponent()
 @property (nonatomic, strong) NSString *useCoreTextAttr;
@@ -153,16 +151,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     pthread_mutexattr_t _propertMutexAttr;
     BOOL _observerIconfont;
     BOOL _enableCopy;
-}
-
-+ (void)setRenderUsingCoreText:(BOOL)usingCoreText
-{
-    textRenderUsingCoreText = usingCoreText;
-}
-
-+ (BOOL)textRenderUsingCoreText
-{
-    return textRenderUsingCoreText;
 }
 
 - (instancetype)initWithRef:(NSString *)ref
@@ -202,11 +190,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     if ([_useCoreTextAttr isEqualToString:@"false"]) {
         return NO;
     }
-    
-    if ([WXTextComponent textRenderUsingCoreText]) {
-        return YES;
-    }
-    return NO;
+    return YES;
 }
 
 - (void)dealloc

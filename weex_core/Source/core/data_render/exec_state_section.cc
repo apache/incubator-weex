@@ -17,15 +17,16 @@
  * under the License.
  */
 
-#include <math.h>
-#include "core/data_render/object.h"
 #include "core/data_render/exec_state_section.h"
+#include <math.h>
+
+#include "base/log_defines.h"
+#include "core/data_render/object.h"
 #include "core/data_render/exec_state_binary.h"
 #include "core/data_render/common_error.h"
 #include "core/data_render/exec_state.h"
 #include "core/data_render/string_table.h"
 #include "core/data_render/table.h"
-#include "base/LogDefines.h"
 
 namespace weex {
 namespace core {

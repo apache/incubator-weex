@@ -47,7 +47,7 @@ public class DefaultWXStorage implements IWXStorageAdapter {
             mExecutorService = Executors.newSingleThreadExecutor();
         }
 
-        if(runnable != null) {
+        if(runnable != null && !mExecutorService.isShutdown()) {
             mExecutorService.execute(WXThread.secure(runnable));
         }
     }
