@@ -24,6 +24,7 @@
 #define WEEXV8_WEEXENV_H
 
 #include <mutex>
+#include "android/jsengine/task/back_to_weex_core_queue.h"
 
 #include "android/jsengine/task/timer_queue.h"
 #include "android/jsengine/weex_ipc_server.h"
@@ -42,12 +43,6 @@ public:
     bool useWson();
 
     void setUseWson(bool useWson);
-
-
-    TimerQueue *timerQueue();
-
-    void setTimerQueue(TimerQueue *timerQueue);
-
 
     WeexCore::ScriptBridge *scriptBridge();
 
@@ -78,10 +73,15 @@ public:
     }
 
 
+    void initIPC();
+
+public:
+    std::unique_ptr<BackToWeexCoreQueue> m_back_to_weex_core_thread;
+    volatile bool isMultiProcess = true;
+    std::unique_ptr<WeexIPCClient> m_ipc_client_;
 private:
     static WeexEnv *env_;
 
-    volatile bool isMultiProcess = true;
     volatile bool isUsingWson = true;
 
     std::unique_ptr<TimerQueue> weexTimerQueue_;

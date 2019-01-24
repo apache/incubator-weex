@@ -24,7 +24,6 @@
 
 #include "android/jsengine/object/args.h"
 #include "base/android/log_utils.h"
-#include "base/android/log_utils.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #include "third_party/IPC/IPCResult.h"
@@ -217,7 +216,7 @@ void CoreSideInSimple::ReportException(const char *page_id, const char *func,
 }
 
 void CoreSideInSimple::SetJSVersion(const char *js_version) {
-  LOGA("init JSFrm version %s", js_version);
+  LOGD("init JSFrm version %s", js_version);
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->platform_side()

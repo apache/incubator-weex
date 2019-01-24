@@ -56,45 +56,36 @@ void WeexObjectHolder::initFromIPCArguments(IPCArguments *arguments, size_t star
 }
 
 void WeexObjectHolder::initFromParams(std::vector<INIT_FRAMEWORK_PARAMS *> &params, bool forAppContext) {
-    if (!WEEXICU::initICUEnv(isMultiProgress)) {
-        LOGE("failed to init ICUEnv single process");
-        // return false;
-    }
-
-    Options::enableRestrictedOptions(true);
-// Initialize JSC before getting VM.
-    WTF::initializeMainThread();
-    initHeapTimer();
-    JSC::initializeThreading();
-#if ENABLE(WEBASSEMBLY)
-    JSC::Wasm::enableFastMemory();
-#endif
-    VM &vm = VM::sharedInstance();
-    JSLockHolder locker(&vm);
-    WeexGlobalObject *globalObject = WeexGlobalObject::create(vm, WeexGlobalObject::createStructure(vm, jsNull()));
+    JSLockHolder locker(this->m_globalVM);
+    VM& vm = *(this->m_globalVM);
+    WeexGlobalObject *globalObject = WeexGlobalObject::create(vm, WeexGlobalObject::createStructure(
+        vm, jsNull()));
     globalObject->initWxEnvironment(params, forAppContext, true);
     if (forAppContext)
         globalObject->initFunctionForAppContext();
     else
         globalObject->initFunction();
 
+    globalObject->timeQueue = this->timeQueue;
     m_globalObject.set(vm, globalObject);
     vm.heap.setGarbageCollectionTimerEnabled(true);
     wson::init(&vm);
 }
 
-WeexObjectHolder::WeexObjectHolder(bool isMultiProgress) {
+WeexObjectHolder::WeexObjectHolder(VM* vm,  TimerQueue* timeQueue, bool isMultiProgress) {
     this->isMultiProgress = isMultiProgress;
+    this->timeQueue = timeQueue;
+    this->m_globalVM = vm;
 }
 
-WeexGlobalObject *WeexObjectHolder::cloneWeexObject(bool initContext, bool forAppContext) {
-    VM &vm = VM::sharedInstance();
-    JSLockHolder locker(&vm);
+WeexGlobalObject *WeexObjectHolder::cloneWeexObject(std::string page_id, bool initContext, bool forAppContext) {
+    JSLockHolder locker(this->m_globalVM);
+    VM& vm = *(this->m_globalVM);
     auto *temp_object = WeexGlobalObject::create(vm,
                                                  WeexGlobalObject::createStructure(vm, jsNull()));
 
     temp_object->initWxEnvironment(m_globalObject->m_initFrameworkParams, forAppContext, false);
-
+    temp_object->timeQueue = this->timeQueue;
     if (forAppContext)
         temp_object->initFunctionForAppContext();
     else if (initContext)
@@ -102,13 +93,13 @@ WeexGlobalObject *WeexObjectHolder::cloneWeexObject(bool initContext, bool forAp
     else
         temp_object->initFunction();
 
+    temp_object->id = page_id;
     return temp_object;
 }
 
 WeexObjectHolder::~WeexObjectHolder() {
-    VM &vm = VM::sharedInstance();
     wson::destory();
-    JSLockHolder locker(&vm);
-    vm.heap.collectAllGarbage();
+    JSLockHolder locker(this->m_globalVM);
+    this->m_globalVM->heap.collectAllGarbage();
 }
 

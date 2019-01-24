@@ -63,6 +63,16 @@ WeexJSServer::WeexJSServerImpl::WeexJSServerImpl(int serverFd, int clientFd, boo
     // initialize signal handler
     crashHandler.reset(new CrashHandlerInfo(crashFileName));
     crashHandler->initializeCrashHandler();
+
+    WeexEnv::getEnv()->m_back_to_weex_core_thread.reset(new BackToWeexCoreQueue());
+    WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->init();
+
+    auto pQueue = WeexEnv::getEnv()->m_back_to_weex_core_thread.get();
+    while (!pQueue->isInitOk) {
+        continue;
+    }
+
+    //WeexEnv::getEnv()->initJSC(true);
 }
 
 WeexJSServer::WeexJSServer(int serverFd, int clientFd, bool enableTrace, std::string crashFileName)
