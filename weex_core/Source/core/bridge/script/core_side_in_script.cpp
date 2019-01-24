@@ -20,7 +20,6 @@
 #include "core/bridge/script/core_side_in_script.h"
 
 #include <cstdlib>
-#include <base/time_calculator.h>
 #include "base/log_defines.h"
 #include "base/make_copyable.h"
 #include "base/thread/waitable_event.h"
@@ -29,6 +28,7 @@
 #include "core/render/manager/render_manager.h"
 #include "wson/wson_parser.h"
 #ifdef OS_ANDROID
+#include <base/time_calculator.h>
 #include "android/weex_extend_js_api.h"
 #endif
 
