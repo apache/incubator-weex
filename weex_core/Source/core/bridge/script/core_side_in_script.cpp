@@ -50,32 +50,18 @@ void CoreSideInScript::CallNative(const char *page_id, const char *task,
                                   const char *callback) {
   if (page_id == nullptr || task == nullptr) return;
 
-  //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
-  //      weex::base::MakeCopyable(
-  //          [pageId = std::unique_ptr<char[]>(copyStr(page_id)),
-  //           taskS = std::unique_ptr<char[]>(copyStr(task)),
-  //           callbackS = std::unique_ptr<char[]>(copyStr(callback))] {
-  //            if (strcmp(taskS.get(),
-  //                       "[{\"module\":\"dom\",\"method\":\"createFinish\","
-  //                       "\"args\":[]}]") == 0) {
-  //              RenderManager::GetInstance()->CreateFinish(pageId.get()) ? 0 :
-  //              -1;
-  //            } else {
-  //              WeexCoreManager::Instance()
-  //                  ->getPlatformBridge()
-  //                  ->platform_side()
-  //                  ->CallNative(pageId.get(), taskS.get(), callbackS.get());
-  //            }
-  //          }));
-  if (strcmp(task,
-             "[{\"module\":\"dom\",\"method\":\"createFinish\","
-             "\"args\":[]}]") == 0) {
-    RenderManager::GetInstance()->CreateFinish(page_id);
-  } else {
+  std::string task_str(task);
+  std::string target_str("[{\"module\":\"dom\",\"method\":\"createFinish\","
+                         "\"args\":[]}]");
+  std::string::size_type idx = task_str.find(target_str);
+
+  if(idx == std::string::npos) {
     WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()
         ->CallNative(page_id, task, callback);
+  } else {
+    RenderManager::GetInstance()->CreateFinish(page_id);
   }
 }
 
