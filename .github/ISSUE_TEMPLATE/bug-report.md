@@ -1,5 +1,5 @@
 ---
-name: Bug report
+name: Bug Report
 about: Report a reproducible bug in the Weex library.
 title: "[Android][iOS][Dev-tool] Unexpected behavior when xx where weex version is
   0.aa.bb.cc"
