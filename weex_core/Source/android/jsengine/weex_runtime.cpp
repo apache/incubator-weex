@@ -605,11 +605,11 @@ int WeexRuntime::destroyInstance(const String &instanceId) {
       JSLockHolder locker(exec);
       VM &vm = exec->vm();
       globalObject->resetPrototype(vm, jsNull());
-//      bool protectCountIsZero = Heap::heap(exec->vmEntryGlobalObject())->unprotect(exec->vmEntryGlobalObject());
-//      vm.heap.reportAbandonedObjectGraph();
+      bool protectCountIsZero = Heap::heap(exec->vmEntryGlobalObject())->unprotect(exec->vmEntryGlobalObject());
+      vm.heap.reportAbandonedObjectGraph();
       //vm.heap.collectSync(CollectionScope::Full);//collectAllGarbage();//collectAsync(CollectionScope::Full);
       //TODO disable gc temporary
-//      vm.heap.collectAllGarbage();
+      vm.heap.collectAllGarbage();
     }
 
 //    globalObject->m_server = nullptr;

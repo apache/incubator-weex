@@ -44,12 +44,11 @@ namespace weex {
                     const char *script, std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
                 LOGD("ScriptSideInQueue::InitFramework");
 //                return runtime_->initFramework(String::fromUTF8(script), params);
-                auto task = new InitFrameworkTask(String::fromUTF8(script), params);
-                weexTaskQueue_->addTask(task);
+                weexTaskQueue_->addTask(new InitFrameworkTask(String::fromUTF8(script), params));
                 weexTaskQueue_->init();
 
                 weexTaskQueue_bk_=new WeexTaskQueue(weexTaskQueue_->isMultiProgress);
-                weexTaskQueue_bk_->addTask(task->clone());
+                weexTaskQueue_bk_->addTask(new InitFrameworkTask(String::fromUTF8(script), params));
                 weexTaskQueue_bk_->init();
                 return 1;
             }
@@ -139,8 +138,8 @@ namespace weex {
                 task->addExtraArg(String::fromUTF8(func));
 
                 if(instanceId == nullptr || strlen(instanceId) == 0) {
-                  weexTaskQueue_->addTask(task->clone());
                   weexTaskQueue_bk_->addTask(task->clone());
+                  weexTaskQueue_->addTask(task);
                 } else {
                   taskQueue(instanceId, false)->addTask(task);
                 }
@@ -159,7 +158,7 @@ namespace weex {
 
                 task->addExtraArg(String::fromUTF8(nameSpace));
                 task->addExtraArg(String::fromUTF8(func));
-              taskQueue(instanceId, false)->addTask(task);
+                taskQueue(instanceId, false)->addTask(task);
                 return std::move(future->waitResult());
             }
 
