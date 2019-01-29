@@ -36,3 +36,7 @@ void WeexEnv::initIPC() {
     // init IpcClient in io Thread
     m_ipc_client_.reset(new WeexIPCClient(ipcClientFd_));
 }
+WeexEnv::WeexEnv() {
+    this->enableBackupThread__ = false;
+    this->isUsingWson = true;
+}

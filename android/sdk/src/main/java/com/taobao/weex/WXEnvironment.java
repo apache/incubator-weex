@@ -28,6 +28,7 @@ import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import com.taobao.weex.BuildConfig;
+import com.taobao.weex.adapter.IWXJscProcessManager;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.LogLevel;
@@ -167,6 +168,8 @@ public class WXEnvironment {
         addCustomOptions(WXConfig.debugMode, "true");
       }
       addCustomOptions(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
+      IWXJscProcessManager wxJscProcessManager = WXSDKManager.getInstance().getWXJscProcessManager();
+      addCustomOptions("enableBackupThread", String.valueOf(wxJscProcessManager != null && wxJscProcessManager.enableBackupThread()));
     }catch (NullPointerException e){
       //There is little chance of NullPointerException as sApplication may be null.
       WXLogUtils.e("WXEnvironment scale Exception: ", e);

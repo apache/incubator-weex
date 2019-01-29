@@ -39,6 +39,7 @@ public:
         return env_;
     }
 
+    WeexEnv();
 
     bool useWson();
 
@@ -75,6 +76,14 @@ public:
 
     void initIPC();
 
+    void setEnableBackupThread(bool enable) {
+        this->enableBackupThread__ = enable;
+    }
+
+    bool enableBackupThread() {
+        return enableBackupThread__;
+    }
+
 public:
     std::unique_ptr<BackToWeexCoreQueue> m_back_to_weex_core_thread;
     volatile bool isMultiProcess = true;
@@ -88,6 +97,7 @@ private:
 
     WeexCore::ScriptBridge *scriptBridge_;
 
+    bool enableBackupThread__ = false;
 
     volatile int ipcClientFd_;
     volatile int ipcServerFd_;
