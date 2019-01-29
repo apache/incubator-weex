@@ -115,6 +115,7 @@ namespace weex {
                 LOGD("ScriptSideInQueue::ExecJsService");
 
                 weexTaskQueue_->addTask(new ExeJsServicesTask(String::fromUTF8(source)));
+                weexTaskQueue_bk_->addTask(new ExeJsServicesTask(String::fromUTF8(source)));
 
                 return 1;
             }
@@ -123,6 +124,7 @@ namespace weex {
                 LOGD("ScriptSideInQueue::ExecTimeCallback");
 
                 weexTaskQueue_->addTask(new CTimeCallBackTask(String::fromUTF8(source)));
+                weexTaskQueue_bk_->addTask(new CTimeCallBackTask(String::fromUTF8(source)));
 
                 return 1;
             }
@@ -171,7 +173,7 @@ namespace weex {
 
                 task->addExtraArg(String::fromUTF8(nameSpace));
                 task->addExtraArg(String::fromUTF8(func));
-              taskQueue(instanceId, false)->addTask(task);
+                taskQueue(instanceId, false)->addTask(task);
             }
 
             int ScriptSideInQueue::CreateInstance(const char *instanceId, const char *func,
@@ -218,7 +220,7 @@ namespace weex {
                 LOGD("ScriptSideInQueue::ExecJSOnInstance");
                 ExeJsOnInstanceTask *task = new ExeJsOnInstanceTask(String::fromUTF8(instanceId),
                                                                     String::fromUTF8(script));
-              taskQueue(instanceId, false)->addTask(task);
+                taskQueue(instanceId, false)->addTask(task);
                 auto future = std::unique_ptr<WeexTask::Future>(new WeexTask::Future());
                 task->set_future(future.get());
                 return std::move(future->waitResult());
@@ -226,7 +228,7 @@ namespace weex {
 
             int ScriptSideInQueue::DestroyInstance(const char *instanceId) {
                 LOGD("ScriptSideInQueue::DestroyInstance instanceId: %s \n", instanceId);
-              taskQueue(instanceId,
+                taskQueue(instanceId,
                         false)->addTask(new DestoryInstanceTask(String::fromUTF8(instanceId)));
                 deleteBackUpRuntimeInstance(instanceId);
                 return 1;
@@ -235,7 +237,7 @@ namespace weex {
             int ScriptSideInQueue::UpdateGlobalConfig(const char *config) {
                 LOGD("ScriptSideInQueue::UpdateGlobalConfig");
                 weexTaskQueue_->addTask(new UpdateGlobalConfigTask(String::fromUTF8(config)));
-              weexTaskQueue_bk_->addTask(new UpdateGlobalConfigTask(String::fromUTF8(config)));
+                weexTaskQueue_bk_->addTask(new UpdateGlobalConfigTask(String::fromUTF8(config)));
                 return 1;
             }
 
