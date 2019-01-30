@@ -27,9 +27,10 @@
 #include <deque>
 
 #include "android/jsengine/task/timer_task.h"
-#include "android/jsengine/task/weex_task_queue.h"
+#include "base/utils/ThreadLocker.h"
 
 class TimerTask;
+class WeexTaskQueue;
 
 class TimerQueue {
 

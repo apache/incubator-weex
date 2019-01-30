@@ -108,6 +108,7 @@ set(${WEEXJSSERVER_NAME}_SOURCES
         task/weex_task_queue.cpp
         task/timer_task.cpp
         task/timer_queue.cpp
+        task/back_to_weex_core_queue.cpp
 
         wson/wson_jsc.h
         wson/wson_jsc.cpp

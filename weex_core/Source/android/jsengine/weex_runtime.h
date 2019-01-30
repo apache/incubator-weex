@@ -23,6 +23,7 @@
 #ifndef WEEXV8_JSRUNTIME_H
 #define WEEXV8_JSRUNTIME_H
 
+#include "android/jsengine/task/timer_queue.h"
 #include "android/jsengine/object/weex_object_holder.h"
 #include "android/jsengine/weex_ipc_client.h"
 
@@ -36,9 +37,11 @@ public:
     std::unique_ptr<WeexObjectHolder> weexObjectHolder;
     std::map<std::string, WeexObjectHolder *> appWorkerContextHolderMap;
 
-    explicit WeexRuntime(bool isMultiProgress = true);
+    RefPtr<VM> m_globalVM;
 
-    explicit WeexRuntime(WeexCore::ScriptBridge *script_bridge, bool isMultiProgress = true);
+  explicit WeexRuntime(TimerQueue* timeQueue, bool isMultiProgress = true);
+
+    explicit WeexRuntime(TimerQueue* timeQueue, WeexCore::ScriptBridge *script_bridge, bool isMultiProgress = true);
 
     bool hasInstanceId(String &id);
 

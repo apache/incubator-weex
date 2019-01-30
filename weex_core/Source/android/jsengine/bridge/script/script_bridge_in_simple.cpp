@@ -35,7 +35,7 @@ ScriptBridgeInSimple* ScriptBridgeInSimple::g_instance = NULL;
 
 ScriptBridgeInSimple::ScriptBridgeInSimple() {
   WeexEnv::getEnv()->setScriptBridge(this);
-  set_script_side(new ScriptSideInSimple(new WeexRuntime(this, false)));
+  set_script_side(new ScriptSideInSimple(new WeexRuntime(nullptr, this, false)));
   set_core_side(new CoreSideInSimple());
 }
 

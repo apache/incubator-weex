@@ -69,3 +69,11 @@ ExeJsTask::ExeJsTask(const String &instanceId, IPCArguments *arguments, size_t s
 ExeJsTask::~ExeJsTask() {
     delete exeJsArgs;
 }
+
+ExeJsTask *ExeJsTask::clone() {
+    ExeJsTask *task = new ExeJsTask(instanceId, this->exeJsArgs->params);
+    for (int i = 0; i < this->extraArgs.size(); ++i) {
+        task->addExtraArg(this->extraArgs[i]);
+    }
+    return task;
+}

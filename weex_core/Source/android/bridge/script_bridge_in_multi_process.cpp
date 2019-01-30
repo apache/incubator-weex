@@ -229,7 +229,8 @@ static std::unique_ptr<IPCResult> HandleCallGCanvasLinkNative(
     IPCArguments *arguments) {
 
   auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-  int type = arguments->get<int32_t>(1);
+  auto typeStr = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  int type = atoi(typeStr.get());
   auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
   weex::base::WaitableEvent event;
   char *retVal = nullptr;
@@ -279,7 +280,8 @@ static std::unique_ptr<IPCResult> HandleCallGCanvasLinkNative(
 static std::unique_ptr<IPCResult> HandleT3DLinkNative(IPCArguments *arguments) {
 
 
-  int type = arguments->get<int32_t>(0);
+  auto typeStr = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  int type = atoi(typeStr.get());
   auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
   weex::base::WaitableEvent event;
   char *retVal = nullptr;
@@ -932,7 +934,7 @@ std::unique_ptr<IPCResult> OnReceivedResult(IPCArguments *arguments) {
   long callback_id = arguments->get<long>(0);
   std::unique_ptr<WeexJSResult> result;
   result.reset(new WeexJSResult);
-  if (arguments->getType(1) == IPCType::BYTEARRAY &&
+  if (arguments->getCount() > 1 && arguments->getType(1) == IPCType::BYTEARRAY &&
       arguments->getByteArray(1)->length > 0) {
     result->length = arguments->getByteArray(1)->length;
     char *string = new char[result->length + 1];

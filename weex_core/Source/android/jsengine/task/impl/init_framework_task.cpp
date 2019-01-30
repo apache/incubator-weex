@@ -55,3 +55,6 @@ InitFrameworkTask::InitFrameworkTask(const String &instanceId, const String &scr
 InitFrameworkTask::~InitFrameworkTask() {
     delete args;
 }
+InitFrameworkTask *InitFrameworkTask::clone() {
+  return new InitFrameworkTask(this->script.utf8().data(), args->params);
+}
