@@ -40,6 +40,7 @@ public:
     void run(WeexRuntime *runtime) override;
     std::string taskName() override { return "ExeJsTask"; }
 
+  ExeJsTask * clone();
 
     ~ExeJsTask() override;
 

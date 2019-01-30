@@ -21,6 +21,7 @@
 //
 
 #include "timer_queue.h"
+#include "android/jsengine/task/weex_task_queue.h"
 
 static void *startThread(void *td) {
     auto *self = static_cast<TimerQueue *>(td);

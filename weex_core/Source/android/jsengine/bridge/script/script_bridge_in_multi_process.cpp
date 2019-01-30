@@ -251,6 +251,17 @@ namespace weex {
                     memset(init_framework_params, 0, sizeof(INIT_FRAMEWORK_PARAMS));
                     init_framework_params->type = IPCByteArrayToWeexByteArray(ba_type);
                     init_framework_params->value = IPCByteArrayToWeexByteArray(ba);
+
+                    if(!WeexEnv::getEnv()->enableBackupThread()) {
+                        auto type = String::fromUTF8(init_framework_params->type->content);
+                        auto value = String::fromUTF8(init_framework_params->value->content);
+                        if(type == "enableBackupThread") {
+                            auto enable = value == "true";
+                            LOGE("enable backupThread %d",enable);
+                            WeexEnv::getEnv()->setEnableBackupThread(enable);
+                        }
+                    }
+
                     params.push_back(init_framework_params);
                 }
                 int val = Instance()->script_side()->InitFramework(source, params);

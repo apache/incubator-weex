@@ -46,6 +46,7 @@ public:
 
     std::string taskName() override { return "InitFrameworkTask"; }
 
+    InitFrameworkTask *clone();
 
     ~InitFrameworkTask();
 

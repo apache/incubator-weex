@@ -26,7 +26,9 @@
 #include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
+#include "wson/wson_parser.h"
 #ifdef OS_ANDROID
+#include <base/time_calculator.h>
 #include "android/weex_extend_js_api.h"
 #endif
 
@@ -125,6 +127,14 @@ void CoreSideInScript::CallNativeComponent(const char *page_id, const char *ref,
 void CoreSideInScript::AddElement(const char *page_id, const char *parent_ref,
                                   const char *dom_str, int dom_str_length,
                                   const char *index_str) {
+
+  
+//  std::string msg = "AddElement :";
+//  wson_parser parser(dom_str);
+//  msg.append(parser.toStringUTF8().c_str());
+//
+//  weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::WEEXCORE, msg.c_str(), page_id);
+
   const char *indexChar = index_str == nullptr ? "\0" : index_str;
   int index = atoi(indexChar);
   if (page_id == nullptr || parent_ref == nullptr || dom_str == nullptr ||
@@ -432,7 +442,7 @@ void CoreSideInScript::ReportException(const char *page_id, const char *func,
 }
 
 void CoreSideInScript::SetJSVersion(const char *js_version) {
-  LOGA("init JSFrm version %s", js_version);
+  LOGD("init JSFrm version %s", js_version);
 
   //  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
   //      weex::base::MakeCopyable(
