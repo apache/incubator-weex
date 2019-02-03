@@ -50,6 +50,8 @@ class RenderList : public RenderObject {
 
   void AddRenderObjectWidth(RenderObject *child, const bool updating);
 
+  void AddAttr(std::string key, std::string value) override;
+
   void UpdateAttr(std::string key, std::string value) override;
 
   float TakeColumnCount();
@@ -83,6 +85,8 @@ class RenderList : public RenderObject {
   std::vector<RenderObject *> cell_slots_copys_;
   float left_gap_ = 0;
   float right_gap_ = 0;
+  std::map<std::string,std::string> mOriginalAttrs;
+
 };
 }  // namespace WeexCore
 

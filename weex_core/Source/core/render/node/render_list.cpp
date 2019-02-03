@@ -276,7 +276,15 @@ void RenderList::AddRenderObjectWidth(RenderObject *child,
   }
 }
 
+
+void RenderList::AddAttr(std::string key, std::string value) {
+  MapInsertOrAssign(&mOriginalAttrs, key, value);
+  RenderObject::AddAttr(key, value);
+}
+
+
 void RenderList::UpdateAttr(std::string key, std::string value) {
+  MapInsertOrAssign(&mOriginalAttrs, key, value);
   RenderObject::UpdateAttr(key, value);
 
   if (!GetAttr(COLUMN_COUNT).empty() || !GetAttr(COLUMN_GAP).empty() ||
@@ -295,8 +303,18 @@ void RenderList::UpdateAttr(std::string key, std::string value) {
   }
 }
 
+static const std::string GetMapAttr(std::map<std::string,std::string>* attrs,  const std::string &key) {
+  if (attrs == nullptr) return "";
+  std::map<std::string, std::string>::iterator iter = attrs->find(key);
+  if (iter != attrs->end()) {
+    return iter->second;
+  } else {
+    return "";
+  }
+}
+
 float RenderList::TakeColumnCount() {
-  std::string column_count = GetAttr(COLUMN_COUNT);
+  std::string column_count = GetMapAttr(&mOriginalAttrs, COLUMN_COUNT);
 
   if (column_count.empty() || column_count == AUTO) {
     return AUTO_VALUE;
@@ -308,7 +326,7 @@ float RenderList::TakeColumnCount() {
 }
 
 float RenderList::TakeColumnGap() {
-  std::string column_gap = GetAttr(COLUMN_GAP);
+  std::string column_gap = GetMapAttr(&mOriginalAttrs, COLUMN_GAP);
 
   if (column_gap.empty() || column_gap == NORMAL) {
     return COLUMN_GAP_NORMAL;
@@ -320,7 +338,7 @@ float RenderList::TakeColumnGap() {
 }
 
 float RenderList::TakeColumnWidth() {
-  std::string column_width = GetAttr(COLUMN_WIDTH);
+  std::string column_width = GetMapAttr(&mOriginalAttrs, COLUMN_WIDTH);
 
   if (column_width.empty() || column_width == AUTO) {
     return AUTO_VALUE;
@@ -332,7 +350,7 @@ float RenderList::TakeColumnWidth() {
 }
 
 float RenderList::TakeLeftGap() {
-  std::string left_gap = GetAttr(LEFT_GAP);
+  std::string left_gap =GetMapAttr(&mOriginalAttrs, LEFT_GAP);
 
   if (left_gap.empty() || left_gap == AUTO) {
     return 0;
@@ -343,7 +361,7 @@ float RenderList::TakeLeftGap() {
 }
 
 float RenderList::TakeRightGap() {
-  std::string right_gap = GetAttr(RIGHT_GAP);
+  std::string right_gap =GetMapAttr(&mOriginalAttrs, RIGHT_GAP);
 
   if (right_gap.empty() || right_gap == AUTO) {
     return 0;
