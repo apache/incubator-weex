@@ -50,7 +50,7 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
   std::map<std::string, float>::iterator iter_viewport =
       this->viewports_.find(page_id);
   if (iter_viewport != this->viewports_.end()) {
-    this->set_viewport_width(page_id, iter_viewport->second);
+    page->set_viewport_width(iter_viewport->second);
     this->viewports_.erase(page_id);
   }
 
@@ -82,7 +82,7 @@ bool RenderManager::CreatePage(const std::string& page_id, RenderObject *root) {
   std::map<std::string, float>::iterator iter =
       this->viewports_.find(page_id);
   if (iter != this->viewports_.end()) {
-    RenderManager::GetInstance()->set_viewport_width(page_id, iter->second);
+    page->set_viewport_width(iter->second);
     this->viewports_.erase(page_id);
   }
 
@@ -101,7 +101,7 @@ bool RenderManager::CreatePage(const std::string& page_id, std::function<RenderO
     std::map<std::string, float>::iterator iter =
     this->viewports_.find(page_id);
     if (iter != this->viewports_.end()) {
-        RenderManager::GetInstance()->set_viewport_width(page_id, iter->second);
+        page->set_viewport_width(iter->second);
         this->viewports_.erase(page_id);
     }
     
@@ -371,7 +371,11 @@ float RenderManager::viewport_width(const std::string &page_id) {
 
 void RenderManager::set_viewport_width(const std::string &page_id, float viewport_width) {
   RenderPage *page = GetPage(page_id);
-  if (page == nullptr) return;
+  if (page == nullptr) {
+      // page is not created yet, we should store the view port value
+      viewports_.insert(std::pair<std::string, float>(page_id, viewport_width));
+      return;
+  }
 
   page->set_viewport_width(viewport_width);
 }
