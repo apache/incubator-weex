@@ -159,6 +159,8 @@ namespace WeexCore
                  isWidthWrapContent:(BOOL)isWidthWrapContent
                 isHeightWrapContent:(BOOL)isHeightWrapContent;
 
++ (void)setDeviceSize:(CGSize)size;
+
 + (void)setViewportWidth:(NSString*)pageId width:(CGFloat)width;
 
 + (void)layoutPage:(NSString*)pageId forced:(BOOL)forced;
@@ -204,6 +206,7 @@ namespace WeexCore
 + (void)registerComponentAffineType:(NSString *)type asType:(NSString *)baseType;
 
 + (BOOL)isComponentAffineType:(NSString *)type asType:(NSString *)baseType;
+
 + (void)registerCoreEnv:(NSString*)key withValue:(NSString*)value;
 
 @end
