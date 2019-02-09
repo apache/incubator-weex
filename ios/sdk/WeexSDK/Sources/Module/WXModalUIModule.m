@@ -35,6 +35,7 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, strong) UIView *toastView;
 @property (nonatomic, weak) UIView *superView;
+@property (nonatomic, weak) WXSDKInstance *instance;
 @property (nonatomic, assign) double duration;
 
 @end
@@ -135,6 +136,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
     }
     UIView *toastView = [self toastViewForMessage:message superView:superView];
     WXToastInfo *info = [WXToastInfo new];
+    info.instance = self.weexInstance;
     info.toastView = toastView;
     info.superView = superView;
     info.duration = duration;
@@ -228,6 +230,15 @@ static const CGFloat WXToastDefaultPadding = 30.0;
             NSMutableArray *queue = [WXToastManager sharedManager].toastQueue;
             if (queue.count > 0) {
                 [queue removeObjectAtIndex:0];
+                
+                // remove invalid toasts
+                for (NSInteger i = [queue count] - 1; i >= 0; i --) {
+                    WXToastInfo *info = queue[i];
+                    if (info.instance == nil) {
+                        [queue removeObjectAtIndex:i];
+                    }
+                }
+                
                 if (queue.count > 0) {
                     WXToastInfo *info = [queue firstObject];
                     [weakSelf showToast:info.toastView superView:info.superView duration:info.duration];
