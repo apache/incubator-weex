@@ -278,7 +278,7 @@ static BOOL bNeedRemoveEvents = YES;
 {
     NSDictionary *styles;
     pthread_mutex_lock(&_propertyMutex);
-    styles = _styles;
+    styles = [_styles copy];
     pthread_mutex_unlock(&_propertyMutex);
     return styles;
 }
@@ -287,7 +287,7 @@ static BOOL bNeedRemoveEvents = YES;
 {
     NSDictionary *pseudoClassStyles;
     pthread_mutex_lock(&_propertyMutex);
-    pseudoClassStyles = _pseudoClassStyles;
+    pseudoClassStyles = [_pseudoClassStyles copy];
     pthread_mutex_unlock(&_propertyMutex);
     
     return pseudoClassStyles;
@@ -302,7 +302,7 @@ static BOOL bNeedRemoveEvents = YES;
 {
     NSDictionary *attributes;
     pthread_mutex_lock(&_propertyMutex);
-    attributes = _attributes;
+    attributes = [_attributes copy];
     pthread_mutex_unlock(&_propertyMutex);
     
     return attributes;
