@@ -477,6 +477,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
             :"unKnowContainer"
     );
     mContainerInfo.put(WXInstanceApm.KEY_PAGE_PROPERTIES_INSTANCE_TYPE,"page");
+
+    WXBridgeManager.getInstance().checkJsEngineMultiThread();
+
   }
 
   /**
