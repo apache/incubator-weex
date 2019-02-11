@@ -211,6 +211,13 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 }
 
 - (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
+    if (ref == nil || ![ref isKindOfClass:[NSString class]]) {
+        if (callback) {
+            callback(@{@"result": @(NO), @"errMsg": @"Illegal parameter, ref must be a string."}, false);
+        }
+        return;
+    }
+    
     [self performBlockOnComponentManager:^(WXComponentManager * manager) {
         if ([ref isEqualToString:@"viewport"]) {
             dispatch_async(dispatch_get_main_queue(), ^{

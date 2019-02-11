@@ -23,6 +23,7 @@
 #ifndef WEEXV8_WEEXTASK_H
 #define WEEXV8_WEEXTASK_H
 
+#include "base/time_calculator.h"
 #include "android/jsengine/weex_runtime.h"
 #include "base/utils/ThreadLocker.h"
 
@@ -53,11 +54,12 @@ public:
     explicit WeexTask(const String &instanceId, int taskId) : future_(nullptr), global_object_(nullptr) {
         this->instanceId = instanceId;
         this->taskId = taskId;
+        this->timeCalculator = new weex::base::TimeCalculator(weex::base::TaskPlatform::JSS_ENGINE, "", this->instanceId.utf8().data());
     };
 
     explicit WeexTask(const String &instanceId) : WeexTask(instanceId, genTaskId()) {};
 
-    virtual ~WeexTask() = default;
+    virtual ~WeexTask() {if(timeCalculator != nullptr) delete timeCalculator;};
 
     virtual void run(WeexRuntime *runtime) = 0;
     virtual std::string taskName() = 0;
@@ -78,6 +80,7 @@ public:
         global_object_ = global_object;
     }
 
+    weex::base::TimeCalculator *timeCalculator;
 private:
     Future* future_;
     WeexGlobalObject* global_object_;

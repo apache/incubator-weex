@@ -26,11 +26,13 @@ import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.bridge.MethodInvoker;
 import com.taobao.weex.annotation.Component;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.lang.annotation.Annotation;
@@ -40,6 +42,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static com.taobao.weex.bridge.WXBridgeManager.METHOD_REGISTER_COMPONENTS;
 
 /**
  * Created by sospartan on 6/12/16.
@@ -214,6 +218,15 @@ public class SimpleComponentHolder implements IFComponentHolder{
     try {
       return keys.toArray(new String[keys.size()]);
     } catch (Throwable throwable) {
+      if(mClz != null) {
+        String name = mClz.getName();
+        String errorMsg = name + ": gen methods failed";
+        WXExceptionUtils.commitCriticalExceptionRT(null,
+                WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_COMPONENT,
+                METHOD_REGISTER_COMPONENTS, errorMsg,
+                null);
+      }
+
       return new String[1];
     }
 

@@ -332,8 +332,10 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     } else if (getRealView() != null) {
       if (!child.isVirtualComponent()) {
         ViewParent parent = null;
-        if(child.getHostView() != null){
-          parent = child.getHostView().getParent();
+        if(child.getParent() instanceof  WXScroller){
+          if(child.getHostView() != null){
+            parent = child.getHostView().getParent();
+          }
         }
         if(parent != null && parent instanceof  ViewGroup){
           ((ViewGroup) parent).removeView(child.getHostView());

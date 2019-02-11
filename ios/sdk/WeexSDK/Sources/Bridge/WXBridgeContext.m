@@ -684,13 +684,14 @@ _Pragma("clang diagnostic pop") \
 
 - (bool)_isParserByRegEx
 {
-    bool useRegEx = true;
-    id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
-
-    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-        useRegEx = [[configCenter configForKey:@"iOS_weex_ext_config.parserTypeByRegEx" defaultValue:@(YES) isDefault:NULL] boolValue];
-    }
-    return useRegEx;
+    return false;
+//    bool useRegEx = true;
+//    id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+//
+//    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+//        useRegEx = [[configCenter configForKey:@"iOS_weex_ext_config.parserTypeByRegEx" defaultValue:@(YES) isDefault:NULL] boolValue];
+//    }
+//    return useRegEx;
 }
 
 - (void)destroyInstance:(NSString *)instance

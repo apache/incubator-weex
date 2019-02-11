@@ -7,6 +7,7 @@ set(${BASE_LIBRARY_NAME}_SOURCES
     common.h
     closure.h
     make_copyable.h
+    time_calculator.h
     time_point.h
     time_point.cc
     time_unit.h

@@ -26,12 +26,16 @@
 #include <map>
 #include "android/jsengine/weex_ipc_server.h"
 #include "android/jsengine/weex_jsc_utils.h"
+
 #include "include/WeexApiHeader.h"
 #include "APICast.h"
 #include "JSStringRef.h"
 #include "JSContextRef.h"
 
 using namespace JSC;
+
+class TimerQueue;
+
 namespace weex {
     class GlobalObjectDelegate;
 }
@@ -48,6 +52,7 @@ public:
     typedef JSGlobalObject Base;
     std::vector<INIT_FRAMEWORK_PARAMS *> m_initFrameworkParams;
     std::string id = "";
+    TimerQueue* timeQueue = nullptr;
     static WeexGlobalObject* create(VM& vm, Structure* structure)
     {
         WeexGlobalObject* object = new (NotNull, allocateCell<WeexGlobalObject>(vm.heap)) WeexGlobalObject(vm, structure);
