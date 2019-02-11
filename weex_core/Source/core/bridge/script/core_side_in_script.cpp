@@ -25,7 +25,6 @@
 #include "base/thread/waitable_event.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
-#include "core/bridge/eagle_bridge.h"
 #ifdef OS_ANDROID
 #include "android/weex_extend_js_api.h"
 #endif
