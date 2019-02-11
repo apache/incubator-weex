@@ -176,11 +176,27 @@
                 [_indicator.view setHidden:NO];
             }
             [_indicator start];
+            [scrollerProtocol setContentOffset:offset animated:YES];
         } else {
             offset.y = 0;
             [_indicator stop];
+            [UIView animateWithDuration:0.25 animations:^{
+                [scrollerProtocol setContentOffset:offset];
+            }];
         }
-        [scrollerProtocol setContentOffset:offset animated:YES];
+        
+        /* If we are adding elements while refreshing, like this demo:http://dotwe.org/vue/f541ed72a121db8447a233b777003e8a
+         the scroller cannot stay at (0, 0) when all animations are finished.
+         So we use
+            [scrollerProtocol setContentOffset:offset animated:YES];
+         when _displayState is TRUE and use
+            [UIView animateWithDuration:0.25 animations:^{
+                [scrollerProtocol setContentOffset:offset];
+            }];
+         when _displayState is FALSE.
+         
+         All things go well. Probably setContentOffset: has higher priority than setContentOffset:animated:
+         */
     }
   
 }

@@ -50,3 +50,6 @@ android/sdk/.externalNativeBuild/ndkBuild/
 
 # release
 apache_release_temp
+
+android/commons/bin/
+android/playground/app/bin/

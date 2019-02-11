@@ -55,6 +55,7 @@
 
 - (CGPoint)contentOffset;
 
+- (void)setContentOffset:(CGPoint)contentOffset;
 - (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated;
 
 - (CGSize)contentSize;
