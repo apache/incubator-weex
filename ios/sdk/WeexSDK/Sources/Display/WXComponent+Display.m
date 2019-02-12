@@ -559,7 +559,9 @@ do {\
             _layer.borderWidth = 0;
             _layer.backgroundColor = NULL;
         } else if (!nowNeedsDrawBorder) {
-            [self _resetNativeBorderRadius];
+            WXPerformBlockOnMainThread(^{
+                [self _resetNativeBorderRadius];
+            });
             _layer.borderWidth = _borderTopWidth;
             _layer.borderColor = _borderTopColor.CGColor;
             if ((_transition.transitionOptions & WXTransitionOptionsBackgroundColor) != WXTransitionOptionsBackgroundColor ) {
