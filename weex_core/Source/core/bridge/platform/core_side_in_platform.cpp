@@ -163,10 +163,7 @@ void CoreSideInPlatform::MarkDirty(const std::string &instance_id,
 
 void CoreSideInPlatform::SetViewPortWidth(const std::string &instance_id,
                                           float width) {
-  RenderPage *page = RenderManager::GetInstance()->GetPage(instance_id);
-  if (page == nullptr) return;
-
-  page->set_viewport_width(width);
+    RenderManager::GetInstance()->set_viewport_width(instance_id, width);
 }
 
 void CoreSideInPlatform::SetPageDirty(const std::string &instance_id) {
