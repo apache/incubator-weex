@@ -967,9 +967,24 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
 {
     NSMutableArray *resultTouches = [NSMutableArray new];
     
+    CGPoint accmOffset = CGPointZero;
+    UIView* rootView = _component.weexInstance.rootView;
+    UIView* view = self.view;
+    while (view && view != rootView) {
+        if ([view isKindOfClass:[UIScrollView class]]) {
+            CGPoint offset = ((UIScrollView*)view).contentOffset;
+            accmOffset.x += offset.x;
+            accmOffset.y += offset.y;
+        }
+        view = view.superview;
+    }
+    
     for (UITouch *touch in touches) {
         CGPoint screenLocation = [touch locationInView:touch.window];
-        CGPoint pageLocation = [touch locationInView:_component.weexInstance.rootView];
+        CGPoint pageLocation = [touch locationInView:rootView];
+        pageLocation.x += accmOffset.x;
+        pageLocation.y += accmOffset.y;
+      
         if (!touch.wx_identifier) {
             touch.wx_identifier = @(_touchIdentifier++);
         }
