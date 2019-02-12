@@ -105,8 +105,8 @@ public class XmlUtils
         {
             index++;
             base = 16;
-        } else if (nm.startsWith("rgb")){
-          return WXResourceUtils.getColor(nm.concat(")"));
+        } else if (nm.contains("rgb")){
+          return WXResourceUtils.getColor(nm);
         }
         return Integer.parseInt(nm.substring(index), base) * sign;
     }
@@ -140,9 +140,9 @@ public class XmlUtils
         } else if ('#' == value.charAt(index)) {
             index++;
             base = 16;
-        } else if (value.startsWith("rgb")){
-          return WXResourceUtils.getColor(value.concat(")"));
-        }
+        } else if (value.contains("rgb")){//rgb,argb
+        return WXResourceUtils.getColor(value);
+    }
         return (int) Long.parseLong(value.substring(index), base);
     }
     /**

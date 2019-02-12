@@ -71,10 +71,6 @@ class HtmlToSpannedConverter implements ContentHandler {
     private HtmlCompat.TagHandler mTagHandler;
     private int mFlags;
     private static Pattern sTextAlignPattern;
-    private static Pattern sForegroundColorPattern;
-    private static Pattern sBackgroundColorPattern;
-    private static Pattern sTextDecorationPattern;
-    private static Pattern sTextFontSizePattern;
     /**
      * Name-value mapping of HTML/CSS colors which have different values in {@link Color}.
      */
@@ -237,38 +233,6 @@ class HtmlToSpannedConverter implements ContentHandler {
             sTextAlignPattern = Pattern.compile("(?:\\s+|\\A)text-align\\s*:\\s*(\\S*)\\b");
         }
         return sTextAlignPattern;
-    }
-
-    private static Pattern getForegroundColorPattern() {
-        if (sForegroundColorPattern == null) {
-            sForegroundColorPattern = Pattern.compile(
-                    "(?:\\s+|\\A)color\\s*:\\s*(\\S*)\\b");
-        }
-        return sForegroundColorPattern;
-    }
-
-    private static Pattern getBackgroundColorPattern() {
-        if (sBackgroundColorPattern == null) {
-            sBackgroundColorPattern = Pattern.compile(
-                    "(?:\\s+|\\A)background(?:-color)?\\s*:\\s*(\\S*)\\b");
-        }
-        return sBackgroundColorPattern;
-    }
-
-    private static Pattern getTextDecorationPattern() {
-        if (sTextDecorationPattern == null) {
-            sTextDecorationPattern = Pattern.compile(
-                    "(?:\\s+|\\A)text-decoration\\s*:\\s*(\\S*)\\b");
-        }
-        return sTextDecorationPattern;
-    }
-
-    private static Pattern getFontSizePattern() {
-        if (sTextFontSizePattern == null) {
-            sTextFontSizePattern = Pattern.compile(
-                    "(?:\\s+|\\A)font-size\\s*:\\s*(\\S*)\\b");
-        }
-        return sTextFontSizePattern;
     }
 
     HtmlToSpannedConverter(Context context, String source,
@@ -602,40 +566,46 @@ class HtmlToSpannedConverter implements ContentHandler {
     private void startCssStyle(Editable text, Attributes attributes) {
         String style = attributes.getValue("", "style");
         if (style != null) {
-            Matcher m = getForegroundColorPattern().matcher(style);
-            if (m.find()) {
-                int c = getHtmlColor(m.group(1));
-                if (c != -1) {
-                    start(text, new Foreground(c | 0xFF000000));
-                }
-            }
-            m = getBackgroundColorPattern().matcher(style);
-            if (m.find()) {
-                int c = getHtmlColor(m.group(1));
-                if (c != -1) {
-                    start(text, new Background(c | 0xFF000000));
-                }
-            }
-            m = getTextDecorationPattern().matcher(style);
-            if (m.find()) {
-                String textDecoration = m.group(1);
-                if (textDecoration.equalsIgnoreCase("line-through")) {
-                    start(text, new Strikethrough());
-                }
-            }
-            m = getFontSizePattern().matcher(style);
-            if (m.find()) {
-                String textSizeString = m.group(1);
-                if (!TextUtils.isEmpty(textSizeString)) {
-                    if (textSizeString.contains("px")) {
-                        int textSize =
-                            Integer.valueOf(textSizeString.substring(0,textSizeString.indexOf("px")));
-                        textSize *= mContext.getResources().getDisplayMetrics().density;
-                        start(text, new AbsoluteSize(textSize));
-                    }
-                    if (textSizeString.contains("em")) {
-                        float textSize = Float.valueOf(textSizeString.substring(0,textSizeString.indexOf("em")));
-                        start(text, new RelativeSize(textSize));
+            String[] attrs = style.split(";");
+            if(attrs.length != 0){
+                for (String attr : attrs) {
+                    int colonIndex = attr.indexOf(":");
+                    int color = -1;
+                    switch (attr.substring(0,colonIndex).toLowerCase().trim()){
+                        case "background":
+                        case "background-color":
+                            color = getHtmlColor(attr.substring(colonIndex + 1));
+                            if (color != -1) {
+                                start(text, new Background(color | 0xFF000000));
+                            }
+                            break;
+                        case "color":
+                            color = getHtmlColor(attr.substring(colonIndex + 1));
+                            if (color != -1) {
+                                start(text, new Foreground(color | 0xFF000000));
+                            }
+                            break;
+                        case "text-decoration":
+                            String textDecoration = attr.substring(colonIndex + 1);
+                            if (textDecoration.equalsIgnoreCase("line-through")) {
+                                start(text, new Strikethrough());
+                            }
+                            break;
+                        case "font-size":
+                            String textSizeString = attr.substring(colonIndex + 1);
+                            if (!TextUtils.isEmpty(textSizeString)) {
+                                if (textSizeString.contains("px")) {
+                                    int textSize =
+                                        Integer.valueOf(textSizeString.substring(0,textSizeString.indexOf("px")));
+                                    textSize *= mContext.getResources().getDisplayMetrics().density;
+                                    start(text, new AbsoluteSize(textSize));
+                                }
+                                if (textSizeString.contains("em")) {
+                                    float textSize = Float.valueOf(textSizeString.substring(0,textSizeString.indexOf("em")));
+                                    start(text, new RelativeSize(textSize));
+                                }
+                            }
+                            break;
                     }
                 }
             }
