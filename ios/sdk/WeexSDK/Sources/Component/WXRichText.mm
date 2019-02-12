@@ -25,6 +25,7 @@
 #import "WXComponent+Layout.h"
 #import "WXNavigationProtocol.h"
 #import "WXImgLoaderProtocol.h"
+#import "WXComponentManager.h"
 #import "WXLog.h"
 #include <pthread/pthread.h>
 
@@ -104,10 +105,8 @@ do {\
     NSMutableDictionary *_nodeRanges;
     NSMutableDictionary *_styles;
     NSMutableDictionary *_attributes;
-    UIEdgeInsets _padding;
     NSTextAlignment _textAlign;
     UIColor *_backgroundColor;
-    NSMutableAttributedString *_attributedString;
     pthread_mutex_t _attributedStringMutex;
     pthread_mutexattr_t _propertMutexAttr;
     CGFloat _lineHeight;
@@ -271,24 +270,29 @@ do {\
 
 - (void)innerLayout
 {
-    if (self.flexCssNode == nullptr) {
-        return;
-    }
-    UIEdgeInsets padding = {
-            WXFloorPixelValue(self.flexCssNode->getPaddingTop()+self.flexCssNode->getBorderWidthTop()),
-            WXFloorPixelValue(self.flexCssNode->getPaddingLeft()+self.flexCssNode->getBorderWidthLeft()),
-            WXFloorPixelValue(self.flexCssNode->getPaddingBottom()+self.flexCssNode->getBorderWidthBottom()),
-            WXFloorPixelValue(self.flexCssNode->getPaddingRight()+self.flexCssNode->getBorderWidthRight())
-        };
-
-    
-    _padding = padding;
-    
-    _attributedString = [self buildAttributeString];
-
-    [self textView].attributedText = _attributedString;
-    [self textView].textContainerInset = _padding;
-    [self textView].backgroundColor = [UIColor clearColor];
+    __weak typeof(self) wself = self;
+    WXPerformBlockOnComponentThread(^{
+        __strong typeof(wself) sself = wself;
+        if (sself) {
+            if (sself.flexCssNode == nullptr) {
+                return;
+            }
+            UIEdgeInsets padding = {
+                WXFloorPixelValue(sself.flexCssNode->getPaddingTop()+sself.flexCssNode->getBorderWidthTop()),
+                WXFloorPixelValue(sself.flexCssNode->getPaddingLeft()+sself.flexCssNode->getBorderWidthLeft()),
+                WXFloorPixelValue(sself.flexCssNode->getPaddingBottom()+sself.flexCssNode->getBorderWidthBottom()),
+                WXFloorPixelValue(sself.flexCssNode->getPaddingRight()+sself.flexCssNode->getBorderWidthRight())
+            };
+            
+            WXRichTextView* view = [self textView];
+            NSMutableAttributedString* attrString = [sself buildAttributeString];
+            WXPerformBlockOnMainThread(^{
+                view.attributedText = attrString;
+                view.textContainerInset = padding;
+                view.backgroundColor = [UIColor clearColor];
+            });
+        }
+    });
 }
 
 - (CGSize (^)(CGSize))measureBlock
