@@ -102,6 +102,7 @@
     BOOL _scrollStartEvent;
     BOOL _scrollEndEvent;
     BOOL _isScrolling;
+    BOOL _isDragging;
     CGFloat _pageSize;
     CGFloat _loadMoreOffset;
     CGFloat _previousLoadMoreContentHeight;
@@ -624,6 +625,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     return rtv;
 }
 
+- (void)setContentOffset:(CGPoint)contentOffset
+{
+    UIScrollView *scrollView = (UIScrollView *)self.view;
+    [scrollView setContentOffset:contentOffset];
+}
+
 - (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated
 {
     UIScrollView *scrollView = (UIScrollView *)self.view;
@@ -692,6 +699,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
+    _isDragging = YES;
+    
     if ([_refreshType isEqualToString:@"refreshForAppear"] && _refreshComponent) {
         [_refreshComponent setIndicatorHidden:NO];
     }
@@ -749,12 +758,15 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-    [_refreshComponent pullingdown:@{
-             REFRESH_DISTANCE_Y: @(fabs((scrollView.contentOffset.y - _lastContentOffset.y)/scaleFactor)),
-             REFRESH_VIEWHEIGHT: @(_refreshComponent.view.frame.size.height/scaleFactor),
-             REFRESH_PULLINGDISTANCE: @(scrollView.contentOffset.y/scaleFactor),
-             @"type":@"pullingdown"
-    }];
+    if (_isDragging) {
+        // only trigger pullingDown event when user is dragging
+        [_refreshComponent pullingdown:@{
+                                         REFRESH_DISTANCE_Y: @(fabs((scrollView.contentOffset.y - _lastContentOffset.y)/scaleFactor)),
+                                         REFRESH_VIEWHEIGHT: @(_refreshComponent.view.frame.size.height/scaleFactor),
+                                         REFRESH_PULLINGDISTANCE: @(fabs(scrollView.contentOffset.y/scaleFactor)),
+                                         @"type":@"pullingdown"
+                                         }];
+    }
     _lastContentOffset = scrollView.contentOffset;
     // check sticky
     [self adjustSticky];
@@ -949,6 +961,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             [delegate scrollViewDidEndDragging:scrollView willDecelerate:decelerate];
         }
     }
+    
+    _isDragging = NO;
 }
 
 - (void)loadMoreIfNeed
