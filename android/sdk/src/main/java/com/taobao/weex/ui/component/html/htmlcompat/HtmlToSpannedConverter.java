@@ -628,12 +628,13 @@ class HtmlToSpannedConverter implements ContentHandler {
                 String textSizeString = m.group(1);
                 if (!TextUtils.isEmpty(textSizeString)) {
                     if (textSizeString.contains("px")) {
-                        int textSize = Integer.valueOf(textSizeString.replaceAll("\\D+", ""));
+                        int textSize =
+                            Integer.valueOf(textSizeString.substring(0,textSizeString.indexOf("px")));
                         textSize *= mContext.getResources().getDisplayMetrics().density;
                         start(text, new AbsoluteSize(textSize));
                     }
                     if (textSizeString.contains("em")) {
-                        float textSize = Float.valueOf(textSizeString.replaceAll("\\D+", ""));
+                        float textSize = Float.valueOf(textSizeString.substring(0,textSizeString.indexOf("em")));
                         start(text, new RelativeSize(textSize));
                     }
                 }
