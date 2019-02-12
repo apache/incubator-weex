@@ -76,17 +76,12 @@
     if (self = [super init]) {
         _rect = rect;
         _radii = [[WXRadii alloc] initWithTopLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
-        //[_radii scale:[self radiiConstraintScaleFactor]];
+        [_radii scale:[self radiiConstraintScaleFactor]];
     }
     
     return self;
 }
 
-/*
- We don't do this scaling because of this demo: http://dotwe.org/vue/594d43b10d8fb9847d8122bbd429f48b
- The width of the animating object is zero and radiiConstraintScaleFactor generated 0 factor
- which causes that no corner-radius is showing.
- 
 - (float)radiiConstraintScaleFactor
 {
     // Constrain corner radii using CSS3 rules:
@@ -121,6 +116,5 @@
     WXAssert(factor <= 1, @"Wrong factor for radii constraint scale:%f", factor);
     return factor;
 }
-*/
 
 @end
