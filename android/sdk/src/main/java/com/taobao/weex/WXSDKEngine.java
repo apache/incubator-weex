@@ -569,6 +569,7 @@ public class WXSDKEngine implements Serializable {
     WXBridgeManager.getInstance().restart();
     WXBridgeManager.getInstance().initScriptsFramework(framework);
 
+    WXServiceManager.reload();
     WXModuleManager.reload();
     WXComponentRegistry.reload();
     WXSDKManager.getInstance().postOnUiThread(new Runnable() {
