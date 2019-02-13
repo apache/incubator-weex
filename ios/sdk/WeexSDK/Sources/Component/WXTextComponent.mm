@@ -127,21 +127,20 @@ static CGFloat WXTextDefaultLineThroughWidth = 1.2;
     UIEdgeInsets _border;
     UIEdgeInsets _padding;
     NSTextStorage *_textStorage;
-    CGFloat _textStorageWidth;
-    
-    UIColor *_color;
+    float _textStorageWidth;
+    float _color[4];
     NSString *_fontFamily;
-    CGFloat _fontSize;
-    CGFloat _fontWeight;
+    float _fontSize;
+    float _fontWeight;
     WXTextStyle _fontStyle;
     NSUInteger _lines;
     NSTextAlignment _textAlign;
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
-    CGFloat _lineHeight;
-    CGFloat _letterSpacing;
-    CGFloat _fontDescender;
-    CGFloat _fontAscender;
+    float _lineHeight;
+    float _letterSpacing;
+    float _fontDescender;
+    float _fontAscender;
     BOOL _truncationLine; // support trunk tail
     
     NSAttributedString * _ctAttributedString;
@@ -245,7 +244,6 @@ do {\
 
 - (void)fillCSSStyles:(NSDictionary *)styles
 {
-    WX_STYLE_FILL_TEXT_WITH_DEFAULT_VALUE(color, color, UIColor, [UIColor blackColor], NO)
     WX_STYLE_FILL_TEXT(fontFamily, fontFamily, NSString, YES)
     WX_STYLE_FILL_TEXT_PIXEL(fontSize, fontSize, YES)
     WX_STYLE_FILL_TEXT(fontWeight, fontWeight, WXTextWeight, YES)
@@ -257,6 +255,22 @@ do {\
     WX_STYLE_FILL_TEXT_PIXEL(lineHeight, lineHeight, YES)
     WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
     WX_STYLE_FILL_TEXT(wordWrap, wordWrap, NSString, YES);
+
+    UIColor* color = [UIColor blackColor];
+    id value = styles[@"color"];
+    if (value) {
+        if(![WXUtility isBlankString:value]){
+            color = [WXConvert UIColor:value];
+        }
+        [self setNeedsRepaint];
+    }
+    CGFloat red, green, blue, alpha;
+    [color getRed:&red green:&green blue:&blue alpha:&alpha];
+    _color[0] = red;
+    _color[1] = green;
+    _color[2] = blue;
+    _color[3] = alpha;
+
     if (_fontFamily && !_observerIconfont) {
         // notification received when custom icon font file download finish
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
@@ -475,9 +489,7 @@ do {\
         string = @"";
     }
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
-    if (_color) {
-        [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
-    }
+    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:_color[0] green:_color[1] blue:_color[2] alpha:_color[3]] range:NSMakeRange(0, string.length)];
     
     // set font
     UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
@@ -567,9 +579,7 @@ do {\
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     
     // set textColor
-    if(_color) {
-        [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
-    }
+    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:_color[0] green:_color[1] blue:_color[2] alpha:_color[3]] range:NSMakeRange(0, string.length)];
     
     // set font
     UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
@@ -1097,7 +1107,10 @@ NS_INLINE NSRange WXNSRangeFromCFRange(CFRange range) {
 {
     [super _resetCSSNodeStyles:styles];
     if ([styles containsObject:@"color"]) {
-        _color = [UIColor blackColor];
+        _color[0] = 0;
+        _color[1] = 0;
+        _color[2] = 0;
+        _color[3] = 1.0;
         [self setNeedsRepaint];
     }
     if ([styles containsObject:@"fontSize"]) {
