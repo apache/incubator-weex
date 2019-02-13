@@ -119,7 +119,7 @@ class RenderObject : public IRenderObject {
 
   void RemoveRenderObject(RenderObject *child);
 
-  void AddAttr(std::string key, std::string value);
+  virtual void AddAttr(std::string key, std::string value);
 
   StyleType AddStyle(std::string key, std::string value);
 
