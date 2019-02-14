@@ -174,6 +174,8 @@ static CGFloat WXTextDefaultLineThroughWidth = 1.2;
             _useCoreTextAttr = nil;
         }
         
+        _color[0] = -1.0;
+
         [self fillCSSStyles:styles];
         [self fillAttributes:attributes];
         
@@ -256,20 +258,20 @@ do {\
     WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
     WX_STYLE_FILL_TEXT(wordWrap, wordWrap, NSString, YES);
 
-    UIColor* color = [UIColor blackColor];
+    UIColor* color;
     id value = styles[@"color"];
     if (value) {
         if(![WXUtility isBlankString:value]){
             color = [WXConvert UIColor:value];
         }
         [self setNeedsRepaint];
+        CGFloat red, green, blue, alpha;
+        [color getRed:&red green:&green blue:&blue alpha:&alpha];
+        _color[0] = red;
+        _color[1] = green;
+        _color[2] = blue;
+        _color[3] = alpha;
     }
-    CGFloat red, green, blue, alpha;
-    [color getRed:&red green:&green blue:&blue alpha:&alpha];
-    _color[0] = red;
-    _color[1] = green;
-    _color[2] = blue;
-    _color[3] = alpha;
 
     if (_fontFamily && !_observerIconfont) {
         // notification received when custom icon font file download finish
@@ -489,7 +491,9 @@ do {\
         string = @"";
     }
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
-    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:_color[0] green:_color[1] blue:_color[2] alpha:_color[3]] range:NSMakeRange(0, string.length)];
+    if (_color[0] >= 0) {
+        [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:_color[0] green:_color[1] blue:_color[2] alpha:_color[3]] range:NSMakeRange(0, string.length)];
+    }
     
     // set font
     UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
@@ -579,7 +583,9 @@ do {\
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     
     // set textColor
-    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:_color[0] green:_color[1] blue:_color[2] alpha:_color[3]] range:NSMakeRange(0, string.length)];
+    if (_color[0] >= 0) {
+        [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:_color[0] green:_color[1] blue:_color[2] alpha:_color[3]] range:NSMakeRange(0, string.length)];
+    }
     
     // set font
     UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
