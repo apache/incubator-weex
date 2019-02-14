@@ -79,6 +79,9 @@ void VNode::SetStyle(const std::string &key, const std::string &value) {
 }
 
 void VNode::SetAttribute(const std::string &key, const std::string &value) {
+  if (key == "ref") {
+      ref_ = value;
+  }
   MapInsertOrAssign(attributes_, key, value);
 }
     
