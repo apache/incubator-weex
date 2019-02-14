@@ -43,6 +43,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
+import com.taobao.weex.adapter.IWXJscProcessManager;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.common.IWXDebugConfig;
@@ -187,6 +188,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   // add for cloud setting, default value is false.
   // weexcore use single process or not
   private static boolean isUseSingleProcess = false;
+  // add for cloud setting, default value is false.
+  // jsEngine use multiThread or not
+  private volatile static boolean isJsEngineMultiThreadEnable = false;
 
   public enum BundType {
     Vue,
@@ -266,7 +270,36 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 //      }
     }
   }
+  public boolean jsEngineMultiThreadEnable() {
+    return isJsEngineMultiThreadEnable;
+  }
 
+  public void checkJsEngineMultiThread() {
+    boolean flag = false;
+    IWXJscProcessManager wxJscProcessManager = WXSDKManager.getInstance().getWXJscProcessManager();
+    if(wxJscProcessManager!=null) {
+      flag = wxJscProcessManager.enableBackupThread();
+    }
+
+    if(flag == WXBridgeManager.isJsEngineMultiThreadEnable) {
+        return;
+    }
+
+    WXBridgeManager.isJsEngineMultiThreadEnable = flag;
+    //we should reinit framework if js framework has been initialized
+    if (isJSFrameworkInit()) {
+      if (isJSThread()) {
+        WXSDKEngine.reload();
+      } else {
+        post(new Runnable() {
+          @Override
+          public void run() {
+            WXSDKEngine.reload();
+          }
+        });
+      }
+    }
+  }
   public void setSandBoxContext(final boolean flag) {
     if (flag != isSandBoxContext) {
       isSandBoxContext = flag;
@@ -1986,6 +2019,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   private WXParams assembleDefaultOptions() {
+    checkJsEngineMultiThread();
+
     Map<String, String> config = WXEnvironment.getConfig();
     WXParams wxParams = new WXParams();
     wxParams.setPlatform(config.get(WXConfig.os));
@@ -2010,7 +2045,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     wxParams.setDeviceWidth(TextUtils.isEmpty(config.get("deviceWidth")) ? String.valueOf(WXViewUtils.getScreenWidth(WXEnvironment.sApplication)) : config.get("deviceWidth"));
     wxParams.setDeviceHeight(TextUtils.isEmpty(config.get("deviceHeight")) ? String.valueOf(WXViewUtils.getScreenHeight(WXEnvironment.sApplication)) : config.get("deviceHeight"));
-    wxParams.setOptions(WXEnvironment.getCustomOptions());
+    Map<String, String> customOptions = WXEnvironment.getCustomOptions();
+    customOptions.put("enableBackupThread", String.valueOf(jsEngineMultiThreadEnable()));
+    wxParams.setOptions(customOptions);
     wxParams.setNeedInitV8(WXSDKManager.getInstance().needInitV8());
     mInitParams = wxParams;
     return wxParams;

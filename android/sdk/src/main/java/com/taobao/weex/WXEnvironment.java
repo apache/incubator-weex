@@ -168,8 +168,6 @@ public class WXEnvironment {
         addCustomOptions(WXConfig.debugMode, "true");
       }
       addCustomOptions(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
-      IWXJscProcessManager wxJscProcessManager = WXSDKManager.getInstance().getWXJscProcessManager();
-      addCustomOptions("enableBackupThread", String.valueOf(wxJscProcessManager != null && wxJscProcessManager.enableBackupThread()));
     }catch (NullPointerException e){
       //There is little chance of NullPointerException as sApplication may be null.
       WXLogUtils.e("WXEnvironment scale Exception: ", e);
