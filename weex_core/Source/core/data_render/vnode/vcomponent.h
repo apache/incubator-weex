@@ -36,6 +36,7 @@ class VComponent : public VNode {
     virtual void OnCreated(
         VComponent* component, Table* data, Table* props,
         const std::unordered_map<std::string, VNodeRefs>& ref_map) = 0;
+    virtual void OnMounted(VComponent* component, const std::unordered_map<std::string, VNodeRefs>& ref_map) = 0;
     virtual void OnUpdated(
         VComponent* component, Table* props,
         const std::unordered_map<std::string, VNodeRefs>& ref_map) = 0;
@@ -69,6 +70,7 @@ class VComponent : public VNode {
   VComponent* component() override {return this;}
 
   void DispatchCreated();
+  void DispatchMounted();
   void DispatchUpdated();
   void DispatchDestroyed();
 
@@ -88,6 +90,7 @@ class VComponent : public VNode {
 
   bool is_dirty_;
   bool has_dispatch_created_;
+  bool has_dispatch_mounted_;
   bool has_moved_;
   // unique id for unique component
   int id_;

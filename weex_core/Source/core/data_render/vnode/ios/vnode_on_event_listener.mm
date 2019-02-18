@@ -41,7 +41,7 @@ void VNodeOnEventListener::OnEvent(VNode *node, const std::string &event,
     int template_id = node->component()->template_id();
     int component_id = node->component()->id();
 
-    [[WXSDKManager bridgeMgr] callJSMethod:@"callJS" args:@[instanceId, @[@{@"method":@"fireEvent", @"args":@[NSSTRING(node->ref().empty() ? node->node_id().c_str() : node->ref().c_str()), @"nodeEvent", [WXUtility objectFromJSON:NSSTRING(json_args.c_str())], NSSTRING(dom_changes.c_str()), @{@"params":@[@{@"templateId":[NSNumber numberWithInt:template_id], @"componentId":[NSNumber numberWithInt:component_id],@"type":NSSTRING(event.c_str()), @"params": NSARRAY(params)}]}]}]]];
+    [[WXSDKManager bridgeMgr] callJSMethod:@"callJS" args:@[instanceId, @[@{@"method":@"fireEvent", @"args":@[NSSTRING(node->node_id().c_str()), @"nodeEvent", [WXUtility objectFromJSON:NSSTRING(json_args.c_str())], NSSTRING(dom_changes.c_str()), @{@"params":@[@{@"templateId":[NSNumber numberWithInt:template_id], @"componentId":[NSNumber numberWithInt:component_id],@"type":NSSTRING(event.c_str()), @"params": NSARRAY(params)}]}]}]]];
   }
 
 }  // namespace data_render

@@ -33,6 +33,7 @@ class VComponentLifecycleListener : public VComponent::LifecycleListener {
       VComponent* component, Table* props,
       const std::unordered_map<std::string, VComponent::VNodeRefs>& ref_map);
   void OnDestroyed(VComponent* component);
+  void OnMounted(VComponent* component, const std::unordered_map<std::string, VComponent::VNodeRefs>& ref_map);
 };
 }  // namespace data_render
 }  // namespace core

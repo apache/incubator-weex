@@ -259,6 +259,8 @@ void VNodeRenderManager::DownloadAndExecScript(
             if (root && root->IsVirtualComponent()) {
               static_cast<weex::core::data_render::VComponent*>(root)
                   ->DispatchCreated();
+              static_cast<weex::core::data_render::VComponent*>(root)
+                ->DispatchMounted();
 
                 //fire event
                 exec_state->set_exec_js_finished(true);

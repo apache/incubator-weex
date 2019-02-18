@@ -82,6 +82,9 @@ class VNode {
     return render_object_ref_;
   }
 
+  inline void set_ref(std::string ref) {
+      ref_ = ref;
+  }
   inline void set_render_object_ref(std::string ref) {
     render_object_ref_ = std::move(ref);
   }

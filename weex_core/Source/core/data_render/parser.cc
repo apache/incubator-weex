@@ -578,6 +578,14 @@ struct ASTParser final {
         statement->PushExpression(child_declaration);
       }
 
+      args.clear();
+      args.push_back(child_identifier);
+      args.push_back(attr_init);
+      Handle<Expression> set_component_func = factory_->NewIdentifier("setComponentRef");
+      Handle<Expression> call_set_component_expr = nullptr;
+      call_set_component_expr = factory_->NewCallExpression(set_component_func, args);
+      statement->PushExpression(call_set_component_expr);
+
       // appendChild(parent, child);
       AddAppendChildCall(json, parent_identifier, child_identifier);
     }
