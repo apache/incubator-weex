@@ -2201,7 +2201,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           String module = iter.next();
           if (module != null) {
             WXModuleManager.resetModuleState(module, true);
-            WXLogUtils.e("[WXBridgeManager]invokeRegisterModules METHOD_REGISTER_MODULES success module:" + module);
+            //WXLogUtils.e("[WXBridgeManager]invokeRegisterModules METHOD_REGISTER_MODULES success module:" + module);
           }
         }
       } catch (Throwable e) {
@@ -2226,7 +2226,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       throw new RuntimeException("Fail receiver should not use source.");
     }
     if (!isJSFrameworkInit()) {
-      WXLogUtils.e("[WXBridgeManager] invokeRegisterComponents: framework.js uninitialized.");
+      //WXLogUtils.e("[WXBridgeManager] invokeRegisterComponents: framework.js uninitialized.");
 
       for (Map<String, Object> comp : components) {
         failReceiver.add(comp);

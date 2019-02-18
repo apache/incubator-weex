@@ -36,6 +36,7 @@ import com.taobao.weex.ui.module.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.cache.RegisterCache;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -66,6 +67,60 @@ public class WXModuleManager {
    */
   private static Map<String, Map<String, WXModule>> sInstanceModuleMap = new ConcurrentHashMap<>();
 
+
+  public static boolean registerModule(Map<String, RegisterCache.ModuleCache> moduleCacheMap) {
+    if (moduleCacheMap.isEmpty())
+      return true;
+
+    final Iterator<Entry<String, RegisterCache.ModuleCache>> iterator = moduleCacheMap.entrySet().iterator();
+    WXBridgeManager.getInstance()
+            .post(new Runnable() {
+              @Override
+              public void run() {
+                Map<String, Object> modules = new HashMap<>();
+
+                while (iterator.hasNext()) {
+                  Entry<String, RegisterCache.ModuleCache> next = iterator.next();
+                  RegisterCache.ModuleCache value = next.getValue();
+                  String moduleName = value.name;
+                  if (TextUtils.equals(moduleName, WXDomModule.WXDOM)) {
+                    WXLogUtils.e("Cannot registered module with name 'dom'.");
+                    continue;
+                  }
+
+                  if (sModuleFactoryMap != null && sModuleFactoryMap.containsKey(moduleName)) {
+                    WXLogUtils.w("WXComponentRegistry Duplicate the Module name: " + moduleName);
+                  }
+                  ModuleFactory factory = value.factory;
+                  try {
+                    registerNativeModule(moduleName, factory);
+                  } catch (WXException e) {
+                    WXLogUtils.e("registerNativeModule" + e);
+                  }
+
+                  if (value.global) {
+                    try {
+                      WXModule wxModule = factory.buildInstance();
+                      wxModule.setModuleName(moduleName);
+                      sGlobalModuleMap.put(moduleName, wxModule);
+                    } catch (Exception e) {
+                      WXLogUtils.e(moduleName + " class must have a default constructor without params. ", e);
+                    }
+                  }
+
+                  try {
+                    sModuleFactoryMap.put(moduleName, new ModuleFactoryImpl(factory));
+                  } catch (Throwable e) {
+
+                  }
+                  modules.put(moduleName, factory.getMethods());
+                }
+                WXSDKManager.getInstance().registerModules(modules);
+              }
+            });
+    return true;
+  }
+
   /**
    * Register module to JavaScript and Android
    */
@@ -79,10 +134,8 @@ public class WXModuleManager {
       return false;
     }
 
-    try {
-      sModuleFactoryMap.put(moduleName, new ModuleFactoryImpl(factory));
-    } catch (Throwable e) {
-
+    if(RegisterCache.getInstance().cacheModule(moduleName,factory,global)) {
+      return true;
     }
 
     //execute task in js thread to make sure register order is same as the order invoke register method.
@@ -110,6 +163,12 @@ public class WXModuleManager {
                 }
 
                 registerJSModule(moduleName, factory);
+
+                try {
+                  sModuleFactoryMap.put(moduleName, new ModuleFactoryImpl(factory));
+                } catch (Throwable e) {
+
+                }
               }
             });
     return true;
