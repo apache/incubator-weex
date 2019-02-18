@@ -265,6 +265,7 @@ void VComponent::DispatchUpdated() {
     return;
   }
   if (!is_dirty_) return;
+  TravelVComponentsWithFunc(&VComponent::DispatchUpdated, root_vnode());
   BuildRefMap();
   if (listener_) {
     if (updated_props_.type == Value::Type::NIL) {
@@ -272,7 +273,6 @@ void VComponent::DispatchUpdated() {
     }
     listener_->OnUpdated(this, ValueTo<Table>(&updated_props_), ref_map_);
   }
-  TravelVComponentsWithFunc(&VComponent::DispatchUpdated, root_vnode());
   is_dirty_ = false;
 }
 
