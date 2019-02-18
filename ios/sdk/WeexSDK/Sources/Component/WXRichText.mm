@@ -284,9 +284,9 @@ do {\
                 WXFloorPixelValue(sself.flexCssNode->getPaddingRight()+sself.flexCssNode->getBorderWidthRight())
             };
             
-            WXRichTextView* view = [self textView];
             NSMutableAttributedString* attrString = [sself buildAttributeString];
             WXPerformBlockOnMainThread(^{
+                WXRichTextView* view = [sself textView];
                 view.attributedText = attrString;
                 view.textContainerInset = padding;
                 view.backgroundColor = [UIColor clearColor];
