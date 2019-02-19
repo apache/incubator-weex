@@ -20,9 +20,11 @@ package com.taobao.weex.ui.component.html;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -80,6 +82,13 @@ public class WxHtmlComponent extends WXVContainer<ScrollView> {
       HtmlComponent.TAG_VIDEO};
   //this params for adjust the second child view's top margin
   private int mFirstChildViewHeight;
+  private ViewTreeObserver.OnScrollChangedListener mHeaderScrollListener = new HeaderScrollListener();
+  private ViewTreeObserver.OnScrollChangedListener mFooterScrollListener = new FooterScrollListener();
+  private Rect mHeaderRect = new Rect();
+  private Rect mFooterRect = new Rect();
+  private Rect mRootRect = new Rect();
+  private boolean mIsHeaderShowing;
+  private boolean mIsFooterShowing;
 
   public WxHtmlComponent(
       WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
@@ -106,6 +115,12 @@ public class WxHtmlComponent extends WXVContainer<ScrollView> {
   }
 
   @Override
+  protected void onFinishLayout() {
+    super.onFinishLayout();
+    getHostView().getLocalVisibleRect(mRootRect);
+  }
+
+  @Override
   public void addSubView(View child, int index) {
     if (child == null || getRealView() == null) {
       return;
@@ -114,10 +129,12 @@ public class WxHtmlComponent extends WXVContainer<ScrollView> {
     child.setTag(TAG_DIRECT_CHILD_ID, TAG_DIRECT_CHILD);
     if(index == 0){ //header view
       mHeaderContainer.removeAllViews();
+      mHeaderContainer.getViewTreeObserver().addOnScrollChangedListener(mHeaderScrollListener);
       mHeaderContainer.addView(child,FrameLayout.LayoutParams.MATCH_PARENT,
                                FrameLayout.LayoutParams.WRAP_CONTENT);
     }else if(index == 1){ //footer view
       mFooterContainer.removeAllViews();
+      mFooterContainer.getViewTreeObserver().addOnScrollChangedListener(mFooterScrollListener);
       mFooterContainer.addView(child,FrameLayout.LayoutParams.MATCH_PARENT,
                                FrameLayout.LayoutParams.WRAP_CONTENT);
     }
@@ -252,6 +269,57 @@ public class WxHtmlComponent extends WXVContainer<ScrollView> {
   @Override
   public void destroy() {
     super.destroy();
+    mHeaderContainer.getViewTreeObserver().removeOnScrollChangedListener(mHeaderScrollListener);
+    mFooterContainer.getViewTreeObserver().removeOnScrollChangedListener(mFooterScrollListener);
     mHtmlComponents.clear();
   }
+
+  private class HeaderScrollListener implements ViewTreeObserver.OnScrollChangedListener {
+    @Override
+    public void onScrollChanged() {
+      if (mHeaderContainer != null && mHeaderContainer.getChildCount() != 0) {
+        mHeaderContainer.getLocalVisibleRect(mHeaderRect);
+        if (mHeaderRect.width() != 0) {
+          if (mHeaderRect.bottom < 0) { // out top
+            if (mIsHeaderShowing) {
+              getInstance().fireEvent(getRef(),Constants.Event.HEADER_DISAPPEAR);
+              mIsHeaderShowing = false;
+              WXLogUtils.i("ScrollChange", "header disappear");
+            }
+          } else { // inside
+            if (!mIsHeaderShowing) {
+              getInstance().fireEvent(getRef(),Constants.Event.HEADER_APPEAR);
+              mIsHeaderShowing = true;
+              WXLogUtils.i("ScrollChange", "header appear");
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private class FooterScrollListener implements ViewTreeObserver.OnScrollChangedListener {
+    @Override
+    public void onScrollChanged() {
+      if (mFooterContainer != null && mFooterContainer.getChildCount() != 0) {
+        mFooterContainer.getLocalVisibleRect(mFooterRect);
+        if (mFooterRect.width() != 0) {
+          if (mFooterRect.top > mRootRect.bottom) { // out bottom
+            if (mIsFooterShowing) {
+              getInstance().fireEvent(getRef(),Constants.Event.FOOTER_DISAPPEAR);
+              mIsFooterShowing = false;
+              WXLogUtils.i("ScrollChange", "footer disappear");
+            }
+          } else { // inside
+            if (!mIsFooterShowing) {
+              getInstance().fireEvent(getRef(),Constants.Event.FOOTER_APPEAR);
+              mIsFooterShowing = true;
+              WXLogUtils.i("ScrollChange", "footer appear");
+            }
+          }
+        }
+      }
+    }
+  }
+
 }

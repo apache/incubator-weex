@@ -347,6 +347,12 @@ public class Constants {
     String STOP_PROPAGATION_RAX = "stoppropagation";
     String ONMESSAGE = "message";
     String NATIVE_BACK = "nativeback";
+
+    //WxHtmlComponent's header & footer appear&disappear event
+    String HEADER_APPEAR = "headerAppear";
+    String HEADER_DISAPPEAR = "headerDisappear";
+    String FOOTER_APPEAR = "footerAppear";
+    String FOOTER_DISAPPEAR = "footerDisappear";
   }
 
   public interface PSEUDO {
