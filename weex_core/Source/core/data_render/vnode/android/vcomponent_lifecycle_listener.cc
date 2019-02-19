@@ -36,6 +36,7 @@ static const char* kKeyMethod = "method";
 static const char* kKeyArgs = "args";
 static const char* kEventOnCreated = "created";
 static const char* kEventOnUpdated = "updated";
+static const char* kEventOnMounted = "mounted";
 static const char* kEventOnDestroyed = "destroyed";
 static int kNonParentId = -1;
 
@@ -239,7 +240,7 @@ void VComponentLifecycleListener::OnMounted(
   //
   // args -> { method: 'componentHook', args: [ componentId, 'lifecycle',
   // lifecycle, [props, refList] ] }
-  GenParamsForCallJS(params, component, kEventOnUpdated, component->id(), 2,
+  GenParamsForCallJS(params, component, kEventOnMounted, component->id(), 2,
                      ref_map);
   WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
       page_id.c_str(), "", kMethodOnComponentEvent, params);
