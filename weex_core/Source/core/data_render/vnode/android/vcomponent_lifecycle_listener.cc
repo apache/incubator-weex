@@ -229,6 +229,23 @@ void VComponentLifecycleListener::OnCreated(
   freeParams(params);
 }
 
+void VComponentLifecycleListener::OnMounted(
+    VComponent* component,
+    const std::unordered_map<std::string, VComponent::VNodeRefs>& ref_map) {
+  auto page_id = component->exec_state()->context()->page_id();
+
+  std::vector<VALUE_WITH_TYPE*> params;
+  // [pageId, args]
+  //
+  // args -> { method: 'componentHook', args: [ componentId, 'lifecycle',
+  // lifecycle, [props, refList] ] }
+  GenParamsForCallJS(params, component, kEventOnUpdated, component->id(), 2,
+                     ref_map);
+  WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
+      page_id.c_str(), "", kMethodOnComponentEvent, params);
+  freeParams(params);
+}
+
 void VComponentLifecycleListener::OnUpdated(
     VComponent* component, Table* props,
     const std::unordered_map<std::string, VComponent::VNodeRefs>& ref_map) {
