@@ -82,6 +82,8 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
+import com.taobao.weex.utils.cache.RegisterCache;
+
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -459,6 +461,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void init(Context context) {
+    RegisterCache.getInstance().idle(true);
     mContext = context;
     mContainerInfo = new HashMap<>(4);
     mNativeInvokeHelper = new NativeInvokeHelper(mInstanceId);

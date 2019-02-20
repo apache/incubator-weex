@@ -26,9 +26,11 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.ui.config.AutoScanConfigRegister;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.cache.RegisterCache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,9 +43,44 @@ public class WXComponentRegistry {
   private static Map<String, IFComponentHolder> sTypeComponentMap = new ConcurrentHashMap<>();
   private static ArrayList<Map<String, Object>> sComponentInfos=new ArrayList<>();
 
+  public static synchronized boolean registerComponent(Map<String, RegisterCache.ComponentCache> componentCacheMap) {
+    if (componentCacheMap.isEmpty())
+      return true;
+    final Iterator<Map.Entry<String, RegisterCache.ComponentCache>> iterator = componentCacheMap.entrySet().iterator();
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        ArrayList<Map<String, Object>> coms = new ArrayList<>();
+        while (iterator.hasNext()) {
+          Map.Entry<String, RegisterCache.ComponentCache> next = iterator.next();
+          try {
+            RegisterCache.ComponentCache value = next.getValue();
+            Map<String, Object> registerInfo = value.componentInfo;
+            if (registerInfo == null) {
+              registerInfo = new HashMap<>();
+            }
+            registerInfo.put("type", value.type);
+            registerInfo.put("methods", value.holder.getMethods());
+            registerNativeComponent(value.type, value.holder);
+            sComponentInfos.add(registerInfo);
+            coms.add(registerInfo);
+          } catch (WXException e) {
+            e.printStackTrace();
+          }
+        }
+        WXSDKManager.getInstance().registerComponents(coms);
+      }
+    });
+    return true;
+  }
+
   public static synchronized boolean registerComponent(final String type, final IFComponentHolder holder, final Map<String, Object> componentInfo) throws WXException {
     if (holder == null || TextUtils.isEmpty(type)) {
       return false;
+    }
+
+    if(RegisterCache.getInstance().cacheComponent(type,holder,componentInfo)) {
+      return true;
     }
 
     //execute task in js thread to make sure register order is same as the order invoke register method.

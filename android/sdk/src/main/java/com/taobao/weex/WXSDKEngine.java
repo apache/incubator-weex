@@ -97,6 +97,7 @@ import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.batch.BatchOperationHelper;
+import com.taobao.weex.utils.cache.RegisterCache;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -377,7 +378,11 @@ public class WXSDKEngine implements Serializable {
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:", e);
     }
-    AutoScanConfigRegister.doScanConfig();
+
+    if(RegisterCache.getInstance().enableAutoScan()) {
+      AutoScanConfigRegister.doScanConfig();
+    }
+
     batchHelper.flush();
   }
 
