@@ -406,6 +406,9 @@ WX_EXPORT_METHOD(@selector(save:))
             [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:extInfo progress:nil completed:nil];
         }
         newURL = [[self imageSrc] copy];
+        if ([newURL length] == 0) {
+            return;
+        }
         WX_REWRITE_URL([self imageSrc], WXResourceTypeImage, self.weexInstance)
         NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp),  @"blurRadius":@(self.blurRadius), @"instanceId":[self _safeInstanceId], @"pageURL": self.weexInstance.scriptURL ?: @""};
         [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:userInfo progress:^(NSInteger receivedSize, NSInteger expectedSize) {
