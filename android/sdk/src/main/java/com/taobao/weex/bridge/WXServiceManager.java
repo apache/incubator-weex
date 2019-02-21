@@ -24,10 +24,11 @@ import com.taobao.weex.common.WXJSService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WXServiceManager {
 
-    private static Map<String, WXJSService> sInstanceJSServiceMap = new HashMap<>();
+    private static volatile ConcurrentHashMap<String, WXJSService> sInstanceJSServiceMap = new ConcurrentHashMap<>();
 
     public static boolean registerService(String name, String serviceScript, Map<String, Object> options) {
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(serviceScript)) return false;
@@ -83,14 +84,16 @@ public class WXServiceManager {
     }
 
     public static void reload() {
-        WXBridgeManager.getInstance().post(new Runnable() {
-            @Override
-            public void run() {
-                for (Map.Entry<String, WXJSService> entry : sInstanceJSServiceMap.entrySet()) {
-                    WXJSService service = entry.getValue();
-                    registerService(service.getName(), service.getScript(), service.getOptions());
+        if(sInstanceJSServiceMap != null && sInstanceJSServiceMap.size() > 0) {
+            WXBridgeManager.getInstance().post(new Runnable() {
+                @Override
+                public void run() {
+                    for (Map.Entry<String, WXJSService> entry : sInstanceJSServiceMap.entrySet()) {
+                        WXJSService service = entry.getValue();
+                        registerService(service.getName(), service.getScript(), service.getOptions());
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 }
