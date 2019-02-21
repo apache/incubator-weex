@@ -9,7 +9,8 @@ assignees: ''
 ---
 
 <!--
-Thanks for using Weex. Please follow the [Bug Report Guidelines](http://weex-project.io/bug-report-guidelines.html) to file issues. A good bug report should include the following information:
+Thanks for using Weex. Github Issue is only used for bur report and please follow the template to report the bug. 
+A good bug report should include the following information:
 -->
 
 <!-- Requirements: please go through this checklist before opening a new issue

@@ -1,24 +1,32 @@
 <!--
-Thanks for using Weex. Please follow the [Bug Report Guidelines](http://weex-project.io/bug-report-guidelines.html) to file issues. A good bug report should include the following information:
+Thanks for using Weex. Github Issue is only used for bur report and please follow the template to report the bug. 
+A good bug report should include the following information:
 -->
 
-<!--
-感谢使用 Weex。请遵照 [Bug 报告指南](http://weex-project.io/cn/bug-report-guidelines.html) 创建 issue，希望你可以提供如下信息：
--->
+<!-- Requirements: please go through this checklist before opening a new issue
+  - * Review the documentation: https://weex.apache.org/index.html
+  - * Search for existing issues: https://github.com/apache/incubator-weex/issues
+  - * Use the latest Weex release: https://github.com/apache/incubator-weex/releases -->
 
-## Description
 
-<!-- The brief description of the potential bug. -->
+## Describe the bug
+<!-- A clear and concise description of what the bug is. -->
+
+## To Reproduce
+<!-- Steps to reproduce the behavior.  Include a MCVE using http://dotwe.org/vue , crash stacktrace or  share your app project. Please follow the guidelines for providing a MCVE: https://stackoverflow.com/help/mcve -->
 
 ## Environment
+<!-- 
+* Device: [e.g. iPhone6]
+* OS: [e.g. iOS8.1]
+* Version [e.g. 22]
+* Build from source [e.g. yes/no] -->
 
-<!-- The environment to reproduce this bug, such as **Weex Version** and **Device Mode**. -->
-<!-- You can get the environment of your device by [this example](http://dotwe.org/vue/1dea64f527db3fd109c0fb682d41c14f). -->
+## Expected behavior
+<!-- A clear and concise description of what you expected to happen. -->
 
-## Broken Example
+## Screenshots
+<!-- If applicable, add screenshots to help explain your problem. -->
 
-<!-- Please offer an example on the [online editor of Weex](http://dotwe.org/) to reproduce this bug. -->
-
-## Steps to Reproduce
-
-<!-- Clear and concise steps to reproduce this bug. -->
+## Additional context
+<!-- Add any other context about the problem here.-->
