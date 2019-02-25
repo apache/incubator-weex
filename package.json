@@ -2,7 +2,7 @@
   "name": "weex",
   "version": "0.12.2",
   "subversion": {
-    "framework": "0.29.1",
+    "framework": "0.29.2",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -83,7 +83,7 @@
     "core-js": "^2.4.0",
     "semver": "^5.1.0",
     "weex-rax-framework": "0.4.20",
-    "weex-vue-framework": "2.5.13-weex.5"
+    "weex-vue-framework": "2.5.16-weex.5"
   },
   "devDependencies": {
     "babel-core": "^6.17.0",
