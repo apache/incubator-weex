@@ -203,7 +203,6 @@ static void GenParamsForCallJS(std::vector<VALUE_WITH_TYPE*>& params,
 
   args->value.byteArray = genWeexByteArray(
       static_cast<const char*>(buffer->data), buffer->position);
-  buffer->data = nullptr;
   wson_buffer_free(buffer);
   params.push_back(args);
 }
@@ -240,7 +239,7 @@ void VComponentLifecycleListener::OnMounted(
   //
   // args -> { method: 'componentHook', args: [ componentId, 'lifecycle',
   // lifecycle, [props, refList] ] }
-  GenParamsForCallJS(params, component, kEventOnMounted, component->id(), 2,
+  GenParamsForCallJS(params, component, kEventOnMounted, component->id(), 1,
                      ref_map);
   WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
       page_id.c_str(), "", kMethodOnComponentEvent, params);
