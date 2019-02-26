@@ -185,14 +185,17 @@ public class WxHtmlComponent extends WXVContainer<ScrollView> {
       if (option != null) {
         // image
         JSONObject image = option.getJSONObject("image");
-        mImageResize = WXUtils.getString(image.get(Constants.Name.RESIZE), "cover");
+        if (image != null) {
+          mImageResize = WXUtils.getString(image.get(Constants.Name.RESIZE), "cover");
+        }
         // table
         JSONObject table = option.getJSONObject("table");
-        mTableTemplate =
-            WXUtils.getString(table.get("template"), HtmlComponent.HTML_TEMPLATE);
+        if (table != null) {
+          mTableTemplate = WXUtils.getString(table.get("template"), HtmlComponent.HTML_TEMPLATE);
+        }
         //tags
         JSONArray tags = option.getJSONArray("tags");
-        if (tags.size() != 0) {
+        if (tags != null && tags.size() != 0) {
           mSupportedTags = new String[tags.size()];
           for (int i = 0; i < tags.size(); i++) {
             mSupportedTags[i] = tags.getString(i);
