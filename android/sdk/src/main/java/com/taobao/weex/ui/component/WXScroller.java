@@ -494,7 +494,16 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
                   int mw = frameLayout.getMeasuredWidth();
                   scrollView.scrollTo(mw, component.getScrollY());
                 } else {
-                  scrollView.scrollTo(0, component.getScrollY());
+                  boolean scrollToBegin = true;
+                  Object scrollToBeginOnLTR = getAttrs().get("scrollToBegin");
+                  if (scrollToBeginOnLTR instanceof String){
+                    if("false".equalsIgnoreCase((String)scrollToBeginOnLTR)){
+                      scrollToBegin = false;
+                    }
+                  }
+                  if (scrollToBegin){
+                    scrollView.scrollTo(0, component.getScrollY());
+                  }
                 }
               }
             });
