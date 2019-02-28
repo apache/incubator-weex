@@ -309,6 +309,11 @@ namespace WeexCore {
                 }
             }
         }
+        else {
+            delete styles;
+            delete attrs;
+            delete events;
+        }
     }
 
     void WsonGenerate(const char* data, const std::string& parentRef, int index, const WsonObjectGenerator& genObject) {
