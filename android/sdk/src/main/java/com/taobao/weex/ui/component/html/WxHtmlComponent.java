@@ -80,8 +80,6 @@ public class WxHtmlComponent extends WXVContainer<ScrollView> {
   private FrameLayout mFooterContainer;
   private String[] mSupportedTags =new String[]{HtmlComponent.TAG_IMAGE, HtmlComponent.TAG_TABLE,
       HtmlComponent.TAG_VIDEO};
-  //this params for adjust the second child view's top margin
-  private int mFirstChildViewHeight;
   private ViewTreeObserver.OnScrollChangedListener mHeaderScrollListener = new HeaderScrollListener();
   private ViewTreeObserver.OnScrollChangedListener mFooterScrollListener = new FooterScrollListener();
   private Rect mHeaderRect = new Rect();
@@ -125,9 +123,9 @@ public class WxHtmlComponent extends WXVContainer<ScrollView> {
     if (child == null || getRealView() == null) {
       return;
     }
-    //remark the direct sub view
-    child.setTag(TAG_DIRECT_CHILD_ID, TAG_DIRECT_CHILD);
     if(index == 0){ //header view
+      //remark the first direct sub view
+      child.setTag(TAG_DIRECT_CHILD_ID, TAG_DIRECT_CHILD);
       mHeaderContainer.removeAllViews();
       mHeaderContainer.getViewTreeObserver().addOnScrollChangedListener(mHeaderScrollListener);
       mHeaderContainer.addView(child,FrameLayout.LayoutParams.MATCH_PARENT,
@@ -153,13 +151,10 @@ public class WxHtmlComponent extends WXVContainer<ScrollView> {
 
     if (lp instanceof ViewGroup.MarginLayoutParams) {
       View hostView = child.getHostView();
-      //reset the opposite top margin of the direct sub view
+      //only set the top margin of the first direct sub view
       if (hostView != null && TAG_DIRECT_CHILD.equals(hostView.getTag(TAG_DIRECT_CHILD_ID))) {
-        this.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, left, top - mFirstChildViewHeight, right,
+        this.setMarginsSupportRTL((ViewGroup.MarginLayoutParams) lp, left, top, right,
                                   bottom);
-        if (mFirstChildViewHeight == 0) {
-          mFirstChildViewHeight = height;
-        }
       }
     }
     return lp;
