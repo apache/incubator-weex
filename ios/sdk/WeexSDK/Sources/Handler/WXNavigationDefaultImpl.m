@@ -66,9 +66,9 @@
     }
     
     BOOL animated = YES;
-    NSString *obj = [[param objectForKey:@"animated"] lowercaseString];
-    if (obj && [obj isEqualToString:@"false"]) {
-        animated = NO;
+    id animatedArgument = [param objectForKey:@"animated"];
+    if (animatedArgument && [animatedArgument respondsToSelector:@selector(boolValue)]) {
+        animated = [animatedArgument boolValue];
     }
     
     WXBaseViewController *vc = [[WXBaseViewController alloc]initWithSourceURL:[NSURL URLWithString:param[@"url"]]];
