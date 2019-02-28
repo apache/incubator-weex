@@ -444,13 +444,18 @@ do {\
     if (styles[@"lineHeight"]) {
         _lineHeight = [WXConvert CGFloat:styles[@"lineHeight"]] / 2;
     }
-    [_styles addEntriesFromDictionary:styles];
-    [self syncTextStorageForView];
+    
+    WXPerformBlockOnComponentThread(^{
+        [_styles addEntriesFromDictionary:styles];
+        [self syncTextStorageForView];
+    });
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes {
-    _attributes = [NSMutableDictionary dictionaryWithDictionary:attributes];
-    [self syncTextStorageForView];
+    WXPerformBlockOnComponentThread(^{
+        _attributes = [NSMutableDictionary dictionaryWithDictionary:attributes];
+        [self syncTextStorageForView];
+    });
 }
 
 - (void)syncTextStorageForView {
