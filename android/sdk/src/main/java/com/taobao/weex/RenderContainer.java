@@ -27,16 +27,16 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 
+import com.taobao.weex.render.AbstractRenderContainer;
+
 import java.lang.ref.WeakReference;
 
 /**
  * Created by sospartan on 08/10/2016.
  */
 
-public class RenderContainer extends FrameLayout implements WeexFrameRateControl.VSyncListener{
-  private WeakReference<WXSDKInstance> mSDKInstance;
+public class RenderContainer extends AbstractRenderContainer implements WeexFrameRateControl.VSyncListener{
   private WeexFrameRateControl mFrameRateControl;
-  private boolean mHasConsumeEvent = false;
 
   public RenderContainer(Context context) {
     super(context);
@@ -59,9 +59,6 @@ public class RenderContainer extends FrameLayout implements WeexFrameRateControl
     mFrameRateControl = new WeexFrameRateControl(this);
   }
 
-  public void setSDKInstance(WXSDKInstance instance) {
-    mSDKInstance = new WeakReference<>(instance);
-  }
 
   @Override
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -109,13 +106,4 @@ public class RenderContainer extends FrameLayout implements WeexFrameRateControl
     }
   }
 
-  @Override
-  public boolean dispatchTouchEvent(MotionEvent ev) {
-    mHasConsumeEvent = true;
-    return super.dispatchTouchEvent(ev);
-  }
-
-  public boolean hasConsumeEvent(){
-    return mHasConsumeEvent;
-  }
 }

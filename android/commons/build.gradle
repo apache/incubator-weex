@@ -43,6 +43,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':weex_sdk')
+    compile project(':HeronAndroid')
     compile "com.android.support:support-v4:${project.supportLibVersion}"
     compile "com.android.support:appcompat-v7:${project.supportLibVersion}"
     // compile project(':weex_sdk')

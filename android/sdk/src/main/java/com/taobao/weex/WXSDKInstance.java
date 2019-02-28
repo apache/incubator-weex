@@ -39,6 +39,7 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IDrawableLoader;
@@ -67,6 +68,7 @@ import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.render.AbstractRenderContainer;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
@@ -117,7 +119,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private IWXStatisticsListener mStatisticsListener;
   /** package **/ Context mContext;
   private final String mInstanceId;
-  private RenderContainer mRenderContainer;
+  private AbstractRenderContainer mRenderContainer;
   private WXComponent mRootComp;
   private boolean mRendered;
   private WXRefreshData mLastRefreshData;
@@ -311,7 +313,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * be aware do not add it to twice when {@link IWXRenderListener#onViewCreated(WXSDKInstance, View)}.
    * @param a
    */
-  public void setRenderContainer(RenderContainer a){
+  public void setRenderContainer(AbstractRenderContainer a){
     if(a != null) {
       a.setSDKInstance(this);
       a.addOnLayoutChangeListener(this);
@@ -410,10 +412,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private List<OnInstanceVisibleListener> mVisibleListeners = new ArrayList<>();
 
   public WXSDKInstance(Context context) {
-    mInstanceId = WXSDKManager.getInstance().generateInstanceId();
-    init(context);
+       this("", context);
   }
 
+  protected WXSDKInstance(String suffix, Context context) {
+    mInstanceId = WXSDKManager.getInstance().generateInstanceId() + "_" + suffix;
+    init(context);
+  }
   /**
    * For unittest only.
    */
