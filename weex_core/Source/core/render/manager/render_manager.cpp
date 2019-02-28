@@ -173,8 +173,17 @@ bool RenderManager::AddRenderObject(const std::string &page_id,
       return static_cast<RenderPage*>(page)->AddRenderObject(parent_ref, index, child);
   }
   else {
-      // TODO for XRender
-      return false;
+      WsonGenerate(data, parent_ref, index, [=] (const std::string& ref,
+                                                const std::string& type,
+                                                const std::string& parentRef,
+                                                std::map<std::string, std::string>* styles,
+                                                std::map<std::string, std::string>* attrs,
+                                                std::set<std::string>* events,
+                                                int index) {
+          page->AddRenderObject(ref, type, parentRef, index, styles, attrs, events);
+      });
+      
+      return true;
   }
 }
 
