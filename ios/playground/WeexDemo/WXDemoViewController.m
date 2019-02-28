@@ -120,12 +120,42 @@
 
 - (void)render
 {
+    static BOOL useXRenderSelected = YES; // 对首页默认使用native渲染
+    static BOOL useXRenderValue = NO;
+    if (!useXRenderSelected) {
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@""
+                                                                       message:@"Use native or X-render"
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction* nativeAction = [UIAlertAction actionWithTitle:@"Native" style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction * action) {
+                                                                 useXRenderSelected = YES;
+                                                                 [self render];
+                                                             }];
+        UIAlertAction* XAction = [UIAlertAction actionWithTitle:@"X-render" style:UIAlertActionStyleDefault
+                                                        handler:^(UIAlertAction * action) {
+                                                            useXRenderValue = YES;
+                                                            useXRenderSelected = YES;
+                                                            [self render];
+                                                        }];
+        
+        [alert addAction:nativeAction];
+        [alert addAction:XAction];
+        [self presentViewController:alert animated:YES completion:^{
+        }];
+        return;
+    }
+    else {
+        useXRenderSelected = NO;
+    }
+    
+    
     CGFloat width = self.view.frame.size.width;
 //    if ([_url.absoluteString isEqualToString:HOME_URL]) {
 //        [self.navigationController setNavigationBarHidden:YES];
 //    }
     [_instance destroyInstance];
-    _instance = [[WXSDKInstance alloc] init];
+    _instance = useXRenderValue ? [[WXSDKInstance alloc] initWithRenderType:@"xrender"] : [[WXSDKInstance alloc] init];
     if([WXPrerenderManager isTaskExist:[self.url absoluteString]]){
         _instance = [WXPrerenderManager instanceFromUrl:self.url.absoluteString];
     }

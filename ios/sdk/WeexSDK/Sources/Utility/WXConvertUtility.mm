@@ -21,7 +21,7 @@
 #import "WXLog.h"
 #import "WXAssert.h"
 
-NSString* const JSONSTRING_SUFFIX = @"\t\n\t\r";
+static NSString* const JSONSTRING_SUFFIX = @"\t\n\t\r";
 
 NSString* TO_JSON(id object)
 {

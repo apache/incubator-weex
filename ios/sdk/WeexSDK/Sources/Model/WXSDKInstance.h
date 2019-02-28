@@ -30,6 +30,27 @@ extern NSString *const bundleUrlOptionKey;
 @interface WXSDKInstance : NSObject
 
 /**
+ * Init instance and render it using iOS native views.
+ * It is the same as initWithRenderType:@"platform"
+ **/
+- (instancetype)init;
+
+/**
+ * Init instance with custom render type.
+ **/
+- (instancetype)initWithRenderType:(NSString*)renderType;
+
+/**
+ * The render type. Default is "platform"
+ **/
+@property (nonatomic, strong, readonly) NSString* renderType;
+
+/**
+ * Returns YES when self.renderType != "platform"
+ **/
+@property (nonatomic, assign, readonly) BOOL isCustomRenderType;
+
+/**
  * The viewControler which the weex bundle is rendered in.
  **/
 @property (nonatomic, weak) UIViewController *viewController;

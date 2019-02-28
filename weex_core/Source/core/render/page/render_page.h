@@ -26,17 +26,15 @@
 #include <utility>
 #include <vector>
 
+#include "render_page_base.h"
 #include "core/css/constants_value.h"
 
 namespace WeexCore {
 
 class RenderAction;
-
 class RenderObject;
 
-class RenderPerformance;
-
-class RenderPage {
+class RenderPage: public RenderPageBase {
  private:
   void TraverseTree(RenderObject *render, long index);
 
@@ -89,45 +87,34 @@ public:
   bool AddRenderObject(const std::string &parent_ref, int insert_posiotn,
                        RenderObject *child);
 
-  bool RemoveRenderObject(const std::string &ref);
+  virtual bool RemoveRenderObject(const std::string &ref) override;
 
-  bool MoveRenderObject(const std::string &ref, const std::string &parent_ref,
-                        int index);
+  virtual bool MoveRenderObject(const std::string &ref, const std::string &parent_ref, int index) override;
 
-  bool UpdateStyle(const std::string &ref,
-                   std::vector<std::pair<std::string, std::string>> *styles);
+  virtual bool UpdateStyle(const std::string &ref,
+                   std::vector<std::pair<std::string, std::string>> *styles) override;
 
-  bool UpdateAttr(const std::string &ref,
-                  std::vector<std::pair<std::string, std::string>> *attrs);
+  virtual bool UpdateAttr(const std::string &ref,
+                  std::vector<std::pair<std::string, std::string>> *attrs) override;
 
-  void SetDefaultHeightAndWidthIntoRootRender(
+  virtual void SetDefaultHeightAndWidthIntoRootRender(
       const float default_width, const float default_height,
-      const bool is_width_wrap_content, const bool is_height_wrap_content);
+      const bool is_width_wrap_content, const bool is_height_wrap_content) override;
 
-  bool AddEvent(const std::string &ref, const std::string &event);
+  virtual bool AddEvent(const std::string &ref, const std::string &event) override;
 
-  bool RemoveEvent(const std::string &ref, const std::string &event);
+  virtual bool RemoveEvent(const std::string &ref, const std::string &event) override;
 
-  bool CreateFinish();
+  virtual bool CreateFinish() override;
 
   void Batch();
-
-  void CssLayoutTime(const int64_t &time);
-
-  void ParseJsonTime(const int64_t &time);
-
-  void CallBridgeTime(const int64_t &time);
-
-  std::vector<int64_t> PrintFirstScreenLog();
-
-  std::vector<int64_t> PrintRenderSuccessLog();
 
   void LayoutImmediately();
 
   void SendUpdateAttrAction(RenderObject *render,
                             std::map<std::string, std::string> *attrs);
 
-  RenderObject *GetRenderObject(const std::string &ref);
+  virtual RenderObject *GetRenderObject(const std::string &ref) override;
     
   void CallNativeModule(const std::string &module,
                           const std::string &method, const std::string &args, int argc = 0);
@@ -150,10 +137,9 @@ public:
 
   void OnRenderProcessGone();
 
-  void OnRenderPageClose();
+  virtual void OnRenderPageClose() override;
 
  public:
-  inline std::string page_id() { return this->page_id_; }
 
   inline bool is_dirty() { return this->is_dirty_.load(); }
 
@@ -167,15 +153,10 @@ public:
     return this->is_render_container_width_wrap_content_.load();
   }
 
-  inline float viewport_width() const { return this->viewport_width_; }
-
-  inline void set_viewport_width(float viewport_width) {
-    this->viewport_width_ = viewport_width;
-  }
-
-  inline bool round_off_deviation() const { return this->round_off_deviation_; }
-
-  inline void set_round_off_deviation(float round_off_deviation) { this->round_off_deviation_ = round_off_deviation; }
+  virtual float GetViewportWidth() override { return viewport_width_; }
+  virtual void SetViewportWidth(float value) override { viewport_width_ = value; };
+  virtual bool GetRoundOffDeviation() override { return round_off_deviation_; }
+  virtual void SetRoundOffDeviation(bool value) override { round_off_deviation_ = value; }
 
   inline void set_before_layout_needed(bool v) { is_before_layout_needed_.store(v); }
 
@@ -190,10 +171,8 @@ public:
 
  private:
   RenderObject *render_root_ = nullptr;
-  std::string page_id_;
   std::pair<float, float> render_page_size_;
   std::map<std::string, RenderObject *> render_object_registers_;
-  RenderPerformance *render_performance_;
   std::atomic_bool is_dirty_{true};
   std::atomic_bool is_render_container_width_wrap_content_{false};
   std::atomic_bool is_render_container_height_wrap_content_{false};

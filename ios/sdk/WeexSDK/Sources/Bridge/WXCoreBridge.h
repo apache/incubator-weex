@@ -209,6 +209,12 @@ namespace WeexCore
 
 + (void)registerCoreEnv:(NSString*)key withValue:(NSString*)value;
 
+// X-Page relative
+
++ (NSSet<NSString*>*)getAvailableCustomRenderTypes;
+
++ (UIView*)createCustomPageRootView:(NSString*)pageId pageType:(NSString*)pageType frame:(CGRect)frame;
+
 @end
 
 #endif

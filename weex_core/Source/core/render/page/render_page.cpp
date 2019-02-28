@@ -27,7 +27,6 @@
 #include "core/css/constants_value.h"
 #include "core/layout/layout.h"
 #include "core/manager/weex_core_manager.h"
-#include "core/moniter/render_performance.h"
 #include "core/render/action/render_action_add_element.h"
 #include "core/render/action/render_action_add_event.h"
 #include "core/render/action/render_action_appendtree_createfinish.h"
@@ -49,18 +48,15 @@
 namespace WeexCore {
 
 RenderPage::RenderPage(const std::string &page_id)
-    : viewport_width_(0),
+    : RenderPageBase(page_id, "platform"),
+    viewport_width_(0),
       render_root_(nullptr),
-      page_id_(),
       render_page_size_(),
-      render_object_registers_(),
-      render_performance_(nullptr) {
+      render_object_registers_() {
 #if RENDER_LOG
   LOGD("[RenderPage] new RenderPage >>>> pageId: %s", pageId.c_str());
 #endif
 
-  this->page_id_ = page_id;
-  this->render_performance_ = new RenderPerformance();
   this->render_page_size_.first =
       WXCoreEnvironment::getInstance()->DeviceWidth();
   this->render_page_size_.second = NAN;
@@ -77,11 +73,6 @@ RenderPage::~RenderPage() {
   if (this->render_root_ != nullptr) {
     delete this->render_root_;
     this->render_root_ = nullptr;
-  }
-
-  if (this->render_performance_ != nullptr) {
-    delete this->render_performance_;
-    this->render_performance_ = nullptr;
   }
 }
 
@@ -127,6 +118,7 @@ void RenderPage::TraverseTree(RenderObject *render, long index) {
 bool RenderPage::CreateRootRender(RenderObject *root) {
   if (root == nullptr) return false;
 
+  set_is_dirty(true);
   SetRootRenderObject(root);
 
   if (isnan(this->render_root_->getStyleWidth())) {
@@ -169,6 +161,8 @@ bool RenderPage::AddRenderObject(const std::string &parent_ref,
   if (insert_posiotn < -1) {
     return false;
   }
+    
+  set_is_dirty(true);
 
   PushRenderToRegisterMap(child);
   SendAddElementAction(child, parent, insert_posiotn, false);
@@ -188,6 +182,7 @@ bool RenderPage::RemoveRenderObject(const std::string &ref) {
   RenderObject *parent = child->parent_render();
   if (parent == nullptr) return false;
 
+  set_is_dirty(true);
   parent->RemoveRenderObject(child);
 
   RemoveRenderFromRegisterMap(child);
@@ -214,6 +209,7 @@ bool RenderPage::MoveRenderObject(const std::string &ref,
     }
   }
 
+  set_is_dirty(true);
   child->getParent()->removeChild(child);
   new_parent->addChildAt(child, index);
 
@@ -226,6 +222,8 @@ bool RenderPage::UpdateStyle(
     std::vector<std::pair<std::string, std::string>> *src) {
   RenderObject *render = GetRenderObject(ref);
   if (render == nullptr || src == nullptr || src->empty()) return false;
+    
+  set_is_dirty(true);
 
   std::vector<std::pair<std::string, std::string>> *style = nullptr;
   std::vector<std::pair<std::string, std::string>> *margin = nullptr;
@@ -346,6 +344,7 @@ bool RenderPage::UpdateAttr(
   RenderObject *render = GetRenderObject(ref);
   if (render == nullptr || attrs == nullptr || attrs->empty()) return false;
 
+  set_is_dirty(true);
   SendUpdateAttrAction(render, attrs);
 
   for (auto iter = attrs->cbegin(); iter != attrs->cend(); iter++) {
@@ -394,6 +393,7 @@ bool RenderPage::AddEvent(const std::string &ref, const std::string &event) {
   RenderObject *render = GetRenderObject(ref);
   if (render == nullptr) return false;
 
+  set_is_dirty(true);
   render->AddEvent(event);
 
   RenderAction *action = new RenderActionAddEvent(this->page_id_, ref, event);
@@ -405,6 +405,7 @@ bool RenderPage::RemoveEvent(const std::string &ref, const std::string &event) {
   RenderObject *render = GetRenderObject(ref);
   if (render == nullptr) return false;
 
+  set_is_dirty(true);
   render->RemoveEvent(event);
 
   RenderAction *action =
@@ -417,6 +418,8 @@ bool RenderPage::CreateFinish() {
   if (this->render_root_ == nullptr) {
     return false;
   }
+
+  set_is_dirty(true);
   Batch();
   SendCreateFinishAction();
   // RenderSuccess means the Dom created after executing script finishes layout
@@ -608,35 +611,6 @@ void RenderPage::SendRenderSuccessAction() {
 void RenderPage::SendAppendTreeCreateFinish(const std::string &ref) {
   RenderAction *action = new RenderActionAppendTreeCreateFinish(page_id(), ref);
   PostRenderAction(action);
-}
-
-void RenderPage::CssLayoutTime(const int64_t &time) {
-  if (this->render_performance_ != nullptr)
-    this->render_performance_->cssLayoutTime += time;
-}
-
-void RenderPage::ParseJsonTime(const int64_t &time) {
-  if (this->render_performance_ != nullptr)
-    this->render_performance_->parseJsonTime += time;
-}
-
-void RenderPage::CallBridgeTime(const int64_t &time) {
-  if (this->render_performance_ != nullptr)
-    this->render_performance_->callBridgeTime += time;
-}
-
-std::vector<int64_t> RenderPage::PrintFirstScreenLog() {
-  std::vector<int64_t> ret;
-  if (this->render_performance_ != nullptr)
-    ret = this->render_performance_->PrintPerformanceLog(onFirstScreen);
-  return ret;
-}
-
-std::vector<int64_t> RenderPage::PrintRenderSuccessLog() {
-  std::vector<int64_t> ret;
-  if (this->render_performance_ != nullptr)
-    ret = this->render_performance_->PrintPerformanceLog(onRenderSuccess);
-  return ret;
 }
 
 void RenderPage::Batch() {

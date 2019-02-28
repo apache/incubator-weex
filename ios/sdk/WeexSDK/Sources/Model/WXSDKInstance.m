@@ -52,6 +52,7 @@
 #import "WXCoreBridge.h"
 
 #define WEEX_LITE_URL_SUFFIX           @"wlasm"
+#define WEEX_RENDER_TYPE_PLATFORM       @"platform"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -72,7 +73,7 @@ typedef enum : NSUInteger {
     
     WXResourceLoader *_mainBundleLoader;
     WXComponentManager *_componentManager;
-    WXRootView *_rootView;
+    UIView *_rootView;
     WXThreadSafeMutableDictionary *_moduleEventObservers;
     BOOL _performanceCommit;
     BOOL _debugJS;
@@ -89,22 +90,44 @@ typedef enum : NSUInteger {
 
 - (instancetype)init
 {
+    return [self initWithRenderType:WEEX_RENDER_TYPE_PLATFORM];
+}
+
+- (instancetype)initWithRenderType:(NSString*)renderType
+{
     self = [super init];
-    if(self){
+    if (self) {
+        _renderType = renderType;
+        
         NSInteger instanceId = 0;
         @synchronized(bundleUrlOptionKey) {
             static NSInteger __instance = 0;
             instanceId = __instance % (1024*1024);
             __instance++;
         }
-        _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
+        
+        if (self.isCustomRenderType) {
+            // check render type is available
+            NSSet* availableRenderTypes = [WXCoreBridge getAvailableCustomRenderTypes];
+            if ([availableRenderTypes containsObject:_renderType]) {
+                _instanceId = [NSString stringWithFormat:@"%ld_%@", (long)instanceId, _renderType];
+            }
+            else {
+                WXLogError(@"Unsupported render type '%@'. Regress to platform target.", _renderType);
+                _renderType = WEEX_RENDER_TYPE_PLATFORM;
+                _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
+            }
+        }
+        else {
+            _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
+        }
         
         // TODO self is retained here.
         [WXSDKManager storeInstance:self forID:_instanceId];
         
         _bizType = @"";
         _pageName = @"";
-
+        
         _performanceDict = [WXThreadSafeMutableDictionary new];
         _moduleInstances = [WXThreadSafeMutableDictionary new];
         _styleConfigs = [NSMutableDictionary new];
@@ -122,6 +145,11 @@ typedef enum : NSUInteger {
         [self addObservers];
     }
     return self;
+}
+
+- (BOOL)isCustomRenderType
+{
+    return ![_renderType isEqualToString:WEEX_RENDER_TYPE_PLATFORM];
 }
 
 - (id<WXBridgeProtocol>)instanceJavaScriptContext
@@ -310,12 +338,17 @@ typedef enum : NSUInteger {
         dictionary[@"debug"] = @(YES);
     }
 
-    //TODO WXRootView
     WXPerformBlockOnMainThread(^{
-        _rootView = [[WXRootView alloc] initWithFrame:self.frame];
-        _rootView.instance = self;
-        if(self.onCreate) {
-            self.onCreate(_rootView);
+        if (self.isCustomRenderType) {
+            self->_rootView = [WXCoreBridge createCustomPageRootView:self.instanceId pageType:self.renderType frame:self.frame];
+        }
+        else {
+            self->_rootView = [[WXRootView alloc] initWithFrame:self.frame];
+            ((WXRootView*)(self->_rootView)).instance = self;
+        }
+        
+        if (self.onCreate) {
+            self.onCreate(self->_rootView);
         }
     });
     // ensure default modules/components/handlers are ready before create instance
@@ -400,17 +433,22 @@ typedef enum : NSUInteger {
         mainBundleString = [WXDebugTool getReplacedBundleJS];
     }
     
-    //TODO WXRootView
     WXPerformBlockOnMainThread(^{
-        _rootView = [[WXRootView alloc] initWithFrame:self.frame];
-        _rootView.instance = self;
-        if(self.onCreate) {
-            self.onCreate(_rootView);
+        if (self.isCustomRenderType) {
+            self->_rootView = [WXCoreBridge createCustomPageRootView:self.instanceId pageType:self.renderType frame:self.frame];
+        }
+        else {
+            self->_rootView = [[WXRootView alloc] initWithFrame:self.frame];
+            ((WXRootView*)(self->_rootView)).instance = self;
+        }
+        
+        if (self.onCreate) {
+            self.onCreate(self->_rootView);
         }
     });
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
-     [[NSNotificationCenter defaultCenter] postNotificationName:WX_SDKINSTANCE_WILL_RENDER object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:WX_SDKINSTANCE_WILL_RENDER object:self];
     
     _mainBundleString = mainBundleString;
     if ([self _handleConfigCenter]) {

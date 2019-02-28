@@ -27,6 +27,7 @@
 
 namespace WeexCore {
 
+class RenderPageBase;
 class RenderPage;
 class RenderObject;
 
@@ -54,10 +55,13 @@ class RenderManager {
   // create root node
   bool CreatePage(const std::string& page_id, const char *data);
     
-
+  // create platform page
   bool CreatePage(const std::string& page_id, RenderObject *root);
     
   bool CreatePage(const std::string& page_id, std::function<RenderObject* (RenderPage*)> constructRoot);
+    
+  // create custom page with self rendering
+  void CreateCustomPage(const std::string& page_id, const std::string& page_type);
 
   /** use auto constructor is bad idea, it cann't transfer binary, use char* is
    * better */
@@ -100,7 +104,7 @@ class RenderManager {
 
   void CallMetaModule(const char *page_id, const char *method, const char *arguments);
 
-  RenderPage *GetPage(const std::string &page_id);
+  RenderPageBase *GetPage(const std::string &page_id);
 
   bool ClosePage(const std::string &page_id);
 
@@ -120,7 +124,7 @@ class RenderManager {
   }
  private:
   static RenderManager *g_pInstance;
-  std::map<std::string, RenderPage *> pages_;
+  std::map<std::string, RenderPageBase *> pages_;
   std::map<std::string, float> viewports_;
   std::map<std::string, bool> round_off_deviations_;
 };
