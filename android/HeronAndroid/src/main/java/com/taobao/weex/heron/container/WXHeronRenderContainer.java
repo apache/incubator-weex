@@ -7,27 +7,25 @@ import android.util.AttributeSet;
 import android.view.ViewGroup;
 
 import com.taobao.weex.render.AbstractRenderContainer;
-import com.taobao.weex.render.component.WXRenderFrameComponent;
 import com.taobao.weex.render.frame.RenderView;
-import com.taobao.weex.ui.action.BasicComponentData;
 
-public class WXHeroRenderContainer extends AbstractRenderContainer {
+public class WXHeronRenderContainer extends AbstractRenderContainer {
 
     private RenderView mRenderView;
 
-    public WXHeroRenderContainer(@NonNull Context context) {
+    public WXHeronRenderContainer(@NonNull Context context) {
         super(context);
     }
 
-    public WXHeroRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public WXHeronRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public WXHeroRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public WXHeronRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    public WXHeroRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public WXHeronRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
