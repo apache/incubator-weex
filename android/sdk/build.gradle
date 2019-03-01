@@ -160,7 +160,7 @@ android {
                 arguments '-DANDROID_PLATFORM='+"${api_level}",
                         '-DANDROID_TOOLCHAIN='+"${compile_tool}",
                         '-DANDROID_STL='+"${cxx_stl}",
-                        '-DCMAKE_BUILD_TYPE=Release',
+                        '-DCMAKE_BUILD_TYPE=Debug',
                         '-DENABLE_ASAN=false'
             }
         }

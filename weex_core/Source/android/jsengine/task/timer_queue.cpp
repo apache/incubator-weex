@@ -114,7 +114,7 @@ TimerTask *TimerQueue::getTask() {
             threadLocker.unlock();
             continue;
         }
-        assert(!taskQueue_.empty());
+        assert(!timerQueue_.empty());
         TimerTask *header = timerQueue_.front();
         nextTaskWhen = header->when;
         if (microTime() > nextTaskWhen) {

@@ -37,6 +37,15 @@ namespace WeexCore {
 
 RenderManager *RenderManager::g_pInstance = nullptr;
 
+#define HERON_SUFFIX "heron"
+
+static bool isHeronPage(const std::string& page_id){
+    if(page_id.find(HERON_SUFFIX) != std::string::npos){
+        return true;
+    }
+    return false;
+}
+
 bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
     
 #if RENDER_LOG
@@ -45,28 +54,49 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
        pageId.c_str(), parser.toStringUTF8().c_str());
 #endif
 
-  RenderPage *page = new RenderPage(page_id);
-  pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
+  LOGE("RenderManager::CreatePage");
+  if(isHeronPage(page_id)){
+      RenderPageCustom* pageCustom = CreateCustomPage(page_id, HERON_SUFFIX);
+      std::string bodyRef = "";
+      WsonGenerate(data, bodyRef, 0, [=](const std::string& ref,
+                                                const std::string& type,
+                                                const std::string& parentRef,
+                                                std::map<std::string, std::string>* styles,
+                                                std::map<std::string, std::string>* attrs,
+                                                std::set<std::string>* events,
+                                                int index){
+          LOGE("RenderManager::CreatePage");
+          if(bodyRef.empty()){
+              pageCustom->CreateBody(ref, type, styles, attrs, events);
+          }else{
+              pageCustom->AddRenderObject(ref, type, parentRef, index, styles, attrs, events);
+          }
+      });
+      return true;
+  }else{
+      RenderPage *page = new RenderPage(page_id);
+      pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
 
-  std::map<std::string, float>::iterator iter_viewport =
-      this->viewports_.find(page_id);
-  if (iter_viewport != this->viewports_.end()) {
-    page->SetViewportWidth(iter_viewport->second);
-    this->viewports_.erase(page_id);
+      std::map<std::string, float>::iterator iter_viewport =
+              this->viewports_.find(page_id);
+      if (iter_viewport != this->viewports_.end()) {
+          page->SetViewportWidth(iter_viewport->second);
+          this->viewports_.erase(page_id);
+      }
+
+      std::map<std::string, bool>::iterator iter_deviation =
+              this->round_off_deviations_.find(page_id);
+      if (iter_deviation != this->round_off_deviations_.end()) {
+          this->set_round_off_deviation(page_id, iter_deviation->second);
+          this->round_off_deviations_.erase(page_id);
+      }
+
+      int64_t start_time = getCurrentTime();
+      RenderObject *root = Wson2RenderObject(data, page_id);
+      page->ParseJsonTime(getCurrentTime() - start_time);
+
+      return page->CreateRootRender(root);
   }
-
-  std::map<std::string, bool>::iterator iter_deviation =
-      this->round_off_deviations_.find(page_id);
-  if (iter_deviation != this->round_off_deviations_.end()) {
-    this->set_round_off_deviation(page_id, iter_deviation->second);
-    this->round_off_deviations_.erase(page_id);
-  }
-
-  int64_t start_time = getCurrentTime();
-  RenderObject *root = Wson2RenderObject(data, page_id);
-  page->ParseJsonTime(getCurrentTime() - start_time);
-
-  return page->CreateRootRender(root);
 }
 
 bool RenderManager::CreatePage(const std::string& page_id, RenderObject *root) {
@@ -110,8 +140,8 @@ bool RenderManager::CreatePage(const std::string& page_id, std::function<RenderO
     
     return page->CreateRootRender(root);
 }
-    
-void RenderManager::CreateCustomPage(const std::string& page_id, const std::string& page_type) {
+
+RenderPageCustom* RenderManager::CreateCustomPage(const std::string& page_id, const std::string& page_type) {
 #if RENDER_LOG
     LOGD("[RenderManager] CreateCustomPage >>>> pageId: %s, pageType: %s", pageId.c_str(), page_type.c_str());
 #endif
@@ -146,6 +176,7 @@ void RenderManager::CreateCustomPage(const std::string& page_id, const std::stri
     
     RenderPageCustom* page = new RenderPageCustom(page_id, page_type, options);
     this->pages_.insert(std::pair<std::string, RenderPageCustom *>(page_id, page));
+    return page;
 }
 
 bool RenderManager::AddRenderObject(const std::string &page_id,

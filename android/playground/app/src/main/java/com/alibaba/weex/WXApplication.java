@@ -27,6 +27,7 @@ import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.commons.adapter.JSExceptionAdapter;
 import com.alibaba.weex.commons.adapter.PicassoBasedDrawableLoader;
+import com.alibaba.weex.commons.render.PicassoImageAdapter;
 import com.alibaba.weex.extend.adapter.ApmGenerator;
 import com.alibaba.weex.extend.adapter.DefaultAccessibilityRoleAdapter;
 import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
@@ -49,6 +50,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
+import com.taobao.weex.render.sdk.RenderSDK;
 
 public class WXApplication extends Application {
 
@@ -113,6 +115,13 @@ public class WXApplication extends Application {
 
       //Typeface nativeFont = Typeface.createFromAsset(getAssets(), "font/native_font.ttf");
       //WXEnvironment.setGlobalFontFamily("bolezhusun", nativeFont);
+      RenderSDK.getInstance().setApplication(this).setImageAdapter(new PicassoImageAdapter());
+      WXSDKManager.getInstance().getWXBridgeManager().post(new Runnable() {
+        @Override
+        public void run() {
+          RenderSDK.getInstance().init();
+        }
+      });
 
     } catch (WXException e) {
       e.printStackTrace();

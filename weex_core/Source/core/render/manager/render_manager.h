@@ -21,6 +21,7 @@
 
 #include <map>
 #include <string>
+#include <core/render/page/render_page_custom.h>
 
 #include "core/css/constants_value.h"
 #include "core/render/node/render_object.h"
@@ -61,7 +62,7 @@ class RenderManager {
   bool CreatePage(const std::string& page_id, std::function<RenderObject* (RenderPage*)> constructRoot);
     
   // create custom page with self rendering
-  void CreateCustomPage(const std::string& page_id, const std::string& page_type);
+  RenderPageCustom* CreateCustomPage(const std::string& page_id, const std::string& page_type);
 
   /** use auto constructor is bad idea, it cann't transfer binary, use char* is
    * better */

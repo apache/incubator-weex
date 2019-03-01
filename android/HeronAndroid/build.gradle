@@ -1,0 +1,68 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+    }
+}
+
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.3"
+
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
+
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_PLATFORM=android-19',
+                        '-DANDROID_TOOLCHAIN=clang',
+                        '-DANDROID_STL=c++_static',
+                        '-DCMAKE_BUILD_TYPE=Debug',
+                        '-DENABLE_ASAN=false'
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path '../../../XSDK/Heron/CMakeLists.txt'
+        }
+    }
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    provided project(':weex_sdk')
+    compile 'com.android.support:appcompat-v7:26.0.2'
+    testCompile 'junit:junit:4.12'
+    androidTestCompile('com.android.support.test.espresso:espresso-idling-resource:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+}
