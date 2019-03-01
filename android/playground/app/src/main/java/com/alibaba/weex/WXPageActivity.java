@@ -57,6 +57,8 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.heron.container.WXHeronRenderContainer;
+import com.taobao.weex.render.AbstractRenderContainer;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -225,8 +227,16 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       mInstance.destroy();
     }
 
-    RenderContainer renderContainer = new RenderContainer(this);
-    mInstance = new WXSDKInstance(this);
+    AbstractRenderContainer renderContainer = null;
+    String heron = "heron";
+    if(url.contains(heron)){
+      renderContainer = new WXHeronRenderContainer(this);
+      mInstance = new WXSDKInstance(heron,this);
+      ((WXHeronRenderContainer) renderContainer).createInstanceRenderView(mInstance.getInstanceId());
+    }else{
+      renderContainer = new RenderContainer(this);
+      mInstance = new WXSDKInstance(this);
+    }
     mInstance.setRenderContainer(renderContainer);
     mInstance.registerRenderListener(this);
     mInstance.setNestedInstanceInterceptor(this);

@@ -63,7 +63,7 @@ namespace WeexCore {
                                            std::set<std::string>* events) {
         if (target_) {
             auto managedStyles = SharedMove(*styles);
-            auto managedAttrs = SharedMove(*attrs);
+            auto managedAttrs =  SharedMove(*attrs);
             auto managedEvents = SharedMove(*events);
             
             target_->addElement(page_id_, ref, type, parent_ref, index, managedStyles, managedAttrs, managedEvents);

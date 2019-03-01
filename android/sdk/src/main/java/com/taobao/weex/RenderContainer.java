@@ -60,15 +60,6 @@ public class RenderContainer extends AbstractRenderContainer implements WeexFram
   }
 
 
-  @Override
-  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-    super.onSizeChanged(w, h, oldw, oldh);
-    WXSDKInstance instance;
-    if (mSDKInstance != null && (instance = mSDKInstance.get()) != null) {
-      //re-render instance
-      instance.setSize(w, h);
-    }
-  }
 
   @Override
   public void onAttachedToWindow() {

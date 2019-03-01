@@ -54,6 +54,16 @@ public class AbstractRenderContainer extends FrameLayout {
         mSDKInstance = new WeakReference<>(instance);
     }
 
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        WXSDKInstance instance;
+        if (mSDKInstance != null && (instance = mSDKInstance.get()) != null) {
+            //re-render instance
+            instance.setSize(w, h);
+        }
+    }
+
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {

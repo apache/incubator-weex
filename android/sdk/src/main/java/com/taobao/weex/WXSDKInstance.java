@@ -415,8 +415,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
        this("", context);
   }
 
-  protected WXSDKInstance(String suffix, Context context) {
-    mInstanceId = WXSDKManager.getInstance().generateInstanceId() + "_" + suffix;
+  public WXSDKInstance(String renderType, Context context) {
+    mInstanceId = WXSDKManager.getInstance().generateInstanceId() + "_" + renderType;
     init(context);
   }
   /**
