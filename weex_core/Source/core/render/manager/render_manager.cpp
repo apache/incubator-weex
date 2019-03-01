@@ -31,20 +31,12 @@
 #include "core/render/node/render_object.h"
 #include "core/render/page/render_page.h"
 #include "core/render/page/render_page_custom.h"
+#include "core/render/target/render_target.h"
 #include "wson/wson_parser.h"
 
 namespace WeexCore {
 
 RenderManager *RenderManager::g_pInstance = nullptr;
-
-#define HERON_SUFFIX "heron"
-
-static bool isHeronPage(const std::string& page_id){
-    if(page_id.find(HERON_SUFFIX) != std::string::npos){
-        return true;
-    }
-    return false;
-}
 
 bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
     
@@ -55,25 +47,34 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
 #endif
 
   LOGE("RenderManager::CreatePage");
-  if(isHeronPage(page_id)){
-      RenderPageCustom* pageCustom = CreateCustomPage(page_id, HERON_SUFFIX);
-      std::string bodyRef = "";
-      WsonGenerate(data, bodyRef, 0, [=](const std::string& ref,
+    
+  std::string targetName = RenderTargetManager::getRenderTargetName(page_id);
+  if (!targetName.empty()) {
+    if (RenderTargetManager::sharedInstance()->getAvailableTargetNames().count(targetName) == 0) {
+      // cannot find the target, degress
+      targetName = "";
+    }
+  }
+
+  if (!targetName.empty()) {
+      RenderPageCustom* pageCustom = CreateCustomPage(page_id, targetName);
+      WsonGenerate(data, "", 0, [=](const std::string& ref,
                                                 const std::string& type,
                                                 const std::string& parentRef,
                                                 std::map<std::string, std::string>* styles,
                                                 std::map<std::string, std::string>* attrs,
                                                 std::set<std::string>* events,
-                                                int index){
-          LOGE("RenderManager::CreatePage");
-          if(bodyRef.empty()){
+                                                int index) {
+          if (ref.empty()) {
               pageCustom->CreateBody(ref, type, styles, attrs, events);
-          }else{
+          }
+          else {
               pageCustom->AddRenderObject(ref, type, parentRef, index, styles, attrs, events);
           }
       });
       return true;
-  }else{
+  }
+  else {
       RenderPage *page = new RenderPage(page_id);
       pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
 

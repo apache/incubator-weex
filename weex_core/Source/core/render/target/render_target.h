@@ -91,6 +91,8 @@ namespace WeexCore {
     public:
         static RenderTargetManager* sharedInstance();
         
+        static std::string getRenderTargetName(const std::string& page);
+        
         void registerRenderTarget(RenderTarget* target);
         
         RenderTarget* getRenderTarget(const std::string& type);

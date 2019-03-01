@@ -21,7 +21,6 @@
 
 #include <map>
 #include <string>
-#include <core/render/page/render_page_custom.h>
 
 #include "core/css/constants_value.h"
 #include "core/render/node/render_object.h"
@@ -29,6 +28,7 @@
 namespace WeexCore {
 
 class RenderPageBase;
+class RenderPageCustom;
 class RenderPage;
 class RenderObject;
 

@@ -26,6 +26,16 @@ namespace WeexCore {
         return instance;
     };
     
+    std::string RenderTargetManager::getRenderTargetName(const std::string& page) {
+        auto pos = page.find_first_of('_');
+        if (pos == std::string::npos) {
+            return "";
+        }
+        else {
+            return std::string(page, pos + 1);
+        }
+    }
+    
     void RenderTargetManager::registerRenderTarget(RenderTarget* target) {
         if (target) {
             targets_.push_back(target);
