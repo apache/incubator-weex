@@ -56,6 +56,7 @@
 #import "WXJSExceptionInfo.h"
 #import "WXIndicatorComponent.h"
 #import "WXImgLoaderProtocol.h"
+#import "WXHandlerFactory.h"
 #import "WXExtendCallNativeProtocol.h"
 #import "WXExceptionUtils.h"
 #import "WXEventModuleProtocol.h"
