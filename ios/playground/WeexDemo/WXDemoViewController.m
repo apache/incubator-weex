@@ -124,7 +124,7 @@
     static BOOL useXRenderValue = NO;
     if (!useXRenderSelected) {
         UIAlertController* alert = [UIAlertController alertControllerWithTitle:@""
-                                                                       message:@"Use native or X-render"
+                                                                       message:@"Use native or Heron"
                                                                 preferredStyle:UIAlertControllerStyleAlert];
         
         UIAlertAction* nativeAction = [UIAlertAction actionWithTitle:@"Native" style:UIAlertActionStyleDefault
@@ -132,7 +132,7 @@
                                                                  useXRenderSelected = YES;
                                                                  [self render];
                                                              }];
-        UIAlertAction* XAction = [UIAlertAction actionWithTitle:@"X-render" style:UIAlertActionStyleDefault
+        UIAlertAction* XAction = [UIAlertAction actionWithTitle:@"Heron" style:UIAlertActionStyleDefault
                                                         handler:^(UIAlertAction * action) {
                                                             useXRenderValue = YES;
                                                             useXRenderSelected = YES;
@@ -155,7 +155,7 @@
 //        [self.navigationController setNavigationBarHidden:YES];
 //    }
     [_instance destroyInstance];
-    _instance = useXRenderValue ? [[WXSDKInstance alloc] initWithRenderType:@"xrender"] : [[WXSDKInstance alloc] init];
+    _instance = useXRenderValue ? [[WXSDKInstance alloc] initWithRenderType:@"heron"] : [[WXSDKInstance alloc] init];
     if([WXPrerenderManager isTaskExist:[self.url absoluteString]]){
         _instance = [WXPrerenderManager instanceFromUrl:self.url.absoluteString];
     }
