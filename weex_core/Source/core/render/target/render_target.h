@@ -25,82 +25,84 @@
 #include <set>
 
 namespace WeexCore {
-    
-    class RenderTarget {
+
+#define WEEX_EXPORT __attribute__((visibility("default")))
+
+    class WEEX_EXPORT RenderTarget {
     public:
-        struct PageOptions {
+        struct WEEX_EXPORT PageOptions {
             bool is_round_off = false;
             float viewport_width = -1;
             float view_scale = 1;
         };
-        
+
     public:
         RenderTarget(const std::string& type): type_(type) {}
-        
+
         const std::string& type() { return type_; }
-        
+
     public:
         // APIs that should be implemented by sub class
         virtual void createPage(const std::string& page, const PageOptions& options) = 0;
-        
+
         virtual void deletePage(const std::string& page) = 0;
-        
+
         virtual void createBody(const std::string& page, const std::string& ref, const std::string& type,
                                 std::shared_ptr<std::map<std::string, std::string>> styles,
                                 std::shared_ptr<std::map<std::string, std::string>> attrs,
                                 std::shared_ptr<std::set<std::string>> events) = 0;
-        
+
         virtual void addElement(const std::string& page, const std::string& ref, const std::string& type,
                                 const std::string &parent_ref, int index,
                                 std::shared_ptr<std::map<std::string, std::string>> styles,
                                 std::shared_ptr<std::map<std::string, std::string>> attrs,
                                 std::shared_ptr<std::set<std::string>> events) = 0;
-        
+
         virtual void removeElement(const std::string& page, const std::string &ref) = 0;
-        
+
         virtual void moveElement(const std::string& page, const std::string &ref, const std::string &parent_ref, int index) = 0;
-        
+
         virtual void updateStyles(const std::string& page, const std::string &ref, std::shared_ptr<std::map<std::string, std::string>> styles) = 0;
-        
+
         virtual void updateAttributes(const std::string& page, const std::string &ref, std::shared_ptr<std::map<std::string, std::string>> attrs) = 0;
-        
+
         virtual void addEvent(const std::string& page, const std::string &ref, const std::string &event) = 0;
-        
+
         virtual void removeEvent(const std::string& page, const std::string &ref, const std::string &event) = 0;
-        
+
         virtual void createFinish(const std::string& page) = 0;
-        
+
         // Life cycle
         virtual uintptr_t createRootView(const std::string& page, float x, float y, float width, float height) = 0;
-        
-//        virtual void SetDefaultHeightAndWidthIntoRootRender(const float default_width, const float default_height,
-//                                                            const bool is_width_wrap_content, const bool is_height_wrap_content) = 0;
-//
-//        virtual void OnRenderPageClose() = 0;
-//
-//        virtual float GetViewportWidth() = 0;
-//        virtual void SetViewportWidth(float value) = 0;
-//        virtual bool GetRoundOffDeviation() = 0;
-//        virtual void SetRoundOffDeviation(bool value) = 0;
-        
+
+        //        virtual void SetDefaultHeightAndWidthIntoRootRender(const float default_width, const float default_height,
+        //                                                            const bool is_width_wrap_content, const bool is_height_wrap_content) = 0;
+        //
+        //        virtual void OnRenderPageClose() = 0;
+        //
+        //        virtual float GetViewportWidth() = 0;
+        //        virtual void SetViewportWidth(float value) = 0;
+        //        virtual bool GetRoundOffDeviation() = 0;
+        //        virtual void SetRoundOffDeviation(bool value) = 0;
+
     protected:
         std::string type_;
     };
-    
-    class RenderTargetManager {
+
+    class WEEX_EXPORT RenderTargetManager {
     public:
-        static RenderTargetManager* sharedInstance();
+        WEEX_EXPORT static RenderTargetManager* sharedInstance();
         
-        static std::string getRenderTargetName(const std::string& page);
-        
-        void registerRenderTarget(RenderTarget* target);
-        
-        RenderTarget* getRenderTarget(const std::string& type);
-        
-        std::set<std::string> getAvailableTargetNames();
-        
+        WEEX_EXPORT static std::string getRenderTargetName(const std::string& page);
+
+        WEEX_EXPORT void registerRenderTarget(RenderTarget* target);
+
+        WEEX_EXPORT RenderTarget* getRenderTarget(const std::string& type);
+
+        WEEX_EXPORT std::set<std::string> getAvailableTargetNames();
+
     private:
         std::vector<RenderTarget*> targets_;
     };
-    
+
 }  // namespace WeexCore
