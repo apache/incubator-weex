@@ -89,33 +89,13 @@ namespace WeexCore {
     
     class RenderTargetManager {
     public:
-        static RenderTargetManager* sharedInstance() {
-            static RenderTargetManager* instance = new RenderTargetManager();
-            return instance;
-        };
+        static RenderTargetManager* sharedInstance();
         
-        void registerRenderTarget(RenderTarget* target) {
-            if (target) {
-                targets_.push_back(target);
-            }
-        }
+        void registerRenderTarget(RenderTarget* target);
         
-        RenderTarget* getRenderTarget(const std::string& type) {
-            for (auto t : targets_) {
-                if (t->type() == type) {
-                    return t;
-                }
-            }
-            return nullptr;
-        }
+        RenderTarget* getRenderTarget(const std::string& type);
         
-        std::set<std::string> getAvailableTargetNames() {
-            std::set<std::string> result;
-            for (auto t : targets_) {
-                result.insert(t->type());
-            }
-            return result;
-        }
+        std::set<std::string> getAvailableTargetNames();
         
     private:
         std::vector<RenderTarget*> targets_;

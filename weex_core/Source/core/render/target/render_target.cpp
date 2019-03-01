@@ -21,4 +21,32 @@
 
 namespace WeexCore {
     
+    RenderTargetManager* RenderTargetManager::sharedInstance() {
+        static RenderTargetManager* instance = new RenderTargetManager();
+        return instance;
+    };
+    
+    void RenderTargetManager::registerRenderTarget(RenderTarget* target) {
+        if (target) {
+            targets_.push_back(target);
+        }
+    }
+    
+    RenderTarget* RenderTargetManager::getRenderTarget(const std::string& type) {
+        for (auto t : targets_) {
+            if (t->type() == type) {
+                return t;
+            }
+        }
+        return nullptr;
+    }
+    
+    std::set<std::string> RenderTargetManager::getAvailableTargetNames() {
+        std::set<std::string> result;
+        for (auto t : targets_) {
+            result.insert(t->type());
+        }
+        return result;
+    }
+    
 }
