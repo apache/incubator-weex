@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -44,10 +46,44 @@ import com.taobao.weex.performance.WXInstanceApm;
 
 public class WXExceptionUtils {
 
+    private static Set<String> sGlobalExceptionRecord = new CopyOnWriteArraySet<String>();
+
 	/**
 	 * degradeUrl for degrade case
 	 */
 	public static String degradeUrl = "BundleUrlDefaultDegradeUrl";
+
+	private static boolean checkNeedReportCauseDup(String instanceId,String exception){
+
+        if (TextUtils.isEmpty(exception)){
+            return false;
+        }
+        if (TextUtils.isEmpty(instanceId)){
+            instanceId = "instanceIdNull";
+        }
+
+        String targetException = exception.length() > 200 ?exception.substring(0,200) : exception;
+        Set<String> recordExceptionHistory= null;
+
+        WXSDKInstance instance =  WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
+        if (null == instance){
+            recordExceptionHistory = sGlobalExceptionRecord;
+        }else {
+            recordExceptionHistory =  instance.getApmForInstance().exceptionRecord;
+        }
+
+        if (null == recordExceptionHistory){
+            return true;
+        }
+
+        if (recordExceptionHistory.contains(targetException)){
+            return false;
+        }
+        recordExceptionHistory.add(targetException);
+        return true;
+    }
+
+
 
 
 	/**
@@ -63,6 +99,16 @@ public class WXExceptionUtils {
 												 @Nullable final String function,
 												 @Nullable final String exception,
 												 @Nullable final Map<String,String> extParams ) {
+
+        try {
+            if (!checkNeedReportCauseDup(instanceId,exception)){
+                return;
+            }
+        }catch (Throwable e){
+            e.printStackTrace();
+        }
+
+
 		commitCriticalExceptionWithDefaultUrl(
 		    "BundleUrlDefault",
             instanceId,
