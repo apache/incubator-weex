@@ -119,7 +119,12 @@ public class WXApplication extends Application {
       WXSDKManager.getInstance().getWXBridgeManager().post(new Runnable() {
         @Override
         public void run() {
-          RenderSDK.getInstance().init();
+          WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              RenderSDK.getInstance().init();
+            }
+          });
         }
       });
 

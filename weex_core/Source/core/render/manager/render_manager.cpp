@@ -65,7 +65,7 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
                                                 std::map<std::string, std::string>* attrs,
                                                 std::set<std::string>* events,
                                                 int index) {
-          if (ref.empty()) {
+          if (parentRef.empty()) {
               pageCustom->CreateBody(ref, type, styles, attrs, events);
           }
           else {

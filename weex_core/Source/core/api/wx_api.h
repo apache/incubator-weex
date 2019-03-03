@@ -16,41 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "bmalloc.h"
+//
+// Created by furture on 2019/3/3.
+//
+
+#ifndef WEEX_PROJECT_WXAPI_H
+#define WEEX_PROJECT_WXAPI_H
+
+
 
 #define WX_EXPORT __attribute__((visibility("default")))
 
-extern "C" {
 
-WX_EXPORT void* mbmalloc(size_t);
-WX_EXPORT void* mbmemalign(size_t, size_t);
-WX_EXPORT void mbfree(void*, size_t);
-WX_EXPORT void* mbrealloc(void*, size_t, size_t);
-WX_EXPORT void mbscavenge();
-    
-void* mbmalloc(size_t size)
-{
-    return bmalloc::api::malloc(size);
-}
-
-void* mbmemalign(size_t alignment, size_t size)
-{
-    return bmalloc::api::memalign(alignment, size);
-}
-
-void mbfree(void* p, size_t)
-{
-    bmalloc::api::free(p);
-}
-
-void* mbrealloc(void* p, size_t, size_t size)
-{
-    return bmalloc::api::realloc(p, size);
-}
-
-void mbscavenge()
-{
-    bmalloc::api::scavenge();
-}
-
-} // extern "C"
+#endif //WEEX_PROJECT_WXAPI_H

@@ -221,7 +221,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   }
 
   private void loadWXfromService(final String url) {
-    mProgressBar.setVisibility(View.VISIBLE);
+    //mProgressBar.setVisibility(View.VISIBLE);
 
     if (mInstance != null) {
       mInstance.destroy();

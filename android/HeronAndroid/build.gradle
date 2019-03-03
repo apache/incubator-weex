@@ -35,8 +35,7 @@ android {
                 arguments '-DANDROID_PLATFORM=android-19',
                         '-DANDROID_TOOLCHAIN=clang',
                         '-DANDROID_STL=c++_static',
-                        '-DCMAKE_BUILD_TYPE=Debug',
-                        '-DENABLE_ASAN=false'
+                        '-DCMAKE_BUILD_TYPE=Debug'
             }
         }
     }
