@@ -96,6 +96,8 @@ namespace WeexCore {
 
         WX_EXPORT RenderTarget* getRenderTarget(const std::string& type);
 
+        WX_EXPORT static std::string getRenderTargetName(const std::string& page);
+
         WX_EXPORT std::set<std::string> getAvailableTargetNames();
 
     private:
