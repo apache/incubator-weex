@@ -16,16 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-//
-// Created by furture on 2019/3/3.
-//
 
-#ifndef WEEX_PROJECT_WXAPI_H
-#define WEEX_PROJECT_WXAPI_H
-
-
+#pragma once
 
 #define WX_EXPORT __attribute__((visibility("default")))
-
-
-#endif //WEEX_PROJECT_WXAPI_H
