@@ -18,7 +18,7 @@
  */
 #ifndef WEEX_PROJECT_WXCOREENVIRONMENT_H
 #define WEEX_PROJECT_WXCOREENVIRONMENT_H
-#include <core/api/wx_api.h>
+#include "core/api/wx_api.h"
 #include <string>
 #include <map>
 
