@@ -46,7 +46,7 @@ public class PicassoImageAdapter extends FrameImageAdapter {
             public void run() {
                 RequestCreator requestCreator = Picasso.with(RenderSDK.getInstance().getApplication()).load(Uri.parse(imageUrl));
                 if(width > 0 && height > 0){
-                    requestCreator.resize(width, height);
+                    requestCreator.resize(width, height).onlyScaleDown();
                 }
                 requestCreator.into(requestTarget);
             }
