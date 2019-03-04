@@ -46,7 +46,6 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
        pageId.c_str(), parser.toStringUTF8().c_str());
 #endif
 
-  LOGE("RenderManager::CreatePage");
     
   std::string targetName = RenderTargetManager::getRenderTargetName(page_id);
   if (!targetName.empty()) {

@@ -224,8 +224,10 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     //mProgressBar.setVisibility(View.VISIBLE);
 
     if (mInstance != null) {
-      mInstance.destroy();
+       mInstance.destroy();
+       mContainer.removeAllViews();
     }
+
 
     AbstractRenderContainer renderContainer = null;
     String heron = "heron";

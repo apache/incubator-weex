@@ -30,14 +30,12 @@ namespace WeexCore {
 
     RenderPageCustom::RenderPageCustom(const std::string& page_id, const std::string& page_type, const PageOptions& options): RenderPageBase(page_id, page_type) {
         target_ = RenderTargetManager::sharedInstance()->getRenderTarget(page_type);
-        LOGE("RenderManager::CreatePage Target %p ", target_);
         if (target_) {
             RenderTarget::PageOptions targetOptions;
             targetOptions.view_scale = options.view_scale;
             targetOptions.is_round_off = options.is_round_off;
             targetOptions.viewport_width = options.viewport_width;
-            target_->createPage(page_id, targetOptions);
-            LOGE("RenderManager::CreatePage Target comine %p ", target_);
+            target_->createPage(page_id, targetOptions);;
 
         }
     }
@@ -50,9 +48,6 @@ namespace WeexCore {
             auto managedStyles = SharedMove(*styles);
             auto managedAttrs = SharedMove(*attrs);
             auto managedEvents = SharedMove(*events);
-
-            LOGE("RenderManager::CreatePage Target createBody %p %s", target_,
-                 page_id_.data(), ref.data());
             target_->createBody(page_id_, ref, type, managedStyles, managedAttrs, managedEvents);
             delete styles;
             delete attrs;
@@ -70,9 +65,6 @@ namespace WeexCore {
             auto managedStyles = SharedMove(*styles);
             auto managedAttrs =  SharedMove(*attrs);
             auto managedEvents = SharedMove(*events);
-            LOGE("RenderManager::CreatePage Target AddRenderObject %p %s ", target_,
-                 page_id_.data());
-
             target_->addElement(page_id_, ref, type, parent_ref, index, managedStyles, managedAttrs, managedEvents);
             delete styles;
             delete attrs;
