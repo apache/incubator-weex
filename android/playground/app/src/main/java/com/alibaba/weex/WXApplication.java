@@ -21,6 +21,7 @@ package com.alibaba.weex;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.alibaba.android.bindingx.plugin.weex.BindingX;
 import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
@@ -48,9 +49,9 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
-import com.taobao.weex.heron.picasso.PicassoImageAdapter;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
-import com.taobao.weex.render.sdk.RenderSDK;
+
+import java.lang.reflect.Method;
 
 public class WXApplication extends Application {
 
@@ -115,18 +116,8 @@ public class WXApplication extends Application {
 
       //Typeface nativeFont = Typeface.createFromAsset(getAssets(), "font/native_font.ttf");
       //WXEnvironment.setGlobalFontFamily("bolezhusun", nativeFont);
-      RenderSDK.getInstance().setApplication(this).setImageAdapter(new PicassoImageAdapter());
-      WXSDKManager.getInstance().getWXBridgeManager().post(new Runnable() {
-        @Override
-        public void run() {
-          WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              RenderSDK.getInstance().init();
-            }
-          });
-        }
-      });
+
+      startHeron();
 
     } catch (WXException e) {
       e.printStackTrace();
@@ -194,6 +185,18 @@ public class WXApplication extends Application {
       WXEnvironment.sDebugServerConnectable = connectable;
       WXEnvironment.sRemoteDebugMode = debuggable;
       WXEnvironment.sRemoteDebugProxyUrl = "ws://" + host + ":8088/debugProxy/native";
+    }
+  }
+
+  private void startHeron(){
+    try{
+        Class<?> heronInitClass = getClassLoader().loadClass("com/taobao/weex/heron/picasso/RenderPicassoInit");
+        Method method = heronInitClass.getMethod("initApplication", Application.class);
+        method.setAccessible(true);
+        method.invoke(null,this);
+        Log.e("Weex", "Weex Heron Init Success");
+     }catch (Exception e){
+        Log.e("Weex", "Weex Heron Init Error", e);
     }
   }
 
