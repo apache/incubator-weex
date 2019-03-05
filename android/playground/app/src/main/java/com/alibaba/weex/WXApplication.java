@@ -27,7 +27,6 @@ import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.commons.adapter.JSExceptionAdapter;
 import com.alibaba.weex.commons.adapter.PicassoBasedDrawableLoader;
-import com.alibaba.weex.commons.render.PicassoImageAdapter;
 import com.alibaba.weex.extend.adapter.ApmGenerator;
 import com.alibaba.weex.extend.adapter.DefaultAccessibilityRoleAdapter;
 import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
@@ -49,6 +48,7 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
+import com.taobao.weex.heron.picasso.PicassoImageAdapter;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.render.sdk.RenderSDK;
 
