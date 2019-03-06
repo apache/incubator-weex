@@ -66,6 +66,7 @@ import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -232,10 +233,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     AbstractRenderContainer renderContainer = null;
     String heron = "heron";
     if(url.contains(heron)){
-      renderContainer = new WXHeronRenderContainer(this);
       mInstance = new WXSDKInstance(heron,this);
-      ((WXHeronRenderContainer) renderContainer).createInstanceRenderView(mInstance.getInstanceId());
-    }else{
+      renderContainer = getHeronContainer(mInstance);
+      if(renderContainer == null){
+          mInstance.destroy();
+      }
+    }
+    if(renderContainer == null){
       renderContainer = new RenderContainer(this);
       mInstance = new WXSDKInstance(this);
     }
@@ -279,6 +283,21 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
     WXHttpManager.getInstance().sendRequest(httpTask);
   }
+
+
+  private AbstractRenderContainer getHeronContainer(WXSDKInstance instance){
+    try{
+      Class containerClass =  getClassLoader().loadClass("com.taobao.weex.heron.container.WXHeronRenderContainer");
+      Constructor constructor = containerClass.getConstructor(Context.class);
+      AbstractRenderContainer container = (AbstractRenderContainer) constructor.newInstance(this);
+      container.createInstanceRenderView(instance.getInstanceId());
+      return container;
+    }catch (Exception e){
+      Log.e("Weex", "getHeronContainer Error Use Native Container", e);
+      return null;
+    }
+  }
+
 
   /**
    * hot refresh

@@ -74,4 +74,8 @@ public class AbstractRenderContainer extends FrameLayout {
     public boolean hasConsumeEvent(){
         return mHasConsumeEvent;
     }
+
+    public void createInstanceRenderView(String instanceId){
+
+    }
 }
