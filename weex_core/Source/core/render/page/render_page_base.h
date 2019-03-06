@@ -24,7 +24,7 @@
 #include <set>
 #include <vector>
 
-#include "include/WeexApiHeader.h"
+#include "include/WeexApiValue.h"
 
 namespace WeexCore {
     

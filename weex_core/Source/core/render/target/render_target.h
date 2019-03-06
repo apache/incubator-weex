@@ -19,7 +19,7 @@
 
 #pragma once
 #include "../../api/wx_api.h"
-#include "../../../include/WeexApiHeader.h"
+#include "../../../include/WeexApiValue.h"
 #include <string>
 #include <vector>
 #include <map>
