@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "stdlib.h"
+
 struct WeexString {
     uint32_t length;
     uint16_t content[1];
