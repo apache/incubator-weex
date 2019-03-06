@@ -386,7 +386,7 @@
 		B8394F3821468AF100CA1EFF /* render_action_trigger_vsync.h in Headers */ = {isa = PBXBuildFile; fileRef = B8394F3521468AF100CA1EFF /* render_action_trigger_vsync.h */; };
 		B8394F3921468AF100CA1EFF /* render_action_trigger_vsync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8394F3621468AF100CA1EFF /* render_action_trigger_vsync.cpp */; };
 		B8394F3A21468AF100CA1EFF /* render_action_trigger_vsync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8394F3621468AF100CA1EFF /* render_action_trigger_vsync.cpp */; };
-		B85ED3032126715100EBEC11 /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; };
+		B85ED3032126715100EBEC11 /* WXRecyclerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 745B2D601E5A8E1E0092D38A /* WXRecyclerComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B863DF322107308000EA887D /* WXBridgeContext.m in Sources */ = {isa = PBXBuildFile; fileRef = B863DF312107307F00EA887D /* WXBridgeContext.m */; };
 		B863DF332107313400EA887D /* WXBridgeContext.m in Sources */ = {isa = PBXBuildFile; fileRef = B863DF312107307F00EA887D /* WXBridgeContext.m */; };
 		B87B9E7D21539B3300B6DC61 /* WXVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = B87B9E7B21539B3300B6DC61 /* WXVersion.h */; };
@@ -2968,11 +2968,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCA4461D1EFA5AAA00D0CFA8 /* WXHandlerFactory.h in Headers */,
+				B85ED3032126715100EBEC11 /* WXRecyclerComponent.h in Headers */,
 				7715EB6321A69DD9001F1108 /* WXRichText.h in Headers */,
 				B8D66C1C21255730003960BD /* style.h in Headers */,
 				B8D66C2421255730003960BD /* layout.h in Headers */,
 				B8D66C2621255730003960BD /* flex_enum.h in Headers */,
-				B85ED3032126715100EBEC11 /* WXRecyclerComponent.h in Headers */,
 				DCA445D21EFA594600D0CFA8 /* WXComponent+Display.h in Headers */,
 				DCA445A81EFA572B00D0CFA8 /* WXResourceResponse.h in Headers */,
 				DCA445BC1EFA57B000D0CFA8 /* WXConvert.h in Headers */,
