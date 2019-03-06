@@ -24,6 +24,8 @@
 #include <set>
 #include <vector>
 
+#include "include/WeexApiHeader.h"
+
 namespace WeexCore {
     
 class RenderObject;
@@ -63,6 +65,10 @@ public:
     virtual bool RemoveEvent(const std::string &ref, const std::string &event) = 0;
     
     virtual bool CreateFinish() = 0;
+    
+    virtual std::unique_ptr<ValueWithType> CallNativeModule(const char *module, const char *method,
+                                                            const char *arguments, int arguments_length, const char *options,
+                                                            int options_length);
     
     // Performance
     void CssLayoutTime(const int64_t &time);

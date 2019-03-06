@@ -19,6 +19,7 @@
 
 #include "render_page_base.h"
 #include "core/moniter/render_performance.h"
+#include "core/manager/weex_core_manager.h"
 
 namespace WeexCore {
 
@@ -61,6 +62,16 @@ namespace WeexCore {
         if (this->render_performance_ != nullptr)
             ret = this->render_performance_->PrintPerformanceLog(onRenderSuccess);
         return ret;
+    }
+    
+    std::unique_ptr<ValueWithType>
+    RenderPageBase::CallNativeModule(const char *module, const char *method,
+                                     const char *arguments, int arguments_length, const char *options,
+                                     int options_length) {
+        return WeexCoreManager::Instance()->
+        getPlatformBridge()->
+        platform_side()->
+        CallNativeModule(page_id_.c_str(), module, method, arguments, arguments_length, options, options_length);
     }
     
 }

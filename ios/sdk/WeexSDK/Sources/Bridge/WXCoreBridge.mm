@@ -37,6 +37,7 @@
 #include "core/render/manager/render_manager.h"
 #include "core/render/target/render_target.h"
 #include "core/render/page/render_page.h"
+#include "core/render/page/render_page_custom.h"
 #include "core/render/node/render_object.h"
 #include "core/render/node/render_list.h"
 #include "core/render/node/factory/render_type.h"
@@ -1216,6 +1217,46 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         return (__bridge UIView*)((void*)(target->createRootView([pageId UTF8String]?:"", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height)));
     }
     return nil;
+}
+
++ (BOOL)forwardCallNativeModuleToCustomPage:(NSString*)pageId
+                                 moduleName:(NSString*)moduleName methodName:(NSString*)methodName
+                                  arguments:(NSArray*)arguments options:(NSDictionary*)options {
+    using namespace WeexCore;
+    
+    // Temporarily before iOS adapt to JSEngine, we intercept here for custom render page
+    if ([pageId containsString:@"_"]) {
+        RenderPageCustom *page = (RenderPageCustom*)RenderManager::GetInstance()->GetPage([pageId UTF8String] ?: "");
+        if (page) {
+            RenderTarget* target = page->GetRenderTarget();
+            if (target && target->shouldHandleModuleMethod([moduleName UTF8String] ?: "", [methodName UTF8String] ?: "")) {
+                __block const char* seralizedArguments = nullptr;
+                __block const char* seralizedOptions = nullptr;
+                ConvertToCString(arguments, ^(const char * value) {
+                    if (value != nullptr) {
+                        seralizedArguments = strdup(value);
+                    }
+                });
+                ConvertToCString(options, ^(const char * value) {
+                    if (value != nullptr) {
+                        seralizedOptions = strdup(value);
+                    }
+                });
+                
+                target->callNativeModule([pageId UTF8String] ?: "", [moduleName UTF8String] ?: "", [methodName UTF8String] ?: "", seralizedArguments ?: "", (int)[arguments count], seralizedOptions ?: "", (int)[options count]);
+                
+                if (seralizedArguments) {
+                    free((void*)seralizedArguments);
+                }
+                if (seralizedOptions) {
+                    free((void*)seralizedOptions);
+                }
+                
+                return YES;
+            }
+        }
+    }
+    return NO;
 }
 
 @end

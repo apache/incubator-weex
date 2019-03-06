@@ -24,6 +24,7 @@
 
 #include "core/css/constants_value.h"
 #include "core/render/node/render_object.h"
+#include "include/WeexApiHeader.h"
 
 namespace WeexCore {
 
@@ -98,10 +99,10 @@ class RenderManager {
                    const std::string &event);
 
   bool CreateFinish(const std::string &page_id);
-  void CallNativeModule(const std::string &page_id, const std::string &module, const std::string &method, const std::string &args, int argc = 0);
-  void CallNativeModule(const char *page_id, const char *module, const char *method,
-                        const char *arguments, int arguments_length, const char *options,
-                        int options_length);
+
+  std::unique_ptr<ValueWithType> CallNativeModule(const char *page_id, const char *module, const char *method,
+                                                  const char *arguments, int arguments_length, const char *options,
+                                                  int options_length);
 
   void CallMetaModule(const char *page_id, const char *method, const char *arguments);
 

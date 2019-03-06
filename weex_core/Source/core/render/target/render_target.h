@@ -19,6 +19,7 @@
 
 #pragma once
 #include "../../api/wx_api.h"
+#include "../../../include/WeexApiHeader.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -70,6 +71,16 @@ namespace WeexCore {
         virtual void removeEvent(const std::string& page, const std::string &ref, const std::string &event) = 0;
 
         virtual void createFinish(const std::string& page) = 0;
+        
+        virtual bool shouldHandleModuleMethod(const std::string& module, const std::string& method) = 0;
+        
+        virtual std::unique_ptr<ValueWithType> callNativeModule(const std::string& page,
+                                                                const std::string& module,
+                                                                const std::string& method,
+                                                                const std::string& arguments,
+                                                                int nArguments,
+                                                                const std::string& options,
+                                                                int nOptions) = 0;
 
         // Life cycle
         virtual uintptr_t createRootView(const std::string& page, float x, float y, float width, float height) = 0;
@@ -91,12 +102,12 @@ namespace WeexCore {
     class WX_EXPORT RenderTargetManager {
     public:
         WX_EXPORT static RenderTargetManager* sharedInstance();
+        
+        WX_EXPORT static std::string getRenderTargetName(const std::string& page);
 
         WX_EXPORT void registerRenderTarget(RenderTarget* target);
 
         WX_EXPORT RenderTarget* getRenderTarget(const std::string& type);
-
-        WX_EXPORT static std::string getRenderTargetName(const std::string& page);
 
         WX_EXPORT std::set<std::string> getAvailableTargetNames();
 

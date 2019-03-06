@@ -19,7 +19,6 @@
 
 #include "base/log_defines.h"
 #include "render_page_custom.h"
-#include "core/render/target/render_target.h"
 
 namespace WeexCore {
     
@@ -36,7 +35,6 @@ namespace WeexCore {
             targetOptions.is_round_off = options.is_round_off;
             targetOptions.viewport_width = options.viewport_width;
             target_->createPage(page_id, targetOptions);;
-
         }
     }
     
@@ -49,10 +47,10 @@ namespace WeexCore {
             auto managedAttrs = SharedMove(*attrs);
             auto managedEvents = SharedMove(*events);
             target_->createBody(page_id_, ref, type, managedStyles, managedAttrs, managedEvents);
-            delete styles;
-            delete attrs;
-            delete events;
         }
+        delete styles;
+        delete attrs;
+        delete events;
         return true;
     }
     
@@ -63,13 +61,13 @@ namespace WeexCore {
                                            std::set<std::string>* events) {
         if (target_) {
             auto managedStyles = SharedMove(*styles);
-            auto managedAttrs =  SharedMove(*attrs);
+            auto managedAttrs = SharedMove(*attrs);
             auto managedEvents = SharedMove(*events);
             target_->addElement(page_id_, ref, type, parent_ref, index, managedStyles, managedAttrs, managedEvents);
-            delete styles;
-            delete attrs;
-            delete events;
         }
+        delete styles;
+        delete attrs;
+        delete events;
         return true;
     }
     
@@ -95,6 +93,7 @@ namespace WeexCore {
             }
             target_->updateStyles(page_id_, ref, managedStyles);
         }
+        delete styles;
         return true;
     }
     
@@ -106,6 +105,7 @@ namespace WeexCore {
             }
             target_->updateAttributes(page_id_, ref, managedAttrs);
         }
+        delete attrs;
         return true;
     }
     
@@ -128,6 +128,23 @@ namespace WeexCore {
             target_->createFinish(page_id_);
         }
         return true;
+    }
+    
+    std::unique_ptr<ValueWithType> RenderPageCustom::CallNativeModule(const char *module, const char *method,
+                                                                      const char *arguments, int arguments_length, const char *options,
+                                                                      int options_length) {
+        // If render target can handle module method, we forward to render target.
+        if (target_) {
+            if (target_->shouldHandleModuleMethod(module, method)) {
+                return target_->callNativeModule(page_id_, module, method, arguments, arguments_length, options, options_length);
+            }
+            else {
+                return RenderPageBase::CallNativeModule(module, method, arguments, arguments_length, options, options_length);
+            }
+        }
+        else {
+            return std::unique_ptr<ValueWithType>();
+        }
     }
     
     // Life cycle
