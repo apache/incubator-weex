@@ -49,7 +49,6 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
-import com.taobao.weex.heron.picasso.RenderPicassoInit;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 
 import java.lang.reflect.Method;
@@ -191,7 +190,10 @@ public class WXApplication extends Application {
 
   private void startHeron(){
     try{
-        RenderPicassoInit.initApplication(this);
+        Class<?> heronInitClass = getClassLoader().loadClass("com/taobao/weex/heron/picasso/RenderPicassoInit");
+        Method method = heronInitClass.getMethod("initApplication", Application.class);
+        method.setAccessible(true);
+        method.invoke(null,this);
         Log.e("Weex", "Weex Heron Init Success");
      }catch (Exception e){
         Log.e("Weex", "Weex Heron Init Error", e);

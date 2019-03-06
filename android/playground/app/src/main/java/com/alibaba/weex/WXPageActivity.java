@@ -57,7 +57,6 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.heron.container.WXHeronRenderContainer;
 import com.taobao.weex.render.AbstractRenderContainer;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXComponent;
