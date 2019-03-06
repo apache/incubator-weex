@@ -34,9 +34,51 @@ void WeexEnv::setScriptBridge(WeexCore::ScriptBridge *scriptBridge) { scriptBrid
 
 void WeexEnv::initIPC() {
     // init IpcClient in io Thread
+    isMultiProcess = true;
     m_ipc_client_.reset(new WeexIPCClient(ipcClientFd_));
 }
 WeexEnv::WeexEnv() {
     this->enableBackupThread__ = false;
     this->isUsingWson = true;
+    this->isJscInitOk_ = false;
+    this->m_cache_task_ = true;
+}
+
+void WeexEnv::initJSC(bool isMultiProgress) {
+    static std::once_flag initJSCFlag;
+    std::call_once(initJSCFlag, [isMultiProgress]{
+      if (!WEEXICU::initICUEnv(isMultiProgress)) {
+          LOGE("failed to init ICUEnv single process");
+          // return false;
+      }
+
+      Options::enableRestrictedOptions(true);
+// Initialize JSC before getting VM.
+      WTF::initializeMainThread();
+      initHeapTimer();
+      JSC::initializeThreading();
+#if ENABLE(WEBASSEMBLY)
+      JSC::Wasm::enableFastMemory();
+#endif
+    });
+}
+void WeexEnv::init_crash_handler(std::string crashFileName) {
+  // initialize signal handler
+  isMultiProcess = true;
+  crashHandler.reset(new crash_handler::CrashHandlerInfo(crashFileName));
+  crashHandler->initializeCrashHandler();
+}
+bool WeexEnv::is_app_crashed() {
+  if(!isMultiProcess)
+    return false;
+  return crashHandler->is_crashed();
+}
+volatile bool WeexEnv::can_m_cache_task_() const {
+  return m_cache_task_;
+}
+void WeexEnv::set_m_cache_task_(volatile bool m_cache_task_) {
+  WeexEnv::m_cache_task_ = m_cache_task_;
+}
+WeexEnv::~WeexEnv() {
+  wson::destory();
 }

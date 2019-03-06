@@ -77,25 +77,25 @@ public class SystemMessageHandler extends Handler implements Serializable {
     private Message obtainAsyncMessage(int what) {
         Message msg = Message.obtain();
         msg.what = what;
-        if (mMessageMethodSetAsynchronous != null) {
-            // If invocation fails, assume this is indicative of future
-            // failures, and avoid log spam by nulling the reflected method.
-            try {
-                mMessageMethodSetAsynchronous.invoke(msg, true);
-            } catch (IllegalAccessException e) {
-                Log.e(TAG, "Illegal access to asynchronous message creation, disabling.");
-                mMessageMethodSetAsynchronous = null;
-            } catch (IllegalArgumentException e) {
-                Log.e(TAG, "Illegal argument for asynchronous message creation, disabling.");
-                mMessageMethodSetAsynchronous = null;
-            } catch (InvocationTargetException e) {
-                Log.e(TAG, "Invocation exception during asynchronous message creation, disabling.");
-                mMessageMethodSetAsynchronous = null;
-            } catch (RuntimeException e) {
-                Log.e(TAG, "Runtime exception during asynchronous message creation, disabling.");
-                mMessageMethodSetAsynchronous = null;
-            }
-        }
+//        if (mMessageMethodSetAsynchronous != null) {
+//            // If invocation fails, assume this is indicative of future
+//            // failures, and avoid log spam by nulling the reflected method.
+//            try {
+//                mMessageMethodSetAsynchronous.invoke(msg, true);
+//            } catch (IllegalAccessException e) {
+//                Log.e(TAG, "Illegal access to asynchronous message creation, disabling.");
+//                mMessageMethodSetAsynchronous = null;
+//            } catch (IllegalArgumentException e) {
+//                Log.e(TAG, "Illegal argument for asynchronous message creation, disabling.");
+//                mMessageMethodSetAsynchronous = null;
+//            } catch (InvocationTargetException e) {
+//                Log.e(TAG, "Invocation exception during asynchronous message creation, disabling.");
+//                mMessageMethodSetAsynchronous = null;
+//            } catch (RuntimeException e) {
+//                Log.e(TAG, "Runtime exception during asynchronous message creation, disabling.");
+//                mMessageMethodSetAsynchronous = null;
+//            }
+//        }
         return msg;
     }
 

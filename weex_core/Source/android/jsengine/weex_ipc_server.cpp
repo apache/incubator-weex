@@ -27,7 +27,6 @@
 using namespace JSC;
 using namespace WTF;
 using namespace WEEXICU;
-using namespace crash_handler;
 
 
 struct WeexJSServer::WeexJSServerImpl {
@@ -38,7 +37,6 @@ struct WeexJSServer::WeexJSServerImpl {
     std::unique_ptr<IPCHandler> handler;
     std::unique_ptr<IPCListener> listener;
     std::unique_ptr<IPCSerializer> serializer;
-    std::unique_ptr<CrashHandlerInfo> crashHandler;
 };
 
 WeexJSServer::WeexJSServerImpl::WeexJSServerImpl(int serverFd, int clientFd, bool enableTrace, std::string crashFileName) {
@@ -60,9 +58,7 @@ WeexJSServer::WeexJSServerImpl::WeexJSServerImpl(int serverFd, int clientFd, boo
     listener = std::move(createIPCListener(futexPageQueue.get(), handler.get()));
     serializer = std::move(createIPCSerializer());
 
-    // initialize signal handler
-    crashHandler.reset(new CrashHandlerInfo(crashFileName));
-    crashHandler->initializeCrashHandler();
+    WeexEnv::getEnv()->init_crash_handler(crashFileName);
 
     WeexEnv::getEnv()->m_back_to_weex_core_thread.reset(new BackToWeexCoreQueue());
     WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->init();

@@ -29,6 +29,9 @@
 #include "android/jsengine/object/weex_env.h"
 
 void WeexTaskQueue::run(WeexTask *task) {
+    if(task == nullptr || WeexEnv::getEnv()->is_app_crashed()) {
+        return;
+    }
     task->timeCalculator->set_task_name(task->taskName());
     task->timeCalculator->taskStart();
     task->run(weexRuntime);
@@ -58,6 +61,11 @@ WeexTask *WeexTaskQueue::getTask() {
         if (taskQueue_.empty()) {
             threadLocker.unlock();
             continue;
+        }
+
+        if(WeexEnv::getEnv()->is_app_crashed()) {
+          threadLocker.unlock();
+          return nullptr;
         }
 
         assert(!taskQueue_.empty());
