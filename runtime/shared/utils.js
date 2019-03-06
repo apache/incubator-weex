@@ -30,6 +30,14 @@ export function typof (v) {
   return s.substring(8, s.length - 1)
 }
 
+export function isPlainObject (value) {
+  return Object.prototype.toString.call(value) === '[object Object]'
+}
+
+export function hasOwn (object, key) {
+  return isPlainObject(object) && Object.prototype.hasOwnProperty.call(object, key)
+}
+
 export function bufferToBase64 (buffer) {
   if (typeof btoa !== 'function') {
     return ''
