@@ -29,24 +29,24 @@ import com.taobao.weex.WXSDKInstance;
 
 import java.lang.ref.WeakReference;
 
-public class AbstractRenderContainer extends FrameLayout {
+public class WXAbstractRenderContainer extends FrameLayout {
 
     protected  WeakReference<WXSDKInstance> mSDKInstance;
     protected boolean mHasConsumeEvent = false;
 
-    public AbstractRenderContainer(@NonNull Context context) {
+    public WXAbstractRenderContainer(@NonNull Context context) {
         super(context);
     }
 
-    public AbstractRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public WXAbstractRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public AbstractRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public WXAbstractRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    public AbstractRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public WXAbstractRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 

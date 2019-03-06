@@ -57,7 +57,7 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.render.AbstractRenderContainer;
+import com.taobao.weex.render.WXAbstractRenderContainer;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -229,7 +229,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     }
 
 
-    AbstractRenderContainer renderContainer = null;
+    WXAbstractRenderContainer renderContainer = null;
     String heron = "heron";
     if(url.contains(heron)){
       mInstance = new WXSDKInstance(heron,this);
@@ -242,7 +242,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       renderContainer = new RenderContainer(this);
       mInstance = new WXSDKInstance(this);
     }
-    mInstance.setRenderContainer(renderContainer);
+    mInstance.setWXAbstractRenderContainer(renderContainer);
     mInstance.registerRenderListener(this);
     mInstance.setNestedInstanceInterceptor(this);
     mInstance.setBundleUrl(url);
@@ -284,11 +284,11 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   }
 
 
-  private AbstractRenderContainer getHeronContainer(WXSDKInstance instance){
+  private WXAbstractRenderContainer getHeronContainer(WXSDKInstance instance){
     try{
       Class containerClass =  getClassLoader().loadClass("com.taobao.weex.heron.container.WXHeronRenderContainer");
       Constructor constructor = containerClass.getConstructor(Context.class);
-      AbstractRenderContainer container = (AbstractRenderContainer) constructor.newInstance(this);
+      WXAbstractRenderContainer container = (WXAbstractRenderContainer) constructor.newInstance(this);
       container.createInstanceRenderView(instance.getInstanceId());
       return container;
     }catch (Exception e){

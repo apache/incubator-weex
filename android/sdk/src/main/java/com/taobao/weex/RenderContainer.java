@@ -22,20 +22,16 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
 
 
-import com.taobao.weex.render.AbstractRenderContainer;
-
-import java.lang.ref.WeakReference;
+import com.taobao.weex.render.WXAbstractRenderContainer;
 
 /**
  * Created by sospartan on 08/10/2016.
  */
 
-public class RenderContainer extends AbstractRenderContainer implements WeexFrameRateControl.VSyncListener{
+public class RenderContainer extends WXAbstractRenderContainer implements WeexFrameRateControl.VSyncListener{
   private WeexFrameRateControl mFrameRateControl;
 
   public RenderContainer(Context context) {
