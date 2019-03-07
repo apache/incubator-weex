@@ -798,19 +798,24 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     int viewXInScroller = 0;
     if (this.isLayoutRTL()) {
       // if layout direction is rtl, we need calculate rtl scroll x;
-      if (getInnerView().getChildCount() > 0) {
-        int totalWidth = getInnerView().getChildAt(0).getWidth();
-        int displayWidth = getInnerView().getMeasuredWidth();
-        viewXInScroller = totalWidth - (component.getAbsoluteX() - getAbsoluteX()) - displayWidth;
+      if (component.getParent() != null && component.getParent() == this) {
+        if (getInnerView().getChildCount() > 0) {
+          int totalWidth = getInnerView().getChildAt(0).getWidth();
+          int displayWidth = getInnerView().getMeasuredWidth();
+          viewXInScroller = totalWidth - (component.getAbsoluteX() - getAbsoluteX()) - displayWidth;
+        } else {
+          viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
+        }
+        offsetFloat = -offsetFloat;
       } else {
-        viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
+        int displayWidth = getInnerView().getMeasuredWidth();
+        viewXInScroller = component.getAbsoluteX() - getAbsoluteX() - displayWidth + (int)component.getLayoutWidth();
       }
-      offsetFloat = - offsetFloat;
     } else {
       viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
     }
-
     scrollBy(viewXInScroller - getScrollX() + (int) offsetFloat, viewYInScroller - getScrollY() + (int) offsetFloat, smooth);
+
   }
 
   /**
