@@ -86,6 +86,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
   private boolean mHasAddScrollEvent = false;
+  private boolean mIslastDirectionRTL = false;
 
   private static final int SWIPE_MIN_DISTANCE = 5;
   private static final int SWIPE_THRESHOLD_VELOCITY = 300;
@@ -101,6 +102,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private boolean pageEnable = false;
   private boolean mIsHostAttachedToWindow = false;
   private View.OnAttachStateChangeListener mOnAttachStateChangeListener;
+
+  private boolean mlastDirectionRTL = false;
 
   public static class Creator implements ComponentCreator {
     @Override
@@ -485,15 +488,13 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         final WXScroller component = this;
         final View.OnLayoutChangeListener listener = new View.OnLayoutChangeListener() {
           @Override
-          public void onLayoutChange(View view, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+          public void onLayoutChange(View view, final int left, int top, final int right, int bottom, final int oldLeft, int oldTop, final int oldRight, int oldBottom) {
             final View frameLayout = view;
             scrollView.post(new Runnable() {
               @Override
               public void run() {
-                if (isLayoutRTL()) {
-                  int mw = frameLayout.getMeasuredWidth();
-                  scrollView.scrollTo(mw, component.getScrollY());
-                } else {
+                if (isLayoutRTL() != mIslastDirectionRTL) {
+                  mIslastDirectionRTL = isLayoutRTL();
                   boolean scrollToBegin = true;
                   Object scrollToBeginOnLTR = getAttrs().get("scrollToBegin");
                   if (scrollToBeginOnLTR instanceof String){
@@ -501,8 +502,22 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
                       scrollToBegin = false;
                     }
                   }
-                  if (scrollToBegin){
-                    scrollView.scrollTo(0, component.getScrollY());
+                  // when layout direction changed we need scroll to begin
+                  if (scrollToBegin) {
+                    if (isLayoutRTL()) {
+                      int mw = frameLayout.getMeasuredWidth();
+                      scrollView.scrollTo(mw, component.getScrollY());
+                    } else {
+                      scrollView.scrollTo(0, component.getScrollY());
+                    }
+                  }
+                } else if (isLayoutRTL()) {
+                  // if layout direction not changed, but width changede, we need keep RTL offset
+                  int oldWidth = oldRight - oldLeft;
+                  int width = right - left;
+                  int changedWidth = width - oldWidth;
+                  if (changedWidth != 0) {
+                    scrollView.scrollBy(changedWidth, component.getScrollY());
                   }
                 }
               }
