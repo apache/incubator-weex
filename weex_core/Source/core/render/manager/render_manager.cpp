@@ -32,6 +32,7 @@
 #include "core/render/page/render_page.h"
 #include "core/render/page/render_page_custom.h"
 #include "core/render/target/render_target.h"
+#include "core/manager/weex_core_manager.h"
 #include "wson/wson_parser.h"
 
 namespace WeexCore {
@@ -219,7 +220,7 @@ bool RenderManager::AddRenderObject(const std::string &page_id,
 }
 
 bool RenderManager::AddRenderObject(const std::string &page_id, const std::string &parent_ref,
-                                    int index,  RenderObject *root) {
+                                    int index, RenderObject *root) {
   RenderPageBase *page = GetPage(page_id);
   if (page == nullptr) return false;
 
@@ -380,12 +381,17 @@ bool RenderManager::CreateFinish(const std::string &page_id) {
   return b;
 }
 
-void RenderManager::CallNativeModule(const char *page_id, const char *module, const char *method,
-                                     const char *arguments, int arguments_length,
-                                     const char *options, int options_length) {
+std::unique_ptr<ValueWithType> RenderManager::CallNativeModule(const char *page_id, const char *module, const char *method,
+                                                               const char *arguments, int arguments_length,
+                                                               const char *options, int options_length) {
   if (strcmp(module, "meta") == 0) {
     CallMetaModule(page_id, method, arguments);
   }
+    
+  RenderPageBase* page = GetPage(page_id);
+  if (page == nullptr) return std::unique_ptr<ValueWithType>();
+
+  return page->CallNativeModule(module, method, arguments, arguments_length, options, options_length);
 }
     
 void RenderManager::CallMetaModule(const char *page_id, const char *method, const char *arguments) {

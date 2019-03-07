@@ -115,9 +115,6 @@ public:
                             std::map<std::string, std::string> *attrs);
 
   virtual RenderObject *GetRenderObject(const std::string &ref) override;
-    
-  void CallNativeModule(const std::string &module,
-                          const std::string &method, const std::string &args, int argc = 0);
 
   void SetRootRenderObject(RenderObject *root);
     

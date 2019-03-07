@@ -20,6 +20,7 @@
 #pragma once
 
 #include "render_page_base.h"
+#include "core/render/target/render_target.h"
 
 namespace WeexCore {
     
@@ -35,6 +36,8 @@ namespace WeexCore {
         
     public:
         explicit RenderPageCustom(const std::string& page_id, const std::string& page_type, const PageOptions& options);
+        
+        RenderTarget* GetRenderTarget() { return target_; }
         
         virtual bool CreateBody(const std::string& ref, const std::string& type,
                                 std::map<std::string, std::string>* styles,
@@ -60,6 +63,10 @@ namespace WeexCore {
         virtual bool RemoveEvent(const std::string &ref, const std::string &event) override;
         
         virtual bool CreateFinish() override;
+        
+        virtual std::unique_ptr<ValueWithType> CallNativeModule(const char *module, const char *method,
+                                                                const char *arguments, int arguments_length, const char *options,
+                                                                int options_length) override;
 
         // Life cycle
         virtual void SetDefaultHeightAndWidthIntoRootRender(const float default_width, const float default_height,

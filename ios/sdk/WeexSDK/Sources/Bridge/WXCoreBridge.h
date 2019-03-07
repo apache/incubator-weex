@@ -215,6 +215,10 @@ namespace WeexCore
 
 + (UIView*)createCustomPageRootView:(NSString*)pageId pageType:(NSString*)pageType frame:(CGRect)frame;
 
++ (BOOL)forwardCallNativeModuleToCustomPage:(NSString*)pageId
+                                 moduleName:(NSString*)moduleName methodName:(NSString*)methodName
+                                  arguments:(NSArray*)arguments options:(NSDictionary*)options;
+
 @end
 
 #endif

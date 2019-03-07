@@ -75,14 +75,9 @@ std::unique_ptr<ValueWithType> CoreSideInScript::CallNativeModule(
   ret->type = ParamsType::INT32;
   ret->value.int32Value = -1;
   if (page_id != nullptr && module != nullptr && method != nullptr) {
-    RenderManager::GetInstance()->CallNativeModule(page_id, module, method,
-                                                   arguments, arguments_length,
-                                                   options, options_length);
-    return WeexCoreManager::Instance()
-        ->getPlatformBridge()
-        ->platform_side()
-        ->CallNativeModule(page_id, module, method, arguments, arguments_length,
-                           options, options_length);
+    return RenderManager::GetInstance()->CallNativeModule(page_id, module, method,
+                                                          arguments, arguments_length,
+                                                          options, options_length);
   }
 
   return ret;
