@@ -2480,7 +2480,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> pageId:").append(pageId)
               .append(", componentType:").append(componentType).append(", ref:").append(ref)
-              .append(", styles:").append(styles)
+              .append(", styles:").append(styles == null ? "{}" : styles.toString())
               .append(", attributes:").append(attributes)
               .append(", events:").append(events);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -2525,7 +2525,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
               .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
               .append(", parentRef:").append(parentRef)
-              .append(", styles:").append(styles)
+              .append(", styles:").append(styles == null ? "{}" : styles.toString())
               .append(", attributes:").append(attributes)
               .append(", events:").append(events);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -2743,7 +2743,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callUpdateStyle >>>> instanceId:").append(instanceId)
-              .append(", ref:").append(ref).append(", styles:").append(styles.toString())
+              .append(", ref:").append(ref).append(", styles:").append(styles == null ? "{}" : styles.toString())
               .append(", paddings:").append(paddings.toString())
                       .append(", margins:").append(margins.toString())
                               .append(", borders:").append(borders.toString());
