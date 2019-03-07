@@ -109,7 +109,7 @@ public class WXEnvironment {
   public static boolean isPerf = false;
   private static boolean sDebugFlagInit = false;
 
-  private static boolean openDebugLog = false;
+  private static boolean openDebugLog = true;
 
   private static String sGlobalFontFamily;
 
