@@ -389,8 +389,13 @@ std::unique_ptr<ValueWithType> RenderManager::CallNativeModule(const char *page_
   }
     
   RenderPageBase* page = GetPage(page_id);
-  if (page == nullptr) return std::make_unique<ValueWithType>((int32_t)-1);
-
+  if (page == nullptr){ //page not exist, call normal platform layer
+      return WeexCoreManager::Instance()->
+              getPlatformBridge()->
+              platform_side()->
+              CallNativeModule(page_id, module, method, arguments, arguments_length, options, options_length);
+  }
+  //redirect to page.
   return page->CallNativeModule(module, method, arguments, arguments_length, options, options_length);
 }
     
