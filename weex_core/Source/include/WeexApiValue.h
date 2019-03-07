@@ -56,4 +56,9 @@ typedef union ExecJsParamValue {
 typedef struct ValueWithType {
     ParamsType type;
     EXEC_JS_PARAM_VALUE value;
+
+    ValueWithType(): type(ParamsType::JSUNDEFINED) {}
+    
+    // ValueWithType((int32_t)-1) normally represents failure for call native weex jsframework
+    ValueWithType(int32_t intValue): type(ParamsType::INT32), value({.int32Value = intValue}) {}
 } VALUE_WITH_TYPE;
