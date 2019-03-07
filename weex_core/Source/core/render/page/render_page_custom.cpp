@@ -146,7 +146,7 @@ namespace WeexCore {
             return result;
         }
         else {
-            return std::make_unique<ValueWithType>((int32_t)-1); // failure
+            return std::unique_ptr<ValueWithType>(new ValueWithType((int32_t)-1)); // failure
         }
     }
     

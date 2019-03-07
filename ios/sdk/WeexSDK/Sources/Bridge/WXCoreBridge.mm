@@ -166,7 +166,7 @@ namespace WeexCore
             
         } while (0);
         
-        return std::make_unique<ValueWithType>(); // return undefined by default
+        return std::unique_ptr<ValueWithType>(new ValueWithType()); // return undefined by default
     }
         
     void IOSSide::CallNativeComponent(const char* pageId, const char* ref, const char *method,
