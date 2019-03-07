@@ -71,9 +71,7 @@ std::unique_ptr<ValueWithType> CoreSideInScript::CallNativeModule(
     const char *page_id, const char *module, const char *method,
     const char *arguments, int arguments_length, const char *options,
     int options_length) {
-  std::unique_ptr<ValueWithType> ret(new ValueWithType);
-  ret->type = ParamsType::INT32;
-  ret->value.int32Value = -1;
+  std::unique_ptr<ValueWithType> ret = std::make_unique<ValueWithType>((int32_t)-1);
   if (page_id != nullptr && module != nullptr && method != nullptr) {
     return RenderManager::GetInstance()->CallNativeModule(page_id, module, method,
                                                           arguments, arguments_length,

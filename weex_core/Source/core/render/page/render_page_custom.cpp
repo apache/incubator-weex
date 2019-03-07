@@ -135,15 +135,18 @@ namespace WeexCore {
                                                                       int options_length) {
         // If render target can handle module method, we forward to render target.
         if (target_) {
-            if (target_->shouldHandleModuleMethod(module, method)) {
-                return target_->callNativeModule(page_id_, module, method, arguments, arguments_length, options, options_length);
-            }
-            else {
+            bool handled = false;
+            auto result = target_->callNativeModule(page_id_, module, method,
+                                                    arguments, arguments_length,
+                                                    options, options_length, handled);
+            if (!handled) {
+                // custom page cannot handle this module method
                 return RenderPageBase::CallNativeModule(module, method, arguments, arguments_length, options, options_length);
             }
+            return result;
         }
         else {
-            return std::unique_ptr<ValueWithType>();
+            return std::make_unique<ValueWithType>((int32_t)-1); // failure
         }
     }
     

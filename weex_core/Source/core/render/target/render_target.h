@@ -18,8 +18,13 @@
  */
 
 #pragma once
+
 #include "../../api/wx_api.h"
+#if HERON_LIBRARY
+#include <jsengine/WeexApiValue.h>
+#else
 #include "../../../include/WeexApiValue.h"
+#endif
 #include <string>
 #include <vector>
 #include <map>
@@ -80,7 +85,7 @@ namespace WeexCore {
                                                                 const std::string& arguments,
                                                                 int nArguments,
                                                                 const std::string& options,
-                                                                int nOptions) = 0;
+                                                                int nOptions, bool& handled) = 0;
 
         // Life cycle
         virtual uintptr_t createRootView(const std::string& page, float x, float y, float width, float height) = 0;

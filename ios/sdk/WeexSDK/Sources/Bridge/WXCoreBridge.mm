@@ -166,7 +166,7 @@ namespace WeexCore
             
         } while (0);
         
-        return std::unique_ptr<ValueWithType>();
+        return std::make_unique<ValueWithType>(); // return undefined by default
     }
         
     void IOSSide::CallNativeComponent(const char* pageId, const char* ref, const char *method,
@@ -1243,7 +1243,8 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
                     }
                 });
                 
-                target->callNativeModule([pageId UTF8String] ?: "", [moduleName UTF8String] ?: "", [methodName UTF8String] ?: "", seralizedArguments ?: "", (int)[arguments count], seralizedOptions ?: "", (int)[options count]);
+                bool handled = false;
+                target->callNativeModule([pageId UTF8String] ?: "", [moduleName UTF8String] ?: "", [methodName UTF8String] ?: "", seralizedArguments ?: "", (int)[arguments count], seralizedOptions ?: "", (int)[options count], handled);
                 
                 if (seralizedArguments) {
                     free((void*)seralizedArguments);

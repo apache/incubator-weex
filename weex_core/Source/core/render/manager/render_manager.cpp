@@ -389,7 +389,7 @@ std::unique_ptr<ValueWithType> RenderManager::CallNativeModule(const char *page_
   }
     
   RenderPageBase* page = GetPage(page_id);
-  if (page == nullptr) return std::unique_ptr<ValueWithType>();
+  if (page == nullptr) return std::make_unique<ValueWithType>((int32_t)-1);
 
   return page->CallNativeModule(module, method, arguments, arguments_length, options, options_length);
 }
