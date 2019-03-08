@@ -120,7 +120,9 @@ public class Constants {
     String AUTO_RECYCLE = "autoBitmapRecycle";
     String SHOW_INDICATORS = "showIndicators";
     String AUTO_PLAY = "autoPlay";
+    String AUTOPLAY = "autoplay";
     String CONTROLS = "controls";
+    String ZORDERTOP = "zOrderTop";
     String SCROLL_DIRECTION = "scrollDirection";
     String SCOPE = "scope";
     String RECYCLE = "recycle";
