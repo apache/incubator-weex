@@ -26,6 +26,8 @@
 #include <vector>
 #include <set>
 #include <map>
+#include "WeexApiValue.h"
+
 #ifdef OS_ANDROID
 #include <jni.h>
 #include "third_party/IPC/IPCResult.h"
@@ -39,16 +41,6 @@ namespace WeexCore {
 }  // namespace WeexCore
 using namespace WeexCore;
 
-struct WeexString {
-    uint32_t length;
-    uint16_t content[1];
-};
-
-struct WeexByteArray {
-    uint32_t length;
-    char content[1];
-};
-
 class WeexJSResult{
 public:
     std::unique_ptr<char[]> data;
@@ -61,36 +53,6 @@ typedef struct InitFrameworkParams {
     WeexByteArray *type;
     WeexByteArray *value;
 } INIT_FRAMEWORK_PARAMS;
-
-
-enum class ParamsType {
-    INT32 = 1,
-    INT64,
-    FLOAT,
-    DOUBLE,
-    JSONSTRING,
-    STRING,
-    BYTEARRAY, /* terminated with zero. */
-    VOID,
-    JSUNDEFINED,
-    END,
-};
-
-
-typedef union ExecJsParamValue {
-    int32_t int32Value;
-    int64_t int64Value;
-    float floatValue;
-    double doubleValue;
-    WeexString *string;
-    WeexByteArray *byteArray;
-} EXEC_JS_PARAM_VALUE;
-
-typedef struct ValueWithType {
-    ParamsType type;
-    EXEC_JS_PARAM_VALUE value;
-} VALUE_WITH_TYPE;
-
 
 #ifdef OS_ANDROID
 
