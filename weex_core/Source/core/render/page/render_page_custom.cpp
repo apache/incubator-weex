@@ -23,7 +23,7 @@
 namespace WeexCore {
     
     template<typename T>
-    std::shared_ptr<T> SharedMove(T& source) {
+    static std::shared_ptr<T> SharedMove(T& source) {
         return std::make_shared<T>(std::move(source));
     }
 
