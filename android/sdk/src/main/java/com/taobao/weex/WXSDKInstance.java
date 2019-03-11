@@ -56,6 +56,7 @@ import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.RenderTypes;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXPerformance;
@@ -187,7 +188,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private WXSDKInstance mParentInstance;
 
-  private String mRenderType = "native";
+  private String mRenderType = RenderTypes.RENDER_TYPE_NATIVE;
 
 
 
