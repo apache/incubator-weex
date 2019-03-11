@@ -766,8 +766,12 @@ typedef enum : NSUInteger {
     if (!url) {
         return nil;
     }
-    
-    return [NSURL URLWithString:url relativeToURL:_scriptURL];
+    NSURL *result = [NSURL URLWithString:url relativeToURL:_scriptURL];
+    if (result) {
+        return result;
+    }
+    // if result is nil, try url-encode the 'url' string.
+    return [NSURL URLWithString:[url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] relativeToURL:_scriptURL];
 }
 
 - (BOOL)checkModuleEventRegistered:(NSString*)event moduleClassName:(NSString*)moduleClassName
