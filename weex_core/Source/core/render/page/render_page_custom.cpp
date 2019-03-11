@@ -124,6 +124,8 @@ namespace WeexCore {
     }
     
     bool RenderPageCustom::CreateFinish() {
+        SendCreateFinishAction();
+        SendRenderSuccessAction();
         if (target_) {
             target_->createFinish(page_id_);
         }

@@ -29,6 +29,7 @@
 namespace WeexCore {
     
 class RenderObject;
+class RenderAction;
 class RenderPerformance;
     
 class RenderPageBase {
@@ -88,6 +89,12 @@ public:
     virtual void SetViewportWidth(float value) = 0;
     virtual bool GetRoundOffDeviation() = 0;
     virtual void SetRoundOffDeviation(bool value) = 0;
+
+    virtual void SendCreateFinishAction();
+
+    virtual void SendRenderSuccessAction();
+
+    void PostRenderAction(RenderAction *action);
     
 protected:
     bool is_platform_page_;

@@ -17,6 +17,8 @@
  * under the License.
  */
 
+#include "core/render/action/render_action_createfinish.h"
+#include "core/render/action/render_action_render_success.h"
 #include "render_page_base.h"
 #include "core/moniter/render_performance.h"
 #include "core/manager/weex_core_manager.h"
@@ -72,6 +74,25 @@ namespace WeexCore {
         getPlatformBridge()->
         platform_side()->
         CallNativeModule(page_id_.c_str(), module, method, arguments, arguments_length, options, options_length);
+    }
+
+    void RenderPageBase::SendCreateFinishAction() {
+        RenderAction *action = new RenderActionCreateFinish(page_id());
+        PostRenderAction(action);
+    }
+
+    void RenderPageBase::SendRenderSuccessAction() {
+        RenderAction *action = new RenderActionRenderSuccess(page_id());
+        PostRenderAction(action);
+    }
+
+
+    void RenderPageBase::PostRenderAction(RenderAction *action) {
+        if (action != nullptr) {
+            action->ExecuteAction();
+            delete action;
+            action = nullptr;
+        }
     }
     
 }

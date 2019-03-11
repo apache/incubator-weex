@@ -65,9 +65,9 @@ class RenderPage: public RenderPageBase {
   void SendCallNativeModuleAction(const std::string &module,
                                   const std::string &method, const std::string &args, int argc = 0);
     
-  void SendCreateFinishAction();
+  void SendCreateFinishAction() override;
 
-  void SendRenderSuccessAction();
+  void SendRenderSuccessAction() override;
 
   void SendAppendTreeCreateFinish(const std::string &ref);
 
