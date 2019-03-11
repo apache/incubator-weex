@@ -220,7 +220,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     addOnListener();
   }
 
-  private void loadWXfromService(final String url) {
+  private void loadWXfromService(final String urlS) {
     //mProgressBar.setVisibility(View.VISIBLE);
 
     if (mInstance != null) {
@@ -228,16 +228,19 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
        mContainer.removeAllViews();
     }
 
+    final String url = "";
+
+
 
     WXAbstractRenderContainer renderContainer = null;
     String heron = "heron";
-    if(url.contains(heron)){
+    //if(url.contains(heron)){
       mInstance = new WXSDKInstance(heron,this);
       renderContainer = getHeronContainer(mInstance);
       if(renderContainer == null){
           mInstance.destroy();
       }
-    }
+    //}
     if(renderContainer == null){
       renderContainer = new RenderContainer(this);
       mInstance = new WXSDKInstance(this);
@@ -249,6 +252,9 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     mInstance.setTrackComponent(true);
     mContainer.addView(renderContainer);
 
+    mInstance.render(TAG, WXFileUtils.loadAsset("videoplus.js", getApplicationContext()), mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
+
+    /**
     WXHttpTask httpTask = new WXHttpTask();
     httpTask.url = url;
     httpTask.requestListener = new WXRequestListener() {
@@ -281,6 +287,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     };
 
     WXHttpManager.getInstance().sendRequest(httpTask);
+     */
   }
 
 
