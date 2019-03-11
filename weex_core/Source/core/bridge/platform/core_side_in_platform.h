@@ -46,6 +46,11 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
   void MarkDirty(const std::string &instance_id,
                  const std::string &render_ref) override;
   void SetViewPortWidth(const std::string &instance_id, float width) override;
+
+  virtual void SetPageRenderType(const std::string &pageId, const std::string renderType)override;
+
+  virtual void RemovePageRenderType(const std::string &pageId)override;
+
   void SetPageDirty(const std::string &instance_id) override;
   void ForceLayout(const std::string &instance_id) override;
   bool NotifyLayout(const std::string &instance_id) override;

@@ -17,23 +17,24 @@
  * under the License.
  */
 
+#include <mutex>
+#include <thread>
 #include "render_target.h"
+#include "core/render/manager/render_manager.h"
 
 namespace WeexCore {
     
     RenderTargetManager* RenderTargetManager::sharedInstance() {
-        static RenderTargetManager* instance = new RenderTargetManager();
+        static RenderTargetManager* instance = nullptr;
+        static std::once_flag oc;
+        std::call_once(oc, [&] () {
+            instance = new RenderTargetManager();
+        });
         return instance;
     };
 
-    std::string RenderTargetManager::getRenderTargetName(const std::string& page) {
-        auto pos = page.find_first_of('_');
-        if (pos == std::string::npos) {
-            return "";
-        }
-        else {
-            return std::string(page, pos + 1);
-        }
+    std::string RenderTargetManager::getRenderTargetName(const std::string& pageId) {
+        return RenderManager::GetInstance()->getPageRenderType(pageId);
     }
     
     void RenderTargetManager::registerRenderTarget(RenderTarget* target) {

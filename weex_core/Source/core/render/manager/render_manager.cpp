@@ -434,6 +434,7 @@ RenderPageBase *RenderManager::GetPage(const std::string &page_id) {
 }
 
 bool RenderManager::ClosePage(const std::string &page_id) {
+  removePageRenderType(page_id);
   RenderPageBase *page = GetPage(page_id);
   if (page == nullptr) return false;
 
@@ -477,6 +478,23 @@ void RenderManager::set_round_off_deviation(const std::string &page_id, bool rou
   if (page == nullptr) return;
 
   page->SetRoundOffDeviation(round_off_deviation);
+}
+
+
+void RenderManager::setPageRenderType(const std::string &pageId, const std::string renderType) {
+    mPageTypes.insert({pageId, renderType});
+}
+
+void RenderManager::removePageRenderType(const std::string &pageId) {
+    mPageTypes.erase(pageId);
+}
+
+std::string RenderManager::getPageRenderType(const std::string &pageId) {
+    auto it = mPageTypes.find(pageId);
+    if(it  !=  mPageTypes.end()){
+        return it->second;
+    }
+    return "";
 }
 
 void RenderManager::Batch(const std::string &page_id) {

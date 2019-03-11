@@ -187,6 +187,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private WXSDKInstance mParentInstance;
 
+  private String mRenderType = "native";
+
+
+
   public List<String> getLayerOverFlowListeners() {
     return mLayerOverFlowListeners;
   }
@@ -415,17 +419,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private List<OnInstanceVisibleListener> mVisibleListeners = new ArrayList<>();
 
   public WXSDKInstance(Context context) {
-       this("", context);
-  }
-
-  public WXSDKInstance(String renderType, Context context) {
-    if(TextUtils.isEmpty(renderType)){
-      mInstanceId = WXSDKManager.getInstance().generateInstanceId();
-    }else{
-      mInstanceId = WXSDKManager.getInstance().generateInstanceId() + "_" + renderType;
-    }
+    mInstanceId = WXSDKManager.getInstance().generateInstanceId();
     init(context);
   }
+
   /**
    * For unittest only.
    */
@@ -2052,5 +2049,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(!getInstanceOnFireEventInterceptorList().contains(instanceOnFireEventInterceptor)){
       getInstanceOnFireEventInterceptorList().add(instanceOnFireEventInterceptor);
     }
+  }
+
+  public String getRenderType() {
+    return mRenderType;
+  }
+
+  public void setRenderType(String renderType) {
+    this.mRenderType = renderType;
   }
 }

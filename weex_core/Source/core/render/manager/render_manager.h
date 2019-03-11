@@ -118,6 +118,12 @@ class RenderManager {
 
   void set_round_off_deviation(const std::string &page_id, bool round_off_deviation);
 
+  void setPageRenderType(const std::string& pageId, const std::string renderType);
+
+  void removePageRenderType(const std::string& pageId);
+
+  std::string getPageRenderType(const std::string& pageId);
+
   static RenderManager *GetInstance() {
     if (NULL == g_pInstance) {
       g_pInstance = new RenderManager();
@@ -127,6 +133,7 @@ class RenderManager {
  private:
   static RenderManager *g_pInstance;
   std::map<std::string, RenderPageBase *> pages_;
+  std::map<std::string,std::string> mPageTypes;
   std::map<std::string, float> viewports_;
   std::map<std::string, bool> round_off_deviations_;
 };

@@ -1413,6 +1413,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       public void run() {
         long start = System.currentTimeMillis();
         instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_START);
+        mWXBridge.setInstanceRenderType(instance.getInstanceId(), instance.getRenderType());
         invokeCreateInstance(instance, template, options, data);
         long end = System.currentTimeMillis();
         instance.getWXPerformance().callCreateInstanceTime = end - start;
@@ -1795,6 +1796,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
     // }
+    mWXBridge.removeInstanceRenderType(instanceId);
     mWXBridge.destoryInstance(instanceId, namespace, function, args);
   }
 

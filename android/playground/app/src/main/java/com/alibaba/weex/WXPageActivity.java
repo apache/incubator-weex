@@ -235,7 +235,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     WXAbstractRenderContainer renderContainer = null;
     String heron = "heron";
     //if(url.contains(heron)){
-      mInstance = new WXSDKInstance(heron,this);
+      mInstance = new WXSDKInstance(this);
+      mInstance.setRenderType(heron);
       renderContainer = getHeronContainer(mInstance);
       if(renderContainer == null){
           mInstance.destroy();
