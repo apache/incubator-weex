@@ -36,6 +36,7 @@ static const char* kKeyMethod = "method";
 static const char* kKeyArgs = "args";
 static const char* kEventOnCreated = "created";
 static const char* kEventOnUpdated = "updated";
+static const char* kEventOnMounted = "mounted";
 static const char* kEventOnDestroyed = "destroyed";
 static int kNonParentId = -1;
 
@@ -202,7 +203,6 @@ static void GenParamsForCallJS(std::vector<VALUE_WITH_TYPE*>& params,
 
   args->value.byteArray = genWeexByteArray(
       static_cast<const char*>(buffer->data), buffer->position);
-  buffer->data = nullptr;
   wson_buffer_free(buffer);
   params.push_back(args);
 }
@@ -224,6 +224,23 @@ void VComponentLifecycleListener::OnCreated(
                      component->template_id(), 5, component->id(), parentId,
                      data, props, ref_map);
   auto page_id = component->exec_state()->context()->page_id();
+  WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
+      page_id.c_str(), "", kMethodOnComponentEvent, params);
+  freeParams(params);
+}
+
+void VComponentLifecycleListener::OnMounted(
+    VComponent* component,
+    const std::unordered_map<std::string, VComponent::VNodeRefs>& ref_map) {
+  auto page_id = component->exec_state()->context()->page_id();
+
+  std::vector<VALUE_WITH_TYPE*> params;
+  // [pageId, args]
+  //
+  // args -> { method: 'componentHook', args: [ componentId, 'lifecycle',
+  // lifecycle, [props, refList] ] }
+  GenParamsForCallJS(params, component, kEventOnMounted, component->id(), 1,
+                     ref_map);
   WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
       page_id.c_str(), "", kMethodOnComponentEvent, params);
   freeParams(params);

@@ -55,11 +55,7 @@ void VNodeOnEventListener::OnEvent(VNode* node, const std::string& event,
 
   std::vector<json11::Json> args_in_args_object;
   // ref TODO make sure the difference between node id and ref
-  if (!node->ref().empty()) {
-    args_in_args_object.push_back(node->ref());
-  } else {
-    args_in_args_object.push_back(node->node_id());
-  }
+  args_in_args_object.push_back(node->node_id());
   // type -> "nodeEvent"
   args_in_args_object.push_back("nodeEvent");
   // args

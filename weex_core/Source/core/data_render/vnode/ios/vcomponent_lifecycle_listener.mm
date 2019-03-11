@@ -47,6 +47,18 @@ void VComponentLifecycleListener::OnCreated(
     [[WXSDKManager bridgeMgr] callJSMethod:@"callJS" args:@[instanceId, @[@{@"method":@"componentHook", @"args":@[[NSNumber numberWithInt:template_id], @"lifecycle", @"created", @[[NSNumber numberWithInt:component_id],[NSNumber numberWithInt:parent_id], NSDICTIONARY(data), NSDICTIONARY(props), NSDICTIONARY(ref_map)]]}]]];
 }
 
+void VComponentLifecycleListener::OnMounted(VComponent* component, const std::unordered_map<std::string, VComponent::VNodeRefs>& ref_map) {
+    std::string page_id = component->exec_state()->context()->page_id();
+    NSString *instanceId = NSSTRING(page_id.c_str());
+    WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+    if (!instance) {
+        return;
+    }
+
+    int component_id = component->id();
+    [[WXSDKManager bridgeMgr] callJSMethod:@"callJS" args:@[instanceId, @[@{@"method":@"componentHook", @"args":@[[NSNumber numberWithInt:component_id], @"lifecycle", @"mounted", @[NSDICTIONARY(ref_map)]]}]]];
+}
+
 void VComponentLifecycleListener::OnUpdated(
     VComponent* component, Table* props, const std::unordered_map<std::string, VComponent::VNodeRefs>& ref_map) {
     std::string page_id = component->exec_state()->context()->page_id();
