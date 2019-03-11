@@ -33,6 +33,8 @@
 #import "WXThreadSafeMutableArray.h"
 #import "WXComponentManager.h"
 #import "WXCoreBridge.h"
+#import "WXDataRenderHandler.h"
+#import "WXHandlerFactory.h"
 
 @interface WXBridgeManager ()
 
@@ -300,7 +302,7 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
 
 - (void)DownloadJS:(NSURL *)scriptUrl completion:(void (^)(NSString *script))complection;
 {
-    if (!scriptUrl) {
+    if (!scriptUrl || ![scriptUrl.absoluteString length]) {
         complection(nil);
         return;
     }
@@ -416,7 +418,12 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
     if (instance.dataRender) {
         WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge fireEvent:instanceId ref:ref event:type args:params?:@{} domChanges:domChanges?:@{}];
+            id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+            if (dataRenderHandler) {
+                [dataRenderHandler fireEvent:instanceId ref:ref event:type args:params?:@{} domChanges:domChanges?:@{}];
+            } else {
+                WXLogError(@"No data render handler found!");
+            }
         });
         return;
     }

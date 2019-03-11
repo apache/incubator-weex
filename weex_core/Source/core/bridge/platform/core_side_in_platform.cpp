@@ -21,7 +21,6 @@
 #include "base/string_util.h"
 #include "base/log_defines.h"
 #include "core/config/core_environment.h"
-#include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/node/factory/render_creator.h"
@@ -29,6 +28,8 @@
 #include "core/render/node/render_list.h"
 #include "core/render/node/render_object.h"
 #include "core/render/page/render_page.h"
+#include "core/bridge/eagle_bridge.h"
+#include "third_party/json11/json11.hpp"
 
 namespace WeexCore {
 
@@ -311,10 +312,6 @@ void CoreSideInPlatform::AddOption(const std::string &key,
 int CoreSideInPlatform::RefreshInstance(
     const char *instanceId, const char *nameSpace, const char *func,
     std::vector<VALUE_WITH_TYPE *> &params) {
-  auto node_manager =
-      weex::core::data_render::VNodeRenderManager::GetInstance();
-  // First check if page is rendered with data render strategy.
-
   if(params.size() < 2)
     return false;
 
@@ -324,7 +321,7 @@ int CoreSideInPlatform::RefreshInstance(
   std::string init_data = weex::base::to_utf8(params[1]->value.string->content,
                                               params[1]->value.string->length);
 
-  if (node_manager->RefreshPage(instanceId, init_data)) {
+  if (EagleBridge::GetInstance()->data_render_handler()->RefreshPage(instanceId, init_data)) {
     return true;
   }
   return ExecJS(instanceId, nameSpace, func, params);
@@ -446,18 +443,11 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
                                extendsApi.c_str(),params);
         };
     if (strcmp(render_strategy, "DATA_RENDER") == 0) {
-      auto node_manager =
-          weex::core::data_render::VNodeRenderManager::GetInstance();
-      node_manager->CreatePage(script, instanceId, render_strategy, initData,
-                               exec_js);
+        EagleBridge::GetInstance()->data_render_handler()->CreatePage(script, instanceId, render_strategy, initData, exec_js);
 
       return true;
     } else if (strcmp(render_strategy, "DATA_RENDER_BINARY") == 0) {
-      auto node_manager =
-          weex::core::data_render::VNodeRenderManager::GetInstance();
-      node_manager->CreatePage(script, script_length, instanceId,
-                               render_strategy, initData, exec_js);
-
+      EagleBridge::GetInstance()->data_render_handler()->CreatePage(script, script_length, instanceId, render_strategy, initData, exec_js);
       return true;
     }
   }
@@ -477,15 +467,7 @@ std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSOnInstance(const char *i
 }
 
 int CoreSideInPlatform::DestroyInstance(const char *instanceId) {
-  auto node_manager =
-      weex::core::data_render::VNodeRenderManager::GetInstance();
-  if (node_manager->ClosePage(instanceId)) {
-    return true;
-  }
-  return WeexCoreManager::Instance()
-      ->script_bridge()
-      ->script_side()
-      ->DestroyInstance(instanceId);
+    return EagleBridge::GetInstance()->data_render_handler()->DestroyInstance(instanceId);
 }
 
 int CoreSideInPlatform::UpdateGlobalConfig(const char *config) {

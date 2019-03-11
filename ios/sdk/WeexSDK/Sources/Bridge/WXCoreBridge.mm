@@ -41,7 +41,6 @@
 #include "core/render/node/factory/render_type.h"
 #include "core/render/node/factory/render_creator.h"
 #include "core/config/core_environment.h"
-#include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/bridge/platform/core_side_in_platform.h"
 #include "core/bridge/script/core_side_in_script.h"
 #include "core/network/http_module.h"
@@ -750,60 +749,6 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     });
 }
 
-+ (void)createDataRenderInstance:(NSString *)pageId template:(NSString *)jsBundleString options:(NSDictionary *)options  data:(id)data
-{
-    auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-    NSString *optionsString = [WXUtility JSONString:options];
-    NSString *dataString = [WXUtility JSONString:data];
-
-    node_manager->CreatePage([jsBundleString UTF8String] ?: "", [pageId UTF8String] ?: "", [optionsString UTF8String] ?: "", [dataString UTF8String] ?: "", [=](const char* javascript){
-        if (!javascript) {
-            return;
-        }
-        [[WXSDKManager bridgeMgr] createInstanceForJS:pageId template:NSSTRING(javascript) options:options data:data];
-    });
-}
-
-+ (void)createDataRenderInstance:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary *)options data:(id)data
-{
-    auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-    NSString *optionsString = [WXUtility JSONString:options];
-    NSString *dataString = [WXUtility JSONString:data];
-    node_manager->CreatePage(static_cast<const char *>(contents.bytes), contents.length, [pageId UTF8String], [optionsString UTF8String], dataString ? [dataString UTF8String] : "", [=](const char* javascript) {
-        if (!javascript) {
-            return;
-        }
-        [[WXSDKManager bridgeMgr] createInstanceForJS:pageId template:NSSTRING(javascript) options:options data:data];
-    });
-}
-
-+ (void)destroyDataRenderInstance:(NSString *)pageId
-{
-    auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-    node_manager->ClosePage([pageId UTF8String] ?: "");
-}
-
-+ (void)refreshDataRenderInstance:(NSString *)pageId data:(NSString *)data;
-{
-    auto node_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-    node_manager->RefreshPage([pageId UTF8String] ?: "", [data UTF8String] ?: "");
-}
-
-+ (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args domChanges:(NSDictionary *)domChanges
-{
-    NSString *params = [WXUtility JSONString:args];
-    NSString* nsDomChanges = [WXUtility JSONString:domChanges];
-    auto vnode_manager = weex::core::data_render::VNodeRenderManager::GetInstance();
-    vnode_manager->FireEvent([pageId UTF8String] ? : "", [ref UTF8String] ? : "", [event UTF8String] ? : "", [params UTF8String] ? : "", [nsDomChanges UTF8String] ? : "");
-}
-
-+ (void)registerModules:(NSDictionary *)modules {
-    NSString *setting = [WXUtility JSONString:modules];
-    if (setting.length > 0) {
-        weex::core::data_render::VNodeRenderManager::GetInstance()->RegisterModules([setting UTF8String] ? : "");
-    }
-}
-
 + (void)registerComponentAffineType:(NSString *)type asType:(NSString *)baseType
 {
     WeexCore::RenderCreator::GetInstance()->RegisterAffineType([type UTF8String] ?: "", [baseType UTF8String] ?: "");
@@ -1028,12 +973,6 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         });
     }];
     return result;
-}
-
-+ (void)callUpdateComponentData:(NSString*)pageId componentId:(NSString*)componentId jsonData:(NSString*)jsonData
-{
-    weex::core::data_render::VNodeRenderManager::GetInstance()
-    ->UpdateComponentData([pageId UTF8String] ?: "", [componentId UTF8String] ?: "", [jsonData UTF8String] ?: "");
 }
 
 + (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index
