@@ -56,6 +56,7 @@ import com.taobao.weex.RenderContainer;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
+import com.taobao.weex.common.RenderTypes;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.render.WXAbstractRenderContainer;
 import com.taobao.weex.ui.component.NestedContainer;
@@ -220,7 +221,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     addOnListener();
   }
 
-  private void loadWXfromService(final String urlS) {
+  private void loadWXfromService(final String url) {
     mProgressBar.setVisibility(View.VISIBLE);
 
     if (mInstance != null) {
@@ -228,15 +229,10 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
        mContainer.removeAllViews();
     }
 
-    final String url = "";
-
-
-
     WXAbstractRenderContainer renderContainer = null;
-    String heron = "heron";
-    if(url.contains(heron)){
+    if(url.contains(RenderTypes.RENDER_TYPE_HERON)){
       mInstance = new WXSDKInstance(this);
-      mInstance.setRenderType(heron);
+      mInstance.setRenderType(RenderTypes.RENDER_TYPE_HERON);
       renderContainer = getHeronContainer(mInstance);
       if(renderContainer == null){
           mInstance.destroy();
