@@ -441,14 +441,6 @@ void RenderPage::LayoutImmediately() {
   }
 }
 
-void RenderPage::PostRenderAction(RenderAction *action) {
-  if (action != nullptr) {
-    action->ExecuteAction();
-    delete action;
-    action = nullptr;
-  }
-}
-
 void RenderPage::PushRenderToRegisterMap(RenderObject *render) {
   if (render == nullptr) return;
 
@@ -596,16 +588,6 @@ void RenderPage::SendUpdateAttrAction(
     delete vAttrs;
     vAttrs = nullptr;
   }
-}
-
-void RenderPage::SendCreateFinishAction() {
-  RenderAction *action = new RenderActionCreateFinish(page_id());
-  PostRenderAction(action);
-}
-
-void RenderPage::SendRenderSuccessAction() {
-  RenderAction *action = new RenderActionRenderSuccess(page_id());
-  PostRenderAction(action);
 }
 
 void RenderPage::SendAppendTreeCreateFinish(const std::string &ref) {

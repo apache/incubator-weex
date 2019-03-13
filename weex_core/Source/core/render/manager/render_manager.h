@@ -133,7 +133,7 @@ class RenderManager {
  private:
   static RenderManager *g_pInstance;
   std::map<std::string, RenderPageBase *> pages_;
-  std::map<std::string,std::string> mPageTypes;
+  std::map<std::string, std::string> mPageTypes;
   std::map<std::string, float> viewports_;
   std::map<std::string, bool> round_off_deviations_;
 };

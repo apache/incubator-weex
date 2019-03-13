@@ -108,7 +108,7 @@ namespace WeexCore {
     public:
         WX_EXPORT static RenderTargetManager* sharedInstance();
         
-        WX_EXPORT static std::string getRenderTargetName(const std::string& pageId);
+        WX_EXPORT static std::string getRenderTargetName(const std::string& page);
 
         WX_EXPORT void registerRenderTarget(RenderTarget* target);
 

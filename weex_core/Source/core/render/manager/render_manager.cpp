@@ -480,7 +480,6 @@ void RenderManager::set_round_off_deviation(const std::string &page_id, bool rou
   page->SetRoundOffDeviation(round_off_deviation);
 }
 
-
 void RenderManager::setPageRenderType(const std::string &pageId, const std::string renderType) {
     mPageTypes.insert({pageId, renderType});
 }
@@ -491,7 +490,7 @@ void RenderManager::removePageRenderType(const std::string &pageId) {
 
 std::string RenderManager::getPageRenderType(const std::string &pageId) {
     auto it = mPageTypes.find(pageId);
-    if(it  !=  mPageTypes.end()){
+    if (it != mPageTypes.end()){
         return it->second;
     }
     return "";

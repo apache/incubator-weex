@@ -86,7 +86,6 @@ namespace WeexCore {
         PostRenderAction(action);
     }
 
-
     void RenderPageBase::PostRenderAction(RenderAction *action) {
         if (action != nullptr) {
             action->ExecuteAction();
