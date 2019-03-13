@@ -135,9 +135,6 @@
 
 @interface WXAnimationModule ()
 
-@property (nonatomic, assign) BOOL needLayout;
-@property (nonatomic, strong) WXTransition *transition;
-@property (nonatomic, strong) NSMutableDictionary *transitionDic;
 @property (nonatomic, assign) BOOL isAnimationedSuccess;
 
 @end
@@ -150,7 +147,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 
 - (void)transition:(NSString *)nodeRef args:(NSDictionary *)args callback:(WXModuleKeepAliveCallback)callback
 {
-    _needLayout = NO;
     _isAnimationedSuccess = YES;
     WXPerformBlockOnComponentThread(^{
         if (nodeRef == nil || ![nodeRef isKindOfClass:[NSString class]] ||
@@ -189,6 +185,9 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 }
 
 - (NSArray<WXAnimationInfo *> *)animationInfoArrayFromArgs:(NSDictionary *)args target:(WXComponent *)target
+                                                needLayout:(BOOL* _Nonnull)needLayout
+                                                transition:(WXTransition* _Nonnull *)transition
+                                             transitionDic:(NSMutableDictionary* _Nonnull *)transitionDic
 {
     UIView *view = target.view;
     CALayer *layer = target.layer;
@@ -197,12 +196,12 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     double duration = [args[@"duration"] doubleValue] / 1000;
     double delay = [args[@"delay"] doubleValue] / 1000;
     if (args[@"needLayout"]) {
-        _needLayout = [WXConvert BOOL:args[@"needLayout"]];
-        if (_needLayout) {
-            _transition = [WXTransition new];
-            _transitionDic = [NSMutableDictionary new];
-            _transition.filterStyles = [NSMutableDictionary new];
-            _transition.oldFilterStyles = [NSMutableDictionary new];
+        *needLayout = [WXConvert BOOL:args[@"needLayout"]];
+        if (*needLayout) {
+            *transition = [WXTransition new];
+            *transitionDic = [NSMutableDictionary new];
+            (*transition).filterStyles = [NSMutableDictionary new];
+            (*transition).oldFilterStyles = [NSMutableDictionary new];
         }
     }
     CAMediaTimingFunction *timingFunction = [WXConvert CAMediaTimingFunction:args[@"timingFunction"]];
@@ -298,8 +297,8 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             info.toValue = @([value floatValue]);
             [infos addObject:info];
         } else if ([property isEqualToString:@"width"]) {
-            if (_needLayout) {
-                [self transitionWithArgs:args withProperty:property target:target];
+            if (*needLayout) {
+                [self transitionWithArgs:args withProperty:property target:target transition:*transition transitionDic:*transitionDic];
             }
             else
             {
@@ -311,8 +310,8 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                 [infos addObject:info];
             }
         } else if ([property isEqualToString:@"height"]) {
-            if (_needLayout) {
-                [self transitionWithArgs:args withProperty:property target:target];
+            if (*needLayout) {
+                [self transitionWithArgs:args withProperty:property target:target transition:*transition transitionDic:*transitionDic];
             }
             else
             {
@@ -329,13 +328,15 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 }
 
 - (void)transitionWithArgs:(NSDictionary *)args withProperty:(NSString *)property target:(WXComponent *)target
+                transition:(WXTransition*)transition
+             transitionDic:(NSMutableDictionary*)transitionDic
 {
-    [_transition.filterStyles setObject:args[@"styles"][property] forKey:property];
-    [_transition.oldFilterStyles setObject:target.styles[property] ?:@0 forKey:property];
+    [transition.filterStyles setObject:args[@"styles"][property] forKey:property];
+    [transition.oldFilterStyles setObject:target.styles[property] ?:@0 forKey:property];
     [target _modifyStyles:@{property:args[@"styles"][property]}];
-    [_transitionDic setObject:@([args[@"duration"] doubleValue]) forKey:kWXTransitionDuration];
-    [_transitionDic setObject:@([args[@"delay"] doubleValue]) forKey:kWXTransitionDelay];
-    [_transitionDic setObject:args[@"timingFunction"] forKey:kWXTransitionTimingFunction];
+    [transitionDic setObject:@([args[@"duration"] doubleValue]) forKey:kWXTransitionDuration];
+    [transitionDic setObject:@([args[@"delay"] doubleValue]) forKey:kWXTransitionDelay];
+    [transitionDic setObject:args[@"timingFunction"] forKey:kWXTransitionTimingFunction];
 }
 
 - (void)animation:(WXComponent *)targetComponent args:(NSDictionary *)args callback:(WXModuleKeepAliveCallback)callback
@@ -362,15 +363,19 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             callback(message,NO);
         }
     }];
-    NSArray<WXAnimationInfo *> *infos = [self animationInfoArrayFromArgs:args target:targetComponent];
+    
+    BOOL needLayout = NO;
+    WXTransition* transition = nil;
+    NSMutableDictionary* transitionDic = nil;
+    NSArray<WXAnimationInfo *> *infos = [self animationInfoArrayFromArgs:args target:targetComponent needLayout:&needLayout transition:&transition transitionDic:&transitionDic];
     for (WXAnimationInfo *info in infos) {
         [self _createCAAnimation:info];
     }
     
     [CATransaction commit];
-    if (_needLayout) {
+    if (needLayout && transition) {
         WXPerformBlockOnComponentThread(^{
-            [_transition _handleTransitionWithStyles:_transitionDic resetStyles:nil target:targetComponent];
+            [transition _handleTransitionWithStyles:transitionDic resetStyles:nil target:targetComponent];
         });
     }
 }
