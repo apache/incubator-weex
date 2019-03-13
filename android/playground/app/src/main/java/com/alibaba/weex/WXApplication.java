@@ -194,9 +194,9 @@ public class WXApplication extends Application {
         Method method = heronInitClass.getMethod("initApplication", Application.class);
         method.setAccessible(true);
         method.invoke(null,this);
-        Log.e("Weex", "Weex Heron Init Success");
+        Log.e("Weex", "Weex Heron Render Init Success");
      }catch (Exception e){
-        Log.e("Weex", "Weex Heron Init Error", e);
+        Log.e("Weex", "Weex Heron Render Mode Not Found", e);
     }
   }
 
