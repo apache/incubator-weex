@@ -467,7 +467,11 @@ std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSOnInstance(const char *i
 }
 
 int CoreSideInPlatform::DestroyInstance(const char *instanceId) {
-    return EagleBridge::GetInstance()->data_render_handler()->DestroyInstance(instanceId);
+    auto handler = EagleBridge::GetInstance()->data_render_handler();
+    if(handler!=nullptr){
+      handler->DestroyInstance(instanceId);
+    }
+    return WeexCoreManager::Instance()->script_bridge()->script_side()->DestroyInstance(instanceId);
 }
 
 int CoreSideInPlatform::UpdateGlobalConfig(const char *config) {

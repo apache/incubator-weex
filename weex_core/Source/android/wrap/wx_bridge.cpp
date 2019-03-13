@@ -36,13 +36,12 @@
 #include "base/android/jni/jbytearray_ref.h"
 #include "base/android/jniprebuild/jniheader/WXBridge_jni.h"
 #include "base/log_defines.h"
-#include "core/data_render/common_error.h"
-#include "core/data_render/vnode/vnode_render_manager.h"
 #include "core/config/core_environment.h"
 #include "core/layout/layout.h"
 #include "core/layout/measure_func_adapter_impl_android.h"
 #include "core/manager/weex_core_manager.h"
-#include "core/data_render/vnode/vnode_render_manager.h"
+#include "core/bridge/eagle_bridge.h"
+#include "third_party/json11/json11.hpp"
 
 using namespace WeexCore;
 jlongArray jFirstScreenRenderTime = nullptr;
@@ -616,18 +615,10 @@ static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
   ScopedJStringUTF8 dataChar(env, data);
   ScopedJStringUTF8 domChangesChar(env, domChanges);
 
-  try {
-    weex::core::data_render::VNodeRenderManager::GetInstance()->FireEvent(
+    WeexCore::EagleBridge::GetInstance()->data_render_handler()->FireEvent(
         idChar.getChars(), refChar.getChars(), typeChar.getChars(),
         dataChar.getChars(), domChangesChar.getChars()
     );
-  } catch (std::exception &e) {
-    auto error = static_cast<weex::core::data_render::Error *>(&e);
-    if (error) {
-      LOGE("Error on FireEventOnDataRenderNode %s", error->what());
-    }
-    return;
-  }
 }
 
 static void RegisterModuleOnDataRenderNode(JNIEnv* env, jobject jcaller,
@@ -638,16 +629,8 @@ static void RegisterModuleOnDataRenderNode(JNIEnv* env, jobject jcaller,
 
   ScopedJStringUTF8 dataChar(env, data);
 
-  try {
-    weex::core::data_render::VNodeRenderManager::GetInstance()->RegisterModules(dataChar.getChars());
-  } catch (std::exception &e) {
-    auto error = static_cast<weex::core::data_render::Error *>(&e);
-    if (error) {
-      LOGE("Error on RegisterModuleOnDataRenderNode %s", error->what());
-
-    }
-    return;
-  }
+  WeexCore::EagleBridge::GetInstance()->data_render_handler()->RegisterModules(
+    dataChar.getChars());
 }
 
 namespace WeexCore {

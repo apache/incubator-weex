@@ -23,7 +23,7 @@
 #if defined __cplusplus
 #include <string>
 #include <functional>
-#include "WeexApiHeader.h"
+#include "include/WeexApiHeader.h"
 
 namespace WeexCore {
     class RenderObject;
