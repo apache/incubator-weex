@@ -1101,7 +1101,9 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     using namespace WeexCore;
     
     // Temporarily before iOS adapt to JSEngine, we intercept here for custom render page
-    if ([pageId containsString:@"_"]) {
+    auto renderType = RenderManager::GetInstance()->getPageRenderType([pageId UTF8String] ?: "");
+    
+    if (!renderType.empty()) {
         // Custom page
         RenderPageBase *page = RenderManager::GetInstance()->GetPage([pageId UTF8String] ?: "");
         if (page) {
@@ -1122,10 +1124,11 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     using namespace WeexCore;
     
     // Temporarily before iOS adapt to JSEngine, we intercept here for custom render page
-    if ([pageId containsString:@"_"]) {
+    auto renderType = RenderManager::GetInstance()->getPageRenderType([pageId UTF8String] ?: "");
+    
+    if (!renderType.empty()) {
         // Custom page
-        NSString* pageType = [pageId substringFromIndex:[pageId rangeOfString:@"_"].location + 1];
-        WeexCore::RenderManager::GetInstance()->CreateCustomPage([pageId UTF8String] ?: "", [pageType UTF8String] ?: "");
+        WeexCore::RenderManager::GetInstance()->CreateCustomPage([pageId UTF8String] ?: "", renderType);
         RenderPageBase *page = RenderManager::GetInstance()->GetPage([pageId UTF8String] ?: "");
         
         [self _custom_parseRenderObject:data parentRef:"" index:0 genObject:^(const std::string &ref, const std::string &type, const std::string &parentRef, std::map<std::string, std::string> *styles, std::map<std::string, std::string> *attrs, std::set<std::string> *events, int index) {
@@ -1200,6 +1203,11 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 }
 
 // X-Page relative
+
++ (void)registerPageRenderType:(NSString*)pageId type:(NSString*)type
+{
+    WeexCore::RenderManager::GetInstance()->setPageRenderType([pageId UTF8String]?:"", [type UTF8String]?:"");
+}
 
 + (NSSet<NSString*>*)getAvailableCustomRenderTypes
 {

@@ -106,20 +106,18 @@ typedef enum : NSUInteger {
             __instance++;
         }
         
+        _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
+        
         if (self.isCustomRenderType) {
             // check render type is available
             NSSet* availableRenderTypes = [WXCoreBridge getAvailableCustomRenderTypes];
             if ([availableRenderTypes containsObject:_renderType]) {
-                _instanceId = [NSString stringWithFormat:@"%ld_%@", (long)instanceId, _renderType];
+                [WXCoreBridge registerPageRenderType:_instanceId type:_renderType];
             }
             else {
                 WXLogError(@"Unsupported render type '%@'. Regress to platform target.", _renderType);
                 _renderType = WEEX_RENDER_TYPE_PLATFORM;
-                _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
             }
-        }
-        else {
-            _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
         }
         
         // TODO self is retained here.

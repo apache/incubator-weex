@@ -211,6 +211,8 @@ namespace WeexCore
 
 // X-Page relative
 
++ (void)registerPageRenderType:(NSString*)pageId type:(NSString*)type;
+
 + (NSSet<NSString*>*)getAvailableCustomRenderTypes;
 
 + (UIView*)createCustomPageRootView:(NSString*)pageId pageType:(NSString*)pageType frame:(CGRect)frame;
