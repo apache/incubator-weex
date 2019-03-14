@@ -81,6 +81,10 @@ namespace WeexCore {
             
             bool UpdateStyle(const std::string &page_id, const std::string &ref,
                              std::vector<std::pair<std::string, std::string>> *stylePair);
+                             
+            int ExecJS(const char *instanceId, const char *nameSpace,
+                       const char *func,
+                       std::vector<VALUE_WITH_TYPE *> &params);
         };
         
         class DataRenderHandler {

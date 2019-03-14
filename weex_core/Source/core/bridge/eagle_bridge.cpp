@@ -150,6 +150,17 @@ namespace WeexCore {
                                   std::vector<std::pair<std::string, std::string>> *stylePair) {
         return RenderManager::GetInstance()->UpdateStyle(page_id, ref, stylePair);
     }
+
+    int EagleBridge::WeexCoreHandler::ExecJS(const char *instanceId, const char *nameSpace,
+                       const char *func,
+                       std::vector<VALUE_WITH_TYPE *> &params){
+        return WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
+            instanceId,
+            nameSpace,
+            func,
+            params
+        );
+    }
     
     int EagleBridge::DataRenderHandler::DestroyInstance(const char *instanceId) {
         return WeexCoreManager::Instance()
