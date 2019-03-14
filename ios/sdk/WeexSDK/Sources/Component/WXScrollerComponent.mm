@@ -567,7 +567,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
     
     if (_scrollDirection == WXScrollDirectionHorizontal) {
-        CGFloat contentOffetX = [component.supercomponent.view convertPoint:component.view.frame.origin toView:self.view].x;
+        CGFloat contentOffetX = 0;
+        if (self.isDirectionRTL && component.supercomponent != self) {
+            contentOffetX = [component.supercomponent.view convertPoint:CGPointMake(CGRectGetMaxX(component.view.frame), component.view.frame.origin.y) toView:self.view].x;
+        } else {
+            contentOffetX = [component.supercomponent.view convertPoint:component.view.frame.origin toView:self.view].x;
+        }
         contentOffetX += offset * scaleFactor;
         
         if (scrollView.contentSize.width >= scrollView.frame.size.width && contentOffetX > scrollView.contentSize.width - scrollView.frame.size.width) {

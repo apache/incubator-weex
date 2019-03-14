@@ -86,6 +86,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
   private boolean mHasAddScrollEvent = false;
+  private Boolean mIslastDirectionRTL;
 
   private static final int SWIPE_MIN_DISTANCE = 5;
   private static final int SWIPE_THRESHOLD_VELOCITY = 300;
@@ -101,6 +102,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private boolean pageEnable = false;
   private boolean mIsHostAttachedToWindow = false;
   private View.OnAttachStateChangeListener mOnAttachStateChangeListener;
+
+  private boolean mlastDirectionRTL = false;
 
   public static class Creator implements ComponentCreator {
     @Override
@@ -482,44 +485,45 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       scrollView.addView(mRealView, layoutParams);
       scrollView.setHorizontalScrollBarEnabled(false);
       mScrollerView = scrollView;
-        final WXScroller component = this;
-        final View.OnLayoutChangeListener listener = new View.OnLayoutChangeListener() {
-          @Override
-          public void onLayoutChange(View view, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-            final View frameLayout = view;
-            scrollView.post(new Runnable() {
-              @Override
-              public void run() {
-                if (isLayoutRTL()) {
-                  int mw = frameLayout.getMeasuredWidth();
-                  scrollView.scrollTo(mw, component.getScrollY());
-                } else {
-                  boolean scrollToBegin = true;
-                  Object scrollToBeginOnLTR = getAttrs().get("scrollToBegin");
-                  if (scrollToBeginOnLTR instanceof String){
-                    if("false".equalsIgnoreCase((String)scrollToBeginOnLTR)){
-                      scrollToBegin = false;
-                    }
-                  }
-                  if (scrollToBegin){
-                    scrollView.scrollTo(0, component.getScrollY());
-                  }
+      final WXScroller component = this;
+      final View.OnLayoutChangeListener listener = new View.OnLayoutChangeListener() {
+        @Override
+        public void onLayoutChange(View view, final int left, int top, final int right, int bottom, final int oldLeft, int oldTop, final int oldRight, int oldBottom) {
+          final View frameLayout = view;
+          scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+              if (mIslastDirectionRTL != null && isLayoutRTL() != mIslastDirectionRTL.booleanValue()) {
+                // when layout direction changed we need convert x to RTL x for scroll to the same item
+                int currentX = getScrollX();
+                int totalWidth = getInnerView().getChildAt(0).getWidth();
+                int displayWidth = getInnerView().getMeasuredWidth();
+                scrollView.scrollTo(totalWidth - currentX - displayWidth, component.getScrollY());
+              } else if (isLayoutRTL()) {
+                // if layout direction not changed, but width changede, we need keep RTL offset
+                int oldWidth = oldRight - oldLeft;
+                int width = right - left;
+                int changedWidth = width - oldWidth;
+                if (changedWidth != 0) {
+                  scrollView.scrollBy(changedWidth, component.getScrollY());
                 }
               }
-            });
-          }
-        };
-        mRealView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-          @Override
-          public void onViewAttachedToWindow(View view) {
-            view.addOnLayoutChangeListener(listener);
-          }
+              mIslastDirectionRTL = new Boolean(isLayoutRTL());
+            }
+          });
+        }
+      };
+      mRealView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+        @Override
+        public void onViewAttachedToWindow(View view) {
+          view.addOnLayoutChangeListener(listener);
+        }
 
-          @Override
-          public void onViewDetachedFromWindow(View view) {
-            view.removeOnLayoutChangeListener(listener);
-          }
-        });
+        @Override
+        public void onViewDetachedFromWindow(View view) {
+          view.removeOnLayoutChangeListener(listener);
+        }
+      });
 
 
       if(pageEnable) {
@@ -798,19 +802,24 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     int viewXInScroller = 0;
     if (this.isLayoutRTL()) {
       // if layout direction is rtl, we need calculate rtl scroll x;
-      if (getInnerView().getChildCount() > 0) {
-        int totalWidth = getInnerView().getChildAt(0).getWidth();
-        int displayWidth = getInnerView().getMeasuredWidth();
-        viewXInScroller = totalWidth - (component.getAbsoluteX() - getAbsoluteX()) - displayWidth;
+      if (component.getParent() != null && component.getParent() == this) {
+        if (getInnerView().getChildCount() > 0) {
+          int totalWidth = getInnerView().getChildAt(0).getWidth();
+          int displayWidth = getInnerView().getMeasuredWidth();
+          viewXInScroller = totalWidth - (component.getAbsoluteX() - getAbsoluteX()) - displayWidth;
+        } else {
+          viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
+        }
       } else {
-        viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
+        int displayWidth = getInnerView().getMeasuredWidth();
+        viewXInScroller = component.getAbsoluteX() - getAbsoluteX() - displayWidth + (int)component.getLayoutWidth();
       }
-      offsetFloat = - offsetFloat;
+      offsetFloat = -offsetFloat;
     } else {
       viewXInScroller = component.getAbsoluteX() - getAbsoluteX();
     }
-
     scrollBy(viewXInScroller - getScrollX() + (int) offsetFloat, viewYInScroller - getScrollY() + (int) offsetFloat, smooth);
+
   }
 
   /**
