@@ -18,7 +18,7 @@
  */
 
 #include "core/bridge/eagle_bridge.h"
-
+#include "base/closure.h"
 #include "core/render/node/render_object.h"
 #include "core/render/node/factory/render_creator.h"
 #include "core/render/manager/render_manager.h"
@@ -160,6 +160,10 @@ namespace WeexCore {
             func,
             params
         );
+    }
+
+    void EagleBridge::WeexCoreHandler::PostTaskToMsgLoop(const weex::base::Closure& closure){
+        WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(closure);
     }
     
     int EagleBridge::DataRenderHandler::DestroyInstance(const char *instanceId) {
