@@ -129,6 +129,7 @@
         
         UIAlertAction* nativeAction = [UIAlertAction actionWithTitle:@"Native" style:UIAlertActionStyleDefault
                                                              handler:^(UIAlertAction * action) {
+                                                                 useXRenderValue = NO;
                                                                  useXRenderSelected = YES;
                                                                  [self render];
                                                              }];

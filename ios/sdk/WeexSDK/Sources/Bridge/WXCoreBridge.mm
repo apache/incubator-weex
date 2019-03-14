@@ -1233,7 +1233,9 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     using namespace WeexCore;
     
     // Temporarily before iOS adapt to JSEngine, we intercept here for custom render page
-    if ([pageId containsString:@"_"]) {
+    auto renderType = RenderManager::GetInstance()->getPageRenderType([pageId UTF8String] ?: "");
+    
+    if (!renderType.empty()) {
         RenderPageCustom *page = (RenderPageCustom*)RenderManager::GetInstance()->GetPage([pageId UTF8String] ?: "");
         if (page) {
             RenderTarget* target = page->GetRenderTarget();
