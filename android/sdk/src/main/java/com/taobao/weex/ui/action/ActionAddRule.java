@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONObject;
@@ -55,12 +57,13 @@ public class ActionAddRule implements IExecutable {
 
     FontDO fontDO = parseFontDO(mData, instance);
     if (fontDO != null && !TextUtils.isEmpty(fontDO.getFontFamilyName())) {
+      notifyAddFontRule(instance, fontDO);
       FontDO cacheFontDO = TypefaceUtil.getFontDO(fontDO.getFontFamilyName());
       if (cacheFontDO == null || !TextUtils.equals(cacheFontDO.getUrl(), fontDO.getUrl())) {
         TypefaceUtil.putFontDO(fontDO);
-        TypefaceUtil.loadTypeface(fontDO);
+        TypefaceUtil.loadTypeface(fontDO, true);
       } else {
-        TypefaceUtil.loadTypeface(cacheFontDO);
+        TypefaceUtil.loadTypeface(cacheFontDO, true);
       }
     }
 
@@ -75,4 +78,21 @@ public class ActionAddRule implements IExecutable {
 
     return new FontDO(name, src,instance);
   }
+
+
+  private void notifyAddFontRule(WXSDKInstance instance, FontDO fontDO){
+    Intent intent = new Intent(ACTION_WEEX_ADD_RULE_FONT);
+    intent.putExtra(FONT_FAMILY_NAME, fontDO.getFontFamilyName());
+    intent.putExtra(FONT_URL, fontDO.getUrl());
+    intent.putExtra(PAGE_ID, instance.getInstanceId());
+    LocalBroadcastManager.getInstance(instance.getContext()).sendBroadcast(intent);
+  }
+
+  /**
+   * Keep The Same With Render FontManager's Constants.
+   * */
+  public static final String ACTION_WEEX_ADD_RULE_FONT = "ACTION_WEEX_ADD_RULE_FONT";
+  public static final String FONT_FAMILY_NAME = "fontFamily";
+  public static final String FONT_URL = "fontUrl";
+  public static final String PAGE_ID = "pageId";
 }
