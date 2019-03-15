@@ -283,10 +283,6 @@ public class TypefaceUtil {
     intent.putExtra("filePath", fontDO.getFilePath());
     intent.putExtra("fontUrl", fontDO.getUrl());
     LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
-    Log.e("Weex", "Weex notifyFontAvailable" +
-    fontDO.getFontFamilyName() +
-            fontDO.getFilePath() + fontDO.getUrl());
-
   }
 
   private static String getFontCacheDir() {

@@ -85,11 +85,12 @@ public class ActionAddRule implements IExecutable {
     intent.putExtra(FONT_FAMILY_NAME, fontDO.getFontFamilyName());
     intent.putExtra(FONT_URL, fontDO.getUrl());
     intent.putExtra(PAGE_ID, instance.getInstanceId());
-    LocalBroadcastManager.getInstance(instance.getContext()).sendBroadcast(intent);
+    /** Send Broadcast Syn Mode, Make Sure FontWatcher Receiver The Font */
+    LocalBroadcastManager.getInstance(instance.getContext()).sendBroadcastSync(intent);
   }
 
   /**
-   * Keep The Same With Render FontManager's Constants.
+   * Keep The Same With Heron FontManager's Constants.
    * */
   public static final String ACTION_WEEX_ADD_RULE_FONT = "ACTION_WEEX_ADD_RULE_FONT";
   public static final String FONT_FAMILY_NAME = "fontFamily";
