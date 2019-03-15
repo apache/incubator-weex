@@ -674,6 +674,9 @@ public class WXTransition {
         if(duration != null){
             duration = duration.replaceAll("ms", "");
         }
+        if(duration != null){
+            duration = duration.replaceAll("px", "");
+        }
         if(TextUtils.isEmpty(duration)){
             return  defaultValue;
         }
