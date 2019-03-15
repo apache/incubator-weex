@@ -258,6 +258,30 @@ static Value SetComponentRoot(ExecState* exec_state) {
   return Value();
 }
 
+// setComponentRoot(component, "attrs");
+static Value SetComponentRef(ExecState* exec_state) {
+    VComponent *component = exec_state->GetArgument(0)->type == Value::Type::NIL ?
+    nullptr : reinterpret_cast<VComponent *>(exec_state->GetArgument(0)->cptr);
+    if (!component) {
+        return Value();
+    }
+    Value *attributes = exec_state->GetArgument(1);
+    if (IsTable(attributes)) {
+        Table* attrs = ValueTo<Table>(attributes);
+        auto it = attrs->map.find("ref");
+        if (it != attrs->map.end()) {
+            Value value = it->second;
+            if (value.type == Value::STRING) {
+                component->SetAttribute(it->first, value.str->c_str());
+            } else if (value.type == Value::INT) {
+                std::string str = std::to_string(value.i);
+                component->SetAttribute(it->first, str);
+            }
+        }
+    }
+    return Value();
+}
+
 // createComponent(template_id, "template_name", func_name);
 static Value CreateComponent(ExecState* exec_state) {
   int template_id = 0;
@@ -594,6 +618,7 @@ void VNodeExecEnv::ImportExecEnv(ExecState *state) {
     state->Register("createComponent", CreateComponent);
     state->Register("saveComponentPropsAndData", saveComponentPropsAndData);
     state->Register("setComponentRoot", SetComponentRoot);
+    state->Register("setComponentRef", SetComponentRef);
     state->Register("appendChild", AppendChild);
     state->Register("encodeURIComponent", encodeURIComponent);
     state->Register("encodeURI", encodeURIComponent);

@@ -33,6 +33,7 @@ VComponent::VComponent(ExecState *exec_state, int template_id,
     : VNode("", "", ""),
       is_dirty_(false),
       has_dispatch_created_(false),
+      has_dispatch_mounted_(false),
       has_moved_(false),
       id_(g_component_id++),
       template_id_(template_id),
@@ -103,6 +104,12 @@ static void BuildRefsInner(
   if (!node->ref().empty()) {
     VComponent::VNodeRef ref;
     ref.insert({"ref", node->render_object_ref()});
+    if (node->IsVirtualComponent()) {
+        ref.insert({"isComponent", "true"});
+        ref.insert({"componentId", std::to_string(node->component()->id())});
+    } else {
+        ref.insert({"tagName", node->tag_name()});
+    }
     auto it = ref_map.find(node->ref());
     if (it != ref_map.end()) {
       if (!in_for_loop) {
@@ -171,6 +178,7 @@ bool VComponent::Equal(VComponent *old_component) {
 
 void VComponent::MoveTo(VComponent *new_component) {
   new_component->has_dispatch_created_ = has_dispatch_created_;
+  new_component->has_dispatch_mounted_ = has_dispatch_mounted_;
   new_component->id_ = id_;
   new_component->SetRootNode(root_vnode_.release());
   new_component->data_ = data_;
@@ -241,12 +249,23 @@ void VComponent::DispatchCreated() {
   has_dispatch_created_ = true;
 }
 
+void VComponent::DispatchMounted() {
+    if (has_dispatch_mounted_) return;
+    TravelVComponentsWithFunc(&VComponent::DispatchMounted, root_vnode());
+    if (listener_) {
+        listener_->OnMounted(this, ref_map_);
+    }
+    has_dispatch_mounted_ = true;
+}
+
 void VComponent::DispatchUpdated() {
   if (!has_dispatch_created_) {
     DispatchCreated();
+    DispatchMounted();
     return;
   }
   if (!is_dirty_) return;
+  TravelVComponentsWithFunc(&VComponent::DispatchUpdated, root_vnode());
   BuildRefMap();
   if (listener_) {
     if (updated_props_.type == Value::Type::NIL) {
@@ -254,7 +273,6 @@ void VComponent::DispatchUpdated() {
     }
     listener_->OnUpdated(this, ValueTo<Table>(&updated_props_), ref_map_);
   }
-  TravelVComponentsWithFunc(&VComponent::DispatchUpdated, root_vnode());
   is_dirty_ = false;
 }
 

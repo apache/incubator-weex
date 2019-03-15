@@ -69,7 +69,6 @@ VALUE_WITH_TYPE* Conversion::GenValueWithType(const char* event_str) {
       buffer, reinterpret_cast<const uint8_t*>(event_str), strlen(event_str));
   event->value.byteArray = genWeexByteArray(
       static_cast<const char*>(buffer->data), buffer->position);
-  buffer->data = nullptr;
   wson_buffer_free(buffer);
   return event;
 }

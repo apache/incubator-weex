@@ -23,6 +23,45 @@
 
 static NSString* const JSONSTRING_SUFFIX = @"\t\n\t\r";
 
+#if 0
+
+void _detectObjectRecursion(id object, NSMutableSet* nodes)
+{
+    if (object == nil) {
+        return;
+    }
+    if ([object isKindOfClass:[NSString class]] ||
+        [object isKindOfClass:[NSNumber class]] ||
+        [object isKindOfClass:[NSNull class]]) {
+        return;
+    }
+    
+    if ([object isKindOfClass:[NSArray class]]) {
+        for (id subobj in object) {
+            if ([nodes containsObject:subobj]) {
+                NSLog(@"Find recursion.");
+            }
+            [nodes addObject:subobj];
+            _detectObjectRecursion(subobj, nodes);
+            [nodes removeObject:subobj];
+        }
+    }
+    else if ([object isKindOfClass:[NSDictionary class]]) {
+        NSArray* allKeys = [object allKeys];
+        for (id key in allKeys) {
+            id subobj = object[key];
+            if ([nodes containsObject:subobj]) {
+                NSLog(@"Find recursion.");
+            }
+            [nodes addObject:subobj];
+            _detectObjectRecursion(subobj, nodes);
+            [nodes removeObject:subobj];
+        }
+    }
+}
+
+#endif
+
 NSString* TO_JSON(id object)
 {
     if (object == nil) {
@@ -31,6 +70,12 @@ NSString* TO_JSON(id object)
     
     @try {
         if ([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]) {
+            
+#if 0
+            NSMutableSet* nodes = [[NSMutableSet alloc] init];
+            _detectObjectRecursion(object, nodes);
+#endif
+            
             NSError *error = nil;
             NSData *data = [NSJSONSerialization dataWithJSONObject:object
                                                            options:0
