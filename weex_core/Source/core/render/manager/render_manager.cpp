@@ -59,12 +59,12 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
   if (!targetName.empty()) {
       RenderPageCustom* pageCustom = CreateCustomPage(page_id, targetName);
       WsonGenerate(data, "", 0, [=](const std::string& ref,
-                                                const std::string& type,
-                                                const std::string& parentRef,
-                                                std::map<std::string, std::string>* styles,
-                                                std::map<std::string, std::string>* attrs,
-                                                std::set<std::string>* events,
-                                                int index) {
+                                    const std::string& type,
+                                    const std::string& parentRef,
+                                    std::map<std::string, std::string>* styles,
+                                    std::map<std::string, std::string>* attrs,
+                                    std::set<std::string>* events,
+                                    int index) {
           if (parentRef.empty()) {
               pageCustom->CreateBody(ref, type, styles, attrs, events);
           }
@@ -148,6 +148,8 @@ RenderPageCustom* RenderManager::CreateCustomPage(const std::string& page_id, co
 #endif
     
     RenderPageCustom::PageOptions options;
+    
+    options.page_url = getPageURL(page_id);
     
     options.view_scale = 1;
     auto value = WeexCore::WXCoreEnvironment::getInstance()->GetOption("pixel_scale");
@@ -434,6 +436,7 @@ RenderPageBase *RenderManager::GetPage(const std::string &page_id) {
 }
 
 bool RenderManager::ClosePage(const std::string &page_id) {
+  removePageURL(page_id);
   removePageRenderType(page_id);
   RenderPageBase *page = GetPage(page_id);
   if (page == nullptr) return false;
@@ -479,8 +482,26 @@ void RenderManager::set_round_off_deviation(const std::string &page_id, bool rou
 
   page->SetRoundOffDeviation(round_off_deviation);
 }
+    
+void RenderManager::setPageURL(const std::string& pageId, const std::string& pageURL) {
+    if (!pageId.empty()) {
+        mPageURLs.insert({pageId, pageURL});
+    }
+}
+    
+void RenderManager::removePageURL(const std::string& pageId) {
+    mPageURLs.erase(pageId);
+}
+    
+std::string RenderManager::getPageURL(const std::string& pageId) {
+    auto it = mPageURLs.find(pageId);
+    if (it != mPageURLs.end()){
+        return it->second;
+    }
+    return "";
+}
 
-void RenderManager::setPageRenderType(const std::string &pageId, const std::string renderType) {
+void RenderManager::setPageRenderType(const std::string &pageId, const std::string &renderType) {
     mPageTypes.insert({pageId, renderType});
 }
 

@@ -165,7 +165,7 @@ void CoreSideInPlatform::SetViewPortWidth(const std::string &instance_id,
 }
 
 void CoreSideInPlatform::SetPageRenderType(const std::string &pageId,
-                                           const std::string renderType) {
+                                           const std::string &renderType) {
     RenderManager::GetInstance()->setPageRenderType(pageId, renderType);
 }
 

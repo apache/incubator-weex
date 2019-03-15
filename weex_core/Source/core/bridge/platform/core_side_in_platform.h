@@ -47,7 +47,7 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
                  const std::string &render_ref) override;
   void SetViewPortWidth(const std::string &instance_id, float width) override;
 
-  virtual void SetPageRenderType(const std::string &pageId, const std::string renderType)override;
+  virtual void SetPageRenderType(const std::string &pageId, const std::string &renderType)override;
 
   virtual void RemovePageRenderType(const std::string &pageId)override;
 

@@ -236,6 +236,12 @@ typedef enum : NSUInteger {
     [WXCoreBridge setViewportWidth:_instanceId width:viewportWidth];
 }
 
+- (void)setScriptURL:(NSURL *)scriptURL
+{
+    _scriptURL = scriptURL;
+    [WXCoreBridge registerPageURL:_instanceId url:[_scriptURL absoluteString]];
+}
+
 - (void)renderWithURL:(NSURL *)url
 {
     [self renderWithURL:url options:nil data:nil];
@@ -258,7 +264,7 @@ typedef enum : NSUInteger {
         return;
     }
 
-    _scriptURL = url;
+    self.scriptURL = url;
     [self _checkPageName];
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
@@ -484,7 +490,7 @@ typedef enum : NSUInteger {
 - (void)_renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
 {
     NSURL *url = request.URL;
-    _scriptURL = url;
+    self.scriptURL = url;
     _jsData = data;
     NSMutableDictionary *newOptions = [options mutableCopy] ?: [NSMutableDictionary new];
     

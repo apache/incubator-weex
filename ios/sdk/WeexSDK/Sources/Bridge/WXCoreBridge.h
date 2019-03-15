@@ -213,6 +213,8 @@ namespace WeexCore
 
 + (void)registerPageRenderType:(NSString*)pageId type:(NSString*)type;
 
++ (void)registerPageURL:(NSString*)pageId url:(NSString*)url;
+
 + (NSSet<NSString*>*)getAvailableCustomRenderTypes;
 
 + (UIView*)createCustomPageRootView:(NSString*)pageId pageType:(NSString*)pageType frame:(CGRect)frame;

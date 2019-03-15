@@ -1209,6 +1209,11 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     WeexCore::RenderManager::GetInstance()->setPageRenderType([pageId UTF8String]?:"", [type UTF8String]?:"");
 }
 
++ (void)registerPageURL:(NSString*)pageId url:(NSString*)url
+{
+    WeexCore::RenderManager::GetInstance()->setPageURL([pageId UTF8String]?:"", [url UTF8String]?:"");
+}
+
 + (NSSet<NSString*>*)getAvailableCustomRenderTypes
 {
     NSMutableSet<NSString*>* result = [[NSMutableSet alloc] init];

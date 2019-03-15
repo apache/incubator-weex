@@ -63,7 +63,7 @@ class PlatformBridge {
                            const std::string& render_ref) = 0;
     virtual void SetViewPortWidth(const std::string& instance_id,
                                   float width) = 0;
-    virtual void SetPageRenderType(const std::string &pageId, const std::string renderType)=0;
+    virtual void SetPageRenderType(const std::string &pageId, const std::string& renderType)=0;
 
     virtual void RemovePageRenderType(const std::string &pageId)=0;
     virtual void SetPageDirty(const std::string& instance_id) = 0;
