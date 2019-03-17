@@ -31,6 +31,7 @@ import java.io.File;
 public class FontDO {
   private final String mFontFamilyName;
   private String mUrl = "";
+  private String mFilePath;
   private int mType = TYPE_NETWORK;
   private Typeface mTypeface;
   private int mState = STATE_INVALID;
@@ -172,5 +173,13 @@ public class FontDO {
 
   public void setState(int state) {
     this.mState = state;
+  }
+
+  public String getFilePath() {
+    return mFilePath;
+  }
+
+  public void setFilePath(String mFilePath) {
+    this.mFilePath = mFilePath;
   }
 }
