@@ -152,3 +152,5 @@ endif(ANDROID)
 add_library(${WEEXCORE_LIBRARY_NAME} SHARED ${FINAL_ADD_LIBRARY})
 target_include_directories(${WEEXCORE_LIBRARY_NAME} PUBLIC .)
 target_link_libraries(${WEEXCORE_LIBRARY_NAME} ${FINAL_TARGET_LINK_LIBRARIES})
+# Enable it for smaller so.
+# set_target_properties(${WEEXCORE_LIBRARY_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden)
