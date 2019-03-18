@@ -22,5 +22,5 @@ public interface FontListener {
 
     public void onAddFontRule(String pageId, String fontFamily, String fontUrl);
 
-    public void onFontLoad(String fontFaimly, String fontUrl, String filePath);
+    public void onFontLoad(String fontFamily, String fontUrl, String filePath);
 }

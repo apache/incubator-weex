@@ -17,9 +17,6 @@
  * under the License.
  */
 package com.taobao.weex.ui.action;
-
-import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONObject;
@@ -82,24 +79,9 @@ public class ActionAddRule implements IExecutable {
 
 
   private void notifyAddFontRule(WXSDKInstance instance, FontDO fontDO){
-    Intent intent = new Intent(ACTION_WEEX_ADD_RULE_FONT);
-    intent.putExtra(FONT_FAMILY_NAME, fontDO.getFontFamilyName());
-    intent.putExtra(FONT_URL, fontDO.getUrl());
-    intent.putExtra(PAGE_ID, instance.getInstanceId());
-    /** Send Broadcast Syn Mode, Make Sure FontWatcher Receiver The Font */
-    LocalBroadcastManager.getInstance(instance.getContext()).sendBroadcastSync(intent);
-
     FontAdapter fontAdapter = WXSDKManager.getInstance().getFontAdapter();
     if(fontAdapter != null){
-       fontAdapter.onAddFontRule(instance.getInstanceId(), fontDO.getFontFamilyName(), fontDO.getUrl());
+        fontAdapter.onAddFontRule(instance.getInstanceId(), fontDO.getFontFamilyName(), fontDO.getUrl());
     }
   }
-
-  /**
-   * Keep The Same With Heron FontManager's Constants.
-   * */
-  public static final String ACTION_WEEX_ADD_RULE_FONT = "ACTION_WEEX_ADD_RULE_FONT";
-  public static final String FONT_FAMILY_NAME = "fontFamily";
-  public static final String FONT_URL = "fontUrl";
-  public static final String PAGE_ID = "pageId";
 }
