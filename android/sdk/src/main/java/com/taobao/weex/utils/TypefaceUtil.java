@@ -32,6 +32,7 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.font.FontAdapter;
 
 import java.io.File;
 import java.util.HashMap;
@@ -283,6 +284,10 @@ public class TypefaceUtil {
     intent.putExtra("filePath", fontDO.getFilePath());
     intent.putExtra("fontUrl", fontDO.getUrl());
     LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+    FontAdapter fontAdapter = WXSDKManager.getInstance().getFontAdapter();
+    if(fontAdapter != null){
+        fontAdapter.onFontLoad(fontDO.getFontFamilyName(), fontDO.getUrl(), fontDO.getFilePath());
+    }
   }
 
   private static String getFontCacheDir() {

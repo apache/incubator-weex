@@ -26,6 +26,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.font.FontAdapter;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.TypefaceUtil;
 
@@ -87,6 +88,11 @@ public class ActionAddRule implements IExecutable {
     intent.putExtra(PAGE_ID, instance.getInstanceId());
     /** Send Broadcast Syn Mode, Make Sure FontWatcher Receiver The Font */
     LocalBroadcastManager.getInstance(instance.getContext()).sendBroadcastSync(intent);
+
+    FontAdapter fontAdapter = WXSDKManager.getInstance().getFontAdapter();
+    if(fontAdapter != null){
+       fontAdapter.onAddFontRule(instance.getInstanceId(), fontDO.getFontFamilyName(), fontDO.getUrl());
+    }
   }
 
   /**
