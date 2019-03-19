@@ -51,6 +51,7 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.common.WXWorkThreadManager;
+import com.taobao.weex.font.FontAdapter;
 import com.taobao.weex.performance.IApmGenerator;
 import com.taobao.weex.performance.IWXAnalyzer;
 import com.taobao.weex.ui.WXRenderManager;
@@ -511,5 +512,19 @@ public class WXSDKManager {
 
   public void setNavigator(INavigator mNavigator) {
     this.mNavigator = mNavigator;
+  }
+
+
+  private FontAdapter mFontAdapter;
+
+  public FontAdapter getFontAdapter(){
+      if(mFontAdapter == null){
+        synchronized (this){
+          if(mFontAdapter == null){
+              mFontAdapter = new FontAdapter();
+          }
+        }
+      }
+      return mFontAdapter;
   }
 }

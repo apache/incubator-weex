@@ -16,21 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.taobao.weex.font;
 
-#include "core/render/action/render_action_createfinish.h"
-#include "core/manager/weex_core_manager.h"
+public interface FontListener {
 
-namespace WeexCore {
+    public void onAddFontRule(String pageId, String fontFamily, String fontUrl);
 
-RenderActionCreateFinish::RenderActionCreateFinish(const std::string &page_id) {
-  LOGE("RenderActionCreateFinish::RenderActionCreateFinish");
-  this->page_id_ = page_id;
+    public void onFontLoad(String fontFamily, String fontUrl, String filePath);
 }
-
-void RenderActionCreateFinish::ExecuteAction() {
-  WeexCoreManager::Instance()
-      ->getPlatformBridge()
-      ->platform_side()
-      ->CreateFinish(this->page_id_.c_str());
-}
-}  // namespace WeexCore

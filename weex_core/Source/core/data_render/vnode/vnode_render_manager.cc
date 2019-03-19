@@ -146,6 +146,7 @@ bool VNodeRenderManager::CreatePageInternal(const string& page_id,
 
   RenderManager::GetInstance()->CreatePage(page_id, render_root);
   RenderManager::GetInstance()->CreateFinish(page_id);
+  LOGE("VNodeRenderManager::CreatePageInternal %s", page_id.data());
   return true;
 }
 

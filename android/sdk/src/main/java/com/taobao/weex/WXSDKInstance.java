@@ -1312,6 +1312,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
 
   public void onCreateFinish() {
+    if(mHasCreateFinish){
+      return;
+    }
     if (mContext != null) {
       onViewAppear();
       View wxView= mRenderContainer;

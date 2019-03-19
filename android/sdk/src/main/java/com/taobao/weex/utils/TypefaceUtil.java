@@ -32,6 +32,7 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.font.FontAdapter;
 
 import java.io.File;
 import java.util.HashMap;
@@ -160,7 +161,7 @@ public class TypefaceUtil {
       return;
     }
     if(notify){
-         notifyFontAvailable(fontDo);
+         notifyFontAvailable(false, fontDo);
     }
   }
 
@@ -260,11 +261,11 @@ public class TypefaceUtil {
             WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
               @Override
               public void run() {
-               notifyFontAvailable(fontDo);
+               notifyFontAvailable(true, fontDo);
               }
             }, 100);
           }else{
-             notifyFontAvailable(fontDo);
+             notifyFontAvailable(true, fontDo);
           }
           return true;
         }
@@ -277,12 +278,18 @@ public class TypefaceUtil {
     return false;
   }
 
-  private static void notifyFontAvailable(FontDO fontDO){
-    Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
-    intent.putExtra("fontFamily", fontDO.getFontFamilyName());
-    intent.putExtra("filePath", fontDO.getFilePath());
-    intent.putExtra("fontUrl", fontDO.getUrl());
-    LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+  private static void notifyFontAvailable(boolean sendBroadcast, FontDO fontDO){
+    if(sendBroadcast){
+      Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
+      intent.putExtra("fontFamily", fontDO.getFontFamilyName());
+      intent.putExtra("filePath", fontDO.getFilePath());
+      intent.putExtra("fontUrl", fontDO.getUrl());
+      LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+    }
+    FontAdapter fontAdapter = WXSDKManager.getInstance().getFontAdapter();
+    if(fontAdapter != null){
+        fontAdapter.onFontLoad(fontDO.getFontFamilyName(), fontDO.getUrl(), fontDO.getFilePath());
+    }
   }
 
   private static String getFontCacheDir() {

@@ -52,6 +52,9 @@ public class GraphicActionCreateFinish extends BasicGraphicAction {
     if (instance == null || instance.getContext() == null) {
       return;
     }
+    if(instance.mHasCreateFinish){
+        return;
+    }
 
     instance.mHasCreateFinish = true;
 
