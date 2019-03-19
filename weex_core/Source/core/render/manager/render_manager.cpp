@@ -370,6 +370,8 @@ bool RenderManager::CreateFinish(const std::string &page_id) {
   RenderPageBase *page = GetPage(page_id);
   if (page == nullptr) return false;
 
+  LOGE("RenderManager::CreateFinish %s", page_id.data());
+
 #if RENDER_LOG
   LOGD("[RenderManager] CreateFinish >>>> pageId: %s", pageId.c_str());
 #endif

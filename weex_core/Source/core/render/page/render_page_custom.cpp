@@ -128,8 +128,10 @@ namespace WeexCore {
         if (target_) {
             target_->createFinish(page_id_);
         }
+        LOGE("SendCreateFinishAction");
         SendCreateFinishAction();
         SendRenderSuccessAction();
+        LOGE("SendCreateFinishActionEnd");
         return true;
     }
     
