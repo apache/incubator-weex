@@ -50,17 +50,19 @@ export function initModules (modules, ifReplace) {
     }
 
     // push each non-existed new method
-    modules[moduleName].forEach(function (method) {
-      if (typeof method === 'string') {
-        method = {
-          name: method
+    if (Array.isArray(modules[moduleName])) {
+      modules[moduleName].forEach(function (method) {
+        if (typeof method === 'string') {
+          method = {
+            name: method
+          }
         }
-      }
 
-      if (!methods[method.name] || ifReplace) {
-        methods[method.name] = method
-      }
-    })
+        if (!methods[method.name] || ifReplace) {
+          methods[method.name] = method
+        }
+      })
+    }
   }
 }
 

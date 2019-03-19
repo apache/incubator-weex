@@ -17,6 +17,7 @@
  * under the License.
  */
 
+import { isPlainObject } from '../shared/utils'
 import { registerElement } from '../vdom/WeexElement'
 
 const weexComponents = {}
@@ -34,7 +35,7 @@ export function registerComponents (newComponents) {
       if (typeof component === 'string') {
         weexComponents[component] = true
       }
-      else if (typeof component === 'object' && typeof component.type === 'string') {
+      else if (isPlainObject(component) && typeof component.type === 'string') {
         weexComponents[component.type] = component
         registerElement(component.type, component.methods)
       }

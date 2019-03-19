@@ -37,7 +37,7 @@ const registeredElements = {}
  */
 export function registerElement (type, methods) {
   // Skip when no special component methods.
-  if (!methods || !methods.length) {
+  if (!Array.isArray(methods) || !methods.length) {
     return
   }
 
