@@ -629,8 +629,11 @@ static void RegisterModuleOnDataRenderNode(JNIEnv* env, jobject jcaller,
 
   ScopedJStringUTF8 dataChar(env, data);
 
-  WeexCore::EagleBridge::GetInstance()->data_render_handler()->RegisterModules(
-    dataChar.getChars());
+  auto data_render_handler = WeexCore::EagleBridge::GetInstance()->data_render_handler();
+  if(data_render_handler){
+    data_render_handler->RegisterModules(
+        dataChar.getChars());
+  }
 }
 
 namespace WeexCore {
