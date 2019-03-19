@@ -122,7 +122,7 @@ public class InitConfig {
     return nativeLibraryList;
   }
 
-  protected InitConfig() {
+  private InitConfig() {
   }
 
   public static class Builder{
