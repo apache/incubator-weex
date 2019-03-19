@@ -414,7 +414,7 @@ int AndroidSide::HasTransitionPros(
   if (env == nullptr)
     return -1;
 
-  if (style == nullptr) {
+  if (style != nullptr) {
     return wx_bridge_->HasTransitionPros(env, page_id, ref, *style);
   } else {
     return wx_bridge_->HasTransitionPros(

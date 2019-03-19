@@ -17,25 +17,29 @@
  * under the License.
  */
 
+import { hasOwn, isPlainObject } from '../shared/utils'
+
 const weexModules = {}
 
 /**
  * Register native modules information.
  * @param {object} newModules
  */
-export function registerModules (newModules) {
+export function registerModules (newModules = {}) {
   for (const name in newModules) {
-    if (!weexModules[name]) {
+    if (!hasOwn(weexModules, name)) {
       weexModules[name] = {}
     }
-    newModules[name].forEach(method => {
-      if (typeof method === 'string') {
-        weexModules[name][method] = true
-      }
-      else {
-        weexModules[name][method.name] = method.args
-      }
-    })
+    if (Array.isArray(newModules[name])) {
+      newModules[name].forEach(method => {
+        if (typeof method === 'string') {
+          weexModules[name][method] = true
+        }
+        else if (isPlainObject(method) && typeof method.name === 'string') {
+          weexModules[name][method.name] = method.args || []
+        }
+      })
+    }
   }
 }
 

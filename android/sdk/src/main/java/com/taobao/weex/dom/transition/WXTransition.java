@@ -674,6 +674,14 @@ public class WXTransition {
         if(duration != null){
             duration = duration.replaceAll("ms", "");
         }
+        if(duration != null){
+            if(WXEnvironment.isApkDebugable()){
+                if(duration.contains("px")){
+                    WXLogUtils.w("Transition Duration Unit Only Support ms, " + duration + " is not ms Unit");
+                }
+            }
+            duration = duration.replaceAll("px", "");
+        }
         if(TextUtils.isEmpty(duration)){
             return  defaultValue;
         }
