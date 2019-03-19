@@ -87,7 +87,7 @@
 		453F376D219A788800A03F1D /* default_request_handler.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F3750219A76CA00A03F1D /* default_request_handler.h */; };
 		453F376E219A789A00A03F1D /* default_request_handler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 453F3753219A76CA00A03F1D /* default_request_handler.mm */; };
 		453F376F219A78D700A03F1D /* WXConvertUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = 453F374C219A76A500A03F1D /* WXConvertUtility.mm */; };
-		45E0B4C121CB7B82005D1B3B /* WXConvertUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F374B219A76A500A03F1D /* WXConvertUtility.h */; };
+		45E0B4C121CB7B82005D1B3B /* WXConvertUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F374B219A76A500A03F1D /* WXConvertUtility.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		45E0B4C221CB7B9C005D1B3B /* WXConvertUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = 453F374B219A76A500A03F1D /* WXConvertUtility.h */; };
 		591324A31D49B7F1004E89ED /* WXTimerModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */; };
 		591DD3311D23AD5800BE8709 /* WXErrorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 591DD32F1D23AD5800BE8709 /* WXErrorView.m */; };
@@ -2286,6 +2286,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				45E0B4C121CB7B82005D1B3B /* WXConvertUtility.h in Headers */,
 				BD9205FB223651D900EDF93D /* eagle_bridge.h in Headers */,
 				BD9205F82236518700EDF93D /* WXDataRenderHandler.h in Headers */,
 				7715EB6221A69DD9001F1108 /* WXRichText.h in Headers */,
@@ -2339,7 +2340,6 @@
 				4532670A213FC84A00DAA620 /* WXDisplayLinkManager.h in Headers */,
 				74A4BA5B1CABBBD000195969 /* WXDebugTool.h in Headers */,
 				2A837AB41CD9DE9200AEDF03 /* WXLoadingIndicator.h in Headers */,
-				45E0B4C121CB7B82005D1B3B /* WXConvertUtility.h in Headers */,
 				747A787C1D1BAAC900DED9D0 /* WXComponent+ViewManagement.h in Headers */,
 				2AE5B7561CABA04E0082FDDB /* WXEventModuleProtocol.h in Headers */,
 				B8D66C6B21255730003960BD /* render_scroller.h in Headers */,
