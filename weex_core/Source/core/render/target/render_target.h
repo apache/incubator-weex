@@ -40,6 +40,7 @@ namespace WeexCore {
             bool is_round_off = false;
             float viewport_width = -1;
             float view_scale = 1;
+            void* user_data = nullptr;
         };
 
     public:
