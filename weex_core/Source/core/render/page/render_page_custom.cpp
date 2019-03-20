@@ -142,22 +142,27 @@ namespace WeexCore {
         if (target_) {
             if (target_->shouldHandleModuleMethod(module, method)) {
                 bool handled = false;
+                const char* jsonArguments = arguments;
+                int jsonArgumentsLength = arguments_length;
                 if (arguments) {
                     wson_parser parser(arguments, arguments_length);
                     std::string json(parser.toStringUTF8());
-                    arguments = json.data();
-                    arguments_length = json.length();
+                    jsonArguments = json.data();
+                    jsonArgumentsLength = json.length();
                 }
+                
+                const char* jsonOptions = options;
+                int jsonOptionsLength = options_length;
                 if (options) {
                     wson_parser parser(options, options_length);
                     std::string json(parser.toStringUTF8());
-                    options = json.data();
-                    options_length = json.length();
+                    jsonOptions = json.data();
+                    jsonOptionsLength = json.length();
                 }
                 
                 auto result = target_->callNativeModule(page_id_, module, method,
-                                                        arguments, arguments_length,
-                                                        options, options_length, handled);
+                                                        jsonArguments, jsonArgumentsLength,
+                                                        jsonOptions, jsonOptionsLength, handled);
                 if (handled) {
                     return result;
                 }
