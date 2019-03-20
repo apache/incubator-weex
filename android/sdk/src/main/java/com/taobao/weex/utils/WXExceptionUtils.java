@@ -25,14 +25,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXErrorCode.ErrorGroup;
 import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
@@ -44,10 +48,49 @@ import com.taobao.weex.performance.WXInstanceApm;
 
 public class WXExceptionUtils {
 
+    private static Set<String> sGlobalExceptionRecord = new CopyOnWriteArraySet<String>();
+
 	/**
 	 * degradeUrl for degrade case
 	 */
 	public static String degradeUrl = "BundleUrlDefaultDegradeUrl";
+
+	private static boolean checkNeedReportCauseRepeat(String instanceId,WXErrorCode errCode,String exception){
+
+	    if (TextUtils.isEmpty(exception)){
+	        return true;
+        }
+
+        if (null != errCode && errCode.getErrorGroup() != ErrorGroup.JS){
+	        return true;
+        }
+
+        if (TextUtils.isEmpty(instanceId)){
+            instanceId = "instanceIdNull";
+        }
+
+        String targetException = exception.length() > 200 ?exception.substring(0,200) : exception;
+        Set<String> recordExceptionHistory= null;
+
+        WXSDKInstance instance =  WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
+        if (null == instance){
+            recordExceptionHistory = sGlobalExceptionRecord;
+        }else {
+            recordExceptionHistory =  instance.getApmForInstance().exceptionRecord;
+        }
+
+        if (null == recordExceptionHistory){
+            return true;
+        }
+
+        if (recordExceptionHistory.contains(targetException)){
+            return false;
+        }
+        recordExceptionHistory.add(targetException);
+        return true;
+    }
+
+
 
 
 	/**
@@ -63,6 +106,26 @@ public class WXExceptionUtils {
 												 @Nullable final String function,
 												 @Nullable final String exception,
 												 @Nullable final Map<String,String> extParams ) {
+
+        try {
+            IWXConfigAdapter configAdapter = WXSDKManager.getInstance().getWxConfigAdapter();
+            boolean doCheck = true;
+            if (null != configAdapter){
+                String value = configAdapter.getConfig("wxapm","check_repeat_report","true");
+                doCheck = "true".equalsIgnoreCase(value);
+            }
+            boolean doReport =true;
+            if (doCheck){
+                doReport = checkNeedReportCauseRepeat(instanceId,errCode,exception);
+            }
+            if (!doReport){
+                return;
+            }
+        }catch (Throwable e){
+            e.printStackTrace();
+        }
+
+
 		commitCriticalExceptionWithDefaultUrl(
 		    "BundleUrlDefault",
             instanceId,
