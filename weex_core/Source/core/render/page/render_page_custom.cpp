@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
+#include <wson_parser.h>
 #include "base/log_defines.h"
 #include "render_page_custom.h"
 
@@ -140,15 +140,23 @@ namespace WeexCore {
                                                                       int options_length) {
         // If render target can handle module method, we forward to render target.
         if (target_) {
+
             bool handled = false;
-            auto result = target_->callNativeModule(page_id_, module, method,
-                                                    arguments, arguments_length,
-                                                    options, options_length, handled);
-            if (!handled) {
-                // custom page cannot handle this module method
-                return RenderPageBase::CallNativeModule(module, method, arguments, arguments_length, options, options_length);
+            if(target_->shouldHandleModuleMethod(module, method)){
+                std::string json;
+                wson_parser parser(arguments, arguments_length);
+                json = parser.toStringUTF8();
+                const char* jsonArguments = json.data();
+                const int jsonArguments_length = json.length();
+                auto result = target_->callNativeModule(page_id_, module, method,
+                                                        jsonArguments, jsonArguments_length,
+                                                        options, options_length, handled);
+                if (handled) {
+                    return result;
+                }
             }
-            return result;
+           // custom page cannot handle this module method
+           return RenderPageBase::CallNativeModule(module, method, arguments, arguments_length, options, options_length);
         }
         else {
             return std::unique_ptr<ValueWithType>(new ValueWithType((int32_t)-1)); // failure
