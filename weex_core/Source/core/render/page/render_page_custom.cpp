@@ -148,7 +148,7 @@ namespace WeexCore {
                     wson_parser parser(arguments, arguments_length);
                     std::string json(parser.toStringUTF8());
                     jsonArguments = json.data();
-                    jsonArgumentsLength = json.length();
+                    jsonArgumentsLength = (int)json.length();
                 }
                 
                 const char* jsonOptions = options;
@@ -157,7 +157,7 @@ namespace WeexCore {
                     wson_parser parser(options, options_length);
                     std::string json(parser.toStringUTF8());
                     jsonOptions = json.data();
-                    jsonOptionsLength = json.length();
+                    jsonOptionsLength = (int)json.length();
                 }
                 
                 auto result = target_->callNativeModule(page_id_, module, method,
