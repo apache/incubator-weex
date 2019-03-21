@@ -41,6 +41,8 @@ enum class ParamsType {
     BYTEARRAY, /* terminated with zero. */
     VOID,
     JSUNDEFINED,
+    BYTEARRAYSTRING,
+    BYTEARRAYJSONSTRING,
     END,
 };
 
