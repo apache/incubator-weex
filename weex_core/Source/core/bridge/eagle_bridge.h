@@ -63,6 +63,7 @@ namespace WeexCore {
             void Send(const char* instance_id, const char* url, std::function<void(const std::string&)> callback);
             int RefreshFinish(const char* page_id, const char* task, const char* callback);
             std::unique_ptr<ValueWithType> CallNativeModule (const char* page_id, const char* module, const char* method,const char* arguments, int arguments_length, const char* options, int options_length);
+            void CallNativeComponent (const char* page_id, const char* module, const char* method,const char* arguments, int arguments_length, const char* options, int options_length);
             void NativeLog(const char* str_array);
             bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
             bool AddRenderObject(const std::string &page_id, const std::string &parent_ref, int index,RenderObject *root);
@@ -98,7 +99,12 @@ namespace WeexCore {
             virtual bool RefreshPage(const std::string &page_id, const std::string &init_data) {return false;}
             virtual void UpdateComponentData(const std::string& page_id, const char* cid, const std::string& json_data) {}
             virtual void FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args,const std::string &dom_changes) {}
+            virtual void InvokeCallback(const std::string& page_id,
+                                      const std::string& callback_id,
+                                      const std::string& data,
+                                      bool keep_alive) {}
             virtual void RegisterModules(const std::string &modules) {}
+            virtual void RegisterComponent(const std::string& str) {}
         };
         
         static EagleBridge* GetInstance() {

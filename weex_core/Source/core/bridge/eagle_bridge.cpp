@@ -104,6 +104,13 @@ namespace WeexCore {
         ->platform_side()
         ->CallNativeModule(page_id, module, method, arguments, arguments_length, options, options_length);
     }
+
+    void EagleBridge::WeexCoreHandler::CallNativeComponent(const char* page_id, const char* module, const char* method,const char* arguments, int arguments_length, const char* options, int options_length) {
+        WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->platform_side()
+        ->CallNativeComponent(page_id, module, method, arguments, arguments_length, options, options_length);
+    }
     
     void EagleBridge::WeexCoreHandler::NativeLog(const char* str_array) {
         WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->NativeLog(str_array);
