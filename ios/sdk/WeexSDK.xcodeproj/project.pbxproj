@@ -3548,6 +3548,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_MODULES = NO;
 				CLANG_WARN_COMMA = NO;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
@@ -3595,10 +3596,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				VALID_ARCHS = "arm64 armv7 x86_64 i386";
-				WARNING_CFLAGS = (
-					"-Wno-documentation",
-					"-Wno-c++14-extensions",
-				);
+				WARNING_CFLAGS = "";
 			};
 			name = Debug;
 		};
@@ -3606,6 +3604,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_MODULES = NO;
 				CLANG_WARN_COMMA = NO;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
@@ -3652,10 +3651,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				VALID_ARCHS = "arm64 armv7 x86_64 i386";
-				WARNING_CFLAGS = (
-					"-Wno-documentation",
-					"-Wno-c++14-extensions",
-				);
+				WARNING_CFLAGS = "";
 			};
 			name = Release;
 		};
