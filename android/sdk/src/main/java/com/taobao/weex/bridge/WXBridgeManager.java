@@ -1470,7 +1470,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             } else {
               options.put(BUNDLE_TYPE, "Others");
             }
-            instance.getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_BUNDLE_TYPE, options.get(BUNDLE_TYPE));
+            Object recordBundleType = options.get(BUNDLE_TYPE);
+            if (recordBundleType instanceof String && "Others".equalsIgnoreCase((String)recordBundleType)){
+              //same as iOS record
+              recordBundleType = "other";
+            }
+            if (null != recordBundleType){
+              instance.getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_BUNDLE_TYPE, recordBundleType);
+            }
           }
           if (options.get("env") == null) {
             options.put("env", mInitParams.toMap());

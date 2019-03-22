@@ -26,6 +26,7 @@ import android.text.TextUtils;
 import com.taobao.weex.adapter.ClassLoaderAdapter;
 import com.taobao.weex.adapter.DefaultUriAdapter;
 import com.taobao.weex.adapter.DefaultWXHttpAdapter;
+import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.adapter.ICrashInfoReporter;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXJscProcessManager;
@@ -91,6 +92,7 @@ public class WXSDKManager {
 
   private IWXJSExceptionAdapter mIWXJSExceptionAdapter;
 
+  private IWXConfigAdapter mConfigAdapter;
   private IWXStorageAdapter mIWXStorageAdapter;
   private IWXStatisticsListener mStatisticsListener;
   private URIAdapter mURIAdapter;
@@ -217,6 +219,14 @@ public class WXSDKManager {
   }
   public WXWorkThreadManager getWXWorkThreadManager() {
     return mWXWorkThreadManager;
+  }
+
+  public void setWxConfigAdapter(IWXConfigAdapter mConfigAdapter) {
+    this.mConfigAdapter = mConfigAdapter;
+  }
+
+  public IWXConfigAdapter getWxConfigAdapter() {
+    return mConfigAdapter;
   }
 
   public @Nullable WXSDKInstance getSDKInstance(String instanceId) {
