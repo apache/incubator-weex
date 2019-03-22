@@ -965,19 +965,23 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
 
 - (void)fireTouchEvent:(NSString *)eventName withTouches:(NSSet<UITouch *> *)touches
 {
+    if (_component == nil) {
+        return;
+    }
+    
     NSMutableArray *resultTouches = [NSMutableArray new];
     
     CGPoint accmOffset = CGPointZero;
     UIView* rootView = _component.weexInstance.rootView;
-    UIView* view = self.view;
-    while (view && view != rootView) {
-        if ([view isKindOfClass:[UIScrollView class]]) {
-            CGPoint offset = ((UIScrollView*)view).contentOffset;
-            accmOffset.x += offset.x;
-            accmOffset.y += offset.y;
-        }
-        view = view.superview;
-    }
+//    UIView* view = self.view;
+//    while (view && view != rootView) {
+//        if ([view isKindOfClass:[UIScrollView class]]) {
+//            CGPoint offset = ((UIScrollView*)view).contentOffset;
+//            accmOffset.x += offset.x;
+//            accmOffset.y += offset.y;
+//        }
+//        view = view.superview;
+//    }
     
     for (UITouch *touch in touches) {
         CGPoint screenLocation = [touch locationInView:touch.window];
@@ -1002,7 +1006,9 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
             }
         }
         
-        [resultTouches addObject:mutableResultTouch];
+        if (mutableResultTouch) { // component is nil, mutableResultTouch will be nil
+            [resultTouches addObject:mutableResultTouch];
+        }
     }
     
     [_component fireEvent:eventName params:@{@"changedTouches":resultTouches ?: @[]}];
