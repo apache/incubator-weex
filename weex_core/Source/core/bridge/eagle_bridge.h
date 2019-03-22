@@ -33,22 +33,41 @@ namespace WeexCore {
     
     class EagleRenderObject {
     public:
+        EagleRenderObject();
         EagleRenderObject(RenderObject* render_object);
         void AddAttr(std::string key, std::string value);
         void AddStyle(std::string key, std::string value);
+        void UpdateAttr(std::string key, std::string value);
+        void UpdateStyle(std::string key, std::string value);
         void AddEvent(std::string event);
+        void RemoveEvent(std::string event);
         std::set<std::string> *events();
         RenderObject* render_object_impl() const {return render_object_impl_;}
         
         void set_page_id(const std::string& page_id);
         void ApplyDefaultStyle();
         void ApplyDefaultAttr();
+        int getChildCount();
+        int getChildIndex(RenderObject *child);
+        EagleRenderObject GetChild(int index);
+        RenderObject* parent_render();
         int AddRenderObject(int index, RenderObject *child);
+        void RemoveRenderObject(RenderObject *child);
+        const std::string& page_id();
+        const std::string& ref();
+
+        explicit operator bool() const
+        {
+            return static_cast<bool>(render_object_impl_);
+        }
 
     private:
         RenderObject* render_object_impl_;
     };
-    
+
+    inline bool operator==(const EagleRenderObject& lhs, const EagleRenderObject& rhs){
+        return lhs.render_object_impl()== rhs.render_object_impl();
+    }
 
     class EagleBridge {
     public:

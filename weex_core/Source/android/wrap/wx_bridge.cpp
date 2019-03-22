@@ -658,8 +658,10 @@ static void RegisterComponentOnDataRenderNode(JNIEnv* env, jobject jcaller,
   }
 
   ScopedJStringUTF8 dataChar(env, data);
-
-  WeexCore::EagleBridge::GetInstance()->data_render_handler()->RegisterComponent(dataChar.getChars());
+  auto data_render_handler = WeexCore::EagleBridge::GetInstance()->data_render_handler();
+  if(data_render_handler) {
+    data_render_handler->RegisterComponent(dataChar.getChars());
+  }
 }
 
 namespace WeexCore {
