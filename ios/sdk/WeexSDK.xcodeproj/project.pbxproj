@@ -2934,7 +2934,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = ". \"${PROJECT_DIR}/buildScripts.sh\"\n\ngenerateSDKHeader 'WeexSDK'\ngenerateBuildTime \"${PROJECT_DIR}/WeexSDK/Sources/Utility/WXVersion.m\"\n";
+			shellScript = ". \"${PROJECT_DIR}/buildScripts.sh\"\n\ngenerateSDKHeader 'WeexSDK' 'eagle_bridge.h'\ngenerateBuildTime \"${PROJECT_DIR}/WeexSDK/Sources/Utility/WXVersion.m\"\n";
 		};
 		DCA445C81EFA584000D0CFA8 /* Generate WeexSDK.h */ = {
 			isa = PBXShellScriptBuildPhase;
