@@ -218,7 +218,7 @@ namespace weex {
                                          ExecJSOnInstance);
                 handler->registerHandler(static_cast<uint32_t>(IPCJSMsg::UPDATEGLOBALCONFIG),
                                          UpdateGlobalConfig);
-                handler->registerHandler(static_cast<uint32_t>(IPCJSMsg::UPDATEInitFrameworkParams),
+                handler->registerHandler(static_cast<uint32_t>(IPCJSMsg::UpdateInitFrameworkParams),
                                          UpdateInitFrameworkParams);
             }
 

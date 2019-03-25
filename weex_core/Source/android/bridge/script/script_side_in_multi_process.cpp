@@ -562,7 +562,7 @@ int ScriptSideInMultiProcess::UpdateInitFrameworkParams(const std::string &key,
       return false;
     }
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
-    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::UPDATEInitFrameworkParams));
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::UpdateInitFrameworkParams));
     serializer->add(key.data(),  key.length());
     serializer->add(value.data(), value.length());
     serializer->add(desc.data(), desc.length());
