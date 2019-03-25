@@ -49,9 +49,21 @@ int ScriptSideInQueue::InitFramework(
   weexTaskQueue_->init();
 
   if (WeexEnv::getEnv()->enableBackupThread()) {
-    weexTaskQueue_bk_ = new WeexTaskQueue(weexTaskQueue_->isMultiProgress);
-    weexTaskQueue_bk_->addTask(new InitFrameworkTask(String::fromUTF8(script), params));
-    weexTaskQueue_bk_->init();
+    WeexEnv::getEnv()->locker()->lock();
+    while (!WeexEnv::getEnv()->is_jsc_init_finished()) {
+      WeexEnv::getEnv()->locker()->wait();
+    }
+    WeexEnv::getEnv()->locker()->unlock();
+
+    if(WeexEnv::getEnv()->can_m_cache_task_()) {
+      WeexEnv::getEnv()->m_task_cache_.push_back(new InitFrameworkTask(String::fromUTF8(script), params));
+      LOGE("cache initFramework %d", WeexEnv::getEnv()->m_task_cache_.size());
+    } else {
+      weexTaskQueue_bk_ = new WeexTaskQueue(weexTaskQueue_->isMultiProgress);
+      weexTaskQueue_bk_->addTask(new InitFrameworkTask(String::fromUTF8(script), params));
+      weexTaskQueue_bk_->init();
+    }
+
   }
 
   return 1;
@@ -119,8 +131,15 @@ int ScriptSideInQueue::ExecJsService(const char *source) {
   LOGD("ScriptSideInQueue::ExecJsService");
 
   weexTaskQueue_->addTask(new ExeJsServicesTask(String::fromUTF8(source)));
-  if (WeexEnv::getEnv()->enableBackupThread() && weexTaskQueue_bk_ != nullptr) {
-    weexTaskQueue_bk_->addTask(new ExeJsServicesTask(String::fromUTF8(source)));
+  if (WeexEnv::getEnv()->enableBackupThread()) {
+    ExeJsServicesTask *task = new ExeJsServicesTask(String::fromUTF8(source));
+    if(WeexEnv::getEnv()->can_m_cache_task_() && weexTaskQueue_bk_ == nullptr){
+      WeexEnv::getEnv()->m_task_cache_.push_back(task);
+      LOGE("cache ExecJsService %d", WeexEnv::getEnv()->m_task_cache_.size());
+    } else {
+      weexTaskQueue_bk_->addTask(task);
+    }
+    
   }
 
   return 1;
@@ -148,8 +167,13 @@ int ScriptSideInQueue::ExecJS(const char *instanceId, const char *nameSpace,
   task->addExtraArg(String::fromUTF8(func));
 
   if (instanceId == nullptr || strlen(instanceId) == 0) {
-    if (WeexEnv::getEnv()->enableBackupThread() && weexTaskQueue_bk_ != nullptr) {
-      weexTaskQueue_bk_->addTask(task->clone());
+    if (WeexEnv::getEnv()->enableBackupThread()) {
+      if(WeexEnv::getEnv()->can_m_cache_task_() && weexTaskQueue_bk_ == nullptr){
+        WeexEnv::getEnv()->m_task_cache_.push_back(task->clone());
+        LOGE("cache ExecJS %d", WeexEnv::getEnv()->m_task_cache_.size());
+      } else {
+        weexTaskQueue_bk_->addTask(task->clone());
+      }
     }
 
     weexTaskQueue_->addTask(task);
@@ -198,6 +222,7 @@ int ScriptSideInQueue::CreateInstance(const char *instanceId,
       "CreateInstance id = %s, func = %s, script = %s, opts = %s, initData = "
       "%s, extendsApi = %s",
       instanceId, func, script, opts, initData, extendsApi);
+  bool backUpThread = false;
   if (WeexEnv::getEnv()->enableBackupThread()) {
     for (int i = 0; i < params.size(); ++i) {
       auto param = params[i];
@@ -205,12 +230,17 @@ int ScriptSideInQueue::CreateInstance(const char *instanceId,
       auto value = String::fromUTF8(param->value->content);
       if (type == "use_back_thread") {
         if (value == "true") {
-          useBackUpWeexRuntime(instanceId);
+          backUpThread = true;
         }
         break;
       }
     }
   }
+
+  if(backUpThread) {
+    useBackUpWeexRuntime(instanceId);
+  }
+
   auto string = String::fromUTF8(script);
   if (string.isEmpty()) {
     return 0;
@@ -289,6 +319,12 @@ WeexTaskQueue *ScriptSideInQueue::taskQueue(const char *id, bool log) {
   if (id != nullptr && shouldUseBackUpWeexRuntime(id)) {
     if (weexTaskQueue_bk_ == nullptr) {
       weexTaskQueue_bk_ = new WeexTaskQueue(weexTaskQueue_->isMultiProgress);
+      WeexEnv::getEnv()->set_m_cache_task_(false);
+      for (std::deque<WeexTask *>::iterator it = WeexEnv::getEnv()->m_task_cache_.begin(); it < WeexEnv::getEnv()->m_task_cache_.end(); ++it) {
+        auto reference = *it;
+        weexTaskQueue_bk_->addTask(std::move(reference));
+      }
+      WeexEnv::getEnv()->m_task_cache_.clear();
     }
     if (log) {
       LOGE("dyyLog instance %s use back up thread time is %lld", id, microTime());

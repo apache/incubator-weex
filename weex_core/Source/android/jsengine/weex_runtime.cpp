@@ -34,20 +34,17 @@ using namespace WEEXICU;
 
 
 WeexRuntime::WeexRuntime(TimerQueue* timeQueue,bool isMultiProgress) : is_multi_process_(isMultiProgress), script_bridge_(nullptr) {
-    if (!WEEXICU::initICUEnv(isMultiProgress)) {
-        LOGE("failed to init ICUEnv single process");
-        // return false;
+    WeexEnv::getEnv()->initJSC(isMultiProgress);
+    m_globalVM = std::move(VM::create(LargeHeap));
+
+    static bool wson_init_flag = false;
+    if(!wson_init_flag) {
+      wson_init_flag = true;
+      wson::init(m_globalVM.get());
     }
 
-    Options::enableRestrictedOptions(true);
-// Initialize JSC before getting VM.
-    WTF::initializeMainThread();
-    initHeapTimer();
-    JSC::initializeThreading();
-#if ENABLE(WEBASSEMBLY)
-    JSC::Wasm::enableFastMemory();
-#endif
-    m_globalVM = std::move(VM::create(LargeHeap));
+    WeexEnv::getEnv()->jsc_init_finished();
+    WeexEnv::getEnv()->locker()->signal();
 
     weexObjectHolder.reset(new WeexObjectHolder(m_globalVM.get(), timeQueue, isMultiProgress));
     LOGE("WeexRuntime is running and mode is %s", isMultiProgress ? "multiProcess" : "singleProcess");
@@ -381,7 +378,12 @@ int WeexRuntime::exeJS(const String &instanceId, const String &nameSpace, const 
     // if function is callJs on instance, should us Instance object to call __WEEX_CALL_JAVASCRIPT__
 
     if (std::strcmp("callJS", runFunc.utf8().data()) == 0) {
+
+      auto iterator = weexObjectHolder->m_jsInstanceGlobalObjectMap.find(instanceId.utf8().data());
+      if (iterator != weexObjectHolder->m_jsInstanceGlobalObjectMap.end()) {
         globalObject = weexObjectHolder->m_jsInstanceGlobalObjectMap[instanceId.utf8().data()];
+      }
+
         if (globalObject == NULL) {
             globalObject = weexObjectHolder->m_globalObject.get();
         } else {
@@ -644,9 +646,15 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
     if (instanceId == "") {
         globalObject = impl_globalObject;
     } else {
-        auto *temp_object = weexObjectHolder->m_jsInstanceGlobalObjectMap[instanceId.utf8().data()];
 
-        if (temp_object == NULL) {
+      WeexGlobalObject * temp_object = nullptr;
+
+      auto iterator = weexObjectHolder->m_jsInstanceGlobalObjectMap.find(instanceId.utf8().data());
+      if (iterator != weexObjectHolder->m_jsInstanceGlobalObjectMap.end()) {
+          temp_object = weexObjectHolder->m_jsInstanceGlobalObjectMap[instanceId.utf8().data()];
+      }
+
+        if (temp_object == nullptr) {
             // new a global object
             // --------------------------------------------------
 //            if (weexLiteAppObjectHolder.get() != nullptr) {

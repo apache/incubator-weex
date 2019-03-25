@@ -69,7 +69,6 @@ void WeexObjectHolder::initFromParams(std::vector<INIT_FRAMEWORK_PARAMS *> &para
     globalObject->timeQueue = this->timeQueue;
     m_globalObject.set(vm, globalObject);
     vm.heap.setGarbageCollectionTimerEnabled(true);
-    wson::init(&vm);
 }
 
 WeexObjectHolder::WeexObjectHolder(VM* vm,  TimerQueue* timeQueue, bool isMultiProgress) {
@@ -98,7 +97,7 @@ WeexGlobalObject *WeexObjectHolder::cloneWeexObject(std::string page_id, bool in
 }
 
 WeexObjectHolder::~WeexObjectHolder() {
-    wson::destory();
+//    wson::destory();
     JSLockHolder locker(this->m_globalVM);
     this->m_globalVM->heap.collectAllGarbage();
 }

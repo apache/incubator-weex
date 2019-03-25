@@ -259,6 +259,10 @@ namespace weex {
                             auto enable = value == "true";
                             LOGE("enable backupThread %d",enable);
                             WeexEnv::getEnv()->setEnableBackupThread(enable);
+                        } else if(type == "enableBackupThreadCache") {
+                            auto enable = value == "true";
+                            LOGE("enable backupThreadCache %d",enable);
+                            WeexEnv::getEnv()->set_m_cache_task_(enable);
                         }
                     }
 

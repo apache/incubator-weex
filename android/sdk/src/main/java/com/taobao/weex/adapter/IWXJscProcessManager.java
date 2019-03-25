@@ -22,6 +22,7 @@ import com.taobao.weex.WXSDKInstance;
 
 public interface IWXJscProcessManager {
     boolean enableBackupThread();
+    boolean enableBackUpThreadCache();
     boolean shouldReboot();
     long rebootTimeout();
     boolean withException(WXSDKInstance instance);
