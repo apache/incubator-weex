@@ -934,6 +934,14 @@ _Pragma("clang diagnostic pop") \
     if(!components) return;
     
     [self callJSMethod:@"registerComponents" args:@[components]];
+    WXPerformBlockOnComponentThread(^{
+        id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+        if (dataRenderHandler) {
+            [dataRenderHandler registerComponents:@[components]];
+        } else {
+            WXLogError(@"No data render handler found!");
+        }
+    });
 }
 
 - (void)callJSMethod:(NSString *)method args:(NSArray *)args

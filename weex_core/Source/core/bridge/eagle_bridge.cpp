@@ -28,7 +28,7 @@
 
 
 namespace WeexCore {
-    EagleBridge* EagleBridge::g_instance = nullptr;
+    EagleBridge *EagleBridge::g_instance = nullptr;
     
     EagleRenderObject::EagleRenderObject():render_object_impl_(nullptr) {}
 
@@ -79,11 +79,11 @@ namespace WeexCore {
     }
 
     int EagleRenderObject::getChildCount() {
-        return render_object_impl_->getChildCount();
+        return static_cast<int>(render_object_impl_->getChildCount());
     }
 
     int EagleRenderObject::getChildIndex(RenderObject *child) {
-        return render_object_impl_->IndexOf(child);
+        return static_cast<int>(render_object_impl_->IndexOf(child));
     }
 
     EagleRenderObject EagleRenderObject::GetChild(int index) {

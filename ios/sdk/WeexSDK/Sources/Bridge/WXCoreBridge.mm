@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#import "WXSDKError.h"
 #import "WXCoreBridge.h"
 #import "JSValue+Weex.h"
 #import "WXSDKManager.h"
@@ -30,6 +31,8 @@
 #import "WXConvertUtility.h"
 #import "WXSDKEngine.h"
 #import "WXAppMonitorProtocol.h"
+#import "WXComponentMethod.h"
+#import "WXExceptionUtils.h"
 
 #include "base/core_constants.h"
 #include "base/time_utils.h"
@@ -121,18 +124,36 @@ namespace WeexCore
         }
     }
     
-    void IOSSide::ReportException(const char* pageId, const char *func, const char *exception_string)
+    void IOSSide::ReportException(const char *page_id, const char *func, const char *exception)
     {
-        NSString* ns_instanceId = NSSTRING(pageId);
-
-        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-        if (!manager.isValid) {
-            return;
-        }
-
-        int wxErrorCode = 9999;
-        NSError * error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:wxErrorCode userInfo:@{@"message":[NSString stringWithUTF8String:exception_string]}];
-        [manager renderFailed:error];
+        do {
+            WXSDKInstance *instance = [WXSDKManager instanceForID:NSSTRING(page_id)];
+            if (!instance) {
+                break;
+            }
+            WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE;
+            BOOL is_render_failed = NO;
+            if (func && strcmp(func, "createInstance") == 0) {
+                errorCode = WX_KEY_EXCEPTION_EMPTY_SCREEN_JS;
+                WXComponentManager *manager = instance.componentManager;
+                if (manager.isValid) {
+                    NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":[NSString stringWithUTF8String:exception]}];
+                    [manager renderFailed:error];
+                }
+                is_render_failed = YES;
+            }
+            NSString *bundleUrl = instance.pageName ? : ([instance.scriptURL absoluteString] ? : @"WX_KEY_EXCEPTION_WXBRIDGE");
+            NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] init];
+            [userInfo setObject:instance.userInfo[@"jsMainBundleStringContentLength"] ? : @"" forKey:@"jsMainBundleStringContentLength"];
+            [userInfo setObject:instance.userInfo[@"jsMainBundleStringContentMd5"] ? : @"" forKey:@"jsMainBundleStringContentMd5"];
+            WXJSExceptionInfo *jsException = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:bundleUrl errorCode: [NSString stringWithFormat:@"%d", errorCode] functionName:func ? [NSString stringWithUTF8String:func] :@"exceptionHandler" exception:exception ? [NSString stringWithUTF8String:exception] : @"unkown" userInfo:userInfo];
+            [WXExceptionUtils commitCriticalExceptionRT:jsException.instanceId errCode:jsException.errorCode function:jsException.functionName exception:jsException.exception extParams:jsException.userInfo];
+            if (!is_render_failed && instance.onJSRuntimeException) {
+                instance.onJSRuntimeException(jsException);
+            }
+            
+        } while (0);
+        
     }
     
     int IOSSide::CallNative(const char* pageId, const char *task, const char *callback)
@@ -141,8 +162,27 @@ namespace WeexCore
         assert(false);
     }
     
+    static WeexByteArray *generator_bytes_array(const char *str, size_t len) {
+        auto *result = (WeexByteArray *)malloc(len + sizeof(WeexByteArray));
+        do {
+            if (!result) {
+                break;
+            }
+            memset(result, 0, len + sizeof(WeexByteArray));
+            result->length = static_cast<uint32_t>(len);
+            memcpy(result->content, str, len);
+            result->content[len] = '\0';
+            
+        } while (0);
+        
+        return result;
+    }
+
     std::unique_ptr<ValueWithType> IOSSide::CallNativeModule(const char *page_id, const char *module, const char *method, const char *args, int args_length, const char *options, int options_length)
     {
+        ValueWithType *returnValue = new ValueWithType();
+        memset(returnValue, 0, sizeof(ValueWithType));
+        returnValue->type = ParamsType::VOID;
         // should not enter this function
         do {
             NSString *instanceId = NSSTRING(page_id);
@@ -159,21 +199,118 @@ namespace WeexCore
             }
             LOGD("CallNativeModule:[%s]:[%s]=>%s \n", module, method, args);
             WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:newArguments options:nil instance:instance];
-            [method invoke];
+            NSInvocation *invocation = [method invoke];
+            if (!invocation) {
+                break;
+            }
+            const char *returnType = [invocation.methodSignature methodReturnType];
+            switch (returnType[0] == _C_CONST ? returnType[1] : returnType[0]) {
+                case _C_VOID: {
+                    // 1.void
+                    returnValue->type = ParamsType::VOID;
+                    break;
+                }
+                case _C_ID: {
+                    // 2.id
+                    void *value;
+                    [invocation getReturnValue:&value];
+                    id object = (__bridge id)value;
+                    if ([object isKindOfClass:[NSString class]]) {
+                        returnValue->type = ParamsType::BYTEARRAYSTRING;
+                        const char *pcstr_utf8 = [(NSString *)object UTF8String];
+                        returnValue->value.byteArray = generator_bytes_array(pcstr_utf8, ((NSString *)object).length);
+                    }
+                    if ([object isKindOfClass:[NSDictionary class]] || [object isKindOfClass:[NSArray class]]) {
+                        NSString *jsonString = [WXUtility JSONString:object];
+                        returnValue->type = ParamsType::BYTEARRAYJSONSTRING;
+                        returnValue->value.byteArray = generator_bytes_array(jsonString.UTF8String, jsonString.length);
+                    }
+                    break;
+                }
+#define WX_MODULE_INT32_VALUE_RET_CASE(ctype, ttype) \
+case ctype: {                         \
+ttype value;                          \
+[invocation getReturnValue:&value];   \
+returnValue->type = ParamsType::INT32; \
+returnValue->value.int32Value = value; \
+break; \
+}
+#define WX_MODULE_INT64_VALUE_RET_CASE(ctype, ttype) \
+case ctype: {                         \
+ttype value;                          \
+[invocation getReturnValue:&value];   \
+returnValue->type = ParamsType::INT64; \
+returnValue->value.int64Value = value; \
+break; \
+}
+                // 3.number
+                WX_MODULE_INT32_VALUE_RET_CASE(_C_CHR, char)
+                WX_MODULE_INT32_VALUE_RET_CASE(_C_UCHR, unsigned char)
+                WX_MODULE_INT32_VALUE_RET_CASE(_C_SHT, short)
+                WX_MODULE_INT32_VALUE_RET_CASE(_C_USHT, unsigned short)
+                WX_MODULE_INT32_VALUE_RET_CASE(_C_INT, int)
+                WX_MODULE_INT32_VALUE_RET_CASE(_C_UINT, unsigned int)
+                WX_MODULE_INT32_VALUE_RET_CASE(_C_BOOL, BOOL)
+                WX_MODULE_INT64_VALUE_RET_CASE(_C_LNG, long)
+                WX_MODULE_INT64_VALUE_RET_CASE(_C_ULNG, unsigned long)
+                WX_MODULE_INT64_VALUE_RET_CASE(_C_LNG_LNG, long long)
+                WX_MODULE_INT64_VALUE_RET_CASE(_C_ULNG_LNG, unsigned long long)
+                case _C_FLT:
+                {
+                    float value;
+                    [invocation getReturnValue:&value];
+                    returnValue->type = ParamsType::FLOAT;
+                    returnValue->value.floatValue = value;
+                    break;
+                }
+                case _C_DBL:
+                {
+                    double value;
+                    [invocation getReturnValue:&value];
+                    returnValue->type = ParamsType::DOUBLE;
+                    returnValue->value.doubleValue = value;
+                    break;
+                }
+                case _C_STRUCT_B:
+                case _C_CHARPTR:
+                case _C_PTR:
+                case _C_CLASS: {
+                    returnValue->type = ParamsType::JSUNDEFINED;
+                    break;
+                }
+            }
             
         } while (0);
         
-        return std::unique_ptr<ValueWithType>();
+        return std::unique_ptr<ValueWithType>(returnValue);
     }
         
-    void IOSSide::CallNativeComponent(const char* pageId, const char* ref, const char *method,
-                                           const char *arguments, int argumentsLength,
-                                           const char *options, int optionsLength)
+    void IOSSide::CallNativeComponent(const char *page_id, const char *ref, const char *method,
+                                      const char *args, int args_length,
+                                      const char *options, int options_length)
     {
-        // should not enter this function
-        assert(false);
+        do {
+            NSString *instanceId = NSSTRING(page_id);
+            WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+            if (!instance) {
+                break;
+            }
+            if (!ref || !method) {
+                break;
+            }
+            NSString *componentRef = [NSString stringWithUTF8String:ref];
+            NSString *methodName = [NSString stringWithUTF8String:method];
+            NSArray *newArguments;
+            if (args && args_length > 0) {
+                NSString *arguments = [NSString stringWithUTF8String:args];
+                newArguments = [WXUtility objectFromJSON:arguments];
+            }
+            WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:componentRef methodName:methodName arguments:newArguments instance:instance];
+            [method invoke];
+            
+        } while (0);
     }
-        
+
     void IOSSide::SetTimeout(const char* callbackID, const char* time)
     {
         // should not enter this function
@@ -279,7 +416,7 @@ namespace WeexCore
         WXLogDebug(@"flexLayout -> action: addEvent ref:%@", ns_ref);
 #endif
         
-        WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
+        WXComponentManager *manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
         if (!manager.isValid) {
             return -1;
         }

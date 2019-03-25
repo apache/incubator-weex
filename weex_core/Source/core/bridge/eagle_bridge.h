@@ -123,7 +123,7 @@ namespace WeexCore {
                                       const std::string& data,
                                       bool keep_alive) {}
             virtual void RegisterModules(const std::string &modules) {}
-            virtual void RegisterComponent(const std::string& str) {}
+            virtual void RegisterComponent(const std::string &str) {};
         };
         
         static EagleBridge* GetInstance() {
@@ -132,8 +132,8 @@ namespace WeexCore {
             }
             return g_instance;
         }
-        DataRenderHandler* data_render_handler() const {return data_render_handler_.get();}
-        void set_data_render_handler(DataRenderHandler* data_render_handler) {data_render_handler_.reset(data_render_handler);}
+        DataRenderHandler *data_render_handler() const {return data_render_handler_.get();}
+        void set_data_render_handler(DataRenderHandler *data_render_handler) {data_render_handler_.reset(data_render_handler);}
         WeexCoreHandler* weex_core_handler() const {return weex_core_handler_.get();}
         
 
