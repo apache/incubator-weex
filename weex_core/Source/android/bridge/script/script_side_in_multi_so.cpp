@@ -178,7 +178,7 @@ int ScriptSideInMultiSo::UpdateGlobalConfig(const char *config) {
 int ScriptSideInMultiSo::UpdateInitFrameworkParams(const std::string &key, const std::string &value,
                                                    const std::string &desc) {
   if(script_side_functions_ == nullptr) {
-    LOGE("ScriptSideInMultiSo::UpdateGlobalConfig script_side_functions_ is null");
+    LOGE("ScriptSideInMultiSo::UpdateInitFrameworkParams script_side_functions_ is null");
     return false;
   }
   return script_side_functions_->funcUpdateInitFrameworkParams(key, value, desc);
