@@ -93,6 +93,9 @@ namespace weex {
 
                 int UpdateGlobalConfig(const char *config) override;
 
+                int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) override;
+
+
             private:
                 std::vector<std::string> usingBackThreadId;
 

@@ -3077,6 +3077,32 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return new long[]{0, 0, 0};
   }
 
+  public void setDeviceWidth(final String instanceId, final float value) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.setDeviceWidth(instanceId, value);
+      }
+    });
+  }
+
+  public void updateInitDeviceWidthHeight(final String width, final String height){
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.updateInitFrameworkParams("deviceWidth", width, "deviceWidth");
+      }
+    });
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.updateInitFrameworkParams("deviceHeight", height, "deviceHeight");
+      }
+    });
+
+
+  }
+
   public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
     if (isJSFrameworkInit()) {
       mWXBridge.setMargin(instanceId, ref, edge, value);

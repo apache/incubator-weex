@@ -166,6 +166,14 @@ void CoreSideInPlatform::SetViewPortWidth(const std::string &instance_id,
     RenderManager::GetInstance()->set_viewport_width(instance_id, width);
 }
 
+void CoreSideInPlatform::SetDeviceWidth(const std::string &instance_id, float width) {
+  RenderManager::GetInstance()->setDeviceWidth(instance_id, width);
+  /**
+   * also update global device with
+   * */
+  WXCoreEnvironment::getInstance()->SetDeviceWidth(std::to_string(width));
+}
+
 void CoreSideInPlatform::SetPageDirty(const std::string &instance_id) {
   RenderPage *page =
       RenderManager::GetInstance()->GetPage(std::string(instance_id));
@@ -494,4 +502,15 @@ int CoreSideInPlatform::UpdateGlobalConfig(const char *config) {
       ->script_side()
       ->UpdateGlobalConfig(config);
 }
+
+
+int CoreSideInPlatform::UpdateInitFrameworkParams(const std::string &key, const std::string &value,
+                                                  const std::string &desc) {
+  return WeexCoreManager::Instance()
+          ->script_bridge()
+          ->script_side()
+          ->UpdateInitFrameworkParams(key, value, desc);
+}
+
+
 }  // namespace WeexCore

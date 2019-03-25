@@ -16,12 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.adapter;
+//
+// Created by furture on 2019/3/25.
+//
 
-/**
- * @author zhongcang
- * @date 2019/3/20
- */
-public interface IWXConfigAdapter {
-    String getConfig(String nameSpace,String key,String defaultValue);
-}
+#ifndef WEEX_PROJECT_UPDATEINITFRAMEWORKPARAMSTASK_H
+#define WEEX_PROJECT_UPDATEINITFRAMEWORKPARAMSTASK_H
+
+#include "android/jsengine/task/weex_task.h"
+
+
+class UpdateInitFrameworkParamsTask : public WeexTask {
+
+public:
+    UpdateInitFrameworkParamsTask(const std::string& key, const std::string& value, const std::string& desc);
+
+    void run(WeexRuntime *runtime) override;
+
+    std::string taskName() override { return "UpdateInitFrameworkParamsTask"; }
+
+private:
+    std::string key_;
+    std::string value_;
+    std::string desc_;
+
+};
+
+
+#endif //WEEX_PROJECT_UPDATEINITFRAMEWORKPARAMSTASK_H

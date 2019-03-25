@@ -60,7 +60,7 @@ FunctionsExposedByJS *ScriptBridgeInMultiSo::GetExposedFunctions() {
       ExecJSOnAppWithResult, CallJSOnAppContext, DestroyAppContext,
       ExecJSService,         ExecTimeCallback,   ExecJS,
       ExecJSWithResult,      ExecJSWithCallback, CreateInstance,     ExecJSOnInstance,
-      DestroyInstance,       UpdateGlobalConfig};
+      DestroyInstance,       UpdateGlobalConfig,  UpdateInitFrameworkParams};
   auto functions = (FunctionsExposedByJS *)malloc(sizeof(FunctionsExposedByJS));
   memset(functions, 0, sizeof(FunctionsExposedByJS));
   memcpy(functions, &temp, sizeof(FunctionsExposedByJS));
@@ -152,6 +152,12 @@ int ScriptBridgeInMultiSo::DestroyInstance(const char *instanceId) {
 int ScriptBridgeInMultiSo::UpdateGlobalConfig(const char *config) {
   return Instance()->script_side()->UpdateGlobalConfig(config);
 }
+
+int ScriptBridgeInMultiSo::UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc){
+    return Instance()->script_side()->UpdateInitFrameworkParams(key, value, desc);
+}
+
+
 }  // namespace js
 }  // namespace bridge
 }  // namespace weex

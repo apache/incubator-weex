@@ -16,12 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.adapter;
+//
+// Created by furture on 2019/3/25.
+//
 
-/**
- * @author zhongcang
- * @date 2019/3/20
- */
-public interface IWXConfigAdapter {
-    String getConfig(String nameSpace,String key,String defaultValue);
+#include "update_init_framework_params_task.h"
+
+
+UpdateInitFrameworkParamsTask::UpdateInitFrameworkParamsTask(const std::string &key,
+                                                             const std::string &value,
+                                                             const std::string &desc):  WeexTask("") {
+    this->key_ = key;
+    this->value_ = value;
+    this->desc_ = desc;
+}
+
+void UpdateInitFrameworkParamsTask::run(WeexRuntime *runtime) {
+    runtime->UpdateInitFrameworkParams(key_, value_,  desc_);
 }
