@@ -715,6 +715,8 @@ typedef enum : NSUInteger {
     [data setObject:[NSString stringWithFormat:@"%ld",(long)state] forKey:@"state"];
     //[[WXSDKManager bridgeMgr] updateState:self.instanceId data:data];
     
+    // First post internal notification
+    [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_NOTIFICATION_UPDATE_STATE_INTERNAL object:self userInfo:data];
     [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_NOTIFICATION_UPDATE_STATE object:self userInfo:data];
 }
 

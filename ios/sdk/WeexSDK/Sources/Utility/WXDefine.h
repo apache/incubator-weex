@@ -78,6 +78,7 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
 #define WX_APPLICATION_DID_BECOME_ACTIVE @"WXApplicationDidBecomeActiveEvent"
 
 #define WX_INSTANCE_NOTIFICATION_UPDATE_STATE @"WXInstUpdateState"
+#define WX_INSTANCE_NOTIFICATION_UPDATE_STATE_INTERNAL @"WXInstUpdateStateInternal"
 
 #define WX_COMPONENT_NOTIFICATION_VIEW_LOADED    @"WXComponentViewLoaded"
 
