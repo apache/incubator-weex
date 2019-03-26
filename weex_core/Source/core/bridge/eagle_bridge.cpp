@@ -214,7 +214,9 @@ EagleRenderObject EagleBridge::WeexCoreHandler::GetEagleRenderObject(const std::
     }
 
     void EagleBridge::WeexCoreHandler::PostTaskToMsgLoop(const weex::base::Closure& closure){
+#ifdef OS_ANDROID
         WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(closure);
+#endif
     }
     
     int EagleBridge::DataRenderHandler::DestroyInstance(const char *instanceId) {

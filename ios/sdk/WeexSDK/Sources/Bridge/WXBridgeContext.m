@@ -93,6 +93,13 @@ _Pragma("clang diagnostic pop") \
         _frameworkLoadFinished = NO;
         _jsServiceQueue = [NSMutableArray new];
         _dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+        if (!_dataRenderHandler) {
+            Class handlerClass = NSClassFromString(@"WXEagleHandler");
+            if (handlerClass) {
+                _dataRenderHandler = [[handlerClass alloc] init];
+                [WXSDKEngine registerHandler:_dataRenderHandler withProtocol:@protocol(WXDataRenderHandler)];
+            }
+        }
     }
     return self;
 }
