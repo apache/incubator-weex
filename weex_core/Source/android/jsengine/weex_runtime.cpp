@@ -635,8 +635,6 @@ int WeexRuntime::updateGlobalConfig(const String &config) {
 //        JSLockHolder locker_global(&vm_global);
 //    }
 
-     weexObjectHolder->m_globalObject;
-
 
     const char *configChar = config.utf8().data();
     doUpdateGlobalSwitchConfig(configChar);
