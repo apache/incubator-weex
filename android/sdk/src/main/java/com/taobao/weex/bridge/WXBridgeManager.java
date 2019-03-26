@@ -3087,6 +3087,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public void updateInitDeviceWidthHeight(final String width, final String height){
+    if(!isJSFrameworkInit()){
+      return;
+    }
     post(new Runnable() {
       @Override
       public void run() {
