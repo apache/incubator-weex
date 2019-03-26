@@ -36,5 +36,7 @@
 - (void)registerModules:(NSDictionary *)modules;
     
 - (void)registerComponents:(NSArray *)components;
+    
+- (void)invokeCallBack:(NSString *)pageId function:(NSString *)funcId args:(NSDictionary *)args keepAlive:(BOOL)keepAlive;
 
 @end
