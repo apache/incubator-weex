@@ -355,6 +355,13 @@ static std::unique_ptr<IPCResult> HandleCallNativeModule(
           }));
 
   event.Wait();
+  /**
+   * when Wait timeout, ret is null.  switch case will crash.
+   * make default value, to avoid the crash
+   * */
+  if(ret.get() == nullptr){
+     ret = std::make_unique<ValueWithType>((int32_t)-1);
+  }
 
   std::unique_ptr<IPCResult> result;
   switch (ret->type) {
