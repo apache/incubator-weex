@@ -1016,6 +1016,7 @@
     }];
 }
 
+// Hook _adjustContentOffsetIfNecessary will cause UITableView freezing if bounces is set to NO.
 - (void)fixFlicker
 {
     static dispatch_once_t onceToken;

@@ -244,7 +244,7 @@ typedef enum : NSUInteger {
 
 - (void)renderView:(id)source options:(NSDictionary *)options data:(id)data
 {
-    _options = options;
+    _options = [options isKindOfClass:[NSDictionary class]] ? options : nil;
     _jsData = data;
     
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
@@ -450,6 +450,9 @@ typedef enum : NSUInteger {
     NSURL *url = request.URL;
     _scriptURL = url;
     _jsData = data;
+    if (![options isKindOfClass:[NSDictionary class]]) {
+        options = @{};
+    }
     NSMutableDictionary *newOptions = [options mutableCopy] ?: [NSMutableDictionary new];
     
     if (!newOptions[bundleUrlOptionKey]) {

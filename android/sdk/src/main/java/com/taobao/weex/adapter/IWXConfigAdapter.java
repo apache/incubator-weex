@@ -18,12 +18,10 @@
  */
 package com.taobao.weex.adapter;
 
-import com.taobao.weex.WXSDKInstance;
-
-public interface IWXJscProcessManager {
-    boolean enableBackupThread();
-    boolean enableBackUpThreadCache();
-    boolean shouldReboot();
-    long rebootTimeout();
-    boolean withException(WXSDKInstance instance);
+/**
+ * @author zhongcang
+ * @date 2019/3/20
+ */
+public interface IWXConfigAdapter {
+    String getConfig(String nameSpace,String key,String defaultValue);
 }

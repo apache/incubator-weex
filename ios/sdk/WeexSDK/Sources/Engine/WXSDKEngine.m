@@ -311,7 +311,7 @@ static NSDictionary *_customEnvironment = nil;
 {
     NSDictionary* result = nil;
     @synchronized (self) {
-        result = _customEnvironment;
+        result = [_customEnvironment copy];
     }
     return result;
 }
