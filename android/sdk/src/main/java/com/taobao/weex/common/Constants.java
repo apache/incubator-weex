@@ -145,6 +145,7 @@ public class Constants {
     String MAXLENGTH = "maxlength";
     String ROWS = "rows";
     String CHECKED = "checked";
+    String ANIMATING = "animating";
     String VISIBILITY = "visibility";
     String ITEM_COLOR = "itemColor";
     String ITEM_SELECTED_COLOR = "itemSelectedColor";
