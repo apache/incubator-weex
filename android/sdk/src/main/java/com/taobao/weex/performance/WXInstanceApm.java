@@ -20,7 +20,9 @@ package com.taobao.weex.performance;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import android.graphics.Rect;
 import android.os.Handler;
@@ -132,6 +134,8 @@ public class WXInstanceApm {
     public boolean hasReportLayerOverDraw = false;
     public boolean hasAddView;
     private Handler mUIHandler;
+
+    public Set<String> exceptionRecord = new CopyOnWriteArraySet<String>();
 
     /**
      * send performance value to js
@@ -302,6 +306,7 @@ public class WXInstanceApm {
         if (null == apmInstance || mEnd) {
             return;
         }
+        exceptionRecord.clear();
         mUIHandler.removeCallbacks(jsPerformanceCallBack);
         onStage(KEY_PAGE_STAGES_DESTROY);
         apmInstance.onEnd();

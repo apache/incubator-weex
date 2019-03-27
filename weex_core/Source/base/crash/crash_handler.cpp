@@ -101,6 +101,7 @@ static _Unwind_Reason_Code traceFunction(_Unwind_Context* context, void* arg)
 CrashHandlerInfo::CrashHandlerInfo(std::string fileName)
             : m_dumpFileFd(-1),
               m_mapsFileFd(-1),
+              m_crash_occurs(false),
               m_dumpFileName(fileName)
 {
     if (!g_crashHandler)
@@ -161,6 +162,7 @@ bool CrashHandlerInfo::handleSignal(int signum, siginfo_t* siginfo, void* uconte
     //TODO return false: add condition to filter which CrashHandlerInfo to handler the
     //signal
 
+    m_crash_occurs = true;
     LOG(INFO) << "CrashHandlerInfo::handleSignal";
     const char* signalName = nullptr;
     for (int i = 0; s_hookSignals[i].signum; ++i) {
@@ -411,6 +413,9 @@ void CrashHandlerInfo::saveFileContent()
         str += byteWritten;
         size -= byteWritten;
     }
+}
+bool CrashHandlerInfo::is_crashed() {
+    return m_crash_occurs;
 }
 
 }

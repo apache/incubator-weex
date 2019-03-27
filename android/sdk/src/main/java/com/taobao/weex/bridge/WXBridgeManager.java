@@ -1469,7 +1469,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             } else {
               options.put(BUNDLE_TYPE, "Others");
             }
-            instance.getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_BUNDLE_TYPE, options.get(BUNDLE_TYPE));
+            Object recordBundleType = options.get(BUNDLE_TYPE);
+            if (recordBundleType instanceof String && "Others".equalsIgnoreCase((String)recordBundleType)){
+              //same as iOS record
+              recordBundleType = "other";
+            }
+            if (null != recordBundleType){
+              instance.getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_BUNDLE_TYPE, recordBundleType);
+            }
           }
           if (options.get("env") == null) {
             options.put("env", mInitParams.toMap());
@@ -2047,6 +2054,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     wxParams.setDeviceHeight(TextUtils.isEmpty(config.get("deviceHeight")) ? String.valueOf(WXViewUtils.getScreenHeight(WXEnvironment.sApplication)) : config.get("deviceHeight"));
     Map<String, String> customOptions = WXEnvironment.getCustomOptions();
     customOptions.put("enableBackupThread", String.valueOf(jsEngineMultiThreadEnable()));
+    IWXJscProcessManager wxJscProcessManager = WXSDKManager.getInstance().getWXJscProcessManager();
+    if(wxJscProcessManager != null) {
+      customOptions.put("enableBackupThreadCache", String.valueOf(wxJscProcessManager.enableBackUpThreadCache()));
+    }
+
     wxParams.setOptions(customOptions);
     wxParams.setNeedInitV8(WXSDKManager.getInstance().needInitV8());
     mInitParams = wxParams;
