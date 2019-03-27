@@ -29,10 +29,10 @@
 namespace WeexCore {
     class RenderObject;
     class DataRenderHandler;
-    class RenderPage;
     
     class EagleRenderObject {
     public:
+        friend class EagleBridge;
         EagleRenderObject();
         EagleRenderObject(RenderObject* render_object);
         void AddAttr(std::string key, std::string value);
@@ -42,7 +42,6 @@ namespace WeexCore {
         void AddEvent(std::string event);
         void RemoveEvent(std::string event);
         std::set<std::string> *events();
-        RenderObject* render_object_impl() const {return render_object_impl_;}
         
         void set_page_id(const std::string& page_id);
         void ApplyDefaultStyle();
@@ -50,12 +49,15 @@ namespace WeexCore {
         int getChildCount();
         int getChildIndex(RenderObject *child);
         EagleRenderObject GetChild(int index);
-        RenderObject* parent_render();
-        int AddRenderObject(int index, RenderObject *child);
+        EagleRenderObject parent_render();
+        int AddRenderObject(int index, EagleRenderObject child);
         void RemoveRenderObject(RenderObject *child);
         const std::string& page_id();
         const std::string& ref();
 
+        bool operator==(const EagleRenderObject& object) {
+            return render_object_impl_ == object.render_object_impl_;
+        }
         explicit operator bool() const
         {
             return static_cast<bool>(render_object_impl_);
@@ -65,17 +67,13 @@ namespace WeexCore {
         RenderObject* render_object_impl_;
     };
 
-    inline bool operator==(const EagleRenderObject& lhs, const EagleRenderObject& rhs){
-        return lhs.render_object_impl()== rhs.render_object_impl();
-    }
-
     class EagleBridge {
     public:
         class WeexCoreHandler {
         public:
             EagleRenderObject GetEagleRenderObject(const std::string &type, const std::string &ref);
-            bool CreatePage(const std::string& page_id, RenderObject *root);
-            RenderPage* GetPage(const std::string& page_id);
+            bool CreatePage(const std::string& page_id, EagleRenderObject root);
+            bool HavePage(const std::string& page_id);
             bool CreateFinish(const std::string &page_id);
             bool ClosePage(const std::string &page_id);
             void ReportException(const char* page_id, const char* func, const char* exception_string);
@@ -85,7 +83,7 @@ namespace WeexCore {
             void CallNativeComponent (const char* page_id, const char* module, const char* method,const char* arguments, int arguments_length, const char* options, int options_length);
             void NativeLog(const char* str_array);
             bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
-            bool AddRenderObject(const std::string &page_id, const std::string &parent_ref, int index,RenderObject *root);
+            bool AddRenderObject(const std::string &page_id, const std::string &parent_ref, int index,EagleRenderObject root);
             bool MoveRenderObject(const std::string &page_id, const std::string &ref,const std::string &parent_ref, int index);
             bool RemoveEvent(const std::string &page_id, const std::string &ref,
                              const std::string &event);
