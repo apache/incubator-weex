@@ -20,6 +20,7 @@
 #import <Foundation/Foundation.h>
 
 @protocol WXDataRenderHandler <NSObject>
+    
 - (void)createPage:(NSString *)pageId template:(NSString *)jsBundleString options:(NSDictionary *)options  data:(id)data;
 
 - (void)createPage:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary *)options data:(id)data;
@@ -33,4 +34,9 @@
 - (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args domChanges:(NSDictionary *)domChanges;
 
 - (void)registerModules:(NSDictionary *)modules;
+    
+- (void)registerComponents:(NSArray *)components;
+    
+- (void)invokeCallBack:(NSString *)pageId function:(NSString *)funcId args:(NSDictionary *)args keepAlive:(BOOL)keepAlive;
+
 @end

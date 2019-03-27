@@ -35,6 +35,7 @@ import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.utils.WXExceptionUtils;
+import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
@@ -71,7 +72,11 @@ public class WXBridge implements IWXBridge {
 
   public native void nativeFireEventOnDataRenderNode(String instanceId, String ref, String type, String data, String domChanges);
 
+  public native void nativeInvokeCallbackOnDataRender(String instanceId, String callbackId, String data, boolean keepAlive);
+
   public native void nativeRegisterModuleOnDataRenderNode( String data);
+
+  public native void nativeRegisterComponentOnDataRenderNode( String data);
 
   private native void nativeTakeHeapSnapshot(String filename);
 
@@ -296,7 +301,23 @@ public class WXBridge implements IWXBridge {
             WXUtils.getFixUnixTime()-start
         );
       }
-      return WXWsonJSONSwitch.toWsonOrJsonWXJSObject(object);
+      if (instance!=null && (instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
+          || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY)){
+        try {
+          if(object == null){
+            return new WXJSObject(null);
+          }
+          if(object.getClass() == WXJSObject.class){
+            return (WXJSObject) object;
+          }
+          return new WXJSObject(WXJSObject.JSON, WXJsonUtils.fromObjectToJSONString(object));
+        } catch (Exception e) {
+          // For wson use in data render mode
+          return WXWsonJSONSwitch.toWsonOrJsonWXJSObject(object);
+        }
+      } else {
+        return WXWsonJSONSwitch.toWsonOrJsonWXJSObject(object);
+      }
     }catch (Exception e){
       WXLogUtils.e(TAG,  e);
       return new WXJSObject(null);
@@ -316,7 +337,22 @@ public class WXBridge implements IWXBridge {
   @CalledByNative
   public void callNativeComponent(String instanceId, String ref, String method, byte[] arguments, byte[] optionsData) {
     try{
-      JSONArray argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
+      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      JSONArray argArray = null;
+      if (arguments != null){
+        // TODO use a better way
+        if (instance!=null && (instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
+            || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY)){
+          try {
+            argArray = (JSONArray) JSON.parse(new String(arguments, "UTF-8"));
+          } catch (Exception e) {
+            // For wson use in data render mode
+            argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
+          }
+        } else {
+          argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
+        }
+      }
       Object options = WXWsonJSONSwitch.parseWsonOrJSON(optionsData);
       WXBridgeManager.getInstance().callNativeComponent(instanceId, ref, method, argArray, options);
     }catch (Exception e){
@@ -714,7 +750,15 @@ public class WXBridge implements IWXBridge {
     nativeFireEventOnDataRenderNode(instanceId,ref,type,data, domChanges);
   }
 
+  public void invokeCallbackOnDataRender(String instanceId, String callbackId, String data, boolean keepAlive) {
+    nativeInvokeCallbackOnDataRender(instanceId,callbackId,data, keepAlive);
+  }
+
   public void registerModuleOnDataRenderNode(String data) {
     nativeRegisterModuleOnDataRenderNode(data);
+  }
+
+  public void registerComponentOnDataRenderNode(String data) {
+    nativeRegisterComponentOnDataRenderNode(data);
   }
 }

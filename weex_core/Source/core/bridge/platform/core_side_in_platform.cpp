@@ -447,7 +447,35 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
 
       return true;
     } else if (strcmp(render_strategy, "DATA_RENDER_BINARY") == 0) {
-      EagleBridge::GetInstance()->data_render_handler()->CreatePage(script, script_length, instanceId, render_strategy, initData, exec_js);
+      std::string error;
+      std::string env_str;
+      std::string option = "{}";
+      auto opts_json_value = json11::Json::parse(opts, error);
+      if (error.empty()) {
+        auto env_obj = opts_json_value["env"];
+        auto bundleUrl = opts_json_value["bundleUrl"];
+        env_str = "";
+        if (env_obj.is_object()) {
+          const json11::Json& options = env_obj["options"];
+          const json11::Json::object& options_obj = options.object_items();
+          json11::Json::object new_env{
+              env_obj.object_items()
+          };
+          for(auto &it :options_obj){
+            new_env[it.first] = it.second;
+          }
+          env_str = json11::Json(new_env).dump();
+        }
+
+        json11::Json::object new_option{
+            {"bundleUrl", bundleUrl},
+            {"weex", json11::Json::object{
+                {"config",opts_json_value}
+            }}
+        };
+        option = json11::Json(new_option).dump();
+      }
+      EagleBridge::GetInstance()->data_render_handler()->CreatePage(script, static_cast<size_t>(script_length), instanceId, option, env_str, initData, exec_js);
       return true;
     }
   }

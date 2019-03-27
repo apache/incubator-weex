@@ -615,10 +615,25 @@ static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
   ScopedJStringUTF8 dataChar(env, data);
   ScopedJStringUTF8 domChangesChar(env, domChanges);
 
-    WeexCore::EagleBridge::GetInstance()->data_render_handler()->FireEvent(
-        idChar.getChars(), refChar.getChars(), typeChar.getChars(),
-        dataChar.getChars(), domChangesChar.getChars()
-    );
+  WeexCore::EagleBridge::GetInstance()->data_render_handler()->FireEvent(
+      idChar.getChars(), refChar.getChars(), typeChar.getChars(),
+      dataChar.getChars(), domChangesChar.getChars()
+  );
+}
+
+static void InvokeCallbackOnDataRender(JNIEnv* env, jobject jcaller,
+                                       jstring instanceId, jstring callbackId,
+                                       jstring data, jboolean keepAlive) {
+  if (instanceId == NULL || callbackId == NULL || data == NULL) {
+    return;
+  }
+
+  ScopedJStringUTF8 idChar(env, instanceId);
+  ScopedJStringUTF8 callbackChar(env, callbackId);
+  ScopedJStringUTF8 dataChar(env, data);
+
+  WeexCore::EagleBridge::GetInstance()->data_render_handler()->InvokeCallback(
+      idChar.getChars(), callbackChar.getChars(), dataChar.getChars(),keepAlive);
 }
 
 static void RegisterModuleOnDataRenderNode(JNIEnv* env, jobject jcaller,
@@ -633,6 +648,19 @@ static void RegisterModuleOnDataRenderNode(JNIEnv* env, jobject jcaller,
   if(data_render_handler){
     data_render_handler->RegisterModules(
         dataChar.getChars());
+  }
+}
+
+static void RegisterComponentOnDataRenderNode(JNIEnv* env, jobject jcaller,
+                                              jstring data) {
+  if (data == NULL) {
+    return;
+  }
+
+  ScopedJStringUTF8 dataChar(env, data);
+  auto data_render_handler = WeexCore::EagleBridge::GetInstance()->data_render_handler();
+  if(data_render_handler) {
+    data_render_handler->RegisterComponent(dataChar.getChars());
   }
 }
 

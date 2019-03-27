@@ -33,22 +33,41 @@ namespace WeexCore {
     
     class EagleRenderObject {
     public:
+        EagleRenderObject();
         EagleRenderObject(RenderObject* render_object);
         void AddAttr(std::string key, std::string value);
         void AddStyle(std::string key, std::string value);
+        void UpdateAttr(std::string key, std::string value);
+        void UpdateStyle(std::string key, std::string value);
         void AddEvent(std::string event);
+        void RemoveEvent(std::string event);
         std::set<std::string> *events();
         RenderObject* render_object_impl() const {return render_object_impl_;}
         
         void set_page_id(const std::string& page_id);
         void ApplyDefaultStyle();
         void ApplyDefaultAttr();
+        int getChildCount();
+        int getChildIndex(RenderObject *child);
+        EagleRenderObject GetChild(int index);
+        RenderObject* parent_render();
         int AddRenderObject(int index, RenderObject *child);
+        void RemoveRenderObject(RenderObject *child);
+        const std::string& page_id();
+        const std::string& ref();
+
+        explicit operator bool() const
+        {
+            return static_cast<bool>(render_object_impl_);
+        }
 
     private:
         RenderObject* render_object_impl_;
     };
-    
+
+    inline bool operator==(const EagleRenderObject& lhs, const EagleRenderObject& rhs){
+        return lhs.render_object_impl()== rhs.render_object_impl();
+    }
 
     class EagleBridge {
     public:
@@ -63,6 +82,7 @@ namespace WeexCore {
             void Send(const char* instance_id, const char* url, std::function<void(const std::string&)> callback);
             int RefreshFinish(const char* page_id, const char* task, const char* callback);
             std::unique_ptr<ValueWithType> CallNativeModule (const char* page_id, const char* module, const char* method,const char* arguments, int arguments_length, const char* options, int options_length);
+            void CallNativeComponent (const char* page_id, const char* module, const char* method,const char* arguments, int arguments_length, const char* options, int options_length);
             void NativeLog(const char* str_array);
             bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
             bool AddRenderObject(const std::string &page_id, const std::string &parent_ref, int index,RenderObject *root);
@@ -94,11 +114,16 @@ namespace WeexCore {
             virtual int DestroyInstance(const char *instanceId);
             virtual void CreatePage(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data, std::function<void(const char*)> exec_js) {}
             
-            virtual void CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& init_data, std::function<void(const char*)> exec_js) {}
+            virtual void CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& env, const std::string& init_data, std::function<void(const char*)> exec_js) {}
             virtual bool RefreshPage(const std::string &page_id, const std::string &init_data) {return false;}
             virtual void UpdateComponentData(const std::string& page_id, const char* cid, const std::string& json_data) {}
             virtual void FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args,const std::string &dom_changes) {}
+            virtual void InvokeCallback(const std::string& page_id,
+                                      const std::string& callback_id,
+                                      const std::string& data,
+                                      bool keep_alive) {}
             virtual void RegisterModules(const std::string &modules) {}
+            virtual void RegisterComponent(const std::string &str) {};
         };
         
         static EagleBridge* GetInstance() {
@@ -107,8 +132,8 @@ namespace WeexCore {
             }
             return g_instance;
         }
-        DataRenderHandler* data_render_handler() const {return data_render_handler_.get();}
-        void set_data_render_handler(DataRenderHandler* data_render_handler) {data_render_handler_.reset(data_render_handler);}
+        DataRenderHandler *data_render_handler() const {return data_render_handler_.get();}
+        void set_data_render_handler(DataRenderHandler *data_render_handler) {data_render_handler_.reset(data_render_handler);}
         WeexCoreHandler* weex_core_handler() const {return weex_core_handler_.get();}
         
 

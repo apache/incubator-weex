@@ -24,12 +24,16 @@
 #include "core/render/manager/render_manager.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/network/http_module.h"
+#include "eagle_bridge.h"
+
 
 namespace WeexCore {
-    EagleBridge* EagleBridge::g_instance = nullptr;
+    EagleBridge *EagleBridge::g_instance = nullptr;
     
+    EagleRenderObject::EagleRenderObject():render_object_impl_(nullptr) {}
+
     EagleRenderObject::EagleRenderObject(RenderObject* render_object):render_object_impl_(render_object) {}
-    
+
     void EagleRenderObject::AddAttr(std::string key, std::string value) {
         render_object_impl_->AddAttr(key, value);
     }
@@ -37,11 +41,23 @@ namespace WeexCore {
     void EagleRenderObject::AddStyle(std::string key, std::string value) {
         render_object_impl_->AddStyle(key, value);
     }
-    
+
+    void EagleRenderObject::UpdateAttr(std::string key, std::string value) {
+        render_object_impl_->UpdateAttr(key, value);
+    }
+
+    void EagleRenderObject::UpdateStyle(std::string key, std::string value) {
+        render_object_impl_->UpdateStyle(key, value);
+    }
+
     void EagleRenderObject::AddEvent(std::string event) {
         render_object_impl_->AddEvent(event);
     }
-    
+
+    void EagleRenderObject::RemoveEvent(std::string event) {
+        render_object_impl_->RemoveEvent(event);
+    }
+
     std::set<std::string>* EagleRenderObject::events() {
         return render_object_impl_->events();
     }
@@ -61,8 +77,36 @@ namespace WeexCore {
     int EagleRenderObject::AddRenderObject(int index, RenderObject *child) {
         return render_object_impl_->AddRenderObject(index, child);
     }
-    
-    EagleRenderObject EagleBridge::WeexCoreHandler::GetEagleRenderObject(const std::string &type, const std::string &ref) {
+
+    int EagleRenderObject::getChildCount() {
+        return static_cast<int>(render_object_impl_->getChildCount());
+    }
+
+    int EagleRenderObject::getChildIndex(RenderObject *child) {
+        return static_cast<int>(render_object_impl_->IndexOf(child));
+    }
+
+    EagleRenderObject EagleRenderObject::GetChild(int index) {
+        return render_object_impl_->GetChild(index);
+    }
+
+    RenderObject* EagleRenderObject::parent_render(){
+        return render_object_impl_->parent_render();
+    }
+
+    const std::string& EagleRenderObject::page_id(){
+        return render_object_impl_->page_id();
+    }
+
+    const std::string& EagleRenderObject::ref(){
+        return render_object_impl_->ref();
+    }
+
+    void EagleRenderObject::RemoveRenderObject(RenderObject* child) {
+        render_object_impl_->RemoveRenderObject(child);
+    }
+
+EagleRenderObject EagleBridge::WeexCoreHandler::GetEagleRenderObject(const std::string &type, const std::string &ref) {
         return EagleRenderObject(static_cast<WeexCore::RenderObject*>(WeexCore::RenderCreator::GetInstance()->CreateRender(type, ref)));
     }
     
@@ -103,6 +147,13 @@ namespace WeexCore {
         ->getPlatformBridge()
         ->platform_side()
         ->CallNativeModule(page_id, module, method, arguments, arguments_length, options, options_length);
+    }
+
+    void EagleBridge::WeexCoreHandler::CallNativeComponent(const char* page_id, const char* module, const char* method,const char* arguments, int arguments_length, const char* options, int options_length) {
+        WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->platform_side()
+        ->CallNativeComponent(page_id, module, method, arguments, arguments_length, options, options_length);
     }
     
     void EagleBridge::WeexCoreHandler::NativeLog(const char* str_array) {
@@ -163,7 +214,9 @@ namespace WeexCore {
     }
 
     void EagleBridge::WeexCoreHandler::PostTaskToMsgLoop(const weex::base::Closure& closure){
+#ifdef OS_ANDROID
         WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(closure);
+#endif
     }
     
     int EagleBridge::DataRenderHandler::DestroyInstance(const char *instanceId) {

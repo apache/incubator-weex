@@ -417,14 +417,15 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
 {
     WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
     if (instance.dataRender) {
-        WXPerformBlockOnComponentThread(^{
-            id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
-            if (dataRenderHandler) {
+        id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+        if (dataRenderHandler) {
+            WXPerformBlockOnComponentThread(^{
                 [dataRenderHandler fireEvent:instanceId ref:ref event:type args:params?:@{} domChanges:domChanges?:@{}];
-            } else {
-                WXLogError(@"No data render handler found!");
-            }
-        });
+            });
+        }
+        else {
+            WXLogError(@"No data render handler found!");
+        }
         return;
     }
 
@@ -483,14 +484,25 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     NSArray *args = nil;
     if (keepAlive) {
         args = @[[funcId copy], params? [params copy]:@"\"{}\"", @true];
-    }else {
+    } else {
         args = @[[funcId copy], params? [params copy]:@"\"{}\""];
     }
     WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-
-    WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:@"jsBridge" methodName:@"callback" arguments:args instance:instance];
-    [self callJsMethod:method];
-}
+    if (instance.wlasmRender) {
+        id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+        if (dataRenderHandler) {
+            WXPerformBlockOnComponentThread(^{
+                [dataRenderHandler invokeCallBack:instanceId function:funcId args:params ? [params copy]:@"\"{}\"" keepAlive:keepAlive];
+            });
+        }
+        else {
+            WXLogError(@"No data render handler found!");
+        }
+    }
+    else {
+        WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:@"jsBridge" methodName:@"callback" arguments:args instance:instance];
+        [self callJsMethod:method];
+    }}
 
 - (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(id)params
 {

@@ -746,6 +746,13 @@ typedef enum : NSUInteger {
         return _defaultPixelScaleFactor;
     }
 }
+    
+- (BOOL)wlasmRender {
+    if ([_options[@"WLASM_RENDER"] boolValue]) {
+        return YES;
+    }
+    return NO;
+}
 
 - (BOOL)dataRender
 {
