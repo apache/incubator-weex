@@ -74,8 +74,11 @@ namespace WeexCore {
         render_object_impl_->ApplyDefaultStyle();
     }
     
-    int EagleRenderObject::AddRenderObject(int index, RenderObject *child) {
-        return render_object_impl_->AddRenderObject(index, child);
+    int EagleRenderObject::AddRenderObject(int index, EagleRenderObject child) {
+        if (!render_object_impl_) {
+            return -1;
+        }
+        return render_object_impl_->AddRenderObject(index, child.render_object_impl_);
     }
 
     int EagleRenderObject::getChildCount() {
@@ -90,7 +93,7 @@ namespace WeexCore {
         return render_object_impl_->GetChild(index);
     }
 
-    RenderObject* EagleRenderObject::parent_render(){
+    EagleRenderObject EagleRenderObject::parent_render(){
         return render_object_impl_->parent_render();
     }
 
@@ -106,16 +109,16 @@ namespace WeexCore {
         render_object_impl_->RemoveRenderObject(child);
     }
 
-EagleRenderObject EagleBridge::WeexCoreHandler::GetEagleRenderObject(const std::string &type, const std::string &ref) {
+    EagleRenderObject EagleBridge::WeexCoreHandler::GetEagleRenderObject(const std::string &type, const std::string &ref) {
         return EagleRenderObject(static_cast<WeexCore::RenderObject*>(WeexCore::RenderCreator::GetInstance()->CreateRender(type, ref)));
     }
     
-    bool EagleBridge::WeexCoreHandler::CreatePage(const std::string& page_id, RenderObject *root) {
-        return RenderManager::GetInstance()->CreatePage(page_id, root);
+    bool EagleBridge::WeexCoreHandler::CreatePage(const std::string& page_id, EagleRenderObject root) {
+        return RenderManager::GetInstance()->CreatePage(page_id, root.render_object_impl_);
     }
 
-    RenderPage* EagleBridge::WeexCoreHandler::GetPage(const std::string& page_id) {
-        return RenderManager::GetInstance()->GetPage(page_id);
+    bool EagleBridge::WeexCoreHandler::HavePage(const std::string& page_id) {
+        return RenderManager::GetInstance()->GetPage(page_id) ? true : false;
     }
     
     bool EagleBridge::WeexCoreHandler::CreateFinish(const std::string &page_id) {
@@ -164,8 +167,8 @@ EagleRenderObject EagleBridge::WeexCoreHandler::GetEagleRenderObject(const std::
         return RenderManager::GetInstance()->RemoveRenderObject(page_id, ref);
     }
     
-    bool EagleBridge::WeexCoreHandler::AddRenderObject(const std::string &page_id, const std::string &parent_ref, int index,RenderObject *root) {
-        return RenderManager::GetInstance()->AddRenderObject(page_id, parent_ref, index, root);
+    bool EagleBridge::WeexCoreHandler::AddRenderObject(const std::string &page_id, const std::string &parent_ref, int index, EagleRenderObject root) {
+        return RenderManager::GetInstance()->AddRenderObject(page_id, parent_ref, index, root.render_object_impl_);
     }
     
     bool EagleBridge::WeexCoreHandler::MoveRenderObject(const std::string &page_id, const std::string &ref,const std::string &parent_ref, int index) {
