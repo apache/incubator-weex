@@ -47,15 +47,15 @@ namespace WeexCore {
         void ApplyDefaultStyle();
         void ApplyDefaultAttr();
         int getChildCount();
-        int getChildIndex(RenderObject *child);
+        int getChildIndex(EagleRenderObject child);
         EagleRenderObject GetChild(int index);
         EagleRenderObject parent_render();
         int AddRenderObject(int index, EagleRenderObject child);
-        void RemoveRenderObject(RenderObject *child);
+        void RemoveRenderObject(EagleRenderObject child);
         const std::string& page_id();
         const std::string& ref();
 
-        bool operator==(const EagleRenderObject& object) {
+        bool operator ==(const EagleRenderObject& object) const {
             return render_object_impl_ == object.render_object_impl_;
         }
         explicit operator bool() const

@@ -85,8 +85,8 @@ namespace WeexCore {
         return static_cast<int>(render_object_impl_->getChildCount());
     }
 
-    int EagleRenderObject::getChildIndex(RenderObject *child) {
-        return static_cast<int>(render_object_impl_->IndexOf(child));
+    int EagleRenderObject::getChildIndex(EagleRenderObject child) {
+        return static_cast<int>(render_object_impl_->IndexOf(child.render_object_impl_));
     }
 
     EagleRenderObject EagleRenderObject::GetChild(int index) {
@@ -105,8 +105,8 @@ namespace WeexCore {
         return render_object_impl_->ref();
     }
 
-    void EagleRenderObject::RemoveRenderObject(RenderObject* child) {
-        render_object_impl_->RemoveRenderObject(child);
+    void EagleRenderObject::RemoveRenderObject(EagleRenderObject child) {
+        render_object_impl_->RemoveRenderObject(child.render_object_impl_);
     }
 
     EagleRenderObject EagleBridge::WeexCoreHandler::GetEagleRenderObject(const std::string &type, const std::string &ref) {
