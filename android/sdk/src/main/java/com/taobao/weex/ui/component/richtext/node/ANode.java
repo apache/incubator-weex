@@ -21,7 +21,9 @@ package com.taobao.weex.ui.component.richtext.node;
 import android.content.Context;
 import android.text.SpannableStringBuilder;
 
+import com.taobao.weex.ui.component.richtext.WXRichText;
 import com.taobao.weex.ui.component.richtext.span.ASpan;
+import com.taobao.weex.utils.WXUtils;
 
 class ANode extends RichTextNode {
 
@@ -54,7 +56,7 @@ class ANode extends RichTextNode {
   protected void updateSpans(SpannableStringBuilder spannableStringBuilder, int level) {
     super.updateSpans(spannableStringBuilder, level);
     if (attr != null && attr.containsKey(HREF)) {
-      ASpan aSpan = new ASpan(mInstanceId, attr.get(HREF).toString());
+      ASpan aSpan = new ASpan(mInstanceId, attr.get(HREF).toString(), mComponentRef,WXUtils.getString(attr.get(RichTextNode.PSEUDO_REF),""));
       spannableStringBuilder.setSpan(aSpan, 0, spannableStringBuilder.length(),
           createSpanFlag(level));
     }

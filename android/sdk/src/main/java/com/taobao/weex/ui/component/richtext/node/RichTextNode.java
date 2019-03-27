@@ -55,6 +55,7 @@ public abstract class RichTextNode {
     public static final String VALUE = Constants.Name.VALUE;
     public static final String ITEM_CLICK="itemclick";
     public static final String PSEUDO_REF="pseudoRef";
+    public static final String CLICK_HREF="click://";
     private static final int MAX_LEVEL = Spanned.SPAN_PRIORITY >> Spanned.SPAN_PRIORITY_SHIFT;
 
     protected final Context mContext;
