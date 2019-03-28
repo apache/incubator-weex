@@ -24,6 +24,7 @@
 #import "WXResourceRequest.h"
 #import "WXBridgeProtocol.h"
 #import "WXApmForInstance.h"
+#import "WXComponentManager.h"
 
 extern NSString *const bundleUrlOptionKey;
 
@@ -106,6 +107,11 @@ extern NSString *const bundleUrlOptionKey;
  * Whether this instance is rendered or not. Please MUST not render an instance twice even if you have called destroyInstance.
  **/
 @property (nonatomic, assign, readonly) BOOL isRendered;
+
+/**
+ * Get component manager of this instance. You can manipulate components then.
+ **/
+@property (nonatomic, readonly, strong) WXComponentManager *componentManager;
 
 /**
  * The state of current instance.
