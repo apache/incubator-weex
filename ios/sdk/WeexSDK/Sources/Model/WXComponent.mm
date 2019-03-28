@@ -100,6 +100,7 @@ static BOOL bNeedRemoveEvents = YES;
         _ariaHidden = nil;
         _accessible = nil;
         _accessibilityHintContent = nil;
+        _cancelsTouchesInView = YES;
         
         _async = NO;
         
@@ -151,6 +152,11 @@ static BOOL bNeedRemoveEvents = YES;
         if (attributes[@"customEvent"]) {
             _customEvent = [WXConvert BOOL:attributes[@"customEvent"]];
         }
+        
+        if (attributes[@"cancelsTouchesInView"]) {
+            _cancelsTouchesInView = [WXConvert BOOL:attributes[@"cancelsTouchesInView"]];
+        }
+
         
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> init component: ref : %@ , styles: %@",ref,styles);
