@@ -845,6 +845,14 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     }
 }
 
++ (void)setPageRequired:(NSString *)pageId width:(CGFloat)width height:(CGFloat)height
+{
+    /// Because env is global, pageId is not used now time.
+    WeexCore::WXCoreEnvironment* env = WeexCore::WXCoreEnvironment::getInstance();
+    env->SetDeviceWidth(std::to_string(width));
+    env->SetDeviceHeight(std::to_string(height));
+}
+
 + (void)layoutPage:(NSString*)pageId forced:(BOOL)forced
 {
     if (platformBridge) {
