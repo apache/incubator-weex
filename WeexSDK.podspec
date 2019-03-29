@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
 
   s.name         = "WeexSDK"
 
-  s.version      = "0.20.0"
+  s.version      = "0.24.0"
 
   s.summary      = "WeexSDK Source."
 
@@ -122,7 +122,7 @@ Pod::Spec.new do |s|
   s.prefix_header_file = 'ios/sdk/WeexSDK/Sources/Supporting Files/WeexSDK-Prefix.pch'
 
   s.xcconfig = { "OTHER_LINK_FLAG" => '$(inherited) -ObjC' }
-  s.pod_target_xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '${PODS_ROOT}/WeexSDK/weex_core/Source/ ${PROJECT_DIR}/../../../weex_core/Source',
+  s.pod_target_xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '${PODS_TARGET_SRCROOT}/weex_core/Source/ ${PROJECT_DIR}/../../../weex_core/Source',
     'GCC_PREPROCESSOR_DEFINITIONS' => 'OS_IOS=1' }
 
   s.frameworks = 'CoreMedia','MediaPlayer','AVFoundation','AVKit','JavaScriptCore','GLKit','OpenGLES','CoreText','QuartzCore','CoreGraphics'
