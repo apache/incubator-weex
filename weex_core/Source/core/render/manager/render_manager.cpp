@@ -149,7 +149,13 @@ RenderPageCustom* RenderManager::CreateCustomPage(const std::string& page_id, co
     
     RenderPageCustom::PageOptions options;
     
-    options.page_url = getPageURL(page_id);
+    {
+        std::lock_guard<std::mutex> guard(page_args_mutex_);
+        auto findPageArgs = page_args_.find(page_id);
+        if (findPageArgs != page_args_.end()) {
+            options.args = findPageArgs->second;
+        }
+    }
     
     options.view_scale = 1;
     auto value = WeexCore::WXCoreEnvironment::getInstance()->GetOption("pixel_scale");
@@ -438,8 +444,7 @@ RenderPageBase *RenderManager::GetPage(const std::string &page_id) {
 }
 
 bool RenderManager::ClosePage(const std::string &page_id) {
-  removePageURL(page_id);
-  removePageRenderType(page_id);
+  removePageArguments(page_id);
   RenderPageBase *page = GetPage(page_id);
   if (page == nullptr) return false;
 
@@ -485,38 +490,29 @@ void RenderManager::set_round_off_deviation(const std::string &page_id, bool rou
   page->SetRoundOffDeviation(round_off_deviation);
 }
     
-void RenderManager::setPageURL(const std::string& pageId, const std::string& pageURL) {
-    if (!pageId.empty()) {
-        mPageURLs.insert({pageId, pageURL});
+void RenderManager::setPageArgument(const std::string& pageId, const std::string& key, const std::string& value) {
+    if (pageId.empty() || key.empty()) {
+        return;
     }
+    std::lock_guard<std::mutex> guard(page_args_mutex_);
+    page_args_[pageId][key] = value;
 }
     
-void RenderManager::removePageURL(const std::string& pageId) {
-    mPageURLs.erase(pageId);
-}
-    
-std::string RenderManager::getPageURL(const std::string& pageId) {
-    auto it = mPageURLs.find(pageId);
-    if (it != mPageURLs.end()){
-        return it->second;
+std::string RenderManager::getPageArgument(const std::string& pageId, const std::string& key) {
+    std::lock_guard<std::mutex> guard(page_args_mutex_);
+    auto findPage = page_args_.find(pageId);
+    if (findPage != page_args_.end()) {
+        auto findKey = findPage->second.find(key);
+        if (findKey != findPage->second.end()) {
+            return findKey->second;
+        }
     }
     return "";
 }
 
-void RenderManager::setPageRenderType(const std::string &pageId, const std::string &renderType) {
-    mPageTypes.insert({pageId, renderType});
-}
-
-void RenderManager::removePageRenderType(const std::string &pageId) {
-    mPageTypes.erase(pageId);
-}
-
-std::string RenderManager::getPageRenderType(const std::string &pageId) {
-    auto it = mPageTypes.find(pageId);
-    if (it != mPageTypes.end()){
-        return it->second;
-    }
-    return "";
+void RenderManager::removePageArguments(const std::string& pageId) {
+    std::lock_guard<std::mutex> guard(page_args_mutex_);
+    page_args_.erase(pageId);
 }
 
 void RenderManager::Batch(const std::string &page_id) {

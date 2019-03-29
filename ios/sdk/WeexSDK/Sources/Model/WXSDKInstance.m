@@ -103,7 +103,7 @@ typedef enum : NSUInteger {
         @synchronized(bundleUrlOptionKey) {
             static NSInteger __instance = 0;
             instanceId = __instance % (1024*1024);
-            __instance++;
+            __instance += 2; // always add by 2 as even number
         }
         
         _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
@@ -112,7 +112,9 @@ typedef enum : NSUInteger {
             // check render type is available
             NSSet* availableRenderTypes = [WXCoreBridge getAvailableCustomRenderTypes];
             if ([availableRenderTypes containsObject:_renderType]) {
-                [WXCoreBridge registerPageRenderType:_instanceId type:_renderType];
+                // custom render page, we use odd instanceId, and (instanceId + 1) is sure not used by other pages.
+                _instanceId = [NSString stringWithFormat:@"%ld", (long)(instanceId + 1)];
+                [WXCoreBridge setPageArgument:_instanceId key:@"renderType" value:_renderType];
             }
             else {
                 WXLogError(@"Unsupported render type '%@'. Regress to platform target.", _renderType);
@@ -239,7 +241,7 @@ typedef enum : NSUInteger {
 - (void)setScriptURL:(NSURL *)scriptURL
 {
     _scriptURL = scriptURL;
-    [WXCoreBridge registerPageURL:_instanceId url:[_scriptURL absoluteString]];
+    [WXCoreBridge setPageArgument:_instanceId key:@"url" value:[_scriptURL absoluteString]];
 }
 
 - (void)renderWithURL:(NSURL *)url
@@ -314,6 +316,7 @@ typedef enum : NSUInteger {
     }
 
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
+    [WXCoreBridge setPageArgument:_instanceId key:@"renderTimeOrigin" value:[NSString stringWithFormat:@"%lld", (long long)([[NSDate date] timeIntervalSince1970] * 1000)]];
     self.performance.renderUnixTimeOrigin = [WXUtility getUnixFixTimeMillis];
     [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
 

@@ -29,7 +29,7 @@ namespace WeexCore {
     };
 
     std::string RenderTargetManager::getRenderTargetName(const std::string& page) {
-        return RenderManager::GetInstance()->getPageRenderType(page);
+        return RenderManager::GetInstance()->getPageArgument(page, "renderType");
     }
     
     void RenderTargetManager::registerRenderTarget(RenderTarget* target) {

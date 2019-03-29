@@ -29,10 +29,10 @@ namespace WeexCore {
     class RenderPageCustom: public RenderPageBase {
     public:
         struct PageOptions {
-            std::string page_url;
             bool is_round_off = false;
             float viewport_width = -1;
             float view_scale = 1;
+            std::map<std::string, std::string> args;
         };
         
     public:

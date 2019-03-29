@@ -31,7 +31,7 @@ namespace WeexCore {
         target_ = RenderTargetManager::sharedInstance()->getRenderTarget(page_type);
         if (target_) {
             RenderTarget::PageOptions targetOptions;
-            targetOptions.page_url = options.page_url;
+            targetOptions.args = std::move(options.args);
             targetOptions.view_scale = options.view_scale;
             targetOptions.is_round_off = options.is_round_off;
             targetOptions.viewport_width = options.viewport_width;

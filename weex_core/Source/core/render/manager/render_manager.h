@@ -118,14 +118,9 @@ class RenderManager {
 
   void set_round_off_deviation(const std::string &page_id, bool round_off_deviation);
     
-  // TODO put pageURL & renderType to options of createInstance method ?
-  void setPageURL(const std::string& pageId, const std::string& pageURL);
-  void removePageURL(const std::string& pageId);
-  std::string getPageURL(const std::string& pageId);
-
-  void setPageRenderType(const std::string& pageId, const std::string& renderType);
-  void removePageRenderType(const std::string& pageId);
-  std::string getPageRenderType(const std::string& pageId);
+  void setPageArgument(const std::string& pageId, const std::string& key, const std::string& value);
+  std::string getPageArgument(const std::string& pageId, const std::string& key);
+  void removePageArguments(const std::string& pageId);
 
   static RenderManager *GetInstance() {
     if (NULL == g_pInstance) {
@@ -136,8 +131,8 @@ class RenderManager {
  private:
   static RenderManager *g_pInstance;
   std::map<std::string, RenderPageBase *> pages_;
-  std::map<std::string, std::string> mPageTypes;
-  std::map<std::string, std::string> mPageURLs;
+  std::mutex page_args_mutex_;
+  std::map<std::string, std::map<std::string, std::string>> page_args_;
   std::map<std::string, float> viewports_;
   std::map<std::string, bool> round_off_deviations_;
 };
