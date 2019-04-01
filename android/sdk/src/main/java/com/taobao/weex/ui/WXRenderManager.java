@@ -165,6 +165,8 @@ public class WXRenderManager {
       return;
     }
 
+    // If more than two pages exist and mCurrentBatchInstanceId not matches new instanceId, we will post all stashed actions at once.
+    // That will cause losing efficacy of batch action, but it is acceptable because it's not serious problem.
     if (mCurrentBatchInstanceId != null && instanceId != null && !mCurrentBatchInstanceId.equals(instanceId) && mBatchActions.size() > 0) {
       Map<String, Object> lastItem = mBatchActions.get(mBatchActions.size() - 1);
       Object mustBeAction = lastItem.get(sKeyAction);
