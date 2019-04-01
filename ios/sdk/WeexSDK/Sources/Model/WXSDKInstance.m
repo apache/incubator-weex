@@ -210,6 +210,11 @@ typedef enum : NSUInteger {
     [WXCoreBridge setViewportWidth:_instanceId width:viewportWidth];
 }
 
+- (void)setPageRequiredWidth:(CGFloat)width height:(CGFloat)height
+{
+    [WXCoreBridge setPageRequired:_instanceId width:width height:height];
+}
+
 - (void)renderWithURL:(NSURL *)url
 {
     [self renderWithURL:url options:nil data:nil];

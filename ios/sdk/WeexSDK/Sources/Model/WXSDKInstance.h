@@ -345,7 +345,10 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 
 @property (nonatomic ,strong) WXApmForInstance* apmInstance;
 
-
+/**
+ * Application required Page Width and Height to prevent Weex use DeviceWidth directly.
+ */
+- (void)setPageRequiredWidth:(CGFloat)width height:(CGFloat)height;
 
 /** 
  * Deprecated 
