@@ -388,6 +388,7 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
     if (!_tapGesture) {
         _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onClick:)];
         _tapGesture.delegate = self;
+        _tapGesture.cancelsTouchesInView = _cancelsTouchesInView;
         [self.view addGestureRecognizer:_tapGesture];
     }
 }
