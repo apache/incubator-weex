@@ -50,6 +50,7 @@
 #import "WXSDKInstance_performance.h"
 #import "WXPageEventNotifyEvent.h"
 #import "WXCoreBridge.h"
+#import <WeexSDK/WXDataRenderHandler.h>
 
 #define WEEX_LITE_URL_SUFFIX           @"wlasm"
 
@@ -240,6 +241,9 @@ typedef enum : NSUInteger {
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:url];
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
+
+    NSURL* nsURL = [NSURL URLWithString:options[@"DATA_RENDER_JS"]];
+    [self _downloadAndExecScript:nsURL];
 }
 
 - (void)renderView:(id)source options:(NSDictionary *)options data:(id)data
@@ -255,6 +259,31 @@ typedef enum : NSUInteger {
     } else if ([source isKindOfClass:[NSData class]]) {
         [self _renderWithData:source];
     }
+    NSURL* nsURL = [NSURL URLWithString:options[@"DATA_RENDER_JS"]];
+    [self _downloadAndExecScript:nsURL];
+}
+
+- (void)_downloadAndExecScript:(NSURL *)url {
+    [[WXSDKManager bridgeMgr] DownloadJS:url completion:^(NSString *script) {
+        if (!script) {
+            return;
+        }
+        if (self.dataRender) {
+            id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+            if (dataRenderHandler) {
+                [[WXSDKManager bridgeMgr] createInstanceForJS:_instanceId template:script options:_options data:_jsData];
+
+                NSString* instanceId = self.instanceId;
+                WXPerformBlockOnComponentThread(^{
+                    [dataRenderHandler DispatchPageLifecycle:instanceId];
+                });
+            }
+            else {
+                WXLogError(@"No data render handler found!");
+            }
+            return;
+        }
+    }];
 }
 
 - (NSString *) bundleTemplate

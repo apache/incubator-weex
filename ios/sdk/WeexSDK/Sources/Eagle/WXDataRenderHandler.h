@@ -39,4 +39,6 @@
     
 - (void)invokeCallBack:(NSString *)pageId function:(NSString *)funcId args:(NSDictionary *)args keepAlive:(BOOL)keepAlive;
 
+- (void)DispatchPageLifecycle:(NSString *)pageId;
+
 @end

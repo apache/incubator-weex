@@ -122,6 +122,7 @@ namespace WeexCore {
                                       bool keep_alive) {}
             virtual void RegisterModules(const std::string &modules) {}
             virtual void RegisterComponent(const std::string &str) {};
+            virtual void DispatchPageLifecycle(const std::string &page_id) {};
         };
         
         static EagleBridge* GetInstance() {
