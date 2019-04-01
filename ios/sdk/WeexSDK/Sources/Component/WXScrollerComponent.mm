@@ -718,12 +718,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
                                           @"height":@(scrollView.contentSize.height / scaleFactor)};
         NSDictionary *contentOffsetData = @{@"x":@(-scrollView.contentOffset.x / scaleFactor),
                                             @"y":@(-scrollView.contentOffset.y / scaleFactor)};
+        NSDictionary *params = @{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData, @"isDragging":@(scrollView.isDragging)};
         
         if (_scrollStartEvent) {
-            [self fireEvent:@"scrollstart" params:@{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData} domChanges:nil];
+            [self fireEvent:@"scrollstart" params:params domChanges:nil];
         }
         if (_scrollEventListener) {
-            _scrollEventListener(self, @"scrollstart", @{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData});
+            _scrollEventListener(self, @"scrollstart", params);
         }
     }
     
