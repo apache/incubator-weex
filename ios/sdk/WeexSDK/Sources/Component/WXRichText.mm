@@ -198,6 +198,9 @@ do {\
     }
     else if (superNode.href) {
         node.href = superNode.href;
+        if (!(node.pseudoRef.length) && superNode.pseudoRef.length) {
+            node.pseudoRef = superNode.pseudoRef;
+        }
     }
     
     if (attributes[@"src"]) {
