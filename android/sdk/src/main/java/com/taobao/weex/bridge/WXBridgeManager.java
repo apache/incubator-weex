@@ -198,7 +198,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     Others
   };
 
-  private static final boolean BRIDGE_LOG_SWITCH = true;
+  private static final boolean BRIDGE_LOG_SWITCH = false;
 
   /**
    * Whether JS Framework(main.js) has been initialized.
