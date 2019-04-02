@@ -763,6 +763,7 @@ _Pragma("clang diagnostic pop") \
                 [_dataRenderHandler refreshDataRenderInstance:instance data:data];
             }
         });
+        [[WXSDKManager bridgeMgr] callJSMethod:@"callJS" args:@[instance, @[@{@"method":@"fireEvent", @"args":@[@"", @"refresh", [WXUtility objectFromJSON:@"[]"], @"", @{@"params":@[@{@"data":data}]}]}]]];
     } else {
         [self callJSMethod:@"refreshInstance" args:@[instance, data]];
     }
