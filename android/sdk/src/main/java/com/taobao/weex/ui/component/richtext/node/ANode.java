@@ -53,7 +53,12 @@ class ANode extends RichTextNode {
   @Override
   protected void updateSpans(SpannableStringBuilder spannableStringBuilder, int level) {
     super.updateSpans(spannableStringBuilder, level);
-    if (attr != null && attr.containsKey(HREF)) {
+    if (attr != null && attr.containsKey(RichTextNode.PSEUDO_REF)) {
+      ItemClickSpan itemClickSpan = new new ItemClickSpan(mInstanceId, mComponentRef,
+              attr.get(RichTextNode.PSEUDO_REF).toString())
+      spannableStringBuilder.setSpan(itemClickSpan, 0, spannableStringBuilder.length(),
+              createSpanFlag(level));
+    }else if (attr != null && attr.containsKey(HREF)) {
       ASpan aSpan = new ASpan(mInstanceId, attr.get(HREF).toString());
       spannableStringBuilder.setSpan(aSpan, 0, spannableStringBuilder.length(),
           createSpanFlag(level));
