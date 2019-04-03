@@ -152,7 +152,12 @@ android {
         versionCode 1
         versionName project.version
         ndk {
-            abiFilters "armeabi-v7a","armeabi","x86"
+            if (project.armABIOnly){
+                abiFilters "armeabi"
+                println "armeabi only"
+            } else {
+                abiFilters "armeabi-v7a", "armeabi", "x86"
+            }
         }
 
         externalNativeBuild {
