@@ -1555,6 +1555,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
          mParentInstance = null;
       }
       mApmForInstance.onEnd();
+
+
       if(mRendered) {
         WXSDKManager.getInstance().destroyInstance(mInstanceId);
       }
@@ -1565,9 +1567,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       }
       if (mRootComp != null) {
         mRootComp.destroy();
-        destroyView(mRenderContainer);
         mRootComp = null;
       }
+
+      if(mRenderContainer != null){
+        destroyView(mRenderContainer);
+      }
+
 
       if (mGlobalEvents != null) {
         mGlobalEvents.clear();

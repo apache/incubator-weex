@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4.1)
 project(WeexCore)
 
 add_compile_options(-fno-rtti)
-
+add_compile_options(-funwind-tables)
 
 if(CMAKE_BUILD_TYPE MATCHES "Release")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fvisibility=hidden -g -Os -ffunction-sections -fdata-sections")
