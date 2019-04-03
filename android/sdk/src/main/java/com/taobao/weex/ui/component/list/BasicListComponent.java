@@ -734,9 +734,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       }
       if (isKeepScrollPosition) {
         if(view.getInnerView().getLayoutManager() instanceof  LinearLayoutManager){
-          if(!view.getInnerView().isLayoutFrozen()){ //frozen, prevent layout when scroll
-            view.getInnerView().setLayoutFrozen(true);
-          }
           if(keepPositionCell == null){
             int last=((LinearLayoutManager)view.getInnerView().getLayoutManager()).findLastCompletelyVisibleItemPosition();
             ListBaseViewHolder holder = (ListBaseViewHolder) view.getInnerView().findViewHolderForAdapterPosition(last);
@@ -744,6 +741,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
               keepPositionCell = holder.getComponent();
             }
             if(keepPositionCell != null) {
+              if(!view.getInnerView().isLayoutFrozen()){ //frozen, prevent layout when scroll
+                view.getInnerView().setLayoutFrozen(true);
+              }
               if(keepPositionCellRunnable != null){
                 view.removeCallbacks(keepPositionCellRunnable);
               }
