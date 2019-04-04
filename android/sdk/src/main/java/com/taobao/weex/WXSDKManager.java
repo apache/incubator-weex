@@ -38,6 +38,7 @@ import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.adapter.IWxHtmlTagAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.appfram.navigator.INavigator;
@@ -55,6 +56,7 @@ import com.taobao.weex.common.WXWorkThreadManager;
 import com.taobao.weex.performance.IApmGenerator;
 import com.taobao.weex.performance.IWXAnalyzer;
 import com.taobao.weex.ui.WXRenderManager;
+import com.taobao.weex.ui.component.html.adapter.DefaultHtmlTagAdapter;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
@@ -86,6 +88,7 @@ public class WXSDKManager {
   private List<IWXAnalyzer> mWXAnalyzerList;
   private IApmGenerator mApmGenerater;
   private IWXJsFileLoaderAdapter mWXJsFileLoaderAdapter;
+  private IWxHtmlTagAdapter mWxHtmlTextViewAdapter;
 
   private ICrashInfoReporter mCrashInfo;
 
@@ -414,6 +417,14 @@ public class WXSDKManager {
     this.mApmGenerater = config.getApmGenerater();
     this.mWXJsFileLoaderAdapter = config.getJsFileLoaderAdapter();
     this.mWXJscProcessManager = config.getJscProcessManager();
+    this.mWxHtmlTextViewAdapter = config.getHtmlTagAdapter();
+  }
+
+  public IWxHtmlTagAdapter getWxHtmlTextViewAdapter() {
+    if (mWxHtmlTextViewAdapter == null) {
+      mWxHtmlTextViewAdapter = new DefaultHtmlTagAdapter();
+    }
+    return mWxHtmlTextViewAdapter;
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){

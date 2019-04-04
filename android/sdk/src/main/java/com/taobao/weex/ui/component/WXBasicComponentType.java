@@ -38,6 +38,7 @@ public class WXBasicComponentType {
   public static final String HLIST = "hlist";
   public static final String CELL = "cell";
   public static final String HEADER = "header";
+  public static final String HTML_TEXT = "html-text";
   public static final String FOOTER = "footer";
   public static final String INDICATOR = "indicator";
   public static final String VIDEO = "video";

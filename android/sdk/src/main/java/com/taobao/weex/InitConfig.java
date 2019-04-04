@@ -27,6 +27,7 @@ import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.adapter.IWxHtmlTagAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
@@ -50,6 +51,7 @@ public class InitConfig {
   private IApmGenerator apmGenerater;
   private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
   private IWXJscProcessManager jscProcessManager;
+  private IWxHtmlTagAdapter htmlTagAdapter;
 
   public IWXHttpAdapter getHttpAdapter() {
     return httpAdapter;
@@ -111,6 +113,10 @@ public class InitConfig {
     return jscProcessManager;
   }
 
+  public IWxHtmlTagAdapter getHtmlTagAdapter() {
+    return htmlTagAdapter;
+  }
+
   private InitConfig() {
   }
 
@@ -128,6 +134,7 @@ public class InitConfig {
     ClassLoaderAdapter classLoaderAdapter;
     IApmGenerator apmGenerater;
     private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
+    private IWxHtmlTagAdapter htmlTagAdapter;
 
     public IWXJscProcessManager getJscProcessManager() {
       return jscProcessManager;
@@ -184,6 +191,11 @@ public class InitConfig {
       return this;
     }
 
+    public Builder setHtmlTagAdapter(IWxHtmlTagAdapter htmlTagAdapter){
+      this.htmlTagAdapter = htmlTagAdapter;
+      return this;
+    }
+
     public Builder setFramework(String framework){
       this.framework=framework;
       return this;
@@ -225,6 +237,7 @@ public class InitConfig {
       config.apmGenerater = this.apmGenerater;
       config.jsFileLoaderAdapter = this.jsFileLoaderAdapter;
       config.jscProcessManager = this.jscProcessManager;
+      config.htmlTagAdapter = this.htmlTagAdapter;
       return config;
     }
   }

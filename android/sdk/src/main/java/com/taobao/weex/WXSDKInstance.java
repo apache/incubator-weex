@@ -46,6 +46,7 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJscProcessManager;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.adapter.IWxHtmlTagAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.bridge.EventResult;
@@ -961,6 +962,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public IWXImgLoaderAdapter getImgLoaderAdapter() {
     return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
+  }
+
+  public IWxHtmlTagAdapter getHtmlTextAdapter() {
+    return WXSDKManager.getInstance().getWxHtmlTextViewAdapter();
   }
 
   public IDrawableLoader getDrawableLoader() {
