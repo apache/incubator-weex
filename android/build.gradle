@@ -50,7 +50,7 @@ subprojects {
         targetSdkVersion=26
         supportLibVersion="26.0.2"
         fastjsonLibVersion="1.1.46.android"
-        armABIOnly = project.hasProperty("armeabiOnly")
+        armABIOnly = !project.hasProperty("armABIOnly") || armABIOnly.equals('true')
     }
 }
 

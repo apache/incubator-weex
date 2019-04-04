@@ -154,7 +154,6 @@ android {
         ndk {
             if (project.armABIOnly){
                 abiFilters "armeabi"
-                println "armeabi only"
             } else {
                 abiFilters "armeabi-v7a", "armeabi", "x86"
             }
