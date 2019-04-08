@@ -65,12 +65,14 @@ checkstyle {
 version = project.hasProperty('weexVersion')? project.getProperty('weexVersion') : "0.20.0.1"
 
 android {
-    delete 'libs/armeabi/libweexcore.so'
-    delete 'libs/armeabi-v7a/libweexcore.so'
-    delete 'libs/x86/libweexcore.so'
-    delete 'libs/armeabi/libweexjss.so'
-    delete 'libs/armeabi-v7a/libweexjss.so'
-    delete 'libs/x86/libweexjss.so'
+    if(project.buildCpp) {
+        delete 'libs/armeabi/libweexcore.so'
+        delete 'libs/armeabi-v7a/libweexcore.so'
+        delete 'libs/x86/libweexcore.so'
+        delete 'libs/armeabi/libweexjss.so'
+        delete 'libs/armeabi-v7a/libweexjss.so'
+        delete 'libs/x86/libweexjss.so'
+    }
 
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
