@@ -65,15 +65,6 @@ checkstyle {
 version = project.hasProperty('weexVersion')? project.getProperty('weexVersion') : "0.20.0.1"
 
 android {
-    if(project.buildCpp) {
-        delete 'libs/armeabi/libweexcore.so'
-        delete 'libs/armeabi-v7a/libweexcore.so'
-        delete 'libs/x86/libweexcore.so'
-        delete 'libs/armeabi/libweexjss.so'
-        delete 'libs/armeabi-v7a/libweexjss.so'
-        delete 'libs/x86/libweexjss.so'
-    }
-
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
@@ -375,7 +366,7 @@ bintray {
         licenses = ["Apache-2.0"]
         publish = true
         version {
-            //这里填写需要发布的版本号
+            //The version to be published
             name = project.version
         }
     }
@@ -414,9 +405,19 @@ def copy_so_and_backup() {
     }
 }
 
+task deleteLibs(type: Delete){
+    project.android.defaultConfig.ndk.abiFilters.each{
+        delete "libs/${it}/libweexcore.so", "libs/${it}/libweexjss.so"
+    }
+}
+
 afterEvaluate { project ->
     project.tasks.find { (it.name.contains("assembleRelease")) }?.doLast {
         println("begin_copy_so")
         copy_so_and_backup()
+    }
+
+    if(project.buildCpp){
+        transformNativeLibsWithStripDebugSymbolForRelease.dependsOn deleteLibs
     }
 }
