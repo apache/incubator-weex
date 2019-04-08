@@ -54,6 +54,7 @@
 #define WEEX_LITE_URL_SUFFIX           @"wlasm"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
+NSString *const bundleResponseUrlOptionKey = @"bundleResponseUrl";
 
 NSTimeInterval JSLibInitTime = 0;
 
@@ -486,6 +487,14 @@ typedef enum : NSUInteger {
      [self.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_START];
     _mainBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        
+        NSMutableDictionary* optionsCopy = [strongSelf->_options mutableCopy];
+        optionsCopy[bundleResponseUrlOptionKey] = [response.URL absoluteString];
+        strongSelf->_options = [optionsCopy copy];
+        
         NSError *error = nil;
         if ([response isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)response).statusCode != 200) {
             error = [NSError errorWithDomain:WX_ERROR_DOMAIN
