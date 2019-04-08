@@ -158,14 +158,15 @@ android {
                 abiFilters "armeabi-v7a", "armeabi", "x86"
             }
         }
-
-        externalNativeBuild {
-            cmake {
-                arguments '-DANDROID_PLATFORM='+"${api_level}",
-                        '-DANDROID_TOOLCHAIN='+"${compile_tool}",
-                        '-DANDROID_STL='+"${cxx_stl}",
-                        '-DCMAKE_BUILD_TYPE=Release',
-                        '-DENABLE_ASAN=false'
+        if(project.buildCpp) {
+            externalNativeBuild {
+                cmake {
+                    arguments '-DANDROID_PLATFORM=' + "${api_level}",
+                            '-DANDROID_TOOLCHAIN=' + "${compile_tool}",
+                            '-DANDROID_STL=' + "${cxx_stl}",
+                            '-DCMAKE_BUILD_TYPE=Release',
+                            '-DENABLE_ASAN=false'
+                }
             }
         }
     }
@@ -186,9 +187,11 @@ android {
         }
     }
 
-    externalNativeBuild {
-        cmake {
-            path '../../weex_core/CMakeLists.txt'
+    if(project.buildCpp) {
+        externalNativeBuild {
+            cmake {
+                path '../../weex_core/CMakeLists.txt'
+            }
         }
     }
 
