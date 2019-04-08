@@ -17,8 +17,18 @@ plugins {
 }
 
 subprojects {
+    if(project.hasProperty('external_script')){
+        for(item in external_script.split()) {
+            apply from: item
+        }
+    }
     repositories {
         mavenLocal()
+        if(project.hasProperty('external_repositories')){
+            maven {
+                url external_repositories
+            }
+        }
         maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
         mavenCentral()
         jcenter()
@@ -40,6 +50,10 @@ subprojects {
         targetSdkVersion=26
         supportLibVersion="26.0.2"
         fastjsonLibVersion="1.1.46.android"
+        //Default value for armABIOnly is true
+        armABIOnly = !project.hasProperty("armABIOnly") || armABIOnly.equals('true')
+        //Default value for buildCpp is true
+        buildCpp = !project.hasProperty("buildCpp") || buildCpp.equals("true")
     }
 }
 
