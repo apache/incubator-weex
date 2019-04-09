@@ -26,7 +26,9 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
-        classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
+        if(!project.disableCov) {
+            classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
+        }
     }
 }
 
@@ -39,8 +41,7 @@ apply plugin: 'checkstyle'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
-if(!disableCov.toBoolean()){
+if(!project.disableCov){
     apply plugin: 'com.vanniktech.android.junit.jacoco'
     junitJacoco {
         excludes = ['com/taobao/weex/dom/flex/**','com/taobao/weex/ui/view/refresh/circlebar/**']
@@ -405,9 +406,9 @@ def copy_so_and_backup() {
     }
 }
 
-task deleteLibs(type: Delete){
+task deleteLibs(type: Delete){ item->
     project.android.defaultConfig.ndk.abiFilters.each{
-        delete "libs/${it}/libweexcore.so", "libs/${it}/libweexjss.so"
+        item.delete "libs/${it}/libweexcore.so", "libs/${it}/libweexjss.so"
     }
 }
 
