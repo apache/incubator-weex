@@ -145,6 +145,7 @@ public class Constants {
     String MAXLENGTH = "maxlength";
     String ROWS = "rows";
     String CHECKED = "checked";
+    String ANIMATING = "animating";
     String VISIBILITY = "visibility";
     String ITEM_COLOR = "itemColor";
     String ITEM_SELECTED_COLOR = "itemSelectedColor";
@@ -178,6 +179,7 @@ public class Constants {
     String OFFSET_ACCURACY = "offsetAccuracy";
     String CONTENT_SIZE = "contentSize";
     String CONTENT_OFFSET = "contentOffset";
+    String ISDRAGGING = "isDragging";
     String X = "x";
     String Y = "y";
     String RETURN_KEY_TYPE = "returnKeyType";

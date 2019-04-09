@@ -65,13 +65,6 @@ checkstyle {
 version = project.hasProperty('weexVersion')? project.getProperty('weexVersion') : "0.20.0.1"
 
 android {
-    delete 'libs/armeabi/libweexcore.so'
-    delete 'libs/armeabi-v7a/libweexcore.so'
-    delete 'libs/x86/libweexcore.so'
-    delete 'libs/armeabi/libweexjss.so'
-    delete 'libs/armeabi-v7a/libweexjss.so'
-    delete 'libs/x86/libweexjss.so'
-
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
@@ -152,16 +145,21 @@ android {
         versionCode 1
         versionName project.version
         ndk {
-            abiFilters "armeabi-v7a","armeabi","x86"
+            if (project.armABIOnly){
+                abiFilters "armeabi"
+            } else {
+                abiFilters "armeabi-v7a", "armeabi", "x86"
+            }
         }
-
-        externalNativeBuild {
-            cmake {
-                arguments '-DANDROID_PLATFORM='+"${api_level}",
-                        '-DANDROID_TOOLCHAIN='+"${compile_tool}",
-                        '-DANDROID_STL='+"${cxx_stl}",
-                        '-DCMAKE_BUILD_TYPE=Release',
-                        '-DENABLE_ASAN=false'
+        if(project.buildCpp) {
+            externalNativeBuild {
+                cmake {
+                    arguments '-DANDROID_PLATFORM=' + "${api_level}",
+                            '-DANDROID_TOOLCHAIN=' + "${compile_tool}",
+                            '-DANDROID_STL=' + "${cxx_stl}",
+                            '-DCMAKE_BUILD_TYPE=Release',
+                            '-DENABLE_ASAN=false'
+                }
             }
         }
     }
@@ -182,9 +180,11 @@ android {
         }
     }
 
-    externalNativeBuild {
-        cmake {
-            path '../../weex_core/CMakeLists.txt'
+    if(project.buildCpp) {
+        externalNativeBuild {
+            cmake {
+                path '../../weex_core/CMakeLists.txt'
+            }
         }
     }
 
@@ -366,8 +366,58 @@ bintray {
         licenses = ["Apache-2.0"]
         publish = true
         version {
-            //这里填写需要发布的版本号
+            //The version to be published
             name = project.version
         }
+    }
+}
+
+def copy_so_and_backup() {
+    def cpu_list = ["armeabi", "armeabi-v7a", "x86"]
+    cpu_list.forEach { cpu_name ->
+        File so_file = new File(project.buildDir, "/intermediates/bundles/default/jni/" + cpu_name)
+        if (so_file.exists()) {
+            println(so_file.getAbsolutePath())
+            copy {
+                from so_file.getAbsolutePath()
+                into new File("libs/" + cpu_name)
+                include 'libweexjss.so', 'libweexcore.so'
+            }
+
+            if(cpu_name == "armeabi") {
+                File back_file = new File(project.buildDir, "/intermediates/cmake/release/obj/armeabi/")
+                //backup so to project'parent's path
+                File backup_des = new File(project.buildDir.parentFile.parentFile.parentFile.parentFile,"weex_so_armeabi")
+                if(backup_des.exists()){
+                    backup_des.deleteDir()
+                    backup_des.mkdir()
+                }
+                println(backup_des.absolutePath)
+
+                println("so backup to "+ backup_des.absolutePath)
+                copy {
+                    from back_file.getAbsolutePath()
+                    into backup_des
+                    include 'libweexjss.so', 'libweexcore.so'
+                }
+            }
+        }
+    }
+}
+
+task deleteLibs(type: Delete){
+    project.android.defaultConfig.ndk.abiFilters.each{
+        delete "libs/${it}/libweexcore.so", "libs/${it}/libweexjss.so"
+    }
+}
+
+afterEvaluate { project ->
+    project.tasks.find { (it.name.contains("assembleRelease")) }?.doLast {
+        println("begin_copy_so")
+        copy_so_and_backup()
+    }
+
+    if(project.buildCpp){
+        transformNativeLibsWithStripDebugSymbolForRelease.dependsOn deleteLibs
     }
 }

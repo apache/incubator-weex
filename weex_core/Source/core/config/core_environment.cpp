@@ -71,9 +71,7 @@ namespace WeexCore {
 
   const std::string WXCoreEnvironment::GetOption(const std::string &key) {
     std::map<std::string, std::string>::iterator iter = mOptions.find(key);
-      LOGE("KEY = %s", key.c_str());
     if (iter != mOptions.end()) {
-        LOGE("KEY = %s, VALUE = %s", key.c_str(), iter->second.c_str());
       return iter->second;
     } else {
       return "";

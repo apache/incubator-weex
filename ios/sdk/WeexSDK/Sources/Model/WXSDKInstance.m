@@ -55,6 +55,7 @@
 #define WEEX_LITE_URL_SUFFIX           @"wlasm"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
+NSString *const bundleResponseUrlOptionKey = @"bundleResponseUrl";
 
 NSTimeInterval JSLibInitTime = 0;
 
@@ -209,6 +210,11 @@ typedef enum : NSUInteger {
     
     // notify weex core
     [WXCoreBridge setViewportWidth:_instanceId width:viewportWidth];
+}
+
+- (void)setPageRequiredWidth:(CGFloat)width height:(CGFloat)height
+{
+    [WXCoreBridge setPageRequired:_instanceId width:width height:height];
 }
 
 - (void)renderWithURL:(NSURL *)url
@@ -510,6 +516,14 @@ typedef enum : NSUInteger {
      [self.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_START];
     _mainBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        
+        NSMutableDictionary* optionsCopy = [strongSelf->_options mutableCopy];
+        optionsCopy[bundleResponseUrlOptionKey] = [response.URL absoluteString];
+        strongSelf->_options = [optionsCopy copy];
+        
         NSError *error = nil;
         if ([response isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)response).statusCode != 200) {
             error = [NSError errorWithDomain:WX_ERROR_DOMAIN
@@ -805,8 +819,12 @@ typedef enum : NSUInteger {
     if (!url) {
         return nil;
     }
-    
-    return [NSURL URLWithString:url relativeToURL:_scriptURL];
+    NSURL *result = [NSURL URLWithString:url relativeToURL:_scriptURL];
+    if (result) {
+        return result;
+    }
+    // if result is nil, try url-encode the 'url' string.
+    return [NSURL URLWithString:[url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] relativeToURL:_scriptURL];
 }
 
 - (BOOL)checkModuleEventRegistered:(NSString*)event moduleClassName:(NSString*)moduleClassName

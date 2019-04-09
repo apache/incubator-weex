@@ -52,6 +52,12 @@ public class WXLoadingIndicator extends WXComponent<CircleProgressBar> {
                 if (color != null)
                     setColor(color);
                 return true;
+            case Constants.Name.ANIMATING:
+                Boolean result = WXUtils.getBoolean(param, null);
+                if (result != null) {
+                    setAnimating(result);
+                }
+                return true;
         }
         return super.setProperty(key, param);
     }
@@ -61,6 +67,15 @@ public class WXLoadingIndicator extends WXComponent<CircleProgressBar> {
         if (color != null && !color.equals("")) {
             int parseColor = WXResourceUtils.getColor(color, Color.RED);
             getHostView().setColorSchemeColors(parseColor);
+        }
+    }
+
+    @WXComponentProp(name = Constants.Name.ANIMATING)
+    public void setAnimating(boolean animating) {
+        if (animating) {
+            getHostView().start();
+        } else {
+            getHostView().stop();
         }
     }
 }

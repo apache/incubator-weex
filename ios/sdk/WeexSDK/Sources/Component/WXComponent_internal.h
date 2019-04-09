@@ -90,6 +90,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     UILongPressGestureRecognizer *_longPressGesture;
     UIPanGestureRecognizer *_panGesture;
     
+    BOOL _cancelsTouchesInView;
+    
     BOOL _listenPanStart;
     BOOL _listenPanMove;
     BOOL _listenPanEnd;
@@ -129,6 +131,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     WXBorderStyle _borderRightStyle;
     WXBorderStyle _borderBottomStyle;
     WXBorderStyle _borderLeftStyle;
+    
+    NSInteger _lastBorderRecords; // Records last border drawing
     
     BOOL _isViewTreeIgnored; // Component is added to super, but it is not added to views.
     BOOL _isFixed;
