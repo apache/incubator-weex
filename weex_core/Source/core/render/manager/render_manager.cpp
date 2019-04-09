@@ -444,9 +444,23 @@ RenderPageBase *RenderManager::GetPage(const std::string &page_id) {
 }
 
 bool RenderManager::ClosePage(const std::string &page_id) {
-  removePageArguments(page_id);
+  auto pageArgs = removePageArguments(page_id);
   RenderPageBase *page = GetPage(page_id);
-  if (page == nullptr) return false;
+  if (page == nullptr) {
+    /* Page in WeexCore is created when js outputs createBody command.
+     But before createBody, custom render page like heron page may be created.
+     So we must tell heron manager to close the page
+     */
+    auto findPageType = pageArgs.find("renderType");
+    if (findPageType != pageArgs.end()) {
+      auto target = RenderTargetManager::sharedInstance()->getRenderTarget(findPageType->second);
+      if (target) {
+        target->deletePage(page_id);
+      }
+    }
+      
+    return false;
+  }
 
 #if RENDER_LOG
   LOGD("[RenderManager] ClosePage >>>> pageId: %s", pageId.c_str());
@@ -510,9 +524,15 @@ std::string RenderManager::getPageArgument(const std::string& pageId, const std:
     return "";
 }
 
-void RenderManager::removePageArguments(const std::string& pageId) {
+std::map<std::string, std::string> RenderManager::removePageArguments(const std::string& pageId) {
     std::lock_guard<std::mutex> guard(page_args_mutex_);
-    page_args_.erase(pageId);
+    std::map<std::string, std::string> result;
+    auto findPage = page_args_.find(pageId);
+    if (findPage != page_args_.end()) {
+        std::swap(result, findPage->second);
+        page_args_.erase(findPage);
+    }
+    return result;
 }
 
 void RenderManager::Batch(const std::string &page_id) {

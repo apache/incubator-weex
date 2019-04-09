@@ -1123,6 +1123,12 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 {
     using namespace WeexCore;
     
+    WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:pageId];
+    WXComponentManager* manager = sdkInstance.componentManager;
+    if (!manager.isValid) {
+        return;
+    }
+    
     // Temporarily before iOS adapt to JSEngine, we intercept here for custom render page
     bool isCustomPage = [pageId integerValue] % 2 != 0;
     

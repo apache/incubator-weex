@@ -120,7 +120,7 @@ class RenderManager {
     
   void setPageArgument(const std::string& pageId, const std::string& key, const std::string& value);
   std::string getPageArgument(const std::string& pageId, const std::string& key);
-  void removePageArguments(const std::string& pageId);
+  std::map<std::string, std::string> removePageArguments(const std::string& pageId); // remove and return the page arguments
 
   static RenderManager *GetInstance() {
     if (NULL == g_pInstance) {
