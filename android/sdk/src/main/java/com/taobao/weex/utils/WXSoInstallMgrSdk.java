@@ -21,16 +21,13 @@ package com.taobao.weex.utils;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
-import android.system.ErrnoException;
-import android.system.Os;
 import android.text.TextUtils;
-
 import com.taobao.weex.IWXStatisticsListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
-
+import dalvik.system.PathClassLoader;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
@@ -47,8 +44,6 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
-
-import dalvik.system.PathClassLoader;
 
 
 /**
@@ -76,8 +71,6 @@ public class WXSoInstallMgrSdk {
   private final static String STARTUPSO = "/libweexjsb.so";
   private final static String STARTUPSOANDROID15 = "/libweexjst.so";
 
-  private final static int ARMEABI_Size = 3583820;
-  private final static int X86_Size = 4340864;
 
   static Context mContext = null;
   private static IWXSoLoaderAdapter mSoLoader = null;
