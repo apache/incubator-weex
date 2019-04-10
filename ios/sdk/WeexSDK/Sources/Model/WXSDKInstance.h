@@ -372,6 +372,13 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 
 @property (nonatomic ,strong) WXApmForInstance* apmInstance;
 
+@property (nonatomic, assign) BOOL appearState;
+
+/*
+ * For custom render page to release/restore OpenGL resources, etc.
+ */
+- (void)willAppear;
+- (void)didDisappear;
 
 
 /** 

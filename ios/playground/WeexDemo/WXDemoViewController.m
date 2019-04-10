@@ -76,12 +76,14 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
+    [_instance didDisappear];
     [self updateInstanceState:WeexInstanceDisappear];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [_instance willAppear];
     [self setupNaviBar];
     [self setupRightBarItem];
     [self.navigationController setNavigationBarHidden:_showNavigationBar];
@@ -121,34 +123,34 @@
 - (void)render
 {
     static BOOL useXRenderSelected = YES; // 对首页默认使用native渲染
-    static BOOL useXRenderValue = NO;
-    if (!useXRenderSelected) {
-        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@""
-                                                                       message:@"Use native or Heron"
-                                                                preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction* nativeAction = [UIAlertAction actionWithTitle:@"Native" style:UIAlertActionStyleDefault
-                                                             handler:^(UIAlertAction * action) {
-                                                                 useXRenderValue = NO;
-                                                                 useXRenderSelected = YES;
-                                                                 [self render];
-                                                             }];
-        UIAlertAction* XAction = [UIAlertAction actionWithTitle:@"Heron" style:UIAlertActionStyleDefault
-                                                        handler:^(UIAlertAction * action) {
-                                                            useXRenderValue = YES;
-                                                            useXRenderSelected = YES;
-                                                            [self render];
-                                                        }];
-        
-        [alert addAction:nativeAction];
-        [alert addAction:XAction];
-        [self presentViewController:alert animated:YES completion:^{
-        }];
-        return;
-    }
-    else {
-        useXRenderSelected = NO;
-    }
+    static BOOL useXRenderValue = YES;
+//    if (!useXRenderSelected) {
+//        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@""
+//                                                                       message:@"Use native or Heron"
+//                                                                preferredStyle:UIAlertControllerStyleAlert];
+//
+//        UIAlertAction* nativeAction = [UIAlertAction actionWithTitle:@"Native" style:UIAlertActionStyleDefault
+//                                                             handler:^(UIAlertAction * action) {
+//                                                                 useXRenderValue = NO;
+//                                                                 useXRenderSelected = YES;
+//                                                                 [self render];
+//                                                             }];
+//        UIAlertAction* XAction = [UIAlertAction actionWithTitle:@"Heron" style:UIAlertActionStyleDefault
+//                                                        handler:^(UIAlertAction * action) {
+//                                                            useXRenderValue = YES;
+//                                                            useXRenderSelected = YES;
+//                                                            [self render];
+//                                                        }];
+//
+//        [alert addAction:nativeAction];
+//        [alert addAction:XAction];
+//        [self presentViewController:alert animated:YES completion:^{
+//        }];
+//        return;
+//    }
+//    else {
+//        useXRenderSelected = NO;
+//    }
     
     
     CGFloat width = self.view.frame.size.width;

@@ -80,6 +80,8 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
 #define WX_INSTANCE_NOTIFICATION_UPDATE_STATE @"WXInstUpdateState"
 #define WX_INSTANCE_NOTIFICATION_UPDATE_STATE_INTERNAL @"WXInstUpdateStateInternal"
 
+#define WX_INSTANCE_NOTIFICATION_CHANGE_VISIBILITY_INTERNAL @"WXInstChangeVisibilityInternal"
+
 #define WX_COMPONENT_NOTIFICATION_VIEW_LOADED    @"WXComponentViewLoaded"
 
 #define WX_INSTANCE_WILL_DESTROY_NOTIFICATION     @"WXSDKInstanceWillDestroyNotification"
