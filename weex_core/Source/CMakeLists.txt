@@ -9,7 +9,9 @@ elseif ("${ANDROID_STL}" STREQUAL "gnustl_static")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++1y")
 endif ()
 add_compile_options(-fexceptions)
-
+add_compile_options(-fstack-protector)
+add_compile_options(-funwind-tables)
+add_compile_options(-fno-omit-frame-pointer)
 
 add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
