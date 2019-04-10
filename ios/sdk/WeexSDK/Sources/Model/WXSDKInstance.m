@@ -99,6 +99,7 @@ typedef enum : NSUInteger {
     self = [super init];
     if (self) {
         _renderType = renderType;
+        _appearState = YES;
         
         NSInteger instanceId = 0;
         @synchronized(bundleUrlOptionKey) {
