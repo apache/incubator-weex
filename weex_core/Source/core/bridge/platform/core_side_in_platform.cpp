@@ -320,8 +320,8 @@ int CoreSideInPlatform::RefreshInstance(
 
   std::string init_data = weex::base::to_utf8(params[1]->value.string->content,
                                               params[1]->value.string->length);
-
-  if (EagleBridge::GetInstance()->data_render_handler()->RefreshPage(instanceId, init_data)) {
+  auto handler = EagleBridge::GetInstance()->data_render_handler();
+  if (handler && handler->RefreshPage(instanceId, init_data)) {
     return true;
   }
   return ExecJS(instanceId, nameSpace, func, params);
@@ -443,7 +443,13 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
                                extendsApi.c_str(),params);
         };
     if (strcmp(render_strategy, "DATA_RENDER") == 0) {
-        EagleBridge::GetInstance()->data_render_handler()->CreatePage(script, instanceId, render_strategy, initData, exec_js);
+        auto handler = EagleBridge::GetInstance()->data_render_handler();
+        if(handler){
+          handler->CreatePage(script, instanceId, render_strategy, initData, exec_js);
+        }
+        else{
+          LOGE("DATA_RENDER mode should not be used if there is no data_render_handler");
+        }
 
       return true;
     } else if (strcmp(render_strategy, "DATA_RENDER_BINARY") == 0) {
@@ -475,7 +481,14 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
         };
         option = json11::Json(new_option).dump();
       }
-      EagleBridge::GetInstance()->data_render_handler()->CreatePage(script, static_cast<size_t>(script_length), instanceId, option, env_str, initData, exec_js);
+      
+      auto handler = EagleBridge::GetInstance()->data_render_handler();
+      if(handler){
+        handler->CreatePage(script, static_cast<size_t>(script_length), instanceId, option, env_str, initData, exec_js);
+      }
+      else{
+        LOGE("DATA_RENDER_BINARY mode should not be used if there is no data_render_handler"); 
+      }
       return true;
     }
   }
