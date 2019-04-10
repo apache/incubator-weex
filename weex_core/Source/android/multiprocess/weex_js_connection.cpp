@@ -218,6 +218,10 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
   pthread_attr_init(&threadAttr);
   pthread_t ipcServerThread;
   int i = pthread_create(&ipcServerThread, &threadAttr, newIPCServer, &td);
+  if(i != 0) {
+    throw IPCException("failed to create ipc server thread");
+  }
+
   while (newThreadStatus == UNFINISH) {
     continue;
   }
