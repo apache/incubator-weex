@@ -71,47 +71,6 @@ set(COMMON_SRCS
   ./core/bridge/script/core_side_in_script.cpp
   ./core/parser/dom_wson.cpp
 
-   ./core/data_render/ast.cc
-   ./core/data_render/ast_builder.cc
-   ./core/data_render/ast_factory.cc
-   ./core/data_render/class.cc
-   ./core/data_render/class_array.cc
-   ./core/data_render/class_json.cc
-   ./core/data_render/class_string.cc
-   ./core/data_render/class_factory.cc
-   ./core/data_render/class_object.cc
-   ./core/data_render/code_generator.cc
-   ./core/data_render/exec_state.cc
-   ./core/data_render/object.cc
-   ./core/data_render/parser.cc
-   ./core/data_render/rax_jsx_ast.cc
-   ./core/data_render/js_common_function.cc
-   ./core/data_render/rax_parser.cc
-   ./core/data_render/rax_parser_builder.cc
-   ./core/data_render/rax_parser_context.cc
-   ./core/data_render/rax_parser_scope.cc
-   ./core/data_render/rax_parser_statistics.cc
-   ./core/data_render/rax_source_locator.cc
-   ./core/data_render/statement.cc
-   ./core/data_render/string_table.cc
-   ./core/data_render/table.cc
-   ./core/data_render/token.cc
-   ./core/data_render/tokenizer.cc
-   ./core/data_render/vm.cc
-   ./core/data_render/binary_file.cc
-   ./core/data_render/class_console.cc
-   ./core/data_render/class_function.cc
-   ./core/data_render/class_math.cc
-   ./core/data_render/class_regex.cc
-   ./core/data_render/class_window.cc
-   ./core/data_render/exec_state_binary.cc
-   ./core/data_render/exec_state_section.cc
-   ./core/data_render/op_code.cc
-   ./core/data_render/vnode/vnode.cc
-   ./core/data_render/vnode/vcomponent.cc
-   ./core/data_render/vnode/vnode_exec_env.cc
-   ./core/data_render/vnode/vnode_render_manager.cc
-   ./core/data_render/vnode/vnode_render_context.cc
    ./core/network/http_module.cc
         )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/base)
@@ -164,10 +123,7 @@ if(ANDROID)
     ./android/wrap/wx_params.cpp
     ./android/multiprocess/weex_js_connection.cpp
     ./android/utils/jni_load.cc
-
-    ./core/data_render/vnode/android/vcomponent_lifecycle_listener.cc
-    ./core/data_render/vnode/android/vnode_on_event_listener.cc
-    ./core/data_render/vnode/android/conversion.cc
+    ./core/bridge/eagle_bridge.cpp
     ./core/network/android/default_request_handler.cc
   )
   SET(FINAL_ADD_LIBRARY
@@ -196,3 +152,5 @@ endif(ANDROID)
 add_library(${WEEXCORE_LIBRARY_NAME} SHARED ${FINAL_ADD_LIBRARY})
 target_include_directories(${WEEXCORE_LIBRARY_NAME} PUBLIC .)
 target_link_libraries(${WEEXCORE_LIBRARY_NAME} ${FINAL_TARGET_LINK_LIBRARIES})
+# Enable it for smaller so.
+# set_target_properties(${WEEXCORE_LIBRARY_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden)

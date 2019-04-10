@@ -17,9 +17,9 @@
  * under the License.
  */
 
+#import <WeexSDK/WeexSDK.h>
 #import "WXNavigationHandlerImpl.h"
 #import "WXDemoViewController.h"
-#import <WeexSDK/WeexSDK.h>
 
 @implementation WXNavigationHandlerImpl
 

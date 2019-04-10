@@ -155,6 +155,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, assign, readonly) BOOL dataRender;
 
 /**
+ *  Which decide whether to use binary code render, default value is false
+ */
+@property (nonatomic, assign, readonly) BOOL wlasmRender;
+    
+/**
  *  The callback triggered when the instance fails to render.
  *
  *  @return A block that takes a NSError argument, which is the error occured

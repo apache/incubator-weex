@@ -19,8 +19,8 @@
 
 #import "WXImgLoaderDefaultImpl.h"
 #import <SDWebImage/UIImageView+WebCache.h>
-#import "WXLog.h"
-#import "WXSDKManager.h"
+#import <WeexSDK/WXLog.h>
+#import <WeexSDK/WXSDKManager.h>
 
 #define MIN_IMAGE_WIDTH 36
 #define MIN_IMAGE_HEIGHT 36

@@ -18,7 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXImgLoaderProtocol.h"
+#import <WeexSDK/WXImgLoaderProtocol.h>
 
 @interface WXImgLoaderDefaultImpl : NSObject<WXImgLoaderProtocol, WXModuleProtocol>
 @end

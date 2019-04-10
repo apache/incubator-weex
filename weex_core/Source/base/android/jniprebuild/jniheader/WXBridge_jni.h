@@ -98,9 +98,17 @@ static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
     jstring data,
     jstring domChanges);
 
+static void InvokeCallbackOnDataRender(JNIEnv* env, jobject jcaller,
+                                       jstring instanceId,
+                                       jstring callbackId,
+                                       jstring data,
+                                       jboolean keepAlive);
+
 static void RegisterModuleOnDataRenderNode(JNIEnv* env, jobject jcaller,
     jstring data);
 
+static void RegisterComponentOnDataRenderNode(JNIEnv* env, jobject jcaller,
+                                              jstring data);
 static void TakeHeapSnapshot(JNIEnv* env, jobject jcaller,
     jstring filename);
 
@@ -1006,20 +1014,33 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "I"
 ")"
 "Ljava/lang/String;", reinterpret_cast<void*>(ExecJSOnInstance) },
-    { "nativeFireEventOnDataRenderNode",
-"("
-"Ljava/lang/String;"
-"Ljava/lang/String;"
-"Ljava/lang/String;"
-"Ljava/lang/String;"
-"Ljava/lang/String;"
-")"
-"V", reinterpret_cast<void*>(FireEventOnDataRenderNode) },
-    { "nativeRegisterModuleOnDataRenderNode",
-"("
-"Ljava/lang/String;"
-")"
-"V", reinterpret_cast<void*>(RegisterModuleOnDataRenderNode) },
+{ "nativeFireEventOnDataRenderNode",
+    "("
+    "Ljava/lang/String;"
+    "Ljava/lang/String;"
+    "Ljava/lang/String;"
+    "Ljava/lang/String;"
+    "Ljava/lang/String;"
+    ")"
+    "V", reinterpret_cast<void*>(FireEventOnDataRenderNode) },
+{ "nativeInvokeCallbackOnDataRender",
+    "("
+    "Ljava/lang/String;"
+    "Ljava/lang/String;"
+    "Ljava/lang/String;"
+    "Z"
+    ")"
+    "V", reinterpret_cast<void*>(InvokeCallbackOnDataRender) },
+{ "nativeRegisterModuleOnDataRenderNode",
+    "("
+    "Ljava/lang/String;"
+    ")"
+    "V", reinterpret_cast<void*>(RegisterModuleOnDataRenderNode) },
+{ "nativeRegisterComponentOnDataRenderNode",
+    "("
+    "Ljava/lang/String;"
+    ")"
+    "V", reinterpret_cast<void*>(RegisterComponentOnDataRenderNode) },
     { "nativeTakeHeapSnapshot",
 "("
 "Ljava/lang/String;"

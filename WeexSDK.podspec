@@ -98,8 +98,10 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Manager/WXInvocationConfig.h',
                           'ios/sdk/WeexSDK/Sources/Engine/WXSDKEngine.h',
                           'ios/sdk/WeexSDK/Sources/Engine/WXSDKError.h',
+                          'ios/sdk/WeexSDK/Sources/Eagle/WXDataRenderHandler.h',
                           'ios/sdk/WeexSDK/Sources/Utility/WXConvert.h',
                           'ios/sdk/WeexSDK/Sources/Utility/WXUtility.h',
+                          'ios/sdk/WeexSDK/Sources/Utility/WXConvertUtility.h',
                           'ios/sdk/WeexSDK/Sources/Utility/WXLog.h',
                           'ios/sdk/WeexSDK/Sources/Utility/WXDefine.h',
                           'ios/sdk/WeexSDK/Sources/Utility/WXType.h',
@@ -110,7 +112,8 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Bridge/WXBridgeMethod.h',
                           'weex_core/Source/core/layout/flex_enum.h',
                           'weex_core/Source/core/layout/layout.h',
-                          'weex_core/Source/core/layout/style.h'
+                          'weex_core/Source/core/layout/style.h',
+                          'weex_core/Source/core/bridge/eagle_bridge.h'
 
   s.module_map = 'WeexSDK.modulemap'
 

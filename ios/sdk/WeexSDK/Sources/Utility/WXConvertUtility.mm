@@ -20,6 +20,8 @@
 #import "WXConvertUtility.h"
 #import "WXLog.h"
 #import "WXAssert.h"
+#include <vector>
+#include <string>
 
 NSString* const JSONSTRING_SUFFIX = @"\t\n\t\r";
 
@@ -172,36 +174,6 @@ NSMutableDictionary* NSDICTIONARY(std::vector<std::pair<std::string, std::string
     return result;
 }
 
-NSMutableDictionary* NSDICTIONARY(const std::unordered_map<std::string, weex::core::data_render::VComponent::VNodeRefs>& ref_map)
-{
-    if (ref_map.size() == 0) {
-        return [[NSMutableDictionary alloc] init];
-    }
-    NSMutableDictionary* dic = [[NSMutableDictionary alloc] initWithCapacity:ref_map.size()];
-    for (auto it : ref_map) {
-        if (it.first.empty()) {
-            continue;
-        }
-        [dic setObject:NSARRAY(it.second) forKey:NSSTRING(it.first.c_str())];
-    }
-    return dic;
-}
-
-NSMutableDictionary* NSDICTIONARY(weex::core::data_render::Table* table)
-{
-    if (table == nullptr || table->map.size() == 0)
-        return [[NSMutableDictionary alloc] init];
-
-    NSMutableDictionary* dic = [[NSMutableDictionary alloc] initWithCapacity:table->map.size()];
-    for (auto it=table->map.begin(); it!=table->map.end(); ++it) {
-        if (it->first.empty()) {
-            continue;
-        };
-        [dic setObject:GenValue(&it->second) forKey:NSSTRING(it->first.c_str())];
-    }
-    return dic;
-}
-
 NSMutableArray* NSARRAY(std::set<std::string>* set)
 {
     if (set == nullptr || set->size() == 0)
@@ -217,18 +189,6 @@ NSMutableArray* NSARRAY(std::set<std::string>* set)
     return result;
 }
 
-NSMutableArray* NSARRAY(weex::core::data_render::Array* array)
-{
-    if (array == nullptr || array->items.size() == 0)
-        return [[NSMutableArray alloc] init];
-
-    NSMutableArray* ns_array = [[NSMutableArray alloc] initWithCapacity:array->items.size()];
-    for (auto it=array->items.begin(); it!=array->items.end(); ++it) {
-        [ns_array addObject:GenValue(&*it)];
-    }
-    return ns_array;
-}
-
 NSMutableArray* NSARRAY(std::vector<std::unordered_map<std::string, std::string>> refs)
 {
     if (refs.size() == 0)
@@ -239,39 +199,6 @@ NSMutableArray* NSARRAY(std::vector<std::unordered_map<std::string, std::string>
         [ns_array addObject:NSDICTIONARY(&it)];
     }
     return ns_array;
-}
-
-NSMutableArray* NSARRAY(const std::vector<weex::core::data_render::Value>& params)
-{
-    if (params.size() == 0) {
-        return [[NSMutableArray alloc] init];
-    }
-    NSMutableArray* array = [[NSMutableArray alloc] initWithCapacity:params.size()];
-    for (auto it : params) {
-        [array addObject:GenValue(&it)];
-    }
-    return array;
-}
-
-id GenValue(weex::core::data_render::Value* value)
-{
-    switch (value->type) {
-        case weex::core::data_render::Value::Type::ARRAY:
-            return NSARRAY( weex::core::data_render::ValueTo<weex::core::data_render::Array>(value));
-        case weex::core::data_render::Value::Type::TABLE:
-            return NSDICTIONARY( weex::core::data_render::ValueTo<weex::core::data_render::Table>(value));
-        case weex::core::data_render::Value::Type::INT:
-            return [NSNumber numberWithLong:
-                   static_cast<long>(value->i)];
-        case weex::core::data_render::Value::Type::NUMBER:
-            return [NSNumber numberWithDouble:value->n];
-        case weex::core::data_render::Value::Type::STRING:
-            return NSSTRING(value->str->c_str());
-        case weex::core::data_render::Value::Type::BOOL:
-            return [NSNumber numberWithBool:value->b];
-        default:
-            return [NSNull null];
-    }
 }
 
 void ConvertToCString(id _Nonnull obj, void (^callback)(const char*))

@@ -147,14 +147,6 @@ namespace WeexCore
 
 + (void)install;
 
-+ (void)createDataRenderInstance:(NSString *)pageId template:(NSString *)temp options:(NSDictionary *)options data:(id)data;
-
-+ (void)createDataRenderInstance:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary *)options  data:(id)data;
-
-+ (void)destroyDataRenderInstance:(NSString *)pageId;
-
-+ (void)refreshDataRenderInstance:(NSString *)pageId data:(NSString *)data;
-
 + (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
                  isWidthWrapContent:(BOOL)isWidthWrapContent
                 isHeightWrapContent:(BOOL)isHeightWrapContent;
@@ -177,8 +169,6 @@ namespace WeexCore
 
 + (void)removeRenderObjectFromMap:(NSString*)pageId object:(void*)object;
 
-+ (void)callUpdateComponentData:(NSString*)pageId componentId:(NSString*)componentId jsonData:(NSString*)jsonData;
-
 + (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index;
 
 + (void)callCreateBody:(NSString*)pageId data:(NSDictionary*)data;
@@ -200,10 +190,6 @@ namespace WeexCore
 + (void)callRefreshFinish:(NSString*)pageId;
 
 + (void)callUpdateFinish:(NSString*)pageId;
-
-+ (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args domChanges:(NSDictionary *)domChanges;
-
-+ (void)registerModules:(NSDictionary *)modules;
 
 + (void)registerComponentAffineType:(NSString *)type asType:(NSString *)baseType;
 

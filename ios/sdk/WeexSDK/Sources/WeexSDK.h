@@ -63,6 +63,8 @@
 #import "WXErrorView.h"
 #import "WXDefine.h"
 #import "WXDebugTool.h"
+#import "WXDataRenderHandler.h"
+#import "WXConvertUtility.h"
 #import "WXConvert.h"
 #import "WXConfigCenterProtocol.h"
 #import "WXComponentManager.h"
