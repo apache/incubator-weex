@@ -359,3 +359,16 @@ bintray {
         }
     }
 }
+
+afterEvaluate {
+    transformNativeLibsWithStripDebugSymbolForRelease << {
+        copy{
+            from new File(project.buildDir, "intermediates/transforms/mergeJniLibs/release/folders/2000/3/main/lib")
+            into new File(project.buildDir, "unstrippedSo")
+            include '**/libweexjss.so', '**/libweexcore.so'
+            eachFile {
+                it.name = "${it.name}_${it.relativePath.segments.first()}"
+            }
+        }
+    }
+}
