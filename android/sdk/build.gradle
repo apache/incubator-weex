@@ -125,14 +125,8 @@ android {
     } else {
         api_level = "android-19";
     }
-    println "ARMEABI_Size: "+ARMEABI_Size;
-    println "ARMEABIV7_Size:" + ARMEABIV7_Size;
-    println "X86_Size:" + X86_Size;
 
     defaultConfig {
-        buildConfigField "long", "ARMEABI_Size", new File(projectDir,"libs/armeabi/libweexcore.so").length()
-        buildConfigField "long", "ARMEABIV7_Size", new File(projectDir,"libs/armeabi-v7/libweexcore.so").length()
-        buildConfigField "long", "X86_Size",  new File(projectDir,"libs/x86/libweexcore.so").length()
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
         minSdkVersion project.minSdkVersion
@@ -149,15 +143,13 @@ android {
                 abiFilters "armeabi-v7a", "armeabi", "x86"
             }
         }
-        if(project.buildCpp) {
-            externalNativeBuild {
-                cmake {
-                    arguments '-DANDROID_PLATFORM=' + "${api_level}",
-                            '-DANDROID_TOOLCHAIN=' + "${compile_tool}",
-                            '-DANDROID_STL=' + "${cxx_stl}",
-                            '-DCMAKE_BUILD_TYPE=Release',
-                            '-DENABLE_ASAN=false'
-                }
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_PLATFORM=' + "${api_level}",
+                        '-DANDROID_TOOLCHAIN=' + "${compile_tool}",
+                        '-DANDROID_STL=' + "${cxx_stl}",
+                        '-DCMAKE_BUILD_TYPE=Release',
+                        '-DENABLE_ASAN=false'
             }
         }
     }
@@ -178,11 +170,9 @@ android {
         }
     }
 
-    if(project.buildCpp) {
-        externalNativeBuild {
-            cmake {
-                path '../../weex_core/CMakeLists.txt'
-            }
+    externalNativeBuild {
+        cmake {
+            path '../../weex_core/CMakeLists.txt'
         }
     }
 
