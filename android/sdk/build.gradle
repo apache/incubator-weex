@@ -367,7 +367,7 @@ afterEvaluate {
             into new File(project.buildDir, "unstrippedSo")
             include '**/libweexjss.so', '**/libweexcore.so'
             eachFile {
-                it.name = "${it.name}_${it.relativePath.segments.first()}"
+                it.name = "${it.relativePath.segments.first()}_${it.name}"
             }
         }
     }
