@@ -430,11 +430,8 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
     } else {
         _lastBorderRecords &= ~WXComponentBorderRecordRight;
     }
-    if (_lastBorderRecords <= 0 || _lastBorderRecords > WXComponentBorderRecordAll) {
-        CGContextClearRect(context, rect);
-    } else {
-        CGContextStrokePath(context);
-    }
+
+    CGContextStrokePath(context);
     
     //clipRadius is beta feature
     //TO DO: remove _clipRadius property
