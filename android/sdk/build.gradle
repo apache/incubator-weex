@@ -137,11 +137,7 @@ android {
         versionCode 1
         versionName project.version
         ndk {
-            if (project.armABIOnly){
-                abiFilters "armeabi"
-            } else {
-                abiFilters "armeabi-v7a", "armeabi", "x86"
-            }
+            abiFilters "armeabi-v7a", "armeabi", "x86"
         }
         externalNativeBuild {
             cmake {
