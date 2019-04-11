@@ -134,43 +134,43 @@ namespace WeexCore {
     }
     
     std::unique_ptr<ValueWithType> RenderPageCustom::CallNativeModule(const char *module, const char *method,
-                                                                      const char *arguments, int arguments_length, const char *options,
+                                                                      const char *argumentsWson, int arguments_length, const char *optionsWson,
                                                                       int options_length) {
         // If render target can handle module method, we forward to render target.
         if (target_) {
             if (target_->shouldHandleModuleMethod(module, method)) {
                 bool handled = false;
-                const char* jsonArguments = arguments;
+                //const char* will not assign, have some problem on android
+                std::string argumentsJson;
                 int jsonArgumentsLength = arguments_length;
-                if (arguments) {
-                    wson_parser parser(arguments, arguments_length);
+                if (argumentsWson) {
+                    wson_parser parser(argumentsWson, arguments_length);
                     std::string json(parser.toStringUTF8());
-                    jsonArguments = json.data();
+                    argumentsJson = json.data();
                     jsonArgumentsLength = (int)json.length();
                 }
                 
-                const char* jsonOptions = options;
+                std::string jsonOptions;
                 int jsonOptionsLength = options_length;
-                if (options) {
-                    wson_parser parser(options, options_length);
+                if (optionsWson) {
+                    wson_parser parser(optionsWson, options_length);
                     std::string json(parser.toStringUTF8());
                     jsonOptions = json.data();
                     jsonOptionsLength = (int)json.length();
                 }
-                
+
                 auto result = target_->callNativeModule(page_id_, module, method,
-                                                        jsonArguments, jsonArgumentsLength,
+                                                        argumentsJson, jsonArgumentsLength,
                                                         jsonOptions, jsonOptionsLength, handled);
                 if (handled) {
                     return result;
                 }
             }
             // custom page cannot handle this module method
-            return RenderPageBase::CallNativeModule(module, method, arguments, arguments_length, options, options_length);
+            return RenderPageBase::CallNativeModule(module, method, argumentsWson, arguments_length, optionsWson, options_length);
         }
-        else {
-            return std::unique_ptr<ValueWithType>(new ValueWithType((int32_t)-1)); // failure
-        }
+        //None Render Target, Use Default CallNativeModule
+        return RenderPageBase::CallNativeModule(module, method, argumentsWson, arguments_length, optionsWson, options_length);
     }
     
     // Life cycle
