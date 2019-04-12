@@ -84,7 +84,6 @@ typedef enum : NSUInteger {
 
 - (void)dealloc
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedDisappear) object:nil];
     [_moduleEventObservers removeAllObjects];
     [self removeObservers];
 }
@@ -99,7 +98,6 @@ typedef enum : NSUInteger {
     self = [super init];
     if (self) {
         _renderType = renderType;
-        _appearState = YES;
         
         NSInteger instanceId = 0;
         @synchronized(bundleUrlOptionKey) {
@@ -656,8 +654,6 @@ typedef enum : NSUInteger {
 
 - (void)destroyInstance
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedDisappear) object:nil];
-    
     [self.apmInstance endRecord];
     NSString *url = @"";
     if ([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
@@ -969,37 +965,6 @@ typedef enum : NSUInteger {
         
         if (state == WeexInstanceDestroy) {
             [self destroyInstance];
-        }
-    }
-}
-
-- (void)willAppear
-{
-    if (self.isCustomRenderType) {
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedDisappear) object:nil];
-        if (!self.appearState) {
-            // do create window,
-            [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_NOTIFICATION_CHANGE_VISIBILITY_INTERNAL object:self userInfo:@{@"visible": @(YES)}];
-            self.appearState = YES;
-        }
-    }
-}
-
-- (void)delayedDisappear
-{
-    if (self.appearState) {
-        // do destroy window
-        [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_NOTIFICATION_CHANGE_VISIBILITY_INTERNAL object:self userInfo:@{@"visible": @(NO)}];
-        self.appearState = NO;
-    }
-}
-
-- (void)didDisappear
-{
-    if (self.isCustomRenderType) {
-        if (self.appearState) {
-            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedDisappear) object:nil];
-            [self performSelector:@selector(delayedDisappear) withObject:nil afterDelay:1];
         }
     }
 }

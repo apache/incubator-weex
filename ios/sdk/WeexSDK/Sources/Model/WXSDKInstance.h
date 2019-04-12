@@ -51,6 +51,11 @@ extern NSString *const bundleUrlOptionKey;
  **/
 @property (nonatomic, assign, readonly) BOOL isCustomRenderType;
 
+/*
+ * For weex containers in view controller(main containers), we may need to release render buffer accordingly to save memory.
+ */
+@property (nonatomic, assign) BOOL shouldAutoreleaseRenderBuffer;
+
 /**
  * The viewControler which the weex bundle is rendered in.
  **/
@@ -367,19 +372,10 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSString *bizType;
 @property (nonatomic, strong) NSString *pageName;
 @property (nonatomic, weak) id pageObject;
+
 //Deprecated, use @WXApmForInstance
 @property (nonatomic, strong) NSMutableDictionary *performanceDict;
-
-@property (nonatomic ,strong) WXApmForInstance* apmInstance;
-
-@property (nonatomic, assign) BOOL appearState;
-
-/*
- * For custom render page to release/restore OpenGL resources, etc.
- */
-- (void)willAppear;
-- (void)didDisappear;
-
+@property (nonatomic, strong) WXApmForInstance* apmInstance;
 
 /** 
  * Deprecated 
