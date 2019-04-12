@@ -76,12 +76,14 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
+    [_instance didDisappear];
     [self updateInstanceState:WeexInstanceDisappear];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [_instance willAppear];
     [self setupNaviBar];
     [self setupRightBarItem];
     [self.navigationController setNavigationBarHidden:_showNavigationBar];
