@@ -38,6 +38,7 @@ cache:
   - node_modules
   - $HOME/.m2
   - $HOME/.gradle
+  - $HOME/android-ndk-r16b 
 before_script:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
@@ -70,7 +71,10 @@ script:
 install:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
-      echo y | sdkmanager "ndk-bundle"
+      wget https://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip
+      unzip android-ndk-r16b-linux-x86_64.zip -d $HOME
+      export ANDROID_NDK_HOME=$HOME/android-ndk-r16b
+      export PATH=$PATH:$ANDROID_NDK_HOME
     fi
 notifications:
   webhooks:
