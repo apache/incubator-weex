@@ -1105,6 +1105,9 @@ namespace WeexCore {
     void WXCoreLayoutNode::determineChildLayoutDirection(const WXCoreDirection direction) {
         for (Index i = 0; i < getChildCount(kBFC); ++i) {
             WXCoreLayoutNode *child = getChildAt(kBFC, i);
+            if (child == nullptr) {
+                continue;
+            }
             // determin direction
             if (child->mLayoutResult->mLayoutDirection == kDirectionInherit) {
                 if(child->mCssStyle->mDirection == kDirectionInherit) {
