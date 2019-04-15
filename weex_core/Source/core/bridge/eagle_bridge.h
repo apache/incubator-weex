@@ -105,6 +105,9 @@ namespace WeexCore {
                        const char *func,
                        std::vector<VALUE_WITH_TYPE *> &params);
             void PostTaskToMsgLoop(const weex::base::Closure& closure);
+#if OS_IOS
+            std::unique_ptr<ValueWithType> RegisterPluginModule(const std::string &name, const std::string &class_name, const std::string &version);
+#endif
         };
         
         class DataRenderHandler {

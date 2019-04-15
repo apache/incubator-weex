@@ -151,7 +151,14 @@ namespace WeexCore {
         ->platform_side()
         ->CallNativeModule(page_id, module, method, arguments, arguments_length, options, options_length);
     }
-
+#if OS_IOS
+    std::unique_ptr<ValueWithType> EagleBridge::WeexCoreHandler::RegisterPluginModule(const std::string &name, const std::string &class_name, const std::string &version) {
+        return WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->platform_side()
+        ->RegisterPluginModule(name.c_str(), class_name.c_str(), version.c_str());
+    }
+#endif
     void EagleBridge::WeexCoreHandler::CallNativeComponent(const char* page_id, const char* module, const char* method,const char* arguments, int arguments_length, const char* options, int options_length) {
         WeexCoreManager::Instance()
         ->getPlatformBridge()
