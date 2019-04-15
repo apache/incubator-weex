@@ -193,7 +193,7 @@
 
 /**
  * @abstract Add custom environment variables
- * @discuss These variables can be obtained by $getConfig().env
+ * @discuss These variables can be obtained by weex.config.env
  *
  **/
 + (void)setCustomEnvironment:(NSDictionary *)environment;
