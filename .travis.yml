@@ -32,7 +32,7 @@ matrix:
             - android-26
             - extra-google-m2repository
             - extra-android-m2repository
-            - sys-img-armeabi-v7a-android-22
+            - sys-img-x86-android-26
 cache:
   directories:
   - node_modules
@@ -44,6 +44,7 @@ before_script:
       curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
       nvm install 7.0
       npm install
+      export ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
@@ -65,6 +66,11 @@ script:
   - |
     if [[ $TEST_SUITE = "danger" ]]; then
       npm run danger -- run --dangerfile ./dangerfile.js
+    fi
+install:
+  - |
+    if [[ $TEST_SUITE = "android" ]]; then
+      echo y | sdkmanager "ndk-bundle"
     fi
 notifications:
   webhooks:
