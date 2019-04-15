@@ -68,7 +68,7 @@ script:
     if [[ $TEST_SUITE = "danger" ]]; then
       npm run danger -- run --dangerfile ./dangerfile.js
     fi
-install:
+before_install:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
       wget https://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip
