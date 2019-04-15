@@ -33,6 +33,7 @@
 #import "WXAppMonitorProtocol.h"
 #import "WXComponentMethod.h"
 #import "WXExceptionUtils.h"
+#import "WXModuleFactory.h"
 
 #include "base/core_constants.h"
 #include "base/time_utils.h"
@@ -177,7 +178,49 @@ namespace WeexCore
         
         return result;
     }
+    
+#if OS_IOS
+    std::unique_ptr<ValueWithType> IOSSide::RegisterPluginModule(const char *pcstr_name, const char *pcstr_class_name, const char *pcstr_version) {
+        ValueWithType *returnValue = new ValueWithType();
+        memset(returnValue, 0, sizeof(ValueWithType));
+        returnValue->type = ParamsType::VOID;
+        do {
+            if (!pcstr_class_name) {
+                break;
+            }
+            NSString *className = [NSString stringWithUTF8String:pcstr_class_name];
+            Class clazz = NSClassFromString(className);
+            if (!clazz) {
+                break;
+            }
+            if (!pcstr_name) {
+                break;
+            }
+            NSString *name = [NSString stringWithUTF8String:pcstr_name];
+            NSString *version = @"0";
+            if (pcstr_version) {
+                version = [NSString stringWithUTF8String:pcstr_version];
+            }
+            NSString *moduleName = [WXModuleFactory registerModule:name withClass:clazz];
+            if (!moduleName.length) {
+                break;
+            }
+            NSDictionary *moduleInfo = [WXModuleFactory moduleMethodMapsWithName:moduleName];
+            if (!moduleInfo || ![moduleInfo isKindOfClass:[NSDictionary class]]) {
+                break;
+            }
+            NSString *setting = [WXUtility JSONString:moduleInfo];
+            if (setting.length > 0) {
+                returnValue->type = ParamsType::BYTEARRAYSTRING;
+                const char *pcstr_utf8 = [setting UTF8String];
+                returnValue->value.byteArray = generator_bytes_array(pcstr_utf8, setting.length);
+            }
 
+        } while (0);
+        
+        return std::unique_ptr<ValueWithType>(returnValue);
+    }
+#endif
     std::unique_ptr<ValueWithType> IOSSide::CallNativeModule(const char *page_id, const char *module, const char *method, const char *args, int args_length, const char *options, int options_length)
     {
         ValueWithType *returnValue = new ValueWithType();
