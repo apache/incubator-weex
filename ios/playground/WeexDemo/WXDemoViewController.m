@@ -161,7 +161,7 @@
         _instance = [WXPrerenderManager instanceFromUrl:self.url.absoluteString];
     }
     
-    _instance.shouldAutoreleaseRenderBuffer = YES;
+    _instance.isMainContainerStack = YES;
     _instance.viewController = self;
     UIEdgeInsets safeArea = UIEdgeInsetsZero;
     

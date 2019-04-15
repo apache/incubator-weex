@@ -52,9 +52,10 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, assign, readonly) BOOL isCustomRenderType;
 
 /*
- * For weex containers in view controller(main containers), we may need to release render buffer accordingly to save memory.
+ * For weex containers in view controller(main containers), we may need to release render buffer
+ * of custom render type page to save memory.
  */
-@property (nonatomic, assign) BOOL shouldAutoreleaseRenderBuffer;
+@property (nonatomic, assign) BOOL isMainContainerStack;
 
 /**
  * The viewControler which the weex bundle is rendered in.
