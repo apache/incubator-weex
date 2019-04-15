@@ -179,7 +179,6 @@ namespace WeexCore
         return result;
     }
     
-#if OS_IOS
     std::unique_ptr<ValueWithType> IOSSide::RegisterPluginModule(const char *pcstr_name, const char *pcstr_class_name, const char *pcstr_version) {
         ValueWithType *returnValue = new ValueWithType();
         memset(returnValue, 0, sizeof(ValueWithType));
@@ -220,7 +219,6 @@ namespace WeexCore
         
         return std::unique_ptr<ValueWithType>(returnValue);
     }
-#endif
     std::unique_ptr<ValueWithType> IOSSide::CallNativeModule(const char *page_id, const char *module, const char *method, const char *args, int args_length, const char *options, int options_length)
     {
         ValueWithType *returnValue = new ValueWithType();

@@ -491,9 +491,8 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     if (instance.wlasmRender) {
         id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
         if (dataRenderHandler) {
-            id strongArgs = params ? [params copy]:@"\"{}\"";
             WXPerformBlockOnComponentThread(^{
-                [dataRenderHandler invokeCallBack:instanceId function:funcId args:strongArgs keepAlive:keepAlive];
+                [dataRenderHandler invokeCallBack:instanceId function:funcId args:params ? [params copy]:@"\"{}\"" keepAlive:keepAlive];
             });
         }
         else {
