@@ -75,7 +75,7 @@ install:
       unzip android-ndk-r16b-linux-x86_64.zip -d $HOME
       export ANDROID_NDK_HOME=$HOME/android-ndk-r16b
       export PATH=$PATH:$ANDROID_NDK_HOME
-      echo "ndk.dir=$ANDROID_NDK_HOME" >> ./android/local.properties
+      echo "ndk.dir=$HOME/android-ndk-r16b" > android/local.properties
     fi
 notifications:
   webhooks:
