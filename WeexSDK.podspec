@@ -76,6 +76,7 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Component/WXRichText.h',
                           'ios/sdk/WeexSDK/Sources/Component/WXIndicatorComponent.h',
                           'ios/sdk/WeexSDK/Sources/Component/WXAComponent.h',
+                          'ios/sdk/WeexSDK/Sources/Component/WXRefreshComponent.h',
                           'ios/sdk/WeexSDK/Sources/Component/Recycler/WXRecyclerComponent.h',
                           'ios/sdk/WeexSDK/Sources/Controller/WXBaseViewController.h',
                           'ios/sdk/WeexSDK/Sources/Controller/WXRootViewController.h',

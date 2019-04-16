@@ -48,7 +48,7 @@
 		2A837AB31CD9DE9200AEDF03 /* WXLoadingComponent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2A837AAD1CD9DE9200AEDF03 /* WXLoadingComponent.mm */; };
 		2A837AB41CD9DE9200AEDF03 /* WXLoadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A837AAE1CD9DE9200AEDF03 /* WXLoadingIndicator.h */; };
 		2A837AB51CD9DE9200AEDF03 /* WXLoadingIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A837AAF1CD9DE9200AEDF03 /* WXLoadingIndicator.m */; };
-		2A837AB61CD9DE9200AEDF03 /* WXRefreshComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A837AB01CD9DE9200AEDF03 /* WXRefreshComponent.h */; };
+		2A837AB61CD9DE9200AEDF03 /* WXRefreshComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A837AB01CD9DE9200AEDF03 /* WXRefreshComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2A837AB71CD9DE9200AEDF03 /* WXRefreshComponent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2A837AB11CD9DE9200AEDF03 /* WXRefreshComponent.mm */; };
 		2A8E658A1C7C7AA20025C7B7 /* WXVideoComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A8E65881C7C7AA20025C7B7 /* WXVideoComponent.h */; };
 		2A8E658B1C7C7AA20025C7B7 /* WXVideoComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A8E65891C7C7AA20025C7B7 /* WXVideoComponent.m */; };
@@ -751,7 +751,7 @@
 		DCA445DF1EFA59BC00D0CFA8 /* WXLoadingComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A837AAC1CD9DE9200AEDF03 /* WXLoadingComponent.h */; };
 		DCA445E01EFA59CD00D0CFA8 /* WXLoadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A837AAE1CD9DE9200AEDF03 /* WXLoadingIndicator.h */; };
 		DCA445E11EFA59D100D0CFA8 /* WXSliderNeighborComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = DCC77C121D770AE300CE7288 /* WXSliderNeighborComponent.h */; };
-		DCA445E21EFA59D700D0CFA8 /* WXRefreshComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A837AB01CD9DE9200AEDF03 /* WXRefreshComponent.h */; };
+		DCA445E21EFA59D700D0CFA8 /* WXRefreshComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A837AB01CD9DE9200AEDF03 /* WXRefreshComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCA445E31EFA59DA00D0CFA8 /* WXEmbedComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 59CE27E61CC387DB000BE37A /* WXEmbedComponent.h */; };
 		DCA445E41EFA59DC00D0CFA8 /* WXVideoComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A8E65881C7C7AA20025C7B7 /* WXVideoComponent.h */; };
 		DCA445E51EFA59E100D0CFA8 /* WXDivComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 77E65A0B1C155E99008B8775 /* WXDivComponent.h */; };
@@ -2286,6 +2286,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2A837AB61CD9DE9200AEDF03 /* WXRefreshComponent.h in Headers */,
 				2A919DA61E321F1F006EB6B5 /* WXBridgeMethod.h in Headers */,
 				DCF087611DCAE161005CD6EB /* WXInvocationConfig.h in Headers */,
 				741081231CED6756001BC6E5 /* WXComponentFactory.h in Headers */,
@@ -2450,7 +2451,6 @@
 				77D161431C02DEE40010B15B /* WXBridgeProtocol.h in Headers */,
 				B8D66C1721255730003960BD /* script_bridge.h in Headers */,
 				59A582D41CF481110081FD3E /* WXAppMonitorProtocol.h in Headers */,
-				2A837AB61CD9DE9200AEDF03 /* WXRefreshComponent.h in Headers */,
 				B8D66BFD2125572F003960BD /* render_performance.h in Headers */,
 				C43C03E81EC8ACA40044C7FF /* WXPrerenderManager.h in Headers */,
 				17C74F0C2072145100AB4CAB /* WXAnalyzerCenter.h in Headers */,
@@ -2521,6 +2521,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCA445E21EFA59D700D0CFA8 /* WXRefreshComponent.h in Headers */,
 				B85ED3032126715100EBEC11 /* WXRecyclerComponent.h in Headers */,
 				7715EB6321A69DD9001F1108 /* WXRichText.h in Headers */,
 				B8D66C1C21255730003960BD /* style.h in Headers */,
@@ -2625,7 +2626,6 @@
 				DCA445E71EFA59E900D0CFA8 /* WXTextComponent.h in Headers */,
 				B8D66C1821255730003960BD /* script_bridge.h in Headers */,
 				DCA445D01EFA593E00D0CFA8 /* WXDisplayQueue.h in Headers */,
-				DCA445E21EFA59D700D0CFA8 /* WXRefreshComponent.h in Headers */,
 				DCA445E81EFA59EF00D0CFA8 /* WXCycleSliderComponent.h in Headers */,
 				DCA4461F1EFA5AB100D0CFA8 /* WXRuleManager.h in Headers */,
 				DCA445E31EFA59DA00D0CFA8 /* WXEmbedComponent.h in Headers */,
