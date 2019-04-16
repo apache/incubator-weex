@@ -145,18 +145,16 @@ namespace WeexCore {
                 int jsonArgumentsLength = arguments_length;
                 if (argumentsWson) {
                     wson_parser parser(argumentsWson, arguments_length);
-                    std::string json(parser.toStringUTF8());
-                    argumentsJson = json.data();
-                    jsonArgumentsLength = (int)json.length();
+                    argumentsJson =  std::move(parser.toStringUTF8());
+                    jsonArgumentsLength = (int)argumentsJson.length();
                 }
                 
                 std::string jsonOptions;
                 int jsonOptionsLength = options_length;
                 if (optionsWson) {
                     wson_parser parser(optionsWson, options_length);
-                    std::string json(parser.toStringUTF8());
-                    jsonOptions = json.data();
-                    jsonOptionsLength = (int)json.length();
+                    jsonOptions = std::move(parser.toStringUTF8());
+                    jsonOptionsLength = (int)jsonOptions.length();
                 }
 
                 auto result = target_->callNativeModule(page_id_, module, method,
