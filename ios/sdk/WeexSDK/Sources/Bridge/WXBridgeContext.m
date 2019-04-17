@@ -1113,9 +1113,14 @@ _Pragma("clang diagnostic pop") \
 
             if (instance) {
                 bundleUrl = instance.pageName?:([instance.scriptURL absoluteString]?:@"WX_KEY_EXCEPTION_WXBRIDGE");
-                message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] [%@:%@:%@] %@\n%@\n%@\n%@\n%@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], [exception toString], [exception[@"stack"] toObject], instance.scriptURL.absoluteString, instance.callCreateInstanceContext?:@"", instance.createInstanceContextResult?:@"", instance.executeRaxApiResult?:@""];
+                message = [NSString stringWithFormat:@"[WX_KEY_EXCEPTION_WXBRIDGE] exception: %@\n stack:%@",[exception toString],[exception[@"stack"] toObject]];
                 userInfo = @{@"jsMainBundleStringContentLength":instance.userInfo[@"jsMainBundleStringContentLength"]?:@"",
-                             @"jsMainBundleStringContentMd5":instance.userInfo[@"jsMainBundleStringContentMd5"]?:@""};
+                             @"jsMainBundleStringContentMd5":instance.userInfo[@"jsMainBundleStringContentMd5"]?:@"",
+                             @"sourceURL":[NSString stringWithFormat:@"%@:%@:%@",exception[@"sourceURL"],exception[@"line"],exception[@"column"]],
+                             @"callCreateInstanceContext":instance.callCreateInstanceContext?:@"",
+                             @"createInstanceContextResult": instance.createInstanceContextResult?:@"",
+                             @"executeRaxApiResult":instance.executeRaxApiResult?:@""
+                             };
             }
             
             if (commitException) {
