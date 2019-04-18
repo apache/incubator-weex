@@ -1,0 +1,2 @@
+cd out
+make

@@ -54,3 +54,4 @@ apache_release_temp
 
 android/commons/bin/
 android/playground/app/bin/
+weex_core/test/out/
