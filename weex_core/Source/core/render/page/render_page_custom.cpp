@@ -145,7 +145,7 @@ namespace WeexCore {
                 int jsonArgumentsLength = arguments_length;
                 if (argumentsWson) {
                     wson_parser parser(argumentsWson, arguments_length);
-                    argumentsJson =  std::move(parser.toStringUTF8());
+                    argumentsJson = parser.toStringUTF8();
                     jsonArgumentsLength = (int)argumentsJson.length();
                 }
                 
@@ -153,7 +153,7 @@ namespace WeexCore {
                 int jsonOptionsLength = options_length;
                 if (optionsWson) {
                     wson_parser parser(optionsWson, options_length);
-                    jsonOptions = std::move(parser.toStringUTF8());
+                    jsonOptions = parser.toStringUTF8();
                     jsonOptionsLength = (int)jsonOptions.length();
                 }
 
