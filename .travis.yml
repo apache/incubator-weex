@@ -77,7 +77,7 @@ install:
       export PATH=$PATH:$ANDROID_NDK_HOME
       echo "ndk.dir=$HOME/android-ndk-r16b" > android/local.properties
       ls -al $ANDROID_NDK_HOME
-      cath android/local.properties
+      cat android/local.properties
     fi
 notifications:
   webhooks:
