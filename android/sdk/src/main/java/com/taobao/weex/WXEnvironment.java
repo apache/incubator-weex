@@ -56,6 +56,9 @@ public class WXEnvironment {
     if(SYS_VERSION != null && SYS_VERSION.toUpperCase().equals("P")){
         SYS_VERSION = "9.0.0";
     }
+    if(SYS_VERSION != null && SYS_VERSION.toUpperCase().equals("Q")){
+       SYS_VERSION = "10.0.0";
+    }
   }
   public static final String SYS_MODEL = android.os.Build.MODEL;
   public static final String EAGLE = "eagle";
