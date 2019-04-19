@@ -716,7 +716,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     final IWXJscProcessManager wxJscProcessManager = WXSDKManager.getInstance().getWXJscProcessManager();
 
-    if(wxJscProcessManager != null && wxJscProcessManager.shouldReboot()) {
+    if(wxJscProcessManager != null && wxJscProcessManager.shouldReboot() && !isDataRender()) {
       WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
         public void run() {
@@ -736,6 +736,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         }
       }, wxJscProcessManager.rebootTimeout());
     }
+  }
+
+  private boolean isDataRender() {
+    return getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY || getRenderStrategy() == WXRenderStrategy.DATA_RENDER;
   }
 
   private void renderByUrlInternal(String pageName,
