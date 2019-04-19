@@ -84,7 +84,6 @@ typedef enum : NSUInteger {
 
 - (void)dealloc
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedDisappear) object:nil];
     [_moduleEventObservers removeAllObjects];
     [self removeObservers];
 }
@@ -656,8 +655,6 @@ typedef enum : NSUInteger {
 
 - (void)destroyInstance
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedDisappear) object:nil];
-
     [self.apmInstance endRecord];
     NSString *url = @"";
     if ([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
@@ -976,7 +973,6 @@ typedef enum : NSUInteger {
 - (void)willAppear
 {
     if (self.isCustomRenderType) {
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedDisappear) object:nil];
         if (!self.appearState) {
             // do create window,
             [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_NOTIFICATION_CHANGE_VISIBILITY_INTERNAL object:self userInfo:@{@"visible": @(YES)}];
@@ -985,21 +981,13 @@ typedef enum : NSUInteger {
     }
 }
 
-- (void)delayedDisappear
-{
-    if (self.appearState) {
-        // do destroy window
-        [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_NOTIFICATION_CHANGE_VISIBILITY_INTERNAL object:self userInfo:@{@"visible": @(NO)}];
-        self.appearState = NO;
-    }
-}
-
 - (void)didDisappear
 {
     if (self.isCustomRenderType) {
         if (self.appearState) {
-            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedDisappear) object:nil];
-            [self performSelector:@selector(delayedDisappear) withObject:nil afterDelay:1];
+            // do destroy window
+            [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_NOTIFICATION_CHANGE_VISIBILITY_INTERNAL object:self userInfo:@{@"visible": @(NO)}];
+            self.appearState = NO;
         }
     }
 }
