@@ -1411,8 +1411,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (instance == null) {
       return false;
     }
-    WXRenderStrategy strategy = instance.getRenderStrategy();
-    return strategy == WXRenderStrategy.DATA_RENDER_BINARY || strategy == WXRenderStrategy.DATA_RENDER;
+    return instance.skipFrameworkInit();
   }
 
   /**
@@ -1470,7 +1469,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private void invokeCreateInstance(@NonNull WXSDKInstance instance, Script template,
                                     Map<String, Object> options, String data) {
     // add for sandbox, will delete on sandbox ok
-    if (isSkipFrameworkInit(instance)){
+    if (!isSkipFrameworkInit(instance)){
       initFramework("");
     }
 
