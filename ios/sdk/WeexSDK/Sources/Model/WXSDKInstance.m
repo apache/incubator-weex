@@ -400,6 +400,7 @@ typedef enum : NSUInteger {
     }
     
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
+    [WXCoreBridge setPageArgument:_instanceId key:@"renderTimeOrigin" value:[NSString stringWithFormat:@"%lld", (long long)([[NSDate date] timeIntervalSince1970] * 1000)]];
     self.performance.renderUnixTimeOrigin = [WXUtility getUnixFixTimeMillis];
     [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
     
