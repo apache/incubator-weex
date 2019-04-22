@@ -116,7 +116,7 @@ dependencies {
     compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     compile 'com.taobao.android.weex_inspection:urlconnection_interceptor:1.0.0'
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
-    compile 'com.taobao.android:weex_inspector:0.18.10'
+    compile 'com.taobao.android:weex_inspector:0.24.2.4'
     //compile project(":weex_inspector")
 
     // Bind actions to effects. See https://alibaba.github.io/bindingx/
