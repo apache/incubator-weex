@@ -158,6 +158,10 @@ namespace WeexCore {
         ->platform_side()
         ->RegisterPluginModule(name.c_str(), class_name.c_str(), version.c_str());
     }
+
+    void EagleBridge::WeexCoreHandler::PostTaskOnComponentThread(const weex::base::Closure& closure) {
+        WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->PostTaskOnComponentThread(closure);
+    }
 #endif
     void EagleBridge::WeexCoreHandler::CallNativeComponent(const char* page_id, const char* module, const char* method,const char* arguments, int arguments_length, const char* options, int options_length) {
         WeexCoreManager::Instance()

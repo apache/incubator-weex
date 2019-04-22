@@ -107,6 +107,8 @@ namespace WeexCore {
             void PostTaskToMsgLoop(const weex::base::Closure& closure);
 #if OS_IOS
             std::unique_ptr<ValueWithType> RegisterPluginModule(const std::string &name, const std::string &class_name, const std::string &version);
+
+            void PostTaskOnComponentThread(const weex::base::Closure& closure);
 #endif
         };
         
