@@ -24,6 +24,7 @@
 
 #include "core/bridge/platform_bridge.h"
 #include "core/layout/measure_func_adapter.h"
+#include "base/closure.h"
 
 namespace WeexCore
 {
@@ -124,6 +125,8 @@ namespace WeexCore
         }
         
         void OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult>& result) override {};
+
+        void PostTaskOnComponentThread(const weex::base::Closure closure) override;
     };
     
     class WXCoreMeasureFunctionBridge : public MeasureFunctionAdapter

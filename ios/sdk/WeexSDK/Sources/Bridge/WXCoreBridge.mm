@@ -876,6 +876,13 @@ break; \
         page->CallBridgeTime(getCurrentTime() - startTime);
         return result;
     }
+
+    void IOSSide::PostTaskOnComponentThread(const weex::base::Closure closure) {
+        WXPerformBlockOnComponentThread(^{
+            closure();
+        });
+    }
+
 #pragma mark - Layout Impl
     
     WXCoreSize WXCoreMeasureFunctionBridge::Measure(const char* page_id, long render_ptr, float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode)
