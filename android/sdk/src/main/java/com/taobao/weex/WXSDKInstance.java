@@ -737,7 +737,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);;
     if(mAutoAdjustDeviceWidth){
          WXParams params = WXBridgeManager.getInstance().getInitParams();
-         if(params != nullptr && !TextUtils.equals(params.getDeviceWidth(), String.valueOf(WXViewUtils.getScreenWidth(mContext)))){
+         if(params != null && !TextUtils.equals(params.getDeviceWidth(), String.valueOf(WXViewUtils.getScreenWidth(mContext)))){
            params.setDeviceWidth(String.valueOf(WXViewUtils.getScreenWidth(mContext)));
            params.setDeviceHeight(String.valueOf(WXViewUtils.getScreenHeight(mContext)));
            WXBridgeManager.getInstance().updateInitDeviceWidthHeight(params.getDeviceWidth(), params.getDeviceHeight());
