@@ -27,12 +27,12 @@
 
 namespace WeexCore {
 
-  const std::string WX("wx");
-  const std::string PX("px");
-  const std::string UNDEFINE("undefined");
-  const std::string SCALE("scale");
-  const std::string AUTO_UNIT("auto");
-  const std::string NONE("none");
+  constexpr char WX[] = "wx";
+  constexpr char PX[] = "px";
+  constexpr char UNDEFINE[] = "undefined";
+  constexpr char SCALE[] = "scale";
+  constexpr char AUTO_UNIT[] = "auto";
+  constexpr char NONE[] = "none";
 
   template<typename T>
   inline std::string to_string(const T &n) {
@@ -108,7 +108,7 @@ namespace WeexCore {
   inline float transferWx(const std::string &stringWithWXPostfix, const float &viewport) {
     std::string temp = stringWithWXPostfix;
     if (endWidth(stringWithWXPostfix, WX)) {
-      temp = stringWithWXPostfix.substr(0, stringWithWXPostfix.size() - WX.size());
+      temp = stringWithWXPostfix.substr(0, stringWithWXPostfix.size() - strlen(WX));
     }
     float f = getFloat(temp.c_str());
     float density = getFloat(WXCoreEnvironment::getInstance()->GetOption(SCALE).c_str());
@@ -127,7 +127,7 @@ namespace WeexCore {
     if (endWidth(src, WX)) {
       ret = getFloat(transferWx(src, viewport), viewport, round_off_deviation);
     } else if (endWidth(src, PX)) {
-      ret = getFloat(src.substr(0, src.size() - PX.size()), viewport, round_off_deviation);
+      ret = getFloat(src.substr(0, src.size() - strlen(PX)), viewport, round_off_deviation);
     } else {
       ret = getFloat(src, viewport, round_off_deviation);
     }
