@@ -319,10 +319,10 @@
     }
 
     // Bugfix: https://github.com/apache/incubator-weex/issues/2347
-    NSUInteger frameCount = _transitionDuration * 60 / 1000;
+    NSUInteger frameCount = MAX(_transitionDuration * 60 / 1000, 1);
     NSUInteger currentFrame = _transitionCount + 1;
     double per = (double)currentFrame / frameCount; //linear
-    if (![[NSString stringWithFormat:@"%@",_transitionTimingFunction] isEqualToString: kCAMediaTimingFunctionLinear]) {
+    if (currentFrame < frameCount && ![[NSString stringWithFormat:@"%@",_transitionTimingFunction] isEqualToString: kCAMediaTimingFunctionLinear]) {
         per = [self solveWithx:per epsilon:SOLVE_EPS(_transitionDuration)];
     }
 
@@ -449,7 +449,7 @@
 - (void)_handleTransitionDisplayLink
 {
     WXAssertComponentThread();
-    int count = _transitionDuration * 60 / 1000;
+    int count = MAX(_transitionDuration * 60 / 1000, 1);
     if (_transitionCount >= count) {
         [self _suspendTransitionDisplayLink];
         [self _resetProcessAnimationParameter];
