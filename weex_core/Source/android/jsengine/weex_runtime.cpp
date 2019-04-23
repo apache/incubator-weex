@@ -625,6 +625,13 @@ int WeexRuntime::updateGlobalConfig(const String &config) {
     VM &vm = globalObject->vm();
     JSLockHolder locker(&vm);
 
+
+
+
+    //FIXME, Heron
+
+
+
 //    if (weexLiteAppObjectHolder.get() != nullptr) {
 //        VM & vm_global = *weexLiteAppObjectHolder->m_globalVM.get();
 //        JSLockHolder locker_global(&vm_global);
@@ -633,6 +640,15 @@ int WeexRuntime::updateGlobalConfig(const String &config) {
 
     const char *configChar = config.utf8().data();
     doUpdateGlobalSwitchConfig(configChar);
+    return static_cast<int32_t>(true);
+}
+
+int WeexRuntime::UpdateInitFrameworkParams(const std::string &key, const std::string &value,
+                                           const std::string &desc) {
+    JSGlobalObject *globalObject = weexObjectHolder->m_globalObject.get();
+    VM &vm = globalObject->vm();
+    JSLockHolder locker(&vm);
+    weexObjectHolder->m_globalObject->updateInitFrameworkParams(key, value);
     return static_cast<int32_t>(true);
 }
 

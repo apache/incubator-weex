@@ -64,6 +64,8 @@ class PlatformBridge {
                            const std::string& render_ref) = 0;
     virtual void SetViewPortWidth(const std::string& instance_id,
                                   float width) = 0;
+    virtual void SetDeviceWidth(const std::string &instance_id, float width) = 0;
+
     virtual void SetPageDirty(const std::string& instance_id) = 0;
     virtual void ForceLayout(const std::string& instance_id) = 0;
     virtual bool NotifyLayout(const std::string& instance_id) = 0;
@@ -125,7 +127,10 @@ class PlatformBridge {
     virtual std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char* instanceId,
                                          const char* script) = 0;
     virtual int DestroyInstance(const char* instanceId) = 0;
+
     virtual int UpdateGlobalConfig(const char* config) = 0;
+
+    virtual int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) = 0;
 
     inline PlatformBridge* bridge() { return bridge_; }
 

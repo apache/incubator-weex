@@ -51,11 +51,14 @@ import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.bridge.NativeInvokeHelper;
 import com.taobao.weex.bridge.SimpleJSCallback;
+import com.taobao.weex.bridge.WXBridge;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
+import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXPerformance;
@@ -185,6 +188,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private List<String> mLayerOverFlowListeners;
 
   private WXSDKInstance mParentInstance;
+
+  /**
+   * Default Width And Viewport is 750,
+   * when screen width change, we adjust viewport to adapter screen change
+   * */
+  private boolean mAutoAdjustDeviceWidth = WXEnvironment.AUTO_ADJUST_ENV_DEVICE_WIDTH;
+
 
   public List<String> getLayerOverFlowListeners() {
     return mLayerOverFlowListeners;
@@ -397,7 +407,22 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void setInstanceViewPortWidth(int instanceViewPortWidth) {
     this.mInstanceViewPortWidth = instanceViewPortWidth;
+    this.mAutoAdjustDeviceWidth = false;
   }
+
+  public void setAutoAdjustDeviceWidth(boolean autoAdjustViewPort){
+    this.mAutoAdjustDeviceWidth = autoAdjustViewPort;
+  }
+
+  public boolean isAutoAdjustDeviceWidth(){
+    return mAutoAdjustDeviceWidth;
+  }
+
+  private void setDeviceWith(int deviceWith){
+    WXBridgeManager.getInstance().setDeviceWidth(getInstanceId(), deviceWith);
+  }
+
+
 
   public int getInstanceViewPortWidth(){
     return mInstanceViewPortWidth;
@@ -704,13 +729,21 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       return;
     }
 
+
+
     mWXPerformance.JSTemplateSize = template.length() / 1024f;
     mApmForInstance.addStats(WXInstanceApm.KEY_PAGE_STATS_BUNDLE_SIZE,mWXPerformance.JSTemplateSize);
-
     mRenderStartTime = System.currentTimeMillis();
-
-    WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);
-
+    WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);;
+    if(mAutoAdjustDeviceWidth){
+         WXParams params = WXBridgeManager.getInstance().getInitParams();
+         if(!TextUtils.equals(params.getDeviceWidth(), String.valueOf(WXViewUtils.getScreenWidth(mContext)))){
+           params.setDeviceWidth(String.valueOf(WXViewUtils.getScreenWidth(mContext)));
+           params.setDeviceHeight(String.valueOf(WXViewUtils.getScreenHeight(mContext)));
+           WXBridgeManager.getInstance().updateInitDeviceWidthHeight(params.getDeviceWidth(), params.getDeviceHeight());
+           setDeviceWith(WXViewUtils.getScreenWidth(mContext));
+         }
+    }
     WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
     mRendered = true;
 

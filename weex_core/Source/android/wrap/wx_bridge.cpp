@@ -248,6 +248,15 @@ static void SetViewPortWidth(JNIEnv* env, jobject jcaller, jstring instanceId,
       ->SetViewPortWidth(jString2StrFast(env, instanceId), value);
 }
 
+static void SetDeviceWidth(JNIEnv* env, jobject jcaller, jstring instanceId,
+                           jfloat value) {
+    WeexCoreManager::Instance()
+            ->getPlatformBridge()
+            ->core_side()
+            ->SetDeviceWidth(jString2StrFast(env, instanceId), value);
+}
+
+
 static jint InitFramework(JNIEnv* env, jobject object, jstring script,
                           jobject params) {
   WXBridge::Instance()->Reset(env, object);
@@ -461,6 +470,25 @@ static void ExecJSWithCallback(JNIEnv* env, jobject jcaller,
                            function.getChars(), params, callbackId);
 
   freeParams(params);
+}
+
+
+static void UpdateInitFrameworkParams(JNIEnv* env, jobject jcaller,
+                                      jstring key_,
+                                      jstring value_,
+                                      jstring desc_){
+
+  if(key_ == nullptr || value_ == nullptr || desc_ == nullptr){
+    return;
+  }
+
+  LOGE("UpdateInitFrameworkParams");
+  WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->core_side()
+        ->UpdateInitFrameworkParams(jString2StrFast(env, key_),
+                                    jString2StrFast(env, value_),
+                                    jString2StrFast(env, desc_));
 }
 
 static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller, jstring config) {

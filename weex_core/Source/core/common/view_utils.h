@@ -59,11 +59,11 @@ namespace WeexCore {
     return ret;
   }
 
-  inline float getFloat(const float &src, const float &viewport, const bool &round_off_deviation) {
+  inline float getFloat(const float &src, const float &viewport, const float& device_width, const bool &round_off_deviation) {
     if (isnan(src))
       return NAN;
 
-    float realPx = (src * WXCoreEnvironment::getInstance()->DeviceWidth() /
+    float realPx = (src * device_width /
                     viewport);
 #if OS_IOS
     return realPx;
@@ -87,7 +87,7 @@ namespace WeexCore {
     }
   }
 
-  inline float getFloat(const std::string &src, const float &viewport, const bool &round_off_deviation) {
+  inline float getFloat(const std::string &src, const float &viewport, const float &device_width, const bool &round_off_deviation) {
     float ret = NAN;
     if (UNDEFINE == src
         || AUTO_UNIT == src
@@ -96,7 +96,7 @@ namespace WeexCore {
       return ret;
     }
     float original_value = getFloat(src.c_str());
-    ret = getFloat(original_value, viewport, round_off_deviation);
+    ret = getFloat(original_value, viewport, device_width, round_off_deviation);
     return ret;
   }
 
@@ -105,17 +105,19 @@ namespace WeexCore {
            src.compare(src.size() - suffix.size(), suffix.size(), suffix) == 0;
   }
 
-  inline float transferWx(const std::string &stringWithWXPostfix, const float &viewport) {
+  inline float transferWx(const std::string &stringWithWXPostfix, const float &viewport,
+                          const float &device_width) {
     std::string temp = stringWithWXPostfix;
     if (endWidth(stringWithWXPostfix, WX)) {
       temp = stringWithWXPostfix.substr(0, stringWithWXPostfix.size() - WX.size());
     }
     float f = getFloat(temp.c_str());
     float density = getFloat(WXCoreEnvironment::getInstance()->GetOption(SCALE).c_str());
-    return density * f * viewport / WXCoreEnvironment::getInstance()->DeviceWidth();
+    return density * f * viewport / device_width; WXCoreEnvironment::getInstance()->DeviceWidth();
   }
 
-  inline static float getFloatByViewport(std::string src, const float &viewport, const bool &round_off_deviation) {
+  inline static float getFloatByViewport(std::string src, const float &viewport,
+          const float &device_width, const bool &round_off_deviation) {
     float ret = NAN;
     if (UNDEFINE == src
         || AUTO_UNIT == src
@@ -125,11 +127,11 @@ namespace WeexCore {
     }
     Trim(src);
     if (endWidth(src, WX)) {
-      ret = getFloat(transferWx(src, viewport), viewport, round_off_deviation);
+      ret = getFloat(transferWx(src, viewport, device_width), viewport,  device_width, round_off_deviation);
     } else if (endWidth(src, PX)) {
-      ret = getFloat(src.substr(0, src.size() - PX.size()), viewport, round_off_deviation);
+      ret = getFloat(src.substr(0, src.size() - PX.size()), viewport, device_width, round_off_deviation);
     } else {
-      ret = getFloat(src, viewport, round_off_deviation);
+      ret = getFloat(src, viewport, device_width, round_off_deviation);
     }
     return ret;
   }

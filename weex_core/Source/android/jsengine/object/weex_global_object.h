@@ -89,6 +89,10 @@ public:
     uint32_t genFunctionID();
     JSValue getTimerFunction(uint32_t function_id);
 
+    void updateInitFrameworkParams(const std::string& key, const std::string& value);
+
+
+
 protected:
     void finishCreation(VM& vm)
     {
@@ -130,6 +134,8 @@ protected:
     {
         addValue(vm, this, name, value);
     }
+
+    //void updateVate(VM& VM);
 
     // use map to store timer js function, avoid the object be gc
     std::map<uint32_t, JSC::Strong<JSC::Unknown>> function_maps_;

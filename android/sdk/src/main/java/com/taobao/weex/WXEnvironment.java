@@ -80,6 +80,12 @@ public class WXEnvironment {
   public static final String SETTING_EXCLUDE_X86SUPPORT = "env_exclude_x86";
 
   public static boolean SETTING_FORCE_VERTICAL_SCREEN = false;
+
+  /**
+   * auto adjust device width for when screen size change.
+   * */
+  public static boolean AUTO_ADJUST_ENV_DEVICE_WIDTH = true;
+
   /**
    * Debug model
    */

@@ -39,7 +39,7 @@ public:
 
     RefPtr<VM> m_globalVM;
 
-  explicit WeexRuntime(TimerQueue* timeQueue, bool isMultiProgress = true);
+    explicit WeexRuntime(TimerQueue* timeQueue, bool isMultiProgress = true);
 
     explicit WeexRuntime(TimerQueue* timeQueue, WeexCore::ScriptBridge *script_bridge, bool isMultiProgress = true);
 
@@ -90,6 +90,11 @@ public:
     int destroyInstance(const String &instanceId);
 
     int updateGlobalConfig(const String &config);
+
+
+    int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc);
+
+
 
     int exeTimerFunction(const String &instanceId, uint32_t timerFunction, JSGlobalObject *globalObject);
 

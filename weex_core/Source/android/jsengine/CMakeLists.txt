@@ -104,6 +104,7 @@ set(${WEEXJSSERVER_NAME}_SOURCES
         task/impl/exe_js_task.cpp
         task/impl/take_heap_snapshot.cpp
         task/impl/native_timer_task.cpp
+        task/impl/update_init_framework_params_task.cpp
         task/weex_task.cpp
         task/weex_task_queue.cpp
         task/timer_task.cpp
