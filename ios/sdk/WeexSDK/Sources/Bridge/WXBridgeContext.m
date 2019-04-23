@@ -726,13 +726,17 @@ _Pragma("clang diagnostic pop") \
         if (_dataRenderHandler) {
             WXPerformBlockOnComponentThread(^{
                 [_dataRenderHandler destroyDataRenderInstance:instance];
+                WXPerformBlockOnBridgeThread(^{
+                    [self callJSMethod:@"destroyInstance" args:@[instance]];
+                });
             });
         }
         else {
             WXLogError(@"No data render handler found!");
         }
+    } else {
+        [self callJSMethod:@"destroyInstance" args:@[instance]];
     }
-    [self callJSMethod:@"destroyInstance" args:@[instance]];
 }
 
 - (void)forceGarbageCollection
