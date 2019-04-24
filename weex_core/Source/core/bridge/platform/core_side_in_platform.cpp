@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <core/common/view_utils.h>
 #include "core/bridge/platform/core_side_in_platform.h"
 #include "base/string_util.h"
 #include "base/log_defines.h"
@@ -167,12 +168,15 @@ void CoreSideInPlatform::SetViewPortWidth(const std::string &instance_id,
     RenderManager::GetInstance()->set_viewport_width(instance_id, width);
 }
 
-void CoreSideInPlatform::SetDeviceWidth(const std::string &instance_id, float width) {
+void CoreSideInPlatform::SetDeviceDisplay(const std::string &instance_id, float width, float height, float scale) {
   RenderManager::GetInstance()->setDeviceWidth(instance_id, width);
-  /**
-   * also update global device with
-   * */
+
+    /**
+     * also update global device with height and options
+     * */
   WXCoreEnvironment::getInstance()->SetDeviceWidth(std::to_string(width));
+  WXCoreEnvironment::getInstance()->SetDeviceHeight(std::to_string(height));
+  WXCoreEnvironment::getInstance()->PutOption(SCALE, std::to_string(scale));
 }
 
 void CoreSideInPlatform::SetPageDirty(const std::string &instance_id) {

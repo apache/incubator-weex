@@ -248,12 +248,12 @@ static void SetViewPortWidth(JNIEnv* env, jobject jcaller, jstring instanceId,
       ->SetViewPortWidth(jString2StrFast(env, instanceId), value);
 }
 
-static void SetDeviceWidth(JNIEnv* env, jobject jcaller, jstring instanceId,
-                           jfloat value) {
-    WeexCoreManager::Instance()
-            ->getPlatformBridge()
-            ->core_side()
-            ->SetDeviceWidth(jString2StrFast(env, instanceId), value);
+static void SetDeviceDisplay(JNIEnv* env, jobject jcaller, jstring instanceId,
+                           jfloat value, float height, float scale) {
+  WeexCoreManager::Instance()
+          ->getPlatformBridge()
+          ->core_side()
+          ->SetDeviceDisplay(jString2StrFast(env, instanceId), value, height, scale);
 }
 
 

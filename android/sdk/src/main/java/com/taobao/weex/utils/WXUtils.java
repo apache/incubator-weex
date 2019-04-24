@@ -143,7 +143,7 @@ public class WXUtils {
       temp = stringWithWXPostfix.substring(0, stringWithWXPostfix.indexOf("wx"));
     }
     Float f = Float.parseFloat(temp);
-    float density = Float.parseFloat(WXEnvironment.getConfig().get(WXConfig.scale));
+    float density = WXEnvironment.sApplication.getResources().getDisplayMetrics().density;
     return density * f * viewport / WXViewUtils.getScreenWidth();
   }
 

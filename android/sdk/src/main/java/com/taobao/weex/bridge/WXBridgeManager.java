@@ -3154,16 +3154,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return new long[]{0, 0, 0};
   }
 
-  public void setDeviceWidth(final String instanceId, final float value) {
+  public void setDeviceDisplay(final String instanceId, final float deviceWidth, final float deviceHeight, final float scale) {
     post(new Runnable() {
       @Override
       public void run() {
-        mWXBridge.setDeviceWidth(instanceId, value);
+        mWXBridge.setDeviceDisplay(instanceId, deviceWidth, deviceHeight, scale);
       }
     });
   }
 
-  public void updateInitDeviceWidthHeight(final String width, final String height){
+  public void updateInitDeviceParams(final String width, final String height, final String density){
     if(!isJSFrameworkInit()){
       return;
     }
@@ -3179,6 +3179,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         mWXBridge.updateInitFrameworkParams("deviceHeight", height, "deviceHeight");
       }
     });
+
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.updateInitFrameworkParams(WXConfig.scale,  density, WXConfig.scale);
+      }
+    });
+
+
 
 
   }

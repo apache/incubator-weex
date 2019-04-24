@@ -108,7 +108,7 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeMarkDirty(String instanceId, String ref, boolean dirty);
 
-  private native void nativeSetDeviceWidth(String instanceId, float value);
+  private native void nativeSetDeviceDisplay(String instanceId, float width, float height, float scale);
 
   private native void nativeRegisterCoreEnv(String key, String value);
 
@@ -716,8 +716,8 @@ public class WXBridge implements IWXBridge {
   }
 
   @Override
-  public void setDeviceWidth(String instanceId, float value) {
-    nativeSetDeviceWidth(instanceId, value);
+  public void setDeviceDisplay(String instanceId, float width, float height, float scale) {
+    nativeSetDeviceDisplay(instanceId, width, height, scale);
   }
 
   @Override

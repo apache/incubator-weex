@@ -95,6 +95,7 @@ namespace WeexCore {
     };
 
     void AddOption(std::string key, std::string value);
+    void PutOption(std::string key, std::string value);
 
     static WXCoreEnvironment *getInstance() {
       if (!m_pInstance) {

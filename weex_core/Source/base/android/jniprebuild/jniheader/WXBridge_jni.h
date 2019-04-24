@@ -174,9 +174,8 @@ static void MarkDirty(JNIEnv* env, jobject jcaller,
     jstring ref,
     jboolean dirty);
 
-static void SetDeviceWidth(JNIEnv* env, jobject jcaller,
-        jstring instanceId,
-        jfloat value);
+static void SetDeviceDisplay(JNIEnv* env, jobject jcaller,
+        jstring instanceId, jfloat width, jfloat height, jfloat scale);
 
 static void RegisterCoreEnv(JNIEnv* env, jobject jcaller,
     jstring key,
@@ -1145,12 +1144,14 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Z"
 ")"
 "V", reinterpret_cast<void*>(MarkDirty) },
-  { "nativeSetDeviceWidth",
+  { "nativeSetDeviceDisplay",
   "("
   "Ljava/lang/String;"
   "F"
+  "F"
+  "F"
   ")"
-  "V", reinterpret_cast<void*>(SetDeviceWidth) },
+  "V", reinterpret_cast<void*>(SetDeviceDisplay) },
     { "nativeRegisterCoreEnv",
 "("
 "Ljava/lang/String;"

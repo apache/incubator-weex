@@ -195,7 +195,7 @@ public interface IWXBridge extends IWXObject {
 
   void markDirty(String instanceId, String ref, boolean dirty);
 
-  void setDeviceWidth(String instanceId, float value);
+  void setDeviceDisplay(String instanceId, float width, float height, float scale);
 
   void registerCoreEnv(String key, String value);
 

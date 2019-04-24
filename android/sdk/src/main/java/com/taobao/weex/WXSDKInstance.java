@@ -51,7 +51,6 @@ import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.bridge.NativeInvokeHelper;
 import com.taobao.weex.bridge.SimpleJSCallback;
-import com.taobao.weex.bridge.WXBridge;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.bridge.WXParams;
@@ -418,8 +417,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     return mAutoAdjustDeviceWidth;
   }
 
-  private void setDeviceWith(int deviceWith){
-    WXBridgeManager.getInstance().setDeviceWidth(getInstanceId(), deviceWith);
+  private void setDeviceDisplay(float deviceWith, float deviceHeight, float scale){
+    WXBridgeManager.getInstance().setDeviceDisplay(getInstanceId(), deviceWith, deviceHeight, scale);
   }
 
 
@@ -740,8 +739,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
          if(params != null && !TextUtils.equals(params.getDeviceWidth(), String.valueOf(WXViewUtils.getScreenWidth(mContext)))){
            params.setDeviceWidth(String.valueOf(WXViewUtils.getScreenWidth(mContext)));
            params.setDeviceHeight(String.valueOf(WXViewUtils.getScreenHeight(mContext)));
-           WXBridgeManager.getInstance().updateInitDeviceWidthHeight(params.getDeviceWidth(), params.getDeviceHeight());
-           setDeviceWith(WXViewUtils.getScreenWidth(mContext));
+           float density = WXEnvironment.sApplication.getResources().getDisplayMetrics().density;
+           WXEnvironment.addCustomOptions(WXConfig.scale, Float.toString(density));
+           WXBridgeManager.getInstance().updateInitDeviceParams(params.getDeviceWidth(),
+                                                                params.getDeviceHeight(),
+                                                                Float.toString(density));
+           setDeviceDisplay(WXViewUtils.getScreenWidth(mContext),
+                            WXViewUtils.getScreenHeight(mContext),
+                            WXViewUtils.getScreenDensity(mContext));
          }
     }
     WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
