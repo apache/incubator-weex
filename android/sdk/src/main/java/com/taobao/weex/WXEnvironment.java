@@ -86,6 +86,8 @@ public class WXEnvironment {
    * */
   public static boolean AUTO_ADJUST_ENV_DEVICE_WIDTH = true;
 
+  public static boolean AUTO_UPDATE_APPLICATION_SCREEN_SIZE = true;
+
   /**
    * Debug model
    */

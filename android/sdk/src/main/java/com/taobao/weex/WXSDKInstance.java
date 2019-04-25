@@ -735,7 +735,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mRenderStartTime = System.currentTimeMillis();
     WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);;
     if(mAutoAdjustDeviceWidth){
-         WXViewUtils.updateApplicationScreen(mContext);
+         if(WXEnvironment.AUTO_UPDATE_APPLICATION_SCREEN_SIZE) {
+             WXViewUtils.updateApplicationScreen(mContext);
+         }
          WXParams params = WXBridgeManager.getInstance().getInitParams();
          if(params != null && !TextUtils.equals(params.getDeviceWidth(), String.valueOf(WXViewUtils.getScreenWidth(mContext)))){
            params.setDeviceWidth(String.valueOf(WXViewUtils.getScreenWidth(mContext)));
