@@ -32,6 +32,7 @@ import android.os.Build.VERSION_CODES;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -154,6 +155,15 @@ public class WXViewUtils {
       }
     }
     return Constants.Value.DENSITY;
+  }
+
+  public static void updateApplicationScreen(Context context){
+    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+    DisplayMetrics displayMetrics =WXEnvironment.sApplication.getResources().getDisplayMetrics();
+    displayMetrics.density = metrics.density;
+    displayMetrics.densityDpi = metrics.densityDpi;
+    displayMetrics.scaledDensity = metrics.scaledDensity;
+    displayMetrics.xdpi = metrics.xdpi;
   }
 
   public static int getScreenWidth(Context ctx) {
