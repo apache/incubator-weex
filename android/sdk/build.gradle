@@ -63,7 +63,7 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-version = project.hasProperty('weexVersion')? project.getProperty('weexVersion') : "0.20.0.1"
+version = project.hasProperty('weexVersion')? project.getProperty('weexVersion') : "0.24.0"
 
 android {
     compileSdkVersion project.compileSdkVersion
