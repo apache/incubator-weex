@@ -121,7 +121,11 @@
                               @"event":self.eventMap
                               };
     NSString* jsonStr = [WXUtility JSONString:InfoMap];
-    NSLog(@"wxApmForInstance :%@",jsonStr);
+    NSLog(@"wxApmForInstance: %@",jsonStr);
+    
+    NSNumber* stageRenderOrigin = self.stageMap[KEY_PAGE_STAGES_RENDER_ORGIGIN];
+    NSNumber* stageInteraction = self.stageMap[KEY_PAGE_STAGES_INTERACTION];
+    NSLog(@"wxApmForInstance interaction time: %lld", [stageInteraction longLongValue] - [stageRenderOrigin longLongValue]);
 }
 
 @end
