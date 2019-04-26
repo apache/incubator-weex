@@ -1345,7 +1345,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private void invokeRefreshInstance(String instanceId, WXRefreshData refreshData) {
     try {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-      if (!isJSFrameworkInit()) {
+      if (!isSkipFrameworkInit(instanceId) && !isJSFrameworkInit()) {
         if (instance != null) {
           instance.onRenderError(
                   WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),

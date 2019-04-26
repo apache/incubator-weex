@@ -2058,7 +2058,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (adapter == null) {
       return false;
     }
-    String result = adapter.getConfig("wxapm", "disable_skip_framework_init", "false");
+    String result = adapter.getConfig("wxeagle", "disable_skip_framework_init", "false");
     return "true".equals(result);
   }
 }
