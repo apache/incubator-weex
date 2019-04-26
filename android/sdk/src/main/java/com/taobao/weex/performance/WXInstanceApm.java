@@ -510,4 +510,16 @@ public class WXInstanceApm {
 
         instance.fireGlobalEventCallback("wx_apm", data);
     }
-}
+
+
+    public String toPerfString() {
+        Long start = stageMap.get(KEY_PAGE_STAGES_RENDER_ORGIGIN);
+        Long end = stageMap.get(KEY_PAGE_STAGES_INTERACTION);
+        StringBuilder builder = new StringBuilder();
+        if(start != null && end != null){
+            builder.append("interactiveTime " + (end - start) + "ms");
+        }
+        return builder.toString();
+   }
+
+ }
