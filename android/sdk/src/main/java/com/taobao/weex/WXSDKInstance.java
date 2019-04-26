@@ -1148,6 +1148,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       }
       this.mCurrentGround = true;
     }
+
+    //component appear
+    if(WXEnvironment.isApkDebugable() && mApmForInstance != null){
+        WXLogUtils.e("PerformanceData " + mApmForInstance.toPerfString());
+    }
   }
 
 
