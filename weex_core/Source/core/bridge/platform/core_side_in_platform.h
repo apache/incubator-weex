@@ -49,7 +49,10 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
 
   virtual void SetPageRenderType(const std::string &pageId, const std::string &renderType)override;
 
-  virtual void RemovePageRenderType(const std::string &pageId)override;
+  virtual void RemovePageRenderType(const std::string &pageId) override;
+
+  virtual void SetPageArgument(const std::string &pageId, const std::string& key, const std::string& value) override;
+
 
   void SetPageDirty(const std::string &instance_id) override;
   void ForceLayout(const std::string &instance_id) override;

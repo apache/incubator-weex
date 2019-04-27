@@ -112,6 +112,7 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeRemoveInstanceRenderType(String instanceId);
 
+  private native void nativeSetPageArgument(String instanceId, String key, String value);
 
 
   /**
@@ -685,9 +686,16 @@ public class WXBridge implements IWXBridge {
     }
     nativeSetInstanceRenderType(instanceId, renderType);
   }
+
+
   @Override
   public void removeInstanceRenderType(String instanceId){
       nativeRemoveInstanceRenderType(instanceId);
+  }
+
+  @Override
+  public void setPageArgument(String instanceId, String key, String value){
+      nativeSetPageArgument(instanceId, key, value);
   }
 
   @Override

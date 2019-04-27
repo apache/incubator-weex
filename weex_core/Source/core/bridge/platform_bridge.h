@@ -67,6 +67,9 @@ class PlatformBridge {
     virtual void SetPageRenderType(const std::string &pageId, const std::string& renderType)=0;
     virtual void RemovePageRenderType(const std::string &pageId)=0;
 
+    virtual void SetPageArgument(const std::string &pageId, const std::string& key, const std::string& value)=0;
+
+
     virtual void SetPageDirty(const std::string& instance_id) = 0;
     virtual void ForceLayout(const std::string& instance_id) = 0;
     virtual bool NotifyLayout(const std::string& instance_id) = 0;

@@ -173,6 +173,13 @@ void CoreSideInPlatform::RemovePageRenderType(const std::string &pageId) {
   // void
 }
 
+
+void CoreSideInPlatform::SetPageArgument(const std::string &pageId, const std::string& key, const std::string& value){
+     RenderManager::GetInstance()->setPageArgument(pageId, key, value);
+}
+
+
+
 void CoreSideInPlatform::SetPageDirty(const std::string &instance_id) {
   RenderPageBase *page = RenderManager::GetInstance()->GetPage(std::string(instance_id));
   if (page == nullptr) return;

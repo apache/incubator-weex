@@ -515,9 +515,13 @@ public class WXInstanceApm {
     public String toPerfString() {
         Long start = stageMap.get(KEY_PAGE_STAGES_RENDER_ORGIGIN);
         Long end = stageMap.get(KEY_PAGE_STAGES_INTERACTION);
+        Long wxNewFsRender = stageMap.get(KEY_PAGE_STAGES_NEW_FSRENDER);
         StringBuilder builder = new StringBuilder();
         if(start != null && end != null){
             builder.append("interactiveTime " + (end - start) + "ms");
+        }
+        if(wxNewFsRender != null){
+            builder.append(" wxNewFsRender " + (wxNewFsRender) + "ms");
         }
         return builder.toString();
    }

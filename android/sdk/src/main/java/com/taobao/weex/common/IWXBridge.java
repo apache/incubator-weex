@@ -202,4 +202,6 @@ public interface IWXBridge extends IWXObject {
 
   void removeInstanceRenderType(String instanceId);
 
+  void setPageArgument(String instanceId, String key, String value);
+
 }

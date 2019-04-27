@@ -184,6 +184,12 @@ static void SetInstanceRenderType(JNIEnv* env, jobject jcaller,
 
 static void RemoveInstanceRenderType(JNIEnv* env, jobject jcaller,
                                      jstring instanceId);
+
+static void SetPageArgument(JNIEnv* env, jobject jcaller,
+                            jstring instanceId,
+                            jstring key,
+                            jstring value);
+
 // Step 2: method stubs.
 
 static intptr_t g_WXBridge_onReceivedResult = 0;
@@ -1134,6 +1140,13 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(ResetWXBridge) },
+{ "nativeSetPageArgument",
+    "("
+    "Ljava/lang/String;"
+    "Ljava/lang/String;"
+    "Ljava/lang/String;"
+    ")"
+    "V", reinterpret_cast<void*>(SetPageArgument) },
     { "nativeUpdateGlobalConfig",
 "("
 "Ljava/lang/String;"

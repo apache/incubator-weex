@@ -267,6 +267,16 @@ static void RemoveInstanceRenderType(JNIEnv* env, jobject jcaller,
           ->RemovePageRenderType(jString2StrFast(env, instanceId));
 }
 
+static void SetPageArgument(JNIEnv* env, jobject jcaller,
+                            jstring instanceId,
+                            jstring key,
+                            jstring value){
+    WeexCoreManager::Instance()
+            ->getPlatformBridge()
+            ->core_side()->SetPageArgument(jString2StrFast(env, instanceId),
+                                           jString2StrFast(env, key), jString2StrFast(env, value));
+}
+
 static jint InitFramework(JNIEnv* env, jobject object, jstring script,
                           jobject params) {
   WXBridge::Instance()->Reset(env, object);
