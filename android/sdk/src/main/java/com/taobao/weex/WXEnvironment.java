@@ -106,7 +106,7 @@ public class WXEnvironment {
 
   public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
-  public static boolean isPerf = false;
+  public static boolean isPerf = true;
   private static boolean sDebugFlagInit = false;
 
   private static boolean openDebugLog = true;
