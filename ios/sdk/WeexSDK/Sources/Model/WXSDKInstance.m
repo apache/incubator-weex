@@ -238,6 +238,7 @@ typedef enum : NSUInteger {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
     }
+    [WXCoreBridge install];
 
     _scriptURL = url;
     [self _checkPageName];
@@ -256,7 +257,8 @@ typedef enum : NSUInteger {
 {
     _options = [options isKindOfClass:[NSDictionary class]] ? options : nil;
     _jsData = data;
-    
+    [WXCoreBridge install];
+
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
 
     if ([source isKindOfClass:[NSString class]]) {
