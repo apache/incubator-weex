@@ -16,12 +16,12 @@
 # specific language governing permissions and limitations
 # under the License.
 
-git tag "$1-$2"
-git push "$3" "$1-$2" 
-cd $TMPDIR
-svn checkout https://dist.apache.org/repos/dist/dev/incubator/weex/ $TMPDIR
-mkdir -p "$TMPDIR/$1/$2"
-cp "apache-weex-incubating-$1-$2-src.tar.gz" "apache-weex-incubating-$1-$2-src.tar.gz.asc" "apache-weex-incubating-$1-$2-src.tar.gz.sha512" "$TMPDIR/weex/$1/$2"
-cd "$TMPDIR/weex"
-svn add "apache-weex-incubating-$1-$2-src.tar.gz" "apache-weex-incubating-$1-$2-src.tar.gz.asc" "apache-weex-incubating-$1-$2-src.tar.gz.sha512"
+# git tag "$1-$2"
+# git push "$3" "$1-$2"
+svn checkout https://dist.apache.org/repos/dist/dev/incubator/weex/ "$TMPDIR""weex"
+mkdir -p "$TMPDIR""weex/""$1/$2"
+echo "$TMPDIR""weex/""$1/$2"
+cp "apache-weex-incubating-$1-$2-src.tar.gz" "apache-weex-incubating-$1-$2-src.tar.gz.asc" "apache-weex-incubating-$1-$2-src.tar.gz.sha512" "$TMPDIR""weex/""$1/$2"
+cd "$TMPDIR""weex"
+svn add "$1"
 svn commit -m "$4"
