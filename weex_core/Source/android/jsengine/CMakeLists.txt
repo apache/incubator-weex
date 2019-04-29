@@ -118,27 +118,6 @@ SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}" CACHE STRING "toolc
 SET(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -shared")
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a -fno-omit-frame-pointer")# -fsanitize=address -g3")
-set(WEEXJSSERVERSTUB_NAME libweexjsb.so)
-add_executable(${WEEXJSSERVERSTUB_NAME}
-               weex_js_server_main_stub.cpp)
-
-set_target_properties(${WEEXJSSERVERSTUB_NAME} 
-PROPERTIES                                                                        
-LINK_FLAGS                                                                        
-"-pie -fPIE"
-)
-
-target_link_libraries(${WEEXJSSERVERSTUB_NAME}
-${WEEXJSSERVER_NAME}
-)
-
-if (APPLE)
-set_target_properties(${WEEXJSSERVERSTUB_NAME}
-PROPERTIES LINK_FLAGS
-"-Wl,--entry=_start"
-)
-endif()
-
 
 set(${WEEXJSSERVER_NAME}_LIBRARY_TYPE SHARED)
 
@@ -182,3 +161,41 @@ LINK_FLAGS
 #    COMMAND cp $<TARGET_FILE:${WEEXJSSERVERSTUB_NAME}> ${CMAKE_SOURCE_DIR}/libweexjsb${SERVERSUFFIX}.so
 #    VERBATIM
 #)
+
+# Compile libweexjsb.so
+set(WEEXJSSERVERSTUB_NAME libweexjsb.so)
+add_executable(${WEEXJSSERVERSTUB_NAME}
+               weex_js_server_main_stub.cpp)
+
+set_target_properties(${WEEXJSSERVERSTUB_NAME} 
+PROPERTIES                                                                        
+LINK_FLAGS                                                                        
+"-pie -fPIE"
+)
+
+target_link_libraries(${WEEXJSSERVERSTUB_NAME}
+${WEEXJSSERVER_NAME}
+)
+
+if (APPLE)
+set_target_properties(${WEEXJSSERVERSTUB_NAME}
+PROPERTIES LINK_FLAGS
+"-Wl,--entry=_start"
+)
+endif()
+
+# Compile libweexjst.so
+set(WEEXJSSERVERSTUB_NAME_BELOW_L libweexjst.so)
+add_executable(${WEEXJSSERVERSTUB_NAME_BELOW_L}
+               weex_js_server_main_stub.cpp)
+
+target_link_libraries(${WEEXJSSERVERSTUB_NAME_BELOW_L}
+${WEEXJSSERVER_NAME}
+)
+
+if (APPLE)
+set_target_properties(${WEEXJSSERVERSTUB_NAME_BELOW_L}
+PROPERTIES LINK_FLAGS
+"-Wl,--entry=_start"
+)
+endif()

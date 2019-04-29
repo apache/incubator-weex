@@ -45,6 +45,9 @@
 - /pre-build/**
 
 ###### weexcore ######
+- /weex_core/Source/.idea
+- /weex_core/Source/cmake-build-debug
+- /weex_core/Source/libs
 + /weex_core
 + /weex_core/CMakeLists.txt
 + /weex_core/Source
@@ -59,6 +62,11 @@
 - /android/sdk/build
 - /android/sdk/NOTICE
 - /android/sdk/libs/*/*.so
+- /android/sdk/.externalNativeBuild
+- /android/sdk/.settings
+- /android/sdk/.classpath
+- /android/sdk/.project
+- /android/sdk/weex_sdk.iml
 + /android/sdk/**
 
 ###### ios ###########
@@ -67,6 +75,9 @@
 - /ios/sdk/LICENSE
 - /ios/sdk/NOTICE
 - /ios/sdk/WeexSDK/Resources/main.js
+- ios/sdk/Products
 + /ios/sdk/**
 
+##### Others #######
++ /RELEASE_NOTE.md
 - *
