@@ -17,7 +17,7 @@
 # under the License.
 
 git tag "$1-$2"
-git push "$1-$2" "$3"
+git push "$3" "$1-$2" 
 cd $TMPDIR
 svn checkout https://dist.apache.org/repos/dist/dev/incubator/weex/ $TMPDIR
 mkdir -p "$TMPDIR/$1/$2"
