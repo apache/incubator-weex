@@ -300,21 +300,32 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
     return value;
 }
 
-- (void)DownloadJS:(NSURL *)scriptUrl completion:(void (^)(NSString *script))complection;
+- (void)DownloadJS:(NSString*)instance url:(NSURL *)scriptUrl completion:(void (^)(NSString *script))complection;
 {
     if (!scriptUrl || ![scriptUrl.absoluteString length]) {
-        complection(nil);
+        if (complection) {
+            complection(nil);
+        }
         return;
     }
     WXResourceRequest* request = [WXResourceRequest requestWithURL:scriptUrl];
     WXResourceLoader* jsLoader = [[WXResourceLoader alloc] initWithRequest:request];
     jsLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         NSString* jsString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        complection(jsString);
+        if (complection) {
+            complection(jsString);
+        }
     };
     jsLoader.onFailed = ^(NSError *loadError) {
-        WXLogError(@"No js URL found");
-        complection(nil);
+        if (complection) {
+            complection(nil);
+        }
+
+        WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
+        NSString *errorMessage = [NSString stringWithFormat:@"Request to %@ occurs an error:%@, info:%@", request.URL, loadError.localizedDescription, loadError.userInfo];
+        WXSDKErrCode errorCode = WX_KEY_EXCEPTION_JS_DOWNLOAD;
+        NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{NSLocalizedDescriptionKey:(errorMessage?:@"No message")}];
+        sdkInstance.onFailed(error);
     };
 
    [jsLoader start];
@@ -424,7 +435,9 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
             });
         }
         else {
-            WXLogError(@"No data render handler found!");
+            WXSDKErrCode errorCode = WX_ERR_EAGLE_RENDER;
+            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
+            instance.onFailed(error);
         }
         return;
     }
@@ -497,7 +510,9 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
             });
         }
         else {
-            WXLogError(@"No data render handler found!");
+            WXSDKErrCode errorCode = WX_ERR_EAGLE_RENDER;
+            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
+            instance.onFailed(error);
         }
     }
     else {

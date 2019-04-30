@@ -272,7 +272,7 @@ typedef enum : NSUInteger {
 }
 
 - (void)_downloadAndExecScript:(NSURL *)url {
-    [[WXSDKManager bridgeMgr] DownloadJS:url completion:^(NSString *script) {
+    [[WXSDKManager bridgeMgr] DownloadJS:_instanceId url:url completion:^(NSString *script) {
         if (!script) {
             return;
         }
@@ -287,7 +287,9 @@ typedef enum : NSUInteger {
                 });
             }
             else {
-                WXLogError(@"No data render handler found!");
+                WXSDKErrCode errorCode = WX_ERR_EAGLE_RENDER;
+                NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
+                self.onFailed(error);
             }
             return;
         }
