@@ -118,9 +118,10 @@ extern "C" {
 
 /**
  + *  download JS Script
- + *  @param scriptUrl    :   script url
+ + *  @param instance    :   instance id
+ + *  @param scriptUrl   :   script url
  + **/
-- (void)DownloadJS:(NSURL *)scriptUrl completion:(void (^)(NSString *script))complection;
+- (void)DownloadJS:(NSString *)instance url:(NSURL *)scriptUrl completion:(void (^)(NSString *script))complection;
 
 /**
  *  Register JS service Script
