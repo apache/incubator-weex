@@ -58,7 +58,7 @@ namespace WeexCore
         void CallNativeComponent(const char* pageId, const char* ref, const char *method,
                                  const char *arguments, int argumentsLength, const char *options, int optionsLength) override;
         std::unique_ptr<ValueWithType> RegisterPluginModule(const char *name, const char *class_name, const char *version) override;
-
+        std::unique_ptr<ValueWithType> RegisterPluginComponent(const char *name, const char *class_name, const char *version) override;
         void SetTimeout(const char* callbackID, const char* time) override ;
         
         void NativeLog(const char* str_array) override ;

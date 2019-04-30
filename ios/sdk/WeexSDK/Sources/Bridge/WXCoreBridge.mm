@@ -34,7 +34,7 @@
 #import "WXComponentMethod.h"
 #import "WXExceptionUtils.h"
 #import "WXModuleFactory.h"
-
+#import "WXComponentFactory.h"
 #include "base/core_constants.h"
 #include "base/time_utils.h"
 #include "core/manager/weex_core_manager.h"
@@ -178,6 +178,47 @@ namespace WeexCore
         
         return result;
     }
+    std::unique_ptr<ValueWithType> IOSSide::RegisterPluginComponent(const char *pcstr_name, const char *pcstr_class_name, const char *pcstr_version) {
+        ValueWithType *returnValue = new ValueWithType();
+        memset(returnValue, 0, sizeof(ValueWithType));
+        returnValue->type = ParamsType::VOID;
+        do {
+            if (!pcstr_class_name) {
+                break;
+            }
+            NSString *className = [NSString stringWithUTF8String:pcstr_class_name];
+            Class clazz = NSClassFromString(className);
+            if (!clazz) {
+                break;
+            }
+            if (!pcstr_name) {
+                break;
+            }
+            NSDictionary *properties = @{ @"append" : @"tree" };
+            NSString *name = [NSString stringWithUTF8String:pcstr_name];
+            [WXComponentFactory registerComponent:name withClass:clazz withPros:properties];
+            NSMutableDictionary *info = [WXComponentFactory componentMethodMapsWithName:name];
+            if (![info isKindOfClass:[NSDictionary class]]) {
+                break;
+            }
+            NSArray *methods = info[@"methods"];
+            if (![methods isKindOfClass:[NSArray class]] || !methods.count) {
+                break;
+            }
+            info[@"type"] = name;
+            NSMutableDictionary *props = [properties mutableCopy];
+            [props addEntriesFromDictionary:info];
+            NSString *componentsInfo = [WXUtility JSONString:@[props]];
+            if (componentsInfo.length > 0) {
+                returnValue->type = ParamsType::BYTEARRAYSTRING;
+                const char *pcstr_utf8 = [componentsInfo UTF8String];
+                returnValue->value.byteArray = generator_bytes_array(pcstr_utf8, componentsInfo.length);
+            }
+            
+        } while (0);
+        
+        return std::unique_ptr<ValueWithType>(returnValue);
+    }
     
     std::unique_ptr<ValueWithType> IOSSide::RegisterPluginModule(const char *pcstr_name, const char *pcstr_class_name, const char *pcstr_version) {
         ValueWithType *returnValue = new ValueWithType();
@@ -196,10 +237,6 @@ namespace WeexCore
                 break;
             }
             NSString *name = [NSString stringWithUTF8String:pcstr_name];
-            NSString *version = @"0";
-            if (pcstr_version) {
-                version = [NSString stringWithUTF8String:pcstr_version];
-            }
             NSString *moduleName = [WXModuleFactory registerModule:name withClass:clazz];
             if (!moduleName.length) {
                 break;

@@ -158,6 +158,12 @@ namespace WeexCore {
         ->platform_side()
         ->RegisterPluginModule(name.c_str(), class_name.c_str(), version.c_str());
     }
+    std::unique_ptr<ValueWithType> EagleBridge::WeexCoreHandler::RegisterPluginComponent(const std::string &name, const std::string &class_name, const std::string &version) {
+        return WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->platform_side()
+        ->RegisterPluginComponent(name.c_str(), class_name.c_str(), version.c_str());
+    }
 
     void EagleBridge::WeexCoreHandler::PostTaskOnComponentThread(const weex::base::Closure& closure) {
         WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->PostTaskOnComponentThread(closure);
