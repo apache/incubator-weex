@@ -132,13 +132,14 @@ namespace WeexCore
             if (!instance) {
                 break;
             }
-            WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE;
+            WXSDKErrCode errorCode = WX_ERR_JS_EXECUTE;
             BOOL is_render_failed = NO;
-            if (func && strcmp(func, "createInstance") == 0) {
-                errorCode = WX_KEY_EXCEPTION_EMPTY_SCREEN_JS;
+            if (func && (strcmp(func, "CreatePageWithContent") == 0 || strcmp(func, "DestroyExecutor") == 0 || strcmp(func, "RefreshInstance") == 0
+                || strcmp(func, "InvokeCallback") == 0 || strcmp(func, "FireEvent") == 0 || strcmp(func, "UpdateComponentData") == 0)) {
+                errorCode = WX_ERR_EAGLE_RENDER;
                 WXComponentManager *manager = instance.componentManager;
                 if (manager.isValid) {
-                    NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":[NSString stringWithUTF8String:exception]}];
+                    NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":[NSString stringWithUTF8String:exception], @"exception function:":@(func)}];
                     [manager renderFailed:error];
                 }
                 is_render_failed = YES;
