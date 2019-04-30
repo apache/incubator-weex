@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,24 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.common;
+//
+// Created by furture on 2019/4/29.
+//
 
-public enum WXRenderStrategy {
-  APPEND_ASYNC("APPEND_ASYNC"),
-  APPEND_ONCE("APPEND_ONCE"),
-  DATA_RENDER("DATA_RENDER"),
-  DATA_RENDER_BINARY("DATA_RENDER_BINARY"),
-  JSON_RENDER("JSON_RENDER");
+#ifndef WEEX_PROJECT_REPLAYPAGE_H
+#define WEEX_PROJECT_REPLAYPAGE_H
+#include <third_party/json11/json11.hpp>
+#include <map>
+#include <string>
+#include <core/render/page/render_page_custom.h>
 
+namespace WeexCore {
 
-  private String flag;
+    /**
+     * Parse Json and send command to render manager.
+     * for qucik replay online state
+     * */
+    class JsonPage {
 
-  WXRenderStrategy(String flag) {
-    this.flag = flag;
-  }
+        public:
+            JsonPage(const std::string& pageId);
 
-  public String getFlag() {
-    return flag;
-  }
+        public:
+            void parseJson(const std::string &data);
+
+         private:
+            void sendChildren(const json11::Json node, const std::string &parent_ref, int index, bool body=false);
+
+        protected:
+            std::string mPageId;
+            RenderPageCustom* mRenderPageCustom;
+
+    };
 }
 
+#endif //WEEX_PROJECT_REPLAYPAGE_H

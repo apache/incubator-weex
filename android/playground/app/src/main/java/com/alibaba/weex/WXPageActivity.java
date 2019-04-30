@@ -264,6 +264,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
           }
           else if (TextUtils.equals(uri.getQueryParameter("__data_render"), Boolean.TRUE.toString())){
             mInstance.render(TAG, new String(task.response.data, "UTF-8"), mConfigMap, null, WXRenderStrategy.DATA_RENDER);
+          }else if (TextUtils.equals(uri.getQueryParameter("__json_render"), Boolean.TRUE.toString())){
+            mInstance.render(TAG, new String(task.response.data, "UTF-8"), mConfigMap, null, WXRenderStrategy.JSON_RENDER);
           } else {
             mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
           }

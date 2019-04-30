@@ -1543,6 +1543,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.DATA_RENDER_BINARY.getFlag());
           // In DATA_RENDER_BINARY strategy script is binary
           instanceObj.data = template.getBinary();
+        }else if (instance.getRenderStrategy() == WXRenderStrategy.JSON_RENDER) {
+             renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.JSON_RENDER.getFlag());
         }
 
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
@@ -1560,7 +1562,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         }
         if (type == BundType.Vue || type == BundType.Rax
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
-                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY) {
+                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY
+                || instance.getRenderStrategy() == WXRenderStrategy.JSON_RENDER) {
           int ret = invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
           if(ret == 0) {
             String err = "[WXBridgeManager] invokeCreateInstance : " + instance.getTemplateInfo();

@@ -29,6 +29,7 @@
 #include "core/render/node/render_list.h"
 #include "core/render/node/render_object.h"
 #include "core/render/page/render_page.h"
+#include "core/json/JsonRenderManager.h"
 
 namespace WeexCore {
 
@@ -431,6 +432,7 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
                                        const char *initData,
                                        const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params,
                                        const char *render_strategy) {
+
   // First check about DATA_RENDER mode
   if (render_strategy != nullptr) {
     std::function<void(const char *)> exec_js =
@@ -467,7 +469,13 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
 
       return true;
     }
+
+    if(strcmp(render_strategy, "JSON_RENDER") == 0){
+       JsonRenderManager::GetInstance()->CreatePage(script, instanceId, render_strategy);
+       return true;
+    }
   }
+
 
   return WeexCoreManager::Instance()
       ->script_bridge()
@@ -487,6 +495,9 @@ int CoreSideInPlatform::DestroyInstance(const char *instanceId) {
   auto node_manager =
       weex::core::data_render::VNodeRenderManager::GetInstance();
   if (node_manager->ClosePage(instanceId)) {
+    return true;
+  }
+  if (JsonRenderManager::GetInstance()->ClosePage(instanceId)) {
     return true;
   }
   return WeexCoreManager::Instance()
