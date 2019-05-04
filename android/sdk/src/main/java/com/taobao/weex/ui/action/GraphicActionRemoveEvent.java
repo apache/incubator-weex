@@ -31,7 +31,7 @@ public class GraphicActionRemoveEvent extends BasicGraphicAction {
 
   private final String mEvent;
 
-  public GraphicActionRemoveEvent(WXSDKInstance instance, String ref, Object event) {
+  GraphicActionRemoveEvent(WXSDKInstance instance, String ref, Object event) {
     super(instance, ref);
     this.mEvent = WXEvent.getEventName(event);
   }

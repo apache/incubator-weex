@@ -37,7 +37,7 @@ public class GraphicActionUpdateStyle extends BasicGraphicAction {
   private boolean mIsCausedByPesudo;
   private boolean mIsBorderSet;
 
-  public GraphicActionUpdateStyle(WXSDKInstance instance, String ref,
+  GraphicActionUpdateStyle(WXSDKInstance instance, String ref,
                                   Map<String, Object> style,
                                   Map<String, String> paddings,
                                   Map<String, String> margins,

@@ -24,7 +24,9 @@ import android.text.TextUtils;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.GraphicActionAnimation;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.list.template.TemplateDom;
@@ -36,7 +38,7 @@ public class WXAnimationModule extends WXModule {
     if (!TextUtils.isEmpty(ref) && !TextUtils.isEmpty(animation) && mWXSDKInstance != null) {
       //Due to animation module rely on the result of the css-layout and the batch mechanism of
       //css-layout, the animation.transition must be delayed the batch time.
-      GraphicActionAnimation action = new GraphicActionAnimation(mWXSDKInstance, ref, animation, callBack);
+      BasicGraphicAction action = WXBridgeManager.getInstance().getActionCreator(mWXSDKInstance).createGraphicActionAnimation(mWXSDKInstance, ref, animation, callBack);
       WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
     }
   }

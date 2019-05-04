@@ -16,39 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
-import com.alibaba.fastjson.JSONArray;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.ui.action.GraphicActionAnimation;
 
-/**
- * Created by listen on 18/01/10.
- */
-public class ActionInvokeMethod implements IExecutable {
+public class PrerenderGraphicActionAnimation extends GraphicActionAnimation {
 
-  private static final String TAG = "ActionInvokeMethod";
 
-  private final String mMethod;
-  private final JSONArray mArgs;
-  private String mPageId;
-  private String mRef;
+  PrerenderGraphicActionAnimation(@NonNull WXSDKInstance instance, @NonNull String ref, @Nullable String animation,
+                                         @Nullable final String callBack) {
+    super(instance, ref, animation, callBack);
 
-  ActionInvokeMethod(String pageId, String ref, String method, JSONArray args) {
-    this.mPageId = pageId;
-    this.mRef = ref;
-    this.mMethod = method;
-    this.mArgs = args;
   }
 
   @Override
   public void executeAction() {
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mRef);
-    if(component == null){
-      WXLogUtils.e(TAG,"target component not found.");
+
+    WXSDKInstance instance = WXSDKManager.getInstance().getWXRenderManager().getWXSDKInstance(getPageId());
+    if (instance == null || instance.getNeedInterceptRender()) {
       return;
     }
-    component.invoke(mMethod,mArgs);
+
+    super.executeAction();
   }
 }

@@ -27,7 +27,7 @@ import com.taobao.weex.ui.component.WXVContainer;
 
 public class GraphicActionRemoveElement extends BasicGraphicAction {
 
-  public GraphicActionRemoveElement(WXSDKInstance instance, String ref) {
+  GraphicActionRemoveElement(WXSDKInstance instance, String ref) {
     super(instance, ref);
   }
 

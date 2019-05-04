@@ -30,7 +30,7 @@ public class GraphicActionMoveElement extends BasicGraphicAction {
   private String mParentref;
   private int mIndex;
 
-  public GraphicActionMoveElement(WXSDKInstance instance, String ref, String parentRef, int index) {
+  GraphicActionMoveElement(WXSDKInstance instance, String ref, String parentRef, int index) {
     super(instance, ref);
     this.mParentref = parentRef;
     this.mIndex = index;

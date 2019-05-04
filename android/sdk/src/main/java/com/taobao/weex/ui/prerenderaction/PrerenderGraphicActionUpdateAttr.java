@@ -16,39 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
-import com.alibaba.fastjson.JSONArray;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.ui.action.BasicGraphicAction;
+import com.taobao.weex.ui.component.node.WXComponentNode;
 
-/**
- * Created by listen on 18/01/10.
- */
-public class ActionInvokeMethod implements IExecutable {
+import java.util.Map;
 
-  private static final String TAG = "ActionInvokeMethod";
+public class PrerenderGraphicActionUpdateAttr extends BasicGraphicAction {
 
-  private final String mMethod;
-  private final JSONArray mArgs;
-  private String mPageId;
-  private String mRef;
+  private Map<String, String> mAttrs;
+  private WXComponentNode mNode;
 
-  ActionInvokeMethod(String pageId, String ref, String method, JSONArray args) {
-    this.mPageId = pageId;
-    this.mRef = ref;
-    this.mMethod = method;
-    this.mArgs = args;
+  PrerenderGraphicActionUpdateAttr(WXSDKInstance instance, String ref,
+                                          Map<String, String> attrs) {
+    super(instance, ref);
+    this.mAttrs = attrs;
+
+    mNode = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
+    if (mNode != null) {
+      mNode.addAttrs(mAttrs);
+    }
   }
 
   @Override
   public void executeAction() {
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mRef);
-    if(component == null){
-      WXLogUtils.e(TAG,"target component not found.");
+    if (mNode == null) {
       return;
     }
-    component.invoke(mMethod,mArgs);
+    mNode.updateAttrs(mAttrs);
   }
 }

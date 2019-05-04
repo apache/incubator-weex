@@ -25,7 +25,6 @@ import android.support.annotation.WorkerThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
-import com.taobao.weex.BuildConfig;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
@@ -48,7 +47,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
   private GraphicSize layoutSize;
   private boolean isLayoutRTL;
 
-  public GraphicActionAddElement(@NonNull WXSDKInstance instance, String ref,
+  GraphicActionAddElement(@NonNull WXSDKInstance instance, String ref,
                                  String componentType, String parentRef,
                                  int index,
                                  Map<String, String> style,
@@ -154,24 +153,28 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
 
   @RestrictTo(Scope.LIBRARY)
   @WorkerThread
+  @Override
   public void setRTL(boolean isRTL){
     this.isLayoutRTL = isRTL;
   }
 
   @RestrictTo(Scope.LIBRARY)
   @WorkerThread
+  @Override
   public void setSize(GraphicSize graphicSize){
     this.layoutSize = graphicSize;
   }
 
   @RestrictTo(Scope.LIBRARY)
   @WorkerThread
+  @Override
   public void setPosition(GraphicPosition position){
     this.layoutPosition = position;
   }
 
   @RestrictTo(Scope.LIBRARY)
   @WorkerThread
+  @Override
   public void setIndex(int index){
     mIndex = index;
   }

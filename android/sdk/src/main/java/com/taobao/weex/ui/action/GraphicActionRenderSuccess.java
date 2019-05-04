@@ -25,7 +25,7 @@ import com.taobao.weex.ui.component.WXComponent;
 
 public class GraphicActionRenderSuccess extends BasicGraphicAction {
 
-    public GraphicActionRenderSuccess(@NonNull WXSDKInstance instance) {
+    GraphicActionRenderSuccess(@NonNull WXSDKInstance instance) {
         super(instance, "");
     }
 

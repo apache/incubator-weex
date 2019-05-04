@@ -16,37 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
-import com.alibaba.fastjson.JSONObject;
+import android.support.annotation.NonNull;
+
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.ui.component.Scrollable;
-import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.action.BasicGraphicAction;
+import com.taobao.weex.ui.component.node.WXComponentNode;
 
 /**
- * Created by listen on 18/01/09.
+ * Description
+ * Created by luciolong on 02/08/2018.
  */
-public class GraphicActionScrollToElement extends BasicGraphicAction {
+public class PrerenderGraphicActionTransformNode extends BasicGraphicAction {
+    @NonNull
+    private final WXComponentNode mNode;
 
-  private final JSONObject mOptions;
-
-  GraphicActionScrollToElement(WXSDKInstance instance, String ref, JSONObject options) {
-    super(instance, ref);
-    this.mOptions = options;
-  }
-
-  @Override
-  public void executeAction() {
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
-    if (component == null) {
-      return;
+    public PrerenderGraphicActionTransformNode(@NonNull WXComponentNode node, WXSDKInstance instance, String ref) {
+        super(instance, ref);
+        this.mNode = node;
+        this.mNode.createComponent();
     }
 
-    Scrollable scroller = component.getParentScroller();
-    if (scroller == null) {
-      return;
+    @Override
+    public void executeAction() {
+        mNode.transformNode();
     }
-    scroller.scrollTo(component, mOptions);
-  }
 }

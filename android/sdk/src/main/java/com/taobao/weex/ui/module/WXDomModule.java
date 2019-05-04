@@ -21,6 +21,8 @@ package com.taobao.weex.ui.module;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridge;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.binding.JSONUtils;
@@ -98,7 +100,7 @@ public final class WXDomModule extends WXModule {
           }
           String ref = args.size() >= 1 ? args.getString(0) : null;
           JSONObject options = args.size() >= 2 ? args.getJSONObject(1) : null;
-          new GraphicActionScrollToElement(mWXSDKInstance, ref, options)
+          WXBridgeManager.getInstance().getActionCreator(mWXSDKInstance).createGraphicActionScrollToElement(mWXSDKInstance, ref, options)
                   .executeActionOnRender();
           break;
         }
@@ -123,8 +125,8 @@ public final class WXDomModule extends WXModule {
             return null;
           }
           // todo：no sure where the request com from
-          new ActionInvokeMethod(mWXSDKInstance.getInstanceId(), args.getString(0), args.getString(1), args.getJSONArray(2))
-                  .executeAction();
+          WXBridgeManager.getInstance().getActionCreator(mWXSDKInstance).createActionInvokeMethod(mWXSDKInstance.getInstanceId(),
+                  args.getString(0), args.getString(1), args.getJSONArray(2)).executeAction();
           break;
         }
         case UPDATE_COMPONENT_DATA:
@@ -192,8 +194,8 @@ public final class WXDomModule extends WXModule {
     if(ref == null || method == null){
       return;
     }
-
-    new ActionInvokeMethod(mWXSDKInstance.getInstanceId(), ref, method, args)
+    WXBridgeManager.getInstance().getActionCreator(mWXSDKInstance)
+            .createActionInvokeMethod(mWXSDKInstance.getInstanceId(), ref, method, args)
             .executeAction();
   }
 }

@@ -22,7 +22,6 @@ import android.support.annotation.NonNull;
 import android.widget.ScrollView;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.ui.component.WXComponent;
@@ -36,7 +35,7 @@ public class GraphicActionCreateBody extends GraphicActionAbstractAddElement {
 
   private WXComponent component;
 
-  public GraphicActionCreateBody(@NonNull WXSDKInstance instance, String ref,
+  GraphicActionCreateBody(@NonNull WXSDKInstance instance, String ref,
                                  String componentType,
                                  Map<String, String> style,
                                  Map<String, String> attributes,

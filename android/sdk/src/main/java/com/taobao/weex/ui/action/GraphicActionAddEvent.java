@@ -31,7 +31,7 @@ public class GraphicActionAddEvent extends BasicGraphicAction {
 
   private final String mEvent;
 
-  public GraphicActionAddEvent(WXSDKInstance instance, String ref, Object event) {
+  GraphicActionAddEvent(WXSDKInstance instance, String ref, Object event) {
     super(instance, ref);
     this.mEvent = WXEvent.getEventName(event);
   }

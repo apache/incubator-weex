@@ -61,14 +61,13 @@ import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.ui.IActionCreator;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.BasicGraphicAction;
-import com.taobao.weex.ui.action.GraphicActionAddElement;
-import com.taobao.weex.ui.action.GraphicActionAddEvent;
 import com.taobao.weex.ui.action.GraphicActionAppendTreeCreateFinish;
-import com.taobao.weex.ui.action.GraphicActionCreateBody;
-import com.taobao.weex.ui.action.GraphicActionCreateFinish;
+import com.taobao.weex.ui.action.GraphicActionBaseAddElement;
+import com.taobao.weex.ui.action.GraphicActionCreator;
 import com.taobao.weex.ui.action.GraphicActionLayout;
 import com.taobao.weex.ui.action.GraphicActionMoveElement;
 import com.taobao.weex.ui.action.GraphicActionRefreshFinish;
@@ -81,6 +80,7 @@ import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.module.WXDomModule;
+import com.taobao.weex.ui.prerenderaction.PrerenderActionCreator;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
@@ -211,6 +211,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private static String GLOBAL_CONFIG_KEY = "global_switch_config";
 
   private static Map<String, String> mWeexCoreEnvOptions = new HashMap<>();
+
+  private IActionCreator mPrerenderCreator = new PrerenderActionCreator();
+  private IActionCreator mNormalCreator = new GraphicActionCreator();
 
   /**
    * package
@@ -2578,7 +2581,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(pageId);
       if (instance != null) {
-        final BasicGraphicAction action = new GraphicActionCreateBody(instance, ref, componentType,
+        final BasicGraphicAction action = getActionCreator(instance).createGraphicActionCreateBody(instance, ref, componentType,
                 styles, attributes, events, margins, paddings, borders);
         WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
@@ -2623,8 +2626,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(pageId);
       if (instance != null) {
-        final GraphicActionAddElement action = new GraphicActionAddElement(instance, ref, componentType, parentRef, index,
-            styles, attributes, events, margins, paddings, borders);
+        final GraphicActionBaseAddElement action = getActionCreator(instance)
+                .createGraphicActionAddElement(instance,
+                        ref, componentType, parentRef, index,
+                        styles, attributes, events, margins, paddings, borders);
         if(willLayout) {
           instance.addInActiveAddElementAction(ref, action);
         }else{
@@ -2667,7 +2672,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
-        final BasicGraphicAction action = new GraphicActionRemoveElement(instance, ref);
+        final BasicGraphicAction action = getActionCreator(instance).createGraphicActionRemoveElement(instance, ref);
         if(instance.getInActiveAddElementAction(ref)!=null){
           instance.removeInActiveAddElmentAction(ref);
         }
@@ -2714,7 +2719,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
-        final BasicGraphicAction action = new GraphicActionMoveElement(instance, ref, parentref, index);
+        final BasicGraphicAction action = getActionCreator(instance).createGraphicActionMoveElement(instance, ref, parentref, index);
         WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
     } catch (Exception e) {
@@ -2754,7 +2759,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
-        new GraphicActionAddEvent(instance, ref, event).executeActionOnRender();
+        getActionCreator(instance).createGraphicActionAddEvent(instance, ref, event).executeActionOnRender();
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callAddEvent exception: ", e);
@@ -2795,7 +2800,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
-        new GraphicActionRemoveEvent(instance, ref, event).executeActionOnRender();
+        getActionCreator(instance).createGraphicActionRemoveEvent(instance, ref, event).executeActionOnRender();
       }
     } catch (Exception e) {
       WXLogUtils.e("[WXBridgeManager] callRemoveEvent exception: ", e);
@@ -2842,7 +2847,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
-        final BasicGraphicAction action = new GraphicActionUpdateStyle(instance, ref, styles, paddings, margins, borders);
+        final BasicGraphicAction action = getActionCreator(instance).createGraphicActionUpdateStyle(instance, ref, styles, paddings, margins, borders);
         WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
     } catch (Exception e) {
@@ -2882,7 +2887,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
-        final BasicGraphicAction action = new GraphicActionUpdateAttr(instance, ref, attrs);
+        final BasicGraphicAction action = getActionCreator(instance).createGraphicActionUpdateAttr(instance, ref, attrs);
         WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
       }
     } catch (Exception e) {
@@ -2928,7 +2933,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (instance != null) {
         GraphicSize size = new GraphicSize(width, height);
         GraphicPosition position = new GraphicPosition(left, top, right, bottom);
-        GraphicActionAddElement addAction = instance.getInActiveAddElementAction(ref);
+        GraphicActionBaseAddElement addAction = instance.getInActiveAddElementAction(ref);
         if(addAction!=null) {
           addAction.setRTL(isRTL);
           addAction.setSize(size);
@@ -2940,7 +2945,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           instance.removeInActiveAddElmentAction(ref);
         }
         else {
-          final BasicGraphicAction action = new GraphicActionLayout(instance, ref, position, size, isRTL);
+          final BasicGraphicAction action = getActionCreator(instance).createGraphicActionLayout(instance, ref, position, size, isRTL);
           WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
         }
       }
@@ -3014,7 +3019,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
         instance.firstScreenCreateInstanceTime(start);
-        GraphicActionCreateFinish action = new GraphicActionCreateFinish(instance);
+        BasicGraphicAction action = getActionCreator(instance).createGraphicActionCreateFinish(instance);
         WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
       }
     } catch (Exception e) {
@@ -3050,7 +3055,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
-        GraphicActionRenderSuccess action = new GraphicActionRenderSuccess(instance);
+        BasicGraphicAction action = getActionCreator(instance).createGraphicActionRenderSuccess(instance);
         WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
       }
     } catch (Exception e) {
@@ -3197,6 +3202,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mWXBridge.registerCoreEnv(key, value);
     else
       mWeexCoreEnvOptions.put(key, value);
+  }
+
+  public IActionCreator getActionCreator(WXSDKInstance instance) {
+    if (instance.hasPrerender()) {
+      return mPrerenderCreator;
+    } else {
+      return mNormalCreator;
+    }
   }
 
   private void onJsFrameWorkInitSuccees() {

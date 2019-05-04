@@ -18,37 +18,40 @@
  */
 package com.taobao.weex.ui.action;
 
+import android.support.annotation.RestrictTo;
+import android.support.annotation.WorkerThread;
+
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.ui.component.WXComponent;
 
-import java.util.Map;
-
-public class GraphicActionUpdateAttr extends BasicGraphicAction {
-
-  private Map<String, String> mAttrs;
-  private WXComponent component;
-
-  GraphicActionUpdateAttr(WXSDKInstance instance, String ref,
-                                 Map<String, String> attrs) {
-    super(instance, ref);
-    this.mAttrs = attrs;
-
-    component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(getPageId(), getRef());
-    if (component == null) {
-      return;
+/**
+ * Created by luciolong on 2019/1/23.
+ */
+public abstract class GraphicActionBaseAddElement extends BasicGraphicAction {
+    public GraphicActionBaseAddElement(WXSDKInstance instance, String ref) {
+        super(instance, ref);
     }
-    if (mAttrs != null) {
-      component.addAttr(mAttrs);
-    }
-  }
 
-  @Override
-  public void executeAction() {
-    if (component == null) {
-      return;
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    @WorkerThread
+    public void setRTL(boolean isRTL) {
+        // empty
     }
-    component.getAttrs().mergeAttr();
-    component.updateAttrs(mAttrs);
-  }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    @WorkerThread
+    public void setSize(GraphicSize graphicSize) {
+        // empty
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    @WorkerThread
+    public void setPosition(GraphicPosition position) {
+        // empty
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    @WorkerThread
+    public void setIndex(int index) {
+        // empty
+    }
 }

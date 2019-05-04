@@ -16,26 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
 import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.ui.action.IExecutable;
+import com.taobao.weex.ui.component.node.WXComponentNode;
 
 /**
  * Created by listen on 18/01/10.
  */
-public class ActionInvokeMethod implements IExecutable {
+public class PrerenderActionInvokeMethod implements IExecutable {
 
-  private static final String TAG = "ActionInvokeMethod";
+  private static final String TAG = "PrerenderActionInvokeMethod";
 
   private final String mMethod;
   private final JSONArray mArgs;
   private String mPageId;
   private String mRef;
 
-  ActionInvokeMethod(String pageId, String ref, String method, JSONArray args) {
+  PrerenderActionInvokeMethod(String pageId, String ref, String method, JSONArray args) {
     this.mPageId = pageId;
     this.mRef = ref;
     this.mMethod = method;
@@ -44,11 +44,9 @@ public class ActionInvokeMethod implements IExecutable {
 
   @Override
   public void executeAction() {
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mRef);
-    if(component == null){
-      WXLogUtils.e(TAG,"target component not found.");
-      return;
+    WXComponentNode node = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(mPageId, mRef);
+    if (node != null) {
+      node.invokeMethod(mMethod, mArgs);
     }
-    component.invoke(mMethod,mArgs);
   }
 }

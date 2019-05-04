@@ -16,39 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.ui.action;
+package com.taobao.weex.ui.prerenderaction;
 
-import com.alibaba.fastjson.JSONArray;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.ui.action.BasicGraphicAction;
+import com.taobao.weex.ui.component.node.WXComponentNode;
 
-/**
- * Created by listen on 18/01/10.
- */
-public class ActionInvokeMethod implements IExecutable {
+public class PrerenderGraphicActionRemoveElement extends BasicGraphicAction {
 
-  private static final String TAG = "ActionInvokeMethod";
-
-  private final String mMethod;
-  private final JSONArray mArgs;
-  private String mPageId;
-  private String mRef;
-
-  ActionInvokeMethod(String pageId, String ref, String method, JSONArray args) {
-    this.mPageId = pageId;
-    this.mRef = ref;
-    this.mMethod = method;
-    this.mArgs = args;
+  PrerenderGraphicActionRemoveElement(WXSDKInstance instance, String ref) {
+    super(instance, ref);
   }
 
   @Override
   public void executeAction() {
-    WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(mPageId, mRef);
-    if(component == null){
-      WXLogUtils.e(TAG,"target component not found.");
-      return;
+    WXComponentNode node = WXSDKManager.getInstance().getWXRenderManager().getWXComponentNode(getPageId(), getRef());
+    if (node != null) {
+      node.removeElement();
     }
-    component.invoke(mMethod,mArgs);
   }
 }
