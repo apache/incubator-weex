@@ -311,6 +311,14 @@
 		7715EB6321A69DD9001F1108 /* WXRichText.h in Headers */ = {isa = PBXBuildFile; fileRef = 7715EB6021A69DD8001F1108 /* WXRichText.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7715EB6421A69DD9001F1108 /* WXRichText.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7715EB6121A69DD9001F1108 /* WXRichText.mm */; };
 		7715EB6521A69DD9001F1108 /* WXRichText.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7715EB6121A69DD9001F1108 /* WXRichText.mm */; };
+		773CB1DA227F0C92005C758A /* JsonPage.h in Headers */ = {isa = PBXBuildFile; fileRef = 773CB1D6227F0C92005C758A /* JsonPage.h */; };
+		773CB1DB227F0C92005C758A /* JsonPage.h in Headers */ = {isa = PBXBuildFile; fileRef = 773CB1D6227F0C92005C758A /* JsonPage.h */; };
+		773CB1DC227F0C92005C758A /* JsonRenderManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 773CB1D7227F0C92005C758A /* JsonRenderManager.cpp */; };
+		773CB1DD227F0C92005C758A /* JsonRenderManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 773CB1D7227F0C92005C758A /* JsonRenderManager.cpp */; };
+		773CB1DE227F0C92005C758A /* JsonPage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 773CB1D8227F0C92005C758A /* JsonPage.cpp */; };
+		773CB1DF227F0C92005C758A /* JsonPage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 773CB1D8227F0C92005C758A /* JsonPage.cpp */; };
+		773CB1E0227F0C92005C758A /* JsonRenderManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 773CB1D9227F0C92005C758A /* JsonRenderManager.h */; };
+		773CB1E1227F0C92005C758A /* JsonRenderManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 773CB1D9227F0C92005C758A /* JsonRenderManager.h */; };
 		775BEE4E1C16F993008D1629 /* WXDefine.h in Headers */ = {isa = PBXBuildFile; fileRef = 775BEE4D1C16F993008D1629 /* WXDefine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		775BEE6E1C1BD8F4008D1629 /* WXImgLoaderProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 775BEE6C1C1BD8F4008D1629 /* WXImgLoaderProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		775BEE711C1BD977008D1629 /* WXModuleProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 775BEE701C1BD977008D1629 /* WXModuleProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1292,6 +1300,10 @@
 		74FD6E031C7C0E9600DBEB6D /* WXScrollerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXScrollerProtocol.h; sourceTree = "<group>"; };
 		7715EB6021A69DD8001F1108 /* WXRichText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXRichText.h; sourceTree = "<group>"; };
 		7715EB6121A69DD9001F1108 /* WXRichText.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXRichText.mm; sourceTree = "<group>"; };
+		773CB1D6227F0C92005C758A /* JsonPage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JsonPage.h; sourceTree = "<group>"; };
+		773CB1D7227F0C92005C758A /* JsonRenderManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JsonRenderManager.cpp; sourceTree = "<group>"; };
+		773CB1D8227F0C92005C758A /* JsonPage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JsonPage.cpp; sourceTree = "<group>"; };
+		773CB1D9227F0C92005C758A /* JsonRenderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JsonRenderManager.h; sourceTree = "<group>"; };
 		775BEE4D1C16F993008D1629 /* WXDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDefine.h; sourceTree = "<group>"; };
 		775BEE6C1C1BD8F4008D1629 /* WXImgLoaderProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXImgLoaderProtocol.h; sourceTree = "<group>"; };
 		775BEE701C1BD977008D1629 /* WXModuleProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXModuleProtocol.h; sourceTree = "<group>"; };
@@ -1898,6 +1910,17 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		773CB1D5227F0C92005C758A /* json */ = {
+			isa = PBXGroup;
+			children = (
+				773CB1D6227F0C92005C758A /* JsonPage.h */,
+				773CB1D7227F0C92005C758A /* JsonRenderManager.cpp */,
+				773CB1D8227F0C92005C758A /* JsonPage.cpp */,
+				773CB1D9227F0C92005C758A /* JsonRenderManager.h */,
+			);
+			path = json;
+			sourceTree = "<group>";
+		};
 		77788B7922292536000D5102 /* target */ = {
 			isa = PBXGroup;
 			children = (
@@ -2275,6 +2298,7 @@
 		B8D66AEC2125572F003960BD /* core */ = {
 			isa = PBXGroup;
 			children = (
+				773CB1D5227F0C92005C758A /* json */,
 				453F374F219A76CA00A03F1D /* network */,
 				B8D66AED2125572F003960BD /* data_render */,
 				B8D66B192125572F003960BD /* moniter */,
@@ -2711,6 +2735,7 @@
 				17036A5320FDE7490029AE3D /* WXApmProtocol.h in Headers */,
 				7423EB511F4ADE30001662D1 /* WXComponent+DataBinding.h in Headers */,
 				74FD6E041C7C0E9600DBEB6D /* WXScrollerProtocol.h in Headers */,
+				773CB1DA227F0C92005C758A /* JsonPage.h in Headers */,
 				74CFDD3D1F459400007A1A66 /* WXRecycleListDataManager.h in Headers */,
 				B8D66BE52125572F003960BD /* object.h in Headers */,
 				77D161201C02DDB40010B15B /* WXSDKEngine.h in Headers */,
@@ -2732,6 +2757,7 @@
 				98399A8E21916A9800D83CCE /* exec_state_binary.h in Headers */,
 				B8D66C1321255730003960BD /* core_side_in_script.h in Headers */,
 				7410811F1CED585A001BC6E5 /* WXComponentManager.h in Headers */,
+				773CB1E0227F0C92005C758A /* JsonRenderManager.h in Headers */,
 				B8D66C8521255730003960BD /* render_appbar_factory.h in Headers */,
 				74CFDD411F45941E007A1A66 /* WXRecycleListTemplateManager.h in Headers */,
 				B8F2C7002133A83C00635B37 /* ast_builder.h in Headers */,
@@ -3070,6 +3096,7 @@
 				B8A72C9D213F8BAE0024E7BE /* class_string.h in Headers */,
 				B8D66BB22125572F003960BD /* parser.h in Headers */,
 				DCA445A91EFA573200D0CFA8 /* WXResourceRequestHandler.h in Headers */,
+				773CB1E1227F0C92005C758A /* JsonRenderManager.h in Headers */,
 				DCA445C41EFA57E300D0CFA8 /* WXAppConfiguration.h in Headers */,
 				DCA445BA1EFA57A200D0CFA8 /* WXDefine.h in Headers */,
 				B8F2C6E72133A83C00635B37 /* common_error.h in Headers */,
@@ -3128,6 +3155,7 @@
 				DCE7F1F020AD358A00D471E7 /* WXPageEventNotifyEvent.h in Headers */,
 				77CF6A5921E6E47E00BA8634 /* log_defines.h in Headers */,
 				DCA445F91EFA5A3700D0CFA8 /* WXClipboardModule.h in Headers */,
+				773CB1DB227F0C92005C758A /* JsonPage.h in Headers */,
 				DCA445FD1EFA5A4000D0CFA8 /* WXAnimationModule.h in Headers */,
 				B8D66C7E21255730003960BD /* render_text_factory.h in Headers */,
 				DCA446171EFA5A9900D0CFA8 /* WXPolyfillSet.h in Headers */,
@@ -3554,6 +3582,7 @@
 				743933B51C7ED9AA00773BB7 /* WXSimulatorShortcutManager.m in Sources */,
 				BA5F00F21FC5AFFE00F76B5C /* WXLocaleModule.m in Sources */,
 				B8D66C9F21255730003960BD /* json11.cc in Sources */,
+				773CB1DE227F0C92005C758A /* JsonPage.cpp in Sources */,
 				B8D66BB72125572F003960BD /* vnode_exec_env.cc in Sources */,
 				74BB5FBA1DFEE81A004FC3DF /* WXMetaModule.m in Sources */,
 				741081201CED585A001BC6E5 /* WXComponentManager.mm in Sources */,
@@ -3598,6 +3627,7 @@
 				98399A8B21916A9800D83CCE /* exec_state_section.cc in Sources */,
 				B8F2C7062133A83C00635B37 /* rax_parser_scope.cc in Sources */,
 				77E659F21C0C3612008B8775 /* WXModuleFactory.m in Sources */,
+				773CB1DC227F0C92005C758A /* JsonRenderManager.cpp in Sources */,
 				B8D66C5F21255730003960BD /* render_action_render_success.cpp in Sources */,
 				DCF343681E49CAEE00A2FB34 /* WXJSExceptionInfo.m in Sources */,
 				B863DF322107308000EA887D /* WXBridgeContext.m in Sources */,
@@ -3776,6 +3806,7 @@
 				B8D66BC62125572F003960BD /* tokenizer.cc in Sources */,
 				B8D66C7421255730003960BD /* render_list.cpp in Sources */,
 				B8D66BCA2125572F003960BD /* ast.cc in Sources */,
+				773CB1DF227F0C92005C758A /* JsonPage.cpp in Sources */,
 				DCA445411EFA55B300D0CFA8 /* WXMultiColumnLayout.m in Sources */,
 				B8D66C6621255730003960BD /* render_mask.cpp in Sources */,
 				DCA445421EFA55B300D0CFA8 /* WXRecyclerComponent.mm in Sources */,
@@ -3820,6 +3851,7 @@
 				B8D66C4E21255730003960BD /* render_action_move_element.cpp in Sources */,
 				DCA445571EFA55B300D0CFA8 /* WXTextAreaComponent.mm in Sources */,
 				DCA445581EFA55B300D0CFA8 /* WXTransform.m in Sources */,
+				773CB1DD227F0C92005C758A /* JsonRenderManager.cpp in Sources */,
 				DCA445591EFA55B300D0CFA8 /* WXWebComponent.m in Sources */,
 				B8D66BB42125572F003960BD /* parser.cc in Sources */,
 				DCA4455A1EFA55B300D0CFA8 /* WXSwitchComponent.mm in Sources */,
