@@ -22,12 +22,12 @@
 
 #include "JsonPage.h"
 #include "base/log_defines.h"
-#include <core/render/node/render_object.h>
-#include <core/render/manager/render_manager.h>
-#include <core/render/node/factory/render_creator.h>
+#include "core/render/node/render_object.h"
+#include "core/render/manager/render_manager.h"
+#include "core/render/node/factory/render_creator.h"
 #include <string>
 #include <map>
-#include <core/render/target/render_target.h>
+#include "core/render/target/render_target.h"
 
 namespace WeexCore {
 

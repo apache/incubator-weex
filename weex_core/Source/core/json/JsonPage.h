@@ -22,10 +22,10 @@
 
 #ifndef WEEX_PROJECT_REPLAYPAGE_H
 #define WEEX_PROJECT_REPLAYPAGE_H
-#include <third_party/json11/json11.hpp>
+#include "third_party/json11/json11.hpp"
 #include <map>
 #include <string>
-#include <core/render/page/render_page_custom.h>
+#include "core/render/page/render_page_custom.h"
 
 namespace WeexCore {
 

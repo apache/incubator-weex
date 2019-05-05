@@ -219,7 +219,8 @@ namespace WeexCore
 
 + (BOOL)forwardCallNativeModuleToCustomPage:(NSString*)pageId
                                  moduleName:(NSString*)moduleName methodName:(NSString*)methodName
-                                  arguments:(NSArray*)arguments options:(NSDictionary*)options;
+                                  arguments:(NSArray*)arguments options:(NSDictionary*)options
+                                returnValue:(id*)returnValue;
 
 @end
 

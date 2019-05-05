@@ -1235,7 +1235,9 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 
 + (BOOL)forwardCallNativeModuleToCustomPage:(NSString*)pageId
                                  moduleName:(NSString*)moduleName methodName:(NSString*)methodName
-                                  arguments:(NSArray*)arguments options:(NSDictionary*)options {
+                                  arguments:(NSArray*)arguments options:(NSDictionary*)options
+                                returnValue:(id*)returnValue
+{
     using namespace WeexCore;
     
     // Temporarily before iOS adapt to JSEngine, we intercept here for custom render page
@@ -1260,7 +1262,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
                 });
                 
                 bool handled = false;
-                target->callNativeModule([pageId UTF8String] ?: "", [moduleName UTF8String] ?: "", [methodName UTF8String] ?: "", seralizedArguments ?: "", (int)[arguments count], seralizedOptions ?: "", (int)[options count], handled);
+                std::unique_ptr<ValueWithType> result = target->callNativeModule([pageId UTF8String] ?: "", [moduleName UTF8String] ?: "", [methodName UTF8String] ?: "", seralizedArguments ?: "", (int)[arguments count], seralizedOptions ?: "", (int)[options count], handled);
                 
                 if (seralizedArguments) {
                     free((void*)seralizedArguments);
@@ -1269,7 +1271,56 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
                     free((void*)seralizedOptions);
                 }
                 
-                return YES;
+                if (handled && result) {
+                    switch (result->type) {
+                        case ParamsType::INT32:
+                            *returnValue = @(result->value.int32Value);
+                            break;
+                        case ParamsType::INT64:
+                            *returnValue = @(result->value.int64Value);
+                            break;
+                        case ParamsType::FLOAT:
+                            *returnValue = @(result->value.floatValue);
+                            break;
+                        case ParamsType::DOUBLE:
+                            *returnValue = @(result->value.doubleValue);
+                            break;
+                        case ParamsType::JSONSTRING:
+                        {
+                            NSString* s = [NSString stringWithCharacters:(const unichar *)(result->value.string->content) length:result->value.string->length];
+                            free(result->value.string);
+                            
+                            @try {
+                                NSError* error = nil;
+                                id jsonObj = [NSJSONSerialization JSONObjectWithData:[s dataUsingEncoding:NSUTF8StringEncoding]
+                                                                             options:NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
+                                                                               error:&error];
+                                
+                                if (jsonObj == nil) {
+                                    WXLogError(@"%@", error);
+                                    WXAssert(NO, @"Fail to convert json to object. %@", error);
+                                }
+                                else {
+                                    *returnValue = jsonObj;
+                                }
+                            } @catch (NSException *exception) {
+                                WXLogError(@"%@", exception);
+                                WXAssert(NO, @"Fail to convert json to object. %@", exception);
+                            }
+                        }
+                            break;
+                        case ParamsType::STRING:
+                            *returnValue = [NSString stringWithCharacters:(const unichar *)(result->value.string->content) length:result->value.string->length];
+                            free(result->value.string);
+                            break;
+                        default:
+                            *returnValue = nil;
+                            break;
+                    }
+                    return YES;
+                }
+                
+                return NO;
             }
         }
     }

@@ -248,11 +248,6 @@ _Pragma("clang diagnostic pop") \
     }
     
     [_jsBridge registerCallNativeModule:^NSInvocation*(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *arguments, NSDictionary *options) {
-        
-        if ([WXCoreBridge forwardCallNativeModuleToCustomPage:instanceId moduleName:moduleName methodName:methodName arguments:arguments options:options]) {
-            return nil;
-        }
-        
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
         if (!instance) {
