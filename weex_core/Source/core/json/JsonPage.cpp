@@ -65,19 +65,18 @@ namespace WeexCore {
         return map;
     }
 
-
-    static std::vector<std::string> getVector(const json11::Json& json, const std::string& key){
-        json11::Json kvs  = json[key];
-        std::vector<std::string> values;
-        if(!kvs.is_array()){
-            return values;
-        }
-        const std::vector<json11::Json>& items = kvs.array_items();
-        for(auto it = items.begin(); it != items.end(); it++) {
-            values.push_back(getString(*it));
-        }
-        return values;
-    }
+//    static std::vector<std::string> getVector(const json11::Json& json, const std::string& key){
+//        json11::Json kvs  = json[key];
+//        std::vector<std::string> values;
+//        if(!kvs.is_array()){
+//            return values;
+//        }
+//        const std::vector<json11::Json>& items = kvs.array_items();
+//        for(auto it = items.begin(); it != items.end(); it++) {
+//            values.push_back(getString(*it));
+//        }
+//        return values;
+//    }
 
     static std::set<std::string> getSet(const json11::Json& json, const std::string& key){
         json11::Json kvs  = json[key];
