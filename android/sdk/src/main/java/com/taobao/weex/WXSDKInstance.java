@@ -719,7 +719,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     final IWXJscProcessManager wxJscProcessManager = WXSDKManager.getInstance().getWXJscProcessManager();
 
-    if(wxJscProcessManager != null && wxJscProcessManager.shouldReboot() && !skipFrameworkInit()) {
+    if(wxJscProcessManager != null && wxJscProcessManager.shouldReboot()) {
       WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
         public void run() {
