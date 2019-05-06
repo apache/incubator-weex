@@ -16,8 +16,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# git tag "$1-$2"
-# git push "$3" "$1-$2"
+git tag "$1-$2"
+git push "$3" "$1-$2"
 rm -rf "$TMPDIR""weex"
 svn checkout https://dist.apache.org/repos/dist/dev/incubator/weex/ "$TMPDIR""weex"
 mkdir -p "$TMPDIR""weex/""$1/$2"
