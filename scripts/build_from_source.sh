@@ -69,6 +69,8 @@ then
 
     gradle wrapper --gradle-version 4.4
     echo 'include ":android_sdk"'>settings.gradle
+    echo "ndk.dir=$2">local.properties
+
     ./gradlew :android_sdk:clean :android_sdk:assembleRelease 
 
     cp android_sdk/.externalNativeBuild/cmake/release/armeabi/Source/android/jsengine/libweexjsb.so android_sdk/libs/armeabi

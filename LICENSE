@@ -246,19 +246,18 @@ This product bundles Guava v20.0, which is available under a "Apache" license. F
   android_sdk/src/main/java/org/apache/taobao/weex/utils/WXDataStructureUtil.java
 
 This product bundles chromium v66.0.3344.2, which is available under a "BSD-style" license. For details, see https://github.com/chromium/chromium/blob/66.0.3344.2/third_party/modp_b64/LICENSE and following files:
-  weex_core/Source/android/base/base64/base64.cpp
-  weex_core/Source/android/base/base64/base64.h
-  weex_core/Source/android/base/base64/modp_base64/modp_b64_data.h
-  weex_core/Source/android/base/base64/modp_base64/modp_b64.cc
-  weex_core/Source/android/base/base64/modp_base64/modp_b64.h
-  weex_core/Source/android/jniprebuild/jniheader/ContentBoxMeasurement_jni.h
-  weex_core/Source/android/jniprebuild/jniheader/MeasureMode_jni.h
-  weex_core/Source/android/jniprebuild/jniheader/NativeRenderObjectUtils_jni.h
-  weex_core/Source/android/jniprebuild/jniheader/SystemMessageHandler_jni.h
-  weex_core/Source/android/jniprebuild/jniheader/WXBridge_jni.h
-  weex_core/Source/android/jniprebuild/jniheader/WXDebugJsBridge_jni.h
-  weex_core/Source/android/jniprebuild/jniheader/WXParams_jni.h
-  weex_core/Source/android/jniprebuild/jni_generator.py
+  weex_core/Source/base/base64/base64.cpp
+  weex_core/Source/base/base64/base64.h
+  weex_core/Source/base/base64/modp_base64/modp_b64_data.h
+  weex_core/Source/base/base64/modp_base64/modp_b64.cc
+  weex_core/Source/base/base64/modp_base64/modp_b64.h
+  weex_core/Source/base/android/jniprebuild/jniheader/ContentBoxMeasurement_jni.h
+  weex_core/Source/base/android/jniprebuild/jniheader/NativeRenderObjectUtils_jni.h
+  weex_core/Source/base/android/jniprebuild/jniheader/SystemMessageHandler_jni.h
+  weex_core/Source/base/android/jniprebuild/jniheader/WXBridge_jni.h
+  weex_core/Source/base/android/jniprebuild/jniheader/WXDebugJsBridge_jni.h
+  weex_core/Source/base/android/jniprebuild/jniheader/WXParams_jni.h
+  weex_core/Source/base/android/jniprebuild/jni_generator.py
 
 This product bundles Android Open Source Project vandroid-4.2.2_r1, which is available under a "BSD" license. For details, see https://android.googlesource.com/platform/bionic/+/android-4.2.2_r1/libc/README and following files:
   weex_core/Source/IPC/futex.h

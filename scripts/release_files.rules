@@ -48,6 +48,7 @@
 - /weex_core/Source/.idea
 - /weex_core/Source/cmake-build-debug
 - /weex_core/Source/libs
+- weex_core/Source/CMakeFiles/**
 + /weex_core
 + /weex_core/CMakeLists.txt
 + /weex_core/Source
@@ -76,6 +77,8 @@
 - /ios/sdk/NOTICE
 - /ios/sdk/WeexSDK/Resources/main.js
 - ios/sdk/Products
+- /ios/sdk/WeexSDK.xcodeproj/project.xcworkspace/xcuserdata
+- /ios/sdk/WeexSDK.xcodeproj/xcuserdata
 + /ios/sdk/**
 
 ##### Others #######
