@@ -226,7 +226,8 @@ if(file('../license/LICENSE').exists()){
                          'Source/android/base/base64/**/*.h','Source/android/base/base64/**/*.cpp',
                          'Source/android/jniprebuild/jniheader/*.h',
                          'Source/base/Compatible.cpp',
-                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c'])
+                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
+                         'weex_core/Source/android/jsengine/dependence/**/*.*'])
     }
     preBuild.dependsOn licenseFormat
 }

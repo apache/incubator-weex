@@ -245,19 +245,142 @@ This product bundles vuejs v1.0.12, which is available under a
 This product bundles Guava v20.0, which is available under a "Apache" license. For details, see https://github.com/google/guava/blob/v20.0/COPYING and following files:
   android_sdk/src/main/java/org/apache/taobao/weex/utils/WXDataStructureUtil.java
 
+This product bundles json11 v1.0.0, which is available under a "MIT" license.For details, see https://github.com/dropbox/json11/tree/v1.0.0 and following files:
+   weex_core/Source/third_party/json11/CMakeLists.txt
+   weex_core/Source/third_party/json11/json11.cc
+   weex_core/Source/third_party/json11/json11.hpp
+
 This product bundles chromium v66.0.3344.2, which is available under a "BSD-style" license. For details, see https://github.com/chromium/chromium/blob/66.0.3344.2/third_party/modp_b64/LICENSE and following files:
   weex_core/Source/base/base64/base64.cpp
   weex_core/Source/base/base64/base64.h
   weex_core/Source/base/base64/modp_base64/modp_b64_data.h
   weex_core/Source/base/base64/modp_base64/modp_b64.cc
   weex_core/Source/base/base64/modp_base64/modp_b64.h
-  weex_core/Source/base/android/jniprebuild/jniheader/ContentBoxMeasurement_jni.h
-  weex_core/Source/base/android/jniprebuild/jniheader/NativeRenderObjectUtils_jni.h
-  weex_core/Source/base/android/jniprebuild/jniheader/SystemMessageHandler_jni.h
-  weex_core/Source/base/android/jniprebuild/jniheader/WXBridge_jni.h
-  weex_core/Source/base/android/jniprebuild/jniheader/WXDebugJsBridge_jni.h
-  weex_core/Source/base/android/jniprebuild/jniheader/WXParams_jni.h
   weex_core/Source/base/android/jniprebuild/jni_generator.py
+
+This product bundles WebkitGTK 2.14.1, which is available under a "BSD 3-clause" license. For details, see https://webkitgtk.org/releases/webkitgtk-2.14.1.tar.xz and following files:
+   Files under: weex_core/Source/android/jsengine/dependence/
+      OptionsCommon.cmake
+      OptionsJSCOnly.cmake
+      WeexCommon.cmake
+      WeexFS.cmake
+      WeexFeatures.cmake
+      WeexHelpers.cmake
+      WeexMacros.cmake
+
+   Files under: weex_core/Source/android/jsengine/dependence/bmalloc
+      CMakeLists.txt
+      ChangeLog
+      Makefile
+
+   Files under: weex_core/Source/android/jsengine/dependence/bmalloc/Configurations
+      Base.xcconfig
+      DebugRelease.xcconfig
+      bmalloc.xcconfig
+      mbmalloc.xcconfig
+
+   Files under: weex_core/Source/android/jsengine/dependence/bmalloc/bmalloc
+      Algorithm.h
+      Allocator.cpp
+      Allocator.h
+      AsyncTask.h
+      AvailableMemory.cpp
+      AvailableMemory.h
+      BAssert.h
+      BPlatform.h
+      BumpAllocator.h
+      BumpRange.h
+      Cache.cpp
+      Cache.h
+      Chunk.h
+      Deallocator.cpp
+      Deallocator.h
+      DebugHeap.cpp
+      DebugHeap.h
+      Environment.cpp
+      Environment.h
+      FixedVector.h
+      Heap.cpp
+      Heap.h
+      Inline.h
+      LargeMap.cpp
+      LargeMap.h
+      LargeRange.h
+      LineMetadata.h
+      List.h
+      Logging.cpp
+      Logging.h
+      Map.h
+      Mutex.h
+      Object.h
+      ObjectType.cpp
+      ObjectType.h
+      PerProcess.h
+      PerThread.h
+      Range.h
+      ScopeExit.h
+      Sizes.h
+      SmallLine.h
+      SmallPage.h
+      StaticMutex.cpp
+      StaticMutex.h
+      Syscall.h
+      VMAllocate.h
+      VMHeap.cpp
+      VMHeap.h
+      Vector.h
+      Zone.cpp
+      Zone.h
+      bmalloc.h
+      mbmalloc.cpp
+
+   Files under: weex_core/Source/android/jsengine/dependence/bmalloc/bmalloc/darwin
+      BSoftLinking.h
+
+   Files under: weex_core/Source/android/jsengine/dependence/bmalloc/bmalloc.xcodeproj
+      project.pbxproj
+
+   Files under: weex_core/Source/android/jsengine/dependence/icu
+      LICENSE
+      README
+
+   Files under: weex_core/Source/android/jsengine/dependence/icu/unicode
+      localpointer.h
+      parseerr.h
+      platform.h
+      ptypes.h
+      putil.h
+      ucal.h
+      uchar.h
+      ucnv.h
+      ucnv_err.h
+      ucol.h
+      uconfig.h
+      ucurr.h
+      udat.h
+      udatpg.h
+      udisplaycontext.h
+      uenum.h
+      uformattable.h
+      uiter.h
+      uloc.h
+      umachine.h
+      umisc.h
+      unorm.h
+      unorm2.h
+      unum.h
+      unumsys.h
+      urename.h
+      uscript.h
+      uset.h
+      ustring.h
+      utf.h
+      utf16.h
+      utf8.h
+      utf_old.h
+      utypes.h
+      uvernum.h
+      uversion.h
 
 This product bundles Android Open Source Project vandroid-4.2.2_r1, which is available under a "BSD" license. For details, see https://android.googlesource.com/platform/bionic/+/android-4.2.2_r1/libc/README and following files:
   weex_core/Source/IPC/futex.h
