@@ -258,7 +258,7 @@ This product bundles chromium v66.0.3344.2, which is available under a "BSD-styl
   weex_core/Source/base/base64/modp_base64/modp_b64.h
   weex_core/Source/base/android/jniprebuild/jni_generator.py
 
-This product bundles WebkitGTK 2.14.1, which is available under a "BSD 3-clause" license. For details, see https://webkitgtk.org/releases/webkitgtk-2.14.1.tar.xz and following files:
+This product bundles Webkit 2.17.4, which is available under a "BSD 2-clause" license. For details, see https://svn.webkit.org/repository/webkit/releases/WebKitGTK/webkit-2.17.4 and following files:
    Files under: weex_core/Source/android/jsengine/dependence/
       OptionsCommon.cmake
       OptionsJSCOnly.cmake
