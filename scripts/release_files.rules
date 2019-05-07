@@ -25,9 +25,9 @@
 + /package.json
 + /.wwprc
 + /.flowconfig
-- /.eslintrc
-- /.eslintignore
-- /.babelrc
++ /.eslintrc
++ /.eslintignore
++ /.babelrc
 + /src
 - /src/h5-render/dist/index.js
 - /src/h5-render/node_modules
