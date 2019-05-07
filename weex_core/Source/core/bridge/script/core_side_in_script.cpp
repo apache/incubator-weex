@@ -475,7 +475,7 @@ void CoreSideInScript::UpdateComponentData(const char* page_id,
     }
     else{
       WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(
-        page_id, "__updateComponentData", 
+        page_id, "UpdateComponentData", 
         "There is no data_render_handler when UpdateComponentData invoked");
     }
 }
