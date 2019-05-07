@@ -130,7 +130,7 @@ namespace WeexCore {
     }
     
     void EagleBridge::WeexCoreHandler::ReportException(const char* page_id, const char* func, const char* exception_string) {
-        WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id, nullptr, exception_string);
+        WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id, func, exception_string);
     }
     
     void EagleBridge::WeexCoreHandler::Send(const char* instance_id, const char* url, std::function<void(const std::string&)> callback) {

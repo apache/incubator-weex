@@ -448,7 +448,9 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
           handler->CreatePage(script, instanceId, render_strategy, initData, exec_js);
         }
         else{
-          LOGE("DATA_RENDER mode should not be used if there is no data_render_handler");
+          WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(
+            instanceId, "CreatePageWithContent", 
+            "There is no data_render_handler when createInstance with DATA_RENDER mode");
         }
 
       return true;
@@ -487,7 +489,9 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
         handler->CreatePage(script, static_cast<size_t>(script_length), instanceId, option, env_str, initData, exec_js);
       }
       else{
-        LOGE("DATA_RENDER_BINARY mode should not be used if there is no data_render_handler"); 
+        WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(
+          instanceId, "CreatePageWithContent", 
+          "There is no data_render_handler when createInstance with DATA_RENDER_BINARY mode");
       }
       return true;
     }
