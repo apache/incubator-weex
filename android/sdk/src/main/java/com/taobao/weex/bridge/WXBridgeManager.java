@@ -140,6 +140,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private static Class clazz_debugProxy = null;
   public static final String METHOD_CREATE_INSTANCE = "createInstance";
   public static final String METHOD_CREATE_PAGE_WITH_CONTENT = "CreatePageWithContent";
+  public static final String METHOD_UPDATE_COMPONENT_WITH_DATA = "UpdateComponentData";
   public static final String METHOD_DESTROY_INSTANCE = "destroyInstance";
   public static final String METHOD_CALL_JS = "callJS";
   public static final String METHOD_SET_TIMEOUT = "setTimeoutCallback";
@@ -2367,7 +2368,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
       instance.setHasException(true);
       exception +=   "\n getTemplateInfo==" +instance.getTemplateInfo();//add network header info
-      if ((METHOD_CREATE_INSTANCE.equals(function) || METHOD_CREATE_PAGE_WITH_CONTENT.equals(function)) || !instance.isContentMd5Match()) {
+      if ((METHOD_CREATE_INSTANCE.equals(function) || METHOD_UPDATE_COMPONENT_WITH_DATA.equals(function) || METHOD_CREATE_PAGE_WITH_CONTENT.equals(function)) || !instance.isContentMd5Match()) {
         try {
           if (isJSFrameworkInit() && (reInitCount > 1 && reInitCount < 10) && !instance.isNeedReLoad()) {
             new ActionReloadPage(instanceId, true).executeAction();
@@ -2395,7 +2396,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           e.printStackTrace();
         }
       }
-      if ((METHOD_CREATE_INSTANCE.equals(function) || METHOD_CREATE_PAGE_WITH_CONTENT.equals(function)) && !instance.getApmForInstance().hasAddView){
+      if ((METHOD_CREATE_INSTANCE.equals(function) || METHOD_UPDATE_COMPONENT_WITH_DATA.equals(function) || METHOD_CREATE_PAGE_WITH_CONTENT.equals(function)) && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE;
       }else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function) && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT;
