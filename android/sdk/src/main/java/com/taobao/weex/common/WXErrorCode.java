@@ -210,7 +210,6 @@ public enum WXErrorCode {
    */
   WX_RENDER_ERR_JS_CREATE_INSTANCE("-9600", "white screen cause create instance failed,check js stack ->",ErrorType.RENDER_ERROR,ErrorGroup.JS),
   WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT("-9601", "white screen cause create instanceContext failed,check js stack ->",ErrorType.RENDER_ERROR,ErrorGroup.JS),
-  WX_RENDER_ERR_EAGLE_RENDER("-9630", "eagle render err, stack ->",ErrorType.RENDER_ERROR,ErrorGroup.JS),
   WX_RENDER_ERR_LAYER_OVERFLOW("-9602", "WX_RENDER_ERR_LAYER_OVERFLOW", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
   WX_RENDER_ERR_NULL_KEY("-9603", "WX_RENDER_ERR_NULL_KEY", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
   WX_RENDER_ERR_NATIVE_RUNTIME("-9604", "WX_RENDER_ERR for js error", ErrorType.RENDER_ERROR, ErrorGroup.NATIVE),
@@ -261,6 +260,8 @@ public enum WXErrorCode {
 
 
   WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED_JS("-1006", "degradeToH5|createInstance fail|wx_create_instance_error",ErrorType.DEGRAD_ERROR,ErrorGroup.JS),
+
+  WX_DEGRAD_EAGLE_RENDER_ERROR ("-1007", "degradeToH5|eagleRenderErr", ErrorType.DEGRAD_ERROR, ErrorGroup.JS),
 
   WX_ERR_HASH_MAP_TMP("-10010", "WX_ERR_HASH_MAP_TMP",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
