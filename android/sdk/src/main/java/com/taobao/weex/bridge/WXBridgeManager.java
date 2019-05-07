@@ -2388,7 +2388,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                      errorMsg
             );
             if (!WXEnvironment.sInAliWeex){
-              WXExceptionUtils.commitCriticalExceptionRT(instanceId,WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE,function,exception,null);
+              WXErrorCode errCode;
+              if (METHOD_CREATE_INSTANCE.equals(function)){
+                errCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE;
+              } else {
+                errCode = WXErrorCode.WX_RENDER_ERR_EAGLE_RENDER;
+              }
+              WXExceptionUtils.commitCriticalExceptionRT(instanceId,errCode,function,exception,null);
             }
             return;
           }
@@ -2396,10 +2402,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           e.printStackTrace();
         }
       }
-      if ((METHOD_CREATE_INSTANCE.equals(function) || METHOD_UPDATE_COMPONENT_WITH_DATA.equals(function) || METHOD_CREATE_PAGE_WITH_CONTENT.equals(function)) && !instance.getApmForInstance().hasAddView){
+      if (METHOD_CREATE_INSTANCE.equals(function) && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE;
-      }else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function) && !instance.getApmForInstance().hasAddView){
+      } else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function) && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT;
+      } else if ((METHOD_UPDATE_COMPONENT_WITH_DATA.equals(function) || METHOD_CREATE_PAGE_WITH_CONTENT.equals(function)) && !instance.getApmForInstance().hasAddView){
+        reportErrorCode = WXErrorCode.WX_RENDER_ERR_EAGLE_RENDER;
       }
       instance.onJSException(reportErrorCode.getErrorCode(), function, exception);
     }
