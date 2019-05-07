@@ -2375,8 +2375,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             instance.setNeedLoad(true);
             return;
           } else {
+            WXErrorCode degreeErrorCode;
+            if(TextUtils.equals(function, METHOD_CREATE_PAGE_WITH_CONTENT) || TextUtils.equals(function, METHOD_UPDATE_COMPONENT_WITH_DATA)){
+              degreeErrorCode = WXErrorCode.WX_RENDER_ERR_EAGLE_RENDER;
+            } else {
+              degreeErrorCode = WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED;
+            }
             String errorMsg = new StringBuilder()
-                .append(WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg())
+                .append(degreeErrorCode.getErrorMsg())
                 .append(", reportJSException >>>> instanceId:").append(instanceId)
                 .append(", exception function:").append(function)
                 .append(", exception:").append(exception)
@@ -2384,7 +2390,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 .append(", extInitErrorMsg:").append(WXBridgeManager.sInitFrameWorkMsg.toString())
                 .toString();
             instance.onRenderError(//DegradPassivity to H5
-                    WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
+                     degreeErrorCode.getErrorCode(),
                      errorMsg
             );
             if (!WXEnvironment.sInAliWeex){
