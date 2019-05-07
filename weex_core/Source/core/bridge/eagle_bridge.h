@@ -23,9 +23,9 @@
 #if defined __cplusplus
 #include <string>
 #include <functional>
-#include "include/WeexApiHeader.h"
-#include "base/closure.h"
+#include <set>
 
+struct ValueWithType;
 namespace WeexCore {
     class RenderObject;
     class DataRenderHandler;
@@ -103,12 +103,12 @@ namespace WeexCore {
 
             int ExecJS(const char *instanceId, const char *nameSpace,
                        const char *func,
-                       std::vector<VALUE_WITH_TYPE *> &params);
-            void PostTaskToMsgLoop(const weex::base::Closure& closure);
+                       std::vector<struct ValueWithType *> &params);
+            void PostTaskToMsgLoop(const std::function<void()>& closure);
 #if OS_IOS
             std::unique_ptr<ValueWithType> RegisterPluginModule(const std::string &name, const std::string &class_name, const std::string &version);
             std::unique_ptr<ValueWithType> RegisterPluginComponent(const std::string &name, const std::string &class_name, const std::string &version);
-            void PostTaskOnComponentThread(const weex::base::Closure& closure);
+            void PostTaskOnComponentThread(const std::function<void()>& closure);
 #endif
         };
         

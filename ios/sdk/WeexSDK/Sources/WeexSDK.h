@@ -22,6 +22,7 @@
 #import "style.h"
 #import "layout.h"
 #import "flex_enum.h"
+#import "eagle_bridge.h"
 #import "WXWebSocketHandler.h"
 #import "WXVoiceOverModule.h"
 #import "WXView.h"
