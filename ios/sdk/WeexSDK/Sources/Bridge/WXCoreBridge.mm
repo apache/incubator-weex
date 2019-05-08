@@ -135,7 +135,7 @@ namespace WeexCore
             WXSDKErrCode errorCode = WX_ERR_JS_EXECUTE;
             BOOL is_render_failed = NO;
             if (func && (strcmp(func, "CreatePageWithContent") == 0 || strcmp(func, "UpdateComponentData") == 0)) {
-                errorCode = WX_ERR_EAGLE_RENDER;
+                errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
                 WXComponentManager *manager = instance.componentManager;
                 if (manager.isValid) {
                     NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":[NSString stringWithUTF8String:exception], @"exception function:":@(func)}];
