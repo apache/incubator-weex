@@ -27,6 +27,10 @@ typedef enum : NSUInteger {
     WXDisplayTypeBlock
 } WXDisplayType;
 
+typedef enum : NSUInteger {
+    WXComponentViewCreatedCallback
+} WXComponentCallbackType;
+
 /**
  * @abstract the component callback , result can be string or dictionary.
  * @discussion callback data to js, the id of callback function will be removed to save memory.
@@ -168,6 +172,13 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 - (nullable CGSize (^)(CGSize constrainedSize))measureBlock;
+
+/**
+ *  The callback of the component
+ *
+ *  @return A block that takes a result. When the callbackType is WXComponentViewCreatedCallback, the result type is UIView.
+ **/
+@property (nonatomic, copy) void (^WXComponentCallback)(WXComponentCallbackType callbackType, id result);
 
 /**
  * @abstract Called on main thread when the component has just laid out.

@@ -155,6 +155,9 @@ do {\
 - (void)viewDidLoad
 {
     WXAssertMainThread();
+    if (self.WXComponentCallback) {
+        self.WXComponentCallback(WXComponentViewCreatedCallback, _view);
+    }
 }
 
 - (void)viewWillUnload
