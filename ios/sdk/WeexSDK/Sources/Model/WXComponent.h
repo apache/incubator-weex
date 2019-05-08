@@ -170,6 +170,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable CGSize (^)(CGSize constrainedSize))measureBlock;
 
 /**
+ *  The callback triggered when the component finishes creating the view.
+ *
+ *  @return A block that takes a UIView argument, which is the view
+ **/
+@property (nonatomic, copy) void (^onViewCreated)(UIView *);
+
+/**
  * @abstract Called on main thread when the component has just laid out.
  */
 - (void)layoutDidFinish;

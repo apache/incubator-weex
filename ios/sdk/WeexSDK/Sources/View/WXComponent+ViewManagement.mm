@@ -155,6 +155,9 @@ do {\
 - (void)viewDidLoad
 {
     WXAssertMainThread();
+    if (self.onViewCreated) {
+        self.onViewCreated(_view);
+    }
 }
 
 - (void)viewWillUnload
