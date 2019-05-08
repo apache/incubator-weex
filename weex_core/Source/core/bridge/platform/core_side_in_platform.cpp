@@ -423,17 +423,17 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
                                        const char *render_strategy) {
   // First check about DATA_RENDER mode
   if (render_strategy != nullptr) {
-    std::function<void(const char *)> exec_js =
+    std::function<void(const char *, const char *)> exec_js =
         [instanceId = std::string(instanceId), func = std::string(func),
          opts = std::string(opts), initData = std::string(initData),
-         extendsApi = std::string(extendsApi)](const char *result) {
+         extendsApi = std::string(extendsApi)](const char *result, const char *bundleTYpe) {
           // FIXME Now only support vue, this should be fixed
           std::string error;
           auto opts_json = json11::Json::parse(opts, error);
           std::map<std::string, json11::Json> &opts_map =
               const_cast<std::map<std::string, json11::Json> &>(
                   opts_json.object_items());
-          opts_map["bundleType"] = "Vue";
+          opts_map["bundleType"] = bundleTYpe;
           std::vector<INIT_FRAMEWORK_PARAMS*> params;
           WeexCoreManager::Instance()
               ->script_bridge()

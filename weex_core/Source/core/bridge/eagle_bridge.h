@@ -77,7 +77,7 @@ namespace WeexCore {
             bool CreateFinish(const std::string &page_id);
             bool ClosePage(const std::string &page_id);
             void ReportException(const char* page_id, const char* func, const char* exception_string);
-            void Send(const char* instance_id, const char* url, std::function<void(const std::string&)> callback);
+            void Send(const char* instance_id, const char* url, std::function<void(const std::string&, const std::string&)> callback);
             int RefreshFinish(const char* page_id, const char* task, const char* callback);
             std::unique_ptr<ValueWithType> CallNativeModule (const char* page_id, const char* module, const char* method,const char* arguments, int arguments_length, const char* options, int options_length);
             void CallNativeComponent (const char* page_id, const char* module, const char* method,const char* arguments, int arguments_length, const char* options, int options_length);
@@ -115,9 +115,9 @@ namespace WeexCore {
         class DataRenderHandler {
         public:
             virtual int DestroyInstance(const char *instanceId);
-            virtual void CreatePage(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data, std::function<void(const char*)> exec_js) {}
+            virtual void CreatePage(const std::string &input, const std::string &page_id, const std::string &options, const std::string &init_data, std::function<void(const char*, const char*)> exec_js) {}
             
-            virtual void CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& env, const std::string& init_data, std::function<void(const char*)> exec_js) {}
+            virtual void CreatePage(const char *contents, size_t length, const std::string& page_id, const std::string& options, const std::string& env, const std::string& init_data, std::function<void(const char*,const char*)> exec_js) {}
             virtual bool RefreshPage(const std::string &page_id, const std::string &init_data) {return false;}
             virtual void UpdateComponentData(const std::string& page_id, const char* cid, const std::string& json_data) {}
             virtual void FireEvent(const std::string &page_id, const std::string &ref, const std::string &event,const std::string &args,const std::string &dom_changes) {}
