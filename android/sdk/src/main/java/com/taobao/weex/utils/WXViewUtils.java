@@ -160,6 +160,8 @@ public class WXViewUtils {
   public static void updateApplicationScreen(Context context){
     DisplayMetrics metrics = context.getResources().getDisplayMetrics();
     DisplayMetrics displayMetrics =WXEnvironment.sApplication.getResources().getDisplayMetrics();
+    displayMetrics.heightPixels = metrics.heightPixels;
+    displayMetrics.widthPixels = metrics.widthPixels;
     displayMetrics.density = metrics.density;
     displayMetrics.densityDpi = metrics.densityDpi;
     displayMetrics.scaledDensity = metrics.scaledDensity;
