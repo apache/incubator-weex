@@ -154,9 +154,12 @@ _Pragma("clang diagnostic pop") \
         }
         else {
             WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-            WXSDKErrCode errorCode = WX_ERR_EAGLE_RENDER;
-            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-            instance.onFailed(error);
+            WXComponentManager *manager = instance.componentManager;
+            if (manager.isValid) {
+                WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
+                NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
+                [manager renderFailed:error];
+            }
         }
         return 0;
     }];
@@ -429,9 +432,12 @@ _Pragma("clang diagnostic pop") \
             });
         }
         else {
-            WXSDKErrCode errorCode = WX_ERR_EAGLE_RENDER;
-            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-            sdkInstance.onFailed(error);
+            WXComponentManager *manager = sdkInstance.componentManager;
+            if (manager.isValid) {
+                WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
+                NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
+                [manager renderFailed:error];
+            }
         }
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
         [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
@@ -604,9 +610,12 @@ _Pragma("clang diagnostic pop") \
             });
         }
         else {
-            WXSDKErrCode errorCode = WX_ERR_EAGLE_RENDER;
-            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-            sdkInstance.onFailed(error);
+            WXComponentManager *manager = sdkInstance.componentManager;
+            if (manager.isValid) {
+                WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
+                NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
+                [manager renderFailed:error];
+            }
         }
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
         [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
@@ -739,9 +748,12 @@ _Pragma("clang diagnostic pop") \
             });
         }
         else {
-            WXSDKErrCode errorCode = WX_ERR_EAGLE_RENDER;
-            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-            sdkInstance.onFailed(error);
+            WXComponentManager *manager = sdkInstance.componentManager;
+            if (manager.isValid) {
+                WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
+                NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
+                [manager renderFailed:error];
+            }
         }
     } else {
         [self callJSMethod:@"destroyInstance" args:@[instance]];
@@ -766,9 +778,12 @@ _Pragma("clang diagnostic pop") \
     WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
     if (sdkInstance.dataRender) {
         if (!_dataRenderHandler) {
-            WXSDKErrCode errorCode = WX_ERR_EAGLE_RENDER;
-            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-            sdkInstance.onFailed(error);
+            WXComponentManager *manager = sdkInstance.componentManager;
+            if (manager.isValid) {
+                WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
+                NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
+                [manager renderFailed:error];
+            }
             return;
         }
         WXPerformBlockOnComponentThread(^{
