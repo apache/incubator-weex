@@ -18,9 +18,11 @@
  */
 package com.taobao.weex.bridge;
 
-import android.net.Uri;
-import android.text.TextUtils;
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
+import android.net.Uri;
+import android.support.annotation.Keep;
+import android.text.TextUtils;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXHttpListener;
 import com.taobao.weex.WXSDKInstance;
@@ -28,19 +30,16 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.base.CalledByNative;
+import com.taobao.weex.bridge.WXBridgeManager.BundType;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.http.WXHttpUtil;
-
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 public class RequestHandler {
 
-  native void nativeInvokeOnSuccess(long callback, String result);
+  @Keep
+  native void nativeInvokeOnSuccess(long callback, String script, String bundleType);
   native void nativeInvokeOnFailed(long callback);
 
   @CalledByNative
@@ -90,7 +89,9 @@ public class RequestHandler {
     @Override
     public void onSuccess(WXResponse response) {
         String script = new String(response.originalData);
-        nativeInvokeOnSuccess(sNativeCallback, script);
+        BundType bundleType = WXBridgeManager.getInstance().getBundleType("", script);
+        String bundleTypeStr = bundleType == null ? "Others" : bundleType.toString();
+        nativeInvokeOnSuccess(sNativeCallback, script, bundleTypeStr);
     }
 
     @Override

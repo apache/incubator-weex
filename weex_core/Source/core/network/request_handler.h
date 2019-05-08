@@ -25,7 +25,7 @@
 namespace weex {
 namespace core {
 namespace network {
-typedef std::function<void(const std::string&)> Callback;
+typedef std::function<void(const std::string&, const std::string&)> Callback;
 
 class RequestHandler {
  public:
