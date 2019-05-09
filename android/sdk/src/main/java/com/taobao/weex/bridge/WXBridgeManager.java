@@ -2391,7 +2391,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
       instance.setHasException(true);
       exception +=   "\n getTemplateInfo==" +instance.getTemplateInfo();//add network header info
-      if ((METHOD_CREATE_INSTANCE.equals(function) || METHOD_UPDATE_COMPONENT_WITH_DATA.equals(function) || METHOD_CREATE_PAGE_WITH_CONTENT.equals(function)) || !instance.isContentMd5Match()) {
+      if ((METHOD_CREATE_INSTANCE.equals(function)) || !instance.isContentMd5Match()) {
         try {
           //data render mode should report exception instead of reload page,
           // so we use !isSkipFrameworkInit(instanceId) to skip the positive branch of if clause.
@@ -2400,14 +2400,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             instance.setNeedLoad(true);
             return;
           } else {
-            WXErrorCode degreeErrorCode;
-            if(TextUtils.equals(function, METHOD_CREATE_PAGE_WITH_CONTENT) || TextUtils.equals(function, METHOD_UPDATE_COMPONENT_WITH_DATA)){
-              degreeErrorCode = WXErrorCode.WX_DEGRAD_EAGLE_RENDER_ERROR;
-            } else {
-              degreeErrorCode = WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED;
-            }
             String errorMsg = new StringBuilder()
-                .append(degreeErrorCode.getErrorMsg())
+                .append(WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg())
                 .append(", reportJSException >>>> instanceId:").append(instanceId)
                 .append(", exception function:").append(function)
                 .append(", exception:").append(exception)
@@ -2415,17 +2409,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 .append(", extInitErrorMsg:").append(WXBridgeManager.sInitFrameWorkMsg.toString())
                 .toString();
             instance.onRenderError(//DegradPassivity to H5
-                     degreeErrorCode.getErrorCode(),
+                     WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
                      errorMsg
             );
             if (!WXEnvironment.sInAliWeex){
-              WXErrorCode errCode;
-              if (METHOD_CREATE_INSTANCE.equals(function)){
-                errCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE;
-              } else {
-                errCode = WXErrorCode.WX_RENDER_ERR_EAGLE_CREATE_PAGE;
-              }
-              WXExceptionUtils.commitCriticalExceptionRT(instanceId,errCode,function,exception,null);
+              WXExceptionUtils.commitCriticalExceptionRT(instanceId, WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE, function,exception,null);
             }
             return;
           }
@@ -2438,7 +2426,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       } else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function) && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT;
       } else if ((METHOD_UPDATE_COMPONENT_WITH_DATA.equals(function) || METHOD_CREATE_PAGE_WITH_CONTENT.equals(function)) && !instance.getApmForInstance().hasAddView){
-        reportErrorCode = WXErrorCode.WX_RENDER_ERR_EAGLE_CREATE_PAGE;
+        reportErrorCode = WXErrorCode.WX_DEGRAD_EAGLE_RENDER_ERROR;
       }
       instance.onJSException(reportErrorCode.getErrorCode(), function, exception);
     }
