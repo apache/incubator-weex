@@ -2423,7 +2423,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               if (METHOD_CREATE_INSTANCE.equals(function)){
                 errCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE;
               } else {
-                errCode = WXErrorCode.WX_DEGRAD_EAGLE_RENDER_ERROR;
+                errCode = WXErrorCode.WX_RENDER_ERR_EAGLE_CREATE_PAGE;
               }
               WXExceptionUtils.commitCriticalExceptionRT(instanceId,errCode,function,exception,null);
             }
@@ -2438,7 +2438,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       } else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function) && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT;
       } else if ((METHOD_UPDATE_COMPONENT_WITH_DATA.equals(function) || METHOD_CREATE_PAGE_WITH_CONTENT.equals(function)) && !instance.getApmForInstance().hasAddView){
-        reportErrorCode = WXErrorCode.WX_DEGRAD_EAGLE_RENDER_ERROR;
+        reportErrorCode = WXErrorCode.WX_RENDER_ERR_EAGLE_CREATE_PAGE;
       }
       instance.onJSException(reportErrorCode.getErrorCode(), function, exception);
     }
