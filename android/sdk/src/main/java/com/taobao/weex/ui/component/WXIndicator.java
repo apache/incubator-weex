@@ -93,7 +93,7 @@ public class WXIndicator extends WXComponent<WXCircleIndicator> {
           setItemSelectedColor(selected_color);
         return true;
       case Constants.Name.ITEM_SIZE:
-        Integer item_size = WXUtils.getInteger(param,null);
+        Integer item_size = WXUtils.getInteger(param,-1);
         if (item_size != null)
           setItemSize(item_size);
         return true;
