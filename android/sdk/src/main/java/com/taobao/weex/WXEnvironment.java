@@ -27,8 +27,7 @@ import android.graphics.Typeface;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import com.taobao.weex.BuildConfig;
-import com.taobao.weex.adapter.IWXJscProcessManager;
+
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.LogLevel;
@@ -181,7 +180,7 @@ public class WXEnvironment {
         addCustomOptions(WXConfig.debugMode, "true");
       }
       addCustomOptions(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
-      addCustomOptions(WXConfig.statusBarHeight, Float.toString(WXViewUtils.getStatusBarHeight(sApplication)));
+      addCustomOptions(WXConfig.androidStatusBarHeight, Float.toString(WXViewUtils.getStatusBarHeight(sApplication)));
     }catch (NullPointerException e){
       //There is little chance of NullPointerException as sApplication may be null.
       WXLogUtils.e("WXEnvironment scale Exception: ", e);

@@ -483,14 +483,13 @@ static void UpdateInitFrameworkParams(JNIEnv* env, jobject jcaller,
     return;
   }
 
-  LOGE("UpdateInitFrameworkParams");
   WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->core_side()
         ->UpdateInitFrameworkParams(jString2StrFast(env, key_),
                                     jString2StrFast(env, value_),
                                     jString2StrFast(env, desc_));
-  if(jString2StrFast(env, key_) == "statusBarHeight"){
+  if(jString2StrFast(env, key_) == "androidStatusBarHeight"){
     WXCoreEnvironment::getInstance()->PutOption(WeexCore::STATUS_BAR_HEIGHT, jString2StrFast(env, value_));
   }
 }

@@ -3191,7 +3191,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       post(new Runnable() {
         @Override
         public void run() {
-          mWXBridge.updateInitFrameworkParams("statusbarHeight",  statusHeight, "statusbarHeight");
+          mWXBridge.updateInitFrameworkParams(WXConfig.androidStatusBarHeight,  statusHeight, WXConfig.androidStatusBarHeight);
         }
       });
     }
