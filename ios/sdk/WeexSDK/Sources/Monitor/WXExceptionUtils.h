@@ -26,5 +26,7 @@
 
 + (void)commitCriticalExceptionRT:(WXJSExceptionInfo*)jsExceptionInfo;
 
++ (void)removeExceptionHistory:(NSString *)instanceId;
+
 @end
 

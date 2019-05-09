@@ -32,10 +32,27 @@
 
 @implementation WXExceptionUtils
 
+static NSMutableDictionary *recordExceptionHistory = nil;
+
 + (void)commitCriticalExceptionRT:(NSString *)instanceId errCode:(NSString *)errCode function:(NSString *)function exception:(NSString *)exception extParams:(NSDictionary *)extParams{
+    WXLogError(@"Weex exception errCode: %@ function: %@ message: %@", errCode, function, exception);
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        recordExceptionHistory = [[NSMutableDictionary alloc] init];
+    });
 
     NSMutableDictionary* extInfo = [[NSMutableDictionary alloc] initWithDictionary:extParams];
     WXPerformBlockOnComponentThread(^{
+        NSString *targetException = exception.length > 200 ? [exception substringWithRange:NSMakeRange(0, 200)] : exception;
+        NSMutableSet *exceptionSet = [recordExceptionHistory objectForKey:instanceId];
+        if (!exceptionSet) {
+            exceptionSet = [[NSMutableSet alloc] init];
+            [recordExceptionHistory setObject:exceptionSet forKey:instanceId];
+        } else if ([exceptionSet containsObject:targetException]) {
+            return;
+        }
+        [exceptionSet addObject:targetException];
+
         NSString *bundleUrlCommit = @"BundleUrlDefault";
         NSString *instanceIdCommit = @"InstanceIdDefalut";
         WXSDKInstance * instance ;
@@ -121,6 +138,14 @@
         }
     }
     return stageStr;
+}
+
++ (void)removeExceptionHistory:(NSString *)instanceId {
+    WXPerformBlockOnComponentThread(^{
+        if (recordExceptionHistory) {
+            [recordExceptionHistory removeObjectForKey:instanceId];
+        }
+    });
 }
 
 
