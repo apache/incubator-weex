@@ -37,6 +37,8 @@ import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewUtils;
+
 import dalvik.system.PathClassLoader;
 import java.io.BufferedReader;
 import java.io.File;
@@ -179,6 +181,7 @@ public class WXEnvironment {
         addCustomOptions(WXConfig.debugMode, "true");
       }
       addCustomOptions(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
+      addCustomOptions(WXConfig.statusBarHeight, Float.toString(WXViewUtils.getStatusBarHeight(sApplication)));
     }catch (NullPointerException e){
       //There is little chance of NullPointerException as sApplication may be null.
       WXLogUtils.e("WXEnvironment scale Exception: ", e);
