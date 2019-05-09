@@ -563,6 +563,8 @@ _Pragma("clang diagnostic pop") \
         [self callJSMethod:@"createInstance" args:args];
         sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = nil;
         
+        [WXExceptionUtils commitCriticalExceptionRT:instanceIdString errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_NO_BUNDLE_TYPE] function:@"createInstance" exception:@"Fatal Error : No bundle type in js bundle head, cause white screen or memory leak!!" extParams:nil];
+
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
     }
 }

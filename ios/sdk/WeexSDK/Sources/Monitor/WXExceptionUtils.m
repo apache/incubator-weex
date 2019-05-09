@@ -32,7 +32,23 @@
 
 @implementation WXExceptionUtils
 
+static NSMutableDictionary *recordExceptionHistory = nil;
+
 + (void)commitCriticalExceptionRT:(NSString *)instanceId errCode:(NSString *)errCode function:(NSString *)function exception:(NSString *)exception extParams:(NSDictionary *)extParams{
+    WXLogError(@"Weex exception errCode: %@ function: %@ message: %@", errCode, function, exception);
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        recordExceptionHistory = [[NSMutableDictionary alloc] init];
+    });
+    NSString *targetException = exception.length > 200 ? [exception substringWithRange:NSMakeRange(0, 200)] : exception;
+    NSMutableArray *exceptionArray = [recordExceptionHistory objectForKey:instanceId];
+    if (!exceptionArray) {
+        exceptionArray = [[NSMutableArray alloc] init];
+        [recordExceptionHistory setObject:exceptionArray forKey:instanceId];
+    } else if ([exceptionArray containsObject:targetException]) {
+        return;
+    }
+    [exceptionArray addObject: targetException];
 
     NSMutableDictionary* extInfo = [[NSMutableDictionary alloc] initWithDictionary:extParams];
     WXPerformBlockOnComponentThread(^{
