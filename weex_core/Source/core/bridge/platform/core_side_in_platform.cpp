@@ -30,6 +30,10 @@
 #include "core/render/page/render_page.h"
 #include "core/bridge/eagle_bridge.h"
 #include "third_party/json11/json11.hpp"
+#ifdef OS_ANDROID
+#include <android/utils/params_utils.h>
+#include <wson/wson.h>
+#endif
 
 namespace WeexCore {
 
@@ -322,6 +326,49 @@ int CoreSideInPlatform::RefreshInstance(
                                               params[1]->value.string->length);
   auto handler = EagleBridge::GetInstance()->data_render_handler();
   if (handler && handler->RefreshPage(instanceId, init_data)) {
+    std::vector<VALUE_WITH_TYPE*> msg;
+
+    VALUE_WITH_TYPE* event = getValueWithTypePtr();
+    event->type = ParamsType::BYTEARRAY;
+    auto buffer = wson_buffer_new();
+    wson_push_type_uint8_string(
+        buffer, reinterpret_cast<const uint8_t*>(instanceId), strlen(instanceId));
+    event->value.byteArray = genWeexByteArray(
+        static_cast<const char*>(buffer->data), buffer->position);
+    wson_buffer_free(buffer);
+    msg.push_back(event);
+
+    // args -> { method: 'fireEvent', args: [ref, "nodeEvent", args , domChanges, {params: [ {"templateId": templateId, "componentId": id, "type": type, "params" : [...]} ]}] }
+    VALUE_WITH_TYPE* args = getValueWithTypePtr();
+    args->type = ParamsType::JSONSTRING;
+    json11::Json final_json = json11::Json::array{
+        json11::Json::object{
+            {"method", "fireEvent"},
+            {"args",
+             json11::Json::array{
+                 "", "refresh", json11::Json::array{}, "",
+                 json11::Json::object{
+                     {"params",
+                      json11::Json::array{
+                          json11::Json::object{
+                              {"data", init_data}
+                          }
+                      }}
+                 }
+             }}
+        }
+    };
+
+    auto final_json_str = final_json.dump().c_str();
+    auto utf16_key = weex::base::to_utf16(const_cast<char*>(final_json_str),
+                                          strlen(final_json_str));
+    args->value.string = genWeexString(
+        reinterpret_cast<const uint16_t*>(utf16_key.c_str()), utf16_key.size());
+    msg.push_back(args);
+
+    WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
+        instanceId, "", "callJS", msg);
+    freeParams(msg);
     return true;
   }
   return ExecJS(instanceId, nameSpace, func, params);
