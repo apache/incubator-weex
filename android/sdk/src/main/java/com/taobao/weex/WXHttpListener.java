@@ -89,6 +89,10 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
         this.instance = instance;
     }
 
+    protected WXSDKInstance getInstance() {
+        return instance;
+    }
+
     @Override
     public void onHttpStart() {
         if (this.instance != null

@@ -31,9 +31,12 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.bridge.WXBridgeManager.BundType;
+import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.http.WXHttpUtil;
+import com.taobao.weex.utils.WXExceptionUtils;
+
 import java.util.HashMap;
 
 public class RequestHandler {
@@ -91,6 +94,15 @@ public class RequestHandler {
         String script = new String(response.originalData);
         BundType bundleType = WXBridgeManager.getInstance().getBundleType("", script);
         String bundleTypeStr = bundleType == null ? "Others" : bundleType.toString();
+        if ("Others".equalsIgnoreCase(bundleTypeStr) && null != getInstance()){
+          WXExceptionUtils.commitCriticalExceptionRT(
+              getInstance().getInstanceId(),
+              WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE,
+              "RequestHandler.onSuccess",
+              "eagle ->" +WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE.getErrorMsg(),
+              null
+          );
+        }
         nativeInvokeOnSuccess(sNativeCallback, script, bundleTypeStr);
     }
 
