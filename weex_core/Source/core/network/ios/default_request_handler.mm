@@ -33,7 +33,7 @@ namespace network {
         NSURL* nsURL = [NSURL URLWithString:NSSTRING(url)];
         [[WXSDKManager bridgeMgr] DownloadJS:@(instance_id) url:nsURL completion:^(NSString *script) {
             WXPerformBlockOnBridgeThread(^{
-                callback([script UTF8String] ? : "");
+                callback([script UTF8String] ? : "", "");
             });
         }];
     }
