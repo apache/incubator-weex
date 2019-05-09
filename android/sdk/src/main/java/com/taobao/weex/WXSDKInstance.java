@@ -744,9 +744,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
            params.setDeviceHeight(String.valueOf(WXViewUtils.getScreenHeight(mContext)));
            float density = WXEnvironment.sApplication.getResources().getDisplayMetrics().density;
            WXEnvironment.addCustomOptions(WXConfig.scale, Float.toString(density));
+           String statusBarHeight =  null;
+           if(WXViewUtils.getStatusBarHeight(mContext) > 0 ){
+             statusBarHeight = String.valueOf(WXViewUtils.getStatusBarHeight(mContext));
+           }
            WXBridgeManager.getInstance().updateInitDeviceParams(params.getDeviceWidth(),
                                                                 params.getDeviceHeight(),
-                                                                Float.toString(density));
+                                                                Float.toString(density), statusBarHeight);
            setDeviceDisplay(WXViewUtils.getScreenWidth(mContext),
                             WXViewUtils.getScreenHeight(mContext),
                             WXViewUtils.getScreenDensity(mContext));

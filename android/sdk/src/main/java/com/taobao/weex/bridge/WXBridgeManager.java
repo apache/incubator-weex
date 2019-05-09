@@ -3163,7 +3163,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     });
   }
 
-  public void updateInitDeviceParams(final String width, final String height, final String density){
+  public void updateInitDeviceParams(final String width, final String height, final String density, final String statusHeight){
     if(!isJSFrameworkInit()){
       return;
     }
@@ -3187,9 +3187,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
     });
 
-
-
-
+    if(statusHeight != null){
+      post(new Runnable() {
+        @Override
+        public void run() {
+          mWXBridge.updateInitFrameworkParams("statusbarHeight",  statusHeight, "statusbarHeight");
+        }
+      });
+    }
   }
 
   public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {

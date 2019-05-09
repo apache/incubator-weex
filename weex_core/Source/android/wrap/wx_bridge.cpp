@@ -41,6 +41,7 @@
 #include "core/layout/measure_func_adapter_impl_android.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/bridge/eagle_bridge.h"
+#include "core/common/view_utils.h"
 #include "third_party/json11/json11.hpp"
 
 using namespace WeexCore;
@@ -489,6 +490,9 @@ static void UpdateInitFrameworkParams(JNIEnv* env, jobject jcaller,
         ->UpdateInitFrameworkParams(jString2StrFast(env, key_),
                                     jString2StrFast(env, value_),
                                     jString2StrFast(env, desc_));
+  if(jString2StrFast(env, key_) == "statusBarHeight"){
+    WXCoreEnvironment::getInstance()->PutOption(WeexCore::STATUS_BAR_HEIGHT, jString2StrFast(env, value_));
+  }
 }
 
 static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller, jstring config) {

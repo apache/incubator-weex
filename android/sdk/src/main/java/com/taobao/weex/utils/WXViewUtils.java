@@ -185,6 +185,17 @@ public class WXViewUtils {
   }
 
 
+  public static int getStatusBarHeight(Context context){
+      Resources resources = context.getResources();
+      int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+      if (resourceId > 0) {
+        int statusBarHeight = resources.getDimensionPixelSize(resourceId);
+        return statusBarHeight;
+      }
+      return -1;
+  }
+
+
   @Deprecated
   public static int getScreenHeight() {
     return getScreenHeight(WXEnvironment.sApplication);
