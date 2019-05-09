@@ -316,6 +316,7 @@ void CoreSideInPlatform::AddOption(const std::string &key,
 int CoreSideInPlatform::RefreshInstance(
     const char *instanceId, const char *nameSpace, const char *func,
     std::vector<VALUE_WITH_TYPE *> &params) {
+#ifdef OS_ANDROID
   if(params.size() < 2)
     return false;
 
@@ -372,6 +373,9 @@ int CoreSideInPlatform::RefreshInstance(
     return true;
   }
   return ExecJS(instanceId, nameSpace, func, params);
+#else
+  return 0;
+#endif
 }
 
 int CoreSideInPlatform::InitFramework(
