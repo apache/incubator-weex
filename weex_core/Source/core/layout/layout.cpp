@@ -1129,6 +1129,9 @@ namespace WeexCore {
             if (child == nullptr) {
                 continue;
             }
+            if (child->mLayoutResult == nullptr || child->mCssStyle == nullptr) {
+                continue;
+            }
             // determin direction
             if (child->mLayoutResult->mLayoutDirection == kDirectionInherit) {
                 if(child->mCssStyle->mDirection == kDirectionInherit) {
