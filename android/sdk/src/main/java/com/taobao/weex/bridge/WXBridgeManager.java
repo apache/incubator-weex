@@ -43,6 +43,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
 import com.taobao.weex.adapter.IWXJscProcessManager;
@@ -872,7 +873,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
 
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        boolean reloadThisInstance = shouReloadCurrentInstance(
+        boolean reloadThisInstance = shouldReloadCurrentInstance(
                 WXSDKManager.getInstance().getSDKInstance(instanceId).getBundleUrl());
         new ActionReloadPage(instanceId, reloadThisInstance).executeAction();
       }
@@ -886,12 +887,28 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING_ERROR;
   }
 
-  public boolean shouReloadCurrentInstance(String aUrl) {
+  public boolean shouldReloadCurrentInstance(String aUrl) {
     long time = System.currentTimeMillis();
+    String bizUrl = aUrl;
+    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+    if (adapter != null) {
+        boolean check_biz_url = Boolean.parseBoolean(adapter
+                .getConfig("android_weex_ext_config",
+                        "check_biz_url",
+                        "true"));
+        WXLogUtils.e("check_biz_url : " + check_biz_url);
+        if(check_biz_url && !TextUtils.isEmpty(aUrl)) {
+            Uri uri = Uri.parse(aUrl);
+            if(uri != null) {
+                bizUrl = uri.buildUpon().clearQuery().build().toString();
+            }
+        }
+    }
+
     if (crashUrl == null ||
-            (crashUrl != null && !crashUrl.equals(aUrl)) ||
+            (crashUrl != null && !crashUrl.equals(bizUrl)) ||
             ((time - lastCrashTime) > 15000)) {
-      crashUrl = aUrl;
+      crashUrl = bizUrl;
       lastCrashTime = time;
       return true;
     }
