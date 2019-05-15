@@ -443,6 +443,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     init(context);
   }
 
+  //for preInit
+  public WXSDKInstance(){
+    mInstanceId = WXSDKManager.getInstance().generateInstanceId();
+    mWXPerformance = new WXPerformance(mInstanceId);
+    mApmForInstance = new WXInstanceApm(mInstanceId);
+  }
+
+
   /**
    * For unittest only.
    */
@@ -495,8 +503,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mContainerInfo = new HashMap<>(4);
     mNativeInvokeHelper = new NativeInvokeHelper(mInstanceId);
 
-    mWXPerformance = new WXPerformance(mInstanceId);
-    mApmForInstance = new WXInstanceApm(mInstanceId);
+    if (null == mWXPerformance){
+      mWXPerformance = new WXPerformance(mInstanceId);
+    }
+    if (null == mApmForInstance){
+      mApmForInstance = new WXInstanceApm(mInstanceId);
+    }
+
     mWXPerformance.WXSDKVersion = WXEnvironment.WXSDK_VERSION;
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
 
@@ -687,6 +700,55 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     renderInternal(pageName, new Script(template), options, jsonInitData, flag);
   }
 
+  private boolean isPreInit = false;
+  public boolean isPreInitMode(){
+    return isPreInit;
+  }
+
+  private boolean isPreDownLoad =false;
+  public boolean isPreDownLoad(){
+    return isPreDownLoad;
+  }
+
+  public void onInstanceReady(){
+    WXLogUtils.e("test->","onInstanceReady");
+    mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_CONTAINER_READY);
+    if (!isPreInit && !isPreDownLoad){
+      return;
+    }
+    mApmForInstance.onInstanceReady(isPreDownLoad);
+    if (isPreDownLoad){
+        mHttpListener.onInstanceReady();
+    }
+  }
+
+  public void preInit(String pageName,
+                      String script,
+                      Map<String, Object> options,
+                      String jsonInitData,
+                      WXRenderStrategy flag){
+    isPreInit = true;
+    mRenderStrategy = flag;
+    Map<String, Object> renderOptions = options;
+    if (renderOptions == null) {
+      renderOptions = new HashMap<>();
+    }
+    //mApmForInstance.doInit();
+    mApmForInstance.isReady = false;
+    WXSDKManager.getInstance().createInstance(this, new Script(script), renderOptions, jsonInitData);
+  }
+
+  public void preDownLoad(String url,
+                          Map<String, Object> options,
+                          String jsonInitData,
+                          WXRenderStrategy flag){
+    this.isPreDownLoad =true;
+    mRenderStrategy = flag;
+    mApmForInstance.isReady = false;
+    renderByUrl(url,url,options,jsonInitData,flag);
+  }
+
+
   private void renderInternal(String pageName,
                               Script template,
                               Map<String, Object> options,
@@ -761,7 +823,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
                             WXViewUtils.getScreenDensity(mContext));
          }
     }
-    WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
+    if (isPreInitMode()){
+      getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_START);
+      WXBridgeManager.getInstance().loadJsBundleInPreInitMode(getInstanceId(),template.getContent());
+    } else {
+      WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
+    }
     mRendered = true;
 
     final IWXJscProcessManager wxJscProcessManager = WXSDKManager.getInstance().getWXJscProcessManager();
@@ -858,12 +925,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     wxRequest.instanceId = getInstanceId();
     wxRequest.paramMap.put(KEY_USER_AGENT, WXHttpUtil.assembleUserAgent(mContext,WXEnvironment.getConfig()));
     wxRequest.paramMap.put("isBundleRequest","true");
-    WXHttpListener httpListener =
-            new WXHttpListener(this, pageName, renderOptions, jsonInitData, flag, System.currentTimeMillis());
-    httpListener.setSDKInstance(this);
+    mHttpListener = new WXHttpListener(this, pageName, renderOptions, jsonInitData, flag, System.currentTimeMillis());
+    mHttpListener.isPreDownLoadMode = isPreDownLoad;
+    mHttpListener.setSDKInstance(this);
     mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
-    adapter.sendRequest(wxRequest, (IWXHttpAdapter.OnHttpListener) httpListener);
+    adapter.sendRequest(wxRequest, (IWXHttpAdapter.OnHttpListener) mHttpListener);
   }
+
+  private WXHttpListener mHttpListener = null;
 
   /**
    * Use {@link #render(String, String, Map, String, WXRenderStrategy)} instead.
@@ -1714,6 +1783,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     this.mRootComp = root;
     this.mRootComp.mDeepInComponentTree =1;
     mRenderContainer.addView(root.getHostView());
+
+
     setSize(mRenderContainer.getWidth(),mRenderContainer.getHeight());
   }
 

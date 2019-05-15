@@ -47,6 +47,9 @@ import android.widget.Toast;
 
 import com.alibaba.weex.R;
 import com.alibaba.weex.WXPageActivity;
+import com.alibaba.weex.WXPreLoadManager;
+import com.alibaba.weex.constants.Constants;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.DecodeHintType;
 import com.google.zxing.Result;
@@ -587,6 +590,13 @@ public final class CaptureActivity extends Activity implements
 				finish();
 				return;
 			} else {
+				String urlData = uri.getQueryParameter(Constants.WEEX_TPL_KEY);
+				if (TextUtils.isEmpty(urlData)){
+					urlData = code;
+				}
+				Log.d("test->", "before nav activity ");
+
+				WXPreLoadManager.getInstance().preLoad(urlData);
 				Toast.makeText(this, rawResult.getText(), Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent(CaptureActivity.this, WXPageActivity.class);
 				intent.setData(Uri.parse(code));
