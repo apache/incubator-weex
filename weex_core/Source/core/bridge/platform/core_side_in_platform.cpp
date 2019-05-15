@@ -492,7 +492,7 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
               ->script_side()
               ->CreateInstance(instanceId.c_str(), func.c_str(), result,
                                opts_json.dump().c_str(), initData.c_str(),
-                               strcmp("Rax", bundleType) ? extendsApi.c_str() : "\0",
+                               strcmp("Rax", bundleType) ? "\0" : extendsApi.c_str(),
                                params);
         };
     if (strcmp(render_strategy, "DATA_RENDER") == 0) {
