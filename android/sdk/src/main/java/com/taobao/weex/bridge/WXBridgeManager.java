@@ -1576,12 +1576,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXJSObject optionsObj = new WXJSObject(WXJSObject.JSON,
                 options == null ? "{}"
                         : WXJsonUtils.fromObjectToJSONString(options));
-        optionsObj = optionObjConvert(isSandBoxContext, type, optionsObj);
+        optionsObj = optionObjConvert(isSandBoxContext, type, instance.getRenderStrategy(), optionsObj);
         WXJSObject dataObj = new WXJSObject(WXJSObject.JSON,
                 data == null ? "{}" : data);
 
         WXJSObject apiObj;
-        if (type == BundType.Rax || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER) {
+        if (type == BundType.Rax ||
+            instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER ||
+            instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY) {
           if (mRaxApi == null) {
             IWXJsFileLoaderAdapter iwxJsFileLoaderAdapter = WXSDKEngine.getIWXJsFileLoaderAdapter();
             if(iwxJsFileLoaderAdapter != null) {
@@ -1659,8 +1661,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
   }
 
-  public WXJSObject optionObjConvert(boolean useSandBox, BundType type, WXJSObject opt) {
-    if (!useSandBox || type == BundType.Others) {
+  public WXJSObject optionObjConvert(boolean useSandBox, BundType type, WXRenderStrategy renderStrategy, WXJSObject opt){
+    if (!useSandBox || (type == BundType.Others && renderStrategy != WXRenderStrategy.DATA_RENDER && renderStrategy != WXRenderStrategy.DATA_RENDER_BINARY )) {
       return opt;
     }
     try {
@@ -1689,7 +1691,18 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       e.printStackTrace();
     }
     return opt;
+  }
 
+  /**
+   * Use {@link #optionObjConvert(boolean, BundType, WXRenderStrategy, WXJSObject)} instead
+   * @param useSandBox
+   * @param type
+   * @param opt
+   * @return
+   */
+  @Deprecated
+  public WXJSObject optionObjConvert(boolean useSandBox, BundType type, WXJSObject opt) {
+    return optionObjConvert(useSandBox, type, null, opt);
   }
 
   /**
