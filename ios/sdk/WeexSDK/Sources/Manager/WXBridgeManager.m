@@ -326,9 +326,11 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
         WXComponentManager *manager = sdkInstance.componentManager;
         if (manager.isValid) {
             NSString *errorMessage = [NSString stringWithFormat:@"Request to %@ occurs an error:%@, info:%@", request.URL, loadError.localizedDescription, loadError.userInfo];
-            WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_JS_DOWNLOAD_ERROR;
+            WXSDKErrCode errorCode = WX_KEY_EXCEPTION_JS_DOWNLOAD;
             NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{NSLocalizedDescriptionKey:(errorMessage?:@"No message")}];
-            [manager renderFailed:error];
+            WXPerformBlockOnComponentThread(^{
+                [manager renderFailed:error];
+            });
         }
     };
 
@@ -443,7 +445,9 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
             if (manager.isValid) {
                 WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
                 NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-                [manager renderFailed:error];
+                WXPerformBlockOnComponentThread(^{
+                    [manager renderFailed:error];
+                });
             }
         }
         return;
@@ -521,7 +525,9 @@ void WXPerformBlockSyncOnBridgeThread(void (^block) (void))
             if (manager.isValid) {
                 WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
                 NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-                [manager renderFailed:error];
+                WXPerformBlockOnComponentThread(^{
+                    [manager renderFailed:error];
+                });
             }
         }
     }
