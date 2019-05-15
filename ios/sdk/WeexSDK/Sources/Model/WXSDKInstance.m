@@ -290,7 +290,9 @@ typedef enum : NSUInteger {
                 if (self.componentManager.isValid) {
                     WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
                     NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-                    [self.componentManager renderFailed:error];
+                    WXPerformBlockOnComponentThread(^{
+                        [self.componentManager renderFailed:error];
+                    });
                 }
             }
             return;
