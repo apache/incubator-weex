@@ -18,6 +18,7 @@
  */
 package com.taobao.weex;
 
+import static com.taobao.weex.common.WXErrorCode.WX_ERR_JSC_CRASH;
 import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
@@ -912,6 +913,18 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       //    destroy();
       // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
       // refreshInstance("{}");
+    } else {
+      IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+      if (adapter != null) {
+        boolean degrade = Boolean.parseBoolean(adapter
+                .getConfig("android_weex_ext_config",
+                        "degrade_to_h5_if_not_reload",
+                        "true"));
+        WXLogUtils.e("degrade : " + degrade);
+        if(degrade) {
+          onJSException(String.valueOf(WX_ERR_JSC_CRASH.getErrorCode()),"jsc Crashed", "jsc Crashed degradeToH5");
+        }
+      }
     }
   }
 
