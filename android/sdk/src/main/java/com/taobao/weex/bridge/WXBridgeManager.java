@@ -1581,7 +1581,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 data == null ? "{}" : data);
 
         WXJSObject apiObj;
-        if (type == BundType.Rax) {
+        if (type == BundType.Rax || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER) {
           if (mRaxApi == null) {
             IWXJsFileLoaderAdapter iwxJsFileLoaderAdapter = WXSDKEngine.getIWXJsFileLoaderAdapter();
             if(iwxJsFileLoaderAdapter != null) {
