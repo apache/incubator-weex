@@ -79,6 +79,7 @@ import com.taobao.weex.ui.component.WXEmbed;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.utils.Trace;
+import com.taobao.weex.utils.WXDeviceUtils;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
@@ -738,7 +739,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mApmForInstance.addStats(WXInstanceApm.KEY_PAGE_STATS_BUNDLE_SIZE,mWXPerformance.JSTemplateSize);
     mRenderStartTime = System.currentTimeMillis();
     WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);;
-    if(mAutoAdjustDeviceWidth){
+    if(mAutoAdjustDeviceWidth && WXDeviceUtils.isAutoResize(mContext)){
          if(WXEnvironment.AUTO_UPDATE_APPLICATION_SCREEN_SIZE) {
              WXViewUtils.updateApplicationScreen(mContext);
          }
