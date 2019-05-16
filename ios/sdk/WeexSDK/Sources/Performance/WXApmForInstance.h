@@ -38,6 +38,7 @@ extern NSString* const KEY_PAGE_PROPERTIES_CONTAINER_NAME;
 extern NSString* const KEY_PAGE_PROPERTIES_INSTANCE_TYPE;
 extern NSString* const KEY_PAGE_PROPERTIES_PARENT_PAGE;
 extern NSString* const KEY_PAGE_PROPERTIES_RENDER_TYPE;
+extern NSString* const KEY_PAGE_PROPERTIES_UIKIT_TYPE;
 
 
 ///************** stages *****************/

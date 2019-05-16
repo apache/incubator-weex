@@ -140,6 +140,8 @@ typedef enum : NSUInteger {
         _performance = [[WXPerformance alloc] init];
         _apmInstance = [[WXApmForInstance alloc] init];
         
+        [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
+        
         _defaultPixelScaleFactor = CGFLOAT_MIN;
         _defaultDataRender = NO;
         
