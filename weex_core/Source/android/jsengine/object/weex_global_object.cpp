@@ -250,7 +250,7 @@ void WeexGlobalObject::initFunction() {
             {"setIntervalWeex",       JSC::Function, NoIntrinsic, {(intptr_t) static_cast<NativeFunction>(functionSetIntervalWeex),     (intptr_t) (3)}},
             {"clearIntervalWeex",     JSC::Function, NoIntrinsic, {(intptr_t) static_cast<NativeFunction>(functionClearIntervalWeex),   (intptr_t) (1)}},
             {"callT3DLinkNative",     JSC::Function, NoIntrinsic, {(intptr_t) static_cast<NativeFunction>(functionT3DLinkNative),       (intptr_t) (2)}},
-            {"__updateComponentData",     JSC::Function, NoIntrinsic, {(intptr_t) static_cast<NativeFunction>(functionUpdateComponentData),       (intptr_t) (3)}},
+            {"__updateComponentData", JSC::Function, NoIntrinsic, {(intptr_t) static_cast<NativeFunction>(functionUpdateComponentData),       (intptr_t) (3)}},
 //            {"setNativeTimeout",      JSC::Function, NoIntrinsic, {(intptr_t) static_cast<NativeFunction>(functionNativeSetTimeout),    (intptr_t) (2)}},
 //            {"setNativeInterval",     JSC::Function, NoIntrinsic, {(intptr_t) static_cast<NativeFunction>(functionNativeSetInterval),  (intptr_t) (2)}},
 //            {"clearNativeTimeout",    JSC::Function, NoIntrinsic, {(intptr_t) static_cast<NativeFunction>(functionNativeClearTimeout),  (intptr_t) (1)}},
@@ -306,6 +306,21 @@ JSValue WeexGlobalObject::getTimerFunction(uint32_t function_id) {
     if (iter == function_maps_.end())
         return jsUndefined();
    return function_maps_[function_id].get();
+}
+
+void WeexGlobalObject::updateInitFrameworkParams(const std::string &key,
+                                                 const std::string &value) {
+
+    LOGE("updateInitFrameworkParams %s %s ", key.data(), value.data());
+    for(INIT_FRAMEWORK_PARAMS* param : m_initFrameworkParams){
+        if(key.length() == param->type->length){
+            if(strncmp(key.data(), param->type->content, key.length()) == 0){
+                WeexByteArray * oldValue = param->value;
+                param->value = genWeexByteArraySS(value.data(), value.length());
+                free(oldValue);
+            }
+        }
+    }
 }
 
 JSFUNCTION functionGCAndSweep(ExecState *exec) {

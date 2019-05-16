@@ -165,6 +165,10 @@ void PlatformBridgeInMultiProcess::RegisterIPCCallback(IPCHandler* handler) {
   handler->registerHandler(
       static_cast<uint32_t>(IPCMsgFromPlatformToCore::UPDATE_GLOBAL_CONFIG),
       UpdateGlobalConfig);
+
+  handler->registerHandler(
+        static_cast<uint32_t>(IPCMsgFromPlatformToCore::UpdateInitFrameworkParams),
+        UpdateInitFrameworkParams);
 }
 
 std::unique_ptr<IPCResult>
@@ -743,6 +747,17 @@ std::unique_ptr<IPCResult> PlatformBridgeInMultiProcess::UpdateGlobalConfig(
   LOGE("IPC UpdateGlobalConfig");
   const char* configString = arguments->getByteArray(0)->content;
   Instance()->core_side()->UpdateGlobalConfig(configString);
+  return createVoidResult();
+}
+
+
+std::unique_ptr<IPCResult> PlatformBridgeInMultiProcess::UpdateInitFrameworkParams(
+    IPCArguments* arguments) {
+  LOGE("IPC UpdateInitFrameworkParams");
+  const char* key = arguments->getByteArray(0)->content;
+  const char* value = arguments->getByteArray(1)->content;
+  const char* desc = arguments->getByteArray(2)->content;
+  Instance()->core_side()->UpdateInitFrameworkParams(key, value, desc);
   return createVoidResult();
 }
 

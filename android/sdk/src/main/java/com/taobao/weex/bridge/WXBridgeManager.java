@@ -3189,6 +3189,49 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return new long[]{0, 0, 0};
   }
 
+  public void setDeviceDisplay(final String instanceId, final float deviceWidth, final float deviceHeight, final float scale) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.setDeviceDisplay(instanceId, deviceWidth, deviceHeight, scale);
+      }
+    });
+  }
+
+  public void updateInitDeviceParams(final String width, final String height, final String density, final String statusHeight){
+    if(!isJSFrameworkInit()){
+      return;
+    }
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.updateInitFrameworkParams(WXConfig.deviceWidth, width, WXConfig.deviceWidth);
+      }
+    });
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.updateInitFrameworkParams(WXConfig.deviceHeight, height, WXConfig.deviceHeight);
+      }
+    });
+
+    post(new Runnable() {
+      @Override
+      public void run() {
+        mWXBridge.updateInitFrameworkParams(WXConfig.scale,  density, WXConfig.scale);
+      }
+    });
+
+    if(statusHeight != null){
+      post(new Runnable() {
+        @Override
+        public void run() {
+          mWXBridge.updateInitFrameworkParams(WXConfig.androidStatusBarHeight,  statusHeight, WXConfig.androidStatusBarHeight);
+        }
+      });
+    }
+  }
+
   public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
     if (isSkipFrameworkInit(instanceId) || isJSFrameworkInit()) {
       mWXBridge.setMargin(instanceId, ref, edge, value);

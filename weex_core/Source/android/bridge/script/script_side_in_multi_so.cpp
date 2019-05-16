@@ -174,6 +174,16 @@ int ScriptSideInMultiSo::UpdateGlobalConfig(const char *config) {
   }
   return script_side_functions_->funcUpdateGlobalConfig(config);
 }
+
+int ScriptSideInMultiSo::UpdateInitFrameworkParams(const std::string &key, const std::string &value,
+                                                   const std::string &desc) {
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::UpdateInitFrameworkParams script_side_functions_ is null");
+    return false;
+  }
+  return script_side_functions_->funcUpdateInitFrameworkParams(key, value, desc);
+}
+
 }  // namespace script
 }  // namespace bridge
 }  // namespace WeexCore

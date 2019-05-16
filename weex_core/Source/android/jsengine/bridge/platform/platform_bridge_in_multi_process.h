@@ -83,6 +83,8 @@ class PlatformBridgeInMultiProcess : public WeexCore::PlatformBridge {
   IPC_METHOD(ExecJSOnInstance)
   IPC_METHOD(DestroyInstance)
   IPC_METHOD(UpdateGlobalConfig)
+  IPC_METHOD(UpdateInitFrameworkParams)
+   
 
  private:
   PlatformBridgeInMultiProcess();

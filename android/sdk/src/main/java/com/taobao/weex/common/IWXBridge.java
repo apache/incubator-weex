@@ -52,6 +52,13 @@ public interface IWXBridge extends IWXObject {
    */
   int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
 
+
+  /**
+   * Update InitFramework Params
+   * */
+  void updateInitFrameworkParams(String key, String value, String desc);
+
+
   void refreshInstance(String instanceId, String namespace, String function, WXJSObject[] args);
 
   /**
@@ -187,6 +194,8 @@ public interface IWXBridge extends IWXObject {
   void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value);
 
   void markDirty(String instanceId, String ref, boolean dirty);
+
+  void setDeviceDisplay(String instanceId, float width, float height, float scale);
 
   void registerCoreEnv(String key, String value);
 

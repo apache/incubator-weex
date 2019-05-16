@@ -98,6 +98,9 @@ class CoreSideInSimple : public WeexCore::PlatformBridge::CoreSide {
     int DestroyInstance(const char *instanceId) override;
     int UpdateGlobalConfig(const char *config) override;
 
+    int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) override;
+
+
  private:
   DISALLOW_COPY_AND_ASSIGN(CoreSideInSimple);
 };

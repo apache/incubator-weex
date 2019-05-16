@@ -372,7 +372,7 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
   }
   if (!WXCoreEnvironment::getInstance()->SetDeviceWidth(
           jString2StrFast(env, reinterpret_cast<jstring&>(deviceWidth)))) {
-    LOGD("setDeviceWidth");
+    LOGD("setDeviceDisplay");
   }
   ADDSTRING(deviceWidth);
   env->DeleteLocalRef(deviceWidth);

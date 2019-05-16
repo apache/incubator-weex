@@ -27,8 +27,7 @@ import android.graphics.Typeface;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import com.taobao.weex.BuildConfig;
-import com.taobao.weex.adapter.IWXJscProcessManager;
+
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.LogLevel;
@@ -37,6 +36,8 @@ import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewUtils;
+
 import dalvik.system.PathClassLoader;
 import java.io.BufferedReader;
 import java.io.File;
@@ -80,6 +81,14 @@ public class WXEnvironment {
   public static final String SETTING_EXCLUDE_X86SUPPORT = "env_exclude_x86";
 
   public static boolean SETTING_FORCE_VERTICAL_SCREEN = false;
+
+  /**
+   * auto adjust device width for when screen size change.
+   * */
+  public static boolean AUTO_ADJUST_ENV_DEVICE_WIDTH = true;
+
+  public static boolean AUTO_UPDATE_APPLICATION_SCREEN_SIZE = true;
+
   /**
    * Debug model
    */
@@ -171,6 +180,7 @@ public class WXEnvironment {
         addCustomOptions(WXConfig.debugMode, "true");
       }
       addCustomOptions(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
+      addCustomOptions(WXConfig.androidStatusBarHeight, Float.toString(WXViewUtils.getStatusBarHeight(sApplication)));
     }catch (NullPointerException e){
       //There is little chance of NullPointerException as sApplication may be null.
       WXLogUtils.e("WXEnvironment scale Exception: ", e);

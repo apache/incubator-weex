@@ -108,9 +108,16 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeMarkDirty(String instanceId, String ref, boolean dirty);
 
+  private native void nativeSetDeviceDisplay(String instanceId, float width, float height, float scale);
+
   private native void nativeRegisterCoreEnv(String key, String value);
 
   private native void nativeResetWXBridge(Object bridge, String className);
+
+  /**
+   * Update Init Framework Params
+   * */
+  private native void nativeUpdateInitFrameworkParams(String key, String value, String desc);
 
   /**
    * update global config,
@@ -119,6 +126,12 @@ public class WXBridge implements IWXBridge {
   public native void nativeUpdateGlobalConfig(String config);
 
   public static final boolean MULTIPROCESS = true;
+
+
+  @Override
+  public void updateInitFrameworkParams(String key, String value, String desc){
+     nativeUpdateInitFrameworkParams(key, value, desc);
+  }
 
   @Override
   public int initFramework(String framework, WXParams params) {
@@ -700,6 +713,11 @@ public class WXBridge implements IWXBridge {
   @Override
   public void markDirty(String instanceId, String ref, boolean dirty) {
     nativeMarkDirty(instanceId, ref, dirty);
+  }
+
+  @Override
+  public void setDeviceDisplay(String instanceId, float width, float height, float scale) {
+    nativeSetDeviceDisplay(instanceId, width, height, scale);
   }
 
   @Override

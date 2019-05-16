@@ -64,6 +64,7 @@ RenderPage::RenderPage(const std::string &page_id)
       WXCoreEnvironment::getInstance()->DeviceWidth();
   this->render_page_size_.second = NAN;
   this->viewport_width_ = kDefaultViewPortWidth;
+  this->device_width_ = WXCoreEnvironment::getInstance()->DeviceWidth();
 }
 
 RenderPage::~RenderPage() {

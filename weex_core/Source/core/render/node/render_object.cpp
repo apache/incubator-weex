@@ -370,6 +370,7 @@ bool RenderObject::UpdateStyleInternal(const std::string key,
   } else {
     float fvalue = getFloatByViewport(value,
                                       RenderManager::GetInstance()->viewport_width(page_id()),
+                                      RenderManager::GetInstance()->DeviceWidth(page_id()),
                                       RenderManager::GetInstance()->round_off_deviation(page_id()));
     if (!isnan(fvalue)) {
       functor(fvalue);
