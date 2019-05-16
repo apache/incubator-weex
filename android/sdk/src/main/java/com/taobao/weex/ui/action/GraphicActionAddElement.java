@@ -89,7 +89,9 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
         if (null != child.getAttrs()){
           flag = child.getAttrs().get("ignoreInteraction");
         }
-        if ("1".equals(flag) || "true".equals(flag) || child.isFixed()){
+        if ("false".equals(flag) || "0".equals(flag)){
+          child.isIgnoreInteraction = false;
+        }else if ("1".equals(flag) || "true".equals(flag) || child.isFixed()){
           child.isIgnoreInteraction = true;
         }
       }

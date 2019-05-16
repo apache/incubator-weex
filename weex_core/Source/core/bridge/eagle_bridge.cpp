@@ -130,10 +130,10 @@ namespace WeexCore {
     }
     
     void EagleBridge::WeexCoreHandler::ReportException(const char* page_id, const char* func, const char* exception_string) {
-        WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id, nullptr, exception_string);
+        WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(page_id, func, exception_string);
     }
     
-    void EagleBridge::WeexCoreHandler::Send(const char* instance_id, const char* url, std::function<void(const std::string&)> callback) {
+    void EagleBridge::WeexCoreHandler::Send(const char* instance_id, const char* url, std::function<void(const std::string&, const std::string&)> callback) {
         weex::core::network::HttpModule http_module;
         http_module.Send(instance_id, url, callback);
     }
@@ -157,6 +157,12 @@ namespace WeexCore {
         ->getPlatformBridge()
         ->platform_side()
         ->RegisterPluginModule(name.c_str(), class_name.c_str(), version.c_str());
+    }
+    std::unique_ptr<ValueWithType> EagleBridge::WeexCoreHandler::RegisterPluginComponent(const std::string &name, const std::string &class_name, const std::string &version) {
+        return WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->platform_side()
+        ->RegisterPluginComponent(name.c_str(), class_name.c_str(), version.c_str());
     }
 
     void EagleBridge::WeexCoreHandler::PostTaskOnComponentThread(const weex::base::Closure& closure) {

@@ -613,6 +613,13 @@ namespace WeexCore {
     void layoutHorizontal(bool isRtl, float left, float top, float right, float bottom,
                           WXCoreLayoutNode*, WXCoreFlexLine *const flexLine);
 
+      void layoutFlexlineHorizontal(const bool isRTL,
+                                    const float width,
+                                    const WXCoreFlexLine *const flexLine,
+                                    float &childLeft,
+                                    float &childRight,
+                                    float &spaceBetweenItem) const;
+      
     void layoutFlexlineHorizontal(const float width,
                                          const WXCoreFlexLine *const flexLine,
                                          float &childLeft,

@@ -26,11 +26,15 @@
 using namespace weex::core::network;
 
 static void InvokeOnSuccess(JNIEnv* env, jobject jcaller, jlong callback,
-                            jstring result) {
+                            jstring script,
+                            jstring bundleType) {
   CallbackWrapper* callback_wrapper =
       reinterpret_cast<CallbackWrapper*>(callback);
-  WeexCore::ScopedJStringUTF8 jni_result(env, result);
-  callback_wrapper->Invoke(jni_result.getChars() ? jni_result.getChars() : "");
+  WeexCore::ScopedJStringUTF8 jni_result(env, script);
+  WeexCore::ScopedJStringUTF8 bundleTypeStr(env, bundleType);
+  callback_wrapper->Invoke(
+      jni_result.getChars() ? jni_result.getChars() : "",
+      bundleTypeStr.getChars());
   delete callback_wrapper;
 }
 

@@ -25,5 +25,8 @@
 + (void)commitCriticalExceptionRT:(NSString *)instanceId errCode:(NSString *)errCode function:(NSString *)function exception:(NSString *)exception extParams:(NSDictionary *)extParams;
 
 + (void)commitCriticalExceptionRT:(WXJSExceptionInfo*)jsExceptionInfo;
+
++ (void)removeExceptionHistory:(NSString *)instanceId;
+
 @end
 

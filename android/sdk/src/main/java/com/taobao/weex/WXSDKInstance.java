@@ -18,6 +18,7 @@
  */
 package com.taobao.weex;
 
+import static com.taobao.weex.common.WXErrorCode.WX_ERR_JSC_CRASH;
 import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
@@ -42,6 +43,7 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IDrawableLoader;
+import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJscProcessManager;
@@ -169,6 +171,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * Render strategy.
    */
   private WXRenderStrategy mRenderStrategy = WXRenderStrategy.APPEND_ASYNC;
+
+  private boolean mDisableSkipFrameworkInit = false;
 
   /**
    * Render start time
@@ -506,7 +510,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mContainerInfo.put(WXInstanceApm.KEY_PAGE_PROPERTIES_INSTANCE_TYPE,"page");
 
     WXBridgeManager.getInstance().checkJsEngineMultiThread();
-
+    mDisableSkipFrameworkInit = isDisableSkipFrameworkInDataRender();
   }
 
   /**
@@ -783,6 +787,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
+  public boolean skipFrameworkInit(){
+    return isDataRender() && !mDisableSkipFrameworkInit;
+  }
+
+  private boolean isDataRender() {
+    return getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY || getRenderStrategy() == WXRenderStrategy.DATA_RENDER;
+  }
+
   private void renderByUrlInternal(String pageName,
                                    final String url,
                                    Map<String, Object> options,
@@ -946,6 +958,18 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       //    destroy();
       // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
       // refreshInstance("{}");
+    } else {
+      IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+      if (adapter != null) {
+        boolean degrade = Boolean.parseBoolean(adapter
+                .getConfig("android_weex_ext_config",
+                        "degrade_to_h5_if_not_reload",
+                        "true"));
+        WXLogUtils.e("degrade : " + degrade);
+        if(degrade) {
+          onJSException(String.valueOf(WX_ERR_JSC_CRASH.getErrorCode()),"jsc Crashed", "jsc Crashed degradeToH5");
+        }
+      }
     }
   }
 
@@ -2085,5 +2109,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(!getInstanceOnFireEventInterceptorList().contains(instanceOnFireEventInterceptor)){
       getInstanceOnFireEventInterceptorList().add(instanceOnFireEventInterceptor);
     }
+  }
+
+  private static boolean isDisableSkipFrameworkInDataRender() {
+    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+    if (adapter == null) {
+      return false;
+    }
+    String result = adapter.getConfig("wxeagle", "disable_skip_framework_init", "false");
+    return "true".equals(result);
   }
 }

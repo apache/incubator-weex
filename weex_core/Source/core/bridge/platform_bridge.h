@@ -177,6 +177,7 @@ class PlatformBridge {
                                      int options_length) = 0;
 #if OS_IOS
     virtual std::unique_ptr<ValueWithType> RegisterPluginModule(const char *name, const char *class_name, const char *version) = 0;
+    virtual std::unique_ptr<ValueWithType> RegisterPluginComponent(const char *name, const char *class_name, const char *version) = 0;
     virtual void PostTaskOnComponentThread(const weex::base::Closure closure) = 0;
 #endif
     virtual void SetTimeout(const char* callback_id, const char* time) = 0;
