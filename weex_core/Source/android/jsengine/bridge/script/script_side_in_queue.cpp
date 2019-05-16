@@ -299,7 +299,7 @@ int ScriptSideInQueue::UpdateInitFrameworkParams(const std::string& key, const s
  LOGD("ScriptSideInQueue::UpdateInitFrameworkParams");
   weexTaskQueue_->addTask(new UpdateInitFrameworkParamsTask(key, value, desc));
   if (WeexEnv::getEnv()->enableBackupThread()) {
-    UpdateInitFrameworkParamsTask* task = new UpdateInitFrameworkParamsTask(key, value, desc)
+    UpdateInitFrameworkParamsTask* task = new UpdateInitFrameworkParamsTask(key, value, desc);
     if(WeexEnv::getEnv()->can_m_cache_task_() && weexTaskQueue_bk_ == nullptr){
       WeexEnv::getEnv()->m_task_cache_.push_back(task);
     } else {
