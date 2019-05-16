@@ -34,7 +34,6 @@ import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -108,7 +107,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -1581,7 +1579,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 data == null ? "{}" : data);
 
         WXJSObject apiObj;
-        if (type == BundType.Rax) {
+        if (type == BundType.Rax || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER) {
           if (mRaxApi == null) {
             IWXJsFileLoaderAdapter iwxJsFileLoaderAdapter = WXSDKEngine.getIWXJsFileLoaderAdapter();
             if(iwxJsFileLoaderAdapter != null) {
@@ -1660,31 +1658,22 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public WXJSObject optionObjConvert(boolean useSandBox, BundType type, WXJSObject opt) {
-    if (!useSandBox || type == BundType.Others) {
+    if (!useSandBox) {
       return opt;
     }
     try {
       String data = opt.data.toString();
       JSONObject obj = JSON.parseObject(data);
-      if (obj.getJSONObject("env") != null) {
-        JSONObject optEnv = obj.getJSONObject("env");
-        // obj.replace()
-        if (optEnv != null) {
-          JSONObject opts = optEnv.getJSONObject("options");
-          if (opts!= null) {
-            optEnv.remove("options");
-            Set<String> set = opts.keySet();
-            for(Iterator it = set.iterator(); it.hasNext();) {
-              String key = it.next().toString();
-              optEnv.put(key, opts.getString(key));
-            }
+      JSONObject optEnv;
+      if ((optEnv = obj.getJSONObject("env")) != null) {
+        JSONObject opts = optEnv.getJSONObject("options");
+        if (opts != null) {
+          for (String s : opts.keySet()) {
+            optEnv.put(s, opts.getString(s));
           }
         }
-        obj.remove("env");
-        obj.put("env", optEnv);
       }
-      WXJSObject optionsObj = new WXJSObject(WXJSObject.JSON, obj.toString());
-      return optionsObj;
+      return new WXJSObject(WXJSObject.JSON, obj.toString());
     } catch (Throwable e) {
       e.printStackTrace();
     }
