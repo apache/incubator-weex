@@ -311,25 +311,15 @@ JSValue WeexGlobalObject::getTimerFunction(uint32_t function_id) {
 void WeexGlobalObject::updateInitFrameworkParams(const std::string &key,
                                                  const std::string &value) {
 
-    LOGE("updateInitFrameworkParams %s %s ",
-         key.data(),
-         value.data());
-    //FIXME Init Framework Params
+    LOGE("updateInitFrameworkParams %s %s ", key.data(), value.data());
     for(INIT_FRAMEWORK_PARAMS* param : m_initFrameworkParams){
         if(key.length() == param->type->length){
             if(strncmp(key.data(), param->type->content, key.length()) == 0){
                 WeexByteArray * oldValue = param->value;
                 param->value = genWeexByteArraySS(value.data(), value.length());
                 free(oldValue);
-                LOGE("updateInitFrameworkParams Success");
             }
         }
-
-        LOGE("updateInitFrameworkParams %s %s %d %d",
-                param->type->content,
-                param->value->content,
-                param->type->length,
-                param->value->length);
     }
 }
 

@@ -135,7 +135,6 @@ protected:
         addValue(vm, this, name, value);
     }
 
-    //void updateVate(VM& VM);
 
     // use map to store timer js function, avoid the object be gc
     std::map<uint32_t, JSC::Strong<JSC::Unknown>> function_maps_;
