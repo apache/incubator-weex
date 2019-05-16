@@ -36,4 +36,9 @@ public interface WXConfig {
   String layoutDirection = "layoutDirection";
   String debugMode = "debugMode";
   String androidStatusBarHeight = "androidStatusBarHeight";
+  String deviceHeight = "deviceHeight";
+  String deviceWidth = "deviceWidth";
+
+
+
 }

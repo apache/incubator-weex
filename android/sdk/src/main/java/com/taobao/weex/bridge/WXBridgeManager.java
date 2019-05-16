@@ -3205,13 +3205,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     post(new Runnable() {
       @Override
       public void run() {
-        mWXBridge.updateInitFrameworkParams("deviceWidth", width, "deviceWidth");
+        mWXBridge.updateInitFrameworkParams(WXConfig.deviceWidth, width, WXConfig.deviceWidth);
       }
     });
     post(new Runnable() {
       @Override
       public void run() {
-        mWXBridge.updateInitFrameworkParams("deviceHeight", height, "deviceHeight");
+        mWXBridge.updateInitFrameworkParams(WXConfig.deviceHeight, height, WXConfig.deviceHeight);
       }
     });
 
