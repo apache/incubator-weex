@@ -69,7 +69,10 @@ class ScriptSideInMultiSo : public ScriptBridge::ScriptSide {
 
   int UpdateGlobalConfig(const char *config) override;
 
-  ScriptSideInMultiSo();
+  int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc)override;
+
+
+    ScriptSideInMultiSo();
 
   virtual ~ScriptSideInMultiSo();
 

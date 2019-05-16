@@ -41,6 +41,7 @@
 #include "core/layout/measure_func_adapter_impl_android.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/bridge/eagle_bridge.h"
+#include "core/common/view_utils.h"
 #include "third_party/json11/json11.hpp"
 
 using namespace WeexCore;
@@ -247,6 +248,15 @@ static void SetViewPortWidth(JNIEnv* env, jobject jcaller, jstring instanceId,
       ->core_side()
       ->SetViewPortWidth(jString2StrFast(env, instanceId), value);
 }
+
+static void SetDeviceDisplay(JNIEnv* env, jobject jcaller, jstring instanceId,
+                           jfloat value, float height, float scale) {
+  WeexCoreManager::Instance()
+          ->getPlatformBridge()
+          ->core_side()
+          ->SetDeviceDisplay(jString2StrFast(env, instanceId), value, height, scale);
+}
+
 
 static jint InitFramework(JNIEnv* env, jobject object, jstring script,
                           jobject params) {
@@ -461,6 +471,27 @@ static void ExecJSWithCallback(JNIEnv* env, jobject jcaller,
                            function.getChars(), params, callbackId);
 
   freeParams(params);
+}
+
+
+static void UpdateInitFrameworkParams(JNIEnv* env, jobject jcaller,
+                                      jstring key_,
+                                      jstring value_,
+                                      jstring desc_){
+
+  if(key_ == nullptr || value_ == nullptr || desc_ == nullptr){
+    return;
+  }
+
+  WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->core_side()
+        ->UpdateInitFrameworkParams(jString2StrFast(env, key_),
+                                    jString2StrFast(env, value_),
+                                    jString2StrFast(env, desc_));
+  if(jString2StrFast(env, key_) == "androidStatusBarHeight"){
+    WXCoreEnvironment::getInstance()->PutOption(WeexCore::STATUS_BAR_HEIGHT, jString2StrFast(env, value_));
+  }
 }
 
 static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller, jstring config) {

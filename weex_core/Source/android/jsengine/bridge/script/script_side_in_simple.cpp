@@ -136,6 +136,15 @@ int ScriptSideInSimple::UpdateGlobalConfig(const char *config) {
   LOGD("ScriptSideInSimple::UpdateGlobalConfig");
   return runtime_->updateGlobalConfig(String::fromUTF8(config));
 }
+
+
+int ScriptSideInSimple::UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc){
+  LOGD("ScriptSideInSimple::UpdateInitFrameworkParams");
+  return runtime_->UpdateInitFrameworkParams(key ,value, desc);
+}
+
+
+
 }  // namespace js
 }  // namespace bridge
 }  // namespace weex

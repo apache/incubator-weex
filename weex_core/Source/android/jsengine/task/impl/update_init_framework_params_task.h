@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,29 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.common;
+//
+// Created by furture on 2019/3/25.
+//
 
-public interface WXConfig {
+#ifndef WEEX_PROJECT_UPDATEINITFRAMEWORKPARAMSTASK_H
+#define WEEX_PROJECT_UPDATEINITFRAMEWORKPARAMSTASK_H
 
-  String os = "os";
-  String osName = "osName";
-  String appVersion="appVersion";
-  String cacheDir = "cacheDir";
-  String devId="devId";
-  String sysVersion="sysVersion";
-  String sysModel="sysModel";
-  String weexVersion="weexVersion";
-  String appName="appName";
-  String appGroup="appGroup";
-  String externalUserAgent="externalUserAgent";
-  String logLevel="logLevel";
-  String scale = "scale";
-  String layoutDirection = "layoutDirection";
-  String debugMode = "debugMode";
-  String androidStatusBarHeight = "androidStatusBarHeight";
-  String deviceHeight = "deviceHeight";
-  String deviceWidth = "deviceWidth";
+#include "android/jsengine/task/weex_task.h"
 
 
+class UpdateInitFrameworkParamsTask : public WeexTask {
 
-}
+public:
+    UpdateInitFrameworkParamsTask(const std::string& key, const std::string& value, const std::string& desc);
+
+    void run(WeexRuntime *runtime) override;
+
+    std::string taskName() override { return "UpdateInitFrameworkParamsTask"; }
+
+private:
+    std::string key_;
+    std::string value_;
+    std::string desc_;
+
+};
+
+
+#endif //WEEX_PROJECT_UPDATEINITFRAMEWORKPARAMSTASK_H
