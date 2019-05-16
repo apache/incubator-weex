@@ -317,10 +317,15 @@
     if (_propertyArray.count == 0) {
         return;
     }
-    double per = 1000 * (_transitionCount + 1 ) / (60 * _transitionDuration);//linear
-    if (![[NSString stringWithFormat:@"%@",_transitionTimingFunction] isEqualToString: kCAMediaTimingFunctionLinear]) {
-        per = [self solveWithx:((_transitionCount+2)*16)/_transitionDuration epsilon:SOLVE_EPS(_transitionDuration)];
+
+    // Bugfix: https://github.com/apache/incubator-weex/issues/2347
+    NSUInteger frameCount = MAX(_transitionDuration * 60 / 1000, 1);
+    NSUInteger currentFrame = _transitionCount + 1;
+    double per = (double)currentFrame / frameCount; //linear
+    if (currentFrame < frameCount && ![[NSString stringWithFormat:@"%@",_transitionTimingFunction] isEqualToString: kCAMediaTimingFunctionLinear]) {
+        per = [self solveWithx:per epsilon:SOLVE_EPS(_transitionDuration)];
     }
+
     NSString *transformString = [NSString string];
     for (WXTransitionInfo *info in _propertyArray) {
         if ([info.propertyName isEqualToString:@"backgroundColor"]) {
@@ -444,7 +449,7 @@
 - (void)_handleTransitionDisplayLink
 {
     WXAssertComponentThread();
-    int count = _transitionDuration * 60 / 1000;
+    int count = MAX(_transitionDuration * 60 / 1000, 1);
     if (_transitionCount >= count) {
         [self _suspendTransitionDisplayLink];
         [self _resetProcessAnimationParameter];
