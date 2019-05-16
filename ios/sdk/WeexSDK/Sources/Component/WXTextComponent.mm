@@ -377,10 +377,9 @@ do {\
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     if (_isCompositingChild) {
-        [self drawTextWithContext:context bounds:rect padding:_padding view:nil];
+        [self drawTextWithContext:context bounds:rect padding:_padding];
     } else {
-        WXTextView *textView = (WXTextView *)_view;
-        [self drawTextWithContext:context bounds:rect padding:_padding view:textView];
+        [self drawTextWithContext:context bounds:rect padding:_padding];
     }
     
     return nil;
@@ -741,7 +740,7 @@ do {\
     [self syncTextStorageForView];
 }
 
-- (void)drawTextWithContext:(CGContextRef)context bounds:(CGRect)bounds padding:(UIEdgeInsets)padding view:(WXTextView *)view
+- (void)drawTextWithContext:(CGContextRef)context bounds:(CGRect)bounds padding:(UIEdgeInsets)padding
 {
     if (bounds.size.width <= 0 || bounds.size.height <= 0) {
         return;
