@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include "cstring"
 #include "core/bridge/platform/core_side_in_platform.h"
 #include "base/string_util.h"
 #include "base/log_defines.h"
@@ -491,7 +492,8 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
               ->script_side()
               ->CreateInstance(instanceId.c_str(), func.c_str(), result,
                                opts_json.dump().c_str(), initData.c_str(),
-                               extendsApi.c_str(),params);
+                               strcmp("Rax", bundleType) ? "\0" : extendsApi.c_str(),
+                               params);
         };
     if (strcmp(render_strategy, "DATA_RENDER") == 0) {
         auto handler = EagleBridge::GetInstance()->data_render_handler();
