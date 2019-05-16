@@ -131,7 +131,7 @@ namespace WeexCore {
     if (endWidth(src, WX)) {
       ret = getFloat(transferWx(src, viewport, device_width), viewport,  device_width, round_off_deviation);
     } else if (endWidth(src, PX)) {
-      ret = getFloat(src.substr(0, src.size() - strlen(PX), viewport, device_width, round_off_deviation);
+      ret = getFloat(src.substr(0, src.size() - strlen(PX)), viewport, device_width, round_off_deviation);
     } else {
       ret = getFloat(src, viewport, device_width, round_off_deviation);
     }
