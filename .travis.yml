@@ -35,10 +35,10 @@ matrix:
             - sys-img-x86-android-26
 cache:
   directories:
-  - node_modules
-  - $HOME/.m2
-  - $HOME/.gradle
-  - $HOME/android-ndk-r16b 
+    - node_modules
+    - $HOME/.m2
+    - $HOME/.gradle
+    - $HOME/android-ndk-r16b 
 before_script:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
