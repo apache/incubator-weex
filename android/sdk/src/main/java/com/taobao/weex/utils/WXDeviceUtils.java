@@ -11,7 +11,7 @@ public class WXDeviceUtils {
     }
 
     /**
-     * Mate X 判断条件
+     * Mate X
      * */
     public static boolean isMateX(Context context) {
         return "HUAWEI".equalsIgnoreCase(Build.BRAND) && ("unknownRLI".equalsIgnoreCase(Build.DEVICE) || ("HWTAH".equalsIgnoreCase(Build.DEVICE)));
@@ -19,7 +19,7 @@ public class WXDeviceUtils {
 
 
     /**
-     * 三星Galaxy Fopld
+     * Galaxy Fopld
      * */
     public static boolean isGalaxyFold(Context context) {
 
