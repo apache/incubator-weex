@@ -378,11 +378,11 @@ bintray {
 afterEvaluate {
     transformNativeLibsWithStripDebugSymbolForRelease << {
         copy{
-            from new File(project.buildDir, "intermediates/transforms/mergeJniLibs/release/folders/2000/3/main/lib")
+            from transformNativeLibsWithMergeJniLibsForRelease
             into new File(project.buildDir, "unstrippedSo")
             include '**/libweexjss.so', '**/libweexcore.so'
             eachFile {
-                it.path = "${it.relativePath.segments.first()}_${it.name}"
+                it.path = "${it.relativePath.segments[5]}_${it.name}"
             }
         }
     }
