@@ -45,7 +45,6 @@ before_script:
       curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
       nvm install 7.0
       npm install
-      export ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
