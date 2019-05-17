@@ -540,14 +540,13 @@ do {\
         paragraphStyle.alignment = retAlign;
     }
     
-    if ([[_wordWrap lowercaseString] isEqualToString:@"break-word"]) {
-        paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
-    } else if ([[_wordWrap lowercaseString] isEqualToString:@"normal"]){
-        paragraphStyle.lineBreakMode = NSLineBreakByClipping;
-    } else {
-         // set default lineBreakMode
+    if ([[_wordWrap lowercaseString] isEqualToString:@"anywhere"]) {
+        paragraphStyle.lineBreakMode = NSLineBreakByCharWrapping;
+    }
+    else {
         paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
     }
+    
     _truncationLine = NO;
     if (_textOverflow && [_textOverflow length] > 0) {
         if (_lines && [_textOverflow isEqualToString:@"ellipsis"])
