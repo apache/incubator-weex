@@ -68,6 +68,8 @@ namespace WeexCore {
         virtual std::unique_ptr<ValueWithType> CallNativeModule(const char *module, const char *method,
                                                                 const char *arguments, int arguments_length, const char *options,
                                                                 int options_length) override;
+        virtual void CallNativeComponent(const char *ref, const char *method, const char *arguments, int arguments_length,
+                                         const char *options, int options_length) override;
 
         // Life cycle
         virtual void SetDefaultHeightAndWidthIntoRootRender(const float default_width, const float default_height,

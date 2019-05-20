@@ -62,9 +62,6 @@ class RenderPage: public RenderPageBase {
       RenderObject *render,
       std::vector<std::pair<std::string, std::string>> *attrs);
 
-  void SendCallNativeModuleAction(const std::string &module,
-                                  const std::string &method, const std::string &args, int argc = 0);
-
   void SendAppendTreeCreateFinish(const std::string &ref);
   
   void LayoutInner();

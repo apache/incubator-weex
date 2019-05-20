@@ -1262,7 +1262,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
                 });
                 
                 bool handled = false;
-                std::unique_ptr<ValueWithType> result = target->callNativeModule([pageId UTF8String] ?: "", [moduleName UTF8String] ?: "", [methodName UTF8String] ?: "", seralizedArguments ?: "", (int)[arguments count], seralizedOptions ?: "", (int)[options count], handled);
+                std::unique_ptr<ValueWithType> result = target->callNativeModule([pageId UTF8String] ?: "", [moduleName UTF8String] ?: "", [methodName UTF8String] ?: "", seralizedArguments ?: "", seralizedArguments ? (int)(strlen(seralizedArguments)) : 0, seralizedOptions ?: "", seralizedOptions ? (int)(strlen(seralizedOptions)) : 0, handled);
                 
                 if (seralizedArguments) {
                     free((void*)seralizedArguments);
@@ -1323,6 +1323,51 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
                 return NO;
             }
         }
+    }
+    return NO;
+}
+
++ (BOOL)forwardCallComponentToCustomPage:(NSString*)pageId
+                                     ref:(NSString*)ref
+                              methodName:(NSString*)methodName
+                               arguments:(NSArray*)arguments
+                                 options:(NSDictionary*)options
+{
+    using namespace WeexCore;
+    
+    // Temporarily before iOS adapt to JSEngine, we intercept here for custom render page
+    bool isCustomPage = [pageId integerValue] % 2 != 0;
+    
+    if (isCustomPage) {
+        RenderPageCustom *page = (RenderPageCustom*)RenderManager::GetInstance()->GetPage([pageId UTF8String] ?: "");
+        if (page) {
+            RenderTarget* target = page->GetRenderTarget();
+            if (target) {
+                __block const char* seralizedArguments = nullptr;
+                __block const char* seralizedOptions = nullptr;
+                ConvertToCString(arguments, ^(const char * value) {
+                    if (value != nullptr) {
+                        seralizedArguments = strdup(value);
+                    }
+                });
+                ConvertToCString(options, ^(const char * value) {
+                    if (value != nullptr) {
+                        seralizedOptions = strdup(value);
+                    }
+                });
+                
+                target->callNativeComponent([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [methodName UTF8String] ?: "", seralizedArguments ?: "", seralizedArguments ? (int)(strlen(seralizedArguments)) : 0, seralizedOptions ?: "", seralizedOptions ? (int)(strlen(seralizedOptions)) : 0);
+                
+                if (seralizedArguments) {
+                    free((void*)seralizedArguments);
+                }
+                if (seralizedOptions) {
+                    free((void*)seralizedOptions);
+                }
+            }
+        }
+        
+        return YES;
     }
     return NO;
 }

@@ -70,6 +70,8 @@ public:
     virtual std::unique_ptr<ValueWithType> CallNativeModule(const char *module, const char *method,
                                                             const char *arguments, int arguments_length, const char *options,
                                                             int options_length);
+    virtual void CallNativeComponent(const char *ref, const char *method, const char *arguments, int arguments_length,
+                                     const char *options, int options_length);
     
     // Performance
     void CssLayoutTime(const int64_t &time);

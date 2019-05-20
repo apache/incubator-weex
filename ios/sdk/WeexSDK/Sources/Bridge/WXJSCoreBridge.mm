@@ -357,6 +357,10 @@
         
         WXLogDebug(@"callNativeComponent...%@,%@,%@,%@", instanceIdString, componentNameString, methodNameString, argsArray);
         
+        if ([WXCoreBridge forwardCallComponentToCustomPage:instanceIdString ref:componentNameString methodName:methodNameString arguments:argsArray options:optionsDic]) {
+            return;
+        }
+        
         callNativeComponentBlock(instanceIdString, componentNameString, methodNameString, argsArray, optionsDic);
     };
 }

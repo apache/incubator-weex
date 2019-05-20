@@ -222,6 +222,12 @@ namespace WeexCore
                                   arguments:(NSArray*)arguments options:(NSDictionary*)options
                                 returnValue:(id*)returnValue;
 
++ (BOOL)forwardCallComponentToCustomPage:(NSString*)pageId
+                                     ref:(NSString*)ref
+                              methodName:(NSString*)methodName
+                               arguments:(NSArray*)arguments
+                                 options:(NSDictionary*)options;
+
 @end
 
 #endif

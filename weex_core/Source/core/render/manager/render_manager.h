@@ -103,6 +103,13 @@ class RenderManager {
   std::unique_ptr<ValueWithType> CallNativeModule(const char *page_id, const char *module, const char *method,
                                                   const char *arguments, int arguments_length, const char *options,
                                                   int options_length);
+    
+  void CallNativeComponent(const char *page_id, const char *ref,
+                           const char *method,
+                           const char *arguments,
+                           int arguments_length,
+                           const char *options,
+                           int options_length);
 
   void CallMetaModule(const char *page_id, const char *method, const char *arguments);
 

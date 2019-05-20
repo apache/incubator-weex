@@ -88,6 +88,8 @@ namespace WeexCore {
                                                                 int nArguments,
                                                                 const std::string& options,
                                                                 int nOptions, bool& handled) = 0;
+        
+        virtual void callNativeComponent(const std::string& page, const std::string& ref, const std::string& method, const std::string& arguments, int nArguments, const std::string& options, int nOptions) = 0;
 
         // Life cycle
         virtual uintptr_t createRootView(const std::string& page, float x, float y, float width, float height) = 0;

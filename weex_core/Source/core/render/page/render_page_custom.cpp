@@ -171,6 +171,32 @@ namespace WeexCore {
         return RenderPageBase::CallNativeModule(module, method, argumentsWson, arguments_length, optionsWson, options_length);
     }
     
+    void RenderPageCustom::CallNativeComponent(const char *ref, const char *method, const char *argumentsWson, int arguments_length,
+                                               const char *optionsWson, int options_length) {
+        if (target_) {
+            std::string argumentsJson;
+            int jsonArgumentsLength = arguments_length;
+            if (argumentsWson) {
+                wson_parser parser(argumentsWson, arguments_length);
+                argumentsJson = parser.toStringUTF8();
+                jsonArgumentsLength = (int)argumentsJson.length();
+            }
+            
+            std::string jsonOptions;
+            int jsonOptionsLength = options_length;
+            if (optionsWson) {
+                wson_parser parser(optionsWson, options_length);
+                jsonOptions = parser.toStringUTF8();
+                jsonOptionsLength = (int)jsonOptions.length();
+            }
+            
+            target_->callNativeComponent(page_id_, ref, method, argumentsJson, jsonArgumentsLength, jsonOptions, jsonOptionsLength);
+        }
+        else {
+            RenderPageBase::CallNativeComponent(ref, method, argumentsWson, arguments_length, optionsWson, options_length);
+        }
+    }
+    
     // Life cycle
     void RenderPageCustom::SetDefaultHeightAndWidthIntoRootRender(const float default_width, const float default_height,
                                                                   const bool is_width_wrap_content, const bool is_height_wrap_content) {

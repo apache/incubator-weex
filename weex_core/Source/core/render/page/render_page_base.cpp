@@ -75,6 +75,15 @@ namespace WeexCore {
         platform_side()->
         CallNativeModule(page_id_.c_str(), module, method, arguments, arguments_length, options, options_length);
     }
+    
+    void RenderPageBase::CallNativeComponent(const char *ref, const char *method, const char *arguments, int arguments_length,
+                                             const char *options, int options_length) {
+        WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->platform_side()
+        ->CallNativeComponent(page_id_.c_str(), ref, method, arguments, arguments_length,
+                              options, options_length);
+    }
 
     void RenderPageBase::SendCreateFinishAction() {
         RenderAction *action = new RenderActionCreateFinish(page_id());

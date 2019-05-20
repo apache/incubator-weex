@@ -408,6 +408,25 @@ std::unique_ptr<ValueWithType> RenderManager::CallNativeModule(const char *page_
   return page->CallNativeModule(module, method, arguments, arguments_length, options, options_length);
 }
     
+void RenderManager::CallNativeComponent(const char *page_id, const char *ref,
+                                        const char *method,
+                                        const char *arguments,
+                                        int arguments_length,
+                                        const char *options,
+                                        int options_length) {
+  RenderPageBase* page = GetPage(page_id);
+  if (page == nullptr) {
+    WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->platform_side()
+      ->CallNativeComponent(page_id, ref, method, arguments, arguments_length,
+                          options, options_length);
+    return;
+  }
+  // redirect to page
+  page->CallNativeComponent(ref, method, arguments, arguments_length, options, options_length);
+}
+    
 void RenderManager::CallMetaModule(const char *page_id, const char *method, const char *arguments) {
   if (strcmp(method, "setViewport") == 0) {
     wson_parser parser(arguments);

@@ -88,32 +88,7 @@ void CoreSideInScript::CallNativeComponent(const char *page_id, const char *ref,
                                            const char *options,
                                            int options_length) {
   if (page_id != nullptr && ref != nullptr && method != nullptr) {
-    //    WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
-    //        weex::base::MakeCopyable(
-    //            [pageId = std::unique_ptr<char[]>(copyStr(page_id)),
-    //             refS = std::unique_ptr<char[]>(copyStr(ref)),
-    //             methodS = std::unique_ptr<char[]>(copyStr(method)),
-    //             argumentsS =
-    //                 std::unique_ptr<char[]>(copyStr(arguments,
-    //                 arguments_length)),
-    //             argLen = arguments_length,
-    //             optionsS =
-    //                 std::unique_ptr<char[]>(copyStr(options,
-    //                 options_length)),
-    //             optLen = options_length] {
-    //              WeexCoreManager::Instance()
-    //                  ->getPlatformBridge()
-    //                  ->platform_side()
-    //                  ->CallNativeComponent(pageId.get(), refS.get(),
-    //                  methodS.get(),
-    //                                        argumentsS.get(), argLen,
-    //                                        optionsS.get(), optLen);
-    //            }));
-    WeexCoreManager::Instance()
-        ->getPlatformBridge()
-        ->platform_side()
-        ->CallNativeComponent(page_id, ref, method, arguments, arguments_length,
-                              options, options_length);
+    RenderManager::GetInstance()->CallNativeComponent(page_id, ref, method, arguments, arguments_length, options, options_length);
   }
 }
 
