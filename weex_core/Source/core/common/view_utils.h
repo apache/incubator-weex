@@ -34,7 +34,7 @@ namespace WeexCore {
   constexpr char AUTO_UNIT[] = "auto";
   constexpr char NONE[] = "none";
 
-  const std::string STATUS_BAR_HEIGHT("status_bar_height");
+  constexpr char STATUS_BAR_HEIGHT[] = "status_bar_height";
 
   template<typename T>
   inline std::string to_string(const T &n) {
