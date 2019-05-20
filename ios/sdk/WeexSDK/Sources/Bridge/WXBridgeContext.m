@@ -419,6 +419,9 @@ _Pragma("clang diagnostic pop") \
 		}
 	}
     WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instanceIdString];
+    if (!sdkInstance) {
+        return;
+    }
     [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_START];
     
     //create a sendQueue bind to the current instance
