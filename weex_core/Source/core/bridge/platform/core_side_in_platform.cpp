@@ -18,8 +18,9 @@
  */
 
 
-#include <core/common/view_utils.h>
 #include "core/bridge/platform/core_side_in_platform.h"
+
+#include "core/common/view_utils.h"
 #include "base/string_util.h"
 #include "base/log_defines.h"
 #include "core/config/core_environment.h"
