@@ -683,10 +683,6 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         }
 
     }
-    if (_inputEvent) {
-        // bind each other , the key must be attrs
-        [self fireEvent:@"input" params:@{@"value":[textField text]} domChanges:@{@"attrs":@{@"value":[textField text]}}];
-    }
     
     if (_maxLength) {
         NSString *toBeString = textField.text;
@@ -704,6 +700,11 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
                 textField.text = [toBeString substringToIndex:_maxLength.integerValue];
             }
         }
+    }
+
+    if (_inputEvent) {
+        // bind each other , the key must be attrs
+        [self fireEvent:@"input" params:@{@"value":[textField text]} domChanges:@{@"attrs":@{@"value":[textField text]}}];
     }
 }
 
