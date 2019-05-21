@@ -144,8 +144,6 @@ _Pragma("clang diagnostic pop") \
         return [weakSelf invokeNative:instance tasks:tasks callback:callback];
     }];
     
-    [WXCoreBridge install];
-    
     [_jsBridge registerCallUpdateComponentData:^NSInteger(NSString *instanceId, NSString *componentId, NSString *jsonData) {
         if (_dataRenderHandler) {
             WXPerformBlockOnComponentThread(^{
