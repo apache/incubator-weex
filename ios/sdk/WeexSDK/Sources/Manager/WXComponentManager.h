@@ -122,6 +122,11 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
  */
 - (void)addComponent:(WXComponent *)component toIndexDictForRef:(NSString *)ref;
 
+/**
+ * @abstract remove an existing component to references look-up map
+ */
+- (void)removeComponentForRef:(NSString *)ref;
+
 ///--------------------------------------
 /// @name Updating
 ///--------------------------------------
