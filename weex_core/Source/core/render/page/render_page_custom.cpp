@@ -35,6 +35,7 @@ namespace WeexCore {
             targetOptions.view_scale = options.view_scale;
             targetOptions.is_round_off = options.is_round_off;
             targetOptions.viewport_width = options.viewport_width;
+            targetOptions.device_width = options.device_width;
             target_->createPage(page_id, targetOptions);;
         }
     }
@@ -222,6 +223,14 @@ namespace WeexCore {
     }
     
     void RenderPageCustom::SetRoundOffDeviation(bool value) {
+        
+    }
+    
+    float RenderPageCustom::GetDeviceWidth() {
+        return 0;
+    }
+    
+    void RenderPageCustom::SetDeviceWidth(float value) {
         
     }
     

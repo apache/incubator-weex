@@ -91,6 +91,8 @@ public:
     virtual void SetViewportWidth(float value) = 0;
     virtual bool GetRoundOffDeviation() = 0;
     virtual void SetRoundOffDeviation(bool value) = 0;
+    virtual float GetDeviceWidth() = 0;
+    virtual void SetDeviceWidth(float value) = 0;
     
 protected:
     virtual void SendCreateFinishAction();

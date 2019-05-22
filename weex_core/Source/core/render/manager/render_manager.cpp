@@ -152,6 +152,16 @@ RenderPageCustom* RenderManager::CreateCustomPage(const std::string& page_id, co
         options.viewport_width = kDefaultViewPortWidth;
     }
     
+    std::map<std::string, float>::iterator iterWidth =
+    this->device_widths_.find(page_id);
+    if (iterWidth != this->device_widths_.end()) {
+        options.device_width = iter->second;
+        this->device_widths_.erase(page_id);
+    }
+    else {
+        options.device_width = WXCoreEnvironment::getInstance()->DeviceWidth();
+    }
+    
     std::map<std::string, bool>::iterator iter_deviation =
     this->round_off_deviations_.find(page_id);
     if (iter_deviation != this->round_off_deviations_.end()) {
@@ -489,21 +499,21 @@ void RenderManager::set_viewport_width(const std::string &page_id, float viewpor
 }
 
 float RenderManager::DeviceWidth(const std::string &page_id) {
-  RenderPage *page = GetPage(page_id);
+  RenderPageBase *page = GetPage(page_id);
   if(page == nullptr){
     return WXCoreEnvironment::getInstance()->DeviceWidth();
   }
-  return page->device_width();
+  return page->GetDeviceWidth();
 }
 
 void RenderManager::setDeviceWidth(const std::string &page_id, float device_width) {
-  RenderPage *page = GetPage(page_id);
+  RenderPageBase *page = GetPage(page_id);
   if (page == nullptr) {
     // page is not created yet, we should store the device width value
-    device_heights_.insert(std::pair<std::string, float>(page_id, device_width));
+    device_widths_.insert(std::pair<std::string, float>(page_id, device_width));
     return;
   }
-  page->set_device_width(device_width);
+  page->SetDeviceWidth(device_width);
 }
 
 bool RenderManager::round_off_deviation(const std::string &page_id) {
@@ -568,10 +578,10 @@ void RenderManager::initDeviceConfig(RenderPage *page, const std::string &page_i
   }
 
   std::map<std::string, float>::iterator iter_device_width =
-          this->device_heights_.find(page_id);
-  if (iter_device_width != this->device_heights_.end()) {
+          this->device_widths_.find(page_id);
+  if (iter_device_width != this->device_widths_.end()) {
     page->set_device_width(iter_device_width->second);
-    this->device_heights_.erase(page_id);
+    this->device_widths_.erase(page_id);
   }
 
   std::map<std::string, bool>::iterator iter_deviation =

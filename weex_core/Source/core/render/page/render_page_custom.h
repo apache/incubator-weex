@@ -31,6 +31,7 @@ namespace WeexCore {
         struct PageOptions {
             bool is_round_off = false;
             float viewport_width = -1;
+            float device_width = -1;
             float view_scale = 1;
             std::map<std::string, std::string> args;
         };
@@ -81,6 +82,8 @@ namespace WeexCore {
         virtual void SetViewportWidth(float value) override;
         virtual bool GetRoundOffDeviation() override;
         virtual void SetRoundOffDeviation(bool value) override;
+        virtual float GetDeviceWidth() override;
+        virtual void SetDeviceWidth(float value) override;
         
     private:
         RenderTarget* target_;

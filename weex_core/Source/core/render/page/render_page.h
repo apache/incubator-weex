@@ -146,6 +146,8 @@ public:
   virtual void SetViewportWidth(float value) override { viewport_width_ = value; };
   virtual bool GetRoundOffDeviation() override { return round_off_deviation_; }
   virtual void SetRoundOffDeviation(bool value) override { round_off_deviation_ = value; }
+  virtual float GetDeviceWidth() override { return device_width_; }
+  virtual void SetDeviceWidth(float value) override { device_width_ = value; }
 
   inline float viewport_width() const { return this->viewport_width_; }
 
