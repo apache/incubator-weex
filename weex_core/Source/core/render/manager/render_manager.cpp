@@ -159,7 +159,9 @@ RenderPageCustom* RenderManager::CreateCustomPage(const std::string& page_id, co
         this->device_widths_.erase(page_id);
     }
     else {
-        options.device_width = WXCoreEnvironment::getInstance()->DeviceWidth();
+        /* For iOS DeviceWidth stored by WeexCore is in UIKit view system coordinate(iPhone6 is 375).
+         So we must provide heron with the pixel device width here. */
+        options.device_width = WXCoreEnvironment::getInstance()->DeviceWidth() * options.view_scale;
     }
     
     std::map<std::string, bool>::iterator iter_deviation =
