@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
 
   s.name         = "WeexSDK"
 
-  s.version      = "0.20.0"
+  s.version      = "0.24.0"
 
   s.summary      = "WeexSDK Source."
 
@@ -71,14 +71,17 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Module/WXVoiceOverModule.h',
                           'ios/sdk/WeexSDK/Sources/Module/WXPrerenderManager.h',
                           'ios/sdk/WeexSDK/Sources/Module/WXModalUIModule.h',
+                          'ios/sdk/WeexSDK/Sources/Module/WXStreamModule.h',
                           'ios/sdk/WeexSDK/Sources/Component/WXListComponent.h',
                           'ios/sdk/WeexSDK/Sources/Component/WXScrollerComponent.h',
                           'ios/sdk/WeexSDK/Sources/Component/WXRichText.h',
                           'ios/sdk/WeexSDK/Sources/Component/WXIndicatorComponent.h',
                           'ios/sdk/WeexSDK/Sources/Component/WXAComponent.h',
+                          'ios/sdk/WeexSDK/Sources/Component/WXRefreshComponent.h',
                           'ios/sdk/WeexSDK/Sources/Component/Recycler/WXRecyclerComponent.h',
                           'ios/sdk/WeexSDK/Sources/Controller/WXBaseViewController.h',
                           'ios/sdk/WeexSDK/Sources/Controller/WXRootViewController.h',
+			  'ios/sdk/WeexSDK/Sources/Handler/WXNavigationDefaultImpl.h',
                           'ios/sdk/WeexSDK/Sources/View/WXView.h',
                           'ios/sdk/WeexSDK/Sources/View/WXErrorView.h',
                           'ios/sdk/WeexSDK/Sources/Protocol/*.h',
@@ -99,8 +102,10 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Manager/WXInvocationConfig.h',
                           'ios/sdk/WeexSDK/Sources/Engine/WXSDKEngine.h',
                           'ios/sdk/WeexSDK/Sources/Engine/WXSDKError.h',
+                          'ios/sdk/WeexSDK/Sources/Eagle/WXDataRenderHandler.h',
                           'ios/sdk/WeexSDK/Sources/Utility/WXConvert.h',
                           'ios/sdk/WeexSDK/Sources/Utility/WXUtility.h',
+                          'ios/sdk/WeexSDK/Sources/Utility/WXConvertUtility.h',
                           'ios/sdk/WeexSDK/Sources/Utility/WXLog.h',
                           'ios/sdk/WeexSDK/Sources/Utility/WXDefine.h',
                           'ios/sdk/WeexSDK/Sources/Utility/WXType.h',
@@ -111,7 +116,8 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Bridge/WXBridgeMethod.h',
                           'weex_core/Source/core/layout/flex_enum.h',
                           'weex_core/Source/core/layout/layout.h',
-                          'weex_core/Source/core/layout/style.h'
+                          'weex_core/Source/core/layout/style.h',
+                          'weex_core/Source/core/bridge/eagle_bridge.h'
 
   s.module_map = 'WeexSDK.modulemap'
 
@@ -123,7 +129,7 @@ Pod::Spec.new do |s|
   s.prefix_header_file = 'ios/sdk/WeexSDK/Sources/Supporting Files/WeexSDK-Prefix.pch'
 
   s.xcconfig = { "OTHER_LINK_FLAG" => '$(inherited) -ObjC' }
-  s.pod_target_xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '${PODS_ROOT}/WeexSDK/weex_core/Source/ ${PROJECT_DIR}/../../../weex_core/Source',
+  s.pod_target_xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '${PODS_TARGET_SRCROOT}/weex_core/Source/ ${PROJECT_DIR}/../../../weex_core/Source',
     'GCC_PREPROCESSOR_DEFINITIONS' => 'OS_IOS=1' }
 
   s.frameworks = 'CoreMedia','MediaPlayer','AVFoundation','AVKit','JavaScriptCore','GLKit','OpenGLES','CoreText','QuartzCore','CoreGraphics'

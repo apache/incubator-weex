@@ -535,7 +535,7 @@ static NSThread *WXComponentThread;
     }
     
     Class clazz = NSClassFromString(config.clazz);
-    WXComponent *component = [clazz alloc];
+    WXComponent *component = [[clazz alloc] init];
     if (component) {
         if (renderObject) {
             [component _setRenderObject:renderObject];

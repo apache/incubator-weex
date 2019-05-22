@@ -188,6 +188,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, assign, readonly) BOOL dataRender;
 
 /**
+ *  Which decide whether to use binary code render, default value is false
+ */
+@property (nonatomic, assign, readonly) BOOL wlasmRender;
+    
+/**
  *  The callback triggered when the instance fails to render.
  *
  *  @return A block that takes a NSError argument, which is the error occured
@@ -385,6 +390,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  */
 - (void)willAppear;
 - (void)didDisappear;
+
+/**
+ * Application required Page Width and Height to prevent Weex use DeviceWidth directly.
+ */
+- (void)setPageRequiredWidth:(CGFloat)width height:(CGFloat)height;
 
 /** 
  * Deprecated 

@@ -24,12 +24,12 @@
 #define __WX_CONVERT_UTILITY_H__
 
 #if defined __cplusplus
-#include "core/data_render/vnode/vnode_render_manager.h"
+#include <map>
+#include <unordered_map>
+#include <set>
 
 #define NSSTRING(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCString(NULL, (const char *)(cstr), kCFStringEncodingUTF8)))
 #define NSSTRING_NO_COPY(cstr) ((__bridge_transfer NSString*)(CFStringCreateWithCStringNoCopy(NULL, (const char *)(cstr), kCFStringEncodingUTF8, kCFAllocatorNull)))
-
-id _Nonnull GenValue(weex::core::data_render::Value* _Nonnull value);
 
 NSString* _Nullable TO_JSON(id _Nullable object);
 
@@ -41,17 +41,9 @@ NSMutableDictionary* _Nonnull NSDICTIONARY(std::unordered_map<std::string, std::
 
 NSMutableDictionary* _Nonnull NSDICTIONARY(std::vector<std::pair<std::string, std::string>>* _Nullable vec);
 
-NSMutableDictionary* _Nonnull NSDICTIONARY(const std::unordered_map<std::string, weex::core::data_render::VComponent::VNodeRefs>& ref_map);
-
-NSMutableDictionary* _Nonnull NSDICTIONARY(weex::core::data_render::Table* _Nullable table);
-
 NSMutableArray* _Nonnull NSARRAY(std::set<std::string>* _Nullable set);
 
-NSMutableArray* _Nonnull NSARRAY(weex::core::data_render::Array* _Nullable array);
-
 NSMutableArray* _Nonnull NSARRAY(std::vector<std::unordered_map<std::string, std::string>> refs);
-
-NSMutableArray* _Nonnull NSARRAY(const std::vector<weex::core::data_render::Value>& params);
 
 void ConvertToCString(id _Nonnull obj, void (^ _Nonnull callback)(const char* _Nullable));
 

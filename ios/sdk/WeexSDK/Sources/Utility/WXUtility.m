@@ -492,6 +492,12 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 + (UIFont *)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily scaleFactor:(CGFloat)scaleFactor useCoreText:(BOOL)useCoreText
 {
+    static NSMutableDictionary* RegisteredFontFileNames;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        RegisteredFontFileNames = [[NSMutableDictionary alloc] init];
+    });
+    
     CGFloat fontSize = (isnan(size) || size == 0) ?  32 * scaleFactor : size;
     UIFont *font = nil;
     
@@ -507,11 +513,53 @@ CGFloat WXFloorPixelValue(CGFloat value)
                     CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL(fontURL);
                     if (fontDataProvider) {
                         CGFontRef newFont = CGFontCreateWithDataProvider(fontDataProvider);
-                        CTFontManagerRegisterGraphicsFont(newFont, NULL);
-                        fontFamily = (__bridge_transfer  NSString*)CGFontCopyPostScriptName(newFont);
-                        CGFontRelease(newFont);
-                        CFRelease(fontURL);
-                        CFRelease(fontDataProvider);
+                        if (newFont) {
+                            fontFamily = (__bridge_transfer NSString*)CGFontCopyPostScriptName(newFont);
+                            CFErrorRef error = NULL;
+                            CTFontManagerRegisterGraphicsFont(newFont, &error);
+                            
+                            if (error == NULL) {
+                                // record which file is registered to this family name
+                                @synchronized (RegisteredFontFileNames) {
+                                    RegisteredFontFileNames[fontFamily] = fpath;
+                                }
+                            }
+                            
+                            if ([fontFamily isEqualToString:@"iconfont"]) {
+                                WXLogError(@"Using iconfont with family name 'iconfont' is prohibited.");
+                                if (error) {
+                                    WXLogError(@"Unable to register font, %@.", fontFamilyDic);
+                                    CFRelease(error);
+                                }
+                            }
+                            else {
+                                // Check if we have already registered another font file with the same family-name
+                                if (error) {
+                                    @synchronized (RegisteredFontFileNames) {
+                                        NSString* previousFilePath = RegisteredFontFileNames[fontFamily];
+                                        if (![previousFilePath isEqualToString:fpath]) {
+                                            // file path changed means a new iconfont file is registered with the same name, we use it
+                                            WXLogError(@"Unable to register font, but will unregister previous one and retry with new font file, %@.", fontFamilyDic);
+                                            CTFontManagerUnregisterGraphicsFont(newFont, NULL);
+                                            CFErrorRef error2 = NULL;
+                                            CTFontManagerRegisterGraphicsFont(newFont, &error2);
+                                            if (error2) {
+                                                WXLogError(@"We cannot register the font finally. %@", error2);
+                                                CFRelease(error2);
+                                            }
+                                            else {
+                                                RegisteredFontFileNames[fontFamily] = fpath;
+                                            }
+                                        }
+                                    }
+                                    CFRelease(error);
+                                }
+                            }
+                            
+                            CGFontRelease(newFont);
+                            CFRelease(fontURL);
+                            CFRelease(fontDataProvider);
+                        }
                     }
                 } else {
                     CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);

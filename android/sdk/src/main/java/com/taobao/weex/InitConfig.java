@@ -18,19 +18,22 @@
  */
 package com.taobao.weex;
 
+import android.support.annotation.NonNull;
 import com.taobao.weex.adapter.ClassLoaderAdapter;
 import com.taobao.weex.adapter.IDrawableLoader;
-import com.taobao.weex.adapter.IWXJscProcessManager;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
+import com.taobao.weex.adapter.IWXJscProcessManager;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
 import com.taobao.weex.performance.IApmGenerator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by sospartan on 5/31/16.
@@ -50,6 +53,7 @@ public class InitConfig {
   private IApmGenerator apmGenerater;
   private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
   private IWXJscProcessManager jscProcessManager;
+  private List<String> nativeLibraryList;
 
   public IWXHttpAdapter getHttpAdapter() {
     return httpAdapter;
@@ -111,6 +115,13 @@ public class InitConfig {
     return jscProcessManager;
   }
 
+  @NonNull Iterable<String> getNativeLibraryList() {
+    if(nativeLibraryList == null){
+      nativeLibraryList = new LinkedList<>();
+    }
+    return nativeLibraryList;
+  }
+
   private InitConfig() {
   }
 
@@ -128,6 +139,7 @@ public class InitConfig {
     ClassLoaderAdapter classLoaderAdapter;
     IApmGenerator apmGenerater;
     private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
+    private List<String> nativeLibraryList = new LinkedList<>();
 
     public IWXJscProcessManager getJscProcessManager() {
       return jscProcessManager;
@@ -209,6 +221,11 @@ public class InitConfig {
       return this;
     }
 
+    public Builder addNativeLibrary(String name){
+      nativeLibraryList.add(name);
+      return this;
+    }
+
     public InitConfig build(){
       InitConfig config =  new InitConfig();
       config.httpAdapter = this.httpAdapter;
@@ -225,6 +242,7 @@ public class InitConfig {
       config.apmGenerater = this.apmGenerater;
       config.jsFileLoaderAdapter = this.jsFileLoaderAdapter;
       config.jscProcessManager = this.jscProcessManager;
+      config.nativeLibraryList = this.nativeLibraryList;
       return config;
     }
   }

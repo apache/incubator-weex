@@ -562,6 +562,15 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)scrollToComponent:(WXComponent *)component withOffset:(CGFloat)offset animated:(BOOL)animated
 {
     UIScrollView *scrollView = (UIScrollView *)self.view;
+    // http://dotwe.org/vue/aa1af34e5fc745c0f1520e346904682a
+    // ignore scroll action if contentSize smaller than scroller frame
+    if (_scrollDirection == WXScrollDirectionVertical && scrollView.contentSize.height < scrollView.frame.size.height) {
+        return;
+    }
+    if (_scrollDirection == WXScrollDirectionHorizontal && scrollView.contentSize.width < scrollView.frame.size.width) {
+        return;
+    }
+
 
     CGPoint contentOffset = scrollView.contentOffset;
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
@@ -718,12 +727,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
                                           @"height":@(scrollView.contentSize.height / scaleFactor)};
         NSDictionary *contentOffsetData = @{@"x":@(-scrollView.contentOffset.x / scaleFactor),
                                             @"y":@(-scrollView.contentOffset.y / scaleFactor)};
+        NSDictionary *params = @{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData, @"isDragging":@(scrollView.isDragging)};
         
         if (_scrollStartEvent) {
-            [self fireEvent:@"scrollstart" params:@{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData} domChanges:nil];
+            [self fireEvent:@"scrollstart" params:params domChanges:nil];
         }
         if (_scrollEventListener) {
-            _scrollEventListener(self, @"scrollstart", @{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData});
+            _scrollEventListener(self, @"scrollstart", params);
         }
     }
     

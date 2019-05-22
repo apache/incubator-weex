@@ -551,6 +551,30 @@ int ScriptSideInMultiProcess::UpdateGlobalConfig(const char *config) {
   }
   return true;
 }
+
+int ScriptSideInMultiProcess::UpdateInitFrameworkParams(const std::string &key,
+                                                        const std::string &value,
+                                                        const std::string &desc) {
+
+  try {
+    if(sender_ == nullptr) {
+      LOGE("UpdateGlobalConfig sender is null");
+      return false;
+    }
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::UpdateInitFrameworkParams));
+    serializer->add(key.data(),  key.length());
+    serializer->add(value.data(), value.length());
+    serializer->add(desc.data(), desc.length());
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
+  } catch (IPCException &e) {
+    LOGE("%s", e.msg());
+  }
+  return true;
+
+}
+
 }  // namespace script
 }  // namespace bridge
 }  // namespace WeexCore

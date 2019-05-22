@@ -143,7 +143,7 @@ public class WXUtils {
       temp = stringWithWXPostfix.substring(0, stringWithWXPostfix.indexOf("wx"));
     }
     Float f = Float.parseFloat(temp);
-    float density = Float.parseFloat(WXEnvironment.getConfig().get(WXConfig.scale));
+    float density = WXEnvironment.sApplication.getResources().getDisplayMetrics().density;
     return density * f * viewport / WXViewUtils.getScreenWidth();
   }
 
@@ -245,7 +245,7 @@ public class WXUtils {
     return getInteger(value, 0);
   }
 
-  public static Integer getInteger(@Nullable Object value, @Nullable Integer df) {
+  public static @Nullable Integer getInteger(@Nullable Object value, @Nullable Integer df) {
 
     if (value == null) {
       return df;
@@ -308,7 +308,7 @@ public class WXUtils {
           WXLogUtils.e("Argument error! value is " + value, e);
         }
       }
-      if (!ret.equals(df)) {
+      if (ret != null && !ret.equals(df)) {
         sCache.put(key, ret);
       }
       return ret;
@@ -404,6 +404,7 @@ public class WXUtils {
     return result;
   }
 
+  @Deprecated
   public static boolean isTabletDevice() {
     try{
       return (WXEnvironment.getApplication().getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;

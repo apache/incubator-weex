@@ -153,6 +153,9 @@ do {\
 - (void)fillAttributes:(NSDictionary *)attributes
 {
     id value = attributes[@"value"];
+    if ([value isKindOfClass:[NSString class]]) {
+        value = [WXUtility objectFromJSON:value];
+    }
     if ([value isKindOfClass: [NSArray class]]) {
         [_richNodes removeAllObjects];
         
@@ -198,6 +201,9 @@ do {\
     }
     else if (superNode.href) {
         node.href = superNode.href;
+        if (!(node.pseudoRef.length) && superNode.pseudoRef.length) {
+            node.pseudoRef = superNode.pseudoRef;
+        }
     }
     
     if (attributes[@"src"]) {

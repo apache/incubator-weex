@@ -43,7 +43,7 @@ class CallbackWrapper {
  public:
   CallbackWrapper(Callback callback) : callback_(callback) {}
   ~CallbackWrapper() {}
-  void Invoke(const std::string& result) { callback_(result); }
+  void Invoke(const std::string& result, const std::string& bundleType) { callback_(result, bundleType); }
 
  private:
   Callback callback_;

@@ -218,6 +218,8 @@ namespace weex {
                                          ExecJSOnInstance);
                 handler->registerHandler(static_cast<uint32_t>(IPCJSMsg::UPDATEGLOBALCONFIG),
                                          UpdateGlobalConfig);
+                handler->registerHandler(static_cast<uint32_t>(IPCJSMsg::UpdateInitFrameworkParams),
+                                         UpdateInitFrameworkParams);
             }
 
             std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::InitFramework(
@@ -259,6 +261,10 @@ namespace weex {
                             auto enable = value == "true";
                             LOGE("enable backupThread %d",enable);
                             WeexEnv::getEnv()->setEnableBackupThread(enable);
+                        } else if(type == "enableBackupThreadCache") {
+                            auto enable = value == "true";
+                            LOGE("enable backupThreadCache %d",enable);
+                            WeexEnv::getEnv()->set_m_cache_task_(enable);
                         }
                     }
 
@@ -478,6 +484,17 @@ namespace weex {
                 LOGD("ScriptBridgeInMultiProcess::UpdateGlobalConfig");
                 const char *configString = GetUTF8StringFromIPCArg(arguments, 0);
                 Instance()->script_side()->UpdateGlobalConfig(configString);
+                return createVoidResult();
+            }
+
+            std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::UpdateInitFrameworkParams(
+                    IPCArguments *arguments) {
+                LOGD("ScriptBridgeInMultiProcess::UpdateInitFrameworkParams");
+                const char *key = GetUTF8StringFromIPCArg(arguments, 0);
+                const char *value = GetUTF8StringFromIPCArg(arguments, 1);
+                const char *desc = GetUTF8StringFromIPCArg(arguments, 2);
+                Instance()->script_side()->UpdateInitFrameworkParams(key, value, desc);
+                LOGD("ScriptBridgeInMultiProcess::UpdateInitFrameworkParams End");
                 return createVoidResult();
             }
 

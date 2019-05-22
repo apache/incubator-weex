@@ -13,4 +13,13 @@ gen
 lint.xml
 project.properties
 assets/main.js
+assets/weex-main-jsfm.js
+assets/weex-rax-api.js
 .externalNativeBuild
+
+/libs/armeabi/libweexcore.so
+/libs/armeabi/libweexjss.so
+/libs/armeabi-v7a/libweexcore.so
+/libs/armeabi-v7a/libweexjss.so
+/libs/x86/libweexcore.so
+/libs/x86/libweexjss.so

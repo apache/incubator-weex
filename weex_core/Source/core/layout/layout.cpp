@@ -715,7 +715,9 @@ namespace WeexCore {
 
     for (WXCoreFlexLine *flexLine: lines) {
       float spaceBetweenItem = 0.f;
-      layoutFlexlineHorizontal(width, flexLine, childLeft, childRight, spaceBetweenItem);
+      // Bugfix: when flex-direction is row-reverse, justify-content:flex-end is not available, it always performance as flex-start
+      // layoutFlexlineHorizontal(width, flexLine, childLeft, childRight, spaceBetweenItem);
+      layoutFlexlineHorizontal(isRtl, width, flexLine, childLeft, childRight, spaceBetweenItem);
       spaceBetweenItem = std::max(spaceBetweenItem, 0.f);
 
       if(absoulteItem == nullptr) {
@@ -740,46 +742,65 @@ namespace WeexCore {
     }
   }
 
+  void WXCoreLayoutNode::layoutFlexlineHorizontal(const bool isRTL,
+                                                  const float width,
+                                                  const WXCoreFlexLine *const flexLine,
+                                                  float &childLeft,
+                                                  float &childRight,
+                                                  float &spaceBetweenItem) const {
+      Index visibleCount, visibleItem;
+      float denominator;
+      switch (mCssStyle->mJustifyContent) {
+          case kJustifyCenter:
+              childLeft = (width - flexLine->mMainSize - mCssStyle->sumPaddingBorderOfEdge(kRight)
+                              + mCssStyle->sumPaddingBorderOfEdge(kLeft)) / 2;
+              childRight = childLeft + flexLine->mMainSize;
+              break;
+          case kJustifySpaceAround:
+              visibleCount = flexLine->mItemCount;
+              if (visibleCount != 0) {
+                  spaceBetweenItem =
+                  (width - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, true)) / visibleCount;
+              }
+              childLeft = getPaddingLeft() + getBorderWidthLeft() + spaceBetweenItem / 2.f;
+              childRight = width - getPaddingRight() - getBorderWidthRight() - spaceBetweenItem / 2.f;
+              break;
+          case kJustifySpaceBetween:
+              childLeft = getPaddingLeft() + getBorderWidthLeft();
+              visibleItem = flexLine->mItemCount;
+              denominator = visibleItem != 1 ? visibleItem - 1 : 1.f;
+              spaceBetweenItem =
+              (width - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, true)) / denominator;
+              childRight = width - getPaddingRight() - getBorderWidthRight();
+              break;
+          case kJustifyFlexEnd:
+              if (isRTL) {
+                  childLeft = getPaddingLeft() + getBorderWidthLeft();
+                  childRight = flexLine->mMainSize + getPaddingLeft() + getBorderWidthLeft();
+              } else {
+                  childLeft = width - flexLine->mMainSize - getPaddingRight() - getBorderWidthRight();
+                  childRight = width - getPaddingRight() - getBorderWidthRight();
+              }
+              break;
+          case kJustifyFlexStart:
+          default:
+              if (isRTL) {
+                  childLeft = width - flexLine->mMainSize - getPaddingRight() - getBorderWidthRight();
+                  childRight = width - getPaddingRight() - getBorderWidthRight();
+              } else {
+                  childLeft = getPaddingLeft() + getBorderWidthLeft();
+                  childRight = flexLine->mMainSize + getPaddingLeft() + getBorderWidthLeft();
+              }
+              break;
+      }
+  }
+    
   void WXCoreLayoutNode::layoutFlexlineHorizontal(const float width,
                               const WXCoreFlexLine *const flexLine,
                               float &childLeft,
                               float &childRight,
                               float &spaceBetweenItem) const {
-    Index visibleCount, visibleItem;
-    float denominator;
-    switch (mCssStyle->mJustifyContent) {
-      case kJustifyFlexEnd:
-        childLeft = width - flexLine->mMainSize - getPaddingRight() - getBorderWidthRight();
-        childRight = width - getPaddingLeft() - getBorderWidthLeft();
-        break;
-      case kJustifyCenter:
-        childLeft = (width - flexLine->mMainSize - mCssStyle->sumPaddingBorderOfEdge(kRight)
-            + mCssStyle->sumPaddingBorderOfEdge(kLeft)) / 2;
-        childRight = childLeft + flexLine->mMainSize;
-        break;
-      case kJustifySpaceAround:
-        visibleCount = flexLine->mItemCount;
-        if (visibleCount != 0) {
-          spaceBetweenItem =
-              (width - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, true)) / visibleCount;
-        }
-        childLeft = getPaddingLeft() + getBorderWidthLeft() + spaceBetweenItem / 2.f;
-        childRight = width - getPaddingRight() - getBorderWidthRight() - spaceBetweenItem / 2.f;
-        break;
-      case kJustifySpaceBetween:
-        childLeft = getPaddingLeft() + getBorderWidthLeft();
-        visibleItem = flexLine->mItemCount;
-        denominator = visibleItem != 1 ? visibleItem - 1 : 1.f;
-        spaceBetweenItem =
-            (width - flexLine->mMainSize - sumPaddingBorderAlongAxis(this, true)) / denominator;
-        childRight = width - getPaddingRight() - getBorderWidthRight();
-        break;
-      case kJustifyFlexStart:
-      default:
-        childLeft = getPaddingLeft() + getBorderWidthLeft();
-        childRight = width - getPaddingRight() - getBorderWidthRight();
-        break;
-    }
+      layoutFlexlineHorizontal(false, width, flexLine, childLeft, childRight, spaceBetweenItem);
   }
 
   void WXCoreLayoutNode::layoutSingleChildHorizontal(const bool isRtl, const bool absoulteItem,
@@ -1105,6 +1126,12 @@ namespace WeexCore {
     void WXCoreLayoutNode::determineChildLayoutDirection(const WXCoreDirection direction) {
         for (Index i = 0; i < getChildCount(kBFC); ++i) {
             WXCoreLayoutNode *child = getChildAt(kBFC, i);
+            if (child == nullptr) {
+                continue;
+            }
+            if (child->mLayoutResult == nullptr || child->mCssStyle == nullptr) {
+                continue;
+            }
             // determin direction
             if (child->mLayoutResult->mLayoutDirection == kDirectionInherit) {
                 if(child->mCssStyle->mDirection == kDirectionInherit) {

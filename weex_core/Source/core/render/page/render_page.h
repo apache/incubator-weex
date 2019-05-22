@@ -141,10 +141,29 @@ public:
     return this->is_render_container_width_wrap_content_.load();
   }
 
+
   virtual float GetViewportWidth() override { return viewport_width_; }
   virtual void SetViewportWidth(float value) override { viewport_width_ = value; };
   virtual bool GetRoundOffDeviation() override { return round_off_deviation_; }
   virtual void SetRoundOffDeviation(bool value) override { round_off_deviation_ = value; }
+
+  inline float viewport_width() const { return this->viewport_width_; }
+
+  inline void set_viewport_width(float viewport_width) {
+    this->viewport_width_ = viewport_width;
+  }
+
+  inline float device_width(){
+    return this->device_width_;
+  }
+
+  inline void set_device_width(float device_width){
+    this->device_width_ = device_width;
+  }
+
+  inline bool round_off_deviation() const { return this->round_off_deviation_; }
+
+  inline void set_round_off_deviation(float round_off_deviation) { this->round_off_deviation_ = round_off_deviation; }
 
   inline void set_before_layout_needed(bool v) { is_before_layout_needed_.store(v); }
 
@@ -168,6 +187,7 @@ public:
   std::atomic_bool is_platform_layout_needed_{false};
   std::atomic_bool is_after_layout_needed_{true};
   float viewport_width_ = -1;
+  float device_width_ = -1;
   bool round_off_deviation_ = kDefaultRoundOffDeviation;
 };
 }  // namespace WeexCore

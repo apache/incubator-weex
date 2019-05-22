@@ -17,23 +17,30 @@
  * under the License.
  */
 //
-// Created by pengtao.pt on 2018/7/25.
+// Created by furture on 2019/3/25.
 //
 
-#include "core/data_render/rax_parser_statistics.h"
-#include <iostream>
+#ifndef WEEX_PROJECT_UPDATEINITFRAMEWORKPARAMSTASK_H
+#define WEEX_PROJECT_UPDATEINITFRAMEWORKPARAMSTASK_H
 
-namespace weex {
-namespace core {
-namespace data_render {
+#include "android/jsengine/task/weex_task.h"
 
-void Statistics::dump() {
-        std::cout << "-- Statistics\n";
-#define PRINT_COUNTER(C) std::cout << #C << " = " << counters_[CountType::k##C] << "\n";
-    COUNTER_TYPE(PRINT_COUNTER)
-#undef PRINT_COUNTER
-}
-    
-}
-}
-}
+
+class UpdateInitFrameworkParamsTask : public WeexTask {
+
+public:
+    UpdateInitFrameworkParamsTask(const std::string& key, const std::string& value, const std::string& desc);
+
+    void run(WeexRuntime *runtime) override;
+
+    std::string taskName() override { return "UpdateInitFrameworkParamsTask"; }
+
+private:
+    std::string key_;
+    std::string value_;
+    std::string desc_;
+
+};
+
+
+#endif //WEEX_PROJECT_UPDATEINITFRAMEWORKPARAMSTASK_H

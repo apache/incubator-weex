@@ -53,7 +53,7 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
 
   virtual void SetPageArgument(const std::string &pageId, const std::string& key, const std::string& value) override;
 
-
+  void SetDeviceDisplay(const std::string &instance_id, float width, float height, float scale) override;
   void SetPageDirty(const std::string &instance_id) override;
   void ForceLayout(const std::string &instance_id) override;
   bool NotifyLayout(const std::string &instance_id) override;
@@ -111,7 +111,10 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
   int DestroyInstance(const char *instanceId) override;
   int UpdateGlobalConfig(const char *config) override;
 
- private:
+  int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) override;
+
+
+private:
   DISALLOW_COPY_AND_ASSIGN(CoreSideInPlatform);
 };
 }  // namespace WeexCore

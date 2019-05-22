@@ -49,6 +49,7 @@ public class WXRenderManager {
 
   private volatile ConcurrentHashMap<String, RenderContextImpl> mRenderContext;
   private WXRenderHandler mWXRenderHandler;
+  private String mCurrentBatchInstanceId = null;
   private ArrayList<Map<String,Object>> mBatchActions = new ArrayList<>();
   private final int MAX_DROP_FRAME_NATIVE_BATCH = 2000;
   private final static  String sKeyAction = "Action";
@@ -123,18 +124,38 @@ public class WXRenderManager {
   }
 
   private void postAllStashedGraphicAction(final String instanceId,final BasicGraphicAction action) {
-      ArrayList<Map<String, Object>> tmpList = new ArrayList<>(mBatchActions);
+      final RenderContextImpl renderContext = mRenderContext.get(instanceId);
+
+      /// keep actions if renderContext still exist
+      ArrayList<Map<String, Object>> tmpList = null;
+      if (renderContext != null) {
+        tmpList = new ArrayList<>(mBatchActions);
+      }
+
+      // clear stashed actions
       this.mBatchActions.clear();
+      mCurrentBatchInstanceId = null;
+      nativeBatchTimes = 0;
+
+      // return if renderContext has been destroyed
+      if (renderContext == null) {
+        return;
+      }
+
+      /// post actions if renderContext still exist
       ArrayList<BasicGraphicAction> actions = new ArrayList<>(tmpList.size());
       for (int i = 0 ; i < tmpList.size(); i ++) {
           Map<String, Object> item = tmpList.get(i);
-          BasicGraphicAction tmpAction = (BasicGraphicAction)item.get(sKeyAction);
+          Object mustBeAction = item.get(sKeyAction);
+          if (!(mustBeAction instanceof BasicGraphicAction)) {
+            continue;
+          }
+          BasicGraphicAction tmpAction = (BasicGraphicAction)mustBeAction;
           if (tmpAction.mActionType == BasicGraphicAction.ActionTypeBatchBegin || tmpAction.mActionType == BasicGraphicAction.ActionTypeBatchEnd) {
-              continue;
+            continue;
           }
           actions.add(tmpAction);
       }
-      nativeBatchTimes = 0;
       postGraphicAction(instanceId, new GraphicActionBatchAction(action.getWXSDKIntance(),action.getRef(), actions));
   }
 
@@ -142,6 +163,17 @@ public class WXRenderManager {
     final RenderContextImpl renderContext = mRenderContext.get(instanceId);
     if (renderContext == null) {
       return;
+    }
+
+    // If more than two pages exist and mCurrentBatchInstanceId not matches new instanceId, we will post all stashed actions at once.
+    // That will cause losing efficacy of batch action, but it is acceptable because it's not serious problem.
+    if (mCurrentBatchInstanceId != null && instanceId != null && !mCurrentBatchInstanceId.equals(instanceId) && mBatchActions.size() > 0) {
+      Map<String, Object> lastItem = mBatchActions.get(mBatchActions.size() - 1);
+      Object mustBeAction = lastItem.get(sKeyAction);
+      if (mustBeAction instanceof BasicGraphicAction) {
+        BasicGraphicAction lastAction = (BasicGraphicAction)mustBeAction;
+        postAllStashedGraphicAction(mCurrentBatchInstanceId, lastAction);
+      }
     }
 
     if (action.mActionType == BasicGraphicAction.ActionTypeBatchEnd) {
@@ -155,6 +187,7 @@ public class WXRenderManager {
             HashMap<String, Object> item = new HashMap<>(1);
             item.put(sKeyAction, action);
             mBatchActions.add(item);
+            mCurrentBatchInstanceId = instanceId;
             return;
         }
     }

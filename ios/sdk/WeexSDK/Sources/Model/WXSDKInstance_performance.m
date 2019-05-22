@@ -52,17 +52,21 @@
     double modifyTime =  CACurrentMediaTime()*1000;
     
     __weak WXComponent* weakComponent = targetComponent;
+    __weak WXPerformance* weakSelf = self;
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong WXComponent* strongComponent = weakComponent;
-        if (nil == strongComponent) {
-            return;
-        }
-        if(![self _verifyComponent:strongComponent]){
-            return;
-        }
-        self.interactionAddCountRecord++;
+        __strong WXPerformance* strongSelf = weakSelf;
         
-        [self _handleRenderTime:strongComponent withModifyTime:modifyTime];
+        if (nil == strongComponent || nil == strongSelf) {
+            return;
+        }
+        
+        if(![strongSelf _verifyComponent:strongComponent]){
+            return;
+        }
+        strongSelf.interactionAddCountRecord++;
+        [strongSelf _handleRenderTime:strongComponent withModifyTime:modifyTime];
     });
 }
 

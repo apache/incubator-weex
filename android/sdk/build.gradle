@@ -26,7 +26,9 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
-        classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
+        if(!project.disableCov) {
+            classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
+        }
     }
 }
 
@@ -39,8 +41,7 @@ apply plugin: 'checkstyle'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
-if(!disableCov.toBoolean()){
+if(!project.disableCov){
     apply plugin: 'com.vanniktech.android.junit.jacoco'
     junitJacoco {
         excludes = ['com/taobao/weex/dom/flex/**','com/taobao/weex/ui/view/refresh/circlebar/**']
@@ -62,16 +63,28 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-version = project.hasProperty('weexVersion')? project.getProperty('weexVersion') : "0.20.0.1"
+version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : "0.20.0.1"
+
+//Check version, the version must have 4 sections. The leading three section must be number, and the last section is odd number with or without suffix string.
+if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVersionCheck').equals("true")) {
+    assert version.tokenize('.').eachWithIndex { it, i ->
+        if (i < 3) {
+            assert it.isNumber()
+        } else if (i == 3) {
+            it.split("-|_").toList().eachWithIndex { inner_it, inner_i ->
+                if (inner_i == 0) {
+                    assert inner_it.isNumber() && inner_it.toInteger() % 2
+                } else {
+                    assert !inner_it.isNumber()
+                }
+            }.size == 4
+        } else {
+            assert false: "Please use semantic versioning witch 4 sections, you are using ${$ { i } + 1} section instead"
+        }
+    }.size == 4
+}
 
 android {
-    delete 'libs/armeabi/libweexcore.so'
-    delete 'libs/armeabi-v7a/libweexcore.so'
-    delete 'libs/x86/libweexcore.so'
-    delete 'libs/armeabi/libweexjss.so'
-    delete 'libs/armeabi-v7a/libweexjss.so'
-    delete 'libs/x86/libweexjss.so'
-
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
@@ -122,9 +135,6 @@ android {
         }
     }
 
-    def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexcore.so").length();
-    def ARMEABIV7_Size = new File(projectDir,"libs/armeabi-v7/libweexcore.so").length();
-    def X86_Size = new File(projectDir,"libs/x86/libweexcore.so").length();
     def ndkversion = 16;
     def api_level = "";
     def compile_tool = "clang";
@@ -134,14 +144,8 @@ android {
     } else {
         api_level = "android-19";
     }
-    println "ARMEABI_Size: "+ARMEABI_Size;
-    println "ARMEABIV7_Size:" + ARMEABIV7_Size;
-    println "X86_Size:" + X86_Size;
 
     defaultConfig {
-        buildConfigField "long", "ARMEABI_Size", "${ARMEABI_Size}"
-        buildConfigField "long", "ARMEABIV7_Size", "${ARMEABIV7_Size}"
-        buildConfigField "long", "X86_Size", "${X86_Size}"
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
         minSdkVersion project.minSdkVersion
@@ -152,15 +156,14 @@ android {
         versionCode 1
         versionName project.version
         ndk {
-            abiFilters "armeabi-v7a","armeabi","x86"
+            abiFilters "armeabi-v7a", "armeabi", "x86"
         }
-
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID_PLATFORM='+"${api_level}",
-                        '-DANDROID_TOOLCHAIN='+"${compile_tool}",
-                        '-DANDROID_STL='+"${cxx_stl}",
-                        '-DCMAKE_BUILD_TYPE=Debug',
+                arguments '-DANDROID_PLATFORM=' + "${api_level}",
+                        '-DANDROID_TOOLCHAIN=' + "${compile_tool}",
+                        '-DANDROID_STL=' + "${cxx_stl}",
+                        '-DCMAKE_BUILD_TYPE=Release',
                         '-DENABLE_ASAN=false'
             }
         }
@@ -366,8 +369,21 @@ bintray {
         licenses = ["Apache-2.0"]
         publish = true
         version {
-            //这里填写需要发布的版本号
+            //The version to be published
             name = project.version
+        }
+    }
+}
+
+afterEvaluate {
+    transformNativeLibsWithStripDebugSymbolForRelease << {
+        copy{
+            from transformNativeLibsWithMergeJniLibsForRelease
+            into new File(project.buildDir, "unstrippedSo")
+            include '**/libweexjss.so', '**/libweexcore.so'
+            eachFile {
+                it.path = "${it.relativePath.segments[5]}_${it.name}"
+            }
         }
     }
 }

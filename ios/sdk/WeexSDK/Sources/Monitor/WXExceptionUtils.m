@@ -32,50 +32,69 @@
 
 @implementation WXExceptionUtils
 
+static NSMutableDictionary *recordExceptionHistory = nil;
+
 + (void)commitCriticalExceptionRT:(NSString *)instanceId errCode:(NSString *)errCode function:(NSString *)function exception:(NSString *)exception extParams:(NSDictionary *)extParams{
+    WXLogError(@"Weex exception errCode: %@ function: %@ message: %@", errCode, function, exception);
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        recordExceptionHistory = [[NSMutableDictionary alloc] init];
+    });
 
     NSMutableDictionary* extInfo = [[NSMutableDictionary alloc] initWithDictionary:extParams];
     WXPerformBlockOnComponentThread(^{
         NSString *bundleUrlCommit = @"BundleUrlDefault";
         NSString *instanceIdCommit = @"InstanceIdDefalut";
-        WXSDKInstance * instance ;
+        WXSDKInstance *instance = nil;
         if(![WXUtility isBlankString:instanceId]){
             instanceIdCommit = instanceId;
             instance = [WXSDKManager instanceForID:instanceId];
-            if(instance){
-                bundleUrlCommit = instance.pageName?:instance.scriptURL.absoluteString;
-                if(nil == bundleUrlCommit || [@"" isEqualToString:bundleUrlCommit]){
-                    bundleUrlCommit = @"instanceUnSetPageNameOrUrl";
-                }
-
-                if (instance.containerInfo && instance.containerInfo.count >0) {
-                    [extInfo addEntriesFromDictionary:instance.containerInfo];
-                }
-                if (nil != instance.viewController) {
-                    [extInfo setObject:NSStringFromClass(instance.viewController.class)?:@"unKnowVCName" forKey:KEY_PAGE_PROPERTIES_CONTAINER_NAME];
-                }
-                [extInfo setObject:[self _convertInstanceStageToStr:instance] forKey:@"wxStageList"];
-                [extInfo setObject:instance.pageName?:@"unKnowPageNameCaseUnSet" forKey:@"wxBundlePageName"];
-                NSString* bundleTemplateCommit = @"has recycle";
-                if (nil != instance.bundleTemplate) {
-                    NSUInteger strLength = instance.bundleTemplate.length;
-                    bundleTemplateCommit = [instance.bundleTemplate substringWithRange:NSMakeRange(0, strLength>300?300:strLength)];
-                }
-                [extInfo setObject:bundleTemplateCommit forKey:@"wxTemplateOfBundle"];
-                [extInfo setObject:[instance.apmInstance templateInfo] forKey:@"templateInfo"];
-                NSNumber* pageStartTime = [instance.apmInstance.stageDic objectForKey:KEY_PAGE_STAGES_DOWN_BUNDLE_START];
-                if (nil == pageStartTime) {
-                    pageStartTime = [instance.apmInstance.stageDic objectForKey:KEY_PAGE_STAGES_RENDER_ORGIGIN];
-                }
-                if (nil != pageStartTime) {
-                    long useTime = [WXUtility getUnixFixTimeMillis] - pageStartTime.longValue;
-                    [extInfo setObject:@(useTime) forKey:@"wxUseTime"];
-                }
-                
-            }else if([instanceIdCommit hasPrefix:@"WX_KEY_EXCEPTION"]){
-                bundleUrlCommit = instanceId;
-            }
         }
+
+        NSString *targetException = exception.length > 200 ? [exception substringWithRange:NSMakeRange(0, 200)] : exception;
+        NSMutableSet *exceptionSet = [recordExceptionHistory objectForKey:instanceIdCommit];
+        if (!exceptionSet) {
+            exceptionSet = [[NSMutableSet alloc] init];
+            [recordExceptionHistory setObject:exceptionSet forKey:instanceIdCommit];
+        } else if ([exceptionSet containsObject:targetException]) {
+            return;
+        }
+        [exceptionSet addObject:targetException];
+
+        if(instance){
+            bundleUrlCommit = instance.pageName?:instance.scriptURL.absoluteString;
+            if(nil == bundleUrlCommit || [@"" isEqualToString:bundleUrlCommit]){
+                bundleUrlCommit = @"instanceUnSetPageNameOrUrl";
+            }
+
+            if (instance.containerInfo && instance.containerInfo.count >0) {
+                [extInfo addEntriesFromDictionary:instance.containerInfo];
+            }
+            if (nil != instance.viewController) {
+                [extInfo setObject:NSStringFromClass(instance.viewController.class)?:@"unKnowVCName" forKey:KEY_PAGE_PROPERTIES_CONTAINER_NAME];
+            }
+            [extInfo setObject:[self _convertInstanceStageToStr:instance] forKey:@"wxStageList"];
+            [extInfo setObject:instance.pageName?:@"unKnowPageNameCaseUnSet" forKey:@"wxBundlePageName"];
+            NSString* bundleTemplateCommit = @"has recycle";
+            if (nil != instance.bundleTemplate) {
+                NSUInteger strLength = instance.bundleTemplate.length;
+                bundleTemplateCommit = [instance.bundleTemplate substringWithRange:NSMakeRange(0, strLength>300?300:strLength)];
+            }
+            [extInfo setObject:bundleTemplateCommit forKey:@"wxTemplateOfBundle"];
+            [extInfo setObject:[instance.apmInstance templateInfo] forKey:@"templateInfo"];
+            NSNumber* pageStartTime = [instance.apmInstance.stageDic objectForKey:KEY_PAGE_STAGES_DOWN_BUNDLE_START];
+            if (nil == pageStartTime) {
+                pageStartTime = [instance.apmInstance.stageDic objectForKey:KEY_PAGE_STAGES_RENDER_ORGIGIN];
+            }
+            if (nil != pageStartTime) {
+                long useTime = [WXUtility getUnixFixTimeMillis] - pageStartTime.longValue;
+                [extInfo setObject:@(useTime) forKey:@"wxUseTime"];
+            }
+
+        }else if([instanceIdCommit hasPrefix:@"WX_KEY_EXCEPTION"]){
+            bundleUrlCommit = instanceId;
+        }
+
         WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instanceIdCommit bundleUrl:bundleUrlCommit errorCode:errCode functionName:function exception:exception userInfo: [extInfo mutableCopy]];
         
 //        //record top5 erromsg ,if errorType is not WX_RENDER_ERROR
@@ -121,6 +140,14 @@
         }
     }
     return stageStr;
+}
+
++ (void)removeExceptionHistory:(NSString *)instanceId {
+    WXPerformBlockOnComponentThread(^{
+        if (recordExceptionHistory) {
+            [recordExceptionHistory removeObjectForKey:instanceId];
+        }
+    });
 }
 
 

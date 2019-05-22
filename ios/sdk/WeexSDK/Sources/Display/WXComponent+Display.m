@@ -31,6 +31,15 @@
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
+typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
+    WXComponentBorderRecordNone = 0,
+    WXComponentBorderRecordTop = 1,
+    WXComponentBorderRecordRight = 1 << 1,
+    WXComponentBorderRecordBottom = 1 << 2,
+    WXComponentBorderRecordLeft = 1 << 3,
+    WXComponentBorderRecordAll = WXComponentBorderRecordTop | WXComponentBorderRecordRight | WXComponentBorderRecordBottom | WXComponentBorderRecordLeft
+};
+
 @implementation WXComponent (Display)
 
 #pragma mark Public
@@ -61,7 +70,7 @@
         return YES;
     }
     
-    if (![self _needsDrawBorder]) {
+    if (![self _needsDrawBorder] && _lastBorderRecords == WXComponentBorderRecordNone) {
         WXLogDebug(@"No need to draw border for %@", self.ref);
         WXPerformBlockOnMainThread(^{
             [self _resetNativeBorderRadius];
@@ -96,19 +105,26 @@
 
 - (WXDisplayBlock)_displayBlock
 {
+    __weak WXComponent* wself = self;
     WXDisplayBlock displayBlock = ^UIImage *(CGRect bounds, BOOL(^isCancelled)(void)) {
         if (isCancelled()) {
             return nil;
         }
         
-        UIGraphicsBeginImageContextWithOptions(bounds.size, [self _bitmapOpaqueWithSize:bounds.size] , 0.0);
-        UIImage *image = [self drawRect:bounds];
-        if (!image) {
-            image = UIGraphicsGetImageFromCurrentImageContext();
+        __strong WXComponent* sself = wself;
+        if (sself) {
+            UIGraphicsBeginImageContextWithOptions(bounds.size, [sself _bitmapOpaqueWithSize:bounds.size] , 0.0);
+            UIImage *image = [sself drawRect:bounds];
+            if (!image) {
+                image = UIGraphicsGetImageFromCurrentImageContext();
+            }
+            UIGraphicsEndImageContext();
+            
+            return image;
         }
-        UIGraphicsEndImageContext();
-        
-        return image;
+        else {
+            return nil;
+        }
     };
     
     return displayBlock;
@@ -354,6 +370,9 @@
         CGContextAddLineToPoint(context, topLeft, _borderTopWidth/2);
         CGContextAddArc(context, topLeft, topLeft, topLeft-_borderTopWidth/2, -M_PI_2, -M_PI_2-M_PI_4-(_borderLeftWidth>0?0:M_PI_4), 1);
         CGContextStrokePath(context);
+        _lastBorderRecords |= WXComponentBorderRecordTop;
+    } else {
+        _lastBorderRecords &= ~(WXComponentBorderRecordTop);
     }
     
     // Left
@@ -372,6 +391,9 @@
         CGContextAddLineToPoint(context, _borderLeftWidth/2, size.height-bottomLeft);
         CGContextAddArc(context, bottomLeft, size.height-bottomLeft, bottomLeft-_borderLeftWidth/2, M_PI, M_PI-M_PI_4-(_borderBottomWidth>0?0:M_PI_4), 1);
         CGContextStrokePath(context);
+        _lastBorderRecords |= WXComponentBorderRecordLeft;
+    } else {
+        _lastBorderRecords &= ~WXComponentBorderRecordLeft;
     }
     
     // Bottom
@@ -390,6 +412,9 @@
         CGContextAddLineToPoint(context, size.width-bottomRight, size.height-_borderBottomWidth/2);
         CGContextAddArc(context, size.width-bottomRight, size.height-bottomRight, bottomRight-_borderBottomWidth/2, M_PI_2, M_PI_4-(_borderRightWidth > 0?0:M_PI_4), 1);
         CGContextStrokePath(context);
+        _lastBorderRecords |= WXComponentBorderRecordBottom;
+    } else {
+        _lastBorderRecords &= ~WXComponentBorderRecordBottom;
     }
     
     // Right
@@ -408,8 +433,11 @@
         CGContextAddLineToPoint(context, size.width-_borderRightWidth/2, topRight);
         CGContextAddArc(context, size.width-topRight, topRight, topRight-_borderRightWidth/2, 0, -M_PI_4-(_borderTopWidth > 0?0:M_PI_4), 1);
         CGContextStrokePath(context);
+        _lastBorderRecords |= WXComponentBorderRecordRight;
+    } else {
+        _lastBorderRecords &= ~WXComponentBorderRecordRight;
     }
-    
+
     CGContextStrokePath(context);
     
     //clipRadius is beta feature

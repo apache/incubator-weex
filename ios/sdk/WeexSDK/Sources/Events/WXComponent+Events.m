@@ -388,6 +388,7 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
     if (!_tapGesture) {
         _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onClick:)];
         _tapGesture.delegate = self;
+        _tapGesture.cancelsTouchesInView = _cancelsTouchesInView;
         [self.view addGestureRecognizer:_tapGesture];
     }
 }
@@ -853,6 +854,20 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
     // onclick and textviewInput
     if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass: NSClassFromString(textTap)]) {
         return YES;
+    }
+    
+    return NO;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] &&
+        [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        if (otherGestureRecognizer.state != UIGestureRecognizerStateFailed) {
+            if ([gestureRecognizer view].wx_component != nil && [otherGestureRecognizer view].wx_component != nil) {
+                return YES;
+            }
+        }
     }
     
     return NO;

@@ -34,7 +34,7 @@ public:
     bool initializeCrashHandler();
     bool handleSignal(int signum, siginfo_t* siginfo, void* ucontext);
     bool printIP(void* addr);
-
+    bool is_crashed();
     struct SignalInfo {
         int signum;
         const char* signame;
@@ -66,6 +66,7 @@ private:
     std::string m_dumpFileName;
     std::string m_fileContent;
     mcontext_t m_mcontext;
+    volatile bool m_crash_occurs;
 };
 }
 #endif /* CRASHHANDLER_H */

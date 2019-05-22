@@ -18,7 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXNavigationProtocol.h"
+#import <WeexSDK/WXNavigationProtocol.h>
 
 @interface WXNavigationHandlerImpl : NSObject <WXNavigationProtocol>
 

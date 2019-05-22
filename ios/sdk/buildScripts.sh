@@ -52,13 +52,16 @@ function findHeaders() {
 # param 1：projectFilePath
 # param 2：searchPattern
 # param 3：headerFilePath
-# param 4：externalHeader
+# param 4：sdkName
+# param 5：excludeHeaders
+# param 6：externalHeader
 function generateImport() {
 	projectFilePath=$1
 	searchPattern=$2
 	headerFilePath=$3
 	sdkName=$4
-	externalHeader=$5
+	excludeHeaders=$5
+	externalHeader=$6
 
 	if [[ $externalHeader ]]; then
 		if [ "$searchPattern" = 'Private' ]; then
@@ -78,6 +81,17 @@ function generateImport() {
 			if [ "$header" = "${sdkName}.h" ];then
 				continue
 			fi
+
+			exclude="no"
+			for excludeHeader in ${excludeHeaders[@]}; do
+				if [ "$excludeHeader" = "$header" ]; then
+					exclude='yes'
+					break
+				fi
+			done
+			if [ "$exclude" = "yes" ]; then
+				continue
+			fi
 			echo "#import \"$header\"" >> $headerFilePath
 		fi
 	done
@@ -88,32 +102,37 @@ function generateImport() {
 # param 1：projectPath
 # param 2：headerFilePath
 # param 3：searchPattern
-# param 4：externalHeader
+# param 4：sdkName
+# param 5：excludeHeaders
+# param 6：externalHeader
 function generateHeader() {
 	projectPath=$1
 	headerFilePath=$2
 	searchPattern=$3
 	sdkName=$4
-	externalHeader=$5
+	excludeHeaders=$5
+	externalHeader=$6
 	generateFileHeader $headerFilePath
-	generateImport $projectPath $searchPattern $headerFilePath $sdkName $externalHeader
+	generateImport $projectPath $searchPattern $headerFilePath $sdkName "${excludeHeaders}" $externalHeader
 	generateFileFooter $headerFilePath
 	return 0
 }
 
 # generateSDKHeader
 # param 1: sdkName
-# param 2：supportPrivate
+# param 2：excludeHeaders
+# param 3：supportPrivate
 function generateSDKHeader() {
 	sdkName=$1
-	supportPrivate=$2
+	excludeHeaders=$2
+	supportPrivate=$3
 	headerFilePath="${PROJECT_DIR}/${sdkName}/Sources"
 	publicHeaderFilePath="${headerFilePath}/${sdkName}.h"
 
 	if [ -f "$publicHeaderFilePath" ]; then
 		rm $publicHeaderFilePath
 	fi
-	generateHeader "${PROJECT_DIR}/${PROJECT_NAME}.xcodeproj" "${publicHeaderFilePath}" 'Public' $sdkName
+	generateHeader "${PROJECT_DIR}/${PROJECT_NAME}.xcodeproj" "${publicHeaderFilePath}" 'Public' $sdkName "${excludeHeaders}"
 }
 
 # generateBuildTime

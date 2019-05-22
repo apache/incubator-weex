@@ -25,6 +25,9 @@
 #import "WXComponent+Layout.h"
 
 @interface WXRefreshComponent()
+{
+    NSTimeInterval _refreshStateTriggerTime;
+}
 
 @property (nonatomic) BOOL displayState;
 @property (nonatomic) BOOL initFinished;
@@ -177,12 +180,23 @@
             }
             [_indicator start];
             [scrollerProtocol setContentOffset:offset animated:YES];
+            _refreshStateTriggerTime = CFAbsoluteTimeGetCurrent();
         } else {
             offset.y = 0;
             [_indicator stop];
-            [UIView animateWithDuration:0.25 animations:^{
-                [scrollerProtocol setContentOffset:offset];
-            }];
+            if (CFAbsoluteTimeGetCurrent() - _refreshStateTriggerTime < 0.3) {
+                /* If javascript doesn't do any refreshing and only update 'display' attribute very quickly.
+                 The previous '[scrollerProtocol setContentOffset:offset animated:YES];' is not finished,
+                 we should also use '[scrollerProtocol setContentOffset:offset animated:YES]' to restore offset.
+                 Or the scroller will not stop at 0.
+                 */
+                [scrollerProtocol setContentOffset:offset animated:YES];
+            }
+            else {
+                [UIView animateWithDuration:0.25 animations:^{
+                    [scrollerProtocol setContentOffset:offset];
+                }];
+            }
         }
         
         /* If we are adding elements while refreshing, like this demo:http://dotwe.org/vue/f541ed72a121db8447a233b777003e8a

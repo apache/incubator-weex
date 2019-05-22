@@ -24,6 +24,7 @@
 
 #include "core/bridge/platform_bridge.h"
 #include "core/layout/measure_func_adapter.h"
+#include "base/closure.h"
 
 namespace WeexCore
 {
@@ -56,7 +57,8 @@ namespace WeexCore
         
         void CallNativeComponent(const char* pageId, const char* ref, const char *method,
                                  const char *arguments, int argumentsLength, const char *options, int optionsLength) override;
-        
+        std::unique_ptr<ValueWithType> RegisterPluginModule(const char *name, const char *class_name, const char *version) override;
+        std::unique_ptr<ValueWithType> RegisterPluginComponent(const char *name, const char *class_name, const char *version) override;
         void SetTimeout(const char* callbackID, const char* time) override ;
         
         void NativeLog(const char* str_array) override ;
@@ -123,6 +125,8 @@ namespace WeexCore
         }
         
         void OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult>& result) override {};
+
+        void PostTaskOnComponentThread(const weex::base::Closure closure) override;
     };
     
     class WXCoreMeasureFunctionBridge : public MeasureFunctionAdapter
@@ -147,14 +151,6 @@ namespace WeexCore
 
 + (void)install;
 
-+ (void)createDataRenderInstance:(NSString *)pageId template:(NSString *)temp options:(NSDictionary *)options data:(id)data;
-
-+ (void)createDataRenderInstance:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary *)options  data:(id)data;
-
-+ (void)destroyDataRenderInstance:(NSString *)pageId;
-
-+ (void)refreshDataRenderInstance:(NSString *)pageId data:(NSString *)data;
-
 + (void)setDefaultDimensionIntoRoot:(NSString*)pageId width:(CGFloat)width height:(CGFloat)height
                  isWidthWrapContent:(BOOL)isWidthWrapContent
                 isHeightWrapContent:(BOOL)isHeightWrapContent;
@@ -162,6 +158,8 @@ namespace WeexCore
 + (void)setDeviceSize:(CGSize)size;
 
 + (void)setViewportWidth:(NSString*)pageId width:(CGFloat)width;
+
++ (void)setPageRequired:(NSString *)pageId width:(CGFloat)width height:(CGFloat)height;
 
 + (void)layoutPage:(NSString*)pageId forced:(BOOL)forced;
 
@@ -174,8 +172,6 @@ namespace WeexCore
 + (void)addChildRenderObject:(void*)child toParent:(void*)parent;
 
 + (void)removeRenderObjectFromMap:(NSString*)pageId object:(void*)object;
-
-+ (void)callUpdateComponentData:(NSString*)pageId componentId:(NSString*)componentId jsonData:(NSString*)jsonData;
 
 + (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index;
 
@@ -198,10 +194,6 @@ namespace WeexCore
 + (void)callRefreshFinish:(NSString*)pageId;
 
 + (void)callUpdateFinish:(NSString*)pageId;
-
-+ (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args domChanges:(NSDictionary *)domChanges;
-
-+ (void)registerModules:(NSDictionary *)modules;
 
 + (void)registerComponentAffineType:(NSString *)type asType:(NSString *)baseType;
 

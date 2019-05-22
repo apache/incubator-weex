@@ -257,6 +257,8 @@ typedef int (*FuncDestroyInstance)(const char *instanceId);
 
 typedef int (*FuncUpdateGlobalConfig)(const char *config);
 
+typedef int (*FuncUpdateInitFrameworkParams)(const std::string& key, const std::string& value, const std::string& desc);
+
 typedef struct FunctionsExposedByJS {
     FuncInitFramework funcInitFramework;
     FuncInitAppFramework funcInitAppFramework;
@@ -273,6 +275,7 @@ typedef struct FunctionsExposedByJS {
     FuncExeJSOnInstance funcExeJSOnInstance;
     FuncDestroyInstance funcDestroyInstance;
     FuncUpdateGlobalConfig funcUpdateGlobalConfig;
+    FuncUpdateInitFrameworkParams funcUpdateInitFrameworkParams;
 } FunctionsExposedByJS;
 
 

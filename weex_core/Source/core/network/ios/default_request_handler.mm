@@ -19,6 +19,8 @@
 #include "core/network/ios/default_request_handler.h"
 #import "WXConvertUtility.h"
 #import "WXSDKManager.h"
+#import "WXComponentManager.h"
+#include <string>
 
 namespace weex {
 namespace core {
@@ -29,11 +31,10 @@ namespace network {
 
     void DefaultRequestHandler::Send(const char* instance_id, const char* url, Callback callback) {
         NSURL* nsURL = [NSURL URLWithString:NSSTRING(url)];
-        [[WXSDKManager bridgeMgr] DownloadJS:nsURL completion:^(NSString *script) {
-            if (!script) {
-                return;
-            }
-            callback([script UTF8String]);
+        [[WXSDKManager bridgeMgr] DownloadJS:@(instance_id) url:nsURL completion:^(NSString *script) {
+            WXPerformBlockOnBridgeThread(^{
+                callback([script UTF8String] ? : "", "");
+            });
         }];
     }
 

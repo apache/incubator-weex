@@ -17,9 +17,7 @@
  * under the License.
  */
 
-#include "core/render/page/render_page.h"
 #include <math.h>
-
 #include "base/log_defines.h"
 #include "base/time_utils.h"
 #include "core/common/view_utils.h"
@@ -27,6 +25,8 @@
 #include "core/css/constants_value.h"
 #include "core/layout/layout.h"
 #include "core/manager/weex_core_manager.h"
+#include "core/moniter/render_performance.h"
+#include "core/render/page/render_page.h"
 #include "core/render/action/render_action_add_element.h"
 #include "core/render/action/render_action_add_event.h"
 #include "core/render/action/render_action_appendtree_createfinish.h"
@@ -61,6 +61,7 @@ RenderPage::RenderPage(const std::string &page_id)
       WXCoreEnvironment::getInstance()->DeviceWidth();
   this->render_page_size_.second = NAN;
   this->viewport_width_ = kDefaultViewPortWidth;
+  this->device_width_ = WXCoreEnvironment::getInstance()->DeviceWidth();
 }
 
 RenderPage::~RenderPage() {

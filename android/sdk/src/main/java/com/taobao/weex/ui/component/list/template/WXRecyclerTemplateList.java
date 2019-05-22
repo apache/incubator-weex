@@ -1205,9 +1205,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
         int contentHeight = calcContentSize();
 
-        Map<String, Object> event = new HashMap<>(2);
-        Map<String, Object> contentSize = new HashMap<>(2);
-        Map<String, Object> contentOffset = new HashMap<>(2);
+        Map<String, Object> event = new HashMap<>(3);
+        Map<String, Object> contentSize = new HashMap<>(3);
+        Map<String, Object> contentOffset = new HashMap<>(3);
 
         contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(contentWidth, getInstance().getInstanceViewPortWidth()));
         contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(contentHeight, getInstance().getInstanceViewPortWidth()));
@@ -1216,6 +1216,7 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
         contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(offsetY, getInstance().getInstanceViewPortWidth()));
         event.put(Constants.Name.CONTENT_SIZE, contentSize);
         event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
+        event.put(Constants.Name.ISDRAGGING, recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING);
         return event;
     }
 

@@ -88,4 +88,14 @@ namespace WeexCore {
       mInteractionLogSwitch = "true" == value;
     }
   }
+
+  void WXCoreEnvironment::PutOption(std::string key, std::string value){
+    auto it = mOptions.find(key);
+    if(it == mOptions.end()){
+      AddOption(key, value);
+      return;
+    }else{
+      it->second = value;
+    }
+  }
 }

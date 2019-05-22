@@ -150,6 +150,8 @@ class ScriptBridge {
 
     virtual int UpdateGlobalConfig(const char *config) = 0;
 
+    virtual int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) = 0;
+
     inline ScriptBridge *bridge() { return bridge_; }
 
    private:
