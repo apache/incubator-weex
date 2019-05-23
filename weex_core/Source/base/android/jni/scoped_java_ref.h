@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// Copyright 2017 The WeexCore Authors. All rights reserved.
 
 #ifndef WeexCore_BASE_ANDROID_SCOPED_JAVA_REF_H_
 #define WeexCore_BASE_ANDROID_SCOPED_JAVA_REF_H_
