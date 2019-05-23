@@ -230,7 +230,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     }
 
     WXAbstractRenderContainer renderContainer = null;
-    if(url.contains(RenderTypes.RENDER_TYPE_HERON)){
+    if(url.contains(RenderTypes.RENDER_TYPE_HERON_URL_PARAM)){
       mInstance = new WXSDKInstance(this);
       mInstance.setRenderType(RenderTypes.RENDER_TYPE_HERON);
       renderContainer = getHeronContainer(mInstance);
