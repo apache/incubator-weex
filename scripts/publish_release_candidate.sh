@@ -19,14 +19,13 @@
 git tag "$1-$2"
 git push "$3" "$1-$2"
 
-if [ ! -d "$TMPDIR""weex" ]
+if [ ! -d "$TMPDIR""weex_release_candidate" ]
 then
-    svn checkout https://dist.apache.org/repos/dist/dev/incubator/weex/ "$TMPDIR""weex"
+    svn checkout https://dist.apache.org/repos/dist/dev/incubator/weex/ "$TMPDIR""weex_release_candidate"
 fi
 
-mkdir -p "$TMPDIR""weex/""$1/$2"
-echo "$TMPDIR""weex/""$1/$2"
-cp "apache-weex-incubating-$1-$2-src.tar.gz" "apache-weex-incubating-$1-$2-src.tar.gz.asc" "apache-weex-incubating-$1-$2-src.tar.gz.sha512" "$TMPDIR""weex/""$1/$2"
-cd "$TMPDIR""weex"
+mkdir -p "$TMPDIR""weex_release_candidate/""$1/$2"
+cp "apache-weex-incubating-$1-$2-src.tar.gz" "apache-weex-incubating-$1-$2-src.tar.gz.asc" "apache-weex-incubating-$1-$2-src.tar.gz.sha512" "$TMPDIR""weex_release_candidate/""$1/$2"
+cd "$TMPDIR""weex_release_candidate"
 svn add "$1/$2"
 svn commit -m "$4"

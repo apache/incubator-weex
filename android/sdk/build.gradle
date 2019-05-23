@@ -282,7 +282,7 @@ task checkNdkVersion() {
 
 preBuild.dependsOn checkNdkVersion
 
-def siteUrl = 'http://weex.incubator.apache.org'
+def siteUrl = 'https://weex.incubator.apache.org'
 def gitUrl = 'https://github.com/apache/incubator-weex.git'
 group = "com.taobao.android"
 install {
@@ -296,7 +296,7 @@ install {
                 licenses {
                     license {
                         name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        url 'https://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
                 developers {
@@ -339,6 +339,7 @@ bintray {
         version {
             //The version to be published
             name = project.version
+            vcsTag = project.version
         }
     }
 }
