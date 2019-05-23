@@ -7,7 +7,7 @@ project(":weex_sdk").projectDir = new File("sdk")
 
 
 //include ":HeronAndroid"
-//project(":HeronAndroid").projectDir = new File("../../XSDK/HeronAndroid")
+//project(":HeronAndroid").projectDir = new File("../../Heron/HeronAndroid")
 
 
 include ":commons"
