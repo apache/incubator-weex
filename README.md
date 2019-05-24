@@ -7,7 +7,7 @@ A framework for building Mobile cross-platform UI.
 | platform | status |
 | -------- | ------ |
 | Android | [![Download](https://api.bintray.com/packages/alibabaweex/maven/weex_sdk/images/download.svg)](https://bintray.com/alibabaweex/maven/weex_sdk/_latestVersion) |
-| iOS | [![Pod version](https://badge.fury.io/co/WeexSDK.svg)](https://cocoapods.org/pods/WeexSDK) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) |
+| iOS | [![Pod version](https://d25lcipzij17d.cloudfront.net/badge.svg?id=co&type=6&v=0.24.0&x2=0)](https://cocoapods.org/pods/WeexSDK) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) |
 | [Mobile Web](https://github.com/weexteam/weex-vue-render) | [![npm version](https://badge.fury.io/js/weex-html5.svg)](https://www.npmjs.com/package/weex-vue-render) |
 
 Support Android 4.1 (API 16), iOS 8.0+ and WebKit 534.30+.
