@@ -59,7 +59,7 @@
 + (NSMutableDictionary *)componentMethodMapsWithName:(NSString *)name;
 + (NSMutableDictionary *)componentSelectorMapsWithName:(NSString *)name;
 
-+ (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method;
++ (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method isSync:(BOOL *)isSync;
 
 /**
  * @abstract Unregister all the components
