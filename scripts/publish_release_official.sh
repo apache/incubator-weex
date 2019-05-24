@@ -58,6 +58,6 @@ release-it --no-npm --no-git.commit --no-git.requireCleanWorkingDir --git.tagNam
 
 # Publish Android to JCenter
 cd android
-./gradlew clean install bintray -Pweexversion="$1" -PbintrayUser=alibabaweex -PbintrayApiKey="$6" 
+./gradlew clean install bintray -PignoreVersionCheck="true"  -Pweexversion="$1" -PbintrayUser=alibabaweex -PbintrayApiKey="$6" 
 
 # Publish iOS to Cocoapods
