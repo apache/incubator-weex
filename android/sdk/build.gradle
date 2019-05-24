@@ -63,7 +63,7 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-version = project.hasProperty('weexVersion')? project.getProperty('weexVersion') : "0.24.0"
+version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : "0.20.0.1"
 
 //Check version, the version must have 4 sections. The leading three section must be number, and the last section is odd number with or without suffix string.
 if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVersionCheck').equals("true")) {
