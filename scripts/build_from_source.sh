@@ -16,6 +16,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# This script is used to build weex from source, One may invoke this script by 
+# scripts/build_from_source.sh $NDK13_dir $NDK_16dir
+
 set -e
 if [ ! -f scripts/build_from_source.sh ];then
     echo "This script must be executed from project root."
@@ -35,19 +38,65 @@ sleep 2
 # Copy built JS resources to their destination.
 [ -d pre-build ] || mkdir pre-build
 cp dist/weex-js-framework.min.js pre-build/native-bundle-main.js
-cp dist/weex-js-framework.min.js android_sdk/assets/native-bundle-main.js
 cp dist/weex-js-framework.min.js pre-build/weex-main-jsfm.js
-cp dist/weex-js-framework.min.js android_sdk/assets/weex-main-jsfm.js
 cp dist/weex-polyfill.min.js pre-build/weex-polyfill.js
 cp dist/weex-rax.min.js pre-build/weex-rax-api.js
-cp dist/weex-rax.min.js android_sdk/assets/weex-rax-api.js
 
 # Build android_sdk
-gradle wrapper --gradle-version 4.4
-echo 'include ":android_sdk"'>settings.gradle
-./gradlew :android_sdk:assemble -PasfRelease
+if [ -d "android_sdk" ]
+then
+    git clone -b 0.23 --depth=1 git@github.com:alibaba/weex_js_engine.git
+    old_path=$PATH
+    export ANDROID_NDK=$1
+    export PATH=$1:$PATH
+    cd weex_js_engine/
+
+    sh build.jsc.sh
+    cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/armeabi
+    cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/armeabi-v7a
+
+    mkdir -p ../weex_core/Source/libs/armeabi
+    cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/armeabi
+    mkdir -p ../weex_core/Source/libs/armeabi-v7a
+    cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/armeabi-v7a
+
+    rm -rf build32
+    sh build.jsc.sh -t x86
+    cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/x86
+    mkdir -p ../weex_core/Source/libs/x86
+    cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/x86
+
+    PATH=$old_path
+    export ANDROID_NDK=$2
+    cd ..
+
+    gradle wrapper --gradle-version 4.4
+    echo 'include ":android_sdk"'>settings.gradle
+    echo "ndk.dir=$2">local.properties
+
+    ./gradlew :android_sdk:clean :android_sdk:assembleRelease 
+
+    cp android_sdk/.externalNativeBuild/cmake/release/armeabi/Source/android/jsengine/libweexjsb.so android_sdk/libs/armeabi
+    cp android_sdk/.externalNativeBuild/cmake/release/armeabi/Source/android/jsengine/libweexjst.so android_sdk/libs/armeabi
+    cp android_sdk/.externalNativeBuild/cmake/release/armeabi-v7a/Source/android/jsengine/libweexjsb.so android_sdk/libs/armeabi-v7a
+    cp android_sdk/.externalNativeBuild/cmake/release/armeabi-v7a/Source/android/jsengine/libweexjst.so android_sdk/libs/armeabi-v7a
+    cp android_sdk/.externalNativeBuild/cmake/release/x86/Source/android/jsengine/libweexjsb.so android_sdk/libs/x86
+    cp android_sdk/.externalNativeBuild/cmake/release/x86/Source/android/jsengine/libweexjst.so android_sdk/libs/x86
+
+else
+    cd android/
+    ./gradlew :playground:clean :playground:assemble
+    cd ..
+fi
 
 # Build iOS sdk
-xcodebuild -project ios_sdk/WeexSDK.xcodeproj -scheme WeexSDK_MTL
+if [ -d "ios_sdk" ]
+then
+    xcodebuild -project ios_sdk/WeexSDK.xcodeproj -scheme WeexSDK_MTL
+else
+    cd ios
+    xcodebuild -project sdk/WeexSDK.xcodeproj -scheme WeexSDK_MTL
+    cd ..
+fi
 
 echo "Weex SDK Build completed."
