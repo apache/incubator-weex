@@ -16,6 +16,13 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# This script is used to genereate release source, signature and checksum. One may invoke this script by
+# scripts/apache_release.sh 0.24.0-RC3 0.19.0.2
+
+# Explanation for variable:
+# $1 The fullname of the release candidate
+# $2  Weex tag of last release, RELEASE_NOTE.md came from the difference between $1 and $2
+
 rm -f commit-history.log
 git log --pretty=format:"%s %h" --no-merges  "$2"..HEAD > commit-history.log
 sed -i '' 's/^*//' commit-history.log

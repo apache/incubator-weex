@@ -16,6 +16,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# This script is used to build weex from source, One may invoke this script by 
+# scripts/build_from_source.sh $NDK13_dir $NDK_16dir
+
 set -e
 if [ ! -f scripts/build_from_source.sh ];then
     echo "This script must be executed from project root."

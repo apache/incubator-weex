@@ -16,6 +16,15 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# This scirpt is used to publish release candidate in Apache, Github
+# One may invoke this script by 
+# scripts/publish_release_candidate.sh 0.24.0 RC3 github-Apache
+
+# Explanation for variable:
+# $1 Weex release candidate prefix
+# $2 The release candaidate suffix
+# $3 The name of your Github repository, whose URL should be git@github.com:apache/incubator-weex.git
+
 git tag "$1-$2"
 git push "$3" "$1-$2"
 
