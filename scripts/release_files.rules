@@ -83,6 +83,7 @@
 - ios/sdk/Products
 - /ios/sdk/WeexSDK.xcodeproj/project.xcworkspace/xcuserdata
 - /ios/sdk/WeexSDK.xcodeproj/xcuserdata
+- /ios/sdk/WeexSDKTests/dependency
 + /ios/sdk/**
 
 ##### Others #######
