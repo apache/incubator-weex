@@ -18,12 +18,12 @@
 
 # This scirpt is used to publish release candidate in Apache, Github
 # One may invoke this script by 
-# scripts/publish_release_candidate.sh 0.24.0 RC3 github-Apache
+# scripts/publish_release_candidate.sh $RELEASE_CANDIDATE_PREFIX $RELEASE_CANDIDATE_SUFFIX $GIT_REMOTE
 
 # Explanation for variable:
-# $1 Weex release candidate prefix
-# $2 The release candaidate suffix
-# $3 The name of your Github repository, whose URL should be git@github.com:apache/incubator-weex.git
+# $RELEASE_CANDIDATE_PREFIX, Weex release candidate prefix, like 0.24.0
+# $RELEASE_CANDIDATE_SUFFIX, The release candaidate suffix, like RC3
+# $GIT_REMOTE The name of your Github repository, like github-Apache whose URL should be git@github.com:apache/incubator-weex.git
 
 git tag "$1-$2"
 git push "$3" "$1-$2"

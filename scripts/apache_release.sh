@@ -17,11 +17,11 @@
 # under the License.
 
 # This script is used to genereate release source, signature and checksum. One may invoke this script by
-# scripts/apache_release.sh 0.24.0-RC3 0.19.0.2
+# scripts/apache_release.sh $RELEASE_CANDIDATE $TAG_OF_LATEST_RELEASE
 
 # Explanation for variable:
-# $1 The fullname of the release candidate
-# $2  Weex tag of last release, RELEASE_NOTE.md came from the difference between $1 and $2
+# $RELEASE_CANDIDATE The fullname of the release candidate, like 0.24.0-RC3
+# $TAG_OF_LATEST_RELEASE  Weex tag of last release, like 0.19.0.2. RELEASE_NOTE.md came from the difference between $RELEASE_CANDIDATE and $TAG_OF_LATEST_RELEASE .
 
 rm -f commit-history.log
 git log --pretty=format:"%s %h" --no-merges  "$2"..HEAD > commit-history.log

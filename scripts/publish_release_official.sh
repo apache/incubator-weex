@@ -19,14 +19,15 @@
 # This scirpt is used to publish release officially in Apache, Github Tag, Github Release, Android JCenter.
 # One may invoke this script by 
 # scripts/publish_release_official.sh 0.24.0 RC3 0.19.0 github-Apache token1 token2
+# scripts/publish_release_official.sh $RELEASE_CANDIDATE_PREFIX $RELEASE_CANDIDATE_SUFFIX $TAG_OF_LATEST_RELEASE $GIT_REMOTE $GITHUB_PERSONAL_TOKEN $JCENTER_TOKEN
 
 # Explanation for variable:
-# $1 Weex tag of current release
-# $2 The release candaidate suffix
-# $3 Weex tag of last release, RELEASE_NOTE.md came from the difference between $1 and $3
-# $4 The name of your Github repository, whose URL should be git@github.com:apache/incubator-weex.git
-# $5 The personal access token of your github Account(https://github.com/settings/tokens), which should have write priviledge to git@github.com:apache/incubator-weex.git . The personal access token is used to publish Github Release
-# $6 The private key for JCenter (https://bintray.com/alibabaweex/maven/weex_sdk/), which is the distribution channel for Android
+# $RELEASE_CANDIDATE_PREFIX, Weex release candidate prefix, like 0.24.0
+# $RELEASE_CANDIDATE_SUFFIX, The release candaidate suffix, like RC3
+# $TAG_OF_LATEST_RELEASE  Weex tag of last release, like 0.19.0.2. RELEASE_NOTE.md came from the difference between ${RELEASE_CANDIDATE_PREFIX}-${RELEASE_CANDIDATE_SUFFIX} and $TAG_OF_LATEST_RELEASE .
+# $GIT_REMOTE The name of your Github repository, like github-Apache whose URL should be git@github.com:apache/incubator-weex.git
+# $GITHUB_PERSONAL_TOKEN The personal access token of your github Account(https://github.com/settings/tokens), which should have write priviledge to git@github.com:apache/incubator-weex.git . The personal access token is used to publish Github Release
+# $JCENTER_TOKEN The private key for JCenter (https://bintray.com/alibabaweex/maven/weex_sdk/), which is the distribution channel for Android
 
 # Prepare RELEASE_NOTE.md
 rm -f commit-history.log
