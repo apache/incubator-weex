@@ -12,7 +12,7 @@ A framework for building Mobile cross-platform UI.
 
 Support Android 4.1 (API 16), iOS 8.0+ and WebKit 534.30+.
 
-> Note: Please note the above download distribution is only for users' users' convenience. Weex Release is always in the format of [source code](https://weex.apache.org/download/download.html)
+**Note: Please note the above download distribution is only for users' users' convenience. Weex Release is always in the format of [source code](https://weex.apache.org/download/download.html).**
 
 ## For Windows
 
