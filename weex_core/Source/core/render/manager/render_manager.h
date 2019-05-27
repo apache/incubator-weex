@@ -103,6 +103,8 @@ class RenderManager {
   RenderPage *GetPage(const std::string &page_id);
 
   bool ClosePage(const std::string &page_id);
+    
+  bool ReloadPageLayout(const std::string& page_id);
 
   float viewport_width(const std::string &page_id);
 
@@ -115,6 +117,10 @@ class RenderManager {
   bool round_off_deviation(const std::string &page_id);
 
   void set_round_off_deviation(const std::string &page_id, bool round_off_deviation);
+    
+  void setPageArgument(const std::string& pageId, const std::string& key, const std::string& value);
+  std::string getPageArgument(const std::string& pageId, const std::string& key);
+  std::map<std::string, std::string> removePageArguments(const std::string& pageId); // remove and return the page arguments
 
   static RenderManager *GetInstance() {
     if (NULL == g_pInstance) {
@@ -128,9 +134,8 @@ class RenderManager {
  private:
   static RenderManager *g_pInstance;
   std::map<std::string, RenderPage *> pages_;
-  std::map<std::string, float> viewports_;
-  std::map<std::string, float> device_heights_;
-  std::map<std::string, bool> round_off_deviations_;
+  std::mutex page_args_mutex_;
+  std::map<std::string, std::map<std::string, std::string>> page_args_;
 };
 }  // namespace WeexCore
 

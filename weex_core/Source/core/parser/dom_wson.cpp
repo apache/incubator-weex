@@ -39,7 +39,7 @@ namespace WeexCore {
     /**
      * parser wson to render object
      * */
-    RenderObject *parserWson2RenderObject(wson_parser& parser, RenderObject *parent, int index, const std::string &pageId){
+    RenderObject *parserWson2RenderObject(wson_parser& parser, RenderObject *parent, int index, const std::string &pageId, bool reserveStyles){
         int objectType = parser.nextType();
         if(!parser.isMap(objectType)){
             parser.skipValue(objectType);
@@ -91,7 +91,7 @@ namespace WeexCore {
                     for(int styleIndex=0; styleIndex<styleMapSize; styleIndex++){
                         std::string styleKeyString = parser.nextMapKeyUTF8();
                         std::string styleValueString = parser.nextStringUTF8(parser.nextType());
-                        render->AddStyle(styleKeyString, styleValueString);
+                        render->AddStyle(styleKeyString, styleValueString, reserveStyles);
                     }
                 }else{
                     keyOrderRight = keys_order_as_expect(render, keyOrderRight);
@@ -116,7 +116,7 @@ namespace WeexCore {
                 if(parser.isArray(childType) && keys_order_as_expect(render, keyOrderRight)){
                     int childSize = parser.nextArraySize();
                     for(int childIndex=0; childIndex < childSize; childIndex++){
-                        parserWson2RenderObject(parser, render, childIndex, pageId);
+                        parserWson2RenderObject(parser, render, childIndex, pageId, reserveStyles);
                     }
                 }else{
                     keyOrderRight = keys_order_as_expect(render, keyOrderRight);
@@ -153,7 +153,7 @@ namespace WeexCore {
                         for(int styleIndex=0; styleIndex<styleMapSize; styleIndex++){
                             std::string styleKeyString = parser.nextMapKeyUTF8();
                             std::string styleValueString = parser.nextStringUTF8(parser.nextType());
-                            render->AddStyle(styleKeyString, styleValueString);
+                            render->AddStyle(styleKeyString, styleValueString, reserveStyles);
                         }
                     }else{
                         parser.skipValue(styleType);
@@ -176,7 +176,7 @@ namespace WeexCore {
                     if(parser.isArray(childType)){
                         int childSize = parser.nextArraySize();
                         for(int childIndex=0; childIndex < childSize; childIndex++){
-                            parserWson2RenderObject(parser, render, childIndex, pageId);
+                            parserWson2RenderObject(parser, render, childIndex, pageId, reserveStyles);
                         }
                     }else{
                         parser.skipValue(childType);
@@ -189,19 +189,19 @@ namespace WeexCore {
 
 
         if (render != nullptr) {
-            render->ApplyDefaultStyle();
+            render->ApplyDefaultStyle(reserveStyles);
             render->ApplyDefaultAttr();
         }
         return render;
     }
 
 
-    RenderObject *Wson2RenderObject(const char *data, const std::string &pageId){
+    RenderObject *Wson2RenderObject(const char *data, const std::string &pageId, bool reserveStyles){
         if(!data){
             return nullptr;
         }
         wson_parser parser(data);
-        return parserWson2RenderObject(parser, nullptr, 0, pageId);
+        return parserWson2RenderObject(parser, nullptr, 0, pageId, reserveStyles);
     }
 
     std::vector<std::pair<std::string, std::string>> *Wson2Pairs(const char *data){

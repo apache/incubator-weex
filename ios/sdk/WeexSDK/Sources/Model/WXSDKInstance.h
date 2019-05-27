@@ -274,6 +274,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 - (void)reload:(BOOL)forcedReload;
 
 /**
+ * Refreshes current instance components' layout after setting custom view port/device width.
+ **/
+- (void)reloadLayout;
+
+/**
  * Refreshes current instance with data.
  *
  * @param data The data the bundle needs when rendered.
@@ -351,9 +356,24 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic ,strong) WXApmForInstance* apmInstance;
 
 /**
+ * Raw css styles are dropped after applied to layout nodes in WeexCore.
+ * If a page needs hot refresh(without recreating instance and reload js) after screen orientation changes or
+ * after setting custom view-port-width/screen-width/, you need to call setPageNeedsRawCssStyles to store all css styles
+ * internally for later use. Or you can use MetaModule's setPageArguments method and provide "reserveCssStyles" as "true" before rendering the page.
+ */
+- (void)setPageKeepRawCssStyles;
+
+/**
+ * Set additional argument value for WeexCore
+ */
+- (void)setPageArgument:(NSString*)key value:(NSString*)value;
+
+/**
  * Application required Page Width and Height to prevent Weex use DeviceWidth directly.
  */
 - (void)setPageRequiredWidth:(CGFloat)width height:(CGFloat)height;
+
+- (void)setViewportWidth:(CGFloat)width;
 
 /** 
  * Deprecated 

@@ -18,6 +18,7 @@
 
 # This scirpt is used to publish release officially in Apache, Github Tag, Github Release, Android JCenter.
 # One may invoke this script by 
+# scripts/publish_release_official.sh 0.24.0 RC3 0.19.0 github-Apache token1 token2
 # scripts/publish_release_official.sh $RELEASE_CANDIDATE_PREFIX $RELEASE_CANDIDATE_SUFFIX $TAG_OF_LATEST_RELEASE $GIT_REMOTE $GITHUB_PERSONAL_TOKEN $JCENTER_TOKEN
 
 # Explanation for variable:
@@ -51,11 +52,9 @@ svn add "$1"
 svn commit -m "Release ${1}"
 
 # Publish to Github Release
-git tag "$1"
-git push "$4" "$1"
 npm install -g release-it
 export GITHUB_TOKEN="$5"
-release-it --ci --no-npm --no-git.commit --no-git.requireCleanWorkingDir --no-git.tag --no-git.push --git.pushRepo="$4" --github.release --github.releaseName="$1" --github.releaseNotes="cat RELEASE_NOTE.md" $1
+release-it --no-npm --no-git.commit --no-git.requireCleanWorkingDir --git.tagName="$1" --git.tagAnnotation='"$(cat RELEASE_NOTE.md)"' --git.tagArgs="--cleanup=verbatim" --git.pushRepo="$4" --github.release --github.releaseName="$1" --github.releaseNotes="cat RELEASE_NOTE.md"
 
 # Publish Android to JCenter
 cd android

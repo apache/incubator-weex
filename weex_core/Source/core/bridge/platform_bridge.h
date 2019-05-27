@@ -64,6 +64,8 @@ class PlatformBridge {
                            const std::string& render_ref) = 0;
     virtual void SetViewPortWidth(const std::string& instance_id,
                                   float width) = 0;
+    virtual void SetPageArgument(const std::string &pageId, const std::string& key, const std::string& value) = 0;
+    virtual void SetDeviceDisplayOfPage(const std::string &instance_id, float width, float height /* unused now */) = 0;
     virtual void SetDeviceDisplay(const std::string &instance_id, float width, float height, float scale) = 0;
 
     virtual void SetPageDirty(const std::string& instance_id) = 0;
@@ -73,6 +75,7 @@ class PlatformBridge {
         const std::string& instance_id) = 0;
     virtual std::vector<int64_t> GetRenderFinishTime(
         const std::string& instance_id) = 0;
+    virtual bool RelayoutUsingRawCssStyles(const std::string& instance_id) = 0; // relayout whole page using raw css styles
     virtual void SetRenderContainerWrapContent(const std::string& instance_id,
                                                bool wrap) = 0;
     virtual void BindMeasurementToRenderObject(long ptr) = 0;

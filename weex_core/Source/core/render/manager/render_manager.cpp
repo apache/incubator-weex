@@ -52,7 +52,7 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
     initDeviceConfig(page, page_id);
 
   int64_t start_time = getCurrentTime();
-  RenderObject *root = Wson2RenderObject(data, page_id);
+  RenderObject *root = Wson2RenderObject(data, page_id, page->reserve_css_styles());
   page->ParseJsonTime(getCurrentTime() - start_time);
 
   page->set_is_dirty(true);
@@ -108,7 +108,7 @@ bool RenderManager::AddRenderObject(const std::string &page_id,
 #endif
 
   int64_t start_time = getCurrentTime();
-  RenderObject *child = Wson2RenderObject(data, page_id);
+  RenderObject *child = Wson2RenderObject(data, page_id, page->reserve_css_styles());
   page->ParseJsonTime(getCurrentTime() - start_time);
 
   if (child == nullptr) return false;
@@ -306,10 +306,51 @@ void RenderManager::CallMetaModule(const char *page_id, const char *method, cons
             std::string key = parser.nextMapKeyUTF8();
             std::string value = parser.nextStringUTF8(parser.nextType());
             if (strcmp(key.c_str(), WIDTH) == 0) {
-              viewports_.insert(std::pair<std::string, float>(page_id, getFloat(value.c_str())));
+              setPageArgument(page_id, "viewportwidth", value);
             }
             if (strcmp(key.c_str(), ROUND_OFF_DEVIATION) == 0) {
-              round_off_deviations_.insert(std::pair<std::string, bool>(page_id, getBool(value.c_str())));
+              setPageArgument(page_id, "roundoffdeviation", value);
+            }
+          }
+        }
+      }
+    }
+  }
+  else if (strcmp(method, "setDeviceSize") == 0) {
+    wson_parser parser(arguments);
+    if (parser.isArray(parser.nextType())) {
+      int size = parser.nextArraySize();
+      for (int i = 0; i < size; i++) {
+        uint8_t value_type = parser.nextType();
+        if (parser.isMap(value_type)) {
+          int map_size = parser.nextMapSize();
+          for (int j = 0; j < map_size; j++) {
+            std::string key = parser.nextMapKeyUTF8();
+            std::string value = parser.nextStringUTF8(parser.nextType());
+            if (strcmp(key.c_str(), WIDTH) == 0) {
+              setPageArgument(page_id, "devicewidth", value);
+            }
+            if (strcmp(key.c_str(), HEIGHT) == 0) {
+              // unsupported now
+            }
+          }
+        }
+      }
+    }
+  }
+  else if (strcmp(method, "setPageArguments") == 0) {
+    wson_parser parser(arguments);
+    if (parser.isArray(parser.nextType())) {
+      int size = parser.nextArraySize();
+      for (int i = 0; i < size; i++) {
+        uint8_t value_type = parser.nextType();
+        if (parser.isMap(value_type)) {
+          int map_size = parser.nextMapSize();
+          for (int j = 0; j < map_size; j++) {
+            std::string key = parser.nextMapKeyUTF8();
+            std::string value = parser.nextStringUTF8(parser.nextType());
+            if (strcmp(key.c_str(), "reserveCssStyles") == 0) {
+              setPageArgument(page_id, "reserveCssStyles", value);
             }
           }
         }
@@ -329,6 +370,7 @@ RenderPage *RenderManager::GetPage(const std::string &page_id) {
 }
 
 bool RenderManager::ClosePage(const std::string &page_id) {
+  removePageArguments(page_id);
   RenderPage *page = GetPage(page_id);
   if (page == nullptr) return false;
 
@@ -340,6 +382,13 @@ bool RenderManager::ClosePage(const std::string &page_id) {
   delete page;
   page = nullptr;
     return true;
+}
+  
+bool RenderManager::ReloadPageLayout(const std::string& page_id)
+{
+  RenderPage *page = GetPage(page_id);
+  if (page == nullptr) return false;
+  return page->ReapplyStyles();
 }
 
 float RenderManager::viewport_width(const std::string &page_id) {
@@ -353,7 +402,7 @@ void RenderManager::set_viewport_width(const std::string &page_id, float viewpor
   RenderPage *page = GetPage(page_id);
   if (page == nullptr) {
       // page is not created yet, we should store the view port value
-      viewports_.insert(std::pair<std::string, float>(page_id, viewport_width));
+      setPageArgument(page_id, "viewportwidth", std::to_string(viewport_width));
       return;
   }
 
@@ -372,7 +421,7 @@ void RenderManager::setDeviceWidth(const std::string &page_id, float device_widt
   RenderPage *page = GetPage(page_id);
   if (page == nullptr) {
     // page is not created yet, we should store the device width value
-    device_heights_.insert(std::pair<std::string, float>(page_id, device_width));
+    setPageArgument(page_id, "devicewidth", std::to_string(device_width));
     return;
   }
   page->set_device_width(device_width);
@@ -387,9 +436,43 @@ bool RenderManager::round_off_deviation(const std::string &page_id) {
 
 void RenderManager::set_round_off_deviation(const std::string &page_id, bool round_off_deviation) {
   RenderPage *page = GetPage(page_id);
-  if (page == nullptr) return;
+  if (page == nullptr) {
+    setPageArgument(page_id, "roundoffdeviation", round_off_deviation ? "true" : "false");
+    return;
+  }
 
   page->set_round_off_deviation(round_off_deviation);
+}
+    
+void RenderManager::setPageArgument(const std::string& pageId, const std::string& key, const std::string& value) {
+    if (pageId.empty() || key.empty()) {
+        return;
+    }
+    std::lock_guard<std::mutex> guard(page_args_mutex_);
+    page_args_[pageId][key] = value;
+}
+
+std::string RenderManager::getPageArgument(const std::string& pageId, const std::string& key) {
+    std::lock_guard<std::mutex> guard(page_args_mutex_);
+    auto findPage = page_args_.find(pageId);
+    if (findPage != page_args_.end()) {
+        auto findKey = findPage->second.find(key);
+        if (findKey != findPage->second.end()) {
+            return findKey->second;
+        }
+    }
+    return "";
+}
+
+std::map<std::string, std::string> RenderManager::removePageArguments(const std::string& pageId) {
+    std::lock_guard<std::mutex> guard(page_args_mutex_);
+    std::map<std::string, std::string> result;
+    auto findPage = page_args_.find(pageId);
+    if (findPage != page_args_.end()) {
+        std::swap(result, findPage->second);
+        page_args_.erase(findPage);
+    }
+    return result;
 }
 
 void RenderManager::Batch(const std::string &page_id) {
@@ -400,27 +483,27 @@ void RenderManager::Batch(const std::string &page_id) {
 }
 
 void RenderManager::initDeviceConfig(RenderPage *page, const std::string &page_id) {
-  std::map<std::string, float>::iterator iter_viewport =
-          this->viewports_.find(page_id);
-  if (iter_viewport != this->viewports_.end()) {
-    page->set_viewport_width(iter_viewport->second);
-    this->viewports_.erase(page_id);
+  if (page == nullptr) return;
+  
+  auto viewPortWidth = getPageArgument(page_id, "viewportwidth");
+  if (!viewPortWidth.empty()) {
+    page->set_viewport_width(getFloat(viewPortWidth.c_str()));
   }
-
-  std::map<std::string, float>::iterator iter_device_width =
-          this->device_heights_.find(page_id);
-  if (iter_device_width != this->device_heights_.end()) {
-    page->set_device_width(iter_device_width->second);
-    this->device_heights_.erase(page_id);
+  
+  auto deviceWidth = getPageArgument(page_id, "devicewidth");
+  if (!deviceWidth.empty()) {
+    page->set_device_width(getFloat(deviceWidth.c_str()));
   }
-
-  std::map<std::string, bool>::iterator iter_deviation =
-          this->round_off_deviations_.find(page_id);
-  if (iter_deviation != this->round_off_deviations_.end()) {
-    this->set_round_off_deviation(page_id, iter_deviation->second);
-    this->round_off_deviations_.erase(page_id);
+  
+  auto roundOff = getPageArgument(page_id, "roundoffdeviation");
+  if (!roundOff.empty()) {
+    page->set_round_off_deviation(getBool(roundOff));
   }
-
+  
+  auto reserveCssStyles = getPageArgument(page_id, "reserveCssStyles");
+  if (!reserveCssStyles.empty()) {
+    page->set_reserve_css_styles(getBool(reserveCssStyles));
+  }
 }
 
 }  // namespace WeexCore

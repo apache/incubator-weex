@@ -1005,6 +1005,12 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     env->SetDeviceHeight(std::to_string(size.height));
 }
 
++ (CGSize)getDeviceSize
+{
+    WeexCore::WXCoreEnvironment* env = WeexCore::WXCoreEnvironment::getInstance();
+    return CGSizeMake(env->DeviceWidth(), env->DeviceHeight());
+}
+
 + (void)setViewportWidth:(NSString*)pageId width:(CGFloat)width
 {
     if (platformBridge) {
@@ -1014,10 +1020,9 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 
 + (void)setPageRequired:(NSString *)pageId width:(CGFloat)width height:(CGFloat)height
 {
-    /// Because env is global, pageId is not used now time.
-    WeexCore::WXCoreEnvironment* env = WeexCore::WXCoreEnvironment::getInstance();
-    env->SetDeviceWidth(std::to_string(width));
-    env->SetDeviceHeight(std::to_string(height));
+    if (platformBridge) {
+        platformBridge->core_side()->SetDeviceDisplayOfPage([pageId UTF8String] ?: "", (float)width, (float)height);
+    }
 }
 
 + (void)layoutPage:(NSString*)pageId forced:(BOOL)forced
@@ -1039,6 +1044,14 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     if (platformBridge) {
         platformBridge->core_side()->OnInstanceClose([pageId UTF8String] ?: "");
     }
+}
+
++ (BOOL)reloadPageLayout:(NSString*)pageId
+{
+    if (platformBridge) {
+        return platformBridge->core_side()->RelayoutUsingRawCssStyles([pageId UTF8String] ?: "");
+    }
+    return false;
 }
 
 + (void)_traverseTree:(WeexCore::RenderObject *)render index:(int)index pageId:(const char *)pageId
@@ -1122,19 +1135,19 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 }
 
 
-+ (void)_parseStyleBeforehand:(NSDictionary *)styles key:(NSString *)key render:(WeexCore::RenderObject*)render
++ (void)_parseStyleBeforehand:(NSDictionary *)styles key:(NSString *)key render:(WeexCore::RenderObject*)render reserveStyles:(bool)reserveStyles
 {
     id data = styles[key];
     if (data) {
         ConvertToCString(data, ^(const char * value) {
             if (value != nullptr) {
-                render->AddStyle([key UTF8String], value);
+                render->AddStyle([key UTF8String], value, reserveStyles);
             }
         });
     }
 }
 
-+ (WeexCore::RenderObject*)_parseRenderObject:(NSDictionary *)data parent:(WeexCore::RenderObject *)parent index:(int)index pageId:(const std::string&)pageId
++ (WeexCore::RenderObject*)_parseRenderObject:(NSDictionary *)data parent:(WeexCore::RenderObject *)parent index:(int)index pageId:(const std::string&)pageId reserveStyles:(bool)reserveStyles
 {
     using namespace WeexCore;
     
@@ -1157,16 +1170,16 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         
         // margin/padding/borderWidth should be handled beforehand. Because maringLeft should override margin.
         NSDictionary* styles = data[@"style"];
-        [self _parseStyleBeforehand:styles key:@"margin" render:render];
-        [self _parseStyleBeforehand:styles key:@"padding" render:render];
-        [self _parseStyleBeforehand:styles key:@"borderWidth" render:render];
+        [self _parseStyleBeforehand:styles key:@"margin" render:render reserveStyles:reserveStyles];
+        [self _parseStyleBeforehand:styles key:@"padding" render:render reserveStyles:reserveStyles];
+        [self _parseStyleBeforehand:styles key:@"borderWidth" render:render reserveStyles:reserveStyles];
         [styles enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
             if ([key isEqualToString:@"margin"] || [key isEqualToString:@"padding"] || [key isEqualToString:@"borderWidth"]) {
                 return;
             }
             ConvertToCString(obj, ^(const char * value) {
                 if (value != nullptr) {
-                    render->AddStyle([key UTF8String], value);
+                    render->AddStyle([key UTF8String], value, reserveStyles);
                 }
             });
         }];
@@ -1181,10 +1194,10 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         
         int childIndex = 0;
         for (NSDictionary* obj in data[@"children"]) {
-            [self _parseRenderObject:obj parent:render index:childIndex ++ pageId:pageId];
+            [self _parseRenderObject:obj parent:render index:childIndex ++ pageId:pageId reserveStyles:reserveStyles];
         }
         
-        render->ApplyDefaultStyle();
+        render->ApplyDefaultStyle(reserveStyles);
         render->ApplyDefaultAttr();
         
         return render;
@@ -1209,7 +1222,11 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 {
     using namespace WeexCore;
     const std::string page([pageId UTF8String] ?: "");
-    RenderObject* child = [self _parseRenderObject:data parent:nullptr index:0 pageId:page];
+    RenderPage* pageInstance = RenderManager::GetInstance()->GetPage(page);
+    if (pageInstance == nullptr) {
+        return;
+    }
+    RenderObject* child = [self _parseRenderObject:data parent:nullptr index:0 pageId:page reserveStyles:pageInstance->reserve_css_styles()];
     RenderManager::GetInstance()->AddRenderObject(page, [parentRef UTF8String] ?: "", index, child);
 }
 
@@ -1221,7 +1238,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         pageInstance->set_before_layout_needed(false); // we do not need before and after layout
         pageInstance->set_after_layout_needed(false);
         pageInstance->set_platform_layout_needed(true);
-        return [self _parseRenderObject:data parent:nullptr index:0 pageId:page];
+        return [self _parseRenderObject:data parent:nullptr index:0 pageId:page reserveStyles:pageInstance->reserve_css_styles()];
     });
 }
 
@@ -1273,6 +1290,11 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 + (void)registerCoreEnv:(NSString*)key withValue:(NSString*)value
 {
     WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->core_side()->RegisterCoreEnv([key UTF8String]?:"", [value UTF8String]?:"");
+}
+
++ (void)setPageArgument:(NSString*)pageId key:(NSString*)key value:(NSString*)value
+{
+    WeexCore::RenderManager::GetInstance()->setPageArgument([pageId UTF8String]?:"", [key UTF8String]?:"", [value UTF8String]?:"");
 }
 
 @end

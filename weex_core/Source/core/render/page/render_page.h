@@ -151,6 +151,9 @@ public:
   void OnRenderProcessGone();
 
   void OnRenderPageClose();
+  
+  // Re-apply raw css styles to page and trigger layout
+  bool ReapplyStyles();
 
  public:
   inline std::string page_id() { return this->page_id_; }
@@ -183,7 +186,11 @@ public:
 
   inline bool round_off_deviation() const { return this->round_off_deviation_; }
 
-  inline void set_round_off_deviation(float round_off_deviation) { this->round_off_deviation_ = round_off_deviation; }
+  inline void set_round_off_deviation(bool round_off_deviation) { this->round_off_deviation_ = round_off_deviation; }
+  
+  inline bool reserve_css_styles() const { return reserve_css_styles_; }
+  
+  inline void set_reserve_css_styles(bool value) { reserve_css_styles_ = value; }
 
   inline void set_before_layout_needed(bool v) { is_before_layout_needed_.store(v); }
 
@@ -211,6 +218,7 @@ public:
   float viewport_width_ = -1;
   float device_width_ = -1;
   bool round_off_deviation_ = kDefaultRoundOffDeviation;
+  bool reserve_css_styles_ = false;
 };
 }  // namespace WeexCore
 
