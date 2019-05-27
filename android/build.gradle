@@ -19,10 +19,10 @@
  
 buildscript {
     repositories {
+        jcenter {
+            url 'https://maven.aliyun.com/repository/jcenter'
+        }
         mavenLocal()
-        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        mavenCentral()
-        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
@@ -41,18 +41,16 @@ subprojects {
         }
     }
     repositories {
-        mavenLocal()
         if(project.hasProperty('external_repositories')){
             maven {
                 url external_repositories
             }
         }
-        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        mavenCentral()
-        jcenter()
-        maven {
-            url 'https://maven.google.com'
+        jcenter {
+            url 'https://maven.aliyun.com/repository/jcenter'
         }
+        mavenCentral()
+        mavenLocal()
     }
     buildscript {
         dependencies {
