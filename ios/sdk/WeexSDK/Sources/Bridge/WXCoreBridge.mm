@@ -52,6 +52,10 @@
 #import <objc/runtime.h>
 #include <fstream>
 
+#ifdef DEBUG
+#include <os/log.h>
+#endif
+
 namespace WeexCore
 {    
     static void consoleWithArguments(NSArray *arguments, WXLogFlag logLevel)
@@ -937,6 +941,50 @@ break; \
     {
         
     }
+    
+#pragma mark - Log Bridge
+    
+    class LogBridgeIOS: public LogBridge {
+    public:
+        virtual void log(LogLevel level, const char* file, unsigned long line, const char* log) override {
+#ifdef DEBUG
+            switch (level) {
+                case LogLevel::Error:
+                    os_log_error(OS_LOG_DEFAULT, "<%s:Error|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
+                    break;
+                case LogLevel::Warn:
+                    os_log_error(OS_LOG_DEFAULT, "<%s:Warn|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
+                    break;
+                case LogLevel::Info:
+                    os_log_info(OS_LOG_DEFAULT, "<%s:Info|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
+                    break;
+                case LogLevel::Debug:
+                    os_log_debug(OS_LOG_DEFAULT, "<%s:Debug|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
+                    break;
+                default:
+                    break;
+            }
+#else
+            WXLogFlag wxLogLevel;
+            switch (level) {
+                case LogLevel::Error:
+                    wxLogLevel = WXLogFlagError;
+                    break;
+                case LogLevel::Warn:
+                    wxLogLevel = WXLogFlagWarning;
+                    break;
+                case LogLevel::Info:
+                    wxLogLevel = WXLogFlagInfo;
+                    break;
+                default:
+                    wxLogLevel = WXLogFlagDebug;
+                    break;
+            }
+            
+            [WXLog devLog:wxLogLevel file:file line:line format:@"<%s> %s", WEEX_CORE_LOG_TAG, log];
+#endif
+        }
+    };
 }
 
 @implementation WXCoreBridge
@@ -957,6 +1005,8 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         env->SetDeviceHeight(std::to_string(screenSize.height));
         env->AddOption("screen_width_pixels", std::to_string(screenSize.width));
         env->AddOption("screen_height_pixels", std::to_string(screenSize.height));
+        
+        WeexCore::WeexCoreManager::Instance()->set_log_bridge(new WeexCore::LogBridgeIOS());
         
         platformBridge = new WeexCore::PlatformBridge();
         platformBridge->set_platform_side(new WeexCore::IOSSide());

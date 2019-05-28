@@ -33,6 +33,7 @@ set(${BASE_LIBRARY_NAME}_SOURCES
     #CoreConstants.h
     core_constants.h
     log_defines.h
+    log_defines.cpp
     time_utils.h
     base64/base64.h
     base64/base64.cpp
