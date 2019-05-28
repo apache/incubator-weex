@@ -52,10 +52,6 @@
 #import <objc/runtime.h>
 #include <fstream>
 
-#ifdef DEBUG
-#include <os/log.h>
-#endif
-
 namespace WeexCore
 {    
     static void consoleWithArguments(NSArray *arguments, WXLogFlag logLevel)
@@ -950,16 +946,16 @@ break; \
 #ifdef DEBUG
             switch (level) {
                 case LogLevel::Error:
-                    os_log_error(OS_LOG_DEFAULT, "<%s:Error|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
+                    printf("<%s:Error|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
                     break;
                 case LogLevel::Warn:
-                    os_log_error(OS_LOG_DEFAULT, "<%s:Warn|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
+                    printf("<%s:Warn|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
                     break;
                 case LogLevel::Info:
-                    os_log_info(OS_LOG_DEFAULT, "<%s:Info|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
+                    printf("<%s:Info|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
                     break;
                 case LogLevel::Debug:
-                    os_log_debug(OS_LOG_DEFAULT, "<%s:Debug|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
+                    printf("<%s:Debug|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
                     break;
                 default:
                     break;
