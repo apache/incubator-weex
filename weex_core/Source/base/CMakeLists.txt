@@ -69,6 +69,7 @@ set(${BASE_LIBRARY_NAME}_SOURCES
     )
 
 if (ANDROID)
+    add_definitions(-DOS_ANDROID=1)
     if ("${ANDROID_ABI}" STREQUAL "x86")
     else ()
       list(APPEND ${BASE_LIBRARY_NAME}_SOURCES
