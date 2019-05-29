@@ -25,7 +25,7 @@ namespace WeexCore {
     public:
         LogBridge() {}
         
-        virtual void log(LogLevel level, const char* file, unsigned long line, const char* log) {};
+        virtual void log(LogLevel level, const char* tag, const char* file, unsigned long line, const char* log) {};
     };
     
 }
