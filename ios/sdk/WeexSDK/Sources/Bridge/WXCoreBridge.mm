@@ -977,7 +977,7 @@ break; \
                     break;
             }
             
-            [WXLog devLog:wxLogLevel file:file line:line format:@"<%s> %s", WEEX_CORE_LOG_TAG, log];
+            [WXLog devLog:wxLogLevel file:file line:line format:@"<%s> %s", tag, log];
 #endif
         }
     };

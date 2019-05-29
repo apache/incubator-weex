@@ -80,7 +80,7 @@ namespace WeexCore {
         LogBridge* logBridge = WeexCore::WeexCoreManager::Instance()->get_log_bridge();
         if (logBridge) {
             // Log to bridge
-            logBridge->log(level, file, line, log.str());
+            logBridge->log(level, tag, file, line, log.str());
         }
         else {
             // Log to console by default
