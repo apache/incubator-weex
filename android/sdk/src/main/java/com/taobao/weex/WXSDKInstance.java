@@ -448,6 +448,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mInstanceId = WXSDKManager.getInstance().generateInstanceId();
     mWXPerformance = new WXPerformance(mInstanceId);
     mApmForInstance = new WXInstanceApm(mInstanceId);
+    WXSDKManager.getInstance().getAllInstanceMap().put(mInstanceId,this);
   }
 
 
@@ -1746,7 +1747,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         public void run() {
           WXSDKManager.getInstance().getAllInstanceMap().remove(mInstanceId);
         }
-      },5000);
+      },1000);
     }
   }
 
