@@ -942,20 +942,20 @@ break; \
     
     class LogBridgeIOS: public LogBridge {
     public:
-        virtual void log(LogLevel level, const char* file, unsigned long line, const char* log) override {
+        virtual void log(LogLevel level, const char* tag, const char* file, unsigned long line, const char* log) override {
 #ifdef DEBUG
             switch (level) {
                 case LogLevel::Error:
-                    printf("<%s:Error|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
+                    printf("<%s:Error|%s:%lu> %s\n", tag, file, line, log);
                     break;
                 case LogLevel::Warn:
-                    printf("<%s:Warn|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
+                    printf("<%s:Warn|%s:%lu> %s\n", tag, file, line, log);
                     break;
                 case LogLevel::Info:
-                    printf("<%s:Info|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
+                    printf("<%s:Info|%s:%lu> %s\n", tag, file, line, log);
                     break;
                 case LogLevel::Debug:
-                    printf("<%s:Debug|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log);
+                    printf("<%s:Debug|%s:%lu> %s\n", tag, file, line, log);
                     break;
                 default:
                     break;

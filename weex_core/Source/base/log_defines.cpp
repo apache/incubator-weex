@@ -71,7 +71,7 @@ namespace WeexCore {
         return *this;
     }
     
-    void PrintLog(LogLevel level, const char* file, unsigned long line, const char* fmt, ...) {
+    void PrintLog(LogLevel level, const char* tag, const char* file, unsigned long line, const char* fmt, ...) {
         va_list args;
         va_start(args, fmt);
         LogFlattenHelper log(fmt, args);
@@ -87,16 +87,16 @@ namespace WeexCore {
 #ifdef __ANDROID__
             switch (level) {
                 case LogLevel::Error:
-                    __android_log_print(ANDROID_LOG_ERROR, WEEX_CORE_LOG_TAG, "%s:%lu, %s", file, line, log.str());
+                    __android_log_print(ANDROID_LOG_ERROR, tag, "%s:%lu, %s", file, line, log.str());
                     break;
                 case LogLevel::Warn:
-                    __android_log_print(ANDROID_LOG_WARN, WEEX_CORE_LOG_TAG, "%s:%lu, %s", file, line, log.str());
+                    __android_log_print(ANDROID_LOG_WARN, tag, "%s:%lu, %s", file, line, log.str());
                     break;
                 case LogLevel::Info:
-                    __android_log_print(ANDROID_LOG_INFO, WEEX_CORE_LOG_TAG, "%s:%lu, %s", file, line, log.str());
+                    __android_log_print(ANDROID_LOG_INFO, tag, "%s:%lu, %s", file, line, log.str());
                     break;
                 case LogLevel::Debug:
-                    __android_log_print(ANDROID_LOG_DEBUG, WEEX_CORE_LOG_TAG, "%s:%lu, %s", file, line, log.str());
+                    __android_log_print(ANDROID_LOG_DEBUG, tag, "%s:%lu, %s", file, line, log.str());
                     break;
                 default:
                     break;
@@ -104,16 +104,16 @@ namespace WeexCore {
 #elif __APPLE__
             switch (level) {
                 case LogLevel::Error:
-                    printf("<%s:Error|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log.str());
+                    printf("<%s:Error|%s:%lu> %s\n", tag, file, line, log.str());
                     break;
                 case LogLevel::Warn:
-                    printf("<%s:Warn|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log.str());
+                    printf("<%s:Warn|%s:%lu> %s\n", tag, file, line, log.str());
                     break;
                 case LogLevel::Info:
-                    printf("<%s:Info|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log.str());
+                    printf("<%s:Info|%s:%lu> %s\n", tag, file, line, log.str());
                     break;
                 case LogLevel::Debug:
-                    printf("<%s:Debug|%s:%lu> %s\n", WEEX_CORE_LOG_TAG, file, line, log.str());
+                    printf("<%s:Debug|%s:%lu> %s\n", tag, file, line, log.str());
                     break;
                 default:
                     break;
