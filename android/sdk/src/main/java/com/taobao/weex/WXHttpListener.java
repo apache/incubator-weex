@@ -50,6 +50,10 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
     private WXPerformance mWXPerformance;
     private WXInstanceApm mApmForInstance;
     private IWXUserTrackAdapter mUserTrackAdapter;
+    public boolean isPreDownLoadMode = false;
+    private boolean isInstanceReady =false;
+    private boolean isResponseHasWait = false;
+    private WXResponse mResponse;
 
     private String mBundleUrl;
 
@@ -202,6 +206,35 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
                 }
             }
         }
+
+        if (isPreDownLoadMode){
+            if (isInstanceReady){
+                WXLogUtils.e("test->", "DownLoad didHttpFinish on http" );
+                didHttpFinish(response);
+            }else {
+                WXLogUtils.e("test->", "DownLoad end before activity created" );
+                mResponse = response;
+                isResponseHasWait = true;
+            }
+        }else {
+            didHttpFinish(response);
+        }
+
+    }
+
+    public void onInstanceReady(){
+        if (!isPreDownLoadMode){
+            return;
+        }
+        this.isInstanceReady = true;
+        if (isResponseHasWait){
+            WXLogUtils.e("test->", "preDownLoad didHttpFinish on ready" );
+            this.didHttpFinish(mResponse);
+        }
+
+    }
+
+    private void didHttpFinish(WXResponse response){
         String wxErrorCode = WXInstanceApm.VALUE_ERROR_CODE_DEFAULT;
         if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
             mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_END);

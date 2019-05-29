@@ -251,7 +251,7 @@ typedef void(*FuncExeJSWithResultId)(const char *instanceId, const char *nameSpa
 typedef int (*FuncCreateInstance)(const char *instanceId, const char *func, const char *script, const char *opts,
                                   const char *initData, const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params);
 
-typedef std::unique_ptr<WeexJSResult> (*FuncExeJSOnInstance)(const char *instanceId, const char *script);
+typedef std::unique_ptr<WeexJSResult> (*FuncExeJSOnInstance)(const char *instanceId, const char *script,int type);
 
 typedef int (*FuncDestroyInstance)(const char *instanceId);
 

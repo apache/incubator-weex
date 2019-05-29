@@ -121,7 +121,7 @@ int ScriptSideInSimple::CreateInstance(const char *instanceId, const char *func,
 }
 
 std::unique_ptr<WeexJSResult> ScriptSideInSimple::ExecJSOnInstance(const char *instanceId,
-                                           const char *script) {
+                                           const char *script,int type) {
   LOGD("ScriptSideInSimple::ExecJSOnInstance");
   return runtime_->exeJSOnInstance(String::fromUTF8(instanceId),
                                    String::fromUTF8(script));

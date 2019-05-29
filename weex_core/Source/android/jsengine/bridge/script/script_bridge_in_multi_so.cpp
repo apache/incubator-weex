@@ -141,8 +141,8 @@ int ScriptBridgeInMultiSo::CreateInstance(const char *instanceId,
 }
 
 std::unique_ptr<WeexJSResult> ScriptBridgeInMultiSo::ExecJSOnInstance(const char *instanceId,
-                                              const char *script) {
-  return Instance()->script_side()->ExecJSOnInstance(instanceId, script);
+                                              const char *script,int type) {
+  return Instance()->script_side()->ExecJSOnInstance(instanceId, script,type);
 }
 
 int ScriptBridgeInMultiSo::DestroyInstance(const char *instanceId) {

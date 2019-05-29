@@ -87,7 +87,7 @@ namespace weex {
                                    std::vector<INIT_FRAMEWORK_PARAMS *> &params) override;
 
                 std::unique_ptr<WeexJSResult>
-                ExecJSOnInstance(const char *instanceId, const char *script) override;
+                ExecJSOnInstance(const char *instanceId, const char *script,int type) override;
 
                 int DestroyInstance(const char *instanceId) override;
 
