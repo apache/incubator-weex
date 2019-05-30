@@ -25,6 +25,9 @@ public class WXDeviceUtils {
 
 
     public static boolean isAutoResize(Context context){
+        if(context == null){
+            return false;
+        }
         return isMateX(context) || isGalaxyFold(context);
     }
 

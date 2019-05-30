@@ -473,8 +473,9 @@ namespace weex {
                 LOGD("ScriptBridgeInMultiProcess::ExecJSONInstance");
                 const char *instanceID = GetUTF8StringFromIPCArg(arguments, 0);
                 const char *script = GetUTF8StringFromIPCArg(arguments, 1);
+                int type = arguments->get<int32_t>(2);
 
-                const std::unique_ptr<WeexJSResult> &ptr = Instance()->script_side()->ExecJSOnInstance(instanceID, script);
+                const std::unique_ptr<WeexJSResult> &ptr = Instance()->script_side()->ExecJSOnInstance(instanceID, script,type);
 
                 return createByteArrayResult(ptr->data.get(), ptr->length);
             }

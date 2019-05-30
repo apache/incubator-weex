@@ -125,9 +125,9 @@
     return [[self sharedInstance] getComponentConfigs];
 }
 
-+ (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method
++ (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method isSync:(BOOL *)isSync
 {
-    return [[self sharedInstance] _methodWithComponetName:name withMethod:method];
+    return [[self sharedInstance] _methodWithComponetName:name withMethod:method isSync:isSync];
 }
 
 + (NSMutableDictionary *)componentMethodMapsWithName:(NSString *)name
@@ -155,6 +155,7 @@
         [methods addObject:mKey];
     };
     [config.asyncMethods enumerateKeysAndObjectsUsingBlock:mBlock];
+    [config.syncMethods enumerateKeysAndObjectsUsingBlock:mBlock];
     [_configLock unlock];
     
     return dict;
@@ -173,28 +174,33 @@
         [methods addObject:mObj];
     };
     [config.asyncMethods enumerateKeysAndObjectsUsingBlock:mBlock];
+    [config.syncMethods enumerateKeysAndObjectsUsingBlock:mBlock];
     [_configLock unlock];
     
     return dict;
 }
 
-- (SEL)_methodWithComponetName:(NSString *)name withMethod:(NSString *)method
+- (SEL)_methodWithComponetName:(NSString *)name withMethod:(NSString *)method isSync:(BOOL *)isSync
 {
     WXAssert(name && method, @"Fail to find selector with module name and method, please check if the parameters are correct ！");
     
     NSString *selStr = nil; SEL selector = nil;
     WXComponentConfig *config = nil;
-    
     [_configLock lock];
     config = [_componentConfigs objectForKey:name];
     if (config.asyncMethods) {
         selStr = [config.asyncMethods objectForKey:method];
     }
+    if (!selStr && config.syncMethods) {
+        selStr = [config.syncMethods objectForKey:method];
+        if (selStr.length > 0 && isSync) {
+            *isSync = YES;
+        }
+    }
     if (selStr) {
         selector = NSSelectorFromString(selStr);
     }
     [_configLock unlock];
-    
     return selector;
 }
 

@@ -18,14 +18,7 @@
  */
 
 buildscript {
-    repositories {
-        mavenLocal()
-        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        mavenCentral()
-        jcenter()
-    }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
         if(!project.disableCov) {
             classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
         }
@@ -63,7 +56,7 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : "0.20.0.1"
+version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : "0.24.0.1"
 
 //Check version, the version must have 4 sections. The leading three section must be number, and the last section is odd number with or without suffix string.
 if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVersionCheck').equals("true")) {
@@ -120,20 +113,6 @@ android {
 //        into new File(projectDir,"assets")
 //        include 'weex-rax-extra-api.js'
 //    }
-
-    if(project.hasProperty('asfRelease')){
-        //download so file if not exist, when compile in source release
-        download{
-            src 'https://gitbox.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/armeabi/libweexcore.so;hb=refs/heads/master'
-            dest "${projectDir}/libs/armeabi/libweexcore.so"
-            overwrite false
-        }
-        download{
-            src 'https://gitbox.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexcore.so;hb=refs/heads/master'
-            dest "${projectDir}/libs/x86/libweexcore.so"
-            overwrite false
-        }
-    }
 
     def ndkversion = 16;
     def api_level = "";
@@ -259,7 +238,12 @@ if(file('../license/LICENSE').exists()){
                          'Source/android/base/base64/**/*.h','Source/android/base/base64/**/*.cpp',
                          'Source/android/jniprebuild/jniheader/*.h',
                          'Source/base/Compatible.cpp',
-                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c'])
+                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
+                         'Source/android/jsengine/dependence/**/*.h',
+                         'Source/android/jsengine/dependence/**/*.cpp',
+                         'Source/include/wtf/Optional.h',
+                         'Source/include/wtf/Brigand.h',
+                         'Source/include/wtf/Variant.h'])
     }
     preBuild.dependsOn licenseFormat
 }
@@ -314,7 +298,7 @@ task checkNdkVersion() {
 
 preBuild.dependsOn checkNdkVersion
 
-def siteUrl = 'http://weex.incubator.apache.org'
+def siteUrl = 'https://weex.incubator.apache.org'
 def gitUrl = 'https://github.com/apache/incubator-weex.git'
 group = "com.taobao.android"
 install {
@@ -328,7 +312,7 @@ install {
                 licenses {
                     license {
                         name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        url 'https://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
                 developers {
@@ -371,6 +355,7 @@ bintray {
         version {
             //The version to be published
             name = project.version
+            vcsTag = project.version
         }
     }
 }

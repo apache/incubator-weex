@@ -583,11 +583,11 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
 }
 
 std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSOnInstance(const char *instanceId,
-                                                 const char *script) {
+                                                 const char *script, int type) {
   return WeexCoreManager::Instance()
       ->script_bridge()
       ->script_side()
-      ->ExecJSOnInstance(instanceId, script);
+      ->ExecJSOnInstance(instanceId, script,type);
 }
 
 int CoreSideInPlatform::DestroyInstance(const char *instanceId) {

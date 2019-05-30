@@ -38,6 +38,7 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXExceptionUtils;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
 public class WXInstanceApm {
@@ -63,6 +64,7 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_PROPERTIES_UIKIT_TYPE = "wxUIKitType";
 
     /************** stages *****************/
+    public static final String KEY_PAGE_STAGES_CONTAINER_READY = "wxContainerReady";
     public static final String KEY_PAGE_STAGES_DOWN_BUNDLE_START = "wxStartDownLoadBundle";
     public static final String KEY_PAGE_STAGES_DOWN_BUNDLE_END = "wxEndDownLoadBundle";
     public static final String KEY_PAGE_STAGES_RENDER_ORGIGIN = "wxRenderTimeOrigin";
@@ -124,6 +126,7 @@ public class WXInstanceApm {
     private IWXApmMonitorAdapter apmInstance;
     private Map<String, Double> recordStatsMap;
     public final Map<String, Long> stageMap;
+    private Map<String,Object> mPropertiesMap;
     private boolean isFSEnd;
     private boolean mHasInit = false;
     private boolean mEnd = false;
@@ -142,16 +145,35 @@ public class WXInstanceApm {
      * send performance value to js
      **/
     private boolean hasSendInteractionToJS = false;
+    public volatile boolean isReady = true;
 
     public WXInstanceApm(String instanceId) {
         mInstanceId = instanceId;
         extInfo = new ConcurrentHashMap<>();
         stageMap = new ConcurrentHashMap<>();
-        IApmGenerator generator = WXSDKManager.getInstance().getApmGenerater();
         mUIHandler = new Handler(Looper.getMainLooper());
+        recordStatsMap = new ConcurrentHashMap<>();
+        mPropertiesMap = new ConcurrentHashMap<>();
+        IApmGenerator generator = WXSDKManager.getInstance().getApmGenerater();
         if (null != generator) {
             apmInstance = generator.generateApmInstance(WEEX_PAGE_TOPIC);
-            recordStatsMap = new ConcurrentHashMap<>();
+        }
+    }
+
+    public void onInstanceReady(boolean isPreDownLoad){
+        this.isReady = true;
+        if (isPreDownLoad){
+            onStage(KEY_PAGE_STAGES_DOWN_BUNDLE_START);
+        }
+        doInit();
+        for (Map.Entry<String,Long> stage:stageMap.entrySet()){
+            sendStageInfo(stage.getKey(),stage.getValue());
+        }
+        for (Map.Entry<String,Double> stats:recordStatsMap.entrySet()){
+           sendStats(stats.getKey(),stats.getValue());
+        }
+        for (Map.Entry<String,Object> p:mPropertiesMap.entrySet()){
+           sendProperty(p.getKey(),p.getValue());
         }
     }
 
@@ -182,13 +204,22 @@ public class WXInstanceApm {
         if (mEnd){
             return;
         }
+        if (null == name){
+            return;
+        }
         stageMap.put(name,time);
+        if (isReady){
+            sendStageInfo(name,time);
+        }
+    }
+
+    private void sendStageInfo(String name,long time){
         if(WXAnalyzerDataTransfer.isOpenPerformance){
             WXAnalyzerDataTransfer.transferPerformance(mInstanceId,"stage",name,time);
         }
 
         if (KEY_PAGE_STAGES_RENDER_ORGIGIN.equalsIgnoreCase(name)){
-          mUIHandler.postDelayed(jsPerformanceCallBack,8000);
+            mUIHandler.postDelayed(jsPerformanceCallBack,8000);
         }
 
         if (null == apmInstance) {
@@ -212,7 +243,16 @@ public class WXInstanceApm {
         if (mEnd){
             return;
         }
+        if (null == key || null == value){
+            return;
+        }
+        mPropertiesMap.put(key,value);
+        if (isReady){
+            sendProperty(key,value);
+        }
+    }
 
+    private void sendProperty(String key,Object value){
         if(WXAnalyzerDataTransfer.isOpenPerformance){
             WXAnalyzerDataTransfer.transferPerformance(mInstanceId,"properties",key,value);
         }
@@ -230,6 +270,16 @@ public class WXInstanceApm {
         if (mEnd){
             return;
         }
+        if (null == key){
+            return;
+        }
+        recordStatsMap.put(key,value);
+        if (isReady){
+            sendStats(key,value);
+        }
+    }
+
+    private void sendStats(String key,double value){
         if(WXAnalyzerDataTransfer.isOpenPerformance){
             WXAnalyzerDataTransfer.transferPerformance(mInstanceId,"stats",key,value);
         }
@@ -249,6 +299,9 @@ public class WXInstanceApm {
      * start record
      */
     public void doInit() {
+        if (!isReady){
+            return;
+        }
         if (mHasInit){
             return;
         }
@@ -314,6 +367,27 @@ public class WXInstanceApm {
         onStage(KEY_PAGE_STAGES_DESTROY);
         apmInstance.onEnd();
         mEnd = true;
+        if (WXEnvironment.isApkDebugable()){
+            printLog();
+        }
+    }
+
+
+    private void printLog(){
+        Long startDownLoad = stageMap.get(KEY_PAGE_STAGES_DOWN_BUNDLE_START);
+        Long endDownLoad = stageMap.get(KEY_PAGE_STAGES_DOWN_BUNDLE_END);
+        Long interaction = stageMap.get(KEY_PAGE_STAGES_INTERACTION);
+        Long containerReady = stageMap.get(KEY_PAGE_STAGES_CONTAINER_READY);
+        if (null != endDownLoad && null != startDownLoad){
+            WXLogUtils.e("test->", "downLoadTime: "+ (endDownLoad - startDownLoad));
+        }
+        if (null != endDownLoad && null != interaction){
+            WXLogUtils.e("test->", "renderTime: "+ (interaction - endDownLoad));
+        }
+        if (null != containerReady && null !=interaction){
+            WXLogUtils.e("test->", "showTime: "+ (interaction - containerReady));
+        }
+
     }
 
     public void arriveNewFsRenderTime(){
@@ -407,7 +481,6 @@ public class WXInstanceApm {
         }
 
         double currentValue = preVal + diffValue;
-        recordStatsMap.put(name, currentValue);
         addStats(name, currentValue);
     }
 
@@ -429,7 +502,6 @@ public class WXInstanceApm {
         }
         if (maxValue < currentVal) {
             maxValue = currentVal;
-            recordStatsMap.put(name, currentVal);
             addStats(name, maxValue);
         }
     }

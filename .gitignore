@@ -51,6 +51,8 @@ android/HeronAndroid/.externalNativeBuild/
 
 # release
 apache_release_temp
+RELEASE_NOTE.md
+RELEASE_AUDIT.LOG
 
 android/commons/bin/
 android/playground/app/bin/

@@ -19,63 +19,78 @@
 
 #ifndef LogDefines_h
 #define LogDefines_h
+#include <cstring>
 
-#define LOG_TAG "WeexCore"
+namespace WeexCore {
+    
+    enum class LogLevel : int {
+        Debug,
+        Info,
+        Warn,
+        Error
+    };
+    
+    void PrintLog(LogLevel level, const char* tag, const char* file, unsigned long line, const char* format, ...);
+    
+}
 
-#ifdef __ANDROID__  //for android platform
+#if defined(LOGE)
+#undef LOGE
+#endif
 
-#include <android/log.h>
+#if defined(LOGW)
+#undef LOGW
+#endif
 
-#define LOGE(...)    __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-#define LOGA(...)    ((void)0) //__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#define LOGD(...)    ((void)0) //__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#if defined(LOGI)
+#undef LOGI
+#endif
+
+#if defined(LOGD)
+#undef LOGD
+#endif
+
+#if defined(LOGV)
+#undef LOGV
+#endif
+
+#define WEEX_CORE_LOG_TAG "WeexCore"
+#define WEEX_CORE_FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#define WEEX_CORE_LOG(level, TAG, format, ...)   WeexCore::PrintLog((level), TAG, WEEX_CORE_FILENAME, __LINE__, (format), ##__VA_ARGS__)
+
+#define LOGE(format, ...)                WEEX_CORE_LOG(WeexCore::LogLevel::Debug, WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
+#define LOGE_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Error, TAG, format, ##__VA_ARGS__)
 
 #ifdef DEBUG
 
-#define LOGV(...)     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
-#define LOGI(...)     __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
-#define LOGW(...)     __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
-#define LOG_LINE LOGV("%s, %d", __func__, __LINE__)
+#define LOGD(format, ...)           WEEX_CORE_LOG(WeexCore::LogLevel::Debug, WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
+#define LOGW(format, ...)           WEEX_CORE_LOG(WeexCore::LogLevel::Warn, WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
+#define LOGI(format, ...)           WEEX_CORE_LOG(WeexCore::LogLevel::Info, WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
+
+#define LOGD_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Debug, TAG, format, ##__VA_ARGS__)
+#define LOGW_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Warn, TAG, format, ##__VA_ARGS__)
+#define LOGI_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Info, TAG, format, ##__VA_ARGS__)
 
 #else
 
-#define LOGV(...) ((void) 0)
-#define LOGD(...) ((void) 0)
-#define LOGI(...) ((void) 0)
-#define LOGW(...) ((void) 0)
-#define LOG_LINE
+#define LOGD(format, ...)       ((void) 0)
+#define LOGW(format, ...)       ((void) 0)
+#define LOGD(format, ...)       ((void) 0)
+
+#define LOGD_TAG(TAG, format, ...)       ((void) 0)
+#define LOGW_TAG(TAG, format, ...)       ((void) 0)
+#define LOGI_TAG(TAG, format, ...)       ((void) 0)
 
 #endif
 
-#elif __APPLE__
-
-#define LOGE(...)    printf(__VA_ARGS__)
-#define LOGA(...)    printf(__VA_ARGS__)
-
-#ifdef DEBUG
-
-#define LOGV(...)     printf(__VA_ARGS__)
-#define LOGD(...)     printf(__VA_ARGS__)
-#define LOGI(...)     printf(__VA_ARGS__)
-#define LOGW(...)     printf(__VA_ARGS__)
-#define LOG_LINE LOGV("%s, %d", __func__, __LINE__)
-
-#else
-
-#define LOGV(...) ((void) 0)
-#define LOGD(...) ((void) 0)
-#define LOGI(...) ((void) 0)
-#define LOGW(...) ((void) 0)
-#define LOG_LINE
-
-#endif
+#define LOGV                    LOGD
+#define LOG_LINE                ((void) 0)
+#define LOGV_TAG                LOGD
 
 #ifndef DISALLOW_COPY_AND_ASSIGN
 #define DISALLOW_COPY_AND_ASSIGN(TypeName)  \
 TypeName(const TypeName&) = delete;      \
 void operator=(const TypeName&) = delete
 #endif
-
-#endif //__ANDROID__
 
 #endif /* LogDefines_h */

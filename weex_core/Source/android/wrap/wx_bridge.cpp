@@ -653,7 +653,7 @@ static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
       WeexCoreManager::Instance()
           ->getPlatformBridge()
           ->core_side()
-          ->ExecJSOnInstance(idChar.getChars(), scriptChar.getChars());
+          ->ExecJSOnInstance(idChar.getChars(), scriptChar.getChars(),type);
 
   if (result.get() == nullptr || result->data.get() == nullptr)
     return nullptr;

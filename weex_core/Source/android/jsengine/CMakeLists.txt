@@ -1,3 +1,22 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
 #cmake_minimum_required(VERSION 3.3)
 #if (POLICY CMP0042)
 #    cmake_policy(SET CMP0042 NEW)
@@ -119,27 +138,6 @@ SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}" CACHE STRING "toolc
 SET(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -shared")
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a -fno-omit-frame-pointer")# -fsanitize=address -g3")
-set(WEEXJSSERVERSTUB_NAME libweexjsb.so)
-add_executable(${WEEXJSSERVERSTUB_NAME}
-               weex_js_server_main_stub.cpp)
-
-set_target_properties(${WEEXJSSERVERSTUB_NAME} 
-PROPERTIES                                                                        
-LINK_FLAGS                                                                        
-"-pie -fPIE"
-)
-
-target_link_libraries(${WEEXJSSERVERSTUB_NAME}
-${WEEXJSSERVER_NAME}
-)
-
-if (APPLE)
-set_target_properties(${WEEXJSSERVERSTUB_NAME}
-PROPERTIES LINK_FLAGS
-"-Wl,--entry=_start"
-)
-endif()
-
 
 set(${WEEXJSSERVER_NAME}_LIBRARY_TYPE SHARED)
 
@@ -183,3 +181,41 @@ LINK_FLAGS
 #    COMMAND cp $<TARGET_FILE:${WEEXJSSERVERSTUB_NAME}> ${CMAKE_SOURCE_DIR}/libweexjsb${SERVERSUFFIX}.so
 #    VERBATIM
 #)
+
+# Compile libweexjsb.so
+set(WEEXJSSERVERSTUB_NAME libweexjsb.so)
+add_executable(${WEEXJSSERVERSTUB_NAME}
+               weex_js_server_main_stub.cpp)
+
+set_target_properties(${WEEXJSSERVERSTUB_NAME} 
+PROPERTIES                                                                        
+LINK_FLAGS                                                                        
+"-pie -fPIE"
+)
+
+target_link_libraries(${WEEXJSSERVERSTUB_NAME}
+${WEEXJSSERVER_NAME}
+)
+
+if (APPLE)
+set_target_properties(${WEEXJSSERVERSTUB_NAME}
+PROPERTIES LINK_FLAGS
+"-Wl,--entry=_start"
+)
+endif()
+
+# Compile libweexjst.so
+set(WEEXJSSERVERSTUB_NAME_BELOW_L libweexjst.so)
+add_executable(${WEEXJSSERVERSTUB_NAME_BELOW_L}
+               weex_js_server_main_stub.cpp)
+
+target_link_libraries(${WEEXJSSERVERSTUB_NAME_BELOW_L}
+${WEEXJSSERVER_NAME}
+)
+
+if (APPLE)
+set_target_properties(${WEEXJSSERVERSTUB_NAME_BELOW_L}
+PROPERTIES LINK_FLAGS
+"-Wl,--entry=_start"
+)
+endif()

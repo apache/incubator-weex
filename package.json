@@ -11,9 +11,9 @@
     "type": "git",
     "url": "git@github.com:apache/incubator-weex.git"
   },
-  "homepage": "http://weex.apache.org/",
+  "homepage": "https://weex.apache.org/",
   "bugs": {
-    "url": "https://issues.apache.org/jira/browse/WEEX/"
+    "url": "https://github.com/apache/incubator-weex/issues"
   },
   "private": true,
   "keywords": [
