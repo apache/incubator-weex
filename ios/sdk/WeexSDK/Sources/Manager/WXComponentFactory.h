@@ -61,6 +61,8 @@
 
 + (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method isSync:(BOOL *)isSync;
 
++ (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method;
+
 /**
  * @abstract Unregister all the components
  */
