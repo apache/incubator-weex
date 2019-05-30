@@ -63,7 +63,7 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : "0.24.0"
+version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : "0.24.0.1"
 
 //Check version, the version must have 4 sections. The leading three section must be number, and the last section is odd number with or without suffix string.
 if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVersionCheck').equals("true")) {
@@ -246,14 +246,14 @@ if(file('../license/LICENSE').exists()){
                          'Source/android/jniprebuild/jniheader/*.h',
                          'Source/base/Compatible.cpp',
                          'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
-                         'weex_core/Source/android/jsengine/dependence/**/*.h',
-                         'weex_core/Source/android/jsengine/dependence/**/*.cpp',
-                         'weex_core/Source/include/wtf/**/*.h',
-                         'weex_core/Source/include/wtf/**/*.c',
-                         'weex_core/Source/include/wtf/**/*.cpp',
-                         'weex_core/Source/include/JavaScriptCore/**/*.h',
-                         'weex_core/Source/include/JavaScriptCore/**/*.c',
-                         'weex_core/Source/include/JavaScriptCore/**/*.cpp'])
+                         'Source/android/jsengine/dependence/**/*.h',
+                         'Source/android/jsengine/dependence/**/*.cpp',
+                         'Source/include/wtf/**/*.h',
+                         'Source/include/wtf/**/*.c',
+                         'Source/include/wtf/**/*.cpp',
+                         'Source/include/JavaScriptCore/**/*.h',
+                         'Source/include/JavaScriptCore/**/*.c',
+                         'Source/include/JavaScriptCore/**/*.cpp'])
     }
     preBuild.dependsOn licenseFormat
 }
