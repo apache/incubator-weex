@@ -248,9 +248,12 @@ if(file('../license/LICENSE').exists()){
                          'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
                          'weex_core/Source/android/jsengine/dependence/**/*.h',
                          'weex_core/Source/android/jsengine/dependence/**/*.cpp',
-                         'weex_core/Source/include/wtf/Optional.h',
-                         'weex_core/Source/include/wtf/Brigand.h',
-                         'weex_core/Source/include/wtf/Variant.h'])
+                         'weex_core/Source/include/wtf/**/*.h',
+                         'weex_core/Source/include/wtf/**/*.c',
+                         'weex_core/Source/include/wtf/**/*.cpp',
+                         'weex_core/Source/include/JavaScriptCore/**/*.h',
+                         'weex_core/Source/include/JavaScriptCore/**/*.c',
+                         'weex_core/Source/include/JavaScriptCore/**/*.cpp'])
     }
     preBuild.dependsOn licenseFormat
 }
