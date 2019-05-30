@@ -51,7 +51,7 @@ svn add "$1"
 svn commit -m "Release ${1}"
 
 # Publish to Github Release
-git tag "$1"
+git tag -a -F "RELEASE_NOTE.md" "$1"
 git push "$4" "$1"
 npm install -g release-it
 export GITHUB_TOKEN="$5"
