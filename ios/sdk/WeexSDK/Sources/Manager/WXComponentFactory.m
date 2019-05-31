@@ -125,6 +125,10 @@
     return [[self sharedInstance] getComponentConfigs];
 }
 
++ (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method {
+    return [[self sharedInstance] _methodWithComponetName:name withMethod:method isSync:NULL];
+}
+
 + (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method isSync:(BOOL *)isSync
 {
     return [[self sharedInstance] _methodWithComponetName:name withMethod:method isSync:isSync];
@@ -191,9 +195,9 @@
     if (config.asyncMethods) {
         selStr = [config.asyncMethods objectForKey:method];
     }
-    if (!selStr && config.syncMethods) {
+    if (isSync && !selStr && config.syncMethods) {
         selStr = [config.syncMethods objectForKey:method];
-        if (selStr.length > 0 && isSync) {
+        if (selStr.length > 0) {
             *isSync = YES;
         }
     }
