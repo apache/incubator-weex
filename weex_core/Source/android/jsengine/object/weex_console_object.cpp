@@ -152,6 +152,7 @@ static EncodedJSValue consoleLogWithLevel(ExecState *exec, MessageLevel level) {
 //        return JSValue::encode(jsUndefined());
 //
 //    client->logWithLevel(exec, Inspector::createScriptArguments(exec, 0), level);
+    JSValue::equalSlowCaseInline(exec,JSC::jsUndefined(),JSC::jsUndefined());
     return JSValue::encode(jsUndefined());
 }
 

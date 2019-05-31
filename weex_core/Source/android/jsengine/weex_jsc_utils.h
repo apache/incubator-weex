@@ -84,6 +84,8 @@
 #include "third_party/IPC/IPCFutexPageQueue.h"
 #include "third_party/IPC/IPCException.h"
 #include "third_party/IPC/Serializing/IPCSerializer.h"
+#include "include/JavaScriptCore/runtime/StructureInlines.h"
+#include "include/JavaScriptCore/runtime/JSCJSValueInlines.h"
 
 #if !defined(PATH_MAX)
 #define PATH_MAX 4096

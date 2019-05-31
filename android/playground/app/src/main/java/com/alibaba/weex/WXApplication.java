@@ -21,6 +21,7 @@ package com.alibaba.weex;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.support.multidex.MultiDex;
 
 import com.alibaba.android.bindingx.plugin.weex.BindingX;
 import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
@@ -55,7 +56,7 @@ public class WXApplication extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
-
+    MultiDex.install(this);
     /**
      * Set up for fresco usage.
      * Set<RequestListener> requestListeners = new HashSet<>();

@@ -23,7 +23,7 @@
 #include "android/jsengine/object/weex_env.h"
 #include "android/jsengine/weex_runtime.h"
 #include "core/manager/weex_core_manager.h"
-
+#include "android/jsengine/weex_jsc_utils.h"
 using namespace JSC;
 using namespace WTF;
 using namespace WEEXICU;

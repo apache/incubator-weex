@@ -21,7 +21,7 @@
 //
 
 #include "weex_task.h"
-
+#include "android/jsengine/weex_jsc_utils.h"
 void WeexTask::Future::setResult(std::unique_ptr<WeexJSResult> &result) {
     thread_locker_.lock();
     has_result_ = true;

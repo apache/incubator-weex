@@ -32,7 +32,7 @@
 #include "base/utils/log_utils.h"
 #include "core/bridge/script_bridge.h"
 #include "include/wtf/text/Base64.h"
-
+#include "android/jsengine/weex_jsc_utils.h"
 #define WX_GLOBAL_CONFIG_KEY "global_switch_config"
 //#define GET_CHARFROM_UNIPTR(str) (str) == nullptr ? nullptr : (reinterpret_cast<const char*>((str).get()))
 using namespace JSC;
