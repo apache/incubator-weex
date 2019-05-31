@@ -1222,12 +1222,9 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 {
     using namespace WeexCore;
     const std::string page([pageId UTF8String] ?: "");
-    RenderPage* pageInstance = RenderManager::GetInstance()->GetPage(page);
-    if (pageInstance == nullptr) {
-        return;
-    }
-    RenderObject* child = [self _parseRenderObject:data parent:nullptr index:0 pageId:page reserveStyles:pageInstance->reserve_css_styles()];
-    RenderManager::GetInstance()->AddRenderObject(page, [parentRef UTF8String] ?: "", index, child);
+    RenderManager::GetInstance()->AddRenderObject(page, [parentRef UTF8String] ?: "", index, [&] (RenderPage* pageInstance) -> RenderObject* {
+        return [self _parseRenderObject:data parent:nullptr index:0 pageId:page reserveStyles:pageInstance->reserve_css_styles()];
+    });
 }
 
 + (void)callCreateBody:(NSString*)pageId data:(NSDictionary*)data
@@ -1295,6 +1292,15 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 + (void)setPageArgument:(NSString*)pageId key:(NSString*)key value:(NSString*)value
 {
     WeexCore::RenderManager::GetInstance()->setPageArgument([pageId UTF8String]?:"", [key UTF8String]?:"", [value UTF8String]?:"");
+}
+
++ (BOOL)isKeepingRawCssStyles:(NSString*)pageId
+{
+    RenderPage* page = RenderManager::GetInstance()->GetPage([pageId UTF8String] ?: "");
+    if (page == nullptr) {
+        return NO;
+    }
+    return page->reserve_css_styles();
 }
 
 @end

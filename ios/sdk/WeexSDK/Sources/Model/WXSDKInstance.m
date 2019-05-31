@@ -218,6 +218,19 @@ typedef enum : NSUInteger {
     [self setPageArgument:@"reserveCssStyles" value:@"true"];
 }
 
+- (BOOL)isKeepingRawCssStyles
+{
+    __block BOOL result = NO;
+    NSString* pageId = _instanceId;
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    WXPerformBlockOnComponentThread(^{
+        result = [WXCoreBridge isKeepingRawCssStyles:pageId];
+        dispatch_semaphore_signal(sem);
+    });
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+    return result;
+}
+
 - (void)setPageArgument:(NSString*)key value:(NSString*)value
 {
     NSString* pageId = _instanceId;

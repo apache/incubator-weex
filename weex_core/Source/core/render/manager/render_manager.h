@@ -68,6 +68,10 @@ class RenderManager {
   bool AddRenderObject(const std::string &page_id,
                        const std::string &parent_ref, int index,
                        RenderObject *root);
+    
+  bool AddRenderObject(const std::string &page_id,
+                       const std::string &parent_ref, int index,
+                       std::function<RenderObject* (RenderPage*)> constructRoot);
 
   bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
 

@@ -362,6 +362,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  * internally for later use. Or you can use MetaModule's setPageArguments method and provide "reserveCssStyles" as "true" before rendering the page.
  */
 - (void)setPageKeepRawCssStyles;
+- (BOOL)isKeepingRawCssStyles;
 
 /**
  * Set additional argument value for WeexCore

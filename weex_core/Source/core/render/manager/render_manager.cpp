@@ -135,6 +135,27 @@ bool RenderManager::AddRenderObject(const std::string &page_id, const std::strin
   page->set_is_dirty(true);
   return page->AddRenderObject(parent_ref, index, root);
 }
+    
+bool RenderManager::AddRenderObject(const std::string &page_id,
+                                    const std::string &parent_ref, int index,
+                                    std::function<RenderObject* (RenderPage*)> constructRoot) {
+    RenderPage *page = GetPage(page_id);
+    if (page == nullptr) return false;
+    
+#if RENDER_LOG
+    wson_parser parser(data);
+    LOGD(
+         "[RenderManager] AddRenderObject >>>> pageId: %s, parentRef: %s, index: "
+         "%d, dom data: %s",
+         pageId.c_str(), parentRef.c_str(), index, parser.toStringUTF8().c_str());
+#endif
+    
+    RenderObject *root = constructRoot(page);
+    if (root == nullptr) return false;
+    
+    page->set_is_dirty(true);
+    return page->AddRenderObject(parent_ref, index, root);
+}
 
 bool RenderManager::RemoveRenderObject(const std::string &page_id,
                                        const std::string &ref) {
@@ -305,51 +326,19 @@ void RenderManager::CallMetaModule(const char *page_id, const char *method, cons
           for (int j = 0; j < map_size; j++) {
             std::string key = parser.nextMapKeyUTF8();
             std::string value = parser.nextStringUTF8(parser.nextType());
-            if (strcmp(key.c_str(), WIDTH) == 0) {
+            if (key == WIDTH) {
               setPageArgument(page_id, "viewportwidth", value);
             }
-            if (strcmp(key.c_str(), ROUND_OFF_DEVIATION) == 0) {
+            else if (key == ROUND_OFF_DEVIATION) {
               setPageArgument(page_id, "roundoffdeviation", value);
             }
-          }
-        }
-      }
-    }
-  }
-  else if (strcmp(method, "setDeviceSize") == 0) {
-    wson_parser parser(arguments);
-    if (parser.isArray(parser.nextType())) {
-      int size = parser.nextArraySize();
-      for (int i = 0; i < size; i++) {
-        uint8_t value_type = parser.nextType();
-        if (parser.isMap(value_type)) {
-          int map_size = parser.nextMapSize();
-          for (int j = 0; j < map_size; j++) {
-            std::string key = parser.nextMapKeyUTF8();
-            std::string value = parser.nextStringUTF8(parser.nextType());
-            if (strcmp(key.c_str(), WIDTH) == 0) {
+            else if (key == "deviceWidth") {
               setPageArgument(page_id, "devicewidth", value);
             }
-            if (strcmp(key.c_str(), HEIGHT) == 0) {
+            else if (key == "deviceHeight") {
               // unsupported now
             }
-          }
-        }
-      }
-    }
-  }
-  else if (strcmp(method, "setPageArguments") == 0) {
-    wson_parser parser(arguments);
-    if (parser.isArray(parser.nextType())) {
-      int size = parser.nextArraySize();
-      for (int i = 0; i < size; i++) {
-        uint8_t value_type = parser.nextType();
-        if (parser.isMap(value_type)) {
-          int map_size = parser.nextMapSize();
-          for (int j = 0; j < map_size; j++) {
-            std::string key = parser.nextMapKeyUTF8();
-            std::string value = parser.nextStringUTF8(parser.nextType());
-            if (strcmp(key.c_str(), "reserveCssStyles") == 0) {
+            else if (key == "reserveCssStyles") {
               setPageArgument(page_id, "reserveCssStyles", value);
             }
           }

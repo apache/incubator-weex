@@ -24,5 +24,6 @@
 
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) NSString *latestVer;
+@property (assign, nonatomic) BOOL allowRotation;
 
 @end

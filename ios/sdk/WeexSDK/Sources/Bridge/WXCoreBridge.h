@@ -209,6 +209,8 @@ namespace WeexCore
 
 + (void)setPageArgument:(NSString*)pageId key:(NSString*)key value:(NSString*)value;
 
++ (BOOL)isKeepingRawCssStyles:(NSString*)pageId;
+
 @end
 
 #endif
