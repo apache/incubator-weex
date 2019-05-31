@@ -58,34 +58,33 @@ namespace WeexCore {
 #define WEEX_CORE_FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 #define WEEX_CORE_LOG(level, TAG, format, ...)   WeexCore::PrintLog((level), TAG, WEEX_CORE_FILENAME, __LINE__, (format), ##__VA_ARGS__)
 
-#define LOGE(format, ...)                WEEX_CORE_LOG(WeexCore::LogLevel::Debug, WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
 #define LOGE_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Error, TAG, format, ##__VA_ARGS__)
+#define LOGE(format, ...)                LOGE_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
+
+#define LOGI_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Info, TAG, format, ##__VA_ARGS__)
+#define LOGI(format, ...)                LOGI_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
 
 #ifdef DEBUG
 
-#define LOGD(format, ...)           WEEX_CORE_LOG(WeexCore::LogLevel::Debug, WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
-#define LOGW(format, ...)           WEEX_CORE_LOG(WeexCore::LogLevel::Warn, WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
-#define LOGI(format, ...)           WEEX_CORE_LOG(WeexCore::LogLevel::Info, WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
-
 #define LOGD_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Debug, TAG, format, ##__VA_ARGS__)
+#define LOGD(format, ...)                LOGD_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
+
 #define LOGW_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Warn, TAG, format, ##__VA_ARGS__)
-#define LOGI_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Info, TAG, format, ##__VA_ARGS__)
+#define LOGW(format, ...)                LOGW_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
 
 #else
 
-#define LOGD(format, ...)       ((void) 0)
-#define LOGW(format, ...)       ((void) 0)
-#define LOGD(format, ...)       ((void) 0)
-
 #define LOGD_TAG(TAG, format, ...)       ((void) 0)
+#define LOGD(format, ...)                ((void) 0)
+
 #define LOGW_TAG(TAG, format, ...)       ((void) 0)
-#define LOGI_TAG(TAG, format, ...)       ((void) 0)
+#define LOGW(format, ...)                ((void) 0)
 
 #endif
 
 #define LOGV                    LOGD
+#define LOGV_TAG                LOGD_TAG
 #define LOG_LINE                ((void) 0)
-#define LOGV_TAG                LOGD
 
 #ifndef DISALLOW_COPY_AND_ASSIGN
 #define DISALLOW_COPY_AND_ASSIGN(TypeName)  \
