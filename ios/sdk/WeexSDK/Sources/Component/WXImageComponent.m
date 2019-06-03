@@ -418,7 +418,7 @@ WX_EXPORT_METHOD(@selector(save:))
                         WX_REWRITE_URL([strongSelf imageSrc], WXResourceTypeImage, strongSelf.weexInstance)
                         NSDictionary *userInfo = @{@"imageQuality":@(strongSelf.imageQuality), @"imageSharp":@(strongSelf.imageSharp),  @"blurRadius":@(strongSelf.blurRadius), @"instanceId":[strongSelf _safeInstanceId], @"pageURL": strongSelf.weexInstance.scriptURL ?: @""};
                         [[strongSelf imageLoader] setImageViewWithURL:imageView url:[NSURL URLWithString:newURL] placeholderImage:nil options:userInfo progress:nil completed:^(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL) {
-                            NSLog(@"asdf, %@, %@", imageView, imageURL);
+                            WXLogInfo(@"Image re-requested because placeholder may override main image. %@", imageURL);
                         }];
                     }
                 }
