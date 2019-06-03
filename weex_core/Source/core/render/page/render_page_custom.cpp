@@ -28,6 +28,7 @@ namespace WeexCore {
     }
 
     RenderPageCustom::RenderPageCustom(const std::string& page_id, const std::string& page_type, const PageOptions& options): RenderPageBase(page_id, page_type) {
+        valid_ = true;
         target_ = RenderTargetManager::sharedInstance()->getRenderTarget(page_type);
         if (target_) {
             RenderTarget::PageOptions targetOptions;

@@ -113,7 +113,7 @@ typedef enum : NSUInteger {
         
         if (self.isCustomRenderType) {
             // check render type is available
-            NSSet* availableRenderTypes = [WXCoreBridge getAvailableCustomRenderTypes];
+            NSSet* availableRenderTypes = [WXCustomPageBridge getAvailableCustomRenderTypes];
             if ([availableRenderTypes containsObject:_renderType]) {
                 // custom render page, we use odd instanceId, and (instanceId + 1) is sure not used by other pages.
                 _instanceId = [NSString stringWithFormat:@"%ld", (long)(instanceId + 1)];
@@ -393,7 +393,7 @@ typedef enum : NSUInteger {
 
     WXPerformBlockOnMainThread(^{
         if (self.isCustomRenderType) {
-            self->_rootView = [WXCoreBridge createCustomPageRootView:self.instanceId pageType:self.renderType frame:self.frame];
+            self->_rootView = [WXCustomPageBridge createPageRootView:self.instanceId pageType:self.renderType frame:self.frame];
         }
         else {
             self->_rootView = [[WXRootView alloc] initWithFrame:self.frame];
@@ -489,7 +489,7 @@ typedef enum : NSUInteger {
     
     WXPerformBlockOnMainThread(^{
         if (self.isCustomRenderType) {
-            self->_rootView = [WXCoreBridge createCustomPageRootView:self.instanceId pageType:self.renderType frame:self.frame];
+            self->_rootView = [WXCustomPageBridge createPageRootView:self.instanceId pageType:self.renderType frame:self.frame];
         }
         else {
             self->_rootView = [[WXRootView alloc] initWithFrame:self.frame];
@@ -732,12 +732,23 @@ typedef enum : NSUInteger {
     WXComponentManager* componentManager = self.componentManager;
     NSString* instanceId = self.instanceId;
     
+    /* Custom render target, currently we manage the pages by ourselves not by WeexCore.
+     We remove the WeexCore page immediately so that any later render commands will be ignored. */
+    if ([WXCustomPageBridge isCustomPage:instanceId]) {
+        [[WXCustomPageBridge sharedInstance] invalidatePage:instanceId];
+    }
+    
     WXPerformBlockOnComponentThread(^{
         // Destroy components and views in main thread. Unbind with underneath RenderObjects.
         [componentManager unload];
         
         // Destroy weexcore c++ page and objects.
         [WXCoreBridge closePage:instanceId];
+        
+        // Destroy heron render target page
+        if ([WXCustomPageBridge isCustomPage:instanceId]) {
+            [[WXCustomPageBridge sharedInstance] removePage:instanceId];
+        }
         
         // Reading config from orange for Release instance in Main Thread or not, for Bug #15172691 +{
         dispatch_async(dispatch_get_main_queue(), ^{

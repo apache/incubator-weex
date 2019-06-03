@@ -336,8 +336,10 @@
         WXLogDebug(@"callNativeModule...%@,%@,%@,%@", instanceIdString, moduleNameString, methodNameString, argsArray);
         
         id result = nil;
-        if ([WXCoreBridge forwardCallNativeModuleToCustomPage:instanceIdString moduleName:moduleNameString methodName:methodNameString arguments:argsArray options:optionsDic returnValue:&result]) {
-            return [JSValue valueWithObject:result inContext:[JSContext currentContext]];
+        if ([WXCustomPageBridge isCustomPage:instanceIdString]) {
+            if ([[WXCustomPageBridge sharedInstance] forwardCallNativeModuleToCustomPage:instanceIdString moduleName:moduleNameString methodName:methodNameString arguments:argsArray options:optionsDic returnValue:&result]) {
+                return [JSValue valueWithObject:result inContext:[JSContext currentContext]];
+            }
         }
         
         NSInvocation *invocation = callNativeModuleBlock(instanceIdString, moduleNameString, methodNameString, argsArray, optionsDic);
@@ -357,7 +359,8 @@
         
         WXLogDebug(@"callNativeComponent...%@,%@,%@,%@", instanceIdString, componentNameString, methodNameString, argsArray);
         
-        if ([WXCoreBridge forwardCallComponentToCustomPage:instanceIdString ref:componentNameString methodName:methodNameString arguments:argsArray options:optionsDic]) {
+        if ([WXCustomPageBridge isCustomPage:instanceIdString]) {
+            [[WXCustomPageBridge sharedInstance] forwardCallComponentToCustomPage:instanceIdString ref:componentNameString methodName:methodNameString arguments:argsArray options:optionsDic];
             return;
         }
         

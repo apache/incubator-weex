@@ -37,9 +37,12 @@ namespace WeexCore {
         };
         
     public:
+        RenderPageCustom() = delete;
         explicit RenderPageCustom(const std::string& page_id, const std::string& page_type, const PageOptions& options);
         
         RenderTarget* GetRenderTarget() { return target_; }
+        bool IsValid() const { return valid_; }
+        void Invalidate() { valid_ = false; }
         
         virtual bool CreateBody(const std::string& ref, const std::string& type,
                                 std::map<std::string, std::string>* styles,
@@ -86,6 +89,7 @@ namespace WeexCore {
         virtual void SetDeviceWidth(float value) override;
         
     private:
+        bool valid_;
         RenderTarget* target_;
     };
     
