@@ -1498,7 +1498,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
       }
     }
-    if(WXEnvironment.isPerf()){
+    if(WXEnvironment.isPerf() && WXEnvironment.openPerfLog){
       WXLogUtils.e("weex_perf",mWXPerformance.getPerfData());
     }
   }
