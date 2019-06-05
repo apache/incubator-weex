@@ -236,6 +236,8 @@ if(file('../license/LICENSE').exists()){
                          'Source/android/jniprebuild/jniheader/*.h',
                          'Source/base/Compatible.cpp',
                          'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
+                         'Source/base/third_party/icu/*.h',
+                         'Source/base/third_party/icu/*.cpp',
                          'Source/android/jsengine/dependence/**/*.h',
                          'Source/android/jsengine/dependence/**/*.cpp',
                          'Source/include/wtf/**/*.h',
