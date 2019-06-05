@@ -155,7 +155,7 @@ namespace WeexCore
                  isWidthWrapContent:(BOOL)isWidthWrapContent
                 isHeightWrapContent:(BOOL)isHeightWrapContent;
 
-// Set GLOBAL device size which will affect all pages
+// Set/Get GLOBAL device size which will affect all pages
 + (void)setDeviceSize:(CGSize)size;
 + (CGSize)getDeviceSize;
 
