@@ -262,11 +262,18 @@ int ScriptSideInQueue::CreateInstance(const char *instanceId,
 }
 
 std::unique_ptr<WeexJSResult> ScriptSideInQueue::ExecJSOnInstance(const char *instanceId,
-                                                                  const char *script) {
-  LOGD("ScriptSideInQueue::ExecJSOnInstance");
+                                                                  const char *script,int type) {
+  LOGD("ScriptSideInQueue::ExecJSOnInstance type:%d",type);
   ExeJsOnInstanceTask *task = new ExeJsOnInstanceTask(String::fromUTF8(instanceId),
                                                       String::fromUTF8(script));
   taskQueue(instanceId, false)->addTask(task);
+  if (type == -1){
+      //don't need wait. just run js.
+    std::unique_ptr<WeexJSResult> returnResult;
+    returnResult.reset(new WeexJSResult());
+    LOGE("test-> return default result");
+    return returnResult;
+  }
   auto future = std::unique_ptr<WeexTask::Future>(new WeexTask::Future());
   task->set_future(future.get());
   return std::move(future->waitResult());

@@ -18,14 +18,7 @@
  */
 
 buildscript {
-    repositories {
-        mavenLocal()
-        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        mavenCentral()
-        jcenter()
-    }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
         if(!project.disableCov) {
             classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
         }
@@ -246,11 +239,11 @@ if(file('../license/LICENSE').exists()){
                          'Source/android/jniprebuild/jniheader/*.h',
                          'Source/base/Compatible.cpp',
                          'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
-                         'weex_core/Source/android/jsengine/dependence/**/*.h',
-                         'weex_core/Source/android/jsengine/dependence/**/*.cpp',
-                         'weex_core/Source/include/wtf/Optional.h',
-                         'weex_core/Source/include/wtf/Brigand.h',
-                         'weex_core/Source/include/wtf/Variant.h'])
+                         'Source/android/jsengine/dependence/**/*.h',
+                         'Source/android/jsengine/dependence/**/*.cpp',
+                         'Source/include/wtf/Optional.h',
+                         'Source/include/wtf/Brigand.h',
+                         'Source/include/wtf/Variant.h'])
     }
     preBuild.dependsOn licenseFormat
 }

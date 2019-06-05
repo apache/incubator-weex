@@ -59,6 +59,8 @@
 + (NSMutableDictionary *)componentMethodMapsWithName:(NSString *)name;
 + (NSMutableDictionary *)componentSelectorMapsWithName:(NSString *)name;
 
++ (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method isSync:(BOOL *)isSync;
+
 + (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method;
 
 /**

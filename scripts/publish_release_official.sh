@@ -52,6 +52,8 @@ svn add "$1"
 svn commit -m "Release ${1}"
 
 # Publish to Github Release
+git tag -a -F "RELEASE_NOTE.md" "$1"
+git push "$4" "$1"
 npm install -g release-it
 export GITHUB_TOKEN="$5"
 release-it --no-npm --no-git.commit --no-git.requireCleanWorkingDir --git.tagName="$1" --git.tagAnnotation='"$(cat RELEASE_NOTE.md)"' --git.tagArgs="--cleanup=verbatim" --git.pushRepo="$4" --github.release --github.releaseName="$1" --github.releaseNotes="cat RELEASE_NOTE.md"

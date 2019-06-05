@@ -150,13 +150,13 @@ int ScriptSideInMultiSo::CreateInstance(const char *instanceId,
 }
 
 std::unique_ptr<WeexJSResult> ScriptSideInMultiSo::ExecJSOnInstance(const char *instanceId,
-                                            const char *script) {
+                                            const char *script,int type) {
   if(script_side_functions_ == nullptr) {
     LOGE("ScriptSideInMultiSo::ExecJSOnInstance script_side_functions_ is null");
     std::unique_ptr<WeexJSResult> result;
     return  result;
   }
-  return script_side_functions_->funcExeJSOnInstance(instanceId, script);
+  return script_side_functions_->funcExeJSOnInstance(instanceId, script,type);
 }
 
 int ScriptSideInMultiSo::DestroyInstance(const char *instanceId) {

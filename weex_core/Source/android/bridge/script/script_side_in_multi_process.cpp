@@ -472,7 +472,7 @@ int ScriptSideInMultiProcess::CreateInstance(
 }
 
 std::unique_ptr<WeexJSResult> ScriptSideInMultiProcess::ExecJSOnInstance(const char *instanceId,
-                                                 const char *script) {
+                                                 const char *script,int type) {
  std::unique_ptr<WeexJSResult> ret;
   try {
     // base::debug::TraceScope traceScope("weex", "native_execJSOnInstance");
@@ -481,6 +481,7 @@ std::unique_ptr<WeexJSResult> ScriptSideInMultiProcess::ExecJSOnInstance(const c
 
     serializer->add(instanceId, strlen(instanceId));
     serializer->add(script, strlen(script));
+    serializer->add(type);
 
     std::unique_ptr<IPCBuffer> buffer = serializer->finish();
     std::unique_ptr<IPCResult> result = sender_->send(buffer.get());

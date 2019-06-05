@@ -33,6 +33,7 @@ set(${BASE_LIBRARY_NAME}_SOURCES
     #CoreConstants.h
     core_constants.h
     log_defines.h
+    log_defines.cpp
     time_utils.h
     base64/base64.h
     base64/base64.cpp
@@ -68,6 +69,7 @@ set(${BASE_LIBRARY_NAME}_SOURCES
     )
 
 if (ANDROID)
+    add_definitions(-DOS_ANDROID=1)
     if ("${ANDROID_ABI}" STREQUAL "x86")
     else ()
       list(APPEND ${BASE_LIBRARY_NAME}_SOURCES

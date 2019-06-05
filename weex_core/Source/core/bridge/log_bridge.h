@@ -16,24 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef _LOG_UTILS_H_
-#define _LOG_UTILS_H_
 
-#include "base/log_defines.h"
+#pragma once
 
-#ifndef DISALLOW_COPY_AND_ASSIGN
-#define DISALLOW_COPY_AND_ASSIGN(TypeName)  \
-  TypeName(const TypeName&) = delete;      \
-  void operator=(const TypeName&) = delete
-#endif
+namespace WeexCore {
 
-namespace Weex {
-  class LogUtil {
-    private:
-      static bool mDebugMode;
+    class LogBridge {
     public:
-      static void setDebugMode(bool debug);
-      static void ConsoleLogPrint(int level, const char* tag, const char* log);
-  };
+        LogBridge() {}
+        
+        virtual void log(LogLevel level, const char* tag, const char* file, unsigned long line, const char* log) {};
+    };
+    
 }
-#endif //_LOG_UTILS_H_

@@ -33,15 +33,13 @@
 #include <wtf/HashMap.h>
 
 
+#define LOGE(format, ...) LOGE(format, ##__VA_ARGS__)
 
 #ifdef  __ANDROID__
     //#define WSON_JSC_DEBUG  true;
-    #include <android/log.h>
     #include <wtf/unicode/WTFUTF8.h>
-    #define TAG "weex"
-    #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
+    #include "base/log_defines.h"
 #else
-  #define LOGE(...)  printf(__VA_ARGS__)
   #include <wtf/unicode/UTF8.h>
 #endif
 
