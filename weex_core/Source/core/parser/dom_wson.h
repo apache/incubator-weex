@@ -32,7 +32,7 @@ namespace WeexCore {
     class RenderObject;
     class RenderPage;
 
-    RenderObject *Wson2RenderObject(const char *data, const std::string &pageId);
+    RenderObject *Wson2RenderObject(const char *data, const std::string &pageId, bool reserveStyles);
     std::vector<std::pair<std::string, std::string>> *Wson2Pairs(const char *data);
 }
 

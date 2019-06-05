@@ -71,6 +71,16 @@
     return YES;
 }
 
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window
+{
+    if (_allowRotation) {
+        return UIInterfaceOrientationMaskAllButUpsideDown;
+    }
+    else {
+        return UIInterfaceOrientationMaskPortrait;
+    }
+}
+
 -(void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler
 {
     if ([shortcutItem.type isEqualToString:QRSCAN]) {
