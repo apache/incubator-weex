@@ -103,6 +103,8 @@ typedef NS_ENUM(NSUInteger, WeexLogLevel){
 
 + (void)registerExternalLog:(id<WXLogProtocol>)externalLog;
 
++ (id<WXLogProtocol>)getCurrentExternalLog;
+
 @end
 
 #define WX_FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
