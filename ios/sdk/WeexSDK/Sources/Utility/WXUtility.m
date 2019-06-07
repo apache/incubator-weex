@@ -43,6 +43,7 @@
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
 
 static BOOL enableRTLLayoutDirection = YES;
+static BOOL overflowHiddenByDefault = YES;
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
@@ -768,6 +769,18 @@ CGFloat WXFloorPixelValue(CGFloat value)
 + (BOOL)enableRTLLayoutDirection
 {
     return enableRTLLayoutDirection;
+}
+
+# pragma mark - Overflow
+
++ (void)setOverflowHiddenByDefault:(BOOL)value
+{
+    overflowHiddenByDefault = value;
+}
+
++ (BOOL)overflowHiddenByDefault
+{
+    return overflowHiddenByDefault;
 }
 
 #pragma mark - get deviceID
