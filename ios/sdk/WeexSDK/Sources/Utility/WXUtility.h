@@ -494,8 +494,10 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
 + (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict;
 
 + (void)setEnableRTLLayoutDirection:(BOOL)value;
-
 + (BOOL)enableRTLLayoutDirection;
+
++ (void)setOverflowHiddenByDefault:(BOOL)value;
++ (BOOL)overflowHiddenByDefault;
 
 + (long) getUnixFixTimeMillis;
 
