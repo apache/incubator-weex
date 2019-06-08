@@ -20,6 +20,14 @@
 #import "WXConsoleLogModule.h"
 #import "WXLog.h"
 
+#if !TARGET_OS_WATCH
+#import <asl.h>
+#endif
+
+#if !__has_feature(objc_arc)
+#error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
+
 @interface WXConsoleLogHandler : NSObject<WXLogProtocol>
 
 @property (nonatomic, assign) WXLogLevel logLevel;
@@ -59,17 +67,22 @@
 
 - (void)log:(WXLogFlag)flag message:(NSString *)message
 {
-    // We use printf to output console log
+#if !TARGET_OS_WATCH
+    dispatch_async(dispatch_get_main_queue(), ^{
+        asl_log_message(ASL_LEVEL_NOTICE, "%s", [message UTF8String]);
+    });
+#else
     printf("\n%s\n", [message UTF8String]);
+#endif
 }
 
 @end
 
 @implementation WXConsoleLogModule
 
-WX_EXPORT_METHOD(@selector(switchLogLevel:))
+WX_EXPORT_METHOD(@selector(switchLogLevel:callback:))
 
-- (void)switchLogLevel:(NSString*)logLevel {
+- (void)switchLogLevel:(NSString*)logLevel callback:(WXKeepAliveCallback)callback {
     static id<WXLogProtocol> OriginalLogger = nil;
     
     // When first invoke WXConsoleLogModule we record original logger
@@ -95,6 +108,10 @@ WX_EXPORT_METHOD(@selector(switchLogLevel:))
     else if ([logLevel isEqualToString:@"debug"]) {
         [WXConsoleLogHandler sharedInstance].logLevel = WXLogLevelDebug;
         [WXLog registerExternalLog:[WXConsoleLogHandler sharedInstance]];
+    }
+    
+    if (callback) {
+        callback(@{}, NO);
     }
 }
 
