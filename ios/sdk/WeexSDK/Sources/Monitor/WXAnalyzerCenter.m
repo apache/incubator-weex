@@ -209,6 +209,15 @@
             });
         }
     }
+    if ([WXSDKManager.bridgeMgr respondsToSelector:@selector(backupBridgeCtx)]) {
+        id backupBridgeCtx = [WXSDKManager.bridgeMgr performSelector:@selector(backupBridgeCtx) withObject:nil];
+        if (nil != backupBridgeCtx && [backupBridgeCtx respondsToSelector:@selector(callJSMethod:args:)]) {
+            WXPerformBlockOnBackupBridgeThread(^(){
+                NSArray* args = @[isOpen?@(1):@(0)];
+                [backupBridgeCtx performSelector:@selector(callJSMethod:args:) withObject:@"switchInteractionLog" withObject:args];
+            });
+        }
+    }
 #pragma clang diagnostic pop
 }
 

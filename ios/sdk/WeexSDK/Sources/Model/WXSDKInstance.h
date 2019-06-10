@@ -52,6 +52,11 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, assign) BOOL needValidate;
 
 /**
+ * Which indicates current instance use backup JS thread run,default value is false.
+ **/
+@property (nonatomic, assign) BOOL useBackupJsThread;
+
+/**
  * The scriptURL of weex bundle.
  **/
 @property (nonatomic, strong) NSURL *scriptURL;

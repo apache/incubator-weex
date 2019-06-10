@@ -754,9 +754,9 @@ _Pragma("clang diagnostic pop") \
         if (_dataRenderHandler) {
             WXPerformBlockOnComponentThread(^{
                 [_dataRenderHandler destroyDataRenderInstance:instance];
-                WXPerformBlockOnBridgeThread(^{
+                WXPerformBlockOnBridgeThreadForInstance(^{
                     [self callJSMethod:@"destroyInstance" args:@[instance]];
-                });
+                }, instance);
             });
         }
         else {

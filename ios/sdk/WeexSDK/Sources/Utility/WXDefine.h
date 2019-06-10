@@ -89,6 +89,8 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
 
 #define WX_BRIDGE_THREAD_NAME @"com.taobao.weex.bridge"
 
+#define WX_BACKUP_BRIDGE_THREAD_NAME @"com.taobao.weex.backup.bridge"
+
 #define WX_FONT_DOWNLOAD_DIR [[WXUtility cacheDirectory] stringByAppendingPathComponent:[NSString stringWithFormat:@"wxdownload"]]
 
 #define WX_EXPORT_METHOD_INTERNAL(method, token) \
