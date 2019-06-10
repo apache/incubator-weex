@@ -800,6 +800,10 @@ static BOOL bNeedRemoveEvents = YES;
 - (void)updateStyles:(NSDictionary *)styles
 {
     WXAssertMainThread();
+
+    if (self.componentCallback) {
+        self.componentCallback(self, WXComponentUpdateStylesCallback, styles);
+    }
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes

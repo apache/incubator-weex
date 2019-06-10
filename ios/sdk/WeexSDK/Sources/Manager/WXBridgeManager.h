@@ -28,6 +28,10 @@ extern "C" {
 #endif
     void WXPerformBlockOnBridgeThread(void (^block)(void));
     void WXPerformBlockSyncOnBridgeThread(void (^block) (void));
+    void WXPerformBlockOnBackupBridgeThread(void (^block)(void));
+
+    void WXPerformBlockOnBridgeThreadForInstance(void (^block)(void), NSString* instance);
+    void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString* instance);
 #ifdef __cplusplus
 }
 #endif

@@ -119,6 +119,8 @@ typedef enum : NSUInteger {
         
         _defaultDataRender = NO;
         
+        _useBackupJsThread = NO;
+
         [self addObservers];
     }
     return self;
@@ -143,6 +145,9 @@ typedef enum : NSUInteger {
     _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] initWithoutDefaultContext];
     if (!_debugJS) {
         id<WXBridgeProtocol> jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"bridgeCtx.jsBridge"];
+        if (_useBackupJsThread) {
+              jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"backupBridgeCtx.jsBridge"];
+        }
         JSContext* globalContex = jsBridge.javaScriptContext;
         JSContextGroupRef contextGroup = JSContextGetGroup([globalContex JSGlobalContextRef]);
         JSClassDefinition classDefinition = kJSClassDefinitionEmpty;
@@ -568,7 +573,7 @@ typedef enum : NSUInteger {
         if (strongSelf == nil) {
             return;
         }
-        
+
         NSMutableDictionary* optionsCopy = [strongSelf->_options mutableCopy];
         optionsCopy[bundleResponseUrlOptionKey] = [response.URL absoluteString];
         strongSelf->_options = [optionsCopy copy];
