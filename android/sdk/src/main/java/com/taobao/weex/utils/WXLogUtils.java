@@ -93,32 +93,44 @@ public class WXLogUtils {
     }
   }
 
+  public static void v(String msg) {
+    v(WEEX_TAG,msg);
+  }
+
   public static void d(String msg) {
     d(WEEX_TAG,msg);
+  }
+
+  public static void d(String tag, byte[] msg) {
+    d(tag, new String(msg));
   }
 
   public static void i(String msg) {
     i(WEEX_TAG,msg);
   }
 
-  public static void info(String msg) {
-    i(WEEX_TAG,msg);
+  public static void i(String tag, byte[] msg) {
+    i(tag, new String(msg));
   }
 
-  public static void v(String msg) {
-    v(WEEX_TAG,msg);
+  public static void info(String msg) {
+    i(WEEX_TAG, msg);
   }
 
   public static void w(String msg) {
-    w(WEEX_TAG,msg);
+    w(WEEX_TAG, msg);
+  }
+
+  public static void w(String tag, byte[] msg) {
+    w(tag, new String(msg));
   }
 
   public static void e(String msg) {
     e(WEEX_TAG,msg);
   }
 
-  public static void d(String tag, byte[] msg) {
-    d(tag,new String(msg));
+  public static void e(String tag, byte[] msg) {
+    e(tag, new String(msg));
   }
 
   public static void wtf(String msg){
