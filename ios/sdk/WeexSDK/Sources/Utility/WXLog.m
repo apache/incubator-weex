@@ -136,9 +136,8 @@ static BOOL _logToWebSocket = NO;
 {
     NSString *flagString;
     switch (flag) {
-        case WXLogFlagError: {
+        case WXLogFlagError:
             flagString = @"error";
-        }
             break;
         case WXLogFlagWarning:
             flagString = @"warn";
@@ -229,6 +228,11 @@ static BOOL _logToWebSocket = NO;
 + (void)registerExternalLog:(id<WXLogProtocol>)externalLog
 {
     _externalLog = externalLog;
+}
+
++ (id<WXLogProtocol>)getCurrentExternalLog
+{
+    return _externalLog;
 }
 
 @end
