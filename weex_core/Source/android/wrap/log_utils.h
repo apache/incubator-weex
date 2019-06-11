@@ -21,12 +21,15 @@
 #define WEEX_PROJECT_LOG_UTILS_H
 
 #include <jni.h>
+#include "base/log_defines.h"
+#include "core/bridge/log_bridge.h"
 
 namespace WeexCore {
-class LogUtils {
+class LogUtils : public LogBridge {
  public:
   static bool RegisterJNIUtils(JNIEnv* env);
   static void NativeLog(JNIEnv* env, const char* str_array);
+  void log(LogLevel level, const char* tag,  const char* file, unsigned long line, const char* log) override;
 };
 }  // namespace WeexCore
 
