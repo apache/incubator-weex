@@ -215,6 +215,21 @@
  */
 + (void)connectDevToolServer:(NSString *)URL;
 
+/**
+ * @abstract Set the global device size of all pages.
+ * You could also set unique device size used by a page using interface of WXSDKInstance.
+ *
+ * @param size, the device size in UIKit system.
+ *
+ */
++ (void)setGlobalDeviceSize:(CGSize)size;
+
+/**
+ * @abstract Get the current global device size used by pages.
+ *
+ */
++ (CGSize)getGlobalDeviceSize;
+
 @end
 
 @interface WXSDKEngine (Deprecated)

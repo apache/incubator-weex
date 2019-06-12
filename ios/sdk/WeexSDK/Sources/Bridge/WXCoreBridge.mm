@@ -1046,6 +1046,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 
 + (void)setDeviceSize:(CGSize)size
 {
+    [WXCoreBridge install];
     WeexCore::WXCoreEnvironment* env = WeexCore::WXCoreEnvironment::getInstance();
     env->SetDeviceWidth(std::to_string(size.width));
     env->SetDeviceHeight(std::to_string(size.height));
@@ -1053,6 +1054,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 
 + (CGSize)getDeviceSize
 {
+    [WXCoreBridge install];
     WeexCore::WXCoreEnvironment* env = WeexCore::WXCoreEnvironment::getInstance();
     return CGSizeMake(env->DeviceWidth(), env->DeviceHeight());
 }

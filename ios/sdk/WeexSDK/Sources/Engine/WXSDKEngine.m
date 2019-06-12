@@ -41,6 +41,7 @@
 #import "WXExceptionUtils.h"
 #import "WXConfigCenterProtocol.h"
 #import "WXComponent+Layout.h"
+#import "WXCoreBridge.h"
 
 @implementation WXSDKEngine
 
@@ -368,6 +369,16 @@ static NSDictionary *_customEnvironment = nil;
 + (void)connectDevToolServer:(NSString *)URL
 {
     [[WXSDKManager bridgeMgr] connectToDevToolWithUrl:[NSURL URLWithString:URL]];
+}
+
++ (void)setGlobalDeviceSize:(CGSize)size
+{
+    [WXCoreBridge setDeviceSize:size];
+}
+
++ (CGSize)getGlobalDeviceSize
+{
+    return [WXCoreBridge getDeviceSize];
 }
 
 + (void)_originalRegisterComponents:(NSDictionary *)components {
