@@ -74,6 +74,10 @@ class RenderManager {
   bool AddRenderObject(const std::string &page_id,
                        const std::string &parent_ref, int index,
                        RenderObject *root);
+    
+  bool AddRenderObject(const std::string &page_id,
+                       const std::string &parent_ref, int index,
+                       std::function<RenderObject* (RenderPage*)> constructRoot);
 
   bool RemoveRenderObject(const std::string &page_id, const std::string &ref);
 
@@ -116,6 +120,8 @@ class RenderManager {
   RenderPageBase *GetPage(const std::string &page_id);
 
   bool ClosePage(const std::string &page_id);
+    
+  bool ReloadPageLayout(const std::string& page_id);
 
   float viewport_width(const std::string &page_id);
 
@@ -144,14 +150,10 @@ class RenderManager {
     void initDeviceConfig(RenderPage *page, const std::string &page_id);
  private:
   static RenderManager *g_pInstance;
+
   std::map<std::string, RenderPageBase *> pages_;
   std::mutex page_args_mutex_;
   std::map<std::string, std::map<std::string, std::string>> page_args_;
-
-  // TODO We should use page_args_ to store such arguments
-  std::map<std::string, float> viewports_;
-  std::map<std::string, float> device_widths_;
-  std::map<std::string, bool> round_off_deviations_;
 };
 }  // namespace WeexCore
 

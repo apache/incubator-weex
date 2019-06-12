@@ -294,6 +294,11 @@ bool RenderPage::UpdateStyle(
       }
     }
   }
+  
+  if (reserve_css_styles_ || render == render_root_) {
+    // If a page requires that all raw css styles saved, we merge to RenderObject's styles map
+    render->MergeStyles(src);
+  }
 
   if (style != nullptr || margin != nullptr || padding != nullptr ||
       border != nullptr || inheriableLayout)
@@ -626,4 +631,93 @@ void RenderPage::OnRenderProcessExited() {}
 void RenderPage::OnRenderProcessGone() {}
 
 void RenderPage::OnRenderPageClose() {}
+
+bool RenderPage::ReapplyStyles() {
+  if (!reserve_css_styles_) {
+    LOGE("CSS styles of page %s are dropped, unable to do reapply styles actions.", page_id().c_str());
+    return false;
+  }
+  
+  for (auto it = render_object_registers_.begin(); it != render_object_registers_.end(); ++ it) {
+    if (it->second == nullptr) {
+      continue;
+    }
+    
+    auto stylesMap = it->second->styles_;
+    if (stylesMap != nullptr) {
+      std::vector<std::pair<std::string, std::string>> *style = nullptr;
+      std::vector<std::pair<std::string, std::string>> *margin = nullptr;
+      std::vector<std::pair<std::string, std::string>> *padding = nullptr;
+      std::vector<std::pair<std::string, std::string>> *border = nullptr;
+      bool inheriableLayout = false;
+      
+      for (auto sit = stylesMap->begin(); sit != stylesMap->end(); ++ sit) {
+        switch (it->second->UpdateStyle(sit->first, sit->second)) {
+          case kTypeStyle:
+            if (style == nullptr) {
+              style = new std::vector<std::pair<std::string, std::string>>();
+            }
+            style->insert(style->end(), std::make_pair(sit->first, sit->second));
+            break;
+          case kTypeMargin:
+            if (margin == nullptr) {
+              margin = new std::vector<std::pair<std::string, std::string>>();
+            }
+            it->second->UpdateStyleInternal(
+                                        sit->first, sit->second, 0, [=](float foo) {
+                                          margin->insert(margin->end(), std::make_pair(sit->first, to_string(foo)));
+                                        });
+            break;
+          case kTypePadding:
+            if (padding == nullptr) {
+              padding = new std::vector<std::pair<std::string, std::string>>();
+            }
+            it->second->UpdateStyleInternal(
+                                        sit->first, sit->second, 0, [=](float foo) {
+                                          padding->insert(padding->end(), std::make_pair(sit->first, to_string(foo)));
+                                        });
+            break;
+          case kTypeBorder:
+            if (border == nullptr) {
+              border = new std::vector<std::pair<std::string, std::string>>();
+            }
+            it->second->UpdateStyleInternal(
+                                        sit->first, sit->second, 0, [=](float foo) {
+                                          border->insert(border->end(), std::make_pair(sit->first, to_string(foo)));
+                                        });
+            break;
+          case kTypeInheritableLayout:
+            inheriableLayout = true;
+            break;
+          default: break;
+        }
+      }
+      
+      if (style != nullptr || margin != nullptr || padding != nullptr ||
+          border != nullptr || inheriableLayout) {
+        SendUpdateStyleAction(it->second, style, margin, padding, border);
+      }
+      
+      if (style != nullptr) {
+        delete style;
+      }
+      
+      if (margin != nullptr) {
+        delete margin;
+      }
+      
+      if (padding != nullptr) {
+        delete padding;
+      }
+      
+      if (border != nullptr) {
+        delete border;
+      }
+    }
+  }
+  
+  Batch();
+  return true;
+}
+  
 }  // namespace WeexCore

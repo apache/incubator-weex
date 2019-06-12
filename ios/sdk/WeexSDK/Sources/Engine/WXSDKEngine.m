@@ -41,6 +41,7 @@
 #import "WXExceptionUtils.h"
 #import "WXConfigCenterProtocol.h"
 #import "WXComponent+Layout.h"
+#import "WXCoreBridge.h"
 
 @implementation WXSDKEngine
 
@@ -66,6 +67,7 @@
     [self registerModule:@"meta" withClass:NSClassFromString(@"WXMetaModule")];
     [self registerModule:@"webSocket" withClass:NSClassFromString(@"WXWebSocketModule")];
     [self registerModule:@"voice-over" withClass:NSClassFromString(@"WXVoiceOverModule")];
+    [self registerModule:@"sdk-console-log" withClass:NSClassFromString(@"WXConsoleLogModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
@@ -377,6 +379,16 @@ static NSDictionary *_customEnvironment = nil;
 + (void)connectDevToolServer:(NSString *)URL
 {
     [[WXSDKManager bridgeMgr] connectToDevToolWithUrl:[NSURL URLWithString:URL]];
+}
+
++ (void)setGlobalDeviceSize:(CGSize)size
+{
+    [WXCoreBridge setDeviceSize:size];
+}
+
++ (CGSize)getGlobalDeviceSize
+{
+    return [WXCoreBridge getDeviceSize];
 }
 
 + (void)_originalRegisterComponents:(NSDictionary *)components {

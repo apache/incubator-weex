@@ -70,7 +70,7 @@ WXAssert([[NSThread currentThread].name isEqualToString:WX_COMPONENT_THREAD_NAME
  *  @abstract macro for asserting that we are running on the bridge thread.
  */
 #define WXAssertBridgeThread() \
-WXAssert([[NSThread currentThread].name isEqualToString:WX_BRIDGE_THREAD_NAME], \
+WXAssert([[NSThread currentThread].name isEqualToString:WX_BRIDGE_THREAD_NAME] || [[NSThread currentThread].name isEqualToString:WX_BACKUP_BRIDGE_THREAD_NAME], \
 @"must be called on the bridge thread")
 
 #define WXAssertNotReached() \

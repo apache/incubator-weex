@@ -299,9 +299,9 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
             [task.instance.componentManager executePrerenderUITask:url];
             task.instance.needPrerender = NO;
         });
-        WXPerformBlockOnBridgeThread(^(){
+        WXPerformBlockOnBridgeThreadForInstance(^{
             [WXPrerenderManager excuteModuleTasksForUrl:url];
-        });
+        }, task.instance.instanceId);
     }
 }
 

@@ -29,7 +29,7 @@ WX_EXPORT_METHOD_SYNC(@selector(setViewport:))
 
 - (void)setViewport:(NSDictionary *)viewportArguments
 {
-    CGFloat viewportWidthFloat;
+    CGFloat viewportWidthFloat = 0.f;
     id viewportWidth = viewportArguments[@"width"];
     if ([viewportWidth isKindOfClass:[NSString class]]) {
         if ([viewportWidth isEqualToString:@"device-width"]) {
@@ -45,6 +45,19 @@ WX_EXPORT_METHOD_SYNC(@selector(setViewport:))
     
     if (viewportWidthFloat > 0) {
         self.weexInstance.viewportWidth = viewportWidthFloat;
+    }
+    
+    id widthId = viewportArguments[@"deviceWidth"];
+    id heightId = viewportArguments[@"deviceHeight"];
+    float width = [widthId floatValue];
+    float height = [heightId floatValue];
+    if (width > 0) {
+        [self.weexInstance setPageRequiredWidth:width height:height];
+    }
+    
+    id reserveCssStyles = viewportArguments[@"reserveCssStyles"];
+    if ([reserveCssStyles boolValue]) {
+        [self.weexInstance setPageArgument:@"reserveCssStyles" value:@"true"];
     }
 }
 

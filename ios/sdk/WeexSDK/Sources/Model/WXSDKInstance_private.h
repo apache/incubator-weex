@@ -25,7 +25,8 @@
 
 @interface WXSDKInstance ()
 
-@property (nonatomic, assign) CGFloat viewportWidth;
+@property (nonatomic, assign) CGFloat viewportWidth; // view port width this instance is using
+@property (nonatomic, assign) CGSize screenSize; // screen size this instance is using
 
 @property (nonatomic, strong) WXThreadSafeMutableDictionary *moduleInstances;
 @property (nonatomic, strong) NSMutableDictionary *naviBarStyles;

@@ -45,18 +45,18 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
                    float value) override;
   void MarkDirty(const std::string &instance_id,
                  const std::string &render_ref) override;
-  void SetViewPortWidth(const std::string &instance_id, float width) override;
 
   virtual void SetPageRenderType(const std::string &pageId, const std::string &renderType)override;
-
   virtual void RemovePageRenderType(const std::string &pageId) override;
 
-  virtual void SetPageArgument(const std::string &pageId, const std::string& key, const std::string& value) override;
-
+  void SetViewPortWidth(const std::string &instance_id, float width) override; // set page required view port width
+  void SetDeviceDisplayOfPage(const std::string &instance_id, float width, float height /* unused now */) override; // set page required device width
+  void SetPageArgument(const std::string &pageId, const std::string& key, const std::string& value) override;
   void SetDeviceDisplay(const std::string &instance_id, float width, float height, float scale) override;
   void SetPageDirty(const std::string &instance_id) override;
   void ForceLayout(const std::string &instance_id) override;
   bool NotifyLayout(const std::string &instance_id) override;
+  bool RelayoutUsingRawCssStyles(const std::string& instance_id) override;
   std::vector<int64_t> GetFirstScreenRenderTime(
       const std::string &instance_id) override;
   std::vector<int64_t> GetRenderFinishTime(

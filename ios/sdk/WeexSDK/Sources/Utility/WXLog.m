@@ -230,6 +230,11 @@ static BOOL _logToWebSocket = NO;
     _externalLog = externalLog;
 }
 
++ (id<WXLogProtocol>)getCurrentExternalLog
+{
+    return _externalLog;
+}
+
 @end
 
 #pragma mark - WXSafeLog

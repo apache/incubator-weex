@@ -64,13 +64,13 @@ RenderObject::~RenderObject() {
   }
 }
 
-void RenderObject::ApplyDefaultStyle() {
+void RenderObject::ApplyDefaultStyle(bool reserve) {
   std::map<std::string, std::string> *style = GetDefaultStyle();
 
   if (style == nullptr) return;
 
   for (auto iter = style->cbegin(); iter != style->cend(); iter++)
-    AddStyle(iter->first, iter->second);
+    AddStyle(iter->first, iter->second, reserve);
 
   if (style != nullptr) {
     delete style;
@@ -371,7 +371,13 @@ bool RenderObject::UpdateStyleInternal(const std::string key,
     float fvalue = getFloatByViewport(value,
                                       RenderManager::GetInstance()->viewport_width(page_id()),
                                       RenderManager::GetInstance()->DeviceWidth(page_id()),
-                                      RenderManager::GetInstance()->round_off_deviation(page_id()));
+#if OS_IOS
+                                      // reduce a map search on iOS
+                                      false
+#else
+                                      RenderManager::GetInstance()->round_off_deviation(page_id())
+#endif
+                                      );
     if (!isnan(fvalue)) {
       functor(fvalue);
       ret = true;
@@ -462,6 +468,14 @@ void RenderObject::UpdateAttr(std::string key, std::string value) {
 StyleType RenderObject::UpdateStyle(std::string key, std::string value) {
   return ApplyStyle(key, value, true);
 }
+  
+void RenderObject::MergeStyles(std::vector<std::pair<std::string, std::string>> *src) {
+  if (src) {
+    for (auto& p : *src) {
+      MapInsertOrAssign(styles_, p.first, p.second);
+    }
+  }
+}
 
 RenderObject *RenderObject::GetChild(const Index &index) {
   return static_cast<RenderObject *>(getChildAt(index));
@@ -475,7 +489,10 @@ void RenderObject::AddAttr(std::string key, std::string value) {
   MapInsertOrAssign(this->attributes_, key, value);
 }
 
-StyleType RenderObject::AddStyle(std::string key, std::string value) {
+StyleType RenderObject::AddStyle(std::string key, std::string value, bool reserve) {
+  if (reserve) {
+    MapInsertOrAssign(styles_, key, value);
+  }
   return ApplyStyle(key, value, false);
 }
 

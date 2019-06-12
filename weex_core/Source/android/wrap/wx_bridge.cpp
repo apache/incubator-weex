@@ -20,6 +20,7 @@
 #include "android/wrap/wx_bridge.h"
 #include <fstream>
 
+#include "android/wrap/log_utils.h"
 #include "android/base/string/string_utils.h"
 #include "android/bridge/platform/android_bridge.h"
 #include "android/bridge/platform/android_bridge_in_multi_process.h"
@@ -375,6 +376,8 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   auto result =
       bridge->core_side()->InitFramework(c_script.getChars(), params_vector);
   freeParams(params_vector);
+
+  WeexCoreManager::Instance()->set_log_bridge(new LogUtils());
   return result;
 }
 

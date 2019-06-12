@@ -93,7 +93,7 @@ class RenderObject : public IRenderObject {
   virtual StyleType ApplyStyle(const std::string &key, const std::string &value,
                                const bool updating);
 
-  void ApplyDefaultStyle();
+  void ApplyDefaultStyle(bool reserve);
 
   void ApplyDefaultAttr();
 
@@ -112,6 +112,8 @@ class RenderObject : public IRenderObject {
   virtual void UpdateAttr(std::string key, std::string value);
 
   virtual StyleType UpdateStyle(std::string key, std::string value);
+  
+  void MergeStyles(std::vector<std::pair<std::string, std::string>> *src);
 
   bool IsAppendTree();
 
@@ -121,7 +123,7 @@ class RenderObject : public IRenderObject {
 
   virtual void AddAttr(std::string key, std::string value);
 
-  StyleType AddStyle(std::string key, std::string value);
+  StyleType AddStyle(std::string key, std::string value, bool reserve);
 
   void AddEvent(std::string event);
 

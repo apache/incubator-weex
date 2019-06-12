@@ -39,7 +39,7 @@ namespace WeexCore {
     }
     
     void EagleRenderObject::AddStyle(std::string key, std::string value) {
-        render_object_impl_->AddStyle(key, value);
+        render_object_impl_->AddStyle(key, value, false);
     }
 
     void EagleRenderObject::UpdateAttr(std::string key, std::string value) {
@@ -71,7 +71,7 @@ namespace WeexCore {
     }
     
     void EagleRenderObject::ApplyDefaultStyle() {
-        render_object_impl_->ApplyDefaultStyle();
+        render_object_impl_->ApplyDefaultStyle(false);
     }
     
     int EagleRenderObject::AddRenderObject(int index, EagleRenderObject child) {

@@ -79,8 +79,7 @@ typedef enum : NSUInteger {
     WXThreadSafeMutableDictionary *_moduleEventObservers;
     BOOL _performanceCommit;
     BOOL _debugJS;
-    id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context    
-    CGFloat _defaultPixelScaleFactor;
+    id<WXBridgeProtocol> _instanceJavaScriptContext; // sandbox javaScript context
     BOOL _defaultDataRender;
 }
 
@@ -144,9 +143,10 @@ typedef enum : NSUInteger {
         
         [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
         
-        _defaultPixelScaleFactor = CGFLOAT_MIN;
         _defaultDataRender = NO;
         
+        _useBackupJsThread = NO;
+
         [self addObservers];
     }
     return self;
@@ -176,6 +176,9 @@ typedef enum : NSUInteger {
     _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] initWithoutDefaultContext];
     if (!_debugJS) {
         id<WXBridgeProtocol> jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"bridgeCtx.jsBridge"];
+        if (_useBackupJsThread) {
+              jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"backupBridgeCtx.jsBridge"];
+        }
         JSContext* globalContex = jsBridge.javaScriptContext;
         JSContextGroupRef contextGroup = JSContextGetGroup([globalContex JSGlobalContextRef]);
         JSClassDefinition classDefinition = kJSClassDefinitionEmpty;
@@ -240,7 +243,41 @@ typedef enum : NSUInteger {
     _viewportWidth = viewportWidth;
     
     // notify weex core
-    [WXCoreBridge setViewportWidth:_instanceId width:viewportWidth];
+    NSString* pageId = _instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXCoreBridge setViewportWidth:pageId width:viewportWidth];
+    });
+}
+
+- (void)setPageKeepRawCssStyles
+{
+    [self setPageArgument:@"reserveCssStyles" value:@"true"];
+}
+
+- (BOOL)isKeepingRawCssStyles
+{
+    if ([NSThread currentThread] == [WXComponentManager componentThread]) {
+        return [WXCoreBridge isKeepingRawCssStyles:_instanceId];
+    }
+    else {
+        __block BOOL result = NO;
+        NSString* pageId = _instanceId;
+        dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+        WXPerformBlockOnComponentThread(^{
+            result = [WXCoreBridge isKeepingRawCssStyles:pageId];
+            dispatch_semaphore_signal(sem);
+        });
+        dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+        return result;
+    }
+}
+
+- (void)setPageArgument:(NSString*)key value:(NSString*)value
+{
+    NSString* pageId = _instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXCoreBridge setPageArgument:pageId key:key value:value];
+    });
 }
 
 - (void)setScriptURL:(NSURL *)scriptURL
@@ -251,7 +288,13 @@ typedef enum : NSUInteger {
 
 - (void)setPageRequiredWidth:(CGFloat)width height:(CGFloat)height
 {
-    [WXCoreBridge setPageRequired:_instanceId width:width height:height];
+    _screenSize = CGSizeMake(width, height);
+    
+    // notify weex core
+    NSString* pageId = _instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXCoreBridge setPageRequired:pageId width:width height:height];
+    });
 }
 
 - (void)renderWithURL:(NSURL *)url
@@ -528,6 +571,9 @@ typedef enum : NSUInteger {
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {		
         BOOL enableRTLLayoutDirection = [[configCenter configForKey:@"iOS_weex_ext_config.enableRTLLayoutDirection" defaultValue:@(YES) isDefault:NULL] boolValue];
         [WXUtility setEnableRTLLayoutDirection:enableRTLLayoutDirection];
+        
+        BOOL overflowHiddenByDefault = [[configCenter configForKey:@"iOS_weex_ext_config.overflowHiddenByDefault" defaultValue:@(YES) isDefault:NULL] boolValue];
+        [WXUtility setOverflowHiddenByDefault:overflowHiddenByDefault];
     }
     return NO;
 }
@@ -576,7 +622,7 @@ typedef enum : NSUInteger {
         if (strongSelf == nil) {
             return;
         }
-        
+
         NSMutableDictionary* optionsCopy = [strongSelf->_options mutableCopy];
         optionsCopy[bundleResponseUrlOptionKey] = [response.URL absoluteString];
         strongSelf->_options = [optionsCopy copy];
@@ -693,6 +739,14 @@ typedef enum : NSUInteger {
     NSURLRequestCachePolicy cachePolicy = forcedReload ? NSURLRequestReloadIgnoringCacheData : NSURLRequestUseProtocolCachePolicy;
     WXResourceRequest *request = [WXResourceRequest requestWithURL:_scriptURL resourceType:WXResourceTypeMainBundle referrer:_scriptURL.absoluteString cachePolicy:cachePolicy];
     [self _renderWithRequest:request options:_options data:_jsData];
+}
+
+- (void)reloadLayout
+{
+    NSString* pageId = _instanceId;
+    WXPerformBlockOnComponentThread(^{
+        [WXCoreBridge reloadPageLayout:pageId];
+    });
 }
 
 - (void)refreshInstance:(id)data
@@ -851,16 +905,9 @@ typedef enum : NSUInteger {
 
 - (CGFloat)pixelScaleFactor
 {
-    if (self.viewportWidth > 0) {
-        return [WXUtility portraitScreenSize].width / self.viewportWidth;
-    } else {
-        if (_defaultPixelScaleFactor != CGFLOAT_MIN) {
-            return _defaultPixelScaleFactor;
-        }
-        
-        _defaultPixelScaleFactor = [WXUtility defaultPixelScaleFactor];
-        return _defaultPixelScaleFactor;
-    }
+    CGFloat usingScreenWidth = _screenSize.width > 0 ? _screenSize.width : [WXCoreBridge getDeviceSize].width;
+    CGFloat usingViewPort = _viewportWidth > 0 ? _viewportWidth : WXDefaultScreenWidth;
+    return usingScreenWidth / usingViewPort;
 }
     
 - (BOOL)wlasmRender {

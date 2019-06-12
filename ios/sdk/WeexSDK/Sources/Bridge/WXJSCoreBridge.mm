@@ -80,9 +80,9 @@
 {
     _jsContext.instanceId = nil;
     __block JSContext* theContext = _jsContext;
-    WXPerformBlockOnBridgeThread(^{
-        theContext = nil; // release the context in js thread to avoid main-thread deadlock
-    });
+    WXPerformBlockOnBridgeThreadForInstance(^{
+         theContext = nil; // release the context in js thread to avoid main-thread deadlock
+    }, _weexInstanceId);
 }
 
 - (void)setJSContext:(JSContext *)context

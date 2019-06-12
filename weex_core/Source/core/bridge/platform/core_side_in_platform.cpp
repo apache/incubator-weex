@@ -170,7 +170,15 @@ void CoreSideInPlatform::MarkDirty(const std::string &instance_id,
 
 void CoreSideInPlatform::SetViewPortWidth(const std::string &instance_id,
                                           float width) {
-    RenderManager::GetInstance()->set_viewport_width(instance_id, width);
+  RenderManager::GetInstance()->set_viewport_width(instance_id, width);
+}
+    
+void CoreSideInPlatform::SetDeviceDisplayOfPage(const std::string &instance_id, float width, float height /* unused now */)  {
+  RenderManager::GetInstance()->setDeviceWidth(instance_id, width);
+}
+    
+void CoreSideInPlatform::SetPageArgument(const std::string &pageId, const std::string& key, const std::string& value){
+    RenderManager::GetInstance()->setPageArgument(pageId, key, value);
 }
 
 void CoreSideInPlatform::SetPageRenderType(const std::string &pageId,
@@ -230,6 +238,10 @@ bool CoreSideInPlatform::NotifyLayout(const std::string &instance_id) {
     return ret ? true : false;
   }
   return false;
+}
+    
+bool CoreSideInPlatform::RelayoutUsingRawCssStyles(const std::string& instance_id) {
+  return RenderManager::GetInstance()->ReloadPageLayout(instance_id);
 }
 
 std::vector<int64_t> CoreSideInPlatform::GetFirstScreenRenderTime(

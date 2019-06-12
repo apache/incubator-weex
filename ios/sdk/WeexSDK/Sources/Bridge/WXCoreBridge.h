@@ -206,15 +206,21 @@ namespace WeexCore
                  isWidthWrapContent:(BOOL)isWidthWrapContent
                 isHeightWrapContent:(BOOL)isHeightWrapContent;
 
+// Set/Get GLOBAL device size which will affect all pages
 + (void)setDeviceSize:(CGSize)size;
++ (CGSize)getDeviceSize;
 
+// DO NOT call this method directly, you should use WXSDKInstance
 + (void)setViewportWidth:(NSString*)pageId width:(CGFloat)width;
 
+// DO NOT call this method directly, you should use WXSDKInstance
 + (void)setPageRequired:(NSString *)pageId width:(CGFloat)width height:(CGFloat)height;
 
 + (void)layoutPage:(NSString*)pageId forced:(BOOL)forced;
 
 + (void)closePage:(NSString*)pageId;
+
++ (BOOL)reloadPageLayout:(NSString*)pageId;
 
 + (void)layoutRenderObject:(void*)object size:(CGSize)size page:(NSString*)pageId;
 
@@ -253,6 +259,8 @@ namespace WeexCore
 + (void)registerCoreEnv:(NSString*)key withValue:(NSString*)value;
 
 + (void)setPageArgument:(NSString*)pageId key:(NSString*)key value:(NSString*)value;
+
++ (BOOL)isKeepingRawCssStyles:(NSString*)pageId;
 
 @end
 

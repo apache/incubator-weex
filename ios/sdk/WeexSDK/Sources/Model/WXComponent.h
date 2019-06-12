@@ -28,7 +28,8 @@ typedef enum : NSUInteger {
 } WXDisplayType;
 
 typedef enum : NSUInteger {
-    WXComponentViewCreatedCallback
+    WXComponentViewCreatedCallback,
+    WXComponentUpdateStylesCallback
 } WXComponentCallbackType;
 
 /**
@@ -177,6 +178,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  The callback of the component
  *
  *  When the callbackType is WXComponentViewCreatedCallback, the result type is UIView.
+ *  When the callbackType is WXComponentUpdateStylesCallback, the result type is NSDictionary.
  *
  *  @return A block that takes component, callbackType and a result.
  **/

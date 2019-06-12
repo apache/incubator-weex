@@ -27,6 +27,7 @@
 #import "DemoDefine.h"
 #import "WXPrerenderManager.h"
 #import "WXMonitor.h"
+#import "AppDelegate.h"
 
 @interface WXDemoViewController () <UIScrollViewDelegate, UIWebViewDelegate>
 @property (nonatomic, strong) WXSDKInstance *instance;
@@ -52,6 +53,14 @@
     return self;
 }
 
+- (void)setInterfaceOrientation:(UIDeviceOrientation)orientation
+{
+    if ([[UIDevice currentDevice] respondsToSelector:@selector(setOrientation:)]) {
+        [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:orientation]
+                                    forKey:@"orientation"];
+    }
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -71,6 +80,9 @@
 {
     [super viewDidAppear:animated];
     [self updateInstanceState:WeexInstanceAppear];
+    
+    AppDelegate* appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    appDelegate.allowRotation = _instance && [_instance isKeepingRawCssStyles];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -78,6 +90,15 @@
     [super viewDidDisappear:animated];
     [_instance didDisappear];
     [self updateInstanceState:WeexInstanceDisappear];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    // restore to protrait
+    AppDelegate* appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    appDelegate.allowRotation = NO;
+    [self setInterfaceOrientation:UIDeviceOrientationPortrait];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -198,9 +219,13 @@
         }
     };
     
+    __weak WXSDKInstance* theInstance = _instance;
     _instance.renderFinish = ^(UIView *view) {
          WXLogDebug(@"%@", @"Render Finish...");
         [weakSelf updateInstanceState:WeexInstanceAppear];
+        
+        AppDelegate* appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+        appDelegate.allowRotation = theInstance && [theInstance isKeepingRawCssStyles];
     };
     
     _instance.updateFinish = ^(UIView *view) {
@@ -282,6 +307,18 @@
 - (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error
 {
     
+}
+
+# pragma mark - orientation
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    if (_instance) {
+        CGFloat w = [UIScreen mainScreen].bounds.size.width;
+        CGFloat h = [UIScreen mainScreen].bounds.size.height;
+        [_instance setPageRequiredWidth:w height:h];
+        [_instance reloadLayout];
+    }
 }
 
 #pragma mark - localBundle

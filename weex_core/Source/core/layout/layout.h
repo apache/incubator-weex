@@ -717,6 +717,15 @@ namespace WeexCore {
           break;
         }
       }
+      
+      // also remove from BFC list, for determineChildLayoutDirection may encounter a wild pointer
+      for (int index = 0; index < BFCs.size(); index++) {
+          if (child == BFCs[index]) {
+              BFCs.erase(BFCs.begin() + index);
+              break;
+          }
+      }
+      
       markDirty();
     }
 
