@@ -209,7 +209,7 @@ public enum WXErrorCode {
    * renderErrorCode
    */
   WX_RENDER_ERR_JS_CREATE_INSTANCE("-9600", "white screen cause create instance failed,check js stack ->",ErrorType.RENDER_ERROR,ErrorGroup.JS),
-  WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT("-9601", "white screen cause create instanceContext failed,check js stack ->",ErrorType.RENDER_ERROR,ErrorGroup.JS),
+  WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT("-9700", "white screen cause create instanceContext failed,check js stack ->",ErrorType.RENDER_ERROR,ErrorGroup.JS),
   WX_RENDER_ERR_LAYER_OVERFLOW("-9602", "WX_RENDER_ERR_LAYER_OVERFLOW", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
   WX_RENDER_ERR_NULL_KEY("-9603", "WX_RENDER_ERR_NULL_KEY", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
   WX_RENDER_ERR_NATIVE_RUNTIME("-9604", "WX_RENDER_ERR for js error", ErrorType.RENDER_ERROR, ErrorGroup.NATIVE),
