@@ -142,21 +142,17 @@ RenderPageCustom* RenderManager::CreateCustomPage(const std::string& page_id, co
         options.view_scale = strtof(value.c_str(), NULL);
     }
     
-    std::map<std::string, float>::iterator iter =
-    this->viewports_.find(page_id);
-    if (iter != this->viewports_.end()) {
-        options.viewport_width = iter->second;
-        this->viewports_.erase(page_id);
+    auto findViewPort = options.args.find("viewportwidth");
+    if (findViewPort != options.args.end()) {
+        options.viewport_width = getFloat(findViewPort->second.c_str());
     }
     else {
         options.viewport_width = kDefaultViewPortWidth;
     }
     
-    std::map<std::string, float>::iterator iterWidth =
-    this->device_widths_.find(page_id);
-    if (iterWidth != this->device_widths_.end()) {
-        options.device_width = iter->second;
-        this->device_widths_.erase(page_id);
+    auto findDeviceWidth = options.args.find("devicewidth");
+    if (findDeviceWidth != options.args.end()) {
+        options.device_width = getFloat(findDeviceWidth->second.c_str());
     }
     else {
         /* For iOS DeviceWidth stored by WeexCore is in UIKit view system coordinate(iPhone6 is 375).
@@ -164,11 +160,9 @@ RenderPageCustom* RenderManager::CreateCustomPage(const std::string& page_id, co
         options.device_width = WXCoreEnvironment::getInstance()->DeviceWidth() * options.view_scale;
     }
     
-    std::map<std::string, bool>::iterator iter_deviation =
-    this->round_off_deviations_.find(page_id);
-    if (iter_deviation != this->round_off_deviations_.end()) {
-        options.is_round_off = iter_deviation->second;
-        this->round_off_deviations_.erase(page_id);
+    auto findDeviation = options.args.find("roundoffdeviation");
+    if (findDeviation != options.args.end()) {
+        options.is_round_off = getBool(findDeviation->second.c_str());
     }
     else {
         options.is_round_off = kDefaultRoundOffDeviation;
@@ -196,7 +190,7 @@ bool RenderManager::AddRenderObject(const std::string &page_id,
   int64_t start_time = getCurrentTime();
 
   if (page->is_platform_page()) {
-      RenderObject *child = Wson2RenderObject(data, page_id, page->reserve_css_styles());
+      RenderObject *child = Wson2RenderObject(data, page_id, static_cast<RenderPage*>(page)->reserve_css_styles());
       static_cast<RenderPage*>(page)->ParseJsonTime(getCurrentTime() - start_time);
 
       if (child == nullptr) return false;
@@ -244,7 +238,7 @@ bool RenderManager::AddRenderObject(const std::string &page_id, const std::strin
 bool RenderManager::AddRenderObject(const std::string &page_id,
                                     const std::string &parent_ref, int index,
                                     std::function<RenderObject* (RenderPage*)> constructRoot) {
-    RenderPage *page = GetPage(page_id);
+    RenderPageBase *page = GetPage(page_id);
     if (page == nullptr) return false;
     
 #if RENDER_LOG
@@ -255,11 +249,11 @@ bool RenderManager::AddRenderObject(const std::string &page_id,
          pageId.c_str(), parentRef.c_str(), index, parser.toStringUTF8().c_str());
 #endif
     
-    RenderObject *root = constructRoot(page);
+    RenderObject *root = constructRoot(static_cast<RenderPage*>(page));
     if (root == nullptr) return false;
     
-    page->set_is_dirty(true);
-    return page->AddRenderObject(parent_ref, index, root);
+    static_cast<RenderPage*>(page)->set_is_dirty(true);
+    return static_cast<RenderPage*>(page)->AddRenderObject(parent_ref, index, root);
 }
 
 bool RenderManager::RemoveRenderObject(const std::string &page_id,
@@ -514,7 +508,7 @@ bool RenderManager::ClosePage(const std::string &page_id) {
   
 bool RenderManager::ReloadPageLayout(const std::string& page_id)
 {
-  RenderPage *page = GetPage(page_id);
+  RenderPageBase *page = GetPage(page_id);
   if (page == nullptr) return false;
   return page->ReapplyStyles();
 }
@@ -580,37 +574,6 @@ void RenderManager::setPageArgument(const std::string& pageId, const std::string
     page_args_[pageId][key] = value;
 }
     
-std::string RenderManager::getPageArgument(const std::string& pageId, const std::string& key) {
-    std::lock_guard<std::mutex> guard(page_args_mutex_);
-    auto findPage = page_args_.find(pageId);
-    if (findPage != page_args_.end()) {
-        auto findKey = findPage->second.find(key);
-        if (findKey != findPage->second.end()) {
-            return findKey->second;
-        }
-    }
-    return "";
-}
-
-std::map<std::string, std::string> RenderManager::removePageArguments(const std::string& pageId) {
-    std::lock_guard<std::mutex> guard(page_args_mutex_);
-    std::map<std::string, std::string> result;
-    auto findPage = page_args_.find(pageId);
-    if (findPage != page_args_.end()) {
-        std::swap(result, findPage->second);
-        page_args_.erase(findPage);
-    }
-    return result;
-}
-    
-void RenderManager::setPageArgument(const std::string& pageId, const std::string& key, const std::string& value) {
-    if (pageId.empty() || key.empty()) {
-        return;
-    }
-    std::lock_guard<std::mutex> guard(page_args_mutex_);
-    page_args_[pageId][key] = value;
-}
-
 std::string RenderManager::getPageArgument(const std::string& pageId, const std::string& key) {
     std::lock_guard<std::mutex> guard(page_args_mutex_);
     auto findPage = page_args_.find(pageId);

@@ -87,6 +87,8 @@ public:
     
     virtual void OnRenderPageClose() = 0;
     
+    virtual bool ReapplyStyles() = 0;
+    
     virtual float GetViewportWidth() = 0;
     virtual void SetViewportWidth(float value) = 0;
     virtual bool GetRoundOffDeviation() = 0;

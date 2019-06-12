@@ -128,7 +128,7 @@ public:
   virtual void OnRenderPageClose() override;
   
   // Re-apply raw css styles to page and trigger layout
-  bool ReapplyStyles();
+  virtual bool ReapplyStyles() override;
 
  public:
 

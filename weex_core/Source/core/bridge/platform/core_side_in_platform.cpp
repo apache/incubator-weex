@@ -176,10 +176,6 @@ void CoreSideInPlatform::SetViewPortWidth(const std::string &instance_id,
 void CoreSideInPlatform::SetDeviceDisplayOfPage(const std::string &instance_id, float width, float height /* unused now */)  {
   RenderManager::GetInstance()->setDeviceWidth(instance_id, width);
 }
-    
-void CoreSideInPlatform::SetPageArgument(const std::string &pageId, const std::string& key, const std::string& value){
-    RenderManager::GetInstance()->setPageArgument(pageId, key, value);
-}
 
 void CoreSideInPlatform::SetPageRenderType(const std::string &pageId,
                                            const std::string &renderType) {

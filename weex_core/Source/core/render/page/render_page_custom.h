@@ -81,6 +81,8 @@ namespace WeexCore {
         
         virtual void OnRenderPageClose() override;
         
+        virtual bool ReapplyStyles() override;
+        
         virtual float GetViewportWidth() override;
         virtual void SetViewportWidth(float value) override;
         virtual bool GetRoundOffDeviation() override;

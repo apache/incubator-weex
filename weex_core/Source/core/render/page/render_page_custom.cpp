@@ -211,6 +211,10 @@ namespace WeexCore {
         }
     }
     
+    bool RenderPageCustom::ReapplyStyles() {
+        return false;
+    }
+    
     float RenderPageCustom::GetViewportWidth() {
         return 0;
     }

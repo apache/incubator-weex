@@ -1779,11 +1779,11 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 
 + (BOOL)isKeepingRawCssStyles:(NSString*)pageId
 {
-    RenderPage* page = RenderManager::GetInstance()->GetPage([pageId UTF8String] ?: "");
+    RenderPageBase* page = RenderManager::GetInstance()->GetPage([pageId UTF8String] ?: "");
     if (page == nullptr) {
         return NO;
     }
-    return page->reserve_css_styles();
+    return static_cast<RenderPage*>(page)->reserve_css_styles();
 }
 
 @end

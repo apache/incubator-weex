@@ -102,7 +102,7 @@ namespace WeexCore {
         render->set_page_id(pageId);
 
         for(auto it=style.begin(); it != style.end(); it++){
-            render->AddStyle(it->first, it->second);
+            render->AddStyle(it->first, it->second, false);
         }
 
         for(auto it=attr.begin(); it != attr.end(); it++){
@@ -113,7 +113,7 @@ namespace WeexCore {
             render->AddEvent(*it);
         }
 
-        render->ApplyDefaultStyle();
+        render->ApplyDefaultStyle(false);
         render->ApplyDefaultAttr();
         return render;
     }
