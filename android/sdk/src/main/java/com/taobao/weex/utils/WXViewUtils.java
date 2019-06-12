@@ -218,7 +218,6 @@ public class WXViewUtils {
       else {
         mScreenHeight = cxt.getResources().getDisplayMetrics().heightPixels;
       }
-      mScreenHeight =cxt.getResources().getDisplayMetrics().heightPixels;
       if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
         mScreenWidth = res
                 .getDisplayMetrics()
