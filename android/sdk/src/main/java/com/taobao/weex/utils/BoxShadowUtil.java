@@ -402,8 +402,11 @@ public class BoxShadowUtil {
         if(WXEnvironment.sApplication.getApplicationInfo().targetSdkVersion > VERSION_CODES.O){
           canvas.clipRect(newRect);
         }
+        else{
+          canvas.clipRect(newRect, Region.Op.REPLACE);
+        }
       }catch (NullPointerException e) {
-        canvas.clipRect(newRect, Region.Op.REPLACE);
+        canvas.clipRect(newRect);
       }
 
       Path contentPath = new Path();
