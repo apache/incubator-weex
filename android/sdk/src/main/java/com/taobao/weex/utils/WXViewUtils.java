@@ -209,10 +209,12 @@ public class WXViewUtils {
 
   public static int getScreenHeight(Context cxt) {
     if(cxt!=null){
+      WindowManager wm;
       Resources res = cxt.getResources();
-      if(Build.VERSION.SDK_INT >= 28){
+      if(Build.VERSION.SDK_INT >= 28 && (wm = (WindowManager)cxt.getSystemService(Context.WINDOW_SERVICE)) != null
+              && wm.getDefaultDisplay() != null){
         Point size = new Point();
-        ((WindowManager)cxt.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealSize(size);
+        wm.getDefaultDisplay().getRealSize(size);
         mScreenHeight = size.y;
       }
       else {
