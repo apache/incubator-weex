@@ -38,6 +38,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.support.annotation.IntRange;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -45,10 +46,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.WXThread;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -399,7 +398,13 @@ public class BoxShadowUtil {
       Rect newRect = new Rect(bounds);
       // Make the Canvas Rect bigger according to the padding.
       newRect.inset(-paddingX * 2, -paddingY * 2);
-      canvas.clipRect(newRect, Region.Op.REPLACE);
+      try {
+        if(WXEnvironment.sApplication.getApplicationInfo().targetSdkVersion > VERSION_CODES.O){
+          canvas.clipRect(newRect);
+        }
+      }catch (NullPointerException e) {
+        canvas.clipRect(newRect, Region.Op.REPLACE);
+      }
 
       Path contentPath = new Path();
       // the content area map must be aligned with bounds
