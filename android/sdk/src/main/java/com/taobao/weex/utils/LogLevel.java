@@ -24,8 +24,14 @@ import android.util.Log;
  * Created by lixinke on 16/5/11.
  */
 public enum LogLevel {
-  WTF("wtf", 0, Log.ASSERT), ERROR("error", 1, Log.ERROR), WARN("warn", 2,Log.WARN), INFO("info", 3,Log.INFO),
-  DEBUG("debug", 4,Log.DEBUG), VERBOSE("verbose", 5, Log.VERBOSE), ALL("debug", 6,Log.DEBUG),OFF("off",7,Log.DEBUG),;
+  OFF("off",7, Log.ASSERT),
+  WTF("wtf", 6, Log.ASSERT),
+  ERROR("error", 5, Log.ERROR),
+  WARN("warn", 4, Log.WARN),
+  INFO("info", 3, Log.INFO),
+  DEBUG("debug", 2, Log.DEBUG),
+  VERBOSE("verbose", 1, Log.VERBOSE),
+  ALL("all", 0, Log.VERBOSE),;
   String name;
   int value;
   int priority;
