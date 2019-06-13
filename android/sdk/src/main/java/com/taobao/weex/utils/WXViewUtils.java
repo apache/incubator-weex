@@ -24,7 +24,6 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -37,8 +36,6 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.WindowManager;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -209,17 +206,8 @@ public class WXViewUtils {
 
   public static int getScreenHeight(Context cxt) {
     if(cxt!=null){
-      WindowManager wm;
       Resources res = cxt.getResources();
-      if(Build.VERSION.SDK_INT >= 28 && (wm = (WindowManager)cxt.getSystemService(Context.WINDOW_SERVICE)) != null
-              && wm.getDefaultDisplay() != null){
-        Point size = new Point();
-        wm.getDefaultDisplay().getRealSize(size);
-        mScreenHeight = size.y;
-      }
-      else {
-        mScreenHeight = cxt.getResources().getDisplayMetrics().heightPixels;
-      }
+      mScreenHeight =cxt.getResources().getDisplayMetrics().heightPixels;
       if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
         mScreenWidth = res
                 .getDisplayMetrics()
