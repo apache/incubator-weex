@@ -191,6 +191,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private List<String> mLayerOverFlowListeners;
 
+  private List<ActionBarHandler> mWXActionbarHandlers;
+
+  private List<OnBackPressedHandler> mWXBackPressedHandlers;
+
   private WXSDKInstance mParentInstance;
 
   /**
@@ -272,6 +276,19 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void setCustomFontNetworkHandler(CustomFontNetworkHandler customFontNetworkHandler) {
     this.mCustomFontNetworkHandler = customFontNetworkHandler;
+  }
+
+
+  /**
+   *  ActionBar Handler
+   */
+
+  public interface ActionBarHandler {
+    boolean onSupportNavigateUp();
+  }
+
+  public interface OnBackPressedHandler {
+    boolean onBackPressed();
   }
 
   /**
@@ -1359,7 +1376,26 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     return false;
   }
 
+  public boolean onSupportNavigateUp() {
+    if (mWXActionbarHandlers != null) {
+      for (ActionBarHandler handler : mWXActionbarHandlers) {
+        if (handler.onSupportNavigateUp()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   public boolean onBackPressed() {
+    if(mWXBackPressedHandlers != null) {
+      for (OnBackPressedHandler handler : mWXBackPressedHandlers) {
+        if(handler.onBackPressed()) {
+          return true;
+        }
+      }
+    }
+
     WXComponent comp = getRootComponent();
     if(comp != null) {
       WXEvent events= comp.getEvents();
@@ -1712,6 +1748,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       mFlatGUIContext = null;
       mInstanceOnFireEventInterceptorList = null;
       mWXScrollListeners = null;
+      mWXActionbarHandlers = null;
+      mWXBackPressedHandlers = null;
       mRenderContainer = null;
       mNestedInstanceInterceptor = null;
       mUserTrackAdapter = null;
@@ -1843,6 +1881,41 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       mWXScrollListeners=new ArrayList<>();
     }
     mWXScrollListeners.add(wxScrollListener);
+  }
+
+  public synchronized void registerActionbarHandler(ActionBarHandler actionBarHandler) {
+    if(actionBarHandler == null) {
+      return;
+    }
+    if(mWXActionbarHandlers == null) {
+      mWXActionbarHandlers = new ArrayList<>();
+    }
+
+    mWXActionbarHandlers.add(actionBarHandler);
+  }
+
+  public synchronized void unRegisterActionbarHandler(ActionBarHandler actionBarHandler) {
+    if(mWXActionbarHandlers != null && actionBarHandler != null) {
+      mWXActionbarHandlers.remove(actionBarHandler);
+    }
+  }
+
+  public synchronized void registerBackPressedHandler(OnBackPressedHandler backPressedHandler) {
+    if(backPressedHandler == null) {
+      return;
+    }
+
+    if(mWXBackPressedHandlers == null) {
+      mWXBackPressedHandlers = new ArrayList<>();
+    }
+
+    mWXBackPressedHandlers.add(backPressedHandler);
+  }
+
+  public synchronized void unRegisterBackPressedHandler(OnBackPressedHandler backPressedHandler) {
+    if(mWXBackPressedHandlers != null && backPressedHandler != null) {
+      mWXBackPressedHandlers.remove(backPressedHandler);
+    }
   }
 
   static int sScreenHeight = -1;
