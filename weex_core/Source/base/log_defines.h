@@ -61,6 +61,9 @@ namespace WeexCore {
 #define LOGE_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Error, TAG, format, ##__VA_ARGS__)
 #define LOGE(format, ...)                LOGE_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
 
+#define LOGW_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Warn, TAG, format, ##__VA_ARGS__)
+#define LOGW(format, ...)                LOGW_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
+
 #define LOGI_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Info, TAG, format, ##__VA_ARGS__)
 #define LOGI(format, ...)                LOGI_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
 
@@ -69,16 +72,10 @@ namespace WeexCore {
 #define LOGD_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Debug, TAG, format, ##__VA_ARGS__)
 #define LOGD(format, ...)                LOGD_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
 
-#define LOGW_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Warn, TAG, format, ##__VA_ARGS__)
-#define LOGW(format, ...)                LOGW_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
-
 #else
 
 #define LOGD_TAG(TAG, format, ...)       ((void) 0)
 #define LOGD(format, ...)                ((void) 0)
-
-#define LOGW_TAG(TAG, format, ...)       ((void) 0)
-#define LOGW(format, ...)                ((void) 0)
 
 #endif
 

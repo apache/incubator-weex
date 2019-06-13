@@ -21,9 +21,7 @@ package com.taobao.weex.utils;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.taobao.weex.WXEnvironment;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -81,13 +79,13 @@ public class WXLogUtils {
     }
 
     if (WXEnvironment.isApkDebugable()) {
-      Log.println(level.getPriority(),tag, msg);
-      // if not debug level then print log
-      if(!level.getName().equals("debug")){
+      if(level.getValue() - WXEnvironment.sLogLevel.getValue() >= 0) {
+        Log.println(level.getPriority(), tag, msg);
         writeConsoleLog(level.getName(), msg);
       }
+      // if not debug level then print log
     }else {
-      if(level.getPriority() - LogLevel.WARN.getPriority() >=0){
+      if(level.getValue() - LogLevel.WARN.getValue() >=0 && level.getValue() - WXEnvironment.sLogLevel.getValue() >= 0){
         Log.println(level.getPriority(),tag, msg);
       }
     }
@@ -156,17 +154,6 @@ public class WXLogUtils {
             } else {
               jsLogWatcher.onJsLog(Log.DEBUG, msg);
             }
-          }
-        }
-
-        /** This log method will be invoked from jni code, so try to extract loglevel from message. **/
-        writeConsoleLog("debug", tag + ":" + msg);
-        if(msg.contains(" | __")){
-          String[] msgs=msg.split(" | __");
-          LogLevel level;
-          if( msgs!=null && msgs.length==4 && !TextUtils.isEmpty(msgs[0]) && !TextUtils.isEmpty(msgs[2])){
-            level=getLogLevel(msgs[2]);
-            return;
           }
         }
       }
