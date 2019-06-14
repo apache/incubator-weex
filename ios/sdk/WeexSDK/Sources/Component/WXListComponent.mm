@@ -334,13 +334,39 @@
             && [subcomponent isKindOfClass:[WXHeaderComponent class]]) {
             // insert a header in the middle, one section may divide into two
             // so the original section need to be reloaded
-            NSIndexPath *indexPathBeforeHeader = [self indexPathForSubIndex:index - 1];
-            if (_sections[insertIndex - 1].rows.count != 0 && indexPathBeforeHeader.row < _sections[insertIndex - 1].rows.count - 1) {
+            
+            /*
+             Here we may encounter a problem that _sections is not always containing all cells of list.
+             Because cell are not added to _sections until cellDidLayout. So if a cell is not added to _sections,
+             
+                NSIndexPath *indexPathBeforeHeader = [self indexPathForSubIndex:index - 1];
+             The indexPathForSubIndex method use all sub components of list to calculate row in section. This would
+             be incorrect if a cell is not added to _sections. And the split is incorrect resulting some cells put to
+             wrong WXSectionComponent and then UITableView crash.
+             
+             In fixed version, we use _subcomponents[index - 1] to get the last component that should be put to original section
+             and get the index of it in section rows.
+             */
+            
+            if (_sections[insertIndex - 1].rows.count > 0) {
+                WXComponent* componentBeforeHeader = _subcomponents[index - 1];
+                
                 reloadSection = _sections[insertIndex - 1];
                 NSArray *rowsToSeparate = reloadSection.rows;
-                insertSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(indexPathBeforeHeader.row + 1, rowsToSeparate.count - indexPathBeforeHeader.row - 1)] mutableCopy];
-                reloadSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(0, indexPathBeforeHeader.row + 1)]  mutableCopy];
+                NSUInteger indexOfLastComponentAfterSeparate = [rowsToSeparate indexOfObject:componentBeforeHeader];
+                
+                insertSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(indexOfLastComponentAfterSeparate + 1, rowsToSeparate.count - (indexOfLastComponentAfterSeparate + 1))] mutableCopy];
+                reloadSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(0, indexOfLastComponentAfterSeparate + 1)]  mutableCopy];
             }
+            
+//          This is wrong!!!
+//            NSIndexPath *indexPathBeforeHeader = [self indexPathForSubIndex:index - 1];
+//            if (_sections[insertIndex - 1].rows.count != 0 && indexPathBeforeHeader.row < _sections[insertIndex - 1].rows.count - 1) {
+//                reloadSection = _sections[insertIndex - 1];
+//                NSArray *rowsToSeparate = reloadSection.rows;
+//                insertSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(indexPathBeforeHeader.row + 1, rowsToSeparate.count - indexPathBeforeHeader.row - 1)] mutableCopy];
+//                reloadSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(0, indexPathBeforeHeader.row + 1)]  mutableCopy];
+//            }
         }
     
         [_sections insertObject:insertSection atIndex:insertIndex];
