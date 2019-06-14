@@ -169,11 +169,6 @@ WX_EXPORT_METHOD(@selector(clearInterval:))
         _timers[callbackID] = timer;
         
         if ([_timers count] > 30) {
-            if (!_tooManyTimersReported) {
-                [WXExceptionUtils commitCriticalExceptionRT:self.weexInstance.instanceId errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_TOO_MANY_TIMERS] function:@"" exception:@"Too many timers." extParams:nil];
-                _tooManyTimersReported = YES;
-            }
-            
             // remove invalid timers
             NSMutableArray* invalidTimerIds = [[NSMutableArray alloc] init];
             for (NSString *cbId in _timers) {
@@ -183,6 +178,14 @@ WX_EXPORT_METHOD(@selector(clearInterval:))
                 }
             }
             [_timers removeObjectsForKeys:invalidTimerIds];
+            
+            // If alive timer count still exceeds 30, we report once for this page.
+            if ([_timers count] > 30) {
+                if (!_tooManyTimersReported) {
+                    [WXExceptionUtils commitCriticalExceptionRT:self.weexInstance.instanceId errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_TOO_MANY_TIMERS] function:@"" exception:@"Too many timers." extParams:nil];
+                    _tooManyTimersReported = YES;
+                }
+            }
         }
     }
 }
