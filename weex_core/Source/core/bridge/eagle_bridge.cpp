@@ -137,6 +137,11 @@ namespace WeexCore {
         weex::core::network::HttpModule http_module;
         http_module.Send(instance_id, url, callback);
     }
+
+    void EagleBridge::WeexCoreHandler::GetBundleType(const char* instance_id, const char* content, std::function<void(const std::string&, const std::string&)> callback) {
+        weex::core::network::HttpModule http_module;
+        http_module.GetBundleType(instance_id, content, callback);
+    }
     
     int EagleBridge::WeexCoreHandler::RefreshFinish(const char* page_id, const char* task, const char* callback) {
         return WeexCore::WeexCoreManager::Instance()

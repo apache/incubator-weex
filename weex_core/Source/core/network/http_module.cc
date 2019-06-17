@@ -34,6 +34,10 @@ void HttpModule::Send(const char* instance_id, const char* url,
   request_handler_->Send(instance_id, url, callback);
 }
 
+void HttpModule::GetBundleType(const char *instance_id, const char *content, Callback callback){
+  request_handler_->GetBundleType(instance_id, content, callback);
+}
+
 }  // namespace network
 }  // namespace core
 }  // namespace weex
