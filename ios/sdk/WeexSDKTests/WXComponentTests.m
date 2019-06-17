@@ -71,6 +71,7 @@
      *  View
      */
     XCTAssertEqual(component->_backgroundColor, [UIColor clearColor]);
+    XCTAssertEqual(component->_clipToBounds, NO);
     XCTAssertNil(component->_view);
     XCTAssertEqual(component->_opacity, 1.0);
     XCTAssertEqual(component->_visibility, WXVisibilityShow);

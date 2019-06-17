@@ -177,15 +177,7 @@ do {\
     _backgroundColor = styles[@"backgroundColor"] ? [WXConvert UIColor:styles[@"backgroundColor"]] : [UIColor clearColor];
     _backgroundImage = styles[@"backgroundImage"] ? [WXConvert NSString:styles[@"backgroundImage"]]: nil;
     _opacity = styles[@"opacity"] ? [WXConvert CGFloat:styles[@"opacity"]] : 1.0;
-    if ([WXUtility overflowHiddenByDefault]) {
-        /* If we enable overflow:hidden by default, we cannot use original "overflow" style value.
-         Unless js explicitly define "ios-overflow: visible", we disable clipToBounds.
-         */
-        _clipToBounds = styles[@"iosOverflow"] ? [WXConvert WXClipType:styles[@"iosOverflow"]] : YES;
-    }
-    else {
-        _clipToBounds = styles[@"overflow"] ? [WXConvert WXClipType:styles[@"overflow"]] : NO;
-    }
+    _clipToBounds = styles[@"overflow"] ? [WXConvert WXClipType:styles[@"overflow"]] : NO;
     _visibility = styles[@"visibility"] ? [WXConvert WXVisibility:styles[@"visibility"]] : WXVisibilityShow;
     _positionType = styles[@"position"] ? [WXConvert WXPositionType:styles[@"position"]] : WXPositionTypeRelative;
     _transform = styles[@"transform"] || styles[@"transformOrigin"] ?
@@ -235,17 +227,9 @@ do {\
         _layer.opacity = _opacity;
     }
     
-    if ([WXUtility overflowHiddenByDefault]) {
-        if (styles[@"iosOverflow"]) {
-            _clipToBounds = [WXConvert WXClipType:styles[@"iosOverflow"]];
-            _view.clipsToBounds = _clipToBounds;
-        }
-    }
-    else {
-        if (styles[@"overflow"]) {
-            _clipToBounds = [WXConvert WXClipType:styles[@"overflow"]];
-            _view.clipsToBounds = _clipToBounds;
-        }
+    if (styles[@"overflow"]) {
+        _clipToBounds = [WXConvert WXClipType:styles[@"overflow"]];
+        _view.clipsToBounds = _clipToBounds;
     }
     
     if (styles[@"position"]) {
