@@ -20,7 +20,7 @@
 // Created by Darin on 10/04/2018.
 //
 #include "android/jsengine/object/weex_object_holder.h"
-
+#include "android/jsengine/weex_jsc_utils.h"
 #include "android/jsengine/object/weex_env.h"
 
 void WeexObjectHolder::initFromIPCArguments(IPCArguments *arguments, size_t startCount, bool forAppContext) {

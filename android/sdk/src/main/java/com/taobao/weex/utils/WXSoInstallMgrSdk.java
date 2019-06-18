@@ -22,6 +22,8 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
+
 import com.taobao.weex.IWXStatisticsListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
@@ -121,6 +123,19 @@ public class WXSoInstallMgrSdk {
     boolean InitSuc = false;
 //    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
 
+
+    try {
+      // If a library loader adapter exists, use this adapter to load library
+      // instead of System.loadLibrary.
+      if (mSoLoader != null) {
+        mSoLoader.doLoadLibrary("c++_shared");
+      } else {
+        System.loadLibrary("c++_shared");
+      }
+    } catch (Exception e) {
+
+    }
+
       /**
        * Load library with {@link System#loadLibrary(String)}
        */
@@ -204,9 +219,11 @@ public class WXSoInstallMgrSdk {
         // if android api < 16 copy libweexjst.so else copy libweexjsb.so
         boolean pieSupport = true;
         File newfile;
+        String startSoName = WXEnvironment.CORE_JSB_SO_NAME;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
           pieSupport = false;
           newfile = new File(cacheFile + STARTUPSOANDROID15);
+          startSoName = WXEnvironment.CORE_JST_SO_NAME;
         } else {
           newfile = new File(cacheFile + STARTUPSO);
         }
@@ -248,6 +265,18 @@ public class WXSoInstallMgrSdk {
         }
 
         File oldfile = new File(soName);
+
+
+        if(!oldfile.exists()) {
+          try {
+            String weexjsb = ((PathClassLoader) (WXSoInstallMgrSdk.class.getClassLoader())).findLibrary(startSoName);
+            oldfile = new File(weexjsb);
+          } catch (Throwable throwable) {
+            // do nothing
+          }
+
+        }
+
         if (oldfile.exists()) {
           WXFileUtils.copyFile(oldfile, newfile);
         } else {

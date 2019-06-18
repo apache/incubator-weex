@@ -1,4 +1,4 @@
-apply plugin: 'jacoco'
+//apply plugin: 'jacoco'
 
 jacoco {
     toolVersion = "0.7.9+"
@@ -7,37 +7,37 @@ jacoco {
 //def sdk_path = '../../sdk'
 //println(sdk_path)
 
-def coverageSourceDirs = [
-        '../app/src/main/java',
-        '../../../android/sdk/src/main/java']
+//def coverageSourceDirs = [
+//        '../app/src/main/java',
+//        '../../../android/sdk/src/main/java']
 
-task jacocoTestReport(type: JacocoReport) {
-    group = "Reporting"
-    description = "Generate Jacoco coverage reports after running tests."
-    reports {
-        xml.enabled = true
-        html.enabled = true
-    }
-    classDirectories = fileTree(//"enter code here"
-            dir: '../../sdk/build/intermediates/classes',
-            excludes: ['**/R*.class',
-                       '**/*$InjectAdapter.class',
-                       '**/*$ModuleAdapter.class',
-                       '**/*$ViewInjector*.class'
-            ])
-    sourceDirectories = files(coverageSourceDirs)
-    File configFile = file('../../../android/sdk/src/main/java')
-    configFile = file(configFile.absolutePath)
-    println configFile.path
-
-
-
-    executionData = files("$buildDir/outputs/code-coverage/connected/coverage.ec")
-    doFirst {
-        new File("$buildDir/intermediates/classes/").eachFileRecurse { file ->
-            if (file.name.contains('$$')) {
-                file.renameTo(file.path.replace('$$', '$'))
-            }
-        }
-    }
-}
+//task jacocoTestReport(type: JacocoReport) {
+//    group = "Reporting"
+//    description = "Generate Jacoco coverage reports after running tests."
+//    reports {
+//        xml.enabled = true
+//        html.enabled = true
+//    }
+//    classDirectories = fileTree(//"enter code here"
+//            dir: '../../sdk/build/intermediates/classes',
+//            excludes: ['**/R*.class',
+//                       '**/*$InjectAdapter.class',
+//                       '**/*$ModuleAdapter.class',
+//                       '**/*$ViewInjector*.class'
+//            ])
+//    sourceDirectories = files(coverageSourceDirs)
+//    File configFile = file('../../../android/sdk/src/main/java')
+//    configFile = file(configFile.absolutePath)
+//    println configFile.path
+//
+//
+//
+//    executionData = files("$buildDir/outputs/code-coverage/connected/coverage.ec")
+//    doFirst {
+//        new File("$buildDir/intermediates/classes/").eachFileRecurse { file ->
+//            if (file.name.contains('$$')) {
+//                file.renameTo(file.path.replace('$$', '$'))
+//            }
+//        }
+//    }
+//}
