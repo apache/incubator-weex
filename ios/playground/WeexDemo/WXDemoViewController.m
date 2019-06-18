@@ -82,7 +82,10 @@
     [self updateInstanceState:WeexInstanceAppear];
     
     AppDelegate* appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    appDelegate.allowRotation = _instance && [_instance isKeepingRawCssStyles];
+    appDelegate.allowRotation = NO;
+    [_instance isKeepingRawCssStyles:^(BOOL value) {
+        appDelegate.allowRotation = value;
+    }];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -191,7 +194,10 @@
         [weakSelf updateInstanceState:WeexInstanceAppear];
         
         AppDelegate* appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-        appDelegate.allowRotation = theInstance && [theInstance isKeepingRawCssStyles];
+        appDelegate.allowRotation = NO;
+        [theInstance isKeepingRawCssStyles:^(BOOL value) {
+            appDelegate.allowRotation = value;
+        }];
     };
     
     _instance.updateFinish = ^(UIView *view) {

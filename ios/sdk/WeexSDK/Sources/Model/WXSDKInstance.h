@@ -367,7 +367,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  * internally for later use. Or you can use MetaModule's setPageArguments method and provide "reserveCssStyles" as "true" before rendering the page.
  */
 - (void)setPageKeepRawCssStyles;
-- (BOOL)isKeepingRawCssStyles;
+- (void)isKeepingRawCssStyles:(void(^)(BOOL))callback;
 
 /**
  * Set additional argument value for WeexCore
@@ -375,17 +375,18 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 - (void)setPageArgument:(NSString*)key value:(NSString*)value;
 
 /**
- * Application required Page Width and Height to prevent Weex use DeviceWidth directly.
+ * Set specific required page width and height to prevent this page using global values.
  */
 - (void)setPageRequiredWidth:(CGFloat)width height:(CGFloat)height;
 
+/**
+ * Set specific required view port width prevent this page using global value (750px).
+ */
 - (void)setViewportWidth:(CGFloat)width;
 
 /** 
  * Deprecated 
  */
-
-
 @property (nonatomic, strong) NSDictionary *properties DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, assign) NSTimeInterval networkTime DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, copy) void (^updateFinish)(UIView *);
