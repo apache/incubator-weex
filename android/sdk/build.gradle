@@ -16,23 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-buildscript {
-    repositories {
-        mavenLocal()
-        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        mavenCentral()
-        jcenter()
-        google()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
-//        if(!project.disableCov) {
-//            classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
-//        }
-    }
-}
-
  plugins {
      id "com.github.hierynomus.license" version "0.14.0"
  }
@@ -90,6 +73,13 @@ android {
 //    buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
     useLibrary 'org.apache.http.legacy'
+    if(project.hasProperty('weexVersion')) {
+        packagingOptions {
+            exclude 'lib/armeabi-v7a/libc++_shared.so'
+            exclude 'lib/arm64-v8a/libc++_shared.so'
+            exclude 'lib/x86/libc++_shared.so'
+        }
+    }
     copy {
         from '../../pre-build'
         into new File(projectDir,"assets")
@@ -113,27 +103,6 @@ android {
         from '../../pre-build'
         into new File(projectDir,"assets")
         include 'weex-rax-api.js'
-    }
-
-
-//    copy {
-//        from '../../pre-build'
-//        into new File(projectDir,"assets")
-//        include 'weex-rax-extra-api.js'
-//    }
-
-    if(project.hasProperty('asfRelease')){
-        //download so file if not exist, when compile in source release
-        download{
-            src 'https://gitbox.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/armeabi/libweexcore.so;hb=refs/heads/master'
-            dest "${projectDir}/libs/armeabi/libweexcore.so"
-            overwrite false
-        }
-        download{
-            src 'https://gitbox.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexcore.so;hb=refs/heads/master'
-            dest "${projectDir}/libs/x86/libweexcore.so"
-            overwrite false
-        }
     }
 
     def ndkversion = 16;

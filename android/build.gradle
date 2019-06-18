@@ -2,10 +2,12 @@
 buildscript {
     repositories {
         mavenLocal()
-        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        mavenCentral()
-        jcenter()
-        google()
+        maven(){
+            url 'https://maven.aliyun.com/repository/google'
+        }
+        jcenter(){
+            url 'https://maven.aliyun.com/repository/jcenter'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
@@ -30,21 +32,26 @@ subprojects {
                 url external_repositories
             }
         }
-        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        mavenCentral()
-        jcenter()
-        maven {
-            url 'https://maven.google.com'
+        maven(){
+            url 'https://maven.aliyun.com/repository/google'
+        }
+        jcenter(){
+            url 'https://maven.aliyun.com/repository/jcenter'
         }
     }
     buildscript {
         dependencies {
-            classpath 'com.android.tools.build:gradle:3.4.1'
             classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
             classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         }
         repositories {
-            google()
+            mavenLocal()
+            maven(){
+                url 'https://maven.aliyun.com/repository/google'
+            }
+            jcenter(){
+                url 'https://maven.aliyun.com/repository/jcenter'
+            }
         }
     }
     ext {
