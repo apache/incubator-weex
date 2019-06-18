@@ -73,7 +73,7 @@ android {
 //    buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
     useLibrary 'org.apache.http.legacy'
-    if(project.hasProperty('weexVersion')) {
+    if(project.hasProperty('removeSharedLib') && "true".equals(project.getProperty('removeSharedLib'))) {
         packagingOptions {
             exclude 'lib/armeabi-v7a/libc++_shared.so'
             exclude 'lib/arm64-v8a/libc++_shared.so'
