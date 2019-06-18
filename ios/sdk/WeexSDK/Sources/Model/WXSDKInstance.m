@@ -571,9 +571,6 @@ typedef enum : NSUInteger {
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {		
         BOOL enableRTLLayoutDirection = [[configCenter configForKey:@"iOS_weex_ext_config.enableRTLLayoutDirection" defaultValue:@(YES) isDefault:NULL] boolValue];
         [WXUtility setEnableRTLLayoutDirection:enableRTLLayoutDirection];
-        
-        BOOL overflowHiddenByDefault = [[configCenter configForKey:@"iOS_weex_ext_config.overflowHiddenByDefault" defaultValue:@(YES) isDefault:NULL] boolValue];
-        [WXUtility setOverflowHiddenByDefault:overflowHiddenByDefault];
     }
     return NO;
 }
