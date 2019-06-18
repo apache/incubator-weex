@@ -1061,6 +1061,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 
 + (void)setViewportWidth:(NSString*)pageId width:(CGFloat)width
 {
+    [WXCoreBridge install];
     if (platformBridge) {
         platformBridge->core_side()->SetViewPortWidth([pageId UTF8String] ?: "", (float)width);
     }
@@ -1068,6 +1069,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 
 + (void)setPageRequired:(NSString *)pageId width:(CGFloat)width height:(CGFloat)height
 {
+    [WXCoreBridge install];
     if (platformBridge) {
         platformBridge->core_side()->SetDeviceDisplayOfPage([pageId UTF8String] ?: "", (float)width, (float)height);
     }
