@@ -142,6 +142,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private boolean mNeedReLoad = false;
   private boolean mUseScroller = false;
   private int mInstanceViewPortWidth = 750;
+  private boolean enableFullScreenHeight = false;
   private WXInstanceApm mApmForInstance;
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
@@ -417,6 +418,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void setNeedLoad(boolean load) {
     mNeedReLoad = load;
   }
+
+  @RestrictTo(Scope.LIBRARY)
+  public void  setEnableFullScreenHeight(boolean fullScreenHeight){enableFullScreenHeight = fullScreenHeight;}
+
+  @RestrictTo(Scope.LIBRARY)
+  public boolean isFullScreenHeightEnabled(){return enableFullScreenHeight;}
 
   public boolean isUseScroller() {
     return mUseScroller;
