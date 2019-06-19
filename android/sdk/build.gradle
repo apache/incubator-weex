@@ -325,15 +325,13 @@ bintray {
 }
 
 afterEvaluate { project ->
-    project.tasks.find { (it.name.contains("assembleRelease")) }?.doLast {
-        println("begin_copy_so")
+    transformNativeLibsWithStripDebugSymbolForRelease << {
         copy{
-            from new File(project.buildDir, "intermediates/transforms/mergeJniLibs/release/0/lib")
-            into new File(project.buildDir, "outputs/aar")
+            from transformNativeLibsWithMergeJniLibsForRelease
+            into new File(project.buildDir, "unstrippedSo")
             include '**/libweexjss.so', '**/libweexcore.so'
             eachFile {
-                it.path = "${it.relativePath.segments.first()}_${it.name}"
-                println "dyy " + it.path
+                it.path = "${it.relativePath.segments[-2]}_${it.name}"
             }
         }
     }
