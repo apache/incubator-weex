@@ -207,11 +207,16 @@ public class WXViewUtils {
     return getScreenHeight(WXEnvironment.sApplication);
   }
 
-  public static int getScreenHeight(Context cxt) {
+  public static int getScreenHeight(String instanceId){
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    return instance.isFullScreenHeightEnabled()?getFullScreenHeight(WXEnvironment.sApplication):getScreenHeight(WXEnvironment.sApplication);
+  }
+
+  public static int getFullScreenHeight(Context cxt) {
     if(cxt!=null){
       WindowManager wm;
       Resources res = cxt.getResources();
-      if(Build.VERSION.SDK_INT >= 28 && (wm = (WindowManager)cxt.getSystemService(Context.WINDOW_SERVICE)) != null
+      if(Build.VERSION.SDK_INT >= 17 && (wm = (WindowManager)cxt.getSystemService(Context.WINDOW_SERVICE)) != null
               && wm.getDefaultDisplay() != null){
         Point size = new Point();
         wm.getDefaultDisplay().getRealSize(size);
@@ -231,6 +236,22 @@ public class WXViewUtils {
     }
     return mScreenHeight;
   }
+  public static int getScreenHeight(Context cxt) {
+    if(cxt!=null){
+      Resources res = cxt.getResources();
+      mScreenHeight = res.getDisplayMetrics().heightPixels;
+      if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
+        mScreenWidth = res
+                .getDisplayMetrics()
+                .widthPixels;
+        mScreenHeight = mScreenHeight > mScreenWidth ? mScreenHeight : mScreenWidth;
+      }
+    } else if (WXEnvironment.isApkDebugable()){
+      throw new WXRuntimeException("Error Context is null When getScreenHeight");
+    }
+    return mScreenHeight;
+  }
+
 
   /**
    * Convert distance from JS,CSS to native. As the JS considers the width of the screen is 750px.

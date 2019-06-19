@@ -85,6 +85,7 @@ import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.ui.component.richtext.WXRichText;
 import com.taobao.weex.ui.config.AutoScanConfigRegister;
+import com.taobao.weex.ui.module.WXDeviceInfoModule;
 import com.taobao.weex.ui.module.WXLocaleModule;
 import com.taobao.weex.ui.module.WXMetaModule;
 import com.taobao.weex.ui.module.WXModalUIModule;
@@ -377,6 +378,7 @@ public class WXSDKEngine implements Serializable {
       registerModule("meta", WXMetaModule.class);
       registerModule("webSocket", WebSocketModule.class);
       registerModule("locale", WXLocaleModule.class);
+      registerModule("deviceInfo", WXDeviceInfoModule.class);
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:", e);
     }
