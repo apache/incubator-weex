@@ -20,6 +20,7 @@
 #ifndef CORE_NETWORK_REQUEST_HANDLER_H
 #define CORE_NETWORK_REQUEST_HANDLER_H
 #include <functional>
+#include <string>
 #include <memory>
 
 namespace weex {
@@ -33,6 +34,10 @@ class RequestHandler {
   virtual ~RequestHandler() {}
   virtual void Send(const char* instance_id, const char* url,
                     Callback callback) = 0;
+  virtual void GetBundleType(const char *instance_id, const char *content, Callback callback){
+     std::string result;
+     callback(result, result);
+  }
   static RequestHandler* CreateDefaultHandler();
 };
 
