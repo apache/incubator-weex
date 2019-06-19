@@ -18,14 +18,13 @@
  */
 
 #pragma once
-
+#include "base/log_defines.h"
 namespace WeexCore {
 
     class LogBridge {
     public:
-        LogBridge() {}
-        
-        virtual void log(LogLevel level, const char* tag, const char* file, unsigned long line, const char* log) {};
+      LogBridge() {}
+      virtual void log(LogLevel level, const char* tag, const char* file, unsigned long line, const char* log) {};
     };
     
 }

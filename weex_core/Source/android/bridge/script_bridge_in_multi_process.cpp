@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <base/utils/log_base.h>
 #include "script_bridge_in_multi_process.h"
 
 #include "android/utils/params_utils.h"
@@ -970,6 +971,26 @@ std::unique_ptr<IPCResult> UpdateComponentData(IPCArguments *arguments) {
     return createInt32Result(static_cast<int32_t>(true));
 }
 
+
+std::unique_ptr<IPCResult> HandleLogDetail(IPCArguments *arguments) {
+  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
+  auto arg4 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3));
+  auto arg5 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 4));
+
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+      weex::base::MakeCopyable(
+          [level_str = std::move(arg1), tag_ptr = std::move(arg2),
+           file_ptr = std::move(arg3), line_ptr = std::move(arg4), log_ptr = std::move(arg5) ]() {
+            int level = atoi(level_str.get());
+            long line = atol(line_ptr.get());
+            weex::base::LogImplement::getLog()->log((WeexCore::LogLevel)level, tag_ptr.get(), file_ptr.get(), line, log_ptr.get());
+          }));
+  return createInt32Result(static_cast<int32_t>(true));
+}
+
+
 ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   set_script_side(new bridge::script::ScriptSideInMultiProcess);
   set_core_side(new CoreSideInScript);
@@ -1063,6 +1084,9 @@ void ScriptBridgeInMultiProcess::RegisterIPCCallback(IPCHandler *handler) {
                            OnReceivedResult);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::UPDATECOMPONENTDATA),
                            UpdateComponentData);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::POSTLOGDETAIL),
+                           HandleLogDetail);
+
 }
 
 }  // namespace WeexCore

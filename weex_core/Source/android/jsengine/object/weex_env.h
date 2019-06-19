@@ -24,7 +24,7 @@
 #define WEEXV8_WEEXENV_H
 
 #include <mutex>
-#include <task/weex_task.h>
+#include <android/jsengine/task/weex_task.h>
 #include "android/jsengine/task/back_to_weex_core_queue.h"
 
 #include "android/jsengine/task/timer_queue.h"
@@ -98,6 +98,12 @@ public:
     void init_crash_handler(std::string crashFileName);
 
     bool is_app_crashed();
+
+    bool sendLog(int level, const char *tag,
+                 const char *file,
+                 unsigned long line,
+                 const char *log);
+
  public:
     std::unique_ptr<BackToWeexCoreQueue> m_back_to_weex_core_thread;
     volatile bool isMultiProcess = false;

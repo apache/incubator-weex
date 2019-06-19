@@ -20,6 +20,7 @@
 #ifndef LogDefines_h
 #define LogDefines_h
 #include <cstring>
+#include <android/log.h>
 
 namespace WeexCore {
     
@@ -27,7 +28,8 @@ namespace WeexCore {
         Debug,
         Info,
         Warn,
-        Error
+        Error,
+        Msg
     };
     
     void PrintLog(LogLevel level, const char* tag, const char* file, unsigned long line, const char* format, ...);
@@ -67,10 +69,15 @@ namespace WeexCore {
 #define LOGI_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Info, TAG, format, ##__VA_ARGS__)
 #define LOGI(format, ...)                LOGI_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
 
+#define LOG_MSG(INSTANCE_ID, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Msg, INSTANCE_ID, format, ##__VA_ARGS__)
+
 #ifdef DEBUG
 
 #define LOGD_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Debug, TAG, format, ##__VA_ARGS__)
 #define LOGD(format, ...)                LOGD_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
+
+
+#define LOGE_TEST(format, ...)  __android_log_print(ANDROID_LOG_ERROR, "WeexCore", format, ##__VA_ARGS__);
 
 #else
 

@@ -39,6 +39,7 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
+import com.taobao.weex.utils.tools.TimeCalculator;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -188,6 +189,7 @@ public class WXBridge implements IWXBridge {
 
   @Override
   public int createInstanceContext(String instanceId, String name, String function, WXJSObject[] args) {
+    Log.e(TimeCalculator.TIMELINE_TAG,"createInstance :" + System.currentTimeMillis());
     return nativeCreateInstanceContext(instanceId, name, function, args);
   }
 

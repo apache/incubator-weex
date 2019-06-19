@@ -82,3 +82,28 @@ void WeexEnv::set_m_cache_task_(volatile bool m_cache_task_) {
 WeexEnv::~WeexEnv() {
   wson::destory();
 }
+bool WeexEnv::sendLog(int level,
+                      const char *tag,
+                      const char *file,
+                      unsigned long line,
+                      const char *log) {
+
+  if(isMultiProcess) {
+    if(m_back_to_weex_core_thread == nullptr || m_back_to_weex_core_thread.get()->isInitOk) {
+      return false;
+    }
+
+    BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+        IPCProxyMsg::POSTLOGDETAIL);
+    auto level_str = std::to_string(level);
+    ipc_task->addParams(level_str.c_str(), level_str.length());
+    ipc_task->addParams(tag);
+    ipc_task->addParams(file);
+    auto line_str = std::to_string(line);
+    ipc_task->addParams(line_str.c_str(), line_str.length());
+    ipc_task->addParams(log);
+    m_back_to_weex_core_thread.get()->addTask(ipc_task);
+    return true;
+  }
+  return false;
+}

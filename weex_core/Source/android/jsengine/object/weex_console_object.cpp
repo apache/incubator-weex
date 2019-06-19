@@ -126,7 +126,7 @@ static void printConsoleLog(ExecState *exec, MessageLevel level) {
     JSValue val = exec->argument(0);
     if (val.isString()) {
         String s = val.toWTFString(exec);
-        Weex::LogUtil::ConsoleLogPrint((int) level, "jsLog", s.utf8().data());
+        Weex::LogUtil::ConsoleLogPrint((int) level, "jsLog timeline", s.utf8().data());
          LOGE("consoleLogWithLevel level: %d log:%s", level, s.utf8().data());
         return;
     } else if (val.isObject()) {

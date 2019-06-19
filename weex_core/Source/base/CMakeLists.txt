@@ -27,6 +27,7 @@ set(${BASE_LIBRARY_NAME}_SOURCES
     closure.h
     make_copyable.h
     time_calculator.h
+    time_calculator.cpp
     time_point.h
     time_point.cc
     time_unit.h

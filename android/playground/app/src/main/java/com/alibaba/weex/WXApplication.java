@@ -56,7 +56,7 @@ public class WXApplication extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
-    MultiDex.install(this);
+//    MultiDex.install(this);
     /**
      * Set up for fresco usage.
      * Set<RequestListener> requestListeners = new HashSet<>();
