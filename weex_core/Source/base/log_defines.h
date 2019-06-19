@@ -31,7 +31,8 @@ namespace WeexCore {
     };
     
     void PrintLog(LogLevel level, const char* tag, const char* file, unsigned long line, const char* format, ...);
-    
+
+    extern bool DebugMode;
 }
 
 #if defined(LOGE)

@@ -190,7 +190,7 @@ void WeexGlobalObject::initWxEnvironment(std::vector<INIT_FRAMEWORK_PARAMS *> &p
         // --------------------------------------------------------
         // add for debug mode
         if (String("debugMode") == type && String("true") == value) {
-            Weex::LogUtil::setDebugMode(true);
+            WeexCore::DebugMode = true;
         }
         // --------------------------------------------------------
 
