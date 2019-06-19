@@ -31,6 +31,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
+import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXExceptionUtils;
@@ -95,6 +96,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
           child.isIgnoreInteraction = true;
         }
       }
+      WXStateRecord.getInstance().recordAction(instance.getInstanceId(),"addElement");
 
     } catch (ClassCastException e) {
       Map<String, String> ext = new ArrayMap<>();

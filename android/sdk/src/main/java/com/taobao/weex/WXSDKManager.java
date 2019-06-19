@@ -235,7 +235,6 @@ public class WXSDKManager {
   public void postOnUiThread(Runnable runnable, long delayMillis) {
     mWXRenderManager.postOnUiThread(WXThread.secure(runnable), delayMillis);
   }
-
   public Map<String, WXSDKInstance> getAllInstanceMap() {
     return mAllInstanceMap;
   }
