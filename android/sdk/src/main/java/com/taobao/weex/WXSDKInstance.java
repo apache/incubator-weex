@@ -71,6 +71,8 @@ import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.performance.WXStateRecord;
+import com.taobao.weex.performance.WhiteScreenUtils;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
@@ -862,6 +864,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
         public void run() {
+          checkWhiteScreen();
           if(isDestroy || hasException || isRenderSuccess) {
             return;
           }
@@ -879,6 +882,28 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       }, wxJscProcessManager.rebootTimeout());
     }
   }
+
+
+  private void checkWhiteScreen(){
+    if (isDestroy ||!WhiteScreenUtils.doWhiteScreenCheck()){
+      return;
+    }
+
+    boolean isWS = WhiteScreenUtils.isWhiteScreen(this);
+    if (!isWS){
+      return;
+    }
+    WXErrorCode errorCode = WXErrorCode.WX_ERROR_WHITE_SCREEN;
+    Map<String,String> args = new HashMap<>(1);
+    String vieTreeMsg = WhiteScreenUtils.getViewMsg(this);
+    args.put("viewTree",null == vieTreeMsg?"null viewTreeMsg":vieTreeMsg);
+
+    for (Map.Entry<String,String> entry: WXStateRecord.getInstance().getStateInfo().entrySet()){
+      args.put(entry.getKey(),entry.getValue());
+    }
+    WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),errorCode,"checkEmptyScreen",errorCode.getErrorMsg(),args);
+  }
+
 
   public boolean skipFrameworkInit(){
     return isDataRender() && !mDisableSkipFrameworkInit;
