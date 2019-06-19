@@ -100,6 +100,32 @@ static void Java_RequestHandler_send(JNIEnv* env, jobject obj, jstring
 
 }
 
+static intptr_t g_RequestHandler_getBundleType = 0;
+static void Java_RequestHandler_getBundleType (JNIEnv* env, jobject obj,
+    jstring instanceId,jstring content,jlong nativeCallback) {
+  /* Must call RegisterNativesImpl()  */
+  //CHECK_CLAZZ(env, obj,
+  //    RequestHandler_clazz(env));
+  jmethodID method_id =
+      base::android::GetMethod(
+          env, RequestHandler_clazz(env),
+          base::android::INSTANCE_METHOD,
+          "getBundleType",
+
+          "("
+          "Ljava/lang/String;"
+          "Ljava/lang/String;"
+          "J"
+          ")"
+          "V",
+          &g_RequestHandler_getBundleType);
+
+  env->CallVoidMethod(obj,
+                      method_id, instanceId, content, nativeCallback);
+  base::android::CheckException(env);
+
+}
+
 // Step 3: RegisterNatives.
 
 static const JNINativeMethod kMethodsRequestHandler[] = {

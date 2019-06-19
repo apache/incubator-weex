@@ -37,6 +37,7 @@ class DefaultRequestHandler : public RequestHandler,
   ~DefaultRequestHandler() override;
   void Send(const char* instance_id, const char* url,
             Callback callback) override;
+  void GetBundleType(const char *instance_id, const char *content, Callback callback) override;
 };
 
 class CallbackWrapper {

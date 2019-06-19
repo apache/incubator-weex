@@ -223,22 +223,13 @@ typedef enum : NSUInteger {
     [self setPageArgument:@"reserveCssStyles" value:@"true"];
 }
 
-- (BOOL)isKeepingRawCssStyles
-{
-    if ([NSThread currentThread] == [WXComponentManager componentThread]) {
-        return [WXCoreBridge isKeepingRawCssStyles:_instanceId];
-    }
-    else {
-        __block BOOL result = NO;
-        NSString* pageId = _instanceId;
-        dispatch_semaphore_t sem = dispatch_semaphore_create(0);
-        WXPerformBlockOnComponentThread(^{
-            result = [WXCoreBridge isKeepingRawCssStyles:pageId];
-            dispatch_semaphore_signal(sem);
-        });
-        dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
-        return result;
-    }
+- (void)isKeepingRawCssStyles:(void(^)(BOOL))callback {
+    NSString* pageId = _instanceId;
+    WXPerformBlockOnComponentThread(^{
+        if (callback) {
+            callback([WXCoreBridge isKeepingRawCssStyles:pageId]);
+        }
+    });
 }
 
 - (void)setPageArgument:(NSString*)key value:(NSString*)value
@@ -522,9 +513,6 @@ typedef enum : NSUInteger {
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {		
         BOOL enableRTLLayoutDirection = [[configCenter configForKey:@"iOS_weex_ext_config.enableRTLLayoutDirection" defaultValue:@(YES) isDefault:NULL] boolValue];
         [WXUtility setEnableRTLLayoutDirection:enableRTLLayoutDirection];
-        
-        BOOL overflowHiddenByDefault = [[configCenter configForKey:@"iOS_weex_ext_config.overflowHiddenByDefault" defaultValue:@(YES) isDefault:NULL] boolValue];
-        [WXUtility setOverflowHiddenByDefault:overflowHiddenByDefault];
     }
     return NO;
 }

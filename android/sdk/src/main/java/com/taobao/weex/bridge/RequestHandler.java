@@ -37,7 +37,9 @@ import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.utils.WXExceptionUtils;
 
+import com.taobao.weex.utils.WXLogUtils;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class RequestHandler {
 
@@ -78,7 +80,26 @@ public class RequestHandler {
         KEY_USER_AGENT, WXHttpUtil.assembleUserAgent(
                             instance.getContext(), WXEnvironment.getConfig()));
     wxRequest.paramMap.put("isBundleRequest", "true");
+    WXLogUtils.i("Eagle", String.format(Locale.ENGLISH, "Weex eagle is going to download script from %s", url));
     adapter.sendRequest(wxRequest, new OnHttpListenerInner(instance, nativeCallback, url));
+  }
+
+  @Keep
+  @CalledByNative
+  public void getBundleType(String instanceId, String content, long nativeCallback){
+    BundType bundleType = WXBridgeManager.getInstance().getBundleType("", content);
+    String bundleTypeStr = bundleType == null ? "Others" : bundleType.toString();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if ("Others".equalsIgnoreCase(bundleTypeStr) && null != instance){
+      WXExceptionUtils.commitCriticalExceptionRT(
+          instanceId,
+          WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE,
+          "RequestHandler.onSuccess",
+          "eagle ->" +WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE.getErrorMsg(),
+          null
+      );
+    }
+    nativeInvokeOnSuccess(nativeCallback, content, bundleTypeStr);
   }
 
   class OnHttpListenerInner extends WXHttpListener {

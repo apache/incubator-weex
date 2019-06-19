@@ -245,12 +245,16 @@
         return;
     }
     
-    NSError *error = NULL;
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"(\\w+)\\((.+?)\\)"
-                                                                           options:NSRegularExpressionCaseInsensitive
-                                                                             error:&error];
+    static NSRegularExpression* parseRegex = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSError *error = NULL;
+        parseRegex = [NSRegularExpression regularExpressionWithPattern:@"(\\w+)\\((.+?)\\)"
+                                                               options:NSRegularExpressionCaseInsensitive
+                                                                 error:&error];
+    });
     
-    NSArray *matches = [regex matchesInString:cssValue options:0 range:NSMakeRange(0, cssValue.length)];
+    NSArray *matches = [parseRegex matchesInString:cssValue options:0 range:NSMakeRange(0, cssValue.length)];
     
     for (NSTextCheckingResult *match in matches) {
         NSString *name = [cssValue substringWithRange:[match rangeAtIndex:1]];

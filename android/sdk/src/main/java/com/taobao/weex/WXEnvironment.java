@@ -127,6 +127,8 @@ public class WXEnvironment {
 
   public static final String CORE_SO_NAME = "weexcore";
   public static final String CORE_JSS_SO_NAME = "weexjss";
+  public static final String CORE_JSB_SO_NAME = "weexjsb";
+  public static final String CORE_JST_SO_NAME = "weexjst";
   public static final String CORE_JSC_SO_NAME = "JavaScriptCore";
   /**
    * this marked jsb.so's version, Change this if we want to update jsb.so
@@ -167,7 +169,6 @@ public class WXEnvironment {
     configs.put(WXConfig.sysVersion, SYS_VERSION);
     configs.put(WXConfig.sysModel, SYS_MODEL);
     configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
-    configs.put(WXConfig.logLevel,sLogLevel.getName());
 
     try {
       configs.put(WXConfig.layoutDirection, isLayoutDirectionRTL() ? "rtl" : "ltr");
@@ -290,7 +291,11 @@ public class WXEnvironment {
   }
 
   public static boolean isApkDebugable() {
-    if (sApplication == null) {
+    return isApkDebugable(sApplication);
+  }
+
+  public static boolean isApkDebugable(Application application) {
+    if (application == null) {
       return false;
     }
 
@@ -304,7 +309,7 @@ public class WXEnvironment {
     try {
       String debugModeConfig = getCustomOptions().get(WXConfig.debugMode);
       if (TextUtils.isEmpty(debugModeConfig)){
-        ApplicationInfo info = sApplication.getApplicationInfo();
+        ApplicationInfo info = application.getApplicationInfo();
         isApkDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
       }else {
         isApkDebug = Boolean.valueOf(debugModeConfig);

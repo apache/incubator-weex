@@ -86,6 +86,7 @@ import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.ui.component.richtext.WXRichText;
 import com.taobao.weex.ui.config.AutoScanConfigRegister;
 import com.taobao.weex.ui.module.WXDeviceInfoModule;
+import com.taobao.weex.ui.module.ConsoleLogModule;
 import com.taobao.weex.ui.module.WXLocaleModule;
 import com.taobao.weex.ui.module.WXMetaModule;
 import com.taobao.weex.ui.module.WXModalUIModule;
@@ -164,14 +165,10 @@ public class WXSDKEngine implements Serializable {
       }
       long start = System.currentTimeMillis();
       WXEnvironment.sSDKInitStart = start;
-      if(WXEnvironment.isApkDebugable()){
-        WXEnvironment.sLogLevel = LogLevel.DEBUG;
+      if(WXEnvironment.isApkDebugable(application)){
+        WXEnvironment.sLogLevel = LogLevel.INFO;
       }else{
-        if(WXEnvironment.sApplication != null){
-          WXEnvironment.sLogLevel = LogLevel.WARN;
-        }else {
-          WXLogUtils.e(TAG,"WXEnvironment.sApplication is " + WXEnvironment.sApplication);
-        }
+        WXEnvironment.sLogLevel = LogLevel.WARN;
       }
       doInitInternal(application,config);
       registerApplicationOptions(application);
@@ -379,6 +376,7 @@ public class WXSDKEngine implements Serializable {
       registerModule("webSocket", WebSocketModule.class);
       registerModule("locale", WXLocaleModule.class);
       registerModule("deviceInfo", WXDeviceInfoModule.class);
+      registerModule("sdk-console-log", ConsoleLogModule.class);
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:", e);
     }

@@ -21,7 +21,6 @@
 //
 
 #include "exe_js_args.h"
-
 #include "android/jsengine/weex_jsc_utils.h"
 
 ExeJsArgs::ExeJsArgs(std::vector<VALUE_WITH_TYPE *> &params) {

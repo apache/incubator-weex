@@ -1645,13 +1645,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           return;
         } else {
           //bad case for js bundle with out bundletype header //vue or rax
-          WXExceptionUtils.commitCriticalExceptionRT(
-                instance.getInstanceId(),
-                WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE,
-                "invokeCreateInstance",
-                WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE.getErrorMsg(),
-                null
-          );
+          //WXExceptionUtils.commitCriticalExceptionRT(
+          //      instance.getInstanceId(),
+          //      WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE,
+          //      "invokeCreateInstance",
+          //      WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE.getErrorMsg(),
+          //      null
+          //);
 
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);

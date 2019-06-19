@@ -567,8 +567,6 @@ _Pragma("clang diagnostic pop") \
         sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = funcInfo;
         [self callJSMethod:@"createInstance" args:args];
         sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = nil;
-        
-        [WXExceptionUtils commitCriticalExceptionRT:instanceIdString errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_NO_BUNDLE_TYPE] function:@"createInstance" exception:@"Fatal Error : No bundle type in js bundle head, cause white screen or memory leak!!" extParams:nil];
 
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
     }
@@ -838,6 +836,7 @@ _Pragma("clang diagnostic pop") \
         NSString *exception = [[self.jsBridge exception] toString];
         NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_SDK_INIT_JSFM_INIT_FAILED] %@",exception];
         [WXExceptionUtils commitCriticalExceptionRT:@"WX_KEY_EXCEPTION_SDK_INIT" errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_SDK_INIT] function:@"" exception:errMsg extParams:nil];
+        WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_EXECUTE, errMsg);
     } else {
         WX_MONITOR_SUCCESS(WXMTJSFramework);
         //the JSFramework has been load successfully.
@@ -951,6 +950,7 @@ _Pragma("clang diagnostic pop") \
             NSString *exception = [[self.jsBridge exception] toString];
             NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE] name:%@,arg:%@,exception :$@",name,exception];
             [WXExceptionUtils commitCriticalExceptionRT:@"WX_KEY_EXCEPTION_INVOKE" errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_INVOKE] function:@"executeJsService" exception:errMsg extParams:nil];
+            WX_MONITOR_FAIL(WXMTJSService, WX_ERR_JSFRAMEWORK_EXECUTE, errMsg);
         } else {
             // success
         }

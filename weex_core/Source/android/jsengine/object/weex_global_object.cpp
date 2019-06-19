@@ -32,7 +32,7 @@
 #include "base/utils/log_utils.h"
 #include "core/bridge/script_bridge.h"
 #include "include/wtf/text/Base64.h"
-
+#include "android/jsengine/weex_jsc_utils.h"
 #define WX_GLOBAL_CONFIG_KEY "global_switch_config"
 //#define GET_CHARFROM_UNIPTR(str) (str) == nullptr ? nullptr : (reinterpret_cast<const char*>((str).get()))
 using namespace JSC;
@@ -190,7 +190,7 @@ void WeexGlobalObject::initWxEnvironment(std::vector<INIT_FRAMEWORK_PARAMS *> &p
         // --------------------------------------------------------
         // add for debug mode
         if (String("debugMode") == type && String("true") == value) {
-            Weex::LogUtil::setDebugMode(true);
+            WeexCore::DebugMode = true;
         }
         // --------------------------------------------------------
 

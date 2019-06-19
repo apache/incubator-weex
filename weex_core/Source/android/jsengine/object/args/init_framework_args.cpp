@@ -21,7 +21,6 @@
 //
 
 #include "init_framework_args.h"
-
 #include "android/jsengine/weex_jsc_utils.h"
 
 InitFrameworkArgs::InitFrameworkArgs(std::vector<INIT_FRAMEWORK_PARAMS *> &params) {

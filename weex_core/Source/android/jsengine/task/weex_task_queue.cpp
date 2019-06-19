@@ -27,7 +27,7 @@
 #include "android/jsengine/bridge/script/script_bridge_in_multi_process.h"
 #include "android/jsengine/bridge/script/core_side_in_multi_process.h"
 #include "android/jsengine/object/weex_env.h"
-
+#include "android/jsengine/weex_jsc_utils.h"
 void WeexTaskQueue::run(WeexTask *task) {
     if(task == nullptr || WeexEnv::getEnv()->is_app_crashed()) {
         return;

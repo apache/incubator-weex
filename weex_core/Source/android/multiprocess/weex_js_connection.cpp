@@ -45,6 +45,9 @@
 
 static bool s_in_find_icu = false;
 static std::string g_crashFileName;
+
+volatile static bool fd_server_closed = false;
+
 static void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie);
 
 static int copyFile(const char *SourceFile, const char *NewFile);
@@ -52,6 +55,13 @@ static int copyFile(const char *SourceFile, const char *NewFile);
 static void closeAllButThis(int fd, int fd2);
 
 static void printLogOnFile(const char *log);
+
+static void closeServerFd(int fd) {
+    if(fd_server_closed)
+        return;
+    close(fd);
+    fd_server_closed = true;
+}
 
 static bool checkOrCreateCrashFile(const char* file) {
     if (file == nullptr) {
@@ -180,7 +190,7 @@ static void *newIPCServer(void *_td) {
       listener->listen();
     } catch (IPCException &e) {
         LOGE("server died");
-        close(td->ipcServerFd);
+        closeServerFd(td->ipcServerFd);
         base::android::DetachFromVM();
         pthread_exit(NULL);
     }
@@ -210,6 +220,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
   if (-1 == fd2) {
     throw IPCException("failed to create ashmem region: %s", strerror(errno));
   }
+  fd_server_closed = false;
   ThreadData td = { static_cast<int>(fd2), static_cast<IPCHandler *>(serverHandler) };
 
   pthread_attr_t threadAttr;
@@ -272,7 +283,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
     int myerrno = errno;
     munmap(base, IPCFutexPageQueue::ipc_size);
     close(fd);
-    close(fd2);
+    closeServerFd(fd2);
     throw IPCException("failed to fork: %s", strerror(myerrno));
   } else if (child == 0) {
     LOGE("weexcore fork child success\n");
@@ -287,7 +298,7 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
   } else {
     printLogOnFile("fork success on main process and start m_impl->futexPageQueue->spinWaitPeer()");
     close(fd);
-    close(fd2);
+    closeServerFd(fd2);
     m_impl->child = child;
     try {
       m_impl->futexPageQueue->spinWaitPeer();
