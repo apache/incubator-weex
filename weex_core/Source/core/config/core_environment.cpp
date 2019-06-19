@@ -82,6 +82,8 @@ namespace WeexCore {
     mOptions.insert(std::pair<std::string, std::string>(key, value));
     if (key == "switchInteractionLog") {
       mInteractionLogSwitch = "true" == value;
+    } else if(key == "debugMode" && value == "true"){
+      WeexCore::DebugMode = true;
     }
   }
 

@@ -352,11 +352,6 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   freeParams(params_vector);
 
   WeexCoreManager::Instance()->set_log_bridge(new LogUtils());
-  auto custom_map = WXCoreEnvironment::getInstance()->options();
-  auto search = custom_map.find("debugMode");
-  if(search != custom_map.end() && search->second == "true"){
-    WeexCore::DebugMode = true;
-  }
   return result;
 }
 
