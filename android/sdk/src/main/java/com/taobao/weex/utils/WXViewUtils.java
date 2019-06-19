@@ -207,11 +207,13 @@ public class WXViewUtils {
     return getScreenHeight(WXEnvironment.sApplication);
   }
 
+
   public static int getScreenHeight(String instanceId){
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     return instance.isFullScreenHeightEnabled()?getFullScreenHeight(WXEnvironment.sApplication):getScreenHeight(WXEnvironment.sApplication);
   }
 
+//get screen height with status bar on full screen
   public static int getFullScreenHeight(Context cxt) {
     if(cxt!=null){
       WindowManager wm;
@@ -236,6 +238,7 @@ public class WXViewUtils {
     }
     return mScreenHeight;
   }
+//  get screen height without status bar
   public static int getScreenHeight(Context cxt) {
     if(cxt!=null){
       Resources res = cxt.getResources();

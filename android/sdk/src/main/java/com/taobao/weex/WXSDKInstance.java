@@ -402,8 +402,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mNeedReLoad = load;
   }
 
+  @RestrictTo(Scope.LIBRARY)
   public void  setEnableFullScreenHeight(boolean fullScreenHeight){enableFullScreenHeight = fullScreenHeight;}
 
+  @RestrictTo(Scope.LIBRARY)
   public boolean isFullScreenHeightEnabled(){return enableFullScreenHeight;}
 
   public boolean isUseScroller() {

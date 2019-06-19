@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.module;
 
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
@@ -30,16 +31,16 @@ import java.util.HashMap;
 public class WXDeviceInfoModule extends WXModule {
     
     @JSMethod(uiThread = false)
-    public void enableFullScreenHeight(JSCallback callback){
+    public void enableFullScreenHeight(final JSCallback callback,JSONObject extend){
         if(mWXSDKInstance != null) {
             mWXSDKInstance.setEnableFullScreenHeight(true);
-            long fullheight = WXViewUtils.getScreenHeight(mWXSDKInstance.getInstanceId());
-            long height = WXViewUtils.getScreenHeight(WXEnvironment.sApplication);
-            HashMap<String, String> ret = new HashMap();
-            WXLogUtils.d("jhy", String.valueOf(fullheight));
-            ret.put("fullheight", String.valueOf(fullheight));
-            ret.put("height", String.valueOf(height));
-            callback.invoke(ret);
+            if(callback != null) {
+                long fullScreenHeight = WXViewUtils.getScreenHeight(mWXSDKInstance.getInstanceId());
+                HashMap<String, String> ret = new HashMap();
+                ret.put("fullScreenHeight", String.valueOf(fullScreenHeight));
+                callback.invoke(ret);
+            }
+
         }
 
     }
