@@ -641,10 +641,7 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
 
 - (void)connectToDevToolWithUrl:(NSURL *)url {
     WXPerformBlockOnBridgeThread(^(){
-    [self.bridgeCtx connectToDevToolWithUrl:url];
-        });
-    WXPerformBlockOnBackupBridgeThread(^(){
-        [self.backupBridgeCtx connectToDevToolWithUrl:url];
+        [self.bridgeCtx connectToDevToolWithUrl:url];
     });
 }
 
@@ -653,9 +650,6 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
         [weakSelf.bridgeCtx connectToWebSocket:url];
-    });
-    WXPerformBlockOnBackupBridgeThread(^(){
-        [weakSelf.backupBridgeCtx connectToWebSocket:url];
     });
 }
 
@@ -666,9 +660,6 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
         [weakSelf.bridgeCtx logToWebSocket:flag message:message];
-    });
-    WXPerformBlockOnBackupBridgeThread(^(){
-        [weakSelf.backupBridgeCtx logToWebSocket:flag message:message];
     });
 }
 
