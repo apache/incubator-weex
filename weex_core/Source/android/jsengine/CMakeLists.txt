@@ -43,6 +43,9 @@ if ("${ANDROID_ABI}" STREQUAL "armeabi")
 elseif ("${ANDROID_ABI}" STREQUAL "armeabi-v7a")
     add_definitions(-DWTF_CPU_ARM)
     set(WTF_CPU_ARM 1)
+elseif("${ANDROID_ABI}" STREQUAL "arm64-v8a")
+    add_definitions(-DWTF_CPU_ARM64)
+    set(WTF_CPU_ARM64 1)
 else ()
     add_definitions(-DWTF_CPU_X86)
     set(WTF_CPU_X86_64 1)
@@ -134,6 +137,7 @@ set(${WEEXJSSERVER_NAME}_SOURCES
         wson/wson_jsc.cpp
 )
 link_directories(${LOCAL_LIBRARIES_DIR})
+message("LOCAL_LIBRARIES_DIR:"${LOCAL_LIBRARIES_DIR})
 SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}" CACHE STRING "toolchain_exelinkflags" FORCE)
 SET(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -shared")
 

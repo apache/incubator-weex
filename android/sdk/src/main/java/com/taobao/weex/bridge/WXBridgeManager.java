@@ -61,6 +61,7 @@ import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.BasicGraphicAction;
@@ -609,6 +610,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
+    WXStateRecord.getInstance().recordAction(instanceId,"callNativeModule:"+module+"."+method);
+
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
               .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
@@ -848,8 +851,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         } catch (Throwable e) {
             e.printStackTrace();
         }
+        WXStateRecord.getInstance().onJSCCrash();
         callReportCrash(crashFile, instanceId, url);
       } else {
+        WXStateRecord.getInstance().onJSEngineReload();
          commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_RELOAD_PAGE, "reboot jsc Engine", instanceId, url);
       }
 
@@ -1639,13 +1644,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           return;
         } else {
           //bad case for js bundle with out bundletype header //vue or rax
-          WXExceptionUtils.commitCriticalExceptionRT(
-                instance.getInstanceId(),
-                WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE,
-                "invokeCreateInstance",
-                WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE.getErrorMsg(),
-                null
-          );
+          //WXExceptionUtils.commitCriticalExceptionRT(
+          //      instance.getInstanceId(),
+          //      WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE,
+          //      "invokeCreateInstance",
+          //      WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE.getErrorMsg(),
+          //      null
+          //);
 
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           return;

@@ -21,7 +21,7 @@ set(WEEXCORE_LIBRARY_NAME weexcore)
 set(WEEX_CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 message("${ANDROID_STL} ")
-if ("${ANDROID_STL}" STREQUAL "c++_static")
+if ("${ANDROID_STL}" STREQUAL "c++_static" OR "${ANDROID_STL}" STREQUAL "c++_shared")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 elseif ("${ANDROID_STL}" STREQUAL "gnustl_static")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++1y")
@@ -33,7 +33,6 @@ add_compile_options(-fno-omit-frame-pointer)
 
 add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
-add_definitions(-DDEBUG=1)
 
 add_definitions(-DRENDER_LOG=0)
 add_definitions(-DPERFORMANCE_LOG=0)
@@ -41,7 +40,8 @@ add_definitions(-DLAYOUT_LOG=0)
 add_definitions(-DJSAPI_LOG=0)
 add_definitions(-DDOM_PARSER_LOG=0)
 
-set(LOCAL_LIBRARIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs/${ANDROID_ABI})
+message("ANDROID_PROJECT_DIR:"${ANDROID_PROJECT_DIR})
+set(LOCAL_LIBRARIES_DIR ${ANDROID_PROJECT_DIR}/libs/${ANDROID_ABI})
 
 if ("${ANDROID_ABI}" STREQUAL "x86")
     # todo

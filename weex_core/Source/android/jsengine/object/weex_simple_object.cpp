@@ -21,6 +21,6 @@
 //
 
 #include "android/jsengine/object/weex_simple_object.h"
-
+#include "android/jsengine/weex_jsc_utils.h"
 
 const ClassInfo SimpleObject::s_info = { "Object", &Base::s_info, nullptr, CREATE_METHOD_TABLE(SimpleObject) };

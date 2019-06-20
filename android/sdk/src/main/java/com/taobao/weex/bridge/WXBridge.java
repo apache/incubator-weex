@@ -35,6 +35,7 @@ import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -393,6 +394,7 @@ public class WXBridge implements IWXBridge {
     if (version != null) {
       WXEnvironment.JS_LIB_SDK_VERSION = version;
     }
+    WXStateRecord.getInstance().onJSFMInit();
   }
 
   @Override

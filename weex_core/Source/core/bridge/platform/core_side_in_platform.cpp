@@ -507,7 +507,6 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId, const char *func,
         [instanceId = std::string(instanceId), func = std::string(func),
          opts = std::string(opts), initData = std::string(initData),
          extendsApi = std::string(extendsApi)](const char *result, const char *bundleType) {
-          // FIXME Now only support vue, this should be fixed
           std::string error;
           auto opts_json = json11::Json::parse(opts, error);
           std::map<std::string, json11::Json> &opts_map =

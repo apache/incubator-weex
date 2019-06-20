@@ -73,6 +73,8 @@ import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.render.WXAbstractRenderContainer;
+import com.taobao.weex.performance.WXStateRecord;
+import com.taobao.weex.performance.WhiteScreenUtils;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
@@ -144,6 +146,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private boolean mNeedReLoad = false;
   private boolean mUseScroller = false;
   private int mInstanceViewPortWidth = 750;
+  private boolean enableFullScreenHeight = false;
   private WXInstanceApm mApmForInstance;
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
@@ -425,6 +428,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void setNeedLoad(boolean load) {
     mNeedReLoad = load;
   }
+
+  @RestrictTo(Scope.LIBRARY)
+  public void  setEnableFullScreenHeight(boolean fullScreenHeight){enableFullScreenHeight = fullScreenHeight;}
+
+  @RestrictTo(Scope.LIBRARY)
+  public boolean isFullScreenHeightEnabled(){return enableFullScreenHeight;}
 
   public boolean isUseScroller() {
     return mUseScroller;
@@ -862,6 +871,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
         public void run() {
+          checkWhiteScreen();
           if(isDestroy || hasException || isRenderSuccess) {
             return;
           }
@@ -879,6 +889,28 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       }, wxJscProcessManager.rebootTimeout());
     }
   }
+
+
+  private void checkWhiteScreen(){
+    if (isDestroy ||!WhiteScreenUtils.doWhiteScreenCheck()){
+      return;
+    }
+
+    boolean isWS = WhiteScreenUtils.isWhiteScreen(this);
+    if (!isWS){
+      return;
+    }
+    WXErrorCode errorCode = WXErrorCode.WX_ERROR_WHITE_SCREEN;
+    Map<String,String> args = new HashMap<>(1);
+    String vieTreeMsg = WhiteScreenUtils.getViewMsg(this);
+    args.put("viewTree",null == vieTreeMsg?"null viewTreeMsg":vieTreeMsg);
+
+    for (Map.Entry<String,String> entry: WXStateRecord.getInstance().getStateInfo().entrySet()){
+      args.put(entry.getKey(),entry.getValue());
+    }
+    WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),errorCode,"checkEmptyScreen",errorCode.getErrorMsg(),args);
+  }
+
 
   public boolean skipFrameworkInit(){
     return isDataRender() && !mDisableSkipFrameworkInit;

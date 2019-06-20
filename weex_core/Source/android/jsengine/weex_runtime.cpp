@@ -27,6 +27,7 @@
 #include "android/jsengine/object/weex_env.h"
 #include "include/JavaScriptCore/runtime/Exception.h"
 #include "include/JavaScriptCore/heap/HeapSnapshotBuilder.h"
+#include "android/jsengine/weex_jsc_utils.h"
 
 using namespace JSC;
 using namespace WTF;

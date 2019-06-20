@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.util.Log;
+import android.support.multidex.MultiDex;
 
 import com.alibaba.android.bindingx.plugin.weex.BindingX;
 import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
@@ -30,6 +31,7 @@ import com.alibaba.weex.commons.adapter.JSExceptionAdapter;
 import com.alibaba.weex.commons.adapter.PicassoBasedDrawableLoader;
 import com.alibaba.weex.extend.adapter.ApmGenerator;
 import com.alibaba.weex.extend.adapter.DefaultAccessibilityRoleAdapter;
+import com.alibaba.weex.extend.adapter.DefaultConfigAdapter;
 import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
 import com.alibaba.weex.extend.adapter.WXAnalyzerDemoListener;
 import com.alibaba.weex.extend.component.WXComponentSyncTest;
@@ -58,7 +60,7 @@ public class WXApplication extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
-
+    MultiDex.install(this);
     /**
      * Set up for fresco usage.
      * Set<RequestListener> requestListeners = new HashSet<>();
@@ -85,6 +87,7 @@ public class WXApplication extends Application {
                                .setApmGenerater(new ApmGenerator())
                                .build()
                           );
+    WXSDKManager.getInstance().setWxConfigAdapter(new DefaultConfigAdapter());
     WXSDKManager.getInstance().addWXAnalyzer(new WXAnalyzerDemoListener());
     WXAnalyzerDataTransfer.isOpenPerformance = false;
 

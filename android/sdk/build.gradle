@@ -16,30 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-buildscript {
-    dependencies {
-        if(!project.disableCov) {
-            classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
-        }
-    }
-}
-
-plugins {
-    id "com.github.hierynomus.license" version "0.14.0"
-}
+ plugins {
+     id "com.github.hierynomus.license" version "0.14.0"
+ }
 
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-if(!project.disableCov){
-    apply plugin: 'com.vanniktech.android.junit.jacoco'
-    junitJacoco {
-        excludes = ['com/taobao/weex/dom/flex/**','com/taobao/weex/ui/view/refresh/circlebar/**']
-    }
-}
+//if(!project.disableCov){
+//    apply plugin: 'com.vanniktech.android.junit.jacoco'
+//    junitJacoco {
+//        excludes = ['com/taobao/weex/dom/flex/**','com/taobao/weex/ui/view/refresh/circlebar/**']
+//    }
+//}
 
 task checkstyle(type: Checkstyle) {
     configFile file("${project.rootDir}/sdk/config/quality/checkstyle.xml") // Where my checkstyle config is...
@@ -56,7 +47,7 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : "0.24.0.1"
+version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : "0.20.0.1"
 
 //Check version, the version must have 4 sections. The leading three section must be number, and the last section is odd number with or without suffix string.
 if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVersionCheck').equals("true")) {
@@ -79,9 +70,16 @@ if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVe
 
 android {
     compileSdkVersion project.compileSdkVersion
-    buildToolsVersion project.buildToolsVersion
+//    buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
     useLibrary 'org.apache.http.legacy'
+    if(project.hasProperty('removeSharedLib') && "true".equals(project.getProperty('removeSharedLib'))) {
+        packagingOptions {
+            exclude 'lib/armeabi-v7a/libc++_shared.so'
+            exclude 'lib/arm64-v8a/libc++_shared.so'
+            exclude 'lib/x86/libc++_shared.so'
+        }
+    }
     copy {
         from '../../pre-build'
         into new File(projectDir,"assets")
@@ -107,22 +105,17 @@ android {
         include 'weex-rax-api.js'
     }
 
-
-//    copy {
-//        from '../../pre-build'
-//        into new File(projectDir,"assets")
-//        include 'weex-rax-extra-api.js'
-//    }
-
     def ndkversion = 16;
     def api_level = "";
     def compile_tool = "clang";
-    def cxx_stl = "c++_static";
+    def cxx_stl = "c++_shared";
     if (ndkversion < 16) {
         api_level = "android-14";
     } else {
-        api_level = "android-19";
+        api_level = "android-21";
     }
+
+    def android_project_dir = projectDir
 
     defaultConfig {
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
@@ -135,7 +128,7 @@ android {
         versionCode 1
         versionName project.version
         ndk {
-            abiFilters "armeabi-v7a", "armeabi", "x86"
+            abiFilters "arm64-v8a", "armeabi-v7a", "x86"
         }
         externalNativeBuild {
             cmake {
@@ -143,6 +136,7 @@ android {
                         '-DANDROID_TOOLCHAIN=' + "${compile_tool}",
                         '-DANDROID_STL=' + "${cxx_stl}",
                         '-DCMAKE_BUILD_TYPE=Release',
+                        '-DANDROID_PROJECT_DIR=' + "${android_project_dir}",
                         '-DENABLE_ASAN=false'
             }
         }
@@ -199,54 +193,54 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    provided "com.android.support:recyclerview-v7:${project.supportLibVersion}"
-    provided "com.android.support:support-v4:${project.supportLibVersion}"
-    provided "com.android.support:appcompat-v7:${project.supportLibVersion}"
-    provided "com.alibaba:fastjson:${project.fastjsonLibVersion}"
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    compileOnly "com.android.support:recyclerview-v7:${project.supportLibVersion}"
+    compileOnly "com.android.support:support-v4:${project.supportLibVersion}"
+    compileOnly "com.android.support:appcompat-v7:${project.supportLibVersion}"
+    compileOnly "com.alibaba:fastjson:${project.fastjsonLibVersion}"
 
-    testCompile "com.alibaba:fastjson:${project.fastjsonLibVersion}"
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.hamcrest:hamcrest-core:1.3'
-    testCompile 'org.javassist:javassist:3.20.0-GA'
-    testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'org.objenesis:objenesis:2.1'
-    testCompile 'org.powermock:powermock-core:1.6.4'
-    testCompile 'org.powermock:powermock-api-mockito:1.6.4'
-    testCompile 'org.powermock:powermock-module-junit4-common:1.6.4'
-    testCompile 'org.powermock:powermock-module-junit4:1.6.4'
-    testCompile 'org.powermock:powermock-module-junit4-legacy:1.6.4'
-    testCompile 'org.powermock:powermock-module-testng:1.6.4'
-    testCompile 'org.powermock:powermock-classloading-xstream:1.6.4'
-    testCompile "org.powermock:powermock-module-junit4-rule:1.6.4"
-    testCompile 'org.robolectric:robolectric:3.3.2'
-    testCompile "org.robolectric:shadows-httpclient:3.3.2"
-    testCompile 'org.json:json:20160212'
+    testImplementation "com.alibaba:fastjson:${project.fastjsonLibVersion}"
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.hamcrest:hamcrest-core:1.3'
+    testImplementation 'org.javassist:javassist:3.20.0-GA'
+    testImplementation 'org.mockito:mockito-core:1.10.19'
+    testImplementation 'org.objenesis:objenesis:2.1'
+    testImplementation 'org.powermock:powermock-core:1.6.4'
+    testImplementation 'org.powermock:powermock-api-mockito:1.6.4'
+    testImplementation 'org.powermock:powermock-module-junit4-common:1.6.4'
+    testImplementation 'org.powermock:powermock-module-junit4:1.6.4'
+    testImplementation 'org.powermock:powermock-module-junit4-legacy:1.6.4'
+    testImplementation 'org.powermock:powermock-module-testng:1.6.4'
+    testImplementation 'org.powermock:powermock-classloading-xstream:1.6.4'
+    testImplementation "org.powermock:powermock-module-junit4-rule:1.6.4"
+    testImplementation 'org.robolectric:robolectric:3.3.2'
+    testImplementation "org.robolectric:shadows-httpclient:3.3.2"
+    testImplementation 'org.json:json:20160212'
 }
 
-if(file('../license/LICENSE').exists()){
-    license {
-        header = file('../license/LICENSE')
-        mapping('cpp','JAVADOC_STYLE')
-        mapping('h','JAVADOC_STYLE')
-        excludes(['com/taobao/weex/utils/WXDataStructureUtil.java'])
-    }
+ if(file('../license/LICENSE').exists()){
+     license {
+         header = file('../license/LICENSE')
+         mapping('cpp','JAVADOC_STYLE')
+         mapping('h','JAVADOC_STYLE')
+         excludes(['com/taobao/weex/utils/WXDataStructureUtil.java'])
+     }
 
-    task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
-        source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc', '**/*.c']).
-                exclude(['Source/rapidjson/**/*.h','Source/rapidjson/**/*.cpp',
-                         'Source/android/base/base64/**/*.h','Source/android/base/base64/**/*.cpp',
-                         'Source/android/jniprebuild/jniheader/*.h',
-                         'Source/base/Compatible.cpp',
-                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
-                         'Source/android/jsengine/dependence/**/*.h',
-                         'Source/android/jsengine/dependence/**/*.cpp',
-                         'Source/include/wtf/Optional.h',
-                         'Source/include/wtf/Brigand.h',
-                         'Source/include/wtf/Variant.h'])
-    }
-    preBuild.dependsOn licenseFormat
-}
+     task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
+         source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc', '**/*.c']).
+                 exclude(['Source/rapidjson/**/*.h','Source/rapidjson/**/*.cpp',
+                          'Source/android/base/base64/**/*.h','Source/android/base/base64/**/*.cpp',
+                          'Source/android/jniprebuild/jniheader/*.h',
+                          'Source/base/Compatible.cpp',
+                          'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
+                          'Source/android/jsengine/dependence/**/*.h',
+                          'Source/android/jsengine/dependence/**/*.cpp',
+                          'Source/include/wtf/Optional.h',
+                          'Source/include/wtf/Brigand.h',
+                          'Source/include/wtf/Variant.h'])
+     }
+     preBuild.dependsOn licenseFormat
+ }
 
 task checkNdkVersion() {
     def rootDir = project.rootDir
@@ -263,36 +257,6 @@ task checkNdkVersion() {
     if(null == ndkDir){
         def errMsg ='please set ndk.dir path in project/local.properties and ndk-16 supported only,example: ndk.dir=/Users/xxx/Library/Android/sdk/ndk-bundle-r16'
         throw new StopActionException(errMsg)
-    }
-
-    if(!ndkDir.isEmpty()) {
-        def sourcePropertiesFile = new File(ndkDir,"source.properties")
-        def ndkVersion = ''
-        println("sourcePropertiesFile" + sourcePropertiesFile.absolutePath)
-        if(sourcePropertiesFile.exists()) {
-            Properties properties = new Properties()
-            sourcePropertiesFile.withInputStream { instr ->
-                properties.load(instr)
-            }
-
-            ndkVersion = properties.getProperty('Pkg.Revision')
-        }
-
-        if(ndkVersion.length() > 2) {
-            def substring = ndkVersion.substring(0, 2)
-            try {
-                if(substring.toInteger() != 16) {
-                    throw new StopActionException("Ndk Version 16 supported only")
-                }
-            } catch (Exception ignored) {
-                println("Ndk Version 16 supported only")
-            }
-
-        } else {
-            println("Ndk Version 16 supported only")
-        }
-    } else {
-        println("Ndk Version 16 supported only")
     }
 }
 
@@ -360,14 +324,14 @@ bintray {
     }
 }
 
-afterEvaluate {
+afterEvaluate { project ->
     transformNativeLibsWithStripDebugSymbolForRelease << {
         copy{
             from transformNativeLibsWithMergeJniLibsForRelease
             into new File(project.buildDir, "unstrippedSo")
             include '**/libweexjss.so', '**/libweexcore.so'
             eachFile {
-                it.path = "${it.relativePath.segments[5]}_${it.name}"
+                it.path = "${it.relativePath.segments[-2]}_${it.name}"
             }
         }
     }

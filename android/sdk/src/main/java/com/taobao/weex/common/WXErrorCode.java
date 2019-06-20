@@ -123,6 +123,9 @@ public enum WXErrorCode {
    */
   WX_ERR_RELOAD_PAGE("-2111", "reloadPage",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
+  WX_ERROR_WHITE_SCREEN("-2116", "WHITE_SCREEN",ErrorType.RENDER_ERROR,ErrorGroup.JS),
+
+
   /**
    *
    */

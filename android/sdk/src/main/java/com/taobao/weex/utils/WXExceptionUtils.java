@@ -41,6 +41,7 @@ import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.performance.WXStateRecord;
 
 /**
  * Created on 2017/10/13.
@@ -108,6 +109,7 @@ public class WXExceptionUtils {
 												 @Nullable final Map<String,String> extParams ) {
 
         try {
+            WXStateRecord.getInstance().recordException(instanceId,exception);
             IWXConfigAdapter configAdapter = WXSDKManager.getInstance().getWxConfigAdapter();
             boolean doCheck = true;
             if (null != configAdapter){

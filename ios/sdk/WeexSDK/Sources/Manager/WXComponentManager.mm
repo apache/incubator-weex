@@ -320,8 +320,17 @@ static NSThread *WXComponentThread;
     }
     if (supercomponent.ignoreInteraction) {
         component.ignoreInteraction = YES;
+    } else {
+        if ([[attributes objectForKey:@"ignoreInteraction"] boolValue]) {
+            component.ignoreInteraction = YES;
+        } else {
+            if (component->_positionType == WXPositionTypeFixed) {
+                component.ignoreInteraction = YES;
+            } else {
+                component.ignoreInteraction = NO;
+            }
+        }
     }
-    component.ignoreInteraction = [[attributes objectForKey:@"ignoreInteraction"] boolValue];
     
 #ifdef DEBUG
     WXLogDebug(@"flexLayout -> _recursivelyAddComponent : super:(%@,%@):[%f,%f] ,child:(%@,%@):[%f,%f],childClass:%@",
