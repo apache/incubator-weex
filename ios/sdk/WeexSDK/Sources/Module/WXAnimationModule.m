@@ -25,6 +25,7 @@
 #import "WXUtility.h"
 #import "WXLength.h"
 #import "WXTransition.h"
+#import "WXComponent+Layout.h"
 
 @interface WXAnimationInfo : NSObject<NSCopying>
 
@@ -332,7 +333,13 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
              transitionDic:(NSMutableDictionary*)transitionDic
 {
     [transition.filterStyles setObject:args[@"styles"][property] forKey:property];
-    [transition.oldFilterStyles setObject:target.styles[property] ?:@0 forKey:property];
+    
+    id oldStyleValue = target.styles[property];
+    if (oldStyleValue == nil) {
+        oldStyleValue = [target convertLayoutValueToStyleValue:property];
+    }
+    [transition.oldFilterStyles setObject:oldStyleValue ?:@0 forKey:property];
+    
     [target _modifyStyles:@{property:args[@"styles"][property]}];
     [transitionDic setObject:@([args[@"duration"] doubleValue]) forKey:kWXTransitionDuration];
     [transitionDic setObject:@([args[@"delay"] doubleValue]) forKey:kWXTransitionDelay];
