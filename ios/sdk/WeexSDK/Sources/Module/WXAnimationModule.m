@@ -338,6 +338,9 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     if (oldStyleValue == nil) {
         oldStyleValue = [target convertLayoutValueToStyleValue:property];
     }
+    if (oldStyleValue == nil) {
+        oldStyleValue = @"0.0";
+    }
     [transition.oldFilterStyles setObject:oldStyleValue ?:@0 forKey:property];
     
     [target _modifyStyles:@{property:args[@"styles"][property]}];
