@@ -213,6 +213,8 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
           }
           WXBridgeManager
               .getInstance().markDirty(getInstanceId(), getRef(), true);
+          forceRelayout();
+
         }
       }
     };

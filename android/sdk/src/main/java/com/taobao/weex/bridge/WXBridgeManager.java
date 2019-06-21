@@ -18,8 +18,6 @@
  */
 package com.taobao.weex.bridge;
 
-import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
-
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -34,6 +32,7 @@ import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -61,6 +60,7 @@ import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.BasicGraphicAction;
@@ -90,6 +90,7 @@ import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -111,6 +112,8 @@ import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+
+import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
 
 /**
  * Manager class for communication between JavaScript and Android.
@@ -609,6 +612,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
+    WXStateRecord.getInstance().recordAction(instanceId,"callNativeModule:"+module+"."+method);
+
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
               .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
@@ -848,8 +853,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         } catch (Throwable e) {
             e.printStackTrace();
         }
+        WXStateRecord.getInstance().onJSCCrash();
         callReportCrash(crashFile, instanceId, url);
       } else {
+        WXStateRecord.getInstance().onJSEngineReload();
          commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_RELOAD_PAGE, "reboot jsc Engine", instanceId, url);
       }
 
@@ -1887,7 +1894,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public int invokeCreateInstanceContext(String instanceId, String namespace, String function,
                                           WXJSObject[] args, boolean logTaskDetail) {
     WXLogUtils.d("invokeCreateInstanceContext instanceId:" + instanceId + " function:"
-            + function + " isJSFrameworkInit：%d" + isJSFrameworkInit());
+            + function + String.format(" isJSFrameworkInit：%b", isJSFrameworkInit()));
     mLodBuilder.append("createInstanceContext >>>> instanceId:").append(instanceId)
             .append("function:").append(function);
     if (logTaskDetail)

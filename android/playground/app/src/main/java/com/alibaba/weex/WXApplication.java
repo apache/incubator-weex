@@ -30,6 +30,7 @@ import com.alibaba.weex.commons.adapter.JSExceptionAdapter;
 import com.alibaba.weex.commons.adapter.PicassoBasedDrawableLoader;
 import com.alibaba.weex.extend.adapter.ApmGenerator;
 import com.alibaba.weex.extend.adapter.DefaultAccessibilityRoleAdapter;
+import com.alibaba.weex.extend.adapter.DefaultConfigAdapter;
 import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
 import com.alibaba.weex.extend.adapter.WXAnalyzerDemoListener;
 import com.alibaba.weex.extend.component.WXComponentSyncTest;
@@ -83,6 +84,7 @@ public class WXApplication extends Application {
                                .setApmGenerater(new ApmGenerator())
                                .build()
                           );
+    WXSDKManager.getInstance().setWxConfigAdapter(new DefaultConfigAdapter());
     WXSDKManager.getInstance().addWXAnalyzer(new WXAnalyzerDemoListener());
     WXAnalyzerDataTransfer.isOpenPerformance = false;
 
