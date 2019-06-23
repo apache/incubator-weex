@@ -334,5 +334,28 @@ afterEvaluate { project ->
                 it.path = "${it.relativePath.segments[-2]}_${it.name}"
             }
         }
+
+        if(project.hasProperty('supportArmeabi') && "true" == project.getProperty('supportArmeabi')){
+            //Copy stripped shared library from armeabi-v7a into armeabi
+            copy{
+                from transformNativeLibsWithStripDebugSymbolForRelease
+                into project.android.sourceSets.main.jniLibs.srcDirs[-1]
+                include '**/armeabi-v7a/**'
+                exclude '**/libc++_shared.so'
+                eachFile {
+                    it.path = "armeabi/${it.name}"
+                }
+            }
+
+            //Copy Unstripped shared library from armeabi-v7a into armeabi
+            copy{
+                from transformNativeLibsWithMergeJniLibsForRelease
+                into new File(project.buildDir, "unstrippedSo")
+                include '**/armeabi-v7a/libweexjss.so', '**/armeabi-v7a/libweexcore.so'
+                eachFile {
+                    it.path = "armeabi_${it.name}"
+                }
+            }
+        }
     }
 }

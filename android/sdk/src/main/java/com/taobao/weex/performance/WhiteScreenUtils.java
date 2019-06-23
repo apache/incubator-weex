@@ -62,18 +62,26 @@ public class WhiteScreenUtils {
         if (group.getChildCount() == 0) {
             return true;
         }
-        return !hasLeafView(group);
+        return !hasLeafViewOrSizeIgnore(group,3);
     }
 
-    private static boolean hasLeafView(View v) {
+    private static boolean hasLeafViewOrSizeIgnore(View v,int checkDeep) {
+
         if (!(v instanceof ViewGroup)) {
             return true;
+        }
+
+        if (checkDeep > 0){
+            if ( v.getHeight() < 10 || v.getWidth() < 10) {
+                return true;
+            }
+            checkDeep--;
         }
 
         ViewGroup group = (ViewGroup)v;
         for (int i = 0; i < group.getChildCount(); i++) {
             View child = group.getChildAt(i);
-            boolean res = hasLeafView(child);
+            boolean res = hasLeafViewOrSizeIgnore(child,checkDeep);
             if (res) {
                 return true;
             }

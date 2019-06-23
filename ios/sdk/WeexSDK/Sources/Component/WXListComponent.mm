@@ -351,12 +351,13 @@
             if (_sections[insertIndex - 1].rows.count > 0) {
                 WXComponent* componentBeforeHeader = _subcomponents[index - 1];
                 
-                reloadSection = _sections[insertIndex - 1];
-                NSArray *rowsToSeparate = reloadSection.rows;
+                NSArray *rowsToSeparate = _sections[insertIndex - 1].rows;
                 NSUInteger indexOfLastComponentAfterSeparate = [rowsToSeparate indexOfObject:componentBeforeHeader];
-                
-                insertSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(indexOfLastComponentAfterSeparate + 1, rowsToSeparate.count - (indexOfLastComponentAfterSeparate + 1))] mutableCopy];
-                reloadSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(0, indexOfLastComponentAfterSeparate + 1)]  mutableCopy];
+                if (indexOfLastComponentAfterSeparate != NSNotFound && componentBeforeHeader != [rowsToSeparate lastObject]) {
+                    reloadSection = _sections[insertIndex - 1];
+                    insertSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(indexOfLastComponentAfterSeparate + 1, rowsToSeparate.count - (indexOfLastComponentAfterSeparate + 1))] mutableCopy];
+                    reloadSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(0, indexOfLastComponentAfterSeparate + 1)]  mutableCopy];
+                }
             }
             
 //          This is wrong!!!
