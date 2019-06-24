@@ -60,6 +60,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
+import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.bridge.WXBridgeManager;
@@ -78,6 +79,7 @@ import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.IFComponentHolder;
+import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.action.GraphicActionAnimation;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
@@ -1682,11 +1684,28 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       getOrCreateBorder().setImage(shader);
     }
   }
+  public boolean shouldCancelHardwareAccelerate() {
+    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+    boolean cancel_hardware_accelerate = false;
+    if (adapter != null) {
+      cancel_hardware_accelerate = Boolean.parseBoolean(adapter
+              .getConfig("android_weex_test_gpu",
+                      "cancel_hardware_accelerate",
+                      "false"));
+      WXLogUtils.e("cancel_hardware_accelerate : " + cancel_hardware_accelerate);
+    }
+    return cancel_hardware_accelerate;
+  }
 
   public void setOpacity(float opacity) {
     if (opacity >= 0 && opacity <= 1 && mHost.getAlpha() != opacity) {
+      int limit = WXRenderManager.getOpenGLRenderLimitValue();
       if (isLayerTypeEnabled()) {
         mHost.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+      }
+      if(shouldCancelHardwareAccelerate() && (getLayoutHeight() > limit ||
+              getLayoutWidth() > limit)){
+        mHost.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
       }
       mHost.setAlpha(opacity);
     }
