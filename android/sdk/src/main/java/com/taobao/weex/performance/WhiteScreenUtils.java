@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXConfigAdapter;
+import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import org.json.JSONObject;
@@ -58,11 +59,33 @@ public class WhiteScreenUtils {
         if (!(v instanceof ViewGroup)) {
             return false;
         }
-        ViewGroup group = (ViewGroup)v;
-        if (group.getChildCount() == 0) {
-            return true;
+        if (isInWhiteList(instance)){
+            return false;
         }
-        return !hasLeafViewOrSizeIgnore(group,3);
+        return !hasLeafViewOrSizeIgnore(v,3);
+    }
+
+    private static boolean isInWhiteList(WXSDKInstance instance){
+        IWXConfigAdapter configAdapter = WXSDKManager.getInstance().getWxConfigAdapter();
+        if (null == configAdapter){
+            return false;
+        }
+        String whiteList = configAdapter.getConfig("wxapm","ws_white_list",null);
+        if (TextUtils.isEmpty(whiteList)){
+            return false;
+        }
+        try {
+            String[] urlList = whiteList.split(";");
+            for (String whiteUrl : urlList){
+                if (instance.getBundleUrl() != null && instance.getBundleUrl().contains(whiteUrl)){
+                    return true;
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     private static boolean hasLeafViewOrSizeIgnore(View v,int checkDeep) {
