@@ -18,16 +18,19 @@
  */
 package com.taobao.weex.ui;
 
+import android.opengl.EGL14;
+import android.opengl.EGLConfig;
+import android.opengl.EGLContext;
+import android.opengl.EGLDisplay;
+import android.opengl.EGLSurface;
 import android.opengl.GLES10;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -35,7 +38,6 @@ import com.taobao.weex.dom.RenderContext;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.GraphicActionBatchAction;
-import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -47,11 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLContext;
-import javax.microedition.khronos.egl.EGLDisplay;
-import javax.microedition.khronos.egl.EGLSurface;
 
 /**
  * Manager class for render operation, mainly for managing {@link RenderContextImpl}.
@@ -96,42 +93,46 @@ public class WXRenderManager {
 
     public static int getOpenGLRenderLimitValue() {
       if(mOpenGLRenderLimitValue == 0){
-          int maxsize;
+          int maxsize = 0;
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-              EGL10 egl = (EGL10) EGLContext.getEGL();
-              EGLDisplay dpy = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
-              int[] vers = new int[2];
-              egl.eglInitialize(dpy, vers);
-              int[] configAttr = {
-                      EGL10.EGL_COLOR_BUFFER_TYPE, EGL10.EGL_RGB_BUFFER,
-                      EGL10.EGL_LEVEL, 0,
-                      EGL10.EGL_SURFACE_TYPE, EGL10.EGL_PBUFFER_BIT,
-                      EGL10.EGL_NONE};
-              EGLConfig[] configs = new EGLConfig[1];
-              int[] numConfig = new int[1];
-              egl.eglChooseConfig(dpy, configAttr, configs, 1, numConfig);
-              if (numConfig[0] == 0) {// TROUBLE! No config found.
+              try {
+                  EGLDisplay dpy = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);
+                  int[] vers = new int[2];
+                  EGL14.eglInitialize(dpy, vers, 0, vers, 1);
+                  int[] configAttr = {
+                          EGL14.EGL_BUFFER_SIZE, 32,
+                          EGL14.EGL_ALPHA_SIZE, 8,
+                          EGL14.EGL_BLUE_SIZE, 8,
+                          EGL14.EGL_GREEN_SIZE, 8,
+                          EGL14.EGL_RED_SIZE, 8,
+                          EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
+                          EGL14.EGL_SURFACE_TYPE, EGL14.EGL_WINDOW_BIT,
+                          EGL14.EGL_NONE};
+                  EGLConfig[] configs = new EGLConfig[1];
+                  int[] numConfig = new int[1];
+                  EGL14.eglChooseConfig(dpy, configAttr, 0, configs, 0, configs.length, numConfig, 0);
+                  EGLConfig config = configs[0];
+                  int[] surfAttr = {
+                          EGL14.EGL_WIDTH, 64,
+                          EGL14.EGL_HEIGHT, 64,
+                          EGL14.EGL_NONE};
+                  EGLSurface surf = EGL14.eglCreatePbufferSurface(dpy, config, surfAttr, 0);
+                  int[] ctxAttrib = {
+                          EGL14.EGL_CONTEXT_CLIENT_VERSION, 1,
+                          EGL14.EGL_NONE};
+                  EGLContext ctx = EGL14.eglCreateContext(dpy, config, EGL14.EGL_NO_CONTEXT, ctxAttrib, 0);
+                  EGL14.eglMakeCurrent(dpy, surf, surf, ctx);
+                  int[] maxSize = new int[1];
+                  GLES10.glGetIntegerv(GLES10.GL_MAX_TEXTURE_SIZE, maxSize, 0);
+                  EGL14.eglMakeCurrent(dpy, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
+                          EGL14.EGL_NO_CONTEXT);
+                  EGL14.eglDestroySurface(dpy, surf);
+                  EGL14.eglDestroyContext(dpy, ctx);
+                  EGL14.eglTerminate(dpy);
+                  maxsize = maxSize[0];
+              } catch(Exception e){
+                  e.printStackTrace();
               }
-              EGLConfig config = configs[0];
-              int[] surfAttr = {
-                      EGL10.EGL_WIDTH, 64,
-                      EGL10.EGL_HEIGHT, 64,
-                      EGL10.EGL_NONE};
-              EGLSurface surf = egl.eglCreatePbufferSurface(dpy, config, surfAttr);
-              final int EGL_CONTEXT_CLIENT_VERSION = 0x3098;// missing in EGL10
-              int[] ctxAttrib = {
-                      EGL_CONTEXT_CLIENT_VERSION, 1,
-                      EGL10.EGL_NONE};
-              EGLContext ctx = egl.eglCreateContext(dpy, config, EGL10.EGL_NO_CONTEXT, ctxAttrib);
-              egl.eglMakeCurrent(dpy, surf, surf, ctx);
-              int[] maxSize = new int[1];
-              GLES10.glGetIntegerv(GLES10.GL_MAX_TEXTURE_SIZE, maxSize, 0);
-              egl.eglMakeCurrent(dpy, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE,
-                      EGL10.EGL_NO_CONTEXT);
-              egl.eglDestroySurface(dpy, surf);
-              egl.eglDestroyContext(dpy, ctx);
-              egl.eglTerminate(dpy);
-              maxsize = maxSize[0];
           } else {
               int[] maxSize = new int[1];
               GLES10.glGetIntegerv(GLES10.GL_MAX_TEXTURE_SIZE, maxSize, 0);

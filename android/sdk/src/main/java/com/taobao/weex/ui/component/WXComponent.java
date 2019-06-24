@@ -1684,15 +1684,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       getOrCreateBorder().setImage(shader);
     }
   }
-  public boolean shouldCancelHardwareAccelerate() {
+  private boolean shouldCancelHardwareAccelerate() {
     IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
     boolean cancel_hardware_accelerate = false;
     if (adapter != null) {
-      cancel_hardware_accelerate = Boolean.parseBoolean(adapter
-              .getConfig("android_weex_test_gpu",
-                      "cancel_hardware_accelerate",
-                      "false"));
-      WXLogUtils.e("cancel_hardware_accelerate : " + cancel_hardware_accelerate);
+      try {
+        cancel_hardware_accelerate = Boolean.parseBoolean(adapter
+                .getConfig("android_weex_test_gpu",
+                        "cancel_hardware_accelerate",
+                        "false"));
+      }catch (Exception e){
+        e.printStackTrace();
+      }
+      WXLogUtils.i("cancel_hardware_accelerate : " + cancel_hardware_accelerate);
     }
     return cancel_hardware_accelerate;
   }
@@ -1703,7 +1707,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       if (isLayerTypeEnabled()) {
         mHost.setLayerType(View.LAYER_TYPE_HARDWARE, null);
       }
-      if(shouldCancelHardwareAccelerate() && (getLayoutHeight() > limit ||
+      if(shouldCancelHardwareAccelerate() && limit > 0 && (getLayoutHeight() > limit ||
               getLayoutWidth() > limit)){
         mHost.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
       }
