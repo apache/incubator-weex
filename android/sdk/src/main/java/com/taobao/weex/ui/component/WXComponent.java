@@ -1694,7 +1694,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
                         "cancel_hardware_accelerate",
                         "false"));
       }catch (Exception e){
-        e.printStackTrace();
+        WXLogUtils.e(WXLogUtils.getStackTrace(e));
       }
       WXLogUtils.i("cancel_hardware_accelerate : " + cancel_hardware_accelerate);
     }

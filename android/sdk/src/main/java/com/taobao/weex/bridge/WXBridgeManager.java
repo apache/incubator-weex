@@ -854,7 +854,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 Log.d("jsengine", "callReportCrashReloadPage crashFile:" + crashFile);
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         WXStateRecord.getInstance().onJSCCrash();
         callReportCrash(crashFile, instanceId, url);
@@ -958,7 +958,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_JSC_CRASH, result.toString(), instanceId, url);
                 br.close();
               } catch (Exception e) {
-                e.printStackTrace();
+                WXLogUtils.e(WXLogUtils.getStackTrace(e));
               }
             } else {
               WXLogUtils.e("[WXBridgeManager] callReportCrash crash file is empty");
@@ -1539,7 +1539,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             WXLogUtils.e("end getBundleType type:" + type.toString() + " time:" + (end - start));
           }
         } catch (Throwable e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
 
         try {
@@ -1569,7 +1569,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             options.put("env", mInitParams.toMap());
           }
         } catch (Throwable e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         instance.bundleType = type;
         if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
@@ -1697,7 +1697,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
       return new WXJSObject(WXJSObject.JSON, obj.toString());
     } catch (Throwable e) {
-      e.printStackTrace();
+      WXLogUtils.e(WXLogUtils.getStackTrace(e));
     }
     return opt;
 
@@ -1751,7 +1751,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
       return BundType.Others;
     } catch (Throwable e) {
-      e.printStackTrace();
+      WXLogUtils.e(WXLogUtils.getStackTrace(e));
       return BundType.Others;
     }
   }
@@ -2033,7 +2033,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               adapter.commit(WXEnvironment.getApplication(),"sJSFMStartListener",IWXUserTrackAdapter.COUNTER,null,params);
             }
           }catch (Exception e){
-            e.printStackTrace();
+            WXLogUtils.e(WXLogUtils.getStackTrace(e));
           }
         }
 
@@ -2042,7 +2042,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         try {
           crashFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
         } catch (Exception e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         boolean pieSupport = true;
         try {
@@ -2050,7 +2050,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             pieSupport = false;
           }
         } catch (Exception e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         sInitFrameWorkMsg.append(" | pieSupport:").append(pieSupport);
         WXLogUtils.d("[WXBridgeManager] initFrameworkEnv crashFile:" + crashFile + " pieSupport:" + pieSupport);
@@ -2446,7 +2446,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             return;
           }
         } catch (Exception e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
       }
       if (METHOD_CREATE_INSTANCE.equals(function) && !instance.getApmForInstance().hasAddView){
@@ -2492,17 +2492,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                       exceptionExt = result.toString();
                       br.close();
                     } catch (Exception e) {
-                      e.printStackTrace();
+                      WXLogUtils.e(WXLogUtils.getStackTrace(e));
                     }
                   }
                   file.delete();
                 }
               } catch (Throwable throwable) {
-                throwable.printStackTrace();
+                WXLogUtils.e(WXLogUtils.getStackTrace(throwable));
               }
             }
           } catch (Throwable e) {
-            e.printStackTrace();
+            WXLogUtils.e(WXLogUtils.getStackTrace(e));
           }
           exception += "\n" + exceptionExt;
           WXLogUtils.e("reportJSException:" + exception);
@@ -2962,7 +2962,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                         "sample_rate_of_report",
                         "0"));
       }catch(Exception e){
-        e.printStackTrace();
+        WXLogUtils.e(WXLogUtils.getStackTrace(e));
       }
       WXLogUtils.i("sample_rate_of_report : " + sample_rate_of_report);
       if(Math.random() < sample_rate_of_report){

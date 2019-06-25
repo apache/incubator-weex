@@ -111,6 +111,10 @@ public class WXRenderManager {
                   EGLConfig[] configs = new EGLConfig[1];
                   int[] numConfig = new int[1];
                   EGL14.eglChooseConfig(dpy, configAttr, 0, configs, 0, configs.length, numConfig, 0);
+                  if(numConfig[0] == 0){
+                      //There is something wrong with opengl environment.
+                      mOpenGLRenderLimitValue = -1;
+                  }
                   EGLConfig config = configs[0];
                   int[] surfAttr = {
                           EGL14.EGL_WIDTH, 64,
@@ -131,7 +135,7 @@ public class WXRenderManager {
                   EGL14.eglTerminate(dpy);
                   maxsize = maxSize[0];
               } catch(Exception e){
-                  e.printStackTrace();
+                  WXLogUtils.e(WXLogUtils.getStackTrace(e));
               }
           } else {
               int[] maxSize = new int[1];
