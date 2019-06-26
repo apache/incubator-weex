@@ -637,7 +637,7 @@ _Pragma("clang diagnostic pop") \
     NSURLComponents * urlComponent = [NSURLComponents componentsWithString:instance.pageName?:@""];
     if (@available(iOS 8.0, *)) {
         for (NSURLQueryItem * queryItem in urlComponent.queryItems) {
-            if ([queryItem.name isEqualToString:@"bundleType"] && [@[@"Vue", @"Rax"] containsObject:queryItem.value]) {
+            if ([queryItem.name isEqualToString:@"bundleType"] && [@[@"Vue", @"Rax",@"vue", @"rax"] containsObject:queryItem.value]) {
                 bundleType = queryItem.value;
                 return bundleType;
             }
