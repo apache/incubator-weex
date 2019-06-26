@@ -152,7 +152,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private Map<String,String> mContainerInfo;
 
   public boolean isNewFsEnd = false;
-  private List<Map<String,String>> componentsInfoExceedGPULimit  = new ArrayList<>();
+  private List<JSONObject> componentsInfoExceedGPULimit  = new ArrayList<>();
 
   /**
    * bundle type
@@ -207,9 +207,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * */
   private boolean mAutoAdjustDeviceWidth = WXEnvironment.AUTO_ADJUST_ENV_DEVICE_WIDTH;
 
-  public  List<Map<String,String>> getComponentsExceedGPULimit(){return componentsInfoExceedGPULimit;}
+  public  List<JSONObject> getComponentsExceedGPULimit(){return componentsInfoExceedGPULimit;}
   @RestrictTo(Scope.LIBRARY)
-  public void setComponentsInfoExceedGPULimit(Map<String,String> component){
+  public void setComponentsInfoExceedGPULimit(JSONObject component){
     if(component!= null && !component.isEmpty()){
       componentsInfoExceedGPULimit.add(component);
     }
