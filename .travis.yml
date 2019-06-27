@@ -34,22 +34,26 @@ matrix:
             - extra-google-m2repository
             - extra-android-m2repository
             - sys-img-x86-android-26
-            - echo y | sdkmanager "ndk-bundle"
-            - echo y | sdkmanager "cmake;3.6.4111459"
 cache:
   directories:
     - node_modules
-    - $HOME/.m2
-    - $HOME/.gradle
-before_script:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+install:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
       curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
       nvm install 7.0
       npm install
+      echo y | sdkmanager "ndk-bundle"
+      echo y | sdkmanager "cmake;3.6.4111459"
       export ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle
       export PATH=$PATH:$ANDROID_NDK_HOME
-      echo "ndk.dir=$HOME/android-ndk-r16b" > android/local.properties
+      echo "ndk.dir=$ANDROID_HOME/ndk-bundle" > android/local.properties
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
