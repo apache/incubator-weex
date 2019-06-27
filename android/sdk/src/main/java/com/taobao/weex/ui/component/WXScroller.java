@@ -974,14 +974,14 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     try {
       String offset = getAttrs().getLoadMoreOffset();
       if (TextUtils.isEmpty(offset)) {
-        return;
+        offset = "0";
       }
       int offsetInt = (int)WXViewUtils.getRealPxByWidth(Float.parseFloat(offset), getInstance().getInstanceViewPortWidth());
 
       int contentH = scrollView.getChildAt(0).getHeight();
       int scrollerH = scrollView.getHeight();
       int offScreenY = contentH - y - scrollerH;
-      if (offScreenY < offsetInt) {
+      if (offScreenY <= offsetInt) {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("[WXScroller-onScroll] offScreenY :" + offScreenY);
         }
