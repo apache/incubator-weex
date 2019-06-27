@@ -24,6 +24,7 @@ matrix:
         env: TEST_SUITE=android
         jdk: oraclejdk8
         language: android
+        dist: trusty
         android:
           components:
             - platform-tools
