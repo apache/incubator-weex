@@ -43,7 +43,7 @@ install:
         echo "dir not empty"
       else
         echo "dir empty"
-        rm "${HOME}/android-ndk-r18b"
+        rmdir "${HOME}/android-ndk-r18b"
       fi
 
       if [[ ! -d "${HOME}/android-ndk-r18b" ]]; then
