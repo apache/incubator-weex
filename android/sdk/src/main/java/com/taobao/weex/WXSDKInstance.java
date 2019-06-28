@@ -895,7 +895,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
     WXErrorCode errorCode = WXErrorCode.WX_ERROR_WHITE_SCREEN;
     Map<String,String> args = new HashMap<>(1);
-    String vieTreeMsg = WhiteScreenUtils.getViewMsg(this);
+    String vieTreeMsg = WhiteScreenUtils.takeViewTreeSnapShot(this);
     args.put("viewTree",null == vieTreeMsg?"null viewTreeMsg":vieTreeMsg);
 
     for (Map.Entry<String,String> entry: WXStateRecord.getInstance().getStateInfo().entrySet()){
