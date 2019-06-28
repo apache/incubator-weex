@@ -24,7 +24,7 @@ matrix:
         env: TEST_SUITE=danger 
 cache:
   directories:
-    - node_modules
+    - npm
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
