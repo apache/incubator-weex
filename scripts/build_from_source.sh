@@ -45,41 +45,40 @@ cp dist/weex-rax.min.js pre-build/weex-rax-api.js
 # Build android_sdk
 if [ -d "android_sdk" ]
 then
-    git clone -b 0.23 --depth=1 git@github.com:alibaba/weex_js_engine.git
-    old_path=$PATH
+    git clone -b 0.24 --depth=1 git@github.com:alibaba/weex_js_engine.git
     export ANDROID_NDK=$1
     export PATH=$1:$PATH
     cd weex_js_engine/
 
     sh build.jsc.sh
-    cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/armeabi
     cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/armeabi-v7a
-
-    mkdir -p ../weex_core/Source/libs/armeabi
-    cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/armeabi
     mkdir -p ../weex_core/Source/libs/armeabi-v7a
     cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/armeabi-v7a
 
     rm -rf build32
+    sh build.jsc.sh -t arm64
+    cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/arm64-v8a
+    mkdir -p ../weex_core/Source/libs/arm64-v8a
+    cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/arm64-v8a
+
+    rm -rf build64
     sh build.jsc.sh -t x86
     cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/x86
     mkdir -p ../weex_core/Source/libs/x86
     cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/x86
 
-    PATH=$old_path
-    export ANDROID_NDK=$2
     cd ..
 
-    gradle wrapper --gradle-version 4.4
+    gradle wrapper --gradle-version 4.10.1
     echo 'include ":android_sdk"'>settings.gradle
-    echo "ndk.dir=$2">local.properties
+    echo "ndk.dir=$1">local.properties
 
     ./gradlew :android_sdk:clean :android_sdk:assembleRelease -PignoreVersionCheck="true" 
 
-    cp android_sdk/.externalNativeBuild/cmake/release/armeabi/Source/android/jsengine/libweexjsb.so android_sdk/libs/armeabi
-    cp android_sdk/.externalNativeBuild/cmake/release/armeabi/Source/android/jsengine/libweexjst.so android_sdk/libs/armeabi
     cp android_sdk/.externalNativeBuild/cmake/release/armeabi-v7a/Source/android/jsengine/libweexjsb.so android_sdk/libs/armeabi-v7a
     cp android_sdk/.externalNativeBuild/cmake/release/armeabi-v7a/Source/android/jsengine/libweexjst.so android_sdk/libs/armeabi-v7a
+    cp android_sdk/.externalNativeBuild/cmake/release/arm64-v8a/Source/android/jsengine/libweexjsb.so android_sdk/libs/armeabi
+    cp android_sdk/.externalNativeBuild/cmake/release/arm64-v8a/Source/android/jsengine/libweexjst.so android_sdk/libs/armeabi
     cp android_sdk/.externalNativeBuild/cmake/release/x86/Source/android/jsengine/libweexjsb.so android_sdk/libs/x86
     cp android_sdk/.externalNativeBuild/cmake/release/x86/Source/android/jsengine/libweexjst.so android_sdk/libs/x86
 

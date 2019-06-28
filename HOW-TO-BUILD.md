@@ -16,7 +16,7 @@ The environment required to build weex is:
     * JDK 1.6+
     * Android SDK(`$ANDROID_HOME` must be set properly)
     * Gradle 2.0+
-    * NDK r18 and ndk 13 (**Both of them are needed**)
+    * NDK r18 
     * [Ninja 1.8.2+](https://ninja-build.org/)
     * CMake 3.9.0+
 * iOS SDK:
@@ -30,9 +30,9 @@ This article was tested in MacOSX system.
 # Build All by Script
 
 This script will build Android and iOS SDKs:
-> `$ bash scripts/build_from_source.sh $NDK13_dir $NDK_16dir`
+> `$ bash scripts/build_from_source.sh $NDK18_dir`
 
-The `$NDK13_dir` and `$NDK16_dir` should be the directory of NDK 13 and NDK 16, otherwise the Android build would failed.
+The `$NDK18_dir` and `$NDK16_dir` should be the directory of NDK 18, otherwise the Android build would failed.
 
 This may take a while. After that, you can look in `dist/`, `android/sdk/build/output/` and `ios/sdk/Products` for Web/Android/iOS SDK artifacts.
 
