@@ -42,7 +42,7 @@ install:
       unzip android-ndk-r18b-linux_x86_64.zip -d $HOME
       export ANDROID_NDK_HOME=$HOME/android-ndk-r18b
       export PATH=$PATH:$ANDROID_NDK_HOME
-      echo "ndk.dir=$ANDROID_HOME/ndk-r18b" > android/local.properties
+      echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
