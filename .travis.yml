@@ -39,6 +39,13 @@ install:
       nvm install 7.0
       npm install
       echo y | sdkmanager "cmake;3.6.4111459"
+      if find "${HOME}/android-ndk-r18b" -mindepth 1 | read; then
+        echo "dir not empty"
+      else
+        echo "dir empty"
+        rm "${HOME}/android-ndk-r18b"
+      fi
+
       if [[ ! -d "${HOME}/android-ndk-r18b" ]]; then
         wget https://dl.google.com/android/repository/android-ndk-r18b-linux-x86_64.zip
         unzip android-ndk-r18b-linux-x86_64.zip -d $HOME
