@@ -1,24 +1,8 @@
-os:
-  - osx
-  - linux
 language: node_js
 node_js: 7.6
 rvm: 2.0.0
-env:
-  - TEST_SUITE=danger
-  - TEST_SUITE=jsfm
-  - TEST_SUITE=android
 matrix:
     fast_finish: true
-    exclude:
-      - os: osx
-        env: TEST_SUITE=danger
-      - os: osx
-        env: TEST_SUITE=jsfm
-      - os: osx
-        env: TEST_SUITE=android
-      - os: linux
-        env: TEST_SUITE=android
     include:
       - os: linux
         env: TEST_SUITE=android
@@ -34,6 +18,10 @@ matrix:
             - extra-google-m2repository
             - extra-android-m2repository
             - sys-img-x86-android-26
+      - os: linux
+        env: TEST_SUITE=jsfm
+      - os: osx
+        env: TEST_SUITE=danger 
 cache:
   directories:
     - node_modules
