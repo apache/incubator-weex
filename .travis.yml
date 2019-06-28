@@ -37,11 +37,12 @@ install:
       curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
       nvm install 7.0
       npm install
-      echo y | sdkmanager "ndk-bundle"
       echo y | sdkmanager "cmake;3.6.4111459"
-      export ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle
+      wget https://dl.google.com/android/repository/android-ndk-r18b-linux_x86_64.zip
+      unzip android-ndk-r18b-linux_x86_64.zip -d $HOME
+      export ANDROID_NDK_HOME=$HOME/android-ndk-r18b
       export PATH=$PATH:$ANDROID_NDK_HOME
-      echo "ndk.dir=$ANDROID_HOME/ndk-bundle" > android/local.properties
+      echo "ndk.dir=$ANDROID_HOME/ndk-r18b" > android/local.properties
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
