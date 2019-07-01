@@ -970,6 +970,18 @@ std::unique_ptr<IPCResult> UpdateComponentData(IPCArguments *arguments) {
     return createInt32Result(static_cast<int32_t>(true));
 }
 
+
+    std::unique_ptr<IPCResult> Tlog(IPCArguments *arguments) {
+      auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+      auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+      WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+              weex::base::MakeCopyable(
+                      [tag = std::move(arg1), log = std::move(arg2)]() {
+                          LOGE_TAG(tag.get(),"%s",log.get());
+                      }));
+      return createInt32Result(static_cast<int32_t>(true));
+    }
+
 ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   set_script_side(new bridge::script::ScriptSideInMultiProcess);
   set_core_side(new CoreSideInScript);
@@ -1063,6 +1075,8 @@ void ScriptBridgeInMultiProcess::RegisterIPCCallback(IPCHandler *handler) {
                            OnReceivedResult);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::UPDATECOMPONENTDATA),
                            UpdateComponentData);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::TLOGMSG),
+                           Tlog);
 }
 
 }  // namespace WeexCore
