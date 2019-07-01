@@ -318,6 +318,7 @@ public class WXInstanceApm {
         addProperty(KEY_PAGE_PROPERTIES_WEEX_VERSION, WXEnvironment.WXSDK_VERSION);
         addProperty(KEY_PAGE_PROPERTIES_UIKIT_TYPE, instance.getRenderType());
 
+        addProperty("wxUseRuntimeApi",WXEnvironment.sUseRunTimeApi);
         if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
             addProperty(KEY_PAGE_PROPERTIES_RENDER_TYPE, WXEnvironment.EAGLE);

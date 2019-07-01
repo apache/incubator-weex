@@ -100,4 +100,12 @@ namespace WeexCore {
       it->second = value;
     }
   }
+
+  void WXCoreEnvironment::setUseRunTimeApi(bool useRuntimeApi) {
+    this->mUseRuntimeApi = useRuntimeApi;
+  }
+
+  bool WXCoreEnvironment::isUseRunTimeApi(){
+    return mUseRuntimeApi;
+  }
 }

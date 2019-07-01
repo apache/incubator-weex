@@ -16,7 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#ifdef USE_JS_RUNTIME
+#include "js_runtime/weex/object/args.h"
+#else
 #include "android/jsengine/object/args.h"
+#endif
 
 namespace WeexCore{
 

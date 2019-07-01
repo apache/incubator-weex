@@ -20,12 +20,15 @@
 // Created by jianbai.gbj on 15/05/2018.
 //
 
+#ifdef USE_JS_RUNTIME
+#include "js_runtime/weex/object/args.h"
+#else
+
 #ifndef ARGS_H
 #define ARGS_H
 
 #include <string>
 #include <wtf/text/WTFString.h>
-
 #include "wson/wson.h"
 
 /**
@@ -87,3 +90,4 @@ namespace WeexCore {
 };
 
 #endif
+#endif //USE_JS_RUNTIME

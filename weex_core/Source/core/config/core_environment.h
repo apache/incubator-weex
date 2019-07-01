@@ -56,6 +56,8 @@ namespace WeexCore {
 
     bool mInteractionLogSwitch;
 
+    bool mUseRuntimeApi;
+
   public:
 
     bool SetPlatform(std::string platformName);
@@ -91,6 +93,10 @@ namespace WeexCore {
     const std::string GetOption(const std::string &key);
 
     const std::map<std::string, std::string> &options();
+
+    bool isUseRunTimeApi();
+
+    void setUseRunTimeApi(bool useRuntimeApi);
 
     void AddOption(std::string key, std::string value);
     void PutOption(std::string key, std::string value);

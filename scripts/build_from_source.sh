@@ -74,7 +74,7 @@ then
     echo 'include ":android_sdk"'>settings.gradle
     echo "ndk.dir=$2">local.properties
 
-    ./gradlew :android_sdk:clean :android_sdk:assembleRelease -PignoreVersionCheck="true" 
+    ./gradlew :android_sdk:clean :android_sdk:assembleRelease -PignoreVersionCheck="true" -PbuildRuntimeApi=true
 
     cp android_sdk/.externalNativeBuild/cmake/release/armeabi/Source/android/jsengine/libweexjsb.so android_sdk/libs/armeabi
     cp android_sdk/.externalNativeBuild/cmake/release/armeabi/Source/android/jsengine/libweexjst.so android_sdk/libs/armeabi

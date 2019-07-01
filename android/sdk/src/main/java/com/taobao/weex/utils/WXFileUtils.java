@@ -24,6 +24,7 @@ import android.util.Base64;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -263,6 +264,35 @@ public class WXFileUtils {
           e1.printStackTrace();
         }
       }
+    }
+  }
+
+  public static void copyFileWithException(File oldFile,File newFile ) throws Exception{
+    FileInputStream inputStream = null;
+    FileOutputStream outputStream = null;
+    try {
+      inputStream = new FileInputStream(oldFile);
+      byte[] data = new byte[1024];
+      outputStream = new FileOutputStream(newFile);
+      while (inputStream.read(data) != -1) {
+        outputStream.write(data);
+      }
+    }catch (Exception e){
+      throw e;
+    }finally {
+      closeIo(inputStream);
+      closeIo(outputStream);
+    }
+  }
+
+  public static void closeIo(Closeable c){
+    if (null == c){
+      return;
+    }
+    try {
+      c.close();
+    }catch (Throwable e){
+      e.printStackTrace();
     }
   }
 

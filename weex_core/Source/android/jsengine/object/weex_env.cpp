@@ -53,6 +53,7 @@ void WeexEnv::initJSC(bool isMultiProgress) {
           // return false;
       }
 
+#ifndef USE_JS_RUNTIME
       Options::enableRestrictedOptions(true);
 // Initialize JSC before getting VM.
       WTF::initializeMainThread();
@@ -60,6 +61,7 @@ void WeexEnv::initJSC(bool isMultiProgress) {
       JSC::initializeThreading();
 #if ENABLE(WEBASSEMBLY)
       JSC::Wasm::enableFastMemory();
+#endif
 #endif
     });
 }
@@ -85,7 +87,9 @@ void WeexEnv::set_m_cache_task_(volatile bool m_cache_task_) {
   WeexEnv::m_cache_task_ = m_cache_task_;
 }
 WeexEnv::~WeexEnv() {
+#ifndef USE_JS_RUNTIME
   wson::destory();
+#endif
 }
 
 void WeexEnv::sendTLog(const char *tag, const char *log) {
