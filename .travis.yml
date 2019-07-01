@@ -1,14 +1,12 @@
 os: linux
-env: 
-- TEST_SUITE=jsfm
-- TEST_SUITE=danger 
-- TEST_SUITE=android
 language: node_js
 node_js: 7.6
 rvm: 2.0.0
 matrix:
     fast_finish: true
     include:
+      - env: TEST_SUITE=danger 
+      - env: TEST_SUITE=jsfm
       - env: TEST_SUITE=android
         language: android
         dist: trusty
