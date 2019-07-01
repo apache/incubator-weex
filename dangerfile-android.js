@@ -92,7 +92,7 @@ console.log('-----------------------------hasAndroidFile------------------------
 if(hasAndroidFile){
   var runTryBuildCmd='source ~/.bash_profile; '
     +'cd android; '
-    +'./gradlew clean install --ino'
+    +'./gradlew clean install --info'
   var runSuccess = shell.exec(runTryBuildCmd,{ async: false, timeout: 60 * 60 * 1000, maxBuffer: 200 * 1024 * 1024 }).code == 0;
   if(!runSuccess){
     fail("Failed to run assembleDebug task for android.");
