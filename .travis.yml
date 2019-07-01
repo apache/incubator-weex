@@ -1,27 +1,27 @@
+os: linux
+env: 
+- TEST_SUITE=jsfm
+- TEST_SUITE=danger 
+- TEST_SUITE=android
 language: node_js
 node_js: 7.6
 rvm: 2.0.0
 matrix:
     fast_finish: true
     include:
-      - os: linux
-        env: TEST_SUITE=android
-        jdk: oraclejdk8
+      - env: TEST_SUITE=android
         language: android
         dist: trusty
+        jdk: oraclejdk8
         android:
           components:
-            - platform-tools
-            - tools
             - build-tools-26.0.3
             - android-26
+            - platform-tools
+            - tools
             - extra-google-m2repository
             - extra-android-m2repository
             - sys-img-x86-android-26
-      - os: linux
-        env: TEST_SUITE=jsfm
-      - os: osx
-        env: TEST_SUITE=danger 
 cache:
   directories:
     - npm
