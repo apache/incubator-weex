@@ -117,6 +117,8 @@ android {
 
     def android_project_dir = projectDir
 
+    def buildRuntimeApi = project.hasProperty('buildRuntimeApi') ? project.property('buildRuntimeApi') : false;
+
     defaultConfig {
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
@@ -137,7 +139,8 @@ android {
                         '-DANDROID_STL=' + "${cxx_stl}",
                         '-DCMAKE_BUILD_TYPE=Release',
                         '-DANDROID_PROJECT_DIR=' + "${android_project_dir}",
-                        '-DENABLE_ASAN=false'
+                        '-DENABLE_ASAN=false',
+                        '-DBUILD_RUNTIME_API='+"${buildRuntimeApi}"
             }
         }
     }

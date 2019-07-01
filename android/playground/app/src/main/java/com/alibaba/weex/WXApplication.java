@@ -84,8 +84,8 @@ public class WXApplication extends Application {
     if(!TextUtils.isEmpty(BuildConfig.externalLibraryName)){
       builder.addNativeLibrary(BuildConfig.externalLibraryName);
     }
-    WXSDKEngine.initialize(this, builder.build());
     WXSDKManager.getInstance().setWxConfigAdapter(new DefaultConfigAdapter());
+    WXSDKEngine.initialize(this, builder.build());
     WXSDKManager.getInstance().addWXAnalyzer(new WXAnalyzerDemoListener());
     WXAnalyzerDataTransfer.isOpenPerformance = false;
 

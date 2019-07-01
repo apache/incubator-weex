@@ -26,7 +26,10 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
+import android.util.Log;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXConfig;
 
@@ -567,6 +570,25 @@ public class WXUtils {
         return  Integer.parseInt(number);
       }
     }catch (Exception e){return  defaultValue;}
+  }
+
+  public static boolean checkGreyConfig(String group,String key,String defaultValue){
+      Log.e("test->", "enter checkGreyConfig");
+      IWXConfigAdapter configAdapter = WXSDKManager.getInstance().getWxConfigAdapter();
+      if (null == configAdapter) {
+        Log.e("test->", "checkGreyConfig: configAdapter return false");
+        return false;
+      }
+      double randomValue = Math.random() * 100;
+      double max = 100;
+      try {
+        String configValue = configAdapter.getConfig(group, key, defaultValue);
+        max = Double.valueOf(configValue);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      Log.e("test->", "checkGreyConfig: "+ randomValue +", max:"+max);
+      return randomValue < max;
   }
 
   private static final long sInterval = System.currentTimeMillis() - SystemClock.uptimeMillis();

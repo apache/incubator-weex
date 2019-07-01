@@ -88,6 +88,7 @@ set(COMMON_SRCS
   ./core/bridge/platform/core_side_in_platform.cpp
   ./core/bridge/script/core_side_in_script.cpp
   ./core/parser/dom_wson.cpp
+  ./core/parser/action_args_check.cpp
 
    ./core/network/http_module.cc
         )
@@ -106,7 +107,20 @@ if(ANDROID)
   add_definitions(-DOS_ANDROID=1)
   ## add_subdirectory for subdirectory has a CMakeLists.txt
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/IPC)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/android/jsengine)
+
+
+  message("check build jsc BUILD_RUNTIME_API flag: ${BUILD_RUNTIME_API}")
+  if ("${BUILD_RUNTIME_API}" STREQUAL "true")
+      add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/js_runtime)
+      message("cmake build jsApi for runtime")
+  else()
+      add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/android/jsengine)
+      message("cmake build jsApi for jsc")
+  endif()
+
+
+
+
   ## include_directories for include head file
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/IPC)
 

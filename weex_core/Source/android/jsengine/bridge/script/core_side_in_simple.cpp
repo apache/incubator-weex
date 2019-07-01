@@ -27,6 +27,8 @@
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #include "third_party/IPC/IPCResult.h"
+#include "core/config/core_environment.h"
+#include "core/parser/action_args_check.h"
 
 namespace weex {
 namespace bridge {
@@ -38,6 +40,19 @@ CoreSideInSimple::~CoreSideInSimple() {}
 void CoreSideInSimple::CallNative(const char *page_id, const char *task,
                                   const char *callback) {
   if (page_id == nullptr || task == nullptr) return;
+
+  if (WXCoreEnvironment::getInstance()->isUseRunTimeApi()){
+    if (isCallNativeToFinish(task)){
+      RenderManager::GetInstance()->CreateFinish(page_id);
+    } else {
+      WeexCoreManager::Instance()
+              ->getPlatformBridge()
+              ->platform_side()
+              ->CallNative(page_id, task, callback);
+    }
+    return;
+  }
+
   if (strcmp(
           task,
           "[{\"module\":\"dom\",\"method\":\"createFinish\",\"args\":[]}]") ==

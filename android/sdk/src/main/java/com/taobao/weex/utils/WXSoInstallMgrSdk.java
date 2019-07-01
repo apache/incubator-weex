@@ -19,13 +19,18 @@
 package com.taobao.weex.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.taobao.weex.IWXStatisticsListener;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
@@ -33,6 +38,7 @@ import dalvik.system.PathClassLoader;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -119,6 +125,7 @@ public class WXSoInstallMgrSdk {
 
     // copy startup so
     copyStartUpSo();
+    copyJssRuntimeSo();
 
     boolean InitSuc = false;
 //    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
@@ -301,6 +308,61 @@ public class WXSoInstallMgrSdk {
       }
     } catch (Throwable e) {
       e.printStackTrace();
+    }
+  }
+
+  private static void copyJssRuntimeSo(){
+    Log.e("test->", "enter copyJssRuntimeSo: ");
+    boolean tryUseRunTimeApi = WXUtils.checkGreyConfig("wxapm","use_runtime_api","100");
+    Log.e("test->", "tryUseRunTimeApi ? "+ tryUseRunTimeApi);
+    if (!tryUseRunTimeApi){
+      return;
+    }
+    try {
+      Log.e("test->", "copyJssRuntimeSo: ");
+      Context c = WXEnvironment.getApplication();
+      String pkgName = c.getPackageName();
+      String toPath = "/data/data/" + pkgName + "/weex";
+      String cachePath = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
+      if (cachePath != null && cachePath.indexOf("/cache") > 0) {
+        toPath = cachePath.replace("/cache", "/weex/libs");
+      }
+      File dir = new File(toPath);
+      if (!dir.exists()){
+        dir.mkdirs();
+      }
+      File targetFile = new File(toPath,"libweexjss.so");
+
+      /** 1. check so and versionCode. if update, then rm old jss.so(runtime) in pkg/libs, and copy new so from apk **/
+      String keyVersionCode = "app_version_code_weex";
+      SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+      PackageInfo info = c.getPackageManager().getPackageInfo(c.getPackageName(), 0);
+      if (targetFile.exists()){
+        if (prefs.getInt(keyVersionCode,-1) < info.versionCode){
+          targetFile.delete();
+        }else {
+          WXEnvironment.CORE_JSS_RUNTIME_SO_PATH= targetFile.getAbsolutePath();
+          WXEnvironment.sUseRunTimeApi = true;
+          Log.e("test->", "copyJssRuntimeSo:  return");
+          return;
+        }
+      }
+      /** 2. copy jss(runtime) so **/
+      String fromPath =  ((PathClassLoader) (WXSoInstallMgrSdk.class.getClassLoader())).findLibrary("weexjssr");
+      if (TextUtils.isEmpty(fromPath)){
+        return;
+      }
+      targetFile.createNewFile();
+      WXFileUtils.copyFileWithException(new File(fromPath),targetFile);
+      /**3. update flag **/
+      WXEnvironment.CORE_JSS_RUNTIME_SO_PATH= targetFile.getAbsolutePath();
+      prefs.edit().putInt(keyVersionCode,info.versionCode).apply();
+      WXEnvironment.sUseRunTimeApi = true;
+      Log.e("test->", "copyJssRuntimeSo:  return 2");
+    }catch (Throwable e){
+      e.printStackTrace();
+      WXEnvironment.sUseRunTimeApi = false;
+      Log.e("test->", "copyJssRuntimeSo:  exception" + e);
     }
   }
 

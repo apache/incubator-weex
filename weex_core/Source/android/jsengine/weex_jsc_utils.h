@@ -20,6 +20,10 @@
 // Created by Darin on 11/02/2018.
 //
 
+#ifdef USE_JS_RUNTIME
+#include "js_runtime/weex/utils/weex_jsc_utils.h"
+#else
+
 #ifndef WEEXV8_UTILS_H
 #define WEEXV8_UTILS_H
 
@@ -343,3 +347,4 @@ namespace WEEXICU {
 }
 
 #endif //WEEXV8_UTILS_H
+#endif //USE_JS_RUNTIME

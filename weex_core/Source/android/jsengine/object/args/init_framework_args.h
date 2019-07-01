@@ -25,7 +25,9 @@
 
 #include <vector>
 #include "include/WeexApiHeader.h"
+#ifndef USE_JS_RUNTIME
 #include "include/wtf/text/WTFString.h"
+#endif
 #include "third_party/IPC/IPCArguments.h"
 
 class InitFrameworkArgs {
