@@ -95,6 +95,7 @@ import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -152,6 +153,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private Map<String,String> mContainerInfo;
 
   public boolean isNewFsEnd = false;
+  private List<JSONObject> componentsInfoExceedGPULimit  = new LinkedList<>();
 
   /**
    * bundle type
@@ -206,6 +208,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * */
   private boolean mAutoAdjustDeviceWidth = WXEnvironment.AUTO_ADJUST_ENV_DEVICE_WIDTH;
 
+  public  List<JSONObject> getComponentsExceedGPULimit(){return componentsInfoExceedGPULimit;}
+  @RestrictTo(Scope.LIBRARY)
+  public void setComponentsInfoExceedGPULimit(JSONObject component){
+    if(component!= null && !component.isEmpty()){
+      componentsInfoExceedGPULimit.add(component);
+    }
+  }
 
   public List<String> getLayerOverFlowListeners() {
     return mLayerOverFlowListeners;
@@ -827,7 +836,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mWXPerformance.JSTemplateSize = template.length() / 1024f;
     mApmForInstance.addStats(WXInstanceApm.KEY_PAGE_STATS_BUNDLE_SIZE,mWXPerformance.JSTemplateSize);
     mRenderStartTime = System.currentTimeMillis();
-    WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);;
+    WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);
     if(mAutoAdjustDeviceWidth && WXDeviceUtils.isAutoResize(mContext)){
          if(WXEnvironment.AUTO_UPDATE_APPLICATION_SCREEN_SIZE) {
              WXViewUtils.updateApplicationScreen(mContext);
