@@ -1,29 +1,14 @@
-os:
-  - osx
-  - linux
 language: node_js
 node_js: 7.6
 rvm: 2.0.0
-env:
-  - TEST_SUITE=danger
-  - TEST_SUITE=jsfm
-  - TEST_SUITE=android
 matrix:
     fast_finish: true
-    exclude:
-      - os: osx
-        env: TEST_SUITE=danger
-      - os: osx
-        env: TEST_SUITE=jsfm
-      - os: osx
-        env: TEST_SUITE=android
-      - os: linux
-        env: TEST_SUITE=android
     include:
       - os: linux
         env: TEST_SUITE=android
         jdk: oraclejdk8
         language: android
+        dist: trusty
         android:
           components:
             - platform-tools
@@ -32,18 +17,42 @@ matrix:
             - android-26
             - extra-google-m2repository
             - extra-android-m2repository
-            - sys-img-armeabi-v7a-android-22
+            - sys-img-x86-android-26
+      - os: linux
+        env: TEST_SUITE=jsfm
+      - os: osx
+        env: TEST_SUITE=danger 
 cache:
   directories:
-  - node_modules
-  - $HOME/.m2
-  - $HOME/.gradle
-before_script:
+    - npm
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+    - $HOME/android-ndk-r18b
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+install:
   - |
     if [[ $TEST_SUITE = "android" ]]; then
       curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
       nvm install 7.0
       npm install
+      echo y | sdkmanager "cmake;3.6.4111459"
+      if find "${HOME}/android-ndk-r18b" -mindepth 1 | read; then
+        echo "dir not empty"
+      else
+        echo "dir empty"
+        rmdir "${HOME}/android-ndk-r18b"
+      fi
+
+      if [[ ! -d "${HOME}/android-ndk-r18b" ]]; then
+        wget https://dl.google.com/android/repository/android-ndk-r18b-linux-x86_64.zip
+        unzip android-ndk-r18b-linux-x86_64.zip -d $HOME
+      fi
+      export ANDROID_NDK_HOME=$HOME/android-ndk-r18b
+      export PATH=$PATH:$ANDROID_NDK_HOME
+      echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
     fi
   - |
     if [[ $TEST_SUITE = "jsfm" ]]; then
