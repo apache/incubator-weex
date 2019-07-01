@@ -1707,9 +1707,9 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       if (isLayerTypeEnabled()) {
         mHost.setLayerType(View.LAYER_TYPE_HARDWARE, null);
       }
-      if(shouldCancelHardwareAccelerate() && limit > 0 && (getLayoutHeight() > limit ||
+      if(isLayerTypeEnabled() && shouldCancelHardwareAccelerate() && limit > 0 && (getLayoutHeight() > limit ||
               getLayoutWidth() > limit)){
-        mHost.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
+        mHost.setLayerType(View.LAYER_TYPE_NONE,null);
       }
       mHost.setAlpha(opacity);
     }

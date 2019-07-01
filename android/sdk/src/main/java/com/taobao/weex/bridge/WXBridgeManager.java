@@ -3001,9 +3001,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (component.getBorder() != null) {
         ext.put("component.border", component.getBorder().toString());
       }
-      Map<String,Object> map = new JSONObject();
+      JSONObject map = new JSONObject();
       map.putAll(ext);
-      WXSDKManager.getInstance().getSDKInstance(instanceId).setComponentsInfoExceedGPULimit((JSONObject)map);
+      WXSDKManager.getInstance().getSDKInstance(instanceId).setComponentsInfoExceedGPULimit(map);
       if(shouldReportGPULimit()) {
         WXExceptionUtils.commitCriticalExceptionRT(instanceId
                 , WXErrorCode.WX_RENDER_WAR_GPU_LIMIT_LAYOUT,
