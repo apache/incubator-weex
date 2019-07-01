@@ -134,6 +134,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private boolean isDestroy=false;
   private boolean hasException = false;
   private boolean isRenderSuccess = false;
+  private boolean createInstanceHeartBeat = false;
   private Map<String,Serializable> mUserTrackParams;
   private NativeInvokeHelper mNativeInvokeHelper;
   private boolean isCommit=false;
@@ -516,6 +517,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void setHasException(boolean hasException) {
     this.hasException = hasException;
   }
+
+  public void createInstanceFuncHeartBeat() {
+    WXLogUtils.d("createInstanceFuncHeartBeat: " + mInstanceId);
+    this.createInstanceHeartBeat = true;
+  }
+
   public void addOnInstanceVisibleListener(OnInstanceVisibleListener l){
     mVisibleListeners.add(l);
   }
@@ -875,7 +882,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
               if(wxJscProcessManager.withException(WXSDKInstance.this)) {
                 onJSException(String.valueOf(WX_ERR_RELOAD_PAGE),"jsc reboot","jsc reboot");
               }
-              WXBridgeManager.getInstance().callReportCrashReloadPage(mInstanceId, null);
+              if(!createInstanceHeartBeat) {
+                  WXBridgeManager.getInstance().callReportCrashReloadPage(mInstanceId, null);
+                  WXLogUtils.e("callReportCrashReloadPage with jsc reboot");
+              }
             }
           }
         }
@@ -1087,7 +1097,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
                         "true"));
         WXLogUtils.e("degrade : " + degrade);
         if(degrade) {
-          onJSException(String.valueOf(WX_ERR_JSC_CRASH.getErrorCode()),"jsc Crashed", "jsc Crashed degradeToH5");
+          onJSException(String.valueOf(WX_ERR_RELOAD_PAGE.getErrorCode()),"Do not reloadPage", "Do not reloadPage degradeToH5");
+          WXLogUtils.e("Do not reloadPage degradeToH5");
         }
       }
     }

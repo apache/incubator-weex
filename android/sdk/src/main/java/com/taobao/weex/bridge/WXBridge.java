@@ -213,6 +213,15 @@ public class WXBridge implements IWXBridge {
    */
   @CalledByNative
   public int callNative(String instanceId, byte[] tasks, String callback) {
+    if("HeartBeat".equals(callback)) {
+      Log.e("HeartBeat instanceId", instanceId);
+      WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if(sdkInstance != null) {
+        sdkInstance.createInstanceFuncHeartBeat();
+      }
+      return IWXBridge.INSTANCE_RENDERING;
+    }
+
     return callNative(instanceId, (JSONArray) JSON.parseArray(new String(tasks)), callback);
   }
 
