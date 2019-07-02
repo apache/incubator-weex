@@ -8,7 +8,6 @@ buildscript {
         jcenter(){
             url 'https://maven.aliyun.com/repository/jcenter'
         }
-        google()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.3.2'
@@ -34,7 +33,6 @@ subprojects {
         jcenter(){
             url 'https://maven.aliyun.com/repository/jcenter'
         }
-        google()
     }
     buildscript {
         dependencies {
