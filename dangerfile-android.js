@@ -86,4 +86,4 @@ if (!hasAndroidFile && danger.git.deleted_files) {
 }
 
 console.log(hasAndroidFile)
-
+console.error("Test")
