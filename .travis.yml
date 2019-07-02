@@ -86,6 +86,7 @@ script:
         esac
 
         hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-android.js)
+        hasAndroidFile=true
         echo "Node returned ${hasAndroidFile}"
         if [[ "$hasAndroidFile" = "true" ]]; then
           cd android
