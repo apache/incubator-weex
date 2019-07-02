@@ -112,7 +112,7 @@ android {
     if (ndkversion < 16) {
         api_level = "android-14";
     } else {
-        api_level = "android-21";
+        api_level = "android-16";
     }
 
     def android_project_dir = projectDir
