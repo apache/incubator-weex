@@ -1,6 +1,7 @@
 os: linux
 language: node_js
 node_js: 7.6
+rvm: 2.0.0
 matrix:
     fast_finish: true
     include:
@@ -44,8 +45,8 @@ install:
   - |
     case $TEST_SUITE in
       "android") 
-        curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
-        nvm install 7.0
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+        nvm install 7.6
         npm install
         echo y | sdkmanager "cmake;3.6.4111459"
         if find "${HOME}/android-ndk-r18b" -mindepth 1 | read; then
