@@ -146,43 +146,12 @@
 
 - (void)render
 {
-    static BOOL useXRenderSelected = YES; // 对首页默认使用native渲染
-    static BOOL useXRenderValue = YES;
-//    if (!useXRenderSelected) {
-//        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@""
-//                                                                       message:@"Use native or Heron"
-//                                                                preferredStyle:UIAlertControllerStyleAlert];
-//
-//        UIAlertAction* nativeAction = [UIAlertAction actionWithTitle:@"Native" style:UIAlertActionStyleDefault
-//                                                             handler:^(UIAlertAction * action) {
-//                                                                 useXRenderValue = NO;
-//                                                                 useXRenderSelected = YES;
-//                                                                 [self render];
-//                                                             }];
-//        UIAlertAction* XAction = [UIAlertAction actionWithTitle:@"Heron" style:UIAlertActionStyleDefault
-//                                                        handler:^(UIAlertAction * action) {
-//                                                            useXRenderValue = YES;
-//                                                            useXRenderSelected = YES;
-//                                                            [self render];
-//                                                        }];
-//
-//        [alert addAction:nativeAction];
-//        [alert addAction:XAction];
-//        [self presentViewController:alert animated:YES completion:^{
-//        }];
-//        return;
-//    }
-//    else {
-//        useXRenderSelected = NO;
-//    }
-    
-    
     CGFloat width = self.view.frame.size.width;
 //    if ([_url.absoluteString isEqualToString:HOME_URL]) {
 //        [self.navigationController setNavigationBarHidden:YES];
 //    }
     [_instance destroyInstance];
-    _instance = useXRenderValue ? [[WXSDKInstance alloc] initWithRenderType:@"heron"] : [[WXSDKInstance alloc] init];
+    _instance = [[WXSDKInstance alloc] init];
     if([WXPrerenderManager isTaskExist:[self.url absoluteString]]){
         _instance = [WXPrerenderManager instanceFromUrl:self.url.absoluteString];
     }
