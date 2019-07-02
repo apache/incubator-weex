@@ -86,7 +86,8 @@ script:
         esac
 
         hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-android.js)
-        if [ $hasAndroidFile = "true" ]; then
+        echo ${hasAndroidFile}
+        if [ "$hasAndroidFile" = "true" ]; then
           cd android
           ./gradlew clean install ${GRADLE_ABI}
         fi
