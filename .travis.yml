@@ -32,47 +32,45 @@ before_cache:
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 install:
   - |
-    if [[ $TEST_SUITE = "android" ]]; then
-      curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
-      nvm install 7.0
-      npm install
-      echo y | sdkmanager "cmake;3.6.4111459"
-      if find "${HOME}/android-ndk-r18b" -mindepth 1 | read; then
-        echo "dir not empty"
-      else
-        echo "dir empty"
-        rmdir "${HOME}/android-ndk-r18b"
-      fi
+    case $TEST_SUITE in
+      "android") 
+        curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+        nvm install 7.0
+        npm install
+        echo y | sdkmanager "cmake;3.6.4111459"
+        if find "${HOME}/android-ndk-r18b" -mindepth 1 | read; then
+          echo "dir not empty"
+        else
+          echo "dir empty"
+          rmdir "${HOME}/android-ndk-r18b"
+        fi
 
-      if [[ ! -d "${HOME}/android-ndk-r18b" ]]; then
-        wget https://dl.google.com/android/repository/android-ndk-r18b-linux-x86_64.zip
-        unzip android-ndk-r18b-linux-x86_64.zip -d $HOME
-      fi
-      export ANDROID_NDK_HOME=$HOME/android-ndk-r18b
-      export PATH=$PATH:$ANDROID_NDK_HOME
-      echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
-    fi
-  - |
-    if [[ $TEST_SUITE = "jsfm" ]]; then
-      npm install
-    fi
-  - |
-    if [[ $TEST_SUITE = "danger" ]]; then
-      npm install
-    fi
+        if [[ ! -d "${HOME}/android-ndk-r18b" ]]; then
+          wget https://dl.google.com/android/repository/android-ndk-r18b-linux-x86_64.zip
+          unzip android-ndk-r18b-linux-x86_64.zip -d $HOME
+        fi
+        export ANDROID_NDK_HOME=$HOME/android-ndk-r18b
+        export PATH=$PATH:$ANDROID_NDK_HOME
+        echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
+        ;;
+      "jsfm" )
+      "danger" )
+        npm install
+        ;;
+    esac
 script:
   - |
-    if [[ $TEST_SUITE = "android" ]]; then
-      npm run danger -- run --dangerfile ./dangerfile-android.js
-    fi
-  - |
-    if [[ $TEST_SUITE = "jsfm" ]]; then
-      npm run danger -- run --dangerfile ./dangerfile-jsfm.js
-    fi
-  - |
-    if [[ $TEST_SUITE = "danger" ]]; then
-      npm run danger -- run --dangerfile ./dangerfile.js
-    fi
+    case $TEST_SUITE in
+      "android") 
+        npm run danger -- run --dangerfile ./dangerfile-android.js
+        ;;
+      "jsfm" )
+        npm run danger -- run --dangerfile ./dangerfile-jsfm.js
+        ;;
+      "danger" )
+        npm run danger -- run --dangerfile ./dangerfile.js
+        ;;
+    esac
 notifications:
   webhooks:
     on_pull_requests: false
