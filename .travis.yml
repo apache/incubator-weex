@@ -12,39 +12,21 @@ matrix:
         jdk: oraclejdk8
         android:
           components:
-            - build-tools-26.0.3
             - android-26
-            - platform-tools
-            - tools
-            - extra-google-m2repository
-            - extra-android-m2repository
-            - sys-img-x86-android-26
       - env: TEST_SUITE=android ABI=arm64-v8a
         language: android
         dist: trusty
         jdk: oraclejdk8
         android:
           components:
-            - build-tools-26.0.3
             - android-26
-            - platform-tools
-            - tools
-            - extra-google-m2repository
-            - extra-android-m2repository
-            - sys-img-x86-android-26
       - env: TEST_SUITE=android ABI=x86
         language: android
         dist: trusty
         jdk: oraclejdk8
         android:
           components:
-            - build-tools-26.0.3
             - android-26
-            - platform-tools
-            - tools
-            - extra-google-m2repository
-            - extra-android-m2repository
-            - sys-img-x86-android-26
 cache:
   directories:
     - npm
@@ -104,7 +86,8 @@ script:
         esac
 
         hasAndroidFile = $(npm run danger -- run --dangerfile ./dangerfile-android.js)
-        if [ "$hasAndroidFile" = "true" ]; then
+        echo ${hasAndroidFile}
+        if [ $hasAndroidFile = "true" ]; then
           cd android
           ./gradlew clean install ${GRADLE_ABI}
         fi
