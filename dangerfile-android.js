@@ -17,11 +17,6 @@
  * under the License.
  */
 import { schedule, danger, fail, warn, message, markdown } from "danger";
-import fs from "fs";
-import path from 'path';
-import GitHubApi from 'github';
-import parseDiff from 'parse-diff';
-import shell from "shelljs";
 
 const type_unknown = 0;
 const type_ios_sdk = 1;
@@ -91,17 +86,4 @@ if (!hasAndroidFile && danger.git.deleted_files) {
 }
 
 console.log(hasAndroidFile)
-
-// if(hasAndroidFile){
-//   var runTryBuildCmd='source ~/.bash_profile; '
-//     +'cd android; '
-//     +'./gradlew clean install --info'
-//   var runSuccess = shell.exec(runTryBuildCmd,{ async: false, timeout: 60 * 60 * 1000, maxBuffer: 200 * 1024 * 1024 }).code == 0;
-//   if(!runSuccess){
-//     fail("Failed to run assembleDebug task for android.");
-//   }
-// }else{
-//   console.log('No android file has been changed.');
-//   message('No android file has een changed.')
-// }
 

@@ -60,7 +60,6 @@ install:
     case $TEST_SUITE in
       "android") 
         curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
-        nvm install 7.0
         npm install
         echo y | sdkmanager "cmake;3.6.4111459"
         if find "${HOME}/android-ndk-r18b" -mindepth 1 | read; then
@@ -86,8 +85,11 @@ script:
   - |
     case $TEST_SUITE in
       "android") 
-        val = $(npm run danger -- run --dangerfile ./dangerfile-android.js)
-        echo val
+        hasAndroidFile = $(npm run danger -- run --dangerfile ./dangerfile-android.js)
+        if [ "$hasAndroidFile" = "true" ]
+          cd android
+          ./gradlew clean install "-P${supportArmeabi-v7a}" "-P${supportArm64-v8a}" "-P${supportX86}"
+        fi
         ;;
       "jsfm" )
         npm run danger -- run --dangerfile ./dangerfile-jsfm.js
