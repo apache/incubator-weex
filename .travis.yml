@@ -90,16 +90,16 @@ script:
       "android") 
         case $ABI in
           "armeabi-v7a" )
-            GRADLE_ABI = "-PsupportArmeabi-v7a=true -PsupportArm64-v8a=false -PsupportX86=false"
+            GRADLE_ABI="-PsupportArmeabi-v7a=true -PsupportArm64-v8a=false -PsupportX86=false"
             ;;
           "arm64-v8a" )
-            GRADLE_ABI = "-PsupportArmeabi-v7a=false -PsupportArm64-v8a=true -PsupportX86=false" 
+            GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=true -PsupportX86=false" 
             ;;
           "x86" )
-            GRADLE_ABI = "-PsupportArmeabi-v7a=false -PsupportArm64-v8a=false -PsupportX86=true"
+            GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=false -PsupportX86=true"
             ;;
           "*" )
-            GRADLE_ABI = ""
+            GRADLE_ABI=""
             ;;
         esac
 
