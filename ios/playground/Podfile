@@ -4,7 +4,6 @@ platform :ios, '8.0'
 
 def common
     pod 'WeexSDK', :path=>'../../'
-#    pod 'WeexHeron', :path=>'../../../WeexHeron/'
     pod 'WXDevtool','0.20.0'
     pod 'SDWebImage', '3.7.5'
     pod 'SDWebImage/WebP'
