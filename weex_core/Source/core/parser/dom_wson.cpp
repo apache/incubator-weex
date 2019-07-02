@@ -223,5 +223,105 @@ namespace WeexCore {
         }
         return pairs;
     };
+    
+    static void WsonGenerate(wson_parser& parser, const std::string& parentRef, int index, const WsonObjectGenerator& genObject) {
+        int objectType = parser.nextType();
+        if(!parser.isMap(objectType)){
+            parser.skipValue(objectType);
+            return;
+        }
+        /**
+         * because strem key order specified, so will cann't dependecy it's keys order,
+         * if key orders right parse one time, if not first parse ref type create render object
+         * then parse others attrs
+         * */
+        std::string ref;
+        std::string renderType;
+        std::map<std::string, std::string>* styles = new std::map<std::string, std::string>();
+        std::map<std::string, std::string>* attrs = new std::map<std::string, std::string>();
+        std::set<std::string>* events = new std::set<std::string>();
+        
+        int size = parser.nextMapSize();
+        int state = parser.getState();
+        for(int i=0; i < size; i++){
+            std::string objectKey = parser.nextMapKeyUTF8();
+            if(0 == strcmp(objectKey.c_str(), "ref")){
+                ref = parser.nextStringUTF8(parser.nextType());
+            }else if (0 == strcmp(objectKey.c_str(), "type")) {
+                renderType = parser.nextStringUTF8(parser.nextType());
+            }else if (0 == strcmp(objectKey.c_str(), "attr")){ //attr is map object
+                uint8_t attrType = parser.nextType();
+                if(parser.isMap(attrType)){
+                    int attrMapSize = parser.nextMapSize();
+                    for(int attrIndex=0; attrIndex<attrMapSize; attrIndex++){
+                        std::string attrKeyString = parser.nextMapKeyUTF8();
+                        std::string attrValueString = parser.nextStringUTF8(parser.nextType());
+                        (*attrs)[attrKeyString] = attrValueString;
+                    }
+                }
+            }else if (0 == strcmp(objectKey.c_str(), "style")){ //style is map object
+                uint8_t styleType = parser.nextType();
+                if(parser.isMap(styleType)){
+                    int styleMapSize = parser.nextMapSize();
+                    for(int styleIndex=0; styleIndex<styleMapSize; styleIndex++){
+                        std::string styleKeyString = parser.nextMapKeyUTF8();
+                        std::string styleValueString = parser.nextStringUTF8(parser.nextType());
+                        (*styles)[styleKeyString] = styleValueString;
+                    }
+                }
+            }else if (0 == strcmp(objectKey.c_str(), "event")) {//event is array
+                uint8_t eventType = parser.nextType();
+                if(parser.isArray(eventType)){
+                    int eventSize = parser.nextArraySize();
+                    for(int eventIndex=0; eventIndex < eventSize; eventIndex++){
+                        std::string eventValue = parser.nextStringUTF8(parser.nextType());
+                        if(eventValue.size() > 0){
+                            events->insert(eventValue);
+                        }
+                    }
+                }
+            }else{
+                // skip children
+                parser.skipValue(parser.nextType());
+            }
+        }
+        
+        // gen one object
+        if (!renderType.empty() && !ref.empty()) {
+            genObject(ref, renderType, parentRef, styles, attrs, events, index);
+            
+            // parse children
+            parser.restoreToState(state);
+            for(int i=0; i < size; i++){
+                std::string objectKey = parser.nextMapKeyUTF8();
+                if (0 == strcmp(objectKey.c_str(), "children")) {
+                    uint8_t childType = parser.nextType();
+                    if (parser.isArray(childType)){
+                        int childSize = parser.nextArraySize();
+                        for(int childIndex=0; childIndex < childSize; childIndex++){
+                            WsonGenerate(parser, ref, childIndex, genObject);
+                        }
+                    } else {
+                        break;
+                    }
+                } else {
+                    parser.skipValue(parser.nextType());
+                }
+            }
+        }
+        else {
+            delete styles;
+            delete attrs;
+            delete events;
+        }
+    }
 
+    void WsonGenerate(const char* data, const std::string& parentRef, int index, const WsonObjectGenerator& genObject) {
+        if (!data) {
+            return;
+        }
+        wson_parser parser(data);
+        WsonGenerate(parser, parentRef, index, genObject);
+    }
+    
 }

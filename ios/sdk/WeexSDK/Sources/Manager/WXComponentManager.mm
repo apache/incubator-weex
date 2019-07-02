@@ -572,6 +572,11 @@ static NSThread *WXComponentThread;
     [_indexDict setObject:component forKey:ref];
 }
 
+- (void)removeComponentForRef:(NSString *)ref
+{
+    [_indexDict removeObjectForKey:ref];
+}
+
 - (NSDictionary *)_extractBindings:(NSDictionary **)attributesOrStylesPoint
 {
     NSDictionary *attributesOrStyles = *attributesOrStylesPoint;

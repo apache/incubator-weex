@@ -21,6 +21,7 @@ cmake_minimum_required(VERSION 3.4.1)
 
 set(IPC_LIBRARY_NAME weexipc)
 
+#add_definitions(-DNDEBUG)
 add_library(${IPC_LIBRARY_NAME} STATIC
   ./Serializing/IPCSerializer.cpp
   ./IPCResult.cpp

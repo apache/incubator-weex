@@ -50,6 +50,7 @@ NSString* const KEY_PAGE_PROPERTIES_CONTAINER_NAME = @"wxContainerName";
 NSString* const KEY_PAGE_PROPERTIES_INSTANCE_TYPE = @"wxInstanceType";
 NSString* const KEY_PAGE_PROPERTIES_PARENT_PAGE = @"wxParentPage";
 NSString* const KEY_PAGE_PROPERTIES_RENDER_TYPE = @"wxRenderType";
+NSString* const KEY_PAGE_PROPERTIES_UIKIT_TYPE = @"wxUIKitType";
 
 
 
@@ -288,6 +289,13 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     [self onStage:KEY_PAGE_STAGES_DESTROY];
     if (nil != _apmProtocolInstance) {
          [self.apmProtocolInstance onEnd];
+    }
+    
+    WXLogInfo(@"apm data: %@", self.recordStageMap);
+    NSNumber* stageRenderOrigin = self.recordStageMap[KEY_PAGE_STAGES_RENDER_ORGIGIN];
+    NSNumber* stageInteraction = self.recordStageMap[KEY_PAGE_STAGES_INTERACTION];
+    if (stageRenderOrigin && stageInteraction) {
+        WXLogInfo(@"apm interaction time(ms): %lld", [stageInteraction longLongValue] - [stageRenderOrigin longLongValue]);
     }
 }
 

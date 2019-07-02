@@ -250,6 +250,33 @@ static void SetViewPortWidth(JNIEnv* env, jobject jcaller, jstring instanceId,
       ->SetViewPortWidth(jString2StrFast(env, instanceId), value);
 }
 
+static void SetInstanceRenderType(JNIEnv* env, jobject jcaller,
+                                  jstring instanceId,
+                                  jstring renderType){
+  WeexCoreManager::Instance()
+          ->getPlatformBridge()
+          ->core_side()
+          ->SetPageRenderType(jString2StrFast(env, instanceId), jString2StrFast(env, renderType));
+}
+
+static void RemoveInstanceRenderType(JNIEnv* env, jobject jcaller,
+                                     jstring instanceId){
+  WeexCoreManager::Instance()
+          ->getPlatformBridge()
+          ->core_side()
+          ->RemovePageRenderType(jString2StrFast(env, instanceId));
+}
+
+static void SetPageArgument(JNIEnv* env, jobject jcaller,
+                            jstring instanceId,
+                            jstring key,
+                            jstring value){
+    WeexCoreManager::Instance()
+            ->getPlatformBridge()
+            ->core_side()->SetPageArgument(jString2StrFast(env, instanceId),
+                                           jString2StrFast(env, key), jString2StrFast(env, value));
+}
+
 static void SetDeviceDisplay(JNIEnv* env, jobject jcaller, jstring instanceId,
                            jfloat value, float height, float scale) {
   WeexCoreManager::Instance()
@@ -257,7 +284,6 @@ static void SetDeviceDisplay(JNIEnv* env, jobject jcaller, jstring instanceId,
           ->core_side()
           ->SetDeviceDisplay(jString2StrFast(env, instanceId), value, height, scale);
 }
-
 
 static jint InitFramework(JNIEnv* env, jobject object, jstring script,
                           jobject params) {
@@ -508,6 +534,9 @@ static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller, jstring config) {
       ->core_side()
       ->UpdateGlobalConfig(scoped_config.getChars());
 }
+
+
+
 
 static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
                                   jstring instanceId, jstring name,

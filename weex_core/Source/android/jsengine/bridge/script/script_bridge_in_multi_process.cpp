@@ -75,7 +75,7 @@ static void *threadEntry(void *_td) {
     return static_cast<void **>(nullptr);
 }
 
-extern "C" int serverMain(int argc, char **argv) {
+__attribute__((visibility("default"))) extern "C" int serverMain(int argc, char **argv) {
     unsigned long fd;
     unsigned long fd_client = 0;
     unsigned long enableTrace;

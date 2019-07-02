@@ -1498,6 +1498,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       @Override
       public void run() {
         long start = System.currentTimeMillis();
+        mWXBridge.setPageArgument(instanceId, "renderTimeOrigin", String.valueOf(instance.getWXPerformance().renderTimeOrigin));
+        mWXBridge.setInstanceRenderType(instance.getInstanceId(), instance.getRenderType());
         invokeCreateInstance(instance, template, options, data);
         long end = System.currentTimeMillis();
         instance.getWXPerformance().callCreateInstanceTime = end - start;
@@ -1628,12 +1630,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.DATA_RENDER_BINARY.getFlag());
           // In DATA_RENDER_BINARY strategy script is binary
           instanceObj.data = template.getBinary();
+        }else if (instance.getRenderStrategy() == WXRenderStrategy.JSON_RENDER) {
+             renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.JSON_RENDER.getFlag());
         }
 
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
                 dataObj, apiObj, renderStrategy, extraOptionObj};
 
         instance.setTemplate(template.getContent());
+
+        instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
+
         // if { "framework": "Vue" } or  { "framework": "Rax" } will use invokeCreateInstanceContext
         // others will use invokeExecJS
         if (!isSandBoxContext) {
@@ -1642,7 +1649,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         }
         if (type == BundType.Vue || type == BundType.Rax
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
-                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY) {
+                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY
+                || instance.getRenderStrategy() == WXRenderStrategy.JSON_RENDER) {
           int ret = invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
           instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
           if(ret == 0) {
@@ -1918,6 +1926,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
     // }
+    mWXBridge.removeInstanceRenderType(instanceId);
     mWXBridge.destoryInstance(instanceId, namespace, function, args);
   }
 
@@ -2621,7 +2630,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> pageId:").append(pageId)
               .append(", componentType:").append(componentType).append(", ref:").append(ref)
-              .append(", styles:").append(styles)
+              .append(", styles:").append(styles == null ? "{}" : styles.toString())
               .append(", attributes:").append(attributes)
               .append(", events:").append(events);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -2666,7 +2675,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
               .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
               .append(", parentRef:").append(parentRef)
-              .append(", styles:").append(styles)
+              .append(", styles:").append(styles == null ? "{}" : styles.toString())
               .append(", attributes:").append(attributes)
               .append(", events:").append(events);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -2884,7 +2893,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callUpdateStyle >>>> instanceId:").append(instanceId)
-              .append(", ref:").append(ref).append(", styles:").append(styles.toString())
+              .append(", ref:").append(ref).append(", styles:").append(styles == null ? "{}" : styles.toString())
               .append(", paddings:").append(paddings.toString())
                       .append(", margins:").append(margins.toString())
                               .append(", borders:").append(borders.toString());

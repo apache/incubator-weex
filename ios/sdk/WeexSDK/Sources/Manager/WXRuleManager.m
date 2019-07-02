@@ -104,10 +104,12 @@ static WXRuleManager *_sharedInstance = nil;
             
             [_fontStorage setObject:fontFamily forKey:rule[@"fontFamily"]];
             // remote font file
+            NSString* instanceId = self.instance ? (self.instance.instanceId ?: @"") : @"";
             NSString *fontfile = [NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:[fontURL absoluteString]]];
             if ([WXUtility isFileExist:fontfile]) {
                 // if has been cached, load directly
                 [fontFamily setObject:[NSURL fileURLWithPath:fontfile] forKey:@"localSrc"];
+                [[NSNotificationCenter defaultCenter] postNotificationName:WX_ICONFONT_READY_NOTIFICATION object:nil userInfo:@{@"instanceId": instanceId, @"fontFamily": rule[@"fontFamily"], @"filePath": fontfile}];
                 return;
             }
             __weak typeof(self) weakSelf = self;
@@ -123,6 +125,7 @@ static WXRuleManager *_sharedInstance = nil;
                     [dictForFontFamily setObject:url forKey:@"localSrc"];
                     
                     [[NSNotificationCenter defaultCenter] postNotificationName:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil userInfo:@{@"fontFamily":rule[@"fontFamily"]}];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:WX_ICONFONT_READY_NOTIFICATION object:nil userInfo:@{@"instanceId": instanceId, @"fontFamily": rule[@"fontFamily"], @"filePath": [url path]}];
                 } else {
                     //there was some errors during loading
                     WXLogError(@"load font failed %@",error.description);

@@ -207,4 +207,10 @@ public interface IWXBridge extends IWXObject {
 
   void resetWXBridge(boolean remoteDebug);
 
+  void setInstanceRenderType(String instanceId, String renderType);
+
+  void removeInstanceRenderType(String instanceId);
+
+  void setPageArgument(String instanceId, String key, String value);
+
 }

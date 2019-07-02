@@ -61,6 +61,7 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_PROPERTIES_PARENT_PAGE = "wxParentPage";
     public static final String KEY_PAGE_PROPERTIES_BUNDLE_TYPE = "wxBundleType";
     public static final String KEY_PAGE_PROPERTIES_RENDER_TYPE = "wxRenderType";
+    public static final String KEY_PAGE_PROPERTIES_UIKIT_TYPE = "wxUIKitType";
 
     /************** stages *****************/
     public static final String KEY_PAGE_STAGES_CONTAINER_READY = "wxContainerReady";
@@ -315,6 +316,8 @@ public class WXInstanceApm {
         addProperty(KEY_PROPERTIES_ERROR_CODE, VALUE_ERROR_CODE_DEFAULT);
         addProperty(KEY_PAGE_PROPERTIES_JSLIB_VERSION, WXEnvironment.JS_LIB_SDK_VERSION);
         addProperty(KEY_PAGE_PROPERTIES_WEEX_VERSION, WXEnvironment.WXSDK_VERSION);
+        addProperty(KEY_PAGE_PROPERTIES_UIKIT_TYPE, instance.getRenderType());
+
         if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
             addProperty(KEY_PAGE_PROPERTIES_RENDER_TYPE, WXEnvironment.EAGLE);
@@ -584,4 +587,20 @@ public class WXInstanceApm {
 
         instance.fireGlobalEventCallback("wx_apm", data);
     }
-}
+
+
+    public String toPerfString() {
+        Long start = stageMap.get(KEY_PAGE_STAGES_RENDER_ORGIGIN);
+        Long end = stageMap.get(KEY_PAGE_STAGES_INTERACTION);
+        Long wxNewFsRender = stageMap.get(KEY_PAGE_STAGES_NEW_FSRENDER);
+        StringBuilder builder = new StringBuilder();
+        if(start != null && end != null){
+            builder.append("interactiveTime " + (end - start) + "ms");
+        }
+        if(wxNewFsRender != null){
+            builder.append(" wxNewFsRender " + (wxNewFsRender) + "ms");
+        }
+        return builder.toString();
+   }
+
+ }

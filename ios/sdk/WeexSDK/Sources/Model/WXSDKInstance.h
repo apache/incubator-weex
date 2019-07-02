@@ -24,10 +24,38 @@
 #import "WXResourceRequest.h"
 #import "WXBridgeProtocol.h"
 #import "WXApmForInstance.h"
+#import "WXComponentManager.h"
 
 extern NSString *const bundleUrlOptionKey;
 
 @interface WXSDKInstance : NSObject
+
+/**
+ * Init instance and render it using iOS native views.
+ * It is the same as initWithRenderType:@"platform"
+ **/
+- (instancetype)init;
+
+/**
+ * Init instance with custom render type.
+ **/
+- (instancetype)initWithRenderType:(NSString*)renderType;
+
+/**
+ * The render type. Default is "platform"
+ **/
+@property (nonatomic, strong, readonly) NSString* renderType;
+
+/**
+ * Returns YES when self.renderType != "platform"
+ **/
+@property (nonatomic, assign, readonly) BOOL isCustomRenderType;
+
+/*
+ * For weex containers in view controller(main containers), we may need to release render buffer
+ * of custom render type page to save memory.
+ */
+@property (nonatomic, assign) BOOL isMainContainerStack;
 
 /**
  * The viewControler which the weex bundle is rendered in.
@@ -90,6 +118,11 @@ extern NSString *const bundleUrlOptionKey;
  * Whether this instance is rendered or not. Please MUST not render an instance twice even if you have called destroyInstance.
  **/
 @property (nonatomic, assign, readonly) BOOL isRendered;
+
+/**
+ * Get component manager of this instance. You can manipulate components then.
+ **/
+@property (nonatomic, readonly, strong) WXComponentManager *componentManager;
 
 /**
  * The state of current instance.
@@ -355,10 +388,18 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSString *bizType;
 @property (nonatomic, strong) NSString *pageName;
 @property (nonatomic, weak) id pageObject;
+
 //Deprecated, use @WXApmForInstance
 @property (nonatomic, strong) NSMutableDictionary *performanceDict;
+@property (nonatomic, strong) WXApmForInstance* apmInstance;
 
-@property (nonatomic ,strong) WXApmForInstance* apmInstance;
+@property (nonatomic, assign) BOOL appearState;
+
+/*
+ * For custom render page to release/restore OpenGL resources, etc.
+ */
+- (void)willAppear;
+- (void)didDisappear;
 
 /**
  * Raw css styles are dropped after applied to layout nodes in WeexCore.

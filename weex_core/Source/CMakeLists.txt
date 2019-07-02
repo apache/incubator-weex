@@ -27,7 +27,9 @@ elseif ("${ANDROID_STL}" STREQUAL "gnustl_static")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++1y")
 endif ()
 add_compile_options(-fexceptions)
-
+add_compile_options(-fstack-protector)
+add_compile_options(-funwind-tables)
+add_compile_options(-fno-omit-frame-pointer)
 
 add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
@@ -54,6 +56,9 @@ add_compile_options(-fexceptions)
 set(COMMON_SRCS
   ./core/render/manager/render_manager.cpp
   ./core/render/page/render_page.cpp
+  ./core/render/page/render_page_base.cpp
+  ./core/render/page/render_page_custom.cpp
+  ./core/render/target/render_target.cpp
 
   ./core/render/node/render_object.cpp
   ./core/render/node/factory/render_creator.cpp
@@ -76,6 +81,10 @@ set(COMMON_SRCS
   ./core/render/action/render_action_update_style.cpp
   ./core/render/action/render_action_render_success.cpp
   ./core/render/action/render_action_trigger_vsync.cpp
+
+  ./core/json/JsonRenderManager.cpp
+  ./core/json/JsonPage.cpp
+
 
   ./core/layout/layout.cpp
   ./core/layout/style.cpp

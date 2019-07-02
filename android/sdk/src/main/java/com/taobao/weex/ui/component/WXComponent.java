@@ -308,6 +308,11 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
+
+  public void applyComponentEvents(){
+       applyEvents();
+  }
+
   private void applyEvents() {
     if (getEvents() == null || getEvents().isEmpty())
       return;

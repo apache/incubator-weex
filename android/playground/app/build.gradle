@@ -93,6 +93,7 @@ dependencies {
 
     implementation project(':commons')
     implementation project(':weex_sdk')
+ //   implementation project(':HeronAndroid')
     //https://github.com/weexteam/weex-analyzer-android
     //Weex-Analyzer provides several convenient tools such as Memory Monitor
     // to optimize your application. It's not available by default,you can

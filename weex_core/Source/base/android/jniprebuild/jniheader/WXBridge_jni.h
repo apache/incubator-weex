@@ -190,6 +190,19 @@ static void UpdateInitFrameworkParams(JNIEnv* env, jobject jcaller,
 static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
     jstring config);
 
+
+static void SetInstanceRenderType(JNIEnv* env, jobject jcaller,
+                                  jstring instanceId,
+                                  jstring renderType);
+
+static void RemoveInstanceRenderType(JNIEnv* env, jobject jcaller,
+                                     jstring instanceId);
+
+static void SetPageArgument(JNIEnv* env, jobject jcaller,
+                            jstring instanceId,
+                            jstring key,
+                            jstring value);
+
 // Step 2: method stubs.
 
 static intptr_t g_WXBridge_onReceivedResult = 0;
@@ -1161,6 +1174,13 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(ResetWXBridge) },
+{ "nativeSetPageArgument",
+    "("
+    "Ljava/lang/String;"
+    "Ljava/lang/String;"
+    "Ljava/lang/String;"
+    ")"
+    "V", reinterpret_cast<void*>(SetPageArgument) },
     { "nativeUpdateInitFrameworkParams",
         "("
         "Ljava/lang/String;"
@@ -1173,6 +1193,17 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(UpdateGlobalConfig) },
+    { "nativeSetInstanceRenderType",
+            "("
+            "Ljava/lang/String;"
+            "Ljava/lang/String;"
+            ")"
+            "V", reinterpret_cast<void*>(SetInstanceRenderType) },
+    { "nativeRemoveInstanceRenderType",
+            "("
+            "Ljava/lang/String;"
+            ")"
+            "V", reinterpret_cast<void*>(RemoveInstanceRenderType) },
 };
 
 static bool RegisterNativesImpl(JNIEnv* env) {

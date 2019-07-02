@@ -21,6 +21,7 @@ package com.alibaba.weex;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.util.Log;
 import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 import com.alibaba.android.bindingx.plugin.weex.BindingX;
@@ -51,6 +52,8 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
+
+import java.lang.reflect.Method;
 
 public class WXApplication extends Application {
 
@@ -118,6 +121,8 @@ public class WXApplication extends Application {
       //Typeface nativeFont = Typeface.createFromAsset(getAssets(), "font/native_font.ttf");
       //WXEnvironment.setGlobalFontFamily("bolezhusun", nativeFont);
 
+      startHeron();
+
     } catch (WXException e) {
       e.printStackTrace();
     }
@@ -184,6 +189,18 @@ public class WXApplication extends Application {
       WXEnvironment.sDebugServerConnectable = connectable;
       WXEnvironment.sRemoteDebugMode = debuggable;
       WXEnvironment.sRemoteDebugProxyUrl = "ws://" + host + ":8088/debugProxy/native";
+    }
+  }
+
+  private void startHeron(){
+    try{
+        Class<?> heronInitClass = getClassLoader().loadClass("com/taobao/weex/heron/picasso/RenderPicassoInit");
+        Method method = heronInitClass.getMethod("initApplication", Application.class);
+        method.setAccessible(true);
+        method.invoke(null,this);
+        Log.e("Weex", "Weex Heron Render Init Success");
+     }catch (Exception e){
+        Log.e("Weex", "Weex Heron Render Mode Not Found", e);
     }
   }
 

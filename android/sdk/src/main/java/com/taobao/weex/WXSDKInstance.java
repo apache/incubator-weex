@@ -59,6 +59,7 @@ import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.RenderTypes;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
@@ -71,6 +72,7 @@ import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.render.WXAbstractRenderContainer;
 import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.performance.WhiteScreenUtils;
 import com.taobao.weex.tracing.WXTracing;
@@ -125,7 +127,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private IWXStatisticsListener mStatisticsListener;
   /** package **/ Context mContext;
   private final String mInstanceId;
-  private RenderContainer mRenderContainer;
+  private WXAbstractRenderContainer mRenderContainer;
   private WXComponent mRootComp;
   private boolean mRendered;
   private WXRefreshData mLastRefreshData;
@@ -201,6 +203,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private List<OnBackPressedHandler> mWXBackPressedHandlers;
 
   private WXSDKInstance mParentInstance;
+
+  private String mRenderType = RenderTypes.RENDER_TYPE_NATIVE;
 
   /**
    * Default Width And Viewport is 750,
@@ -355,6 +359,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * @param a
    */
   public void setRenderContainer(RenderContainer a){
+     setWXAbstractRenderContainer(a);
+  }
+
+  public void setWXAbstractRenderContainer(WXAbstractRenderContainer a){
     if(a != null) {
       a.setSDKInstance(this);
       a.addOnLayoutChangeListener(this);
@@ -1336,6 +1344,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       }
       this.mCurrentGround = true;
     }
+
+    //component appear
+    if((WXEnvironment.isApkDebugable() || WXEnvironment.isPerf()) && mApmForInstance != null){
+        WXLogUtils.e("PerformanceData " + mApmForInstance.toPerfString());
+    }
   }
 
 
@@ -1519,6 +1532,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
 
   public void onCreateFinish() {
+    if(mHasCreateFinish){
+      return;
+    }
     if (mContext != null) {
       onViewAppear();
       View wxView= mRenderContainer;
@@ -1759,6 +1775,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
          mParentInstance = null;
       }
       mApmForInstance.onEnd();
+
+
       if(mRendered) {
         WXSDKManager.getInstance().destroyInstance(mInstanceId);
       }
@@ -1769,9 +1787,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       }
       if (mRootComp != null) {
         mRootComp.destroy();
-        destroyView(mRenderContainer);
         mRootComp = null;
       }
+
+      if(mRenderContainer != null){
+        destroyView(mRenderContainer);
+      }
+
 
       if (mGlobalEvents != null) {
         mGlobalEvents.clear();
@@ -2296,6 +2318,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(!getInstanceOnFireEventInterceptorList().contains(instanceOnFireEventInterceptor)){
       getInstanceOnFireEventInterceptorList().add(instanceOnFireEventInterceptor);
     }
+  }
+
+  public String getRenderType() {
+    return mRenderType;
+  }
+
+  public void setRenderType(String renderType) {
+    this.mRenderType = renderType;
   }
 
   private static boolean isDisableSkipFrameworkInDataRender() {

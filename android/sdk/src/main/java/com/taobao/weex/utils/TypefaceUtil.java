@@ -24,6 +24,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
@@ -31,6 +32,7 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.font.FontAdapter;
 
 import java.io.File;
 import java.util.HashMap;
@@ -130,7 +132,7 @@ public class TypefaceUtil {
     }
   }
 
-  public static void loadTypeface(final FontDO fontDo) {
+  public static void loadTypeface(final FontDO fontDo, boolean notify) {
     if (fontDo != null && fontDo.getTypeface() == null &&
             (fontDo.getState() == FontDO.STATE_FAILED || fontDo.getState() == FontDO.STATE_INIT)) {
       fontDo.setState(FontDO.STATE_LOADING);
@@ -156,6 +158,10 @@ public class TypefaceUtil {
           fontDo.setState(FontDO.STATE_FAILED);
         }
       }
+      return;
+    }
+    if(notify){
+         notifyFontAvailable(false, fontDo);
     }
   }
 
@@ -226,7 +232,7 @@ public class TypefaceUtil {
     });
   }
 
-  private static boolean loadLocalFontFile(String path, final String fontFamily, boolean hasNetworkDowload) {
+  private static boolean loadLocalFontFile(final String path, final String fontFamily, boolean hasNetworkDowload) {
     if (TextUtils.isEmpty(path) || TextUtils.isEmpty(fontFamily)) {
       return false;
     }
@@ -237,10 +243,11 @@ public class TypefaceUtil {
       }
       Typeface typeface = Typeface.createFromFile(path);
       if (typeface != null) {
-        FontDO fontDo = sCacheMap.get(fontFamily);
+        final FontDO fontDo = sCacheMap.get(fontFamily);
         if (fontDo != null) {
           fontDo.setState(FontDO.STATE_SUCCESS);
           fontDo.setTypeface(typeface);
+          fontDo.setFilePath(path);
           if(WXEnvironment.isApkDebugable()) {
             WXLogUtils.d(TAG, "load local font file success");
           }
@@ -254,15 +261,11 @@ public class TypefaceUtil {
             WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
               @Override
               public void run() {
-                Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
-                intent.putExtra("fontFamily", fontFamily);
-                LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+               notifyFontAvailable(true, fontDo);
               }
             }, 100);
           }else{
-            Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
-            intent.putExtra("fontFamily", fontFamily);
-            LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+             notifyFontAvailable(true, fontDo);
           }
           return true;
         }
@@ -273,6 +276,20 @@ public class TypefaceUtil {
       WXLogUtils.e(TAG, e.toString());
     }
     return false;
+  }
+
+  private static void notifyFontAvailable(boolean sendBroadcast, FontDO fontDO){
+    if(sendBroadcast){
+      Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
+      intent.putExtra("fontFamily", fontDO.getFontFamilyName());
+      intent.putExtra("filePath", fontDO.getFilePath());
+      intent.putExtra("fontUrl", fontDO.getUrl());
+      LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+    }
+    FontAdapter fontAdapter = WXSDKManager.getInstance().getFontAdapter();
+    if(fontAdapter != null){
+        fontAdapter.onFontLoad(fontDO.getFontFamilyName(), fontDO.getUrl(), fontDO.getFilePath());
+    }
   }
 
   private static String getFontCacheDir() {

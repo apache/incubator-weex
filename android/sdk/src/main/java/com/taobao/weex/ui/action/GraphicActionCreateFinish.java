@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.RenderTypes;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.component.WXComponent;
@@ -51,11 +52,18 @@ public class GraphicActionCreateFinish extends BasicGraphicAction {
     if (instance == null || instance.getContext() == null) {
       return;
     }
+    if(instance.mHasCreateFinish){
+        return;
+    }
 
     instance.mHasCreateFinish = true;
 
     if (instance.getRenderStrategy() == WXRenderStrategy.APPEND_ONCE) {
       instance.onCreateFinish();
+    }else{
+      if(!RenderTypes.RENDER_TYPE_NATIVE.equals(instance.getRenderType())){
+          instance.onCreateFinish();
+      }
     }
 
     if (null != instance.getWXPerformance()){

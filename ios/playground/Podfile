@@ -4,9 +4,9 @@ platform :ios, '8.0'
 
 def common
     pod 'WeexSDK', :path=>'../../'
-
     pod 'WXDevtool','0.20.0'
     pod 'SDWebImage', '3.7.5'
+    pod 'SDWebImage/WebP'
     pod 'SocketRocket', '0.4.2'
     pod 'ATSDK-Weex', '0.0.1',:configurations => ['Debug']
     pod 'BindingX', '1.0.3'

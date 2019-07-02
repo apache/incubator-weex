@@ -56,7 +56,9 @@ import com.taobao.weex.RenderContainer;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
+import com.taobao.weex.common.RenderTypes;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.render.WXAbstractRenderContainer;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -64,6 +66,7 @@ import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -223,25 +226,32 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   }
 
   private void loadWXfromService(final String url) {
-
-    Log.d("test->", "on ActivityCreate ,loadWXfromService: ");
-
     mProgressBar.setVisibility(View.VISIBLE);
 
     if (mInstance != null) {
-      mInstance.destroy();
+       mInstance.destroy();
+       mContainer.removeAllViews();
     }
 
-    RenderContainer renderContainer = new RenderContainer(this);
-    //mInstance = new WXSDKInstance(this);
-    mInstance = WXPreLoadManager.getInstance().offerPreInitInstance(url);
-    if (null != mInstance){
-      mInstance.init(this);
-    }else {
+    WXAbstractRenderContainer renderContainer = null;
+    if(url.contains(RenderTypes.RENDER_TYPE_HERON_URL_PARAM)){
       mInstance = new WXSDKInstance(this);
+      mInstance.setRenderType(RenderTypes.RENDER_TYPE_HERON);
+      renderContainer = getHeronContainer(mInstance);
+      if(renderContainer == null){
+          mInstance.destroy();
+      }
     }
-
-    mInstance.setRenderContainer(renderContainer);
+    if(renderContainer == null){
+      renderContainer = new RenderContainer(this);
+      mInstance = WXPreLoadManager.getInstance().offerPreInitInstance(url);
+      if (null != mInstance){
+        mInstance.init(this);
+      }else {
+        mInstance = new WXSDKInstance(this);
+      }
+    }
+    mInstance.setWXAbstractRenderContainer(renderContainer);
     mInstance.registerRenderListener(this);
     mInstance.setNestedInstanceInterceptor(this);
     mInstance.setBundleUrl(url);
@@ -268,6 +278,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
           }
           else if (TextUtils.equals(uri.getQueryParameter("__data_render"), Boolean.TRUE.toString())){
             mInstance.render(TAG, new String(task.response.data, "UTF-8"), mConfigMap, null, WXRenderStrategy.DATA_RENDER);
+          }else if (TextUtils.equals(uri.getQueryParameter("__json_render"), Boolean.TRUE.toString())){
+            mInstance.render(TAG, new String(task.response.data, "UTF-8"), mConfigMap, null, WXRenderStrategy.JSON_RENDER);
           } else {
             mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, WXRenderStrategy.APPEND_ASYNC);
           }
@@ -286,6 +298,21 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
     WXHttpManager.getInstance().sendRequest(httpTask);
   }
+
+
+  private WXAbstractRenderContainer getHeronContainer(WXSDKInstance instance){
+    try{
+      Class containerClass =  getClassLoader().loadClass("com.taobao.weex.heron.container.WXHeronRenderContainer");
+      Constructor constructor = containerClass.getConstructor(Context.class);
+      WXAbstractRenderContainer container = (WXAbstractRenderContainer) constructor.newInstance(this);
+      container.createInstanceRenderView(instance.getInstanceId());
+      return container;
+    }catch (Exception e){
+      Log.e("Weex", "getHeronContainer Error Use Native Container", e);
+      return null;
+    }
+  }
+
 
   /**
    * hot refresh

@@ -153,7 +153,7 @@ static BOOL _logToWebSocket = NO;
             break;
     }
 
-    NSString *logMessage = [NSString stringWithFormat:@"<Weex>[%@]%s:%ld, %@", flagString, fileName, (unsigned long)line, message];
+    NSString *logMessage = [NSString stringWithFormat:@"<Weex>[%@]%s:%lu, %@", flagString, fileName, (unsigned long)line, message];
 
     if ([_externalLog logLevel] & flag) {
         [_externalLog log:flag message:logMessage];
@@ -202,9 +202,9 @@ static BOOL _logToWebSocket = NO;
 		}
         va_end(args);
 
-        NSArray *messageAry = [NSArray arrayWithObjects:message, nil];
         Class WXLogClass = NSClassFromString(@"WXDebugger");
         if (WXLogClass) {
+            NSArray *messageAry = [NSArray arrayWithObjects:message, nil];
             SEL selector = NSSelectorFromString(@"coutLogWithLevel:arguments:");
             NSMethodSignature *methodSignature = [WXLogClass instanceMethodSignatureForSelector:selector];
             if (methodSignature == nil) {
