@@ -1006,6 +1006,19 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
   }
 
+  public void loadJsBundleInPreInitMode(final String instanceId, final String js){
+    post(new Runnable() {
+      @Override
+      public void run() {
+        invokeExecJSOnInstance(instanceId, js, -1);
+        WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
+        if (null != instance && instance.isPreInitMode()){
+          instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
+        }
+      }
+    });
+  }
+
   /**
    * ref, type, data, domChanges
    * */
@@ -1480,11 +1493,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
 
     WXModuleManager.createDomModule(instance);
+    instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_START);
     post(new Runnable() {
       @Override
       public void run() {
         long start = System.currentTimeMillis();
-        instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_START);
         mWXBridge.setPageArgument(instanceId, "renderTimeOrigin", String.valueOf(instance.getWXPerformance().renderTimeOrigin));
         mWXBridge.setInstanceRenderType(instance.getInstanceId(), instance.getRenderType());
         invokeCreateInstance(instance, template, options, data);
@@ -1639,6 +1652,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY
                 || instance.getRenderStrategy() == WXRenderStrategy.JSON_RENDER) {
           int ret = invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
+          instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
           if(ret == 0) {
             String err = "[WXBridgeManager] invokeCreateInstance : " + instance.getTemplateInfo();
 
@@ -1658,6 +1672,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           //);
 
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
+          instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
           return;
         }
       } catch (Throwable e) {

@@ -869,6 +869,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
     if (isPreInitMode()){
       getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_START);
+      WXBridgeManager.getInstance().loadJsBundleInPreInitMode(getInstanceId(),template.getContent());
     } else {
       WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
     }

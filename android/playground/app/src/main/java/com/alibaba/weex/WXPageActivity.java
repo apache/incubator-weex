@@ -153,6 +153,10 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
     mWxAnalyzerDelegate = new WXAnalyzerDelegate(this);
     mWxAnalyzerDelegate.onCreate();
+
+    //if (mInstance.isPreDownLoad() || mInstance.isPreInitMode()){
+      mInstance.onInstanceReady();
+    //}
   }
 
   @Override
@@ -240,7 +244,12 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     }
     if(renderContainer == null){
       renderContainer = new RenderContainer(this);
-      mInstance = new WXSDKInstance(this);
+      mInstance = WXPreLoadManager.getInstance().offerPreInitInstance(url);
+      if (null != mInstance){
+        mInstance.init(this);
+      }else {
+        mInstance = new WXSDKInstance(this);
+      }
     }
     mInstance.setWXAbstractRenderContainer(renderContainer);
     mInstance.registerRenderListener(this);
@@ -248,6 +257,11 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     mInstance.setBundleUrl(url);
     mInstance.setTrackComponent(true);
     mContainer.addView(renderContainer);
+
+    if (mInstance.isPreDownLoad()){
+      return;
+    }
+
 
     WXHttpTask httpTask = new WXHttpTask();
     httpTask.url = url;
