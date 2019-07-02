@@ -15,3 +15,4 @@ captures
 /incrementalClean.sh
 /incrementalDeployContinuous.sh
 /incrementalDeployOld.sh
+/.incremental_builder/

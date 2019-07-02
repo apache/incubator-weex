@@ -233,11 +233,16 @@ dependencies {
                           'Source/android/jniprebuild/jniheader/*.h',
                           'Source/base/Compatible.cpp',
                           'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
+                          'Source/base/third_party/icu/*.h',
+                          'Source/base/third_party/icu/*.cpp',
                           'Source/android/jsengine/dependence/**/*.h',
                           'Source/android/jsengine/dependence/**/*.cpp',
-                          'Source/include/wtf/Optional.h',
-                          'Source/include/wtf/Brigand.h',
-                          'Source/include/wtf/Variant.h'])
+                          'Source/include/wtf/**/*.h',
+                          'Source/include/wtf/**/*.c',
+                          'Source/include/wtf/**/*.cpp',
+                          'Source/include/JavaScriptCore/**/*.h',
+                          'Source/include/JavaScriptCore/**/*.c',
+                          'Source/include/JavaScriptCore/**/*.cpp'])
      }
      preBuild.dependsOn licenseFormat
  }

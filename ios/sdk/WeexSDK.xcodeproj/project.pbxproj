@@ -595,6 +595,7 @@
 		D362F9501C83EDA20003F546 /* WXWebViewModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D362F94E1C83EDA20003F546 /* WXWebViewModule.m */; };
 		D3FC0DF71C508B2A002B9E31 /* WXTimerModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D3FC0DF51C508B2A002B9E31 /* WXTimerModule.h */; };
 		D3FC0DF81C508B2A002B9E31 /* WXTimerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D3FC0DF61C508B2A002B9E31 /* WXTimerModule.m */; };
+		D77286FF22C9B22C00E1DA7D /* eagle_bridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD9205FA223651D800EDF93D /* eagle_bridge.cpp */; };
 		DC03ADB91D508719003F76E7 /* WXTextAreaComponent.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC03ADB71D508719003F76E7 /* WXTextAreaComponent.mm */; };
 		DC03ADBA1D508719003F76E7 /* WXTextAreaComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */; };
 		DC15A3DB2010BC93009C8977 /* weex-main-jsfm.js in Resources */ = {isa = PBXBuildFile; fileRef = DC15A3D92010BC93009C8977 /* weex-main-jsfm.js */; };
@@ -3258,6 +3259,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D77286FF22C9B22C00E1DA7D /* eagle_bridge.cpp in Sources */,
 				453F376F219A78D700A03F1D /* WXConvertUtility.mm in Sources */,
 				453F376E219A789A00A03F1D /* default_request_handler.mm in Sources */,
 				453F376A219A784F00A03F1D /* http_module.cc in Sources */,
@@ -3760,6 +3762,7 @@
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_WARN_COMMA = NO;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
@@ -3806,6 +3809,7 @@
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_WARN_COMMA = NO;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;

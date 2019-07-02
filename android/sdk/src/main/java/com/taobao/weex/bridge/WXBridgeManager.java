@@ -62,6 +62,7 @@ import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.ui.WXComponentRegistry;
+import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
@@ -102,11 +103,13 @@ import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
@@ -851,7 +854,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 Log.d("jsengine", "callReportCrashReloadPage crashFile:" + crashFile);
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         WXStateRecord.getInstance().onJSCCrash();
         callReportCrash(crashFile, instanceId, url);
@@ -955,7 +958,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_JSC_CRASH, result.toString(), instanceId, url);
                 br.close();
               } catch (Exception e) {
-                e.printStackTrace();
+                WXLogUtils.e(WXLogUtils.getStackTrace(e));
               }
             } else {
               WXLogUtils.e("[WXBridgeManager] callReportCrash crash file is empty");
@@ -1525,7 +1528,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             WXLogUtils.e("end getBundleType type:" + type.toString() + " time:" + (end - start));
           }
         } catch (Throwable e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
 
         try {
@@ -1555,7 +1558,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             options.put("env", mInitParams.toMap());
           }
         } catch (Throwable e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         instance.bundleType = type;
         if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
@@ -1687,7 +1690,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
       return new WXJSObject(WXJSObject.JSON, obj.toString());
     } catch (Throwable e) {
-      e.printStackTrace();
+      WXLogUtils.e(WXLogUtils.getStackTrace(e));
     }
     return opt;
 
@@ -1741,7 +1744,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
       return BundType.Others;
     } catch (Throwable e) {
-      e.printStackTrace();
+      WXLogUtils.e(WXLogUtils.getStackTrace(e));
       return BundType.Others;
     }
   }
@@ -2024,7 +2027,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               adapter.commit(WXEnvironment.getApplication(),"sJSFMStartListener",IWXUserTrackAdapter.COUNTER,null,params);
             }
           }catch (Exception e){
-            e.printStackTrace();
+            WXLogUtils.e(WXLogUtils.getStackTrace(e));
           }
         }
 
@@ -2033,7 +2036,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         try {
           crashFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
         } catch (Exception e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         boolean pieSupport = true;
         try {
@@ -2041,7 +2044,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             pieSupport = false;
           }
         } catch (Exception e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         sInitFrameWorkMsg.append(" | pieSupport:").append(pieSupport);
         WXLogUtils.d("[WXBridgeManager] initFrameworkEnv crashFile:" + crashFile + " pieSupport:" + pieSupport);
@@ -2437,7 +2440,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             return;
           }
         } catch (Exception e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
       }
       if (METHOD_CREATE_INSTANCE.equals(function) && !instance.getApmForInstance().hasAddView){
@@ -2483,17 +2486,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                       exceptionExt = result.toString();
                       br.close();
                     } catch (Exception e) {
-                      e.printStackTrace();
+                      WXLogUtils.e(WXLogUtils.getStackTrace(e));
                     }
                   }
                   file.delete();
                 }
               } catch (Throwable throwable) {
-                throwable.printStackTrace();
+                WXLogUtils.e(WXLogUtils.getStackTrace(throwable));
               }
             }
           } catch (Throwable e) {
-            e.printStackTrace();
+            WXLogUtils.e(WXLogUtils.getStackTrace(e));
           }
           exception += "\n" + exceptionExt;
           WXLogUtils.e("reportJSException:" + exception);
@@ -2942,7 +2945,69 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     return IWXBridge.INSTANCE_RENDERING;
   }
+  private boolean shouldReportGPULimit() {
+    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+    boolean report_gpu_limited_layout = false;
+    float sample_rate_of_report = 0;
+    if (adapter != null) {
+      try {
+        sample_rate_of_report = Float.parseFloat(adapter
+                .getConfig("android_weex_test_gpu",
+                        "sample_rate_of_report",
+                        "0"));
+      }catch(Exception e){
+        WXLogUtils.e(WXLogUtils.getStackTrace(e));
+      }
+      WXLogUtils.i("sample_rate_of_report : " + sample_rate_of_report);
+      if(Math.random() < sample_rate_of_report){
+        report_gpu_limited_layout = true;
+      }
+    }
+    return report_gpu_limited_layout;
+  }
 
+  private void reportIfReachGPULimit(String instanceId,String ref,GraphicSize layoutSize){
+    float limit = WXRenderManager.getOpenGLRenderLimitValue();
+    if(limit > 0 && (layoutSize.getHeight() > limit || layoutSize.getWidth() > limit)){
+      Map<String, String> ext = new ArrayMap<>();
+      WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(instanceId,ref);
+      ext.put("GPU limit",String.valueOf(limit));
+      ext.put("component.width",String.valueOf(layoutSize.getWidth()));
+      ext.put("component.height",String.valueOf(layoutSize.getHeight()));
+      if (component.getComponentType() != null && !component.getComponentType().isEmpty()) {
+        ext.put("component.type", component.getComponentType());
+      }
+      if (component.getStyles() != null && !component.getStyles().isEmpty()) {
+        ext.put("component.style", component.getStyles().toString());
+      }
+      if (component.getAttrs() != null && !component.getAttrs().isEmpty()) {
+        ext.put("component.attr", component.getAttrs().toString());
+      }
+      if (component.getEvents() != null && !component.getEvents().isEmpty()) {
+        ext.put("component.event", component.getEvents().toString());
+      }
+      if (component.getMargin() != null) {
+        ext.put("component.margin", component.getMargin().toString());
+      }
+      if (component.getPadding() != null) {
+        ext.put("component.padding", component.getPadding().toString());
+      }
+      if (component.getBorder() != null) {
+        ext.put("component.border", component.getBorder().toString());
+      }
+      JSONObject map = new JSONObject();
+      map.putAll(ext);
+      WXSDKManager.getInstance().getSDKInstance(instanceId).setComponentsInfoExceedGPULimit(map);
+      if(shouldReportGPULimit()) {
+        WXExceptionUtils.commitCriticalExceptionRT(instanceId
+                , WXErrorCode.WX_RENDER_WAR_GPU_LIMIT_LAYOUT,
+                "WXBridgeManager",
+                String.format(Locale.ENGLISH, "You are creating a component(%s x %2$s) which exceeds the limit of gpu(%3$s x %3$s),it may cause crash",
+                        String.valueOf(layoutSize.getWidth()), String.valueOf(layoutSize.getHeight()), String.valueOf(limit)),
+                ext);
+      }
+    }
+  }
   public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width, boolean isRTL, int index) {
 
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(ref)) {
@@ -2976,6 +3041,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (instance != null) {
         GraphicSize size = new GraphicSize(width, height);
         GraphicPosition position = new GraphicPosition(left, top, right, bottom);
+        reportIfReachGPULimit(pageId,ref,size);
         GraphicActionAddElement addAction = instance.getInActiveAddElementAction(ref);
         if(addAction!=null) {
           addAction.setRTL(isRTL);

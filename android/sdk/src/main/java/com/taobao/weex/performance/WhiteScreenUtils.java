@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXConfigAdapter;
+import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import org.json.JSONObject;
@@ -58,11 +59,33 @@ public class WhiteScreenUtils {
         if (!(v instanceof ViewGroup)) {
             return false;
         }
-        ViewGroup group = (ViewGroup)v;
-        if (group.getChildCount() == 0) {
-            return true;
+        if (isInWhiteList(instance)){
+            return false;
         }
-        return !hasLeafViewOrSizeIgnore(group,3);
+        return !hasLeafViewOrSizeIgnore(v,3);
+    }
+
+    private static boolean isInWhiteList(WXSDKInstance instance){
+        IWXConfigAdapter configAdapter = WXSDKManager.getInstance().getWxConfigAdapter();
+        if (null == configAdapter){
+            return false;
+        }
+        String whiteList = configAdapter.getConfig("wxapm","ws_white_list",null);
+        if (TextUtils.isEmpty(whiteList)){
+            return false;
+        }
+        try {
+            String[] urlList = whiteList.split(";");
+            for (String whiteUrl : urlList){
+                if (instance.getBundleUrl() != null && instance.getBundleUrl().contains(whiteUrl)){
+                    return true;
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     private static boolean hasLeafViewOrSizeIgnore(View v,int checkDeep) {
@@ -92,38 +115,16 @@ public class WhiteScreenUtils {
     /**
      * get instance viewTree && component tree msg
      */
-    public static String getViewMsg(WXSDKInstance instance) {
+    public static String takeViewTreeSnapShot(WXSDKInstance instance) {
         if (null == instance) {
             return "nullInstance";
         }
         View v = instance.getContainerView();
-        StringBuilder builder = new StringBuilder();
-        WXComponent component = instance.getRootComponent();
-        if (null != component) {
-            builder.append("componentMsg:").append(getComponentTreeMsg(component)).append("-----");
+        JSONObject root = geViewDetailTreeMsg(v);
+        if (null != root) {
+            return root.toString();
         }
-        if (null != v) {
-            builder.append("viewTreeMsg:").append(geViewDetailTreeMsg(v));
-        }
-        return builder.toString();
-    }
-
-    private static String getComponentTreeMsg(WXComponent component) {
-        if (null == component) {
-            return "nullComponent";
-        }
-
-        if (!(component instanceof WXVContainer)) {
-            return component.getRef();
-        }
-        WXVContainer container = (WXVContainer)component;
-        StringBuilder builder = new StringBuilder();
-        builder.append(" _start_ ");
-        for (int i = 0; i < container.getChildCount(); i++) {
-            builder.append(getComponentTreeMsg(container.getChild(i))).append(",");
-        }
-        builder.append(" _end_ ");
-        return builder.toString();
+        return "";
     }
 
     private static JSONObject geViewDetailTreeMsg(View view) {
@@ -142,10 +143,10 @@ public class WhiteScreenUtils {
             node.put("y", location[1]);
 
             if (view instanceof ViewGroup) {
-                node.put("type", "ViewGroup");
+                node.put("type", view.getClass().getSimpleName());
                 ViewGroup group = (ViewGroup)view;
                 for (int i = 0; i < group.getChildCount(); i++) {
-                    node.put("child", geViewDetailTreeMsg(group.getChildAt(i)));
+                    node.put("child_"+i, geViewDetailTreeMsg(group.getChildAt(i)));
                 }
             } else {
                 node.put("type", view.getClass().getSimpleName());

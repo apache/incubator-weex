@@ -56,7 +56,7 @@ const getFileType = file => {
 
 function checkAndroidFile(file){
   var type = getFileType(file);
-  return type == type_android_test || type == type_android_sdk || type == type_jsfm;
+  return true
 }
 
 var hasAndroidFile = false;
@@ -92,10 +92,8 @@ console.log('-----------------------------hasAndroidFile------------------------
 if(hasAndroidFile){
   var runTryBuildCmd='source ~/.bash_profile; '
     +'cd android; '
-    +'./gradlew clean assembleDebug --info -PdisableCov=true '
-    +'-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m '
-    +'-XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8 '
-  var runSuccess = shell.exec(runTryBuildCmd,{ async: false, timeout: 8 * 60 * 1000, maxBuffer: 200 * 1024 * 1024 }).code == 0;
+    +'./gradlew clean install --info'
+  var runSuccess = shell.exec(runTryBuildCmd,{ async: false, timeout: 60 * 60 * 1000, maxBuffer: 200 * 1024 * 1024 }).code == 0;
   if(!runSuccess){
     fail("Failed to run assembleDebug task for android.");
   }

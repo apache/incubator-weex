@@ -110,7 +110,7 @@ public class WXStateRecord {
         @Override
         public boolean add(E e) {
             if (this.size()>0 && this.size() >= maxSize){
-                remove(this.size() - 1);
+                remove(0);
             }
             return super.add(e);
         }

@@ -23,7 +23,7 @@ import android.app.Application;
 import android.os.Bundle;
 import android.util.Log;
 import android.support.multidex.MultiDex;
-
+import android.text.TextUtils;
 import com.alibaba.android.bindingx.plugin.weex.BindingX;
 import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
@@ -76,17 +76,18 @@ public class WXApplication extends Application {
     WXEnvironment.setApkDebugable(true);
     WXSDKEngine.addCustomOptions("appName", "WXSample");
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
-    WXSDKEngine.initialize(this,
-                           new InitConfig.Builder()
-                               //.setImgAdapter(new FrescoImageAdapter())// use fresco adapter
-                               .setImgAdapter(new ImageAdapter())
-                                   .setDrawableLoader(new PicassoBasedDrawableLoader(getApplicationContext()))
-                               .setWebSocketAdapterFactory(new DefaultWebSocketAdapterFactory())
-                               .setJSExceptionAdapter(new JSExceptionAdapter())
-                               .setHttpAdapter(new InterceptWXHttpAdapter())
-                               .setApmGenerater(new ApmGenerator())
-                               .build()
-                          );
+    InitConfig.Builder builder = new InitConfig.Builder()
+        //.setImgAdapter(new FrescoImageAdapter())// use fresco adapter
+        .setImgAdapter(new ImageAdapter())
+        .setDrawableLoader(new PicassoBasedDrawableLoader(getApplicationContext()))
+        .setWebSocketAdapterFactory(new DefaultWebSocketAdapterFactory())
+        .setJSExceptionAdapter(new JSExceptionAdapter())
+        .setHttpAdapter(new InterceptWXHttpAdapter())
+        .setApmGenerater(new ApmGenerator());
+    if(!TextUtils.isEmpty(BuildConfig.externalLibraryName)){
+      builder.addNativeLibrary(BuildConfig.externalLibraryName);
+    }
+    WXSDKEngine.initialize(this, builder.build());
     WXSDKManager.getInstance().setWxConfigAdapter(new DefaultConfigAdapter());
     WXSDKManager.getInstance().addWXAnalyzer(new WXAnalyzerDemoListener());
     WXAnalyzerDataTransfer.isOpenPerformance = false;

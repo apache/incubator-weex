@@ -659,6 +659,7 @@ typedef enum : NSUInteger {
         }
         
         if (([newOptions[@"DATA_RENDER"] boolValue] && [newOptions[@"RENDER_WITH_BINARY"] boolValue]) || [newOptions[@"WLASM_RENDER"] boolValue]) {
+            [strongSelf.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_END];
             [strongSelf _renderWithData:data];
             return;
         }

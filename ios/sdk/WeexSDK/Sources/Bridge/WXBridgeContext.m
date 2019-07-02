@@ -481,8 +481,6 @@ _Pragma("clang diagnostic pop") \
     [self.sendQueue setValue:sendQueue forKey:instanceIdString];
 
     if (sdkInstance.dataRender && ![options[@"EXEC_JS"] boolValue]) {
-        WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instanceIdString]);
-        WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
         if (_dataRenderHandler) {
             WXPerformBlockOnComponentThread(^{
                 [_dataRenderHandler createPage:instanceIdString template:jsBundleString options:options data:data];
@@ -498,8 +496,6 @@ _Pragma("clang diagnostic pop") \
                 });
             }
         }
-        WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
-        [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
         return;
     }
 
@@ -530,6 +526,7 @@ _Pragma("clang diagnostic pop") \
         }
         if ([WXDebugTool isDevToolDebug]) {
             [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[],raxAPIScript?:@""]];
+            [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
             
             if ([NSURL URLWithString:sdkInstance.pageName]) {
                 [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]];
@@ -537,7 +534,7 @@ _Pragma("clang diagnostic pop") \
                 [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
             }
             WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
-            [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
+            [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
         } else {
             sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@", instanceIdString, newOptions, data];
             //add instanceId to weexContext ,if fucn createInstanceContext failure ，then we will know which instance has problem (exceptionhandler)
@@ -601,6 +598,7 @@ _Pragma("clang diagnostic pop") \
                     [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
                 }
                 sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = nil;
+                [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
                 WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
             }];
         }
@@ -621,7 +619,7 @@ _Pragma("clang diagnostic pop") \
         sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = funcInfo;
         [self callJSMethod:@"createInstance" args:args];
         sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = nil;
-
+        [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
     }
 }
@@ -661,8 +659,6 @@ _Pragma("clang diagnostic pop") \
     [self.sendQueue setValue:sendQueue forKey:instanceIdString];
 
     if (sdkInstance.dataRender) {
-        WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instanceIdString]);
-        WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
         if (_dataRenderHandler) {
             WXPerformBlockOnComponentThread(^{
                 [_dataRenderHandler createPage:instanceIdString contents:contents options:options data:data];
@@ -678,8 +674,6 @@ _Pragma("clang diagnostic pop") \
                 });
             }
         }
-        WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
-        [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
         return;
     }
 }
@@ -691,7 +685,7 @@ _Pragma("clang diagnostic pop") \
     NSURLComponents * urlComponent = [NSURLComponents componentsWithString:instance.pageName?:@""];
     if (@available(iOS 8.0, *)) {
         for (NSURLQueryItem * queryItem in urlComponent.queryItems) {
-            if ([queryItem.name isEqualToString:@"bundleType"] && [@[@"vue", @"rax"] containsObject:queryItem.value]) {
+            if ([queryItem.name isEqualToString:@"bundleType"] && [@[@"Vue", @"Rax", @"vue", @"rax"] containsObject:queryItem.value]) {
                 bundleType = queryItem.value;
                 return bundleType;
             }
