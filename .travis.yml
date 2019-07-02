@@ -64,11 +64,11 @@ install:
         npm install
         echo y | sdkmanager "cmake;3.6.4111459"
         if find "${HOME}/android-ndk-r18b" -mindepth 1 | read; then
-          echo $(ls -al)
           echo "dir not empty"
+          ls -al "${HOME}/android-ndk-r18b"
         else
           echo "dir empty"
-          echo $(ls -al)
+          ls -al "${HOME}/android-ndk-r18b"
           rmdir "${HOME}/android-ndk-r18b"
         fi
 
