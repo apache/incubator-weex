@@ -13,7 +13,6 @@ matrix:
         android:
           components:
             - android-26
-            - extra-google-m2repository
             - extra-android-m2repository
       - env: TEST_SUITE=android ABI=arm64-v8a
         language: android
@@ -22,7 +21,6 @@ matrix:
         android:
           components:
             - android-26
-            - extra-google-m2repository
             - extra-android-m2repository
       - env: TEST_SUITE=android ABI=x86
         language: android
@@ -31,7 +29,6 @@ matrix:
         android:
           components:
             - android-26
-            - extra-google-m2repository
             - extra-android-m2repository
 cache:
   directories:
@@ -96,7 +93,7 @@ script:
         echo "Node returned ${hasAndroidFile}"
         if [[ "$hasAndroidFile" = "true" ]]; then
           cd android
-          ./gradlew clean install ${GRADLE_ABI}
+          ./gradlew clean install ${GRADLE_ABI} --info
         fi
         ;;
       "jsfm" )
