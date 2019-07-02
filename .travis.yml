@@ -104,7 +104,6 @@ script:
         hasAndroidFile=true
         echo "Node returned ${hasAndroidFile}"
         if [[ "$hasAndroidFile" = "true" ]]; then
-          source ~/.bash_profile; 
           cd android
           ./gradlew clean install ${GRADLE_ABI}
         fi
