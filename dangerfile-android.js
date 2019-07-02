@@ -89,18 +89,19 @@ if (!hasAndroidFile && danger.git.deleted_files) {
     return f;
   });
 }
-console.log('-----------------------------hasAndroidFile-----------------------------:'+hasAndroidFile);
-if(hasAndroidFile){
-  var runTryBuildCmd='source ~/.bash_profile; '
-    +'cd android; '
-    +'./gradlew clean install --info'
-  var runSuccess = shell.exec(runTryBuildCmd,{ async: false, timeout: 60 * 60 * 1000, maxBuffer: 200 * 1024 * 1024 }).code == 0;
-  if(!runSuccess){
-    fail("Failed to run assembleDebug task for android.");
-  }
-}else{
-  console.log('No android file has been changed.');
-  message('No android file has been changed.')
-}
 
-message('android build verification finished.')
+console.log(hasAndroidFile)
+
+// if(hasAndroidFile){
+//   var runTryBuildCmd='source ~/.bash_profile; '
+//     +'cd android; '
+//     +'./gradlew clean install --info'
+//   var runSuccess = shell.exec(runTryBuildCmd,{ async: false, timeout: 60 * 60 * 1000, maxBuffer: 200 * 1024 * 1024 }).code == 0;
+//   if(!runSuccess){
+//     fail("Failed to run assembleDebug task for android.");
+//   }
+// }else{
+//   console.log('No android file has been changed.');
+//   message('No android file has een changed.')
+// }
+

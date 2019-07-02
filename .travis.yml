@@ -1,13 +1,38 @@
 os: linux
 language: node_js
 node_js: 7.6
-rvm: 2.0.0
 matrix:
     fast_finish: true
     include:
       - env: TEST_SUITE=danger 
       - env: TEST_SUITE=jsfm
-      - env: TEST_SUITE=android
+      - env: TEST_SUITE=android supportArmeabi-v7a=true supportArm64-v8a=false supportX86=false
+        language: android
+        dist: trusty
+        jdk: oraclejdk8
+        android:
+          components:
+            - build-tools-26.0.3
+            - android-26
+            - platform-tools
+            - tools
+            - extra-google-m2repository
+            - extra-android-m2repository
+            - sys-img-x86-android-26
+      - env: TEST_SUITE=android supportArmeabi-v7a=false supportArm64-v8a=true supportX86=false
+        language: android
+        dist: trusty
+        jdk: oraclejdk8
+        android:
+          components:
+            - build-tools-26.0.3
+            - android-26
+            - platform-tools
+            - tools
+            - extra-google-m2repository
+            - extra-android-m2repository
+            - sys-img-x86-android-26
+      - env: TEST_SUITE=android supportArmeabi-v7a=false supportArm64-v8a=false supportX86=true
         language: android
         dist: trusty
         jdk: oraclejdk8
@@ -61,7 +86,8 @@ script:
   - |
     case $TEST_SUITE in
       "android") 
-        npm run danger -- run --dangerfile ./dangerfile-android.js
+        val = $(npm run danger -- run --dangerfile ./dangerfile-android.js)
+        echo val
         ;;
       "jsfm" )
         npm run danger -- run --dangerfile ./dangerfile-jsfm.js
