@@ -87,7 +87,7 @@ script:
 
         hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-android.js)
         echo ${hasAndroidFile}
-        if [ "$hasAndroidFile" = "true" ]; then
+        if [[ "$hasAndroidFile" = "true" ]]; then
           cd android
           ./gradlew clean install ${GRADLE_ABI}
         fi
