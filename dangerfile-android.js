@@ -17,6 +17,11 @@
  * under the License.
  */
 import { schedule, danger, fail, warn, message, markdown } from "danger";
+import fs from "fs";
+import path from 'path';
+import GitHubApi from 'github';
+import parseDiff from 'parse-diff';
+import shell from "shelljs";
 
 const type_unknown = 0;
 const type_ios_sdk = 1;
@@ -50,9 +55,7 @@ const getFileType = file => {
 }
 
 function checkAndroidFile(file){
-  return true
-  // var type = getFileType(file);
-  // return type == type_android_test || type == type_android_sdk || type == type_jsfm;
+  return type == type_android_test || type == type_android_sdk || type == type_jsfm;
 }
 
 var hasAndroidFile = false;
@@ -84,6 +87,5 @@ if (!hasAndroidFile && danger.git.deleted_files) {
     return f;
   });
 }
-
-console.log(hasAndroidFile)
-console.error("Test")
+console.log('-----------------------------hasAndroidFile-----------------------------:'+hasAndroidFile);
+message('android build verification finished.')
