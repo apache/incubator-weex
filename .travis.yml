@@ -13,6 +13,10 @@ matrix:
         android:
           components:
             - android-26
+            - platform-tools
+            - build-tools-26.0.3
+            - tools
+            - extra-google-m2repository
             - extra-android-m2repository
       - env: TEST_SUITE=android ABI=arm64-v8a
         language: android
@@ -21,6 +25,10 @@ matrix:
         android:
           components:
             - android-26
+            - platform-tools
+            - build-tools-26.0.3
+            - tools
+            - extra-google-m2repository
             - extra-android-m2repository
       - env: TEST_SUITE=android ABI=x86
         language: android
@@ -29,8 +37,11 @@ matrix:
         android:
           components:
             - android-26
+            - platform-tools
+            - build-tools-26.0.3
+            - tools
+            - extra-google-m2repository
             - extra-android-m2repository
-
 cache:
   directories:
     - npm
@@ -93,6 +104,7 @@ script:
         hasAndroidFile=true
         echo "Node returned ${hasAndroidFile}"
         if [[ "$hasAndroidFile" = "true" ]]; then
+          source ~/.bash_profile; 
           cd android
           ./gradlew clean install ${GRADLE_ABI}
         fi
