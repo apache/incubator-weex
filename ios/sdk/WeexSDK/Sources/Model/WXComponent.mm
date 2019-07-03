@@ -850,6 +850,7 @@ static BOOL bNeedRemoveEvents = YES;
             if (gradientLayer) {
                 _backgroundColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
                 strongSelf.view.backgroundColor = _backgroundColor;
+                [strongSelf setNeedsDisplay];
             }
         }
     });

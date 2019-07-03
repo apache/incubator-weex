@@ -353,6 +353,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
         CGContextSetFillColorWithColor(context, _backgroundColor.CGColor);
         UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
         [bezierPath fill];
+        _view.backgroundColor = UIColor.clearColor;
     }
     // Top
     if (_borderTopWidth > 0) {
