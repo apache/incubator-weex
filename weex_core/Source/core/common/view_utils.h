@@ -54,7 +54,8 @@ namespace WeexCore {
 
   inline float getFloat(const char* src) {
     char *end;
-    float ret = strtof(src, &end);
+    float ret = (float) strtod(src, &end);
+
     if(*end != '\0'){
       ret = NAN;
     }
