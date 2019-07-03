@@ -55,7 +55,8 @@ const getFileType = file => {
 }
 
 function checkAndroidFile(file){
-  return type == type_android_test || type == type_android_sdk || type == type_jsfm;
+  return true
+  // return type == type_android_test || type == type_android_sdk || type == type_jsfm;
 }
 
 var hasAndroidFile = false;
