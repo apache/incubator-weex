@@ -1,7 +1,7 @@
 
 buildscript {
     repositories {
-        mavenLocal()
+        google()
         maven(){
             url 'https://maven.aliyun.com/repository/google'
         }
@@ -26,12 +26,12 @@ subprojects {
         }
     }
     repositories {
-        mavenLocal()
         if(project.hasProperty('external_repositories')){
             maven {
                 url external_repositories
             }
         }
+        google()
         maven(){
             url 'https://maven.aliyun.com/repository/google'
         }
@@ -45,7 +45,7 @@ subprojects {
             classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         }
         repositories {
-            mavenLocal()
+            google()
             maven(){
                 url 'https://maven.aliyun.com/repository/google'
             }
