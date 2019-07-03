@@ -1010,15 +1010,13 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
         NSDictionary *resultTouch = [_component touchResultWithScreenLocation:screenLocation pageLocation:pageLocation identifier:touch.wx_identifier];
         NSMutableDictionary * mutableResultTouch = [resultTouch mutableCopy];
         
-        if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"9.0")) {
-            float value = touch.force*60;
-            float maxValue = touch.maximumPossibleForce*60;
-            if (touch.maximumPossibleForce) {
-                // the forece value will be range 1 from 0.
-                [mutableResultTouch setObject:[NSNumber numberWithFloat:value/maxValue] forKey:@"force"];
-            }else {
-                [mutableResultTouch setObject:[NSNumber numberWithFloat:0.0] forKey:@"force"];
-            }
+        float value = touch.force*60;
+        float maxValue = touch.maximumPossibleForce*60;
+        if (touch.maximumPossibleForce) {
+            // the forece value will be range 1 from 0.
+            [mutableResultTouch setObject:[NSNumber numberWithFloat:value/maxValue] forKey:@"force"];
+        }else {
+            [mutableResultTouch setObject:[NSNumber numberWithFloat:0.0] forKey:@"force"];
         }
         
         if (mutableResultTouch) { // component is nil, mutableResultTouch will be nil

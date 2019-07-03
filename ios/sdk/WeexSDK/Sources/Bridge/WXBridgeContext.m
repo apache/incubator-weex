@@ -546,11 +546,7 @@ _Pragma("clang diagnostic pop") \
             __weak typeof(self) weakSelf = self;
             [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
                 if (sdkInstance.pageName) {
-                    if (@available(iOS 8.0, *)) {
-                        [sdkInstance.instanceJavaScriptContext.javaScriptContext setName:sdkInstance.pageName];
-                    } else {
-                        // Fallback
-                    }
+                    [sdkInstance.instanceJavaScriptContext.javaScriptContext setName:sdkInstance.pageName];
                 }
                 weakSelf.jsBridge.javaScriptContext[@"wxExtFuncInfo"]= nil;
                 
@@ -683,16 +679,11 @@ _Pragma("clang diagnostic pop") \
     NSString * bundleType = nil;
     WXSDKInstance * instance = [WXSDKManager instanceForID:instanceIdString];
     NSURLComponents * urlComponent = [NSURLComponents componentsWithString:instance.pageName?:@""];
-    if (@available(iOS 8.0, *)) {
-        for (NSURLQueryItem * queryItem in urlComponent.queryItems) {
-            if ([queryItem.name isEqualToString:@"bundleType"] && [@[@"Vue", @"Rax", @"vue", @"rax"] containsObject:queryItem.value]) {
-                bundleType = queryItem.value;
-                return bundleType;
-            }
+    for (NSURLQueryItem * queryItem in urlComponent.queryItems) {
+        if ([queryItem.name isEqualToString:@"bundleType"] && [@[@"Vue", @"Rax", @"vue", @"rax"] containsObject:queryItem.value]) {
+            bundleType = queryItem.value;
+            return bundleType;
         }
-    } else {
-        // Fallback on earlier versions
-        return bundleType;
     }
     
     // find first character that is not space or new line character
@@ -1238,10 +1229,6 @@ _Pragma("clang diagnostic pop") \
         }
     };
     
-    if (WX_SYS_VERSION_LESS_THAN(@"8.0")) {
-        // solve iOS7 memory problem
-        context[@"nativeSet"] = [WXPolyfillSet class];
-    }
     context[@"console"][@"error"] = ^(){
         [WXBridgeContext handleConsoleOutputWithArgument:[JSContext currentArguments] logLevel:WXLogFlagError];
     };

@@ -110,13 +110,8 @@
 
 - (void)executeJSFramework:(NSString *)frameworkScript
 {
-
     WXAssertParam(frameworkScript);
-    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-        [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:@"weex-main-jsfm.js"]];
-    }else{
-        [_jsContext evaluateScript:frameworkScript];
-    }
+    [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:@"weex-main-jsfm.js"]];
 }
 
 - (JSValue *)callJSMethod:(NSString *)method args:(NSArray *)args
@@ -423,9 +418,7 @@
     __weak typeof(self) weakSelf = self;
     
     _jsContext = [[JSContext alloc] init];
-    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-        _jsContext.name = @"Weex Context";
-    }
+    _jsContext.name = @"Weex Context";
     
     [WXBridgeContext mountContextEnvironment:_jsContext];
     

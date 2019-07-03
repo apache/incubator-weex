@@ -159,12 +159,7 @@ static NSThread *WXComponentThread;
     dispatch_once(&onceToken, ^{
         WXComponentThread = [[NSThread alloc] initWithTarget:[self sharedManager] selector:@selector(_runLoopThread) object:nil];
         [WXComponentThread setName:WX_COMPONENT_THREAD_NAME];
-        if(WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-            [WXComponentThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
-        } else {
-            [WXComponentThread setThreadPriority:[[NSThread mainThread] threadPriority]];
-        }
-        
+        [WXComponentThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
         [WXComponentThread start];
     });
     

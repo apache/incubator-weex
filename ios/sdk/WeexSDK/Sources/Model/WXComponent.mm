@@ -261,12 +261,6 @@ static BOOL bNeedRemoveEvents = YES;
         [_panGesture removeTarget:nil action:NULL];
     }
     
-    if (bNeedRemoveEvents) {
-        if (WX_SYS_VERSION_LESS_THAN(@"9.0")) {
-            [self _removeAllEvents];
-        }
-    }
-    
     if (_bindingExpressions != nullptr) {
         for (WXJSExpression* expr : *_bindingExpressions) {
             if (expr != nullptr) {
