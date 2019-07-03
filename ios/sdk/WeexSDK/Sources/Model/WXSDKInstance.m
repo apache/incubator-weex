@@ -930,7 +930,7 @@ typedef enum : NSUInteger {
         return result;
     }
     // if result is nil, try url-encode the 'url' string.
-    return [NSURL URLWithString:[url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] relativeToURL:_scriptURL];
+    return [NSURL URLWithString:[url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]] relativeToURL:_scriptURL];
 }
 
 - (BOOL)checkModuleEventRegistered:(NSString*)event moduleClassName:(NSString*)moduleClassName
