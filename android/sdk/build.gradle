@@ -51,21 +51,21 @@ version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion'
 
 //Check version, the version must have 4 sections. The leading three section must be number, and the last section is odd number with or without suffix string.
 if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVersionCheck').equals("true")) {
-    assert version.tokenize('.').eachWithIndex { it, i ->
+    version.tokenize('.').eachWithIndex { it, i ->
         if (i < 3) {
-            assert it.isNumber()
+            assert it.isNumber() : "Please use semantic versioning witch 4 sections, you are using ${$ { i } + 1} section instead."
         } else if (i == 3) {
-            it.split("-|_").toList().eachWithIndex { inner_it, inner_i ->
+            it.split("[-_]").toList().eachWithIndex { inner_it, inner_i ->
                 if (inner_i == 0) {
-                    assert inner_it.isNumber() && inner_it.toInteger() % 2
+                    assert inner_it.isNumber() && inner_it.toInteger() % 2 : "The 4th dight in the versioning number must be a odd number, and it is ${inner_it} currently."
                 } else {
-                    assert !inner_it.isNumber()
+                    assert !inner_it.isNumber() : "The suffix of the versioning number is not allowed to contain any number, and it is ${inner_it} currently."
                 }
             }.size == 4
         } else {
-            assert false: "Please use semantic versioning witch 4 sections, you are using ${$ { i } + 1} section instead"
+            assert false: "Please use semantic versioning witch 4 sections, you are using ${$ { i } + 1} section instead."
         }
-    }.size == 4
+    }
 }
 
 android {
