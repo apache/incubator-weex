@@ -1641,6 +1641,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void onRenderError(final String errCode, final String msg) {
     if (mRenderListener != null && mContext != null) {
+      WXLogUtils.e("onRenderError "+errCode +","+msg);
       runOnUiThread(new Runnable() {
 
         @Override
@@ -1656,6 +1657,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void onJSException(final String errCode, final String function, final String exception) {
     hasException = true;
     if (mRenderListener != null && mContext != null) {
+      WXLogUtils.e("onJSException "+errCode +","+exception);
       runOnUiThread(new Runnable() {
 
         @Override

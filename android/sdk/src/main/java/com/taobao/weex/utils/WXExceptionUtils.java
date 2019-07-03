@@ -109,6 +109,7 @@ public class WXExceptionUtils {
 												 @Nullable final Map<String,String> extParams ) {
 
         try {
+            WXLogUtils.e("weex","commitCriticalExceptionRT :"+errCode+"exception"+exception);
             WXStateRecord.getInstance().recordException(instanceId,exception);
             IWXConfigAdapter configAdapter = WXSDKManager.getInstance().getWxConfigAdapter();
             boolean doCheck = true;
