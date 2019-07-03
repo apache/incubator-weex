@@ -22,8 +22,6 @@
 #import "WXUtility.h"
 #import "WXAssert.h"
 
-static NSString *WXModalCallbackKey;
-
 typedef enum : NSUInteger {
     WXModalTypeToast = 1,
     WXModalTypeAlert,
@@ -72,9 +70,6 @@ typedef enum : NSUInteger {
 @end
 
 @implementation WXModalUIModule
-{
-    NSMutableSet *_alertViews;
-}
 
 @synthesize weexInstance;
 
@@ -86,7 +81,6 @@ WX_EXPORT_METHOD(@selector(prompt:callback:))
 - (instancetype)init
 {
     if (self = [super init]) {
-        _alertViews = [NSMutableSet setWithCapacity:1];
     }
     
     return self;
@@ -94,7 +88,6 @@ WX_EXPORT_METHOD(@selector(prompt:callback:))
 
 - (void)dealloc
 {
-    [_alertViews removeAllObjects];
 }
 
 #pragma mark - Toast
@@ -293,7 +286,6 @@ static const CGFloat WXToastDefaultPadding = 30.0;
     [self alert:message okTitle:okTitle cancelTitle:cancelTitle defaultText:defaultValue type:WXModalTypePrompt callback:callback];
 }
 
-
 #pragma mark - Private
 
 - (void)alert:(NSString *)message okTitle:(NSString *)okTitle cancelTitle:(NSString *)cancelTitle defaultText:(NSString *)defaultText type:(WXModalType)type callback:(WXModuleKeepAliveCallback)callback
@@ -305,50 +297,74 @@ static const CGFloat WXToastDefaultPadding = 30.0;
         return;
     }
     
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"" message:message delegate:self cancelButtonTitle:cancelTitle otherButtonTitles:okTitle, nil];
-    alertView.tag = type;
-    if (type == WXModalTypePrompt) {
-        alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-        UITextField *textField = [alertView textFieldAtIndex:0];
-        textField.placeholder = defaultText;
-    }
-    objc_setAssociatedObject(alertView, &WXModalCallbackKey, [callback copy], OBJC_ASSOCIATION_COPY_NONATOMIC);
-    [_alertViews addObject:alertView];
+    __weak WXModalUIModule* wModuleSelf = self;
     
     WXPerformBlockOnMainThread(^{
-        [alertView show];
+        __strong WXModalUIModule* sModuleSelf = wModuleSelf;
+        
+        if (sModuleSelf) {
+            void (^handleAction)(UIAlertController*, UIAlertAction*) = ^(UIAlertController* alertView, UIAlertAction* action) {
+                if (callback) {
+                    id result = @"";
+                    switch (type) {
+                        case WXModalTypeAlert: {
+                            break;
+                        }
+                        case WXModalTypeConfirm: {
+                            result = action.title ?: @"";
+                            break;
+                        }
+                        case WXModalTypePrompt: {
+                            NSString *clickTitle = action.title ?: @"";
+                            NSString *text = [alertView.textFields firstObject].text ?: @"";
+                            result = @{ @"result": clickTitle, @"data": text };
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                    
+                    callback(result, NO);
+                }
+            };
+            
+            UIAlertController *alertView = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
+            __weak UIAlertController* weakAlertView = alertView;
+            
+            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle ?: @"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+                handleAction(weakAlertView, action);
+            }];
+            
+            UIAlertAction *OKAction = nil;
+            if (okTitle) {
+                OKAction = [UIAlertAction actionWithTitle:okTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                    handleAction(weakAlertView, action);
+                }];
+            }
+            
+            if (type == WXModalTypePrompt) {
+                [alertView addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+                    textField.placeholder = defaultText ?: @"";
+                }];
+            }
+            
+            [alertView addAction:cancelAction];
+            
+            if (OKAction) {
+                [alertView addAction:OKAction];
+            }
+            
+            UIViewController* selfVC = sModuleSelf.weexInstance.viewController;
+            if (selfVC == nil) {
+                selfVC = [UIApplication sharedApplication].delegate.window.rootViewController;
+                WXLogWarning(@"Unable to find view controller for instance. Use Application root vc to show AlertViewController.");
+            }
+            
+            if (selfVC) {
+                [selfVC presentViewController:alertView animated:YES completion:nil];
+            }
+        }
     });
-}
-
-- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    WXModuleKeepAliveCallback callback = objc_getAssociatedObject(alertView, &WXModalCallbackKey);
-    if (!callback) return;
-    
-    id result = @"";
-    switch (alertView.tag) {
-        case WXModalTypeAlert: {
-            result = @"";
-            break;
-        }
-        case WXModalTypeConfirm: {
-            NSString *clickTitle = [alertView buttonTitleAtIndex:buttonIndex];
-            result = clickTitle;
-            break;
-        }
-        case WXModalTypePrompt: {
-            NSString *clickTitle = [alertView buttonTitleAtIndex:buttonIndex];
-            NSString *text= [[alertView textFieldAtIndex:0] text] ?: @"";
-            result = @{ @"result": clickTitle, @"data": text };
-            break;
-        }
-        default:
-            break;
-    }
-    
-    callback(result,NO);
-    
-    [_alertViews removeObject:alertView];
 }
 
 - (NSString*)stringValue:(id)value
