@@ -17,7 +17,7 @@
  * under the License.
  */
 //
-// Created by 董亚运 on 2019-07-01.
+// Created by Darin on 2019-07-01.
 //
 
 #ifndef WEEX_PROJECT_TLOG_H
