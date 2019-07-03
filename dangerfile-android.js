@@ -56,6 +56,7 @@ const getFileType = file => {
 
 function checkAndroidFile(file){
   return true
+  // var type = getFileType(file);
   // return type == type_android_test || type == type_android_sdk || type == type_jsfm;
 }
 
@@ -88,5 +89,6 @@ if (!hasAndroidFile && danger.git.deleted_files) {
     return f;
   });
 }
-console.log('-----------------------------hasAndroidFile-----------------------------:'+hasAndroidFile);
-message('android build verification finished.')
+if(hasAndroidFile){
+  console.log('hasAndroidFiled');
+}
