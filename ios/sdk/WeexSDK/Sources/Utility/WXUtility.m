@@ -160,13 +160,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
 + (WXLayoutDirection)getEnvLayoutDirection {
     // We not use the below technique, because your app maybe not support the first preferredLanguages
     // _sysLayoutDirection = [NSLocale characterDirectionForLanguage:[[NSLocale preferredLanguages] objectAtIndex:0]] == NSLocaleLanguageDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
-    if (@available(iOS 9.0, *)) {
-        // The view is shown in right-to-left mode right now.
-        return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:UISemanticContentAttributeUnspecified] == UIUserInterfaceLayoutDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
-    } else {
-        // Use the previous technique
-        return [[UIApplication sharedApplication] userInterfaceLayoutDirection] == UIUserInterfaceLayoutDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
-    }
+    return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:UISemanticContentAttributeUnspecified] == UIUserInterfaceLayoutDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
 }
 
 + (NSDictionary *)getEnvironment

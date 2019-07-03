@@ -101,12 +101,7 @@ static NSThread *WXBackupBridgeThread;
     dispatch_once(&onceToken, ^{
         WXBridgeThread = [[NSThread alloc] initWithTarget:[[self class]sharedManager] selector:@selector(_runLoopThread) object:nil];
         [WXBridgeThread setName:WX_BRIDGE_THREAD_NAME];
-        if(WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-            [WXBridgeThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
-        } else {
-            [WXBridgeThread setThreadPriority:[[NSThread mainThread] threadPriority]];
-        }
-        
+        [WXBridgeThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
         [WXBridgeThread start];
     });
     
@@ -119,12 +114,7 @@ static NSThread *WXBackupBridgeThread;
     dispatch_once(&onceToken, ^{
         WXBackupBridgeThread = [[NSThread alloc] initWithTarget:[[self class]sharedManager] selector:@selector(_runLoopThread) object:nil];
         [WXBackupBridgeThread setName:WX_BACKUP_BRIDGE_THREAD_NAME];
-        if(WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-            [WXBackupBridgeThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
-        } else {
-            [WXBackupBridgeThread setThreadPriority:[[NSThread mainThread] threadPriority]];
-        }
-
+        [WXBackupBridgeThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
         [WXBackupBridgeThread start];
     });
 

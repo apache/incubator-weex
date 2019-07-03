@@ -112,10 +112,7 @@
 
 - (BOOL)greater8SysVer
 {
-    //return NO;
-    NSString *reqSysVer = @"8.0";
-    NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
-    return [currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending;
+    return YES;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
