@@ -1229,10 +1229,6 @@ _Pragma("clang diagnostic pop") \
         }
     };
     
-    if (WX_SYS_VERSION_LESS_THAN(@"8.0")) {
-        // solve iOS7 memory problem
-        context[@"nativeSet"] = [WXPolyfillSet class];
-    }
     context[@"console"][@"error"] = ^(){
         [WXBridgeContext handleConsoleOutputWithArgument:[JSContext currentArguments] logLevel:WXLogFlagError];
     };

@@ -94,12 +94,6 @@ WX_EXPORT_METHOD(@selector(prompt:callback:))
 
 - (void)dealloc
 {
-    if (WX_SYS_VERSION_LESS_THAN(@"8.0")) {
-        for (UIAlertView *alerView in _alertViews) {
-            alerView.delegate = nil;
-        }
-    }
-    
     [_alertViews removeAllObjects];
 }
 

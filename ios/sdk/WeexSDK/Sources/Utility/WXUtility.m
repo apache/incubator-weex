@@ -577,22 +577,14 @@ CGFloat WXFloorPixelValue(CGFloat value)
             if (fontFamily) {
                 WXLogWarning(@"Unknown fontFamily:%@", fontFamily);
             }
-            if(WX_SYS_VERSION_LESS_THAN(@"8.2")) {
-                font = [UIFont systemFontOfSize:fontSize];
-            } else {
-                font = [UIFont systemFontOfSize:fontSize weight:textWeight];
-            }
+            font = [UIFont systemFontOfSize:fontSize weight:textWeight];
         }
     }
     UIFontDescriptor *fontD = font.fontDescriptor;
     UIFontDescriptorSymbolicTraits traits = 0;
     
     traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
-    if (WX_SYS_VERSION_LESS_THAN(@"8.2")) {
-        traits = ((textWeight-0.4) >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
-    }else {
-        traits = (textWeight-UIFontWeightBold >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
-    }
+    traits = (textWeight-UIFontWeightBold >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
     if (traits != 0) {
         fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
         UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];
