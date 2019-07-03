@@ -47,7 +47,7 @@ public class WXStateRecord {
 
     private WXStateRecord() {
         mExceptionHistory = new RecordList<>(5);
-        mActionHistory = new RecordList<>(10);
+        mActionHistory = new RecordList<>(20);
         mJsfmInitHistory = new RecordList<>(3);
         mJscCrashHistory = new RecordList<>(3);
         mJscReloadHistory = new RecordList<>(5);
