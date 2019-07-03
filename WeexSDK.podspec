@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
                     "doumafang "   => "doumafang@gmail.com"
                    }
   s.platform     = :ios
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '9.0'
 
   # use for public
   # s.source =  {
