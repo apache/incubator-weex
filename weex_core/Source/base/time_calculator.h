@@ -17,7 +17,7 @@
  * under the License.
  */
 //
-// Created by 董亚运 on 2019/1/14.
+// Created by Darin on 2019/1/14.
 //
 
 #ifndef WEEX_PROJECT_TIME_CALCULATOR_H

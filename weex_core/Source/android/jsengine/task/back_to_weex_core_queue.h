@@ -17,7 +17,7 @@
  * under the License.
  */
 //
-// Created by 董亚运 on 2019/1/8.
+// Created by Darin on 2019/1/8.
 //
 
 #ifndef WEEX_PROJECT_BACK_TO_WEEX_CORE_QUEUE_H

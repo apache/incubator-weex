@@ -196,32 +196,6 @@ static std::unique_ptr<IPCResult> HandleCallNative(IPCArguments *arguments) {
                   ->CallNative(pageId.get(), task.get(), callback.get());
             }
           }));
-
-  //  char *pageId = getArumentAsCStr(arguments, 0);
-  //  char *task = getArumentAsCStr(arguments, 1);
-  //  char *callback = getArumentAsCStr(arguments, 2);
-  //
-  //  if (pageId != nullptr && task != nullptr) {
-  //#if JSAPI_LOG
-  //    LOGD("[ExtendJSApi] handleCallNative >>>> pageId: %s, task: %s", pageId,
-  //         task);
-  //#endif
-  //    WeexCoreManager::Instance()->script_bridge()->core_side()->CallNative(
-  //        pageId, task, callback);
-  //  }
-  //
-  //  if (pageId != nullptr) {
-  //    delete[] pageId;
-  //    pageId = nullptr;
-  //  }
-  //  if (task != nullptr) {
-  //    delete[] task;
-  //    task = nullptr;
-  //  }
-  //  if (callback != nullptr) {
-  //    delete[] callback;
-  //    callback = nullptr;
-  //  }
   return createInt32Result(0);
 }
 
@@ -977,6 +951,35 @@ std::unique_ptr<IPCResult> UpdateComponentData(IPCArguments *arguments) {
     return createInt32Result(static_cast<int32_t>(true));
 }
 
+
+std::unique_ptr<IPCResult> Tlog(IPCArguments *arguments) {
+  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+          weex::base::MakeCopyable(
+                  [tag = std::move(arg1), log = std::move(arg2)]() {
+                      LOGE_TAG(tag.get(),"%s",log.get());
+                  }));
+  return createInt32Result(static_cast<int32_t>(true));
+}
+
+
+std::unique_ptr<IPCResult> HeartBeat(IPCArguments *arguments) {
+  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+          weex::base::MakeCopyable(
+                  [pageId = std::move(arg1)]() {
+                      if (pageId != nullptr) {
+                        LOGE("HeartBeat %s", pageId.get());
+                        WeexCoreManager::Instance()
+                                ->script_bridge()
+                                ->core_side()
+                                ->CallNative(pageId.get(), "HeartBeat", "HeartBeat");
+                      }
+                  }));
+  return createInt32Result(static_cast<int32_t>(true));
+}
+
 ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   set_script_side(new bridge::script::ScriptSideInMultiProcess);
   set_core_side(new CoreSideInScript);
@@ -1070,6 +1073,10 @@ void ScriptBridgeInMultiProcess::RegisterIPCCallback(IPCHandler *handler) {
                            OnReceivedResult);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::UPDATECOMPONENTDATA),
                            UpdateComponentData);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::TLOGMSG),
+                           Tlog);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::HEARTBEAT),
+                           HeartBeat);
 }
 
 }  // namespace WeexCore

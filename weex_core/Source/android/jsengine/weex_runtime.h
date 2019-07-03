@@ -57,8 +57,6 @@ public:
 
     std::unique_ptr<WeexJSResult> exeJSOnAppWithResult(const String &instanceId, const String &jsBundle);
 
-    int callJSOnAppContext(IPCArguments *arguments);
-
     int callJSOnAppContext(const String &instanceId, const String &func, std::vector<VALUE_WITH_TYPE *> &params);
 
     int destroyAppContext(const String &instanceId);
@@ -106,9 +104,6 @@ private:
     int _initFramework(const String &source);
 
     int _initAppFramework(const String &instanceId, const String &appFramework);
-
-    void _getArgListFromIPCArguments(MarkedArgumentBuffer *obj, ExecState *state, IPCArguments *arguments,
-                                     size_t start);
 
     void _getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *state, std::vector<VALUE_WITH_TYPE *> &params);
 
