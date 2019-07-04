@@ -17,11 +17,6 @@
  * under the License.
  */
 import { schedule, danger, fail, warn, message, markdown } from "danger";
-import fs from "fs";
-import path from 'path';
-import GitHubApi from 'github';
-import parseDiff from 'parse-diff';
-import shell from "shelljs";
 
 const type_unknown = 0;
 const type_ios_sdk = 1;
