@@ -1,7 +1,6 @@
 os: linux
 language: node_js
 node_js: 7.6
-rvm: 2.0.0
 matrix:
     fast_finish: true
     include:
