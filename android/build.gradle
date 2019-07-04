@@ -47,7 +47,6 @@ subprojects {
             jcenter(){
                 url 'https://maven.aliyun.com/repository/jcenter'
             }
-            google()
         }
     }
     ext {
