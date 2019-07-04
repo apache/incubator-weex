@@ -315,6 +315,7 @@ public class WXInstanceApm {
         addProperty(KEY_PROPERTIES_ERROR_CODE, VALUE_ERROR_CODE_DEFAULT);
         addProperty(KEY_PAGE_PROPERTIES_JSLIB_VERSION, WXEnvironment.JS_LIB_SDK_VERSION);
         addProperty(KEY_PAGE_PROPERTIES_WEEX_VERSION, WXEnvironment.WXSDK_VERSION);
+        addProperty("wxUseRuntimeApi",WXEnvironment.sUseRunTimeApi);
         if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
             addProperty(KEY_PAGE_PROPERTIES_RENDER_TYPE, WXEnvironment.EAGLE);

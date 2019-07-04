@@ -155,10 +155,11 @@ public class WXExceptionUtils {
         Map<String, String> commitMap = extParams;
         if (null == commitMap){
             commitMap = new HashMap<>();
-            commitMap.put("wxSdkInitStartTime", String.valueOf(WXEnvironment.sSDKInitStart));
-            commitMap.put("wxSDKInitCostTime", String.valueOf(WXEnvironment.sSDKInitTime));
-            commitMap.put("wxSDKCurExceptionTime", String.valueOf(System.currentTimeMillis()));
         }
+        commitMap.put("wxSdkInitStartTime", String.valueOf(WXEnvironment.sSDKInitStart));
+        commitMap.put("wxSDKInitCostTime", String.valueOf(WXEnvironment.sSDKInitTime));
+        commitMap.put("wxSDKCurExceptionTime", String.valueOf(System.currentTimeMillis()));
+        commitMap.put("wxUseRuntimeApi",String.valueOf(WXEnvironment.sUseRunTimeApi));
         if (!TextUtils.isEmpty(instanceId)) {
             instanceIdCommit = instanceId;
             instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
