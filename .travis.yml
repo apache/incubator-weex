@@ -50,11 +50,9 @@ install:
         npm install
         echo y | sdkmanager "cmake;3.6.4111459"
         if find "${HOME}/android-ndk-r18b" -mindepth 1 | read; then
-          echo "dir not empty"
-          ls -al "${HOME}/android-ndk-r18b"
+          echo "NDK cache hit"
         else
-          echo "dir empty"
-          ls -al "${HOME}/android-ndk-r18b"
+          echo "NDK cache missed"
           rmdir "${HOME}/android-ndk-r18b"
         fi
 
@@ -90,8 +88,7 @@ script:
         esac
 
         hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-android.js)
-        echo "Node returned ${hasAndroidFile}"
-        echo "This is end"
+        echo "The value of hasAndroidFile is ${hasAndroidFile}"
         if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
           cd android
           ./gradlew clean install ${GRADLE_ABI} --info
