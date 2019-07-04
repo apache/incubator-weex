@@ -131,17 +131,17 @@ public class WXSoInstallMgrSdk {
 //    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
 
 
-    try {
-      // If a library loader adapter exists, use this adapter to load library
-      // instead of System.loadLibrary.
-      if (mSoLoader != null) {
-        mSoLoader.doLoadLibrary("c++_shared");
-      } else {
-        System.loadLibrary("c++_shared");
-      }
-    } catch (Exception e) {
-
-    }
+    //try {
+    //  // If a library loader adapter exists, use this adapter to load library
+    //  // instead of System.loadLibrary.
+    //  if (mSoLoader != null) {
+    //    mSoLoader.doLoadLibrary("c++_shared");
+    //  } else {
+    //    System.loadLibrary("c++_shared");
+    //  }
+    //} catch (Exception e) {
+    //
+    //}
 
       /**
        * Load library with {@link System#loadLibrary(String)}
