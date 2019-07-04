@@ -45,7 +45,7 @@ cp dist/weex-rax.min.js pre-build/weex-rax-api.js
 # Build android_sdk
 if [ -d "android_sdk" ]
 then
-    git clone -b 0.24 --depth=1 git@github.com:alibaba/weex_js_engine.git
+    git clone -b 0.25 --depth=1 git@github.com:alibaba/weex_js_engine.git
     export ANDROID_NDK=$1
     export PATH=$1:$PATH
     cd weex_js_engine/
