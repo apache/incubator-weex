@@ -54,18 +54,19 @@ then
     cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/armeabi-v7a
     mkdir -p ../weex_core/Source/libs/armeabi-v7a
     cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/armeabi-v7a
+    rm -rf build32 libWTF.so libJavaScriptCore.so
 
-    rm -rf build32
     sh build.jsc.sh -t arm64
     cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/arm64-v8a
     mkdir -p ../weex_core/Source/libs/arm64-v8a
     cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/arm64-v8a
+    rm -rf build64 libWTF.so libJavaScriptCore.so
 
-    rm -rf build64
     sh build.jsc.sh -t x86
     cp libWTF.so libJavaScriptCore.so ../android_sdk/libs/x86
     mkdir -p ../weex_core/Source/libs/x86
     cp libWTF.so libJavaScriptCore.so ../weex_core/Source/libs/x86
+    rm -rf build32 libWTF.so libJavaScriptCore.so
 
     cd ..
 
