@@ -246,7 +246,7 @@ This product bundles vuejs v1.0.12, which is available under a
 This product bundles Guava v20.0, which is available under a "Apache" license. For details, see https://github.com/google/guava/blob/v20.0/COPYING and following files:
   android_sdk/src/main/java/org/apache/taobao/weex/utils/WXDataStructureUtil.java
 
-This product bundles json11 v1.0.0, which is available under a "MIT" license.For details, see https://github.com/dropbox/json11/tree/v1.0.0 and following files:
+This product bundles json11 v1.0.0, which is available under a "MIT" license. For details, see https://github.com/dropbox/json11/tree/v1.0.0 and following files:
    weex_core/Source/third_party/json11/CMakeLists.txt
    weex_core/Source/third_party/json11/json11.cc
    weex_core/Source/third_party/json11/json11.hpp
@@ -275,8 +275,6 @@ This product bundles json11 v1.0.0, which is available under a "MIT" license.For
 This product bundles chromium v66.0.3344.2, which is available under a "BSD-style" license. For details, see https://github.com/chromium/chromium/blob/66.0.3344.2/ and following files:
    modp_b64:
       The following files are copied from https://github.com/chromium/chromium/tree/master/third_party/modp_b64 and their names are listed below:
-         weex_core/Source/base/base64/base64.cpp
-         weex_core/Source/base/base64/base64.h
          weex_core/Source/base/base64/modp_base64/modp_b64_data.h
          weex_core/Source/base/base64/modp_base64/modp_b64.cc
          weex_core/Source/base/base64/modp_base64/modp_b64.h
@@ -708,3 +706,13 @@ This product bundles Webkit 2.17.4, which is available under a "BSD-style" licen
          * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
          * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          */
+
+This product bundles files from Boost under "Boost Software License". For more details, reference http://www.boost.org/LICENSE_1_0.txt
+  weex_core/Source/js_runtime/utils/base64.hpp
+
+  //
+  // Copyright (c) 2013-2017 Vinnie Falco (vinnie dot falco at gmail dot com)
+  //
+  // Distributed under the Boost Software License, Version 1.0. (See accompanying
+  // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+  //
