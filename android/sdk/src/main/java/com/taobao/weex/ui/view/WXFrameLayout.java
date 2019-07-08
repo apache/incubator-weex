@@ -20,45 +20,46 @@ package com.taobao.weex.ui.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
-
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXDiv;
-import com.taobao.weex.ui.flat.widget.Widget;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXViewUtils;
-
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * FrameLayout wrapper
  *
  */
-public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IRenderStatus<WXDiv>,IRenderResult<WXDiv> {
-
-  private WXGesture wxGesture;
+public class WXFrameLayout extends BaseFrameLayout implements WXGestureObservable,IRenderStatus<WXDiv>,IRenderResult<WXDiv>{
 
   private WeakReference<WXDiv> mWeakReference;
+  private WXGesture wxGesture;
 
-  private List<Widget> mWidgets;
 
   public WXFrameLayout(Context context) {
     super(context);
+  }
+
+  @Nullable
+  @Override
+  public WXDiv getComponent() {
+    return null != mWeakReference ? mWeakReference.get() : null;
+  }
+
+  @Override
+  public void holdComponent(WXDiv component) {
+    mWeakReference = new WeakReference<WXDiv>(component);
   }
 
   @Override
@@ -79,41 +80,10 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
     }
     return result;
   }
-
-  @Override
-  public void holdComponent(WXDiv component) {
-    mWeakReference = new WeakReference<WXDiv>(component);
-  }
-
-  @Nullable
-  @Override
-  public WXDiv getComponent() {
-    return null != mWeakReference ? mWeakReference.get() : null;
-  }
-
-  public void mountFlatGUI(List<Widget> widgets){
-    this.mWidgets = widgets;
-    if (mWidgets != null) {
-      setWillNotDraw(true);
-    }
-    invalidate();
-  }
-
-  public void unmountFlatGUI(){
-    mWidgets = null;
-    setWillNotDraw(false);
-    invalidate();
-  }
-
-  @Override
-  protected boolean verifyDrawable(@NonNull Drawable who) {
-    return mWidgets != null || super.verifyDrawable(who);
-  }
-
   @Override
   protected void dispatchDraw(Canvas canvas) {
     try {
-      dispatchDrawInterval(canvas);
+      super.dispatchDrawInterval(canvas);
     } catch (Throwable e) {
       if (getComponent() != null) {
         notifyLayerOverFlow();
@@ -128,7 +98,6 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
       WXLogUtils.e("Layer overflow limit error", WXLogUtils.getStackTrace(e));
     }
   }
-
   private int reportLayerOverFlowError() {
     int deep = calLayerDeep(this, 0);
     if (getComponent() != null) {
@@ -140,21 +109,6 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
     }
     return deep;
   }
-
-  private void dispatchDrawInterval(Canvas canvas) {
-    if (mWidgets != null) {
-      canvas.save();
-      canvas.translate(getPaddingLeft(), getPaddingTop());
-      for (Widget widget : mWidgets) {
-        widget.draw(canvas);
-      }
-      canvas.restore();
-    } else {
-      WXViewUtils.clipCanvasWithinBorderBox(this, canvas);
-      super.dispatchDraw(canvas);
-    }
-  }
-
   private int calLayerDeep(View view, int deep) {
     deep++;
     if (view.getParent() != null && view.getParent() instanceof View) {
@@ -182,4 +136,5 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
       component.fireEvent(Constants.Event.LAYEROVERFLOW, params);
     }
   }
+
 }
