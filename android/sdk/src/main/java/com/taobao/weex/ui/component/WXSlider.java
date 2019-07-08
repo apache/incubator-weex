@@ -38,6 +38,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.ui.view.BaseFrameLayout;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.WXCirclePageAdapter;
 import com.taobao.weex.ui.view.WXCircleViewPager;
@@ -104,8 +105,8 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   }
 
   @Override
-  protected FrameLayout initComponentHostView(@NonNull Context context) {
-    FrameLayout view = new FrameLayout(context);
+  protected BaseFrameLayout initComponentHostView(@NonNull Context context) {
+    BaseFrameLayout view = new BaseFrameLayout(context);
     // init view pager
     if (getAttrs() != null) {
       Object obj = getAttrs().get(INFINITE);
