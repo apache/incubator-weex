@@ -61,6 +61,19 @@ subprojects {
         //Default value for disableCov is false
         disableCov = project.hasProperty("disableCov") && disableCov.equals("true")
     }
+    if(project.name == 'playground'){
+        apply plugin: 'com.android.application'
+        dependencies {
+            implementation project(':weex_sdk')
+        }
+    }
+
+    if(project.name == 'commons'){
+        apply plugin: 'com.android.library'
+        dependencies {
+            implementation project(':weex_sdk')
+        }
+    }
 }
 
 //task clean(type: Delete) {

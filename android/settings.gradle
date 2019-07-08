@@ -1,7 +1,4 @@
 rootProject.name = 'weex-project'
-include ":playground"
-project(":playground").projectDir=new File("playground/app")
-
 include ":weex_sdk"
 project(":weex_sdk").projectDir = new File("sdk")
 
@@ -9,7 +6,10 @@ project(":weex_sdk").projectDir = new File("sdk")
 //include ":HeronAndroid"
 //project(":HeronAndroid").projectDir = new File("../../Heron/HeronAndroid")
 
+include ":playground"
+project(":playground").projectDir=new File("weex_playground/android/playground/app")
 
 include ":commons"
+project(":commons").projectDir=new File("weex_playground/android/commons")
 
 

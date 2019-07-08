@@ -276,7 +276,6 @@ task checkNdkVersion() {
 }
 
 preBuild.dependsOn checkNdkVersion
-
 def siteUrl = 'https://weex.incubator.apache.org'
 def gitUrl = 'https://github.com/apache/incubator-weex.git'
 group = "com.taobao.android"
@@ -339,7 +338,14 @@ bintray {
     }
 }
 
-afterEvaluate { project ->
+task updateSubmodules(type: Exec){
+    description 'Update git submodules'
+    commandLine "git", "submodule", "update", "--init", "--remote"
+}
+
+
+afterEvaluate {
+    externalNativeBuildRelease.dependsOn updateSubmodules
     transformNativeLibsWithStripDebugSymbolForRelease << {
         copy{
             from transformNativeLibsWithMergeJniLibsForRelease
