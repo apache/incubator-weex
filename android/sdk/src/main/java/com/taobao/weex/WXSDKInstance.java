@@ -18,7 +18,6 @@
  */
 package com.taobao.weex;
 
-import static com.taobao.weex.common.WXErrorCode.WX_ERR_JSC_CRASH;
 import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
@@ -72,9 +71,9 @@ import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
-import com.taobao.weex.render.WXAbstractRenderContainer;
 import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.performance.WhiteScreenUtils;
+import com.taobao.weex.render.WXAbstractRenderContainer;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
@@ -92,7 +91,6 @@ import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.cache.RegisterCache;
-
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -1351,7 +1349,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if (null != mContext){
         mContext.sendBroadcast(intent);
       }else {
-        WXEnvironment.getApplication().sendBroadcast(intent);
+        try {
+          WXEnvironment.getApplication().sendBroadcast(intent);
+        } catch (Exception e){
+          WXLogUtils.e("weex",e);
+        }
       }
       this.mCurrentGround = true;
     }
