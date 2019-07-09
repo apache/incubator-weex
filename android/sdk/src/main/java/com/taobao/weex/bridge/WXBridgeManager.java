@@ -2960,31 +2960,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     return IWXBridge.INSTANCE_RENDERING;
   }
-  private boolean shouldReportGPULimit() {
-    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
-    boolean report_gpu_limited_layout = false;
-    float sample_rate_of_report = 0;
-    if (adapter != null) {
-      try {
-        sample_rate_of_report = Float.parseFloat(adapter
-                .getConfig("android_weex_test_gpu",
-                        "sample_rate_of_report",
-                        "0"));
-      }catch(Exception e){
-        WXLogUtils.e(WXLogUtils.getStackTrace(e));
-      }
-      WXLogUtils.i("sample_rate_of_report : " + sample_rate_of_report);
-      if(Math.random() < sample_rate_of_report){
-        report_gpu_limited_layout = true;
-      }
-    }
-    return report_gpu_limited_layout;
-  }
 
-  private void reportIfReachGPULimit(String instanceId,String ref,GraphicSize layoutSize){
+  private void setExceedGPULimitComponentsInfo(String instanceId,String ref,GraphicSize layoutSize){
     float limit = WXRenderManager.getOpenGLRenderLimitValue();
     if(limit > 0 && (layoutSize.getHeight() > limit || layoutSize.getWidth() > limit)){
-      Map<String, String> ext = new ArrayMap<>();
+      JSONObject ext = new JSONObject();
       WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(instanceId,ref);
       ext.put("GPU limit",String.valueOf(limit));
       ext.put("component.width",String.valueOf(layoutSize.getWidth()));
@@ -3010,17 +2990,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (component.getBorder() != null) {
         ext.put("component.border", component.getBorder().toString());
       }
-      JSONObject map = new JSONObject();
-      map.putAll(ext);
-      WXSDKManager.getInstance().getSDKInstance(instanceId).setComponentsInfoExceedGPULimit(map);
-      if(shouldReportGPULimit()) {
-        WXExceptionUtils.commitCriticalExceptionRT(instanceId
-                , WXErrorCode.WX_RENDER_WAR_GPU_LIMIT_LAYOUT,
-                "WXBridgeManager",
-                String.format(Locale.ENGLISH, "You are creating a component(%s x %2$s) which exceeds the limit of gpu(%3$s x %3$s),it may cause crash",
-                        String.valueOf(layoutSize.getWidth()), String.valueOf(layoutSize.getHeight()), String.valueOf(limit)),
-                ext);
-      }
+      WXSDKManager.getInstance().getSDKInstance(instanceId).setComponentsInfoExceedGPULimit(ext);
     }
   }
   public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width, boolean isRTL, int index) {
@@ -3056,7 +3026,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (instance != null) {
         GraphicSize size = new GraphicSize(width, height);
         GraphicPosition position = new GraphicPosition(left, top, right, bottom);
-        reportIfReachGPULimit(pageId,ref,size);
+        setExceedGPULimitComponentsInfo(pageId,ref,size);
         GraphicActionAddElement addAction = instance.getInActiveAddElementAction(ref);
         if(addAction!=null) {
           addAction.setRTL(isRTL);
