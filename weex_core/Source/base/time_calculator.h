@@ -70,8 +70,8 @@ class TimeCalculator {
       m_task_end_time_ = getCurrentTime();
     }
     m_destructor_time_ = getCurrentTime();
-//    print();
-    transform();
+    print();
+//    transform();
   }
 
   void taskStart();

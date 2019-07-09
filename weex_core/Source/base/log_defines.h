@@ -25,7 +25,7 @@
 namespace WeexCore {
     
     enum class LogLevel : int {
-        Debug,
+        Debug = 0,
         Info,
         Warn,
         Error,

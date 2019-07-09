@@ -33,6 +33,10 @@ class LogUtilsJSS : public weex::base::LogBase {
            unsigned long line,
            const char *log) override {
 
+    if(level < WeexCore::LogLevel::Error) {
+      return false;
+    }
+
     return WeexEnv::getEnv()->sendLog((int) level, tag, file, line, log);
   }
 };

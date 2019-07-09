@@ -356,12 +356,12 @@ WeexTaskQueue *ScriptSideInQueue::taskQueue(const char *id, bool log) {
       WeexEnv::getEnv()->m_task_cache_.clear();
     }
     if (log) {
-      LOGE("dyyLog instance %s use back up thread time is %lld", id, microTime());
+      LOGE("instance %s use back up thread time is %lld", id, microTime());
     }
     return weexTaskQueue_bk_;
   }
   if (log && id != nullptr) {
-    LOGE("dyyLog instance %s use main thread time is %lld", id, microTime());
+    LOGE("instance %s use main thread time is %lld", id, microTime());
   }
   return weexTaskQueue_;
 }

@@ -23,7 +23,7 @@ namespace weex {
 namespace base {
 void weex::base::TimeCalculator::taskEnd() {
   LOGE(
-      "dyyLog %s taskName is %s : instanceId %s : m_task_id_ %d: taskEnd",
+      "%s taskName is %s : instanceId %s : m_task_id_ %d: taskEnd",
       m_task_platform_.c_str(),
       m_task_name_.c_str(),
       m_instance_id_.c_str(),
@@ -33,7 +33,7 @@ void weex::base::TimeCalculator::taskEnd() {
 }
 void weex::base::TimeCalculator::taskStart() {
   LOGE(
-      "dyyLog timeline %s taskName is %s : instanceId %s : m_task_id_ %d: taskStart",
+      "timeline %s taskName is %s : instanceId %s : m_task_id_ %d: taskStart",
       m_task_platform_.c_str(),
       m_task_name_.c_str(),
       m_instance_id_.c_str(),
@@ -50,7 +50,7 @@ void weex::base::TimeCalculator::print() {
   if (!args.empty() || taskWait > 100) {
     showLog = true;
   } else if (taskCost < 5) {
-    LOGE("dyyLog timeline %s taskName is %s cost less than 5ms", m_task_platform_.c_str(),
+    LOGE("timeline %s taskName is %s cost less than 5ms", m_task_platform_.c_str(),
          m_task_name_.c_str());
   } else {
     showLog = true;
@@ -66,7 +66,7 @@ void weex::base::TimeCalculator::print() {
   }
 
   if (showLog) {
-    LOGE("dyyLog timeline taskName: %s, result: %s", m_task_name_.c_str(), formatData().c_str());
+    LOGE("timeline taskName: %s, result: %s", m_task_name_.c_str(), formatData().c_str());
   }
 }
 void weex::base::TimeCalculator::transform() {

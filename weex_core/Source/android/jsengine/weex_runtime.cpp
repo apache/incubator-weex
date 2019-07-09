@@ -371,7 +371,7 @@ int WeexRuntime::exeCTimeCallback(const String &source) {
 
 int WeexRuntime::exeJS(const String &instanceId, const String &nameSpace, const String &func,
                        std::vector<VALUE_WITH_TYPE *> &params) {
-//    LOGE("dyyLog EXECJS func:%s and params size is %d", func.utf8().data(), params.size());
+//    LOGE("EXECJS func:%s and params size is %d", func.utf8().data(), params.size());
 
     String runFunc = func;
     JSGlobalObject *globalObject;
@@ -728,7 +728,7 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
             auto instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
             auto pArray = JSObjectCopyPropertyNames(globalContextRef, ref);
             size_t keyCount = JSPropertyNameArrayGetCount(pArray);
-//            LOGE("dyyLog instance create and id is %s, and time is %lld, currentThread is %u", instanceId.utf8().data(), microTime(), pthread_self());
+//            LOGE("instance create and id is %s, and time is %lld, currentThread is %u", instanceId.utf8().data(), microTime(), pthread_self());
             for (size_t i = 0; i < keyCount; ++i) {
                 auto propertyName_ = JSPropertyNameArrayGetNameAtIndex(pArray, i);
                 auto propertyValue_ = JSObjectGetProperty(globalContextRef, ref, propertyName_, NULL);
@@ -854,7 +854,7 @@ WeexRuntime::_getArgListFromIPCArguments(MarkedArgumentBuffer *obj, ExecState *s
 
 void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *state,
                                           std::vector<VALUE_WITH_TYPE *> &params) {
-    //dyyLog delete
+    //delete
     String msg = "exejs Args ";
     weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::JSS_ENGINE, "exejs Args", "exec js");
     timeCalculator.taskStart();
