@@ -275,6 +275,11 @@ filesToVerifySrcHeader.forEach(filepath => {
   }
 });
 
+// check if document update:
+var pr_body = danger.github.pr.body
+if (!pr_body.match(/\[Document\]\(http.*\)/)){
+  warn("if you update the code，maybe you should update the document and add the document PR link in the PR content with the format:[Document](http://document_PR_link)")
+}
 
 /*
  * try to find the appropriate reviewer according to the blame info
