@@ -275,6 +275,12 @@ filesToVerifySrcHeader.forEach(filepath => {
   }
 });
 
+// check if pr bind the github milestone
+console.log("checkMileStone")
+if(!danger.github.pr.milestone){
+  console.error("current pr not bind the milestone");
+  fail("current pr not bind the milestone");
+}
 
 /*
  * try to find the appropriate reviewer according to the blame info
