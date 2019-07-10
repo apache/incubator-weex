@@ -572,7 +572,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     );
     mContainerInfo.put(WXInstanceApm.KEY_PAGE_PROPERTIES_INSTANCE_TYPE,"page");
 
-    WXBridgeManager.getInstance().checkJsEngineMultiThread();
+    // WXBridgeManager.getInstance().checkJsEngineMultiThread();
     mDisableSkipFrameworkInit = isDisableSkipFrameworkInDataRender();
   }
 
