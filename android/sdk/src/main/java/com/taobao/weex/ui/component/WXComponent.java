@@ -1693,6 +1693,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
     boolean cancel_hardware_accelerate = false;
     if (adapter != null) {
+      WXLogUtils.e("cancel_hardware_accelerate1 adapter != null");
+
       try {
         cancel_hardware_accelerate = Boolean.parseBoolean(adapter
                 .getConfig("android_weex_test_gpu",
@@ -1703,6 +1705,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       }
       WXLogUtils.i("cancel_hardware_accelerate : " + cancel_hardware_accelerate);
     }
+    WXLogUtils.e("cancel_hardware_accelerate2 : " + cancel_hardware_accelerate);
     return cancel_hardware_accelerate;
   }
 
