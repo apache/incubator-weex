@@ -16,23 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { schedule, danger, fail, warn, message, markdown } from "danger";
+// Removed import
 import fs from "fs";
 import path from 'path';
 import GitHubApi from 'github';
 import parseDiff from 'parse-diff';
 
 // check if pr submitted to master branch
-console.log(checkMasterBranch)
+console.log("checkMasterBranch")
 const isMergeRefMaster = danger.github.pr.base.ref === 'master';
 if(!isMergeRefMaster){
   fail("you must submit PR to master branch")
 }
 
-// check if pr contains a document link:
-console.log("checkDocument")
-var pr_body = danger.github.pr.body
-if (!pr_body.toLowerCase().match(/document.*http.*/)){
+if (!pr_body.toLowerCase().match(/document[\s:]*http.*/)){
   const msg = "if you update the code, "+
     "maybe you should update the document and add the document link in the PR description. \n" +
     "here is the guide about how to contribute document:https://weex.apache.org/guide/contribute/how-to-contribute.html#contribute-code-or-document \n"
@@ -41,7 +38,7 @@ if (!pr_body.toLowerCase().match(/document.*http.*/)){
 
 // check if pr contains a demo link
 console.log("checkDemo")
-if (!pr_body.toLowerCase().match(/demo.*http.*/)){
+if (!pr_body.toLowerCase().match(/demo[\s:]*http.*/)){
   const msg =  "if your PR is about fixing a bug excluding crash the code,"+
     "you should add the demo link in the PR description. \n "+
     "here is a demo link:http://dotwe.org/vue?spm=a2c7j.-guide-contribute-contribute-code.0.0.3e93748cmxz3yt"
