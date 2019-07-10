@@ -1,5 +1,5 @@
 cd ../android/sdk
-gradle compileDebugSources
+../gradlew assembleDebug
 cd ..
 cp sdk/build/intermediates/cmake/debug/obj/armeabi/libweexcore.so sdk/libs/armeabi/libweexcore.so
 ##cp sdk/build/intermediates/cmake/debug/obj/armeabi-v7a/libweexcore.so sdk/libs/armeabi-v7a/libweexcore.so

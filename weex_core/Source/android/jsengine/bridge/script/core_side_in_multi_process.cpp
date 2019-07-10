@@ -319,10 +319,15 @@ namespace weex {
                     // }
                     if (result->getType() != IPCType::VOID) {
                         if (result->getStringLength() > 0) {
+#ifdef USE_JS_RUNTIME
+                            return jString2String(result->getStringContent(),
+                                                  result->getStringLength()).c_str();
+#else
                             return jString2String(result->getStringContent(),
                                                   result->getStringLength())
                                     .utf8()
                                     .data();
+#endif
                         }
                     }
                 } catch (IPCException &e) {
@@ -391,10 +396,15 @@ namespace weex {
                 // }
                 if (result->getType() != IPCType::VOID) {
                     if (result->getStringLength() > 0) {
+#ifdef USE_JS_RUNTIME
+                        return jString2String(result->getStringContent(),
+                                              result->getStringLength()).c_str();
+#else
                         return jString2String(result->getStringContent(),
                                               result->getStringLength())
                                 .utf8()
                                 .data();
+#endif
                     }
                 }
                 return nullptr;

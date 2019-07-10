@@ -117,6 +117,8 @@ android {
 
     def android_project_dir = projectDir
 
+    def buildRuntimeApi = project.hasProperty('buildRuntimeApi') ? project.property('buildRuntimeApi') : true
+
     defaultConfig {
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
@@ -129,7 +131,7 @@ android {
         versionName project.version
         ndk {
             if(!project.hasProperty('supportArmeabi-v7a') || "false" != project.getProperty('supportArmeabi-v7a')){
-                abiFilters 'arm64-v8a'
+                abiFilters 'armeabi-v7a'
             }
 
             if(!project.hasProperty('supportArm64-v8a') || "false" != project.getProperty('supportArm64-v8a')){
@@ -147,7 +149,8 @@ android {
                         '-DANDROID_STL=' + "${cxx_stl}",
                         '-DCMAKE_BUILD_TYPE=Release',
                         '-DANDROID_PROJECT_DIR=' + "${android_project_dir}",
-                        '-DENABLE_ASAN=false'
+                        '-DENABLE_ASAN=false',
+                        '-DBUILD_RUNTIME_API='+"${buildRuntimeApi}"
             }
         }
     }
@@ -228,34 +231,34 @@ dependencies {
     testImplementation 'org.json:json:20160212'
 }
 
- if(file('../license/LICENSE').exists()){
-     license {
-         header = file('../license/LICENSE')
-         mapping('cpp','JAVADOC_STYLE')
-         mapping('h','JAVADOC_STYLE')
-         excludes(['com/taobao/weex/utils/WXDataStructureUtil.java'])
-     }
+if(file('../license/LICENSE').exists()){
+    license {
+        header = file('../license/LICENSE')
+        mapping('cpp','JAVADOC_STYLE')
+        mapping('h','JAVADOC_STYLE')
+        excludes(['com/taobao/weex/utils/WXDataStructureUtil.java'])
+    }
 
-     task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
-         source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc', '**/*.c']).
-                 exclude(['Source/rapidjson/**/*.h','Source/rapidjson/**/*.cpp',
-                          'Source/android/base/base64/**/*.h','Source/android/base/base64/**/*.cpp',
-                          'Source/android/jniprebuild/jniheader/*.h',
-                          'Source/base/Compatible.cpp',
-                          'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
-                          'Source/base/third_party/icu/*.h',
-                          'Source/base/third_party/icu/*.cpp',
-                          'Source/android/jsengine/dependence/**/*.h',
-                          'Source/android/jsengine/dependence/**/*.cpp',
-                          'Source/include/wtf/**/*.h',
-                          'Source/include/wtf/**/*.c',
-                          'Source/include/wtf/**/*.cpp',
-                          'Source/include/JavaScriptCore/**/*.h',
-                          'Source/include/JavaScriptCore/**/*.c',
-                          'Source/include/JavaScriptCore/**/*.cpp'])
-     }
-     preBuild.dependsOn licenseFormat
- }
+    task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
+        source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc', '**/*.c']).
+                exclude(['Source/rapidjson/**/*.h','Source/rapidjson/**/*.cpp',
+                         'Source/android/base/base64/**/*.h','Source/android/base/base64/**/*.cpp',
+                         'Source/android/jniprebuild/jniheader/*.h',
+                         'Source/base/Compatible.cpp',
+                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
+                         'Source/base/third_party/icu/*.h',
+                         'Source/base/third_party/icu/*.cpp',
+                         'Source/android/jsengine/dependence/**/*.h',
+                         'Source/android/jsengine/dependence/**/*.cpp',
+                         'Source/include/wtf/**/*.h',
+                         'Source/include/wtf/**/*.c',
+                         'Source/include/wtf/**/*.cpp',
+                         'Source/include/JavaScriptCore/**/*.h',
+                         'Source/include/JavaScriptCore/**/*.c',
+                         'Source/include/JavaScriptCore/**/*.cpp'])
+    }
+    preBuild.dependsOn licenseFormat
+}
 
 task checkNdkVersion() {
     def rootDir = project.rootDir

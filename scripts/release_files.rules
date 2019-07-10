@@ -53,6 +53,13 @@
 - weex_core/Source/base/android/jniprebuild/jni_files
 - weex_core/Source/base/android/jniprebuild/jni_generator.py
 - weex_core/Source/base/android/jniprebuild/prebuild.sh
++ /weex_core/Source/include/JavaScriptCore/API/
++ /weex_core/Source/include/JavaScriptCore/API/**
++ /weex_core/Source/include/JavaScriptCore/ForwardingHeaders/
++ /weex_core/Source/include/JavaScriptCore/ForwardingHeaders/JavaScriptCore/
++ /weex_core/Source/include/JavaScriptCore/ForwardingHeaders/JavaScriptCore/**
+- /weex_core/Source/include/JavaScriptCore/**
+- /weex_core/Source/include/wtf/
 + /weex_core
 + /weex_core/CMakeLists.txt
 + /weex_core/Source

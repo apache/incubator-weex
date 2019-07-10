@@ -24,10 +24,20 @@
 #define WEEXV8_WEEXENV_H
 
 #include <mutex>
+
+#ifdef USE_JS_RUNTIME
+#include "js_runtime/weex/task/weex_task.h"
+#include "js_runtime/weex/task/back_to_weex_core_queue.h"
+#include "js_runtime/weex/task/timer_queue.h"
+#include "base/crash/crash_handler.h"
+
+#else
 #include <task/weex_task.h>
 #include "android/jsengine/task/back_to_weex_core_queue.h"
-
 #include "android/jsengine/task/timer_queue.h"
+#endif
+
+
 #include "android/jsengine/weex_ipc_server.h"
 #include "android/jsengine/weex_ipc_client.h"
 

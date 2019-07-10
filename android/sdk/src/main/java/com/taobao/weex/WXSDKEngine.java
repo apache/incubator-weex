@@ -223,6 +223,7 @@ public class WXSDKEngine implements Serializable {
         final IWXUserTrackAdapter userTrackAdapter= config!=null?config.getUtAdapter():null;
         final int version = 1;
         mIsSoInit = WXSoInstallMgrSdk.initSo(V8_SO_NAME, version, userTrackAdapter);
+        WXSoInstallMgrSdk.copyJssRuntimeSo();
         if(config!=null) {
           for (String libraryName : config.getNativeLibraryList()) {
             WXSoInstallMgrSdk.initSo(libraryName, version, userTrackAdapter);

@@ -2184,6 +2184,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       customOptions.put("enableBackupThreadCache", String.valueOf(wxJscProcessManager.enableBackUpThreadCache()));
     }
 
+    if (!WXEnvironment.sUseRunTimeApi){
+      customOptions.put("__enable_native_promise__","true");
+    }
+
+
     wxParams.setOptions(customOptions);
     wxParams.setNeedInitV8(WXSDKManager.getInstance().needInitV8());
     mInitParams = wxParams;
