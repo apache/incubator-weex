@@ -22,9 +22,46 @@ import path from 'path';
 import GitHubApi from 'github';
 import parseDiff from 'parse-diff';
 
+// check if pr submitted to master branch
+console.log(checkMasterBranch)
+const isMergeRefMaster = danger.github.pr.base.ref === 'master';
+if(!isMergeRefMaster){
+  fail("you must submit PR to master branch")
+}
+
+// check if pr contains a document link:
+console.log("checkDocument")
+var pr_body = danger.github.pr.body
+if (!pr_body.toLowerCase().match(/document.*http.*/)){
+  const msg = "if you update the code, "+
+    "maybe you should update the document and add the document link in the PR description. \n" +
+    "here is the guide about how to contribute document:https://weex.apache.org/guide/contribute/how-to-contribute.html#contribute-code-or-document \n"
+  warn(msg)
+}
+
+// check if pr contains a demo link
+console.log("checkDemo")
+if (!pr_body.toLowerCase().match(/demo.*http.*/)){
+  const msg =  "if your PR is about fixing a bug excluding crash the code,"+
+    "you should add the demo link in the PR description. \n "+
+    "here is a demo link:http://dotwe.org/vue?spm=a2c7j.-guide-contribute-contribute-code.0.0.3e93748cmxz3yt"
+  warn(msg)
+}
+
+// check if pr bind the github milestone
+console.log("checkMileStone")
+if(!danger.github.pr.milestone){
+  warn("current pr not bind the milestone");
+}
+
 // Make sure there are changelog entries
 const hasChangelog = danger.git.modified_files.includes("changelog.md")
-if (!hasChangelog) { warn("No Changelog changes!") }
+if (!hasChangelog) { 
+  const title = "No Changelog changes!"
+  const idea =  "Can you add a Changelog?"+
+    "To do so,append your changes to the changelog.md "
+  warn(`${title} - <i>${idea}</i>`);
+}
 
 const jsFiles = danger.git.created_files.filter(path => path.endsWith("js"));
 
