@@ -45,6 +45,7 @@ WeexEnv::WeexEnv() {
 }
 
 void WeexEnv::initJSC(bool isMultiProgress) {
+    weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::JSS_ENGINE, "initJSC", "initJSC");
     static std::once_flag initJSCFlag;
     std::call_once(initJSCFlag, [isMultiProgress]{
       if (!WEEXICU::initICUEnv(isMultiProgress)) {
@@ -61,6 +62,7 @@ void WeexEnv::initJSC(bool isMultiProgress) {
       JSC::Wasm::enableFastMemory();
 #endif
     });
+  timeCalculator.taskEnd();
 }
 void WeexEnv::init_crash_handler(std::string crashFileName) {
   // initialize signal handler
