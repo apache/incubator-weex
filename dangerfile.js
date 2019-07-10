@@ -29,6 +29,7 @@ if(!isMergeRefMaster){
   fail("you must submit PR to master branch")
 }
 
+console.log("checkDemo")
 if (!pr_body.toLowerCase().match(/document[\s:]*http.*/)){
   const msg = "if you update the code, "+
     "maybe you should update the document and add the document link in the PR description. \n" +
