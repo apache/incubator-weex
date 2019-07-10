@@ -160,12 +160,15 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     [self.apmProtocolInstance onEvent:name withValue:value];
 }
 
-- (void) onStage:(NSString *)name
+- (long) onStage:(NSString *)name
 {
     if(_isEnd){
-        return;
+        return 0;
     }
-    [self onStageWithTime:name time:[WXUtility getUnixFixTimeMillis]];
+    
+    long result = [WXUtility getUnixFixTimeMillis];
+    [self onStageWithTime:name time:result];
+    return result;
 }
 
 - (void) onStageWithTime:(NSString*)name time:(long)unixTime
