@@ -1,4 +1,13 @@
 rootProject.name = 'weex-project'
+
+def updateSubmodule(){
+    def command = "git submodule update --init --remote"
+        exec {
+            executable "bash"
+            args "-c", command
+        }
+}
+updateSubmodule()
 include ":weex_sdk"
 project(":weex_sdk").projectDir = new File("sdk")
 
