@@ -316,7 +316,10 @@ public class WXInstanceApm {
         addProperty(KEY_PROPERTIES_ERROR_CODE, VALUE_ERROR_CODE_DEFAULT);
         addProperty(KEY_PAGE_PROPERTIES_JSLIB_VERSION, WXEnvironment.JS_LIB_SDK_VERSION);
         addProperty(KEY_PAGE_PROPERTIES_WEEX_VERSION, WXEnvironment.WXSDK_VERSION);
-        addProperty(KEY_PAGE_PROPERTIES_UIKIT_TYPE, instance.getRenderType());
+        addProperty(KEY_PAGE_PROPERTIES_WEEX_VERSION, WXEnvironment.WXSDK_VERSION);
+        if (null != instance){
+            addProperty(KEY_PAGE_PROPERTIES_UIKIT_TYPE, instance.getRenderType());
+        }
 
         if (instance != null && (instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)) {
