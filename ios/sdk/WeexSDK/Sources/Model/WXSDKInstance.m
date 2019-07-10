@@ -396,9 +396,12 @@ typedef enum : NSUInteger {
     }
 
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
-    [WXCoreBridge setPageArgument:_instanceId key:@"renderTimeOrigin" value:[NSString stringWithFormat:@"%lld", (long long)([[NSDate date] timeIntervalSince1970] * 1000)]];
     self.performance.renderUnixTimeOrigin = [WXUtility getUnixFixTimeMillis];
-    [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
+    long renderOriginTimePlatform = [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
+    
+    // pass render origin time to page
+    [WXCoreBridge setPageArgument:_instanceId key:@"renderTimeOrigin" value:[NSString stringWithFormat:@"%lld", (long long)([[NSDate date] timeIntervalSince1970] * 1000)]];
+    [WXCoreBridge setPageArgument:_instanceId key:@"renderTimeOriginPlatform" value:[NSString stringWithFormat:@"%lld", (long long)renderOriginTimePlatform]];
 
     if (![WXUtility isBlankString:self.pageName]) {
         WXLog(@"Start rendering page:%@", self.pageName);
@@ -479,9 +482,12 @@ typedef enum : NSUInteger {
     }
     
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
-    [WXCoreBridge setPageArgument:_instanceId key:@"renderTimeOrigin" value:[NSString stringWithFormat:@"%lld", (long long)([[NSDate date] timeIntervalSince1970] * 1000)]];
     self.performance.renderUnixTimeOrigin = [WXUtility getUnixFixTimeMillis];
-    [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
+    long renderOriginTimePlatform = [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
+    
+    // pass render origin time to page
+    [WXCoreBridge setPageArgument:_instanceId key:@"renderTimeOrigin" value:[NSString stringWithFormat:@"%lld", (long long)([[NSDate date] timeIntervalSince1970] * 1000)]];
+    [WXCoreBridge setPageArgument:_instanceId key:@"renderTimeOriginPlatform" value:[NSString stringWithFormat:@"%lld", (long long)renderOriginTimePlatform]];
     
     if (![WXUtility isBlankString:self.pageName]) {
         WXLog(@"Start rendering page:%@", self.pageName);
