@@ -26,29 +26,45 @@ import parseDiff from 'parse-diff';
 console.log("checkMasterBranch")
 const isMergeRefMaster = danger.github.pr.base.ref === 'master';
 if(!isMergeRefMaster){
-  fail("you must submit PR to master branch")
+  fail("you must submit PR to master branch");
 }
 
-console.log("checkDocument")
-var pr_body = danger.github.pr.body
-if (!pr_body.toLowerCase().match(/document[\s:\]]*http.*/)){
+// match regex line by line
+function matchRegex(pr_body,regex){
+  const lines = pr_body.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    if(lines[i].match(regex)){
+      return true;
+    }
+  }
+  return false;
+}
+
+var pr_body = danger.github.pr.body.toLowerCase();
+// Because Pr description template include the following line：
+// 1. Write the corresponding [documentation](https://weex.io/guide/contribute/how-to-contribute.html#contribute-code-or-document)
+// so we should check the documentation below the ### checklist
+console.log("checkDocumentation");
+const index = pr_body.indexOf("checklist")
+const includeChecklist = (index!=-1)
+if(includeChecklist && !matchRegex(pr_body.substring(index),/documentation.*http/)){
   const msg = "if you update the code, "+
-    "maybe you should update the document and add the document link in the PR description. \n" +
-    "here is the guide about how to contribute document:https://weex.apache.org/guide/contribute/how-to-contribute.html#contribute-code-or-document \n"
-  warn(msg)
+    "maybe you should update the documentation and add the documentation link in the PR description. \n" +
+    "here is the guide about how to contribute documentation:https://weex.apache.org/guide/contribute/how-to-contribute.html#contribute-code-or-document \n";
+  warn(msg);
 }
 
 // check if pr contains a demo link
-console.log("checkDemo")
-if (!pr_body.toLowerCase().match(/demo[\s:\]]*http.*/)){
+console.log("checkDemo");
+if(!matchRegex(pr_body,/demo.*http/)){
   const msg =  "if your PR is about fixing a bug excluding crash the code,"+
     "you should add the demo link in the PR description. \n "+
-    "here is a demo link:http://dotwe.org/vue?spm=a2c7j.-guide-contribute-contribute-code.0.0.3e93748cmxz3yt"
-  warn(msg)
+    "here is a demo link:http://dotwe.org/vue?spm=a2c7j.-guide-contribute-contribute-code.0.0.3e93748cmxz3yt";
+  warn(msg);
 }
 
 // check if pr bind the github milestone
-console.log("checkMileStone")
+console.log("checkMileStone");
 if(!danger.github.pr.milestone){
   warn("current pr not bind the milestone");
 }
