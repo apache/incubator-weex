@@ -28,8 +28,8 @@
 #include "core/bridge/eagle_bridge.h"
 #include "wson/wson_parser.h"
 #include "core/config/core_environment.h"
-#include "core/parser/action_args_check.h"
 #ifdef OS_ANDROID
+#include "core/parser/action_args_check.h"
 #include <base/time_calculator.h>
 #include "android/weex_extend_js_api.h"
 #endif
@@ -53,7 +53,7 @@ inline char *copyStr(const char *str, int length = 0) {
 void CoreSideInScript::CallNative(const char *page_id, const char *task,
                                   const char *callback) {
   if (page_id == nullptr || task == nullptr) return;
-
+#ifdef OS_ANDROID
   if (WXCoreEnvironment::getInstance()->isUseRunTimeApi()){
     if (isCallNativeToFinish(task)){
       RenderManager::GetInstance()->CreateFinish(page_id);
@@ -65,6 +65,7 @@ void CoreSideInScript::CallNative(const char *page_id, const char *task,
     }
     return;
   }
+#endif
   std::string task_str(task);
   std::string target_str("[{\"module\":\"dom\",\"method\":\"createFinish\","
                          "\"args\":[]}]");
