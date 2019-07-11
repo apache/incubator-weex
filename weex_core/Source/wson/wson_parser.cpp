@@ -213,7 +213,7 @@ double wson_parser::nextNumber(uint8_t type) {
             wson_next_bts(wsonBuffer, size);
             uint8_t *utf8 = wson_next_bts(wsonBuffer, size);
             str.append(reinterpret_cast<char *>(utf8), size);
-            return atof(str.c_str());
+            return strtod(str.c_str(), nullptr);
         }
         case WSON_STRING_TYPE:
         case WSON_NUMBER_BIG_INT_TYPE:
@@ -223,7 +223,7 @@ double wson_parser::nextNumber(uint8_t type) {
             wson_next_bts(wsonBuffer, size);
             uint16_t *utf16 = (uint16_t *) wson_next_bts(wsonBuffer, size);
             wson::utf16_convert_to_utf8_string(utf16, size/sizeof(uint16_t), requireDecodingBuffer(size*2),str);
-            return atof(str.c_str());
+            return strtod(str.c_str(), nullptr);
         }
         case WSON_NULL_TYPE:
             return  0;
