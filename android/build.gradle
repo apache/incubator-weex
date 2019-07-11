@@ -49,18 +49,20 @@ subprojects {
             }
         }
     }
-    ext {
-        compileSdkVersion=26
-        buildToolsVersion="26.0.3"
-        minSdkVersion=14
-        targetSdkVersion=26
-        supportLibVersion="26.0.2"
-        fastjsonLibVersion="1.1.46.android"
-        //Default value for buildCpp is true
-        buildCpp = !project.hasProperty("buildCpp") || buildCpp.equals("true")
-        //Default value for disableCov is false
-        disableCov = project.hasProperty("disableCov") && disableCov.equals("true")
-    }
+}
+ext {
+    compileSdkVersion=26
+    buildToolsVersion="26.0.3"
+    minSdkVersion=14
+    targetSdkVersion=26
+    supportLibVersion="26.0.2"
+    fastjsonLibVersion="1.1.46.android"
+    //Default value for buildCpp is true
+    buildCpp = !project.hasProperty("buildCpp") || buildCpp.equals("true")
+    //Default value for disableCov is false
+    disableCov = project.hasProperty("disableCov") && disableCov.equals("true")
+    implementFromWeex = true
+
 }
 
 //task clean(type: Delete) {
