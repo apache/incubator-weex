@@ -28,7 +28,6 @@
 #include "wson/wson.h"
 #include "wson/wson_parser.h"
 //#ifdef test_log
-#include "base/utils/log_utils.h"
 #include "core/config/core_environment.h"
 //#else
 //#define LOGW
