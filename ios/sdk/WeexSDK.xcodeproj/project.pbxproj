@@ -578,6 +578,14 @@
 		D362F9501C83EDA20003F546 /* WXWebViewModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D362F94E1C83EDA20003F546 /* WXWebViewModule.m */; };
 		D3FC0DF71C508B2A002B9E31 /* WXTimerModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D3FC0DF51C508B2A002B9E31 /* WXTimerModule.h */; };
 		D3FC0DF81C508B2A002B9E31 /* WXTimerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D3FC0DF61C508B2A002B9E31 /* WXTimerModule.m */; };
+		D735F18422D7089200B53CDF /* action_args_check.h in Headers */ = {isa = PBXBuildFile; fileRef = D735F18222D7089200B53CDF /* action_args_check.h */; };
+		D735F18522D7089200B53CDF /* action_args_check.h in Headers */ = {isa = PBXBuildFile; fileRef = D735F18222D7089200B53CDF /* action_args_check.h */; };
+		D735F18622D7089200B53CDF /* action_args_check.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D735F18322D7089200B53CDF /* action_args_check.cpp */; };
+		D735F18722D7089200B53CDF /* action_args_check.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D735F18322D7089200B53CDF /* action_args_check.cpp */; };
+		D735F19422D708C700B53CDF /* log_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = D735F18F22D708C700B53CDF /* log_utils.h */; };
+		D735F19522D708C700B53CDF /* log_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = D735F18F22D708C700B53CDF /* log_utils.h */; };
+		D735F19622D708C700B53CDF /* log_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D735F19022D708C700B53CDF /* log_utils.cpp */; };
+		D735F19722D708C700B53CDF /* log_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D735F19022D708C700B53CDF /* log_utils.cpp */; };
 		DC03ADB91D508719003F76E7 /* WXTextAreaComponent.mm in Sources */ = {isa = PBXBuildFile; fileRef = DC03ADB71D508719003F76E7 /* WXTextAreaComponent.mm */; };
 		DC03ADBA1D508719003F76E7 /* WXTextAreaComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */; };
 		DC15A3DB2010BC93009C8977 /* weex-main-jsfm.js in Resources */ = {isa = PBXBuildFile; fileRef = DC15A3D92010BC93009C8977 /* weex-main-jsfm.js */; };
@@ -1288,6 +1296,10 @@
 		D362F94E1C83EDA20003F546 /* WXWebViewModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXWebViewModule.m; sourceTree = "<group>"; };
 		D3FC0DF51C508B2A002B9E31 /* WXTimerModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTimerModule.h; sourceTree = "<group>"; };
 		D3FC0DF61C508B2A002B9E31 /* WXTimerModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTimerModule.m; sourceTree = "<group>"; };
+		D735F18222D7089200B53CDF /* action_args_check.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = action_args_check.h; sourceTree = "<group>"; };
+		D735F18322D7089200B53CDF /* action_args_check.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = action_args_check.cpp; sourceTree = "<group>"; };
+		D735F18F22D708C700B53CDF /* log_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log_utils.h; sourceTree = "<group>"; };
+		D735F19022D708C700B53CDF /* log_utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = log_utils.cpp; sourceTree = "<group>"; };
 		DAB176F008F516E4F9391C61 /* libPods-WeexSDK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WeexSDK.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC03ADB71D508719003F76E7 /* WXTextAreaComponent.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXTextAreaComponent.mm; sourceTree = "<group>"; };
 		DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTextAreaComponent.h; sourceTree = "<group>"; };
@@ -2188,6 +2200,8 @@
 		B8D66B722125572F003960BD /* parser */ = {
 			isa = PBXGroup;
 			children = (
+				D735F18322D7089200B53CDF /* action_args_check.cpp */,
+				D735F18222D7089200B53CDF /* action_args_check.h */,
 				B8D66B732125572F003960BD /* dom_wson.h */,
 				B8D66B742125572F003960BD /* dom_wson.cpp */,
 			);
@@ -2247,6 +2261,7 @@
 		B8D66B872125572F003960BD /* base */ = {
 			isa = PBXGroup;
 			children = (
+				D735F18E22D708C700B53CDF /* utils */,
 				77CF6A5421E6E47D00BA8634 /* core_constants.h */,
 				7767C8CB22815A60008D465B /* log_defines.cpp */,
 				77CF6A5521E6E47D00BA8634 /* log_defines.h */,
@@ -2274,6 +2289,15 @@
 				C4F012761E1502A6003378D0 /* WXWebSocketHandler.h */,
 			);
 			path = WebSocket;
+			sourceTree = "<group>";
+		};
+		D735F18E22D708C700B53CDF /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				D735F18F22D708C700B53CDF /* log_utils.h */,
+				D735F19022D708C700B53CDF /* log_utils.cpp */,
+			);
+			path = utils;
 			sourceTree = "<group>";
 		};
 		DC9F46841D61AC9100A88239 /* module */ = {
@@ -2345,11 +2369,13 @@
 				B8D66C1321255730003960BD /* core_side_in_script.h in Headers */,
 				7410811F1CED585A001BC6E5 /* WXComponentManager.h in Headers */,
 				B8D66C8521255730003960BD /* render_appbar_factory.h in Headers */,
+				D735F19422D708C700B53CDF /* log_utils.h in Headers */,
 				74CFDD411F45941E007A1A66 /* WXRecycleListTemplateManager.h in Headers */,
 				1D3000F11D40B9AC004F3B4F /* WXClipboardModule.h in Headers */,
 				17B122222090AA9300387E33 /* WXSDKInstance_performance.h in Headers */,
 				775BEE4E1C16F993008D1629 /* WXDefine.h in Headers */,
 				77D161241C02DDD10010B15B /* WXSDKInstance.h in Headers */,
+				D735F18422D7089200B53CDF /* action_args_check.h in Headers */,
 				DC6836E61EBB12B200AD2D84 /* WXConfigCenterProtocol.h in Headers */,
 				DC7764941F3C2CA300B5727E /* WXRecyclerDragController.h in Headers */,
 				B8D66CB321255730003960BD /* make_copyable.h in Headers */,
@@ -2547,6 +2573,7 @@
 				B8D66C1C21255730003960BD /* style.h in Headers */,
 				B8D66C2421255730003960BD /* layout.h in Headers */,
 				B8D66C2621255730003960BD /* flex_enum.h in Headers */,
+				D735F18522D7089200B53CDF /* action_args_check.h in Headers */,
 				DCA445D21EFA594600D0CFA8 /* WXComponent+Display.h in Headers */,
 				DCA445A81EFA572B00D0CFA8 /* WXResourceResponse.h in Headers */,
 				DCA445BC1EFA57B000D0CFA8 /* WXConvert.h in Headers */,
@@ -2741,6 +2768,7 @@
 				B8D66C1021255730003960BD /* core_side_in_platform.h in Headers */,
 				DCA445D41EFA594E00D0CFA8 /* UIBezierPath+Weex.h in Headers */,
 				DCA446031EFA5A5200D0CFA8 /* WXCanvasModule.h in Headers */,
+				D735F19522D708C700B53CDF /* log_utils.h in Headers */,
 				B8D66C4221255730003960BD /* render_action_add_event.h in Headers */,
 				DCA445EF1EFA5A1800D0CFA8 /* WXSwitchComponent.h in Headers */,
 				B8D66CB421255730003960BD /* make_copyable.h in Headers */,
@@ -3165,6 +3193,7 @@
 				74A4BA971CB365D100195969 /* WXAppConfiguration.m in Sources */,
 				17B122212090AA9300387E33 /* WXSDKInstance_performance.m in Sources */,
 				B8D66C3921255730003960BD /* render_action_layout.cpp in Sources */,
+				D735F19622D708C700B53CDF /* log_utils.cpp in Sources */,
 				59A583091CF5B2FD0081FD3E /* WXNavigationDefaultImpl.m in Sources */,
 				746B923C1F46BE36009AE86B /* WXCellSlotComponent.mm in Sources */,
 				7463192A1C71B92600EFEBD4 /* WXModalUIModule.m in Sources */,
@@ -3183,6 +3212,7 @@
 				745B2D691E5A8E1E0092D38A /* WXMultiColumnLayout.m in Sources */,
 				77D161391C02DE940010B15B /* WXBridgeManager.m in Sources */,
 				74BF19F91F5139BB00AEE3D7 /* WXJSASTParser.mm in Sources */,
+				D735F18622D7089200B53CDF /* action_args_check.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3198,6 +3228,7 @@
 				B82A159A20F857450098A509 /* WXWebSocketLoader.m in Sources */,
 				B82A159920F857200098A509 /* WXSDKError.m in Sources */,
 				B82A159820F8556F0098A509 /* WXSDKInstance_performance.m in Sources */,
+				D735F19722D708C700B53CDF /* log_utils.cpp in Sources */,
 				B82A159B20F857470098A509 /* WXWebSocketModule.m in Sources */,
 				BA5F00F41FC6834C00F76B5C /* WXLocaleModule.m in Sources */,
 				DCA4452F1EFA55B300D0CFA8 /* WXResourceLoader.m in Sources */,
@@ -3322,6 +3353,7 @@
 				B8D66C9621255730003960BD /* dom_wson.cpp in Sources */,
 				DCA445781EFA55B300D0CFA8 /* NSArray+Weex.m in Sources */,
 				DCA445791EFA55B300D0CFA8 /* WXThreadSafeCounter.m in Sources */,
+				D735F18722D7089200B53CDF /* action_args_check.cpp in Sources */,
 				DCA4457A1EFA55B300D0CFA8 /* WXSimulatorShortcutManager.m in Sources */,
 				DCA4457B1EFA55B300D0CFA8 /* WXAssert.m in Sources */,
 				ED053503207F4DEB007B4568 /* JSContext+Weex.m in Sources */,
