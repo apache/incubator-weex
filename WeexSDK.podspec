@@ -52,6 +52,7 @@ Pod::Spec.new do |s|
                     'weex_core/Source/base/crash',
                     'weex_core/Source/base/utils/Compatible.cpp',
                     'weex_core/Source/base/utils/ThreadLocker.cpp',
+                    'weex_core/Source/core/parser/action_args_check.*',
                     'weex_core/Source/third_party/IPC',
                     'weex_core/Source/core/network/android/',
                     'weex_core/Source/include/JavaScriptCore/',
