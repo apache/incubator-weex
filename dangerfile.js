@@ -29,8 +29,9 @@ if(!isMergeRefMaster){
   fail("you must submit PR to master branch")
 }
 
-console.log("checkDemo")
-if (!pr_body.toLowerCase().match(/document[\s:]*http.*/)){
+console.log("checkDocument")
+var pr_body = danger.github.pr.body
+if (!pr_body.toLowerCase().match(/document[\s:\]]*http.*/)){
   const msg = "if you update the code, "+
     "maybe you should update the document and add the document link in the PR description. \n" +
     "here is the guide about how to contribute document:https://weex.apache.org/guide/contribute/how-to-contribute.html#contribute-code-or-document \n"
@@ -39,7 +40,7 @@ if (!pr_body.toLowerCase().match(/document[\s:]*http.*/)){
 
 // check if pr contains a demo link
 console.log("checkDemo")
-if (!pr_body.toLowerCase().match(/demo[\s:]*http.*/)){
+if (!pr_body.toLowerCase().match(/demo[\s:\]]*http.*/)){
   const msg =  "if your PR is about fixing a bug excluding crash the code,"+
     "you should add the demo link in the PR description. \n "+
     "here is a demo link:http://dotwe.org/vue?spm=a2c7j.-guide-contribute-contribute-code.0.0.3e93748cmxz3yt"
