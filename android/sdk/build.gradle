@@ -18,6 +18,7 @@
  */
  plugins {
      id "com.github.hierynomus.license" version "0.14.0"
+     id 'com.jfrog.artifactory' version '4.9.7'
  }
 
 apply plugin: 'com.android.library'
@@ -341,6 +342,21 @@ bintray {
         }
     }
 }
+artifactory {
+    contextUrl = 'http://oss.jfrog.org/artifactory'
+    publish {
+        repository {
+            repoKey = 'oss-snapshot-local'
+            username = bintray.user
+            password = bintray.key
+            maven = true
+        }
+        defaults {
+            publishConfigs('archives')
+        }
+    }
+}
+
 
 afterEvaluate { project ->
     transformNativeLibsWithStripDebugSymbolForRelease << {
