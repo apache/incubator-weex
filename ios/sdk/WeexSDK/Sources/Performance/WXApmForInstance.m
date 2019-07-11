@@ -294,12 +294,14 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
          [self.apmProtocolInstance onEnd];
     }
     
-    WXLogInfo(@"apm data: %@", self.recordStageMap);
-    NSNumber* stageRenderOrigin = self.recordStageMap[KEY_PAGE_STAGES_RENDER_ORGIGIN];
-    NSNumber* stageInteraction = self.recordStageMap[KEY_PAGE_STAGES_INTERACTION];
-    if (stageRenderOrigin && stageInteraction) {
-        WXLogInfo(@"apm interaction time(ms): %lld", [stageInteraction longLongValue] - [stageRenderOrigin longLongValue]);
-    }
+    WXPerformBlockOnComponentThread(^{
+        WXLogInfo(@"APM data of instance: %@, %@", self.instanceId, self.recordStageMap);
+        NSNumber* stageRenderOrigin = self.recordStageMap[KEY_PAGE_STAGES_RENDER_ORGIGIN];
+        NSNumber* stageInteraction = self.recordStageMap[KEY_PAGE_STAGES_INTERACTION];
+        if (stageRenderOrigin && stageInteraction) {
+            WXLogInfo(@"APM interaction time(ms): %lld", [stageInteraction longLongValue] - [stageRenderOrigin longLongValue]);
+        }
+    });
 }
 
 - (void) updateFSDiffStats:(NSString *)name withDiffValue:(double)diff
