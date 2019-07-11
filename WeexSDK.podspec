@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
 
   s.name         = "WeexSDK"
 
-  s.version      = "0.24.0"
+  s.version      = "0.26.0"
 
   s.summary      = "WeexSDK Source."
 
@@ -50,7 +50,8 @@ Pod::Spec.new do |s|
                     'weex_core/Source/base/android',
                     'weex_core/Source/base/base64',
                     'weex_core/Source/base/crash',
-                    'weex_core/Source/base/utils',
+                    'weex_core/Source/base/utils/Compatible.cpp',
+                    'weex_core/Source/base/utils/ThreadLocker.cpp',
                     'weex_core/Source/third_party/IPC',
                     'weex_core/Source/core/network/android/',
                     'weex_core/Source/include/JavaScriptCore/',
@@ -75,7 +76,7 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Component/Recycler/WXRecyclerComponent.h',
                           'ios/sdk/WeexSDK/Sources/Controller/WXBaseViewController.h',
                           'ios/sdk/WeexSDK/Sources/Controller/WXRootViewController.h',
-			  'ios/sdk/WeexSDK/Sources/Handler/WXNavigationDefaultImpl.h',
+                          'ios/sdk/WeexSDK/Sources/Handler/WXNavigationDefaultImpl.h',
                           'ios/sdk/WeexSDK/Sources/View/WXView.h',
                           'ios/sdk/WeexSDK/Sources/View/WXErrorView.h',
                           'ios/sdk/WeexSDK/Sources/Protocol/*.h',
