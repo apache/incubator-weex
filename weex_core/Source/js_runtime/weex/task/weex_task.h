@@ -24,7 +24,7 @@
 #define WEEXV8_WEEXTASK_H
 
 #include "base/time_calculator.h"
-#include "base/utils/ThreadLocker.h"
+#include "base/android/ThreadLocker.h"
 #include "js_runtime/weex/utils/weex_jsc_utils.h"
 #include "js_runtime/weex/object/weex_runtime_v2.h"
 //#include "android/jsengine/weex_runtime.h"

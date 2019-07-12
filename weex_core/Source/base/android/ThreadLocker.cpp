@@ -20,7 +20,7 @@
 // Created by Darin on 14/06/2018.
 //
 
-#include "base/utils/ThreadLocker.h"
+#include "ThreadLocker.h"
 
 int ThreadLocker::lock() {
     return pthread_mutex_lock(&mutex_);
