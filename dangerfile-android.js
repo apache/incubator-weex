@@ -33,9 +33,7 @@ const getFileType = file => {
     return type_ios_sdk;
   } else if (file.match(/WeexSDKTests\//)) {
     return type_ios_test;
-  } else if (file.match(/android\/sdk\/src\/test\/.+\.java/)) {
-    return type_android_test;
-  } else if (file.match(/android\/sdk\/src\/main\/java\/.+\.java/)) {
+  } else if (file.match(/android\/sdk\//)) {
     return type_android_sdk;
   } else if (file.match(/html5\/(shared|frameworks|render|runtime|services)\/.+\.js/)) {
     return type_jsfm;
