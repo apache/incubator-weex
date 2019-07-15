@@ -90,7 +90,8 @@ script:
         echo "The value of hasAndroidFile is ${hasAndroidFile}"
         if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
           cd android
-          ./gradlew clean install ${GRADLE_ABI} --info
+          ./gradlew clean install -PweexVersion=true ${GRADLE_ABI} --info
+          ./gradlew install -PweexVersion=false ${GRADLE_ABI} --info
         fi
         ;;
       "jsfm" )
