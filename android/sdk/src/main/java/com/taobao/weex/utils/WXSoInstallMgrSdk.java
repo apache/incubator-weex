@@ -125,19 +125,25 @@ public class WXSoInstallMgrSdk {
 
     boolean InitSuc = false;
 //    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
+      try {
+        // If a library loader adapter exists, use this adapter to load library
+        // instead of System.loadLibrary.
+        if (mSoLoader != null) {
+          mSoLoader.doLoadLibrary("c++_shared");
+        } else {
+          System.loadLibrary("c++_shared");
+        }
+      } catch (Exception | Error e) {
+        WXExceptionUtils.commitCriticalExceptionRT(null,
+                WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
+                "initSo",
+                        "load c++_shared failed Detail Error is: " +e.getMessage(),
+                null);
 
-
-    try {
-      // If a library loader adapter exists, use this adapter to load library
-      // instead of System.loadLibrary.
-      if (mSoLoader != null) {
-        mSoLoader.doLoadLibrary("c++_shared");
-      } else {
-        System.loadLibrary("c++_shared");
+        if(WXEnvironment.isApkDebugable()) {
+          throw e;
+        }
       }
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
 
       /**
        * Load library with {@link System#loadLibrary(String)}
@@ -160,40 +166,44 @@ public class WXSoInstallMgrSdk {
                           "\n Detail Error is: " +e2.getMessage(),
                   null);
         }
-        InitSuc = false;
-      }
 
-      try {
-
-        if (!InitSuc) {
-
-          //File extracted from apk already exists.
-          if (isExist(libName, version)) {
-            boolean res = _loadUnzipSo(libName, version, utAdapter);
-            if (res) {
-              return res;
-            } else {
-              //Delete the corrupt so library, and extract it again.
-              removeSoIfExit(libName, version);
-            }
-          }
-
-          //Fail for loading file from libs, extract so library from so and load it.
-          if (cpuType.equalsIgnoreCase(MIPS)) {
-            return false;
-          } else {
-            try {
-              InitSuc = unZipSelectedFiles(libName, version, utAdapter);
-            } catch (IOException e2) {
-              e2.printStackTrace();
-            }
-          }
-
+        if(WXEnvironment.isApkDebugable()) {
+          throw e2;
         }
-      } catch (Exception | Error e) {
         InitSuc = false;
-        e.printStackTrace();
       }
+
+//      try {
+
+//        if (!InitSuc) {
+//
+//          //File extracted from apk already exists.
+//          if (isExist(libName, version)) {
+//            boolean res = _loadUnzipSo(libName, version, utAdapter);
+//            if (res) {
+//              return res;
+//            } else {
+//              //Delete the corrupt so library, and extract it again.
+//              removeSoIfExit(libName, version);
+//            }
+//          }
+//
+//          //Fail for loading file from libs, extract so library from so and load it.
+//          if (cpuType.equalsIgnoreCase(MIPS)) {
+//            return false;
+//          } else {
+//            try {
+//              InitSuc = unZipSelectedFiles(libName, version, utAdapter);
+//            } catch (IOException e2) {
+//              e2.printStackTrace();
+//            }
+//          }
+//
+//        }
+//      } catch (Exception | Error e) {
+//        InitSuc = false;
+//        e.printStackTrace();
+//      }
   //  }
     return InitSuc;
   }
