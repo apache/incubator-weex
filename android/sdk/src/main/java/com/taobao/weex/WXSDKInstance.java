@@ -891,6 +891,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
             return;
           }
 
+          // there is no need to reboot js engine if render by eagle
+          if(isDataRender()) {
+            return;
+          }
+
           View containerView = getContainerView();
           if(containerView instanceof ViewGroup) {
             if(0 == ((ViewGroup) containerView).getChildCount()) {
