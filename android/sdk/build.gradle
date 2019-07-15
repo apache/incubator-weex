@@ -48,13 +48,13 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : "0.26.0.1"
+version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : '0.26.0.1'
 
 //Check version, the version must have 4 sections. The leading three section must be number, and the last section is odd number with or without suffix string.
 if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVersionCheck').equals("true")) {
     version.tokenize('.').eachWithIndex { it, i ->
         if (i < 3) {
-            assert it.isNumber() : "Please use semantic versioning witch 4 sections, you are using ${$ { i } + 1} section instead."
+            assert it.isNumber() : "Please use semantic versioning witch 4 sections, you are using ${${i} + 1} section instead."
         } else if (i == 3) {
             it.split("[-_]").toList().eachWithIndex { inner_it, inner_i ->
                 if (inner_i == 0) {
@@ -64,7 +64,7 @@ if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVe
                 }
             }.size == 4
         } else {
-            assert false: "Please use semantic versioning witch 4 sections, you are using ${$ { i } + 1} section instead."
+            assert false: "Please use semantic versioning witch 4 sections, you are using ${${i} + 1} section instead."
         }
     }
 }
