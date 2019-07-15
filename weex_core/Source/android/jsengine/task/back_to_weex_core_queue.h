@@ -29,7 +29,7 @@
 #include <third_party/IPC/IPCResult.h>
 #include <third_party/IPC/IPCMessageJS.h>
 #include <vector>
-#include "base/utils/android/ThreadLocker.h"
+#include "base/android/ThreadLocker.h"
 #include "base/closure.h"
 
 class BackToWeexCoreQueue {

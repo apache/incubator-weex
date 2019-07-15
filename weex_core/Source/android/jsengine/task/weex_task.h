@@ -25,7 +25,7 @@
 
 #include "base/time_calculator.h"
 #include "android/jsengine/weex_runtime.h"
-#include "base/utils/android/ThreadLocker.h"
+#include "base/android/ThreadLocker.h"
 
 class WeexTask {
 
