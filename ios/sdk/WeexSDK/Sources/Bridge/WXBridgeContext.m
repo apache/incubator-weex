@@ -510,7 +510,10 @@ _Pragma("clang diagnostic pop") \
         if (!options) {
             newOptions = [NSMutableDictionary new];
         }
-        [newOptions addEntriesFromDictionary:@{@"env":[WXUtility getEnvironment]}];
+        NSDictionary* immutableEnvDict = [[WXUtility getEnvironment] copy];
+        if (immutableEnvDict) {
+            [newOptions addEntriesFromDictionary:@{@"env":immutableEnvDict}];
+        }
         newOptions[@"bundleType"] = bundleType;
         __block NSString *raxAPIScript = nil;
         __block NSString *raxAPIScriptPath = nil;
@@ -536,7 +539,8 @@ _Pragma("clang diagnostic pop") \
             WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
             [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
         } else {
-            sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@", instanceIdString, newOptions, data];
+            NSDictionary* immutableOptions = [newOptions copy];
+            sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@", instanceIdString, immutableOptions, data];
             //add instanceId to weexContext ,if fucn createInstanceContext failure ，then we will know which instance has problem (exceptionhandler)
             self.jsBridge.javaScriptContext[@"wxExtFuncInfo"]= @{
                                                                  @"func":@"createInstanceContext",
@@ -544,7 +548,7 @@ _Pragma("clang diagnostic pop") \
                                                                  @"instanceId":sdkInstance.instanceId?:@"unknownId"
                                                                 };
             __weak typeof(self) weakSelf = self;
-            [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
+            [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, immutableOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
                 if (sdkInstance.pageName) {
                     [sdkInstance.instanceJavaScriptContext.javaScriptContext setName:sdkInstance.pageName];
                 }
@@ -929,10 +933,6 @@ _Pragma("clang diagnostic pop") \
         bridge = self.jsBridge;
     }
     if (self.frameworkLoadFinished) {
-        newArg = [args mutableCopy];
-        if ([newArg containsObject:completion]) {
-            [newArg removeObject:completion];
-        }
         WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
         if (([bridge isKindOfClass:[WXJSCoreBridge class]]) ||
             ([bridge isKindOfClass:NSClassFromString(@"WXDebugger") ]) ) {
@@ -1100,9 +1100,9 @@ _Pragma("clang diagnostic pop") \
         NSTimeInterval start = CACurrentMediaTime()*1000;
         
         if (execInstance.instanceJavaScriptContext && execInstance.bundleType) {
-            [self callJSMethod:@"__WEEX_CALL_JAVASCRIPT__" args:@[execIns, tasks] onContext:execInstance.instanceJavaScriptContext completion:nil];
+            [self callJSMethod:@"__WEEX_CALL_JAVASCRIPT__" args:@[execIns, [tasks copy]] onContext:execInstance.instanceJavaScriptContext completion:nil];
         } else {
-            [self callJSMethod:@"callJS" args:@[execIns, tasks]];
+            [self callJSMethod:@"callJS" args:@[execIns, [tasks copy]]];
         }
         if (execInstance && !(execInstance.isJSCreateFinish)) {
             NSTimeInterval diff = CACurrentMediaTime()*1000 - start;

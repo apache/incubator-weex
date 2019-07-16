@@ -315,7 +315,7 @@ static NSDictionary *_customEnvironment = nil;
 + (void)setCustomEnvironment:(NSDictionary *)environment
 {
     @synchronized (self) {
-        _customEnvironment = environment;
+        _customEnvironment = [environment copy];
     }
 }
 

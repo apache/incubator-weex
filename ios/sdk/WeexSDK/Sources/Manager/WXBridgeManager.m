@@ -36,6 +36,7 @@
 #import "WXCoreBridge.h"
 #import "WXDataRenderHandler.h"
 #import "WXHandlerFactory.h"
+#import "WXUtility.h"
 
 @interface WXBridgeManager ()
 
@@ -483,6 +484,8 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
 {
     if (!modules) return;
     
+    modules = [WXUtility convertContainerToImmutable:modules];
+    
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
         [weakSelf.bridgeCtx registerModules:modules];
@@ -495,6 +498,8 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
 - (void)registerComponents:(NSArray *)components
 {
     if (!components) return;
+    
+    components = [WXUtility convertContainerToImmutable:components];
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
@@ -558,7 +563,7 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
         [instance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_EVENT_NUM withDiffValue:1];
     }
     
-    WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"fireEvent" arguments:args instance:instance];
+    WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"fireEvent" arguments:[WXUtility convertContainerToImmutable:args] instance:instance];
     [self callJsMethod:method];
 }
 
@@ -622,7 +627,8 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     else {
         WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:@"jsBridge" methodName:@"callback" arguments:args instance:instance];
         [self callJsMethod:method];
-    }}
+    }
+}
 
 - (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(id)params
 {
