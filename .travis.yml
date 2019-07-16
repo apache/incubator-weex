@@ -106,7 +106,6 @@ script:
         hasIosFile=$(npm run danger -- run --dangerfile ./dangerfile-ios.js)
         echo "The value of hasIosFile is ${hasIosFile}"
         if [[ "$hasIosFile" =~ "hasIosFile" ]]; then
-          echo "enter if hasIosFile"
           xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6"
         fi
         ;;
