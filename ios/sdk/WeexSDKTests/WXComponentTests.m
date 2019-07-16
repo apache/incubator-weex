@@ -56,26 +56,26 @@
     [super tearDown];
 }
 
-- (void)testDefaultProperties
-{
-    WXComponent *component = [[WXComponent alloc] initWithRef:@"0" type:@"div" styles:@{} attributes:@{} events:@[] weexInstance:[[WXSDKInstance alloc] init]];
-
-    /**
-     *  Layout
-     */
-    XCTAssertTrue(component->_isLayoutDirty);
-    XCTAssertTrue(CGRectEqualToRect(component.calculatedFrame, CGRectZero));
-    XCTAssertEqual(component->_positionType, WXPositionTypeRelative);
-
-    /**
-     *  View
-     */
-    XCTAssertEqual(component->_backgroundColor, [UIColor clearColor]);
-    XCTAssertEqual(component->_clipToBounds, NO);
-    XCTAssertNil(component->_view);
-    XCTAssertEqual(component->_opacity, 1.0);
-    XCTAssertEqual(component->_visibility, WXVisibilityShow);
-}
+//- (void)testDefaultProperties
+//{
+//    WXComponent *component = [[WXComponent alloc] initWithRef:@"0" type:@"div" styles:@{} attributes:@{} events:@[] weexInstance:[[WXSDKInstance alloc] init]];
+//
+//    /**
+//     *  Layout
+//     */
+//    XCTAssertTrue(component->_isLayoutDirty);
+//    XCTAssertTrue(CGRectEqualToRect(component.calculatedFrame, CGRectZero));
+//    XCTAssertEqual(component->_positionType, WXPositionTypeRelative);
+//
+//    /**
+//     *  View
+//     */
+//    XCTAssertEqual(component->_backgroundColor, [UIColor clearColor]);
+//    XCTAssertEqual(component->_clipToBounds, NO);
+//    XCTAssertNil(component->_view);
+//    XCTAssertEqual(component->_opacity, 1.0);
+//    XCTAssertEqual(component->_visibility, WXVisibilityShow);
+//}
 
 - (void)testThatComponentCreatedOnBackgroundCanCreateView
 {
