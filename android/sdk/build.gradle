@@ -71,7 +71,6 @@ if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVe
 
 android {
     compileSdkVersion project.compileSdkVersion
-//    buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
     useLibrary 'org.apache.http.legacy'
     if(project.hasProperty('removeSharedLib') && "true".equals(project.getProperty('removeSharedLib'))) {
