@@ -272,6 +272,20 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     }
   }
 
+  jmethodID m_get_jsb_so_path =
+      env->GetMethodID(c_params, "getLibJsbPath", "()Ljava/lang/String;");
+  if (m_get_jsb_so_path != nullptr) {
+    jobject j_get_jsb_so_path =
+        env->CallObjectMethod(params, m_get_jsb_so_path);
+    if (j_get_jsb_so_path != nullptr) {
+      SoUtils::set_jsb_so_path(const_cast<char*>(
+                                    env->GetStringUTFChars((jstring)(j_get_jsb_so_path), nullptr)));
+      LOGE("g_jsbSoPath is %s ", SoUtils::jsb_so_path());
+      env->DeleteLocalRef(j_get_jsb_so_path);
+    }
+  }
+
+
   jmethodID m_get_lib_ld_path =
           env->GetMethodID(c_params, "getLibLdPath", "()Ljava/lang/String;");
   if (m_get_lib_ld_path != nullptr) {
