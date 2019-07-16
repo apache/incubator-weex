@@ -127,13 +127,13 @@
             __unused UIView *subView = subcomponent.view;
             XCTAssertTrue([subSubcomponent isViewLoaded], @"Component's lazyCreateView can not create subview.");
             XCTAssertEqual(subSubcomponent.view.superview, subcomponent.view, @"Component's lazyCreateView can not add subcomponent's view to subview");
+            XCTAssertTrue(1==2);
         });
     });
 }
 
 #define XCTAssertEqualCGFloat(expression1, expression2, ...) \
     XCTAssertEqualWithAccuracy(expression1, expression2, 0.00001)
-
 
 //- (void)testCSSNodeStyleConvert
 //{

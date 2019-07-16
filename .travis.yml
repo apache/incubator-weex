@@ -65,7 +65,7 @@ install:
         export PATH=$PATH:$ANDROID_NDK_HOME
         echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
         ;;
-      "jsfm" | "danger" )
+      "jsfm" | "danger" | "ios" )
         npm install
         ;;
     esac
