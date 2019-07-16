@@ -165,7 +165,7 @@ public class WXSoInstallMgrSdk {
         if (cpuType.contains(ARMEABI) || cpuType.contains(X86)) {
           WXExceptionUtils.commitCriticalExceptionRT(null,
                   WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
-                  "initSo", "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for android cpuType is " +cpuType +
+                  "initSo", libName + "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for android cpuType is " +cpuType +
                           "\n Detail Error is: " +e2.getMessage(),
                   null);
         }
@@ -227,8 +227,6 @@ public class WXSoInstallMgrSdk {
   public static void copyStartUpSo() {
     try {
       // copy libjsb.so to cache/weex/jsb/cputype
-
-
       String pkgName = WXEnvironment.getApplication().getPackageName();
       String cacheFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
 
@@ -248,7 +246,7 @@ public class WXSoInstallMgrSdk {
       if(!copyPath.exists()) {
         copyPath.mkdirs();
       }
-      newfile = new File(copyPath + startSoPath);
+      newfile = new File(copyPath, startSoPath);
       WXEnvironment.CORE_JSB_SO_PATH = newfile.getAbsolutePath();
       String jsb = WXEnvironment.getDefaultSettingValue(startSoName, "-1");
       if(newfile.exists() && TextUtils.equals(WXEnvironment.getAppVersionName(), jsb)) {
@@ -260,15 +258,13 @@ public class WXSoInstallMgrSdk {
       if (cacheFile != null && cacheFile.indexOf("/cache") > 0) {
         path = cacheFile.replace("/cache", "/lib");
       }
-
-      String soName;
+      File oldfile = null;
       if (pieSupport) {
-        soName = path + STARTUPSO;
+        oldfile = new File(path + STARTUPSO);
       } else {
-        soName = path + STARTUPSOANDROID15;
+        oldfile = new File(path + STARTUPSOANDROID15);
       }
 
-      File oldfile = new File(soName);
 
       if (!oldfile.exists()) {
         try {
@@ -278,6 +274,7 @@ public class WXSoInstallMgrSdk {
           // do nothing
         }
       }
+
 
       if(!oldfile.exists()) {
         WXEnvironment.extractSo();
@@ -354,7 +351,7 @@ public class WXSoInstallMgrSdk {
     if(TextUtils.isEmpty(mAbi)) {
       try {
         mAbi = Build.CPU_ABI;
-      }catch (Exception e){
+      }catch (Throwable e){
         e.printStackTrace();
         mAbi = ARMEABI;
       }

@@ -164,7 +164,7 @@ public class WXEnvironment {
     return mWXDefaultSettings;
   }
 
-  public static String getDefaultSettingValue(String key, String defaultValue) {
+  public static synchronized String getDefaultSettingValue(String key, String defaultValue) {
     WXDefaultSettings wxDefaultSettings = getWXDefaultSettings();
     if (wxDefaultSettings == null || TextUtils.isEmpty(key)) {
       return defaultValue;
@@ -278,30 +278,33 @@ public class WXEnvironment {
   }
 
 
-
   public static String copySoDesDir() {
-    if (TextUtils.isEmpty(COPY_SO_DES_DIR)) {
-      if (sApplication == null) {
-        WXLogUtils.e("sApplication is null, so copy path will be null");
-        return null;
-      }
+    try {
+      if (TextUtils.isEmpty(COPY_SO_DES_DIR)) {
+        if (sApplication == null) {
+          WXLogUtils.e("sApplication is null, so copy path will be null");
+          return null;
+        }
 
-      String dirName = "/cache/weex/libs";
-      File desDir = null;
-      String cachePath = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
+        String dirName = "/cache/weex/libs";
+        File desDir = null;
+        String cachePath = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
 
-      if (TextUtils.isEmpty(cachePath)) {
-        desDir = new File(cachePath, dirName);
-      } else {
-        String pkgName = sApplication.getPackageName();
-        String toPath = "/data/data/" + pkgName + dirName;
-        desDir = new File(toPath);
-      }
+        if (TextUtils.isEmpty(cachePath)) {
+          desDir = new File(cachePath, dirName);
+        } else {
+          String pkgName = sApplication.getPackageName();
+          String toPath = "/data/data/" + pkgName + dirName;
+          desDir = new File(toPath);
+        }
 
-      if (!desDir.exists()) {
-        desDir.mkdirs();
+        if (!desDir.exists()) {
+          desDir.mkdirs();
+        }
+        COPY_SO_DES_DIR = desDir.getAbsolutePath();
       }
-      COPY_SO_DES_DIR = desDir.getAbsolutePath();
+    } catch (Throwable e) {
+      WXLogUtils.e(WXLogUtils.getStackTrace(e));
     }
     return COPY_SO_DES_DIR;
 
@@ -655,12 +658,12 @@ public class WXEnvironment {
 
     public synchronized String getValue(String key, String defaultValue) {
       if(sharedPreferences == null || TextUtils.isEmpty(key)) {
-        WXLogUtils.e("get default settings " + key + " return default value :" + defaultValue);
+        WXLogUtils.i("get default settings " + key + " return default value :" + defaultValue);
         return defaultValue;
       }
 
       String result = sharedPreferences.getString(key, defaultValue);
-      WXLogUtils.e("get default settings " + key + " : " + result);
+      WXLogUtils.i("get default settings " + key + " : " + result);
       return result;
     }
 
@@ -670,7 +673,7 @@ public class WXEnvironment {
               || TextUtils.isEmpty(value)) {
         return;
       }
-      WXLogUtils.e("save default settings " + key + ":" + value);
+      WXLogUtils.i("save default settings " + key + ":" + value);
       SharedPreferences.Editor editor = sharedPreferences.edit();
       editor.putString(key, value);
       editor.apply();
