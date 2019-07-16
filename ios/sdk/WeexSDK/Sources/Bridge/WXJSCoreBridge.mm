@@ -114,9 +114,35 @@
     [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:@"weex-main-jsfm.js"]];
 }
 
+//static void __checkMutable(id container) {
+//    if ([container isKindOfClass:[NSArray class]]) {
+//        if ([container isKindOfClass:[NSMutableArray class]]) {
+//            printf("This is mutable.");
+//        }
+//        else {
+//            NSUInteger count = [container count];
+//            for (NSUInteger index = 0; index < count; ++index) {
+//                __checkMutable(container[index]);
+//            }
+//        }
+//    }
+//    else if ([container isKindOfClass:[NSDictionary class]]) {
+//        if ([container isKindOfClass:[NSMutableDictionary class]]) {
+//            printf("This is mutable.");
+//        }
+//        else {
+//            NSArray* allKeys = [container allKeys];
+//            for (id key in allKeys) {
+//                __checkMutable(container[key]);
+//            }
+//        }
+//    }
+//}
+
 - (JSValue *)callJSMethod:(NSString *)method args:(NSArray *)args
 {
     WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
+//    __checkMutable(args);
     return [[_jsContext globalObject] invokeMethod:method withArguments:args];
 }
 

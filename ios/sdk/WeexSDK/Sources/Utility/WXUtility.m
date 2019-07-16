@@ -259,6 +259,30 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return [self JSONObject:[json dataUsingEncoding:NSUTF8StringEncoding] error:nil];
 }
 
++ (id _Nullable)convertContainerToImmutable:(id _Nullable)source
+{
+    if (source == nil) {
+        return nil;
+    }
+    
+    if ([source isKindOfClass:[NSArray class]]) {
+        NSMutableArray* tmpArray = [[NSMutableArray alloc] init];
+        for (id obj in source) {
+            [tmpArray addObject:[self convertContainerToImmutable:obj]];
+        }
+        return [NSArray arrayWithArray:tmpArray];
+    }
+    else if ([source isKindOfClass:[NSDictionary class]]) {
+        NSMutableDictionary* tmpDictionary = [[NSMutableDictionary alloc] init];
+        for (id key in [source keyEnumerator]) {
+            tmpDictionary[key] = [self convertContainerToImmutable:[source objectForKey:key]];
+        }
+        return [NSDictionary dictionaryWithDictionary:tmpDictionary];
+    }
+    
+    return source;
+}
+
 + (id)JSONObject:(NSData*)data error:(NSError **)error
 {
     if (!data) return nil;
