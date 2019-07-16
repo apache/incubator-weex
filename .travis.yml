@@ -6,6 +6,8 @@ matrix:
     include:
       - env: TEST_SUITE=danger 
       - env: TEST_SUITE=jsfm
+      - env: TEST_SUITE=ios
+        language: objective-c
       - env: TEST_SUITE=android ABI=armeabi-v7a
         language: android
         dist: trusty
@@ -99,6 +101,13 @@ script:
         ;;
       "danger" )
         npm run danger -- run --dangerfile ./dangerfile.js
+        ;;
+      "ios" )
+        hasIosFile=$(npm run danger -- run --dangerfile ./dangerfile-ios.js)
+        echo "The value of hasIosFile is ${hasIosFile}"
+        if [[ "$hasIosFile" =~ "hasIosFile" ]]; then
+          xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6"
+        fi
         ;;
     esac
 notifications:
