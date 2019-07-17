@@ -127,7 +127,7 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     JNIEnv* env, jobject params,
     const std::function<void(const char*, const char*)>&
         ReportNativeInitStatus) {
-  LOGE("initFromParam is running ");
+  LOGD("initFromParam is running ");
   std::vector<INIT_FRAMEWORK_PARAMS*> initFrameworkParams;
 
 #define ADDSTRING(name)                                                     \

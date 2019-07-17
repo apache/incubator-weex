@@ -33,7 +33,9 @@ class LogUtilsJSS : public weex::base::LogBase {
            unsigned long line,
            const char *log) override {
 
-    if(level < WeexCore::LogLevel::Error) {
+    // for performance, only send TLog & Msg to main process
+
+    if(level <= WeexCore::LogLevel::Error) {
       return false;
     }
 

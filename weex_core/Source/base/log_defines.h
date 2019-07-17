@@ -29,6 +29,7 @@ namespace WeexCore {
         Info,
         Warn,
         Error,
+        Tlog,
         Msg
     };
     
