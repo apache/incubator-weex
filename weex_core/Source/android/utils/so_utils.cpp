@@ -28,6 +28,7 @@
 namespace WeexCore {
     char * SoUtils::g_cache_dir = nullptr;
     char * SoUtils::g_jss_so_path = nullptr;
+    char * SoUtils::g_jsb_so_path = nullptr;
     char * SoUtils::g_jsc_so_path = nullptr;
     char * SoUtils::g_crash_file_path = nullptr;
     char * SoUtils::g_jss_icu_path = nullptr;

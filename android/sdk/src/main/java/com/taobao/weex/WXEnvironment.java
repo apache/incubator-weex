@@ -20,6 +20,7 @@ package com.taobao.weex;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -27,6 +28,7 @@ import android.graphics.Typeface;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
@@ -48,6 +50,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class WXEnvironment {
 
@@ -132,11 +136,6 @@ public class WXEnvironment {
   public static final String CORE_JSB_SO_NAME = "weexjsb";
   public static final String CORE_JST_SO_NAME = "weexjst";
   public static final String CORE_JSC_SO_NAME = "JavaScriptCore";
-  /**
-   * this marked jsb.so's version, Change this if we want to update jsb.so
-   */
-  public static final int CORE_JSB_SO_VERSION = 1;
-
   private static  String CORE_JSS_SO_PATH = null;
 
   public static  String CORE_JSS_RUNTIME_SO_PATH = null;
@@ -145,14 +144,45 @@ public class WXEnvironment {
 
   private static String CORE_JSC_SO_PATH = null;
 
-  private static String LIB_LD_PATH = null;
+  public static String CORE_JSB_SO_PATH = null;
 
+  private static String COPY_SO_DES_DIR = null;
+
+  private static String LIB_LD_PATH = null;
 
   private static Map<String, String> options = new ConcurrentHashMap<>();
   static {
     options.put(WXConfig.os, OS);
     options.put(WXConfig.osName, OS);
   }
+
+
+  public static synchronized WXDefaultSettings getWXDefaultSettings() {
+    if (mWXDefaultSettings == null && getApplication() != null) {
+      mWXDefaultSettings = new WXDefaultSettings(getApplication());
+    }
+    return mWXDefaultSettings;
+  }
+
+  public static synchronized String getDefaultSettingValue(String key, String defaultValue) {
+    WXDefaultSettings wxDefaultSettings = getWXDefaultSettings();
+    if (wxDefaultSettings == null || TextUtils.isEmpty(key)) {
+      return defaultValue;
+    }
+    return wxDefaultSettings.getValue(key, defaultValue);
+  }
+
+  public static synchronized void writeDefaultSettingsValue(String key, String value) {
+    WXDefaultSettings wxDefaultSettings = getWXDefaultSettings();
+    if (wxDefaultSettings == null
+            || TextUtils.isEmpty(key)
+            || TextUtils.isEmpty(value)) {
+      return;
+    }
+    wxDefaultSettings.saveValue(key, value);
+  }
+
+  private static WXDefaultSettings mWXDefaultSettings;
 
   /**
    * dynamic
@@ -200,7 +230,7 @@ public class WXEnvironment {
   /**
    * Get the version of the current app.
    */
-  private static String getAppVersionName() {
+  public static String getAppVersionName() {
     String versionName = "";
     PackageManager manager;
     PackageInfo info = null;
@@ -245,6 +275,39 @@ public class WXEnvironment {
 
   public static String getCustomOptions(String key){
     return options.get(key);
+  }
+
+
+  public static String copySoDesDir() {
+    try {
+      if (TextUtils.isEmpty(COPY_SO_DES_DIR)) {
+        if (sApplication == null) {
+          WXLogUtils.e("sApplication is null, so copy path will be null");
+          return null;
+        }
+
+        String dirName = "/cache/weex/libs";
+        File desDir = null;
+        String cachePath = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
+
+        if (TextUtils.isEmpty(cachePath)) {
+          desDir = new File(cachePath, dirName);
+        } else {
+          String pkgName = sApplication.getPackageName();
+          String toPath = "/data/data/" + pkgName + dirName;
+          desDir = new File(toPath);
+        }
+
+        if (!desDir.exists()) {
+          desDir.mkdirs();
+        }
+        COPY_SO_DES_DIR = desDir.getAbsolutePath();
+      }
+    } catch (Throwable e) {
+      WXLogUtils.e(WXLogUtils.getStackTrace(e));
+    }
+    return COPY_SO_DES_DIR;
+
   }
 
   @Deprecated
@@ -439,10 +502,10 @@ public class WXEnvironment {
 
   public static boolean extractSo() {
     File sourceFile = new File(getApplication().getApplicationContext().getApplicationInfo().sourceDir);
-    final String cacheDir = getCacheDir();
-    if (sourceFile.exists() && !TextUtils.isEmpty(cacheDir)) {
+    final String soDesPath = copySoDesDir();
+    if (sourceFile.exists() && !TextUtils.isEmpty(soDesPath)) {
       try {
-        WXFileUtils.extractSo(sourceFile.getAbsolutePath(), cacheDir);
+        WXFileUtils.extractSo(sourceFile.getAbsolutePath(), soDesPath);
       } catch (IOException e) {
         WXLogUtils.e("extractSo error " + e.getMessage());
 //        e.printStackTrace();
@@ -582,5 +645,38 @@ public class WXEnvironment {
 
     WXLogUtils.e("getLibLdPath is " + LIB_LD_PATH);
     return LIB_LD_PATH;
+  }
+
+  public static class WXDefaultSettings {
+    private String configName = "weex_default_settings";
+    private SharedPreferences sharedPreferences = null;
+    public WXDefaultSettings(Application application) {
+      if(application != null) {
+        sharedPreferences = application.getSharedPreferences(configName, MODE_PRIVATE);
+      }
+    }
+
+    public synchronized String getValue(String key, String defaultValue) {
+      if(sharedPreferences == null || TextUtils.isEmpty(key)) {
+        WXLogUtils.i("get default settings " + key + " return default value :" + defaultValue);
+        return defaultValue;
+      }
+
+      String result = sharedPreferences.getString(key, defaultValue);
+      WXLogUtils.i("get default settings " + key + " : " + result);
+      return result;
+    }
+
+    public synchronized void saveValue(String key, String value) {
+      if (sharedPreferences == null
+              || TextUtils.isEmpty(key)
+              || TextUtils.isEmpty(value)) {
+        return;
+      }
+      WXLogUtils.i("save default settings " + key + ":" + value);
+      SharedPreferences.Editor editor = sharedPreferences.edit();
+      editor.putString(key, value);
+      editor.apply();
+    }
   }
 }

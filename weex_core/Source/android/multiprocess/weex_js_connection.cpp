@@ -518,7 +518,7 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
            << result << " startupPie:" << startupPie << std::endl;
 #endif
     if (result == -1) {
-      executableName = std::string(SoUtils::cache_dir()) + '/' + start_so;
+      executableName = std::string(SoUtils::jsb_so_path());
       int result_cache = access(executableName.c_str(), 00);
       if (result_cache == -1) {
         std::string sourceSo = executablePath + '/' + start_so;
@@ -536,7 +536,7 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
       const char *argv[] = {executableName.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0", g_crashFileName.c_str(), nullptr};
       if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                        const_cast<char *const *>(envp.get()))) {
-          LOGE("aaaaaaaa execve failed errno %s \n", strerror(errno));
+          LOGE("execve failed errno %s \n", strerror(errno));
 #if PRINT_LOG_CACHEFILE
         mcfile << "execve failed11:" << strerror(errno) << std::endl;
 #endif
