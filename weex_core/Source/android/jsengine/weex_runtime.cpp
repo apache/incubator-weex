@@ -20,7 +20,6 @@
 // Created by Darin on 28/04/2018.
 //
 
-#include <object/tlog.h>
 #include "android/jsengine/weex_runtime.h"
 
 #include "android/jsengine/bridge/script/script_bridge_in_multi_so.h"
@@ -608,7 +607,7 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
                                 const String &extendsApi,
                                 std::vector<INIT_FRAMEWORK_PARAMS*>& params) {
     LOGE("test-> : start createInstance");
-    Weex::TLog::tlog("id --> %s CreateInstance start", instanceId.utf8().data());
+    LOG_TLOG("jsEngine","id --> %s CreateInstance start", instanceId.utf8().data());
 
     JSGlobalObject *impl_globalObject = weexObjectHolder->m_globalObject.get();
     JSGlobalObject *globalObject;
@@ -680,13 +679,13 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
             for (size_t i = 0; i < keyCount; ++i) {
                 auto propertyName_ = JSPropertyNameArrayGetNameAtIndex(pArray, i);
                 if(propertyName_ == nullptr) {
-                    Weex::TLog::tlog("id --> %s CreateInstance's propertyName_ is null", instanceId.utf8().data());
+                    LOG_TLOG("jsEngine","id --> %s CreateInstance's propertyName_ is null", instanceId.utf8().data());
                     continue;
                 }
 
                 auto propertyValue_ = JSObjectGetProperty(globalContextRef, ref, propertyName_, NULL);
                 if(propertyValue_ == nullptr) {
-                    Weex::TLog::tlog("id --> %s CreateInstance's propertyValue_ is null", instanceId.utf8().data());
+                    LOG_TLOG("jsEngine","id --> %s CreateInstance's propertyValue_ is null", instanceId.utf8().data());
                     continue;
                 }
 
@@ -734,7 +733,7 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
     if (!extendsApi.isEmpty() && extendsApi.length() > 0) {
         if (!ExecuteJavaScript(globalObject, extendsApi, ("weex run raxApi"), true,
                                "runRaxApi", instanceId.utf8().data())) {
-            Weex::TLog::tlog("id --> %s CreateInstance's weex run raxApi failed", instanceId.utf8().data());
+            LOG_TLOG("jsEngine","id --> %s CreateInstance's weex run raxApi failed", instanceId.utf8().data());
             return static_cast<int32_t>(false);
         }
     }
@@ -744,7 +743,7 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
     if (!ExecuteJavaScript(globalObject, script, ("weex createInstanceContext"), true,
                            "createInstanceContext", instanceId.utf8().data())) {
         LOGE("createInstanceContext and ExecuteJavaScript Error");
-        Weex::TLog::tlog("id --> %s CreateInstance's createInstanceContext failed", instanceId.utf8().data());
+        LOG_TLOG("jsEngine","id --> %s CreateInstance's createInstanceContext failed", instanceId.utf8().data());
         return static_cast<int32_t>(false);
     }
     LOGE("test-> : after ExecuteJavaScript");

@@ -21,7 +21,6 @@
 //
 
 #include "weex_env.h"
-#include "tlog.h"
 
 WeexEnv *WeexEnv::env_ = nullptr;
 
@@ -78,7 +77,7 @@ bool WeexEnv::is_app_crashed() {
     return false;
     bool crashed = crashHandler->is_crashed();
     if(crashed) {
-        Weex::TLog::tlog("%s", "AppCrashed");
+      LOG_TLOG("jsEngine","%s", "AppCrashed");
     }
     return crashed;
 }

@@ -21,7 +21,6 @@
 //
 
 #include <object/weex_env.h>
-#include <object/tlog.h>
 #include "script_side_in_queue.h"
 
 #include "android/jsengine/task/impl/init_framework_task.h"
@@ -245,7 +244,7 @@ int ScriptSideInQueue::CreateInstance(const char *instanceId,
 
   auto string = String::fromUTF8(script);
   if (string.isEmpty()) {
-    Weex::TLog::tlog("%s id CreateInstance's script is null", instanceId);
+    LOG_TLOG("jsEngine","%s id CreateInstance's script is null", instanceId);
     return 0;
   }
   CreateInstanceTask *task = new CreateInstanceTask(String::fromUTF8(instanceId),
