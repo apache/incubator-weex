@@ -41,8 +41,6 @@ namespace Weex {
                 vsnprintf(const_cast<char*>(buffer), byte_count, fmt, arg_list);
                 va_end(arg_list);
             }
-            WeexEnv::getEnv()->sendTLog("JSEngine", buffer);
-
             free(buffer);
         }
     };

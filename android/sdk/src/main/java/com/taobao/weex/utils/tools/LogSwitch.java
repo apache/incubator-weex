@@ -16,33 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.taobao.weex.utils.tools;
 
-#ifndef WEEX_PROJECT_LOG_UTILS_H
-#define WEEX_PROJECT_LOG_UTILS_H
+public class LogSwitch {
 
-#include <jni.h>
-#include "base/utils/log_base.h"
-#include "base/log_defines.h"
-#include "core/bridge/log_bridge.h"
-
-namespace WeexCore {
-class LogUtils : public LogBridge {
- public:
-  static bool RegisterJNIUtils(JNIEnv* env);
-  static void NativeLog(JNIEnv* env, const char* str_array);
-  void log(LogLevel level, const char* tag,  const char* file, unsigned long line, const char* log) override;
-};
-
-class LogUtilsWeexCore : public weex::base::LogBase {
- public:
-  bool log(WeexCore::LogLevel level,
-           const char *tag,
-           const char *file,
-           unsigned long line,
-           const char *log) override;
-};
-
-}  // namespace WeexCore
+    private int low_level = 4;
+    private int medium_level = 2;
+    private int high_level = 1;
+    private int log_switch = 0;
+    private boolean showLowLevelLog = false;
+    private boolean showMediumLevelLog = false;
+    private boolean showHighLevelLog = true;
 
 
-#endif  // WEEX_PROJECT_LOG_UTILS_H
+    public void setLog_switch() {
+        // Todo
+        // read prop
+
+        if (showLowLevelLog)
+            log_switch |= low_level;
+
+        if (showMediumLevelLog) {
+            log_switch |= medium_level;
+        }
+
+        if (showHighLevelLog) {
+            log_switch |= high_level;
+        }
+    }
+
+
+    public int getLog_switch() {
+        return log_switch;
+    }
+
+
+}

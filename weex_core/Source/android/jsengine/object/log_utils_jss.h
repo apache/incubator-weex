@@ -16,33 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+//
+// Created by Darin on 2019-06-24.
+//
 
-#ifndef WEEX_PROJECT_LOG_UTILS_H
-#define WEEX_PROJECT_LOG_UTILS_H
+#ifndef WEEX_PROJECT_LOG_UTILS_JSS_H
+#define WEEX_PROJECT_LOG_UTILS_JSS_H
 
-#include <jni.h>
-#include "base/utils/log_base.h"
-#include "base/log_defines.h"
-#include "core/bridge/log_bridge.h"
-
-namespace WeexCore {
-class LogUtils : public LogBridge {
- public:
-  static bool RegisterJNIUtils(JNIEnv* env);
-  static void NativeLog(JNIEnv* env, const char* str_array);
-  void log(LogLevel level, const char* tag,  const char* file, unsigned long line, const char* log) override;
-};
-
-class LogUtilsWeexCore : public weex::base::LogBase {
+#include <base/utils/log_base.h>
+#include "weex_env.h"
+class LogUtilsJSS : public weex::base::LogBase {
  public:
   bool log(WeexCore::LogLevel level,
            const char *tag,
            const char *file,
            unsigned long line,
-           const char *log) override;
+           const char *log) override {
+
+    if(level < WeexCore::LogLevel::Error) {
+      return false;
+    }
+
+    return WeexEnv::getEnv()->sendLog((int) level, tag, file, line, log);
+  }
 };
-
-}  // namespace WeexCore
-
-
-#endif  // WEEX_PROJECT_LOG_UTILS_H
+#endif //WEEX_PROJECT_LOG_UTILS_JSS_H

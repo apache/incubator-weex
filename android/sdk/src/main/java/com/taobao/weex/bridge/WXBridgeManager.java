@@ -91,6 +91,8 @@ import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
+import com.taobao.weex.utils.tools.LogDetail;
+import com.taobao.weex.utils.tools.TimeCalculator;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -344,7 +346,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             WXModuleManager.reload();
             WXComponentRegistry.reload();
           }
-        }, null);
+        });
       }
     }
   }
@@ -504,12 +506,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       public void run() {
         mNextTickTasks.setStackTopInstance(instanceId);
       }
-    }, instanceId);
+    },instanceId, null, null);
   }
 
   @Override
   public void post(Runnable r) {
-    if (mInterceptor != null && mInterceptor.take(r)) {
+      postWithName(r,null,null);
+  }
+
+  public void postWithName(Runnable r, WXSDKInstance instance, String runnableName) {
+   Runnable secure = WXThread.secure(r,instance, runnableName);
+    if (mInterceptor != null && mInterceptor.take(secure)) {
       //task is token by the interceptor
       return;
     }
@@ -517,7 +524,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return;
     }
 
-    mJSHandler.post(WXThread.secure(r));
+    mJSHandler.post(secure);
   }
 
   @Override
@@ -525,14 +532,18 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     mInterceptor = interceptor;
   }
 
-  public void post(Runnable r, Object token) {
+  public void post(Runnable r, Object token, WXSDKInstance instance, String runnableName) {
     if (mJSHandler == null) {
       return;
     }
 
-    Message m = Message.obtain(mJSHandler, WXThread.secure(r));
+    Message m = Message.obtain(mJSHandler, WXThread.secure(r, instance, runnableName));
     m.obj = token;
     m.sendToTarget();
+  }
+
+  public void post(Runnable r, Object token) {
+    post(r, token, null, null);
   }
 
   public void postDelay(Runnable r,long delayMillis){
@@ -1488,7 +1499,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         public void run() {
           initFramework("");
         }
-      }, instanceId);
+      }, instanceId, instance,"initFrameworkInCreateInstance");
       return;
     }
 
@@ -1505,7 +1516,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         instance.getWXPerformance().callCreateInstanceTime = end - start;
         instance.getWXPerformance().communicateTime =  instance.getWXPerformance().callCreateInstanceTime;
       }
-    }, instanceId);
+    }, instanceId, instance,"createInstance");
   }
 
   private void invokeCreateInstance(@NonNull WXSDKInstance instance, Script template,
@@ -1784,7 +1795,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         removeTaskByInstance(instanceId);
         invokeDestroyInstance(instanceId);
       }
-    }, instanceId);
+    }, instanceId, null, "destroyInstance");
   }
 
   private void removeTaskByInstance(String instanceId) {
@@ -1850,8 +1861,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     invokeExecJS(instanceId, namespace, function, args, true);
   }
 
-  public void invokeExecJS(String instanceId, String namespace, String function,
-                           WXJSObject[] args, boolean logTaskDetail) {
+  public void invokeExecJS(final String instanceId, final String namespace, final String function,
+                           final WXJSObject[] args, boolean logTaskDetail) {
     if (WXEnvironment.isOpenDebugLog() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
               .append("function:").append(function);
@@ -1873,7 +1884,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
       callbackJavascriptOnDataRender(instanceId, (String) data.first.first, data.first.second, data.second);
     } else {
-      mWXBridge.execJS(instanceId, namespace, function, args);
+
+      WXThread.secure(new Runnable() {
+        @Override
+        public void run() {
+          mWXBridge.execJS(instanceId, namespace, function, args);
+        }
+      }, instance, "ExecJs").run();
     }
     if (null != instance){
       long diff = System.currentTimeMillis()-start;
@@ -1994,12 +2011,19 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public static StringBuilder sInitFrameWorkMsg = new StringBuilder();
 
   private void initFramework(String framework) {
+    LogDetail logDetail = new LogDetail();
+    logDetail.name("initFramework");
+    logDetail.taskStart();
     if (WXSDKEngine.isSoInitialized() && !isJSFrameworkInit()) {
       sInitFrameWorkTimeOrigin = System.currentTimeMillis();
       if (TextUtils.isEmpty(framework)) {
         // if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("weex JS framework from assets");
         // }
+
+        LogDetail logDetail2 = new LogDetail();
+        logDetail2.name("loadJSFramework");
+        logDetail2.taskStart();
 
         IWXJsFileLoaderAdapter wxJsFileLoaderAdapter = WXSDKEngine.getIWXJsFileLoaderAdapter();
 
@@ -2021,6 +2045,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           }
         }
         sInitFrameWorkMsg.append("| weex JS framework from assets, isSandBoxContext: ").append(isSandBoxContext);
+        logDetail2.taskEnd();
       }
       if (TextUtils.isEmpty(framework)) {
         setJSFrameworkInit(false);
@@ -2064,11 +2089,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         sInitFrameWorkMsg.append(" | pieSupport:").append(pieSupport);
         WXLogUtils.d("[WXBridgeManager] initFrameworkEnv crashFile:" + crashFile + " pieSupport:" + pieSupport);
         // extends initFramework
+        LogDetail logDetail3 = new LogDetail();
+        logDetail3.name("native initFrameworkEnv");
+        logDetail3.taskStart();
         if (mWXBridge.initFrameworkEnv(framework, assembleDefaultOptions(), crashFile, pieSupport) == INIT_FRAMEWORK_OK) {
+          logDetail3.taskEnd();
           WXEnvironment.sJSLibInitTime = System.currentTimeMillis() - start;
           WXEnvironment.sSDKInitTime = System.currentTimeMillis() - WXEnvironment.sSDKInitStart;
           setJSFrameworkInit(true);
-
+          logDetail.taskEnd();
           if (WXSDKManager.getInstance().getWXStatisticsListener() != null) {
             WXSDKManager.getInstance().getWXStatisticsListener().onJsFrameworkReady();
           }
@@ -2251,7 +2280,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           public void run() {
             invokeRegisterModules(modules, mRegisterModuleFailList);
           }
-        }, null);
+        });
       }
     }
   }
@@ -2274,17 +2303,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if(isJSThread() && isJSFrameworkInit()){
       runnable.run();
     }else{
-      post(runnable, null);
+      post(runnable);
     }
   }
 
   public void execJSService(final String service) {
-    post(new Runnable() {
+    postWithName(new Runnable() {
       @Override
       public void run() {
         invokeExecJSService(service, mRegisterServiceFailList);
       }
-    });
+    },null,"execJSService");
   }
 
   private void invokeExecJSService(String service, List<String> receiver) {

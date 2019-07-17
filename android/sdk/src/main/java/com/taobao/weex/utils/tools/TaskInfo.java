@@ -16,33 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.taobao.weex.utils.tools;
 
-#ifndef WEEX_PROJECT_LOG_UTILS_H
-#define WEEX_PROJECT_LOG_UTILS_H
+import com.alibaba.fastjson.annotation.JSONField;
 
-#include <jni.h>
-#include "base/utils/log_base.h"
-#include "base/log_defines.h"
-#include "core/bridge/log_bridge.h"
+public class TaskInfo{
 
-namespace WeexCore {
-class LogUtils : public LogBridge {
- public:
-  static bool RegisterJNIUtils(JNIEnv* env);
-  static void NativeLog(JNIEnv* env, const char* str_array);
-  void log(LogLevel level, const char* tag,  const char* file, unsigned long line, const char* log) override;
-};
+	@JSONField(name="args")
+	public String args;
 
-class LogUtilsWeexCore : public weex::base::LogBase {
- public:
-  bool log(WeexCore::LogLevel level,
-           const char *tag,
-           const char *file,
-           unsigned long line,
-           const char *log) override;
-};
+	@JSONField(name="relateTaskId")
+	public int relateTaskId;
 
-}  // namespace WeexCore
-
-
-#endif  // WEEX_PROJECT_LOG_UTILS_H
+	@Override
+ 	public String toString(){
+		return 
+			"TaskInfo{" + 
+			"args = '" + args + '\'' + 
+			",relateTaskId = '" + relateTaskId + '\'' + 
+			"}";
+		}
+}

@@ -19,6 +19,8 @@
 
 #include "android/wrap/wx_bridge.h"
 #include <fstream>
+#include <base/time_calculator.h>
+#include <base/utils/log_base.h>
 
 #include "android/wrap/log_utils.h"
 #include "android/base/string/string_utils.h"
@@ -290,6 +292,8 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   WXBridge::Instance()->Reset(env, object);
   // Init platform thread --- ScriptThread
   WeexCoreManager::Instance()->InitScriptThread();
+  weex::base::LogImplement::getLog()->setLogImplement(new LogUtilsWeexCore());
+  WeexCoreManager::Instance()->set_log_bridge(new LogUtils());
   // Exception handler for so
   SoUtils::RegisterExceptionHanler(
       [](const char* status_code, const char* error_msg) {
@@ -374,8 +378,6 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   auto result =
       bridge->core_side()->InitFramework(c_script.getChars(), params_vector);
   freeParams(params_vector);
-
-  WeexCoreManager::Instance()->set_log_bridge(new LogUtils());
   return result;
 }
 

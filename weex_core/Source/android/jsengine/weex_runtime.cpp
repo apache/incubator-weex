@@ -319,7 +319,7 @@ int WeexRuntime::exeCTimeCallback(const String &source) {
 
 int WeexRuntime::exeJS(const String &instanceId, const String &nameSpace, const String &func,
                        std::vector<VALUE_WITH_TYPE *> &params) {
-//    LOGE("dyyLog EXECJS func:%s and params size is %d", func.utf8().data(), params.size());
+//    LOGE("EXECJS func:%s and params size is %d", func.utf8().data(), params.size());
 
     String runFunc = func;
     JSGlobalObject *globalObject;
@@ -728,8 +728,9 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
 
     VM &vm = globalObject->vm();
     JSLockHolder locker(&vm);
-
-    // if extend api is not null should exec befor createInstanceContext, such as rax-api
+    weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::JSS_ENGINE, "weex run raxApi", instanceId.utf8().data());
+    timeCalculator.taskStart();
+    // if extend api is not null should exec before createInstanceContext, such as rax-api
     if (!extendsApi.isEmpty() && extendsApi.length() > 0) {
         if (!ExecuteJavaScript(globalObject, extendsApi, ("weex run raxApi"), true,
                                "runRaxApi", instanceId.utf8().data())) {
@@ -737,7 +738,7 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
             return static_cast<int32_t>(false);
         }
     }
-
+    timeCalculator.taskEnd();
     LOGE("test-> : after run extendsApi");
 
     if (!ExecuteJavaScript(globalObject, script, ("weex createInstanceContext"), true,
@@ -766,9 +767,10 @@ int WeexRuntime::_initFramework(const String &source) {
 
 void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *state,
                                           std::vector<VALUE_WITH_TYPE *> &params) {
-
-    //dyyLog delete
-//    String msg = "exejs Args ";
+    //delete
+    String msg = "exejs Args ";
+    weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::JSS_ENGINE, "exejs Args", "exec js");
+    timeCalculator.taskStart();
 
     for (unsigned int i = 0; i < params.size(); i++) {
         VALUE_WITH_TYPE *paramsObject = params[i];
@@ -783,8 +785,8 @@ void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *
                 const String &string2String = weexString2String(ipcstr);
                 obj->append(jString2JSValue(state, ipcstr->content, ipcstr->length));
 
-//                msg.append(":");
-//                msg.append(string2String.utf8().data());
+                msg.append(":");
+                msg.append(string2String.utf8().data());
             }
                 break;
             case ParamsType::JSONSTRING: {
@@ -794,8 +796,8 @@ void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *
                 JSValue o = parseToObject(state, str);
                 obj->append(o);
 
-//                msg.append(":");
-//                msg.append(str.utf8().data());
+                msg.append(":");
+                msg.append(str.utf8().data());
             }
                 break;
             case ParamsType::BYTEARRAY: {
@@ -804,8 +806,8 @@ void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *
 
                 obj->append(o);
 
-//                msg.append(":");
-//                msg.append(JSONStringify(state, o, 0).utf8().data());
+                msg.append(":");
+                msg.append(JSONStringify(state, o, 0).utf8().data());
             }
                 break;
             default:
@@ -813,8 +815,8 @@ void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *
                 break;
         }
     }
-
-//    LOGE("dyyLog exejs Args is %s", msg.utf8().data());
+    timeCalculator.taskEnd();
+    timeCalculator.setArgs(msg.utf8().data());
 }
 
 WeexObjectHolder *WeexRuntime::getLightAppObjectHolder(const String &instanceId) {

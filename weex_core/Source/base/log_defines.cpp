@@ -23,6 +23,7 @@
 
 #ifdef __ANDROID__
 #include <android/log.h>
+#include <base/utils/log_base.h>
 #endif
 
 #include "core/manager/weex_core_manager.h"
@@ -78,12 +79,8 @@ namespace WeexCore {
         LogFlattenHelper log(fmt, args);
         va_end(args);
         
-        LogBridge* logBridge = WeexCore::WeexCoreManager::Instance()->get_log_bridge();
-        if (logBridge) {
-            // Log to bridge
-            logBridge->log(level, tag, file, line, log.str());
-        }
-        else {
+      bool succeed = weex::base::LogImplement::getLog()->log(level, tag, file, line, log.str());
+      if (!succeed) {
             // Log to console by default
 #ifdef __ANDROID__
             if(DebugMode) {

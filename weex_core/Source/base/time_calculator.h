@@ -24,9 +24,10 @@
 #define WEEX_PROJECT_TIME_CALCULATOR_H
 
 #include <string>
+#include <mutex>
 #include "time_point.h"
 #include "time_unit.h"
-#include "android/log_utils.h"
+#include "time_utils.h"
 
 namespace weex {
 namespace base {
@@ -35,20 +36,27 @@ enum TaskPlatform {
   JSS_ENGINE
 };
 
+enum Level {
+  HIGH,
+  MEDIUM,
+  LOW,
+};
+
 class TimeCalculator {
  public:
-  TimeCalculator(TaskPlatform taskPlatform, std::string name, std::string id) :
-      task_name(name),
-      instance_id(id),
-      end(TimePoint::Now()),
-      start(TimePoint::Now()),
-      task_end(TimePoint::Now()),
-      task_start(TimePoint::Now()),
-      task_id(genTaskId()) {
+  TimeCalculator(TaskPlatform taskPlatform, std::string name, std::string id, Level level = LOW) :
+      m_task_name_(name),
+      m_instance_id_(id),
+      m_destructor_time_(getCurrentTime()),
+      m_constructor_time_(getCurrentTime()),
+      m_task_end_time_(getCurrentTime()),
+      m_task_start_time_(getCurrentTime()),
+      m_task_id_(genTaskId()),
+      m_relative_task_id_(0) {
     if (taskPlatform == TaskPlatform::JSS_ENGINE) {
-      task_platform = "jsengine";
+      m_task_platform_ = "JSEngine";
     } else {
-      task_platform = "weexcore";
+      m_task_platform_ = "WeexCore";
     }
   }
 
@@ -58,84 +66,45 @@ class TimeCalculator {
   }
 
   ~TimeCalculator() {
-    if (!task_end_flag) {
-      task_end = TimePoint::Now();
+    if (!m_task_end_flag_) {
+      m_task_end_time_ = getCurrentTime();
     }
-    end = TimePoint::Now();
+    m_destructor_time_ = getCurrentTime();
     print();
+//    transform();
   }
 
-  void taskStart() {
-//    LOGE(
-//        "dyyLog %s taskName is %s : instanceId %s : task_id %d: taskStart",
-//        task_platform.c_str(),
-//        task_name.c_str(),
-//        instance_id.c_str(),
-//        task_id);
-    this->task_start = TimePoint::Now();
-  }
+  void taskStart();
 
-  void taskEnd() {
-//    LOGE(
-//        "dyyLog %s taskName is %s : instanceId %s : task_id %d: taskEnd",
-//        task_platform.c_str(),
-//        task_name.c_str(),
-//        instance_id.c_str(),
-//        task_id);
-    this->task_end = TimePoint::Now();
-    task_end_flag = true;
-  }
+  void taskEnd();
 
   void set_task_name(std::string name) {
-    this->task_name = name;
+    this->m_task_name_ = name;
   }
 
-  void print() {
-    const TimeUnit &allCost = end.ToTimeUnit() - start.ToTimeUnit();
-    const TimeUnit &taskWait = task_start.ToTimeUnit() - start.ToTimeUnit();
-    const TimeUnit &taskCost = task_end.ToTimeUnit() - task_start.ToTimeUnit();
-
-//    int64_t taskCostMS = taskCost.ToMilliseconds();
-//    if (taskCostMS < 5) {
-//      LOGD("dyyLog %s taskName is %s cost less than 5ms", task_platform.c_str(),
-//           task_name.c_str());
-//    } else {
-//      std::string msg = "normal";
-//
-//      if (taskCostMS > 100) {
-//        msg = "task cost than 100, ";
-//      }
-//
-//      if (taskWait.ToMilliseconds() > 100) {
-//        std::string a = "wait to long time than 100ms";
-//        msg += a;
-//      }
-//
-//      LOGE(
-//          "dyyLog %s taskName is %s : instanceId %s : task_id %d: start : %lld  ---  end : %lld  ---  allCost:%lld  ---  taskCost:%lld  ---  taskWait:%lld --- msg:%s",
-//          task_platform.c_str(),
-//          task_name.c_str(),
-//          instance_id.c_str(),
-//          task_id,
-//          start.ToTimeUnit().ToMilliseconds(),
-//          end.ToTimeUnit().ToMilliseconds(),
-//          allCost.ToMilliseconds(),
-//          taskCostMS,
-//          taskWait.ToMilliseconds(),
-//          msg.c_str());
-//    }
+  void setArgs(std::string args) {
+    this->args = args;
   }
 
+  std::string formatData();
+  void transform();
+  void print();
  private:
-  std::string task_name;
-  int task_id;
-  std::string instance_id;
-  TimePoint start;
-  TimePoint end;
-  TimePoint task_start;
-  TimePoint task_end;
-  bool task_end_flag = false;
-  std::string task_platform;
+  std::string m_task_name_;
+  std::string m_log_tag_;
+  std::string m_log_level_;
+  int m_task_id_;
+  int m_relative_task_id_;
+  std::string m_instance_id_;
+  long long m_constructor_time_;
+  long long m_destructor_time_;
+  long long m_task_start_time_;
+  long long m_task_end_time_;
+  bool m_task_end_flag_ = false;
+  std::string m_task_platform_;
+  std::string m_final_info_string_;
+  std::string args;
+
 };
 }  // namespace base
 }  // namespace weex

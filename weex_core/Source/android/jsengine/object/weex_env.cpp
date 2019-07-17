@@ -46,6 +46,7 @@ WeexEnv::WeexEnv() {
 }
 
 void WeexEnv::initJSC(bool isMultiProgress) {
+    weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::JSS_ENGINE, "initJSC", "initJSC");
     static std::once_flag initJSCFlag;
     std::call_once(initJSCFlag, [isMultiProgress]{
       if (!WEEXICU::initICUEnv(isMultiProgress)) {
@@ -64,6 +65,7 @@ void WeexEnv::initJSC(bool isMultiProgress) {
 #endif
 #endif
     });
+  timeCalculator.taskEnd();
 }
 void WeexEnv::init_crash_handler(std::string crashFileName) {
   // initialize signal handler
@@ -92,12 +94,30 @@ WeexEnv::~WeexEnv() {
 #endif
 }
 
-void WeexEnv::sendTLog(const char *tag, const char *log) {
-    if(m_back_to_weex_core_thread.get()) {
-        BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
-                IPCProxyMsg::TLOGMSG);
-        ipc_task->addParams(tag);
-        ipc_task->addParams(log);
-        m_back_to_weex_core_thread->addTask(ipc_task);
-    }
+bool WeexEnv::sendLog(int level,
+                      const char *tag,
+                      const char *file,
+                      unsigned long line,
+                      const char *log) {
+
+  if (!isMultiProcess) {
+    return false;
+  }
+
+  if (m_back_to_weex_core_thread.get() == nullptr
+  || m_back_to_weex_core_thread.get()->isInitOk == 0) {
+    return false;
+  }
+
+  BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+      IPCProxyMsg::POSTLOGDETAIL);
+  auto level_str = std::to_string(level);
+  ipc_task->addParams(level_str.c_str(), level_str.length());
+  ipc_task->addParams(tag);
+  ipc_task->addParams(file);
+  auto line_str = std::to_string(line);
+  ipc_task->addParams(line_str.c_str(), line_str.length());
+  ipc_task->addParams(log);
+  m_back_to_weex_core_thread.get()->addTask(ipc_task);
+  return true;
 }

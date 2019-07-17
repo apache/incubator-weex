@@ -75,8 +75,8 @@ enum class IPCProxyMsg {
     DISPATCHMESSAGESYNC,
   	ONRECEIVEDRESULT,
     UPDATECOMPONENTDATA,
-    TLOGMSG,
     HEARTBEAT,
+    POSTLOGDETAIL,
 };
 // Message from Script to Core in ScriptBridge
 

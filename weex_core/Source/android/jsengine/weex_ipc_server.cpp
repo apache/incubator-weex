@@ -17,13 +17,14 @@
  * under the License.
  */
 #include "android/jsengine/weex_ipc_server.h"
-
 #include "android/jsengine/bridge/platform/platform_side_multi_process.h"
 #include "android/jsengine/bridge/platform/platform_bridge_in_multi_process.h"
 #include "android/jsengine/object/weex_env.h"
 #include "android/jsengine/weex_runtime.h"
 #include "core/manager/weex_core_manager.h"
 #include "android/jsengine/weex_jsc_utils.h"
+#include "base/utils/log_base.h"
+#include "android/jsengine/object/log_utils_jss.h"
 #ifdef USE_JS_RUNTIME
 #include "base/crash/crash_handler.h"
 #include <unistd.h>
@@ -49,7 +50,6 @@ WeexJSServer::WeexJSServerImpl::WeexJSServerImpl(int serverFd, int clientFd, boo
     WeexEnv::getEnv()->setIpcServerFd(serverFd);
     WeexEnv::getEnv()->setIpcClientFd(clientFd);
     WeexEnv::getEnv()->setEnableTrace(enableTrace);
-
     int _fd = serverFd;
     void *base = mmap(nullptr, IPCFutexPageQueue::ipc_size, PROT_READ | PROT_WRITE, MAP_SHARED, _fd, 0);
     if (base == MAP_FAILED) {
@@ -63,7 +63,7 @@ WeexJSServer::WeexJSServerImpl::WeexJSServerImpl(int serverFd, int clientFd, boo
     sender = std::move(createIPCSender(futexPageQueue.get(), handler.get()));
     listener = std::move(createIPCListener(futexPageQueue.get(), handler.get()));
     serializer = std::move(createIPCSerializer());
-
+    weex::base::LogImplement::getLog()->setLogImplement(new LogUtilsJSS());
     WeexEnv::getEnv()->init_crash_handler(crashFileName);
 
     WeexEnv::getEnv()->m_back_to_weex_core_thread.reset(new BackToWeexCoreQueue());

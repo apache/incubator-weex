@@ -74,7 +74,7 @@ public class WXModuleManager {
 
     final Iterator<Entry<String, RegisterCache.ModuleCache>> iterator = moduleCacheMap.entrySet().iterator();
     WXBridgeManager.getInstance()
-            .post(new Runnable() {
+            .postWithName(new Runnable() {
               @Override
               public void run() {
                 Map<String, Object> modules = new HashMap<>();
@@ -117,7 +117,7 @@ public class WXModuleManager {
                 }
                 WXSDKManager.getInstance().registerModules(modules);
               }
-            });
+            },null,"registerModule From Cache");
     return true;
   }
 
@@ -140,7 +140,7 @@ public class WXModuleManager {
 
     //execute task in js thread to make sure register order is same as the order invoke register method.
     WXBridgeManager.getInstance()
-            .post(new Runnable() {
+            .postWithName(new Runnable() {
               @Override
               public void run() {
                 if (sModuleFactoryMap != null && sModuleFactoryMap.containsKey(moduleName)) {
@@ -170,7 +170,7 @@ public class WXModuleManager {
 
                 }
               }
-            });
+            },null,"registerModule");
     return true;
 
   }

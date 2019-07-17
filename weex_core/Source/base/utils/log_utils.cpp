@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <android/log.h>
 #include "base/utils/log_utils.h"
 
 namespace Weex{
@@ -33,22 +34,22 @@ namespace Weex{
         // }
         switch(level) {
           case 1:
-            LOGV_TAG("jsengine", "%s", log);
+              __android_log_print(ANDROID_LOG_ERROR, tag, "%s", log);
             break;
           case 2:
-            LOGW_TAG("jsengine", "%s", log);
+              __android_log_print(ANDROID_LOG_ERROR, tag, "%s", log);
             break;
           case 3:
-            LOGE_TAG("jsengine", "%s", log);
+              __android_log_print(ANDROID_LOG_ERROR, tag, "%s", log);
             break;
           case 4:
-            LOGD_TAG("jsengine", "%s", log);
+              __android_log_print(ANDROID_LOG_ERROR, tag, "%s", log);
             break;
           case 5:
-            LOGI_TAG("jsengine", "%s", log);
+              __android_log_print(ANDROID_LOG_ERROR, tag, "%s", log);
             break;
           default:
-            LOGV_TAG("jsengine", "%s", log);
+              __android_log_print(ANDROID_LOG_ERROR, tag, "%s", log);
             break;
         }
       }

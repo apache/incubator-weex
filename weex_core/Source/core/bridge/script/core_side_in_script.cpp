@@ -111,11 +111,11 @@ void CoreSideInScript::AddElement(const char *page_id, const char *parent_ref,
                                   const char *index_str) {
 
   
-//  std::string msg = "AddElement :";
+  std::string msg = "AddElement";
 //  wson_parser parser(dom_str);
 //  msg.append(parser.toStringUTF8().c_str());
 //
-//  weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::WEEXCORE, msg.c_str(), page_id);
+  weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::WEEXCORE, msg.c_str(), page_id);
 
   const char *indexChar = index_str == nullptr ? "\0" : index_str;
   int index = atoi(indexChar);

@@ -18,15 +18,17 @@
  */
 
 #include <sstream>
+#include <android/log.h>
 #include "android/wrap/log_utils.h"
 
 #include "android/base/string/string_utils.h"
 #include "base/android/jni/android_jni.h"
+#include "log_utils.h"
 
 namespace WeexCore {
 
 const char kWXLogUtilsClassPath[] = "com/taobao/weex/utils/WXLogUtils";
-jclass g_WXLogUtils_clazz = nullptr;
+static jclass g_WXLogUtils_clazz = nullptr;
 
 static intptr_t g_WXLogUtils_d = 0;
 static void Java_WXLogUtils_d(JNIEnv* env, jstring tag, jbyteArray msg) {
@@ -68,6 +70,16 @@ static void Java_WXLogUtils_e(JNIEnv* env, jstring tag, jbyteArray msg) {
   base::android::CheckException(env);
 }
 
+static intptr_t g_WXLogUtils_Msg = 0;
+static void Java_WXLogUtils_Msg(JNIEnv* env, jstring tag, jbyteArray msg) {
+  jmethodID method_id = base::android::GetMethod(
+      env, g_WXLogUtils_clazz, base::android::STATIC_METHOD, "msg",
+      "(Ljava/lang/String;[B)V", &g_WXLogUtils_Msg);
+
+  env->CallStaticVoidMethod(g_WXLogUtils_clazz, method_id, tag, msg);
+  base::android::CheckException(env);
+}
+
 bool LogUtils::RegisterJNIUtils(JNIEnv* env) {
   g_WXLogUtils_clazz = reinterpret_cast<jclass>(env->NewGlobalRef(
       base::android::GetClass(env, kWXLogUtilsClassPath).Get()));
@@ -82,7 +94,11 @@ void LogUtils::NativeLog(JNIEnv* env, const char* str_array) {
   Java_WXLogUtils_d(env, tag.Get(), msg.Get());
 }
 
-void LogUtils::log(LogLevel level, const char* tag,  const char* file, unsigned long line, const char* log){
+void LogUtils::log(LogLevel level,
+                   const char *tag,
+                   const char *file,
+                   unsigned long line,
+                   const char *log) {
   JNIEnv *env = base::android::AttachCurrentThread();
   if (env == nullptr) {
     return;
@@ -90,25 +106,65 @@ void LogUtils::log(LogLevel level, const char* tag,  const char* file, unsigned 
   else {
     std::stringstream ss;
     ss << file << ":" << line << "," << log;
-
     auto tag_jstring = base::android::ScopedLocalJavaRef<jstring>(
         env,  env->NewStringUTF(tag));
     auto msg_jbyteArray = base::android::ScopedLocalJavaRef<jbyteArray>(
-        env, newJByteArray(env, ss.str().c_str()));
+        env, WeexCore::newJByteArray(env, ss.str().c_str()));
+
     switch (level) {
-      case LogLevel::Debug:
-        Java_WXLogUtils_d(env, tag_jstring.Get(), msg_jbyteArray.Get());
+      case WeexCore::LogLevel::Debug:
+        WeexCore::Java_WXLogUtils_d(env, tag_jstring.Get(), msg_jbyteArray.Get());
         break;
-      case LogLevel::Info:
-        Java_WXLogUtils_i(env, tag_jstring.Get(), msg_jbyteArray.Get());
+      case WeexCore::LogLevel::Info:
+        WeexCore::Java_WXLogUtils_i(env, tag_jstring.Get(), msg_jbyteArray.Get());
         break;
-      case LogLevel::Warn:
-        Java_WXLogUtils_w(env, tag_jstring.Get(), msg_jbyteArray.Get());
+      case WeexCore::LogLevel::Warn:
+        WeexCore::Java_WXLogUtils_w(env, tag_jstring.Get(), msg_jbyteArray.Get());
         break;
-      case LogLevel::Error:
-        Java_WXLogUtils_e(env, tag_jstring.Get(), msg_jbyteArray.Get());
+      case WeexCore::LogLevel::Error:
+        WeexCore::Java_WXLogUtils_e(env, tag_jstring.Get(), msg_jbyteArray.Get());
+        break;
+      case WeexCore::LogLevel::Msg :
+        WeexCore::Java_WXLogUtils_Msg(env, tag_jstring.Get(), msg_jbyteArray.Get());
         break;
     }
   }
 }
+
+bool LogUtilsWeexCore::log(WeexCore::LogLevel level,
+                           const char *tag,
+                           const char *file,
+                           unsigned long line,
+                           const char *log) {
+  JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr) {
+    return false;
+  }
+  std::stringstream ss;
+  ss << file << ":" << line << "," << log;
+  auto tag_jstring = base::android::ScopedLocalJavaRef<jstring>(
+      env,  env->NewStringUTF(tag));
+  auto msg_jbyteArray = base::android::ScopedLocalJavaRef<jbyteArray>(
+      env, WeexCore::newJByteArray(env, ss.str().c_str()));
+  switch (level) {
+    case WeexCore::LogLevel::Debug:
+      Java_WXLogUtils_d(env, tag_jstring.Get(), msg_jbyteArray.Get());
+      break;
+    case LogLevel::Info:
+      Java_WXLogUtils_i(env, tag_jstring.Get(), msg_jbyteArray.Get());
+      break;
+    case LogLevel::Warn:
+      Java_WXLogUtils_w(env, tag_jstring.Get(), msg_jbyteArray.Get());
+      break;
+    case LogLevel::Error:
+      Java_WXLogUtils_e(env, tag_jstring.Get(), msg_jbyteArray.Get());
+      break;
+    case LogLevel::Msg :
+      Java_WXLogUtils_Msg(env, tag_jstring.Get(), msg_jbyteArray.Get());
+      break;
+  }
+  return true;
+}
+
 }  // namespace WeexCore
+
