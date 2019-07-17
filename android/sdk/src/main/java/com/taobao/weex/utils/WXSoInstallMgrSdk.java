@@ -260,9 +260,9 @@ public class WXSoInstallMgrSdk {
       }
       File oldfile = null;
       if (pieSupport) {
-        oldfile = new File(path + STARTUPSO);
+        oldfile = new File(path, STARTUPSO);
       } else {
-        oldfile = new File(path + STARTUPSOANDROID15);
+        oldfile = new File(path , STARTUPSOANDROID15);
       }
 
 

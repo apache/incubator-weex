@@ -157,7 +157,7 @@ public class WXEnvironment {
   }
 
 
-  public static WXDefaultSettings getWXDefaultSettings() {
+  public static synchronized WXDefaultSettings getWXDefaultSettings() {
     if (mWXDefaultSettings == null && getApplication() != null) {
       mWXDefaultSettings = new WXDefaultSettings(getApplication());
     }
@@ -172,7 +172,7 @@ public class WXEnvironment {
     return wxDefaultSettings.getValue(key, defaultValue);
   }
 
-  public static void writeDefaultSettingsValue(String key, String value) {
+  public static synchronized void writeDefaultSettingsValue(String key, String value) {
     WXDefaultSettings wxDefaultSettings = getWXDefaultSettings();
     if (wxDefaultSettings == null
             || TextUtils.isEmpty(key)
