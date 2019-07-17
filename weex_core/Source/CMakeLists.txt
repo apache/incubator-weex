@@ -27,11 +27,12 @@ elseif ("${ANDROID_STL}" STREQUAL "gnustl_static")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++1y")
 endif ()
 add_compile_options(-fexceptions)
-
+add_compile_options(-fstack-protector)
+add_compile_options(-funwind-tables)
+add_compile_options(-fno-omit-frame-pointer)
 
 add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
-add_definitions(-DDEBUG=1)
 
 add_definitions(-DRENDER_LOG=0)
 add_definitions(-DPERFORMANCE_LOG=0)
@@ -56,6 +57,9 @@ add_compile_options(-fexceptions)
 set(COMMON_SRCS
   ./core/render/manager/render_manager.cpp
   ./core/render/page/render_page.cpp
+  ./core/render/page/render_page_base.cpp
+  ./core/render/page/render_page_custom.cpp
+  ./core/render/target/render_target.cpp
 
   ./core/render/node/render_object.cpp
   ./core/render/node/factory/render_creator.cpp
@@ -79,6 +83,10 @@ set(COMMON_SRCS
   ./core/render/action/render_action_render_success.cpp
   ./core/render/action/render_action_trigger_vsync.cpp
 
+  ./core/json/JsonRenderManager.cpp
+  ./core/json/JsonPage.cpp
+
+
   ./core/layout/layout.cpp
   ./core/layout/style.cpp
 
@@ -90,6 +98,7 @@ set(COMMON_SRCS
   ./core/bridge/platform/core_side_in_platform.cpp
   ./core/bridge/script/core_side_in_script.cpp
   ./core/parser/dom_wson.cpp
+  ./core/parser/action_args_check.cpp
 
    ./core/network/http_module.cc
         )
@@ -108,7 +117,20 @@ if(ANDROID)
   add_definitions(-DOS_ANDROID=1)
   ## add_subdirectory for subdirectory has a CMakeLists.txt
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/IPC)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/android/jsengine)
+
+
+  message("check build jsc BUILD_RUNTIME_API flag: ${BUILD_RUNTIME_API}")
+  if ("${BUILD_RUNTIME_API}" STREQUAL "true")
+      add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/js_runtime)
+      message("cmake build jsApi for runtime")
+  else()
+      add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/android/jsengine)
+      message("cmake build jsApi for jsc")
+  endif()
+
+
+
+
   ## include_directories for include head file
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/IPC)
 

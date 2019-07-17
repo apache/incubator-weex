@@ -27,7 +27,9 @@
 #include "core/render/manager/render_manager.h"
 #include "core/bridge/eagle_bridge.h"
 #include "wson/wson_parser.h"
+#include "core/config/core_environment.h"
 #ifdef OS_ANDROID
+#include "core/parser/action_args_check.h"
 #include <base/time_calculator.h>
 #include "android/weex_extend_js_api.h"
 #endif
@@ -51,7 +53,19 @@ inline char *copyStr(const char *str, int length = 0) {
 void CoreSideInScript::CallNative(const char *page_id, const char *task,
                                   const char *callback) {
   if (page_id == nullptr || task == nullptr) return;
-
+#ifdef OS_ANDROID
+  if (WXCoreEnvironment::getInstance()->isUseRunTimeApi()){
+    if (isCallNativeToFinish(task)){
+      RenderManager::GetInstance()->CreateFinish(page_id);
+    } else {
+      WeexCoreManager::Instance()
+              ->getPlatformBridge()
+              ->platform_side()
+              ->CallNative(page_id, task, callback);
+    }
+    return;
+  }
+#endif
   std::string task_str(task);
   std::string target_str("[{\"module\":\"dom\",\"method\":\"createFinish\","
                          "\"args\":[]}]");
@@ -71,18 +85,11 @@ std::unique_ptr<ValueWithType> CoreSideInScript::CallNativeModule(
     const char *page_id, const char *module, const char *method,
     const char *arguments, int arguments_length, const char *options,
     int options_length) {
-  std::unique_ptr<ValueWithType> ret(new ValueWithType);
-  ret->type = ParamsType::INT32;
-  ret->value.int32Value = -1;
+  std::unique_ptr<ValueWithType> ret(new ValueWithType((int32_t)-1));
   if (page_id != nullptr && module != nullptr && method != nullptr) {
-    RenderManager::GetInstance()->CallNativeModule(page_id, module, method,
-                                                   arguments, arguments_length,
-                                                   options, options_length);
-    return WeexCoreManager::Instance()
-        ->getPlatformBridge()
-        ->platform_side()
-        ->CallNativeModule(page_id, module, method, arguments, arguments_length,
-                           options, options_length);
+    return RenderManager::GetInstance()->CallNativeModule(page_id, module, method,
+                                                          arguments, arguments_length,
+                                                          options, options_length);
   }
 
   return ret;
@@ -95,32 +102,7 @@ void CoreSideInScript::CallNativeComponent(const char *page_id, const char *ref,
                                            const char *options,
                                            int options_length) {
   if (page_id != nullptr && ref != nullptr && method != nullptr) {
-    //    WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
-    //        weex::base::MakeCopyable(
-    //            [pageId = std::unique_ptr<char[]>(copyStr(page_id)),
-    //             refS = std::unique_ptr<char[]>(copyStr(ref)),
-    //             methodS = std::unique_ptr<char[]>(copyStr(method)),
-    //             argumentsS =
-    //                 std::unique_ptr<char[]>(copyStr(arguments,
-    //                 arguments_length)),
-    //             argLen = arguments_length,
-    //             optionsS =
-    //                 std::unique_ptr<char[]>(copyStr(options,
-    //                 options_length)),
-    //             optLen = options_length] {
-    //              WeexCoreManager::Instance()
-    //                  ->getPlatformBridge()
-    //                  ->platform_side()
-    //                  ->CallNativeComponent(pageId.get(), refS.get(),
-    //                  methodS.get(),
-    //                                        argumentsS.get(), argLen,
-    //                                        optionsS.get(), optLen);
-    //            }));
-    WeexCoreManager::Instance()
-        ->getPlatformBridge()
-        ->platform_side()
-        ->CallNativeComponent(page_id, ref, method, arguments, arguments_length,
-                              options, options_length);
+    RenderManager::GetInstance()->CallNativeComponent(page_id, ref, method, arguments, arguments_length, options, options_length);
   }
 }
 

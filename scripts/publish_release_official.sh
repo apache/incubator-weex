@@ -29,7 +29,7 @@
 # $GITHUB_PERSONAL_TOKEN The personal access token of your github Account(https://github.com/settings/tokens), which should have write priviledge to git@github.com:apache/incubator-weex.git . The personal access token is used to publish Github Release
 # $JCENTER_TOKEN The private key for JCenter (https://bintray.com/alibabaweex/maven/weex_sdk/), which is the distribution channel for Android
 
-# Prepare RELEASE_NOTE.md
+echo "Prepare RELEASE_NOTE.md"
 rm -f commit-history.log
 git log --pretty=format:"%s %h" --no-merges  "$3"..HEAD > commit-history.log
 sed -i '' 's/^*//' commit-history.log
@@ -38,7 +38,7 @@ sed -i '' -e '1i \
 # Detail Commit' commit-history.log
 cat CHANGELOG.md commit-history.log > RELEASE_NOTE.md
 
-# Publish source file or release to Apache SVN server
+echo "Publish source file to Apache SVN server"
 if [ ! -d "${TMPDIR}weex_release" ]
 then
     svn checkout https://dist.apache.org/repos/dist/release/incubator/weex/ "${TMPDIR}weex_release"
@@ -51,15 +51,17 @@ cd ..
 svn add "$1"
 svn commit -m "Release ${1}"
 
-# Publish to Github Release
+echo "Push Git Tag to Github Repo"
 git tag -a -F "RELEASE_NOTE.md" "$1"
 git push "$4" "$1"
+
+echo "Publish Github Release"
 npm install -g release-it
 export GITHUB_TOKEN="$5"
-release-it --no-npm --no-git.commit --no-git.requireCleanWorkingDir --git.tagName="$1" --git.tagAnnotation='"$(cat RELEASE_NOTE.md)"' --git.tagArgs="--cleanup=verbatim" --git.pushRepo="$4" --github.release --github.releaseName="$1" --github.releaseNotes="cat RELEASE_NOTE.md"
+release-it --ci --no-npm --no-increment --no-git.requireCleanWorkingDir --no-git.commit --no-git.tag --no-git.push --git.pushRepo="$4" --github.release --github.releaseName="$1" --github.releaseNotes="cat RELEASE_NOTE.md"
 
-# Publish Android to JCenter
+echo "Publish Android JCenter Release"
 cd android
-./gradlew clean install bintray -PignoreVersionCheck="true"  -Pweexversion="$1" -PbintrayUser=alibabaweex -PbintrayApiKey="$6" 
+./gradlew clean install bintray -PbuildRuntimeApi=true -PignoreVersionCheck="true"  -PweexVersion="$1" -PbintrayUser=alibabaweex -PbintrayApiKey="$6" 
 
 # Publish iOS to Cocoapods

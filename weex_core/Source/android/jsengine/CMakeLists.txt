@@ -25,7 +25,7 @@
 set(PORT JSCOnly)
 add_definitions(-DPRINT_LOG_CACHEFILE=0)
 add_definitions(-DOS_ANDROID)
-
+#add_definitions(-DNDEBUG)
 add_definitions(-DUSE_SYSTEM_MALLOC=1)
 if (${ANDROID_PLATFORM} STREQUAL "android-21")
 else ()

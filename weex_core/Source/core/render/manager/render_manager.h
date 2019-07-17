@@ -24,9 +24,12 @@
 
 #include "core/css/constants_value.h"
 #include "core/render/node/render_object.h"
+#include "include/WeexApiHeader.h"
 
 namespace WeexCore {
 
+class RenderPageBase;
+class RenderPageCustom;
 class RenderPage;
 class RenderObject;
 
@@ -54,10 +57,13 @@ class RenderManager {
   // create root node
   bool CreatePage(const std::string& page_id, const char *data);
     
-
+  // create platform page
   bool CreatePage(const std::string& page_id, RenderObject *root);
     
   bool CreatePage(const std::string& page_id, std::function<RenderObject* (RenderPage*)> constructRoot);
+    
+  // create custom page with self rendering
+  RenderPageCustom* CreateCustomPage(const std::string& page_id, const std::string& page_type);
 
   /** use auto constructor is bad idea, it cann't transfer binary, use char* is
    * better */
@@ -97,14 +103,21 @@ class RenderManager {
                    const std::string &event);
 
   bool CreateFinish(const std::string &page_id);
-  void CallNativeModule(const std::string &page_id, const std::string &module, const std::string &method, const std::string &args, int argc = 0);
-  void CallNativeModule(const char *page_id, const char *module, const char *method,
-                        const char *arguments, int arguments_length, const char *options,
-                        int options_length);
+
+  std::unique_ptr<ValueWithType> CallNativeModule(const char *page_id, const char *module, const char *method,
+                                                  const char *arguments, int arguments_length, const char *options,
+                                                  int options_length);
+    
+  void CallNativeComponent(const char *page_id, const char *ref,
+                           const char *method,
+                           const char *arguments,
+                           int arguments_length,
+                           const char *options,
+                           int options_length);
 
   void CallMetaModule(const char *page_id, const char *method, const char *arguments);
 
-  RenderPage *GetPage(const std::string &page_id);
+  RenderPageBase *GetPage(const std::string &page_id);
 
   bool ClosePage(const std::string &page_id);
     
@@ -137,7 +150,8 @@ class RenderManager {
     void initDeviceConfig(RenderPage *page, const std::string &page_id);
  private:
   static RenderManager *g_pInstance;
-  std::map<std::string, RenderPage *> pages_;
+
+  std::map<std::string, RenderPageBase *> pages_;
   std::mutex page_args_mutex_;
   std::map<std::string, std::map<std::string, std::string>> page_args_;
 };

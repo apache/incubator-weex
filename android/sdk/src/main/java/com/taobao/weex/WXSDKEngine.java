@@ -85,6 +85,7 @@ import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.ui.component.richtext.WXRichText;
 import com.taobao.weex.ui.config.AutoScanConfigRegister;
+import com.taobao.weex.ui.module.WXDeviceInfoModule;
 import com.taobao.weex.ui.module.ConsoleLogModule;
 import com.taobao.weex.ui.module.WXLocaleModule;
 import com.taobao.weex.ui.module.WXMetaModule;
@@ -222,6 +223,7 @@ public class WXSDKEngine implements Serializable {
         final IWXUserTrackAdapter userTrackAdapter= config!=null?config.getUtAdapter():null;
         final int version = 1;
         mIsSoInit = WXSoInstallMgrSdk.initSo(V8_SO_NAME, version, userTrackAdapter);
+        WXSoInstallMgrSdk.copyJssRuntimeSo();
         if(config!=null) {
           for (String libraryName : config.getNativeLibraryList()) {
             WXSoInstallMgrSdk.initSo(libraryName, version, userTrackAdapter);
@@ -374,6 +376,7 @@ public class WXSDKEngine implements Serializable {
       registerModule("meta", WXMetaModule.class);
       registerModule("webSocket", WebSocketModule.class);
       registerModule("locale", WXLocaleModule.class);
+      registerModule("deviceInfo", WXDeviceInfoModule.class);
       registerModule("sdk-console-log", ConsoleLogModule.class);
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:", e);

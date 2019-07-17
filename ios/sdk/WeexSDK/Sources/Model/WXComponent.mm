@@ -261,12 +261,6 @@ static BOOL bNeedRemoveEvents = YES;
         [_panGesture removeTarget:nil action:NULL];
     }
     
-    if (bNeedRemoveEvents) {
-        if (WX_SYS_VERSION_LESS_THAN(@"9.0")) {
-            [self _removeAllEvents];
-        }
-    }
-    
     if (_bindingExpressions != nullptr) {
         for (WXJSExpression* expr : *_bindingExpressions) {
             if (expr != nullptr) {
@@ -604,7 +598,6 @@ static BOOL bNeedRemoveEvents = YES;
     pthread_mutex_unlock(&_propertyMutex);
     
     if (subcomponent->_positionType == WXPositionTypeFixed) {
-        subcomponent.ignoreInteraction = YES;
         [self.weexInstance.componentManager addFixedComponent:subcomponent];
     }
     
@@ -851,6 +844,7 @@ static BOOL bNeedRemoveEvents = YES;
             if (gradientLayer) {
                 _backgroundColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
                 strongSelf.view.backgroundColor = _backgroundColor;
+                [strongSelf setNeedsDisplay];
             }
         }
     });

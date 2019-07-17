@@ -65,8 +65,6 @@ set(${BASE_LIBRARY_NAME}_SOURCES
     third_party/icu/icu_utf.cpp
     utils/log_utils.h
     utils/log_utils.cpp
-    utils/ThreadLocker.h
-    utils/ThreadLocker.cpp   
     )
 
 if (ANDROID)
@@ -93,6 +91,8 @@ if (ANDROID)
         android/jni/jbytearray_ref.cpp
         android/jni/scoped_java_ref.h
         android/jni/scoped_java_ref.cpp
+        android/ThreadLocker.h
+        android/ThreadLocker.cpp
        )
     list(APPEND ${BASE_LIBRARY_NAME}_SOURCES
         ${BASE_ANDROID_SOURCES}

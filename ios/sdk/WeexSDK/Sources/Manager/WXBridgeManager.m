@@ -36,6 +36,7 @@
 #import "WXCoreBridge.h"
 #import "WXDataRenderHandler.h"
 #import "WXHandlerFactory.h"
+#import "WXUtility.h"
 
 @interface WXBridgeManager ()
 
@@ -101,12 +102,7 @@ static NSThread *WXBackupBridgeThread;
     dispatch_once(&onceToken, ^{
         WXBridgeThread = [[NSThread alloc] initWithTarget:[[self class]sharedManager] selector:@selector(_runLoopThread) object:nil];
         [WXBridgeThread setName:WX_BRIDGE_THREAD_NAME];
-        if(WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-            [WXBridgeThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
-        } else {
-            [WXBridgeThread setThreadPriority:[[NSThread mainThread] threadPriority]];
-        }
-        
+        [WXBridgeThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
         [WXBridgeThread start];
     });
     
@@ -119,12 +115,7 @@ static NSThread *WXBackupBridgeThread;
     dispatch_once(&onceToken, ^{
         WXBackupBridgeThread = [[NSThread alloc] initWithTarget:[[self class]sharedManager] selector:@selector(_runLoopThread) object:nil];
         [WXBackupBridgeThread setName:WX_BACKUP_BRIDGE_THREAD_NAME];
-        if(WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-            [WXBackupBridgeThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
-        } else {
-            [WXBackupBridgeThread setThreadPriority:[[NSThread mainThread] threadPriority]];
-        }
-
+        [WXBackupBridgeThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
         [WXBackupBridgeThread start];
     });
 
@@ -493,6 +484,8 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
 {
     if (!modules) return;
     
+    modules = [WXUtility convertContainerToImmutable:modules];
+    
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
         [weakSelf.bridgeCtx registerModules:modules];
@@ -505,6 +498,8 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
 - (void)registerComponents:(NSArray *)components
 {
     if (!components) return;
+    
+    components = [WXUtility convertContainerToImmutable:components];
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
@@ -568,7 +563,7 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
         [instance.apmInstance updateFSDiffStats:KEY_PAGE_STATS_FS_CALL_EVENT_NUM withDiffValue:1];
     }
     
-    WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"fireEvent" arguments:args instance:instance];
+    WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:nil methodName:@"fireEvent" arguments:[WXUtility convertContainerToImmutable:args] instance:instance];
     [self callJsMethod:method];
 }
 
@@ -632,7 +627,8 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     else {
         WXCallJSMethod *method = [[WXCallJSMethod alloc] initWithModuleName:@"jsBridge" methodName:@"callback" arguments:args instance:instance];
         [self callJsMethod:method];
-    }}
+    }
+}
 
 - (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(id)params
 {
@@ -641,10 +637,7 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
 
 - (void)connectToDevToolWithUrl:(NSURL *)url {
     WXPerformBlockOnBridgeThread(^(){
-    [self.bridgeCtx connectToDevToolWithUrl:url];
-        });
-    WXPerformBlockOnBackupBridgeThread(^(){
-        [self.backupBridgeCtx connectToDevToolWithUrl:url];
+        [self.bridgeCtx connectToDevToolWithUrl:url];
     });
 }
 
@@ -653,9 +646,6 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
         [weakSelf.bridgeCtx connectToWebSocket:url];
-    });
-    WXPerformBlockOnBackupBridgeThread(^(){
-        [weakSelf.backupBridgeCtx connectToWebSocket:url];
     });
 }
 
@@ -666,9 +656,6 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
         [weakSelf.bridgeCtx logToWebSocket:flag message:message];
-    });
-    WXPerformBlockOnBackupBridgeThread(^(){
-        [weakSelf.backupBridgeCtx logToWebSocket:flag message:message];
     });
 }
 

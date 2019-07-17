@@ -18,8 +18,6 @@
  */
 package com.taobao.weex.bridge;
 
-import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
-
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -34,6 +32,7 @@ import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -61,7 +60,9 @@ import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.ui.WXComponentRegistry;
+import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.BasicGraphicAction;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
@@ -104,16 +105,20 @@ import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+
+import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
 
 /**
  * Manager class for communication between JavaScript and Android.
@@ -621,6 +626,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
+    WXStateRecord.getInstance().recordAction(instanceId,"callNativeModule:"+module+"."+method);
+
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
               .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
@@ -858,10 +865,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 Log.d("jsengine", "callReportCrashReloadPage crashFile:" + crashFile);
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
+        WXStateRecord.getInstance().onJSCCrash();
         callReportCrash(crashFile, instanceId, url);
       } else {
+        WXStateRecord.getInstance().onJSEngineReload();
          commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_RELOAD_PAGE, "reboot jsc Engine", instanceId, url);
       }
 
@@ -960,7 +969,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_JSC_CRASH, result.toString(), instanceId, url);
                 br.close();
               } catch (Exception e) {
-                e.printStackTrace();
+                WXLogUtils.e(WXLogUtils.getStackTrace(e));
               }
             } else {
               WXLogUtils.e("[WXBridgeManager] callReportCrash crash file is empty");
@@ -1500,6 +1509,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       @Override
       public void run() {
         long start = System.currentTimeMillis();
+        mWXBridge.setPageArgument(instanceId, "renderTimeOrigin", String.valueOf(instance.getWXPerformance().renderTimeOrigin));
+        mWXBridge.setInstanceRenderType(instance.getInstanceId(), instance.getRenderType());
         invokeCreateInstance(instance, template, options, data);
         long end = System.currentTimeMillis();
         instance.getWXPerformance().callCreateInstanceTime = end - start;
@@ -1541,7 +1552,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             WXLogUtils.e("end getBundleType type:" + type.toString() + " time:" + (end - start));
           }
         } catch (Throwable e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
 
         try {
@@ -1571,7 +1582,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             options.put("env", mInitParams.toMap());
           }
         } catch (Throwable e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         instance.bundleType = type;
         if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
@@ -1630,12 +1641,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.DATA_RENDER_BINARY.getFlag());
           // In DATA_RENDER_BINARY strategy script is binary
           instanceObj.data = template.getBinary();
+        }else if (instance.getRenderStrategy() == WXRenderStrategy.JSON_RENDER) {
+             renderStrategy = new WXJSObject(WXJSObject.String, WXRenderStrategy.JSON_RENDER.getFlag());
         }
 
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
                 dataObj, apiObj, renderStrategy, extraOptionObj};
 
         instance.setTemplate(template.getContent());
+
+        instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
+
         // if { "framework": "Vue" } or  { "framework": "Rax" } will use invokeCreateInstanceContext
         // others will use invokeExecJS
         if (!isSandBoxContext) {
@@ -1644,7 +1660,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         }
         if (type == BundType.Vue || type == BundType.Rax
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
-                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY) {
+                || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY
+                || instance.getRenderStrategy() == WXRenderStrategy.JSON_RENDER) {
           int ret = invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
           instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
           if(ret == 0) {
@@ -1657,13 +1674,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           return;
         } else {
           //bad case for js bundle with out bundletype header //vue or rax
-          WXExceptionUtils.commitCriticalExceptionRT(
-                instance.getInstanceId(),
-                WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE,
-                "invokeCreateInstance",
-                WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE.getErrorMsg(),
-                null
-          );
+          //WXExceptionUtils.commitCriticalExceptionRT(
+          //      instance.getInstanceId(),
+          //      WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE,
+          //      "invokeCreateInstance",
+          //      WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE.getErrorMsg(),
+          //      null
+          //);
 
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
@@ -1699,7 +1716,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
       return new WXJSObject(WXJSObject.JSON, obj.toString());
     } catch (Throwable e) {
-      e.printStackTrace();
+      WXLogUtils.e(WXLogUtils.getStackTrace(e));
     }
     return opt;
 
@@ -1753,7 +1770,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
       return BundType.Others;
     } catch (Throwable e) {
-      e.printStackTrace();
+      WXLogUtils.e(WXLogUtils.getStackTrace(e));
       return BundType.Others;
     }
   }
@@ -1905,7 +1922,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public int invokeCreateInstanceContext(String instanceId, String namespace, String function,
                                           WXJSObject[] args, boolean logTaskDetail) {
     WXLogUtils.d("invokeCreateInstanceContext instanceId:" + instanceId + " function:"
-            + function + " isJSFrameworkInit：%d" + isJSFrameworkInit());
+            + function + String.format(" isJSFrameworkInit：%b", isJSFrameworkInit()));
     mLodBuilder.append("createInstanceContext >>>> instanceId:").append(instanceId)
             .append("function:").append(function);
     if (logTaskDetail)
@@ -1926,6 +1943,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     WXLogUtils.d(mLodBuilder.substring(0));
     mLodBuilder.setLength(0);
     // }
+    mWXBridge.removeInstanceRenderType(instanceId);
     mWXBridge.destoryInstance(instanceId, namespace, function, args);
   }
 
@@ -2049,7 +2067,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               adapter.commit(WXEnvironment.getApplication(),"sJSFMStartListener",IWXUserTrackAdapter.COUNTER,null,params);
             }
           }catch (Exception e){
-            e.printStackTrace();
+            WXLogUtils.e(WXLogUtils.getStackTrace(e));
           }
         }
 
@@ -2058,7 +2076,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         try {
           crashFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
         } catch (Exception e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         boolean pieSupport = true;
         try {
@@ -2066,7 +2084,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             pieSupport = false;
           }
         } catch (Exception e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         sInitFrameWorkMsg.append(" | pieSupport:").append(pieSupport);
         WXLogUtils.d("[WXBridgeManager] initFrameworkEnv crashFile:" + crashFile + " pieSupport:" + pieSupport);
@@ -2177,6 +2195,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     wxParams.setLayoutDirection(config.get(WXConfig.layoutDirection));
     wxParams.setUseSingleProcess(isUseSingleProcess ? "true" : "false");
     wxParams.setCrashFilePath(WXEnvironment.getCrashFilePath(WXEnvironment.getApplication().getApplicationContext()));
+    wxParams.setLibJsbPath(WXEnvironment.CORE_JSB_SO_PATH);
     wxParams.setLibJssPath(WXEnvironment.getLibJssRealPath());
     wxParams.setLibIcuPath(WXEnvironment.getLibJssIcuPath());
     wxParams.setLibLdPath(WXEnvironment.getLibLdPath());
@@ -2194,6 +2213,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if(wxJscProcessManager != null) {
       customOptions.put("enableBackupThreadCache", String.valueOf(wxJscProcessManager.enableBackUpThreadCache()));
     }
+
+    if (!WXEnvironment.sUseRunTimeApi){
+      customOptions.put("__enable_native_promise__","true");
+    }
+
 
     wxParams.setOptions(customOptions);
     wxParams.setNeedInitV8(WXSDKManager.getInstance().needInitV8());
@@ -2466,7 +2490,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
             return;
           }
         } catch (Exception e) {
-          e.printStackTrace();
+          WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
       }
       if (METHOD_CREATE_INSTANCE.equals(function) && !instance.getApmForInstance().hasAddView){
@@ -2512,17 +2536,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                       exceptionExt = result.toString();
                       br.close();
                     } catch (Exception e) {
-                      e.printStackTrace();
+                      WXLogUtils.e(WXLogUtils.getStackTrace(e));
                     }
                   }
                   file.delete();
                 }
               } catch (Throwable throwable) {
-                throwable.printStackTrace();
+                WXLogUtils.e(WXLogUtils.getStackTrace(throwable));
               }
             }
           } catch (Throwable e) {
-            e.printStackTrace();
+            WXLogUtils.e(WXLogUtils.getStackTrace(e));
           }
           exception += "\n" + exceptionExt;
           WXLogUtils.e("reportJSException:" + exception);
@@ -2641,7 +2665,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> pageId:").append(pageId)
               .append(", componentType:").append(componentType).append(", ref:").append(ref)
-              .append(", styles:").append(styles)
+              .append(", styles:").append(styles == null ? "{}" : styles.toString())
               .append(", attributes:").append(attributes)
               .append(", events:").append(events);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -2686,7 +2710,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mLodBuilder.append("[WXBridgeManager] callAddElement >>>> pageId:").append(pageId)
               .append(", componentType:").append(componentType).append(", ref:").append(ref).append(", index:").append(index)
               .append(", parentRef:").append(parentRef)
-              .append(", styles:").append(styles)
+              .append(", styles:").append(styles == null ? "{}" : styles.toString())
               .append(", attributes:").append(attributes)
               .append(", events:").append(events);
       WXLogUtils.d(mLodBuilder.substring(0));
@@ -2904,7 +2928,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callUpdateStyle >>>> instanceId:").append(instanceId)
-              .append(", ref:").append(ref).append(", styles:").append(styles.toString())
+              .append(", ref:").append(ref).append(", styles:").append(styles == null ? "{}" : styles.toString())
               .append(", paddings:").append(paddings.toString())
                       .append(", margins:").append(margins.toString())
                               .append(", borders:").append(borders.toString());
@@ -2972,6 +2996,38 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
+  private void setExceedGPULimitComponentsInfo(String instanceId,String ref,GraphicSize layoutSize){
+    float limit = WXRenderManager.getOpenGLRenderLimitValue();
+    if(limit > 0 && (layoutSize.getHeight() > limit || layoutSize.getWidth() > limit)){
+      JSONObject ext = new JSONObject();
+      WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(instanceId,ref);
+      ext.put("GPU limit",String.valueOf(limit));
+      ext.put("component.width",String.valueOf(layoutSize.getWidth()));
+      ext.put("component.height",String.valueOf(layoutSize.getHeight()));
+      if (component.getComponentType() != null && !component.getComponentType().isEmpty()) {
+        ext.put("component.type", component.getComponentType());
+      }
+      if (component.getStyles() != null && !component.getStyles().isEmpty()) {
+        ext.put("component.style", component.getStyles().toString());
+      }
+      if (component.getAttrs() != null && !component.getAttrs().isEmpty()) {
+        ext.put("component.attr", component.getAttrs().toString());
+      }
+      if (component.getEvents() != null && !component.getEvents().isEmpty()) {
+        ext.put("component.event", component.getEvents().toString());
+      }
+      if (component.getMargin() != null) {
+        ext.put("component.margin", component.getMargin().toString());
+      }
+      if (component.getPadding() != null) {
+        ext.put("component.padding", component.getPadding().toString());
+      }
+      if (component.getBorder() != null) {
+        ext.put("component.border", component.getBorder().toString());
+      }
+      WXSDKManager.getInstance().getSDKInstance(instanceId).setComponentsInfoExceedGPULimit(ext);
+    }
+  }
   public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width, boolean isRTL, int index) {
 
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(ref)) {
@@ -3005,6 +3061,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (instance != null) {
         GraphicSize size = new GraphicSize(width, height);
         GraphicPosition position = new GraphicPosition(left, top, right, bottom);
+        setExceedGPULimitComponentsInfo(pageId,ref,size);
         GraphicActionAddElement addAction = instance.getInActiveAddElementAction(ref);
         if(addAction!=null) {
           addAction.setRTL(isRTL);

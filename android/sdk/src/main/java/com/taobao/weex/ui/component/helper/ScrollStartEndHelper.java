@@ -42,7 +42,10 @@ public class ScrollStartEndHelper implements Runnable{
     private Handler handler;
     private WXComponent component;
     private boolean  hasStart;
+    private boolean  canStart = false;
+
     private long  minInterval;
+    private int oldState = OnWXScrollListener.IDLE;
 
     private int x;
     private int y;
@@ -64,14 +67,16 @@ public class ScrollStartEndHelper implements Runnable{
                 || component.getEvents().contains(Constants.Event.SCROLL_END))){
             this.x = x;
             this.y = y;
-            if(!hasStart){
+            if(!hasStart && canStart){
                 if(component.getEvents().contains(Constants.Event.SCROLL_START)){
                     Map<String, Object> event = getScrollEvent(x,y);
                     if (null !=event && !event.isEmpty()){
                         component.fireEvent(Constants.Event.SCROLL_START,event);
+
                     }
                 }
                 hasStart = true;
+                canStart = false;
             }
             handler.removeCallbacks(this);
             handler.postDelayed(this, minInterval);
@@ -87,8 +92,13 @@ public class ScrollStartEndHelper implements Runnable{
         if(!hasScrollEnd){
             return;
         }
+        if(canStart){
+            component.fireEvent(Constants.Event.SCROLL_START, getScrollEvent(this.x, this.y));
+            canStart = false;
+        }
         if(component.getEvents().contains(Constants.Event.SCROLL_END)){
             component.fireEvent(Constants.Event.SCROLL_END, getScrollEvent(this.x, this.y));
+
         }
         hasStart = false;
         hasScrollEnd = false;
@@ -115,11 +125,18 @@ public class ScrollStartEndHelper implements Runnable{
     }
 
     public void onScrollStateChanged(int newState){
+
+        if(oldState == OnWXScrollListener.IDLE){
+            canStart = true;
+        }
+
         if(newState == OnWXScrollListener.IDLE){
             hasScrollEnd = true;
             handler.removeCallbacks(this);
             handler.postDelayed(this, minInterval);
         }
+
+        oldState = newState;
     }
 
 

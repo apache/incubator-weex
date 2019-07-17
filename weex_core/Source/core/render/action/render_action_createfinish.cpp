@@ -23,6 +23,7 @@
 namespace WeexCore {
 
 RenderActionCreateFinish::RenderActionCreateFinish(const std::string &page_id) {
+  LOGE("RenderActionCreateFinish::RenderActionCreateFinish");
   this->page_id_ = page_id;
 }
 

@@ -1,8 +1,26 @@
 rootProject.name = 'weex-project'
-include ":playground"
-project(":playground").projectDir=new File("playground/app")
 
-include ":weex_sdk"
-project(":weex_sdk").projectDir=new File("sdk")
+def updateSubmodule(){
+    def command = "git submodule update --init --remote"
+    exec {
+        executable "bash"
+        args "-c", command
+    }
+}
+
+updateSubmodule()
+
+include ":playground"
+project(":playground").projectDir=new File("../weex-playground/android/playground")
 
 include ":commons"
+project(":commons").projectDir=new File("../weex-playground/android/commons")
+
+include ":weex_sdk"
+project(":weex_sdk").projectDir = new File("sdk")
+
+
+//include ":HeronAndroid"
+//project(":HeronAndroid").projectDir = new File("../../Heron/HeronAndroid")
+
+

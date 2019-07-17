@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# update submodule
+echo "update submodule"
+git submodule update --init --remote
+
 # generateFileHeader
 # param 1：headerFilePath
 function generateFileHeader() {

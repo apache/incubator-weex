@@ -41,6 +41,7 @@ import com.taobao.weex.common.WXJSExceptionInfo;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.performance.WXStateRecord;
 
 /**
  * Created on 2017/10/13.
@@ -108,6 +109,8 @@ public class WXExceptionUtils {
 												 @Nullable final Map<String,String> extParams ) {
 
         try {
+            WXLogUtils.e("weex","commitCriticalExceptionRT :"+errCode+"exception"+exception);
+            WXStateRecord.getInstance().recordException(instanceId,exception);
             IWXConfigAdapter configAdapter = WXSDKManager.getInstance().getWxConfigAdapter();
             boolean doCheck = true;
             if (null != configAdapter){
@@ -153,10 +156,11 @@ public class WXExceptionUtils {
         Map<String, String> commitMap = extParams;
         if (null == commitMap){
             commitMap = new HashMap<>();
-            commitMap.put("wxSdkInitStartTime", String.valueOf(WXEnvironment.sSDKInitStart));
-            commitMap.put("wxSDKInitCostTime", String.valueOf(WXEnvironment.sSDKInitTime));
-            commitMap.put("wxSDKCurExceptionTime", String.valueOf(System.currentTimeMillis()));
         }
+        commitMap.put("wxSdkInitStartTime", String.valueOf(WXEnvironment.sSDKInitStart));
+        commitMap.put("wxSDKInitCostTime", String.valueOf(WXEnvironment.sSDKInitTime));
+        commitMap.put("wxSDKCurExceptionTime", String.valueOf(System.currentTimeMillis()));
+        commitMap.put("wxUseRuntimeApi",String.valueOf(WXEnvironment.sUseRunTimeApi));
         if (!TextUtils.isEmpty(instanceId)) {
             instanceIdCommit = instanceId;
             instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);

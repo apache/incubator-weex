@@ -16,19 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <object/log_utils_jss.h>
 #include "android/jsengine/weex_ipc_server.h"
-
 #include "android/jsengine/bridge/platform/platform_side_multi_process.h"
 #include "android/jsengine/bridge/platform/platform_bridge_in_multi_process.h"
 #include "android/jsengine/object/weex_env.h"
 #include "android/jsengine/weex_runtime.h"
 #include "core/manager/weex_core_manager.h"
 #include "android/jsengine/weex_jsc_utils.h"
+#include "base/utils/log_base.h"
+#include "android/jsengine/object/log_utils_jss.h"
+#ifdef USE_JS_RUNTIME
+#include "base/crash/crash_handler.h"
+#include <unistd.h>
+#include <sys/mman.h>
+//using namespace crash_handler;
+#else
 using namespace JSC;
 using namespace WTF;
 using namespace WEEXICU;
-
+#endif
 
 struct WeexJSServer::WeexJSServerImpl {
     WeexJSServerImpl(int serverFd, int clientFd, bool enableTrace, std::string crashFileName);

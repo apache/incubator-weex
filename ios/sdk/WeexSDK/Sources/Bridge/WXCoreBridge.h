@@ -147,6 +147,57 @@ namespace WeexCore
 
 // For Objective-C use
 
+// Bridge for custom page like Heron
+@interface WXCustomPageBridge : NSObject
+
++ (instancetype)sharedInstance;
+
++ (BOOL)isCustomPage:(NSString*)pageId;
+
++ (NSSet<NSString*>*)getAvailableCustomRenderTypes;
+
++ (UIView*)createPageRootView:(NSString*)pageId pageType:(NSString*)pageType frame:(CGRect)frame;
+
+- (void)invalidatePage:(NSString*)pageId;
+
+- (void)removePage:(NSString*)pageId;
+
+- (void)callCreateBody:(NSString*)pageId data:(NSDictionary*)data;
+
+- (void)callAddElement:(NSString*)pageId parentRef:(NSString*)parentRef data:(NSDictionary*)data index:(int)index;
+
+- (void)callRemoveElement:(NSString*)pageId ref:(NSString*)ref;
+
+- (void)callMoveElement:(NSString*)pageId ref:(NSString*)ref parentRef:(NSString*)parentRef index:(int)index;
+
+- (void)callUpdateAttrs:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data;
+
+- (void)callUpdateStyle:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data;
+
+- (void)callAddEvent:(NSString*)pageId ref:(NSString*)ref event:(NSString*)event;
+
+- (void)callRemoveEvent:(NSString*)pageId ref:(NSString*)ref event:(NSString*)event;
+
+- (void)callCreateFinish:(NSString*)pageId;
+
+- (void)callRefreshFinish:(NSString*)pageId;
+
+- (void)callUpdateFinish:(NSString*)pageId;
+
+- (BOOL)forwardCallNativeModuleToCustomPage:(NSString*)pageId
+                                 moduleName:(NSString*)moduleName methodName:(NSString*)methodName
+                                  arguments:(NSArray*)arguments options:(NSDictionary*)options
+                                returnValue:(id*)returnValue;
+
+- (void)forwardCallComponentToCustomPage:(NSString*)pageId
+                                     ref:(NSString*)ref
+                              methodName:(NSString*)methodName
+                               arguments:(NSArray*)arguments
+                                 options:(NSDictionary*)options;
+
+@end
+
+// Bridge for WeexCore
 @interface WXCoreBridge : NSObject
 
 + (void)install;

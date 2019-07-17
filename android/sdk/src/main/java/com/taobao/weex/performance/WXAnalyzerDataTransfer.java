@@ -16,6 +16,7 @@
  */
 package com.taobao.weex.performance;
 
+import java.util.Iterator;
 import java.util.List;
 
 import android.util.Log;
@@ -71,8 +72,10 @@ public class WXAnalyzerDataTransfer {
         return;
       }
 
-      for (IWXAnalyzer transfer : transferList) {
-          transfer.transfer(MODULE_WX_APM, instance.getInstanceId(), type, data);
+      Iterator<IWXAnalyzer> itr = transferList.iterator();
+      while (itr.hasNext()){
+          IWXAnalyzer item = itr.next();
+          item.transfer(MODULE_WX_APM, instance.getInstanceId(), type, data);
       }
   }
 

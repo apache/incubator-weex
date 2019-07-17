@@ -450,7 +450,7 @@ bool RenderObject::ViewInit() {
 }
 
 RenderPage *RenderObject::GetRenderPage() {
-  return RenderManager::GetInstance()->GetPage(page_id());
+  return static_cast<RenderPage*>(RenderManager::GetInstance()->GetPage(page_id()));
 }
 
 bool RenderObject::IsAppendTree() {

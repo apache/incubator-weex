@@ -246,7 +246,11 @@ const ignoreCopyrightVerifyPath = [
   'ios/playground/bundlejs',
   'ios/sdk/WeexSDK/Resources',
   'ios/sdk/WeexSDK/Sources/Layout',
-  'ios/sdk/WeexSDK/dependency/SRWebSocket'
+  'ios/sdk/WeexSDK/dependency/SRWebSocket',
+  'weex_core/Source/include/JavaScriptCore',
+  'weex_core/Source/include/wtf',
+  'weex_core/Source/base/third_party/icu',
+  'weex_core/Source/base/base64/modp_base64'
 ]
 
 console.log('copyright_header_components')
@@ -259,6 +263,7 @@ filesToVerifySrcHeader.forEach(filepath => {
   const content = fs.readFileSync(filepath).toString();
   for (const line of copyright_header_components) {
     if (!content.match(new RegExp(line))) {
+      console.error("Code file "+ filepath +" does not have the copyright header.");
       fail("Code file "+ filepath +" does not have the copyright header.");
       return;
     }

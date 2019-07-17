@@ -159,12 +159,7 @@ static NSThread *WXComponentThread;
     dispatch_once(&onceToken, ^{
         WXComponentThread = [[NSThread alloc] initWithTarget:[self sharedManager] selector:@selector(_runLoopThread) object:nil];
         [WXComponentThread setName:WX_COMPONENT_THREAD_NAME];
-        if(WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-            [WXComponentThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
-        } else {
-            [WXComponentThread setThreadPriority:[[NSThread mainThread] threadPriority]];
-        }
-        
+        [WXComponentThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
         [WXComponentThread start];
     });
     
@@ -320,8 +315,17 @@ static NSThread *WXComponentThread;
     }
     if (supercomponent.ignoreInteraction) {
         component.ignoreInteraction = YES;
+    } else {
+        if ([[attributes objectForKey:@"ignoreInteraction"] boolValue]) {
+            component.ignoreInteraction = YES;
+        } else {
+            if (component->_positionType == WXPositionTypeFixed) {
+                component.ignoreInteraction = YES;
+            } else {
+                component.ignoreInteraction = NO;
+            }
+        }
     }
-    component.ignoreInteraction = [[attributes objectForKey:@"ignoreInteraction"] boolValue];
     
 #ifdef DEBUG
     WXLogDebug(@"flexLayout -> _recursivelyAddComponent : super:(%@,%@):[%f,%f] ,child:(%@,%@):[%f,%f],childClass:%@",
@@ -561,6 +565,11 @@ static NSThread *WXComponentThread;
 - (void)addComponent:(WXComponent *)component toIndexDictForRef:(NSString *)ref
 {
     [_indexDict setObject:component forKey:ref];
+}
+
+- (void)removeComponentForRef:(NSString *)ref
+{
+    [_indexDict removeObjectForKey:ref];
 }
 
 - (NSDictionary *)_extractBindings:(NSDictionary **)attributesOrStylesPoint

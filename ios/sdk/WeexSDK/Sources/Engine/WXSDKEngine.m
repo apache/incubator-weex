@@ -284,10 +284,20 @@
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        [self _loadRenderPlugins];
         [self _registerDefaultComponents];
         [self _registerDefaultModules];
         [self _registerDefaultHandlers];
     });
+}
+
++ (void)_loadRenderPlugins
+{
+    // Load agil render
+    Class agilRender = NSClassFromString(@"WXAgilRender");
+    if (agilRender) {
+        [agilRender initialize];
+    }
 }
 
 + (NSString*)SDKEngineVersion
@@ -305,7 +315,7 @@ static NSDictionary *_customEnvironment = nil;
 + (void)setCustomEnvironment:(NSDictionary *)environment
 {
     @synchronized (self) {
-        _customEnvironment = environment;
+        _customEnvironment = [environment copy];
     }
 }
 

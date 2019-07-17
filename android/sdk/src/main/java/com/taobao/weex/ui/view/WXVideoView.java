@@ -265,6 +265,7 @@ public class WXVideoView extends VideoView implements WXGestureObservable {
       }
       mMediaController = controller;
       mVideoView = video;
+      mVideoView.setZOrderOnTop(true);
 
       if(mUri != null) {
         setVideoURI(mUri);

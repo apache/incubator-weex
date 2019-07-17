@@ -29,7 +29,8 @@
 #include "core/manager/weex_core_manager.h"
 
 namespace WeexCore {
-    
+    bool DebugMode = false;
+
     struct LogFlattenHelper {
         LogFlattenHelper() : mLargeBuf() {}
         LogFlattenHelper(const char *fmt, va_list args) : LogFlattenHelper() {
@@ -82,21 +83,43 @@ namespace WeexCore {
       if (!succeed) {
             // Log to console by default
 #ifdef __ANDROID__
-            switch (level) {
-                case LogLevel::Error:
-                    __android_log_print(ANDROID_LOG_ERROR, tag, "%s:%lu, %s", file, line, log.str());
+            if(DebugMode) {
+                switch (level) {
+                    case LogLevel::Error:
+                        __android_log_print(ANDROID_LOG_ERROR,
+                                            tag,
+                                            "%s:%lu, %s",
+                                            file,
+                                            line,
+                                            log.str());
                     break;
-                case LogLevel::Warn:
-                    __android_log_print(ANDROID_LOG_WARN, tag, "%s:%lu, %s", file, line, log.str());
+                    case LogLevel::Warn:
+                        __android_log_print(ANDROID_LOG_WARN,
+                                            tag,
+                                            "%s:%lu, %s",
+                                            file,
+                                            line,
+                                            log.str());
                     break;
-                case LogLevel::Info:
-                    __android_log_print(ANDROID_LOG_INFO, tag, "%s:%lu, %s", file, line, log.str());
+                    case LogLevel::Info:
+                        __android_log_print(ANDROID_LOG_INFO,
+                                            tag,
+                                            "%s:%lu, %s",
+                                            file,
+                                            line,
+                                            log.str());
                     break;
-                case LogLevel::Debug:
-                    __android_log_print(ANDROID_LOG_DEBUG, tag, "%s:%lu, %s", file, line, log.str());
+                    case LogLevel::Debug:
+                        __android_log_print(ANDROID_LOG_DEBUG,
+                                            tag,
+                                            "%s:%lu, %s",
+                                            file,
+                                            line,
+                                            log.str());
                     break;
-                default:
-                    break;
+                    default:
+                        break;
+                }
             }
 #elif __APPLE__
             switch (level) {

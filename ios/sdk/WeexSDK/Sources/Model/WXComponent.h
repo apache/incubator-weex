@@ -437,6 +437,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)updateBindingData:(NSDictionary *)data;
 
+///--------------------------------------
+/// @name Heron
+///--------------------------------------
+
+/**
+ * @abstract Unload native view of embeded component in Heron mode.
+ */
+- (void)unloadNativeView;
+
 @end
 
 @interface WXComponent (Deprecated)

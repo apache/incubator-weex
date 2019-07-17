@@ -32,7 +32,7 @@
 {
     if (self = [super init]) {
         _methodName = methodName;
-        _arguments = [NSMutableArray arrayWithArray:arguments];
+        _arguments = arguments ? [arguments copy] : @[];
         _instance = instance;
     }
     
@@ -124,8 +124,8 @@
         id argument;
         if (!strcmp(parameterType, blockType)) {
             // callback
-            argument = [^void(NSString *result, BOOL keepAlive) {
-                [[WXSDKManager bridgeMgr] callBack:instanceId funcId:(NSString *)obj params:result keepAlive:keepAlive];
+            argument = [^void(id result, BOOL keepAlive) {
+                [[WXSDKManager bridgeMgr] callBack:instanceId funcId:(NSString *)obj params:[WXUtility convertContainerToImmutable:result] keepAlive:keepAlive];
             } copy];
             
             // retain block

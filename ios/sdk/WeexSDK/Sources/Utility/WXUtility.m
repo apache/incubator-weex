@@ -160,13 +160,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
 + (WXLayoutDirection)getEnvLayoutDirection {
     // We not use the below technique, because your app maybe not support the first preferredLanguages
     // _sysLayoutDirection = [NSLocale characterDirectionForLanguage:[[NSLocale preferredLanguages] objectAtIndex:0]] == NSLocaleLanguageDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
-    if (@available(iOS 9.0, *)) {
-        // The view is shown in right-to-left mode right now.
-        return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:UISemanticContentAttributeUnspecified] == UIUserInterfaceLayoutDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
-    } else {
-        // Use the previous technique
-        return [[UIApplication sharedApplication] userInterfaceLayoutDirection] == UIUserInterfaceLayoutDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
-    }
+    return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:UISemanticContentAttributeUnspecified] == UIUserInterfaceLayoutDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
 }
 
 + (NSDictionary *)getEnvironment
@@ -263,6 +257,30 @@ CGFloat WXFloorPixelValue(CGFloat value)
     if ([json isEqualToString:@"{}"]) return @{}.mutableCopy;
     if ([json isEqualToString:@"[]"]) return @[].mutableCopy;
     return [self JSONObject:[json dataUsingEncoding:NSUTF8StringEncoding] error:nil];
+}
+
++ (id _Nullable)convertContainerToImmutable:(id _Nullable)source
+{
+    if (source == nil) {
+        return nil;
+    }
+    
+    if ([source isKindOfClass:[NSArray class]]) {
+        NSMutableArray* tmpArray = [[NSMutableArray alloc] init];
+        for (id obj in source) {
+            [tmpArray addObject:[self convertContainerToImmutable:obj]];
+        }
+        return [NSArray arrayWithArray:tmpArray];
+    }
+    else if ([source isKindOfClass:[NSDictionary class]]) {
+        NSMutableDictionary* tmpDictionary = [[NSMutableDictionary alloc] init];
+        for (id key in [source keyEnumerator]) {
+            tmpDictionary[key] = [self convertContainerToImmutable:[source objectForKey:key]];
+        }
+        return [NSDictionary dictionaryWithDictionary:tmpDictionary];
+    }
+    
+    return source;
 }
 
 + (id)JSONObject:(NSData*)data error:(NSError **)error
@@ -583,22 +601,14 @@ CGFloat WXFloorPixelValue(CGFloat value)
             if (fontFamily) {
                 WXLogWarning(@"Unknown fontFamily:%@", fontFamily);
             }
-            if(WX_SYS_VERSION_LESS_THAN(@"8.2")) {
-                font = [UIFont systemFontOfSize:fontSize];
-            } else {
-                font = [UIFont systemFontOfSize:fontSize weight:textWeight];
-            }
+            font = [UIFont systemFontOfSize:fontSize weight:textWeight];
         }
     }
     UIFontDescriptor *fontD = font.fontDescriptor;
     UIFontDescriptorSymbolicTraits traits = 0;
     
     traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
-    if (WX_SYS_VERSION_LESS_THAN(@"8.2")) {
-        traits = ((textWeight-0.4) >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
-    }else {
-        traits = (textWeight-UIFontWeightBold >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
-    }
+    traits = (textWeight-UIFontWeightBold >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
     if (traits != 0) {
         fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
         UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];

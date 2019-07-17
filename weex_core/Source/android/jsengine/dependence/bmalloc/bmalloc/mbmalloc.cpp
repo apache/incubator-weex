@@ -24,15 +24,15 @@
  */
 #include "bmalloc.h"
 
-#define EXPORT __attribute__((visibility("default")))
+#define WX_EXPORT __attribute__((visibility("default")))
 
 extern "C" {
 
-EXPORT void* mbmalloc(size_t);
-EXPORT void* mbmemalign(size_t, size_t);
-EXPORT void mbfree(void*, size_t);
-EXPORT void* mbrealloc(void*, size_t, size_t);
-EXPORT void mbscavenge();
+WX_EXPORT void* mbmalloc(size_t);
+WX_EXPORT void* mbmemalign(size_t, size_t);
+WX_EXPORT void mbfree(void*, size_t);
+WX_EXPORT void* mbrealloc(void*, size_t, size_t);
+WX_EXPORT void mbscavenge();
     
 void* mbmalloc(size_t size)
 {

@@ -197,32 +197,6 @@ static std::unique_ptr<IPCResult> HandleCallNative(IPCArguments *arguments) {
                   ->CallNative(pageId.get(), task.get(), callback.get());
             }
           }));
-
-  //  char *pageId = getArumentAsCStr(arguments, 0);
-  //  char *task = getArumentAsCStr(arguments, 1);
-  //  char *callback = getArumentAsCStr(arguments, 2);
-  //
-  //  if (pageId != nullptr && task != nullptr) {
-  //#if JSAPI_LOG
-  //    LOGD("[ExtendJSApi] handleCallNative >>>> pageId: %s, task: %s", pageId,
-  //         task);
-  //#endif
-  //    WeexCoreManager::Instance()->script_bridge()->core_side()->CallNative(
-  //        pageId, task, callback);
-  //  }
-  //
-  //  if (pageId != nullptr) {
-  //    delete[] pageId;
-  //    pageId = nullptr;
-  //  }
-  //  if (task != nullptr) {
-  //    delete[] task;
-  //    task = nullptr;
-  //  }
-  //  if (callback != nullptr) {
-  //    delete[] callback;
-  //    callback = nullptr;
-  //  }
   return createInt32Result(0);
 }
 
@@ -356,6 +330,13 @@ static std::unique_ptr<IPCResult> HandleCallNativeModule(
           }));
 
   event.Wait();
+  /**
+   * when Wait timeout, ret is null.  switch case will crash.
+   * make default value, to avoid the crash
+   * */
+  if(ret.get() == nullptr){
+     ret = std::make_unique<ValueWithType>((int32_t)-1);
+  }
 
   std::unique_ptr<IPCResult> result;
   switch (ret->type) {
@@ -972,6 +953,24 @@ std::unique_ptr<IPCResult> UpdateComponentData(IPCArguments *arguments) {
 }
 
 
+
+
+std::unique_ptr<IPCResult> HeartBeat(IPCArguments *arguments) {
+  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+          weex::base::MakeCopyable(
+                  [pageId = std::move(arg1)]() {
+                      if (pageId != nullptr) {
+                        LOGE("HeartBeat %s", pageId.get());
+                        WeexCoreManager::Instance()
+                                ->script_bridge()
+                                ->core_side()
+                                ->CallNative(pageId.get(), "HeartBeat", "HeartBeat");
+                      }
+                  }));
+  return createInt32Result(static_cast<int32_t>(true));
+}
+
 std::unique_ptr<IPCResult> HandleLogDetail(IPCArguments *arguments) {
   auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
   auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
@@ -989,7 +988,6 @@ std::unique_ptr<IPCResult> HandleLogDetail(IPCArguments *arguments) {
           }));
   return createInt32Result(static_cast<int32_t>(true));
 }
-
 
 ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   set_script_side(new bridge::script::ScriptSideInMultiProcess);
@@ -1084,9 +1082,10 @@ void ScriptBridgeInMultiProcess::RegisterIPCCallback(IPCHandler *handler) {
                            OnReceivedResult);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::UPDATECOMPONENTDATA),
                            UpdateComponentData);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::HEARTBEAT),
+                           HeartBeat);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::POSTLOGDETAIL),
                            HandleLogDetail);
-
 }
 
 }  // namespace WeexCore

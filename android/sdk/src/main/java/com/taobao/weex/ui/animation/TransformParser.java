@@ -57,6 +57,7 @@ public class TransformParser {
     public final static String WX_ROTATE = "rotate";
     public final static String WX_ROTATE_X ="rotateX";
     public final static String WX_ROTATE_Y ="rotateY";
+    public final static String WX_ROTATE_Z ="rotateZ";
     public final static String WX_SCALE = "scale";
     public final static String WX_SCALE_X = "scaleX";
     public final static String WX_SCALE_Y = "scaleY";
@@ -83,6 +84,7 @@ public class TransformParser {
         wxToAndroidMap.put(WX_TRANSLATE_X, Collections.singletonList(View.TRANSLATION_X));
         wxToAndroidMap.put(WX_TRANSLATE_Y, Collections.singletonList(View.TRANSLATION_Y));
         wxToAndroidMap.put(WX_ROTATE, Collections.singletonList(View.ROTATION));
+        wxToAndroidMap.put(WX_ROTATE_Z, Collections.singletonList(View.ROTATION));
         wxToAndroidMap.put(WX_ROTATE_X, Collections.singletonList(View.ROTATION_X));
         wxToAndroidMap.put(WX_ROTATE_Y, Collections.singletonList(View.ROTATION_Y));
         wxToAndroidMap.put(WX_SCALE, Arrays.asList(View.SCALE_X, View.SCALE_Y));

@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
 
   s.name         = "WeexSDK"
 
-  s.version      = "0.24.0"
+  s.version      = "0.26.0"
 
   s.summary      = "WeexSDK Source."
 
@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
                     "doumafang "   => "doumafang@gmail.com"
                    }
   s.platform     = :ios
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '9.0'
 
   # use for public
   # s.source =  {
@@ -50,7 +50,10 @@ Pod::Spec.new do |s|
                     'weex_core/Source/base/android',
                     'weex_core/Source/base/base64',
                     'weex_core/Source/base/crash',
-                    'weex_core/Source/base/utils',
+                    'weex_core/Source/base/message_loop',
+                    'weex_core/Source/base/third_party',
+                    'weex_core/Source/base/thread',
+                    'weex_core/Source/core/parser/action_args_check.*',
                     'weex_core/Source/third_party/IPC',
                     'weex_core/Source/core/network/android/',
                     'weex_core/Source/include/JavaScriptCore/',
@@ -75,7 +78,7 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Component/Recycler/WXRecyclerComponent.h',
                           'ios/sdk/WeexSDK/Sources/Controller/WXBaseViewController.h',
                           'ios/sdk/WeexSDK/Sources/Controller/WXRootViewController.h',
-			  'ios/sdk/WeexSDK/Sources/Handler/WXNavigationDefaultImpl.h',
+                          'ios/sdk/WeexSDK/Sources/Handler/WXNavigationDefaultImpl.h',
                           'ios/sdk/WeexSDK/Sources/View/WXView.h',
                           'ios/sdk/WeexSDK/Sources/View/WXErrorView.h',
                           'ios/sdk/WeexSDK/Sources/Protocol/*.h',
@@ -91,6 +94,7 @@ Pod::Spec.new do |s|
                           'ios/sdk/WeexSDK/Sources/Manager/WXSDKManager.h',
                           'ios/sdk/WeexSDK/Sources/Manager/WXBridgeManager.h',
                           'ios/sdk/WeexSDK/Sources/Manager/WXComponentManager.h',
+                          'ios/sdk/WeexSDK/Sources/Manager/WXHandlerFactory.h',
                           'ios/sdk/WeexSDK/Sources/Manager/WXComponentFactory.h',
                           'ios/sdk/WeexSDK/Sources/Manager/WXInvocationConfig.h',
                           'ios/sdk/WeexSDK/Sources/Engine/WXSDKEngine.h',

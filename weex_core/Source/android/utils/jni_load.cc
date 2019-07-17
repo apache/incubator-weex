@@ -18,6 +18,9 @@
  */
 
 #include <jni.h>
+#include "core/bridge/platform_bridge.h"
+#include "android/bridge/platform/android_bridge.h"
+#include "core/manager/weex_core_manager.h"
 #include "android/utils/so_utils.h"
 #include "android/wrap/content_box_measurement_impl_android.h"
 #include "android/wrap/hash_set.h"
@@ -51,7 +54,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     WeexCore::SoUtils::Init(env);
     WeexCore::WMLBridge::RegisterJNIUtils(env);
   }
-
+  PlatformBridge* bridge = new AndroidBridgeInSimple;
+  WeexCoreManager::Instance()->set_platform_bridge(bridge);
   return result ? JNI_VERSION_1_4 : JNI_FALSE;
 }
 

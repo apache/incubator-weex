@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.bridge;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
@@ -34,6 +35,7 @@ import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -114,6 +116,13 @@ public class WXBridge implements IWXBridge {
   private native void nativeRegisterCoreEnv(String key, String value);
 
   private native void nativeResetWXBridge(Object bridge, String className);
+
+  private native void nativeSetInstanceRenderType(String instanceId, String renderType);
+
+  private native void nativeRemoveInstanceRenderType(String instanceId);
+
+  private native void nativeSetPageArgument(String instanceId, String key, String value);
+
 
   /**
    * Update Init Framework Params
@@ -214,6 +223,15 @@ public class WXBridge implements IWXBridge {
    */
   @CalledByNative
   public int callNative(String instanceId, byte[] tasks, String callback) {
+    if("HeartBeat".equals(callback)) {
+      Log.e("HeartBeat instanceId", instanceId);
+      WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if(sdkInstance != null) {
+        sdkInstance.createInstanceFuncHeartBeat();
+      }
+      return IWXBridge.INSTANCE_RENDERING;
+    }
+
     return callNative(instanceId, (JSONArray) JSON.parseArray(new String(tasks)), callback);
   }
 
@@ -387,6 +405,7 @@ public class WXBridge implements IWXBridge {
     if (version != null) {
       WXEnvironment.JS_LIB_SDK_VERSION = version;
     }
+    WXStateRecord.getInstance().onJSFMInit();
   }
 
   @Override
@@ -725,6 +744,25 @@ public class WXBridge implements IWXBridge {
   @Override
   public void setStyleHeight(String instanceId, String ref, float value) {
     nativeSetStyleHeight(instanceId, ref, value);
+  }
+
+  @Override
+  public void setInstanceRenderType(String instanceId, String renderType){
+    if(TextUtils.isEmpty(renderType)){
+       return;
+    }
+    nativeSetInstanceRenderType(instanceId, renderType);
+  }
+
+
+  @Override
+  public void removeInstanceRenderType(String instanceId){
+      nativeRemoveInstanceRenderType(instanceId);
+  }
+
+  @Override
+  public void setPageArgument(String instanceId, String key, String value){
+      nativeSetPageArgument(instanceId, key, value);
   }
 
   @Override

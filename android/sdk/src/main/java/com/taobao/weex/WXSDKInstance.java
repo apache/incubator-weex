@@ -18,7 +18,6 @@
  */
 package com.taobao.weex;
 
-import static com.taobao.weex.common.WXErrorCode.WX_ERR_JSC_CRASH;
 import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
@@ -59,6 +58,7 @@ import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.RenderTypes;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
@@ -71,6 +71,9 @@ import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
+import com.taobao.weex.performance.WXStateRecord;
+import com.taobao.weex.performance.WhiteScreenUtils;
+import com.taobao.weex.render.WXAbstractRenderContainer;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.component.NestedContainer;
@@ -90,11 +93,11 @@ import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.cache.RegisterCache;
 import com.taobao.weex.utils.tools.LogDetail;
 import com.taobao.weex.utils.tools.TimeCalculator;
-
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -124,7 +127,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private IWXStatisticsListener mStatisticsListener;
   /** package **/ Context mContext;
   private final String mInstanceId;
-  private RenderContainer mRenderContainer;
+  private WXAbstractRenderContainer mRenderContainer;
   private WXComponent mRootComp;
   private boolean mRendered;
   private WXRefreshData mLastRefreshData;
@@ -134,6 +137,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private boolean isDestroy=false;
   private boolean hasException = false;
   private boolean isRenderSuccess = false;
+  private boolean createInstanceHeartBeat = false;
   private Map<String,Serializable> mUserTrackParams;
   private NativeInvokeHelper mNativeInvokeHelper;
   private boolean isCommit=false;
@@ -144,6 +148,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private boolean mNeedReLoad = false;
   private boolean mUseScroller = false;
   private int mInstanceViewPortWidth = 750;
+  private boolean enableFullScreenHeight = false;
   private WXInstanceApm mApmForInstance;
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
@@ -151,6 +156,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private Map<String,String> mContainerInfo;
 
   public boolean isNewFsEnd = false;
+  private List<JSONObject> componentsInfoExceedGPULimit  = new LinkedList<>();
 
   /**
    * bundle type
@@ -199,6 +205,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private WXSDKInstance mParentInstance;
 
+  private String mRenderType = RenderTypes.RENDER_TYPE_NATIVE;
+
   public TimeCalculator mTimeCalculator;
   /**
    * Default Width And Viewport is 750,
@@ -206,6 +214,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * */
   private boolean mAutoAdjustDeviceWidth = WXEnvironment.AUTO_ADJUST_ENV_DEVICE_WIDTH;
 
+  public  List<JSONObject> getComponentsExceedGPULimit(){return componentsInfoExceedGPULimit;}
+  @RestrictTo(Scope.LIBRARY)
+  public void setComponentsInfoExceedGPULimit(JSONObject component){
+    if(component!= null && !component.isEmpty()){
+      componentsInfoExceedGPULimit.add(component);
+    }
+  }
 
   public List<String> getLayerOverFlowListeners() {
     return mLayerOverFlowListeners;
@@ -346,6 +361,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    * @param a
    */
   public void setRenderContainer(RenderContainer a){
+     setWXAbstractRenderContainer(a);
+  }
+
+  public void setWXAbstractRenderContainer(WXAbstractRenderContainer a){
     if(a != null) {
       a.setSDKInstance(this);
       a.addOnLayoutChangeListener(this);
@@ -420,6 +439,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void setNeedLoad(boolean load) {
     mNeedReLoad = load;
   }
+
+  @RestrictTo(Scope.LIBRARY)
+  public void  setEnableFullScreenHeight(boolean fullScreenHeight){enableFullScreenHeight = fullScreenHeight;}
+
+  @RestrictTo(Scope.LIBRARY)
+  public boolean isFullScreenHeightEnabled(){return enableFullScreenHeight;}
 
   public boolean isUseScroller() {
     return mUseScroller;
@@ -510,6 +535,12 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void setHasException(boolean hasException) {
     this.hasException = hasException;
   }
+
+  public void createInstanceFuncHeartBeat() {
+    WXLogUtils.d("createInstanceFuncHeartBeat: " + mInstanceId);
+    this.createInstanceHeartBeat = true;
+  }
+
   public void addOnInstanceVisibleListener(OnInstanceVisibleListener l){
     mVisibleListeners.add(l);
   }
@@ -544,7 +575,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     );
     mContainerInfo.put(WXInstanceApm.KEY_PAGE_PROPERTIES_INSTANCE_TYPE,"page");
 
-    WXBridgeManager.getInstance().checkJsEngineMultiThread();
+    // WXBridgeManager.getInstance().checkJsEngineMultiThread();
     mDisableSkipFrameworkInit = isDisableSkipFrameworkInDataRender();
 
     mTimeCalculator = new TimeCalculator(this);
@@ -824,7 +855,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mWXPerformance.JSTemplateSize = template.length() / 1024f;
     mApmForInstance.addStats(WXInstanceApm.KEY_PAGE_STATS_BUNDLE_SIZE,mWXPerformance.JSTemplateSize);
     mRenderStartTime = System.currentTimeMillis();
-    WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);;
+    WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);
     if(mAutoAdjustDeviceWidth && WXDeviceUtils.isAutoResize(mContext)){
          if(WXEnvironment.AUTO_UPDATE_APPLICATION_SCREEN_SIZE) {
              WXViewUtils.updateApplicationScreen(mContext);
@@ -863,7 +894,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
         public void run() {
+          checkWhiteScreen();
           if(isDestroy || hasException || isRenderSuccess) {
+            return;
+          }
+
+          // there is no need to reboot js engine if render by eagle
+          if(isDataRender()) {
             return;
           }
 
@@ -873,13 +910,38 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
               if(wxJscProcessManager.withException(WXSDKInstance.this)) {
                 onJSException(String.valueOf(WX_ERR_RELOAD_PAGE),"jsc reboot","jsc reboot");
               }
-              WXBridgeManager.getInstance().callReportCrashReloadPage(mInstanceId, null);
+              if(!createInstanceHeartBeat) {
+                  WXBridgeManager.getInstance().callReportCrashReloadPage(mInstanceId, null);
+                  WXLogUtils.e("callReportCrashReloadPage with jsc reboot");
+              }
             }
           }
         }
       }, wxJscProcessManager.rebootTimeout());
     }
   }
+
+
+  private void checkWhiteScreen(){
+    if (isDestroy ||!WhiteScreenUtils.doWhiteScreenCheck()){
+      return;
+    }
+
+    boolean isWS = WhiteScreenUtils.isWhiteScreen(this);
+    if (!isWS){
+      return;
+    }
+    WXErrorCode errorCode = WXErrorCode.WX_ERROR_WHITE_SCREEN;
+    Map<String,String> args = new HashMap<>(1);
+    String vieTreeMsg = WhiteScreenUtils.takeViewTreeSnapShot(this);
+    args.put("viewTree",null == vieTreeMsg?"null viewTreeMsg":vieTreeMsg);
+
+    for (Map.Entry<String,String> entry: WXStateRecord.getInstance().getStateInfo().entrySet()){
+      args.put(entry.getKey(),entry.getValue());
+    }
+    WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),errorCode,"checkEmptyScreen",errorCode.getErrorMsg(),args);
+  }
+
 
   public boolean skipFrameworkInit(){
     return isDataRender() && !mDisableSkipFrameworkInit;
@@ -1067,7 +1129,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
                         "true"));
         WXLogUtils.e("degrade : " + degrade);
         if(degrade) {
-          onJSException(String.valueOf(WX_ERR_JSC_CRASH.getErrorCode()),"jsc Crashed", "jsc Crashed degradeToH5");
+          onJSException(String.valueOf(WX_ERR_RELOAD_PAGE.getErrorCode()),"Do not reloadPage", "Do not reloadPage degradeToH5");
+          WXLogUtils.e("Do not reloadPage degradeToH5");
         }
       }
     }
@@ -1303,9 +1366,18 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if (null != mContext){
         mContext.sendBroadcast(intent);
       }else {
-        WXEnvironment.getApplication().sendBroadcast(intent);
+        try {
+          WXEnvironment.getApplication().sendBroadcast(intent);
+        } catch (Exception e){
+          WXLogUtils.e("weex",e);
+        }
       }
       this.mCurrentGround = true;
+    }
+
+    //component appear
+    if((WXEnvironment.isApkDebugable() || WXEnvironment.isPerf()) && mApmForInstance != null){
+        WXLogUtils.e("PerformanceData " + mApmForInstance.toPerfString());
     }
   }
 
@@ -1491,6 +1563,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
 
   public void onCreateFinish() {
+    if(mHasCreateFinish){
+      return;
+    }
     if (mContext != null) {
       onViewAppear();
       View wxView= mRenderContainer;
@@ -1597,6 +1672,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void onRenderError(final String errCode, final String msg) {
     if (mRenderListener != null && mContext != null) {
+      WXLogUtils.e("onRenderError "+errCode +","+msg);
       runOnUiThread(new Runnable() {
 
         @Override
@@ -1612,6 +1688,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void onJSException(final String errCode, final String function, final String exception) {
     hasException = true;
     if (mRenderListener != null && mContext != null) {
+      WXLogUtils.e("onJSException "+errCode +","+exception);
       runOnUiThread(new Runnable() {
 
         @Override
@@ -1731,6 +1808,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
          mParentInstance = null;
       }
       mApmForInstance.onEnd();
+
+
       if(mRendered) {
         WXSDKManager.getInstance().destroyInstance(mInstanceId);
       }
@@ -1741,9 +1820,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       }
       if (mRootComp != null) {
         mRootComp.destroy();
-        destroyView(mRenderContainer);
         mRootComp = null;
       }
+
+      if(mRenderContainer != null){
+        destroyView(mRenderContainer);
+      }
+
 
       if (mGlobalEvents != null) {
         mGlobalEvents.clear();
@@ -2268,6 +2351,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(!getInstanceOnFireEventInterceptorList().contains(instanceOnFireEventInterceptor)){
       getInstanceOnFireEventInterceptorList().add(instanceOnFireEventInterceptor);
     }
+  }
+
+  public String getRenderType() {
+    return mRenderType;
+  }
+
+  public void setRenderType(String renderType) {
+    this.mRenderType = renderType;
   }
 
   private static boolean isDisableSkipFrameworkInDataRender() {

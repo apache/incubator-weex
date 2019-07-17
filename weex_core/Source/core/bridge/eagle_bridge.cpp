@@ -144,6 +144,9 @@ namespace WeexCore {
     }
     
     int EagleBridge::WeexCoreHandler::RefreshFinish(const char* page_id, const char* task, const char* callback) {
+      WeexCore::WeexCoreManager::Instance()
+          ->getPlatformBridge()
+          ->core_side()->ForceLayout(page_id);
         return WeexCore::WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->platform_side()

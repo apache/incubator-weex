@@ -50,6 +50,7 @@ NSString* const KEY_PAGE_PROPERTIES_CONTAINER_NAME = @"wxContainerName";
 NSString* const KEY_PAGE_PROPERTIES_INSTANCE_TYPE = @"wxInstanceType";
 NSString* const KEY_PAGE_PROPERTIES_PARENT_PAGE = @"wxParentPage";
 NSString* const KEY_PAGE_PROPERTIES_RENDER_TYPE = @"wxRenderType";
+NSString* const KEY_PAGE_PROPERTIES_UIKIT_TYPE = @"wxUIKitType";
 
 
 
@@ -62,6 +63,9 @@ NSString* const KEY_PAGE_STAGES_CUSTOM_PREPROCESS_END  = @"wxCustomPreprocessEnd
 NSString* const KEY_PAGE_STAGES_RENDER_ORGIGIN  = @"wxRenderTimeOrigin";
 NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_START  = @"wxStartLoadBundle";
 NSString* const KEY_PAGE_STAGES_LOAD_BUNDLE_END  = @"wxEndLoadBundle";
+NSString* const KEY_PAGE_STAGES_EXECUTE_BUNDLE_END  = @"wxEndExecuteBundle";
+NSString* const KEY_PAGE_STAGES_EXECUTE_JSON_START = @"wxStartExecuteJson";
+NSString* const KEY_PAGE_STAGES_EXECUTE_JSON_END = @"wxEndExecuteJson";
 NSString* const KEY_PAGE_STAGES_CREATE_FINISH = @"wxJSBundleCreateFinish";
 NSString* const KEY_PAGE_STAGES_FSRENDER  = @"wxFsRender";
 NSString* const KEY_PAGE_STAGES_NEW_FSRENDER = @"wxNewFsRender";
@@ -156,12 +160,15 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     [self.apmProtocolInstance onEvent:name withValue:value];
 }
 
-- (void) onStage:(NSString *)name
+- (long) onStage:(NSString *)name
 {
     if(_isEnd){
-        return;
+        return 0;
     }
-    [self onStageWithTime:name time:[WXUtility getUnixFixTimeMillis]];
+    
+    long result = [WXUtility getUnixFixTimeMillis];
+    [self onStageWithTime:name time:result];
+    return result;
 }
 
 - (void) onStageWithTime:(NSString*)name time:(long)unixTime
@@ -286,6 +293,15 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (nil != _apmProtocolInstance) {
          [self.apmProtocolInstance onEnd];
     }
+    
+    WXPerformBlockOnComponentThread(^{
+        WXLogInfo(@"APM data of instance: %@, %@", self.instanceId, self.recordStageMap);
+        NSNumber* stageRenderOrigin = self.recordStageMap[KEY_PAGE_STAGES_RENDER_ORGIGIN];
+        NSNumber* stageInteraction = self.recordStageMap[KEY_PAGE_STAGES_INTERACTION];
+        if (stageRenderOrigin && stageInteraction) {
+            WXLogInfo(@"APM interaction time(ms): %lld", [stageInteraction longLongValue] - [stageRenderOrigin longLongValue]);
+        }
+    });
 }
 
 - (void) updateFSDiffStats:(NSString *)name withDiffValue:(double)diff
