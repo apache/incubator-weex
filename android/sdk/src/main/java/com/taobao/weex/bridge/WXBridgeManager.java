@@ -864,6 +864,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       }
 
       if (reInitCount > CRASHREINIT) {
+        WXExceptionUtils.commitCriticalExceptionRT("jsEngine", WXErrorCode.WX_ERR_RELOAD_PAGE_EXCEED_LIMIT,
+            "callReportCrashReloadPage","reInitCount:"+reInitCount,null);
         return IWXBridge.INSTANCE_RENDERING_ERROR;
       }
       reInitCount++;
