@@ -32,6 +32,9 @@ matrix:
           components:
             - android-26
             - extra-android-m2repository
+      - env: STATIC_CODE_ANALYSIS=true
+        language: objective-c
+        osx_image: xcode7.2
 cache:
   directories:
     - npm
@@ -42,6 +45,14 @@ cache:
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+before_install:
+  if [[ "${STATIC_CODE_ANALYSIS}" = "true" ]]; then
+    - brew cask uninstall oclint
+    - brew tap oclint/formulae
+    - brew install oclint
+  fi
+
 install:
   - |
     case $TEST_SUITE in
@@ -69,6 +80,7 @@ install:
         npm install
         ;;
     esac
+
 script:
   - |
     case $TEST_SUITE in
@@ -110,6 +122,25 @@ script:
         fi
         ;;
     esac
+
+    if [[ "${STATIC_CODE_ANALYSIS}" = "true" ]]; then
+      cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
+      oclint-json-compilation-database oclint_args -- \
+        -disable-rule=ShortVariableName \
+        -disable-rule=LongLine \
+        -disable-rule=LongMethod \
+        -disable-rule=HighNcssMethod \
+        -disable-rule=LongVariableName \
+        -disable-rule=HighCyclomaticComplexity \
+        -disable-rule=HighNPathComplexity \
+        -disable-rule=UnusedLocalVariable \
+        -disable-rule=DoubleNegative \
+        -disable-rule=MultipleUnaryOperator \
+        -disable-rule=DeepNestedBlock \
+        -max-priority-1=15000 \
+        -max-priority-2=15000 \
+        -max-priority-3=15000 \
+    fi 
 notifications:
   webhooks:
     on_pull_requests: false
