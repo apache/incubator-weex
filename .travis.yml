@@ -59,7 +59,8 @@ before_cache:
 
 before_install:
   - |
-    if [[ "${STATIC_CODE_ANALYSIS}" = "true" ]]; then
+    # install oclint
+    if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_C}" = "true") ]]; then
       brew cask uninstall oclint
       brew tap oclint/formulae
       brew install oclint
@@ -86,8 +87,12 @@ install:
         export ANDROID_NDK_HOME=$HOME/android-ndk-r18b
         export PATH=$PATH:$ANDROID_NDK_HOME
         echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
-    elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") || ("$TEST_SUITE" = "ios") || ("${CHECK_C}" = "true") ]]; then
+    elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") ||  ("${CHECK_C}" = "true") ]]; then
         npm install
+    elif [[ ("$TEST_SUITE" = "ios") ]] then
+        npm install
+        cd weex-playground/ios && pod install --repo-update
+        cd ../../
     fi
 
 script:
@@ -127,7 +132,10 @@ script:
         hasIosFile=$(npm run danger -- run --dangerfile ./dangerfile-ios.js)
         echo "The value of hasIosFile is ${hasIosFile}"
         if [[ "$hasIosFile" =~ "hasIosFile" ]]; then
+          # build WeexSDK and run WeexSDKTests
           xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6"
+          # build WeexDemo and run WeexDemo test
+          xcodebuild -workspace weex-playground/ios/WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6"
         fi
         ;;
     esac
@@ -158,7 +166,8 @@ script:
     if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_ANDROID}" = "true") ]]; then
       hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
       echo "The value of hasAndroidFile is ${hasAndroidFile}"
-      if [[ "$hasCFile" =~ "hasCFile" ]]; then
+      if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
+        cd android
         ./gradlew clean assembleDebug test lint
       fi
     fi
