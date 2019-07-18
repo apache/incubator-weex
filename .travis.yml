@@ -47,11 +47,12 @@ before_cache:
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 
 before_install:
-  if [[ "${STATIC_CODE_ANALYSIS}" = "true" ]]; then
-    - brew cask uninstall oclint
-    - brew tap oclint/formulae
-    - brew install oclint
-  fi
+  - |
+    if [[ "${STATIC_CODE_ANALYSIS}" = "true" ]]; then
+      brew cask uninstall oclint
+      brew tap oclint/formulae
+      brew install oclint
+    fi
 
 install:
   - |
