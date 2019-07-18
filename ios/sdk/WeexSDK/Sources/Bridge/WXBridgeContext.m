@@ -166,72 +166,112 @@ _Pragma("clang diagnostic pop") \
 
     [_jsBridge registerCallAddElement:^NSInteger(NSString *instanceId, NSString *parentRef, NSDictionary *elementData, NSInteger index) {
         
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge callAddElement:instanceId parentRef:parentRef data:elementData index:(int)index];
-        });
+        if ([WXCustomPageBridge isCustomPage:instanceId]) {
+            [[WXCustomPageBridge sharedInstance] callAddElement:instanceId parentRef:parentRef data:elementData index:(int)index];
+        }
+        else {
+            WXPerformBlockOnComponentThread(^{
+                [WXCoreBridge callAddElement:instanceId parentRef:parentRef data:elementData index:(int)index];
+            });
+        }
         
         return 0;
     }];
     
     [_jsBridge registerCallCreateBody:^NSInteger(NSString *instanceId, NSDictionary *bodyData) {
         
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge callCreateBody:instanceId data:bodyData];
-        });
+        if ([WXCustomPageBridge isCustomPage:instanceId]) {
+            [[WXCustomPageBridge sharedInstance] callCreateBody:instanceId data:bodyData];
+        }
+        else {
+            WXPerformBlockOnComponentThread(^{
+                [WXCoreBridge callCreateBody:instanceId data:bodyData];
+            });
+        }
         
         return 0;
     }];
     
     [_jsBridge registerCallRemoveElement:^NSInteger(NSString *instanceId, NSString *ref) {
         
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge callRemoveElement:instanceId ref:ref];
-        });
+        if ([WXCustomPageBridge isCustomPage:instanceId]) {
+            [[WXCustomPageBridge sharedInstance] callRemoveElement:instanceId ref:ref];
+        }
+        else {
+            WXPerformBlockOnComponentThread(^{
+                [WXCoreBridge callRemoveElement:instanceId ref:ref];
+            });
+        }
         
         return 0;
     }];
     
     [_jsBridge registerCallMoveElement:^NSInteger(NSString *instanceId, NSString *ref, NSString *parentRef, NSInteger index) {
         
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge callMoveElement:instanceId ref:ref parentRef:parentRef index:(int)index];
-        });
+        if ([WXCustomPageBridge isCustomPage:instanceId]) {
+            [[WXCustomPageBridge sharedInstance] callMoveElement:instanceId ref:ref parentRef:parentRef index:(int)index];
+        }
+        else {
+            WXPerformBlockOnComponentThread(^{
+                [WXCoreBridge callMoveElement:instanceId ref:ref parentRef:parentRef index:(int)index];
+            });
+        }
         
         return 0;
     }];
     
     [_jsBridge registerCallUpdateAttrs:^NSInteger(NSString *instanceId, NSString *ref, NSDictionary *attrsData) {
         
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge callUpdateAttrs:instanceId ref:ref data:attrsData];
-        });
+        if ([WXCustomPageBridge isCustomPage:instanceId]) {
+            [[WXCustomPageBridge sharedInstance] callUpdateAttrs:instanceId ref:ref data:attrsData];
+        }
+        else {
+            WXPerformBlockOnComponentThread(^{
+                [WXCoreBridge callUpdateAttrs:instanceId ref:ref data:attrsData];
+            });
+        }
         
         return 0;
     }];
     
     [_jsBridge registerCallUpdateStyle:^NSInteger(NSString *instanceId, NSString *ref, NSDictionary *stylesData) {
         
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge callUpdateStyle:instanceId ref:ref data:stylesData];
-        });
-
+        if ([WXCustomPageBridge isCustomPage:instanceId]) {
+            [[WXCustomPageBridge sharedInstance] callUpdateStyle:instanceId ref:ref data:stylesData];
+        }
+        else {
+            WXPerformBlockOnComponentThread(^{
+                [WXCoreBridge callUpdateStyle:instanceId ref:ref data:stylesData];
+            });
+        }
+        
         return 0;
     }];
     
     [_jsBridge registerCallAddEvent:^NSInteger(NSString *instanceId, NSString *ref, NSString *event) {
         
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge callAddEvent:instanceId ref:ref event:event];
-        });
+        if ([WXCustomPageBridge isCustomPage:instanceId]) {
+            [[WXCustomPageBridge sharedInstance] callAddEvent:instanceId ref:ref event:event];
+        }
+        else {
+            WXPerformBlockOnComponentThread(^{
+                [WXCoreBridge callAddEvent:instanceId ref:ref event:event];
+            });
+        }
         
         return 0;
     }];
     
     [_jsBridge registerCallRemoveEvent:^NSInteger(NSString *instanceId, NSString *ref, NSString *event) {
         
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge callRemoveEvent:instanceId ref:ref event:event];
-        });
+        if ([WXCustomPageBridge isCustomPage:instanceId]) {
+            [[WXCustomPageBridge sharedInstance] callRemoveEvent:instanceId ref:ref event:event];
+        }
+        else {
+            WXPerformBlockOnComponentThread(^{
+                [WXCoreBridge callRemoveEvent:instanceId ref:ref event:event];
+            });
+        }
         
         return 0;
     }];
@@ -241,9 +281,14 @@ _Pragma("clang diagnostic pop") \
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         [instance.apmInstance onStage:KEY_PAGE_STAGES_CREATE_FINISH];
         
-        WXPerformBlockOnComponentThread(^{
-            [WXCoreBridge callCreateFinish:instanceId];
-        });
+        if ([WXCustomPageBridge isCustomPage:instanceId]) {
+            [[WXCustomPageBridge sharedInstance] callCreateFinish:instanceId];
+        }
+        else {
+            WXPerformBlockOnComponentThread(^{
+                [WXCoreBridge callCreateFinish:instanceId];
+            });
+        }
         
         return 0;
     }];
@@ -251,9 +296,14 @@ _Pragma("clang diagnostic pop") \
     if ([_jsBridge respondsToSelector:@selector(registerCallRefreshFinish:)]) {
         [_jsBridge registerCallRefreshFinish:^NSInteger(NSString *instanceId) {
             
-            WXPerformBlockOnComponentThread(^{
-                [WXCoreBridge callRefreshFinish:instanceId];
-            });
+            if ([WXCustomPageBridge isCustomPage:instanceId]) {
+                [[WXCustomPageBridge sharedInstance] callRefreshFinish:instanceId];
+            }
+            else {
+                WXPerformBlockOnComponentThread(^{
+                    [WXCoreBridge callRefreshFinish:instanceId];
+                });
+            }
             
             return 0;
         }];
@@ -262,16 +312,20 @@ _Pragma("clang diagnostic pop") \
     if ([_jsBridge respondsToSelector:@selector(registerCallUpdateFinish:)]) {
         [_jsBridge registerCallUpdateFinish:^NSInteger(NSString *instanceId) {
             
-            WXPerformBlockOnComponentThread(^{
-                [WXCoreBridge callUpdateFinish:instanceId];
-            });
+            if ([WXCustomPageBridge isCustomPage:instanceId]) {
+                [[WXCustomPageBridge sharedInstance] callUpdateFinish:instanceId];
+            }
+            else {
+                WXPerformBlockOnComponentThread(^{
+                    [WXCoreBridge callUpdateFinish:instanceId];
+                });
+            }
             
             return 0;
         }];
     }
     
     [_jsBridge registerCallNativeModule:^NSInvocation*(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *arguments, NSDictionary *options) {
-        
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
         if (!instance) {
@@ -456,7 +510,10 @@ _Pragma("clang diagnostic pop") \
         if (!options) {
             newOptions = [NSMutableDictionary new];
         }
-        [newOptions addEntriesFromDictionary:@{@"env":[WXUtility getEnvironment]}];
+        NSDictionary* immutableEnvDict = [[WXUtility getEnvironment] copy];
+        if (immutableEnvDict) {
+            [newOptions addEntriesFromDictionary:@{@"env":immutableEnvDict}];
+        }
         newOptions[@"bundleType"] = bundleType;
         __block NSString *raxAPIScript = nil;
         __block NSString *raxAPIScriptPath = nil;
@@ -482,7 +539,8 @@ _Pragma("clang diagnostic pop") \
             WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
             [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
         } else {
-            sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@", instanceIdString, newOptions, data];
+            NSDictionary* immutableOptions = [newOptions copy];
+            sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@", instanceIdString, immutableOptions, data];
             //add instanceId to weexContext ,if fucn createInstanceContext failure ，then we will know which instance has problem (exceptionhandler)
             self.jsBridge.javaScriptContext[@"wxExtFuncInfo"]= @{
                                                                  @"func":@"createInstanceContext",
@@ -490,13 +548,9 @@ _Pragma("clang diagnostic pop") \
                                                                  @"instanceId":sdkInstance.instanceId?:@"unknownId"
                                                                 };
             __weak typeof(self) weakSelf = self;
-            [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
+            [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, immutableOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
                 if (sdkInstance.pageName) {
-                    if (@available(iOS 8.0, *)) {
-                        [sdkInstance.instanceJavaScriptContext.javaScriptContext setName:sdkInstance.pageName];
-                    } else {
-                        // Fallback
-                    }
+                    [sdkInstance.instanceJavaScriptContext.javaScriptContext setName:sdkInstance.pageName];
                 }
                 weakSelf.jsBridge.javaScriptContext[@"wxExtFuncInfo"]= nil;
                 
@@ -629,16 +683,11 @@ _Pragma("clang diagnostic pop") \
     NSString * bundleType = nil;
     WXSDKInstance * instance = [WXSDKManager instanceForID:instanceIdString];
     NSURLComponents * urlComponent = [NSURLComponents componentsWithString:instance.pageName?:@""];
-    if (@available(iOS 8.0, *)) {
-        for (NSURLQueryItem * queryItem in urlComponent.queryItems) {
-            if ([queryItem.name isEqualToString:@"bundleType"] && [@[@"Vue", @"Rax", @"vue", @"rax"] containsObject:queryItem.value]) {
-                bundleType = queryItem.value;
-                return bundleType;
-            }
+    for (NSURLQueryItem * queryItem in urlComponent.queryItems) {
+        if ([queryItem.name isEqualToString:@"bundleType"] && [@[@"Vue", @"Rax", @"vue", @"rax"] containsObject:queryItem.value]) {
+            bundleType = queryItem.value;
+            return bundleType;
         }
-    } else {
-        // Fallback on earlier versions
-        return bundleType;
     }
     
     // find first character that is not space or new line character
@@ -884,10 +933,6 @@ _Pragma("clang diagnostic pop") \
         bridge = self.jsBridge;
     }
     if (self.frameworkLoadFinished) {
-        newArg = [args mutableCopy];
-        if ([newArg containsObject:completion]) {
-            [newArg removeObject:completion];
-        }
         WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
         if (([bridge isKindOfClass:[WXJSCoreBridge class]]) ||
             ([bridge isKindOfClass:NSClassFromString(@"WXDebugger") ]) ) {
@@ -1055,9 +1100,9 @@ _Pragma("clang diagnostic pop") \
         NSTimeInterval start = CACurrentMediaTime()*1000;
         
         if (execInstance.instanceJavaScriptContext && execInstance.bundleType) {
-            [self callJSMethod:@"__WEEX_CALL_JAVASCRIPT__" args:@[execIns, tasks] onContext:execInstance.instanceJavaScriptContext completion:nil];
+            [self callJSMethod:@"__WEEX_CALL_JAVASCRIPT__" args:@[execIns, [tasks copy]] onContext:execInstance.instanceJavaScriptContext completion:nil];
         } else {
-            [self callJSMethod:@"callJS" args:@[execIns, tasks]];
+            [self callJSMethod:@"callJS" args:@[execIns, [tasks copy]]];
         }
         if (execInstance && !(execInstance.isJSCreateFinish)) {
             NSTimeInterval diff = CACurrentMediaTime()*1000 - start;
@@ -1184,10 +1229,6 @@ _Pragma("clang diagnostic pop") \
         }
     };
     
-    if (WX_SYS_VERSION_LESS_THAN(@"8.0")) {
-        // solve iOS7 memory problem
-        context[@"nativeSet"] = [WXPolyfillSet class];
-    }
     context[@"console"][@"error"] = ^(){
         [WXBridgeContext handleConsoleOutputWithArgument:[JSContext currentArguments] logLevel:WXLogFlagError];
     };

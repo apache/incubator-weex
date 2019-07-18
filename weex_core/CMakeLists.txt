@@ -18,4 +18,12 @@
 #
 cmake_minimum_required(VERSION 3.4.1)
 project(WeexCore)
+
+
+if(CMAKE_BUILD_TYPE MATCHES "Release")
+    message(STATUS "************CMake Release Build************")
+else()
+    message(STATUS "************CMake ${CMAKE_BUILD_TYPE} Build************")
+endif()
+
 add_subdirectory(Source)

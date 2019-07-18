@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.bridge;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
@@ -115,6 +116,13 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeResetWXBridge(Object bridge, String className);
 
+  private native void nativeSetInstanceRenderType(String instanceId, String renderType);
+
+  private native void nativeRemoveInstanceRenderType(String instanceId);
+
+  private native void nativeSetPageArgument(String instanceId, String key, String value);
+
+
   /**
    * Update Init Framework Params
    * */
@@ -131,6 +139,7 @@ public class WXBridge implements IWXBridge {
 
   @Override
   public void updateInitFrameworkParams(String key, String value, String desc){
+    WXStateRecord.getInstance().recordAction("","updateInitFrameworkParams:");
      nativeUpdateInitFrameworkParams(key, value, desc);
   }
 
@@ -142,24 +151,29 @@ public class WXBridge implements IWXBridge {
   @Override
   public int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport) {
     if (MULTIPROCESS) {
+      WXStateRecord.getInstance().recordAction("","nativeInitFrameworkEnv:");
       return nativeInitFrameworkEnv(framework, params, cacheDir, pieSupport);
     } else {
+      WXStateRecord.getInstance().recordAction("","nativeInitFramework:");
       return nativeInitFramework(framework, params);
     }
   }
 
   @Override
   public void refreshInstance(String instanceId, String namespace, String function, WXJSObject[] args) {
+    WXStateRecord.getInstance().recordAction(instanceId,"refreshInstance:"+namespace+","+function);
     nativeRefreshInstance(instanceId, namespace, function, args);
   }
 
   @Override
   public int execJS(String instanceId, String namespace, String function, WXJSObject[] args) {
+    WXStateRecord.getInstance().recordAction(instanceId,"execJS:"+namespace+","+function);
     return nativeExecJS(instanceId, namespace, function, args);
   }
 
   @Override
   public void execJSWithCallback(String instanceId, String namespace, String function, WXJSObject[] args, ResultCallback callback) {
+    WXStateRecord.getInstance().recordAction(instanceId,"execJSWithCallback:"+namespace+","+function);
     if (callback == null) {
       execJS(instanceId, namespace, function, args);
     }
@@ -170,6 +184,7 @@ public class WXBridge implements IWXBridge {
   // Result from js engine
   @CalledByNative
   public void onReceivedResult(long callbackId, byte[] result) {
+    WXStateRecord.getInstance().recordAction("onReceivedResult","callbackId"+callbackId);
     ResultCallback callback = ResultCallbackManager.removeCallbackById(callbackId);
     if (callback != null) {
        callback.onReceiveResult(result);
@@ -178,6 +193,7 @@ public class WXBridge implements IWXBridge {
 
   @Override
   public int execJSService(String javascript) {
+    WXStateRecord.getInstance().recordAction("execJSService","execJSService:");
     return nativeExecJSService(javascript);
   }
 
@@ -189,16 +205,19 @@ public class WXBridge implements IWXBridge {
 
   @Override
   public int createInstanceContext(String instanceId, String name, String function, WXJSObject[] args) {
+    WXStateRecord.getInstance().recordAction(instanceId,"createInstanceContext:");
     return nativeCreateInstanceContext(instanceId, name, function, args);
   }
 
   @Override
   public int destoryInstance(String instanceId, String name, String function, WXJSObject[] args) {
+    WXStateRecord.getInstance().recordAction(instanceId,"destoryInstance:");
     return nativeDestoryInstance(instanceId, name, function, args);
   }
 
   @Override
   public String execJSOnInstance(String instanceId, String script, int type) {
+    WXStateRecord.getInstance().recordAction(instanceId,"execJSOnInstance:"+type);
     return nativeExecJSOnInstance(instanceId, script, type);
   }
 
@@ -213,6 +232,15 @@ public class WXBridge implements IWXBridge {
    */
   @CalledByNative
   public int callNative(String instanceId, byte[] tasks, String callback) {
+    if("HeartBeat".equals(callback)) {
+      Log.e("HeartBeat instanceId", instanceId);
+      WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if(sdkInstance != null) {
+        sdkInstance.createInstanceFuncHeartBeat();
+      }
+      return IWXBridge.INSTANCE_RENDERING;
+    }
+
     return callNative(instanceId, (JSONArray) JSON.parseArray(new String(tasks)), callback);
   }
 
@@ -268,6 +296,7 @@ public class WXBridge implements IWXBridge {
   @CalledByNative
   public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
     try {
+      WXStateRecord.getInstance().recordAction(instanceId,"callNativeModule:"+module+"."+method);
       long start = WXUtils.getFixUnixTime();
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       JSONArray argArray = null;
@@ -350,6 +379,7 @@ public class WXBridge implements IWXBridge {
   @Override
   @CalledByNative
   public void callNativeComponent(String instanceId, String ref, String method, byte[] arguments, byte[] optionsData) {
+    WXStateRecord.getInstance().recordAction(instanceId,"callNativeComponent:"+method);
     try{
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       JSONArray argArray = null;
@@ -725,6 +755,25 @@ public class WXBridge implements IWXBridge {
   @Override
   public void setStyleHeight(String instanceId, String ref, float value) {
     nativeSetStyleHeight(instanceId, ref, value);
+  }
+
+  @Override
+  public void setInstanceRenderType(String instanceId, String renderType){
+    if(TextUtils.isEmpty(renderType)){
+       return;
+    }
+    nativeSetInstanceRenderType(instanceId, renderType);
+  }
+
+
+  @Override
+  public void removeInstanceRenderType(String instanceId){
+      nativeRemoveInstanceRenderType(instanceId);
+  }
+
+  @Override
+  public void setPageArgument(String instanceId, String key, String value){
+      nativeSetPageArgument(instanceId, key, value);
   }
 
   @Override

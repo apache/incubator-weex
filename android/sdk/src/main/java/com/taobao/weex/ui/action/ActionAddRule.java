@@ -17,13 +17,13 @@
  * under the License.
  */
 package com.taobao.weex.ui.action;
-
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.font.FontAdapter;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.TypefaceUtil;
 
@@ -55,12 +55,13 @@ public class ActionAddRule implements IExecutable {
 
     FontDO fontDO = parseFontDO(mData, instance);
     if (fontDO != null && !TextUtils.isEmpty(fontDO.getFontFamilyName())) {
+      notifyAddFontRule(instance, fontDO);
       FontDO cacheFontDO = TypefaceUtil.getFontDO(fontDO.getFontFamilyName());
       if (cacheFontDO == null || !TextUtils.equals(cacheFontDO.getUrl(), fontDO.getUrl())) {
         TypefaceUtil.putFontDO(fontDO);
-        TypefaceUtil.loadTypeface(fontDO);
+        TypefaceUtil.loadTypeface(fontDO, true);
       } else {
-        TypefaceUtil.loadTypeface(cacheFontDO);
+        TypefaceUtil.loadTypeface(cacheFontDO, true);
       }
     }
 
@@ -74,5 +75,13 @@ public class ActionAddRule implements IExecutable {
     String name = jsonObject.getString(Constants.Name.FONT_FAMILY);
 
     return new FontDO(name, src,instance);
+  }
+
+
+  private void notifyAddFontRule(WXSDKInstance instance, FontDO fontDO){
+    FontAdapter fontAdapter = WXSDKManager.getInstance().getFontAdapter();
+    if(fontAdapter != null){
+        fontAdapter.onAddFontRule(instance.getInstanceId(), fontDO.getFontFamilyName(), fontDO.getUrl());
+    }
   }
 }

@@ -24,12 +24,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.HorizontalScrollView;
-
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
-
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class WXHorizontalScrollView extends HorizontalScrollView implements IWXScroller, WXGestureObservable {
 
@@ -77,7 +75,7 @@ public class WXHorizontalScrollView extends HorizontalScrollView implements IWXS
 
   public void addScrollViewListener(ScrollViewListener scrollViewListener) {
     if (mScrollViewListeners == null) {
-      mScrollViewListeners = new ArrayList<>();
+      mScrollViewListeners = new CopyOnWriteArrayList<>();
     }
     if (!mScrollViewListeners.contains(scrollViewListener)) {
       mScrollViewListeners.add(scrollViewListener);

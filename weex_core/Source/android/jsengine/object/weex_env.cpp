@@ -21,6 +21,7 @@
 //
 
 #include "weex_env.h"
+#include "tlog.h"
 
 WeexEnv *WeexEnv::env_ = nullptr;
 
@@ -52,6 +53,7 @@ void WeexEnv::initJSC(bool isMultiProgress) {
           // return false;
       }
 
+#ifndef USE_JS_RUNTIME
       Options::enableRestrictedOptions(true);
 // Initialize JSC before getting VM.
       WTF::initializeMainThread();
@@ -59,6 +61,7 @@ void WeexEnv::initJSC(bool isMultiProgress) {
       JSC::initializeThreading();
 #if ENABLE(WEBASSEMBLY)
       JSC::Wasm::enableFastMemory();
+#endif
 #endif
     });
 }
@@ -71,7 +74,11 @@ void WeexEnv::init_crash_handler(std::string crashFileName) {
 bool WeexEnv::is_app_crashed() {
   if(!isMultiProcess)
     return false;
-  return crashHandler->is_crashed();
+    bool crashed = crashHandler->is_crashed();
+    if(crashed) {
+        Weex::TLog::tlog("%s", "AppCrashed");
+    }
+    return crashed;
 }
 volatile bool WeexEnv::can_m_cache_task_() const {
   return m_cache_task_;
@@ -80,5 +87,17 @@ void WeexEnv::set_m_cache_task_(volatile bool m_cache_task_) {
   WeexEnv::m_cache_task_ = m_cache_task_;
 }
 WeexEnv::~WeexEnv() {
+#ifndef USE_JS_RUNTIME
   wson::destory();
+#endif
+}
+
+void WeexEnv::sendTLog(const char *tag, const char *log) {
+    if(m_back_to_weex_core_thread.get()) {
+        BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                IPCProxyMsg::TLOGMSG);
+        ipc_task->addParams(tag);
+        ipc_task->addParams(log);
+        m_back_to_weex_core_thread->addTask(ipc_task);
+    }
 }

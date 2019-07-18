@@ -159,6 +159,14 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  */
 + (id _Nullable)objectFromJSON:(NSString * _Nonnull)json;
 
+/**
+ Convert all sub-structure objects of source to immutable container.
+
+ @param source Source object.
+ @return Converted object using immutable container.
+ */
++ (id _Nullable)convertContainerToImmutable:(id _Nullable)source;
+
 #define WXDecodeJson(json)  [WXUtility objectFromJSON:json]
 
 /**

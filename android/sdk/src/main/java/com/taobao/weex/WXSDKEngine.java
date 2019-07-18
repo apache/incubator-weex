@@ -51,6 +51,7 @@ import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.http.WXStreamModule;
+import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.ui.ExternalLoaderComponentHolder;
 import com.taobao.weex.ui.IExternalComponentGetter;
 import com.taobao.weex.ui.IExternalModuleGetter;
@@ -223,6 +224,7 @@ public class WXSDKEngine implements Serializable {
         final IWXUserTrackAdapter userTrackAdapter= config!=null?config.getUtAdapter():null;
         final int version = 1;
         mIsSoInit = WXSoInstallMgrSdk.initSo(V8_SO_NAME, version, userTrackAdapter);
+        WXSoInstallMgrSdk.copyJssRuntimeSo();
         if(config!=null) {
           for (String libraryName : config.getNativeLibraryList()) {
             WXSoInstallMgrSdk.initSo(libraryName, version, userTrackAdapter);
@@ -242,6 +244,7 @@ public class WXSDKEngine implements Serializable {
         WXLogUtils.renderPerformanceLog("SDKInitExecuteTime", WXEnvironment.sSDKInitExecuteTime);
       }
     });
+    WXStateRecord.getInstance().startJSThreadWatchDog();
     register();
   }
 

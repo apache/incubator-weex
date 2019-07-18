@@ -20,6 +20,10 @@
 // Created by Darin on 28/04/2018.
 //
 
+#ifdef USE_JS_RUNTIME
+#include "js_runtime/weex/object/weex_runtime.h"
+#else
+
 #ifndef WEEXV8_JSRUNTIME_H
 #define WEEXV8_JSRUNTIME_H
 
@@ -56,8 +60,6 @@ public:
     int createAppContext(const String &instanceId, const String &jsBundle);
 
     std::unique_ptr<WeexJSResult> exeJSOnAppWithResult(const String &instanceId, const String &jsBundle);
-
-    int callJSOnAppContext(IPCArguments *arguments);
 
     int callJSOnAppContext(const String &instanceId, const String &func, std::vector<VALUE_WITH_TYPE *> &params);
 
@@ -107,9 +109,6 @@ private:
 
     int _initAppFramework(const String &instanceId, const String &appFramework);
 
-    void _getArgListFromIPCArguments(MarkedArgumentBuffer *obj, ExecState *state, IPCArguments *arguments,
-                                     size_t start);
-
     void _getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *state, std::vector<VALUE_WITH_TYPE *> &params);
 
     bool is_multi_process_;
@@ -119,3 +118,4 @@ private:
 
 
 #endif //WEEXV8_JSRUNTIME_H
+#endif //USE_JS_RUNTIME

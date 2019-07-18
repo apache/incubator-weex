@@ -192,9 +192,16 @@ public class WXVideo extends WXComponent<FrameLayout> {
         }
         return true;
       case Constants.Name.AUTO_PLAY:
+      case Constants.Name.AUTOPLAY:
         Boolean result = WXUtils.getBoolean(param, null);
         if (result != null) {
           setAutoPlay(result);
+        }
+        return true;
+      case Constants.Name.ZORDERTOP:
+        Boolean zOrderTop = WXUtils.getBoolean(param, null);
+        if (zOrderTop != null) {
+            mWrapper.getVideoView().setZOrderOnTop(zOrderTop);
         }
         return true;
       case Constants.Name.PLAY_STATUS:

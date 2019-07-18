@@ -64,6 +64,10 @@ class PlatformBridge {
                            const std::string& render_ref) = 0;
     virtual void SetViewPortWidth(const std::string& instance_id,
                                   float width) = 0;
+                                  
+    virtual void SetPageRenderType(const std::string &pageId, const std::string& renderType)=0;
+    virtual void RemovePageRenderType(const std::string &pageId)=0;
+
     virtual void SetPageArgument(const std::string &pageId, const std::string& key, const std::string& value) = 0;
     virtual void SetDeviceDisplayOfPage(const std::string &instance_id, float width, float height /* unused now */) = 0;
     virtual void SetDeviceDisplay(const std::string &instance_id, float width, float height, float scale) = 0;

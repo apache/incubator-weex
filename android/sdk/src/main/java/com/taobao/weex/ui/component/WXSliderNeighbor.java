@@ -31,6 +31,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
+import com.taobao.weex.ui.view.BaseFrameLayout;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.WXCirclePageAdapter;
 import com.taobao.weex.ui.view.WXCircleViewPager;
@@ -79,8 +80,8 @@ public class WXSliderNeighbor extends WXSlider {
     }
 
     @Override
-    protected FrameLayout initComponentHostView(@NonNull Context context) {
-        FrameLayout view = new FrameLayout(context);
+    protected BaseFrameLayout initComponentHostView(@NonNull Context context) {
+        BaseFrameLayout view = new BaseFrameLayout(context);
 
         // init view pager
         FrameLayout.LayoutParams pagerParams = new FrameLayout.LayoutParams(

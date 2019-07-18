@@ -246,7 +246,7 @@ This product bundles vuejs v1.0.12, which is available under a
 This product bundles Guava v20.0, which is available under a "Apache" license. For details, see https://github.com/google/guava/blob/v20.0/COPYING and following files:
   android_sdk/src/main/java/org/apache/taobao/weex/utils/WXDataStructureUtil.java
 
-This product bundles json11 v1.0.0, which is available under a "MIT" license.For details, see https://github.com/dropbox/json11/tree/v1.0.0 and following files:
+This product bundles json11 v1.0.0, which is available under a "MIT" license. For details, see https://github.com/dropbox/json11/tree/v1.0.0 and following files:
    weex_core/Source/third_party/json11/CMakeLists.txt
    weex_core/Source/third_party/json11/json11.cc
    weex_core/Source/third_party/json11/json11.hpp
@@ -272,195 +272,447 @@ This product bundles json11 v1.0.0, which is available under a "MIT" license.For
    * THE SOFTWARE.
    */
 
-This product bundles chromium v66.0.3344.2, which is available under a "BSD-style" license. For details, see https://github.com/chromium/chromium/blob/66.0.3344.2/third_party/modp_b64/LICENSE and following files:
-  weex_core/Source/base/base64/base64.cpp
-  weex_core/Source/base/base64/base64.h
-  weex_core/Source/base/base64/modp_base64/modp_b64_data.h
-  weex_core/Source/base/base64/modp_base64/modp_b64.cc
-  weex_core/Source/base/base64/modp_base64/modp_b64.h
-  weex_core/Source/base/android/jniprebuild/jni_generator.py
+This product bundles chromium v66.0.3344.2, which is available under a "BSD-style" license. For details, see https://github.com/chromium/chromium/blob/66.0.3344.2/ and following files:
+   modp_b64:
+      The following files are copied from https://github.com/chromium/chromium/tree/master/third_party/modp_b64 and their names are listed below:
+         weex_core/Source/base/base64/modp_base64/modp_b64_data.h
+         weex_core/Source/base/base64/modp_base64/modp_b64.cc
+         weex_core/Source/base/base64/modp_base64/modp_b64.h
 
-   # Copyright (c) 2012 The Chromium Authors. All rights reserved.
-   # Use of this source code is governed by a BSD-style license that can be
-   # found in the LICENSE file.
+      License for above files:
+         * MODP_B64 - High performance base64 encoder/decoder
+         * Version 1.3 -- 17-Mar-2006
+         * http://modp.com/release/base64
+         *
+         * Copyright (c) 2005, 2006  Nick Galbreath -- nickg [at] modp [dot] com
+         * All rights reserved.
+         *
+         * Redistribution and use in source and binary forms, with or without
+         * modification, are permitted provided that the following conditions are
+         * met:
+         *
+         *   Redistributions of source code must retain the above copyright
+         *   notice, this list of conditions and the following disclaimer.
+         *
+         *   Redistributions in binary form must reproduce the above copyright
+         *   notice, this list of conditions and the following disclaimer in the
+         *   documentation and/or other materials provided with the distribution.
+         *
+         *   Neither the name of the modp.com nor the names of its
+         *   contributors may be used to endorse or promote products derived from
+         *   this software without specific prior written permission.
+         *
+         * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+         * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+         * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+         * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+         * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+         * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+         * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+         * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+         * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+         * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+         * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   ICU:
+      The following files are copied from https://github.com/chromium/chromium/tree/66.0.3344.2/base/third_party/icu and their names are listed below:
+         weex_core/Source/base/third_party/icu/icu_utf.h
+         weex_core/Source/base/third_party/icu/icu_utf.cpp
+      
+      License for above files:
+         /* COPYRIGHT AND PERMISSION NOTICE (ICU 58 and later)
+         *
+         * Copyright © 1991-2017 Unicode, Inc. All rights reserved.
+         * Distributed under the Terms of Use in http://www.unicode.org/copyright.html
+         *
+         * Permission is hereby granted, free of charge, to any person obtaining
+         * a copy of the Unicode data files and any associated documentation
+         * (the "Data Files") or Unicode software and any associated documentation
+         * (the "Software") to deal in the Data Files or Software
+         * without restriction, including without limitation the rights to use,
+         * copy, modify, merge, publish, distribute, and/or sell copies of
+         * the Data Files or Software, and to permit persons to whom the Data Files
+         * or Software are furnished to do so, provided that either
+         * (a) this copyright and permission notice appear with all copies
+         * of the Data Files or Software, or
+         * (b) this copyright and permission notice appear in associated
+         * Documentation.
+         * 
+         * THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF
+         * ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+         * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+         * NONINFRINGEMENT OF THIRD PARTY RIGHTS.
+         * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS
+         * NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL
+         * DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+         * DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+         * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+         * PERFORMANCE OF THE DATA FILES OR SOFTWARE.
+         * 
+         * Except as contained in this notice, the name of a copyright holder
+         * shall not be used in advertising or otherwise to promote the sale,
+         * use or other dealings in these Data Files or Software without prior
+         * written authorization of the copyright holder.
+         *
+         * ---------------------
+         *
+         * Third-Party Software Licenses
+         *  
+         * This section contains third-party software notices and/or additional
+         * terms for licensed third-party software components included within ICU
+         * libraries.
+         * 
+         * 1. ICU License - ICU 1.8.1 to ICU 57.1
+         *
+         * COPYRIGHT AND PERMISSION NOTICE
+         * 
+         * Copyright (c) 1995-2016 International Business Machines Corporation and others
+         * All rights reserved.
+         *  
+         * Permission is hereby granted, free of charge, to any person obtaining
+         * a copy of this software and associated documentation files (the
+         * "Software"), to deal in the Software without restriction, including
+         * without limitation the rights to use, copy, modify, merge, publish,
+         * distribute, and/or sell copies of the Software, and to permit persons
+         * to whom the Software is furnished to do so, provided that the above
+         * copyright notice(s) and this permission notice appear in all copies of
+         * the Software and that both the above copyright notice(s) and this
+         * permission notice appear in supporting documentation.
+         * 
+         * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+         * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+         * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+         * OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+         * HOLDERS INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY
+         * SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER
+         * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+         * CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+         * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+         * 
+         * Except as contained in this notice, the name of a copyright holder
+         * shall not be used in advertising or otherwise to promote the sale, use
+         * or other dealings in this Software without prior written authorization
+         * of the copyright holder.
+         * 
+         * All trademarks and registered trademarks mentioned herein are the
+         * property of their respective owners.
+
+   Other files:
+      weex_core/Source/base/android/jniprebuild/jni_generator.py
+
+      The license for this file is below:
+      # Copyright (c) 2012 The Chromium Authors. All rights reserved.
+      # Use of this source code is governed by a BSD-style license that can be
+      # found in the LICENSE file.
 
 This product bundles Android Open Source Project vandroid-4.2.2_r1, which is available under a "BSD" license. For details, see https://android.googlesource.com/platform/bionic/+/android-4.2.2_r1/libc/README and following files:
   weex_core/Source/IPC/futex.h
 
-This product bundles Webkit 2.17.4, which is available under a "BSD 2-clause" license. For details, reference https://webkit.org/licensing-webkit/ for license(Weex only uses the files under BSD license) and see https://svn.webkit.org/repository/webkit/releases/WebKitGTK/webkit-2.17.4 for following files:
-   Files under: weex_core/Source/android/jsengine/dependence/
-      OptionsCommon.cmake
-      OptionsJSCOnly.cmake
-      WeexCommon.cmake
-      WeexFS.cmake
-      WeexFeatures.cmake
-      WeexHelpers.cmake
-      WeexMacros.cmake
+This product bundles Webkit 2.17.4, which is available under a "BSD-style" license. For details, reference https://webkit.org/licensing-webkit/ for license and see https://svn.webkit.org/repository/webkit/releases/WebKitGTK/webkit-2.17.4 for following files:
 
-   Files under: weex_core/Source/android/jsengine/dependence/bmalloc
-      CMakeLists.txt
-      ChangeLog
-      Makefile
+   Bmalloc in WebKit:
+      weex_core/Source/android/jsengine/dependence/bmalloc:
+         CMakeLists.txt
+         ChangeLog
+         Makefile
 
-   Files under: weex_core/Source/android/jsengine/dependence/bmalloc/Configurations
-      Base.xcconfig
-      DebugRelease.xcconfig
-      bmalloc.xcconfig
-      mbmalloc.xcconfig
+      weex_core/Source/android/jsengine/dependence/bmalloc/Configurations:
+         Base.xcconfig
+         DebugRelease.xcconfig
+         bmalloc.xcconfig
+         mbmalloc.xcconfig
 
-   Files under: weex_core/Source/android/jsengine/dependence/bmalloc/bmalloc
-      Algorithm.h
-      Allocator.cpp
-      Allocator.h
-      AsyncTask.h
-      AvailableMemory.cpp
-      AvailableMemory.h
-      BAssert.h
-      BPlatform.h
-      BumpAllocator.h
-      BumpRange.h
-      Cache.cpp
-      Cache.h
-      Chunk.h
-      Deallocator.cpp
-      Deallocator.h
-      DebugHeap.cpp
-      DebugHeap.h
-      Environment.cpp
-      Environment.h
-      FixedVector.h
-      Heap.cpp
-      Heap.h
-      Inline.h
-      LargeMap.cpp
-      LargeMap.h
-      LargeRange.h
-      LineMetadata.h
-      List.h
-      Logging.cpp
-      Logging.h
-      Map.h
-      Mutex.h
-      Object.h
-      ObjectType.cpp
-      ObjectType.h
-      PerProcess.h
-      PerThread.h
-      Range.h
-      ScopeExit.h
-      Sizes.h
-      SmallLine.h
-      SmallPage.h
-      StaticMutex.cpp
-      StaticMutex.h
-      Syscall.h
-      VMAllocate.h
-      VMHeap.cpp
-      VMHeap.h
-      Vector.h
-      Zone.cpp
-      Zone.h
-      bmalloc.h
-      mbmalloc.cpp
+      weex_core/Source/android/jsengine/dependence/bmalloc/bmalloc:
+         Algorithm.h
+         Allocator.cpp
+         Allocator.h
+         AsyncTask.h
+         AvailableMemory.cpp
+         AvailableMemory.h
+         BAssert.h
+         BPlatform.h
+         BumpAllocator.h
+         BumpRange.h
+         Cache.cpp
+         Cache.h
+         Chunk.h
+         Deallocator.cpp
+         Deallocator.h
+         DebugHeap.cpp
+         DebugHeap.h
+         Environment.cpp
+         Environment.h
+         FixedVector.h
+         Heap.cpp
+         Heap.h
+         Inline.h
+         LargeMap.cpp
+         LargeMap.h
+         LargeRange.h
+         LineMetadata.h
+         List.h
+         Logging.cpp
+         Logging.h
+         Map.h
+         Mutex.h
+         Object.h
+         ObjectType.cpp
+         ObjectType.h
+         PerProcess.h
+         PerThread.h
+         Range.h
+         ScopeExit.h
+         Sizes.h
+         SmallLine.h
+         SmallPage.h
+         StaticMutex.cpp
+         StaticMutex.h
+         Syscall.h
+         VMAllocate.h
+         VMHeap.cpp
+         VMHeap.h
+         Vector.h
+         Zone.cpp
+         Zone.h
+         bmalloc.h
+         mbmalloc.cpp
 
-   Files under: weex_core/Source/android/jsengine/dependence/bmalloc/bmalloc/darwin
-      BSoftLinking.h
+      weex_core/Source/android/jsengine/dependence/bmalloc/bmalloc/darwin:
+         BSoftLinking.h
 
-   Files under: weex_core/Source/android/jsengine/dependence/bmalloc/bmalloc.xcodeproj
-      project.pbxproj
+      weex_core/Source/android/jsengine/dependence/bmalloc/bmalloc.xcodeproj:
+         project.pbxproj
 
-   Files under: weex_core/Source/android/jsengine/dependence/icu
-      LICENSE
-      README
+   ICU in WebKit:
+      weex_core/Source/android/jsengine/dependence/icu:
+         LICENSE
+         README
 
-   Files under: weex_core/Source/android/jsengine/dependence/icu/unicode
-      localpointer.h
-      parseerr.h
-      platform.h
-      ptypes.h
-      putil.h
-      ucal.h
-      uchar.h
-      ucnv.h
-      ucnv_err.h
-      ucol.h
-      uconfig.h
-      ucurr.h
-      udat.h
-      udatpg.h
-      udisplaycontext.h
-      uenum.h
-      uformattable.h
-      uiter.h
-      uloc.h
-      umachine.h
-      umisc.h
-      unorm.h
-      unorm2.h
-      unum.h
-      unumsys.h
-      urename.h
-      uscript.h
-      uset.h
-      ustring.h
-      utf.h
-      utf16.h
-      utf8.h
-      utf_old.h
-      utypes.h
-      uvernum.h
-      uversion.h
-      
+      weex_core/Source/android/jsengine/dependence/icu/unicode:
+         localpointer.h
+         parseerr.h
+         platform.h
+         ptypes.h
+         putil.h
+         ucal.h
+         uchar.h
+         ucnv.h
+         ucnv_err.h
+         ucol.h
+         uconfig.h
+         ucurr.h
+         udat.h
+         udatpg.h
+         udisplaycontext.h
+         uenum.h
+         uformattable.h
+         uiter.h
+         uloc.h
+         umachine.h
+         umisc.h
+         unorm.h
+         unorm2.h
+         unum.h
+         unumsys.h
+         urename.h
+         uscript.h
+         uset.h
+         ustring.h
+         utf.h
+         utf16.h
+         utf8.h
+         utf_old.h
+         utypes.h
+         uvernum.h
+         uversion.h
+   
+   JavaScriptCore in WebKit:
+      weex_core/Source/include/JavaScriptCore/API:
+         APICallbackFunction.h
+         APICast.h
+         APIUtils.h
+         JSAPIWrapperObject.h
+         JSBase.h
+         JSBasePrivate.h
+         JSCTestRunnerUtils.h
+         JSCallbackConstructor.h
+         JSCallbackFunction.h
+         JSCallbackObject.h
+         JSCallbackObjectFunctions.h
+         JSClassRef.h
+         JSContext.h
+         JSContextInternal.h
+         JSContextPrivate.h
+         JSContextRef.h
+         JSContextRefInspectorSupport.h
+         JSContextRefInternal.h
+         JSContextRefPrivate.h
+         JSExport.h
+         JSManagedValue.h
+         JSManagedValueInternal.h
+         JSObjectRef.h
+         JSObjectRefPrivate.h
+         JSRemoteInspector.h
+         JSRetainPtr.h
+         JSScriptRefPrivate.h
+         JSStringRef.h
+         JSStringRefBSTR.h
+         JSStringRefCF.h
+         JSStringRefPrivate.h
+         JSTypedArray.h
+         JSValue.h
+         JSValueInternal.h
+         JSValueRef.h
+         JSVirtualMachine.h
+         JSVirtualMachineInternal.h
+         JSWeakObjectMapRefInternal.h
+         JSWeakObjectMapRefPrivate.h
+         JSWrapperMap.h
+         JavaScript.h
+         JavaScriptCore.h
+         ObjCCallbackFunction.h
+         ObjcRuntimeExtras.h
+         OpaqueJSString.h
+         WebKitAvailability.h
+
+      weex_core/Source/include/JavaScriptCore/ForwardingHeaders/JavaScriptCore:
+         APICast.h
+         JSBase.h
+         JSCTestRunnerUtils.h
+         JSContextRef.h
+         JSObjectRef.h
+         JSObjectRefPrivate.h
+         JSRetainPtr.h
+         JSStringRef.h
+         JSStringRefCF.h
+         JSTypedArray.h
+         JSValueRef.h
+         JavaScript.h
+         JavaScriptCore.h
+         OpaqueJSString.h
+         WebKitAvailability.h
+
+   Other files in Webkit:
+      weex_core/Source/android/jsengine/dependence:
+         OptionsCommon.cmake
+         OptionsJSCOnly.cmake
+
    The copyright for files above is listed below:
+      weex_core/Source/android/jsengine/dependence/icu:
+         COPYRIGHT AND PERMISSION NOTICE
 
-      COPYRIGHT AND PERMISSION NOTICE
+         Copyright (c) 1995-2006 International Business Machines Corporation and others
 
-      Copyright (c) 1995-2006 International Business Machines Corporation and others
+         All rights reserved.
 
-      All rights reserved.
+         Permission is hereby granted, free of charge, to any person obtaining a copy of this
+         software and associated documentation files (the "Software"), to deal in the Software
+         without restriction, including without limitation the rights to use, copy, modify,
+         merge, publish, distribute, and/or sell copies of the Software, and to permit persons
+         to whom the Software is furnished to do so, provided that the above copyright notice(s)
+         and this permission notice appear in all copies of the Software and that both the above
+         copyright notice(s) and this permission notice appear in supporting documentation.
 
-      Permission is hereby granted, free of charge, to any person obtaining a copy of this
-      software and associated documentation files (the "Software"), to deal in the Software
-      without restriction, including without limitation the rights to use, copy, modify,
-      merge, publish, distribute, and/or sell copies of the Software, and to permit persons
-      to whom the Software is furnished to do so, provided that the above copyright notice(s)
-      and this permission notice appear in all copies of the Software and that both the above
-      copyright notice(s) and this permission notice appear in supporting documentation.
+         THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+         INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+         PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER
+         OR HOLDERS INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR
+         CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+         PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+         OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-      INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-      PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER
-      OR HOLDERS INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR
-      CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
-      PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
-      OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+         Except as contained in this notice, the name of a copyright holder shall not be used in
+         advertising or otherwise to promote the sale, use or other dealings in this Software
+         without prior written authorization of the copyright holder.
+      
+      weex_core/Source/include/JavaScriptCore:
 
-      Except as contained in this notice, the name of a copyright holder shall not be used in
-      advertising or otherwise to promote the sale, use or other dealings in this Software
-      without prior written authorization of the copyright holder.
+         /*
+         * Copyright (C) 2005, 2006, 2007, 2010 Apple Inc. All rights reserved.
+         * Copyright (C) 2006 Apple Inc.  All rights reserved.
+         * Copyright (C) 2006, 2007 Apple Inc. All rights reserved.
+         * Copyright (C) 2006, 2008 Apple Inc. All rights reserved.
+         * Copyright (C) 2006, 2008, 2016 Apple Inc. All rights reserved.
+         * Copyright (C) 2006-2016 Apple Inc. All rights reserved.
+         * Copyright (C) 2007 Apple Inc.  All rights reserved.
+         * Copyright (C) 2008 Apple Inc.  All rights reserved.
+         * Copyright (C) 2008, 2009, 2010, 2014 Apple Inc. All Rights Reserved.
+         * Copyright (C) 2009 Apple Inc.  All rights reserved.
+         * Copyright (C) 2010 Apple Inc. All rights reserved.
+         * Copyright (C) 2012 Apple Inc. All rights reserved.
+         * Copyright (C) 2013 Apple Inc. All rights reserved.
+         * Copyright (C) 2013, 2016 Apple Inc. All rights reserved.
+         * Copyright (C) 2013, 2017 Apple Inc. All rights reserved.
+         * Copyright (C) 2014 Apple Inc. All rights reserved.
+         * Copyright (C) 2015 Apple Inc.  All rights reserved.
+         * Copyright (C) 2015-2016 Apple Inc. All rights reserved.
+         * Copyright (C) 2016 Apple Inc. All rights reserved.
+         * Copyright (C) 2007 Eric Seidel <eric@webkit.org>
+         * Copyright (C) 2007 Eric Seidel <eric@webkit.org>
+         * Copyright (C) 2008 Alp Toker <alp@atoker.com>
+         * Copyright (C) 2008 Kelvin W Sherlock (ksherlock@gmail.com)
+         * Copyright (C) 2015 Dominic Szablewski (dominic@phoboslab.org)
+         *
+         * Redistribution and use in source and binary forms, with or without
+         * modification, are permitted provided that the following conditions
+         * are met:
+         * 1. Redistributions of source code must retain the above copyright
+         *    notice, this list of conditions and the following disclaimer.
+         * 2. Redistributions in binary form must reproduce the above copyright
+         *    notice, this list of conditions and the following disclaimer in the
+         *    documentation and/or other materials provided with the distribution.
+         *
+         * THIS SOFTWARE IS PROVIDED BY APPLE INC. ``AS IS'' AND ANY
+         * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+         * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+         * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL APPLE INC. OR
+         * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+         * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+         * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+         * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+         * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+         * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+         * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+         */
 
+         weex_core/Source/android/jsengine/dependence/bmalloc:
 
-      /*
-      * Copyright (C) 2016 Apple Inc. All rights reserved.
-      *
-      * Redistribution and use in source and binary forms, with or without
-      * modification, are permitted provided that the following conditions
-      * are met:
-      * 1. Redistributions of source code must retain the above copyright
-      *    notice, this list of conditions and the following disclaimer.
-      * 2. Redistributions in binary form must reproduce the above copyright
-      *    notice, this list of conditions and the following disclaimer in the
-      *    documentation and/or other materials provided with the distribution.
-      *
-      * THIS SOFTWARE IS PROVIDED BY APPLE INC. ``AS IS'' AND ANY
-      * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-      * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-      * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL APPLE INC. OR
-      * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-      * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-      * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-      * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-      * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-      * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-      * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-      */
+         /*
+         * Copyright (C) 2007, 2008, 2011-2016 Apple Inc. All rights reserved.
+         * Copyright (C) 2012-2017 Apple Inc. All rights reserved.
+         * Copyright (C) 2014 Apple Inc. All rights reserved.
+         * Copyright (C) 2014, 2015 Apple Inc. All rights reserved.
+         * Copyright (C) 2014, 2016 Apple Inc. All rights reserved.
+         * Copyright (C) 2014-2016 Apple Inc. All rights reserved.
+         * Copyright (C) 2016 Apple Inc. All rights reserved.
+         *
+         * Redistribution and use in source and binary forms, with or without
+         * modification, are permitted provided that the following conditions
+         * are met:
+         * 1.  Redistributions of source code must retain the above copyright
+         *     notice, this list of conditions and the following disclaimer.
+         * 2.  Redistributions in binary form must reproduce the above copyright
+         *     notice, this list of conditions and the following disclaimer in the
+         *     documentation and/or other materials provided with the distribution.
+         *
+         * THIS SOFTWARE IS PROVIDED BY APPLE INC. AND ITS CONTRIBUTORS ``AS IS'' AND ANY
+         * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+         * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+         * DISCLAIMED. IN NO EVENT SHALL APPLE INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY
+         * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+         * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+         * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+         * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+         * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+         * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+         */
+
+This product bundles files from Boost under "Boost Software License". For more details, reference http://www.boost.org/LICENSE_1_0.txt
+  weex_core/Source/js_runtime/utils/base64.hpp
+
+  //
+  // Copyright (c) 2013-2017 Vinnie Falco (vinnie dot falco at gmail dot com)
+  //
+  // Distributed under the Boost Software License, Version 1.0. (See accompanying
+  // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+  //

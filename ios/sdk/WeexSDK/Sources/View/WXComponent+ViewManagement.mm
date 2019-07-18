@@ -360,4 +360,25 @@ do {\
     [self viewDidUnload];
 }
 
+- (void)unloadNativeView
+{
+    WXAssertMainThread();
+    
+    [self viewWillUnload];
+    
+    _view.gestureRecognizers = nil;
+    
+    [self _removeAllEvents];
+    
+    if ([_view superview]) {
+        [_view removeFromSuperview];
+    }
+
+    _view = nil;
+    [_layer removeFromSuperlayer];
+    _layer = nil;
+    
+    [self viewDidUnload];
+}
+
 @end

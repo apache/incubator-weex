@@ -24,7 +24,7 @@ const { WXEnvironment } = global
 
 /* istanbul ignore next */
 if (typeof WXEnvironment !== 'undefined'
-  && WXEnvironment.platform === 'iOS'
+  && (WXEnvironment.platform === 'iOS' || WXEnvironment.platform === 'android')
   && !WXEnvironment.__enable_native_promise__) {
   global.Promise = undefined
 }

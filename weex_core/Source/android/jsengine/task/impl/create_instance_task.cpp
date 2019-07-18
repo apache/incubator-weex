@@ -20,6 +20,7 @@
 // Created by Darin on 20/07/2018.
 //
 
+#include <object/weex_env.h>
 #include "create_instance_task.h"
 
 void CreateInstanceTask::addExtraArg(String arg) {
@@ -37,5 +38,13 @@ void CreateInstanceTask::run(WeexRuntime *runtime) {
 
     runtime->createInstance(instanceId, extraArgs.at(0), this->script, extraArgs.at(1), extraArgs.at(2),
                             extraArgs.at(3), initExtraArgs->params);
+
+
+    if(WeexEnv::getEnv()->m_back_to_weex_core_thread.get()) {
+        BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
+                IPCProxyMsg::HEARTBEAT);
+        ipc_task->addParams(instanceId.utf8().data());
+        WeexEnv::getEnv()->m_back_to_weex_core_thread.get()->addTask(ipc_task);
+    }
 }
 

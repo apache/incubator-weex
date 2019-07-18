@@ -123,6 +123,8 @@ public enum WXErrorCode {
    */
   WX_ERR_RELOAD_PAGE("-2111", "reloadPage",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
+  WX_ERR_RELOAD_PAGE_EXCEED_LIMIT("-2114", "RELOAD_PAGE_EXCEED_LIMIT",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
+
   WX_ERROR_WHITE_SCREEN("-2116", "WHITE_SCREEN",ErrorType.RENDER_ERROR,ErrorGroup.JS),
 
 
@@ -224,6 +226,9 @@ public enum WXErrorCode {
   WX_RENDER_ERR_LIST_INVALID_COLUMN_COUNT("-9619", "WX_RENDER_ERR_LIST_INVALID_COLUMNJ_CONUNT", ErrorType.JS_ERROR, ErrorGroup.JS),
   WX_RENDER_ERR_TEXTURE_SETBACKGROUND("-9620", "WX_RENDER_ERR_TEXTURE_SETBACKGROUND", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
   WX_RENDER_WAR_GPU_LIMIT_LAYOUT("-9621", "WX_RENDER_WAR_GPU_LIMIT_LAYOUT", ErrorType.JS_ERROR,ErrorGroup.JS),
+
+  WX_KEY_EXCEPTION_HERON("-9900", "Error of Heron engine: ", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
+  WX_KEY_EXCEPTION_HERON_RENDER("-9901", "Render error of Heron engine: ", ErrorType.RENDER_ERROR, ErrorGroup.NATIVE),
 
   WX_KEY_EXCEPTION_NO_BUNDLE_TYPE("-9801", "Fatal Error : No bundle type in js bundle head, cause white screen or memory leak!!", ErrorType.JS_ERROR, ErrorGroup.JS),
   /**

@@ -69,6 +69,12 @@ class SoUtils {
 
   inline static const char* jss_icu_path() { return g_jss_icu_path; }
 
+  inline static void set_jsb_so_path(char* jsb_so_path) {
+    g_jsb_so_path = jsb_so_path;
+  }
+
+  inline static const char* jsb_so_path() { return g_jsb_so_path; }
+
   inline static void set_lib_ld_path(char* lib_ld_path) {
     g_lib_ld_path = lib_ld_path;
   }
@@ -81,6 +87,7 @@ class SoUtils {
   static const char* GetDefaultCacheDir(JNIEnv* env);
   static char* g_cache_dir;
   static char* g_jss_so_path;
+  static char* g_jsb_so_path;
   static char* g_crash_file_path;
   static char* g_jss_so_name;
   static char* g_jss_icu_path;

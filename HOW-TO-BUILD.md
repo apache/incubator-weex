@@ -32,7 +32,7 @@ This article was tested in MacOSX system.
 This script will build Android and iOS SDKs:
 > `$ bash scripts/build_from_source.sh $NDK13_dir $NDK_16dir`
 
-The `$NDK13_dir` and `$NDK16_dir` should be the directory of NDK 13 and NDK 16, otherwise the Android build would failed.
+The `$NDK18_dir` should be the directory of NDK 18, otherwise the Android build would failed.
 
 This may take a while. After that, you can look in `dist/`, `android/sdk/build/output/` and `ios/sdk/Products` for Web/Android/iOS SDK artifacts.
 
@@ -61,11 +61,11 @@ Move `min` version to Native SDK folder, which will be used by native SDK build.
 check env
 
 - you have gradle installed, see more details about 'how to install gradle' on the [gradle website](https://gradle.org/install).
-- NDK r16  [link](https://developer.android.com/ndk/)
+- [NDK r18](https://developer.android.com/ndk/downloads/older_releases.html)
 - edit local.propteries (in `Android` dir)
 
 	```
-	ndk.dir=/Users/{user}/Library/Android/sdk/ndk-bundle-r16
+	ndk.dir=/Users/{user}/Library/Android/sdk/ndk-bundle-r18
 	sdk.dir=/Users/{user}/Library/Android/sdk
 	```
 

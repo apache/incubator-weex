@@ -20,6 +20,7 @@
 // Created by Darin on 28/04/2018.
 //
 
+#include <object/tlog.h>
 #include "android/jsengine/weex_runtime.h"
 
 #include "android/jsengine/bridge/script/script_bridge_in_multi_so.h"
@@ -223,59 +224,6 @@ WeexRuntime::callJSOnAppContext(const String &instanceId, const String &func, st
         ExecState *state = worker_globalObject->globalExec();
         _getArgListFromJSParams(&obj, state, params);
 //        LOGE("Weex jsserver IPCJSMsg::CALLJSONAPPCONTEXT3");
-        Identifier funcIdentifier = Identifier::fromString(this->m_globalVM.get(), func);
-
-        JSValue function;
-        JSValue result;
-        function = worker_globalObject->get(state, funcIdentifier);
-        CallData callData;
-        CallType callType = getCallData(function, callData);
-        NakedPtr<Exception> returnedException;
-        // LOGE("Weex jsserver IPCJSMsg::CALLJSONAPPCONTEXT start call js runtime funtion");
-        if (function.isEmpty()) {
-            LOGE("Weex jsserver IPCJSMsg::CALLJSONAPPCONTEXT js funtion is empty");
-        }
-        JSValue ret = call(state, function, callType, callData, worker_globalObject, obj, returnedException);
-        // LOGE("Weex jsserver IPCJSMsg::CALLJSONAPPCONTEXT end");
-        if (returnedException) {
-            ReportException(worker_globalObject, returnedException.get(), instanceId.utf8().data(), func.utf8().data());
-            return static_cast<int32_t>(false);
-        }
-        worker_globalObject->vm().drainMicrotasks();
-        return static_cast<int32_t>(true);
-    }
-}
-
-int WeexRuntime::callJSOnAppContext(IPCArguments *arguments) {
-    const IPCString *ipcInstanceId = arguments->getString(0);
-    const IPCString *ipcFunc = arguments->getString(1);
-    String instanceId = jString2String(ipcInstanceId->content, ipcInstanceId->length);
-    String func = jString2String(ipcFunc->content, ipcFunc->length);
-    // LOGE("Weex jsserver IPCJSMsg::CALLJSONAPPCONTEXT instanceId:%s, func:%s", instanceId.utf8().data(), func.utf8().data());
-
-    if (instanceId == "") {
-        return static_cast<int32_t>(false);
-    } else {
-        std::map<std::string, WeexGlobalObject *>::iterator it_find;
-        auto appWorkerObjectHolder = getLightAppObjectHolder(instanceId);
-        if (appWorkerObjectHolder == nullptr) {
-//            LOGE("callJSOnAppContext is running and id is %s and weexLiteAppObjectHolder is null", instanceId.utf8().data());
-            return static_cast<int32_t>(false);
-        }
-
-        JSGlobalObject *worker_globalObject = appWorkerObjectHolder->m_globalObject.get();
-        if (worker_globalObject == NULL) {
-//            LOGE("Weex jsserver IPCJSMsg::CALLJSONAPPCONTEXT worker_globalObject is null");
-            return static_cast<int32_t>(false);
-        }
-//        LOGE("Weex jsserver IPCJSMsg::CALLJSONAPPCONTEXT1");
-
-        JSLockHolder locker(this->m_globalVM.get());
-        // LOGE("Weex jsserver IPCJSMsg::CALLJSONAPPCONTEXT2");
-        MarkedArgumentBuffer obj;
-        ExecState *state = worker_globalObject->globalExec();
-        _getArgListFromIPCArguments(&obj, state, arguments, 2);
-        // LOGE("Weex jsserver IPCJSMsg::CALLJSONAPPCONTEXT3");
         Identifier funcIdentifier = Identifier::fromString(this->m_globalVM.get(), func);
 
         JSValue function;
@@ -660,6 +608,7 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
                                 const String &extendsApi,
                                 std::vector<INIT_FRAMEWORK_PARAMS*>& params) {
     LOGE("test-> : start createInstance");
+    Weex::TLog::tlog("id --> %s CreateInstance start", instanceId.utf8().data());
 
     JSGlobalObject *impl_globalObject = weexObjectHolder->m_globalObject.get();
     JSGlobalObject *globalObject;
@@ -728,17 +677,16 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
             auto instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
             auto pArray = JSObjectCopyPropertyNames(globalContextRef, ref);
             size_t keyCount = JSPropertyNameArrayGetCount(pArray);
-//            LOGE("dyyLog instance create and id is %s, and time is %lld, currentThread is %u", instanceId.utf8().data(), microTime(), pthread_self());
             for (size_t i = 0; i < keyCount; ++i) {
                 auto propertyName_ = JSPropertyNameArrayGetNameAtIndex(pArray, i);
-                auto propertyValue_ = JSObjectGetProperty(globalContextRef, ref, propertyName_, NULL);
-                if(propertyValue_ == nullptr) {
-                    LOGE("dyy create instance propertyValue_ == null");
+                if(propertyName_ == nullptr) {
+                    Weex::TLog::tlog("id --> %s CreateInstance's propertyName_ is null", instanceId.utf8().data());
                     continue;
                 }
 
-                if(propertyName_ == nullptr) {
-                    LOGE("dyy create instance propertyName_ == null");
+                auto propertyValue_ = JSObjectGetProperty(globalContextRef, ref, propertyName_, NULL);
+                if(propertyValue_ == nullptr) {
+                    Weex::TLog::tlog("id --> %s CreateInstance's propertyValue_ is null", instanceId.utf8().data());
                     continue;
                 }
 
@@ -785,7 +733,7 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
     if (!extendsApi.isEmpty() && extendsApi.length() > 0) {
         if (!ExecuteJavaScript(globalObject, extendsApi, ("weex run raxApi"), true,
                                "runRaxApi", instanceId.utf8().data())) {
-            LOGE("before createInstanceContext run rax api Error");
+            Weex::TLog::tlog("id --> %s CreateInstance's weex run raxApi failed", instanceId.utf8().data());
             return static_cast<int32_t>(false);
         }
     }
@@ -795,6 +743,7 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
     if (!ExecuteJavaScript(globalObject, script, ("weex createInstanceContext"), true,
                            "createInstanceContext", instanceId.utf8().data())) {
         LOGE("createInstanceContext and ExecuteJavaScript Error");
+        Weex::TLog::tlog("id --> %s CreateInstance's createInstanceContext failed", instanceId.utf8().data());
         return static_cast<int32_t>(false);
     }
     LOGE("test-> : after ExecuteJavaScript");
@@ -813,42 +762,6 @@ int WeexRuntime::_initFramework(const String &source) {
 
     setJSFVersion(globalObject);
     return true;
-}
-
-void
-WeexRuntime::_getArgListFromIPCArguments(MarkedArgumentBuffer *obj, ExecState *state, IPCArguments *arguments,
-                                         size_t start) {
-    size_t count = arguments->getCount();
-    for (size_t i = start; i < count; ++i) {
-        switch (arguments->getType(i)) {
-            case IPCType::DOUBLE:
-                obj->append(jsNumber(arguments->get<double>(i)));
-                break;
-            case IPCType::STRING: {
-                const IPCString *ipcstr = arguments->getString(i);
-                obj->append(jString2JSValue(state, ipcstr->content, ipcstr->length));
-            }
-                break;
-            case IPCType::JSONSTRING: {
-                const IPCString *ipcstr = arguments->getString(i);
-
-                String str = jString2String(ipcstr->content, ipcstr->length);
-
-                JSValue o = parseToObject(state, str);
-                obj->append(o);
-            }
-                break;
-            case IPCType::BYTEARRAY: {
-                const IPCByteArray *array = arguments->getByteArray(i);
-                JSValue o = wson::toJSValue(state, (void *) array->content, array->length);
-                obj->append(o);
-            }
-                break;
-            default:
-                obj->append(jsUndefined());
-                break;
-        }
-    }
 }
 
 void WeexRuntime::_getArgListFromJSParams(MarkedArgumentBuffer *obj, ExecState *state,

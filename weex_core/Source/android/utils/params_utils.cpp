@@ -203,6 +203,24 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     }
   }
 
+  jmethodID m_use_runtime_api =  env->GetMethodID(c_params, "getUseRunTimeApi", "()Ljava/lang/String;");
+  if (m_use_runtime_api == nullptr) {
+    LOGE("m_use_runtime_api method is missing");
+    WXCoreEnvironment::getInstance()->setUseRunTimeApi(false);
+  } else {
+    jobject j_use_runtime_api =
+            env->CallObjectMethod(params, m_use_runtime_api);
+    const char* use_runtime_api_str =
+            env->GetStringUTFChars((jstring)(j_use_runtime_api), nullptr);
+    if (nullptr == use_runtime_api_str){
+      WXCoreEnvironment::getInstance()->setUseRunTimeApi(false);
+    } else{
+      bool use_runtime_api = strstr(use_runtime_api_str, "true") != nullptr;
+      WXCoreEnvironment::getInstance()->setUseRunTimeApi(use_runtime_api);
+      env->DeleteLocalRef(j_use_runtime_api);
+    }
+  }
+
   jmethodID m_get_jsc_so_path =
           env->GetMethodID(c_params, "getLibJscPath", "()Ljava/lang/String;");
   if (m_get_jsc_so_path != nullptr) {
@@ -253,6 +271,20 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
       env->DeleteLocalRef(j_get_jss_icu_path);
     }
   }
+
+  jmethodID m_get_jsb_so_path =
+      env->GetMethodID(c_params, "getLibJsbPath", "()Ljava/lang/String;");
+  if (m_get_jsb_so_path != nullptr) {
+    jobject j_get_jsb_so_path =
+        env->CallObjectMethod(params, m_get_jsb_so_path);
+    if (j_get_jsb_so_path != nullptr) {
+      SoUtils::set_jsb_so_path(const_cast<char*>(
+                                    env->GetStringUTFChars((jstring)(j_get_jsb_so_path), nullptr)));
+      LOGE("g_jsbSoPath is %s ", SoUtils::jsb_so_path());
+      env->DeleteLocalRef(j_get_jsb_so_path);
+    }
+  }
+
 
   jmethodID m_get_lib_ld_path =
           env->GetMethodID(c_params, "getLibLdPath", "()Ljava/lang/String;");

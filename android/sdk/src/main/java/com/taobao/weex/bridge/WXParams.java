@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.bridge;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -47,6 +48,7 @@ public class WXParams implements Serializable {
   private String libJscPath;
   private String libIcuPath;
   private String libLdPath;
+  private String libJsbPath;
 
   private Map<String, String> options;
 
@@ -214,6 +216,16 @@ public class WXParams implements Serializable {
   }
 
   @CalledByNative
+  public String getLibJsbPath() {
+    WXLogUtils.e("getLibJsbPath is running " + libJsbPath);
+    return libJsbPath;
+  }
+
+  public void setLibJsbPath(String libJsbPath) {
+    this.libJsbPath = libJsbPath;
+  }
+
+  @CalledByNative
   public String getLibJscPath() {
     WXLogUtils.e("getLibJscPath is running " + libJscPath);
     return libJscPath;
@@ -244,6 +256,11 @@ public class WXParams implements Serializable {
     this.libLdPath = libLdPath;
   }
 
+  @CalledByNative
+  public String getUseRunTimeApi() {
+    return String.valueOf(WXEnvironment.sUseRunTimeApi);
+  }
+
   public Map<String, Object> toMap() {
     HashMap<String, Object> map  = new HashMap<>();
     map.put("appName", appName);
@@ -266,6 +283,8 @@ public class WXParams implements Serializable {
     map.put("libIcuPath", libIcuPath);
     map.put("libLdPath", libLdPath);
     map.put("options", options);
+    map.put("useRunTimeApi",WXEnvironment.sUseRunTimeApi);
+    map.put("__enable_native_promise__",!WXEnvironment.sUseRunTimeApi);
     return map;
   }
 }

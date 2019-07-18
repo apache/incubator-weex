@@ -52,6 +52,7 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.common.WXWorkThreadManager;
+import com.taobao.weex.font.FontAdapter;
 import com.taobao.weex.performance.IApmGenerator;
 import com.taobao.weex.performance.IWXAnalyzer;
 import com.taobao.weex.ui.WXRenderManager;
@@ -63,6 +64,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -118,7 +120,7 @@ public class WXSDKManager {
     mWXRenderManager = renderManager;
     mBridgeManager = WXBridgeManager.getInstance();
     mWXWorkThreadManager = new WXWorkThreadManager();
-    mWXAnalyzerList = new ArrayList<>();
+    mWXAnalyzerList = new CopyOnWriteArrayList<>();
     mAllInstanceMap = new HashMap<>();
   }
 
@@ -520,5 +522,19 @@ public class WXSDKManager {
 
   public void setNavigator(INavigator mNavigator) {
     this.mNavigator = mNavigator;
+  }
+
+
+  private FontAdapter mFontAdapter;
+
+  public FontAdapter getFontAdapter(){
+      if(mFontAdapter == null){
+        synchronized (this){
+          if(mFontAdapter == null){
+              mFontAdapter = new FontAdapter();
+          }
+        }
+      }
+      return mFontAdapter;
   }
 }

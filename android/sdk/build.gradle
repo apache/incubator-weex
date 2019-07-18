@@ -18,6 +18,7 @@
  */
  plugins {
      id "com.github.hierynomus.license" version "0.14.0"
+     id 'com.jfrog.artifactory' version '4.9.7'
  }
 
 apply plugin: 'com.android.library'
@@ -47,30 +48,29 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : "0.20.0.1"
+version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : '0.26.0.1'
 
 //Check version, the version must have 4 sections. The leading three section must be number, and the last section is odd number with or without suffix string.
 if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVersionCheck').equals("true")) {
-    assert version.tokenize('.').eachWithIndex { it, i ->
+    version.tokenize('.').eachWithIndex { it, i ->
         if (i < 3) {
-            assert it.isNumber()
+            assert it.isNumber() : "Please use semantic versioning witch 4 sections, you are using ${${i} + 1} section instead."
         } else if (i == 3) {
-            it.split("-|_").toList().eachWithIndex { inner_it, inner_i ->
+            it.split("[-_]").toList().eachWithIndex { inner_it, inner_i ->
                 if (inner_i == 0) {
-                    assert inner_it.isNumber() && inner_it.toInteger() % 2
+                    assert inner_it.isNumber() && inner_it.toInteger() % 2 : "The 4th dight in the versioning number must be a odd number, and it is ${inner_it} currently."
                 } else {
-                    assert !inner_it.isNumber()
+                    assert !inner_it.isNumber() : "The suffix of the versioning number is not allowed to contain any number, and it is ${inner_it} currently."
                 }
             }.size == 4
         } else {
-            assert false: "Please use semantic versioning witch 4 sections, you are using ${$ { i } + 1} section instead"
+            assert false: "Please use semantic versioning witch 4 sections, you are using ${${i} + 1} section instead."
         }
-    }.size == 4
+    }
 }
 
 android {
     compileSdkVersion project.compileSdkVersion
-//    buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
     useLibrary 'org.apache.http.legacy'
     if(project.hasProperty('removeSharedLib') && "true".equals(project.getProperty('removeSharedLib'))) {
@@ -112,10 +112,12 @@ android {
     if (ndkversion < 16) {
         api_level = "android-14";
     } else {
-        api_level = "android-21";
+        api_level = "android-16";
     }
 
     def android_project_dir = projectDir
+
+    def buildRuntimeApi = project.hasProperty('buildRuntimeApi') ? project.property('buildRuntimeApi') : true
 
     defaultConfig {
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
@@ -128,7 +130,17 @@ android {
         versionCode 1
         versionName project.version
         ndk {
-            abiFilters "arm64-v8a", "armeabi-v7a", "x86"
+            if(!project.hasProperty('supportArmeabi-v7a') || "false" != project.getProperty('supportArmeabi-v7a')){
+                abiFilters 'armeabi-v7a'
+            }
+
+            if(!project.hasProperty('supportArm64-v8a') || "false" != project.getProperty('supportArm64-v8a')){
+                abiFilters 'arm64-v8a'
+            }
+
+            if(!project.hasProperty('supportX86') || "false" != project.getProperty('supportX86')){
+                abiFilters 'x86'
+            }
         }
         externalNativeBuild {
             cmake {
@@ -137,7 +149,8 @@ android {
                         '-DANDROID_STL=' + "${cxx_stl}",
                         '-DCMAKE_BUILD_TYPE=Release',
                         '-DANDROID_PROJECT_DIR=' + "${android_project_dir}",
-                        '-DENABLE_ASAN=false'
+                        '-DENABLE_ASAN=false',
+                        '-DBUILD_RUNTIME_API='+"${buildRuntimeApi}"
             }
         }
     }
@@ -218,34 +231,35 @@ dependencies {
     testImplementation 'org.json:json:20160212'
 }
 
- if(file('../license/LICENSE').exists()){
-     license {
-         header = file('../license/LICENSE')
-         mapping('cpp','JAVADOC_STYLE')
-         mapping('h','JAVADOC_STYLE')
-         excludes(['com/taobao/weex/utils/WXDataStructureUtil.java'])
-     }
+if(file('../license/LICENSE').exists()){
+    license {
+        header = file('../license/LICENSE')
+        mapping('cpp','JAVADOC_STYLE')
+        mapping('h','JAVADOC_STYLE')
+        excludes(['com/taobao/weex/utils/WXDataStructureUtil.java'])
+    }
 
-     task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
-         source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc', '**/*.c']).
-                 exclude(['Source/rapidjson/**/*.h','Source/rapidjson/**/*.cpp',
-                          'Source/android/base/base64/**/*.h','Source/android/base/base64/**/*.cpp',
-                          'Source/android/jniprebuild/jniheader/*.h',
-                          'Source/base/Compatible.cpp',
-                          'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
-                          'Source/base/third_party/icu/*.h',
-                          'Source/base/third_party/icu/*.cpp',
-                          'Source/android/jsengine/dependence/**/*.h',
-                          'Source/android/jsengine/dependence/**/*.cpp',
-                          'Source/include/wtf/**/*.h',
-                          'Source/include/wtf/**/*.c',
-                          'Source/include/wtf/**/*.cpp',
-                          'Source/include/JavaScriptCore/**/*.h',
-                          'Source/include/JavaScriptCore/**/*.c',
-                          'Source/include/JavaScriptCore/**/*.cpp'])
-     }
-     preBuild.dependsOn licenseFormat
- }
+    task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
+        source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc', '**/*.c']).
+                exclude(['Source/rapidjson/**/*.h','Source/rapidjson/**/*.cpp',
+                         'Source/android/jniprebuild/jniheader/*.h',
+                         'Source/base/Compatible.cpp',
+                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
+                         'Source/base/base64/modp_base64/**/*.h',
+                         'Source/base/base64/modp_base64/**/*.cc',
+                         'Source/base/third_party/icu/*.h',
+                         'Source/base/third_party/icu/*.cpp',
+                         'Source/android/jsengine/dependence/**/*.h',
+                         'Source/android/jsengine/dependence/**/*.cpp',
+                         'Source/include/wtf/**/*.h',
+                         'Source/include/wtf/**/*.c',
+                         'Source/include/wtf/**/*.cpp',
+                         'Source/include/JavaScriptCore/**/*.h',
+                         'Source/include/JavaScriptCore/**/*.c',
+                         'Source/include/JavaScriptCore/**/*.cpp'])
+    }
+    preBuild.dependsOn licenseFormat
+}
 
 task checkNdkVersion() {
     def rootDir = project.rootDir
@@ -328,6 +342,21 @@ bintray {
         }
     }
 }
+artifactory {
+    contextUrl = 'http://oss.jfrog.org/artifactory'
+    publish {
+        repository {
+            repoKey = 'oss-snapshot-local'
+            username = bintray.user
+            password = bintray.key
+            maven = true
+        }
+        defaults {
+            publishConfigs('archives')
+        }
+    }
+}
+
 
 afterEvaluate { project ->
     transformNativeLibsWithStripDebugSymbolForRelease << {

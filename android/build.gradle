@@ -1,7 +1,7 @@
 
 buildscript {
     repositories {
-        mavenLocal()
+        google()
         maven(){
             url 'https://maven.aliyun.com/repository/google'
         }
@@ -14,11 +14,6 @@ buildscript {
     }
 }
 
-plugins {
-    id "de.undercouch.download" version "3.2.0"
-//    id "com.github.dcendents.android-maven" version "1.5"
-}
-
 subprojects {
     if(project.hasProperty('external_script')){
         for(item in external_script.split()) {
@@ -26,12 +21,12 @@ subprojects {
         }
     }
     repositories {
-        mavenLocal()
         if(project.hasProperty('external_repositories')){
             maven {
                 url external_repositories
             }
         }
+        google()
         maven(){
             url 'https://maven.aliyun.com/repository/google'
         }
@@ -45,7 +40,7 @@ subprojects {
             classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         }
         repositories {
-            mavenLocal()
+            google()
             maven(){
                 url 'https://maven.aliyun.com/repository/google'
             }
@@ -54,18 +49,16 @@ subprojects {
             }
         }
     }
-    ext {
-        compileSdkVersion=26
-        buildToolsVersion="26.0.3"
-        minSdkVersion=14
-        targetSdkVersion=26
-        supportLibVersion="26.0.2"
-        fastjsonLibVersion="1.1.46.android"
-        //Default value for buildCpp is true
-        buildCpp = !project.hasProperty("buildCpp") || buildCpp.equals("true")
-        //Default value for disableCov is false
-        disableCov = project.hasProperty("disableCov") && disableCov.equals("true")
-    }
+}
+ext {
+    compileSdkVersion=26
+    minSdkVersion=14
+    targetSdkVersion=26
+    supportLibVersion="26.0.2"
+    fastjsonLibVersion="1.1.70.android"
+    //Default value for disableCov is false
+    disableCov = project.hasProperty("disableCov") && disableCov.equals("true")
+    implementFromWeex = true
 }
 
 //task clean(type: Delete) {

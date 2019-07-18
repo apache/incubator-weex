@@ -78,6 +78,10 @@ namespace WeexCore {
     }
   }
 
+  const std::map<std::string, std::string>& WXCoreEnvironment::options() {
+      return mOptions;
+  }
+
   void WXCoreEnvironment::AddOption(std::string key, std::string value) {
     mOptions.insert(std::pair<std::string, std::string>(key, value));
     if (key == "switchInteractionLog") {
@@ -95,5 +99,13 @@ namespace WeexCore {
     }else{
       it->second = value;
     }
+  }
+
+  void WXCoreEnvironment::setUseRunTimeApi(bool useRuntimeApi) {
+    this->mUseRuntimeApi = useRuntimeApi;
+  }
+
+  bool WXCoreEnvironment::isUseRunTimeApi(){
+    return mUseRuntimeApi;
   }
 }

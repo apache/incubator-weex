@@ -24,7 +24,11 @@
 #define WEEXV8_SCRIPT_SIDE_IN_QUEUE_H
 
 #include "core/bridge/script_bridge.h"
+#ifdef USE_JS_RUNTIME
+#include "js_runtime/weex/task/weex_task_queue.h"
+#else
 #include "android/jsengine/task/weex_task_queue.h"
+#endif
 
 namespace weex {
     namespace bridge {

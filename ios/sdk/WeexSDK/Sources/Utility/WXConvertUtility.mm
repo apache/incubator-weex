@@ -23,7 +23,7 @@
 #include <vector>
 #include <string>
 
-NSString* const JSONSTRING_SUFFIX = @"\t\n\t\r";
+static NSString* const JSONSTRING_SUFFIX = @"\t\n\t\r";
 
 #if 0
 
