@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { schedule, danger, fail, warn, message, markdown } from "danger";
+// Removed import
 import fs from "fs";
 import path from 'path';
 import GitHubApi from 'github';
@@ -48,8 +48,8 @@ function check(file_type){
     has_file_type = false;
     if (!has_file_type && danger.git.created_files) {
         danger.git.created_files.some(file => {
-            var f = checkFileType(file)
-            if(getFileType(file)==file_type){
+            var f = (getFileType(file)==file_type)
+            if(f){
                 has_file_type =f;
             }
             return f;
@@ -58,8 +58,8 @@ function check(file_type){
 
     if (!has_file_type && danger.git.modified_files) {
         danger.git.created_files.some(file => {
-            var f = checkFileType(file)
-            if(getFileType(file)==file_type){
+            var f = (getFileType(file)==file_type)
+            if(f){
                 has_file_type =f;
             }
             return f;
@@ -68,8 +68,8 @@ function check(file_type){
 
     if (!has_file_type && danger.git.deleted_files) {
         danger.git.created_files.some(file => {
-            var f = checkFileType(file)
-            if(getFileType(file)==file_type){
+            var f = (getFileType(file)==file_type)
+            if(f){
                 has_file_type =f;
             }
             return f;
