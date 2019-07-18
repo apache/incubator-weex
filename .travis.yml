@@ -32,7 +32,7 @@ matrix:
           components:
             - android-26
             - extra-android-m2repository
-      - env: STATIC_CODE_ANALYSIS=true
+      - env: STATIC_CODE_ANALYSIS=true CHECK_C=true
         language: objective-c
         osx_image: xcode7.2
 cache:
@@ -128,7 +128,7 @@ script:
         ;;
     esac
 
-    if [[ "${STATIC_CODE_ANALYSIS}" = "true" ]]; then
+    if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_C}" = "true") ]]; then
       hasCFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
       echo "The value of hasIosFile is ${hasIosFile}"
       if [[ "$hasCFile" =~ "hasCFile" ]]; then
