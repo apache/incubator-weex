@@ -183,6 +183,10 @@ namespace weex {
             WeexConversionUtils::GetStringFromArgsDefaultUndefined(vars, 1, cid);
             bool succeed = WeexConversionUtils::GetCharOrJsonFromArgs(vars, 2, json_data);
             const char *json_data_char = succeed ? json_data.c_str() : nullptr;
+            if(json_data_char == nullptr){
+                nativeObject->js_bridge()->core_side()->ReportException(page_id.c_str(),"updateComponentData","parse json failed");
+                return unicorn::RuntimeValues::MakeUndefined();
+            }
 
             LOG_WEEX_BINDING("WeexGlobalBinding method :__updateComponentData page:%s, cid:%s,json_data:%s",
                              page_id.c_str(), cid.c_str(), json_data_char
