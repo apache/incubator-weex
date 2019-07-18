@@ -82,6 +82,10 @@ install:
         ;;
     esac
 
+    if [[ "${STATIC_CODE_ANALYSIS}" = "true" ]]; then
+      npm install
+    fi
+
 script:
   - |
     case $TEST_SUITE in
@@ -119,28 +123,32 @@ script:
         hasIosFile=$(npm run danger -- run --dangerfile ./dangerfile-ios.js)
         echo "The value of hasIosFile is ${hasIosFile}"
         if [[ "$hasIosFile" =~ "hasIosFile" ]]; then
-          xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6"
+          xcodebuild -workspace WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6"
         fi
         ;;
     esac
 
     if [[ "${STATIC_CODE_ANALYSIS}" = "true" ]]; then
-      cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
-      oclint-json-compilation-database oclint_args -- \
-        -disable-rule=ShortVariableName \
-        -disable-rule=LongLine \
-        -disable-rule=LongMethod \
-        -disable-rule=HighNcssMethod \
-        -disable-rule=LongVariableName \
-        -disable-rule=HighCyclomaticComplexity \
-        -disable-rule=HighNPathComplexity \
-        -disable-rule=UnusedLocalVariable \
-        -disable-rule=DoubleNegative \
-        -disable-rule=MultipleUnaryOperator \
-        -disable-rule=DeepNestedBlock \
-        -max-priority-1=15000 \
-        -max-priority-2=15000 \
-        -max-priority-3=15000
+      hasCFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
+      echo "The value of hasIosFile is ${hasIosFile}"
+      if [[ "$hasCFile" =~ "hasCFile" ]]; then
+        cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
+        oclint-json-compilation-database oclint_args -- \
+          -disable-rule=ShortVariableName \
+          -disable-rule=LongLine \
+          -disable-rule=LongMethod \
+          -disable-rule=HighNcssMethod \
+          -disable-rule=LongVariableName \
+          -disable-rule=HighCyclomaticComplexity \
+          -disable-rule=HighNPathComplexity \
+          -disable-rule=UnusedLocalVariable \
+          -disable-rule=DoubleNegative \
+          -disable-rule=MultipleUnaryOperator \
+          -disable-rule=DeepNestedBlock \
+          -max-priority-1=15000 \
+          -max-priority-2=15000 \
+          -max-priority-3=15000
+      fi
     fi 
 notifications:
   webhooks:
