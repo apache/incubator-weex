@@ -607,12 +607,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
     UIFontDescriptor *fontD = font.fontDescriptor;
     UIFontDescriptorSymbolicTraits traits = 0;
     
-    if (WX_SYS_VERSION_LESS_THAN(@"8.2")) {
-        traits = ((textWeight-0.4) >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
-    }else {
-        traits = (textWeight-UIFontWeightBold >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
-    }
-    
+    traits = (textWeight-UIFontWeightBold >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
     if (textStyle == WXTextStyleItalic || traits != 0) {
         if (traits != 0) {
             fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
