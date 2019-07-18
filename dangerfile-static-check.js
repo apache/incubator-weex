@@ -83,13 +83,14 @@ hasCFile = check(type_c)
 hasAndroidFile = check(type_android)
 hasJsFile = check(type_js)
 
+var output_str = ""
 if(hasCFile){
-    console.log('hasIosFile');
+    output_str += 'hasCFile\n'
 }
 if(hasAndroidFile){
-    console.log('hasAndroidFile');
+    output_str += 'hasAndroidFile\n'
 }
 if(hasJsFile){
-    console.log('hasJsFile');
+    output_str += 'hasJsFile\n'
 }
-
+console.log(output_str)
