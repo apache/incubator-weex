@@ -123,14 +123,14 @@ script:
         hasIosFile=$(npm run danger -- run --dangerfile ./dangerfile-ios.js)
         echo "The value of hasIosFile is ${hasIosFile}"
         if [[ "$hasIosFile" =~ "hasIosFile" ]]; then
-          xcodebuild -workspace WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6"
+          xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6"
         fi
         ;;
     esac
 
     if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_C}" = "true") ]]; then
       hasCFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
-      echo "The value of hasIosFile is ${hasIosFile}"
+      echo "The value of hasCFile is ${hasCFile}"
       if [[ "$hasCFile" =~ "hasCFile" ]]; then
         cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
         oclint-json-compilation-database oclint_args -- \
