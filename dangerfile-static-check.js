@@ -29,11 +29,11 @@ const type_android = 2;
 const type_js = 3;
 
 const getFileType = file => {
-  if (file.match(/\.(m|h|mm|cpp|cc)/)) {
+  if (file.match(/.+\.(m|h|mm|cpp|cc)/)) {
     return type_c;
-  } else if (file.match(/\.java/)) {
+  } else if (file.match(/.+\.java/)) {
     return type_android;
-  } else if (file.match(/\.js/)) {
+  } else if (file.match(/.+\.js/)) {
     return type_js;
   }else{
     return type_unknown;
