@@ -45,7 +45,7 @@ var hasAndroidFile = false;
 var hasJsFile = false;
 
 function check(file_type){
-    has_file_type = false;
+    var has_file_type = false;
     if (!has_file_type && danger.git.created_files) {
         danger.git.created_files.some(file => {
             var f = (getFileType(file)==file_type)
