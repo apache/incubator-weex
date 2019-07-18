@@ -182,7 +182,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private static final int CRASHREINIT = 50;
   static volatile WXBridgeManager mBridgeManager;
   private static long LOW_MEM_VALUE = 120;
-  private volatile static int reInitCount = 1;
+  public volatile static int reInitCount = 1;
   private static String crashUrl = null;
   private static long lastCrashTime = 0;
 
@@ -357,6 +357,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   private void setJSFrameworkInit(boolean init) {
     mInit = init;
+    WXStateRecord.getInstance().recoreJsfmInitHistory("setJsfmInitFlag:"+init);
     if (init == true) {
       onJsFrameWorkInitSuccees();
     }
@@ -615,8 +616,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    WXStateRecord.getInstance().recordAction(instanceId,"callNativeModule:"+module+"."+method);
-
     if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
       mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
               .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
@@ -728,11 +727,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 dom.callDomMethod(task, parseNanos);
               } else {
                 JSONObject optionObj = task.getJSONObject(OPTIONS);
+                WXStateRecord.getInstance().recordAction(instanceId,"callModuleMethod:"+instanceId+","+module+","+task.get(METHOD));
                 callModuleMethod(instanceId, (String) module,
                         (String) task.get(METHOD), (JSONArray) task.get(ARGS), optionObj);
               }
             } else if (task.get(COMPONENT) != null) {
               WXDomModule dom = WXModuleManager.getDomModule(instanceId);
+              WXStateRecord.getInstance().recordAction(instanceId,"callDomMethod:"+instanceId+","+task.get(METHOD));
               dom.invokeMethod((String) task.get(REF), (String) task.get(METHOD), (JSONArray) task.get(ARGS));
             } else {
               throw new IllegalArgumentException("unknown callNative");
@@ -1477,6 +1478,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg() +
                       " instanceId==" + instanceId + " template ==" + template + " mJSHandler== " + mJSHandler.toString()
       );
+
+      instance.getApmForInstance().onStage("createInstance failed return; "+TextUtils.isEmpty(instanceId)+ ","+template.isEmpty()+","+(mJSHandler ==null));
       return;
     }
 
@@ -1485,6 +1488,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
               WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg() +
                       " isJSFrameworkInit==" + isJSFrameworkInit() + " reInitCount == 1" );
+      instance.getApmForInstance().onStage("createInstance failed jsfm isn't init return;");
       post(new Runnable() {
         @Override
         public void run() {
@@ -1499,6 +1503,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     post(new Runnable() {
       @Override
       public void run() {
+        instance.getApmForInstance().onStage("wxLoadBundleStartOnJsThread");
         long start = System.currentTimeMillis();
         mWXBridge.setPageArgument(instanceId, "renderTimeOrigin", String.valueOf(instance.getWXPerformance().renderTimeOrigin));
         mWXBridge.setInstanceRenderType(instance.getInstanceId(), instance.getRenderType());
@@ -1527,6 +1532,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg()
         );
         WXLogUtils.e(err);
+        instance.getApmForInstance().onStage("framework.js uninitialized and return");
         return;
       }
 
@@ -1646,6 +1652,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         // if { "framework": "Vue" } or  { "framework": "Rax" } will use invokeCreateInstanceContext
         // others will use invokeExecJS
         if (!isSandBoxContext) {
+          instance.getApmForInstance().onStage("!isSandBoxContext,and excute");
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           return;
         }
@@ -1653,6 +1660,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY
                 || instance.getRenderStrategy() == WXRenderStrategy.JSON_RENDER) {
+          instance.getApmForInstance().onStage("wxBeforeInvokeCreateInstanceContext");
           int ret = invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
           instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
           if(ret == 0) {
@@ -1672,7 +1680,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           //      WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE.getErrorMsg(),
           //      null
           //);
-
+          instance.getApmForInstance().onStage("StartInvokeExecJSBadBundleType");
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
           return;
@@ -1680,6 +1688,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       } catch (Throwable e) {
         String err = "[WXBridgeManager] invokeCreateInstance " + e.getCause()
                 + instance.getTemplateInfo();
+        instance.getApmForInstance().onStage("createInstance error :"+e.toString());
 
         instance.onRenderError(
                 WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
@@ -3120,6 +3129,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       long start = System.currentTimeMillis();
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
+        instance.getApmForInstance().onStage("callCreateFinish");
         instance.firstScreenCreateInstanceTime(start);
         GraphicActionCreateFinish action = new GraphicActionCreateFinish(instance);
         WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
@@ -3157,6 +3167,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     try {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
+        instance.getApmForInstance().onStage("callRenderSuccess");
         GraphicActionRenderSuccess action = new GraphicActionRenderSuccess(instance);
         WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(instanceId, action);
       }
