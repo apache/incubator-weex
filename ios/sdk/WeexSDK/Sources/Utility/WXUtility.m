@@ -607,10 +607,15 @@ CGFloat WXFloorPixelValue(CGFloat value)
     UIFontDescriptor *fontD = font.fontDescriptor;
     UIFontDescriptorSymbolicTraits traits = 0;
     
-    traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
     traits = (textWeight-UIFontWeightBold >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
-    if (traits != 0) {
-        fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
+    if (textStyle == WXTextStyleItalic || traits != 0) {
+        if (traits != 0) {
+            fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
+        }
+        if (textStyle == WXTextStyleItalic) {
+            CGAffineTransform matrix = CGAffineTransformMake(1, 0, tanf(16 * (CGFloat)M_PI / 180), 1, 0, 0);
+            fontD = [fontD fontDescriptorWithMatrix:matrix];
+        }
         UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];
         if (tempFont) {
             font = tempFont;
