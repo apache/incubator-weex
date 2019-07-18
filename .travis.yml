@@ -32,9 +32,20 @@ matrix:
           components:
             - android-26
             - extra-android-m2repository
+      
+      # static check
       - env: STATIC_CODE_ANALYSIS=true CHECK_C=true
         language: objective-c
         osx_image: xcode7.2
+      - env: STATIC_CODE_ANALYSIS=true CHECK_ANDROID=true
+        language: android
+        dist: trusty
+        jdk: oraclejdk8
+        android:
+          components:
+            - android-26
+            - extra-android-m2repository
+        
 cache:
   directories:
     - npm
@@ -56,8 +67,7 @@ before_install:
 
 install:
   - |
-    case $TEST_SUITE in
-      "android") 
+    if [[ ("$TEST_SUITE" = "android") || ("${CHECK_ANDROID}" = "true") ]]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
         nvm install 7.6
         npm install
@@ -76,14 +86,8 @@ install:
         export ANDROID_NDK_HOME=$HOME/android-ndk-r18b
         export PATH=$PATH:$ANDROID_NDK_HOME
         echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
-        ;;
-      "jsfm" | "danger" | "ios" )
+    elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") || ("$TEST_SUITE" = "ios") || ("${CHECK_C}" = "true") ]]; then
         npm install
-        ;;
-    esac
-
-    if [[ "${STATIC_CODE_ANALYSIS}" = "true" ]]; then
-      npm install
     fi
 
 script:
@@ -150,6 +154,15 @@ script:
           -max-priority-3=15000
       fi
     fi 
+
+    if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_ANDROID}" = "true") ]]; then
+      hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
+      echo "The value of hasAndroidFile is ${hasAndroidFile}"
+      if [[ "$hasCFile" =~ "hasCFile" ]]; then
+        ./gradlew clean assembleDebug test lint
+      fi
+    fi
+
 notifications:
   webhooks:
     on_pull_requests: false
