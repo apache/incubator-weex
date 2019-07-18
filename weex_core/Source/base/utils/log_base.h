@@ -36,6 +36,14 @@ class LogBase {
                    const char *file,
                    unsigned long line,
                    const char *log) = 0;
+
+  inline void setPrintLevel(WeexCore::LogLevel level) { this->printLevel = level; }
+
+  LogBase() : printLevel(WeexCore::LogLevel::Error) {};
+
+ public:
+  WeexCore::LogLevel printLevel = WeexCore::LogLevel::Error;
+  bool
 };
 
 class LogImplement {
@@ -59,14 +67,17 @@ class LogImplement {
     if (m_log == nullptr) {
       return false;
     }
+
+    if (!WeexCore::DebugMode && level < m_log->printLevel) {
+      return true;
+    }
+
     return m_log->log(level, tag, file, line, log);
   }
 
  private:
   weex::base::LogBase *m_log;
-  bool m_debug;
-
-  LogImplement() : m_log(nullptr), m_debug(false) {}
+  LogImplement() : m_log(nullptr) {}
 };
 }
 }

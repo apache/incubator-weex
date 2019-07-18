@@ -52,7 +52,7 @@ import java.util.Map;
  * Communication interface for Java code and JavaScript code.
  */
 
-public class WXBridge implements IWXBridge {
+    public class WXBridge implements IWXBridge {
 
   private native int nativeInitFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
 
@@ -123,7 +123,6 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeSetPageArgument(String instanceId, String key, String value);
 
-
   /**
    * Update Init Framework Params
    * */
@@ -135,12 +134,19 @@ public class WXBridge implements IWXBridge {
    * */
   public native void nativeUpdateGlobalConfig(String config);
 
+  private native void nativeSetLogType(int type, boolean isPerf);
+
   public static final boolean MULTIPROCESS = true;
 
 
   @Override
   public void updateInitFrameworkParams(String key, String value, String desc){
      nativeUpdateInitFrameworkParams(key, value, desc);
+  }
+
+  @Override
+  public void setLogType(int type, boolean isPerf) {
+    nativeSetLogType(type, isPerf);
   }
 
   @Override

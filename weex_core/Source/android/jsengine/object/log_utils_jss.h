@@ -35,11 +35,11 @@ class LogUtilsJSS : public weex::base::LogBase {
 
     // for performance, only send TLog & Msg to main process
 
-    if(level <= WeexCore::LogLevel::Error) {
-      return false;
+    if(level == WeexCore::LogLevel::Msg || level == WeexCore::LogLevel::Tlog) {
+      return WeexEnv::getEnv()->sendLog((int) level, tag, file, line, log);
     }
 
-    return WeexEnv::getEnv()->sendLog((int) level, tag, file, line, log);
+    return false;
   }
 };
 #endif //WEEX_PROJECT_LOG_UTILS_JSS_H

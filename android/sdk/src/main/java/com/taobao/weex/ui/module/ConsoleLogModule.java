@@ -48,6 +48,11 @@ public class ConsoleLogModule extends WXModule {
 
   }
 
+  @JSMethod(uiThread = false)
+  public void setPerfMode(@Nullable String on) {
+    WXEnvironment.isPerf = "true".equals(on);
+  }
+
   private @Nullable LogLevel getLogLevel(@Nullable String logLevel) {
     LogLevel logLevelEnum = null;
     if(!TextUtils.isEmpty(logLevel)){

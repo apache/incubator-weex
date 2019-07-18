@@ -1204,6 +1204,12 @@ static const JNINativeMethod kMethodsWXBridge[] = {
             "Ljava/lang/String;"
             ")"
             "V", reinterpret_cast<void*>(RemoveInstanceRenderType) },
+    { "setLogType",
+      "("
+      "I"
+      "Z"
+      ")"
+      "V", reinterpret_cast<void*>(setLogType) },
 };
 
 static bool RegisterNativesImpl(JNIEnv* env) {

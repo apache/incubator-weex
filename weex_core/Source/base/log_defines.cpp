@@ -29,6 +29,7 @@
 #include "core/manager/weex_core_manager.h"
 
 namespace WeexCore {
+
     bool DebugMode = false;
 
     struct LogFlattenHelper {
