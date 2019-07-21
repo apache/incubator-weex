@@ -53,7 +53,7 @@ function check(file_type) {
     }
 
     if (!has_file_type && danger.git.modified_files) {
-        danger.git.created_files.some(file => {
+        danger.git.modified_files.some(file => {
             var f = (getFileType(file) == file_type)
             if (f) {
                 has_file_type = f;
@@ -63,7 +63,7 @@ function check(file_type) {
     }
 
     if (!has_file_type && danger.git.deleted_files) {
-        danger.git.created_files.some(file => {
+        danger.git.deleted_files.some(file => {
             var f = (getFileType(file) == file_type)
             if (f) {
                 has_file_type = f;
