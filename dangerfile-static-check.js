@@ -26,15 +26,12 @@ import shell from "shelljs";
 const type_unknown = 0;
 const type_c = 1;
 const type_android = 2;
-const type_js = 3;
 
 const getFileType = file => {
   if (file.match(/.+\.(m|h|mm|cpp|cc)/)) {
     return type_c;
   } else if (file.match(/.+\.java/)) {
     return type_android;
-  } else if (file.match(/.+\.js/)) {
-    return type_js;
   }else{
     return type_unknown;
   }
@@ -42,7 +39,6 @@ const getFileType = file => {
 
 var hasCFile = false;
 var hasAndroidFile = false;
-var hasJsFile = false;
 
 function check(file_type){
     var has_file_type = false;
@@ -81,7 +77,6 @@ function check(file_type){
 
 hasCFile = check(type_c)
 hasAndroidFile = check(type_android)
-hasJsFile = check(type_js)
 
 var output_str = ""
 if(hasCFile){
@@ -89,8 +84,5 @@ if(hasCFile){
 }
 if(hasAndroidFile){
     output_str += 'hasAndroidFile\n'
-}
-if(hasJsFile){
-    output_str += 'hasJsFile\n'
 }
 console.log(output_str)
