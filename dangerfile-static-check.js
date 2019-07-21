@@ -28,25 +28,25 @@ const type_c = 1;
 const type_android = 2;
 
 const getFileType = file => {
-  if (file.match(/.+\.(m|h|mm|cpp|cc)/)) {
-    return type_c;
-  } else if (file.match(/.+\.java/)) {
-    return type_android;
-  }else{
-    return type_unknown;
-  }
+    if (file.match(/.+\.(m|h|mm|cpp|cc)/)) {
+        return type_c;
+    } else if (file.match(/.+\.java/)) {
+        return type_android;
+    } else {
+        return type_unknown;
+    }
 }
 
 var hasCFile = false;
 var hasAndroidFile = false;
 
-function check(file_type){
+function check(file_type) {
     var has_file_type = false;
     if (!has_file_type && danger.git.created_files) {
         danger.git.created_files.some(file => {
-            var f = (getFileType(file)==file_type)
-            if(f){
-                has_file_type =f;
+            var f = (getFileType(file) == file_type)
+            if (f) {
+                has_file_type = f;
             }
             return f;
         });
@@ -54,9 +54,9 @@ function check(file_type){
 
     if (!has_file_type && danger.git.modified_files) {
         danger.git.created_files.some(file => {
-            var f = (getFileType(file)==file_type)
-            if(f){
-                has_file_type =f;
+            var f = (getFileType(file) == file_type)
+            if (f) {
+                has_file_type = f;
             }
             return f;
         });
@@ -64,9 +64,9 @@ function check(file_type){
 
     if (!has_file_type && danger.git.deleted_files) {
         danger.git.created_files.some(file => {
-            var f = (getFileType(file)==file_type)
-            if(f){
-                has_file_type =f;
+            var f = (getFileType(file) == file_type)
+            if (f) {
+                has_file_type = f;
             }
             return f;
         });
@@ -79,10 +79,12 @@ hasCFile = check(type_c)
 hasAndroidFile = check(type_android)
 
 var output_str = ""
-if(hasCFile){
+if (hasCFile) {
     output_str += 'hasCFile\n'
 }
-if(hasAndroidFile){
+if (hasAndroidFile) {
     output_str += 'hasAndroidFile\n'
 }
 console.log(output_str)
+
+
