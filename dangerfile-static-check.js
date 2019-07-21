@@ -86,5 +86,3 @@ if (hasAndroidFile) {
     output_str += 'hasAndroidFile\n'
 }
 console.log(output_str)
-
-
