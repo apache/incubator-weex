@@ -176,7 +176,7 @@ script:
         # then run android lint
         echo "hasAndroidFile"
         cd android
-        ./gradlew clean assembleDebug test lint
+        ./gradlew lint
       fi
     fi
 
