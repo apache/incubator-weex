@@ -4,6 +4,9 @@ node_js: 7.6
 matrix:
     fast_finish: true
     include:
+      # format code using clang-format
+      - env: FORMAT_CODE=true
+        language: ruby
       - env: TEST_SUITE=danger 
       - env: TEST_SUITE=jsfm
       - env: TEST_SUITE=ios
@@ -44,10 +47,6 @@ matrix:
           components:
             - android-26
             - extra-android-m2repository
-      
-      # format code using clang-format
-      - env: FORMAT_CODE=true
-        language: ruby
         
 cache:
   directories:
