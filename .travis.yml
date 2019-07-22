@@ -97,9 +97,8 @@ install:
         npm install
         cd weex-playground/ios && pod install --repo-update
         cd ../../
-    # elif [[ ("${FORMAT_CODE}" = "true" )]]; then
-    #     # gem install bundler
-    #     bundle install
+    elif [[ ("${FORMAT_CODE}" = "true" )]]; then
+        bundle install
     fi
 
 script:
