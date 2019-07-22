@@ -300,8 +300,6 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   WXBridge::Instance()->Reset(env, object);
   // Init platform thread --- ScriptThread
   WeexCoreManager::Instance()->InitScriptThread();
-  weex::base::LogImplement::getLog()->setLogImplement(new LogUtilsWeexCore());
-  WeexCoreManager::Instance()->set_log_bridge(new LogUtils());
   // Exception handler for so
   SoUtils::RegisterExceptionHanler(
       [](const char* status_code, const char* error_msg) {

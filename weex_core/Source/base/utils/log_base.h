@@ -37,13 +37,12 @@ class LogBase {
                    unsigned long line,
                    const char *log) = 0;
 
-  inline void setPrintLevel(WeexCore::LogLevel level) { this->printLevel = level; }
-
-  LogBase() : printLevel(WeexCore::LogLevel::Error) {};
+  LogBase() : printLevel(WeexCore::LogLevel::Error), m_debugMode(false), m_perfMode(false) {};
 
  public:
   WeexCore::LogLevel printLevel = WeexCore::LogLevel::Error;
-  bool
+  bool m_perfMode = false;
+  bool m_debugMode = false;
 };
 
 class LogImplement {
@@ -59,6 +58,28 @@ class LogImplement {
     m_log = logVirtual;
   }
 
+  inline void setPrintLevel(WeexCore::LogLevel level) {
+    if (m_log)
+      m_log->printLevel = level;
+  }
+
+  inline void setDebugMode(bool debugFlag) {
+    if (m_log)
+      m_log->m_debugMode = debugFlag;
+  }
+
+  inline bool debugMode() {
+    if(m_log)
+      return m_log->m_debugMode;
+
+    return false;
+  }
+
+  inline void setPerfMode(bool perfFlag) {
+    if (m_log)
+      m_log->m_perfMode = perfFlag;
+  }
+
   bool log(WeexCore::LogLevel level,
            const char *tag,
            const char *file,
@@ -68,7 +89,7 @@ class LogImplement {
       return false;
     }
 
-    if (!WeexCore::DebugMode && level < m_log->printLevel) {
+    if (!m_log->m_debugMode && level < m_log->printLevel) {
       return true;
     }
 

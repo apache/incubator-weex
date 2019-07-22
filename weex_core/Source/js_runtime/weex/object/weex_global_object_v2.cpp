@@ -20,6 +20,7 @@
 // Created by chenpeihan on 2019/2/22.
 //
 
+#include "base/utils/log_base.h"
 #include "core/bridge/script_bridge.h"
 #include "js_runtime/weex/utils/weex_jsc_utils.h"
 #include "core/bridge/script_bridge.h"
@@ -131,7 +132,7 @@ WeexGlobalObjectV2::initWxEnvironment(std::vector<INIT_FRAMEWORK_PARAMS *> &para
         // add for debug mode
         if (std::string("debugMode") == type && std::string("true") == value) {
            // Weex::LogUtil::setDebugMode(true);
-            WeexCore::DebugMode = true;
+            weex::base::LogImplement::getLog()->setDebugMode(true);
             LOGE("jss use %s","runtime");
         }
         // --------------------------------------------------------

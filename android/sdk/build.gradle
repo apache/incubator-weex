@@ -274,10 +274,10 @@ task checkNdkVersion() {
         ndkDir = properties.getProperty('ndk.dir')
     }
 
-    if(null == ndkDir){
-        def errMsg ='please set ndk.dir path in project/local.properties and ndk-16 supported only,example: ndk.dir=/Users/xxx/Library/Android/sdk/ndk-bundle-r16'
-        throw new StopActionException(errMsg)
-    }
+//    if(null == ndkDir){
+//        def errMsg ='please set ndk.dir path in project/local.properties and ndk-16 supported only,example: ndk.dir=/Users/xxx/Library/Android/sdk/ndk-bundle-r16'
+//        throw new StopActionException(errMsg)
+//    }
 }
 
 preBuild.dependsOn checkNdkVersion

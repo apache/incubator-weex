@@ -43,12 +43,6 @@ class WeexCoreManager {
   inline void set_platform_bridge(PlatformBridge *bridge) {
     platform_bridge_ = bridge;
   }
-    
-  inline LogBridge *get_log_bridge() { return log_bridge_; }
-
-  inline void set_log_bridge(LogBridge *bridge) {
-    log_bridge_ = bridge;
-  }
 
   inline ScriptBridge *script_bridge() { return script_bridge_; }
 
@@ -80,14 +74,12 @@ class WeexCoreManager {
  private:
   PlatformBridge *platform_bridge_;
   MeasureFunctionAdapter *measure_function_adapter_;
-  LogBridge *log_bridge_;
   ScriptBridge *script_bridge_;
   ProjectMode project_mode_;
   weex::base::Thread *script_thread_;
 
   WeexCoreManager()
       : platform_bridge_(nullptr),
-        log_bridge_(nullptr),
         measure_function_adapter_(nullptr),
         script_bridge_(nullptr),
         project_mode_(COMMON),

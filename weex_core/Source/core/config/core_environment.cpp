@@ -22,6 +22,7 @@
 
 #include "base/core_constants.h"
 #include "base/log_defines.h"
+#include "base/utils/log_base.h"
 #include "core/common/view_utils.h"
 
 namespace WeexCore {
@@ -87,7 +88,7 @@ namespace WeexCore {
     if (key == "switchInteractionLog") {
       mInteractionLogSwitch = "true" == value;
     } else if(key == "debugMode" && value == "true"){
-      WeexCore::DebugMode = true;
+      weex::base::LogImplement::getLog()->setDebugMode(true);
     }
   }
 
