@@ -170,13 +170,14 @@ script:
       echo "The value of hasAndroidFile is ${hasAndroidFile}"
       if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
         # format code using google-java-format at first
-        for n in `find ./android -name "*.java"`; do
-          java -jar ./format-tool/google-java-format-1.7-all-deps.jar --replace $n
-        done
+        # for n in `find ./android -name "*.java"`; do
+        #   java -jar ./format-tool/google-java-format-1.7-all-deps.jar --replace $n
+        # done
         # then run android lint
-        echo "hasAndroidFile"
+        # echo "hasAndroidFile"
+        echo "run android lint"
         cd android
-        ./gradlew clean assembleDebug test lint
+        ./gradlew lint
       fi
     fi
 
