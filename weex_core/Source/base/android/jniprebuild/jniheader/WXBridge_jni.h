@@ -198,6 +198,9 @@ static void SetInstanceRenderType(JNIEnv* env, jobject jcaller,
 static void RemoveInstanceRenderType(JNIEnv* env, jobject jcaller,
                                      jstring instanceId);
 
+static void SetViewPortWidth(JNIEnv* env, jobject jcaller,
+                             jstring instanceId,jfloat viewPortWidth);
+
 static void SetPageArgument(JNIEnv* env, jobject jcaller,
                             jstring instanceId,
                             jstring key,
@@ -1204,6 +1207,12 @@ static const JNINativeMethod kMethodsWXBridge[] = {
             "Ljava/lang/String;"
             ")"
             "V", reinterpret_cast<void*>(RemoveInstanceRenderType) },
+    { "nativeSetViewPortWidth",
+            "("
+            "Ljava/lang/String;"
+            "F"
+            ")"
+            "V", reinterpret_cast<void*>(SetViewPortWidth)},
 };
 
 static bool RegisterNativesImpl(JNIEnv* env) {
