@@ -141,8 +141,6 @@ typedef enum : NSUInteger {
         _performance = [[WXPerformance alloc] init];
         _apmInstance = [[WXApmForInstance alloc] init];
         
-        [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
-        
         _defaultDataRender = NO;
         
         _useBackupJsThread = NO;
@@ -391,6 +389,8 @@ typedef enum : NSUInteger {
     //some case , with out render (url)
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
+    
+    [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
     if (self.dataRender) {
         [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"eagle"];
     }
@@ -477,6 +477,8 @@ typedef enum : NSUInteger {
     [self _checkPageName];
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
+    
+    [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
     if (self.dataRender) {
         [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"eagle"];
     }
