@@ -499,10 +499,15 @@ do {\
     }
     
     // set font
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
-    CTFontRef ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName,
-                                           font.pointSize,
-                                           NULL);
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:WXTextStyleNormal fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
+    CTFontRef ctFont;
+    
+    if (_fontStyle == WXTextStyleItalic) {
+        CGAffineTransform matrix = CGAffineTransformMake(1, 0, tanf(16 * (CGFloat)M_PI / 180), 1, 0, 0);
+        ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName, font.pointSize, &matrix);
+    }else {
+        ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName, font.pointSize, NULL);
+    }
     
     _fontAscender = font.ascender;
     _fontDescender = font.descender;
@@ -870,6 +875,12 @@ do {\
                 lineOrigin.y += [baselineOffset doubleValue];
             }
         }
+        //To properly draw the glyphs in a run, the fields tx and ty of the CGAffineTransform returned by CTRunGetTextMatrix should be set to the current text position.
+        CGAffineTransform transform = CTRunGetTextMatrix(run);
+        transform.tx = lineOrigin.x;
+        transform.ty = lineOrigin.y;
+        CGContextSetTextMatrix(context, transform);
+        
         CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
         CTRunDraw(run, context, CFRangeMake(0, 0));
         CFIndex glyphCount = CTRunGetGlyphCount(run);

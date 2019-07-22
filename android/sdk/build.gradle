@@ -117,7 +117,7 @@ android {
 
     def android_project_dir = projectDir
 
-    def buildRuntimeApi = project.hasProperty('buildRuntimeApi') ? project.property('buildRuntimeApi') : true
+    def buildRuntimeApi = project.hasProperty('buildRuntimeApi') ? project.property('buildRuntimeApi') : false
 
     defaultConfig {
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""

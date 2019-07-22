@@ -262,6 +262,10 @@ int ScriptSideInQueue::CreateInstance(const char *instanceId,
   return 1;
 }
 
+void ScriptSideInQueue::SetLogType(const int logLevel, const bool isPerf) {
+  // do nothing;
+};
+
 std::unique_ptr<WeexJSResult> ScriptSideInQueue::ExecJSOnInstance(const char *instanceId,
                                                                   const char *script,int type) {
   LOGD("ScriptSideInQueue::ExecJSOnInstance type:%d",type);

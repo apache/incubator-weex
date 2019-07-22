@@ -898,7 +898,10 @@ JSFUNCTION functionUpdateComponentData(ExecState *state) {
     auto page_id = getCharOrJSONStringFromState(state, 0);
     auto cid = getCharOrJSONStringFromState(state, 1);
     auto json_data = getCharOrJSONStringFromState(state, 2);
-
+    if (json_data == nullptr){
+        globalObject->js_bridge()->core_side()->ReportException(page_id.get(), "UpdateComponentData", "parse json failed");
+        return JSValue::encode(jsUndefined());
+    }
     globalObject->js_bridge()->core_side()->UpdateComponentData(page_id.get(), cid.get(), json_data.get());
     return JSValue::encode(jsUndefined());
 }
