@@ -45,6 +45,9 @@ matrix:
           components:
             - android-26
             - extra-android-m2repository
+
+      - env: FORMAT_CODE=true
+        language: ruby
         
 cache:
   directories:
@@ -94,6 +97,12 @@ install:
         npm install
         cd weex-playground/ios && pod install --repo-update
         cd ../../
+    fi
+
+before_script:
+  - |
+    if [[ ("FORMAT_CODE" = "true" )]]; then
+        bundle exec danger
     fi
 
 script:
