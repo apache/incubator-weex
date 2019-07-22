@@ -6,45 +6,45 @@ matrix:
     include:
       - env: TEST_SUITE=danger 
       - env: TEST_SUITE=jsfm
-      - env: TEST_SUITE=ios
-        language: objective-c
-      - env: TEST_SUITE=android ABI=armeabi-v7a
-        language: android
-        dist: trusty
-        jdk: oraclejdk8
-        android:
-          components:
-            - android-26
-            - extra-android-m2repository
-      - env: TEST_SUITE=android ABI=arm64-v8a
-        language: android
-        dist: trusty
-        jdk: oraclejdk8
-        android:
-          components:
-            - android-26
-            - extra-android-m2repository
-      - env: TEST_SUITE=android ABI=x86
-        language: android
-        dist: trusty
-        jdk: oraclejdk8
-        android:
-          components:
-            - android-26
-            - extra-android-m2repository
+      # - env: TEST_SUITE=ios
+      #   language: objective-c
+      # - env: TEST_SUITE=android ABI=armeabi-v7a
+      #   language: android
+      #   dist: trusty
+      #   jdk: oraclejdk8
+      #   android:
+      #     components:
+      #       - android-26
+      #       - extra-android-m2repository
+      # - env: TEST_SUITE=android ABI=arm64-v8a
+      #   language: android
+      #   dist: trusty
+      #   jdk: oraclejdk8
+      #   android:
+      #     components:
+      #       - android-26
+      #       - extra-android-m2repository
+      # - env: TEST_SUITE=android ABI=x86
+      #   language: android
+      #   dist: trusty
+      #   jdk: oraclejdk8
+      #   android:
+      #     components:
+      #       - android-26
+      #       - extra-android-m2repository
       
-      # static check
-      - env: STATIC_CODE_ANALYSIS=true CHECK_C=true
-        language: objective-c
-        osx_image: xcode7.2
-      - env: STATIC_CODE_ANALYSIS=true CHECK_ANDROID=true
-        language: android
-        dist: trusty
-        jdk: oraclejdk8
-        android:
-          components:
-            - android-26
-            - extra-android-m2repository
+      # # static check
+      # - env: STATIC_CODE_ANALYSIS=true CHECK_C=true
+      #   language: objective-c
+      #   osx_image: xcode7.2
+      # - env: STATIC_CODE_ANALYSIS=true CHECK_ANDROID=true
+      #   language: android
+      #   dist: trusty
+      #   jdk: oraclejdk8
+      #   android:
+      #     components:
+      #       - android-26
+      #       - extra-android-m2repository
 
       - env: FORMAT_CODE=true
         language: ruby
@@ -60,44 +60,44 @@ before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 
-before_install:
-  - |
+# before_install:
+#   - |
     # install oclint
-    if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_C}" = "true") ]]; then
-      brew cask uninstall oclint
-      brew tap oclint/formulae
-      brew install oclint
-    fi
+    # if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_C}" = "true") ]]; then
+    #   brew cask uninstall oclint
+    #   brew tap oclint/formulae
+    #   brew install oclint
+    # fi
 
 install:
   - |
-    if [[ ("$TEST_SUITE" = "android") || ("${CHECK_ANDROID}" = "true") ]]; then
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-        nvm install 7.6
-        npm install
-        echo y | sdkmanager "cmake;3.6.4111459"
-        if find "${HOME}/android-ndk-r18b" -mindepth 1 | read; then
-          echo "NDK cache hit"
-        else
-          echo "NDK cache missed"
-          rmdir "${HOME}/android-ndk-r18b"
-        fi
+    # if [[ ("$TEST_SUITE" = "android") || ("${CHECK_ANDROID}" = "true") ]]; then
+    #     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+    #     nvm install 7.6
+    #     npm install
+    #     echo y | sdkmanager "cmake;3.6.4111459"
+    #     if find "${HOME}/android-ndk-r18b" -mindepth 1 | read; then
+    #       echo "NDK cache hit"
+    #     else
+    #       echo "NDK cache missed"
+    #       rmdir "${HOME}/android-ndk-r18b"
+    #     fi
 
-        if [[ ! -d "${HOME}/android-ndk-r18b" ]]; then
-          wget https://dl.google.com/android/repository/android-ndk-r18b-linux-x86_64.zip
-          unzip android-ndk-r18b-linux-x86_64.zip -d $HOME
-        fi
-        export ANDROID_NDK_HOME=$HOME/android-ndk-r18b
-        export PATH=$PATH:$ANDROID_NDK_HOME
-        echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
-    elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") ||  ("${CHECK_C}" = "true") ]]; then
-        npm install
-    elif [[ ("$TEST_SUITE" = "ios") ]]; then
-        bash weex-playground/ios/update_podfile_for_travisci.sh
-        npm install
-        cd weex-playground/ios && pod install --repo-update
-        cd ../../
-    fi
+    #     if [[ ! -d "${HOME}/android-ndk-r18b" ]]; then
+    #       wget https://dl.google.com/android/repository/android-ndk-r18b-linux-x86_64.zip
+    #       unzip android-ndk-r18b-linux-x86_64.zip -d $HOME
+    #     fi
+    #     export ANDROID_NDK_HOME=$HOME/android-ndk-r18b
+    #     export PATH=$PATH:$ANDROID_NDK_HOME
+    #     echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
+    # elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") ||  ("${CHECK_C}" = "true") ]]; then
+    #     npm install
+    # elif [[ ("$TEST_SUITE" = "ios") ]]; then
+    #     bash weex-playground/ios/update_podfile_for_travisci.sh
+    #     npm install
+    #     cd weex-playground/ios && pod install --repo-update
+    #     cd ../../
+    # fi
 
 before_script:
   - |
@@ -108,87 +108,87 @@ before_script:
 script:
   - |
     case $TEST_SUITE in
-      "android") 
-        case $ABI in
-          "armeabi-v7a" )
-            GRADLE_ABI="-PsupportArmeabi-v7a=true -PsupportArm64-v8a=false -PsupportX86=false"
-            ;;
-          "arm64-v8a" )
-            GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=true -PsupportX86=false" 
-            ;;
-          "x86" )
-            GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=false -PsupportX86=true"
-            ;;
-          "*" )
-            GRADLE_ABI=""
-            ;;
-        esac
+      # "android") 
+      #   case $ABI in
+      #     "armeabi-v7a" )
+      #       GRADLE_ABI="-PsupportArmeabi-v7a=true -PsupportArm64-v8a=false -PsupportX86=false"
+      #       ;;
+      #     "arm64-v8a" )
+      #       GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=true -PsupportX86=false" 
+      #       ;;
+      #     "x86" )
+      #       GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=false -PsupportX86=true"
+      #       ;;
+      #     "*" )
+      #       GRADLE_ABI=""
+      #       ;;
+      #   esac
 
-        hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-android.js)
-        echo "The value of hasAndroidFile is ${hasAndroidFile}"
-        if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
-          cd android
-          ./gradlew clean install -PbuildRuntimeApi=true ${GRADLE_ABI} --info
-          ./gradlew install -PbuildRuntimeApi=false ${GRADLE_ABI} --info
-        fi
-        ;;
+      #   hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-android.js)
+      #   echo "The value of hasAndroidFile is ${hasAndroidFile}"
+      #   if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
+      #     cd android
+      #     ./gradlew clean install -PbuildRuntimeApi=true ${GRADLE_ABI} --info
+      #     ./gradlew install -PbuildRuntimeApi=false ${GRADLE_ABI} --info
+      #   fi
+      #   ;;
       "jsfm" )
         npm run danger -- run --dangerfile ./dangerfile-jsfm.js
         ;;
       "danger" )
         npm run danger -- run --dangerfile ./dangerfile.js
         ;;
-      "ios" )
-        hasIosFile=$(npm run danger -- run --dangerfile ./dangerfile-ios.js)
-        echo "The value of hasIosFile is ${hasIosFile}"
-        if [[ "$hasIosFile" =~ "hasIosFile" ]]; then
-          # build WeexSDK and run WeexSDKTests
-          xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" | egrep -A 5 error:
-          # build WeexDemo and run WeexDemo test
-          xcodebuild -workspace weex-playground/ios/WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" | egrep -A 5 error:
-        fi
-        ;;
+      # "ios" )
+      #   hasIosFile=$(npm run danger -- run --dangerfile ./dangerfile-ios.js)
+      #   echo "The value of hasIosFile is ${hasIosFile}"
+      #   if [[ "$hasIosFile" =~ "hasIosFile" ]]; then
+      #     # build WeexSDK and run WeexSDKTests
+      #     xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" | egrep -A 5 error:
+      #     # build WeexDemo and run WeexDemo test
+      #     xcodebuild -workspace weex-playground/ios/WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" | egrep -A 5 error:
+      #   fi
+      #   ;;
     esac
 
-    if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_C}" = "true") ]]; then
-      hasCFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
-      echo "The value of hasCFile is ${hasCFile}"
-      if [[ "$hasCFile" =~ "hasCFile" ]]; then
-        echo "hasCFile"
-        cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
-        oclint-json-compilation-database oclint_args -- \
-          -disable-rule=ShortVariableName \
-          -disable-rule=LongLine \
-          -disable-rule=LongMethod \
-          -disable-rule=HighNcssMethod \
-          -disable-rule=LongVariableName \
-          -disable-rule=HighCyclomaticComplexity \
-          -disable-rule=HighNPathComplexity \
-          -disable-rule=UnusedLocalVariable \
-          -disable-rule=DoubleNegative \
-          -disable-rule=MultipleUnaryOperator \
-          -disable-rule=DeepNestedBlock \
-          -max-priority-1=15000 \
-          -max-priority-2=15000 \
-          -max-priority-3=15000
-      fi
-    fi 
+    # if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_C}" = "true") ]]; then
+    #   hasCFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
+    #   echo "The value of hasCFile is ${hasCFile}"
+    #   if [[ "$hasCFile" =~ "hasCFile" ]]; then
+    #     echo "hasCFile"
+    #     cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
+    #     oclint-json-compilation-database oclint_args -- \
+    #       -disable-rule=ShortVariableName \
+    #       -disable-rule=LongLine \
+    #       -disable-rule=LongMethod \
+    #       -disable-rule=HighNcssMethod \
+    #       -disable-rule=LongVariableName \
+    #       -disable-rule=HighCyclomaticComplexity \
+    #       -disable-rule=HighNPathComplexity \
+    #       -disable-rule=UnusedLocalVariable \
+    #       -disable-rule=DoubleNegative \
+    #       -disable-rule=MultipleUnaryOperator \
+    #       -disable-rule=DeepNestedBlock \
+    #       -max-priority-1=15000 \
+    #       -max-priority-2=15000 \
+    #       -max-priority-3=15000
+    #   fi
+    # fi 
 
-    if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_ANDROID}" = "true") ]]; then
-      hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
-      echo "The value of hasAndroidFile is ${hasAndroidFile}"
-      if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
-        # format code using google-java-format at first
-        # for n in `find ./android -name "*.java"`; do
-        #   java -jar ./format-tool/google-java-format-1.7-all-deps.jar --replace $n
-        # done
-        # then run android lint
-        # echo "hasAndroidFile"
-        echo "run android lint"
-        cd android
-        ./gradlew lint
-      fi
-    fi
+    # if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_ANDROID}" = "true") ]]; then
+    #   hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
+    #   echo "The value of hasAndroidFile is ${hasAndroidFile}"
+    #   if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
+    #     # format code using google-java-format at first
+    #     # for n in `find ./android -name "*.java"`; do
+    #     #   java -jar ./format-tool/google-java-format-1.7-all-deps.jar --replace $n
+    #     # done
+    #     # then run android lint
+    #     # echo "hasAndroidFile"
+    #     echo "run android lint"
+    #     cd android
+    #     ./gradlew lint
+    #   fi
+    # fi
 
 notifications:
   webhooks:
