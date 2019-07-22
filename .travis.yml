@@ -96,8 +96,8 @@ install:
     elif [[ ("$TEST_SUITE" = "ios") ]]; then
         git submodule update --init --remote
         cd weex-playground/ios && bash update_podfile_for_travisci.sh
-        npm install
-        pod install --repo-update
+        cd ../../ && npm install
+        cd weex-playground/ios && pod install --repo-update
         cd ../../
     elif [[ ("${FORMAT_CODE}" = "true" )]]; then
         bundle install
