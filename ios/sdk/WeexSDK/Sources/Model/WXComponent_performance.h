@@ -25,3 +25,4 @@
 @property (nonatomic,assign) BOOL ignoreInteraction;
 
 @end
+
