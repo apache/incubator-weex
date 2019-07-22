@@ -291,7 +291,7 @@ public class WXSoInstallMgrSdk {
   }
 
   public static void copyJssRuntimeSo(){
-    boolean tryUseRunTimeApi = WXUtils.checkGreyConfig("wxapm","use_runtime_api","100");
+    boolean tryUseRunTimeApi = WXUtils.checkGreyConfig("wxapm","use_runtime_api","0");
     WXLogUtils.e("weex", "tryUseRunTimeApi ? "+ tryUseRunTimeApi);
     if (!tryUseRunTimeApi){
       return;
