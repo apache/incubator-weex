@@ -141,6 +141,7 @@ import java.util.Map;
 
   @Override
   public void updateInitFrameworkParams(String key, String value, String desc){
+    WXStateRecord.getInstance().recordAction("","updateInitFrameworkParams:");
      nativeUpdateInitFrameworkParams(key, value, desc);
   }
 
@@ -157,24 +158,29 @@ import java.util.Map;
   @Override
   public int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport) {
     if (MULTIPROCESS) {
+      WXStateRecord.getInstance().recordAction("","nativeInitFrameworkEnv:");
       return nativeInitFrameworkEnv(framework, params, cacheDir, pieSupport);
     } else {
+      WXStateRecord.getInstance().recordAction("","nativeInitFramework:");
       return nativeInitFramework(framework, params);
     }
   }
 
   @Override
   public void refreshInstance(String instanceId, String namespace, String function, WXJSObject[] args) {
+    WXStateRecord.getInstance().recordAction(instanceId,"refreshInstance:"+namespace+","+function);
     nativeRefreshInstance(instanceId, namespace, function, args);
   }
 
   @Override
   public int execJS(String instanceId, String namespace, String function, WXJSObject[] args) {
+    WXStateRecord.getInstance().recordAction(instanceId,"execJS:"+namespace+","+function);
     return nativeExecJS(instanceId, namespace, function, args);
   }
 
   @Override
   public void execJSWithCallback(String instanceId, String namespace, String function, WXJSObject[] args, ResultCallback callback) {
+    WXStateRecord.getInstance().recordAction(instanceId,"execJSWithCallback:"+namespace+","+function);
     if (callback == null) {
       execJS(instanceId, namespace, function, args);
     }
@@ -185,6 +191,7 @@ import java.util.Map;
   // Result from js engine
   @CalledByNative
   public void onReceivedResult(long callbackId, byte[] result) {
+    WXStateRecord.getInstance().recordAction("onReceivedResult","callbackId"+callbackId);
     ResultCallback callback = ResultCallbackManager.removeCallbackById(callbackId);
     if (callback != null) {
        callback.onReceiveResult(result);
@@ -193,6 +200,7 @@ import java.util.Map;
 
   @Override
   public int execJSService(String javascript) {
+    WXStateRecord.getInstance().recordAction("execJSService","execJSService:");
     return nativeExecJSService(javascript);
   }
 
@@ -205,16 +213,19 @@ import java.util.Map;
   @Override
   public int createInstanceContext(String instanceId, String name, String function, WXJSObject[] args) {
     Log.e(TimeCalculator.TIMELINE_TAG,"createInstance :" + System.currentTimeMillis());
+    WXStateRecord.getInstance().recordAction(instanceId,"createInstanceContext:");
     return nativeCreateInstanceContext(instanceId, name, function, args);
   }
 
   @Override
   public int destoryInstance(String instanceId, String name, String function, WXJSObject[] args) {
+    WXStateRecord.getInstance().recordAction(instanceId,"destoryInstance:");
     return nativeDestoryInstance(instanceId, name, function, args);
   }
 
   @Override
   public String execJSOnInstance(String instanceId, String script, int type) {
+    WXStateRecord.getInstance().recordAction(instanceId,"execJSOnInstance:"+type);
     return nativeExecJSOnInstance(instanceId, script, type);
   }
 
@@ -293,6 +304,7 @@ import java.util.Map;
   @CalledByNative
   public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
     try {
+      WXStateRecord.getInstance().recordAction(instanceId,"callNativeModule:"+module+"."+method);
       long start = WXUtils.getFixUnixTime();
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       JSONArray argArray = null;
@@ -375,6 +387,7 @@ import java.util.Map;
   @Override
   @CalledByNative
   public void callNativeComponent(String instanceId, String ref, String method, byte[] arguments, byte[] optionsData) {
+    WXStateRecord.getInstance().recordAction(instanceId,"callNativeComponent:"+method);
     try{
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       JSONArray argArray = null;

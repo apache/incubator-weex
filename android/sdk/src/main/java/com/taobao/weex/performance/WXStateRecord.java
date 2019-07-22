@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.utils.WXUtils;
 
 /**
@@ -36,6 +38,7 @@ public class WXStateRecord {
     private RecordList<Info> mJsfmInitHistory;
     private RecordList<Info> mJscCrashHistory;
     private RecordList<Info> mJscReloadHistory;
+    private RecordList<Info> mJsThradWatchHistory;
 
     private static class SingleTonHolder {
         private static final WXStateRecord S_INSTANCE = new WXStateRecord();
@@ -46,11 +49,12 @@ public class WXStateRecord {
     }
 
     private WXStateRecord() {
-        mExceptionHistory = new RecordList<>(5);
+        mExceptionHistory = new RecordList<>(10);
         mActionHistory = new RecordList<>(20);
-        mJsfmInitHistory = new RecordList<>(3);
-        mJscCrashHistory = new RecordList<>(3);
-        mJscReloadHistory = new RecordList<>(5);
+        mJsfmInitHistory = new RecordList<>(10);
+        mJscCrashHistory = new RecordList<>(10);
+        mJscReloadHistory = new RecordList<>(10);
+        mJsThradWatchHistory = new RecordList<>(20);
     }
 
     /**
@@ -72,7 +76,15 @@ public class WXStateRecord {
      * check onJSFMInit time,and we know when jsfm is init sucess in reloadJsEngine case
      */
     public void onJSFMInit() {
-        mJsfmInitHistory.add(new Info(WXUtils.getFixUnixTime(), "JSFM", "onJsfmInit"));
+        recoreJsfmInitHistory("setJsfmVersion");
+    }
+
+    public void recoreJsfmInitHistory(String msg){
+        mJsfmInitHistory.add(new Info(WXUtils.getFixUnixTime(), "JSFM", msg));
+    }
+
+    public void recordJsThreadWatch(String msg){
+        mJsThradWatchHistory.add(new Info(WXUtils.getFixUnixTime(), "jsWatch", msg));
     }
 
     /**
@@ -96,6 +108,8 @@ public class WXStateRecord {
         stateInfo.put("jsfmInitHistory", mJsfmInitHistory.toString());
         stateInfo.put("jscCrashHistory", mJscCrashHistory.toString());
         stateInfo.put("jscReloadHistory", mJscReloadHistory.toString());
+        stateInfo.put("jsThreadWatch", mJsThradWatchHistory.toString());
+        stateInfo.put("reInitCount", String.valueOf(WXBridgeManager.reInitCount));
         return stateInfo;
     }
 
@@ -144,4 +158,23 @@ public class WXStateRecord {
                 .toString();
         }
     }
+
+    public void startJSThreadWatchDog(){
+        WXBridgeManager.getInstance().post(jsThreadWatchTask);
+    }
+
+    private  long jsThreadTime =-1;
+
+    private Runnable jsThreadWatchTask = new Runnable() {
+        @Override
+        public void run() {
+            if (jsThreadTime == -1){
+                jsThreadTime = WXUtils.getFixUnixTime();
+            }
+            long diff = WXUtils.getFixUnixTime() - jsThreadTime;
+            recordJsThreadWatch("diff:"+diff);
+            jsThreadTime = WXUtils.getFixUnixTime();
+            WXBridgeManager.getInstance().postDelay(jsThreadWatchTask,500);
+        }
+    };
 }

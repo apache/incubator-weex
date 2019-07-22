@@ -75,6 +75,7 @@ import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.transition.WXTransition;
 import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.performance.WXAnalyzerDataTransfer;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.tracing.Stopwatch;
 import com.taobao.weex.tracing.WXTracing;
@@ -975,6 +976,12 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if (this instanceof WXCell && realHeight >= WXPerformance.VIEW_LIMIT_HEIGHT && realWidth>=WXPerformance.VIEW_LIMIT_WIDTH){
       mInstance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_CELL_EXCEED_NUM,1);
       mInstance.getWXPerformance().cellExceedNum++;
+      if (WXAnalyzerDataTransfer.isOpenPerformance){
+        WXAnalyzerDataTransfer.transferPerformance(getInstanceId(),"details",WXInstanceApm.KEY_PAGE_STATS_CELL_EXCEED_NUM,
+            String.format("cell:[w:%d,h:%d],attrs:%s,styles:%s",realWidth,realHeight,getAttrs(),getStyles())
+        );
+      }
+
     }
 
     mAbsoluteY = (int) (nullParent ? 0 : mParent.getAbsoluteY() + getCSSLayoutTop());
@@ -1691,13 +1698,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
   private boolean shouldCancelHardwareAccelerate() {
     IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
-    boolean cancel_hardware_accelerate = false;
+    boolean cancel_hardware_accelerate = true;
     if (adapter != null) {
       try {
         cancel_hardware_accelerate = Boolean.parseBoolean(adapter
                 .getConfig("android_weex_test_gpu",
                         "cancel_hardware_accelerate",
-                        "false"));
+                        "true"));
       }catch (Exception e){
         WXLogUtils.e(WXLogUtils.getStackTrace(e));
       }
