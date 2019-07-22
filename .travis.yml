@@ -4,6 +4,9 @@ node_js: 7.6
 matrix:
     fast_finish: true
     include:
+      # format code using clang-format
+      - env: FORMAT_CODE=true
+        language: ruby
       - env: TEST_SUITE=danger 
       - env: TEST_SUITE=jsfm
       - env: TEST_SUITE=ios
@@ -31,8 +34,7 @@ matrix:
         android:
           components:
             - android-26
-            - extra-android-m2repository
-      
+            - extra-android-m2repository 
       # static check
       - env: STATIC_CODE_ANALYSIS=true CHECK_C=true
         language: objective-c
@@ -53,6 +55,8 @@ cache:
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
     - $HOME/android-ndk-r18b
+    - bundle
+
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -90,9 +94,13 @@ install:
     elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") ||  ("${CHECK_C}" = "true") ]]; then
         npm install
     elif [[ ("$TEST_SUITE" = "ios") ]]; then
+        git submodule update --init --remote
+        cd weex-playground/ios && bash update_podfile_for_travisci.sh
         npm install
-        cd weex-playground/ios && pod install --repo-update
+        pod install --repo-update
         cd ../../
+    elif [[ ("${FORMAT_CODE}" = "true" )]]; then
+        bundle install
     fi
 
 script:
@@ -133,19 +141,20 @@ script:
         echo "The value of hasIosFile is ${hasIosFile}"
         if [[ "$hasIosFile" =~ "hasIosFile" ]]; then
           # build WeexSDK and run WeexSDKTests
-          xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6"
+          xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" | egrep -A 5 error:
           # build WeexDemo and run WeexDemo test
-          xcodebuild -workspace weex-playground/ios/WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" | grep -A 5 error
+          xcodebuild -workspace weex-playground/ios/WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" | egrep -A 5 error:
         fi
         ;;
     esac
-
+    
+    # address santizier and oclint
     if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_C}" = "true") ]]; then
       hasCFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
       echo "The value of hasCFile is ${hasCFile}"
       if [[ "$hasCFile" =~ "hasCFile" ]]; then
         echo "hasCFile"
-        cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
+        cd ios/sdk && xcodebuild -enableAddressSanitizer YES | xcpretty -r json-compilation-database -o compile_commands.json
         oclint-json-compilation-database oclint_args -- \
           -disable-rule=ShortVariableName \
           -disable-rule=LongLine \
@@ -168,10 +177,21 @@ script:
       hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
       echo "The value of hasAndroidFile is ${hasAndroidFile}"
       if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
-        echo "hasAndroidFile"
+        # format code using google-java-format at first
+        # for n in `find ./android -name "*.java"`; do
+        #   java -jar ./format-tool/google-java-format-1.7-all-deps.jar --replace $n
+        # done
+        # then run android lint
+        # echo "hasAndroidFile"
+        echo "run android lint"
         cd android
-        ./gradlew clean assembleDebug test lint
+        ./gradlew lint
       fi
+    fi
+
+    if [[ ("${FORMAT_CODE}" = "true" )]]; then
+        echo "exec danger ruby"
+        bundle exec danger
     fi
 
 notifications:

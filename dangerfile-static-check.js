@@ -26,51 +26,47 @@ import shell from "shelljs";
 const type_unknown = 0;
 const type_c = 1;
 const type_android = 2;
-const type_js = 3;
 
 const getFileType = file => {
-  if (file.match(/.+\.(m|h|mm|cpp|cc)/)) {
-    return type_c;
-  } else if (file.match(/.+\.java/)) {
-    return type_android;
-  } else if (file.match(/.+\.js/)) {
-    return type_js;
-  }else{
-    return type_unknown;
-  }
+    if (file.match(/.+\.(m|h|mm|cpp|cc)/)) {
+        return type_c;
+    } else if (file.match(/.+\.java/)) {
+        return type_android;
+    } else {
+        return type_unknown;
+    }
 }
 
 var hasCFile = false;
 var hasAndroidFile = false;
-var hasJsFile = false;
 
-function check(file_type){
+function check(file_type) {
     var has_file_type = false;
     if (!has_file_type && danger.git.created_files) {
         danger.git.created_files.some(file => {
-            var f = (getFileType(file)==file_type)
-            if(f){
-                has_file_type =f;
+            var f = (getFileType(file) == file_type)
+            if (f) {
+                has_file_type = f;
             }
             return f;
         });
     }
 
     if (!has_file_type && danger.git.modified_files) {
-        danger.git.created_files.some(file => {
-            var f = (getFileType(file)==file_type)
-            if(f){
-                has_file_type =f;
+        danger.git.modified_files.some(file => {
+            var f = (getFileType(file) == file_type)
+            if (f) {
+                has_file_type = f;
             }
             return f;
         });
     }
 
     if (!has_file_type && danger.git.deleted_files) {
-        danger.git.created_files.some(file => {
-            var f = (getFileType(file)==file_type)
-            if(f){
-                has_file_type =f;
+        danger.git.deleted_files.some(file => {
+            var f = (getFileType(file) == file_type)
+            if (f) {
+                has_file_type = f;
             }
             return f;
         });
@@ -81,16 +77,12 @@ function check(file_type){
 
 hasCFile = check(type_c)
 hasAndroidFile = check(type_android)
-hasJsFile = check(type_js)
 
 var output_str = ""
-if(hasCFile){
+if (hasCFile) {
     output_str += 'hasCFile\n'
 }
-if(hasAndroidFile){
+if (hasAndroidFile) {
     output_str += 'hasAndroidFile\n'
-}
-if(hasJsFile){
-    output_str += 'hasJsFile\n'
 }
 console.log(output_str)
