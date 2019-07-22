@@ -220,6 +220,9 @@ namespace weex {
                                          UpdateGlobalConfig);
                 handler->registerHandler(static_cast<uint32_t>(IPCJSMsg::UpdateInitFrameworkParams),
                                          UpdateInitFrameworkParams);
+
+                handler->registerHandler(static_cast<uint32_t>(IPCJSMsg::SETLOGLEVEL),
+                                         setLogType);
             }
 
             std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::InitFramework(
@@ -503,6 +506,16 @@ namespace weex {
                 LOGD("ScriptBridgeInMultiProcess::UpdateInitFrameworkParams End");
                 return createVoidResult();
             }
+
+        std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::setLogType(
+            IPCArguments *arguments) {
+            LOGD("ScriptBridgeInMultiProcess::setLogType");
+            int type = arguments->get<int32_t>(0);
+            int perf = arguments->get<int32_t>(1);
+            Instance()->script_side()->SetLogType(type, perf == 1);
+            return createVoidResult();
+        }
+
 
             std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::TakeHeapSnapshot(
                     IPCArguments *arguments) {

@@ -576,7 +576,21 @@ int ScriptSideInMultiProcess::UpdateInitFrameworkParams(const std::string &key,
 }
 
 void ScriptSideInMultiProcess::SetLogType(const int logLevel, const bool isPerf) {
-
+  try {
+    if(sender_ == nullptr) {
+      LOGE("SetLogType sender is null");
+      return;
+    }
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::SETLOGLEVEL));
+    serializer->add(logLevel);
+    serializer->add(isPerf ? 1 : 0);
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
+  } catch (IPCException &e) {
+    LOGE("%s", e.msg());
+  }
+  return;
 }
 
 }  // namespace script

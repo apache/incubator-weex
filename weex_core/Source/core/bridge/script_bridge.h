@@ -89,6 +89,8 @@ class ScriptBridge {
                                      const char* cid,
                                      const char* json_data) = 0;
 
+
+
     inline ScriptBridge *bridge() { return bridge_; }
 
    private:

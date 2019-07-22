@@ -44,6 +44,7 @@ enum class IPCJSMsg {
     EXECJSONAPPWITHRESULT,
     CALLJSONAPPCONTEXT,
     DESTORYAPPCONTEXT,
+    SETLOGLEVEL,
 };
 
 // Message from Script to Core in ScriptBridge
