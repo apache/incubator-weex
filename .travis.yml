@@ -44,9 +44,9 @@ matrix:
           components:
             - android-26
             - extra-android-m2repository
-      # format code using clang-format
-      # - env: FORMAT_CODE=true
-      #   language: ruby
+      format code using clang-format
+      - env: FORMAT_CODE=true
+        language: ruby
         
 cache:
   directories:
@@ -97,9 +97,9 @@ install:
         npm install
         cd weex-playground/ios && pod install --repo-update
         cd ../../
-    # elif [[ ("${FORMAT_CODE}" = "true" )]]; then
-    #     bundle install
-    # fi
+    elif [[ ("${FORMAT_CODE}" = "true" )]]; then
+        bundle install
+    fi
 
 script:
   - |
@@ -187,10 +187,10 @@ script:
       fi
     fi
 
-    # if [[ ("${FORMAT_CODE}" = "true" )]]; then
-    #     echo "exec danger ruby"
-    #     bundle exec danger
-    # fi
+    if [[ ("${FORMAT_CODE}" = "true" )]]; then
+        echo "exec danger ruby"
+        bundle exec danger
+    fi
 
 notifications:
   webhooks:
