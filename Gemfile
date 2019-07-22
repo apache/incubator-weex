@@ -6,6 +6,7 @@ if !ENV['CIRCLECI']
     gem "danger"
     gem "danger-xcode_summary"
     gem "cocoapods"
+    gem 'danger-code_style_validation', :git => 'https://github.com/flix-tech/danger-code_style_validation.git'
   end
 end
 # gem "danger-prose"

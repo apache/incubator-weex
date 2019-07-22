@@ -476,6 +476,9 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
     message("According to the blame info, we recommended " + names.join(' , ') + " to be the reviewers.")
   }
 }
+# code format using danger-code_style_validation based on clang-format
+code_style_validation.check file_extensions: ['.hpp', '.cpp', '.m' , '.h', 'mm', '.cc', '.java']
+
 message('danger test finished.')
 /*
  * find reviewer end
