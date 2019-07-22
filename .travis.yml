@@ -44,7 +44,8 @@ matrix:
           components:
             - android-26
             - extra-android-m2repository
-      format code using clang-format
+      
+      # format code using clang-format
       - env: FORMAT_CODE=true
         language: ruby
         
@@ -55,7 +56,8 @@ cache:
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
     - $HOME/android-ndk-r18b
-    # - bundle
+    - bundle
+
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
