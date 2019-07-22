@@ -153,7 +153,7 @@ script:
       echo "The value of hasCFile is ${hasCFile}"
       if [[ "$hasCFile" =~ "hasCFile" ]]; then
         echo "hasCFile"
-        cd ios/sdk && xcodebuild YES | xcpretty -r json-compilation-database -o compile_commands.json
+        cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
         oclint-json-compilation-database oclint_args -- \
           -disable-rule=ShortVariableName \
           -disable-rule=LongLine \
