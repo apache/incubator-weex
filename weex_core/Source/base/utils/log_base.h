@@ -75,6 +75,13 @@ class LogImplement {
     return false;
   }
 
+  inline bool ferfMode() {
+    if(m_log)
+      return m_log->m_perfMode;
+
+    return false;
+  }
+
   inline void setPerfMode(bool perfFlag) {
     if (m_log)
       m_log->m_perfMode = perfFlag;

@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <base/utils/log_base.h>
 #include "time_calculator.h"
 #include "log_defines.h"
 namespace weex {
@@ -41,6 +40,10 @@ void weex::base::TimeCalculator::taskStart() {
   this->m_task_start_time_ = getCurrentTime();
 }
 void weex::base::TimeCalculator::print() {
+  if (!turnOn()) {
+    return;
+  }
+
   const long long &allCost = m_destructor_time_ - m_constructor_time_;
   const long long &taskWait = m_task_start_time_ - m_constructor_time_;
   const long long &taskCost = m_task_end_time_ - m_task_start_time_;
@@ -70,6 +73,9 @@ void weex::base::TimeCalculator::print() {
   }
 }
 void weex::base::TimeCalculator::transform() {
+  if (!turnOn()) {
+    return;
+  }
   LOG_MSG(m_instance_id_.c_str(), "%s", formatData().c_str());
 }
 std::string weex::base::TimeCalculator::formatData() {

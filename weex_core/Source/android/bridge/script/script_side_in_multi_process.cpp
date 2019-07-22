@@ -556,7 +556,6 @@ int ScriptSideInMultiProcess::UpdateGlobalConfig(const char *config) {
 int ScriptSideInMultiProcess::UpdateInitFrameworkParams(const std::string &key,
                                                         const std::string &value,
                                                         const std::string &desc) {
-
   try {
     if(sender_ == nullptr) {
       LOGE("UpdateGlobalConfig sender is null");
@@ -573,6 +572,10 @@ int ScriptSideInMultiProcess::UpdateInitFrameworkParams(const std::string &key,
     LOGE("%s", e.msg());
   }
   return true;
+
+}
+
+void ScriptSideInMultiProcess::SetLogType(const int logLevel, const bool isPerf) {
 
 }
 

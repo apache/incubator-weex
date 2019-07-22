@@ -28,6 +28,7 @@
 #include "time_point.h"
 #include "time_unit.h"
 #include "time_utils.h"
+#include "base/utils/log_base.h"
 
 namespace weex {
 namespace base {
@@ -89,6 +90,12 @@ class TimeCalculator {
   std::string formatData();
   void transform();
   void print();
+
+  //println
+  bool turnOn() {
+    return weex::base::LogImplement::getLog()->ferfMode();
+  }
+
  private:
   std::string m_task_name_;
   std::string m_log_tag_;

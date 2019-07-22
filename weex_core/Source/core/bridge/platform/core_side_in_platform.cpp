@@ -624,5 +624,9 @@ int CoreSideInPlatform::UpdateInitFrameworkParams(const std::string &key, const 
           ->UpdateInitFrameworkParams(key, value, desc);
 }
 
+void CoreSideInPlatform::SetLogType(const int logType, const bool isPerf) {
+
+}
+
 
 }  // namespace WeexCore

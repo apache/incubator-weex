@@ -269,7 +269,7 @@ static void RemoveInstanceRenderType(JNIEnv* env, jobject jcaller,
           ->RemovePageRenderType(jString2StrFast(env, instanceId));
 }
 
-static void setLogType(JNIEnv* env, jint type,
+static void SetLogType(JNIEnv* env, jint logLevel,
                                      jboolean isPerf){
 //  WeexCoreManager::Instance()
 //      ->getPlatformBridge()
