@@ -95,6 +95,7 @@ install:
     elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") ||  ("${CHECK_C}" = "true") ]]; then
         npm install
     elif [[ ("$TEST_SUITE" = "ios") ]]; then
+        git submodule update --init --remote
         bash weex-playground/ios/update_podfile_for_travisci.sh
         npm install
         cd weex-playground/ios && pod install --repo-update
