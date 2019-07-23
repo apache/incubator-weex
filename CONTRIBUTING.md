@@ -1,5 +1,12 @@
 # Contributing to Weex
 Weex community respects all kinds of contributing, including but not limited to code, documentation, mailing list.
+## Table of Content
+* [Code of Conduct](#code-of-conduct)
+* [Mailing List](#mailing-list)
+* [Ask or Answer Questions](#mailing-list)
+* [Contribute Code or document](#contribute-code-or-document)
+    * [Contribute Documentation](contribute-documentation)
+    * [Contribute Code](#contribute-code)
 
 # Code of Conduct
 To make an open and friendly community, Weex community adopt [Contributor Covenant](./CODE_OF_CONDUCT.md) as the code of conduct.
