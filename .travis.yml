@@ -95,8 +95,9 @@ install:
         npm install
     elif [[ ("$TEST_SUITE" = "ios") ]]; then
         git submodule update --init --remote
-        cd weex-playground/ios && bash update_podfile_for_travisci.sh
-        cd ../../ && npm install
+        # cd weex-playground/ios && bash update_podfile_for_travisci.sh
+        # cd ../../ && 
+        npm install
         cd weex-playground/ios && pod install --repo-update
         cd ../../
     elif [[ ("${FORMAT_CODE}" = "true" )]]; then
@@ -143,7 +144,8 @@ script:
           # build WeexSDK and run WeexSDKTests
           xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" | grep -A 5 error:
           # build WeexDemo and run WeexDemo test
-          xcodebuild -workspace weex-playground/ios/WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" | grep -A 5 error:
+          cd weex-playground/ios && mkdir tmp && mv * tmp;cd tmp
+          xcodebuild -workspace WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" | grep -A 5 error:
         fi
         ;;
     esac
