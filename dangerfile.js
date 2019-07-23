@@ -42,7 +42,7 @@ function matchRegex(pr_body,regex){
 
 var pr_body = danger.github.pr.body.toLowerCase();
 // Because Pr description template include the following line：
-// 1. Write the corresponding [documentation](https://weex.io/guide/contribute/how-to-contribute.html#contribute-code-or-document)
+// 1. Write the corresponding [documentation](https://github.com/apache/incubator-weex/blob/master/CONTRIBUTING.md#contribute-code-or-document)
 // so we should check the documentation below the ### checklist
 console.log("checkDocumentation");
 const index = pr_body.indexOf("checklist")
@@ -50,7 +50,7 @@ const includeChecklist = (index!=-1)
 if(includeChecklist && !matchRegex(pr_body.substring(index),/documentation.*http/)){
   const msg = "If you update the code, "+
     "maybe you should update the documentation and add the documentation link in the PR description. \n" +
-    "here is the guide about how to contribute documentation:https://weex.apache.org/guide/contribute/how-to-contribute.html#contribute-code-or-document \n";
+    "here is the guide about how to contribute documentation:https://github.com/apache/incubator-weex/blob/master/CONTRIBUTING.md#contribute-code-or-document \n";
   warn(msg);
 }
 
