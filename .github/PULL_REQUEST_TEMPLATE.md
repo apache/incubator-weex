@@ -13,9 +13,7 @@ All PRs should be submitted to master branch -->
 # Brief Description of the PR
 
 # Checklist
-<!-- For example,if you write the corresponding Documentation,you should list it below with the format:
-[x] Documentation:http-links -->
-* [] Demo:
-* [] Documentation:
+* Demo:
+* Documation:
 
 <!-- # Additional content -->
