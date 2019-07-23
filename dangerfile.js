@@ -72,7 +72,7 @@ if(!danger.github.pr.milestone){
 // Make sure there are changelog entries
 const hasChangelog = danger.git.modified_files.includes("changelog.md")
 if (!hasChangelog) { 
-  warn("No Changelog changes! - *Can you add a Changelog? To do so,append your changes to the changelog.md*");
+  warn(`No Changelog changes! - <i>Can you add a Changelog? To do so,append your changes to the changelog.md</i>`);
 }
 
 const jsFiles = danger.git.created_files.filter(path => path.endsWith("js"));
