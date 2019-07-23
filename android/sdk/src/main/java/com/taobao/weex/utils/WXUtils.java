@@ -27,9 +27,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXConfig;
 
 public class WXUtils {
 
@@ -304,9 +303,7 @@ public class WXUtils {
             }
           }
         } catch (NumberFormatException nfe) {
-          if (WXEnvironment.isApkDebugable()) {
-            WXLogUtils.w("The parameter format is not supported", nfe);
-          }
+          WXLogUtils.e("Argument format error! value is " + value, nfe);
         } catch (Exception e) {
           WXLogUtils.e("Argument error! value is " + value, e);
         }
@@ -433,8 +430,8 @@ public class WXUtils {
     ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
     ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
     am.getMemoryInfo(mi);
-    //mi.availMem;
-    //return Formatter.formatFileSize(context, mi.availMem);
+    //mi.availMem; 当前系统的可用内存
+    //return Formatter.formatFileSize(context, mi.availMem);// 将获取的内存大小规格化
     WXLogUtils.w("app AvailMemory ---->>>"+mi.availMem/(1024*1024));
     return mi.availMem/(1024*1024);
   }
@@ -570,22 +567,6 @@ public class WXUtils {
         return  Integer.parseInt(number);
       }
     }catch (Exception e){return  defaultValue;}
-  }
-
-  public static boolean checkGreyConfig(String group,String key,String defaultValue){
-      IWXConfigAdapter configAdapter = WXSDKManager.getInstance().getWxConfigAdapter();
-      if (null == configAdapter) {
-        return false;
-      }
-      double randomValue = Math.random() * 100;
-      double max = 100;
-      try {
-        String configValue = configAdapter.getConfig(group, key, defaultValue);
-        max = Double.valueOf(configValue);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      return randomValue < max;
   }
 
   private static final long sInterval = System.currentTimeMillis() - SystemClock.uptimeMillis();
