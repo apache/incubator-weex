@@ -26,7 +26,7 @@ import parseDiff from 'parse-diff';
 console.log("checkMasterBranch")
 const isMergeRefMaster = danger.github.pr.base.ref === 'master';
 if(!isMergeRefMaster){
-  fail("you must submit PR to master branch");
+  warn("You'd better to submit PR to master branch as the development of Weex is on master branch.");
 }
 
 // match regex line by line
@@ -48,7 +48,7 @@ console.log("checkDocumentation");
 const index = pr_body.indexOf("checklist")
 const includeChecklist = (index!=-1)
 if(includeChecklist && !matchRegex(pr_body.substring(index),/documentation.*http/)){
-  const msg = "if you update the code, "+
+  const msg = "If you update the code, "+
     "maybe you should update the documentation and add the documentation link in the PR description. \n" +
     "here is the guide about how to contribute documentation:https://weex.apache.org/guide/contribute/how-to-contribute.html#contribute-code-or-document \n";
   warn(msg);
@@ -57,7 +57,7 @@ if(includeChecklist && !matchRegex(pr_body.substring(index),/documentation.*http
 // check if pr contains a demo link
 console.log("checkDemo");
 if(!matchRegex(pr_body,/demo.*http/)){
-  const msg =  "if your PR is about fixing a bug excluding crash the code,"+
+  const msg =  "If your PR is about fixing a bug excluding crash the code,"+
     "you should add the demo link in the PR description. \n "+
     "here is a demo link:http://dotwe.org/vue?spm=a2c7j.-guide-contribute-contribute-code.0.0.3e93748cmxz3yt";
   warn(msg);
@@ -66,7 +66,7 @@ if(!matchRegex(pr_body,/demo.*http/)){
 // check if pr bind the github milestone
 console.log("checkMileStone");
 if(!danger.github.pr.milestone){
-  warn("current pr not bind the milestone");
+  warn("Current pr not bind the milestone");
 }
 
 // Make sure there are changelog entries
