@@ -14,6 +14,6 @@ All PRs should be submitted to master branch -->
 
 # Checklist
 * Demo:
-* Documation:
+* Documentation:
 
 <!-- # Additional content -->
