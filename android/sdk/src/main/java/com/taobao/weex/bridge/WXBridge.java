@@ -134,6 +134,8 @@ public class WXBridge implements IWXBridge {
    * */
   public native void nativeUpdateGlobalConfig(String config);
 
+  private native void nativeSetViewPortWidth(String instanceId, float viewPortWidth);
+
   public static final boolean MULTIPROCESS = true;
 
 
@@ -765,6 +767,10 @@ public class WXBridge implements IWXBridge {
     nativeSetInstanceRenderType(instanceId, renderType);
   }
 
+  @Override
+  public void setViewPortWidth(String instanceId,float viewPortWidth){
+    nativeSetViewPortWidth(instanceId,viewPortWidth);
+  }
 
   @Override
   public void removeInstanceRenderType(String instanceId){
