@@ -119,6 +119,12 @@ typedef void
 (*FuncUpdateComponentData)(const char* page_id, const char* cid, const char* json_data);
 
 
+typedef bool
+(*FuncLog)(int level, const char *tag,
+           const char *file,
+           unsigned long line,
+           const char *log);
+
 typedef struct FunctionsExposedByCore {
     FuncSetJSVersion funcSetJSVersion;
     FuncReportException funcReportException;
@@ -147,6 +153,7 @@ typedef struct FunctionsExposedByCore {
     FuncCallDispatchMessageSync funcCallDispatchMessageSync;
     FuncOnReceivedResult  funcOnReceivedResult;
     FuncUpdateComponentData funcUpdateComponentData;
+    FuncLog funcLog;
 } FunctionsExposedByCore;
 
 typedef void (*FuncCallSetJSVersion)(const char* version);

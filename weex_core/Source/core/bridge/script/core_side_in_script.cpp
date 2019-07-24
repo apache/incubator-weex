@@ -462,4 +462,11 @@ void CoreSideInScript::UpdateComponentData(const char* page_id,
     }
 }
 
+bool CoreSideInScript::Log(int level, const char *tag,
+         const char *file,
+         unsigned long line,
+         const char *log) {
+  return weex::base::LogImplement::getLog()->log((LogLevel) level, tag, file, line, log);
+}
+
 }  // namespace WeexCore

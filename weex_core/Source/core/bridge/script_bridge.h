@@ -90,6 +90,10 @@ class ScriptBridge {
                                      const char* json_data) = 0;
 
 
+    virtual bool Log(int level, const char *tag,
+                     const char *file,
+                     unsigned long line,
+                     const char *log) = 0;
 
     inline ScriptBridge *bridge() { return bridge_; }
 
