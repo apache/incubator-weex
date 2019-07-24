@@ -19,8 +19,11 @@
 package com.taobao.weex.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -73,10 +76,11 @@ public class WXSoInstallMgrSdk {
   private final static String STARTUPSO = "/libweexjsb.so";
   private final static String STARTUPSOANDROID15 = "/libweexjst.so";
 
-
   static Context mContext = null;
   private static IWXSoLoaderAdapter mSoLoader = null;
   private static IWXStatisticsListener mStatisticsListener = null;
+
+  private static String mAbi = null;
 
   public static void init(Context c,
                           IWXSoLoaderAdapter loader,
@@ -118,23 +122,31 @@ public class WXSoInstallMgrSdk {
     }
 
     // copy startup so
-    copyStartUpSo();
+    if (WXEnvironment.CORE_SO_NAME.equals(libName)) {
+      copyStartUpSo();
+    }
+
 
     boolean InitSuc = false;
-//    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
+      try {
+        // If a library loader adapter exists, use this adapter to load library
+        // instead of System.loadLibrary.
+        if (mSoLoader != null) {
+          mSoLoader.doLoadLibrary("c++_shared");
+        } else {
+          System.loadLibrary("c++_shared");
+        }
+      } catch (Exception | Error e) {
+        WXExceptionUtils.commitCriticalExceptionRT(null,
+                WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
+                "initSo",
+                        "load c++_shared failed Detail Error is: " +e.getMessage(),
+                null);
 
-
-    try {
-      // If a library loader adapter exists, use this adapter to load library
-      // instead of System.loadLibrary.
-      if (mSoLoader != null) {
-        mSoLoader.doLoadLibrary("c++_shared");
-      } else {
-        System.loadLibrary("c++_shared");
+        if(WXEnvironment.isApkDebugable()) {
+          throw e;
+        }
       }
-    } catch (Exception e) {
-
-    }
 
       /**
        * Load library with {@link System#loadLibrary(String)}
@@ -153,46 +165,60 @@ public class WXSoInstallMgrSdk {
         if (cpuType.contains(ARMEABI) || cpuType.contains(X86)) {
           WXExceptionUtils.commitCriticalExceptionRT(null,
                   WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
-                  "initSo", "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for android cpuType is " +cpuType +
+                  "initSo", libName + "[WX_KEY_EXCEPTION_SDK_INIT_CPU_NOT_SUPPORT] for android cpuType is " +cpuType +
                           "\n Detail Error is: " +e2.getMessage(),
                   null);
         }
-        InitSuc = false;
-      }
 
-      try {
-
-        if (!InitSuc) {
-
-          //File extracted from apk already exists.
-          if (isExist(libName, version)) {
-            boolean res = _loadUnzipSo(libName, version, utAdapter);
-            if (res) {
-              return res;
-            } else {
-              //Delete the corrupt so library, and extract it again.
-              removeSoIfExit(libName, version);
-            }
-          }
-
-          //Fail for loading file from libs, extract so library from so and load it.
-          if (cpuType.equalsIgnoreCase(MIPS)) {
-            return false;
-          } else {
-            try {
-              InitSuc = unZipSelectedFiles(libName, version, utAdapter);
-            } catch (IOException e2) {
-              e2.printStackTrace();
-            }
-          }
-
+        if(WXEnvironment.isApkDebugable()) {
+          throw e2;
         }
-      } catch (Exception | Error e) {
         InitSuc = false;
-        e.printStackTrace();
       }
+
+//      try {
+
+//        if (!InitSuc) {
+//
+//          //File extracted from apk already exists.
+//          if (isExist(libName, version)) {
+//            boolean res = _loadUnzipSo(libName, version, utAdapter);
+//            if (res) {
+//              return res;
+//            } else {
+//              //Delete the corrupt so library, and extract it again.
+//              removeSoIfExit(libName, version);
+//            }
+//          }
+//
+//          //Fail for loading file from libs, extract so library from so and load it.
+//          if (cpuType.equalsIgnoreCase(MIPS)) {
+//            return false;
+//          } else {
+//            try {
+//              InitSuc = unZipSelectedFiles(libName, version, utAdapter);
+//            } catch (IOException e2) {
+//              e2.printStackTrace();
+//            }
+//          }
+//
+//        }
+//      } catch (Exception | Error e) {
+//        InitSuc = false;
+//        e.printStackTrace();
+//      }
   //  }
     return InitSuc;
+  }
+
+  private static File _desSoCopyFile(String soName) {
+    String cpuType = _cpuType();
+    String copyPath = WXEnvironment.copySoDesDir();
+    if (TextUtils.isEmpty(copyPath)) {
+      return null;
+    }
+    File desDir = new File(copyPath, soName + "/" + cpuType);
+    return desDir;
   }
 
   /**
@@ -200,107 +226,115 @@ public class WXSoInstallMgrSdk {
    */
   public static void copyStartUpSo() {
     try {
-      boolean installOnSdcard = true;
+      // copy libjsb.so to cache/weex/jsb/cputype
       String pkgName = WXEnvironment.getApplication().getPackageName();
+      String cacheFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
+
       // cp weexjsb any way
-//      try {
-//        PackageManager pm = WXEnvironment.getApplication().getApplicationContext().getPackageManager();
-//        ApplicationInfo appInfo = pm.getApplicationInfo(pkgName, 0);
-//        if ((appInfo.flags & ApplicationInfo.FLAG_EXTERNAL_STORAGE) != 0) {
-//          // App on sdcard
-//          installOnSdcard = true;
-//        }
-//      } catch (Throwable e) {
-//      }
-
-      if (installOnSdcard) {
-
-        String cacheFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
-        // if android api < 16 copy libweexjst.so else copy libweexjsb.so
-        boolean pieSupport = true;
-        File newfile;
-        String startSoName = WXEnvironment.CORE_JSB_SO_NAME;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-          pieSupport = false;
-          newfile = new File(cacheFile + STARTUPSOANDROID15);
-          startSoName = WXEnvironment.CORE_JST_SO_NAME;
-        } else {
-          newfile = new File(cacheFile + STARTUPSO);
-        }
-
-        String jsbVersionFile = "jsb.version";
-
-        File versionFile = new File(cacheFile,jsbVersionFile);
-        Closeable r = null;
-
-        if(newfile.exists() && versionFile.exists()) {
-          try {
-            FileReader fileReader = new FileReader(versionFile);
-            r = fileReader;
-            BufferedReader br = new BufferedReader(fileReader);
-            String s = br.readLine();
-            if(!TextUtils.isEmpty(s)) {
-              boolean same = String.valueOf(WXEnvironment.CORE_JSB_SO_VERSION).equals(s.trim());
-              if(same)
-                return;
-            }
-          } catch (FileNotFoundException e) {
-            //do nothing and copy so file
-          } finally {
-            if (r != null)
-              r.close();
-          }
-        }
-
-        String path = "/data/data/" + pkgName + "/lib";
-        if (cacheFile != null && cacheFile.indexOf("/cache") > 0) {
-          path = cacheFile.replace("/cache", "/lib");
-        }
-
-        String soName;
-        if (pieSupport) {
-          soName = path + STARTUPSO;
-        } else {
-          soName = path + STARTUPSOANDROID15;
-        }
-
-        File oldfile = new File(soName);
-
-
-        if(!oldfile.exists()) {
-          try {
-            String weexjsb = ((PathClassLoader) (WXSoInstallMgrSdk.class.getClassLoader())).findLibrary(startSoName);
-            oldfile = new File(weexjsb);
-          } catch (Throwable throwable) {
-            // do nothing
-          }
-
-        }
-
-        if (oldfile.exists()) {
-          WXFileUtils.copyFile(oldfile, newfile);
-        } else {
-          WXEnvironment.extractSo();
-        }
-
-        Closeable w = null;
-        try {
-          if(!versionFile.exists())
-            versionFile.createNewFile();
-          FileWriter fileWriter = new FileWriter(versionFile);
-          w = fileWriter;
-          fileWriter.write(String.valueOf(WXEnvironment.CORE_JSB_SO_VERSION));
-          fileWriter.flush();
-        } catch (Exception e ) {
-          // do nothing
-        } finally {
-          if(w != null)
-            w.close();
-        }
-
+      // if android api < 16 copy libweexjst.so else copy libweexjsb.so
+      boolean pieSupport = true;
+      File newfile;
+      String startSoName = WXEnvironment.CORE_JSB_SO_NAME;
+      String startSoPath = STARTUPSO;
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+        pieSupport = false;
+        startSoName = WXEnvironment.CORE_JST_SO_NAME;
+        startSoPath = STARTUPSOANDROID15;
       }
+
+      final File copyPath = _desSoCopyFile(startSoName);
+      if(!copyPath.exists()) {
+        copyPath.mkdirs();
+      }
+      newfile = new File(copyPath, startSoPath);
+      WXEnvironment.CORE_JSB_SO_PATH = newfile.getAbsolutePath();
+      String jsb = WXEnvironment.getDefaultSettingValue(startSoName, "-1");
+      if(newfile.exists() && TextUtils.equals(WXEnvironment.getAppVersionName(), jsb)) {
+        // no update so skip copy
+        return;
+      }
+
+      String path = "/data/data/" + pkgName + "/lib";
+      if (cacheFile != null && cacheFile.indexOf("/cache") > 0) {
+        path = cacheFile.replace("/cache", "/lib");
+      }
+      File oldfile = null;
+      if (pieSupport) {
+        oldfile = new File(path, STARTUPSO);
+      } else {
+        oldfile = new File(path , STARTUPSOANDROID15);
+      }
+
+
+      if (!oldfile.exists()) {
+        try {
+          String weexjsb = ((PathClassLoader) (WXSoInstallMgrSdk.class.getClassLoader())).findLibrary(startSoName);
+          oldfile = new File(weexjsb);
+        } catch (Throwable throwable) {
+          // do nothing
+        }
+      }
+
+
+      if(!oldfile.exists()) {
+        WXEnvironment.extractSo();
+        oldfile = new File(copyPath, STARTUPSO);
+      }
+
+      if (oldfile.exists()) {
+        WXFileUtils.copyFile(oldfile, newfile);
+      }
+      WXEnvironment.writeDefaultSettingsValue(startSoName, WXEnvironment.getAppVersionName());
     } catch (Throwable e) {
       e.printStackTrace();
+    }
+  }
+
+  public static void copyJssRuntimeSo(){
+    boolean tryUseRunTimeApi = WXUtils.checkGreyConfig("wxapm","use_runtime_api","0");
+    WXLogUtils.e("weex", "tryUseRunTimeApi ? "+ tryUseRunTimeApi);
+    if (!tryUseRunTimeApi){
+      return;
+    }
+    try {
+      WXLogUtils.e("weex", "copyJssRuntimeSo: ");
+      File toPath = _desSoCopyFile(WXEnvironment.CORE_JSS_SO_NAME);
+      if(!toPath.exists()) {
+        toPath.mkdirs();
+      }
+      File targetFile = new File(toPath,"libweexjss.so");
+
+      /** 1. check so and versionCode. if update, then rm old jss.so(runtime) in pkg/libs, and copy new so from apk **/
+      String keyVersionCode = "app_version_code_weex";
+      String defaultSettingValue = WXEnvironment.getDefaultSettingValue(keyVersionCode, "-1");
+
+
+      if (targetFile.exists()){
+        if (!TextUtils.equals(WXEnvironment.getAppVersionName(),defaultSettingValue)){
+          targetFile.delete();
+        }else {
+          WXEnvironment.CORE_JSS_RUNTIME_SO_PATH= targetFile.getAbsolutePath();
+          WXEnvironment.sUseRunTimeApi = true;
+          WXLogUtils.e("weex", "copyJssRuntimeSo exist:  return");
+          return;
+        }
+      }
+      /** 2. copy jss(runtime) so **/
+      String fromPath =  ((PathClassLoader) (WXSoInstallMgrSdk.class.getClassLoader())).findLibrary("weexjssr");
+      if (TextUtils.isEmpty(fromPath)){
+        return;
+      }
+      targetFile.createNewFile();
+      WXFileUtils.copyFileWithException(new File(fromPath),targetFile);
+      /**3. update flag **/
+      WXEnvironment.CORE_JSS_RUNTIME_SO_PATH= targetFile.getAbsolutePath();
+      WXEnvironment.writeDefaultSettingsValue(keyVersionCode,WXEnvironment.getAppVersionName());
+      WXEnvironment.sUseRunTimeApi = true;
+      WXLogUtils.e("weex", "copyJssRuntimeSo: cp end and return ");
+    }catch (Throwable e){
+      e.printStackTrace();
+      WXEnvironment.sUseRunTimeApi = false;
+      WXLogUtils.e("weex", "copyJssRuntimeSo:  exception" + e);
     }
   }
 
@@ -314,18 +348,19 @@ public class WXSoInstallMgrSdk {
   }
 
   private static String _cpuType() {
-    String abi ;
-    try {
-      abi = Build.CPU_ABI;
-    }catch (Exception e){
-      e.printStackTrace();
-      abi = ARMEABI;
+    if(TextUtils.isEmpty(mAbi)) {
+      try {
+        mAbi = Build.CPU_ABI;
+      }catch (Throwable e){
+        e.printStackTrace();
+        mAbi = ARMEABI;
+      }
+      if (TextUtils.isEmpty(mAbi)){
+        mAbi = ARMEABI;
+      }
+      mAbi = mAbi.toLowerCase();
     }
-    if (TextUtils.isEmpty(abi)){
-      abi = ARMEABI;
-    }
-    abi = abi.toLowerCase();
-    return abi;
+    return mAbi;
   }
 
   /**
