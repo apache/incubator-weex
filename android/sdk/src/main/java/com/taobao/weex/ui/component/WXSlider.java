@@ -91,7 +91,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
    */
   protected WXCirclePageAdapter mAdapter;
 
-  protected boolean mShowIndicators;
+  protected boolean mShowIndicators = true;
 
   protected OnPageChangeListener mPageChangeListener = new SliderPageChangeListener();
 
@@ -264,6 +264,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       return;
     }
     mIndicator = indicator;
+    mIndicator.setShowIndicators(mShowIndicators);
     WXCircleIndicator indicatorView = indicator.getHostView();
     if (indicatorView != null) {
       indicatorView.setCircleViewPager(mViewPager);

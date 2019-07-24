@@ -213,4 +213,6 @@ public interface IWXBridge extends IWXObject {
 
   void setPageArgument(String instanceId, String key, String value);
 
+  void setViewPortWidth(String instanceId,float viewPortWidth);
+
 }

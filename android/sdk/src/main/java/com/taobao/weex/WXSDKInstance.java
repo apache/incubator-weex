@@ -454,6 +454,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void setInstanceViewPortWidth(int instanceViewPortWidth) {
     this.mInstanceViewPortWidth = instanceViewPortWidth;
     this.mAutoAdjustDeviceWidth = false;
+    WXBridgeManager.getInstance().setViewPortWidth(getInstanceId(),mInstanceViewPortWidth);
   }
 
   public void setAutoAdjustDeviceWidth(boolean autoAdjustViewPort){

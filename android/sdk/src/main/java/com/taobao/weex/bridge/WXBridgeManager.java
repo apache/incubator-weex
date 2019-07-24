@@ -3338,6 +3338,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mWXBridge.markDirty(instanceId, ref, dirty);
     }
   }
+  public void setViewPortWidth(String instanceId,float viewPortWidth){
+    if (isSkipFrameworkInit(instanceId) || isJSFrameworkInit()) {
+      mWXBridge.setViewPortWidth(instanceId,viewPortWidth);
+    }
+  }
 
   public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
     WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(instanceId, ref);
