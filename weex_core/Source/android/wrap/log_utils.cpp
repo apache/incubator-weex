@@ -71,9 +71,9 @@ static void Java_WXLogUtils_e(JNIEnv* env, jstring tag, jbyteArray msg) {
 }
 
 static intptr_t g_WXLogUtils_Msg = 0;
-static void Java_WXLogUtils_Msg(JNIEnv* env, jstring tag, jbyteArray msg) {
+static void Java_WXLogUtils_Performance(JNIEnv* env, jstring tag, jbyteArray msg) {
   jmethodID method_id = base::android::GetMethod(
-      env, g_WXLogUtils_clazz, base::android::STATIC_METHOD, "msg",
+      env, g_WXLogUtils_clazz, base::android::STATIC_METHOD, "performance",
       "(Ljava/lang/String;[B)V", &g_WXLogUtils_Msg);
 
   env->CallStaticVoidMethod(g_WXLogUtils_clazz, method_id, tag, msg);
@@ -124,8 +124,8 @@ void LogUtils::log(LogLevel level,
       case WeexCore::LogLevel::Error:
         WeexCore::Java_WXLogUtils_e(env, tag_jstring.Get(), msg_jbyteArray.Get());
         break;
-      case WeexCore::LogLevel::Msg :
-        WeexCore::Java_WXLogUtils_Msg(env, tag_jstring.Get(), msg_jbyteArray.Get());
+      case WeexCore::LogLevel::Performance :
+        WeexCore::Java_WXLogUtils_Performance(env, tag_jstring.Get(), msg_jbyteArray.Get());
         break;
     }
   }
@@ -159,8 +159,8 @@ bool LogUtilsWeexCore::log(WeexCore::LogLevel level,
     case LogLevel::Error:
       Java_WXLogUtils_e(env, tag_jstring.Get(), msg_jbyteArray.Get());
       break;
-    case LogLevel::Msg :
-      Java_WXLogUtils_Msg(env, tag_jstring.Get(), msg_jbyteArray.Get());
+    case LogLevel::Performance :
+      Java_WXLogUtils_Performance(env, tag_jstring.Get(), msg_jbyteArray.Get());
       break;
   }
   return true;

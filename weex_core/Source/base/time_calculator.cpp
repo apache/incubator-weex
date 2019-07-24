@@ -76,7 +76,7 @@ void weex::base::TimeCalculator::transform() {
   if (!turnOn()) {
     return;
   }
-  LOG_MSG(m_instance_id_.c_str(), "%s", formatData().c_str());
+  LOG_Performance(m_instance_id_.c_str(), "%s", formatData().c_str());
 }
 std::string weex::base::TimeCalculator::formatData() {
   char buffer[1024];

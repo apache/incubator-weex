@@ -139,7 +139,7 @@ public class WXLogUtils {
     e(tag, new String(msg));
   }
 
-  public static void msg(String instanceId, byte[]msg) {
+  public static void performance(String instanceId, byte[]msg) {
     String s = new String(msg);
     if(!TextUtils.isEmpty(instanceId)) {
       WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);

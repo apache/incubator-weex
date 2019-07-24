@@ -25,12 +25,16 @@
 namespace WeexCore {
     
     enum class LogLevel : int {
-        Debug = 0,
+        All = 0,
+        Verbose,
+        Debug,
         Info,
         Warn,
-        Msg,
         Error,
         Tlog,
+        Wtf,
+        Off,
+        Performance,
     };
     
     void PrintLog(LogLevel level, const char* tag, const char* file, unsigned long line, const char* format, ...);
@@ -69,7 +73,7 @@ namespace WeexCore {
 #define LOGI_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Info, TAG, format, ##__VA_ARGS__)
 #define LOGI(format, ...)                LOGI_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
 
-#define LOG_MSG(INSTANCE_ID, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Msg, INSTANCE_ID, format, ##__VA_ARGS__)
+#define LOG_Performance(INSTANCE_ID, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Performance, INSTANCE_ID, format, ##__VA_ARGS__)
 
 #define LOG_TLOG(TAG, format, ...)  WEEX_CORE_LOG(WeexCore::LogLevel::Tlog, TAG, format, ##__VA_ARGS__)
 
