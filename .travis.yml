@@ -5,7 +5,7 @@ matrix:
     fast_finish: true
     include:
       # format code using clang-format
-      - env: FORMAT_CODE=true
+      - env: TEST_SUITE=code_format
         language: ruby
       - env: TEST_SUITE=danger 
       - env: TEST_SUITE=jsfm
@@ -36,10 +36,10 @@ matrix:
             - android-26
             - extra-android-m2repository 
       # static check
-      - env: STATIC_CODE_ANALYSIS=true CHECK_C=true
+      - env: TEST_SUITE=static_code_analysis OCLINT=true
         language: objective-c
         osx_image: xcode7.2
-      - env: STATIC_CODE_ANALYSIS=true CHECK_ANDROID=true
+      - env: TEST_SUITE=static_code_analysis ANDROID_LINT=true
         language: android
         dist: trusty
         jdk: oraclejdk8
@@ -64,7 +64,7 @@ before_cache:
 before_install:
   - |
     # install oclint
-    if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_C}" = "true") ]]; then
+    if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
       brew cask uninstall oclint
       brew tap oclint/formulae
       brew install oclint
@@ -72,7 +72,7 @@ before_install:
 
 install:
   - |
-    if [[ ("$TEST_SUITE" = "android") || ("${CHECK_ANDROID}" = "true") ]]; then
+    if [[ ("$TEST_SUITE" = "android") || ("${ANDROID_LINT}" = "true") ]]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
         nvm install 7.6
         npm install
@@ -91,7 +91,7 @@ install:
         export ANDROID_NDK_HOME=$HOME/android-ndk-r18b
         export PATH=$PATH:$ANDROID_NDK_HOME
         echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
-    elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") ||  ("${CHECK_C}" = "true") ]]; then
+    elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") ||  ("${OCLINT}" = "true") ]]; then
         npm install
     elif [[ ("$TEST_SUITE" = "ios") ]]; then
         git submodule update --init --remote
@@ -99,7 +99,7 @@ install:
         cd ../../ && npm install
         cd weex-playground/ios && pod install --repo-update
         cd ../../
-    elif [[ ("${FORMAT_CODE}" = "true" )]]; then
+    elif [[ ("$TEST_SUITE" = "code_format") ]]; then
         bundle install
     fi
 
@@ -149,7 +149,7 @@ script:
         ;;
     esac
     
-    if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_C}" = "true") ]]; then
+    if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
       hasCFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
       echo "The value of hasCFile is ${hasCFile}"
       if [[ "$hasCFile" =~ "hasCFile" ]]; then
@@ -173,7 +173,7 @@ script:
       fi
     fi 
 
-    if [[ ("${STATIC_CODE_ANALYSIS}" = "true") && ("${CHECK_ANDROID}" = "true") ]]; then
+    if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${ANDROID_LINT}" = "true") ]]; then
       hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
       echo "The value of hasAndroidFile is ${hasAndroidFile}"
       if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
@@ -189,8 +189,8 @@ script:
       fi
     fi
 
-    if [[ ("${FORMAT_CODE}" = "true" )]]; then
-        echo "exec danger ruby"
+    if [[ ("$TEST_SUITE" = "code_format") ]]; then
+        echo "exec code format"
         bundle exec danger
     fi
 
