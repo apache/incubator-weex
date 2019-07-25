@@ -134,7 +134,7 @@ import java.util.Map;
    * */
   public native void nativeUpdateGlobalConfig(String config);
 
-  private native void nativeSetLogType(int type, boolean isPerf);
+  private native void nativeSetLogType(float type, boolean isPerf);
 
   public static final boolean MULTIPROCESS = true;
 
@@ -146,7 +146,8 @@ import java.util.Map;
   }
 
   @Override
-  public void setLogType(int type, boolean isPerf) {
+  public void setLogType(float type, boolean isPerf) {
+    Log.e("setLog", "setLog" + WXEnvironment.sLogLevel.getValue());
     nativeSetLogType(type, isPerf);
   }
 

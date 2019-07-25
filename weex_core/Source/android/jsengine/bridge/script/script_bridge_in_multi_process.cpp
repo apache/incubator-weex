@@ -513,6 +513,7 @@ namespace weex {
             int type = arguments->get<int32_t>(0);
             int perf = arguments->get<int32_t>(1);
             Instance()->script_side()->SetLogType(type, perf == 1);
+
             return createVoidResult();
         }
 

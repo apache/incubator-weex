@@ -263,7 +263,9 @@ int ScriptSideInQueue::CreateInstance(const char *instanceId,
 }
 
 void ScriptSideInQueue::SetLogType(const int logLevel, const bool isPerf) {
-  // do nothing;
+  weex::base::LogImplement::getLog()->setDebugMode(logLevel <= (int)WeexCore::LogLevel::Debug);
+  weex::base::LogImplement::getLog()->setPerfMode(isPerf);
+  LOGE("jsEngine setLog Level %d in Performance mode %s", logLevel, isPerf ? "true" :"false");
 };
 
 std::unique_ptr<WeexJSResult> ScriptSideInQueue::ExecJSOnInstance(const char *instanceId,

@@ -23,7 +23,7 @@
 #include "android/jsengine/weex_runtime.h"
 #include "core/manager/weex_core_manager.h"
 #include "android/jsengine/weex_jsc_utils.h"
-#include "base/utils/log_base.h"
+#include "base/log_defines.h"
 #include "android/jsengine/object/log_utils_jss.h"
 #ifdef USE_JS_RUNTIME
 #include "base/crash/crash_handler.h"

@@ -625,7 +625,10 @@ int CoreSideInPlatform::UpdateInitFrameworkParams(const std::string &key, const 
 }
 
 void CoreSideInPlatform::SetLogType(const int logType, const bool isPerf) {
-
+  WeexCoreManager::Instance()
+      ->script_bridge()
+      ->script_side()
+      ->SetLogType(logType,isPerf);
 }
 
 

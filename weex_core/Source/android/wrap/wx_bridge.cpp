@@ -20,7 +20,7 @@
 #include "android/wrap/wx_bridge.h"
 #include <fstream>
 #include <base/time_calculator.h>
-#include <base/utils/log_base.h>
+#include "base/log_defines.h"
 
 #include "android/wrap/log_utils.h"
 #include "android/base/string/string_utils.h"
@@ -269,8 +269,13 @@ static void RemoveInstanceRenderType(JNIEnv* env, jobject jcaller,
           ->RemovePageRenderType(jString2StrFast(env, instanceId));
 }
 
-static void SetLogType(JNIEnv* env, jint logLevel,
+static void SetLogType(JNIEnv* env, jfloat logLevel,
                                      jboolean isPerf){
+
+  weex::base::LogImplement::getLog()->setDebugMode(logLevel <= (int)WeexCore::LogLevel::Debug);
+  weex::base::LogImplement::getLog()->setPerfMode(isPerf);
+  LOGE("WeexCore setLog Level %d in Performance mode %s debug %d", (int32_t)logLevel, isPerf ? "true" : "false",(int)WeexCore::LogLevel::Debug);
+
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()

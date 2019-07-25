@@ -22,7 +22,7 @@
 
 #include "base/core_constants.h"
 #include "base/log_defines.h"
-#include "base/utils/log_base.h"
+#include "base/log_defines.h"
 #include "core/common/view_utils.h"
 
 namespace WeexCore {

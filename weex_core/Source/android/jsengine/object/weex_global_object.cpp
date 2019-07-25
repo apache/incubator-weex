@@ -186,7 +186,7 @@ void WeexGlobalObject::initWxEnvironment(std::vector<INIT_FRAMEWORK_PARAMS *> &p
             }
             isGlobalConfigStartUpSet = true;
         }
-
+        LOGE("test");
         // --------------------------------------------------------
         // add for debug mode
         if (String("debugMode") == type && String("true") == value) {

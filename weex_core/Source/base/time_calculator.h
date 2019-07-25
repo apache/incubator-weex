@@ -28,7 +28,7 @@
 #include "time_point.h"
 #include "time_unit.h"
 #include "time_utils.h"
-#include "base/utils/log_base.h"
+#include "base/log_defines.h"
 
 namespace weex {
 namespace base {
@@ -93,7 +93,7 @@ class TimeCalculator {
 
   //println
   bool turnOn() {
-    return weex::base::LogImplement::getLog()->ferfMode();
+    return weex::base::LogImplement::getLog()->perfMode();
   }
 
  private:

@@ -1476,6 +1476,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     createInstance(instanceId, new Script(template), options, data);
   }
 
+  public void setLogLevel(final int level, final boolean isPerf) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        if(mWXBridge != null) {
+          mWXBridge.setLogType(level, isPerf);
+        }
+      }
+    });
+  }
+
   public void createInstance(final String instanceId, final Script template,
                              final Map<String, Object> options, final String data) {
     final WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);

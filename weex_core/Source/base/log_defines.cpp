@@ -23,7 +23,7 @@
 
 #ifdef __ANDROID__
 #include <android/log.h>
-#include <base/utils/log_base.h>
+#include "base/log_defines.h"
 #endif
 
 #include "core/manager/weex_core_manager.h"
@@ -87,6 +87,7 @@ void PrintLog(LogLevel level,
     // Log to console by default
 #ifdef __ANDROID__
     bool debugMode = weex::base::LogImplement::getLog()->debugMode();
+    LOGE_FOR_DEBUG("dyy","debug %d log %s",debugMode, log.str());
     switch (level) {
       case LogLevel::Error:
         __android_log_print(ANDROID_LOG_ERROR,

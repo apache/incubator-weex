@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include <base/utils/log_base.h>
+#include "base/log_defines.h"
 #include "script_bridge_in_multi_process.h"
 
 #include "android/utils/params_utils.h"

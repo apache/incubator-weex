@@ -20,7 +20,7 @@
 #include "script_bridge_in_multi_so.h"
 #include <dlfcn.h>
 #include <malloc.h>
-#include <base/utils/log_base.h>
+#include "base/log_defines.h"
 
 #include "android/bridge/multi_so_initializer.h"
 #include "android/bridge/script/script_side_in_multi_so.h"

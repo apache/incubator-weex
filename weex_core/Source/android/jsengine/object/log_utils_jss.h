@@ -23,7 +23,7 @@
 #ifndef WEEX_PROJECT_LOG_UTILS_JSS_H
 #define WEEX_PROJECT_LOG_UTILS_JSS_H
 
-#include <base/utils/log_base.h>
+#include "base/log_defines.h"
 #include "weex_env.h"
 class LogUtilsJSS : public weex::base::LogBase {
  public:
@@ -33,12 +33,13 @@ class LogUtilsJSS : public weex::base::LogBase {
            unsigned long line,
            const char *log) override {
 
-    // for performance, only send TLog & Msg to main process
+    //Please do not add Any LOGE in this function.
 
-    if(level == WeexCore::LogLevel::Performance || level == WeexCore::LogLevel::Tlog) {
+    // for performance, only send TLog & performance Log to main process
+    if (level == WeexCore::LogLevel::Performance
+        || level == WeexCore::LogLevel::Tlog) {
       return WeexEnv::getEnv()->sendLog((int) level, tag, file, line, log);
     }
-
     return false;
   }
 };

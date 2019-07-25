@@ -20,7 +20,7 @@
 // Created by chenpeihan on 2019/2/22.
 //
 
-#include "base/utils/log_base.h"
+#include "base/log_defines.h"
 #include "core/bridge/script_bridge.h"
 #include "js_runtime/weex/utils/weex_jsc_utils.h"
 #include "core/bridge/script_bridge.h"

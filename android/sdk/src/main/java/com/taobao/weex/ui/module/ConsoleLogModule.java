@@ -21,9 +21,12 @@ package com.taobao.weex.ui.module;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
+import android.util.Log;
+
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.LogLevel;
 import java.util.Map;
@@ -37,6 +40,7 @@ public class ConsoleLogModule extends WXModule {
     Map<String, String> ret = new ArrayMap<>();
     if (logLevelEnum != null) {
       WXEnvironment.sLogLevel = logLevelEnum;
+      WXBridgeManager.getInstance().setLogLevel(WXEnvironment.sLogLevel.getValue(),WXEnvironment.isPerf());
       ret.put("status", "success");
     } else {
       ret.put("status", "failure");
@@ -51,6 +55,7 @@ public class ConsoleLogModule extends WXModule {
   @JSMethod(uiThread = false)
   public void setPerfMode(@Nullable String on) {
     WXEnvironment.isPerf = "true".equals(on);
+    WXBridgeManager.getInstance().setLogLevel(WXEnvironment.sLogLevel.getValue(),WXEnvironment.isPerf());
   }
 
   private @Nullable LogLevel getLogLevel(@Nullable String logLevel) {

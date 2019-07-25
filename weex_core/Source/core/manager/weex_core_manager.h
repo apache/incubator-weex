@@ -25,7 +25,6 @@
 #include "base/thread/thread.h"
 #include "core/bridge/platform_bridge.h"
 #include "core/bridge/script_bridge.h"
-#include "core/bridge/log_bridge.h"
 #include "base/message_loop/message_loop.h"
 
 namespace WeexCore {
