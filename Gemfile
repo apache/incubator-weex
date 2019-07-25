@@ -11,5 +11,4 @@ end
 # gem "danger-prose"
 # gem "danger-clorox"
 # gem "danger-mention"
-
 # gem "rails"
