@@ -87,7 +87,7 @@ void PrintLog(LogLevel level,
     // Log to console by default
 #ifdef __ANDROID__
     bool debugMode = weex::base::LogImplement::getLog()->debugMode();
-    LOGE_FOR_DEBUG("dyy","debug %d log %s",debugMode, log.str());
+    LOGE_FOR_DEBUG("WeexCore","debug %d log %s",debugMode, log.str());
     switch (level) {
       case LogLevel::Error:
         __android_log_print(ANDROID_LOG_ERROR,

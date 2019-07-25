@@ -472,8 +472,13 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
             genInitFrameworkParams(c_key_chars, c_value_chars));
         const std::string& key = jString2Str(env, jkey);
         if (key != "") {
+          const std::string &value = jString2Str(env, jvalue);
           WXCoreEnvironment::getInstance()->AddOption(key,
-                                                      jString2Str(env, jvalue));
+                                                      value);
+          if(key == "debugMode" && value == "true"){
+            __android_log_print(ANDROID_LOG_ERROR,"WeexCore","setDebugMode  2 ");
+            weex::base::LogImplement::getLog()->setDebugMode(true);
+          }
         }
       }
     }

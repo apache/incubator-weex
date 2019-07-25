@@ -270,16 +270,17 @@ static void RemoveInstanceRenderType(JNIEnv* env, jobject jcaller,
 }
 
 static void SetLogType(JNIEnv* env, jfloat logLevel,
-                                     jboolean isPerf){
+                       jfloat isPerf){
 
   weex::base::LogImplement::getLog()->setDebugMode(logLevel <= (int)WeexCore::LogLevel::Debug);
-  weex::base::LogImplement::getLog()->setPerfMode(isPerf);
-  LOGE("WeexCore setLog Level %d in Performance mode %s debug %d", (int32_t)logLevel, isPerf ? "true" : "false",(int)WeexCore::LogLevel::Debug);
+  bool flag = isPerf == 1;
+  weex::base::LogImplement::getLog()->setPerfMode(flag);
+  LOGE("WeexCore setLog Level %d in Performance mode %s debug %d", (int32_t)logLevel, flag ? "true" : "false", (int)WeexCore::LogLevel::Debug);
 
   WeexCoreManager::Instance()
       ->getPlatformBridge()
       ->core_side()
-      ->SetLogType(logLevel, isPerf);
+      ->SetLogType((int32_t)logLevel, flag);
 }
 
 static void SetPageArgument(JNIEnv* env, jobject jcaller,

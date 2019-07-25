@@ -186,12 +186,16 @@ void WeexGlobalObject::initWxEnvironment(std::vector<INIT_FRAMEWORK_PARAMS *> &p
             }
             isGlobalConfigStartUpSet = true;
         }
-        LOGE("test");
         // --------------------------------------------------------
         // add for debug mode
-        if (String("debugMode") == type && String("true") == value) {
-            weex::base::LogImplement::getLog()->setDebugMode(true);
-            LOGE("jss use %s"," jsc");
+        static bool hasSet = false;
+        if(!hasSet) {
+            if (String("debugMode") == type && String("true") == value) {
+                __android_log_print(ANDROID_LOG_ERROR,"WeexCore","setDebugMode  1 ");
+                weex::base::LogImplement::getLog()->setDebugMode(true);
+                hasSet = true;
+                LOGE("jss use %s"," jsc");
+            }
         }
         // --------------------------------------------------------
 

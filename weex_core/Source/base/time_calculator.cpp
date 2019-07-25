@@ -21,6 +21,10 @@
 namespace weex {
 namespace base {
 void weex::base::TimeCalculator::taskEnd() {
+  if (!turnOn()) {
+    return;
+  }
+
   LOGE(
       "%s taskName is %s : instanceId %s : m_task_id_ %d: taskEnd",
       m_task_platform_.c_str(),
@@ -31,6 +35,12 @@ void weex::base::TimeCalculator::taskEnd() {
   m_task_end_flag_ = true;
 }
 void weex::base::TimeCalculator::taskStart() {
+
+  if (!turnOn()) {
+    return;
+  }
+
+
   LOGE(
       "timeline %s taskName is %s : instanceId %s : m_task_id_ %d: taskStart",
       m_task_platform_.c_str(),
@@ -79,6 +89,9 @@ void weex::base::TimeCalculator::transform() {
   LOG_Performance(m_instance_id_.c_str(), "%s", formatData().c_str());
 }
 std::string weex::base::TimeCalculator::formatData() {
+  if (!turnOn()) {
+    return "";
+  }
   char buffer[1024];
   std::string format =
       "{\"time\":{\"execTime\":%lld,\"waitTime\":%lld,\"constructor\":%lld,\"destructor\":%lld,\"taskStart\":%lld,\"taskEnd\":%lld},"

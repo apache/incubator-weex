@@ -103,6 +103,13 @@ bool LogUtilsWeexCore::log(WeexCore::LogLevel level,
   if (env == nullptr) {
     return false;
   }
+
+  if(!weex::base::LogImplement::getLog()->debugMode()) {
+    if(level < WeexCore::LogLevel::Error) {
+      return true;
+    }
+  }
+
   std::stringstream ss;
   ss << file << ":" << line << "," << log;
   auto tag_jstring = base::android::ScopedLocalJavaRef<jstring>(

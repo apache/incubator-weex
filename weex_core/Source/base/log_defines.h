@@ -84,8 +84,10 @@ class LogImplement {
   }
 
   inline void setDebugMode(bool debugFlag) {
-    if (m_log)
+    if (m_log) {
+      __android_log_print(ANDROID_LOG_ERROR,"WeexCore","setDebugMode %d", debugFlag);
       m_log->m_debugMode = debugFlag;
+    }
   }
 
   inline bool debugMode() {

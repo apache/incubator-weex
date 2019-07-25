@@ -204,7 +204,7 @@ static void SetPageArgument(JNIEnv *env, jobject jcaller,
 
 
 static void SetLogType(JNIEnv* env, jfloat type,
-                       jboolean isPerf);
+                       jfloat isPerf);
 // Step 2: method stubs.
 
 static intptr_t g_WXBridge_onReceivedResult = 0;
@@ -1209,7 +1209,7 @@ static const JNINativeMethod kMethodsWXBridge[] = {
     {"nativeSetLogType",
      "("
      "F"
-     "Z"
+     "F"
      ")"
      "V", reinterpret_cast<void *>(SetLogType)},
 };
