@@ -21,6 +21,7 @@ package com.taobao.weex.utils.tools;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -37,6 +38,9 @@ public class TimeCalculator {
     }
 
     public void addLog(LogDetail logDetail) {
+        if(!WXEnvironment.isPerf()) {
+            return;
+        }
         logRecorder.add(logDetail);
     }
 
@@ -48,6 +52,10 @@ public class TimeCalculator {
     }
 
     public void println() {
+        if(!WXEnvironment.isPerf()) {
+            return;
+        }
+
         for (LogDetail l: logRecorder) {
             Log.e(TIMELINE_TAG, JSON.toJSONString(l));
         }

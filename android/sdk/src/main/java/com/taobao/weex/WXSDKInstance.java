@@ -1440,7 +1440,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
             WXLogUtils.w("Warning :Component tree has not build completely, onActivityDestroy can not be call!");
         }
     }
-
     this.mTimeCalculator.println();
     destroy();
   }
