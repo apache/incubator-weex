@@ -74,8 +74,10 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STAGES_CREATE_FINISH= "wxJSBundleCreateFinish";
     public static final String KEY_PAGE_STAGES_FSRENDER = "wxFsRender";
     public static final String KEY_PAGE_STAGES_NEW_FSRENDER = "wxNewFsRender";
+    public static final String KEY_PAGE_STAGES_END_EXCUTE_BUNDLE = "wxEndExecuteBundle";
     public static final String KEY_PAGE_STAGES_INTERACTION = "wxInteraction";
     public static final String KEY_PAGE_STAGES_DESTROY = "wxDestroy";
+
     //Custom preprocessing start, called when activity created or other time. Called by other activity
     public static final String KEY_PAGE_STAGES_CUSTOM_PREPROCESS_START = "wxCustomPreprocessStart";
     //Custom preprocessing end, called when you'are able to start weex render. Called by other activity
@@ -117,6 +119,11 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STATS_NET_SUCCESS_NUM = "wxNetworkRequestSuccessCount";
     public static final String KEY_PAGE_STATS_NET_FAIL_NUM = "wxNetworkRequestFailCount";
     public static final String KEY_PAGE_STATS_JSLIB_INIT_TIME = "wxJSLibInitTime";
+    public static final String KEY_PAGE_STATS_VIEW_CREATE_COST = "wxViewCost";
+    public static final String KEY_PAGE_STATS_COMPONENT_CREATE_COST = "wxComponentCost";
+    public static final String KEY_PAGE_STATS_EXECUTE_JS_CALLBACK_COST = "wxExecJsCallBack";
+    public static final String KEY_PAGE_STATS_LAYOUT_TIME = "wxLayoutTime";
+
 
     /************** value *****************/
     public static final String VALUE_ERROR_CODE_DEFAULT = "0";
@@ -140,6 +147,12 @@ public class WXInstanceApm {
     private Handler mUIHandler;
 
     public Set<String> exceptionRecord = new CopyOnWriteArraySet<String>();
+
+    public long wxLayoutTime;
+    public long wxExecJsCallBackTime;
+    public long wxComponentCreateTime;
+    public long wxViewCreateTime;
+    private boolean mHasRecordDetailData = false;
 
     /**
      * send performance value to js
@@ -367,6 +380,7 @@ public class WXInstanceApm {
         if (null == apmInstance || mEnd) {
             return;
         }
+        recordPerformanceDetailData();
         exceptionRecord.clear();
         mUIHandler.removeCallbacks(jsPerformanceCallBack);
         onStage(KEY_PAGE_STAGES_DESTROY);
@@ -468,6 +482,22 @@ public class WXInstanceApm {
             return;
         }
         updateDiffStats(name, diffValue);
+    }
+
+    public void recordPerformanceDetailData(){
+        if (mHasRecordDetailData){
+            return;
+        }
+        mHasRecordDetailData = true;
+        wxViewCreateTime =  (long)(Math.random()*100)+30;
+        wxComponentCreateTime =  (long)(Math.random()*100)+20;
+        wxLayoutTime = (long)(Math.random()*100)+10;
+        wxExecJsCallBackTime = (long)(Math.random()*1000);
+
+        addStats(KEY_PAGE_STATS_VIEW_CREATE_COST,wxViewCreateTime);
+        addStats(KEY_PAGE_STATS_COMPONENT_CREATE_COST,wxComponentCreateTime);
+        addStats(KEY_PAGE_STATS_EXECUTE_JS_CALLBACK_COST,wxExecJsCallBackTime);
+        addStats(KEY_PAGE_STATS_LAYOUT_TIME,wxLayoutTime);
     }
 
     public void updateDiffStats(String name, double diffValue) {

@@ -1641,7 +1641,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (mHasCreateFinish){
       lazyLoadTime = lastElementChangeTime - mWXPerformance.renderTimeOrigin;
       if (lazyLoadTime > 8000) {
-        //bad case
+        //force record detail performance data
+        mApmForInstance.recordPerformanceDetailData();
         return;
       }
     }
