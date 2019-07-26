@@ -757,9 +757,6 @@ break; \
     int IOSSide::CreateFinish(const char* pageId)
     {
         RenderPageBase *page = RenderManager::GetInstance()->GetPage(pageId);
-        if (page == nullptr) {
-            return -1;
-        }
         
         long long startTime = getCurrentTime();
         
@@ -776,16 +773,15 @@ break; \
         [manager startComponentTasks];
         [manager createFinish];
 
-        page->CallBridgeTime(getCurrentTime() - startTime);
+        if (page) {
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        }
         return 0;
     }
     
     int IOSSide::RenderSuccess(const char* pageId)
     {
         RenderPageBase *page = RenderManager::GetInstance()->GetPage(pageId);
-        if (page == nullptr) {
-            return -1;
-        }
         
         long long startTime = getCurrentTime();
         
@@ -802,7 +798,9 @@ break; \
         [manager startComponentTasks];
         [manager renderFinish];
         
-        page->CallBridgeTime(getCurrentTime() - startTime);
+        if (page) {
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        }
         return 0;
     }
         
@@ -1261,10 +1259,12 @@ break; \
 
 - (void)callCreateFinish:(NSString*)pageId
 {
-    RenderPageCustom* page = [self getPage:pageId];
-    if (page && page->IsValid()) {
-        page->CreateFinish();
-    }
+    WXPerformBlockOnComponentThread(^{
+        RenderPageCustom* page = [self getPage:pageId];
+        if (page && page->IsValid()) {
+            page->CreateFinish();
+        }
+    });
 }
 
 - (void)callRefreshFinish:(NSString*)pageId
