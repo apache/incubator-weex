@@ -203,7 +203,7 @@ static void SetPageArgument(JNIEnv *env, jobject jcaller,
                             jstring value);
 
 
-static void SetLogType(JNIEnv* env, jfloat type,
+static void SetLogType(JNIEnv* env, jobject jcaller, jfloat type,
                        jfloat isPerf);
 // Step 2: method stubs.
 

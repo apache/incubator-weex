@@ -189,7 +189,7 @@ static void RemoveInstanceRenderType(JNIEnv* env, jobject jcaller,
 static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
     jstring config);
 
-static void SetLogType(JNIEnv* env, jint logLevel,
+static void SetLogType(JNIEnv* env, jobject jcaller, jint logLevel,
                        jboolean isPerf);
 
 // Step 2: method stubs.

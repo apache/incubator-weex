@@ -269,9 +269,9 @@ static void RemoveInstanceRenderType(JNIEnv* env, jobject jcaller,
           ->RemovePageRenderType(jString2StrFast(env, instanceId));
 }
 
-static void SetLogType(JNIEnv* env, jfloat logLevel,
+static void SetLogType(JNIEnv* env, jobject jcaller, jfloat logLevel,
                        jfloat isPerf){
-  int32_t l = (int)logLevel;
+  int32_t l = (int32_t)logLevel;
   weex::base::LogImplement::getLog()->setPrintLevel((WeexCore::LogLevel)l);
   bool flag = isPerf == 1;
   weex::base::LogImplement::getLog()->setPerfMode(flag);
