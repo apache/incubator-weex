@@ -25,7 +25,7 @@ void weex::base::TimeCalculator::taskEnd() {
     return;
   }
 
-  LOGE(
+  LOG_Performance(m_instance_id_.c_str(),
       "%s taskName is %s : instanceId %s : m_task_id_ %d: taskEnd",
       m_task_platform_.c_str(),
       m_task_name_.c_str(),
@@ -41,7 +41,7 @@ void weex::base::TimeCalculator::taskStart() {
   }
 
 
-  LOGE(
+  LOG_Performance(m_instance_id_.c_str(),
       "timeline %s taskName is %s : instanceId %s : m_task_id_ %d: taskStart",
       m_task_platform_.c_str(),
       m_task_name_.c_str(),
@@ -63,7 +63,7 @@ void weex::base::TimeCalculator::print() {
   if (!args.empty() || taskWait > 100) {
     showLog = true;
   } else if (taskCost < 5) {
-    LOGE("timeline %s taskName is %s cost less than 5ms", m_task_platform_.c_str(),
+    LOG_Performance(m_instance_id_.c_str(),"timeline %s taskName is %s cost less than 5ms", m_task_platform_.c_str(),
          m_task_name_.c_str());
   } else {
     showLog = true;
@@ -79,7 +79,7 @@ void weex::base::TimeCalculator::print() {
   }
 
   if (showLog) {
-    LOGE("timeline taskName: %s, result: %s", m_task_name_.c_str(), formatData().c_str());
+    LOG_Performance(m_instance_id_.c_str(),"timeline taskName: %s, result: %s", m_task_name_.c_str(), formatData().c_str());
   }
 }
 void weex::base::TimeCalculator::transform() {

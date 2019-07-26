@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.taobao.weex.WXEnvironment;
 
 public class LogDetail {
     public static final String KeyWrod_Init = "Weex_Init";
@@ -51,6 +52,7 @@ public class LogDetail {
     public String keyWords = KeyWords_Render;
 
     public void println() {
+        if(WXEnvironment.isPerf())
         Log.e(TimeCalculator.TIMELINE_TAG," timeline " + this.keyWords + " java LogDetail: " + this.toString());
     }
 

@@ -59,7 +59,38 @@ class LogBase {
 
   LogBase() : printLevel(WeexCore::LogLevel::Error), m_debugMode(false), m_perfMode(false) {};
 
- public:
+  inline void setDebugMode(bool isDebug) {
+    if (isDebug) {
+      printLevel = WeexCore::LogLevel::Debug;
+    } else {
+      printLevel = WeexCore::LogLevel::Error;
+    }
+    m_debugMode = isDebug;
+  }
+
+  inline bool is_debug_mode() { return m_debugMode; }
+
+  inline void setPerfMode(bool isPerf) {
+    m_perfMode = isPerf;
+  }
+
+  inline bool is_perf_mode() { return m_perfMode; }
+
+  inline void setPrintLevel(WeexCore::LogLevel l) {
+    printLevel = l;
+  }
+
+  inline WeexCore::LogLevel print_level() { return printLevel; }
+
+  inline bool shouldPrint(WeexCore::LogLevel l) {
+    if (m_perfMode && l == WeexCore::LogLevel::Performance) {
+      return true;
+    }
+
+    return l != WeexCore::LogLevel::Performance && l >= printLevel;
+  }
+
+ private:
   WeexCore::LogLevel printLevel = WeexCore::LogLevel::Error;
   bool m_perfMode = false;
   bool m_debugMode = false;
@@ -79,34 +110,42 @@ class LogImplement {
   }
 
   inline void setPrintLevel(WeexCore::LogLevel level) {
-    if (m_log)
-      m_log->printLevel = level;
+    if (m_log) {
+      m_log->setPrintLevel(level);
+    }
   }
 
   inline void setDebugMode(bool debugFlag) {
     if (m_log) {
-      __android_log_print(ANDROID_LOG_ERROR,"WeexCore","setDebugMode %d", debugFlag);
-      m_log->m_debugMode = debugFlag;
+      __android_log_print(ANDROID_LOG_ERROR, "WeexCore", "setDebugMode %d", debugFlag);
+      m_log->setDebugMode(debugFlag);
     }
   }
 
   inline bool debugMode() {
-    if(m_log)
-      return m_log->m_debugMode;
+    if (m_log)
+      return m_log->is_debug_mode();
 
     return false;
   }
 
   inline bool perfMode() {
-    if(m_log)
-      return m_log->m_perfMode;
+    if (m_log)
+      return m_log->is_perf_mode();
 
     return false;
   }
 
   inline void setPerfMode(bool perfFlag) {
     if (m_log)
-      m_log->m_perfMode = perfFlag;
+      m_log->setPerfMode(perfFlag);
+  }
+
+  inline bool can_print_log(WeexCore::LogLevel l) {
+    if (m_log)
+      return m_log->shouldPrint(l);
+
+    return false;
   }
 
   bool log(WeexCore::LogLevel level,
@@ -118,7 +157,7 @@ class LogImplement {
       return false;
     }
 
-    if (!m_log->m_debugMode && level < m_log->printLevel) {
+    if (!m_log->shouldPrint(level)) {
       return true;
     }
 
@@ -131,7 +170,6 @@ class LogImplement {
 };
 }
 }
-
 
 #if defined(LOGE)
 #undef LOGE
@@ -155,42 +193,31 @@ class LogImplement {
 
 #define WEEX_CORE_LOG_TAG "WeexCore"
 #define WEEX_CORE_FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
-#define WEEX_CORE_LOG(level, TAG, format, ...)   WeexCore::PrintLog((level), TAG, WEEX_CORE_FILENAME, __LINE__, (format), ##__VA_ARGS__)
+#define WEEX_CORE_LOG(level, TAG, format, ...) \
+        do{ \
+        if(weex::base::LogImplement::getLog()->can_print_log((level))) \
+          WeexCore::PrintLog((level), TAG, WEEX_CORE_FILENAME, __LINE__, (format), ##__VA_ARGS__);\
+        }while(0);\
 
 #define LOGE_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Error, TAG, format, ##__VA_ARGS__)
 #define LOGE(format, ...)                LOGE_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
 
-
-#define LOGW_TAG(TAG, format, ...) \
-        do{ \
-        if(weex::base::LogImplement::getLog()->debugMode()) \
-          WEEX_CORE_LOG(WeexCore::LogLevel::Warn, TAG, format, ##__VA_ARGS__);\
-        }while(0);\
+#define LOGW_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Warn, TAG, format, ##__VA_ARGS__)
 
 #define LOGW(format, ...)                LOGW_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
 
-#define LOGI_TAG(TAG, format, ...) \
-        do{ \
-        if(weex::base::LogImplement::getLog()->debugMode()) \
-          WEEX_CORE_LOG(WeexCore::LogLevel::Info, TAG, format, ##__VA_ARGS__);\
-        }while(0);\
+#define LOGI_TAG(TAG, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Info, TAG, format, ##__VA_ARGS__)
 
 #define LOGI(format, ...)                LOGI_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
-
-
 
 #define LOG_Performance(INSTANCE_ID, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Performance, INSTANCE_ID, format, ##__VA_ARGS__)
 
 #define LOG_TLOG(TAG, format, ...)  WEEX_CORE_LOG(WeexCore::LogLevel::Tlog, TAG, format, ##__VA_ARGS__)
 
-#define LOGE_FOR_DEBUG(TAG, format, ...)  __android_log_print(ANDROID_LOG_ERROR,TAG,format,##__VA_ARGS__);
+#define LOGE_FOR_DEBUG(TAG, format, ...)  __android_log_print(ANDROID_LOG_ERROR,TAG,format,##__VA_ARGS__)
 
 #ifdef DEBUG
-#define LOGD_TAG(TAG, format, ...) \
-        do{ \
-        if(weex::base::LogImplement::getLog()->debugMode()) \
-          WEEX_CORE_LOG(WeexCore::LogLevel::Debug, TAG, format, ##__VA_ARGS__);\
-        }while(0);\
+#define LOGD_TAG(TAG, format, ...) WEEX_CORE_LOG(WeexCore::LogLevel::Debug, TAG, format, ##__VA_ARGS__)
 
 #define LOGD(format, ...) LOGD_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
 
