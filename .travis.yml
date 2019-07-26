@@ -100,7 +100,7 @@ script:
         npm run danger -- run --dangerfile ./dangerfile-jsfm.js
         ;;
       "danger" )
-        npm run danger -- run --dangerfile ./dangerfile.js
+        DEBUG="*" npm run danger -- run --dangerfile ./dangerfile.js
         ;;
       "ios" )
         hasIosFile=$(npm run danger -- run --dangerfile ./dangerfile-ios.js)
