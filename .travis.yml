@@ -167,9 +167,12 @@ script:
           -disable-rule=DoubleNegative \
           -disable-rule=MultipleUnaryOperator \
           -disable-rule=DeepNestedBlock \
+          -disable-rule=AssignIvarOutsideAccessors \
           -max-priority-1=15000 \
           -max-priority-2=15000 \
-          -max-priority-3=15000
+          -max-priority-3=15000 > oclint.log
+        export COMMAND="cat ios/sdk/oclint.log | grep -i \"P[1|2]\""
+        cd ../../ && npm run danger -- run --dangerfile ./dangerfile-output.js
       fi
     fi 
 
