@@ -63,13 +63,8 @@ before_cache:
 
 before_install:
   - |
-    # update node
-    if [[  ("$TEST_SUITE" = "ios") ]];then 
-      brew install node
-    fi 
     # install oclint
     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
-      brew install node
       brew cask uninstall oclint
       brew tap oclint/formulae
       brew install oclint
@@ -105,8 +100,13 @@ install:
         export PATH=$PATH:$ANDROID_NDK_HOME
         echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
     elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") ||  ("${OCLINT}" = "true") ]]; then
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+        nvm install 12.6.0  
         npm install
     elif [[ ("$TEST_SUITE" = "ios") ]]; then
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+        nvm install 12.6.0  
+
         git submodule update --init --remote
         cd weex-playground/ios && bash update_podfile_for_travisci.sh
         cd ../../ && npm install
