@@ -83,7 +83,8 @@
     "core-js": "^2.4.0",
     "semver": "^5.1.0",
     "weex-rax-framework": "0.4.20",
-    "weex-vue-framework": "2.5.16-weex.5"
+    "weex-vue-framework": "2.5.16-weex.5",
+    "yarn": "^1.17.3"
   },
   "devDependencies": {
     "babel-core": "^6.17.0",
