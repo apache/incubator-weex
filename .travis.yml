@@ -150,10 +150,10 @@ script:
       "ios" )
         if npm run danger -- ci --dangerfile ./dangerfile-ios.js | grep -q "hasIosFile" ; then
           # build WeexSDK and run WeexSDKTests
-          xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
+          xcodebuild -quiet -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
           # build WeexDemo and run WeexDemo test
           cd weex-playground/ios && mkdir tmp && mv * tmp;cd tmp
-          xcodebuild -workspace WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
+          xcodebuild -quiet -workspace WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
         fi
         ;;
     esac
@@ -187,7 +187,7 @@ script:
       if npm run danger -- ci --dangerfile ./dangerfile-static-check.js | grep -q "hasAndroidFile" ; then
         echo "hasAndroidFile"
         cd android
-        bundle exec danger --danger_id=androidLint --dangerfile=../Dangerfile-android
+        git init && bundle exec danger --danger_id=androidLint --dangerfile=../Dangerfile-android
       fi
     fi
 
