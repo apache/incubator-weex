@@ -427,8 +427,6 @@ namespace weex {
 
             std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::CreateInstance(
                     IPCArguments *arguments) {
-                LOGD("ScriptBridgeInMultiProcess::CreateInstance");
-
                 const char *instanceID = GetUTF8StringFromIPCArg(arguments, 0);
                 const char *func = GetUTF8StringFromIPCArg(arguments, 1);
                 const char *script = GetUTF8StringFromIPCArg(arguments, 2);
@@ -457,6 +455,7 @@ namespace weex {
                     init_framework_params->value = IPCByteArrayToWeexByteArray(ba);
                     params.push_back(init_framework_params);
                 }
+                LOG_TLOG("jsEngine","ScriptBridgeInMultiProcess::CreateInstance and Id is : %s", instanceID);
                 auto result = createInt32Result(Instance()->script_side()->CreateInstance(
                                         instanceID, func, script, opts, initData, extendsApi,params));
                 freeInitFrameworkParams(params);

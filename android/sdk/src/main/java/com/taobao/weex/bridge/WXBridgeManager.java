@@ -1675,6 +1675,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         // others will use invokeExecJS
         if (!isSandBoxContext) {
           instance.getApmForInstance().onStage("!isSandBoxContext,and excute");
+          WXLogUtils.e("Instance " + instance.getInstanceId() + " Did Not Render in SandBox Mode");
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           return;
         }
@@ -1683,11 +1684,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 || instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY
                 || instance.getRenderStrategy() == WXRenderStrategy.JSON_RENDER) {
           instance.getApmForInstance().onStage("wxBeforeInvokeCreateInstanceContext");
+
+          WXLogUtils.d("Instance " + instance.getInstanceId() + " Render in SandBox Mode And Render Type is "
+                  + type + " Render Strategy is " + instance.getRenderStrategy());
+
           int ret = invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
           instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
           if(ret == 0) {
             String err = "[WXBridgeManager] invokeCreateInstance : " + instance.getTemplateInfo();
-
+            WXLogUtils.e("Instance " + instance.getInstanceId() + "Render error : " + err);
             instance.onRenderError(
                     WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
                     WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg() + err);
@@ -1702,6 +1707,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           //      WXErrorCode.WX_KEY_EXCEPTION_NO_BUNDLE_TYPE.getErrorMsg(),
           //      null
           //);
+
+          WXLogUtils.d("Instance " + instance.getInstanceId() + "Did not Render in SandBox Mode And Render Type is "
+                + type + " Render Strategy is " + instance.getRenderStrategy());
           instance.getApmForInstance().onStage("StartInvokeExecJSBadBundleType");
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
@@ -1711,7 +1719,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         String err = "[WXBridgeManager] invokeCreateInstance " + e.getCause()
                 + instance.getTemplateInfo();
         instance.getApmForInstance().onStage("createInstance error :"+e.toString());
-
+        WXLogUtils.e("Instance " + instance.getInstanceId() + "Render error : " + err);
         instance.onRenderError(
                 WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
                 WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg() + err);

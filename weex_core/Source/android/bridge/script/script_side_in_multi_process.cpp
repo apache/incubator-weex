@@ -461,7 +461,7 @@ int ScriptSideInMultiProcess::CreateInstance(
     }
     return result->get<jint>();
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("%s %s","Create Instance is failed and Error msg is", e.msg());
     // report crash here
     WeexCoreManager::Instance()
         ->getPlatformBridge()

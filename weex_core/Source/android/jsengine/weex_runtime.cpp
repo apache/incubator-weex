@@ -607,7 +607,6 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
                                 const String &initData,
                                 const String &extendsApi,
                                 std::vector<INIT_FRAMEWORK_PARAMS*>& params) {
-    LOGE("test-> : start createInstance");
     LOG_TLOG("jsEngine","id --> %s CreateInstance start", instanceId.utf8().data());
 
     JSGlobalObject *impl_globalObject = weexObjectHolder->m_globalObject.get();
@@ -739,7 +738,6 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
         }
     }
     timeCalculator.taskEnd();
-    LOGE("test-> : after run extendsApi");
 
     if (!ExecuteJavaScript(globalObject, script, ("weex createInstanceContext"), true,
                            "createInstanceContext", instanceId.utf8().data())) {
@@ -747,7 +745,6 @@ int WeexRuntime::createInstance(const String &instanceId, const String &func, co
         LOG_TLOG("jsEngine","id --> %s CreateInstance's createInstanceContext failed", instanceId.utf8().data());
         return static_cast<int32_t>(false);
     }
-    LOGE("test-> : after ExecuteJavaScript");
     return static_cast<int32_t>(true);
 }
 

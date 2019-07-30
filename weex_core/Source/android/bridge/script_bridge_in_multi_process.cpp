@@ -981,10 +981,16 @@ std::unique_ptr<IPCResult> HandleLogDetail(IPCArguments *arguments) {
   WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
       weex::base::MakeCopyable(
           [level_str = std::move(arg1), tag_ptr = std::move(arg2),
-           file_ptr = std::move(arg3), line_ptr = std::move(arg4), log_ptr = std::move(arg5) ]() {
-            int level = atoi(level_str.get());
-            long line = atol(line_ptr.get());
-            weex::base::LogImplement::getLog()->log((WeexCore::LogLevel)level, tag_ptr.get(), file_ptr.get(), line, log_ptr.get());
+              file_ptr = std::move(arg3), line_ptr = std::move(arg4), log_ptr = std::move(arg5)]() {
+            int level = (level_str == nullptr || level_str.get() == nullptr)
+                        ? ((int) (WeexCore::LogLevel::Debug)) : atoi(level_str.get());
+            long line =
+                (line_ptr == nullptr || line_ptr.get() == nullptr) ? 0 : atol(line_ptr.get());
+            weex::base::LogImplement::getLog()->log((WeexCore::LogLevel) level,
+                                                    tag_ptr.get(),
+                                                    file_ptr.get(),
+                                                    line,
+                                                    log_ptr.get());
           }));
   return createInt32Result(static_cast<int32_t>(true));
 }
