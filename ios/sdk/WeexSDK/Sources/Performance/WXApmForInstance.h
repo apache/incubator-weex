@@ -114,6 +114,7 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 @property (nonatomic, assign) BOOL isStartRender;
 @property (nonatomic,assign)  BOOL  hasRecordFirstInterationView;
 @property (nonatomic, assign) BOOL isDownLoadFailed;
+@property (nonatomic, assign) BOOL forceStopRecordInteractionTime;
 @property (nonatomic,assign) double pageRatio;
 
 #pragma mark - basic method

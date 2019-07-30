@@ -123,7 +123,6 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     BOOL _hasRecordInteractionTime;
     BOOL _hasRecordDownLoadStart;
     BOOL _hasRecordDownLoadEnd;
-    BOOL _forceRecordInteractionTime;
 }
 
 @property (nonatomic,strong) id<WXApmProtocol> apmProtocolInstance;
@@ -198,7 +197,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     
     if ([KEY_PAGE_STAGES_INTERACTION isEqualToString:name]) {
         _hasRecordInteractionTime = YES;
-        if (_forceRecordInteractionTime) {
+        if (self.forceStopRecordInteractionTime) {
             return;
         }
     }
@@ -545,7 +544,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 - (void) forceSetInteractionTime:(long) unixTime
 {
     [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:unixTime];
-    _forceRecordInteractionTime=YES;
+    _forceStopRecordInteractionTime = YES;
 }
 
 @end
