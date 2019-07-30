@@ -194,7 +194,7 @@ script:
 
     if [[ ("$TEST_SUITE" = "code_format") ]]; then
         echo "exec code format"
-        bundle exec danger --danger_id=dangerRuby 
+        bundle exec danger --danger_id=codeFormat
     fi
 
 notifications:
