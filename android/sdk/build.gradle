@@ -192,7 +192,6 @@ android {
     compileOptions.encoding = "UTF-8"
     lintOptions {
         abortOnError false
-        xmlReport true
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
