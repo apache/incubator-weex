@@ -1,0 +1,2 @@
+android_lint.severity = "Error"
+android_lint.lint
