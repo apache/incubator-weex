@@ -62,20 +62,20 @@ before_cache:
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
   - rm -fr $HOME/node_modules/*
 
-before_install:
-  - |
-    # install oclint
-    if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
-      brew cask uninstall oclint
-      brew tap oclint/formulae
-      brew install oclint
-    fi
-    # install android lint 
-    if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${ANDROID_LINT}" = "true") ]]; then
-      sudo apt-get install rubygems
-      gem install bundler
-      bundle install
-    fi
+# before_install:
+#   - |
+#     # install oclint
+#     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
+#       brew cask uninstall oclint
+#       brew tap oclint/formulae
+#       brew install oclint
+#     fi
+#     # install android lint 
+#     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${ANDROID_LINT}" = "true") ]]; then
+#       sudo apt-get install rubygems
+#       gem install bundler
+#       bundle install
+#     fi
 
     
 
@@ -100,89 +100,89 @@ install:
         export ANDROID_NDK_HOME=$HOME/android-ndk-r18b
         export PATH=$PATH:$ANDROID_NDK_HOME
         echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
-    elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") ||  ("${OCLINT}" = "true") ]]; then
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-        nvm install 12.6.0  
-        npm install
-    elif [[ ("$TEST_SUITE" = "ios") ]]; then
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-        nvm install 12.6.0  
+    # elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") ||  ("${OCLINT}" = "true") ]]; then
+    #     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+    #     nvm install 12.6.0  
+    #     npm install
+    # elif [[ ("$TEST_SUITE" = "ios") ]]; then
+    #     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+    #     nvm install 12.6.0  
 
-        git submodule update --init --remote
-        cd weex-playground/ios && bash update_podfile_for_travisci.sh
-        cd ../../ && npm install
-        cd weex-playground/ios && pod install --repo-update
-        cd ../../
-    elif [[ ("$TEST_SUITE" = "code_format") ]]; then
-        bundle install
+    #     git submodule update --init --remote
+    #     cd weex-playground/ios && bash update_podfile_for_travisci.sh
+    #     cd ../../ && npm install
+    #     cd weex-playground/ios && pod install --repo-update
+    #     cd ../../
+    # elif [[ ("$TEST_SUITE" = "code_format") ]]; then
+    #     bundle install
     fi
     
 
 script:
   - |
-    case $TEST_SUITE in
-      "android") 
-        case $ABI in
-          "armeabi-v7a" )
-            GRADLE_ABI="-PsupportArmeabi-v7a=true -PsupportArm64-v8a=false -PsupportX86=false"
-            ;;
-          "arm64-v8a" )
-            GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=true -PsupportX86=false" 
-            ;;
-          "x86" )
-            GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=false -PsupportX86=true"
-            ;;
-          "*" )
-            GRADLE_ABI=""
-            ;;
-        esac
-        if npm run danger -- ci --dangerfile ./dangerfile-android.js | grep -q "hasAndroidFile" ; then
-          cd android
-          ./gradlew clean install -PbuildRuntimeApi=true ${GRADLE_ABI} --info
-          ./gradlew install -PbuildRuntimeApi=false ${GRADLE_ABI} --info
-        fi
-        ;;
-      "jsfm" )
-        npm run danger -- ci -i jsfm --dangerfile ./dangerfile-jsfm.js
-        ;;
-      "danger" )
-        npm run danger -- ci -i danger --dangerfile ./dangerfile.js
-        ;;
-      "ios" )
-        if npm run danger -- ci --dangerfile ./dangerfile-ios.js | grep -q "hasIosFile" ; then
-          # build WeexSDK and run WeexSDKTests
-          xcodebuild -quiet -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
-          # build WeexDemo and run WeexDemo test
-          cd weex-playground/ios && mkdir tmp && mv * tmp;cd tmp
-          xcodebuild -quiet -workspace WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
-        fi
-        ;;
-    esac
+    # case $TEST_SUITE in
+    #   "android") 
+    #     case $ABI in
+    #       "armeabi-v7a" )
+    #         GRADLE_ABI="-PsupportArmeabi-v7a=true -PsupportArm64-v8a=false -PsupportX86=false"
+    #         ;;
+    #       "arm64-v8a" )
+    #         GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=true -PsupportX86=false" 
+    #         ;;
+    #       "x86" )
+    #         GRADLE_ABI="-PsupportArmeabi-v7a=false -PsupportArm64-v8a=false -PsupportX86=true"
+    #         ;;
+    #       "*" )
+    #         GRADLE_ABI=""
+    #         ;;
+    #     esac
+    #     if npm run danger -- ci --dangerfile ./dangerfile-android.js | grep -q "hasAndroidFile" ; then
+    #       cd android
+    #       ./gradlew clean install -PbuildRuntimeApi=true ${GRADLE_ABI} --info
+    #       ./gradlew install -PbuildRuntimeApi=false ${GRADLE_ABI} --info
+    #     fi
+    #     ;;
+    #   "jsfm" )
+    #     npm run danger -- ci -i jsfm --dangerfile ./dangerfile-jsfm.js
+    #     ;;
+    #   "danger" )
+    #     npm run danger -- ci -i danger --dangerfile ./dangerfile.js
+    #     ;;
+    #   "ios" )
+    #     if npm run danger -- ci --dangerfile ./dangerfile-ios.js | grep -q "hasIosFile" ; then
+    #       # build WeexSDK and run WeexSDKTests
+    #       xcodebuild -quiet -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
+    #       # build WeexDemo and run WeexDemo test
+    #       cd weex-playground/ios && mkdir tmp && mv * tmp;cd tmp
+    #       xcodebuild -quiet -workspace WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
+    #     fi
+    #     ;;
+    # esac
     
-    if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
-      if npm run danger -- ci --dangerfile ./dangerfile-static-check.js | grep -q "hasCFile" ; then
-        echo "hasCFile"
-        cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
-        oclint-json-compilation-database oclint_args -- \
-          -disable-rule=ShortVariableName \
-          -disable-rule=LongLine \
-          -disable-rule=LongMethod \
-          -disable-rule=HighNcssMethod \
-          -disable-rule=LongVariableName \
-          -disable-rule=HighCyclomaticComplexity \
-          -disable-rule=HighNPathComplexity \
-          -disable-rule=UnusedLocalVariable \
-          -disable-rule=DoubleNegative \
-          -disable-rule=MultipleUnaryOperator \
-          -disable-rule=DeepNestedBlock \
-          -disable-rule=AssignIvarOutsideAccessors \
-          -max-priority-1=15000 \
-          -max-priority-2=15000 \
-          -max-priority-3=15000 > oclint.log
-        export COMMAND="cat ios/sdk/oclint.log | grep -i \"P[1|2]\""
-        cd ../../ && npm run danger -- ci -i output --dangerfile ./dangerfile-output.js
-      fi
-    fi 
+    # if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
+    #   if npm run danger -- ci --dangerfile ./dangerfile-static-check.js | grep -q "hasCFile" ; then
+    #     echo "hasCFile"
+    #     cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
+    #     oclint-json-compilation-database oclint_args -- \
+    #       -disable-rule=ShortVariableName \
+    #       -disable-rule=LongLine \
+    #       -disable-rule=LongMethod \
+    #       -disable-rule=HighNcssMethod \
+    #       -disable-rule=LongVariableName \
+    #       -disable-rule=HighCyclomaticComplexity \
+    #       -disable-rule=HighNPathComplexity \
+    #       -disable-rule=UnusedLocalVariable \
+    #       -disable-rule=DoubleNegative \
+    #       -disable-rule=MultipleUnaryOperator \
+    #       -disable-rule=DeepNestedBlock \
+    #       -disable-rule=AssignIvarOutsideAccessors \
+    #       -max-priority-1=15000 \
+    #       -max-priority-2=15000 \
+    #       -max-priority-3=15000 > oclint.log
+    #     export COMMAND="cat ios/sdk/oclint.log | grep -i \"P[1|2]\""
+    #     cd ../../ && npm run danger -- ci -i output --dangerfile ./dangerfile-output.js
+    #   fi
+    # fi 
 
     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${ANDROID_LINT}" = "true") ]]; then
       if npm run danger -- ci --dangerfile ./dangerfile-static-check.js | grep -q "hasAndroidFile" ; then
@@ -196,10 +196,10 @@ script:
       fi
     fi
 
-    if [[ ("$TEST_SUITE" = "code_format") ]]; then
-        echo "exec code format"
-        bundle exec danger --danger_id=codeFormat
-    fi
+    # if [[ ("$TEST_SUITE" = "code_format") ]]; then
+    #     echo "exec code format"
+    #     bundle exec danger --danger_id=codeFormat
+    # fi
 
 notifications:
   webhooks:
