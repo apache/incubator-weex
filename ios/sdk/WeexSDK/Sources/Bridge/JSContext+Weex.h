@@ -24,3 +24,4 @@
 @property (nonatomic, strong) NSString *instanceId;
 
 @end
+
