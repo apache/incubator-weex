@@ -4,13 +4,6 @@ node_js: 12.6.0
 matrix:
     fast_finish: true
     include:
-      # format code using clang-format
-      # - env: TEST_SUITE=code_format
-      #   language: ruby
-      # - env: TEST_SUITE=danger 
-      # - env: TEST_SUITE=jsfm
-      # - env: TEST_SUITE=ios
-      #   language: objective-c
       - env: TEST_SUITE=android ABI=armeabi-v7a
         language: android
         dist: trusty
@@ -35,10 +28,6 @@ matrix:
           components:
             - android-26
             - extra-android-m2repository 
-      # static check
-      # - env: TEST_SUITE=static_code_analysis OCLINT=true
-      #   osx_image: xcode7.2
-      #   language: objective-c
       - env: TEST_SUITE=static_code_analysis ANDROID_LINT=true
         language: android
         dist: trusty
