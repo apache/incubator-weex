@@ -132,10 +132,7 @@ script:
             GRADLE_ABI=""
             ;;
         esac
-
-        hasAndroidFile=$(yarn danger ci --dangerfile ./dangerfile-android.js)
-        echo "The value of hasAndroidFile is ${hasAndroidFile}"
-        if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
+        if yarn danger ci --dangerfile ./dangerfile-android.js | grep -q "hasAndroidFile" ; then
           cd android
           ./gradlew clean install -PbuildRuntimeApi=true ${GRADLE_ABI} --info
           ./gradlew install -PbuildRuntimeApi=false ${GRADLE_ABI} --info
@@ -148,9 +145,7 @@ script:
         yarn danger ci -i danger --dangerfile ./dangerfile.js
         ;;
       "ios" )
-        hasIosFile=$(yarn danger ci --dangerfile ./dangerfile-ios.js)
-        echo "The value of hasIosFile is ${hasIosFile}"
-        if [[ "$hasIosFile" =~ "hasIosFile" ]]; then
+        if yarn danger ci --dangerfile ./dangerfile-ios.js | grep -q "hasIosFile" ; then
           # build WeexSDK and run WeexSDKTests
           xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
           # build WeexDemo and run WeexDemo test
@@ -161,9 +156,7 @@ script:
     esac
     
     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
-      hasCFile=$(yarn danger ci --dangerfile ./dangerfile-static-check.js)
-      echo "The value of hasCFile is ${hasCFile}"
-      if [[ "$hasCFile" =~ "hasCFile" ]]; then
+      if yarn danger ci --dangerfile ./dangerfile-static-check.js | grep -q "hasCFile" ; then
         echo "hasCFile"
         cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
         oclint-json-compilation-database oclint_args -- \
@@ -188,9 +181,7 @@ script:
     fi 
 
     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${ANDROID_LINT}" = "true") ]]; then
-      hasAndroidFile=$(yarn danger ci --dangerfile ./dangerfile-static-check.js)
-      echo "The value of hasAndroidFile is ${hasAndroidFile}"
-      if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
+      if yarn danger ci --dangerfile ./dangerfile-static-check.js | grep -q "hasAndroidFile" ; then
         echo "hasAndroidFile"
         bundle exec danger --danger_id=androidLint --dangerfile=./Dangerfile-android
       fi
