@@ -21,7 +21,9 @@
 #define LogDefines_h
 #include <cstring>
 #include <string>
+#ifdef __ANDROID__
 #include <android/log.h>
+#endif
 #include <mutex>
 
 namespace WeexCore {
@@ -117,7 +119,6 @@ class LogImplement {
 
   inline void setDebugMode(bool debugFlag) {
     if (m_log) {
-      __android_log_print(ANDROID_LOG_ERROR, "WeexCore", "setDebugMode %d", debugFlag);
       m_log->setDebugMode(debugFlag);
     }
   }
@@ -213,8 +214,10 @@ class LogImplement {
 #define LOG_Performance(INSTANCE_ID, format, ...)       WEEX_CORE_LOG(WeexCore::LogLevel::Performance, INSTANCE_ID, format, ##__VA_ARGS__)
 
 #define LOG_TLOG(TAG, format, ...)  WEEX_CORE_LOG(WeexCore::LogLevel::Tlog, TAG, format, ##__VA_ARGS__)
-
+#ifdef __ANDROID__
 #define LOGE_FOR_DEBUG(TAG, format, ...)  __android_log_print(ANDROID_LOG_ERROR,TAG,format,##__VA_ARGS__)
+#endif
+
 
 #ifdef DEBUG
 #define LOGD_TAG(TAG, format, ...) WEEX_CORE_LOG(WeexCore::LogLevel::Debug, TAG, format, ##__VA_ARGS__)

@@ -23,6 +23,7 @@
 #include "base/log_defines.h"
 #include "base/make_copyable.h"
 #include "base/thread/waitable_event.h"
+#include "base/time_calculator.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #include "core/bridge/eagle_bridge.h"
@@ -30,7 +31,6 @@
 #include "core/config/core_environment.h"
 #ifdef OS_ANDROID
 #include "core/parser/action_args_check.h"
-#include <base/time_calculator.h>
 #include "android/weex_extend_js_api.h"
 #endif
 

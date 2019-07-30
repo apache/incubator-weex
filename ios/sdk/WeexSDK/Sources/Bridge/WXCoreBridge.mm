@@ -37,6 +37,7 @@
 #import "WXComponentFactory.h"
 #include "base/core_constants.h"
 #include "base/time_utils.h"
+#include "base/log_defines.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/target/render_target.h"
@@ -942,9 +943,9 @@ break; \
     
 #pragma mark - Log Bridge
     
-    class LogBridgeIOS: public LogBridge {
+    class LogBridgeIOS: public weex::base::LogBase {
     public:
-        virtual void log(LogLevel level, const char* tag, const char* file, unsigned long line, const char* log) override {
+        virtual bool log(LogLevel level, const char* tag, const char* file, unsigned long line, const char* log) override {
 #ifdef DEBUG
             switch (level) {
                 case LogLevel::Error:
@@ -981,6 +982,7 @@ break; \
             
             [WXLog devLog:wxLogLevel file:file line:line format:@"<%s> %s", tag, log];
 #endif
+            return true;
         }
     };
 }
@@ -1430,7 +1432,15 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         env->AddOption("screen_width_pixels", std::to_string(screenSize.width));
         env->AddOption("screen_height_pixels", std::to_string(screenSize.height));
         
-        WeexCore::WeexCoreManager::Instance()->set_log_bridge(new WeexCore::LogBridgeIOS());
+        weex::base::LogImplement::getLog()->setLogImplement(new WeexCore::LogBridgeIOS());
+        
+#ifdef DEBUG
+        weex::base::LogImplement::getLog()->setDebugMode(true);
+#else
+        weex::base::LogImplement::getLog()->setDebugMode(false);
+#endif
+        
+        
         
         platformBridge = new WeexCore::PlatformBridge();
         platformBridge->set_platform_side(new WeexCore::IOSSide());
