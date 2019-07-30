@@ -1,6 +1,6 @@
 os: linux
 language: node_js
-node_js: 8.0
+node_js: 12.6.0
 matrix:
     fast_finish: true
     include:
@@ -60,6 +60,7 @@ cache:
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -fr $HOME/node_modules/*
 
 before_install:
   - |
@@ -74,7 +75,7 @@ install:
   - |
     if [[ ("$TEST_SUITE" = "android") || ("${ANDROID_LINT}" = "true") ]]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-        nvm install 8.0
+        nvm install 12.6.0
         npm install
         echo y | sdkmanager "cmake;3.6.4111459"
         if find "${HOME}/android-ndk-r18b" -mindepth 1 | read; then
