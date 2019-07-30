@@ -179,6 +179,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public boolean mIsAddElementToTree = false;
   //for fix element case
   public int interactionAbsoluteX=0,interactionAbsoluteY=0;
+  //for fix slider case :cssLeft is not real left base parent;
+  protected int mChildrensWidth = 0;
   private boolean mHasAddFocusListener = false;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
@@ -1068,8 +1070,14 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }else {
       float cssTop = getCSSLayoutTop();
       float cssLeft = getCSSLayoutLeft();
-      interactionAbsoluteX = (int)(this.isFixed() ? cssLeft : mParent.interactionAbsoluteX + cssLeft);
+      interactionAbsoluteX = (int)(this.isFixed() ? cssLeft : mParent.interactionAbsoluteX + mParent.mChildrensWidth + cssLeft);
       interactionAbsoluteY = (int)(this.isFixed() ? cssTop  : mParent.interactionAbsoluteY + cssTop);
+      //fix for slider impl ,and interactionTime calculate if component is out screen
+      if (WXBasicComponentType.SLIDER.equalsIgnoreCase(mParent.getComponentType()) || WXBasicComponentType.CYCLE_SLIDER.equalsIgnoreCase(mParent.getComponentType())){
+        if (!WXBasicComponentType.INDICATOR.equalsIgnoreCase(getComponentType())){
+          mParent.mChildrensWidth += (int)(realWidth + cssLeft);
+        }
+      }
     }
 
     if (null == getInstance().getApmForInstance().instanceRect){
