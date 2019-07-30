@@ -63,8 +63,13 @@ before_cache:
 
 before_install:
   - |
+    # update node
+    if [[  ("$TEST_SUITE" = "ios") ]];then 
+      brew install node
+    fi 
     # install oclint
     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
+      brew install node
       brew cask uninstall oclint
       brew tap oclint/formulae
       brew install oclint
@@ -182,7 +187,7 @@ script:
       if npm run danger -- ci --dangerfile ./dangerfile-static-check.js | grep -q "hasAndroidFile" ; then
         echo "hasAndroidFile"
         cd android
-        bundle exec danger --danger_id=androidLint --dangerfile=./Dangerfile-android
+        bundle exec danger --danger_id=androidLint --dangerfile=../Dangerfile-android
       fi
     fi
 
