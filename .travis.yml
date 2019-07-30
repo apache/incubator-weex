@@ -122,7 +122,7 @@ script:
             ;;
         esac
 
-        hasAndroidFile=$(npm run danger -- run -i android --dangerfile ./dangerfile-android.js)
+        hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-android.js)
         echo "The value of hasAndroidFile is ${hasAndroidFile}"
         if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
           cd android
@@ -131,13 +131,13 @@ script:
         fi
         ;;
       "jsfm" )
-        npm run danger -- run --dangerfile  -i jsfm ./dangerfile-jsfm.js
+        npm run danger -- run --dangerfile ./dangerfile-jsfm.js
         ;;
       "danger" )
-        npm run danger -- run --dangerfile  -i danger ./dangerfile.js
+        npm run danger -- run --dangerfile ./dangerfile.js
         ;;
       "ios" )
-        hasIosFile=$(npm run danger -- run -i ios --dangerfile ./dangerfile-ios.js)
+        hasIosFile=$(npm run danger -- run --dangerfile ./dangerfile-ios.js)
         echo "The value of hasIosFile is ${hasIosFile}"
         if [[ "$hasIosFile" =~ "hasIosFile" ]]; then
           # build WeexSDK and run WeexSDKTests
@@ -150,7 +150,7 @@ script:
     esac
     
     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
-      hasCFile=$(npm run danger -- run -i oclint --dangerfile ./dangerfile-static-check.js)
+      hasCFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
       echo "The value of hasCFile is ${hasCFile}"
       if [[ "$hasCFile" =~ "hasCFile" ]]; then
         echo "hasCFile"
@@ -172,12 +172,12 @@ script:
           -max-priority-2=15000 \
           -max-priority-3=15000 > oclint.log
         export COMMAND="cat ios/sdk/oclint.log | grep -i \"P[1|2]\""
-        cd ../../ && npm run danger -- run -i oclintOutput --dangerfile ./dangerfile-output.js
+        cd ../../ && npm run danger -- run --dangerfile ./dangerfile-output.js
       fi
     fi 
 
     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${ANDROID_LINT}" = "true") ]]; then
-      hasAndroidFile=$(npm run danger -- run -i androidLint --dangerfile ./dangerfile-static-check.js)
+      hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
       echo "The value of hasAndroidFile is ${hasAndroidFile}"
       if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
         # format code using google-java-format at first
