@@ -187,7 +187,11 @@ script:
       if npm run danger -- ci --dangerfile ./dangerfile-static-check.js | grep -q "hasAndroidFile" ; then
         echo "hasAndroidFile"
         cd android
-        git init && bundle exec danger --danger_id=androidLint --dangerfile=../Dangerfile-android
+        # use androidLint danger plugin to report android lint information
+        # androidLint danger need the project .git directory to get github repo infomation
+        # and it read from .git from current directory 
+        # so temp to mv .git to current directory and mv .git to it's origin directory after exec androidLint plugin 
+        mv ../.git ./ && bundle exec danger --danger_id=androidLint --dangerfile=../Dangerfile-android && mv .git ../
       fi
     fi
 
