@@ -39,6 +39,7 @@ add_definitions(-DPERFORMANCE_LOG=0)
 add_definitions(-DLAYOUT_LOG=0)
 add_definitions(-DJSAPI_LOG=0)
 add_definitions(-DDOM_PARSER_LOG=0)
+add_definitions(-DDEBUG=1)
 
 message("ANDROID_PROJECT_DIR:"${ANDROID_PROJECT_DIR})
 set(LOCAL_LIBRARIES_DIR ${ANDROID_PROJECT_DIR}/libs/${ANDROID_ABI})

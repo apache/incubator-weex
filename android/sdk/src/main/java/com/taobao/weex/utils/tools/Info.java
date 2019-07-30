@@ -16,16 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/*
- * Implementation of the user-space ashmem API for devices, which have our
- * ashmem-enabled kernel. See ashmem-sim.c for the "fake" tmp-based version,
- * used by the simulator.
- */
+package com.taobao.weex.utils.tools;
 
-#ifndef IPCLOG_H
-#define IPCLOG_H
-#include "../../base/log_defines.h"
+import com.alibaba.fastjson.annotation.JSONField;
 
-#define IPC_LOGE(format, ...) LOGE(format, ##__VA_ARGS__)
-#define IPC_LOGD(format, ...) LOGD(format, ##__VA_ARGS__)
-#endif /* IPCLOG_H */
+public class Info{
+
+	public Info() {
+		taskInfo = new TaskInfo();
+	}
+
+	@JSONField(name="instanceId")
+	public String instanceId;
+
+	@JSONField(name="taskName")
+	public String taskName;
+
+	@JSONField(name="taskInfo")
+	public TaskInfo taskInfo;
+
+	@JSONField(name="platform")
+	public String platform;
+
+	@JSONField(name="taskId")
+	public int taskId;
+
+	@Override
+ 	public String toString(){
+		return 
+			"Info : {" +
+			"instanceId = '" + instanceId + '\'' + 
+			",taskName = '" + taskName + '\'' + 
+			",taskInfo = '" + taskInfo + '\'' + 
+			",platform = '" + platform + '\'' + 
+			",taskId = '" + taskId + '\'' + 
+			"}";
+		}
+}

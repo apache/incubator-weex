@@ -59,6 +59,8 @@ public interface IWXBridge extends IWXObject {
   void updateInitFrameworkParams(String key, String value, String desc);
 
 
+  void setLogType(float type, boolean isPerf);
+
   void refreshInstance(String instanceId, String namespace, String function, WXJSObject[] args);
 
   /**

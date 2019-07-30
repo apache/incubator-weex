@@ -89,6 +89,12 @@ class ScriptBridge {
                                      const char* cid,
                                      const char* json_data) = 0;
 
+
+    virtual bool Log(int level, const char *tag,
+                     const char *file,
+                     unsigned long line,
+                     const char *log) = 0;
+
     inline ScriptBridge *bridge() { return bridge_; }
 
    private:
@@ -152,7 +158,11 @@ class ScriptBridge {
 
     virtual int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) = 0;
 
+    virtual void SetLogType(const int logLevel, const bool isPerf) = 0;
+
     inline ScriptBridge *bridge() { return bridge_; }
+
+
 
    private:
     ScriptBridge *bridge_;

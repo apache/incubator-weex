@@ -72,6 +72,7 @@ class ScriptSideInMultiProcess : public ScriptBridge::ScriptSide {
 
   int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) override;
 
+  void SetLogType(const int logLevel, const bool isPerf) override;
 
     ScriptSideInMultiProcess();
 
