@@ -4,9 +4,11 @@ Weex community respects all kinds of contributing, including but not limited to 
 * [Code of Conduct](#code-of-conduct)
 * [Mailing List](#mailing-list)
 * [Ask or Answer Questions](#mailing-list)
+* [Development Process](#development-process)
 * [Contribute Code or document](#contribute-code-or-document)
     * [Contribute Documentation](contribute-documentation)
     * [Contribute Code](#contribute-code)
+* [Members and Governance Model](#members-and-governance-model)
 
 # Code of Conduct
 To make an open and friendly community, Weex community adopt [Contributor Covenant](./CODE_OF_CONDUCT.md) as the code of conduct.
@@ -35,6 +37,15 @@ Compared to the amount of issues, Weex community may not response to your issues
 
 *Tip*:
 > If your Github issue doesn't get any response over a week, you can ask developers through [weex mailing list](https://weex.apache.org/guide/contribute/how-to-contribute.html#mailing-list).
+
+# Development Process
+Most of the development process is described in [confluence](https://cwiki.apache.org/confluence/x/eJBTBw), which services the contributors of Weex and is transparent to all users.
+
+* [Release Plan](https://github.com/apache/incubator-weex/milestones): All feature, bugfix, issue-solved are associated with a certain milestone since Weex 0.27. As every Weex release needs approval from PPMC and IPMC, the due date of milestone is just an estimation of release date, not accuracy schedule.
+* [Release Procedure](https://cwiki.apache.org/confluence/x/_I5TBw)
+* [Major feature](https://github.com/apache/incubator-weex/projects)
+* [System Design](https://cwiki.apache.org/confluence/x/XYxTBw)
+* [Road Map](https://cwiki.apache.org/confluence/x/fJBTBw)
 
 # Contribute Code or document
 In Weex community, **Documentation is as important as code**, and Weex community respects all the contribution of documentation or code.
@@ -132,3 +143,6 @@ There will be a static check program when you submit a PR,and the following rule
 
 *Tip*:
 > Reviewing PR may take a great deal of time, please be patient. If your PR doesn't get response over 96 hours, you might send an email to [mailing list](https://weex.apache.org/guide/contribute/how-to-contribute.html#mailing-list) to ask the progress.
+
+# Members and Governance Model
+You can find committers, PPMCs and governance model of Weex from [confluence](https://cwiki.apache.org/confluence/x/bFoyBw).
