@@ -81,7 +81,6 @@ before_install:
 
 install:
   - |
-    npm install yarn
     if [[ ("$TEST_SUITE" = "android") || ("${ANDROID_LINT}" = "true") ]]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
         nvm install 12.6.0
@@ -132,20 +131,20 @@ script:
             GRADLE_ABI=""
             ;;
         esac
-        if yarn danger ci --dangerfile ./dangerfile-android.js | grep -q "hasAndroidFile" ; then
+        if npm run danger -- ci --dangerfile ./dangerfile-android.js | grep -q "hasAndroidFile" ; then
           cd android
           ./gradlew clean install -PbuildRuntimeApi=true ${GRADLE_ABI} --info
           ./gradlew install -PbuildRuntimeApi=false ${GRADLE_ABI} --info
         fi
         ;;
       "jsfm" )
-        yarn danger ci -i jsfm --dangerfile ./dangerfile-jsfm.js
+        npm run danger -- ci -i jsfm --dangerfile ./dangerfile-jsfm.js
         ;;
       "danger" )
-        yarn danger ci -i danger --dangerfile ./dangerfile.js
+        npm run danger -- ci -i danger --dangerfile ./dangerfile.js
         ;;
       "ios" )
-        if yarn danger ci --dangerfile ./dangerfile-ios.js | grep -q "hasIosFile" ; then
+        if npm run danger -- ci --dangerfile ./dangerfile-ios.js | grep -q "hasIosFile" ; then
           # build WeexSDK and run WeexSDKTests
           xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
           # build WeexDemo and run WeexDemo test
@@ -156,7 +155,7 @@ script:
     esac
     
     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
-      if yarn danger ci --dangerfile ./dangerfile-static-check.js | grep -q "hasCFile" ; then
+      if npm run danger -- ci --dangerfile ./dangerfile-static-check.js | grep -q "hasCFile" ; then
         echo "hasCFile"
         cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
         oclint-json-compilation-database oclint_args -- \
@@ -176,12 +175,12 @@ script:
           -max-priority-2=15000 \
           -max-priority-3=15000 > oclint.log
         export COMMAND="cat ios/sdk/oclint.log | grep -i \"P[1|2]\""
-        cd ../../ && yarn danger ci -i output --dangerfile ./dangerfile-output.js
+        cd ../../ && npm run danger -- ci -i output --dangerfile ./dangerfile-output.js
       fi
     fi 
 
     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${ANDROID_LINT}" = "true") ]]; then
-      if yarn danger ci --dangerfile ./dangerfile-static-check.js | grep -q "hasAndroidFile" ; then
+      if npm run danger -- ci --dangerfile ./dangerfile-static-check.js | grep -q "hasAndroidFile" ; then
         echo "hasAndroidFile"
         bundle exec danger --danger_id=androidLint --dangerfile=./Dangerfile-android
       fi
