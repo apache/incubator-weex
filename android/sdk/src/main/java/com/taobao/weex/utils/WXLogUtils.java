@@ -140,19 +140,19 @@ public class WXLogUtils {
   }
 
   public static void performance(String instanceId, byte[]msg) {
-    String s = new String(msg);
-    if(!TextUtils.isEmpty(instanceId)) {
-      WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-      if(sdkInstance != null) {
-        int i = s.indexOf(",");
-        if(i >=0 && i < s.length()) {
-          String substring = s.substring(s.indexOf(",") + 1);
-          LogDetail logDetail = JSON.parseObject(substring,LogDetail.class);
-          sdkInstance.mTimeCalculator.addLog(logDetail);
-        }
-      }
-    }
-    Log.e(TIMELINE_TAG, "from WeexCore" + s);
+//    String s = new String(msg);
+//    if(!TextUtils.isEmpty(instanceId)) {
+//      WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+//      if(sdkInstance != null) {
+//        int i = s.indexOf(",");
+//        if(i >=0 && i < s.length()) {
+//          String substring = s.substring(s.indexOf(",") + 1);
+//          LogDetail logDetail = JSON.parseObject(substring,LogDetail.class);
+//          sdkInstance.mTimeCalculator.addLog(logDetail);
+//        }
+//      }
+//    }
+//    Log.e(TIMELINE_TAG, "from WeexCore" + s);
   }
 
   public static void wtf(String msg){
