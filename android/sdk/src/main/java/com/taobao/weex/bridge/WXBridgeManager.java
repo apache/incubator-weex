@@ -65,6 +65,7 @@ import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.ui.action.ActionReloadPage;
 import com.taobao.weex.ui.action.BasicGraphicAction;
+import com.taobao.weex.ui.action.GraphicActionAddChildToRichtext;
 import com.taobao.weex.ui.action.GraphicActionAddElement;
 import com.taobao.weex.ui.action.GraphicActionAddEvent;
 import com.taobao.weex.ui.action.GraphicActionAppendTreeCreateFinish;
@@ -73,10 +74,13 @@ import com.taobao.weex.ui.action.GraphicActionCreateFinish;
 import com.taobao.weex.ui.action.GraphicActionLayout;
 import com.taobao.weex.ui.action.GraphicActionMoveElement;
 import com.taobao.weex.ui.action.GraphicActionRefreshFinish;
+import com.taobao.weex.ui.action.GraphicActionRemoveChildFromRichtext;
 import com.taobao.weex.ui.action.GraphicActionRemoveElement;
 import com.taobao.weex.ui.action.GraphicActionRemoveEvent;
 import com.taobao.weex.ui.action.GraphicActionRenderSuccess;
 import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
+import com.taobao.weex.ui.action.GraphicActionUpdateRichtextAttr;
+import com.taobao.weex.ui.action.GraphicActionUpdateRichtextStyle;
 import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
 import com.taobao.weex.ui.action.GraphicPosition;
 import com.taobao.weex.ui.action.GraphicSize;
@@ -3010,6 +3014,164 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXSDKManager.getInstance().getSDKInstance(instanceId).setComponentsInfoExceedGPULimit(ext);
     }
   }
+
+  public int callAddChildToRichtext(String instanceId, String nodeType, String ref, String parentRef, String richTextRef,
+                                    HashMap<String, String> styles, HashMap<String, String> attrs){
+    if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref)) {
+      if (WXEnvironment.isApkDebugable()){
+        WXLogUtils.d("[WXBridgeManager] call callAddChildToRichtext arguments is null");
+      }
+
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_RENDER_ERR_BRIDGE_ARG_NULL, "callAddChildToRichtext",
+              "arguments is empty, INSTANCE_RENDERING_ERROR will be set", null);
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+      mLodBuilder.append("[WXBridgeManager] callAddChildToRichtext >>>> instanceId:").append(instanceId)
+              .append(", nodeType:").append(nodeType).append(", ref:").append(ref).append(", parentRef:")
+              .append(parentRef).append(", richTextRef:").append(richTextRef).append(", styles:")
+              .append(styles.toString()).append(", attrs:").append(attrs.toString());
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+    try {
+      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if (instance != null) {
+        final BasicGraphicAction action = new GraphicActionAddChildToRichtext(instance,nodeType,ref,parentRef,richTextRef,styles,attrs
+        );
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callAddChildToRichtext exception: ", WXLogUtils.getStackTrace(e));
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_BRIDGE, "callAddChildToRichtext",
+              WXLogUtils.getStackTrace(e), null);
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callRemoveChildFromRichtext(String instanceId, String ref, String parentRef, String richTextRef){
+    if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref)) {
+      if (WXEnvironment.isApkDebugable()){
+        WXLogUtils.d("[WXBridgeManager] call callRemoveChildFromRichtext arguments is null");
+      }
+
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_RENDER_ERR_BRIDGE_ARG_NULL, "callRemoveChildFromRichtext",
+              "arguments is empty, INSTANCE_RENDERING_ERROR will be set", null);
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+      mLodBuilder.append("[WXBridgeManager] callRemoveChildFromRichtext >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref).append(", parentRef:").append(parentRef).append(", richTextRef:").append(richTextRef);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+    try {
+      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if (instance != null) {
+        final BasicGraphicAction action = new GraphicActionRemoveChildFromRichtext(instance, ref, parentRef, richTextRef);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callRemoveChildFromRichtext exception: ", e);
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_BRIDGE, "callRemoveChildFromRichtext",
+              WXLogUtils.getStackTrace(e), null);
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callUpdateRichtextStyle(String instanceId, String ref, HashMap<String, String> styles, String parentRef, String richTextRef){
+    if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref)) {
+      if (WXEnvironment.isApkDebugable()){
+        WXLogUtils.d("[WXBridgeManager] call callUpdateRichtextStyle arguments is null");
+      }
+
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_RENDER_ERR_BRIDGE_ARG_NULL, "callUpdateRichtextStyle",
+              "arguments is empty, INSTANCE_RENDERING_ERROR will be set", null);
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+      mLodBuilder.append("[WXBridgeManager] callUpdateRichtextStyle >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref).append(", styles:").append(styles.toString()).append(", parentRef:")
+              .append(parentRef).append(", richTextRef:").append(richTextRef);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+    try {
+      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if (instance != null) {
+        final BasicGraphicAction action = new GraphicActionUpdateRichtextStyle(instance, ref, styles, parentRef, richTextRef);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callUpdateRichtextStyle exception: ", e);
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_BRIDGE, "callUpdateRichtextStyle",
+              WXLogUtils.getStackTrace(e), null);
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+  public int callUpdateRichtextChildAttr(String instanceId, String ref, HashMap<String, String> attrs, String parentRef, String richTextRef){
+    if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref)) {
+      if (WXEnvironment.isApkDebugable()){
+        WXLogUtils.d("[WXBridgeManager] call callUpdateRichtextChildAttr arguments is null");
+      }
+
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_RENDER_ERR_BRIDGE_ARG_NULL, "callUpdateRichtextChildAttr",
+              "arguments is empty, INSTANCE_RENDERING_ERROR will be set", null);
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+
+    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+      mLodBuilder.append("[WXBridgeManager] callUpdateRichtextChildAttr >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref).append(", attrs:").append(attrs.toString()).append(", parentRef:")
+              .append(parentRef).append(", richTextRef:").append(richTextRef);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+    try {
+      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if (instance != null) {
+        final BasicGraphicAction action = new GraphicActionUpdateRichtextAttr(instance, ref, attrs, parentRef, richTextRef);
+        WXSDKManager.getInstance().getWXRenderManager().postGraphicAction(action.getPageId(), action);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callUpdateRichtextChildAttr exception: ", e);
+      WXExceptionUtils.commitCriticalExceptionRT(instanceId,
+              WXErrorCode.WX_KEY_EXCEPTION_INVOKE_BRIDGE, "callUpdateRichtextChildAttr",
+              WXLogUtils.getStackTrace(e), null);
+    }
+
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
   public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width, boolean isRTL, int index) {
 
     if (TextUtils.isEmpty(pageId) || TextUtils.isEmpty(ref)) {

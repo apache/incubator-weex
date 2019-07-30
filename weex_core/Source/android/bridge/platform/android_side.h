@@ -79,6 +79,17 @@ class AndroidSide : public PlatformBridge::PlatformSide {
                  std::set<std::string>* events, const WXCoreMargin& margins,
                  const WXCorePadding& paddings,
                  const WXCoreBorderWidth& borders, bool willLayout) override;
+  int AddChildToRichtext(const char *pageId, const char *nodeType, const char *ref, const char *parentRef,
+                         const char *richtextRef, std::map<std::string, std::string> *styles,
+                         std::map<std::string, std::string> *attributes) override;
+  int RemoveChildFromRichtext(const char *pageId, const char *ref, const char *parent_ref,
+                              const char *richtext_ref) override;
+  int UpdateRichtextStyle(const char *pageId, const char *ref,
+                          std::vector<std::pair<std::string, std::string>> *style, const char *parent_ref,
+                          const char *richtext_ref) override;
+  int UpdateRichtextChildAttr(const char *pageId, const char *ref,
+                              std::vector<std::pair<std::string, std::string>> *attrs,
+                              const char *parent_ref, const char *richtext_ref) override;
   int Layout(const char* page_id, const char* ref, float top, float bottom,
              float left, float right, float height, float width, bool isRTL,
              int index) override;

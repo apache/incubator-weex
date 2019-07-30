@@ -761,6 +761,133 @@ static jint Java_WXBridge_callUpdateAttrs(JNIEnv* env, jobject obj, jstring
   return ret;
 }
 
+static intptr_t g_WXBridge_callAddChildToRichtext = 0;
+static jint Java_WXBridge_callAddChildToRichtext(JNIEnv* env, jobject obj, jstring instanceId, jstring nodeType,
+                                          jstring ref,
+                                          jstring parentRef,
+                                          jstring richtextRef,
+                                          jobject styles,
+                                          jobject attrs) {
+    /* Must call RegisterNativesImpl()  */
+    //CHECK_CLAZZ(env, obj,
+    //    WXBridge_clazz(env), 0);
+    jmethodID method_id =
+            base::android::GetMethod(
+                    env, WXBridge_clazz(env),
+                    base::android::INSTANCE_METHOD,
+                    "callAddChildToRichtext",
+
+                    "("
+                    "Ljava/lang/String;"
+                    "Ljava/lang/String;"
+                    "Ljava/lang/String;"
+                    "Ljava/lang/String;"
+                    "Ljava/lang/String;"
+                    "Ljava/util/HashMap;"
+                    "Ljava/util/HashMap;"
+                    ")"
+                    "I",
+                    &g_WXBridge_callAddChildToRichtext);
+
+    jint ret =
+            env->CallIntMethod(obj,
+                               method_id, instanceId, nodeType, ref,  parentRef, richtextRef, styles, attrs);
+    base::android::CheckException(env);
+    return ret;
+}
+
+static intptr_t g_WXBridge_callRemoveChildFromRichtext = 0;
+static jint Java_WXBridge_callRemoveChildFromRichtext(JNIEnv* env, jobject obj, jstring instanceId,
+                                                 jstring ref,
+                                                 jstring parentRef,
+                                                 jstring richtextRef) {
+    /* Must call RegisterNativesImpl()  */
+    //CHECK_CLAZZ(env, obj,
+    //    WXBridge_clazz(env), 0);
+    jmethodID method_id =
+            base::android::GetMethod(
+                    env, WXBridge_clazz(env),
+                    base::android::INSTANCE_METHOD,
+                    "callRemoveChildFromRichtext",
+
+                    "("
+                    "Ljava/lang/String;"
+                    "Ljava/lang/String;"
+                    "Ljava/lang/String;"
+                    "Ljava/lang/String;"
+                    ")"
+                    "I",
+                    &g_WXBridge_callRemoveChildFromRichtext);
+
+    jint ret =
+            env->CallIntMethod(obj,
+                               method_id, instanceId, ref,  parentRef, richtextRef);
+    base::android::CheckException(env);
+    return ret;
+}
+
+static intptr_t g_WXBridge_callUpdateRichtextStyle = 0;
+static jint Java_WXBridge_callUpdateRichtextStyle(JNIEnv* env, jobject obj, jstring instanceId,
+                                                 jstring ref,
+                                                 jobject styles,
+                                                 jstring parentRef,
+                                                 jstring richtextRef) {
+    /* Must call RegisterNativesImpl()  */
+    //CHECK_CLAZZ(env, obj,
+    //    WXBridge_clazz(env), 0);
+    jmethodID method_id =
+            base::android::GetMethod(
+                    env, WXBridge_clazz(env),
+                    base::android::INSTANCE_METHOD,
+                    "callUpdateRichtextStyle",
+                    "("
+                    "Ljava/lang/String;"
+                    "Ljava/lang/String;"
+                    "Ljava/util/HashMap;"
+                    "Ljava/lang/String;"
+                    "Ljava/lang/String;"
+                    ")"
+                    "I",
+                    &g_WXBridge_callUpdateRichtextStyle);
+
+    jint ret =
+            env->CallIntMethod(obj,
+                               method_id, instanceId, ref, styles, parentRef, richtextRef);
+    base::android::CheckException(env);
+    return ret;
+}
+
+static intptr_t g_WXBridge_callUpdateRichtextChildAttr = 0;
+static jint Java_WXBridge_callUpdateRichtextChildAttr(JNIEnv* env, jobject obj, jstring instanceId,
+                                                  jstring ref,
+                                                  jobject attrs,
+                                                  jstring parentRef,
+                                                  jstring richtextRef) {
+    /* Must call RegisterNativesImpl()  */
+    //CHECK_CLAZZ(env, obj,
+    //    WXBridge_clazz(env), 0);
+    jmethodID method_id =
+            base::android::GetMethod(
+                    env, WXBridge_clazz(env),
+                    base::android::INSTANCE_METHOD,
+                    "callUpdateRichtextChildAttr",
+                    "("
+                    "Ljava/lang/String;"
+                    "Ljava/lang/String;"
+                    "Ljava/util/HashMap;"
+                    "Ljava/lang/String;"
+                    "Ljava/lang/String;"
+                    ")"
+                    "I",
+                    &g_WXBridge_callUpdateRichtextChildAttr);
+
+    jint ret =
+            env->CallIntMethod(obj,
+                               method_id, instanceId, ref, attrs, parentRef, richtextRef);
+    base::android::CheckException(env);
+    return ret;
+}
+
 static intptr_t g_WXBridge_callLayout = 0;
 static jint Java_WXBridge_callLayout(JNIEnv* env, jobject obj, jstring
     instanceId,

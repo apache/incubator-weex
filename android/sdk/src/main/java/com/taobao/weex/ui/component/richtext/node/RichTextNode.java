@@ -29,6 +29,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
@@ -40,6 +41,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXCustomStyleSpan;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -60,6 +62,7 @@ public abstract class RichTextNode {
     protected final Context mContext;
     protected final String mInstanceId;
     protected final String mComponentRef;
+    protected final String mRef;
     protected Map<String, Object> style;
     protected Map<String, Object> attr;
     protected List<RichTextNode> children;
@@ -68,6 +71,25 @@ public abstract class RichTextNode {
         mContext = context;
         mInstanceId = instanceId;
         mComponentRef = componentRef;
+        mRef = null;
+    }
+    protected RichTextNode(Context context, String instanceId, String componentRef, String ref, Map<String,Object> styles, Map<String,Object> attrs) {
+        mContext = context;
+        mInstanceId = instanceId;
+        mComponentRef = componentRef;
+        mRef = ref;
+        if(styles != null){
+            style = styles;
+        }
+        else {
+            style = new ArrayMap<>(0);
+        }
+        if (attrs != null) {
+            attr = attrs;
+        } else {
+            attr = new ArrayMap<>(0);
+        }
+        children = new LinkedList<>();
     }
 
     public static
@@ -102,6 +124,10 @@ public abstract class RichTextNode {
 
     protected abstract boolean isInternalNode();
 
+    public String getRef(){
+        return mRef;
+    }
+
     final void parse(@NonNull Context context, @NonNull String instanceId, @NonNull String componentRef, JSONObject jsonObject) {
         JSONObject jsonStyle, jsonAttr, child;
         JSONArray jsonChildren;
@@ -131,6 +157,37 @@ public abstract class RichTextNode {
             }
         } else {
             children = new ArrayList<>(0);
+        }
+    }
+    public void addChildNode(RichTextNode child){
+        if(children == null){
+            children = new LinkedList<>();
+        }
+        if(child != null && isInternalNode()){
+            children.add(child);
+        }
+    }
+    public void removeChildNode(String ref){
+        if(children != null && !children.isEmpty() && !TextUtils.isEmpty(ref)){
+            try {
+                for (RichTextNode child : children) {
+                    if (TextUtils.equals(child.mRef, ref)) {
+                        children.remove(child);
+                    }
+                }
+            }catch(Exception e){
+                WXLogUtils.getStackTrace(e);
+            }
+        }
+    }
+    public void updateStyles(Map<String,Object> styles){
+        if(styles != null && !styles.isEmpty()){
+            style.putAll(styles);
+        }
+    }
+    public void updateAttrs(Map<String,Object> attrs){
+        if(attr != null && !attrs.isEmpty()){
+            attr.putAll(attrs);
         }
     }
 
@@ -173,6 +230,7 @@ public abstract class RichTextNode {
             MAX_LEVEL << Spanned.SPAN_PRIORITY_SHIFT;
     }
 
+
     private static
     @NonNull
     Spannable parse(@NonNull List<RichTextNode> list) {
@@ -183,7 +241,7 @@ public abstract class RichTextNode {
         return spannableStringBuilder;
     }
 
-    private Spannable toSpan(int level) {
+    public Spannable toSpan(int level) {
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
         spannableStringBuilder.append(toString());
         if (isInternalNode() && children != null) {
@@ -216,5 +274,18 @@ public abstract class RichTextNode {
         } else {
             return null;
         }
+    }
+    public RichTextNode findRichNode(String ref){
+        RichTextNode theNode;
+        if(mRef != null && TextUtils.equals(mRef,ref)){
+            return this;
+        }
+        if(children != null && !children.isEmpty()){
+            for (RichTextNode child:children) {
+                if((theNode = child.findRichNode(ref)) != null)
+                    return theNode;
+            }
+        }
+        return null;
     }
 }

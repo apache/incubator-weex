@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,12 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_REMOVE_CHILD_FROM_RICHTEXT_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_REMOVE_CHILD_FROM_RICHTEXT_H_
 
-#import "WXComponent.h"
+#include <string>
+#include "core/render/action/render_action_interface.h"
 
-@interface WXRichText : WXComponent<UITextViewDelegate>
-- (void)addChildNode:(NSString *)type ref:(NSString*)ref styles:(NSDictionary*)styles attributes:(NSDictionary*)attributes  toSuperNodeRef:(NSString *)superNodeRef;
-- (void)updateChildNodeAttributes:(NSDictionary *)attributes ref:(NSString*)ref parentRef:(NSString*)parentRef;
-- (void)updateChildNodeStyles:(NSDictionary *)styles ref:(NSString*)ref parentRef:(NSString*)parentRef;
-- (void)removeChildNode:(NSString*)ref superNodeRef:(NSString *)superNodeRef;
-@end
+namespace WeexCore {
+class RenderObject;
+class RenderActionRemoveChildFromRichtext : public RenderAction {
+ public:
+  explicit RenderActionRemoveChildFromRichtext(const std::string &page_id, const std::string &ref, const RenderObject* parent, RenderObject* richtext);
+
+  void ExecuteAction();
+
+ public:
+  std::string page_id_;
+  std::string ref_;
+  std::string parent_ref_;
+  std::string richtext_ref_;
+};
+}  // namespace WeexCore
+
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_REMOVE_CHILD_FROM_RICHTEXT_H_
