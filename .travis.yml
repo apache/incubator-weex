@@ -11,30 +11,30 @@ matrix:
       # - env: TEST_SUITE=jsfm
       # - env: TEST_SUITE=ios
       #   language: objective-c
-      # - env: TEST_SUITE=android ABI=armeabi-v7a
-      #   language: android
-      #   dist: trusty
-      #   jdk: oraclejdk8
-      #   android:
-      #     components:
-      #       - android-26
-      #       - extra-android-m2repository
-      # - env: TEST_SUITE=android ABI=arm64-v8a
-      #   language: android
-      #   dist: trusty
-      #   jdk: oraclejdk8
-      #   android:
-      #     components:
-      #       - android-26
-      #       - extra-android-m2repository
-      # - env: TEST_SUITE=android ABI=x86
-      #   language: android
-      #   dist: trusty
-      #   jdk: oraclejdk8
-      #   android:
-      #     components:
-      #       - android-26
-      #       - extra-android-m2repository 
+      - env: TEST_SUITE=android ABI=armeabi-v7a
+        language: android
+        dist: trusty
+        jdk: oraclejdk8
+        android:
+          components:
+            - android-26
+            - extra-android-m2repository
+      - env: TEST_SUITE=android ABI=arm64-v8a
+        language: android
+        dist: trusty
+        jdk: oraclejdk8
+        android:
+          components:
+            - android-26
+            - extra-android-m2repository
+      - env: TEST_SUITE=android ABI=x86
+        language: android
+        dist: trusty
+        jdk: oraclejdk8
+        android:
+          components:
+            - android-26
+            - extra-android-m2repository 
       # static check
       # - env: TEST_SUITE=static_code_analysis OCLINT=true
       #   osx_image: xcode7.2
