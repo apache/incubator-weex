@@ -32,6 +32,7 @@
 @interface WXRichNode : NSObject
 
 @property (nonatomic, strong) NSString  *type;
+@property (nonatomic, strong) NSString  *ref;
 @property (nonatomic, strong) NSString  *text;
 @property (nonatomic, strong) UIColor   *color;
 @property (nonatomic, strong) UIColor   *backgroundColor;
@@ -46,10 +47,18 @@
 @property (nonatomic, strong) NSURL *href;
 @property (nonatomic, strong) NSURL *src;
 @property (nonatomic, assign) NSRange range;
+@property (nonatomic, strong) NSMutableArray *childNodes;
 
 @end
 
 @implementation WXRichNode
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _childNodes = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
 
 @end
 
@@ -153,6 +162,9 @@ do {\
 - (void)fillAttributes:(NSDictionary *)attributes
 {
     id value = attributes[@"value"];
+    if (!value) {
+        return;
+    }
     if ([value isKindOfClass:[NSString class]]) {
         value = [WXUtility objectFromJSON:value];
     }
@@ -162,7 +174,6 @@ do {\
         WXRichNode *rootNode = [[WXRichNode alloc]init];
         [_richNodes addObject:rootNode];
         
-        //记录richtext根节点styles，仅用于子节点的样式继承
         rootNode.type = @"root";
         if (_styles) {
             [self fillCSSStyles:_styles toNode:rootNode superNode:nil];
@@ -250,6 +261,79 @@ do {\
             }
         }
     }
+}
+
+- (WXRichNode*)findRichNode:(NSString*)ref {
+    NSMutableArray *array = [NSMutableArray arrayWithArray:_richNodes];
+    for (WXRichNode* node in array) {
+        if ([node.ref isEqualToString:ref]) {
+            return node;
+        }
+    }
+    return nil;
+}
+
+- (NSInteger)indexOfRichNode:(WXRichNode*)node {
+    NSInteger index = -1;
+    NSMutableArray *array = [NSMutableArray arrayWithArray:_richNodes];
+    for (WXRichNode* item in array) {
+        if ([item.ref isEqualToString:node.ref]) {
+            return index+1;
+        }
+        index++;
+    }
+    return index;
+}
+
+- (void)removeChildNode:(NSString*)ref superNodeRef:(NSString *)superNodeRef {
+    WXRichNode* node = [self findRichNode:ref];
+    WXRichNode* superNode = [self findRichNode:@"_root"];
+    if (superNodeRef.length > 0) {
+        superNode = [self findRichNode:superNodeRef];
+    }
+    if (superNode) {
+         [superNode.childNodes removeObject:node];
+    }
+    [_richNodes removeObject:node];
+    [self setNeedsLayout];
+    [self innerLayout];
+}
+
+- (void)addChildNode:(NSString *)type ref:(NSString*)ref styles:(NSDictionary*)styles attributes:(NSDictionary*)attributes  toSuperNodeRef:(NSString *)superNodeRef {
+    if ([_richNodes count] == 0) {
+        WXRichNode *rootNode = [[WXRichNode alloc]init];
+        [_richNodes addObject:rootNode];
+        rootNode.type = @"root";
+        rootNode.ref = @"_root";
+        if (_styles) {
+            [self fillCSSStyles:_styles toNode:rootNode superNode:nil];
+        }
+        _backgroundColor = rootNode.backgroundColor?:[UIColor whiteColor];
+    }
+
+    WXRichNode* superNode = [self findRichNode:@"_root"];
+    if (superNodeRef.length > 0) {
+        superNode = [self findRichNode:superNodeRef];
+    }
+
+    WXRichNode *node = [[WXRichNode alloc]init];
+    node.ref = ref;
+    NSInteger index = [self indexOfRichNode:superNode];
+    if (index < 0) {
+        return;
+    }
+    if (index == 0) {
+        [_richNodes addObject:node];
+    } else {
+        [_richNodes insertObject:node atIndex:(index + superNode.childNodes.count + 1)];
+    }
+    [superNode.childNodes addObject:node];
+    node.type = type;
+
+    [self fillCSSStyles:styles toNode:node superNode:superNode];
+    [self fillAttributes:attributes toNode:node superNode:superNode];
+    [self setNeedsLayout];
+    [self innerLayout];
 }
 
 #pragma mark - Subclass
@@ -457,10 +541,42 @@ do {\
     });
 }
 
+- (void)updateChildNodeStyles:(NSDictionary *)styles ref:(NSString*)ref parentRef:(NSString*)parentRef {
+    WXPerformBlockOnComponentThread(^{
+        WXRichNode* node =  [self findRichNode:ref];
+        if (node) {
+            WXRichNode* superNode = [self findRichNode:@"_root"];
+            if (parentRef.length > 0) {
+                superNode = [self findRichNode:parentRef];
+            }
+            if (superNode) {
+                [self fillCSSStyles:styles toNode:node superNode:superNode];
+                [self syncTextStorageForView];
+            }
+        }
+    });
+}
+
 - (void)updateAttributes:(NSDictionary *)attributes {
     WXPerformBlockOnComponentThread(^{
         _attributes = [NSMutableDictionary dictionaryWithDictionary:attributes];
         [self syncTextStorageForView];
+    });
+}
+
+- (void)updateChildNodeAttributes:(NSDictionary *)attributes ref:(NSString*)ref parentRef:(NSString*)parentRef {
+    WXPerformBlockOnComponentThread(^{
+        WXRichNode* node =  [self findRichNode:ref];
+        if (node) {
+            WXRichNode* superNode = [self findRichNode:@"_root"];
+            if (parentRef.length > 0) {
+                superNode = [self findRichNode:parentRef];
+            }
+            if (superNode) {
+                [self fillAttributes:attributes toNode:node superNode:superNode];
+                [self syncTextStorageForView];
+            }
+        }
     });
 }
 

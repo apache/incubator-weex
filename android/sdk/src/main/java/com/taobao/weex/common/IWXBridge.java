@@ -155,6 +155,15 @@ public interface IWXBridge extends IWXObject {
   int callUpdateAttrs(String instanceId, String ref,
                       HashMap<String, String> attrs);
 
+  int callAddChildToRichtext(String instanceId, String nodeType, String ref, String parentRef, String richTextRef,
+                             HashMap<String, String> styles, HashMap<String, String> attrs);
+
+  int callRemoveChildFromRichtext(String instanceId, String ref, String parentRef, String richTextRef);
+
+  int callUpdateRichtextStyle(String instanceId, String ref, HashMap<String, String> styles, String parentRef, String richTextRef);
+
+  int callUpdateRichtextChildAttr(String instanceId, String ref, HashMap<String, String> attrs, String parentRef, String richTextRef);
+
   int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, boolean isRTL, int index);
 
   int callCreateFinish(String instanceId);

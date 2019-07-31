@@ -142,7 +142,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
     hasBeenMeasured = true;
     float textWidth = getTextWidth(mTextPaint, width, widthMeasureMode == MeasureMode.EXACTLY);
 
-    if (textWidth > 0 && mText != null) {
+    if (textWidth > 0 && spanned != null) {
       layout = createLayout(textWidth,null);
       previousWidth = layout.getWidth();
       if (Float.isNaN(width)) {
@@ -458,7 +458,7 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
     float contentWidth = WXDomUtils.getContentWidth(mComponent.getPadding(), mComponent.getBorder(), computedWidth);
     if (contentWidth > 0) {
       spanned = createSpanned(mText);
-      if (mText != null) {
+      if (spanned != null) {
         layout = createLayout(contentWidth, layout);
         previousWidth = layout.getWidth();
       } else {

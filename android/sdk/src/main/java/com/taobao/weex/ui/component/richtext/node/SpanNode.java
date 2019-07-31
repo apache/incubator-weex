@@ -19,11 +19,15 @@
 package com.taobao.weex.ui.component.richtext.node;
 
 import android.content.Context;
+import android.support.v4.util.ArrayMap;
 import android.text.SpannableStringBuilder;
 
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.TextDecorationSpan;
 import com.taobao.weex.dom.WXStyle;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 class SpanNode extends RichTextNode {
 
@@ -33,12 +37,21 @@ class SpanNode extends RichTextNode {
     public SpanNode createRichTextNode(Context context, String instanceId, String componentRef) {
       return new SpanNode(context, instanceId, componentRef);
     }
+
+    @Override
+    public SpanNode createRichTextNode(Context context,String instanceId,String componentRef,String ref,
+                                       Map<String,Object> styles, Map<String,Object> attrs){
+      return new SpanNode(context,instanceId,componentRef,ref,styles,attrs);
+    }
   }
 
   public static final String NODE_TYPE = "span";
 
   private SpanNode(Context context, String instanceId, String componentRef) {
     super(context, instanceId, componentRef);
+  }
+  private SpanNode(Context context, String instanceId, String componentRef, String ref, Map<String,Object> styles,Map<String,Object> attrs) {
+    super(context, instanceId, componentRef, ref, styles, attrs);
   }
 
   @Override
