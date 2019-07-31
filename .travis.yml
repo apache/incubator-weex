@@ -181,7 +181,7 @@ script:
     #       -max-priority-2=15000 \
     #       -max-priority-3=15000 > oclint.log
     #     export COMMAND="cat ios/sdk/oclint.log | grep -i \"P[1|2]\""
-    #     cd ../../ && npm run danger -- ci -i output --dangerfile ./dangerfile-output.js
+    #     cd ../../ && npm run danger -- ci -i oclint --dangerfile ./dangerfile-output.js
     #   fi
     # fi 
 
@@ -195,7 +195,11 @@ script:
         # # so temp to mv .git to current directory and mv .git to it's origin directory after exec androidLint plugin 
         # # mv ../.git ./ && bundle exec danger --danger_id=androidLint --dangerfile=../Dangerfile-android && mv .git ../
         # bundle exec danger --danger_id=androidLint --dangerfile=../Dangerfile-android
-        ./gradlew lint
+        ./gradlew lint --quiet
+        export COMMAND="echo AndroidLint"
+        npm run danger -- ci -i androidlint --dangerfile ../dangerfile-output.js
+        export COMMAND="cat app/build/reports/lint/lint-result.xml"
+        npm run danger -- ci -i androidlint --dangerfile ../dangerfile-output.js
       fi
     fi
 
