@@ -18,17 +18,53 @@
  */
 
 import { fail, warn } from 'danger'
-
 const shell = require('shelljs')
-const command = process.env.COMMAND
 const title = process.env.TITLE
-const child = shell.exec(command)
+const fs = require('fs')
 
-if (child.stdout !== '') {
-  warn(`## ${title}`)
-  warn(child.stdout)
+// code come from: https://stackoverflow.com/a/12745196
+// get the index of nth char in string
+function nth_occurrence (string, char, nth) {
+  var first_index = string.indexOf(char)
+  var length_up_to_first_index = first_index + 1
+  if (nth === 1) {
+      return first_index;
+  } else {
+      var string_after_first_occurrence = string.slice(length_up_to_first_index);
+      var next_occurrence = nth_occurrence(string_after_first_occurrence, char, nth - 1);
+      if (next_occurrence === -1) {
+          return -1;
+      } else {
+          return length_up_to_first_index + next_occurrence;  
+      }
+  }
 }
-if (child.stderr !== '') {
-  fail(`## ${title}`)
-  fail(child.stderr)
+
+if (title === 'OCLint Result') {
+  const command = 'cat ios/sdk/oclint.log | grep -i "P[1|2]"'
+  const child = shell.exec(command)
+  if (child.stdout !== '') {
+    warn(title)
+    warn(child.stdout)
+  }
+  if (child.stderr !== '') {
+    fail(title)
+    fail(child.stderr)
+  }
+}
+else if (title === 'AndroidLint Result') {
+  var content = fs.readFileSync('android/sdk/build/reports/lint-results.html', 'utf8')
+  // the occurance of </section>
+  const occurance = content.split('</section>').length - 1
+  if (occurance < 3) {
+    warn(title)
+    warn(content)
+  } else {
+    // grep the str from the second <section to the third </section> from last"
+    // because the other information is not needed
+    content = content.substr(nth_occurrence(content, '<section ', 2))
+    content = content.substr(0, nth_occurrence(content, '</section>', occurance - 2))
+    warn(title)
+    warn(content)
+  }
 }

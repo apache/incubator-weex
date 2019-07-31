@@ -181,7 +181,6 @@ script:
           -max-priority-2=15000 \
           -max-priority-3=15000 > oclint.log
         export TITLE="OCLint Result"
-        export COMMAND="cat ios/sdk/oclint.log | grep -i \"P[1|2]\""
         cd ../../ && npm run danger -- ci -i oclint --dangerfile ./dangerfile-output.js
       fi
     fi 
@@ -192,7 +191,6 @@ script:
         cd android
         ./gradlew lint --quiet
         export TITLE="AndroidLint Result"
-        export COMMAND="cat android/sdk/build/reports/lint-results.xml"
         cd ../ && npm run danger -- ci -i androidlint --dangerfile ./dangerfile-output.js
       fi
     fi
