@@ -148,10 +148,16 @@ public class WXInstanceApm {
 
     public Set<String> exceptionRecord = new CopyOnWriteArraySet<String>();
 
-    public long wxLayoutTime;
-    public long wxExecJsCallBackTime;
-    public long wxComponentCreateTime;
-    public long wxViewCreateTime;
+    private double interactionLayoutTime;
+    public long componentCreateTime;
+    private long interactionComponentCreateTime;
+    public long viewCreateTime;
+    private long interactionViewCreateTime;
+    //next version
+    private long wxExecJsCallBackTime;
+    private long interactionJsCallBackTime;
+
+
     private boolean mHasRecordDetailData = false;
 
     /**
@@ -380,6 +386,7 @@ public class WXInstanceApm {
         if (null == apmInstance || mEnd) {
             return;
         }
+        new Handler(Looper.getMainLooper()).removeCallbacks(delayCollectDataTask);
         recordPerformanceDetailData();
         exceptionRecord.clear();
         mUIHandler.removeCallbacks(jsPerformanceCallBack);
@@ -392,6 +399,17 @@ public class WXInstanceApm {
             printLog();
         }
     }
+
+    public void doDelayCollectData(){
+        new Handler(Looper.getMainLooper()).postDelayed(delayCollectDataTask,8000);
+    }
+
+    private Runnable delayCollectDataTask = new Runnable() {
+        @Override
+        public void run() {
+            recordPerformanceDetailData();
+        }
+    };
 
 
     private void printLog(){
@@ -464,6 +482,17 @@ public class WXInstanceApm {
         if (forceStopRecordInteraction){
             return;
         }
+        long now = WXUtils.getFixUnixTime();
+        if (now - preUpdateTime > 50){
+            //for performance, reduce jni calls
+            WXBridgeManager.getInstance().onInteractionTimeUpdate(mInstanceId);
+            preUpdateTime = now;
+        }
+
+        interactionComponentCreateTime = componentCreateTime;
+        interactionViewCreateTime = viewCreateTime;
+        Double layoutTime = recordStatsMap.get("wxLayoutTime");
+        interactionLayoutTime = layoutTime ==null? 0:layoutTime;
 
         performanceRecord.interactionTime = curTime - performanceRecord.renderUnixTimeOrigin;
         performanceRecord.interactionRealUnixTime = System.currentTimeMillis();
@@ -477,6 +506,8 @@ public class WXInstanceApm {
         }
     }
 
+    private long preUpdateTime = 0;
+
     public void updateFSDiffStats(String name, double diffValue) {
         if (null == apmInstance || isFSEnd) {
             return;
@@ -489,15 +520,10 @@ public class WXInstanceApm {
             return;
         }
         mHasRecordDetailData = true;
-        wxViewCreateTime =  (long)(Math.random()*100)+30;
-        wxComponentCreateTime =  (long)(Math.random()*100)+20;
-        wxLayoutTime = (long)(Math.random()*100)+10;
-        wxExecJsCallBackTime = (long)(Math.random()*1000);
-
-        addStats(KEY_PAGE_STATS_VIEW_CREATE_COST,wxViewCreateTime);
-        addStats(KEY_PAGE_STATS_COMPONENT_CREATE_COST,wxComponentCreateTime);
-        addStats(KEY_PAGE_STATS_EXECUTE_JS_CALLBACK_COST,wxExecJsCallBackTime);
-        addStats(KEY_PAGE_STATS_LAYOUT_TIME,wxLayoutTime);
+        addStats(KEY_PAGE_STATS_VIEW_CREATE_COST,interactionViewCreateTime);
+        addStats(KEY_PAGE_STATS_COMPONENT_CREATE_COST,interactionComponentCreateTime);
+        addStats(KEY_PAGE_STATS_EXECUTE_JS_CALLBACK_COST,interactionJsCallBackTime);
+        addStats(KEY_PAGE_STATS_LAYOUT_TIME,interactionLayoutTime);
     }
 
     public void updateDiffStats(String name, double diffValue) {
@@ -638,4 +664,20 @@ public class WXInstanceApm {
         return builder.toString();
    }
 
+   public void updateNativePerformanceData(Map<String,String> nativePerformanceData){
+        if (null == nativePerformanceData){
+            return;
+        }
+        for (Map.Entry<String,String> entry : nativePerformanceData.entrySet()){
+            double value = -1;
+            try {
+                value = Double.valueOf(entry.getValue());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            if (value != -1){
+                recordStatsMap.put(entry.getKey(),value);
+            }
+        }
+   }
  }

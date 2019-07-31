@@ -102,5 +102,9 @@ namespace WeexCore {
             action = nullptr;
         }
     }
-    
+
+    RenderPerformance* RenderPageBase::getPerformance() {
+        return this->render_performance_;
+    }
+
 }

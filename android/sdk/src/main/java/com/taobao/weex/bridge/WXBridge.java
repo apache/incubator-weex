@@ -122,6 +122,7 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeSetPageArgument(String instanceId, String key, String value);
 
+  public native void nativeOnInteractionTimeUpdate(String instanceId);
 
   /**
    * Update Init Framework Params
@@ -181,6 +182,18 @@ public class WXBridge implements IWXBridge {
     }
     nativeExecJSWithCallback(instanceId, namespace, function, args,
             ResultCallbackManager.generateCallbackId(callback));
+  }
+
+  @CalledByNative
+  public void onNativePerformanceDataUpdate(String instanceId,Map<String,String> map){
+    if (TextUtils.isEmpty(instanceId) || null == map || map.size() < 1){
+      return;
+    }
+    WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
+    if (null == instance || null == instance.getApmForInstance()){
+      return;
+    }
+    instance.getApmForInstance().updateNativePerformanceData(map);
   }
 
   // Result from js engine

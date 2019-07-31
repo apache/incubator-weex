@@ -283,6 +283,18 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 //      }
     }
   }
+
+  public void onInteractionTimeUpdate(final String instanceId){
+    post(new Runnable() {
+      @Override
+      public void run() {
+        if (mWXBridge instanceof WXBridge ){
+          ((WXBridge)mWXBridge).nativeOnInteractionTimeUpdate(instanceId);
+        }
+      }
+    });
+  }
+
   public boolean jsEngineMultiThreadEnable() {
     return isJsEngineMultiThreadEnable;
   }
