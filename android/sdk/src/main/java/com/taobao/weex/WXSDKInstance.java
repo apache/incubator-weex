@@ -816,6 +816,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
     mApmForInstance.setPageName(pageName);
     mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_RENDER_ORGIGIN);
+    mApmForInstance.doDelayCollectData();
 
     mWXPerformance.pageName = (TextUtils.isEmpty(pageName) ? "defaultBundleUrl":pageName);
     if (TextUtils.isEmpty(mBundleUrl)) {
@@ -1641,7 +1642,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (mHasCreateFinish){
       lazyLoadTime = lastElementChangeTime - mWXPerformance.renderTimeOrigin;
       if (lazyLoadTime > 8000) {
-        //bad case
+        //force record detail performance data
         return;
       }
     }

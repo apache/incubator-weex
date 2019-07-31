@@ -88,6 +88,8 @@ static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
     jstring script,
     jint type);
 
+static void onInteractionTimeUpdate(JNIEnv* env, jobject jcaller, jstring instanceId);
+
 static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
     jstring instanceId,
     jstring ref,
@@ -1092,6 +1094,31 @@ static void Java_WXBridge_reportNativeInitStatus(JNIEnv* env, jobject obj,
 
 }
 
+static intptr_t g_WXBridge_onNativePerformanceDataUpdate = 0;
+static void Java_WXBridge_onNativePerformanceDataUpdate(JNIEnv* env, jobject obj,
+                                                        jstring id,
+                                                        jobject data) {
+    /* Must call RegisterNativesImpl()  */
+    //CHECK_CLAZZ(env, obj,
+    //    WXBridge_clazz(env));
+    jmethodID method_id =
+            base::android::GetMethod(
+                    env, WXBridge_clazz(env),
+                    base::android::INSTANCE_METHOD,
+                    "onNativePerformanceDataUpdate",
+                    "("
+                    "Ljava/lang/String;"
+                    "Ljava/util/Map;"
+                    ")"
+                    "V",
+                    &g_WXBridge_onNativePerformanceDataUpdate);
+
+    env->CallVoidMethod(obj,
+                        method_id, id, data);
+    base::android::CheckException(env);
+
+}
+
 // Step 3: RegisterNatives.
 
 static const JNINativeMethod kMethodsWXBridge[] = {
@@ -1162,6 +1189,11 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "I"
 ")"
 "Ljava/lang/String;", reinterpret_cast<void*>(ExecJSOnInstance) },
+    { "nativeOnInteractionTimeUpdate",
+"("
+"Ljava/lang/String;"
+")"
+"V", reinterpret_cast<void*>(onInteractionTimeUpdate) },
 { "nativeFireEventOnDataRenderNode",
     "("
     "Ljava/lang/String;"
@@ -1389,6 +1421,7 @@ static void Java_WXBridge_reset_clazz(JNIEnv* env, const char* className) {
     g_WXBridge_callHasTransitionPros = 0;
     g_WXBridge_getMeasurementFunc = 0;
     g_WXBridge_reportNativeInitStatus = 0;
+    g_WXBridge_onNativePerformanceDataUpdate = 0;
 }
 
 #endif  // com_taobao_weex_bridge_WXBridge_JNI

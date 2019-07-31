@@ -17,6 +17,7 @@
  * under the License.
  */
 #include <cstdint>
+#include <string>
 #include "render_performance.h"
 
 namespace WeexCore {
@@ -43,4 +44,16 @@ namespace WeexCore {
 
     return ret;
   }
+
+    bool RenderPerformance::onInteractionTimeUpdate() {
+      if (cssLayoutTimeForInteraction == cssLayoutTime){
+          return false;
+      }
+      cssLayoutTimeForInteraction = cssLayoutTime;
+        return true;
+    }
+
+    void RenderPerformance::getPerformanceStringData(std::map<std::string, std::string> &map) {
+        map["wxLayoutTime"] = std::to_string(this->cssLayoutTimeForInteraction);
+    }
 }

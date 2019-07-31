@@ -283,6 +283,18 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 //      }
     }
   }
+
+  public void onInteractionTimeUpdate(final String instanceId){
+    post(new Runnable() {
+      @Override
+      public void run() {
+        if (mWXBridge instanceof WXBridge ){
+          ((WXBridge)mWXBridge).nativeOnInteractionTimeUpdate(instanceId);
+        }
+      }
+    });
+  }
+
   public boolean jsEngineMultiThreadEnable() {
     return isJsEngineMultiThreadEnable;
   }
@@ -1021,6 +1033,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
         if (null != instance && instance.isPreInitMode()){
           instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
+          instance.getApmForInstance().onStageWithTime(WXInstanceApm.KEY_PAGE_STAGES_END_EXCUTE_BUNDLE,WXUtils.getFixUnixTime()+600);
         }
       }
     });

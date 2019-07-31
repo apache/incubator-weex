@@ -19,6 +19,7 @@
 
 #include "android/wrap/wx_bridge.h"
 #include <fstream>
+#include <core/render/manager/render_manager.h>
 
 #include "android/wrap/log_utils.h"
 #include "android/base/string/string_utils.h"
@@ -44,6 +45,8 @@
 #include "core/bridge/eagle_bridge.h"
 #include "core/common/view_utils.h"
 #include "third_party/json11/json11.hpp"
+#include "core/moniter/render_performance.h"
+#include "core/render/page/render_page_base.h"
 
 using namespace WeexCore;
 jlongArray jFirstScreenRenderTime = nullptr;
@@ -660,6 +663,38 @@ static jstring ExecJSOnInstance(JNIEnv* env, jobject jcaller,
     return nullptr;
 
   return env->NewStringUTF(result->data.get());
+}
+
+static void onInteractionTimeUpdate(JNIEnv* env, jobject jcaller, jstring instanceId) {
+  ScopedJStringUTF8 idChar(env, instanceId);
+
+  RenderPageBase* page = RenderManager::GetInstance()->GetPage(idChar.getChars());
+  if (nullptr == page){
+    return;
+  }
+  auto performance = page->getPerformance();
+  if (nullptr == performance){
+    return;
+  }
+  bool change = performance->onInteractionTimeUpdate();
+
+  if (!change){
+      return;
+  }
+
+  std::map<std::string,std::string> c_performance_data;
+  performance->getPerformanceStringData(c_performance_data);
+
+
+  auto performance_map = std::unique_ptr<WXMap>(new WXMap);
+  if (performance_map == nullptr) {
+      return;
+  }
+  performance_map->Put(env,c_performance_data);
+
+  jobject jni_map_performance =
+          performance_map.get() != nullptr ? performance_map->jni_object() : nullptr;
+  Java_WXBridge_onNativePerformanceDataUpdate(env,jcaller,instanceId,jni_map_performance);
 }
 
 static void FireEventOnDataRenderNode(JNIEnv* env, jobject jcaller,
