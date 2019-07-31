@@ -1,6 +1,6 @@
 os: linux
 language: node_js
-node_js: 7.6
+node_js: 12.6.0
 matrix:
     fast_finish: true
     include:
@@ -37,8 +37,8 @@ matrix:
             - extra-android-m2repository 
       # static check
       - env: TEST_SUITE=static_code_analysis OCLINT=true
-        language: objective-c
         osx_image: xcode7.2
+        language: objective-c
       - env: TEST_SUITE=static_code_analysis ANDROID_LINT=true
         language: android
         dist: trusty
@@ -60,9 +60,17 @@ cache:
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -fr $HOME/node_modules/*
 
 before_install:
   - |
+    # install android lint 
+    if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${ANDROID_LINT}" = "true") ]]; then
+      sudo apt-get install rubygems
+      gem install bundler
+      bundle install
+    fi
+
     # install oclint
     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
       brew cask uninstall oclint
@@ -70,11 +78,13 @@ before_install:
       brew install oclint
     fi
 
+    
+
 install:
   - |
     if [[ ("$TEST_SUITE" = "android") || ("${ANDROID_LINT}" = "true") ]]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-        nvm install 7.6
+        nvm install 12.6.0
         npm install
         echo y | sdkmanager "cmake;3.6.4111459"
         if find "${HOME}/android-ndk-r18b" -mindepth 1 | read; then
@@ -92,8 +102,13 @@ install:
         export PATH=$PATH:$ANDROID_NDK_HOME
         echo "ndk.dir=$ANDROID_NDK_HOME" > android/local.properties
     elif [[ ("$TEST_SUITE" = "jsfm") || ("$TEST_SUITE" = "danger") ||  ("${OCLINT}" = "true") ]]; then
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+        nvm install 12.6.0  
         npm install
     elif [[ ("$TEST_SUITE" = "ios") ]]; then
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+        nvm install 12.6.0  
+
         git submodule update --init --remote
         cd weex-playground/ios && bash update_podfile_for_travisci.sh
         cd ../../ && npm install
@@ -102,6 +117,7 @@ install:
     elif [[ ("$TEST_SUITE" = "code_format") ]]; then
         bundle install
     fi
+    
 
 script:
   - |
@@ -121,38 +137,31 @@ script:
             GRADLE_ABI=""
             ;;
         esac
-
-        hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-android.js)
-        echo "The value of hasAndroidFile is ${hasAndroidFile}"
-        if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
+        if npm run danger -- ci --dangerfile ./dangerfile-android.js | grep -q "hasAndroidFile" ; then
           cd android
           ./gradlew clean install -PbuildRuntimeApi=true ${GRADLE_ABI} --info
           ./gradlew install -PbuildRuntimeApi=false ${GRADLE_ABI} --info
         fi
         ;;
       "jsfm" )
-        npm run danger -- run --dangerfile ./dangerfile-jsfm.js
+        npm run danger -- ci -i jsfm --dangerfile ./dangerfile-jsfm.js
         ;;
       "danger" )
-        npm run danger -- run --dangerfile ./dangerfile.js -i danger
+        npm run danger -- ci -i danger --dangerfile ./dangerfile.js
         ;;
       "ios" )
-        hasIosFile=$(npm run danger -- run --dangerfile ./dangerfile-ios.js)
-        echo "The value of hasIosFile is ${hasIosFile}"
-        if [[ "$hasIosFile" =~ "hasIosFile" ]]; then
+        if npm run danger -- ci --dangerfile ./dangerfile-ios.js | grep -q "hasIosFile" ; then
           # build WeexSDK and run WeexSDKTests
-          xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
+          xcodebuild -quiet -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
           # build WeexDemo and run WeexDemo test
           cd weex-playground/ios && mkdir tmp && mv * tmp;cd tmp
-          xcodebuild -workspace WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
+          xcodebuild -quiet -workspace WeexDemo.xcworkspace test -scheme WeexDemo CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination "platform=iOS Simulator,name=iPhone 6" || exit 1
         fi
         ;;
     esac
     
     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${OCLINT}" = "true") ]]; then
-      hasCFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
-      echo "The value of hasCFile is ${hasCFile}"
-      if [[ "$hasCFile" =~ "hasCFile" ]]; then
+      if npm run danger -- ci --dangerfile ./dangerfile-static-check.js | grep -q "hasCFile" ; then
         echo "hasCFile"
         cd ios/sdk && xcodebuild | xcpretty -r json-compilation-database -o compile_commands.json
         oclint-json-compilation-database oclint_args -- \
@@ -171,24 +180,20 @@ script:
           -max-priority-1=15000 \
           -max-priority-2=15000 \
           -max-priority-3=15000 > oclint.log
+        export TITLE="OCLint Result"
         export COMMAND="cat ios/sdk/oclint.log | grep -i \"P[1|2]\""
-        cd ../../ && npm run danger -- run --dangerfile ./dangerfile-output.js -i oclint
+        cd ../../ && npm run danger -- ci -i oclint --dangerfile ./dangerfile-output.js
       fi
     fi 
 
     if [[ ("$TEST_SUITE" = "static_code_analysis") && ("${ANDROID_LINT}" = "true") ]]; then
-      hasAndroidFile=$(npm run danger -- run --dangerfile ./dangerfile-static-check.js)
-      echo "The value of hasAndroidFile is ${hasAndroidFile}"
-      if [[ "$hasAndroidFile" =~ "hasAndroidFile" ]]; then
-        # format code using google-java-format at first
-        # for n in `find ./android -name "*.java"`; do
-        #   java -jar ./format-tool/google-java-format-1.7-all-deps.jar --replace $n
-        # done
-        # then run android lint
-        # echo "hasAndroidFile"
-        echo "run android lint"
+      if npm run danger -- ci --dangerfile ./dangerfile-static-check.js | grep -q "hasAndroidFile" ; then
+        echo "hasAndroidFile"
         cd android
-        ./gradlew lint
+        ./gradlew lint --quiet
+        export TITLE="AndroidLint Result"
+        export COMMAND="cat android/sdk/build/reports/lint-results.xml"
+        cd ../ && npm run danger -- ci -i androidlint --dangerfile ./dangerfile-output.js
       fi
     fi
 
