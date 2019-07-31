@@ -197,9 +197,9 @@ script:
         # bundle exec danger --danger_id=androidLint --dangerfile=../Dangerfile-android
         ./gradlew lint --quiet
         export COMMAND="echo AndroidLint"
-        npm run danger -- ci -i androidlint --dangerfile ../dangerfile-output.js
-        export COMMAND="cat sdk/build/reports/lint-results.xml"
-        npm run danger -- ci -i androidlint --dangerfile ../dangerfile-output.js
+        cd ../ && npm run danger -- ci -i androidlint --dangerfile ./dangerfile-output.js && cd android
+        export COMMAND="cat android/sdk/build/reports/lint/lint-result.xml"
+        cd ../ && npm run danger -- ci -i androidlint --dangerfile ./dangerfile-output.js
       fi
     fi
 
