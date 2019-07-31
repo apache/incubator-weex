@@ -22,6 +22,7 @@ package com.taobao.weex.ui.component.richtext;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.TextUtils;
@@ -34,10 +35,15 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.component.richtext.node.RichTextNode;
+import com.taobao.weex.ui.component.richtext.node.RichTextNodeManager;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class WXRichText extends WXText {
+  private List<RichTextNode> nodes = new LinkedList<>();
 
   static class RichTextContentBoxMeasurement extends TextContentBoxMeasurement {
 
@@ -48,18 +54,25 @@ public class WXRichText extends WXText {
     @NonNull
     @Override
     protected Spanned createSpanned(String text) {
-      if (mComponent.getInstance() != null & mComponent.getInstance().getUIContext() != null &&
-              !TextUtils.isEmpty(mComponent.getInstanceId())) {
-        Spannable spannable = RichTextNode.parse(
-                mComponent.getInstance().getUIContext(),
-                mComponent.getInstanceId(),
-                mComponent.getRef(),
-                text);
+      if(!TextUtils.isEmpty(text)) {
+        if (mComponent.getInstance() != null & mComponent.getInstance().getUIContext() != null &&
+                !TextUtils.isEmpty(mComponent.getInstanceId())) {
+          Spannable spannable = RichTextNode.parse(
+                  mComponent.getInstance().getUIContext(),
+                  mComponent.getInstanceId(),
+                  mComponent.getRef(),
+                  text);
+          updateSpannable(spannable, RichTextNode.createSpanFlag(0));
+          return spannable;
+        } else {
+          return new SpannedString("");
+        }
+      }
+      else {
+        Spannable spannable = ((WXRichText)mComponent).toSpan();
         updateSpannable(spannable, RichTextNode.createSpanFlag(0));
         return spannable;
-      } else {
-        return new SpannedString("");
-      }
+        }
     }
   }
 
@@ -73,6 +86,70 @@ public class WXRichText extends WXText {
   public WXRichText(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     super(instance, parent, basicComponentData);
     setContentBoxMeasurement(new RichTextContentBoxMeasurement(this));
+  }
+  public void AddChildNode(String ref, String nodeType,String parentRef, Map<String,String> styles,Map<String,String> attrs) {
+    if(getInstance() != null && getInstance().getUIContext() != null && !TextUtils.isEmpty(getInstanceId()) &&
+            !TextUtils.isEmpty(ref) && !TextUtils.isEmpty(nodeType)) {
+      RichTextNode child = RichTextNodeManager.createRichTextNode(getInstance().getUIContext(), getInstanceId(), getRef(), ref, nodeType, styles, attrs);
+      if (TextUtils.isEmpty(parentRef)) {
+        nodes.add(child);
+      } else {
+        RichTextNode parent = findRichNode(parentRef);
+        if (parent != null) {
+          parent.addChildNode(child);
+        }
+      }
+    }
+  }
+  private Spannable toSpan(){
+    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+    if(nodes != null && !nodes.isEmpty()){
+      for(RichTextNode node:nodes){
+        spannableStringBuilder.append(node.toSpan(1));
+      }
+    }
+    return spannableStringBuilder;
+  }
+
+  public void removeChildNode(String parentRef,String ref) {
+    if (nodes != null && !nodes.isEmpty()) {
+      if (parentRef.equals("")) {
+        for (RichTextNode node : nodes) {
+          if (TextUtils.equals(node.getRef(), ref)) {
+            nodes.remove(node);
+          }
+        }
+      } else {
+        RichTextNode parent = findRichNode(parentRef);
+        if (parent != null) {
+          parent.removeChildNode(ref);
+        }
+      }
+    }
+  }
+  public void updateChildNodeStyles(String ref,Map<String,Object> styles){
+    RichTextNode node = findRichNode(ref);
+    if(node != null){
+      node.updateStyles(styles);
+    }
+  }
+  public void updateChildNodeAttrs(String ref,Map<String,Object> attrs){
+    RichTextNode node = findRichNode(ref);
+    if(node != null){
+      node.updateAttrs(attrs);
+    }
+  }
+  private RichTextNode findRichNode(String ref){
+    if(!TextUtils.isEmpty(ref)) {
+      RichTextNode theNode;
+      if (nodes != null && !nodes.isEmpty()) {
+        for (RichTextNode node : nodes) {
+          if ((theNode = node.findRichNode(ref)) != null)
+            return theNode;
+        }
+      }
+    }
+    return null;
   }
 
   @Override

@@ -1014,6 +1014,57 @@ int WXBridge::AddEvent(JNIEnv* env, const char* page_id, const char* ref,
                                     jEventId.Get());
 }
 
+int WXBridge::AddChildToRichtext(JNIEnv* env, const char *pageId, const char *nodeType,
+        const char *ref,const char *parentRef,const char *richtextRef,
+        std::map<std::string, std::string> *styles,std::map<std::string, std::string> *attributes) {
+    auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(pageId));
+    auto jParentPef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(parentRef));
+    auto jRef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(ref));
+    auto jRichtextRef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(richtextRef));
+    auto jNodeType =
+                base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(nodeType));
+    auto styles_map = std::unique_ptr<WXMap>(new WXMap);
+    styles_map->Put(env, *styles);
+    auto attributes_map = std::unique_ptr<WXMap>(new WXMap);
+    attributes_map->Put(env, *attributes);
+    return Java_WXBridge_callAddChildToRichtext(env, jni_object(), jPageId.Get(), jNodeType.Get(), jRef.Get(),
+            jParentPef.Get(),jRichtextRef.Get(),styles_map->jni_object(), attributes_map->jni_object());
+}
+
+int WXBridge::RemoveChildFromRichtext(JNIEnv* env, const char *pageId, const char *ref, const char *parent_ref,
+                                          const char *richtext_ref) {
+    auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(pageId));
+    auto jParentPef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(parent_ref));
+    auto jRef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(ref));
+    auto jRichtextRef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(richtext_ref));
+    return Java_WXBridge_callRemoveChildFromRichtext(env, jni_object(), jPageId.Get(),jRef.Get(),
+                                                    jParentPef.Get(),jRichtextRef.Get());
+}
+int WXBridge::UpdateRichtextStyle(JNIEnv* env, const char *pageId, const char *ref,
+                                      std::vector<std::pair<std::string, std::string>> *styles, const char *parent_ref,
+                                      const char *richtext_ref) {
+    auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(pageId));
+    auto jParentPef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(parent_ref));
+    auto jRef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(ref));
+    auto jRichtextRef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(richtext_ref));
+    auto styles_map = std::unique_ptr<WXMap>(new WXMap);
+    styles_map->Put(env, *styles);
+    return Java_WXBridge_callUpdateRichtextStyle(env, jni_object(), jPageId.Get(), jRef.Get(),
+                                                    styles_map->jni_object(), jParentPef.Get(), jRichtextRef.Get());
+}
+int WXBridge::UpdateRichtextChildAttr(JNIEnv* env, const char *pageId, const char *ref,
+                                      std::vector<std::pair<std::string, std::string>> *attributes,
+                                      const char *parent_ref, const char *richtext_ref) {
+    auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(pageId));
+    auto jParentPef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(parent_ref));
+    auto jRef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(ref));
+    auto jRichtextRef = base::android::ScopedLocalJavaRef<jstring >(env, env->NewStringUTF(richtext_ref));
+    auto attributes_map = std::unique_ptr<WXMap>(new WXMap);
+    attributes_map->Put(env, *attributes);
+    return Java_WXBridge_callUpdateRichtextChildAttr(env, jni_object(), jPageId.Get(), jRef.Get(),
+                                                 attributes_map->jni_object(), jParentPef.Get(), jRichtextRef.Get());
+}
+
 int WXBridge::RefreshFinish(JNIEnv* env, const char* page_id, const char* task,
                             const char* callback) {
   auto jTask = base::android::ScopedLocalJavaRef<jbyteArray>(
