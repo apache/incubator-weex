@@ -9,8 +9,6 @@ if !ENV['CIRCLECI']
     # fork by 'https://github.com/flix-tech/danger-code_style_validation.git'
     # update the message level from fail to warn
     gem 'danger-code_style_validation', :git => 'https://github.com/wrmswindmill/danger-code_style_validation.git'
-    # android lint
-    gem 'danger-android_lint'
   end
 end
 # gem "danger-prose"
