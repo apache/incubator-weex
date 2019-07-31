@@ -198,7 +198,7 @@ script:
         ./gradlew lint --quiet
         export COMMAND="echo AndroidLint"
         npm run danger -- ci -i androidlint --dangerfile ../dangerfile-output.js
-        export COMMAND="cat app/build/reports/lint/lint-result.xml"
+        export COMMAND="cat sdk/build/reports/lint-results.xml"
         npm run danger -- ci -i androidlint --dangerfile ../dangerfile-output.js
       fi
     fi
