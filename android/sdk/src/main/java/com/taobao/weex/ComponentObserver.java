@@ -48,3 +48,4 @@ public interface ComponentObserver {
    */
   void onViewCreated(WXComponent component,View view);
 }
+
