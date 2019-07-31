@@ -21,11 +21,14 @@ import { fail, warn } from 'danger'
 
 const shell = require('shelljs')
 const command = process.env.COMMAND
+const title = process.env.TITLE
 const child = shell.exec(command)
-	
+
 if (child.stdout !== '') {
+  warn(`## ${title}`)
   warn(child.stdout)
 }
 if (child.stderr !== '') {
+  fail(`## ${title}`)
   fail(child.stderr)
 }
