@@ -44,27 +44,28 @@ if (title === 'OCLint Result') {
   const command = 'cat ios/sdk/oclint.log | grep -i "P[1|2]"'
   const child = shell.exec(command)
   if (child.stdout !== '') {
-    warn(title)
     warn(child.stdout)
+    warn(title)
   }
   if (child.stderr !== '') {
-    fail(title)
     fail(child.stderr)
+    fail(title)
   }
 }
 else if (title === 'AndroidLint Result') {
   var content = fs.readFileSync('android/sdk/build/reports/lint-results.html', 'utf8')
-  // the occurance of </section>
+  // in xml report,Overview Section,Disabled Checks Section and Suppressing Warnings and Errors Section is not reported.
+  // in html report, those Section are included,
+  // but Overview Section can't work in markdown,
+  // on the other hand,Disabled Checks Section and Suppressing Warnings and Errors Section are not needed.
+  // the first section is Overview section,
+  // the last two section are  Disabled Checks Section and Suppressing Warnings and Errors Section.
+  // so we should grep the str from the second <section to the third </section> from last"
   const occurance = content.split('</section>').length - 1
-  if (occurance < 3) {
-    warn(title)
-    warn(content)
-  } else {
-    // grep the str from the second <section to the third </section> from last"
-    // because the other information is not needed
+  if (occurance > 3) {
     content = content.substr(nth_occurrence(content, '<section ', 2))
-    content = content.substr(0, nth_occurrence(content, '</section>', occurance - 2))
-    warn(title)
+    content = content.substr(0, nth_occurrence(content, '</section>', occurance - 3))
     warn(content)
+    warn(title)
   }
 }
