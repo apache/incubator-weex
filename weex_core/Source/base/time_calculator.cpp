@@ -54,7 +54,6 @@ void weex::base::TimeCalculator::print() {
     return;
   }
 
-  const long long &allCost = m_destructor_time_ - m_constructor_time_;
   const long long &taskWait = m_task_start_time_ - m_constructor_time_;
   const long long &taskCost = m_task_end_time_ - m_task_start_time_;
 
