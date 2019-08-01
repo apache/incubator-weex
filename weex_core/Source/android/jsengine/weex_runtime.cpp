@@ -71,7 +71,6 @@ int WeexRuntime::initFramework(const String &script, std::vector<INIT_FRAMEWORK_
     base::debug::TraceEvent::StartATrace(nullptr);
     base::debug::TraceScope traceScope("weex", "initFramework");
     weexObjectHolder->initFromParams(params, false);
-    LOGD("dyyLog %s","i am a testing log");
     return _initFramework(script);
 }
 
