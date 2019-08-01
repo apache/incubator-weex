@@ -1104,10 +1104,10 @@ _Pragma("clang diagnostic pop") \
         } else {
             [self callJSMethod:@"callJS" args:@[execIns, [tasks copy]]];
         }
-        if (execInstance && !(execInstance.isJSCreateFinish)) {
+        if (execInstance) {
             NSTimeInterval diff = CACurrentMediaTime()*1000 - start;
-            execInstance.performance.fsCallJsNum++;
-            execInstance.performance.fsCallJsTime =  execInstance.performance.fsCallJsTime+ diff;
+            execInstance.performance.callJsNum++;
+            execInstance.performance.callJsTime =  execInstance.performance.callJsTime+ diff;
          }
         if (execInstance && !execInstance.apmInstance.isFSEnd) {
              NSTimeInterval diff = CACurrentMediaTime()*1000 - start;
