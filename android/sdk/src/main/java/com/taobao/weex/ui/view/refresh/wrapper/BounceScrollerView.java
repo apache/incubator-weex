@@ -18,11 +18,13 @@
  */
 package com.taobao.weex.ui.view.refresh.wrapper;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.view.WXScrollView;
 
+@SuppressLint("ViewConstructor")
 public class BounceScrollerView extends BaseBounceView<WXScrollView> {
 
     public BounceScrollerView(Context context, int orientation, WXScroller waScroller) {

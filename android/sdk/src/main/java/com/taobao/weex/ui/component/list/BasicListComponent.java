@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.component.list;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
@@ -174,6 +175,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     stickyHelper = new WXStickyHelper(this);
   }
 
+  @SuppressLint("RtlHardcoded")
   @Override
   public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
