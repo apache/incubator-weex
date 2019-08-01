@@ -554,6 +554,10 @@
 		BD9205F82236518700EDF93D /* WXDataRenderHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = BD9205F72236518700EDF93D /* WXDataRenderHandler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BD9205FB223651D900EDF93D /* eagle_bridge.h in Headers */ = {isa = PBXBuildFile; fileRef = BD9205F9223651D800EDF93D /* eagle_bridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BD9205FC223651D900EDF93D /* eagle_bridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BD9205FA223651D800EDF93D /* eagle_bridge.cpp */; };
+		BDEEADBA22F2902E0099F1D7 /* time_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEEADB822F2902D0099F1D7 /* time_calculator.cpp */; };
+		BDEEADBB22F2902E0099F1D7 /* time_calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BDEEADB822F2902D0099F1D7 /* time_calculator.cpp */; };
+		BDEEADBC22F2902E0099F1D7 /* time_calculator.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEEADB922F2902E0099F1D7 /* time_calculator.h */; };
+		BDEEADBD22F2902E0099F1D7 /* time_calculator.h in Headers */ = {isa = PBXBuildFile; fileRef = BDEEADB922F2902E0099F1D7 /* time_calculator.h */; };
 		C401945E1E344E8300D19C31 /* WXFloatCompareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */; };
 		C41E1A971DC1FD15009C7F90 /* WXDatePickerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */; };
 		C41E1A981DC1FD15009C7F90 /* WXDatePickerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */; };
@@ -1282,6 +1286,8 @@
 		BD9205F72236518700EDF93D /* WXDataRenderHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDataRenderHandler.h; sourceTree = "<group>"; };
 		BD9205F9223651D800EDF93D /* eagle_bridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eagle_bridge.h; sourceTree = "<group>"; };
 		BD9205FA223651D800EDF93D /* eagle_bridge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = eagle_bridge.cpp; sourceTree = "<group>"; };
+		BDEEADB822F2902D0099F1D7 /* time_calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = time_calculator.cpp; sourceTree = "<group>"; };
+		BDEEADB922F2902E0099F1D7 /* time_calculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = time_calculator.h; sourceTree = "<group>"; };
 		C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXFloatCompareTests.m; sourceTree = "<group>"; };
 		C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDatePickerManager.h; sourceTree = "<group>"; };
 		C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDatePickerManager.m; sourceTree = "<group>"; };
@@ -2308,6 +2314,8 @@
 				D735F1AA22D761F800B53CDF /* utils */,
 				77E349F6229FE67900B1CDAB /* log_defines.cpp */,
 				77CF6A5421E6E47D00BA8634 /* core_constants.h */,
+				BDEEADB822F2902D0099F1D7 /* time_calculator.cpp */,
+				BDEEADB922F2902E0099F1D7 /* time_calculator.h */,
 				77CF6A5521E6E47D00BA8634 /* log_defines.h */,
 				B8F3323B2141A4C500701BA0 /* string_util.h */,
 				B8D66B892125572F003960BD /* make_copyable.h */,
@@ -2489,6 +2497,7 @@
 				74CFDD451F459443007A1A66 /* WXRecycleListUpdateManager.h in Headers */,
 				74A4BA9A1CB3BAA100195969 /* WXThreadSafeMutableDictionary.h in Headers */,
 				741DFE021DDD7D18009B020F /* WXRoundedRect.h in Headers */,
+				BDEEADBC22F2902E0099F1D7 /* time_calculator.h in Headers */,
 				17C74F0F2072147B00AB4CAB /* WXAnalyzerProtocol.h in Headers */,
 				7423899B1C3174EB00D748CA /* WXWeakObjectWrapper.h in Headers */,
 				74BF19F81F5139BB00AEE3D7 /* WXJSASTParser.h in Headers */,
@@ -2731,6 +2740,7 @@
 				DCA445E31EFA59DA00D0CFA8 /* WXEmbedComponent.h in Headers */,
 				DCA445DF1EFA59BC00D0CFA8 /* WXLoadingComponent.h in Headers */,
 				B8D66C2E21255730003960BD /* render_manager.h in Headers */,
+				BDEEADBD22F2902E0099F1D7 /* time_calculator.h in Headers */,
 				C42E8FAD1F3C7C3F001EBE9D /* WXExtendCallNativeManager.h in Headers */,
 				DCA445CB1EFA590600D0CFA8 /* WXComponent+Layout.h in Headers */,
 				DCA4460F1EFA5A8100D0CFA8 /* WXDiffUtil.h in Headers */,
@@ -3264,6 +3274,7 @@
 				7461F8931CFB373100F62D44 /* WXLayer.m in Sources */,
 				74D205211E091B8000128F44 /* WXCallJSMethod.m in Sources */,
 				C41E1A981DC1FD15009C7F90 /* WXDatePickerManager.m in Sources */,
+				BDEEADBA22F2902E0099F1D7 /* time_calculator.cpp in Sources */,
 				77D1614C1C02E3790010B15B /* WXConvert.m in Sources */,
 				749DC27C1D40827B009E1C91 /* WXMonitor.m in Sources */,
 				C4B834271DE69B09007AD27E /* WXPickerModule.m in Sources */,
@@ -3450,6 +3461,7 @@
 				DCA445941EFA55B300D0CFA8 /* WXComponentFactory.m in Sources */,
 				DCA445951EFA55B300D0CFA8 /* WXRuleManager.m in Sources */,
 				DCA445961EFA55B300D0CFA8 /* WXMonitor.m in Sources */,
+				BDEEADBB22F2902E0099F1D7 /* time_calculator.cpp in Sources */,
 				DCA445971EFA55B300D0CFA8 /* WXComponent+Navigation.m in Sources */,
 				DCA445981EFA55B300D0CFA8 /* WXSDKInstance.m in Sources */,
 				DCA445991EFA55B300D0CFA8 /* WXJSExceptionInfo.m in Sources */,
