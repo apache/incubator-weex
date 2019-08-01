@@ -60,12 +60,12 @@ public class WXMetaModule extends WXModule {
                 // todo maybe getString(WIDTH) is "device-height"
                 if (DEVICE_WIDTH.endsWith(jsObj.getString(WIDTH))) {
                     int width = (int)(WXViewUtils.getScreenWidth(cxt)/WXViewUtils.getScreenDensity(cxt));
-                    mWXSDKInstance.setInstanceViewPortWidth(width);
+                    mWXSDKInstance.setInstanceViewPortWidth(width,true);
                     WXLogUtils.d("[WXMetaModule] setViewport success[device-width]=" + width);
                 } else {
                     int width = jsObj.getInteger(WIDTH);
                     if (width > 0) {
-                        mWXSDKInstance.setInstanceViewPortWidth(width);
+                        mWXSDKInstance.setInstanceViewPortWidth(width,true);
                     }
                     WXLogUtils.d("[WXMetaModule] setViewport success[width]=" + width);
                 }
