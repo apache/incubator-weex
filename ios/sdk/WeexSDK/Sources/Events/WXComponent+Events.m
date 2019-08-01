@@ -108,9 +108,6 @@
 - (instancetype) init
 {
     self = [super init];
-    if (self) {
-        
-    }
     return self;
 }
 
@@ -406,8 +403,6 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
             [_tapGesture removeTarget:self action:@selector(onClick:)];
         }@catch(NSException *exception) {
             WXLog(@"%@", exception);
-        } @finally {
-            
         }
         _tapGesture = nil;
     }
@@ -489,8 +484,6 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
         }
     }@catch(NSException *exception) {
         WXLog(@"%@", exception);
-    }@finally {
-        
     }
     _swipeGestures = nil;
 }
@@ -552,8 +545,6 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
             [_longPressGesture removeTarget:self action:@selector(onLongPress:)];
         }@catch(NSException * exception) {
             WXLog(@"%@", exception);
-        }@finally {
-            
         }
         _longPressGesture = nil;
     }
@@ -712,8 +703,6 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
             [_panGesture removeTarget:self action:@selector(onPan:)];
         }@catch(NSException * exception) {
             WXLog(@"%@", exception);
-        }@finally {
-            
         }
         _panGesture = nil;
     }

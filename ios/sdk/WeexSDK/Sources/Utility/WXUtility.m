@@ -834,7 +834,6 @@ CGFloat WXFloorPixelValue(CGFloat value)
             ret = [NSKeyedUnarchiver unarchiveObjectWithData:(__bridge NSData *)keyData];
         } @catch (NSException *e) {
             NSLog(@"Unarchive of %@ failed: %@", service, e);
-        } @finally {
         }
     }
     if (keyData)

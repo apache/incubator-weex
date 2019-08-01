@@ -400,8 +400,6 @@
                     [_tableView endUpdates];
                 } @catch (NSException *exception) {
                     WXLogError(@"list insert component occurs exception %@", exception);
-                } @finally {
-                     // nothing
                 }
                 
             }];
@@ -656,8 +654,6 @@
                     [_tableView endUpdates];
                 }@catch(NSException * exception){
                     WXLogDebug(@"move cell exception: %@", [exception description]);
-                }@finally {
-                    // do nothing
                 }
             }];
         }

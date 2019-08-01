@@ -1056,6 +1056,7 @@ typedef enum : NSUInteger {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
     }
     @catch (NSException *exception) {
+        // avoid empty-catch warning
     }
 }
 
