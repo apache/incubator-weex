@@ -16,16 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/*
- * Implementation of the user-space ashmem API for devices, which have our
- * ashmem-enabled kernel. See ashmem-sim.c for the "fake" tmp-based version,
- * used by the simulator.
- */
+package com.taobao.weex.utils.tools;
 
-#ifndef IPCLOG_H
-#define IPCLOG_H
-#include "../../base/log_defines.h"
+public class LogSwitch {
 
-#define IPC_LOGE(format, ...) LOGE(format, ##__VA_ARGS__)
-#define IPC_LOGD(format, ...) LOGD(format, ##__VA_ARGS__)
-#endif /* IPCLOG_H */
+    private int low_level = 4;
+    private int medium_level = 2;
+    private int high_level = 1;
+    private int log_switch = 0;
+    private boolean showLowLevelLog = false;
+    private boolean showMediumLevelLog = false;
+    private boolean showHighLevelLog = true;
+
+
+    public void setLog_switch() {
+        // Todo
+        // read prop
+
+        if (showLowLevelLog)
+            log_switch |= low_level;
+
+        if (showMediumLevelLog) {
+            log_switch |= medium_level;
+        }
+
+        if (showHighLevelLog) {
+            log_switch |= high_level;
+        }
+    }
+
+
+    public int getLog_switch() {
+        return log_switch;
+    }
+
+
+}

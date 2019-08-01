@@ -21,7 +21,13 @@ package com.taobao.weex.utils;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.utils.tools.LogDetail;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -29,6 +35,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.taobao.weex.utils.tools.TimeCalculator.TIMELINE_TAG;
 
 public class WXLogUtils {
 
@@ -129,6 +137,22 @@ public class WXLogUtils {
 
   public static void e(String tag, byte[] msg) {
     e(tag, new String(msg));
+  }
+
+  public static void performance(String instanceId, byte[]msg) {
+//    String s = new String(msg);
+//    if(!TextUtils.isEmpty(instanceId)) {
+//      WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+//      if(sdkInstance != null) {
+//        int i = s.indexOf(",");
+//        if(i >=0 && i < s.length()) {
+//          String substring = s.substring(s.indexOf(",") + 1);
+//          LogDetail logDetail = JSON.parseObject(substring,LogDetail.class);
+//          sdkInstance.mTimeCalculator.addLog(logDetail);
+//        }
+//      }
+//    }
+//    Log.e(TIMELINE_TAG, "from WeexCore" + s);
   }
 
   public static void wtf(String msg){

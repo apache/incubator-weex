@@ -186,12 +186,16 @@ void WeexGlobalObject::initWxEnvironment(std::vector<INIT_FRAMEWORK_PARAMS *> &p
             }
             isGlobalConfigStartUpSet = true;
         }
-
         // --------------------------------------------------------
         // add for debug mode
-        if (String("debugMode") == type && String("true") == value) {
-            WeexCore::DebugMode = true;
-            LOGE("jss use %s"," jsc");
+        static bool hasSet = false;
+        if(!hasSet) {
+            if (String("debugMode") == type && String("true") == value) {
+                __android_log_print(ANDROID_LOG_ERROR,"WeexCore","setDebugMode  1 ");
+                weex::base::LogImplement::getLog()->setDebugMode(true);
+                hasSet = true;
+                LOGE("jss use %s"," jsc");
+            }
         }
         // --------------------------------------------------------
 
@@ -418,14 +422,6 @@ JSFUNCTION functionCallNativeModule(ExecState *state) {
     getStringArgsFromState(state, 2, methodChar);
     getWsonOrJsonArgsFromState(state, 3, arguments);
     getWsonOrJsonArgsFromState(state, 4, options);
-
-//    String a;
-//    a.append("functionCallNativeModule:");
-//    a.append(moduleChar.getValue());
-//    a.append(":");
-//    a.append(methodChar.getValue());
-//    weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::JSS_ENGINE, a.utf8().data(), instanceId.getValue());
-//    timeCalculator.taskStart();
     auto result = globalObject->js_bridge()->core_side()->CallNativeModule(instanceId.getValue(),
                                                                            moduleChar.getValue(),
                                                                            methodChar.getValue(),
@@ -433,7 +429,6 @@ JSFUNCTION functionCallNativeModule(ExecState *state) {
                                                                            arguments.getLength(),
                                                                            options.getValue(),
                                                                            options.getLength());
-//    timeCalculator.taskEnd();
     JSValue ret;
     switch (result->type) {
         case ParamsType::DOUBLE:

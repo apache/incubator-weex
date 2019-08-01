@@ -16,16 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.taobao.weex.utils.tools;
 
-#pragma once
+import com.alibaba.fastjson.annotation.JSONField;
 
-namespace WeexCore {
+public class TaskInfo{
 
-    class LogBridge {
-    public:
-        LogBridge() {}
-        
-        virtual void log(LogLevel level, const char* tag, const char* file, unsigned long line, const char* log) {};
-    };
-    
+	@JSONField(name="args")
+	public String args;
+
+	@JSONField(name="relateTaskId")
+	public int relateTaskId;
+
+	@Override
+ 	public String toString(){
+		return 
+			"TaskInfo{" + 
+			"args = '" + args + '\'' + 
+			",relateTaskId = '" + relateTaskId + '\'' + 
+			"}";
+		}
 }

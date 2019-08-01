@@ -302,5 +302,9 @@ int PlatformBridgeInMultiSo::UpdateInitFrameworkParams(const std::string& key, c
     return Instance()->core_side()->UpdateInitFrameworkParams(key, value, desc);
 }
 
+void PlatformBridgeInMultiSo::SetLogType(const int logLevel, const bool isPerf) {
+  return Instance()->core_side()->SetLogType(logLevel, isPerf);
+}
+
 
 }  // namespace weex
