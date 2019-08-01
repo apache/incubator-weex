@@ -139,6 +139,8 @@ class PlatformBridge {
 
     virtual int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) = 0;
 
+    virtual void SetLogType(const int logType, const bool isPerf) = 0;
+
     inline PlatformBridge* bridge() { return bridge_; }
 
    protected:

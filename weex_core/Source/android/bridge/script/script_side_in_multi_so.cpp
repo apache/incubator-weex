@@ -184,6 +184,15 @@ int ScriptSideInMultiSo::UpdateInitFrameworkParams(const std::string &key, const
   return script_side_functions_->funcUpdateInitFrameworkParams(key, value, desc);
 }
 
+void ScriptSideInMultiSo::SetLogType(const int logLevel, const bool isPerf) {
+  if(script_side_functions_ == nullptr) {
+    LOGE("ScriptSideInMultiSo::UpdateInitFrameworkParams script_side_functions_ is null");
+    return;
+  }
+  return script_side_functions_->funcSetLogType(logLevel, isPerf);
+
+}
+
 }  // namespace script
 }  // namespace bridge
 }  // namespace WeexCore

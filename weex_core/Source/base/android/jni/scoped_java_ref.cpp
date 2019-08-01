@@ -18,6 +18,7 @@
  */
 // Copyright 2017 The Weex Authors. All rights reserved.
 
+#include <base/log_defines.h>
 #include "base/android/jni/scoped_java_ref.h"
 
 #include "base/android/jni/android_jni.h"
@@ -27,7 +28,8 @@ namespace android {
 
 JavaRef::JavaRef() : obj_(nullptr) {}
 
-JavaRef::JavaRef(JNIEnv *env, jobject obj) : obj_(obj) {}
+JavaRef::JavaRef(JNIEnv *env, jobject obj) : obj_(obj) {
+}
 
 void JavaRef::ResetNewLocalRef(JNIEnv *env, jobject obj) {
   if (!env) {
@@ -44,6 +46,7 @@ void JavaRef::ResetNewLocalRef(JNIEnv *env, jobject obj) {
   if (obj_)
     env->DeleteLocalRef(obj_);
   obj_ = obj;
+
 }
 
 void JavaRef::ReleaseLocalRef(JNIEnv *env) {

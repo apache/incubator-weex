@@ -41,6 +41,7 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
+import com.taobao.weex.utils.tools.TimeCalculator;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -51,7 +52,7 @@ import java.util.Map;
  * Communication interface for Java code and JavaScript code.
  */
 
-public class WXBridge implements IWXBridge {
+    public class WXBridge implements IWXBridge {
 
   private native int nativeInitFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
 
@@ -136,6 +137,7 @@ public class WXBridge implements IWXBridge {
   public native void nativeUpdateGlobalConfig(String config);
 
   private native void nativeSetViewPortWidth(String instanceId, float viewPortWidth);
+  private native void nativeSetLogType(float type, float isPerf);
 
   public static final boolean MULTIPROCESS = true;
 
@@ -144,6 +146,12 @@ public class WXBridge implements IWXBridge {
   public void updateInitFrameworkParams(String key, String value, String desc){
     WXStateRecord.getInstance().recordAction("","updateInitFrameworkParams:");
      nativeUpdateInitFrameworkParams(key, value, desc);
+  }
+
+  @Override
+  public void setLogType(float type, boolean isPerf) {
+    Log.e("WeexCore", "setLog" + WXEnvironment.sLogLevel.getValue() + "isPerf : " + isPerf);
+    nativeSetLogType(type, isPerf ? 1 : 0);
   }
 
   @Override
@@ -220,6 +228,7 @@ public class WXBridge implements IWXBridge {
 
   @Override
   public int createInstanceContext(String instanceId, String name, String function, WXJSObject[] args) {
+    Log.e(TimeCalculator.TIMELINE_TAG,"createInstance :" + System.currentTimeMillis());
     WXStateRecord.getInstance().recordAction(instanceId,"createInstanceContext:");
     return nativeCreateInstanceContext(instanceId, name, function, args);
   }
