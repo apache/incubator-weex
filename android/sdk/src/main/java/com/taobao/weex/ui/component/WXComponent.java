@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -52,7 +53,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOverlay;
 import android.widget.FrameLayout;
-
 import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.ComponentObserver;
 import com.taobao.weex.IWXActivityStateListener;
@@ -91,7 +91,6 @@ import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
 import com.taobao.weex.ui.component.binding.Statements;
 import com.taobao.weex.ui.component.list.WXCell;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
 import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
@@ -113,7 +112,6 @@ import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -247,6 +245,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
 
+  @SuppressLint("RtlHardcoded")
   public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
       lp.setMargins(left, top, right, bottom);
       if (lp instanceof FrameLayout.LayoutParams) {

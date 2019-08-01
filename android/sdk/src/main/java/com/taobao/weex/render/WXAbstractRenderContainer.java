@@ -18,15 +18,15 @@
  */
 package com.taobao.weex.render;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
-
 import com.taobao.weex.WXSDKInstance;
-
 import java.lang.ref.WeakReference;
 
 public class WXAbstractRenderContainer extends FrameLayout {
@@ -46,6 +46,7 @@ public class WXAbstractRenderContainer extends FrameLayout {
         super(context, attrs, defStyleAttr);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public WXAbstractRenderContainer(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }

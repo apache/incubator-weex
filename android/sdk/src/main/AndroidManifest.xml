@@ -18,9 +18,8 @@ specific language governing permissions and limitations
 under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.taobao.weex"
-          android:versionCode="1"
-          android:versionName="1.0">
+          package="com.taobao.weex">
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <application>
         <receiver
