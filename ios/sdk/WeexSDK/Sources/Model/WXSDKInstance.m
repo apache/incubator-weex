@@ -141,6 +141,8 @@ typedef enum : NSUInteger {
         _performance = [[WXPerformance alloc] init];
         _apmInstance = [[WXApmForInstance alloc] init];
         
+        [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
+        
         _defaultDataRender = NO;
         
         _useBackupJsThread = NO;
@@ -389,19 +391,14 @@ typedef enum : NSUInteger {
     //some case , with out render (url)
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
-    
-    [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
     if (self.dataRender) {
         [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"eagle"];
     }
 
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
-    self.performance.renderUnixTimeOrigin = [WXUtility getUnixFixTimeMillis];
-    long renderOriginTimePlatform = [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
-    
-    // pass render origin time to page
     [WXCoreBridge setPageArgument:_instanceId key:@"renderTimeOrigin" value:[NSString stringWithFormat:@"%lld", (long long)([[NSDate date] timeIntervalSince1970] * 1000)]];
-    [WXCoreBridge setPageArgument:_instanceId key:@"renderTimeOriginPlatform" value:[NSString stringWithFormat:@"%lld", (long long)renderOriginTimePlatform]];
+    self.performance.renderUnixTimeOrigin = [WXUtility getUnixFixTimeMillis];
+    [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
 
     if (![WXUtility isBlankString:self.pageName]) {
         WXLog(@"Start rendering page:%@", self.pageName);
@@ -477,19 +474,14 @@ typedef enum : NSUInteger {
     [self _checkPageName];
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
-    
-    [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
     if (self.dataRender) {
         [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"eagle"];
     }
     
     self.performance.renderTimeOrigin = CACurrentMediaTime()*1000;
-    self.performance.renderUnixTimeOrigin = [WXUtility getUnixFixTimeMillis];
-    long renderOriginTimePlatform = [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
-    
-    // pass render origin time to page
     [WXCoreBridge setPageArgument:_instanceId key:@"renderTimeOrigin" value:[NSString stringWithFormat:@"%lld", (long long)([[NSDate date] timeIntervalSince1970] * 1000)]];
-    [WXCoreBridge setPageArgument:_instanceId key:@"renderTimeOriginPlatform" value:[NSString stringWithFormat:@"%lld", (long long)renderOriginTimePlatform]];
+    self.performance.renderUnixTimeOrigin = [WXUtility getUnixFixTimeMillis];
+    [self.apmInstance onStage:KEY_PAGE_STAGES_RENDER_ORGIGIN];
     
     if (![WXUtility isBlankString:self.pageName]) {
         WXLog(@"Start rendering page:%@", self.pageName);
@@ -1056,7 +1048,6 @@ typedef enum : NSUInteger {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
     }
     @catch (NSException *exception) {
-        // avoid empty-catch warning
     }
 }
 
