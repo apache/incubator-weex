@@ -201,7 +201,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void setLayout(WXComponent component) {
     if (component.getHostView() != null) {
-      int layoutDirection = component.isLayoutRTL() ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR;
+      int layoutDirection = component.isLayoutRTL() ? ViewCompat.LAYOUT_DIRECTION_RTL : ViewCompat.LAYOUT_DIRECTION_LTR;
       ViewCompat.setLayoutDirection(component.getHostView(), layoutDirection);
     }
     super.setLayout(component);

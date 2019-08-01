@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -39,6 +40,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 
+@SuppressLint("AppCompatCustomView")
 public class WXImageView extends ImageView implements WXGestureObservable,
         IRenderStatus<WXImage>,
         IRenderResult<WXImage>, WXImage.Measurable {

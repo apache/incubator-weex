@@ -23,6 +23,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.taobao.weex.WXEnvironment;
+import java.util.Locale;
 
 public class LogDetail {
     public static final String KeyWrod_Init = "Weex_Init";
@@ -60,7 +61,7 @@ public class LogDetail {
         time.constructor();
         info.taskName = name;
         if(!TextUtils.isEmpty(name)) {
-            String s = name.toLowerCase();
+            String s = name.toLowerCase(Locale.ROOT);
             if(s.contains("module")
             || s.contains("component")
                     || s.contains("framework")) {
