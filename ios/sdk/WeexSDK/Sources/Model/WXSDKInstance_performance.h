@@ -61,12 +61,15 @@
 //all componentCreate time in instance life
 @property (nonatomic,assign) double componentCreateTime;
 
+@property (nonatomic,assign) double viewCreateTime;
+
 @property (nonatomic,assign) double newFsRenderTime;
 @property (nonatomic,assign) long lastRealInteractionTime;
 //for performance record
 
 - (void)onViewLoad:(WXComponent *)targetComponent;
 - (void)recordComponentCreatePerformance:(double) diffTime forComponent:(WXComponent *)targetComponent;
+- (void)recordViewCreatePerformance:(double) diffTime;
 - (void)onInstanceRenderSuccess:(WXSDKInstance*) instance;
 
 @end

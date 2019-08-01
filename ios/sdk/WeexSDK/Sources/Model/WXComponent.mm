@@ -359,6 +359,7 @@ static BOOL bNeedRemoveEvents = YES;
         return _view;
     } else {
         WXAssertMainThread();
+        double startCreateViewTime = CACurrentMediaTime()*1000;
         
         // compositing child will be drew by its composited ancestor
         if (_isCompositingChild) {
@@ -446,6 +447,8 @@ static BOOL bNeedRemoveEvents = YES;
             [self _buildViewHierarchyLazily];
         }
 
+        double diffTime = CACurrentMediaTime()*1000 - startCreateViewTime;
+        [self.weexInstance.performance recordViewCreatePerformance:diffTime];
         [self _handleFirstScreenTime];
         
         [self.weexInstance.performance onViewLoad:self];

@@ -42,6 +42,10 @@
     self.componentCreateTime+=diffTime;
 }
 
+- (void)recordViewCreatePerformance:(double) diffTime {
+    self.viewCreateTime += diffTime;
+}
+
 /** on UI thread **/
 - (void)onViewLoad:(WXComponent *)targetComponent
 {
@@ -124,6 +128,10 @@
     self.interactionAddCount = self.interactionAddCountRecord;
     [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT curMaxValue:self.interactionLimitAddOpCount];
     [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_I_ALL_VIEW_COUNT curMaxValue:self.interactionAddCount];
+    [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_EXECUTE_JS_TIME curMaxValue:self.fsCallJsTime];
+    [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_CREATE_COMPONENT_TIME curMaxValue:self.componentCreateTime];
+    [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_CREATE_VIEW_TIME curMaxValue:self.viewCreateTime];
+
     self.interactionTime = self.interactionTime < diff ? diff :self.interactionTime;
 }
 
