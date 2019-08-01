@@ -270,14 +270,16 @@ CGFloat WXFloorPixelValue(CGFloat value)
         for (id obj in source) {
             [tmpArray addObject:[self convertContainerToImmutable:obj]];
         }
-        return [NSArray arrayWithArray:tmpArray];
+        id immutableArray = [NSArray arrayWithArray:tmpArray];
+        return immutableArray ? immutableArray : tmpArray;
     }
     else if ([source isKindOfClass:[NSDictionary class]]) {
         NSMutableDictionary* tmpDictionary = [[NSMutableDictionary alloc] init];
         for (id key in [source keyEnumerator]) {
             tmpDictionary[key] = [self convertContainerToImmutable:[source objectForKey:key]];
         }
-        return [NSDictionary dictionaryWithDictionary:tmpDictionary];
+        id immutableDict = [NSDictionary dictionaryWithDictionary:tmpDictionary];
+        return immutableDict ? immutableDict : tmpDictionary;
     }
     
     return source;
