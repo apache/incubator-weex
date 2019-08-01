@@ -308,6 +308,9 @@ typedef enum : NSUInteger {
         return;
     }
     [WXCoreBridge install];
+    if (_useBackupJsThread) {
+        [[WXSDKManager bridgeMgr] executeJSTaskQueue];
+    }
 
     self.scriptURL = url;
     [self _checkPageName];
@@ -327,6 +330,9 @@ typedef enum : NSUInteger {
     _options = [options isKindOfClass:[NSDictionary class]] ? options : nil;
     _jsData = data;
     [WXCoreBridge install];
+    if (_useBackupJsThread) {
+        [[WXSDKManager bridgeMgr] executeJSTaskQueue];
+    }
 
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
 
