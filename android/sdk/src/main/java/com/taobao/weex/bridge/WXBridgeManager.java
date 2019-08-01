@@ -957,7 +957,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public void callReportCrash(String crashFile, final String instanceId, final String url) {
     // statistic weex core process crash
     Date date = new Date();
-    DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+    DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
     String time = format.format(date);
     final String origin_filename = crashFile + "." + time;
     File oldfile = new File(crashFile);

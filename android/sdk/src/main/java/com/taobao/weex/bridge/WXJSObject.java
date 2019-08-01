@@ -54,12 +54,12 @@ public class WXJSObject {
         data = object;
         if (object instanceof Integer) {
             type = NUMBER;
-            data = new Double(((Integer) object).intValue());
+            data = (double) (Integer) object;
         } else if (object instanceof Double) {
             type = NUMBER;
         } else if (object instanceof Float) {
             type = NUMBER;
-            data = new Double(((Float) object).intValue());
+            data = (double) ((Float) object).intValue();
         } else if (object instanceof String) {
             type = String;
         } else if (object instanceof Object) {

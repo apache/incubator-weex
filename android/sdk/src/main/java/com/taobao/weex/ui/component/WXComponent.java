@@ -122,6 +122,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -979,7 +980,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       mInstance.getWXPerformance().cellExceedNum++;
       if (WXAnalyzerDataTransfer.isOpenPerformance){
         WXAnalyzerDataTransfer.transferPerformance(getInstanceId(),"details",WXInstanceApm.KEY_PAGE_STATS_CELL_EXCEED_NUM,
-            String.format("cell:[w:%d,h:%d],attrs:%s,styles:%s",realWidth,realHeight,getAttrs(),getStyles())
+            String.format(Locale.ROOT, "cell:[w:%d,h:%d],attrs:%s,styles:%s",realWidth,realHeight,getAttrs(),getStyles())
         );
       }
 

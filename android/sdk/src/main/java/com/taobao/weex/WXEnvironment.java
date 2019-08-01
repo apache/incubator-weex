@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,10 +59,10 @@ public class WXEnvironment {
   public static final String OS = "android";
   public static String SYS_VERSION = android.os.Build.VERSION.RELEASE;
   static{
-    if(SYS_VERSION != null && SYS_VERSION.toUpperCase().equals("P")){
+    if(SYS_VERSION != null && SYS_VERSION.toUpperCase(Locale.ROOT).equals("P")){
         SYS_VERSION = "9.0.0";
     }
-    if(SYS_VERSION != null && SYS_VERSION.toUpperCase().equals("Q")){
+    if(SYS_VERSION != null && SYS_VERSION.toUpperCase(Locale.ROOT).equals("Q")){
        SYS_VERSION = "10.0.0";
     }
   }
