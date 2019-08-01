@@ -135,7 +135,7 @@ public class WXUtils {
     return df;
   }
 
-  private static float transferWx(String stringWithWXPostfix, int viewport) {
+  public static float transferWx(String stringWithWXPostfix, int viewport) {
     if(null == stringWithWXPostfix) {
       return 0;
     }

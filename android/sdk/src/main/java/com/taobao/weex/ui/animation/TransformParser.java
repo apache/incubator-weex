@@ -74,6 +74,7 @@ public class TransformParser {
     private static final String FULL = "100%";
     private static final String ZERO = "0%";
     private static final String PX = "px";
+    private static final String WX = "wx";
     private static final String DEG = "deg";
     public static Map<String, List<Property<View,Float>>> wxToAndroidMap = new ArrayMap<>();
 
@@ -242,7 +243,7 @@ public class TransformParser {
         return new LinkedHashMap<>();
     }
 
-    private static Pair<Float, Float> parsePivot(@Nullable String transformOrigin,
+    protected static Pair<Float, Float> parsePivot(@Nullable String transformOrigin,
                                                  int width, int height, int viewportW) {
         if (!TextUtils.isEmpty(transformOrigin)) {
             int firstSpace = transformOrigin.indexOf(FunctionParser.SPACE);
@@ -300,6 +301,8 @@ public class TransformParser {
             return parsePercent(raw.substring(0, suffix), unit, precision);
         } else if ((suffix = raw.lastIndexOf(PX)) != -1) {
             return WXViewUtils.getRealPxByWidth(WXUtils.fastGetFloat(raw.substring(0, suffix), precision),viewportW);
+        }else if(raw.lastIndexOf(WX) != -1){
+            return WXViewUtils.getRealPxByWidth(WXUtils.transferWx(raw, viewportW),viewportW);
         }
         return WXViewUtils.getRealPxByWidth(WXUtils.fastGetFloat(raw, precision),viewportW);
     }
