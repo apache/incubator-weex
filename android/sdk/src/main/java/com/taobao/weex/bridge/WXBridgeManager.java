@@ -874,6 +874,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
         url = instance.getBundleUrl();
+        instance.setHasException(true);
       }
       if(!isCrashFileEmpty) {
         try {
