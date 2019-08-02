@@ -443,6 +443,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     return measureOutput;
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   protected ViewGroup initComponentHostView(@NonNull Context context) {
     String scroll;
@@ -492,7 +493,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
           scrollView.post(new Runnable() {
             @Override
             public void run() {
-              if (mIslastDirectionRTL != null && isLayoutRTL() != mIslastDirectionRTL.booleanValue()) {
+              if (mIslastDirectionRTL != null && isLayoutRTL() != mIslastDirectionRTL) {
                 // when layout direction changed we need convert x to RTL x for scroll to the same item
                 int currentX = getScrollX();
                 int totalWidth = getInnerView().getChildAt(0).getWidth();
@@ -507,7 +508,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
                   scrollView.scrollBy(changedWidth, component.getScrollY());
                 }
               }
-              mIslastDirectionRTL = new Boolean(isLayoutRTL());
+              mIslastDirectionRTL = isLayoutRTL();
             }
           });
         }

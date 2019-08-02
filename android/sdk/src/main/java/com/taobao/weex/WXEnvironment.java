@@ -18,6 +18,9 @@
  */
 package com.taobao.weex;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -28,8 +31,6 @@ import android.graphics.Typeface;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.LogLevel;
@@ -39,7 +40,6 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import dalvik.system.PathClassLoader;
 import java.io.BufferedReader;
 import java.io.File;
@@ -51,8 +51,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class WXEnvironment {
 
@@ -279,6 +277,7 @@ public class WXEnvironment {
   }
 
 
+  @SuppressLint("SdCardPath")
   public static String copySoDesDir() {
     try {
       if (TextUtils.isEmpty(COPY_SO_DES_DIR)) {
@@ -397,9 +396,18 @@ public class WXEnvironment {
     return isPerf;
   }
 
+  @SuppressLint("HardwareIds")
   private static String getDevId() {
-    return sApplication == null ? "" : ((TelephonyManager) sApplication
+    String ret = "";
+    if(sApplication != null){
+      try{
+        ret = ((TelephonyManager) sApplication
             .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+      }catch (SecurityException | NullPointerException e){
+        WXLogUtils.e(WXLogUtils.getStackTrace(e));
+      }
+    }
+    return ret;
   }
 
   public static Application getApplication() {
