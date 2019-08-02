@@ -31,7 +31,7 @@ const type_android = 2;
 const getFileType = file => {
     if (file.match(/.+\.(m|h|mm|cpp|cc)/)) {
         return type_c;
-    } else if (file.match(/.+\.java/)) {
+    } else if (file.match(/android/)) {
         return type_android;
     } else {
         return type_unknown;

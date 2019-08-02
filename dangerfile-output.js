@@ -44,8 +44,8 @@ if (title === 'OCLint Result') {
   const command = 'cat ios/sdk/oclint.log | grep -i "P[1|2]"'
   const child = shell.exec(command)
   if (child.stdout !== '') {
-    warn(child.stdout)
-    warn(title)
+    fail(child.stdout)
+    fail(title)
   }
   if (child.stderr !== '') {
     fail(child.stderr)
@@ -65,7 +65,7 @@ else if (title === 'AndroidLint Result') {
   if (occurance > 3) {
     content = content.substr(nth_occurrence(content, '<section ', 2))
     content = content.substr(0, nth_occurrence(content, '</section>', occurance - 3))
-    warn(content)
-    warn(title)
+    fail(content)
+    fail(title)
   }
 }
