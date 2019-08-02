@@ -1680,6 +1680,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
                   new int[]{rippleColor});
           return new RippleDrawable(colorStateList, new ColorDrawable(colorInt), null) {
             @Override
+            @SuppressLint("CanvasSize")
             public void draw(@NonNull Canvas canvas) {
               if (mBackgroundDrawable != null) {
                 Path border = mBackgroundDrawable.getContentPath(new RectF(0, 0, canvas.getWidth(), canvas.getHeight()));

@@ -939,6 +939,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         if (anchorComponent != null && anchorComponent.getHostView() != null && !isExcluded) {
           View anchor = anchorComponent.getHostView();
           anchor.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
               if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {

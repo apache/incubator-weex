@@ -217,6 +217,7 @@ public class WXSoInstallMgrSdk {
   /**
    * copyStartUpSo
    */
+  @SuppressLint("SdCardPath")
   public static void copyStartUpSo() {
     try {
       // copy libjsb.so to cache/weex/jsb/cputype
@@ -402,6 +403,7 @@ public class WXSoInstallMgrSdk {
    * @param version the version of the so library
    * @return the path of the so library
    */
+  @SuppressLint("SdCardPath")
   static String _targetSoFile(String libName, int version) {
     Context context = mContext;
     if (null == context) {
