@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+  <!-- Ignore the UselessLeaf issue in the specified file -->
+  <issue id="IconLocation">
+    <ignore path="src/main/res/drawable/weex_error.png" />
+  </issue>
+</lint>
