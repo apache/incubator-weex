@@ -972,7 +972,7 @@
         // catch system exception under 11.2 https://forums.developer.apple.com/thread/49676
         @try {
             [_tableView insertSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:animation];
-        } @catch(NSException *) {
+        } @catch(NSException *) {//!OCLint
             
         }
     } withKeepScrollPosition:keepScrollPosition adjustmentBlock:^CGFloat(NSIndexPath *top) {
@@ -990,7 +990,7 @@
         // catch system exception under 11.2 https://forums.developer.apple.com/thread/49676
         @try {
             [_tableView deleteSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:animation];
-        } @catch(NSException *) {
+        } @catch(NSException *) {//!OCLint
             
         }
 
@@ -1012,7 +1012,7 @@
             // catch system exception under 11.2 https://forums.developer.apple.com/thread/49676
             @try {
                 [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:animation];
-            } @catch(NSException *e) {
+            } @catch(NSException *e) {//!OCLint
                 
             }
         }
@@ -1034,7 +1034,7 @@
         // catch system exception under 11.2 https://forums.developer.apple.com/thread/49676
         @try {
             [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:animation];
-        } @catch (NSException* e) {
+        } @catch (NSException* e) {//!OCLint
             
         }
     } withKeepScrollPosition:keepScrollPosition adjustmentBlock:^CGFloat(NSIndexPath *top) {

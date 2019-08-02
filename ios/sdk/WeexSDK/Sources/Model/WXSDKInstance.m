@@ -1055,7 +1055,7 @@ typedef enum : NSUInteger {
         [self removeObserver:self forKeyPath:@"state" context:NULL];
         [[NSNotificationCenter defaultCenter] removeObserver:self];
     }
-    @catch (NSException *exception) {
+    @catch (NSException *exception) {//!OCLint
     }
 }
 

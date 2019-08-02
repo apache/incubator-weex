@@ -703,7 +703,7 @@ _Pragma("clang diagnostic pop") \
     @try {
         jsBundleString = [jsBundleString substringWithRange:NSMakeRange(validCharacter, MIN(100, length - validCharacter))];
     }
-    @catch (NSException* e) {
+    @catch (NSException* e) {//!OCLint
     }
     if ([jsBundleString length] == 0) {
         return bundleType;

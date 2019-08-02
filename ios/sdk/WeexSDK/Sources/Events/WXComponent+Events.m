@@ -899,7 +899,7 @@ if ([removeEventName isEqualToString:@#eventName1]||[removeEventName isEqualToSt
 
 - (instancetype)initWithTarget:(id)target action:(SEL)action
 {
-    return [self initWithComponent:nil];;
+    return [self initWithComponent:nil];
 }
 
 - (instancetype)initWithComponent:(WXComponent *)component
