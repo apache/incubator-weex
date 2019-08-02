@@ -245,8 +245,13 @@ public class WXUtils {
   public static int getInt(Object value) {
     return getInteger(value, 0);
   }
-
-  public static @Nullable Integer getInteger(@Nullable Object value, @Nullable Integer df) {
+  public static int getInt(@Nullable Object value, int viewPort) {
+    return getInteger(value,0,viewPort);
+  }
+  public static int getInteger(@Nullable Object value, @Nullable Integer df){
+    return getInteger(value,df,750);
+  }
+  public static @Nullable Integer getInteger(@Nullable Object value, @Nullable Integer df,int viewPort) {
 
     if (value == null) {
       return df;
@@ -271,7 +276,7 @@ public class WXUtils {
                   + " use wx unit, which will be not supported soon after.");
         }
         try {
-          ret = (int)transferWx(temp, 750);
+          ret = (int)transferWx(temp, viewPort);
         } catch (NumberFormatException e) {
           WXLogUtils.e("Argument format error! value is " + value, e);
         } catch (Exception e) {
@@ -311,7 +316,7 @@ public class WXUtils {
           WXLogUtils.e("Argument error! value is " + value, e);
         }
       }
-      if (ret != null && !ret.equals(df)) {
+      if (ret != null && !ret.equals(df) && !TextUtils.equals("wx", suffix)) {
         sCache.put(key, ret);
       }
       return ret;
