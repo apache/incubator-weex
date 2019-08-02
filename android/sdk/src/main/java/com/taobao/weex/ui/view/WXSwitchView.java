@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v7.widget.SwitchCompat;
 import android.view.Gravity;
@@ -46,6 +47,7 @@ public class WXSwitchView extends SwitchCompat implements WXGestureObservable {
     return wxGesture;
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     boolean result = super.onTouchEvent(event);

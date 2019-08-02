@@ -67,6 +67,7 @@ public class WXEditText extends EditText implements WXGestureObservable {
     mLines = lines;
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     boolean result = super.onTouchEvent(event);
