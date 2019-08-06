@@ -99,6 +99,7 @@ static BOOL bNeedRemoveEvents = YES;
         _isViewFrameSyncWithCalculated = YES;
         _ariaHidden = nil;
         _accessible = nil;
+        _userInteractionEnabled = nil;
         _accessibilityHintContent = nil;
         _cancelsTouchesInView = YES;
         
@@ -117,6 +118,10 @@ static BOOL bNeedRemoveEvents = YES;
             if (!_styles[@"top"] && !_styles[@"bottom"]) {
                 _styles[@"top"] = @0.0f;
             }
+        }
+        
+        if (attributes[@"userInteractionEnabled"]) {
+            _userInteractionEnabled = [WXConvert NSString:attributes[@"userInteractionEnabled"]];
         }
         
         if (attributes[@"ariaHidden"]) {
@@ -419,9 +424,12 @@ static BOOL bNeedRemoveEvents = YES;
         if (_accessible) {
             [_view setIsAccessibilityElement:[WXConvert BOOL:_accessible]];
         }
-        
+        if (_userInteractionEnabled) {
+            [_view setUserInteractionEnabled:[WXConvert BOOL:_userInteractionEnabled]];
+        }
         if (_ariaHidden) {
             [_view setAccessibilityElementsHidden:[WXConvert BOOL:_ariaHidden]];
+            
         }
         if (_groupAccessibilityChildren) {
             [_view setShouldGroupAccessibilityChildren:[WXConvert BOOL:_groupAccessibilityChildren]];
@@ -878,7 +886,10 @@ static BOOL bNeedRemoveEvents = YES;
         _groupAccessibilityChildren = [WXConvert NSString:attributes[@"groupAccessibilityChildren"]];
         [self.view setShouldGroupAccessibilityChildren:[WXConvert BOOL:_groupAccessibilityChildren]];
     }
-
+    if (attributes[@"userInteractionEnabled"]) {
+        _userInteractionEnabled = [WXConvert NSString:attributes[@"userInteractionEnabled"]];
+        [self.view setUserInteractionEnabled:[WXConvert BOOL:_userInteractionEnabled]];
+    }
     
     if (attributes[@"testId"]) {
         [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];
