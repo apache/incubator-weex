@@ -50,7 +50,7 @@ const includeChecklist = (index!=-1)
 if(includeChecklist && !matchRegex(pr_body.substring(index),/documentation.*http/)){
   const msg = "If you update the code, "+
     "maybe you should update the documentation and add the documentation link in the PR description. \n" +
-    "here is the guide about how to contribute documentation:https://github.com/apache/incubator-weex/blob/master/CONTRIBUTING.md#contribute-code-or-document \n";
+    "here is the guide about how to contribute documentation: <a href='https://github.com/apache/incubator-weex/blob/master/CONTRIBUTING.md#contribute-code-or-document'>https://github.com/apache/incubator-weex/blob/master/CONTRIBUTING.md#contribute-code-or-document</a>";
   warn(msg);
 }
 
@@ -58,8 +58,8 @@ if(includeChecklist && !matchRegex(pr_body.substring(index),/documentation.*http
 console.log("checkDemo");
 if(!matchRegex(pr_body,/demo.*http/)){
   const msg =  "If your PR is about fixing a bug excluding crash the code,"+
-    "you should add the demo link in the PR description. \n "+
-    "here is a demo link:http://dotwe.org/vue?spm=a2c7j.-guide-contribute-contribute-code.0.0.3e93748cmxz3yt";
+    "you should add the demo link in the PR description. "+
+    "Demo link: <a href='http://dotwe.org/vue'>http://dotwe.org/vue</a>";
   warn(msg);
 }
 
@@ -70,7 +70,7 @@ if(!danger.github.pr.milestone){
 }
 
 // Make sure there are changelog entries
-const hasChangelog = danger.git.modified_files.includes("changelog.md")
+const hasChangelog = danger.git.modified_files.includes("CHANGELOG.md")
 if (!hasChangelog) { 
   warn(`No Changelog changes! - <i>Can you add a Changelog? To do so,append your changes to the changelog.md</i>`);
 }
