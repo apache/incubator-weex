@@ -18,6 +18,7 @@
  */
 package com.taobao.weex;
 
+import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_BY_HEART_CHECK;
 import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
@@ -920,6 +921,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
               }
               if(!createInstanceHeartBeat) {
                   WXBridgeManager.getInstance().callReportCrashReloadPage(mInstanceId, null);
+                  WXExceptionUtils.commitCriticalExceptionRT(mInstanceId,WX_ERR_RELOAD_BY_HEART_CHECK,"shouldReboot","",null);
                   WXLogUtils.e("callReportCrashReloadPage with jsc reboot");
               }
             }
