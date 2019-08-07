@@ -59,8 +59,8 @@ console.log("checkDemo");
 if(!matchRegex(pr_body,/demo.*http/)){
   const msg =  "If your PR is about fixing a bug excluding crash the code,"+
     "you should add the demo link in the PR description. "+
-    "[Demo link](http://dotwe.org/vue)";
-  markdown(msg);
+    "Demo link: http://dotwe.org/vue)";
+  warn(msg);
 }
 
 // check if pr bind the github milestone
@@ -70,7 +70,7 @@ if(!danger.github.pr.milestone){
 }
 
 // Make sure there are changelog entries
-const hasChangelog = danger.git.modified_files.includes("changelog.md")
+const hasChangelog = danger.git.modified_files.includes("CHANGELOG.md")
 if (!hasChangelog) { 
   warn(`No Changelog changes! - <i>Can you add a Changelog? To do so,append your changes to the changelog.md</i>`);
 }
