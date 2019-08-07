@@ -151,7 +151,7 @@ void WXPerformBlockOnBridgeThreadForInstance(void (^block)(void), NSString* inst
     if ([NSThread currentThread] == [self jsThread]) {
         block();
     } else {
-        [self performSelector:@selector(_performBlockOnBridgeThread:instance:)
+        [self performSelector:@selector(_performBlockOnBridgeThread:)
                          onThread:[self jsThread]
                        withObject:[block copy]
                     waitUntilDone:NO];
@@ -205,12 +205,18 @@ void WXPerformBlockOnBackupBridgeThread(void (^block)(void))
         return;
     }
     if (putInTaskQueue) {
-        [[WXSDKManager bridgeMgr].jsTaskQueue addObject:block];
+        [WXBridgeManager _performBlockOnBackupBridgeThread:^{
+            [[WXSDKManager bridgeMgr].jsTaskQueue addObject:block];
+        } putInTaskQueue:NO];
     } else {
-        [self performSelector:@selector(_performBlockOnBridgeThread:instance:)
-                     onThread:[self backupJsThread]
-                   withObject:[block copy]
-                waitUntilDone:NO];
+        if ([NSThread currentThread] == [self backupJsThread]) {
+            block();
+        } else {
+            [self performSelector:@selector(_performBlockOnBridgeThread:instance:)
+                         onThread:[self backupJsThread]
+                       withObject:[block copy]
+                    waitUntilDone:NO];
+        }
     }
 }
 
@@ -350,13 +356,17 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
 }
 
 - (void)executeJSTaskQueue {
-    if (_jsTaskQueue.count == 0 || !_supportMultiJSThread) {
-        return;
-    }
-    for (id block in _jsTaskQueue) {
-        [WXBridgeManager _performBlockOnBackupBridgeThread:block putInTaskQueue:NO];
-    }
-    [_jsTaskQueue removeAllObjects];
+    __weak typeof(self) weakSelf = self;
+    [WXBridgeManager _performBlockOnBackupBridgeThread:^{
+        if (weakSelf.jsTaskQueue.count == 0 || !weakSelf.supportMultiJSThread) {
+            return;
+        }
+        for (id task in weakSelf.jsTaskQueue) {
+            void (^block)(void) = task;
+            block();
+        }
+        [weakSelf.jsTaskQueue removeAllObjects];
+    } putInTaskQueue:NO];
 }
 
 - (WXThreadSafeMutableArray *)instanceIdStack

@@ -101,10 +101,9 @@ class LogBase {
 class LogImplement {
  public:
   static LogImplement *getLog() {
-    static weex::base::LogImplement *mySelf;
     static std::once_flag once_flag;
-    std::call_once(once_flag, []() { mySelf = new LogImplement(); });
-    return mySelf;
+    std::call_once(once_flag, []() { g_instance = new LogImplement(); });
+    return g_instance;
   }
 
   void setLogImplement(weex::base::LogBase *logVirtual) {
@@ -167,6 +166,7 @@ class LogImplement {
 
  private:
   weex::base::LogBase *m_log;
+  static LogImplement *g_instance;
   LogImplement() : m_log(nullptr) {}
 };
 }
