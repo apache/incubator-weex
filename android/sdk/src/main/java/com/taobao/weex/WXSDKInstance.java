@@ -546,6 +546,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void createInstanceFuncHeartBeat() {
     WXLogUtils.d("createInstanceFuncHeartBeat: " + mInstanceId);
     this.createInstanceHeartBeat = true;
+    getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_END_EXCUTE_BUNDLE);
   }
 
   public void addOnInstanceVisibleListener(OnInstanceVisibleListener l){
