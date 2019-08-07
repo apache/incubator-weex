@@ -4,9 +4,6 @@ node_js: 12.6.0
 matrix:
     fast_finish: true
     include:
-      # format code using clang-format
-      - env: TEST_SUITE=code_format
-        language: ruby
       - env: TEST_SUITE=danger 
       - env: TEST_SUITE=jsfm
       - env: TEST_SUITE=ios
@@ -114,8 +111,6 @@ install:
         cd ../../ && npm install
         cd weex-playground/ios && pod install --repo-update
         cd ../../
-    elif [[ ("$TEST_SUITE" = "code_format") ]]; then
-        bundle install
     fi
     
 
@@ -141,7 +136,7 @@ script:
           cd android
           ./gradlew clean install -PbuildRuntimeApi=true ${GRADLE_ABI} --info
           ./gradlew install -PbuildRuntimeApi=false ${GRADLE_ABI} --info
-        fi
+/        fi
         ;;
       "jsfm" )
         npm run danger -- ci -i jsfm --dangerfile ./dangerfile-jsfm.js
@@ -194,11 +189,6 @@ script:
         export TITLE="AndroidLint Result"
         cd ../ && npm run danger -- ci -i androidlint --dangerfile ./dangerfile-output.js
       fi
-    fi
-
-    if [[ ("$TEST_SUITE" = "code_format") ]]; then
-        echo "exec code format"
-        bundle exec danger --danger_id=codeFormat
     fi
 
 notifications:
