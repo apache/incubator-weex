@@ -28,6 +28,8 @@
 
 #include "core/manager/weex_core_manager.h"
 
+weex::base::LogImplement* weex::base::LogImplement::g_instance = nullptr;
+
 namespace WeexCore {
 struct LogFlattenHelper {
   LogFlattenHelper() : mLargeBuf() {}
