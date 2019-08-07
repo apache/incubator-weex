@@ -58,9 +58,9 @@ if(includeChecklist && !matchRegex(pr_body.substring(index),/documentation.*http
 console.log("checkDemo");
 if(!matchRegex(pr_body,/demo.*http/)){
   const msg =  "If your PR is about fixing a bug excluding crash the code,"+
-    "you should add the demo link in the PR description. \n "+
-    "here is a demo link:http://dotwe.org/vue?spm=a2c7j.-guide-contribute-contribute-code.0.0.3e93748cmxz3yt";
-  warn(msg);
+    "you should add the demo link in the PR description. "+
+    "[Demo link](http://dotwe.org/vue)";
+  markdown(msg);
 }
 
 // check if pr bind the github milestone
