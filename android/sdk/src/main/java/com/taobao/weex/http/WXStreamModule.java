@@ -36,6 +36,7 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
+import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.utils.WXLogUtils;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -130,7 +131,7 @@ public class WXStreamModule extends WXModule {
     fetch(optionsObj, callback, progressCallback, mWXSDKInstance.getInstanceId(), mWXSDKInstance.getBundleUrl());
   }
 
-  public void fetch(JSONObject optionsObj , final JSCallback callback, JSCallback progressCallback, String instanceId, String bundleURL){
+  public void fetch(JSONObject optionsObj , final JSCallback callback, JSCallback progressCallback, final String instanceId, String bundleURL){
     boolean invaildOption = optionsObj==null || optionsObj.getString("url")==null;
     if(invaildOption){
       if(callback != null) {
@@ -202,6 +203,7 @@ public class WXStreamModule extends WXModule {
             resp.put(STATUS_TEXT, Status.getStatusText(response.statusCode));
           }
           resp.put("headers", headers);
+          WXStateRecord.getInstance().recordAction(instanceId,"stream response code:"+(null!= response?response.statusCode:"null"));
           callback.invoke(resp);
         }
       }
