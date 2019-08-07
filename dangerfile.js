@@ -50,7 +50,7 @@ const includeChecklist = (index!=-1)
 if(includeChecklist && !matchRegex(pr_body.substring(index),/documentation.*http/)){
   const msg = "If you update the code, "+
     "maybe you should update the documentation and add the documentation link in the PR description. \n" +
-    "here is the guide about how to contribute documentation:https://github.com/apache/incubator-weex/blob/master/CONTRIBUTING.md#contribute-code-or-document \n";
+    "here is the guide about how to contribute documentation: <a href='https://github.com/apache/incubator-weex/blob/master/CONTRIBUTING.md#contribute-code-or-document'>https://github.com/apache/incubator-weex/blob/master/CONTRIBUTING.md#contribute-code-or-document</a>";
   warn(msg);
 }
 
@@ -59,7 +59,7 @@ console.log("checkDemo");
 if(!matchRegex(pr_body,/demo.*http/)){
   const msg =  "If your PR is about fixing a bug excluding crash the code,"+
     "you should add the demo link in the PR description. "+
-    "Demo link: http://dotwe.org/vue)";
+    "Demo link: <a href='http://dotwe.org/vue'>http://dotwe.org/vue</a>";
   warn(msg);
 }
 
