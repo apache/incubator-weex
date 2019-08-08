@@ -137,6 +137,8 @@ static void RegisterCoreEnv(JNIEnv* env, jobject jcaller,
 static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller,
     jstring config);
 
+static void AddRenderType(JNIEnv* env, jobject jcaller, jobjectArray array, jint length);
+
 // Step 2: method stubs.
 
 // Step 3: RegisterNatives.
@@ -306,6 +308,12 @@ static const JNINativeMethod kMethodsWXBridge[] = {
 "Ljava/lang/String;"
 ")"
 "V", reinterpret_cast<void*>(UpdateGlobalConfig) },
+    { "nativeAddRenderType",
+"("
+"[Ljava/lang/String;"
+"I"
+")"
+"V", reinterpret_cast<void*>(AddRenderType) },
 };
 
 static bool RegisterNativesImpl(JNIEnv* env) {

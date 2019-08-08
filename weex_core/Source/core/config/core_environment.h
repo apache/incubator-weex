@@ -54,6 +54,8 @@ namespace WeexCore {
 
     std::map<std::string, std::string> mOptions;
 
+    std::map<std::string, int> mRenderTypes;
+
   public:
 
     bool SetPlatform(std::string platformName);
@@ -73,6 +75,10 @@ namespace WeexCore {
     const std::string &GetOption(const std::string &key);
 
     void AddOption(std::string key, std::string value);
+
+    const int GetRenderType(const std::string &key);
+
+    void AddRenderType(std::map<std::string, int32_t> types);
 
     static WXCoreEnvironment *getInstance() {
       if (!m_pInstance) {

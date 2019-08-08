@@ -333,6 +333,19 @@ static void UpdateGlobalConfig(JNIEnv* env, jobject jcaller, jstring config) {
   WeexProxy::updateGlobalConfig(env, jcaller, config);
 }
 
+static void AddRenderType(JNIEnv* env, jobject jcaller, jobjectArray array, jint length) {
+    std::map<std::string,int32_t> types;
+    int32_t len = (int32_t)length;
+    for (int i = 0; i < length * 2; i+=2) {
+        jstring obj_param_i = (jstring)env->GetObjectArrayElement(array, i);
+        const char *c_param0 = env->GetStringUTFChars(obj_param_i, 0);
+
+        jstring obj_param_i2 = (jstring)env->GetObjectArrayElement(array, i + 1);
+        const char *c_param02 = env->GetStringUTFChars(obj_param_i2, 0);
+        types.insert(std::pair<std::string, int32_t>(c_param0, atoi(c_param02)));
+    }
+    WXCoreEnvironment::getInstance()->AddRenderType(types);
+}
 
 static jint CreateInstanceContext(JNIEnv* env, jobject jcaller, jstring instanceId, jstring name, jstring function, jobjectArray args) {
   return WeexProxy::createInstanceContext(env, jcaller, instanceId, name, function, args);

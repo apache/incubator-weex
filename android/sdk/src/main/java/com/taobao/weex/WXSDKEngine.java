@@ -542,4 +542,20 @@ public class WXSDKEngine implements Serializable {
   public static void registerCoreEnv(String key, String value) {
     WXBridgeManager.getInstance().registerCoreEnv(key, value);
   }
+
+  /**
+   * set custom component render factory type,default render is RenderCommonFactory
+   * such as:
+   *  RenderTextFactory
+   *  RenderListFactory
+   *  RenderMaskFactory
+   *  RenderScrollerFactory
+   *  RenderAppBarFactory
+   *  RenderCommonFactory
+   * @See WXRenderType
+   * @param type
+   */
+  public static void setComponentRenderTypes(Map<String,Integer> type) {
+    WXBridgeManager.getInstance().setComponentRenderTypes(type);
+  }
 }

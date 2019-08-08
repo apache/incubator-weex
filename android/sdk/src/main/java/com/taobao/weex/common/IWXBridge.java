@@ -25,6 +25,7 @@ import com.taobao.weex.layout.ContentBoxMeasurement;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Bridge interface, native bridge and debug bridge both need to implement this interface
@@ -187,4 +188,6 @@ public interface IWXBridge extends IWXObject {
   void registerCoreEnv(String key, String value);
 
   void reportNativeInitStatus(String statusCode, String errorMsg);
+
+  void setComponentRenderTypes(Map<String, Integer> map);
 }

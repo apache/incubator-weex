@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <core/config/core_environment.h>
 #include "core/render/node/factory/render_creator.h"
 #include "core/render/node/factory/render_appbar_factory.h"
 #include "core/render/node/factory/render_factory_interface.h"
@@ -34,21 +35,44 @@ RenderCreator *RenderCreator::g_pInstance = nullptr;
 IRenderObject *RenderCreator::CreateRender(const std::string &type,
                                            const std::string &ref) {
   IRenderFactory *factory;
-  if (type == kRenderText) {
-    factory = new RenderTextFactory();
-  } else if (type == kRenderList || type == kRenderWaterfall ||
-             type == kRenderRecycleList) {
-    factory = new RenderListFactory();
-  } else if (type == kRenderMask) {
-    factory = new RenderMaskFactory();
-  } else if (type == kRenderScroller) {
-    factory = new RenderScrollerFactory();
-  } else if (type == kRenderAppBar) {
-    factory = new RenderAppBarFactory();
-  } else {
-    factory = new RenderCommonFactory();
-  }
-
+    int renderType = WXCoreEnvironment::getInstance()->GetRenderType(type);
+    if (renderType <= 0) {
+        if (type == kRenderText) {
+            factory = new RenderTextFactory();
+        } else if (type == kRenderList || type == kRenderWaterfall ||
+                   type == kRenderRecycleList) {
+            factory = new RenderListFactory();
+        } else if (type == kRenderMask) {
+            factory = new RenderMaskFactory();
+        } else if (type == kRenderScroller) {
+            factory = new RenderScrollerFactory();
+        } else if (type == kRenderAppBar) {
+            factory = new RenderAppBarFactory();
+        } else {
+            factory = new RenderCommonFactory();
+        }
+    } else {
+        switch (renderType) {
+            case 1:
+                factory = new RenderTextFactory();
+                break;
+            case 2:
+                factory = new RenderListFactory();
+                break;
+            case 3:
+                factory = new RenderMaskFactory();
+                break;
+            case 4:
+                factory = new RenderScrollerFactory();
+                break;
+            case 5:
+                factory = new RenderAppBarFactory();
+                break;
+            case 6:
+                factory = new RenderCommonFactory();
+                break;
+        }
+    }
   IRenderObject *render = factory->CreateRender();
   render->set_ref(ref);
   render->set_type(type);

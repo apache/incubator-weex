@@ -93,6 +93,8 @@ public class WXBridge implements IWXBridge {
 
   private native void nativeRegisterCoreEnv(String key, String value);
 
+  private native void nativeAddRenderType(String[] types, int length);
+
   /**
    * update global config,
    * @param config params
@@ -602,5 +604,16 @@ public class WXBridge implements IWXBridge {
         break;
       }
     }
+  }
+
+  @Override
+  public void setComponentRenderTypes(Map<String, Integer> map) {
+    String[] types = new String[map.size() * 2];
+    int counter = 0;
+    for(Map.Entry<String, Integer> typeSet : map.entrySet()) {
+      types[counter * 2] = typeSet.getKey();
+      types[counter * 2 + 1] = typeSet.getValue() + "";
+    }
+    nativeAddRenderType(types, map.size());
   }
 }

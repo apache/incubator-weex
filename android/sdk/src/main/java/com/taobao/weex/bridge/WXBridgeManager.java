@@ -2672,4 +2672,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     mWeexCoreEnvOptions.clear();
   }
+
+  public void setComponentRenderTypes(Map<String,Integer> type) {
+    mWXBridge.setComponentRenderTypes(type);
+  }
 }

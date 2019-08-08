@@ -78,4 +78,17 @@ namespace WeexCore {
   void WXCoreEnvironment::AddOption(std::string key, std::string value) {
     mOptions.insert(std::pair<std::string, std::string>(key, value));
   }
+
+    const int WXCoreEnvironment::GetRenderType(const std::string &key) {
+        std::map<std::string, int32_t>::iterator iter = mRenderTypes.find(key.c_str());
+        if (iter != mRenderTypes.end()) {
+            return iter->second;
+        } else {
+            return 0;
+        }
+    }
+
+    void WXCoreEnvironment::AddRenderType(std::map<std::string, int32_t> types) {
+        mRenderTypes = types;
+    }
 }
