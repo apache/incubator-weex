@@ -97,7 +97,7 @@
     "chromedriver": "^2.21.2",
     "cross-spawn": "^4.0.0",
     "css-loader": "^0.26.1",
-    "danger": "^0.18.0",
+    "danger": "^9.0.0",
     "dateformat": "^2.0.0",
     "eslint": "^2.11.1",
     "eslint-plugin-flowtype": "^2.40.1",
