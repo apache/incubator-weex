@@ -391,7 +391,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 + (BOOL)isValidPoint:(CGPoint)point
 {
-    return !(isnan(point.x)) && !(isnan(point.y));
+    return !(isnan(point.x)) && !(isnan(point.y)); //!OCLint
 }
 
 + (NSError *)errorWithCode:(NSInteger)code message:(NSString *)message
