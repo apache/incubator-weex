@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import android.support.annotation.NonNull;
 import com.taobao.weex.bridge.WXBridgeManager;
@@ -66,14 +67,14 @@ public class WXStateRecord {
      */
     public void recordException(String instanceId, String exception) {
         String shortException = exception.length() > 200 ?exception.substring(0,200) : exception;
-        mExceptionHistory.add(new Info(WXUtils.getFixUnixTime(), instanceId, shortException));
+        recordCommon(mExceptionHistory,new Info(WXUtils.getFixUnixTime(), instanceId, shortException));
     }
 
     /**
      * check history action (may be occupy cpu by preInstance or some task)
      */
     public void recordAction(String instanceId, String action) {
-        mActionHistory.add(new Info(WXUtils.getFixUnixTime(), instanceId, action));
+        recordCommon(mActionHistory,new Info(WXUtils.getFixUnixTime(), instanceId, action));
     }
 
     /**
@@ -84,25 +85,39 @@ public class WXStateRecord {
     }
 
     public void recoreJsfmInitHistory(String msg){
-        mJsfmInitHistory.add(new Info(WXUtils.getFixUnixTime(), "JSFM", msg));
+        recordCommon(mJsfmInitHistory,new Info(WXUtils.getFixUnixTime(), "JSFM", msg));
     }
 
     public void recordJsThreadWatch(String msg){
-        mJsThradWatchHistory.add(new Info(WXUtils.getFixUnixTime(), "jsWatch", msg));
+        recordCommon(mJsThradWatchHistory,new Info(WXUtils.getFixUnixTime(), "jsWatch", msg));
     }
 
     /**
      * check onJSEngineReload time,and we know how many times reload and each reload time
      */
     public void onJSEngineReload() {
-        mJscReloadHistory.add(new Info(WXUtils.getFixUnixTime(), "", "onJSEngineReload"));
+        recordCommon(mJscReloadHistory,new Info(WXUtils.getFixUnixTime(), "", "onJSEngineReload"));
     }
 
     /**
      * check jsc crash time,and we know how many times jscCrash and each crash time
      */
     public void onJSCCrash() {
-        mJscCrashHistory.add(new Info(WXUtils.getFixUnixTime(), "", "onJSCCrash"));
+        recordCommon(mJscCrashHistory,new Info(WXUtils.getFixUnixTime(), "", "onJSCCrash"));
+    }
+
+    private void recordCommon(RecordList<Info> list ,Info info){
+        if (null == list || null == info){
+            return;
+        }
+        try {
+            list.add(info);
+            if (!list.isEmpty() && list.size()>list.maxSize){
+                list.poll();
+            }
+        }catch (Throwable e){
+            e.getStackTrace();
+        }
     }
 
     public Map<String, String> getStateInfo() {
@@ -112,7 +127,7 @@ public class WXStateRecord {
         int size = mExceptionHistory.size()+mActionHistory.size()+mJsfmInitHistory.size()
             +mJscCrashHistory.size()+mJscReloadHistory.size()+mJsThradWatchHistory.size();
 
-        List<Info> reportTimeLineInfo = new RecordList<>(size);
+        List<Info> reportTimeLineInfo = new ArrayList<>(size);
         reportTimeLineInfo.addAll(mExceptionHistory);
         reportTimeLineInfo.addAll(mActionHistory);
         reportTimeLineInfo.addAll(mJsfmInitHistory);
@@ -125,28 +140,21 @@ public class WXStateRecord {
         return stateInfo;
     }
 
-    private static class RecordList<E> extends ArrayList<E> {
+    private static class RecordList<E> extends ConcurrentLinkedQueue<E> {
         private int maxSize;
 
         public RecordList(int maxSize) {
-            super(maxSize);
+            super();
             this.maxSize = maxSize;
-        }
-
-        @Override
-        public boolean add(E e) {
-            if (this.size()>0 && this.size() >= maxSize){
-                remove(0);
-            }
-            return super.add(e);
         }
 
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();
-            int size = size();
-            for (int i = 0; i < size; i++) {
-                builder.append('[').append(get(i).toString()).append(']').append("->");
+            E e = this.poll();
+            while (null != e){
+                builder.append('[').append(e.toString()).append(']').append("->");
+                e = this.poll();
             }
             return builder.toString();
         }
