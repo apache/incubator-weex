@@ -460,7 +460,7 @@ WX_EXPORT_METHOD(@selector(removeItem:callback:))
 }
 
 - (void)setInfo:(NSDictionary *)info ForKey:(NSString *)key {
-    NSAssert(info, @"info must not be nil");
+    NSAssert(info, @"info must not be nil"); //!OCLint
     
     // save info for key
     NSMutableDictionary *newInfo = [NSMutableDictionary dictionaryWithDictionary:info];

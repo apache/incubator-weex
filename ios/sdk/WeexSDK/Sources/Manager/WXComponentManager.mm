@@ -1100,7 +1100,7 @@ static NSThread *WXComponentThread;
         }
     }
     
-    if (mismatchBeginIndex == _uiTaskQueue.count) {
+    if (mismatchBeginIndex == _uiTaskQueue.count) {//!OCLint
         // here we get end tag or there are not begin and end directives
     } else {
         _syncUITaskCount ++;

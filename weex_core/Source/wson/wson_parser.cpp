@@ -230,23 +230,19 @@ double wson_parser::nextNumber(uint8_t type) {
         case WSON_NUMBER_INT_TYPE:{
               int32_t num = wson_next_int(wsonBuffer);
               return num;
-            }
-            break;
+        }
         case WSON_NUMBER_FLOAT_TYPE:{
                 float num = wson_next_float(wsonBuffer);
                 return num;
-            }
-            break;
+        }
         case WSON_NUMBER_DOUBLE_TYPE:{
                 double num = wson_next_double(wsonBuffer);
                 return num;
-            }
-            break;
+        }
         case WSON_NUMBER_LONG_TYPE:{
                 int64_t num = wson_next_long(wsonBuffer);
                 return num;
-            }
-            break;
+        }
         case WSON_BOOLEAN_TYPE_TRUE:
             return 1;
         case WSON_BOOLEAN_TYPE_FALSE:

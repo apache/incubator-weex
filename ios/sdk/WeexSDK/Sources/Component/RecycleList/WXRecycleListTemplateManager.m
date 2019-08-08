@@ -83,7 +83,7 @@
 
 - (WXCellSlotComponent *)templateWithType:(NSString *)type
 {
-    return [_templateTypeMap objectForKey:type];;
+    return [_templateTypeMap objectForKey:type];
 }
 
 - (void)_registerCellClassForReuseID:(NSString *)templateID
