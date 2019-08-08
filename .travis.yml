@@ -139,7 +139,7 @@ script:
           cd android
           ./gradlew clean install -PbuildRuntimeApi=true ${GRADLE_ABI} --info
           ./gradlew install -PbuildRuntimeApi=false ${GRADLE_ABI} --info
-/        fi
+        fi
         ;;
       "jsfm" )
         npm run danger -- ci -i jsfm --dangerfile ./dangerfile-jsfm.js
