@@ -41,7 +41,7 @@ function nth_occurrence (string, char, nth) {
 }
 
 if (title === 'OCLint Result') {
-  const command = 'cat ios/sdk/oclint.log | grep -i "P[1|2]"'
+  const command = 'cat ios/sdk/oclint.log | grep -v "Summary: TotalFiles=" | grep -i "P[1|2]"'
   const child = shell.exec(command)
   if (child.stdout !== '') {
     fail(child.stdout)
