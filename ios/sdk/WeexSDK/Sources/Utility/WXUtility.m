@@ -518,7 +518,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
         RegisteredFontFileNames = [[NSMutableDictionary alloc] init];
     });
     
-    CGFloat fontSize = (isnan(size) || size == 0) ?  32 * scaleFactor : size;
+    CGFloat fontSize = (isnan(size) || size == 0) ?  32 * scaleFactor : size; //!OCLint
     UIFont *font = nil;
     
     WXThreadSafeMutableDictionary *fontFace = [[WXRuleManager sharedInstance] getRule:@"fontFace"];
