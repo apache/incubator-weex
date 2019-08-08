@@ -246,17 +246,17 @@ do {\
 
 - (void)fillCSSStyles:(NSDictionary *)styles
 {
-    WX_STYLE_FILL_TEXT(fontFamily, fontFamily, NSString, YES)
-    WX_STYLE_FILL_TEXT_PIXEL(fontSize, fontSize, YES)
-    WX_STYLE_FILL_TEXT(fontWeight, fontWeight, WXTextWeight, YES)
-    WX_STYLE_FILL_TEXT(fontStyle, fontStyle, WXTextStyle, YES)
-    WX_STYLE_FILL_TEXT(lines, lines, NSUInteger, YES)
-    WX_STYLE_FILL_TEXT(textAlign, textAlign, NSTextAlignment, NO)
-    WX_STYLE_FILL_TEXT(textDecoration, textDecoration, WXTextDecoration, YES)
-    WX_STYLE_FILL_TEXT(textOverflow, textOverflow, NSString, NO)
-    WX_STYLE_FILL_TEXT_PIXEL(lineHeight, lineHeight, YES)
-    WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
-    WX_STYLE_FILL_TEXT(wordWrap, wordWrap, NSString, YES);
+    WX_STYLE_FILL_TEXT(fontFamily, fontFamily, NSString, YES) //!OCLint
+    WX_STYLE_FILL_TEXT_PIXEL(fontSize, fontSize, YES) //!OCLint
+    WX_STYLE_FILL_TEXT(fontWeight, fontWeight, WXTextWeight, YES) //!OCLint
+    WX_STYLE_FILL_TEXT(fontStyle, fontStyle, WXTextStyle, YES) //!OCLint
+    WX_STYLE_FILL_TEXT(lines, lines, NSUInteger, YES) //!OCLint
+    WX_STYLE_FILL_TEXT(textAlign, textAlign, NSTextAlignment, NO) //!OCLint
+    WX_STYLE_FILL_TEXT(textDecoration, textDecoration, WXTextDecoration, YES) //!OCLint
+    WX_STYLE_FILL_TEXT(textOverflow, textOverflow, NSString, NO) //!OCLint
+    WX_STYLE_FILL_TEXT_PIXEL(lineHeight, lineHeight, YES) //!OCLint
+    WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES) //!OCLint
+    WX_STYLE_FILL_TEXT(wordWrap, wordWrap, NSString, YES); //!OCLint
 
     UIColor* color = nil;
     id value = styles[@"color"];

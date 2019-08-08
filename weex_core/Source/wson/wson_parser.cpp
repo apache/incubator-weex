@@ -151,7 +151,7 @@ void wson_parser::toJSONtring(std::string &builder){
 
 std::string wson_parser::nextStringUTF8(uint8_t type) {
     std::string str;
-    switch (type) {
+    switch (type) {//!OCLint
         case WSON_UINT8_STRING_TYPE: {
             int size = wson_next_uint(wsonBuffer);
             uint8_t *utf8 = wson_next_bts(wsonBuffer, size);

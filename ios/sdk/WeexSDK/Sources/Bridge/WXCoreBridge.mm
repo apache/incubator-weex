@@ -164,7 +164,7 @@ namespace WeexCore
     int IOSSide::CallNative(const char* pageId, const char *task, const char *callback)
     {
         // should not enter this function
-        assert(false);
+        assert(false); //!OCLint
     }
     
     static WeexByteArray *generator_bytes_array(const char *str, size_t len) {
@@ -396,7 +396,7 @@ break; \
     void IOSSide::SetTimeout(const char* callbackID, const char* time)
     {
         // should not enter this function
-        assert(false);
+        assert(false); //!OCLint
     }
 
     void IOSSide::NativeLog(const char *args)
@@ -1038,7 +1038,7 @@ break; \
     WXCoreSize WXCoreMeasureFunctionBridge::Measure(const char* page_id, long render_ptr, float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode)
     {
         // should not enter this function
-        assert(false);
+        assert(false); //!OCLint
     }
     
     void WXCoreMeasureFunctionBridge::LayoutBefore(const char* page_id, long render_ptr)

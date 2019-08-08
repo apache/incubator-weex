@@ -430,7 +430,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         }
     } else {
         CATransform3D transform = layer.transform;
-        if (info.target->_transform.perspective && !isinf(info.target->_transform.perspective)) {
+        if (info.target->_transform.perspective && !isinf(info.target->_transform.perspective)) { //!OCLint
             transform.m34 = -1.0/info.target->_transform.perspective*[UIScreen mainScreen].scale;
             layer.transform = transform;
         }
