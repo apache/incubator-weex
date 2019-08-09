@@ -99,7 +99,7 @@ static BOOL bNeedRemoveEvents = YES;
         _isViewFrameSyncWithCalculated = YES;
         _ariaHidden = nil;
         _accessible = nil;
-        _userInteractionEnabled = nil;
+        _userInteractionEnabled = YES;
         _accessibilityHintContent = nil;
         _cancelsTouchesInView = YES;
         
@@ -121,7 +121,7 @@ static BOOL bNeedRemoveEvents = YES;
         }
         
         if (attributes[@"userInteractionEnabled"]) {
-            _userInteractionEnabled = [WXConvert NSString:attributes[@"userInteractionEnabled"]];
+            _userInteractionEnabled = [WXConvert BOOL:attributes[@"userInteractionEnabled"]];
         }
         
         if (attributes[@"ariaHidden"]) {
@@ -425,7 +425,7 @@ static BOOL bNeedRemoveEvents = YES;
             [_view setIsAccessibilityElement:[WXConvert BOOL:_accessible]];
         }
         if (_userInteractionEnabled) {
-            [_view setUserInteractionEnabled:[WXConvert BOOL:_userInteractionEnabled]];
+            [_view setUserInteractionEnabled:_userInteractionEnabled];
         }
         if (_ariaHidden) {
             [_view setAccessibilityElementsHidden:[WXConvert BOOL:_ariaHidden]];
@@ -887,8 +887,8 @@ static BOOL bNeedRemoveEvents = YES;
         [self.view setShouldGroupAccessibilityChildren:[WXConvert BOOL:_groupAccessibilityChildren]];
     }
     if (attributes[@"userInteractionEnabled"]) {
-        _userInteractionEnabled = [WXConvert NSString:attributes[@"userInteractionEnabled"]];
-        [self.view setUserInteractionEnabled:[WXConvert BOOL:_userInteractionEnabled]];
+        _userInteractionEnabled = [WXConvert BOOL:attributes[@"userInteractionEnabled"]];
+        [self.view setUserInteractionEnabled:_userInteractionEnabled];
     }
     
     if (attributes[@"testId"]) {

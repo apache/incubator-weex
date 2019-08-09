@@ -70,8 +70,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     NSString * _accessibilityHintContent; // hint for the action
     NSString * _groupAccessibilityChildren; // voice-over navigation order
     NSString * _testId;// just for auto-test
-    NSString * _userInteractionEnabled;
     
+    BOOL  _userInteractionEnabled;
     BOOL _accessibilityMagicTapEvent;
     
     /**
