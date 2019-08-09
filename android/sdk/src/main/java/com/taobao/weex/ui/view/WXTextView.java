@@ -18,11 +18,11 @@
  */
 package com.taobao.weex.ui.view;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.PopupMenu;
@@ -31,11 +31,9 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
-
 import java.lang.ref.WeakReference;
 
 /**
@@ -65,6 +63,7 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
     canvas.restore();
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     boolean result = super.onTouchEvent(event);

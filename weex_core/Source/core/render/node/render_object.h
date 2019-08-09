@@ -60,6 +60,10 @@ class RenderObject : public IRenderObject {
 
   void CopyFrom(RenderObject *src);
 
+  RenderObject* RichtextParent();
+
+  bool hasShadow(const RenderObject* shadow) const;
+
   void MapInsertOrAssign(std::map<std::string, std::string> *targetMap,
                          const std::string &key, const std::string &value);
 
@@ -136,6 +140,8 @@ class RenderObject : public IRenderObject {
 
   inline RenderObject *parent_render() { return this->parent_render_; }
 
+  const std::vector<RenderObject*>& get_shadow_objects() const {return shadow_objects_;}
+
   inline std::map<std::string, std::string> *styles() const {
     return this->styles_;
   }
@@ -152,13 +158,19 @@ class RenderObject : public IRenderObject {
 
   inline bool is_sticky() { return this->is_sticky_; }
 
+  bool is_richtext_child() const {return is_richtext_child_;}
+
+  void set_is_richtext_child(const bool is_richtext_child) {is_richtext_child_ = is_richtext_child;}
+
  private:
   RenderObject *parent_render_;
+  std::vector<RenderObject*> shadow_objects_;
   std::map<std::string, std::string> *styles_;
   std::map<std::string, std::string> *attributes_;
   std::set<std::string> *events_;
   bool is_root_render_;
   bool is_sticky_ = false;
+  bool is_richtext_child_ = false;
 };
 }  // namespace WeexCore
 #endif  // CORE_RENDER_NODE_RENDER_OBJECT_H_

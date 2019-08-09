@@ -24,6 +24,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
 import android.text.SpannableStringBuilder;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
@@ -35,8 +36,11 @@ import com.taobao.weex.ui.component.richtext.span.ImgSpan;
 import com.taobao.weex.ui.component.richtext.span.ItemClickSpan;
 import com.taobao.weex.utils.ImgURIUtil;
 import com.taobao.weex.utils.WXUtils;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 class ImgNode extends RichTextNode {
 
@@ -46,6 +50,11 @@ class ImgNode extends RichTextNode {
     public ImgNode createRichTextNode(Context context, String instanceId, String componentRef) {
       return new ImgNode(context, instanceId, componentRef);
     }
+    @Override
+    public ImgNode createRichTextNode(Context context,String instanceId,String componentRef,String ref,
+                                       Map<String,Object> styles, Map<String,Object> attrs){
+      return new ImgNode(context,instanceId,componentRef,ref,styles,attrs);
+    }
   }
 
   public static final String NODE_TYPE = "image";
@@ -53,10 +62,13 @@ class ImgNode extends RichTextNode {
   private ImgNode(Context context, String instanceId, String componentRef) {
     super(context, instanceId, componentRef);
   }
+  private ImgNode(Context context, String instanceId, String componentRef, String ref, Map<String,Object> styles, Map<String,Object> attrs) {
+    super(context, instanceId, componentRef, ref, styles, attrs);
+  }
 
   @Override
   public String toString() {
-    return " ";
+    return "\uFEFF";
   }
 
   @Override

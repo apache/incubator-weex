@@ -23,6 +23,7 @@
 #include "base/log_defines.h"
 #include "base/make_copyable.h"
 #include "base/thread/waitable_event.h"
+#include "base/time_calculator.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #include "core/bridge/eagle_bridge.h"
@@ -30,7 +31,6 @@
 #include "core/config/core_environment.h"
 #ifdef OS_ANDROID
 #include "core/parser/action_args_check.h"
-#include <base/time_calculator.h>
 #include "android/weex_extend_js_api.h"
 #endif
 
@@ -111,11 +111,11 @@ void CoreSideInScript::AddElement(const char *page_id, const char *parent_ref,
                                   const char *index_str) {
 
   
-//  std::string msg = "AddElement :";
+  std::string msg = "AddElement";
 //  wson_parser parser(dom_str);
 //  msg.append(parser.toStringUTF8().c_str());
 //
-//  weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::WEEXCORE, msg.c_str(), page_id);
+  weex::base::TimeCalculator timeCalculator(weex::base::TaskPlatform::WEEXCORE, msg.c_str(), page_id);
 
   const char *indexChar = index_str == nullptr ? "\0" : index_str;
   int index = atoi(indexChar);
@@ -460,6 +460,13 @@ void CoreSideInScript::UpdateComponentData(const char* page_id,
         page_id, "UpdateComponentData", 
         "There is no data_render_handler when UpdateComponentData invoked");
     }
+}
+
+bool CoreSideInScript::Log(int level, const char *tag,
+         const char *file,
+         unsigned long line,
+         const char *log) {
+  return weex::base::LogImplement::getLog()->log((LogLevel) level, tag, file, line, log);
 }
 
 }  // namespace WeexCore

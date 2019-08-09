@@ -26,12 +26,10 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
-import android.util.Log;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.common.WXConfig;
 
 public class WXUtils {
 
@@ -306,7 +304,9 @@ public class WXUtils {
             }
           }
         } catch (NumberFormatException nfe) {
-          WXLogUtils.e("Argument format error! value is " + value, nfe);
+          if (WXEnvironment.isApkDebugable()) {
+            WXLogUtils.w("The parameter format is not supported", nfe);
+          }
         } catch (Exception e) {
           WXLogUtils.e("Argument error! value is " + value, e);
         }

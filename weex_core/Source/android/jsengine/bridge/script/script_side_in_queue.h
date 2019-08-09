@@ -98,7 +98,7 @@ namespace weex {
                 int UpdateGlobalConfig(const char *config) override;
 
                 int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) override;
-
+                void SetLogType(const int logLevel, const bool isPerf) override;
 
             private:
                 std::vector<std::string> usingBackThreadId;

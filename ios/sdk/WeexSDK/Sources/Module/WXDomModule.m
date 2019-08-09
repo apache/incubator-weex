@@ -155,9 +155,14 @@ WX_EXPORT_METHOD(@selector(endBatchMark))
 - (void)createFinish
 {
     NSString* instanceId = self.weexInstance.instanceId;
-    WXPerformBlockOnComponentThread(^{
-        [WXCoreBridge callCreateFinish:instanceId];
-    });
+    if ([WXCustomPageBridge isCustomPage:instanceId]) {
+        [[WXCustomPageBridge sharedInstance] callCreateFinish:instanceId];
+    }
+    else {
+        WXPerformBlockOnComponentThread(^{
+            [WXCoreBridge callCreateFinish:instanceId];
+        });
+    }
 }
 
 - (void)updateFinish

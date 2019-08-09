@@ -84,6 +84,11 @@ class CoreSideInScript : public ScriptBridge::CoreSide {
                            const char* cid,
                            const char* json_data) override;
 
+  bool Log(int level, const char *tag,
+           const char *file,
+           unsigned long line,
+           const char *log) override ;
+
  private:
   DISALLOW_COPY_AND_ASSIGN(CoreSideInScript);
 };

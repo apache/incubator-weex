@@ -209,7 +209,7 @@ public class WXSDKEngine implements Serializable {
     }
     WXEnvironment.JsFrameworkInit = false;
 
-    WXBridgeManager.getInstance().post(new Runnable() {
+    WXBridgeManager.getInstance().postWithName(new Runnable() {
       @Override
       public void run() {
         long start = System.currentTimeMillis();
@@ -243,7 +243,7 @@ public class WXSDKEngine implements Serializable {
         WXEnvironment.sSDKInitExecuteTime = System.currentTimeMillis() - start;
         WXLogUtils.renderPerformanceLog("SDKInitExecuteTime", WXEnvironment.sSDKInitExecuteTime);
       }
-    });
+    },null,"doInitWeexSdkInternal");
     WXStateRecord.getInstance().startJSThreadWatchDog();
     register();
   }

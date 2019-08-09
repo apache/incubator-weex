@@ -22,10 +22,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
@@ -554,6 +558,40 @@ public class WXViewUtils {
           return false;
         }
       }
+    }
+    return true;
+  }
+
+  public static boolean isViewVisible(View v) {
+    if (null == v){
+      return false;
+    }
+
+    boolean isAttachToWindow = Build.VERSION.SDK_INT >= VERSION_CODES.KITKAT
+        ?v.isAttachedToWindow()
+        :v.getWindowToken() != null;
+
+    if (!isAttachToWindow){
+      return false;
+    }
+    if (v.getVisibility() != View.VISIBLE || v.getAlpha()<=0){
+      return false;
+    }
+
+    Drawable bacDrawable = v.getBackground();
+    if (null == bacDrawable){
+      return true;
+    }
+    if (Build.VERSION.SDK_INT >= VERSION_CODES.KITKAT){
+      return bacDrawable.getAlpha()>0;
+    }
+    //< 4.4
+    if (bacDrawable instanceof ColorDrawable){
+      int alpha = Color.alpha(((ColorDrawable) bacDrawable).getColor());
+      return alpha >0;
+    }else if (bacDrawable instanceof BitmapDrawable){
+      Paint paint = ((BitmapDrawable) bacDrawable).getPaint();
+      return paint.getAlpha() > 0;
     }
     return true;
   }

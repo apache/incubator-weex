@@ -41,6 +41,7 @@ namespace WeexCore {
         void UpdateStyle(std::string key, std::string value);
         void AddEvent(std::string event);
         void RemoveEvent(std::string event);
+        void set_is_richtext_child(const bool is_richtext_child);
         std::set<std::string> *events();
         
         void set_page_id(const std::string& page_id);

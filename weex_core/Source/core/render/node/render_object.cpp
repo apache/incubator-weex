@@ -62,6 +62,10 @@ RenderObject::~RenderObject() {
       delete child;
     }
   }
+
+  for (auto it : shadow_objects_) {
+      delete it;
+  }
 }
 
 void RenderObject::ApplyDefaultStyle(bool reserve) {
@@ -75,6 +79,15 @@ void RenderObject::ApplyDefaultStyle(bool reserve) {
   if (style != nullptr) {
     delete style;
   }
+}
+
+RenderObject* RenderObject::RichtextParent() {
+    if (parent_render_ && parent_render_->type() == "richtext") {
+        return parent_render_;
+    } else if (parent_render_) {
+        return parent_render_->RichtextParent();
+    }
+    return nullptr;
 }
 
 void RenderObject::ApplyDefaultAttr() {
@@ -326,9 +339,25 @@ const std::string RenderObject::GetAttr(const std::string &key) {
   }
 }
 
+bool RenderObject::hasShadow(const RenderObject* shadow) const {
+    if(std::find(shadow_objects_.begin(), shadow_objects_.end(), shadow) != shadow_objects_.end()){
+        return true;
+    }else{
+        return false;
+    }
+}
+
 int RenderObject::AddRenderObject(int index, RenderObject *child) {
   if (child == nullptr || index < -1) {
     return index;
+  }
+
+  if (type() == "richtext") {
+      if (!hasShadow(child)) {
+          shadow_objects_.push_back(child);
+          child->set_parent_render(this);
+      }
+      return index;
   }
 
   Index count = getChildCount();
@@ -482,7 +511,18 @@ RenderObject *RenderObject::GetChild(const Index &index) {
 }
 
 void RenderObject::RemoveRenderObject(RenderObject *child) {
-  removeChild(child);
+    if (type() == "richtext") {
+        int index = 0;
+        for (auto it : shadow_objects_) {
+            if (it == child) {
+                shadow_objects_.erase(shadow_objects_.begin() + index);
+                return;
+            }
+            index++;
+        }
+    } else {
+          removeChild(child);
+    }
 }
 
 void RenderObject::AddAttr(std::string key, std::string value) {

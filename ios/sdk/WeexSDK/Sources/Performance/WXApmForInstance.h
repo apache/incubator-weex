@@ -63,6 +63,9 @@ extern NSString* const KEY_PAGE_STAGES_DESTROY;
 extern NSString* const KEY_PAGE_STATS_BUNDLE_SIZE;
 extern NSString* const KEY_PAGE_STATS_FS_CALL_JS_TIME;
 extern NSString* const KEY_PAGE_STATS_FS_CALL_JS_NUM;
+extern NSString* const KEY_PAGE_STATS_EXECUTE_JS_TIME;
+extern NSString* const KEY_PAGE_STATS_CREATE_COMPONENT_TIME;
+extern NSString* const KEY_PAGE_STATS_CREATE_VIEW_TIME;
 extern NSString* const KEY_PAGE_STATS_FS_TIMER_NUM;
 extern NSString* const KEY_PAGE_STATS_FS_CALL_NATIVE_TIME;
 extern NSString* const KEY_PAGE_STATS_FS_CALL_NATIVE_NUM;
@@ -114,6 +117,7 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 @property (nonatomic, assign) BOOL isStartRender;
 @property (nonatomic,assign)  BOOL  hasRecordFirstInterationView;
 @property (nonatomic, assign) BOOL isDownLoadFailed;
+@property (nonatomic, assign) BOOL forceStopRecordInteractionTime;
 @property (nonatomic,assign) double pageRatio;
 
 #pragma mark - basic method

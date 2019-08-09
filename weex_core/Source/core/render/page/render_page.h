@@ -43,8 +43,11 @@ class RenderPage: public RenderPageBase {
   void SendAddElementAction(RenderObject *child, RenderObject *parent,
                             int index, bool is_recursion,
                             bool will_layout = true);
+  void SendAddChildToRichtextAction(RenderObject *child, RenderObject *parent, RenderObject *richtext);
 
   void SendRemoveElementAction(const std::string &ref);
+
+  void SendRemoveChildFromRichtextAction(const std::string &ref, RenderObject *parent, RenderObject *richtext);
 
   void SendMoveElementAction(const std::string &ref,
                              const std::string &parent_ref, int index);
@@ -58,10 +61,15 @@ class RenderPage: public RenderPageBase {
       std::vector<std::pair<std::string, std::string>> *padding,
       std::vector<std::pair<std::string, std::string>> *border);
 
+  void SendUpdateRichtextChildStyleAction(RenderObject *render, std::vector<std::pair<std::string, std::string>> *style, RenderObject *parent, RenderObject *richtext);
+
   void SendUpdateAttrAction(
       RenderObject *render,
       std::vector<std::pair<std::string, std::string>> *attrs);
 
+ void SendUpdateRichtextChildAttrAction(
+                              RenderObject *render,
+                              std::vector<std::pair<std::string, std::string>> *attrs, RenderObject *parent, RenderObject *richtext);
   void SendAppendTreeCreateFinish(const std::string &ref);
   
   void LayoutInner();
