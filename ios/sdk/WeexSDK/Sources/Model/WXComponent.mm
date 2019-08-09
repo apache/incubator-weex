@@ -100,6 +100,7 @@ static BOOL bNeedRemoveEvents = YES;
         _ariaHidden = nil;
         _accessible = nil;
         _userInteractionEnabled = YES;
+        _eventPenetrationEnabled = NO;
         _accessibilityHintContent = nil;
         _cancelsTouchesInView = YES;
         
@@ -122,6 +123,10 @@ static BOOL bNeedRemoveEvents = YES;
         
         if (attributes[@"userInteractionEnabled"]) {
             _userInteractionEnabled = [WXConvert BOOL:attributes[@"userInteractionEnabled"]];
+        }
+        
+        if (attributes[@"eventPenetrationEnabled"]) {
+            _eventPenetrationEnabled = [WXConvert BOOL:attributes[@"eventPenetrationEnabled"]];
         }
         
         if (attributes[@"ariaHidden"]) {
@@ -405,9 +410,9 @@ static BOOL bNeedRemoveEvents = YES;
         _view.wx_component = self;
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
-    
+        
         [_view setUserInteractionEnabled:_userInteractionEnabled];
-    
+        
         if (_roles) {
             [_view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits roles:_roles]];
         }
@@ -889,6 +894,10 @@ static BOOL bNeedRemoveEvents = YES;
     if (attributes[@"userInteractionEnabled"]) {
         _userInteractionEnabled = [WXConvert BOOL:attributes[@"userInteractionEnabled"]];
         [self.view setUserInteractionEnabled:_userInteractionEnabled];
+    }
+    
+    if (attributes[@"eventPenetrationEnabled"]) {
+        _eventPenetrationEnabled = [WXConvert BOOL:attributes[@"eventPenetrationEnabled"]];
     }
     
     if (attributes[@"testId"]) {
