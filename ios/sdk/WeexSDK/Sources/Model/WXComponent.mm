@@ -405,7 +405,9 @@ static BOOL bNeedRemoveEvents = YES;
         _view.wx_component = self;
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
-        
+    
+        [_view setUserInteractionEnabled:_userInteractionEnabled];
+    
         if (_roles) {
             [_view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits roles:_roles]];
         }
@@ -424,9 +426,7 @@ static BOOL bNeedRemoveEvents = YES;
         if (_accessible) {
             [_view setIsAccessibilityElement:[WXConvert BOOL:_accessible]];
         }
-        if (_userInteractionEnabled) {
-            [_view setUserInteractionEnabled:_userInteractionEnabled];
-        }
+        
         if (_ariaHidden) {
             [_view setAccessibilityElementsHidden:[WXConvert BOOL:_ariaHidden]];
             
