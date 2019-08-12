@@ -268,6 +268,12 @@ CGFloat WXFloorPixelValue(CGFloat value)
     if ([source isKindOfClass:[NSArray class]]) {
         NSMutableArray* tmpArray = [[NSMutableArray alloc] init];
         for (id obj in source) {
+            if (obj == nil) {
+                /* srouce may be a subclass of NSArray and the subclassed
+                 array may return nil in its overridden objectAtIndex: method.
+                 So obj could be nil!!!. */
+                continue;
+            }
             [tmpArray addObject:[self convertContainerToImmutable:obj]];
         }
         id immutableArray = [NSArray arrayWithArray:tmpArray];
