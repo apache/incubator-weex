@@ -93,8 +93,6 @@
 - (instancetype)init {
     
     self = [super init];
-    if (!self) {
-    }
     _decelerationRate = 0.01;
     _scrollEnabled = YES;
     _bounces = YES;
@@ -1621,7 +1619,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 
 - (void)setIndicatorView:(WXIndicatorView *)indicatorView
 {
-    NSAssert(_sliderView, @"");
+    NSAssert(_sliderView, @""); //!OCLint
     [_sliderView setIndicator:indicatorView];
 }
 

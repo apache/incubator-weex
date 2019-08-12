@@ -30,6 +30,7 @@ import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.tools.LogDetail;
 
 import java.util.HashMap;
 import java.util.List;
@@ -54,10 +55,14 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
     private boolean isInstanceReady =false;
     private boolean isResponseHasWait = false;
     private WXResponse mResponse;
+    private LogDetail mLogDetail;
 
     private String mBundleUrl;
 
     public WXHttpListener(WXSDKInstance instance) {
+        if(instance != null) {
+            mLogDetail = instance.mTimeCalculator.createLogDetail("downloadBundleJS");
+        }
         this.instance = instance;
         this.traceId = WXTracing.nextId();
         this.mWXPerformance = instance.getWXPerformance();
@@ -102,6 +107,9 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
         if (this.instance != null
                 && this.instance.getWXStatisticsListener() != null) {
             this.instance.getWXStatisticsListener().onHttpStart();
+            if(mLogDetail != null) {
+                mLogDetail.taskStart();
+            }
         }
     }
 
@@ -131,7 +139,9 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
 
     @Override
     public void onHttpFinish(WXResponse response) {
-
+        if(mLogDetail != null) {
+            mLogDetail.taskEnd();
+        }
         if (this.instance != null
                 && this.instance.getWXStatisticsListener() != null) {
             this.instance.getWXStatisticsListener().onHttpFinish();

@@ -91,6 +91,11 @@ class CoreSideInMultiSo : public WeexCore::ScriptBridge::CoreSide {
   void OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult>& result);
   void UpdateComponentData(const char* page_id, const char* cid, const char* json_data);
 
+  bool Log(int level, const char *tag,
+           const char *file,
+           unsigned long line,
+           const char *log)override;
+
  private:
   FunctionsExposedByCore *functions_exposed_by_core_;
   DISALLOW_COPY_AND_ASSIGN(CoreSideInMultiSo);

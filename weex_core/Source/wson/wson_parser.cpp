@@ -151,7 +151,7 @@ void wson_parser::toJSONtring(std::string &builder){
 
 std::string wson_parser::nextStringUTF8(uint8_t type) {
     std::string str;
-    switch (type) {
+    switch (type) {//!OCLint
         case WSON_UINT8_STRING_TYPE: {
             int size = wson_next_uint(wsonBuffer);
             uint8_t *utf8 = wson_next_bts(wsonBuffer, size);
@@ -230,23 +230,19 @@ double wson_parser::nextNumber(uint8_t type) {
         case WSON_NUMBER_INT_TYPE:{
               int32_t num = wson_next_int(wsonBuffer);
               return num;
-            }
-            break;
+        }
         case WSON_NUMBER_FLOAT_TYPE:{
                 float num = wson_next_float(wsonBuffer);
                 return num;
-            }
-            break;
+        }
         case WSON_NUMBER_DOUBLE_TYPE:{
                 double num = wson_next_double(wsonBuffer);
                 return num;
-            }
-            break;
+        }
         case WSON_NUMBER_LONG_TYPE:{
                 int64_t num = wson_next_long(wsonBuffer);
                 return num;
-            }
-            break;
+        }
         case WSON_BOOLEAN_TYPE_TRUE:
             return 1;
         case WSON_BOOLEAN_TYPE_FALSE:

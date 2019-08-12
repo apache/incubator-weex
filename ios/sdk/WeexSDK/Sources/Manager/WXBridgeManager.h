@@ -242,4 +242,6 @@ extern "C" {
 
 - (void)callJSMethod:(NSString *)method args:(NSArray *)args;
 
+- (void)executeJSTaskQueue;
+
 @end

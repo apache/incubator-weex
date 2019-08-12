@@ -55,7 +55,7 @@ bool DefaultRequestHandler::RegisterJNIUtils(JNIEnv* env) {
 }
 
 DefaultRequestHandler::DefaultRequestHandler() {
-  JNIEnv* env = base::android::AttachCurrentThread();
+  JNIEnv* env = ::base::android::AttachCurrentThread();
   Reset(env, Java_RequestHandler_create(env).Release());
 }
 
@@ -63,23 +63,23 @@ DefaultRequestHandler::~DefaultRequestHandler() {}
 
 void DefaultRequestHandler::Send(const char* instance_id, const char* url,
                                  Callback callback) {
-  JNIEnv* env = base::android::AttachCurrentThread();
+  JNIEnv* env = ::base::android::AttachCurrentThread();
   if (!env) return;
   CallbackWrapper* callback_wrapper = new CallbackWrapper(callback);
-  base::android::ScopedLocalJavaRef<jstring> jni_url(env,
+  ::base::android::ScopedLocalJavaRef<jstring> jni_url(env,
                                                      env->NewStringUTF(url));
-  base::android::ScopedLocalJavaRef<jstring> jni_id(
+  ::base::android::ScopedLocalJavaRef<jstring> jni_id(
       env, env->NewStringUTF(instance_id));
   Java_RequestHandler_send(env, jni_object(), jni_id.Get(), jni_url.Get(),
                            reinterpret_cast<jlong>(callback_wrapper));
 }
 
 void DefaultRequestHandler::GetBundleType(const char *instance_id, const char *content, Callback callback){
-  JNIEnv* env = base::android::AttachCurrentThread();
+  JNIEnv* env = ::base::android::AttachCurrentThread();
   if (!env) return;
   CallbackWrapper* callback_wrapper = new CallbackWrapper(callback);
-  base::android::ScopedLocalJavaRef<jstring> jni_id(env, env->NewStringUTF(instance_id));
-  base::android::ScopedLocalJavaRef<jstring> jni_content(env,env->NewStringUTF(content));
+  ::base::android::ScopedLocalJavaRef<jstring> jni_id(env, env->NewStringUTF(instance_id));
+  ::base::android::ScopedLocalJavaRef<jstring> jni_content(env,env->NewStringUTF(content));
   Java_RequestHandler_getBundleType(env, jni_object(), jni_id.Get(), jni_content.Get(),
                            reinterpret_cast<jlong>(callback_wrapper));
 }

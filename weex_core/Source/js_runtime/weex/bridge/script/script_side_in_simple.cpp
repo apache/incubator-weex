@@ -143,6 +143,9 @@ int ScriptSideInSimple::UpdateInitFrameworkParams(const std::string& key, const 
   return runtime_->UpdateInitFrameworkParams(key ,value, desc);
 }
 
+void ScriptSideInSimple::SetLogType(const int logLevel, const bool isPerf) {
+  //do nothing
+}
 
 
 }  // namespace js

@@ -91,6 +91,8 @@ import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.cache.RegisterCache;
+import com.taobao.weex.utils.tools.LogDetail;
+import com.taobao.weex.utils.tools.TimeCalculator;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -205,6 +207,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private String mRenderType = RenderTypes.RENDER_TYPE_NATIVE;
 
+  public TimeCalculator mTimeCalculator;
   /**
    * Default Width And Viewport is 750,
    * when screen width change, we adjust viewport to adapter screen change
@@ -452,8 +455,15 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void setInstanceViewPortWidth(int instanceViewPortWidth) {
+    setInstanceViewPortWidth(instanceViewPortWidth,false);
+
+  }
+  public void setInstanceViewPortWidth(int instanceViewPortWidth,boolean fromMetaModule){
     this.mInstanceViewPortWidth = instanceViewPortWidth;
     this.mAutoAdjustDeviceWidth = false;
+    if(!fromMetaModule){
+      WXBridgeManager.getInstance().setViewPortWidth(getInstanceId(), mInstanceViewPortWidth);
+    }
   }
 
   public void setAutoAdjustDeviceWidth(boolean autoAdjustViewPort){
@@ -536,6 +546,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void createInstanceFuncHeartBeat() {
     WXLogUtils.d("createInstanceFuncHeartBeat: " + mInstanceId);
     this.createInstanceHeartBeat = true;
+    getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_END_EXCUTE_BUNDLE);
   }
 
   public void addOnInstanceVisibleListener(OnInstanceVisibleListener l){
@@ -574,6 +585,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     // WXBridgeManager.getInstance().checkJsEngineMultiThread();
     mDisableSkipFrameworkInit = isDisableSkipFrameworkInDataRender();
+
+    mTimeCalculator = new TimeCalculator(this);
   }
 
   /**
@@ -807,6 +820,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       return;
     }
 
+    LogDetail logDetail = mTimeCalculator.createLogDetail("renderInternal");
     mRenderStrategy = flag;
 
     //some case ,from render(template),but not render (url)
@@ -815,6 +829,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
     mApmForInstance.setPageName(pageName);
     mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_RENDER_ORGIGIN);
+    mApmForInstance.doDelayCollectData();
 
     mWXPerformance.pageName = (TextUtils.isEmpty(pageName) ? "defaultBundleUrl":pageName);
     if (TextUtils.isEmpty(mBundleUrl)) {
@@ -844,7 +859,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       return;
     }
 
-
+    TimeCalculator timeCalculator = new TimeCalculator(this);
 
     mWXPerformance.JSTemplateSize = template.length() / 1024f;
     mApmForInstance.addStats(WXInstanceApm.KEY_PAGE_STATS_BUNDLE_SIZE,mWXPerformance.JSTemplateSize);
@@ -872,12 +887,14 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
                             WXViewUtils.getScreenDensity(mContext));
          }
     }
+    logDetail.taskStart();
     if (isPreInitMode()){
       getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_START);
       WXBridgeManager.getInstance().loadJsBundleInPreInitMode(getInstanceId(),template.getContent());
     } else {
       WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
     }
+    logDetail.taskEnd();
     mRendered = true;
 
     final IWXJscProcessManager wxJscProcessManager = WXSDKManager.getInstance().getWXJscProcessManager();
@@ -949,6 +966,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
                                    final String jsonInitData,
                                    WXRenderStrategy flag) {
 
+
+    LogDetail logDetail = mTimeCalculator.createLogDetail("renderByUrlInternal");
+    logDetail.taskStart();
     ensureRenderArchor();
     pageName = wrapPageName(pageName, url);
     mBundleUrl = url;
@@ -1010,6 +1030,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mHttpListener.setSDKInstance(this);
     mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
     adapter.sendRequest(wxRequest, (IWXHttpAdapter.OnHttpListener) mHttpListener);
+    logDetail.taskEnd();
   }
 
   private WXHttpListener mHttpListener = null;
@@ -1428,7 +1449,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
             WXLogUtils.w("Warning :Component tree has not build completely, onActivityDestroy can not be call!");
         }
     }
-
+    this.mTimeCalculator.println();
     destroy();
   }
 
@@ -1640,7 +1661,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (mHasCreateFinish){
       lazyLoadTime = lastElementChangeTime - mWXPerformance.renderTimeOrigin;
       if (lazyLoadTime > 8000) {
-        //bad case
+        //force record detail performance data
         return;
       }
     }

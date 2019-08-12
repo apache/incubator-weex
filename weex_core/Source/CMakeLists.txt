@@ -39,6 +39,7 @@ add_definitions(-DPERFORMANCE_LOG=0)
 add_definitions(-DLAYOUT_LOG=0)
 add_definitions(-DJSAPI_LOG=0)
 add_definitions(-DDOM_PARSER_LOG=0)
+add_definitions(-DDEBUG=1)
 
 message("ANDROID_PROJECT_DIR:"${ANDROID_PROJECT_DIR})
 set(LOCAL_LIBRARIES_DIR ${ANDROID_PROJECT_DIR}/libs/${ANDROID_ABI})
@@ -81,11 +82,12 @@ set(COMMON_SRCS
   ./core/render/action/render_action_update_style.cpp
   ./core/render/action/render_action_render_success.cpp
   ./core/render/action/render_action_trigger_vsync.cpp
-
   ./core/json/JsonRenderManager.cpp
   ./core/json/JsonPage.cpp
-
-
+  ./core/render/action/render_action_add_child_to_richtext.cpp
+  ./core/render/action/render_action_remove_child_from_richtext.cpp
+  ./core/render/action/render_action_update_richtext_child_style.cpp
+  ./core/render/action/render_action_update_richtext_child_attr.cpp
   ./core/layout/layout.cpp
   ./core/layout/style.cpp
 

@@ -232,6 +232,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 {
     if(self.view) {
         [self.view becomeFirstResponder];
+        self.weexInstance.apmInstance.forceStopRecordInteractionTime = YES;
     }
 }
 
@@ -674,9 +675,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         if (cursorPosition == textField.text.length) {
             adjust = newString.length-oldText.length;
         }
-        if (textField.deleteWords &&[textField.editWords isKindOfClass:[NSString class]] && [_recoverRule isEqualToString:textField.editWords]) {
-            // do nothing
-        } else {
+        if (!textField.deleteWords || ![textField.editWords isKindOfClass:[NSString class]] || ![_recoverRule isEqualToString:textField.editWords]) {
             textField.text = [newString copy];
             UITextPosition * newPosition = [textField positionFromPosition:textField.beginningOfDocument offset:cursorPosition+adjust];
             textField.selectedTextRange = [textField textRangeFromPosition:newPosition toPosition:newPosition];
@@ -846,6 +845,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         }else
         {
             [self.view becomeFirstResponder];
+             self.weexInstance.apmInstance.forceStopRecordInteractionTime = YES;
         }
     } else {
         if([self isDateType])

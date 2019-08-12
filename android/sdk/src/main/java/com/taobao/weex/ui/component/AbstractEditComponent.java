@@ -745,6 +745,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       getHostView().postDelayed(WXThread.secure(new Runnable() {
         @Override
         public void run() {
+          if (getInstance() != null && getInstance().getApmForInstance() != null){
+            getInstance().getApmForInstance().forceStopRecordInteraction = true;
+          }
           mInputMethodManager.showSoftInput(getHostView(), InputMethodManager.SHOW_IMPLICIT);
         }
       }), 100);

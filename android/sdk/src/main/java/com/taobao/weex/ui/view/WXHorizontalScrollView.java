@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -105,6 +106,7 @@ public class WXHorizontalScrollView extends HorizontalScrollView implements IWXS
     return result;
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
     if(!scrollable) {

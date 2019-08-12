@@ -80,7 +80,7 @@ WX_EXPORT_METHOD(@selector(prompt:callback:))
 
 - (instancetype)init
 {
-    if (self = [super init]) {
+    if (self = [super init]) {//!OCLint
     }
     
     return self;

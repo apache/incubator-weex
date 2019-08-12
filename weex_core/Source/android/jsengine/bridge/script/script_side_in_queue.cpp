@@ -21,7 +21,6 @@
 //
 
 #include <object/weex_env.h>
-#include <object/tlog.h>
 #include "script_side_in_queue.h"
 
 #include "android/jsengine/task/impl/init_framework_task.h"
@@ -245,7 +244,7 @@ int ScriptSideInQueue::CreateInstance(const char *instanceId,
 
   auto string = String::fromUTF8(script);
   if (string.isEmpty()) {
-    Weex::TLog::tlog("%s id CreateInstance's script is null", instanceId);
+    LOG_TLOG("jsEngine","%s id CreateInstance's script is null", instanceId);
     return 0;
   }
   CreateInstanceTask *task = new CreateInstanceTask(String::fromUTF8(instanceId),
@@ -262,6 +261,12 @@ int ScriptSideInQueue::CreateInstance(const char *instanceId,
   }
   return 1;
 }
+
+void ScriptSideInQueue::SetLogType(const int logLevel, const bool isPerf) {
+  LOGE("jsEngine setLog Level %d in Performance mode %s", logLevel, isPerf ? "true" :"false");
+  weex::base::LogImplement::getLog()->setPrintLevel((WeexCore::LogLevel)logLevel);
+  weex::base::LogImplement::getLog()->setPerfMode(isPerf);
+};
 
 std::unique_ptr<WeexJSResult> ScriptSideInQueue::ExecJSOnInstance(const char *instanceId,
                                                                   const char *script,int type) {
@@ -358,12 +363,12 @@ WeexTaskQueue *ScriptSideInQueue::taskQueue(const char *id, bool log) {
       WeexEnv::getEnv()->m_task_cache_.clear();
     }
     if (log) {
-      LOGE("dyyLog instance %s use back up thread time is %lld", id, microTime());
+      LOGE("instance %s use back up thread time is %lld", id, microTime());
     }
     return weexTaskQueue_bk_;
   }
   if (log && id != nullptr) {
-    LOGE("dyyLog instance %s use main thread time is %lld", id, microTime());
+    LOGE("instance %s use main thread time is %lld", id, microTime());
   }
   return weexTaskQueue_;
 }

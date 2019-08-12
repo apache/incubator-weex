@@ -646,7 +646,7 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 -(void)setIndicatorView:(WXIndicatorView *)indicatorView
 {
-    NSAssert(_recycleSliderView, @"");
+    NSAssert(_recycleSliderView, @"");//!OCLint
     [_recycleSliderView setIndicator:indicatorView];
 }
 

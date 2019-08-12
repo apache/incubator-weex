@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.view.ActionMode;
@@ -33,6 +34,7 @@ import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 /**
  * Wrapper class for editText
  */
+@SuppressLint("AppCompatCustomView")
 public class WXEditText extends EditText implements WXGestureObservable {
 
   private WXGesture wxGesture;
@@ -65,6 +67,7 @@ public class WXEditText extends EditText implements WXGestureObservable {
     mLines = lines;
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     boolean result = super.onTouchEvent(event);

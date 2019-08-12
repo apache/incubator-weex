@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.component.pesudo;
 
+import android.annotation.SuppressLint;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -33,6 +34,7 @@ public class TouchActivePseudoListener implements View.OnTouchListener {
     mIsConsumeOnTouch = consumeInTouch;
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouch(View v, MotionEvent event) {
     int action = event.getAction();

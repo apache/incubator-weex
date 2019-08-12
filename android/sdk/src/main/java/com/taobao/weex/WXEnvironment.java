@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -18,6 +18,9 @@
  */
 package com.taobao.weex;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -28,8 +31,6 @@ import android.graphics.Typeface;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.LogLevel;
@@ -39,7 +40,6 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import dalvik.system.PathClassLoader;
 import java.io.BufferedReader;
 import java.io.File;
@@ -48,20 +48,19 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class WXEnvironment {
 
   public static final String OS = "android";
   public static String SYS_VERSION = android.os.Build.VERSION.RELEASE;
   static{
-    if(SYS_VERSION != null && SYS_VERSION.toUpperCase().equals("P")){
+    if(SYS_VERSION != null && SYS_VERSION.toUpperCase(Locale.ROOT).equals("P")){
         SYS_VERSION = "9.0.0";
     }
-    if(SYS_VERSION != null && SYS_VERSION.toUpperCase().equals("Q")){
+    if(SYS_VERSION != null && SYS_VERSION.toUpperCase(Locale.ROOT).equals("Q")){
        SYS_VERSION = "10.0.0";
     }
   }
@@ -124,7 +123,7 @@ public class WXEnvironment {
 
   public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
-  public static boolean isPerf = true;
+  public static boolean isPerf = false;
   private static boolean sDebugFlagInit = false;
 
   private static boolean openDebugLog = true;
@@ -278,6 +277,7 @@ public class WXEnvironment {
   }
 
 
+  @SuppressLint("SdCardPath")
   public static String copySoDesDir() {
     try {
       if (TextUtils.isEmpty(COPY_SO_DES_DIR)) {
@@ -396,9 +396,18 @@ public class WXEnvironment {
     return isPerf;
   }
 
+  @SuppressLint("HardwareIds")
   private static String getDevId() {
-    return sApplication == null ? "" : ((TelephonyManager) sApplication
+    String ret = "";
+    if(sApplication != null){
+      try{
+        ret = ((TelephonyManager) sApplication
             .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+      }catch (SecurityException | NullPointerException e){
+        WXLogUtils.e(WXLogUtils.getStackTrace(e));
+      }
+    }
+    return ret;
   }
 
   public static Application getApplication() {
