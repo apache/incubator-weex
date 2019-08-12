@@ -646,10 +646,10 @@ break; \
         if (!manager.isValid) {
             return -1;
         }
-        CGRect frame = CGRectMake(isnan(WXRoundPixelValue(left))?0:WXRoundPixelValue(left),
-                                  isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
-                                  isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
-                                  isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
+        CGRect frame = CGRectMake(isnan(WXCeilPixelValue(left))?0:WXCeilPixelValue(left),
+                                  isnan(WXCeilPixelValue(top))?0:WXCeilPixelValue(top),
+                                  isnan(WXCeilPixelValue(width))?0:WXCeilPixelValue(width),
+                                  isnan(WXCeilPixelValue(height))?0:WXCeilPixelValue(height));
         [manager layoutComponent:component frame:frame isRTL:isRTL innerMainSize:renderObject->getLargestMainSize()];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -1551,10 +1551,10 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
             float width = render->getLayoutWidth();
             BOOL isRTL = render->getLayoutDirectionFromPathNode() == WeexCore::kDirectionRTL;
             WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            CGRect frame = CGRectMake(isnan(WXRoundPixelValue(left))?0:WXRoundPixelValue(left),
-                                      isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
-                                      isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
-                                      isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
+            CGRect frame = CGRectMake(isnan(WXCeilPixelValue(left))?0:WXCeilPixelValue(left),
+                                      isnan(WXCeilPixelValue(top))?0:WXCeilPixelValue(top),
+                                      isnan(WXCeilPixelValue(width))?0:WXCeilPixelValue(width),
+                                      isnan(WXCeilPixelValue(height))?0:WXCeilPixelValue(height));
             [manager layoutComponent:component frame:frame isRTL:isRTL innerMainSize:render->getLargestMainSize()];
         }
         render->setHasNewLayout(false);
