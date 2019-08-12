@@ -83,12 +83,17 @@ void PrintLog(LogLevel level,
   va_start(args, fmt);
   LogFlattenHelper log(fmt, args);
   va_end(args);
+  bool succeed = false;
+  bool debugMode = false;
+  weex::base::LogImplement *pImplement = weex::base::LogImplement::getLog();
+  if(pImplement != nullptr) {
+    succeed = pImplement->log(level, tag, file, line, log.str());
+    debugMode = pImplement->debugMode();
+  }
 
-  bool succeed = weex::base::LogImplement::getLog()->log(level, tag, file, line, log.str());
   if (!succeed) {
     // Log to console by default
 #ifdef __ANDROID__
-    bool debugMode = weex::base::LogImplement::getLog()->debugMode();
     switch (level) {
       case LogLevel::Error:
         __android_log_print(ANDROID_LOG_ERROR,
