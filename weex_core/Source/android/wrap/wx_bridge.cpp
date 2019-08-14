@@ -39,7 +39,6 @@
 #include "base/android/jni_type.h"
 #include "base/android/jni/jbytearray_ref.h"
 #include "base/android/jniprebuild/jniheader/WXBridge_jni.h"
-#include "base/log_defines.h"
 #include "core/config/core_environment.h"
 #include "core/layout/layout.h"
 #include "core/layout/measure_func_adapter_impl_android.h"
@@ -305,9 +304,13 @@ static void SetDeviceDisplay(JNIEnv* env, jobject jcaller, jstring instanceId,
 
 static jint InitFramework(JNIEnv* env, jobject object, jstring script,
                           jobject params) {
-  WXBridge::Instance()->Reset(env, object);
+  if (!WXBridge::Instance()->jni_object()) {
+    WXBridge::Instance()->Reset(env, object);
+  };
   // Init platform thread --- ScriptThread
-  WeexCoreManager::Instance()->InitScriptThread();
+  if (!WeexCoreManager::Instance()->script_thread()){
+    WeexCoreManager::Instance()->InitScriptThread();
+  };
   // Exception handler for so
   SoUtils::RegisterExceptionHanler(
       [](const char* status_code, const char* error_msg) {
@@ -623,7 +626,7 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
   if (!WXBridge::Instance()->jni_object()) {
     WXBridge::Instance()->Reset(env, jcaller);
   }
-  if (!WeexCoreManager::Instance()->script_thread()){
+  if (!WeexCoreManager::Instance()->script_thread()) {
     WeexCoreManager::Instance()->InitScriptThread();
   }
   if (scoped_render_strategy.getChars() != nullptr
