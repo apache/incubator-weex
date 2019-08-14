@@ -620,6 +620,9 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
 
   // If strategy is DATA_RENDER_BINARY, jscript is a jbyteArray, otherwise jstring
   // TODO use better way
+  if (!WXBridge::Instance()->jni_object()) {
+    WXBridge::Instance()->Reset(env, jcaller);
+  }
   if (scoped_render_strategy.getChars() != nullptr
       && strcmp(scoped_render_strategy.getChars(), "DATA_RENDER_BINARY") == 0) {
     JByteArrayRef byte_array(env, static_cast<jbyteArray>(jscript.Get()));
