@@ -26,6 +26,7 @@ import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.utils.tools.LogDetail;
 
 import java.io.IOException;
@@ -80,6 +81,9 @@ public class WXLogUtils {
   private static void log(String tag, String msg, LogLevel level){
     if(TextUtils.isEmpty(msg) || TextUtils.isEmpty(tag) || level == null || TextUtils.isEmpty(level.getName())){
       return;
+    }
+    if (level == LogLevel.ERROR && !TextUtils.isEmpty(msg) && msg.contains("IPCException")){
+      WXStateRecord.getInstance().recordIPCException("ipc",msg);
     }
 
     if(sLogWatcher !=null){

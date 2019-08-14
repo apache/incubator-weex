@@ -189,7 +189,7 @@ static void *newIPCServer(void *_td) {
       futexPageQueue->spinWaitPeer();
       listener->listen();
     } catch (IPCException &e) {
-        LOGE("server died");
+        LOGE("IPCException server died %s",e.msg());
         closeServerFd(td->ipcServerFd);
         base::android::DetachFromVM();
         pthread_exit(NULL);
