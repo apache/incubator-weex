@@ -249,6 +249,8 @@ namespace WeexCore {
         );
     }
 
+    //FIXME If WeexCore::InitFramework is not invoked, there will be a NPE
+    // problem due to message_loop is nullptr.
     void EagleBridge::WeexCoreHandler::PostTaskToMsgLoop(const weex::base::Closure& closure){
 #ifdef OS_ANDROID
         WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(closure);
