@@ -867,6 +867,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   }
 
+  public void restartWeexCoreThread(){
+      WXLogUtils.e("weex","restartWeexCoreThread");
+      WXThread oldThread = mJSThread;
+      mJSThread = new WXThread("WeexJSBridgeThread", this);
+      mJSHandler = mJSThread.getHandler();
+      oldThread.quit();
+  }
+
   public int callReportCrashReloadPage(String instanceId, String crashFile) {
     boolean isCrashFileEmpty = TextUtils.isEmpty(crashFile);
     try {
@@ -876,6 +884,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         url = instance.getBundleUrl();
         instance.setHasException(true);
       }
+      Map<String,String> extInfo = new HashMap<>(2);
+      extInfo.put("weexCoreThreadStackTrace:",WXBridgeManager.getInstance().getWeexCoreThreadStackTrace());
+      extInfo.put("wxStateInfo",WXStateRecord.getInstance().getStateInfo().toString());
+
       if(!isCrashFileEmpty) {
         try {
             if (WXEnvironment.getApplication() != null) {
@@ -886,15 +898,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         WXStateRecord.getInstance().onJSCCrash();
-        callReportCrash(crashFile, instanceId, url);
+        callReportCrash(crashFile, instanceId, url,extInfo);
       } else {
         WXStateRecord.getInstance().onJSEngineReload();
-         commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_RELOAD_PAGE, "reboot jsc Engine", instanceId, url);
+         commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_RELOAD_PAGE, "reboot jsc Engine", instanceId, url,extInfo);
       }
 
       if (reInitCount > CRASHREINIT) {
         WXExceptionUtils.commitCriticalExceptionRT("jsEngine", WXErrorCode.WX_ERR_RELOAD_PAGE_EXCEED_LIMIT,
-            "callReportCrashReloadPage","reInitCount:"+reInitCount,null);
+            "callReportCrashReloadPage","reInitCount:"+reInitCount,extInfo);
         return IWXBridge.INSTANCE_RENDERING_ERROR;
       }
       reInitCount++;
@@ -914,6 +926,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         boolean reloadThisInstance = shouldReloadCurrentInstance(
                 WXSDKManager.getInstance().getSDKInstance(instanceId).getBundleUrl());
+        boolean restartCoreThread = true;
+        IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+        if (null != adapter){
+            String config = adapter.getConfig("wxapm","restartCoreThread","true");
+            restartCoreThread = Boolean.valueOf(config);
+        }
+        if (restartCoreThread){
+              WXBridgeManager.getInstance().restartWeexCoreThread();
+        }
+        WXSDKManager.getInstance().getSDKInstance(instanceId).getContainerInfo()
+            .put("restartWeexCoreThread",String.valueOf(restartCoreThread));
         new ActionReloadPage(instanceId, reloadThisInstance).executeAction();
       }
 
@@ -955,7 +978,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return false;
   }
 
-  public void callReportCrash(String crashFile, final String instanceId, final String url) {
+  public void callReportCrash(String crashFile, final String instanceId, final String url,final Map<String,String> extInfo) {
     // statistic weex core process crash
     Date date = new Date();
     DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
@@ -986,7 +1009,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                   // }
                   result.append(s + "\n");
                 }
-                commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_JSC_CRASH, result.toString(), instanceId, url);
+                commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_JSC_CRASH, result.toString(), instanceId, url,extInfo);
                 br.close();
               } catch (Exception e) {
                 WXLogUtils.e(WXLogUtils.getStackTrace(e));
@@ -1454,7 +1477,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   }
 
   public void commitJscCrashAlarmMonitor(final String type, final WXErrorCode errorCode, String errMsg,
-                                         String instanceId, String url) {
+                                         String instanceId, String url,Map<String, String> extInfo) {
     if (TextUtils.isEmpty(type) || errorCode == null) {
       return;
     }
@@ -1464,6 +1487,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     String exception = "weex core process crash and restart exception";
     Map<String, String> extParams = new HashMap<String, String>();
     extParams.put("jscCrashStack", errMsg);
+    if (null != extInfo){
+      extParams.putAll(extInfo);
+    }
     IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
     if (adapter != null) {
       WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, url, errorCode, method, exception, extParams);
@@ -3595,4 +3621,24 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     mWeexCoreEnvOptions.clear();
   }
+
+  public  String getWeexCoreThreadStackTrace(){
+    if (null == mJSThread){
+      return "null == mJSThread";
+    }
+    StringBuilder stringBuilder = new StringBuilder();
+
+    try {
+      stringBuilder.append(String.format("Thread Name: '%s'\n", mJSThread.getName()));
+      stringBuilder.append(String.format(Locale.ENGLISH,"\"%s\" prio=%d tid=%d %s\n", mJSThread.getName(), mJSThread.getPriority(), mJSThread.getId(), mJSThread.getState()));
+
+      for (StackTraceElement e: mJSThread.getStackTrace()){
+        stringBuilder.append(String.format("\tat %s\n", e.toString()));
+      }
+    } catch (Exception var8) {
+      Log.e("weex", "getJSThreadStackTrace error:", var8);
+    }
+    return stringBuilder.toString();
+  }
+
 }
