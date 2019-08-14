@@ -623,6 +623,9 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
   if (!WXBridge::Instance()->jni_object()) {
     WXBridge::Instance()->Reset(env, jcaller);
   }
+  if (!WeexCoreManager::Instance()->script_thread()){
+    WeexCoreManager::Instance()->InitScriptThread();
+  }
   if (scoped_render_strategy.getChars() != nullptr
       && strcmp(scoped_render_strategy.getChars(), "DATA_RENDER_BINARY") == 0) {
     JByteArrayRef byte_array(env, static_cast<jbyteArray>(jscript.Get()));
