@@ -867,6 +867,14 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   }
 
+  public void restartWeexCoreThread(){
+      WXLogUtils.e("weex","restartWeexCoreThread");
+      WXThread oldThread = mJSThread;
+      mJSThread = new WXThread("WeexJSBridgeThread", this);
+      mJSHandler = mJSThread.getHandler();
+      oldThread.quit();
+  }
+
   public int callReportCrashReloadPage(String instanceId, String crashFile) {
     boolean isCrashFileEmpty = TextUtils.isEmpty(crashFile);
     try {
@@ -918,6 +926,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
         boolean reloadThisInstance = shouldReloadCurrentInstance(
                 WXSDKManager.getInstance().getSDKInstance(instanceId).getBundleUrl());
+        boolean restartCoreThread = true;
+        IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+        if (null != adapter){
+            String config = adapter.getConfig("wxapm","restartCoreThread","true");
+            restartCoreThread = Boolean.valueOf(config);
+        }
+        if (restartCoreThread){
+              WXBridgeManager.getInstance().restartWeexCoreThread();
+        }
+        WXSDKManager.getInstance().getSDKInstance(instanceId).getContainerInfo()
+            .put("restartWeexCoreThread",String.valueOf(restartCoreThread));
         new ActionReloadPage(instanceId, reloadThisInstance).executeAction();
       }
 
