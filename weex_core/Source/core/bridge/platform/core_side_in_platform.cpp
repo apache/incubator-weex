@@ -34,6 +34,7 @@
 #include "core/json/JsonRenderManager.h"
 #include "core/bridge/eagle_bridge.h"
 #include "third_party/json11/json11.hpp"
+#include "core/moniter/render_performance.h"
 #ifdef OS_ANDROID
 #include <android/utils/params_utils.h>
 #include <wson/wson.h>
@@ -629,6 +630,13 @@ void CoreSideInPlatform::SetLogType(const int logType, const bool isPerf) {
       ->script_bridge()
       ->script_side()
       ->SetLogType(logType,isPerf);
+}
+
+double CoreSideInPlatform::GetLayoutTime(const char* instanceId) const {
+    RenderPageBase *page = RenderManager::GetInstance()->GetPage(instanceId);
+    if (page == nullptr) return 0;
+    if (!page->is_platform_page()) return 0;
+    return page->getPerformance()->cssLayoutTime;
 }
 
 
