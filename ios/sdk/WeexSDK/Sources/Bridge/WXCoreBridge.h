@@ -232,6 +232,8 @@ namespace WeexCore
 
 + (void)layoutPage:(NSString*)pageId forced:(BOOL)forced;
 
++ (double)getLayoutTime:(NSString*)pageId;
+
 + (void)closePage:(NSString*)pageId;
 
 + (BOOL)reloadPageLayout:(NSString*)pageId;

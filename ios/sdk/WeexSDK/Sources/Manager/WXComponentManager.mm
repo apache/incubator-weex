@@ -316,8 +316,8 @@ static NSThread *WXComponentThread;
     if (supercomponent.ignoreInteraction) {
         component.ignoreInteraction = YES;
     } else {
-        if ([[attributes objectForKey:@"ignoreInteraction"] boolValue]) {
-            component.ignoreInteraction = YES;
+        if ([attributes objectForKey:@"ignoreInteraction"]) {
+            component.ignoreInteraction = [[attributes objectForKey:@"ignoreInteraction"] boolValue];
         } else {
             if (component->_positionType == WXPositionTypeFixed) {
                 component.ignoreInteraction = YES;

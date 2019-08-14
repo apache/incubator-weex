@@ -455,13 +455,12 @@ static BOOL bNeedRemoveEvents = YES;
         [self setNeedsDisplay];
         [[NSNotificationCenter defaultCenter] postNotificationName:WX_COMPONENT_NOTIFICATION_VIEW_LOADED object:self];
         [self viewDidLoad];
+        double diffTime = CACurrentMediaTime()*1000 - startCreateViewTime;
+        [self.weexInstance.performance recordViewCreatePerformance:diffTime];
         
         if (_lazyCreateView) {
             [self _buildViewHierarchyLazily];
         }
-
-        double diffTime = CACurrentMediaTime()*1000 - startCreateViewTime;
-        [self.weexInstance.performance recordViewCreatePerformance:diffTime];
         [self _handleFirstScreenTime];
         
         [self.weexInstance.performance onViewLoad:self];

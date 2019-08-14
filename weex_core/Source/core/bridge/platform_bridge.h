@@ -141,6 +141,8 @@ class PlatformBridge {
 
     virtual void SetLogType(const int logType, const bool isPerf) = 0;
 
+    virtual double GetLayoutTime(const char* instanceId) const {return 0;}
+
     inline PlatformBridge* bridge() { return bridge_; }
 
    protected:

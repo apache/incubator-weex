@@ -45,6 +45,8 @@ extern NSString* const KEY_PAGE_PROPERTIES_UIKIT_TYPE;
 extern NSString* const KEY_PAGE_STAGES_START;
 extern NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_START;
 extern NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_END;
+extern NSString* const KEY_PAGE_STAGES_DOWN_JS_START;
+extern NSString* const KEY_PAGE_STAGES_DOWN_JS_END;
 extern NSString* const KEY_PAGE_STAGES_CUSTOM_PREPROCESS_START;
 extern NSString* const KEY_PAGE_STAGES_CUSTOM_PREPROCESS_END;
 extern NSString* const KEY_PAGE_STAGES_RENDER_ORGIGIN;
@@ -66,6 +68,7 @@ extern NSString* const KEY_PAGE_STATS_FS_CALL_JS_NUM;
 extern NSString* const KEY_PAGE_STATS_EXECUTE_JS_TIME;
 extern NSString* const KEY_PAGE_STATS_CREATE_COMPONENT_TIME;
 extern NSString* const KEY_PAGE_STATS_CREATE_VIEW_TIME;
+extern NSString* const KEY_PAGE_STATS_LAYOUT_TIME;
 extern NSString* const KEY_PAGE_STATS_FS_TIMER_NUM;
 extern NSString* const KEY_PAGE_STATS_FS_CALL_NATIVE_TIME;
 extern NSString* const KEY_PAGE_STATS_FS_CALL_NATIVE_NUM;
@@ -137,6 +140,8 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 - (void) updateMaxStats:(NSString *)name curMaxValue:(double)maxValue;
 - (void) updateExtInfoFromResponseHeader:(NSDictionary*) extInfo;
 - (void) forceSetInteractionTime:(long) unixTime;
+- (void) addUpdateComponentDataTimestamp:(long)unixTime;
+- (void) addUpdateComponentDataTime:(long)unixTime;
 
 
 #pragma mark - called by IWXHttpAdapter implementer
