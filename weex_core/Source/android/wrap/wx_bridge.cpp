@@ -306,7 +306,7 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
                           jobject params) {
   if (!WXBridge::Instance()->jni_object()) {
     WXBridge::Instance()->Reset(env, object);
-  };
+  }
   // Init platform thread --- ScriptThread
   WeexCoreManager::Instance()->InitScriptThread();
   // Exception handler for so
