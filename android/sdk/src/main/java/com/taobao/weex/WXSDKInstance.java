@@ -944,6 +944,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     Map<String,String> args = new HashMap<>(1);
     String vieTreeMsg = WhiteScreenUtils.takeViewTreeSnapShot(this);
     args.put("viewTree",null == vieTreeMsg?"null viewTreeMsg":vieTreeMsg);
+    args.put("weexCoreThreadStackTrace",WXBridgeManager.getInstance().getWeexCoreThreadStackTrace());
 
     for (Map.Entry<String,String> entry: WXStateRecord.getInstance().getStateInfo().entrySet()){
       args.put(entry.getKey(),entry.getValue());
