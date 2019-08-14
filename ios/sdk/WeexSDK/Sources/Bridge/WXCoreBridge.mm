@@ -1639,6 +1639,14 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     }
 }
 
++ (double)getLayoutTime:(NSString*)pageId {
+    if (platformBridge) {
+        const char* page = [pageId UTF8String] ?: "";
+        return platformBridge->core_side()->GetLayoutTime(page);
+    }
+    return 0;
+}
+
 + (void)closePage:(NSString*)pageId
 {
     if (platformBridge) {

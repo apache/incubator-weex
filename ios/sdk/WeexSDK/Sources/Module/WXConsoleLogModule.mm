@@ -19,6 +19,7 @@
 
 #import "WXConsoleLogModule.h"
 #import "WXLog.h"
+#include "base/log_defines.h"
 
 #if !TARGET_OS_WATCH
 #import <asl.h>
@@ -91,21 +92,26 @@ WX_EXPORT_METHOD(@selector(switchLogLevel:callback:))
     }
     
     if ([logLevel isEqualToString:@"off"]) {
+        weex::base::LogImplement::getLog()->setPrintLevel(WeexCore::LogLevel::Off);
         [WXLog registerExternalLog:OriginalLogger];
     }
     else if ([logLevel isEqualToString:@"error"]) {
+        weex::base::LogImplement::getLog()->setPrintLevel(WeexCore::LogLevel::Error);
         [WXConsoleLogHandler sharedInstance].logLevel = WXLogLevelError;
         [WXLog registerExternalLog:[WXConsoleLogHandler sharedInstance]];
     }
     else if ([logLevel isEqualToString:@"warning"]) {
+        weex::base::LogImplement::getLog()->setPrintLevel(WeexCore::LogLevel::Warn);
         [WXConsoleLogHandler sharedInstance].logLevel = WXLogLevelWarning;
         [WXLog registerExternalLog:[WXConsoleLogHandler sharedInstance]];
     }
     else if ([logLevel isEqualToString:@"info"]) {
+        weex::base::LogImplement::getLog()->setPrintLevel(WeexCore::LogLevel::Info);
         [WXConsoleLogHandler sharedInstance].logLevel = WXLogLevelInfo;
         [WXLog registerExternalLog:[WXConsoleLogHandler sharedInstance]];
     }
     else if ([logLevel isEqualToString:@"debug"]) {
+        weex::base::LogImplement::getLog()->setPrintLevel(WeexCore::LogLevel::Debug);
         [WXConsoleLogHandler sharedInstance].logLevel = WXLogLevelDebug;
         [WXLog registerExternalLog:[WXConsoleLogHandler sharedInstance]];
     }
