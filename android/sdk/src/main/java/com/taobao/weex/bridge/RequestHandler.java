@@ -86,9 +86,9 @@ public class RequestHandler {
 
   @Keep
   @CalledByNative
-  public void getBundleType(String instanceId, final String content, final long nativeCallback){
+  public void getBundleType(String instanceId, String content, long nativeCallback){
     BundType bundleType = WXBridgeManager.getInstance().getBundleType("", content);
-    final String bundleTypeStr = bundleType == null ? "Others" : bundleType.toString();
+    String bundleTypeStr = bundleType == null ? "Others" : bundleType.toString();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if ("Others".equalsIgnoreCase(bundleTypeStr) && null != instance){
       WXExceptionUtils.commitCriticalExceptionRT(
@@ -99,12 +99,7 @@ public class RequestHandler {
           null
       );
     }
-    WXBridgeManager.getInstance().post(new Runnable() {
-      @Override
-      public void run() {
-        nativeInvokeOnSuccess(nativeCallback, content, bundleTypeStr);
-      }
-    });
+    nativeInvokeOnSuccess(nativeCallback, content, bundleTypeStr);
   }
 
   class OnHttpListenerInner extends WXHttpListener {
@@ -117,9 +112,9 @@ public class RequestHandler {
 
     @Override
     public void onSuccess(WXResponse response) {
-        final String script = new String(response.originalData);
+        String script = new String(response.originalData);
         BundType bundleType = WXBridgeManager.getInstance().getBundleType("", script);
-        final String bundleTypeStr = bundleType == null ? "Others" : bundleType.toString();
+        String bundleTypeStr = bundleType == null ? "Others" : bundleType.toString();
         if ("Others".equalsIgnoreCase(bundleTypeStr) && null != getInstance()){
           WXExceptionUtils.commitCriticalExceptionRT(
               getInstance().getInstanceId(),
@@ -129,22 +124,12 @@ public class RequestHandler {
               null
           );
         }
-        WXBridgeManager.getInstance().post(new Runnable() {
-          @Override
-          public void run() {
-            nativeInvokeOnSuccess(sNativeCallback, script, bundleTypeStr);
-          }
-        });
+        nativeInvokeOnSuccess(sNativeCallback, script, bundleTypeStr);
     }
 
     @Override
     public void onFail(WXResponse response) {
-      WXBridgeManager.getInstance().post(new Runnable() {
-        @Override
-        public void run() {
-          nativeInvokeOnFailed(sNativeCallback);
-        }
-      });
+      nativeInvokeOnFailed(sNativeCallback);
     }
   }
 }
