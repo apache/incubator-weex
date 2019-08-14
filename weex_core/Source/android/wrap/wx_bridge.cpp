@@ -308,9 +308,7 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
     WXBridge::Instance()->Reset(env, object);
   };
   // Init platform thread --- ScriptThread
-  if (!WeexCoreManager::Instance()->script_thread()){
-    WeexCoreManager::Instance()->InitScriptThread();
-  };
+  WeexCoreManager::Instance()->InitScriptThread();
   // Exception handler for so
   SoUtils::RegisterExceptionHanler(
       [](const char* status_code, const char* error_msg) {
@@ -625,9 +623,6 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
   // TODO use better way
   if (!WXBridge::Instance()->jni_object()) {
     WXBridge::Instance()->Reset(env, jcaller);
-  }
-  if (!WeexCoreManager::Instance()->script_thread()) {
-    WeexCoreManager::Instance()->InitScriptThread();
   }
   if (scoped_render_strategy.getChars() != nullptr
       && strcmp(scoped_render_strategy.getChars(), "DATA_RENDER_BINARY") == 0) {
