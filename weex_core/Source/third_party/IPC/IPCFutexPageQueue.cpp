@@ -112,6 +112,7 @@ void IPCFutexPageQueue::lock(size_t id, bool checkFinish)
                 break;
             }
             struct timespec waitTime = { m_timeoutSec, 0 };
+            LOGE("IPCException IPCFutexPageQueue:: start futex wait");
             int futexReturn = __futex(pageStart + 1, FUTEX_WAIT, 0, &waitTime);
             if (futexReturn == -1) {
                 int myerrno = errno;

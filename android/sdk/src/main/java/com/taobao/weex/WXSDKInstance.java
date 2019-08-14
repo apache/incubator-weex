@@ -920,7 +920,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
                 onJSException(String.valueOf(WX_ERR_RELOAD_PAGE),"jsc reboot","jsc reboot");
               }
               if(!createInstanceHeartBeat) {
-                  WXBridgeManager.getInstance().callReportCrashReloadPage(mInstanceId, null);
+                  WXBridgeManager.getInstance().callReportCrashReloadPage(mInstanceId, null,false);
                   WXLogUtils.e("callReportCrashReloadPage with jsc reboot");
               }
             }
@@ -944,6 +944,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     Map<String,String> args = new HashMap<>(1);
     String vieTreeMsg = WhiteScreenUtils.takeViewTreeSnapShot(this);
     args.put("viewTree",null == vieTreeMsg?"null viewTreeMsg":vieTreeMsg);
+    args.put("weexCoreThreadStackTrace",WXBridgeManager.getInstance().getWeexCoreThreadStackTrace());
 
     for (Map.Entry<String,String> entry: WXStateRecord.getInstance().getStateInfo().entrySet()){
       args.put(entry.getKey(),entry.getValue());

@@ -44,6 +44,7 @@ public class WXStateRecord {
     private RecordList<Info> mJscCrashHistory;
     private RecordList<Info> mJscReloadHistory;
     private RecordList<Info> mJsThradWatchHistory;
+    private RecordList<Info> mIPCExceptionHistory;
 
     private static class SingleTonHolder {
         private static final WXStateRecord S_INSTANCE = new WXStateRecord();
@@ -60,6 +61,7 @@ public class WXStateRecord {
         mJscCrashHistory = new RecordList<>(10);
         mJscReloadHistory = new RecordList<>(10);
         mJsThradWatchHistory = new RecordList<>(20);
+        mIPCExceptionHistory = new RecordList<>(20);
     }
 
     /**
@@ -75,6 +77,11 @@ public class WXStateRecord {
      */
     public void recordAction(String instanceId, String action) {
         recordCommon(mActionHistory,new Info(WXUtils.getFixUnixTime(), instanceId, action));
+    }
+
+    public void recordIPCException (String instanceId,String exception){
+        String shortException = exception.length() > 200 ?exception.substring(0,200) : exception;
+        recordCommon(mIPCExceptionHistory,new Info(WXUtils.getFixUnixTime(), instanceId, shortException));
     }
 
     /**
@@ -134,6 +141,7 @@ public class WXStateRecord {
         reportTimeLineInfo.addAll(mJscCrashHistory);
         reportTimeLineInfo.addAll(mJscReloadHistory);
         reportTimeLineInfo.addAll(mJsThradWatchHistory);
+        reportTimeLineInfo.addAll(mIPCExceptionHistory);
         Collections.sort(reportTimeLineInfo);
         stateInfo.put("stateInfoList",reportTimeLineInfo.toString());
 
@@ -146,17 +154,6 @@ public class WXStateRecord {
         public RecordList(int maxSize) {
             super();
             this.maxSize = maxSize;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder builder = new StringBuilder();
-            E e = this.poll();
-            while (null != e){
-                builder.append('[').append(e.toString()).append(']').append("->");
-                e = this.poll();
-            }
-            return builder.toString();
         }
     }
 
@@ -174,7 +171,7 @@ public class WXStateRecord {
         @Override
         public String toString() {
             return new StringBuilder()
-                .append(instanceId).append(',').append(time).append(',').append(msg)
+                .append('[').append(instanceId).append(',').append(time).append(',').append(msg).append("]->")
                 .toString();
         }
 

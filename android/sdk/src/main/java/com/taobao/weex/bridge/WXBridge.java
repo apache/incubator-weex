@@ -485,7 +485,7 @@ import java.util.Map;
     WXLogUtils.e(TAG, "reportServerCrash instanceId:" + instanceId + " crashFile: " + crashFile);
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
-      errorCode = WXBridgeManager.getInstance().callReportCrashReloadPage(instanceId, crashFile);
+      errorCode = WXBridgeManager.getInstance().callReportCrashReloadPage(instanceId, crashFile,true);
 
       // upload crash log
     } catch (Throwable e) {
