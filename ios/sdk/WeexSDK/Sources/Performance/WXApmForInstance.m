@@ -44,6 +44,7 @@ NSString* const KEY_PAGE_PROPERTIES_JSLIB_VERSION  = @"wxJSLibVersion";
 NSString* const KEY_PAGE_PROPERTIES_WEEX_VERSION  = @"wxSDKVersion";
 NSString* const KEY_PAGE_PROPERTIES_REQUEST_TYPE  = @"wxRequestType";
 NSString* const KEY_PAGE_PROPERTIES_Z_CACHE_INFO  = @"wxZCacheInfo";
+NSString* const KEY_PAGE_PROPERTIES_GREY_BUNDLE = @"wxGreyBundle";
 NSString* const KEY_PAGE_PROPERTIES_JS_FM_INIT  = @"wxJsFrameworkInit";
 NSString* const KEY_PAGE_PROPERTIES_BUNDLE_TYPE = @"wxBundleType";
 NSString* const KEY_PAGE_PROPERTIES_CONTAINER_NAME = @"wxContainerName";
@@ -441,6 +442,11 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
         return;
     }
     
+    id wxGreyBundle = [extInfo objectForKey:KEY_PAGE_PROPERTIES_GREY_BUNDLE];
+    if (nil != wxGreyBundle && [wxGreyBundle isKindOfClass:NSString.class]) {
+        [self setProperty:KEY_PAGE_PROPERTIES_GREY_BUNDLE withValue:wxGreyBundle];
+    }
+
     id wxRequestType = [extInfo objectForKey:KEY_PAGE_PROPERTIES_REQUEST_TYPE];
     if (nil != wxRequestType && [wxRequestType isKindOfClass: NSString.class]) {
         [self setProperty:KEY_PAGE_PROPERTIES_REQUEST_TYPE withValue:wxRequestType];
