@@ -249,10 +249,11 @@ namespace WeexCore {
         );
     }
 
+    //FIXME Please don't call this method, which will cause downgrade of Weex.
     void EagleBridge::WeexCoreHandler::PostTaskToMsgLoop(const weex::base::Closure& closure){
-#ifdef OS_ANDROID
-        WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(closure);
-#endif
+        WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(
+            "", "PostTaskToMsgLoop",
+            "PostTaskToMsgLoop is not supported anymore, please update to the latest version of Weex.");
     }
     
     int EagleBridge::DataRenderHandler::DestroyInstance(const char *instanceId) {

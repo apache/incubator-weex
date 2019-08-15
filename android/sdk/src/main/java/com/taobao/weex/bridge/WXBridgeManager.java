@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.bridge;
 
+import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -27,12 +29,13 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -96,8 +99,6 @@ import com.taobao.weex.utils.WXWsonJSONSwitch;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
 import com.taobao.weex.utils.tools.LogDetail;
-import com.taobao.weex.utils.tools.TimeCalculator;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -109,7 +110,6 @@ import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -121,8 +121,6 @@ import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
 
 /**
  * Manager class for communication between JavaScript and Android.
@@ -152,6 +150,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public static final String METHOD_CREATE_INSTANCE = "createInstance";
   public static final String METHOD_CREATE_PAGE_WITH_CONTENT = "CreatePageWithContent";
   public static final String METHOD_UPDATE_COMPONENT_WITH_DATA = "UpdateComponentData";
+  private static final String METHOD_POST_TASK_TO_MSG_LOOP = "PostTaskToMsgLoop";
+  private static final String METHOD_JSFM_NOT_INIT_IN_EAGLE_MODE = "JsfmNotInitInEagleMode";
   public static final String METHOD_DESTROY_INSTANCE = "destroyInstance";
   public static final String METHOD_CALL_JS = "callJS";
   public static final String METHOD_SET_TIMEOUT = "setTimeoutCallback";
@@ -369,7 +369,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   // setJSFrameworkInit and isJSFrameworkInit may use on diff thread
   // use volatile
-  private boolean isJSFrameworkInit() {
+  @RestrictTo(Scope.LIBRARY)
+  boolean isJSFrameworkInit() {
     return mInit;
   }
 
@@ -2552,7 +2553,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE;
       } else if ( METHOD_CREATE_INSTANCE_CONTEXT.equals(function) && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT;
-      } else if ((METHOD_UPDATE_COMPONENT_WITH_DATA.equals(function) || METHOD_CREATE_PAGE_WITH_CONTENT.equals(function)) && !instance.getApmForInstance().hasAddView){
+      } else if (
+          (METHOD_UPDATE_COMPONENT_WITH_DATA.equals(function) ||
+          METHOD_CREATE_PAGE_WITH_CONTENT.equals(function) ||
+          METHOD_POST_TASK_TO_MSG_LOOP.equals(function) ||
+              METHOD_JSFM_NOT_INIT_IN_EAGLE_MODE.equals(function) )
+          && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_DEGRAD_EAGLE_RENDER_ERROR;
       }
       instance.onJSException(reportErrorCode.getErrorCode(), function, exception);
