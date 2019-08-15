@@ -86,9 +86,9 @@ public class RequestHandler {
 
   @Keep
   @CalledByNative
-  public void getBundleType(String instanceId, String content, long nativeCallback){
+  public void getBundleType(String instanceId, final String content, final long nativeCallback){
     BundType bundleType = WXBridgeManager.getInstance().getBundleType("", content);
-    String bundleTypeStr = bundleType == null ? "Others" : bundleType.toString();
+    final String bundleTypeStr = bundleType == null ? "Others" : bundleType.toString();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if ("Others".equalsIgnoreCase(bundleTypeStr) && null != instance){
       WXExceptionUtils.commitCriticalExceptionRT(
@@ -99,7 +99,12 @@ public class RequestHandler {
           null
       );
     }
-    nativeInvokeOnSuccess(nativeCallback, content, bundleTypeStr);
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        nativeInvokeOnSuccess(nativeCallback, content, bundleTypeStr);
+      }
+    });
   }
 
   class OnHttpListenerInner extends WXHttpListener {
@@ -112,9 +117,9 @@ public class RequestHandler {
 
     @Override
     public void onSuccess(WXResponse response) {
-        String script = new String(response.originalData);
+        final String script = new String(response.originalData);
         BundType bundleType = WXBridgeManager.getInstance().getBundleType("", script);
-        String bundleTypeStr = bundleType == null ? "Others" : bundleType.toString();
+        final String bundleTypeStr = bundleType == null ? "Others" : bundleType.toString();
         if ("Others".equalsIgnoreCase(bundleTypeStr) && null != getInstance()){
           WXExceptionUtils.commitCriticalExceptionRT(
               getInstance().getInstanceId(),
@@ -124,7 +129,12 @@ public class RequestHandler {
               null
           );
         }
-        nativeInvokeOnSuccess(sNativeCallback, script, bundleTypeStr);
+        WXBridgeManager.getInstance().post(new Runnable() {
+          @Override
+          public void run() {
+            nativeInvokeOnSuccess(sNativeCallback, script, bundleTypeStr);
+          }
+        });
     }
 
     @Override
