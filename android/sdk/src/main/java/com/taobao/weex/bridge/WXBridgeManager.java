@@ -29,6 +29,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
@@ -367,7 +369,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   // setJSFrameworkInit and isJSFrameworkInit may use on diff thread
   // use volatile
-  private boolean isJSFrameworkInit() {
+  @RestrictTo(Scope.LIBRARY)
+  boolean isJSFrameworkInit() {
     return mInit;
   }
 

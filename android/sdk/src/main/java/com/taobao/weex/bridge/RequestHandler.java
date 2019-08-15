@@ -102,7 +102,12 @@ public class RequestHandler {
     WXBridgeManager.getInstance().post(new Runnable() {
       @Override
       public void run() {
-        nativeInvokeOnSuccess(nativeCallback, content, bundleTypeStr);
+        if(WXBridgeManager.getInstance().isJSFrameworkInit()) {
+          nativeInvokeOnSuccess(nativeCallback, content, bundleTypeStr);
+        }
+        else {
+          nativeInvokeOnFailed(nativeCallback);
+        }
       }
     });
   }
@@ -132,7 +137,12 @@ public class RequestHandler {
         WXBridgeManager.getInstance().post(new Runnable() {
           @Override
           public void run() {
-            nativeInvokeOnSuccess(sNativeCallback, script, bundleTypeStr);
+            if(WXBridgeManager.getInstance().isJSFrameworkInit()) {
+              nativeInvokeOnSuccess(sNativeCallback, script, bundleTypeStr);
+            }
+            else{
+              nativeInvokeOnFailed(sNativeCallback);
+            }
           }
         });
     }
