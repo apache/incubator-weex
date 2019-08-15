@@ -149,6 +149,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public static final String METHOD_CREATE_PAGE_WITH_CONTENT = "CreatePageWithContent";
   public static final String METHOD_UPDATE_COMPONENT_WITH_DATA = "UpdateComponentData";
   private static final String METHOD_POST_TASK_TO_MSG_LOOP = "PostTaskToMsgLoop";
+  private static final String METHOD_JSFM_NOT_INIT_IN_EAGLE_MODE = "JsfmNotInitInEagleMode";
   public static final String METHOD_DESTROY_INSTANCE = "destroyInstance";
   public static final String METHOD_CALL_JS = "callJS";
   public static final String METHOD_SET_TIMEOUT = "setTimeoutCallback";
@@ -2571,7 +2572,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       } else if (
           (METHOD_UPDATE_COMPONENT_WITH_DATA.equals(function) ||
           METHOD_CREATE_PAGE_WITH_CONTENT.equals(function) ||
-          METHOD_POST_TASK_TO_MSG_LOOP.equals(function) )
+          METHOD_POST_TASK_TO_MSG_LOOP.equals(function) ||
+              METHOD_JSFM_NOT_INIT_IN_EAGLE_MODE.equals(function) )
           && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_DEGRAD_EAGLE_RENDER_ERROR;
       }

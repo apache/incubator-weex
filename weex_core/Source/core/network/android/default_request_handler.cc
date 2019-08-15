@@ -23,6 +23,7 @@
 #include "android/base/string/scoped_jstring_utf8.h"
 #include "base/android/jniprebuild/jniheader/RequestHandler_jni.h"
 #include "base/android/jni/android_jni.h"
+#include "core/manager/weex_core_manager.h"
 
 using namespace weex::core::network;
 
@@ -44,6 +45,9 @@ static void InvokeOnFailed(JNIEnv* env, jobject jcaller, jlong callback) {
   CallbackWrapper* callback_wrapper =
       reinterpret_cast<CallbackWrapper*>(callback);
   delete callback_wrapper;
+  WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(
+      "", "JsfmNotInitInEagleMode",
+      "JSFramework is not initialized when executing bundle JS in eagle mode");
 }
 
 namespace weex {
