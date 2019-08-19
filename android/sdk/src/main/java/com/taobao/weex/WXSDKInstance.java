@@ -501,6 +501,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mWXPerformance = new WXPerformance(mInstanceId);
     mApmForInstance = new WXInstanceApm(mInstanceId);
     WXSDKManager.getInstance().getAllInstanceMap().put(mInstanceId,this);
+    mTimeCalculator = new TimeCalculator(this);
   }
 
 
@@ -586,7 +587,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     // WXBridgeManager.getInstance().checkJsEngineMultiThread();
     mDisableSkipFrameworkInit = isDisableSkipFrameworkInDataRender();
 
-    mTimeCalculator = new TimeCalculator(this);
+    if(mTimeCalculator == null) {
+      mTimeCalculator = new TimeCalculator(this);
+    }
   }
 
   /**
