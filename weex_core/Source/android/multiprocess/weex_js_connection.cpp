@@ -196,10 +196,16 @@ static void *newIPCServer(void *_td) {
     }
     return nullptr;
 }
-
+static int s_memId = 0;
 
 IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandler, bool reinit) {
-  int fd = ashmem_create_region("WEEX_IPC_CLIENT", IPCFutexPageQueue::ipc_size);
+  pid_t pid = getpid();
+  int id = __sync_fetch_and_add(&s_memId, 1);
+  std::string clientName("WEEX_IPC_CLIENT-");
+  clientName += std::to_string(pid);
+  clientName += "-";
+  clientName += std::to_string(id);
+  int fd = ashmem_create_region(clientName.c_str(), IPCFutexPageQueue::ipc_size);
   if (-1 == fd) {
     throw IPCException("failed to create ashmem region: %s", strerror(errno));
   }
@@ -215,11 +221,15 @@ IPCSender *WeexJSConnection::start(IPCHandler *handler, IPCHandler *serverHandle
   std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), handler));
   m_impl->serverSender = std::move(sender);
   m_impl->futexPageQueue = std::move(futexPageQueue);
-
-  int fd2 = ashmem_create_region("WEEX_IPC_SERVER", IPCFutexPageQueue::ipc_size);
+  std::string serverName("WEEX_IPC_SERVER-");
+  serverName += std::to_string(pid);
+  serverName += "-";
+  serverName += std::to_string(id);
+  int fd2 = ashmem_create_region(serverName.c_str(), IPCFutexPageQueue::ipc_size);
   if (-1 == fd2) {
     throw IPCException("failed to create ashmem region: %s", strerror(errno));
   }
+  LOGE("weex create Client's Name is %s Server's name is %s",clientName.c_str(), serverName.c_str());
   fd_server_closed = false;
   ThreadData td = { static_cast<int>(fd2), static_cast<IPCHandler *>(serverHandler) };
 
