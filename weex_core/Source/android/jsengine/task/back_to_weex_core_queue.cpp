@@ -87,7 +87,7 @@ void BackToWeexCoreQueue::stop() {
 }
 
 void BackToWeexCoreQueue::IPCTask::run() {
-    if (params.empty())
+    if (params.empty() || WeexEnv::getEnv()->is_app_crashed())
         return;
 
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());;
