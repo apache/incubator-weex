@@ -714,7 +714,8 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
     CGRect rootViewFrame = rootView.frame;
     CGRect inputFrame = [self.view.superview convertRect:self.view.frame toView:rootView];
     if (movedUp) {
-        CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height) + _upriseOffset;
+        CGFloat inputOffset = inputFrame.size.height - (rootViewFrame.size.height - inputFrame.origin.y);
+        CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height- (inputOffset > 0 ? inputFrame.size.height - inputOffset : inputFrame.size.height)) + _upriseOffset;
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
