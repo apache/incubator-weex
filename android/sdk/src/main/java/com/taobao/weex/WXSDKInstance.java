@@ -1828,10 +1828,15 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         WXSDKManager.getInstance().destroyInstance(mInstanceId);
       }
 
-      if (mGlobalEventReceiver != null) {
-        getContext().unregisterReceiver(mGlobalEventReceiver);
-        mGlobalEventReceiver = null;
+      try {
+        if (mGlobalEventReceiver != null) {
+          getContext().unregisterReceiver(mGlobalEventReceiver);
+          mGlobalEventReceiver = null;
+        }
+      }catch (IllegalArgumentException e){
+        WXLogUtils.w(WXLogUtils.getStackTrace(e));
       }
+
       if (mRootComp != null) {
         mRootComp.destroy();
         mRootComp = null;
