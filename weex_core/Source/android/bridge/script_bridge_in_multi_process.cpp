@@ -72,9 +72,9 @@ static std::unique_ptr<IPCResult> HandleReportException(
   }
 
   WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
-      weex::base::MakeCopyable([pageId = std::string(pageId),
-                                funcS = std::string(func),
-                                exceptionStr = std::string(exceptionInfo)] {
+      weex::base::MakeCopyable([pageId = std::string(pageId == nullptr ? "" : pageId),
+                                funcS = std::string(func == nullptr ? "" : func),
+                                exceptionStr = std::string(exceptionInfo == nullptr ? "" : exceptionInfo)] {
         WeexCoreManager::Instance()
             ->script_bridge()
             ->core_side()
