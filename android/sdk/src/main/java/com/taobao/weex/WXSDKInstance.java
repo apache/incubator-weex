@@ -203,6 +203,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private List<OnBackPressedHandler> mWXBackPressedHandlers;
 
+  private List<OnActivityResultHandler> mWXOnActivityResultHandlers;
+
   private WXSDKInstance mParentInstance;
 
   private String mRenderType = RenderTypes.RENDER_TYPE_NATIVE;
@@ -307,6 +309,20 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public interface OnBackPressedHandler {
     boolean onBackPressed();
+  }
+
+  public static abstract class OnActivityResultHandler {
+    private String id;
+
+    public OnActivityResultHandler(String id) {
+      this.id = id;
+    }
+
+    public abstract boolean onActivityResult(int requestCode, int resultCode, Intent data, String id);
+
+    public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+      return onActivityResult(requestCode, resultCode, data, id);
+    }
   }
 
   /**
@@ -1523,6 +1539,16 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
             WXLogUtils.w("Warning :Component tree has not build completely, onActivityResult can not be call!");
         }
     }
+
+
+    if (mWXOnActivityResultHandlers != null && !mWXOnActivityResultHandlers.isEmpty()) {
+      for (OnActivityResultHandler onActivityResultHandler : mWXOnActivityResultHandlers) {
+        if (onActivityResultHandler.onActivityResult(requestCode, resultCode, data)) {
+          break;
+        }
+      }
+    }
+
   }
 
 
@@ -1854,6 +1880,18 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         mLayerOverFlowListeners.clear();
       }
 
+      if(mWXOnActivityResultHandlers != null && !mWXOnActivityResultHandlers.isEmpty()) {
+        mWXOnActivityResultHandlers.clear();
+      }
+
+      if(mWXBackPressedHandlers != null && !mWXBackPressedHandlers.isEmpty()) {
+        mWXBackPressedHandlers.clear();
+      }
+
+      if(mWXActionbarHandlers != null && !mWXActionbarHandlers.isEmpty()) {
+        mWXActionbarHandlers.clear();
+      }
+
       getFlatUIContext().destroy();
       mFlatGUIContext = null;
       mInstanceOnFireEventInterceptorList = null;
@@ -2009,6 +2047,24 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       mWXActionbarHandlers.remove(actionBarHandler);
     }
   }
+
+  public synchronized void unRegisterOnActivityResultHandler(OnActivityResultHandler onActivityResultHandler) {
+    if(mWXOnActivityResultHandlers != null && onActivityResultHandler != null) {
+      mWXOnActivityResultHandlers.remove(onActivityResultHandler);
+    }
+  }
+
+  public synchronized void registerOnActivityResultHandler(OnActivityResultHandler onActivityResultHandler) {
+    if(onActivityResultHandler == null) {
+      return;
+    }
+
+    if(mWXOnActivityResultHandlers == null) {
+      mWXOnActivityResultHandlers = new ArrayList<>();
+    }
+    mWXOnActivityResultHandlers.add(onActivityResultHandler);
+  }
+
 
   public synchronized void registerBackPressedHandler(OnBackPressedHandler backPressedHandler) {
     if(backPressedHandler == null) {
