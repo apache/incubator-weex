@@ -57,6 +57,8 @@ public class WXBridge implements IWXBridge {
 
   private native int nativeInitFramework(String framework, WXParams params);
 
+  private native int nativeInitEagleEnv(WXParams params);
+
   private native void nativeRefreshInstance(String instanceId, String namespace, String function, WXJSObject[] args);
 
   private native int nativeExecJS(String instanceId, String name, String function, WXJSObject[] args);
@@ -134,6 +136,8 @@ public class WXBridge implements IWXBridge {
    * */
   public native void nativeUpdateGlobalConfig(String config);
 
+  private native void nativeSetViewPortWidth(String instanceId, float viewPortWidth);
+
   public static final boolean MULTIPROCESS = true;
 
 
@@ -157,6 +161,11 @@ public class WXBridge implements IWXBridge {
       WXStateRecord.getInstance().recordAction("","nativeInitFramework:");
       return nativeInitFramework(framework, params);
     }
+  }
+
+  @Override
+  public int initEagleEnv(WXParams params) {
+    return nativeInitEagleEnv(params);
   }
 
   @Override
@@ -399,6 +408,21 @@ public class WXBridge implements IWXBridge {
       }
       Object options = WXWsonJSONSwitch.parseWsonOrJSON(optionsData);
       WXBridgeManager.getInstance().callNativeComponent(instanceId, ref, method, argArray, options);
+    }catch (Exception e){
+      WXLogUtils.e(TAG,  e);
+    }
+  }
+
+
+  /**
+   * Bridge component Js Method
+   *
+   */
+  @Override
+  @CalledByNative
+  public void callEagleTask(String task, String options) {
+    try{
+      WXBridgeManager.getInstance().callEagleTask(task, options);
     }catch (Exception e){
       WXLogUtils.e(TAG,  e);
     }

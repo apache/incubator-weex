@@ -186,6 +186,8 @@ class PlatformBridge {
     virtual std::unique_ptr<ValueWithType> RegisterPluginModule(const char *name, const char *class_name, const char *version) = 0;
     virtual std::unique_ptr<ValueWithType> RegisterPluginComponent(const char *name, const char *class_name, const char *version) = 0;
     virtual void PostTaskOnComponentThread(const weex::base::Closure closure) = 0;
+#else
+    virtual void CallEagleTask(const char* task, const char* options) {}
 #endif
     virtual void SetTimeout(const char* callback_id, const char* time) = 0;
     virtual void NativeLog(const char* str_array) = 0;

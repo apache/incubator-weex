@@ -42,6 +42,7 @@ public class WXComponentRegistry {
 
   private static Map<String, IFComponentHolder> sTypeComponentMap = new ConcurrentHashMap<>();
   private static ArrayList<Map<String, Object>> sComponentInfos=new ArrayList<>();
+  private static final Map<String, Runnable> sEagleComponentTasks=new ConcurrentHashMap<>();
 
   public static synchronized boolean registerComponent(Map<String, RegisterCache.ComponentCache> componentCacheMap) {
     if (componentCacheMap.isEmpty())
@@ -124,6 +125,67 @@ public class WXComponentRegistry {
     coms.add(componentInfo);
     WXSDKManager.getInstance().registerComponents(coms);
     return true;
+  }
+
+  public static boolean registerEagleOnlyComponent(final String type, final IFComponentHolder holder, final Map<String, Object> componentInfo){
+    if (holder == null || TextUtils.isEmpty(type)) {
+      return false;
+    }
+
+    Runnable tasks = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          Map<String, Object> registerInfo = componentInfo;
+          if (registerInfo == null) {
+            registerInfo = new HashMap<>();
+          }
+
+          registerInfo.put("type", type);
+          registerInfo.put("methods", holder.getMethods());
+          registerNativeComponent(type, holder);
+
+          ArrayList<Map<String, Object>> coms = new ArrayList<>();
+          coms.add(registerInfo);
+          WXSDKManager.getInstance().registerEagleComponents(coms);
+          sComponentInfos.add(registerInfo);
+        } catch (WXException e) {
+          WXLogUtils.e("register component error:", e);
+        }
+
+      }
+    };
+    sEagleComponentTasks.put(type, tasks);
+    WXBridgeManager.getInstance()
+        .post(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              registerNativeComponent(type, holder);
+            } catch (WXException e) {
+              WXLogUtils.e("register component error:", e);
+            }
+          }
+        });
+    return true;
+  }
+
+  /**
+   * will be called in js thread.
+   */
+  public static boolean requireEagleComponent(final String type){
+    Runnable remove = sEagleComponentTasks.remove(type);
+    if (remove == null){
+      return false;
+    }
+
+    try {
+      remove.run();
+      return true;
+    } catch (Exception e) {
+      WXLogUtils.e("register eagle component error:", e);
+      return false;
+    }
   }
 
   public static IFComponentHolder getComponent(String type) {

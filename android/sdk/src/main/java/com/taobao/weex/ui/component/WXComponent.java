@@ -241,7 +241,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   protected final void setContentBoxMeasurement(final ContentBoxMeasurement contentBoxMeasurement) {
     this.contentBoxMeasurement = contentBoxMeasurement;
     mInstance.addContentBoxMeasurement(getRenderObjectPtr(), contentBoxMeasurement);
-    WXBridgeManager.getInstance().bindMeasurementToRenderObject(getRenderObjectPtr());
+    WXBridgeManager.getInstance().bindMeasurementToRenderObject(getInstanceId(), getRenderObjectPtr());
   }
 
 

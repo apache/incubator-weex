@@ -156,6 +156,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public static final String METHD_COMPONENT_HOOK_SYNC = "componentHook";
   public static final String METHOD_CALLBACK = "callback";
   public static final String METHOD_REFRESH_INSTANCE = "refreshInstance";
+  public static final String METHOD_REFRESH_INSTANCE_EAGLE_ONLY = "refreshInstanceEagleOnly";
   public static final String METHOD_FIRE_EVENT_ON_DATA_RENDER_NODE = "fireEventOnDataRenderNode";
   public static final String METHOD_NOTIFY_TRIM_MEMORY = "notifyTrimMemory";
   public static final String METHOD_NOTIFY_SERIALIZE_CODE_CACHE =
@@ -178,6 +179,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private static final String UNDEFINED = "undefined";
   private static final String BUNDLE_TYPE = "bundleType";
   private static final String RENDER_STRATEGY = "renderStrategy";
+  private static final String EAGLE_TASK_REQUIRE_MODULE = "requireModule";
+  private static final String EAGLE_TASK_REQUIRE_COMP = "requireComp";
   private static final int INIT_FRAMEWORK_OK = 1;
   private static final int CRASHREINIT = 50;
   static volatile WXBridgeManager mBridgeManager;
@@ -679,6 +682,25 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
     return null;
   }
+
+  public void callEagleTask(String task, String options) {
+    if (task == null){
+      return;
+    }
+
+    Log.e("EAGLE_TEST", "req: "+task+":"+options);
+    switch (task){
+      case EAGLE_TASK_REQUIRE_MODULE:{
+        WXModuleManager.requireEagleModule(options);
+        break;
+      }
+      case EAGLE_TASK_REQUIRE_COMP:{
+        WXComponentRegistry.requireEagleComponent(options);
+        break;
+      }
+    }
+  }
+
 
   /**
    * Dispatch the native task to be executed.
@@ -1190,6 +1212,24 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     msg.sendToTarget();
   }
 
+  public void initEagleCoreEnv() {
+    if (WXSDKEngine.isSoInitialized()) {
+      try {
+        WXLogUtils.d("[WXBridgeManager] initEagleEnv");
+        // extends initFramework
+        if (mWXBridge.initEagleEnv(assembleDefaultOptions()) == INIT_FRAMEWORK_OK) {
+          Map<String, Object> domMap = new HashMap<>();
+          domMap.put(WXDomModule.WXDOM, WXDomModule.METHODS);
+          registerEagleModules(domMap);
+        } else {
+          WXLogUtils.e("[WXBridgeManager] initEagleEnv fail");
+        }
+      } catch (Throwable e) {
+        WXLogUtils.e("[WXBridgeManager] initEagleEnv ", e);
+      }
+    }
+  }
+
   @Deprecated
   public void fireEvent(final String instanceId, final String ref,
                         final String type, final Map<String, Object> data) {
@@ -1414,7 +1454,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXJSObject dataObj = new WXJSObject(WXJSObject.JSON,
               refreshData.data == null ? "{}" : refreshData.data);
       WXJSObject[] args = {instanceIdObj, dataObj};
-      mWXBridge.refreshInstance(instanceId, null, METHOD_REFRESH_INSTANCE, args);
+
+      String METHOD = (instance!=null && instance.getRenderStrategy() == WXRenderStrategy.DATA_RENDER_BINARY)?
+          METHOD_REFRESH_INSTANCE_EAGLE_ONLY:METHOD_REFRESH_INSTANCE;
+      mWXBridge.refreshInstance(instanceId, null, METHOD, args);
     } catch (Throwable e) {
       String err = "[WXBridgeManager] invokeRefreshInstance " + WXLogUtils.getStackTrace(e);
       WXExceptionUtils.commitCriticalExceptionRT(instanceId,
@@ -2120,6 +2163,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   @SuppressWarnings("unchecked")
   private void invokeCallJSBatch(Message message) {
     if (mNextTickTasks.isEmpty() || !isJSFrameworkInit()) {
+      Object instId = message.obj;
+      if (instId instanceof String && isSkipFrameworkInit((String) instId)){
+        return;
+      }
       if (!isJSFrameworkInit()) {
         WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized!!  message:" + message.toString());
       }
@@ -2288,6 +2335,33 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       post(runnable, null);
     }
   }
+  /**
+   * Registered Eagle component, must be called in js thread.
+   */
+  public void registerEagleComponents(final List<Map<String, Object>> components) {
+    if (mJSHandler == null || components == null
+            || components.size() == 0) {
+      return;
+    }
+
+    if(isJSThread()){
+      invokeRegisterEagleComponent(components);
+    }
+  }
+
+  /**
+   * Registered Eagle module, must be called in js thread.
+   */
+  public void registerEagleModules(Map<String, Object> modules) {
+    if (mJSHandler == null || modules == null
+            || modules.size() == 0) {
+      return;
+    }
+
+    if(isJSThread()){
+      invokeRegisterEagleModules(modules);
+    }
+  }
 
   public void execJSService(final String service) {
     post(new Runnable() {
@@ -2334,17 +2408,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       failReceiver.add(modules);
       return;
     }
-
+    invokeRegisterEagleModules(modules);
     WXJSObject[] args = {WXWsonJSONSwitch.toWsonOrJsonWXJSObject(modules)};
     String errorMsg = null;
-    try{
-      // TODO use a better way
-      if (mWXBridge instanceof WXBridge) {
-        ((WXBridge) mWXBridge).registerModuleOnDataRenderNode(WXJsonUtils.fromObjectToJSONString(modules));
-      }
-    } catch (Throwable e){
-      WXLogUtils.e("Weex [data_render register err]", e);
-    }
     try {
         if(0 == mWXBridge.execJS("", null, METHOD_REGISTER_MODULES, args)) {
             errorMsg = "execJS error";
@@ -2375,6 +2441,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
   }
 
+  private void invokeRegisterEagleModules(Map<String, Object> modules) {
+    try{
+      if (mWXBridge instanceof WXBridge && modules != null) {
+        ((WXBridge) mWXBridge).registerModuleOnDataRenderNode(WXJsonUtils.fromObjectToJSONString(modules));
+      }
+    } catch (Throwable e){
+      WXLogUtils.e("Weex [data_render register err]", e);
+    }
+  }
+
   private void invokeRegisterComponents(List<Map<String, Object>> components, List<Map<String, Object>> failReceiver) {
     if (components == failReceiver) {
       throw new RuntimeException("Fail receiver should not use source.");
@@ -2390,16 +2466,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if (components == null) {
       return;
     }
-
-    try{
-      // TODO use a better way
-      if (mWXBridge instanceof WXBridge) {
-        ((WXBridge) mWXBridge).registerComponentOnDataRenderNode(WXJsonUtils.fromObjectToJSONString(components));
-      }
-    } catch (Throwable e){
-      WXLogUtils.e("Weex [data_render register err]", e);
-    }
-
+    invokeRegisterEagleComponent(components);
     WXJSObject[] args = {WXWsonJSONSwitch.toWsonOrJsonWXJSObject(components)};
     String errorMsg = null;
     try {
@@ -2418,6 +2485,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 WXErrorCode.WX_KEY_EXCEPTION_INVOKE_REGISTER_COMPONENT,
                 METHOD_REGISTER_COMPONENTS, errorMsg,
                 null);
+    }
+  }
+
+  private void invokeRegisterEagleComponent(List<Map<String, Object>> components) {
+    try{
+      if (mWXBridge instanceof WXBridge && components!=null) {
+        ((WXBridge) mWXBridge).registerComponentOnDataRenderNode(WXJsonUtils.fromObjectToJSONString(components));
+      }
+    } catch (Throwable e){
+      WXLogUtils.e("Weex [data_render register err]", e);
     }
   }
 
@@ -3190,8 +3267,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return contentBoxMeasurement;
   }
 
-  public void bindMeasurementToRenderObject(long ptr){
-    if (isJSFrameworkInit()) {
+  public void bindMeasurementToRenderObject(String instanceId, long ptr){
+    if (isSkipFrameworkInit(instanceId) || isJSFrameworkInit()) {
       mWXBridge.bindMeasurementToRenderObject(ptr);
     }
   }
@@ -3358,6 +3435,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mWXBridge.registerCoreEnv(key, value);
     else
       mWeexCoreEnvOptions.put(key, value);
+  }
+
+  public void registerCoreEnvEagle(String key, String value) {
+      mWXBridge.registerCoreEnv(key, value);
   }
 
   private void onJsFrameWorkInitSuccees() {

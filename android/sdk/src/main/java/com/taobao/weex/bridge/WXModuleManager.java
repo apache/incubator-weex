@@ -59,6 +59,7 @@ public class WXModuleManager {
   private static volatile ConcurrentMap<String, ModuleFactoryImpl> sModuleFactoryMap = new ConcurrentHashMap<>();
   private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
   private static Map<String, WXDomModule> sDomModuleMap = new HashMap<>();
+  private static final Map<String, Runnable> sEagleModuleTasks=new ConcurrentHashMap<>();
 
 
   /**
@@ -175,6 +176,73 @@ public class WXModuleManager {
 
   }
 
+  /**
+   * Register module to Eagle
+   */
+  public static boolean registerEagleModule(final String moduleName, final ModuleFactory factory, final boolean global) throws WXException {
+    if (moduleName == null || factory == null) {
+      return false;
+    }
+
+    if (TextUtils.equals(moduleName,WXDomModule.WXDOM)) {
+      WXLogUtils.e("Cannot registered module with name 'dom'.");
+      return false;
+    }
+
+    //execute task in js thread to make sure register order is same as the order invoke register method.
+    Runnable task = new Runnable() {
+      @Override
+      public void run() {
+        if (sModuleFactoryMap != null && sModuleFactoryMap.containsKey(moduleName)) {
+          WXLogUtils.w("WXComponentRegistry Duplicate the Module name: " + moduleName);
+        }
+        try {
+          registerNativeModule(moduleName, factory);
+        } catch (WXException e) {
+          WXLogUtils.e("registerNativeModule" + e);
+        }
+
+        if (global) {
+          try {
+            WXModule wxModule = factory.buildInstance();
+            wxModule.setModuleName(moduleName);
+            sGlobalModuleMap.put(moduleName, wxModule);
+          } catch (Exception e) {
+            WXLogUtils.e(moduleName + " class must have a default constructor without params. ", e);
+          }
+        }
+
+        registerEagleCoreModules(moduleName, factory);
+
+        try {
+          sModuleFactoryMap.put(moduleName, new ModuleFactoryImpl(factory));
+        } catch (Throwable e) {
+
+        }
+      }
+    };
+    sEagleModuleTasks.put(moduleName, task);
+    return true;
+  }
+
+  /**
+   * will be called in js thread.
+   */
+  public static boolean requireEagleModule(final String type){
+    Runnable remove = sEagleModuleTasks.remove(type);
+    if (remove == null){
+      return false;
+    }
+
+    try {
+      remove.run();
+      return true;
+    } catch (Exception e) {
+      WXLogUtils.e("[WXModuleManager] Register Eagle Module error:", e);
+      return false;
+    }
+  }
+
   static boolean registerNativeModule(String moduleName, ModuleFactory factory) throws WXException {
     if (factory == null) {
       return false;
@@ -195,6 +263,12 @@ public class WXModuleManager {
     return true;
   }
 
+  private static boolean registerEagleCoreModules(String moduleName, ModuleFactory factory) {
+    Map<String, Object> modules = new HashMap<>();
+    modules.put(moduleName, factory.getMethods());
+    WXSDKManager.getInstance().registerEagleModules(modules);
+    return true;
+  }
   static boolean registerJSModule(String moduleName, ModuleFactory factory) {
     Map<String, Object> modules = new HashMap<>();
     modules.put(moduleName, factory.getMethods());

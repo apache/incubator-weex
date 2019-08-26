@@ -184,6 +184,14 @@ void AndroidSide::CallNativeComponent(const char *page_id, const char *ref,
                                   arguments_length, options, options_length);
 }
 
+void AndroidSide::CallEagleTask(const char* task, const char* options) {
+  JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
+  wx_bridge_->CallEagleTask(env, task, options);
+}
+
 void AndroidSide::SetTimeout(const char *callback_id, const char *time) {
   JNIEnv *env = base::android::AttachCurrentThread();
   if (env == nullptr)
