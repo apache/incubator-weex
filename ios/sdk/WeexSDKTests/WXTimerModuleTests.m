@@ -18,7 +18,7 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "WXTimerModule.h"
+#import <WeexSDK/WeexSDK.h>
 #import "TestSupportUtils.h"
 
 @interface WXTimerModuleTests : XCTestCase

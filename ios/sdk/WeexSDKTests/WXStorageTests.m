@@ -18,8 +18,7 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "WeexSDK.h"
-#import "WXStorageModule.h"
+#import <WeexSDK/WeexSDK.h>
 
 @interface WXStorageTests : XCTestCase
 

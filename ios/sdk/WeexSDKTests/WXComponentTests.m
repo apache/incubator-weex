@@ -18,10 +18,8 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "WXSDKInstance.h"
-#import "WXComponent.h"
-#import "WXComponent_internal.h"
-#import "WXUtility.h"
+#import <WeexSDK/WeexSDK.h>
+
 
 @interface WXTestComponent : WXComponent
 

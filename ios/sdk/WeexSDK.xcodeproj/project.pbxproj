@@ -218,7 +218,6 @@
 		74A4BA9B1CB3BAA100195969 /* WXThreadSafeMutableDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 74A4BA991CB3BAA100195969 /* WXThreadSafeMutableDictionary.m */; };
 		74A4BA9E1CB3C0A100195969 /* WXHandlerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 74A4BA9C1CB3C0A100195969 /* WXHandlerFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		74A4BA9F1CB3C0A100195969 /* WXHandlerFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 74A4BA9D1CB3C0A100195969 /* WXHandlerFactory.m */; };
-		74A4BAA61CB4F98300195969 /* WXStreamModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 74A4BAA41CB4F98300195969 /* WXStreamModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		74A4BAA71CB4F98300195969 /* WXStreamModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 74A4BAA51CB4F98300195969 /* WXStreamModule.m */; };
 		74AD99841D5B0E59008F0336 /* WXPolyfillSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 74AD99821D5B0E59008F0336 /* WXPolyfillSet.h */; };
 		74AD99851D5B0E59008F0336 /* WXPolyfillSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 74AD99831D5B0E59008F0336 /* WXPolyfillSet.m */; };
@@ -593,7 +592,6 @@
 		D334510D1D3E19B80083598A /* WXCanvasModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D334510B1D3E19B80083598A /* WXCanvasModule.m */; };
 		D362F94F1C83EDA20003F546 /* WXWebViewModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D362F94D1C83EDA20003F546 /* WXWebViewModule.h */; };
 		D362F9501C83EDA20003F546 /* WXWebViewModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D362F94E1C83EDA20003F546 /* WXWebViewModule.m */; };
-		D3FC0DF71C508B2A002B9E31 /* WXTimerModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D3FC0DF51C508B2A002B9E31 /* WXTimerModule.h */; };
 		D3FC0DF81C508B2A002B9E31 /* WXTimerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D3FC0DF61C508B2A002B9E31 /* WXTimerModule.m */; };
 		D735F1B022D761F800B53CDF /* log_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = D735F1AB22D761F800B53CDF /* log_utils.h */; };
 		D735F1B122D761F800B53CDF /* log_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = D735F1AB22D761F800B53CDF /* log_utils.h */; };
@@ -868,6 +866,8 @@
 		ED053501207F4DEB007B4568 /* JSContext+Weex.h in Headers */ = {isa = PBXBuildFile; fileRef = ED0534FE207F4DEB007B4568 /* JSContext+Weex.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ED053502207F4DEB007B4568 /* JSContext+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = ED0534FF207F4DEB007B4568 /* JSContext+Weex.m */; };
 		ED053503207F4DEB007B4568 /* JSContext+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = ED0534FF207F4DEB007B4568 /* JSContext+Weex.m */; };
+		F75C58EB2313C03C002FFF94 /* WXTimerModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D3FC0DF51C508B2A002B9E31 /* WXTimerModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F75C591C2313C1FC002FFF94 /* WXStreamModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 74A4BAA41CB4F98300195969 /* WXStreamModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2370,8 +2370,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F75C591C2313C1FC002FFF94 /* WXStreamModule.h in Headers */,
+				F75C58EB2313C03C002FFF94 /* WXTimerModule.h in Headers */,
 				74A4BA9E1CB3C0A100195969 /* WXHandlerFactory.h in Headers */,
-				74A4BAA61CB4F98300195969 /* WXStreamModule.h in Headers */,
 				59A583081CF5B2FD0081FD3E /* WXNavigationDefaultImpl.h in Headers */,
 				2A837AB61CD9DE9200AEDF03 /* WXRefreshComponent.h in Headers */,
 				2A919DA61E321F1F006EB6B5 /* WXBridgeMethod.h in Headers */,
@@ -2424,7 +2425,6 @@
 				DC6836E61EBB12B200AD2D84 /* WXConfigCenterProtocol.h in Headers */,
 				DC7764941F3C2CA300B5727E /* WXRecyclerDragController.h in Headers */,
 				77788B712229252D000D5102 /* render_page_custom.h in Headers */,
-				74A4BAA61CB4F98300195969 /* WXStreamModule.h in Headers */,
 				B8D66CB321255730003960BD /* make_copyable.h in Headers */,
 				740451EA1E14BB26004157CB /* WXServiceFactory.h in Headers */,
 				744BEA591D0520F300452B5D /* WXComponent+Layout.h in Headers */,
@@ -2509,7 +2509,6 @@
 				B8D66C5B21255730003960BD /* render_action_add_element.h in Headers */,
 				745B2D701E5A8E1E0092D38A /* WXSectionDataController.h in Headers */,
 				745B2D6E1E5A8E1E0092D38A /* WXRecyclerUpdateController.h in Headers */,
-				D3FC0DF71C508B2A002B9E31 /* WXTimerModule.h in Headers */,
 				D312CE3B1C730DEB00046D68 /* WXWebComponent.h in Headers */,
 				741081261CEDB4EC001BC6E5 /* WXComponent_internal.h in Headers */,
 				77E65A191C155F25008B8775 /* WXScrollerComponent.h in Headers */,
@@ -2942,8 +2941,9 @@
 					};
 					74C8963C1D2AC2210043B82A = {
 						CreatedOnToolsVersion = 8.0;
+						DevelopmentTeam = 5783442933;
 						DevelopmentTeamName = "Nanjing Taobao Software Co., Ltd.";
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 					};
 					77D160FC1C02DBE70010B15B = {
 						CreatedOnToolsVersion = 7.1.1;
@@ -3504,7 +3504,9 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				DEVELOPMENT_TEAM = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5783442933;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/WeexSDK/Dependency",
@@ -3520,6 +3522,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.weex.WeexSDKTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
@@ -3529,7 +3532,9 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				DEVELOPMENT_TEAM = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5783442933;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/WeexSDK/Dependency",
@@ -3545,6 +3550,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.weex.WeexSDKTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Release;
 		};

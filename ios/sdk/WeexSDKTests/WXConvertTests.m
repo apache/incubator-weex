@@ -18,7 +18,7 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "WXConvert.h"
+#import <WeexSDK/WeexSDK.h>
 
 @interface WXConvertTests : XCTestCase
 

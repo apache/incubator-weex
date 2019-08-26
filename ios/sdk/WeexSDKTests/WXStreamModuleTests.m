@@ -18,9 +18,9 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "WXStreamModule.h"
-#import "WeexSDK.h"
-#import "WXResourceRequestHandlerDefaultImpl.h"
+
+#import <WeexSDK/WeexSDK.h>
+
 
 @interface WXStreamModuleTests : XCTestCase
 @property (nonatomic, strong)  WXStreamModule *streamModule;

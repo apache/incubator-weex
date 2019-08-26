@@ -18,8 +18,7 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "WXInstanceWrap.h"
-#import "WXSDKInstance.h"
+#import <WeexSDK/WeexSDK.h>
 
 @interface WXInstanceWrapTests : XCTestCase
 

@@ -18,12 +18,7 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "WXSDKEngine.h"
-#import "WXModuleFactory.h"
-#import "WXComponentFactory.h"
-#import "WXHandlerFactory.h"
-#import "WXResourceRequest.h"
-#import "WXResourceRequestHandlerDefaultImpl.h"
+#import <WeexSDK/WeexSDK.h>
 
 @interface WXSDKEngineTests : XCTestCase
 
