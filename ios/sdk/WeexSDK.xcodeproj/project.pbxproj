@@ -866,7 +866,7 @@
 		ED053501207F4DEB007B4568 /* JSContext+Weex.h in Headers */ = {isa = PBXBuildFile; fileRef = ED0534FE207F4DEB007B4568 /* JSContext+Weex.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ED053502207F4DEB007B4568 /* JSContext+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = ED0534FF207F4DEB007B4568 /* JSContext+Weex.m */; };
 		ED053503207F4DEB007B4568 /* JSContext+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = ED0534FF207F4DEB007B4568 /* JSContext+Weex.m */; };
-		F75C58EB2313C03C002FFF94 /* WXTimerModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D3FC0DF51C508B2A002B9E31 /* WXTimerModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F75C58EB2313C03C002FFF94 /* WXTimerModule.h in Headers */ = {isa = PBXBuildFile; fileRef = D3FC0DF51C508B2A002B9E31 /* WXTimerModule.h */; };
 		F75C591C2313C1FC002FFF94 /* WXStreamModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 74A4BAA41CB4F98300195969 /* WXStreamModule.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -2371,7 +2371,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F75C591C2313C1FC002FFF94 /* WXStreamModule.h in Headers */,
-				F75C58EB2313C03C002FFF94 /* WXTimerModule.h in Headers */,
 				74A4BA9E1CB3C0A100195969 /* WXHandlerFactory.h in Headers */,
 				59A583081CF5B2FD0081FD3E /* WXNavigationDefaultImpl.h in Headers */,
 				2A837AB61CD9DE9200AEDF03 /* WXRefreshComponent.h in Headers */,
@@ -2442,6 +2441,7 @@
 				591DD3321D23AD5800BE8709 /* WXErrorView.h in Headers */,
 				B8D66C8D21255730003960BD /* render_creator.h in Headers */,
 				17C74F0B2072145100AB4CAB /* WXAnalyzerCenter+Transfer.h in Headers */,
+				F75C58EB2313C03C002FFF94 /* WXTimerModule.h in Headers */,
 				D362F94F1C83EDA20003F546 /* WXWebViewModule.h in Headers */,
 				C4F012861E150307003378D0 /* WXWebSocketLoader.h in Headers */,
 				77D161381C02DE940010B15B /* WXBridgeManager.h in Headers */,

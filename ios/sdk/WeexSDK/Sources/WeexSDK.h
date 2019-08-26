@@ -34,7 +34,6 @@ FOUNDATION_EXPORT const unsigned char WeexSDKVersionString[];
 #import <WeexSDK/WXUtility.h>
 #import <WeexSDK/WXURLRewriteProtocol.h>
 #import <WeexSDK/WXType.h>
-#import <WeexSDK/WXTimerModule.h>
 #import <WeexSDK/WXStreamModule.h>
 #import <WeexSDK/WXScrollerProtocol.h>
 #import <WeexSDK/WXScrollerComponent.h>

@@ -115,7 +115,7 @@
         WXComponent *component = [[WXComponent alloc] initWithRef:@"0" type:@"div" styles:@{} attributes:@{} events:@[] weexInstance:instance];
         WXComponent *subcomponent = [[WXComponent alloc] initWithRef:@"1" type:@"div" styles:@{} attributes:@{} events:@[] weexInstance:instance];
         WXComponent *subSubcomponent = [[WXComponent alloc] initWithRef:@"2" type:@"div" styles:@{} attributes:@{} events:@[] weexInstance:instance];
-        subcomponent->_lazyCreateView = YES;
+//        subcomponent->_lazyCreateView = YES;
         [component _insertSubcomponent:subcomponent atIndex:0];
         [subcomponent _insertSubcomponent:subSubcomponent atIndex:0];
         dispatch_async(dispatch_get_main_queue(), ^{

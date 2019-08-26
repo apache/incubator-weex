@@ -19,6 +19,8 @@
 
 #import <XCTest/XCTest.h>
 #import <WeexSDK/WeexSDK.h>
+#import "WXAnimationModule.h"
+#import "TestSupportUtils.h"
 
 @interface WXAnimationModuleTests : XCTestCase
 
