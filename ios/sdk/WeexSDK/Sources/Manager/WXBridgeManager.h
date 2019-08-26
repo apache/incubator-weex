@@ -102,7 +102,7 @@ extern "C" {
  *  @param instance  :   instance id
  *  @param data      :   external data
  **/
-- (void)refreshInstance:(NSString *)instance data:(id)data;
+- (void)refreshInstance:(NSString *)instance data:(id _Nullable)data;
 
 /**
  *  Unload
@@ -114,7 +114,7 @@ extern "C" {
  *  @param instance  :   instance id
  *  @param data      :   parameters
  **/
-- (void)updateState:(NSString *)instance data:(id)data;
+- (void)updateState:(NSString *)instance data:(id _Nullable)data;
 
 /**
  *  Execute JSFramework Script

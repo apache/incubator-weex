@@ -22,7 +22,7 @@
 #define WEEXCORE_FLEXLAYOUT_WXCOREFLEXENUMS_H
 
 
-#include "flex_enum.h"
+#include <WeexSDK/flex_enum.h>
 #include <math.h>
 #include <cmath>
 

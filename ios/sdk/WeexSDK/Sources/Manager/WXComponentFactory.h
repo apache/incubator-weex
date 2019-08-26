@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface WXComponentConfig : WXInvocationConfig
 
-@property (nonatomic, strong) NSDictionary *properties;
+@property (nonatomic, strong) NSDictionary * _Nullable properties;
 
 - (instancetype)initWithName:(NSString *)name class:(NSString *)clazz pros:(NSDictionary * _Nullable)pros;
 

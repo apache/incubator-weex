@@ -96,7 +96,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param completion Completion callback. JS is executed in asynchronously.
  *
  */
-+ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary * _Nullable)options completion:(void(^)(BOOL result))completion;
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary * _Nullable)options completion:(nullable void(^)(BOOL result))completion;
 
 /**
  * @abstract Registers a component for a given name, options and js url
@@ -122,7 +122,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param completion Completion callback. JS is executed in asynchronously.
  *
  */
-+ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary * _Nullable)options completion:(void(^)(BOOL result))completion;
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary * _Nullable)options completion:(nullable void (^)(BOOL result))completion;
 
 /**
  * @abstract Registers a component for a given name, options and js code

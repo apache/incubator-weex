@@ -24,8 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface WXValidateResult : NSObject
 
-@property(nonatomic,assign)BOOL            isSuccess;
-@property(nonatomic,strong)NSError*        error;
+@property(nonatomic,assign) BOOL            isSuccess;
+@property(nonatomic,strong) NSError* _Nullable    error;
 
 @end
 
@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 -(WXModuleValidateResult *)validateWithWXSDKInstance:(WXSDKInstance *)wxsdkInstance module:(NSString*) moduel method:(NSString *)method args:(nullable NSArray *)args options:(nullable NSDictionary *)options;
 
--(WXComponentValidateResult *)validateWithWXSDKInstance:(WXSDKInstance *)wxsdkInstance component:(NSString *)componentName supercomponent:(WXComponent *)supercomponent;
+-(WXComponentValidateResult *)validateWithWXSDKInstance:(WXSDKInstance *)wxsdkInstance component:(NSString *)componentName supercomponent:(nullable WXComponent *)supercomponent;
 
 @end
 
