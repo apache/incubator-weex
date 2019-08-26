@@ -18,7 +18,9 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXModuleProtocol.h"
+#import <WeexSDK/WXModuleProtocol.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @class WXModuleMethod;
 
@@ -36,7 +38,7 @@
  *  @param callback  the module method callback
  *
  **/
-+ (void) addTask:(NSString *) url instanceId:(NSString *)instanceId callback:(WXModuleKeepAliveCallback)callback;
++ (void) addTask:(NSString *) url instanceId:(NSString *)instanceId callback:(WXModuleKeepAliveCallback _Nullable)callback;
 
 /**
  *  @abstract add prerender task
@@ -46,7 +48,7 @@
  *  @param callback  the module method callback
  *
  **/
-+ (void) addGlobalTask:(NSString *) url callback:(WXModuleKeepAliveCallback)callback;
++ (void) addGlobalTask:(NSString *) url callback:(WXModuleKeepAliveCallback _Nullable)callback;
 
 /**
  *  @abstract Returns true if url is exist in task .
@@ -108,3 +110,5 @@
  **/
 + (void)destroyTask:(NSString *)parentInstanceId;
 @end
+
+NS_ASSUME_NONNULL_END

@@ -18,8 +18,9 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXSDKInstance.h"
+#import <WeexSDK/WXSDKInstance.h>
 
+NS_ASSUME_NONNULL_BEGIN
 
 @interface WXValidateResult : NSObject
 
@@ -43,8 +44,10 @@
 
 -(BOOL)needValidate:(NSURL*) bundleUrl;
 
--(WXModuleValidateResult *)validateWithWXSDKInstance:(WXSDKInstance *)wxsdkInstance module:(NSString*) moduel method:(NSString *)method args:(NSArray *)args options:(NSDictionary *)options;
+-(WXModuleValidateResult *)validateWithWXSDKInstance:(WXSDKInstance *)wxsdkInstance module:(NSString*) moduel method:(NSString *)method args:(nullable NSArray *)args options:(nullable NSDictionary *)options;
 
 -(WXComponentValidateResult *)validateWithWXSDKInstance:(WXSDKInstance *)wxsdkInstance component:(NSString *)componentName supercomponent:(WXComponent *)supercomponent;
 
 @end
+
+NS_ASSUME_NONNULL_END

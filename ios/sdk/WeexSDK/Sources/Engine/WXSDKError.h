@@ -18,7 +18,9 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXSDKInstance.h"
+#import <WeexSDK/WXSDKInstance.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 #define WX_ERROR_GROUP_NATIVE   @"NATIVE"
 #define WX_ERROR_GROUP_JS       @"JS"
@@ -137,3 +139,4 @@ typedef NS_ENUM (NSInteger,WXSDKErrorGroup){
 
 @end
 
+NS_ASSUME_NONNULL_END

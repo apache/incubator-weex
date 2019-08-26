@@ -19,6 +19,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef void (^WXJSFrameworkLoadBlock)(NSString *path, NSString *script);
 
 @protocol WXJSFrameworkLoadProtocol <NSObject>
@@ -27,3 +29,5 @@ typedef void (^WXJSFrameworkLoadBlock)(NSString *path, NSString *script);
 - (void)loadPolyfillFramework:(WXJSFrameworkLoadBlock)block;
 
 @end
+
+NS_ASSUME_NONNULL_END

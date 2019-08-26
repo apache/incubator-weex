@@ -17,7 +17,9 @@
  * under the License.
  */
 
-#import "WXJSExceptionInfo.h"
+#import <WeexSDK/WXJSExceptionInfo.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @protocol WXPageEventNotifyEventProtocol <NSObject>
 
@@ -30,3 +32,5 @@
 - (void)pageDestroy:(NSString*)instanceId;
 
 @end
+
+NS_ASSUME_NONNULL_END

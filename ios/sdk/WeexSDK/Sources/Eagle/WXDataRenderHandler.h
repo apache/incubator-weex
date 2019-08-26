@@ -19,6 +19,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol WXDataRenderHandler <NSObject>
     
 - (void)createPage:(NSString *)pageId template:(NSString *)jsBundleString options:(NSDictionary *)options  data:(id)data;
@@ -31,7 +33,7 @@
 
 - (void)refreshDataRenderInstance:(NSString *)pageId data:(NSString *)data;
 
-- (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args domChanges:(NSDictionary *)domChanges;
+- (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args domChanges:(NSDictionary * _Nullable)domChanges;
 
 - (void)registerModules:(NSDictionary *)modules;
     
@@ -42,3 +44,5 @@
 - (void)DispatchPageLifecycle:(NSString *)pageId;
 
 @end
+
+NS_ASSUME_NONNULL_END

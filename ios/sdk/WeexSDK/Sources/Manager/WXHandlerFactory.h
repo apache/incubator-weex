@@ -19,6 +19,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface WXHandlerFactory : NSObject
 
 /**
@@ -43,3 +45,5 @@
 + (NSDictionary *)handlerConfigs;
 
 @end
+
+NS_ASSUME_NONNULL_END

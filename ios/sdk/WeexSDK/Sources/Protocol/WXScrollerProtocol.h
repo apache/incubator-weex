@@ -17,7 +17,9 @@
  * under the License.
  */
 
-#import "WXType.h"
+#import <WeexSDK/WXType.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @class WXComponent;
 @protocol WXScrollerProtocol <NSObject>
@@ -84,3 +86,4 @@
 
 @end
 
+NS_ASSUME_NONNULL_END

@@ -17,8 +17,12 @@
  * under the License.
  */
 
-#import "WXComponent.h"
+#import <WeexSDK/WXComponent.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface WXAComponent : WXComponent <UIGestureRecognizerDelegate>
 
 @end
+
+NS_ASSUME_NONNULL_END

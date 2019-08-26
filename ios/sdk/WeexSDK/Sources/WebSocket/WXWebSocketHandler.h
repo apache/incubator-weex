@@ -18,7 +18,9 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXModuleProtocol.h"
+#import <WeexSDK/WXModuleProtocol.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @protocol WXWebSocketDelegate<NSObject>
 - (void)didOpen;
@@ -35,3 +37,5 @@
 - (void)close:(NSString *)identifier code:(NSInteger)code reason:(NSString *)reason;
 - (void)clear:(NSString *)identifier;
 @end
+
+NS_ASSUME_NONNULL_END

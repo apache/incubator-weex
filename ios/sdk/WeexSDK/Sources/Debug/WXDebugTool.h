@@ -18,7 +18,9 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXModuleProtocol.h"
+#import <WeexSDK/WXModuleProtocol.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface WXDebugTool : NSObject<WXModuleProtocol>
 
@@ -42,7 +44,7 @@
 
 + (NSString*)getReplacedJSFramework;
 
-+ (BOOL) cacheJsService: (NSString *)name withScript: (NSString *)script withOptions: (NSDictionary *) options;
++ (BOOL) cacheJsService: (NSString *)name withScript: (NSString *)script withOptions: (NSDictionary * _Nullable) options;
 
 + (BOOL) removeCacheJsService: (NSString *)name;
 
@@ -53,3 +55,5 @@
 + (void)setRemoteTracing:(BOOL)isRemoteTracing;
 
 @end
+
+NS_ASSUME_NONNULL_END

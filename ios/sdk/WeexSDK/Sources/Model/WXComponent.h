@@ -18,7 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXType.h"
+#import <WeexSDK/WXType.h>
 
 @class WXSDKInstance;
 
@@ -486,3 +486,4 @@ typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
 @end
 
 NS_ASSUME_NONNULL_END
+

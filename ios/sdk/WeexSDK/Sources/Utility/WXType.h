@@ -20,6 +20,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef NS_ENUM(NSUInteger, WXLayoutDirection) {
     WXLayoutDirectionLTR,
     WXLayoutDirectionRTL,
@@ -88,3 +90,5 @@ typedef NS_ENUM(NSInteger, WXGradientType) {
     WXGradientTypeToTopleft,
     WXGradientTypeToBottomright,
 };
+
+NS_ASSUME_NONNULL_END
