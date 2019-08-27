@@ -232,6 +232,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 {
     if(self.view) {
         [self.view becomeFirstResponder];
+        self.weexInstance.apmInstance.forceStopRecordInteractionTime = YES;
     }
 }
 
@@ -846,6 +847,7 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
         }else
         {
             [self.view becomeFirstResponder];
+             self.weexInstance.apmInstance.forceStopRecordInteractionTime = YES;
         }
     } else {
         if([self isDateType])

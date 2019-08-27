@@ -22,13 +22,12 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.support.annotation.NonNull;
-import android.support.v4.util.LruCache;
-import android.util.Pair;
 import android.text.TextUtils;
-
+import android.util.Pair;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -334,7 +333,7 @@ public class WXResourceUtils {
     float[] points = {0, 0, 0, 0};
 
     if (!TextUtils.isEmpty(direction)) {
-      direction = direction.replaceAll("\\s*", "").toLowerCase();
+      direction = direction.replaceAll("\\s*", "").toLowerCase(Locale.ROOT);
     }
 
     switch (direction) {

@@ -84,6 +84,8 @@ public:
     virtual RenderObject *GetRenderObject(const std::string &ref) { return nullptr; };
     virtual void SetDefaultHeightAndWidthIntoRootRender(const float default_width, const float default_height,
                                                         const bool is_width_wrap_content, const bool is_height_wrap_content) {};
+
+    virtual RenderPerformance* getPerformance();
     
     virtual void OnRenderPageClose() = 0;
     

@@ -56,6 +56,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
   }
   PlatformBridge* bridge = new AndroidBridgeInSimple;
   WeexCoreManager::Instance()->set_platform_bridge(bridge);
+  weex::base::LogImplement::getLog()->setLogImplement(new LogUtilsWeexCore());
   return result ? JNI_VERSION_1_4 : JNI_FALSE;
 }
 

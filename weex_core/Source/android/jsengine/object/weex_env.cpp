@@ -21,8 +21,11 @@
 //
 
 #include "weex_env.h"
-#include "tlog.h"
+#include "core/bridge/script_bridge.h"
 
+namespace WeexCore {
+class ScriptBridge;
+}
 WeexEnv *WeexEnv::env_ = nullptr;
 
 WeexCore::ScriptBridge *WeexEnv::scriptBridge() { return scriptBridge_; }
@@ -31,39 +34,44 @@ bool WeexEnv::useWson() { return isUsingWson; }
 
 void WeexEnv::setUseWson(bool useWson) { isUsingWson = useWson; }
 
-void WeexEnv::setScriptBridge(WeexCore::ScriptBridge *scriptBridge) { scriptBridge_ = scriptBridge; }
+void WeexEnv::setScriptBridge(WeexCore::ScriptBridge *scriptBridge) {
+  scriptBridge_ = scriptBridge;
+}
 
 void WeexEnv::initIPC() {
-    // init IpcClient in io Thread
-    isMultiProcess = true;
-    m_ipc_client_.reset(new WeexIPCClient(ipcClientFd_));
+  // init IpcClient in io Thread
+  isMultiProcess = true;
+  m_ipc_client_.reset(new WeexIPCClient(ipcClientFd_));
 }
 WeexEnv::WeexEnv() {
-    this->enableBackupThread__ = false;
-    this->isUsingWson = true;
-    this->isJscInitOk_ = false;
-    this->m_cache_task_ = true;
+  this->enableBackupThread__ = false;
+  this->isUsingWson = true;
+  this->isJscInitOk_ = false;
+  this->m_cache_task_ = true;
 }
 
 void WeexEnv::initJSC(bool isMultiProgress) {
-    static std::once_flag initJSCFlag;
-    std::call_once(initJSCFlag, [isMultiProgress]{
-      if (!WEEXICU::initICUEnv(isMultiProgress)) {
-          LOGE("failed to init ICUEnv single process");
-          // return false;
-      }
+  weex::base::TimeCalculator
+      timeCalculator(weex::base::TaskPlatform::JSS_ENGINE, "initJSC", "initJSC");
+  static std::once_flag initJSCFlag;
+  std::call_once(initJSCFlag, [isMultiProgress] {
+    if (!WEEXICU::initICUEnv(isMultiProgress)) {
+      LOGE("failed to init ICUEnv single process");
+      // return false;
+    }
 
 #ifndef USE_JS_RUNTIME
-      Options::enableRestrictedOptions(true);
+    Options::enableRestrictedOptions(true);
 // Initialize JSC before getting VM.
-      WTF::initializeMainThread();
-      initHeapTimer();
-      JSC::initializeThreading();
+    WTF::initializeMainThread();
+    initHeapTimer();
+    JSC::initializeThreading();
 #if ENABLE(WEBASSEMBLY)
-      JSC::Wasm::enableFastMemory();
+    JSC::Wasm::enableFastMemory();
 #endif
 #endif
-    });
+  });
+  timeCalculator.taskEnd();
 }
 void WeexEnv::init_crash_handler(std::string crashFileName) {
   // initialize signal handler
@@ -72,13 +80,13 @@ void WeexEnv::init_crash_handler(std::string crashFileName) {
   crashHandler->initializeCrashHandler();
 }
 bool WeexEnv::is_app_crashed() {
-  if(!isMultiProcess)
+  if (!isMultiProcess)
     return false;
-    bool crashed = crashHandler->is_crashed();
-    if(crashed) {
-        Weex::TLog::tlog("%s", "AppCrashed");
-    }
-    return crashed;
+  bool crashed = crashHandler->is_crashed();
+  if (crashed) {
+    LOG_TLOG("jsEngine", "%s", "AppCrashed");
+  }
+  return crashed;
 }
 volatile bool WeexEnv::can_m_cache_task_() const {
   return m_cache_task_;
@@ -92,12 +100,14 @@ WeexEnv::~WeexEnv() {
 #endif
 }
 
-void WeexEnv::sendTLog(const char *tag, const char *log) {
-    if(m_back_to_weex_core_thread.get()) {
-        BackToWeexCoreQueue::IPCTask *ipc_task = new BackToWeexCoreQueue::IPCTask(
-                IPCProxyMsg::TLOGMSG);
-        ipc_task->addParams(tag);
-        ipc_task->addParams(log);
-        m_back_to_weex_core_thread->addTask(ipc_task);
-    }
+bool WeexEnv::sendLog(int level,
+                      const char *tag,
+                      const char *file,
+                      unsigned long line,
+                      const char *log) {
+
+  if (scriptBridge_ == nullptr) {
+    return false;
+  }
+  return scriptBridge_->core_side()->Log(level, tag, file, line, log);
 }

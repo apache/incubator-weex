@@ -499,10 +499,15 @@ do {\
     }
     
     // set font
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
-    CTFontRef ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName,
-                                           font.pointSize,
-                                           NULL);
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:WXTextStyleNormal fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
+    CTFontRef ctFont;
+    
+    if (_fontStyle == WXTextStyleItalic) {
+        CGAffineTransform matrix = CGAffineTransformMake(1, 0, tanf(16 * (CGFloat)M_PI / 180), 1, 0, 0);
+        ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName, font.pointSize, &matrix);
+    }else {
+        ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName, font.pointSize, NULL);
+    }
     
     _fontAscender = font.ascender;
     _fontDescender = font.descender;
@@ -567,14 +572,6 @@ do {\
         [attributedString addAttribute:NSKernAttributeName value:@(_letterSpacing) range:(NSRange){0, attributedString.length}];
     }
     
-    if ([self adjustLineHeight]) {
-        if (_lineHeight > font.lineHeight) {
-            [attributedString addAttribute:NSBaselineOffsetAttributeName
-                                     value:@((_lineHeight - font.lineHeight)/ 2)
-                                     range:(NSRange){0, attributedString.length}];
-        }
-    }
-    
     return attributedString;
 }
 
@@ -632,13 +629,6 @@ do {\
         [attributedString addAttribute:NSParagraphStyleAttributeName
                                  value:paragraphStyle
                                  range:(NSRange){0, attributedString.length}];
-    }
-    if ([self adjustLineHeight]) {
-        if (_lineHeight > font.lineHeight) {
-            [attributedString addAttribute:NSBaselineOffsetAttributeName
-                                     value:@((_lineHeight - font.lineHeight)/ 2)
-                                     range:(NSRange){0, attributedString.length}];
-        }
     }
 
     return attributedString;
@@ -795,12 +785,11 @@ do {\
         CTLineRef ctTruncatedLine = NULL;
         CTFrameGetLineOrigins(coreTextFrameRef, CFRangeMake(0, 0), lineOrigins);
         
-        CGFloat fixDescent = 0;
         if (lineCount > 0 && _lineHeight && WX_SYS_VERSION_LESS_THAN(@"10.0")) {
             CGFloat ascent, descent, leading;
             CTLineRef line1 = (CTLineRef)CFArrayGetValueAtIndex(ctLines, 0);
             CTLineGetTypographicBounds(line1, &ascent, &descent, &leading);
-            fixDescent = (descent + _fontDescender) + (ascent - _fontAscender);
+            lineOrigins[0].y += (_lineHeight-(leading+ascent+descent))/2;
         }
         
         for (CFIndex lineIndex = 0;(!_lines || _lines > lineIndex) && lineIndex < lineCount; lineIndex ++) {
@@ -811,7 +800,12 @@ do {\
             }
             CGPoint lineOrigin = lineOrigins[lineIndex];
             lineOrigin.x += padding.left;
-            lineOrigin.y -= padding.top + fixDescent;
+            if(_lineHeight && WX_SYS_VERSION_LESS_THAN(@"10.0")){
+                lineOrigin.y = lineOrigins[0].y - padding.top - _lineHeight * lineIndex ;
+            }else{
+                lineOrigin.y = lineOrigin.y - padding.top ;
+            }
+            
             CFArrayRef runs = CTLineGetGlyphRuns(lineRef);
             [mutableLines addObject:(__bridge id _Nonnull)(lineRef)];
             // lineIndex base 0
@@ -864,12 +858,12 @@ do {\
         run = (CTRunRef)CFArrayGetValueAtIndex(runs, runIndex);
         CFDictionaryRef attr = NULL;
         attr = CTRunGetAttributes(run);
-        if (0 == runIndex) {
-            NSNumber *baselineOffset = (NSNumber*)CFDictionaryGetValue(attr, (__bridge void *)NSBaselineOffsetAttributeName);
-            if (baselineOffset) {
-                lineOrigin.y += [baselineOffset doubleValue];
-            }
-        }
+        //To properly draw the glyphs in a run, the fields tx and ty of the CGAffineTransform returned by CTRunGetTextMatrix should be set to the current text position.
+        CGAffineTransform transform = CTRunGetTextMatrix(run);
+        transform.tx = lineOrigin.x;
+        transform.ty = lineOrigin.y;
+        CGContextSetTextMatrix(context, transform);
+        
         CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
         CTRunDraw(run, context, CFRangeMake(0, 0));
         CFIndex glyphCount = CTRunGetGlyphCount(run);

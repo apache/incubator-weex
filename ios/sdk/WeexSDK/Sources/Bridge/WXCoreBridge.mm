@@ -35,8 +35,10 @@
 #import "WXExceptionUtils.h"
 #import "WXModuleFactory.h"
 #import "WXComponentFactory.h"
+#import "WXRichText.h"
 #include "base/core_constants.h"
 #include "base/time_utils.h"
+#include "base/log_defines.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 #include "core/render/target/render_target.h"
@@ -624,6 +626,34 @@ break; \
         return 0;
     }
     
+    int IOSSide::AddChildToRichtext(const char* pageId, const char *nodeType, const char* ref,
+                            const char* parentRef, const char* richtextRef,
+                            std::map<std::string, std::string> *styles,
+                            std::map<std::string, std::string> *attributes)
+    {
+        RenderPageBase *page = RenderManager::GetInstance()->GetPage(pageId);
+        if (page == nullptr) {
+            return -1;
+        }
+        NSString* ns_richtextRef = NSSTRING(richtextRef);
+        NSString* ns_instanceId = NSSTRING(pageId);
+        NSString* ns_nodeType = NSSTRING(nodeType);
+        NSString* ns_ref = NSSTRING(ref);
+        NSString* ns_parentRef = NSSTRING(parentRef);
+        NSMutableDictionary* ns_styles = NSDICTIONARY(styles);
+        NSDictionary* ns_attributes = NSDICTIONARY(attributes);
+
+        WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:ns_instanceId];
+        WXComponentManager* manager = sdkInstance.componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+
+        WXRichText* richtext = (WXRichText*)[manager componentForRef:ns_richtextRef];
+        [richtext addChildNode:ns_nodeType ref:ns_ref styles:ns_styles attributes:ns_attributes toSuperNodeRef:ns_parentRef];
+        return 0;
+    }
+
     int IOSSide::Layout(const char* pageId, const char* ref,
                        float top, float bottom, float left, float right,
                        float height, float width, bool isRTL, int index)
@@ -682,6 +712,35 @@ break; \
         page->CallBridgeTime(getCurrentTime() - startTime);
     }
     
+    int IOSSide::UpdateRichtextStyle(const char* pageId, const char* ref,
+                             std::vector<std::pair<std::string, std::string>> *style,
+                             const char* parent_ref, const char* richtext_ref)
+    {
+        RenderPageBase *page = RenderManager::GetInstance()->GetPage(pageId);
+        if (page == nullptr) {
+            return -1;
+        }
+
+        NSString* ns_instanceId = NSSTRING(pageId);
+        NSString* ns_ref = NSSTRING(ref);
+        NSString* ns_richtextRef = NSSTRING(richtext_ref);
+        NSString* ns_parentRef = NSSTRING(parent_ref);
+        NSMutableDictionary* ns_style = NSDICTIONARY(style);
+
+        WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:ns_instanceId];
+        if (!sdkInstance) {
+            return -1;
+        }
+        WXComponentManager* manager = sdkInstance.componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+
+        WXRichText* richtext = (WXRichText*)[manager componentForRef:ns_richtextRef];
+        [richtext updateChildNodeStyles:ns_style ref:ns_ref parentRef:ns_parentRef];
+        return 0;
+    }
+
     int IOSSide::UpdateStyle(const char* pageId, const char* ref,
                             std::vector<std::pair<std::string, std::string>> *style,
                             std::vector<std::pair<std::string, std::string>> *margin,
@@ -753,13 +812,43 @@ break; \
         page->CallBridgeTime(getCurrentTime() - startTime);
         return 0;
     }
-        
-    int IOSSide::CreateFinish(const char* pageId)
+
+    int IOSSide::UpdateRichtextChildAttr(const char* pageId, const char* ref,
+                            std::vector<std::pair<std::string, std::string>> *attrs, const char* parent_ref, const char* richtext_ref)
     {
         RenderPageBase *page = RenderManager::GetInstance()->GetPage(pageId);
         if (page == nullptr) {
             return -1;
         }
+        if (attrs == nullptr) {
+            return 0;
+        }
+        if (attrs->size() == 0) {
+            return 0;
+        }
+
+        NSString* ns_instanceId = NSSTRING(pageId);
+        NSString* ns_ref = NSSTRING(ref);
+        NSString* ns_parentRef = NSSTRING(parent_ref);
+        NSString* ns_richtextRef = NSSTRING(richtext_ref);
+        NSDictionary* ns_attributes = NSDICTIONARY(attrs);
+        WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:ns_instanceId];
+        if (!sdkInstance) {
+            return -1;
+        }
+        WXComponentManager* manager = sdkInstance.componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+
+        WXRichText* richtext = (WXRichText*)[manager componentForRef:ns_richtextRef];
+        [richtext updateChildNodeAttributes:ns_attributes ref:ns_ref parentRef:ns_parentRef];
+        return 0;
+    }
+        
+    int IOSSide::CreateFinish(const char* pageId)
+    {
+        RenderPageBase *page = RenderManager::GetInstance()->GetPage(pageId);
         
         long long startTime = getCurrentTime();
         
@@ -776,16 +865,15 @@ break; \
         [manager startComponentTasks];
         [manager createFinish];
 
-        page->CallBridgeTime(getCurrentTime() - startTime);
+        if (page) {
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        }
         return 0;
     }
     
     int IOSSide::RenderSuccess(const char* pageId)
     {
         RenderPageBase *page = RenderManager::GetInstance()->GetPage(pageId);
-        if (page == nullptr) {
-            return -1;
-        }
         
         long long startTime = getCurrentTime();
         
@@ -802,10 +890,33 @@ break; \
         [manager startComponentTasks];
         [manager renderFinish];
         
-        page->CallBridgeTime(getCurrentTime() - startTime);
+        if (page) {
+            page->CallBridgeTime(getCurrentTime() - startTime);
+        }
         return 0;
     }
+
+    int IOSSide::RemoveChildFromRichtext(const char* pageId, const char* ref, const char* parent_ref, const char* richtext_ref) {
+        RenderPageBase *page = RenderManager::GetInstance()->GetPage(pageId);
+        if (page == nullptr) {
+            return -1;
+        }
         
+        NSString* ns_instanceId = NSSTRING(pageId);
+        NSString* ns_richtextRef = NSSTRING(richtext_ref);
+        NSString* ns_ref = NSSTRING(ref);
+        NSString* ns_parentRef = NSSTRING(parent_ref);
+
+        WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:ns_instanceId];
+        WXComponentManager* manager = sdkInstance.componentManager;
+        if (!manager.isValid) {
+            return -1;
+        }
+
+        WXRichText* richtext = (WXRichText*)[manager componentForRef:ns_richtextRef];
+        [richtext removeChildNode:ns_ref superNodeRef:ns_parentRef];
+        return 0;
+    }
     int IOSSide::RemoveElement(const char* pageId, const char* ref)
     {
         RenderPageBase *page = RenderManager::GetInstance()->GetPage(pageId);
@@ -942,9 +1053,9 @@ break; \
     
 #pragma mark - Log Bridge
     
-    class LogBridgeIOS: public LogBridge {
+    class LogBridgeIOS: public weex::base::LogBase {
     public:
-        virtual void log(LogLevel level, const char* tag, const char* file, unsigned long line, const char* log) override {
+        virtual bool log(LogLevel level, const char* tag, const char* file, unsigned long line, const char* log) override {
 #ifdef DEBUG
             switch (level) {
                 case LogLevel::Error:
@@ -981,6 +1092,7 @@ break; \
             
             [WXLog devLog:wxLogLevel file:file line:line format:@"<%s> %s", tag, log];
 #endif
+            return true;
         }
     };
 }
@@ -1261,10 +1373,12 @@ break; \
 
 - (void)callCreateFinish:(NSString*)pageId
 {
-    RenderPageCustom* page = [self getPage:pageId];
-    if (page && page->IsValid()) {
-        page->CreateFinish();
-    }
+    WXPerformBlockOnComponentThread(^{
+        RenderPageCustom* page = [self getPage:pageId];
+        if (page && page->IsValid()) {
+            page->CreateFinish();
+        }
+    });
 }
 
 - (void)callRefreshFinish:(NSString*)pageId
@@ -1430,7 +1544,15 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         env->AddOption("screen_width_pixels", std::to_string(screenSize.width));
         env->AddOption("screen_height_pixels", std::to_string(screenSize.height));
         
-        WeexCore::WeexCoreManager::Instance()->set_log_bridge(new WeexCore::LogBridgeIOS());
+        weex::base::LogImplement::getLog()->setLogImplement(new WeexCore::LogBridgeIOS());
+        
+#ifdef DEBUG
+        weex::base::LogImplement::getLog()->setDebugMode(true);
+#else
+        weex::base::LogImplement::getLog()->setDebugMode(false);
+#endif
+        
+        
         
         platformBridge = new WeexCore::PlatformBridge();
         platformBridge->set_platform_side(new WeexCore::IOSSide());

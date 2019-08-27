@@ -23,126 +23,132 @@
 
 #ifdef __ANDROID__
 #include <android/log.h>
+#include "base/log_defines.h"
 #endif
 
 #include "core/manager/weex_core_manager.h"
 
-namespace WeexCore {
-    bool DebugMode = false;
+weex::base::LogImplement* weex::base::LogImplement::g_instance = nullptr;
 
-    struct LogFlattenHelper {
-        LogFlattenHelper() : mLargeBuf() {}
-        LogFlattenHelper(const char *fmt, va_list args) : LogFlattenHelper() {
-            set(fmt, args);
-        }
-        ~LogFlattenHelper() {
-            if (mLargeBuf)
-                free(mLargeBuf);
-        }
-        
-        const char *str() const { return mLargeBuf ? mLargeBuf : mSmallBuf.data(); }
-        LogFlattenHelper &set(const char *fmt, va_list args);
-        
-    private:
-        LogFlattenHelper(const LogFlattenHelper &) = delete;
-        void operator=(const LogFlattenHelper &) = delete;
-        
-        std::array<char, 4096> mSmallBuf;
-        char *mLargeBuf;
-    };
-    
-    LogFlattenHelper &LogFlattenHelper::set(const char *fmt, va_list args) {
-        va_list argsCopy;
-        va_copy(argsCopy, args);
-        int len = 1 + vsnprintf(nullptr, 0, fmt, argsCopy);
-        va_end(argsCopy);
-        if (len <= 1) {
-            mSmallBuf[0] = 0;
-            return *this;
-        }
-        if (len > (int)mSmallBuf.size())
-            mLargeBuf = static_cast<char *>(malloc(len));
-        int rv;
-        if (mLargeBuf) {
-            rv = vsnprintf(mLargeBuf, len, fmt, args);
-        } else {
-            rv = vsnprintf(mSmallBuf.data(), mSmallBuf.size(), fmt, args);
-        }
-        (void)rv;
-        return *this;
-    }
-    
-    void PrintLog(LogLevel level, const char* tag, const char* file, unsigned long line, const char* fmt, ...) {
-        va_list args;
-        va_start(args, fmt);
-        LogFlattenHelper log(fmt, args);
-        va_end(args);
-        
-        LogBridge* logBridge = WeexCore::WeexCoreManager::Instance()->get_log_bridge();
-        if (logBridge) {
-            // Log to bridge
-            logBridge->log(level, tag, file, line, log.str());
-        }
-        else {
-            // Log to console by default
+namespace WeexCore {
+struct LogFlattenHelper {
+  LogFlattenHelper() : mLargeBuf() {}
+  LogFlattenHelper(const char *fmt, va_list args) : LogFlattenHelper() {
+    set(fmt, args);
+  }
+  ~LogFlattenHelper() {
+    if (mLargeBuf)
+      free(mLargeBuf);
+  }
+
+  const char *str() const { return mLargeBuf ? mLargeBuf : mSmallBuf.data(); }
+  LogFlattenHelper &set(const char *fmt, va_list args);
+
+ private:
+  LogFlattenHelper(const LogFlattenHelper &) = delete;
+  void operator=(const LogFlattenHelper &) = delete;
+
+  std::array<char, 4096> mSmallBuf;
+  char *mLargeBuf;
+};
+
+LogFlattenHelper &LogFlattenHelper::set(const char *fmt, va_list args) {
+  va_list argsCopy;
+  va_copy(argsCopy, args);
+  int len = 1 + vsnprintf(nullptr, 0, fmt, argsCopy);
+  va_end(argsCopy);
+  if (len <= 1) {
+    mSmallBuf[0] = 0;
+    return *this;
+  }
+  if (len > (int) mSmallBuf.size())
+    mLargeBuf = static_cast<char *>(malloc(len));
+  int rv;
+  if (mLargeBuf) {
+    rv = vsnprintf(mLargeBuf, len, fmt, args);
+  } else {
+    rv = vsnprintf(mSmallBuf.data(), mSmallBuf.size(), fmt, args);
+  }
+  (void) rv;
+  return *this;
+}
+
+void PrintLog(LogLevel level,
+              const char *tag,
+              const char *file,
+              unsigned long line,
+              const char *fmt,
+              ...) {
+  va_list args;
+  va_start(args, fmt);
+  LogFlattenHelper log(fmt, args);
+  va_end(args);
+
+  bool succeed = weex::base::LogImplement::getLog()->log(level, tag, file, line, log.str());
+  if (!succeed) {
+    // Log to console by default
 #ifdef __ANDROID__
-            if(DebugMode) {
-                switch (level) {
-                    case LogLevel::Error:
-                        __android_log_print(ANDROID_LOG_ERROR,
-                                            tag,
-                                            "%s:%lu, %s",
-                                            file,
-                                            line,
-                                            log.str());
-                    break;
-                    case LogLevel::Warn:
-                        __android_log_print(ANDROID_LOG_WARN,
-                                            tag,
-                                            "%s:%lu, %s",
-                                            file,
-                                            line,
-                                            log.str());
-                    break;
-                    case LogLevel::Info:
-                        __android_log_print(ANDROID_LOG_INFO,
-                                            tag,
-                                            "%s:%lu, %s",
-                                            file,
-                                            line,
-                                            log.str());
-                    break;
-                    case LogLevel::Debug:
-                        __android_log_print(ANDROID_LOG_DEBUG,
-                                            tag,
-                                            "%s:%lu, %s",
-                                            file,
-                                            line,
-                                            log.str());
-                    break;
-                    default:
-                        break;
-                }
-            }
-#elif __APPLE__
-            switch (level) {
-                case LogLevel::Error:
-                    printf("<%s:Error|%s:%lu> %s\n", tag, file, line, log.str());
-                    break;
-                case LogLevel::Warn:
-                    printf("<%s:Warn|%s:%lu> %s\n", tag, file, line, log.str());
-                    break;
-                case LogLevel::Info:
-                    printf("<%s:Info|%s:%lu> %s\n", tag, file, line, log.str());
-                    break;
-                case LogLevel::Debug:
-                    printf("<%s:Debug|%s:%lu> %s\n", tag, file, line, log.str());
-                    break;
-                default:
-                    break;
-            }
-#endif
+    bool debugMode = weex::base::LogImplement::getLog()->debugMode();
+    switch (level) {
+      case LogLevel::Error:
+        __android_log_print(ANDROID_LOG_ERROR,
+                            tag,
+                            "%s:%lu, %s",
+                            file,
+                            line,
+                            log.str());
+        break;
+      case LogLevel::Warn:
+        if (debugMode) {
+          __android_log_print(ANDROID_LOG_WARN,
+                              tag,
+                              "%s:%lu, %s",
+                              file,
+                              line,
+                              log.str());
         }
+        break;
+      case LogLevel::Info:
+        if (debugMode) {
+          __android_log_print(ANDROID_LOG_INFO,
+                              tag,
+                              "%s:%lu, %s",
+                              file,
+                              line,
+                              log.str());
+        }
+        break;
+      case LogLevel::Debug:
+        if (debugMode) {
+          __android_log_print(ANDROID_LOG_DEBUG,
+                              tag,
+                              "%s:%lu, %s",
+                              file,
+                              line,
+                              log.str());
+        }
+        break;
+      default:break;
     }
-    
+#elif __APPLE__
+    switch (level) {
+        case LogLevel::Error:
+            printf("<%s:Error|%s:%lu> %s\n", tag, file, line, log.str());
+            break;
+        case LogLevel::Warn:
+            printf("<%s:Warn|%s:%lu> %s\n", tag, file, line, log.str());
+            break;
+        case LogLevel::Info:
+            printf("<%s:Info|%s:%lu> %s\n", tag, file, line, log.str());
+            break;
+        case LogLevel::Debug:
+            printf("<%s:Debug|%s:%lu> %s\n", tag, file, line, log.str());
+            break;
+        default:
+            break;
+    }
+#endif
+  }
+}
+
 }

@@ -20,9 +20,13 @@
 package com.taobao.weex.performance;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
+import android.support.annotation.NonNull;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.utils.WXUtils;
@@ -103,13 +107,21 @@ public class WXStateRecord {
 
     public Map<String, String> getStateInfo() {
         Map<String, String> stateInfo = new HashMap<>(5);
-        stateInfo.put("exceptionHistory", mExceptionHistory.toString());
-        stateInfo.put("actionHistory", mActionHistory.toString());
-        stateInfo.put("jsfmInitHistory", mJsfmInitHistory.toString());
-        stateInfo.put("jscCrashHistory", mJscCrashHistory.toString());
-        stateInfo.put("jscReloadHistory", mJscReloadHistory.toString());
-        stateInfo.put("jsThreadWatch", mJsThradWatchHistory.toString());
         stateInfo.put("reInitCount", String.valueOf(WXBridgeManager.reInitCount));
+
+        int size = mExceptionHistory.size()+mActionHistory.size()+mJsfmInitHistory.size()
+            +mJscCrashHistory.size()+mJscReloadHistory.size()+mJsThradWatchHistory.size();
+
+        List<Info> reportTimeLineInfo = new RecordList<>(size);
+        reportTimeLineInfo.addAll(mExceptionHistory);
+        reportTimeLineInfo.addAll(mActionHistory);
+        reportTimeLineInfo.addAll(mJsfmInitHistory);
+        reportTimeLineInfo.addAll(mJscCrashHistory);
+        reportTimeLineInfo.addAll(mJscReloadHistory);
+        reportTimeLineInfo.addAll(mJsThradWatchHistory);
+        Collections.sort(reportTimeLineInfo);
+        stateInfo.put("stateInfoList",reportTimeLineInfo.toString());
+
         return stateInfo;
     }
 
@@ -140,7 +152,7 @@ public class WXStateRecord {
         }
     }
 
-    private static class Info {
+    private static class Info implements Comparable<Info>{
         private long time;
         private String instanceId;
         private String msg;
@@ -156,6 +168,14 @@ public class WXStateRecord {
             return new StringBuilder()
                 .append(instanceId).append(',').append(time).append(',').append(msg)
                 .toString();
+        }
+
+        @Override
+        public int compareTo(@NonNull Info next) {
+            if (this.time == next.time){
+                return 0;
+            }
+            return this.time > next.time? 1:-1;
         }
     }
 

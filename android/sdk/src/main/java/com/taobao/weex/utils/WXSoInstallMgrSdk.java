@@ -18,34 +18,27 @@
  */
 package com.taobao.weex.utils;
 
+import android.annotation.SuppressLint;
+import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.taobao.weex.IWXStatisticsListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
 import dalvik.system.PathClassLoader;
-import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -76,13 +69,13 @@ public class WXSoInstallMgrSdk {
   private final static String STARTUPSO = "/libweexjsb.so";
   private final static String STARTUPSOANDROID15 = "/libweexjst.so";
 
-  static Context mContext = null;
+  static Application mContext = null;
   private static IWXSoLoaderAdapter mSoLoader = null;
   private static IWXStatisticsListener mStatisticsListener = null;
 
   private static String mAbi = null;
 
-  public static void init(Context c,
+  public static void init(Application c,
                           IWXSoLoaderAdapter loader,
                           IWXStatisticsListener listener) {
     mContext = c;
@@ -224,6 +217,7 @@ public class WXSoInstallMgrSdk {
   /**
    * copyStartUpSo
    */
+  @SuppressLint("SdCardPath")
   public static void copyStartUpSo() {
     try {
       // copy libjsb.so to cache/weex/jsb/cputype
@@ -358,7 +352,7 @@ public class WXSoInstallMgrSdk {
       if (TextUtils.isEmpty(mAbi)){
         mAbi = ARMEABI;
       }
-      mAbi = mAbi.toLowerCase();
+      mAbi = mAbi.toLowerCase(Locale.ROOT);
     }
     return mAbi;
   }
@@ -409,6 +403,7 @@ public class WXSoInstallMgrSdk {
    * @param version the version of the so library
    * @return the path of the so library
    */
+  @SuppressLint("SdCardPath")
   static String _targetSoFile(String libName, int version) {
     Context context = mContext;
     if (null == context) {
@@ -455,6 +450,7 @@ public class WXSoInstallMgrSdk {
   /**
    * Load .so library
    */
+  @SuppressLint("UnsafeDynamicallyLoadedCode")
   static boolean _loadUnzipSo(String libName,
                               int version,
                               IWXUserTrackAdapter utAdapter) {

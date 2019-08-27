@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -52,7 +53,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOverlay;
 import android.widget.FrameLayout;
-
 import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.ComponentObserver;
 import com.taobao.weex.IWXActivityStateListener;
@@ -91,7 +91,6 @@ import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
 import com.taobao.weex.ui.component.binding.Statements;
 import com.taobao.weex.ui.component.list.WXCell;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
 import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
@@ -113,7 +112,6 @@ import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -124,6 +122,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -179,6 +178,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public boolean mIsAddElementToTree = false;
   //for fix element case
   public int interactionAbsoluteX=0,interactionAbsoluteY=0;
+  //for fix slider case :cssLeft is not real left base parent;
+  protected int mChildrensWidth = 0;
   private boolean mHasAddFocusListener = false;
 
   public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
@@ -245,6 +246,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
 
+  @SuppressLint("RtlHardcoded")
   public void setMarginsSupportRTL(ViewGroup.MarginLayoutParams lp, int left, int top, int right, int bottom) {
       lp.setMargins(left, top, right, bottom);
       if (lp instanceof FrameLayout.LayoutParams) {
@@ -978,7 +980,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       mInstance.getWXPerformance().cellExceedNum++;
       if (WXAnalyzerDataTransfer.isOpenPerformance){
         WXAnalyzerDataTransfer.transferPerformance(getInstanceId(),"details",WXInstanceApm.KEY_PAGE_STATS_CELL_EXCEED_NUM,
-            String.format("cell:[w:%d,h:%d],attrs:%s,styles:%s",realWidth,realHeight,getAttrs(),getStyles())
+            String.format(Locale.ROOT, "cell:[w:%d,h:%d],attrs:%s,styles:%s",realWidth,realHeight,getAttrs(),getStyles())
         );
       }
 
@@ -1068,8 +1070,14 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }else {
       float cssTop = getCSSLayoutTop();
       float cssLeft = getCSSLayoutLeft();
-      interactionAbsoluteX = (int)(this.isFixed() ? cssLeft : mParent.interactionAbsoluteX + cssLeft);
+      interactionAbsoluteX = (int)(this.isFixed() ? cssLeft : mParent.interactionAbsoluteX + mParent.mChildrensWidth + cssLeft);
       interactionAbsoluteY = (int)(this.isFixed() ? cssTop  : mParent.interactionAbsoluteY + cssTop);
+      //fix for slider impl ,and interactionTime calculate if component is out screen
+      if (WXBasicComponentType.SLIDER.equalsIgnoreCase(mParent.getComponentType()) || WXBasicComponentType.CYCLE_SLIDER.equalsIgnoreCase(mParent.getComponentType())){
+        if (!WXBasicComponentType.INDICATOR.equalsIgnoreCase(getComponentType())){
+          mParent.mChildrensWidth += (int)(realWidth + cssLeft);
+        }
+      }
     }
 
     if (null == getInstance().getApmForInstance().instanceRect){
@@ -1672,6 +1680,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
                   new int[]{rippleColor});
           return new RippleDrawable(colorStateList, new ColorDrawable(colorInt), null) {
             @Override
+            @SuppressLint("CanvasSize")
             public void draw(@NonNull Canvas canvas) {
               if (mBackgroundDrawable != null) {
                 Path border = mBackgroundDrawable.getContentPath(new RectF(0, 0, canvas.getWidth(), canvas.getHeight()));

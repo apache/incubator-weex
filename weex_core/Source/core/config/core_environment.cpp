@@ -22,6 +22,7 @@
 
 #include "base/core_constants.h"
 #include "base/log_defines.h"
+#include "base/log_defines.h"
 #include "core/common/view_utils.h"
 
 namespace WeexCore {
@@ -86,8 +87,6 @@ namespace WeexCore {
     mOptions.insert(std::pair<std::string, std::string>(key, value));
     if (key == "switchInteractionLog") {
       mInteractionLogSwitch = "true" == value;
-    } else if(key == "debugMode" && value == "true"){
-      WeexCore::DebugMode = true;
     }
   }
 

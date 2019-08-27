@@ -76,6 +76,9 @@ NSString* const KEY_PAGE_STAGES_DESTROY  = @"wxDestroy";
 NSString* const KEY_PAGE_STATS_BUNDLE_SIZE  = @"wxBundleSize";
 NSString* const KEY_PAGE_STATS_FS_CALL_JS_TIME  = @"wxFSCallJsTotalTime";
 NSString* const KEY_PAGE_STATS_FS_CALL_JS_NUM  = @"wxFSCallJsTotalNum";
+NSString* const KEY_PAGE_STATS_EXECUTE_JS_TIME = @"wxExecJsCallBack";
+NSString* const KEY_PAGE_STATS_CREATE_COMPONENT_TIME = @"wxComponentCost";
+NSString* const KEY_PAGE_STATS_CREATE_VIEW_TIME = @"wxViewCost";
 NSString* const KEY_PAGE_STATS_FS_TIMER_NUM = @"wxFSTimerCount";
 NSString* const KEY_PAGE_STATS_FS_CALL_NATIVE_TIME = @"wxFSCallNativeTotalTime";
 NSString* const KEY_PAGE_STATS_FS_CALL_NATIVE_NUM = @"wxFSCallNativeTotalNum";
@@ -123,7 +126,6 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     BOOL _hasRecordInteractionTime;
     BOOL _hasRecordDownLoadStart;
     BOOL _hasRecordDownLoadEnd;
-    BOOL _forceRecordInteractionTime;
 }
 
 @property (nonatomic,strong) id<WXApmProtocol> apmProtocolInstance;
@@ -198,7 +200,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     
     if ([KEY_PAGE_STAGES_INTERACTION isEqualToString:name]) {
         _hasRecordInteractionTime = YES;
-        if (_forceRecordInteractionTime) {
+        if (self.forceStopRecordInteractionTime) {
             return;
         }
     }
@@ -545,7 +547,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 - (void) forceSetInteractionTime:(long) unixTime
 {
     [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:unixTime];
-    _forceRecordInteractionTime=YES;
+    _forceStopRecordInteractionTime = YES;
 }
 
 @end

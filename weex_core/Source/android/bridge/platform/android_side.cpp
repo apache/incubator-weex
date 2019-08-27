@@ -120,6 +120,56 @@ int AndroidSide::CallNative(const char *page_id, const char *task,
   }
   return flag;
 }
+int AndroidSide::AddChildToRichtext(const char *pageId, const char *nodeType, const char *ref, const char *parentRef,
+                                    const char *richtextRef, std::map<std::string, std::string> *styles,
+                                    std::map<std::string, std::string> *attributes) {
+    JNIEnv *env = base::android::AttachCurrentThread();
+    if (env == nullptr)
+        return -1;
+    int flag = wx_bridge_->AddChildToRichtext(env, pageId, nodeType, ref, parentRef, richtextRef, styles ,attributes);
+    if (flag == -1) {
+        LOGE("instance destroy JFM must stop AddChildToRichtext");
+    }
+    return flag;
+}
+int AndroidSide::RemoveChildFromRichtext(const char *pageId, const char *ref, const char *parent_ref,
+                                         const char *richtext_ref) {
+    JNIEnv *env = base::android::AttachCurrentThread();
+    if (env == nullptr)
+        return -1;
+
+    int flag = wx_bridge_->RemoveChildFromRichtext(env, pageId, ref, parent_ref, richtext_ref);
+    if (flag == -1) {
+        LOGE("instance destroy JFM must stop RemoveChildFromRichtext");
+    }
+    return flag;
+}
+int AndroidSide::UpdateRichtextStyle(const char *pageId, const char *ref,
+                                     std::vector<std::pair<std::string, std::string>> *styles, const char *parent_ref,
+                                     const char *richtext_ref) {
+    JNIEnv *env = base::android::AttachCurrentThread();
+    if (env == nullptr)
+        return -1;
+
+    int flag = wx_bridge_->UpdateRichtextStyle(env, pageId, ref, styles, parent_ref, richtext_ref);
+    if (flag == -1) {
+        LOGE("instance destroy JFM must stop UpdateRichtextStyle");
+    }
+    return flag;
+}
+int AndroidSide::UpdateRichtextChildAttr(const char *pageId, const char *ref,
+                                         std::vector<std::pair<std::string, std::string>> *attributes,
+                                         const char *parent_ref, const char *richtext_ref) {
+    JNIEnv *env = base::android::AttachCurrentThread();
+    if (env == nullptr)
+        return -1;
+
+    int flag = wx_bridge_->UpdateRichtextChildAttr(env, pageId, ref, attributes, parent_ref, richtext_ref);
+    if (flag == -1) {
+        LOGE("instance destroy JFM must stop UpdateRichtextChildAttr");
+    }
+    return flag;
+}
 
 std::unique_ptr<ValueWithType> AndroidSide::CallNativeModule(
     const char *page_id, const char *module, const char *method,

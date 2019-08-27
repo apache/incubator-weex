@@ -59,4 +59,15 @@ public class RichTextNodeManager {
     }
     return instance;
   }
+  public static RichTextNode createRichTextNode(Context context,String instanceId,String componentRef,String ref,
+                                         String nodeType,Map<String,String> styles,Map<String,String> attrs){
+    RichTextNode instance;
+    try{
+      instance = registeredTextNodes.get(nodeType).createRichTextNode(context,instanceId,componentRef,ref,styles,attrs);
+    }catch (Exception e){
+      WXLogUtils.e("Richtext", WXLogUtils.getStackTrace(e));
+      instance = null;
+    }
+    return instance;
+  }
 }

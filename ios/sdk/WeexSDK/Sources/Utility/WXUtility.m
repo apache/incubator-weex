@@ -270,14 +270,16 @@ CGFloat WXFloorPixelValue(CGFloat value)
         for (id obj in source) {
             [tmpArray addObject:[self convertContainerToImmutable:obj]];
         }
-        return [NSArray arrayWithArray:tmpArray];
+        id immutableArray = [NSArray arrayWithArray:tmpArray];
+        return immutableArray ? immutableArray : tmpArray;
     }
     else if ([source isKindOfClass:[NSDictionary class]]) {
         NSMutableDictionary* tmpDictionary = [[NSMutableDictionary alloc] init];
         for (id key in [source keyEnumerator]) {
             tmpDictionary[key] = [self convertContainerToImmutable:[source objectForKey:key]];
         }
-        return [NSDictionary dictionaryWithDictionary:tmpDictionary];
+        id immutableDict = [NSDictionary dictionaryWithDictionary:tmpDictionary];
+        return immutableDict ? immutableDict : tmpDictionary;
     }
     
     return source;
@@ -607,10 +609,15 @@ CGFloat WXFloorPixelValue(CGFloat value)
     UIFontDescriptor *fontD = font.fontDescriptor;
     UIFontDescriptorSymbolicTraits traits = 0;
     
-    traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
     traits = (textWeight-UIFontWeightBold >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
-    if (traits != 0) {
-        fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
+    if (textStyle == WXTextStyleItalic || traits != 0) {
+        if (traits != 0) {
+            fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
+        }
+        if (textStyle == WXTextStyleItalic) {
+            CGAffineTransform matrix = CGAffineTransformMake(1, 0, tanf(16 * (CGFloat)M_PI / 180), 1, 0, 0);
+            fontD = [fontD fontDescriptorWithMatrix:matrix];
+        }
         UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];
         if (tempFont) {
             font = tempFont;

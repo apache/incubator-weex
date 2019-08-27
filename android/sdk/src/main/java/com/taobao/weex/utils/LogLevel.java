@@ -24,8 +24,9 @@ import android.util.Log;
  * Created by lixinke on 16/5/11.
  */
 public enum LogLevel {
-  OFF("off",7, Log.ASSERT),
-  WTF("wtf", 6, Log.ASSERT),
+  OFF("off",8, Log.ASSERT),
+  WTF("wtf", 7, Log.ASSERT),
+  TLOG("tlog",6,Log.ERROR), //Add For Son Process
   ERROR("error", 5, Log.ERROR),
   WARN("warn", 4, Log.WARN),
   INFO("info", 3, Log.INFO),

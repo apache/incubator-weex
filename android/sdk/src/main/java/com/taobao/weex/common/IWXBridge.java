@@ -65,6 +65,8 @@ public interface IWXBridge extends IWXObject {
   void updateInitFrameworkParams(String key, String value, String desc);
 
 
+  void setLogType(float type, boolean isPerf);
+
   void refreshInstance(String instanceId, String namespace, String function, WXJSObject[] args);
 
   /**
@@ -162,6 +164,15 @@ public interface IWXBridge extends IWXObject {
   int callUpdateAttrs(String instanceId, String ref,
                       HashMap<String, String> attrs);
 
+  int callAddChildToRichtext(String instanceId, String nodeType, String ref, String parentRef, String richTextRef,
+                             HashMap<String, String> styles, HashMap<String, String> attrs);
+
+  int callRemoveChildFromRichtext(String instanceId, String ref, String parentRef, String richTextRef);
+
+  int callUpdateRichtextStyle(String instanceId, String ref, HashMap<String, String> styles, String parentRef, String richTextRef);
+
+  int callUpdateRichtextChildAttr(String instanceId, String ref, HashMap<String, String> attrs, String parentRef, String richTextRef);
+
   int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, boolean isRTL, int index);
 
   int callCreateFinish(String instanceId);
@@ -219,5 +230,7 @@ public interface IWXBridge extends IWXObject {
   void removeInstanceRenderType(String instanceId);
 
   void setPageArgument(String instanceId, String key, String value);
+
+  void setViewPortWidth(String instanceId,float viewPortWidth);
 
 }

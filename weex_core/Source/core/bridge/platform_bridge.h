@@ -139,6 +139,8 @@ class PlatformBridge {
 
     virtual int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) = 0;
 
+    virtual void SetLogType(const int logType, const bool isPerf) = 0;
+
     inline PlatformBridge* bridge() { return bridge_; }
 
    protected:
@@ -217,6 +219,12 @@ class PlatformBridge {
                            const WXCorePadding& paddings,
                            const WXCoreBorderWidth& borders,
                            bool willLayout = true) = 0;
+
+      virtual int AddChildToRichtext(const char* pageId, const char *nodeType, const char* ref,
+                                       const char* parentRef, const char* richtextRef,
+                                       std::map<std::string, std::string> *styles,
+                                       std::map<std::string, std::string> *attributes) = 0;
+
     virtual int Layout(const char* page_id, const char* ref, float top,
                        float bottom, float left, float right, float height,
                        float width, bool isRTL, int index) = 0;
@@ -227,15 +235,26 @@ class PlatformBridge {
         std::vector<std::pair<std::string, std::string>>* margin,
         std::vector<std::pair<std::string, std::string>>* padding,
         std::vector<std::pair<std::string, std::string>>* border) = 0;
+
     virtual int UpdateAttr(
         const char* pageId, const char* ref,
         std::vector<std::pair<std::string, std::string>>* attrs) = 0;
+
+    virtual int UpdateRichtextChildAttr(
+                                          const char* pageId, const char* ref,
+                                          std::vector<std::pair<std::string, std::string>>* attrs, const char* parent_ref, const char* richtext_ref) = 0;
+
+    virtual int UpdateRichtextStyle(const char* pageId, const char* ref,
+                                      std::vector<std::pair<std::string, std::string>> *style,
+                                      const char* parent_ref, const char* richtext_ref) = 0;
 
     virtual int CreateFinish(const char* pageId) = 0;
 
     virtual int RenderSuccess(const char* pageId) = 0;
 
     virtual int RemoveElement(const char* pageId, const char* ref) = 0;
+
+    virtual int RemoveChildFromRichtext(const char* pageId, const char* ref, const char* parent_ref, const char* richtext_ref) = 0;
 
     virtual int MoveElement(const char* pageId, const char* ref,
                             const char* parentRef, int index) = 0;

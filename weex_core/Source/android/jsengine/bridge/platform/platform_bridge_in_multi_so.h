@@ -107,8 +107,7 @@ class PlatformBridgeInMultiSo : public WeexCore::PlatformBridge {
   static int DestroyInstance(const char *instanceId);
   static int UpdateGlobalConfig(const char *config);
   static int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc);
-
-
+  static void SetLogType(const int logLevel, const bool isPerf);
 
  private:
   PlatformBridgeInMultiSo();
