@@ -161,7 +161,6 @@ static void *newIPCServer(void *_td) {
     if (base == MAP_FAILED) {
         LOGE("newIPCServer start map filed errno %d ", errno);
         int _errno = errno;
-        server->closeFd();
         //throw IPCException("failed to map ashmem region: %s", strerror(_errno));
         newThreadStatus = ERROR;
         return nullptr;
@@ -180,7 +179,6 @@ static void *newIPCServer(void *_td) {
       listener->listen();
     } catch (IPCException &e) {
         LOGE("IPCException server died %s",e.msg());
-        server->closeFd();
         base::android::DetachFromVM();
         pthread_exit(NULL);
     }
@@ -199,7 +197,6 @@ IPCSender *WeexJSConnection::start(bool reinit) {
   void *base = client_->mmap_for_ipc();
   if (base == MAP_FAILED) {
     int _errno = errno;
-    client_->closeFd();
     throw IPCException("failed to map ashmem region: %s", strerror(_errno));
   }
 
@@ -267,8 +264,6 @@ IPCSender *WeexJSConnection::start(bool reinit) {
   if (child == -1) {
     int myerrno = errno;
     munmap(base, IPCFutexPageQueue::ipc_size);
-    client_->closeFd();
-    server_->closeFd();
     throw IPCException("failed to fork: %s", strerror(myerrno));
   } else if (child == 0) {
     LOGE("weexcore fork child success\n");
@@ -282,8 +277,6 @@ IPCSender *WeexJSConnection::start(bool reinit) {
     _exit(1);
   } else {
     printLogOnFile("fork success on main process and start m_impl->futexPageQueue->spinWaitPeer()");
-    client_->closeFd();
-    server_->closeFd();
     m_impl->child = child;
     try {
       m_impl->futexPageQueue->spinWaitPeer();
