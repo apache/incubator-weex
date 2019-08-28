@@ -226,7 +226,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         //may be list
         if ([@"scroller" isEqualToString:type]) {
             [weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_SCROLLER_NUM withDiffValue:1];
-        }        
+        }
+
+        if (weexInstance.instanceCallback) {
+            weexInstance.instanceCallback(weexInstance, WXScrollerComponentCreatedCallback, self);
+        }
     }
     
     return self;

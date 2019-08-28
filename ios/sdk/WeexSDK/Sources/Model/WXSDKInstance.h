@@ -151,6 +151,10 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
     FrameworkVersionErrorCode,
 };
 
+typedef enum : NSUInteger {
+    WXScrollerComponentCreatedCallback
+} WXSDKInstanceCallbackType;
+
 
 @property (nonatomic, assign) WXState state;
 
@@ -224,6 +228,15 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  *  @return A block that takes a CGPoint argument, which is content offset of the scroller
  **/
 @property (nonatomic, copy) void (^onScroll)(CGPoint contentOffset);
+
+/**
+ *  The callback of the instance
+ *
+ *  When the callbackType is WXScrollerComponentCreatedCallback, the result type is WXScrollerComponent.
+ *
+ *  @return A block that takes instance, callbackType and a result.
+ **/
+@property (nonatomic, copy) void (^instanceCallback)(WXSDKInstance* instance, WXSDKInstanceCallbackType callbackType, id result);
 
 /**
  * the callback to be run repeatedly while the instance is rendering.
