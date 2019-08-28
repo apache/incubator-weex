@@ -32,17 +32,17 @@
 namespace WeexCore {
 
 bool MultiProcessAndSoInitializer::Init(const std::function<void(IPCHandler*)>& OnHandlerCreated,
-                                        const std::function<bool(std::unique_ptr<WeexJSConnection>, std::unique_ptr<IPCHandler>, std::unique_ptr<IPCHandler>)>& OnInitFinished,
+                                        const std::function<bool(std::unique_ptr<WeexJSConnection>)>& OnInitFinished,
                                         const std::function<void(const char*, const char*, const char*)>& ReportException){
   bool reinit = false;
   LOGE("MultiProcessAndSoInitializer IS IN init");
 startInitFrameWork:
   try {
-    auto handler = std::move(createIPCHandler());
     auto server_handler = std::move(createIPCHandler());
     OnHandlerCreated(server_handler.get());
-    std::unique_ptr<WeexJSConnection> connection(new WeexJSConnection());
-    auto sender = connection->start(handler.get(), server_handler.get(), reinit);
+    std::unique_ptr<WeexJSConnection> connection(new WeexJSConnection(new WeexConnInfo(std::move(createIPCHandler()), true),
+        new WeexConnInfo(std::move(server_handler), false)));
+    auto sender = connection->start(reinit);
     if (sender == nullptr) {
       LOGE("JSFramwork init start sender is null");
       if (!reinit) {
@@ -52,7 +52,7 @@ startInitFrameWork:
         return false;
       }
     } else {
-      OnInitFinished(std::move(connection), std::move(handler), std::move(server_handler));
+      OnInitFinished(std::move(connection));
     }
   } catch (IPCException& e) {
     LOGE("WeexProxy catch：%s", e.msg());

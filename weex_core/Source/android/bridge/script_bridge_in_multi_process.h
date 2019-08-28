@@ -24,6 +24,7 @@
 
 class IPCHandler;
 class WeexJSConnection;
+class WeexConnInfo;
 class IPCHandler;
 namespace WeexCore {
 
@@ -31,13 +32,10 @@ class ScriptBridgeInMultiProcess : public ScriptBridge {
  public:
   ScriptBridgeInMultiProcess();
   ~ScriptBridgeInMultiProcess();
-
   void RegisterIPCCallback(IPCHandler *handler);
 
  private:
   std::unique_ptr<WeexJSConnection> connection_;
-  std::unique_ptr<IPCHandler> handler_;
-  std::unique_ptr<IPCHandler> server_handler_;
   DISALLOW_COPY_AND_ASSIGN(ScriptBridgeInMultiProcess);
 };
 }  // namespace WeexCore
