@@ -605,18 +605,19 @@ int copyFile(const char *SourceFile, const char *NewFile) {
 
 void *WeexConnInfo::mmap_for_ipc() {
   pid_t pid = getpid();
-  std::string clientName(this->is_client ? "WEEX_IPC_CLIENT" : "WEEX_IPC_SERVER");
-  clientName += std::to_string(pid);
+  std::string fileName(this->is_client ? "WEEX_IPC_CLIENT" : "WEEX_IPC_SERVER");
+  fileName += std::to_string(pid);
   int fd = -1;
   int initTimes = 1;
   void *base = MAP_FAILED;
   do {
-    fd = ashmem_create_region(clientName.c_str(), IPCFutexPageQueue::ipc_size);
+    fd = ashmem_create_region(fileName.c_str(), IPCFutexPageQueue::ipc_size);
     if (-1 == fd) {
       if (this->is_client) {
         throw IPCException("failed to create ashmem region: %s", strerror(errno));
       } else {
         LOGE("failed to create ashmem region: %s", strerror(errno))
+        return base;
       }
     }
     base = mmap(nullptr, IPCFutexPageQueue::ipc_size, PROT_READ | PROT_WRITE, MAP_SHARED,

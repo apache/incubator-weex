@@ -45,6 +45,10 @@ class WeexConnInfo {
   void *mmap_for_ipc();
 
   void closeFd() {
+    if(ipcFd == -1) {
+      return;
+    }
+
     if(hasBeenClosed)
       return;
     hasBeenClosed = true;
