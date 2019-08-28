@@ -305,6 +305,11 @@ int ScriptSideInQueue::UpdateInitFrameworkParams(const std::string& key, const s
   return 1;
 }
 
+void ScriptSideInQueue::SetLogType(const int logLevel, const bool isPerf) {
+  // do nothing;
+};
+
+
 void ScriptSideInQueue::useBackUpWeexRuntime(std::string id) {
   usingBackThreadId.push_back(id);
 }

@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.component.richtext;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.Layout;
@@ -37,6 +38,7 @@ public class WXRichTextView extends WXTextView {
     super(context);
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     boolean superResult = super.onTouchEvent(event);

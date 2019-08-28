@@ -36,6 +36,8 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
+
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
@@ -78,10 +80,13 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
     try {
       parent = (WXVContainer) WXSDKManager.getInstance().getWXRenderManager()
           .getWXComponent(getPageId(), mParentRef);
+      long start = WXUtils.getFixUnixTime();
       BasicComponentData basicComponentData = new BasicComponentData(ref, mComponentType,
           mParentRef);
       child = createComponent(instance, parent, basicComponentData);
       child.setTransition(WXTransition.fromMap(child.getStyles(), child));
+      long diff = WXUtils.getFixUnixTime()-start;
+      instance.getApmForInstance().componentCreateTime += diff;
       if (null != parent && parent.isIgnoreInteraction){
         child.isIgnoreInteraction = true;
       }
@@ -187,6 +192,7 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
       if (!TextUtils.equals(mComponentType, "video") && !TextUtils.equals(mComponentType, "videoplus"))
         child.mIsAddElementToTree = true;
 
+      long start = WXUtils.getFixUnixTime();
       parent.addChild(child, mIndex);
       parent.createChildViewAt(mIndex);
 
@@ -196,6 +202,11 @@ public class GraphicActionAddElement extends GraphicActionAbstractAddElement {
       }
       child.applyLayoutAndEvent(child);
       child.bindData(child);
+      long diff = WXUtils.getFixUnixTime() - start;
+      if (null != getWXSDKIntance()){
+        getWXSDKIntance().getApmForInstance().viewCreateTime +=diff;
+      }
+
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);
     }

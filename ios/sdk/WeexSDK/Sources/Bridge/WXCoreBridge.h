@@ -90,6 +90,11 @@ namespace WeexCore
                            const WXCoreBorderWidth &borders,
                            bool willLayout= true) override;
         
+        int AddChildToRichtext(const char* pageId, const char *nodeType, const char* ref,
+                                 const char* parentRef, const char* richtextRef,
+                                 std::map<std::string, std::string> *styles,
+                                 std::map<std::string, std::string> *attributes) override;
+
         int Layout(const char* pageId, const char* ref,
                        float top, float bottom, float left, float right,
                        float height, float width, bool isRTL, int index) override;
@@ -100,15 +105,24 @@ namespace WeexCore
                             std::vector<std::pair<std::string, std::string>> *padding,
                             std::vector<std::pair<std::string, std::string>> *border) override;
         
+        int UpdateRichtextStyle(const char* pageId, const char* ref,
+                                         std::vector<std::pair<std::string, std::string>> *style,
+                                         const char* parent_ref, const char* richtext_ref) override;
+
         int UpdateAttr(const char* pageId, const char* ref,
                            std::vector<std::pair<std::string, std::string>> *attrs) override;
         
+        int UpdateRichtextChildAttr(const char* pageId, const char* ref,
+                       std::vector<std::pair<std::string, std::string>> *attrs,  const char* parent_ref, const char* richtext_ref) override;
+
         int CreateFinish(const char* pageId) override;
         
         int RenderSuccess(const char* pageId) override;
         
         int RemoveElement(const char* pageId, const char* ref) override;
         
+        int RemoveChildFromRichtext(const char* pageId, const char* ref, const char* parent_ref, const char* richtext_ref) override;
+
         int MoveElement(const char* pageId, const char* ref, const char* parentRef, int index) override;
         
         int AppendTreeCreateFinish(const char* pageId, const char* ref) override;
@@ -217,6 +231,8 @@ namespace WeexCore
 + (void)setPageRequired:(NSString *)pageId width:(CGFloat)width height:(CGFloat)height;
 
 + (void)layoutPage:(NSString*)pageId forced:(BOOL)forced;
+
++ (double)getLayoutTime:(NSString*)pageId;
 
 + (void)closePage:(NSString*)pageId;
 

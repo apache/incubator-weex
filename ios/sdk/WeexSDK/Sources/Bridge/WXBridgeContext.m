@@ -147,7 +147,11 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallUpdateComponentData:^NSInteger(NSString *instanceId, NSString *componentId, NSString *jsonData) {
         if (_dataRenderHandler) {
             WXPerformBlockOnComponentThread(^{
+                long start = [WXUtility getUnixFixTimeMillis];
+                WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+                [instance.apmInstance addUpdateComponentDataTimestamp:start];
                 [_dataRenderHandler callUpdateComponentData:instanceId componentId:componentId jsonData:jsonData];
+                [instance.apmInstance addUpdateComponentDataTime:[WXUtility getUnixFixTimeMillis] - start];
             });
         }
         else {
@@ -529,15 +533,12 @@ _Pragma("clang diagnostic pop") \
         }
         if ([WXDebugTool isDevToolDebug]) {
             [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, newOptions, data?:@[],raxAPIScript?:@""]];
-            [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
             
             if ([NSURL URLWithString:sdkInstance.pageName]) {
                 [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]];
             } else {
                 [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
             }
-            WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
-            [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
         } else {
             NSDictionary* immutableOptions = [newOptions copy];
             sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@", instanceIdString, immutableOptions, data];
@@ -548,6 +549,7 @@ _Pragma("clang diagnostic pop") \
                                                                  @"instanceId":sdkInstance.instanceId?:@"unknownId"
                                                                 };
             __weak typeof(self) weakSelf = self;
+            [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
             [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, immutableOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
                 if (sdkInstance.pageName) {
                     [sdkInstance.instanceJavaScriptContext.javaScriptContext setName:sdkInstance.pageName];
@@ -578,14 +580,13 @@ _Pragma("clang diagnostic pop") \
                         }];
                     }
                 }
-                
+
                 if (raxAPIScript) {
                     [sdkInstance.instanceJavaScriptContext executeJavascript:raxAPIScript withSourceURL:[NSURL URLWithString:raxAPIScriptPath]];
                     NSArray* allKeys = [WXUtility extractPropertyNamesOfJSValueObject:sdkInstance.instanceJavaScriptContext.javaScriptContext.globalObject];
                     sdkInstance.executeRaxApiResult = [NSString stringWithFormat:@"%@", allKeys];
                 }
                 
-                [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
                 NSDictionary* funcInfo = @{
                                            @"func":@"createInstance",
                                            @"arg":@"start",
@@ -703,7 +704,7 @@ _Pragma("clang diagnostic pop") \
     @try {
         jsBundleString = [jsBundleString substringWithRange:NSMakeRange(validCharacter, MIN(100, length - validCharacter))];
     }
-    @catch (NSException* e) {
+    @catch (NSException* e) {//!OCLint
     }
     if ([jsBundleString length] == 0) {
         return bundleType;
@@ -990,8 +991,6 @@ _Pragma("clang diagnostic pop") \
             NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE] name:%@,arg:%@,exception :$@",name,exception];
             [WXExceptionUtils commitCriticalExceptionRT:@"WX_KEY_EXCEPTION_INVOKE" errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_INVOKE] function:@"executeJsService" exception:errMsg extParams:nil];
             WX_MONITOR_FAIL(WXMTJSService, WX_ERR_JSFRAMEWORK_EXECUTE, errMsg);
-        } else {
-            // success
         }
     }else {
         [_jsServiceQueue addObject:@{
@@ -1104,10 +1103,10 @@ _Pragma("clang diagnostic pop") \
         } else {
             [self callJSMethod:@"callJS" args:@[execIns, [tasks copy]]];
         }
-        if (execInstance && !(execInstance.isJSCreateFinish)) {
+        if (execInstance) {
             NSTimeInterval diff = CACurrentMediaTime()*1000 - start;
-            execInstance.performance.fsCallJsNum++;
-            execInstance.performance.fsCallJsTime =  execInstance.performance.fsCallJsTime+ diff;
+            execInstance.performance.callJsNum++;
+            execInstance.performance.callJsTime =  execInstance.performance.callJsTime+ diff;
          }
         if (execInstance && !execInstance.apmInstance.isFSEnd) {
              NSTimeInterval diff = CACurrentMediaTime()*1000 - start;

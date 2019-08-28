@@ -10,7 +10,6 @@ bin
 .settings
 gen
 *.iml
-lint.xml
 project.properties
 assets/main.js
 assets/weex-main-jsfm.js

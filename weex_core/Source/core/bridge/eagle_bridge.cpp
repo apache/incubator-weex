@@ -39,7 +39,11 @@ namespace WeexCore {
     }
     
     void EagleRenderObject::AddStyle(std::string key, std::string value) {
-        render_object_impl_->AddStyle(key, value, false);
+        if (render_object_impl_->is_richtext_child()) {
+            render_object_impl_->MapInsertOrAssign(render_object_impl_->styles(), key, value);
+        } else {
+            render_object_impl_->AddStyle(key, value, false);
+        }
     }
 
     void EagleRenderObject::UpdateAttr(std::string key, std::string value) {
@@ -91,6 +95,10 @@ namespace WeexCore {
 
     EagleRenderObject EagleRenderObject::GetChild(int index) {
         return render_object_impl_->GetChild(index);
+    }
+
+    void EagleRenderObject::set_is_richtext_child(const bool is_richtext_child) {
+        render_object_impl_->set_is_richtext_child(is_richtext_child);
     }
 
     EagleRenderObject EagleRenderObject::parent_render(){
@@ -241,10 +249,11 @@ namespace WeexCore {
         );
     }
 
+    //FIXME Please don't call this method, which will cause downgrade of Weex.
     void EagleBridge::WeexCoreHandler::PostTaskToMsgLoop(const weex::base::Closure& closure){
-#ifdef OS_ANDROID
-        WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(closure);
-#endif
+        WeexCore::WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->ReportException(
+            "", "PostTaskToMsgLoop",
+            "PostTaskToMsgLoop is not supported anymore, please update to the latest version of Weex.");
     }
     
     int EagleBridge::DataRenderHandler::DestroyInstance(const char *instanceId) {

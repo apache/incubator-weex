@@ -25,6 +25,7 @@
 #ifndef IPCLOG_H
 #define IPCLOG_H
 #include "../../base/log_defines.h"
+
 #define IPC_LOGE(format, ...) LOGE(format, ##__VA_ARGS__)
 #define IPC_LOGD(format, ...) LOGD(format, ##__VA_ARGS__)
 #endif /* IPCLOG_H */

@@ -59,7 +59,7 @@ int ScriptSideInMultiProcess::InitFramework(
       return false;
     }
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException InitFramework %s", e.msg());
     return false;
   }
   return true;
@@ -88,7 +88,7 @@ int ScriptSideInMultiProcess::InitAppFramework(
     std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
     return result->get<jint>();
   } catch (IPCException &e) {
-    LOGE("initAppFramework error %s", e.msg());
+    LOGE("IPCException initAppFramework error %s", e.msg());
     // report crash here
     WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -115,7 +115,7 @@ int ScriptSideInMultiProcess::CreateAppContext(const char *instanceId,
     std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
     return result->get<jint>();
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException CreateAppContext %s", e.msg());
     // report crash here
     WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -156,7 +156,7 @@ std::unique_ptr<WeexJSResult> ScriptSideInMultiProcess::ExecJSOnAppWithResult(co
       return ret;
 
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException ExecJSOnAppWithResult %s", e.msg());
     // report crash here
     WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -204,7 +204,7 @@ int ScriptSideInMultiProcess::CallJSOnAppContext(
     }
     return result->get<jint>();
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException CallJSOnAppContext %s", e.msg());
     // report crash here
     WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -228,7 +228,7 @@ int ScriptSideInMultiProcess::DestroyAppContext(const char *instanceId) {
     std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
     return true;
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException DestroyAppContext %s", e.msg());
     // report crash here
     WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -255,7 +255,7 @@ int ScriptSideInMultiProcess::ExecJsService(const char *source) {
     }
     return result->get<jint>();
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException ExecJsService error %s", e.msg());
     return false;
   }
 }
@@ -304,14 +304,14 @@ int ScriptSideInMultiProcess::ExecJS(const char *instanceId,
 
     std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
     if (result->getType() != IPCType::INT32) {
-      LOGE("execJS Unexpected result type");
+      LOGE("IPCException execJS Unexpected result type");
       return false;
     }
 
     return result->get<jint>();
 
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException ExecJS %s", e.msg());
     // report crash here
     WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -380,7 +380,7 @@ std::unique_ptr<WeexJSResult> ScriptSideInMultiProcess::ExecJSWithResult(
 
       return ret;
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException ExecJSWithResult %s", e.msg());
     // report crash here
     WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -396,7 +396,7 @@ void ScriptSideInMultiProcess::ExecJSWithCallback(
     std::unique_ptr<WeexJSResult> ret;
   try {
     if(sender_ == nullptr) {
-      LOGE("ExecJSWithResult sender is null");
+      LOGE("IPCException ExecJSWithResult sender is null");
       return;
     }
     std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
@@ -421,7 +421,7 @@ void ScriptSideInMultiProcess::ExecJSWithCallback(
     std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
 
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException ExecJSWithCallback %s", e.msg());
     // report crash here
     WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -461,7 +461,7 @@ int ScriptSideInMultiProcess::CreateInstance(
     }
     return result->get<jint>();
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException %s %s","Create Instance is failed and Error msg is", e.msg());
     // report crash here
     WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -498,7 +498,7 @@ std::unique_ptr<WeexJSResult> ScriptSideInMultiProcess::ExecJSOnInstance(const c
     string[ret->length] = '\0';
       return ret;
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException ExecJSOnInstance %s", e.msg());
     // report crash here
     WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -526,7 +526,7 @@ int ScriptSideInMultiProcess::DestroyInstance(const char *instanceId) {
     }
     return result->get<jint>();
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException DestroyInstance %s", e.msg());
     // report crash here
     WeexCoreManager::Instance()
         ->getPlatformBridge()
@@ -548,7 +548,7 @@ int ScriptSideInMultiProcess::UpdateGlobalConfig(const char *config) {
     std::unique_ptr<IPCBuffer> buffer = serializer->finish();
     std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException UpdateGlobalConfig %s", e.msg());
   }
   return true;
 }
@@ -556,7 +556,6 @@ int ScriptSideInMultiProcess::UpdateGlobalConfig(const char *config) {
 int ScriptSideInMultiProcess::UpdateInitFrameworkParams(const std::string &key,
                                                         const std::string &value,
                                                         const std::string &desc) {
-
   try {
     if(sender_ == nullptr) {
       LOGE("UpdateGlobalConfig sender is null");
@@ -570,10 +569,28 @@ int ScriptSideInMultiProcess::UpdateInitFrameworkParams(const std::string &key,
     std::unique_ptr<IPCBuffer> buffer = serializer->finish();
     std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
   } catch (IPCException &e) {
-    LOGE("%s", e.msg());
+    LOGE("IPCException UpdateInitFrameworkParams %s", e.msg());
   }
   return true;
 
+}
+
+void ScriptSideInMultiProcess::SetLogType(const int logLevel, const bool isPerf) {
+  try {
+    if(sender_ == nullptr) {
+      LOGE("SetLogType sender is null");
+      return;
+    }
+    std::unique_ptr<IPCSerializer> serializer(createIPCSerializer());
+    serializer->setMsg(static_cast<uint32_t>(IPCJSMsg::SETLOGLEVEL));
+    serializer->add(logLevel);
+    serializer->add(isPerf ? 1 : 0);
+    std::unique_ptr<IPCBuffer> buffer = serializer->finish();
+    std::unique_ptr<IPCResult> result = sender_->send(buffer.get());
+  } catch (IPCException &e) {
+    LOGE("IPCException SetLogType %s", e.msg());
+  }
+  return;
 }
 
 }  // namespace script

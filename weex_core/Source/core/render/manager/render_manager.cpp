@@ -454,7 +454,7 @@ void RenderManager::CallMetaModule(const char *page_id, const char *method, cons
             else if (key == "deviceWidth") {
               setPageArgument(page_id, "devicewidth", value);
             }
-            else if (key == "deviceHeight") {
+            else if (key == "deviceHeight") { //!OCLint
               // unsupported now
             }
             else if (key == "reserveCssStyles") {

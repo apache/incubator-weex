@@ -316,8 +316,8 @@ static NSThread *WXComponentThread;
     if (supercomponent.ignoreInteraction) {
         component.ignoreInteraction = YES;
     } else {
-        if ([[attributes objectForKey:@"ignoreInteraction"] boolValue]) {
-            component.ignoreInteraction = YES;
+        if ([attributes objectForKey:@"ignoreInteraction"]) {
+            component.ignoreInteraction = [[attributes objectForKey:@"ignoreInteraction"] boolValue];
         } else {
             if (component->_positionType == WXPositionTypeFixed) {
                 component.ignoreInteraction = YES;
@@ -1100,7 +1100,7 @@ static NSThread *WXComponentThread;
         }
     }
     
-    if (mismatchBeginIndex == _uiTaskQueue.count) {
+    if (mismatchBeginIndex == _uiTaskQueue.count) {//!OCLint
         // here we get end tag or there are not begin and end directives
     } else {
         _syncUITaskCount ++;

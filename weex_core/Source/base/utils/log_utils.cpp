@@ -19,38 +19,32 @@
 
 #include "base/utils/log_utils.h"
 
-namespace Weex{
-  void LogUtil::ConsoleLogPrint(int level, const char* tag, const char* log) {
-        // Log = 1, 
-        // Warning = 2,
-        // Error = 3,
-        // Debug = 4,
-        // Info = 5,
-        
-        // if (!mDebugMode) {
-        //   LOGE("LogUtil mDebugMode is false");
-        //   return;
-        // }
-        switch(level) {
-          case 1:
-            LOGV_TAG("jsengine", "%s", log);
-            break;
-          case 2:
-            LOGW_TAG("jsengine", "%s", log);
-            break;
-          case 3:
-            LOGE_TAG("jsengine", "%s", log);
-            break;
-          case 4:
-            LOGD_TAG("jsengine", "%s", log);
-            break;
-          case 5:
-            LOGI_TAG("jsengine", "%s", log);
-            break;
-          default:
-            LOGV_TAG("jsengine", "%s", log);
-            break;
-        }
-      }
+namespace Weex {
+void LogUtil::ConsoleLogPrint(int level, const char *tag, const char *log) {
+  // Log = 1,
+  // Warning = 2,
+  // Error = 3,
+  // Debug = 4,
+  // Info = 5,
+
+  // if (!mDebugMode) {
+  //   LOGE("LogUtil mDebugMode is false");
+  //   return;
+  // }
+  switch (level) {
+    case 1:LOGD_TAG(tag, "%s", log);
+      break;
+    case 2:LOGW_TAG(tag, "%s", log);
+      break;
+    case 3:LOGE_TAG(tag, "%s", log);
+      break;
+    case 4:LOGD_TAG(tag, "%s", log);
+      break;
+    case 5:LOGI_TAG(tag, "%s", log);
+      break;
+    default:LOGE_TAG(tag, "%s", log);
+      break;
+  }
+}
 
 }

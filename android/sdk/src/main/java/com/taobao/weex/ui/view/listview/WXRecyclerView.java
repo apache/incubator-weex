@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.view.listview;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
@@ -88,6 +89,7 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
     return mGesture;
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     if(!scrollable) {

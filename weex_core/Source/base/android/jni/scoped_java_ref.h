@@ -21,6 +21,7 @@
 #define WeexCore_BASE_ANDROID_SCOPED_JAVA_REF_H_
 
 #include <jni.h>
+#include "base/log_defines.h"
 
 namespace base {
 namespace android {

@@ -21,12 +21,14 @@ package com.taobao.weex.performance;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.WXViewUtils;
 import org.json.JSONObject;
 
 /**
@@ -59,6 +61,10 @@ public class WhiteScreenUtils {
         if (!(v instanceof ViewGroup)) {
             return false;
         }
+
+        if (!WXViewUtils.isViewVisible(v) || !checkParentVisible(v.getParent())){
+            return false;
+        }
         if (isInWhiteList(instance)){
             return false;
         }
@@ -86,6 +92,19 @@ public class WhiteScreenUtils {
         }
 
         return false;
+    }
+
+    private static boolean checkParentVisible(ViewParent parent){
+        //root view getParent is null
+        if (!(parent instanceof View)){
+            return true;
+        }
+        View vp = (View)parent;
+        boolean visible = vp.getVisibility() == View.VISIBLE && vp.getAlpha()>0;
+        if (!visible){
+            return false;
+        }
+        return checkParentVisible(vp.getParent());
     }
 
     private static boolean hasLeafViewOrSizeIgnore(View v,int checkDeep) {

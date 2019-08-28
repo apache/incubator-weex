@@ -152,7 +152,7 @@ void CoreSideInMultiSo::PostMessage(const char *vim_id, const char *data, int da
 void CoreSideInMultiSo::DispatchMessage(const char *client_id, const char *data, int dataLength,
                                         const char *callback,
                                         const char *vm_id) {
-  functions_exposed_by_core_->funcCallDIspatchMessage(client_id, data,dataLength, callback,
+  functions_exposed_by_core_->funcCallDIspatchMessage(client_id, data, dataLength, callback,
                                                       vm_id);
 }
 
@@ -160,7 +160,7 @@ std::unique_ptr<WeexJSResult> CoreSideInMultiSo::DispatchMessageSync(
     const char *client_id, const char *data, int dataLength,
     const char *vm_id) {
   return functions_exposed_by_core_->funcCallDispatchMessageSync(client_id, data,
-                                                          dataLength, vm_id);
+                                                                 dataLength, vm_id);
 }
 
 void CoreSideInMultiSo::ReportException(const char *page_id, const char *func,
@@ -173,13 +173,23 @@ void CoreSideInMultiSo::SetJSVersion(const char *js_version) {
   functions_exposed_by_core_->funcSetJSVersion(js_version);
 }
 
-void CoreSideInMultiSo::OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult>& result) {
+void CoreSideInMultiSo::OnReceivedResult(long callback_id, std::unique_ptr<WeexJSResult> &result) {
   functions_exposed_by_core_->funcOnReceivedResult(callback_id, result);
 }
 
-void CoreSideInMultiSo::UpdateComponentData(const char* page_id, const char* cid, const char* json_data) {
+void CoreSideInMultiSo::UpdateComponentData(const char *page_id,
+                                            const char *cid,
+                                            const char *json_data) {
   functions_exposed_by_core_->funcUpdateComponentData(page_id, cid, json_data);
 }
+
+bool CoreSideInMultiSo::Log(int level, const char *tag,
+                            const char *file,
+                            unsigned long line,
+                            const char *log) {
+  return functions_exposed_by_core_->funcLog(level, tag, file, line, log);
+}
+
 }  // namespace js
 }  // namespace bridge
 }  // namespace weex
