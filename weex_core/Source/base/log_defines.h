@@ -157,6 +157,11 @@ class LogImplement {
       return false;
     }
 
+    if (file == nullptr
+        || log == nullptr) {
+      return true;
+    }
+
     if (!m_log->shouldPrint(level)) {
       return true;
     }
