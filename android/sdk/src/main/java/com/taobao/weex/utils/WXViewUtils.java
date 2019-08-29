@@ -266,10 +266,19 @@ public class WXViewUtils {
    * @return the actual distance in the screen.
    */
 
+
+  /**
+   * Use {@link WXViewUtils#getRealPxByWidth(Object, float, int)} instead.
+   */
   @Deprecated
   public static float getRealPxByWidth(float pxValue) {
     return getRealPxByWidth(pxValue,750);
   }
+
+  /**
+   * Use {@link WXViewUtils#getRealPxByWidth(Object, float, int)} instead.
+   */
+  @Deprecated
   public static float getRealPxByWidth(float pxValue,int customViewport) {
     if (Float.isNaN(pxValue)) {
       return pxValue;
@@ -303,9 +312,9 @@ public class WXViewUtils {
                 pxValue = Float.parseFloat(temp);
             }
         } catch (NumberFormatException nfe) {
-            WXLogUtils.e("Argument format error! value is " + temp, nfe);
+            WXLogUtils.e("Argument format error! value is " + temp, WXLogUtils.getStackTrace(nfe));
         } catch (Exception e) {
-            WXLogUtils.e("Argument error! value is " + temp, e);
+            WXLogUtils.e("Argument error! value is " + temp, WXLogUtils.getStackTrace(e));
         }
         if (mUseWebPx) {
             return (float) Math.rint(pxValue);
