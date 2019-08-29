@@ -112,7 +112,8 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
   int UpdateGlobalConfig(const char *config) override;
 
   int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) override;
-
+  void SetLogType(const int logType, const bool isPerf) override;
+  double GetLayoutTime(const char* instanceId) const override;
 
 private:
   DISALLOW_COPY_AND_ASSIGN(CoreSideInPlatform);

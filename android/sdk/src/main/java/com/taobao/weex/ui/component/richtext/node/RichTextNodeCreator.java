@@ -20,7 +20,10 @@ package com.taobao.weex.ui.component.richtext.node;
 
 import android.content.Context;
 
+import java.util.Map;
+
 public interface RichTextNodeCreator<T extends RichTextNode> {
 
   T createRichTextNode(Context context, String instanceId, String componentRef);
+  T createRichTextNode(Context context,String instanceId,String componentRef,String ref,Map<String,Object> styles, Map<String,Object> attrs);
 }

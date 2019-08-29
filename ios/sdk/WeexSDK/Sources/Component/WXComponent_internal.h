@@ -71,6 +71,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     NSString * _groupAccessibilityChildren; // voice-over navigation order
     NSString * _testId;// just for auto-test
     
+    BOOL _userInteractionEnabled;
+    BOOL _eventPenetrationEnabled;
     BOOL _accessibilityMagicTapEvent;
     
     /**

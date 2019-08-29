@@ -34,6 +34,7 @@ extern NSString* const KEY_PAGE_PROPERTIES_JSLIB_VERSION;
 extern NSString* const KEY_PAGE_PROPERTIES_WEEX_VERSION;
 extern NSString* const KEY_PAGE_PROPERTIES_REQUEST_TYPE;
 extern NSString* const KEY_PAGE_PROPERTIES_Z_CACHE_INFO;
+extern NSString* const KEY_PAGE_PROPERTIES_GREY_BUNDLE;
 extern NSString* const KEY_PAGE_PROPERTIES_JS_FM_INIT;
 extern NSString* const KEY_PAGE_PROPERTIES_BUNDLE_TYPE;
 extern NSString* const KEY_PAGE_PROPERTIES_CONTAINER_NAME;
@@ -47,6 +48,8 @@ extern NSString* const KEY_PAGE_PROPERTIES_UIKIT_TYPE;
 extern NSString* const KEY_PAGE_STAGES_START;
 extern NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_START;
 extern NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_END;
+extern NSString* const KEY_PAGE_STAGES_DOWN_JS_START;
+extern NSString* const KEY_PAGE_STAGES_DOWN_JS_END;
 extern NSString* const KEY_PAGE_STAGES_CUSTOM_PREPROCESS_START;
 extern NSString* const KEY_PAGE_STAGES_CUSTOM_PREPROCESS_END;
 extern NSString* const KEY_PAGE_STAGES_RENDER_ORGIGIN;
@@ -65,6 +68,10 @@ extern NSString* const KEY_PAGE_STAGES_DESTROY;
 extern NSString* const KEY_PAGE_STATS_BUNDLE_SIZE;
 extern NSString* const KEY_PAGE_STATS_FS_CALL_JS_TIME;
 extern NSString* const KEY_PAGE_STATS_FS_CALL_JS_NUM;
+extern NSString* const KEY_PAGE_STATS_EXECUTE_JS_TIME;
+extern NSString* const KEY_PAGE_STATS_CREATE_COMPONENT_TIME;
+extern NSString* const KEY_PAGE_STATS_CREATE_VIEW_TIME;
+extern NSString* const KEY_PAGE_STATS_LAYOUT_TIME;
 extern NSString* const KEY_PAGE_STATS_FS_TIMER_NUM;
 extern NSString* const KEY_PAGE_STATS_FS_CALL_NATIVE_TIME;
 extern NSString* const KEY_PAGE_STATS_FS_CALL_NATIVE_NUM;
@@ -116,6 +123,7 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 @property (nonatomic, assign) BOOL isStartRender;
 @property (nonatomic,assign)  BOOL  hasRecordFirstInterationView;
 @property (nonatomic, assign) BOOL isDownLoadFailed;
+@property (nonatomic, assign) BOOL forceStopRecordInteractionTime;
 @property (nonatomic,assign) double pageRatio;
 
 #pragma mark - basic method
@@ -135,6 +143,8 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 - (void) updateMaxStats:(NSString *)name curMaxValue:(double)maxValue;
 - (void) updateExtInfoFromResponseHeader:(NSDictionary*) extInfo;
 - (void) forceSetInteractionTime:(long) unixTime;
+- (void) addUpdateComponentDataTimestamp:(long)unixTime;
+- (void) addUpdateComponentDataTime:(long)unixTime;
 
 
 #pragma mark - called by IWXHttpAdapter implementer

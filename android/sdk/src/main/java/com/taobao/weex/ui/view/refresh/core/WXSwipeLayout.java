@@ -20,6 +20,7 @@ package com.taobao.weex.ui.view.refresh.core;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
@@ -692,11 +693,14 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
    * Whether child view can scroll up
    * @return
    */
+  @SuppressLint("ObsoleteSdkInt")
   public boolean canChildScrollUp() {
     if (mTargetView == null) {
       return false;
     }
     if (Build.VERSION.SDK_INT < 14) {
+      //The minimum version of Android platform that Weex supports is API 14,
+      //so this block should never enter.
       if (mTargetView instanceof AbsListView) {
         final AbsListView absListView = (AbsListView) mTargetView;
         return absListView.getChildCount() > 0
@@ -714,11 +718,14 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
    * Whether child view can scroll down
    * @return
    */
+  @SuppressLint("ObsoleteSdkInt")
   public boolean canChildScrollDown() {
     if (mTargetView == null) {
       return false;
     }
     if (Build.VERSION.SDK_INT < 14) {
+      //The minimum version of Android platform that Weex supports is API 14,
+      //so this block should never enter.
       if (mTargetView instanceof AbsListView) {
         final AbsListView absListView = (AbsListView) mTargetView;
         if (absListView.getChildCount() > 0) {

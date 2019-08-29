@@ -30,9 +30,9 @@
 @property (nonatomic, assign) double jsCreateFinishTime;
 
 //firsrScreen call jsMethod totalTime
-@property (nonatomic, assign) double fsCallJsTime;
+@property (nonatomic, assign) double callJsTime;
 //firsrScreen call jsMethod totalNum
-@property (nonatomic, assign) double fsCallJsNum;
+@property (nonatomic, assign) double callJsNum;
 //firsrScreen call nativeMethod totalTime
 @property (nonatomic, assign) double fsCallNativeTime;
 //firsrScreen call nativeMethod totalNum
@@ -61,12 +61,15 @@
 //all componentCreate time in instance life
 @property (nonatomic,assign) double componentCreateTime;
 
+@property (nonatomic,assign) double viewCreateTime;
+
 @property (nonatomic,assign) double newFsRenderTime;
 @property (nonatomic,assign) long lastRealInteractionTime;
 //for performance record
 
 - (void)onViewLoad:(WXComponent *)targetComponent;
 - (void)recordComponentCreatePerformance:(double) diffTime forComponent:(WXComponent *)targetComponent;
+- (void)recordViewCreatePerformance:(double) diffTime;
 - (void)onInstanceRenderSuccess:(WXSDKInstance*) instance;
 
 @end

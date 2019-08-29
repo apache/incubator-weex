@@ -17,37 +17,30 @@
  * under the License.
  */
 //
-// Created by Darin on 2019-07-01.
+// Created by Darin on 2019-06-24.
 //
 
-#ifndef WEEX_PROJECT_TLOG_H
-#define WEEX_PROJECT_TLOG_H
+#ifndef WEEX_PROJECT_LOG_UTILS_JSS_H
+#define WEEX_PROJECT_LOG_UTILS_JSS_H
 
+#include "base/log_defines.h"
 #include "weex_env.h"
+class LogUtilsJSS : public weex::base::LogBase {
+ public:
+  bool log(WeexCore::LogLevel level,
+           const char *tag,
+           const char *file,
+           unsigned long line,
+           const char *log) override {
 
-namespace Weex {
-    class TLog {
-    public: static void tlog(const char* fmt, ...) {
-            va_list arg_list;
-            int size;
-            va_start(arg_list, fmt);
-            size = vsnprintf(nullptr, 0, fmt, arg_list);
-            int byte_count = size + 1;
-            char * buffer = (char*)malloc(byte_count);
-            memset(buffer, 0, byte_count);
-            va_end(arg_list);
-            if (size > 0) {
-                va_start(arg_list, fmt);
-                vsnprintf(const_cast<char*>(buffer), byte_count, fmt, arg_list);
-                va_end(arg_list);
-            }
-            WeexEnv::getEnv()->sendTLog("JSEngine", buffer);
+    //Please do not add Any LOGE in this function.
 
-            free(buffer);
-        }
-    };
-
-
-}
-
-#endif //WEEX_PROJECT_TLOG_H
+    // for performance, only send TLog & performance Log to main process
+    if (level == WeexCore::LogLevel::Performance
+        || level == WeexCore::LogLevel::Tlog) {
+      return WeexEnv::getEnv()->sendLog((int) level, tag, file, line, log);
+    }
+    return false;
+  }
+};
+#endif //WEEX_PROJECT_LOG_UTILS_JSS_H

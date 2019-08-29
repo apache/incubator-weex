@@ -19,10 +19,14 @@
 package com.taobao.weex.ui.component.richtext.node;
 
 import android.content.Context;
+import android.support.v4.util.ArrayMap;
 import android.text.SpannableStringBuilder;
 
 import com.taobao.weex.ui.component.richtext.span.ASpan;
 import com.taobao.weex.ui.component.richtext.span.ItemClickSpan;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 class ANode extends RichTextNode {
 
@@ -32,6 +36,12 @@ class ANode extends RichTextNode {
     public ANode createRichTextNode(Context context, String instanceId, String componentRef) {
       return new ANode(context, instanceId, componentRef);
     }
+    @Override
+    public ANode createRichTextNode(Context context,String instanceId,String componentRef,String ref,
+                                      Map<String,Object> styles, Map<String,Object> attrs){
+      return new ANode(context,instanceId,componentRef,ref,styles,attrs);
+    }
+
   }
 
   public static final String NODE_TYPE = "a";
@@ -39,6 +49,9 @@ class ANode extends RichTextNode {
 
   private ANode(Context context, String instanceId, String componentRef) {
     super(context, instanceId, componentRef);
+  }
+  private ANode(Context context, String instanceId, String componentRef, String ref, Map<String,Object> styles, Map<String,Object> attrs) {
+    super(context, instanceId, componentRef, ref, styles, attrs);
   }
 
   @Override

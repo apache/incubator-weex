@@ -74,8 +74,10 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STAGES_CREATE_FINISH= "wxJSBundleCreateFinish";
     public static final String KEY_PAGE_STAGES_FSRENDER = "wxFsRender";
     public static final String KEY_PAGE_STAGES_NEW_FSRENDER = "wxNewFsRender";
+    public static final String KEY_PAGE_STAGES_END_EXCUTE_BUNDLE = "wxEndExecuteBundle";
     public static final String KEY_PAGE_STAGES_INTERACTION = "wxInteraction";
     public static final String KEY_PAGE_STAGES_DESTROY = "wxDestroy";
+
     //Custom preprocessing start, called when activity created or other time. Called by other activity
     public static final String KEY_PAGE_STAGES_CUSTOM_PREPROCESS_START = "wxCustomPreprocessStart";
     //Custom preprocessing end, called when you'are able to start weex render. Called by other activity
@@ -117,6 +119,11 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STATS_NET_SUCCESS_NUM = "wxNetworkRequestSuccessCount";
     public static final String KEY_PAGE_STATS_NET_FAIL_NUM = "wxNetworkRequestFailCount";
     public static final String KEY_PAGE_STATS_JSLIB_INIT_TIME = "wxJSLibInitTime";
+    public static final String KEY_PAGE_STATS_VIEW_CREATE_COST = "wxViewCost";
+    public static final String KEY_PAGE_STATS_COMPONENT_CREATE_COST = "wxComponentCost";
+    public static final String KEY_PAGE_STATS_EXECUTE_JS_CALLBACK_COST = "wxExecJsCallBack";
+    public static final String KEY_PAGE_STATS_LAYOUT_TIME = "wxLayoutTime";
+
 
     /************** value *****************/
     public static final String VALUE_ERROR_CODE_DEFAULT = "0";
@@ -140,6 +147,18 @@ public class WXInstanceApm {
     private Handler mUIHandler;
 
     public Set<String> exceptionRecord = new CopyOnWriteArraySet<String>();
+
+    private double interactionLayoutTime;
+    public long componentCreateTime;
+    private long interactionComponentCreateTime;
+    public long viewCreateTime;
+    private long interactionViewCreateTime;
+    //next version
+    private long wxExecJsCallBackTime;
+    private long interactionJsCallBackTime;
+
+
+    private boolean mHasRecordDetailData = false;
 
     /**
      * send performance value to js
@@ -367,6 +386,8 @@ public class WXInstanceApm {
         if (null == apmInstance || mEnd) {
             return;
         }
+        new Handler(Looper.getMainLooper()).removeCallbacks(delayCollectDataTask);
+        recordPerformanceDetailData();
         exceptionRecord.clear();
         mUIHandler.removeCallbacks(jsPerformanceCallBack);
         onStage(KEY_PAGE_STAGES_DESTROY);
@@ -378,6 +399,17 @@ public class WXInstanceApm {
             printLog();
         }
     }
+
+    public void doDelayCollectData(){
+        new Handler(Looper.getMainLooper()).postDelayed(delayCollectDataTask,8000);
+    }
+
+    private Runnable delayCollectDataTask = new Runnable() {
+        @Override
+        public void run() {
+            recordPerformanceDetailData();
+        }
+    };
 
 
     private void printLog(){
@@ -450,6 +482,17 @@ public class WXInstanceApm {
         if (forceStopRecordInteraction){
             return;
         }
+        long now = WXUtils.getFixUnixTime();
+        if (now - preUpdateTime > 50){
+            //for performance, reduce jni calls
+            WXBridgeManager.getInstance().onInteractionTimeUpdate(mInstanceId);
+            preUpdateTime = now;
+        }
+
+        interactionComponentCreateTime = componentCreateTime;
+        interactionViewCreateTime = viewCreateTime;
+        Double layoutTime = recordStatsMap.get("wxLayoutTime");
+        interactionLayoutTime = layoutTime ==null? 0:layoutTime;
 
         performanceRecord.interactionTime = curTime - performanceRecord.renderUnixTimeOrigin;
         performanceRecord.interactionRealUnixTime = System.currentTimeMillis();
@@ -463,11 +506,24 @@ public class WXInstanceApm {
         }
     }
 
+    private long preUpdateTime = 0;
+
     public void updateFSDiffStats(String name, double diffValue) {
         if (null == apmInstance || isFSEnd) {
             return;
         }
         updateDiffStats(name, diffValue);
+    }
+
+    public void recordPerformanceDetailData(){
+        if (mHasRecordDetailData){
+            return;
+        }
+        mHasRecordDetailData = true;
+        addStats(KEY_PAGE_STATS_VIEW_CREATE_COST,interactionViewCreateTime);
+        addStats(KEY_PAGE_STATS_COMPONENT_CREATE_COST,interactionComponentCreateTime);
+        addStats(KEY_PAGE_STATS_EXECUTE_JS_CALLBACK_COST,interactionJsCallBackTime);
+        addStats(KEY_PAGE_STATS_LAYOUT_TIME,interactionLayoutTime);
     }
 
     public void updateDiffStats(String name, double diffValue) {
@@ -608,4 +664,20 @@ public class WXInstanceApm {
         return builder.toString();
    }
 
+   public void updateNativePerformanceData(Map<String,String> nativePerformanceData){
+        if (null == nativePerformanceData){
+            return;
+        }
+        for (Map.Entry<String,String> entry : nativePerformanceData.entrySet()){
+            double value = -1;
+            try {
+                value = Double.valueOf(entry.getValue());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            if (value != -1){
+                recordStatsMap.put(entry.getKey(),value);
+            }
+        }
+   }
  }

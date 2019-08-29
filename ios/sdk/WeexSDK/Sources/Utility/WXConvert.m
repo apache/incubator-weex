@@ -134,9 +134,6 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             WXPerformBlockSyncOnMainThread(^{
                 safeAreaInsets = topInstance.rootView.safeAreaInsets;
             });
-            
-        } else {
-            // Fallback on earlier versions
         }
 #endif
         NSUInteger key = [directionArray indexOfObject:value];

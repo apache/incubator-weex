@@ -182,6 +182,7 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
     }
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
     if(!scrollable) {

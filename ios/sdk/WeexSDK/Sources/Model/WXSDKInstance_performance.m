@@ -28,6 +28,7 @@
 #import "WXImageComponent.h"
 #import "WXUtility.h"
 #import "WXAnalyzerCenter+Transfer.h"
+#import "WXCoreBridge.h"
 
 @interface WXPerformance()
 @property (nonatomic, assign) bool hasRecordFsRenderTimeByPosition;
@@ -40,6 +41,10 @@
 {
     self.componentCount++;
     self.componentCreateTime+=diffTime;
+}
+
+- (void)recordViewCreatePerformance:(double) diffTime {
+    self.viewCreateTime += diffTime;
 }
 
 /** on UI thread **/
@@ -108,7 +113,7 @@
     if ([targetComponent.type isEqualToString:@"videoplus"]) {
         return;
     }
-    
+
     bool inScreen = CGRectIntersectsRect(rootFrame, absoluteFrame);
     if (!inScreen) {
         return;
@@ -124,6 +129,11 @@
     self.interactionAddCount = self.interactionAddCountRecord;
     [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_I_SCREEN_VIEW_COUNT curMaxValue:self.interactionLimitAddOpCount];
     [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_I_ALL_VIEW_COUNT curMaxValue:self.interactionAddCount];
+    [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_EXECUTE_JS_TIME curMaxValue:self.callJsTime];
+    [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_CREATE_COMPONENT_TIME curMaxValue:self.componentCreateTime];
+    [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_CREATE_VIEW_TIME curMaxValue:self.viewCreateTime];
+    [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_LAYOUT_TIME curMaxValue:[WXCoreBridge getLayoutTime:targetComponent.weexInstance.instanceId]];
+
     self.interactionTime = self.interactionTime < diff ? diff :self.interactionTime;
 }
 
@@ -186,8 +196,8 @@
     [WXMonitor performanceFinishWithState:DebugAfterFSFinish instance:self];
     self.performance.jsCreateFinishTime =  CACurrentMediaTime()*1000;
     self.isJSCreateFinish = TRUE;
-    WX_MONITOR_PERF_SET(WXPTFsCallJsNum, self.performance.fsCallJsNum, self);
-    WX_MONITOR_PERF_SET(WXPTFsCallJsTime, self.performance.fsCallJsTime, self);
+    WX_MONITOR_PERF_SET(WXPTFsCallJsNum, self.performance.callJsNum, self);
+    WX_MONITOR_PERF_SET(WXPTFsCallJsTime, self.performance.callJsTime, self);
     WX_MONITOR_PERF_SET(WXPTFsCallNativeNum, self.performance.fsCallNativeNum, self);
     WX_MONITOR_PERF_SET(WXPTFsCallNativeTime, self.performance.fsCallNativeTime, self);
     WX_MONITOR_PERF_SET(WXPTFsReqNetNum, self.performance.fsReqNetNum, self);

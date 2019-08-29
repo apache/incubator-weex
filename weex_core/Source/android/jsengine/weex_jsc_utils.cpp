@@ -540,7 +540,8 @@ void ReportException(JSGlobalObject *_globalObject, Exception *exception, const 
     CString data = exceptionInfo.utf8();
 
     auto *globalObject = static_cast<WeexGlobalObject *>(_globalObject);
-    globalObject->js_bridge()->core_side()->ReportException(instanceid, func, data.data());
+    const char *exception_char = data.data();
+    globalObject->js_bridge()->core_side()->ReportException(instanceid, func, exception_char == nullptr? "" : exception_char);
 }
 
 

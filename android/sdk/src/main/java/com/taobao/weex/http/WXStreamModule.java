@@ -36,11 +36,13 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
+import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.utils.WXLogUtils;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,7 +78,7 @@ public class WXStreamModule extends WXModule {
     String body = paramsObj.getString("body");
     int timeout = paramsObj.getIntValue("timeout");
 
-    if (method != null) method = method.toUpperCase();
+    if (method != null) method = method.toUpperCase(Locale.ROOT);
     Options.Builder builder = new Options.Builder()
             .setMethod(!"GET".equals(method)
                     &&!"POST".equals(method)
@@ -129,7 +131,7 @@ public class WXStreamModule extends WXModule {
     fetch(optionsObj, callback, progressCallback, mWXSDKInstance.getInstanceId(), mWXSDKInstance.getBundleUrl());
   }
 
-  public void fetch(JSONObject optionsObj , final JSCallback callback, JSCallback progressCallback, String instanceId, String bundleURL){
+  public void fetch(JSONObject optionsObj , final JSCallback callback, JSCallback progressCallback, final String instanceId, String bundleURL){
     boolean invaildOption = optionsObj==null || optionsObj.getString("url")==null;
     if(invaildOption){
       if(callback != null) {
@@ -157,7 +159,7 @@ public class WXStreamModule extends WXModule {
       }
     }
 
-    if (method != null) method = method.toUpperCase();
+    if (method != null) method = method.toUpperCase(Locale.ROOT);
     Options.Builder builder = new Options.Builder()
         .setMethod(!"GET".equals(method)
             &&!"POST".equals(method)
@@ -201,6 +203,7 @@ public class WXStreamModule extends WXModule {
             resp.put(STATUS_TEXT, Status.getStatusText(response.statusCode));
           }
           resp.put("headers", headers);
+          WXStateRecord.getInstance().recordAction(instanceId,"stream response code:"+(null!= response?response.statusCode:"null"));
           callback.invoke(resp);
         }
       }
@@ -234,7 +237,7 @@ public class WXStreamModule extends WXModule {
     if(headers.containsKey(key)){
       return headers.get(key);
     }else{
-      return headers.get(key.toLowerCase());
+      return headers.get(key.toLowerCase(Locale.ROOT));
     }
   }
 
@@ -243,7 +246,7 @@ public class WXStreamModule extends WXModule {
   static String readAsString(byte[] data,String cType){
     String charset = "utf-8";
     if(cType != null){
-      Matcher matcher = CHARSET_PATTERN.matcher(cType.toLowerCase());
+      Matcher matcher = CHARSET_PATTERN.matcher(cType.toLowerCase(Locale.ROOT));
       if(matcher.find()){
         charset = matcher.group(1);
       }

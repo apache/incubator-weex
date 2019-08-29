@@ -332,6 +332,10 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                 transition:(WXTransition*)transition
              transitionDic:(NSMutableDictionary*)transitionDic
 {
+    if (args[@"styles"][property] == nil) {
+        return;
+    }
+    
     [transition.filterStyles setObject:args[@"styles"][property] forKey:property];
     
     id oldStyleValue = target.styles[property];
@@ -346,7 +350,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     [target _modifyStyles:@{property:args[@"styles"][property]}];
     [transitionDic setObject:@([args[@"duration"] doubleValue]) forKey:kWXTransitionDuration];
     [transitionDic setObject:@([args[@"delay"] doubleValue]) forKey:kWXTransitionDelay];
-    [transitionDic setObject:args[@"timingFunction"] forKey:kWXTransitionTimingFunction];
+    [transitionDic setObject:args[@"timingFunction"] ?: @"linear" forKey:kWXTransitionTimingFunction];
 }
 
 - (void)animation:(WXComponent *)targetComponent args:(NSDictionary *)args callback:(WXModuleKeepAliveCallback)callback
@@ -426,7 +430,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         }
     } else {
         CATransform3D transform = layer.transform;
-        if (info.target->_transform.perspective && !isinf(info.target->_transform.perspective)) {
+        if (info.target->_transform.perspective && !isinf(info.target->_transform.perspective)) { //!OCLint
             transform.m34 = -1.0/info.target->_transform.perspective*[UIScreen mainScreen].scale;
             layer.transform = transform;
         }

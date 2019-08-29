@@ -18,6 +18,10 @@
  */
 package com.taobao.weex.ui.view.gesture;
 
+import static com.taobao.weex.common.Constants.Event.STOP_PROPAGATION;
+import static com.taobao.weex.common.Constants.Event.STOP_PROPAGATION_RAX;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -30,7 +34,6 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.bridge.EventResult;
@@ -44,15 +47,11 @@ import com.taobao.weex.ui.view.gesture.WXGestureType.LowLevelGesture;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import static com.taobao.weex.common.Constants.Event.STOP_PROPAGATION;
-import static com.taobao.weex.common.Constants.Event.STOP_PROPAGATION_RAX;
 
 public class WXGesture extends GestureDetector.SimpleOnGestureListener implements OnTouchListener {
 
@@ -207,6 +206,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
     return false;
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouch(View v, MotionEvent event) {
     if(requestDisallowInterceptTouchEvent){

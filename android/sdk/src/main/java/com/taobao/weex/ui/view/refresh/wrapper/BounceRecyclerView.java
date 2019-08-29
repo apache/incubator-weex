@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.view.refresh.wrapper;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
@@ -30,6 +31,7 @@ import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 
+@SuppressLint("ViewConstructor")
 public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implements ListComponentView,WXGestureObservable {
 
   public static final int DEFAULT_COLUMN_COUNT = 1;

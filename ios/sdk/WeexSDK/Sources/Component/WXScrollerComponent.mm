@@ -266,8 +266,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         if ([scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
             scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
         }
-    } else {
-        // Fallback on earlier versions
     }
     
     if (self.ancestorScroller) {
@@ -935,8 +933,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             if( offset.y <= _refreshComponent.calculatedFrame.size.height ) {
                 [self loadMoreIfNeed];
             }
-        } else if (velocity.y > 0) {
-            // drop up
         }
     }
     

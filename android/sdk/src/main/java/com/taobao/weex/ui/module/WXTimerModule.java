@@ -25,6 +25,7 @@ import static com.taobao.weex.bridge.WXBridgeManager.METHOD_CALL_JS;
 import static com.taobao.weex.common.WXJSBridgeMsgType.MODULE_INTERVAL;
 import static com.taobao.weex.common.WXJSBridgeMsgType.MODULE_TIMEOUT;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.FloatRange;
@@ -61,6 +62,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   private Handler handler;
   private SparseArray<Integer> antiIntAutoBoxing;
 
+  @SuppressLint("UseSparseArrays")
   public WXTimerModule() {
     handler = new Handler(WXBridgeManager.getInstance().getJSLooper(), this);
     antiIntAutoBoxing = new SparseArray<>();

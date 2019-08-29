@@ -32,7 +32,7 @@ class MultiProcessAndSoInitializer {
   virtual ~MultiProcessAndSoInitializer() {}
 
   bool Init(const std::function<void(IPCHandler*)>&,
-            const std::function<bool(std::unique_ptr<WeexJSConnection>, std::unique_ptr<IPCHandler>, std::unique_ptr<IPCHandler>)>&,
+            const std::function<bool(std::unique_ptr<WeexJSConnection>)>&,
             const std::function<void(const char*, const char*, const char*)>&);
 };
 }  // namespace WeexCore

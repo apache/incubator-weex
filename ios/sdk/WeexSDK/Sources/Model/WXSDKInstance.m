@@ -141,8 +141,6 @@ typedef enum : NSUInteger {
         _performance = [[WXPerformance alloc] init];
         _apmInstance = [[WXApmForInstance alloc] init];
         
-        [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
-        
         _defaultDataRender = NO;
         
         _useBackupJsThread = NO;
@@ -310,6 +308,9 @@ typedef enum : NSUInteger {
         return;
     }
     [WXCoreBridge install];
+    if (_useBackupJsThread) {
+        [[WXSDKManager bridgeMgr] executeJSTaskQueue];
+    }
 
     self.scriptURL = url;
     [self _checkPageName];
@@ -329,6 +330,9 @@ typedef enum : NSUInteger {
     _options = [options isKindOfClass:[NSDictionary class]] ? options : nil;
     _jsData = data;
     [WXCoreBridge install];
+    if (_useBackupJsThread) {
+        [[WXSDKManager bridgeMgr] executeJSTaskQueue];
+    }
 
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:self.scriptURL];
 
@@ -391,6 +395,8 @@ typedef enum : NSUInteger {
     //some case , with out render (url)
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
+    
+    [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
     if (self.dataRender) {
         [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"eagle"];
     }
@@ -477,6 +483,8 @@ typedef enum : NSUInteger {
     [self _checkPageName];
     [self.apmInstance startRecord:self.instanceId];
     self.apmInstance.isStartRender = YES;
+    
+    [_apmInstance setProperty:KEY_PAGE_PROPERTIES_UIKIT_TYPE withValue:_renderType?: WEEX_RENDER_TYPE_PLATFORM];
     if (self.dataRender) {
         [self.apmInstance setProperty:KEY_PAGE_PROPERTIES_RENDER_TYPE withValue:@"eagle"];
     }
@@ -1053,7 +1061,7 @@ typedef enum : NSUInteger {
         [self removeObserver:self forKeyPath:@"state" context:NULL];
         [[NSNotificationCenter defaultCenter] removeObserver:self];
     }
-    @catch (NSException *exception) {
+    @catch (NSException *exception) {//!OCLint
     }
 }
 

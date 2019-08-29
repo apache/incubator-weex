@@ -150,6 +150,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     return false;
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
     if(!scrollable) {

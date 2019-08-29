@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import android.Manifest;
@@ -484,7 +485,7 @@ public class WXImage extends WXComponent<ImageView> {
 
         if (WXAnalyzerDataTransfer.isOpenPerformance){
           WXAnalyzerDataTransfer.transferPerformance(getInstanceId(),"details",WXInstanceApm.KEY_PAGE_STATS_WRONG_IMG_SIZE_COUNT,
-              String.format("imgSize:[%d,%d],viewSize:[%d,%d],urL:%s",imgWidth,imgHeight,imageView.getMeasuredWidth(),imageView.getMeasuredHeight()
+              String.format(Locale.ROOT, "imgSize:[%d,%d],viewSize:[%d,%d],urL:%s",imgWidth,imgHeight,imageView.getMeasuredWidth(),imageView.getMeasuredHeight()
               ,currentImgUrlStr)
           );
         }

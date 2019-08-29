@@ -16,16 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#ifndef CORE_RENDER_ACTION_RENDER_ACTION_REMOVE_CHILD_FROM_RICHTEXT_H_
+#define CORE_RENDER_ACTION_RENDER_ACTION_REMOVE_CHILD_FROM_RICHTEXT_H_
 
-#pragma once
+#include <string>
+#include "core/render/action/render_action_interface.h"
 
 namespace WeexCore {
+class RenderObject;
+class RenderActionRemoveChildFromRichtext : public RenderAction {
+ public:
+  explicit RenderActionRemoveChildFromRichtext(const std::string &page_id, const std::string &ref, const RenderObject* parent, RenderObject* richtext);
 
-    class LogBridge {
-    public:
-        LogBridge() {}
-        
-        virtual void log(LogLevel level, const char* tag, const char* file, unsigned long line, const char* log) {};
-    };
-    
-}
+  void ExecuteAction();
+
+ public:
+  std::string page_id_;
+  std::string ref_;
+  std::string parent_ref_;
+  std::string richtext_ref_;
+};
+}  // namespace WeexCore
+
+#endif  // CORE_RENDER_ACTION_RENDER_ACTION_REMOVE_CHILD_FROM_RICHTEXT_H_

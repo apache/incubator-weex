@@ -151,7 +151,9 @@ void BufferAssembler::readData(const char*& blob)
             break;
         case IPCType::END:
         default:
-            IPC_UNREACHABLE();
+            IPC_LOGE("IPC TO BE END");
+            m_datas.emplace_back();
+            break;
         }
     }
 }
