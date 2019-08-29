@@ -20,6 +20,8 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class WXBridgeMethod;
 @class WXSDKInstance;
 @class WXComponent;
@@ -281,3 +283,5 @@ void WXPerformBlockSyncOnComponentThread(void (^block)(void));
 - (void)performBatchEnd;
 
 @end
+
+NS_ASSUME_NONNULL_END

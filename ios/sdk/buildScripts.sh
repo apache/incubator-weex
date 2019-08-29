@@ -28,8 +28,12 @@ echo '* Licensed to the Apache Software Foundation (ASF) under one
 * under the License.' >> $headerFilePath
 	echo ' */' >> $headerFilePath
 	echo '' >> $headerFilePath
-	echo '#ifdef __OBJC__' >> $headerFilePath
+	echo '#import <UIKit/UIKit.h>' >> $headerFilePath
 	echo '' >> $headerFilePath
+    echo 'FOUNDATION_EXPORT double WeexSDKVersionNumber;' >> $headerFilePath
+    echo '' >> $headerFilePath
+    echo 'FOUNDATION_EXPORT const unsigned char WeexSDKVersionString[];' >> $headerFilePath
+    echo '' >> $headerFilePath
 	return 0;
 }
 
@@ -38,7 +42,7 @@ echo '* Licensed to the Apache Software Foundation (ASF) under one
 function generateFileFooter() {
 	headerFilePath=$1
 	echo '' >> $headerFilePath
-	echo '#endif /* __OBJC__ */' >> $headerFilePath
+#    echo '#endif /* __OBJC__ */' >> $headerFilePath
 	return 0;
 }
 
@@ -96,7 +100,7 @@ function generateImport() {
 			if [ "$exclude" = "yes" ]; then
 				continue
 			fi
-			echo "#import \"$header\"" >> $headerFilePath
+			echo "#import <WeexSDK/$header>" >> $headerFilePath
 		fi
 	done
 	return 0;

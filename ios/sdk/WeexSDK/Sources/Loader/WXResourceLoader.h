@@ -18,9 +18,10 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXResourceRequest.h"
-#import "WXResourceResponse.h"
+#import <WeexSDK/WXResourceRequest.h>
+#import <WeexSDK/WXResourceResponse.h>
 
+NS_ASSUME_NONNULL_BEGIN
 
 @interface WXResourceLoader : NSObject
 
@@ -39,3 +40,5 @@
 - (void)cancel:(NSError **)error;
 
 @end
+
+NS_ASSUME_NONNULL_END

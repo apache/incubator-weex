@@ -17,7 +17,9 @@
  * under the License.
  */
 
-#import "WXComponent.h"
+#import <WeexSDK/WXComponent.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 #define  REFRESH_DISTANCE_Y                 @"dy"
 #define  REFRESH_PULLINGDISTANCE            @"pullingDistance"
@@ -36,3 +38,5 @@
 - (void)setDisplay;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -18,13 +18,15 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "WXComponent.h"
-#import "WXJSExceptionInfo.h"
-#import "WXResourceResponse.h"
-#import "WXResourceRequest.h"
-#import "WXBridgeProtocol.h"
-#import "WXApmForInstance.h"
-#import "WXComponentManager.h"
+#import <WeexSDK/WXComponent.h>
+#import <WeexSDK/WXJSExceptionInfo.h>
+#import <WeexSDK/WXResourceResponse.h>
+#import <WeexSDK/WXResourceRequest.h>
+#import <WeexSDK/WXBridgeProtocol.h>
+#import <WeexSDK/WXApmForInstance.h>
+#import <WeexSDK/WXComponentManager.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const bundleUrlOptionKey;
 
@@ -249,13 +251,13 @@ typedef enum : NSUInteger {
  * The callback triggered when the bundleJS request finished in the renderWithURL.
  * @return A block that takes response which the server response,request which send to server,data which the server returned and an error
  */
-@property (nonatomic, copy) void(^onJSDownloadedFinish)(WXResourceResponse *response,WXResourceRequest *request,NSData *data, NSError* error);
+@property (nonatomic, copy) void(^onJSDownloadedFinish)(WXResourceResponse *response,WXResourceRequest *request,NSData* _Nullable data, NSError* _Nullable error);
 
 /**
  * The callback triggered when the bundleJS request finished in the renderWithURL. If the callback returns YES, the render process will terminate.
  * @return A block that takes response which the server response,request which send to server,data which the server returned and an error
  */
-@property (nonatomic, copy) BOOL (^onRenderTerminateWhenJSDownloadedFinish)(WXResourceResponse *response,WXResourceRequest *request,NSData *data, NSError* error);
+@property (nonatomic, copy) BOOL (^onRenderTerminateWhenJSDownloadedFinish)(WXResourceResponse *response,WXResourceRequest *request,NSData* _Nullable data, NSError* _Nullable error);
 
 @property(nonatomic,strong) NSDictionary* continerInfo;
 
@@ -294,7 +296,7 @@ typedef enum : NSUInteger {
  *
  * @param data The data the bundle needs when rendered.  Defalut is nil.
  **/
-- (void)renderWithURL:(NSURL *)url options:(NSDictionary *)options data:(id)data;
+- (void)renderWithURL:(NSURL *)url options:(NSDictionary * _Nullable)options data:(id _Nullable)data;
 
 ///**
 // * Renders weex view with resource request.
@@ -314,7 +316,7 @@ typedef enum : NSUInteger {
  *
  * @param data The data the bundle needs when rendered. Defalut is nil.
  **/
-- (void)renderView:(id)source options:(NSDictionary *)options data:(id)data;
+- (void)renderView:(id)source options:(NSDictionary * _Nullable)options data:(id _Nullable)data;
 
 /**
  * Reload the js bundle from the current URL and rerender.
@@ -378,12 +380,12 @@ typedef enum : NSUInteger {
  * @param eventName the event name
  * @param params event params
  */
-- (void)fireModuleEvent:(Class)module eventName:(NSString *)eventName params:(NSDictionary*)params;
+- (void)fireModuleEvent:(Class)module eventName:(NSString *)eventName params:(NSDictionary* _Nullable)params;
 
 /**
  * fire global event
  */
-- (void)fireGlobalEvent:(NSString *)eventName params:(NSDictionary *)params;
+- (void)fireGlobalEvent:(NSString *)eventName params:(NSDictionary * _Nullable)params;
 
 /**
  * complete url based with bundle url
@@ -393,7 +395,7 @@ typedef enum : NSUInteger {
 /**
  * jsbundle str ,may be nil (weak)
  */
-- (NSString*) bundleTemplate;
+- (NSString* _Nullable) bundleTemplate;
 
 /**
  * application performance statistics
@@ -454,3 +456,5 @@ typedef enum : NSUInteger {
 - (void)creatFinish DEPRECATED_MSG_ATTRIBUTE();
 
 @end
+
+NS_ASSUME_NONNULL_END

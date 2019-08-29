@@ -18,11 +18,9 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "WXSDKInstance.h"
+#import <WeexSDK/WeexSDK.h>
 #import "TestSupportUtils.h"
-#import "WXSDKEngine.h"
-#import "WXLog.h"
-#import "WXUtility.h"
+
 
 @interface WXRootViewTests : XCTestCase
 

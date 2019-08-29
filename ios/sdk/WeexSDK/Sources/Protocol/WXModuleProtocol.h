@@ -18,8 +18,10 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "WXDefine.h"
-#import "WXSDKInstance.h"
+#import <WeexSDK/WXDefine.h>
+#import <WeexSDK/WXSDKInstance.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 #define MSG_SUCCESS     @"WX_SUCCESS"
 #define MSG_NO_HANDLER  @"WX_NO_HANDLER"
@@ -34,14 +36,14 @@
  * @abstract the module callback , result can be string or dictionary.
  * @discussion callback data to js, the id of callback function will be removed to save memory.
  */
-typedef void (^WXModuleCallback)(id result);
+typedef void (^WXModuleCallback)(id _Nullable result);
 //DEPRECATED_MSG_ATTRIBUTE("use WXModuleKeepAliveCallback, you can specify keep the callback or not, if keeped, it can be called multi times, or it will be removed after called.")
 
 /**
  * @abstract the module callback , result can be string or dictionary.
  * @discussion callback data to js, you can specify the keepAlive parameter to keep callback function id keepalive or not. If the keepAlive is true, it won't be removed until instance destroyed, so you can call it repetitious.
  */
-typedef void (^WXModuleKeepAliveCallback)(id result, BOOL keepAlive);
+typedef void (^WXModuleKeepAliveCallback)(id _Nullable result, BOOL keepAlive);
 
 #define WX_EXPORT_MODULE(module) 
 
@@ -76,3 +78,5 @@ typedef void (^WXModuleKeepAliveCallback)(id result, BOOL keepAlive);
 @property (nonatomic, weak) WXSDKInstance *weexInstance;
 
 @end
+
+NS_ASSUME_NONNULL_END

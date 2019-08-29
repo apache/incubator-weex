@@ -18,10 +18,7 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "WXSDKInstance.h"
-#import "WXComponent.h"
-#import "WXConvert.h"
-#import "WXComponent_internal.h"
+#import <WeexSDK/WeexSDK.h>
 #import "WXAnimationModule.h"
 #import "TestSupportUtils.h"
 

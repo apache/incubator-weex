@@ -17,7 +17,9 @@
  * under the License.
  */
 
-#import "WXModuleProtocol.h"
+#import <WeexSDK/WXModuleProtocol.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  * This enum is used to define the position of navbar item.
@@ -82,7 +84,7 @@ typedef void (^WXNavigationResultBlock)(NSString *code, NSDictionary * responseD
  */
 - (void)setNavigationItemWithParam:(NSDictionary *)param
                           position:(WXNavigationItemPosition)position
-                        completion:(WXNavigationResultBlock)block
+                        completion:(nullable WXNavigationResultBlock)block
                      withContainer:(UIViewController *)container;
 
 /**
@@ -99,7 +101,7 @@ typedef void (^WXNavigationResultBlock)(NSString *code, NSDictionary * responseD
  */
 - (void)clearNavigationItemWithParam:(NSDictionary *)param
                             position:(WXNavigationItemPosition)position
-                          completion:(WXNavigationResultBlock)block
+                          completion:(nullable WXNavigationResultBlock)block
                        withContainer:(UIViewController *)container;
 
 /**
@@ -113,7 +115,7 @@ typedef void (^WXNavigationResultBlock)(NSString *code, NSDictionary * responseD
  *
  */
 - (void)pushViewControllerWithParam:(NSDictionary *)param
-                         completion:(WXNavigationResultBlock)block
+                         completion:(nullable WXNavigationResultBlock)block
                       withContainer:(UIViewController *)container;
 
 /**
@@ -127,7 +129,7 @@ typedef void (^WXNavigationResultBlock)(NSString *code, NSDictionary * responseD
  *
  */
 - (void)popViewControllerWithParam:(NSDictionary *)param
-                        completion:(WXNavigationResultBlock)block
+                        completion:(nullable WXNavigationResultBlock)block
                      withContainer:(UIViewController *)container;
 
     
@@ -145,8 +147,8 @@ typedef void (^WXNavigationResultBlock)(NSString *code, NSDictionary * responseD
  * @param container The target controller.
  *
  */
-- (void)open:(NSDictionary *)param success:(WXModuleCallback)success
-                                   failure:(WXModuleCallback)failure
+- (void)open:(NSDictionary *)param success:(nullable WXModuleCallback)success
+                                   failure:(nullable WXModuleCallback)failure
                              withContainer:(UIViewController *)container;
 
 
@@ -162,7 +164,9 @@ typedef void (^WXNavigationResultBlock)(NSString *code, NSDictionary * responseD
   * @param container The target controller.
   *
   */
-- (void)close:(NSDictionary *)param success:(WXModuleCallback)success
-                                   failure:(WXModuleCallback)failure
+- (void)close:(NSDictionary *)param success:(nullable WXModuleCallback)success
+                                   failure:(nullable WXModuleCallback)failure
                              withContainer:(UIViewController *)container;
 @end
+
+NS_ASSUME_NONNULL_END

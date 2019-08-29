@@ -19,6 +19,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef enum : NSUInteger {
     WXResourceTypeMainBundle,
     WXResourceTypeServiceBundle,
@@ -40,7 +42,9 @@ typedef enum : NSUInteger {
 
 + (instancetype)requestWithURL:(NSURL *)url
                   resourceType:(WXResourceType)type
-                      referrer:(NSString *)referrer
+                      referrer:(NSString * _Nullable)referrer
                    cachePolicy:(NSURLRequestCachePolicy)cachePolicy;
 
 @end
+
+NS_ASSUME_NONNULL_END

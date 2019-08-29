@@ -18,7 +18,9 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXJSExceptionInfo.h"
+#import <WeexSDK/WXJSExceptionInfo.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - const static string
 
@@ -161,3 +163,5 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 #pragma mark templateinfo
 - (NSString*) templateInfo;
 @end
+
+NS_ASSUME_NONNULL_END

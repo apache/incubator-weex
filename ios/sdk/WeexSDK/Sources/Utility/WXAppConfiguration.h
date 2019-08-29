@@ -19,6 +19,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface WXAppConfiguration : NSObject
 
 /**
@@ -64,3 +66,5 @@
 + (void)setCustomizeProtocolClasses:(NSArray*)customizeProtocolClasses;
 
 @end
+
+NS_ASSUME_NONNULL_END

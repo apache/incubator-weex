@@ -18,10 +18,8 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "WXSDKInstance.h"
-#import "WXComponent.h"
-#import "WXComponent_internal.h"
-#import "WXUtility.h"
+#import <WeexSDK/WeexSDK.h>
+
 
 @interface WXTestComponent : WXComponent
 
@@ -108,27 +106,6 @@
     
     [component release];
     XCTAssertTrue(1 == component.retainCount);
-}
-
-- (void)testLazyCreatView
-{
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        WXSDKInstance *instance = [[WXSDKInstance alloc] init];
-        WXComponent *component = [[WXComponent alloc] initWithRef:@"0" type:@"div" styles:@{} attributes:@{} events:@[] weexInstance:instance];
-        WXComponent *subcomponent = [[WXComponent alloc] initWithRef:@"1" type:@"div" styles:@{} attributes:@{} events:@[] weexInstance:instance];
-        WXComponent *subSubcomponent = [[WXComponent alloc] initWithRef:@"2" type:@"div" styles:@{} attributes:@{} events:@[] weexInstance:instance];
-        subcomponent->_lazyCreateView = YES;
-        [component _insertSubcomponent:subcomponent atIndex:0];
-        [subcomponent _insertSubcomponent:subSubcomponent atIndex:0];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            __unused UIView *view = component.view;
-            XCTAssertFalse([subcomponent isViewLoaded], @"Component which has lazyCreateView should create view when used");
-            XCTAssertFalse([subSubcomponent isViewLoaded], @"Component which has lazyCreateView should create view when used");
-            __unused UIView *subView = subcomponent.view;
-            XCTAssertTrue([subSubcomponent isViewLoaded], @"Component's lazyCreateView can not create subview.");
-            XCTAssertEqual(subSubcomponent.view.superview, subcomponent.view, @"Component's lazyCreateView can not add subcomponent's view to subview");
-        });
-    });
 }
 
 #define XCTAssertEqualCGFloat(expression1, expression2, ...) \

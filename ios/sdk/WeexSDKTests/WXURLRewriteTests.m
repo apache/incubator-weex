@@ -18,10 +18,7 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "WXURLRewriteProtocol.h"
-#import "WXHandlerFactory.h"
-#import "WXSDKInstance.h"
-#import "WXSDKEngine.h"
+#import <WeexSDK/WeexSDK.h>
 
 @interface WXURLRewriteTests : XCTestCase
 
