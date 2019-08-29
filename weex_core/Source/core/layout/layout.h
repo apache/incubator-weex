@@ -27,8 +27,8 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
-#include <WeexSDK/style.h>
-#include <WeexSDK/flex_enum.h>
+#include "style.h"
+#include "flex_enum.h"
 
 namespace WeexCore {
 
