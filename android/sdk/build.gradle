@@ -151,6 +151,9 @@ android {
                         '-DANDROID_PROJECT_DIR=' + "${android_project_dir}",
                         '-DENABLE_ASAN=false',
                         '-DBUILD_RUNTIME_API='+"${buildRuntimeApi}"
+                if(project.hasProperty('enableASan') && "true" == project.getProperty('enableASan')) {
+                    cppFlags "-fsanitize=address -fno-omit-frame-pointer"
+                }
             }
         }
     }
@@ -264,11 +267,10 @@ if(file('../license/LICENSE').exists()){
     }
     preBuild.dependsOn licenseFormat
 }
-
+def ndkDir = ''
 task checkNdkVersion() {
     def rootDir = project.rootDir
     def localProperties = new File(rootDir, "local.properties")
-    def ndkDir = ''
     if (localProperties.exists()) {
         Properties properties = new Properties()
         localProperties.withInputStream { instr ->
@@ -360,7 +362,45 @@ artifactory {
         }
     }
 }
-
+def asanAbi = project.hasProperty('asanAbi') ? project.getProperty('asanAbi') : 'arm64-v8a'
+task clearASanLibs(type: Delete){
+    delete project.android.sourceSets.main.resources.srcDirs
+    delete fileTree(project.android.sourceSets.main.jniLibs.srcDirs[-1]) {
+        include '**/libclang_rt.asan-*-android.so'
+    }
+}
+task copyWrapScript(type: Copy,dependsOn: clearASanLibs) {
+    if(project.hasProperty('enableASan') && "true" == project.getProperty('enableASan')) {
+        from '../../scripts/wrap.sh'
+        into new File(project.android.sourceSets.main.resources.srcDirs[-1], "lib")
+        eachFile {
+            it.path = "${asanAbi}/${it.name}"
+        }
+    }
+}
+task copyASanLib(type: Copy,dependsOn: copyWrapScript){
+    if(project.hasProperty('enableASan') && "true" == project.getProperty('enableASan')) {
+        def ndkPath = ndkDir == '' ? System.getenv("ANDROID_NDK_HOME"):ndkDir
+        def dir = ndkPath + '/toolchains/llvm/prebuilt/'
+        def renamedAbi = asanAbi
+        if (asanAbi == "armeabi-v7a" || asanAbi == "armeabi")
+            renamedAbi = "arm"
+        if (asanAbi == "arm64-v8a")
+            renamedAbi = "aarch64"
+        if (asanAbi == "x86")
+            renamedAbi = "i686"
+        new File(dir).eachFileRecurse { file ->
+            if (file.name == 'libclang_rt.asan-' + renamedAbi + '-android.so')
+                from file.absolutePath
+                into project.android.sourceSets.main.jniLibs.srcDirs[-1]
+                eachFile {
+                    it.path = "${asanAbi}/${it.name}"
+                }
+            includeEmptyDirs = false
+        }
+    }
+}
+preBuild.dependsOn copyASanLib
 
 afterEvaluate { project ->
     transformNativeLibsWithStripDebugSymbolForRelease << {
