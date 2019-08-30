@@ -204,11 +204,11 @@ public class GraphicActionAnimation extends BasicGraphicAction {
         ViewGroup.LayoutParams layoutParams = target.getLayoutParams();
         if (!TextUtils.isEmpty(style.width)) {
           holders.add(PropertyValuesHolder.ofInt(new WidthProperty(), layoutParams.width,
-              (int) WXViewUtils.getRealPxByWidth(WXUtils.getFloat(style.width), viewPortWidth)));
+              (int) WXViewUtils.getRealPxByWidth(style.width, Float.NaN, viewPortWidth)));
         }
         if (!TextUtils.isEmpty(style.height)) {
           holders.add(PropertyValuesHolder.ofInt(new HeightProperty(), layoutParams.height,
-              (int) WXViewUtils.getRealPxByWidth(WXUtils.getFloat(style.height), viewPortWidth)));
+              (int) WXViewUtils.getRealPxByWidth(style.width, Float.NaN, viewPortWidth)));
         }
       }
 

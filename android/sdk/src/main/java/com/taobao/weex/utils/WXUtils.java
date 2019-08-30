@@ -48,7 +48,10 @@ public class WXUtils {
     return Float.isNaN(value);
   }
 
-
+  /**
+   * Use {@link WXViewUtils#getRealPxByWidth(Object, float, int)} instead.
+   */
+  @Deprecated
   public static float getFloatByViewport(Object value, int viewport) {
     if (value == null) {
       return Float.NaN;
@@ -89,11 +92,18 @@ public class WXUtils {
     }
     return Float.NaN;
   }
-
+  /**
+   * Use {@link WXViewUtils#getRealPxByWidth(Object, float, int)} instead.
+   */
+  @Deprecated
   public static float getFloat(Object value) {
     return getFloat(value, Float.NaN);
   }
 
+  /**
+   * Use {@link WXViewUtils#getRealPxByWidth(Object, float, int)} instead.
+   */
+  @Deprecated
   public static Float getFloat(Object value, @Nullable Float df) {
     if (value == null) {
       return df;
@@ -135,7 +145,7 @@ public class WXUtils {
     return df;
   }
 
-  private static float transferWx(String stringWithWXPostfix, int viewport) {
+  static float transferWx(String stringWithWXPostfix, int viewport) {
     if(null == stringWithWXPostfix) {
       return 0;
     }
