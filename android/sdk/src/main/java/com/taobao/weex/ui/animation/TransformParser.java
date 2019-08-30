@@ -243,7 +243,7 @@ public class TransformParser {
         return new LinkedHashMap<>();
     }
 
-    protected static Pair<Float, Float> parsePivot(@Nullable String transformOrigin,
+    static Pair<Float, Float> parsePivot(@Nullable String transformOrigin,
                                                  int width, int height, int viewportW) {
         if (!TextUtils.isEmpty(transformOrigin)) {
             int firstSpace = transformOrigin.indexOf(FunctionParser.SPACE);

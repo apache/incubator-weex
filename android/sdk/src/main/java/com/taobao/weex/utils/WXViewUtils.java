@@ -312,9 +312,9 @@ public class WXViewUtils {
                 pxValue = Float.parseFloat(temp);
             }
         } catch (NumberFormatException nfe) {
-            WXLogUtils.e("Argument format error! value is " + temp, WXLogUtils.getStackTrace(nfe));
+            WXLogUtils.e(WXLogUtils.getStackTrace(nfe));
         } catch (Exception e) {
-            WXLogUtils.e("Argument error! value is " + temp, WXLogUtils.getStackTrace(e));
+            WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
         if (mUseWebPx) {
             return (float) Math.rint(pxValue);
