@@ -267,11 +267,10 @@ if(file('../license/LICENSE').exists()){
     }
     preBuild.dependsOn licenseFormat
 }
-
+def ndkDir = ''
 task checkNdkVersion() {
     def rootDir = project.rootDir
     def localProperties = new File(rootDir, "local.properties")
-    def ndkDir = ''
     if (localProperties.exists()) {
         Properties properties = new Properties()
         localProperties.withInputStream { instr ->
@@ -381,23 +380,24 @@ task copyWrapScript(type: Copy,dependsOn: clearASanLibs) {
 }
 task copyASanLib(type: Copy,dependsOn: copyWrapScript){
     if(project.hasProperty('enableASan') && "true" == project.getProperty('enableASan')) {
-        def ndkDir = System.getenv("ANDROID_NDK_HOME")
-        println("ndkDir" + ndkDir)
+        def ndkPath = ndkDir == '' ? System.getenv("ANDROID_NDK_HOME"):ndkDir
+        def dir = ndkPath + '/toolchains/llvm/prebuilt/'
         def renamedAbi = asanAbi
-        if(asanAbi == "armeabi-v7a" || asanAbi == "armeabi")
+        if (asanAbi == "armeabi-v7a" || asanAbi == "armeabi")
             renamedAbi = "arm"
-        if(asanAbi == "arm64-v8a")
+        if (asanAbi == "arm64-v8a")
             renamedAbi = "aarch64"
         if (asanAbi == "x86")
             renamedAbi = "i686"
-        from (ndkDir+'/toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/'){
-            include '**/lib/linux/libclang_rt.asan-'+renamedAbi+'-android.so'
+        new File(dir).eachFileRecurse { file ->
+            if (file.name == 'libclang_rt.asan-' + renamedAbi + '-android.so')
+                from file.absolutePath
+                into project.android.sourceSets.main.jniLibs.srcDirs[-1]
+                eachFile {
+                    it.path = "${asanAbi}/${it.name}"
+                }
+            includeEmptyDirs = false
         }
-        into project.android.sourceSets.main.jniLibs.srcDirs[-1]
-        eachFile {
-            it.path = "${asanAbi}/${it.name}"
-        }
-        includeEmptyDirs = false
     }
 }
 preBuild.dependsOn copyASanLib
