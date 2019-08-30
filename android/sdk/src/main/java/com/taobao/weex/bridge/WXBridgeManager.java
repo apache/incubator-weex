@@ -3580,6 +3580,22 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       mWXBridge.setViewPortWidth(instanceId,viewPortWidth);
     }
   }
+  public void setPageArgument(String instanceId,String key,String value){
+    if (isSkipFrameworkInit(instanceId) || isJSFrameworkInit()) {
+      mWXBridge.setPageArgument(instanceId,key,value);
+    }
+  }
+  public void reloadPageLayout(String instanceId){
+    if (isSkipFrameworkInit(instanceId) || isJSFrameworkInit()) {
+      mWXBridge.reloadPageLayout(instanceId);
+    }
+  }
+
+  public void setDeviceDisplayOfPage(String instanceId,float width,float height){
+    if (isSkipFrameworkInit(instanceId) || isJSFrameworkInit()) {
+      mWXBridge.setDeviceDisplayOfPage(instanceId,width,height);
+    }
+  }
 
   public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
     WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(instanceId, ref);

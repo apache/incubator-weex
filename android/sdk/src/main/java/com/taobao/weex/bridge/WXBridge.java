@@ -139,6 +139,10 @@ import java.util.Map;
   private native void nativeSetViewPortWidth(String instanceId, float viewPortWidth);
   private native void nativeSetLogType(float type, float isPerf);
 
+  private native void nativeReloadPageLayout(String instanceId);
+
+  private native void nativeSetDeviceDisplayOfPage(String instanceId,float width,float height);
+
   public static final boolean MULTIPROCESS = true;
 
 
@@ -919,4 +923,12 @@ import java.util.Map;
   public void registerComponentOnDataRenderNode(String data) {
     nativeRegisterComponentOnDataRenderNode(data);
   }
+  public void reloadPageLayout(String instanceId){
+    nativeReloadPageLayout(instanceId);
+  }
+
+  public void setDeviceDisplayOfPage(String instanceId, float width, float height){
+    nativeSetDeviceDisplayOfPage(instanceId,width,height);
+  }
+
 }

@@ -210,6 +210,12 @@ static void SetPageArgument(JNIEnv *env, jobject jcaller,
 static void SetLogType(JNIEnv* env, jobject jcaller, jfloat type,
                        jfloat isPerf);
 
+static void ReloadPageLayout(JNIEnv *env, jobject jcaller,
+                             jstring instanceId);
+static void SetDeviceDisplayOfPage(JNIEnv *env, jobject jcaller,
+                                   jstring instanceId,jfloat width,jfloat height);
+
+
 // Step 2: method stubs.
 
 static intptr_t g_WXBridge_onReceivedResult = 0;
@@ -1390,6 +1396,18 @@ static const JNINativeMethod kMethodsWXBridge[] = {
      "F"
      ")"
      "V", reinterpret_cast<void *>(SetLogType)},
+    {"nativeReloadPageLayout",
+     "("
+     "Ljava/lang/String;"
+     ")"
+     "V",reinterpret_cast<void *>(ReloadPageLayout)},
+    {"nativeSetDeviceDisplayOfPage",
+    "("
+    "Ljava/lang/String;"
+    "F"
+    "F"
+    ")"
+    "V",reinterpret_cast<void *>(SetDeviceDisplayOfPage)}
 };
 
 static bool RegisterNativesImpl(JNIEnv *env) {
