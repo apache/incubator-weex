@@ -371,7 +371,7 @@ task clearASanLibs(type: Delete){
 }
 task copyWrapScript(type: Copy,dependsOn: clearASanLibs) {
     if(project.hasProperty('enableASan') && "true" == project.getProperty('enableASan')) {
-        from '../../scripts/wrap.sh'
+        from 'wrap.sh'
         into new File(project.android.sourceSets.main.resources.srcDirs[-1], "lib")
         eachFile {
             it.path = "${asanAbi}/${it.name}"
