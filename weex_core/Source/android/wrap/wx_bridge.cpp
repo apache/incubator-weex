@@ -286,6 +286,10 @@ static void SetLogType(JNIEnv* env, jobject jcaller, jfloat logLevel,
       ->core_side()
       ->SetLogType(l, flag);
 }
+static void ReloadPageLayout(JNIEnv *env, jobject jcaller,
+                              jstring instanceId){
+  WeexCoreManager::Instance()->getPlatformBridge()->core_side()->RelayoutUsingRawCssStyles(jString2StrFast(env,instanceId));
+}
 
 static void SetPageArgument(JNIEnv* env, jobject jcaller,
                             jstring instanceId,
@@ -295,6 +299,10 @@ static void SetPageArgument(JNIEnv* env, jobject jcaller,
             ->getPlatformBridge()
             ->core_side()->SetPageArgument(jString2StrFast(env, instanceId),
                                            jString2StrFast(env, key), jString2StrFast(env, value));
+}
+static void SetDeviceDisplayOfPage(JNIEnv *env, jobject jcaller,
+                                   jstring instanceId,jfloat width,jfloat height){
+  WeexCoreManager::Instance()->getPlatformBridge()->core_side()->SetDeviceDisplayOfPage(jString2StrFast(env,instanceId),width,height);
 }
 
 static void SetDeviceDisplay(JNIEnv* env, jobject jcaller, jstring instanceId,

@@ -465,6 +465,15 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXBridgeManager.getInstance().setViewPortWidth(getInstanceId(), mInstanceViewPortWidth);
     }
   }
+  public void resetDeviceDisplayOfPage(){
+    WXBridgeManager.getInstance().setDeviceDisplayOfPage(getInstanceId(), WXViewUtils.getScreenWidth(getContext()), WXViewUtils.getScreenHeight(getContext()));
+  }
+  public void setPageKeepRawCssStyles(){
+    WXBridgeManager.getInstance().setPageArgument(getInstanceId(),"reserveCssStyles","true");
+  }
+  public void reloadPageLayout(){
+    WXBridgeManager.getInstance().reloadPageLayout(getInstanceId());
+  }
 
   public void setAutoAdjustDeviceWidth(boolean autoAdjustViewPort){
     this.mAutoAdjustDeviceWidth = autoAdjustViewPort;
