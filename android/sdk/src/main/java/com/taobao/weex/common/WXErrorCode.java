@@ -227,8 +227,8 @@ public enum WXErrorCode {
   WX_RENDER_ERR_TEXTURE_SETBACKGROUND("-9620", "WX_RENDER_ERR_TEXTURE_SETBACKGROUND", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
   WX_RENDER_WAR_GPU_LIMIT_LAYOUT("-9621", "WX_RENDER_WAR_GPU_LIMIT_LAYOUT", ErrorType.JS_ERROR,ErrorGroup.JS),
 
-  WX_KEY_EXCEPTION_HERON("-9900", "Error of Heron engine: ", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
-  WX_KEY_EXCEPTION_HERON_RENDER("-9901", "Render error of Heron engine: ", ErrorType.RENDER_ERROR, ErrorGroup.NATIVE),
+  WX_KEY_EXCEPTION_HERON("Heron_-9900", "Error of Heron engine: ", ErrorType.NATIVE_ERROR, ErrorGroup.NATIVE),
+  WX_KEY_EXCEPTION_HERON_RENDER("Heron_-9901", "Render error of Heron engine: ", ErrorType.RENDER_ERROR, ErrorGroup.NATIVE),
 
   WX_KEY_EXCEPTION_NO_BUNDLE_TYPE("-9801", "Fatal Error : No bundle type in js bundle head, cause white screen or memory leak!!", ErrorType.JS_ERROR, ErrorGroup.JS),
   /**
@@ -270,7 +270,7 @@ public enum WXErrorCode {
 
   WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED_JS("-1006", "degradeToH5|createInstance fail|wx_create_instance_error",ErrorType.DEGRAD_ERROR,ErrorGroup.JS),
 
-  WX_DEGRAD_EAGLE_RENDER_ERROR ("-1007", "degradeToH5|eagleRenderErr", ErrorType.DEGRAD_ERROR, ErrorGroup.JS),
+  WX_DEGRAD_EAGLE_RENDER_ERROR ("Eagle_-1007", "degradeToH5|eagleRenderErr", ErrorType.DEGRAD_ERROR, ErrorGroup.NATIVE),
 
   WX_ERR_HASH_MAP_TMP("-10010", "WX_ERR_HASH_MAP_TMP",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
