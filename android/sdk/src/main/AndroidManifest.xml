@@ -20,14 +20,4 @@ under the License.
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.taobao.weex">
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-
-    <application>
-        <receiver
-                android:name="com.taobao.weex.WXGlobalEventReceiver"
-                android:enabled="true"
-                android:exported="false">
-        </receiver>
-
-
-    </application>
 </manifest>
