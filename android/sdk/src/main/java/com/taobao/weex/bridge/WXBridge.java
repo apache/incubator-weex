@@ -884,7 +884,7 @@ import java.util.Map;
         params.put(IWXUserTrackAdapter.MONITOR_ERROR_CODE, statusCode);
         params.put(IWXUserTrackAdapter.MONITOR_ARG, "InitFrameworkNativeError");
         params.put(IWXUserTrackAdapter.MONITOR_ERROR_MSG, errorMsg);
-        Log.e("Dyy", "reportNativeInitStatus is running and errorCode is " + statusCode + " And errorMsg is " + errorMsg);
+        WXLogUtils.e("reportNativeInitStatus is running and errorCode is " + statusCode + " And errorMsg is " + errorMsg);
         userTrackAdapter.commit(null, null, IWXUserTrackAdapter.INIT_FRAMEWORK, null, params);
       }
 

@@ -493,7 +493,7 @@ void WeexRuntime::exeJSWithCallback(const String &instanceId, const String &name
 }
 
 std::unique_ptr<WeexJSResult> WeexRuntime::exeJSOnInstance(const String &instanceId, const String &script) {
-    LOGE("test-> [runtime] beofore exeJSOnInstance");
+    LOGD("test-> [runtime] beofore exeJSOnInstance");
     std::unique_ptr<WeexJSResult> returnResult;
     returnResult.reset(new WeexJSResult);
 
@@ -526,7 +526,7 @@ std::unique_ptr<WeexJSResult> WeexRuntime::exeJSOnInstance(const String &instanc
     char *buf = new char[returnResult->length + 1];
     strcpy(buf, data);
     returnResult->data.reset(buf);
-    LOGE("test-> [runtime] end exeJSOnInstance");
+    LOGD("test-> [runtime] end exeJSOnInstance");
     return returnResult;
 }
 

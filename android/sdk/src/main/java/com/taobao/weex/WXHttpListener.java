@@ -219,10 +219,10 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
 
         if (isPreDownLoadMode){
             if (isInstanceReady){
-                WXLogUtils.e("test->", "DownLoad didHttpFinish on http" );
+                WXLogUtils.d("test->", "DownLoad didHttpFinish on http" );
                 didHttpFinish(response);
             }else {
-                WXLogUtils.e("test->", "DownLoad end before activity created" );
+                WXLogUtils.d("test->", "DownLoad end before activity created" );
                 mResponse = response;
                 isResponseHasWait = true;
             }
@@ -238,7 +238,7 @@ public class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
         }
         this.isInstanceReady = true;
         if (isResponseHasWait){
-            WXLogUtils.e("test->", "preDownLoad didHttpFinish on ready" );
+            WXLogUtils.d("test->", "preDownLoad didHttpFinish on ready" );
             this.didHttpFinish(mResponse);
         }
 

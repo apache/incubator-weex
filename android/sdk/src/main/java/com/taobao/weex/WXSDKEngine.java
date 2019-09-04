@@ -167,7 +167,7 @@ public class WXSDKEngine implements Serializable {
       long start = System.currentTimeMillis();
       WXEnvironment.sSDKInitStart = start;
       if(WXEnvironment.isApkDebugable(application)){
-        WXEnvironment.sLogLevel = LogLevel.INFO;
+        WXEnvironment.sLogLevel = LogLevel.DEBUG;
       }else{
         WXEnvironment.sLogLevel = LogLevel.WARN;
       }

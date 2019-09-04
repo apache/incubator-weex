@@ -605,13 +605,13 @@ public class WXEnvironment {
 
   public static String getLibJssRealPath() {
     if (WXEnvironment.sUseRunTimeApi && !TextUtils.isEmpty(CORE_JSS_RUNTIME_SO_PATH)){
-      WXLogUtils.e("test-> findLibJssRuntimeRealPath " + CORE_JSS_RUNTIME_SO_PATH);
+      WXLogUtils.d("test-> findLibJssRuntimeRealPath " + CORE_JSS_RUNTIME_SO_PATH);
       return CORE_JSS_RUNTIME_SO_PATH;
     }
 
     if(TextUtils.isEmpty(CORE_JSS_SO_PATH)) {
       CORE_JSS_SO_PATH = findSoPath(CORE_JSS_SO_NAME);
-      WXLogUtils.e("test-> findLibJssRealPath " + CORE_JSS_SO_PATH);
+      WXLogUtils.d("test-> findLibJssRealPath " + CORE_JSS_SO_PATH);
     }
 
     return CORE_JSS_SO_PATH;
@@ -652,7 +652,7 @@ public class WXEnvironment {
       }
     }
 
-    WXLogUtils.e("getLibLdPath is " + LIB_LD_PATH);
+    WXLogUtils.d("getLibLdPath is " + LIB_LD_PATH);
     return LIB_LD_PATH;
   }
 
