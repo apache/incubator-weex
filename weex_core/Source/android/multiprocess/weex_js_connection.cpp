@@ -334,11 +334,11 @@ static void findIcuDataPath(std::string &icuDataPath) {
   fseek(f,0L,SEEK_END);
   int size=ftell(f);
 
-    LOGE("file size is %d",size);
+    LOGD("file size is %d",size);
     struct stat statbuf;
     stat("/proc/self/maps",&statbuf);
     int size1=statbuf.st_size;
-    LOGE("file size1 is %d",size1);
+    LOGD("file size1 is %d",size1);
   char buffer[256];
   char *line;
   while ((line = fgets(buffer, 256, f))) {
@@ -401,7 +401,7 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
   std::string executablePath;
   std::string icuDataPath;
   if(SoUtils::jss_icu_path() != nullptr) {
-    LOGE("jss_icu_path not null %s",SoUtils::jss_icu_path());
+    LOGD("jss_icu_path not null %s",SoUtils::jss_icu_path());
     icuDataPath = SoUtils::jss_icu_path();
   } else {
     s_in_find_icu = true;
@@ -529,7 +529,7 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
       const char *argv[] = {executableName.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0", g_crashFileName.c_str(), nullptr};
       if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                        const_cast<char *const *>(envp.get()))) {
-          LOGE("bbbbbbbbbbbb execve failed errno %s \n", strerror(errno));
+          LOGE("execve failed errno %s \n", strerror(errno));
 #if PRINT_LOG_CACHEFILE
         mcfile << "execve failed:" << strerror(errno) << std::endl;
 #endif

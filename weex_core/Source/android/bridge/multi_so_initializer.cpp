@@ -43,7 +43,7 @@ bool MultiSoInitializer::Init(
     soPath = SoUtils::FindLibJssSoPath();
   }
 
-  LOGE("final executablePath:%s", soPath.c_str());
+  LOGD("final executablePath:%s", soPath.c_str());
   SoUtils::updateSoLinkPath(SoUtils::lib_ld_path());
   void *handle = dlopen(soPath.c_str(), RTLD_NOW);
   if (!handle) {

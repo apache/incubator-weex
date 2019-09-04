@@ -58,7 +58,7 @@ int ScriptSideInQueue::InitFramework(
 
     if(WeexEnv::getEnv()->can_m_cache_task_()) {
       WeexEnv::getEnv()->m_task_cache_.push_back(new InitFrameworkTask(String::fromUTF8(script), params));
-      LOGE("cache initFramework %d", WeexEnv::getEnv()->m_task_cache_.size());
+      LOGD("cache initFramework %d", WeexEnv::getEnv()->m_task_cache_.size());
     } else {
       weexTaskQueue_bk_ = new WeexTaskQueue(weexTaskQueue_->isMultiProgress);
       weexTaskQueue_bk_->addTask(new InitFrameworkTask(String::fromUTF8(script), params));
@@ -136,7 +136,7 @@ int ScriptSideInQueue::ExecJsService(const char *source) {
     ExeJsServicesTask *task = new ExeJsServicesTask(String::fromUTF8(source));
     if(WeexEnv::getEnv()->can_m_cache_task_() && weexTaskQueue_bk_ == nullptr){
       WeexEnv::getEnv()->m_task_cache_.push_back(task);
-      LOGE("cache ExecJsService %d", WeexEnv::getEnv()->m_task_cache_.size());
+      LOGD("cache ExecJsService %d", WeexEnv::getEnv()->m_task_cache_.size());
     } else {
       weexTaskQueue_bk_->addTask(task);
     }
@@ -171,7 +171,7 @@ int ScriptSideInQueue::ExecJS(const char *instanceId, const char *nameSpace,
     if (WeexEnv::getEnv()->enableBackupThread()) {
       if(WeexEnv::getEnv()->can_m_cache_task_() && weexTaskQueue_bk_ == nullptr){
         WeexEnv::getEnv()->m_task_cache_.push_back(task->clone());
-        LOGE("cache ExecJS %d", WeexEnv::getEnv()->m_task_cache_.size());
+        LOGD("cache ExecJS %d", WeexEnv::getEnv()->m_task_cache_.size());
       } else {
         weexTaskQueue_bk_->addTask(task->clone());
       }
@@ -278,7 +278,7 @@ std::unique_ptr<WeexJSResult> ScriptSideInQueue::ExecJSOnInstance(const char *in
       //don't need wait. just run js.
     std::unique_ptr<WeexJSResult> returnResult;
     returnResult.reset(new WeexJSResult());
-    LOGE("test-> return default result");
+    LOGD("test-> return default result");
     return returnResult;
   }
   auto future = std::unique_ptr<WeexTask::Future>(new WeexTask::Future());

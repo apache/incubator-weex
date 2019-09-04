@@ -1001,14 +1001,14 @@ ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   std::unique_ptr<MultiProcessAndSoInitializer> initializer(
       new MultiProcessAndSoInitializer);
 
-  LOGE("ScriptBridgeInMultiProcess");
+  LOGD("ScriptBridgeInMultiProcess");
   bool passable = initializer->Init(
       [this](IPCHandler *handler) { RegisterIPCCallback(handler); },
       [this](std::unique_ptr<WeexJSConnection> connection) {
         static_cast<bridge::script::ScriptSideInMultiProcess *>(script_side())
             ->set_sender(connection->sender());
         connection_ = std::move(connection);
-        LOGE("ScriptBridgeInMultiProcess finish");
+        LOGD("ScriptBridgeInMultiProcess finish");
         return true;
       },
       [this](const char *page_id, const char *func,

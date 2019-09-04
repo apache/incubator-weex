@@ -418,13 +418,13 @@ public class WXInstanceApm {
         Long interaction = stageMap.get(KEY_PAGE_STAGES_INTERACTION);
         Long containerReady = stageMap.get(KEY_PAGE_STAGES_CONTAINER_READY);
         if (null != endDownLoad && null != startDownLoad){
-            WXLogUtils.e("test->", "downLoadTime: "+ (endDownLoad - startDownLoad));
+            WXLogUtils.d("test->", "downLoadTime: "+ (endDownLoad - startDownLoad));
         }
         if (null != endDownLoad && null != interaction){
-            WXLogUtils.e("test->", "renderTime: "+ (interaction - endDownLoad));
+            WXLogUtils.d("test->", "renderTime: "+ (interaction - endDownLoad));
         }
         if (null != containerReady && null !=interaction){
-            WXLogUtils.e("test->", "showTime: "+ (interaction - containerReady));
+            WXLogUtils.d("test->", "showTime: "+ (interaction - containerReady));
         }
 
     }
