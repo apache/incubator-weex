@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.ui.module;
 
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
@@ -41,8 +43,14 @@ import com.taobao.weex.utils.WXLogUtils;
  * <p>
  *   This module is work different with other regular module, method is invoked directly, without reflection.
  * </p>
+ *
+ * <p>
+ *  This class is for internal purpose,
+ *  please don't use it directly unless you know what you are doing.
+ * </p>
  */
-public final class WXDomModule extends WXModule {
+@RestrictTo(Scope.LIBRARY_GROUP)
+public class WXDomModule extends WXModule {
 
   /** package **/
   public static final String SCROLL_TO_ELEMENT = "scrollToElement";

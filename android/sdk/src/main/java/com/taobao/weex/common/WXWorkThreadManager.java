@@ -18,13 +18,21 @@
  */
 package com.taobao.weex.common;
 
+import android.support.annotation.RestrictTo;
+import android.support.annotation.RestrictTo.Scope;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Class for managing work thread
+ * Class for managing work thread.
+ *
+ * <p>
+ *  This class is for internal purpose,
+ *  please don't use it directly unless you know what you are doing.
+ * </p>
  */
-public final class WXWorkThreadManager {
+@RestrictTo(Scope.LIBRARY_GROUP)
+public class WXWorkThreadManager {
 
   private ExecutorService singleThreadExecutor;
 
