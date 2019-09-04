@@ -163,6 +163,7 @@ static void *newIPCServer(void *_td) {
         int _errno = errno;
         //throw IPCException("failed to map ashmem region: %s", strerror(_errno));
         newThreadStatus = ERROR;
+        base::android::DetachFromVM();
         return nullptr;
     }
 
