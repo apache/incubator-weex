@@ -23,10 +23,10 @@ FOUNDATION_EXPORT double WeexSDKVersionNumber;
 
 FOUNDATION_EXPORT const unsigned char WeexSDKVersionString[];
 
-#import "style.h"
-#import "layout.h"
-#import "flex_enum.h"
-#import "eagle_bridge.h"
+#import <WeexSDK/style.h>
+#import <WeexSDK/layout.h>
+#import <WeexSDK/flex_enum.h>
+#import <WeexSDK/eagle_bridge.h>
 #import <WeexSDK/WXWebSocketHandler.h>
 #import <WeexSDK/WXVoiceOverModule.h>
 #import <WeexSDK/WXView.h>
