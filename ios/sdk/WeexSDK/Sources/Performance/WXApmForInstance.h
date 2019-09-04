@@ -150,11 +150,11 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 #pragma mark - called by IWXHttpAdapter implementer
 
 - (void) actionNetRequest;
-- (void) actionNetRequestResult:(bool)succeed withErrorCode:(NSString*)errorCode;
+- (void) actionNetRequestResult:(bool)succeed withErrorCode:(nullable NSString*)errorCode;
 
 #pragma mark - called by IWXImgLoaderAdapter implementer
 - (void) actionImgLoad;
-- (void) actionImgLoadResult:(bool)succeed withErrorCode:(NSString*)errorCode;
+- (void) actionImgLoadResult:(bool)succeed withErrorCode:(nullable NSString*)errorCode;
 
 #pragma mark record top5 errorMsg
 - (void) recordErrorMsg:(WXJSExceptionInfo *)exception;
