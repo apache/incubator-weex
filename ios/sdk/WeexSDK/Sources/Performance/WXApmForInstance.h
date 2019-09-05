@@ -125,6 +125,8 @@ extern NSString* const VALUE_ERROR_CODE_DEFAULT;
 @property (nonatomic, assign) BOOL isDownLoadFailed;
 @property (nonatomic, assign) BOOL forceStopRecordInteractionTime;
 @property (nonatomic,assign) double pageRatio;
+@property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStatsMap;
+@property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStageMap;
 
 #pragma mark - basic method
 
