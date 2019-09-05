@@ -134,8 +134,6 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 @property (nonatomic,strong) id<WXApmProtocol> apmProtocolInstance;
 @property (nonatomic,strong) NSString* instanceId;
-@property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStatsMap;
-@property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStageMap;
 @property (nonatomic,strong) NSMutableArray<NSNumber*>* recordUpdateComponentDataTimestamp;
 @property (nonatomic,strong) NSMutableArray<NSNumber*>* recordUpdateComponentDataTime;
 
