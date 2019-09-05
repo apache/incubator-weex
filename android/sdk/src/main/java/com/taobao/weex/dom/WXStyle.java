@@ -158,7 +158,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if (style == null) {
       return (int) WXViewUtils.getRealPxByWidth(WXText.sDEFAULT_SIZE,viewPortW);
     }
-    int fontSize = (int) WXViewUtils.getRealPxByWidth(style.get(Constants.Name.FONT_SIZE),viewPortW);
+    int fontSize = (int) WXViewUtils.getRealPxByWidth(style.get(Constants.Name.FONT_SIZE), 0f,viewPortW);
     if (fontSize <= 0) {
       fontSize = WXText.sDEFAULT_SIZE;
     }
@@ -213,7 +213,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if (style == null) {
       return UNSET;
     }
-    int lineHeight = (int)WXViewUtils.getRealPxByWidth(style.get(Constants.Name.LINE_HEIGHT),viewPortW);
+    int lineHeight = (int)WXViewUtils.getRealPxByWidth(style.get(Constants.Name.LINE_HEIGHT), 0f,viewPortW);
     if (lineHeight <= 0) {
       lineHeight = UNSET;
     }

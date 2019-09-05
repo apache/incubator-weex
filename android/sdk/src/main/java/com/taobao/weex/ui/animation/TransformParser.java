@@ -300,7 +300,7 @@ public class TransformParser {
         if ((suffix = raw.lastIndexOf(WXUtils.PERCENT)) != -1) {
             return parsePercent(raw.substring(0, suffix), unit, precision);
         }
-        return WXViewUtils.getRealPxByWidth(raw,viewportW);
+        return WXViewUtils.getRealPxByWidth(raw, 0f,viewportW);
 
     }
 
