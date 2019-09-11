@@ -175,7 +175,6 @@ class ScriptBridge {
   inline ScriptSide *script_side() { return script_side_.get(); }
 
   inline void set_core_side(CoreSide *core_side) {
-    LOGE("xxx set_core_side is runing and %p", core_side);
     core_side_.reset(core_side);
     core_side_->set_bridge(this);
   }
