@@ -124,6 +124,8 @@ typedef enum : NSUInteger {
             }
         }
         
+        WXLogInfo(@"Create instance: %@, render type: %@", _instanceId, _renderType);
+        
         // TODO self is retained here.
         [WXSDKManager storeInstance:self forID:_instanceId];
         
@@ -204,6 +206,12 @@ typedef enum : NSUInteger {
 {
     // get _rootView.frame in JS thread may cause deaklock.
     return [NSString stringWithFormat:@"<%@: %p; id = %@; rootView = %p; url= %@>", NSStringFromClass([self class]), self, _instanceId, (__bridge void*)_rootView, _scriptURL];
+}
+
+- (void)setParentInstance:(WXSDKInstance *)parentInstance
+{
+    WXLogInfo(@"Embed instance %@ into parent instance %@", _instanceId, parentInstance.instanceId);
+    _parentInstance = parentInstance;
 }
 
 #pragma mark Public Mehtods
@@ -710,12 +718,13 @@ typedef enum : NSUInteger {
     };
     
     _mainBundleLoader.onFailed = ^(NSError *loadError) {
+        WXLogError(@"Request failed with error: %@", loadError);
+        
         NSString *errorMessage = [NSString stringWithFormat:@"Request to %@ occurs an error:%@, info:%@", request.URL, loadError.localizedDescription, loadError.userInfo];
         long wxErrorCode = [loadError.domain isEqualToString:NSURLErrorDomain] && loadError.code == NSURLErrorNotConnectedToInternet ? WX_ERR_NOT_CONNECTED_TO_INTERNET : WX_ERR_JSBUNDLE_DOWNLOAD;
 
         WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, wxErrorCode, errorMessage, weakSelf.pageName);
         
-    
         NSMutableDictionary *allUserInfo = [[NSMutableDictionary alloc] initWithDictionary:error.userInfo];
         [allUserInfo addEntriesFromDictionary:loadError.userInfo];
         NSError *errorWithReportMsg = [NSError errorWithDomain:error.domain
@@ -766,6 +775,8 @@ typedef enum : NSUInteger {
 
 - (void)destroyInstance
 {
+    WXLogInfo(@"Destroy instance: %@", _instanceId);
+    
     [self.apmInstance endRecord];
     NSString *url = @"";
     if ([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
@@ -810,6 +821,7 @@ typedef enum : NSUInteger {
         // Reading config from orange for Release instance in Main Thread or not, for Bug #15172691 +{
         dispatch_async(dispatch_get_main_queue(), ^{
             [WXSDKManager removeInstanceforID:instanceId];
+            WXLogInfo(@"Finally remove instance: %@", instanceId);
         });
         //+}
     });

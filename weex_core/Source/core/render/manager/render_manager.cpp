@@ -48,6 +48,8 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
   LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s",
        pageId.c_str(), parser.toStringUTF8().c_str());
 #endif
+  
+  LOGI("RenderManager::CreatePage, id: %s", page_id.c_str());
     
   std::string targetName = RenderTargetManager::getRenderTargetName(page_id);
   if (!targetName.empty()) {
@@ -95,6 +97,8 @@ bool RenderManager::CreatePage(const std::string& page_id, RenderObject *root) {
   LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s",
        pageId.c_str(), parser.toStringUTF8().c_str());
 #endif
+  
+  LOGI("RenderManager::CreatePage, id: %s", page_id.c_str());
 
   RenderPage *page = new RenderPage(page_id);
   this->pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
@@ -108,23 +112,27 @@ bool RenderManager::CreatePage(const std::string& page_id, std::function<RenderO
 #if RENDER_LOG
     LOGD("[RenderManager] CreatePage >>>> pageId: %s", pageId.c_str());
 #endif
+  
+  LOGI("RenderManager::CreatePage, id: %s", page_id.c_str());
     
-    RenderPage *page = new RenderPage(page_id);
-    this->pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
+  RenderPage *page = new RenderPage(page_id);
+  this->pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
 
-    initDeviceConfig(page, page_id);
-    
-    int64_t start_time = getCurrentTime();
-    RenderObject *root = constructRoot(page);
-    page->ParseJsonTime(getCurrentTime() - start_time);
-    
-    return page->CreateRootRender(root);
+  initDeviceConfig(page, page_id);
+  
+  int64_t start_time = getCurrentTime();
+  RenderObject *root = constructRoot(page);
+  page->ParseJsonTime(getCurrentTime() - start_time);
+  
+  return page->CreateRootRender(root);
 }
 
 RenderPageCustom* RenderManager::CreateCustomPage(const std::string& page_id, const std::string& page_type) {
 #if RENDER_LOG
     LOGD("[RenderManager] CreateCustomPage >>>> pageId: %s, pageType: %s", pageId.c_str(), page_type.c_str());
 #endif
+  
+  LOGI("RenderManager::CreateCustomPage, id: %s, type: %s", page_id.c_str(), page_type.c_str());
     
     RenderPageCustom::PageOptions options;
     
@@ -382,7 +390,7 @@ bool RenderManager::CreateFinish(const std::string &page_id) {
   RenderPageBase *page = GetPage(page_id);
   if (page == nullptr) return false;
 
-  LOGE("RenderManager::CreateFinish %s", page_id.data());
+  LOGI("RenderManager::CreateFinish, id: %s", page_id.data());
 
 #if RENDER_LOG
   LOGD("[RenderManager] CreateFinish >>>> pageId: %s", pageId.c_str());

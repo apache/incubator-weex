@@ -257,6 +257,7 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 }
 
 - (void)printRecordStageMap {
+    // These logs are for performance auto-test platforms.
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnComponentThread(^{
         if (!weakSelf) {
