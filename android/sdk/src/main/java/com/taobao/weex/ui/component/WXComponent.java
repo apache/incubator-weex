@@ -707,7 +707,19 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
 
     for (Map.Entry<String, Object> entry : props.entrySet()) {
-      String key = entry.getKey();
+      Object key_obj = entry.getKey();
+      String key = WXUtils.getString(key_obj, null);
+      if (!(key_obj instanceof String)) {
+        Map<String, String> map = new HashMap<>();
+        map.put("componentType", getComponentType());
+        map.put("actual key", key == null ? "" : key);
+        WXExceptionUtils.commitCriticalExceptionRT(getInstanceId(),
+            WXErrorCode.WX_RENDER_ERR_COMPONENT_ATTR_KEY,
+            "WXComponent.updateProperties",
+            WXErrorCode.WX_RENDER_ERR_COMPONENT_ATTR_KEY.getErrorMsg(),
+            map);
+      }
+
       Object param = entry.getValue();
       String value = WXUtils.getString(param, null);
 
