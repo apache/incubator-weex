@@ -137,8 +137,8 @@ script:
         esac
         if npm run danger -- ci --dangerfile ./dangerfile-android.js | grep -q "hasAndroidFile" ; then
           cd android
-          ./gradlew clean install -PbuildRuntimeApi=true ${GRADLE_ABI} --info
-          ./gradlew install -PbuildRuntimeApi=false ${GRADLE_ABI} --info
+          ./gradlew clean assembleRelease -PbuildRuntimeApi=true ${GRADLE_ABI} --info
+          ./gradlew assembleRelease -PbuildRuntimeApi=false ${GRADLE_ABI} --info
         fi
         ;;
       "jsfm" )
