@@ -210,6 +210,7 @@ static void SetPageArgument(JNIEnv *env, jobject jcaller,
 static void SetLogType(JNIEnv* env, jobject jcaller, jfloat type,
                        jfloat isPerf);
 
+static jstring nativeDumpIpcPageQueueInfo(JNIEnv* env, jobject jcaller);
 static void ReloadPageLayout(JNIEnv *env, jobject jcaller,
                              jstring instanceId);
 static void SetDeviceDisplayOfPage(JNIEnv *env, jobject jcaller,
@@ -1396,6 +1397,10 @@ static const JNINativeMethod kMethodsWXBridge[] = {
      "F"
      ")"
      "V", reinterpret_cast<void *>(SetLogType)},
+    { "nativeDumpIpcPageQueueInfo",
+    "("
+    ")"
+    "Ljava/lang/String;", reinterpret_cast<void*>(nativeDumpIpcPageQueueInfo) },
     {"nativeReloadPageLayout",
      "("
      "Ljava/lang/String;"

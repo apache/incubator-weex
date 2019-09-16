@@ -48,6 +48,7 @@
 #include "third_party/json11/json11.hpp"
 #include "core/moniter/render_performance.h"
 #include "core/render/page/render_page_base.h"
+#include "third_party/IPC/IPCFutexPageQueue.h"
 
 using namespace WeexCore;
 jlongArray jFirstScreenRenderTime = nullptr;
@@ -285,6 +286,20 @@ static void SetLogType(JNIEnv* env, jobject jcaller, jfloat logLevel,
       ->getPlatformBridge()
       ->core_side()
       ->SetLogType(l, flag);
+}
+
+static jstring nativeDumpIpcPageQueueInfo(JNIEnv* env, jobject jcaller){
+    std::string client_quene_msg;
+    if (WeexCoreManager::Instance()->client_queue_ != nullptr){
+        WeexCoreManager::Instance()->client_queue_->dumpPageInfo(client_quene_msg);
+    }
+    std::string server_quene_msg;
+    if (WeexCoreManager::Instance()->server_queue_ != nullptr){
+        WeexCoreManager::Instance()->server_queue_->dumpPageInfo(server_quene_msg);
+    }
+    std::string result ;
+    result = "{client:"+client_quene_msg+"}\n"+"{server:"+server_quene_msg+"}";
+    return env->NewStringUTF(result.c_str());
 }
 static void ReloadPageLayout(JNIEnv *env, jobject jcaller,
                               jstring instanceId){

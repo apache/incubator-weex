@@ -174,6 +174,7 @@ static void *newIPCServer(void *_td) {
     std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), handler));
     std::unique_ptr<IPCListener> listener =std::move(createIPCListener(futexPageQueue.get(), handler)) ;
     newThreadStatus = SUCCESS;
+    WeexCore::WeexCoreManager::Instance()->server_queue_=futexPageQueue.get();
 
     try {
       futexPageQueue->spinWaitPeer();
@@ -181,6 +182,7 @@ static void *newIPCServer(void *_td) {
     } catch (IPCException &e) {
         LOGE("IPCException server died %s",e.msg());
         base::android::DetachFromVM();
+        WeexCore::WeexCoreManager::Instance()->server_queue_= nullptr;
         pthread_exit(NULL);
     }
     return nullptr;
@@ -207,6 +209,7 @@ IPCSender *WeexJSConnection::start(bool reinit) {
   m_impl->serverSender = std::move(sender);
   m_impl->futexPageQueue = std::move(futexPageQueue);
 
+  WeexCore::WeexCoreManager::Instance()->client_queue_=m_impl->futexPageQueue.get();
   pthread_attr_t threadAttr;
   newThreadStatus = UNFINISH;
 
@@ -295,6 +298,7 @@ IPCSender *WeexJSConnection::start(bool reinit) {
 
 void WeexJSConnection::end() {
   try {
+    WeexCoreManager::Instance()->client_queue_ = nullptr;
     m_impl->serverSender.reset();
     m_impl->futexPageQueue.reset();
   } catch (IPCException &e) {

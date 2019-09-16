@@ -443,6 +443,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     }
   }
 
+  public String dumpIpcPageInfo(){
+    if (mWXBridge instanceof WXBridge){
+      return ((WXBridge)mWXBridge).nativeDumpIpcPageQueueInfo();
+    }
+    return "";
+  }
+
   public void stopRemoteDebug() {
     if (mWxDebugProxy != null) {
       try {
