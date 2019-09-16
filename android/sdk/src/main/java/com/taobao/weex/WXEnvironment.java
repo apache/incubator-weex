@@ -114,6 +114,8 @@ public class WXEnvironment {
 
   public static long sJSFMStartListenerTime=0;
 
+  public static volatile boolean isWsFixMode = true;
+
   /**
    * component and modules ready
    * */

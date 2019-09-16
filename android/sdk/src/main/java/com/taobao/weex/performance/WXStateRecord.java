@@ -104,15 +104,15 @@ public class WXStateRecord {
     /**
      * check onJSEngineReload time,and we know how many times reload and each reload time
      */
-    public void onJSEngineReload() {
-        recordCommon(mJscReloadHistory,new Info(WXUtils.getFixUnixTime(), "", "onJSEngineReload"));
+    public void onJSEngineReload(String instanceId) {
+        recordCommon(mJscReloadHistory,new Info(WXUtils.getFixUnixTime(), instanceId, "onJSEngineReload"));
     }
 
     /**
      * check jsc crash time,and we know how many times jscCrash and each crash time
      */
-    public void onJSCCrash() {
-        recordCommon(mJscCrashHistory,new Info(WXUtils.getFixUnixTime(), "", "onJSCCrash"));
+    public void onJSCCrash(String instanceId) {
+        recordCommon(mJscCrashHistory,new Info(WXUtils.getFixUnixTime(), instanceId, "onJSCCrash"));
     }
 
     private void recordCommon(RecordList<Info> list ,Info info){
