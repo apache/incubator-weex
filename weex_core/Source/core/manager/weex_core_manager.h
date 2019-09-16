@@ -27,6 +27,8 @@
 #include "core/bridge/script_bridge.h"
 #include "base/message_loop/message_loop.h"
 
+class IPCFutexPageQueue;
+
 namespace WeexCore {
 class WeexCoreManager {
  public:
@@ -70,6 +72,9 @@ class WeexCoreManager {
 
   inline weex::base::Thread *script_thread() { return script_thread_; }
 
+  IPCFutexPageQueue* client_queue_;
+  IPCFutexPageQueue* server_queue_;
+
  private:
   PlatformBridge *platform_bridge_;
   MeasureFunctionAdapter *measure_function_adapter_;
@@ -82,7 +87,9 @@ class WeexCoreManager {
         measure_function_adapter_(nullptr),
         script_bridge_(nullptr),
         project_mode_(COMMON),
-        script_thread_(nullptr){};
+        script_thread_(nullptr),
+        client_queue_(nullptr),
+        server_queue_(nullptr){};
   ~WeexCoreManager(){};
 };
 }  // namespace WeexCore

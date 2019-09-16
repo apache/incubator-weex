@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import android.support.annotation.NonNull;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.utils.WXUtils;
@@ -145,6 +147,10 @@ public class WXStateRecord {
         Collections.sort(reportTimeLineInfo);
         stateInfo.put("stateInfoList",reportTimeLineInfo.toString());
 
+        IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+        if (null != adapter && "true".equalsIgnoreCase(adapter.getConfig("wxapm","dumpIpcPageInfo","true"))){
+            stateInfo.put("pageQueueInfo",WXBridgeManager.getInstance().dumpIpcPageInfo());
+        }
         return stateInfo;
     }
 

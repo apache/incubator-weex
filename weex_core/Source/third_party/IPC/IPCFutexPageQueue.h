@@ -26,6 +26,7 @@
 #define IPCFUTEXPAGEQUEUE_H
 
 #include <stdint.h>
+#include <string>
 
 // shared memory page layout:
 // futex uint32_t
@@ -50,6 +51,7 @@ public:
     inline size_t getPageSize() const { return m_pageSize - sizeof(uint32_t) * 2; }
 
     static const size_t ipc_size = 2 * 1024 * 1024;
+    void dumpPageInfo(std::string& info);
 
 private:
     void unlock(size_t id);

@@ -125,6 +125,8 @@ import java.util.Map;
 
   public native void nativeOnInteractionTimeUpdate(String instanceId);
 
+  public native String nativeDumpIpcPageQueueInfo();
+
   /**
    * Update Init Framework Params
    * */

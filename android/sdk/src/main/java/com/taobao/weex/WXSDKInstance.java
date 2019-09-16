@@ -968,7 +968,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (!isWS){
       return;
     }
-    WXErrorCode errorCode = WXErrorCode.WX_ERROR_WHITE_SCREEN;
+    WXErrorCode errorCode = createInstanceHeartBeat?WXErrorCode.WX_ERROR_WHITE_SCREEN:WXErrorCode.WHITE_SCREEN_RESPONSE_TIMEOUT;
     Map<String,String> args = new HashMap<>(1);
     String vieTreeMsg = WhiteScreenUtils.takeViewTreeSnapShot(this);
     args.put("viewTree",null == vieTreeMsg?"null viewTreeMsg":vieTreeMsg);
