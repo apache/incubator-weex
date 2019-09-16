@@ -26,14 +26,15 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.util.Log;
 import android.view.Choreographer;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXErrorCode;
 import java.lang.ref.WeakReference;
 
 public class WeexFrameRateControl {
     private static final long VSYNC_FRAME = 1000 / 60;
     private WeakReference<VSyncListener> mListener;
-    private final Choreographer mChoreographer;
-    private final Choreographer.FrameCallback mVSyncFrameCallback;
+    private Choreographer mChoreographer;
+    private Choreographer.FrameCallback mVSyncFrameCallback;
     private final Runnable runnable;
 
     public interface VSyncListener {
@@ -43,27 +44,32 @@ public class WeexFrameRateControl {
     public WeexFrameRateControl(VSyncListener listener) {
         mListener = new WeakReference<>(listener);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-            mChoreographer = Choreographer.getInstance();
-            mVSyncFrameCallback = new Choreographer.FrameCallback() {
-                @SuppressLint("NewApi")
-                @Override
-                public void doFrame(long frameTimeNanos) {
-                    VSyncListener vSyncListener;
-                    if (mListener != null && (vSyncListener=mListener.get()) != null) {
-                        try {
-                            vSyncListener.OnVSync();
-                            mChoreographer.postFrameCallback(mVSyncFrameCallback);
-                        }catch (UnsatisfiedLinkError e){
-                            if(vSyncListener instanceof WXSDKInstance){
-                                ((WXSDKInstance) vSyncListener).onRenderError(
-                                    WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
-                                    Log.getStackTraceString(e));
-                            }
-                        }
-                    }
-                }
-            };
-            runnable = null;
+          WXBridgeManager.getInstance().post(new Runnable() {
+              @Override
+              public void run() {
+                  mChoreographer = Choreographer.getInstance();
+                  mVSyncFrameCallback = new Choreographer.FrameCallback() {
+                      @SuppressLint("NewApi")
+                      @Override
+                      public void doFrame(long frameTimeNanos) {
+                          VSyncListener vSyncListener;
+                          if (mListener != null && (vSyncListener=mListener.get()) != null) {
+                              try {
+                                  vSyncListener.OnVSync();
+                                  mChoreographer.postFrameCallback(mVSyncFrameCallback);
+                              }catch (UnsatisfiedLinkError e){
+                                  if(vSyncListener instanceof WXSDKInstance){
+                                      ((WXSDKInstance) vSyncListener).onRenderError(
+                                          WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorCode(),
+                                          Log.getStackTraceString(e));
+                                  }
+                              }
+                          }
+                      }
+                  };
+              }
+          });
+          runnable = null;
         } else {
             // For API 15 or lower
             runnable = new Runnable() {
