@@ -2274,6 +2274,16 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       customOptions.put("__enable_native_promise__","true");
     }
 
+    String enableAlarmSignal = "true";
+    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+    if (null != adapter){
+      try {
+        enableAlarmSignal = adapter.getConfigWhenInit("wxapm","enableAlarmSignal",enableAlarmSignal);
+      }catch (Exception e){
+        e.printStackTrace();
+      }
+    }
+    customOptions.put("enableAlarmSignal",enableAlarmSignal);
 
     wxParams.setOptions(customOptions);
     wxParams.setNeedInitV8(WXSDKManager.getInstance().needInitV8());

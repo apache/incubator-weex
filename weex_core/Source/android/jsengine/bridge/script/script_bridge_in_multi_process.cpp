@@ -101,6 +101,7 @@ __attribute__((visibility("default"))) extern "C" int serverMain(int argc, char 
 namespace weex {
     namespace bridge {
         namespace js {
+            bool ScriptBridgeInMultiProcess::has_read_alarm_config = false;
 
             static inline const char* GetUTF8StringFromIPCArg(IPCArguments* arguments, size_t index) {
                 return arguments->getByteArray(index)->length == 0 ? nullptr : arguments->getByteArray(index)->content;
@@ -273,6 +274,20 @@ namespace weex {
                             auto enable = value == "true";
                             LOGE("enable backupThreadCache %d",enable);
                             WeexEnv::getEnv()->set_m_cache_task_(enable);
+                        }
+                    }
+                    if (!has_read_alarm_config){
+#ifdef USE_JS_RUNTIME
+                        std::string type = init_framework_params->type->content;
+                        std::string value = init_framework_params->value->content;
+#else
+                        auto type = String::fromUTF8(init_framework_params->type->content);
+                        auto value = String::fromUTF8(init_framework_params->value->content);
+#endif
+                        if (type == "enableAlarmSignal"){
+                            has_read_alarm_config = true;
+                            auto enable = value =="true";
+                            WeexEnv::getEnv()->enableHandleAlarmSignal(enable);
                         }
                     }
 

@@ -57,6 +57,8 @@ DECLARE_SIGNAL(SIGTRAP)
 { 0, nullptr }
 };
 
+volatile sig_atomic_t is_sig_after_crash = 0;
+
 /* static functions */
 static bool isFileAccess(const char* file)
 {
@@ -69,6 +71,12 @@ static bool isFileAccess(const char* file)
         return false;
     }
     return true;
+}
+
+static void handleExitAlarm(int num, siginfo_t* info, void* ucontext){
+    if (is_sig_after_crash){
+        _exit(0);
+    }
 }
 
 static void crashSigAction(int num, siginfo_t* info, void* ucontext)
@@ -163,6 +171,28 @@ bool CrashHandlerInfo::handleSignal(int signum, siginfo_t* siginfo, void* uconte
     //signal
 
     m_crash_occurs = true;
+
+    if (handle_alarm_signal){
+        //handleSignal maybe cause sig delivered deadLock,and maybe block weexCoreThread on ipc，then cause whiteScreen or other issue unless restart app
+        //cause 1:async-signal-safe http://man7.org/linux/man-pages/man7/signal-safety.7.html#top_of_page
+        //cause 2:other logic crash or dl.
+        //solution: google breakPad dump crash on a new process to avoid bugs.
+        //tmp solution: setTimeout 1s,force exit on handleExitAlarm(if has deadLock)
+
+
+        is_sig_after_crash =1;
+
+        struct sigaction alarmSigaction = { 0 };
+        alarmSigaction.sa_sigaction = handleExitAlarm;
+        alarmSigaction.sa_flags = SA_SIGINFO;
+
+
+        if (-1 == sigaction(SIGALRM, &alarmSigaction, nullptr)) {
+            _exit(0);
+        }
+        alarm(1);
+    }
+
     LOG(INFO) << "CrashHandlerInfo::handleSignal";
     const char* signalName = nullptr;
     for (int i = 0; s_hookSignals[i].signum; ++i) {
