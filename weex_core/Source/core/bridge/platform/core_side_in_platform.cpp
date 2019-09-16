@@ -55,6 +55,10 @@ void CoreSideInPlatform::SetDefaultHeightAndWidthIntoRootDom(
 }
 
 void CoreSideInPlatform::OnInstanceClose(const std::string &instance_id) {
+  auto handler = EagleBridge::GetInstance()->data_render_handler();
+  if (handler) {
+    handler->DestroyInstance(instance_id.c_str());
+  }
   RenderManager::GetInstance()->ClosePage(instance_id);
 }
 

@@ -792,26 +792,7 @@ _Pragma("clang diagnostic pop") \
     }
     
     WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
-    if (sdkInstance.dataRender) {
-        if (_dataRenderHandler) {
-            WXPerformBlockOnComponentThread(^{
-                [_dataRenderHandler destroyDataRenderInstance:instance];
-                WXPerformBlockOnBridgeThreadForInstance(^{
-                    [self callJSMethod:@"destroyInstance" args:@[instance]];
-                }, instance);
-            });
-        }
-        else {
-            WXComponentManager *manager = sdkInstance.componentManager;
-            if (manager.isValid) {
-                WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
-                NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-                WXPerformBlockOnComponentThread(^{
-                    [manager renderFailed:error];
-                });
-            }
-        }
-    } else {
+    if (!sdkInstance.wlasmRender) {
         [self callJSMethod:@"destroyInstance" args:@[instance]];
     }
 }
