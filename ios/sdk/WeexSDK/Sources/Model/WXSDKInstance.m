@@ -795,7 +795,11 @@ typedef enum : NSUInteger {
 
     [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];
-    [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
+    BOOL dataRender = self.dataRender;
+    BOOL wlasmRender = self.wlasmRender;
+    if (!dataRender) {
+        [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
+    }
     
     WXComponentManager* componentManager = self.componentManager;
     NSString* instanceId = self.instanceId;
@@ -813,6 +817,10 @@ typedef enum : NSUInteger {
         // Destroy weexcore c++ page and objects.
         [WXCoreBridge closePage:instanceId];
         
+        if (dataRender && !wlasmRender) {
+            [[WXSDKManager bridgeMgr] destroyInstance:instanceId];
+        }
+
         // Destroy heron render target page
         if ([WXCustomPageBridge isCustomPage:instanceId]) {
             [[WXCustomPageBridge sharedInstance] removePage:instanceId];

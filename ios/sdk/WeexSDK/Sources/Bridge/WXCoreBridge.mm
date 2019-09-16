@@ -1651,6 +1651,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 + (void)closePage:(NSString*)pageId
 {
     if (platformBridge) {
+        platformBridge->core_side()->DestroyInstance([pageId UTF8String]);
         platformBridge->core_side()->OnInstanceClose([pageId UTF8String] ?: "");
     }
 }
