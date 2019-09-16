@@ -600,13 +600,17 @@ std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSOnInstance(const char *i
 
 int CoreSideInPlatform::DestroyInstance(const char *instanceId) {
     auto handler = EagleBridge::GetInstance()->data_render_handler();
-    if(handler!=nullptr){
+    if (handler != nullptr) {
       handler->DestroyInstance(instanceId);
     }
     if (JsonRenderManager::GetInstance()->ClosePage(instanceId)) {
       return true;
     }
-    return WeexCoreManager::Instance()->script_bridge()->script_side()->DestroyInstance(instanceId);
+    auto script_side = WeexCoreManager::Instance()->script_bridge()->script_side();
+    if (script_side) {
+        return script_side->DestroyInstance(instanceId);
+    }
+    return true;
 }
 
 int CoreSideInPlatform::UpdateGlobalConfig(const char *config) {
