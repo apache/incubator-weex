@@ -1538,11 +1538,14 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         env->AddOption("scale", "1");
         env->AddOption("pixel_scale", std::to_string([[UIScreen mainScreen] scale]));
         
+        // Here we initialize weex device width and height using portrait by default.
         CGSize screenSize = [UIScreen mainScreen].bounds.size;
-        env->SetDeviceWidth(std::to_string(screenSize.width));
-        env->SetDeviceHeight(std::to_string(screenSize.height));
-        env->AddOption("screen_width_pixels", std::to_string(screenSize.width));
-        env->AddOption("screen_height_pixels", std::to_string(screenSize.height));
+        CGFloat w = MIN(screenSize.width, screenSize.height);
+        CGFloat h = MAX(screenSize.width, screenSize.height);
+        env->SetDeviceWidth(std::to_string(w));
+        env->SetDeviceHeight(std::to_string(h));
+        env->AddOption("screen_width_pixels", std::to_string(w));
+        env->AddOption("screen_height_pixels", std::to_string(h));
         
         weex::base::LogImplement::getLog()->setLogImplement(new WeexCore::LogBridgeIOS());
         
@@ -1551,8 +1554,6 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 #else
         weex::base::LogImplement::getLog()->setDebugMode(false);
 #endif
-        
-        
         
         platformBridge = new WeexCore::PlatformBridge();
         platformBridge->set_platform_side(new WeexCore::IOSSide());
