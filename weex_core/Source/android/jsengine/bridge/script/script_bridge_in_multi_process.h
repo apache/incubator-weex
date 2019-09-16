@@ -71,6 +71,7 @@ class ScriptBridgeInMultiProcess : public WeexCore::ScriptBridge {
  private:
   static ScriptBridgeInMultiProcess* g_instance;
   DISALLOW_COPY_AND_ASSIGN(ScriptBridgeInMultiProcess);
+  static bool has_read_alarm_config;
 };
 }  // namespace js
 }  // namespace bridge

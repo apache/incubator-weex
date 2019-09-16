@@ -97,6 +97,9 @@ public:
     bool enableBackupThread() {
         return enableBackupThread__;
     }
+    inline void enableHandleAlarmSignal(bool enable){
+        crashHandler->setEnableAlarmSignal(enable);
+    }
 
     void jsc_init_finished() { isJscInitOk_ = true; };
 
