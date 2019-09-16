@@ -315,6 +315,7 @@ typedef enum : NSUInteger {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
     }
+    WXLogInfo(@"pageid: %@ renderWithURL: %@", _instanceId, url.absoluteString);
     [WXCoreBridge install];
     if (_useBackupJsThread) {
         [[WXSDKManager bridgeMgr] executeJSTaskQueue];
@@ -337,6 +338,8 @@ typedef enum : NSUInteger {
 {
     _options = [options isKindOfClass:[NSDictionary class]] ? options : nil;
     _jsData = data;
+    WXLogInfo(@"pageid: %@ renderView pageNmae: %@  options: %@", _instanceId, _pageName, options);
+
     [WXCoreBridge install];
     if (_useBackupJsThread) {
         [[WXSDKManager bridgeMgr] executeJSTaskQueue];
