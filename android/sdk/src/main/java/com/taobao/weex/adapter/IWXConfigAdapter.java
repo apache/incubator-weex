@@ -25,4 +25,5 @@ package com.taobao.weex.adapter;
 public interface IWXConfigAdapter {
     String getConfig(String nameSpace,String key,String defaultValue);
     String getConfigWhenInit(String nameSpace,String key,String defaultValue);
+    boolean checkMode(String name);
 }

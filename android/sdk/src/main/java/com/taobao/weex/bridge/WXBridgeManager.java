@@ -890,10 +890,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         } catch (Throwable e) {
           WXLogUtils.e(WXLogUtils.getStackTrace(e));
         }
-        WXStateRecord.getInstance().onJSCCrash();
+        WXStateRecord.getInstance().onJSCCrash(TextUtils.isEmpty(instanceId)?"null":instanceId);
         callReportCrash(crashFile, instanceId, url,extInfo);
       } else {
-        WXStateRecord.getInstance().onJSEngineReload();
+        WXStateRecord.getInstance().onJSEngineReload(TextUtils.isEmpty(instanceId)?"null":instanceId);
          commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_RELOAD_PAGE, "reboot jsc Engine", instanceId, url,extInfo);
       }
 
@@ -2278,7 +2278,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
     if (null != adapter){
       try {
-        enableAlarmSignal = adapter.getConfigWhenInit("wxapm","enableAlarmSignal",enableAlarmSignal);
+        if (adapter.checkMode("white_screen_fix_open")){
+          WXEnvironment.isWsFixMode = true;
+        }else {
+          enableAlarmSignal = adapter.getConfigWhenInit("wxapm","enableAlarmSignal",enableAlarmSignal);
+          WXEnvironment.isWsFixMode = "true".equalsIgnoreCase(enableAlarmSignal);
+        }
       }catch (Exception e){
         e.printStackTrace();
       }
