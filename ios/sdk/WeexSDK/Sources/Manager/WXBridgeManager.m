@@ -69,7 +69,7 @@ static NSThread *WXBackupBridgeThread;
     self = [super init];
     if (self) {
         _bridgeCtx = [[WXBridgeContext alloc] init];
-        _supportMultiJSThread = YES;
+        _supportMultiJSThread = NO;
         _jsTaskQueue = [NSMutableArray array];
     }
     return self;
