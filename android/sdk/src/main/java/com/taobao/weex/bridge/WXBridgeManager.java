@@ -31,7 +31,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.RestrictTo.Scope;
-import android.support.annotation.WorkerThread;
+import android.support.annotation.UiThread;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
@@ -3461,7 +3461,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    * @param instanceId
    * @return
    */
-  @WorkerThread
+  @UiThread
   public boolean notifyLayout(String instanceId) {
     if (isSkipFrameworkInit(instanceId) || isJSFrameworkInit()) {
       return mWXBridge.notifyLayout(instanceId);
@@ -3469,7 +3469,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return false;
   }
 
-  @WorkerThread
+  @UiThread
   public void forceLayout(String instanceId) {
     if (isSkipFrameworkInit(instanceId) || isJSFrameworkInit()) {
       mWXBridge.forceLayout(instanceId);
