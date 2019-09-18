@@ -440,6 +440,12 @@ typedef enum : NSUInteger {
  */
 - (void)setViewportWidth:(CGFloat)width;
 
+/**
+ * @abstract Get information about the last rendered page.
+ Useful fot debugging and fixing online bugs.
+ */
++ (NSDictionary*)lastPageInfo;
+
 /** 
  * Deprecated 
  */
