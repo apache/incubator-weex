@@ -2281,12 +2281,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       customOptions.put("__enable_native_promise__","true");
     }
 
-    String enableAlarmSignal = "true";
+    String enableAlarmSignal = "false";
     IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
     if (null != adapter){
       try {
         if (adapter.checkMode("white_screen_fix_open")){
           WXEnvironment.isWsFixMode = true;
+          enableAlarmSignal = "true";
         }else {
           enableAlarmSignal = adapter.getConfigWhenInit("wxapm","enableAlarmSignal",enableAlarmSignal);
           WXEnvironment.isWsFixMode = "true".equalsIgnoreCase(enableAlarmSignal);
@@ -2295,7 +2296,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         e.printStackTrace();
       }
     }
-    customOptions.put("enableAlarmSignal",enableAlarmSignal);
+    if (null != enableAlarmSignal){
+      customOptions.put("enableAlarmSignal",enableAlarmSignal);
+    }
+    WXLogUtils.e("weex","enableAlarmSignal:"+enableAlarmSignal);
 
     wxParams.setOptions(customOptions);
     wxParams.setNeedInitV8(WXSDKManager.getInstance().needInitV8());
@@ -2552,7 +2556,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           } else {
             String errorMsg = new StringBuilder()
                 .append(WXErrorCode.WX_DEGRAD_ERR_INSTANCE_CREATE_FAILED.getErrorMsg())
-                .append(", reportJSException >>>> instanceId:").append(instanceId)
                 .append(", exception function:").append(function)
                 .append(", exception:").append(exception)
                 .append(", extInitTime:").append(System.currentTimeMillis()-WXBridgeManager.sInitFrameWorkTimeOrigin).append("ms")

@@ -992,7 +992,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
       mInstance.getWXPerformance().cellExceedNum++;
       if (WXAnalyzerDataTransfer.isOpenPerformance){
         WXAnalyzerDataTransfer.transferPerformance(getInstanceId(),"details",WXInstanceApm.KEY_PAGE_STATS_CELL_EXCEED_NUM,
-            String.format(Locale.ROOT, "cell:[w:%d,h:%d],attrs:%s,styles:%s",realWidth,realHeight,getAttrs(),getStyles())
+            String.format(Locale.ROOT, "cell:ref:%s,[w:%d,h:%d],attrs:%s,styles:%s",getRef(),realWidth,realHeight,getAttrs(),getStyles())
         );
       }
 
