@@ -60,6 +60,9 @@ NSString *const bundleResponseUrlOptionKey = @"bundleResponseUrl";
 
 NSTimeInterval JSLibInitTime = 0;
 
+static NSString* lastPageInfoLock = @"";
+static NSDictionary* lastPageInfo = nil;
+
 typedef enum : NSUInteger {
     WXLoadTypeNormal,
     WXLoadTypeBack,
@@ -316,6 +319,11 @@ typedef enum : NSUInteger {
         return;
     }
     WXLogInfo(@"pageid: %@ renderWithURL: %@", _instanceId, url.absoluteString);
+    
+    @synchronized (lastPageInfoLock) {
+        lastPageInfo = @{@"pageId": [_instanceId copy], @"url": [url absoluteString] ?: @""};
+    }
+    
     [WXCoreBridge install];
     if (_useBackupJsThread) {
         [[WXSDKManager bridgeMgr] executeJSTaskQueue];
@@ -339,6 +347,10 @@ typedef enum : NSUInteger {
     _options = [options isKindOfClass:[NSDictionary class]] ? options : nil;
     _jsData = data;
     WXLogInfo(@"pageid: %@ renderView pageNmae: %@  options: %@", _instanceId, _pageName, options);
+    
+    @synchronized (lastPageInfoLock) {
+        lastPageInfo = @{@"pageId": [_instanceId copy], @"options": options ? [options description] : @""};
+    }
 
     [WXCoreBridge install];
     if (_useBackupJsThread) {
@@ -1139,6 +1151,15 @@ typedef enum : NSUInteger {
             self.appearState = NO;
         }
     }
+}
+
++ (NSDictionary*)lastPageInfo
+{
+    NSDictionary* result;
+    @synchronized (lastPageInfoLock) {
+        result = [lastPageInfo copy];
+    }
+    return result;
 }
 
 @end
