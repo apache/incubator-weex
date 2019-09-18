@@ -709,7 +709,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     for (Map.Entry<String, Object> entry : props.entrySet()) {
       Object key_obj = entry.getKey();
       String key = WXUtils.getString(key_obj, null);
-      if (!(key_obj instanceof String)) {
+      if ((key != null) && !(key_obj instanceof String)) {
         Map<String, String> map = new HashMap<>();
         map.put("componentType", getComponentType());
         map.put("actual key", key == null ? "" : key);
