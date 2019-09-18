@@ -154,7 +154,8 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 };
 
 typedef enum : NSUInteger {
-    WXScrollerComponentCreatedCallback
+    WXScrollerComponentCreatedCallback,
+    WXTabbarComponentCreatedCallback
 } WXSDKInstanceCallbackType;
 
 
