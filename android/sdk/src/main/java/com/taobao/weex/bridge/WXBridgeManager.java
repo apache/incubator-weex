@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.bridge;
 
+import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -32,7 +34,6 @@ import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -91,7 +92,6 @@ import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -103,20 +103,16 @@ import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
 
 /**
  * Manager class for communication between JavaScript and Android.
@@ -146,6 +142,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public static final String METHOD_CREATE_INSTANCE = "createInstance";
   public static final String METHOD_CREATE_PAGE_WITH_CONTENT = "CreatePageWithContent";
   public static final String METHOD_UPDATE_COMPONENT_WITH_DATA = "UpdateComponentData";
+  private static final String METHOD_MOVE_RENDER_OBJECT = "RenderPage::MoveRenderObject";
   public static final String METHOD_DESTROY_INSTANCE = "destroyInstance";
   public static final String METHOD_CALL_JS = "callJS";
   public static final String METHOD_SET_TIMEOUT = "setTimeoutCallback";
@@ -2481,6 +2478,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         reportErrorCode = WXErrorCode.WX_RENDER_ERR_JS_CREATE_INSTANCE_CONTEXT;
       } else if ((METHOD_UPDATE_COMPONENT_WITH_DATA.equals(function) || METHOD_CREATE_PAGE_WITH_CONTENT.equals(function)) && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_DEGRAD_EAGLE_RENDER_ERROR;
+      } else if (METHOD_MOVE_RENDER_OBJECT.equals(function)) {
+        reportErrorCode = WXErrorCode.WX_ERROR_MOVE_RENDER_OBJECT_OUT_OF_BOUNDS;
       }
       instance.onJSException(reportErrorCode.getErrorCode(), function, exception);
     }
