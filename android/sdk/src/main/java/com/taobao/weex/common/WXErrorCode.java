@@ -276,6 +276,9 @@ public enum WXErrorCode {
 
   WX_ERR_HASH_MAP_TMP("-10010", "WX_ERR_HASH_MAP_TMP",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
+  WX_ERROR_MOVE_RENDER_OBJECT_OUT_OF_BOUNDS("-2120", "Index out of bounds when move element",
+      ErrorType.NATIVE_ERROR, ErrorGroup.JS),
+
   /**
    * TEST
    */
