@@ -158,11 +158,11 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if (style == null) {
       return (int) WXViewUtils.getRealPxByWidth(WXText.sDEFAULT_SIZE,viewPortW);
     }
-    int fontSize = (int) WXViewUtils.getRealPxByWidth(style.get(Constants.Name.FONT_SIZE),viewPortW);
+    int fontSize = WXUtils.getInt(style.get(Constants.Name.FONT_SIZE));
     if (fontSize <= 0) {
       fontSize = WXText.sDEFAULT_SIZE;
     }
-    return fontSize;
+    return (int) WXViewUtils.getRealPxByWidth(fontSize,viewPortW);
   }
 
   public static String getFontFamily(Map<String, Object> style) {
@@ -213,11 +213,12 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if (style == null) {
       return UNSET;
     }
-    int lineHeight = (int)WXViewUtils.getRealPxByWidth(style.get(Constants.Name.LINE_HEIGHT),viewPortW);
+    int lineHeight = WXUtils.getInt(style.get(Constants.Name.LINE_HEIGHT));
     if (lineHeight <= 0) {
       lineHeight = UNSET;
+      return lineHeight;
     }
-    return lineHeight;
+    return (int) WXViewUtils.getRealPxByWidth(lineHeight,viewPortW);
   }
 
   public float getBorderRadius() {

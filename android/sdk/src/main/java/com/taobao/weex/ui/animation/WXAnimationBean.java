@@ -119,6 +119,73 @@ public class WXAnimationBean {
     private List<PropertyValuesHolder> holders=new LinkedList<>();
     private float cameraDistance = Float.MAX_VALUE;
 
+
+    private static Pair<Float, Float> parsePivot(@Nullable String transformOrigin,
+                                                 int width, int height,int viewportW) {
+      if (!TextUtils.isEmpty(transformOrigin)) {
+        int firstSpace = transformOrigin.indexOf(FunctionParser.SPACE);
+        if (firstSpace != -1) {
+          int i = firstSpace;
+          for (; i < transformOrigin.length(); i++) {
+            if (transformOrigin.charAt(i) != FunctionParser.SPACE) {
+              break;
+            }
+          }
+          if (i < transformOrigin.length() && transformOrigin.charAt(i) != FunctionParser.SPACE) {
+            List<String> list = new ArrayList<>(2);
+            list.add(transformOrigin.substring(0, firstSpace).trim());
+            list.add(transformOrigin.substring(i, transformOrigin.length()).trim());
+            return parsePivot(list, width, height,viewportW);
+          }
+        }
+      }
+      return null;
+    }
+
+    private static Pair<Float, Float> parsePivot(@NonNull List<String> list, int width, int height,int viewportW) {
+      return new Pair<>(
+              parsePivotX(list.get(0), width,viewportW), parsePivotY(list.get(1), height,viewportW));
+    }
+
+    private static float parsePivotX(String x, int width,int viewportW) {
+      String value = x;
+      if (WXAnimationBean.Style.LEFT.equals(x)) {
+        value = ZERO;
+      } else if (WXAnimationBean.Style.RIGHT.equals(x)) {
+        value = FULL;
+      } else if (WXAnimationBean.Style.CENTER.equals(x)) {
+        value = HALF;
+      }
+      return parsePercentOrPx(value, width,viewportW);
+    }
+
+    private static float parsePivotY(String y, int height,int viewportW) {
+      String value = y;
+      if (WXAnimationBean.Style.TOP.equals(y)) {
+        value = ZERO;
+      } else if (WXAnimationBean.Style.BOTTOM.equals(y)) {
+        value = FULL;
+      } else if (WXAnimationBean.Style.CENTER.equals(y)) {
+        value = HALF;
+      }
+      return parsePercentOrPx(value, height,viewportW);
+    }
+
+    private static float parsePercentOrPx(String raw, int unit,int viewportW) {
+      final int precision = 1;
+      int suffix;
+      if ((suffix = raw.lastIndexOf(WXUtils.PERCENT)) != -1) {
+        return parsePercent(raw.substring(0, suffix), unit, precision);
+      } else if ((suffix = raw.lastIndexOf(PX)) != -1) {
+        return WXViewUtils.getRealPxByWidth(WXUtils.fastGetFloat(raw.substring(0, suffix), precision),viewportW);
+      }
+      return WXViewUtils.getRealPxByWidth(WXUtils.fastGetFloat(raw, precision),viewportW);
+    }
+
+    private static float parsePercent(String percent, int unit, int precision) {
+      return WXUtils.fastGetFloat(percent, precision) / 100 * unit;
+    }
+
     private void resetToDefaultIfAbsent() {
       for (Entry<Property<View, Float>, Float> entry : defaultMap.entrySet()) {
         if (!transformMap.containsKey(entry.getKey())) {
@@ -133,7 +200,7 @@ public class WXAnimationBean {
 
     public void init(@Nullable String transformOrigin,@Nullable String rawTransform,
                      final int width, final int height,int viewportW, WXSDKInstance instance){
-      pivot = TransformParser.parsePivot(transformOrigin,width,height,viewportW);
+      pivot = parsePivot(transformOrigin,width,height,viewportW);
       transformMap.putAll(TransformParser.parseTransForm(instance.getInstanceId(), rawTransform, width,height,viewportW));
       resetToDefaultIfAbsent();
       if (transformMap.containsKey(CameraDistanceProperty.getInstance())) {

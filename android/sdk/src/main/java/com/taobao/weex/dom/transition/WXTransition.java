@@ -443,72 +443,72 @@ public class WXTransition {
         switch (property){
             case Constants.Name.WIDTH:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.WIDTH, mWXComponent.getLayoutWidth(),
-                        WXViewUtils.getRealPxByWidth(value,0.0f, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloat(value, 0.0f), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.HEIGHT:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.HEIGHT, mWXComponent.getLayoutHeight(),
-                        WXViewUtils.getRealPxByWidth(value,0.0f, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloat(value, 0.0f), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.MARGIN_TOP:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_TOP,  mWXComponent.getMargin().get(CSSShorthand.EDGE.TOP),
-                        WXViewUtils.getRealPxByWidth(value, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.MARGIN_LEFT:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_LEFT,  mWXComponent.getMargin().get(CSSShorthand.EDGE.LEFT),
-                        WXViewUtils.getRealPxByWidth(value, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.MARGIN_RIGHT:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_RIGHT,  mWXComponent.getMargin().get(CSSShorthand.EDGE.RIGHT),
-                        WXViewUtils.getRealPxByWidth(value, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.MARGIN_BOTTOM:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.MARGIN_BOTTOM,  mWXComponent.getMargin().get(CSSShorthand.EDGE.BOTTOM),
-                        WXViewUtils.getRealPxByWidth(value, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.LEFT:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.LEFT,  mWXComponent.getLayoutPosition().getLeft(),
-                        WXViewUtils.getRealPxByWidth(value, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.RIGHT:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.RIGHT,  mWXComponent.getLayoutPosition().getRight(),
-                        WXViewUtils.getRealPxByWidth(value, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.BOTTOM:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.BOTTOM,  mWXComponent.getLayoutPosition().getBottom(),
-                        WXViewUtils.getRealPxByWidth(value, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.TOP:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.TOP,  mWXComponent.getLayoutPosition().getTop(),
-                        WXViewUtils.getRealPxByWidth(value, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.PADDING_TOP:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_TOP,  mWXComponent.getPadding().get(CSSShorthand.EDGE.TOP),
-                        WXViewUtils.getRealPxByWidth(value, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.PADDING_BOTTOM:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_BOTTOM,  mWXComponent.getPadding().get(CSSShorthand.EDGE.BOTTOM),
-                        WXViewUtils.getRealPxByWidth(value, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.PADDING_LEFT:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_LEFT,  mWXComponent.getPadding().get(CSSShorthand.EDGE.LEFT),
-                        WXViewUtils.getRealPxByWidth(value, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             case Constants.Name.PADDING_RIGHT:{
                 holder = PropertyValuesHolder.ofFloat(Constants.Name.PADDING_RIGHT,  mWXComponent.getPadding().get(CSSShorthand.EDGE.RIGHT),
-                        WXViewUtils.getRealPxByWidth(value, mWXComponent.getViewPortWidth()));
+                        WXViewUtils.getRealPxByWidth(WXUtils.getFloatByViewport(value, mWXComponent.getViewPortWidth()), mWXComponent.getViewPortWidth()));
             }
             break;
             default:
