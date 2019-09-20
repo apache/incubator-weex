@@ -37,7 +37,6 @@ import android.os.Build.VERSION_CODES;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
@@ -270,19 +269,10 @@ public class WXViewUtils {
    * @return the actual distance in the screen.
    */
 
-
-  /**
-   * Use {@link WXViewUtils#getRealPxByWidth(Object, float, int)} instead.
-   */
   @Deprecated
   public static float getRealPxByWidth(float pxValue) {
     return getRealPxByWidth(pxValue,750);
   }
-
-  /**
-   * Use {@link WXViewUtils#getRealPxByWidth(Object, float, int)} instead.
-   */
-  @Deprecated
   public static float getRealPxByWidth(float pxValue,int customViewport) {
     if (Float.isNaN(pxValue)) {
       return pxValue;
@@ -294,42 +284,6 @@ public class WXViewUtils {
       return realPx > 0.005 && realPx < 1 ? 1 : (float) Math.rint(realPx);
     }
   }
-    public static float getRealPxByWidth(Object value, float df, int customViewport) {
-        Float pxValue = df;
-        if (value == null) {
-            return df;
-        }
-        String temp = value.toString().trim();
-        if (Constants.Name.AUTO.equals(temp)
-                || Constants.Name.UNDEFINED.equals(temp)
-                || TextUtils.isEmpty(temp)) {
-            WXLogUtils.e("Argument Warning ! value is " + temp + "And default Value:" + df);
-            return df;
-        }
-        try {
-            if (temp.endsWith("wx")) {
-                pxValue = WXUtils.transferWx(temp, customViewport);
-            } else if (temp.endsWith("px")) {
-                temp = temp.substring(0, temp.indexOf("px"));
-                pxValue = Float.parseFloat(temp);
-            } else {
-                pxValue = Float.parseFloat(temp);
-            }
-        } catch (NumberFormatException nfe) {
-            WXLogUtils.e(WXLogUtils.getStackTrace(nfe));
-        } catch (Exception e) {
-            WXLogUtils.e(WXLogUtils.getStackTrace(e));
-        }
-        if (mUseWebPx) {
-            return (float) Math.rint(pxValue);
-        } else {
-            float realPx = (pxValue * getScreenWidth() / customViewport);
-            return realPx > 0.005 && realPx < 1 ? 1 : (float) Math.rint(realPx);
-        }
-    }
-    public static float getRealPxByWidth(Object value,int customViewport) {
-        return getRealPxByWidth(value,Float.NaN,customViewport);
-    }
 
   @Deprecated
   public static float getRealSubPxByWidth(float pxValue) {
