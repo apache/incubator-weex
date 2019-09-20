@@ -50,6 +50,7 @@ task copyAndRenameCppSourceFile(type: Copy, dependsOn: copyOtherCppFile){
         include '**/*.cpp', '**/*.cc', '**/*.c', '**/*.h', '**/*.hpp'
         filter { String line ->
             line.replaceAll('(.*".*)(com/taobao/weex)(.*".*)', { _, prefix, packageName, suffix ->
+                logger.info("Content substation in .cpp/.h files happpened, \n Input: ${line}, \n Output: ${prefix}org/apache/weex${suffix}")
                 "${prefix}org/apache/weex${suffix}"
             })
         }
