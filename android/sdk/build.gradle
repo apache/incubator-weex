@@ -26,13 +26,6 @@ apply plugin: 'checkstyle'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-//if(!project.disableCov){
-//    apply plugin: 'com.vanniktech.android.junit.jacoco'
-//    junitJacoco {
-//        excludes = ['com/taobao/weex/dom/flex/**','com/taobao/weex/ui/view/refresh/circlebar/**']
-//    }
-//}
-
 task checkstyle(type: Checkstyle) {
     configFile file("${project.rootDir}/sdk/config/quality/checkstyle.xml") // Where my checkstyle config is...
     // configProperties.checkstyleSuppressionsPath = file("${project.rootDir}/config/quality/checkstyle/suppressions.xml").absolutePath // Where is my suppressions file for checkstyle is...
@@ -68,6 +61,8 @@ if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVe
         }
     }
 }
+
+def useApachePackageName = project.hasProperty('apachePackageName') ? project.property('apachePackageName').toBoolean() : true
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -118,6 +113,8 @@ android {
     def android_project_dir = projectDir
 
     def buildRuntimeApi = project.hasProperty('buildRuntimeApi') ? project.property('buildRuntimeApi') : false
+
+    defaultPublishConfig useApachePackageName ? 'apacheRelease' : 'legacyRelease'
 
     defaultConfig {
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
@@ -172,6 +169,14 @@ android {
             testCoverageEnabled disableCov.toBoolean()
             consumerProguardFiles 'proguard-rules.pro'
         }
+
+        apacheRelease{
+            initWith release
+        }
+
+        legacyRelease{
+            initWith release
+        }
     }
 
     externalNativeBuild {
@@ -181,15 +186,12 @@ android {
     }
 
     sourceSets {
-        main {
-            assets.srcDirs = ['assets']
-            jniLibs.srcDir(['libs'])
-            java {
-                srcDirs = ["src/main/java"];
-            }
+        main.assets.srcDirs = ['assets']
+        main.jniLibs.srcDirs = ['libs']
+        if(!useApachePackageName){
+            main.java.srcDirs = ['src/legacyRelease/java']
+            main.manifest.srcFile (new File('src/legacyRelease/AndroidManifest.xml'))
         }
-        debug.setRoot('build-types/debug')
-        release.setRoot('build-types/release')
     }
 
     compileOptions.encoding = "UTF-8"
@@ -238,35 +240,33 @@ dependencies {
     testImplementation 'org.json:json:20160212'
 }
 
-if(file('../license/LICENSE').exists()){
-    license {
-        header = file('../license/LICENSE')
-        mapping('cpp','JAVADOC_STYLE')
-        mapping('h','JAVADOC_STYLE')
-        excludes(['com/taobao/weex/utils/WXDataStructureUtil.java'])
-    }
-
-    task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat){
-        source = fileTree(dir:"../../weex_core").include(['**/*.h','**/*.cpp', '**/*.cc', '**/*.c']).
-                exclude(['Source/rapidjson/**/*.h','Source/rapidjson/**/*.cpp',
-                         'Source/android/jniprebuild/jniheader/*.h',
-                         'Source/base/Compatible.cpp',
-                         'Source/IPC/**/*.h','Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
-                         'Source/base/base64/modp_base64/**/*.h',
-                         'Source/base/base64/modp_base64/**/*.cc',
-                         'Source/base/third_party/icu/*.h',
-                         'Source/base/third_party/icu/*.cpp',
-                         'Source/android/jsengine/dependence/**/*.h',
-                         'Source/android/jsengine/dependence/**/*.cpp',
-                         'Source/include/wtf/**/*.h',
-                         'Source/include/wtf/**/*.c',
-                         'Source/include/wtf/**/*.cpp',
-                         'Source/include/JavaScriptCore/**/*.h',
-                         'Source/include/JavaScriptCore/**/*.c',
-                         'Source/include/JavaScriptCore/**/*.cpp'])
-    }
-    preBuild.dependsOn licenseFormat
+license {
+    header = file('../license/LICENSE')
+    mapping('cpp', 'JAVADOC_STYLE')
+    mapping('h', 'JAVADOC_STYLE')
+    excludes(['com/taobao/weex/utils/WXDataStructureUtil.java'])
 }
+
+task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
+    source = fileTree(dir: "../../weex_core").include(['**/*.h', '**/*.cpp', '**/*.cc', '**/*.c']).
+            exclude(['Source/rapidjson/**/*.h', 'Source/rapidjson/**/*.cpp',
+                     'Source/android/jniprebuild/jniheader/*.h',
+                     'Source/base/Compatible.cpp',
+                     'Source/IPC/**/*.h', 'Source/IPC/**/*.cpp', 'Source/IPC/**/*.c',
+                     'Source/base/base64/modp_base64/**/*.h',
+                     'Source/base/base64/modp_base64/**/*.cc',
+                     'Source/base/third_party/icu/*.h',
+                     'Source/base/third_party/icu/*.cpp',
+                     'Source/android/jsengine/dependence/**/*.h',
+                     'Source/android/jsengine/dependence/**/*.cpp',
+                     'Source/include/wtf/**/*.h',
+                     'Source/include/wtf/**/*.c',
+                     'Source/include/wtf/**/*.cpp',
+                     'Source/include/JavaScriptCore/**/*.h',
+                     'Source/include/JavaScriptCore/**/*.c',
+                     'Source/include/JavaScriptCore/**/*.cpp'])
+}
+
 def ndkDir = ''
 task checkNdkVersion() {
     def rootDir = project.rootDir
@@ -278,14 +278,7 @@ task checkNdkVersion() {
         }
         ndkDir = properties.getProperty('ndk.dir')
     }
-
-//    if(null == ndkDir){
-//        def errMsg ='please set ndk.dir path in project/local.properties and ndk-16 supported only,example: ndk.dir=/Users/xxx/Library/Android/sdk/ndk-bundle-r16'
-//        throw new StopActionException(errMsg)
-//    }
 }
-
-preBuild.dependsOn checkNdkVersion
 
 def siteUrl = 'https://weex.incubator.apache.org'
 def gitUrl = 'https://github.com/apache/incubator-weex.git'
@@ -319,15 +312,6 @@ install {
             }
         }
     }
-}
-
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-artifacts {
-    archives sourcesJar
 }
 
 bintray {
@@ -400,40 +384,90 @@ task copyASanLib(type: Copy,dependsOn: copyWrapScript){
         }
     }
 }
-preBuild.dependsOn copyASanLib
 
-afterEvaluate { project ->
-    transformNativeLibsWithStripDebugSymbolForRelease << {
+task copyAndRenamePackage(type: Copy) {
+    if(!useApachePackageName) {
+        doFirst {
+            delete new File('src/legacyRelease/java')
+        }
+        from new File('src/main/java/com/taobao/weex')
+        into new File('src/legacyRelease/java/org/apache/weex')
+        filter { String line ->
+            line.replaceAll(/^(package com\.taobao)(\.weex.*)$/, { _, packageName, suffix ->
+                "package org.apache${suffix}"
+            }).replaceAll(/^(import com\.taobao)(\.weex.*)$/, { _, packageName, suffix ->
+                "import org.apache${suffix}"
+            }).replaceAll(/^(import static com\.taobao)(\.weex.*)$/, { _, packageName, suffix ->
+                "import static org.apache${suffix}"
+            })
+        }
+    }
+}
+
+task copyManifest(type: Copy){
+    if(!useApachePackageName){
+        doFirst {
+            delete new File('src/legacyRelease/AndroidManifest.xml')
+        }
+        from new File('src/main/AndroidManifest.xml')
+        into new File('src/legacyRelease')
+        filter { String line ->
+            line.replaceAll(/(com\.taobao)(\.weex.*)/, { _, packageName, suffix ->
+                "org.apache${suffix}"
+            })
+        }
+    }
+}
+
+def processNativeLibs = { unstripped, stripped ->
+    copy{
+        from unstripped
+        into new File(project.buildDir, "unstrippedSo")
+        include '**/libweexjss.so', '**/libweexcore.so'
+        eachFile {
+            it.path = "${it.relativePath.segments[-2]}_${it.name}"
+        }
+    }
+
+    if(project.hasProperty('supportArmeabi') && "true" == project.getProperty('supportArmeabi')){
+        //Copy stripped shared library from armeabi-v7a into armeabi
         copy{
-            from transformNativeLibsWithMergeJniLibsForRelease
-            into new File(project.buildDir, "unstrippedSo")
-            include '**/libweexjss.so', '**/libweexcore.so'
+            from stripped
+            into project.android.sourceSets.main.jniLibs.srcDirs[-1]
+            include '**/armeabi-v7a/**'
+            exclude '**/libc++_shared.so'
             eachFile {
-                it.path = "${it.relativePath.segments[-2]}_${it.name}"
+                it.path = "armeabi/${it.name}"
             }
         }
 
-        if(project.hasProperty('supportArmeabi') && "true" == project.getProperty('supportArmeabi')){
-            //Copy stripped shared library from armeabi-v7a into armeabi
-            copy{
-                from transformNativeLibsWithStripDebugSymbolForRelease
-                into project.android.sourceSets.main.jniLibs.srcDirs[-1]
-                include '**/armeabi-v7a/**'
-                exclude '**/libc++_shared.so'
-                eachFile {
-                    it.path = "armeabi/${it.name}"
-                }
-            }
-
-            //Copy Unstripped shared library from armeabi-v7a into armeabi
-            copy{
-                from transformNativeLibsWithMergeJniLibsForRelease
-                into new File(project.buildDir, "unstrippedSo")
-                include '**/armeabi-v7a/libweexjss.so', '**/armeabi-v7a/libweexcore.so'
-                eachFile {
-                    it.path = "armeabi_${it.name}"
-                }
+        //Copy Unstripped shared library from armeabi-v7a into armeabi
+        copy{
+            from unstripped
+            into new File(project.buildDir, "unstrippedSo")
+            include '**/armeabi-v7a/libweexjss.so', '**/armeabi-v7a/libweexcore.so'
+            eachFile {
+                it.path = "armeabi_${it.name}"
             }
         }
     }
 }
+
+afterEvaluate { project ->
+    transformNativeLibsWithStripDebugSymbolForRelease << {
+        processNativeLibs transformNativeLibsWithMergeJniLibsForRelease,
+                transformNativeLibsWithStripDebugSymbolForRelease
+    }
+
+    transformNativeLibsWithStripDebugSymbolForApacheRelease << {
+        processNativeLibs transformNativeLibsWithMergeJniLibsForApacheRelease,
+                transformNativeLibsWithStripDebugSymbolForApacheRelease
+    }
+
+    transformNativeLibsWithStripDebugSymbolForLegacyRelease << {
+        processNativeLibs transformNativeLibsWithMergeJniLibsForLegacyRelease,
+                transformNativeLibsWithStripDebugSymbolForLegacyRelease
+    }
+}
+
+preBuild.dependsOn copyAndRenamePackage, copyManifest, copyASanLib, checkNdkVersion, licenseFormat
