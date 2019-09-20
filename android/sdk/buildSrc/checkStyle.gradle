@@ -1,0 +1,14 @@
+task checkstyle(type: Checkstyle) {
+    configFile file("${project.rootDir}/sdk/config/quality/checkstyle.xml") // Where my checkstyle config is...
+    // configProperties.checkstyleSuppressionsPath = file("${project.rootDir}/config/quality/checkstyle/suppressions.xml").absolutePath // Where is my suppressions file for checkstyle is...
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    exclude '**/test/**'
+    exclude '**/com/taobao/weex/dom/flex/**'
+    classpath = files()
+}
+
+checkstyle {
+    toolVersion = '6.9'
+}

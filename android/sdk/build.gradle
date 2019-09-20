@@ -26,20 +26,11 @@ apply plugin: 'checkstyle'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-task checkstyle(type: Checkstyle) {
-    configFile file("${project.rootDir}/sdk/config/quality/checkstyle.xml") // Where my checkstyle config is...
-    // configProperties.checkstyleSuppressionsPath = file("${project.rootDir}/config/quality/checkstyle/suppressions.xml").absolutePath // Where is my suppressions file for checkstyle is...
-    source 'src'
-    include '**/*.java'
-    exclude '**/gen/**'
-    exclude '**/test/**'
-    exclude '**/com/taobao/weex/dom/flex/**'
-    classpath = files()
-}
-
-checkstyle {
-    toolVersion = '6.9'
-}
+apply from: 'buildSrc/asan.gradle'
+apply from: 'buildSrc/jcenter.gradle'
+apply from: 'buildSrc/unstripped.gradle'
+apply from: 'buildSrc/checkStyle.gradle'
+apply from: 'buildSrc/packageName.gradle'
 
 version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : '0.26.0.1'
 
@@ -61,8 +52,6 @@ if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVe
         }
     }
 }
-
-def useApachePackageName = project.hasProperty('apachePackageName') ? project.property('apachePackageName').toBoolean() : true
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -114,7 +103,7 @@ android {
 
     def buildRuntimeApi = project.hasProperty('buildRuntimeApi') ? project.property('buildRuntimeApi') : false
 
-    defaultPublishConfig useApachePackageName ? 'apacheRelease' : 'legacyRelease'
+    defaultPublishConfig project.useApachePackageName ? 'apacheRelease' : 'legacyRelease'
 
     defaultConfig {
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
@@ -188,7 +177,7 @@ android {
     sourceSets {
         main.assets.srcDirs = ['assets']
         main.jniLibs.srcDirs = ['libs']
-        if(!useApachePackageName){
+        if(!project.useApachePackageName){
             main.java.srcDirs = ['src/legacyRelease/java']
             main.manifest.srcFile (new File('src/legacyRelease/AndroidManifest.xml'))
         }
@@ -265,209 +254,6 @@ task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat) 
                      'Source/include/JavaScriptCore/**/*.h',
                      'Source/include/JavaScriptCore/**/*.c',
                      'Source/include/JavaScriptCore/**/*.cpp'])
-}
-
-def ndkDir = ''
-task checkNdkVersion() {
-    def rootDir = project.rootDir
-    def localProperties = new File(rootDir, "local.properties")
-    if (localProperties.exists()) {
-        Properties properties = new Properties()
-        localProperties.withInputStream { instr ->
-            properties.load(instr)
-        }
-        ndkDir = properties.getProperty('ndk.dir')
-    }
-}
-
-def siteUrl = 'https://weex.incubator.apache.org'
-def gitUrl = 'https://github.com/apache/incubator-weex.git'
-group = "com.taobao.android"
-install {
-    repositories.mavenInstaller {
-        // This generates POM.xml with proper parameters
-        pom {
-            project {
-                packaging 'aar'
-                name 'weex_sdk'
-                url siteUrl
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'https://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id 'weex alibaba'
-                        name 'weex alibaba'
-                        email 'alibabaweex@gmail.com'
-                    }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-                }
-            }
-        }
-    }
-}
-
-bintray {
-    configurations = ['archives']
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
-    pkg {
-        repo = "maven"
-        name = "weex_sdk"
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = ["Apache-2.0"]
-        publish = true
-        version {
-            //The version to be published
-            name = project.version
-            vcsTag = project.version
-        }
-    }
-}
-artifactory {
-    contextUrl = 'http://oss.jfrog.org/artifactory'
-    publish {
-        repository {
-            repoKey = 'oss-snapshot-local'
-            username = bintray.user
-            password = bintray.key
-            maven = true
-        }
-        defaults {
-            publishConfigs('archives')
-        }
-    }
-}
-def asanAbi = project.hasProperty('asanAbi') ? project.getProperty('asanAbi') : 'arm64-v8a'
-task clearASanLibs(type: Delete){
-    delete project.android.sourceSets.main.resources.srcDirs
-    delete fileTree(project.android.sourceSets.main.jniLibs.srcDirs[-1]) {
-        include '**/libclang_rt.asan-*-android.so'
-    }
-}
-task copyWrapScript(type: Copy,dependsOn: clearASanLibs) {
-    if(project.hasProperty('enableASan') && "true" == project.getProperty('enableASan')) {
-        from 'wrap.sh'
-        into new File(project.android.sourceSets.main.resources.srcDirs[-1], "lib")
-        eachFile {
-            it.path = "${asanAbi}/${it.name}"
-        }
-    }
-}
-task copyASanLib(type: Copy,dependsOn: copyWrapScript){
-    if(project.hasProperty('enableASan') && "true" == project.getProperty('enableASan')) {
-        def ndkPath = ndkDir == '' ? System.getenv("ANDROID_NDK_HOME"):ndkDir
-        def dir = ndkPath + '/toolchains/llvm/prebuilt/'
-        def renamedAbi = asanAbi
-        if (asanAbi == "armeabi-v7a" || asanAbi == "armeabi")
-            renamedAbi = "arm"
-        if (asanAbi == "arm64-v8a")
-            renamedAbi = "aarch64"
-        if (asanAbi == "x86")
-            renamedAbi = "i686"
-        new File(dir).eachFileRecurse { file ->
-            if (file.name == 'libclang_rt.asan-' + renamedAbi + '-android.so')
-                from file.absolutePath
-                into project.android.sourceSets.main.jniLibs.srcDirs[-1]
-                eachFile {
-                    it.path = "${asanAbi}/${it.name}"
-                }
-            includeEmptyDirs = false
-        }
-    }
-}
-
-task copyAndRenamePackage(type: Copy) {
-    if(!useApachePackageName) {
-        doFirst {
-            delete new File('src/legacyRelease/java')
-        }
-        from new File('src/main/java/com/taobao/weex')
-        into new File('src/legacyRelease/java/org/apache/weex')
-        filter { String line ->
-            line.replaceAll(/^(package com\.taobao)(\.weex.*)$/, { _, packageName, suffix ->
-                "package org.apache${suffix}"
-            }).replaceAll(/^(import com\.taobao)(\.weex.*)$/, { _, packageName, suffix ->
-                "import org.apache${suffix}"
-            }).replaceAll(/^(import static com\.taobao)(\.weex.*)$/, { _, packageName, suffix ->
-                "import static org.apache${suffix}"
-            })
-        }
-    }
-}
-
-task copyManifest(type: Copy){
-    if(!useApachePackageName){
-        doFirst {
-            delete new File('src/legacyRelease/AndroidManifest.xml')
-        }
-        from new File('src/main/AndroidManifest.xml')
-        into new File('src/legacyRelease')
-        filter { String line ->
-            line.replaceAll(/(com\.taobao)(\.weex.*)/, { _, packageName, suffix ->
-                "org.apache${suffix}"
-            })
-        }
-    }
-}
-
-def processNativeLibs = { unstripped, stripped ->
-    copy{
-        from unstripped
-        into new File(project.buildDir, "unstrippedSo")
-        include '**/libweexjss.so', '**/libweexcore.so'
-        eachFile {
-            it.path = "${it.relativePath.segments[-2]}_${it.name}"
-        }
-    }
-
-    if(project.hasProperty('supportArmeabi') && "true" == project.getProperty('supportArmeabi')){
-        //Copy stripped shared library from armeabi-v7a into armeabi
-        copy{
-            from stripped
-            into project.android.sourceSets.main.jniLibs.srcDirs[-1]
-            include '**/armeabi-v7a/**'
-            exclude '**/libc++_shared.so'
-            eachFile {
-                it.path = "armeabi/${it.name}"
-            }
-        }
-
-        //Copy Unstripped shared library from armeabi-v7a into armeabi
-        copy{
-            from unstripped
-            into new File(project.buildDir, "unstrippedSo")
-            include '**/armeabi-v7a/libweexjss.so', '**/armeabi-v7a/libweexcore.so'
-            eachFile {
-                it.path = "armeabi_${it.name}"
-            }
-        }
-    }
-}
-
-afterEvaluate { project ->
-    transformNativeLibsWithStripDebugSymbolForRelease << {
-        processNativeLibs transformNativeLibsWithMergeJniLibsForRelease,
-                transformNativeLibsWithStripDebugSymbolForRelease
-    }
-
-    transformNativeLibsWithStripDebugSymbolForApacheRelease << {
-        processNativeLibs transformNativeLibsWithMergeJniLibsForApacheRelease,
-                transformNativeLibsWithStripDebugSymbolForApacheRelease
-    }
-
-    transformNativeLibsWithStripDebugSymbolForLegacyRelease << {
-        processNativeLibs transformNativeLibsWithMergeJniLibsForLegacyRelease,
-                transformNativeLibsWithStripDebugSymbolForLegacyRelease
-    }
 }
 
 preBuild.dependsOn copyAndRenamePackage, copyManifest, copyASanLib, checkNdkVersion, licenseFormat

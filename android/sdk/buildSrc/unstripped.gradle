@@ -1,0 +1,50 @@
+def processNativeLibs = { unstripped, stripped ->
+    copy{
+        from unstripped
+        into new File(project.buildDir, "unstrippedSo")
+        include '**/libweexjss.so', '**/libweexcore.so'
+        eachFile {
+            it.path = "${it.relativePath.segments[-2]}_${it.name}"
+        }
+    }
+
+    if(project.hasProperty('supportArmeabi') && "true" == project.getProperty('supportArmeabi')){
+        //Copy stripped shared library from armeabi-v7a into armeabi
+        copy{
+            from stripped
+            into project.android.sourceSets.main.jniLibs.srcDirs[-1]
+            include '**/armeabi-v7a/**'
+            exclude '**/libc++_shared.so'
+            eachFile {
+                it.path = "armeabi/${it.name}"
+            }
+        }
+
+        //Copy Unstripped shared library from armeabi-v7a into armeabi
+        copy{
+            from unstripped
+            into new File(project.buildDir, "unstrippedSo")
+            include '**/armeabi-v7a/libweexjss.so', '**/armeabi-v7a/libweexcore.so'
+            eachFile {
+                it.path = "armeabi_${it.name}"
+            }
+        }
+    }
+}
+
+afterEvaluate { project ->
+    transformNativeLibsWithStripDebugSymbolForRelease << {
+        processNativeLibs transformNativeLibsWithMergeJniLibsForRelease,
+                transformNativeLibsWithStripDebugSymbolForRelease
+    }
+
+    transformNativeLibsWithStripDebugSymbolForApacheRelease << {
+        processNativeLibs transformNativeLibsWithMergeJniLibsForApacheRelease,
+                transformNativeLibsWithStripDebugSymbolForApacheRelease
+    }
+
+    transformNativeLibsWithStripDebugSymbolForLegacyRelease << {
+        processNativeLibs transformNativeLibsWithMergeJniLibsForLegacyRelease,
+                transformNativeLibsWithStripDebugSymbolForLegacyRelease
+    }
+}

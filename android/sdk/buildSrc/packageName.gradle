@@ -1,0 +1,33 @@
+task copyAndRenamePackage(type: Copy) {
+    if(!project.useApachePackageName) {
+        doFirst {
+            delete new File('src/legacyRelease/java')
+        }
+        from new File('src/main/java/com/taobao/weex')
+        into new File('src/legacyRelease/java/org/apache/weex')
+        filter { String line ->
+            line.replaceAll(/^(package com\.taobao)(\.weex.*)$/, { _, packageName, suffix ->
+                "package org.apache${suffix}"
+            }).replaceAll(/^(import com\.taobao)(\.weex.*)$/, { _, packageName, suffix ->
+                "import org.apache${suffix}"
+            }).replaceAll(/^(import static com\.taobao)(\.weex.*)$/, { _, packageName, suffix ->
+                "import static org.apache${suffix}"
+            })
+        }
+    }
+}
+
+task copyManifest(type: Copy){
+    if(!project.useApachePackageName){
+        doFirst {
+            delete new File('src/legacyRelease/AndroidManifest.xml')
+        }
+        from new File('src/main/AndroidManifest.xml')
+        into new File('src/legacyRelease')
+        filter { String line ->
+            line.replaceAll(/(com\.taobao)(\.weex.*)/, { _, packageName, suffix ->
+                "org.apache${suffix}"
+            })
+        }
+    }
+}
