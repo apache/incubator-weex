@@ -170,7 +170,16 @@ android {
 
     externalNativeBuild {
         cmake {
-            path '../../weex_core/CMakeLists.txt'
+            if(project.useApachePackageName) {
+                path '../../weex_core/CMakeLists.txt'
+            }
+            else{
+                copy{
+                    from new File('../../weex_core/CMakeLists.txt')
+                    into new File('src/legacyRelease/cpp')
+                }
+                path 'src/legacyRelease/cpp/CMakeLists.txt'
+            }
         }
     }
 
@@ -256,4 +265,4 @@ task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat) 
                      'Source/include/JavaScriptCore/**/*.cpp'])
 }
 
-preBuild.dependsOn copyAndRenamePackage, copyManifest, copyASanLib, checkNdkVersion, licenseFormat
+preBuild.dependsOn copyAndRenameCppSourceFile, copyAndRenamePackage, copyManifest, copyASanLib, checkNdkVersion, licenseFormat
