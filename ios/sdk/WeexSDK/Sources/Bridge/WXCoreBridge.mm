@@ -1302,6 +1302,7 @@ break; \
         _customPages[sId] = page;
     }
     
+    SetConvertCurrentPage(pageId);
     [WXCustomPageBridge parseRenderObject:data parentRef:"" index:0 genObject:^(const std::string &ref, const std::string &type, const std::string &parentRef, std::map<std::string, std::string> *styles, std::map<std::string, std::string> *attrs, std::set<std::string> *events, int index) {
         if (parentRef.empty()) {
             // is root body
@@ -1343,6 +1344,7 @@ break; \
 {
     RenderPageCustom* page = [self getPage:pageId];
     if (page && page->IsValid()) {
+        SetConvertCurrentPage(pageId);
         page->UpdateAttr([ref UTF8String] ?: "", [WXCustomPageBridge parseMapValuePairs:data]);
     }
 }
@@ -1351,6 +1353,7 @@ break; \
 {
     RenderPageCustom* page = [self getPage:pageId];
     if (page && page->IsValid()) {
+        SetConvertCurrentPage(pageId);
         page->UpdateStyle([ref UTF8String] ?: "", [WXCustomPageBridge parseMapValuePairs:data]);
     }
 }
@@ -1406,6 +1409,7 @@ break; \
         if (target && target->shouldHandleModuleMethod([moduleName UTF8String] ?: "", [methodName UTF8String] ?: "")) {
             __block const char* seralizedArguments = nullptr;
             __block const char* seralizedOptions = nullptr;
+            SetConvertCurrentPage(pageId);
             ConvertToCString(arguments, ^(const char * value) {
                 if (value != nullptr) {
                     seralizedArguments = strdup(value);
@@ -1495,6 +1499,7 @@ break; \
         if (target) {
             __block const char* seralizedArguments = nullptr;
             __block const char* seralizedOptions = nullptr;
+            SetConvertCurrentPage(pageId);
             ConvertToCString(arguments, ^(const char * value) {
                 if (value != nullptr) {
                     seralizedArguments = strdup(value);
@@ -1847,6 +1852,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         return;
     }
     
+    SetConvertCurrentPage(pageId);
     const std::string page([pageId UTF8String] ?: "");
     RenderManager::GetInstance()->CreatePage(page, [&] (RenderPage* pageInstance) -> RenderObject* {
         pageInstance->set_before_layout_needed(false); // we do not need before and after layout
@@ -1868,11 +1874,13 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 
 + (void)callUpdateAttrs:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
 {
+    SetConvertCurrentPage(pageId);
     WeexCore::RenderManager::GetInstance()->UpdateAttr([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [self _parseMapValuePairs:data]);
 }
 
 + (void)callUpdateStyle:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
 {
+    SetConvertCurrentPage(pageId);
     WeexCore::RenderManager::GetInstance()->UpdateStyle([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [self _parseMapValuePairs:data]);
 }
 

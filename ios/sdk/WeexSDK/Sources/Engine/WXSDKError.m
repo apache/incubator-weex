@@ -105,6 +105,8 @@
                 
                 @(WX_KEY_EXCEPTION_NO_BUNDLE_TYPE):@{ERROR_TYPE:@(WX_JS_ERROR),ERROR_GROUP:@(WX_JS)},
                 
+                @(WX_KEY_EXCEPTION_INVALID_JSON_OBJECT):@{ERROR_TYPE:@(WX_JS_ERROR),ERROR_GROUP:@(WX_JS)},
+                
                 @(WX_KEY_EXCEPTION_HERON_ERROR):@{ERROR_TYPE:@(WX_NATIVE_ERROR),ERROR_GROUP:@(WX_NATIVE)},
                 @(WX_KEY_EXCEPTION_HERON_RENDER_ERROR):@{ERROR_TYPE:@(WX_RENDER_ERROR),ERROR_GROUP:@(WX_NATIVE)},
                 };

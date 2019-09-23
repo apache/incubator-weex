@@ -49,6 +49,7 @@
 #import "WXJSCoreBridge.h"
 #import "WXSDKInstance_performance.h"
 #import "WXPageEventNotifyEvent.h"
+#import "WXConvertUtility.h"
 #import "WXCoreBridge.h"
 #import <WeexSDK/WXDataRenderHandler.h>
 
@@ -599,6 +600,11 @@ typedef enum : NSUInteger {
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {		
         BOOL enableRTLLayoutDirection = [[configCenter configForKey:@"iOS_weex_ext_config.enableRTLLayoutDirection" defaultValue:@(YES) isDefault:NULL] boolValue];
         [WXUtility setEnableRTLLayoutDirection:enableRTLLayoutDirection];
+        
+        BOOL isIOS13 = [[[UIDevice currentDevice] systemVersion] integerValue] == 13;
+        BOOL useMRCForInvalidJSONObject = [[configCenter configForKey:@"iOS_weex_ext_config.useMRCForInvalidJSONObject" defaultValue:@(YES) isDefault:NULL] boolValue];
+        BOOL alwaysUseMRCForObjectToWeexCore = [[configCenter configForKey:@"iOS_weex_ext_config.alwaysUseMRC" defaultValue:@(NO) isDefault:NULL] boolValue];
+        ConvertSwitches(isIOS13, useMRCForInvalidJSONObject, alwaysUseMRCForObjectToWeexCore);
     }
     return NO;
 }
