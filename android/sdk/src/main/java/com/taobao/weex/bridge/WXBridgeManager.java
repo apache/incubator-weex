@@ -152,6 +152,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public static final String METHOD_UPDATE_COMPONENT_WITH_DATA = "UpdateComponentData";
   private static final String METHOD_POST_TASK_TO_MSG_LOOP = "PostTaskToMsgLoop";
   private static final String METHOD_JSFM_NOT_INIT_IN_EAGLE_MODE = "JsfmNotInitInEagleMode";
+  private static final String METHOD_MOVE_RENDER_OBJECT = "RenderPage::MoveRenderObject";
   public static final String METHOD_DESTROY_INSTANCE = "destroyInstance";
   public static final String METHOD_CALL_JS = "callJS";
   public static final String METHOD_SET_TIMEOUT = "setTimeoutCallback";
@@ -2585,6 +2586,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               METHOD_JSFM_NOT_INIT_IN_EAGLE_MODE.equals(function) )
           && !instance.getApmForInstance().hasAddView){
         reportErrorCode = WXErrorCode.WX_DEGRAD_EAGLE_RENDER_ERROR;
+      } else if (METHOD_MOVE_RENDER_OBJECT.equals(function)) {
+        reportErrorCode = WXErrorCode.WX_ERROR_MOVE_RENDER_OBJECT_OUT_OF_BOUNDS;
       }
       instance.onJSException(reportErrorCode.getErrorCode(), function, exception);
     }
