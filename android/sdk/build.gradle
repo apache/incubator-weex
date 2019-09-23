@@ -146,9 +146,9 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "ENABLE_TRACE", "false"
-            consumerProguardFiles 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), useApachePackageName ? 'proguard-rules.pro' : 'proguard-rules-legacy.pro'
+            consumerProguardFiles useApachePackageName ? 'proguard-rules.pro' : 'proguard-rules-legacy.pro'
         }
 
         debug {
@@ -161,10 +161,14 @@ android {
 
         apacheRelease{
             initWith release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-rules.pro'
         }
 
         legacyRelease{
             initWith release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),  'proguard-rules-legacy.pro'
+            consumerProguardFiles 'proguard-rules-legacy.pro'
         }
     }
 
@@ -186,9 +190,13 @@ android {
     sourceSets {
         main.assets.srcDirs = ['assets']
         main.jniLibs.srcDirs = ['libs']
+        apacheRelease.java.srcDirs = ['src/main/java']
+        apacheRelease.manifest.srcFile(new File('src/main/AndroidManifest.xml'))
+        legacyRelease.java.srcDirs = ['src/legacyRelease/java']
+        legacyRelease.manifest.srcFile(new File('src/legacyRelease/AndroidManifest.xml'))
         if(!project.useApachePackageName){
             main.java.srcDirs = ['src/legacyRelease/java']
-            main.manifest.srcFile (new File('src/legacyRelease/AndroidManifest.xml'))
+            main.manifest.srcFile(new File('src/legacyRelease/AndroidManifest.xml'))
         }
     }
 
@@ -265,4 +273,4 @@ task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat) 
                      'Source/include/JavaScriptCore/**/*.cpp'])
 }
 
-preBuild.dependsOn copyAndRenameCppSourceFile, copyAndRenamePackage, copyManifest, copyASanLib, checkNdkVersion, licenseFormat
+preBuild.dependsOn copyAndRenameCppSourceFile, copyAndRenamePackage, copyManifest, copyProguard, copyASanLib, checkNdkVersion, licenseFormat

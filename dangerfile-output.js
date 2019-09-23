@@ -40,20 +40,7 @@ function nth_occurrence (string, char, nth) {
   }
 }
 
-if (title === 'OCLint Result') {
-  const command = 'cat ios/sdk/oclint.log | grep -v "Summary: TotalFiles=" | grep -i "P[1|2]"'
-  const child = shell.exec(command)
-  if (child.stdout !== '') {
-    fail(child.stdout)
-    fail(title)
-  }
-  if (child.stderr !== '') {
-    fail(child.stderr)
-    fail(title)
-  }
-}
-else if (title === 'AndroidLint Result') {
-  var content = fs.readFileSync('android/sdk/build/reports/lint-results.html', 'utf8')
+function check_android_lint(content){
   // in xml report,Overview Section,Disabled Checks Section and Suppressing Warnings and Errors Section is not reported.
   // in html report, those Section are included,
   // but Overview Section can't work in markdown,
@@ -68,4 +55,23 @@ else if (title === 'AndroidLint Result') {
     fail(content)
     fail(title)
   }
+}
+
+if (title === 'OCLint Result') {
+  const command = 'cat ios/sdk/oclint.log | grep -v "Summary: TotalFiles=" | grep -i "P[1|2]"'
+  const child = shell.exec(command)
+  if (child.stdout !== '') {
+    fail(child.stdout)
+    fail(title)
+  }
+  if (child.stderr !== '') {
+    fail(child.stderr)
+    fail(title)
+  }
+}
+else if (title === 'AndroidLint Result') {
+  var apacheRelease_content = fs.readFileSync('android/sdk/build/reports/lint-results-apacheRelease.html', 'utf8')
+  var legacyRelease_content = fs.readFileSync('android/sdk/build/reports/lint-results-apacheRelease.html', 'utf8')
+  check_android_lint(apacheRelease_content)
+  check_android_lint(legacyRelease_content)
 }

@@ -58,7 +58,7 @@ ext {
     fastjsonLibVersion="1.1.70.android"
     //Default value for disableCov is false
     disableCov = project.hasProperty("disableCov") && disableCov.equals("true")
-    useApachePackageName = project.hasProperty('apachePackageName') ? project.property('apachePackageName').toBoolean() : true
+    useApachePackageName = project.hasProperty('apachePackageName') ? project.property('apachePackageName').toBoolean() : false
     implementFromWeex = true
 }
 

@@ -3,15 +3,15 @@ task copyAndRenamePackage(type: Copy) {
         doFirst {
             delete new File('src/legacyRelease/java')
         }
-        from new File('src/main/java/com/taobao/weex')
-        into new File('src/legacyRelease/java/org/apache/weex')
+        from new File('src/main/java/org/apache/weex')
+        into new File('src/legacyRelease/java/com/taobao/weex')
         filter { String line ->
-            line.replaceAll(/^(package com\.taobao)(\.weex.*)$/, { _, packageName, suffix ->
-                "package org.apache${suffix}"
-            }).replaceAll(/^(import com\.taobao)(\.weex.*)$/, { _, packageName, suffix ->
-                "import org.apache${suffix}"
-            }).replaceAll(/^(import static com\.taobao)(\.weex.*)$/, { _, packageName, suffix ->
-                "import static org.apache${suffix}"
+            line.replaceAll(/^(package org\.apache)(\.weex.*)$/, { _, packageName, suffix ->
+                "package com.taobao${suffix}"
+            }).replaceAll(/^(import org\.apache)(\.weex.*)$/, { _, packageName, suffix ->
+                "import com.taobao${suffix}"
+            }).replaceAll(/^(import static org\.apache)(\.weex.*)$/, { _, packageName, suffix ->
+                "import static com.taobao${suffix}"
             })
         }
     }
@@ -25,8 +25,24 @@ task copyManifest(type: Copy){
         from new File('src/main/AndroidManifest.xml')
         into new File('src/legacyRelease')
         filter { String line ->
-            line.replaceAll(/(com\.taobao)(\.weex.*)/, { _, packageName, suffix ->
-                "org.apache${suffix}"
+            line.replaceAll(/(org\.apache)(\.weex.*)/, { _, packageName, suffix ->
+                "com.taobao${suffix}"
+            })
+        }
+    }
+}
+
+task copyProguard(type: Copy){
+    if(!project.useApachePackageName){
+        doFirst {
+            delete new File('proguard-rules-legacy.pro')
+        }
+        from new File('proguard-rules.pro')
+        into new File('.')
+        rename 'proguard-rules.pro', 'proguard-rules-legacy.pro'
+        filter { String line ->
+            line.replaceAll(/(org\.apache)(\.weex.*)/, { _, packageName, suffix ->
+                "com.taobao${suffix}"
             })
         }
     }
@@ -49,10 +65,19 @@ task copyAndRenameCppSourceFile(type: Copy, dependsOn: copyOtherCppFile){
         into new File('src/legacyRelease/cpp')
         include '**/*.cpp', '**/*.cc', '**/*.c', '**/*.h', '**/*.hpp'
         filter { String line ->
-            line.replaceAll('(.*".*)(com/taobao/weex)(.*".*)', { _, prefix, packageName, suffix ->
-                logger.info("Content substation in .cpp/.h files happpened, \n Input: ${line}, \n Output: ${prefix}org/apache/weex${suffix}")
-                "${prefix}org/apache/weex${suffix}"
+            line.replaceAll('(.*".*)(org/apache/weex)(.*".*)', { _, prefix, packageName, suffix ->
+                logger.info("Content substation in .cpp/.h files happpened, \n Input: ${line}, \n Output: ${prefix}com/taobao/weex${suffix}")
+                "${prefix}com/taobao/weex${suffix}"
             })
         }
+    }
+}
+
+gradle.taskGraph.beforeTask { Task task ->
+    if(task.name == 'assembleApacheRelease'){
+        throw new StopActionException('Not Supported. assembleApacheRelease is not supported, please use the following command instead.\n assembleRelease -PapachePackageName="true"')
+    }
+    else if(task.name == 'assembleLegacyRelease'){
+        throw new StopActionException('Not Supported. assembleLegacyRelease is not supported, please use the following command instead.\n assembleRelease -PapachePackageName="false"')
     }
 }
