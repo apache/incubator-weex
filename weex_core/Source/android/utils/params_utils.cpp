@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <core/manager/weex_core_manager.h>
 #include "android/utils/params_utils.h"
 #include "android/base/string/string_utils.h"
 #include "android/utils/so_utils.h"
@@ -219,6 +220,15 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
       WXCoreEnvironment::getInstance()->setUseRunTimeApi(use_runtime_api);
       env->DeleteLocalRef(j_use_runtime_api);
     }
+  }
+
+  jmethodID m_release_map =  env->GetMethodID(c_params, "getReleaseMap", "()Z");
+  if (m_release_map == nullptr) {
+    WeexCoreManager::Instance()->set_release_map(false);
+    LOGE("m_release_map method is missing");
+  } else {
+    jboolean j_release_map_bool = env->CallBooleanMethod(params,m_release_map);
+    WeexCoreManager::Instance()->set_release_map(j_release_map_bool==JNI_TRUE);
   }
 
   jmethodID m_get_jsc_so_path =

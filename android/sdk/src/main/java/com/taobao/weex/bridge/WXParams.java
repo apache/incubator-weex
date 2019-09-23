@@ -19,6 +19,8 @@
 package com.taobao.weex.bridge;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.base.CalledByNative;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -140,6 +142,17 @@ public class WXParams implements Serializable {
   @CalledByNative
   public String getDeviceWidth() {
     return deviceWidth;
+  }
+
+  @CalledByNative
+  public boolean getReleaseMap() {
+    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+    if (null == adapter){
+      return false;
+    }
+    String doRelease = adapter.getConfigWhenInit("wxapm","release_map","true");
+    WXLogUtils.e("getReleaseMap:"+doRelease);
+    return "true".equalsIgnoreCase(doRelease);
   }
 
 
