@@ -62,7 +62,7 @@ static base::android::ScopedLocalJavaRef<jobject>
 
 "("
 ")"
-"Lorg/apacheweex/bridge/RequestHandler;",
+"Lorg/apache/weex/bridge/RequestHandler;",
       &g_RequestHandler_create);
 
   jobject ret =
