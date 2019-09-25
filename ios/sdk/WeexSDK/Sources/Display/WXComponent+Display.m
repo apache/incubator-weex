@@ -28,6 +28,7 @@
 #import "UIBezierPath+Weex.h"
 #import "WXRoundedRect.h"
 #import "WXSDKInstance.h"
+#import "WXConvert.h"
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
@@ -289,7 +290,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
 - (void)_collectCompositingDisplayBlocks:(NSMutableArray *)displayBlocks context:(CGContextRef)context isCancelled:(BOOL(^)(void))isCancelled
 {
     // TODO: compositingChild has no chance to applyPropertiesToView, need update here?
-    UIColor *backgroundColor = _backgroundColor;
+    UIColor *backgroundColor = [WXConvert UIColorFromRGBA:_backgroundColor];
     BOOL clipsToBounds = _clipToBounds;
     CGRect frame = self.calculatedFrame;
     CGRect bounds = CGRectMake(0, 0, frame.size.width, frame.size.height);
@@ -349,8 +350,9 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
     
     CGContextSetAlpha(context, _opacity);
     // fill background color
-    if (_backgroundColor && CGColorGetAlpha(_backgroundColor.CGColor) > 0) {
-        CGContextSetFillColorWithColor(context, _backgroundColor.CGColor);
+    UIColor* backgroundColor = [WXConvert UIColorFromRGBA:_backgroundColor];
+    if (CGColorGetAlpha(backgroundColor.CGColor) > 0) {
+        CGContextSetFillColorWithColor(context, backgroundColor.CGColor);
         UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
         [bezierPath fill];
         WXPerformBlockOnMainThread(^{
@@ -367,7 +369,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
             CGContextSetLineDash(context, 0, 0, 0);
         }
         CGContextSetLineWidth(context, _borderTopWidth);
-        CGContextSetStrokeColorWithColor(context, _borderTopColor.CGColor);
+        CGContextSetStrokeColorWithColor(context, [WXConvert UIColorFromRGBA:_borderTopColor].CGColor);
         CGContextAddArc(context, size.width-topRight, topRight, topRight-_borderTopWidth/2, -M_PI_4+(_borderRightWidth>0?0:M_PI_4), -M_PI_2, 1);
         CGContextMoveToPoint(context, size.width-topRight, _borderTopWidth/2);
         CGContextAddLineToPoint(context, topLeft, _borderTopWidth/2);
@@ -388,7 +390,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
             CGContextSetLineDash(context, 0, 0, 0);
         }
         CGContextSetLineWidth(context, _borderLeftWidth);
-        CGContextSetStrokeColorWithColor(context, _borderLeftColor.CGColor);
+        CGContextSetStrokeColorWithColor(context, [WXConvert UIColorFromRGBA:_borderLeftColor].CGColor);
         CGContextAddArc(context, topLeft, topLeft, topLeft-_borderLeftWidth/2, -M_PI, -M_PI_2-M_PI_4+(_borderTopWidth > 0?0:M_PI_4), 0);
         CGContextMoveToPoint(context, _borderLeftWidth/2, topLeft);
         CGContextAddLineToPoint(context, _borderLeftWidth/2, size.height-bottomLeft);
@@ -409,7 +411,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
             CGContextSetLineDash(context, 0, 0, 0);
         }
         CGContextSetLineWidth(context, _borderBottomWidth);
-        CGContextSetStrokeColorWithColor(context, _borderBottomColor.CGColor);
+        CGContextSetStrokeColorWithColor(context, [WXConvert UIColorFromRGBA:_borderBottomColor].CGColor);
         CGContextAddArc(context, bottomLeft, size.height-bottomLeft, bottomLeft-_borderBottomWidth/2, M_PI-M_PI_4+(_borderLeftWidth>0?0:M_PI_4), M_PI_2, 1);
         CGContextMoveToPoint(context, bottomLeft, size.height-_borderBottomWidth/2);
         CGContextAddLineToPoint(context, size.width-bottomRight, size.height-_borderBottomWidth/2);
@@ -430,7 +432,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
             CGContextSetLineDash(context, 0, 0, 0);
         }
         CGContextSetLineWidth(context, _borderRightWidth);
-        CGContextSetStrokeColorWithColor(context, _borderRightColor.CGColor);
+        CGContextSetStrokeColorWithColor(context, [WXConvert UIColorFromRGBA:_borderRightColor].CGColor);
         CGContextAddArc(context, size.width-bottomRight, size.height-bottomRight, bottomRight-_borderRightWidth/2, M_PI_4+(_borderBottomWidth>0?0:M_PI_4), 0, 1);
         CGContextMoveToPoint(context, size.width-_borderRightWidth/2, size.height-bottomRight);
         CGContextAddLineToPoint(context, size.width-_borderRightWidth/2, topRight);
@@ -486,7 +488,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
     if (!radiusEqual) {
         return YES;
     }
-    BOOL colorEqual = [_borderTopColor isEqual:_borderRightColor] && [_borderRightColor isEqual:_borderBottomColor] && [_borderBottomColor isEqual:_borderLeftColor];
+    BOOL colorEqual = _borderTopColor == _borderRightColor && _borderRightColor == _borderBottomColor && _borderBottomColor == _borderLeftColor;
     if (!colorEqual) {
         return YES;
     }
@@ -499,7 +501,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
     if (!updating) {
         // init with default value
         _borderTopStyle = _borderRightStyle = _borderBottomStyle = _borderLeftStyle = WXBorderStyleSolid;
-        _borderTopColor = _borderLeftColor = _borderRightColor = _borderBottomColor = [UIColor blackColor];
+        _borderTopColor = _borderLeftColor = _borderRightColor = _borderBottomColor = [WXConvert RGBAColorFromUIColor:[UIColor blackColor]];
         _borderTopWidth = _borderLeftWidth = _borderRightWidth = _borderBottomWidth = 0;
         _borderTopLeftRadius = _borderTopRightRadius = _borderBottomLeftRadius = _borderBottomRightRadius = 0;
     }
@@ -535,6 +537,39 @@ do {\
     NSString *styleDirection4Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction4, prop));\
     if (styles[styleDirection4Prop]) {\
         _border##direction4##prop = [WXConvert type:styles[styleDirection4Prop]];\
+        needsDisplay = YES;\
+    }\
+    if (needsDisplay && updating) {\
+        [self setNeedsDisplay];\
+    }\
+} while (0);
+
+#define WX_CHECK_BORDER_PROP_COLOR(prop, direction1, direction2, direction3, direction4, type)\
+do {\
+    BOOL needsDisplay = NO; \
+    NSString *styleProp= WX_NSSTRING(WX_CONCAT(border, prop));\
+    if (styles[styleProp]) {\
+        _border##direction1##prop = _border##direction2##prop = _border##direction3##prop = _border##direction4##prop = [WXConvert RGBAColorFromUIColor:[WXConvert type:styles[styleProp]]];\
+        needsDisplay = YES;\
+    }\
+    NSString *styleDirection1Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction1, prop));\
+    if (styles[styleDirection1Prop]) {\
+        _border##direction1##prop = [WXConvert RGBAColorFromUIColor:[WXConvert type:styles[styleDirection1Prop]]];\
+        needsDisplay = YES;\
+    }\
+    NSString *styleDirection2Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction2, prop));\
+    if (styles[styleDirection2Prop]) {\
+        _border##direction2##prop = [WXConvert RGBAColorFromUIColor:[WXConvert type:styles[styleDirection2Prop]]];\
+        needsDisplay = YES;\
+    }\
+    NSString *styleDirection3Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction3, prop));\
+    if (styles[styleDirection3Prop]) {\
+        _border##direction3##prop = [WXConvert RGBAColorFromUIColor:[WXConvert type:styles[styleDirection3Prop]]];\
+        needsDisplay = YES;\
+    }\
+    NSString *styleDirection4Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction4, prop));\
+    if (styles[styleDirection4Prop]) {\
+        _border##direction4##prop = [WXConvert RGBAColorFromUIColor:[WXConvert type:styles[styleDirection4Prop]]];\
         needsDisplay = YES;\
     }\
     if (needsDisplay && updating) {\
@@ -578,7 +613,7 @@ do {\
     
     
     WX_CHECK_BORDER_PROP(Style, Top, Left, Bottom, Right, WXBorderStyle)
-    WX_CHECK_BORDER_PROP(Color, Top, Left, Bottom, Right, UIColor)
+    WX_CHECK_BORDER_PROP_COLOR(Color, Top, Left, Bottom, Right, UIColor)
     WX_CHECK_BORDER_PROP_PIXEL(Width, Top, Left, Bottom, Right)
     WX_CHECK_BORDER_PROP_PIXEL(Radius, TopLeft, TopRight, BottomLeft, BottomRight)
 
@@ -592,9 +627,9 @@ do {\
         } else if (!nowNeedsDrawBorder) {
             [self _resetNativeBorderRadius];
             _layer.borderWidth = _borderTopWidth;
-            _layer.borderColor = _borderTopColor.CGColor;
+            _layer.borderColor = [WXConvert UIColorFromRGBA:_borderTopColor].CGColor;
             if ((_transition.transitionOptions & WXTransitionOptionsBackgroundColor) != WXTransitionOptionsBackgroundColor ) {
-                _layer.backgroundColor = _backgroundColor.CGColor;
+                _layer.backgroundColor = [WXConvert UIColorFromRGBA:_backgroundColor].CGColor;
             }
         }
     }
@@ -606,7 +641,7 @@ do {\
     WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:rect topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
     WXRadii *radii = borderRect.radii;
     BOOL hasBorderRadius = [radii hasBorderRadius];
-    return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha(_backgroundColor.CGColor) == 1.0 && [self _needsDrawBorder];
+    return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha([WXConvert UIColorFromRGBA:_backgroundColor].CGColor) == 1.0 && [self _needsDrawBorder];
 }
 
 - (CAShapeLayer *)drawBorderRadiusMaskLayer:(CGRect)rect
