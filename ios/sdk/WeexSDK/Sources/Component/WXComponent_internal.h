@@ -49,7 +49,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     /**
      *  View
      */
-    UIColor *_backgroundColor;
+    uint32_t _backgroundColor;
     NSString *_backgroundImage;
     NSString *_clipRadius;
     WXClipType _clipToBounds;
@@ -114,10 +114,10 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     BOOL _isCompositingChild;
     WXThreadSafeCounter *_displayCounter;
     
-    UIColor *_borderTopColor;
-    UIColor *_borderRightColor;
-    UIColor *_borderLeftColor;
-    UIColor *_borderBottomColor;
+    uint32_t _borderTopColor;
+    uint32_t _borderRightColor;
+    uint32_t _borderLeftColor;
+    uint32_t _borderBottomColor;
     
     CGFloat _borderTopWidth;
     CGFloat _borderRightWidth;
