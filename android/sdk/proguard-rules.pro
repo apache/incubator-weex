@@ -34,8 +34,8 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
--keep class com.taobao.weex.bridge.** { *; }
--keep class com.taobao.weex.layout.** { *; }
--keep class com.taobao.weex.WXSDKEngine { *; }
--keep class com.taobao.weex.base.SystemMessageHandler { *; }
--dontwarn com.taobao.weex.bridge.**
+-keep class org.apache.weex.bridge.** { *; }
+-keep class org.apache.weex.layout.** { *; }
+-keep class org.apache.weex.WXSDKEngine { *; }
+-keep class org.apache.weex.base.SystemMessageHandler { *; }
+-dontwarn org.apache.weex.bridge.**
