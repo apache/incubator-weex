@@ -451,6 +451,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return "";
   }
 
+  public boolean isRebootExceedLimit(){
+    return reInitCount > CRASHREINIT;
+  }
+
   public void stopRemoteDebug() {
     if (mWxDebugProxy != null) {
       try {
