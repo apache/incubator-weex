@@ -39,7 +39,7 @@ task copyJscToJniDir(type: Copy, dependsOn: unzipJSC) {
     doFirst{
         delete libsDir
     }
-    from tarTree(resources.gzip(aar_file))
+    from zipTree(aar_file)
     into libsDir
     include 'jni/**/*.so'
     includeEmptyDirs false
