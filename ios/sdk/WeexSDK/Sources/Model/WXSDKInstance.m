@@ -606,6 +606,10 @@ typedef enum : NSUInteger {
         BOOL alwaysUseMRCForObjectToWeexCore = [[configCenter configForKey:@"iOS_weex_ext_config.alwaysUseMRC" defaultValue:@(NO) isDefault:NULL] boolValue];
         ConvertSwitches(isIOS13, useMRCForInvalidJSONObject, alwaysUseMRCForObjectToWeexCore);
     }
+    else {
+        BOOL isIOS13 = [[[UIDevice currentDevice] systemVersion] integerValue] == 13;
+        ConvertSwitches(isIOS13, YES, NO);
+    }
     return NO;
 }
 
