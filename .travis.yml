@@ -138,9 +138,9 @@ script:
         if npm run danger -- ci --dangerfile ./dangerfile-android.js | grep -q "hasAndroidFile" ; then
           cd android
           ./gradlew clean assembleRelease --quiet -PbuildRuntimeApi=true ${GRADLE_ABI} -PapachePackageName="false" || exit 1
-          ./gradlew assembleRelease --quiet -PbuildRuntimeApi=false ${GRADLE_ABI} -PapachePackageName="false" || exit 1
-          ./gradlew :weex_sdk:assembleRelease --quiet -PbuildRuntimeApi=true ${GRADLE_ABI} -PapachePackageName="true"  || exit 1
-          ./gradlew :weex_sdk:assembleRelease --quiet -PbuildRuntimeApi=false ${GRADLE_ABI} -PapachePackageName="true" || exit 1
+          ./gradlew assembleRelease --quiet ${GRADLE_ABI} -PbuildRuntimeApi=false -Pjsc_url="https://raw.githubusercontent.com/apache/incubator-weex/release/0.26/android/sdk/weex_sdk-0.26.0.aar" -Paar_name="weex_sdk" -PJSInterpolatorName="JavaScriptCore" -PapachePackageName="false" || exit 1
+          ./gradlew :weex_sdk:assembleRelease --quiet -PbuildRuntimeApi=true ${GRADLE_ABI} -PapachePackageName="true" || exit 1
+          ./gradlew :weex_sdk:assembleRelease --quiet  ${GRADLE_ABI} -PbuildRuntimeApi=false -Pjsc_url="https://raw.githubusercontent.com/apache/incubator-weex/release/0.26/android/sdk/weex_sdk-0.26.0.aar" -Paar_name="weex_sdk" -PJSInterpolatorName="JavaScriptCore" -PapachePackageName="true" || exit 1
         fi
         ;;
       "jsfm" )

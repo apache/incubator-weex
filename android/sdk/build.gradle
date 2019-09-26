@@ -31,6 +31,7 @@ apply from: 'buildSrc/jcenter.gradle'
 apply from: 'buildSrc/unstripped.gradle'
 apply from: 'buildSrc/checkStyle.gradle'
 apply from: 'buildSrc/packageName.gradle'
+apply from: 'buildSrc/download_jsc.gradle'
 
 version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : '0.26.0.1'
 
@@ -101,13 +102,15 @@ android {
 
     def android_project_dir = projectDir
 
-    def buildRuntimeApi = project.hasProperty('buildRuntimeApi') ? project.property('buildRuntimeApi') : false
+    def buildRuntimeApi = project.hasProperty('buildRuntimeApi') ? project.property('buildRuntimeApi').toBoolean() : true
+    def jsInterpolatorName = project.hasProperty('JSInterpolatorName') ? project.property('JSInterpolatorName') : 'jsc'
 
     defaultPublishConfig project.useApachePackageName ? 'apacheRelease' : 'legacyRelease'
 
     defaultConfig {
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
+        buildConfigField "String", "JSInterpolatorName", "\"${jsInterpolatorName}\""
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
 
@@ -135,8 +138,10 @@ android {
                         '-DANDROID_STL=' + "${cxx_stl}",
                         '-DCMAKE_BUILD_TYPE=Release',
                         '-DANDROID_PROJECT_DIR=' + "${android_project_dir}",
-                        '-DENABLE_ASAN=false',
-                        '-DBUILD_RUNTIME_API='+"${buildRuntimeApi}"
+                        '-DENABLE_ASAN=false'
+                if(buildRuntimeApi){
+                    arguments '-DBUILD_RUNTIME_API='+"${buildRuntimeApi}"
+                }
                 if(project.hasProperty('enableASan') && "true" == project.getProperty('enableASan')) {
                     cppFlags "-fsanitize=address -fno-omit-frame-pointer"
                 }
@@ -189,7 +194,6 @@ android {
 
     sourceSets {
         main.assets.srcDirs = ['assets']
-        main.jniLibs.srcDirs = ['libs']
         apacheRelease.java.srcDirs = ['src/main/java']
         apacheRelease.manifest.srcFile(new File('src/main/AndroidManifest.xml'))
         legacyRelease.java.srcDirs = ['src/legacyRelease/java']
@@ -273,4 +277,5 @@ task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat) 
                      'Source/include/JavaScriptCore/**/*.cpp'])
 }
 
-preBuild.dependsOn copyAndRenameCppSourceFile, copyAndRenamePackage, copyManifest, copyProguard, copyASanLib, checkNdkVersion, licenseFormat
+preBuild.dependsOn copyAndRenameCppSourceFile, copyAndRenamePackage, copyManifest, copyProguard,
+        copyASanLib, checkNdkVersion, licenseFormat, copyJscToJniDir

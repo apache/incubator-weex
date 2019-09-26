@@ -212,16 +212,26 @@ set(${WEEXJSSERVER_NAME}_LIBRARIES
 weexbase
 weexipc
 wson
-#c++_shared
-JavaScriptCore
-WTF
-#jsc
 log
 z
 -lc
 -ldl
 -pthread
 )
+
+if (DEFINED BUILD_RUNTIME_API)
+    set(${WEEXJSSERVER_NAME}_LIBRARIES
+        ${${WEEXJSSERVER_NAME}_LIBRARIES}
+        c++_shared
+        jsc
+    )
+else()
+    set(${WEEXJSSERVER_NAME}_LIBRARIES
+        ${${WEEXJSSERVER_NAME}_LIBRARIES}
+        JavaScriptCore
+        WTF
+    )
+endif()
 
 add_library(${WEEXJSSERVER_NAME} SHARED
             ${${WEEXJSSERVER_NAME}_SOURCES} )

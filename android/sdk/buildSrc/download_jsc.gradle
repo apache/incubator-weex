@@ -1,0 +1,57 @@
+def jsc_dir = new File(project.buildDir, 'jsc')
+def jsc_url = project.hasProperty('jsc_url') ? new URL(project.getProperty('jsc_url').toString()) : new URL('https://registry.npmjs.org/jsc-android/-/jsc-android-241213.1.0.tgz')
+def aar_name = project.hasProperty('aar_name') ? project.getProperty('aar_name').toString() : 'android-jsc-intl'
+
+def jsc_file = new File(jsc_dir, jsc_url.path.split('/').last())
+def aar_file = new File(jsc_dir, "${aar_name}.aar")
+
+def downloadJSC = { URL url, File dest ->
+    if (!dest.getParentFile().exists()) {
+        dest.getParentFile().mkdirs()
+    }
+    url.withInputStream { i -> dest.withOutputStream { it << i } }
+}
+
+task download(){
+    inputs.property('url', jsc_url)
+    outputs.file(jsc_file)
+    doFirst {
+        if (!jsc_file.exists()) {
+            downloadJSC(jsc_url, jsc_file)
+        }
+    }
+}
+
+task unzipJSC(type: Copy, dependsOn: download) {
+    from jsc_file.name.endsWith(".aar") ? jsc_file : tarTree(jsc_file)
+    into jsc_dir
+    include "**/*${aar_name}*.aar"
+    includeEmptyDirs false
+    eachFile {
+        it.path = it.name
+        it.name = "${aar_name}.aar"
+    }
+    inputs.file(jsc_file)
+    outputs.file(aar_file)
+}
+
+task copyJscToJniDir(type: Copy, dependsOn: unzipJSC) {
+    def libsDir = project.android.sourceSets.main.jniLibs.srcDirs[-1]
+    doFirst{
+        delete libsDir
+    }
+    from zipTree(aar_file)
+    into libsDir
+    include 'jni/**/*.so'
+    exclude '**/libweexcore.so', '**/libweexjsb.so', '**/libweexjss.so',
+            '**/libweexjssr.so', '**/libweexjst.so', '**/libc++_shared.so',
+            '**/x86_64/**'
+    includeEmptyDirs false
+    eachFile {
+        def path_list = new LinkedList<>(it.relativePath.segments.toList())
+        path_list.removeAt(0)
+        it.relativePath = new RelativePath(true, path_list[0], path_list[1])
+    }
+    inputs.file(aar_file)
+    outputs.dir(libsDir)
+}
