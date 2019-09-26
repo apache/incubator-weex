@@ -13,6 +13,7 @@ def downloadJSC = { URL url, File dest ->
 }
 
 task(download) {
+    inputs.property('url', jsc_url)
     outputs.file(jsc_file)
     doFirst {
         if (!jsc_file.exists()) {
