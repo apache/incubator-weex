@@ -30,7 +30,7 @@ task unzipJSC(type: Copy, dependsOn: download) {
 
 task copyJscToJniDir(type: Copy, dependsOn: unzipJSC)  {
     if(project.hasProperty('jsc_url')){
-        jsc_url = project.getProperty('jsc_url').toString()
+        jsc_url = new URL(project.getProperty('jsc_url').toString())
     }
     if(project.hasProperty('aar_name')){
         aar_name = project.getProperty('aar_name').toString()
