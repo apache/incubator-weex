@@ -35,8 +35,12 @@ task unzipJSC(type: Copy, dependsOn: download) {
 }
 
 task copyJscToJniDir(type: Copy, dependsOn: unzipJSC) {
+    def libsDir = project.android.sourceSets.main.jniLibs.srcDirs[-1]
+    doFirst{
+        delete libsDir
+    }
     from tarTree(resources.gzip(aar_file))
-    into project.android.sourceSets.main.jniLibs.srcDirs[-1]
+    into libsDir
     include 'jni/**/*.so'
     includeEmptyDirs false
     eachFile {
@@ -45,5 +49,5 @@ task copyJscToJniDir(type: Copy, dependsOn: unzipJSC) {
         it.relativePath = new RelativePath(true, path_list[0], path_list[1])
     }
     inputs.file(aar_file)
-    outputs.dir(project.android.sourceSets.main.jniLibs.srcDirs[-1])
+    outputs.dir(libsDir)
 }
