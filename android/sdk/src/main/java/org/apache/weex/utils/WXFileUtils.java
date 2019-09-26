@@ -36,9 +36,11 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+import org.apache.weex.WXEnvironment;
 
 public class WXFileUtils {
 
@@ -212,7 +214,8 @@ public class WXFileUtils {
         continue;
       }
       if(zipEntry.getName().contains("lib/armeabi/") &&
-              (zipEntry.getName().contains("weex") || zipEntry.getName().equals("libJavaScriptCore.so"))){
+              (zipEntry.getName().contains("weex") || zipEntry.getName().equals(
+                  String.format(Locale.ENGLISH, "lib%s.so", WXEnvironment.CORE_JSC_SO_NAME)))){
         String[] fileNames = zipEntry.getName().split("/");
         String fileName = fileNames[fileNames.length - 1];
         InputStream inputStream = zip.getInputStream(zipEntry);

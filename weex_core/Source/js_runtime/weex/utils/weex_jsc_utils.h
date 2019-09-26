@@ -209,6 +209,7 @@ namespace WEEXICU {
 //    }
 
     static bool initICUEnv(bool multiProcess) {
+      #ifdef BUILD_RUNTIME_API
         static bool isInit = false;
         if (isInit)
             return true;
@@ -245,6 +246,9 @@ namespace WEEXICU {
             return true;//mapIcuData(std::string(path));
         }
         return false;
+      #else
+        return true;
+      #endif
     }
 
 }

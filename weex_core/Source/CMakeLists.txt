@@ -119,18 +119,13 @@ if(ANDROID)
   ## add_subdirectory for subdirectory has a CMakeLists.txt
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/IPC)
 
-
-  message("check build jsc BUILD_RUNTIME_API flag: ${BUILD_RUNTIME_API}")
-  if ("${BUILD_RUNTIME_API}" STREQUAL "true")
-      add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/js_runtime)
-      message("cmake build jsApi for runtime")
+  if (DEFINED BUILD_RUNTIME_API)
+    message("Variable BUILD_RUNTIME_API is defined with value: ${BUILD_RUNTIME_API}")
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/js_runtime)
   else()
-      add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/android/jsengine)
-      message("cmake build jsApi for jsc")
+    message("Variable BUILD_RUNTIME_API is not defined")
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/android/jsengine)
   endif()
-
-
-
 
   ## include_directories for include head file
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/IPC)
