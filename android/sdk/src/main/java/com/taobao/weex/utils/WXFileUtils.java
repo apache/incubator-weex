@@ -85,7 +85,7 @@ public class WXFileUtils {
     return "";
   }
 
-  private static String readStreamToString(InputStream inputStream) {
+  public static String readStreamToString(InputStream inputStream) {
     BufferedReader bufferedReader = null;
     try {
       StringBuilder builder = new StringBuilder(inputStream.available() + 10);
