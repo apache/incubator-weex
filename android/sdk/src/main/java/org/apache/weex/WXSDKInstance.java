@@ -969,6 +969,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       return;
     }
     WXErrorCode errorCode = createInstanceHeartBeat?WXErrorCode.WX_ERROR_WHITE_SCREEN:WXErrorCode.WHITE_SCREEN_RESPONSE_TIMEOUT;
+    if (WXBridgeManager.getInstance().isRebootExceedLimit()){
+      errorCode = WXErrorCode.WHITE_SCREEN_REBOOT_EXCEED_LIMIT;
+    }
     Map<String,String> args = new HashMap<>(1);
     String vieTreeMsg = WhiteScreenUtils.takeViewTreeSnapShot(this);
     args.put("viewTree",null == vieTreeMsg?"null viewTreeMsg":vieTreeMsg);

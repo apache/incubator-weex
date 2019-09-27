@@ -451,6 +451,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return "";
   }
 
+  public boolean isRebootExceedLimit(){
+    return reInitCount > CRASHREINIT;
+  }
+
   public void stopRemoteDebug() {
     if (mWxDebugProxy != null) {
       try {
@@ -2282,7 +2286,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       customOptions.put("__enable_native_promise__","true");
     }
 
-    String enableAlarmSignal = "false";
+    String enableAlarmSignal = "true";
     IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
     if (null != adapter){
       try {
