@@ -440,7 +440,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     g = g8 / 255.f;
     b = b8 / 255.f;
     a = a8 / 255.f;
-    return [UIColor colorWithRed:r green:g blue:b alpha:a];
+    return a < 0.5 ? [UIColor clearColor] : [UIColor colorWithRed:r green:g blue:b alpha:a];
 }
 
 + (uint32_t)RGBAColorFromUIColor:(UIColor*)color
