@@ -148,6 +148,10 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)setCurrentIndex:(NSInteger)currentIndex
 {
+    if (_currentIndex == currentIndex) {
+        return;
+    }
+    
     if (currentIndex >= _itemViews.count || currentIndex < 0) {
         currentIndex = 0;
     }
