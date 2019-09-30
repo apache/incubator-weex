@@ -289,7 +289,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
 - (void)_collectCompositingDisplayBlocks:(NSMutableArray *)displayBlocks context:(CGContextRef)context isCancelled:(BOOL(^)(void))isCancelled
 {
     // TODO: compositingChild has no chance to applyPropertiesToView, need update here?
-    UIColor *backgroundColor = _backgroundColor;
+    UIColor *backgroundColor = self.backgroundColor;
     BOOL clipsToBounds = _clipToBounds;
     CGRect frame = self.calculatedFrame;
     CGRect bounds = CGRectMake(0, 0, frame.size.width, frame.size.height);
@@ -349,15 +349,13 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
     
     CGContextSetAlpha(context, _opacity);
     // fill background color
-    @synchronized (self) {
-        if (_backgroundColor && CGColorGetAlpha(_backgroundColor.CGColor) > 0) {
-            CGContextSetFillColorWithColor(context, _backgroundColor.CGColor);
-            UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
-            [bezierPath fill];
-            WXPerformBlockOnMainThread(^{
-                _view.backgroundColor = UIColor.clearColor;
-            });
-        }
+    if (self.backgroundColor && CGColorGetAlpha(self.backgroundColor.CGColor) > 0) {
+        CGContextSetFillColorWithColor(context, self.backgroundColor.CGColor);
+        UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
+        [bezierPath fill];
+        WXPerformBlockOnMainThread(^{
+            _view.backgroundColor = UIColor.clearColor;
+        });
     }
     // Top
     if (_borderTopWidth > 0) {
@@ -596,7 +594,7 @@ do {\
             _layer.borderWidth = _borderTopWidth;
             _layer.borderColor = _borderTopColor.CGColor;
             if ((_transition.transitionOptions & WXTransitionOptionsBackgroundColor) != WXTransitionOptionsBackgroundColor ) {
-                _layer.backgroundColor = _backgroundColor.CGColor;
+                _layer.backgroundColor = self.backgroundColor.CGColor;
             }
         }
     }
@@ -608,7 +606,7 @@ do {\
     WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:rect topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
     WXRadii *radii = borderRect.radii;
     BOOL hasBorderRadius = [radii hasBorderRadius];
-    return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha(_backgroundColor.CGColor) == 1.0 && [self _needsDrawBorder];
+    return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha(self.backgroundColor.CGColor) == 1.0 && [self _needsDrawBorder];
 }
 
 - (CAShapeLayer *)drawBorderRadiusMaskLayer:(CGRect)rect
