@@ -193,7 +193,9 @@ do {\
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (styles[@"backgroundColor"]) {
-        _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
+        @synchronized (self) {
+            _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
+        }
     }
     if (styles[@"opacity"]) {
         _opacity = [WXConvert CGFloat:styles[@"opacity"]];
@@ -211,7 +213,9 @@ do {\
     }
     
     if (styles[@"backgroundColor"]) {
-        _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
+        @synchronized (self) {
+            _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
+        }
         [self setNeedsDisplay];
     }
     
@@ -307,7 +311,9 @@ do {\
 - (void)_resetStyles:(NSArray *)styles
 {
     if (styles && [styles containsObject:@"backgroundColor"]) {
-        _backgroundColor = [UIColor clearColor];
+        @synchronized (self) {
+            _backgroundColor = [UIColor clearColor];
+        }
         [self setNeedsDisplay];
     }
     if (styles && [styles containsObject:@"boxShadow"]) {

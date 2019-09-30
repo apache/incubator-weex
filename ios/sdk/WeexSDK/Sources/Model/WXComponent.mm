@@ -857,7 +857,9 @@ static BOOL bNeedRemoveEvents = YES;
             UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
             CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:(WXGradientType)[linearGradient[@"gradientType"] integerValue]];
             if (gradientLayer) {
-                _backgroundColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
+                @synchronized (strongSelf) {
+                    _backgroundColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
+                }
                 strongSelf.view.backgroundColor = _backgroundColor;
                 [strongSelf setNeedsDisplay];
             }

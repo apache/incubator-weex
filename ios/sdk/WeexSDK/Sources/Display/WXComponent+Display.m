@@ -349,13 +349,15 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
     
     CGContextSetAlpha(context, _opacity);
     // fill background color
-    if (_backgroundColor && CGColorGetAlpha(_backgroundColor.CGColor) > 0) {
-        CGContextSetFillColorWithColor(context, _backgroundColor.CGColor);
-        UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
-        [bezierPath fill];
-        WXPerformBlockOnMainThread(^{
-            _view.backgroundColor = UIColor.clearColor;
-        });
+    @synchronized (self) {
+        if (_backgroundColor && CGColorGetAlpha(_backgroundColor.CGColor) > 0) {
+            CGContextSetFillColorWithColor(context, _backgroundColor.CGColor);
+            UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
+            [bezierPath fill];
+            WXPerformBlockOnMainThread(^{
+                _view.backgroundColor = UIColor.clearColor;
+            });
+        }
     }
     // Top
     if (_borderTopWidth > 0) {
