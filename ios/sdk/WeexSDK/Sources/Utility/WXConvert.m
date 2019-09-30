@@ -428,36 +428,6 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     return color;
 }
 
-+ (UIColor *)UIColorFromRGBA:(uint32_t)rgba
-{
-    float r, g, b, a;
-    uint8_t r8, g8, b8, a8;
-    r8 = rgba >> 24;
-    g8 = (rgba & 0x00FF0000) >> 16;
-    b8 = (rgba & 0x0000FF00) >> 8;
-    a8 = rgba & 0x000000FF;
-    r = r8 / 255.f;
-    g = g8 / 255.f;
-    b = b8 / 255.f;
-    a = a8 / 255.f;
-    return a < (0.5 / 255.f) ? [UIColor clearColor] : [UIColor colorWithRed:r green:g blue:b alpha:a];
-}
-
-+ (uint32_t)RGBAColorFromUIColor:(UIColor*)color
-{
-    CGFloat r, g, b, a;
-    if (color) {
-        [color getRed:&r green:&g blue:&b alpha:&a];
-        uint8_t r8, g8, b8, a8;
-        r8 = (uint8_t)(lround(r * 255.f));
-        g8 = (uint8_t)(lround(g * 255.f));
-        b8 = (uint8_t)(lround(b * 255.f));
-        a8 = (uint8_t)(lround(a * 255.f));
-        return ((uint32_t)r8 << 24) | ((uint32_t)g8 << 16) | ((uint32_t)b8 << 8) | (uint32_t)a8;
-    }
-    return 0;
-}
-
 + (CGColorRef)CGColor:(id)value
 {
     UIColor *color = [self UIColor:value];

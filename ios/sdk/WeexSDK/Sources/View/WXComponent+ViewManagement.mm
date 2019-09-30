@@ -62,7 +62,7 @@ do {\
 #define WX_BOARD_RADIUS_COLOR_RESET_ALL(key)\
 do {\
     if (styles && [styles containsObject:@#key]) {\
-        _borderTopColor = _borderLeftColor = _borderRightColor = _borderBottomColor = [WXConvert RGBAColorFromUIColor:[UIColor blackColor]];\
+        _borderTopColor = _borderLeftColor = _borderRightColor = _borderBottomColor = [UIColor blackColor];\
         [self setNeedsDisplay];\
     }\
 } while(0);
@@ -70,7 +70,7 @@ do {\
 #define WX_BOARD_COLOR_RESET(key)\
 do {\
     if (styles && [styles containsObject:@#key]) {\
-        _##key = [WXConvert RGBAColorFromUIColor:[UIColor blackColor]];\
+        _##key = [UIColor blackColor];\
         [self setNeedsDisplay];\
     }\
 } while(0);
@@ -174,8 +174,7 @@ do {\
 
 - (void)_initViewPropertyWithStyles:(NSDictionary *)styles
 {
-    UIColor* bgColor = styles[@"backgroundColor"] ? [WXConvert UIColor:styles[@"backgroundColor"]] : [UIColor clearColor];
-    _backgroundColor = [WXConvert RGBAColorFromUIColor:bgColor ?: [UIColor clearColor]];
+    _backgroundColor = styles[@"backgroundColor"] ? [WXConvert UIColor:styles[@"backgroundColor"]] : [UIColor clearColor];
     _backgroundImage = styles[@"backgroundImage"] ? [WXConvert NSString:styles[@"backgroundImage"]]: nil;
     _opacity = styles[@"opacity"] ? [WXConvert CGFloat:styles[@"opacity"]] : 1.0;
     _clipToBounds = styles[@"overflow"] ? [WXConvert WXClipType:styles[@"overflow"]] : NO;
@@ -194,7 +193,9 @@ do {\
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (styles[@"backgroundColor"]) {
-        _backgroundColor = [WXConvert RGBAColorFromUIColor:[WXConvert UIColor:styles[@"backgroundColor"]]];
+        @synchronized (self) {
+            _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
+        }
     }
     if (styles[@"opacity"]) {
         _opacity = [WXConvert CGFloat:styles[@"opacity"]];
@@ -212,7 +213,9 @@ do {\
     }
     
     if (styles[@"backgroundColor"]) {
-        _backgroundColor = [WXConvert RGBAColorFromUIColor:[WXConvert UIColor:styles[@"backgroundColor"]]];
+        @synchronized (self) {
+            _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
+        }
         [self setNeedsDisplay];
     }
     
@@ -308,7 +311,9 @@ do {\
 - (void)_resetStyles:(NSArray *)styles
 {
     if (styles && [styles containsObject:@"backgroundColor"]) {
-        _backgroundColor = [WXConvert RGBAColorFromUIColor:[UIColor clearColor]];
+        @synchronized (self) {
+            _backgroundColor = [UIColor clearColor];
+        }
         [self setNeedsDisplay];
     }
     if (styles && [styles containsObject:@"boxShadow"]) {
