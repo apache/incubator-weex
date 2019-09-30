@@ -140,7 +140,7 @@
     WXLogDebug(@"request:%@ didReceiveResponse:%@ ", request, response);
     
     _response = response;
-    _data = nil
+    _data = nil;
     
     if (self.onResponseReceived) {
         self.onResponseReceived(response);
