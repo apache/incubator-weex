@@ -37,6 +37,7 @@
 #import "WXDataRenderHandler.h"
 #import "WXHandlerFactory.h"
 #import "WXUtility.h"
+#import "WXExceptionUtils.h"
 
 @interface WXBridgeManager ()
 
@@ -46,6 +47,7 @@
 @property (nonatomic, strong) WXBridgeContext *backupBridgeCtx;
 @property (nonatomic, strong) WXThreadSafeMutableArray *instanceIdStack;
 @property (nonatomic, strong) NSMutableArray* jsTaskQueue;
+@property (nonatomic, strong) NSTimer *timer;
 
 @end
 
@@ -71,9 +73,36 @@ static NSThread *WXBackupBridgeThread;
         _bridgeCtx = [[WXBridgeContext alloc] init];
         _supportMultiJSThread = NO;
         _jsTaskQueue = [NSMutableArray array];
+        _lastJSMethod = [NSMutableDictionary dictionary];
+        _timer = [NSTimer scheduledTimerWithTimeInterval:5.0f target:self selector:@selector(_postTaskToBridgeThread) userInfo:nil repeats:YES];
     }
     return self;
 }
+
+- (void)_postTaskToBridgeThread {
+    __block BOOL taskFinished = NO;
+    WXPerformBlockOnBridgeThread(^{
+        taskFinished = YES;
+    });
+
+    __weak typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (!weakSelf) {
+            return;
+        }
+        if (!taskFinished) {
+            WXSDKErrCode errorCode = WX_KEY_EXCEPTION_JS_THREAD_BLOCK;
+            WXSDKInstance* instance = weakSelf.topInstance;
+            if (!instance) {
+                return;
+            }
+            NSString *instanceId = instance.instanceId;
+            WXJSExceptionInfo *jsException = [[WXJSExceptionInfo alloc] initWithInstanceId:instanceId bundleUrl:@"" errorCode: [NSString stringWithFormat:@"%d", errorCode] functionName:@"" exception:@"JS Thread is block" userInfo:[weakSelf.lastJSMethod mutableCopy]];
+            [WXExceptionUtils commitCriticalExceptionRT:jsException.instanceId errCode:jsException.errorCode function:jsException.functionName exception:jsException.exception extParams:jsException.userInfo];
+        }
+    });
+}
+
 
 - (WXBridgeContext *)backupBridgeCtx {
     if (_backupBridgeCtx) {

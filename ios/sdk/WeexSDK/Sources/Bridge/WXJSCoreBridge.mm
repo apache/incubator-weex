@@ -39,6 +39,7 @@
 #import "WXCoreBridge.h"
 #import "WXAnalyzerCenter.h"
 
+
 #import <dlfcn.h>
 
 #import <mach/mach.h>
@@ -143,7 +144,8 @@
 - (JSValue *)callJSMethod:(NSString *)method args:(NSArray *)args
 {
     WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
-//    __checkMutable(args);
+    [[WXSDKManager bridgeMgr].lastJSMethod setObject:method?:@"" forKey:@"method"];
+    [[WXSDKManager bridgeMgr].lastJSMethod setObject:args?:@[] forKey:@"args"];
     return [[_jsContext globalObject] invokeMethod:method withArguments:args];
 }
 

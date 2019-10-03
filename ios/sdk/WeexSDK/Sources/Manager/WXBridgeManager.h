@@ -45,6 +45,10 @@ extern "C" {
  **/
 @property (nonatomic, weak, readonly) WXSDKInstance *topInstance;
 
+@property (atomic, strong)  NSMutableDictionary *lastJSMethod;
+
++ (instancetype)sharedManager;
+
 /**
  *  Create Instance Method
  *  @param instance  :   instance id
