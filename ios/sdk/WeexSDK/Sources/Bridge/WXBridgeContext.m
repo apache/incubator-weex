@@ -567,6 +567,7 @@ _Pragma("clang diagnostic pop") \
                         JSObjectSetPrototype(instanceContextRef, JSValueToObject(instanceContextRef, [instanceContextEnvironment valueForProperty:key].JSValueRef, NULL), JSObjectGetPrototype(instanceContextRef, instanceGlobalObject));
                     }
                     JSObjectSetProperty(instanceContextRef, instanceGlobalObject, propertyName, [instanceContextEnvironment valueForProperty:key].JSValueRef, 0, NULL);
+                    JSStringRelease(propertyName);
                 }
                 
                 if (WX_SYS_VERSION_LESS_THAN(@"10.2")) {
