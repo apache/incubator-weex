@@ -145,12 +145,12 @@ _Pragma("clang diagnostic pop") \
     }];
     
     [_jsBridge registerCallUpdateComponentData:^NSInteger(NSString *instanceId, NSString *componentId, NSString *jsonData) {
-        if (_dataRenderHandler) {
+        if (weakSelf.dataRenderHandler) {
             WXPerformBlockOnComponentThread(^{
                 long start = [WXUtility getUnixFixTimeMillis];
                 WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
                 [instance.apmInstance addUpdateComponentDataTimestamp:start];
-                [_dataRenderHandler callUpdateComponentData:instanceId componentId:componentId jsonData:jsonData];
+                [weakSelf.dataRenderHandler callUpdateComponentData:instanceId componentId:componentId jsonData:jsonData];
                 [instance.apmInstance addUpdateComponentDataTime:[WXUtility getUnixFixTimeMillis] - start];
             });
         }
