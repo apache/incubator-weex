@@ -49,7 +49,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     /**
      *  View
      */
-    UIColor *_backgroundColor;
+    UIColor *_styleBackgroundColor;
     NSString *_backgroundImage;
     NSString *_clipRadius;
     WXClipType _clipToBounds;
@@ -178,7 +178,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 /**
  DO NOT use "_backgroundColor" directly. The same reason as '_transform'.
  */
-@property (atomic, strong) UIColor* backgroundColor;
+@property (atomic, strong) UIColor* styleBackgroundColor;
 
 ///--------------------------------------
 /// @name Package Internal Methods
