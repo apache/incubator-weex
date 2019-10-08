@@ -27,7 +27,7 @@
 
 namespace WeexCore {
 
-const char kWXLogUtilsClassPath[] = "com/taobao/weex/utils/WXLogUtils";
+const char kWXLogUtilsClassPath[] = "org/apache/weex/utils/WXLogUtils";
 static jclass g_WXLogUtils_clazz = nullptr;
 
 static intptr_t g_WXLogUtils_d = 0;

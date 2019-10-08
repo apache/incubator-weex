@@ -70,6 +70,7 @@ static BOOL bNeedRemoveEvents = YES;
 }
 
 @synthesize transform = _transform;
+@synthesize styleBackgroundColor = _styleBackgroundColor;
 
 #pragma mark Life Cycle
 
@@ -391,7 +392,7 @@ static BOOL bNeedRemoveEvents = YES;
             _layer.borderWidth = _borderTopWidth;
             [self _resetNativeBorderRadius];
             _layer.opacity = _opacity;
-            _view.backgroundColor = _backgroundColor;
+            _view.backgroundColor = self.styleBackgroundColor;
         }
 
         if (_backgroundImage) {
@@ -857,8 +858,8 @@ static BOOL bNeedRemoveEvents = YES;
             UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
             CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:(WXGradientType)[linearGradient[@"gradientType"] integerValue]];
             if (gradientLayer) {
-                _backgroundColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
-                strongSelf.view.backgroundColor = _backgroundColor;
+                strongSelf.styleBackgroundColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
+                strongSelf.view.backgroundColor = strongSelf.styleBackgroundColor;
                 [strongSelf setNeedsDisplay];
             }
         }

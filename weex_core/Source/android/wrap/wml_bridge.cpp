@@ -189,7 +189,7 @@ jclass g_WMLBridge_clazz = nullptr;
 
 static JNINativeMethod gWMMethods[] = {
     {"nativeInitAppFramework",
-     "(Ljava/lang/String;Ljava/lang/String;[Lcom/taobao/weex/bridge/"
+     "(Ljava/lang/String;Ljava/lang/String;[Lorg/apache/weex/bridge/"
      "WXJSObject;)I",
      (void*)InitAppFramework},
     {"nativeCreateAppContext",
@@ -197,7 +197,7 @@ static JNINativeMethod gWMMethods[] = {
      (void*)CreateAppContext},
     {"nativeExecJsOnApp",
      "(Ljava/lang/String;Ljava/lang/String;"
-     "[Lcom/taobao/weex/bridge/WXJSObject;)I",
+     "[Lorg/apache/weex/bridge/WXJSObject;)I",
      (void*)ExecJsOnApp},
     {"nativeExecJsOnAppWithResult",
      "(Ljava/lang/String;Ljava/lang/String;"

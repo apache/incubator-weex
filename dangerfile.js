@@ -525,7 +525,6 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
     message("According to the blame info, we recommended " + names.join(' , ') + " to be the reviewers.")
   }
 }
-message('danger test finished.')
 /*
  * find reviewer end
  */
