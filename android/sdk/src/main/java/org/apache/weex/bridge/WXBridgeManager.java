@@ -190,6 +190,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   static volatile WXBridgeManager mBridgeManager;
   private static long LOW_MEM_VALUE = 120;
   public volatile static int reInitCount = 1;
+  private volatile static int sInitFrameWorkCount = 0;
   private static String crashUrl = null;
   private static long lastCrashTime = 0;
 
@@ -908,6 +909,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXStateRecord.getInstance().onJSEngineReload(TextUtils.isEmpty(instanceId)?"null":instanceId);
          commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_RELOAD_PAGE, "reboot jsc Engine", instanceId, url,extInfo);
       }
+
+      WXLogUtils.e("reInitCount:"+reInitCount);
 
       if (reInitCount > CRASHREINIT) {
         WXExceptionUtils.commitCriticalExceptionRT("jsEngine", WXErrorCode.WX_ERR_RELOAD_PAGE_EXCEED_LIMIT,
@@ -2172,6 +2175,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
           execRegisterFailTask();
           WXEnvironment.JsFrameworkInit = true;
+          sInitFrameWorkCount++;
+          WXLogUtils.e("initFrameWorkCount :"+ sInitFrameWorkCount);
           registerDomModule();
           trackComponentAndModulesTime();
         } else {
