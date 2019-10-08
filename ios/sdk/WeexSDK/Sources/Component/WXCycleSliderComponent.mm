@@ -148,10 +148,6 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)setCurrentIndex:(NSInteger)currentIndex
 {
-    if (_currentIndex == currentIndex) {
-        return;
-    }
-    
     if (currentIndex >= _itemViews.count || currentIndex < 0) {
         currentIndex = 0;
     }
@@ -368,12 +364,24 @@ typedef NS_ENUM(NSInteger, Direction) {
 }
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
+    /* In this case, we forbid animation temporarily so that
+     setContentOffset in setCurrentIndex won't cause endless loop
+     on some devices.
+     We have to use _forbidSlideAnimation in setCurrentIndex because
+     sometimes JS will trigger the slider to slide to some posistion
+     with animation.
+     */
+    BOOL oldValue = _forbidSlideAnimation;
+    _forbidSlideAnimation = YES;
+    
     if (_infinite) {
         [self resetScrollView];
     } else {
         NSInteger index = _scrollView.contentOffset.x / self.width;
         [self setCurrentIndex:index];
     }
+        
+    _forbidSlideAnimation = oldValue;
 }
 
 @end
