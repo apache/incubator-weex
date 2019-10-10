@@ -32,41 +32,29 @@ Please ***INSTALL [Git for Windows](https://git-scm.com/download/win)*** and run
 * [Documents](http://weex.apache.org/references)
 
 ### Android
+**You should install [android environment](./HOW-TO-BUILD.md#android) before building.**
 
-* Prerequisites
-  * Install [Node.js](http://nodejs.org/) 8.0+
-  * Under project root
-    * `npm install`, install project
-    * `./start`
-    * Install [Android Environment](http://developer.android.com/training/basics/firstapp/index.html)
-    * Install [NDK](https://developer.android.com/ndk/) r18
-    * Install [Cmake](https://cmake.org/download/) 3.9.0+
-* Run playground, In Android Studio
-    * Open `android/playground`
-    * In `app/java/com.alibaba.weex/IndexActivity`, modify `CURRENT_IP` to your local IP
-    * Click <img src="http://gtms04.alicdn.com/tps/i4/TB1wCcqMpXXXXakXpXX3G7tGXXX-34-44.png" height="16" > (`Run` button)
-* [Add an example](./examples/README.md#add-an-example)
+You can either build Weex from IDE (*Android Studio*) or command line.
 
-#### Runtime
+#### Build From Android Studio
+1. Open `android` directory in Android Studio.
+2. Run `git submodule update --init --remote` in `android` directory if this is the first time you try to run Weex.
 
-On Android Platform , Weex code is executed in [weex_js_engine](https://github.com/alibaba/weex_js_engine/tree/bridge_branch_mergeTimer) which is based on JavaScriptCore engine.
+#### Build From Command Line
+Please read [How To Build](./HOW-TO-BUILD.md) for detail.
 
 ### iOS
-* run playground
-  * Prerequisites
-    * Install [Node.js](http://nodejs.org/) 8.0+
-      * Under project root
-          * `npm install`, install project
-          * `./start`
-      * Install [iOS Environment](https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/AppStoreDistributionTutorial/Setup/Setup.html)
-      * Install [CocoaPods](https://guides.cocoapods.org/using/getting-started.html)
-  * Run playground
-      * `cd ios/playground`
-      * `pod install`
-      * Open `WeexDemo.xcworkspace` in Xcode
-      * Click <img src="http://img1.tbcdn.cn/L1/461/1/5470b677a2f2eaaecf412cc55eeae062dbc275f9" height="16" > (`Run` button) or use default shortcut `cmd + r` in Xcode
-      * If you want to run the demo on your device, don't need to modify `CURRENT_IP` manually. ~~In `DemoDefine.h`(you can search this file by Xcode default shortcut `cmd + shift + o`), modify `CURRENT_IP` to your local IP~~
-  * [Add an example](./examples/README.md#add-an-example)
+**You should install [iOS environment](./HOW-TO-BUILD.md#ios) before building.**
+
+You can either build Weex from IDE (*XCode*) or command line.
+
+#### Build From XCode
+* Run playground
+  * `cd ios/playground`
+  * `pod install`
+  * Open `WeexDemo.xcworkspace` in Xcode
+  * Click <img src="http://img1.tbcdn.cn/L1/461/1/5470b677a2f2eaaecf412cc55eeae062dbc275f9" height="16" > (`Run` button) or use default shortcut `cmd + r` in Xcode
+  * If you want to run the demo on your device, don't need to modify `CURRENT_IP` manually. ~~In `DemoDefine.h`(you can search this file by Xcode default shortcut `cmd + shift + o`), modify `CURRENT_IP` to your local IP~~
 * integrate to your application
 
   - **[CocoaPods](https://cocoapods.org)**
@@ -84,6 +72,9 @@ On Android Platform , Weex code is executed in [weex_js_engine](https://github.c
      github "apache/incubator-weex"
    ```
    Run `carthage update`, and you should now have the latest version of   `WeexSDK` in your `Carthage` folder.
+
+#### Build From Command Line
+Please read [How To Build](./HOW-TO-BUILD.md) for detail.
 
 ### Mobile Web
 

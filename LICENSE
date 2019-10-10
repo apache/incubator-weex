@@ -244,7 +244,7 @@ This product bundles vuejs v1.0.12, which is available under a
 
 
 This product bundles Guava v20.0, which is available under a "Apache" license. For details, see https://github.com/google/guava/blob/v20.0/COPYING and following files:
-  android_sdk/src/main/java/org/apache/taobao/weex/utils/WXDataStructureUtil.java
+  android/sdk/src/main/java/org/apache/weex/utils/WXDataStructureUtil.java
 
 This product bundles json11 v1.0.0, which is available under a "MIT" license. For details, see https://github.com/dropbox/json11/tree/v1.0.0 and following files:
    weex_core/Source/third_party/json11/CMakeLists.txt
