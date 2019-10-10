@@ -64,8 +64,6 @@ typedef CGFloat WXPixelType;
 + (UIAccessibilityTraits)WXUIAccessibilityTraits:(id)value;
 
 + (UIColor *)UIColor:(id)value;
-+ (UIColor *)UIColorFromRGBA:(uint32_t)rgba;
-+ (uint32_t)RGBAColorFromUIColor:(UIColor*)color;
 + (CGColorRef)CGColor:(id)value;
 + (NSString *)HexWithColor:(UIColor *)color;
 + (WXBorderStyle)WXBorderStyle:(id)value;

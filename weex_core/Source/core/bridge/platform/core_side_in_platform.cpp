@@ -388,10 +388,9 @@ int CoreSideInPlatform::RefreshInstance(
              }}
         }
     };
-
-    auto final_json_str = final_json.dump().c_str();
-    auto utf16_key = weex::base::to_utf16(const_cast<char*>(final_json_str),
-                                          strlen(final_json_str));
+    std::string out = final_json.dump();
+    auto utf16_key = weex::base::to_utf16(const_cast<char*>(out.c_str()),
+                                          out.length());
     args->value.string = genWeexString(
         reinterpret_cast<const uint16_t*>(utf16_key.c_str()), utf16_key.size());
     msg.push_back(args);

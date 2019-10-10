@@ -254,7 +254,7 @@ license {
     header = file('../license/LICENSE')
     mapping('cpp', 'JAVADOC_STYLE')
     mapping('h', 'JAVADOC_STYLE')
-    excludes(['com/taobao/weex/utils/WXDataStructureUtil.java'])
+    excludes(['org/apache/weex/utils/WXDataStructureUtil.java'])
 }
 
 task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {

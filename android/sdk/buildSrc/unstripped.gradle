@@ -33,17 +33,17 @@ def processNativeLibs = { unstripped, stripped ->
 }
 
 afterEvaluate { project ->
-    transformNativeLibsWithStripDebugSymbolForRelease << {
+    transformNativeLibsWithStripDebugSymbolForRelease.doLast {
         processNativeLibs transformNativeLibsWithMergeJniLibsForRelease,
                 transformNativeLibsWithStripDebugSymbolForRelease
     }
 
-    transformNativeLibsWithStripDebugSymbolForApacheRelease << {
+    transformNativeLibsWithStripDebugSymbolForApacheRelease.doLast {
         processNativeLibs transformNativeLibsWithMergeJniLibsForApacheRelease,
                 transformNativeLibsWithStripDebugSymbolForApacheRelease
     }
 
-    transformNativeLibsWithStripDebugSymbolForLegacyRelease << {
+    transformNativeLibsWithStripDebugSymbolForLegacyRelease.doLast {
         processNativeLibs transformNativeLibsWithMergeJniLibsForLegacyRelease,
                 transformNativeLibsWithStripDebugSymbolForLegacyRelease
     }

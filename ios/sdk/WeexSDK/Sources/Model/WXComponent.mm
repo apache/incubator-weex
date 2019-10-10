@@ -70,6 +70,7 @@ static BOOL bNeedRemoveEvents = YES;
 }
 
 @synthesize transform = _transform;
+@synthesize styleBackgroundColor = _styleBackgroundColor;
 
 #pragma mark Life Cycle
 
@@ -387,11 +388,11 @@ static BOOL bNeedRemoveEvents = YES;
         _view.hidden = _visibility == WXVisibilityShow ? NO : YES;
         _view.clipsToBounds = _clipToBounds;
         if (![self _needsDrawBorder]) {
-            _layer.borderColor = [WXConvert UIColorFromRGBA:_borderTopColor].CGColor;
+            _layer.borderColor = _borderTopColor.CGColor;
             _layer.borderWidth = _borderTopWidth;
             [self _resetNativeBorderRadius];
             _layer.opacity = _opacity;
-            _view.backgroundColor = [WXConvert UIColorFromRGBA:_backgroundColor];
+            _view.backgroundColor = self.styleBackgroundColor;
         }
 
         if (_backgroundImage) {
@@ -857,9 +858,8 @@ static BOOL bNeedRemoveEvents = YES;
             UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
             CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:(WXGradientType)[linearGradient[@"gradientType"] integerValue]];
             if (gradientLayer) {
-                UIColor* patternColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
-                _backgroundColor = [WXConvert RGBAColorFromUIColor:patternColor];
-                strongSelf.view.backgroundColor = patternColor;
+                strongSelf.styleBackgroundColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
+                strongSelf.view.backgroundColor = strongSelf.styleBackgroundColor;
                 [strongSelf setNeedsDisplay];
             }
         }

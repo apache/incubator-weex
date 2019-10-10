@@ -1152,6 +1152,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             _flexCssNode->calculateLayout(renderPageSize);
             _flexCssNode->setParent(parent, _flexCssNode);
             
+            /* We must clear BFCs becuase we have set parent of _flexCSSNode to nullptr and
+             manually called its calculateLayout method. This will cause a non-bfc layout node
+             to have items in its BFCs vector. Later, a wild pointer may cause crash. */
+            _flexCssNode->clearBFCs();
+            
             // set origin and size back
             _flexCssNode->rewriteLayoutResult(left, top, width, height);
         }
