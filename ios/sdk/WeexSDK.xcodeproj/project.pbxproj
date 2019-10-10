@@ -2997,8 +2997,7 @@
 					};
 					77D160FC1C02DBE70010B15B = {
 						CreatedOnToolsVersion = 7.1.1;
-						DevelopmentTeam = 5783442933;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 					DCA445241EFA555400D0CFA8 = {
 						CreatedOnToolsVersion = 8.3.3;
@@ -3743,10 +3742,10 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5783442933;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3785,6 +3784,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.WeexSDK;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = YES;
 				VALID_ARCHS = "arm64 armv7 x86_64 i386";
 				WARNING_CFLAGS = "";
@@ -3802,9 +3802,9 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5783442933;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3843,6 +3843,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.WeexSDK;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = YES;
 				VALID_ARCHS = "arm64 armv7 x86_64 i386";
 				WARNING_CFLAGS = "";

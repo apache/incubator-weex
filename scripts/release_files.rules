@@ -66,9 +66,10 @@
 + /weex_core/Source/**
 
 ###### android #######
-+ /android
++ /android/
 + /android/build.gradle
-+ /android/sdk/
++ /android/settings.gradle
++ /android/license/***
 - /android/sdk/assets/*.js
 - /android/sdk/.gradle
 - /android/sdk/build
@@ -79,19 +80,23 @@
 - /android/sdk/.classpath
 - /android/sdk/.project
 - /android/sdk/weex_sdk.iml
-+ /android/sdk/**
+- /android/sdk/.cxx
+- /android/sdk/src/legacyRelease
+- /android/sdk/src/main/jniLibs
++ /android/sdk/***
 
 ###### ios ###########
-+ /ios
-+ /ios/sdk/
++ /ios/
 - /ios/sdk/LICENSE
 - /ios/sdk/NOTICE
 - /ios/sdk/WeexSDK/Resources/main.js
-- ios/sdk/Products
+- /ios/sdk/Products
 - /ios/sdk/WeexSDK.xcodeproj/project.xcworkspace/xcuserdata
 - /ios/sdk/WeexSDK.xcodeproj/xcuserdata
 - /ios/sdk/WeexSDKTests/dependency
-+ /ios/sdk/**
+- /ios/sdk/build
+- /ios/playground
++ /ios/sdk/***
 
 ##### Others #######
 + /RELEASE_NOTE.md
