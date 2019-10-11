@@ -86,7 +86,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 include_directories(${WEEX_CORE_SOURCE_DIR})
 include_directories(${WEEX_CORE_SOURCE_DIR}/include)
-#include_directories(${WEEX_CORE_SOURCE_DIR}/include/JavaScriptCore)
 include_directories(${WEEX_CORE_SOURCE_DIR}/include/JSCHeaderNew)
 
 
