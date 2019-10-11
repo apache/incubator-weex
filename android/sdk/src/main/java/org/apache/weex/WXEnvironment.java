@@ -145,8 +145,6 @@ public class WXEnvironment {
   public static String CORE_JSC_SO_NAME = BuildConfig.JSInterpolatorName;
   private static  String CORE_JSS_SO_PATH = null;
 
-  public static  String CORE_JSS_RUNTIME_SO_PATH = null;
-
   private static String CORE_JSS_ICU_PATH = null;
 
   private static String CORE_JSC_SO_PATH = null;
@@ -612,11 +610,6 @@ public class WXEnvironment {
   }
 
   public static String getLibJssRealPath() {
-    if (WXEnvironment.sUseRunTimeApi && !TextUtils.isEmpty(CORE_JSS_RUNTIME_SO_PATH)){
-      WXLogUtils.d("test-> findLibJssRuntimeRealPath " + CORE_JSS_RUNTIME_SO_PATH);
-      return CORE_JSS_RUNTIME_SO_PATH;
-    }
-
     if(TextUtils.isEmpty(CORE_JSS_SO_PATH)) {
       CORE_JSS_SO_PATH = findSoPath(CORE_JSS_SO_NAME);
       WXLogUtils.d("test-> findLibJssRealPath " + CORE_JSS_SO_PATH);
