@@ -54,4 +54,5 @@ task copyJscToJniDir(type: Copy, dependsOn: unzipJSC) {
     }
     inputs.file(aar_file)
     outputs.dir(libsDir)
+    outputs.upToDateWhen {false}
 }
