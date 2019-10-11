@@ -74,3 +74,5 @@ gradle.taskGraph.beforeTask { Task task ->
         throw new StopActionException('Not Supported. assembleLegacyRelease is not supported, please use the following command instead.\n assembleRelease -PapachePackageName="false"')
     }
 }
+
+preBuild.dependsOn copyAndRenameCppSourceFile, copyAndRenamePackage, copyManifest, copyProguard

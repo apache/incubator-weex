@@ -284,5 +284,4 @@ task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat) 
                      'Source/include/JavaScriptCore/**/*.cpp'])
 }
 
-preBuild.dependsOn copyAndRenameCppSourceFile, copyAndRenamePackage, copyManifest, copyProguard,
-        copyASanLib, checkNdkVersion, licenseFormat, copyJscToJniDir
+preBuild.dependsOn copyASanLib, checkNdkVersion, licenseFormat

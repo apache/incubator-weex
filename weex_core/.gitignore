@@ -3,3 +3,5 @@ build32/
 build64/
 cmake-build-debug
 cscope.out
+
+weex_core/Source/include/JSCHeaderNew/JavaScriptCore
