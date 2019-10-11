@@ -196,8 +196,6 @@ public class WXSDKEngine implements Serializable {
   }
 
   private static void doInitInternal(final Application application,final InitConfig config){
-    WXEnvironment.sUseRunTimeApi = config.isUseRuntimeAPI();
-    WXEnvironment.CORE_JSC_SO_NAME = config.getJsInterpolatorName();
     WXEnvironment.sApplication = application;
     if(application == null){
       WXLogUtils.e(TAG, " doInitInternal application is null");

@@ -19,8 +19,6 @@
 package org.apache.weex;
 
 import android.support.annotation.NonNull;
-import java.util.LinkedList;
-import java.util.List;
 import org.apache.weex.adapter.ClassLoaderAdapter;
 import org.apache.weex.adapter.IDrawableLoader;
 import org.apache.weex.adapter.IWXHttpAdapter;
@@ -34,6 +32,8 @@ import org.apache.weex.adapter.URIAdapter;
 import org.apache.weex.appfram.storage.IWXStorageAdapter;
 import org.apache.weex.appfram.websocket.IWebSocketAdapterFactory;
 import org.apache.weex.performance.IApmGenerator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by sospartan on 5/31/16.
@@ -53,8 +53,6 @@ public class InitConfig {
   private IApmGenerator apmGenerater;
   private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
   private IWXJscProcessManager jscProcessManager;
-  private String jsInterpolatorName;
-  private boolean useRuntimeAPI;
   private List<String> nativeLibraryList;
 
   public IWXHttpAdapter getHttpAdapter() {
@@ -124,14 +122,6 @@ public class InitConfig {
     return nativeLibraryList;
   }
 
-  public String getJsInterpolatorName(){
-    return jsInterpolatorName;
-  }
-
-  public boolean isUseRuntimeAPI(){
-    return useRuntimeAPI;
-  }
-
   private InitConfig() {
   }
 
@@ -145,8 +135,6 @@ public class InitConfig {
     URIAdapter mURIAdapter;
     IWXJSExceptionAdapter mJSExceptionAdapter;
     String framework;
-    String jsInterpolatorName = BuildConfig.JSInterpolatorName;
-    boolean useRuntimeAPI = false;
     IWebSocketAdapterFactory webSocketAdapterFactory;
     ClassLoaderAdapter classLoaderAdapter;
     IApmGenerator apmGenerater;
@@ -238,16 +226,6 @@ public class InitConfig {
       return this;
     }
 
-    public Builder setJsInterpolatorName(String name){
-      jsInterpolatorName = name;
-      return this;
-    }
-
-    public Builder setUseRuntimeAPI(boolean useRuntimeAPI){
-      this.useRuntimeAPI = useRuntimeAPI;
-      return this;
-    }
-
     public InitConfig build(){
       InitConfig config =  new InitConfig();
       config.httpAdapter = this.httpAdapter;
@@ -265,8 +243,6 @@ public class InitConfig {
       config.jsFileLoaderAdapter = this.jsFileLoaderAdapter;
       config.jscProcessManager = this.jscProcessManager;
       config.nativeLibraryList = this.nativeLibraryList;
-      config.jsInterpolatorName = this.jsInterpolatorName;
-      config.useRuntimeAPI = this.useRuntimeAPI;
       return config;
     }
   }
