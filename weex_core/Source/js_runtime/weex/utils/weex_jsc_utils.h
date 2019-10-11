@@ -209,6 +209,7 @@ namespace WEEXICU {
 //    }
 
     static bool initICUEnv(bool multiProcess) {
+#ifdef INIT_JSC_PRIVATE_API
         static bool isInit = false;
         if (isInit)
             return true;
@@ -245,6 +246,10 @@ namespace WEEXICU {
             return true;//mapIcuData(std::string(path));
         }
         return false;
+#else
+        LOGE("skip initICUEnv");
+        return true;
+#endif
     }
 
 }

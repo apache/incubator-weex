@@ -16,7 +16,8 @@ assets/weex-main-jsfm.js
 assets/weex-rax-api.js
 .externalNativeBuild
 
-/libs/armeabi
+/libs/
+/src/main/jniLibs
 
 /src/legacyRelease/
 proguard-rules-legacy.pro
