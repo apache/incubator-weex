@@ -56,6 +56,7 @@
 - /weex_core/Source/android/jsengine/dependence/
 - /weex_core/Source/include/JavaScriptCore/
 - /weex_core/Source/include/wtf/
+- /weex_core/Source/include/JSCHeaderNew/JavaScriptCore/
 + /weex_core
 + /weex_core/CMakeLists.txt
 + /weex_core/Source
