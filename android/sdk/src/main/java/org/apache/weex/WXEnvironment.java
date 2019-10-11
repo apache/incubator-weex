@@ -143,7 +143,7 @@ public class WXEnvironment {
 
   @RestrictTo(Scope.LIBRARY)
   public static String CORE_JSC_SO_NAME = BuildConfig.JSInterpolatorName;
-  private static  String CORE_JSS_SO_PATH = null;
+  public static  String CORE_JSS_SO_PATH = null;
 
   private static String CORE_JSS_ICU_PATH = null;
 
