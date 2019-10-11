@@ -104,6 +104,10 @@ android {
 
     def buildRuntimeApi = project.hasProperty('buildRuntimeApi') ? project.property('buildRuntimeApi').toBoolean() : true
     def jsInterpolatorName = project.hasProperty('JSInterpolatorName') ? project.property('JSInterpolatorName') : 'jsc'
+    def initJSCPrivateApi = false
+    if (buildRuntimeApi){
+        initJSCPrivateApi = jsInterpolatorName =="JavaScriptCore"
+    }
 
     defaultPublishConfig project.useApachePackageName ? 'apacheRelease' : 'legacyRelease'
 
@@ -141,6 +145,9 @@ android {
                         '-DENABLE_ASAN=false'
                 if(buildRuntimeApi){
                     arguments '-DBUILD_RUNTIME_API='+"${buildRuntimeApi}"
+                    if (initJSCPrivateApi){
+                        arguments '-DINIT_JSC_PRIVATE_API='+"${initJSCPrivateApi}"
+                    }
                 }
                 if(project.hasProperty('enableASan') && "true" == project.getProperty('enableASan')) {
                     cppFlags "-fsanitize=address -fno-omit-frame-pointer"
