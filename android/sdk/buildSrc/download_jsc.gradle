@@ -62,12 +62,8 @@ task copyJscToJniDir(type: Copy, dependsOn: unzipJSC) {
 }
 
 task copyJSCHeaderToWeexCore(type: Copy, dependsOn: unzipJSC) {
-    def dest = new File('../../weex_core/Source/include/JSCHeaderNew/JavaScriptCore')
-    if(!dest.exists()){
-        dest.mkdirs()
-    }
     from new File(jsc_dir, 'include')
-    into dest
+    into '../../weex_core/Source/include/JSCHeaderNew/JavaScriptCore'
     includeEmptyDirs false
     inputs.dir(new File(jsc_dir, 'include'))
     outputs.upToDateWhen {false}
