@@ -26,12 +26,12 @@ apply plugin: 'checkstyle'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-apply from: 'buildSrc/asan.gradle'
 apply from: 'buildSrc/jcenter.gradle'
 apply from: 'buildSrc/unstripped.gradle'
 apply from: 'buildSrc/checkStyle.gradle'
 apply from: 'buildSrc/download_jsc.gradle'
 apply from: 'buildSrc/packageName.gradle'
+apply from: 'buildSrc/asan.gradle'
 
 version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : '0.26.0.1'
 
@@ -284,4 +284,4 @@ task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat) 
                      'Source/include/JavaScriptCore/**/*.cpp'])
 }
 
-preBuild.dependsOn copyASanLib, checkNdkVersion, licenseFormat
+preBuild.dependsOn licenseFormat

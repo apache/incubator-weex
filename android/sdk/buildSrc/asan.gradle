@@ -50,3 +50,6 @@ task copyASanLib(type: Copy,dependsOn: copyWrapScript){
         }
     }
 }
+
+preBuild.dependsOn copyASanLib, checkNdkVersion
+copyASanLib.shouldRunAfter copyJscToJniDir

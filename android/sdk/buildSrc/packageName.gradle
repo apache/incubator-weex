@@ -55,8 +55,7 @@ task copyOtherCppFile(type: Copy){
     }
 }
 
-task copyAndRenameCppSourceFile(type: Copy){
-    dependsOn copyOtherCppFile, copyJSCHeaderToWeexCore
+task copyAndRenameCppSourceFile(type: Copy, dependsOn: copyOtherCppFile){
     if(!project.useApachePackageName) {
         inputs.dir new File('../../weex_core')
         from new File('../../weex_core')
@@ -82,3 +81,4 @@ gradle.taskGraph.beforeTask { Task task ->
 
 preBuild.dependsOn copyAndRenameCppSourceFile, copyAndRenamePackage, copyManifest, copyProguard
 clean.dependsOn cleanCopyAndRenamePackage, cleanCopyManifest, cleanCopyProguard, cleanCopyOtherCppFile, cleanCopyAndRenameCppSourceFile
+copyAndRenameCppSourceFile.shouldRunAfter copyJSCHeaderToWeexCore
