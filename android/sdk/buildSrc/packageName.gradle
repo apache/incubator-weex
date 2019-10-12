@@ -42,6 +42,10 @@ task copyProguard(type: Copy){
     }
 }
 
+task(cleanCopyProguard, overwrite: true, type: Delete){
+    delete 'proguard-rules-legacy.pro'
+}
+
 task copyOtherCppFile(type: Copy){
     if(!project.useApachePackageName) {
         inputs.dir new File('../../weex_core')
@@ -77,4 +81,4 @@ gradle.taskGraph.beforeTask { Task task ->
 }
 
 preBuild.dependsOn copyAndRenameCppSourceFile, copyAndRenamePackage, copyManifest, copyProguard
-clean.dependsOn cleanCopyAndRenamePackage, cleanCopyManifest, cleanCopyOtherCppFile, cleanCopyAndRenameCppSourceFile
+clean.dependsOn cleanCopyAndRenamePackage, cleanCopyManifest, cleanCopyProguard, cleanCopyOtherCppFile, cleanCopyAndRenameCppSourceFile
