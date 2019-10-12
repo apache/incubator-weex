@@ -247,7 +247,6 @@ This product bundles Guava v20.0, which is available under a "Apache" license. F
   android/sdk/src/main/java/org/apache/weex/utils/WXDataStructureUtil.java
 
 This product bundles json11 v1.0.0, which is available under a "MIT" license. For details, see https://github.com/dropbox/json11/tree/v1.0.0 and following files:
-   weex_core/Source/third_party/json11/CMakeLists.txt
    weex_core/Source/third_party/json11/json11.cc
    weex_core/Source/third_party/json11/json11.hpp
 
