@@ -62,8 +62,6 @@ task copyJscToJniDir(type: Copy, dependsOn: unzipJSC) {
 }
 
 task copyJSCHeaderToWeexCore(type: Copy, dependsOn: unzipJSC) {
-    println 'Prepare adding log'
-    println new File(jsc_dir, 'include').listFiles()
     from new File(jsc_dir, 'include')
     into '../../weex_core/Source/include/JSCHeaderNew/JavaScriptCore'
     includeEmptyDirs false
@@ -72,3 +70,4 @@ task copyJSCHeaderToWeexCore(type: Copy, dependsOn: unzipJSC) {
 }
 
 preBuild.dependsOn copyJscToJniDir, copyJSCHeaderToWeexCore
+clean.dependsOn cleanCopyJscToJniDir, cleanCopyJSCHeaderToWeexCore

@@ -76,3 +76,4 @@ gradle.taskGraph.beforeTask { Task task ->
 }
 
 preBuild.dependsOn copyAndRenameCppSourceFile, copyAndRenamePackage, copyManifest, copyProguard
+clean.dependsOn cleanCopyAndRenamePackage, cleanCopyManifest, cleanCopyOtherCppFile, cleanCopyAndRenameCppSourceFile
