@@ -228,7 +228,6 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
     //noinspection GradleDependency
     compileOnly "com.android.support:recyclerview-v7:${project.supportLibVersion}"
     //noinspection GradleDependency
