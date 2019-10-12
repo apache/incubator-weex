@@ -28,7 +28,8 @@ task copyWrapScript(type: Copy,dependsOn: clearASanLibs) {
         }
     }
 }
-task copyASanLib(type: Copy,dependsOn: copyWrapScript){
+task copyASanLib(type: Copy){
+    dependsOn copyWrapScript, copyJscToJniDir
     if(project.hasProperty('enableASan') && "true" == project.getProperty('enableASan')) {
         def ndkPath = ndkDir == '' ? System.getenv("ANDROID_NDK_HOME"):ndkDir
         def dir = ndkPath + '/toolchains/llvm/prebuilt/'
@@ -52,4 +53,3 @@ task copyASanLib(type: Copy,dependsOn: copyWrapScript){
 }
 
 preBuild.dependsOn copyASanLib, checkNdkVersion
-copyASanLib.mustRunAfter copyJscToJniDir
