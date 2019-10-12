@@ -30,8 +30,8 @@ apply from: 'buildSrc/asan.gradle'
 apply from: 'buildSrc/jcenter.gradle'
 apply from: 'buildSrc/unstripped.gradle'
 apply from: 'buildSrc/checkStyle.gradle'
-apply from: 'buildSrc/packageName.gradle'
 apply from: 'buildSrc/download_jsc.gradle'
+apply from: 'buildSrc/packageName.gradle'
 
 version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : '0.26.0.1'
 

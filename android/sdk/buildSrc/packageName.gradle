@@ -51,7 +51,8 @@ task copyOtherCppFile(type: Copy){
     }
 }
 
-task copyAndRenameCppSourceFile(type: Copy, dependsOn: copyOtherCppFile){
+task copyAndRenameCppSourceFile(type: Copy){
+    dependsOn copyOtherCppFile, copyJSCHeaderToWeexCore
     if(!project.useApachePackageName) {
         inputs.dir new File('../../weex_core')
         from new File('../../weex_core')
