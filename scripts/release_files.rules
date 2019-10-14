@@ -77,6 +77,8 @@
 - /android/sdk/.classpath
 - /android/sdk/.project
 - /android/sdk/weex_sdk.iml
+- /android/sdk/android-weex_sdk.iml
+- /android/sdk/weex-android-weex_sdk.iml
 - /android/sdk/.cxx
 - /android/sdk/src/legacyRelease
 - /android/sdk/src/main/jniLibs
