@@ -60,9 +60,6 @@ task unzipJSC(type: Copy, dependsOn: download) {
 
 task copyJscToJniDir(type: Copy, dependsOn: unzipJSC) {
     def libsDir = project.android.sourceSets.main.jniLibs.srcDirs[-1]
-    doFirst{
-        delete libsDir
-    }
     from zipTree(aar_file)
     into libsDir
     include 'jni/**/*.so'
