@@ -7,7 +7,7 @@ A framework for building Mobile cross-platform UI.
 ## Important Notice
 * The convenience distribution below is only for users' users' **convenience**. Weex Release is always in the form of [source code](https://weex.apache.org/download/download.html).
 * From Weex `0.28` or higher, the JavaScript interpreter is not bundled with Weex anymore. Developers could choose whatever JavaScript interpreter they like in their app as long as it implements the [cpp headers](https://svn.webkit.org/repository/webkit/releases/WebKitGTK/webkit-2.9.92/Source/JavaScriptCore/API/).
-  * Optional JavaScript interpreter choice: If you have no idea about how to choose proper JavaScript interpreter, you could add `apply from: 'https://raw.githubusercontent.com/apache/incubator-weex/release/0.28/android/sdk/buildSrc/download_jsc.gradle'` in your build.gradle, everything else should work as expected. See [weex-playground](https://github.com/apache/incubator-weex-playground/blob/master/android/playground/build.gradle#L7) to learn more.
+  * **Optional** JavaScript interpreter choice: If you have no idea about how to choose proper JavaScript interpreter, you could add `apply from: 'https://raw.githubusercontent.com/apache/incubator-weex/release/0.28/android/sdk/buildSrc/download_jsc.gradle'` in your build.gradle, everything else should work as expected. See [weex-playground](https://github.com/apache/incubator-weex-playground/blob/master/android/playground/build.gradle#L7) to see a demo.
 
 ## Convenience Distribution 
 
@@ -22,7 +22,7 @@ Support Android 4.1 (API 16), iOS 8.0+ and WebKit 534.30+.
 ## For Windows
 First of all, compiling or building Weex from Windows is not support officially.
 
-You could [Git for Windows](https://git-scm.com/download/win)*** and run all the following commands in git-bash and give it a try.
+You could [Git for Windows](https://git-scm.com/download/win) and run all the following commands in git-bash and give it a try.
 
 ## Meet Weex
 
