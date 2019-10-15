@@ -4,6 +4,13 @@ A framework for building Mobile cross-platform UI.
 
 [![Build Status](https://travis-ci.org/apache/incubator-weex.svg?branch=master)](https://travis-ci.org/apache/incubator-weex/)
 
+## Important Notice
+* The convenience distribution below is only for users' users' **convenience**. Weex Release is always in the form of [source code](https://weex.apache.org/download/download.html).
+* From Weex `0.28` or higher, the JavaScript interpreter is not bundled with Weex anymore. Developers could choose whatever JavaScript interpreter they like in their app as long as it implements the [cpp headers](https://svn.webkit.org/repository/webkit/releases/WebKitGTK/webkit-2.9.92/Source/JavaScriptCore/API/).
+  * Optional JavaScript interpreter choice: If you have no idea about how to choose proper JavaScript interpreter, you could add `apply from: 'https://raw.githubusercontent.com/apache/incubator-weex/release/0.28/android/sdk/buildSrc/download_jsc.gradle'` in your build.gradle, everything else should work as expected. See [weex-playground](https://github.com/apache/incubator-weex-playground/blob/master/android/playground/build.gradle#L7) to learn more.
+
+## Convenience Distribution 
+
 | platform | status |
 | -------- | ------ |
 | Android | [![Download](https://api.bintray.com/packages/alibabaweex/maven/weex_sdk/images/download.svg)](https://bintray.com/alibabaweex/maven/weex_sdk/_latestVersion) |
@@ -12,11 +19,10 @@ A framework for building Mobile cross-platform UI.
 
 Support Android 4.1 (API 16), iOS 8.0+ and WebKit 534.30+.
 
-**Note: Please note the above download distribution is only for users' users' convenience. Weex Release is always in the format of [source code](https://weex.apache.org/download/download.html).**
-
 ## For Windows
+First of all, compiling or building Weex from Windows is not support officially.
 
-Please ***INSTALL [Git for Windows](https://git-scm.com/download/win)*** and run all the following commands in git-bash.
+You could [Git for Windows](https://git-scm.com/download/win)*** and run all the following commands in git-bash and give it a try.
 
 ## Meet Weex
 
