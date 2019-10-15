@@ -283,4 +283,5 @@ task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat) 
                      'Source/include/JavaScriptCore/**/*.cpp'])
 }
 
-preBuild.dependsOn licenseFormat
+preBuild.dependsOn licenseFormat, copyJSCHeaderToWeexCore
+clean.dependsOn cleanCopyJSCHeaderToWeexCore
