@@ -209,6 +209,10 @@ android {
             main.java.srcDirs = ['src/legacyRelease/java']
             main.manifest.srcFile(new File('src/legacyRelease/AndroidManifest.xml'))
         }
+
+        if(project.unbundlingJSC){
+            main.jniLibs.srcDirs = []
+        }
     }
 
     compileOptions.encoding = "UTF-8"

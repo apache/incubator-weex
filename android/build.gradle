@@ -76,6 +76,7 @@ ext {
     //Default value for disableCov is false
     disableCov = project.hasProperty("disableCov") && disableCov.equals("true")
     useApachePackageName = project.hasProperty('apachePackageName') ? project.property('apachePackageName').toBoolean() : false
+    unbundlingJSC = project.hasProperty('unbundlingJSC') ? project.property('unbundlingJSC').toBoolean() : false
     implementFromWeex = true
 }
 
