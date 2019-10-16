@@ -15,7 +15,7 @@ The environment required to build weex is categorized by platforms.
 ## Android
 * JDK `1.8+`
 * Android SDK Platform 28
-  * `$ANDROID_HOME` must be configured by using `export ANDROID_HOME=/path_to_ndk`
+  * `$ANDROID_HOME` must be configured by using `export ANDROID_HOME=/path_to_sdk`
   * Normally, you should install [Android Studio](https://developer.android.com/studio) to get Android SDK Platform 28 installed.
 * Gradle 4.10+
 * NDK `r18`
