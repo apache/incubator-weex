@@ -36,19 +36,20 @@ sed -i '' 's/^*//' commit-history.log
 sed -i '' 's/^/* /' commit-history.log
 sed -i '' -e '1i \
 # Detail Commit' commit-history.log
-cat CHANGELOG.md commit-history.log > RELEASE_NOTE.md
+cat DISCLAIMER CHANGELOG.md commit-history.log > RELEASE_NOTE.md
 
 echo "Publish source file to Apache SVN server"
 if [ ! -d "${TMPDIR}weex_release" ]
 then
     svn checkout https://dist.apache.org/repos/dist/release/incubator/weex/ "${TMPDIR}weex_release"
 fi
+svn delete .
 mkdir -p "${TMPDIR}weex_release/${1}" && cd "$_"
 curl "https://dist.apache.org/repos/dist/dev/incubator/weex/${1}/${2}/apache-weex-incubating-${1}-${2}-src.tar.gz" -o "apache-weex-incubating-${1}-src.tar.gz"
 curl "https://dist.apache.org/repos/dist/dev/incubator/weex/${1}/${2}/apache-weex-incubating-${1}-${2}-src.tar.gz.asc" -o "apache-weex-incubating-${1}-src.tar.gz.asc"
 curl "https://dist.apache.org/repos/dist/dev/incubator/weex/${1}/${2}/apache-weex-incubating-${1}-${2}-src.tar.gz.sha512" -o "apache-weex-incubating-${1}-src.tar.gz.sha512"
 cd ..
-svn add "$1"
+svn add . --force
 svn commit -m "Release ${1}"
 
 echo "Push Git Tag to Github Repo"
@@ -62,6 +63,7 @@ release-it --ci --no-npm --no-increment --no-git.requireCleanWorkingDir --no-git
 
 echo "Publish Android JCenter Release"
 cd android
-./gradlew clean install bintray -PbuildRuntimeApi=true -PignoreVersionCheck="true"  -PweexVersion="$1" -PbintrayUser=alibabaweex -PbintrayApiKey="$6" 
+./gradlew clean install bintray -PartifactName="sdk" -PuseApachePackageName="true" -PvcsTag="$1" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PignoreVersionCheck="true" -PweexVersion="$1" -PbintrayUser=alibabaweex -PbintrayApiKey="$6" 
+./gradlew install bintray -PartifactName="sdk_legacy" -PuseApachePackageName="false" -PvcsTag="$1" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PignoreVersionCheck="true" -PweexVersion="$1" -PbintrayUser=alibabaweex -PbintrayApiKey="$6" 
 
 # Publish iOS to Cocoapods

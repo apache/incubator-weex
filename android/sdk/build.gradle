@@ -33,7 +33,8 @@ apply from: 'buildSrc/download_jsc.gradle'
 apply from: 'buildSrc/packageName.gradle'
 apply from: 'buildSrc/asan.gradle'
 
-version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : '0.26.0.1'
+version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : '0.28.0.1'
+group = "com.taobao.android"
 
 //Check version, the version must have 4 sections. The leading three section must be number, and the last section is odd number with or without suffix string.
 if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVersionCheck').equals("true")) {
