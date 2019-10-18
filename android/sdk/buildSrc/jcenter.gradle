@@ -26,7 +26,8 @@ install {
         pom {
             project {
                 packaging 'aar'
-                name project.artifactName
+                name 'Apache Incubator-Weex'
+                artifactId project.artifactName
                 groupId 'org.apache.weex'
                 url siteUrl
                 licenses {

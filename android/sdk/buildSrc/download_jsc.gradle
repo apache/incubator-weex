@@ -81,7 +81,6 @@ task copyJSCHeaderToWeexCore(type: Copy, dependsOn: unzipJSC) {
     into '../../weex_core/Source/include/JSCHeaderNew/JavaScriptCore'
     includeEmptyDirs false
     inputs.dir(new File(jsc_dir, 'include'))
-    outputs.upToDateWhen {false}
 }
 
 preBuild.dependsOn copyJscToJniDir
