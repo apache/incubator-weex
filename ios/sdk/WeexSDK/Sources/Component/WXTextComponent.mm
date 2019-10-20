@@ -119,7 +119,7 @@ static NSString *const WXTextTruncationToken = @"\u2026";
 static CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 @interface WXTextComponent()
-@property (nonatomic, strong) NSString *useCoreTextAttr;
+@property (atomic, strong) NSString *fontFamily;
 @end
 
 @implementation WXTextComponent
@@ -129,7 +129,6 @@ static CGFloat WXTextDefaultLineThroughWidth = 1.2;
     NSTextStorage *_textStorage;
     float _textStorageWidth;
     float _color[4];
-    NSString *_fontFamily;
     float _fontSize;
     float _fontWeight;
     WXTextStyle _fontStyle;
@@ -150,6 +149,8 @@ static CGFloat WXTextDefaultLineThroughWidth = 1.2;
     pthread_mutexattr_t _propertMutexAttr;
     BOOL _observerIconfont;
     BOOL _enableCopy;
+    
+    BOOL _useCoreText;
 }
 
 - (instancetype)initWithRef:(NSString *)ref
@@ -169,9 +170,9 @@ static CGFloat WXTextDefaultLineThroughWidth = 1.2;
         _textAlign = NSTextAlignmentNatural;
         
         if ([attributes objectForKey:@"coretext"]) {
-            _useCoreTextAttr = [WXConvert NSString:attributes[@"coretext"]];
+            _useCoreText = [WXConvert BOOL:attributes[@"coretext"]];
         } else {
-            _useCoreTextAttr = nil;
+            _useCoreText = YES;
         }
         
         _color[0] = -1.0;
@@ -185,18 +186,12 @@ static CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (BOOL)useCoreText
 {
-    if ([_useCoreTextAttr isEqualToString:@"true"]) {
-        return YES;
-    }
-    if ([_useCoreTextAttr isEqualToString:@"false"]) {
-        return NO;
-    }
-    return YES;
+    return _useCoreText;
 }
 
 - (void)dealloc
 {
-    if (_fontFamily && _observerIconfont) {
+    if (self.fontFamily && _observerIconfont) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
     pthread_mutex_destroy(&_ctAttributedStringMutex);
@@ -246,7 +241,15 @@ do {\
 
 - (void)fillCSSStyles:(NSDictionary *)styles
 {
-    WX_STYLE_FILL_TEXT(fontFamily, fontFamily, NSString, YES) //!OCLint
+    do {
+        id value = styles[@"fontFamily"];
+        if (value) {
+            self.fontFamily = [WXConvert NSString:value];
+            [self setNeedsRepaint];
+            [self setNeedsLayout];
+        }
+    } while(0);
+    
     WX_STYLE_FILL_TEXT_PIXEL(fontSize, fontSize, YES) //!OCLint
     WX_STYLE_FILL_TEXT(fontWeight, fontWeight, WXTextWeight, YES) //!OCLint
     WX_STYLE_FILL_TEXT(fontStyle, fontStyle, WXTextStyle, YES) //!OCLint
@@ -277,7 +280,7 @@ do {\
         }
     }
 
-    if (_fontFamily && !_observerIconfont) {
+    if (self.fontFamily && !_observerIconfont) {
         // notification received when custom icon font file download finish
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
         _observerIconfont = YES;
@@ -473,7 +476,7 @@ do {\
 
 - (void)repaintText:(NSNotification *)notification
 {
-    if (![_fontFamily isEqualToString:notification.userInfo[@"fontFamily"]]) {
+    if (![self.fontFamily isEqualToString:notification.userInfo[@"fontFamily"]]) {
         return;
     }
     [self setNeedsRepaint];
@@ -499,7 +502,7 @@ do {\
     }
     
     // set font
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:WXTextStyleNormal fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:WXTextStyleNormal fontFamily:self.fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
     CTFontRef ctFont;
     
     if (_fontStyle == WXTextStyleItalic) {
@@ -587,7 +590,7 @@ do {\
     }
     
     // set font
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:self.fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     if (font) {
         [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, string.length)];
     }
