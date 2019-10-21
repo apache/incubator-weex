@@ -63,7 +63,7 @@ release-it --ci --no-npm --no-increment --no-git.requireCleanWorkingDir --no-git
 
 echo "Publish Android JCenter Release"
 cd android
-./gradlew clean install bintray -PartifactName="sdk" -PuseApachePackageName="true" -PvcsTag="$1" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PignoreVersionCheck="true" -PweexVersion="$1" -PbintrayUser=alibabaweex -PbintrayApiKey="$6" 
-./gradlew install bintray -PartifactName="sdk_legacy" -PuseApachePackageName="false" -PvcsTag="$1" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PignoreVersionCheck="true" -PweexVersion="$1" -PbintrayUser=alibabaweex -PbintrayApiKey="$6" 
+./gradlew :weex_sdk:clean :weex_sdk:install :weex_sdk:bintray -PgroupId="org.apache.weex" -PartifactName="sdk" -PApachePackageName="true" -PvcsTag="$1" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PignoreVersionCheck="true" -PweexVersion="$1" -PbintrayUser=weex -PbintrayApiKey="$6" 
+./gradlew :weex_sdk:install :weex_sdk:bintray -PgroupId="org.apache.weex" -PartifactName="sdk_legacy" -PApachePackageName="false" -PvcsTag="$1" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PignoreVersionCheck="true" -PweexVersion="$1" -PbintrayUser=weex -PbintrayApiKey="$6" 
 
 # Publish iOS to Cocoapods

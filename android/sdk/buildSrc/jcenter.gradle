@@ -28,8 +28,9 @@ install {
                 packaging 'aar'
                 name 'Apache Incubator-Weex'
                 artifactId project.artifactName
-                groupId 'org.apache.weex'
+                groupId project.groupId
                 url siteUrl
+                version = project.weexVersion
                 licenses {
                     license {
                         name 'The Apache Software License, Version 2.0'
@@ -38,7 +39,7 @@ install {
                 }
                 developers {
                     developer {
-                        name 'Apache Incubator-Weex PPMC'
+                        name 'Apache Weex(Incubating) PPMC'
                         email mailingList
                     }
                 }
@@ -57,13 +58,13 @@ bintray {
     user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
     pkg {
-        repo = "maven"
-        name = 'weex_sdk'
+        repo = "Android"
+        name = 'sdk'
         websiteUrl = siteUrl
         desc = description
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
-        publish = true
+        //publish = true
         version {
             name = project.version
             vcsTag = project.hasProperty('vcsTag') ? project.property('vcsTag') : project.version
