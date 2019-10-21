@@ -1647,6 +1647,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (!isNewFsEnd){
       getApmForInstance().arriveNewFsRenderTime();
     }
+    if (!getApmForInstance().stageMap.containsKey(WXInstanceApm.KEY_PAGE_STAGES_INTERACTION)){
+      getApmForInstance().arriveInteraction(getRootComponent());
+    }
 
     long time = System.currentTimeMillis() - mRenderStartTime;
     long[] renderFinishTime = WXBridgeManager.getInstance().getRenderFinishTime(getInstanceId());
