@@ -72,9 +72,9 @@ static std::unique_ptr<IPCResult> HandleReportException(
   }
 
   WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
-      weex::base::MakeCopyable([pageId = std::string(pageId),
-                                funcS = std::string(func),
-                                exceptionStr = std::string(exceptionInfo)] {
+      weex::base::MakeCopyable([pageId = std::string(pageId == nullptr ? "" : pageId),
+                                funcS = std::string(func == nullptr ? "" : func),
+                                exceptionStr = std::string(exceptionInfo == nullptr ? "" : exceptionInfo)] {
         WeexCoreManager::Instance()
             ->script_bridge()
             ->core_side()
@@ -1001,19 +1001,14 @@ ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   std::unique_ptr<MultiProcessAndSoInitializer> initializer(
       new MultiProcessAndSoInitializer);
 
-  LOGE("ScriptBridgeInMultiProcess");
+  LOGD("ScriptBridgeInMultiProcess");
   bool passable = initializer->Init(
       [this](IPCHandler *handler) { RegisterIPCCallback(handler); },
-      [this](std::unique_ptr<WeexJSConnection> connection,
-             std::unique_ptr<IPCHandler> handler,
-             std::unique_ptr<IPCHandler> server_handler) {
+      [this](std::unique_ptr<WeexJSConnection> connection) {
         static_cast<bridge::script::ScriptSideInMultiProcess *>(script_side())
             ->set_sender(connection->sender());
         connection_ = std::move(connection);
-        handler_ = std::move(handler);
-        server_handler_ = std::move(server_handler);
-        LOGE("ScriptBridgeInMultiProcess finish %p %p", server_handler_.get(),
-             server_handler.get());
+        LOGD("ScriptBridgeInMultiProcess finish");
         return true;
       },
       [this](const char *page_id, const char *func,

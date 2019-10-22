@@ -18,9 +18,8 @@
  */
 
 #import <XCTest/XCTest.h>
+#import <WeexSDK/WeexSDK.h>
 #import "WXCallJSMethod.h"
-#import "WXSDKInstance.h"
-#import "WXTestBridgeMethodDummy.h"
 
 @interface WXBridgeMethodTests : XCTestCase
 

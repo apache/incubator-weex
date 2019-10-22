@@ -18,8 +18,10 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXSDKInstance.h"
-#import "WXBridgeManager.h"
+#import <WeexSDK/WXSDKInstance.h>
+#import <WeexSDK/WXBridgeManager.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @class WXModuleManager;
 
@@ -60,3 +62,5 @@
 + (WXModuleManager *)moduleMgr DEPRECATED_MSG_ATTRIBUTE();
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -19,6 +19,8 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * The WXRootViewController class inherited from UINavigationController class which implements a specialized
  * view controller that manages the navigation of hierarchical content. Developing an iOS application, you
@@ -42,3 +44,5 @@
 - (id)initWithSourceURL:(NSURL *)sourceURL;
 
 @end
+
+NS_ASSUME_NONNULL_END

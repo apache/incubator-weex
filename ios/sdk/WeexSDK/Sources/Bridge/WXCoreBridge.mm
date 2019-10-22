@@ -164,7 +164,7 @@ namespace WeexCore
     int IOSSide::CallNative(const char* pageId, const char *task, const char *callback)
     {
         // should not enter this function
-        assert(false);
+        assert(false); //!OCLint
     }
     
     static WeexByteArray *generator_bytes_array(const char *str, size_t len) {
@@ -396,7 +396,7 @@ break; \
     void IOSSide::SetTimeout(const char* callbackID, const char* time)
     {
         // should not enter this function
-        assert(false);
+        assert(false); //!OCLint
     }
 
     void IOSSide::NativeLog(const char *args)
@@ -676,10 +676,10 @@ break; \
         if (!manager.isValid) {
             return -1;
         }
-        CGRect frame = CGRectMake(isnan(WXRoundPixelValue(left))?0:WXRoundPixelValue(left),
-                                  isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
-                                  isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
-                                  isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
+        CGRect frame = CGRectMake(isnan(WXCeilPixelValue(left))?0:WXCeilPixelValue(left),
+                                  isnan(WXCeilPixelValue(top))?0:WXCeilPixelValue(top),
+                                  isnan(WXCeilPixelValue(width))?0:WXCeilPixelValue(width),
+                                  isnan(WXCeilPixelValue(height))?0:WXCeilPixelValue(height));
         [manager layoutComponent:component frame:frame isRTL:isRTL innerMainSize:renderObject->getLargestMainSize()];
 
         page->CallBridgeTime(getCurrentTime() - startTime);
@@ -1038,7 +1038,7 @@ break; \
     WXCoreSize WXCoreMeasureFunctionBridge::Measure(const char* page_id, long render_ptr, float width, MeasureMode widthMeasureMode, float height, MeasureMode heightMeasureMode)
     {
         // should not enter this function
-        assert(false);
+        assert(false); //!OCLint
     }
     
     void WXCoreMeasureFunctionBridge::LayoutBefore(const char* page_id, long render_ptr)
@@ -1302,6 +1302,7 @@ break; \
         _customPages[sId] = page;
     }
     
+    SetConvertCurrentPage(pageId);
     [WXCustomPageBridge parseRenderObject:data parentRef:"" index:0 genObject:^(const std::string &ref, const std::string &type, const std::string &parentRef, std::map<std::string, std::string> *styles, std::map<std::string, std::string> *attrs, std::set<std::string> *events, int index) {
         if (parentRef.empty()) {
             // is root body
@@ -1343,6 +1344,7 @@ break; \
 {
     RenderPageCustom* page = [self getPage:pageId];
     if (page && page->IsValid()) {
+        SetConvertCurrentPage(pageId);
         page->UpdateAttr([ref UTF8String] ?: "", [WXCustomPageBridge parseMapValuePairs:data]);
     }
 }
@@ -1351,6 +1353,7 @@ break; \
 {
     RenderPageCustom* page = [self getPage:pageId];
     if (page && page->IsValid()) {
+        SetConvertCurrentPage(pageId);
         page->UpdateStyle([ref UTF8String] ?: "", [WXCustomPageBridge parseMapValuePairs:data]);
     }
 }
@@ -1406,6 +1409,7 @@ break; \
         if (target && target->shouldHandleModuleMethod([moduleName UTF8String] ?: "", [methodName UTF8String] ?: "")) {
             __block const char* seralizedArguments = nullptr;
             __block const char* seralizedOptions = nullptr;
+            SetConvertCurrentPage(pageId);
             ConvertToCString(arguments, ^(const char * value) {
                 if (value != nullptr) {
                     seralizedArguments = strdup(value);
@@ -1495,6 +1499,7 @@ break; \
         if (target) {
             __block const char* seralizedArguments = nullptr;
             __block const char* seralizedOptions = nullptr;
+            SetConvertCurrentPage(pageId);
             ConvertToCString(arguments, ^(const char * value) {
                 if (value != nullptr) {
                     seralizedArguments = strdup(value);
@@ -1538,11 +1543,14 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         env->AddOption("scale", "1");
         env->AddOption("pixel_scale", std::to_string([[UIScreen mainScreen] scale]));
         
+        // Here we initialize weex device width and height using portrait by default.
         CGSize screenSize = [UIScreen mainScreen].bounds.size;
-        env->SetDeviceWidth(std::to_string(screenSize.width));
-        env->SetDeviceHeight(std::to_string(screenSize.height));
-        env->AddOption("screen_width_pixels", std::to_string(screenSize.width));
-        env->AddOption("screen_height_pixels", std::to_string(screenSize.height));
+        CGFloat w = MIN(screenSize.width, screenSize.height);
+        CGFloat h = MAX(screenSize.width, screenSize.height);
+        env->SetDeviceWidth(std::to_string(w));
+        env->SetDeviceHeight(std::to_string(h));
+        env->AddOption("screen_width_pixels", std::to_string(w));
+        env->AddOption("screen_height_pixels", std::to_string(h));
         
         weex::base::LogImplement::getLog()->setLogImplement(new WeexCore::LogBridgeIOS());
         
@@ -1551,8 +1559,6 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 #else
         weex::base::LogImplement::getLog()->setDebugMode(false);
 #endif
-        
-        
         
         platformBridge = new WeexCore::PlatformBridge();
         platformBridge->set_platform_side(new WeexCore::IOSSide());
@@ -1639,9 +1645,18 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
     }
 }
 
++ (double)getLayoutTime:(NSString*)pageId {
+    if (platformBridge) {
+        const char* page = [pageId UTF8String] ?: "";
+        return platformBridge->core_side()->GetLayoutTime(page);
+    }
+    return 0;
+}
+
 + (void)closePage:(NSString*)pageId
 {
     if (platformBridge) {
+        platformBridge->core_side()->DestroyInstance([pageId UTF8String]);
         platformBridge->core_side()->OnInstanceClose([pageId UTF8String] ?: "");
     }
 }
@@ -1673,10 +1688,10 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
             float width = render->getLayoutWidth();
             BOOL isRTL = render->getLayoutDirectionFromPathNode() == WeexCore::kDirectionRTL;
             WXComponentManager* manager = [WXSDKManager instanceForID:ns_instanceId].componentManager;
-            CGRect frame = CGRectMake(isnan(WXRoundPixelValue(left))?0:WXRoundPixelValue(left),
-                                      isnan(WXRoundPixelValue(top))?0:WXRoundPixelValue(top),
-                                      isnan(WXRoundPixelValue(width))?0:WXRoundPixelValue(width),
-                                      isnan(WXRoundPixelValue(height))?0:WXRoundPixelValue(height));
+            CGRect frame = CGRectMake(isnan(WXCeilPixelValue(left))?0:WXCeilPixelValue(left),
+                                      isnan(WXCeilPixelValue(top))?0:WXCeilPixelValue(top),
+                                      isnan(WXCeilPixelValue(width))?0:WXCeilPixelValue(width),
+                                      isnan(WXCeilPixelValue(height))?0:WXCeilPixelValue(height));
             [manager layoutComponent:component frame:frame isRTL:isRTL innerMainSize:render->getLargestMainSize()];
         }
         render->setHasNewLayout(false);
@@ -1837,6 +1852,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         return;
     }
     
+    SetConvertCurrentPage(pageId);
     const std::string page([pageId UTF8String] ?: "");
     RenderManager::GetInstance()->CreatePage(page, [&] (RenderPage* pageInstance) -> RenderObject* {
         pageInstance->set_before_layout_needed(false); // we do not need before and after layout
@@ -1858,11 +1874,13 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
 
 + (void)callUpdateAttrs:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
 {
+    SetConvertCurrentPage(pageId);
     WeexCore::RenderManager::GetInstance()->UpdateAttr([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [self _parseMapValuePairs:data]);
 }
 
 + (void)callUpdateStyle:(NSString*)pageId ref:(NSString*)ref data:(NSDictionary*)data
 {
+    SetConvertCurrentPage(pageId);
     WeexCore::RenderManager::GetInstance()->UpdateStyle([pageId UTF8String] ?: "", [ref UTF8String] ?: "", [self _parseMapValuePairs:data]);
 }
 

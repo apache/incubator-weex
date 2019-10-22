@@ -198,7 +198,7 @@ static JSContext *jsContext;
                 [self.weexInstance.componentManager updateAttributes:newAttributesOrStyles forComponent:self.ref];
             } else if (i == WXDataBindingTypeEvents) {
                 [self _addEventParams:newAttributesOrStyles];
-            } else if (i == WXDataBindingTypeProp) {
+            } else if (i == WXDataBindingTypeProp) {//!OCLint
             }
         }
     }

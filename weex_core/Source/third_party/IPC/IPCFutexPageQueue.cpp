@@ -112,6 +112,7 @@ void IPCFutexPageQueue::lock(size_t id, bool checkFinish)
                 break;
             }
             struct timespec waitTime = { m_timeoutSec, 0 };
+            IPC_LOGE("IPCException IPCFutexPageQueue:: start futex wait");
             int futexReturn = __futex(pageStart + 1, FUTEX_WAIT, 0, &waitTime);
             if (futexReturn == -1) {
                 int myerrno = errno;
@@ -212,4 +213,17 @@ void IPCFutexPageQueue::clearFinishedTag()
     uint32_t* pageRead = static_cast<uint32_t*>(getPage(m_currentWrite));
     pageRead[1] = 0;
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
+}
+
+void IPCFutexPageQueue::dumpPageInfo(std::string &info) {
+    std::string builder;
+
+    for (size_t i = 0; i < m_pagesCount ; ++i) {
+        uint32_t* pageStart = static_cast<uint32_t*>(getPage(i));
+        auto tmp = new IPCException("[%zu,%zu,%zu]",*pageStart,*(pageStart+1),*(pageStart+2));
+        builder+= tmp->msg();
+        delete(tmp);
+    }
+    auto msg = new IPCException("tid:%d,readId:%zu,writeId:%zu,info:%s",m_tid,m_currentRead,m_currentWrite,builder.c_str());
+    info.assign(msg->msg());
 }

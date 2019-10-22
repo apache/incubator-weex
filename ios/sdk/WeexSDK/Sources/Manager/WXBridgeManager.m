@@ -69,7 +69,7 @@ static NSThread *WXBackupBridgeThread;
     self = [super init];
     if (self) {
         _bridgeCtx = [[WXBridgeContext alloc] init];
-        _supportMultiJSThread = YES;
+        _supportMultiJSThread = NO;
         _jsTaskQueue = [NSMutableArray array];
     }
     return self;
@@ -530,6 +530,8 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
 
 - (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion
 {
+    WXLogInfo(@"Register service: %@, options: %@", name, options);
+    
     if (!name || !serviceScript || !options) {
         if (completion) {
             completion(NO);
@@ -557,6 +559,7 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
 {
     if (!name) return;
     
+    WXLogInfo(@"Unregister service: %@", name);
     NSString *script = [WXServiceFactory unregisterServiceScript:name];
     
     __weak typeof(self) weakSelf = self;
@@ -575,6 +578,7 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     if (!modules) return;
     
     modules = [WXUtility convertContainerToImmutable:modules];
+    WXLogInfo(@"Register modules: %@", modules);
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
@@ -590,6 +594,7 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     if (!components) return;
     
     components = [WXUtility convertContainerToImmutable:components];
+    WXLogInfo(@"Register components: %@", components);
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){

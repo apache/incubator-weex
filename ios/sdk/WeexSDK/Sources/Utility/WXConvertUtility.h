@@ -47,6 +47,15 @@ NSMutableArray* _Nonnull NSARRAY(std::vector<std::unordered_map<std::string, std
 
 void ConvertToCString(id _Nonnull obj, void (^ _Nonnull callback)(const char* _Nullable));
 
+extern "C" {
+    void SetConvertCurrentPage(NSString* _Nonnull pageId);
+    void ConvertSwitches(BOOL isIOS13, BOOL invalidJSONObjectUseMRC, BOOL alwaysUseMRC);
+}
+
+#else
+void SetConvertCurrentPage(NSString* _Nonnull pageId);
+void ConvertSwitches(BOOL isIOS13, BOOL invalidJSONObjectUseMRC, BOOL alwaysUseMRC);
 #endif
 
 #endif
+

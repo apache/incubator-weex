@@ -19,6 +19,8 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol WXErrorViewDelegate <NSObject>
 
 - (void)onclickErrorView;
@@ -30,3 +32,5 @@
 @property (nonatomic, weak) id<WXErrorViewDelegate>  delegate;
 
 @end
+
+NS_ASSUME_NONNULL_END

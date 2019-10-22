@@ -34,6 +34,7 @@
 #include "core/json/JsonRenderManager.h"
 #include "core/bridge/eagle_bridge.h"
 #include "third_party/json11/json11.hpp"
+#include "core/moniter/render_performance.h"
 #ifdef OS_ANDROID
 #include <android/utils/params_utils.h>
 #include <wson/wson.h>
@@ -387,15 +388,17 @@ int CoreSideInPlatform::RefreshInstance(
              }}
         }
     };
-
-    auto final_json_str = final_json.dump().c_str();
-    auto utf16_key = weex::base::to_utf16(const_cast<char*>(final_json_str),
-                                          strlen(final_json_str));
+    std::string out = final_json.dump();
+    auto utf16_key = weex::base::to_utf16(const_cast<char*>(out.c_str()),
+                                          out.length());
     args->value.string = genWeexString(
         reinterpret_cast<const uint16_t*>(utf16_key.c_str()), utf16_key.size());
     msg.push_back(args);
-
-    WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
+    ScriptBridge* bridge = WeexCore::WeexCoreManager::Instance()->script_bridge();
+    if (!bridge){
+      return false;
+    }
+    bridge->script_side()->ExecJS(
         instanceId, "", "callJS", msg);
     freeParams(msg);
     return true;
@@ -599,13 +602,17 @@ std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSOnInstance(const char *i
 
 int CoreSideInPlatform::DestroyInstance(const char *instanceId) {
     auto handler = EagleBridge::GetInstance()->data_render_handler();
-    if(handler!=nullptr){
+    if (handler != nullptr) {
       handler->DestroyInstance(instanceId);
     }
     if (JsonRenderManager::GetInstance()->ClosePage(instanceId)) {
       return true;
     }
-    return WeexCoreManager::Instance()->script_bridge()->script_side()->DestroyInstance(instanceId);
+    auto script_side = WeexCoreManager::Instance()->script_bridge()->script_side();
+    if (script_side) {
+        return script_side->DestroyInstance(instanceId);
+    }
+    return true;
 }
 
 int CoreSideInPlatform::UpdateGlobalConfig(const char *config) {
@@ -629,6 +636,13 @@ void CoreSideInPlatform::SetLogType(const int logType, const bool isPerf) {
       ->script_bridge()
       ->script_side()
       ->SetLogType(logType,isPerf);
+}
+
+double CoreSideInPlatform::GetLayoutTime(const char* instanceId) const {
+    RenderPageBase *page = RenderManager::GetInstance()->GetPage(instanceId);
+    if (page == nullptr) return 0;
+    if (!page->is_platform_page()) return 0;
+    return page->getPerformance()->cssLayoutTime;
 }
 
 

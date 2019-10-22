@@ -280,7 +280,7 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     if (j_get_jsb_so_path != nullptr) {
       SoUtils::set_jsb_so_path(const_cast<char*>(
                                     env->GetStringUTFChars((jstring)(j_get_jsb_so_path), nullptr)));
-      LOGE("g_jsbSoPath is %s ", SoUtils::jsb_so_path());
+      LOGD("g_jsbSoPath is %s ", SoUtils::jsb_so_path());
       env->DeleteLocalRef(j_get_jsb_so_path);
     }
   }
@@ -294,7 +294,7 @@ std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
     if (j_get_lib_ld_path != nullptr) {
       SoUtils::set_lib_ld_path(const_cast<char*>(
                                         env->GetStringUTFChars((jstring)(j_get_lib_ld_path), nullptr)));
-      LOGE("lib_ld_path is %s ", SoUtils::lib_ld_path());
+      LOGD("lib_ld_path is %s ", SoUtils::lib_ld_path());
       env->DeleteLocalRef(j_get_lib_ld_path);
     }
   }

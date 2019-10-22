@@ -44,6 +44,7 @@ NSString* const KEY_PAGE_PROPERTIES_JSLIB_VERSION  = @"wxJSLibVersion";
 NSString* const KEY_PAGE_PROPERTIES_WEEX_VERSION  = @"wxSDKVersion";
 NSString* const KEY_PAGE_PROPERTIES_REQUEST_TYPE  = @"wxRequestType";
 NSString* const KEY_PAGE_PROPERTIES_Z_CACHE_INFO  = @"wxZCacheInfo";
+NSString* const KEY_PAGE_PROPERTIES_GREY_BUNDLE = @"wxGreyBundle";
 NSString* const KEY_PAGE_PROPERTIES_JS_FM_INIT  = @"wxJsFrameworkInit";
 NSString* const KEY_PAGE_PROPERTIES_BUNDLE_TYPE = @"wxBundleType";
 NSString* const KEY_PAGE_PROPERTIES_CONTAINER_NAME = @"wxContainerName";
@@ -58,6 +59,8 @@ NSString* const KEY_PAGE_PROPERTIES_UIKIT_TYPE = @"wxUIKitType";
 NSString* const KEY_PAGE_STAGES_START = @"wxRecordStart";
 NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_START  = @"wxStartDownLoadBundle";
 NSString* const KEY_PAGE_STAGES_DOWN_BUNDLE_END  = @"wxEndDownLoadBundle";
+NSString* const KEY_PAGE_STAGES_DOWN_JS_START  = @"wxStartDownLoadJS";
+NSString* const KEY_PAGE_STAGES_DOWN_JS_END  = @"wxEndDownLoadJS";
 NSString* const KEY_PAGE_STAGES_CUSTOM_PREPROCESS_START  = @"wxCustomPreprocessStart";
 NSString* const KEY_PAGE_STAGES_CUSTOM_PREPROCESS_END  = @"wxCustomPreprocessEnd";
 NSString* const KEY_PAGE_STAGES_RENDER_ORGIGIN  = @"wxRenderTimeOrigin";
@@ -79,6 +82,7 @@ NSString* const KEY_PAGE_STATS_FS_CALL_JS_NUM  = @"wxFSCallJsTotalNum";
 NSString* const KEY_PAGE_STATS_EXECUTE_JS_TIME = @"wxExecJsCallBack";
 NSString* const KEY_PAGE_STATS_CREATE_COMPONENT_TIME = @"wxComponentCost";
 NSString* const KEY_PAGE_STATS_CREATE_VIEW_TIME = @"wxViewCost";
+NSString* const KEY_PAGE_STATS_LAYOUT_TIME = @"wxLayoutTime";
 NSString* const KEY_PAGE_STATS_FS_TIMER_NUM = @"wxFSTimerCount";
 NSString* const KEY_PAGE_STATS_FS_CALL_NATIVE_TIME = @"wxFSCallNativeTotalTime";
 NSString* const KEY_PAGE_STATS_FS_CALL_NATIVE_NUM = @"wxFSCallNativeTotalNum";
@@ -130,8 +134,9 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 
 @property (nonatomic,strong) id<WXApmProtocol> apmProtocolInstance;
 @property (nonatomic,strong) NSString* instanceId;
-@property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStatsMap;
-@property (nonatomic,strong) NSMutableDictionary<NSString*,NSNumber*>* recordStageMap;
+@property (nonatomic,strong) NSMutableArray<NSNumber*>* recordUpdateComponentDataTimestamp;
+@property (nonatomic,strong) NSMutableArray<NSNumber*>* recordUpdateComponentDataTime;
+
 @property (nonatomic,strong) NSMutableArray<WXJSExceptionInfo*>* errorList;
 @end
 
@@ -144,6 +149,8 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     if (self) {
         _recordStatsMap = [[NSMutableDictionary alloc] init];
         _recordStageMap = [[NSMutableDictionary alloc] init];
+        _recordUpdateComponentDataTimestamp = [[NSMutableArray alloc] init];
+        _recordUpdateComponentDataTime = [[NSMutableArray alloc] init];
         _errorList = [[NSMutableArray alloc] init];
         _isOpenApm = [self _loadApmSwitch];
         if (_isOpenApm) {
@@ -166,6 +173,12 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 {
     if(_isEnd){
         return 0;
+    }
+    if ([name isEqualToString:KEY_PAGE_STAGES_RENDER_ORGIGIN]) {
+        __weak typeof(self) weakSelf = self;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [weakSelf printRecordStageMap];
+        });
     }
     
     long result = [WXUtility getUnixFixTimeMillis];
@@ -241,6 +254,82 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
     }
   
     [self.apmProtocolInstance addStatistic:name withValue:value];
+}
+
+- (void)printRecordStageMap {
+    // These logs are for performance auto-test platforms.
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnComponentThread(^{
+        if (!weakSelf) {
+            return;
+        }
+        WXSDKInstance *instance = [WXSDKManager instanceForID:weakSelf.instanceId];
+        if (!instance) {
+            return;
+        }
+
+        NSNumber* downloadBundleStart = weakSelf.recordStageMap[KEY_PAGE_STAGES_DOWN_BUNDLE_START];
+        NSNumber* downloadBundleEnd = weakSelf.recordStageMap[KEY_PAGE_STAGES_DOWN_BUNDLE_END];
+        if (downloadBundleStart) {
+            WXLogInfo(@"pageid: %@ start download url: %@  at timestamp: %lld", weakSelf.instanceId, instance.scriptURL.absoluteString, [downloadBundleStart longLongValue]);
+        } else {
+            NSNumber* renderTimeOrigin = weakSelf.recordStageMap[KEY_PAGE_STAGES_RENDER_ORGIGIN];
+            WXLogInfo(@"pageid: %@ start render view at timestamp: %lld", weakSelf.instanceId, [renderTimeOrigin longLongValue]);
+        }
+
+        if (downloadBundleStart && downloadBundleEnd) {
+            WXLogInfo(@"pageid: %@ download bundle time(ms): %lld", weakSelf.instanceId, [downloadBundleEnd longLongValue] - [downloadBundleStart longLongValue]);
+        }
+
+        NSNumber* executeJsonStart = weakSelf.recordStageMap[KEY_PAGE_STAGES_EXECUTE_JSON_START];
+        NSNumber* executeJsonEnd = weakSelf.recordStageMap[KEY_PAGE_STAGES_EXECUTE_JSON_END];
+        if (executeJsonStart && executeJsonEnd) {
+            WXLogInfo(@"pageid: %@ execute json time(ms): %lld", weakSelf.instanceId, [executeJsonEnd longLongValue] - [executeJsonStart longLongValue]);
+        }
+
+        NSNumber* downloadJsStart = weakSelf.recordStageMap[KEY_PAGE_STAGES_DOWN_JS_START];
+        NSNumber* downloadJsEnd = weakSelf.recordStageMap[KEY_PAGE_STAGES_DOWN_JS_END];
+        if (downloadJsStart && downloadJsEnd) {
+            WXLogInfo(@"pageid: %@ download javascript time(ms): %lld", weakSelf.instanceId, [downloadJsEnd longLongValue] - [downloadJsStart longLongValue]);
+        }
+
+        NSNumber* loadBundleEnd = weakSelf.recordStageMap[KEY_PAGE_STAGES_LOAD_BUNDLE_END];
+        NSNumber* executeBundleEnd = weakSelf.recordStageMap[KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
+        if (loadBundleEnd && executeBundleEnd) {
+            WXLogInfo(@"pageid: %@ execute js bundle time(ms): %lld", weakSelf.instanceId, [executeBundleEnd longLongValue] - [loadBundleEnd longLongValue]);
+        }
+
+        for (int i=0; i<weakSelf.recordUpdateComponentDataTimestamp.count; i++) {
+            NSNumber* timestamp = weakSelf.recordUpdateComponentDataTimestamp[i];
+            WXLogInfo(@"pageid: %@ updateComponentData at: %lld cost time(ms): %lld", weakSelf.instanceId, [timestamp longLongValue], [weakSelf.recordUpdateComponentDataTime[i] longLongValue]);
+        }
+
+        NSNumber* executeJsCallbackTime = weakSelf.recordStatsMap[KEY_PAGE_STATS_EXECUTE_JS_TIME];
+        if (executeJsCallbackTime) {
+            WXLogInfo(@"pageid: %@ execute js callback time(ms): %f", weakSelf.instanceId, [executeJsCallbackTime doubleValue]);
+        }
+
+        NSNumber* createComponentTime = weakSelf.recordStatsMap[KEY_PAGE_STATS_CREATE_COMPONENT_TIME];
+        if (createComponentTime) {
+            WXLogInfo(@"pageid: %@ create components time(ms): %f", weakSelf.instanceId, [createComponentTime doubleValue]);
+        }
+
+        NSNumber* createViewTime = weakSelf.recordStatsMap[KEY_PAGE_STATS_CREATE_VIEW_TIME];
+        if (createViewTime) {
+            WXLogInfo(@"pageid: %@ create views time(ms): %f", weakSelf.instanceId, [createViewTime doubleValue]);
+        }
+
+        NSNumber* layoutTime = weakSelf.recordStatsMap[KEY_PAGE_STATS_LAYOUT_TIME];
+        if (layoutTime) {
+            WXLogInfo(@"pageid: %@ layout time(ms): %f", weakSelf.instanceId, [layoutTime doubleValue]);
+        }
+
+        NSNumber* renderOrgin = weakSelf.recordStageMap[KEY_PAGE_STAGES_RENDER_ORGIGIN];
+        NSNumber* interactionTime = weakSelf.recordStageMap[KEY_PAGE_STAGES_INTERACTION];
+        if (renderOrgin && interactionTime) {
+            WXLogInfo(@"pageid: %@ interaction time(ms): %lld", weakSelf.instanceId, [interactionTime longLongValue] - [renderOrgin longLongValue]);
+        }
+    });
 }
 
 #pragma mark - instance record
@@ -352,6 +441,11 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
         return;
     }
     
+    id wxGreyBundle = [extInfo objectForKey:KEY_PAGE_PROPERTIES_GREY_BUNDLE];
+    if (nil != wxGreyBundle && [wxGreyBundle isKindOfClass:NSString.class]) {
+        [self setProperty:KEY_PAGE_PROPERTIES_GREY_BUNDLE withValue:wxGreyBundle];
+    }
+
     id wxRequestType = [extInfo objectForKey:KEY_PAGE_PROPERTIES_REQUEST_TYPE];
     if (nil != wxRequestType && [wxRequestType isKindOfClass: NSString.class]) {
         [self setProperty:KEY_PAGE_PROPERTIES_REQUEST_TYPE withValue:wxRequestType];
@@ -548,6 +642,14 @@ NSString* const VALUE_ERROR_CODE_DEFAULT = @"0";
 {
     [self onStageWithTime:KEY_PAGE_STAGES_INTERACTION time:unixTime];
     _forceStopRecordInteractionTime = YES;
+}
+
+- (void) addUpdateComponentDataTimestamp:(long)unixTime {
+    [_recordUpdateComponentDataTimestamp addObject:@(unixTime)];
+}
+
+- (void) addUpdateComponentDataTime:(long)unixTime {
+    [_recordUpdateComponentDataTime addObject:@(unixTime)];
 }
 
 @end

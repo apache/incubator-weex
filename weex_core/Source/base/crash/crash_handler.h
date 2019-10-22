@@ -39,6 +39,7 @@ public:
         int signum;
         const char* signame;
     };
+    void setEnableAlarmSignal(bool handle){handle_alarm_signal = handle;}
 
 private:
     void printContext();
@@ -67,6 +68,7 @@ private:
     std::string m_fileContent;
     mcontext_t m_mcontext;
     volatile bool m_crash_occurs;
+    volatile bool handle_alarm_signal = true;
 };
 }
 #endif /* CRASHHANDLER_H */

@@ -226,7 +226,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         //may be list
         if ([@"scroller" isEqualToString:type]) {
             [weexInstance.apmInstance updateDiffStats:KEY_PAGE_STATS_SCROLLER_NUM withDiffValue:1];
-        }        
+        }
+
+        if (weexInstance.instanceCallback) {
+            weexInstance.instanceCallback(weexInstance, WXScrollerComponentCreatedCallback, self);
+        }
     }
     
     return self;
@@ -266,8 +270,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         if ([scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
             scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
         }
-    } else {
-        // Fallback on earlier versions
     }
     
     if (self.ancestorScroller) {
@@ -935,8 +937,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             if( offset.y <= _refreshComponent.calculatedFrame.size.height ) {
                 [self loadMoreIfNeed];
             }
-        } else if (velocity.y > 0) {
-            // drop up
         }
     }
     
@@ -1151,6 +1151,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             _flexCssNode->setParent(nullptr, _flexCssNode);
             _flexCssNode->calculateLayout(renderPageSize);
             _flexCssNode->setParent(parent, _flexCssNode);
+            
+            /* We must clear BFCs becuase we have set parent of _flexCSSNode to nullptr and
+             manually called its calculateLayout method. This will cause a non-bfc layout node
+             to have items in its BFCs vector. Later, a wild pointer may cause crash. */
+            _flexCssNode->clearBFCs();
             
             // set origin and size back
             _flexCssNode->rewriteLayoutResult(left, top, width, height);

@@ -34,7 +34,7 @@
 
 - (void)dealloc
 {
-    if (self) {
+    if (self) { //!OCLint
 //        self.delegate = nil;
     }
 }

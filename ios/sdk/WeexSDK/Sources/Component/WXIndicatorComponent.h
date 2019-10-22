@@ -17,7 +17,9 @@
  * under the License.
  */
 
-#import "WXComponent.h"
+#import <WeexSDK/WXComponent.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 typedef enum
 {
@@ -50,3 +52,5 @@ typedef enum
 @property (nonatomic, weak) id<WXIndicatorComponentDelegate> delegate;
 
 @end
+
+NS_ASSUME_NONNULL_END

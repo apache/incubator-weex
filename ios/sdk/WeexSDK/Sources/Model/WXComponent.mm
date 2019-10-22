@@ -70,6 +70,7 @@ static BOOL bNeedRemoveEvents = YES;
 }
 
 @synthesize transform = _transform;
+@synthesize styleBackgroundColor = _styleBackgroundColor;
 
 #pragma mark Life Cycle
 
@@ -99,6 +100,8 @@ static BOOL bNeedRemoveEvents = YES;
         _isViewFrameSyncWithCalculated = YES;
         _ariaHidden = nil;
         _accessible = nil;
+        _userInteractionEnabled = YES;
+        _eventPenetrationEnabled = NO;
         _accessibilityHintContent = nil;
         _cancelsTouchesInView = YES;
         
@@ -117,6 +120,14 @@ static BOOL bNeedRemoveEvents = YES;
             if (!_styles[@"top"] && !_styles[@"bottom"]) {
                 _styles[@"top"] = @0.0f;
             }
+        }
+        
+        if (attributes[@"userInteractionEnabled"]) {
+            _userInteractionEnabled = [WXConvert BOOL:attributes[@"userInteractionEnabled"]];
+        }
+        
+        if (attributes[@"eventPenetrationEnabled"]) {
+            _eventPenetrationEnabled = [WXConvert BOOL:attributes[@"eventPenetrationEnabled"]];
         }
         
         if (attributes[@"ariaHidden"]) {
@@ -381,7 +392,7 @@ static BOOL bNeedRemoveEvents = YES;
             _layer.borderWidth = _borderTopWidth;
             [self _resetNativeBorderRadius];
             _layer.opacity = _opacity;
-            _view.backgroundColor = _backgroundColor;
+            _view.backgroundColor = self.styleBackgroundColor;
         }
 
         if (_backgroundImage) {
@@ -401,6 +412,8 @@ static BOOL bNeedRemoveEvents = YES;
         _view.wx_component = self;
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
+        
+        [_view setUserInteractionEnabled:_userInteractionEnabled];
         
         if (_roles) {
             [_view setAccessibilityTraits:[self _parseAccessibilityTraitsWithTraits:self.view.accessibilityTraits roles:_roles]];
@@ -423,6 +436,7 @@ static BOOL bNeedRemoveEvents = YES;
         
         if (_ariaHidden) {
             [_view setAccessibilityElementsHidden:[WXConvert BOOL:_ariaHidden]];
+            
         }
         if (_groupAccessibilityChildren) {
             [_view setShouldGroupAccessibilityChildren:[WXConvert BOOL:_groupAccessibilityChildren]];
@@ -442,13 +456,12 @@ static BOOL bNeedRemoveEvents = YES;
         [self setNeedsDisplay];
         [[NSNotificationCenter defaultCenter] postNotificationName:WX_COMPONENT_NOTIFICATION_VIEW_LOADED object:self];
         [self viewDidLoad];
+        double diffTime = CACurrentMediaTime()*1000 - startCreateViewTime;
+        [self.weexInstance.performance recordViewCreatePerformance:diffTime];
         
         if (_lazyCreateView) {
             [self _buildViewHierarchyLazily];
         }
-
-        double diffTime = CACurrentMediaTime()*1000 - startCreateViewTime;
-        [self.weexInstance.performance recordViewCreatePerformance:diffTime];
         [self _handleFirstScreenTime];
         
         [self.weexInstance.performance onViewLoad:self];
@@ -845,8 +858,8 @@ static BOOL bNeedRemoveEvents = YES;
             UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
             CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:(WXGradientType)[linearGradient[@"gradientType"] integerValue]];
             if (gradientLayer) {
-                _backgroundColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
-                strongSelf.view.backgroundColor = _backgroundColor;
+                strongSelf.styleBackgroundColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
+                strongSelf.view.backgroundColor = strongSelf.styleBackgroundColor;
                 [strongSelf setNeedsDisplay];
             }
         }
@@ -881,7 +894,14 @@ static BOOL bNeedRemoveEvents = YES;
         _groupAccessibilityChildren = [WXConvert NSString:attributes[@"groupAccessibilityChildren"]];
         [self.view setShouldGroupAccessibilityChildren:[WXConvert BOOL:_groupAccessibilityChildren]];
     }
-
+    if (attributes[@"userInteractionEnabled"]) {
+        _userInteractionEnabled = [WXConvert BOOL:attributes[@"userInteractionEnabled"]];
+        [self.view setUserInteractionEnabled:_userInteractionEnabled];
+    }
+    
+    if (attributes[@"eventPenetrationEnabled"]) {
+        _eventPenetrationEnabled = [WXConvert BOOL:attributes[@"eventPenetrationEnabled"]];
+    }
     
     if (attributes[@"testId"]) {
         [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];

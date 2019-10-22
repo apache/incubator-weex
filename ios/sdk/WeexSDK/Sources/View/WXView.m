@@ -40,6 +40,9 @@
     
     UIView* result = [super hitTest:point withEvent:event];
     if (result) {
+        if (self.wx_component && self.wx_component->_eventPenetrationEnabled && result == self) {
+            return nil;
+        }
         return result;
     }
     

@@ -18,20 +18,24 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXModuleProtocol.h"
+#import <WeexSDK/WXModuleProtocol.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @protocol WXWebSocketDelegate<NSObject>
 - (void)didOpen;
 - (void)didFailWithError:(NSError *)error;
 - (void)didReceiveMessage:(id)message;
-- (void)didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean;
+- (void)didCloseWithCode:(NSInteger)code reason:(nullable NSString *)reason wasClean:(BOOL)wasClean;
 @end
 
 @protocol WXWebSocketHandler<NSObject>
 
-- (void)open:(NSString *)url protocol:(NSString *)protocol identifier:(NSString *)identifier withDelegate:(id<WXWebSocketDelegate>)delegate;
+- (void)open:(NSString *)url protocol:(NSString *)protocol identifier:(nullable NSString *)identifier withDelegate:(id<WXWebSocketDelegate>)delegate;
 - (void)send:(NSString *)identifier data:(NSString *)data;
 - (void)close:(NSString *)identifier;
-- (void)close:(NSString *)identifier code:(NSInteger)code reason:(NSString *)reason;
+- (void)close:(NSString *)identifier code:(NSInteger)code reason:(nullable NSString *)reason;
 - (void)clear:(NSString *)identifier;
 @end
+
+NS_ASSUME_NONNULL_END

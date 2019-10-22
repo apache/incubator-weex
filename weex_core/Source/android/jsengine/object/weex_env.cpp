@@ -84,7 +84,7 @@ bool WeexEnv::is_app_crashed() {
     return false;
   bool crashed = crashHandler->is_crashed();
   if (crashed) {
-    LOG_TLOG("jsEngine", "%s", "AppCrashed");
+    LOGE("jsEngine AppCrashed");
   }
   return crashed;
 }

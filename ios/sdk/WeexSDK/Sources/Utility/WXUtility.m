@@ -268,6 +268,12 @@ CGFloat WXFloorPixelValue(CGFloat value)
     if ([source isKindOfClass:[NSArray class]]) {
         NSMutableArray* tmpArray = [[NSMutableArray alloc] init];
         for (id obj in source) {
+            if (obj == nil) {
+                /* srouce may be a subclass of NSArray and the subclassed
+                 array may return nil in its overridden objectAtIndex: method.
+                 So obj could be nil!!!. */
+                continue;
+            }
             [tmpArray addObject:[self convertContainerToImmutable:obj]];
         }
         id immutableArray = [NSArray arrayWithArray:tmpArray];
@@ -391,7 +397,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 + (BOOL)isValidPoint:(CGPoint)point
 {
-    return !(isnan(point.x)) && !(isnan(point.y));
+    return !(isnan(point.x)) && !(isnan(point.y)); //!OCLint
 }
 
 + (NSError *)errorWithCode:(NSInteger)code message:(NSString *)message
@@ -518,7 +524,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
         RegisteredFontFileNames = [[NSMutableDictionary alloc] init];
     });
     
-    CGFloat fontSize = (isnan(size) || size == 0) ?  32 * scaleFactor : size;
+    CGFloat fontSize = (isnan(size) || size == 0) ?  32 * scaleFactor : size; //!OCLint
     UIFont *font = nil;
     
     WXThreadSafeMutableDictionary *fontFace = [[WXRuleManager sharedInstance] getRule:@"fontFace"];
@@ -836,7 +842,6 @@ CGFloat WXFloorPixelValue(CGFloat value)
             ret = [NSKeyedUnarchiver unarchiveObjectWithData:(__bridge NSData *)keyData];
         } @catch (NSException *e) {
             NSLog(@"Unarchive of %@ failed: %@", service, e);
-        } @finally {
         }
     }
     if (keyData)

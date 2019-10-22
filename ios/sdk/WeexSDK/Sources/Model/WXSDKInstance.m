@@ -49,6 +49,7 @@
 #import "WXJSCoreBridge.h"
 #import "WXSDKInstance_performance.h"
 #import "WXPageEventNotifyEvent.h"
+#import "WXConvertUtility.h"
 #import "WXCoreBridge.h"
 #import <WeexSDK/WXDataRenderHandler.h>
 
@@ -59,6 +60,9 @@ NSString *const bundleUrlOptionKey = @"bundleUrl";
 NSString *const bundleResponseUrlOptionKey = @"bundleResponseUrl";
 
 NSTimeInterval JSLibInitTime = 0;
+
+static NSString* lastPageInfoLock = @"";
+static NSDictionary* lastPageInfo = nil;
 
 typedef enum : NSUInteger {
     WXLoadTypeNormal,
@@ -123,6 +127,8 @@ typedef enum : NSUInteger {
                 _renderType = WEEX_RENDER_TYPE_PLATFORM;
             }
         }
+        
+        WXLogInfo(@"Create instance: %@, render type: %@", _instanceId, _renderType);
         
         // TODO self is retained here.
         [WXSDKManager storeInstance:self forID:_instanceId];
@@ -204,6 +210,12 @@ typedef enum : NSUInteger {
 {
     // get _rootView.frame in JS thread may cause deaklock.
     return [NSString stringWithFormat:@"<%@: %p; id = %@; rootView = %p; url= %@>", NSStringFromClass([self class]), self, _instanceId, (__bridge void*)_rootView, _scriptURL];
+}
+
+- (void)setParentInstance:(WXSDKInstance *)parentInstance
+{
+    WXLogInfo(@"Embed instance %@ into parent instance %@", _instanceId, parentInstance.instanceId);
+    _parentInstance = parentInstance;
 }
 
 #pragma mark Public Mehtods
@@ -307,6 +319,12 @@ typedef enum : NSUInteger {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
     }
+    WXLogInfo(@"pageid: %@ renderWithURL: %@", _instanceId, url.absoluteString);
+    
+    @synchronized (lastPageInfoLock) {
+        lastPageInfo = @{@"pageId": [_instanceId copy], @"url": [url absoluteString] ?: @""};
+    }
+    
     [WXCoreBridge install];
     if (_useBackupJsThread) {
         [[WXSDKManager bridgeMgr] executeJSTaskQueue];
@@ -329,6 +347,12 @@ typedef enum : NSUInteger {
 {
     _options = [options isKindOfClass:[NSDictionary class]] ? options : nil;
     _jsData = data;
+    WXLogInfo(@"pageid: %@ renderView pageNmae: %@  options: %@", _instanceId, _pageName, options);
+    
+    @synchronized (lastPageInfoLock) {
+        lastPageInfo = @{@"pageId": [_instanceId copy], @"options": options ? [options description] : @""};
+    }
+
     [WXCoreBridge install];
     if (_useBackupJsThread) {
         [[WXSDKManager bridgeMgr] executeJSTaskQueue];
@@ -576,6 +600,15 @@ typedef enum : NSUInteger {
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {		
         BOOL enableRTLLayoutDirection = [[configCenter configForKey:@"iOS_weex_ext_config.enableRTLLayoutDirection" defaultValue:@(YES) isDefault:NULL] boolValue];
         [WXUtility setEnableRTLLayoutDirection:enableRTLLayoutDirection];
+        
+        BOOL isIOS13 = [[[UIDevice currentDevice] systemVersion] integerValue] == 13;
+        BOOL useMRCForInvalidJSONObject = [[configCenter configForKey:@"iOS_weex_ext_config.useMRCForInvalidJSONObject" defaultValue:@(YES) isDefault:NULL] boolValue];
+        BOOL alwaysUseMRCForObjectToWeexCore = [[configCenter configForKey:@"iOS_weex_ext_config.alwaysUseMRC" defaultValue:@(NO) isDefault:NULL] boolValue];
+        ConvertSwitches(isIOS13, useMRCForInvalidJSONObject, alwaysUseMRCForObjectToWeexCore);
+    }
+    else {
+        BOOL isIOS13 = [[[UIDevice currentDevice] systemVersion] integerValue] == 13;
+        ConvertSwitches(isIOS13, YES, NO);
     }
     return NO;
 }
@@ -710,12 +743,13 @@ typedef enum : NSUInteger {
     };
     
     _mainBundleLoader.onFailed = ^(NSError *loadError) {
+        WXLogError(@"Request failed with error: %@", loadError);
+        
         NSString *errorMessage = [NSString stringWithFormat:@"Request to %@ occurs an error:%@, info:%@", request.URL, loadError.localizedDescription, loadError.userInfo];
         long wxErrorCode = [loadError.domain isEqualToString:NSURLErrorDomain] && loadError.code == NSURLErrorNotConnectedToInternet ? WX_ERR_NOT_CONNECTED_TO_INTERNET : WX_ERR_JSBUNDLE_DOWNLOAD;
 
         WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, wxErrorCode, errorMessage, weakSelf.pageName);
         
-    
         NSMutableDictionary *allUserInfo = [[NSMutableDictionary alloc] initWithDictionary:error.userInfo];
         [allUserInfo addEntriesFromDictionary:loadError.userInfo];
         NSError *errorWithReportMsg = [NSError errorWithDomain:error.domain
@@ -766,6 +800,8 @@ typedef enum : NSUInteger {
 
 - (void)destroyInstance
 {
+    WXLogInfo(@"Destroy instance: %@", _instanceId);
+    
     [self.apmInstance endRecord];
     NSString *url = @"";
     if ([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
@@ -784,7 +820,11 @@ typedef enum : NSUInteger {
 
     [WXPrerenderManager removePrerenderTaskforUrl:[self.scriptURL absoluteString]];
     [WXPrerenderManager destroyTask:self.instanceId];
-    [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
+    BOOL dataRender = self.dataRender;
+    BOOL wlasmRender = self.wlasmRender;
+    if (!dataRender) {
+        [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
+    }
     
     WXComponentManager* componentManager = self.componentManager;
     NSString* instanceId = self.instanceId;
@@ -802,6 +842,10 @@ typedef enum : NSUInteger {
         // Destroy weexcore c++ page and objects.
         [WXCoreBridge closePage:instanceId];
         
+        if (dataRender && !wlasmRender) {
+            [[WXSDKManager bridgeMgr] destroyInstance:instanceId];
+        }
+
         // Destroy heron render target page
         if ([WXCustomPageBridge isCustomPage:instanceId]) {
             [[WXCustomPageBridge sharedInstance] removePage:instanceId];
@@ -810,6 +854,7 @@ typedef enum : NSUInteger {
         // Reading config from orange for Release instance in Main Thread or not, for Bug #15172691 +{
         dispatch_async(dispatch_get_main_queue(), ^{
             [WXSDKManager removeInstanceforID:instanceId];
+            WXLogInfo(@"Finally remove instance: %@", instanceId);
         });
         //+}
     });
@@ -1061,7 +1106,7 @@ typedef enum : NSUInteger {
         [self removeObserver:self forKeyPath:@"state" context:NULL];
         [[NSNotificationCenter defaultCenter] removeObserver:self];
     }
-    @catch (NSException *exception) {
+    @catch (NSException *exception) {//!OCLint
     }
 }
 
@@ -1116,6 +1161,15 @@ typedef enum : NSUInteger {
             self.appearState = NO;
         }
     }
+}
+
++ (NSDictionary*)lastPageInfo
+{
+    NSDictionary* result;
+    @synchronized (lastPageInfoLock) {
+        result = [lastPageInfo copy];
+    }
+    return result;
 }
 
 @end

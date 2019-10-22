@@ -39,7 +39,6 @@
 #include "base/android/jni_type.h"
 #include "base/android/jni/jbytearray_ref.h"
 #include "base/android/jniprebuild/jniheader/WXBridge_jni.h"
-#include "base/log_defines.h"
 #include "core/config/core_environment.h"
 #include "core/layout/layout.h"
 #include "core/layout/measure_func_adapter_impl_android.h"
@@ -49,6 +48,7 @@
 #include "third_party/json11/json11.hpp"
 #include "core/moniter/render_performance.h"
 #include "core/render/page/render_page_base.h"
+#include "third_party/IPC/IPCFutexPageQueue.h"
 
 using namespace WeexCore;
 jlongArray jFirstScreenRenderTime = nullptr;
@@ -179,10 +179,13 @@ static jlongArray GetRenderFinishTime(JNIEnv* env, jobject jcaller,
 // Notice that this method is invoked from main thread.
 static jboolean NotifyLayout(JNIEnv* env, jobject jcaller, jstring instanceId) {
   if (WeexCoreManager::Instance()->getPlatformBridge()) {
+    ScopedJStringUTF8 nativeString = ScopedJStringUTF8(env, instanceId);
+    const char* c_str_instance_id = nativeString.getChars();
+    std::string std_string_nstanceId = std::string(c_str_instance_id == nullptr ? "" : c_str_instance_id);
     return WeexCoreManager::Instance()
         ->getPlatformBridge()
         ->core_side()
-        ->NotifyLayout(jString2StrFast(env, instanceId));
+        ->NotifyLayout(std_string_nstanceId);
   }
   return false;
 }
@@ -285,6 +288,24 @@ static void SetLogType(JNIEnv* env, jobject jcaller, jfloat logLevel,
       ->SetLogType(l, flag);
 }
 
+static jstring nativeDumpIpcPageQueueInfo(JNIEnv* env, jobject jcaller){
+    std::string client_quene_msg;
+    if (WeexCoreManager::Instance()->client_queue_ != nullptr){
+        WeexCoreManager::Instance()->client_queue_->dumpPageInfo(client_quene_msg);
+    }
+    std::string server_quene_msg;
+    if (WeexCoreManager::Instance()->server_queue_ != nullptr){
+        WeexCoreManager::Instance()->server_queue_->dumpPageInfo(server_quene_msg);
+    }
+    std::string result ;
+    result = "{client:"+client_quene_msg+"}\n"+"{server:"+server_quene_msg+"}";
+    return env->NewStringUTF(result.c_str());
+}
+static void ReloadPageLayout(JNIEnv *env, jobject jcaller,
+                              jstring instanceId){
+  WeexCoreManager::Instance()->getPlatformBridge()->core_side()->RelayoutUsingRawCssStyles(jString2StrFast(env,instanceId));
+}
+
 static void SetPageArgument(JNIEnv* env, jobject jcaller,
                             jstring instanceId,
                             jstring key,
@@ -293,6 +314,10 @@ static void SetPageArgument(JNIEnv* env, jobject jcaller,
             ->getPlatformBridge()
             ->core_side()->SetPageArgument(jString2StrFast(env, instanceId),
                                            jString2StrFast(env, key), jString2StrFast(env, value));
+}
+static void SetDeviceDisplayOfPage(JNIEnv *env, jobject jcaller,
+                                   jstring instanceId,jfloat width,jfloat height){
+  WeexCoreManager::Instance()->getPlatformBridge()->core_side()->SetDeviceDisplayOfPage(jString2StrFast(env,instanceId),width,height);
 }
 
 static void SetDeviceDisplay(JNIEnv* env, jobject jcaller, jstring instanceId,
@@ -305,7 +330,9 @@ static void SetDeviceDisplay(JNIEnv* env, jobject jcaller, jstring instanceId,
 
 static jint InitFramework(JNIEnv* env, jobject object, jstring script,
                           jobject params) {
-  WXBridge::Instance()->Reset(env, object);
+  if (!WXBridge::Instance()->jni_object()) {
+    WXBridge::Instance()->Reset(env, object);
+  }
   // Init platform thread --- ScriptThread
   WeexCoreManager::Instance()->InitScriptThread();
   // Exception handler for so
@@ -620,6 +647,9 @@ static jint CreateInstanceContext(JNIEnv* env, jobject jcaller,
 
   // If strategy is DATA_RENDER_BINARY, jscript is a jbyteArray, otherwise jstring
   // TODO use better way
+  if (!WXBridge::Instance()->jni_object()) {
+    WXBridge::Instance()->Reset(env, jcaller);
+  }
   if (scoped_render_strategy.getChars() != nullptr
       && strcmp(scoped_render_strategy.getChars(), "DATA_RENDER_BINARY") == 0) {
     JByteArrayRef byte_array(env, static_cast<jbyteArray>(jscript.Get()));

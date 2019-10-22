@@ -19,10 +19,11 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "WXDefine.h"
-#import "WXType.h"
-#import "WXLog.h"
-#import "WXSDKInstance.h"
+
+#import <WeexSDK/WXDefine.h>
+#import <WeexSDK/WXType.h>
+#import <WeexSDK/WXLog.h>
+#import <WeexSDK/WXSDKInstance.h>
 
 // The default screen width which helps us to calculate the real size or scale in different devices.
 static const CGFloat WXDefaultScreenWidth = 750.0;

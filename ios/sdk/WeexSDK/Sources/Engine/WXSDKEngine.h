@@ -19,6 +19,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class WXSDKInstance;
 
 @interface WXSDKEngine : NSObject
@@ -68,7 +70,7 @@
  * @param properties properties to apply to the component
  *
  */
-+ (void)registerComponent:(NSString *)name withClass:(Class)clazz withProperties:(NSDictionary *)properties;
++ (void)registerComponent:(NSString *)name withClass:(Class)clazz withProperties:(NSDictionary * _Nullable)properties;
 
 /**
  * @abstract Registers a component for a given name, options and js code
@@ -80,7 +82,7 @@
  * @param serviceScript service js code to invoke
  *
  */
-+ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options;
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary * _Nullable)options;
 
 /**
  * @abstract Registers a component for a given name, options and js code
@@ -94,7 +96,7 @@
  * @param completion Completion callback. JS is executed in asynchronously.
  *
  */
-+ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion;
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary * _Nullable)options completion:(nullable void(^)(BOOL result))completion;
 
 /**
  * @abstract Registers a component for a given name, options and js url
@@ -106,7 +108,7 @@
  * @param serviceScriptUrl The service url to register
  *
  */
-+ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options;
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary * _Nullable)options;
 
 /**
  * @abstract Registers a component for a given name, options and js url
@@ -120,7 +122,7 @@
  * @param completion Completion callback. JS is executed in asynchronously.
  *
  */
-+ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options completion:(void(^)(BOOL result))completion;
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary * _Nullable)options completion:(nullable void (^)(BOOL result))completion;
 
 /**
  * @abstract Registers a component for a given name, options and js code
@@ -238,3 +240,5 @@
 + (void)initSDKEnviroment:(NSString *)script DEPRECATED_MSG_ATTRIBUTE("To fix typo,  use initSDKEnvironment: method instead.");
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -81,7 +81,7 @@
         } else if (rate == 1.0) {
             if (_playbackStateChanged)
                 _playbackStateChanged(WXPlaybackStatePlaying);
-        } else if (rate == -1.0) {
+        } else if (rate == -1.0) {//!OCLint
             // Reverse playback
         }
     } else if ([keyPath isEqualToString:@"status"]) {
@@ -295,7 +295,7 @@
                 break;
                 
             default:
-                NSCAssert(NO, @"");
+                NSCAssert(NO, @"");//!OCLint
                 break;
         }
         [weakSelf fireEvent:eventType params:nil];

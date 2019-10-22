@@ -1,0 +1,88 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+def jsc_dir = new File(project.buildDir, 'jsc')
+def jsc_url = project.hasProperty('jsc_url') ? new URL(project.getProperty('jsc_url').toString()) : new URL('https://registry.npmjs.org/jsc-android/-/jsc-android-241213.1.0.tgz')
+def aar_name = project.hasProperty('aar_name') ? project.getProperty('aar_name').toString() : 'android-jsc-intl'
+
+def jsc_file = new File(jsc_dir, jsc_url.path.split('/').last())
+def aar_file = new File(jsc_dir, "${aar_name}.aar")
+
+def downloadJSC = { URL url, File dest ->
+    if (!dest.getParentFile().exists()) {
+        dest.getParentFile().mkdirs()
+    }
+    url.withInputStream { i -> dest.withOutputStream { it << i } }
+}
+
+task download(){
+    inputs.property('url', jsc_url)
+    outputs.file(jsc_file)
+    doFirst {
+        if (!jsc_file.exists()) {
+            downloadJSC(jsc_url, jsc_file)
+        }
+    }
+}
+
+task unzipJSC(type: Copy, dependsOn: download) {
+    from jsc_file.name.endsWith(".aar") ? jsc_file : tarTree(jsc_file)
+    into jsc_dir
+    include "**/*${aar_name}*.aar", '**/include/*.h'
+    includeEmptyDirs false
+    eachFile {
+        if(it.name.endsWith('.aar')) {
+            it.path = it.name
+            it.name = "${aar_name}.aar"
+        }
+        else if(it.name.endsWith('.h')){
+            it.path= 'include/' + it.name
+        }
+    }
+    inputs.file(jsc_file)
+    outputs.file(aar_file)
+}
+
+task copyJscToJniDir(type: Copy, dependsOn: unzipJSC) {
+    def libsDir = project.android.sourceSets.main.jniLibs.srcDirs[-1]
+    from zipTree(aar_file)
+    into libsDir
+    include 'jni/**/*.so'
+    exclude '**/libweexcore.so', '**/libweexjsb.so', '**/libweexjss.so',
+            '**/libweexjssr.so', '**/libweexjst.so', '**/libc++_shared.so',
+            '**/x86_64/**'
+    includeEmptyDirs false
+    eachFile {
+        def path_list = new LinkedList<>(it.relativePath.segments.toList())
+        path_list.removeAt(0)
+        it.relativePath = new RelativePath(true, path_list[0], path_list[1])
+    }
+    inputs.file(aar_file)
+    outputs.upToDateWhen {false}
+}
+
+task copyJSCHeaderToWeexCore(type: Copy, dependsOn: unzipJSC) {
+    from new File(jsc_dir, 'include')
+    into '../../weex_core/Source/include/JSCHeaderNew/JavaScriptCore'
+    includeEmptyDirs false
+    inputs.dir(new File(jsc_dir, 'include'))
+    outputs.upToDateWhen {false}
+}
+
+preBuild.dependsOn copyJscToJniDir, copyJSCHeaderToWeexCore
+clean.dependsOn cleanCopyJscToJniDir, cleanCopyJSCHeaderToWeexCore

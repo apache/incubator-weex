@@ -19,11 +19,13 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol WXDataRenderHandler <NSObject>
     
-- (void)createPage:(NSString *)pageId template:(NSString *)jsBundleString options:(NSDictionary *)options  data:(id)data;
+- (void)createPage:(NSString *)pageId template:(NSString *)jsBundleString options:(NSDictionary * _Nullable)options  data:(id)data;
 
-- (void)createPage:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary *)options data:(id)data;
+- (void)createPage:(NSString *)pageId contents:(NSData *)contents options:(NSDictionary * _Nullable)options data:(id)data;
 
 - (void)callUpdateComponentData:(NSString*)pageId componentId:(NSString*)componentId jsonData:(NSString*)jsonData;
 
@@ -31,14 +33,16 @@
 
 - (void)refreshDataRenderInstance:(NSString *)pageId data:(NSString *)data;
 
-- (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary *)args domChanges:(NSDictionary *)domChanges;
+- (void)fireEvent:(NSString *)pageId ref:(NSString *)ref event:(NSString *)event args:(NSDictionary * _Nullable)args domChanges:(NSDictionary * _Nullable)domChanges;
 
 - (void)registerModules:(NSDictionary *)modules;
     
 - (void)registerComponents:(NSArray *)components;
     
-- (void)invokeCallBack:(NSString *)pageId function:(NSString *)funcId args:(NSDictionary *)args keepAlive:(BOOL)keepAlive;
+- (void)invokeCallBack:(NSString *)pageId function:(NSString *)funcId args:(NSDictionary * _Nullable)args keepAlive:(BOOL)keepAlive;
 
 - (void)DispatchPageLifecycle:(NSString *)pageId;
 
 @end
+
+NS_ASSUME_NONNULL_END

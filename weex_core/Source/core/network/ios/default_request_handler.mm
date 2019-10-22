@@ -31,7 +31,15 @@ namespace network {
 
     void DefaultRequestHandler::Send(const char* instance_id, const char* url, Callback callback) {
         NSURL* nsURL = [NSURL URLWithString:NSSTRING(url)];
+        WXSDKInstance *instance = [WXSDKManager instanceForID:@(instance_id)];
+        [instance.apmInstance onStage:KEY_PAGE_STAGES_DOWN_JS_START];
+        __weak typeof(WXSDKInstance*) weakInstance = instance;
         [[WXSDKManager bridgeMgr] DownloadJS:@(instance_id) url:nsURL completion:^(NSString *script) {
+            __strong typeof(weakInstance) strongInstance = weakInstance;
+            if (!strongInstance) {
+                return;
+            }
+            [strongInstance.apmInstance onStage:KEY_PAGE_STAGES_DOWN_JS_END];
             WXPerformBlockOnBridgeThread(^{
                 NSString* bundleType = @"Vue";
                 callback([script UTF8String] ? : "", [bundleType UTF8String]);

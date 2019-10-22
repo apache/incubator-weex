@@ -19,8 +19,10 @@
 
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
-#import "WXLog.h"
-#import "WXType.h"
+#import <WeexSDK/WXLog.h>
+#import <WeexSDK/WXType.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @class WXLength;
 @class WXBoxShadow;
@@ -103,3 +105,5 @@ typedef BOOL WXClipType;
 + (WXPixelType)WXPixelType:(id)value DEPRECATED_MSG_ATTRIBUTE("Use [WXConvert WXPixelType:scaleFactor:] instead");
 
 @end
+
+NS_ASSUME_NONNULL_END

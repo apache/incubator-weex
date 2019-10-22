@@ -18,7 +18,7 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "WXUtility.h"
+#import <WeexSDK/WeexSDK.h>
 
 @interface WXFloatCompareTests : XCTestCase
 

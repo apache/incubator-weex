@@ -1,5 +1,5 @@
 # Weex Apache Source Release
-Weex produce SDKs to integrate with iOS/Android/Mobile web applications. This file will cover how to build Weex from source. You can either use the script we provided or manually build from source step by step.
+Weex produce SDKs to integrate with iOS/Android/Mobile web applications. This file will cover how to build Weex from command line. You can either use the script we provided or manually build from source step by step.
 See `README.md` for further information about the Weex Framework.
 
 Weex SDK includes 3 different SDKs to use in corresponding system/browser:
@@ -9,32 +9,36 @@ Weex SDK includes 3 different SDKs to use in corresponding system/browser:
 
 See our [guide in our website](http://weex.apache.org/guide/integrate-to-your-app.html) to learn more about how to integrate Weex SDK into your app.
 
-## Build Environment
-The environment required to build weex is:
-* Android SDK:
-    * NodeJS 4.0+
-    * JDK 1.6+
-    * Android SDK(`$ANDROID_HOME` must be set properly)
-    * Gradle 2.0+
-    * NDK r18 and ndk 13 (**Both of them are needed**)
-    * [Ninja 1.8.2+](https://ninja-build.org/)
-    * CMake 3.9.0+
-* iOS SDK:
-    * NodeJS 4.0+
-    * XCode & Command Tools 8.0+
-* Mobile web SDK:
-    * NodeJS 4.0+
+# Build Environment
+The environment required to build weex is categorized by platforms.
+
+## Android
+* JDK `1.8+`
+* Android SDK Platform 28
+  * `$ANDROID_HOME` must be configured by using `export ANDROID_HOME=/path_to_sdk`
+  * Normally, you should install [Android Studio](https://developer.android.com/studio) to get Android SDK Platform 28 installed.
+* Gradle 4.10+
+* NDK `r18`
+  * `ANDROID_NDK_HOME` must be configured by using `export ANDROID_NDK_HOME=/path_to_ndk`
+  * Higher version of NDK than `r18` isn't not tested yet.
+* CMake 3.4.1+
+
+## iOS
+* Install [iOS Environment](https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/AppStoreDistributionTutorial/Setup/Setup.html)
+* Install [CocoaPods](https://guides.cocoapods.org/using/getting-started.html)
+* XCode Command Tools 8.0+
+
+## Mobile
+* NodeJS 4.0+
 
 This article was tested in MacOSX system.
 
 # Build All by Script
 
 This script will build Android and iOS SDKs:
-> `$ bash scripts/build_from_source.sh $NDK13_dir $NDK_16dir`
+> `$ bash scripts/build_from_source.sh `
 
-The `$NDK18_dir` should be the directory of NDK 18, otherwise the Android build would failed.
-
-This may take a while. After that, you can look in `dist/`, `android/sdk/build/output/` and `ios/sdk/Products` for Web/Android/iOS SDK artifacts.
+This may take a while. After that, you can look in `dist/`, `android/sdk/build/outputs/aar` and `ios/sdk/Products` for Web / Android / iOS SDK artifacts.
 
 # Build for Platforms
 
@@ -53,37 +57,22 @@ Build the javascript libraries:
 
 ### Before build Native SDK
 Move `min` version to Native SDK folder, which will be used by native SDK build.
-> `cp packages/weex-js-framework/index.min.js ios_sdk/WeexSDK/Resources/main.js`
-> `cp packages/weex-js-framework/index.min.js android_sdk/assets/main.js`
+> `cp packages/weex-js-framework/index.min.js ios/sdk/WeexSDK/Resources/main.js`
+> `cp packages/weex-js-framework/index.min.js android/sdk/assets/main.js`
 
 ## Build Android SDK
+1. Install the [Android environment](#android).
+2. Execute the following command
 
-check env
+    ```
+    cd android
+    ./gradlew :weex_sdk:clean :weex_sdk:assembleRelease
+    ```
 
-- you have gradle installed, see more details about 'how to install gradle' on the [gradle website](https://gradle.org/install).
-- [NDK r18](https://developer.android.com/ndk/downloads/older_releases.html)
-- edit local.propteries (in `Android` dir)
-
-	```
-	ndk.dir=/Users/{user}/Library/Android/sdk/ndk-bundle-r18
-	sdk.dir=/Users/{user}/Library/Android/sdk
-	```
-
-then do buid
-
-> cd Android/sdk
-
-> ../gradlew clean assemble
-
-
-artifacts path:
-
-` android/sdk/build/outputs/aar`
-
-You can now import the aar file to your android project.
+3. Output can be found at `android/sdk/build/outputs/aar`
 
 ## Build iOS SDK
 Execute command below to compile iOS SDK:
-> `$ xcodebuild -project ios_sdk/WeexSDK.xcodeproj -target WeexSDK_MTL`
+> `$ xcodebuild -project ios/sdk/WeexSDK.xcodeproj -target WeexSDK_MTL`
 
 Then you'll find the iOS library(Framework file) under `ios_sdk/Products`.

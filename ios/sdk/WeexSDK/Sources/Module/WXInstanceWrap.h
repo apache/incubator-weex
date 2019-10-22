@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#import "WXModuleProtocol.h"
+#import <WeexSDK/WXModuleProtocol.h>
 
 @interface WXInstanceWrap : NSObject <WXModuleProtocol>
 

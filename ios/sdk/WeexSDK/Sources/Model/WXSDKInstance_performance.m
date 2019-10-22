@@ -28,6 +28,7 @@
 #import "WXImageComponent.h"
 #import "WXUtility.h"
 #import "WXAnalyzerCenter+Transfer.h"
+#import "WXCoreBridge.h"
 
 @interface WXPerformance()
 @property (nonatomic, assign) bool hasRecordFsRenderTimeByPosition;
@@ -112,7 +113,7 @@
     if ([targetComponent.type isEqualToString:@"videoplus"]) {
         return;
     }
-    
+
     bool inScreen = CGRectIntersectsRect(rootFrame, absoluteFrame);
     if (!inScreen) {
         return;
@@ -131,6 +132,14 @@
     [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_EXECUTE_JS_TIME curMaxValue:self.callJsTime];
     [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_CREATE_COMPONENT_TIME curMaxValue:self.componentCreateTime];
     [targetComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_CREATE_VIEW_TIME curMaxValue:self.viewCreateTime];
+    __weak WXComponent* weakComponent = targetComponent;
+    WXPerformBlockOnComponentThread(^{
+         __strong WXComponent* strongComponent = weakComponent;
+        if (!strongComponent) {
+            return;
+        }
+        [strongComponent.weexInstance.apmInstance updateMaxStats:KEY_PAGE_STATS_LAYOUT_TIME curMaxValue:[WXCoreBridge getLayoutTime:strongComponent.weexInstance.instanceId]];
+    });
 
     self.interactionTime = self.interactionTime < diff ? diff :self.interactionTime;
 }

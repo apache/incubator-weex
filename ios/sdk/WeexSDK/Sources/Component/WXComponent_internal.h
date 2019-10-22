@@ -49,7 +49,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     /**
      *  View
      */
-    UIColor *_backgroundColor;
+    UIColor *_styleBackgroundColor;
     NSString *_backgroundImage;
     NSString *_clipRadius;
     WXClipType _clipToBounds;
@@ -71,6 +71,8 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     NSString * _groupAccessibilityChildren; // voice-over navigation order
     NSString * _testId;// just for auto-test
     
+    BOOL _userInteractionEnabled;
+    BOOL _eventPenetrationEnabled;
     BOOL _accessibilityMagicTapEvent;
     
     /**
@@ -168,10 +170,15 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     NSMutableDictionary<NSString *, NSArray *> *_eventParameters;
 }
 
-/* _transform may be modified in mutiple threads. DO NOT use "_transform = XXX" directly.
+/* DO NOT use "_transform = XXX" directly.
  Ivar access in ObjC is compiled to code with additional release or retain. So use Ivar in mutiple
  thread may lead to crash. Use an ATOMIC property is well enough. */
 @property (atomic, strong) WXTransform *transform;
+
+/**
+ DO NOT use "_backgroundColor" directly. The same reason as '_transform'.
+ */
+@property (atomic, strong) UIColor* styleBackgroundColor;
 
 ///--------------------------------------
 /// @name Package Internal Methods

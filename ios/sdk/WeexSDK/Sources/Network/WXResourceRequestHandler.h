@@ -19,8 +19,10 @@
 
 
 #import <Foundation/Foundation.h>
-#import "WXResourceRequest.h"
-#import "WXResourceResponse.h"
+#import <WeexSDK/WXResourceRequest.h>
+#import <WeexSDK/WXResourceResponse.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @protocol WXResourceRequestDelegate <NSObject>
 
@@ -28,16 +30,16 @@
 - (void)request:(WXResourceRequest *)request didSendData:(unsigned long long)bytesSent totalBytesToBeSent:(unsigned long long)totalBytesToBeSent;
 
 // Tells the delegate that the request received the initial reply (headers) from the server.
-- (void)request:(WXResourceRequest *)request didReceiveResponse:(WXResourceResponse *)response;
+- (void)request:(WXResourceRequest *)request didReceiveResponse:(WXResourceResponse * _Nullable)response;
 
 // Tells the delegate that the request has received some of the expected data.
-- (void)request:(WXResourceRequest *)request didReceiveData:(NSData *)data;
+- (void)request:(WXResourceRequest *)request didReceiveData:(NSData * _Nullable)data;
 
 // Tells the delegate that the request finished transferring data.
 - (void)requestDidFinishLoading:(WXResourceRequest *)request;
 
 // Tells the delegate that the request failed to load successfully.
-- (void)request:(WXResourceRequest *)request didFailWithError:(NSError *)error;
+- (void)request:(WXResourceRequest *)request didFailWithError:(NSError * _Nullable)error;
     
 // Tells the delegate that when complete statistics information has been collected for the task.
 #ifdef __IPHONE_10_0
@@ -58,4 +60,4 @@
 
 @end
 
-
+NS_ASSUME_NONNULL_END

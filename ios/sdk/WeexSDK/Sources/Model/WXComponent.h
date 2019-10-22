@@ -18,7 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXType.h"
+#import <WeexSDK/WXType.h>
 
 @class WXSDKInstance;
 
@@ -182,7 +182,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @return A block that takes component, callbackType and a result.
  **/
-@property (nonatomic, copy) void (^componentCallback)(WXComponent *component, WXComponentCallbackType callbackType, id result);
+@property (nonatomic, copy) void (^componentCallback)(WXComponent *component, WXComponentCallbackType callbackType, id _Nullable result);
 
 /**
  * @abstract Called on main thread when the component has just laid out.
@@ -486,3 +486,4 @@ typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
 @end
 
 NS_ASSUME_NONNULL_END
+

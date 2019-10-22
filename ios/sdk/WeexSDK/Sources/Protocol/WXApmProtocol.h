@@ -19,6 +19,7 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
 
 @protocol WXApmProtocol <NSObject>
 
@@ -100,3 +101,5 @@
 @required
 - (id<WXApmProtocol>)gengratorApmInstance:(NSString *) type;
 @end
+
+NS_ASSUME_NONNULL_END

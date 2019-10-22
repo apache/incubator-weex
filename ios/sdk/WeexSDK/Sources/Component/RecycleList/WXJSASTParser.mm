@@ -287,7 +287,7 @@ static int binaryPrecedence(WXJSToken *token)
     // Check for most common single-character punctuators.
     int ch = _source[_index];
     std::string str = "";
-    switch (ch) {
+    switch (ch) {//!OCLint
         // single-character punctuators
         case 46:   // .
         case 40:   // (
@@ -875,7 +875,7 @@ static int binaryPrecedence(WXJSToken *token)
         node->value = token->value == "true";
         return node;
     } else {
-        assert(false);
+        assert(false);//!OCLint
     }
 }
 

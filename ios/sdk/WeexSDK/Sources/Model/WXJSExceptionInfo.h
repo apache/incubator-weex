@@ -19,6 +19,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface WXJSExceptionInfo : NSObject
 /**
  * instance id
@@ -66,7 +68,9 @@
                          bundleUrl:(NSString *)bundleUrl
                          errorCode:(NSString *)errorCode
                       functionName:(NSString *)functionName
-                         exception:(NSString *)exception
-                          userInfo:(NSMutableDictionary *)userInfo;
+                         exception:(NSString * _Nullable)exception
+                          userInfo:(NSMutableDictionary * _Nullable)userInfo;
 
 @end
+
+NS_ASSUME_NONNULL_END
