@@ -110,8 +110,6 @@ android {
         initJSCPrivateApi = jsInterpolatorName =="JavaScriptCore"
     }
 
-    defaultPublishConfig project.useApachePackageName ? 'apacheRelease' : 'legacyRelease'
-
     defaultConfig {
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""

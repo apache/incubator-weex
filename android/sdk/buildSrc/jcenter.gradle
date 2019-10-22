@@ -59,7 +59,7 @@ bintray {
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
     pkg {
         repo = "Android"
-        name = 'sdk'
+        name = project.artifactName
         websiteUrl = siteUrl
         desc = description
         vcsUrl = gitUrl
@@ -91,7 +91,27 @@ artifactory {
             maven = true
         }
         defaults {
-            publishConfigs('archives')
+            publications ('artifactorySnapthost')
+        }
+    }
+}
+
+artifactoryPublish.doFirst{
+    apply plugin: 'maven-publish'
+    publishing {
+        publications {
+            artifactorySnapthost(MavenPublication) {
+                groupId project.groupId
+                artifactId project.artifactName
+                version project.weexVersion
+                artifact bundleReleaseAar
+            }
+        }
+        repositories {
+            maven {
+                name = 'OJOSnapshot'
+                url = 'http://oss.jfrog.org/artifactory'
+            }
         }
     }
 }
