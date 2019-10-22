@@ -29,6 +29,7 @@
 + /.eslintignore
 + /.babelrc
 + /src
++ /.rat-excludes
 - /src/h5-render/dist/index.js
 - /src/h5-render/node_modules
 - /src/js-framework/node_modules

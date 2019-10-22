@@ -58,7 +58,7 @@ bintray {
     user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
     pkg {
-        repo = "Android"
+        repo = 'Android'
         name = project.artifactName
         websiteUrl = siteUrl
         desc = description
@@ -81,22 +81,8 @@ artifacts {
     archives sourcesJar
 }
 
-artifactory {
-    contextUrl = 'http://oss.jfrog.org/artifactory'
-    publish {
-        repository {
-            repoKey = 'oss-snapshot-local'
-            username = bintray.user
-            password = bintray.key
-            maven = true
-        }
-        defaults {
-            publications ('artifactorySnapthost')
-        }
-    }
-}
-
-artifactoryPublish.doFirst{
+if (project.gradle.startParameter.taskNames.contains('artifactoryPublish') ||
+        project.gradle.startParameter.taskNames.contains(':weex_sdk:artifactoryPublish')) {
     apply plugin: 'maven-publish'
     publishing {
         publications {
@@ -112,6 +98,21 @@ artifactoryPublish.doFirst{
                 name = 'OJOSnapshot'
                 url = 'http://oss.jfrog.org/artifactory'
             }
+        }
+    }
+}
+
+artifactory {
+    contextUrl = 'http://oss.jfrog.org/artifactory'
+    publish {
+        repository {
+            repoKey = 'oss-snapshot-local'
+            username = bintray.user
+            password = bintray.key
+            maven = true
+        }
+        defaults {
+            publications ('artifactorySnapthost')
         }
     }
 }
