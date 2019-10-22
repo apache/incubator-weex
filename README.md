@@ -22,7 +22,9 @@ Support Android 4.1 (API 16), iOS 8.0+ and WebKit 534.30+.
 ## For Windows
 First of all, compiling or building Weex from Windows is not support officially.
 
-You could [Git for Windows](https://git-scm.com/download/win) and run all the following commands in git-bash and give it a try.
+You could install [Git for Windows](https://git-scm.com/download/win) and run all the following commands in git-bash.
+
+Good Luck.
 
 ## Meet Weex
 

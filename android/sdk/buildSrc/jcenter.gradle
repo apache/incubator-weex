@@ -64,10 +64,10 @@ bintray {
         desc = description
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
-        //publish = true
+        publish = true
         version {
-            name = project.version
-            vcsTag = project.hasProperty('vcsTag') ? project.property('vcsTag') : project.version
+            name = project.weexVersion
+            vcsTag = project.hasProperty('vcsTag') ? project.property('vcsTag') :  project.weexVersion
         }
     }
 }
