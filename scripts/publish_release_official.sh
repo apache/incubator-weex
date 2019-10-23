@@ -43,7 +43,6 @@ if [ ! -d "${TMPDIR}weex_release" ]
 then
     svn checkout https://dist.apache.org/repos/dist/release/incubator/weex/ "${TMPDIR}weex_release"
 fi
-svn delete .
 mkdir -p "${TMPDIR}weex_release/${1}" && cd "$_"
 curl "https://dist.apache.org/repos/dist/dev/incubator/weex/${1}/${2}/apache-weex-incubating-${1}-${2}-src.tar.gz" -o "apache-weex-incubating-${1}-src.tar.gz"
 curl "https://dist.apache.org/repos/dist/dev/incubator/weex/${1}/${2}/apache-weex-incubating-${1}-${2}-src.tar.gz.asc" -o "apache-weex-incubating-${1}-src.tar.gz.asc"
@@ -53,7 +52,9 @@ svn add . --force
 svn commit -m "Release ${1}"
 
 echo "Push Git Tag to Github Repo"
-git tag -a -F "RELEASE_NOTE.md" "$1"
+cd -
+cd -
+git tag -a -F "RELEASE_NOTE.md" "$1" "$1-$2"
 git push "$4" "$1"
 
 echo "Publish Github Release"
@@ -63,7 +64,7 @@ release-it --ci --no-npm --no-increment --no-git.requireCleanWorkingDir --no-git
 
 echo "Publish Android JCenter Release"
 cd android
-./gradlew :weex_sdk:clean :weex_sdk:install :weex_sdk:bintray -PgroupId="org.apache.weex" -PartifactName="sdk" -PApachePackageName="true" -PvcsTag="$1" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PignoreVersionCheck="true" -PweexVersion="$1" -PbintrayUser=weex -PbintrayApiKey="$6" 
-./gradlew :weex_sdk:install :weex_sdk:bintray -PgroupId="org.apache.weex" -PartifactName="sdk_legacy" -PApachePackageName="false" -PvcsTag="$1" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PignoreVersionCheck="true" -PweexVersion="$1" -PbintrayUser=weex -PbintrayApiKey="$6" 
+./gradlew :weex_sdk:clean :weex_sdk:install :weex_sdk:bintray -PgroupId="org.apache.weex" -PartifactName="sdk" -PapachePackageName="true" -PvcsTag="$1" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PignoreVersionCheck="true" -PweexVersion="$1" -PbintrayUser=weex -PbintrayApiKey="$6" 
+./gradlew :weex_sdk:install :weex_sdk:bintray -PgroupId="org.apache.weex" -PartifactName="sdk_legacy" -PapachePackageName="false" -PvcsTag="$1" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PignoreVersionCheck="true" -PweexVersion="$1" -PbintrayUser=weex -PbintrayApiKey="$6" 
 
 # Publish iOS to Cocoapods

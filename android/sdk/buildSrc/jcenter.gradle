@@ -66,6 +66,8 @@ bintray {
         licenses = ["Apache-2.0"]
         publish = true
         version {
+            desc = description
+            released = new Date()
             name = project.weexVersion
             vcsTag = project.hasProperty('vcsTag') ? project.property('vcsTag') :  project.weexVersion
         }

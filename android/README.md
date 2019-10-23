@@ -35,7 +35,7 @@ When some commits of  playground rely on unpublished features of weex-sdk,a SNAP
 
 ```
 cd android
-./gradlew clean install ArtifactoryPublish -PgroupId="org.apache.weex" -PartifactName="sdk_legacy" -PApachePackageName="false" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PweexVersion=$PUBLISH_VERSION -PbintrayUser=weex -PbintrayApiKey=$JCENTER_TOKEN 
+./gradlew clean install ArtifactoryPublish -PgroupId="org.apache.weex" -PartifactName="sdk_legacy" -PapachePackageName="false" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PweexVersion=$PUBLISH_VERSION -PbintrayUser=weex -PbintrayApiKey=$JCENTER_TOKEN 
 ```
 
 * Explanation for variable:  
