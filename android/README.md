@@ -32,8 +32,11 @@ Double type `SHIFT` and enter `Build Variants`, will give you build variants win
 ### When to publish SNAPSHOT
 When some commits of  playground rely on unpublished features of weex-sdk,a SNAPSHOT of weex-sdk will be needed to support it.
 ### How to publish SNAPSHOT
- `cd android `  
-`./gradlew clean install ArtifactoryPublish -PweexVersion=$PUBLISH_VERSION -PbintrayUser=alibabaweex -PbintrayApiKey=$JCENTER_TOKEN `  
+
+```
+cd android
+./gradlew clean install ArtifactoryPublish -PgroupId="org.apache.weex" -PartifactName="sdk_legacy" -PapachePackageName="false" -PunbundlingJSC="true" -PbuildRuntimeApi=true -PweexVersion=$PUBLISH_VERSION -PbintrayUser=weex -PbintrayApiKey=$JCENTER_TOKEN 
+```
 
 * Explanation for variable:  
 $PUBLISH_VERSION The version of snapshot, like 0.26.1.3-SNAPSHOT  

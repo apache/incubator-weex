@@ -16,33 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-def siteUrl = 'https://weex.incubator.apache.org'
+def siteUrl = 'https://weex.apache.org/'
 def gitUrl = 'https://github.com/apache/incubator-weex.git'
-group = "com.taobao.android"
+def mailingList = 'dev@weex.apache.org'
+def description='Weex release is always under the form of source code, the JCenter distribuion is only used for users\' convenience. View https://weex.apache.org/download/download.html for all the source code release'
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
         pom {
             project {
                 packaging 'aar'
-                name 'weex_sdk'
+                name 'Apache Incubator-Weex'
+                artifactId project.artifactName
+                groupId project.groupId
                 url siteUrl
+                version = project.weexVersion
                 licenses {
                     license {
                         name 'The Apache Software License, Version 2.0'
-                        url 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                        url 'https://raw.githubusercontent.com/apache/incubator-weex/master/LICENSE'
                     }
                 }
                 developers {
                     developer {
-                        id 'weex alibaba'
-                        name 'weex alibaba'
-                        email 'alibabaweex@gmail.com'
+                        name 'Apache Weex(Incubating) PPMC'
+                        email mailingList
                     }
                 }
                 scm {
                     connection gitUrl
-                    developerConnection gitUrl
+                    developerConnection mailingList
                     url siteUrl
                 }
             }
@@ -55,19 +58,52 @@ bintray {
     user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
     pkg {
-        repo = "maven"
-        name = "weex_sdk"
+        repo = 'Android'
+        name = project.artifactName
         websiteUrl = siteUrl
+        desc = description
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
         publish = true
         version {
-            //The version to be published
-            name = project.version
-            vcsTag = project.version
+            desc = description
+            released = new Date()
+            name = project.weexVersion
+            vcsTag = project.hasProperty('vcsTag') ? project.property('vcsTag') :  project.weexVersion
         }
     }
 }
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+if (project.gradle.startParameter.taskNames.contains('artifactoryPublish') ||
+        project.gradle.startParameter.taskNames.contains(':weex_sdk:artifactoryPublish')) {
+    apply plugin: 'maven-publish'
+    publishing {
+        publications {
+            artifactorySnapthost(MavenPublication) {
+                groupId project.groupId
+                artifactId project.artifactName
+                version project.weexVersion
+                artifact bundleReleaseAar
+            }
+        }
+        repositories {
+            maven {
+                name = 'OJOSnapshot'
+                url = 'http://oss.jfrog.org/artifactory'
+            }
+        }
+    }
+}
+
 artifactory {
     contextUrl = 'http://oss.jfrog.org/artifactory'
     publish {
@@ -78,7 +114,7 @@ artifactory {
             maven = true
         }
         defaults {
-            publishConfigs('archives')
+            publications ('artifactorySnapthost')
         }
     }
 }

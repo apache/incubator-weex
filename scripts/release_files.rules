@@ -29,6 +29,7 @@
 + /.eslintignore
 + /.babelrc
 + /src
++ /.rat-excludes
 - /src/h5-render/dist/index.js
 - /src/h5-render/node_modules
 - /src/js-framework/node_modules
@@ -77,6 +78,8 @@
 - /android/sdk/.classpath
 - /android/sdk/.project
 - /android/sdk/weex_sdk.iml
+- /android/sdk/android-weex_sdk.iml
+- /android/sdk/weex-android-weex_sdk.iml
 - /android/sdk/.cxx
 - /android/sdk/src/legacyRelease
 - /android/sdk/src/main/jniLibs

@@ -18,7 +18,7 @@
  */
  plugins {
      id "com.github.hierynomus.license" version "0.14.0"
-     id 'com.jfrog.artifactory' version '4.9.7'
+     id 'com.jfrog.artifactory' version '4.10.0'
  }
 
 apply plugin: 'com.android.library'
@@ -33,7 +33,8 @@ apply from: 'buildSrc/download_jsc.gradle'
 apply from: 'buildSrc/packageName.gradle'
 apply from: 'buildSrc/asan.gradle'
 
-version = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : '0.26.0.1'
+version = project.weexVersion
+group = project.groupId
 
 //Check version, the version must have 4 sections. The leading three section must be number, and the last section is odd number with or without suffix string.
 if (!project.hasProperty('ignoreVersionCheck') || !project.getProperty('ignoreVersionCheck').equals("true")) {
@@ -108,8 +109,6 @@ android {
     if (buildRuntimeApi){
         initJSCPrivateApi = jsInterpolatorName =="JavaScriptCore"
     }
-
-    defaultPublishConfig project.useApachePackageName ? 'apacheRelease' : 'legacyRelease'
 
     defaultConfig {
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
@@ -209,6 +208,10 @@ android {
             main.java.srcDirs = ['src/legacyRelease/java']
             main.manifest.srcFile(new File('src/legacyRelease/AndroidManifest.xml'))
         }
+
+        if(project.unbundlingJSC){
+            main.jniLibs.srcDirs = []
+        }
     }
 
     compileOptions.encoding = "UTF-8"
@@ -283,4 +286,5 @@ task weex_core_license(type: com.hierynomus.gradle.license.tasks.LicenseFormat) 
                      'Source/include/JavaScriptCore/**/*.cpp'])
 }
 
-preBuild.dependsOn licenseFormat
+preBuild.dependsOn licenseFormat, copyJSCHeaderToWeexCore
+clean.dependsOn cleanCopyJSCHeaderToWeexCore

@@ -15,7 +15,7 @@ The environment required to build weex is categorized by platforms.
 ## Android
 * JDK `1.8+`
 * Android SDK Platform 28
-  * `$ANDROID_HOME` must be configured by using `export ANDROID_HOME=/path_to_sdk`
+  * `ANDROID_HOME` must be configured by using `export ANDROID_HOME=/path_to_sdk`
   * Normally, you should install [Android Studio](https://developer.android.com/studio) to get Android SDK Platform 28 installed.
 * Gradle 4.10+
 * NDK `r18`
@@ -57,8 +57,11 @@ Build the javascript libraries:
 
 ### Before build Native SDK
 Move `min` version to Native SDK folder, which will be used by native SDK build.
-> `cp packages/weex-js-framework/index.min.js ios/sdk/WeexSDK/Resources/main.js`
-> `cp packages/weex-js-framework/index.min.js android/sdk/assets/main.js`
+
+```
+cp packages/weex-js-framework/index.min.js ios/sdk/WeexSDK/Resources/main.js
+cp packages/weex-js-framework/index.min.js android/sdk/assets/main.js
+```
 
 ## Build Android SDK
 1. Install the [Android environment](#android).

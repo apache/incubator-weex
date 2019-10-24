@@ -53,8 +53,8 @@ subprojects {
     }
     buildscript {
         dependencies {
-            classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
-            classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+            classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+            classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         }
         repositories {
             google()
@@ -76,6 +76,10 @@ ext {
     //Default value for disableCov is false
     disableCov = project.hasProperty("disableCov") && disableCov.equals("true")
     useApachePackageName = project.hasProperty('apachePackageName') ? project.property('apachePackageName').toBoolean() : false
+    unbundlingJSC = project.hasProperty('unbundlingJSC') ? project.property('unbundlingJSC').toBoolean() : false
+    artifactName = project.hasProperty('artifactName') ? project.property('artifactName') : 'weex_sdk'
+    groupId = project.hasProperty('groupId') ? project.property('groupId') : 'com.taobao.android'
+    weexVersion = project.hasProperty('weexVersion') ? project.getProperty('weexVersion') : '0.28.0.1'
     implementFromWeex = true
 }
 
