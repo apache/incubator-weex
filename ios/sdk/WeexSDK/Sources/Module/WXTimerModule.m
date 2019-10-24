@@ -162,7 +162,7 @@ WX_EXPORT_METHOD(@selector(clearInterval:))
 - (void)createTimerWithCallback:(NSString *)callbackID time:(NSTimeInterval)milliseconds target:(id)target selector:(SEL)selector shouldRepeat:(BOOL)shouldRepeat {
     
     WXAssert(!isnan(milliseconds), @"Timer interval is NAN.");
-    if (isnan(milliseconds)) {
+    if (isnan(milliseconds)) { //!OCLint
         WXLogError(@"Create timer with NAN interval.");
         return;
     }
