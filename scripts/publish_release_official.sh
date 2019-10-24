@@ -43,6 +43,8 @@ if [ ! -d "${TMPDIR}weex_release" ]
 then
     svn checkout https://dist.apache.org/repos/dist/release/incubator/weex/ "${TMPDIR}weex_release"
 fi
+cd "${TMPDIR}weex_release"
+export svn_dir=`ls -C -d */` ; svn delete $svn_dir
 mkdir -p "${TMPDIR}weex_release/${1}" && cd "$_"
 curl "https://dist.apache.org/repos/dist/dev/incubator/weex/${1}/${2}/apache-weex-incubating-${1}-${2}-src.tar.gz" -o "apache-weex-incubating-${1}-src.tar.gz"
 curl "https://dist.apache.org/repos/dist/dev/incubator/weex/${1}/${2}/apache-weex-incubating-${1}-${2}-src.tar.gz.asc" -o "apache-weex-incubating-${1}-src.tar.gz.asc"
@@ -52,8 +54,7 @@ svn add . --force
 svn commit -m "Release ${1}"
 
 echo "Push Git Tag to Github Repo"
-cd -
-cd -
+pushd +3
 git tag -a -F "RELEASE_NOTE.md" "$1" "$1-$2"
 git push "$4" "$1"
 

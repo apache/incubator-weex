@@ -4,16 +4,14 @@ A framework for building Mobile cross-platform UI.
 
 [![Build Status](https://travis-ci.org/apache/incubator-weex.svg?branch=master)](https://travis-ci.org/apache/incubator-weex/)
 
-## Important Notice
-* The convenience distribution below is only for users' **convenience**. Weex Release is always in the form of [source code](https://weex.apache.org/download/download.html).
-* From Weex `0.28` or higher, the JavaScript interpreter is not bundled with Weex anymore. Developers could choose whatever JavaScript interpreter they like in their app as long as it implements the [cpp headers](https://svn.webkit.org/repository/webkit/releases/WebKitGTK/webkit-2.9.92/Source/JavaScriptCore/API/).
-  * **Optional** JavaScript interpreter choice: If you have no idea about how to choose proper JavaScript interpreter, you could add `apply from: 'https://raw.githubusercontent.com/apache/incubator-weex/release/0.28/android/sdk/buildSrc/download_jsc.gradle'` in your build.gradle, everything else should work as expected. See [weex-playground](https://github.com/apache/incubator-weex-playground/blob/master/android/playground/build.gradle#L7) to see a demo.
-
 ## Convenience Distribution 
+**Since 0.28.0, Weex would publish two convince binary in each release for Android, please [read the documentation about the detail](major_change.html).**
+
+**Please take the above link seriously, otherwise you would be able to use the latest version of Weex.**
 
 | platform | status |
 | -------- | ------ |
-| Android | [![Download](https://api.bintray.com/packages/alibabaweex/maven/weex_sdk/images/download.svg)](https://bintray.com/alibabaweex/maven/weex_sdk/_latestVersion) |
+| Android | [sdk ![Download](https://api.bintray.com/packages/weex/Android/sdk/images/download.svg)](https://bintray.com/weex/Android/sdk/_latestVersion) Or [sdk_legacy ![Download](https://api.bintray.com/packages/weex/Android/sdk_legacy/images/download.svg)](https://bintray.com/weex/Android/sdk_legacy/_latestVersion) |
 | iOS | [![Pod version](https://badge.fury.io/co/WeexSDK.svg)](https://cocoapods.org/pods/WeexSDK) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) |
 | [Mobile Web](https://github.com/weexteam/weex-vue-render) | [![npm version](https://badge.fury.io/js/weex-html5.svg)](https://www.npmjs.com/package/weex-vue-render) |
 
