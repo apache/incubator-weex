@@ -13,9 +13,11 @@ A framework for building Mobile cross-platform UI.
 | -------- | ------ |
 | Android | [sdk ![Download](https://api.bintray.com/packages/weex/Android/sdk/images/download.svg)](https://bintray.com/weex/Android/sdk/_latestVersion) Or [sdk_legacy ![Download](https://api.bintray.com/packages/weex/Android/sdk_legacy/images/download.svg)](https://bintray.com/weex/Android/sdk_legacy/_latestVersion) |
 | iOS | [![Pod version](https://badge.fury.io/co/WeexSDK.svg)](https://cocoapods.org/pods/WeexSDK) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) |
-| [Mobile Web](https://github.com/weexteam/weex-vue-render) | [![npm version](https://badge.fury.io/js/weex-html5.svg)](https://www.npmjs.com/package/weex-vue-render) |
+| [Mobile Web](https://github.com/weexteam/vue-render-for-apache-weex) | [![npm version](https://badge.fury.io/js/weex-html5.svg)](https://www.npmjs.com/package/weex-vue-render) |
 
 Support Android 4.1 (API 16), iOS 8.0+ and WebKit 534.30+.
+
+**FYI: The [mobile web render](https://github.com/weexteam/vue-render-for-apache-weex) is not supported by Apache Weex officially**
 
 ## For Windows
 First of all, compiling or building Weex from Windows is not support officially.
@@ -83,8 +85,9 @@ You can either build Weex from IDE (*XCode*) or command line.
 Please read [How To Build](./HOW-TO-BUILD.md) for detail.
 
 ### Mobile Web
+**Vue Render for Apache Weex is a third party plugin, and not developed nor maintained by Apache Weex.**
 
-see [weex-vue-render](https://github.com/weexteam/weex-vue-render).
+see [Vue Render for Apache Weex](https://github.com/weexteam/vue-render-for-apache-weex).
 
 ## Scripts
 
