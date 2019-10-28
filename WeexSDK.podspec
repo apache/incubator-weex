@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
 
   s.name         = "WeexSDK"
 
-  s.version      = "0.26.0"
+  s.version      = "0.28.0"
 
   s.summary      = "WeexSDK Source."
 
@@ -12,21 +12,12 @@ Pod::Spec.new do |s|
                    A framework for building Mobile cross-platform UI
                    DESC
 
-  s.homepage     = "https://github.com/alibaba/weex"
+  s.homepage     = "https://github.com/apache/incubator-weex"
   s.license = {
-    :type => 'Copyright',
-    :text => <<-LICENSE
-           Alibaba-INC copyright
-    LICENSE
+    :type => 'Apache-2.0'
   }
   s.authors      = {
-                    "cxfeng1"      => "cxfeng1@gmail.com",
-                    "boboning"     => "ningli928@163.com",
-                    "yangshengtao" => "yangshengtao1314@163.com",
-                    "kfeagle"      => "sunjjbobo@163.com",
-                    "acton393"     => "zhangxing610321@gmail.com",
-                    "wqyfavor"     => "wqyfavor88@gmail.com",
-                    "doumafang "   => "doumafang@gmail.com"
+                    "dev" => "dev@weex.apache.org"
                    }
   s.platform     = :ios
   s.ios.deployment_target = '9.0'
