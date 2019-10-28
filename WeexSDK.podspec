@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
     :type => 'Apache-2.0'
   }
   s.authors      = {
-                    dev@weex.apache.org
+                    "dev" => "dev@weex.apache.org"
                    }
   s.platform     = :ios
   s.ios.deployment_target = '9.0'
