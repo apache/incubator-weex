@@ -32,6 +32,7 @@ def downloadJSC = { URL url, File dest ->
 
 task download(){
     inputs.property('url', jsc_url)
+    outputs.file(jsc_file)
     outputs.upToDateWhen {
         jsc_file.exists()
     }
@@ -57,6 +58,7 @@ task unzipJSC(type: Copy, dependsOn: download) {
         }
     }
     inputs.file(jsc_file)
+    outputs.file(aar_file)
     outputs.upToDateWhen {
         aar_file.exists()
     }
