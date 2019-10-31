@@ -538,7 +538,7 @@ typedef enum : NSUInteger {
     if (!self.userInfo[@"jsMainBundleStringContentLength"]) {
         self.userInfo[@"jsMainBundleStringContentLength"] = @([mainBundleString length]);
     }
-    if (!self.userInfo[@"jsMainBundleStringContentLength"]) {
+    if (!self.userInfo[@"jsMainBundleStringContentMd5"]) {
         self.userInfo[@"jsMainBundleStringContentMd5"] = [WXUtility md5:mainBundleString];
     }
     
