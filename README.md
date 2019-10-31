@@ -4,6 +4,9 @@ A framework for building Mobile cross-platform UI.
 
 [![Build Status](https://travis-ci.org/apache/incubator-weex.svg?branch=master)](https://travis-ci.org/apache/incubator-weex/)
 
+## Join Us
+**Join us through [mailing list](https://weex.apache.org/guide/contribute/how-to-contribute.html#mailing-list).**
+
 ## Convenience Distribution 
 **Since 0.28.0, Weex would publish two convince binary in each release for Android, please [read the documentation about the detail](major_change.html).**
 
@@ -28,8 +31,8 @@ Good Luck.
 
 ## Meet Weex
 
-* Install [Weex Playground App](https://weex.apache.org/tools/playground.html) to see examples we already written.
-* If you want to write a demo, install [weex-toolkit](https://www.npmjs.com/package/weex-toolkit) in [Node.js](http://nodejs.org/) 8.0+ and
+* Install [Weex Playground](https://weex.apache.org/tools/playground.html) to see examples we already written.
+* If you want to write a demo, install [weex-cli](https://www.npmjs.com/package/weex-toolkit) in [Node.js](http://nodejs.org/) 8.0+ and
 * Run `weex init` to generate & start a simple project in an empty folder.
 * Follow the instructions in the project README.
 * Enjoy it.
@@ -89,15 +92,12 @@ Please read [How To Build](./HOW-TO-BUILD.md) for detail.
 
 see [Vue Render for Apache Weex](https://github.com/weexteam/vue-render-for-apache-weex).
 
-## Scripts
+## Third part plugin
+There is a third party plugin provides for debugging purpose.
+* [Android](https://weex.apache.org/guide/debug/integrate-devtool-to-android.html)
+* [iOS](https://weex.apache.org/guide/debug/integrate-devtool-to-ios.html)
 
-See [SCRIPTS.md](./SCRIPTS.md) for more information.
-
-## IDE Plugin & Syntax Highlight & DevTool
-
-Weex team have developed a [DevTool](https://github.com/weexteam/weex-devtool) to help you to improve the debugging efficiency.
-
-See more stuff on [this wiki page](https://github.com/alibaba/weex/wiki/Weex-Community)
+You can also view this page for all [third party plugin](https://weex.apache.org/tools).
 
 ## Weex Community
 * [Mailing List](https://weex.apache.org/guide/contribute/how-to-contribute.html#mailing-list) Weex Mailing List, where most discussion happens.
