@@ -37,6 +37,9 @@
 #import "WXDataRenderHandler.h"
 #import "WXHandlerFactory.h"
 #import "WXUtility.h"
+#import "WXExceptionUtils.h"
+#import "WXSDKEngine.h"
+#import "WXConfigCenterProtocol.h"
 
 @interface WXBridgeManager ()
 
@@ -46,6 +49,7 @@
 @property (nonatomic, strong) WXBridgeContext *backupBridgeCtx;
 @property (nonatomic, strong) WXThreadSafeMutableArray *instanceIdStack;
 @property (nonatomic, strong) NSMutableArray* jsTaskQueue;
+@property (nonatomic, strong) NSTimer *timer;
 
 @end
 
@@ -71,8 +75,18 @@ static NSThread *WXBackupBridgeThread;
         _bridgeCtx = [[WXBridgeContext alloc] init];
         _supportMultiJSThread = NO;
         _jsTaskQueue = [NSMutableArray array];
+        _timer = nil;
+        _lastMethodInfo = [NSMutableDictionary dictionary];
     }
     return self;
+}
+
+- (WXBridgeContext *)bridgeCtx {
+    if (_bridgeCtx) {
+        return _bridgeCtx;
+    }
+    _bridgeCtx = [[WXBridgeContext alloc] init];
+    return _bridgeCtx;
 }
 
 - (WXBridgeContext *)backupBridgeCtx {
@@ -120,7 +134,7 @@ static NSThread *WXBackupBridgeThread;
         [WXBridgeThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
         [WXBridgeThread start];
     });
-    
+
     return WXBridgeThread;
 }
 
@@ -776,6 +790,42 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
         WXBridgeContext* context = sdkInstance && sdkInstance.useBackupJsThread ? weakSelf.backupBridgeCtx :  weakSelf.bridgeCtx;
         [context callJSMethod:method args:args onContext:nil completion:nil];
     }, instanceId);
+}
+
+#pragma mark JS Thread Check
+- (void)checkJSThread {
+    if (!_timer) {
+        id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+        if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+            BOOL enableCheckJSThread = [[configCenter configForKey:@"iOS_weex_ext_config.enable_check_js_thread" defaultValue:@(YES) isDefault:NULL] boolValue];
+            if (enableCheckJSThread) {
+                _timer = [NSTimer scheduledTimerWithTimeInterval:5.0f target:self selector:@selector(_postTaskToBridgeThread) userInfo:nil repeats:YES];
+            }
+        }
+    }
+}
+
+- (void)_postTaskToBridgeThread {
+    __block BOOL taskFinished = NO;
+    WXPerformBlockOnBridgeThread(^{
+        taskFinished = YES;
+    });
+
+    __weak typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (!weakSelf) {
+            return;
+        }
+        if (!taskFinished) {
+            WXSDKErrCode errorCode = WX_KEY_EXCEPTION_JS_THREAD_BLOCK;
+            WXSDKInstance* instance = weakSelf.topInstance;
+            if (!instance) {
+                return;
+            }
+            NSString *instanceId = instance.instanceId;
+            [WXExceptionUtils commitCriticalExceptionRT:instanceId errCode:[NSString stringWithFormat:@"%d", errorCode] function:@"" exception:@"JS Thread is block" extParams:weakSelf.lastMethodInfo];
+        }
+    });
 }
 
 #pragma mark - Deprecated
