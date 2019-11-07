@@ -1570,6 +1570,8 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         WeexCore::WeexCoreManager::Instance()->set_script_bridge(jsBridge);
         
         WeexCore::WeexCoreManager::Instance()->set_measure_function_adapter(new WeexCore::WXCoreMeasureFunctionBridge());
+
+        [[WXSDKManager bridgeMgr] checkJSThread];
     });
 }
 

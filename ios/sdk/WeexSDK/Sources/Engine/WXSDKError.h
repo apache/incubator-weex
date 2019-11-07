@@ -88,6 +88,7 @@ typedef NS_ENUM(int, WXSDKErrCode)
     WX_KEY_EXCEPTION_JS_DOWNLOAD =-9200,
     WX_KEY_EXCEPTION_DOM = -9300,
     WX_KEY_EXCEPTION_WXBRIDGE=-9400,
+    WX_KEY_EXCEPTION_JS_THREAD_BLOCK=-9401,
     
     // The following error codes have a remapped value defined in WXSDKUniversalErrCode
     WX_KEY_EXCEPTION_DEGRADE = -9500,
