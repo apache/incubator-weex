@@ -163,6 +163,22 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:UISemanticContentAttributeUnspecified] == UIUserInterfaceLayoutDirectionRightToLeft ? WXLayoutDirectionRTL : WXLayoutDirectionLTR;
 }
 
++ (BOOL)isSystemInDarkTheme
+{
+    if (@available(iOS 13.0, *)) {
+        __block BOOL result = NO;
+        WXPerformBlockSyncOnMainThread(^{
+#ifdef __IPHONE_13_0
+            if ([UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark) {
+                result = YES;
+            }
+#endif
+        });
+        return result;
+    }
+    return NO;
+}
+
 + (NSDictionary *)getEnvironment
 {
     NSString *platform = @"iOS";
@@ -187,7 +203,8 @@ CGFloat WXFloorPixelValue(CGFloat value)
                                     @"deviceWidth":@(deviceWidth * scale),
                                     @"deviceHeight":@(deviceHeight * scale),
                                     @"scale":@(scale),
-                                    @"layoutDirection": [self getEnvLayoutDirection] == WXLayoutDirectionRTL ? @"rtl" : @"ltr"
+                                    @"layoutDirection": [self getEnvLayoutDirection] == WXLayoutDirectionRTL ? @"rtl" : @"ltr",
+                                    @"theme": [self isSystemInDarkTheme] ? @"dark" : @"light"
                                 }];
     
     if ([[[UIDevice currentDevice] systemVersion] integerValue] >= 11) {

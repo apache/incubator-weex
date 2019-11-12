@@ -53,14 +53,14 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 @interface WXImageComponent ()
 {
-    NSString * _imageSrc;
-    pthread_mutex_t _imageSrcMutex;
-    pthread_mutexattr_t _propertMutexAttr;
     BOOL _shouldUpdateImage;
     BOOL _mainImageSuccess;
 }
 
+@property (atomic, strong) NSString *src;
+@property (atomic, strong) NSString *darkThemeSrc;
 @property (atomic, strong) NSString *placeholdSrc;
+@property (atomic, strong) NSString *darkThemePlaceholderSrc;
 @property (nonatomic, assign) CGFloat blurRadius;
 @property (nonatomic, assign) UIViewContentMode resizeMode;
 @property (nonatomic, assign) WXImageQuality imageQuality;
@@ -71,7 +71,7 @@ static dispatch_queue_t WXImageUpdateQueue;
 @property (nonatomic) BOOL imageLoadEvent;
 @property (nonatomic) BOOL imageDownloadFinish;
 @property (nonatomic) BOOL downloadImageWithURL;
-@property (nonatomic ,strong) NSString* preUrl;
+@property (nonatomic, strong) NSString* preUrl;
 
 @end
 
@@ -88,17 +88,15 @@ WX_EXPORT_METHOD(@selector(save:))
             WXImageUpdateQueue = dispatch_queue_create("com.taobao.weex.ImageUpdateQueue", DISPATCH_QUEUE_SERIAL);
         }
         
-        pthread_mutexattr_init(&(_propertMutexAttr));
-        pthread_mutexattr_settype(&(_propertMutexAttr), PTHREAD_MUTEX_RECURSIVE);
-        pthread_mutex_init(&(_imageSrcMutex), &(_propertMutexAttr));
-        
         if (attributes[@"src"]) {
-             pthread_mutex_lock(&(_imageSrcMutex));
-            _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-             pthread_mutex_unlock(&(_imageSrcMutex));
+            self.src = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         } else {
             WXLogWarning(@"image src is nil");
         }
+        if (attributes[@"darkThemeSrc"]) {
+            self.darkThemeSrc = [[WXConvert NSString:attributes[@"darkThemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        }
+        
         [self configPlaceHolder:attributes];
         
         NSString *resizeMode = attributes[@"resize"];
@@ -134,6 +132,9 @@ WX_EXPORT_METHOD(@selector(save:))
 {
     if (attributes[@"placeHolder"] || attributes[@"placeholder"]) {
         self.placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]?:attributes[@"placeholder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    }
+    if (attributes[@"darkThemePlaceholder"]) {
+        self.darkThemePlaceholderSrc = [[WXConvert NSString:attributes[@"darkThemePlaceholder"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     }
 }
 
@@ -258,12 +259,13 @@ WX_EXPORT_METHOD(@selector(save:))
 - (void)dealloc
 {
     [self cancelImage];
-    pthread_mutex_destroy(&(_imageSrcMutex));
-    pthread_mutexattr_destroy(&_propertMutexAttr);
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
 {
+    if (attributes[@"darkThemeSrc"]) {
+        self.darkThemeSrc = [[WXConvert NSString:attributes[@"darkThemeSrc"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    }
     if (attributes[@"src"]) {
         [self setImageSrc:[[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
     }
@@ -293,7 +295,16 @@ WX_EXPORT_METHOD(@selector(save:))
     [self _clipsToBounds];
     
     [self updateImage];
-    
+}
+
+- (void)themeDidChange:(NSString*)theme
+{
+    [super themeDidChange:theme];
+    if (_view) {
+        if (self.darkThemeSrc || self.darkThemePlaceholderSrc) {
+            [self updateImage];
+        }
+    }
 }
 
 - (BOOL)_needsDrawBorder
@@ -358,26 +369,15 @@ WX_EXPORT_METHOD(@selector(save:))
     }
 }
 
-- (NSString *)imageSrc
-{
-    pthread_mutex_lock(&(_imageSrcMutex));
-    NSString * imageSrcCpy = [_imageSrc copy];
-    pthread_mutex_unlock(&(_imageSrcMutex));
-    
-    return imageSrcCpy;
-}
-
 - (void)setImageSrc:(NSString*)src
 {
-    if ([src isEqualToString:_imageSrc]) {
+    if ([src isEqualToString:self.src]) {
         // if image src is equal to then ignore it.
         return;
     }
-    pthread_mutex_lock(&(_imageSrcMutex));
-    _imageSrc = src;
+    self.src = src;
     _imageDownloadFinish = NO;
     ((UIImageView*)self.view).image = nil;
-    pthread_mutex_unlock(&(_imageSrcMutex));
     
     [self updateImage];
 }
@@ -397,14 +397,19 @@ WX_EXPORT_METHOD(@selector(save:))
         _shouldUpdateImage = YES;
         return;
     }
+    
+    BOOL isDarkMode = [self.weexInstance isDarkTheme];
+    NSString* choosedSrc = isDarkMode ? (self.darkThemeSrc ?: self.src) : self.src;
+    NSString* choosedPlaceholder = isDarkMode ? (self.darkThemePlaceholderSrc ?: self.placeholdSrc) : self.placeholdSrc;
+    
     __weak typeof(self) weakSelf = self;
     if (_downloadImageWithURL && [[self imageLoader] respondsToSelector:@selector(setImageViewWithURL:url:placeholderImage:options:progress:completed:)]) {
         _mainImageSuccess = NO;
         
         NSString *newURL = nil;
-        if (self.placeholdSrc) {
-            newURL = [self.placeholdSrc copy];
-            WX_REWRITE_URL([self placeholdSrc], WXResourceTypeImage, self.weexInstance)
+        if (choosedPlaceholder) {
+            newURL = [choosedPlaceholder copy];
+            WX_REWRITE_URL(choosedPlaceholder, WXResourceTypeImage, self.weexInstance)
             NSDictionary* extInfo = @{@"instanceId":[self _safeInstanceId], @"pageURL": self.weexInstance.scriptURL ?: @""};
             [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:extInfo progress:nil completed:^(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL) {
                 /* We cannot rely on image library even if we call setImage with placeholer before calling setImage with real url.
@@ -414,8 +419,8 @@ WX_EXPORT_METHOD(@selector(save:))
                     UIImageView *imageView = (UIImageView *)strongSelf.view;
                     if (imageView && imageView.image == image && strongSelf->_mainImageSuccess) {
                         // reload image with main image url
-                        NSString* newURL = [[strongSelf imageSrc] copy];
-                        WX_REWRITE_URL([strongSelf imageSrc], WXResourceTypeImage, strongSelf.weexInstance)
+                        NSString* newURL = [choosedSrc copy];
+                        WX_REWRITE_URL(choosedSrc, WXResourceTypeImage, strongSelf.weexInstance)
                         NSDictionary *userInfo = @{@"imageQuality":@(strongSelf.imageQuality), @"imageSharp":@(strongSelf.imageSharp),  @"blurRadius":@(strongSelf.blurRadius), @"instanceId":[strongSelf _safeInstanceId], @"pageURL": strongSelf.weexInstance.scriptURL ?: @""};
                         [[strongSelf imageLoader] setImageViewWithURL:imageView url:[NSURL URLWithString:newURL] placeholderImage:nil options:userInfo progress:nil completed:^(UIImage *image, NSError *error, WXImageLoaderCacheType cacheType, NSURL *imageURL) {
                             WXLogInfo(@"Image re-requested because placeholder may override main image. %@", imageURL);
@@ -424,11 +429,11 @@ WX_EXPORT_METHOD(@selector(save:))
                 }
             }];
         }
-        newURL = [[self imageSrc] copy];
+        newURL = [choosedSrc copy];
         if ([newURL length] == 0) {
             return;
         }
-        WX_REWRITE_URL([self imageSrc], WXResourceTypeImage, self.weexInstance)
+        WX_REWRITE_URL(choosedSrc, WXResourceTypeImage, self.weexInstance)
         NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp),  @"blurRadius":@(self.blurRadius), @"instanceId":[self _safeInstanceId], @"pageURL": self.weexInstance.scriptURL ?: @""};
         [[self imageLoader] setImageViewWithURL:(UIImageView*)self.view url:[NSURL URLWithString:newURL] placeholderImage:nil options:userInfo progress:^(NSInteger receivedSize, NSInteger expectedSize) {
             // progress when loading image
@@ -444,9 +449,9 @@ WX_EXPORT_METHOD(@selector(save:))
                 WXLogError(@"Error downloading image: %@, detail:%@", imageURL.absoluteString, [error localizedDescription]);
                 
                 // retry set placeholder, maybe placeholer image can be downloaded
-                if (strongSelf.placeholdSrc) {
-                    NSString *newURL = [strongSelf.placeholdSrc copy];
-                    WX_REWRITE_URL([strongSelf placeholdSrc], WXResourceTypeImage, strongSelf.weexInstance)
+                if (choosedPlaceholder) {
+                    NSString *newURL = [choosedPlaceholder copy];
+                    WX_REWRITE_URL(choosedPlaceholder, WXResourceTypeImage, strongSelf.weexInstance)
                     [[strongSelf imageLoader] setImageViewWithURL:(UIImageView*)strongSelf.view
                                                               url:[NSURL URLWithString:newURL]
                                                  placeholderImage:nil
@@ -513,7 +518,7 @@ WX_EXPORT_METHOD(@selector(save:))
             [strongSelf updatePlaceHolderWithFailedBlock:downloadFailed];
             [strongSelf updateContentImageWithFailedBlock:downloadFailed];
 
-            if (!strongSelf.imageSrc && !strongSelf.placeholdSrc) {
+            if (!choosedSrc && !choosedPlaceholder) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     strongSelf.layer.contents = nil;
                     strongSelf.imageDownloadFinish = YES;
@@ -526,15 +531,16 @@ WX_EXPORT_METHOD(@selector(save:))
 
 - (void)updatePlaceHolderWithFailedBlock:(void(^)(NSString *, NSError *))downloadFailedBlock
 {
-    NSString *placeholderSrc = self.placeholdSrc;
+    BOOL isDarkMode = [self.weexInstance isDarkTheme];
+    NSString* choosedPlaceholder = isDarkMode ? (self.darkThemePlaceholderSrc ?: self.placeholdSrc) : self.placeholdSrc;
     
-    if ([WXUtility isBlankString:placeholderSrc]) {
+    if ([WXUtility isBlankString:choosedPlaceholder]) {
         return;
     }
     
-    WXLogDebug(@"Updating image, component:%@, placeholder:%@ ", self.ref, placeholderSrc);
-    NSString *newURL = [self.placeholdSrc copy];
-    WX_REWRITE_URL(self.placeholdSrc, WXResourceTypeImage, self.weexInstance)
+    WXLogDebug(@"Updating image, component:%@, placeholder:%@ ", self.ref, choosedPlaceholder);
+    NSString *newURL = [choosedPlaceholder copy];
+    WX_REWRITE_URL(choosedPlaceholder, WXResourceTypeImage, self.weexInstance)
     
     __weak typeof(self) weakSelf = self;
     self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL imageFrame:self.calculatedFrame
@@ -543,16 +549,21 @@ WX_EXPORT_METHOD(@selector(save:))
     {
         dispatch_async(dispatch_get_main_queue(), ^{
             __strong typeof(self) strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
             UIImage *viewImage = ((UIImageView *)strongSelf.view).image;
             if (error) {
-                downloadFailedBlock(placeholderSrc,error);
+                downloadFailedBlock(choosedPlaceholder, error);
                 if ([strongSelf isViewLoaded] && !viewImage) {
                     ((UIImageView *)(strongSelf.view)).image = nil;
                     [strongSelf readyToRender];
                 }
                 return;
             }
-            if (![placeholderSrc isEqualToString:strongSelf.placeholdSrc]) {
+            
+            NSString* currentPlaceholder = [strongSelf.weexInstance isDarkTheme] ? (strongSelf.darkThemePlaceholderSrc ?: strongSelf.placeholdSrc) : strongSelf.placeholdSrc;
+            if (![choosedPlaceholder isEqualToString:currentPlaceholder]) {
                 return;
             }
             
@@ -570,20 +581,25 @@ WX_EXPORT_METHOD(@selector(save:))
 
 - (void)updateContentImageWithFailedBlock:(void(^)(NSString *, NSError *))downloadFailedBlock
 {
-    NSString *imageSrc = [NSString stringWithFormat:@"%@", self.imageSrc?:@""];
-    if ([WXUtility isBlankString:imageSrc]) {
+    BOOL isDarkMode = [self.weexInstance isDarkTheme];
+    NSString* choosedSrc = isDarkMode ? (self.darkThemeSrc ?: self.src) : self.src;
+    
+    if ([WXUtility isBlankString:choosedSrc]) {
         WXLogError(@"image src is empty");
         return;
     }
     
-    WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
+    WXLogDebug(@"Updating image:%@, component:%@", choosedSrc, self.ref);
     NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius), @"instanceId":[self _safeInstanceId], @"pageURL": self.weexInstance.scriptURL ?: @""};
-    NSString * newURL = [imageSrc copy];
-    WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance)
+    NSString * newURL = [choosedSrc copy];
+    WX_REWRITE_URL(choosedSrc, WXResourceTypeImage, self.weexInstance)
     __weak typeof(self) weakSelf = self;
     weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {
         dispatch_async(dispatch_get_main_queue(), ^{
             __strong typeof(self) strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
             
             if (strongSelf.imageLoadEvent) {
                 NSMutableDictionary *sizeDict = [NSMutableDictionary new];
@@ -598,12 +614,13 @@ WX_EXPORT_METHOD(@selector(save:))
                 [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
             }
             if (error) {
-                downloadFailedBlock(imageSrc, error);
+                downloadFailedBlock(choosedSrc, error);
                 [strongSelf readyToRender];
                 return ;
             }
             
-            if (![imageSrc isEqualToString:strongSelf.imageSrc]) {
+            NSString* currentSrc = [strongSelf.weexInstance isDarkTheme] ? (strongSelf.darkThemeSrc ?: strongSelf.src) : strongSelf.src;
+            if (![choosedSrc isEqualToString:currentSrc]) {
                 return ;
             }
             

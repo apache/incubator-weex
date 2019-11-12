@@ -67,6 +67,14 @@ do {\
     }\
 } while(0);
 
+#define WX_BOARD_RADIUS_DARK_THEME_COLOR_RESET_ALL(key)\
+do {\
+    if (styles && [styles containsObject:@#key]) {\
+        _darkThemeBorderTopColor = _darkThemeBorderLeftColor = _darkThemeBorderRightColor = _darkThemeBorderBottomColor = [UIColor blackColor];\
+        [self setNeedsDisplay];\
+    }\
+} while(0);
+
 #define WX_BOARD_COLOR_RESET(key)\
 do {\
     if (styles && [styles containsObject:@#key]) {\
@@ -175,7 +183,11 @@ do {\
 - (void)_initViewPropertyWithStyles:(NSDictionary *)styles
 {
     self.styleBackgroundColor = styles[@"backgroundColor"] ? [WXConvert UIColor:styles[@"backgroundColor"]] : [UIColor clearColor];
+    if (styles[@"darkThemeBackgroundColor"]) {
+        self.darkThemeBackgroundColor = [WXConvert UIColor:styles[@"darkThemeBackgroundColor"]];
+    }
     _backgroundImage = styles[@"backgroundImage"] ? [WXConvert NSString:styles[@"backgroundImage"]]: nil;
+    _darkThemeBackgroundImage = styles[@"darkThemeBackgroundImage"] ? [WXConvert NSString:styles[@"darkThemeBackgroundImage"]] : nil;
     _opacity = styles[@"opacity"] ? [WXConvert CGFloat:styles[@"opacity"]] : 1.0;
     _clipToBounds = styles[@"overflow"] ? [WXConvert WXClipType:styles[@"overflow"]] : NO;
     _visibility = styles[@"visibility"] ? [WXConvert WXVisibility:styles[@"visibility"]] : WXVisibilityShow;
@@ -194,6 +206,9 @@ do {\
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (styles[@"backgroundColor"]) {
         self.styleBackgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
+    }
+    if (styles[@"darkThemeBackgroundColor"]) {
+        self.darkThemeBackgroundColor = [WXConvert UIColor:styles[@"darkThemeBackgroundColor"]];
     }
     if (styles[@"opacity"]) {
         _opacity = [WXConvert CGFloat:styles[@"opacity"]];
@@ -215,9 +230,21 @@ do {\
         [self setNeedsDisplay];
     }
     
+    if (styles[@"darkThemeBackgroundColor"]) {
+        self.darkThemeBackgroundColor = [WXConvert UIColor:styles[@"darkThemeBackgroundColor"]];
+        [self setNeedsDisplay];
+    }
+    
     if (styles[@"backgroundImage"]) {
-        _backgroundImage = styles[@"backgroundImage"] ? [WXConvert NSString:styles[@"backgroundImage"]]: nil;
-        if (_backgroundImage) {
+        _backgroundImage = [WXConvert NSString:styles[@"backgroundImage"]];
+    }
+    
+    if (styles[@"darkThemeBackgroundImage"]) {
+        _darkThemeBackgroundImage = [WXConvert NSString:styles[@"darkThemeBackgroundImage"]];
+    }
+    
+    if (styles[@"backgroundImage"] || styles[@"darkThemeBackgroundImage"]) {
+        if (_backgroundImage || _darkThemeBackgroundImage) {
             [self setGradientLayer];
         }
     }
@@ -302,6 +329,11 @@ do {\
     WX_BOARD_COLOR_RESET(borderLeftColor);
     WX_BOARD_COLOR_RESET(borderRightColor);
     WX_BOARD_COLOR_RESET(borderBottomColor);
+    WX_BOARD_RADIUS_DARK_THEME_COLOR_RESET_ALL(darkThemeBorderColor);
+    WX_BOARD_COLOR_RESET(darkThemeBorderTopColor);
+    WX_BOARD_COLOR_RESET(darkThemeBorderLeftColor);
+    WX_BOARD_COLOR_RESET(darkThemeBorderRightColor);
+    WX_BOARD_COLOR_RESET(darkThemeBorderBottomColor);
 }
 
 - (void)_resetStyles:(NSArray *)styles
@@ -310,6 +342,11 @@ do {\
         self.styleBackgroundColor = [UIColor clearColor];
         [self setNeedsDisplay];
     }
+    if (styles && [styles containsObject:@"darkThemeBackgroundColor"]) {
+        self.darkThemeBackgroundColor = nil;
+        [self setNeedsDisplay];
+    }
+    
     if (styles && [styles containsObject:@"boxShadow"]) {
         _lastBoxShadow = _boxShadow;
         _boxShadow = nil;
@@ -317,6 +354,11 @@ do {\
     }
     if (styles && [styles containsObject:@"backgroundImage"]) {
         _backgroundImage = nil;
+    }
+    if (styles && [styles containsObject:@"darkThemeBackgroundImage"]) {
+        _darkThemeBackgroundImage = nil;
+    }
+    if (styles && ([styles containsObject:@"backgroundImage"] || [styles containsObject:@"darkThemeBackgroundImage"])) {
         [self setGradientLayer];
     }
     

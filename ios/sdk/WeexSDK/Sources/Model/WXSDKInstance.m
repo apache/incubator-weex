@@ -51,7 +51,8 @@
 #import "WXPageEventNotifyEvent.h"
 #import "WXConvertUtility.h"
 #import "WXCoreBridge.h"
-#import <WeexSDK/WXDataRenderHandler.h>
+#import "WXDataRenderHandler.h"
+#import "WXDarkThemeProtocol.h"
 
 #define WEEX_LITE_URL_SUFFIX           @"wlasm"
 #define WEEX_RENDER_TYPE_PLATFORM       @"platform"
@@ -102,6 +103,7 @@ typedef enum : NSUInteger {
 {
     self = [super init];
     if (self) {
+        self.themeName = [WXUtility isSystemInDarkTheme] ? @"dark" : @"light";
         _renderType = renderType;
         _appearState = YES;
         
@@ -537,9 +539,6 @@ typedef enum : NSUInteger {
     }
     if (!self.userInfo[@"jsMainBundleStringContentLength"]) {
         self.userInfo[@"jsMainBundleStringContentLength"] = @([mainBundleString length]);
-    }
-    if (!self.userInfo[@"jsMainBundleStringContentLength"]) {
-        self.userInfo[@"jsMainBundleStringContentMd5"] = [WXUtility md5:mainBundleString];
     }
     
     id<WXPageEventNotifyEventProtocol> pageEvent = [WXSDKEngine handlerForProtocol:@protocol(WXPageEventNotifyEventProtocol)];
@@ -1170,6 +1169,84 @@ typedef enum : NSUInteger {
         result = [lastPageInfo copy];
     }
     return result;
+}
+
++ (id<WXDarkThemeProtocol>)darkThemeColorHandler
+{
+    static id<WXDarkThemeProtocol> colorHandler;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        colorHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDarkThemeProtocol)];
+    });
+    return colorHandler;
+}
+
+- (NSString*)currentThemeName
+{
+    return self.themeName;
+}
+
+- (BOOL)isDarkTheme
+{
+    return [self.themeName isEqualToString:@"dark"];
+}
+
+- (void)setCurrentThemeName:(NSString*)name
+{
+    if (name && ![name isEqualToString:self.themeName]) {
+        self.themeName = name;
+        
+        // Recursively visit all components and notify that theme had changed.
+        __weak WXSDKInstance* weakSelf = self;
+        WXPerformBlockOnComponentThread(^{
+            __strong WXSDKInstance* strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
+            
+            if (!strongSelf->_componentManager.isValid) {
+                return;
+            }
+            
+            [strongSelf->_componentManager enumerateComponentsUsingBlock:^(WXComponent * _Nonnull component, BOOL * _Nonnull stop) {
+                __weak WXComponent* wcomp = component;
+                WXPerformBlockOnMainThread(^{
+                    __strong WXComponent* scomp = wcomp;
+                    if (scomp) {
+                        [scomp themeDidChange:name];
+                    }
+                });
+            }];
+        });
+        
+        [[WXSDKManager bridgeMgr] fireEvent:_instanceId
+                                        ref:WX_SDK_ROOT_REF
+                                       type:@"themechanged"
+                                     params:@{@"theme": self.themeName?:@"light"}
+                                 domChanges:nil];
+    }
+}
+
+- (UIColor*)chooseColor:(UIColor*)originalColor darkThemeColor:(UIColor*)darkColor invert:(BOOL)invert scene:(WXColorScene)scene
+{
+    if ([self isDarkTheme]) {
+        if (darkColor) {
+            return darkColor;
+        }
+        else if (invert) {
+            // Invert originalColor
+            if (originalColor == [UIColor clearColor]) {
+                return originalColor;
+            }
+            return [[WXSDKInstance darkThemeColorHandler] getInvertedColorFor:originalColor ofScene:scene withDefault:originalColor];
+        }
+        else {
+            return originalColor;
+        }
+    }
+    else {
+        return originalColor;
+    }
 }
 
 @end

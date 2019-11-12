@@ -260,6 +260,7 @@ static NSThread *WXComponentThread;
     WXAssert(_rootComponent == nil, @"Create body is invoked twice.");
     
     _rootComponent = [self _buildComponent:ref type:type supercomponent:nil styles:styles attributes:attributes events:events renderObject:renderObject];
+    _rootComponent.invertForDarkTheme = YES;
     
     CGSize size = _weexInstance.frame.size;
     [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId
@@ -325,6 +326,11 @@ static NSThread *WXComponentThread;
                 component.ignoreInteraction = NO;
             }
         }
+    }
+    
+    // Not explicitly declare "invertForDarkTheme", inherit
+    if (attributes[@"invertForDarkTheme"] == nil) {
+        component.invertForDarkTheme = supercomponent.invertForDarkTheme;
     }
     
 #ifdef DEBUG

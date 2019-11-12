@@ -131,6 +131,14 @@ _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 + (void)performBlock:(void (^_Nonnull)(void))block onThread:(NSThread *_Nonnull)thread;
 
 /**
+ * @abstract Check if system is in dark mode.
+ *
+ * @return Boolean
+ *
+ */
++ (BOOL)isSystemInDarkTheme;
+
+/**
  * @abstract Returns the environment of current application, you can get some necessary properties such as appVersion、sdkVersion、appName etc.
  *
  * @return A dictionary object which contains these properties.

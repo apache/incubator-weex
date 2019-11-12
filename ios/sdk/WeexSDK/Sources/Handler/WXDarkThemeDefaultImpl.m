@@ -17,13 +17,22 @@
  * under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import "WXDarkThemeDefaultImpl.h"
 
-@protocol WXDestroyProtocol <NSObject>
+@implementation WXDarkThemeDefaultImpl
 
-/**
- *  @abstract execute unload function before dealloc
- */
-- (void)unload;
+- (void)configureView:(UIView *)view ofComponent:(WXComponent *)component
+{
+    // Nothing
+}
+
+- (UIColor *_Nullable)getInvertedColorFor:(UIColor *_Nonnull)color ofScene:(WXColorScene)scene withDefault:(UIColor *_Nullable)defaultColor
+{
+    CGFloat red, blue, green, alpha;
+    if ([color getRed:&red green:&green blue:&blue alpha:&alpha]) {
+        return [UIColor colorWithRed:1 - red green:1 - green blue:1 - blue alpha:alpha];
+    }
+    return color;
+}
 
 @end
