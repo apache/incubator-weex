@@ -50,7 +50,9 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
      *  View
      */
     UIColor *_styleBackgroundColor;
+    UIColor *_darkThemeBackgroundColor;
     NSString *_backgroundImage;
+    NSString *_darkThemeBackgroundImage;
     NSString *_clipRadius;
     WXClipType _clipToBounds;
     UIView *_view;
@@ -115,9 +117,13 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     WXThreadSafeCounter *_displayCounter;
     
     UIColor *_borderTopColor;
+    UIColor *_darkThemeBorderTopColor;
     UIColor *_borderRightColor;
+    UIColor *_darkThemeBorderRightColor;
     UIColor *_borderLeftColor;
+    UIColor *_darkThemeBorderLeftColor;
     UIColor *_borderBottomColor;
+    UIColor *_darkThemeBorderBottomColor;
     
     CGFloat _borderTopWidth;
     CGFloat _borderRightWidth;
@@ -179,6 +185,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
  DO NOT use "_backgroundColor" directly. The same reason as '_transform'.
  */
 @property (atomic, strong) UIColor* styleBackgroundColor;
+@property (atomic, strong) UIColor* darkThemeBackgroundColor;
 
 ///--------------------------------------
 /// @name Package Internal Methods

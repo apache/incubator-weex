@@ -27,6 +27,7 @@
 #import "WXImgLoaderProtocol.h"
 #import "WXComponentManager.h"
 #import "WXLog.h"
+#import "WXDarkThemeProtocol.h"
 #include <pthread/pthread.h>
 
 @interface WXRichNode : NSObject
@@ -35,7 +36,9 @@
 @property (nonatomic, strong) NSString  *ref;
 @property (nonatomic, strong) NSString  *text;
 @property (nonatomic, strong) UIColor   *color;
+@property (nonatomic, strong) UIColor   *darkThemeColor;
 @property (nonatomic, strong) UIColor   *backgroundColor;
+@property (nonatomic, strong) UIColor   *darkThemeBackgroundColor;
 @property (nonatomic, strong) NSString  *fontFamily;
 @property (nonatomic, assign) CGFloat   fontSize;
 @property (nonatomic, assign) CGFloat   fontWeight;
@@ -91,7 +94,9 @@ do {\
     id value = styles[@#key]; \
     if (value) { \
         node.key = [WXConvert type:value];\
-    } else if (!([@#key isEqualToString:@"backgroundColor"] || [@#key isEqualToString:@"textDecoration"]) && superNode.key ) { \
+    } else if (!([@#key isEqualToString:@"backgroundColor"] || \
+        [@#key isEqualToString:@"darkThemeBackgroundColor"] || \
+        [@#key isEqualToString:@"textDecoration"]) && superNode.key ) { \
         node.key = superNode.key; \
     } \
 } while(0);
@@ -190,7 +195,9 @@ do {\
 - (void)fillCSSStyles:(NSDictionary *)styles toNode:(WXRichNode *)node superNode:(WXRichNode *)superNode
 {
     WX_STYLE_FILL_RICHTEXT(color, UIColor)
+    WX_STYLE_FILL_RICHTEXT(darkThemeColor, UIColor)
     WX_STYLE_FILL_RICHTEXT(backgroundColor, UIColor)
+    WX_STYLE_FILL_RICHTEXT(darkThemeBackgroundColor, UIColor)
     WX_STYLE_FILL_RICHTEXT(fontFamily, NSString)
     WX_STYLE_FILL_RICHTEXT_PIXEL(fontSize)
     WX_STYLE_FILL_RICHTEXT(fontWeight, WXTextWeight)
@@ -421,6 +428,15 @@ do {\
     };
 }
 
+- (void)themeDidChange:(NSString*)theme
+{
+    [super themeDidChange:theme];
+    if ([self isViewLoaded]) {
+        // Force inner layout
+        [self innerLayout];
+    }
+}
+
 #pragma mark Text Building
 
 - (NSMutableAttributedString *)buildAttributeString
@@ -434,6 +450,16 @@ do {\
     NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] init];
     NSUInteger location;
     
+    BOOL invert = self.invertForDarkTheme;
+    
+    // Invert default background color.
+    UIColor* defaultTextColor = [UIColor blackColor];
+    UIColor* defaultBackgroundColor = _backgroundColor;
+    if (invert && [self.weexInstance isDarkTheme]) {
+        defaultTextColor = [[WXSDKInstance darkThemeColorHandler] getInvertedColorFor:[UIColor blackColor] ofScene:[self colorSceneType] withDefault:[UIColor blackColor]];
+        defaultBackgroundColor = [[WXSDKInstance darkThemeColorHandler] getInvertedColorFor:_backgroundColor ofScene:[self colorSceneType] withDefault:_backgroundColor];
+    }
+    
     __weak typeof(self) weakSelf = self;
     for (WXRichNode *node in array) {
         location = attrStr.length;
@@ -444,8 +470,10 @@ do {\
                 [attrStr.mutableString appendString:text];
                 
                 NSRange range = NSMakeRange(location, text.length);
-                [attrStr addAttribute:NSForegroundColorAttributeName value:node.color ?: [UIColor blackColor] range:range];
-                [attrStr addAttribute:NSBackgroundColorAttributeName value:node.backgroundColor ?: _backgroundColor range:range];
+                UIColor* textColor = [self.weexInstance chooseColor:node.color darkThemeColor:node.darkThemeColor invert:invert scene:[self colorSceneType]];
+                UIColor* bgColor = [self.weexInstance chooseColor:node.backgroundColor darkThemeColor:node.darkThemeBackgroundColor invert:invert scene:[self colorSceneType]];
+                [attrStr addAttribute:NSForegroundColorAttributeName value:textColor ?: defaultTextColor range:range];
+                [attrStr addAttribute:NSBackgroundColorAttributeName value:bgColor ?: defaultBackgroundColor range:range];
                 
                 UIFont *font = [WXUtility fontWithSize:node.fontSize textWeight:node.fontWeight textStyle:WXTextStyleNormal fontFamily:node.fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
                 if (font) {

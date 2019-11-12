@@ -28,6 +28,8 @@
 #import "UIBezierPath+Weex.h"
 #import "WXRoundedRect.h"
 #import "WXSDKInstance.h"
+#import "WXDarkThemeProtocol.h"
+#import "WXHandlerFactory.h"
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
@@ -99,6 +101,29 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
 - (void)didFinishDrawingLayer:(BOOL)success
 {
     WXAssertMainThread();
+}
+
+- (void)themeDidChange:(NSString*)theme
+{
+    WXAssertMainThread();
+    if (_view) {
+        if (![self _needsDrawBorder]) {
+            _layer.borderColor = [self.weexInstance chooseColor:_borderTopColor darkThemeColor:_darkThemeBorderTopColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor;
+            _layer.backgroundColor = [self.weexInstance chooseColor:self.styleBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor;
+        }
+        else {
+            [self setNeedsDisplay];
+        }
+        
+        if (_backgroundImage) {
+            [self setGradientLayer];
+        }
+    }
+}
+
+- (WXColorScene)colorSceneType
+{
+    return WXColorSceneUnknown;
 }
 
 #pragma mark Private
@@ -289,7 +314,7 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
 - (void)_collectCompositingDisplayBlocks:(NSMutableArray *)displayBlocks context:(CGContextRef)context isCancelled:(BOOL(^)(void))isCancelled
 {
     // TODO: compositingChild has no chance to applyPropertiesToView, need update here?
-    UIColor *backgroundColor = self.styleBackgroundColor;
+    UIColor *backgroundColor = [self.weexInstance chooseColor:self.styleBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:self.invertForDarkTheme scene:[self colorSceneType]];
     BOOL clipsToBounds = _clipToBounds;
     CGRect frame = self.calculatedFrame;
     CGRect bounds = CGRectMake(0, 0, frame.size.width, frame.size.height);
@@ -349,8 +374,9 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
     
     CGContextSetAlpha(context, _opacity);
     // fill background color
-    if (self.styleBackgroundColor && CGColorGetAlpha(self.styleBackgroundColor.CGColor) > 0) {
-        CGContextSetFillColorWithColor(context, self.styleBackgroundColor.CGColor);
+    UIColor* bgColor = [self.weexInstance chooseColor:self.styleBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:self.invertForDarkTheme scene:[self colorSceneType]];
+    if (bgColor && CGColorGetAlpha(bgColor.CGColor) > 0) {
+        CGContextSetFillColorWithColor(context, bgColor.CGColor);
         UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
         [bezierPath fill];
         WXPerformBlockOnMainThread(^{
@@ -367,7 +393,8 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
             CGContextSetLineDash(context, 0, 0, 0);
         }
         CGContextSetLineWidth(context, _borderTopWidth);
-        CGContextSetStrokeColorWithColor(context, _borderTopColor.CGColor);
+        CGContextSetStrokeColorWithColor(context,
+                                         [self.weexInstance chooseColor:_borderTopColor darkThemeColor:_darkThemeBorderTopColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor);
         CGContextAddArc(context, size.width-topRight, topRight, topRight-_borderTopWidth/2, -M_PI_4+(_borderRightWidth>0?0:M_PI_4), -M_PI_2, 1);
         CGContextMoveToPoint(context, size.width-topRight, _borderTopWidth/2);
         CGContextAddLineToPoint(context, topLeft, _borderTopWidth/2);
@@ -388,7 +415,8 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
             CGContextSetLineDash(context, 0, 0, 0);
         }
         CGContextSetLineWidth(context, _borderLeftWidth);
-        CGContextSetStrokeColorWithColor(context, _borderLeftColor.CGColor);
+        CGContextSetStrokeColorWithColor(context,
+                                         [self.weexInstance chooseColor:_borderLeftColor darkThemeColor:_darkThemeBorderLeftColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor);
         CGContextAddArc(context, topLeft, topLeft, topLeft-_borderLeftWidth/2, -M_PI, -M_PI_2-M_PI_4+(_borderTopWidth > 0?0:M_PI_4), 0);
         CGContextMoveToPoint(context, _borderLeftWidth/2, topLeft);
         CGContextAddLineToPoint(context, _borderLeftWidth/2, size.height-bottomLeft);
@@ -409,7 +437,8 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
             CGContextSetLineDash(context, 0, 0, 0);
         }
         CGContextSetLineWidth(context, _borderBottomWidth);
-        CGContextSetStrokeColorWithColor(context, _borderBottomColor.CGColor);
+        CGContextSetStrokeColorWithColor(context,
+                                         [self.weexInstance chooseColor:_borderBottomColor darkThemeColor:_darkThemeBorderBottomColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor);
         CGContextAddArc(context, bottomLeft, size.height-bottomLeft, bottomLeft-_borderBottomWidth/2, M_PI-M_PI_4+(_borderLeftWidth>0?0:M_PI_4), M_PI_2, 1);
         CGContextMoveToPoint(context, bottomLeft, size.height-_borderBottomWidth/2);
         CGContextAddLineToPoint(context, size.width-bottomRight, size.height-_borderBottomWidth/2);
@@ -430,7 +459,8 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
             CGContextSetLineDash(context, 0, 0, 0);
         }
         CGContextSetLineWidth(context, _borderRightWidth);
-        CGContextSetStrokeColorWithColor(context, _borderRightColor.CGColor);
+        CGContextSetStrokeColorWithColor(context,
+                                         [self.weexInstance chooseColor:_borderRightColor darkThemeColor:_darkThemeBorderRightColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor);
         CGContextAddArc(context, size.width-bottomRight, size.height-bottomRight, bottomRight-_borderRightWidth/2, M_PI_4+(_borderBottomWidth>0?0:M_PI_4), 0, 1);
         CGContextMoveToPoint(context, size.width-_borderRightWidth/2, size.height-bottomRight);
         CGContextAddLineToPoint(context, size.width-_borderRightWidth/2, topRight);
@@ -486,7 +516,17 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
     if (!radiusEqual) {
         return YES;
     }
-    BOOL colorEqual = [_borderTopColor isEqual:_borderRightColor] && [_borderRightColor isEqual:_borderBottomColor] && [_borderBottomColor isEqual:_borderLeftColor];
+    
+    BOOL invert = self.invertForDarkTheme;
+    WXColorScene scene = [self colorSceneType];
+    UIColor* usingBorderTopColor = [self.weexInstance chooseColor:_borderTopColor darkThemeColor:_darkThemeBorderTopColor invert:invert scene:scene];
+    UIColor* usingBorderRightColor = [self.weexInstance chooseColor:_borderRightColor darkThemeColor:_darkThemeBorderRightColor invert:invert scene:scene];
+    UIColor* usingBorderBottomColor = [self.weexInstance chooseColor:_borderBottomColor darkThemeColor:_darkThemeBorderBottomColor invert:invert scene:scene];
+    UIColor* usingBorderLeftColor = [self.weexInstance chooseColor:_borderLeftColor darkThemeColor:_darkThemeBorderLeftColor invert:invert scene:scene];
+    
+    BOOL colorEqual = [usingBorderTopColor isEqual:usingBorderRightColor] &&
+        [usingBorderRightColor isEqual:usingBorderBottomColor] &&
+        [usingBorderBottomColor isEqual:usingBorderLeftColor];
     if (!colorEqual) {
         return YES;
     }
@@ -579,6 +619,32 @@ do {\
     
     WX_CHECK_BORDER_PROP(Style, Top, Left, Bottom, Right, WXBorderStyle)
     WX_CHECK_BORDER_PROP(Color, Top, Left, Bottom, Right, UIColor)
+    do {
+        BOOL needsDisplay = NO;
+        if (styles[@"darkThemeBorderColor"]) {
+            _darkThemeBorderTopColor = _darkThemeBorderLeftColor = _darkThemeBorderRightColor = _darkThemeBorderBottomColor = [WXConvert UIColor:styles[@"darkThemeBorderColor"]];
+            needsDisplay = YES;
+        }
+        if (styles[@"darkThemeBorderTopColor"]) {
+            _darkThemeBorderTopColor = [WXConvert UIColor:styles[@"darkThemeBorderTopColor"]];
+            needsDisplay = YES;
+        }
+        if (styles[@"darkThemeBorderLeftColor"]) {
+            _darkThemeBorderLeftColor = [WXConvert UIColor:styles[@"darkThemeBorderLeftColor"]];
+            needsDisplay = YES;
+        }
+        if (styles[@"darkThemeBorderRightColor"]) {
+            _darkThemeBorderRightColor = [WXConvert UIColor:styles[@"darkThemeBorderRightColor"]];
+            needsDisplay = YES;
+        }
+        if (styles[@"darkThemeBorderBottomColor"]) {
+            _darkThemeBorderBottomColor = [WXConvert UIColor:styles[@"darkThemeBorderBottomColor"]];
+            needsDisplay = YES;
+        }
+        if (needsDisplay && updating) {
+            [self setNeedsDisplay];
+        }
+    } while (0);
     WX_CHECK_BORDER_PROP_PIXEL(Width, Top, Left, Bottom, Right)
     WX_CHECK_BORDER_PROP_PIXEL(Radius, TopLeft, TopRight, BottomLeft, BottomRight)
 
@@ -592,9 +658,9 @@ do {\
         } else if (!nowNeedsDrawBorder) {
             [self _resetNativeBorderRadius];
             _layer.borderWidth = _borderTopWidth;
-            _layer.borderColor = _borderTopColor.CGColor;
+            _layer.borderColor = [self.weexInstance chooseColor:_borderTopColor darkThemeColor:_darkThemeBorderTopColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor;
             if ((_transition.transitionOptions & WXTransitionOptionsBackgroundColor) != WXTransitionOptionsBackgroundColor ) {
-                _layer.backgroundColor = self.styleBackgroundColor.CGColor;
+                _layer.backgroundColor = [self.weexInstance chooseColor:self.styleBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:self.invertForDarkTheme scene:[self colorSceneType]].CGColor;
             }
         }
     }
@@ -606,7 +672,8 @@ do {\
     WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:rect topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
     WXRadii *radii = borderRect.radii;
     BOOL hasBorderRadius = [radii hasBorderRadius];
-    return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha(self.styleBackgroundColor.CGColor) == 1.0 && [self _needsDrawBorder];
+    UIColor* currentBgColor = [self.weexInstance chooseColor:self.styleBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:self.invertForDarkTheme scene:[self colorSceneType]];
+    return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha(currentBgColor.CGColor) == 1.0 && [self _needsDrawBorder];
 }
 
 - (CAShapeLayer *)drawBorderRadiusMaskLayer:(CGRect)rect

@@ -42,6 +42,7 @@
 #import "WXSDKInstance_performance.h"
 #import "WXComponent_performance.h"
 #import "WXCoreBridge.h"
+#import "WXDarkThemeProtocol.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -71,6 +72,7 @@ static BOOL bNeedRemoveEvents = YES;
 
 @synthesize transform = _transform;
 @synthesize styleBackgroundColor = _styleBackgroundColor;
+@synthesize darkThemeBackgroundColor = _darkThemeBackgroundColor;
 
 #pragma mark Life Cycle
 
@@ -104,6 +106,7 @@ static BOOL bNeedRemoveEvents = YES;
         _eventPenetrationEnabled = NO;
         _accessibilityHintContent = nil;
         _cancelsTouchesInView = YES;
+        _invertForDarkTheme = NO;
         
         _async = NO;
         
@@ -120,6 +123,10 @@ static BOOL bNeedRemoveEvents = YES;
             if (!_styles[@"top"] && !_styles[@"bottom"]) {
                 _styles[@"top"] = @0.0f;
             }
+        }
+        
+        if (attributes[@"invertForDarkTheme"]) {
+            _invertForDarkTheme = [WXConvert BOOL:attributes[@"invertForDarkTheme"]];
         }
         
         if (attributes[@"userInteractionEnabled"]) {
@@ -380,6 +387,10 @@ static BOOL bNeedRemoveEvents = YES;
         [self viewWillLoad];
         
         _view = [self loadView];
+        
+        // Provide a chance for dark theme handler to process the view
+        [[WXSDKInstance darkThemeColorHandler] configureView:_view ofComponent:self];
+        
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> loadView:addr-(%p),componentRef-(%@)",_view,self.ref);
 #endif
@@ -388,11 +399,19 @@ static BOOL bNeedRemoveEvents = YES;
         _view.hidden = _visibility == WXVisibilityShow ? NO : YES;
         _view.clipsToBounds = _clipToBounds;
         if (![self _needsDrawBorder]) {
-            _layer.borderColor = _borderTopColor.CGColor;
+            _layer.borderColor = [self.weexInstance chooseColor:_borderTopColor darkThemeColor:_darkThemeBorderTopColor invert:_invertForDarkTheme scene:[self colorSceneType]].CGColor;
             _layer.borderWidth = _borderTopWidth;
             [self _resetNativeBorderRadius];
             _layer.opacity = _opacity;
-            _view.backgroundColor = self.styleBackgroundColor;
+            
+            /* Also set background color to view to fix that problem that system may
+             set dynamic color to UITableView. Without these codes, event if we set
+             clear color to layer, the table view could not be transparent. */
+            UIColor* choosedColor = [self.weexInstance chooseColor:self.styleBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:_invertForDarkTheme scene:[self colorSceneType]];
+            if (choosedColor == [UIColor clearColor]) {
+                _view.backgroundColor = choosedColor;
+            }
+            _layer.backgroundColor = choosedColor.CGColor;
         }
 
         if (_backgroundImage) {
@@ -845,7 +864,11 @@ static BOOL bNeedRemoveEvents = YES;
     if (CGRectEqualToRect(self.view.frame, CGRectZero)) {
         return;
     }
-    NSDictionary * linearGradient = [WXUtility linearGradientWithBackgroundImage:_backgroundImage];
+    
+    BOOL isDark = [self.weexInstance isDarkTheme];
+    NSString* styleValue = isDark ? (_darkThemeBackgroundImage ?: _backgroundImage) : _backgroundImage;
+    
+    NSDictionary * linearGradient = [WXUtility linearGradientWithBackgroundImage:styleValue];
     if (!linearGradient) {
         return ;
     }
@@ -854,6 +877,7 @@ static BOOL bNeedRemoveEvents = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong typeof(self) strongSelf = weakSelf;
         if(strongSelf) {
+            // No need to auto-invert linear-gradient colors. We only allows using 'dark-theme-background-image' style.
             UIColor * startColor = (UIColor*)linearGradient[@"startColor"];
             UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
             CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:(WXGradientType)[linearGradient[@"gradientType"] integerValue]];

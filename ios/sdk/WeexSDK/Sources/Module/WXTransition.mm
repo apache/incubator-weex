@@ -30,6 +30,7 @@
 #import "WXAssert.h"
 #import "WXSDKInstance_private.h"
 #import "WXLength.h"
+#import "WXDarkThemeProtocol.h"
 
 @implementation WXTransitionInfo
 @end
@@ -82,6 +83,7 @@
                                                            @"bottom": @(WXTransitionOptionsBottom),
                                                            @"top": @(WXTransitionOptionsTop),
                                                            @"backgroundColor": @(WXTransitionOptionsBackgroundColor),
+                                                           @"darkThemeBackgroundColor": @(WXTransitionOptionsBackgroundColor),
                                                            @"transform": @(WXTransitionOptionsTransform),
                                                            @"opacity": @(WXTransitionOptionsOpacity)
                                                            };
@@ -106,24 +108,55 @@
     _filterStyles = _filterStyles ?:[NSMutableDictionary new];
     _oldFilterStyles = _oldFilterStyles ?: [NSMutableDictionary new];
     NSMutableDictionary *futileStyles = [NSMutableDictionary new];
+    NSDictionary* componentRawStyles = targetComponent.styles;
+    
+    BOOL isDarkTheme = [targetComponent.weexInstance isDarkTheme];
+    BOOL updatingDarkThemeBackgroundColor = styles[@"darkThemeBackgroundColor"] != nil;
     
     for (NSString *key in styles) {
         if (self.transitionOptions & [self transitionOptionsFromString:key]) {
+            if ([key isEqualToString:@"backgroundColor"]) {
+                if (isDarkTheme && (updatingDarkThemeBackgroundColor ||
+                                    componentRawStyles[@"darkThemeBackgroundColor"] != nil)) {
+                    /* Updating "darkThemeBackgroundColor" in dark mode,
+                     or this component has dark bg color explicitly defined in styels.
+                     We ignore transition animation for "backgroundColor" */
+                    [futileStyles setObject:styles[key] forKey:key];
+                    continue;
+                }
+            }
+            else if ([key isEqualToString:@"darkThemeBackgroundColor"]) {
+                if (!isDarkTheme || componentRawStyles[@"darkThemeBackgroundColor"] == nil) {
+                    /* Do not do animation for "darkThemeBackgroundColor" in light mode.
+                     Or there is no dark bg color explicitly defined in styles.
+                     */
+                    [futileStyles setObject:styles[key] forKey:key];
+                    continue;
+                }
+            }
+            
             [_filterStyles setObject:styles[key] forKey:key];
             if (![key isEqualToString:@"transform"]) {
                 if (!isRunning) {
-                    /* style value may not be in component.styles, so we must get
-                     value from layout and convert it to style value. */
-                    id styleValue = targetComponent.styles[key];
-                    if (styleValue == nil) {
+                    // Get animation 'from' value from raw styles.
+                    id styleValue = componentRawStyles[key];
+                    if ([key isEqualToString:@"backgroundColor"] ||
+                        [key isEqualToString:@"darkThemeBackgroundColor"]) {
+                        if (styleValue == nil) {
+                            // background color is transparent by default.
+                            styleValue = @"transparent";
+                        }
+                    }
+                    else if (styleValue == nil) {
+                        /* Flex styles may not be in component.styles, so we must get
+                         value from layout and convert it to style value. */
                         styleValue = [targetComponent convertLayoutValueToStyleValue:key];
                     }
                     [_oldFilterStyles setObject:styleValue forKey:key];
                 }
             }
         }
-        else
-        {
+        else {
             [futileStyles setObject:styles[key] forKey:key];
         }
     }
@@ -131,7 +164,7 @@
 
     _targetComponent = targetComponent;
     NSMutableDictionary *componentStyles = [NSMutableDictionary dictionaryWithDictionary:styles];
-    [componentStyles addEntriesFromDictionary:targetComponent.styles];
+    [componentStyles addEntriesFromDictionary:componentRawStyles];
 
     _transitionDuration = componentStyles[kWXTransitionDuration] ? [WXConvert CGFloat:componentStyles[kWXTransitionDuration]] : 0;
     _transitionDelay = componentStyles[kWXTransitionDelay] ? [WXConvert CGFloat:componentStyles[kWXTransitionDelay]] : 0;
@@ -200,10 +233,21 @@
         if (!_propertyArray) {
             _propertyArray = [NSMutableArray new];
         }
-        if ([singleProperty isEqualToString:@"backgroundColor"]) {
+        if ([singleProperty isEqualToString:@"backgroundColor"] ||
+            [singleProperty isEqualToString:@"darkThemeBackgroundColor"]) {
+            UIColor* fromColor = [WXConvert UIColor:_oldFilterStyles[singleProperty]];
+            UIColor* toColor = [WXConvert UIColor:_filterStyles[singleProperty]];
+            if ([_targetComponent.weexInstance isDarkTheme] &&
+                _targetComponent.invertForDarkTheme &&
+                [singleProperty isEqualToString:@"backgroundColor"]) {
+                // Invert color
+                fromColor = [[WXSDKInstance darkThemeColorHandler] getInvertedColorFor:fromColor ofScene:[_targetComponent colorSceneType] withDefault:fromColor];
+                toColor = [[WXSDKInstance darkThemeColorHandler] getInvertedColorFor:toColor ofScene:[_targetComponent colorSceneType] withDefault:toColor];
+            }
+            
             WXTransitionInfo *info = [WXTransitionInfo new];
-            info.fromValue = [self _dealWithColor:[WXConvert UIColor:_oldFilterStyles[singleProperty]]];
-            info.toValue = [self _dealWithColor:[WXConvert UIColor:_filterStyles[singleProperty]]];
+            info.fromValue = [self _dealWithColor:fromColor];
+            info.toValue = [self _dealWithColor:toColor];
             info.perValue = [self _calculatePerColorRGB1:info.toValue RGB2:info.fromValue];
             info.propertyName = singleProperty;
             [_propertyArray addObject:info];
@@ -337,6 +381,7 @@
                                @([info.fromValue[3] floatValue] + [info.perValue[3] floatValue] * per)];
             UIColor *color = [UIColor colorWithRed:[array[0] floatValue] green:[array[1] floatValue] blue:[array[2] floatValue] alpha:[array[3] floatValue]];
             WXPerformBlockOnMainThread(^{
+                // Here we do not need to consider about dark mode.
                 _targetComponent.view.backgroundColor = color;
                 [_targetComponent.view setNeedsDisplay];
             });
