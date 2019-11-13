@@ -389,7 +389,9 @@ static BOOL bNeedRemoveEvents = YES;
         _view = [self loadView];
         
         // Provide a chance for dark theme handler to process the view
-        [[WXSDKInstance darkThemeColorHandler] configureView:_view ofComponent:self];
+        if ([WXUtility isDarkThemeSupportEnabled]) {
+            [[WXSDKInstance darkThemeColorHandler] configureView:_view ofComponent:self];
+        }
         
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> loadView:addr-(%p),componentRef-(%@)",_view,self.ref);

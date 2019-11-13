@@ -437,6 +437,11 @@ do {\
     }
 }
 
+- (WXColorScene)colorSceneType
+{
+    return WXColorSceneText;
+}
+
 #pragma mark Text Building
 
 - (NSMutableAttributedString *)buildAttributeString
