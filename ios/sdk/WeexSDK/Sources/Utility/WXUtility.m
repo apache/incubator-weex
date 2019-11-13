@@ -43,6 +43,7 @@
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
 
 static BOOL enableRTLLayoutDirection = YES;
+static BOOL isDarkThemeSupportEnabled = YES;
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
@@ -181,6 +182,11 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 + (NSDictionary *)getEnvironment
 {
+    NSString* currentTheme = @"light";
+    if ([WXUtility isDarkThemeSupportEnabled]) {
+        currentTheme = [self isSystemInDarkTheme] ? @"dark" : @"light";
+    }
+    
     NSString *platform = @"iOS";
     NSString *sysVersion = [[UIDevice currentDevice] systemVersion] ?: @"";
     NSString *weexVersion = WX_SDK_VERSION;
@@ -204,7 +210,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
                                     @"deviceHeight":@(deviceHeight * scale),
                                     @"scale":@(scale),
                                     @"layoutDirection": [self getEnvLayoutDirection] == WXLayoutDirectionRTL ? @"rtl" : @"ltr",
-                                    @"theme": [self isSystemInDarkTheme] ? @"dark" : @"light"
+                                    @"theme": currentTheme
                                 }];
     
     if ([[[UIDevice currentDevice] systemVersion] integerValue] >= 11) {
@@ -808,6 +814,18 @@ CGFloat WXFloorPixelValue(CGFloat value)
 + (BOOL)enableRTLLayoutDirection
 {
     return enableRTLLayoutDirection;
+}
+
+#pragma mark - Dark theme
+
++ (void)setDarkThemeSupportEnable:(BOOL)value
+{
+    isDarkThemeSupportEnabled = value;
+}
+
++ (BOOL)isDarkThemeSupportEnabled
+{
+    return isDarkThemeSupportEnabled;
 }
 
 #pragma mark - get deviceID
