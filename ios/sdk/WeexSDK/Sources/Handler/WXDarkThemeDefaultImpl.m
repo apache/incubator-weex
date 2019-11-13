@@ -21,6 +21,11 @@
 
 @implementation WXDarkThemeDefaultImpl
 
+- (BOOL)defaultInvertValueForRootComponent
+{
+    return NO;
+}
+
 - (void)configureView:(UIView *)view ofComponent:(WXComponent *)component
 {
     // Nothing
