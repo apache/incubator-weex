@@ -103,7 +103,13 @@ typedef enum : NSUInteger {
 {
     self = [super init];
     if (self) {
-        self.themeName = [WXUtility isSystemInDarkTheme] ? @"dark" : @"light";
+        if ([WXUtility isDarkThemeSupportEnabled]) {
+            self.themeName = [WXUtility isSystemInDarkTheme] ? @"dark" : @"light";
+        }
+        else {
+            self.themeName = @"light";
+        }
+        
         _renderType = renderType;
         _appearState = YES;
         
@@ -604,6 +610,9 @@ typedef enum : NSUInteger {
         BOOL useMRCForInvalidJSONObject = [[configCenter configForKey:@"iOS_weex_ext_config.useMRCForInvalidJSONObject" defaultValue:@(YES) isDefault:NULL] boolValue];
         BOOL alwaysUseMRCForObjectToWeexCore = [[configCenter configForKey:@"iOS_weex_ext_config.alwaysUseMRC" defaultValue:@(NO) isDefault:NULL] boolValue];
         ConvertSwitches(isIOS13, useMRCForInvalidJSONObject, alwaysUseMRCForObjectToWeexCore);
+        
+        BOOL isDarkThemeSupportEnabled = [[configCenter configForKey:@"iOS_weex_ext_config.supportDarkTheme" defaultValue:@(YES) isDefault:NULL] boolValue];
+        [WXUtility setDarkThemeSupportEnable:isDarkThemeSupportEnabled];
     }
     else {
         BOOL isIOS13 = [[[UIDevice currentDevice] systemVersion] integerValue] == 13;
@@ -1193,6 +1202,11 @@ typedef enum : NSUInteger {
 
 - (void)setCurrentThemeName:(NSString*)name
 {
+    if (![WXUtility isDarkThemeSupportEnabled]) {
+        self.themeName = @"light";
+        return;
+    }
+    
     if (name && ![name isEqualToString:self.themeName]) {
         self.themeName = name;
         
@@ -1229,6 +1243,10 @@ typedef enum : NSUInteger {
 
 - (UIColor*)chooseColor:(UIColor*)originalColor darkThemeColor:(UIColor*)darkColor invert:(BOOL)invert scene:(WXColorScene)scene
 {
+    if (![WXUtility isDarkThemeSupportEnabled]) {
+        return originalColor;
+    }
+    
     if ([self isDarkTheme]) {
         if (darkColor) {
             return darkColor;

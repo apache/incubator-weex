@@ -510,9 +510,19 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
  */
 + (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict;
 
+/**
+*  @abstract Switch for RTL.
+*
+*/
 + (void)setEnableRTLLayoutDirection:(BOOL)value;
-
 + (BOOL)enableRTLLayoutDirection;
+
+/**
+*  @abstract Switch for dark mode support.
+*
+*/
++ (void)setDarkThemeSupportEnable:(BOOL)value;
++ (BOOL)isDarkThemeSupportEnabled;
 
 + (long) getUnixFixTimeMillis;
 
