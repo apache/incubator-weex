@@ -42,6 +42,7 @@
 #import "WXComponent_performance.h"
 #import "WXAnalyzerCenter.h"
 #import "WXDisplayLinkManager.h"
+#import "WXDarkThemeProtocol.h"
 
 static NSThread *WXComponentThread;
 
@@ -260,7 +261,12 @@ static NSThread *WXComponentThread;
     WXAssert(_rootComponent == nil, @"Create body is invoked twice.");
     
     _rootComponent = [self _buildComponent:ref type:type supercomponent:nil styles:styles attributes:attributes events:events renderObject:renderObject];
-    _rootComponent.invertForDarkTheme = YES;
+    
+    if ([WXUtility isDarkThemeSupportEnabled]) {
+        if (attributes[@"invertForDarkTheme"] == nil) {
+            _rootComponent.invertForDarkTheme = [[WXSDKInstance darkThemeColorHandler] defaultInvertValueForRootComponent];
+        }
+    }
     
     CGSize size = _weexInstance.frame.size;
     [WXCoreBridge setDefaultDimensionIntoRoot:_weexInstance.instanceId
