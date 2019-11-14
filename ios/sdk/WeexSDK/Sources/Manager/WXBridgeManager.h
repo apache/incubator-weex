@@ -45,6 +45,10 @@ extern "C" {
  **/
 @property (nonatomic, weak, readonly) WXSDKInstance *topInstance;
 
+@property (nonatomic, strong) NSMutableDictionary *lastMethodInfo;
+
++ (instancetype)sharedManager;
+
 /**
  *  Create Instance Method
  *  @param instance  :   instance id
@@ -245,6 +249,8 @@ extern "C" {
 - (void)callJSMethod:(NSString *)method args:(NSArray *)args;
 
 - (void)executeJSTaskQueue;
+
+- (void)checkJSThread;
 
 @end
 

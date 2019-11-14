@@ -20,10 +20,32 @@
 #import "WXConvertUtility.h"
 #import "WXLog.h"
 #import "WXAssert.h"
+#import "WXExceptionUtils.h"
+#import "WXSDKError.h"
+
 #include <vector>
 #include <string>
 
 static NSString* const JSONSTRING_SUFFIX = @"\t\n\t\r";
+static NSString* const OBJC_MRC_SUFFIX = @"\t\t\n\r";
+
+static BOOL bIsIOS13 = NO;
+static BOOL bUseMRCForInvalidJSONObject = NO;
+static BOOL bAlwaysUseMRC = NO;
+
+static NSString* sCurrentPage = nil;
+
+void SetConvertCurrentPage(NSString* pageId)
+{
+    sCurrentPage = pageId;
+}
+
+void ConvertSwitches(BOOL isIOS13, BOOL invalidJSONObjectUseMRC, BOOL alwaysUseMRC)
+{
+    bIsIOS13 = isIOS13;
+    bUseMRCForInvalidJSONObject = invalidJSONObjectUseMRC;
+    bAlwaysUseMRC = alwaysUseMRC;
+}
 
 #if 0
 
@@ -78,6 +100,28 @@ NSString* TO_JSON(id object)
             _detectObjectRecursion(object, nodes);
 #endif
             
+            if (bAlwaysUseMRC) {
+                return [NSString stringWithFormat:@"%p%@", (__bridge_retained void*)object, OBJC_MRC_SUFFIX];
+            }
+            
+            if (bIsIOS13) {
+                if (![NSJSONSerialization isValidJSONObject:object]) {
+                    [WXExceptionUtils commitCriticalExceptionRT:sCurrentPage
+                                                        errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_INVALID_JSON_OBJECT]
+                                                       function:@""
+                                                      exception:@"Invalid JSON object."
+                                                      extParams:nil];
+                    
+                    // Report for instance.
+                    if (bUseMRCForInvalidJSONObject) {
+                        return [NSString stringWithFormat:@"%p%@", (__bridge_retained void*)object, OBJC_MRC_SUFFIX];
+                    }
+                    else {
+                        return nil;
+                    }
+                }
+            }
+            
             NSError *error = nil;
             NSData *data = [NSJSONSerialization dataWithJSONObject:object
                                                            options:0
@@ -126,6 +170,15 @@ id TO_OBJECT(NSString* s)
             WXAssert(NO, @"Fail to convert json to object. %@", exception);
         }
     }
+    else if ([s hasSuffix:OBJC_MRC_SUFFIX]) {
+        NSScanner* scanner = [NSScanner scannerWithString:s];
+        unsigned long long address = 0;
+        [scanner scanHexLongLong:&address];
+        if (address != 0) {
+            return (__bridge_transfer id)((void*)address);
+        }
+    }
+    
     return s; // return s instead
 }
 

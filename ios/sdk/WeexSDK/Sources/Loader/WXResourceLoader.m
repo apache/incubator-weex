@@ -140,14 +140,7 @@
     WXLogDebug(@"request:%@ didReceiveResponse:%@ ", request, response);
     
     _response = response;
-    id<WXConfigCenterProtocol> configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
-    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-        BOOL isDefault;
-        BOOL clearResponseData = [[configCenter configForKey:@"iOS_weex_ext_config.clearResponseDataWhenDidReceiveResponse" defaultValue:@(NO) isDefault:&isDefault] boolValue];
-        if(clearResponseData) {
-            _data = nil;
-        }
-    }
+    _data = nil;
     
     if (self.onResponseReceived) {
         self.onResponseReceived(response);
