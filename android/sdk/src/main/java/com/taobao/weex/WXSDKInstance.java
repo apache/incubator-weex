@@ -2394,14 +2394,34 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void OnVSync() {
-    boolean forceLayout = WXBridgeManager.getInstance().notifyLayout(getInstanceId());
-    if(forceLayout) {
+    boolean fixMultiThreadBug = false;
+
+    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+    if (adapter != null) {
+      String config = adapter.getConfig("android_weex_ext_config", "fixMultiThreadBug", "true");
+      fixMultiThreadBug = Boolean.parseBoolean(config);
+    }
+
+    if(fixMultiThreadBug) {
       WXBridgeManager.getInstance().post(new Runnable() {
         @Override
         public void run() {
-          WXBridgeManager.getInstance().forceLayout(getInstanceId());
+          boolean forceLayout = WXBridgeManager.getInstance().notifyLayout(getInstanceId());
+          if(forceLayout) {
+            WXBridgeManager.getInstance().forceLayout(getInstanceId());
+          }
         }
       });
+    } else  {
+      boolean forceLayout = WXBridgeManager.getInstance().notifyLayout(getInstanceId());
+      if(forceLayout) {
+        WXBridgeManager.getInstance().post(new Runnable() {
+          @Override
+          public void run() {
+            WXBridgeManager.getInstance().forceLayout(getInstanceId());
+          }
+        });
+      }
     }
   }
 
