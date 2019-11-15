@@ -391,7 +391,7 @@ public class WXInstanceApm {
         exceptionRecord.clear();
         mUIHandler.removeCallbacks(jsPerformanceCallBack);
         onStage(KEY_PAGE_STAGES_DESTROY);
-        if (!mHasInit){
+        if (mHasInit && null != apmInstance){
             apmInstance.onEnd();
         }
         mEnd = true;
