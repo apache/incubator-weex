@@ -3473,6 +3473,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
    * @param instanceId
    * @return
    */
+  @UiThread
   public boolean notifyLayout(String instanceId) {
     if (isSkipFrameworkInit(instanceId) || isJSFrameworkInit()) {
       return mWXBridge.notifyLayout(instanceId);
@@ -3480,6 +3481,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return false;
   }
 
+  @UiThread
   public void forceLayout(String instanceId) {
     if (isSkipFrameworkInit(instanceId) || isJSFrameworkInit()) {
       mWXBridge.forceLayout(instanceId);
