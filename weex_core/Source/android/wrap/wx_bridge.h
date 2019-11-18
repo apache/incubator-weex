@@ -103,6 +103,7 @@ class WXBridge : public JNIObjectWrap {
                            const char *method, const char *arguments,
                            int arguments_length, const char *options,
                            int options_length);
+  void CallEagleTask(JNIEnv *env, const char* task, const char* options);
   base::android::ScopedLocalJavaRef<jobject> CallNativeModule(
       JNIEnv *env, const char *page_id, const char *module, const char *method,
       const char *arguments, int arguments_length, const char *options,

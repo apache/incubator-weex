@@ -256,6 +256,15 @@ namespace WeexCore {
             "PostTaskToMsgLoop is not supported anymore, please update to the latest version of Weex.");
     }
     
+#ifdef OS_ANDROID
+    void EagleBridge::WeexCoreHandler::CallEagleTask(const std::string &task, const std::string & options){
+        WeexCoreManager::Instance()
+            ->getPlatformBridge()
+            ->platform_side()
+            ->CallEagleTask(task.c_str(), options.c_str());
+    }
+#endif
+
     int EagleBridge::DataRenderHandler::DestroyInstance(const char *instanceId) {
         return WeexCoreManager::Instance()
         ->script_bridge()

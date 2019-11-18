@@ -355,6 +355,10 @@ int CoreSideInPlatform::RefreshInstance(
   std::string init_data = weex::base::to_utf8(params[1]->value.string->content,
                                               params[1]->value.string->length);
   auto handler = EagleBridge::GetInstance()->data_render_handler();
+  //DATA_RENDER_BINARY should not call ExecJS when failed.
+  if (strcmp(func,"refreshInstanceEagleOnly") == 0){
+    return handler && handler->RefreshPage(instanceId, init_data);
+  }
   if (handler && handler->RefreshPage(instanceId, init_data)) {
     std::vector<VALUE_WITH_TYPE*> msg;
 

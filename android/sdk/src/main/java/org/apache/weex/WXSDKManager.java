@@ -262,10 +262,22 @@ public class WXSDKManager {
     mBridgeManager.initScriptsFramework(framework);
   }
 
+  public void initEagleCoreEnv() {
+    mBridgeManager.initEagleCoreEnv();
+  }
+
   public void registerComponents(List<Map<String, Object>> components) {
     mBridgeManager.registerComponents(components);
   }
 
+  public void registerEagleComponents(List<Map<String, Object>> components) {
+    mBridgeManager.registerEagleComponents(components);
+  }
+
+  public void registerEagleModules(Map<String, Object> modules) {
+    mBridgeManager.registerEagleModules(modules);
+  }
+  
   public void registerModules(Map<String, Object> modules) {
     mBridgeManager.registerModules(modules);
   }

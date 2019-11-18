@@ -49,6 +49,9 @@ static jint InitFramework(JNIEnv *env, jobject jcaller,
                           jstring framework,
                           jobject params);
 
+static jint InitEagleEnv(JNIEnv* env, jobject jcaller,
+    jobject params);
+
 static void RefreshInstance(JNIEnv *env, jobject jcaller,
                             jstring instanceId,
                             jstring _namespace,
@@ -363,6 +366,32 @@ instanceId,
 
   env->CallVoidMethod(obj,
                       method_id, instanceId, ref, method, arguments, optionsData);
+  base::android::CheckException(env);
+
+}
+
+static intptr_t g_WXBridge_callEagleTask = 0;
+static void Java_WXBridge_callEagleTask(JNIEnv* env, jobject obj, jstring
+    task,
+    jstring options) {
+  /* Must call RegisterNativesImpl()  */
+  //CHECK_CLAZZ(env, obj,
+  //    WXBridge_clazz(env));
+  jmethodID method_id =
+      base::android::GetMethod(
+      env, WXBridge_clazz(env),
+      base::android::INSTANCE_METHOD,
+      "callEagleTask",
+
+"("
+"Ljava/lang/String;"
+"Ljava/lang/String;"
+")"
+"V",
+      &g_WXBridge_callEagleTask);
+
+     env->CallVoidMethod(obj,
+          method_id, task, options);
   base::android::CheckException(env);
 
 }
@@ -1155,6 +1184,11 @@ static const JNINativeMethod kMethodsWXBridge[] = {
      "Lorg/apache/weex/bridge/WXParams;"
      ")"
      "I", reinterpret_cast<void *>(InitFramework)},
+    { "nativeInitEagleEnv",
+    "("
+    "Lcom/taobao/weex/bridge/WXParams;"
+    ")"
+    "I", reinterpret_cast<void*>(InitEagleEnv) },
     {"nativeRefreshInstance",
      "("
      "Ljava/lang/String;"

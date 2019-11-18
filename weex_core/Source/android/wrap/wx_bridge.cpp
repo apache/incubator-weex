@@ -422,6 +422,73 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   return result;
 }
 
+static jint InitEagleEnv(JNIEnv* env, jobject object, jobject params) {
+  WXBridge::Instance()->Reset(env, object);
+  // Init platform thread --- ScriptThread
+//  WeexCoreManager::Instance()->InitScriptThread();
+  // Exception handler for so
+  SoUtils::RegisterExceptionHanler(
+      [](const char* status_code, const char* error_msg) {
+        WeexCoreManager::Instance()
+            ->getPlatformBridge()
+            ->platform_side()
+            ->ReportNativeInitStatus(status_code, error_msg);
+      });
+  PlatformBridge* bridge = WeexCoreManager::Instance()->getPlatformBridge();
+  // Init params
+  std::vector<INIT_FRAMEWORK_PARAMS*> params_vector = initFromParam(
+      env, params, [](const char* status_code, const char* error_msg) {
+        WeexCoreManager::Instance()
+            ->getPlatformBridge()
+            ->platform_side()
+            ->ReportNativeInitStatus(status_code, error_msg);
+      });
+  // If parse init params error, return false
+  if (params_vector.empty()) return false;
+  // Set project mode
+//  WeexCoreManager::Instance()->set_project_mode(
+//      WeexCoreManager::ProjectMode::MULTI_PROCESS);
+
+//  WeexCoreManager::Instance()->set_script_bridge(
+//      new ScriptBridgeInMultiProcess);
+
+//  // It means initialization failed when any bridge is not passable
+//  if (!WeexCoreManager::Instance()->getPlatformBridge()->is_passable() ||
+//      !WeexCoreManager::Instance()->script_bridge()->is_passable()) {
+//
+//    if(isSingleProcess()) {
+//      WeexCoreManager::Instance()->set_project_mode(
+//          WeexCoreManager::ProjectMode::MULTI_SO);
+//      WeexCoreManager::Instance()->set_script_bridge(new ScriptBridgeInMultiSo);
+//
+//      if (!WeexCoreManager::Instance()->getPlatformBridge()->is_passable() ||
+//          !WeexCoreManager::Instance()->script_bridge()->is_passable()) {
+//        return false;
+//      }
+//    }
+//  }
+
+  // for environment
+  bridge->core_side()->SetPlatform(
+      WXCoreEnvironment::getInstance()->platform());
+  bridge->core_side()->SetDeviceWidthAndHeight(
+      WXCoreEnvironment::getInstance()->DeviceWidth(),
+      WXCoreEnvironment::getInstance()->DeviceHeight());
+//  auto options = WXCoreEnvironment::getInstance()->options();
+//  auto it = options.begin();
+//  for (; it != options.end(); it++) {
+//    bridge->core_side()->AddOption(it->first, it->second);
+//  }
+  // Set measure function
+  WeexCoreManager::Instance()->set_measure_function_adapter(
+      new MeasureFunctionAdapterImplAndroid());
+  bridge->core_side()->SetMeasureFunctionAdapter();
+  freeParams(params_vector);
+  //jsc will crash in future init process for some unknown reasons if set_log_bridge
+  //WeexCoreManager::Instance()->set_log_bridge(new LogUtils());
+  return 1;
+}
+
 static void RefreshInstance(JNIEnv* env, jobject jcaller, jstring instanceId,
                             jstring _namespace, jstring _function,
                             jobjectArray args) {
@@ -1199,6 +1266,17 @@ void WXBridge::CallNativeComponent(JNIEnv* env, const char* page_id,
     Java_WXBridge_callNativeComponent(env, jni_object(), jPageId.Get(), jRef.Get(),
                                       jMethod.Get(), jArgString.Get(),
                                       jOptString.Get());
+  }
+}
+
+void WXBridge::CallEagleTask(JNIEnv* env, const char* task, const char* options) {
+  auto jTask = base::android::ScopedLocalJavaRef<jstring>(
+      env, env->NewStringUTF(task));
+  auto jOption = base::android::ScopedLocalJavaRef<jstring>(
+      env, env->NewStringUTF(options));
+
+  if (!jTask.IsNull() && !jOption.IsNull()) {
+    Java_WXBridge_callEagleTask(env, jni_object(), jTask.Get(), jOption.Get());
   }
 }
 

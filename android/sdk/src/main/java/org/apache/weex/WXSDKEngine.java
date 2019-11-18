@@ -106,6 +106,7 @@ public class WXSDKEngine implements Serializable {
   public static final String JS_FRAMEWORK_RELOAD="js_framework_reload";
   private static final String V8_SO_NAME = WXEnvironment.CORE_SO_NAME;
   private volatile static boolean mIsInit = false;
+  private volatile static boolean mIsEagleInit = false;
   private volatile static boolean mIsSoInit = false;
   private static final Object mLock = new Object();
   private static final String TAG = "WXSDKEngine";
@@ -175,6 +176,80 @@ public class WXSDKEngine implements Serializable {
       WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
       mIsInit = true;
     }
+  }
+
+  /**
+   * Init eagle related env only. skip JSFramework.
+   * @param application
+   * @param config initial configurations or null
+   */
+  public static void initializeEagle(Application application,InitConfig config){
+    synchronized (mLock) {
+      if (mIsEagleInit){
+        return;
+      }
+      if (mIsInit && !mIsEagleInit) {
+        WXSDKEagleEngine.registerEagle();
+        mIsEagleInit = true;
+        return;
+      }
+      long start = System.currentTimeMillis();
+      if(WXEnvironment.isApkDebugable(application)){
+        WXEnvironment.sLogLevel = LogLevel.DEBUG;
+      }else{
+        WXEnvironment.sLogLevel = LogLevel.WARN;
+      }
+      doInitEagleInternal(application,config);
+      WXLogUtils.renderPerformanceLog("SDKEagleInitInvokeTime", System.currentTimeMillis()-start);
+      mIsEagleInit = true;
+    }
+  }
+
+  private static void doInitEagleInternal(final Application application,final InitConfig config){
+    WXEnvironment.sApplication = application;
+    if(application == null){
+      WXLogUtils.e(TAG, " doInitInternal application is null");
+      WXExceptionUtils.commitCriticalExceptionRT(null,
+          WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
+          "doInitInternal",
+          WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorMsg() + "WXEnvironment sApplication is null",
+          null);
+    }
+
+    WXBridgeManager.getInstance().post(new Runnable() {
+      @Override
+      public void run() {
+        long start = System.currentTimeMillis();
+        WXSDKManager sm = WXSDKManager.getInstance();
+        if(config != null ) {
+          sm.setInitConfig(config);
+        }
+        WXSoInstallMgrSdk.init(application,
+            sm.getIWXSoLoaderAdapter(),
+            sm.getWXStatisticsListener());
+        final IWXUserTrackAdapter userTrackAdapter= config!=null?config.getUtAdapter():null;
+        final int version = 1;
+        mIsSoInit = WXSoInstallMgrSdk.initSo(V8_SO_NAME, version, userTrackAdapter);
+        WXSoInstallMgrSdk.copyJssRuntimeSo();
+        if(config!=null) {
+          for (String libraryName : config.getNativeLibraryList()) {
+            WXSoInstallMgrSdk.initSo(libraryName, version, userTrackAdapter);
+          }
+        }
+        if (!mIsSoInit) {
+          WXExceptionUtils.commitCriticalExceptionRT(null,
+              WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT,
+              "doInitInternal",
+              WXErrorCode.WX_KEY_EXCEPTION_SDK_INIT.getErrorMsg() + "isSoInit false",
+              null);
+          return;
+        }
+        sm.initEagleCoreEnv();
+        WXSDKEagleEngine.registerApplicationOptionsEagle(application);
+        WXLogUtils.renderPerformanceLog("SDKInitEagleExecuteTime", System.currentTimeMillis() - start);
+      }
+    });
+    WXSDKEagleEngine.registerEagle();
   }
 
   private static void registerApplicationOptions(final Application application) {

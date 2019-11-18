@@ -52,6 +52,12 @@ public interface IWXBridge extends IWXObject {
    */
   int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
 
+  /**
+   * init Eagle Only
+   *
+   * @return
+   */
+  int initEagleEnv(WXParams params);
 
   /**
    * Update InitFramework Params
@@ -124,6 +130,8 @@ public interface IWXBridge extends IWXObject {
   Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options);
 
   void callNativeComponent(String instanceId, String ref, String method, byte[] arguments, byte[] options);
+  
+  void callEagleTask(String task, String options);
 
   int callUpdateFinish(String instanceId, byte[] tasks, String callback);
 

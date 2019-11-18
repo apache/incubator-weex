@@ -111,6 +111,8 @@ namespace WeexCore {
             std::unique_ptr<ValueWithType> RegisterPluginModule(const std::string &name, const std::string &class_name, const std::string &version);
             std::unique_ptr<ValueWithType> RegisterPluginComponent(const std::string &name, const std::string &class_name, const std::string &version);
             void PostTaskOnComponentThread(const std::function<void()>& closure);
+#else
+            void CallEagleTask(const std::string &task, const std::string & options);
 #endif
         };
         
