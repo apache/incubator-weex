@@ -61,6 +61,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     WXBoxShadow *_originalBoxShadow;
     WXBoxShadow *_lastBoxShadow;
     WXBoxShadow *_boxShadow;
+    WXBoxShadow *_darkThemeBoxShadow;
     
     /**
      * accessibility support

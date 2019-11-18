@@ -196,8 +196,8 @@ do {\
     [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:styles[@"transformOrigin"]] instance:self.weexInstance] :
     [[WXTransform alloc] initWithCSSValue:nil origin:nil instance:self.weexInstance];
     _boxShadow = styles[@"boxShadow"]?[WXConvert WXBoxShadow:styles[@"boxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor]:nil;
-    if (_boxShadow) {
-        _lastBoxShadow = _boxShadow;
+    if (styles[@"darkThemeBoxShadow"]) {
+        _darkThemeBoxShadow = [WXConvert WXBoxShadow:styles[@"darkThemeBoxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
 }
 
@@ -219,9 +219,24 @@ do {\
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (styles[@"boxShadow"]) {
-        _lastBoxShadow = _boxShadow;
         _boxShadow = styles[@"boxShadow"]?[WXConvert WXBoxShadow:styles[@"boxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor]:nil;
-        [self configBoxShadow:_boxShadow];
+    }
+    if (styles[@"darkThemeBoxShadow"]) {
+        _darkThemeBoxShadow = [WXConvert WXBoxShadow:styles[@"darkThemeBoxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor];
+    }
+    if (styles[@"boxShadow"] || styles[@"darkThemeBoxShadow"]) {
+        WXBoxShadow* usingBoxShadow = nil;
+        if (_darkThemeBoxShadow && [self.weexInstance isDarkTheme]) {
+            usingBoxShadow = _darkThemeBoxShadow;
+        }
+        else {
+            usingBoxShadow = _boxShadow;
+        }
+        
+        if (usingBoxShadow) {
+            _lastBoxShadow = usingBoxShadow;
+            [self configBoxShadow:usingBoxShadow];
+        }
         [self setNeedsDisplay];
     }
     
@@ -352,6 +367,11 @@ do {\
         _boxShadow = nil;
         [self setNeedsDisplay];
     }
+    if (styles && [styles containsObject:@"darkThemeBoxShadow"]) {
+        _darkThemeBoxShadow = nil;
+        [self setNeedsDisplay];
+    }
+    
     if (styles && [styles containsObject:@"backgroundImage"]) {
         _backgroundImage = nil;
     }
