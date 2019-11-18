@@ -20,6 +20,7 @@
 #import "WXComponent+Display.h"
 #import "WXComponent.h"
 #import "WXComponent_internal.h"
+#import "WXComponent+BoxShadow.h"
 #import "WXLayer.h"
 #import "WXAssert.h"
 #import "WXUtility.h"
@@ -117,6 +118,19 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
         
         if (_backgroundImage) {
             [self setGradientLayer];
+        }
+        
+        WXBoxShadow* usingBoxShadow = nil;
+        if (_darkThemeBoxShadow && [self.weexInstance isDarkTheme]) {
+            usingBoxShadow = _darkThemeBoxShadow;
+        }
+        else {
+            usingBoxShadow = _boxShadow;
+        }
+        
+        if (usingBoxShadow) {
+            _lastBoxShadow = usingBoxShadow;
+            [self configBoxShadow:usingBoxShadow];
         }
     }
 }

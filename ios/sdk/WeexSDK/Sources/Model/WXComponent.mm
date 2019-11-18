@@ -426,8 +426,17 @@ static BOOL bNeedRemoveEvents = YES;
         
         [self _adjustForRTL];
         
-        if (_boxShadow) {
-            [self configBoxShadow:_boxShadow];
+        WXBoxShadow* usingBoxShadow = nil;
+        if (_darkThemeBoxShadow && [self.weexInstance isDarkTheme]) {
+            usingBoxShadow = _darkThemeBoxShadow;
+        }
+        else {
+            usingBoxShadow = _boxShadow;
+        }
+        
+        if (usingBoxShadow) {
+            _lastBoxShadow = usingBoxShadow;
+            [self configBoxShadow:usingBoxShadow];
         }
         
         _view.wx_component = self;
