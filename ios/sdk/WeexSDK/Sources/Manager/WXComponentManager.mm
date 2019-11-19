@@ -907,6 +907,9 @@ static NSThread *WXComponentThread;
     [self _addUITask:^{
         UIView *rootView = instance.rootView;
         [instance.performance onInstanceRenderSuccess:instance];
+        if (instance.wlasmRender) {
+            [instance.apmInstance forceSetInteractionTime:[WXUtility getUnixFixTimeMillis]];
+        }
         if (instance.renderFinish) {
             instance.renderFinish(rootView);
         }

@@ -798,7 +798,7 @@ typedef enum : NSUInteger {
 }
     
 - (BOOL)wlasmRender {
-    if ([_options[@"WLASM_RENDER"] boolValue]) {
+    if ([_options[@"WLASM_RENDER"] boolValue] || [_scriptURL.pathExtension isEqualToString:@"wlasm"] || [_scriptURL.pathExtension isEqualToString:@"wlm"]) {
         return YES;
     }
     return NO;
