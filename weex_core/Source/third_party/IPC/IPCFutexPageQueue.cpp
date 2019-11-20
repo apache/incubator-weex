@@ -63,6 +63,7 @@ IPCFutexPageQueue::~IPCFutexPageQueue()
     } catch (IPCException& e) {
         IPC_LOGE("%s", e.msg());
     }
+    IPC_LOGE("do munmap")
     munmap(m_sharedMemory, m_pageSize << 2);
 }
 

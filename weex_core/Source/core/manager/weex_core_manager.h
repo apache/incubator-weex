@@ -72,6 +72,9 @@ class WeexCoreManager {
 
   inline weex::base::Thread *script_thread() { return script_thread_; }
 
+  inline bool do_release_map() { return release_map_; }
+  inline void set_release_map(bool release) {  release_map_ = release; }
+
   IPCFutexPageQueue* client_queue_;
   IPCFutexPageQueue* server_queue_;
 
@@ -81,6 +84,7 @@ class WeexCoreManager {
   ScriptBridge *script_bridge_;
   ProjectMode project_mode_;
   weex::base::Thread *script_thread_;
+  volatile bool release_map_;
 
   WeexCoreManager()
       : platform_bridge_(nullptr),
@@ -89,7 +93,8 @@ class WeexCoreManager {
         project_mode_(COMMON),
         script_thread_(nullptr),
         client_queue_(nullptr),
-        server_queue_(nullptr){};
+        server_queue_(nullptr),
+        release_map_(false){};
   ~WeexCoreManager(){};
 };
 }  // namespace WeexCore

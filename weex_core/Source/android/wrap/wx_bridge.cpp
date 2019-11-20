@@ -358,8 +358,16 @@ static jint InitFramework(JNIEnv* env, jobject object, jstring script,
   WeexCoreManager::Instance()->set_project_mode(
           WeexCoreManager::ProjectMode::MULTI_PROCESS);
 
+
+  ScriptBridge* pre_script_bridge  =  WeexCoreManager::Instance()->script_bridge();
+
   WeexCoreManager::Instance()->set_script_bridge(
           new ScriptBridgeInMultiProcess);
+
+  if (nullptr != pre_script_bridge && WeexCoreManager::Instance()->do_release_map()){
+    delete pre_script_bridge;
+    pre_script_bridge = nullptr;
+  }
 
   // It means initialization failed when any bridge is not passable
   if (!WeexCoreManager::Instance()->getPlatformBridge()->is_passable() ||

@@ -19,6 +19,8 @@
 package org.apache.weex.bridge;
 
 import org.apache.weex.WXEnvironment;
+import org.apache.weex.WXSDKManager;
+import org.apache.weex.adapter.IWXConfigAdapter;
 import org.apache.weex.base.CalledByNative;
 import org.apache.weex.utils.WXLogUtils;
 
@@ -142,6 +144,16 @@ public class WXParams implements Serializable {
     return deviceWidth;
   }
 
+  @CalledByNative
+  public boolean getReleaseMap() {
+    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+    if (null == adapter){
+      return false;
+    }
+    String doRelease = adapter.getConfigWhenInit("wxapm","release_map","true");
+    WXLogUtils.e("getReleaseMap:"+doRelease);
+    return "true".equalsIgnoreCase(doRelease);
+  }
 
   /**
    * Device should not be set manually, instead it suppose to represent the width of device and
