@@ -1239,7 +1239,7 @@ typedef enum : NSUInteger {
         
         [[WXSDKManager bridgeMgr] fireEvent:_instanceId
                                         ref:WX_SDK_ROOT_REF
-                                       type:@"themechanged"
+                                       type:@"themechange"
                                      params:@{@"theme": self.themeName?:@"light"}
                                  domChanges:nil];
     }
