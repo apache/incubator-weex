@@ -124,6 +124,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private FrameLayout mScrollerView;
 
   private int mContentHeight = 0;
+  private int mContentWidth = 0;
 
   private WXStickyHelper stickyHelper;
   private Handler handler=new Handler(Looper.getMainLooper());
@@ -478,6 +479,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         @Override
         public void onScrollChanged(WXHorizontalScrollView scrollView, int x, int y, int oldx, int oldy) {
           procAppear(x,y,oldx,oldy);
+          onLoadMore(scrollView,x,y);
         }
       });
       FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
@@ -970,7 +972,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    * @param x the X direction
    * @param y the Y direction
    */
-  protected void onLoadMore(WXScrollView scrollView, int x, int y) {
+  protected void onLoadMore(FrameLayout scrollView, int x, int y) {
     try {
       String offset = getAttrs().getLoadMoreOffset();
       if (TextUtils.isEmpty(offset)) {
@@ -978,17 +980,27 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       }
       int offsetInt = (int)WXViewUtils.getRealPxByWidth(Float.parseFloat(offset), getInstance().getInstanceViewPortWidth());
 
-      int contentH = scrollView.getChildAt(0).getHeight();
-      int scrollerH = scrollView.getHeight();
-      int offScreenY = contentH - y - scrollerH;
-      if (offScreenY < offsetInt) {
-        if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils.d("[WXScroller-onScroll] offScreenY :" + offScreenY);
-        }
-        if (mContentHeight != contentH || mForceLoadmoreNextTime) {
+      if (scrollView instanceof WXHorizontalScrollView){
+        int contentWidth = scrollView.getChildAt(0).getWidth();
+        int offScreenX =  contentWidth-x-scrollView.getWidth();
+        if (offScreenX < offsetInt && (mContentWidth != contentWidth || mForceLoadmoreNextTime)){
           fireEvent(Constants.Event.LOADMORE);
-          mContentHeight = contentH;
+          mContentWidth=contentWidth;
           mForceLoadmoreNextTime = false;
+        }
+      }else {
+        int contentH = scrollView.getChildAt(0).getHeight();
+        int scrollerH = scrollView.getHeight();
+        int offScreenY = contentH - y - scrollerH;
+        if (offScreenY < offsetInt) {
+          if (WXEnvironment.isApkDebugable()) {
+            WXLogUtils.d("[WXScroller-onScroll] offScreenY :" + offScreenY);
+          }
+          if (mContentHeight != contentH || mForceLoadmoreNextTime) {
+            fireEvent(Constants.Event.LOADMORE);
+            mContentHeight = contentH;
+            mForceLoadmoreNextTime = false;
+          }
         }
       }
     } catch (Exception e) {
