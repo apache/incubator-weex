@@ -1210,6 +1210,10 @@ typedef enum : NSUInteger {
     if (name && ![name isEqualToString:self.themeName]) {
         self.themeName = name;
         
+        if (self.isCustomRenderType) {
+            return;
+        }
+        
         // Recursively visit all components and notify that theme had changed.
         __weak WXSDKInstance* weakSelf = self;
         WXPerformBlockOnComponentThread(^{
