@@ -37,8 +37,10 @@
 @property (nonatomic, strong) NSString  *text;
 @property (nonatomic, strong) UIColor   *color;
 @property (nonatomic, strong) UIColor   *darkThemeColor;
+@property (nonatomic, strong) UIColor   *lightThemeColor;
 @property (nonatomic, strong) UIColor   *backgroundColor;
 @property (nonatomic, strong) UIColor   *darkThemeBackgroundColor;
+@property (nonatomic, strong) UIColor   *lightThemeBackgroundColor;
 @property (nonatomic, strong) NSString  *fontFamily;
 @property (nonatomic, assign) CGFloat   fontSize;
 @property (nonatomic, assign) CGFloat   fontWeight;
@@ -196,8 +198,10 @@ do {\
 {
     WX_STYLE_FILL_RICHTEXT(color, UIColor)
     WX_STYLE_FILL_RICHTEXT(darkThemeColor, UIColor)
+    WX_STYLE_FILL_RICHTEXT(lightThemeColor, UIColor)
     WX_STYLE_FILL_RICHTEXT(backgroundColor, UIColor)
     WX_STYLE_FILL_RICHTEXT(darkThemeBackgroundColor, UIColor)
+    WX_STYLE_FILL_RICHTEXT(lightThemeBackgroundColor, UIColor)
     WX_STYLE_FILL_RICHTEXT(fontFamily, NSString)
     WX_STYLE_FILL_RICHTEXT_PIXEL(fontSize)
     WX_STYLE_FILL_RICHTEXT(fontWeight, WXTextWeight)
@@ -475,8 +479,8 @@ do {\
                 [attrStr.mutableString appendString:text];
                 
                 NSRange range = NSMakeRange(location, text.length);
-                UIColor* textColor = [self.weexInstance chooseColor:node.color darkThemeColor:node.darkThemeColor invert:invert scene:[self colorSceneType]];
-                UIColor* bgColor = [self.weexInstance chooseColor:node.backgroundColor darkThemeColor:node.darkThemeBackgroundColor invert:invert scene:[self colorSceneType]];
+                UIColor* textColor = [self.weexInstance chooseColor:node.color lightThemeColor:node.lightThemeColor darkThemeColor:node.darkThemeColor invert:invert scene:[self colorSceneType]];
+                UIColor* bgColor = [self.weexInstance chooseColor:node.backgroundColor lightThemeColor:node.lightThemeBackgroundColor darkThemeColor:node.darkThemeBackgroundColor invert:invert scene:[self colorSceneType]];
                 [attrStr addAttribute:NSForegroundColorAttributeName value:textColor ?: defaultTextColor range:range];
                 [attrStr addAttribute:NSBackgroundColorAttributeName value:bgColor ?: defaultBackgroundColor range:range];
                 

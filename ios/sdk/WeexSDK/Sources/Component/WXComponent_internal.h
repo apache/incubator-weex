@@ -51,8 +51,10 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
      */
     UIColor *_styleBackgroundColor;
     UIColor *_darkThemeBackgroundColor;
+    UIColor *_lightThemeBackgroundColor;
     NSString *_backgroundImage;
     NSString *_darkThemeBackgroundImage;
+    NSString *_lightThemeBackgroundImage;
     NSString *_clipRadius;
     WXClipType _clipToBounds;
     UIView *_view;
@@ -62,6 +64,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     WXBoxShadow *_lastBoxShadow;
     WXBoxShadow *_boxShadow;
     WXBoxShadow *_darkThemeBoxShadow;
+    WXBoxShadow *_lightThemeBoxShadow;
     
     /**
      * accessibility support
@@ -119,12 +122,16 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
     
     UIColor *_borderTopColor;
     UIColor *_darkThemeBorderTopColor;
+    UIColor *_lightThemeBorderTopColor;
     UIColor *_borderRightColor;
     UIColor *_darkThemeBorderRightColor;
+    UIColor *_lightThemeBorderRightColor;
     UIColor *_borderLeftColor;
     UIColor *_darkThemeBorderLeftColor;
+    UIColor *_lightThemeBorderLeftColor;
     UIColor *_borderBottomColor;
     UIColor *_darkThemeBorderBottomColor;
+    UIColor *_lightThemeBorderBottomColor;
     
     CGFloat _borderTopWidth;
     CGFloat _borderRightWidth;
@@ -187,6 +194,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
  */
 @property (atomic, strong) UIColor* styleBackgroundColor;
 @property (atomic, strong) UIColor* darkThemeBackgroundColor;
+@property (atomic, strong) UIColor* lightThemeBackgroundColor;
 
 ///--------------------------------------
 /// @name Package Internal Methods
@@ -308,5 +316,7 @@ typedef id (^WXDataBindingBlock)(NSDictionary *data, BOOL *needUpdate);
 - (void)_adjustForRTL;
 
 - (BOOL)_isAffineTypeAs:(NSString *)type;
+
+- (WXBoxShadow*)_chooseBoxShadow;
 
 @end

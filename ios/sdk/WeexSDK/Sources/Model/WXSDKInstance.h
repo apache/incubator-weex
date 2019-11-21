@@ -473,7 +473,11 @@ typedef enum : NSUInteger {
  Choose final color between original color and dark-mode one.
  Also considering invert.
  */
-- (UIColor*)chooseColor:(UIColor*)originalColor darkThemeColor:(UIColor*)darkColor invert:(BOOL)invert scene:(WXColorScene)scene;
+- (UIColor*)chooseColor:(UIColor*)originalColor
+        lightThemeColor:(UIColor*)lightColor
+         darkThemeColor:(UIColor*)darkColor
+                 invert:(BOOL)invert
+                  scene:(WXColorScene)scene;
 
 /** 
  * Deprecated 

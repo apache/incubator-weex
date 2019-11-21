@@ -212,6 +212,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     
     BOOL isDarkTheme = [target.weexInstance isDarkTheme];
     BOOL updatingDarkThemeBackgroundColor = styles[@"darkThemeBackgroundColor"] != nil;
+    BOOL updatingLightThemeBackgroundColor = styles[@"lightThemeBackgroundColor"] != nil;
     
     for (NSString *property in styles) {
         if ([property isEqualToString:@"backgroundColor"]) {
@@ -222,12 +223,21 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                  We ignore transition animation for "backgroundColor" */
                 continue;
             }
+            else if (!isDarkTheme && (updatingLightThemeBackgroundColor ||
+                                      componentRawStyles[@"lightThemeBackgroundColor"] != nil)) {
+                continue;
+            }
         }
         else if ([property isEqualToString:@"darkThemeBackgroundColor"]) {
             if (!isDarkTheme || componentRawStyles[@"darkThemeBackgroundColor"] == nil) {
                 /* Do not do animation for "darkThemeBackgroundColor" in light mode.
                  Or there is no dark bg color explicitly defined in styles.
                  */
+                continue;
+            }
+        }
+        else if ([property isEqualToString:@"lightThemeBackgroundColor"]){
+            if (isDarkTheme || componentRawStyles[@"lightThemeBackgroundColor"] == nil) {
                 continue;
             }
         }
@@ -312,7 +322,8 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             }
             target.transform = wxTransform;
         } else if ([property isEqualToString:@"backgroundColor"] ||
-                   [property isEqualToString:@"darkThemeBackgroundColor"]) {
+                   [property isEqualToString:@"darkThemeBackgroundColor"] ||
+                   [property isEqualToString:@"lightThemeBackgroundColor"]) {
             info.propertyName = @"backgroundColor";
             info.fromValue = (__bridge id)(layer.backgroundColor);
             UIColor* toColor = [WXConvert UIColor:value];

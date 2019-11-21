@@ -73,6 +73,7 @@ static BOOL bNeedRemoveEvents = YES;
 @synthesize transform = _transform;
 @synthesize styleBackgroundColor = _styleBackgroundColor;
 @synthesize darkThemeBackgroundColor = _darkThemeBackgroundColor;
+@synthesize lightThemeBackgroundColor = _lightThemeBackgroundColor;
 
 #pragma mark Life Cycle
 
@@ -401,7 +402,7 @@ static BOOL bNeedRemoveEvents = YES;
         _view.hidden = _visibility == WXVisibilityShow ? NO : YES;
         _view.clipsToBounds = _clipToBounds;
         if (![self _needsDrawBorder]) {
-            _layer.borderColor = [self.weexInstance chooseColor:_borderTopColor darkThemeColor:_darkThemeBorderTopColor invert:_invertForDarkTheme scene:[self colorSceneType]].CGColor;
+            _layer.borderColor = [self.weexInstance chooseColor:_borderTopColor lightThemeColor:_lightThemeBorderTopColor darkThemeColor:_darkThemeBorderTopColor invert:_invertForDarkTheme scene:[self colorSceneType]].CGColor;
             _layer.borderWidth = _borderTopWidth;
             [self _resetNativeBorderRadius];
             _layer.opacity = _opacity;
@@ -409,7 +410,7 @@ static BOOL bNeedRemoveEvents = YES;
             /* Also set background color to view to fix that problem that system may
              set dynamic color to UITableView. Without these codes, event if we set
              clear color to layer, the table view could not be transparent. */
-            UIColor* choosedColor = [self.weexInstance chooseColor:self.styleBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:_invertForDarkTheme scene:[self colorSceneType]];
+            UIColor* choosedColor = [self.weexInstance chooseColor:self.styleBackgroundColor lightThemeColor:self.lightThemeBackgroundColor darkThemeColor:self.darkThemeBackgroundColor invert:_invertForDarkTheme scene:[self colorSceneType]];
             if (choosedColor == [UIColor clearColor]) {
                 _view.backgroundColor = choosedColor;
             }
@@ -426,14 +427,7 @@ static BOOL bNeedRemoveEvents = YES;
         
         [self _adjustForRTL];
         
-        WXBoxShadow* usingBoxShadow = nil;
-        if (_darkThemeBoxShadow && [self.weexInstance isDarkTheme]) {
-            usingBoxShadow = _darkThemeBoxShadow;
-        }
-        else {
-            usingBoxShadow = _boxShadow;
-        }
-        
+        WXBoxShadow* usingBoxShadow = [self _chooseBoxShadow];        
         if (usingBoxShadow) {
             _lastBoxShadow = usingBoxShadow;
             [self configBoxShadow:usingBoxShadow];
@@ -876,8 +870,22 @@ static BOOL bNeedRemoveEvents = YES;
         return;
     }
     
+    NSString* styleValue = nil;
     BOOL isDark = [self.weexInstance isDarkTheme];
-    NSString* styleValue = isDark ? (_darkThemeBackgroundImage ?: _backgroundImage) : _backgroundImage;
+    if (isDark) {
+        if (_darkThemeBackgroundImage) {
+            styleValue = _darkThemeBackgroundImage;
+        }
+        else {
+            styleValue = _backgroundImage;
+        }
+    }
+    else if (_lightThemeBackgroundImage) {
+        styleValue = _lightThemeBackgroundImage;
+    }
+    else {
+        styleValue = _backgroundImage;
+    }
     
     NSDictionary * linearGradient = [WXUtility linearGradientWithBackgroundImage:styleValue];
     if (!linearGradient) {
